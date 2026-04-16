@@ -468,8 +468,8 @@
     if (!state.nodes.length) {
       return ui.renderEmptyState({
         icon: '\uD83C\uDF33',
-        title: { vi: 'Khong co du lieu do thi', en: 'No graph data' },
-        desc: { vi: 'Thu tra cuu mot ma lo khac', en: 'Try looking up a different lot ID' }
+        title: { vi: 'Không có dữ liệu đồ thị', en: 'No graph data' },
+        desc: { vi: 'Thử tra cứu một mã lô khác', en: 'Try looking up a different lot ID' }
       });
     }
 
@@ -648,12 +648,12 @@
       // Determine direction relative to root
       var direction = '—';
       if (state.selectedNodeId) {
-        if (n.id === state.selectedNodeId) direction = T({ vi: 'Goc', en: 'Root' });
+        if (n.id === state.selectedNodeId) direction = T({ vi: 'Gốc', en: 'Root' });
         else {
           var rootLevel = getNodeLevel(state.selectedNodeId);
           var nodeLevel = getNodeLevel(n.id);
-          if (nodeLevel < rootLevel) direction = T({ vi: 'Nguoc dong', en: 'Upstream' });
-          else if (nodeLevel > rootLevel) direction = T({ vi: 'Xuoi dong', en: 'Downstream' });
+          if (nodeLevel < rootLevel) direction = T({ vi: 'Ngược dòng', en: 'Upstream' });
+          else if (nodeLevel > rootLevel) direction = T({ vi: 'Xuôi dòng', en: 'Downstream' });
         }
       }
       return {
@@ -670,14 +670,14 @@
     });
 
     var columns = [
-      { key: 'level',          label: { vi: 'Cap',            en: 'Level' },           type: 'number', sortable: true },
-      { key: 'direction',      label: { vi: 'Huong',          en: 'Direction' } },
-      { key: 'type',           label: { vi: 'Loai',           en: 'Type' },            type: 'badge' },
-      { key: 'identifier',     label: { vi: 'Ma dinh danh',   en: 'ID' },              type: 'id', sortable: true },
-      { key: 'name',           label: { vi: 'Ten',            en: 'Name' },            sortable: true },
-      { key: 'quantity',       label: { vi: 'So luong',       en: 'Qty' },             type: 'number' },
-      { key: 'date',           label: { vi: 'Ngay',           en: 'Date' },            type: 'date', sortable: true },
-      { key: 'quality_status', label: { vi: 'Trang thai CL',  en: 'Quality Status' },  type: 'badge' }
+      { key: 'level',          label: { vi: 'Cấp',            en: 'Level' },           type: 'number', sortable: true },
+      { key: 'direction',      label: { vi: 'Hướng',          en: 'Direction' } },
+      { key: 'type',           label: { vi: 'Loại',           en: 'Type' },            type: 'badge' },
+      { key: 'identifier',     label: { vi: 'Mã định danh',   en: 'ID' },              type: 'id', sortable: true },
+      { key: 'name',           label: { vi: 'Tên',            en: 'Name' },            sortable: true },
+      { key: 'quantity',       label: { vi: 'Số lượng',       en: 'Qty' },             type: 'number' },
+      { key: 'date',           label: { vi: 'Ngày',           en: 'Date' },            type: 'date', sortable: true },
+      { key: 'quality_status', label: { vi: 'Trạng thái CL',  en: 'Quality Status' },  type: 'badge' }
     ];
 
     return ui.renderDataGrid(columns, rows, { selectable: false });
@@ -713,7 +713,7 @@
   function renderNodeDetailPanel() {
     var node = state.selectedNode;
     if (!node) {
-      return ui.renderEmptyState({ icon: '\uD83D\uDC49', title: { vi: 'Chon mot nut de xem chi tiet', en: 'Select a node to view details' } });
+      return ui.renderEmptyState({ icon: '\uD83D\uDC49', title: { vi: 'Chọn một nút để xem chi tiết', en: 'Select a node to view details' } });
     }
 
     var detail = state.nodeDetail || node;
@@ -730,29 +730,29 @@
     // Action buttons for expand
     html += '<div style="display:flex;gap:6px;margin-bottom:12px">';
     html += '<button class="eqms-btn secondary sm" data-action="expand-upstream" data-id="' + esc(node.id) + '">';
-    html += '\u2B06 ' + T({ vi: 'Mo rong nguoc', en: 'Upstream' });
+    html += '\u2B06 ' + T({ vi: 'Mở rộng ngược', en: 'Upstream' });
     html += '</button>';
     html += '<button class="eqms-btn secondary sm" data-action="expand-downstream" data-id="' + esc(node.id) + '">';
-    html += '\u2B07 ' + T({ vi: 'Mo rong xuoi', en: 'Downstream' });
+    html += '\u2B07 ' + T({ vi: 'Mở rộng xuôi', en: 'Downstream' });
     html += '</button>';
     html += '</div>';
 
     // Node fields
     html += ui.renderFieldGrid([
-      { label: { vi: 'Ma dinh danh',      en: 'Identifier' },      value: detail.identifier || detail.id,   mono: true },
-      { label: { vi: 'Ten',               en: 'Name' },            value: detail.name },
-      { label: { vi: 'Loai',              en: 'Type' },            value: T(typeInfo.label) || detail.type,  badge: true },
-      { label: { vi: 'Trang thai CL',     en: 'Quality Status' },  value: detail.quality_status,            badge: true },
-      { label: { vi: 'So luong',          en: 'Quantity' },        value: detail.quantity },
-      { label: { vi: 'Don vi tinh',       en: 'UOM' },             value: detail.uom },
-      { label: { vi: 'Ma lo',             en: 'Lot/Batch' },       value: detail.lot_number,                mono: true },
-      { label: { vi: 'Serial',            en: 'Serial' },          value: detail.serial_number,             mono: true },
-      { label: { vi: 'Ngay san xuat',     en: 'Production Date' }, value: fmtDate(detail.production_date) },
-      { label: { vi: 'Ngay het han',      en: 'Expiry Date' },     value: fmtDate(detail.expiry_date) },
-      { label: { vi: 'Nha cung cap',      en: 'Supplier' },        value: detail.supplier_name },
-      { label: { vi: 'Khach hang',        en: 'Customer' },        value: detail.customer_name },
-      { label: { vi: 'Vi tri',            en: 'Location' },        value: detail.location },
-      { label: { vi: 'Lenh san xuat',     en: 'Work Order' },      value: detail.work_order_id,             mono: true }
+      { label: { vi: 'Mã định danh',      en: 'Identifier' },      value: detail.identifier || detail.id,   mono: true },
+      { label: { vi: 'Tên',               en: 'Name' },            value: detail.name },
+      { label: { vi: 'Loại',              en: 'Type' },            value: T(typeInfo.label) || detail.type,  badge: true },
+      { label: { vi: 'Trạng thái CL',     en: 'Quality Status' },  value: detail.quality_status,            badge: true },
+      { label: { vi: 'Số lượng',          en: 'Quantity' },        value: detail.quantity },
+      { label: { vi: 'Đơn vị tính',       en: 'UOM' },             value: detail.uom },
+      { label: { vi: 'Mã lô',             en: 'Lot/Batch' },       value: detail.lot_number,                mono: true },
+      { label: { vi: 'Số sê-ri',          en: 'Serial' },          value: detail.serial_number,             mono: true },
+      { label: { vi: 'Ngày sản xuất',     en: 'Production Date' }, value: fmtDate(detail.production_date) },
+      { label: { vi: 'Ngày hết hạn',      en: 'Expiry Date' },     value: fmtDate(detail.expiry_date) },
+      { label: { vi: 'Nhà cung cấp',      en: 'Supplier' },        value: detail.supplier_name },
+      { label: { vi: 'Khách hàng',        en: 'Customer' },        value: detail.customer_name },
+      { label: { vi: 'Vị trí',            en: 'Location' },        value: detail.location },
+      { label: { vi: 'Lệnh sản xuất',     en: 'Work Order' },      value: detail.work_order_id,             mono: true }
     ]);
 
     html += '</div></div>';
@@ -767,15 +767,15 @@
     var records = state.linkedRecords;
     var html = '<div class="eqms-section">';
     html += '<div class="eqms-section-header">';
-    html += '<span>' + T({ vi: 'Ban ghi chat luong lien ket', en: 'Linked Quality Records' }) + '</span>';
+    html += '<span>' + T({ vi: 'Bản ghi chất lượng liên kết', en: 'Linked Quality Records' }) + '</span>';
     html += '</div>';
     html += '<div class="eqms-section-body">';
 
     if (!records || records.length === 0) {
       html += ui.renderEmptyState({
         icon: '\uD83D\uDD17',
-        title: { vi: 'Khong co ban ghi lien ket', en: 'No linked records' },
-        desc: { vi: 'Khong co NCR, CAPA, sai lech, khieu nai hoac giai phong lo nao', en: 'No NCRs, CAPAs, deviations, complaints, or batch releases found' }
+        title: { vi: 'Không có bản ghi liên kết', en: 'No linked records' },
+        desc: { vi: 'Không có NCR, CAPA, sai lệch, khiếu nại hoặc giải phóng lô nào', en: 'No NCRs, CAPAs, deviations, complaints, or batch releases found' }
       });
     } else {
       // Group by type
@@ -789,10 +789,10 @@
       var typeLabels = {
         ncr:            { vi: 'NCR',            en: 'NCR' },
         capa:           { vi: 'CAPA',           en: 'CAPA' },
-        deviation:      { vi: 'Sai lech',       en: 'Deviation' },
-        complaint:      { vi: 'Khieu nai',      en: 'Complaint' },
-        batch_release:  { vi: 'Giai phong lo',  en: 'Batch Release' },
-        other:          { vi: 'Khac',           en: 'Other' }
+        deviation:      { vi: 'Sai lệch',       en: 'Deviation' },
+        complaint:      { vi: 'Khiếu nại',      en: 'Complaint' },
+        batch_release:  { vi: 'Giải phóng lô',  en: 'Batch Release' },
+        other:          { vi: 'Khác',           en: 'Other' }
       };
 
       Object.keys(grouped).forEach(function(type) {
@@ -821,7 +821,7 @@
   // SCREEN: ANALYTICS
   // =========================================================================
   function renderAnalytics() {
-    if (state.loading) return ui.renderLoadingState({ vi: 'Dang tai phan tich...', en: 'Loading analytics...' });
+    if (state.loading) return ui.renderLoadingState({ vi: 'Đang tải phân tích...', en: 'Loading analytics...' });
     if (state.error) return ui.renderErrorState(state.error, 'retry-analytics');
 
     var m = state.metrics || {};
@@ -829,31 +829,31 @@
 
     // Back
     html += '<button class="eqms-btn ghost sm" data-action="go-search" style="margin-bottom:8px">';
-    html += '\u2190 ' + T({ vi: 'Quay lai tim kiem', en: 'Back to search' });
+    html += '\u2190 ' + T({ vi: 'Quay lại tìm kiếm', en: 'Back to search' });
     html += '</button>';
 
     html += '<h2 style="margin:0 0 16px;font-size:18px;font-weight:600">';
-    html += T({ vi: 'Phan tich truy xuat nguon goc', en: 'Genealogy Analytics' });
+    html += T({ vi: 'Phân tích truy xuất nguồn gốc', en: 'Genealogy Analytics' });
     html += '</h2>';
 
     // KPIs
     html += ui.renderKpiRow([
-      { label: { vi: 'Tong truy xuat',         en: 'Total Traces' },          value: fmt(m.total_traces || 0) },
-      { label: { vi: 'Do sau TB',              en: 'Avg Trace Depth' },       value: fmt(m.avg_depth || 0) + ' ' + T({ vi: 'cap', en: 'levels' }) },
-      { label: { vi: 'Mat do lien ket CL',     en: 'Quality Linkage Density' }, value: (m.linkage_density || 0) + '%', accent: (m.linkage_density || 0) >= 50 ? 'success' : 'warning' },
-      { label: { vi: 'Bao cao dong bang',       en: 'Frozen Reports' },        value: fmt(m.frozen_reports || 0) }
+      { label: { vi: 'Tổng truy xuất',         en: 'Total Traces' },          value: fmt(m.total_traces || 0) },
+      { label: { vi: 'Độ sâu TB',              en: 'Avg Trace Depth' },       value: fmt(m.avg_depth || 0) + ' ' + T({ vi: 'cấp', en: 'levels' }) },
+      { label: { vi: 'Mật độ liên kết CL',     en: 'Quality Linkage Density' }, value: (m.linkage_density || 0) + '%', accent: (m.linkage_density || 0) >= 50 ? 'success' : 'warning' },
+      { label: { vi: 'Báo cáo đóng băng',       en: 'Frozen Reports' },        value: fmt(m.frozen_reports || 0) }
     ]);
 
     // Trace depth distribution
     var depthData = m.depth_distribution || [];
     var depthColumns = [
-      { key: 'depth',   label: { vi: 'Do sau (cap)',   en: 'Depth (levels)' }, type: 'number' },
-      { key: 'count',   label: { vi: 'So luong',       en: 'Count' },          type: 'number' },
-      { key: 'percent', label: { vi: 'Ti le',          en: 'Percent' },        render: function(v) { return esc((v || 0) + '%'); } }
+      { key: 'depth',   label: { vi: 'Độ sâu (cấp)',   en: 'Depth (levels)' }, type: 'number' },
+      { key: 'count',   label: { vi: 'Số lượng',       en: 'Count' },          type: 'number' },
+      { key: 'percent', label: { vi: 'Tỉ lệ',          en: 'Percent' },        render: function(v) { return esc((v || 0) + '%'); } }
     ];
 
     html += '<div style="margin-top:16px">';
-    html += ui.renderSection({ vi: 'Phan bo do sau truy xuat', en: 'Trace Depth Distribution' },
+    html += ui.renderSection({ vi: 'Phân bổ độ sâu truy xuất', en: 'Trace Depth Distribution' },
       ui.renderChartWithTableFallback('gen-depth-chart', null, depthColumns, depthData, { defaultMode: 'table' })
     );
     html += '</div>';
@@ -861,13 +861,13 @@
     // Most-traced products
     var topProducts = m.most_traced_products || [];
     var productColumns = [
-      { key: 'product',      label: { vi: 'San pham',       en: 'Product' } },
-      { key: 'trace_count',  label: { vi: 'So lan truy xuat', en: 'Trace Count' }, type: 'number' },
-      { key: 'last_traced',  label: { vi: 'Lan cuoi',       en: 'Last Traced' },  type: 'date' }
+      { key: 'product',      label: { vi: 'Sản phẩm',       en: 'Product' } },
+      { key: 'trace_count',  label: { vi: 'Số lần truy xuất', en: 'Trace Count' }, type: 'number' },
+      { key: 'last_traced',  label: { vi: 'Lần cuối',       en: 'Last Traced' },  type: 'date' }
     ];
 
     html += '<div style="margin-top:16px">';
-    html += ui.renderSection({ vi: 'San pham truy xuat nhieu nhat', en: 'Most-Traced Products' },
+    html += ui.renderSection({ vi: 'Sản phẩm truy xuất nhiều nhất', en: 'Most-Traced Products' },
       ui.renderDataGrid(productColumns, topProducts, { selectable: false })
     );
     html += '</div>';
@@ -875,13 +875,13 @@
     // Quality linkage density over time
     var linkageTrend = m.linkage_trend || [];
     var linkageColumns = [
-      { key: 'period',   label: { vi: 'Giai doan',            en: 'Period' } },
-      { key: 'density',  label: { vi: 'Mat do lien ket (%)',  en: 'Linkage Density (%)' }, type: 'number' },
-      { key: 'records',  label: { vi: 'Ban ghi CL',           en: 'Quality Records' },     type: 'number' }
+      { key: 'period',   label: { vi: 'Giai đoạn',            en: 'Period' } },
+      { key: 'density',  label: { vi: 'Mật độ liên kết (%)',  en: 'Linkage Density (%)' }, type: 'number' },
+      { key: 'records',  label: { vi: 'Bản ghi CL',           en: 'Quality Records' },     type: 'number' }
     ];
 
     html += '<div style="margin-top:16px">';
-    html += ui.renderSection({ vi: 'Mat do lien ket chat luong theo thoi gian', en: 'Quality Linkage Density Over Time' },
+    html += ui.renderSection({ vi: 'Mật độ liên kết chất lượng theo thời gian', en: 'Quality Linkage Density Over Time' },
       ui.renderChartWithTableFallback('gen-linkage-chart', null, linkageColumns, linkageTrend, { defaultMode: 'table' })
     );
     html += '</div>';

@@ -65,7 +65,7 @@
 
   var URGENCY_OPTIONS = [
     { value: 'routine',   label: { vi: 'Thường xuyên', en: 'Routine' } },
-    { value: 'urgent',    label: { vi: 'Khẩn cấp',    en: 'Urgent' } },
+    { value: 'urgent',    label: { vi: 'Cấp bách',    en: 'Urgent' } },
     { value: 'emergency', label: { vi: 'Khẩn cấp',    en: 'Emergency' } }
   ];
 

@@ -899,14 +899,14 @@
     // Deviation rate by project type
     var devByType = m.deviation_by_type || [];
     var devColumns = [
-      { key: 'type',           label: { vi: 'Loai xac nhan',   en: 'Validation Type' }, type: 'badge' },
-      { key: 'total_projects', label: { vi: 'Tong du an',       en: 'Total Projects' }, type: 'number' },
-      { key: 'deviations',     label: { vi: 'Sai lech',         en: 'Deviations' },     type: 'number' },
-      { key: 'deviation_rate', label: { vi: 'Ti le sai lech',   en: 'Deviation Rate' }, render: function(v) { return esc((v || 0) + '%'); } }
+      { key: 'type',           label: { vi: 'Loại xác nhận',   en: 'Validation Type' }, type: 'badge' },
+      { key: 'total_projects', label: { vi: 'Tổng dự án',       en: 'Total Projects' }, type: 'number' },
+      { key: 'deviations',     label: { vi: 'Sai lệch',         en: 'Deviations' },     type: 'number' },
+      { key: 'deviation_rate', label: { vi: 'Tỉ lệ sai lệch',   en: 'Deviation Rate' }, render: function(v) { return esc((v || 0) + '%'); } }
     ];
 
     html += '<div style="margin-top:16px">';
-    html += ui.renderSection({ vi: 'Ti le sai lech theo loai du an', en: 'Deviation Rate by Project Type' },
+    html += ui.renderSection({ vi: 'Tỉ lệ sai lệch theo loại dự án', en: 'Deviation Rate by Project Type' },
       ui.renderChartWithTableFallback('val-dev-type-chart', null, devColumns, devByType, { defaultMode: 'table' })
     );
     html += '</div>';
@@ -914,13 +914,13 @@
     // Requirements coverage trend
     var coverageTrend = m.coverage_trend || [];
     var coverageColumns = [
-      { key: 'period',        label: { vi: 'Giai doan',       en: 'Period' } },
-      { key: 'coverage_rate', label: { vi: 'Do bao phu (%)',  en: 'Coverage (%)' }, type: 'number' },
-      { key: 'projects',      label: { vi: 'So du an',        en: 'Projects' },     type: 'number' }
+      { key: 'period',        label: { vi: 'Giai đoạn',       en: 'Period' } },
+      { key: 'coverage_rate', label: { vi: 'Độ bao phủ (%)',  en: 'Coverage (%)' }, type: 'number' },
+      { key: 'projects',      label: { vi: 'Số dự án',        en: 'Projects' },     type: 'number' }
     ];
 
     html += '<div style="margin-top:16px">';
-    html += ui.renderSection({ vi: 'Xu huong do bao phu yeu cau', en: 'Requirements Coverage Trend' },
+    html += ui.renderSection({ vi: 'Xu hướng độ bao phủ yêu cầu', en: 'Requirements Coverage Trend' },
       ui.renderChartWithTableFallback('val-coverage-chart', null, coverageColumns, coverageTrend, { defaultMode: 'table' })
     );
     html += '</div>';

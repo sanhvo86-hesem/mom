@@ -44,43 +44,43 @@
   // CONSTANTS
   // =========================================================================
   var AGREEMENT_TYPES = [
-    { value: 'quality',   label: { vi: 'Chat luong',     en: 'Quality' } },
-    { value: 'supply',    label: { vi: 'Cung ung',       en: 'Supply' } },
-    { value: 'service',   label: { vi: 'Dich vu',        en: 'Service' } },
-    { value: 'technical', label: { vi: 'Ky thuat',       en: 'Technical' } }
+    { value: 'quality',   label: { vi: 'Chất lượng',     en: 'Quality' } },
+    { value: 'supply',    label: { vi: 'Cung ứng',       en: 'Supply' } },
+    { value: 'service',   label: { vi: 'Dịch vụ',        en: 'Service' } },
+    { value: 'technical', label: { vi: 'Kỹ thuật',       en: 'Technical' } }
   ];
 
   var STATUS_OPTIONS = MOD.workflow.map(function(s) {
     var labels = {
-      draft:            { vi: 'Nhap',             en: 'Draft' },
-      under_review:     { vi: 'Dang xem xet',     en: 'Under Review' },
-      active:           { vi: 'Hoat dong',         en: 'Active' },
-      renewal_pending:  { vi: 'Cho gia han',       en: 'Renewal Pending' },
-      expired:          { vi: 'Het han',           en: 'Expired' },
-      terminated:       { vi: 'Cham dut',          en: 'Terminated' }
+      draft:            { vi: 'Nháp',             en: 'Draft' },
+      under_review:     { vi: 'Đang xem xét',     en: 'Under Review' },
+      active:           { vi: 'Đang hoạt động',    en: 'Active' },
+      renewal_pending:  { vi: 'Chờ gia hạn',       en: 'Renewal Pending' },
+      expired:          { vi: 'Hết hạn',           en: 'Expired' },
+      terminated:       { vi: 'Đã chấm dứt',      en: 'Terminated' }
     };
     return { value: s, label: labels[s] || { vi: s, en: s } };
   });
 
   var SCOPE_OPTIONS = [
-    { value: 'global',   label: { vi: 'Toan cau',     en: 'Global' } },
-    { value: 'regional', label: { vi: 'Khu vuc',      en: 'Regional' } },
-    { value: 'site',     label: { vi: 'Nha may',      en: 'Site' } },
-    { value: 'product',  label: { vi: 'San pham',     en: 'Product' } }
+    { value: 'global',   label: { vi: 'Toàn cầu',     en: 'Global' } },
+    { value: 'regional', label: { vi: 'Khu vực',      en: 'Regional' } },
+    { value: 'site',     label: { vi: 'Nhà máy',      en: 'Site' } },
+    { value: 'product',  label: { vi: 'Sản phẩm',     en: 'Product' } }
   ];
 
   var REVIEW_FREQUENCY = [
-    { value: 'annual',       label: { vi: 'Hang nam',          en: 'Annual' } },
-    { value: 'semi_annual',  label: { vi: 'Nua nam',           en: 'Semi-Annual' } },
-    { value: 'quarterly',    label: { vi: 'Hang quy',          en: 'Quarterly' } },
-    { value: 'as_needed',    label: { vi: 'Khi can thiet',     en: 'As Needed' } }
+    { value: 'annual',       label: { vi: 'Hằng năm',          en: 'Annual' } },
+    { value: 'semi_annual',  label: { vi: 'Nửa năm',           en: 'Semi-Annual' } },
+    { value: 'quarterly',    label: { vi: 'Hằng quý',          en: 'Quarterly' } },
+    { value: 'as_needed',    label: { vi: 'Khi cần thiết',     en: 'As Needed' } }
   ];
 
   var COMPLIANCE_STATUS_OPTIONS = [
-    { value: 'compliant',       label: { vi: 'Tuan thu',          en: 'Compliant' } },
-    { value: 'non_compliant',   label: { vi: 'Khong tuan thu',    en: 'Non-Compliant' } },
-    { value: 'partially',       label: { vi: 'Tuan thu mot phan', en: 'Partially Compliant' } },
-    { value: 'not_assessed',    label: { vi: 'Chua danh gia',     en: 'Not Assessed' } }
+    { value: 'compliant',       label: { vi: 'Tuân thủ',          en: 'Compliant' } },
+    { value: 'non_compliant',   label: { vi: 'Không tuân thủ',    en: 'Non-Compliant' } },
+    { value: 'partially',       label: { vi: 'Tuân thủ một phần', en: 'Partially Compliant' } },
+    { value: 'not_assessed',    label: { vi: 'Chưa đánh giá',     en: 'Not Assessed' } }
   ];
 
   var SCREENS = { REGISTER: 'register', WORKSPACE: 'workspace' };
@@ -166,12 +166,12 @@
         state.records = res.data || [];
         state.pagination.total = res.total || res.data.length || 0;
       } else {
-        state.error = res.message || 'Failed to load quality agreements';
+        state.error = res.message || T({ vi: 'Không thể tải thoả thuận chất lượng', en: 'Failed to load quality agreements' });
       }
       paint();
     }).catch(function(err) {
       state.loading = false;
-      state.error = err.message || 'Network error';
+      state.error = err.message || T({ vi: 'Lỗi mạng', en: 'Network error' });
       paint();
     });
   }
@@ -194,12 +194,12 @@
         state.comments = res.data.comments || [];
         state.attachments = res.data.attachments || [];
       } else {
-        state.error = res.message || 'Failed to load agreement';
+        state.error = res.message || T({ vi: 'Không thể tải thoả thuận', en: 'Failed to load agreement' });
       }
       paint();
     }).catch(function(err) {
       state.loading = false;
-      state.error = err.message || 'Network error';
+      state.error = err.message || T({ vi: 'Lỗi mạng', en: 'Network error' });
       paint();
     });
 
@@ -219,7 +219,7 @@
   // SCREEN: REGISTER
   // =========================================================================
   function renderRegister() {
-    if (state.loading) return ui.renderLoadingState({ vi: 'Dang tai thoa thuan chat luong...', en: 'Loading quality agreements...' });
+    if (state.loading) return ui.renderLoadingState({ vi: 'Đang tải thoả thuận chất lượng...', en: 'Loading quality agreements...' });
     if (state.error) return ui.renderErrorState(state.error, 'retry-register');
 
     var html = '';
@@ -230,17 +230,17 @@
     var expiredCount = countByStatus('expired');
 
     html += ui.renderKpiRow([
-      { label: { vi: 'Tong thoa thuan',     en: 'Total Agreements' },    value: fmt(state.pagination.total) },
-      { label: { vi: 'Dang hoat dong',      en: 'Active' },             value: fmt(activeCount), accent: 'success' },
-      { label: { vi: 'Cho gia han',         en: 'Renewal Pending' },    value: fmt(pendingCount), accent: pendingCount > 0 ? 'warning' : '' },
-      { label: { vi: 'Het han',             en: 'Expired' },            value: fmt(expiredCount), accent: expiredCount > 0 ? 'danger' : '' }
+      { label: { vi: 'Tổng thoả thuận',     en: 'Total Agreements' },    value: fmt(state.pagination.total) },
+      { label: { vi: 'Đang hoạt động',      en: 'Active' },             value: fmt(activeCount), accent: 'success' },
+      { label: { vi: 'Chờ gia hạn',         en: 'Renewal Pending' },    value: fmt(pendingCount), accent: pendingCount > 0 ? 'warning' : '' },
+      { label: { vi: 'Hết hạn',             en: 'Expired' },            value: fmt(expiredCount), accent: expiredCount > 0 ? 'danger' : '' }
     ]);
 
     // Toolbar
     html += '<div class="eqms-toolbar">';
     html += '<div class="eqms-toolbar-left">';
     html += '<button class="eqms-btn primary" data-action="go-create">';
-    html += '+ ' + T({ vi: 'Tao thoa thuan moi', en: 'New Agreement' });
+    html += '+ ' + T({ vi: 'Tạo thoả thuận mới', en: 'New Agreement' });
     html += '</button>';
     html += '</div>';
     html += '<div class="eqms-toolbar-right">';
@@ -250,24 +250,24 @@
     // Filter bar
     html += ui.renderFilterBar(state.filters, {
       fields: [
-        { key: 'search', type: 'text', placeholder: { vi: 'Tim theo ma, doi tac, tieu de...', en: 'Search by ID, partner, title...' }, width: '260px' },
-        { key: 'partner', type: 'text', label: { vi: 'Doi tac', en: 'Partner' }, width: '160px' },
-        { key: 'status', type: 'select', label: { vi: 'Trang thai', en: 'Status' }, options: STATUS_OPTIONS },
-        { key: 'scope', type: 'select', label: { vi: 'Pham vi', en: 'Scope' }, options: SCOPE_OPTIONS },
-        { key: 'expiry_before', type: 'date', label: { vi: 'Het han truoc', en: 'Expires Before' } }
+        { key: 'search', type: 'text', placeholder: { vi: 'Tìm theo mã, đối tác, tiêu đề...', en: 'Search by ID, partner, title...' }, width: '260px' },
+        { key: 'partner', type: 'text', label: { vi: 'Đối tác', en: 'Partner' }, width: '160px' },
+        { key: 'status', type: 'select', label: { vi: 'Trạng thái', en: 'Status' }, options: STATUS_OPTIONS },
+        { key: 'scope', type: 'select', label: { vi: 'Phạm vi', en: 'Scope' }, options: SCOPE_OPTIONS },
+        { key: 'expiry_before', type: 'date', label: { vi: 'Hết hạn trước', en: 'Expires Before' } }
       ]
     });
 
     // Data grid
     var columns = [
-      { key: 'agreement_id',   label: { vi: 'Ma thoa thuan',   en: 'Agreement ID' },    type: 'id', sortable: true },
-      { key: 'partner_name',   label: { vi: 'Doi tac',         en: 'Partner' },          sortable: true },
-      { key: 'title',          label: { vi: 'Tieu de',         en: 'Title' },            sortable: true },
-      { key: 'status',         label: { vi: 'Trang thai',      en: 'Status' },           type: 'badge', sortable: true },
-      { key: 'scope',          label: { vi: 'Pham vi',         en: 'Scope' },            type: 'badge' },
-      { key: 'effective_date', label: { vi: 'Ngay hieu luc',   en: 'Effective Date' },   type: 'date', sortable: true },
-      { key: 'expiry_date',    label: { vi: 'Ngay het han',    en: 'Expiry Date' },      type: 'date', sortable: true },
-      { key: 'compliance_pct', label: { vi: 'Tuan thu (%)',    en: 'Compliance (%)' },   sortable: true,
+      { key: 'agreement_id',   label: { vi: 'Mã thoả thuận',   en: 'Agreement ID' },    type: 'id', sortable: true },
+      { key: 'partner_name',   label: { vi: 'Đối tác',         en: 'Partner' },          sortable: true },
+      { key: 'title',          label: { vi: 'Tiêu đề',         en: 'Title' },            sortable: true },
+      { key: 'status',         label: { vi: 'Trạng thái',      en: 'Status' },           type: 'badge', sortable: true },
+      { key: 'scope',          label: { vi: 'Phạm vi',         en: 'Scope' },            type: 'badge' },
+      { key: 'effective_date', label: { vi: 'Ngày hiệu lực',   en: 'Effective Date' },   type: 'date', sortable: true },
+      { key: 'expiry_date',    label: { vi: 'Ngày hết hạn',    en: 'Expiry Date' },      type: 'date', sortable: true },
+      { key: 'compliance_pct', label: { vi: 'Tuân thủ (%)',    en: 'Compliance (%)' },   sortable: true,
         render: function(v) {
           var pct = v || 0;
           var color = pct >= 90 ? 'var(--hm-accent-success,#22c55e)' : pct >= 70 ? 'var(--hm-accent-warning,#f59e0b)' : 'var(--hm-accent-danger,#ef4444)';
@@ -295,23 +295,23 @@
   // SCREEN: WORKSPACE
   // =========================================================================
   function renderWorkspace() {
-    if (state.loading) return ui.renderLoadingState({ vi: 'Dang tai chi tiet thoa thuan...', en: 'Loading agreement details...' });
+    if (state.loading) return ui.renderLoadingState({ vi: 'Đang tải chi tiết thoả thuận...', en: 'Loading agreement details...' });
     if (state.error) return ui.renderErrorState(state.error, 'retry-detail');
-    if (!state.record) return ui.renderEmptyState({ icon: '\uD83E\uDD1D', title: { vi: 'Khong tim thay ban ghi', en: 'Record not found' } });
+    if (!state.record) return ui.renderEmptyState({ icon: '\uD83E\uDD1D', title: { vi: 'Không tìm thấy bản ghi', en: 'Record not found' } });
 
     var rec = state.record;
     var html = '';
 
     // Back button
     html += '<button class="eqms-btn ghost sm" data-action="go-register" style="margin-bottom:8px">';
-    html += '\u2190 ' + T({ vi: 'Quay lai danh sach', en: 'Back to register' });
+    html += '\u2190 ' + T({ vi: 'Quay lại danh sách', en: 'Back to register' });
     html += '</button>';
 
     // Expiry warning
     if (rec.status === 'renewal_pending' || isExpiringWithin30Days(rec.expiry_date)) {
       html += '<div class="eqms-notice warning" style="margin-bottom:12px;display:flex;align-items:center;gap:8px">';
       html += '<span style="font-size:20px">\u26A0\uFE0F</span>';
-      html += '<strong>' + T({ vi: 'Thoa thuan sap het han — Can gia han', en: 'Agreement expiring soon — Renewal required' }) + '</strong>';
+      html += '<strong>' + T({ vi: 'Thoả thuận sắp hết hạn — Cần gia hạn', en: 'Agreement expiring soon — Renewal required' }) + '</strong>';
       html += '</div>';
     }
 
@@ -319,10 +319,10 @@
     html += ui.renderIdentityHeader(rec, {
       actions: getWorkspaceActions(rec),
       extraMeta: [
-        { label: { vi: 'Doi tac', en: 'Partner' }, value: rec.partner_name },
-        { label: { vi: 'Pham vi', en: 'Scope' }, value: rec.scope },
-        { label: { vi: 'Loai', en: 'Type' }, value: rec.type },
-        { label: { vi: 'Het han', en: 'Expiry' }, value: fmtDate(rec.expiry_date) }
+        { label: { vi: 'Đối tác', en: 'Partner' }, value: rec.partner_name },
+        { label: { vi: 'Phạm vi', en: 'Scope' }, value: rec.scope },
+        { label: { vi: 'Loại', en: 'Type' }, value: rec.type },
+        { label: { vi: 'Hết hạn', en: 'Expiry' }, value: fmtDate(rec.expiry_date) }
       ]
     });
 
@@ -331,12 +331,12 @@
 
     // Tabs
     var tabs = [
-      { id: 'summary',    label: { vi: 'Tom tat',           en: 'Summary' } },
-      { id: 'terms',      label: { vi: 'Dieu khoan',        en: 'Terms' }, badge: state.clauses.length || null },
-      { id: 'compliance', label: { vi: 'Tuan thu',          en: 'Compliance' } },
-      { id: 'renewal',    label: { vi: 'Gia han',           en: 'Renewal' } },
-      { id: 'related',    label: { vi: 'Lien ket & Kiem toan', en: 'Related & Audit' } },
-      { id: 'signatures', label: { vi: 'Chu ky & Dinh kem',  en: 'Signatures & Files' } }
+      { id: 'summary',    label: { vi: 'Tóm tắt',           en: 'Summary' } },
+      { id: 'terms',      label: { vi: 'Điều khoản',        en: 'Terms' }, badge: state.clauses.length || null },
+      { id: 'compliance', label: { vi: 'Tuân thủ',          en: 'Compliance' } },
+      { id: 'renewal',    label: { vi: 'Gia hạn',           en: 'Renewal' } },
+      { id: 'related',    label: { vi: 'Liên kết & Kiểm toán', en: 'Related & Audit' } },
+      { id: 'signatures', label: { vi: 'Chữ ký & Đính kèm',  en: 'Signatures & Files' } }
     ];
 
     html += ui.renderTabs(tabs, state.activeTab);
@@ -362,18 +362,18 @@
     var s = rec.status;
 
     if (s === 'draft') {
-      actions.push({ action: 'submit-review', label: { vi: 'Gui xem xet', en: 'Submit for Review' }, style: 'primary' });
+      actions.push({ action: 'submit-review', label: { vi: 'Gửi xem xét', en: 'Submit for Review' }, style: 'primary' });
     }
     if (s === 'under_review') {
-      actions.push({ action: 'activate', label: { vi: 'Kich hoat', en: 'Activate' }, style: 'primary' });
+      actions.push({ action: 'activate', label: { vi: 'Kích hoạt', en: 'Activate' }, style: 'primary' });
     }
     if (s === 'active') {
-      actions.push({ action: 'request-renewal', label: { vi: 'Yeu cau gia han', en: 'Request Renewal' }, style: 'secondary' });
-      actions.push({ action: 'terminate', label: { vi: 'Cham dut', en: 'Terminate' }, style: 'ghost' });
+      actions.push({ action: 'request-renewal', label: { vi: 'Yêu cầu gia hạn', en: 'Request Renewal' }, style: 'secondary' });
+      actions.push({ action: 'terminate', label: { vi: 'Chấm dứt', en: 'Terminate' }, style: 'ghost' });
     }
     if (s === 'renewal_pending') {
-      actions.push({ action: 'activate', label: { vi: 'Phe duyet gia han', en: 'Approve Renewal' }, style: 'primary' });
-      actions.push({ action: 'expire', label: { vi: 'De het han', en: 'Let Expire' }, style: 'ghost' });
+      actions.push({ action: 'activate', label: { vi: 'Phê duyệt gia hạn', en: 'Approve Renewal' }, style: 'primary' });
+      actions.push({ action: 'expire', label: { vi: 'Để hết hạn', en: 'Let Expire' }, style: 'ghost' });
     }
 
     return actions;
@@ -397,20 +397,20 @@
   // --- Summary Tab ---
   function renderSummaryTab() {
     var rec = state.record;
-    return ui.renderSection({ vi: 'Thong tin thoa thuan', en: 'Agreement Information' },
+    return ui.renderSection({ vi: 'Thông tin thoả thuận', en: 'Agreement Information' },
       ui.renderFieldGrid([
-        { label: { vi: 'Ma thoa thuan',       en: 'Agreement ID' },      value: rec.agreement_id,        mono: true },
-        { label: { vi: 'Doi tac',             en: 'Partner' },           value: rec.partner_name },
-        { label: { vi: 'Tieu de',             en: 'Title' },             value: rec.title },
-        { label: { vi: 'Pham vi',             en: 'Scope' },             value: rec.scope,               badge: true },
-        { label: { vi: 'Loai thoa thuan',     en: 'Agreement Type' },    value: rec.type,                badge: true },
-        { label: { vi: 'Ngay hieu luc',       en: 'Effective Date' },    value: fmtDate(rec.effective_date) },
-        { label: { vi: 'Ngay het han',        en: 'Expiry Date' },       value: fmtDate(rec.expiry_date) },
-        { label: { vi: 'Tan suat xem xet',   en: 'Review Frequency' },  value: rec.review_frequency },
-        { label: { vi: 'Chu so huu',          en: 'Owner' },             value: rec.owner },
-        { label: { vi: 'Trang thai',          en: 'Status' },            value: rec.status,              badge: true },
-        { label: { vi: 'Mo ta',               en: 'Description' },       value: rec.description },
-        { label: { vi: 'Ghi chu',             en: 'Notes' },             value: rec.notes }
+        { label: { vi: 'Mã thoả thuận',       en: 'Agreement ID' },      value: rec.agreement_id,        mono: true },
+        { label: { vi: 'Đối tác',             en: 'Partner' },           value: rec.partner_name },
+        { label: { vi: 'Tiêu đề',             en: 'Title' },             value: rec.title },
+        { label: { vi: 'Phạm vi',             en: 'Scope' },             value: rec.scope,               badge: true },
+        { label: { vi: 'Loại thoả thuận',     en: 'Agreement Type' },    value: rec.type,                badge: true },
+        { label: { vi: 'Ngày hiệu lực',       en: 'Effective Date' },    value: fmtDate(rec.effective_date) },
+        { label: { vi: 'Ngày hết hạn',        en: 'Expiry Date' },       value: fmtDate(rec.expiry_date) },
+        { label: { vi: 'Tần suất xem xét',   en: 'Review Frequency' },  value: rec.review_frequency },
+        { label: { vi: 'Chủ sở hữu',          en: 'Owner' },             value: rec.owner },
+        { label: { vi: 'Trạng thái',          en: 'Status' },            value: rec.status,              badge: true },
+        { label: { vi: 'Mô tả',               en: 'Description' },       value: rec.description },
+        { label: { vi: 'Ghi chú',             en: 'Notes' },             value: rec.notes }
       ])
     );
   }
@@ -421,24 +421,24 @@
 
     // Key quality requirements
     if (state.record && state.record.key_requirements) {
-      html += ui.renderSection({ vi: 'Yeu cau chat luong chinh', en: 'Key Quality Requirements' },
+      html += ui.renderSection({ vi: 'Yêu cầu chất lượng chính', en: 'Key Quality Requirements' },
         '<div style="line-height:1.7;color:var(--hm-text-primary,#1e293b)">' + esc(state.record.key_requirements) + '</div>'
       );
     }
 
     // Clauses table
     var columns = [
-      { key: 'clause_number',     label: { vi: 'So dieu',          en: 'Clause #' },           sortable: true },
-      { key: 'title',             label: { vi: 'Tieu de',          en: 'Title' },               sortable: true },
-      { key: 'description',       label: { vi: 'Mo ta',            en: 'Description' },         type: 'truncate' },
-      { key: 'compliance_status', label: { vi: 'Tuan thu',         en: 'Compliance Status' },   type: 'badge' },
-      { key: 'last_assessed',     label: { vi: 'Danh gia lan cuoi', en: 'Last Assessed' },      type: 'date' }
+      { key: 'clause_number',     label: { vi: 'Số điều',          en: 'Clause #' },           sortable: true },
+      { key: 'title',             label: { vi: 'Tiêu đề',          en: 'Title' },               sortable: true },
+      { key: 'description',       label: { vi: 'Mô tả',            en: 'Description' },         type: 'truncate' },
+      { key: 'compliance_status', label: { vi: 'Tuân thủ',         en: 'Compliance Status' },   type: 'badge' },
+      { key: 'last_assessed',     label: { vi: 'Đánh giá lần cuối', en: 'Last Assessed' },      type: 'date' }
     ];
 
-    html += ui.renderSection({ vi: 'Danh sach dieu khoan', en: 'Clauses' },
+    html += ui.renderSection({ vi: 'Danh sách điều khoản', en: 'Clauses' },
       ui.renderDataGrid(columns, state.clauses, { selectable: false }),
       {
-        headerActions: '<button class="eqms-btn ghost sm" data-action="add-clause">+ ' + T({ vi: 'Them dieu khoan', en: 'Add Clause' }) + '</button>'
+        headerActions: '<button class="eqms-btn ghost sm" data-action="add-clause">+ ' + T({ vi: 'Thêm điều khoản', en: 'Add Clause' }) + '</button>'
       }
     );
 
@@ -455,25 +455,25 @@
     var scoreColor = score >= 90 ? 'success' : score >= 70 ? 'warning' : 'danger';
 
     html += ui.renderKpiRow([
-      { label: { vi: 'Diem tuan thu tong',      en: 'Overall Compliance Score' }, value: score + '%', accent: scoreColor },
-      { label: { vi: 'Dieu khoan tuan thu',      en: 'Compliant Clauses' },       value: comp ? fmt(comp.compliant_count || 0) : '0', accent: 'success' },
-      { label: { vi: 'Khong tuan thu',           en: 'Non-Compliant' },           value: comp ? fmt(comp.non_compliant_count || 0) : '0', accent: (comp && comp.non_compliant_count > 0) ? 'danger' : '' },
-      { label: { vi: 'Chua danh gia',            en: 'Not Assessed' },            value: comp ? fmt(comp.not_assessed_count || 0) : '0' }
+      { label: { vi: 'Điểm tuân thủ tổng',      en: 'Overall Compliance Score' }, value: score + '%', accent: scoreColor },
+      { label: { vi: 'Điều khoản tuân thủ',      en: 'Compliant Clauses' },       value: comp ? fmt(comp.compliant_count || 0) : '0', accent: 'success' },
+      { label: { vi: 'Không tuân thủ',           en: 'Non-Compliant' },           value: comp ? fmt(comp.non_compliant_count || 0) : '0', accent: (comp && comp.non_compliant_count > 0) ? 'danger' : '' },
+      { label: { vi: 'Chưa đánh giá',            en: 'Not Assessed' },            value: comp ? fmt(comp.not_assessed_count || 0) : '0' }
     ]);
 
     // Non-compliance issues
     var issues = (comp && comp.issues) || [];
     if (issues.length > 0) {
       var issueColumns = [
-        { key: 'clause_ref',  label: { vi: 'Dieu khoan',    en: 'Clause' } },
-        { key: 'description', label: { vi: 'Mo ta',         en: 'Description' } },
-        { key: 'severity',    label: { vi: 'Muc do',        en: 'Severity' },     type: 'badge' },
-        { key: 'due_date',    label: { vi: 'Han xu ly',     en: 'Due Date' },     type: 'date' },
-        { key: 'owner',       label: { vi: 'Nguoi phu trach', en: 'Owner' } },
-        { key: 'status',      label: { vi: 'Trang thai',    en: 'Status' },       type: 'badge' }
+        { key: 'clause_ref',  label: { vi: 'Điều khoản',    en: 'Clause' } },
+        { key: 'description', label: { vi: 'Mô tả',         en: 'Description' } },
+        { key: 'severity',    label: { vi: 'Mức độ',        en: 'Severity' },     type: 'badge' },
+        { key: 'due_date',    label: { vi: 'Hạn xử lý',     en: 'Due Date' },     type: 'date' },
+        { key: 'owner',       label: { vi: 'Người phụ trách', en: 'Owner' } },
+        { key: 'status',      label: { vi: 'Trạng thái',    en: 'Status' },       type: 'badge' }
       ];
 
-      html += ui.renderSection({ vi: 'Van de khong tuan thu', en: 'Non-Compliance Issues' },
+      html += ui.renderSection({ vi: 'Vấn đề không tuân thủ', en: 'Non-Compliance Issues' },
         ui.renderDataGrid(issueColumns, issues, { selectable: false })
       );
     }
@@ -482,13 +482,13 @@
     var actionItems = (comp && comp.action_items) || [];
     if (actionItems.length > 0) {
       var actionColumns = [
-        { key: 'action',     label: { vi: 'Hanh dong',        en: 'Action' } },
-        { key: 'owner',      label: { vi: 'Nguoi phu trach',  en: 'Owner' } },
-        { key: 'due_date',   label: { vi: 'Han',              en: 'Due Date' },  type: 'date' },
-        { key: 'status',     label: { vi: 'Trang thai',       en: 'Status' },    type: 'badge' }
+        { key: 'action',     label: { vi: 'Hành động',        en: 'Action' } },
+        { key: 'owner',      label: { vi: 'Người phụ trách',  en: 'Owner' } },
+        { key: 'due_date',   label: { vi: 'Hạn',              en: 'Due Date' },  type: 'date' },
+        { key: 'status',     label: { vi: 'Trạng thái',       en: 'Status' },    type: 'badge' }
       ];
 
-      html += ui.renderSection({ vi: 'Hang muc hanh dong', en: 'Action Items' },
+      html += ui.renderSection({ vi: 'Hạng mục hành động', en: 'Action Items' },
         ui.renderDataGrid(actionColumns, actionItems, { selectable: false })
       );
     }
@@ -496,8 +496,8 @@
     if (!issues.length && !actionItems.length && score === 0) {
       html += ui.renderEmptyState({
         icon: '\u2705',
-        title: { vi: 'Chua co du lieu tuan thu', en: 'No compliance data yet' },
-        desc: { vi: 'Danh gia tuan thu se hien thi o day sau khi duoc thuc hien', en: 'Compliance assessments will appear here once performed' }
+        title: { vi: 'Chưa có dữ liệu tuân thủ', en: 'No compliance data yet' },
+        desc: { vi: 'Đánh giá tuân thủ sẽ hiển thị ở đây sau khi được thực hiện', en: 'Compliance assessments will appear here once performed' }
       });
     }
 
@@ -510,26 +510,26 @@
     var html = '';
 
     // Next renewal info
-    html += ui.renderSection({ vi: 'Thong tin gia han', en: 'Renewal Information' },
+    html += ui.renderSection({ vi: 'Thông tin gia hạn', en: 'Renewal Information' },
       ui.renderFieldGrid([
-        { label: { vi: 'Ngay het han hien tai',    en: 'Current Expiry Date' },   value: fmtDate(rec.expiry_date) },
-        { label: { vi: 'Ngay gia han tiep theo',   en: 'Next Renewal Date' },     value: fmtDate(rec.next_renewal_date) },
-        { label: { vi: 'Tan suat xem xet',         en: 'Review Frequency' },      value: rec.review_frequency },
-        { label: { vi: 'Trang thai gia han',        en: 'Renewal Status' },        value: rec.renewal_status || rec.status, badge: true }
+        { label: { vi: 'Ngày hết hạn hiện tại',    en: 'Current Expiry Date' },   value: fmtDate(rec.expiry_date) },
+        { label: { vi: 'Ngày gia hạn tiếp theo',   en: 'Next Renewal Date' },     value: fmtDate(rec.next_renewal_date) },
+        { label: { vi: 'Tần suất xem xét',         en: 'Review Frequency' },      value: rec.review_frequency },
+        { label: { vi: 'Trạng thái gia hạn',        en: 'Renewal Status' },        value: rec.renewal_status || rec.status, badge: true }
       ])
     );
 
     // Renewal checklist
     if (state.renewalChecklist.length > 0) {
-      html += ui.renderSection({ vi: 'Danh sach kiem tra gia han', en: 'Renewal Checklist' }, renderChecklist(state.renewalChecklist));
+      html += ui.renderSection({ vi: 'Danh sách kiểm tra gia hạn', en: 'Renewal Checklist' }, renderChecklist(state.renewalChecklist));
     }
 
     // Approval section
     if (rec.status === 'renewal_pending') {
-      html += ui.renderSection({ vi: 'Phe duyet gia han', en: 'Renewal Approval' },
+      html += ui.renderSection({ vi: 'Phê duyệt gia hạn', en: 'Renewal Approval' },
         '<div style="display:flex;gap:8px;padding:12px 0">' +
-        '<button class="eqms-btn primary" data-action="activate">' + T({ vi: 'Phe duyet gia han', en: 'Approve Renewal' }) + '</button>' +
-        '<button class="eqms-btn ghost" data-action="expire">' + T({ vi: 'De het han', en: 'Let Expire' }) + '</button>' +
+        '<button class="eqms-btn primary" data-action="activate">' + T({ vi: 'Phê duyệt gia hạn', en: 'Approve Renewal' }) + '</button>' +
+        '<button class="eqms-btn ghost" data-action="expire">' + T({ vi: 'Để hết hạn', en: 'Let Expire' }) + '</button>' +
         '</div>'
       );
     }
@@ -537,21 +537,21 @@
     // Renewal history
     if (state.renewalHistory.length > 0) {
       var histColumns = [
-        { key: 'version',        label: { vi: 'Phien ban',          en: 'Version' } },
-        { key: 'effective_date', label: { vi: 'Ngay hieu luc',      en: 'Effective Date' },  type: 'date' },
-        { key: 'expiry_date',    label: { vi: 'Ngay het han',       en: 'Expiry Date' },     type: 'date' },
-        { key: 'approved_by',    label: { vi: 'Phe duyet boi',      en: 'Approved By' } },
-        { key: 'notes',          label: { vi: 'Ghi chu',            en: 'Notes' } }
+        { key: 'version',        label: { vi: 'Phiên bản',          en: 'Version' } },
+        { key: 'effective_date', label: { vi: 'Ngày hiệu lực',      en: 'Effective Date' },  type: 'date' },
+        { key: 'expiry_date',    label: { vi: 'Ngày hết hạn',       en: 'Expiry Date' },     type: 'date' },
+        { key: 'approved_by',    label: { vi: 'Phê duyệt bởi',      en: 'Approved By' } },
+        { key: 'notes',          label: { vi: 'Ghi chú',            en: 'Notes' } }
       ];
 
-      html += ui.renderSection({ vi: 'Lich su gia han', en: 'Renewal History' },
+      html += ui.renderSection({ vi: 'Lịch sử gia hạn', en: 'Renewal History' },
         ui.renderDataGrid(histColumns, state.renewalHistory, { selectable: false })
       );
     } else if (state.renewalChecklist.length === 0 && rec.status !== 'renewal_pending') {
       html += ui.renderEmptyState({
         icon: '\uD83D\uDD04',
-        title: { vi: 'Chua co lich su gia han', en: 'No renewal history' },
-        desc: { vi: 'Lich su gia han se hien thi khi thoa thuan duoc gia han', en: 'Renewal history will appear when the agreement is renewed' }
+        title: { vi: 'Chưa có lịch sử gia hạn', en: 'No renewal history' },
+        desc: { vi: 'Lịch sử gia hạn sẽ hiển thị khi thoả thuận được gia hạn', en: 'Renewal history will appear when the agreement is renewed' }
       });
     }
 
@@ -576,11 +576,11 @@
   function renderRelatedTab() {
     var html = '';
 
-    html += ui.renderSection({ vi: 'Lien ket', en: 'Relationships' },
+    html += ui.renderSection({ vi: 'Liên kết', en: 'Relationships' },
       ui.renderRelationshipsPanel(state.relationships)
     );
 
-    html += ui.renderSection({ vi: 'Nhat ky kiem toan', en: 'Audit Trail' },
+    html += ui.renderSection({ vi: 'Nhật ký kiểm toán', en: 'Audit Trail' },
       ui.renderAuditTrail(state.auditEvents)
     );
 
@@ -591,20 +591,20 @@
   function renderSignaturesTab() {
     var html = '';
 
-    html += ui.renderSection({ vi: 'Chu ky dien tu', en: 'Electronic Signatures' },
+    html += ui.renderSection({ vi: 'Chữ ký điện tử', en: 'Electronic Signatures' },
       ui.renderSignaturePanel(state.signatures, [
-        { vi: 'Nguoi tao', en: 'Drafted' },
-        { vi: 'Doi tac ky', en: 'Partner Signed' },
-        { vi: 'Nguoi phe duyet', en: 'Approved' },
-        { vi: 'QA Xac nhan', en: 'QA Acknowledged' }
+        { vi: 'Người tạo', en: 'Drafted' },
+        { vi: 'Đối tác ký', en: 'Partner Signed' },
+        { vi: 'Người phê duyệt', en: 'Approved' },
+        { vi: 'QA Xác nhận', en: 'QA Acknowledged' }
       ])
     );
 
-    html += ui.renderSection({ vi: 'Tep dinh kem', en: 'Attachments' },
+    html += ui.renderSection({ vi: 'Tệp đính kèm', en: 'Attachments' },
       ui.renderAttachmentsGrid(state.attachments)
     );
 
-    html += ui.renderSection({ vi: 'Binh luan', en: 'Comments' },
+    html += ui.renderSection({ vi: 'Bình luận', en: 'Comments' },
       ui.renderCommentsThread(state.comments)
     );
 
