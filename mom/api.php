@@ -2034,6 +2034,7 @@ function module_access_portal_catalog(): array {
     ['id' => 'fmea', 'default_access' => 'all', 'default_roles' => []],
     ['id' => 'apqp-ppap', 'default_access' => 'all', 'default_roles' => []],
     ['id' => 'ai-scheduling', 'default_access' => 'all', 'default_roles' => []],
+    ['id' => 'eqms', 'default_access' => 'all', 'default_roles' => []],
     ['id' => 'forms', 'default_access' => 'all', 'default_roles' => []],
     ['id' => 'evidence', 'default_access' => 'all', 'default_roles' => []],
     ['id' => 'compliance-reports', 'default_access' => 'all', 'default_roles' => []],

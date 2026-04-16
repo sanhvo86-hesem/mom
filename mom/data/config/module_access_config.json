@@ -105,6 +105,11 @@
       "access": "all",
       "roles": []
     },
+    "eqms": {
+      "enabled": true,
+      "access": "all",
+      "roles": []
+    },
     "forms": {
       "enabled": true,
       "access": "all",
