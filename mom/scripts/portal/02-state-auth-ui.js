@@ -479,6 +479,7 @@ function moduleAccessPortalCatalog(){
     {id:'fmea', group:'quality', icon:'⚡', labelEn:'FMEA & Control Plan', labelVi:'FMEA & Control Plan', noteEn:'Risk analysis and control planning.', noteVi:'Phân tích rủi ro và kế hoạch kiểm soát.', defaultAccess:'all'},
     {id:'apqp-ppap', group:'quality', icon:'🎯', labelEn:'APQP / PPAP', labelVi:'APQP / PPAP', noteEn:'APQP and PPAP governance.', noteVi:'Điều hành APQP và PPAP.', defaultAccess:'all'},
     {id:'ai-scheduling', group:'quality', icon:'🤖', labelEn:'AI quality', labelVi:'AI Chất lượng', noteEn:'AI-assisted quality tooling.', noteVi:'Công cụ chất lượng có hỗ trợ AI.', defaultAccess:'all'},
+    {id:'eqms', group:'eqms', icon:'🏯', labelEn:'EQMS Suite', labelVi:'EQMS Suite', noteEn:'Enterprise Quality Management System — 22 world-class quality modules.', noteVi:'Hệ thống Quản lý Chất lượng Doanh nghiệp — 22 module chất lượng đẳng cấp.', defaultAccess:'all'},
     {id:'forms', group:'records', icon:'📋', labelEn:'Evidence control', labelVi:'Kiểm soát chứng cứ', noteEn:'Controlled forms and evidence capture.', noteVi:'Biểu mẫu kiểm soát và thu thập chứng cứ.', defaultAccess:'all'},
     /* 'evidence' nav removed — Evidence Vault is now inside "Kiểm soát chứng cứ" (forms module), Chứng cứ tab */
     {id:'compliance-reports', group:'records', icon:'📊', labelEn:'Reports', labelVi:'Báo cáo', noteEn:'Compliance and operational reporting.', noteVi:'Báo cáo tuân thủ và vận hành.', defaultAccess:'all'},
@@ -2187,8 +2188,8 @@ function renderSidebar(){
 
     /* EQMS Suite — World-Class Quality Management */
     const eqmsButtons = [];
-    eqmsButtons.push(portalNavButtonHtml('eqms', '\u{1F3EF}', lang==='en'?'EQMS Suite':'EQMS Suite', {active: currentPage==='eqms'}));
-    html += portalNavSectionHtml(lang==='en'?'EQMS':'EQMS', eqmsButtons);
+    if(canUserAccessModule('eqms')) eqmsButtons.push(portalNavButtonHtml('eqms', '\u{1F3EF}', lang==='en'?'EQMS Suite':'EQMS Suite', {active: currentPage==='eqms'}));
+    if(eqmsButtons.length) html += portalNavSectionHtml(lang==='en'?'EQMS':'EQMS', eqmsButtons);
 
     const recordButtons = [];
     if(canUserAccessModule('forms')) recordButtons.push(portalNavButtonHtml('forms', '📋', lang==='en'?'Evidence Control':'Kiểm soát chứng cứ', {active: currentPage==='forms'}));
