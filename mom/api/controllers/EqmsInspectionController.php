@@ -122,24 +122,28 @@ class EqmsInspectionController extends EqmsBaseController
         $params     = [':lim' => $q['limit'], ':off' => $q['offset']];
 
         if ($q['search'] !== '') {
-            $conditions[] = "(lot_number ILIKE :search OR supplier_id::text ILIKE :search OR item_id::text ILIKE :search)";
+            $conditions[] = "(inspection_number ILIKE :search OR vendor_id::text ILIKE :search OR item_id::text ILIKE :search)";
             $params[':search'] = '%' . $q['search'] . '%';
         }
 
-        foreach (['status', 'supplier_id', 'item_id', 'result'] as $f) {
-            if (!empty($q['filters'][$f])) {
-                $conditions[] = "{$f} = :{$f}";
-                $params[":{$f}"] = $q['filters'][$f];
+        foreach (['status', 'vendor_id', 'item_id', 'result'] as $f) {
+            // support legacy 'supplier_id' filter alias
+            $colName = ($f === 'vendor_id' && !isset($q['filters']['vendor_id']) && !empty($q['filters']['supplier_id']))
+                       ? 'vendor_id' : $f;
+            $filterKey = ($f === 'vendor_id') ? ($q['filters']['vendor_id'] ?? $q['filters']['supplier_id'] ?? null) : ($q['filters'][$f] ?? null);
+            if (!empty($filterKey)) {
+                $conditions[] = "{$colName} = :{$f}";
+                $params[":{$f}"] = $filterKey;
             }
         }
 
         $where  = implode(' AND ', $conditions);
-        $sortBy = in_array($q['sort_by'], ['lot_number', 'supplier_id', 'status', 'received_date', 'created_at'], true)
+        $sortBy = in_array($q['sort_by'], ['inspection_number', 'vendor_id', 'status', 'received_date', 'created_at'], true)
                   ? $q['sort_by'] : 'created_at';
 
         $items = $this->data->query(
-            "SELECT inspection_id, lot_number, supplier_id, item_id,
-                    quantity, result, status, received_date, created_at
+            "SELECT inspection_id, inspection_number, vendor_id, item_id,
+                    qty_received AS quantity, result, status, received_date, created_at
              FROM " . self::IQC_TABLE . "
              WHERE {$where}
              ORDER BY {$sortBy} {$q['sort_dir']}
@@ -201,7 +205,7 @@ class EqmsInspectionController extends EqmsBaseController
         }
 
         $rows = $this->data->query(
-            "SELECT inspection_id, lot_number, supplier_id, result, status
+            "SELECT inspection_id, inspection_number, vendor_id, result, status
              FROM " . self::IQC_TABLE . " WHERE inspection_id IN ({$placeholders})",
             $params
         ) ?? [];
@@ -229,7 +233,7 @@ class EqmsInspectionController extends EqmsBaseController
         $body      = $this->jsonBody();
         $sets      = [];
         $params    = [':id' => $id];
-        $updatable = ['lot_number', 'quantity', 'received_date', 'notes'];
+        $updatable = ['inspection_number', 'qty_received', 'received_date', 'notes'];
 
         foreach ($updatable as $field) {
             if (array_key_exists($field, $body)) {

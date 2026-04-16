@@ -83,7 +83,7 @@ final class EqmsAuditsController extends EqmsBaseController
             $params[':status'] = (string)$f['status'];
         }
         if (!empty($f['standard'])) {
-            $where[]            = 'a.standard = :standard';
+            $where[]            = 'a.standard_ref = :standard';
             $params[':standard'] = (string)$f['standard'];
         }
         if (!empty($f['lead_auditor'])) {
@@ -100,7 +100,7 @@ final class EqmsAuditsController extends EqmsBaseController
             ? $q['sort_by'] : 'created_at';
 
         $rows = $this->data->query(
-            "SELECT a.audit_id, a.audit_number, a.audit_type, a.scope, a.standard,
+            "SELECT a.audit_id, a.audit_number, a.audit_type, a.scope, a.standard_ref AS standard,
                     a.lead_auditor, a.auditee_dept, a.planned_date, a.actual_start,
                     a.actual_end, a.status, a.version, a.created_at
              FROM eqms_audits a

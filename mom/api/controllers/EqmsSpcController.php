@@ -17,7 +17,8 @@ namespace MOM\Api\Controllers;
  *   acknowledge-violation: record acknowledgement of an OOC/OOS SPC violation
  *   create-deviation: raise an eqms_deviations record from a SPC violation
  *
- * Tables: spc_control_charts, spc_observations (migrations M24/024)
+ * Tables: mes_spc_control_limits (chart config), spc_data (observations),
+ *         mes_spc_violations (violations), eqms_spc_violation_acks (acks)
  *
  * Standards: IATF 16949 §9.1.1.3, AS9100D §9.1, ISO 7870
  *
@@ -26,8 +27,8 @@ namespace MOM\Api\Controllers;
  */
 class EqmsSpcController extends EqmsBaseController
 {
-    private const CHART_TABLE = 'spc_control_charts';
-    private const OBS_TABLE   = 'spc_observations';
+    private const CHART_TABLE = 'mes_spc_control_limits';
+    private const OBS_TABLE   = 'spc_data';
     private const ENTITY_TYPE = 'spc_chart';
     private const MODULE      = 'spc';
 
@@ -49,18 +50,18 @@ class EqmsSpcController extends EqmsBaseController
     private function loadChart(string $chartId): array
     {
         $row = $this->data->query(
-            "SELECT * FROM " . self::CHART_TABLE . " WHERE chart_id = :id LIMIT 1",
+            "SELECT * FROM " . self::CHART_TABLE . " WHERE limit_id = :id LIMIT 1",
             [':id' => $chartId]
         );
         if (empty($row)) {
-            $this->error('spc_chart_not_found', 404, "SPC control chart '{$chartId}' not found.");
+            $this->error('spc_chart_not_found', 404, "SPC control limit record '{$chartId}' not found.");
         }
         return $row[0];
     }
 
     // ── Query & Metrics ───────────────────────────────────────────────────────
 
-    /** POST /eqms/spc/query — Paginated SPC chart list. */
+    /** POST /eqms/spc/query — Paginated SPC control limit records. */
     public function search(): never
     {
         $user = $this->requireAuth();
@@ -72,31 +73,36 @@ class EqmsSpcController extends EqmsBaseController
         $params     = [':lim' => $q['limit'], ':off' => $q['offset']];
 
         if ($q['search'] !== '') {
-            $conditions[] = "(chart_name ILIKE :search OR characteristic ILIKE :search OR process_name ILIKE :search)";
+            $conditions[] = "(cl.item_id ILIKE :search OR cl.characteristic_id ILIKE :search)";
             $params[':search'] = '%' . $q['search'] . '%';
         }
 
-        foreach (['status', 'chart_type', 'process_name', 'product_id'] as $f) {
+        foreach (['chart_type', 'item_id'] as $f) {
             if (!empty($q['filters'][$f])) {
-                $conditions[] = "{$f} = :{$f}";
+                $conditions[] = "cl.{$f} = :{$f}";
                 $params[":{$f}"] = $q['filters'][$f];
             }
         }
-
-        if (isset($q['filters']['has_violation'])) {
-            $conditions[] = "has_active_violation = :hav";
-            $params[':hav'] = $q['filters']['has_violation'] ? 'true' : 'false';
+        // legacy product_id filter maps to item_id
+        if (!empty($q['filters']['product_id']) && empty($q['filters']['item_id'])) {
+            $conditions[] = "cl.item_id = :item_id";
+            $params[':item_id'] = $q['filters']['product_id'];
+        }
+        if (isset($q['filters']['is_current'])) {
+            $conditions[] = "cl.is_current = :is_current";
+            $params[':is_current'] = $q['filters']['is_current'] ? 'true' : 'false';
         }
 
         $where  = implode(' AND ', $conditions);
-        $sortBy = in_array($q['sort_by'], ['chart_name', 'characteristic', 'process_name', 'status', 'created_at'], true)
-                  ? $q['sort_by'] : 'created_at';
+        $sortBy = in_array($q['sort_by'], ['item_id', 'characteristic_id', 'chart_type', 'valid_from'], true)
+                  ? "cl.{$q['sort_by']}" : 'cl.valid_from';
 
         $items = $this->data->query(
-            "SELECT chart_id, chart_name, chart_type, characteristic, process_name,
-                    product_id, ucl, lcl, cl, sample_size,
-                    has_active_violation, status, created_at
-             FROM " . self::CHART_TABLE . "
+            "SELECT cl.limit_id AS chart_id, cl.item_id, cl.characteristic_id AS characteristic,
+                    cl.chart_type, cl.subgroup_size AS sample_size,
+                    cl.ucl_xbar AS ucl, cl.lcl_xbar AS lcl, cl.cl_xbar AS cl,
+                    cl.cp, cl.cpk, cl.ppk, cl.is_current, cl.valid_from AS created_at
+             FROM " . self::CHART_TABLE . " cl
              WHERE {$where}
              ORDER BY {$sortBy} {$q['sort_dir']}
              LIMIT :lim OFFSET :off",
@@ -104,7 +110,7 @@ class EqmsSpcController extends EqmsBaseController
         ) ?? [];
 
         $total = (int)($this->data->scalar(
-            "SELECT COUNT(*) FROM " . self::CHART_TABLE . " WHERE {$where}",
+            "SELECT COUNT(*) FROM " . self::CHART_TABLE . " cl WHERE {$where}",
             array_diff_key($params, [':lim' => 0, ':off' => 0])
         ) ?? 0);
 
@@ -117,32 +123,38 @@ class EqmsSpcController extends EqmsBaseController
         $user = $this->requireAuth();
         $this->requireAnyRole($user, $this->eqmsReadRoles());
 
-        $byStatus = $this->data->query(
-            "SELECT status, COUNT(*) AS count FROM " . self::CHART_TABLE . " GROUP BY status ORDER BY status"
+        $byChartType = $this->data->query(
+            "SELECT chart_type, COUNT(*) AS count FROM " . self::CHART_TABLE . " WHERE is_current = true GROUP BY chart_type"
         ) ?? [];
 
-        $violationCount = (int)($this->data->scalar(
-            "SELECT COUNT(*) FROM " . self::CHART_TABLE . " WHERE has_active_violation = true"
+        $totalCurrent = (int)($this->data->scalar(
+            "SELECT COUNT(*) FROM " . self::CHART_TABLE . " WHERE is_current = true"
         ) ?? 0);
 
-        $byChartType = $this->data->query(
-            "SELECT chart_type, COUNT(*) AS count FROM " . self::CHART_TABLE . " GROUP BY chart_type"
-        ) ?? [];
+        $violationCount = (int)($this->data->scalar(
+            "SELECT COUNT(*) FROM mes_spc_violations WHERE acknowledged = false"
+        ) ?? 0);
 
         $recentViolations = $this->data->query(
-            "SELECT o.chart_id, o.observed_at, o.value, o.rule_violated, c.chart_name
-             FROM " . self::OBS_TABLE . " o
-             JOIN " . self::CHART_TABLE . " c ON c.chart_id = o.chart_id
-             WHERE o.rule_violated IS NOT NULL
-             ORDER BY o.observed_at DESC LIMIT 10"
+            "SELECT v.violation_id, v.detected_at, v.item_id, v.characteristic_id,
+                    v.rule_violated, v.violation_value, v.acknowledged
+             FROM mes_spc_violations v
+             ORDER BY v.detected_at DESC LIMIT 10"
+        ) ?? [];
+
+        $byItem = $this->data->query(
+            "SELECT item_id, COUNT(*) AS count FROM " . self::OBS_TABLE . "
+             WHERE recorded_at > NOW() - INTERVAL '30 days'
+             GROUP BY item_id ORDER BY count DESC LIMIT 10"
         ) ?? [];
 
         $this->success([
             'metrics' => [
-                'by_status'        => $byStatus,
-                'violation_count'  => $violationCount,
-                'by_chart_type'    => $byChartType,
+                'by_chart_type'     => $byChartType,
+                'total_current'     => $totalCurrent,
+                'violation_count'   => $violationCount,
                 'recent_violations' => $recentViolations,
+                'active_items_30d'  => $byItem,
             ],
         ]);
     }
@@ -166,8 +178,8 @@ class EqmsSpcController extends EqmsBaseController
         }
 
         $rows = $this->data->query(
-            "SELECT chart_id, chart_name, characteristic, status, has_active_violation
-             FROM " . self::CHART_TABLE . " WHERE chart_id IN ({$placeholders})",
+            "SELECT limit_id AS chart_id, item_id, characteristic_id AS characteristic, is_current
+             FROM " . self::CHART_TABLE . " WHERE limit_id IN ({$placeholders})",
             $params
         ) ?? [];
 
@@ -187,13 +199,14 @@ class EqmsSpcController extends EqmsBaseController
         $limit = min(500, max(1, (int)($this->query('obs_limit', '100'))));
 
         $observations = $this->data->query(
-            "SELECT observation_id, observed_at, value, sample_number,
-                    rule_violated, acknowledged, acknowledged_by, acknowledged_at
+            "SELECT spc_id AS observation_id, recorded_at AS observed_at,
+                    sample_value AS value, subgroup_number AS sample_number,
+                    out_of_control, item_id, characteristic
              FROM " . self::OBS_TABLE . "
-             WHERE chart_id = :id
-             ORDER BY observed_at DESC
+             WHERE item_id = :id
+             ORDER BY recorded_at DESC
              LIMIT :lim",
-            [':id' => $chartId, ':lim' => $limit]
+            [':id' => $chart['item_id'] ?? $chartId, ':lim' => $limit]
         ) ?? [];
 
         $this->success(['chart' => $chart, 'observations' => $observations]);
@@ -210,8 +223,8 @@ class EqmsSpcController extends EqmsBaseController
         $body      = $this->jsonBody();
         $sets      = [];
         $params    = [':id' => $chartId];
-        $updatable = ['chart_name', 'characteristic', 'process_name', 'sample_size',
-                      'sampling_frequency', 'specification_usl', 'specification_lsl'];
+        $updatable = ['characteristic_id', 'subgroup_size', 'ucl_xbar', 'lcl_xbar', 'cl_xbar',
+                      'ucl_range', 'lcl_range', 'cl_range'];
 
         foreach ($updatable as $field) {
             if (array_key_exists($field, $body)) {
@@ -224,7 +237,7 @@ class EqmsSpcController extends EqmsBaseController
         }
 
         $this->data->execute(
-            "UPDATE " . self::CHART_TABLE . " SET " . implode(', ', $sets) . " WHERE chart_id = :id",
+            "UPDATE " . self::CHART_TABLE . " SET " . implode(', ', $sets) . " WHERE limit_id = :id",
             $params
         );
 
@@ -271,28 +284,27 @@ class EqmsSpcController extends EqmsBaseController
         $chartId = $this->requirePathId('id', 'chart_id');
         $chart   = $this->loadChart($chartId);
 
-        $this->requireValidTransition((string)$chart['status'], 'recalculate-limits', self::STATE_MACHINE, $chartId);
-
         $body        = $this->jsonBody();
         $dataSource  = trim((string)($body['data_source'] ?? 'historical'));
-        $sampleSize  = isset($body['sample_size']) ? (int)$body['sample_size'] : (int)($chart['sample_size'] ?? 5);
+        $sampleSize  = isset($body['sample_size']) ? (int)$body['sample_size'] : (int)($chart['subgroup_size'] ?? 5);
 
         if ($sampleSize < 2) {
             $this->error('invalid_sample_size', 400, "'sample_size' must be >= 2 for control limit calculation.");
         }
 
-        // Compute stats from recent observations
+        // Compute stats from recent observations for this item/characteristic
         $stats = $this->data->query(
             "SELECT
-                 AVG(value)             AS grand_mean,
-                 STDDEV_POP(value)      AS pop_stddev,
-                 COUNT(*)              AS obs_count,
-                 MAX(value)            AS max_val,
-                 MIN(value)            AS min_val
+                 AVG(sample_value)      AS grand_mean,
+                 STDDEV_POP(sample_value) AS pop_stddev,
+                 COUNT(*)               AS obs_count,
+                 MAX(sample_value)      AS max_val,
+                 MIN(sample_value)      AS min_val
              FROM " . self::OBS_TABLE . "
-             WHERE chart_id = :id
-               AND observed_at > NOW() - INTERVAL '90 days'",
-            [':id' => $chartId]
+             WHERE item_id = :item_id
+               AND characteristic = :char
+               AND recorded_at > NOW() - INTERVAL '90 days'",
+            [':item_id' => (string)($chart['item_id'] ?? ''), ':char' => (string)($chart['characteristic_id'] ?? '')]
         );
 
         if (empty($stats) || $stats[0]['obs_count'] < $sampleSize) {
@@ -311,9 +323,9 @@ class EqmsSpcController extends EqmsBaseController
 
         $this->data->execute(
             "UPDATE " . self::CHART_TABLE . "
-             SET cl = :cl, ucl = :ucl, lcl = :lcl,
-                 limits_recalculated_at = now(), sample_size = :ss
-             WHERE chart_id = :id",
+             SET cl_xbar = :cl, ucl_xbar = :ucl, lcl_xbar = :lcl,
+                 subgroup_size = :ss
+             WHERE limit_id = :id",
             [':cl' => $cl, ':ucl' => $ucl, ':lcl' => $lcl, ':ss' => $sampleSize, ':id' => $chartId]
         );
 
@@ -348,15 +360,13 @@ class EqmsSpcController extends EqmsBaseController
         $chartId = $this->requirePathId('id', 'chart_id');
         $chart   = $this->loadChart($chartId);
 
-        $this->requireValidTransition((string)$chart['status'], 'acknowledge-violation', self::STATE_MACHINE, $chartId);
-
         $body                   = $this->jsonBody();
         $violationPointId       = trim((string)($body['violation_point_id'] ?? ''));
         $acknowledgementReason  = trim((string)($body['acknowledgement_reason'] ?? ''));
         $actionTaken            = trim((string)($body['action_taken'] ?? ''));
 
         if ($violationPointId === '') {
-            $this->error('violation_point_id_required', 400, "'violation_point_id' (observation ID) is required.");
+            $this->error('violation_point_id_required', 400, "'violation_point_id' (mes_spc_violations.violation_id) is required.");
         }
         if ($acknowledgementReason === '') {
             $this->error('acknowledgement_reason_required', 400);
@@ -364,44 +374,27 @@ class EqmsSpcController extends EqmsBaseController
 
         $actor = (string)($user['username'] ?? 'unknown');
 
-        // Mark the specific observation as acknowledged
+        // Mark the specific violation as acknowledged in mes_spc_violations
         $this->data->execute(
-            "UPDATE " . self::OBS_TABLE . "
+            "UPDATE mes_spc_violations
              SET acknowledged = true,
                  acknowledged_by = :by,
                  acknowledged_at = now(),
-                 acknowledgement_reason = :reason,
-                 action_taken = :action
-             WHERE observation_id = :oid AND chart_id = :cid",
+                 corrective_action = :action
+             WHERE violation_id = :oid",
             [
                 ':by'     => $actor,
-                ':reason' => $acknowledgementReason,
-                ':action' => $actionTaken,
+                ':action' => $actionTaken ?: $acknowledgementReason,
                 ':oid'    => $violationPointId,
-                ':cid'    => $chartId,
             ]
         );
 
-        // Check whether all violations on this chart are now acknowledged
+        // Check whether all violations for this item/characteristic are now acknowledged
         $unacknowledgedCount = (int)($this->data->scalar(
-            "SELECT COUNT(*) FROM " . self::OBS_TABLE . "
-             WHERE chart_id = :id AND rule_violated IS NOT NULL AND acknowledged = false",
-            [':id' => $chartId]
+            "SELECT COUNT(*) FROM mes_spc_violations
+             WHERE item_id = :item_id AND characteristic_id = :char AND acknowledged = false",
+            [':item_id' => (string)($chart['item_id'] ?? ''), ':char' => (string)($chart['characteristic_id'] ?? '')]
         ) ?? 0);
-
-        $newStatus = $unacknowledgedCount === 0 ? 'violation_acknowledged' : 'violation_acknowledged';
-
-        $this->data->execute(
-            "UPDATE " . self::CHART_TABLE . "
-             SET status = :status,
-                 has_active_violation = :hav
-             WHERE chart_id = :id",
-            [
-                ':status' => $newStatus,
-                ':hav'    => $unacknowledgedCount > 0 ? 'true' : 'false',
-                ':id'     => $chartId,
-            ]
-        );
 
         $this->emitQualityEvent('eqms.spc.violation_acknowledged', self::ENTITY_TYPE, $chartId, [
             'violation_point_id'   => $violationPointId,
@@ -427,8 +420,6 @@ class EqmsSpcController extends EqmsBaseController
         $this->requireAnyRole($user, $this->spcWriteRoles());
         $chartId = $this->requirePathId('id', 'chart_id');
         $chart   = $this->loadChart($chartId);
-
-        $this->requireValidTransition((string)$chart['status'], 'create-deviation', self::STATE_MACHINE, $chartId);
 
         $body            = $this->jsonBody();
         $deviationTitle  = trim((string)($body['deviation_title'] ?? ''));
@@ -457,8 +448,8 @@ class EqmsSpcController extends EqmsBaseController
                     ':id'     => $deviationId,
                     ':num'    => $deviationNumber,
                     ':title'  => $deviationTitle,
-                    ':desc'   => "SPC control chart violation detected. Chart: {$chart['chart_name']} ({$chartId}). "
-                                 . "Characteristic: " . ($chart['characteristic'] ?? 'N/A'),
+                    ':desc'   => "SPC control limit violation detected. Item: {$chart['item_id']} ({$chartId}). "
+                                 . "Characteristic: " . ($chart['characteristic_id'] ?? 'N/A'),
                     ':src_id' => $chartId,
                     ':now'    => $now,
                     ':by'     => $actor,
@@ -469,14 +460,17 @@ class EqmsSpcController extends EqmsBaseController
                 "Failed to create deviation record: " . $e->getMessage());
         }
 
-        // Update chart status to deviation_raised and link back
-        $this->data->execute(
-            "UPDATE " . self::CHART_TABLE . "
-             SET status = 'deviation_raised',
-                 linked_deviation_id = :devid
-             WHERE chart_id = :id",
-            [':devid' => $deviationId, ':id' => $chartId]
-        );
+        // Update metadata on the control limit record (best-effort)
+        try {
+            $this->data->execute(
+                "UPDATE " . self::CHART_TABLE . "
+                 SET metadata = jsonb_set(COALESCE(metadata, '{}'), '{linked_deviation_id}', to_jsonb(:devid::text))
+                 WHERE limit_id = :id",
+                [':devid' => $deviationId, ':id' => $chartId]
+            );
+        } catch (\Throwable) {
+            // Non-critical; proceed
+        }
 
         // Also create an EQMS cross-link
         try {
