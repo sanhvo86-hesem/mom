@@ -27,7 +27,7 @@ window.HmAiStream = {
     try {
       var self = this;
       var url = ((window.HmRuntimePaths && HmRuntimePaths.apiBase) || '') +
-                'api.php?action=events_stream&channels=ai,dashboard';
+                'api/events/stream?channels=ai,dashboard';
       this._source = new EventSource(url, { withCredentials: true });
 
       this._source.onopen = function() {
@@ -136,14 +136,15 @@ HmAiStream.on('ai.analysis.completed', function(data) {
   if(typeof showToast === 'function') showToast(_t('Phan tich AI hoan tat', 'AI Analysis complete'), 'success');
 });
 
-/* ── Auto-connect when page is ready ─────────────────── */
+/* ── Conditional auto-connect ─────────────────────────── */
 document.addEventListener('DOMContentLoaded', function() {
-  // Connect after a brief delay to let the page load
   setTimeout(function() {
-    if (typeof EventSource !== 'undefined') {
+    // Only connect if AI is enabled (server sets window.HmAiEnabled)
+    // and if EventSource is supported
+    if (typeof EventSource !== 'undefined' && window.HmAiEnabled === true) {
       HmAiStream.connect();
     }
-  }, 2000);
+  }, 3000);
 });
 
 })();

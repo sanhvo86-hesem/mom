@@ -28,12 +28,17 @@
     action:   '/api/v1/mes/quality/spc/'         // + {id}/actions/{action}
   };
 
-  function restCall(url, payload, method) {
+  function restCall(url, payload, method, timeout) {
     method = method || 'POST';
-    var opts = { method: method, headers: { 'Content-Type': 'application/json' } };
+    timeout = timeout || 30000;
+    var controller = new AbortController();
+    var timer = setTimeout(function() { controller.abort(); }, timeout);
+    var opts = { method: method, headers: { 'Content-Type': 'application/json' }, signal: controller.signal };
     if (window.csrfToken) opts.headers['X-CSRF-Token'] = window.csrfToken;
     if (method !== 'GET' && payload) opts.body = JSON.stringify(payload);
-    return fetch(url, opts).then(function(r) { return r.json(); });
+    return fetch(url, opts)
+      .then(function(r) { clearTimeout(timer); return r.json(); })
+      .catch(function(err) { clearTimeout(timer); if (err.name === 'AbortError') return { ok: false, error: 'timeout' }; throw err; });
   }
 
   /* ── Constants ────────────────────────────────────────────────────────── */

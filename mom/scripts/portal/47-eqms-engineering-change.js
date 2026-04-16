@@ -109,28 +109,32 @@
   // =========================================================================
   // API HELPERS
   // =========================================================================
-  function api(path, payload, method) {
+  function api(path, payload, method, timeout) {
     method = method || 'POST';
+    timeout = timeout || 30000;
     var url = API_BASE + (path ? '/' + path : '');
+    var controller = new AbortController();
+    var timer = setTimeout(function() { controller.abort(); }, timeout);
     return fetch(url, {
       method: method,
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': window.csrfToken || ''
-      },
-      body: method !== 'GET' ? JSON.stringify(payload || {}) : undefined
-    }).then(function(r) { return r.json(); });
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': window.csrfToken || '' },
+      body: method !== 'GET' ? JSON.stringify(payload || {}) : undefined,
+      signal: controller.signal
+    }).then(function(r) { clearTimeout(timer); return r.json(); })
+      .catch(function(err) { clearTimeout(timer); if (err.name === 'AbortError') return { ok: false, error: 'timeout' }; throw err; });
   }
 
-  function apiGet(path) {
+  function apiGet(path, timeout) {
+    timeout = timeout || 30000;
     var url = API_BASE + '/' + path;
+    var controller = new AbortController();
+    var timer = setTimeout(function() { controller.abort(); }, timeout);
     return fetch(url, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRF-Token': window.csrfToken || ''
-      }
-    }).then(function(r) { return r.json(); });
+      headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': window.csrfToken || '' },
+      signal: controller.signal
+    }).then(function(r) { clearTimeout(timer); return r.json(); })
+      .catch(function(err) { clearTimeout(timer); if (err.name === 'AbortError') return { ok: false, error: 'timeout' }; throw err; });
   }
 
   // =========================================================================

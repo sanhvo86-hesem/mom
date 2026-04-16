@@ -32,6 +32,12 @@ return static function (Router $router, string $dataDir): void {
     
     // Server-Sent Events stream (Phase 1.2)
     $router->get('/api/events/stream', EventStreamController::class, 'stream');
+
+    // Legacy action aliases for SSE (used by 22d-ai-realtime.js and 14-mes-control-center.js)
+    $router->actions([
+        'events_stream' => [EventStreamController::class, 'stream'],
+        'mes_stream'    => [EventStreamController::class, 'stream'],
+    ]);
     
     // Health checks (Kubernetes-ready)
     $router->get('/api/health/live', HealthController::class, 'live');

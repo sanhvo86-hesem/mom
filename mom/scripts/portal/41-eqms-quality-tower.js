@@ -96,7 +96,8 @@
   };
 
   // ── API Layer ──
-  function apiFetch(path, params) {
+  function apiFetch(path, params, timeout) {
+    timeout = timeout || 30000;
     var url = 'api/v1/eqms/quality-tower/' + path;
     if (params) {
       var qs = Object.keys(params).filter(function(k) {
@@ -106,14 +107,21 @@
       }).join('&');
       if (qs) url += '?' + qs;
     }
-    var opts = { method: 'GET', headers: { 'Content-Type': 'application/json' } };
+    var controller = new AbortController();
+    var timer = setTimeout(function() { controller.abort(); }, timeout);
+    var opts = { method: 'GET', headers: { 'Content-Type': 'application/json' }, signal: controller.signal };
     if (window.csrfToken) opts.headers['X-CSRF-Token'] = window.csrfToken;
     return fetch(url, opts).then(function(r) {
+      clearTimeout(timer);
       if (!r.ok) throw new Error('HTTP ' + r.status);
       return r.json();
     }).then(function(json) {
       if (json && json.success === false) throw new Error(json.message || 'API error');
       return json.data || json;
+    }).catch(function(err) {
+      clearTimeout(timer);
+      if (err.name === 'AbortError') throw new Error('Request timed out');
+      throw err;
     });
   }
 

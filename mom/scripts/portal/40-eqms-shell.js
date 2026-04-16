@@ -88,15 +88,27 @@
   // API wrapper
   function apiCall(action, payload, method, timeout) {
     method = method || 'POST';
+    timeout = timeout || 30000; // 30s default timeout
     var url = 'api.php?action=' + encodeURIComponent(action);
-    var opts = { method: method, headers: { 'Content-Type': 'application/json' } };
+    var controller = new AbortController();
+    var timer = setTimeout(function() { controller.abort(); }, timeout);
+    var opts = { method: method, headers: { 'Content-Type': 'application/json' }, signal: controller.signal };
     if (window.csrfToken) opts.headers['X-CSRF-Token'] = window.csrfToken;
     if (method !== 'GET' && payload) opts.body = JSON.stringify(payload);
     if (method === 'GET' && payload) {
       var qs = Object.keys(payload).map(function(k) { return encodeURIComponent(k) + '=' + encodeURIComponent(payload[k]); }).join('&');
       if (qs) url += '&' + qs;
     }
-    return fetch(url, opts).then(function(r) { return r.json(); });
+    return fetch(url, opts).then(function(r) {
+      clearTimeout(timer);
+      return r.json();
+    }).catch(function(err) {
+      clearTimeout(timer);
+      if (err.name === 'AbortError') {
+        return { ok: false, success: false, error: 'timeout', message: 'Request timed out after ' + (timeout/1000) + 's' };
+      }
+      throw err;
+    });
   }
 
   // =========================================================================
@@ -1015,6 +1027,7 @@
   function apiCallEnhanced(action, payload, method, config) {
     config = config || {};
     method = method || 'POST';
+    var timeout = config.timeout || 30000; // 30s default timeout
     var url = 'api.php?action=' + encodeURIComponent(action);
     var opts = { method: method, headers: { 'Content-Type': 'application/json' } };
     if (window.csrfToken) opts.headers['X-CSRF-Token'] = window.csrfToken;
@@ -1029,7 +1042,11 @@
     var attempt = 0;
 
     function doFetch() {
-      return fetch(url, opts).then(function(r) {
+      var controller = new AbortController();
+      var timer = setTimeout(function() { controller.abort(); }, timeout);
+      var fetchOpts = Object.assign({}, opts, { signal: controller.signal });
+      return fetch(url, fetchOpts).then(function(r) {
+        clearTimeout(timer);
         var result = r.json();
         return result.then(function(data) {
           data._httpStatus = r.status;
@@ -1042,6 +1059,13 @@
           return data;
         });
       }).catch(function(err) {
+        clearTimeout(timer);
+        if (err.name === 'AbortError') {
+          var timeoutErr = new Error('Request timed out after ' + (timeout/1000) + 's');
+          timeoutErr.status = 0;
+          timeoutErr.data = { ok: false, success: false, error: 'timeout' };
+          throw timeoutErr;
+        }
         if (attempt < retries && (!err.status || err.status >= 500)) {
           attempt++;
           return new Promise(function(resolve) {
