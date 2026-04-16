@@ -26,7 +26,7 @@ window.HmAiStream = {
 
     try {
       var self = this;
-      var url = (window.HmRuntimePaths ? HmRuntimePaths.apiBase : '') +
+      var url = ((window.HmRuntimePaths && HmRuntimePaths.apiBase) || '') +
                 'api.php?action=events_stream&channels=ai,dashboard';
       this._source = new EventSource(url, { withCredentials: true });
 

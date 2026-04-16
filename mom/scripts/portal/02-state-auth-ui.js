@@ -61,7 +61,7 @@ function resetPortalToLogin(options={}){
   clearPendingAuthTimer();
   try{ if(typeof stopLiveDocsSync==='function') stopLiveDocsSync(); }catch(e){}
   syncCurrentUserRef(null);
-  csrfToken = null;
+  _syncCsrf(null);
   enrollInfo = null;
 
   const app = document.getElementById('app');
@@ -1017,6 +1017,9 @@ async function loadCustomDocsFromServer(){
 // AUTH
 // ═══════════════════════════════════════════════════
 let csrfToken = null;
+// Sync csrfToken to window.csrfToken so EQMS shell modules (40-eqms-shell.js)
+// and REST-based modules (50-eqms-audits.js etc.) can read it via window.csrfToken.
+function _syncCsrf(v){ csrfToken = v; window.csrfToken = v; }
 let loginStage = 'password';
 let nextAfterLogin = null;
 let enrollInfo = null;
@@ -1686,14 +1689,14 @@ function fillLogin(username){
 }
 
 async function onLoggedIn(res){
-  csrfToken = res.csrf_token || csrfToken;
+  _syncCsrf(res.csrf_token || csrfToken);
   syncCurrentUserRef(res.user || currentUser);
 
   if(!currentUser){
     // fallback: check status
     try{
       const s = await apiCall('status', null, 'GET');
-      if(s.logged_in){ syncCurrentUserRef(s.user); csrfToken = s.csrf_token || csrfToken; }
+      if(s.logged_in){ syncCurrentUserRef(s.user); _syncCsrf(s.csrf_token || csrfToken); }
     }catch(e){}
   }
   // V10 Role migration: map old role keys to new JD-based keys
@@ -1722,7 +1725,7 @@ async function onLoggedIn(res){
     const accepted = await showConsentDialog();
     if(!accepted){
       showToast(lang==='en'?'Access denied — consent required':'Truy cập bị từ chối — cần đồng ý điều khoản');
-      syncCurrentUserRef(null); csrfToken = null;
+      syncCurrentUserRef(null); _syncCsrf(null);
       try{ await apiCall('auth_logout', {}, 'POST'); }catch(e){}
       setLoginStage('password');
       return;
@@ -1742,7 +1745,7 @@ async function onLoggedIn(res){
         not_supported: lang==='en'?'Browser does not support geolocation.':'Trình duyệt không hỗ trợ định vị.'
       };
       alert('⚠ ' + (reasons[geo.reason] || reasons.denied) + '\n\n' + (lang==='en'?'Session will be terminated.':'Phiên sẽ kết thúc.'));
-      syncCurrentUserRef(null); csrfToken = null;
+      syncCurrentUserRef(null); _syncCsrf(null);
       try{ await apiCall('auth_logout', {}, 'POST'); }catch(e){}
       setLoginStage('password');
       return;
@@ -1932,7 +1935,7 @@ async function doLogin(){
       }
       if(res.enroll_required){
         enrollInfo = res;
-        csrfToken = res.csrf_token || csrfToken;
+        _syncCsrf(res.csrf_token || csrfToken);
         document.getElementById('enroll-issuer').textContent = res.issuer || '';
         document.getElementById('enroll-username').textContent = res.username || u;
         document.getElementById('enroll-secret').textContent = res.secret || '';
@@ -1942,7 +1945,7 @@ async function doLogin(){
         return;
       }
       if(res.mfa_required){
-        csrfToken = res.csrf_token || csrfToken;
+        _syncCsrf(res.csrf_token || csrfToken);
         showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nhập mã xác thực 6 số từ Authenticator', res.pending_expires_in);
         return;
       }
@@ -1996,7 +1999,7 @@ async function doLogout(){
   clearPendingAuthTimer();
   try{ await apiCall('auth_logout', {}, 'POST'); }catch(e){}
 
-  csrfToken = null;
+  _syncCsrf(null);
   syncCurrentUserRef(null);
   try{ if(typeof stopLiveDocsSync==='function') stopLiveDocsSync(); }catch(e){}
 
@@ -2023,7 +2026,7 @@ async function checkSession(){
       lastStatus = s;
       if(s && s.logged_in){
         clearPendingAuthTimer();
-        csrfToken = s.csrf_token || null;
+        _syncCsrf(s.csrf_token || null);
         syncCurrentUserRef(s.user);
         setLoginChecking(false, '');
         const geo = await requireGeolocation().catch(()=>({ok:false}));
@@ -2032,7 +2035,7 @@ async function checkSession(){
         return;
       }
       if(s && s.enroll_pending){
-        csrfToken = s.csrf_token || null;
+        _syncCsrf(s.csrf_token || null);
         enrollInfo = s;
         document.getElementById('enroll-issuer').textContent = s.issuer || '';
         document.getElementById('enroll-username').textContent = s.username || '';
@@ -2044,7 +2047,7 @@ async function checkSession(){
         return;
       }
       if(s && s.mfa_pending){
-        csrfToken = s.csrf_token || null;
+        _syncCsrf(s.csrf_token || null);
         setLoginChecking(false, '');
         showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nhập mã xác thực 6 số từ Authenticator', s.pending_expires_in);
         return;
@@ -2087,7 +2090,7 @@ async function showApp(){
     try{ status = await apiCall('status', null, 'GET', 8000); }catch(e){}
     if(!(status && status.logged_in)){
       if(status && status.enroll_pending){
-        csrfToken = status.csrf_token || null;
+        _syncCsrf(status.csrf_token || null);
         enrollInfo = status;
         document.getElementById('enroll-issuer').textContent = status.issuer || '';
         document.getElementById('enroll-username').textContent = status.username || '';
@@ -2098,7 +2101,7 @@ async function showApp(){
         return;
       }
       if(status && status.mfa_pending){
-        csrfToken = status.csrf_token || null;
+        _syncCsrf(status.csrf_token || null);
         showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nhập mã xác thực 6 số từ Authenticator', status.pending_expires_in);
         return;
       }
