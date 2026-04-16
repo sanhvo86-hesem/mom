@@ -795,7 +795,10 @@ class AdminController extends BaseController
         $user = $this->requireAuth();
         $this->requireAnyRole($user, admin_roles());
 
-        $cfg = $this->data->loadConfig('ai_config') ?: [];
+        $aiCfgFile = $this->confDir . '/ai_config.json';
+        $cfg = is_file($aiCfgFile)
+            ? (json_decode((string)file_get_contents($aiCfgFile), true) ?: [])
+            : [];
 
         // Mask API key — only return last 4 chars
         $key = (string)($cfg['api_key'] ?? '');
@@ -868,7 +871,10 @@ class AdminController extends BaseController
         $enabled = filter_var($body['enabled'] ?? false, FILTER_VALIDATE_BOOLEAN);
 
         // Load existing config to preserve stored API key if not updated
-        $existing = $this->data->loadConfig('ai_config') ?: [];
+        $aiCfgFile = $this->confDir . '/ai_config.json';
+        $existing  = is_file($aiCfgFile)
+            ? (json_decode((string)file_get_contents($aiCfgFile), true) ?: [])
+            : [];
         $newKey   = isset($body['api_key']) ? trim((string)$body['api_key']) : '';
         $apiKey   = $newKey !== '' ? $newKey : ($existing['api_key'] ?? '');
 
@@ -893,7 +899,8 @@ class AdminController extends BaseController
             'updated_by'     => (string)($user['username'] ?? 'admin'),
         ];
 
-        $this->data->saveConfig('ai_config', $cfg);
+        $aiCfgFile = $this->confDir . '/ai_config.json';
+        file_put_contents($aiCfgFile, json_encode($cfg, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
         $this->auditLog('ai_config_save', [
             'enabled' => $enabled,
@@ -987,7 +994,10 @@ class AdminController extends BaseController
         $this->requireAnyRole($user, admin_roles());
 
         $body  = $this->jsonBody();
-        $cfg   = $this->data->loadConfig('ai_config') ?: [];
+        $aiCfgFile = $this->confDir . '/ai_config.json';
+        $cfg   = is_file($aiCfgFile)
+            ? (json_decode((string)file_get_contents($aiCfgFile), true) ?: [])
+            : [];
         $key   = trim((string)($body['api_key'] ?? ''));
         $model = (string)($body['model'] ?? ($cfg['model'] ?? 'claude-sonnet-4-20250514'));
 
