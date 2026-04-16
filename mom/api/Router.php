@@ -118,7 +118,7 @@ class Router
     /**
      * Register a RESTful route.
      *
-     * @param string                       $httpMethod HTTP method (GET, POST, PUT, DELETE).
+     * @param string                       $httpMethod HTTP method (GET, POST, PUT, PATCH, DELETE).
      * @param string                       $pattern    URL pattern (e.g. '/api/documents', '/api/forms/{code}/entries').
      * @param class-string<BaseController> $controller Controller class name.
      * @param string                       $method     Controller method name.
@@ -168,6 +168,19 @@ class Router
     public function put(string $pattern, string $controller, string $method): static
     {
         return $this->route('PUT', $pattern, $controller, $method);
+    }
+
+    /**
+     * Shorthand for PATCH route.
+     *
+     * @param string                       $pattern    URL pattern.
+     * @param class-string<BaseController> $controller Controller class.
+     * @param string                       $method     Controller method.
+     * @return static
+     */
+    public function patch(string $pattern, string $controller, string $method): static
+    {
+        return $this->route('PATCH', $pattern, $controller, $method);
     }
 
     /**
