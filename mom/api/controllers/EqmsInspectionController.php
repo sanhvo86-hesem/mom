@@ -174,7 +174,7 @@ class EqmsInspectionController extends EqmsBaseController
         ) ?? [];
 
         $pendingCount = (int)($this->data->scalar(
-            "SELECT COUNT(*) FROM " . self::IQC_TABLE . " WHERE status IN ('pending', 'in_progress', 'under_review')"
+            "SELECT COUNT(*) FROM " . self::IQC_TABLE . " WHERE status IN ('pending', 'in_progress', 'on_hold')"
         ) ?? 0);
 
         $this->success([
