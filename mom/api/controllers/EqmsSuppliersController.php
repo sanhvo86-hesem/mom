@@ -62,7 +62,7 @@ final class EqmsSuppliersController extends EqmsBaseController
             $params[':risk_tier'] = (string)$f['risk_tier'];
         }
         if ($q['search'] !== '') {
-            $where[]           = "(v.vendor_name ILIKE :search OR v.vendor_code ILIKE :search)";
+            $where[]           = "(v.vendor_name ILIKE :search OR v.vendor_id ILIKE :search)";
             $params[':search'] = '%' . $q['search'] . '%';
         }
 
@@ -71,11 +71,11 @@ final class EqmsSuppliersController extends EqmsBaseController
             ? $q['sort_by'] : 'updated_at';
 
         $rows = $this->data->query(
-            "SELECT sp.supplier_profile_id, sp.vendor_id, v.vendor_name, v.vendor_code,
+            "SELECT sp.supplier_profile_id, sp.vendor_id, v.vendor_name,
                     sp.qualification_status, sp.qualification_date, sp.requalification_due,
                     sp.risk_tier, sp.approved_categories, sp.notes, sp.version, sp.updated_at
              FROM eqms_supplier_profiles sp
-             JOIN vendors v ON v.vendor_id = sp.vendor_id
+             JOIN vendors v ON v.vendor_id = sp.vendor_id::text
              WHERE {$whereClause}
              ORDER BY sp.{$sortBy} {$q['sort_dir']}
              LIMIT :lim OFFSET :off",
@@ -84,7 +84,7 @@ final class EqmsSuppliersController extends EqmsBaseController
 
         $total = (int)($this->data->scalar(
             "SELECT COUNT(*) FROM eqms_supplier_profiles sp
-             JOIN vendors v ON v.vendor_id = sp.vendor_id
+             JOIN vendors v ON v.vendor_id = sp.vendor_id::text
              WHERE {$whereClause}",
             $params
         ) ?? 0);
@@ -111,7 +111,7 @@ final class EqmsSuppliersController extends EqmsBaseController
              WHERE qualification_status = 'qualified' AND requalification_due <= (now() + interval '30 days')"
         ) ?? 0);
         $avgScore    = (float)($this->data->scalar(
-            "SELECT ROUND(AVG(overall_score)::numeric, 1) FROM supplier_scorecards WHERE period_end >= date_trunc('year', now())"
+            "SELECT ROUND(AVG(overall_score)::numeric, 1) FROM supplier_scorecards WHERE created_at >= date_trunc('year', now())"
         ) ?? 0.0);
 
         $this->success([
@@ -204,9 +204,9 @@ final class EqmsSuppliersController extends EqmsBaseController
         $profileId = $this->requirePathId();
 
         $row = $this->data->query(
-            "SELECT sp.*, v.vendor_name, v.vendor_code, v.country, v.contact_email
+            "SELECT sp.*, v.vendor_name, v.country, v.contact_email
              FROM eqms_supplier_profiles sp
-             JOIN vendors v ON v.vendor_id = sp.vendor_id
+             JOIN vendors v ON v.vendor_id = sp.vendor_id::text
              WHERE sp.supplier_profile_id = :id LIMIT 1",
             [':id' => $profileId]
         );
@@ -300,11 +300,11 @@ final class EqmsSuppliersController extends EqmsBaseController
         $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
 
         $rows = $this->data->query(
-            "SELECT scorecard_id, vendor_id, period_start, period_end,
-                    delivery_score, quality_score, responsiveness_score, overall_score,
-                    prepared_by, approved_by, issued_at
+            "SELECT scorecard_id, vendor_id, period,
+                    delivery_score, quality_score, overall_score,
+                    created_at
              FROM supplier_scorecards WHERE vendor_id = :vid
-             ORDER BY period_end DESC LIMIT :lim OFFSET :off",
+             ORDER BY created_at DESC LIMIT :lim OFFSET :off",
             [':vid' => $vendorId, ':lim' => $limit, ':off' => $offset]
         ) ?? [];
 

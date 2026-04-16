@@ -144,7 +144,7 @@ class EqmsCalibrationController extends EqmsBaseController
         ) ?? 0);
 
         $failCount = (int)($this->data->scalar(
-            "SELECT COUNT(*) FROM " . self::TABLE . " WHERE pass_fail = 'fail'"
+            "SELECT COUNT(*) FROM " . self::TABLE . " WHERE pass_fail = false"
         ) ?? 0);
 
         $this->success([

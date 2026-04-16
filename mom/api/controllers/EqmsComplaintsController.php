@@ -175,7 +175,7 @@ final class EqmsComplaintsController extends EqmsBaseController
         ) ?? 0);
 
         $avgResolutionDays = (float)($this->data->scalar(
-            "SELECT ROUND(AVG(EXTRACT(EPOCH FROM (resolution_date - received_date)) / 86400)::numeric, 1)
+            "SELECT ROUND(AVG((resolution_date - received_date))::numeric, 1)
              FROM eqms_complaints
              WHERE resolution_date IS NOT NULL AND received_date IS NOT NULL"
         ) ?? 0.0);

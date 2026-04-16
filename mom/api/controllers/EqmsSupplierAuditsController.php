@@ -113,7 +113,7 @@ final class EqmsSupplierAuditsController extends EqmsBaseController
                     sa.planned_date, sa.actual_start, sa.actual_end,
                     sa.finding_count, sa.status, sa.version, sa.created_at
              FROM eqms_supplier_audits sa
-             JOIN vendors v ON v.vendor_id = sa.vendor_id
+             JOIN vendors v ON v.vendor_id = sa.vendor_id::text
              WHERE {$whereClause}
              ORDER BY sa.{$sortBy} {$q['sort_dir']}
              LIMIT :lim OFFSET :off",
@@ -122,7 +122,7 @@ final class EqmsSupplierAuditsController extends EqmsBaseController
 
         $total = (int)($this->data->scalar(
             "SELECT COUNT(*) FROM eqms_supplier_audits sa
-             JOIN vendors v ON v.vendor_id = sa.vendor_id WHERE {$whereClause}",
+             JOIN vendors v ON v.vendor_id = sa.vendor_id::text WHERE {$whereClause}",
             $params
         ) ?? 0);
 
@@ -231,9 +231,9 @@ final class EqmsSupplierAuditsController extends EqmsBaseController
         $auditId = $this->requirePathId();
 
         $row = $this->data->query(
-            "SELECT sa.*, v.vendor_name, v.vendor_code
+            "SELECT sa.*, v.vendor_name, 
              FROM eqms_supplier_audits sa
-             JOIN vendors v ON v.vendor_id = sa.vendor_id
+             JOIN vendors v ON v.vendor_id = sa.vendor_id::text
              WHERE sa.supplier_audit_id = :id LIMIT 1",
             [':id' => $auditId]
         );
@@ -607,7 +607,7 @@ final class EqmsSupplierAuditsController extends EqmsBaseController
                     s.supplier_audit_id, s.priority, s.description,
                     s.assigned_to, s.response_due_date, s.status, s.version, s.created_at
              FROM eqms_scars s
-             JOIN vendors v ON v.vendor_id = s.vendor_id
+             JOIN vendors v ON v.vendor_id = s.vendor_id::text
              WHERE {$whereClause}
              ORDER BY s.{$sortBy} {$q['sort_dir']}
              LIMIT :lim OFFSET :off",
@@ -616,7 +616,7 @@ final class EqmsSupplierAuditsController extends EqmsBaseController
 
         $total = (int)($this->data->scalar(
             "SELECT COUNT(*) FROM eqms_scars s
-             JOIN vendors v ON v.vendor_id = s.vendor_id WHERE {$whereClause}",
+             JOIN vendors v ON v.vendor_id = s.vendor_id::text WHERE {$whereClause}",
             $params
         ) ?? 0);
 
@@ -722,9 +722,9 @@ final class EqmsSupplierAuditsController extends EqmsBaseController
         $scarId = $this->requirePathId();
 
         $row = $this->data->query(
-            "SELECT s.*, v.vendor_name, v.vendor_code
+            "SELECT s.*, v.vendor_name, 
              FROM eqms_scars s
-             JOIN vendors v ON v.vendor_id = s.vendor_id
+             JOIN vendors v ON v.vendor_id = s.vendor_id::text
              WHERE s.scar_id = :id LIMIT 1",
             [':id' => $scarId]
         );

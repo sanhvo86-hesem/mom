@@ -55,8 +55,8 @@ final class EqmsQualityTowerController extends EqmsBaseController
               (SELECT COUNT(*) FROM eqms_capa_records        WHERE status NOT IN ('closed')) AS open_capa,
               (SELECT COUNT(*) FROM eqms_change_controls     WHERE status NOT IN ('closed','cancelled')) AS open_changes,
               (SELECT COUNT(*) FROM eqms_audit_findings      WHERE status NOT IN ('closed')) AS open_audit_findings,
-              (SELECT COUNT(*) FROM eqms_scar_records        WHERE status NOT IN ('closed')) AS open_scar,
-              (SELECT COUNT(*) FROM eqms_batch_release_records WHERE status = 'pending_release') AS pending_release,
+              (SELECT COUNT(*) FROM eqms_scars               WHERE status NOT IN ('closed')) AS open_scar,
+              (SELECT COUNT(*) FROM eqms_batch_release       WHERE status = 'pending_release') AS pending_release,
               (SELECT COUNT(*) FROM eqms_field_actions       WHERE status NOT IN ('closed')) AS active_field_actions,
               (SELECT COUNT(*) FROM eqms_lab_investigations  WHERE status NOT IN ('closed')) AS open_lab_investigations,
               (SELECT COUNT(*) FROM eqms_calibration_records WHERE next_due_date < NOW()
@@ -157,7 +157,7 @@ final class EqmsQualityTowerController extends EqmsBaseController
               COUNT(*) AS issued,
               COUNT(*) FILTER (WHERE status NOT IN ('draft','issued')
                 AND updated_at <= (created_at + INTERVAL '30 days')) AS responded_on_time
-            FROM eqms_scar_records
+            FROM eqms_scars
             WHERE created_at >= NOW() - INTERVAL '180 days'
         ")->fetch(\PDO::FETCH_ASSOC);
 
@@ -200,7 +200,7 @@ final class EqmsQualityTowerController extends EqmsBaseController
 
         if (in_array('capa', $modules, true)) {
             $st = $db->query("
-                SELECT id, 'capa' AS module, title, status,
+                SELECT capa_id::text AS id, 'capa' AS module, title, status,
                   EXTRACT(DAY FROM NOW() - target_close_date)::int AS days_overdue,
                   owner_user_id AS owner
                 FROM eqms_capa_records
@@ -214,7 +214,7 @@ final class EqmsQualityTowerController extends EqmsBaseController
 
         if (in_array('ncr', $modules, true)) {
             $st = $db->query("
-                SELECT id, 'ncr' AS module, description AS title, status,
+                SELECT ncr_id::text AS id, 'ncr' AS module, description AS title, status,
                   EXTRACT(DAY FROM NOW() - due_date)::int AS days_overdue,
                   assigned_to AS owner
                 FROM eqms_ncr_records
@@ -228,10 +228,10 @@ final class EqmsQualityTowerController extends EqmsBaseController
 
         if (in_array('scar', $modules, true)) {
             $st = $db->query("
-                SELECT id, 'scar' AS module, title, status,
+                SELECT scar_id::text AS id, 'scar' AS module, title, status,
                   EXTRACT(DAY FROM NOW() - response_due_date)::int AS days_overdue,
-                  supplier_id::text AS owner
-                FROM eqms_scar_records
+                  vendor_id::text AS owner
+                FROM eqms_scars
                 WHERE status NOT IN ('closed')
                   AND response_due_date IS NOT NULL
                   AND response_due_date < NOW()
@@ -242,7 +242,7 @@ final class EqmsQualityTowerController extends EqmsBaseController
 
         if (in_array('training', $modules, true)) {
             $st = $db->query("
-                SELECT id, 'training' AS module, course_name AS title, status,
+                SELECT training_id::text AS id, 'training' AS module, course_name AS title, status,
                   EXTRACT(DAY FROM NOW() - due_date)::int AS days_overdue,
                   employee_id::text AS owner
                 FROM eqms_training_records
@@ -256,7 +256,7 @@ final class EqmsQualityTowerController extends EqmsBaseController
 
         if (in_array('calibration', $modules, true)) {
             $st = $db->query("
-                SELECT id, 'calibration' AS module, instrument_name AS title, status,
+                SELECT calibration_id::text AS id, 'calibration' AS module, instrument_name AS title, status,
                   EXTRACT(DAY FROM NOW() - next_due_date)::int AS days_overdue,
                   responsible_user_id::text AS owner
                 FROM eqms_calibration_records
@@ -270,7 +270,7 @@ final class EqmsQualityTowerController extends EqmsBaseController
 
         if (in_array('field_actions', $modules, true)) {
             $st = $db->query("
-                SELECT id, 'field_action' AS module, title, status,
+                SELECT field_action_id::text AS id, 'field_action' AS module, title, status,
                   EXTRACT(DAY FROM NOW() - target_completion_date)::int AS days_overdue,
                   owner_user_id::text AS owner
                 FROM eqms_field_actions
@@ -317,7 +317,7 @@ final class EqmsQualityTowerController extends EqmsBaseController
 
         // Calibrations due
         $calDue = $db->prepare("
-            SELECT id, instrument_name AS name, 'calibration_due' AS event_type,
+            SELECT calibration_id::text AS id, instrument_name AS name, 'calibration_due' AS event_type,
               next_due_date AS due_date
             FROM eqms_calibration_records
             WHERE status NOT IN ('closed','cancelled')
@@ -328,7 +328,7 @@ final class EqmsQualityTowerController extends EqmsBaseController
 
         // Training expirations
         $trainDue = $db->prepare("
-            SELECT id, course_name AS name, 'training_expiry' AS event_type,
+            SELECT training_id::text AS id, course_name AS name, 'training_expiry' AS event_type,
               due_date
             FROM eqms_training_records
             WHERE status != 'completed'
@@ -339,7 +339,7 @@ final class EqmsQualityTowerController extends EqmsBaseController
 
         // Scheduled audits
         $auditDue = $db->prepare("
-            SELECT id, audit_name AS name, 'audit_scheduled' AS event_type,
+            SELECT audit_id::text AS id, COALESCE(scope, audit_number) AS name, 'audit_scheduled' AS event_type,
               planned_date AS due_date
             FROM eqms_audits
             WHERE status IN ('planned','scheduled')
@@ -350,7 +350,7 @@ final class EqmsQualityTowerController extends EqmsBaseController
 
         // Quality agreement reviews
         $agmtDue = $db->prepare("
-            SELECT id, agreement_title AS name, 'quality_agreement_review' AS event_type,
+            SELECT id::text AS id, agreement_title AS name, 'quality_agreement_review' AS event_type,
               review_date AS due_date
             FROM eqms_supplier_quality_agreements
             WHERE status NOT IN ('expired','terminated')
