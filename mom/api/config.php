@@ -94,12 +94,33 @@ return [
         'ttl_seconds' => max(300, (int)(getenv('QMS_API_IDEMPOTENCY_TTL_SECONDS') ?: 86400)),
         'retry_window_seconds' => max(15, (int)(getenv('QMS_API_IDEMPOTENCY_RETRY_WINDOW_SECONDS') ?: 120)),
     ],
-    'ai' => [
-        'anthropic_api_key'    => getenv('ANTHROPIC_API_KEY') ?: '',
-        'anthropic_model'      => getenv('ANTHROPIC_MODEL') ?: 'claude-sonnet-4-20250514',
-        'anthropic_max_tokens' => (int)(getenv('ANTHROPIC_MAX_TOKENS') ?: 4096),
-        'anthropic_timeout'    => (int)(getenv('ANTHROPIC_TIMEOUT') ?: 30),
-        'cache_ttl'            => (int)(getenv('AI_CACHE_TTL') ?: 300),
-        'enabled'              => $envBool('AI_ENABLED', false),
-    ],
+    'ai' => (function() use ($envBool): array {
+        // Runtime override: admin can save AI config via the AI Control tab.
+        // The JSON file takes precedence over env vars for all settings.
+        $cfgFile = __DIR__ . '/../data/config/ai_config.json';
+        $fileCfg = [];
+        if (is_file($cfgFile)) {
+            $raw = @file_get_contents($cfgFile);
+            if ($raw !== false) {
+                $decoded = json_decode($raw, true);
+                if (is_array($decoded)) {
+                    $fileCfg = $decoded;
+                }
+            }
+        }
+
+        return [
+            'anthropic_api_key'    => (string)($fileCfg['api_key']     ?? getenv('ANTHROPIC_API_KEY') ?: ''),
+            'anthropic_model'      => (string)($fileCfg['model']        ?? getenv('ANTHROPIC_MODEL') ?: 'claude-sonnet-4-20250514'),
+            'anthropic_max_tokens' => (int)   ($fileCfg['max_tokens']   ?? getenv('ANTHROPIC_MAX_TOKENS') ?: 4096),
+            'anthropic_timeout'    => (int)   ($fileCfg['timeout']      ?? getenv('ANTHROPIC_TIMEOUT') ?: 30),
+            'cache_ttl'            => (int)   ($fileCfg['cache_ttl']    ?? getenv('AI_CACHE_TTL') ?: 300),
+            'enabled'              => isset($fileCfg['enabled'])
+                ? filter_var($fileCfg['enabled'], FILTER_VALIDATE_BOOLEAN)
+                : $envBool('AI_ENABLED', false),
+            'features'             => is_array($fileCfg['features'] ?? null) ? $fileCfg['features'] : [],
+            'rpm_limit'            => (int)($fileCfg['rpm_limit']     ?? 60),
+            'user_rpm_limit'       => (int)($fileCfg['user_rpm_limit'] ?? 20),
+        ];
+    })(),
 ];

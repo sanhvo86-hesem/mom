@@ -785,6 +785,278 @@ class AdminController extends BaseController
         }
     }
 
+    // ── AI Configuration ─────────────────────────────────────────────────────
+
+    /**
+     * GET admin_ai_config_get — Load AI engine configuration.
+     */
+    public function getAiConfig(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, admin_roles());
+
+        $cfg = $this->data->loadConfig('ai_config') ?: [];
+
+        // Mask API key — only return last 4 chars
+        $key = (string)($cfg['api_key'] ?? '');
+        if ($key !== '') {
+            $cfg['api_key_masked'] = str_repeat('•', max(0, strlen($key) - 4)) . substr($key, -4);
+            unset($cfg['api_key']); // never send the real key to browser
+        }
+
+        // Merge env defaults so the UI always has values
+        $envEnabled = filter_var(getenv('AI_ENABLED') ?: 'false', FILTER_VALIDATE_BOOLEAN);
+        $defaults = [
+            'enabled'       => $envEnabled,
+            'model'         => getenv('ANTHROPIC_MODEL') ?: 'claude-sonnet-4-20250514',
+            'max_tokens'    => (int)(getenv('ANTHROPIC_MAX_TOKENS') ?: 4096),
+            'timeout'       => (int)(getenv('ANTHROPIC_TIMEOUT') ?: 30),
+            'cache_ttl'     => (int)(getenv('AI_CACHE_TTL') ?: 300),
+            'rpm_limit'     => 60,
+            'user_rpm_limit'=> 20,
+            'features'      => [
+                'realtime'        => true,
+                'recommendations' => true,
+                'chat'            => true,
+                'predictions'     => true,
+                'schedule'        => true,
+                'summarise'       => true,
+                'rca'             => true,
+            ],
+        ];
+
+        foreach ($defaults as $k => $v) {
+            if (!array_key_exists($k, $cfg)) {
+                $cfg[$k] = $v;
+            }
+        }
+        if (!isset($cfg['features']) || !is_array($cfg['features'])) {
+            $cfg['features'] = $defaults['features'];
+        }
+
+        $this->success(['config' => $cfg]);
+    }
+
+    /**
+     * POST admin_ai_config_save — Save AI engine configuration.
+     */
+    public function saveAiConfig(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAnyRole($user, admin_roles());
+
+        $body = $this->jsonBody();
+
+        // Validate
+        $allowed_models = [
+            'claude-opus-4-5', 'claude-sonnet-4-5', 'claude-haiku-3-5',
+            'claude-opus-4-20250514', 'claude-sonnet-4-20250514', 'claude-haiku-3-20240307',
+        ];
+
+        $model = (string)($body['model'] ?? 'claude-sonnet-4-20250514');
+        if (!in_array($model, $allowed_models, true)) {
+            $this->error('invalid_model', 400, 'Unknown model: ' . $model);
+        }
+
+        $maxTok  = max(512, min(16000, (int)($body['max_tokens'] ?? 4096)));
+        $timeout = max(10,  min(120,   (int)($body['timeout']    ?? 30)));
+        $cacheTtl= max(0,   min(3600,  (int)($body['cache_ttl']  ?? 300)));
+        $rpmLim  = max(5,   min(300,   (int)($body['rpm_limit']  ?? 60)));
+        $userRpm = max(1,   min(60,    (int)($body['user_rpm_limit'] ?? 20)));
+
+        $enabled = filter_var($body['enabled'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+        // Load existing config to preserve stored API key if not updated
+        $existing = $this->data->loadConfig('ai_config') ?: [];
+        $newKey   = isset($body['api_key']) ? trim((string)$body['api_key']) : '';
+        $apiKey   = $newKey !== '' ? $newKey : ($existing['api_key'] ?? '');
+
+        $features = [];
+        $allowedFeats = ['realtime','recommendations','chat','predictions','schedule','summarise','rca'];
+        $bodyFeats = is_array($body['features'] ?? null) ? $body['features'] : [];
+        foreach ($allowedFeats as $f) {
+            $features[$f] = filter_var($bodyFeats[$f] ?? true, FILTER_VALIDATE_BOOLEAN);
+        }
+
+        $cfg = [
+            'enabled'        => $enabled,
+            'model'          => $model,
+            'api_key'        => $apiKey,
+            'max_tokens'     => $maxTok,
+            'timeout'        => $timeout,
+            'cache_ttl'      => $cacheTtl,
+            'rpm_limit'      => $rpmLim,
+            'user_rpm_limit' => $userRpm,
+            'features'       => $features,
+            'updated_at'     => gmdate('c'),
+            'updated_by'     => (string)($user['username'] ?? 'admin'),
+        ];
+
+        $this->data->saveConfig('ai_config', $cfg);
+
+        $this->auditLog('ai_config_save', [
+            'enabled' => $enabled,
+            'model'   => $model,
+            'features'=> $features,
+        ], (string)($user['username'] ?? ''));
+
+        $this->success(['saved' => true]);
+    }
+
+    /**
+     * GET admin_ai_usage_get — AI token usage and circuit breaker status.
+     */
+    public function getAiUsage(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, admin_roles());
+
+        $logDir = $this->dataDir . '/ai-logs';
+        $today  = gmdate('Y-m-d');
+        $todayFile = $logDir . '/usage-' . $today . '.jsonl';
+
+        $todayStats = ['requests' => 0, 'tokens_in' => 0, 'tokens_out' => 0, 'cost_usd' => 0.0];
+        $totalStats = ['requests' => 0, 'tokens_in' => 0, 'tokens_out' => 0, 'cost_usd' => 0.0];
+
+        // Aggregate today's log
+        if (is_file($todayFile)) {
+            $lines = file($todayFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            foreach ((array)$lines as $line) {
+                $entry = json_decode($line, true);
+                if (!is_array($entry)) continue;
+                $todayStats['requests']++;
+                $todayStats['tokens_in']  += (int)($entry['input_tokens']  ?? 0);
+                $todayStats['tokens_out'] += (int)($entry['output_tokens'] ?? 0);
+                $todayStats['cost_usd']   += (float)($entry['cost_usd']    ?? 0);
+            }
+        }
+
+        // Aggregate all logs (up to last 30 files for performance)
+        if (is_dir($logDir)) {
+            $files = glob($logDir . '/usage-*.jsonl') ?: [];
+            rsort($files);
+            $files = array_slice($files, 0, 30);
+            foreach ($files as $f) {
+                $lines = file($f, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+                foreach ((array)$lines as $line) {
+                    $entry = json_decode($line, true);
+                    if (!is_array($entry)) continue;
+                    $totalStats['requests']++;
+                    $totalStats['tokens_in']  += (int)($entry['input_tokens']  ?? 0);
+                    $totalStats['tokens_out'] += (int)($entry['output_tokens'] ?? 0);
+                    $totalStats['cost_usd']   += (float)($entry['cost_usd']    ?? 0);
+                }
+            }
+        }
+
+        // Circuit breaker state from cache file
+        $cbFile = $this->dataDir . '/ai-logs/circuit_breaker.json';
+        $cb = ['state' => 'closed', 'failure_count' => 0, 'failure_threshold' => 5, 'recovery_timeout' => 120];
+        if (is_file($cbFile)) {
+            $stored = json_decode((string)file_get_contents($cbFile), true);
+            if (is_array($stored)) {
+                $cb = array_merge($cb, $stored);
+                // Compute live state from timestamps
+                if (($stored['state'] ?? '') === 'open') {
+                    $openedAt = (int)($stored['opened_at'] ?? 0);
+                    $recoveryTimeout = (int)($stored['recovery_timeout'] ?? 120);
+                    if (time() - $openedAt >= $recoveryTimeout) {
+                        $cb['state'] = 'half_open';
+                    }
+                }
+            }
+        }
+
+        $this->success([
+            'usage' => [
+                'today'           => $todayStats,
+                'total'           => $totalStats,
+                'circuit_breaker' => $cb,
+            ],
+        ]);
+    }
+
+    /**
+     * POST admin_ai_test_connection — Ping Anthropic API with current/provided key.
+     */
+    public function testAiConnection(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAnyRole($user, admin_roles());
+
+        $body  = $this->jsonBody();
+        $cfg   = $this->data->loadConfig('ai_config') ?: [];
+        $key   = trim((string)($body['api_key'] ?? ''));
+        $model = (string)($body['model'] ?? ($cfg['model'] ?? 'claude-sonnet-4-20250514'));
+
+        if ($key === '') {
+            $key = (string)($cfg['api_key'] ?? getenv('ANTHROPIC_API_KEY') ?: '');
+        }
+        if ($key === '') {
+            $this->error('no_api_key', 400, 'No API key configured');
+        }
+
+        $ch = curl_init('https://api.anthropic.com/v1/messages');
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 15,
+            CURLOPT_POST           => true,
+            CURLOPT_HTTPHEADER     => [
+                'x-api-key: ' . $key,
+                'anthropic-version: 2023-06-01',
+                'content-type: application/json',
+            ],
+            CURLOPT_POSTFIELDS => json_encode([
+                'model'      => $model,
+                'max_tokens' => 10,
+                'messages'   => [['role' => 'user', 'content' => 'ping']],
+            ]),
+        ]);
+        $raw  = curl_exec($ch);
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $err  = curl_error($ch);
+        curl_close($ch);
+
+        if ($err) {
+            $this->error('curl_error', 502, $err);
+        }
+
+        $resp = json_decode((string)$raw, true);
+        if ($code === 200 || isset($resp['content'])) {
+            $this->success(['connected' => true, 'model' => $model]);
+        }
+
+        $msg = (string)($resp['error']['message'] ?? ('HTTP ' . $code));
+        $this->error('connection_failed', 502, $msg);
+    }
+
+    /**
+     * POST admin_ai_reset_circuit_breaker — Reset the AI circuit breaker to closed state.
+     */
+    public function resetAiCircuitBreaker(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAnyRole($user, admin_roles());
+
+        $cbFile = $this->dataDir . '/ai-logs/circuit_breaker.json';
+        $reset = [
+            'state'            => 'closed',
+            'failure_count'    => 0,
+            'failure_threshold'=> 5,
+            'recovery_timeout' => 120,
+            'reset_at'         => gmdate('c'),
+            'reset_by'         => (string)($user['username'] ?? 'admin'),
+        ];
+        @mkdir(dirname($cbFile), 0755, true);
+        file_put_contents($cbFile, json_encode($reset));
+
+        $this->auditLog('ai_circuit_breaker_reset', [], (string)($user['username'] ?? ''));
+        $this->success(['reset' => true]);
+    }
+
     /**
      * @param array<string, mixed> $body
      * @param array<string, mixed> $resource

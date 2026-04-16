@@ -514,6 +514,7 @@ function moduleAccessAdminTabCatalog(){
     {id:'manual_runtime', group:'operations', icon:'🧾', labelEn:'Manual runtime', labelVi:'Nhập tay vận hành', noteEn:'Manual runtime fallback workspace.', noteVi:'Không gian fallback nhập tay vận hành.', defaultAccess:'admin'},
     {id:'version_control', group:'operations', icon:'🔄', labelEn:'Version control', labelVi:'Điều khiển phiên bản', noteEn:'Git synchronization and release hygiene.', noteVi:'Đồng bộ Git và vệ sinh phát hành.', defaultAccess:'admin'},
     {id:'mfa', group:'security', icon:'🔑', labelEn:'MFA security', labelVi:'Bảo mật MFA', noteEn:'MFA policy and enrollment status.', noteVi:'Chính sách MFA và trạng thái kích hoạt.', defaultAccess:'admin'},
+    {id:'ai_control', group:'operations', icon:'🤖', labelEn:'AI Control', labelVi:'Điều khiển AI', noteEn:'AI engine on/off, model selection, feature toggles, usage and cost tracking.', noteVi:'Bật/tắt AI engine, chọn model, tính năng, theo dõi sử dụng và chi phí.', defaultAccess:'admin'},
     {id:'appearance', group:'content', icon:'🎨', labelEn:'Appearance', labelVi:'Giao diện', noteEn:'Portal design system and theme settings.', noteVi:'Thiết lập giao diện và design system.', defaultAccess:'admin'}
   ];
 }
@@ -6517,7 +6518,26 @@ function renderAdmin(){
   }
   if(adminTab==='retention') renderAdminRetention();
   if(adminTab==='mfa') renderAdminMfa();
+  if(adminTab==='ai_control') renderAdminAiControl();
   if(adminTab==='appearance') renderAdminAppearance();
+}
+
+/* ── Admin: AI Control Tab ───────────────────────────────────────────────── */
+function renderAdminAiControl(){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+  if(typeof window._renderAdminAiControl === 'function'){
+    window._renderAdminAiControl(el);
+    return;
+  }
+  el.innerHTML = '<div class="hm-empty">'+(lang==='en'?'Loading AI Control...':'Đang tải AI Control...')+'</div>';
+  var existing = document.getElementById('admin-ai-control-script');
+  if(existing){ existing.remove(); }
+  var s = document.createElement('script');
+  s.id  = 'admin-ai-control-script';
+  s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00d-admin-ai-control.js?v=' + (window.APP_VERSION || Date.now());
+  s.onload = function(){ if(typeof window._renderAdminAiControl === 'function') window._renderAdminAiControl(el); };
+  document.head.appendChild(s);
 }
 
 /* ── Admin: Appearance Settings — Enterprise Theme Editor v2 ─────────────── */
