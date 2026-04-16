@@ -167,12 +167,13 @@
     state.error = null;
     paint();
 
-    var payload = Object.assign({}, state.filters, {
+    var payload = {
+      filters: state.filters,
       offset: state.pagination.offset,
       limit: state.pagination.limit,
-      sort_key: state.sortKey,
+      sort_by: state.sortKey,
       sort_dir: state.sortDir
-    });
+    };
 
     apiCall('eqms_field_actions_query', payload).then(function(res) {
       state.loading = false;
@@ -990,9 +991,14 @@
   // ACTIONS
   // =========================================================================
   function executeAction(action) {
-    if (!state.record || !state.record.id) return;
-    apiCall('eqms_field_actions_update', { id: state.record.id, action: action }).then(function(res) {
-      if (res.success) { loadDetail(state.record.id); }
+    var id = state.record ? (state.record.field_action_id || state.record.id || '') : '';
+    if (!id) return;
+    var endpoint = 'eqms_field_actions_action_' + action.replace(/-/g, '_');
+    apiCall(endpoint, {
+      id: id,
+      version: state.record ? state.record.version : undefined
+    }).then(function(res) {
+      if (res.success) { loadDetail(id); }
     });
   }
 
@@ -1020,14 +1026,14 @@
     if (!_container || !state.record) return;
     var textarea = _container.querySelector('[data-field="new-comment"]');
     if (!textarea || !textarea.value.trim()) return;
-    apiCall('eqms_field_actions_audit', { id: state.record.id, action: 'add-comment', text: textarea.value.trim() }).then(function(res) {
+    apiCall('eqms_field_actions_audit', { id: state.record.field_action_id || state.record.id, action: 'add-comment', text: textarea.value.trim() }).then(function(res) {
       if (res.success) { state.comments = res.data || state.comments; textarea.value = ''; paint(); }
     });
   }
 
   function handleExport(format) {
     var payload = { format: format };
-    if (state.screen === SCREENS.WORKSPACE && state.record) { payload.id = state.record.id; }
+    if (state.screen === SCREENS.WORKSPACE && state.record) { payload.id = state.record.field_action_id || state.record.id; }
     else { payload.filters = state.filters; }
     apiCall('eqms_field_actions_export', payload).then(function(res) {
       if (res.success && res.data && res.data.url) { window.open(res.data.url, '_blank'); }

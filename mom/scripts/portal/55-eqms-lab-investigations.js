@@ -113,12 +113,13 @@
   function loadQueue() {
     state.loading = true;
     rerender();
-    var payload = Object.assign({}, state.filters, {
-      sort_key: state.sort.key,
+    var payload = {
+      filters:  Object.assign({}, state.filters),
+      sort_by:  state.sort.key,
       sort_dir: state.sort.dir,
       offset:   (state.page - 1) * state.limit,
       limit:    state.limit
-    });
+    };
     api('eqms_lab_investigations_query', payload).then(function(res) {
       state.loading = false;
       if (res.success === false) { state.error = res.message || 'Query failed'; }
@@ -159,18 +160,32 @@
 
   function executeAction(action, payload) {
     if (!state.detail) return;
+    var id = state.detail.investigation_id;
     state.loading = true;
     rerender();
-    var body = Object.assign({
-      investigation_id: state.detail.investigation_id,
-      action: action
-    }, payload || {});
-    api('eqms_lab_investigations_update', body).then(function(res) {
-      state.loading = false;
-      if (res.success === false) { state.error = res.message; }
-      else { state.detail = res.data || res; state.error = null; }
-      rerender();
-    }).catch(function(e) { state.loading = false; state.error = e.message; rerender(); });
+    // actions with dedicated backend methods
+    var dedicatedActions = ['start-phase1', 'start-phase2', 'request-retest', 'request-resample', 'link-capa', 'close', 'intake-oos', 'intake-oot'];
+    if (dedicatedActions.indexOf(action) !== -1) {
+      var endpoint = 'eqms_lab_investigations_action_' + action.replace(/-/g, '_');
+      var body = Object.assign({ investigation_id: id }, payload || {});
+      api(endpoint, body).then(function(res) {
+        state.loading = false;
+        if (res && res.success === false) { state.error = (res && res.message) || 'Action failed'; rerender(); }
+        else { loadDetail(id); }
+      }).catch(function(e) { state.loading = false; state.error = e.message; rerender(); });
+    } else {
+      // void, conclude, update-phase1, update-phase2, update-conclusion, add-retest-decision:
+      // fallback to update endpoint (no dedicated action endpoint)
+      var fallbackBody = Object.assign({
+        investigation_id: id,
+        action: action
+      }, payload || {});
+      api('eqms_lab_investigations_update', fallbackBody).then(function(res) {
+        state.loading = false;
+        if (res && res.success === false) { state.error = res.message; rerender(); }
+        else { state.detail = (res && res.data) || res; state.error = null; rerender(); }
+      }).catch(function(e) { state.loading = false; state.error = e.message; rerender(); });
+    }
   }
 
   function handleExport(format) {

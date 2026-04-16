@@ -177,12 +177,13 @@
     state.error = null;
     paint();
 
-    var payload = Object.assign({}, state.filters, {
+    var payload = {
+      filters: state.filters,
       offset: state.pagination.offset,
       limit: state.pagination.limit,
-      sort_key: state.sortKey,
+      sort_by: state.sortKey,
       sort_dir: state.sortDir
-    });
+    };
 
     apiCall('eqms_validation_projects_query', payload).then(function(res) {
       state.loading = false;
@@ -1036,10 +1037,20 @@
   // ACTIONS
   // =========================================================================
   function executeAction(action) {
-    if (!state.record || !state.record.id) return;
-    apiCall('eqms_validation_projects_update', { id: state.record.id, action: action }).then(function(res) {
-      if (res.success) { loadDetail(state.record.id); }
-    });
+    var id = state.record ? (state.record.project_id || state.record.id || '') : '';
+    if (!id) return;
+    var stateTransitionActions = ['approve-protocol', 'start-execution', 'record-result', 'log-deviation', 'generate-summary'];
+    if (stateTransitionActions.indexOf(action) !== -1) {
+      var endpoint = 'eqms_validation_action_' + action.replace(/-/g, '_');
+      apiCall(endpoint, { id: id }).then(function(res) {
+        if (res.success) { loadDetail(id); }
+      });
+    } else {
+      // define-requirements, author-protocol: field updates
+      apiCall('eqms_validation_projects_update', { id: id, action: action }).then(function(res) {
+        if (res.success) { loadDetail(id); }
+      });
+    }
   }
 
   function saveDraft() {
@@ -1068,9 +1079,10 @@
     _container.querySelectorAll('[data-field^="req_"]').forEach(function(el) {
       data[el.getAttribute('data-field').replace('req_', '')] = el.value;
     });
-    data.project_id = state.record.id;
-    apiCall('eqms_validation_projects_update', { id: state.record.id, action: 'add-requirement', requirement: data }).then(function(res) {
-      if (res.success) { loadDetail(state.record.id); }
+    var recId = state.record.project_id || state.record.id;
+    data.project_id = recId;
+    apiCall('eqms_validation_projects_update', { id: recId, action: 'add-requirement', requirement: data }).then(function(res) {
+      if (res.success) { loadDetail(recId); }
     });
   }
 
@@ -1080,9 +1092,10 @@
     _container.querySelectorAll('[data-field^="exec_"]').forEach(function(el) {
       data[el.getAttribute('data-field').replace('exec_', '')] = el.value;
     });
-    data.project_id = state.record.id;
-    apiCall('eqms_validation_projects_update', { id: state.record.id, action: 'record-result', execution: data }).then(function(res) {
-      if (res.success) { loadDetail(state.record.id); }
+    var recId = state.record.project_id || state.record.id;
+    data.project_id = recId;
+    apiCall('eqms_validation_projects_update', { id: recId, action: 'record-result', execution: data }).then(function(res) {
+      if (res.success) { loadDetail(recId); }
     });
   }
 
@@ -1090,14 +1103,14 @@
     if (!_container || !state.record) return;
     var textarea = _container.querySelector('[data-field="new-comment"]');
     if (!textarea || !textarea.value.trim()) return;
-    apiCall('eqms_validation_audit', { id: state.record.id, action: 'add-comment', text: textarea.value.trim() }).then(function(res) {
+    apiCall('eqms_validation_audit', { id: state.record.project_id || state.record.id, action: 'add-comment', text: textarea.value.trim() }).then(function(res) {
       if (res.success) { state.comments = res.data || state.comments; textarea.value = ''; paint(); }
     });
   }
 
   function handleExport(format) {
     var payload = { format: format };
-    if (state.screen === SCREENS.WORKSPACE && state.record) { payload.id = state.record.id; }
+    if (state.screen === SCREENS.WORKSPACE && state.record) { payload.id = state.record.project_id || state.record.id; }
     else { payload.filters = state.filters; }
     apiCall('eqms_validation_export', payload).then(function(res) {
       if (res.success && res.data && res.data.url) { window.open(res.data.url, '_blank'); }

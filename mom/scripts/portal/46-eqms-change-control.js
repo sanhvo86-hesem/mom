@@ -739,19 +739,25 @@
   }
 
   function executeAction(actionKey, container) {
-    apiCall('eqms_change_controls_update', {
-      id: state.recordId,
-      action: actionKey,
+    var id = state.recordId || (state.record ? (state.record.change_control_id || state.record.id) : '');
+    if (!id) return;
+    var endpoint = 'eqms_change_controls_action_' + actionKey.replace(/-/g, '_');
+    apiCall(endpoint, {
+      id: id,
       version: state.record ? state.record.version : undefined
     }).then(function(res) {
       if (res.success !== false) {
         loadDetail(container);
       } else {
-        var msg = (res.error && res.error.message) || 'Action failed';
-        container.querySelector('.eqms-tab-content').innerHTML = (ui.renderRichErrorState || ui.renderErrorState)(msg, 'reload-detail');
+        var msg = (res.error && res.error.message) || res.message || 'Action failed';
+        if (container && container.querySelector) {
+          container.querySelector('.eqms-tab-content').innerHTML = (ui.renderRichErrorState || ui.renderErrorState)(msg, 'reload-detail');
+        }
       }
     }).catch(function(err) {
-      container.querySelector('.eqms-tab-content').innerHTML = (ui.renderRichErrorState || ui.renderErrorState)(err.message, 'reload-detail');
+      if (container && container.querySelector) {
+        container.querySelector('.eqms-tab-content').innerHTML = (ui.renderRichErrorState || ui.renderErrorState)(err.message, 'reload-detail');
+      }
     });
   }
 

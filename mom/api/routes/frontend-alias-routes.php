@@ -138,6 +138,16 @@ return static function (Router $router, string $dataDir): void {
         'eqms_complaints_export'      => [EqmsComplaintsController::class, 'export'],
         'eqms_complaints_attachments' => [EqmsComplaintsController::class, 'attachments'],
         'eqms_complaints_relationships' => [EqmsComplaintsController::class, 'relationships'],
+        'eqms_complaints_action_intake'                => [EqmsComplaintsController::class, 'actionIntake'],
+        'eqms_complaints_action_triage'                => [EqmsComplaintsController::class, 'actionTriage'],
+        'eqms_complaints_action_assign'                => [EqmsComplaintsController::class, 'actionAssign'],
+        'eqms_complaints_action_record_containment'    => [EqmsComplaintsController::class, 'actionRecordContainment'],
+        'eqms_complaints_action_start_investigation'   => [EqmsComplaintsController::class, 'actionStartInvestigation'],
+        'eqms_complaints_action_link_capa'             => [EqmsComplaintsController::class, 'actionLinkCapa'],
+        'eqms_complaints_action_initiate_field_action' => [EqmsComplaintsController::class, 'actionInitiateFieldAction'],
+        'eqms_complaints_action_issue_response'        => [EqmsComplaintsController::class, 'actionIssueResponse'],
+        'eqms_complaints_action_close'                 => [EqmsComplaintsController::class, 'actionClose'],
+        'eqms_complaints_action_reopen'                => [EqmsComplaintsController::class, 'actionReopen'],
     ]);
 
     // Module 43: eqms-deviations.js
@@ -153,7 +163,14 @@ return static function (Router $router, string $dataDir): void {
         'eqms_deviations_relationships'  => [EqmsDeviationController::class, 'relationships'],
         'eqms_deviations_signatures'     => [EqmsDeviationController::class, 'signatures'],
         'eqms_deviations_export'         => [EqmsDeviationController::class, 'export'],
-        'eqms_deviations_action_classify' => [EqmsDeviationController::class, 'actionClassify'],
+        'eqms_deviations_action_classify'            => [EqmsDeviationController::class, 'actionClassify'],
+        'eqms_deviations_action_record_containment'  => [EqmsDeviationController::class, 'actionRecordContainment'],
+        'eqms_deviations_action_start_investigation' => [EqmsDeviationController::class, 'actionStartInvestigation'],
+        'eqms_deviations_action_link_batch'          => [EqmsDeviationController::class, 'actionLinkBatch'],
+        'eqms_deviations_action_link_change_control' => [EqmsDeviationController::class, 'actionLinkChangeControl'],
+        'eqms_deviations_action_link_capa'           => [EqmsDeviationController::class, 'actionLinkCapa'],
+        'eqms_deviations_action_close'               => [EqmsDeviationController::class, 'actionClose'],
+        'eqms_deviations_action_void'                => [EqmsDeviationController::class, 'actionVoid'],
     ]);
 
     // Module 44: eqms-ncr.js
@@ -168,7 +185,13 @@ return static function (Router $router, string $dataDir): void {
         'eqms_ncr_attachments'   => [EqmsNcrController::class, 'attachments'],
         'eqms_ncr_relationships' => [EqmsNcrController::class, 'relationships'],
         'eqms_ncr_signatures'    => [EqmsNcrController::class, 'signatures'],
-        'eqms_ncr_export'        => [EqmsNcrController::class, 'export'],
+        'eqms_ncr_export'                    => [EqmsNcrController::class, 'export'],
+        'eqms_ncr_action_contain'            => [EqmsNcrController::class, 'actionContain'],
+        'eqms_ncr_action_investigate'        => [EqmsNcrController::class, 'actionInvestigate'],
+        'eqms_ncr_action_submit_mrb'         => [EqmsNcrController::class, 'actionSubmitMrb'],
+        'eqms_ncr_action_record_disposition' => [EqmsNcrController::class, 'actionRecordDisposition'],
+        'eqms_ncr_action_close'              => [EqmsNcrController::class, 'actionClose'],
+        'eqms_ncr_action_reopen'             => [EqmsNcrController::class, 'actionReopen'],
     ]);
 
     // Module 45: eqms-capa.js
@@ -183,7 +206,16 @@ return static function (Router $router, string $dataDir): void {
         'eqms_capa_attachments'   => [EqmsCapaController::class, 'attachments'],
         'eqms_capa_relationships' => [EqmsCapaController::class, 'relationships'],
         'eqms_capa_signatures'    => [EqmsCapaController::class, 'signatures'],
-        'eqms_capa_export'        => [EqmsCapaController::class, 'export'],
+        'eqms_capa_export'                       => [EqmsCapaController::class, 'export'],
+        'eqms_capa_action_start_analysis'        => [EqmsCapaController::class, 'actionStartAnalysis'],
+        'eqms_capa_action_record_root_cause'     => [EqmsCapaController::class, 'actionRecordRootCause'],
+        'eqms_capa_action_add_action_plan'       => [EqmsCapaController::class, 'actionAddActionPlan'],
+        'eqms_capa_action_assign_action'         => [EqmsCapaController::class, 'actionAssignAction'],
+        'eqms_capa_action_submit_approval'       => [EqmsCapaController::class, 'actionSubmitApproval'],
+        'eqms_capa_action_submit_verification'   => [EqmsCapaController::class, 'actionSubmitVerification'],
+        'eqms_capa_action_record_effectiveness'  => [EqmsCapaController::class, 'actionRecordEffectiveness'],
+        'eqms_capa_action_close'                 => [EqmsCapaController::class, 'actionClose'],
+        'eqms_capa_action_cancel'                => [EqmsCapaController::class, 'actionCancel'],
     ]);
 
     // Module 46: eqms-change-control.js
@@ -197,7 +229,14 @@ return static function (Router $router, string $dataDir): void {
         'eqms_change_controls_comments'      => [EqmsChangeControlController::class, 'comments'],
         'eqms_change_controls_attachments'   => [EqmsChangeControlController::class, 'attachments'],
         'eqms_change_controls_relationships' => [EqmsChangeControlController::class, 'relationships'],
-        'eqms_change_controls_signatures'    => [EqmsChangeControlController::class, 'signatures'],
+        'eqms_change_controls_signatures'                    => [EqmsChangeControlController::class, 'signatures'],
+        'eqms_change_controls_action_classify'              => [EqmsChangeControlController::class, 'actionClassify'],
+        'eqms_change_controls_action_assess_impact'         => [EqmsChangeControlController::class, 'actionAssessImpact'],
+        'eqms_change_controls_action_route_approval'        => [EqmsChangeControlController::class, 'actionRouteApproval'],
+        'eqms_change_controls_action_approve'               => [EqmsChangeControlController::class, 'actionApprove'],
+        'eqms_change_controls_action_launch_implementation' => [EqmsChangeControlController::class, 'actionLaunchImplementation'],
+        'eqms_change_controls_action_verify_effectiveness'  => [EqmsChangeControlController::class, 'actionVerifyEffectiveness'],
+        'eqms_change_controls_action_close'                 => [EqmsChangeControlController::class, 'actionClose'],
     ]);
 
     // Module 48: eqms-documents.js
@@ -212,7 +251,16 @@ return static function (Router $router, string $dataDir): void {
         'eqms_documents_attachments'   => [EqmsDocumentsController::class, 'attachments'],
         'eqms_documents_relationships' => [EqmsDocumentsController::class, 'relationships'],
         'eqms_documents_signatures'    => [EqmsDocumentsController::class, 'signatures'],
-        'eqms_documents_export'        => [EqmsDocumentsController::class, 'export'],
+        'eqms_documents_export'                         => [EqmsDocumentsController::class, 'export'],
+        'eqms_documents_action_check_out'               => [EqmsDocumentsController::class, 'actionCheckOut'],
+        'eqms_documents_action_check_in'                => [EqmsDocumentsController::class, 'actionCheckIn'],
+        'eqms_documents_action_submit_review'           => [EqmsDocumentsController::class, 'actionSubmitReview'],
+        'eqms_documents_action_approve'                 => [EqmsDocumentsController::class, 'actionApprove'],
+        'eqms_documents_action_release'                 => [EqmsDocumentsController::class, 'actionRelease'],
+        'eqms_documents_action_supersede'               => [EqmsDocumentsController::class, 'actionSupersede'],
+        'eqms_documents_action_obsolete'                => [EqmsDocumentsController::class, 'actionObsolete'],
+        'eqms_documents_action_request_acknowledgement' => [EqmsDocumentsController::class, 'actionRequestAcknowledgement'],
+        'eqms_documents_action_record_acknowledgement'  => [EqmsDocumentsController::class, 'actionRecordAcknowledgement'],
     ]);
 
     // Module 49: eqms-training.js
@@ -248,7 +296,9 @@ return static function (Router $router, string $dataDir): void {
         'eqms_suppliers_update'   => [EqmsSuppliersController::class, 'update'],
         'eqms_suppliers_metrics'  => [EqmsSuppliersController::class, 'metrics'],
         'eqms_suppliers_audit'    => [EqmsSuppliersController::class, 'audit'],
-        'eqms_suppliers_export'   => [EqmsSuppliersController::class, 'exportBulk'],
+        'eqms_suppliers_export'            => [EqmsSuppliersController::class, 'exportBulk'],
+        'eqms_suppliers_action_qualify'    => [EqmsSuppliersController::class, 'actionQualify'],
+        'eqms_suppliers_action_disqualify' => [EqmsSuppliersController::class, 'actionDisqualify'],
     ]);
 
     // Module 52: eqms-supplier-audits.js
@@ -261,7 +311,17 @@ return static function (Router $router, string $dataDir): void {
         'eqms_scars_query'             => [EqmsSupplierAuditsController::class, 'scarQuery'],
         'eqms_scars_detail'            => [EqmsSupplierAuditsController::class, 'scarDetail'],
         'eqms_scars_create'            => [EqmsSupplierAuditsController::class, 'scarCreate'],
-        'eqms_scars_update'            => [EqmsSupplierAuditsController::class, 'scarUpdate'],
+        'eqms_scars_update'                          => [EqmsSupplierAuditsController::class, 'scarUpdate'],
+        'eqms_supplier_audits_action_schedule'       => [EqmsSupplierAuditsController::class, 'actionSchedule'],
+        'eqms_supplier_audits_action_start'          => [EqmsSupplierAuditsController::class, 'actionStart'],
+        'eqms_supplier_audits_action_record_finding' => [EqmsSupplierAuditsController::class, 'actionRecordFinding'],
+        'eqms_supplier_audits_action_issue_scar'     => [EqmsSupplierAuditsController::class, 'actionIssueScar'],
+        'eqms_supplier_audits_action_close'          => [EqmsSupplierAuditsController::class, 'actionClose'],
+        'eqms_supplier_audits_action_cancel'         => [EqmsSupplierAuditsController::class, 'actionCancel'],
+        'eqms_scars_action_assign'                   => [EqmsSupplierAuditsController::class, 'scarActionAssign'],
+        'eqms_scars_action_submit_response'          => [EqmsSupplierAuditsController::class, 'scarActionSubmitResponse'],
+        'eqms_scars_action_verify_effectiveness'     => [EqmsSupplierAuditsController::class, 'scarActionVerifyEffectiveness'],
+        'eqms_scars_action_close'                    => [EqmsSupplierAuditsController::class, 'scarActionClose'],
     ]);
 
     // Module 53: eqms-risks.js
@@ -275,7 +335,12 @@ return static function (Router $router, string $dataDir): void {
         'eqms_risks_heatmap'    => [EqmsRisksController::class, 'heatmap'],
         'eqms_fmea_query'       => [EqmsRisksController::class, 'fmeaQuery'],
         'eqms_fmea_detail'      => [EqmsRisksController::class, 'fmeaDetail'],
-        'eqms_fmea_update'      => [EqmsRisksController::class, 'fmeaUpdate'],
+        'eqms_fmea_update'                       => [EqmsRisksController::class, 'fmeaUpdate'],
+        'eqms_risks_action_assess'               => [EqmsRisksController::class, 'actionAssess'],
+        'eqms_risks_action_add_control'          => [EqmsRisksController::class, 'actionAddControl'],
+        'eqms_risks_action_verify_control'       => [EqmsRisksController::class, 'actionVerifyControl'],
+        'eqms_risks_action_accept_residual_risk' => [EqmsRisksController::class, 'actionAcceptResidualRisk'],
+        'eqms_risks_action_review'               => [EqmsRisksController::class, 'actionReview'],
     ]);
 
     // Module 54: eqms-calibration.js
@@ -287,7 +352,13 @@ return static function (Router $router, string $dataDir): void {
         'eqms_calibration_audit'      => [EqmsCalibrationController::class, 'audit'],
         'eqms_calibration_signatures' => [EqmsCalibrationController::class, 'signatures'],
         'eqms_msa_query'              => [EqmsCalibrationController::class, 'msaQuery'],
-        'eqms_msa_detail'             => [EqmsCalibrationController::class, 'msaDetail'],
+        'eqms_msa_detail'                        => [EqmsCalibrationController::class, 'msaDetail'],
+        'eqms_calibration_action_start'          => [EqmsCalibrationController::class, 'actionStart'],
+        'eqms_calibration_action_record_result'  => [EqmsCalibrationController::class, 'actionRecordResult'],
+        'eqms_calibration_action_submit_review'  => [EqmsCalibrationController::class, 'actionSubmitReview'],
+        'eqms_calibration_action_approve'        => [EqmsCalibrationController::class, 'actionApprove'],
+        'eqms_calibration_action_declare_oot'    => [EqmsCalibrationController::class, 'actionDeclareOot'],
+        'eqms_calibration_action_close'          => [EqmsCalibrationController::class, 'actionClose'],
     ]);
 
     // Module 55: eqms-lab-investigations.js
@@ -299,7 +370,15 @@ return static function (Router $router, string $dataDir): void {
         'eqms_lab_investigations_metrics'    => [EqmsLabInvestigationsController::class, 'metrics'],
         'eqms_lab_investigations_audit'      => [EqmsLabInvestigationsController::class, 'audit'],
         'eqms_lab_investigations_signatures' => [EqmsLabInvestigationsController::class, 'signatures'],
-        'eqms_lab_investigations_export'     => [EqmsLabInvestigationsController::class, 'export'],
+        'eqms_lab_investigations_export'                   => [EqmsLabInvestigationsController::class, 'export'],
+        'eqms_lab_investigations_action_intake_oos'        => [EqmsLabInvestigationsController::class, 'actionIntakeOos'],
+        'eqms_lab_investigations_action_intake_oot'        => [EqmsLabInvestigationsController::class, 'actionIntakeOot'],
+        'eqms_lab_investigations_action_start_phase1'      => [EqmsLabInvestigationsController::class, 'actionStartPhase1'],
+        'eqms_lab_investigations_action_start_phase2'      => [EqmsLabInvestigationsController::class, 'actionStartPhase2'],
+        'eqms_lab_investigations_action_request_retest'    => [EqmsLabInvestigationsController::class, 'actionRequestRetest'],
+        'eqms_lab_investigations_action_request_resample'  => [EqmsLabInvestigationsController::class, 'actionRequestResample'],
+        'eqms_lab_investigations_action_link_capa'         => [EqmsLabInvestigationsController::class, 'actionLinkCapa'],
+        'eqms_lab_investigations_action_close'             => [EqmsLabInvestigationsController::class, 'actionClose'],
     ]);
 
     // Module 58: eqms-batch-release.js
@@ -311,7 +390,12 @@ return static function (Router $router, string $dataDir): void {
         'eqms_batch_release_metrics'    => [EqmsBatchReleaseController::class, 'metrics'],
         'eqms_batch_release_audit'      => [EqmsBatchReleaseController::class, 'audit'],
         'eqms_batch_release_signatures' => [EqmsBatchReleaseController::class, 'signatures'],
-        'eqms_batch_release_export'     => [EqmsBatchReleaseController::class, 'export'],
+        'eqms_batch_release_export'                    => [EqmsBatchReleaseController::class, 'export'],
+        'eqms_batch_release_action_aggregate_data'     => [EqmsBatchReleaseController::class, 'actionAggregateData'],
+        'eqms_batch_release_action_review_exceptions'  => [EqmsBatchReleaseController::class, 'actionReviewExceptions'],
+        'eqms_batch_release_action_approve_release'    => [EqmsBatchReleaseController::class, 'actionApproveRelease'],
+        'eqms_batch_release_action_hold_release'       => [EqmsBatchReleaseController::class, 'actionHoldRelease'],
+        'eqms_batch_release_action_market_ship'        => [EqmsBatchReleaseController::class, 'actionMarketShip'],
     ]);
 
     // Module 59: eqms-validation.js
@@ -324,7 +408,12 @@ return static function (Router $router, string $dataDir): void {
         'eqms_validation_audit'           => [EqmsValidationController::class, 'projectAudit'],
         'eqms_validation_signatures'      => [EqmsValidationController::class, 'projectSignatures'],
         'eqms_validation_export'          => [EqmsValidationController::class, 'exportBulk'],
-        'eqms_validation_trace_matrix'    => [EqmsValidationController::class, 'traceMatrix'],
+        'eqms_validation_trace_matrix'                 => [EqmsValidationController::class, 'traceMatrix'],
+        'eqms_validation_action_approve_protocol'      => [EqmsValidationController::class, 'protocolActionApprove'],
+        'eqms_validation_action_start_execution'       => [EqmsValidationController::class, 'executionActionStart'],
+        'eqms_validation_action_record_result'         => [EqmsValidationController::class, 'executionActionRecordResult'],
+        'eqms_validation_action_log_deviation'         => [EqmsValidationController::class, 'executionActionLogDeviation'],
+        'eqms_validation_action_generate_summary'      => [EqmsValidationController::class, 'executionActionGenerateSummary'],
     ]);
 
     // Module 60: eqms-field-actions.js
@@ -336,7 +425,13 @@ return static function (Router $router, string $dataDir): void {
         'eqms_field_actions_metrics'    => [EqmsFieldActionsController::class, 'metrics'],
         'eqms_field_actions_audit'      => [EqmsFieldActionsController::class, 'audit'],
         'eqms_field_actions_signatures' => [EqmsFieldActionsController::class, 'signatures'],
-        'eqms_field_actions_export'     => [EqmsFieldActionsController::class, 'export'],
+        'eqms_field_actions_export'                      => [EqmsFieldActionsController::class, 'export'],
+        'eqms_field_actions_action_evaluate'             => [EqmsFieldActionsController::class, 'actionEvaluate'],
+        'eqms_field_actions_action_plan'                 => [EqmsFieldActionsController::class, 'actionPlan'],
+        'eqms_field_actions_action_launch'               => [EqmsFieldActionsController::class, 'actionLaunch'],
+        'eqms_field_actions_action_notify_customers'     => [EqmsFieldActionsController::class, 'actionNotifyCustomers'],
+        'eqms_field_actions_action_record_effectiveness' => [EqmsFieldActionsController::class, 'actionRecordEffectiveness'],
+        'eqms_field_actions_action_close'                => [EqmsFieldActionsController::class, 'actionClose'],
     ]);
 
     // Module 61: eqms-genealogy.js

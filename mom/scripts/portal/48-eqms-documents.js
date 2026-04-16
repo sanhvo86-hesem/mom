@@ -164,12 +164,17 @@
     state.error = null;
     paint();
 
-    var payload = Object.assign({}, state.filters, {
+    var rawFilters = Object.assign({}, state.filters);
+    var searchStr = rawFilters.search || '';
+    delete rawFilters.search;
+    var payload = {
+      filters: rawFilters,
+      search:  searchStr,
+      sort_by:  state.sortKey || 'created_at',
+      sort_dir: state.sortDir || 'desc',
       offset: state.pagination.offset,
-      limit: state.pagination.limit,
-      sort_key: state.sortKey,
-      sort_dir: state.sortDir
-    });
+      limit:  state.pagination.limit
+    };
 
     apiCall('eqms_documents_query', payload).then(function(res) {
       state.loading = false;
@@ -1094,10 +1099,15 @@
   // ACTIONS
   // =========================================================================
   function executeAction(action) {
-    if (!state.record || !state.record.id) return;
-    apiCall('eqms_documents_update', { id: state.record.id, action: action }).then(function(res) {
+    var id = state.record ? (state.record.doc_id || state.record.id || '') : '';
+    if (!id) return;
+    var endpoint = 'eqms_documents_action_' + action.replace(/-/g, '_');
+    apiCall(endpoint, {
+      id: id,
+      version: state.record ? state.record.version : undefined
+    }).then(function(res) {
       if (res.success) {
-        loadDetail(state.record.id);
+        loadDetail(id);
       }
     });
   }
@@ -1128,7 +1138,7 @@
     if (!_container || !state.record) return;
     var textarea = _container.querySelector('[data-field="new-comment"]');
     if (!textarea || !textarea.value.trim()) return;
-    apiCall('eqms_documents_comments', { id: state.record.id, action: 'add', text: textarea.value.trim() }).then(function(res) {
+    apiCall('eqms_documents_comments', { id: state.record.doc_id || state.record.id, action: 'add', text: textarea.value.trim() }).then(function(res) {
       if (res.success) {
         state.comments = res.data || state.comments;
         textarea.value = '';
@@ -1140,7 +1150,7 @@
   function handleExport(format) {
     var payload = { format: format };
     if (state.screen === SCREENS.DETAIL && state.record) {
-      payload.id = state.record.id;
+      payload.id = state.record.doc_id || state.record.id;
     } else {
       payload.filters = state.filters;
     }

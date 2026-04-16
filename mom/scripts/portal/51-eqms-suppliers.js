@@ -185,12 +185,19 @@
   // ACTIONS
   // =========================================================================
   function executeAction(action, id) {
-    apiCall('eqms_suppliers_update', { id: id, action: action }).then(function(res) {
-      if (res.success !== false) {
-        if (state.screen === 'detail') loadDetail(id);
-        else loadList();
-      }
-    }).catch(function() {});
+    if (!id) return;
+    // qualify and disqualify have dedicated action endpoints
+    if (action === 'qualify' || action === 'disqualify') {
+      var endpoint = 'eqms_suppliers_action_' + action;
+      apiCall(endpoint, { id: id }).then(function(res) {
+        if (res.success !== false) { loadDetail(id); }
+      }).catch(function() {});
+    } else {
+      // suspend, reactivate, edit-supplier: use update endpoint for field patches
+      apiCall('eqms_suppliers_update', { id: id, action: action }).then(function(res) {
+        if (res.success !== false) { loadDetail(id); }
+      }).catch(function() {});
+    }
   }
 
   function handleExport(format) {

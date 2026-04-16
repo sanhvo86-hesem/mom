@@ -907,7 +907,8 @@
   function handleWorkflowAction(action) {
     if (!state.record) return;
     var id = state.record.id || state.record.batch_id;
-    apiCall('eqms_batch_release_update', { id: id, action: action }).then(function() {
+    var endpoint = 'eqms_batch_release_action_' + action.replace(/-/g, '_');
+    apiCall(endpoint, { id: id }).then(function() {
       toast(T({ vi: 'Cap nhat thanh cong', en: 'Updated successfully' }));
       loadWorkspace(id);
     }).catch(function(err) { toast(T({ vi: 'Loi', en: 'Error' }) + ': ' + (err.message || '')); });
@@ -950,9 +951,8 @@
       return;
     }
 
-    apiCall('eqms_batch_release_update', {
+    apiCall('eqms_batch_release_action_market_ship', {
       id: id,
-      action: 'market-ship-decision',
       decision: data.ship_decision,
       notes: data.ship_notes,
       regulatory_attestation: data.regulatory_attestation,

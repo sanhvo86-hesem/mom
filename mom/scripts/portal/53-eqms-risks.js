@@ -1110,7 +1110,7 @@
     if (!modal || !state.record) return;
     var data = collectForm(modal);
     data.risk_id = state.record.id || state.record.risk_id;
-    apiCall('eqms_risks_update', { id: data.risk_id, action: 'add-control', control: data }).then(function() {
+    apiCall('eqms_risks_action_add_control', { id: data.risk_id, control: data }).then(function() {
       closeModal();
       toast(T({ vi: 'Da them kiem soat', en: 'Control added' }));
       loadRiskDetail(data.risk_id);
@@ -1129,10 +1129,11 @@
     }).catch(function(err) { toast(T({ vi: 'Loi', en: 'Error' }) + ': ' + (err.message || '')); });
   }
 
-  function handleWorkflowAction(action) {
+  function handleWorkflowAction(action, payload) {
     if (!state.record) return;
     var id = state.record.id || state.record.risk_id;
-    apiCall('eqms_risks_update', { id: id, action: action }).then(function() {
+    var endpoint = 'eqms_risks_action_' + action.replace(/-/g, '_');
+    apiCall(endpoint, Object.assign({ id: id }, payload || {})).then(function() {
       toast(T({ vi: 'Cap nhat thanh cong', en: 'Updated successfully' }));
       loadRiskDetail(id);
     }).catch(function(err) { toast(T({ vi: 'Loi', en: 'Error' }) + ': ' + (err.message || '')); });

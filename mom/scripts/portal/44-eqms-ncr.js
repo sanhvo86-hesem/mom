@@ -82,12 +82,17 @@
   function loadQueue() {
     state.loading = true;
     rerender();
-    var payload = Object.assign({}, state.filters, {
-      sort_key: state.sort.key,
-      sort_dir: state.sort.dir,
-      offset:   (state.page - 1) * 25,
-      limit:    25
-    });
+    var rawFilters = Object.assign({}, state.filters);
+    var searchStr = rawFilters.search || '';
+    delete rawFilters.search;
+    var payload = {
+      filters: rawFilters,
+      search:  searchStr,
+      sort_by:  state.sort ? state.sort.key : 'created_at',
+      sort_dir: state.sort ? state.sort.dir : 'desc',
+      offset: state.pagination ? (state.pagination.page || 0) * (state.pagination.limit || 25) : 0,
+      limit:  state.pagination ? (state.pagination.limit || 25) : 25
+    };
     api('eqms_ncr_query', payload).then(function(res) {
       state.loading = false;
       if (res.success === false) { state.error = res.message || 'Query failed'; }
@@ -157,11 +162,14 @@
   function executeAction(action, payload) {
     state.loading = true;
     rerender();
-    var body = Object.assign({ ncr_id: state.detail.ncr_id, action: action }, payload || {});
-    api('eqms_ncr_update', body).then(function(res) {
+    var id = state.detail ? (state.detail.ncr_id || state.detail.id || '') : '';
+    if (!id) { state.loading = false; rerender(); return; }
+    var endpoint = 'eqms_ncr_action_' + action.replace(/-/g, '_');
+    var body = Object.assign({ id: id }, payload || {});
+    api(endpoint, body).then(function(res) {
       state.loading = false;
-      if (res.success === false) { state.error = res.message; }
-      else { state.detail = res.data || res; state.error = null; }
+      if (res && res.success === false) { state.error = res.message || 'Action failed'; }
+      else { state.detail = (res && (res.data || res.ncr)) || state.detail; state.error = null; }
       rerender();
     }).catch(function(e) { state.loading = false; state.error = e.message; rerender(); });
   }

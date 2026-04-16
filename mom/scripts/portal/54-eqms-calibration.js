@@ -894,7 +894,8 @@
   function handleWorkflowAction(action) {
     if (!state.record) return;
     var id = state.record.id || state.record.cal_id;
-    apiCall('eqms_calibration_update', { id: id, action: action }).then(function() {
+    var endpoint = 'eqms_calibration_action_' + action.replace(/-/g, '_');
+    apiCall(endpoint, { id: id }).then(function() {
       toast(T({ vi: 'Cap nhat thanh cong', en: 'Updated successfully' }));
       loadCalDetail(id);
     }).catch(function(err) { toast(T({ vi: 'Loi', en: 'Error' }) + ': ' + (err.message || '')); });

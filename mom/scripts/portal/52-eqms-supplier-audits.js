@@ -267,21 +267,32 @@
   // ACTIONS
   // =========================================================================
   function executeAuditAction(action, id) {
-    apiCall('eqms_supplier_audits_update', { id: id, action: action }).then(function(res) {
+    if (!id) return;
+    // map frontend action strings to backend endpoint names
+    var actionMap = {
+      'issue-report': 'issue_scar'
+    };
+    var endpointAction = actionMap[action] || action.replace(/-/g, '_');
+    var endpoint = 'eqms_supplier_audits_action_' + endpointAction;
+    apiCall(endpoint, { id: id }).then(function(res) {
       if (res.success !== false) {
         if (state.screen === 'audit-detail') loadAuditDetail(id);
         else loadAuditList();
       }
-    }).catch(function() {});
+    }).catch(function(err) { console.error(err); });
   }
 
   function executeScarAction(action, id) {
-    apiCall('eqms_scars_update', { id: id, action: action }).then(function(res) {
+    if (!id) return;
+    // action strings arriving here are already stripped of 'scar-' prefix by the event handler
+    var endpointAction = action.replace(/-/g, '_');
+    var endpoint = 'eqms_scars_action_' + endpointAction;
+    apiCall(endpoint, { id: id }).then(function(res) {
       if (res.success !== false) {
         if (state.screen === 'scar-detail') loadScarDetail(id);
         else loadScarList();
       }
-    }).catch(function() {});
+    }).catch(function(err) { console.error(err); });
   }
 
   // =========================================================================
