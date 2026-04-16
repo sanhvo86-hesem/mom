@@ -90,8 +90,8 @@ final class QueueService
                 'AMQPLAIN', // login_method
                 null,   // login_response
                 'en_US', // locale
-                3.0,    // connection_timeout
-                3.0     // read_write_timeout
+                0.5,    // connection_timeout — fast-fail when RabbitMQ unavailable
+                1.0     // read_write_timeout
             );
             $this->channel = $this->connection->channel();
             $this->declareTopology();

@@ -125,6 +125,12 @@ class AuthMiddleware
             // Update last active time AFTER successful checks
             $_SESSION['last_active'] = $now;
 
+            // SEC-SESSION-001: Release session file lock BEFORE calling controller.
+            // PHP file-based sessions use flock(). Without this, concurrent requests
+            // from the same browser session queue behind each other (one per tab),
+            // exhausting PHP-FPM workers and causing 502 upstream errors.
+            @session_write_close();
+
             // Pass through to controller
             $next();
         };
