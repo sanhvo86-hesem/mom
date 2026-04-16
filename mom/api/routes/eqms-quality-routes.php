@@ -281,6 +281,11 @@ return static function (Router $router, string $dataDir): void {
     $router->get ('/api/v1/eqms/training/{id}/attachments',                EqmsTrainingController::class, 'attachments');
     $router->post('/api/v1/eqms/training/{id}/attachments',                EqmsTrainingController::class, 'attachments');
     $router->get ('/api/v1/eqms/training/{id}/available-actions',          EqmsTrainingController::class, 'availableActions');
+    $router->get ('/api/v1/eqms/training/{id}/signatures',                 EqmsTrainingController::class, 'signatures');
+    $router->post('/api/v1/eqms/training/{id}/signatures',                 EqmsTrainingController::class, 'signatures');
+    $router->get ('/api/v1/eqms/training/{id}/relationships',              EqmsTrainingController::class, 'relationships');
+    $router->post('/api/v1/eqms/training/{id}/relationships/link',         EqmsTrainingController::class, 'relationships');
+    $router->post('/api/v1/eqms/training/{id}/relationships/unlink',       EqmsTrainingController::class, 'relationships');
     $router->post('/api/v1/eqms/training/{id}/export',                     EqmsTrainingController::class, 'export');
     $router->post('/api/v1/eqms/training/export',                          EqmsTrainingController::class, 'exportBulk');
     $router->post('/api/v1/eqms/training/{id}/actions/assign',             EqmsTrainingController::class, 'actionAssign');

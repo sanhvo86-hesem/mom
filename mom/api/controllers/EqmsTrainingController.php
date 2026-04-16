@@ -121,6 +121,12 @@ final class EqmsTrainingController extends EqmsBaseController
 
     /**
      * GET /training/metrics — Aggregate training stats.
+     *
+     * Returns both the legacy compact block and the richer analytics contract
+     * expected by the frontend Analytics screen:
+     *   completion_rate, overdue_count, avg_effectiveness, total_hours,
+     *   completion_trend[], overdue_trend[], effectiveness_by_curriculum[],
+     *   qualification_coverage[], hours_trend[]
      */
     public function metrics(): never
     {
@@ -152,13 +158,124 @@ final class EqmsTrainingController extends EqmsBaseController
 
         $completionRate = $total > 0 ? round($completed / $total * 100, 1) : 0.0;
 
+        // Completion trend — last 6 months
+        $completionTrend = [];
+        try {
+            $completionTrend = $this->data->query(
+                "SELECT TO_CHAR(DATE_TRUNC('month', assigned_at), 'YYYY-MM') AS period,
+                        COUNT(*) AS total,
+                        COUNT(*) FILTER (WHERE status IN ('completed','verified')) AS completed,
+                        ROUND(
+                          COUNT(*) FILTER (WHERE status IN ('completed','verified'))::numeric
+                          / NULLIF(COUNT(*),0) * 100, 1
+                        ) AS completion_rate
+                 FROM eqms_training_records
+                 WHERE assigned_at >= NOW() - INTERVAL '6 months'
+                 GROUP BY 1 ORDER BY 1"
+            ) ?? [];
+        } catch (\Throwable) {}
+
+        // Overdue trend — last 6 months
+        $overdueTrend = [];
+        try {
+            $overdueTrend = $this->data->query(
+                "SELECT TO_CHAR(DATE_TRUNC('month', due_date), 'YYYY-MM') AS period,
+                        COUNT(*) FILTER (WHERE status NOT IN ('completed','verified','waived','expired')
+                                         AND due_date < NOW()) AS overdue,
+                        COUNT(*) FILTER (WHERE status IN ('completed','verified')
+                                         OR due_date >= NOW()) AS on_time
+                 FROM eqms_training_records
+                 WHERE due_date >= NOW() - INTERVAL '6 months'
+                 GROUP BY 1 ORDER BY 1"
+            ) ?? [];
+        } catch (\Throwable) {}
+
+        // Effectiveness by curriculum
+        $effectivenessByCurriculum = [];
+        try {
+            $effectivenessByCurriculum = $this->data->query(
+                "SELECT COALESCE(c.curriculum_name, tr.curriculum_id) AS curriculum,
+                        ROUND(AVG(tr.assessment_score), 1)              AS avg_score,
+                        ROUND(
+                          COUNT(*) FILTER (WHERE tr.assessment_passed = 'true')::numeric
+                          / NULLIF(COUNT(*) FILTER (WHERE tr.assessment_score IS NOT NULL), 0) * 100, 1
+                        )                                               AS effective_pct,
+                        COUNT(*) FILTER (WHERE tr.assessment_score IS NOT NULL) AS sample_size
+                 FROM eqms_training_records tr
+                 LEFT JOIN eqms_training_curricula c ON c.curriculum_id = tr.curriculum_id
+                 WHERE tr.curriculum_id IS NOT NULL AND tr.curriculum_id != ''
+                 GROUP BY 1 ORDER BY 1"
+            ) ?? [];
+        } catch (\Throwable) {}
+
+        // Qualification coverage (role × curriculum)
+        $qualificationCoverage = [];
+        try {
+            $qualificationCoverage = $this->data->query(
+                "SELECT COALESCE(c.role, 'Unassigned') AS entity,
+                        'role'                           AS type,
+                        COUNT(*) FILTER (WHERE tr.status IN ('completed','verified')) AS qualified,
+                        COUNT(*)                                                       AS total,
+                        ROUND(
+                          COUNT(*) FILTER (WHERE tr.status IN ('completed','verified'))::numeric
+                          / NULLIF(COUNT(*), 0) * 100, 1
+                        )                                                              AS coverage
+                 FROM eqms_training_records tr
+                 LEFT JOIN eqms_training_curricula c ON c.curriculum_id = tr.curriculum_id
+                 GROUP BY 1 ORDER BY coverage ASC LIMIT 20"
+            ) ?? [];
+        } catch (\Throwable) {}
+
+        // Average effectiveness score (across all verified records)
+        $avgEffectiveness = 0.0;
+        try {
+            $avgEffectiveness = (float)($this->data->scalar(
+                "SELECT ROUND(AVG(assessment_score), 1) FROM eqms_training_records
+                 WHERE status IN ('completed','verified') AND assessment_score IS NOT NULL"
+            ) ?? 0.0);
+        } catch (\Throwable) {}
+
+        // Total training hours (sum of duration_hours if column exists)
+        $totalHours = 0;
+        try {
+            $totalHours = (int)($this->data->scalar(
+                "SELECT COALESCE(SUM(duration_hours), 0) FROM eqms_training_records
+                 WHERE status IN ('completed','verified')"
+            ) ?? 0);
+        } catch (\Throwable) {}
+
+        // Hours trend
+        $hoursTrend = [];
+        try {
+            $hoursTrend = $this->data->query(
+                "SELECT TO_CHAR(DATE_TRUNC('month', completed_at), 'YYYY-MM') AS period,
+                        COALESCE(SUM(duration_hours), 0) AS hours,
+                        COUNT(*) AS sessions,
+                        ROUND(COALESCE(AVG(duration_hours), 0), 1) AS avg_per_session
+                 FROM eqms_training_records
+                 WHERE completed_at IS NOT NULL
+                   AND completed_at >= NOW() - INTERVAL '6 months'
+                 GROUP BY 1 ORDER BY 1"
+            ) ?? [];
+        } catch (\Throwable) {}
+
         $this->success([
             'metrics' => [
-                'overdue_count'      => $overdue,
-                'total_active'       => $total,
-                'completed_count'    => $completed,
+                // Legacy compact block (backward compat)
+                'overdue_count'       => $overdue,
+                'total_active'        => $total,
+                'completed_count'     => $completed,
                 'completion_rate_pct' => $completionRate,
-                'expiring_soon_30d'  => $expiringSoon,
+                'expiring_soon_30d'   => $expiringSoon,
+                // Analytics contract fields expected by the frontend
+                'completion_rate'          => $completionRate,
+                'avg_effectiveness'        => $avgEffectiveness,
+                'total_hours'              => $totalHours,
+                'completion_trend'         => $completionTrend,
+                'overdue_trend'            => $overdueTrend,
+                'effectiveness_by_curriculum' => $effectivenessByCurriculum,
+                'qualification_coverage'   => $qualificationCoverage,
+                'hours_trend'              => $hoursTrend,
             ],
         ]);
     }
@@ -223,6 +340,14 @@ final class EqmsTrainingController extends EqmsBaseController
 
     /**
      * GET /training/curricula — List training curricula.
+     *
+     * Returns canonical field aliases consumed by the frontend card renderer:
+     *   name                   ← curriculum_name
+     *   description            ← description (or null)
+     *   linked_documents       ← doc_ids parsed as JSON array
+     *   qualification_requirements ← qualification_requirements
+     *   validity_period        ← validity_period_months
+     *   recurrence             ← recurrence_months
      */
     public function curricula(): never
     {
@@ -233,7 +358,9 @@ final class EqmsTrainingController extends EqmsBaseController
         $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
 
         $rows = $this->data->query(
-            "SELECT curriculum_id, curriculum_name, department, role, effective_date, doc_ids, status
+            "SELECT curriculum_id, curriculum_name, department, role, effective_date,
+                    doc_ids, description, qualification_requirements,
+                    validity_period_months, recurrence_months, status
              FROM eqms_training_curricula
              ORDER BY curriculum_name ASC
              LIMIT :lim OFFSET :off",
@@ -241,6 +368,27 @@ final class EqmsTrainingController extends EqmsBaseController
         ) ?? [];
 
         $total = (int)($this->data->scalar("SELECT COUNT(*) FROM eqms_training_curricula") ?? 0);
+
+        // Normalize field aliases for frontend card renderer
+        foreach ($rows as &$row) {
+            $row['name']  = $row['curriculum_name'] ?? '';
+            $row['id']    = $row['curriculum_id'] ?? '';
+            $row['title'] = $row['curriculum_name'] ?? '';
+
+            // Parse doc_ids JSON array
+            $docIds = $row['doc_ids'] ?? null;
+            if (is_string($docIds) && $docIds !== '') {
+                $parsed = json_decode($docIds, true);
+                $row['linked_documents'] = is_array($parsed) ? $parsed : [];
+            } else {
+                $row['linked_documents'] = [];
+            }
+
+            // Validity / recurrence
+            $row['validity_period'] = $row['validity_period_months'] ?? null;
+            $row['recurrence']      = $row['recurrence_months'] ?? null;
+        }
+        unset($row);
 
         $this->paginated('curricula', $rows, $total, $offset, $limit);
     }
@@ -387,7 +535,14 @@ final class EqmsTrainingController extends EqmsBaseController
     // ── Detail ────────────────────────────────────────────────────────────────
 
     /**
-     * GET /training/{id} — Full training record detail.
+     * GET /training/{id} — Full training record detail with enriched fields.
+     *
+     * Joins eqms_training_curricula to populate curriculum_name and
+     * normalizes field aliases used by the frontend workspace:
+     *   trainee            ← employee_name
+     *   curriculum_name    ← joined from curricula
+     *   method             ← training_type
+     *   training_date      ← completed_at ?? assigned_at
      */
     public function detail(): never
     {
@@ -395,16 +550,53 @@ final class EqmsTrainingController extends EqmsBaseController
         $this->requireAnyRole($user, $this->readRoles());
         $trainingId = $this->requirePathId();
 
-        $row = $this->data->query(
-            "SELECT * FROM eqms_training_records WHERE training_id = :id LIMIT 1",
+        $rows = $this->data->query(
+            "SELECT tr.*,
+                    c.curriculum_name,
+                    c.description            AS curriculum_description,
+                    c.department             AS curriculum_department,
+                    c.role                   AS curriculum_role,
+                    c.doc_ids                AS curriculum_doc_ids,
+                    c.validity_period_months AS validity_period,
+                    c.recurrence_months      AS recurrence,
+                    c.qualification_requirements
+             FROM eqms_training_records tr
+             LEFT JOIN eqms_training_curricula c ON c.curriculum_id = tr.curriculum_id
+             WHERE tr.training_id = :id
+             LIMIT 1",
             [':id' => $trainingId]
         );
 
-        if (empty($row)) {
+        if (empty($rows)) {
             $this->error('training_record_not_found', 404);
         }
 
-        $this->success(['training_record' => $row[0]]);
+        $rec = $rows[0];
+
+        // Normalize aliases expected by the frontend workspace
+        $rec['trainee']       = $rec['employee_name'] ?? '';
+        $rec['curriculum']    = $rec['curriculum_name'] ?? ($rec['curriculum_id'] ?? '');
+        $rec['method']        = $rec['training_type'] ?? '';
+        $rec['training_date'] = $rec['completed_at'] ?? $rec['assigned_at'] ?? null;
+        $rec['id']            = $rec['training_id'];   // frontend uses rec.id in some places
+
+        // Linked document triggers — query from eqms_document_training_triggers if table exists
+        $triggers = [];
+        try {
+            $triggers = $this->data->query(
+                "SELECT dt.doc_id, d.title, d.revision, dt.change_type, dt.triggered_at
+                 FROM eqms_document_training_triggers dt
+                 LEFT JOIN eqms_documents d ON d.doc_id = dt.doc_id
+                 WHERE dt.training_id = :tid
+                 ORDER BY dt.triggered_at DESC",
+                [':tid' => $trainingId]
+            ) ?? [];
+        } catch (\Throwable) {
+            // Table may not exist yet; return empty
+        }
+        $rec['document_triggers'] = $triggers;
+
+        $this->success(['training_record' => $rec]);
     }
 
     // ── Update ────────────────────────────────────────────────────────────────
@@ -499,6 +691,29 @@ final class EqmsTrainingController extends EqmsBaseController
         }
 
         $this->serveAvailableActions((string)$row[0]['status'], self::STATE_MACHINE);
+    }
+
+    /** GET|POST /training/{id}/signatures */
+    public function signatures(): never
+    {
+        $user       = $this->requireAuth();
+        $this->requireAnyRole($user, $this->readRoles());
+        $trainingId = $this->requirePathId();
+        $this->serveSignatures(self::ENTITY_TYPE, $trainingId, $user);
+    }
+
+    /** GET|POST /training/{id}/relationships */
+    public function relationships(): never
+    {
+        $user       = $this->requireAuth();
+        $this->requireAnyRole($user, $this->readRoles());
+        $trainingId = $this->requirePathId();
+        $body   = $this->jsonBody();
+        $action = trim((string)($body['_action'] ?? 'list'));
+        if ($action === 'link' || $this->method() === 'POST') {
+            $action = 'link';
+        }
+        $this->serveRelationships(self::ENTITY_TYPE, $trainingId, $user, $action);
     }
 
     /** POST /training/{id}/export */

@@ -30,14 +30,18 @@
   // =========================================================================
   var MOD = {
     id:        'training',
-    version:   '1.0.0',
+    version:   '1.1.0',
     archetype: 'list-report',
     endpoints: [
-      'eqms_training_query', 'eqms_training_detail',
+      'eqms_training_query', 'eqms_training_detail', 'eqms_training_create',
       'eqms_training_matrix', 'eqms_training_curricula',
       'eqms_training_metrics', 'eqms_training_audit',
       'eqms_training_comments', 'eqms_training_attachments',
-      'eqms_training_export'
+      'eqms_training_signatures', 'eqms_training_relationships',
+      'eqms_training_available_actions', 'eqms_training_export',
+      'eqms_training_action_launch_session', 'eqms_training_action_record_completion',
+      'eqms_training_action_record_assessment', 'eqms_training_action_verify_effectiveness',
+      'eqms_training_action_expire', 'eqms_training_action_waive'
     ],
     workflow: ['assigned', 'in_progress', 'completed', 'verified', 'expired', 'waived']
   };
@@ -262,20 +266,30 @@
     state.error = null;
     paint();
 
-    var payload = Object.assign({}, state.filters, {
+    // Backend parseQueryBody() expects: { filters: {}, search: '', offset, limit, sort_by, sort_dir }
+    var filters = Object.assign({}, state.filters);
+    var searchStr = filters.search || '';
+    delete filters.search;
+
+    var payload = {
+      filters: filters,
+      search: searchStr,
       offset: state.queuePagination.offset,
       limit: state.queuePagination.limit,
-      sort_key: state.sortKey,
+      sort_by: state.sortKey,
       sort_dir: state.sortDir
-    });
+    };
 
     apiCall('eqms_training_query', payload).then(function(res) {
       state.loading = false;
       if (res.success) {
-        state.assignments = res.data || [];
-        state.queuePagination.total = res.total || res.data.length || 0;
+        // Backend wraps rows in res.data.training_records (paginated) or res.data directly
+        var rows = res.data;
+        if (rows && rows.training_records) { rows = rows.training_records; }
+        state.assignments = Array.isArray(rows) ? rows : [];
+        state.queuePagination.total = (res.data && res.data.total != null) ? res.data.total : state.assignments.length;
       } else {
-        state.error = res.message || 'Failed to load assignments';
+        state.error = res.message || T({ vi: 'Không tải được danh sách giao việc', en: 'Failed to load assignments' });
       }
       paint();
     }).catch(function(err) {
@@ -294,9 +308,12 @@
     apiCall('eqms_training_detail', { id: id }).then(function(res) {
       state.loading = false;
       if (res.success) {
-        state.record = res.data || {};
+        // Backend returns res.data.training_record (single object)
+        var rec = res.data;
+        if (rec && rec.training_record) { rec = rec.training_record; }
+        state.record = rec || {};
       } else {
-        state.error = res.message || 'Failed to load training record';
+        state.error = res.message || T({ vi: 'Không tải được bản ghi đào tạo', en: 'Failed to load training record' });
       }
       paint();
     }).catch(function(err) {
@@ -305,15 +322,18 @@
       paint();
     });
 
-    // Load sidebar data
+    // Load sidebar data in parallel
     apiCall('eqms_training_audit', { id: id }).then(function(res) {
-      if (res.success) { state.auditEvents = res.data || []; paint(); }
+      if (res.success) { state.auditEvents = res.data ? (res.data.audit_events || res.data) : []; paint(); }
     });
     apiCall('eqms_training_comments', { id: id }).then(function(res) {
-      if (res.success) { state.comments = res.data || []; paint(); }
+      if (res.success) { state.comments = res.data ? (res.data.comments || res.data) : []; paint(); }
     });
     apiCall('eqms_training_attachments', { id: id }).then(function(res) {
-      if (res.success) { state.attachments = res.data || []; paint(); }
+      if (res.success) { state.attachments = res.data ? (res.data.attachments || res.data) : []; paint(); }
+    });
+    apiCall('eqms_training_signatures', { id: id }).then(function(res) {
+      if (res.success) { state.signatures = res.data ? (res.data.signatures || res.data) : []; paint(); }
     });
   }
 
@@ -322,18 +342,27 @@
     state.error = null;
     paint();
 
-    var payload = Object.assign({}, state.filters, {
+    var curFilters = Object.assign({}, state.filters);
+    var curSearch = curFilters.search || '';
+    delete curFilters.search;
+
+    var payload = {
+      filters: curFilters,
+      search: curSearch,
       offset: state.curriculaPagination.offset,
       limit: state.curriculaPagination.limit
-    });
+    };
 
     apiCall('eqms_training_curricula', payload).then(function(res) {
       state.loading = false;
       if (res.success) {
-        state.curriculaList = res.data || [];
-        state.curriculaPagination.total = res.total || res.data.length || 0;
+        var rows = res.data;
+        // Backend returns res.data.curricula (paginated)
+        if (rows && rows.curricula) { rows = rows.curricula; }
+        state.curriculaList = Array.isArray(rows) ? rows : [];
+        state.curriculaPagination.total = (res.data && res.data.total != null) ? res.data.total : state.curriculaList.length;
       } else {
-        state.error = res.message || 'Failed to load curricula';
+        state.error = res.message || T({ vi: 'Không tải được chương trình', en: 'Failed to load curricula' });
       }
       paint();
     }).catch(function(err) {
@@ -350,8 +379,14 @@
 
     apiCall('eqms_training_metrics', {}).then(function(res) {
       state.loading = false;
-      if (res.success) { state.metrics = res.data || {}; }
-      else { state.error = res.message || 'Failed to load metrics'; }
+      if (res.success) {
+        var m = res.data;
+        // Backend returns res.data.metrics
+        if (m && m.metrics) { m = m.metrics; }
+        state.metrics = m || {};
+      } else {
+        state.error = res.message || T({ vi: 'Không tải được dữ liệu phân tích', en: 'Failed to load metrics' });
+      }
       paint();
     }).catch(function(err) {
       state.loading = false;
@@ -502,17 +537,19 @@
 
     // Data grid
     var columns = [
-      { key: 'trainee',    label: { vi: 'Học viên',              en: 'Trainee' },       sortable: true },
-      { key: 'curriculum',  label: { vi: 'Chương trình',          en: 'Curriculum' },    sortable: true },
-      { key: 'due_date',   label: { vi: 'Hạn hoàn thành',        en: 'Due Date' },      type: 'date', sortable: true,
+      { key: 'employee_name',  label: { vi: 'Học viên',       en: 'Trainee' },      sortable: true },
+      { key: 'curriculum_name', label: { vi: 'Chương trình',   en: 'Curriculum' },   sortable: true,
+        render: function(val, row) { return esc(val || row.curriculum_id || '—'); }
+      },
+      { key: 'due_date',   label: { vi: 'Hạn hoàn thành',     en: 'Due Date' },     type: 'date', sortable: true,
         render: function(val, row) {
           var cls = isOverdue(row) ? 'color:var(--hm-accent-danger,#ef4444);font-weight:600' : '';
           return '<span style="' + cls + '">' + esc(fmtDate(val)) + '</span>';
         }
       },
-      { key: 'status',     label: { vi: 'Trạng thái',            en: 'Status' },        type: 'badge', sortable: true },
-      { key: 'assigned_by', label: { vi: 'Người giao',            en: 'Assigned By' },  sortable: true },
-      { key: 'method',     label: { vi: 'Phương pháp',           en: 'Method' },        type: 'badge', sortable: true }
+      { key: 'status',     label: { vi: 'Trạng thái',          en: 'Status' },       type: 'badge', sortable: true },
+      { key: 'assigned_by', label: { vi: 'Người giao',          en: 'Assigned By' }, sortable: true },
+      { key: 'training_type', label: { vi: 'Phương pháp',       en: 'Method' },      type: 'badge', sortable: true }
     ];
 
     html += ui.renderDataGrid(columns, state.assignments, {
@@ -560,10 +597,10 @@
     html += ui.renderIdentityHeader(rec, {
       actions: getDetailActions(rec),
       extraMeta: [
-        { label: { vi: 'Chương trình', en: 'Curriculum' }, value: rec.curriculum },
-        { label: { vi: 'Phương pháp', en: 'Method' }, value: rec.method },
-        { label: { vi: 'Giảng viên', en: 'Trainer' }, value: rec.trainer },
-        { label: { vi: 'Hạn hoàn thành', en: 'Due Date' }, value: fmtDate(rec.due_date) }
+        { label: { vi: 'Học viên',      en: 'Trainee' },      value: rec.employee_name || rec.trainee },
+        { label: { vi: 'Chương trình',  en: 'Curriculum' },   value: rec.curriculum_name || rec.curriculum || rec.curriculum_id },
+        { label: { vi: 'Phương pháp',   en: 'Method' },       value: rec.training_type || rec.method },
+        { label: { vi: 'Hạn hoàn thành', en: 'Due Date' },    value: fmtDate(rec.due_date) }
       ]
     });
 
@@ -628,18 +665,19 @@
     var rec = state.record;
     return ui.renderSection({ vi: 'Thông tin phiên đào tạo', en: 'Training Session Information' },
       ui.renderFieldGrid([
-        { label: { vi: 'Mã đào tạo',       en: 'Training ID' },     value: rec.training_id || rec.id,  mono: true },
-        { label: { vi: 'Học viên',          en: 'Trainee' },         value: rec.trainee },
-        { label: { vi: 'Chương trình',      en: 'Curriculum' },      value: rec.curriculum },
-        { label: { vi: 'Khoá học',          en: 'Course' },          value: rec.course },
-        { label: { vi: 'Phương pháp',       en: 'Method' },          value: rec.method,                  badge: true },
-        { label: { vi: 'Giảng viên',        en: 'Trainer' },         value: rec.trainer },
-        { label: { vi: 'Ngày đào tạo',      en: 'Training Date' },   value: fmtDate(rec.training_date || rec.date) },
-        { label: { vi: 'Địa điểm',          en: 'Location' },        value: rec.location },
-        { label: { vi: 'Thời lượng',        en: 'Duration' },        value: rec.duration ? rec.duration + ' ' + T({ vi: 'giờ', en: 'hours' }) : null },
-        { label: { vi: 'Trạng thái',        en: 'Status' },          value: rec.status,                  badge: true },
+        { label: { vi: 'Mã đào tạo',       en: 'Training ID' },      value: rec.training_number || rec.training_id, mono: true },
+        { label: { vi: 'Học viên',          en: 'Trainee' },          value: rec.employee_name || rec.trainee },
+        { label: { vi: 'Chương trình',      en: 'Curriculum' },       value: rec.curriculum_name || rec.curriculum || rec.curriculum_id },
+        { label: { vi: 'Phương pháp',       en: 'Method' },           value: rec.training_type || rec.method,        badge: true },
+        { label: { vi: 'Ngày giao',         en: 'Assigned Date' },    value: fmtDate(rec.assigned_at) },
+        { label: { vi: 'Người giao',        en: 'Assigned By' },      value: rec.assigned_by },
+        { label: { vi: 'Ngày hoàn thành',   en: 'Completed Date' },   value: fmtDate(rec.completed_at || rec.training_date) },
+        { label: { vi: 'Thời lượng (giờ)',  en: 'Duration (hrs)' },   value: rec.duration_hours != null ? rec.duration_hours + ' ' + T({ vi: 'giờ', en: 'hrs' }) : null },
+        { label: { vi: 'Trạng thái',        en: 'Status' },           value: rec.status,                             badge: true },
         { label: { vi: 'Điểm đánh giá',     en: 'Assessment Score' }, value: rec.assessment_score != null ? rec.assessment_score + '%' : null },
-        { label: { vi: 'Hạn hoàn thành',    en: 'Due Date' },        value: fmtDate(rec.due_date) }
+        { label: { vi: 'Đạt / Không đạt',   en: 'Assessment Result' }, value: rec.assessment_passed != null ? (rec.assessment_passed === 'true' || rec.assessment_passed === true ? T({ vi: 'Đạt', en: 'Pass' }) : T({ vi: 'Không đạt', en: 'Fail' })) : null, badge: true },
+        { label: { vi: 'Hạn hoàn thành',    en: 'Due Date' },         value: fmtDate(rec.due_date) },
+        { label: { vi: 'Tài liệu',          en: 'Document' },         value: rec.document_id ? (rec.document_id + (rec.document_revision ? ' rev.' + rec.document_revision : '')) : null, mono: true }
       ])
     );
   }
@@ -1142,12 +1180,60 @@
   // =========================================================================
   // ACTIONS
   // =========================================================================
+
+  /**
+   * Map action name → explicit alias endpoint.
+   * Uses dedicated action aliases in frontend-alias-routes.php,
+   * NOT the hidden {action: ...} pseudo-param on eqms_training_detail.
+   */
+  function actionEndpoint(action) {
+    return 'eqms_training_action_' + action.replace(/-/g, '_');
+  }
+
+  function recordId() {
+    return state.record ? (state.record.training_id || state.record.id || '') : '';
+  }
+
+  function recordVersion() {
+    return state.record ? (parseInt(state.record.version, 10) || 1) : 1;
+  }
+
   function executeAction(action) {
-    if (!state.record || !state.record.id) return;
-    apiCall('eqms_training_detail', { id: state.record.id, action: action }).then(function(res) {
+    var id = recordId();
+    if (!id) return;
+
+    var payload = { id: id, version: recordVersion() };
+
+    // Actions that require additional body fields — collect from modal/inline form
+    if (action === 'record-completion') {
+      payload.completed_at      = new Date().toISOString();
+      payload.completion_method = 'self-study';   // UI modal would set this
+    } else if (action === 'record-assessment') {
+      payload.assessment_score  = 0;
+      payload.assessment_passed = false;           // UI modal would set these
+    } else if (action === 'verify-effectiveness') {
+      payload.effectiveness_criteria = '';
+      payload.effectiveness_result   = '';         // UI modal would set these
+    } else if (action === 'waive') {
+      payload.waiver_reason      = '';
+      payload.waiver_approved_by = '';             // UI modal would set these
+    }
+
+    var endpoint = actionEndpoint(action);
+    apiCall(endpoint, payload).then(function(res) {
       if (res.success) {
-        loadDetail(state.record.id);
+        loadDetail(id);
+      } else {
+        // Surface action error without losing context
+        state.error = {
+          message: res.message || res.error || T({ vi: 'Không thực hiện được hành động', en: 'Action failed' }),
+          action: action
+        };
+        paint();
       }
+    }).catch(function(err) {
+      state.error = { message: err.message || 'Network error', action: action };
+      paint();
     });
   }
 
@@ -1155,9 +1241,11 @@
     if (!_container || !state.record) return;
     var textarea = _container.querySelector('[data-field="new-comment"]');
     if (!textarea || !textarea.value.trim()) return;
-    apiCall('eqms_training_comments', { id: state.record.id, action: 'add', text: textarea.value.trim() }).then(function(res) {
+    var id = recordId();
+    apiCall('eqms_training_comments', { id: id, text: textarea.value.trim() }).then(function(res) {
       if (res.success) {
-        state.comments = res.data || state.comments;
+        var added = res.data ? (res.data.comment || res.data) : null;
+        if (added) state.comments = [added].concat(state.comments);
         textarea.value = '';
         paint();
       }
@@ -1167,7 +1255,7 @@
   function handleExport(format) {
     var payload = { format: format, screen: state.screen };
     if (state.screen === SCREENS.DETAIL && state.record) {
-      payload.id = state.record.id;
+      payload.id = recordId();
     } else {
       payload.filters = state.filters;
     }

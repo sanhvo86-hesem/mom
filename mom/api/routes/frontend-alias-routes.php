@@ -217,15 +217,27 @@ return static function (Router $router, string $dataDir): void {
 
     // Module 49: eqms-training.js
     $router->actions([
-        'eqms_training_query'       => [EqmsTrainingController::class, 'search'],
-        'eqms_training_detail'      => [EqmsTrainingController::class, 'detail'],
-        'eqms_training_matrix'      => [EqmsTrainingController::class, 'matrix'],
-        'eqms_training_curricula'   => [EqmsTrainingController::class, 'curricula'],
-        'eqms_training_metrics'     => [EqmsTrainingController::class, 'metrics'],
-        'eqms_training_audit'       => [EqmsTrainingController::class, 'audit'],
-        'eqms_training_comments'    => [EqmsTrainingController::class, 'comments'],
-        'eqms_training_attachments' => [EqmsTrainingController::class, 'attachments'],
-        'eqms_training_export'      => [EqmsTrainingController::class, 'export'],
+        'eqms_training_query'            => [EqmsTrainingController::class, 'search'],
+        'eqms_training_detail'           => [EqmsTrainingController::class, 'detail'],
+        'eqms_training_create'           => [EqmsTrainingController::class, 'create'],
+        'eqms_training_matrix'           => [EqmsTrainingController::class, 'matrix'],
+        'eqms_training_curricula'        => [EqmsTrainingController::class, 'curricula'],
+        'eqms_training_metrics'          => [EqmsTrainingController::class, 'metrics'],
+        'eqms_training_audit'            => [EqmsTrainingController::class, 'audit'],
+        'eqms_training_comments'         => [EqmsTrainingController::class, 'comments'],
+        'eqms_training_attachments'      => [EqmsTrainingController::class, 'attachments'],
+        'eqms_training_signatures'       => [EqmsTrainingController::class, 'signatures'],
+        'eqms_training_relationships'    => [EqmsTrainingController::class, 'relationships'],
+        'eqms_training_available_actions'=> [EqmsTrainingController::class, 'availableActions'],
+        'eqms_training_export'           => [EqmsTrainingController::class, 'export'],
+        // Workflow action aliases — each maps to its dedicated action method
+        'eqms_training_action_launch_session'       => [EqmsTrainingController::class, 'actionLaunchSession'],
+        'eqms_training_action_record_completion'    => [EqmsTrainingController::class, 'actionRecordCompletion'],
+        'eqms_training_action_record_assessment'    => [EqmsTrainingController::class, 'actionRecordAssessment'],
+        'eqms_training_action_verify_effectiveness' => [EqmsTrainingController::class, 'actionVerifyEffectiveness'],
+        'eqms_training_action_expire'               => [EqmsTrainingController::class, 'actionExpire'],
+        'eqms_training_action_waive'                => [EqmsTrainingController::class, 'actionWaive'],
+        'eqms_training_action_assign'               => [EqmsTrainingController::class, 'actionAssign'],
     ]);
 
     // Module 51: eqms-suppliers.js
