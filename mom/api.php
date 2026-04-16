@@ -647,6 +647,16 @@ function require_logged_in(array $store): array {
     api_json(['ok' => false, 'error' => 'mfa_required'], 401);
   }
 
+  // SEC-SESSION-002: Release session file lock after all auth checks and $_SESSION writes
+  // are complete. PHP file-based sessions use flock(); holding the lock through the entire
+  // action (DB queries, AMQP, etc.) serialises concurrent requests from the same browser —
+  // including the login status check on the login page. Releasing it here means concurrent
+  // requests to api.php only contend during the fast auth-check phase, not during action work.
+  // $_SESSION superglobal remains readable in-memory. Any code that needs to WRITE $_SESSION
+  // after this point (e.g. destroy_auth_session, csrf_token) must call session_init() first —
+  // all such helpers already include that guard.
+  @session_write_close();
+
   return $me;
 }
 
