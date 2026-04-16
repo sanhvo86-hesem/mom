@@ -315,7 +315,7 @@
     });
 
     if (state.loading) { html += ui.renderLoadingState({ vi: 'Dang tai danh sach NCC...', en: 'Loading suppliers...' }); return html; }
-    if (state.error) { html += ui.renderErrorState(state.error, 'retry-list'); return html; }
+    if (state.error) { html += (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-list'); return html; }
 
     // Data grid
     var columns = [

@@ -332,7 +332,7 @@
   // =========================================================================
   function renderDetail() {
     var rec = state.record;
-    if (!rec) return ui.renderErrorState(T({ vi: 'Không tìm thấy bản ghi', en: 'Record not found' }), 'retry-detail');
+    if (!rec) return (ui.renderRichErrorState || ui.renderErrorState)(T({ vi: 'Không tìm thấy bản ghi', en: 'Record not found' }), 'retry-detail');
 
     var html = '';
 
@@ -600,7 +600,7 @@
   // --- Tab: Related Records ---
   function renderTabRelated() {
     return ui.renderSection({ vi: 'Bản ghi liên quan', en: 'Related Records' },
-      ui.renderRelationshipsPanel(state.relationships)
+      (ui.renderLinkedRecordGraph || ui.renderRelationshipsPanel)(state.relationships)
     );
   }
 
@@ -870,7 +870,7 @@
     }
 
     if (state.error && state.screen !== 'detail') {
-      container.innerHTML = ui.renderErrorState(state.error, 'retry');
+      container.innerHTML = (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry');
       return;
     }
 

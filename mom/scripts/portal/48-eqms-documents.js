@@ -255,7 +255,7 @@
   // =========================================================================
   function renderRegister() {
     if (state.loading) return ui.renderLoadingState({ vi: 'Đang tải tài liệu...', en: 'Loading documents...' });
-    if (state.error) return ui.renderErrorState(state.error, 'retry-register');
+    if (state.error) return (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-register');
 
     var html = '';
 
@@ -334,7 +334,7 @@
   // =========================================================================
   function renderDetail() {
     if (state.loading) return ui.renderLoadingState({ vi: 'Đang tải chi tiết tài liệu...', en: 'Loading document details...' });
-    if (state.error) return ui.renderErrorState(state.error, 'retry-detail');
+    if (state.error) return (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-detail');
     if (!state.record) return ui.renderEmptyState({ icon: '\uD83D\uDCC4', title: { vi: 'Không tìm thấy tài liệu', en: 'Document not found' } });
 
     var rec = state.record;
@@ -681,7 +681,7 @@
     );
 
     html += ui.renderSection({ vi: 'Liên kết', en: 'Relationships' },
-      ui.renderRelationshipsPanel(state.relationships)
+      (ui.renderLinkedRecordGraph || ui.renderRelationshipsPanel)(state.relationships)
     );
 
     html += ui.renderSection({ vi: 'Nhật ký kiểm toán', en: 'Audit Trail' },
@@ -829,7 +829,7 @@
   // =========================================================================
   function renderAnalytics() {
     if (state.loading) return ui.renderLoadingState({ vi: 'Đang tải phân tích...', en: 'Loading analytics...' });
-    if (state.error) return ui.renderErrorState(state.error, 'retry-analytics');
+    if (state.error) return (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-analytics');
 
     var m = state.metrics || {};
     var html = '';

@@ -822,7 +822,7 @@
   // =========================================================================
   function renderAnalytics() {
     if (state.loading) return ui.renderLoadingState({ vi: 'Đang tải phân tích...', en: 'Loading analytics...' });
-    if (state.error) return ui.renderErrorState(state.error, 'retry-analytics');
+    if (state.error) return (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-analytics');
 
     var m = state.metrics || {};
     var html = '';

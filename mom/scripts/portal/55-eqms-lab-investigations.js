@@ -259,7 +259,7 @@
     }
 
     if (state.error && state.screen !== 'detail') {
-      html += ui.renderErrorState(state.error, 'retry-queue');
+      html += (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-queue');
       html += '</div>';
       _container.innerHTML = html;
       return;
@@ -346,7 +346,7 @@
   function renderDetail() {
     var d = state.detail;
     if (state.loading || !d) return ui.renderLoadingState({ vi: 'Dang tai chi tiet...', en: 'Loading detail...' });
-    if (state.error) return ui.renderErrorState(state.error, 'retry-detail');
+    if (state.error) return (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-detail');
 
     var html = '';
 

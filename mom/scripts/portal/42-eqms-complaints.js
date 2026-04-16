@@ -324,7 +324,7 @@
     if (state.loading) {
       html += ui.renderLoadingState({ vi: 'Đang tải danh sách khiếu nại...', en: 'Loading complaints...' });
     } else if (state.error) {
-      html += ui.renderErrorState(state.error, 'retry-queue');
+      html += (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-queue');
     } else {
       // Data grid
       var columns = [
@@ -622,9 +622,15 @@
   // ── Tab e) Related Records ──────────────────────────────────────────────
   function renderRelatedTab() {
     var links = state.tabData.relationships || [];
-    return ui.renderRelationshipsPanel(links, {
+    var html = '';
+    // Enhanced linked-record graph (falls back gracefully if not available)
+    if (ui.renderLinkedRecordGraph) {
+      html += ui.renderLinkedRecordGraph(links, { entityType: 'complaint', recordId: state.recordId });
+    }
+    html += ui.renderRelationshipsPanel(links, {
       readonly: state.record && state.record.status === 'closed'
     });
+    return html;
   }
 
   // ── Tab f) Audit Trail ──────────────────────────────────────────────────
@@ -1336,6 +1342,9 @@
       target = e.target.closest('[data-action="open-detail"]');
       if (target) {
         var id = target.getAttribute('data-id');
+        if (window.EqmsShell.drillToRecord) {
+          window.EqmsShell.drillToRecord('complaint', id, { source: 'complaints-queue' });
+        }
         state.screen = 'detail';
         state.recordId = id;
         state.record = null;

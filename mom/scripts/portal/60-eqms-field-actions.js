@@ -248,7 +248,7 @@
   // =========================================================================
   function renderQueue() {
     if (state.loading) return ui.renderLoadingState({ vi: 'Đang tải hành động thực địa...', en: 'Loading field actions...' });
-    if (state.error) return ui.renderErrorState(state.error, 'retry-queue');
+    if (state.error) return (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-queue');
 
     var html = '';
 
@@ -326,7 +326,7 @@
   // =========================================================================
   function renderWorkspace() {
     if (state.loading) return ui.renderLoadingState({ vi: 'Đang tải chi tiết...', en: 'Loading details...' });
-    if (state.error) return ui.renderErrorState(state.error, 'retry-detail');
+    if (state.error) return (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-detail');
     if (!state.record) return ui.renderEmptyState({ icon: '\uD83D\uDEA8', title: { vi: 'Không tìm thấy bản ghi', en: 'Record not found' } });
 
     var rec = state.record;
@@ -823,7 +823,7 @@
   // =========================================================================
   function renderAnalytics() {
     if (state.loading) return ui.renderLoadingState({ vi: 'Đang tải phân tích...', en: 'Loading analytics...' });
-    if (state.error) return ui.renderErrorState(state.error, 'retry-analytics');
+    if (state.error) return (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-analytics');
 
     var m = state.metrics || {};
     var html = '';

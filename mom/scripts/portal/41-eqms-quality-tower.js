@@ -34,7 +34,7 @@
   // ── Module Meta ──
   var MOD = {
     id:        'quality-tower',
-    label:     { vi: 'Thap chat luong', en: 'Quality Control Tower' },
+    label:     { vi: 'Tháp chất lượng', en: 'Quality Control Tower' },
     icon:      '\uD83C\uDFEF',
     archetype: 'control-tower',
     version:   '1.0.0'
@@ -47,18 +47,18 @@
   var PRIORITY_COLORS      = { critical: '#dc2626', high: '#ea580c', medium: '#ca8a04', low: '#16a34a' };
 
   var MODULE_DEFS = [
-    { id: 'complaints',     label: { vi: 'Khieu nai',      en: 'Complaints' },        icon: '\uD83D\uDCE2' },
-    { id: 'deviations',     label: { vi: 'Sai lech',       en: 'Deviations' },         icon: '\u26A0\uFE0F' },
-    { id: 'ncr',            label: { vi: 'NCR',            en: 'NCR / MRB' },          icon: '\uD83D\uDEAB' },
-    { id: 'capa',           label: { vi: 'CAPA',           en: 'CAPA' },               icon: '\uD83D\uDD27' },
-    { id: 'change-control', label: { vi: 'Thay doi',       en: 'Change Control' },     icon: '\uD83D\uDD04' },
-    { id: 'audits',         label: { vi: 'Danh gia',       en: 'Audits' },             icon: '\uD83D\uDD0D' },
-    { id: 'suppliers',      label: { vi: 'NCC',            en: 'Suppliers' },           icon: '\uD83C\uDF10' },
-    { id: 'calibration',    label: { vi: 'Hieu chuan',     en: 'Calibration' },        icon: '\uD83D\uDCCF' },
-    { id: 'lab-investigations', label: { vi: 'OOS/OOT',    en: 'Lab Investigations' }, icon: '\uD83D\uDD2C' },
-    { id: 'field-actions',  label: { vi: 'Hanh dong',      en: 'Field Actions' },      icon: '\uD83D\uDEA8' },
-    { id: 'batch-release',  label: { vi: 'Giai phong lo',  en: 'Batch Release' },      icon: '\uD83D\uDCE6' },
-    { id: 'training',       label: { vi: 'Dao tao',        en: 'Training' },           icon: '\uD83C\uDF93' }
+    { id: 'complaints',     label: { vi: 'Khiếu nại',          en: 'Complaints' },        icon: '\uD83D\uDCE2' },
+    { id: 'deviations',     label: { vi: 'Sai lệch',           en: 'Deviations' },         icon: '\u26A0\uFE0F' },
+    { id: 'ncr',            label: { vi: 'NCR',                 en: 'NCR / MRB' },          icon: '\uD83D\uDEAB' },
+    { id: 'capa',           label: { vi: 'CAPA',                en: 'CAPA' },               icon: '\uD83D\uDD27' },
+    { id: 'change-control', label: { vi: 'Thay đổi',            en: 'Change Control' },     icon: '\uD83D\uDD04' },
+    { id: 'audits',         label: { vi: 'Đánh giá',            en: 'Audits' },             icon: '\uD83D\uDD0D' },
+    { id: 'suppliers',      label: { vi: 'NCC',                 en: 'Suppliers' },           icon: '\uD83C\uDF10' },
+    { id: 'calibration',    label: { vi: 'Hiệu chuẩn',         en: 'Calibration' },        icon: '\uD83D\uDCCF' },
+    { id: 'lab-investigations', label: { vi: 'OOS/OOT',         en: 'Lab Investigations' }, icon: '\uD83D\uDD2C' },
+    { id: 'field-actions',  label: { vi: 'Hành động thực địa',  en: 'Field Actions' },      icon: '\uD83D\uDEA8' },
+    { id: 'batch-release',  label: { vi: 'Giải phóng lô',      en: 'Batch Release' },      icon: '\uD83D\uDCE6' },
+    { id: 'training',       label: { vi: 'Đào tạo',             en: 'Training' },           icon: '\uD83C\uDF93' }
   ];
 
   /* Role visibility configuration: which KPI cards each role can see */
@@ -156,9 +156,9 @@
 
   function renderFreshnessIndicator(sectionLabel) {
     var cls = getFreshnessClass();
-    var labels = { fresh: T({ vi: 'Moi cap nhat', en: 'Just updated' }),
-                   aging: T({ vi: 'Dang cap nhat', en: 'Updating soon' }),
-                   stale: T({ vi: 'Du lieu cu', en: 'Stale data' }) };
+    var labels = { fresh: T({ vi: 'Mới cập nhật', en: 'Just updated' }),
+                   aging: T({ vi: 'Đang cập nhật', en: 'Updating soon' }),
+                   stale: T({ vi: 'Dữ liệu cũ', en: 'Stale data' }) };
     var html = '<span class="eqms-freshness ' + cls + '" title="' + esc(sectionLabel || '') + '">';
     html += '<span class="eqms-freshness-dot"></span>';
     html += esc(labels[cls]);
@@ -215,7 +215,7 @@
 
     if (isKpiVisible('open_ncr')) {
       items.push({
-        label: { vi: 'NCR dang mo', en: 'Open NCRs' },
+        label: { vi: 'NCR đang mở', en: 'Open NCRs' },
         value: fmt(openNcr),
         accent: openNcr > 10 ? 'critical' : (openNcr > 5 ? 'warning' : ''),
         trend: snap.open_ncr_count ? (openNcr - parseInt(snap.open_ncr_count, 10)) : null,
@@ -231,18 +231,18 @@
         return a.module === 'capa';
       }).length;
       items.push({
-        label: { vi: 'CAPA dang mo', en: 'Open CAPAs' },
+        label: { vi: 'CAPA đang mở', en: 'Open CAPAs' },
         value: fmt(openCapa),
         accent: capaOverdue > 0 ? 'warning' : '',
         trend: capaOverdue > 0 ? capaOverdue : null,
-        trendLabel: capaOverdue > 0 ? capaOverdue + ' ' + T({ vi: 'qua han', en: 'overdue' }) : null,
+        trendLabel: capaOverdue > 0 ? capaOverdue + ' ' + T({ vi: 'quá hạn', en: 'overdue' }) : null,
         freshness: getFreshnessClass()
       });
     }
 
     if (isKpiVisible('overdue_items')) {
       items.push({
-        label: { vi: 'Muc qua han', en: 'Overdue Items' },
+        label: { vi: 'Mục quá hạn', en: 'Overdue Items' },
         value: fmt(overdueTotal),
         accent: overdueTotal > 0 ? 'critical' : 'success',
         freshness: getFreshnessClass()
@@ -251,7 +251,7 @@
 
     if (isKpiVisible('copq_mtd')) {
       items.push({
-        label: { vi: 'COPQ thang nay', en: 'COPQ MTD ($)' },
+        label: { vi: 'COPQ tháng này', en: 'COPQ MTD ($)' },
         value: copqValue != null ? '$' + fmt(copqValue) : '\u2014',
         accent: copqValue > 50000 ? 'critical' : (copqValue > 20000 ? 'warning' : ''),
         freshness: getFreshnessClass()
@@ -260,7 +260,7 @@
 
     if (isKpiVisible('supplier_quality')) {
       items.push({
-        label: { vi: 'Chat luong NCC', en: 'Supplier Quality Score' },
+        label: { vi: 'Chất lượng NCC', en: 'Supplier Quality Score' },
         value: supplierScore != null ? supplierScore + '%' : '\u2014',
         accent: supplierScore != null ? (supplierScore >= 90 ? 'success' : (supplierScore >= 70 ? 'info' : 'warning')) : 'info',
         freshness: getFreshnessClass()
@@ -269,7 +269,7 @@
 
     if (isKpiVisible('audit_adherence')) {
       items.push({
-        label: { vi: 'Tuan thu lich danh gia', en: 'Audit Schedule Adherence' },
+        label: { vi: 'Tuân thủ lịch đánh giá', en: 'Audit Schedule Adherence' },
         value: auditAdherence != null ? auditAdherence + '%' : '\u2014',
         accent: auditAdherence != null ? (auditAdherence >= 95 ? 'success' : (auditAdherence >= 80 ? 'info' : 'warning')) : 'info',
         freshness: getFreshnessClass()
@@ -302,7 +302,7 @@
       return {
         id:        a.id,
         module:    a.module || 'unknown',
-        title:     a.title || T({ vi: 'Khong co tieu de', en: 'No title' }),
+        title:     a.title || T({ vi: 'Không có tiêu đề', en: 'No title' }),
         priority:  priority,
         age:       daysOverdue,
         ageLabel:  daysOverdue + 'd',
@@ -327,8 +327,8 @@
     if (!events || !events.length) {
       return ui.renderEmptyState({
         icon: '\u2705',
-        title: { vi: 'Khong co su kien qua han', en: 'No overdue quality events' },
-        desc:  { vi: 'Tat ca muc tieu dang tren ke hoach', en: 'All items are on track' }
+        title: { vi: 'Không có sự kiện quá hạn', en: 'No overdue quality events' },
+        desc:  { vi: 'Tất cả mục tiêu đang trên kế hoạch', en: 'All items are on track' }
       });
     }
 
@@ -344,10 +344,10 @@
       if (!group.length) return;
 
       var priorityLabel = {
-        critical: T({ vi: 'Nghiem trong', en: 'Critical' }),
+        critical: T({ vi: 'Nghiêm trọng', en: 'Critical' }),
         high:     T({ vi: 'Cao', en: 'High' }),
-        medium:   T({ vi: 'Trung binh', en: 'Medium' }),
-        low:      T({ vi: 'Thap', en: 'Low' })
+        medium:   T({ vi: 'Trung bình', en: 'Medium' }),
+        low:      T({ vi: 'Thấp', en: 'Low' })
       };
 
       html += '<div class="eqms-event-group">';
@@ -370,7 +370,7 @@
         html += '<span class="eqms-event-title">' + esc(ev.title) + '</span>';
         html += '</div>';
         html += '<div class="eqms-event-bottom">';
-        html += '<span class="eqms-event-age" title="' + T({ vi: 'So ngay qua han', en: 'Days overdue' }) + '">' + esc(ev.ageLabel) + ' ' + T({ vi: 'qua han', en: 'overdue' }) + '</span>';
+        html += '<span class="eqms-event-age" title="' + T({ vi: 'Số ngày quá hạn', en: 'Days overdue' }) + '">' + esc(ev.ageLabel) + ' ' + T({ vi: 'quá hạn', en: 'overdue' }) + '</span>';
         html += '<span class="eqms-event-assignee">' + esc(ev.assignee) + '</span>';
         html += '<span class="eqms-badge ' + slugify(ev.module) + '" style="font-size:11px">' + esc(modLabel) + '</span>';
         html += '</div>';
@@ -393,47 +393,47 @@
     // 1. NCR Trend (12 months) — bar chart concept
     html += renderSingleChart(
       'tower-ncr-trend',
-      { vi: 'Xu huong NCR (12 thang)', en: 'NCR Trend (12 Months)' },
+      { vi: 'Xu hướng NCR (12 tháng)', en: 'NCR Trend (12 Months)' },
       buildNcrTrendData(),
       [
-        { key: 'month', label: { vi: 'Thang', en: 'Month' }, sortable: false },
-        { key: 'count', label: { vi: 'So luong', en: 'Count' }, type: 'number' }
+        { key: 'month', label: { vi: 'Tháng', en: 'Month' }, sortable: false },
+        { key: 'count', label: { vi: 'Số lượng', en: 'Count' }, type: 'number' }
       ]
     );
 
     // 2. CAPA Effectiveness Rate — line chart concept
     html += renderSingleChart(
       'tower-capa-effectiveness',
-      { vi: 'Hieu qua CAPA', en: 'CAPA Effectiveness Rate' },
+      { vi: 'Hiệu quả CAPA', en: 'CAPA Effectiveness Rate' },
       buildCapaEffectivenessData(m),
       [
-        { key: 'metric', label: { vi: 'Chi so', en: 'Metric' }, sortable: false },
-        { key: 'value',  label: { vi: 'Gia tri', en: 'Value' } },
-        { key: 'target', label: { vi: 'Muc tieu', en: 'Target' } }
+        { key: 'metric', label: { vi: 'Chỉ số', en: 'Metric' }, sortable: false },
+        { key: 'value',  label: { vi: 'Giá trị', en: 'Value' } },
+        { key: 'target', label: { vi: 'Mục tiêu', en: 'Target' } }
       ]
     );
 
     // 3. Complaint Response Time — bar chart concept
     html += renderSingleChart(
       'tower-complaint-response',
-      { vi: 'Thoi gian phan hoi khieu nai', en: 'Complaint Response Time' },
+      { vi: 'Thời gian phản hồi khiếu nại', en: 'Complaint Response Time' },
       buildComplaintResponseData(),
       [
-        { key: 'period', label: { vi: 'Ky', en: 'Period' }, sortable: false },
-        { key: 'avg_days', label: { vi: 'TB (ngay)', en: 'Avg (days)' }, type: 'number' },
-        { key: 'target', label: { vi: 'Muc tieu', en: 'Target' }, type: 'number' }
+        { key: 'period', label: { vi: 'Kỳ', en: 'Period' }, sortable: false },
+        { key: 'avg_days', label: { vi: 'TB (ngày)', en: 'Avg (days)' }, type: 'number' },
+        { key: 'target', label: { vi: 'Mục tiêu', en: 'Target' }, type: 'number' }
       ]
     );
 
     // 4. Supplier Quality Trend — line chart concept
     html += renderSingleChart(
       'tower-supplier-trend',
-      { vi: 'Xu huong chat luong NCC', en: 'Supplier Quality Trend' },
+      { vi: 'Xu hướng chất lượng NCC', en: 'Supplier Quality Trend' },
       buildSupplierTrendData(m),
       [
-        { key: 'metric', label: { vi: 'Chi so', en: 'Metric' }, sortable: false },
-        { key: 'value',  label: { vi: 'Gia tri', en: 'Value' } },
-        { key: 'status', label: { vi: 'Trang thai', en: 'Status' }, type: 'badge' }
+        { key: 'metric', label: { vi: 'Chỉ số', en: 'Metric' }, sortable: false },
+        { key: 'value',  label: { vi: 'Giá trị', en: 'Value' } },
+        { key: 'status', label: { vi: 'Trạng thái', en: 'Status' }, type: 'badge' }
       ]
     );
 
@@ -477,19 +477,19 @@
 
   function buildCapaEffectivenessData(metrics) {
     return [
-      { metric: T({ vi: 'Ti le dong dung han', en: 'On-Time Closure Rate' }),
+      { metric: T({ vi: 'Tỉ lệ đóng đúng hạn', en: 'On-Time Closure Rate' }),
         value: metrics.capa_on_time_closure_rate_pct != null ? metrics.capa_on_time_closure_rate_pct + '%' : '\u2014',
         target: '90%' },
-      { metric: T({ vi: '0-30 ngay', en: '0-30 days' }),
+      { metric: T({ vi: '0-30 ngày', en: '0-30 days' }),
         value: fmt(metrics.capa_aging_buckets ? metrics.capa_aging_buckets.bucket_0_30 : null),
         target: '\u2014' },
-      { metric: T({ vi: '31-60 ngay', en: '31-60 days' }),
+      { metric: T({ vi: '31-60 ngày', en: '31-60 days' }),
         value: fmt(metrics.capa_aging_buckets ? metrics.capa_aging_buckets.bucket_31_60 : null),
         target: '\u2014' },
-      { metric: T({ vi: '61-90 ngay', en: '61-90 days' }),
+      { metric: T({ vi: '61-90 ngày', en: '61-90 days' }),
         value: fmt(metrics.capa_aging_buckets ? metrics.capa_aging_buckets.bucket_61_90 : null),
         target: '\u2014' },
-      { metric: T({ vi: '>90 ngay', en: '>90 days' }),
+      { metric: T({ vi: '>90 ngày', en: '>90 days' }),
         value: fmt(metrics.capa_aging_buckets ? metrics.capa_aging_buckets.bucket_over_90 : null),
         target: '0' }
     ];
@@ -499,7 +499,7 @@
     var lc = (state.dashboard || {}).live_counts || {};
     return [{ period: 'Q1', avg_days: '\u2014', target: 5 }, { period: 'Q2', avg_days: '\u2014', target: 5 },
       { period: 'Q3', avg_days: '\u2014', target: 5 },
-      { period: T({ vi: 'Hien tai', en: 'Current' }), avg_days: parseInt(lc.open_complaints || 0, 10) > 0 ? '\u2014' : 0, target: 5 }];
+      { period: T({ vi: 'Hiện tại', en: 'Current' }), avg_days: parseInt(lc.open_complaints || 0, 10) > 0 ? '\u2014' : 0, target: 5 }];
   }
 
   function buildSupplierTrendData(m) {
@@ -507,9 +507,9 @@
     var sts = sr == null ? 'unknown' : (sr >= 90 ? 'good' : (sr >= 70 ? 'acceptable' : 'poor'));
     var pct = function(v) { return v != null ? v + '%' : '\u2014'; };
     return [
-      { metric: T({ vi: 'Ti le phan hoi SCAR', en: 'SCAR Response Rate' }), value: pct(sr), status: sts },
-      { metric: T({ vi: 'Tuan thu hieu chuan', en: 'Calibration Compliance' }), value: pct(m.calibration_compliance_rate_pct), status: m.calibration_compliance_rate_pct >= 95 ? 'good' : 'acceptable' },
-      { metric: T({ vi: 'Tuan thu dao tao', en: 'Training Compliance' }), value: pct(m.training_compliance_rate_pct), status: m.training_compliance_rate_pct >= 90 ? 'good' : 'acceptable' }
+      { metric: T({ vi: 'Tỉ lệ phản hồi SCAR', en: 'SCAR Response Rate' }), value: pct(sr), status: sts },
+      { metric: T({ vi: 'Tuân thủ hiệu chuẩn', en: 'Calibration Compliance' }), value: pct(m.calibration_compliance_rate_pct), status: m.calibration_compliance_rate_pct >= 95 ? 'good' : 'acceptable' },
+      { metric: T({ vi: 'Tuân thủ đào tạo', en: 'Training Compliance' }), value: pct(m.training_compliance_rate_pct), status: m.training_compliance_rate_pct >= 90 ? 'good' : 'acceptable' }
     ];
   }
 
@@ -550,15 +550,15 @@
             + row.icon + ' ' + esc(val) + '</span>';
         }
       },
-      { key: 'open',    label: { vi: 'Dang mo', en: 'Open' },    type: 'number' },
-      { key: 'overdue', label: { vi: 'Qua han', en: 'Overdue' }, type: 'number',
+      { key: 'open',    label: { vi: 'Đang mở', en: 'Open' },    type: 'number' },
+      { key: 'overdue', label: { vi: 'Quá hạn', en: 'Overdue' }, type: 'number',
         render: function(val) {
           var n = parseInt(val || 0, 10);
           if (n > 0) return '<span style="color:#dc2626;font-weight:600">' + fmt(n) + '</span>';
           return '<span style="color:#16a34a">' + fmt(n) + '</span>';
         }
       },
-      { key: 'trend',   label: { vi: 'Xu huong', en: 'Trend' }, sortable: false,
+      { key: 'trend',   label: { vi: 'Xu hướng', en: 'Trend' }, sortable: false,
         render: function(val) {
           if (val === 'up')   return '<span style="color:#dc2626">\u2191</span>';
           if (val === 'down') return '<span style="color:#16a34a">\u2193</span>';
@@ -595,8 +595,8 @@
     if (!events.length) {
       return ui.renderEmptyState({
         icon: '\uD83D\uDCC5',
-        title: { vi: 'Khong co su kien sap toi', en: 'No upcoming compliance events' },
-        desc:  { vi: 'Trong 30 ngay toi', en: 'In the next 30 days' }
+        title: { vi: 'Không có sự kiện sắp tới', en: 'No upcoming compliance events' },
+        desc:  { vi: 'Trong 30 ngày tới', en: 'In the next 30 days' }
       });
     }
 
@@ -605,10 +605,10 @@
     var html = '<div class="eqms-calendar-list">';
     shown.forEach(function(ev) {
       var typeLabels = {
-        calibration_due:          T({ vi: 'Hieu chuan den han', en: 'Calibration Due' }),
-        training_expiry:          T({ vi: 'Dao tao het han', en: 'Training Expiry' }),
-        audit_scheduled:          T({ vi: 'Danh gia da len ke hoach', en: 'Audit Scheduled' }),
-        quality_agreement_review: T({ vi: 'Xem xet thoa thuan CL', en: 'QA Review Due' })
+        calibration_due:          T({ vi: 'Hiệu chuẩn đến hạn', en: 'Calibration Due' }),
+        training_expiry:          T({ vi: 'Đào tạo hết hạn', en: 'Training Expiry' }),
+        audit_scheduled:          T({ vi: 'Đánh giá đã lên kế hoạch', en: 'Audit Scheduled' }),
+        quality_agreement_review: T({ vi: 'Xem xét thỏa thuận CL', en: 'QA Review Due' })
       };
       var typeIcons = {
         calibration_due: '\uD83D\uDCCF',
@@ -631,11 +631,11 @@
       html += '<div>' + esc(fmtDate(ev.due_date)) + '</div>';
       html += '<div class="eqms-calendar-countdown ' + urgency + '">';
       if (daysUntil <= 0) {
-        html += T({ vi: 'Qua han!', en: 'Overdue!' });
+        html += T({ vi: 'Quá hạn!', en: 'Overdue!' });
       } else if (daysUntil === 1) {
-        html += T({ vi: 'Ngay mai', en: 'Tomorrow' });
+        html += T({ vi: 'Ngày mai', en: 'Tomorrow' });
       } else {
-        html += daysUntil + ' ' + T({ vi: 'ngay', en: 'days' });
+        html += daysUntil + ' ' + T({ vi: 'ngày', en: 'days' });
       }
       html += '</div></div>';
       html += '</div>';
@@ -645,7 +645,7 @@
     if (events.length > 8) {
       html += '<div style="text-align:center;padding:8px 0">';
       html += '<span style="color:var(--hm-text-secondary,#64748b);font-size:12px">';
-      html += '+' + (events.length - 8) + ' ' + T({ vi: 'su kien khac', en: 'more events' });
+      html += '+' + (events.length - 8) + ' ' + T({ vi: 'sự kiện khác', en: 'more events' });
       html += '</span></div>';
     }
 
@@ -659,35 +659,35 @@
         {
           key: 'date_from',
           type: 'date',
-          label: { vi: 'Tu ngay', en: 'From' }
+          label: { vi: 'Từ ngày', en: 'From' }
         },
         {
           key: 'date_to',
           type: 'date',
-          label: { vi: 'Den ngay', en: 'To' }
+          label: { vi: 'Đến ngày', en: 'To' }
         },
         {
           key: 'department',
           type: 'select',
-          label: { vi: 'Phong ban', en: 'Department' },
+          label: { vi: 'Phòng ban', en: 'Department' },
           options: [
-            { value: 'production',  label: { vi: 'San xuat', en: 'Production' } },
-            { value: 'engineering', label: { vi: 'Ky thuat', en: 'Engineering' } },
-            { value: 'quality',     label: { vi: 'Chat luong', en: 'Quality' } },
+            { value: 'production',  label: { vi: 'Sản xuất', en: 'Production' } },
+            { value: 'engineering', label: { vi: 'Kỹ thuật', en: 'Engineering' } },
+            { value: 'quality',     label: { vi: 'Chất lượng', en: 'Quality' } },
             { value: 'warehouse',   label: { vi: 'Kho', en: 'Warehouse' } },
-            { value: 'purchasing',  label: { vi: 'Mua hang', en: 'Purchasing' } },
-            { value: 'maintenance', label: { vi: 'Bao tri', en: 'Maintenance' } }
+            { value: 'purchasing',  label: { vi: 'Mua hàng', en: 'Purchasing' } },
+            { value: 'maintenance', label: { vi: 'Bảo trì', en: 'Maintenance' } }
           ]
         },
         {
           key: 'priority',
           type: 'select',
-          label: { vi: 'Muc do', en: 'Priority' },
+          label: { vi: 'Mức độ', en: 'Priority' },
           options: [
-            { value: 'critical', label: { vi: 'Nghiem trong', en: 'Critical' } },
+            { value: 'critical', label: { vi: 'Nghiêm trọng', en: 'Critical' } },
             { value: 'high',     label: { vi: 'Cao', en: 'High' } },
-            { value: 'medium',   label: { vi: 'Trung binh', en: 'Medium' } },
-            { value: 'low',      label: { vi: 'Thap', en: 'Low' } }
+            { value: 'medium',   label: { vi: 'Trung bình', en: 'Medium' } },
+            { value: 'low',      label: { vi: 'Thấp', en: 'Low' } }
           ]
         }
       ]
@@ -709,7 +709,7 @@
 
     // First load
     if (state.loading && !state.lastFetchedAt) {
-      container.innerHTML = ui.renderLoadingState({ vi: 'Dang tai Quality Tower...', en: 'Loading Quality Control Tower...' });
+      container.innerHTML = ui.renderLoadingState({ vi: 'Đang tải Quality Tower...', en: 'Loading Quality Control Tower...' });
       loadAllData().then(function() {
         renderDashboard(container);
         startAutoRefresh(container);
@@ -733,13 +733,13 @@
     // ── Header bar ──
     html += '<div class="eqms-tower-header">';
     html += '<div class="eqms-tower-header-left">';
-    html += '<h2 class="eqms-tower-title">' + T({ vi: 'Thap Kiem soat Chat luong', en: 'Quality Control Tower' }) + '</h2>';
-    html += '<span class="eqms-tower-subtitle">' + T({ vi: 'Tong quan thoi gian thuc | Danh cho quan ly', en: 'Real-time overview | Executive dashboard' }) + '</span>';
+    html += '<h2 class="eqms-tower-title">' + T({ vi: 'Tháp Kiểm soát Chất lượng', en: 'Quality Control Tower' }) + '</h2>';
+    html += '<span class="eqms-tower-subtitle">' + T({ vi: 'Tổng quan thời gian thực | Dành cho quản lý', en: 'Real-time overview | Executive dashboard' }) + '</span>';
     html += '</div>';
     html += '<div class="eqms-tower-header-right">';
-    html += renderFreshnessIndicator(T({ vi: 'Du lieu tong the', en: 'Overall data' }));
+    html += renderFreshnessIndicator(T({ vi: 'Dữ liệu tổng thể', en: 'Overall data' }));
     html += '<button class="eqms-btn secondary sm" data-action="refresh-now" style="margin-left:8px">';
-    html += '\u21BB ' + T({ vi: 'Lam moi', en: 'Refresh' });
+    html += '\u21BB ' + T({ vi: 'Làm mới', en: 'Refresh' });
     html += '</button>';
     html += renderTowerExportMenu();
     html += '</div>';
@@ -761,22 +761,22 @@
     var events = buildEventQueue();
     var eventQueueHtml = renderEventQueue(events);
     var eventHeaderActions = '<span style="font-size:12px;color:var(--hm-text-secondary,#64748b)">';
-    eventHeaderActions += fmt(events.length) + ' ' + T({ vi: 'muc', en: 'items' });
+    eventHeaderActions += fmt(events.length) + ' ' + T({ vi: 'mục', en: 'items' });
     eventHeaderActions += '</span>';
     html += '<div class="eqms-tower-col-main">';
     html += ui.renderSection(
-      { vi: 'Hang doi su kien chat luong', en: 'Quality Event Queue' },
+      { vi: 'Hàng đợi sự kiện chất lượng', en: 'Quality Event Queue' },
       eventQueueHtml,
-      { headerActions: renderFreshnessIndicator(T({ vi: 'Su kien', en: 'Events' })) + eventHeaderActions }
+      { headerActions: renderFreshnessIndicator(T({ vi: 'Sự kiện', en: 'Events' })) + eventHeaderActions }
     );
     html += '</div>';
 
     // Right: Compliance Calendar Preview
     html += '<div class="eqms-tower-col-side">';
     html += ui.renderSection(
-      { vi: 'Lich tuan thu (30 ngay)', en: 'Compliance Calendar (30 days)' },
+      { vi: 'Lịch tuân thủ (30 ngày)', en: 'Compliance Calendar (30 days)' },
       renderCalendarPreview(),
-      { headerActions: renderFreshnessIndicator(T({ vi: 'Lich', en: 'Calendar' })) }
+      { headerActions: renderFreshnessIndicator(T({ vi: 'Lịch', en: 'Calendar' })) }
     );
     html += '</div>';
 
@@ -784,23 +784,23 @@
 
     // ── Trend Charts Section ──
     html += ui.renderSection(
-      { vi: 'Bieu do xu huong', en: 'Trend Charts' },
+      { vi: 'Biểu đồ xu hướng', en: 'Trend Charts' },
       renderTrendCharts(),
-      { headerActions: renderFreshnessIndicator(T({ vi: 'Xu huong', en: 'Trends' })) }
+      { headerActions: renderFreshnessIndicator(T({ vi: 'Xu hướng', en: 'Trends' })) }
     );
 
     // ── Module Status Overview ──
     html += ui.renderSection(
-      { vi: 'Tong quan trang thai module', en: 'Module Status Overview' },
+      { vi: 'Tổng quan trạng thái module', en: 'Module Status Overview' },
       renderModuleStatusGrid(),
-      { headerActions: renderFreshnessIndicator(T({ vi: 'Trang thai', en: 'Status' })) }
+      { headerActions: renderFreshnessIndicator(T({ vi: 'Trạng thái', en: 'Status' })) }
     );
 
     // ── CAPA Aging Breakdown (bonus insight) ──
     var agingHtml = renderCapaAgingBreakdown();
     if (agingHtml) {
       html += ui.renderSection(
-        { vi: 'Phan tich tuoi CAPA', en: 'CAPA Aging Breakdown' },
+        { vi: 'Phân tích tuổi CAPA', en: 'CAPA Aging Breakdown' },
         agingHtml,
         { headerActions: renderFreshnessIndicator(T({ vi: 'CAPA', en: 'CAPA' })) }
       );
@@ -829,7 +829,7 @@
     if (total === 0) {
       return ui.renderEmptyState({
         icon: '\u2705',
-        title: { vi: 'Khong co CAPA mo', en: 'No open CAPAs' }
+        title: { vi: 'Không có CAPA mở', en: 'No open CAPAs' }
       });
     }
 
@@ -862,7 +862,7 @@
       html += '</span>';
     });
     html += '<span class="eqms-aging-legend-item" style="margin-left:auto;font-weight:600">';
-    html += T({ vi: 'Tong', en: 'Total' }) + ': ' + total;
+    html += T({ vi: 'Tổng', en: 'Total' }) + ': ' + total;
     html += '</span>';
     html += '</div>';
 
@@ -952,7 +952,7 @@
     var container = state._container;
     if (!container) return;
 
-    container.innerHTML = ui.renderLoadingState({ vi: 'Dang cap nhat...', en: 'Refreshing...' });
+    container.innerHTML = ui.renderLoadingState({ vi: 'Đang cập nhật...', en: 'Refreshing...' });
     loadAllData().then(function() {
       renderDashboard(container);
     });
@@ -967,11 +967,11 @@
       .then(function(r) { return r.json(); })
       .then(function(json) {
         if (json && json.data && json.data.job_id) {
-          showToast(T({ vi: 'Yeu cau xuat du lieu da gui. Ma: ', en: 'Export requested. Job: ' }) + json.data.job_id);
+          showToast(T({ vi: 'Yêu cầu xuất dữ liệu đã gửi. Mã:', en: 'Export requested. Job: ' }) + json.data.job_id);
         }
       })
       .catch(function() {
-        showToast(T({ vi: 'Xuat du lieu that bai', en: 'Export failed' }));
+        showToast(T({ vi: 'Xuất dữ liệu thất bại', en: 'Export failed' }));
       });
   }
 

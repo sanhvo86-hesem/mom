@@ -104,7 +104,8 @@ abstract class EqmsBaseController extends BaseController
      */
     protected function requirePathId(string $name = 'id', string $label = 'id'): string
     {
-        $raw = $this->query($name);
+        // Check $_GET first (REST path params), then JSON body (action-alias params)
+        $raw = $this->input($name);
         if ($raw === null || trim($raw) === '') {
             $this->error("missing_{$label}", 400, "Path parameter '{$name}' is required.");
         }

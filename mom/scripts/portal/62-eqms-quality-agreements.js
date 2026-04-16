@@ -220,7 +220,7 @@
   // =========================================================================
   function renderRegister() {
     if (state.loading) return ui.renderLoadingState({ vi: 'Đang tải thoả thuận chất lượng...', en: 'Loading quality agreements...' });
-    if (state.error) return ui.renderErrorState(state.error, 'retry-register');
+    if (state.error) return (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-register');
 
     var html = '';
 
@@ -296,7 +296,7 @@
   // =========================================================================
   function renderWorkspace() {
     if (state.loading) return ui.renderLoadingState({ vi: 'Đang tải chi tiết thoả thuận...', en: 'Loading agreement details...' });
-    if (state.error) return ui.renderErrorState(state.error, 'retry-detail');
+    if (state.error) return (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-detail');
     if (!state.record) return ui.renderEmptyState({ icon: '\uD83E\uDD1D', title: { vi: 'Không tìm thấy bản ghi', en: 'Record not found' } });
 
     var rec = state.record;

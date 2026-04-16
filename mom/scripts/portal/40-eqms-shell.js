@@ -795,6 +795,8 @@
     if (shell.mobileNavOpen) html += '<div class="eqms-nav-backdrop" data-action="close-nav"></div>';
     // Content
     html += '<div class="eqms-content">';
+    html += renderGlobalSearch();
+    html += renderCommandCenterStrip();
     html += renderBreadcrumb();
     html += '<div class="eqms-module-content">';
     if (shell.activeModule) {
@@ -870,14 +872,403 @@
   }
 
   // =========================================================================
+  // BACKBONE 1: CANONICAL ENTITY MODEL
+  // =========================================================================
+  var ENTITY_MODEL = {
+    // Quality Events
+    complaint:          { module: 'complaints',         icon: '\u{1F4E2}', label: { vi: 'Khiếu nại', en: 'Complaint' },         color: '#ef4444' },
+    deviation:          { module: 'deviations',         icon: '\u26A0\uFE0F', label: { vi: 'Sự kiện CL', en: 'Deviation' },      color: '#f97316' },
+    ncr:                { module: 'ncr',                icon: '\u{1F6AB}', label: { vi: 'NCR', en: 'NCR' },                      color: '#dc2626' },
+    mrbDecision:        { module: 'ncr',                icon: '\u2696\uFE0F', label: { vi: 'MRB', en: 'MRB Decision' },          color: '#b91c1c' },
+    capa:               { module: 'capa',               icon: '\u{1F527}', label: { vi: 'CAPA', en: 'CAPA' },                    color: '#8b5cf6' },
+    // Documents & Change
+    changeControl:      { module: 'change-control',     icon: '\u{1F504}', label: { vi: 'Kiểm soát TĐ', en: 'Change Control' }, color: '#3b82f6' },
+    engineeringChange:  { module: 'engineering-change',  icon: '\u2699\uFE0F', label: { vi: 'ECO/ECR', en: 'Eng. Change' },      color: '#2563eb' },
+    controlledDocument: { module: 'documents',          icon: '\u{1F4C4}', label: { vi: 'Tài liệu', en: 'Document' },           color: '#0ea5e9' },
+    trainingProgram:    { module: 'training',           icon: '\u{1F393}', label: { vi: 'Đào tạo', en: 'Training' },             color: '#06b6d4' },
+    competencyMatrix:   { module: 'training',           icon: '\u{1F4CA}', label: { vi: 'Ma trận NL', en: 'Competency' },        color: '#0891b2' },
+    assessment:         { module: 'training',           icon: '\u{1F4DD}', label: { vi: 'Đánh giá', en: 'Assessment' },          color: '#0e7490' },
+    // Audits & Compliance
+    auditProgram:       { module: 'audits',             icon: '\u{1F50D}', label: { vi: 'Đánh giá', en: 'Audit' },               color: '#059669' },
+    auditFinding:       { module: 'audits',             icon: '\u{1F4CB}', label: { vi: 'Phát hiện', en: 'Finding' },             color: '#047857' },
+    // Supplier Quality
+    supplier:           { module: 'suppliers',          icon: '\u{1F310}', label: { vi: 'NCC', en: 'Supplier' },                 color: '#7c3aed' },
+    supplierEvaluation: { module: 'suppliers',          icon: '\u{1F4C8}', label: { vi: 'Đánh giá NCC', en: 'Evaluation' },      color: '#6d28d9' },
+    scar:               { module: 'supplier-audits',    icon: '\u{1F6A8}', label: { vi: 'SCAR', en: 'SCAR' },                    color: '#9333ea' },
+    supplierAudit:      { module: 'supplier-audits',    icon: '\u{1F50E}', label: { vi: 'ĐG NCC', en: 'Supplier Audit' },        color: '#a855f7' },
+    qualityAgreement:   { module: 'quality-agreements', icon: '\u{1F91D}', label: { vi: 'Thoả thuận CL', en: 'QA Agreement' },   color: '#c084fc' },
+    // Risk & Compliance
+    riskItem:           { module: 'risks',              icon: '\u{1F6E1}\uFE0F', label: { vi: 'Rủi ro', en: 'Risk' },            color: '#ea580c' },
+    fmeaItem:           { module: 'risks',              icon: '\u{1F4D0}', label: { vi: 'FMEA', en: 'FMEA' },                    color: '#d97706' },
+    // Calibration & Lab
+    calibrationAsset:   { module: 'calibration',        icon: '\u{1F4CF}', label: { vi: 'Hiệu chuẩn', en: 'Calibration' },      color: '#65a30d' },
+    msaStudy:           { module: 'calibration',        icon: '\u{1F4D0}', label: { vi: 'MSA', en: 'MSA Study' },                color: '#4d7c0f' },
+    oosInvestigation:   { module: 'lab-investigations', icon: '\u{1F52C}', label: { vi: 'OOS/OOT', en: 'OOS Investigation' },    color: '#ca8a04' },
+    // Inspection & Testing
+    iqcInspection:      { module: 'inspection',         icon: '\u2705', label: { vi: 'IQC', en: 'IQC Inspection' },              color: '#16a34a' },
+    inspectionResult:   { module: 'inspection',         icon: '\u{1F4CB}', label: { vi: 'Kết quả KT', en: 'Inspection Result' }, color: '#15803d' },
+    spcStudy:           { module: 'spc',                icon: '\u{1F4C8}', label: { vi: 'SPC', en: 'SPC Study' },                color: '#0d9488' },
+    testResult:         { module: 'spc',                icon: '\u{1F9EA}', label: { vi: 'Kết quả TN', en: 'Test Result' },       color: '#0f766e' },
+    lotRelease:         { module: 'batch-release',      icon: '\u{1F4E6}', label: { vi: 'Giải phóng lô', en: 'Lot Release' },    color: '#0369a1' },
+    // Advanced
+    validationPackage:  { module: 'validation',         icon: '\u{1F9EA}', label: { vi: 'Xác nhận', en: 'Validation' },          color: '#4338ca' },
+    fieldAction:        { module: 'field-actions',      icon: '\u{1F6A8}', label: { vi: 'Hành động TĐ', en: 'Field Action' },    color: '#be123c' },
+    // Cross-cutting
+    attachmentEvidence: { module: null, icon: '\u{1F4CE}', label: { vi: 'Bằng chứng', en: 'Evidence' },       color: '#64748b' },
+    approvalAction:     { module: null, icon: '\u2705',    label: { vi: 'Phê duyệt', en: 'Approval' },        color: '#22c55e' },
+    signatureEvent:     { module: null, icon: '\u270D\uFE0F', label: { vi: 'Chữ ký', en: 'Signature' },       color: '#1d4ed8' },
+    auditEvent:         { module: null, icon: '\u{1F4DC}', label: { vi: 'Sự kiện ĐG', en: 'Audit Event' },    color: '#475569' },
+    linkedRecord:       { module: null, icon: '\u{1F517}', label: { vi: 'Liên kết', en: 'Linked Record' },    color: '#6366f1' },
+    task:               { module: null, icon: '\u2611\uFE0F', label: { vi: 'Nhiệm vụ', en: 'Task' },         color: '#f59e0b' },
+    comment:            { module: null, icon: '\u{1F4AC}', label: { vi: 'Bình luận', en: 'Comment' },         color: '#a3a3a3' }
+  };
+
+  // Link semantics for traceability graph
+  var LINK_TYPES = {
+    'caused-by':     { label: { vi: 'Gây ra bởi',    en: 'Caused by' },     arrow: '\u2190', color: '#ef4444' },
+    'related-to':    { label: { vi: 'Liên quan đến',  en: 'Related to' },    arrow: '\u2194', color: '#3b82f6' },
+    'requires':      { label: { vi: 'Yêu cầu',       en: 'Requires' },      arrow: '\u2192', color: '#f97316' },
+    'verifies':      { label: { vi: 'Xác minh',       en: 'Verifies' },      arrow: '\u2192', color: '#22c55e' },
+    'trains':        { label: { vi: 'Đào tạo',        en: 'Trains' },        arrow: '\u2192', color: '#06b6d4' },
+    'releases':      { label: { vi: 'Giải phóng',     en: 'Releases' },      arrow: '\u2192', color: '#8b5cf6' },
+    'sourced-from':  { label: { vi: 'Nguồn từ',       en: 'Sourced from' },  arrow: '\u2190', color: '#7c3aed' },
+    'supersedes':    { label: { vi: 'Thay thế',       en: 'Supersedes' },    arrow: '\u2192', color: '#64748b' },
+    'contains':      { label: { vi: 'Chứa',           en: 'Contains' },      arrow: '\u2192', color: '#0ea5e9' },
+    'implements':    { label: { vi: 'Thực hiện',      en: 'Implements' },    arrow: '\u2192', color: '#059669' },
+    'mitigates':     { label: { vi: 'Giảm thiểu',    en: 'Mitigates' },     arrow: '\u2192', color: '#16a34a' }
+  };
+
+  // =========================================================================
+  // BACKBONE 2: ENHANCED ERROR STATE TAXONOMY
+  // =========================================================================
+  var ERROR_STATES = {
+    no_data:          { icon: '\u{1F4CB}', title: { vi: 'Không có dữ liệu',          en: 'No data' },              cls: 'info' },
+    not_configured:   { icon: '\u2699\uFE0F', title: { vi: 'Chưa được cấu hình',     en: 'Not configured' },       cls: 'warning' },
+    permission_denied:{ icon: '\u{1F512}', title: { vi: 'Không có quyền truy cập',    en: 'Permission denied' },    cls: 'danger' },
+    upstream_failure:  { icon: '\u26A1', title: { vi: 'Lỗi dịch vụ upstream',         en: 'Upstream service failure' }, cls: 'danger' },
+    stale_cache:      { icon: '\u{1F504}', title: { vi: 'Dữ liệu cũ / cache hết hạn', en: 'Stale cache' },         cls: 'warning' },
+    retrying:         { icon: '\u23F3', title: { vi: 'Đang thử lại...',               en: 'Retrying...' },           cls: 'info' },
+    partial_data:     { icon: '\u{1F4CA}', title: { vi: 'Dữ liệu không đầy đủ',      en: 'Partial data loaded' },  cls: 'warning' },
+    network_error:    { icon: '\u{1F310}', title: { vi: 'Lỗi mạng',                   en: 'Network error' },        cls: 'danger' },
+    unknown_action:   { icon: '\u2753', title: { vi: 'Hành động không xác định',      en: 'Unknown action' },       cls: 'danger' },
+    version_conflict: { icon: '\u{1F500}', title: { vi: 'Xung đột phiên bản',        en: 'Version conflict' },     cls: 'warning' }
+  };
+
+  /**
+   * Enhanced error state renderer with taxonomy-aware diagnostics.
+   * Replaces the basic renderErrorState for EQMS-specific error handling.
+   */
+  function renderRichErrorState(error, retryAction, config) {
+    config = config || {};
+    var errorKey = classifyError(error);
+    var errorDef = ERROR_STATES[errorKey] || ERROR_STATES.upstream_failure;
+
+    var html = '<div class="eqms-error-state eqms-error-' + errorDef.cls + '">';
+    html += '<div class="eqms-error-state-icon">' + errorDef.icon + '</div>';
+    html += '<div class="eqms-error-state-title">' + esc(T(errorDef.title)) + '</div>';
+    var msg = typeof error === 'string' ? error : (error && error.message) || '';
+    if (msg) html += '<div class="eqms-error-state-desc">' + esc(msg) + '</div>';
+
+    // Diagnostic info for developers
+    if (config.endpoint) {
+      html += '<div class="eqms-error-diagnostic">';
+      html += '<code>' + esc(config.endpoint) + '</code>';
+      if (error && error.status) html += ' <span class="eqms-badge">' + error.status + '</span>';
+      html += '</div>';
+    }
+
+    // Action buttons
+    html += '<div class="eqms-error-actions">';
+    if (retryAction) {
+      html += '<button class="eqms-btn primary sm" data-action="' + esc(retryAction) + '">' + T({ vi: 'Thử lại', en: 'Retry' }) + '</button>';
+    }
+    if (errorKey === 'permission_denied') {
+      html += '<button class="eqms-btn secondary sm" data-action="request-access">' + T({ vi: 'Yêu cầu quyền', en: 'Request Access' }) + '</button>';
+    }
+    if (errorKey === 'stale_cache') {
+      html += '<button class="eqms-btn secondary sm" data-action="force-refresh">' + T({ vi: 'Làm mới', en: 'Force Refresh' }) + '</button>';
+    }
+    html += '</div></div>';
+    return html;
+  }
+
+  function classifyError(error) {
+    if (!error) return 'upstream_failure';
+    var msg = (typeof error === 'string' ? error : (error.message || error.error || '')).toLowerCase();
+    var status = error && error.status;
+
+    if (status === 403 || msg.indexOf('permission') >= 0 || msg.indexOf('forbidden') >= 0 || msg.indexOf('quyền') >= 0) return 'permission_denied';
+    if (status === 412 || msg.indexOf('version') >= 0 || msg.indexOf('conflict') >= 0) return 'version_conflict';
+    if (status === 400 && msg.indexOf('unknown_action') >= 0) return 'unknown_action';
+    if (msg.indexOf('network') >= 0 || msg.indexOf('fetch') >= 0 || msg.indexOf('timeout') >= 0) return 'network_error';
+    if (msg.indexOf('not configured') >= 0 || msg.indexOf('chưa cấu hình') >= 0) return 'not_configured';
+    if (msg.indexOf('stale') >= 0 || msg.indexOf('cache') >= 0) return 'stale_cache';
+    if (msg.indexOf('partial') >= 0 || msg.indexOf('incomplete') >= 0) return 'partial_data';
+    if (msg.indexOf('no data') >= 0 || msg.indexOf('empty') >= 0 || msg.indexOf('not found') >= 0) return 'no_data';
+    if (status >= 500) return 'upstream_failure';
+    return 'upstream_failure';
+  }
+
+  // =========================================================================
+  // BACKBONE 3: ENHANCED API WRAPPER WITH ERROR CLASSIFICATION
+  // =========================================================================
+  function apiCallEnhanced(action, payload, method, config) {
+    config = config || {};
+    method = method || 'POST';
+    var url = 'api.php?action=' + encodeURIComponent(action);
+    var opts = { method: method, headers: { 'Content-Type': 'application/json' } };
+    if (window.csrfToken) opts.headers['X-CSRF-Token'] = window.csrfToken;
+    if (config.version) opts.headers['If-Match'] = '"' + config.version + '"';
+    if (method !== 'GET' && payload) opts.body = JSON.stringify(payload);
+    if (method === 'GET' && payload) {
+      var qs = Object.keys(payload).map(function(k) { return encodeURIComponent(k) + '=' + encodeURIComponent(payload[k]); }).join('&');
+      if (qs) url += '&' + qs;
+    }
+
+    var retries = config.retries || 0;
+    var attempt = 0;
+
+    function doFetch() {
+      return fetch(url, opts).then(function(r) {
+        var result = r.json();
+        return result.then(function(data) {
+          data._httpStatus = r.status;
+          if (!r.ok && !data.success && !data.ok) {
+            var err = new Error(data.error || data.message || 'Request failed');
+            err.status = r.status;
+            err.data = data;
+            throw err;
+          }
+          return data;
+        });
+      }).catch(function(err) {
+        if (attempt < retries && (!err.status || err.status >= 500)) {
+          attempt++;
+          return new Promise(function(resolve) {
+            setTimeout(resolve, Math.min(1000 * Math.pow(2, attempt - 1), 8000));
+          }).then(doFetch);
+        }
+        throw err;
+      });
+    }
+
+    return doFetch();
+  }
+
+  // =========================================================================
+  // BACKBONE 4: GLOBAL INBOX / WORK QUEUE RENDERER
+  // =========================================================================
+  function renderGlobalInbox(container, config) {
+    config = config || {};
+    var html = '<div class="eqms-global-inbox">';
+    html += '<div class="eqms-section-header">';
+    html += '<span>' + T({ vi: 'Hộp thư EQMS', en: 'EQMS Inbox' }) + '</span>';
+    html += '<div style="display:flex;gap:6px">';
+    html += '<button class="eqms-btn ghost sm" data-action="inbox-refresh">\u{1F504}</button>';
+    html += '<select class="eqms-filter-select" data-filter="inbox-scope" style="font-size:12px">';
+    html += '<option value="mine">' + T({ vi: 'Của tôi', en: 'My Items' }) + '</option>';
+    html += '<option value="team">' + T({ vi: 'Nhóm', en: 'Team' }) + '</option>';
+    html += '<option value="all">' + T({ vi: 'Tất cả', en: 'All' }) + '</option>';
+    html += '</select></div></div>';
+
+    html += '<div class="eqms-inbox-categories">';
+    var categories = [
+      { key: 'pending_approval', label: { vi: 'Chờ phê duyệt', en: 'Pending Approval' }, icon: '\u{1F4DD}', accent: 'warning' },
+      { key: 'pending_signature', label: { vi: 'Chờ ký', en: 'Pending Signature' }, icon: '\u270D\uFE0F', accent: 'danger' },
+      { key: 'assigned_tasks', label: { vi: 'Nhiệm vụ được giao', en: 'Assigned Tasks' }, icon: '\u2611\uFE0F', accent: '' },
+      { key: 'overdue_items', label: { vi: 'Mục quá hạn', en: 'Overdue Items' }, icon: '\u23F0', accent: 'danger' },
+      { key: 'mentions', label: { vi: 'Đề cập', en: 'Mentions' }, icon: '\u{1F4AC}', accent: 'info' }
+    ];
+    categories.forEach(function(cat) {
+      html += '<div class="eqms-inbox-category ' + cat.accent + '" data-action="inbox-filter" data-category="' + esc(cat.key) + '">';
+      html += '<span class="eqms-inbox-category-icon">' + cat.icon + '</span>';
+      html += '<span class="eqms-inbox-category-label">' + esc(T(cat.label)) + '</span>';
+      html += '<span class="eqms-inbox-category-count" data-count="' + esc(cat.key) + '">—</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+
+    html += '<div class="eqms-inbox-list" id="eqms-inbox-items">';
+    html += renderLoadingState({ vi: 'Đang tải hộp thư...', en: 'Loading inbox...' });
+    html += '</div></div>';
+
+    if (container) container.innerHTML = html;
+    return html;
+  }
+
+  // =========================================================================
+  // BACKBONE 5: LINKED-RECORD GRAPH EXPLORER
+  // =========================================================================
+  function renderLinkedRecordGraph(links, config) {
+    config = config || {};
+    if (!links || !links.length) {
+      return renderEmptyState({ icon: '\u{1F517}', title: { vi: 'Chưa có liên kết', en: 'No linked records' } });
+    }
+
+    var html = '<div class="eqms-linked-graph">';
+    // View toggle
+    html += '<div class="eqms-linked-graph-toolbar">';
+    html += '<button class="eqms-btn ghost sm active" data-action="graph-view" data-mode="list">' + T({ vi: 'Danh sách', en: 'List' }) + '</button>';
+    html += '<button class="eqms-btn ghost sm" data-action="graph-view" data-mode="tree">' + T({ vi: 'Cây', en: 'Tree' }) + '</button>';
+    html += '</div>';
+
+    // Group links by semantic type
+    var grouped = {};
+    links.forEach(function(l) {
+      var lt = l.link_type || l.relationship || 'related-to';
+      if (!grouped[lt]) grouped[lt] = [];
+      grouped[lt].push(l);
+    });
+
+    // Render grouped view
+    html += '<div class="eqms-linked-graph-content">';
+    Object.keys(grouped).forEach(function(lt) {
+      var linkDef = LINK_TYPES[lt] || LINK_TYPES['related-to'];
+      html += '<div class="eqms-linked-group">';
+      html += '<div class="eqms-linked-group-header" style="border-left:3px solid ' + linkDef.color + '">';
+      html += '<span>' + linkDef.arrow + ' ' + esc(T(linkDef.label)) + '</span>';
+      html += '<span class="eqms-badge">' + grouped[lt].length + '</span>';
+      html += '</div>';
+      grouped[lt].forEach(function(l) {
+        var entityType = l.entity_type || l.type || '';
+        var entityDef = ENTITY_MODEL[entityType] || {};
+        html += '<div class="eqms-linked-item" data-action="open-linked" data-type="' + esc(entityType) + '" data-id="' + esc(l.target_id || l.id || '') + '">';
+        html += '<span class="eqms-linked-item-icon" style="color:' + (entityDef.color || '#64748b') + '">' + (entityDef.icon || '\u{1F517}') + '</span>';
+        html += '<div class="eqms-linked-item-info">';
+        html += '<span class="eqms-linked-item-type">' + esc(T(entityDef.label || { en: entityType })) + '</span>';
+        html += '<span class="eqms-linked-item-id">' + esc(l.target_id || l.record_id || l.id || '') + '</span>';
+        if (l.title) html += '<span class="eqms-linked-item-title">' + esc(l.title) + '</span>';
+        html += '</div>';
+        if (l.status) html += '<span class="eqms-badge ' + slugify(l.status) + '">' + esc(l.status) + '</span>';
+        html += '</div>';
+      });
+      html += '</div>';
+    });
+    html += '</div>';
+
+    if (config.readonly !== true) {
+      html += '<button class="eqms-btn ghost sm" data-action="link-record" style="margin-top:var(--eqms-gap-sm)">';
+      html += '+ ' + T({ vi: 'Liên kết bản ghi', en: 'Link Record' });
+      html += '</button>';
+    }
+    html += '</div>';
+    return html;
+  }
+
+  // =========================================================================
+  // BACKBONE 6: GLOBAL SEARCH
+  // =========================================================================
+  function renderGlobalSearch() {
+    var html = '<div class="eqms-global-search">';
+    html += '<div class="eqms-search-input-wrap">';
+    html += '<span class="eqms-search-icon">\u{1F50D}</span>';
+    html += '<input type="text" class="eqms-search-input" placeholder="' + T({ vi: 'Tìm kiếm EQMS... (NCR, CAPA, tài liệu, NCC...)', en: 'Search EQMS... (NCR, CAPA, documents, suppliers...)' }) + '" data-action="global-search">';
+    html += '</div>';
+    html += '<div class="eqms-search-results" id="eqms-search-results" style="display:none"></div>';
+    html += '</div>';
+    return html;
+  }
+
+  // =========================================================================
+  // BACKBONE 7: ANALYTICS COMMAND CENTER DATA LAYER
+  // =========================================================================
+  var analyticsCache = {};
+
+  function loadCommandCenterData(callback) {
+    var pending = 0;
+    var results = {};
+    var endpoints = [
+      { key: 'quality_tower', action: 'eqms_quality_tower_dashboard' },
+      { key: 'overdue', action: 'eqms_quality_tower_overdue' }
+    ];
+
+    endpoints.forEach(function(ep) {
+      pending++;
+      apiCall(ep.action, {}).then(function(res) {
+        results[ep.key] = res.success ? (res.data || {}) : null;
+      }).catch(function() {
+        results[ep.key] = null;
+      }).finally(function() {
+        pending--;
+        if (pending === 0 && callback) {
+          analyticsCache = results;
+          callback(results);
+        }
+      });
+    });
+  }
+
+  function renderCommandCenterStrip() {
+    var html = '<div class="eqms-command-strip">';
+    var items = [
+      { key: 'open_ncr',     label: { vi: 'NCR mở',       en: 'Open NCRs' },       accent: 'danger' },
+      { key: 'open_capa',    label: { vi: 'CAPA mở',      en: 'Open CAPAs' },       accent: 'warning' },
+      { key: 'overdue',      label: { vi: 'Quá hạn',      en: 'Overdue' },          accent: 'danger' },
+      { key: 'pending_sign', label: { vi: 'Chờ ký',       en: 'Pending Sign' },     accent: 'warning' },
+      { key: 'complaints',   label: { vi: 'Khiếu nại',    en: 'Complaints' },       accent: '' },
+      { key: 'audit_due',    label: { vi: 'Đánh giá sắp', en: 'Audits Due' },       accent: 'info' }
+    ];
+    items.forEach(function(item) {
+      html += '<div class="eqms-command-item ' + item.accent + '" data-action="drill-kpi" data-kpi="' + esc(item.key) + '">';
+      html += '<span class="eqms-command-label">' + esc(T(item.label)) + '</span>';
+      html += '<span class="eqms-command-value" data-kpi-value="' + esc(item.key) + '">—</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  // =========================================================================
+  // BACKBONE 8: CROSS-MODULE DRILL NAVIGATION
+  // =========================================================================
+  function drillToRecord(entityType, recordId, context) {
+    var entityDef = ENTITY_MODEL[entityType];
+    if (!entityDef || !entityDef.module) return;
+
+    navigateToModule(entityDef.module, Object.assign({
+      recordId: recordId,
+      screen: 'detail',
+      drillSource: context && context.sourceModule,
+      drillEntity: entityType
+    }, context || {}));
+  }
+
+  function resolveEntityLabel(entityType) {
+    var def = ENTITY_MODEL[entityType];
+    return def ? T(def.label) : entityType;
+  }
+
+  function resolveEntityIcon(entityType) {
+    var def = ENTITY_MODEL[entityType];
+    return def ? def.icon : '\u{1F4CB}';
+  }
+
+  function resolveEntityColor(entityType) {
+    var def = ENTITY_MODEL[entityType];
+    return def ? def.color : '#64748b';
+  }
+
+  // =========================================================================
   // PUBLIC API
   // =========================================================================
   window.EqmsModules = window.EqmsModules || {};
   window.EqmsShell = {
     render: render,
     navigate: navigateToModule,
+    drillToRecord: drillToRecord,
     modules: MODULES,
     groups: GROUPS,
+    // Canonical entity model
+    entityModel: ENTITY_MODEL,
+    linkTypes: LINK_TYPES,
+    errorStates: ERROR_STATES,
+    // Entity helpers
+    resolveEntityLabel: resolveEntityLabel,
+    resolveEntityIcon: resolveEntityIcon,
+    resolveEntityColor: resolveEntityColor,
+    classifyError: classifyError,
+    // Analytics
+    loadCommandCenterData: loadCommandCenterData,
     // Shared components for use by child modules
     ui: {
       renderIdentityHeader: renderIdentityHeader,
@@ -887,6 +1278,7 @@
       renderCommentsThread: renderCommentsThread,
       renderAttachmentsGrid: renderAttachmentsGrid,
       renderRelationshipsPanel: renderRelationshipsPanel,
+      renderLinkedRecordGraph: renderLinkedRecordGraph,
       renderFilterBar: renderFilterBar,
       renderDataGrid: renderDataGrid,
       renderKpiRow: renderKpiRow,
@@ -894,6 +1286,7 @@
       renderEmptyState: renderEmptyState,
       renderLoadingState: renderLoadingState,
       renderErrorState: renderErrorState,
+      renderRichErrorState: renderRichErrorState,
       renderWizardShell: renderWizardShell,
       renderTabs: renderTabs,
       renderChartWithTableFallback: renderChartWithTableFallback,
@@ -901,7 +1294,10 @@
       renderSection: renderSection,
       renderFieldGrid: renderFieldGrid,
       renderFormField: renderFormField,
-      renderBreadcrumb: renderBreadcrumb
+      renderBreadcrumb: renderBreadcrumb,
+      renderGlobalInbox: renderGlobalInbox,
+      renderGlobalSearch: renderGlobalSearch,
+      renderCommandCenterStrip: renderCommandCenterStrip
     },
     // Utility functions for use by child modules
     util: {
@@ -913,6 +1309,7 @@
       slugify: slugify,
       initials: initials,
       apiCall: apiCall,
+      apiCallEnhanced: apiCallEnhanced,
       lang: _lang
     }
   };

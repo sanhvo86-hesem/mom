@@ -241,7 +241,7 @@
     if (state.loading) {
       html += ui.renderLoadingState({ vi: 'Dang tai du lieu...', en: 'Loading data...' });
     } else if (state.error) {
-      html += ui.renderErrorState(state.error, 'retry-queue');
+      html += (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-queue');
     } else {
       var columns = [
         { key: 'ncr_id',       label: { vi: 'Ma NCR',        en: 'NCR ID' },        type: 'id',    sortable: true },
@@ -284,7 +284,7 @@
   function renderDetail() {
     var d = state.detail;
     if (state.loading || !d) return ui.renderLoadingState({ vi: 'Dang tai chi tiet...', en: 'Loading detail...' });
-    if (state.error) return ui.renderErrorState(state.error, 'retry-detail');
+    if (state.error) return (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-detail');
 
     var html = '';
 
@@ -470,9 +470,14 @@
 
   // Tab: Related Records
   function renderTabRelated() {
-    return ui.renderSection({ vi: 'Ban ghi lien quan', en: 'Related Records' },
+    var html = '';
+    if (ui.renderLinkedRecordGraph) {
+      html += ui.renderLinkedRecordGraph(state.relationships, { entityType: 'ncr', recordId: state.detail && state.detail.ncr_id });
+    }
+    html += ui.renderSection({ vi: 'Ban ghi lien quan', en: 'Related Records' },
       ui.renderRelationshipsPanel(state.relationships)
     );
+    return html;
   }
 
   // Tab: Audit Trail

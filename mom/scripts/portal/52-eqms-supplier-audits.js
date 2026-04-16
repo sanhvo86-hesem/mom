@@ -359,7 +359,7 @@
     });
 
     if (state.loading) { html += ui.renderLoadingState({ vi: 'Dang tai danh sach danh gia...', en: 'Loading audits...' }); return html; }
-    if (state.error) { html += ui.renderErrorState(state.error, 'retry-audit-list'); return html; }
+    if (state.error) { html += (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-audit-list'); return html; }
 
     // Grid
     var columns = [
@@ -625,7 +625,7 @@
     });
 
     if (state.loading) { html += ui.renderLoadingState({ vi: 'Dang tai danh sach SCAR...', en: 'Loading SCARs...' }); return html; }
-    if (state.error) { html += ui.renderErrorState(state.error, 'retry-scar-list'); return html; }
+    if (state.error) { html += (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-scar-list'); return html; }
 
     // Grid
     var columns = [

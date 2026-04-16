@@ -106,6 +106,60 @@
   var _container = null;
 
   // =========================================================================
+  // MATRIX DATA NORMALIZATION
+  // =========================================================================
+  /**
+   * Backend may return flat rows: [{ employee_id, curriculum_id, curriculum_name, ... }]
+   * Frontend expects: { roles: [...], curricula: [...], cells: { 'roleId::currId': status } }
+   */
+  function normalizeMatrixData(rawData) {
+    if (!Array.isArray(rawData)) return rawData;
+    if (rawData.length === 0) return { roles: [], curricula: [], cells: {} };
+
+    var rolesMap = {};
+    var curriculaMap = {};
+    var cells = {};
+
+    rawData.forEach(function(row) {
+      var empId = row.employee_id || row.role_id || '';
+      var curId = row.curriculum_id || '';
+      var curName = row.curriculum_name || row.name || curId;
+
+      if (empId && !rolesMap[empId]) {
+        rolesMap[empId] = { id: empId, name: row.employee_name || row.role_name || empId, department: row.department || '' };
+      }
+      if (curId && !curriculaMap[curId]) {
+        curriculaMap[curId] = { id: curId, name: curName, department: row.department || '' };
+      }
+
+      if (empId && curId) {
+        var cellKey = empId + '::' + curId;
+        var status = row.completion_status || row.status || 'na';
+        // Map backend statuses to matrix cell states
+        if (status === 'completed' || status === 'verified') status = 'qualified';
+        else if (status === 'assigned' || status === 'in_progress') {
+          var dueDate = row.next_due_at || row.due_date;
+          if (dueDate && new Date(dueDate) < new Date()) status = 'overdue';
+          else status = 'due';
+        }
+        else if (status === 'expired') status = 'expired';
+        else if (status === 'not_required' || !row.required) status = 'na';
+
+        cells[cellKey] = status;
+        if (row.training_id || row.record_id) {
+          cells[cellKey + '::record_id'] = row.training_id || row.record_id || '';
+        }
+      }
+    });
+
+    return {
+      roles: Object.values(rolesMap),
+      curricula: Object.values(curriculaMap),
+      cells: cells
+    };
+  }
+
+  // =========================================================================
   // RENDER ENTRY POINT
   // =========================================================================
   function render(container, context) {
@@ -186,15 +240,19 @@
 
     apiCall('eqms_training_matrix', state.filters).then(function(res) {
       state.loading = false;
-      if (res.success) {
-        state.matrixData = res.data || { roles: [], curricula: [], cells: {} };
+      if (res.success || res.ok) {
+        state.matrixData = res.data || res.matrix || { roles: [], curricula: [], cells: {} };
+        // Normalize: backend may return { matrix: [...] } instead of { roles, curricula, cells }
+        if (Array.isArray(state.matrixData.matrix || state.matrixData)) {
+          state.matrixData = normalizeMatrixData(state.matrixData.matrix || state.matrixData);
+        }
       } else {
-        state.error = res.message || 'Failed to load training matrix';
+        state.error = { message: res.message || res.error || T({ vi: 'Không tải được ma trận đào tạo', en: 'Failed to load training matrix' }), status: res._httpStatus || 0, endpoint: 'eqms_training_matrix' };
       }
       paint();
     }).catch(function(err) {
       state.loading = false;
-      state.error = err.message || 'Network error';
+      state.error = { message: err.message || 'Network error', status: err.status || 0, endpoint: 'eqms_training_matrix' };
       paint();
     });
   }
@@ -307,7 +365,7 @@
   // =========================================================================
   function renderMatrix() {
     if (state.loading) return ui.renderLoadingState({ vi: 'Đang tải ma trận năng lực...', en: 'Loading competency matrix...' });
-    if (state.error) return ui.renderErrorState(state.error, 'retry-matrix');
+    if (state.error) return (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-matrix', { endpoint: state.error && state.error.endpoint });
 
     var md = state.matrixData;
     if (!md || !md.roles || !md.roles.length) {

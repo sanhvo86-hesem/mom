@@ -519,7 +519,7 @@
   // =========================================================================
   function renderDetail() {
     var rec = state.record;
-    if (!rec) return ui.renderErrorState(T({ vi: 'Không tìm thấy bản ghi', en: 'Record not found' }), 'retry-detail');
+    if (!rec) return (ui.renderRichErrorState || ui.renderErrorState)(T({ vi: 'Không tìm thấy bản ghi', en: 'Record not found' }), 'retry-detail');
 
     var html = '';
 
@@ -815,7 +815,7 @@
     // Build relationships from findings that generated CAPAs/NCRs
     var links = state.relationships || [];
     return ui.renderSection({ vi: 'Bản ghi liên quan', en: 'Related Records' },
-      ui.renderRelationshipsPanel(links)
+      (ui.renderLinkedRecordGraph || ui.renderRelationshipsPanel)(links)
     );
   }
 
@@ -1155,7 +1155,7 @@
     }
 
     if (state.error && state.screen !== 'detail') {
-      container.innerHTML = ui.renderErrorState(state.error, 'retry');
+      container.innerHTML = (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry');
       return;
     }
 

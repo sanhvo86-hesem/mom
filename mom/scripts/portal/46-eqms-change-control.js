@@ -206,7 +206,7 @@
     if (state.loading) {
       html += ui.renderLoadingState({ vi: 'Dang tai danh sach...', en: 'Loading records...' });
     } else if (state.error) {
-      html += ui.renderErrorState(state.error, 'reload-queue');
+      html += (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'reload-queue');
     } else {
       var columns = [
         { key: 'change_control_number', label: { vi: 'Ma so', en: 'ID' }, type: 'id' },
@@ -312,7 +312,7 @@
 
   function renderDetailScreen(container) {
     if (state.error) {
-      container.innerHTML = '<div class="eqms-module-page">' + renderBackButton() + ui.renderErrorState(state.error, 'reload-detail') + '</div>';
+      container.innerHTML = '<div class="eqms-module-page">' + renderBackButton() + (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'reload-detail') + '</div>';
       bindDetailEvents(container);
       return;
     }
@@ -676,7 +676,7 @@
   // --- Tab: Related Records ---
   function renderTabRelated() {
     return ui.renderSection({ vi: 'Ban ghi lien quan', en: 'Related Records' },
-      ui.renderRelationshipsPanel(state.relationships)
+      (ui.renderLinkedRecordGraph || ui.renderRelationshipsPanel)(state.relationships)
     );
   }
 
@@ -748,10 +748,10 @@
         loadDetail(container);
       } else {
         var msg = (res.error && res.error.message) || 'Action failed';
-        container.querySelector('.eqms-tab-content').innerHTML = ui.renderErrorState(msg, 'reload-detail');
+        container.querySelector('.eqms-tab-content').innerHTML = (ui.renderRichErrorState || ui.renderErrorState)(msg, 'reload-detail');
       }
     }).catch(function(err) {
-      container.querySelector('.eqms-tab-content').innerHTML = ui.renderErrorState(err.message, 'reload-detail');
+      container.querySelector('.eqms-tab-content').innerHTML = (ui.renderRichErrorState || ui.renderErrorState)(err.message, 'reload-detail');
     });
   }
 

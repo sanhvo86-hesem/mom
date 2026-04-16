@@ -265,7 +265,7 @@
   // =========================================================================
   function renderInventory() {
     if (state.loading) return ui.renderLoadingState({ vi: 'Đang tải dự án xác nhận...', en: 'Loading validation projects...' });
-    if (state.error) return ui.renderErrorState(state.error, 'retry-inventory');
+    if (state.error) return (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-inventory');
 
     var html = '';
 
@@ -339,7 +339,7 @@
   // =========================================================================
   function renderWorkspace() {
     if (state.loading) return ui.renderLoadingState({ vi: 'Đang tải chi tiết dự án...', en: 'Loading project details...' });
-    if (state.error) return ui.renderErrorState(state.error, 'retry-detail');
+    if (state.error) return (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-detail');
     if (!state.record) return ui.renderEmptyState({ icon: '\uD83E\uDDEA', title: { vi: 'Không tìm thấy dự án', en: 'Project not found' } });
 
     var rec = state.record;
@@ -863,7 +863,7 @@
   // =========================================================================
   function renderAnalytics() {
     if (state.loading) return ui.renderLoadingState({ vi: 'Đang tải phân tích...', en: 'Loading analytics...' });
-    if (state.error) return ui.renderErrorState(state.error, 'retry-analytics');
+    if (state.error) return (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-analytics');
 
     var m = state.metrics || {};
     var html = '';
