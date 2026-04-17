@@ -167,7 +167,8 @@
       search: '', sort_by: 'created_at', sort_dir: 'DESC',
       filters: {}
     };
-    if (state.ipFilters.work_order) payload.filters.work_order = state.ipFilters.work_order;
+    if (state.ipFilters.work_order) payload.filters.work_order_id = state.ipFilters.work_order;
+    if (state.ipFilters.operation) payload.filters.operation_code = state.ipFilters.operation;
     if (state.ipFilters.status) payload.filters.status = state.ipFilters.status;
 
     restCall(API.ipQuery, payload).then(function(res) {
@@ -642,8 +643,8 @@
     // Filter bar
     html += UI.renderFilterBar(state.ipFilters, {
       fields: [
-        { key: 'work_order', label: { vi: 'Lệnh SX', en: 'Work Order' }, type: 'text', placeholder: { vi: 'WO-...', en: 'WO-...' } },
-        { key: 'operation', label: { vi: 'Công đoạn', en: 'Operation' }, type: 'text', placeholder: { vi: 'OP...', en: 'OP...' } },
+        { key: 'work_order', label: { vi: 'Lệnh SX', en: 'Work Order' }, type: 'select', reference: 'work_orders' },
+        { key: 'operation', label: { vi: 'Công đoạn', en: 'Operation' }, type: 'select', reference: 'operations' },
         { key: 'station', label: { vi: 'Trạm', en: 'Station' }, type: 'text', placeholder: { vi: 'Trạm...', en: 'Station...' } },
         { key: 'status', label: { vi: 'Trạng thái', en: 'Status' }, type: 'select', options: STATUS_OPTIONS }
       ]

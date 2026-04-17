@@ -34,6 +34,24 @@ final class EqmsReferenceController extends EqmsBaseController
             'where' => "site_status = 'active'",
             'meta' => "jsonb_build_object('customer_id', customer_id, 'country_code', country_code, 'status', site_status)",
         ],
+        'parties' => [
+            'table' => 'party',
+            'value' => 'party_code',
+            'label' => "party_code || ' - ' || display_name",
+            'search' => ['party_code', 'display_name', 'party_type', 'tax_registration_no', 'country_code'],
+            'order' => 'display_name',
+            'where' => "status_code = 'active'",
+            'meta' => "jsonb_build_object('party_id', party_id::text, 'type', party_type, 'country_code', country_code)",
+        ],
+        'party_records' => [
+            'table' => 'party',
+            'value' => 'party_id::text',
+            'label' => "party_code || ' - ' || display_name",
+            'search' => ['party_id', 'party_code', 'display_name', 'party_type', 'tax_registration_no', 'country_code'],
+            'order' => 'display_name',
+            'where' => "status_code = 'active'",
+            'meta' => "jsonb_build_object('party_code', party_code, 'type', party_type, 'country_code', country_code)",
+        ],
         'suppliers' => [
             'table' => 'vendors',
             'value' => 'vendor_id',
@@ -135,6 +153,26 @@ final class EqmsReferenceController extends EqmsBaseController
             'where' => 'is_active IS TRUE',
             'meta' => "jsonb_build_object('department_id', department_id, 'type', work_center_type::text)",
         ],
+        'operations' => [
+            'table' => 'routing_operations',
+            'value' => 'operation_code',
+            'label' => "operation_code || ' - ' || COALESCE(NULLIF(operation_description_vi, ''), operation_description)",
+            'search' => ['operation_code', 'operation_description', 'operation_description_vi', 'routing_id', 'work_center_id'],
+            'order' => 'routing_id, operation_seq, operation_code',
+            'where' => "operation_code IS NOT NULL AND operation_code <> ''",
+            'meta' => "jsonb_build_object('operation_id', operation_id::text, 'routing_id', routing_id, 'operation_seq', operation_seq, 'work_center_id', work_center_id)",
+        ],
+        'operation_records' => [
+            'table' => 'routing_operations',
+            'value' => 'operation_id::text',
+            'label' => "operation_code || ' - ' || COALESCE(NULLIF(operation_description_vi, ''), operation_description)",
+            'search' => ['operation_id', 'operation_code', 'operation_description', 'operation_description_vi', 'routing_id', 'work_center_id'],
+            'order' => 'routing_id, operation_seq, operation_code',
+            'meta' => "jsonb_build_object('operation_code', operation_code, 'routing_id', routing_id, 'operation_seq', operation_seq, 'work_center_id', work_center_id)",
+        ],
+        'routing_operations' => [
+            'alias' => 'operations',
+        ],
         'warehouses' => [
             'table' => 'warehouses',
             'value' => 'warehouse_id',
@@ -171,6 +209,22 @@ final class EqmsReferenceController extends EqmsBaseController
             'search' => ['sales_order_id', 'sales_order_number', 'customer_id', 'customer_po_number', 'so_status', 'project_id'],
             'order' => 'created_at DESC, sales_order_number',
             'meta' => "jsonb_build_object('sales_order_number', sales_order_number, 'status', so_status::text, 'customer_id', customer_id, 'customer_po_number', customer_po_number)",
+        ],
+        'purchase_orders' => [
+            'table' => 'purchase_orders',
+            'value' => 'po_number',
+            'label' => "po_number || ' - ' || vendor_id",
+            'search' => ['po_number', 'vendor_id', 'po_status', 'po_type', 'buyer_id', 'vendor_quote_ref'],
+            'order' => 'po_date DESC, po_number',
+            'meta' => "jsonb_build_object('po_id', po_id::text, 'status', po_status::text, 'vendor_id', vendor_id, 'type', po_type::text)",
+        ],
+        'purchase_order_records' => [
+            'table' => 'purchase_orders',
+            'value' => 'po_id::text',
+            'label' => "po_number || ' - ' || vendor_id",
+            'search' => ['po_id', 'po_number', 'vendor_id', 'po_status', 'po_type', 'buyer_id', 'vendor_quote_ref'],
+            'order' => 'po_date DESC, po_number',
+            'meta' => "jsonb_build_object('po_number', po_number, 'status', po_status::text, 'vendor_id', vendor_id, 'type', po_type::text)",
         ],
         'incoterms' => [
             'table' => 'mdm_incoterms',
@@ -255,6 +309,20 @@ final class EqmsReferenceController extends EqmsBaseController
         'tooling_assets' => [
             'alias' => 'tools',
         ],
+        'test_labs' => [
+            'table' => 'qual_test_labs',
+            'value' => 'lab_code',
+            'label' => "lab_code || ' - ' || lab_name",
+            'search' => ['lab_code', 'lab_name', 'lab_type', 'accreditation_reference'],
+            'order' => 'lab_name',
+            'meta' => "jsonb_build_object('lab_id', qual_test_lab_id::text, 'type', lab_type, 'accreditation', accreditation_reference)",
+        ],
+        'labs' => [
+            'alias' => 'test_labs',
+        ],
+        'qual_test_labs' => [
+            'alias' => 'test_labs',
+        ],
         'work_orders' => [
             'table' => 'work_orders',
             'value' => 'work_order_number',
@@ -270,6 +338,22 @@ final class EqmsReferenceController extends EqmsBaseController
             'search' => ['work_order_id', 'work_order_number', 'item_id', 'traveler_number', 'work_order_status', 'equipment_id'],
             'order' => 'created_at DESC, work_order_number',
             'meta' => "jsonb_build_object('work_order_number', work_order_number, 'status', work_order_status, 'item_id', item_id, 'equipment_id', equipment_id)",
+        ],
+        'production_orders' => [
+            'table' => 'production_order',
+            'value' => 'production_order_no',
+            'label' => "production_order_no || ' - ' || item_revision_id::text",
+            'search' => ['production_order_no', 'production_order_id', 'release_state', 'status_code'],
+            'order' => 'planned_start_at DESC NULLS LAST, production_order_no',
+            'meta' => "jsonb_build_object('production_order_id', production_order_id::text, 'release_state', release_state, 'status', status_code, 'item_revision_id', item_revision_id::text, 'plant_id', plant_id::text)",
+        ],
+        'production_order_records' => [
+            'table' => 'production_order',
+            'value' => 'production_order_id::text',
+            'label' => "production_order_no || ' - ' || item_revision_id::text",
+            'search' => ['production_order_id', 'production_order_no', 'release_state', 'status_code'],
+            'order' => 'planned_start_at DESC NULLS LAST, production_order_no',
+            'meta' => "jsonb_build_object('production_order_no', production_order_no, 'release_state', release_state, 'status', status_code, 'item_revision_id', item_revision_id::text, 'plant_id', plant_id::text)",
         ],
         'job_orders' => [
             'table' => 'job_orders',
@@ -451,13 +535,25 @@ final class EqmsReferenceController extends EqmsBaseController
         'customer_destination' => 'customers',
         'customer_site' => 'customer_sites',
         'customer_site_id' => 'customer_sites',
+        'party' => 'parties',
+        'party_code' => 'parties',
+        'party_id' => 'party_records',
+        'partner' => 'parties',
+        'partner_name' => 'parties',
+        'partner_id' => 'party_records',
         'supplier' => 'suppliers',
         'supplier_id' => 'suppliers',
         'vendor' => 'suppliers',
         'vendor_id' => 'suppliers',
         'department' => 'departments',
         'department_id' => 'departments',
+        'department_code' => 'departments',
+        'dept' => 'departments',
+        'dept_id' => 'departments',
         'dept_code' => 'departments',
+        'owner_department' => 'departments',
+        'owning_department' => 'departments',
+        'responsible_department' => 'departments',
         'auditee_dept' => 'departments',
         'role' => 'roles',
         'role_code' => 'roles',
@@ -496,6 +592,15 @@ final class EqmsReferenceController extends EqmsBaseController
         'item_revision' => 'item_revisions',
         'work_center' => 'work_centers',
         'work_center_id' => 'work_centers',
+        'operation' => 'operations',
+        'operation_code' => 'operations',
+        'operation_id' => 'operation_records',
+        'routing_operation' => 'operations',
+        'routing_operation_id' => 'operation_records',
+        'process' => 'operations',
+        'process_code' => 'operations',
+        'process_name' => 'operations',
+        'affected_process' => 'operations',
         'warehouse' => 'warehouses',
         'warehouse_id' => 'warehouses',
         'location' => 'inventory_locations',
@@ -506,6 +611,12 @@ final class EqmsReferenceController extends EqmsBaseController
         'so_number' => 'sales_orders',
         'customer_po_number' => 'sales_orders',
         'purchase_order' => 'sales_orders',
+        'purchase_order_number' => 'purchase_orders',
+        'supplier_purchase_order' => 'purchase_orders',
+        'supplier_po' => 'purchase_orders',
+        'po_number' => 'purchase_orders',
+        'po_id' => 'purchase_order_records',
+        'quick_po' => 'purchase_orders',
         'incoterm' => 'incoterms',
         'incoterm_code' => 'incoterms',
         'payment_term' => 'payment_terms',
@@ -524,6 +635,7 @@ final class EqmsReferenceController extends EqmsBaseController
         'responsible_person' => 'users',
         'responsible_user' => 'users',
         'responsible_user_id' => 'users',
+        'responsibility' => 'users',
         'lead_auditor' => 'users',
         'auditor' => 'users',
         'reviewer' => 'users',
@@ -532,7 +644,10 @@ final class EqmsReferenceController extends EqmsBaseController
         'operator' => 'users',
         'approver' => 'users',
         'prepared_by' => 'users',
+        'preparer' => 'users',
+        'form_preparer' => 'users',
         'issued_by' => 'users',
+        'issuer' => 'users',
         'approved_by' => 'users',
         'reviewed_by' => 'users',
         'verified_by' => 'users',
@@ -545,6 +660,7 @@ final class EqmsReferenceController extends EqmsBaseController
         'originator' => 'users',
         'reported_by' => 'users',
         'submitted_by' => 'users',
+        'submitter' => 'users',
         'recorded_by' => 'users',
         'closed_by' => 'users',
         'signed_by' => 'users',
@@ -553,6 +669,10 @@ final class EqmsReferenceController extends EqmsBaseController
         'new_action_owner' => 'users',
         'initial_action_owner' => 'users',
         'team_lead' => 'users',
+        'rt_analyst' => 'users',
+        'created_by' => 'users',
+        'creator' => 'users',
+        'created_user' => 'users',
         'trainer' => 'users',
         'instructor' => 'users',
         'employee' => 'employees',
@@ -569,12 +689,38 @@ final class EqmsReferenceController extends EqmsBaseController
         'tool_id' => 'tools',
         'tooling' => 'tools',
         'tooling_asset' => 'tools',
+        'lab' => 'test_labs',
+        'labs' => 'test_labs',
+        'lab_code' => 'test_labs',
+        'lab_id' => 'test_labs',
+        'laboratory' => 'test_labs',
+        'test_lab' => 'test_labs',
+        'test_lab_id' => 'test_labs',
         'work_order' => 'work_orders',
+        'workorder' => 'work_orders',
         'work_order_number' => 'work_orders',
         'work_order_id' => 'work_order_records',
+        'wo' => 'work_orders',
+        'wo_number' => 'work_orders',
+        'wo_id' => 'work_order_records',
         'job_order' => 'job_orders',
         'job_number' => 'job_orders',
+        'job_order_number' => 'job_orders',
         'job_order_id' => 'job_order_records',
+        'production_order' => 'production_orders',
+        'production_order_no' => 'production_orders',
+        'production_order_number' => 'production_orders',
+        'production_order_id' => 'production_order_records',
+        'prod_order' => 'production_orders',
+        'prod_order_no' => 'production_orders',
+        'prod_order_number' => 'production_orders',
+        'prod_order_id' => 'production_order_records',
+        'manufacturing_order' => 'production_orders',
+        'manufacturing_order_no' => 'production_orders',
+        'manufacturing_order_number' => 'production_orders',
+        'manufacturing_order_id' => 'production_order_records',
+        'mo_number' => 'production_orders',
+        'mo_id' => 'production_order_records',
         'program' => 'cnc_programs',
         'program_number' => 'cnc_programs',
         'cnc_program' => 'cnc_programs',
@@ -582,6 +728,10 @@ final class EqmsReferenceController extends EqmsBaseController
         'program_id' => 'cnc_program_records',
         'document_id' => 'documents',
         'doc_id' => 'documents',
+        'audit_report_ref' => 'documents',
+        'supersedes' => 'documents',
+        'supersedes_doc_id' => 'documents',
+        'superseded_document_id' => 'documents',
         'change_control_id' => 'change_controls',
         'linked_change_control_id' => 'change_controls',
         'capa_id' => 'capa_records',
@@ -590,9 +740,16 @@ final class EqmsReferenceController extends EqmsBaseController
         'ncr_id' => 'ncr_records',
         'complaint_id' => 'complaints',
         'audit_id' => 'audits',
+        'source_audit' => 'audits',
+        'source_audit_id' => 'audits',
         'source_event_id' => 'source_records',
         'source_id' => 'source_records',
+        'source_ref' => 'source_records',
+        'source_reference' => 'source_records',
+        'source_record' => 'source_records',
+        'source_record_id' => 'source_records',
         'standard' => 'eqms.standard_ref',
+        'req_source' => 'eqms.standard_ref',
         'release_type' => 'eqms.release_type',
         'action_type' => 'eqms.action_type',
         'type' => 'eqms.type',
@@ -898,11 +1055,17 @@ final class EqmsReferenceController extends EqmsBaseController
         if (str_contains($key, 'customer_site')) {
             return 'customer_sites';
         }
+        if ($key === 'party' || $key === 'party_code' || $key === 'party_id' || $key === 'partner' || $key === 'partner_id' || $key === 'partner_name') {
+            return str_ends_with($key, '_id') ? 'party_records' : 'parties';
+        }
         if ($key === 'equipment' || $key === 'equipment_id' || $key === 'equipment_system' || $key === 'machine' || $key === 'machine_id' || str_ends_with($key, '_equipment_id') || str_ends_with($key, '_machine_id')) {
             return 'equipment';
         }
         if ($key === 'tool' || $key === 'tool_id' || $key === 'tooling' || $key === 'tooling_asset' || str_contains($key, 'tool_id')) {
             return 'tools';
+        }
+        if ($key === 'lab' || $key === 'labs' || $key === 'lab_code' || $key === 'lab_id' || $key === 'laboratory' || $key === 'test_lab' || $key === 'test_lab_id') {
+            return 'test_labs';
         }
         if (str_contains($key, 'sales_order') || str_contains($key, 'so_number') || str_contains($key, 'purchase_order')) {
             return str_ends_with($key, '_id') ? 'sales_order_records' : 'sales_orders';
@@ -913,8 +1076,14 @@ final class EqmsReferenceController extends EqmsBaseController
         if (str_contains($key, 'job_order') || str_contains($key, 'job_number')) {
             return str_ends_with($key, '_id') ? 'job_order_records' : 'job_orders';
         }
+        if (str_contains($key, 'production_order') || str_contains($key, 'prod_order') || str_contains($key, 'manufacturing_order') || str_contains($key, 'mo_number')) {
+            return str_ends_with($key, '_id') ? 'production_order_records' : 'production_orders';
+        }
         if (str_contains($key, 'revision')) {
             return 'item_revisions';
+        }
+        if ($key === 'operation' || $key === 'operation_code' || $key === 'process' || $key === 'process_code' || $key === 'process_name' || $key === 'affected_process' || str_contains($key, 'routing_operation')) {
+            return str_ends_with($key, '_id') ? 'operation_records' : 'operations';
         }
         if ($key === 'program' || $key === 'program_id' || $key === 'program_number' || str_contains($key, 'cnc_program') || str_contains($key, 'nc_program')) {
             return str_ends_with($key, '_id') ? 'cnc_program_records' : 'cnc_programs';
@@ -929,7 +1098,7 @@ final class EqmsReferenceController extends EqmsBaseController
         }
 
         return preg_match(
-            '/(^|_)(owner|assignee|assigned_to|responsible|auditor|reviewer|approver|verifier|inspector|analyst|operator|trainer|instructor|requester|requestor|originator|author|signer|team_lead|lead_auditor)($|_)/',
+            '/(^|_)(owner|assignee|assigned_to|responsible|responsibility|auditor|reviewer|approver|verifier|inspector|analyst|operator|trainer|instructor|requester|requestor|originator|author|signer|preparer|creator|issuer|submitter|pic|team_lead|lead_auditor)($|_)/',
             $key
         ) === 1;
     }

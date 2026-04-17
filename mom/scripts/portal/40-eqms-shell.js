@@ -294,13 +294,25 @@
       customer_destination: 'customers',
       customer_site: 'customer_sites',
       customer_site_id: 'customer_sites',
+      party: 'parties',
+      party_code: 'parties',
+      party_id: 'party_records',
+      partner: 'parties',
+      partner_name: 'parties',
+      partner_id: 'party_records',
       supplier: 'suppliers',
       supplier_id: 'suppliers',
       vendor: 'suppliers',
       vendor_id: 'suppliers',
       department: 'departments',
       department_id: 'departments',
+      department_code: 'departments',
+      dept: 'departments',
+      dept_id: 'departments',
       dept_code: 'departments',
+      owner_department: 'departments',
+      owning_department: 'departments',
+      responsible_department: 'departments',
       auditee_dept: 'departments',
       role: 'roles',
       role_code: 'roles',
@@ -339,6 +351,15 @@
       item_revision: 'item_revisions',
       work_center: 'work_centers',
       work_center_id: 'work_centers',
+      operation: 'operations',
+      operation_code: 'operations',
+      operation_id: 'operation_records',
+      routing_operation: 'operations',
+      routing_operation_id: 'operation_records',
+      process: 'operations',
+      process_code: 'operations',
+      process_name: 'operations',
+      affected_process: 'operations',
       warehouse: 'warehouses',
       warehouse_id: 'warehouses',
       location: 'inventory_locations',
@@ -349,6 +370,12 @@
       so_number: 'sales_orders',
       customer_po_number: 'sales_orders',
       purchase_order: 'sales_orders',
+      purchase_order_number: 'purchase_orders',
+      supplier_purchase_order: 'purchase_orders',
+      supplier_po: 'purchase_orders',
+      po_number: 'purchase_orders',
+      po_id: 'purchase_order_records',
+      quick_po: 'purchase_orders',
       incoterm: 'incoterms',
       incoterm_code: 'incoterms',
       payment_term: 'payment_terms',
@@ -367,6 +394,7 @@
       responsible_person: 'users',
       responsible_user: 'users',
       responsible_user_id: 'users',
+      responsibility: 'users',
       lead_auditor: 'users',
       auditor: 'users',
       reviewer: 'users',
@@ -375,7 +403,10 @@
       operator: 'users',
       approver: 'users',
       prepared_by: 'users',
+      preparer: 'users',
+      form_preparer: 'users',
       issued_by: 'users',
+      issuer: 'users',
       approved_by: 'users',
       reviewed_by: 'users',
       verified_by: 'users',
@@ -388,6 +419,7 @@
       originator: 'users',
       reported_by: 'users',
       submitted_by: 'users',
+      submitter: 'users',
       recorded_by: 'users',
       closed_by: 'users',
       signed_by: 'users',
@@ -396,6 +428,10 @@
       new_action_owner: 'users',
       initial_action_owner: 'users',
       team_lead: 'users',
+      rt_analyst: 'users',
+      created_by: 'users',
+      creator: 'users',
+      created_user: 'users',
       trainer: 'users',
       instructor: 'users',
       employee: 'employees',
@@ -413,11 +449,30 @@
       tooling: 'tools',
       tooling_asset: 'tools',
       work_order: 'work_orders',
+      workorder: 'work_orders',
       work_order_number: 'work_orders',
       work_order_id: 'work_order_records',
+      wo: 'work_orders',
+      wo_number: 'work_orders',
+      wo_id: 'work_order_records',
       job_order: 'job_orders',
       job_number: 'job_orders',
+      job_order_number: 'job_orders',
       job_order_id: 'job_order_records',
+      production_order: 'production_orders',
+      production_order_no: 'production_orders',
+      production_order_number: 'production_orders',
+      production_order_id: 'production_order_records',
+      prod_order: 'production_orders',
+      prod_order_no: 'production_orders',
+      prod_order_number: 'production_orders',
+      prod_order_id: 'production_order_records',
+      manufacturing_order: 'production_orders',
+      manufacturing_order_no: 'production_orders',
+      manufacturing_order_number: 'production_orders',
+      manufacturing_order_id: 'production_order_records',
+      mo_number: 'production_orders',
+      mo_id: 'production_order_records',
       program: 'cnc_programs',
       program_number: 'cnc_programs',
       cnc_program: 'cnc_programs',
@@ -425,6 +480,10 @@
       program_id: 'cnc_program_records',
       document_id: 'documents',
       doc_id: 'documents',
+      audit_report_ref: 'documents',
+      supersedes: 'documents',
+      supersedes_doc_id: 'documents',
+      superseded_document_id: 'documents',
       change_control_id: 'change_controls',
       linked_change_control_id: 'change_controls',
       capa_id: 'capa_records',
@@ -433,9 +492,23 @@
       ncr_id: 'ncr_records',
       complaint_id: 'complaints',
       audit_id: 'audits',
+      source_audit: 'audits',
+      source_audit_id: 'audits',
       source_event_id: 'source_records',
       source_id: 'source_records',
+      source_ref: 'source_records',
+      source_reference: 'source_records',
+      source_record: 'source_records',
+      source_record_id: 'source_records',
+      lab: 'test_labs',
+      labs: 'test_labs',
+      lab_code: 'test_labs',
+      lab_id: 'test_labs',
+      laboratory: 'test_labs',
+      test_lab: 'test_labs',
+      test_lab_id: 'test_labs',
       standard: 'eqms.standard_ref',
+      req_source: 'eqms.standard_ref',
       release_type: 'eqms.release_type',
       action_type: 'eqms.action_type',
       type: 'eqms.type',
@@ -513,6 +586,7 @@
     if (exact[key]) return exact[key];
 
     if (key.indexOf('customer_site') >= 0) return 'customer_sites';
+    if (key === 'party' || key === 'party_code' || key === 'party_id' || key === 'partner' || key === 'partner_id' || key === 'partner_name') return /_id$/.test(key) ? 'party_records' : 'parties';
     if (key.indexOf('customer') >= 0) return 'customers';
     if (key.indexOf('supplier') >= 0 || key.indexOf('vendor') >= 0) return 'suppliers';
     if (key.indexOf('department') >= 0 || key.indexOf('dept') >= 0) return 'departments';
@@ -524,17 +598,20 @@
     if (key.indexOf('revision') >= 0) return 'item_revisions';
     if (key.indexOf('item') >= 0 || key.indexOf('part') >= 0 || key.indexOf('product') >= 0 || key.indexOf('material') >= 0) return 'items';
     if (key.indexOf('work_center') >= 0) return 'work_centers';
+    if (key === 'operation' || key === 'operation_code' || key === 'process' || key === 'process_code' || key === 'process_name' || key === 'affected_process' || key.indexOf('routing_operation') >= 0) return /_id$/.test(key) ? 'operation_records' : 'operations';
     if (key.indexOf('warehouse') >= 0) return 'warehouses';
     if (key.indexOf('location') >= 0) return 'inventory_locations';
-    if (/(^|_)(owner|assignee|assigned_to|responsible|auditor|reviewer|approver|verifier|inspector|analyst|operator|trainer|instructor|requester|requestor|originator|author|signer|team_lead|lead_auditor)($|_)/.test(key) || /_by$/.test(key)) return 'users';
+    if (/(^|_)(owner|assignee|assigned_to|responsible|responsibility|auditor|reviewer|approver|verifier|inspector|analyst|operator|trainer|instructor|requester|requestor|originator|author|signer|preparer|creator|issuer|submitter|pic|team_lead|lead_auditor)($|_)/.test(key) || /_by$/.test(key)) return 'users';
     if (/(^|_)(employee|trainee)($|_)/.test(key)) return 'employees';
     if (key === 'equipment' || key === 'equipment_id' || key === 'equipment_system' || key === 'machine' || key === 'machine_id' || /_equipment_id$/.test(key) || /_machine_id$/.test(key)) return 'equipment';
     if (key === 'tool' || key === 'tool_id' || key === 'tooling' || key === 'tooling_asset' || key.indexOf('tool_id') >= 0) return 'tools';
     if (key.indexOf('sales_order') >= 0 || key.indexOf('so_number') >= 0 || key.indexOf('purchase_order') >= 0) return /_id$/.test(key) ? 'sales_order_records' : 'sales_orders';
     if (key.indexOf('work_order') >= 0 || key.indexOf('workorder') >= 0) return /_id$/.test(key) ? 'work_order_records' : 'work_orders';
     if (key.indexOf('job_order') >= 0 || key.indexOf('job_number') >= 0) return /_id$/.test(key) ? 'job_order_records' : 'job_orders';
+    if (key.indexOf('production_order') >= 0 || key.indexOf('prod_order') >= 0 || key.indexOf('manufacturing_order') >= 0 || key.indexOf('mo_number') >= 0) return /_id$/.test(key) ? 'production_order_records' : 'production_orders';
     if (key === 'program' || key === 'program_id' || key === 'program_number' || key.indexOf('cnc_program') >= 0 || key.indexOf('nc_program') >= 0) return /_id$/.test(key) ? 'cnc_program_records' : 'cnc_programs';
     if (key.indexOf('document') >= 0 || key === 'doc') return 'documents';
+    if (key === 'lab' || key === 'labs' || key === 'lab_code' || key === 'lab_id' || key === 'laboratory' || key === 'test_lab' || key === 'test_lab_id') return 'test_labs';
 
     if (key === 'status' || /_status$/.test(key)) return 'eqms.status';
     if (key === 'severity' || /_severity$/.test(key)) return 'eqms.severity';
@@ -2227,6 +2304,7 @@
       renderSection: renderSection,
       renderFieldGrid: renderFieldGrid,
       renderFormField: renderFormField,
+      renderWizardField: renderFormField,
       renderBreadcrumb: renderBreadcrumb,
       renderGlobalInbox: renderGlobalInbox,
       renderGlobalSearch: renderGlobalSearch,

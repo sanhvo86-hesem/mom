@@ -354,8 +354,8 @@
         { key: 'nc_type',      type: 'select',  label: { vi: 'Loai NC',         en: 'NC Type' },        options: NC_TYPES },
         { key: 'severity',     type: 'select',  label: { vi: 'Muc do',          en: 'Severity' },       options: SEVERITIES },
         { key: 'status',       type: 'select',  label: { vi: 'Trang thai',      en: 'Status' },         options: STATES.map(function(s) { return { value: s, label: s.replace(/_/g, ' ') }; }) },
-        { key: 'department',   type: 'text',    placeholder: { vi: 'Phong ban...', en: 'Department...' }, width: '140px' },
-        { key: 'work_order',   type: 'text',    placeholder: { vi: 'Lenh SX...', en: 'Work Order...' }, width: '120px' },
+        { key: 'department',   type: 'select',  reference: 'departments', label: { vi: 'Phong ban', en: 'Department' }, width: '140px' },
+        { key: 'work_order',   type: 'select',  reference: 'work_orders', label: { vi: 'Lenh SX', en: 'Work Order' }, width: '140px' },
         { key: 'disposition',  type: 'select',  label: { vi: 'Xu ly',           en: 'Disposition' },    options: DISPOSITIONS }
       ],
       savedViews: true
@@ -664,8 +664,8 @@
     var html = '<div class="eqms-form-grid">';
     html += ui.renderFormField({ key: 'nc_type',    label: { vi: 'Loai khong phu hop', en: 'NC Type' },     type: 'select', required: true, value: d.nc_type,  options: NC_TYPES });
     html += ui.renderFormField({ key: 'severity',   label: { vi: 'Muc do',             en: 'Severity' },    type: 'select', required: true, value: d.severity,  options: SEVERITIES });
-    html += ui.renderFormField({ key: 'department',  label: { vi: 'Phong ban',          en: 'Department' },  type: 'text',   required: true, value: d.department });
-    html += ui.renderFormField({ key: 'work_order',  label: { vi: 'Lenh san xuat',      en: 'Work Order' },  type: 'text',   value: d.work_order });
+    html += ui.renderFormField({ key: 'department',  label: { vi: 'Phong ban',          en: 'Department' },  type: 'select', reference: 'departments', required: true, value: d.department });
+    html += ui.renderFormField({ key: 'work_order',  label: { vi: 'Lenh san xuat',      en: 'Work Order' },  type: 'select', reference: 'work_orders', value: d.work_order });
     html += '</div>';
     return html;
   }
@@ -674,9 +674,9 @@
     var d = state.wizard.data;
     var html = '<div class="eqms-form-grid">';
     html += ui.renderFormField({ key: 'title',        label: { vi: 'Tieu de',         en: 'Title' },         type: 'text',     required: true, value: d.title });
-    html += ui.renderFormField({ key: 'part_number',   label: { vi: 'Ma san pham',     en: 'Part Number' },   type: 'text',     value: d.part_number });
-    html += ui.renderFormField({ key: 'supplier',      label: { vi: 'Nha cung cap',    en: 'Supplier' },      type: 'text',     value: d.supplier });
-    html += ui.renderFormField({ key: 'location',      label: { vi: 'Vi tri',          en: 'Location' },      type: 'text',     value: d.location });
+    html += ui.renderFormField({ key: 'part_number',   label: { vi: 'Ma san pham',     en: 'Part Number' },   type: 'select',   reference: 'items', value: d.part_number });
+    html += ui.renderFormField({ key: 'supplier',      label: { vi: 'Nha cung cap',    en: 'Supplier' },      type: 'select',   reference: 'suppliers', value: d.supplier });
+    html += ui.renderFormField({ key: 'location',      label: { vi: 'Vi tri',          en: 'Location' },      type: 'select',   reference: 'inventory_locations', value: d.location });
     html += ui.renderFormField({ key: 'detection_point', label: { vi: 'Diem phat hien', en: 'Detection Point' }, type: 'text',  value: d.detection_point });
     html += ui.renderFormField({ key: 'description',   label: { vi: 'Mo ta chi tiet',  en: 'Description' },   type: 'textarea', required: true, value: d.description });
     html += '</div>';
@@ -697,7 +697,7 @@
     var d = state.wizard.data;
     var html = '<div class="eqms-form-grid">';
     html += ui.renderFormField({ key: 'initial_containment', label: { vi: 'Hanh dong kiem soat ban dau', en: 'Initial Containment' }, type: 'textarea', value: d.initial_containment });
-    html += ui.renderFormField({ key: 'quarantine_location', label: { vi: 'Khu vuc cach ly',             en: 'Quarantine Location' },  type: 'text',     value: d.quarantine_location });
+    html += ui.renderFormField({ key: 'quarantine_location', label: { vi: 'Khu vuc cach ly',             en: 'Quarantine Location' },  type: 'select',   reference: 'inventory_locations', value: d.quarantine_location });
     html += ui.renderFormField({ key: 'quarantined_qty',     label: { vi: 'SL cach ly',                  en: 'Quarantined Qty' },       type: 'number',   value: d.quarantined_qty, min: 0 });
     html += '</div>';
     return html;

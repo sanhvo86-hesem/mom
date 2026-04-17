@@ -515,7 +515,7 @@ class EqmsInspectionController extends EqmsBaseController
             $params[':search'] = '%' . $q['search'] . '%';
         }
 
-        foreach (['status', 'work_order_id', 'product_id'] as $f) {
+        foreach (['status', 'work_order_id', 'operation_code', 'product_id'] as $f) {
             if (!empty($q['filters'][$f])) {
                 $conditions[] = "{$f} = :{$f}";
                 $params[":{$f}"] = $q['filters'][$f];
