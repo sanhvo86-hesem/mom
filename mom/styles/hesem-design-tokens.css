@@ -116,6 +116,9 @@
   --cyan-bg:  rgba(8,145,178,0.08);
   --cyan-light: #0891b2;
   --cyan-dark:  #22d3ee;
+  --orange:       #ea580c;
+  --orange-bg:    rgba(234,88,12,0.08);
+  --orange-dark:  #fb923c;
 
   /* ── SEMANTIC: SURFACE ─────────────────────────────────────────────────── */
   --bg-page:        var(--bg-page-light);
