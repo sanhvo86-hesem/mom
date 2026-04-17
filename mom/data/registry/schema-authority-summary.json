@@ -1,7 +1,7 @@
 {
     "schema_authority": {
         "version": "1.0.0",
-        "declared_at": "2026-04-17T01:17:05+00:00",
+        "declared_at": "2026-04-17T01:27:44+00:00",
         "authoritative_schema_source": "database/migrations/*.sql (001–139)",
         "authoritative_schema_file": "database/schema.sql",
         "authority_scope": "platform_global",

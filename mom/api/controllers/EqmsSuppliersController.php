@@ -387,8 +387,13 @@ final class EqmsSuppliersController extends EqmsBaseController
         $profileId = $this->requirePathId();
 
         $rows = $this->data->query(
-            "SELECT qualification_event_id, supplier_profile_id, event_type,
-                    qualification_status, event_date, performed_by, notes, created_at
+            "SELECT event_id AS qualification_event_id, event_id AS id,
+                    supplier_profile_id,
+                    event_type, event_type AS qualification_status,
+                    event_type AS status, event_type AS standard,
+                    event_date, event_date AS qualification_date,
+                    recorded_by AS performed_by, recorded_by AS auditor,
+                    notes, notes AS evidence, created_at
              FROM eqms_supplier_qualification_events
              WHERE supplier_profile_id = :id
              ORDER BY event_date DESC",
@@ -834,28 +839,52 @@ final class EqmsSuppliersController extends EqmsBaseController
         $this->requireAnyRole($user, $this->readRoles());
         $profileId = $this->requirePathId();
 
-        $vendorId = $this->data->scalar(
-            "SELECT vendor_id FROM eqms_supplier_profiles WHERE supplier_profile_id = :id",
-            [':id' => $profileId]
-        );
-        if ($vendorId === null) {
-            $this->error('supplier_profile_not_found', 404);
-        }
+        $this->supplierVendorId($profileId);
 
         $offset = max(0, (int)($this->query('offset', '0')));
         $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
 
         $rows = $this->data->query(
-            "SELECT deviation_id, deviation_number, title, category, severity, status, created_at
-             FROM eqms_deviations
-             WHERE vendor_id = :vid
-             ORDER BY created_at DESC LIMIT :lim OFFSET :off",
-            [':vid' => $vendorId, ':lim' => $limit, ':off' => $offset]
+            "SELECT d.deviation_id, d.deviation_id AS record_id,
+                    d.deviation_number, d.deviation_number AS record_number,
+                    d.title, d.severity, d.status, d.created_at,
+                    'deviation' AS entity_type, 'deviation' AS type,
+                    l.relationship_type
+             FROM eqms_deviations d
+             JOIN eqms_record_links l
+               ON (
+                    l.source_type = 'supplier_profile'
+                    AND l.source_id = CAST(:sid_source AS uuid)
+                    AND l.target_type = 'deviation'
+                    AND l.target_id = d.deviation_id
+                  )
+               OR (
+                    l.target_type = 'supplier_profile'
+                    AND l.target_id = CAST(:sid_target AS uuid)
+                    AND l.source_type = 'deviation'
+                    AND l.source_id = d.deviation_id
+                  )
+             ORDER BY d.created_at DESC LIMIT :lim OFFSET :off",
+            [':sid_source' => $profileId, ':sid_target' => $profileId, ':lim' => $limit, ':off' => $offset]
         ) ?? [];
 
         $total = (int)($this->data->scalar(
-            "SELECT COUNT(*) FROM eqms_deviations WHERE vendor_id = :vid",
-            [':vid' => $vendorId]
+            "SELECT COUNT(*)
+             FROM eqms_deviations d
+             JOIN eqms_record_links l
+               ON (
+                    l.source_type = 'supplier_profile'
+                    AND l.source_id = CAST(:sid_source AS uuid)
+                    AND l.target_type = 'deviation'
+                    AND l.target_id = d.deviation_id
+                  )
+               OR (
+                    l.target_type = 'supplier_profile'
+                    AND l.target_id = CAST(:sid_target AS uuid)
+                    AND l.source_type = 'deviation'
+                    AND l.source_id = d.deviation_id
+                  )",
+            [':sid_source' => $profileId, ':sid_target' => $profileId]
         ) ?? 0);
 
         $this->paginated('deviations', $rows, $total, $offset, $limit);
@@ -882,8 +911,15 @@ final class EqmsSuppliersController extends EqmsBaseController
         $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
 
         $rows = $this->data->query(
-            "SELECT scar_id, scar_number, priority, description,
-                    root_cause, assigned_to, response_due_date, status, created_at
+            "SELECT scar_id, scar_id AS record_id,
+                    scar_number, scar_number AS record_number,
+                    title,
+                    priority, priority AS severity,
+                    description,
+                    root_cause, assigned_to, response_due_date, status, created_at,
+                    created_at::date AS issued_date,
+                    GREATEST(0, DATE_PART('day', COALESCE(closed_at, now()) - created_at)::int) AS days_open,
+                    'scar' AS entity_type, 'scar' AS type
              FROM eqms_scars WHERE vendor_id = :vid
              ORDER BY created_at DESC LIMIT :lim OFFSET :off",
             [':vid' => $vendorId, ':lim' => $limit, ':off' => $offset]
@@ -952,9 +988,8 @@ final class EqmsSuppliersController extends EqmsBaseController
         // Record qualification history event
         $this->data->execute(
             "INSERT INTO eqms_supplier_qualification_events
-             (qualification_event_id, supplier_profile_id, event_type,
-              qualification_status, event_date, performed_by, notes, created_at)
-             VALUES (:eid, :pid, 'qualified', 'qualified', :edate, :by, :notes, :now)",
+             (event_id, supplier_profile_id, event_type, event_date, recorded_by, notes, created_at)
+             VALUES (:eid, :pid, 'qualified', :edate, :by, :notes, :now)",
             [
                 ':eid'   => $this->newUuid(),
                 ':pid'   => $profileId,
@@ -1013,6 +1048,7 @@ final class EqmsSuppliersController extends EqmsBaseController
         $this->data->execute(
             "UPDATE eqms_supplier_profiles
              SET qualification_status = 'disqualified',
+                 disqualification_reason = :reason,
                  notes      = :reason,
                  version    = :ver,
                  updated_at = :now,
@@ -1029,9 +1065,8 @@ final class EqmsSuppliersController extends EqmsBaseController
 
         $this->data->execute(
             "INSERT INTO eqms_supplier_qualification_events
-             (qualification_event_id, supplier_profile_id, event_type,
-              qualification_status, event_date, performed_by, notes, created_at)
-             VALUES (:eid, :pid, 'disqualified', 'disqualified', :edate, :by, :notes, :now)",
+             (event_id, supplier_profile_id, event_type, event_date, recorded_by, notes, created_at)
+             VALUES (:eid, :pid, 'disqualified', :edate, :by, :notes, :now)",
             [
                 ':eid'   => $this->newUuid(),
                 ':pid'   => $profileId,

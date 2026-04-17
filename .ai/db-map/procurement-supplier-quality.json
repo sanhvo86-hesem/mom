@@ -2,7 +2,7 @@
     "_meta": {
         "domain": "procurement_supplier_quality",
         "table_count": 12,
-        "generated_at": "2026-04-16T00:03:01+00:00"
+        "generated_at": "2026-04-17T01:32:11+00:00"
     },
     "tables": {
         "incoming_inspection_results": {
@@ -20,7 +20,19 @@
         "incoming_inspections": {
             "defined_in": "035_supplier_quality_management.sql",
             "extended_in": [
-                "070_enterprise_governance_uplift.sql"
+                "070_enterprise_governance_uplift.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql"
             ],
             "primary_key": "inspection_id",
             "foreign_keys": [

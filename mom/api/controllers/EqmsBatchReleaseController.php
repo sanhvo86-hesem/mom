@@ -457,15 +457,22 @@ class EqmsBatchReleaseController extends EqmsBaseController
             static fn(array $row): string => (string)($row['deviation_id'] ?? ''),
             $pkg['deviations']
         )));
+        $capaConditions = ["(source_type = 'batch_release' AND source_id = :release_id)"];
+        $capaParams = [':release_id' => $brId];
+        if ($deviationIds !== []) {
+            $devPlaceholders = [];
+            foreach ($deviationIds as $idx => $deviationId) {
+                $key = ":deviation_id_{$idx}";
+                $devPlaceholders[] = $key;
+                $capaParams[$key] = $deviationId;
+            }
+            $capaConditions[] = "(source_type = 'deviation' AND source_id IN (" . implode(',', $devPlaceholders) . "))";
+        }
         $pkg['capa_items'] = $this->data->query(
             "SELECT capa_id, capa_number, status FROM eqms_capa_records
-             WHERE (source_type = 'batch_release' AND source_id = :release_id)
-                OR (source_type = 'deviation' AND source_id = ANY(:deviation_ids::uuid[]))
+             WHERE " . implode(' OR ', $capaConditions) . "
              ORDER BY created_at DESC LIMIT 10",
-            [
-                ':release_id'    => $brId,
-                ':deviation_ids' => '{' . implode(',', $deviationIds) . '}',
-            ]
+            $capaParams
         ) ?? [];
 
         $pkg['aggregated_at'] = $this->nowIso();

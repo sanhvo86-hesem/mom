@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 717,
-        "generated_at": "2026-04-16T00:03:01+00:00"
+        "table_count": 720,
+        "generated_at": "2026-04-17T01:32:11+00:00"
     },
     "tables": {
         "ai_conversations": {
@@ -2296,7 +2296,11 @@
         },
         "eqms_audit_findings": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql"
+            ],
             "primary_key": "finding_id",
             "foreign_keys": [
                 {
@@ -2322,14 +2326,22 @@
         },
         "eqms_calibration_records": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql"
+            ],
             "primary_key": "calibration_id",
             "foreign_keys": [],
             "contract": null
         },
         "eqms_capa_records": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql"
+            ],
             "primary_key": "capa_id",
             "foreign_keys": [],
             "contract": null
@@ -2348,7 +2360,9 @@
         },
         "eqms_change_controls": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "137_eqms_schema_drift_reconcile.sql"
+            ],
             "primary_key": "change_control_id",
             "foreign_keys": [],
             "contract": null
@@ -2390,7 +2404,13 @@
         },
         "eqms_complaints": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql"
+            ],
             "primary_key": "complaint_id",
             "foreign_keys": [],
             "contract": null
@@ -2416,7 +2436,12 @@
         },
         "eqms_deviations": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql"
+            ],
             "primary_key": "deviation_id",
             "foreign_keys": [],
             "contract": null
@@ -2511,7 +2536,10 @@
         },
         "eqms_documents": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql"
+            ],
             "primary_key": "doc_id",
             "foreign_keys": [],
             "contract": null
@@ -2610,7 +2638,11 @@
         },
         "eqms_field_actions": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql"
+            ],
             "primary_key": "field_action_id",
             "foreign_keys": [],
             "contract": null
@@ -2796,7 +2828,10 @@
         },
         "eqms_ncr_records": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql"
+            ],
             "primary_key": "ncr_id",
             "foreign_keys": [],
             "contract": null
@@ -2842,8 +2877,20 @@
         },
         "eqms_quality_agreements": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql"
+            ],
             "primary_key": "agreement_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_quality_tower_snapshots": {
+            "defined_in": "137_eqms_schema_drift_reconcile.sql",
+            "extended_in": [],
+            "primary_key": "id",
             "foreign_keys": [],
             "contract": null
         },
@@ -2887,7 +2934,11 @@
         },
         "eqms_scars": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql"
+            ],
             "primary_key": "scar_id",
             "foreign_keys": [
                 {
@@ -2937,9 +2988,21 @@
             ],
             "contract": null
         },
+        "eqms_supplier_quality_agreements": {
+            "defined_in": "137_eqms_schema_drift_reconcile.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "eqms_training_curricula": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql"
+            ],
             "primary_key": "curriculum_id",
             "foreign_keys": [],
             "contract": null
@@ -2970,7 +3033,11 @@
         },
         "eqms_training_records": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql",
+                "137_eqms_schema_drift_reconcile.sql"
+            ],
             "primary_key": "training_id",
             "foreign_keys": [
                 {
@@ -3957,6 +4024,13 @@
             "foreign_keys": [],
             "contract": null
         },
+        "genealogy_threads": {
+            "defined_in": "137_eqms_schema_drift_reconcile.sql",
+            "extended_in": [],
+            "primary_key": "thread_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "gl_transactions": {
             "defined_in": "015_finance.sql",
             "extended_in": [
@@ -4269,7 +4343,22 @@
         "inspection_lot": {
             "defined_in": "078_canonical_eqms_compliance_backbone.sql",
             "extended_in": [
-                "091_runtime_governance_continuity.sql"
+                "091_runtime_governance_continuity.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql",
+                "139_eqms_runtime_contract_reconcile.sql"
             ],
             "primary_key": "inspection_lot_id",
             "foreign_keys": [

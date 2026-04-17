@@ -59,6 +59,34 @@ class EqmsSpcController extends EqmsBaseController
         return $row[0];
     }
 
+    private function chartWorkflowState(array $chart): string
+    {
+        $metadata = $chart['metadata'] ?? [];
+        if (is_string($metadata)) {
+            $decoded = json_decode($metadata, true);
+            $metadata = is_array($decoded) ? $decoded : [];
+        }
+        if (is_array($metadata) && !empty($metadata['linked_deviation_id'])) {
+            return 'deviation_raised';
+        }
+
+        $params = [
+            ':item_id' => (string)($chart['item_id'] ?? ''),
+            ':char'    => (string)($chart['characteristic_id'] ?? ''),
+        ];
+        $violationCount = (int)($this->data->scalar(
+            "SELECT COUNT(*) FROM mes_spc_violations WHERE item_id = :item_id AND characteristic_id = :char",
+            $params
+        ) ?? 0);
+        $openCount = (int)($this->data->scalar(
+            "SELECT COUNT(*) FROM mes_spc_violations
+             WHERE item_id = :item_id AND characteristic_id = :char AND acknowledged = false",
+            $params
+        ) ?? 0);
+
+        return $violationCount > 0 && $openCount === 0 ? 'violation_acknowledged' : 'active';
+    }
+
     // ── Query & Metrics ───────────────────────────────────────────────────────
 
     /** POST /eqms/spc/query — Paginated SPC control limit records. */
@@ -283,6 +311,7 @@ class EqmsSpcController extends EqmsBaseController
         $this->requireAnyRole($user, $this->spcWriteRoles());
         $chartId = $this->requirePathId('id', 'chart_id');
         $chart   = $this->loadChart($chartId);
+        $this->requireValidTransition($this->chartWorkflowState($chart), 'recalculate-limits', self::STATE_MACHINE, $chartId);
 
         $body        = $this->jsonBody();
         $dataSource  = trim((string)($body['data_source'] ?? 'historical'));
@@ -359,6 +388,7 @@ class EqmsSpcController extends EqmsBaseController
         $this->requireAnyRole($user, $this->spcWriteRoles());
         $chartId = $this->requirePathId('id', 'chart_id');
         $chart   = $this->loadChart($chartId);
+        $this->requireValidTransition($this->chartWorkflowState($chart), 'acknowledge-violation', self::STATE_MACHINE, $chartId);
 
         $body                   = $this->jsonBody();
         $violationPointId       = trim((string)($body['violation_point_id'] ?? ''));
@@ -420,12 +450,17 @@ class EqmsSpcController extends EqmsBaseController
         $this->requireAnyRole($user, $this->spcWriteRoles());
         $chartId = $this->requirePathId('id', 'chart_id');
         $chart   = $this->loadChart($chartId);
+        $this->requireValidTransition($this->chartWorkflowState($chart), 'create-deviation', self::STATE_MACHINE, $chartId);
 
         $body            = $this->jsonBody();
         $deviationTitle  = trim((string)($body['deviation_title'] ?? ''));
+        $severity        = trim((string)($body['severity'] ?? 'major'));
 
         if ($deviationTitle === '') {
             $this->error('deviation_title_required', 400, "'deviation_title' is required for creating a deviation.");
+        }
+        if (!in_array($severity, ['minor', 'major', 'critical'], true)) {
+            $this->error('invalid_severity', 400, "'severity' must be minor, major, or critical.");
         }
 
         $deviationId     = $this->newUuid();
@@ -437,22 +472,22 @@ class EqmsSpcController extends EqmsBaseController
         try {
             $this->data->execute(
                 "INSERT INTO eqms_deviations
-                 (deviation_id, deviation_number, title, description, source,
-                  source_ref_id, source_ref_type, severity, status,
-                  version, created_at, created_by)
+                 (deviation_id, deviation_number, title, description,
+                  severity, deviation_type, affected_process, detected_at, detected_by,
+                  status, version, created_at, created_by)
                  VALUES
-                 (:id, :num, :title, :desc, 'spc_violation',
-                  :src_id, 'spc_chart', 'major', 'open',
-                  1, :now, :by)",
+                 (:id, :num, :title, :desc,
+                  :severity, 'unplanned', 'spc', :now, :by,
+                  'draft', 1, :now, :by)",
                 [
-                    ':id'     => $deviationId,
-                    ':num'    => $deviationNumber,
-                    ':title'  => $deviationTitle,
-                    ':desc'   => "SPC control limit violation detected. Item: {$chart['item_id']} ({$chartId}). "
-                                 . "Characteristic: " . ($chart['characteristic_id'] ?? 'N/A'),
-                    ':src_id' => $chartId,
-                    ':now'    => $now,
-                    ':by'     => $actor,
+                    ':id'       => $deviationId,
+                    ':num'      => $deviationNumber,
+                    ':title'    => $deviationTitle,
+                    ':desc'     => "SPC control limit violation detected. Item: {$chart['item_id']} ({$chartId}). "
+                                   . "Characteristic: " . ($chart['characteristic_id'] ?? 'N/A'),
+                    ':severity' => $severity,
+                    ':now'      => $now,
+                    ':by'       => $actor,
                 ]
             );
         } catch (\Throwable $e) {
@@ -464,7 +499,7 @@ class EqmsSpcController extends EqmsBaseController
         try {
             $this->data->execute(
                 "UPDATE " . self::CHART_TABLE . "
-                 SET metadata = jsonb_set(COALESCE(metadata, '{}'), '{linked_deviation_id}', to_jsonb(:devid::text))
+                 SET metadata = jsonb_set(COALESCE(metadata, '{}'), '{linked_deviation_id}', to_jsonb(CAST(:devid AS text)))
                  WHERE limit_id = :id",
                 [':devid' => $deviationId, ':id' => $chartId]
             );
