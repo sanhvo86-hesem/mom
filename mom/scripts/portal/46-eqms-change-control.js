@@ -849,11 +849,12 @@
       html += '<td><strong>' + esc(row.area) + '</strong></td>';
       html += '<td style="text-align:center"><input type="checkbox" data-impact-field="impacted" data-idx="' + idx + '"' + (row.impacted ? ' checked' : '') + '></td>';
       html += '<td><input type="text" class="eqms-form-input" data-impact-field="description" data-idx="' + idx + '" value="' + esc(row.description) + '" placeholder="' + T({ vi: 'Mo ta...', en: 'Describe...' }) + '" style="width:100%"></td>';
-      html += '<td><select class="eqms-form-select" data-impact-field="severity" data-idx="' + idx + '" style="width:100%">';
-      IMPACT_LEVELS.forEach(function(lv) {
-        html += '<option value="' + esc(lv.value) + '"' + (row.severity === lv.value ? ' selected' : '') + '>' + esc(T(lv.label)) + '</option>';
-      });
-      html += '</select></td>';
+      html += '<td><select class="eqms-form-select" data-impact-field="severity" data-idx="' + idx + '" style="width:100%"' +
+        ' data-eqms-reference="eqms.severity" data-current-value="' + esc(row.severity || '') + '"' +
+        ' data-empty-label="' + esc(T({ vi: 'Chon...', en: 'Select...' })) + '" disabled>' +
+        '<option value="">' + esc(T({ vi: 'Dang tai du lieu DB...', en: 'Loading DB data...' })) + '</option>' +
+        (row.severity ? '<option value="' + esc(row.severity) + '" selected>' + esc(row.severity) + '</option>' : '') +
+        '</select></td>';
       html += '<td><input type="text" class="eqms-form-input" data-impact-field="mitigation" data-idx="' + idx + '" value="' + esc(row.mitigation) + '" placeholder="' + T({ vi: 'Bien phap...', en: 'Mitigation...' }) + '" style="width:100%"></td>';
       html += '</tr>';
     });

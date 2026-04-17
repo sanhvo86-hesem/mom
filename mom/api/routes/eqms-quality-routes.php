@@ -37,6 +37,10 @@ use MOM\Api\Router;
  */
 return static function (Router $router, string $dataDir): void {
 
+    // Shared DB-backed reference/dropdown sources for all EQMS tabs.
+    $router->get ('/api/v1/eqms/reference/options', EqmsReferenceController::class, 'options');
+    $router->post('/api/v1/eqms/reference/options', EqmsReferenceController::class, 'options');
+
     // ═══════════════════════════════════════════════════════════════════════════
     // MODULE M04-E: Customer Complaints (upgraded to eqms namespace)
     // ═══════════════════════════════════════════════════════════════════════════

@@ -701,27 +701,9 @@ function render(container){
 
 window._renderApqpPpap = render;
 
-/* Bridge: expose inside EQMS Shell module registry.
- * When user clicks APQP/PPAP inside EQMS Shell, shows a card linking
- * to the full standalone APQP/PPAP page (avoids CSS nesting conflicts). */
+/* Native EQMS Shell integration — renders the full APQP/PPAP module
+ * directly inside the EQMS shell content area (no navigate-out bridge). */
 window.EqmsModules = window.EqmsModules || {};
-window.EqmsModules['apqp-ppap'] = {
-  render: function(container) {
-    var isEn = (typeof window.lang !== 'undefined' && window.lang === 'en');
-    container.innerHTML = '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;height:100%;box-sizing:border-box">'
-      + '<div style="font-size:3em;margin-bottom:16px">\u{1F3AF}</div>'
-      + '<h2 style="margin:0 0 8px;font-size:1.4em;font-weight:700">APQP / PPAP</h2>'
-      + '<p style="color:#6b7280;margin:0 0 4px;font-size:0.95em">'
-      + (isEn ? 'Advanced Product Quality Planning &amp; Production Part Approval Process' : 'Lập kế hoạch Chất lượng Sản phẩm Nâng cao &amp; Phê duyệt Chi tiết Sản xuất')
-      + '</p>'
-      + '<p style="font-size:0.82em;color:#9ca3af;margin:0 0 24px">AS9145 / IATF 16949 &nbsp;&middot;&nbsp; '
-      + (isEn ? '5-phase APQP · PPAP levels 1-5 · Gate Reviews · PSW' : 'APQP 5 pha · PPAP cấp độ 1-5 · Gate Reviews · PSW')
-      + '</p>'
-      + '<button onclick="window.navigateTo&&navigateTo(\'apqp-ppap\')" style="background:#3b82f6;color:#fff;border:none;border-radius:8px;padding:11px 28px;cursor:pointer;font-size:1em;font-weight:600;letter-spacing:0.01em">'
-      + (isEn ? 'Open APQP / PPAP \u2192' : 'M\u1edf module APQP / PPAP \u2192')
-      + '</button>'
-      + '</div>';
-  }
-};
+window.EqmsModules['apqp-ppap'] = { render: render };
 
 })();

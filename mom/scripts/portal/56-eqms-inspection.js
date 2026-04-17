@@ -379,18 +379,9 @@
 
   function renderQuickLookup() {
     var html = '<div class="eqms-field-grid" style="grid-template-columns:repeat(3,1fr)">';
-    html += '<div class="eqms-field">';
-    html += '<div class="eqms-field-label">' + T({ vi: 'Theo PO', en: 'By PO' }) + '</div>';
-    html += '<input type="text" class="eqms-form-input" data-field="quick-po" placeholder="PO-...">';
-    html += '</div>';
-    html += '<div class="eqms-field">';
-    html += '<div class="eqms-field-label">' + T({ vi: 'Theo NCC', en: 'By Supplier' }) + '</div>';
-    html += '<input type="text" class="eqms-form-input" data-field="quick-supplier" placeholder="SUP-...">';
-    html += '</div>';
-    html += '<div class="eqms-field">';
-    html += '<div class="eqms-field-label">' + T({ vi: 'Theo vật tư', en: 'By Material' }) + '</div>';
-    html += '<input type="text" class="eqms-form-input" data-field="quick-material" placeholder="MAT-...">';
-    html += '</div>';
+    html += UI.renderFormField({ key: 'quick-po', label: { vi: 'Theo PO', en: 'By PO' }, type: 'text', placeholder: 'PO-...' });
+    html += UI.renderFormField({ key: 'quick-supplier', label: { vi: 'Theo NCC', en: 'By Supplier' }, placeholder: 'SUP-...' });
+    html += UI.renderFormField({ key: 'quick-material', label: { vi: 'Theo vat tu', en: 'By Material' }, placeholder: 'MAT-...' });
     html += '</div>';
     return html;
   }

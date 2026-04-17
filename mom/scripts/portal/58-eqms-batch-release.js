@@ -453,12 +453,12 @@
       { key: 'disposition',  label: { vi: 'Xu ly', en: 'Disposition' },
         render: function(v, row) {
           if (row.disposition_locked) return '<span class="eqms-badge">' + esc(v || '—') + '</span>';
-          return '<select class="eqms-input sm" data-exception-id="' + esc(row.exception_id || '') + '" data-field="exception_disposition">' +
-            '<option value="">' + T({ vi: '-- Chon --', en: '-- Select --' }) + '</option>' +
-            DISPOSITION_OPTIONS.map(function(o) {
-              var sel = (v === o.value) ? ' selected' : '';
-              return '<option value="' + esc(o.value) + '"' + sel + '>' + esc(T(o.label)) + '</option>';
-            }).join('') + '</select>';
+          return '<select class="eqms-input sm" data-exception-id="' + esc(row.exception_id || '') + '" data-field="exception_disposition"' +
+            ' data-eqms-reference="eqms.disposition" data-current-value="' + esc(v || '') + '"' +
+            ' data-empty-label="' + esc(T({ vi: '-- Chon --', en: '-- Select --' })) + '" disabled>' +
+            '<option value="">' + esc(T({ vi: 'Dang tai du lieu DB...', en: 'Loading DB data...' })) + '</option>' +
+            (v ? '<option value="' + esc(v) + '" selected>' + esc(v) + '</option>' : '') +
+            '</select>';
         } },
       { key: 'justification', label: { vi: 'Ly do', en: 'Justification' },
         render: function(v, row) {
@@ -774,11 +774,11 @@
   // ═══════════════════════════════════════════════════════════════════════
   function renderCreateBatchForm() {
     var body = '';
-    body += ui.renderFormField({ key: 'batch_id', label: { vi: 'Ma lo', en: 'Batch/Lot ID' }, required: true });
-    body += ui.renderFormField({ key: 'product', label: { vi: 'San pham', en: 'Product' }, required: true });
+    body += ui.renderFormField({ key: 'batch_number', label: { vi: 'So lo', en: 'Batch/Lot Number' }, required: true });
+    body += ui.renderFormField({ key: 'product_id', label: { vi: 'San pham', en: 'Product' }, required: true });
     body += ui.renderFormField({ key: 'lot_size', label: { vi: 'Kich thuoc lo', en: 'Lot Size' }, type: 'number', min: 1, required: true });
-    body += ui.renderFormField({ key: 'mfg_date', label: { vi: 'Ngay san xuat', en: 'Mfg Date' }, type: 'date', required: true });
-    body += ui.renderFormField({ key: 'target_ship_date', label: { vi: 'Ngay xuat du kien', en: 'Target Ship Date' }, type: 'date', required: true });
+    body += ui.renderFormField({ key: 'manufacture_date', label: { vi: 'Ngay san xuat', en: 'Mfg Date' }, type: 'date', required: true });
+    body += ui.renderFormField({ key: 'expiry_date', label: { vi: 'Ngay het han', en: 'Expiry Date' }, type: 'date' });
     body += ui.renderFormField({ key: 'release_type', label: { vi: 'Loai xuat', en: 'Release Type' }, type: 'select', options: BR_RELEASE_TYPES, required: true });
     body += ui.renderFormField({ key: 'customer_destination', label: { vi: 'Diem den', en: 'Customer Destination' } });
     return ui.renderWizardShell([

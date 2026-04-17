@@ -7,6 +7,10 @@ namespace MOM\Api\Controllers;
 use MOM\Api\Router;
 
 return static function (Router $router, string $dataDir): void {
+    $router->actions([
+        'eqms_reference_options' => [EqmsReferenceController::class, 'options'],
+    ]);
+
     // â”€â”€ Frontend Action Aliases â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     // Map frontend action names to existing controller methods where naming differs.
     

@@ -35,6 +35,294 @@ function api(action, payload, method){
   return fetch(url, opts).then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); });
 }
 
+var runtimeReferenceCache = {};
+var runtimeReferencePending = {};
+
+function normalizeReferenceKey(key){
+  return String(key || '').trim().toLowerCase().replace(/^registry:/, '').replace(/[\s-]+/g, '_');
+}
+
+function inferRuntimeReferenceKey(field){
+  field = field || {};
+  if(field.reference === false || field.ref === false || field.lookup === false) return '';
+
+  var explicit = normalizeReferenceKey(field.reference_code || field.reference_key || field.reference || field.ref || field.lookup || '');
+  var registryMap = {
+    scar_status: 'eqms.status',
+    status_options: 'eqms.status',
+    severity_level: 'eqms.severity',
+    severity_options: 'eqms.severity',
+    priority_level: 'eqms.priority',
+    priority_options: 'eqms.priority',
+    risk_level: 'eqms.risk_level',
+    disposition: 'eqms.disposition',
+    document_type: 'eqms.document_type',
+    doc_type: 'eqms.document_type',
+    audit_type: 'eqms.audit_type',
+    training_type: 'eqms.training_type'
+  };
+  if(explicit) return registryMap[explicit] || explicit;
+
+  var source = normalizeReferenceKey(field.options_source || '');
+  if(source && registryMap[source]) return registryMap[source];
+
+  var key = normalizeReferenceKey(field.key || field.name || field.id || '');
+  if(!key) return '';
+
+  if(window.EqmsShell && window.EqmsShell.util && typeof window.EqmsShell.util.inferReferenceKey === 'function'){
+    var shellKey = window.EqmsShell.util.inferReferenceKey({ key: key, name: key, type: field.type || 'select' });
+    if(shellKey) return shellKey;
+  }
+
+  var exact = {
+    customer: 'customers',
+    customer_id: 'customers',
+    customer_name: 'customers',
+    supplier: 'suppliers',
+    supplier_id: 'suppliers',
+    vendor: 'suppliers',
+    vendor_id: 'suppliers',
+    department: 'departments',
+    department_id: 'departments',
+    dept_code: 'departments',
+    role: 'roles',
+    role_code: 'roles',
+    site: 'sites',
+    site_id: 'sites',
+    area: 'areas',
+    area_id: 'areas',
+    plant: 'plants',
+    plant_id: 'plants',
+    lot: 'lots',
+    lot_number: 'lots',
+    batch: 'lots',
+    batch_number: 'lots',
+    item: 'items',
+    item_id: 'items',
+    material: 'items',
+    material_id: 'items',
+    part: 'items',
+    part_number: 'items',
+    product: 'items',
+    product_id: 'items',
+    work_center: 'work_centers',
+    work_center_id: 'work_centers',
+    warehouse: 'warehouses',
+    warehouse_id: 'warehouses',
+    location: 'inventory_locations',
+    location_id: 'inventory_locations',
+    owner: 'users',
+    assigned_to: 'users',
+    responsible_party: 'users',
+    document_id: 'documents',
+    doc_id: 'documents',
+    capa_id: 'capa_records',
+    deviation_id: 'deviations',
+    ncr_id: 'ncr_records',
+    complaint_id: 'complaints',
+    audit_id: 'audits',
+    source_id: 'source_records',
+    source_event_id: 'source_records',
+    standard: 'eqms.standard_ref',
+    standard_ref: 'eqms.standard_ref',
+    release_type: 'eqms.release_type',
+    action_type: 'eqms.action_type',
+    audit_type: 'eqms.audit_type',
+    training_type: 'eqms.training_type',
+    document_type: 'eqms.document_type',
+    doc_type: 'eqms.document_type',
+    change_type: 'eqms.change_type',
+    change_category: 'eqms.change_category',
+    deviation_type: 'eqms.deviation_type',
+    nc_type: 'eqms.nc_type',
+    defect_type: 'eqms.defect_type',
+    detection_method: 'eqms.detection_method',
+    detection_point: 'eqms.detection_point',
+    regulatory_impact: 'eqms.regulatory_impact',
+    overall_risk: 'eqms.risk_level',
+    risk_tier: 'eqms.risk_level',
+    strategic_classification: 'eqms.strategic_classification',
+    checklist_template: 'eqms.checklist_template',
+    validation_type: 'eqms.validation_type',
+    req_priority: 'eqms.requirement_priority',
+    requirement_priority: 'eqms.requirement_priority',
+    req_type: 'eqms.requirement_type',
+    requirement_type: 'eqms.requirement_type',
+    exec_status: 'eqms.execution_status',
+    execution_status: 'eqms.execution_status',
+    health_hazard_classification: 'eqms.hazard_class',
+    hazard_class: 'eqms.hazard_class',
+    urgency: 'eqms.urgency',
+    type: 'eqms.type',
+    status: 'eqms.status',
+    severity: 'eqms.severity',
+    priority: 'eqms.priority',
+    source: 'eqms.source_type',
+    source_type: 'eqms.source_type',
+    source_event_type: 'eqms.source_type',
+    category: 'eqms.category',
+    classification: 'eqms.classification',
+    risk_level: 'eqms.risk_level',
+    disposition: 'eqms.disposition',
+    due_status: 'eqms.due_status',
+    decision: 'eqms.decision',
+    outcome: 'eqms.outcome',
+    vote: 'eqms.vote',
+    impact: 'eqms.impact',
+    format: 'eqms.format',
+    quality_status: 'eqms.quality_status',
+    regulatory_notification: 'eqms.boolean',
+    regulatory_notification_required: 'eqms.boolean',
+    conc_regulatory_notification: 'eqms.boolean',
+    conc_batch_impact: 'eqms.boolean',
+    containment_needed: 'eqms.boolean',
+    new_action_evidence: 'eqms.boolean',
+    has_exceptions: 'eqms.boolean',
+    escalated: 'eqms.boolean',
+    p1_assignable_cause_found: 'eqms.boolean',
+    p1_calculation_verified: 'eqms.boolean',
+    p1_equipment_verified: 'eqms.boolean',
+    p1_method_followed: 'eqms.boolean',
+    p1_sample_integrity: 'eqms.boolean',
+    matrix_status: 'eqms.training_matrix_status',
+    control_status: 'eqms.control_status',
+    effectiveness: 'eqms.effectiveness',
+    level: 'eqms.capability_level',
+    capability_level: 'eqms.capability_level',
+    equipment_type: 'eqms.equipment_type',
+    fmea_type: 'eqms.fmea_type',
+    response_method: 'eqms.response_method',
+    rt_type: 'eqms.rt_type',
+    study_type: 'eqms.study_type'
+  };
+  if(exact[key]) return exact[key];
+
+  if(key.indexOf('customer') >= 0) return 'customers';
+  if(key.indexOf('supplier') >= 0 || key.indexOf('vendor') >= 0) return 'suppliers';
+  if(key.indexOf('department') >= 0 || key.indexOf('dept') >= 0) return 'departments';
+  if(key.indexOf('role') >= 0) return 'roles';
+  if(key.indexOf('site') >= 0) return 'sites';
+  if(key.indexOf('area') >= 0) return 'areas';
+  if(key.indexOf('plant') >= 0) return 'plants';
+  if(key.indexOf('lot') >= 0 || key.indexOf('batch') >= 0) return 'lots';
+  if(key.indexOf('item') >= 0 || key.indexOf('part') >= 0 || key.indexOf('product') >= 0 || key.indexOf('material') >= 0) return 'items';
+  if(key.indexOf('work_center') >= 0) return 'work_centers';
+  if(key.indexOf('warehouse') >= 0) return 'warehouses';
+  if(key.indexOf('location') >= 0) return 'inventory_locations';
+  if(field.type === 'select' || field.type === 'multi_select') return 'eqms.' + key;
+  return '';
+}
+
+function renderRuntimeReferenceSelect(id, field, value, ariaReq, ariaDesc, readOnly, multiple){
+  var referenceKey = inferRuntimeReferenceKey(field);
+  var values = multiple ? (Array.isArray(value) ? value.map(String) : []) : [];
+  var current = multiple ? JSON.stringify(values) : String(value || '');
+  var readonlyAttr = readOnly ? ' data-eqms-reference-readonly="1"' : '';
+  var multiAttr = multiple ? ' multiple data-eqms-reference-multiple="1"' : '';
+  var html = '<select class="hm-input hm-select" id="' + esc(id) + '"' + multiAttr +
+    ' data-eqms-reference="' + esc(referenceKey) + '"' +
+    ' data-current-value="' + esc(current) + '"' +
+    ' data-empty-label="' + esc(t('Chọn', 'Select')) + '"' +
+    readonlyAttr + ariaReq + ariaDesc + ' disabled>';
+  html += '<option value="">' + esc(t('Đang tải dữ liệu DB...', 'Loading DB data...')) + '</option>';
+  if(multiple){
+    values.forEach(function(v){ html += '<option value="' + esc(v) + '" selected>' + esc(v) + '</option>'; });
+  } else if(current){
+    html += '<option value="' + esc(current) + '" selected>' + esc(current) + '</option>';
+  }
+  html += '</select>';
+  return html;
+}
+
+function loadRuntimeReferenceOptions(keys){
+  keys = (keys || []).map(normalizeReferenceKey).filter(Boolean);
+  keys = keys.filter(function(k, i){ return keys.indexOf(k) === i; });
+
+  if(window.EqmsShell && window.EqmsShell.util && typeof window.EqmsShell.util.loadReferenceOptions === 'function'){
+    return window.EqmsShell.util.loadReferenceOptions(keys);
+  }
+
+  var missing = keys.filter(function(k){ return !runtimeReferenceCache[k] && !runtimeReferencePending[k]; });
+  if(missing.length){
+    var request = api('eqms_reference_options', { keys: missing, limit: 200 }, 'POST').then(function(resp){
+      var references = (resp && (resp.references || resp.data)) || {};
+      missing.forEach(function(k){
+        var entry = references[k] || {};
+        runtimeReferenceCache[k] = entry.ok === false
+          ? { ok: false, options: [], error: entry.detail || entry.error || 'reference_load_failed' }
+          : { ok: true, options: entry.options || [] };
+        delete runtimeReferencePending[k];
+      });
+      return runtimeReferenceCache;
+    }).catch(function(err){
+      missing.forEach(function(k){
+        runtimeReferenceCache[k] = { ok: false, options: [], error: err.message || 'reference_load_failed' };
+        delete runtimeReferencePending[k];
+      });
+      return runtimeReferenceCache;
+    });
+    missing.forEach(function(k){ runtimeReferencePending[k] = request; });
+  }
+
+  return Promise.all(keys.map(function(k){ return runtimeReferencePending[k] || Promise.resolve(runtimeReferenceCache[k]); })).then(function(){
+    var out = {};
+    keys.forEach(function(k){ out[k] = runtimeReferenceCache[k] || { ok: true, options: [] }; });
+    return out;
+  });
+}
+
+function fillRuntimeReferenceSelect(select, entry){
+  var multiple = select.hasAttribute('multiple') || select.getAttribute('data-eqms-reference-multiple') === '1';
+  var current = select.getAttribute('data-current-value') || select.value || '';
+  var currentValues = [];
+  if(multiple){
+    try {
+      var parsed = JSON.parse(current || '[]');
+      currentValues = Array.isArray(parsed) ? parsed.map(String) : [];
+    } catch(e){
+      currentValues = String(current || '').split(/[|,]/).map(function(v){ return v.trim(); }).filter(Boolean);
+    }
+  }
+  var options = (entry && entry.options) || [];
+  var html = multiple ? '' : '<option value="">' + esc(select.getAttribute('data-empty-label') || t('Chọn', 'Select')) + '</option>';
+  if(entry && entry.ok === false){
+    select.innerHTML = '<option value="">' + esc(t('Không tải được dữ liệu DB', 'Failed to load DB data')) + '</option>';
+    select.disabled = true;
+    select.title = entry.error || 'reference_load_failed';
+    select.setAttribute('data-eqms-reference-loaded', '1');
+    return;
+  }
+  options.forEach(function(option){
+    var value = option && option.value != null ? String(option.value) : '';
+    if(!value) return;
+    var selected = multiple ? currentValues.indexOf(value) >= 0 : (current && value === current);
+    html += '<option value="' + esc(value) + '"' + (selected ? ' selected' : '') + '>' + esc(option.label || value) + '</option>';
+  });
+  select.innerHTML = html || '<option value="">' + esc(t('DB chưa có dữ liệu', 'No DB records')) + '</option>';
+  select.disabled = select.getAttribute('data-eqms-reference-readonly') === '1';
+  select.setAttribute('data-eqms-reference-loaded', '1');
+}
+
+function hydrateRuntimeReferenceControls(root){
+  if(window.EqmsShell && window.EqmsShell.util && typeof window.EqmsShell.util.hydrateReferenceControls === 'function'){
+    return window.EqmsShell.util.hydrateReferenceControls(root || document);
+  }
+  var controls = Array.prototype.slice.call((root || document).querySelectorAll('select[data-eqms-reference]'))
+    .filter(function(el){ return el.getAttribute('data-eqms-reference-loaded') !== '1' && el.getAttribute('data-eqms-reference-loading') !== '1'; });
+  if(!controls.length) return Promise.resolve({});
+  var keys = controls.map(function(el){ return normalizeReferenceKey(el.getAttribute('data-eqms-reference')); }).filter(Boolean)
+    .filter(function(k, i, arr){ return arr.indexOf(k) === i; });
+  controls.forEach(function(el){ el.setAttribute('data-eqms-reference-loading', '1'); });
+  return loadRuntimeReferenceOptions(keys).then(function(map){
+    controls.forEach(function(el){
+      var key = normalizeReferenceKey(el.getAttribute('data-eqms-reference'));
+      fillRuntimeReferenceSelect(el, map[key] || { ok: true, options: [] });
+      el.removeAttribute('data-eqms-reference-loading');
+    });
+    return map;
+  });
+}
+
 function toast(msg, type){
   if(typeof window._ecShowToast === 'function') window._ecShowToast(msg, type);
   else if(typeof window._fhShowToast === 'function') window._fhShowToast(msg, type);
@@ -739,39 +1027,24 @@ function renderField(field, value, readOnly){
     case 'datetime':
       html += '<input class="hm-input" id="' + esc(id) + '" type="datetime-local" value="' + esc(val) + '"' + ariaReq + ariaDesc + disabled + '>';
       break;
-    case 'select':
-      /* Resolve options: prefer registry source over hardcoded */
-      var selectOpts = field.options || [];
-      if(field.options_source){
-        var regOpts = resolveRegistryOptions(field.options_source);
-        if(regOpts && regOpts.length) selectOpts = regOpts;
-      }
-      html += '<select class="hm-input hm-select" id="' + esc(id) + '"' + ariaReq + ariaDesc + disabled + '><option value="">' + esc(t('Chọn', 'Select')) + '</option>';
-      selectOpts.forEach(function(opt){
-        var ov = typeof opt === 'string' ? opt : (opt.value || '');
-        var ol = typeof opt === 'string' ? opt : t(opt.label || opt.value, opt.label_en || opt.label || opt.value);
-        html += '<option value="' + esc(ov) + '"' + (String(val) === String(ov) ? ' selected' : '') + '>' + esc(ol) + '</option>';
-      });
-      html += '</select>';
-      if(field.options_source) html += '<div class="eqms-helper eqms-registry-hint">' + esc(t('Dữ liệu từ registry: ', 'Data from registry: ') + field.options_source) + '</div>';
-      break;
-    case 'multi_select':
-      /* Resolve options: prefer registry source over hardcoded */
-      var multiOpts = field.options || [];
-      if(field.options_source){
-        var regMultiOpts = resolveRegistryOptions(field.options_source);
-        if(regMultiOpts && regMultiOpts.length) multiOpts = regMultiOpts;
-      }
-      html += '<div class="eqms-multi" role="group" aria-label="' + esc(labelEn) + '">';
-      var selected = Array.isArray(val) ? val : [];
-      multiOpts.forEach(function(opt){
-        var ov = typeof opt === 'string' ? opt : (opt.value || '');
-        var ol = typeof opt === 'string' ? opt : t(opt.label || opt.value, opt.label_en || opt.label || opt.value);
-        html += '<label class="hm-checkbox-label"><input type="checkbox" data-multi="' + esc(field.id) + '" value="' + esc(ov) + '"' + (selected.indexOf(ov) >= 0 ? ' checked' : '') + disabled + '> ' + esc(ol) + '</label>';
-      });
-      html += '</div>';
-      if(field.options_source) html += '<div class="eqms-helper eqms-registry-hint">' + esc(t('Dữ liệu từ registry: ', 'Data from registry: ') + field.options_source) + '</div>';
-      break;
+	    case 'select':
+	      if(inferRuntimeReferenceKey(field)){
+	        html += renderRuntimeReferenceSelect(id, field, val, ariaReq, ariaDesc, readOnly || fieldReadOnly, false);
+	      } else {
+	        html += '<select class="hm-input hm-select" id="' + esc(id) + '"' + ariaReq + ariaDesc + ' disabled>';
+	        html += '<option value="">' + esc(t('Chưa cấu hình reference DB', 'DB reference not configured')) + '</option>';
+	        html += '</select>';
+	      }
+	      break;
+	    case 'multi_select':
+	      if(inferRuntimeReferenceKey(field)){
+	        html += renderRuntimeReferenceSelect(id, field, val, ariaReq, ariaDesc, readOnly || fieldReadOnly, true);
+	      } else {
+	        html += '<select class="hm-input hm-select" id="' + esc(id) + '" multiple disabled>';
+	        html += '<option value="">' + esc(t('Chưa cấu hình reference DB', 'DB reference not configured')) + '</option>';
+	        html += '</select>';
+	      }
+	      break;
     case 'textarea':
       html += '<textarea class="hm-input hm-textarea" id="' + esc(id) + '" rows="4" placeholder="' + esc(t(field.placeholder || '', field.placeholder_en || '')) + '"' + ariaReq + ariaDesc + disabled + '>' + esc(val) + '</textarea>';
       break;
@@ -808,22 +1081,22 @@ function renderField(field, value, readOnly){
           var colId = typeof col === 'string' ? col : (col.id || col.label || '');
           var cellVal = (row && row[colId] !== undefined) ? row[colId] : '';
           var colType = (typeof col === 'object' && col.type) ? col.type : 'text';
-          if(colType === 'select'){
-            /* Resolve column options: prefer registry source over hardcoded */
-            var colOpts = (typeof col === 'object' && col.options) ? col.options : [];
-            if(typeof col === 'object' && col.options_source){
-              var regColOpts = resolveRegistryOptions(col.options_source);
-              if(regColOpts && regColOpts.length) colOpts = regColOpts;
-            }
-            html += '<td><select class="eqms-table-cell hm-input" data-table="' + esc(field.id) + '" data-col="' + esc(colId) + '" data-row="' + ri + '"' + disabled + '>';
-            html += '<option value="">—</option>';
-            colOpts.forEach(function(opt){
-              var ov = typeof opt === 'string' ? opt : (opt.value || '');
-              var ol = typeof opt === 'string' ? opt : t(opt.label || opt.value, opt.label_en || opt.label || opt.value);
-              html += '<option value="' + esc(ov) + '"' + (String(cellVal) === String(ov) ? ' selected' : '') + '>' + esc(ol) + '</option>';
-            });
-            html += '</select></td>';
-          } else {
+	          if(colType === 'select'){
+	            var colField = typeof col === 'object' ? Object.assign({}, col, { id: colId, type: 'select' }) : { id: colId, type: 'select' };
+	            var colReference = inferRuntimeReferenceKey(colField);
+	            if(colReference){
+	              html += '<td><select class="eqms-table-cell hm-input" data-table="' + esc(field.id) + '" data-col="' + esc(colId) + '" data-row="' + ri + '"' +
+	                ' data-eqms-reference="' + esc(colReference) + '" data-current-value="' + esc(cellVal || '') + '"' +
+	                ' data-empty-label="—"' + (readOnly || fieldReadOnly ? ' data-eqms-reference-readonly="1"' : '') + ' disabled>' +
+	                '<option value="">' + esc(t('Đang tải dữ liệu DB...', 'Loading DB data...')) + '</option>' +
+	                (cellVal ? '<option value="' + esc(cellVal) + '" selected>' + esc(cellVal) + '</option>' : '') +
+	                '</select></td>';
+	            } else {
+	              html += '<td><select class="eqms-table-cell hm-input" data-table="' + esc(field.id) + '" data-col="' + esc(colId) + '" data-row="' + ri + '" disabled>';
+	              html += '<option value="">' + esc(t('Chưa cấu hình reference DB', 'DB reference not configured')) + '</option>';
+	              html += '</select></td>';
+	            }
+	          } else {
             html += '<td><input class="eqms-table-cell hm-input" type="' + esc(colType === 'number' ? 'number' : 'text') + '" data-table="' + esc(field.id) + '" data-col="' + esc(colId) + '" data-row="' + ri + '" value="' + esc(cellVal) + '"' + disabled + '></td>';
           }
         });
@@ -1039,12 +1312,13 @@ function renderForm(container){
     html += '</div></div>';
   }
 
-  container.innerHTML = html;
-  bindFields(container);
-  applyConditions(container, schema);
-  if(state.editMode) startAutoSave();
-  else stopAutoSave();
-}
+	  container.innerHTML = html;
+	  bindFields(container);
+	  applyConditions(container, schema);
+	  hydrateRuntimeReferenceControls(container);
+	  if(state.editMode) startAutoSave();
+	  else stopAutoSave();
+	}
 
 /* ── Field Binding ── */
 function bindFields(container){
@@ -1127,11 +1401,23 @@ function bindFields(container){
     };
   });
 
-  fields.forEach(function(field){
-    if(field.type === 'multi_select'){
-      Array.prototype.forEach.call(container.querySelectorAll('[data-multi="' + field.id + '"]'), function(cb){
-        cb.onchange = function(){
-          var vals = [];
+	  fields.forEach(function(field){
+	    if(field.type === 'multi_select'){
+	      var multiEl = document.getElementById('eqms-f-' + field.id);
+	      if(multiEl && multiEl.tagName === 'SELECT'){
+	        multiEl.onchange = function(){
+	          var vals = Array.prototype.slice.call(multiEl.selectedOptions || []).map(function(opt){ return opt.value; }).filter(Boolean);
+	          var old = state.fieldValues[field.id] || [];
+	          state.fieldValues[field.id] = vals;
+	          logFieldChange(field.id, JSON.stringify(old), JSON.stringify(vals));
+	          applyConditions(container, schema);
+	          updateCalculatedFields(container, schema);
+	        };
+	        return;
+	      }
+	      Array.prototype.forEach.call(container.querySelectorAll('[data-multi="' + field.id + '"]'), function(cb){
+	        cb.onchange = function(){
+	          var vals = [];
           Array.prototype.forEach.call(container.querySelectorAll('[data-multi="' + field.id + '"]:checked'), function(c){ vals.push(c.value); });
           var old = state.fieldValues[field.id] || [];
           state.fieldValues[field.id] = vals;
@@ -1909,7 +2195,7 @@ window.openEqmsForm = function(formCode, container, options){
   container.innerHTML = '<div class="eqms-runtime" id="eqms-form-container"><div class="eqms-loading">Đang tải biểu mẫu...</div></div>';
   var runtime = container.querySelector('.eqms-runtime');
 
-  Promise.all([loadSchema(formCode), ensureMasterData(), ensureCompanyDirectory(), ensureRegistryOptions()]).then(function(results){
+	  Promise.all([loadSchema(formCode), ensureMasterData(), ensureCompanyDirectory()]).then(function(results){
     var schema = normalizeSchemaLookups(results[0]);
     if(!schema){
       runtime.innerHTML = '<div class="eqms-empty">' +

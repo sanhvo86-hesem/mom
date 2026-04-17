@@ -10,45 +10,53 @@
   'use strict';
 
   // =========================================================================
-  // MODULE REGISTRY — All 22 EQMS modules
+  // MODULE REGISTRY — 31 EQMS modules (world-class surface v4.1)
   // =========================================================================
   var MODULES = [
     // --- Quality Events ---
-    { id: 'quality-tower',      label: { vi: 'Tháp chất lượng', en: 'Quality Control Tower' },       icon: '\u{1F3EF}', group: 'quality-events', archetype: 'control-tower' },
-    { id: 'complaints',         label: { vi: 'Khiếu nại khách hàng', en: 'Customer Complaints' },    icon: '\u{1F4E2}', group: 'quality-events', archetype: 'exception-hub' },
-    { id: 'deviations',         label: { vi: 'Sự kiện chất lượng', en: 'Deviations / Quality Events' }, icon: '\u26A0\uFE0F', group: 'quality-events', archetype: 'exception-hub' },
-    { id: 'ncr',                label: { vi: 'NCR / MRB', en: 'NCR / MRB' },                         icon: '\u{1F6AB}', group: 'quality-events', archetype: 'exception-hub' },
-    { id: 'capa',               label: { vi: 'CAPA', en: 'CAPA' },                                   icon: '\u{1F527}', group: 'quality-events', archetype: 'evidence-workspace' },
+    { id: 'quality-tower',        label: { vi: 'Tháp chất lượng', en: 'Quality Control Tower' },          icon: '\u{1F3EF}', group: 'quality-events', archetype: 'control-tower' },
+    { id: 'complaints',           label: { vi: 'Khiếu nại khách hàng', en: 'Customer Complaints' },       icon: '\u{1F4E2}', group: 'quality-events', archetype: 'exception-hub' },
+    { id: 'deviations',           label: { vi: 'Sự kiện chất lượng', en: 'Deviations / Quality Events' }, icon: '\u26A0\uFE0F', group: 'quality-events', archetype: 'exception-hub' },
+    { id: 'ncr',                  label: { vi: 'NCR / MRB', en: 'NCR / MRB' },                            icon: '\u{1F6AB}', group: 'quality-events', archetype: 'exception-hub' },
+    { id: 'capa',                 label: { vi: 'CAPA', en: 'CAPA' },                                      icon: '\u{1F527}', group: 'quality-events', archetype: 'evidence-workspace' },
+    { id: 'concessions',          label: { vi: 'Nhượng bộ / Dùng nguyên trạng', en: 'Concessions' },      icon: '\u{1F4DD}', group: 'quality-events', archetype: 'approval-queue' },
+    { id: 'lessons-learned',      label: { vi: 'Bài học kinh nghiệm', en: 'Lessons Learned' },            icon: '\u{1F4A1}', group: 'quality-events', archetype: 'list-report' },
+    { id: 'customer-satisfaction',label: { vi: 'Đo lường KH hài lòng', en: 'Customer Satisfaction' },    icon: '\u2B50', group: 'quality-events', archetype: 'analytical-list' },
 
     // --- Documents & Change ---
-    { id: 'change-control',     label: { vi: 'Kiểm soát thay đổi', en: 'Change Control' },           icon: '\u{1F504}', group: 'docs-change', archetype: 'evidence-workspace' },
-    { id: 'engineering-change', label: { vi: 'Thay đổi kỹ thuật', en: 'Engineering Change' },        icon: '\u2699\uFE0F', group: 'docs-change', archetype: 'evidence-workspace' },
-    { id: 'documents',          label: { vi: 'Kiểm soát tài liệu', en: 'Document Control' },         icon: '\u{1F4C4}', group: 'docs-change', archetype: 'evidence-workspace' },
-    { id: 'training',           label: { vi: 'Đào tạo & Năng lực', en: 'Training & Competency' },    icon: '\u{1F393}', group: 'docs-change', archetype: 'list-report' },
-    { id: 'audits',             label: { vi: 'Quản lý đánh giá', en: 'Audit Management' },           icon: '\u{1F50D}', group: 'docs-change', archetype: 'list-report' },
+    { id: 'change-control',       label: { vi: 'Kiểm soát thay đổi', en: 'Change Control' },              icon: '\u{1F504}', group: 'docs-change', archetype: 'evidence-workspace' },
+    { id: 'engineering-change',   label: { vi: 'Thay đổi kỹ thuật', en: 'Engineering Change' },           icon: '\u2699\uFE0F', group: 'docs-change', archetype: 'evidence-workspace' },
+    { id: 'documents',            label: { vi: 'Kiểm soát tài liệu', en: 'Document Control' },            icon: '\u{1F4C4}', group: 'docs-change', archetype: 'evidence-workspace' },
+    { id: 'training',             label: { vi: 'Đào tạo & Năng lực', en: 'Training & Competency' },       icon: '\u{1F393}', group: 'docs-change', archetype: 'list-report' },
+    { id: 'audits',               label: { vi: 'Quản lý đánh giá', en: 'Audit Management' },              icon: '\u{1F50D}', group: 'docs-change', archetype: 'list-report' },
 
     // --- Supplier Quality ---
-    { id: 'suppliers',          label: { vi: 'Mạng lưới nhà cung cấp', en: 'Supplier Quality Network' }, icon: '\u{1F310}', group: 'supplier', archetype: 'analytical-list' },
-    { id: 'supplier-audits',    label: { vi: 'Đánh giá NCC & SCAR', en: 'Supplier Audits & SCAR' },  icon: '\u{1F4CB}', group: 'supplier', archetype: 'evidence-workspace' },
+    { id: 'suppliers',            label: { vi: 'Mạng lưới nhà cung cấp', en: 'Supplier Quality Network' },icon: '\u{1F310}', group: 'supplier', archetype: 'analytical-list' },
+    { id: 'supplier-audits',      label: { vi: 'Đánh giá NCC & SCAR', en: 'Supplier Audits & SCAR' },     icon: '\u{1F4CB}', group: 'supplier', archetype: 'evidence-workspace' },
+    { id: 'aml',                  label: { vi: 'Danh sách NCC được duyệt', en: 'Approved Supplier List' }, icon: '\u2705', group: 'supplier', archetype: 'analytical-list' },
 
     // --- Risk & Compliance ---
-    { id: 'risks',              label: { vi: 'Quản lý rủi ro & FMEA', en: 'Risk Management & FMEA' }, icon: '\u{1F6E1}\uFE0F', group: 'risk-compliance', archetype: 'analytical-list' },
-    { id: 'calibration',        label: { vi: 'Hiệu chuẩn / MSA', en: 'Calibration / MSA' },          icon: '\u{1F4CF}', group: 'risk-compliance', archetype: 'evidence-workspace' },
-    { id: 'lab-investigations', label: { vi: 'OOS/OOT / Điều tra', en: 'Lab Investigations' },        icon: '\u{1F52C}', group: 'risk-compliance', archetype: 'exception-hub' },
+    { id: 'risks',                label: { vi: 'Quản lý rủi ro & FMEA', en: 'Risk Management & FMEA' },   icon: '\u{1F6E1}\uFE0F', group: 'risk-compliance', archetype: 'analytical-list' },
+    { id: 'calibration',          label: { vi: 'Hiệu chuẩn / MSA', en: 'Calibration / MSA' },             icon: '\u{1F4CF}', group: 'risk-compliance', archetype: 'evidence-workspace' },
+    { id: 'lab-investigations',   label: { vi: 'OOS/OOT / Điều tra', en: 'Lab Investigations' },           icon: '\u{1F52C}', group: 'risk-compliance', archetype: 'exception-hub' },
 
     // --- Inspection & Testing ---
-    { id: 'inspection',         label: { vi: 'IQC / Kiểm tra', en: 'IQC / In-Process Inspection' },  icon: '\u2705', group: 'inspection', archetype: 'operator-execution' },
-    { id: 'spc',                label: { vi: 'SPC Analytics', en: 'SPC Analytics' },                  icon: '\u{1F4C8}', group: 'inspection', archetype: 'analytical-list' },
-    { id: 'batch-release',      label: { vi: 'Giải phóng lô', en: 'Batch Release' },                 icon: '\u{1F4E6}', group: 'inspection', archetype: 'approval-queue' },
+    { id: 'inspection',           label: { vi: 'IQC / Kiểm tra', en: 'IQC / In-Process Inspection' },     icon: '\u{1F4CB}', group: 'inspection', archetype: 'operator-execution' },
+    { id: 'spc',                  label: { vi: 'SPC Analytics', en: 'SPC Analytics' },                     icon: '\u{1F4C8}', group: 'inspection', archetype: 'analytical-list' },
+    { id: 'batch-release',        label: { vi: 'Giải phóng lô', en: 'Batch Release' },                    icon: '\u{1F4E6}', group: 'inspection', archetype: 'approval-queue' },
+    { id: 'sampling-plans',       label: { vi: 'Kế hoạch lấy mẫu AQL', en: 'Sampling Plans (AQL)' },      icon: '\u{1F4CA}', group: 'inspection', archetype: 'list-report' },
 
     // --- Advanced ---
-    { id: 'validation',         label: { vi: 'Quản lý xác nhận', en: 'Validation Management' },      icon: '\u{1F9EA}', group: 'advanced', archetype: 'evidence-workspace' },
-    { id: 'field-actions',      label: { vi: 'Hành động thực địa', en: 'Field Actions / Recall' },    icon: '\u{1F6A8}', group: 'advanced', archetype: 'exception-hub' },
-    { id: 'genealogy',          label: { vi: 'Truy xuất nguồn gốc', en: 'Genealogy / Traceability' }, icon: '\u{1F333}', group: 'advanced', archetype: 'object-page' },
-    { id: 'quality-agreements', label: { vi: 'Thoả thuận chất lượng', en: 'Quality Agreements' },     icon: '\u{1F91D}', group: 'advanced', archetype: 'evidence-workspace' },
+    { id: 'validation',           label: { vi: 'Quản lý xác nhận', en: 'Validation Management' },         icon: '\u{1F9EA}', group: 'advanced', archetype: 'evidence-workspace' },
+    { id: 'field-actions',        label: { vi: 'Hành động thực địa', en: 'Field Actions / Recall' },       icon: '\u{1F6A8}', group: 'advanced', archetype: 'exception-hub' },
+    { id: 'genealogy',            label: { vi: 'Truy xuất nguồn gốc', en: 'Genealogy / Traceability' },    icon: '\u{1F333}', group: 'advanced', archetype: 'object-page' },
+    { id: 'quality-agreements',   label: { vi: 'Thoả thuận chất lượng', en: 'Quality Agreements' },        icon: '\u{1F91D}', group: 'advanced', archetype: 'evidence-workspace' },
+    { id: 'warranty',             label: { vi: 'Bảo hành & Khiếu kiện', en: 'Warranty & Claims' },         icon: '\u{1F6E0}\uFE0F', group: 'advanced', archetype: 'exception-hub' },
 
-    // --- Pre-Launch Quality (IATF 16949 / AS9145) ---
-    { id: 'apqp-ppap', label: { vi: 'APQP / PPAP', en: 'APQP / PPAP' }, icon: '\u{1F3AF}', group: 'pre-launch', archetype: 'evidence-workspace' }
+    // --- Pre-Launch Quality (IATF 16949 / AS9100D / AS9145) ---
+    { id: 'apqp-ppap',            label: { vi: 'APQP / PPAP', en: 'APQP / PPAP' },                        icon: '\u{1F3AF}', group: 'pre-launch', archetype: 'evidence-workspace' },
+    { id: 'special-characteristics', label: { vi: 'Đặc tính đặc biệt (SC/CC)', en: 'Special Characteristics' }, icon: '\u{1F536}', group: 'pre-launch', archetype: 'analytical-list' },
+    { id: 'fai',                  label: { vi: 'Kiểm tra lần đầu (FAI)', en: 'First Article Inspection' }, icon: '\u{1F195}', group: 'pre-launch', archetype: 'evidence-workspace' }
   ];
 
   var GROUPS = [
@@ -100,7 +108,10 @@
     'audit', 'supplier_profile', 'supplier_audit', 'scar', 'risk',
     'fmea_record', 'calibration_record', 'msa_record', 'investigation',
     'batch_release', 'project', 'validation_project', 'field_action',
-    'thread', 'quality_agreement'
+    'thread', 'quality_agreement',
+    'concession', 'lesson_learned', 'csat_survey', 'aml_entry',
+    'sampling_plan', 'warranty_claim', 'special_char', 'fai_report',
+    'apqp_project', 'iqc_summary'
   ];
   var RESPONSE_LIST_KEYS = [
     'complaints', 'deviations', 'ncr_records', 'capa_records',
@@ -112,7 +123,10 @@
     'lab_investigations', 'batch_releases', 'validation_projects',
     'requirements', 'protocols', 'executions', 'field_actions',
     'genealogy_threads', 'records', 'items', 'comments', 'attachments',
-    'relationships', 'signatures', 'upstream_chain', 'downstream_chain'
+    'relationships', 'signatures', 'upstream_chain', 'downstream_chain',
+    'concessions', 'lessons_learned', 'csat_surveys', 'aml_entries',
+    'sampling_plans', 'warranty_claims', 'special_chars', 'fai_reports',
+    'apqp_projects', 'iqc_records'
   ];
 
   function isPlainObject(value) {
@@ -203,6 +217,344 @@
       }
       throw err;
     });
+  }
+
+  // DB-backed reference/dropdown hydration. No local option fallback is used.
+  var referenceCache = {};
+  var referencePending = {};
+  var referenceHydrationScheduled = false;
+
+  function normalizeReferenceKey(key) {
+    return String(key || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
+  }
+
+  function inferReferenceKey(field) {
+    field = field || {};
+    if (field.reference === false || field.ref === false || field.lookup === false) return '';
+    var explicit = normalizeReferenceKey(field.reference || field.ref || field.lookup || '');
+    if (explicit) return explicit;
+
+    var key = normalizeReferenceKey(field.key || field.name || '');
+    if (!key) return '';
+
+    var exact = {
+      customer: 'customers',
+      customer_id: 'customers',
+      customer_name: 'customers',
+      customer_destination: 'customers',
+      supplier: 'suppliers',
+      supplier_id: 'suppliers',
+      vendor: 'suppliers',
+      vendor_id: 'suppliers',
+      department: 'departments',
+      department_id: 'departments',
+      dept_code: 'departments',
+      auditee_dept: 'departments',
+      role: 'roles',
+      role_code: 'roles',
+      owner_role: 'roles',
+      reviewer_role: 'roles',
+      site: 'sites',
+      site_id: 'sites',
+      area: 'areas',
+      area_id: 'areas',
+      plant: 'plants',
+      plant_id: 'plants',
+      lot: 'lots',
+      lot_number: 'lots',
+      affected_lot_number: 'lots',
+      batch: 'lots',
+      batch_id: 'lots',
+      batch_number: 'lots',
+      item: 'items',
+      item_id: 'items',
+      material: 'items',
+      material_id: 'items',
+      part: 'items',
+      part_number: 'items',
+      product: 'items',
+      product_id: 'items',
+      product_name: 'items',
+      affected_product_id: 'items',
+      work_center: 'work_centers',
+      work_center_id: 'work_centers',
+      warehouse: 'warehouses',
+      warehouse_id: 'warehouses',
+      location: 'inventory_locations',
+      location_id: 'inventory_locations',
+      owner: 'users',
+      assigned_to: 'users',
+      responsible_party: 'users',
+      lead_auditor: 'users',
+      approver: 'users',
+      employee_id: 'users',
+      document_id: 'documents',
+      doc_id: 'documents',
+      change_control_id: 'change_controls',
+      linked_change_control_id: 'change_controls',
+      capa_id: 'capa_records',
+      linked_capa_id: 'capa_records',
+      deviation_id: 'deviations',
+      ncr_id: 'ncr_records',
+      complaint_id: 'complaints',
+      audit_id: 'audits',
+      source_event_id: 'source_records',
+      source_id: 'source_records',
+      standard: 'eqms.standard_ref',
+      release_type: 'eqms.release_type',
+      action_type: 'eqms.action_type',
+      type: 'eqms.type',
+      status: 'eqms.status',
+      severity: 'eqms.severity',
+      priority: 'eqms.priority',
+      source: 'eqms.source_type',
+      source_type: 'eqms.source_type',
+      source_event_type: 'eqms.source_type',
+      change_type: 'eqms.change_type',
+      change_category: 'eqms.change_category',
+      deviation_type: 'eqms.deviation_type',
+      document_type: 'eqms.document_type',
+      doc_type: 'eqms.document_type',
+      audit_type: 'eqms.audit_type',
+      standard_ref: 'eqms.standard_ref',
+      risk_level: 'eqms.risk_level',
+      risk_tier: 'eqms.risk_level',
+      overall_risk: 'eqms.risk_level',
+      disposition: 'eqms.disposition',
+      training_type: 'eqms.training_type',
+      category: 'eqms.category',
+      classification: 'eqms.classification',
+      nc_type: 'eqms.nc_type',
+      defect_type: 'eqms.defect_type',
+      detection_method: 'eqms.detection_method',
+      detection_point: 'eqms.detection_point',
+      regulatory_impact: 'eqms.regulatory_impact',
+      regulatory_notification: 'eqms.boolean',
+      regulatory_notification_required: 'eqms.boolean',
+      conc_regulatory_notification: 'eqms.boolean',
+      conc_batch_impact: 'eqms.boolean',
+      containment_needed: 'eqms.boolean',
+      new_action_evidence: 'eqms.boolean',
+      has_exceptions: 'eqms.boolean',
+      escalated: 'eqms.boolean',
+      p1_assignable_cause_found: 'eqms.boolean',
+      p1_calculation_verified: 'eqms.boolean',
+      p1_equipment_verified: 'eqms.boolean',
+      p1_method_followed: 'eqms.boolean',
+      p1_sample_integrity: 'eqms.boolean',
+      overdue: 'eqms.boolean',
+      overdue_only: 'eqms.overdue_filter',
+      due_status: 'eqms.due_status',
+      matrix_status: 'eqms.training_matrix_status',
+      control_status: 'eqms.control_status',
+      outcome: 'eqms.outcome',
+      effectiveness: 'eqms.effectiveness',
+      strategic_classification: 'eqms.strategic_classification',
+      checklist_template: 'eqms.checklist_template',
+      validation_type: 'eqms.validation_type',
+      req_priority: 'eqms.requirement_priority',
+      requirement_priority: 'eqms.requirement_priority',
+      req_type: 'eqms.requirement_type',
+      requirement_type: 'eqms.requirement_type',
+      exec_status: 'eqms.execution_status',
+      execution_status: 'eqms.execution_status',
+      health_hazard_classification: 'eqms.hazard_class',
+      hazard_class: 'eqms.hazard_class',
+      urgency: 'eqms.urgency',
+      level: 'eqms.capability_level',
+      capability_level: 'eqms.capability_level',
+      equipment_type: 'eqms.equipment_type',
+      fmea_type: 'eqms.fmea_type',
+      response_method: 'eqms.response_method',
+      rt_type: 'eqms.rt_type',
+      study_type: 'eqms.study_type',
+      format: 'eqms.format',
+      decision: 'eqms.decision',
+      vote: 'eqms.vote',
+      impact: 'eqms.impact',
+      quality_status: 'eqms.quality_status'
+    };
+    if (exact[key]) return exact[key];
+
+    if (key.indexOf('customer') >= 0) return 'customers';
+    if (key.indexOf('supplier') >= 0 || key.indexOf('vendor') >= 0) return 'suppliers';
+    if (key.indexOf('department') >= 0 || key.indexOf('dept') >= 0) return 'departments';
+    if (key.indexOf('role') >= 0) return 'roles';
+    if (key.indexOf('site') >= 0) return 'sites';
+    if (key.indexOf('area') >= 0) return 'areas';
+    if (key.indexOf('plant') >= 0) return 'plants';
+    if (key.indexOf('lot') >= 0 || key.indexOf('batch') >= 0) return 'lots';
+    if (key.indexOf('item') >= 0 || key.indexOf('part') >= 0 || key.indexOf('product') >= 0 || key.indexOf('material') >= 0) return 'items';
+    if (key.indexOf('work_center') >= 0) return 'work_centers';
+    if (key.indexOf('warehouse') >= 0) return 'warehouses';
+    if (key.indexOf('location') >= 0) return 'inventory_locations';
+    if (key.indexOf('document') >= 0 || key === 'doc') return 'documents';
+
+    if (key === 'status' || /_status$/.test(key)) return 'eqms.status';
+    if (key === 'severity' || /_severity$/.test(key)) return 'eqms.severity';
+    if (key === 'priority' || /_priority$/.test(key)) return 'eqms.priority';
+    if (key === 'source' || key === 'source_type') return 'eqms.source_type';
+    if (key === 'change_type') return 'eqms.change_type';
+    if (key === 'change_category') return 'eqms.change_category';
+    if (key === 'deviation_type') return 'eqms.deviation_type';
+    if (key === 'document_type') return 'eqms.document_type';
+    if (key === 'audit_type') return 'eqms.audit_type';
+    if (key === 'standard_ref') return 'eqms.standard_ref';
+    if (key === 'risk_level' || key === 'risk_tier') return 'eqms.risk_level';
+    if (key === 'disposition') return 'eqms.disposition';
+    if (key === 'training_type') return 'eqms.training_type';
+    if (key === 'category' && field.type === 'select') return 'eqms.category';
+    if (field.type === 'select') return 'eqms.' + key;
+
+    return '';
+  }
+
+  function scheduleReferenceHydration(root) {
+    if (root && root.nodeType === 1) {
+      root.setAttribute('data-eqms-reference-root', '1');
+    }
+    if (referenceHydrationScheduled) return;
+    referenceHydrationScheduled = true;
+    setTimeout(function() {
+      referenceHydrationScheduled = false;
+      hydrateReferenceControls(document);
+    }, 0);
+  }
+
+  function loadReferenceOptions(keys) {
+    keys = (keys || []).map(normalizeReferenceKey).filter(Boolean);
+    keys = keys.filter(function(k, i) { return keys.indexOf(k) === i; });
+    var missing = keys.filter(function(k) { return !referenceCache[k] && !referencePending[k]; });
+    if (missing.length) {
+      var request = apiCall('eqms_reference_options', { keys: missing, limit: 200 }, 'POST', 15000)
+        .then(function(res) {
+          var references = (res && (res.references || res.data)) || {};
+          missing.forEach(function(k) {
+            var entry = references[k] || {};
+            if (entry.ok === false) {
+              referenceCache[k] = { ok: false, options: [], error: entry.detail || entry.error || 'reference_load_failed' };
+            } else {
+              referenceCache[k] = { ok: true, options: entry.options || [] };
+            }
+            delete referencePending[k];
+          });
+          return referenceCache;
+        })
+        .catch(function(err) {
+          missing.forEach(function(k) {
+            referenceCache[k] = { ok: false, options: [], error: err.message || 'reference_load_failed' };
+            delete referencePending[k];
+          });
+          return referenceCache;
+        });
+      missing.forEach(function(k) { referencePending[k] = request; });
+    }
+
+    return Promise.all(keys.map(function(k) {
+      return referencePending[k] || Promise.resolve(referenceCache[k]);
+    })).then(function() {
+      var out = {};
+      keys.forEach(function(k) { out[k] = referenceCache[k] || { ok: true, options: [] }; });
+      return out;
+    });
+  }
+
+  function renderCurrentReferenceOption(currentValue) {
+    if (!currentValue) return '';
+    return '<option value="' + esc(currentValue) + '" selected>' + esc(currentValue) + '</option>';
+  }
+
+  function renderReferenceSelect(className, dataAttr, fieldKey, referenceKey, currentValue, emptyLabel, required, width) {
+    scheduleReferenceHydration();
+    var style = width ? ' style="width:' + esc(width) + '"' : '';
+    var html = '<select class="' + esc(className) + '" ' + dataAttr + '="' + esc(fieldKey) + '"' +
+      ' data-eqms-reference="' + esc(referenceKey) + '"' +
+      ' data-current-value="' + esc(currentValue || '') + '"' +
+      ' data-empty-label="' + esc(emptyLabel) + '"' +
+      (required ? ' required' : '') + style + ' disabled>';
+    html += '<option value="">' + esc(T({ vi: 'Dang tai du lieu DB...', en: 'Loading DB data...' })) + '</option>';
+    html += renderCurrentReferenceOption(currentValue || '');
+    html += '</select>';
+    return html;
+  }
+
+  function hydrateReferenceControls(root) {
+    root = root || document;
+    var controls = Array.prototype.slice.call(root.querySelectorAll('select[data-eqms-reference]'))
+      .filter(function(el) { return el.getAttribute('data-eqms-reference-loaded') !== '1' && el.getAttribute('data-eqms-reference-loading') !== '1'; });
+    if (!controls.length) return Promise.resolve({});
+
+    var keys = controls.map(function(el) { return normalizeReferenceKey(el.getAttribute('data-eqms-reference')); })
+      .filter(Boolean)
+      .filter(function(k, i, arr) { return arr.indexOf(k) === i; });
+    controls.forEach(function(el) { el.setAttribute('data-eqms-reference-loading', '1'); });
+
+    return loadReferenceOptions(keys).then(function(map) {
+      controls.forEach(function(el) {
+        var key = normalizeReferenceKey(el.getAttribute('data-eqms-reference'));
+        fillReferenceControl(el, map[key] || { ok: true, options: [] });
+      });
+      return map;
+    });
+  }
+
+  function fillReferenceControl(select, entry) {
+    var current = select.getAttribute('data-current-value') || select.value || '';
+    var isMultiple = select.hasAttribute('multiple') || select.getAttribute('data-eqms-reference-multiple') === '1';
+    var currentValues = [];
+    if (isMultiple) {
+      try {
+        var parsed = JSON.parse(current || '[]');
+        currentValues = Array.isArray(parsed) ? parsed.map(String) : [];
+      } catch (e) {
+        currentValues = String(current || '').split(/[|,]/).map(function(v) { return v.trim(); }).filter(Boolean);
+      }
+    }
+    var emptyLabel = select.getAttribute('data-empty-label') || T({ vi: 'Chon...', en: 'Select...' });
+    var keepDisabled = select.getAttribute('data-eqms-reference-readonly') === '1';
+    var options = (entry && entry.options) || [];
+    var html = isMultiple ? '' : '<option value="">' + esc(emptyLabel) + '</option>';
+    var foundCurrent = isMultiple ? currentValues.length === 0 : !current;
+
+    if (entry && entry.ok === false) {
+      html = '<option value="">' + esc(T({ vi: 'Khong tai duoc du lieu DB', en: 'Failed to load DB data' })) + '</option>';
+      if (isMultiple) {
+        currentValues.forEach(function(value) { html += renderCurrentReferenceOption(value); });
+      } else if (current) {
+        html += renderCurrentReferenceOption(current);
+      }
+      select.innerHTML = html;
+      select.disabled = true;
+      select.title = entry.error || 'reference_load_failed';
+      select.removeAttribute('data-eqms-reference-loading');
+      select.setAttribute('data-eqms-reference-loaded', '1');
+      return;
+    }
+
+    options.forEach(function(option) {
+      var val = option && option.value != null ? String(option.value) : '';
+      if (!val) return;
+      var lbl = option && option.label != null ? String(option.label) : val;
+      var selected = isMultiple ? currentValues.indexOf(val) >= 0 : (current && val === current);
+      if (selected) foundCurrent = true;
+      html += '<option value="' + esc(val) + '"' + (selected ? ' selected' : '') + '>' + esc(lbl) + '</option>';
+    });
+    if (isMultiple) {
+      currentValues.forEach(function(value) {
+        var exists = options.some(function(option) { return String(option && option.value != null ? option.value : '') === value; });
+        if (value && !exists) html += renderCurrentReferenceOption(value);
+      });
+    } else if (current && !foundCurrent) {
+      html += renderCurrentReferenceOption(current);
+    }
+    if (!options.length && !current && !isMultiple) {
+      html += '<option value="" disabled>' + esc(T({ vi: 'DB chua co du lieu', en: 'No DB records' })) + '</option>';
+    }
+
+    select.innerHTML = html;
+    select.disabled = keepDisabled;
+    select.removeAttribute('data-eqms-reference-loading');
+    select.setAttribute('data-eqms-reference-loaded', '1');
   }
 
   // =========================================================================
@@ -447,15 +799,21 @@
     (config.fields || []).forEach(function(f) {
       html += '<div class="eqms-filter-group">';
       if (f.label) html += '<span class="eqms-filter-label">' + esc(T(f.label)) + '</span>';
-      if (f.type === 'select') {
-        html += '<select class="eqms-filter-select" data-filter="' + esc(f.key) + '">';
-        html += '<option value="">' + T({ vi: 'Tất cả', en: 'All' }) + '</option>';
-        (f.options || []).forEach(function(o) {
-          var val = typeof o === 'string' ? o : (o.value || o.id);
-          var lbl = typeof o === 'string' ? o : T(o.label || o);
-          var sel = (filters[f.key] === val) ? ' selected' : '';
-          html += '<option value="' + esc(val) + '"' + sel + '>' + esc(lbl) + '</option>';
-        });
+      var referenceKey = inferReferenceKey(f);
+      if (referenceKey) {
+        html += renderReferenceSelect(
+          'eqms-filter-select',
+          'data-filter',
+          f.key,
+          referenceKey,
+          filters[f.key] || '',
+          T({ vi: 'Tất cả', en: 'All' }),
+          false,
+          f.width || null
+        );
+      } else if (f.type === 'select') {
+        html += '<select class="eqms-filter-select" data-filter="' + esc(f.key) + '" disabled>';
+        html += '<option value="">' + esc(T({ vi: 'Chua cau hinh reference DB', en: 'DB reference not configured' })) + '</option>';
         html += '</select>';
       } else if (f.type === 'date') {
         html += '<input type="date" class="eqms-filter-input" data-filter="' + esc(f.key) + '" value="' + esc(filters[f.key] || '') + '" style="width:140px">';
@@ -772,15 +1130,23 @@
     html += '<label class="eqms-form-label">' + esc(T(field.label));
     if (field.required) html += '<span class="required">*</span>';
     html += '</label>';
-    if (field.type === 'select') {
-      html += '<select class="eqms-form-select" data-field="' + esc(field.key) + '"' + (field.required ? ' required' : '') + '>';
-      html += '<option value="">' + T({ vi: 'Chọn...', en: 'Select...' }) + '</option>';
-      (field.options || []).forEach(function(o) {
-        var val = typeof o === 'string' ? o : (o.value || o.id);
-        var lbl = typeof o === 'string' ? o : T(o.label || o);
-        var sel = field.value === val ? ' selected' : '';
-        html += '<option value="' + esc(val) + '"' + sel + '>' + esc(lbl) + '</option>';
-      });
+    var fieldType = field.type || 'text';
+    var referenceKey = inferReferenceKey(field);
+    var referenceAllowed = ['textarea', 'date', 'number', 'checkbox', 'hidden', 'file'].indexOf(fieldType) === -1;
+    if (referenceKey && referenceAllowed) {
+      html += renderReferenceSelect(
+        'eqms-form-select',
+        'data-field',
+        field.key,
+        referenceKey,
+        field.value || '',
+        T({ vi: 'Chọn...', en: 'Select...' }),
+        !!field.required,
+        null
+      );
+    } else if (field.type === 'select') {
+      html += '<select class="eqms-form-select" data-field="' + esc(field.key) + '"' + (field.required ? ' required' : '') + ' disabled>';
+      html += '<option value="">' + esc(T({ vi: 'Chua cau hinh reference DB', en: 'DB reference not configured' })) + '</option>';
       html += '</select>';
     } else if (field.type === 'textarea') {
       html += '<textarea class="eqms-form-textarea" data-field="' + esc(field.key) + '" placeholder="' + esc(T(field.placeholder || '')) + '"' + (field.required ? ' required' : '') + '>' + esc(field.value || '') + '</textarea>';
@@ -873,7 +1239,15 @@
       'field-actions':      T({ vi: 'Thu hồi, hành động thực địa, giám sát sản phẩm', en: 'Recall, field actions, product surveillance' }),
       'genealogy':          T({ vi: 'Đồ thị phả hệ, truy xuất ngược/xuôi', en: 'Genealogy graph, upstream/downstream traceability' }),
       'quality-agreements': T({ vi: 'Thoả thuận chất lượng, hợp tác đối tác', en: 'Quality agreements, partner collaboration' }),
-      'apqp-ppap':          T({ vi: 'APQP 5 pha, gate reviews, PPAP cấp độ 1-5, PSW (IATF 16949 / AS9145)', en: 'APQP 5-phase, gate reviews, PPAP levels 1-5, PSW (IATF 16949 / AS9145)' })
+      'apqp-ppap':              T({ vi: 'APQP 5 pha, gate reviews, PPAP cấp độ 1-5, PSW (IATF 16949 / AS9145)', en: 'APQP 5-phase, gate reviews, PPAP levels 1-5, PSW (IATF 16949 / AS9145)' }),
+      'concessions':            T({ vi: 'Ủy quyền nhượng bộ, dùng nguyên trạng, thẩm quyền phê duyệt', en: 'Concession authorization, use-as-is disposition, approval authority' }),
+      'lessons-learned':        T({ vi: 'Thu thập bài học, tra cứu theo dự án/sản phẩm, tái sử dụng', en: 'Capture lessons, search by project/product, reuse across programs' }),
+      'customer-satisfaction':  T({ vi: 'CSAT, NPS, khảo sát, xu hướng, phân tích gốc rễ', en: 'CSAT, NPS, surveys, trends, dissatisfaction root-cause linkage' }),
+      'aml':                    T({ vi: 'Danh sách NCC được duyệt, trạng thái, gia hạn, phong toả', en: 'Approved supplier list, status, renewal, blocking' }),
+      'sampling-plans':         T({ vi: 'Kế hoạch lấy mẫu AQL, skip-lot, gán cho nhóm sản phẩm', en: 'AQL sampling plans, skip-lot, assignment to product families' }),
+      'warranty':               T({ vi: 'Yêu cầu bảo hành, khiếu kiện NCC, phân tích lỗi thực địa', en: 'Warranty claims, supplier charge-backs, field failure analysis' }),
+      'special-characteristics': T({ vi: 'Đặc tính SC/CC, phân loại, liên kết FMEA/bản vẽ', en: 'SC/CC characteristics, classification, FMEA/drawing linkage' }),
+      'fai':                    T({ vi: 'Báo cáo kiểm tra lần đầu AS9102/PPAP, phê duyệt, kho lưu', en: 'First article inspection AS9102/PPAP, approval, record vault' })
     };
     return descs[id] || '';
   }
@@ -942,6 +1316,7 @@
 
     // Bind events
     bindShellEvents(container);
+    scheduleReferenceHydration(container);
   }
 
   // =========================================================================
@@ -1028,6 +1403,16 @@
     // Advanced
     validationPackage:  { module: 'validation',         icon: '\u{1F9EA}', label: { vi: 'Xác nhận', en: 'Validation' },          color: '#4338ca' },
     fieldAction:        { module: 'field-actions',      icon: '\u{1F6A8}', label: { vi: 'Hành động TĐ', en: 'Field Action' },    color: '#be123c' },
+    // New modules v4.1
+    concession:         { module: 'concessions',        icon: '\u{1F4DD}', label: { vi: 'Nhượng bộ', en: 'Concession' },           color: '#fb923c' },
+    lessonLearned:      { module: 'lessons-learned',    icon: '\u{1F4A1}', label: { vi: 'Bài học KN', en: 'Lesson Learned' },       color: '#facc15' },
+    csatSurvey:         { module: 'customer-satisfaction', icon: '\u2B50', label: { vi: 'CSAT', en: 'CSAT Survey' },                color: '#f59e0b' },
+    amlEntry:           { module: 'aml',                icon: '\u2705',    label: { vi: 'NCC được duyệt', en: 'Approved Supplier' }, color: '#16a34a' },
+    samplingPlan:       { module: 'sampling-plans',     icon: '\u{1F4CA}', label: { vi: 'Kế hoạch mẫu', en: 'Sampling Plan' },      color: '#0891b2' },
+    warrantyClaim:      { module: 'warranty',           icon: '\u{1F6E0}\uFE0F', label: { vi: 'Bảo hành', en: 'Warranty Claim' },  color: '#dc2626' },
+    specialChar:        { module: 'special-characteristics', icon: '\u{1F536}', label: { vi: 'SC/CC', en: 'Special Char.' },        color: '#7c3aed' },
+    faiReport:          { module: 'fai',                icon: '\u{1F195}', label: { vi: 'FAI', en: 'FAI Report' },                  color: '#2563eb' },
+    apqpProject:        { module: 'apqp-ppap',          icon: '\u{1F3AF}', label: { vi: 'APQP', en: 'APQP Project' },              color: '#059669' },
     // Cross-cutting
     attachmentEvidence: { module: null, icon: '\u{1F4CE}', label: { vi: 'Bằng chứng', en: 'Evidence' },       color: '#64748b' },
     approvalAction:     { module: null, icon: '\u2705',    label: { vi: 'Phê duyệt', en: 'Approval' },        color: '#22c55e' },
@@ -1437,6 +1822,9 @@
       initials: initials,
       apiCall: apiCall,
       apiCallEnhanced: apiCallEnhanced,
+      loadReferenceOptions: loadReferenceOptions,
+      hydrateReferenceControls: hydrateReferenceControls,
+      inferReferenceKey: inferReferenceKey,
       normalizeApiResponse: normalizeApiResponse,
       lang: _lang
     }

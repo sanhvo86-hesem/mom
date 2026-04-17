@@ -478,9 +478,9 @@ function moduleAccessPortalCatalog(){
     {id:'quality-exceptions', group:'quality', icon:'🔴', labelEn:'Nonconformance', labelVi:'Sự không phù hợp', noteEn:'[Deprecated] Use EQMS Suite → NCR/CAPA. Legacy NCR/exception workflow.', noteVi:'[Đã hợp nhất] Dùng EQMS Suite → NCR/CAPA. Quy trình NCR/ngoại lệ cũ.', defaultAccess:'all', deprecated:true, deprecatedNote:'Merged into EQMS Suite → NCR/CAPA'},
     {id:'supplier-quality', group:'quality', icon:'🏪', labelEn:'Supplier quality', labelVi:'Chất lượng NCC', noteEn:'[Deprecated] Use EQMS Suite → Supplier Quality Network. Legacy supplier QA.', noteVi:'[Đã hợp nhất] Dùng EQMS Suite → Mạng lưới NCC. Đảm bảo chất lượng NCC cũ.', defaultAccess:'all', deprecated:true, deprecatedNote:'Merged into EQMS Suite → Suppliers'},
     {id:'fmea', group:'quality', icon:'⚡', labelEn:'FMEA & Control Plan', labelVi:'FMEA & Control Plan', noteEn:'[Deprecated] Use EQMS Suite → Risk & FMEA. Legacy risk analysis and control planning.', noteVi:'[Đã hợp nhất] Dùng EQMS Suite → Rủi ro & FMEA. Phân tích rủi ro cũ.', defaultAccess:'all', deprecated:true, deprecatedNote:'Merged into EQMS Suite → Risks/FMEA'},
-    {id:'apqp-ppap', group:'quality', icon:'🎯', labelEn:'APQP / PPAP', labelVi:'APQP / PPAP', noteEn:'APQP and PPAP governance (IATF 16949). Shown in QUALITY sidebar section.', noteVi:'Điều hành APQP và PPAP (IATF 16949). Hiển thị trong mục CHẤT LƯỢNG sidebar.', defaultAccess:'all'},
+    {id:'apqp-ppap', group:'quality', icon:'🎯', labelEn:'APQP / PPAP', labelVi:'APQP / PPAP', noteEn:'[Integrated] Now a native module inside EQMS Suite → Pre-Launch Quality group.', noteVi:'[Tích hợp] Nay là module nội bộ bên trong EQMS Suite → nhóm Tiền sản xuất.', defaultAccess:'all', deprecated:true, deprecatedNote:'Integrated into EQMS Suite → Pre-Launch Quality (IATF 16949)'},
     {id:'ai-scheduling', group:'quality', icon:'🤖', labelEn:'AI scheduling & quality', labelVi:'AI Lập lịch & Chất lượng', noteEn:'[Sidebar hidden] AI scheduling (accessible from Orders) + AI quality (use EQMS Tower).', noteVi:'[Ẩn sidebar] AI lập lịch (từ Đơn hàng) + AI chất lượng (dùng EQMS Tower).', defaultAccess:'all', deprecated:true, deprecatedNote:'AI quality merged into EQMS Tower; scheduling accessible from Orders module'},
-    {id:'eqms', group:'eqms', icon:'🏯', labelEn:'EQMS Suite', labelVi:'EQMS Suite', noteEn:'Enterprise Quality Management System — 22 world-class quality modules.', noteVi:'Hệ thống Quản lý Chất lượng Doanh nghiệp — 22 module chất lượng đẳng cấp.', defaultAccess:'all'},
+    {id:'eqms', group:'eqms', icon:'🏯', labelEn:'EQMS Suite', labelVi:'EQMS Suite', noteEn:'Enterprise Quality Management System — 31 world-class quality modules (v4.1).', noteVi:'Hệ thống Quản lý Chất lượng Doanh nghiệp — 31 module chất lượng đẳng cấp (v4.1).', defaultAccess:'all'},
     {id:'forms', group:'records', icon:'📋', labelEn:'Evidence control', labelVi:'Kiểm soát chứng cứ', noteEn:'Controlled forms and evidence capture.', noteVi:'Biểu mẫu kiểm soát và thu thập chứng cứ.', defaultAccess:'all'},
     /* 'evidence' nav removed — Evidence Vault is now inside "Kiểm soát chứng cứ" (forms module), Chứng cứ tab */
     {id:'compliance-reports', group:'records', icon:'📊', labelEn:'Reports', labelVi:'Báo cáo', noteEn:'Compliance and operational reporting.', noteVi:'Báo cáo tuân thủ và vận hành.', defaultAccess:'all'},
@@ -2225,12 +2225,10 @@ function renderSidebar(){
     }
     html += portalNavSectionHtml(lang==='en'?'SUPPLY CHAIN':'CHUỖI CUNG ỨNG', supplyButtons);
 
-    /* CHẤT LƯỢNG: EQMS Suite (hub chất lượng) + APQP/PPAP (pre-launch).
-     * Các module NCR, CAPA, FMEA, Supplier Quality, AI Quality đã được
-     * hợp nhất vào EQMS Suite — không còn hiển thị riêng trên sidebar. */
+    /* CHẤT LƯỢNG: chỉ còn EQMS Suite — APQP/PPAP đã tích hợp thành module
+     * nội bộ bên trong EQMS Shell (group: pre-launch). */
     const qualityButtons = [];
-    if(canUserAccessModule('eqms')) qualityButtons.push(portalNavButtonHtml('eqms', '\u{1F3EF}', lang==='en'?'EQMS Suite':'EQMS Suite', {active: currentPage==='eqms'}));
-    if(canUserAccessModule('apqp-ppap')) qualityButtons.push(portalNavButtonHtml('apqp-ppap', '🎯', lang==='en'?'APQP / PPAP':'APQP / PPAP', {active: currentPage==='apqp-ppap'}));
+    if(canUserAccessModule('eqms')) qualityButtons.push(portalNavButtonHtml('eqms', '\u{1F3EF}', lang==='en'?'EQMS Suite':'EQMS Suite', {active: currentPage==='eqms'||currentPage==='apqp-ppap'}));
     html += portalNavSectionHtml(lang==='en'?'QUALITY':'CHẤT LƯỢNG', qualityButtons);
 
     const recordButtons = [];
@@ -2530,7 +2528,7 @@ function navigateTo(page, filter, bypassGuard){
     else if(tdp && typeof window._renderTemplateModule==='function'){ window._renderTemplateModule(tdp); }
   }
   if(page==='fmea' && typeof window._renderFmeaControlPlan==='function'){ var fmp=document.getElementById('page-fmea'); if(fmp) window._renderFmeaControlPlan(fmp); }
-  if(page==='apqp-ppap' && typeof window._renderApqpPpap==='function'){ var app=document.getElementById('page-apqp-ppap'); if(app) window._renderApqpPpap(app); }
+  if(page==='apqp-ppap'){ navigateTo('eqms'); if(window.EqmsShell) requestAnimationFrame(function(){ EqmsShell.navigate('apqp-ppap'); }); return; }
   if(page==='mobile-shopfloor' && typeof window._renderMobileShopFloor==='function'){ var msp=document.getElementById('page-mobile-shopfloor'); if(msp) window._renderMobileShopFloor(msp); }
   if(page==='knowledge-base' && typeof window._renderKnowledgeBase==='function'){ var kbp=document.getElementById('page-knowledge-base'); if(kbp) window._renderKnowledgeBase(kbp); }
   if(page==='continuous-improvement' && typeof window._renderContinuousImprovement==='function'){ var cip=document.getElementById('page-continuous-improvement'); if(cip) window._renderContinuousImprovement(cip); }

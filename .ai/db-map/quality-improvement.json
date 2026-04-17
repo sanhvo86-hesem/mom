@@ -2,7 +2,7 @@
     "_meta": {
         "domain": "quality_improvement",
         "table_count": 15,
-        "generated_at": "2026-04-17T02:05:34+00:00"
+        "generated_at": "2026-04-17T05:32:04+00:00"
     },
     "tables": {
         "apqp_gate_reviews": {
