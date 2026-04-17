@@ -23,49 +23,49 @@
   // ─── Constants ───────────────────────────────────────────────────────
   var RISK_STATES = ['identified','assessed','controls_defined','monitoring','accepted','mitigated','closed'];
   var RISK_CATEGORIES = [
-    { value: 'process',       label: { vi: 'Quy trinh', en: 'Process' } },
-    { value: 'product',       label: { vi: 'San pham', en: 'Product' } },
-    { value: 'supplier',      label: { vi: 'Nha cung cap', en: 'Supplier' } },
-    { value: 'regulatory',    label: { vi: 'Phap quy', en: 'Regulatory' } },
-    { value: 'safety',        label: { vi: 'An toan', en: 'Safety' } },
-    { value: 'environmental', label: { vi: 'Moi truong', en: 'Environmental' } }
+    { value: 'process',       label: { vi: 'Quy trình', en: 'Process' } },
+    { value: 'product',       label: { vi: 'Sản phẩm', en: 'Product' } },
+    { value: 'supplier',      label: { vi: 'Nhà cung cấp', en: 'Supplier' } },
+    { value: 'regulatory',    label: { vi: 'Pháp quy', en: 'Regulatory' } },
+    { value: 'safety',        label: { vi: 'An toàn', en: 'Safety' } },
+    { value: 'environmental', label: { vi: 'Môi trường', en: 'Environmental' } }
   ];
   var CONTROL_TYPES = [
-    { value: 'preventive', label: { vi: 'Phong ngua', en: 'Preventive' } },
-    { value: 'detective',  label: { vi: 'Phat hien', en: 'Detective' } },
-    { value: 'corrective', label: { vi: 'Khac phuc', en: 'Corrective' } }
+    { value: 'preventive', label: { vi: 'Phòng ngừa', en: 'Preventive' } },
+    { value: 'detective',  label: { vi: 'Phát hiện', en: 'Detective' } },
+    { value: 'corrective', label: { vi: 'Khắc phục', en: 'Corrective' } }
   ];
   var CONTROL_STATUSES = [
-    { value: 'planned',      label: { vi: 'Da len ke hoach', en: 'Planned' } },
-    { value: 'implemented',  label: { vi: 'Da thuc hien', en: 'Implemented' } },
-    { value: 'verified',     label: { vi: 'Da xac minh', en: 'Verified' } },
-    { value: 'ineffective',  label: { vi: 'Khong hieu qua', en: 'Ineffective' } }
+    { value: 'planned',      label: { vi: 'Đã lên kế hoạch', en: 'Planned' } },
+    { value: 'implemented',  label: { vi: 'Đã thực hiện', en: 'Implemented' } },
+    { value: 'verified',     label: { vi: 'Đã xác minh', en: 'Verified' } },
+    { value: 'ineffective',  label: { vi: 'Không hiệu quả', en: 'Ineffective' } }
   ];
   var LIKELIHOOD_LABELS = [
-    { vi: 'Hiem khi', en: 'Rare' },
-    { vi: 'Kho xay ra', en: 'Unlikely' },
-    { vi: 'Co the', en: 'Possible' },
-    { vi: 'Co kha nang', en: 'Likely' },
-    { vi: 'Gan nhu chac chan', en: 'Almost Certain' }
+    { vi: 'Hiếm khi', en: 'Rare' },
+    { vi: 'Khó xảy ra', en: 'Unlikely' },
+    { vi: 'Có thể', en: 'Possible' },
+    { vi: 'Có khả năng', en: 'Likely' },
+    { vi: 'Gần như chắc chắn', en: 'Almost Certain' }
   ];
   var SEVERITY_LABELS = [
-    { vi: 'Khong dang ke', en: 'Negligible' },
-    { vi: 'Nho', en: 'Minor' },
-    { vi: 'Trung binh', en: 'Moderate' },
-    { vi: 'Lon', en: 'Major' },
-    { vi: 'Tham hoa', en: 'Catastrophic' }
+    { vi: 'Không đáng kể', en: 'Negligible' },
+    { vi: 'Nhỏ', en: 'Minor' },
+    { vi: 'Trung bình', en: 'Moderate' },
+    { vi: 'Lớn', en: 'Major' },
+    { vi: 'Thảm họa', en: 'Catastrophic' }
   ];
   var FMEA_TYPES = [
     { value: 'DFMEA', label: { vi: 'DFMEA', en: 'DFMEA' } },
     { value: 'PFMEA', label: { vi: 'PFMEA', en: 'PFMEA' } }
   ];
   var RISK_ACTIONS = {
-    identified: [{ action: 'assess',               label: { vi: 'Danh gia', en: 'Assess' },              style: 'primary' }],
-    assessed:   [{ action: 'add-control',           label: { vi: 'Them kiem soat', en: 'Add Control' },   style: 'primary' }],
-    controls_defined: [{ action: 'verify-control',  label: { vi: 'Xac minh', en: 'Verify Control' },     style: 'primary' }],
+    identified: [{ action: 'assess',               label: { vi: 'Đánh giá', en: 'Assess' },              style: 'primary' }],
+    assessed:   [{ action: 'add-control',           label: { vi: 'Thêm kiểm soát', en: 'Add Control' },   style: 'primary' }],
+    controls_defined: [{ action: 'verify-control',  label: { vi: 'Xác minh', en: 'Verify Control' },     style: 'primary' }],
     monitoring: [
-      { action: 'accept-residual-risk', label: { vi: 'Chap nhan rui ro', en: 'Accept Risk' },   style: 'secondary' },
-      { action: 'review',               label: { vi: 'Xem xet lai', en: 'Review' },             style: 'primary' }
+      { action: 'accept-residual-risk', label: { vi: 'Chấp nhận rủi ro', en: 'Accept Risk' },   style: 'secondary' },
+      { action: 'review',               label: { vi: 'Xem xét lại', en: 'Review' },             style: 'primary' }
     ]
   };
 
@@ -200,16 +200,16 @@
   // ─── MODULE META ─────────────────────────────────────────────────────
   var MOD = {
     id: 'risks',
-    label: { vi: 'Quan ly rui ro & FMEA', en: 'Risk Management & FMEA' },
+    label: { vi: 'Quản lý rủi ro & FMEA', en: 'Risk Management & FMEA' },
     icon: '\u{1F6E1}\uFE0F'
   };
 
   // ─── TOP-LEVEL TABS ──────────────────────────────────────────────────
   var SCREEN_TABS = [
-    { id: 'risk-register', label: { vi: 'So rui ro', en: 'Risk Register' } },
-    { id: 'heatmap',       label: { vi: 'Ban do nhiet', en: 'Risk Heatmap' } },
+    { id: 'risk-register', label: { vi: 'Sổ rủi ro', en: 'Risk Register' } },
+    { id: 'heatmap',       label: { vi: 'Bản đồ nhiệt', en: 'Risk Heatmap' } },
     { id: 'fmea-list',     label: { vi: 'FMEA', en: 'FMEA' } },
-    { id: 'analytics',     label: { vi: 'Phan tich', en: 'Analytics' } }
+    { id: 'analytics',     label: { vi: 'Phân tích', en: 'Analytics' } }
   ];
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -225,7 +225,7 @@
     }
 
     if (state.loading) {
-      html += ui.renderLoadingState({ vi: 'Dang tai du lieu...', en: 'Loading data...' });
+      html += ui.renderLoadingState({ vi: 'Đang tải dữ liệu...', en: 'Loading data...' });
       container.innerHTML = html;
       return;
     }
@@ -251,47 +251,47 @@
     // KPI row
     if (state.metrics) {
       html += ui.renderKpiRow([
-        { label: { vi: 'Tong rui ro', en: 'Total Risks' },         value: fmt(state.metrics.total_risks),     accent: '' },
-        { label: { vi: 'Rui ro cao', en: 'High Risks' },           value: fmt(state.metrics.high_risks),      accent: 'danger' },
-        { label: { vi: 'Dang giam sat', en: 'Monitoring' },        value: fmt(state.metrics.monitoring),      accent: 'warning' },
-        { label: { vi: 'Da dong', en: 'Closed' },                  value: fmt(state.metrics.closed),          accent: 'success' },
-        { label: { vi: 'Can xem xet', en: 'Due for Review' },      value: fmt(state.metrics.due_for_review),  accent: 'info' }
+        { label: { vi: 'Tổng rủi ro', en: 'Total Risks' },         value: fmt(state.metrics.total_risks),     accent: '' },
+        { label: { vi: 'Rủi ro cao', en: 'High Risks' },           value: fmt(state.metrics.high_risks),      accent: 'danger' },
+        { label: { vi: 'Đang giám sát', en: 'Monitoring' },        value: fmt(state.metrics.monitoring),      accent: 'warning' },
+        { label: { vi: 'Đã đóng', en: 'Closed' },                  value: fmt(state.metrics.closed),          accent: 'success' },
+        { label: { vi: 'Cần xem xét', en: 'Due for Review' },      value: fmt(state.metrics.due_for_review),  accent: 'info' }
       ]);
     }
 
     // Toolbar
     html += '<div class="eqms-toolbar">';
-    html += '<button class="eqms-btn primary sm" data-action="create-risk">' + T({ vi: '+ Them rui ro', en: '+ New Risk' }) + '</button>';
+    html += '<button class="eqms-btn primary sm" data-action="create-risk">' + T({ vi: '+ Thêm rủi ro', en: '+ New Risk' }) + '</button>';
     html += ui.renderExportMenu({ formats: ['pdf', 'excel', 'csv'] });
     html += '</div>';
 
     // Filters
     html += ui.renderFilterBar(state.filters, {
       fields: [
-        { key: 'search', type: 'text', placeholder: { vi: 'Tim kiem...', en: 'Search...' }, width: '200px' },
-        { key: 'category', type: 'select', label: { vi: 'Danh muc', en: 'Category' }, options: RISK_CATEGORIES },
-        { key: 'risk_level', type: 'select', label: { vi: 'Muc rui ro', en: 'Risk Level' }, options: [
-          { value: 'low', label: { vi: 'Thap', en: 'Low' } },
-          { value: 'medium', label: { vi: 'Trung binh', en: 'Medium' } },
+        { key: 'search', type: 'text', placeholder: { vi: 'Tìm kiếm...', en: 'Search...' }, width: '200px' },
+        { key: 'category', type: 'select', label: { vi: 'Danh mục', en: 'Category' }, options: RISK_CATEGORIES },
+        { key: 'risk_level', type: 'select', label: { vi: 'Mức rủi ro', en: 'Risk Level' }, options: [
+          { value: 'low', label: { vi: 'Thấp', en: 'Low' } },
+          { value: 'medium', label: { vi: 'Trung bình', en: 'Medium' } },
           { value: 'high', label: { vi: 'Cao', en: 'High' } },
-          { value: 'critical', label: { vi: 'Nghiem trong', en: 'Critical' } }
+          { value: 'critical', label: { vi: 'Nghiêm trọng', en: 'Critical' } }
         ]},
-        { key: 'control_status', type: 'select', label: { vi: 'Trang thai KS', en: 'Control Status' }, options: CONTROL_STATUSES },
-        { key: 'status', type: 'select', label: { vi: 'Trang thai', en: 'Status' }, options: RISK_STATES.map(function(s) { return { value: s, label: s.replace(/_/g, ' ') }; }) }
+        { key: 'control_status', type: 'select', label: { vi: 'Trạng thái KS', en: 'Control Status' }, options: CONTROL_STATUSES },
+        { key: 'status', type: 'select', label: { vi: 'Trạng thái', en: 'Status' }, options: RISK_STATES.map(function(s) { return { value: s, label: s.replace(/_/g, ' ') }; }) }
       ]
     });
 
     // Grid
     var columns = [
-      { key: 'risk_id',        label: { vi: 'Ma rui ro', en: 'Risk ID' },      type: 'id',     sortable: true },
-      { key: 'title',          label: { vi: 'Tieu de', en: 'Title' },           type: 'truncate', sortable: true },
-      { key: 'category',       label: { vi: 'Danh muc', en: 'Category' },       type: 'badge',  sortable: true },
-      { key: 'likelihood',     label: { vi: 'Kha nang', en: 'Likelihood' },     type: 'number', sortable: true },
-      { key: 'severity',       label: { vi: 'Muc do', en: 'Severity' },         type: 'number', sortable: true },
-      { key: 'risk_score',     label: { vi: 'Diem rui ro', en: 'Risk Score' },  sortable: true, render: function(v) { return riskScoreHtml(v); } },
-      { key: 'control_status', label: { vi: 'Kiem soat', en: 'Control Status' }, type: 'badge',  sortable: true },
-      { key: 'owner',          label: { vi: 'Chu so huu', en: 'Owner' },         sortable: true },
-      { key: 'review_date',    label: { vi: 'Ngay xem xet', en: 'Review Date' }, type: 'date',   sortable: true }
+      { key: 'risk_id',        label: { vi: 'Mã rủi ro', en: 'Risk ID' },      type: 'id',     sortable: true },
+      { key: 'title',          label: { vi: 'Tiêu đề', en: 'Title' },           type: 'truncate', sortable: true },
+      { key: 'category',       label: { vi: 'Danh mục', en: 'Category' },       type: 'badge',  sortable: true },
+      { key: 'likelihood',     label: { vi: 'Khả năng', en: 'Likelihood' },     type: 'number', sortable: true },
+      { key: 'severity',       label: { vi: 'Mức độ', en: 'Severity' },         type: 'number', sortable: true },
+      { key: 'risk_score',     label: { vi: 'Điểm rủi ro', en: 'Risk Score' },  sortable: true, render: function(v) { return riskScoreHtml(v); } },
+      { key: 'control_status', label: { vi: 'Kiểm soát', en: 'Control Status' }, type: 'badge',  sortable: true },
+      { key: 'owner',          label: { vi: 'Chủ sở hữu', en: 'Owner' },         sortable: true },
+      { key: 'review_date',    label: { vi: 'Ngày xem xét', en: 'Review Date' }, type: 'date',   sortable: true }
     ];
 
     html += ui.renderDataGrid(columns, state.data, {
@@ -310,12 +310,12 @@
   // ═══════════════════════════════════════════════════════════════════════
   function renderRiskDetail() {
     var r = state.record;
-    if (!r) return ui.renderEmptyState({ icon: '\u26A0\uFE0F', title: { vi: 'Khong tim thay rui ro', en: 'Risk not found' } });
+    if (!r) return ui.renderEmptyState({ icon: '\u26A0\uFE0F', title: { vi: 'Không tìm thấy rủi ro', en: 'Risk not found' } });
 
     var html = '';
 
     // Back button
-    html += '<div style="margin-bottom:12px"><button class="eqms-btn ghost sm" data-action="back-to-list">\u2190 ' + T({ vi: 'Quay lai', en: 'Back' }) + '</button></div>';
+    html += '<div style="margin-bottom:12px"><button class="eqms-btn ghost sm" data-action="back-to-list">\u2190 ' + T({ vi: 'Quay lại', en: 'Back' }) + '</button></div>';
 
     // Identity header
     var actions = RISK_ACTIONS[r.status] || [];
@@ -326,12 +326,12 @@
 
     // Tabs
     var detailTabs = [
-      { id: 'summary',        label: { vi: 'Tong quan', en: 'Summary' } },
-      { id: 'assessment',     label: { vi: 'Danh gia', en: 'Assessment' } },
-      { id: 'controls',       label: { vi: 'Kiem soat', en: 'Controls' }, badge: r.controls ? r.controls.length : 0 },
-      { id: 'residual',       label: { vi: 'Rui ro con lai', en: 'Residual Risk' } },
-      { id: 'review-history', label: { vi: 'Lich su xem xet', en: 'Review History' } },
-      { id: 'audit',          label: { vi: 'Nhat ky', en: 'Audit Trail' } }
+      { id: 'summary',        label: { vi: 'Tổng quan', en: 'Summary' } },
+      { id: 'assessment',     label: { vi: 'Đánh giá', en: 'Assessment' } },
+      { id: 'controls',       label: { vi: 'Kiểm soát', en: 'Controls' }, badge: r.controls ? r.controls.length : 0 },
+      { id: 'residual',       label: { vi: 'Rủi ro còn lại', en: 'Residual Risk' } },
+      { id: 'review-history', label: { vi: 'Lịch sử xem xét', en: 'Review History' } },
+      { id: 'audit',          label: { vi: 'Nhật ký', en: 'Audit Trail' } }
     ];
     html += ui.renderTabs(detailTabs, state.detailTab);
 
@@ -352,29 +352,29 @@
   // ── Detail Tab: Summary ──
   function renderRiskSummary(r) {
     return ui.renderFieldGrid([
-      { label: { vi: 'Ma rui ro', en: 'Risk ID' },           value: r.risk_id, mono: true },
-      { label: { vi: 'Tieu de', en: 'Title' },               value: r.title },
-      { label: { vi: 'Danh muc', en: 'Category' },           value: r.category, badge: true },
-      { label: { vi: 'Mo ta', en: 'Description' },           value: r.description },
-      { label: { vi: 'Kha nang (1-5)', en: 'Likelihood' },   value: r.likelihood },
-      { label: { vi: 'Muc do (1-5)', en: 'Severity' },       value: r.severity },
-      { label: { vi: 'Diem rui ro', en: 'Risk Score' },      value: r.risk_score, badge: true },
-      { label: { vi: 'Cap do rui ro', en: 'Risk Level' },    value: r.risk_level, badge: true },
-      { label: { vi: 'Chu so huu', en: 'Owner' },            value: r.owner },
-      { label: { vi: 'Ngay xac dinh', en: 'Identified Date' }, value: fmtDate(r.identified_date) },
-      { label: { vi: 'Ngay xem xet', en: 'Review Date' },    value: fmtDate(r.review_date) },
-      { label: { vi: 'Trang thai', en: 'Status' },           value: r.status, badge: true }
+      { label: { vi: 'Mã rủi ro', en: 'Risk ID' },           value: r.risk_id, mono: true },
+      { label: { vi: 'Tiêu đề', en: 'Title' },               value: r.title },
+      { label: { vi: 'Danh mục', en: 'Category' },           value: r.category, badge: true },
+      { label: { vi: 'Mô tả', en: 'Description' },           value: r.description },
+      { label: { vi: 'Khả năng (1-5)', en: 'Likelihood' },   value: r.likelihood },
+      { label: { vi: 'Mức độ (1-5)', en: 'Severity' },       value: r.severity },
+      { label: { vi: 'Điểm rủi ro', en: 'Risk Score' },      value: r.risk_score, badge: true },
+      { label: { vi: 'Cấp độ rủi ro', en: 'Risk Level' },    value: r.risk_level, badge: true },
+      { label: { vi: 'Chủ sở hữu', en: 'Owner' },            value: r.owner },
+      { label: { vi: 'Ngày xác định', en: 'Identified Date' }, value: fmtDate(r.identified_date) },
+      { label: { vi: 'Ngày xem xét', en: 'Review Date' },    value: fmtDate(r.review_date) },
+      { label: { vi: 'Trạng thái', en: 'Status' },           value: r.status, badge: true }
     ]);
   }
 
   // ── Detail Tab: Assessment ──
   function renderRiskAssessment(r) {
     var html = '';
-    html += ui.renderSection({ vi: 'Danh gia hien tai', en: 'Current Assessment' },
+    html += ui.renderSection({ vi: 'Đánh giá hiện tại', en: 'Current Assessment' },
       ui.renderFieldGrid([
-        { label: { vi: 'Ly do kha nang', en: 'Likelihood Rationale' }, value: r.likelihood_rationale },
-        { label: { vi: 'Ly do muc do', en: 'Severity Rationale' },     value: r.severity_rationale },
-        { label: { vi: 'Vi tri ma tran', en: 'Matrix Position' },      value: 'L=' + (r.likelihood || '-') + ', S=' + (r.severity || '-') + ' => ' + (r.risk_score || '-') }
+        { label: { vi: 'Lý do khả năng', en: 'Likelihood Rationale' }, value: r.likelihood_rationale },
+        { label: { vi: 'Lý do mức độ', en: 'Severity Rationale' },     value: r.severity_rationale },
+        { label: { vi: 'Vị trí ma trận', en: 'Matrix Position' },      value: 'L=' + (r.likelihood || '-') + ', S=' + (r.severity || '-') + ' => ' + (r.risk_score || '-') }
       ])
     );
 
@@ -395,15 +395,15 @@
     // Assessment history
     var history = r.assessment_history || [];
     if (history.length) {
-      html += ui.renderSection({ vi: 'Lich su danh gia', en: 'Assessment History' },
+      html += ui.renderSection({ vi: 'Lịch sử đánh giá', en: 'Assessment History' },
         ui.renderDataGrid(
           [
-            { key: 'date',       label: { vi: 'Ngay', en: 'Date' },           type: 'date' },
-            { key: 'assessor',   label: { vi: 'Nguoi danh gia', en: 'Assessor' } },
-            { key: 'likelihood', label: { vi: 'Kha nang', en: 'L' },          type: 'number' },
-            { key: 'severity',   label: { vi: 'Muc do', en: 'S' },            type: 'number' },
-            { key: 'score',      label: { vi: 'Diem', en: 'Score' },          render: function(v) { return riskScoreHtml(v); } },
-            { key: 'notes',      label: { vi: 'Ghi chu', en: 'Notes' },       type: 'truncate' }
+            { key: 'date',       label: { vi: 'Ngày', en: 'Date' },           type: 'date' },
+            { key: 'assessor',   label: { vi: 'Người đánh giá', en: 'Assessor' } },
+            { key: 'likelihood', label: { vi: 'Khả năng', en: 'L' },          type: 'number' },
+            { key: 'severity',   label: { vi: 'Mức độ', en: 'S' },            type: 'number' },
+            { key: 'score',      label: { vi: 'Điểm', en: 'Score' },          render: function(v) { return riskScoreHtml(v); } },
+            { key: 'notes',      label: { vi: 'Ghi chú', en: 'Notes' },       type: 'truncate' }
           ],
           history, { selectable: false }
         )
@@ -418,16 +418,16 @@
     var html = '';
 
     html += '<div class="eqms-toolbar">';
-    html += '<button class="eqms-btn primary sm" data-action="add-control">' + T({ vi: '+ Them kiem soat', en: '+ Add Control' }) + '</button>';
+    html += '<button class="eqms-btn primary sm" data-action="add-control">' + T({ vi: '+ Thêm kiểm soát', en: '+ Add Control' }) + '</button>';
     html += '</div>';
 
     var cols = [
-      { key: 'control_id',        label: { vi: 'Ma KS', en: 'Control ID' },           type: 'id' },
-      { key: 'description',       label: { vi: 'Mo ta', en: 'Description' },           type: 'truncate' },
-      { key: 'type',              label: { vi: 'Loai', en: 'Type' },                   type: 'badge' },
-      { key: 'status',            label: { vi: 'Trang thai', en: 'Status' },           type: 'badge' },
-      { key: 'owner',             label: { vi: 'Nguoi phu trach', en: 'Owner' } },
-      { key: 'verification_date', label: { vi: 'Ngay xac minh', en: 'Verification Date' }, type: 'date' }
+      { key: 'control_id',        label: { vi: 'Mã KS', en: 'Control ID' },           type: 'id' },
+      { key: 'description',       label: { vi: 'Mô tả', en: 'Description' },           type: 'truncate' },
+      { key: 'type',              label: { vi: 'Loại', en: 'Type' },                   type: 'badge' },
+      { key: 'status',            label: { vi: 'Trạng thái', en: 'Status' },           type: 'badge' },
+      { key: 'owner',             label: { vi: 'Người phụ trách', en: 'Owner' } },
+      { key: 'verification_date', label: { vi: 'Ngày xác minh', en: 'Verification Date' }, type: 'date' }
     ];
     html += ui.renderDataGrid(cols, controls, { selectable: false });
     return html;
@@ -437,43 +437,43 @@
   function renderResidualRisk(r) {
     var res = r.residual || {};
     return ui.renderFieldGrid([
-      { label: { vi: 'Kha nang con lai', en: 'Post-Control Likelihood' },   value: res.likelihood },
-      { label: { vi: 'Muc do con lai', en: 'Post-Control Severity' },       value: res.severity },
-      { label: { vi: 'Diem rui ro con lai', en: 'Residual Risk Score' },    value: res.risk_score, badge: true },
-      { label: { vi: 'Quyet dinh chap nhan', en: 'Acceptance Decision' },   value: res.acceptance_decision, badge: true },
-      { label: { vi: 'Nguoi chap nhan', en: 'Acceptor' },                   value: res.acceptor },
-      { label: { vi: 'Ngay chap nhan', en: 'Acceptance Date' },             value: fmtDate(res.acceptance_date) }
+      { label: { vi: 'Khả năng còn lại', en: 'Post-Control Likelihood' },   value: res.likelihood },
+      { label: { vi: 'Mức độ còn lại', en: 'Post-Control Severity' },       value: res.severity },
+      { label: { vi: 'Điểm rủi ro còn lại', en: 'Residual Risk Score' },    value: res.risk_score, badge: true },
+      { label: { vi: 'Quyết định chấp nhận', en: 'Acceptance Decision' },   value: res.acceptance_decision, badge: true },
+      { label: { vi: 'Người chấp nhận', en: 'Acceptor' },                   value: res.acceptor },
+      { label: { vi: 'Ngày chấp nhận', en: 'Acceptance Date' },             value: fmtDate(res.acceptance_date) }
     ]);
   }
 
   // ── Detail Tab: Review History ──
   function renderReviewHistory(r) {
     var reviews = r.reviews || [];
-    if (!reviews.length) return ui.renderEmptyState({ icon: '\u{1F4CB}', title: { vi: 'Chua co xem xet', en: 'No reviews yet' } });
+    if (!reviews.length) return ui.renderEmptyState({ icon: '\u{1F4CB}', title: { vi: 'Chưa có xem xét', en: 'No reviews yet' } });
 
     return ui.renderDataGrid([
-      { key: 'date',       label: { vi: 'Ngay', en: 'Date' },              type: 'date' },
-      { key: 'reviewer',   label: { vi: 'Nguoi xem xet', en: 'Reviewer' } },
-      { key: 'outcome',    label: { vi: 'Ket qua', en: 'Outcome' },        type: 'badge' },
+      { key: 'date',       label: { vi: 'Ngày', en: 'Date' },              type: 'date' },
+      { key: 'reviewer',   label: { vi: 'Người xem xét', en: 'Reviewer' } },
+      { key: 'outcome',    label: { vi: 'Kết quả', en: 'Outcome' },        type: 'badge' },
       { key: 'likelihood', label: { vi: 'L', en: 'L' },                    type: 'number' },
       { key: 'severity',   label: { vi: 'S', en: 'S' },                    type: 'number' },
-      { key: 'score',      label: { vi: 'Diem', en: 'Score' },             render: function(v) { return riskScoreHtml(v); } },
-      { key: 'notes',      label: { vi: 'Ghi chu', en: 'Notes' },          type: 'truncate' },
-      { key: 'next_review', label: { vi: 'Xem xet tiep', en: 'Next Review' }, type: 'date' }
+      { key: 'score',      label: { vi: 'Điểm', en: 'Score' },             render: function(v) { return riskScoreHtml(v); } },
+      { key: 'notes',      label: { vi: 'Ghi chú', en: 'Notes' },          type: 'truncate' },
+      { key: 'next_review', label: { vi: 'Xem xét tiếp', en: 'Next Review' }, type: 'date' }
     ], reviews, { selectable: false });
   }
 
   // ── Detail Tab: Audit Trail + Signatures + Attachments + Comments ──
   function renderRiskAuditTab(r) {
     var html = '';
-    html += ui.renderSection({ vi: 'Nhat ky kiem toan', en: 'Audit Trail' }, ui.renderAuditTrail(state.auditEvents));
-    html += ui.renderSection({ vi: 'Chu ky', en: 'Signatures' }, ui.renderSignaturePanel(state.signatures, [
-      { vi: 'Nguoi xac dinh', en: 'Identified By' },
-      { vi: 'Nguoi danh gia', en: 'Assessed By' },
-      { vi: 'Nguoi phe duyet', en: 'Approved By' }
+    html += ui.renderSection({ vi: 'Nhật ký kiểm toán', en: 'Audit Trail' }, ui.renderAuditTrail(state.auditEvents));
+    html += ui.renderSection({ vi: 'Chữ ký', en: 'Signatures' }, ui.renderSignaturePanel(state.signatures, [
+      { vi: 'Người xác định', en: 'Identified By' },
+      { vi: 'Người đánh giá', en: 'Assessed By' },
+      { vi: 'Người phê duyệt', en: 'Approved By' }
     ]));
-    html += ui.renderSection({ vi: 'Tep dinh kem', en: 'Attachments' }, ui.renderAttachmentsGrid(r.attachments || []));
-    html += ui.renderSection({ vi: 'Binh luan', en: 'Comments' }, ui.renderCommentsThread(r.comments || []));
+    html += ui.renderSection({ vi: 'Tệp đính kèm', en: 'Attachments' }, ui.renderAttachmentsGrid(r.attachments || []));
+    html += ui.renderSection({ vi: 'Bình luận', en: 'Comments' }, ui.renderCommentsThread(r.comments || []));
     return html;
   }
 
@@ -486,11 +486,11 @@
     var cells = hm.cells || {};
 
     html += '<div class="eqms-heatmap-container">';
-    html += '<div class="eqms-heatmap-title">' + T({ vi: 'Ma tran rui ro 5x5', en: '5x5 Risk Matrix' }) + '</div>';
+    html += '<div class="eqms-heatmap-title">' + T({ vi: 'Ma trận rủi ro 5x5', en: '5x5 Risk Matrix' }) + '</div>';
 
     // Y-axis label
     html += '<div class="eqms-heatmap-grid">';
-    html += '<div class="eqms-heatmap-ylabel">' + T({ vi: 'Muc do', en: 'Severity' }) + '</div>';
+    html += '<div class="eqms-heatmap-ylabel">' + T({ vi: 'Mức độ', en: 'Severity' }) + '</div>';
 
     html += '<div class="eqms-heatmap-matrix">';
     // Header row for likelihood labels
@@ -522,24 +522,24 @@
     html += '</div>'; // matrix
 
     // X-axis label
-    html += '<div class="eqms-heatmap-xlabel">' + T({ vi: 'Kha nang xay ra', en: 'Likelihood' }) + '</div>';
+    html += '<div class="eqms-heatmap-xlabel">' + T({ vi: 'Khả năng xảy ra', en: 'Likelihood' }) + '</div>';
     html += '</div>'; // grid
 
     // Cell detail panel
     if (hm.selectedCell) {
       var sc = hm.selectedCell;
       html += '<div class="eqms-heatmap-detail">';
-      html += '<div class="eqms-section-header"><span>' + T({ vi: 'Rui ro tai L=', en: 'Risks at L=' }) + sc.l + ', S=' + sc.s + '</span></div>';
+      html += '<div class="eqms-section-header"><span>' + T({ vi: 'Rủi ro tại L=', en: 'Risks at L=' }) + sc.l + ', S=' + sc.s + '</span></div>';
       var cellRisks = sc.risks || [];
       if (cellRisks.length) {
         html += ui.renderDataGrid([
-          { key: 'risk_id', label: { vi: 'Ma', en: 'ID' },        type: 'id' },
-          { key: 'title',   label: { vi: 'Tieu de', en: 'Title' }, type: 'truncate' },
-          { key: 'owner',   label: { vi: 'Chu', en: 'Owner' } },
-          { key: 'status',  label: { vi: 'Trang thai', en: 'Status' }, type: 'badge' }
+          { key: 'risk_id', label: { vi: 'Mã', en: 'ID' },        type: 'id' },
+          { key: 'title',   label: { vi: 'Tiêu đề', en: 'Title' }, type: 'truncate' },
+          { key: 'owner',   label: { vi: 'Chủ', en: 'Owner' } },
+          { key: 'status',  label: { vi: 'Trạng thái', en: 'Status' }, type: 'badge' }
         ], cellRisks, { selectable: false });
       } else {
-        html += ui.renderEmptyState({ icon: '\u2705', title: { vi: 'Khong co rui ro', en: 'No risks in this cell' } });
+        html += ui.renderEmptyState({ icon: '\u2705', title: { vi: 'Không có rủi ro', en: 'No risks in this cell' } });
       }
       html += '</div>';
     }
@@ -548,10 +548,10 @@
 
     // Legend
     html += '<div class="eqms-heatmap-legend">';
-    html += '<span class="eqms-heatmap-legend-item"><span class="eqms-risk-dot risk-green"></span> 1-6 ' + T({ vi: 'Thap', en: 'Low' }) + '</span>';
-    html += '<span class="eqms-heatmap-legend-item"><span class="eqms-risk-dot risk-yellow"></span> 7-12 ' + T({ vi: 'Trung binh', en: 'Medium' }) + '</span>';
+    html += '<span class="eqms-heatmap-legend-item"><span class="eqms-risk-dot risk-green"></span> 1-6 ' + T({ vi: 'Thấp', en: 'Low' }) + '</span>';
+    html += '<span class="eqms-heatmap-legend-item"><span class="eqms-risk-dot risk-yellow"></span> 7-12 ' + T({ vi: 'Trung bình', en: 'Medium' }) + '</span>';
     html += '<span class="eqms-heatmap-legend-item"><span class="eqms-risk-dot risk-orange"></span> 13-19 ' + T({ vi: 'Cao', en: 'High' }) + '</span>';
-    html += '<span class="eqms-heatmap-legend-item"><span class="eqms-risk-dot risk-red"></span> 20-25 ' + T({ vi: 'Nghiem trong', en: 'Critical' }) + '</span>';
+    html += '<span class="eqms-heatmap-legend-item"><span class="eqms-risk-dot risk-red"></span> 20-25 ' + T({ vi: 'Nghiêm trọng', en: 'Critical' }) + '</span>';
     html += '</div>';
 
     return html;
@@ -565,39 +565,39 @@
 
     // Toolbar
     html += '<div class="eqms-toolbar">';
-    html += '<button class="eqms-btn primary sm" data-action="create-fmea">' + T({ vi: '+ Tao FMEA', en: '+ New FMEA' }) + '</button>';
+    html += '<button class="eqms-btn primary sm" data-action="create-fmea">' + T({ vi: '+ Tạo FMEA', en: '+ New FMEA' }) + '</button>';
     html += ui.renderExportMenu({ formats: ['pdf', 'excel'] });
     html += '</div>';
 
     // Filters
     html += ui.renderFilterBar(state.fmeaFilters, {
       fields: [
-        { key: 'search', type: 'text', placeholder: { vi: 'Tim kiem...', en: 'Search...' }, width: '200px' },
-        { key: 'fmea_type', type: 'select', label: { vi: 'Loai', en: 'Type' }, options: FMEA_TYPES },
-        { key: 'status', type: 'select', label: { vi: 'Trang thai', en: 'Status' }, options: [
-          { value: 'draft', label: { vi: 'Nhap', en: 'Draft' } },
-          { value: 'in_progress', label: { vi: 'Dang thuc hien', en: 'In Progress' } },
-          { value: 'review', label: { vi: 'Xem xet', en: 'Review' } },
-          { value: 'approved', label: { vi: 'Phe duyet', en: 'Approved' } },
-          { value: 'closed', label: { vi: 'Dong', en: 'Closed' } }
+        { key: 'search', type: 'text', placeholder: { vi: 'Tìm kiếm...', en: 'Search...' }, width: '200px' },
+        { key: 'fmea_type', type: 'select', label: { vi: 'Loại', en: 'Type' }, options: FMEA_TYPES },
+        { key: 'status', type: 'select', label: { vi: 'Trạng thái', en: 'Status' }, options: [
+          { value: 'draft', label: { vi: 'Nháp', en: 'Draft' } },
+          { value: 'in_progress', label: { vi: 'Đang thực hiện', en: 'In Progress' } },
+          { value: 'review', label: { vi: 'Xem xét', en: 'Review' } },
+          { value: 'approved', label: { vi: 'Phê duyệt', en: 'Approved' } },
+          { value: 'closed', label: { vi: 'Đóng', en: 'Closed' } }
         ]},
-        { key: 'part_process', type: 'text', label: { vi: 'Bo phan/Quy trinh', en: 'Part/Process' }, width: '150px' }
+        { key: 'part_process', type: 'text', label: { vi: 'Bộ phận/Quy trình', en: 'Part/Process' }, width: '150px' }
       ]
     });
 
     // Grid
     var columns = [
-      { key: 'fmea_id',       label: { vi: 'Ma FMEA', en: 'FMEA ID' },     type: 'id',       sortable: true },
-      { key: 'title',         label: { vi: 'Tieu de', en: 'Title' },        type: 'truncate', sortable: true },
-      { key: 'fmea_type',     label: { vi: 'Loai', en: 'Type' },            type: 'badge',    sortable: true },
-      { key: 'status',        label: { vi: 'Trang thai', en: 'Status' },    type: 'badge',    sortable: true },
-      { key: 'part_process',  label: { vi: 'Bo phan/QT', en: 'Part/Process' }, sortable: true },
-      { key: 'team_lead',     label: { vi: 'Truong nhom', en: 'Team Lead' }, sortable: true },
+      { key: 'fmea_id',       label: { vi: 'Mã FMEA', en: 'FMEA ID' },     type: 'id',       sortable: true },
+      { key: 'title',         label: { vi: 'Tiêu đề', en: 'Title' },        type: 'truncate', sortable: true },
+      { key: 'fmea_type',     label: { vi: 'Loại', en: 'Type' },            type: 'badge',    sortable: true },
+      { key: 'status',        label: { vi: 'Trạng thái', en: 'Status' },    type: 'badge',    sortable: true },
+      { key: 'part_process',  label: { vi: 'Bộ phận/QT', en: 'Part/Process' }, sortable: true },
+      { key: 'team_lead',     label: { vi: 'Trưởng nhóm', en: 'Team Lead' }, sortable: true },
       { key: 'ap_high_count', label: { vi: 'AP Cao', en: 'AP High' },       type: 'number',   sortable: true,
         render: function(v) { return v > 0 ? '<span class="eqms-badge ap-high">' + esc(v) + '</span>' : esc(v || 0); } },
-      { key: 'ap_medium_count', label: { vi: 'AP TB', en: 'AP Medium' },    type: 'number',   sortable: true,
+      { key: 'ap_medium_count', label: { vi: 'AP TB', en: 'AP Medium' },     type: 'number',   sortable: true,
         render: function(v) { return v > 0 ? '<span class="eqms-badge ap-medium">' + esc(v) + '</span>' : esc(v || 0); } },
-      { key: 'created_at',    label: { vi: 'Ngay tao', en: 'Created' },     type: 'date',     sortable: true }
+      { key: 'created_at',    label: { vi: 'Ngày tạo', en: 'Created' },     type: 'date',     sortable: true }
     ];
 
     html += ui.renderDataGrid(columns, state.fmeaData, {
@@ -615,27 +615,27 @@
   // ═══════════════════════════════════════════════════════════════════════
   function renderFmeaDetail() {
     var f = state.fmeaRecord;
-    if (!f) return ui.renderEmptyState({ icon: '\u26A0\uFE0F', title: { vi: 'Khong tim thay FMEA', en: 'FMEA not found' } });
+    if (!f) return ui.renderEmptyState({ icon: '\u26A0\uFE0F', title: { vi: 'Không tìm thấy FMEA', en: 'FMEA not found' } });
 
     var html = '';
 
     // Back button
-    html += '<div style="margin-bottom:12px"><button class="eqms-btn ghost sm" data-action="back-to-fmea">\u2190 ' + T({ vi: 'Quay lai', en: 'Back' }) + '</button></div>';
+    html += '<div style="margin-bottom:12px"><button class="eqms-btn ghost sm" data-action="back-to-fmea">\u2190 ' + T({ vi: 'Quay lại', en: 'Back' }) + '</button></div>';
 
     // Identity header
     html += ui.renderIdentityHeader(f, {
       actions: [
-        { action: 'edit-fmea', label: { vi: 'Chinh sua', en: 'Edit' }, style: 'secondary' }
+        { action: 'edit-fmea', label: { vi: 'Chỉnh sửa', en: 'Edit' }, style: 'secondary' }
       ]
     });
 
     // Tabs
     var fmeaTabs = [
-      { id: 'summary',      label: { vi: 'Tong quan', en: 'Summary' } },
+      { id: 'summary',      label: { vi: 'Tổng quan', en: 'Summary' } },
       { id: 'worksheet',    label: { vi: 'Failure Mode', en: 'Failure Mode Worksheet' }, badge: f.failure_modes ? f.failure_modes.length : 0 },
-      { id: 'actions',      label: { vi: 'Theo doi', en: 'Action Tracker' } },
-      { id: 'control-plan', label: { vi: 'Ke hoach KS', en: 'Control Plan' } },
-      { id: 'audit',        label: { vi: 'Nhat ky', en: 'Audit Trail' } }
+      { id: 'actions',      label: { vi: 'Theo dõi', en: 'Action Tracker' } },
+      { id: 'control-plan', label: { vi: 'Kế hoạch KS', en: 'Control Plan' } },
+      { id: 'audit',        label: { vi: 'Nhật ký', en: 'Audit Trail' } }
     ];
     html += ui.renderTabs(fmeaTabs, state.fmeaDetailTab);
 
@@ -654,15 +654,15 @@
   // ── FMEA Tab: Summary ──
   function renderFmeaSummary(f) {
     return ui.renderFieldGrid([
-      { label: { vi: 'Ma FMEA', en: 'FMEA ID' },               value: f.fmea_id, mono: true },
-      { label: { vi: 'Tieu de', en: 'Title' },                  value: f.title },
-      { label: { vi: 'Loai FMEA', en: 'FMEA Type' },           value: f.fmea_type, badge: true },
-      { label: { vi: 'Chuc nang/San pham', en: 'Item/Function' }, value: f.item_function },
-      { label: { vi: 'Truong nhom', en: 'Team Lead' },          value: f.team_lead },
-      { label: { vi: 'Thanh vien nhom', en: 'Team Members' },   value: Array.isArray(f.team_members) ? f.team_members.join(', ') : f.team_members },
-      { label: { vi: 'Pham vi', en: 'Scope' },                  value: f.scope },
-      { label: { vi: 'Phien ban', en: 'Revision' },             value: f.revision },
-      { label: { vi: 'Trang thai', en: 'Status' },              value: f.status, badge: true }
+      { label: { vi: 'Mã FMEA', en: 'FMEA ID' },               value: f.fmea_id, mono: true },
+      { label: { vi: 'Tiêu đề', en: 'Title' },                  value: f.title },
+      { label: { vi: 'Loại FMEA', en: 'FMEA Type' },           value: f.fmea_type, badge: true },
+      { label: { vi: 'Chức năng/Sản phẩm', en: 'Item/Function' }, value: f.item_function },
+      { label: { vi: 'Trưởng nhóm', en: 'Team Lead' },          value: f.team_lead },
+      { label: { vi: 'Thành viên nhóm', en: 'Team Members' },   value: Array.isArray(f.team_members) ? f.team_members.join(', ') : f.team_members },
+      { label: { vi: 'Phạm vi', en: 'Scope' },                  value: f.scope },
+      { label: { vi: 'Phiên bản', en: 'Revision' },             value: f.revision },
+      { label: { vi: 'Trạng thái', en: 'Status' },              value: f.status, badge: true }
     ]);
   }
 
@@ -672,27 +672,27 @@
     var html = '';
 
     html += '<div class="eqms-toolbar">';
-    html += '<button class="eqms-btn primary sm" data-action="add-failure-mode">' + T({ vi: '+ Them Failure Mode', en: '+ Add Failure Mode' }) + '</button>';
+    html += '<button class="eqms-btn primary sm" data-action="add-failure-mode">' + T({ vi: '+ Thêm Failure Mode', en: '+ Add Failure Mode' }) + '</button>';
     html += '</div>';
 
     html += '<div class="eqms-grid-wrapper" style="overflow-x:auto">';
     html += '<table class="eqms-grid eqms-fmea-table">';
     html += '<thead><tr>';
     var headers = [
-      { vi: 'Chuc nang', en: 'Item/Function' },
-      { vi: 'Che do loi', en: 'Failure Mode' },
-      { vi: 'Anh huong', en: 'Effect' },
+      { vi: 'Chức năng', en: 'Item/Function' },
+      { vi: 'Chế độ lỗi', en: 'Failure Mode' },
+      { vi: 'Ảnh hưởng', en: 'Effect' },
       { vi: 'S', en: 'S' },
-      { vi: 'Nguyen nhan', en: 'Cause' },
-      { vi: 'KS Phong ngua', en: 'Prevention' },
+      { vi: 'Nguyên nhân', en: 'Cause' },
+      { vi: 'KS Phòng ngừa', en: 'Prevention' },
       { vi: 'O', en: 'O' },
-      { vi: 'KS Phat hien', en: 'Detection' },
+      { vi: 'KS Phát hiện', en: 'Detection' },
       { vi: 'D', en: 'D' },
       { vi: 'AP', en: 'AP' },
-      { vi: 'Hanh dong', en: 'Actions' },
-      { vi: 'Phu trach', en: 'Resp.' },
-      { vi: 'Muc tieu', en: 'Target' },
-      { vi: 'Da lam', en: 'Taken' },
+      { vi: 'Hành động', en: 'Actions' },
+      { vi: 'Phụ trách', en: 'Resp.' },
+      { vi: 'Mục tiêu', en: 'Target' },
+      { vi: 'Đã làm', en: 'Taken' },
       { vi: 'S2', en: 'New S' },
       { vi: 'O2', en: 'New O' },
       { vi: 'D2', en: 'New D' },
@@ -705,7 +705,7 @@
 
     if (!modes.length) {
       html += '<tr><td colspan="18">';
-      html += ui.renderEmptyState({ icon: '\u{1F4CB}', title: { vi: 'Chua co failure mode', en: 'No failure modes' } });
+      html += ui.renderEmptyState({ icon: '\u{1F4CB}', title: { vi: 'Chưa có failure mode', en: 'No failure modes' } });
       html += '</td></tr>';
     } else {
       modes.forEach(function(m) {
@@ -741,16 +741,16 @@
   // ── FMEA Tab: Action Tracker ──
   function renderFmeaActions(f) {
     var actions = f.recommended_actions || [];
-    if (!actions.length) return ui.renderEmptyState({ icon: '\u{1F4CB}', title: { vi: 'Chua co hanh dong', en: 'No recommended actions' } });
+    if (!actions.length) return ui.renderEmptyState({ icon: '\u{1F4CB}', title: { vi: 'Chưa có hành động', en: 'No recommended actions' } });
 
     return ui.renderDataGrid([
-      { key: 'action_id',    label: { vi: 'Ma', en: 'ID' },                    type: 'id' },
-      { key: 'description',  label: { vi: 'Mo ta', en: 'Description' },        type: 'truncate' },
-      { key: 'responsibility', label: { vi: 'Phu trach', en: 'Responsibility' } },
-      { key: 'target_date',  label: { vi: 'Muc tieu', en: 'Target' },          type: 'date' },
-      { key: 'status',       label: { vi: 'Trang thai', en: 'Status' },        type: 'badge' },
-      { key: 'completion',   label: { vi: 'Hoan thanh', en: 'Completion' },     render: function(v) { return '<div class="eqms-progress"><div class="eqms-progress-bar" style="width:' + (v || 0) + '%"></div><span>' + (v || 0) + '%</span></div>'; } },
-      { key: 'before_rpn',   label: { vi: 'RPN truoc', en: 'Before RPN' },     type: 'number' },
+      { key: 'action_id',    label: { vi: 'Mã', en: 'ID' },                    type: 'id' },
+      { key: 'description',  label: { vi: 'Mô tả', en: 'Description' },        type: 'truncate' },
+      { key: 'responsibility', label: { vi: 'Phụ trách', en: 'Responsibility' } },
+      { key: 'target_date',  label: { vi: 'Mục tiêu', en: 'Target' },          type: 'date' },
+      { key: 'status',       label: { vi: 'Trạng thái', en: 'Status' },        type: 'badge' },
+      { key: 'completion',   label: { vi: 'Hoàn thành', en: 'Completion' },     render: function(v) { return '<div class="eqms-progress"><div class="eqms-progress-bar" style="width:' + (v || 0) + '%"></div><span>' + (v || 0) + '%</span></div>'; } },
+      { key: 'before_rpn',   label: { vi: 'RPN trước', en: 'Before RPN' },     type: 'number' },
       { key: 'after_rpn',    label: { vi: 'RPN sau', en: 'After RPN' },        type: 'number',
         render: function(v, row) {
           if (v == null) return '—';
@@ -768,31 +768,31 @@
     if (!links.length) {
       return ui.renderEmptyState({
         icon: '\u{1F517}',
-        title: { vi: 'Chua lien ket ke hoach kiem soat', en: 'No linked control plan characteristics' },
-        action: { key: 'link-control-plan', label: { vi: 'Lien ket', en: 'Link' } }
+        title: { vi: 'Chưa liên kết kế hoạch kiểm soát', en: 'No linked control plan characteristics' },
+        action: { key: 'link-control-plan', label: { vi: 'Liên kết', en: 'Link' } }
       });
     }
     return ui.renderDataGrid([
-      { key: 'characteristic_id', label: { vi: 'Ma dac tinh', en: 'Char. ID' },          type: 'id' },
-      { key: 'characteristic',    label: { vi: 'Dac tinh', en: 'Characteristic' },        type: 'truncate' },
-      { key: 'control_method',    label: { vi: 'Phuong phap KS', en: 'Control Method' } },
-      { key: 'sample_size',       label: { vi: 'Co mau', en: 'Sample Size' } },
-      { key: 'frequency',         label: { vi: 'Tan suat', en: 'Frequency' } },
-      { key: 'reaction_plan',     label: { vi: 'Ke hoach xu ly', en: 'Reaction Plan' },   type: 'truncate' }
+      { key: 'characteristic_id', label: { vi: 'Mã đặc tính', en: 'Char. ID' },          type: 'id' },
+      { key: 'characteristic',    label: { vi: 'Đặc tính', en: 'Characteristic' },        type: 'truncate' },
+      { key: 'control_method',    label: { vi: 'Phương pháp KS', en: 'Control Method' } },
+      { key: 'sample_size',       label: { vi: 'Cỡ mẫu', en: 'Sample Size' } },
+      { key: 'frequency',         label: { vi: 'Tần suất', en: 'Frequency' } },
+      { key: 'reaction_plan',     label: { vi: 'Kế hoạch xử lý', en: 'Reaction Plan' },   type: 'truncate' }
     ], links, { selectable: false });
   }
 
   // ── FMEA Tab: Audit Trail ──
   function renderFmeaAuditTab(f) {
     var html = '';
-    html += ui.renderSection({ vi: 'Nhat ky kiem toan', en: 'Audit Trail' }, ui.renderAuditTrail(f.audit_events || []));
-    html += ui.renderSection({ vi: 'Chu ky', en: 'Signatures' }, ui.renderSignaturePanel(f.signatures || [], [
-      { vi: 'Truong nhom', en: 'Team Lead' },
-      { vi: 'Ky thuat', en: 'Engineering' },
-      { vi: 'Chat luong', en: 'Quality' }
+    html += ui.renderSection({ vi: 'Nhật ký kiểm toán', en: 'Audit Trail' }, ui.renderAuditTrail(f.audit_events || []));
+    html += ui.renderSection({ vi: 'Chữ ký', en: 'Signatures' }, ui.renderSignaturePanel(f.signatures || [], [
+      { vi: 'Trưởng nhóm', en: 'Team Lead' },
+      { vi: 'Kỹ thuật', en: 'Engineering' },
+      { vi: 'Chất lượng', en: 'Quality' }
     ]));
-    html += ui.renderSection({ vi: 'Tep dinh kem', en: 'Attachments' }, ui.renderAttachmentsGrid(f.attachments || []));
-    html += ui.renderSection({ vi: 'Binh luan', en: 'Comments' }, ui.renderCommentsThread(f.comments || []));
+    html += ui.renderSection({ vi: 'Tệp đính kèm', en: 'Attachments' }, ui.renderAttachmentsGrid(f.attachments || []));
+    html += ui.renderSection({ vi: 'Bình luận', en: 'Comments' }, ui.renderCommentsThread(f.comments || []));
     return html;
   }
 
@@ -805,64 +805,64 @@
 
     // KPI cards
     html += ui.renderKpiRow([
-      { label: { vi: 'Tong rui ro', en: 'Total Risks' },           value: fmt(m.total_risks),         accent: '' },
-      { label: { vi: 'Rui ro cao/Nghiem trong', en: 'High/Critical' }, value: fmt(m.high_risks),      accent: 'danger' },
-      { label: { vi: 'Trung binh giam RPN', en: 'Avg RPN Reduction' }, value: m.avg_rpn_reduction ? m.avg_rpn_reduction + '%' : '—', accent: 'success' },
-      { label: { vi: 'FMEA hoan thanh', en: 'FMEAs Completed' },   value: fmt(m.fmea_completed),     accent: 'info' }
+      { label: { vi: 'Tổng rủi ro', en: 'Total Risks' },           value: fmt(m.total_risks),         accent: '' },
+      { label: { vi: 'Rủi ro cao/Nghiêm trọng', en: 'High/Critical' }, value: fmt(m.high_risks),      accent: 'danger' },
+      { label: { vi: 'Trung bình giảm RPN', en: 'Avg RPN Reduction' }, value: m.avg_rpn_reduction ? m.avg_rpn_reduction + '%' : '—', accent: 'success' },
+      { label: { vi: 'FMEA hoàn thành', en: 'FMEAs Completed' },   value: fmt(m.fmea_completed),     accent: 'info' }
     ]);
 
     // RPN Trend chart
-    html += ui.renderSection({ vi: 'Xu huong RPN (truoc/sau)', en: 'RPN Trend (Before/After)' },
+    html += ui.renderSection({ vi: 'Xu hướng RPN (trước/sau)', en: 'RPN Trend (Before/After)' },
       ui.renderChartWithTableFallback('chart-rpn-trend', null,
         [
-          { key: 'period', label: { vi: 'Thoi gian', en: 'Period' } },
-          { key: 'before_avg', label: { vi: 'RPN truoc', en: 'Before' }, type: 'number' },
+          { key: 'period', label: { vi: 'Thời gian', en: 'Period' } },
+          { key: 'before_avg', label: { vi: 'RPN trước', en: 'Before' }, type: 'number' },
           { key: 'after_avg', label: { vi: 'RPN sau', en: 'After' }, type: 'number' },
-          { key: 'reduction_pct', label: { vi: 'Giam %', en: 'Reduction %' }, type: 'number' }
+          { key: 'reduction_pct', label: { vi: 'Giảm %', en: 'Reduction %' }, type: 'number' }
         ],
         m.rpn_trend || []
       )
     );
 
     // AP Distribution
-    html += ui.renderSection({ vi: 'Phan bo AP', en: 'AP Distribution' },
+    html += ui.renderSection({ vi: 'Phân bổ AP', en: 'AP Distribution' },
       renderApDistribution(m.ap_distribution || {})
     );
 
     // Risk reduction effectiveness
-    html += ui.renderSection({ vi: 'Hieu qua giam rui ro', en: 'Risk Reduction Effectiveness' },
+    html += ui.renderSection({ vi: 'Hiệu quả giảm rủi ro', en: 'Risk Reduction Effectiveness' },
       ui.renderChartWithTableFallback('chart-risk-effectiveness', null,
         [
-          { key: 'category', label: { vi: 'Danh muc', en: 'Category' } },
-          { key: 'initial_avg', label: { vi: 'Ban dau TB', en: 'Initial Avg' }, type: 'number' },
-          { key: 'current_avg', label: { vi: 'Hien tai TB', en: 'Current Avg' }, type: 'number' },
-          { key: 'reduction', label: { vi: 'Giam', en: 'Reduction' }, type: 'number' }
+          { key: 'category', label: { vi: 'Danh mục', en: 'Category' } },
+          { key: 'initial_avg', label: { vi: 'Ban đầu TB', en: 'Initial Avg' }, type: 'number' },
+          { key: 'current_avg', label: { vi: 'Hiện tại TB', en: 'Current Avg' }, type: 'number' },
+          { key: 'reduction', label: { vi: 'Giảm', en: 'Reduction' }, type: 'number' }
         ],
         m.risk_effectiveness || []
       )
     );
 
     // Top 10 risks by score
-    html += ui.renderSection({ vi: 'Top 10 rui ro', en: 'Top 10 Risks by Score' },
+    html += ui.renderSection({ vi: 'Top 10 rủi ro', en: 'Top 10 Risks by Score' },
       ui.renderDataGrid([
-        { key: 'risk_id',    label: { vi: 'Ma', en: 'ID' },             type: 'id' },
-        { key: 'title',      label: { vi: 'Tieu de', en: 'Title' },     type: 'truncate' },
-        { key: 'category',   label: { vi: 'Danh muc', en: 'Category' }, type: 'badge' },
-        { key: 'risk_score', label: { vi: 'Diem', en: 'Score' },        render: function(v) { return riskScoreHtml(v); } },
-        { key: 'owner',      label: { vi: 'Chu', en: 'Owner' } },
-        { key: 'status',     label: { vi: 'Trang thai', en: 'Status' }, type: 'badge' }
+        { key: 'risk_id',    label: { vi: 'Mã', en: 'ID' },             type: 'id' },
+        { key: 'title',      label: { vi: 'Tiêu đề', en: 'Title' },     type: 'truncate' },
+        { key: 'category',   label: { vi: 'Danh mục', en: 'Category' }, type: 'badge' },
+        { key: 'risk_score', label: { vi: 'Điểm', en: 'Score' },        render: function(v) { return riskScoreHtml(v); } },
+        { key: 'owner',      label: { vi: 'Chủ', en: 'Owner' } },
+        { key: 'status',     label: { vi: 'Trạng thái', en: 'Status' }, type: 'badge' }
       ], m.top_risks || [], { selectable: false })
     );
 
     // Heatmap evolution
-    html += ui.renderSection({ vi: 'Tien trien ban do nhiet', en: 'Heatmap Evolution' },
+    html += ui.renderSection({ vi: 'Tiến triển bản đồ nhiệt', en: 'Heatmap Evolution' },
       ui.renderChartWithTableFallback('chart-heatmap-evolution', null,
         [
-          { key: 'period', label: { vi: 'Thoi gian', en: 'Period' } },
-          { key: 'green', label: { vi: 'Thap', en: 'Low' }, type: 'number' },
+          { key: 'period', label: { vi: 'Thời gian', en: 'Period' } },
+          { key: 'green', label: { vi: 'Thấp', en: 'Low' }, type: 'number' },
           { key: 'yellow', label: { vi: 'TB', en: 'Medium' }, type: 'number' },
           { key: 'orange', label: { vi: 'Cao', en: 'High' }, type: 'number' },
-          { key: 'red', label: { vi: 'Nghiem trong', en: 'Critical' }, type: 'number' }
+          { key: 'red', label: { vi: 'Nghiêm trọng', en: 'Critical' }, type: 'number' }
         ],
         m.heatmap_evolution || []
       )
@@ -891,66 +891,66 @@
   // ═══════════════════════════════════════════════════════════════════════
   function renderCreateRiskForm() {
     var steps = [
-      { label: { vi: 'Thong tin', en: 'Information' } },
-      { label: { vi: 'Danh gia', en: 'Assessment' } },
-      { label: { vi: 'Xem xet', en: 'Review' } }
+      { label: { vi: 'Thông tin', en: 'Information' } },
+      { label: { vi: 'Đánh giá', en: 'Assessment' } },
+      { label: { vi: 'Xem xét', en: 'Review' } }
     ];
     var body = '';
-    body += ui.renderFormField({ key: 'title', label: { vi: 'Tieu de', en: 'Title' }, required: true });
-    body += ui.renderFormField({ key: 'category', label: { vi: 'Danh muc', en: 'Category' }, type: 'select', options: RISK_CATEGORIES, required: true });
-    body += ui.renderFormField({ key: 'description', label: { vi: 'Mo ta', en: 'Description' }, type: 'textarea' });
-    body += ui.renderFormField({ key: 'owner', label: { vi: 'Chu so huu', en: 'Owner' }, required: true });
-    body += ui.renderFormField({ key: 'likelihood', label: { vi: 'Kha nang (1-5)', en: 'Likelihood (1-5)' }, type: 'number', min: 1, max: 5 });
-    body += ui.renderFormField({ key: 'severity', label: { vi: 'Muc do (1-5)', en: 'Severity (1-5)' }, type: 'number', min: 1, max: 5 });
-    body += ui.renderFormField({ key: 'review_date', label: { vi: 'Ngay xem xet', en: 'Review Date' }, type: 'date' });
+    body += ui.renderFormField({ key: 'title', label: { vi: 'Tiêu đề', en: 'Title' }, required: true });
+    body += ui.renderFormField({ key: 'category', label: { vi: 'Danh mục', en: 'Category' }, type: 'select', options: RISK_CATEGORIES, required: true });
+    body += ui.renderFormField({ key: 'description', label: { vi: 'Mô tả', en: 'Description' }, type: 'textarea' });
+    body += ui.renderFormField({ key: 'owner', label: { vi: 'Chủ sở hữu', en: 'Owner' }, required: true });
+    body += ui.renderFormField({ key: 'likelihood', label: { vi: 'Khả năng (1-5)', en: 'Likelihood (1-5)' }, type: 'number', min: 1, max: 5 });
+    body += ui.renderFormField({ key: 'severity', label: { vi: 'Mức độ (1-5)', en: 'Severity (1-5)' }, type: 'number', min: 1, max: 5 });
+    body += ui.renderFormField({ key: 'review_date', label: { vi: 'Ngày xem xét', en: 'Review Date' }, type: 'date' });
     return ui.renderWizardShell(steps, 0, body, { saveDraft: true });
   }
 
   function renderCreateFmeaForm() {
     var body = '';
-    body += ui.renderFormField({ key: 'title', label: { vi: 'Tieu de', en: 'Title' }, required: true });
-    body += ui.renderFormField({ key: 'fmea_type', label: { vi: 'Loai FMEA', en: 'FMEA Type' }, type: 'select', options: FMEA_TYPES, required: true });
-    body += ui.renderFormField({ key: 'item_function', label: { vi: 'Chuc nang/San pham', en: 'Item/Function' }, required: true });
-    body += ui.renderFormField({ key: 'team_lead', label: { vi: 'Truong nhom', en: 'Team Lead' }, required: true });
-    body += ui.renderFormField({ key: 'team_members', label: { vi: 'Thanh vien', en: 'Team Members' }, placeholder: { vi: 'Cach nhau dau phay', en: 'Comma separated' } });
-    body += ui.renderFormField({ key: 'scope', label: { vi: 'Pham vi', en: 'Scope' }, type: 'textarea' });
+    body += ui.renderFormField({ key: 'title', label: { vi: 'Tiêu đề', en: 'Title' }, required: true });
+    body += ui.renderFormField({ key: 'fmea_type', label: { vi: 'Loại FMEA', en: 'FMEA Type' }, type: 'select', options: FMEA_TYPES, required: true });
+    body += ui.renderFormField({ key: 'item_function', label: { vi: 'Chức năng/Sản phẩm', en: 'Item/Function' }, required: true });
+    body += ui.renderFormField({ key: 'team_lead', label: { vi: 'Trưởng nhóm', en: 'Team Lead' }, required: true });
+    body += ui.renderFormField({ key: 'team_members', label: { vi: 'Thành viên', en: 'Team Members' }, placeholder: { vi: 'Cách nhau dấu phẩy', en: 'Comma separated' } });
+    body += ui.renderFormField({ key: 'scope', label: { vi: 'Phạm vi', en: 'Scope' }, type: 'textarea' });
     return ui.renderWizardShell([
-      { label: { vi: 'Thong tin', en: 'Information' } },
-      { label: { vi: 'Xem xet', en: 'Review' } }
+      { label: { vi: 'Thông tin', en: 'Information' } },
+      { label: { vi: 'Xem xét', en: 'Review' } }
     ], 0, body, { saveDraft: true });
   }
 
   function renderAddControlForm() {
     var body = '';
-    body += ui.renderFormField({ key: 'description', label: { vi: 'Mo ta kiem soat', en: 'Control Description' }, type: 'textarea', required: true });
-    body += ui.renderFormField({ key: 'type', label: { vi: 'Loai', en: 'Type' }, type: 'select', options: CONTROL_TYPES, required: true });
-    body += ui.renderFormField({ key: 'owner', label: { vi: 'Nguoi phu trach', en: 'Owner' }, required: true });
-    body += ui.renderFormField({ key: 'verification_date', label: { vi: 'Ngay xac minh du kien', en: 'Planned Verification Date' }, type: 'date' });
+    body += ui.renderFormField({ key: 'description', label: { vi: 'Mô tả kiểm soát', en: 'Control Description' }, type: 'textarea', required: true });
+    body += ui.renderFormField({ key: 'type', label: { vi: 'Loại', en: 'Type' }, type: 'select', options: CONTROL_TYPES, required: true });
+    body += ui.renderFormField({ key: 'owner', label: { vi: 'Người phụ trách', en: 'Owner' }, required: true });
+    body += ui.renderFormField({ key: 'verification_date', label: { vi: 'Ngày xác minh dự kiến', en: 'Planned Verification Date' }, type: 'date' });
     return '<div class="eqms-modal-body">' + body + '</div>' +
       '<div class="eqms-modal-footer">' +
-      '<button class="eqms-btn secondary" data-action="cancel-modal">' + T({ vi: 'Huy', en: 'Cancel' }) + '</button>' +
-      '<button class="eqms-btn primary" data-action="submit-control">' + T({ vi: 'Them', en: 'Add' }) + '</button>' +
+      '<button class="eqms-btn secondary" data-action="cancel-modal">' + T({ vi: 'Hủy', en: 'Cancel' }) + '</button>' +
+      '<button class="eqms-btn primary" data-action="submit-control">' + T({ vi: 'Thêm', en: 'Add' }) + '</button>' +
       '</div>';
   }
 
   function renderAddFailureModeForm() {
     var body = '';
-    body += ui.renderFormField({ key: 'item_function', label: { vi: 'Chuc nang', en: 'Item/Function' }, required: true });
-    body += ui.renderFormField({ key: 'failure_mode', label: { vi: 'Che do loi', en: 'Failure Mode' }, required: true });
-    body += ui.renderFormField({ key: 'potential_effect', label: { vi: 'Anh huong tiem an', en: 'Potential Effect' }, type: 'textarea' });
-    body += ui.renderFormField({ key: 'severity', label: { vi: 'Muc do S (1-10)', en: 'Severity S (1-10)' }, type: 'number', min: 1, max: 10, required: true });
-    body += ui.renderFormField({ key: 'potential_cause', label: { vi: 'Nguyen nhan', en: 'Potential Cause' }, type: 'textarea' });
-    body += ui.renderFormField({ key: 'prevention_controls', label: { vi: 'KS Phong ngua', en: 'Prevention Controls' }, type: 'textarea' });
-    body += ui.renderFormField({ key: 'occurrence', label: { vi: 'Xuat hien O (1-10)', en: 'Occurrence O (1-10)' }, type: 'number', min: 1, max: 10, required: true });
-    body += ui.renderFormField({ key: 'detection_controls', label: { vi: 'KS Phat hien', en: 'Detection Controls' }, type: 'textarea' });
-    body += ui.renderFormField({ key: 'detection', label: { vi: 'Phat hien D (1-10)', en: 'Detection D (1-10)' }, type: 'number', min: 1, max: 10, required: true });
-    body += ui.renderFormField({ key: 'recommended_actions', label: { vi: 'Hanh dong de nghi', en: 'Recommended Actions' }, type: 'textarea' });
-    body += ui.renderFormField({ key: 'responsibility', label: { vi: 'Phu trach', en: 'Responsibility' } });
-    body += ui.renderFormField({ key: 'target_date', label: { vi: 'Ngay muc tieu', en: 'Target Date' }, type: 'date' });
+    body += ui.renderFormField({ key: 'item_function', label: { vi: 'Chức năng', en: 'Item/Function' }, required: true });
+    body += ui.renderFormField({ key: 'failure_mode', label: { vi: 'Chế độ lỗi', en: 'Failure Mode' }, required: true });
+    body += ui.renderFormField({ key: 'potential_effect', label: { vi: 'Ảnh hưởng tiềm ẩn', en: 'Potential Effect' }, type: 'textarea' });
+    body += ui.renderFormField({ key: 'severity', label: { vi: 'Mức độ S (1-10)', en: 'Severity S (1-10)' }, type: 'number', min: 1, max: 10, required: true });
+    body += ui.renderFormField({ key: 'potential_cause', label: { vi: 'Nguyên nhân', en: 'Potential Cause' }, type: 'textarea' });
+    body += ui.renderFormField({ key: 'prevention_controls', label: { vi: 'KS Phòng ngừa', en: 'Prevention Controls' }, type: 'textarea' });
+    body += ui.renderFormField({ key: 'occurrence', label: { vi: 'Xuất hiện O (1-10)', en: 'Occurrence O (1-10)' }, type: 'number', min: 1, max: 10, required: true });
+    body += ui.renderFormField({ key: 'detection_controls', label: { vi: 'KS Phát hiện', en: 'Detection Controls' }, type: 'textarea' });
+    body += ui.renderFormField({ key: 'detection', label: { vi: 'Phát hiện D (1-10)', en: 'Detection D (1-10)' }, type: 'number', min: 1, max: 10, required: true });
+    body += ui.renderFormField({ key: 'recommended_actions', label: { vi: 'Hành động đề nghị', en: 'Recommended Actions' }, type: 'textarea' });
+    body += ui.renderFormField({ key: 'responsibility', label: { vi: 'Phụ trách', en: 'Responsibility' } });
+    body += ui.renderFormField({ key: 'target_date', label: { vi: 'Ngày mục tiêu', en: 'Target Date' }, type: 'date' });
     return '<div class="eqms-modal-body">' + body + '</div>' +
       '<div class="eqms-modal-footer">' +
-      '<button class="eqms-btn secondary" data-action="cancel-modal">' + T({ vi: 'Huy', en: 'Cancel' }) + '</button>' +
-      '<button class="eqms-btn primary" data-action="submit-failure-mode">' + T({ vi: 'Them', en: 'Add' }) + '</button>' +
+      '<button class="eqms-btn secondary" data-action="cancel-modal">' + T({ vi: 'Hủy', en: 'Cancel' }) + '</button>' +
+      '<button class="eqms-btn primary" data-action="submit-failure-mode">' + T({ vi: 'Thêm', en: 'Add' }) + '</button>' +
       '</div>';
   }
 
@@ -997,13 +997,13 @@
         case 'back-to-fmea':
           state.screen = 'fmea-list'; state.fmeaRecord = null; loadFmeas(); break;
         case 'create-risk':
-          showModal({ vi: 'Tao rui ro moi', en: 'Create New Risk' }, renderCreateRiskForm()); break;
+          showModal({ vi: 'Tạo rủi ro mới', en: 'Create New Risk' }, renderCreateRiskForm()); break;
         case 'create-fmea':
-          showModal({ vi: 'Tao FMEA moi', en: 'Create New FMEA' }, renderCreateFmeaForm()); break;
+          showModal({ vi: 'Tạo FMEA mới', en: 'Create New FMEA' }, renderCreateFmeaForm()); break;
         case 'add-control':
-          showModal({ vi: 'Them kiem soat', en: 'Add Control' }, renderAddControlForm()); break;
+          showModal({ vi: 'Thêm kiểm soát', en: 'Add Control' }, renderAddControlForm()); break;
         case 'add-failure-mode':
-          showModal({ vi: 'Them Failure Mode', en: 'Add Failure Mode' }, renderAddFailureModeForm()); break;
+          showModal({ vi: 'Thêm Failure Mode', en: 'Add Failure Mode' }, renderAddFailureModeForm()); break;
 
         case 'wizard-submit':
           handleWizardSubmit(); break;
@@ -1098,10 +1098,10 @@
     var endpoint = state.screen === 'fmea-list' ? 'eqms_fmea_create' : 'eqms_risks_create';
     apiCall(endpoint, data).then(function(r) {
       closeModal();
-      toast(T({ vi: 'Da tao thanh cong', en: 'Created successfully' }));
+      toast(T({ vi: 'Đã tạo thành công', en: 'Created successfully' }));
       if (state.screen === 'fmea-list') loadFmeas(); else loadRisks();
     }).catch(function(err) {
-      toast(T({ vi: 'Loi: ' + (err.message || ''), en: 'Error: ' + (err.message || '') }));
+      toast(T({ vi: 'Lỗi: ' + (err.message || ''), en: 'Error: ' + (err.message || '') }));
     });
   }
 
@@ -1112,9 +1112,9 @@
     data.risk_id = state.record.id || state.record.risk_id;
     apiCall('eqms_risks_action_add_control', { id: data.risk_id, control: data }).then(function() {
       closeModal();
-      toast(T({ vi: 'Da them kiem soat', en: 'Control added' }));
+      toast(T({ vi: 'Đã thêm kiểm soát', en: 'Control added' }));
       loadRiskDetail(data.risk_id);
-    }).catch(function(err) { toast(T({ vi: 'Loi', en: 'Error' }) + ': ' + (err.message || '')); });
+    }).catch(function(err) { toast(T({ vi: 'Lỗi', en: 'Error' }) + ': ' + (err.message || '')); });
   }
 
   function handleSubmitFailureMode() {
@@ -1124,9 +1124,9 @@
     data.fmea_id = state.fmeaRecord.id || state.fmeaRecord.fmea_id;
     apiCall('eqms_fmea_update', { id: data.fmea_id, action: 'add-failure-mode', failure_mode: data }).then(function() {
       closeModal();
-      toast(T({ vi: 'Da them failure mode', en: 'Failure mode added' }));
+      toast(T({ vi: 'Đã thêm failure mode', en: 'Failure mode added' }));
       loadFmeaDetail(data.fmea_id);
-    }).catch(function(err) { toast(T({ vi: 'Loi', en: 'Error' }) + ': ' + (err.message || '')); });
+    }).catch(function(err) { toast(T({ vi: 'Lỗi', en: 'Error' }) + ': ' + (err.message || '')); });
   }
 
   function handleWorkflowAction(action, payload) {
@@ -1134,16 +1134,16 @@
     var id = state.record.id || state.record.risk_id;
     var endpoint = 'eqms_risks_action_' + action.replace(/-/g, '_');
     apiCall(endpoint, Object.assign({ id: id }, payload || {})).then(function() {
-      toast(T({ vi: 'Cap nhat thanh cong', en: 'Updated successfully' }));
+      toast(T({ vi: 'Cập nhật thành công', en: 'Updated successfully' }));
       loadRiskDetail(id);
-    }).catch(function(err) { toast(T({ vi: 'Loi', en: 'Error' }) + ': ' + (err.message || '')); });
+    }).catch(function(err) { toast(T({ vi: 'Lỗi', en: 'Error' }) + ': ' + (err.message || '')); });
   }
 
   function handleExport(format) {
     var endpoint = state.screen === 'fmea-list' ? 'eqms_fmea_export' : 'eqms_risks_export';
     apiCall(endpoint, { format: format }, 'GET').then(function(r) {
       if (r && r.url) window.open(r.url, '_blank');
-      else toast(T({ vi: 'Da yeu cau xuat', en: 'Export requested' }));
+      else toast(T({ vi: 'Đã yêu cầu xuất', en: 'Export requested' }));
     });
   }
 

@@ -31,7 +31,7 @@
     id:        'complaints',
     version:   '1.0.0',
     archetype: 'exception-hub',
-    label:     { vi: 'Khieu nai khach hang', en: 'Customer Complaints' },
+    label:     { vi: 'Khiếu nại khách hàng', en: 'Customer Complaints' },
     icon:      '\uD83D\uDCE2'
   };
 
@@ -715,107 +715,107 @@
       // ── Step 1: Customer Information ────────────────────────────────────
       case 0:
         return '<div class="eqms-wizard-step-content">' +
-          '<h3>' + T({ vi: 'Thong tin khach hang', en: 'Customer Information' }) + '</h3>' +
+          '<h3>' + T({ vi: 'Thông tin khách hàng', en: 'Customer Information' }) + '</h3>' +
           '<div class="eqms-form-row">' +
-            ui.renderFormField({ key: 'customer_name', label: { vi: 'Ten khach hang', en: 'Customer Name' }, type: 'text', required: true, value: d.customer_name || '', error: e.customer_name, placeholder: { vi: 'Nhap ten khach hang', en: 'Enter customer name' } }) +
-            ui.renderFormField({ key: 'customer_id', label: { vi: 'Ma khach hang', en: 'Customer ID' }, type: 'text', value: d.customer_id || '', placeholder: { vi: 'Ma noi bo / SAP', en: 'Internal / SAP ID' } }) +
+            ui.renderFormField({ key: 'customer_name', label: { vi: 'Tên khách hàng', en: 'Customer Name' }, type: 'text', required: true, value: d.customer_name || '', error: e.customer_name, placeholder: { vi: 'Nhập tên khách hàng', en: 'Enter customer name' } }) +
+            ui.renderFormField({ key: 'customer_id', label: { vi: 'Mã khách hàng', en: 'Customer ID' }, type: 'text', value: d.customer_id || '', placeholder: { vi: 'Mã nội bộ / SAP', en: 'Internal / SAP ID' } }) +
           '</div>' +
           '<div class="eqms-form-row">' +
-            ui.renderFormField({ key: 'contact_name', label: { vi: 'Nguoi lien he', en: 'Contact Person' }, type: 'text', value: d.contact_name || '' }) +
-            ui.renderFormField({ key: 'contact_email', label: { vi: 'Email lien he', en: 'Contact Email' }, type: 'email', value: d.contact_email || '' }) +
-            ui.renderFormField({ key: 'contact_phone', label: { vi: 'Dien thoai', en: 'Phone' }, type: 'text', value: d.contact_phone || '' }) +
+            ui.renderFormField({ key: 'contact_name', label: { vi: 'Người liên hệ', en: 'Contact Person' }, type: 'text', value: d.contact_name || '' }) +
+            ui.renderFormField({ key: 'contact_email', label: { vi: 'Email liên hệ', en: 'Contact Email' }, type: 'email', value: d.contact_email || '' }) +
+            ui.renderFormField({ key: 'contact_phone', label: { vi: 'Điện thoại', en: 'Phone' }, type: 'text', value: d.contact_phone || '' }) +
           '</div>' +
           '<div class="eqms-form-row">' +
-            ui.renderFormField({ key: 'purchase_order', label: { vi: 'So PO', en: 'Purchase Order' }, type: 'text', value: d.purchase_order || '' }) +
-            ui.renderFormField({ key: 'product_name', label: { vi: 'San pham', en: 'Product' }, type: 'text', value: d.product_name || '', placeholder: { vi: 'Ten hoac ma san pham', en: 'Product name or code' } }) +
-            ui.renderFormField({ key: 'lot_number', label: { vi: 'So lo', en: 'Lot / Batch Number' }, type: 'text', value: d.lot_number || '' }) +
+            ui.renderFormField({ key: 'purchase_order', label: { vi: 'Số PO', en: 'Purchase Order' }, type: 'text', value: d.purchase_order || '' }) +
+            ui.renderFormField({ key: 'product_name', label: { vi: 'Sản phẩm', en: 'Product' }, type: 'text', value: d.product_name || '', placeholder: { vi: 'Tên hoặc mã sản phẩm', en: 'Product name or code' } }) +
+            ui.renderFormField({ key: 'lot_number', label: { vi: 'Số lô', en: 'Lot / Batch Number' }, type: 'text', value: d.lot_number || '' }) +
           '</div>' +
         '</div>';
 
       // ── Step 2: Complaint Details ──────────────────────────────────────
       case 1:
         return '<div class="eqms-wizard-step-content">' +
-          '<h3>' + T({ vi: 'Chi tiet khieu nai', en: 'Complaint Details' }) + '</h3>' +
+          '<h3>' + T({ vi: 'Chi tiết khiếu nại', en: 'Complaint Details' }) + '</h3>' +
           '<div class="eqms-form-row">' +
-            ui.renderFormField({ key: 'subject', label: { vi: 'Chu de', en: 'Subject' }, type: 'text', required: true, value: d.subject || '', error: e.subject, placeholder: { vi: 'Tom tat ngan gon khieu nai', en: 'Brief complaint summary' } }) +
+            ui.renderFormField({ key: 'subject', label: { vi: 'Chủ đề', en: 'Subject' }, type: 'text', required: true, value: d.subject || '', error: e.subject, placeholder: { vi: 'Tóm tắt ngắn gọn khiếu nại', en: 'Brief complaint summary' } }) +
           '</div>' +
           '<div class="eqms-form-row">' +
-            ui.renderFormField({ key: 'description', label: { vi: 'Mo ta chi tiet', en: 'Detailed Description' }, type: 'textarea', required: true, value: d.description || '', error: e.description, placeholder: { vi: 'Mo ta day du khieu nai: trieu chung, dieu kien, tan suat...', en: 'Full complaint description: symptoms, conditions, frequency...' } }) +
+            ui.renderFormField({ key: 'description', label: { vi: 'Mô tả chi tiết', en: 'Detailed Description' }, type: 'textarea', required: true, value: d.description || '', error: e.description, placeholder: { vi: 'Mô tả đầy đủ khiếu nại: triệu chứng, điều kiện, tần suất...', en: 'Full complaint description: symptoms, conditions, frequency...' } }) +
           '</div>' +
           '<div class="eqms-form-row">' +
-            ui.renderFormField({ key: 'defect_type', label: { vi: 'Loai loi', en: 'Defect Type' }, type: 'select', value: d.defect_type || '', options: [
-              { value: 'visual',       label: { vi: 'Ngoai quan', en: 'Visual / Cosmetic' } },
-              { value: 'dimensional',   label: { vi: 'Kich thuoc', en: 'Dimensional' } },
-              { value: 'functional',    label: { vi: 'Chuc nang', en: 'Functional' } },
-              { value: 'material',      label: { vi: 'Vat lieu', en: 'Material' } },
-              { value: 'contamination', label: { vi: 'Nhiem ban', en: 'Contamination' } },
-              { value: 'documentation', label: { vi: 'Tai lieu', en: 'Documentation' } },
-              { value: 'other',         label: { vi: 'Khac', en: 'Other' } }
+            ui.renderFormField({ key: 'defect_type', label: { vi: 'Loại lỗi', en: 'Defect Type' }, type: 'select', value: d.defect_type || '', options: [
+              { value: 'visual',       label: { vi: 'Ngoại quan', en: 'Visual / Cosmetic' } },
+              { value: 'dimensional',   label: { vi: 'Kích thước', en: 'Dimensional' } },
+              { value: 'functional',    label: { vi: 'Chức năng', en: 'Functional' } },
+              { value: 'material',      label: { vi: 'Vật liệu', en: 'Material' } },
+              { value: 'contamination', label: { vi: 'Nhiễm bẩn', en: 'Contamination' } },
+              { value: 'documentation', label: { vi: 'Tài liệu', en: 'Documentation' } },
+              { value: 'other',         label: { vi: 'Khác', en: 'Other' } }
             ] }) +
-            ui.renderFormField({ key: 'severity', label: { vi: 'Muc do nghiem trong', en: 'Severity' }, type: 'select', required: true, value: d.severity || '', error: e.severity, options: SEVERITY_OPTIONS }) +
+            ui.renderFormField({ key: 'severity', label: { vi: 'Mức độ nghiêm trọng', en: 'Severity' }, type: 'select', required: true, value: d.severity || '', error: e.severity, options: SEVERITY_OPTIONS }) +
           '</div>' +
           '<div class="eqms-form-row">' +
-            ui.renderFormField({ key: 'quantity_affected', label: { vi: 'So luong anh huong', en: 'Quantity Affected' }, type: 'number', value: d.quantity_affected || '', min: 0 }) +
-            ui.renderFormField({ key: 'quantity_shipped', label: { vi: 'So luong da giao', en: 'Quantity Shipped' }, type: 'number', value: d.quantity_shipped || '', min: 0 }) +
-            ui.renderFormField({ key: 'received_date', label: { vi: 'Ngay nhan khieu nai', en: 'Date Received' }, type: 'date', required: true, value: d.received_date || '', error: e.received_date }) +
+            ui.renderFormField({ key: 'quantity_affected', label: { vi: 'Số lượng ảnh hưởng', en: 'Quantity Affected' }, type: 'number', value: d.quantity_affected || '', min: 0 }) +
+            ui.renderFormField({ key: 'quantity_shipped', label: { vi: 'Số lượng đã giao', en: 'Quantity Shipped' }, type: 'number', value: d.quantity_shipped || '', min: 0 }) +
+            ui.renderFormField({ key: 'received_date', label: { vi: 'Ngày nhận khiếu nại', en: 'Date Received' }, type: 'date', required: true, value: d.received_date || '', error: e.received_date }) +
           '</div>' +
         '</div>';
 
       // ── Step 3: Classification ─────────────────────────────────────────
       case 2:
         return '<div class="eqms-wizard-step-content">' +
-          '<h3>' + T({ vi: 'Phan loai', en: 'Classification' }) + '</h3>' +
+          '<h3>' + T({ vi: 'Phân loại', en: 'Classification' }) + '</h3>' +
           '<div class="eqms-form-row">' +
-            ui.renderFormField({ key: 'category', label: { vi: 'Danh muc', en: 'Category' }, type: 'select', value: d.category || '', options: CATEGORY_OPTIONS }) +
-            ui.renderFormField({ key: 'source', label: { vi: 'Nguon phat hien', en: 'Complaint Source' }, type: 'select', value: d.source || '', options: SOURCE_OPTIONS }) +
+            ui.renderFormField({ key: 'category', label: { vi: 'Danh mục', en: 'Category' }, type: 'select', value: d.category || '', options: CATEGORY_OPTIONS }) +
+            ui.renderFormField({ key: 'source', label: { vi: 'Nguồn phát hiện', en: 'Complaint Source' }, type: 'select', value: d.source || '', options: SOURCE_OPTIONS }) +
           '</div>' +
           '<div class="eqms-form-row">' +
-            ui.renderFormField({ key: 'detection_method', label: { vi: 'Phuong phap phat hien', en: 'Detection Method' }, type: 'select', value: d.detection_method || '', options: DETECTION_OPTIONS }) +
-            ui.renderFormField({ key: 'department', label: { vi: 'Bo phan lien quan', en: 'Related Department' }, type: 'select', value: d.department || '', options: [
-              { value: 'production',   label: { vi: 'San xuat', en: 'Production' } },
-              { value: 'quality',      label: { vi: 'Chat luong', en: 'Quality' } },
-              { value: 'engineering',  label: { vi: 'Ky thuat', en: 'Engineering' } },
-              { value: 'logistics',    label: { vi: 'Hau can', en: 'Logistics' } },
-              { value: 'procurement',  label: { vi: 'Mua hang', en: 'Procurement' } },
+            ui.renderFormField({ key: 'detection_method', label: { vi: 'Phương pháp phát hiện', en: 'Detection Method' }, type: 'select', value: d.detection_method || '', options: DETECTION_OPTIONS }) +
+            ui.renderFormField({ key: 'department', label: { vi: 'Bộ phận liên quan', en: 'Related Department' }, type: 'select', value: d.department || '', options: [
+              { value: 'production',   label: { vi: 'Sản xuất', en: 'Production' } },
+              { value: 'quality',      label: { vi: 'Chất lượng', en: 'Quality' } },
+              { value: 'engineering',  label: { vi: 'Kỹ thuật', en: 'Engineering' } },
+              { value: 'logistics',    label: { vi: 'Hậu cần', en: 'Logistics' } },
+              { value: 'procurement',  label: { vi: 'Mua hàng', en: 'Procurement' } },
               { value: 'sales',        label: { vi: 'Kinh doanh', en: 'Sales' } }
             ] }) +
           '</div>' +
           '<div class="eqms-form-row">' +
-            ui.renderFormField({ key: 'regulatory_impact', label: { vi: 'Anh huong quy dinh', en: 'Regulatory Impact' }, type: 'select', value: d.regulatory_impact || '', options: [
-              { value: 'none',  label: { vi: 'Khong', en: 'None' } },
-              { value: 'low',   label: { vi: 'Thap', en: 'Low' } },
-              { value: 'medium', label: { vi: 'Trung binh', en: 'Medium' } },
+            ui.renderFormField({ key: 'regulatory_impact', label: { vi: 'Ảnh hưởng quy định', en: 'Regulatory Impact' }, type: 'select', value: d.regulatory_impact || '', options: [
+              { value: 'none',  label: { vi: 'Không', en: 'None' } },
+              { value: 'low',   label: { vi: 'Thấp', en: 'Low' } },
+              { value: 'medium', label: { vi: 'Trung bình', en: 'Medium' } },
               { value: 'high',  label: { vi: 'Cao', en: 'High' } },
-              { value: 'critical', label: { vi: 'Nghiem trong', en: 'Critical — Potential Reportable' } }
+              { value: 'critical', label: { vi: 'Nghiêm trọng', en: 'Critical — Potential Reportable' } }
             ] }) +
-            ui.renderFormField({ key: 'regulatory_reference', label: { vi: 'Tham chieu quy dinh', en: 'Regulatory Reference' }, type: 'text', value: d.regulatory_reference || '', placeholder: { vi: 'VD: FDA MDR, EU Vigilance...', en: 'e.g. FDA MDR, EU Vigilance...' } }) +
+            ui.renderFormField({ key: 'regulatory_reference', label: { vi: 'Tham chiếu quy định', en: 'Regulatory Reference' }, type: 'text', value: d.regulatory_reference || '', placeholder: { vi: 'VD: FDA MDR, EU Vigilance...', en: 'e.g. FDA MDR, EU Vigilance...' } }) +
           '</div>' +
         '</div>';
 
       // ── Step 4: Initial Assessment ─────────────────────────────────────
       case 3:
         return '<div class="eqms-wizard-step-content">' +
-          '<h3>' + T({ vi: 'Danh gia ban dau', en: 'Initial Assessment' }) + '</h3>' +
+          '<h3>' + T({ vi: 'Đánh giá ban đầu', en: 'Initial Assessment' }) + '</h3>' +
           '<div class="eqms-form-row">' +
-            ui.renderFormField({ key: 'risk_level', label: { vi: 'Muc do rui ro', en: 'Risk Level' }, type: 'select', value: d.risk_level || '', options: [
-              { value: 'low',      label: { vi: 'Thap', en: 'Low' } },
-              { value: 'medium',   label: { vi: 'Trung binh', en: 'Medium' } },
+            ui.renderFormField({ key: 'risk_level', label: { vi: 'Mức độ rủi ro', en: 'Risk Level' }, type: 'select', value: d.risk_level || '', options: [
+              { value: 'low',      label: { vi: 'Thấp', en: 'Low' } },
+              { value: 'medium',   label: { vi: 'Trung bình', en: 'Medium' } },
               { value: 'high',     label: { vi: 'Cao', en: 'High' } },
-              { value: 'critical', label: { vi: 'Nghiem trong', en: 'Critical' } }
+              { value: 'critical', label: { vi: 'Nghiêm trọng', en: 'Critical' } }
             ] }) +
-            ui.renderFormField({ key: 'priority', label: { vi: 'Do uu tien', en: 'Priority' }, type: 'select', value: d.priority || '', options: PRIORITY_OPTIONS }) +
+            ui.renderFormField({ key: 'priority', label: { vi: 'Độ ưu tiên', en: 'Priority' }, type: 'select', value: d.priority || '', options: PRIORITY_OPTIONS }) +
           '</div>' +
           '<div class="eqms-form-row">' +
-            ui.renderFormField({ key: 'containment_needed', label: { vi: 'Can hanh dong ngan chan?', en: 'Containment Needed?' }, type: 'select', value: d.containment_needed || '', options: [
-              { value: 'yes', label: { vi: 'Co', en: 'Yes' } },
-              { value: 'no',  label: { vi: 'Khong', en: 'No' } },
-              { value: 'tbd', label: { vi: 'Can danh gia', en: 'To Be Determined' } }
+            ui.renderFormField({ key: 'containment_needed', label: { vi: 'Cần hành động ngăn chặn?', en: 'Containment Needed?' }, type: 'select', value: d.containment_needed || '', options: [
+              { value: 'yes', label: { vi: 'Có', en: 'Yes' } },
+              { value: 'no',  label: { vi: 'Không', en: 'No' } },
+              { value: 'tbd', label: { vi: 'Cần đánh giá', en: 'To Be Determined' } }
             ] }) +
-            ui.renderFormField({ key: 'assigned_to', label: { vi: 'Phan cong cho', en: 'Assign To' }, type: 'text', value: d.assigned_to || '', placeholder: { vi: 'Ten nguoi phu trach', en: 'Name of responsible person' } }) +
+            ui.renderFormField({ key: 'assigned_to', label: { vi: 'Phân công cho', en: 'Assign To' }, type: 'text', value: d.assigned_to || '', placeholder: { vi: 'Tên người phụ trách', en: 'Name of responsible person' } }) +
           '</div>' +
           '<div class="eqms-form-row">' +
-            ui.renderFormField({ key: 'due_date', label: { vi: 'Han xu ly', en: 'Due Date' }, type: 'date', value: d.due_date || '' }) +
-            ui.renderFormField({ key: 'initial_assessment_notes', label: { vi: 'Ghi chu danh gia', en: 'Assessment Notes' }, type: 'textarea', value: d.initial_assessment_notes || '', placeholder: { vi: 'Nhan xet ban dau, huong xu ly...', en: 'Initial observations, proposed approach...' } }) +
+            ui.renderFormField({ key: 'due_date', label: { vi: 'Hạn xử lý', en: 'Due Date' }, type: 'date', value: d.due_date || '' }) +
+            ui.renderFormField({ key: 'initial_assessment_notes', label: { vi: 'Ghi chú đánh giá', en: 'Assessment Notes' }, type: 'textarea', value: d.initial_assessment_notes || '', placeholder: { vi: 'Nhận xét ban đầu, hướng xử lý...', en: 'Initial observations, proposed approach...' } }) +
           '</div>' +
         '</div>';
 
@@ -831,49 +831,49 @@
   function renderWizardReview() {
     var d = state.wizardData;
     var html = '<div class="eqms-wizard-step-content">';
-    html += '<h3>' + T({ vi: 'Xem lai thong tin truoc khi gui', en: 'Review Before Submitting' }) + '</h3>';
+    html += '<h3>' + T({ vi: 'Xem lại thông tin trước khi gửi', en: 'Review Before Submitting' }) + '</h3>';
 
-    html += ui.renderSection({ vi: 'Khach hang', en: 'Customer' },
+    html += ui.renderSection({ vi: 'Khách hàng', en: 'Customer' },
       ui.renderFieldGrid([
-        { label: { vi: 'Ten khach hang', en: 'Customer Name' },    value: d.customer_name },
-        { label: { vi: 'Ma khach hang', en: 'Customer ID' },       value: d.customer_id },
-        { label: { vi: 'Nguoi lien he', en: 'Contact' },           value: d.contact_name },
+        { label: { vi: 'Tên khách hàng', en: 'Customer Name' },    value: d.customer_name },
+        { label: { vi: 'Mã khách hàng', en: 'Customer ID' },       value: d.customer_id },
+        { label: { vi: 'Người liên hệ', en: 'Contact' },           value: d.contact_name },
         { label: { vi: 'Email', en: 'Email' },                     value: d.contact_email },
-        { label: { vi: 'Dien thoai', en: 'Phone' },                value: d.contact_phone },
-        { label: { vi: 'So PO', en: 'PO Number' },                 value: d.purchase_order },
-        { label: { vi: 'San pham', en: 'Product' },                value: d.product_name },
-        { label: { vi: 'So lo', en: 'Lot Number' },                value: d.lot_number }
+        { label: { vi: 'Điện thoại', en: 'Phone' },                value: d.contact_phone },
+        { label: { vi: 'Số PO', en: 'PO Number' },                 value: d.purchase_order },
+        { label: { vi: 'Sản phẩm', en: 'Product' },                value: d.product_name },
+        { label: { vi: 'Số lô', en: 'Lot Number' },                value: d.lot_number }
       ])
     );
 
-    html += ui.renderSection({ vi: 'Chi tiet', en: 'Details' },
+    html += ui.renderSection({ vi: 'Chi tiết', en: 'Details' },
       ui.renderFieldGrid([
-        { label: { vi: 'Chu de', en: 'Subject' },               value: d.subject },
-        { label: { vi: 'Mo ta', en: 'Description' },            value: d.description },
-        { label: { vi: 'Loai loi', en: 'Defect Type' },         value: d.defect_type },
-        { label: { vi: 'Muc do', en: 'Severity' },              value: d.severity, badge: true },
-        { label: { vi: 'SL anh huong', en: 'Qty Affected' },    value: d.quantity_affected },
-        { label: { vi: 'Ngay nhan', en: 'Date Received' },      value: fmtDate(d.received_date) }
+        { label: { vi: 'Chủ đề', en: 'Subject' },               value: d.subject },
+        { label: { vi: 'Mô tả', en: 'Description' },            value: d.description },
+        { label: { vi: 'Loại lỗi', en: 'Defect Type' },         value: d.defect_type },
+        { label: { vi: 'Mức độ', en: 'Severity' },              value: d.severity, badge: true },
+        { label: { vi: 'SL ảnh hưởng', en: 'Qty Affected' },    value: d.quantity_affected },
+        { label: { vi: 'Ngày nhận', en: 'Date Received' },      value: fmtDate(d.received_date) }
       ])
     );
 
-    html += ui.renderSection({ vi: 'Phan loai', en: 'Classification' },
+    html += ui.renderSection({ vi: 'Phân loại', en: 'Classification' },
       ui.renderFieldGrid([
-        { label: { vi: 'Danh muc', en: 'Category' },              value: d.category },
-        { label: { vi: 'Nguon', en: 'Source' },                   value: d.source },
-        { label: { vi: 'Phuong phap', en: 'Detection' },          value: d.detection_method },
-        { label: { vi: 'Bo phan', en: 'Department' },             value: d.department },
-        { label: { vi: 'Anh huong quy dinh', en: 'Regulatory' }, value: d.regulatory_impact }
+        { label: { vi: 'Danh mục', en: 'Category' },              value: d.category },
+        { label: { vi: 'Nguồn', en: 'Source' },                   value: d.source },
+        { label: { vi: 'Phương pháp', en: 'Detection' },          value: d.detection_method },
+        { label: { vi: 'Bộ phận', en: 'Department' },             value: d.department },
+        { label: { vi: 'Ảnh hưởng quy định', en: 'Regulatory' }, value: d.regulatory_impact }
       ])
     );
 
-    html += ui.renderSection({ vi: 'Danh gia', en: 'Assessment' },
+    html += ui.renderSection({ vi: 'Đánh giá', en: 'Assessment' },
       ui.renderFieldGrid([
-        { label: { vi: 'Rui ro', en: 'Risk Level' },         value: d.risk_level },
-        { label: { vi: 'Uu tien', en: 'Priority' },          value: d.priority, badge: true },
-        { label: { vi: 'Ngan chan', en: 'Containment' },      value: d.containment_needed },
-        { label: { vi: 'Phan cong', en: 'Assigned To' },     value: d.assigned_to },
-        { label: { vi: 'Han xu ly', en: 'Due Date' },        value: fmtDate(d.due_date) }
+        { label: { vi: 'Rủi ro', en: 'Risk Level' },         value: d.risk_level },
+        { label: { vi: 'Ưu tiên', en: 'Priority' },          value: d.priority, badge: true },
+        { label: { vi: 'Ngăn chặn', en: 'Containment' },      value: d.containment_needed },
+        { label: { vi: 'Phân công', en: 'Assigned To' },     value: d.assigned_to },
+        { label: { vi: 'Hạn xử lý', en: 'Due Date' },        value: fmtDate(d.due_date) }
       ])
     );
 
@@ -888,7 +888,7 @@
     var html = '<div class="eqms-analytics-view">';
 
     if (!state.metrics) {
-      html += ui.renderLoadingState({ vi: 'Dang tai so lieu...', en: 'Loading metrics...' });
+      html += ui.renderLoadingState({ vi: 'Đang tải số liệu...', en: 'Loading metrics...' });
       html += '</div>';
       return html;
     }
@@ -898,24 +898,24 @@
     // KPI row
     html += ui.renderKpiRow([
       {
-        label: { vi: 'Khieu nai mo', en: 'Open Complaints' },
+        label: { vi: 'Khiếu nại mở', en: 'Open Complaints' },
         value: fmt(m.open_count || 0),
         accent: (m.open_count > 10) ? 'danger' : '',
         freshness: (m.open_count > 20) ? 'critical' : (m.open_count > 10) ? 'warning' : 'healthy'
       },
       {
-        label: { vi: 'Nghiem trong dang mo', en: 'Critical Open' },
+        label: { vi: 'Nghiêm trọng đang mở', en: 'Critical Open' },
         value: fmt(m.critical_open || 0),
         accent: (m.critical_open > 0) ? 'danger' : ''
       },
       {
-        label: { vi: 'TB ngay xu ly', en: 'Avg Resolution (days)' },
+        label: { vi: 'TB ngày xử lý', en: 'Avg Resolution (days)' },
         value: m.avg_resolution_days != null ? m.avg_resolution_days.toFixed(1) : '\u2014',
         trend: m.resolution_trend || 0,
         trendLabel: m.resolution_trend ? Math.abs(m.resolution_trend) + '%' : ''
       },
       {
-        label: { vi: 'Ty le dong', en: 'Closure Rate' },
+        label: { vi: 'Tỷ lệ đóng', en: 'Closure Rate' },
         value: m.closure_rate != null ? m.closure_rate + '%' : '\u2014'
       }
     ]);
@@ -926,8 +926,8 @@
       'chart-by-severity',
       null,
       [
-        { key: 'severity', label: { vi: 'Muc do', en: 'Severity' }, type: 'badge' },
-        { key: 'count',    label: { vi: 'So luong', en: 'Count' }, type: 'number' }
+        { key: 'severity', label: { vi: 'Mức độ', en: 'Severity' }, type: 'badge' },
+        { key: 'count',    label: { vi: 'Số lượng', en: 'Count' }, type: 'number' }
       ],
       severityData,
       { defaultMode: 'table' }
@@ -939,8 +939,8 @@
       'chart-by-status',
       null,
       [
-        { key: 'status', label: { vi: 'Trang thai', en: 'Status' }, type: 'badge' },
-        { key: 'count',  label: { vi: 'So luong', en: 'Count' }, type: 'number' }
+        { key: 'status', label: { vi: 'Trạng thái', en: 'Status' }, type: 'badge' },
+        { key: 'count',  label: { vi: 'Số lượng', en: 'Count' }, type: 'number' }
       ],
       statusData,
       { defaultMode: 'table' }
@@ -948,13 +948,13 @@
 
     // Chart: Top Categories (Pareto)
     var catData = m.top_categories || [];
-    html += ui.renderSection({ vi: 'Top danh muc khieu nai (Pareto)', en: 'Top Complaint Categories (Pareto)' },
+    html += ui.renderSection({ vi: 'Top danh mục khiếu nại (Pareto)', en: 'Top Complaint Categories (Pareto)' },
       ui.renderChartWithTableFallback(
         'chart-top-categories',
         null,
         [
-          { key: 'category', label: { vi: 'Danh muc', en: 'Category' } },
-          { key: 'count',    label: { vi: 'So luong', en: 'Count' }, type: 'number' }
+          { key: 'category', label: { vi: 'Danh mục', en: 'Category' } },
+          { key: 'count',    label: { vi: 'Số lượng', en: 'Count' }, type: 'number' }
         ],
         catData,
         { defaultMode: 'table' }
@@ -1085,7 +1085,7 @@
       if (containmentField) payload.containment_action = containmentField.value;
       if (containmentDate)  payload.containment_date   = containmentDate.value;
       if (!payload.containment_action) {
-        showToast(T({ vi: 'Vui long nhap hanh dong ngan chan', en: 'Please enter containment action' }), 'warning');
+        showToast(T({ vi: 'Vui lòng nhập hành động ngăn chặn', en: 'Please enter containment action' }), 'warning');
         return;
       }
     }
@@ -1096,31 +1096,31 @@
       if (respField) payload.customer_response = respField.value;
       if (respMethod) payload.response_method  = respMethod.value;
       if (!payload.customer_response) {
-        showToast(T({ vi: 'Vui long nhap noi dung phan hoi', en: 'Please enter response content' }), 'warning');
+        showToast(T({ vi: 'Vui lòng nhập nội dung phản hồi', en: 'Please enter response content' }), 'warning');
         return;
       }
     }
 
     if (actionKey === 'close') {
-      var reason = prompt(T({ vi: 'Ly do dong khieu nai:', en: 'Closure reason:' }));
+      var reason = prompt(T({ vi: 'Lý do đóng khiếu nại:', en: 'Closure reason:' }));
       if (!reason) return;
       payload.closure_reason = reason;
     }
 
     if (actionKey === 'reopen') {
-      var reopenReason = prompt(T({ vi: 'Ly do mo lai:', en: 'Reason for reopening:' }));
+      var reopenReason = prompt(T({ vi: 'Lý do mở lại:', en: 'Reason for reopening:' }));
       if (!reopenReason) return;
       payload.reopen_reason = reopenReason;
     }
 
     if (actionKey === 'assign') {
-      var assignee = prompt(T({ vi: 'Phan cong cho:', en: 'Assign to:' }));
+      var assignee = prompt(T({ vi: 'Phân công cho:', en: 'Assign to:' }));
       if (!assignee) return;
       payload.assigned_to = assignee;
     }
 
     if (actionKey === 'link-capa') {
-      var capaId = prompt(T({ vi: 'Ma CAPA:', en: 'CAPA ID:' }));
+      var capaId = prompt(T({ vi: 'Mã CAPA:', en: 'CAPA ID:' }));
       if (!capaId) return;
       payload.capa_id = capaId;
     }
@@ -1135,9 +1135,9 @@
       state.loading = false;
       if (res && res.complaint) {
         state.record = res.complaint;
-        showToast(T({ vi: 'Hanh dong thanh cong', en: 'Action completed successfully' }), 'success');
+        showToast(T({ vi: 'Hành động thành công', en: 'Action completed successfully' }), 'success');
       } else {
-        showToast((res && res.message) || T({ vi: 'Hanh dong that bai', en: 'Action failed' }), 'error');
+        showToast((res && res.message) || T({ vi: 'Hành động thất bại', en: 'Action failed' }), 'error');
       }
       refreshUI();
     }).catch(function(err) {
@@ -1152,18 +1152,18 @@
     var d = state.wizardData;
     var errors = {};
 
-    if (!d.customer_name) errors.customer_name = { vi: 'Bat buoc', en: 'Required' };
-    if (!d.subject)       errors.subject       = { vi: 'Bat buoc', en: 'Required' };
-    if (!d.description)   errors.description   = { vi: 'Bat buoc', en: 'Required' };
-    if (!d.severity)      errors.severity      = { vi: 'Bat buoc', en: 'Required' };
-    if (!d.received_date) errors.received_date = { vi: 'Bat buoc', en: 'Required' };
+    if (!d.customer_name) errors.customer_name = { vi: 'Bắt buộc', en: 'Required' };
+    if (!d.subject)       errors.subject       = { vi: 'Bắt buộc', en: 'Required' };
+    if (!d.description)   errors.description   = { vi: 'Bắt buộc', en: 'Required' };
+    if (!d.severity)      errors.severity      = { vi: 'Bắt buộc', en: 'Required' };
+    if (!d.received_date) errors.received_date = { vi: 'Bắt buộc', en: 'Required' };
 
     if (Object.keys(errors).length > 0) {
       state.wizardErrors = errors;
       // Go back to first step with an error
       state.wizardStep = !d.customer_name ? 0 : 1;
       refreshUI();
-      showToast(T({ vi: 'Vui long dien day du thong tin bat buoc', en: 'Please fill all required fields' }), 'warning');
+      showToast(T({ vi: 'Vui lòng điền đầy đủ thông tin bắt buộc', en: 'Please fill all required fields' }), 'warning');
       return;
     }
 
@@ -1181,7 +1181,7 @@
     }).then(function(res) {
       state.loading = false;
       if (res && res.complaint) {
-        showToast(T({ vi: 'Tao khieu nai thanh cong', en: 'Complaint created successfully' }), 'success');
+        showToast(T({ vi: 'Tạo khiếu nại thành công', en: 'Complaint created successfully' }), 'success');
         // Navigate to the new record
         state.screen = 'detail';
         state.recordId = res.complaint.complaint_id;
@@ -1190,7 +1190,7 @@
         state.wizardStep = 0;
         state.wizardErrors = {};
       } else {
-        showToast((res && res.message) || T({ vi: 'Tao that bai', en: 'Creation failed' }), 'error');
+        showToast((res && res.message) || T({ vi: 'Tạo thất bại', en: 'Creation failed' }), 'error');
       }
       refreshUI();
     }).catch(function(err) {
@@ -1203,7 +1203,7 @@
   function saveDraft() {
     var d = state.wizardData;
     if (!d.subject && !d.customer_name) {
-      showToast(T({ vi: 'Vui long nhap it nhat chu de hoac khach hang', en: 'Please enter at least subject or customer' }), 'warning');
+      showToast(T({ vi: 'Vui lòng nhập ít nhất chủ đề hoặc khách hàng', en: 'Please enter at least subject or customer' }), 'warning');
       return;
     }
 
@@ -1211,16 +1211,16 @@
     refreshUI();
 
     apiCall('eqms_complaints_create', {
-      subject:       d.subject || T({ vi: 'Nhap khieu nai', en: 'Draft complaint' }),
+      subject:       d.subject || T({ vi: 'Nháp khiếu nại', en: 'Draft complaint' }),
       description:   d.description || '',
       received_date: d.received_date || new Date().toISOString().slice(0, 10),
       severity:      d.severity || 'minor',
-      customer_name: d.customer_name || T({ vi: 'Chua xac dinh', en: 'TBD' }),
+      customer_name: d.customer_name || T({ vi: 'Chưa xác định', en: 'TBD' }),
       category:      d.category || null
     }).then(function(res) {
       state.loading = false;
       if (res && res.complaint) {
-        showToast(T({ vi: 'Da luu nhap', en: 'Draft saved' }), 'success');
+        showToast(T({ vi: 'Đã lưu nháp', en: 'Draft saved' }), 'success');
         state.screen = 'detail';
         state.recordId = res.complaint.complaint_id;
         state.record = res.complaint;
@@ -1245,7 +1245,7 @@
       filters: ids ? null : state.filters
     }).then(function(res) {
       if (res && res.job_id) {
-        showToast(T({ vi: 'Yeu cau xuat du lieu da duoc gui. Ma cong viec: ', en: 'Export request submitted. Job ID: ' }) + res.job_id, 'success');
+        showToast(T({ vi: 'Yêu cầu xuất dữ liệu đã được gửi. Mã công việc: ', en: 'Export request submitted. Job ID: ' }) + res.job_id, 'success');
       } else {
         showToast((res && res.message) || 'Export failed', 'error');
       }
@@ -1270,7 +1270,7 @@
         loadTabData('comments');
       }
     }).catch(function() {
-      showToast(T({ vi: 'Gui binh luan that bai', en: 'Failed to post comment' }), 'error');
+      showToast(T({ vi: 'Gửi bình luận thất bại', en: 'Failed to post comment' }), 'error');
     });
   }
 
@@ -1486,9 +1486,9 @@
 
         // Bulk actions
         if (action === 'bulk-assign') {
-          var bulkAssignee = prompt(T({ vi: 'Phan cong cho:', en: 'Assign to:' }));
+          var bulkAssignee = prompt(T({ vi: 'Phân công cho:', en: 'Assign to:' }));
           if (!bulkAssignee) return;
-          showToast(T({ vi: 'Dang phan cong ' + state.selectedIds.length + ' khieu nai...', en: 'Assigning ' + state.selectedIds.length + ' complaints...' }), 'info');
+          showToast(T({ vi: 'Đang phân công ' + state.selectedIds.length + ' khiếu nại...', en: 'Assigning ' + state.selectedIds.length + ' complaints...' }), 'info');
           return;
         }
         if (action === 'bulk-export') {
@@ -1507,7 +1507,7 @@
             }, 'PATCH').then(function(res) {
               if (res && res.complaint) {
                 state.record = res.complaint;
-                showToast(T({ vi: 'Da luu ghi chu', en: 'Notes saved' }), 'success');
+                showToast(T({ vi: 'Đã lưu ghi chú', en: 'Notes saved' }), 'success');
               }
               refreshUI();
             });
@@ -1527,7 +1527,7 @@
               if (res) {
                 state.tabData._signaturesLoaded = false;
                 loadTabData('signatures');
-                showToast(T({ vi: 'Da ky', en: 'Signed' }), 'success');
+                showToast(T({ vi: 'Đã ký', en: 'Signed' }), 'success');
               }
             });
           }

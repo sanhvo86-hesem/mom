@@ -25,7 +25,7 @@
   // =========================================================================
   var MOD = {
     id:        'suppliers',
-    label:     { vi: 'Mang luoi nha cung cap', en: 'Supplier Quality Network' },
+    label:     { vi: 'Mạng lưới nhà cung cấp', en: 'Supplier Quality Network' },
     icon:      '\uD83C\uDF10',
     group:     'supplier',
     archetype: 'analytical-list'
@@ -35,52 +35,52 @@
   // CONSTANTS
   // =========================================================================
   var STATUSES = [
-    { value: 'approved',      label: { vi: 'Da duyet', en: 'Approved' } },
-    { value: 'conditional',   label: { vi: 'Co dieu kien', en: 'Conditional' } },
-    { value: 'suspended',     label: { vi: 'Tam ngung', en: 'Suspended' } },
-    { value: 'disqualified',  label: { vi: 'Khong dat', en: 'Disqualified' } },
-    { value: 'new',           label: { vi: 'Moi', en: 'New' } }
+    { value: 'approved',      label: { vi: 'Đã duyệt', en: 'Approved' } },
+    { value: 'conditional',   label: { vi: 'Có điều kiện', en: 'Conditional' } },
+    { value: 'suspended',     label: { vi: 'Tạm ngừng', en: 'Suspended' } },
+    { value: 'disqualified',  label: { vi: 'Không đạt', en: 'Disqualified' } },
+    { value: 'new',           label: { vi: 'Mới', en: 'New' } }
   ];
 
   var RISK_LEVELS = [
-    { value: 'low',      label: { vi: 'Thap', en: 'Low' } },
-    { value: 'medium',   label: { vi: 'Trung binh', en: 'Medium' } },
+    { value: 'low',      label: { vi: 'Thấp', en: 'Low' } },
+    { value: 'medium',   label: { vi: 'Trung bình', en: 'Medium' } },
     { value: 'high',     label: { vi: 'Cao', en: 'High' } },
-    { value: 'critical', label: { vi: 'Nghiem trong', en: 'Critical' } }
+    { value: 'critical', label: { vi: 'Nghiêm trọng', en: 'Critical' } }
   ];
 
   var SCORE_AXES = [
-    { key: 'quality',        label: { vi: 'Chat luong', en: 'Quality' } },
-    { key: 'delivery',       label: { vi: 'Giao hang', en: 'Delivery' } },
-    { key: 'cost',           label: { vi: 'Chi phi', en: 'Cost' } },
-    { key: 'responsiveness', label: { vi: 'Phan hoi', en: 'Responsiveness' } },
-    { key: 'compliance',     label: { vi: 'Tuan thu', en: 'Compliance' } }
+    { key: 'quality',        label: { vi: 'Chất lượng', en: 'Quality' } },
+    { key: 'delivery',       label: { vi: 'Giao hàng', en: 'Delivery' } },
+    { key: 'cost',           label: { vi: 'Chi phí', en: 'Cost' } },
+    { key: 'responsiveness', label: { vi: 'Phản hồi', en: 'Responsiveness' } },
+    { key: 'compliance',     label: { vi: 'Tuân thủ', en: 'Compliance' } }
   ];
 
   var DETAIL_TABS = [
-    { id: 'profile',        label: { vi: 'Ho so', en: 'Profile' } },
-    { id: 'scorecard',      label: { vi: 'The diem', en: 'Scorecard' } },
-    { id: 'qualifications', label: { vi: 'Chung nhan', en: 'Qualifications' } },
-    { id: 'agreements',     label: { vi: 'Thoa thuan CL', en: 'Quality Agreements' } },
-    { id: 'deviations',     label: { vi: 'Sai lech', en: 'Deviations' } },
+    { id: 'profile',        label: { vi: 'Hồ sơ', en: 'Profile' } },
+    { id: 'scorecard',      label: { vi: 'Thẻ điểm', en: 'Scorecard' } },
+    { id: 'qualifications', label: { vi: 'Chứng nhận', en: 'Qualifications' } },
+    { id: 'agreements',     label: { vi: 'Thoả thuận CL', en: 'Quality Agreements' } },
+    { id: 'deviations',     label: { vi: 'Sai lệch', en: 'Deviations' } },
     { id: 'scars',          label: { vi: 'SCAR', en: 'SCARs' } },
-    { id: 'audits',         label: { vi: 'Danh gia', en: 'Audits' } },
-    { id: 'performance',    label: { vi: 'Hieu suat', en: 'Performance History' } },
-    { id: 'related',        label: { vi: 'Lien ket', en: 'Related Records' } },
-    { id: 'files',          label: { vi: 'Tep & Binh luan', en: 'Files & Comments' } }
+    { id: 'audits',         label: { vi: 'Đánh giá', en: 'Audits' } },
+    { id: 'performance',    label: { vi: 'Hiệu suất', en: 'Performance History' } },
+    { id: 'related',        label: { vi: 'Liên kết', en: 'Related Records' } },
+    { id: 'files',          label: { vi: 'Tệp & Bình luận', en: 'Files & Comments' } }
   ];
 
   var QUAL_STATUSES = [
-    { value: 'qualified',  label: { vi: 'Dat', en: 'Qualified' } },
-    { value: 'pending',    label: { vi: 'Cho xu ly', en: 'Pending' } },
-    { value: 'expired',    label: { vi: 'Het han', en: 'Expired' } },
-    { value: 'failed',     label: { vi: 'Khong dat', en: 'Failed' } }
+    { value: 'qualified',  label: { vi: 'Đạt', en: 'Qualified' } },
+    { value: 'pending',    label: { vi: 'Chờ xử lý', en: 'Pending' } },
+    { value: 'expired',    label: { vi: 'Hết hạn', en: 'Expired' } },
+    { value: 'failed',     label: { vi: 'Không đạt', en: 'Failed' } }
   ];
 
   var AGREEMENT_STATUSES = [
-    { value: 'active',  label: { vi: 'Hieu luc', en: 'Active' } },
-    { value: 'pending', label: { vi: 'Cho xu ly', en: 'Pending' } },
-    { value: 'expired', label: { vi: 'Het han', en: 'Expired' } }
+    { value: 'active',  label: { vi: 'Hiệu lực', en: 'Active' } },
+    { value: 'pending', label: { vi: 'Chờ xử lý', en: 'Pending' } },
+    { value: 'expired', label: { vi: 'Hết hạn', en: 'Expired' } }
   ];
 
   // =========================================================================
@@ -302,20 +302,20 @@
     // KPI row
     var m = state.metrics || {};
     html += ui.renderKpiRow([
-      { label: { vi: 'Tong NCC', en: 'Total Suppliers' },        value: fmt(m.total_suppliers || 0) },
-      { label: { vi: 'Da duyet', en: 'Approved' },               value: fmt(m.approved || 0),     accent: 'success' },
-      { label: { vi: 'Co dieu kien', en: 'Conditional' },        value: fmt(m.conditional || 0),  accent: 'warning' },
-      { label: { vi: 'Tam ngung', en: 'Suspended' },             value: fmt(m.suspended || 0),    accent: 'danger' },
-      { label: { vi: 'Diem CL TB', en: 'Avg Quality Score' },    value: m.avg_quality_score != null ? Math.round(m.avg_quality_score) : '\u2014', accent: scoreColor(m.avg_quality_score) },
-      { label: { vi: 'Rui ro cao', en: 'High Risk' },            value: fmt(m.high_risk || 0),    accent: 'danger' }
+      { label: { vi: 'Tổng NCC', en: 'Total Suppliers' },        value: fmt(m.total_suppliers || 0) },
+      { label: { vi: 'Đã duyệt', en: 'Approved' },               value: fmt(m.approved || 0),     accent: 'success' },
+      { label: { vi: 'Có điều kiện', en: 'Conditional' },        value: fmt(m.conditional || 0),  accent: 'warning' },
+      { label: { vi: 'Tạm ngừng', en: 'Suspended' },             value: fmt(m.suspended || 0),    accent: 'danger' },
+      { label: { vi: 'Điểm CL TB', en: 'Avg Quality Score' },    value: m.avg_quality_score != null ? Math.round(m.avg_quality_score) : '\u2014', accent: scoreColor(m.avg_quality_score) },
+      { label: { vi: 'Rủi ro cao', en: 'High Risk' },            value: fmt(m.high_risk || 0),    accent: 'danger' }
     ]);
 
     // Toolbar
     html += '<div class="eqms-toolbar">';
     html += '<div class="eqms-toolbar-left">';
-    html += '<button class="eqms-btn primary sm" data-action="create-supplier">' + T({ vi: '+ NCC moi', en: '+ New Supplier' }) + '</button>';
-    html += '<button class="eqms-btn ghost sm ' + (state.screen === 'analytics' ? '' : 'active') + '" data-action="screen-list">' + T({ vi: 'Danh sach', en: 'List' }) + '</button>';
-    html += '<button class="eqms-btn ghost sm ' + (state.screen === 'analytics' ? 'active' : '') + '" data-action="screen-analytics">' + T({ vi: 'Phan tich', en: 'Analytics' }) + '</button>';
+    html += '<button class="eqms-btn primary sm" data-action="create-supplier">' + T({ vi: '+ NCC mới', en: '+ New Supplier' }) + '</button>';
+    html += '<button class="eqms-btn ghost sm ' + (state.screen === 'analytics' ? '' : 'active') + '" data-action="screen-list">' + T({ vi: 'Danh sách', en: 'List' }) + '</button>';
+    html += '<button class="eqms-btn ghost sm ' + (state.screen === 'analytics' ? 'active' : '') + '" data-action="screen-analytics">' + T({ vi: 'Phân tích', en: 'Analytics' }) + '</button>';
     html += '</div>';
     html += ui.renderExportMenu({ formats: ['excel', 'csv', 'pdf'] });
     html += '</div>';
@@ -323,29 +323,29 @@
     // Filters
     html += ui.renderFilterBar(state.filters, {
       fields: [
-        { key: 'search', type: 'text', placeholder: { vi: 'Tim NCC...', en: 'Search suppliers...' }, width: '200px' },
-        { key: 'status', type: 'select', label: { vi: 'Trang thai', en: 'Status' }, options: STATUSES },
-        { key: 'risk_level', type: 'select', label: { vi: 'Rui ro', en: 'Risk Level' }, options: RISK_LEVELS },
-        { key: 'category', type: 'text', placeholder: { vi: 'Danh muc...', en: 'Category...' }, width: '140px' },
-        { key: 'score_min', type: 'number', label: { vi: 'Diem tu', en: 'Score from' }, width: '80px' },
-        { key: 'score_max', type: 'number', label: { vi: 'Diem den', en: 'Score to' }, width: '80px' }
+        { key: 'search', type: 'text', placeholder: { vi: 'Tìm NCC...', en: 'Search suppliers...' }, width: '200px' },
+        { key: 'status', type: 'select', label: { vi: 'Trạng thái', en: 'Status' }, options: STATUSES },
+        { key: 'risk_level', type: 'select', label: { vi: 'Rủi ro', en: 'Risk Level' }, options: RISK_LEVELS },
+        { key: 'category', type: 'text', placeholder: { vi: 'Danh mục...', en: 'Category...' }, width: '140px' },
+        { key: 'score_min', type: 'number', label: { vi: 'Điểm từ', en: 'Score from' }, width: '80px' },
+        { key: 'score_max', type: 'number', label: { vi: 'Điểm đến', en: 'Score to' }, width: '80px' }
       ]
     });
 
-    if (state.loading) { html += ui.renderLoadingState({ vi: 'Dang tai danh sach NCC...', en: 'Loading suppliers...' }); return html; }
+    if (state.loading) { html += ui.renderLoadingState({ vi: 'Đang tải danh sách NCC...', en: 'Loading suppliers...' }); return html; }
     if (state.error) { html += (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-list'); return html; }
 
     // Data grid
     var columns = [
-      { key: 'supplier_id', label: { vi: 'Ma NCC', en: 'Supplier ID' }, type: 'id', sortable: true },
-      { key: 'name', label: { vi: 'Ten', en: 'Name' }, type: 'truncate', sortable: true },
-      { key: 'status', label: { vi: 'Trang thai', en: 'Status' }, type: 'badge', sortable: true },
-      { key: 'quality_score', label: { vi: 'Diem CL', en: 'Quality Score' }, sortable: true, render: function(v) { return renderScoreBar(v); } },
-      { key: 'risk_level', label: { vi: 'Rui ro', en: 'Risk Level' }, type: 'priority', sortable: true },
-      { key: 'category', label: { vi: 'Danh muc', en: 'Category' }, sortable: true },
-      { key: 'country', label: { vi: 'Quoc gia', en: 'Country' }, sortable: true },
-      { key: 'cert_status', label: { vi: 'Chung chi', en: 'Cert Status' }, type: 'badge' },
-      { key: 'last_audit_date', label: { vi: 'Danh gia gan nhat', en: 'Last Audit' }, type: 'date', sortable: true }
+      { key: 'supplier_id', label: { vi: 'Mã NCC', en: 'Supplier ID' }, type: 'id', sortable: true },
+      { key: 'name', label: { vi: 'Tên', en: 'Name' }, type: 'truncate', sortable: true },
+      { key: 'status', label: { vi: 'Trạng thái', en: 'Status' }, type: 'badge', sortable: true },
+      { key: 'quality_score', label: { vi: 'Điểm CL', en: 'Quality Score' }, sortable: true, render: function(v) { return renderScoreBar(v); } },
+      { key: 'risk_level', label: { vi: 'Rủi ro', en: 'Risk Level' }, type: 'priority', sortable: true },
+      { key: 'category', label: { vi: 'Danh mục', en: 'Category' }, sortable: true },
+      { key: 'country', label: { vi: 'Quốc gia', en: 'Country' }, sortable: true },
+      { key: 'cert_status', label: { vi: 'Chứng chỉ', en: 'Cert Status' }, type: 'badge' },
+      { key: 'last_audit_date', label: { vi: 'Đánh giá gần nhất', en: 'Last Audit' }, type: 'date', sortable: true }
     ];
 
     html += ui.renderDataGrid(columns, state.list || [], {
@@ -364,31 +364,31 @@
   // =========================================================================
   function renderDetail() {
     var d = state.detail;
-    if (!d) return state.loading ? ui.renderLoadingState({ vi: 'Dang tai...', en: 'Loading...' }) : '';
+    if (!d) return state.loading ? ui.renderLoadingState({ vi: 'Đang tải...', en: 'Loading...' }) : '';
     var html = '';
 
     // Identity header
     var actions = [];
     if (d.status === 'new' || d.status === 'conditional') {
-      actions.push({ action: 'qualify', label: { vi: 'Phe duyet', en: 'Qualify' }, style: 'primary' });
+      actions.push({ action: 'qualify', label: { vi: 'Phê duyệt', en: 'Qualify' }, style: 'primary' });
     }
     if (d.status === 'approved' || d.status === 'conditional') {
-      actions.push({ action: 'suspend', label: { vi: 'Tam ngung', en: 'Suspend' }, style: 'warning' });
+      actions.push({ action: 'suspend', label: { vi: 'Tạm ngừng', en: 'Suspend' }, style: 'warning' });
     }
     if (d.status === 'suspended') {
-      actions.push({ action: 'reactivate', label: { vi: 'Kich hoat lai', en: 'Reactivate' }, style: 'primary' });
+      actions.push({ action: 'reactivate', label: { vi: 'Kích hoạt lại', en: 'Reactivate' }, style: 'primary' });
     }
     if (d.status !== 'disqualified') {
-      actions.push({ action: 'disqualify', label: { vi: 'Huy tu cach', en: 'Disqualify' }, style: 'danger' });
+      actions.push({ action: 'disqualify', label: { vi: 'Hủy tư cách', en: 'Disqualify' }, style: 'danger' });
     }
-    actions.push({ action: 'edit-supplier', label: { vi: 'Chinh sua', en: 'Edit' }, style: 'secondary' });
+    actions.push({ action: 'edit-supplier', label: { vi: 'Chỉnh sửa', en: 'Edit' }, style: 'secondary' });
 
     html += ui.renderIdentityHeader(d, {
       actions: actions,
       extraMeta: [
-        { label: { vi: 'Danh muc', en: 'Category' }, value: d.category },
-        { label: { vi: 'Quoc gia', en: 'Country' }, value: d.country },
-        { label: { vi: 'Rui ro', en: 'Risk Tier' }, value: d.risk_tier }
+        { label: { vi: 'Danh mục', en: 'Category' }, value: d.category },
+        { label: { vi: 'Quốc gia', en: 'Country' }, value: d.country },
+        { label: { vi: 'Rủi ro', en: 'Risk Tier' }, value: d.risk_tier }
       ]
     });
 
@@ -425,24 +425,24 @@
   // --- Profile Tab ---
   function renderProfileTab(d) {
     var html = '';
-    html += ui.renderSection({ vi: 'Thong tin co ban', en: 'Basic Information' }, ui.renderFieldGrid([
-      { label: { vi: 'Ma NCC', en: 'Supplier ID' },         value: d.supplier_id, mono: true },
-      { label: { vi: 'Ten', en: 'Name' },                   value: d.name },
-      { label: { vi: 'Dia chi', en: 'Address' },             value: d.address },
-      { label: { vi: 'Quoc gia', en: 'Country' },            value: d.country },
-      { label: { vi: 'Nguoi lien he', en: 'Contact Name' },  value: d.contact_name },
+    html += ui.renderSection({ vi: 'Thông tin cơ bản', en: 'Basic Information' }, ui.renderFieldGrid([
+      { label: { vi: 'Mã NCC', en: 'Supplier ID' },         value: d.supplier_id, mono: true },
+      { label: { vi: 'Tên', en: 'Name' },                   value: d.name },
+      { label: { vi: 'Địa chỉ', en: 'Address' },             value: d.address },
+      { label: { vi: 'Quốc gia', en: 'Country' },            value: d.country },
+      { label: { vi: 'Người liên hệ', en: 'Contact Name' },  value: d.contact_name },
       { label: { vi: 'Email', en: 'Contact Email' },         value: d.contact_email },
-      { label: { vi: 'Dien thoai', en: 'Phone' },            value: d.phone },
-      { label: { vi: 'Danh muc', en: 'Category' },           value: d.category },
-      { label: { vi: 'Muc rui ro', en: 'Risk Tier' },        value: d.risk_tier, badge: true }
+      { label: { vi: 'Điện thoại', en: 'Phone' },            value: d.phone },
+      { label: { vi: 'Danh mục', en: 'Category' },           value: d.category },
+      { label: { vi: 'Mức rủi ro', en: 'Risk Tier' },        value: d.risk_tier, badge: true }
     ]));
 
-    html += ui.renderSection({ vi: 'Chung nhan & Nang luc', en: 'Certifications & Capabilities' }, ui.renderFieldGrid([
-      { label: { vi: 'Chung chi', en: 'Certifications' },           value: (d.certifications || []).join(', ') || '\u2014' },
-      { label: { vi: 'Nang luc', en: 'Capabilities' },              value: (d.capabilities || []).join(', ') || d.capabilities || '\u2014' },
-      { label: { vi: 'Doanh thu hang nam', en: 'Annual Revenue' },  value: d.annual_revenue ? fmt(d.annual_revenue) : '\u2014' },
-      { label: { vi: 'So nhan vien', en: 'Employee Count' },        value: d.employee_count ? fmt(d.employee_count) : '\u2014' },
-      { label: { vi: 'Phan loai chien luoc', en: 'Strategic Classification' }, value: d.strategic_classification }
+    html += ui.renderSection({ vi: 'Chứng nhận & Năng lực', en: 'Certifications & Capabilities' }, ui.renderFieldGrid([
+      { label: { vi: 'Chứng chỉ', en: 'Certifications' },           value: (d.certifications || []).join(', ') || '\u2014' },
+      { label: { vi: 'Năng lực', en: 'Capabilities' },              value: (d.capabilities || []).join(', ') || d.capabilities || '\u2014' },
+      { label: { vi: 'Doanh thu hàng năm', en: 'Annual Revenue' },  value: d.annual_revenue ? fmt(d.annual_revenue) : '\u2014' },
+      { label: { vi: 'Số nhân viên', en: 'Employee Count' },        value: d.employee_count ? fmt(d.employee_count) : '\u2014' },
+      { label: { vi: 'Phân loại chiến lược', en: 'Strategic Classification' }, value: d.strategic_classification }
     ]));
 
     return html;
@@ -461,18 +461,18 @@
     html += '</div>';
     html += '<div style="flex:1;min-width:200px">';
     html += ui.renderFieldGrid([
-      { label: { vi: 'Diem tong hop', en: 'Overall Score' },       value: sc.overall_score != null ? Math.round(sc.overall_score) : (d.quality_score != null ? Math.round(d.quality_score) : '\u2014') },
-      { label: { vi: 'Chat luong', en: 'Quality' },                value: scores.quality != null ? Math.round(scores.quality) : '\u2014' },
-      { label: { vi: 'Giao hang', en: 'Delivery' },                value: scores.delivery != null ? Math.round(scores.delivery) : '\u2014' },
-      { label: { vi: 'Chi phi', en: 'Cost' },                      value: scores.cost != null ? Math.round(scores.cost) : '\u2014' },
-      { label: { vi: 'Phan hoi', en: 'Responsiveness' },           value: scores.responsiveness != null ? Math.round(scores.responsiveness) : '\u2014' },
-      { label: { vi: 'Tuan thu', en: 'Compliance' },               value: scores.compliance != null ? Math.round(scores.compliance) : '\u2014' }
+      { label: { vi: 'Điểm tổng hợp', en: 'Overall Score' },       value: sc.overall_score != null ? Math.round(sc.overall_score) : (d.quality_score != null ? Math.round(d.quality_score) : '\u2014') },
+      { label: { vi: 'Chất lượng', en: 'Quality' },                value: scores.quality != null ? Math.round(scores.quality) : '\u2014' },
+      { label: { vi: 'Giao hàng', en: 'Delivery' },                value: scores.delivery != null ? Math.round(scores.delivery) : '\u2014' },
+      { label: { vi: 'Chi phí', en: 'Cost' },                      value: scores.cost != null ? Math.round(scores.cost) : '\u2014' },
+      { label: { vi: 'Phản hồi', en: 'Responsiveness' },           value: scores.responsiveness != null ? Math.round(scores.responsiveness) : '\u2014' },
+      { label: { vi: 'Tuân thủ', en: 'Compliance' },               value: scores.compliance != null ? Math.round(scores.compliance) : '\u2014' }
     ]);
     // Score band legend
     html += '<div style="margin-top:16px;display:flex;gap:16px;font-size:12px">';
-    html += '<span style="color:var(--hm-success,#22c55e)">\u25CF 90-100: ' + T({ vi: 'Xuat sac', en: 'Excellent' }) + '</span>';
-    html += '<span style="color:var(--hm-warning,#eab308)">\u25CF 70-89: ' + T({ vi: 'Dat', en: 'Acceptable' }) + '</span>';
-    html += '<span style="color:var(--hm-danger,#ef4444)">\u25CF <70: ' + T({ vi: 'Khong dat', en: 'Unacceptable' }) + '</span>';
+    html += '<span style="color:var(--hm-success,#22c55e)">\u25CF 90-100: ' + T({ vi: 'Xuất sắc', en: 'Excellent' }) + '</span>';
+    html += '<span style="color:var(--hm-warning,#eab308)">\u25CF 70-89: ' + T({ vi: 'Đạt', en: 'Acceptable' }) + '</span>';
+    html += '<span style="color:var(--hm-danger,#ef4444)">\u25CF <70: ' + T({ vi: 'Không đạt', en: 'Unacceptable' }) + '</span>';
     html += '</div>';
     html += '</div></div>';
 
@@ -480,15 +480,15 @@
     var trendData = sc.score_trend_12months || sc.trends || [];
     if (trendData.length) {
       var trendCols = [
-        { key: 'month', label: { vi: 'Thang', en: 'Month' } },
-        { key: 'quality', label: { vi: 'Chat luong', en: 'Quality' }, type: 'number' },
-        { key: 'delivery', label: { vi: 'Giao hang', en: 'Delivery' }, type: 'number' },
-        { key: 'cost', label: { vi: 'Chi phi', en: 'Cost' }, type: 'number' },
-        { key: 'responsiveness', label: { vi: 'Phan hoi', en: 'Response' }, type: 'number' },
-        { key: 'compliance', label: { vi: 'Tuan thu', en: 'Compliance' }, type: 'number' },
-        { key: 'overall', label: { vi: 'Tong hop', en: 'Overall' }, render: function(v) { return renderScoreBar(v); } }
+        { key: 'month', label: { vi: 'Tháng', en: 'Month' } },
+        { key: 'quality', label: { vi: 'Chất lượng', en: 'Quality' }, type: 'number' },
+        { key: 'delivery', label: { vi: 'Giao hàng', en: 'Delivery' }, type: 'number' },
+        { key: 'cost', label: { vi: 'Chi phí', en: 'Cost' }, type: 'number' },
+        { key: 'responsiveness', label: { vi: 'Phản hồi', en: 'Response' }, type: 'number' },
+        { key: 'compliance', label: { vi: 'Tuân thủ', en: 'Compliance' }, type: 'number' },
+        { key: 'overall', label: { vi: 'Tổng hợp', en: 'Overall' }, render: function(v) { return renderScoreBar(v); } }
       ];
-      html += ui.renderSection({ vi: 'Xu huong 12 thang', en: '12-Month Score Trend' },
+      html += ui.renderSection({ vi: 'Xu hướng 12 tháng', en: '12-Month Score Trend' },
         ui.renderChartWithTableFallback('supplier-score-trend', null, trendCols, trendData, { defaultMode: 'table' })
       );
     }
@@ -501,27 +501,27 @@
     var data = state.tabData.qualifications || [];
     var html = '';
     var cols = [
-      { key: 'standard', label: { vi: 'Tieu chuan / Yeu cau', en: 'Standard / Requirement' } },
-      { key: 'status', label: { vi: 'Trang thai', en: 'Status' }, type: 'badge' },
-      { key: 'qualification_date', label: { vi: 'Ngay chung nhan', en: 'Qualification Date' }, type: 'date' },
-      { key: 'expiry_date', label: { vi: 'Ngay het han', en: 'Expiry Date' }, type: 'date' },
-      { key: 'evidence', label: { vi: 'Bang chung', en: 'Evidence' } },
-      { key: 'auditor', label: { vi: 'Danh gia vien', en: 'Auditor' } }
+      { key: 'standard', label: { vi: 'Tiêu chuẩn / Yêu cầu', en: 'Standard / Requirement' } },
+      { key: 'status', label: { vi: 'Trạng thái', en: 'Status' }, type: 'badge' },
+      { key: 'qualification_date', label: { vi: 'Ngày chứng nhận', en: 'Qualification Date' }, type: 'date' },
+      { key: 'expiry_date', label: { vi: 'Ngày hết hạn', en: 'Expiry Date' }, type: 'date' },
+      { key: 'evidence', label: { vi: 'Bằng chứng', en: 'Evidence' } },
+      { key: 'auditor', label: { vi: 'Đánh giá viên', en: 'Auditor' } }
     ];
-    html += ui.renderSection({ vi: 'Ho so chung nhan', en: 'Qualification Records' },
+    html += ui.renderSection({ vi: 'Hồ sơ chứng nhận', en: 'Qualification Records' },
       ui.renderDataGrid(cols, data, { selectable: false }),
-      { headerActions: '<button class="eqms-btn primary sm" data-action="add-qualification">' + T({ vi: '+ Them', en: '+ Add' }) + '</button>' }
+      { headerActions: '<button class="eqms-btn primary sm" data-action="add-qualification">' + T({ vi: '+ Thêm', en: '+ Add' }) + '</button>' }
     );
 
     // Requalification schedule
     var schedule = (state.tabData.qualifications_schedule || []);
     if (schedule.length) {
       var schCols = [
-        { key: 'standard', label: { vi: 'Tieu chuan', en: 'Standard' } },
-        { key: 'next_date', label: { vi: 'Lich tai danh gia', en: 'Next Requalification' }, type: 'date' },
-        { key: 'days_remaining', label: { vi: 'Con lai (ngay)', en: 'Days Remaining' }, type: 'number' }
+        { key: 'standard', label: { vi: 'Tiêu chuẩn', en: 'Standard' } },
+        { key: 'next_date', label: { vi: 'Lịch tái đánh giá', en: 'Next Requalification' }, type: 'date' },
+        { key: 'days_remaining', label: { vi: 'Còn lại (ngày)', en: 'Days Remaining' }, type: 'number' }
       ];
-      html += ui.renderSection({ vi: 'Lich tai danh gia', en: 'Requalification Schedule' },
+      html += ui.renderSection({ vi: 'Lịch tái đánh giá', en: 'Requalification Schedule' },
         ui.renderDataGrid(schCols, schedule, { selectable: false })
       );
     }
@@ -533,17 +533,17 @@
   function renderAgreementsTab() {
     var data = state.tabData.agreements || [];
     var cols = [
-      { key: 'agreement_id', label: { vi: 'Ma TT', en: 'Agreement ID' }, type: 'id' },
-      { key: 'title', label: { vi: 'Tieu de', en: 'Title' }, type: 'truncate' },
-      { key: 'effective_date', label: { vi: 'Ngay hieu luc', en: 'Effective Date' }, type: 'date' },
-      { key: 'expiry_date', label: { vi: 'Ngay het han', en: 'Expiry Date' }, type: 'date' },
-      { key: 'status', label: { vi: 'Trang thai', en: 'Status' }, type: 'badge' },
-      { key: 'scope', label: { vi: 'Pham vi', en: 'Scope' }, type: 'truncate' },
-      { key: 'key_terms', label: { vi: 'Dieu khoan chinh', en: 'Key Terms' }, type: 'truncate' }
+      { key: 'agreement_id', label: { vi: 'Mã TT', en: 'Agreement ID' }, type: 'id' },
+      { key: 'title', label: { vi: 'Tiêu đề', en: 'Title' }, type: 'truncate' },
+      { key: 'effective_date', label: { vi: 'Ngày hiệu lực', en: 'Effective Date' }, type: 'date' },
+      { key: 'expiry_date', label: { vi: 'Ngày hết hạn', en: 'Expiry Date' }, type: 'date' },
+      { key: 'status', label: { vi: 'Trạng thái', en: 'Status' }, type: 'badge' },
+      { key: 'scope', label: { vi: 'Phạm vi', en: 'Scope' }, type: 'truncate' },
+      { key: 'key_terms', label: { vi: 'Điều khoản chính', en: 'Key Terms' }, type: 'truncate' }
     ];
-    return ui.renderSection({ vi: 'Thoa thuan chat luong', en: 'Quality Agreements' },
+    return ui.renderSection({ vi: 'Thoả thuận chất lượng', en: 'Quality Agreements' },
       ui.renderDataGrid(cols, data, { selectable: false }),
-      { headerActions: '<button class="eqms-btn primary sm" data-action="add-agreement">' + T({ vi: '+ Them', en: '+ Add' }) + '</button>' }
+      { headerActions: '<button class="eqms-btn primary sm" data-action="add-agreement">' + T({ vi: '+ Thêm', en: '+ Add' }) + '</button>' }
     );
   }
 
@@ -551,13 +551,13 @@
   function renderDeviationsTab() {
     var data = (state.tabData.deviations || []).filter(function(r) { return r.type === 'deviation' || r.entity_type === 'deviation'; });
     var cols = [
-      { key: 'record_id', label: { vi: 'Ma', en: 'ID' }, type: 'id' },
-      { key: 'title', label: { vi: 'Tieu de', en: 'Title' }, type: 'truncate' },
-      { key: 'status', label: { vi: 'Trang thai', en: 'Status' }, type: 'badge' },
-      { key: 'severity', label: { vi: 'Muc do', en: 'Severity' }, type: 'priority' },
-      { key: 'created_at', label: { vi: 'Ngay tao', en: 'Created' }, type: 'date' }
+      { key: 'record_id', label: { vi: 'Mã', en: 'ID' }, type: 'id' },
+      { key: 'title', label: { vi: 'Tiêu đề', en: 'Title' }, type: 'truncate' },
+      { key: 'status', label: { vi: 'Trạng thái', en: 'Status' }, type: 'badge' },
+      { key: 'severity', label: { vi: 'Mức độ', en: 'Severity' }, type: 'priority' },
+      { key: 'created_at', label: { vi: 'Ngày tạo', en: 'Created' }, type: 'date' }
     ];
-    return ui.renderSection({ vi: 'Sai lech lien quan', en: 'Linked Deviations' },
+    return ui.renderSection({ vi: 'Sai lệch liên quan', en: 'Linked Deviations' },
       ui.renderDataGrid(cols, data, { selectable: false })
     );
   }
@@ -566,14 +566,14 @@
   function renderScarsTab() {
     var data = (state.tabData.scars || []).filter(function(r) { return r.type === 'scar' || r.entity_type === 'scar'; });
     var cols = [
-      { key: 'record_id', label: { vi: 'Ma SCAR', en: 'SCAR ID' }, type: 'id' },
-      { key: 'title', label: { vi: 'Tieu de', en: 'Title' }, type: 'truncate' },
-      { key: 'severity', label: { vi: 'Muc do', en: 'Severity' }, type: 'badge' },
-      { key: 'status', label: { vi: 'Trang thai', en: 'Status' }, type: 'badge' },
-      { key: 'issued_date', label: { vi: 'Ngay phat hanh', en: 'Issued Date' }, type: 'date' },
-      { key: 'days_open', label: { vi: 'So ngay mo', en: 'Days Open' }, type: 'number' }
+      { key: 'record_id', label: { vi: 'Mã SCAR', en: 'SCAR ID' }, type: 'id' },
+      { key: 'title', label: { vi: 'Tiêu đề', en: 'Title' }, type: 'truncate' },
+      { key: 'severity', label: { vi: 'Mức độ', en: 'Severity' }, type: 'badge' },
+      { key: 'status', label: { vi: 'Trạng thái', en: 'Status' }, type: 'badge' },
+      { key: 'issued_date', label: { vi: 'Ngày phát hành', en: 'Issued Date' }, type: 'date' },
+      { key: 'days_open', label: { vi: 'Số ngày mở', en: 'Days Open' }, type: 'number' }
     ];
-    return ui.renderSection({ vi: 'Lich su SCAR', en: 'SCAR History' },
+    return ui.renderSection({ vi: 'Lịch sử SCAR', en: 'SCAR History' },
       ui.renderDataGrid(cols, data, { selectable: false })
     );
   }
@@ -582,14 +582,14 @@
   function renderAuditsTab() {
     var data = state.tabData.audits || [];
     var cols = [
-      { key: 'audit_id', label: { vi: 'Ma DG', en: 'Audit ID' }, type: 'id' },
-      { key: 'audit_type', label: { vi: 'Loai', en: 'Type' }, type: 'badge' },
-      { key: 'status', label: { vi: 'Trang thai', en: 'Status' }, type: 'badge' },
-      { key: 'planned_date', label: { vi: 'Ngay ke hoach', en: 'Planned Date' }, type: 'date' },
-      { key: 'score', label: { vi: 'Diem', en: 'Score' }, render: function(v) { return renderScoreBar(v); } },
-      { key: 'finding_count', label: { vi: 'So phat hien', en: 'Findings' }, type: 'number' }
+      { key: 'audit_id', label: { vi: 'Mã ĐG', en: 'Audit ID' }, type: 'id' },
+      { key: 'audit_type', label: { vi: 'Loại', en: 'Type' }, type: 'badge' },
+      { key: 'status', label: { vi: 'Trạng thái', en: 'Status' }, type: 'badge' },
+      { key: 'planned_date', label: { vi: 'Ngày kế hoạch', en: 'Planned Date' }, type: 'date' },
+      { key: 'score', label: { vi: 'Điểm', en: 'Score' }, render: function(v) { return renderScoreBar(v); } },
+      { key: 'finding_count', label: { vi: 'Số phát hiện', en: 'Findings' }, type: 'number' }
     ];
-    return ui.renderSection({ vi: 'Lich su danh gia', en: 'Audit History' },
+    return ui.renderSection({ vi: 'Lịch sử đánh giá', en: 'Audit History' },
       ui.renderDataGrid(cols, data, { selectable: false })
     );
   }
@@ -598,15 +598,15 @@
   function renderPerformanceTab() {
     var data = state.tabData.performance || [];
     var cols = [
-      { key: 'month', label: { vi: 'Thang', en: 'Month' } },
-      { key: 'iqc_accept_rate', label: { vi: 'Ty le IQC dat', en: 'IQC Accept Rate' }, render: function(v) { return v != null ? esc(v + '%') : '\u2014'; } },
-      { key: 'ncr_count', label: { vi: 'So NCR', en: 'NCR Count' }, type: 'number' },
-      { key: 'on_time_delivery', label: { vi: 'Giao hang dung han', en: 'On-Time Delivery' }, render: function(v) { return v != null ? esc(v + '%') : '\u2014'; } },
-      { key: 'response_time', label: { vi: 'TG phan hoi (ngay)', en: 'Response Time (days)' }, type: 'number' },
-      { key: 'scar_count', label: { vi: 'So SCAR', en: 'SCAR Count' }, type: 'number' }
+      { key: 'month', label: { vi: 'Tháng', en: 'Month' } },
+      { key: 'iqc_accept_rate', label: { vi: 'Tỷ lệ IQC đạt', en: 'IQC Accept Rate' }, render: function(v) { return v != null ? esc(v + '%') : '\u2014'; } },
+      { key: 'ncr_count', label: { vi: 'Số NCR', en: 'NCR Count' }, type: 'number' },
+      { key: 'on_time_delivery', label: { vi: 'Giao hàng đúng hạn', en: 'On-Time Delivery' }, render: function(v) { return v != null ? esc(v + '%') : '\u2014'; } },
+      { key: 'response_time', label: { vi: 'TG phản hồi (ngày)', en: 'Response Time (days)' }, type: 'number' },
+      { key: 'scar_count', label: { vi: 'Số SCAR', en: 'SCAR Count' }, type: 'number' }
     ];
 
-    return ui.renderSection({ vi: 'Lich su hieu suat', en: 'Performance History' },
+    return ui.renderSection({ vi: 'Lịch sử hiệu suất', en: 'Performance History' },
       ui.renderChartWithTableFallback('supplier-perf-trend', null, cols, data, { defaultMode: 'table' })
     );
   }
@@ -616,10 +616,10 @@
     var related = state.tabData.related || [];
     var auditTrail = state.tabData.audit_trail || state.detail.audit_trail || [];
     var html = '';
-    html += ui.renderSection({ vi: 'Ban ghi lien quan', en: 'Related Records' },
+    html += ui.renderSection({ vi: 'Bản ghi liên quan', en: 'Related Records' },
       ui.renderRelationshipsPanel(related)
     );
-    html += ui.renderSection({ vi: 'Nhat ky thay doi', en: 'Audit Trail' },
+    html += ui.renderSection({ vi: 'Nhật ký thay đổi', en: 'Audit Trail' },
       ui.renderAuditTrail(auditTrail)
     );
     return html;
@@ -630,10 +630,10 @@
     var attachments = state.tabData.attachments || state.detail.attachments || [];
     var comments    = state.tabData.comments || state.detail.comments || [];
     var html = '';
-    html += ui.renderSection({ vi: 'Tep dinh kem', en: 'Attachments' },
+    html += ui.renderSection({ vi: 'Tệp đính kèm', en: 'Attachments' },
       ui.renderAttachmentsGrid(attachments)
     );
-    html += ui.renderSection({ vi: 'Binh luan', en: 'Comments' },
+    html += ui.renderSection({ vi: 'Bình luận', en: 'Comments' },
       ui.renderCommentsThread(comments)
     );
     return html;
@@ -647,37 +647,37 @@
     var html = '';
 
     html += ui.renderKpiRow([
-      { label: { vi: 'Tong NCC', en: 'Total Suppliers' },     value: fmt(m.total_suppliers || 0) },
-      { label: { vi: 'Diem TB', en: 'Avg Score' },            value: m.avg_quality_score != null ? Math.round(m.avg_quality_score) : '\u2014' },
-      { label: { vi: '% Chung nhan', en: 'Qualification %' }, value: m.qualification_coverage != null ? m.qualification_coverage + '%' : '\u2014' },
-      { label: { vi: 'SCAR mo', en: 'Open SCARs' },           value: fmt(m.open_scars || 0), accent: 'danger' }
+      { label: { vi: 'Tổng NCC', en: 'Total Suppliers' },     value: fmt(m.total_suppliers || 0) },
+      { label: { vi: 'Điểm TB', en: 'Avg Score' },            value: m.avg_quality_score != null ? Math.round(m.avg_quality_score) : '\u2014' },
+      { label: { vi: '% Chứng nhận', en: 'Qualification %' }, value: m.qualification_coverage != null ? m.qualification_coverage + '%' : '\u2014' },
+      { label: { vi: 'SCAR mở', en: 'Open SCARs' },           value: fmt(m.open_scars || 0), accent: 'danger' }
     ]);
 
     // Scorecard comparison radar (placeholder for multi-supplier overlay)
-    html += ui.renderSection({ vi: 'So sanh the diem NCC', en: 'Supplier Scorecard Comparison' },
+    html += ui.renderSection({ vi: 'So sánh thẻ điểm NCC', en: 'Supplier Scorecard Comparison' },
       '<div style="display:flex;justify-content:center;padding:16px">' +
       renderRadarChart(m.avg_scores || {}, 300) +
       '</div>' +
       '<div style="text-align:center;font-size:12px;color:var(--hm-text-secondary,#64748b)">' +
-      T({ vi: 'Diem trung binh tat ca NCC', en: 'Average scores across all suppliers' }) +
+      T({ vi: 'Điểm trung bình tất cả NCC', en: 'Average scores across all suppliers' }) +
       '</div>'
     );
 
     // Risk heatmap
-    html += ui.renderSection({ vi: 'Ban do rui ro', en: 'Risk Heatmap' }, renderRiskHeatmap(m.risk_matrix || []));
+    html += ui.renderSection({ vi: 'Bản đồ rủi ro', en: 'Risk Heatmap' }, renderRiskHeatmap(m.risk_matrix || []));
 
     // Top / Bottom ranking
     var topCols = [
       { key: 'rank', label: { vi: '#', en: '#' }, type: 'number' },
-      { key: 'supplier_id', label: { vi: 'Ma NCC', en: 'ID' }, type: 'id' },
-      { key: 'name', label: { vi: 'Ten', en: 'Name' }, type: 'truncate' },
-      { key: 'quality_score', label: { vi: 'Diem', en: 'Score' }, render: function(v) { return renderScoreBar(v); } }
+      { key: 'supplier_id', label: { vi: 'Mã NCC', en: 'ID' }, type: 'id' },
+      { key: 'name', label: { vi: 'Tên', en: 'Name' }, type: 'truncate' },
+      { key: 'quality_score', label: { vi: 'Điểm', en: 'Score' }, render: function(v) { return renderScoreBar(v); } }
     ];
     html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">';
-    html += ui.renderSection({ vi: 'Top 10 NCC tot nhat', en: 'Top 10 Suppliers' },
+    html += ui.renderSection({ vi: 'Top 10 NCC tốt nhất', en: 'Top 10 Suppliers' },
       ui.renderDataGrid(topCols, (m.top_suppliers || []).map(function(s, i) { s.rank = i + 1; return s; }), { selectable: false })
     );
-    html += ui.renderSection({ vi: 'Top 10 NCC can cai thien', en: 'Bottom 10 Suppliers' },
+    html += ui.renderSection({ vi: 'Top 10 NCC cần cải thiện', en: 'Bottom 10 Suppliers' },
       ui.renderDataGrid(topCols, (m.bottom_suppliers || []).map(function(s, i) { s.rank = i + 1; return s; }), { selectable: false })
     );
     html += '</div>';
@@ -686,11 +686,11 @@
     var trendData = m.quality_trends || [];
     if (trendData.length) {
       var trendCols = [
-        { key: 'month', label: { vi: 'Thang', en: 'Month' } },
+        { key: 'month', label: { vi: 'Tháng', en: 'Month' } },
         { key: 'supplier_name', label: { vi: 'NCC', en: 'Supplier' } },
-        { key: 'quality_score', label: { vi: 'Diem CL', en: 'Quality Score' }, render: function(v) { return renderScoreBar(v); } }
+        { key: 'quality_score', label: { vi: 'Điểm CL', en: 'Quality Score' }, render: function(v) { return renderScoreBar(v); } }
       ];
-      html += ui.renderSection({ vi: 'Xu huong chat luong theo NCC', en: 'Quality Trend by Supplier' },
+      html += ui.renderSection({ vi: 'Xu hướng chất lượng theo NCC', en: 'Quality Trend by Supplier' },
         ui.renderChartWithTableFallback('supplier-qual-trend', null, trendCols, trendData, { defaultMode: 'table' })
       );
     }
@@ -700,7 +700,7 @@
 
   function renderRiskHeatmap(matrix) {
     if (!matrix || !matrix.length) {
-      return ui.renderEmptyState({ icon: '\uD83D\uDEE1\uFE0F', title: { vi: 'Chua co du lieu rui ro', en: 'No risk data available' } });
+      return ui.renderEmptyState({ icon: '\uD83D\uDEE1\uFE0F', title: { vi: 'Chưa có dữ liệu rủi ro', en: 'No risk data available' } });
     }
     var size = 320;
     var pad = 50;
@@ -719,8 +719,8 @@
     }
 
     // Axis labels
-    svg += '<text x="' + (size / 2) + '" y="' + (size - 8) + '" text-anchor="middle" font-size="11" fill="var(--hm-text-secondary)">' + esc(T({ vi: 'Kha nang xay ra', en: 'Likelihood' })) + '</text>';
-    svg += '<text x="12" y="' + (size / 2) + '" text-anchor="middle" font-size="11" fill="var(--hm-text-secondary)" transform="rotate(-90,12,' + (size / 2) + ')">' + esc(T({ vi: 'Tac dong', en: 'Impact' })) + '</text>';
+    svg += '<text x="' + (size / 2) + '" y="' + (size - 8) + '" text-anchor="middle" font-size="11" fill="var(--hm-text-secondary)">' + esc(T({ vi: 'Khả năng xảy ra', en: 'Likelihood' })) + '</text>';
+    svg += '<text x="12" y="' + (size / 2) + '" text-anchor="middle" font-size="11" fill="var(--hm-text-secondary)" transform="rotate(-90,12,' + (size / 2) + ')">' + esc(T({ vi: 'Tác động', en: 'Impact' })) + '</text>';
 
     // Plot suppliers as dots
     matrix.forEach(function(item) {
@@ -741,34 +741,34 @@
   // =========================================================================
   function renderCreateForm() {
     var steps = [
-      { label: { vi: 'Thong tin co ban', en: 'Basic Info' } },
-      { label: { vi: 'Lien he & Phan loai', en: 'Contact & Classification' } },
-      { label: { vi: 'Chung nhan', en: 'Certifications' } }
+      { label: { vi: 'Thông tin cơ bản', en: 'Basic Info' } },
+      { label: { vi: 'Liên hệ & Phân loại', en: 'Contact & Classification' } },
+      { label: { vi: 'Chứng nhận', en: 'Certifications' } }
     ];
     var step = state.wizardStep || 0;
     var body = '';
 
     if (step === 0) {
-      body += ui.renderFormField({ key: 'name', label: { vi: 'Ten NCC', en: 'Supplier Name' }, required: true, value: (state.formData || {}).name });
-      body += ui.renderFormField({ key: 'address', label: { vi: 'Dia chi', en: 'Address' }, type: 'textarea', value: (state.formData || {}).address });
-      body += ui.renderFormField({ key: 'country', label: { vi: 'Quoc gia', en: 'Country' }, required: true, value: (state.formData || {}).country });
-      body += ui.renderFormField({ key: 'category', label: { vi: 'Danh muc', en: 'Category' }, required: true, value: (state.formData || {}).category });
+      body += ui.renderFormField({ key: 'name', label: { vi: 'Tên NCC', en: 'Supplier Name' }, required: true, value: (state.formData || {}).name });
+      body += ui.renderFormField({ key: 'address', label: { vi: 'Địa chỉ', en: 'Address' }, type: 'textarea', value: (state.formData || {}).address });
+      body += ui.renderFormField({ key: 'country', label: { vi: 'Quốc gia', en: 'Country' }, required: true, value: (state.formData || {}).country });
+      body += ui.renderFormField({ key: 'category', label: { vi: 'Danh mục', en: 'Category' }, required: true, value: (state.formData || {}).category });
     } else if (step === 1) {
-      body += ui.renderFormField({ key: 'contact_name', label: { vi: 'Nguoi lien he', en: 'Contact Name' }, value: (state.formData || {}).contact_name });
+      body += ui.renderFormField({ key: 'contact_name', label: { vi: 'Người liên hệ', en: 'Contact Name' }, value: (state.formData || {}).contact_name });
       body += ui.renderFormField({ key: 'contact_email', label: { vi: 'Email', en: 'Email' }, type: 'email', value: (state.formData || {}).contact_email });
-      body += ui.renderFormField({ key: 'phone', label: { vi: 'Dien thoai', en: 'Phone' }, value: (state.formData || {}).phone });
-      body += ui.renderFormField({ key: 'risk_tier', label: { vi: 'Muc rui ro', en: 'Risk Tier' }, type: 'select', options: RISK_LEVELS, value: (state.formData || {}).risk_tier });
-      body += ui.renderFormField({ key: 'strategic_classification', label: { vi: 'Phan loai chien luoc', en: 'Strategic Classification' }, type: 'select', options: [
-        { value: 'strategic', label: { vi: 'Chien luoc', en: 'Strategic' } },
-        { value: 'preferred', label: { vi: 'Uu tien', en: 'Preferred' } },
-        { value: 'approved',  label: { vi: 'Da duyet', en: 'Approved' } },
-        { value: 'transactional', label: { vi: 'Giao dich', en: 'Transactional' } }
+      body += ui.renderFormField({ key: 'phone', label: { vi: 'Điện thoại', en: 'Phone' }, value: (state.formData || {}).phone });
+      body += ui.renderFormField({ key: 'risk_tier', label: { vi: 'Mức rủi ro', en: 'Risk Tier' }, type: 'select', options: RISK_LEVELS, value: (state.formData || {}).risk_tier });
+      body += ui.renderFormField({ key: 'strategic_classification', label: { vi: 'Phân loại chiến lược', en: 'Strategic Classification' }, type: 'select', options: [
+        { value: 'strategic', label: { vi: 'Chiến lược', en: 'Strategic' } },
+        { value: 'preferred', label: { vi: 'Ưu tiên', en: 'Preferred' } },
+        { value: 'approved',  label: { vi: 'Đã duyệt', en: 'Approved' } },
+        { value: 'transactional', label: { vi: 'Giao dịch', en: 'Transactional' } }
       ], value: (state.formData || {}).strategic_classification });
     } else {
-      body += ui.renderFormField({ key: 'certifications', label: { vi: 'Chung chi (cach nhau bang dau phay)', en: 'Certifications (comma-separated)' }, placeholder: { vi: 'ISO 9001, AS9100, IATF 16949...', en: 'ISO 9001, AS9100, IATF 16949...' }, value: (state.formData || {}).certifications });
-      body += ui.renderFormField({ key: 'capabilities', label: { vi: 'Nang luc', en: 'Capabilities' }, type: 'textarea', value: (state.formData || {}).capabilities });
-      body += ui.renderFormField({ key: 'annual_revenue', label: { vi: 'Doanh thu hang nam', en: 'Annual Revenue' }, type: 'number', value: (state.formData || {}).annual_revenue });
-      body += ui.renderFormField({ key: 'employee_count', label: { vi: 'So nhan vien', en: 'Employee Count' }, type: 'number', value: (state.formData || {}).employee_count });
+      body += ui.renderFormField({ key: 'certifications', label: { vi: 'Chứng chỉ (cách nhau bằng dấu phẩy)', en: 'Certifications (comma-separated)' }, placeholder: { vi: 'ISO 9001, AS9100, IATF 16949...', en: 'ISO 9001, AS9100, IATF 16949...' }, value: (state.formData || {}).certifications });
+      body += ui.renderFormField({ key: 'capabilities', label: { vi: 'Năng lực', en: 'Capabilities' }, type: 'textarea', value: (state.formData || {}).capabilities });
+      body += ui.renderFormField({ key: 'annual_revenue', label: { vi: 'Doanh thu hàng năm', en: 'Annual Revenue' }, type: 'number', value: (state.formData || {}).annual_revenue });
+      body += ui.renderFormField({ key: 'employee_count', label: { vi: 'Số nhân viên', en: 'Employee Count' }, type: 'number', value: (state.formData || {}).employee_count });
     }
 
     return ui.renderWizardShell(steps, step, body, { saveDraft: true });

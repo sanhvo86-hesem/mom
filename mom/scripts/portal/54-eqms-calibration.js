@@ -23,36 +23,36 @@
   // ─── Constants ───────────────────────────────────────────────────────
   var CAL_STATES = ['scheduled','in_progress','result_recorded','under_review','approved','oot_declared','closed'];
   var CAL_RESULTS = [
-    { value: 'pass',        label: { vi: 'Dat', en: 'Pass' } },
-    { value: 'fail',        label: { vi: 'Khong dat', en: 'Fail' } },
-    { value: 'conditional', label: { vi: 'Co dieu kien', en: 'Conditional' } }
+    { value: 'pass',        label: { vi: 'Đạt', en: 'Pass' } },
+    { value: 'fail',        label: { vi: 'Không đạt', en: 'Fail' } },
+    { value: 'conditional', label: { vi: 'Có điều kiện', en: 'Conditional' } }
   ];
   var EQUIPMENT_TYPES = [
-    { value: 'gauge',       label: { vi: 'Dong ho do', en: 'Gauge' } },
-    { value: 'caliper',     label: { vi: 'Thuoc cap', en: 'Caliper' } },
-    { value: 'micrometer',  label: { vi: 'Thuoc do micromet', en: 'Micrometer' } },
-    { value: 'scale',       label: { vi: 'Can', en: 'Scale' } },
-    { value: 'thermometer', label: { vi: 'Nhiet ke', en: 'Thermometer' } },
-    { value: 'pressure',    label: { vi: 'Dong ho ap suat', en: 'Pressure Gauge' } },
-    { value: 'cmm',         label: { vi: 'May CMM', en: 'CMM' } },
-    { value: 'other',       label: { vi: 'Khac', en: 'Other' } }
+    { value: 'gauge',       label: { vi: 'Đồng hồ đo', en: 'Gauge' } },
+    { value: 'caliper',     label: { vi: 'Thước cặp', en: 'Caliper' } },
+    { value: 'micrometer',  label: { vi: 'Thước đo micromet', en: 'Micrometer' } },
+    { value: 'scale',       label: { vi: 'Cân', en: 'Scale' } },
+    { value: 'thermometer', label: { vi: 'Nhiệt kế', en: 'Thermometer' } },
+    { value: 'pressure',    label: { vi: 'Đồng hồ áp suất', en: 'Pressure Gauge' } },
+    { value: 'cmm',         label: { vi: 'Máy CMM', en: 'CMM' } },
+    { value: 'other',       label: { vi: 'Khác', en: 'Other' } }
   ];
   var MSA_TYPES = [
     { value: 'gauge_rr',   label: { vi: 'Gauge R&R', en: 'Gauge R&R' } },
-    { value: 'linearity',  label: { vi: 'Do tuyen tinh', en: 'Linearity' } },
-    { value: 'bias',       label: { vi: 'Do lech', en: 'Bias' } },
-    { value: 'stability',  label: { vi: 'Do on dinh', en: 'Stability' } }
+    { value: 'linearity',  label: { vi: 'Độ tuyến tính', en: 'Linearity' } },
+    { value: 'bias',       label: { vi: 'Độ lệch', en: 'Bias' } },
+    { value: 'stability',  label: { vi: 'Độ ổn định', en: 'Stability' } }
   ];
   var CAL_ACTIONS = {
-    scheduled:        [{ action: 'start',         label: { vi: 'Bat dau', en: 'Start' },          style: 'primary' }],
-    in_progress:      [{ action: 'record-result', label: { vi: 'Ghi ket qua', en: 'Record Result' }, style: 'primary' }],
-    result_recorded:  [{ action: 'submit-review', label: { vi: 'Gui xem xet', en: 'Submit Review' }, style: 'primary' }],
+    scheduled:        [{ action: 'start',         label: { vi: 'Bắt đầu', en: 'Start' },          style: 'primary' }],
+    in_progress:      [{ action: 'record-result', label: { vi: 'Ghi kết quả', en: 'Record Result' }, style: 'primary' }],
+    result_recorded:  [{ action: 'submit-review', label: { vi: 'Gửi xem xét', en: 'Submit Review' }, style: 'primary' }],
     under_review:     [
-      { action: 'approve',     label: { vi: 'Phe duyet', en: 'Approve' },     style: 'primary' },
-      { action: 'declare-oot', label: { vi: 'Khai bao OOT', en: 'Declare OOT' }, style: 'danger' }
+      { action: 'approve',     label: { vi: 'Phê duyệt', en: 'Approve' },     style: 'primary' },
+      { action: 'declare-oot', label: { vi: 'Khai báo OOT', en: 'Declare OOT' }, style: 'danger' }
     ],
-    approved:         [{ action: 'close', label: { vi: 'Dong', en: 'Close' }, style: 'secondary' }],
-    oot_declared:     [{ action: 'close', label: { vi: 'Dong', en: 'Close' }, style: 'secondary' }]
+    approved:         [{ action: 'close', label: { vi: 'Đóng', en: 'Close' }, style: 'secondary' }],
+    oot_declared:     [{ action: 'close', label: { vi: 'Đóng', en: 'Close' }, style: 'secondary' }]
   };
 
   // ─── State ───────────────────────────────────────────────────────────
@@ -91,9 +91,9 @@
   function dueStatusBadge(nextDue) {
     var s = dueStatus(nextDue);
     var labels = {
-      'overdue':  { vi: 'Qua han', en: 'Overdue' },
-      'due-soon': { vi: 'Sap den han', en: 'Due Soon' },
-      'on-time':  { vi: 'Dung han', en: 'On Time' }
+      'overdue':  { vi: 'Quá hạn', en: 'Overdue' },
+      'due-soon': { vi: 'Sắp đến hạn', en: 'Due Soon' },
+      'on-time':  { vi: 'Đúng hạn', en: 'On Time' }
     };
     var cls = s === 'overdue' ? 'overdue' : (s === 'due-soon' ? 'due-soon' : 'on-time');
     return '<span class="eqms-badge ' + cls + '">' + esc(T(labels[s] || { vi: '—', en: '—' })) + '</span>';
@@ -108,9 +108,9 @@
   function grrConclusion(pct) {
     if (pct == null) return '—';
     var p = Number(pct);
-    if (p < 10) return '<span class="eqms-badge pass">' + T({ vi: 'Chap nhan <10%', en: 'Acceptable <10%' }) + '</span>';
-    if (p <= 30) return '<span class="eqms-badge conditional">' + T({ vi: 'Can cai thien 10-30%', en: 'Marginal 10-30%' }) + '</span>';
-    return '<span class="eqms-badge fail">' + T({ vi: 'Khong chap nhan >30%', en: 'Unacceptable >30%' }) + '</span>';
+    if (p < 10) return '<span class="eqms-badge pass">' + T({ vi: 'Chấp nhận <10%', en: 'Acceptable <10%' }) + '</span>';
+    if (p <= 30) return '<span class="eqms-badge conditional">' + T({ vi: 'Cần cải thiện 10-30%', en: 'Marginal 10-30%' }) + '</span>';
+    return '<span class="eqms-badge fail">' + T({ vi: 'Không chấp nhận >30%', en: 'Unacceptable >30%' }) + '</span>';
   }
 
   function toast(msg) {
@@ -186,15 +186,15 @@
   // ─── Module Meta ─────────────────────────────────────────────────────
   var MOD = {
     id: 'calibration',
-    label: { vi: 'Hieu chuan / MSA', en: 'Calibration / MSA' },
+    label: { vi: 'Hiệu chuẩn / MSA', en: 'Calibration / MSA' },
     icon: '\u{1F4CF}'
   };
 
   // ─── Screen Tabs ─────────────────────────────────────────────────────
   var SCREEN_TABS = [
-    { id: 'schedule',   label: { vi: 'Lich hieu chuan', en: 'Schedule' } },
+    { id: 'schedule',   label: { vi: 'Lịch hiệu chuẩn', en: 'Schedule' } },
     { id: 'msa-list',   label: { vi: 'MSA', en: 'MSA Studies' } },
-    { id: 'analytics',  label: { vi: 'Phan tich', en: 'Analytics' } }
+    { id: 'analytics',  label: { vi: 'Phân tích', en: 'Analytics' } }
   ];
 
   // ═══════════════════════════════════════════════════════════════════════
@@ -209,7 +209,7 @@
     }
 
     if (state.loading) {
-      html += ui.renderLoadingState({ vi: 'Dang tai du lieu...', en: 'Loading data...' });
+      html += ui.renderLoadingState({ vi: 'Đang tải dữ liệu...', en: 'Loading data...' });
       container.innerHTML = html;
       return;
     }
@@ -234,20 +234,20 @@
     // KPI row
     if (state.metrics) {
       html += ui.renderKpiRow([
-        { label: { vi: 'Tong thiet bi', en: 'Total Equipment' },       value: fmt(state.metrics.total_equipment),   accent: '' },
-        { label: { vi: 'Dung han', en: 'On Time' },                    value: fmt(state.metrics.on_time),           accent: 'success' },
-        { label: { vi: 'Sap den han', en: 'Due Soon' },                value: fmt(state.metrics.due_soon),          accent: 'warning' },
-        { label: { vi: 'Qua han', en: 'Overdue' },                     value: fmt(state.metrics.overdue),           accent: 'danger' },
-        { label: { vi: 'Ty le dung han', en: 'On-Time Rate' },         value: state.metrics.on_time_rate ? state.metrics.on_time_rate + '%' : '—', accent: 'info', trend: state.metrics.on_time_trend }
+        { label: { vi: 'Tổng thiết bị', en: 'Total Equipment' },       value: fmt(state.metrics.total_equipment),   accent: '' },
+        { label: { vi: 'Đúng hạn', en: 'On Time' },                    value: fmt(state.metrics.on_time),           accent: 'success' },
+        { label: { vi: 'Sắp đến hạn', en: 'Due Soon' },                value: fmt(state.metrics.due_soon),          accent: 'warning' },
+        { label: { vi: 'Quá hạn', en: 'Overdue' },                     value: fmt(state.metrics.overdue),           accent: 'danger' },
+        { label: { vi: 'Tỷ lệ đúng hạn', en: 'On-Time Rate' },         value: state.metrics.on_time_rate ? state.metrics.on_time_rate + '%' : '—', accent: 'info', trend: state.metrics.on_time_trend }
       ]);
     }
 
     // Toolbar
     html += '<div class="eqms-toolbar">';
-    html += '<button class="eqms-btn primary sm" data-action="create-cal">' + T({ vi: '+ Tao hieu chuan', en: '+ New Calibration' }) + '</button>';
+    html += '<button class="eqms-btn primary sm" data-action="create-cal">' + T({ vi: '+ Tạo hiệu chuẩn', en: '+ New Calibration' }) + '</button>';
     html += '<div class="eqms-view-toggle">';
-    html += '<button class="eqms-btn ' + (state.viewMode === 'list' ? 'secondary' : 'ghost') + ' sm" data-action="view-mode" data-mode="list">' + T({ vi: 'Danh sach', en: 'List' }) + '</button>';
-    html += '<button class="eqms-btn ' + (state.viewMode === 'calendar' ? 'secondary' : 'ghost') + ' sm" data-action="view-mode" data-mode="calendar">' + T({ vi: 'Lich', en: 'Calendar' }) + '</button>';
+    html += '<button class="eqms-btn ' + (state.viewMode === 'list' ? 'secondary' : 'ghost') + ' sm" data-action="view-mode" data-mode="list">' + T({ vi: 'Danh sách', en: 'List' }) + '</button>';
+    html += '<button class="eqms-btn ' + (state.viewMode === 'calendar' ? 'secondary' : 'ghost') + ' sm" data-action="view-mode" data-mode="calendar">' + T({ vi: 'Lịch', en: 'Calendar' }) + '</button>';
     html += '</div>';
     html += ui.renderExportMenu({ formats: ['pdf', 'excel', 'csv'] });
     html += '</div>';
@@ -255,16 +255,16 @@
     // Filters
     html += ui.renderFilterBar(state.filters, {
       fields: [
-        { key: 'search', type: 'text', placeholder: { vi: 'Tim kiem...', en: 'Search...' }, width: '200px' },
-        { key: 'equipment_type', type: 'select', label: { vi: 'Loai TB', en: 'Equip. Type' }, options: EQUIPMENT_TYPES },
-        { key: 'location', type: 'text', label: { vi: 'Vi tri', en: 'Location' }, width: '120px' },
-        { key: 'due_status', type: 'select', label: { vi: 'Trang thai', en: 'Due Status' }, options: [
-          { value: 'on-time',  label: { vi: 'Dung han', en: 'On Time' } },
-          { value: 'due-soon', label: { vi: 'Sap den han', en: 'Due Soon' } },
-          { value: 'overdue',  label: { vi: 'Qua han', en: 'Overdue' } }
+        { key: 'search', type: 'text', placeholder: { vi: 'Tìm kiếm...', en: 'Search...' }, width: '200px' },
+        { key: 'equipment_type', type: 'select', label: { vi: 'Loại TB', en: 'Equip. Type' }, options: EQUIPMENT_TYPES },
+        { key: 'location', type: 'text', label: { vi: 'Vị trí', en: 'Location' }, width: '120px' },
+        { key: 'due_status', type: 'select', label: { vi: 'Trạng thái', en: 'Due Status' }, options: [
+          { value: 'on-time',  label: { vi: 'Đúng hạn', en: 'On Time' } },
+          { value: 'due-soon', label: { vi: 'Sắp đến hạn', en: 'Due Soon' } },
+          { value: 'overdue',  label: { vi: 'Quá hạn', en: 'Overdue' } }
         ]},
-        { key: 'due_from', type: 'date', label: { vi: 'Tu ngay', en: 'From' } },
-        { key: 'due_to', type: 'date', label: { vi: 'Den ngay', en: 'To' } }
+        { key: 'due_from', type: 'date', label: { vi: 'Từ ngày', en: 'From' } },
+        { key: 'due_to', type: 'date', label: { vi: 'Đến ngày', en: 'To' } }
       ]
     });
 
@@ -281,16 +281,16 @@
 
   function renderListView() {
     var columns = [
-      { key: 'equipment_id',   label: { vi: 'Ma TB', en: 'Equipment ID' },     type: 'id',       sortable: true },
-      { key: 'equipment_name', label: { vi: 'Ten', en: 'Name' },                sortable: true },
-      { key: 'equipment_type', label: { vi: 'Loai', en: 'Type' },              type: 'badge',    sortable: true },
+      { key: 'equipment_id',   label: { vi: 'Mã TB', en: 'Equipment ID' },     type: 'id',       sortable: true },
+      { key: 'equipment_name', label: { vi: 'Tên', en: 'Name' },                sortable: true },
+      { key: 'equipment_type', label: { vi: 'Loại', en: 'Type' },              type: 'badge',    sortable: true },
       { key: 'serial_number',  label: { vi: 'S/N', en: 'S/N' },                sortable: true },
-      { key: 'location',       label: { vi: 'Vi tri', en: 'Location' },         sortable: true },
-      { key: 'calibration_date', label: { vi: 'Ngay HC', en: 'Cal Date' },      type: 'date',     sortable: true },
-      { key: 'next_due_date',  label: { vi: 'Han ke tiep', en: 'Next Due' },    type: 'date',     sortable: true },
-      { key: 'due_status',     label: { vi: 'Tinh trang', en: 'Status' },       sortable: true,
+      { key: 'location',       label: { vi: 'Vị trí', en: 'Location' },         sortable: true },
+      { key: 'calibration_date', label: { vi: 'Ngày HC', en: 'Cal Date' },      type: 'date',     sortable: true },
+      { key: 'next_due_date',  label: { vi: 'Hạn kế tiếp', en: 'Next Due' },    type: 'date',     sortable: true },
+      { key: 'due_status',     label: { vi: 'Tình trạng', en: 'Status' },       sortable: true,
         render: function(v, row) { return dueStatusBadge(row.next_due_date); } },
-      { key: 'result',         label: { vi: 'Ket qua', en: 'Result' },          sortable: true,
+      { key: 'result',         label: { vi: 'Kết quả', en: 'Result' },          sortable: true,
         render: function(v) { return resultBadge(v); } },
       { key: 'status',         label: { vi: 'Workflow', en: 'Workflow' },        type: 'badge',    sortable: true }
     ];
@@ -309,7 +309,7 @@
     var firstDay = new Date(year, month, 1).getDay();
     var daysInMonth = new Date(year, month + 1, 0).getDate();
     var monthNames = lang() === 'vi'
-      ? ['Thang 1','Thang 2','Thang 3','Thang 4','Thang 5','Thang 6','Thang 7','Thang 8','Thang 9','Thang 10','Thang 11','Thang 12']
+      ? ['Tháng 1','Tháng 2','Tháng 3','Tháng 4','Tháng 5','Tháng 6','Tháng 7','Tháng 8','Tháng 9','Tháng 10','Tháng 11','Tháng 12']
       : ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
     // Map calibrations by due day
@@ -361,17 +361,17 @@
   // ═══════════════════════════════════════════════════════════════════════
   function renderCalDetail() {
     var r = state.record;
-    if (!r) return ui.renderEmptyState({ icon: '\u26A0\uFE0F', title: { vi: 'Khong tim thay', en: 'Not found' } });
+    if (!r) return ui.renderEmptyState({ icon: '\u26A0\uFE0F', title: { vi: 'Không tìm thấy', en: 'Not found' } });
 
     var html = '';
 
     // Back button
-    html += '<div style="margin-bottom:12px"><button class="eqms-btn ghost sm" data-action="back-to-schedule">\u2190 ' + T({ vi: 'Quay lai', en: 'Back' }) + '</button></div>';
+    html += '<div style="margin-bottom:12px"><button class="eqms-btn ghost sm" data-action="back-to-schedule">\u2190 ' + T({ vi: 'Quay lại', en: 'Back' }) + '</button></div>';
 
     // Identity header
     var actions = CAL_ACTIONS[r.status] || [];
     html += ui.renderIdentityHeader(r, { actions: actions, extraMeta: [
-      { label: { vi: 'Thiet bi', en: 'Equipment' }, value: r.equipment_name },
+      { label: { vi: 'Thiết bị', en: 'Equipment' }, value: r.equipment_name },
       { label: { vi: 'S/N', en: 'S/N' }, value: r.serial_number }
     ]});
 
@@ -380,12 +380,12 @@
 
     // Tabs
     var detailTabs = [
-      { id: 'summary',    label: { vi: 'Tong quan', en: 'Summary' } },
-      { id: 'results',    label: { vi: 'Ket qua', en: 'Results' } },
-      { id: 'certificate', label: { vi: 'Chung chi', en: 'Certificate' } },
+      { id: 'summary',    label: { vi: 'Tổng quan', en: 'Summary' } },
+      { id: 'results',    label: { vi: 'Kết quả', en: 'Results' } },
+      { id: 'certificate', label: { vi: 'Chứng chỉ', en: 'Certificate' } },
       { id: 'oot',        label: { vi: 'OOT', en: 'OOT Declaration' } },
-      { id: 'history',    label: { vi: 'Lich su TB', en: 'Equipment History' } },
-      { id: 'audit',      label: { vi: 'Nhat ky', en: 'Audit Trail' } }
+      { id: 'history',    label: { vi: 'Lịch sử TB', en: 'Equipment History' } },
+      { id: 'audit',      label: { vi: 'Nhật ký', en: 'Audit Trail' } }
     ];
     html += ui.renderTabs(detailTabs, state.detailTab);
 
@@ -405,20 +405,20 @@
   // ── Cal Tab: Summary ──
   function renderCalSummary(r) {
     return ui.renderFieldGrid([
-      { label: { vi: 'Ma hieu chuan', en: 'Cal ID' },          value: r.cal_id, mono: true },
-      { label: { vi: 'Ma thiet bi', en: 'Equipment ID' },      value: r.equipment_id, mono: true },
-      { label: { vi: 'Ten thiet bi', en: 'Equipment Name' },   value: r.equipment_name },
-      { label: { vi: 'Loai thiet bi', en: 'Equipment Type' },  value: r.equipment_type, badge: true },
-      { label: { vi: 'So seri', en: 'Serial Number' },         value: r.serial_number },
-      { label: { vi: 'Vi tri', en: 'Location' },               value: r.location },
-      { label: { vi: 'Chuan su dung', en: 'Standard Used' },   value: r.standard_used },
-      { label: { vi: 'Ngay hieu chuan', en: 'Calibration Date' }, value: fmtDate(r.calibration_date) },
-      { label: { vi: 'Han tiep theo', en: 'Next Due Date' },   value: fmtDate(r.next_due_date) },
-      { label: { vi: 'Thuc hien boi', en: 'Performed By' },    value: r.performed_by },
-      { label: { vi: 'Trang thai', en: 'Status' },             value: r.status, badge: true },
-      { label: { vi: 'Ket qua', en: 'Result' },                value: r.result, badge: true },
+      { label: { vi: 'Mã hiệu chuẩn', en: 'Cal ID' },          value: r.cal_id, mono: true },
+      { label: { vi: 'Mã thiết bị', en: 'Equipment ID' },      value: r.equipment_id, mono: true },
+      { label: { vi: 'Tên thiết bị', en: 'Equipment Name' },   value: r.equipment_name },
+      { label: { vi: 'Loại thiết bị', en: 'Equipment Type' },  value: r.equipment_type, badge: true },
+      { label: { vi: 'Số seri', en: 'Serial Number' },         value: r.serial_number },
+      { label: { vi: 'Vị trí', en: 'Location' },               value: r.location },
+      { label: { vi: 'Chuẩn sử dụng', en: 'Standard Used' },   value: r.standard_used },
+      { label: { vi: 'Ngày hiệu chuẩn', en: 'Calibration Date' }, value: fmtDate(r.calibration_date) },
+      { label: { vi: 'Hạn tiếp theo', en: 'Next Due Date' },   value: fmtDate(r.next_due_date) },
+      { label: { vi: 'Thực hiện bởi', en: 'Performed By' },    value: r.performed_by },
+      { label: { vi: 'Trạng thái', en: 'Status' },             value: r.status, badge: true },
+      { label: { vi: 'Kết quả', en: 'Result' },                value: r.result, badge: true },
       { label: { vi: 'Dung sai', en: 'Tolerance' },            value: r.tolerance },
-      { label: { vi: 'Gia tri thuc', en: 'Actual Value' },     value: r.actual_value }
+      { label: { vi: 'Giá trị thực', en: 'Actual Value' },     value: r.actual_value }
     ]);
   }
 
@@ -427,24 +427,24 @@
     var measurements = r.measurements || [];
     var html = '';
 
-    html += ui.renderSection({ vi: 'Ket qua do luong', en: 'Measurement Results' },
+    html += ui.renderSection({ vi: 'Kết quả đo lường', en: 'Measurement Results' },
       ui.renderDataGrid([
-        { key: 'parameter',  label: { vi: 'Thong so', en: 'Parameter' } },
-        { key: 'nominal',    label: { vi: 'Danh dinh', en: 'Nominal' },     type: 'number' },
+        { key: 'parameter',  label: { vi: 'Thông số', en: 'Parameter' } },
+        { key: 'nominal',    label: { vi: 'Danh định', en: 'Nominal' },     type: 'number' },
         { key: 'tolerance_plus',  label: { vi: 'Dung sai +', en: 'Tol +' }, type: 'number' },
         { key: 'tolerance_minus', label: { vi: 'Dung sai -', en: 'Tol -' }, type: 'number' },
-        { key: 'actual',     label: { vi: 'Thuc te', en: 'Actual' },        type: 'number' },
-        { key: 'pass_fail',  label: { vi: 'Dat/Truot', en: 'Pass/Fail' },
+        { key: 'actual',     label: { vi: 'Thực tế', en: 'Actual' },        type: 'number' },
+        { key: 'pass_fail',  label: { vi: 'Đạt/Trượt', en: 'Pass/Fail' },
           render: function(v) { return resultBadge(v); } }
       ], measurements, { selectable: false })
     );
 
     // Result summary
-    html += ui.renderSection({ vi: 'Tong hop ket qua', en: 'Result Summary' },
+    html += ui.renderSection({ vi: 'Tổng hợp kết quả', en: 'Result Summary' },
       ui.renderFieldGrid([
-        { label: { vi: 'Ket qua chung', en: 'Overall Result' },         value: r.result, badge: true },
-        { label: { vi: 'Do khong dam bao', en: 'Uncertainty' },          value: r.uncertainty },
-        { label: { vi: 'Ghi chu', en: 'Notes' },                        value: r.result_notes }
+        { label: { vi: 'Kết quả chung', en: 'Overall Result' },         value: r.result, badge: true },
+        { label: { vi: 'Độ không đảm bảo', en: 'Uncertainty' },          value: r.uncertainty },
+        { label: { vi: 'Ghi chú', en: 'Notes' },                        value: r.result_notes }
       ])
     );
 
@@ -457,17 +457,17 @@
     if (!cert.certificate_number && !cert.issued_by) {
       return ui.renderEmptyState({
         icon: '\u{1F4DC}',
-        title: { vi: 'Chua co chung chi', en: 'No certificate yet' },
-        desc: { vi: 'Chung chi se duoc tao sau khi phe duyet', en: 'Certificate will be generated after approval' }
+        title: { vi: 'Chưa có chứng chỉ', en: 'No certificate yet' },
+        desc: { vi: 'Chứng chỉ sẽ được tạo sau khi phê duyệt', en: 'Certificate will be generated after approval' }
       });
     }
 
     var html = '';
     html += ui.renderFieldGrid([
-      { label: { vi: 'So chung chi', en: 'Certificate Number' },   value: cert.certificate_number, mono: true },
-      { label: { vi: 'Cap boi', en: 'Issued By' },                  value: cert.issued_by },
-      { label: { vi: 'Ngay cap', en: 'Issue Date' },                value: fmtDate(cert.issue_date) },
-      { label: { vi: 'Hieu luc den', en: 'Valid Until' },           value: fmtDate(cert.valid_until) }
+      { label: { vi: 'Số chứng chỉ', en: 'Certificate Number' },   value: cert.certificate_number, mono: true },
+      { label: { vi: 'Cấp bởi', en: 'Issued By' },                  value: cert.issued_by },
+      { label: { vi: 'Ngày cấp', en: 'Issue Date' },                value: fmtDate(cert.issue_date) },
+      { label: { vi: 'Hiệu lực đến', en: 'Valid Until' },           value: fmtDate(cert.valid_until) }
     ]);
 
     // Certificate preview area
@@ -475,7 +475,7 @@
     if (cert.preview_url) {
       html += '<iframe src="' + esc(cert.preview_url) + '" style="width:100%;height:500px;border:1px solid var(--hm-border,#e2e8f0);border-radius:8px"></iframe>';
     } else {
-      html += '<div class="eqms-empty-state" style="min-height:200px"><span>' + T({ vi: 'Xem truoc khong kha dung', en: 'Preview not available' }) + '</span></div>';
+      html += '<div class="eqms-empty-state" style="min-height:200px"><span>' + T({ vi: 'Xem trước không khả dụng', en: 'Preview not available' }) + '</span></div>';
     }
     html += '</div>';
 
@@ -488,18 +488,18 @@
     if (!oot.oot_flag && r.status !== 'oot_declared') {
       return ui.renderEmptyState({
         icon: '\u2705',
-        title: { vi: 'Khong co OOT', en: 'No OOT Declaration' },
-        desc: { vi: 'Thiet bi trong dung sai', en: 'Equipment is within tolerance' }
+        title: { vi: 'Không có OOT', en: 'No OOT Declaration' },
+        desc: { vi: 'Thiết bị trong dung sai', en: 'Equipment is within tolerance' }
       });
     }
 
     return ui.renderFieldGrid([
-      { label: { vi: 'Co OOT', en: 'OOT Flag' },                    value: oot.oot_flag ? T({ vi: 'Co', en: 'Yes' }) : T({ vi: 'Khong', en: 'No' }), badge: true },
-      { label: { vi: 'Danh gia tac dong', en: 'Impact Assessment' }, value: oot.impact_assessment },
-      { label: { vi: 'Phep do bi anh huong', en: 'Affected Measurements' }, value: oot.affected_measurements },
-      { label: { vi: 'Hanh dong khac phuc', en: 'Corrective Actions' }, value: oot.corrective_actions },
-      { label: { vi: 'Ngay khai bao', en: 'Declaration Date' },      value: fmtDate(oot.declaration_date) },
-      { label: { vi: 'Nguoi khai bao', en: 'Declared By' },          value: oot.declared_by }
+      { label: { vi: 'Có OOT', en: 'OOT Flag' },                    value: oot.oot_flag ? T({ vi: 'Có', en: 'Yes' }) : T({ vi: 'Không', en: 'No' }), badge: true },
+      { label: { vi: 'Đánh giá tác động', en: 'Impact Assessment' }, value: oot.impact_assessment },
+      { label: { vi: 'Phép đo bị ảnh hưởng', en: 'Affected Measurements' }, value: oot.affected_measurements },
+      { label: { vi: 'Hành động khắc phục', en: 'Corrective Actions' }, value: oot.corrective_actions },
+      { label: { vi: 'Ngày khai báo', en: 'Declaration Date' },      value: fmtDate(oot.declaration_date) },
+      { label: { vi: 'Người khai báo', en: 'Declared By' },          value: oot.declared_by }
     ]);
   }
 
@@ -509,27 +509,27 @@
     var html = '';
 
     // Trend chart placeholder
-    html += ui.renderSection({ vi: 'Xu huong thong so', en: 'Parameter Trend' },
+    html += ui.renderSection({ vi: 'Xu hướng thông số', en: 'Parameter Trend' },
       ui.renderChartWithTableFallback('chart-equip-trend', null,
         [
-          { key: 'date', label: { vi: 'Ngay', en: 'Date' }, type: 'date' },
-          { key: 'parameter', label: { vi: 'Thong so', en: 'Parameter' } },
-          { key: 'value', label: { vi: 'Gia tri', en: 'Value' }, type: 'number' },
-          { key: 'nominal', label: { vi: 'Danh dinh', en: 'Nominal' }, type: 'number' }
+          { key: 'date', label: { vi: 'Ngày', en: 'Date' }, type: 'date' },
+          { key: 'parameter', label: { vi: 'Thông số', en: 'Parameter' } },
+          { key: 'value', label: { vi: 'Giá trị', en: 'Value' }, type: 'number' },
+          { key: 'nominal', label: { vi: 'Danh định', en: 'Nominal' }, type: 'number' }
         ],
         r.trend_data || []
       )
     );
 
     // History table
-    html += ui.renderSection({ vi: 'Lich su hieu chuan', en: 'Calibration History' },
+    html += ui.renderSection({ vi: 'Lịch sử hiệu chuẩn', en: 'Calibration History' },
       ui.renderDataGrid([
-        { key: 'cal_id',           label: { vi: 'Ma HC', en: 'Cal ID' },      type: 'id' },
-        { key: 'calibration_date', label: { vi: 'Ngay', en: 'Date' },          type: 'date' },
-        { key: 'result',           label: { vi: 'Ket qua', en: 'Result' },     render: function(v) { return resultBadge(v); } },
-        { key: 'performed_by',     label: { vi: 'Thuc hien', en: 'Performed By' } },
-        { key: 'standard_used',    label: { vi: 'Chuan', en: 'Standard' } },
-        { key: 'notes',            label: { vi: 'Ghi chu', en: 'Notes' },      type: 'truncate' }
+        { key: 'cal_id',           label: { vi: 'Mã HC', en: 'Cal ID' },      type: 'id' },
+        { key: 'calibration_date', label: { vi: 'Ngày', en: 'Date' },          type: 'date' },
+        { key: 'result',           label: { vi: 'Kết quả', en: 'Result' },     render: function(v) { return resultBadge(v); } },
+        { key: 'performed_by',     label: { vi: 'Thực hiện', en: 'Performed By' } },
+        { key: 'standard_used',    label: { vi: 'Chuẩn', en: 'Standard' } },
+        { key: 'notes',            label: { vi: 'Ghi chú', en: 'Notes' },      type: 'truncate' }
       ], history, { selectable: false })
     );
 
@@ -539,14 +539,14 @@
   // ── Cal Tab: Audit Trail ──
   function renderCalAuditTab(r) {
     var html = '';
-    html += ui.renderSection({ vi: 'Nhat ky kiem toan', en: 'Audit Trail' }, ui.renderAuditTrail(state.auditEvents));
-    html += ui.renderSection({ vi: 'Chu ky', en: 'Signatures' }, ui.renderSignaturePanel(state.signatures, [
-      { vi: 'Thuc hien', en: 'Performed By' },
-      { vi: 'Xem xet', en: 'Reviewed By' },
-      { vi: 'Phe duyet', en: 'Approved By' }
+    html += ui.renderSection({ vi: 'Nhật ký kiểm toán', en: 'Audit Trail' }, ui.renderAuditTrail(state.auditEvents));
+    html += ui.renderSection({ vi: 'Chữ ký', en: 'Signatures' }, ui.renderSignaturePanel(state.signatures, [
+      { vi: 'Thực hiện', en: 'Performed By' },
+      { vi: 'Xem xét', en: 'Reviewed By' },
+      { vi: 'Phê duyệt', en: 'Approved By' }
     ]));
-    html += ui.renderSection({ vi: 'Tep dinh kem', en: 'Attachments' }, ui.renderAttachmentsGrid(r.attachments || []));
-    html += ui.renderSection({ vi: 'Binh luan', en: 'Comments' }, ui.renderCommentsThread(r.comments || []));
+    html += ui.renderSection({ vi: 'Tệp đính kèm', en: 'Attachments' }, ui.renderAttachmentsGrid(r.attachments || []));
+    html += ui.renderSection({ vi: 'Bình luận', en: 'Comments' }, ui.renderCommentsThread(r.comments || []));
     return html;
   }
 
@@ -558,36 +558,36 @@
 
     // Toolbar
     html += '<div class="eqms-toolbar">';
-    html += '<button class="eqms-btn primary sm" data-action="create-msa">' + T({ vi: '+ Tao MSA', en: '+ New MSA Study' }) + '</button>';
+    html += '<button class="eqms-btn primary sm" data-action="create-msa">' + T({ vi: '+ Tạo MSA', en: '+ New MSA Study' }) + '</button>';
     html += ui.renderExportMenu({ formats: ['pdf', 'excel'] });
     html += '</div>';
 
     // Filters
     html += ui.renderFilterBar(state.msaFilters, {
       fields: [
-        { key: 'search', type: 'text', placeholder: { vi: 'Tim kiem...', en: 'Search...' }, width: '200px' },
-        { key: 'study_type', type: 'select', label: { vi: 'Loai', en: 'Type' }, options: MSA_TYPES },
-        { key: 'status', type: 'select', label: { vi: 'Trang thai', en: 'Status' }, options: [
-          { value: 'planned',     label: { vi: 'Ke hoach', en: 'Planned' } },
-          { value: 'in_progress', label: { vi: 'Dang thuc hien', en: 'In Progress' } },
-          { value: 'completed',   label: { vi: 'Hoan thanh', en: 'Completed' } }
+        { key: 'search', type: 'text', placeholder: { vi: 'Tìm kiếm...', en: 'Search...' }, width: '200px' },
+        { key: 'study_type', type: 'select', label: { vi: 'Loại', en: 'Type' }, options: MSA_TYPES },
+        { key: 'status', type: 'select', label: { vi: 'Trạng thái', en: 'Status' }, options: [
+          { value: 'planned',     label: { vi: 'Kế hoạch', en: 'Planned' } },
+          { value: 'in_progress', label: { vi: 'Đang thực hiện', en: 'In Progress' } },
+          { value: 'completed',   label: { vi: 'Hoàn thành', en: 'Completed' } }
         ]}
       ]
     });
 
     // Grid
     var columns = [
-      { key: 'study_id',    label: { vi: 'Ma', en: 'Study ID' },        type: 'id',       sortable: true },
-      { key: 'equipment',   label: { vi: 'Thiet bi', en: 'Equipment' }, sortable: true },
-      { key: 'study_type',  label: { vi: 'Loai', en: 'Type' },          type: 'badge',    sortable: true },
-      { key: 'status',      label: { vi: 'Trang thai', en: 'Status' },  type: 'badge',    sortable: true },
-      { key: 'result',      label: { vi: 'Ket qua', en: 'Result' },     sortable: true,
+      { key: 'study_id',    label: { vi: 'Mã', en: 'Study ID' },        type: 'id',       sortable: true },
+      { key: 'equipment',   label: { vi: 'Thiết bị', en: 'Equipment' }, sortable: true },
+      { key: 'study_type',  label: { vi: 'Loại', en: 'Type' },          type: 'badge',    sortable: true },
+      { key: 'status',      label: { vi: 'Trạng thái', en: 'Status' },  type: 'badge',    sortable: true },
+      { key: 'result',      label: { vi: 'Kết quả', en: 'Result' },     sortable: true,
         render: function(v) {
           if (!v) return '—';
           return grrConclusion(v);
         }},
       { key: 'grr_pct',     label: { vi: '%GRR', en: '%GRR' },          type: 'number',   sortable: true },
-      { key: 'created_at',  label: { vi: 'Ngay', en: 'Date' },          type: 'date',     sortable: true }
+      { key: 'created_at',  label: { vi: 'Ngày', en: 'Date' },          type: 'date',     sortable: true }
     ];
 
     html += ui.renderDataGrid(columns, state.msaData, {
@@ -605,31 +605,31 @@
   // ═══════════════════════════════════════════════════════════════════════
   function renderMsaDetailScreen() {
     var m = state.msaRecord;
-    if (!m) return ui.renderEmptyState({ icon: '\u26A0\uFE0F', title: { vi: 'Khong tim thay', en: 'Not found' } });
+    if (!m) return ui.renderEmptyState({ icon: '\u26A0\uFE0F', title: { vi: 'Không tìm thấy', en: 'Not found' } });
 
     var html = '';
 
     // Back button
-    html += '<div style="margin-bottom:12px"><button class="eqms-btn ghost sm" data-action="back-to-msa">\u2190 ' + T({ vi: 'Quay lai', en: 'Back' }) + '</button></div>';
+    html += '<div style="margin-bottom:12px"><button class="eqms-btn ghost sm" data-action="back-to-msa">\u2190 ' + T({ vi: 'Quay lại', en: 'Back' }) + '</button></div>';
 
     // Identity header
     html += ui.renderIdentityHeader(m, {});
 
     // Summary fields
     html += ui.renderFieldGrid([
-      { label: { vi: 'Ma nghien cuu', en: 'Study ID' },         value: m.study_id, mono: true },
-      { label: { vi: 'Thiet bi', en: 'Equipment' },             value: m.equipment },
-      { label: { vi: 'Loai nghien cuu', en: 'Study Type' },     value: m.study_type, badge: true },
-      { label: { vi: 'So chi tiet', en: 'Parts Count' },        value: m.parts_count },
-      { label: { vi: 'So nguoi van hanh', en: 'Operators Count' }, value: m.operators_count },
-      { label: { vi: 'So lan thu', en: 'Trials Count' },        value: m.trials_count }
+      { label: { vi: 'Mã nghiên cứu', en: 'Study ID' },         value: m.study_id, mono: true },
+      { label: { vi: 'Thiết bị', en: 'Equipment' },             value: m.equipment },
+      { label: { vi: 'Loại nghiên cứu', en: 'Study Type' },     value: m.study_type, badge: true },
+      { label: { vi: 'Số chi tiết', en: 'Parts Count' },        value: m.parts_count },
+      { label: { vi: 'Số người vận hành', en: 'Operators Count' }, value: m.operators_count },
+      { label: { vi: 'Số lần thử', en: 'Trials Count' },        value: m.trials_count }
     ]);
 
     // Results section
-    html += ui.renderSection({ vi: 'Ket qua nghien cuu', en: 'Study Results' },
+    html += ui.renderSection({ vi: 'Kết quả nghiên cứu', en: 'Study Results' },
       ui.renderFieldGrid([
-        { label: { vi: 'Do lap lai', en: 'Repeatability' },       value: m.repeatability },
-        { label: { vi: 'Do tai lap', en: 'Reproducibility' },     value: m.reproducibility },
+        { label: { vi: 'Độ lặp lại', en: 'Repeatability' },       value: m.repeatability },
+        { label: { vi: 'Độ tái lập', en: 'Reproducibility' },     value: m.reproducibility },
         { label: { vi: '%GRR', en: '%GRR' },                      value: m.grr_pct },
         { label: { vi: 'ndc', en: 'ndc' },                        value: m.ndc }
       ])
@@ -637,28 +637,28 @@
 
     // Conclusion
     var grrPct = m.grr_pct != null ? Number(m.grr_pct) : null;
-    html += ui.renderSection({ vi: 'Ket luan', en: 'Conclusion' },
+    html += ui.renderSection({ vi: 'Kết luận', en: 'Conclusion' },
       '<div style="padding:12px">' + grrConclusion(grrPct) + '</div>'
     );
 
     // ANOVA Results
     if (m.anova_results && m.anova_results.length) {
-      html += ui.renderSection({ vi: 'Ket qua ANOVA', en: 'ANOVA Results' },
+      html += ui.renderSection({ vi: 'Kết quả ANOVA', en: 'ANOVA Results' },
         ui.renderDataGrid([
-          { key: 'source',     label: { vi: 'Nguon', en: 'Source' } },
+          { key: 'source',     label: { vi: 'Nguồn', en: 'Source' } },
           { key: 'df',         label: { vi: 'df', en: 'df' },              type: 'number' },
           { key: 'ss',         label: { vi: 'SS', en: 'SS' },              type: 'number' },
           { key: 'ms',         label: { vi: 'MS', en: 'MS' },              type: 'number' },
           { key: 'f_value',    label: { vi: 'F', en: 'F' },                type: 'number' },
           { key: 'p_value',    label: { vi: 'p', en: 'p' },                type: 'number' },
-          { key: 'variance_pct', label: { vi: '% Phuong sai', en: '% Variance' }, type: 'number' }
+          { key: 'variance_pct', label: { vi: '% Phương sai', en: '% Variance' }, type: 'number' }
         ], m.anova_results, { selectable: false })
       );
     }
 
     // Audit trail
-    html += ui.renderSection({ vi: 'Nhat ky', en: 'Audit Trail' }, ui.renderAuditTrail(m.audit_events || []));
-    html += ui.renderSection({ vi: 'Tep dinh kem', en: 'Attachments' }, ui.renderAttachmentsGrid(m.attachments || []));
+    html += ui.renderSection({ vi: 'Nhật ký', en: 'Audit Trail' }, ui.renderAuditTrail(m.audit_events || []));
+    html += ui.renderSection({ vi: 'Tệp đính kèm', en: 'Attachments' }, ui.renderAttachmentsGrid(m.attachments || []));
 
     return html;
   }
@@ -672,56 +672,56 @@
 
     // KPI cards
     html += ui.renderKpiRow([
-      { label: { vi: 'Ty le dung han', en: 'On-Time Rate' },         value: m.on_time_rate ? m.on_time_rate + '%' : '—', accent: 'success', trend: m.on_time_trend },
-      { label: { vi: 'Tan suat OOT', en: 'OOT Frequency' },         value: fmt(m.oot_count),                           accent: 'danger' },
-      { label: { vi: 'MSA Dat', en: 'MSA Acceptable' },              value: fmt(m.msa_acceptable),                      accent: 'info' },
-      { label: { vi: 'TB can chu y', en: 'Equipment Attention' },    value: fmt(m.equipment_attention),                  accent: 'warning' }
+      { label: { vi: 'Tỷ lệ đúng hạn', en: 'On-Time Rate' },         value: m.on_time_rate ? m.on_time_rate + '%' : '—', accent: 'success', trend: m.on_time_trend },
+      { label: { vi: 'Tần suất OOT', en: 'OOT Frequency' },         value: fmt(m.oot_count),                           accent: 'danger' },
+      { label: { vi: 'MSA Đạt', en: 'MSA Acceptable' },              value: fmt(m.msa_acceptable),                      accent: 'info' },
+      { label: { vi: 'TB cần chú ý', en: 'Equipment Attention' },    value: fmt(m.equipment_attention),                  accent: 'warning' }
     ]);
 
     // On-time calibration rate trend
-    html += ui.renderSection({ vi: 'Xu huong ty le dung han', en: 'On-Time Calibration Rate Trend' },
+    html += ui.renderSection({ vi: 'Xu hướng tỷ lệ đúng hạn', en: 'On-Time Calibration Rate Trend' },
       ui.renderChartWithTableFallback('chart-ontime-trend', null,
         [
-          { key: 'period', label: { vi: 'Thoi gian', en: 'Period' } },
-          { key: 'total', label: { vi: 'Tong', en: 'Total' }, type: 'number' },
-          { key: 'on_time', label: { vi: 'Dung han', en: 'On Time' }, type: 'number' },
-          { key: 'rate_pct', label: { vi: 'Ty le %', en: 'Rate %' }, type: 'number' }
+          { key: 'period', label: { vi: 'Thời gian', en: 'Period' } },
+          { key: 'total', label: { vi: 'Tổng', en: 'Total' }, type: 'number' },
+          { key: 'on_time', label: { vi: 'Đúng hạn', en: 'On Time' }, type: 'number' },
+          { key: 'rate_pct', label: { vi: 'Tỷ lệ %', en: 'Rate %' }, type: 'number' }
         ],
         m.ontime_trend || []
       )
     );
 
     // OOT by equipment type
-    html += ui.renderSection({ vi: 'Tan suat OOT theo loai TB', en: 'OOT Frequency by Equipment Type' },
+    html += ui.renderSection({ vi: 'Tần suất OOT theo loại TB', en: 'OOT Frequency by Equipment Type' },
       ui.renderChartWithTableFallback('chart-oot-by-type', null,
         [
-          { key: 'equipment_type', label: { vi: 'Loai TB', en: 'Equip. Type' } },
-          { key: 'oot_count', label: { vi: 'So OOT', en: 'OOT Count' }, type: 'number' },
-          { key: 'total_cals', label: { vi: 'Tong HC', en: 'Total Cals' }, type: 'number' },
-          { key: 'oot_rate', label: { vi: 'Ty le OOT %', en: 'OOT Rate %' }, type: 'number' }
+          { key: 'equipment_type', label: { vi: 'Loại TB', en: 'Equip. Type' } },
+          { key: 'oot_count', label: { vi: 'Số OOT', en: 'OOT Count' }, type: 'number' },
+          { key: 'total_cals', label: { vi: 'Tổng HC', en: 'Total Cals' }, type: 'number' },
+          { key: 'oot_rate', label: { vi: 'Tỷ lệ OOT %', en: 'OOT Rate %' }, type: 'number' }
         ],
         m.oot_by_type || []
       )
     );
 
     // MSA capability summary
-    html += ui.renderSection({ vi: 'Tong hop nang luc MSA', en: 'MSA Capability Summary' },
+    html += ui.renderSection({ vi: 'Tổng hợp năng lực MSA', en: 'MSA Capability Summary' },
       ui.renderDataGrid([
-        { key: 'equipment',  label: { vi: 'Thiet bi', en: 'Equipment' } },
-        { key: 'study_type', label: { vi: 'Loai', en: 'Type' },        type: 'badge' },
+        { key: 'equipment',  label: { vi: 'Thiết bị', en: 'Equipment' } },
+        { key: 'study_type', label: { vi: 'Loại', en: 'Type' },        type: 'badge' },
         { key: 'grr_pct',    label: { vi: '%GRR', en: '%GRR' },        type: 'number' },
-        { key: 'conclusion', label: { vi: 'Ket luan', en: 'Conclusion' }, render: function(v, row) { return grrConclusion(row.grr_pct); } },
-        { key: 'date',       label: { vi: 'Ngay', en: 'Date' },        type: 'date' }
+        { key: 'conclusion', label: { vi: 'Kết luận', en: 'Conclusion' }, render: function(v, row) { return grrConclusion(row.grr_pct); } },
+        { key: 'date',       label: { vi: 'Ngày', en: 'Date' },        type: 'date' }
       ], m.msa_summary || [], { selectable: false })
     );
 
     // Equipment requiring attention
-    html += ui.renderSection({ vi: 'Thiet bi can chu y', en: 'Equipment Requiring Attention' },
+    html += ui.renderSection({ vi: 'Thiết bị cần chú ý', en: 'Equipment Requiring Attention' },
       ui.renderDataGrid([
-        { key: 'equipment_id',   label: { vi: 'Ma', en: 'ID' },         type: 'id' },
-        { key: 'equipment_name', label: { vi: 'Ten', en: 'Name' } },
-        { key: 'reason',         label: { vi: 'Ly do', en: 'Reason' },  type: 'truncate' },
-        { key: 'next_due_date',  label: { vi: 'Han', en: 'Due' },       type: 'date' },
+        { key: 'equipment_id',   label: { vi: 'Mã', en: 'ID' },         type: 'id' },
+        { key: 'equipment_name', label: { vi: 'Tên', en: 'Name' } },
+        { key: 'reason',         label: { vi: 'Lý do', en: 'Reason' },  type: 'truncate' },
+        { key: 'next_due_date',  label: { vi: 'Hạn', en: 'Due' },       type: 'date' },
         { key: 'status',         label: { vi: 'TT', en: 'Status' },     type: 'badge' }
       ], m.equipment_attention_list || [], { selectable: false })
     );
@@ -734,31 +734,31 @@
   // ═══════════════════════════════════════════════════════════════════════
   function renderCreateCalForm() {
     var body = '';
-    body += ui.renderFormField({ key: 'equipment_id', label: { vi: 'Ma thiet bi', en: 'Equipment ID' }, required: true });
-    body += ui.renderFormField({ key: 'equipment_name', label: { vi: 'Ten thiet bi', en: 'Equipment Name' }, required: true });
-    body += ui.renderFormField({ key: 'equipment_type', label: { vi: 'Loai', en: 'Type' }, type: 'select', options: EQUIPMENT_TYPES, required: true });
-    body += ui.renderFormField({ key: 'serial_number', label: { vi: 'So seri', en: 'Serial Number' } });
-    body += ui.renderFormField({ key: 'location', label: { vi: 'Vi tri', en: 'Location' } });
-    body += ui.renderFormField({ key: 'standard_used', label: { vi: 'Chuan su dung', en: 'Standard Used' } });
-    body += ui.renderFormField({ key: 'calibration_date', label: { vi: 'Ngay hieu chuan', en: 'Calibration Date' }, type: 'date', required: true });
-    body += ui.renderFormField({ key: 'next_due_date', label: { vi: 'Han tiep theo', en: 'Next Due Date' }, type: 'date', required: true });
-    body += ui.renderFormField({ key: 'performed_by', label: { vi: 'Thuc hien boi', en: 'Performed By' }, required: true });
+    body += ui.renderFormField({ key: 'equipment_id', label: { vi: 'Mã thiết bị', en: 'Equipment ID' }, required: true });
+    body += ui.renderFormField({ key: 'equipment_name', label: { vi: 'Tên thiết bị', en: 'Equipment Name' }, required: true });
+    body += ui.renderFormField({ key: 'equipment_type', label: { vi: 'Loại', en: 'Type' }, type: 'select', options: EQUIPMENT_TYPES, required: true });
+    body += ui.renderFormField({ key: 'serial_number', label: { vi: 'Số seri', en: 'Serial Number' } });
+    body += ui.renderFormField({ key: 'location', label: { vi: 'Vị trí', en: 'Location' } });
+    body += ui.renderFormField({ key: 'standard_used', label: { vi: 'Chuẩn sử dụng', en: 'Standard Used' } });
+    body += ui.renderFormField({ key: 'calibration_date', label: { vi: 'Ngày hiệu chuẩn', en: 'Calibration Date' }, type: 'date', required: true });
+    body += ui.renderFormField({ key: 'next_due_date', label: { vi: 'Hạn tiếp theo', en: 'Next Due Date' }, type: 'date', required: true });
+    body += ui.renderFormField({ key: 'performed_by', label: { vi: 'Thực hiện bởi', en: 'Performed By' }, required: true });
     return ui.renderWizardShell([
-      { label: { vi: 'Thong tin', en: 'Information' } },
-      { label: { vi: 'Xem xet', en: 'Review' } }
+      { label: { vi: 'Thông tin', en: 'Information' } },
+      { label: { vi: 'Xem xét', en: 'Review' } }
     ], 0, body, { saveDraft: true });
   }
 
   function renderCreateMsaForm() {
     var body = '';
-    body += ui.renderFormField({ key: 'equipment', label: { vi: 'Thiet bi', en: 'Equipment' }, required: true });
-    body += ui.renderFormField({ key: 'study_type', label: { vi: 'Loai', en: 'Study Type' }, type: 'select', options: MSA_TYPES, required: true });
-    body += ui.renderFormField({ key: 'parts_count', label: { vi: 'So chi tiet', en: 'Parts Count' }, type: 'number', min: 1 });
-    body += ui.renderFormField({ key: 'operators_count', label: { vi: 'So nguoi VH', en: 'Operators Count' }, type: 'number', min: 1 });
-    body += ui.renderFormField({ key: 'trials_count', label: { vi: 'So lan thu', en: 'Trials Count' }, type: 'number', min: 1 });
+    body += ui.renderFormField({ key: 'equipment', label: { vi: 'Thiết bị', en: 'Equipment' }, required: true });
+    body += ui.renderFormField({ key: 'study_type', label: { vi: 'Loại', en: 'Study Type' }, type: 'select', options: MSA_TYPES, required: true });
+    body += ui.renderFormField({ key: 'parts_count', label: { vi: 'Số chi tiết', en: 'Parts Count' }, type: 'number', min: 1 });
+    body += ui.renderFormField({ key: 'operators_count', label: { vi: 'Số người VH', en: 'Operators Count' }, type: 'number', min: 1 });
+    body += ui.renderFormField({ key: 'trials_count', label: { vi: 'Số lần thử', en: 'Trials Count' }, type: 'number', min: 1 });
     return ui.renderWizardShell([
-      { label: { vi: 'Thong tin', en: 'Information' } },
-      { label: { vi: 'Xem xet', en: 'Review' } }
+      { label: { vi: 'Thông tin', en: 'Information' } },
+      { label: { vi: 'Xem xét', en: 'Review' } }
     ], 0, body, { saveDraft: true });
   }
 
@@ -805,9 +805,9 @@
         case 'back-to-msa':
           state.screen = 'msa-list'; state.msaRecord = null; loadMsaList(); break;
         case 'create-cal':
-          showModal({ vi: 'Tao hieu chuan moi', en: 'New Calibration' }, renderCreateCalForm()); break;
+          showModal({ vi: 'Tạo hiệu chuẩn mới', en: 'New Calibration' }, renderCreateCalForm()); break;
         case 'create-msa':
-          showModal({ vi: 'Tao MSA moi', en: 'New MSA Study' }, renderCreateMsaForm()); break;
+          showModal({ vi: 'Tạo MSA mới', en: 'New MSA Study' }, renderCreateMsaForm()); break;
 
         case 'view-mode':
           state.viewMode = actionEl.getAttribute('data-mode') || 'list'; renderRoot(); break;
@@ -886,9 +886,9 @@
     var endpoint = (state.screen === 'msa-list') ? 'eqms_msa_create' : 'eqms_calibration_create';
     apiCall(endpoint, data).then(function() {
       closeModal();
-      toast(T({ vi: 'Da tao thanh cong', en: 'Created successfully' }));
+      toast(T({ vi: 'Đã tạo thành công', en: 'Created successfully' }));
       if (state.screen === 'msa-list') loadMsaList(); else loadSchedule();
-    }).catch(function(err) { toast(T({ vi: 'Loi', en: 'Error' }) + ': ' + (err.message || '')); });
+    }).catch(function(err) { toast(T({ vi: 'Lỗi', en: 'Error' }) + ': ' + (err.message || '')); });
   }
 
   function handleWorkflowAction(action) {
@@ -896,16 +896,16 @@
     var id = state.record.id || state.record.cal_id;
     var endpoint = 'eqms_calibration_action_' + action.replace(/-/g, '_');
     apiCall(endpoint, { id: id }).then(function() {
-      toast(T({ vi: 'Cap nhat thanh cong', en: 'Updated successfully' }));
+      toast(T({ vi: 'Cập nhật thành công', en: 'Updated successfully' }));
       loadCalDetail(id);
-    }).catch(function(err) { toast(T({ vi: 'Loi', en: 'Error' }) + ': ' + (err.message || '')); });
+    }).catch(function(err) { toast(T({ vi: 'Lỗi', en: 'Error' }) + ': ' + (err.message || '')); });
   }
 
   function handleExport(format) {
     var endpoint = state.screen === 'msa-list' ? 'eqms_msa_export' : 'eqms_calibration_export';
     apiCall(endpoint, { format: format }, 'GET').then(function(r) {
       if (r && r.url) window.open(r.url, '_blank');
-      else toast(T({ vi: 'Da yeu cau xuat', en: 'Export requested' }));
+      else toast(T({ vi: 'Đã yêu cầu xuất', en: 'Export requested' }));
     });
   }
 

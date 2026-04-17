@@ -1329,12 +1329,17 @@
   // SHARED COMPONENT 16: renderTabs
   // =========================================================================
   function renderTabs(tabs, activeTab) {
-    var html = '<div class="eqms-tabs">';
+    var html = '<div class="eqms-tabs" role="tablist">';
     tabs.forEach(function(tab) {
       var id = tab.id || tab;
       var label = tab.label || tab;
       var badge = tab.badge;
-      html += '<div class="eqms-tab ' + (id === activeTab ? 'active' : '') + '" data-tab="' + esc(id) + '">';
+      var isActive = id === activeTab;
+      html += '<div role="tab"'
+        + ' aria-selected="' + (isActive ? 'true' : 'false') + '"'
+        + ' tabindex="' + (isActive ? '0' : '-1') + '"'
+        + ' class="eqms-tab ' + (isActive ? 'active' : '') + '"'
+        + ' data-tab="' + esc(id) + '">';
       html += esc(T(label));
       if (badge != null) html += '<span class="eqms-tab-badge">' + esc(String(badge)) + '</span>';
       html += '</div>';
@@ -1670,76 +1675,76 @@
   // =========================================================================
   var ENTITY_MODEL = {
     // Quality Events
-    complaint:          { module: 'complaints',         icon: '\u{1F4E2}', label: { vi: 'Khiếu nại', en: 'Complaint' },         color: '#ef4444' },
-    deviation:          { module: 'deviations',         icon: '\u26A0\uFE0F', label: { vi: 'Sự kiện CL', en: 'Deviation' },      color: '#f97316' },
-    ncr:                { module: 'ncr',                icon: '\u{1F6AB}', label: { vi: 'NCR', en: 'NCR' },                      color: '#dc2626' },
-    mrbDecision:        { module: 'ncr',                icon: '\u2696\uFE0F', label: { vi: 'MRB', en: 'MRB Decision' },          color: '#b91c1c' },
-    capa:               { module: 'capa',               icon: '\u{1F527}', label: { vi: 'CAPA', en: 'CAPA' },                    color: '#8b5cf6' },
+    complaint:          { module: 'complaints',         icon: '\u{1F4E2}', label: { vi: 'Khiếu nại', en: 'Complaint' },         color: 'var(--eqms-entity-complaint,#ef4444)' },
+    deviation:          { module: 'deviations',         icon: '\u26A0\uFE0F', label: { vi: 'Sự kiện CL', en: 'Deviation' },      color: 'var(--eqms-entity-deviation,#f97316)' },
+    ncr:                { module: 'ncr',                icon: '\u{1F6AB}', label: { vi: 'NCR', en: 'NCR' },                      color: 'var(--eqms-entity-ncr,#dc2626)' },
+    mrbDecision:        { module: 'ncr',                icon: '\u2696\uFE0F', label: { vi: 'MRB', en: 'MRB Decision' },          color: 'var(--eqms-entity-mrb,#b91c1c)' },
+    capa:               { module: 'capa',               icon: '\u{1F527}', label: { vi: 'CAPA', en: 'CAPA' },                    color: 'var(--eqms-entity-capa,#8b5cf6)' },
     // Documents & Change
-    changeControl:      { module: 'change-control',     icon: '\u{1F504}', label: { vi: 'Kiểm soát TĐ', en: 'Change Control' }, color: '#3b82f6' },
-    engineeringChange:  { module: 'engineering-change',  icon: '\u2699\uFE0F', label: { vi: 'ECO/ECR', en: 'Eng. Change' },      color: '#2563eb' },
-    controlledDocument: { module: 'documents',          icon: '\u{1F4C4}', label: { vi: 'Tài liệu', en: 'Document' },           color: '#0ea5e9' },
-    trainingProgram:    { module: 'training',           icon: '\u{1F393}', label: { vi: 'Đào tạo', en: 'Training' },             color: '#06b6d4' },
-    competencyMatrix:   { module: 'training',           icon: '\u{1F4CA}', label: { vi: 'Ma trận NL', en: 'Competency' },        color: '#0891b2' },
-    assessment:         { module: 'training',           icon: '\u{1F4DD}', label: { vi: 'Đánh giá', en: 'Assessment' },          color: '#0e7490' },
+    changeControl:      { module: 'change-control',     icon: '\u{1F504}', label: { vi: 'Kiểm soát TĐ', en: 'Change Control' }, color: 'var(--eqms-entity-change-control,#3b82f6)' },
+    engineeringChange:  { module: 'engineering-change',  icon: '\u2699\uFE0F', label: { vi: 'ECO/ECR', en: 'Eng. Change' },      color: 'var(--eqms-entity-eng-change,#2563eb)' },
+    controlledDocument: { module: 'documents',          icon: '\u{1F4C4}', label: { vi: 'Tài liệu', en: 'Document' },           color: 'var(--eqms-entity-document,#0ea5e9)' },
+    trainingProgram:    { module: 'training',           icon: '\u{1F393}', label: { vi: 'Đào tạo', en: 'Training' },             color: 'var(--eqms-entity-training,#06b6d4)' },
+    competencyMatrix:   { module: 'training',           icon: '\u{1F4CA}', label: { vi: 'Ma trận NL', en: 'Competency' },        color: 'var(--eqms-entity-competency,#0891b2)' },
+    assessment:         { module: 'training',           icon: '\u{1F4DD}', label: { vi: 'Đánh giá', en: 'Assessment' },          color: 'var(--eqms-entity-assessment,#0e7490)' },
     // Audits & Compliance
-    auditProgram:       { module: 'audits',             icon: '\u{1F50D}', label: { vi: 'Đánh giá', en: 'Audit' },               color: '#059669' },
-    auditFinding:       { module: 'audits',             icon: '\u{1F4CB}', label: { vi: 'Phát hiện', en: 'Finding' },             color: '#047857' },
+    auditProgram:       { module: 'audits',             icon: '\u{1F50D}', label: { vi: 'Đánh giá', en: 'Audit' },               color: 'var(--eqms-entity-audit,#059669)' },
+    auditFinding:       { module: 'audits',             icon: '\u{1F4CB}', label: { vi: 'Phát hiện', en: 'Finding' },             color: 'var(--eqms-entity-finding,#047857)' },
     // Supplier Quality
-    supplier:           { module: 'suppliers',          icon: '\u{1F310}', label: { vi: 'NCC', en: 'Supplier' },                 color: '#7c3aed' },
-    supplierEvaluation: { module: 'suppliers',          icon: '\u{1F4C8}', label: { vi: 'Đánh giá NCC', en: 'Evaluation' },      color: '#6d28d9' },
-    scar:               { module: 'supplier-audits',    icon: '\u{1F6A8}', label: { vi: 'SCAR', en: 'SCAR' },                    color: '#9333ea' },
-    supplierAudit:      { module: 'supplier-audits',    icon: '\u{1F50E}', label: { vi: 'ĐG NCC', en: 'Supplier Audit' },        color: '#a855f7' },
-    qualityAgreement:   { module: 'quality-agreements', icon: '\u{1F91D}', label: { vi: 'Thoả thuận CL', en: 'QA Agreement' },   color: '#c084fc' },
+    supplier:           { module: 'suppliers',          icon: '\u{1F310}', label: { vi: 'NCC', en: 'Supplier' },                 color: 'var(--eqms-entity-supplier,#7c3aed)' },
+    supplierEvaluation: { module: 'suppliers',          icon: '\u{1F4C8}', label: { vi: 'Đánh giá NCC', en: 'Evaluation' },      color: 'var(--eqms-entity-evaluation,#6d28d9)' },
+    scar:               { module: 'supplier-audits',    icon: '\u{1F6A8}', label: { vi: 'SCAR', en: 'SCAR' },                    color: 'var(--eqms-entity-scar,#9333ea)' },
+    supplierAudit:      { module: 'supplier-audits',    icon: '\u{1F50E}', label: { vi: 'ĐG NCC', en: 'Supplier Audit' },        color: 'var(--eqms-entity-supplier-audit,#a855f7)' },
+    qualityAgreement:   { module: 'quality-agreements', icon: '\u{1F91D}', label: { vi: 'Thoả thuận CL', en: 'QA Agreement' },   color: 'var(--eqms-entity-quality-agreement,#c084fc)' },
     // Risk & Compliance
-    riskItem:           { module: 'risks',              icon: '\u{1F6E1}\uFE0F', label: { vi: 'Rủi ro', en: 'Risk' },            color: '#ea580c' },
-    fmeaItem:           { module: 'risks',              icon: '\u{1F4D0}', label: { vi: 'FMEA', en: 'FMEA' },                    color: '#d97706' },
+    riskItem:           { module: 'risks',              icon: '\u{1F6E1}\uFE0F', label: { vi: 'Rủi ro', en: 'Risk' },            color: 'var(--eqms-entity-risk,#ea580c)' },
+    fmeaItem:           { module: 'risks',              icon: '\u{1F4D0}', label: { vi: 'FMEA', en: 'FMEA' },                    color: 'var(--eqms-entity-fmea,#d97706)' },
     // Calibration & Lab
-    calibrationAsset:   { module: 'calibration',        icon: '\u{1F4CF}', label: { vi: 'Hiệu chuẩn', en: 'Calibration' },      color: '#65a30d' },
-    msaStudy:           { module: 'calibration',        icon: '\u{1F4D0}', label: { vi: 'MSA', en: 'MSA Study' },                color: '#4d7c0f' },
-    oosInvestigation:   { module: 'lab-investigations', icon: '\u{1F52C}', label: { vi: 'OOS/OOT', en: 'OOS Investigation' },    color: '#ca8a04' },
+    calibrationAsset:   { module: 'calibration',        icon: '\u{1F4CF}', label: { vi: 'Hiệu chuẩn', en: 'Calibration' },      color: 'var(--eqms-entity-calibration,#65a30d)' },
+    msaStudy:           { module: 'calibration',        icon: '\u{1F4D0}', label: { vi: 'MSA', en: 'MSA Study' },                color: 'var(--eqms-entity-msa,#4d7c0f)' },
+    oosInvestigation:   { module: 'lab-investigations', icon: '\u{1F52C}', label: { vi: 'OOS/OOT', en: 'OOS Investigation' },    color: 'var(--eqms-entity-oos,#ca8a04)' },
     // Inspection & Testing
-    iqcInspection:      { module: 'inspection',         icon: '\u2705', label: { vi: 'IQC', en: 'IQC Inspection' },              color: '#16a34a' },
-    inspectionResult:   { module: 'inspection',         icon: '\u{1F4CB}', label: { vi: 'Kết quả KT', en: 'Inspection Result' }, color: '#15803d' },
-    spcStudy:           { module: 'spc',                icon: '\u{1F4C8}', label: { vi: 'SPC', en: 'SPC Study' },                color: '#0d9488' },
-    testResult:         { module: 'spc',                icon: '\u{1F9EA}', label: { vi: 'Kết quả TN', en: 'Test Result' },       color: '#0f766e' },
-    lotRelease:         { module: 'batch-release',      icon: '\u{1F4E6}', label: { vi: 'Giải phóng lô', en: 'Lot Release' },    color: '#0369a1' },
+    iqcInspection:      { module: 'inspection',         icon: '\u2705', label: { vi: 'IQC', en: 'IQC Inspection' },              color: 'var(--eqms-entity-iqc,#16a34a)' },
+    inspectionResult:   { module: 'inspection',         icon: '\u{1F4CB}', label: { vi: 'Kết quả KT', en: 'Inspection Result' }, color: 'var(--eqms-entity-inspection-result,#15803d)' },
+    spcStudy:           { module: 'spc',                icon: '\u{1F4C8}', label: { vi: 'SPC', en: 'SPC Study' },                color: 'var(--eqms-entity-spc,#0d9488)' },
+    testResult:         { module: 'spc',                icon: '\u{1F9EA}', label: { vi: 'Kết quả TN', en: 'Test Result' },       color: 'var(--eqms-entity-test-result,#0f766e)' },
+    lotRelease:         { module: 'batch-release',      icon: '\u{1F4E6}', label: { vi: 'Giải phóng lô', en: 'Lot Release' },    color: 'var(--eqms-entity-lot-release,#0369a1)' },
     // Advanced
-    validationPackage:  { module: 'validation',         icon: '\u{1F9EA}', label: { vi: 'Xác nhận', en: 'Validation' },          color: '#4338ca' },
-    fieldAction:        { module: 'field-actions',      icon: '\u{1F6A8}', label: { vi: 'Hành động TĐ', en: 'Field Action' },    color: '#be123c' },
+    validationPackage:  { module: 'validation',         icon: '\u{1F9EA}', label: { vi: 'Xác nhận', en: 'Validation' },          color: 'var(--eqms-entity-validation,#4338ca)' },
+    fieldAction:        { module: 'field-actions',      icon: '\u{1F6A8}', label: { vi: 'Hành động TĐ', en: 'Field Action' },    color: 'var(--eqms-entity-field-action,#be123c)' },
     // New modules v4.1
-    concession:         { module: 'concessions',        icon: '\u{1F4DD}', label: { vi: 'Nhượng bộ', en: 'Concession' },           color: '#fb923c' },
-    lessonLearned:      { module: 'lessons-learned',    icon: '\u{1F4A1}', label: { vi: 'Bài học KN', en: 'Lesson Learned' },       color: '#facc15' },
-    csatSurvey:         { module: 'customer-satisfaction', icon: '\u2B50', label: { vi: 'CSAT', en: 'CSAT Survey' },                color: '#f59e0b' },
-    amlEntry:           { module: 'aml',                icon: '\u2705',    label: { vi: 'NCC được duyệt', en: 'Approved Supplier' }, color: '#16a34a' },
-    samplingPlan:       { module: 'sampling-plans',     icon: '\u{1F4CA}', label: { vi: 'Kế hoạch mẫu', en: 'Sampling Plan' },      color: '#0891b2' },
-    warrantyClaim:      { module: 'warranty',           icon: '\u{1F6E0}\uFE0F', label: { vi: 'Bảo hành', en: 'Warranty Claim' },  color: '#dc2626' },
-    specialChar:        { module: 'special-characteristics', icon: '\u{1F536}', label: { vi: 'SC/CC', en: 'Special Char.' },        color: '#7c3aed' },
-    faiReport:          { module: 'fai',                icon: '\u{1F195}', label: { vi: 'FAI', en: 'FAI Report' },                  color: '#2563eb' },
-    apqpProject:        { module: 'apqp-ppap',          icon: '\u{1F3AF}', label: { vi: 'APQP', en: 'APQP Project' },              color: '#059669' },
+    concession:         { module: 'concessions',        icon: '\u{1F4DD}', label: { vi: 'Nhượng bộ', en: 'Concession' },           color: 'var(--eqms-entity-concession,#fb923c)' },
+    lessonLearned:      { module: 'lessons-learned',    icon: '\u{1F4A1}', label: { vi: 'Bài học KN', en: 'Lesson Learned' },       color: 'var(--eqms-entity-lesson-learned,#facc15)' },
+    csatSurvey:         { module: 'customer-satisfaction', icon: '\u2B50', label: { vi: 'CSAT', en: 'CSAT Survey' },                color: 'var(--eqms-entity-csat,#f59e0b)' },
+    amlEntry:           { module: 'aml',                icon: '\u2705',    label: { vi: 'NCC được duyệt', en: 'Approved Supplier' }, color: 'var(--eqms-entity-aml,#16a34a)' },
+    samplingPlan:       { module: 'sampling-plans',     icon: '\u{1F4CA}', label: { vi: 'Kế hoạch mẫu', en: 'Sampling Plan' },      color: 'var(--eqms-entity-sampling-plan,#0891b2)' },
+    warrantyClaim:      { module: 'warranty',           icon: '\u{1F6E0}\uFE0F', label: { vi: 'Bảo hành', en: 'Warranty Claim' },  color: 'var(--eqms-entity-warranty,#dc2626)' },
+    specialChar:        { module: 'special-characteristics', icon: '\u{1F536}', label: { vi: 'SC/CC', en: 'Special Char.' },        color: 'var(--eqms-entity-special-char,#7c3aed)' },
+    faiReport:          { module: 'fai',                icon: '\u{1F195}', label: { vi: 'FAI', en: 'FAI Report' },                  color: 'var(--eqms-entity-fai,#2563eb)' },
+    apqpProject:        { module: 'apqp-ppap',          icon: '\u{1F3AF}', label: { vi: 'APQP', en: 'APQP Project' },              color: 'var(--eqms-entity-apqp,#059669)' },
     // Cross-cutting
-    attachmentEvidence: { module: null, icon: '\u{1F4CE}', label: { vi: 'Bằng chứng', en: 'Evidence' },       color: '#64748b' },
-    approvalAction:     { module: null, icon: '\u2705',    label: { vi: 'Phê duyệt', en: 'Approval' },        color: '#22c55e' },
-    signatureEvent:     { module: null, icon: '\u270D\uFE0F', label: { vi: 'Chữ ký', en: 'Signature' },       color: '#1d4ed8' },
-    auditEvent:         { module: null, icon: '\u{1F4DC}', label: { vi: 'Sự kiện ĐG', en: 'Audit Event' },    color: '#475569' },
-    linkedRecord:       { module: null, icon: '\u{1F517}', label: { vi: 'Liên kết', en: 'Linked Record' },    color: '#6366f1' },
-    task:               { module: null, icon: '\u2611\uFE0F', label: { vi: 'Nhiệm vụ', en: 'Task' },         color: '#f59e0b' },
-    comment:            { module: null, icon: '\u{1F4AC}', label: { vi: 'Bình luận', en: 'Comment' },         color: '#a3a3a3' }
+    attachmentEvidence: { module: null, icon: '\u{1F4CE}', label: { vi: 'Bằng chứng', en: 'Evidence' },       color: 'var(--eqms-entity-evidence,#64748b)' },
+    approvalAction:     { module: null, icon: '\u2705',    label: { vi: 'Phê duyệt', en: 'Approval' },        color: 'var(--eqms-entity-approval,#22c55e)' },
+    signatureEvent:     { module: null, icon: '\u270D\uFE0F', label: { vi: 'Chữ ký', en: 'Signature' },       color: 'var(--eqms-entity-signature,#1d4ed8)' },
+    auditEvent:         { module: null, icon: '\u{1F4DC}', label: { vi: 'Sự kiện ĐG', en: 'Audit Event' },    color: 'var(--eqms-entity-audit-event,#475569)' },
+    linkedRecord:       { module: null, icon: '\u{1F517}', label: { vi: 'Liên kết', en: 'Linked Record' },    color: 'var(--eqms-entity-linked,#6366f1)' },
+    task:               { module: null, icon: '\u2611\uFE0F', label: { vi: 'Nhiệm vụ', en: 'Task' },         color: 'var(--eqms-entity-task,#f59e0b)' },
+    comment:            { module: null, icon: '\u{1F4AC}', label: { vi: 'Bình luận', en: 'Comment' },         color: 'var(--eqms-entity-comment,#a3a3a3)' }
   };
 
   // Link semantics for traceability graph
   var LINK_TYPES = {
-    'caused-by':     { label: { vi: 'Gây ra bởi',    en: 'Caused by' },     arrow: '\u2190', color: '#ef4444' },
-    'related-to':    { label: { vi: 'Liên quan đến',  en: 'Related to' },    arrow: '\u2194', color: '#3b82f6' },
-    'requires':      { label: { vi: 'Yêu cầu',       en: 'Requires' },      arrow: '\u2192', color: '#f97316' },
-    'verifies':      { label: { vi: 'Xác minh',       en: 'Verifies' },      arrow: '\u2192', color: '#22c55e' },
-    'trains':        { label: { vi: 'Đào tạo',        en: 'Trains' },        arrow: '\u2192', color: '#06b6d4' },
-    'releases':      { label: { vi: 'Giải phóng',     en: 'Releases' },      arrow: '\u2192', color: '#8b5cf6' },
-    'sourced-from':  { label: { vi: 'Nguồn từ',       en: 'Sourced from' },  arrow: '\u2190', color: '#7c3aed' },
-    'supersedes':    { label: { vi: 'Thay thế',       en: 'Supersedes' },    arrow: '\u2192', color: '#64748b' },
-    'contains':      { label: { vi: 'Chứa',           en: 'Contains' },      arrow: '\u2192', color: '#0ea5e9' },
-    'implements':    { label: { vi: 'Thực hiện',      en: 'Implements' },    arrow: '\u2192', color: '#059669' },
-    'mitigates':     { label: { vi: 'Giảm thiểu',    en: 'Mitigates' },     arrow: '\u2192', color: '#16a34a' }
+    'caused-by':     { label: { vi: 'Gây ra bởi',    en: 'Caused by' },     arrow: '\u2190', color: 'var(--eqms-link-caused-by,#ef4444)' },
+    'related-to':    { label: { vi: 'Liên quan đến',  en: 'Related to' },    arrow: '\u2194', color: 'var(--eqms-link-related-to,#3b82f6)' },
+    'requires':      { label: { vi: 'Yêu cầu',       en: 'Requires' },      arrow: '\u2192', color: 'var(--eqms-link-requires,#f97316)' },
+    'verifies':      { label: { vi: 'Xác minh',       en: 'Verifies' },      arrow: '\u2192', color: 'var(--eqms-link-verifies,#22c55e)' },
+    'trains':        { label: { vi: 'Đào tạo',        en: 'Trains' },        arrow: '\u2192', color: 'var(--eqms-link-trains,#06b6d4)' },
+    'releases':      { label: { vi: 'Giải phóng',     en: 'Releases' },      arrow: '\u2192', color: 'var(--eqms-link-releases,#8b5cf6)' },
+    'sourced-from':  { label: { vi: 'Nguồn từ',       en: 'Sourced from' },  arrow: '\u2190', color: 'var(--eqms-link-sourced-from,#7c3aed)' },
+    'supersedes':    { label: { vi: 'Thay thế',       en: 'Supersedes' },    arrow: '\u2192', color: 'var(--eqms-link-supersedes,#64748b)' },
+    'contains':      { label: { vi: 'Chứa',           en: 'Contains' },      arrow: '\u2192', color: 'var(--eqms-link-contains,#0ea5e9)' },
+    'implements':    { label: { vi: 'Thực hiện',      en: 'Implements' },    arrow: '\u2192', color: 'var(--eqms-link-implements,#059669)' },
+    'mitigates':     { label: { vi: 'Giảm thiểu',    en: 'Mitigates' },     arrow: '\u2192', color: 'var(--eqms-link-mitigates,#16a34a)' }
   };
 
   // =========================================================================
@@ -1949,7 +1954,7 @@
         var entityType = l.entity_type || l.type || '';
         var entityDef = ENTITY_MODEL[entityType] || {};
         html += '<div class="eqms-linked-item" data-action="open-linked" data-type="' + esc(entityType) + '" data-id="' + esc(l.target_id || l.id || '') + '">';
-        html += '<span class="eqms-linked-item-icon" style="color:' + (entityDef.color || '#64748b') + '">' + (entityDef.icon || '\u{1F517}') + '</span>';
+        html += '<span class="eqms-linked-item-icon" style="color:' + (entityDef.color || 'var(--eqms-entity-evidence,#64748b)') + '">' + (entityDef.icon || '\u{1F517}') + '</span>';
         html += '<div class="eqms-linked-item-info">';
         html += '<span class="eqms-linked-item-type">' + esc(T(entityDef.label || { en: entityType })) + '</span>';
         html += '<span class="eqms-linked-item-id">' + esc(l.target_id || l.record_id || l.id || '') + '</span>';

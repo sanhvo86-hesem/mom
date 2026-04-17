@@ -1606,7 +1606,7 @@ function renderForm(container){
     html += '<div class="eqms-audit-section">' +
       '<div class="eqms-section-head">' +
         '<div class="eqms-section-num">A</div>' +
-        '<div><div class="eqms-section-title">' + esc(t('Nhat ky thay doi', 'Audit trail')) + '</div></div>' +
+        '<div><div class="eqms-section-title">' + esc(t('Nhật ký thay đổi', 'Audit trail')) + '</div></div>' +
       '</div>' +
       '<div class="eqms-audit-list">';
     state.entry.history.slice(-20).reverse().forEach(function(evt){

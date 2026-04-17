@@ -44,7 +44,6 @@
   var AUTO_REFRESH_MS      = 5 * 60 * 1000;   // 5 minutes
   var STALE_THRESHOLD_MS   = 10 * 60 * 1000;  // 10 minutes — mark sections stale
   var PRIORITY_ORDER       = ['critical', 'high', 'medium', 'low'];
-  var PRIORITY_COLORS      = { critical: '#dc2626', high: '#ea580c', medium: '#ca8a04', low: '#16a34a' };
 
   var MODULE_DEFS = [
     { id: 'complaints',         label: { vi: 'Khiếu nại',           en: 'Complaints' },           icon: '\uD83D\uDCE2' },
@@ -482,7 +481,7 @@
 
       html += '<div class="eqms-event-group">';
       html += '<div class="eqms-event-group-header">';
-      html += '<span class="eqms-priority-dot ' + p + '" style="background:' + (PRIORITY_COLORS[p] || '#94a3b8') + '"></span>';
+      html += '<span class="eqms-priority-dot eqms-priority-' + p + '"></span>';
       html += '<span class="eqms-event-group-label">' + esc(priorityLabel[p] || p) + '</span>';
       html += '<span class="eqms-event-group-count">(' + group.length + ')</span>';
       html += '</div>';
@@ -728,12 +727,12 @@
       cellCounts[k] = (cellCounts[k] || 0) + 1;
     });
 
-    function riskColor(l, s) {
+    function riskScoreClass(l, s) {
       var score = l * s;
-      if (score >= 16) return '#dc2626';
-      if (score >= 9)  return '#ea580c';
-      if (score >= 4)  return '#ca8a04';
-      return '#16a34a';
+      if (score >= 16) return 'eqms-risk-critical';
+      if (score >= 9)  return 'eqms-risk-high';
+      if (score >= 4)  return 'eqms-risk-medium';
+      return 'eqms-risk-low';
     }
 
     var html = '<div class="eqms-risk-heatmap">';
@@ -749,10 +748,10 @@
       html += '<div class="eqms-risk-row-header">' + esc(T({ vi: 'KN', en: 'Lik' }) + ' ' + li) + '</div>';
       LEVELS.forEach(function(si) {
         var count = cellCounts[li + ':' + si] || 0;
-        var bg    = riskColor(li, si);
+        var cls   = riskScoreClass(li, si);
         var score = li * si;
         var title = T({ vi: 'Khả năng', en: 'Likelihood' }) + ':' + li + ' × ' + T({ vi: 'Mức độ', en: 'Severity' }) + ':' + si + ' = ' + score + '. ' + count + ' rủi ro.';
-        html += '<div class="eqms-risk-cell" style="background:' + bg + ';opacity:' + (count > 0 ? 1 : 0.15) + '" title="' + esc(title) + '">';
+        html += '<div class="eqms-risk-cell ' + cls + (count === 0 ? ' eqms-risk-empty' : '') + '" title="' + esc(title) + '">';
         if (count > 0) html += '<span>' + count + '</span>';
         html += '</div>';
       });
@@ -766,9 +765,9 @@
       html += '<div style="font-size:12px;font-weight:600;margin-bottom:6px">' + T({ vi: 'Top rủi ro cần chú ý', en: 'Top risks to watch' }) + '</div>';
       topRisks.forEach(function(r) {
         var score = (r.likelihood || 1) * (r.severity || 1);
-        var color = riskColor(r.likelihood || 1, r.severity || 1);
+        var cls = riskScoreClass(r.likelihood || 1, r.severity || 1);
         html += '<div class="eqms-risk-top-item" style="display:flex;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid var(--hm-border,#e2e8f0)">';
-        html += '<span style="min-width:28px;text-align:center;font-weight:700;color:#fff;background:' + color + ';border-radius:4px;padding:1px 5px;font-size:11px">' + score + '</span>';
+        html += '<span class="eqms-risk-score-badge ' + cls + '">' + score + '</span>';
         html += '<span style="flex:1;font-size:12px;color:var(--hm-text-primary,#0f172a)">' + esc(r.title || r.risk_id || '\u2014') + '</span>';
         if (r.owner) html += '<span style="font-size:11px;color:var(--hm-text-secondary,#64748b)">' + esc(r.owner) + '</span>';
         html += '</div>';
@@ -801,7 +800,7 @@
       html += '<div class="eqms-calendar-type">' + esc(item.review_type || 'Management Review') + '</div>';
       html += '</div>';
       html += '<div class="eqms-calendar-date">';
-      html += '<div style="font-size:11px;color:#dc2626;font-weight:600">' + daysOverdue + 'd ' + T({ vi: 'quá hạn', en: 'overdue' }) + '</div>';
+      html += '<div class="eqms-text-critical" style="font-size:11px;font-weight:600">' + daysOverdue + 'd ' + T({ vi: 'quá hạn', en: 'overdue' }) + '</div>';
       html += '</div>';
       html += '</div>';
     });
@@ -821,7 +820,7 @@
         label: { vi: 'Nhượng bộ', en: 'Concessions' },
         open:  parseInt(xm.open_concessions || lc.open_concessions || 0, 10),
         extra: xm.concessions_approved_mtd != null ? T({ vi: 'Duyệt tháng này:', en: 'Approved MTD:' }) + ' ' + xm.concessions_approved_mtd : null,
-        accent: parseInt(xm.open_concessions || 0, 10) > 5 ? '#ea580c' : '#16a34a'
+        accent: parseInt(xm.open_concessions || 0, 10) > 5 ? 'var(--eqms-priority-high,#ea580c)' : 'var(--eqms-priority-low,#16a34a)'
       },
       {
         id:    'fai',
@@ -829,7 +828,7 @@
         label: { vi: 'FAI', en: 'First Article Insp.' },
         open:  parseInt(xm.open_fai || lc.open_fai || 0, 10),
         extra: xm.fai_pass_rate_pct != null ? T({ vi: 'Pass rate:', en: 'Pass rate:' }) + ' ' + xm.fai_pass_rate_pct.toFixed(0) + '%' : null,
-        accent: xm.fai_pass_rate_pct != null && xm.fai_pass_rate_pct < 80 ? '#dc2626' : '#16a34a'
+        accent: xm.fai_pass_rate_pct != null && xm.fai_pass_rate_pct < 80 ? 'var(--eqms-priority-critical,#dc2626)' : 'var(--eqms-priority-low,#16a34a)'
       },
       {
         id:    'warranty',
@@ -837,7 +836,7 @@
         label: { vi: 'Bảo hành', en: 'Warranty Claims' },
         open:  parseInt(xm.warranty_claims_open || lc.warranty_claims_open || 0, 10),
         extra: xm.warranty_claims_mtd != null ? T({ vi: 'Tháng này:', en: 'MTD:' }) + ' ' + xm.warranty_claims_mtd + ' | $' + fmt(xm.warranty_cost_mtd || 0) : null,
-        accent: parseInt(xm.warranty_claims_open || 0, 10) > 10 ? '#dc2626' : '#ca8a04'
+        accent: parseInt(xm.warranty_claims_open || 0, 10) > 10 ? 'var(--eqms-priority-critical,#dc2626)' : 'var(--eqms-priority-medium,#ca8a04)'
       },
       {
         id:    'csat',
@@ -845,7 +844,7 @@
         label: { vi: 'CSAT', en: 'Customer Satisfaction' },
         open:  parseInt(xm.csat_open_surveys || 0, 10),
         extra: xm.csat_avg_score != null ? T({ vi: 'Điểm TB:', en: 'Avg score:' }) + ' ' + xm.csat_avg_score.toFixed(1) + '/10' : null,
-        accent: xm.csat_avg_score != null && xm.csat_avg_score < 6 ? '#dc2626' : '#16a34a'
+        accent: xm.csat_avg_score != null && xm.csat_avg_score < 6 ? 'var(--eqms-priority-critical,#dc2626)' : 'var(--eqms-priority-low,#16a34a)'
       },
       {
         id:    'sampling-plans',
@@ -853,7 +852,7 @@
         label: { vi: 'Kế hoạch lấy mẫu', en: 'Sampling Plans' },
         open:  parseInt(xm.approved_sampling_plans || 0, 10),
         extra: xm.sampling_plans_pending != null ? T({ vi: 'Chờ duyệt:', en: 'Pending:' }) + ' ' + xm.sampling_plans_pending : null,
-        accent: '#3b82f6'
+        accent: 'var(--eqms-open,#3b82f6)'
       }
     ];
 
@@ -920,15 +919,15 @@
       { key: 'overdue', label: { vi: 'Quá hạn', en: 'Overdue' }, type: 'number',
         render: function(val) {
           var n = parseInt(val || 0, 10);
-          if (n > 0) return '<span style="color:#dc2626;font-weight:600">' + fmt(n) + '</span>';
-          return '<span style="color:#16a34a">' + fmt(n) + '</span>';
+          if (n > 0) return '<span class="eqms-text-critical" style="font-weight:600">' + fmt(n) + '</span>';
+          return '<span class="eqms-text-success">' + fmt(n) + '</span>';
         }
       },
       { key: 'trend',   label: { vi: 'Xu hướng', en: 'Trend' }, sortable: false,
         render: function(val) {
-          if (val === 'up')   return '<span style="color:#dc2626">\u2191</span>';
-          if (val === 'down') return '<span style="color:#16a34a">\u2193</span>';
-          return '<span style="color:#94a3b8">\u2192</span>';
+          if (val === 'up')   return '<span class="eqms-text-critical">\u2191</span>';
+          if (val === 'down') return '<span class="eqms-text-success">\u2193</span>';
+          return '<span class="eqms-text-neutral">\u2192</span>';
         }
       }
     ];
@@ -1252,10 +1251,10 @@
     // Stacked horizontal bar
     html += '<div class="eqms-aging-bar">';
     var segments = [
-      { count: b030,  label: '0-30d',  color: '#16a34a' },
-      { count: b3160, label: '31-60d', color: '#ca8a04' },
-      { count: b6190, label: '61-90d', color: '#ea580c' },
-      { count: b90p,  label: '>90d',   color: '#dc2626' }
+      { count: b030,  label: '0-30d',  color: 'var(--eqms-priority-low,#16a34a)' },
+      { count: b3160, label: '31-60d', color: 'var(--eqms-priority-medium,#ca8a04)' },
+      { count: b6190, label: '61-90d', color: 'var(--eqms-priority-high,#ea580c)' },
+      { count: b90p,  label: '>90d',   color: 'var(--eqms-priority-critical,#dc2626)' }
     ];
     segments.forEach(function(seg) {
       if (seg.count === 0) return;
@@ -1394,7 +1393,7 @@
     if (window.showNotification) { window.showNotification(msg, 'info'); return; }
     var el = document.createElement('div');
     el.textContent = msg;
-    el.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#1e293b;color:#fff;padding:12px 20px;border-radius:8px;font-size:13px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.15);transition:opacity .3s';
+    el.className = 'eqms-qt-toast';
     document.body.appendChild(el);
     setTimeout(function() { el.style.opacity = '0'; }, 3000);
     setTimeout(function() { if (el.parentNode) el.parentNode.removeChild(el); }, 3500);
@@ -1456,11 +1455,11 @@
       '.eqms-event-record-id{font-size:11px;font-family:monospace;color:var(--hm-text-secondary,#64748b);white-space:nowrap}' +
       '.eqms-event-title{font-size:13px;color:var(--hm-text-primary,#0f172a);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
       '.eqms-event-bottom{display:flex;gap:8px;align-items:center;flex-wrap:wrap}' +
-      '.eqms-event-age{font-size:11px;color:#dc2626;font-weight:600}' +
+      '.eqms-event-age{font-size:11px;color:var(--eqms-priority-critical,#dc2626);font-weight:600}' +
       '.eqms-event-assignee{font-size:11px;color:var(--hm-text-secondary,#64748b)}' +
       '.eqms-calendar-list{display:flex;flex-direction:column;gap:6px}' +
       '.eqms-calendar-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;border:1px solid var(--hm-border,#e2e8f0)}' +
-      '.eqms-calendar-item.critical{border-left:3px solid #dc2626}.eqms-calendar-item.warning{border-left:3px solid #ca8a04}' +
+      '.eqms-calendar-item.critical{border-left:3px solid var(--eqms-priority-critical,#dc2626)}.eqms-calendar-item.warning{border-left:3px solid var(--eqms-priority-medium,#ca8a04)}' +
       '.eqms-calendar-icon{font-size:16px;flex-shrink:0}' +
       '.eqms-calendar-detail{flex:1;min-width:0}' +
       '.eqms-calendar-name{font-size:13px;color:var(--hm-text-primary,#0f172a);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}' +
@@ -1468,10 +1467,10 @@
       '.eqms-calendar-date{text-align:right;flex-shrink:0}' +
       '.eqms-calendar-date>div:first-child{font-size:12px;color:var(--hm-text-primary,#0f172a)}' +
       '.eqms-calendar-countdown{font-size:11px;font-weight:600}' +
-      '.eqms-calendar-countdown.critical{color:#dc2626}.eqms-calendar-countdown.warning{color:#ca8a04}' +
+      '.eqms-calendar-countdown.critical{color:var(--eqms-priority-critical,#dc2626)}.eqms-calendar-countdown.warning{color:var(--eqms-priority-medium,#ca8a04)}' +
       '.eqms-aging-bar-container{padding:4px 0}' +
       '.eqms-aging-bar{display:flex;height:28px;border-radius:6px;overflow:hidden;margin-bottom:10px}' +
-      '.eqms-aging-segment{display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;transition:width .3s;min-width:0}' +
+      '.eqms-aging-segment{display:flex;align-items:center;justify-content:center;color:var(--hm-text-inverse,#fff);font-size:12px;font-weight:600;transition:width .3s;min-width:0}' +
       '.eqms-aging-legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--hm-text-secondary,#64748b)}' +
       '.eqms-aging-legend-item{display:flex;align-items:center;gap:4px}' +
       '.eqms-aging-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}' +
@@ -1487,7 +1486,9 @@
       // Risk heatmap
       '.eqms-risk-heatmap-grid{display:grid;grid-template-columns:40px repeat(5,44px);gap:3px;width:max-content}' +
       '.eqms-risk-col-header,.eqms-risk-row-header{display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--hm-text-secondary,#64748b);font-weight:600}' +
-      '.eqms-risk-cell{width:44px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:4px;color:#fff;font-weight:700;font-size:12px;cursor:default}';
+      '.eqms-risk-cell{width:44px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:4px;color:var(--hm-text-inverse,#fff);font-weight:700;font-size:12px;cursor:default}' +
+'.eqms-risk-top-item{display:flex;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid var(--hm-border,#e2e8f0)}' +
+'.eqms-qt-toast{position:fixed;bottom:20px;right:20px;background:var(--hm-bg-inverse,#1e293b);color:var(--hm-text-inverse,#fff);padding:12px 20px;border-radius:var(--eqms-radius-lg,8px);font-size:var(--hm-font-size-sm,13px);z-index:var(--hm-z-toast,9999);box-shadow:var(--hm-shadow-md,0 4px 12px rgba(0,0,0,.15));transition:opacity .3s}';
     document.head.appendChild(style);
   }
 

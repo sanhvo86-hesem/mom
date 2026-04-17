@@ -382,7 +382,7 @@
     var html = '<div class="eqms-field-grid" style="grid-template-columns:repeat(3,1fr)">';
     html += UI.renderFormField({ key: 'quick-po', label: { vi: 'Theo PO', en: 'By PO' }, type: 'text', placeholder: 'PO-...' });
     html += UI.renderFormField({ key: 'quick-supplier', label: { vi: 'Theo NCC', en: 'By Supplier' }, placeholder: 'SUP-...' });
-    html += UI.renderFormField({ key: 'quick-material', label: { vi: 'Theo vat tu', en: 'By Material' }, placeholder: 'MAT-...' });
+    html += UI.renderFormField({ key: 'quick-material', label: { vi: 'Theo vật tư', en: 'By Material' }, placeholder: 'MAT-...' });
     html += '</div>';
     return html;
   }

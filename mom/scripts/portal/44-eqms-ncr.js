@@ -32,25 +32,25 @@
   var STATES = ['draft', 'submitted', 'under_review', 'disposition_set', 'containment_active', 'close_requested', 'closed'];
 
   var NC_TYPES = [
-    { value: 'material',       label: { vi: 'Vat lieu',     en: 'Material' } },
-    { value: 'process',        label: { vi: 'Quy trinh',    en: 'Process' } },
-    { value: 'dimensional',    label: { vi: 'Kich thuoc',   en: 'Dimensional' } },
-    { value: 'documentation',  label: { vi: 'Tai lieu',     en: 'Documentation' } },
-    { value: 'workmanship',    label: { vi: 'Tay nghe',     en: 'Workmanship' } }
+    { value: 'material',       label: { vi: 'Vật liệu',     en: 'Material' } },
+    { value: 'process',        label: { vi: 'Quy trình',    en: 'Process' } },
+    { value: 'dimensional',    label: { vi: 'Kích thước',   en: 'Dimensional' } },
+    { value: 'documentation',  label: { vi: 'Tài liệu',     en: 'Documentation' } },
+    { value: 'workmanship',    label: { vi: 'Tay nghề',     en: 'Workmanship' } }
   ];
 
   var SEVERITIES = [
-    { value: 'critical', label: { vi: 'Nghiem trong', en: 'Critical' } },
-    { value: 'major',    label: { vi: 'Lon',          en: 'Major' } },
-    { value: 'minor',    label: { vi: 'Nho',          en: 'Minor' } }
+    { value: 'critical', label: { vi: 'Nghiêm trọng', en: 'Critical' } },
+    { value: 'major',    label: { vi: 'Lớn',          en: 'Major' } },
+    { value: 'minor',    label: { vi: 'Nhỏ',          en: 'Minor' } }
   ];
 
   var DISPOSITIONS = [
-    { value: 'rework',           label: { vi: 'Lam lai',          en: 'Rework' },           style: 'secondary', icon: '\u{1F527}' },
-    { value: 'repair',           label: { vi: 'Sua chua',         en: 'Repair' },            style: 'secondary', icon: '\u{1F6E0}\uFE0F' },
-    { value: 'use-as-is',        label: { vi: 'Su dung nguyen trang', en: 'Use As-Is' },     style: 'ghost',     icon: '\u2705' },
-    { value: 'return-to-vendor', label: { vi: 'Tra NCC',          en: 'Return to Vendor' },  style: 'secondary', icon: '\u{1F4E6}' },
-    { value: 'scrap',            label: { vi: 'Huy bo',           en: 'Scrap' },             style: 'danger',    icon: '\u{1F5D1}\uFE0F' }
+    { value: 'rework',           label: { vi: 'Làm lại',          en: 'Rework' },           style: 'secondary', icon: '\u{1F527}' },
+    { value: 'repair',           label: { vi: 'Sửa chữa',         en: 'Repair' },            style: 'secondary', icon: '\u{1F6E0}\uFE0F' },
+    { value: 'use-as-is',        label: { vi: 'Sử dụng nguyên trạng', en: 'Use As-Is' },     style: 'ghost',     icon: '\u2705' },
+    { value: 'return-to-vendor', label: { vi: 'Trả NCC',          en: 'Return to Vendor' },  style: 'secondary', icon: '\u{1F4E6}' },
+    { value: 'scrap',            label: { vi: 'Huỷ bỏ',           en: 'Scrap' },             style: 'danger',    icon: '\u{1F5D1}\uFE0F' }
   ];
 
   // ─── State ──────────────────────────────────────────────────────────────
@@ -194,7 +194,7 @@
       if (seq !== state.queueSeq || !state.loading) return;
       state.loading = false;
       state.loaded = true;
-      state.error = T({ vi: 'Yeu cau tai du lieu qua thoi gian. Vui long thu lai.', en: 'Data request timed out. Please retry.' });
+      state.error = T({ vi: 'Yêu cầu tải dữ liệu quá thời gian. Vui lòng thử lại.', en: 'Data request timed out. Please retry.' });
       rerender();
     }, 35000);
 
@@ -304,30 +304,30 @@
     var s = record.status || record.state || 'draft';
     var map = {
       draft:              [
-        { action: 'contain',     label: { vi: 'Kiem soat',       en: 'Contain' },           style: 'secondary' },
-        { action: 'investigate', label: { vi: 'Dieu tra',        en: 'Investigate' },        style: 'primary' }
+        { action: 'contain',     label: { vi: 'Kiểm soát',       en: 'Contain' },           style: 'secondary' },
+        { action: 'investigate', label: { vi: 'Điều tra',        en: 'Investigate' },        style: 'primary' }
       ],
       submitted:          [
-        { action: 'contain',     label: { vi: 'Kiem soat',       en: 'Contain' },           style: 'secondary' },
-        { action: 'investigate', label: { vi: 'Dieu tra',        en: 'Investigate' },        style: 'secondary' },
-        { action: 'submit-mrb',  label: { vi: 'Gui MRB',        en: 'Submit to MRB' },      style: 'primary' }
+        { action: 'contain',     label: { vi: 'Kiểm soát',       en: 'Contain' },           style: 'secondary' },
+        { action: 'investigate', label: { vi: 'Điều tra',        en: 'Investigate' },        style: 'secondary' },
+        { action: 'submit-mrb',  label: { vi: 'Gửi MRB',        en: 'Submit to MRB' },      style: 'primary' }
       ],
       under_review:       [
-        { action: 'submit-mrb',        label: { vi: 'Gui MRB',          en: 'Submit to MRB' },           style: 'primary' },
-        { action: 'record-disposition', label: { vi: 'Ghi xu ly',        en: 'Record Disposition' },      style: 'secondary' }
+        { action: 'submit-mrb',        label: { vi: 'Gửi MRB',          en: 'Submit to MRB' },           style: 'primary' },
+        { action: 'record-disposition', label: { vi: 'Ghi xử lý',        en: 'Record Disposition' },      style: 'secondary' }
       ],
       disposition_set:    [
-        { action: 'close',    label: { vi: 'Dong',         en: 'Close' },        style: 'primary' },
-        { action: 'reopen',   label: { vi: 'Mo lai',       en: 'Reopen' },       style: 'ghost' }
+        { action: 'close',    label: { vi: 'Đóng',         en: 'Close' },        style: 'primary' },
+        { action: 'reopen',   label: { vi: 'Mở lại',       en: 'Reopen' },       style: 'ghost' }
       ],
       containment_active: [
-        { action: 'close',    label: { vi: 'Dong',         en: 'Close' },        style: 'primary' }
+        { action: 'close',    label: { vi: 'Đóng',         en: 'Close' },        style: 'primary' }
       ],
       close_requested:    [
-        { action: 'close',    label: { vi: 'Dong',         en: 'Close' },        style: 'primary' }
+        { action: 'close',    label: { vi: 'Đóng',         en: 'Close' },        style: 'primary' }
       ],
       closed:             [
-        { action: 'reopen',   label: { vi: 'Mo lai',       en: 'Reopen' },       style: 'ghost' }
+        { action: 'reopen',   label: { vi: 'Mở lại',       en: 'Reopen' },       style: 'ghost' }
       ]
     };
     return map[s] || [];
@@ -341,47 +341,47 @@
     var m = state.metrics || {};
 
     html += ui.renderKpiRow([
-      { label: { vi: 'Tong mo',            en: 'Total Open' },          value: m.total_open != null ? m.total_open : '...' },
-      { label: { vi: 'Cho xu ly',          en: 'Pending Disposition' }, value: m.pending_disposition != null ? m.pending_disposition : '...', accent: 'warn' },
-      { label: { vi: 'Lam lai',            en: 'Rework Active' },       value: m.rework_active != null ? m.rework_active : '...' },
-      { label: { vi: 'COPQ (thang)',       en: 'COPQ (Month)' },        value: m.copq_month != null ? '$' + fmt(m.copq_month) : '...', accent: 'danger' },
-      { label: { vi: 'NCC hang dau',       en: 'Top Supplier NCR' },    value: m.top_supplier != null ? m.top_supplier : '...' }
+      { label: { vi: 'Tổng mở',            en: 'Total Open' },          value: m.total_open != null ? m.total_open : '...' },
+      { label: { vi: 'Chờ xử lý',          en: 'Pending Disposition' }, value: m.pending_disposition != null ? m.pending_disposition : '...', accent: 'warn' },
+      { label: { vi: 'Làm lại',            en: 'Rework Active' },       value: m.rework_active != null ? m.rework_active : '...' },
+      { label: { vi: 'COPQ (tháng)',       en: 'COPQ (Month)' },        value: m.copq_month != null ? '$' + fmt(m.copq_month) : '...', accent: 'danger' },
+      { label: { vi: 'NCC hàng đầu',       en: 'Top Supplier NCR' },    value: m.top_supplier != null ? m.top_supplier : '...' }
     ]);
 
     html += ui.renderFilterBar(state.filters, {
       fields: [
-        { key: 'search',       type: 'text',   placeholder: { vi: 'Tim kiem...', en: 'Search...' }, width: '200px' },
-        { key: 'nc_type',      type: 'select',  label: { vi: 'Loai NC',         en: 'NC Type' },        options: NC_TYPES },
-        { key: 'severity',     type: 'select',  label: { vi: 'Muc do',          en: 'Severity' },       options: SEVERITIES },
-        { key: 'status',       type: 'select',  label: { vi: 'Trang thai',      en: 'Status' },         options: STATES.map(function(s) { return { value: s, label: s.replace(/_/g, ' ') }; }) },
-        { key: 'department',   type: 'select',  reference: 'departments', label: { vi: 'Phong ban', en: 'Department' }, width: '140px' },
-        { key: 'work_order',   type: 'select',  reference: 'work_orders', label: { vi: 'Lenh SX', en: 'Work Order' }, width: '140px' },
-        { key: 'disposition',  type: 'select',  label: { vi: 'Xu ly',           en: 'Disposition' },    options: DISPOSITIONS }
+        { key: 'search',       type: 'text',   placeholder: { vi: 'Tìm kiếm...', en: 'Search...' }, width: '200px' },
+        { key: 'nc_type',      type: 'select',  label: { vi: 'Loại NC',         en: 'NC Type' },        options: NC_TYPES },
+        { key: 'severity',     type: 'select',  label: { vi: 'Mức độ',          en: 'Severity' },       options: SEVERITIES },
+        { key: 'status',       type: 'select',  label: { vi: 'Trạng thái',      en: 'Status' },         options: STATES.map(function(s) { return { value: s, label: s.replace(/_/g, ' ') }; }) },
+        { key: 'department',   type: 'select',  reference: 'departments', label: { vi: 'Phòng ban', en: 'Department' }, width: '140px' },
+        { key: 'work_order',   type: 'select',  reference: 'work_orders', label: { vi: 'Lệnh SX', en: 'Work Order' }, width: '140px' },
+        { key: 'disposition',  type: 'select',  label: { vi: 'Xử lý',           en: 'Disposition' },    options: DISPOSITIONS }
       ],
       savedViews: true
     });
 
     html += '<div class="eqms-action-bar">';
-    html += '<button class="eqms-btn primary sm" data-action="go-create">' + T({ vi: '+ Tao NCR', en: '+ New NCR' }) + '</button>';
+    html += '<button class="eqms-btn primary sm" data-action="go-create">' + T({ vi: '+ Tạo NCR', en: '+ New NCR' }) + '</button>';
     html += ui.renderExportMenu({ formats: ['pdf', 'excel', 'csv'] });
     html += '</div>';
 
     if (state.loading) {
-      html += ui.renderLoadingState({ vi: 'Dang tai du lieu...', en: 'Loading data...' });
+      html += ui.renderLoadingState({ vi: 'Đang tải dữ liệu...', en: 'Loading data...' });
     } else if (state.error) {
       html += (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-queue');
     } else {
       var columns = [
-        { key: 'ncr_id',       label: { vi: 'Ma NCR',        en: 'NCR ID' },        type: 'id',    sortable: true },
-        { key: 'title',        label: { vi: 'Tieu de',       en: 'Title' },          type: 'truncate', sortable: true },
-        { key: 'nc_type',      label: { vi: 'Loai NC',       en: 'NC Type' },        type: 'badge', sortable: true },
-        { key: 'severity',     label: { vi: 'Muc do',        en: 'Severity' },       type: 'badge', sortable: true },
-        { key: 'status',       label: { vi: 'Trang thai',    en: 'Status' },         type: 'badge', sortable: true },
-        { key: 'disposition',  label: { vi: 'Xu ly',         en: 'Disposition' },     type: 'badge', sortable: true },
-        { key: 'part_number',  label: { vi: 'Ma SP',         en: 'Part #' },         sortable: true },
+        { key: 'ncr_id',       label: { vi: 'Mã NCR',        en: 'NCR ID' },        type: 'id',    sortable: true },
+        { key: 'title',        label: { vi: 'Tiêu đề',       en: 'Title' },          type: 'truncate', sortable: true },
+        { key: 'nc_type',      label: { vi: 'Loại NC',       en: 'NC Type' },        type: 'badge', sortable: true },
+        { key: 'severity',     label: { vi: 'Mức độ',        en: 'Severity' },       type: 'badge', sortable: true },
+        { key: 'status',       label: { vi: 'Trạng thái',    en: 'Status' },         type: 'badge', sortable: true },
+        { key: 'disposition',  label: { vi: 'Xử lý',         en: 'Disposition' },     type: 'badge', sortable: true },
+        { key: 'part_number',  label: { vi: 'Mã SP',         en: 'Part #' },         sortable: true },
         { key: 'supplier',     label: { vi: 'NCC',           en: 'Supplier' },       sortable: true },
-        { key: 'quantity_rejected', label: { vi: 'SL tu choi', en: 'Qty Rejected' }, type: 'number', sortable: true },
-        { key: 'created_at',   label: { vi: 'Ngay tao',      en: 'Created' },        type: 'date',  sortable: true }
+        { key: 'quantity_rejected', label: { vi: 'SL từ chối', en: 'Qty Rejected' }, type: 'number', sortable: true },
+        { key: 'created_at',   label: { vi: 'Ngày tạo',      en: 'Created' },        type: 'date',  sortable: true }
       ];
       html += ui.renderDataGrid(columns, state.records, {
         selectable: true,
@@ -398,20 +398,20 @@
   // SCREEN: DETAIL
   // =========================================================================
   var DETAIL_TABS = [
-    { id: 'summary',       label: { vi: 'Tong quan',           en: 'Summary' } },
-    { id: 'containment',   label: { vi: 'Kiem soat',           en: 'Containment' } },
-    { id: 'investigation', label: { vi: 'Dieu tra',            en: 'Investigation' } },
-    { id: 'mrb',           label: { vi: 'Hoi dong MRB',       en: 'MRB Panel' } },
-    { id: 'disposition',   label: { vi: 'Xu ly',               en: 'Disposition' } },
-    { id: 'related',       label: { vi: 'Ban ghi lien quan',   en: 'Related Records' } },
-    { id: 'audit',         label: { vi: 'Nhat ky',             en: 'Audit Trail' } },
-    { id: 'signatures',    label: { vi: 'Chu ky',              en: 'Signatures' } },
-    { id: 'attachments',   label: { vi: 'Tep & Binh luan',     en: 'Attachments & Comments' } }
+    { id: 'summary',       label: { vi: 'Tổng quan',           en: 'Summary' } },
+    { id: 'containment',   label: { vi: 'Kiểm soát',           en: 'Containment' } },
+    { id: 'investigation', label: { vi: 'Điều tra',            en: 'Investigation' } },
+    { id: 'mrb',           label: { vi: 'Hội đồng MRB',       en: 'MRB Panel' } },
+    { id: 'disposition',   label: { vi: 'Xử lý',               en: 'Disposition' } },
+    { id: 'related',       label: { vi: 'Bản ghi liên quan',   en: 'Related Records' } },
+    { id: 'audit',         label: { vi: 'Nhật ký',             en: 'Audit Trail' } },
+    { id: 'signatures',    label: { vi: 'Chữ ký',              en: 'Signatures' } },
+    { id: 'attachments',   label: { vi: 'Tệp & Bình luận',     en: 'Attachments & Comments' } }
   ];
 
   function renderDetail() {
     var d = state.detail;
-    if (state.loading || !d) return ui.renderLoadingState({ vi: 'Dang tai chi tiet...', en: 'Loading detail...' });
+    if (state.loading || !d) return ui.renderLoadingState({ vi: 'Đang tải chi tiết...', en: 'Loading detail...' });
     if (state.error) return (ui.renderRichErrorState || ui.renderErrorState)(state.error, 'retry-detail');
 
     var html = '';
@@ -429,10 +429,10 @@
     }, {
       actions: getActions(d),
       extraMeta: [
-        { label: { vi: 'Loai NC',     en: 'NC Type' },     value: d.nc_type },
+        { label: { vi: 'Loại NC',     en: 'NC Type' },     value: d.nc_type },
         { label: { vi: 'NCC',         en: 'Supplier' },    value: d.supplier },
-        { label: { vi: 'Lenh SX',     en: 'Work Order' },  value: d.work_order },
-        { label: { vi: 'Ma SP',       en: 'Part #' },      value: d.part_number }
+        { label: { vi: 'Lệnh SX',     en: 'Work Order' },  value: d.work_order },
+        { label: { vi: 'Mã SP',       en: 'Part #' },      value: d.part_number }
       ]
     });
 
@@ -463,22 +463,22 @@
 
   // Tab: Summary
   function renderTabSummary(d) {
-    return ui.renderSection({ vi: 'Thong tin NCR', en: 'NCR Information' },
+    return ui.renderSection({ vi: 'Thông tin NCR', en: 'NCR Information' },
       ui.renderFieldGrid([
-        { label: { vi: 'Ma NCR',            en: 'NCR ID' },           value: d.ncr_id || d.ncr_number, mono: true },
-        { label: { vi: 'Tieu de',           en: 'Title' },             value: d.title },
-        { label: { vi: 'Loai NC',           en: 'NC Type' },           value: d.nc_type, badge: true },
-        { label: { vi: 'Loai loi',          en: 'Defect Type' },       value: d.defect_type },
-        { label: { vi: 'Muc do',            en: 'Severity' },          value: d.severity, badge: true },
-        { label: { vi: 'SL anh huong',      en: 'Qty Affected' },      value: d.quantity_affected },
-        { label: { vi: 'SL tu choi',        en: 'Qty Rejected' },      value: d.quantity_rejected },
-        { label: { vi: 'Vi tri',            en: 'Location' },          value: d.location },
-        { label: { vi: 'Diem phat hien',    en: 'Detection Point' },   value: d.detection_point },
-        { label: { vi: 'Lenh san xuat',     en: 'Work Order' },        value: d.work_order },
-        { label: { vi: 'Ma san pham',       en: 'Part Number' },       value: d.part_number },
-        { label: { vi: 'Nha cung cap',      en: 'Supplier' },          value: d.supplier }
+        { label: { vi: 'Mã NCR',            en: 'NCR ID' },           value: d.ncr_id || d.ncr_number, mono: true },
+        { label: { vi: 'Tiêu đề',           en: 'Title' },             value: d.title },
+        { label: { vi: 'Loại NC',           en: 'NC Type' },           value: d.nc_type, badge: true },
+        { label: { vi: 'Loại lỗi',          en: 'Defect Type' },       value: d.defect_type },
+        { label: { vi: 'Mức độ',            en: 'Severity' },          value: d.severity, badge: true },
+        { label: { vi: 'SL ảnh hưởng',      en: 'Qty Affected' },      value: d.quantity_affected },
+        { label: { vi: 'SL từ chối',        en: 'Qty Rejected' },      value: d.quantity_rejected },
+        { label: { vi: 'Vị trí',            en: 'Location' },          value: d.location },
+        { label: { vi: 'Điểm phát hiện',    en: 'Detection Point' },   value: d.detection_point },
+        { label: { vi: 'Lệnh sản xuất',     en: 'Work Order' },        value: d.work_order },
+        { label: { vi: 'Mã sản phẩm',       en: 'Part Number' },       value: d.part_number },
+        { label: { vi: 'Nhà cung cấp',      en: 'Supplier' },          value: d.supplier }
       ])
-    ) + ui.renderSection({ vi: 'Mo ta', en: 'Description' },
+    ) + ui.renderSection({ vi: 'Mô tả', en: 'Description' },
       '<div class="eqms-text-block">' + esc(d.description || '') + '</div>'
     );
   }
@@ -487,22 +487,22 @@
   function renderTabContainment(d) {
     var actions = d.containment_actions || [];
     var addBtn = '<button class="eqms-btn ghost sm" data-action="add-containment-action">' +
-                 T({ vi: '+ Them hanh dong', en: '+ Add Action' }) + '</button>';
-    return ui.renderSection({ vi: 'Hanh dong kiem soat', en: 'Containment Actions' },
+                 T({ vi: '+ Thêm hành động', en: '+ Add Action' }) + '</button>';
+    return ui.renderSection({ vi: 'Hành động kiểm soát', en: 'Containment Actions' },
       ui.renderDataGrid([
-        { key: 'description',  label: { vi: 'Mo ta',       en: 'Description' },   sortable: false },
-        { key: 'owner',        label: { vi: 'Chu so huu',  en: 'Owner' },          sortable: false },
-        { key: 'due_date',     label: { vi: 'Han',         en: 'Due Date' },       type: 'date', sortable: false },
-        { key: 'status',       label: { vi: 'Trang thai',  en: 'Status' },         type: 'badge', sortable: false },
-        { key: 'completed_at', label: { vi: 'Hoan thanh',  en: 'Completed' },      type: 'date', sortable: false }
+        { key: 'description',  label: { vi: 'Mô tả',       en: 'Description' },   sortable: false },
+        { key: 'owner',        label: { vi: 'Chủ sở hữu',  en: 'Owner' },          sortable: false },
+        { key: 'due_date',     label: { vi: 'Hạn',         en: 'Due Date' },       type: 'date', sortable: false },
+        { key: 'status',       label: { vi: 'Trạng thái',  en: 'Status' },         type: 'badge', sortable: false },
+        { key: 'completed_at', label: { vi: 'Hoàn thành',  en: 'Completed' },      type: 'date', sortable: false }
       ], actions, { selectable: false }),
       { headerActions: addBtn }
-    ) + ui.renderSection({ vi: 'Vung cach ly', en: 'Quarantine Zone' },
+    ) + ui.renderSection({ vi: 'Vùng cách ly', en: 'Quarantine Zone' },
       ui.renderFieldGrid([
-        { label: { vi: 'Khu vuc cach ly',   en: 'Quarantine Location' },  value: d.quarantine_location },
-        { label: { vi: 'SL cach ly',        en: 'Quarantined Qty' },      value: d.quarantined_qty },
-        { label: { vi: 'Ngay cach ly',      en: 'Quarantine Date' },      value: fmtDate(d.quarantine_date) },
-        { label: { vi: 'Ghi chu',           en: 'Notes' },                value: d.quarantine_notes }
+        { label: { vi: 'Khu vực cách ly',   en: 'Quarantine Location' },  value: d.quarantine_location },
+        { label: { vi: 'SL cách ly',        en: 'Quarantined Qty' },      value: d.quarantined_qty },
+        { label: { vi: 'Ngày cách ly',      en: 'Quarantine Date' },      value: fmtDate(d.quarantine_date) },
+        { label: { vi: 'Ghi chú',           en: 'Notes' },                value: d.quarantine_notes }
       ])
     );
   }
@@ -510,15 +510,15 @@
   // Tab: Investigation
   function renderTabInvestigation(d) {
     var inv = d.investigation || {};
-    return ui.renderSection({ vi: 'Ket qua dieu tra', en: 'Investigation Findings' },
+    return ui.renderSection({ vi: 'Kết quả điều tra', en: 'Investigation Findings' },
       ui.renderFieldGrid([
-        { label: { vi: 'Nguyen nhan goc',     en: 'Root Cause' },           value: inv.root_cause || d.root_cause },
-        { label: { vi: 'Yeu to dong gop',     en: 'Contributing Factors' }, value: inv.contributing_factors },
-        { label: { vi: 'Phuong phap dieu tra', en: 'Investigation Method' }, value: inv.method },
-        { label: { vi: 'Dieu tra vien',        en: 'Investigator' },         value: inv.investigator },
-        { label: { vi: 'Ngay dieu tra',        en: 'Investigation Date' },   value: fmtDate(inv.date) }
+        { label: { vi: 'Nguyên nhân gốc',     en: 'Root Cause' },           value: inv.root_cause || d.root_cause },
+        { label: { vi: 'Yếu tố đóng góp',     en: 'Contributing Factors' }, value: inv.contributing_factors },
+        { label: { vi: 'Phương pháp điều tra', en: 'Investigation Method' }, value: inv.method },
+        { label: { vi: 'Điều tra viên',        en: 'Investigator' },         value: inv.investigator },
+        { label: { vi: 'Ngày điều tra',        en: 'Investigation Date' },   value: fmtDate(inv.date) }
       ])
-    ) + ui.renderSection({ vi: 'Ghi chu dieu tra', en: 'Investigation Notes' },
+    ) + ui.renderSection({ vi: 'Ghi chú điều tra', en: 'Investigation Notes' },
       '<div class="eqms-text-block">' + esc(inv.notes || d.investigation_notes || '') + '</div>'
     );
   }
@@ -529,21 +529,21 @@
     var members = mrb.members || d.mrb_members || [];
     var votes   = mrb.votes   || d.mrb_votes   || [];
 
-    var html = ui.renderSection({ vi: 'Thanh vien hoi dong MRB', en: 'MRB Review Board Members' },
+    var html = ui.renderSection({ vi: 'Thành viên hội đồng MRB', en: 'MRB Review Board Members' },
       ui.renderDataGrid([
-        { key: 'name',       label: { vi: 'Thanh vien',   en: 'Member' },       sortable: false },
-        { key: 'role',       label: { vi: 'Vai tro',      en: 'Role' },          sortable: false },
-        { key: 'department', label: { vi: 'Phong ban',    en: 'Department' },    sortable: false },
-        { key: 'vote',       label: { vi: 'Phieu bau',    en: 'Vote' },          type: 'badge', sortable: false },
-        { key: 'voted_at',   label: { vi: 'Ngay bau',     en: 'Voted At' },      type: 'datetime', sortable: false },
-        { key: 'comments',   label: { vi: 'Nhan xet',     en: 'Comments' },      sortable: false }
+        { key: 'name',       label: { vi: 'Thành viên',   en: 'Member' },       sortable: false },
+        { key: 'role',       label: { vi: 'Vai trò',      en: 'Role' },          sortable: false },
+        { key: 'department', label: { vi: 'Phòng ban',    en: 'Department' },    sortable: false },
+        { key: 'vote',       label: { vi: 'Phiếu bầu',    en: 'Vote' },          type: 'badge', sortable: false },
+        { key: 'voted_at',   label: { vi: 'Ngày bầu',     en: 'Voted At' },      type: 'datetime', sortable: false },
+        { key: 'comments',   label: { vi: 'Nhận xét',     en: 'Comments' },      sortable: false }
       ], members.length ? members : votes, { selectable: false })
     );
 
     // MRB disposition voting
-    html += ui.renderSection({ vi: 'Quyet dinh xu ly', en: 'Disposition Decision' }, function() {
+    html += ui.renderSection({ vi: 'Quyết định xử lý', en: 'Disposition Decision' }, function() {
       var h = '<div class="eqms-mrb-disposition">';
-      h += '<p class="eqms-mrb-label">' + T({ vi: 'Chon xu ly cuoi cung (yeu cau xac nhan):', en: 'Select final disposition (confirmation required):' }) + '</p>';
+      h += '<p class="eqms-mrb-label">' + T({ vi: 'Chọn xử lý cuối cùng (yêu cầu xác nhận):', en: 'Select final disposition (confirmation required):' }) + '</p>';
       h += '<div class="eqms-disposition-actions">';
       DISPOSITIONS.forEach(function(disp) {
         h += '<button class="eqms-btn ' + disp.style + ' sm eqms-disposition-btn" data-action="disposition-confirm" data-disposition="' + esc(disp.value) + '">';
@@ -555,7 +555,7 @@
       // Final disposition summary
       if (mrb.final_disposition || d.disposition) {
         h += '<div class="eqms-mrb-result">';
-        h += '<span class="eqms-field-label">' + T({ vi: 'Xu ly cuoi cung:', en: 'Final Disposition:' }) + '</span> ';
+        h += '<span class="eqms-field-label">' + T({ vi: 'Xử lý cuối cùng:', en: 'Final Disposition:' }) + '</span> ';
         h += '<span class="eqms-badge ' + slugify(mrb.final_disposition || d.disposition || '') + '">';
         h += esc(mrb.final_disposition || d.disposition || '');
         h += '</span>';
@@ -571,27 +571,27 @@
   // Tab: Disposition
   function renderTabDisposition(d) {
     var disp = d.disposition_details || {};
-    return ui.renderSection({ vi: 'Chi tiet xu ly', en: 'Disposition Details' },
+    return ui.renderSection({ vi: 'Chi tiết xử lý', en: 'Disposition Details' },
       ui.renderFieldGrid([
-        { label: { vi: 'Xu ly da chon',      en: 'Selected Disposition' },  value: disp.selected || d.disposition, badge: true },
-        { label: { vi: 'Ly do',              en: 'Disposition Rationale' }, value: disp.rationale || d.disposition_rationale },
-        { label: { vi: 'Nguoi quyet dinh',   en: 'Decided By' },            value: disp.decided_by },
-        { label: { vi: 'Ngay quyet dinh',    en: 'Decision Date' },         value: fmtDate(disp.decided_date) }
+        { label: { vi: 'Xử lý đã chọn',      en: 'Selected Disposition' },  value: disp.selected || d.disposition, badge: true },
+        { label: { vi: 'Lý do',              en: 'Disposition Rationale' }, value: disp.rationale || d.disposition_rationale },
+        { label: { vi: 'Người quyết định',   en: 'Decided By' },            value: disp.decided_by },
+        { label: { vi: 'Ngày quyết định',    en: 'Decision Date' },         value: fmtDate(disp.decided_date) }
       ])
     ) + (disp.selected === 'rework' || d.disposition === 'rework'
-      ? ui.renderSection({ vi: 'Huong dan lam lai', en: 'Rework Instructions' },
+      ? ui.renderSection({ vi: 'Hướng dẫn làm lại', en: 'Rework Instructions' },
           '<div class="eqms-text-block">' + esc(disp.rework_instructions || d.rework_instructions || '') + '</div>'
         )
       : ''
     ) + (disp.selected === 'repair' || d.disposition === 'repair'
-      ? ui.renderSection({ vi: 'Huong dan sua chua', en: 'Repair Instructions' },
+      ? ui.renderSection({ vi: 'Hướng dẫn sửa chữa', en: 'Repair Instructions' },
           '<div class="eqms-text-block">' + esc(disp.repair_instructions || d.repair_instructions || '') + '</div>'
         )
       : ''
-    ) + ui.renderSection({ vi: 'Yeu cau chu ky', en: 'Signature Required' },
+    ) + ui.renderSection({ vi: 'Yêu cầu chữ ký', en: 'Signature Required' },
       ui.renderSignaturePanel(state.signatures, [
-        { vi: 'QA Phe duyet xu ly', en: 'QA Disposition Approval' },
-        { vi: 'Truong phong SX',    en: 'Production Manager' }
+        { vi: 'QA Phê duyệt xử lý', en: 'QA Disposition Approval' },
+        { vi: 'Trưởng phòng SX',    en: 'Production Manager' }
       ])
     );
   }
@@ -602,7 +602,7 @@
     if (ui.renderLinkedRecordGraph) {
       html += ui.renderLinkedRecordGraph(state.relationships, { entityType: 'ncr', recordId: state.detail && state.detail.ncr_id });
     }
-    html += ui.renderSection({ vi: 'Ban ghi lien quan', en: 'Related Records' },
+    html += ui.renderSection({ vi: 'Bản ghi liên quan', en: 'Related Records' },
       ui.renderRelationshipsPanel(state.relationships)
     );
     return html;
@@ -610,28 +610,28 @@
 
   // Tab: Audit Trail
   function renderTabAudit() {
-    return ui.renderSection({ vi: 'Nhat ky thay doi', en: 'Audit Trail' },
+    return ui.renderSection({ vi: 'Nhật ký thay đổi', en: 'Audit Trail' },
       ui.renderAuditTrail(state.audit)
     );
   }
 
   // Tab: Signatures
   function renderTabSignatures() {
-    return ui.renderSection({ vi: 'Chu ky dien tu', en: 'Electronic Signatures' },
+    return ui.renderSection({ vi: 'Chữ ký điện tử', en: 'Electronic Signatures' },
       ui.renderSignaturePanel(state.signatures, [
-        { vi: 'Nguoi tao',         en: 'Originator' },
-        { vi: 'QA Xem xet',        en: 'QA Review' },
-        { vi: 'MRB Phe duyet',     en: 'MRB Approval' },
-        { vi: 'Dong NCR',          en: 'NCR Closure' }
+        { vi: 'Người tạo',         en: 'Originator' },
+        { vi: 'QA Xem xét',        en: 'QA Review' },
+        { vi: 'MRB Phê duyệt',     en: 'MRB Approval' },
+        { vi: 'Đóng NCR',          en: 'NCR Closure' }
       ])
     );
   }
 
   // Tab: Attachments + Comments
   function renderTabAttachments() {
-    return ui.renderSection({ vi: 'Tep dinh kem', en: 'Attachments' },
+    return ui.renderSection({ vi: 'Tệp đính kèm', en: 'Attachments' },
       ui.renderAttachmentsGrid(state.attachments)
-    ) + ui.renderSection({ vi: 'Binh luan', en: 'Comments' },
+    ) + ui.renderSection({ vi: 'Bình luận', en: 'Comments' },
       ui.renderCommentsThread(state.comments)
     );
   }
@@ -640,11 +640,11 @@
   // SCREEN: CREATE (Wizard)
   // =========================================================================
   var WIZARD_STEPS = [
-    { label: { vi: 'Loai',       en: 'Type' } },
-    { label: { vi: 'Mo ta',      en: 'Description' } },
-    { label: { vi: 'Loi',        en: 'Defect' } },
-    { label: { vi: 'Kiem soat',  en: 'Containment' } },
-    { label: { vi: 'Gui',        en: 'Submit' } }
+    { label: { vi: 'Loại',       en: 'Type' } },
+    { label: { vi: 'Mô tả',      en: 'Description' } },
+    { label: { vi: 'Lỗi',        en: 'Defect' } },
+    { label: { vi: 'Kiểm soát',  en: 'Containment' } },
+    { label: { vi: 'Gửi',        en: 'Submit' } }
   ];
 
   function renderCreate() {
@@ -662,10 +662,10 @@
   function renderWizardType() {
     var d = state.wizard.data;
     var html = '<div class="eqms-form-grid">';
-    html += ui.renderFormField({ key: 'nc_type',    label: { vi: 'Loai khong phu hop', en: 'NC Type' },     type: 'select', required: true, value: d.nc_type,  options: NC_TYPES });
-    html += ui.renderFormField({ key: 'severity',   label: { vi: 'Muc do',             en: 'Severity' },    type: 'select', required: true, value: d.severity,  options: SEVERITIES });
-    html += ui.renderFormField({ key: 'department',  label: { vi: 'Phong ban',          en: 'Department' },  type: 'select', reference: 'departments', required: true, value: d.department });
-    html += ui.renderFormField({ key: 'work_order',  label: { vi: 'Lenh san xuat',      en: 'Work Order' },  type: 'select', reference: 'work_orders', value: d.work_order });
+    html += ui.renderFormField({ key: 'nc_type',    label: { vi: 'Loại không phù hợp', en: 'NC Type' },     type: 'select', required: true, value: d.nc_type,  options: NC_TYPES });
+    html += ui.renderFormField({ key: 'severity',   label: { vi: 'Mức độ',             en: 'Severity' },    type: 'select', required: true, value: d.severity,  options: SEVERITIES });
+    html += ui.renderFormField({ key: 'department',  label: { vi: 'Phòng ban',          en: 'Department' },  type: 'select', reference: 'departments', required: true, value: d.department });
+    html += ui.renderFormField({ key: 'work_order',  label: { vi: 'Lệnh sản xuất',      en: 'Work Order' },  type: 'select', reference: 'work_orders', value: d.work_order });
     html += '</div>';
     return html;
   }
@@ -673,12 +673,12 @@
   function renderWizardDescription() {
     var d = state.wizard.data;
     var html = '<div class="eqms-form-grid">';
-    html += ui.renderFormField({ key: 'title',        label: { vi: 'Tieu de',         en: 'Title' },         type: 'text',     required: true, value: d.title });
-    html += ui.renderFormField({ key: 'part_number',   label: { vi: 'Ma san pham',     en: 'Part Number' },   type: 'select',   reference: 'items', value: d.part_number });
-    html += ui.renderFormField({ key: 'supplier',      label: { vi: 'Nha cung cap',    en: 'Supplier' },      type: 'select',   reference: 'suppliers', value: d.supplier });
-    html += ui.renderFormField({ key: 'location',      label: { vi: 'Vi tri',          en: 'Location' },      type: 'select',   reference: 'inventory_locations', value: d.location });
-    html += ui.renderFormField({ key: 'detection_point', label: { vi: 'Diem phat hien', en: 'Detection Point' }, type: 'text',  value: d.detection_point });
-    html += ui.renderFormField({ key: 'description',   label: { vi: 'Mo ta chi tiet',  en: 'Description' },   type: 'textarea', required: true, value: d.description });
+    html += ui.renderFormField({ key: 'title',        label: { vi: 'Tiêu đề',         en: 'Title' },         type: 'text',     required: true, value: d.title });
+    html += ui.renderFormField({ key: 'part_number',   label: { vi: 'Mã sản phẩm',     en: 'Part Number' },   type: 'select',   reference: 'items', value: d.part_number });
+    html += ui.renderFormField({ key: 'supplier',      label: { vi: 'Nhà cung cấp',    en: 'Supplier' },      type: 'select',   reference: 'suppliers', value: d.supplier });
+    html += ui.renderFormField({ key: 'location',      label: { vi: 'Vị trí',          en: 'Location' },      type: 'select',   reference: 'inventory_locations', value: d.location });
+    html += ui.renderFormField({ key: 'detection_point', label: { vi: 'Điểm phát hiện', en: 'Detection Point' }, type: 'text',  value: d.detection_point });
+    html += ui.renderFormField({ key: 'description',   label: { vi: 'Mô tả chi tiết',  en: 'Description' },   type: 'textarea', required: true, value: d.description });
     html += '</div>';
     return html;
   }
@@ -686,9 +686,9 @@
   function renderWizardDefect() {
     var d = state.wizard.data;
     var html = '<div class="eqms-form-grid">';
-    html += ui.renderFormField({ key: 'defect_type',       label: { vi: 'Loai loi',       en: 'Defect Type' },       type: 'text',   required: true, value: d.defect_type });
-    html += ui.renderFormField({ key: 'quantity_affected',  label: { vi: 'SL anh huong',   en: 'Qty Affected' },      type: 'number', required: true, value: d.quantity_affected, min: 0 });
-    html += ui.renderFormField({ key: 'quantity_rejected',  label: { vi: 'SL tu choi',     en: 'Qty Rejected' },      type: 'number', required: true, value: d.quantity_rejected, min: 0 });
+    html += ui.renderFormField({ key: 'defect_type',       label: { vi: 'Loại lỗi',       en: 'Defect Type' },       type: 'text',   required: true, value: d.defect_type });
+    html += ui.renderFormField({ key: 'quantity_affected',  label: { vi: 'SL ảnh hưởng',   en: 'Qty Affected' },      type: 'number', required: true, value: d.quantity_affected, min: 0 });
+    html += ui.renderFormField({ key: 'quantity_rejected',  label: { vi: 'SL từ chối',     en: 'Qty Rejected' },      type: 'number', required: true, value: d.quantity_rejected, min: 0 });
     html += '</div>';
     return html;
   }
@@ -696,9 +696,9 @@
   function renderWizardContainment() {
     var d = state.wizard.data;
     var html = '<div class="eqms-form-grid">';
-    html += ui.renderFormField({ key: 'initial_containment', label: { vi: 'Hanh dong kiem soat ban dau', en: 'Initial Containment' }, type: 'textarea', value: d.initial_containment });
-    html += ui.renderFormField({ key: 'quarantine_location', label: { vi: 'Khu vuc cach ly',             en: 'Quarantine Location' },  type: 'select',   reference: 'inventory_locations', value: d.quarantine_location });
-    html += ui.renderFormField({ key: 'quarantined_qty',     label: { vi: 'SL cach ly',                  en: 'Quarantined Qty' },       type: 'number',   value: d.quarantined_qty, min: 0 });
+    html += ui.renderFormField({ key: 'initial_containment', label: { vi: 'Hành động kiểm soát ban đầu', en: 'Initial Containment' }, type: 'textarea', value: d.initial_containment });
+    html += ui.renderFormField({ key: 'quarantine_location', label: { vi: 'Khu vực cách ly',             en: 'Quarantine Location' },  type: 'select',   reference: 'inventory_locations', value: d.quarantine_location });
+    html += ui.renderFormField({ key: 'quarantined_qty',     label: { vi: 'SL cách ly',                  en: 'Quarantined Qty' },       type: 'number',   value: d.quarantined_qty, min: 0 });
     html += '</div>';
     return html;
   }
@@ -706,26 +706,26 @@
   function renderWizardReview() {
     var d = state.wizard.data;
     var html = '<div class="eqms-wizard-review">';
-    html += ui.renderSection({ vi: 'Xem lai', en: 'Review' },
+    html += ui.renderSection({ vi: 'Xem lại', en: 'Review' },
       ui.renderFieldGrid([
-        { label: { vi: 'Tieu de',        en: 'Title' },          value: d.title },
-        { label: { vi: 'Loai NC',        en: 'NC Type' },        value: d.nc_type, badge: true },
-        { label: { vi: 'Muc do',         en: 'Severity' },       value: d.severity, badge: true },
-        { label: { vi: 'Phong ban',      en: 'Department' },     value: d.department },
-        { label: { vi: 'Ma SP',          en: 'Part Number' },    value: d.part_number },
+        { label: { vi: 'Tiêu đề',        en: 'Title' },          value: d.title },
+        { label: { vi: 'Loại NC',        en: 'NC Type' },        value: d.nc_type, badge: true },
+        { label: { vi: 'Mức độ',         en: 'Severity' },       value: d.severity, badge: true },
+        { label: { vi: 'Phòng ban',      en: 'Department' },     value: d.department },
+        { label: { vi: 'Mã SP',          en: 'Part Number' },    value: d.part_number },
         { label: { vi: 'NCC',            en: 'Supplier' },       value: d.supplier },
-        { label: { vi: 'SL anh huong',   en: 'Qty Affected' },   value: d.quantity_affected },
-        { label: { vi: 'SL tu choi',     en: 'Qty Rejected' },   value: d.quantity_rejected },
-        { label: { vi: 'Loai loi',       en: 'Defect Type' },    value: d.defect_type }
+        { label: { vi: 'SL ảnh hưởng',   en: 'Qty Affected' },   value: d.quantity_affected },
+        { label: { vi: 'SL từ chối',     en: 'Qty Rejected' },   value: d.quantity_rejected },
+        { label: { vi: 'Loại lỗi',       en: 'Defect Type' },    value: d.defect_type }
       ])
     );
     if (d.description) {
-      html += ui.renderSection({ vi: 'Mo ta', en: 'Description' },
+      html += ui.renderSection({ vi: 'Mô tả', en: 'Description' },
         '<div class="eqms-text-block">' + esc(d.description) + '</div>'
       );
     }
     if (d.initial_containment) {
-      html += ui.renderSection({ vi: 'Kiem soat ban dau', en: 'Initial Containment' },
+      html += ui.renderSection({ vi: 'Kiểm soát ban đầu', en: 'Initial Containment' },
         '<div class="eqms-text-block">' + esc(d.initial_containment) + '</div>'
       );
     }
@@ -741,21 +741,21 @@
     var html = '';
 
     html += ui.renderKpiRow([
-      { label: { vi: 'Tong NCR',          en: 'Total NCR' },          value: m.total != null ? m.total : '...' },
-      { label: { vi: 'Mo',                en: 'Open' },               value: m.total_open != null ? m.total_open : '...' },
-      { label: { vi: 'Dong trong thang',  en: 'Closed This Month' },  value: m.closed_this_month != null ? m.closed_this_month : '...' },
-      { label: { vi: 'COPQ tich luy',     en: 'COPQ Cumulative' },    value: m.copq_cumulative != null ? '$' + fmt(m.copq_cumulative) : '...' },
-      { label: { vi: 'Ty le loi NCC',     en: 'Supplier Defect Rate' }, value: m.supplier_defect_rate != null ? m.supplier_defect_rate + '%' : '...' }
+      { label: { vi: 'Tổng NCR',          en: 'Total NCR' },          value: m.total != null ? m.total : '...' },
+      { label: { vi: 'Mở',                en: 'Open' },               value: m.total_open != null ? m.total_open : '...' },
+      { label: { vi: 'Đóng trong tháng',  en: 'Closed This Month' },  value: m.closed_this_month != null ? m.closed_this_month : '...' },
+      { label: { vi: 'COPQ tích lũy',     en: 'COPQ Cumulative' },    value: m.copq_cumulative != null ? '$' + fmt(m.copq_cumulative) : '...' },
+      { label: { vi: 'Tỉ lệ lỗi NCC',     en: 'Supplier Defect Rate' }, value: m.supplier_defect_rate != null ? m.supplier_defect_rate + '%' : '...' }
     ]);
 
     // Trend
     var trendData = m.trend || [];
-    html += ui.renderSection({ vi: 'Xu huong NCR', en: 'NCR Trend' },
+    html += ui.renderSection({ vi: 'Xu hướng NCR', en: 'NCR Trend' },
       ui.renderChartWithTableFallback('ncr-trend-chart', null,
         [
-          { key: 'month',  label: { vi: 'Thang',   en: 'Month' },  sortable: false },
-          { key: 'opened', label: { vi: 'Mo',      en: 'Opened' }, type: 'number', sortable: false },
-          { key: 'closed', label: { vi: 'Dong',    en: 'Closed' }, type: 'number', sortable: false }
+          { key: 'month',  label: { vi: 'Tháng',   en: 'Month' },  sortable: false },
+          { key: 'opened', label: { vi: 'Mở',      en: 'Opened' }, type: 'number', sortable: false },
+          { key: 'closed', label: { vi: 'Đóng',    en: 'Closed' }, type: 'number', sortable: false }
         ],
         trendData
       )
@@ -763,12 +763,12 @@
 
     // Defect Pareto
     var paretoData = m.defect_pareto || [];
-    html += ui.renderSection({ vi: 'Pareto loi', en: 'Defect Pareto' },
+    html += ui.renderSection({ vi: 'Pareto lỗi', en: 'Defect Pareto' },
       ui.renderChartWithTableFallback('ncr-pareto-chart', null,
         [
-          { key: 'defect_type',        label: { vi: 'Loai loi',    en: 'Defect Type' },        sortable: false },
-          { key: 'count',              label: { vi: 'So luong',    en: 'Count' },               type: 'number', sortable: false },
-          { key: 'cumulative_percent', label: { vi: 'Tich luy %',  en: 'Cumulative %' },        sortable: false }
+          { key: 'defect_type',        label: { vi: 'Loại lỗi',    en: 'Defect Type' },        sortable: false },
+          { key: 'count',              label: { vi: 'Số lượng',    en: 'Count' },               type: 'number', sortable: false },
+          { key: 'cumulative_percent', label: { vi: 'Tích lũy %',  en: 'Cumulative %' },        sortable: false }
         ],
         paretoData
       )
@@ -776,12 +776,12 @@
 
     // Disposition distribution
     var dispData = m.disposition_distribution || [];
-    html += ui.renderSection({ vi: 'Phan bo xu ly', en: 'Disposition Distribution' },
+    html += ui.renderSection({ vi: 'Phân bố xử lý', en: 'Disposition Distribution' },
       ui.renderChartWithTableFallback('ncr-disp-chart', null,
         [
-          { key: 'disposition', label: { vi: 'Xu ly',    en: 'Disposition' }, sortable: false },
-          { key: 'count',       label: { vi: 'So luong', en: 'Count' },      type: 'number', sortable: false },
-          { key: 'percentage',  label: { vi: 'Ty le',    en: 'Percentage' }, sortable: false }
+          { key: 'disposition', label: { vi: 'Xử lý',    en: 'Disposition' }, sortable: false },
+          { key: 'count',       label: { vi: 'Số lượng', en: 'Count' },      type: 'number', sortable: false },
+          { key: 'percentage',  label: { vi: 'Tỉ lệ',    en: 'Percentage' }, sortable: false }
         ],
         dispData
       )
@@ -789,13 +789,13 @@
 
     // COPQ trend
     var copqData = m.copq_trend || [];
-    html += ui.renderSection({ vi: 'COPQ theo thang', en: 'Cost of Poor Quality (COPQ)' },
+    html += ui.renderSection({ vi: 'COPQ theo tháng', en: 'Cost of Poor Quality (COPQ)' },
       ui.renderChartWithTableFallback('ncr-copq-chart', null,
         [
-          { key: 'month',       label: { vi: 'Thang',        en: 'Month' },        sortable: false },
-          { key: 'scrap_cost',  label: { vi: 'Chi phi huy',  en: 'Scrap Cost' },   type: 'number', sortable: false },
-          { key: 'rework_cost', label: { vi: 'Chi phi lam lai', en: 'Rework Cost' }, type: 'number', sortable: false },
-          { key: 'total_copq',  label: { vi: 'Tong COPQ',    en: 'Total COPQ' },   type: 'number', sortable: false }
+          { key: 'month',       label: { vi: 'Tháng',        en: 'Month' },        sortable: false },
+          { key: 'scrap_cost',  label: { vi: 'Chi phí hủy',  en: 'Scrap Cost' },   type: 'number', sortable: false },
+          { key: 'rework_cost', label: { vi: 'Chi phí làm lại', en: 'Rework Cost' }, type: 'number', sortable: false },
+          { key: 'total_copq',  label: { vi: 'Tổng COPQ',    en: 'Total COPQ' },   type: 'number', sortable: false }
         ],
         copqData
       )
@@ -806,10 +806,10 @@
     html += ui.renderSection({ vi: 'NCR theo NCC', en: 'Supplier NCR Comparison' },
       ui.renderChartWithTableFallback('ncr-supplier-chart', null,
         [
-          { key: 'supplier',       label: { vi: 'Nha cung cap',  en: 'Supplier' },       sortable: false },
-          { key: 'ncr_count',      label: { vi: 'So NCR',        en: 'NCR Count' },       type: 'number', sortable: false },
-          { key: 'defect_rate',    label: { vi: 'Ty le loi %',   en: 'Defect Rate %' },   sortable: false },
-          { key: 'total_rejected', label: { vi: 'Tong tu choi',  en: 'Total Rejected' },  type: 'number', sortable: false }
+          { key: 'supplier',       label: { vi: 'Nhà cung cấp',  en: 'Supplier' },       sortable: false },
+          { key: 'ncr_count',      label: { vi: 'Số NCR',        en: 'NCR Count' },       type: 'number', sortable: false },
+          { key: 'defect_rate',    label: { vi: 'Tỉ lệ lỗi %',   en: 'Defect Rate %' },   sortable: false },
+          { key: 'total_rejected', label: { vi: 'Tổng từ chối',  en: 'Total Rejected' },  type: 'number', sortable: false }
         ],
         supplierData
       )
@@ -836,8 +836,8 @@
     }
 
     var screenTabs = [
-      { id: 'queue',     label: { vi: 'Hang doi',   en: 'Queue' } },
-      { id: 'analytics', label: { vi: 'Phan tich',  en: 'Analytics' } }
+      { id: 'queue',     label: { vi: 'Hàng đợi',   en: 'Queue' } },
+      { id: 'analytics', label: { vi: 'Phân tích',  en: 'Analytics' } }
     ];
     var html = '<div class="eqms-module eqms-ncr">';
 
@@ -850,7 +850,7 @@
     });
     html += '</div>';
     if (state.screen === 'detail' && state.detail) {
-      html += '<button class="eqms-btn ghost sm" data-action="back-to-queue">' + T({ vi: 'Quay lai', en: 'Back to Queue' }) + '</button>';
+      html += '<button class="eqms-btn ghost sm" data-action="back-to-queue">' + T({ vi: 'Quay lại', en: 'Back to Queue' }) + '</button>';
     }
     html += '</div>';
 
@@ -990,7 +990,7 @@
         case 'disposition-confirm':
           var disp = target.getAttribute('data-disposition');
           var dispLabel = DISPOSITIONS.find(function(d) { return d.value === disp; });
-          var msg = T({ vi: 'Xac nhan xu ly: ', en: 'Confirm disposition: ' }) + (dispLabel ? T(dispLabel.label) : disp);
+          var msg = T({ vi: 'Xác nhận xử lý: ', en: 'Confirm disposition: ' }) + (dispLabel ? T(dispLabel.label) : disp);
           if (!confirm(msg)) return;
           executeAction(disp, { disposition: disp });
           break;
@@ -1013,7 +1013,7 @@
                'rework', 'repair', 'use-as-is', 'return-to-vendor', 'scrap',
                'close', 'reopen'].indexOf(action) !== -1) {
             if (action === 'close' || action === 'scrap') {
-              if (!confirm(T({ vi: 'Ban co chac muon thuc hien hanh dong nay?', en: 'Are you sure you want to perform this action?' }))) return;
+              if (!confirm(T({ vi: 'Bạn có chắc muốn thực hiện hành động này?', en: 'Are you sure you want to perform this action?' }))) return;
             }
             executeAction(action);
           }
