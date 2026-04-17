@@ -44,7 +44,12 @@
     if (window.csrfToken) opts.headers['X-CSRF-Token'] = window.csrfToken;
     if (method !== 'GET' && payload) opts.body = JSON.stringify(payload);
     return fetch(url, opts)
-      .then(function(r) { clearTimeout(timer); return r.json(); })
+      .then(function(r) {
+        clearTimeout(timer);
+        return r.json().then(function(data) {
+          return UTIL.normalizeApiResponse ? UTIL.normalizeApiResponse(data, r.status) : data;
+        });
+      })
       .catch(function(err) { clearTimeout(timer); if (err.name === 'AbortError') return { ok: false, error: 'timeout' }; throw err; });
   }
 
@@ -81,12 +86,12 @@
     activeTab: 'scan',
     // IQC list
     iqcFilters: { status: '', supplier: '', material: '', date_from: '', date_to: '' },
-    iqcData: [], iqcTotal: 0, iqcPage: 1, iqcLoading: false,
+    iqcData: [], iqcTotal: 0, iqcPage: 1, iqcLoading: false, iqcLoaded: false,
     // IQC detail
     iqcRecord: null, iqcAudit: [], iqcSignatures: [],
     // In-process list
     ipFilters: { work_order: '', operation: '', station: '', status: '' },
-    ipData: [], ipTotal: 0, ipPage: 1, ipLoading: false,
+    ipData: [], ipTotal: 0, ipPage: 1, ipLoading: false, ipLoaded: false,
     // In-process detail
     ipRecord: null,
     // Scan
@@ -122,12 +127,14 @@
     if (state.iqcFilters.material) payload.filters.item_id = state.iqcFilters.material;
 
     restCall(API.iqcQuery, payload).then(function(res) {
-      state.iqcData = (res.data && res.data.iqc_inspections) || res.data || [];
+      state.iqcData = res.data || res.iqc_inspections || [];
       state.iqcTotal = (res.pagination && res.pagination.total) || state.iqcData.length;
       state.iqcLoading = false;
+      state.iqcLoaded = true;
       rerender();
     }).catch(function() {
       state.iqcLoading = false;
+      state.iqcLoaded = true;
       state.iqcData = [];
       rerender();
     });
@@ -164,12 +171,14 @@
     if (state.ipFilters.status) payload.filters.status = state.ipFilters.status;
 
     restCall(API.ipQuery, payload).then(function(res) {
-      state.ipData = (res.data && res.data.inspections) || res.data || [];
+      state.ipData = res.data || res.in_process_inspections || res.inspections || [];
       state.ipTotal = (res.pagination && res.pagination.total) || state.ipData.length;
       state.ipLoading = false;
+      state.ipLoaded = true;
       rerender();
     }).catch(function() {
       state.ipLoading = false;
+      state.ipLoaded = true;
       state.ipData = [];
       rerender();
     });
@@ -285,11 +294,11 @@
     if (state.activeTab === 'analytics' && !state.metrics && !state.metricsLoading) {
       loadMetrics();
     }
-    if (state.activeTab === 'iqc-review' && !state.iqcData.length && !state.iqcLoading) {
+    if (state.activeTab === 'iqc-review' && !state.iqcLoaded && !state.iqcLoading) {
       state.iqcFilters.status = 'under_review';
       loadIqcList();
     }
-    if (state.activeTab === 'inprocess' && !state.ipData.length && !state.ipLoading && !state.ipRecord) {
+    if (state.activeTab === 'inprocess' && !state.ipLoaded && !state.ipLoading && !state.ipRecord) {
       loadIpList();
     }
     if (state.activeTab === 'scan') {

@@ -708,7 +708,15 @@
       if (res.success) {
         state.screen = SCREENS.WORKSPACE; state.activeTab = 'summary';
         loadDetail(res.data.id || res.data.agreement_id);
+      } else {
+        state.error = res.message || res.error || T({ vi: 'Cần chọn nhà cung cấp thật trước khi tạo thoả thuận.', en: 'A real supplier must be selected before creating an agreement.' });
+        state.screen = SCREENS.REGISTER;
+        paint();
       }
+    }).catch(function(err) {
+      state.error = err.message || T({ vi: 'Không thể tạo thoả thuận', en: 'Unable to create agreement' });
+      state.screen = SCREENS.REGISTER;
+      paint();
     });
   }
 

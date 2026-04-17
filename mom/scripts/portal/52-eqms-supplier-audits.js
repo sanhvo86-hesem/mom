@@ -162,7 +162,7 @@
       state.loading = false;
       if (res.success === false) { state.error = res.message; paint(); return; }
       state.detail = res.data || res;
-      window.EqmsShell.navigate('supplier-audits', { recordId: state.detail.audit_id || id });
+      window.EqmsShell.navigate('supplier-audits', { recordId: state.detail.supplier_audit_id || state.detail.audit_id || id });
       paint();
     }).catch(function(err) {
       state.loading = false;
@@ -174,7 +174,19 @@
   function loadAuditTabData(tab) {
     if (state.tabData[tab]) return;
     if (!state.detail) return;
-    var id = state.detail.id || state.detail.audit_id;
+    var id = state.detail.supplier_audit_id || state.detail.id || state.detail.audit_id;
+    if (tab === 'evidence') {
+      Promise.all([
+        apiCall('eqms_supplier_audits_attachments', { id: id }),
+        apiCall('eqms_supplier_audits_comments', { id: id })
+      ]).then(function(results) {
+        state.tabData.attachments = results[0].data || results[0].attachments || [];
+        state.tabData.comments = results[1].data || results[1].comments || [];
+        state.tabData.evidence = true;
+        paint();
+      }).catch(function() {});
+      return;
+    }
     var actionMap = {
       checklist:   'eqms_supplier_audits_detail',
       findings:    'eqms_supplier_audits_detail',
@@ -248,12 +260,23 @@
     if (state.scarTabData[tab]) return;
     if (!state.scarDetail) return;
     var id = state.scarDetail.id || state.scarDetail.scar_id;
+    if (tab === 'evidence') {
+      Promise.all([
+        apiCall('eqms_scars_attachments', { id: id }),
+        apiCall('eqms_scars_comments', { id: id })
+      ]).then(function(results) {
+        state.scarTabData.attachments = results[0].data || results[0].attachments || [];
+        state.scarTabData.comments = results[1].data || results[1].comments || [];
+        state.scarTabData.evidence = true;
+        paint();
+      }).catch(function() {});
+      return;
+    }
     var actionMap = {
       response:      'eqms_scars_detail',
       verification:  'eqms_scars_detail',
       effectiveness: 'eqms_scars_detail',
-      related:       'eqms_scars_detail',
-      evidence:      'eqms_scars_detail'
+      related:       'eqms_scars_detail'
     };
     var action = actionMap[tab];
     if (!action) return;
@@ -1166,9 +1189,12 @@
     var isAudit = state.screen === 'audit-detail';
     var detail = isAudit ? state.detail : state.scarDetail;
     if (!detail) return;
-    var commentAction = isAudit ? 'eqms_supplier_audits_comments' : 'eqms_scars_detail';
+    var commentAction = isAudit ? 'eqms_supplier_audits_comments' : 'eqms_scars_comments';
+    var commentId = isAudit
+      ? (detail.supplier_audit_id || detail.id || detail.audit_id)
+      : (detail.scar_id || detail.id);
     apiCall(commentAction, {
-      id: detail.id || detail.audit_id || detail.scar_id,
+      id: commentId,
       action: 'add',
       text: textarea.value.trim()
     }).then(function(res) {

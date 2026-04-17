@@ -1222,6 +1222,12 @@ function _paint(){
   if(!state.container) return;
   var allTabs = _buildTabs();
   var html='<div class="aq">';
+  html+='<div style="background:#fffbeb;border:1px solid #f59e0b;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+    +'<span style="font-size:1.2em">⚠️</span>'
+    +'<div style="flex:1;min-width:180px"><b style="color:#b45309">'+_t('AI Chất lượng đã được tích hợp vào EQMS Suite','AI Quality has been integrated into EQMS Suite')+'</b>'
+    +'<div style="font-size:0.85em;color:#78716c;margin-top:2px">'+_t('Dùng EQMS Suite → Quality Tower. Lập lịch AI vẫn dùng qua module Đơn hàng.','Use EQMS Suite → Quality Tower. AI Scheduling still accessible from Orders module.')+'</div></div>'
+    +'<button onclick="window.navigateTo&&navigateTo(\'eqms\')" style="background:#f59e0b;color:#fff;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;font-weight:600;white-space:nowrap">'+_t('Mở EQMS Suite →','Open EQMS Suite →')+'</button>'
+    +'</div>';
   html+='<div class="aq-tabs">';
   var lastSection='';
   allTabs.forEach(function(tab){

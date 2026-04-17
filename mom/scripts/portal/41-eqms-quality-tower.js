@@ -114,7 +114,9 @@
     return fetch(url, opts).then(function(r) {
       clearTimeout(timer);
       if (!r.ok) throw new Error('HTTP ' + r.status);
-      return r.json();
+      return r.json().then(function(data) {
+        return util.normalizeApiResponse ? util.normalizeApiResponse(data, r.status) : data;
+      });
     }).then(function(json) {
       if (json && json.success === false) throw new Error(json.message || 'API error');
       return json.data || json;

@@ -84,4 +84,4 @@ CREATE INDEX IF NOT EXISTS idx_eqms_risk_register_status
     ON eqms_risk_register (status, created_at DESC);
 
 CREATE INDEX IF NOT EXISTS idx_eqms_risk_register_severity
-    ON eqms_risk_register (severity_level, status);
+    ON eqms_risk_register (severity, status);

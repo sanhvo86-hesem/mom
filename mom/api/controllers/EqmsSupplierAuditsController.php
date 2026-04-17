@@ -108,7 +108,8 @@ final class EqmsSupplierAuditsController extends EqmsBaseController
             ? $q['sort_by'] : 'created_at';
 
         $rows = $this->data->query(
-            "SELECT sa.supplier_audit_id, sa.supplier_audit_number, sa.vendor_id,
+            "SELECT sa.supplier_audit_id, sa.supplier_audit_id AS id, sa.supplier_audit_id AS audit_id,
+                    sa.supplier_audit_number, sa.vendor_id,
                     v.vendor_name, sa.audit_scope, sa.audit_type, sa.lead_auditor,
                     sa.planned_date, sa.actual_start, sa.actual_end,
                     sa.finding_count, sa.status, sa.version, sa.created_at
@@ -231,7 +232,7 @@ final class EqmsSupplierAuditsController extends EqmsBaseController
         $auditId = $this->requirePathId();
 
         $row = $this->data->query(
-            "SELECT sa.*, v.vendor_name, 
+            "SELECT sa.*, sa.supplier_audit_id AS id, sa.supplier_audit_id AS audit_id, v.vendor_name
              FROM eqms_supplier_audits sa
              JOIN vendors v ON v.vendor_id = sa.vendor_id::text
              WHERE sa.supplier_audit_id = :id LIMIT 1",
@@ -299,6 +300,22 @@ final class EqmsSupplierAuditsController extends EqmsBaseController
         $this->requireAnyRole($user, $this->readRoles());
         $auditId = $this->requirePathId();
         $this->serveAuditTrail(self::AUDIT_ENTITY_TYPE, $auditId);
+    }
+
+    public function comments(): never
+    {
+        $user    = $this->requireAuth();
+        $this->requireAnyRole($user, $this->method() === 'POST' ? $this->writeRoles() : $this->readRoles());
+        $auditId = $this->requirePathId();
+        $this->serveComments(self::AUDIT_ENTITY_TYPE, $auditId, $user);
+    }
+
+    public function attachments(): never
+    {
+        $user    = $this->requireAuth();
+        $this->requireAnyRole($user, $this->method() === 'POST' ? $this->writeRoles() : $this->readRoles());
+        $auditId = $this->requirePathId();
+        $this->serveAttachments(self::AUDIT_ENTITY_TYPE, $auditId, $user);
     }
 
     /** GET /supplier-audits/{id}/available-actions */
@@ -603,7 +620,7 @@ final class EqmsSupplierAuditsController extends EqmsBaseController
             ? $q['sort_by'] : 'created_at';
 
         $rows = $this->data->query(
-            "SELECT s.scar_id, s.scar_number, s.vendor_id, v.vendor_name,
+            "SELECT s.scar_id, s.scar_id AS id, s.scar_number, s.vendor_id, v.vendor_name,
                     s.supplier_audit_id, s.priority, s.description,
                     s.assigned_to, s.response_due_date, s.status, s.version, s.created_at
              FROM eqms_scars s
@@ -722,7 +739,7 @@ final class EqmsSupplierAuditsController extends EqmsBaseController
         $scarId = $this->requirePathId();
 
         $row = $this->data->query(
-            "SELECT s.*, v.vendor_name, 
+            "SELECT s.*, s.scar_id AS id, v.vendor_name
              FROM eqms_scars s
              JOIN vendors v ON v.vendor_id = s.vendor_id::text
              WHERE s.scar_id = :id LIMIT 1",
@@ -799,6 +816,22 @@ final class EqmsSupplierAuditsController extends EqmsBaseController
         $this->requireAnyRole($user, $this->readRoles());
         $scarId = $this->requirePathId();
         $this->serveSignatures(self::SCAR_ENTITY_TYPE, $scarId, $user);
+    }
+
+    public function scarComments(): never
+    {
+        $user   = $this->requireAuth();
+        $this->requireAnyRole($user, $this->method() === 'POST' ? $this->writeRoles() : $this->readRoles());
+        $scarId = $this->requirePathId();
+        $this->serveComments(self::SCAR_ENTITY_TYPE, $scarId, $user);
+    }
+
+    public function scarAttachments(): never
+    {
+        $user   = $this->requireAuth();
+        $this->requireAnyRole($user, $this->method() === 'POST' ? $this->writeRoles() : $this->readRoles());
+        $scarId = $this->requirePathId();
+        $this->serveAttachments(self::SCAR_ENTITY_TYPE, $scarId, $user);
     }
 
     /** POST /scars/{id}/export */

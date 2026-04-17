@@ -120,7 +120,12 @@
       headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': window.csrfToken || '' },
       body: method !== 'GET' ? JSON.stringify(payload || {}) : undefined,
       signal: controller.signal
-    }).then(function(r) { clearTimeout(timer); return r.json(); })
+    }).then(function(r) {
+      clearTimeout(timer);
+      return r.json().then(function(data) {
+        return util.normalizeApiResponse ? util.normalizeApiResponse(data, r.status) : data;
+      });
+    })
       .catch(function(err) { clearTimeout(timer); if (err.name === 'AbortError') return { ok: false, error: 'timeout' }; throw err; });
   }
 
@@ -133,7 +138,12 @@
       method: 'GET',
       headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': window.csrfToken || '' },
       signal: controller.signal
-    }).then(function(r) { clearTimeout(timer); return r.json(); })
+    }).then(function(r) {
+      clearTimeout(timer);
+      return r.json().then(function(data) {
+        return util.normalizeApiResponse ? util.normalizeApiResponse(data, r.status) : data;
+      });
+    })
       .catch(function(err) { clearTimeout(timer); if (err.name === 'AbortError') return { ok: false, error: 'timeout' }; throw err; });
   }
 

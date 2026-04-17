@@ -421,12 +421,21 @@ class EqmsBatchReleaseController extends EqmsBaseController
             [':lot' => $lotId]
         ) ?? []) : [];
 
-        // Deviations (EQMS)
-        $pkg['deviations'] = $productId ? ($this->data->query(
-            "SELECT deviation_id, deviation_number, status, severity FROM eqms_deviations
-             WHERE product_id = :prod AND created_at > NOW() - INTERVAL '2 years' LIMIT 20",
-            [':prod' => $productId]
-        ) ?? []) : [];
+        // Deviations (EQMS) are linked to batches/lots in the schema, not product_id.
+        $pkg['deviations'] = [];
+        if ($lotId) {
+            $pkg['deviations'] = $this->data->query(
+                "SELECT deviation_id, deviation_number, status, severity FROM eqms_deviations
+                 WHERE batch_id = :batch_id AND created_at > NOW() - INTERVAL '2 years' LIMIT 20",
+                [':batch_id' => $lotId]
+            ) ?? [];
+        } elseif (!empty($br['batch_number'])) {
+            $pkg['deviations'] = $this->data->query(
+                "SELECT deviation_id, deviation_number, status, severity FROM eqms_deviations
+                 WHERE batch_number = :batch_number AND created_at > NOW() - INTERVAL '2 years' LIMIT 20",
+                [':batch_number' => $br['batch_number']]
+            ) ?? [];
+        }
 
         // Lab investigations
         $pkg['lab_investigations'] = $productId ? ($this->data->query(
@@ -443,12 +452,21 @@ class EqmsBatchReleaseController extends EqmsBaseController
              ORDER BY approved_at DESC LIMIT 20"
         ) ?? [];
 
-        // CAPA links
-        $pkg['capa_items'] = $productId ? ($this->data->query(
+        // CAPA evidence must be explicitly linked to the batch release or its deviations.
+        $deviationIds = array_values(array_filter(array_map(
+            static fn(array $row): string => (string)($row['deviation_id'] ?? ''),
+            $pkg['deviations']
+        )));
+        $pkg['capa_items'] = $this->data->query(
             "SELECT capa_id, capa_number, status FROM eqms_capa_records
-             WHERE product_id = :prod AND created_at > NOW() - INTERVAL '2 years' LIMIT 10",
-            [':prod' => $productId]
-        ) ?? []) : [];
+             WHERE (source_type = 'batch_release' AND source_id = :release_id)
+                OR (source_type = 'deviation' AND source_id = ANY(:deviation_ids::uuid[]))
+             ORDER BY created_at DESC LIMIT 10",
+            [
+                ':release_id'    => $brId,
+                ':deviation_ids' => '{' . implode(',', $deviationIds) . '}',
+            ]
+        ) ?? [];
 
         $pkg['aggregated_at'] = $this->nowIso();
         $pkg['aggregated_by'] = (string)($user['username'] ?? 'unknown');

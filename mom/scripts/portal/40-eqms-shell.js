@@ -45,7 +45,10 @@
     { id: 'validation',         label: { vi: 'Quản lý xác nhận', en: 'Validation Management' },      icon: '\u{1F9EA}', group: 'advanced', archetype: 'evidence-workspace' },
     { id: 'field-actions',      label: { vi: 'Hành động thực địa', en: 'Field Actions / Recall' },    icon: '\u{1F6A8}', group: 'advanced', archetype: 'exception-hub' },
     { id: 'genealogy',          label: { vi: 'Truy xuất nguồn gốc', en: 'Genealogy / Traceability' }, icon: '\u{1F333}', group: 'advanced', archetype: 'object-page' },
-    { id: 'quality-agreements', label: { vi: 'Thoả thuận chất lượng', en: 'Quality Agreements' },     icon: '\u{1F91D}', group: 'advanced', archetype: 'evidence-workspace' }
+    { id: 'quality-agreements', label: { vi: 'Thoả thuận chất lượng', en: 'Quality Agreements' },     icon: '\u{1F91D}', group: 'advanced', archetype: 'evidence-workspace' },
+
+    // --- Pre-Launch Quality (IATF 16949 / AS9145) ---
+    { id: 'apqp-ppap', label: { vi: 'APQP / PPAP', en: 'APQP / PPAP' }, icon: '\u{1F3AF}', group: 'pre-launch', archetype: 'evidence-workspace' }
   ];
 
   var GROUPS = [
@@ -54,7 +57,8 @@
     { id: 'supplier',         label: { vi: 'Chất lượng nhà cung cấp', en: 'Supplier Quality' } },
     { id: 'risk-compliance',  label: { vi: 'Rủi ro & Tuân thủ', en: 'Risk & Compliance' } },
     { id: 'inspection',       label: { vi: 'Kiểm tra & Thử nghiệm', en: 'Inspection & Testing' } },
-    { id: 'advanced',         label: { vi: 'Nâng cao', en: 'Advanced' } }
+    { id: 'advanced',         label: { vi: 'Nâng cao', en: 'Advanced' } },
+    { id: 'pre-launch',       label: { vi: 'Tiền sản xuất (IATF 16949)', en: 'Pre-Launch Quality (IATF 16949)' } }
   ];
 
   // =========================================================================
@@ -85,6 +89,94 @@
     return (parts[0][0] + (parts.length > 1 ? parts[parts.length - 1][0] : '')).toUpperCase();
   };
 
+  var ENVELOPE_KEYS = {
+    ok: true, success: true, server_time: true, _httpStatus: true,
+    error: true, detail: true, message: true,
+    total: true, offset: true, limit: true, has_more: true
+  };
+  var RESPONSE_RECORD_KEYS = [
+    'complaint', 'deviation', 'ncr_record', 'capa_record', 'change_control',
+    'engineering_change', 'document', 'training_record', 'curriculum',
+    'audit', 'supplier_profile', 'supplier_audit', 'scar', 'risk',
+    'fmea_record', 'calibration_record', 'msa_record', 'investigation',
+    'batch_release', 'project', 'validation_project', 'field_action',
+    'thread', 'quality_agreement'
+  ];
+  var RESPONSE_LIST_KEYS = [
+    'complaints', 'deviations', 'ncr_records', 'capa_records',
+    'change_controls', 'engineering_changes', 'documents',
+    'training_records', 'curricula', 'matrix', 'audits', 'audit_events',
+    'checklist_items', 'findings', 'supplier_profiles', 'scorecards',
+    'qualifications', 'quality_agreements', 'supplier_audits', 'scars',
+    'risks', 'fmea_records', 'calibration_records', 'msa_records',
+    'lab_investigations', 'batch_releases', 'validation_projects',
+    'requirements', 'protocols', 'executions', 'field_actions',
+    'genealogy_threads', 'records', 'items', 'comments', 'attachments',
+    'relationships', 'signatures', 'upstream_chain', 'downstream_chain'
+  ];
+
+  function isPlainObject(value) {
+    return value && typeof value === 'object' && !Array.isArray(value);
+  }
+
+  function queryStringFromPayload(payload) {
+    if (!payload) return '';
+    return Object.keys(payload).map(function(k) {
+      var value = payload[k];
+      if (value == null) value = '';
+      if (typeof value === 'object') value = JSON.stringify(value);
+      return encodeURIComponent(k) + '=' + encodeURIComponent(value);
+    }).join('&');
+  }
+
+  function normalizeApiResponse(data, status) {
+    if (!isPlainObject(data)) return data;
+    if (status != null && data._httpStatus == null) data._httpStatus = status;
+
+    if (data.success == null && data.ok != null) data.success = !!data.ok;
+    if (data.ok == null && data.success != null) data.ok = !!data.success;
+    if (!data.message && (data.detail || data.error)) data.message = data.detail || data.error;
+
+    if (data.data == null) {
+      var payloadKeys = Object.keys(data).filter(function(k) { return !ENVELOPE_KEYS[k]; });
+      var listKey = RESPONSE_LIST_KEYS.find(function(k) { return Array.isArray(data[k]); });
+      var recordKey = RESPONSE_RECORD_KEYS.find(function(k) { return isPlainObject(data[k]); });
+
+      if (data.nodes || data.edges) {
+        data.data = {
+          nodes: data.nodes || [],
+          edges: data.edges || [],
+          root_id: data.root_id || data.rootId || null
+        };
+      } else if (listKey) {
+        data.data = data[listKey];
+      } else if (recordKey) {
+        var record = Object.assign({}, data[recordKey]);
+        payloadKeys.forEach(function(k) {
+          if (k !== recordKey && record[k] == null) record[k] = data[k];
+        });
+        data.data = record;
+      } else if (data.metrics && isPlainObject(data.metrics)) {
+        data.data = data.metrics;
+      } else if (payloadKeys.length === 1) {
+        data.data = data[payloadKeys[0]];
+      }
+    }
+
+    if (data.total == null && data.pagination && data.pagination.total != null) {
+      data.total = data.pagination.total;
+    }
+    if (data.pagination == null && data.total != null) {
+      data.pagination = {
+        total: Number(data.total) || 0,
+        offset: Number(data.offset) || 0,
+        limit: Number(data.limit) || 0,
+        has_more: !!data.has_more
+      };
+    }
+    return data;
+  }
+
   // API wrapper
   function apiCall(action, payload, method, timeout) {
     method = method || 'POST';
@@ -96,12 +188,14 @@
     if (window.csrfToken) opts.headers['X-CSRF-Token'] = window.csrfToken;
     if (method !== 'GET' && payload) opts.body = JSON.stringify(payload);
     if (method === 'GET' && payload) {
-      var qs = Object.keys(payload).map(function(k) { return encodeURIComponent(k) + '=' + encodeURIComponent(payload[k]); }).join('&');
+      var qs = queryStringFromPayload(payload);
       if (qs) url += '&' + qs;
     }
     return fetch(url, opts).then(function(r) {
       clearTimeout(timer);
-      return r.json();
+      return r.json().then(function(data) {
+        return normalizeApiResponse(data, r.status);
+      });
     }).catch(function(err) {
       clearTimeout(timer);
       if (err.name === 'AbortError') {
@@ -404,8 +498,16 @@
       html += '</td></tr>';
     } else {
       data.forEach(function(row) {
-        html += '<tr data-id="' + esc(row.id || row.record_id || '') + '">';
-        if (config.selectable) html += '<td><input type="checkbox" data-action="select-row" data-id="' + esc(row.id || '') + '"></td>';
+        var rowId = row.id || row.record_id || row[config.rowKey || ''] ||
+          row.complaint_id || row.deviation_id || row.ncr_id || row.capa_id ||
+          row.change_control_id || row.ec_id || row.doc_id || row.training_record_id ||
+          row.audit_id || row.supplier_profile_id || row.supplier_audit_id ||
+          row.scar_id || row.risk_id || row.fmea_id || row.calibration_id ||
+          row.msa_id || row.investigation_id || row.inspection_id || row.spc_id ||
+          row.batch_release_id || row.project_id || row.field_action_id ||
+          row.thread_id || row.agreement_id || '';
+        html += '<tr data-id="' + esc(rowId) + '">';
+        if (config.selectable) html += '<td><input type="checkbox" data-action="select-row" data-id="' + esc(rowId) + '"></td>';
         columns.forEach(function(col) {
           var val = row[col.key];
           var cls = '';
@@ -770,7 +872,8 @@
       'validation':         T({ vi: 'Dự án xác nhận IQ/OQ/PQ/CSV, ma trận truy xuất', en: 'Validation projects IQ/OQ/PQ/CSV, trace matrix' }),
       'field-actions':      T({ vi: 'Thu hồi, hành động thực địa, giám sát sản phẩm', en: 'Recall, field actions, product surveillance' }),
       'genealogy':          T({ vi: 'Đồ thị phả hệ, truy xuất ngược/xuôi', en: 'Genealogy graph, upstream/downstream traceability' }),
-      'quality-agreements': T({ vi: 'Thoả thuận chất lượng, hợp tác đối tác', en: 'Quality agreements, partner collaboration' })
+      'quality-agreements': T({ vi: 'Thoả thuận chất lượng, hợp tác đối tác', en: 'Quality agreements, partner collaboration' }),
+      'apqp-ppap':          T({ vi: 'APQP 5 pha, gate reviews, PPAP cấp độ 1-5, PSW (IATF 16949 / AS9145)', en: 'APQP 5-phase, gate reviews, PPAP levels 1-5, PSW (IATF 16949 / AS9145)' })
     };
     return descs[id] || '';
   }
@@ -1034,7 +1137,7 @@
     if (config.version) opts.headers['If-Match'] = '"' + config.version + '"';
     if (method !== 'GET' && payload) opts.body = JSON.stringify(payload);
     if (method === 'GET' && payload) {
-      var qs = Object.keys(payload).map(function(k) { return encodeURIComponent(k) + '=' + encodeURIComponent(payload[k]); }).join('&');
+      var qs = queryStringFromPayload(payload);
       if (qs) url += '&' + qs;
     }
 
@@ -1049,7 +1152,7 @@
         clearTimeout(timer);
         var result = r.json();
         return result.then(function(data) {
-          data._httpStatus = r.status;
+          data = normalizeApiResponse(data, r.status);
           if (!r.ok && !data.success && !data.ok) {
             var err = new Error(data.error || data.message || 'Request failed');
             err.status = r.status;
@@ -1334,6 +1437,7 @@
       initials: initials,
       apiCall: apiCall,
       apiCallEnhanced: apiCallEnhanced,
+      normalizeApiResponse: normalizeApiResponse,
       lang: _lang
     }
   };

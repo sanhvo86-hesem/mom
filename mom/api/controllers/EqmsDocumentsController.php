@@ -420,7 +420,13 @@ final class EqmsDocumentsController extends EqmsBaseController
         $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
 
         $copies = $this->data->query(
-            "SELECT copy_id, copy_number, recipient, copy_format, issued_by, issued_at, is_active
+            "SELECT copy_id, copy_number,
+                    issued_to AS recipient,
+                    issued_location AS copy_format,
+                    issued_location,
+                    issued_by, issued_at,
+                    (status = 'active') AS is_active,
+                    status
              FROM eqms_controlled_copies
              WHERE doc_id = :id
              ORDER BY issued_at DESC
@@ -462,12 +468,13 @@ final class EqmsDocumentsController extends EqmsBaseController
 
         $this->data->execute(
             "INSERT INTO eqms_controlled_copies
-             (copy_id, doc_id, copy_number, recipient, copy_format, issued_by, issued_at, is_active)
-             VALUES (:cid, :did, :cnum, :recipient, :fmt, :by, :at, true)",
+             (copy_id, doc_id, copy_number, revision_code, issued_to, issued_location, issued_by, issued_at, status)
+             VALUES (:cid, :did, :cnum, :rev, :recipient, :fmt, :by, :at, 'active')",
             [
                 ':cid'       => $copyId,
                 ':did'       => $id,
                 ':cnum'      => $copyNum,
+                ':rev'       => (string)($rec['revision_code'] ?? 'A'),
                 ':recipient' => trim((string)$body['recipient']),
                 ':fmt'       => trim((string)$body['copy_format']),
                 ':by'        => $actor,
@@ -495,7 +502,7 @@ final class EqmsDocumentsController extends EqmsBaseController
         $params = [':id' => $id];
 
         if ($q['search'] !== '') {
-            $where[]           = "acknowledged_by ILIKE :search";
+            $where[]           = "(employee_id ILIKE :search OR employee_name ILIKE :search)";
             $params[':search'] = '%' . $q['search'] . '%';
         }
         if (!empty($q['filters']['acknowledged'])) {
@@ -505,10 +512,17 @@ final class EqmsDocumentsController extends EqmsBaseController
         $whereClause = implode(' AND ', $where);
 
         $items = $this->data->query(
-            "SELECT acknowledgement_id, acknowledged_by, acknowledged_at, is_mandatory, requested_at
+            "SELECT ack_id AS acknowledgement_id,
+                    employee_id AS acknowledged_by,
+                    employee_name,
+                    acknowledged_at,
+                    (required_by IS NOT NULL) AS is_mandatory,
+                    required_by AS requested_at,
+                    status,
+                    acknowledgement_method
              FROM eqms_document_acknowledgements
              WHERE {$whereClause}
-             ORDER BY requested_at DESC
+             ORDER BY required_by DESC NULLS LAST
              LIMIT :lim OFFSET :off",
             array_merge($params, [':lim' => $q['limit'], ':off' => $q['offset']])
         ) ?? [];
@@ -930,10 +944,10 @@ final class EqmsDocumentsController extends EqmsBaseController
             $ackId = $this->newUuid();
             $this->data->execute(
                 "INSERT INTO eqms_document_acknowledgements
-                 (acknowledgement_id, doc_id, acknowledged_by, is_mandatory, requested_at, requested_by)
-                 VALUES (:aid, :did, :uid, true, :now, :by)
-                 ON CONFLICT (doc_id, acknowledged_by) DO NOTHING",
-                [':aid' => $ackId, ':did' => $id, ':uid' => $uid, ':now' => $now, ':by' => $actor]
+                 (ack_id, doc_id, employee_id, required_by, acknowledgement_method, status)
+                 VALUES (:aid, :did, :uid, CURRENT_DATE, 'portal', 'pending')
+                 ON CONFLICT (doc_id, employee_id) DO NOTHING",
+                [':aid' => $ackId, ':did' => $id, ':uid' => $uid]
             );
             $count++;
         }
@@ -964,8 +978,8 @@ final class EqmsDocumentsController extends EqmsBaseController
 
         // Upsert: create if not exists, update acknowledged_at if pending
         $existing = $this->data->query(
-            "SELECT acknowledgement_id, acknowledged_at FROM eqms_document_acknowledgements
-             WHERE doc_id = :did AND acknowledged_by = :uid LIMIT 1",
+            "SELECT ack_id AS acknowledgement_id, acknowledged_at FROM eqms_document_acknowledgements
+             WHERE doc_id = :did AND employee_id = :uid LIMIT 1",
             [':did' => $id, ':uid' => $actor]
         );
 
@@ -974,16 +988,17 @@ final class EqmsDocumentsController extends EqmsBaseController
                 $this->success(['already_acknowledged' => true, 'acknowledged_at' => $existing[0]['acknowledged_at']]);
             }
             $this->data->execute(
-                "UPDATE eqms_document_acknowledgements SET acknowledged_at = :now
-                 WHERE doc_id = :did AND acknowledged_by = :uid",
+                "UPDATE eqms_document_acknowledgements
+                 SET acknowledged_at = :now, status = 'acknowledged', acknowledgement_method = 'portal'
+                 WHERE doc_id = :did AND employee_id = :uid",
                 [':now' => $now, ':did' => $id, ':uid' => $actor]
             );
         } else {
             $ackId = $this->newUuid();
             $this->data->execute(
                 "INSERT INTO eqms_document_acknowledgements
-                 (acknowledgement_id, doc_id, acknowledged_by, is_mandatory, requested_at, requested_by, acknowledged_at)
-                 VALUES (:aid, :did, :uid, false, :now, :uid, :now)",
+                 (ack_id, doc_id, employee_id, required_by, acknowledged_at, acknowledgement_method, status)
+                 VALUES (:aid, :did, :uid, CURRENT_DATE, :now, 'portal', 'acknowledged')",
                 [':aid' => $ackId, ':did' => $id, ':uid' => $actor, ':now' => $now]
             );
         }

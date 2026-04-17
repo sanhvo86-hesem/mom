@@ -3256,9 +3256,12 @@ final class DataSchemaService
             $columns = is_array($table['columns'] ?? null) ? array_keys($table['columns']) : [];
             $columnMetaLookup = is_array($table['columns'] ?? null) ? $table['columns'] : [];
             $fieldNames = $columns !== [] ? $columns : $this->scalarStringList($entity['fields'] ?? []);
+            $dbColumns = array_keys(is_array($dbColumnLookup[$key] ?? null) ? $dbColumnLookup[$key] : []);
+            $dbPresent = $dbProbeResolved ? isset($dbLookup[$key]) : null;
+            $governanceFieldNames = ($dbPresent === true && $dbColumns !== []) ? $dbColumns : $fieldNames;
             $governanceMissing = $this->scalarStringList($entity['governanceMissing'] ?? []);
-            if ($governanceMissing === [] && $fieldNames !== []) {
-                $fieldLookup = array_fill_keys($fieldNames, true);
+            if ($governanceMissing === [] && $governanceFieldNames !== []) {
+                $fieldLookup = array_fill_keys($governanceFieldNames, true);
                 $governanceMissing = array_values(array_filter(self::GOVERNANCE_FIELDS, static fn(string $field): bool => !isset($fieldLookup[$field])));
             }
             $governancePosture = $this->governancePosture($key, $table, $entity, $governanceMissing, $governanceCarriers);
@@ -3266,7 +3269,6 @@ final class DataSchemaService
             $endpointStats = $endpointCounts[$key] ?? ['total' => 0, 'linked' => 0];
             $endpointCount = (int)$endpointStats['total'];
             $linkedEndpointCount = (int)$endpointStats['linked'];
-            $dbColumns = array_keys(is_array($dbColumnLookup[$key] ?? null) ? $dbColumnLookup[$key] : []);
             $expectedPkFields = $this->scalarStringList($table['primaryKeys'] ?? ($entity['primaryKeyFields'] ?? []));
             if ($expectedPkFields === []) {
                 $expectedPrimaryKey = $this->scalarOrJoined($table['primaryKey'] ?? ($entity['primaryKey'] ?? ''));
@@ -3275,10 +3277,9 @@ final class DataSchemaService
                 }
             }
             $dbPkFields = array_values(array_filter((array)($dbPkLookup[$key] ?? []), 'is_string'));
-            $dbPresent = $dbProbeResolved ? isset($dbLookup[$key]) : null;
             $dbStatus = $this->tableDbStatus($dbProbeApplicable, $dbProbeResolved, $dbPresent, $migrationLedgerEmpty, $dbTargetIncomplete);
             $missingColumns = $dbPresent === true ? array_values(array_diff($fieldNames, $dbColumns)) : [];
-            $unexpectedColumns = $dbPresent === true ? array_values(array_diff($dbColumns, $fieldNames)) : [];
+            $unexpectedColumns = $dbPresent === true ? array_values(array_diff(array_diff($dbColumns, $fieldNames), self::GOVERNANCE_FIELDS)) : [];
             $typeDrifts = [];
             if ($dbPresent === true) {
                 $dbColumnTypes = is_array($dbColumnTypeLookup[$key] ?? null) ? $dbColumnTypeLookup[$key] : [];

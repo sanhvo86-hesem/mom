@@ -36,6 +36,34 @@ final class EqmsSuppliersController extends EqmsBaseController
         return $this->eqmsReadRoles();
     }
 
+    private function supplierVendorId(string $profileId): string
+    {
+        $vendorId = $this->data->scalar(
+            "SELECT vendor_id FROM eqms_supplier_profiles WHERE supplier_profile_id = :id",
+            [':id' => $profileId]
+        );
+        if ($vendorId === null) {
+            $this->error('supplier_profile_not_found', 404);
+        }
+        return (string)$vendorId;
+    }
+
+    private function loadQualityAgreement(string $agreementId): array
+    {
+        $row = $this->data->query(
+            "SELECT qa.*, sp.supplier_profile_id, v.vendor_name
+             FROM eqms_quality_agreements qa
+             LEFT JOIN eqms_supplier_profiles sp ON sp.vendor_id = qa.vendor_id
+             LEFT JOIN vendors v ON v.vendor_id = qa.vendor_id::text
+             WHERE qa.agreement_id = :id LIMIT 1",
+            [':id' => $agreementId]
+        );
+        if (empty($row)) {
+            $this->error('quality_agreement_not_found', 404);
+        }
+        return $row[0];
+    }
+
     // ── List / Query ──────────────────────────────────────────────────────────
 
     /**
@@ -71,7 +99,9 @@ final class EqmsSuppliersController extends EqmsBaseController
             ? $q['sort_by'] : 'updated_at';
 
         $rows = $this->data->query(
-            "SELECT sp.supplier_profile_id, sp.vendor_id, v.vendor_name,
+            "SELECT sp.supplier_profile_id, sp.supplier_profile_id AS id,
+                    sp.vendor_id, sp.vendor_id AS supplier_id,
+                    v.vendor_name, v.vendor_name AS name,
                     sp.qualification_status, sp.qualification_date, sp.requalification_due,
                     sp.risk_tier, sp.approved_categories, sp.notes, sp.version, sp.updated_at
              FROM eqms_supplier_profiles sp
@@ -103,6 +133,7 @@ final class EqmsSuppliersController extends EqmsBaseController
         $this->requireAnyRole($user, $this->readRoles());
 
         $qualified   = (int)($this->data->scalar("SELECT COUNT(*) FROM eqms_supplier_profiles WHERE qualification_status = 'qualified'") ?? 0);
+        $total       = (int)($this->data->scalar("SELECT COUNT(*) FROM eqms_supplier_profiles") ?? 0);
         $conditional = (int)($this->data->scalar("SELECT COUNT(*) FROM eqms_supplier_profiles WHERE qualification_status = 'conditional'") ?? 0);
         $disqualified = (int)($this->data->scalar("SELECT COUNT(*) FROM eqms_supplier_profiles WHERE qualification_status = 'disqualified'") ?? 0);
         $highRisk    = (int)($this->data->scalar("SELECT COUNT(*) FROM eqms_supplier_profiles WHERE risk_tier = 'high'") ?? 0);
@@ -113,15 +144,20 @@ final class EqmsSuppliersController extends EqmsBaseController
         $avgScore    = (float)($this->data->scalar(
             "SELECT ROUND(AVG(overall_score)::numeric, 1) FROM supplier_scorecards WHERE created_at >= date_trunc('year', now())"
         ) ?? 0.0);
+        $openScars   = (int)($this->data->scalar("SELECT COUNT(*) FROM eqms_scars WHERE status <> 'closed'") ?? 0);
 
         $this->success([
             'metrics' => [
+                'total_suppliers'       => $total,
                 'qualified_count'       => $qualified,
                 'conditional_count'     => $conditional,
                 'disqualified_count'    => $disqualified,
                 'high_risk_count'       => $highRisk,
                 'requalification_due_30d' => $requalDue,
                 'avg_scorecard_score_ytd' => $avgScore,
+                'avg_quality_score'     => $avgScore,
+                'qualification_coverage' => $total > 0 ? round(($qualified / $total) * 100, 1) : 0,
+                'open_scars'            => $openScars,
             ],
         ]);
     }
@@ -204,7 +240,8 @@ final class EqmsSuppliersController extends EqmsBaseController
         $profileId = $this->requirePathId();
 
         $row = $this->data->query(
-            "SELECT sp.*, v.vendor_name, v.country, v.contact_email
+            "SELECT sp.*, sp.supplier_profile_id AS id, sp.vendor_id AS supplier_id,
+                    v.vendor_name, v.vendor_name AS name, v.country, v.contact_email
              FROM eqms_supplier_profiles sp
              JOIN vendors v ON v.vendor_id = sp.vendor_id::text
              WHERE sp.supplier_profile_id = :id LIMIT 1",
@@ -274,6 +311,30 @@ final class EqmsSuppliersController extends EqmsBaseController
         $this->requireAnyRole($user, $this->readRoles());
         $profileId = $this->requirePathId();
         $this->serveAuditTrail(self::ENTITY_TYPE, $profileId);
+    }
+
+    public function comments(): never
+    {
+        $user      = $this->requireAuth();
+        $this->requireAnyRole($user, $this->method() === 'POST' ? $this->writeRoles() : $this->readRoles());
+        $profileId = $this->requirePathId();
+        $this->serveComments(self::ENTITY_TYPE, $profileId, $user);
+    }
+
+    public function attachments(): never
+    {
+        $user      = $this->requireAuth();
+        $this->requireAnyRole($user, $this->method() === 'POST' ? $this->writeRoles() : $this->readRoles());
+        $profileId = $this->requirePathId();
+        $this->serveAttachments(self::ENTITY_TYPE, $profileId, $user);
+    }
+
+    public function relationships(): never
+    {
+        $user      = $this->requireAuth();
+        $this->requireAnyRole($user, $this->readRoles());
+        $profileId = $this->requirePathId();
+        $this->serveRelationships(self::ENTITY_TYPE, $profileId, $user);
     }
 
     // ── Sub-resource Endpoints ────────────────────────────────────────────────
@@ -402,6 +463,7 @@ final class EqmsSuppliersController extends EqmsBaseController
         $user      = $this->requireAuth();
         $this->requireAnyRole($user, $this->readRoles());
         $profileId = $this->requirePathId();
+        $vendorId  = $this->supplierVendorId($profileId);
 
         $offset = max(0, (int)($this->query('offset', '0')));
         $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
@@ -413,15 +475,27 @@ final class EqmsSuppliersController extends EqmsBaseController
              WHERE qa.vendor_id = :id
              ORDER BY qa.effective_date DESC
              LIMIT :lim OFFSET :off",
-            [':id' => $profileId, ':lim' => $limit, ':off' => $offset]
+            [':id' => $vendorId, ':lim' => $limit, ':off' => $offset]
         ) ?? [];
 
         $total = (int)($this->data->scalar(
             "SELECT COUNT(*) FROM eqms_quality_agreements WHERE vendor_id = :id",
-            [':id' => $profileId]
+            [':id' => $vendorId]
         ) ?? 0);
 
         $this->paginated('quality_agreements', $rows, $total, $offset, $limit);
+    }
+
+    public function qualityAgreementDetail(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->readRoles());
+        $agreementId = $this->requirePathId('id', 'agreement_id');
+        $agreement = $this->loadQualityAgreement($agreementId);
+        $this->success([
+            'quality_agreement' => $agreement,
+            'clauses' => is_array($agreement['key_requirements'] ?? null) ? $agreement['key_requirements'] : json_decode((string)($agreement['key_requirements'] ?? '[]'), true),
+        ]);
     }
 
     /**
@@ -432,15 +506,7 @@ final class EqmsSuppliersController extends EqmsBaseController
         $user      = $this->requireAuth();
         $this->requireAnyRole($user, $this->writeRoles());
         $profileId = $this->requirePathId();
-
-        // Verify profile exists
-        $exists = $this->data->scalar(
-            "SELECT 1 FROM eqms_supplier_profiles WHERE supplier_profile_id = :id",
-            [':id' => $profileId]
-        );
-        if ($exists === null) {
-            $this->error('supplier_profile_not_found', 404);
-        }
+        $vendorId  = $this->supplierVendorId($profileId);
 
         $body = $this->jsonBody();
         $this->requireFields($body, ['title', 'effective_date']);
@@ -451,19 +517,24 @@ final class EqmsSuppliersController extends EqmsBaseController
 
         $this->data->execute(
             "INSERT INTO eqms_quality_agreements
-             (agreement_id, supplier_profile_id, agreement_number, title,
-              effective_date, expiry_date, status, storage_ref, created_at, created_by)
+             (agreement_id, vendor_id, agreement_number, title,
+              effective_date, expiry_date, scope, key_requirements, document_ref,
+              status, created_at, created_by)
              VALUES
-             (:id, :pid, :num, :title,
-              :eff, :exp, 'active', :ref, now(), :by)",
+             (:id, :vid, :num, :title,
+              :eff, :exp, :scope, :reqs::jsonb, :ref,
+              :status, now(), :by)",
             [
                 ':id'    => $agreementId,
-                ':pid'   => $profileId,
+                ':vid'   => $vendorId,
                 ':num'   => $agreementNumber,
                 ':title' => (string)$body['title'],
                 ':eff'   => (string)$body['effective_date'],
-                ':exp'   => (string)($body['expiry_date'] ?? ''),
-                ':ref'   => (string)($body['storage_ref'] ?? ''),
+                ':exp'   => ($body['expiry_date'] ?? null) ?: null,
+                ':scope' => (string)($body['scope'] ?? ''),
+                ':reqs'  => json_encode($body['key_requirements'] ?? [], JSON_THROW_ON_ERROR),
+                ':ref'   => (string)($body['document_ref'] ?? $body['storage_ref'] ?? ''),
+                ':status' => (string)($body['status'] ?? 'draft'),
                 ':by'    => $actor,
             ]
         );
@@ -477,9 +548,142 @@ final class EqmsSuppliersController extends EqmsBaseController
             'quality_agreement' => [
                 'agreement_id'     => $agreementId,
                 'agreement_number' => $agreementNumber,
-                'status'           => 'active',
+                'vendor_id'         => $vendorId,
+                'status'           => (string)($body['status'] ?? 'draft'),
             ],
         ], 201);
+    }
+
+    public function qualityAgreementCreateStandalone(): never
+    {
+        $body = $this->jsonBody();
+        $profileId = trim((string)($body['supplier_profile_id'] ?? $body['profile_id'] ?? ''));
+        if ($profileId === '') {
+            $this->error('supplier_profile_required', 400, 'Creating a quality agreement requires a real supplier_profile_id.');
+        }
+        $_GET['id'] = $profileId;
+        $this->createQualityAgreement();
+    }
+
+    public function qualityAgreementUpdate(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->writeRoles());
+        $agreementId = $this->requirePathId('id', 'agreement_id');
+        $rec = $this->loadQualityAgreement($agreementId);
+        $body = $this->jsonBody();
+        $action = trim((string)($body['action'] ?? ''));
+        $actor = (string)($user['username'] ?? $user['user'] ?? 'unknown');
+        $now = $this->nowIso();
+
+        if ($action !== '') {
+            $statusMap = [
+                'submit-review' => 'under_review',
+                'activate' => 'active',
+                'request-renewal' => 'renewal_pending',
+                'expire' => 'expired',
+                'terminate' => 'terminated',
+            ];
+            if ($action === 'acknowledge') {
+                $this->data->execute(
+                    "UPDATE eqms_quality_agreements
+                     SET acknowledged_by = :actor, acknowledged_at = :now,
+                         version = version + 1, updated_at = :now, updated_by = :actor
+                     WHERE agreement_id = :id",
+                    [':actor' => $actor, ':now' => $now, ':id' => $agreementId]
+                );
+            } elseif (isset($statusMap[$action])) {
+                $this->data->execute(
+                    "UPDATE eqms_quality_agreements
+                     SET status = :status, version = version + 1, updated_at = :now, updated_by = :actor
+                     WHERE agreement_id = :id",
+                    [':status' => $statusMap[$action], ':now' => $now, ':actor' => $actor, ':id' => $agreementId]
+                );
+            } else {
+                $this->error('unsupported_quality_agreement_action', 400, "Action '{$action}' is not supported.");
+            }
+
+            $this->emitQualityEvent('eqms.quality_agreement.' . str_replace('-', '_', $action), 'quality_agreement', $agreementId, [
+                'previous_status' => (string)($rec['status'] ?? ''),
+            ], $user);
+            $this->success(['quality_agreement' => $this->loadQualityAgreement($agreementId)]);
+        }
+
+        $allowed = ['title', 'effective_date', 'expiry_date', 'scope', 'document_ref', 'status'];
+        $sets = ['version = version + 1', 'updated_at = :now', 'updated_by = :actor'];
+        $params = [':id' => $agreementId, ':now' => $now, ':actor' => $actor];
+        foreach ($allowed as $field) {
+            if (array_key_exists($field, $body)) {
+                $sets[] = "{$field} = :{$field}";
+                $params[":{$field}"] = $body[$field];
+            }
+        }
+        if (array_key_exists('key_requirements', $body)) {
+            $sets[] = "key_requirements = :key_requirements::jsonb";
+            $params[':key_requirements'] = json_encode($body['key_requirements'], JSON_THROW_ON_ERROR);
+        }
+        if (count($sets) === 3) {
+            $this->error('no_updatable_fields', 400);
+        }
+        $this->data->execute(
+            "UPDATE eqms_quality_agreements SET " . implode(', ', $sets) . " WHERE agreement_id = :id",
+            $params
+        );
+        $this->success(['quality_agreement' => $this->loadQualityAgreement($agreementId)]);
+    }
+
+    public function qualityAgreementMetrics(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->readRoles());
+        $byStatus = $this->data->query(
+            "SELECT status, COUNT(*) AS count FROM eqms_quality_agreements GROUP BY status ORDER BY status"
+        ) ?? [];
+        $expiring = (int)($this->data->scalar(
+            "SELECT COUNT(*) FROM eqms_quality_agreements
+             WHERE status IN ('active', 'renewal_pending') AND expiry_date <= (now() + interval '60 days')::date"
+        ) ?? 0);
+        $this->success(['metrics' => ['by_status' => $byStatus, 'expiring_60d' => $expiring]]);
+    }
+
+    public function qualityAgreementAudit(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->readRoles());
+        $agreementId = $this->requirePathId('id', 'agreement_id');
+        $this->serveAuditTrail('quality_agreement', $agreementId);
+    }
+
+    public function qualityAgreementSignatures(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->method() === 'POST' ? $this->writeRoles() : $this->readRoles());
+        $agreementId = $this->requirePathId('id', 'agreement_id');
+        $this->serveSignatures('quality_agreement', $agreementId, $user);
+    }
+
+    public function qualityAgreementComments(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->method() === 'POST' ? $this->writeRoles() : $this->readRoles());
+        $agreementId = $this->requirePathId('id', 'agreement_id');
+        $this->serveComments('quality_agreement', $agreementId, $user);
+    }
+
+    public function qualityAgreementAttachments(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->method() === 'POST' ? $this->writeRoles() : $this->readRoles());
+        $agreementId = $this->requirePathId('id', 'agreement_id');
+        $this->serveAttachments('quality_agreement', $agreementId, $user);
+    }
+
+    public function qualityAgreementRelationships(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->readRoles());
+        $agreementId = $this->requirePathId('id', 'agreement_id');
+        $this->serveRelationships('quality_agreement', $agreementId, $user);
     }
 
     /**
@@ -494,11 +698,12 @@ final class EqmsSuppliersController extends EqmsBaseController
         $this->requireAnyRole($user, $this->writeRoles());
         $profileId   = $this->requirePathId('id', 'supplier_profile_id');
         $agreementId = $this->requirePathId('agreementId', 'agreement_id');
+        $vendorId     = $this->supplierVendorId($profileId);
 
         $rec = $this->data->row(
             "SELECT agreement_id, status, version FROM eqms_quality_agreements
-             WHERE agreement_id = :aid AND supplier_profile_id = :pid",
-            [':aid' => $agreementId, ':pid' => $profileId]
+             WHERE agreement_id = :aid AND vendor_id = :vid",
+            [':aid' => $agreementId, ':vid' => $vendorId]
         );
         if ($rec === null) {
             $this->error('quality_agreement_not_found', 404);
@@ -559,11 +764,12 @@ final class EqmsSuppliersController extends EqmsBaseController
         $this->requireAnyRole($user, array_merge(admin_roles(), ['quality_manager', 'qa_manager', 'qms_manager']));
         $profileId   = $this->requirePathId('id', 'supplier_profile_id');
         $agreementId = $this->requirePathId('agreementId', 'agreement_id');
+        $vendorId     = $this->supplierVendorId($profileId);
 
         $rec = $this->data->row(
             "SELECT agreement_id, status, version, expiry_date FROM eqms_quality_agreements
-             WHERE agreement_id = :aid AND supplier_profile_id = :pid",
-            [':aid' => $agreementId, ':pid' => $profileId]
+             WHERE agreement_id = :aid AND vendor_id = :vid",
+            [':aid' => $agreementId, ':vid' => $vendorId]
         );
         if ($rec === null) {
             $this->error('quality_agreement_not_found', 404);

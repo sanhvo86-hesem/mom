@@ -657,6 +657,12 @@ function _loadCpDetail(id){
 function _paint(){
   if(!state.container) return;
   var html='<div class="fm">';
+  html+='<div style="background:#fffbeb;border:1px solid #f59e0b;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+    +'<span style="font-size:1.2em">⚠️</span>'
+    +'<div style="flex:1;min-width:180px"><b style="color:#b45309">'+_t('Module này đã được hợp nhất vào EQMS Suite','This module has been merged into EQMS Suite')+'</b>'
+    +'<div style="font-size:0.85em;color:#78716c;margin-top:2px">'+_t('Dùng EQMS Suite → Quản lý Rủi ro & FMEA thay thế.','Use EQMS Suite → Risk Management & FMEA instead.')+'</div></div>'
+    +'<button onclick="window.navigateTo&&navigateTo(\'eqms\')" style="background:#f59e0b;color:#fff;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;font-weight:600;white-space:nowrap">'+_t('Mở EQMS Suite →','Open EQMS Suite →')+'</button>'
+    +'</div>';
   html+='<div class="fm-tabs">';
   TABS.forEach(function(tab){
     var hidden=(tab.key==='detail'&&!state.selectedFmea)||(tab.key==='cp_detail'&&!state.selectedCp);

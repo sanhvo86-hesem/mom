@@ -608,13 +608,48 @@ abstract class EqmsBaseController extends BaseController
     protected function parseQueryBody(): array
     {
         $body = $this->jsonBody();
+        $query = [];
+        foreach ($_GET as $key => $value) {
+            if ($key === 'action') {
+                continue;
+            }
+            if (is_string($value)) {
+                $trimmed = trim($value);
+                if ($trimmed !== '' && in_array($trimmed[0] ?? '', ['{', '['], true)) {
+                    $decoded = json_decode($trimmed, true);
+                    if (is_array($decoded)) {
+                        $query[$key] = $decoded;
+                        continue;
+                    }
+                }
+            }
+            $query[$key] = $value;
+        }
+
+        $input = array_replace($query, $body);
+        $filters = is_array($input['filters'] ?? null) ? $input['filters'] : [];
+        $reserved = [
+            'offset' => true, 'limit' => true, 'filters' => true,
+            'sort' => true, 'sort_by' => true, 'dir' => true, 'sort_dir' => true,
+            'search' => true, 'action' => true, 'id' => true, 'tab' => true,
+        ];
+        foreach ($input as $key => $value) {
+            if (isset($reserved[$key]) || $value === null || $value === '') {
+                continue;
+            }
+            $filters[$key] = $value;
+        }
+
+        $sortBy = $input['sort_by'] ?? ($input['sort'] ?? 'created_at');
+        $sortDir = $input['sort_dir'] ?? ($input['dir'] ?? 'DESC');
+
         return [
-            'offset'   => max(0, (int)($body['offset'] ?? 0)),
-            'limit'    => min(500, max(1, (int)($body['limit'] ?? 50))),
-            'filters'  => is_array($body['filters'] ?? null) ? $body['filters'] : [],
-            'sort_by'  => trim((string)($body['sort_by'] ?? 'created_at')),
-            'sort_dir' => strtoupper(trim((string)($body['sort_dir'] ?? 'DESC'))) === 'ASC' ? 'ASC' : 'DESC',
-            'search'   => trim((string)($body['search'] ?? '')),
+            'offset'   => max(0, (int)($input['offset'] ?? 0)),
+            'limit'    => min(500, max(1, (int)($input['limit'] ?? 50))),
+            'filters'  => $filters,
+            'sort_by'  => trim((string)$sortBy),
+            'sort_dir' => strtoupper(trim((string)$sortDir)) === 'ASC' ? 'ASC' : 'DESC',
+            'search'   => trim((string)($input['search'] ?? '')),
         ];
     }
 

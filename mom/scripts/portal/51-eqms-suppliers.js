@@ -148,7 +148,7 @@
       state.loading = false;
       if (res.success === false) { state.error = res.message; paint(); return; }
       state.detail = res.data || res;
-      window.EqmsShell.navigate('suppliers', { recordId: state.detail.supplier_id || id });
+      window.EqmsShell.navigate('suppliers', { recordId: state.detail.supplier_profile_id || state.detail.supplier_id || id });
       paint();
     }).catch(function(err) {
       state.loading = false;
@@ -160,17 +160,28 @@
   function loadTabData(tab) {
     if (state.tabData[tab]) return;
     if (!state.detail) return;
-    var id = state.detail.id || state.detail.supplier_id;
+    var id = state.detail.supplier_profile_id || state.detail.id || state.detail.supplier_id;
+    if (tab === 'files') {
+      Promise.all([
+        apiCall('eqms_suppliers_attachments', { id: id }),
+        apiCall('eqms_suppliers_comments', { id: id })
+      ]).then(function(results) {
+        state.tabData.attachments = results[0].data || results[0].attachments || [];
+        state.tabData.comments = results[1].data || results[1].comments || [];
+        state.tabData.files = true;
+        paint();
+      }).catch(function() {});
+      return;
+    }
     var actionMap = {
       scorecard:      'eqms_suppliers_scorecards',
       qualifications: 'eqms_suppliers_qualifications',
       agreements:     'eqms_suppliers_quality_agreements',
-      deviations:     'eqms_suppliers_relationships',
-      scars:          'eqms_suppliers_relationships',
+      deviations:     'eqms_suppliers_deviations',
+      scars:          'eqms_suppliers_scars',
       audits:         'eqms_suppliers_audit',
       performance:    'eqms_suppliers_metrics',
-      related:        'eqms_suppliers_relationships',
-      files:          'eqms_suppliers_attachments'
+      related:        'eqms_suppliers_relationships'
     };
     var action = actionMap[tab];
     if (!action) return;
@@ -940,7 +951,7 @@
     var textarea = _container.querySelector('[data-field="new-comment"]');
     if (!textarea || !textarea.value.trim()) return;
     apiCall('eqms_suppliers_comments', {
-      id: state.detail.id || state.detail.supplier_id,
+      id: state.detail.supplier_profile_id || state.detail.id || state.detail.supplier_id,
       action: 'add',
       text: textarea.value.trim()
     }).then(function(res) {

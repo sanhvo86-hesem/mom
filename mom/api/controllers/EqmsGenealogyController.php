@@ -150,11 +150,12 @@ class EqmsGenealogyController extends EqmsBaseController
 
         $body = $this->jsonBody();
 
-        // Support lookup by lot_ids or thread_ids
+        // Support lookup by lot_ids, thread_ids, or the single scan-first identifier used by the portal.
         $lotIds    = is_array($body['lot_ids'] ?? null)    ? $body['lot_ids']    : [];
         $threadIds = is_array($body['thread_ids'] ?? null) ? $body['thread_ids'] : [];
+        $identifier = trim((string)($body['identifier'] ?? ''));
 
-        if (empty($lotIds) && empty($threadIds)) {
+        if (empty($lotIds) && empty($threadIds) && $identifier === '') {
             $this->success(['records' => []]);
         }
 
@@ -177,6 +178,11 @@ class EqmsGenealogyController extends EqmsBaseController
             $conditions[] = "thread_id IN ({$phs})";
         }
 
+        if ($identifier !== '') {
+            $conditions[] = "(thread_id::text = :identifier OR lot_id = :identifier OR product_id = :identifier OR work_order_id = :identifier)";
+            $params[':identifier'] = $identifier;
+        }
+
         $where = implode(' OR ', $conditions);
 
         $rows = $this->data->query(
@@ -185,7 +191,24 @@ class EqmsGenealogyController extends EqmsBaseController
             $params
         ) ?? [];
 
-        $this->success(['records' => $rows]);
+        $nodes = array_map(static function (array $row): array {
+            return [
+                'id' => (string)($row['thread_id'] ?? ''),
+                'label' => (string)($row['lot_id'] ?? $row['product_id'] ?? $row['thread_id'] ?? ''),
+                'type' => 'genealogy_thread',
+                'lot_id' => $row['lot_id'] ?? null,
+                'product_id' => $row['product_id'] ?? null,
+                'work_order_id' => $row['work_order_id'] ?? null,
+                'frozen' => (bool)($row['frozen'] ?? false),
+            ];
+        }, $rows);
+
+        $this->success([
+            'records' => $rows,
+            'nodes' => $nodes,
+            'edges' => [],
+            'root_id' => $nodes[0]['id'] ?? null,
+        ]);
     }
 
     // ── Detail & Update ───────────────────────────────────────────────────────

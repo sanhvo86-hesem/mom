@@ -596,6 +596,12 @@ function _transitionException(type, id, status){
 function _paint(){
   if(!state.container) return;
   var html='<div class="qeh">';
+  html+='<div style="background:#fffbeb;border:1px solid #f59e0b;border-radius:8px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+    +'<span style="font-size:1.2em">⚠️</span>'
+    +'<div style="flex:1;min-width:180px"><b style="color:#b45309">'+_t('Module này đã được hợp nhất vào EQMS Suite','This module has been merged into EQMS Suite')+'</b>'
+    +'<div style="font-size:0.85em;color:#78716c;margin-top:2px">'+_t('Dùng EQMS Suite → NCR / MRB / CAPA thay thế.','Use EQMS Suite → NCR / MRB / CAPA instead.')+'</div></div>'
+    +'<button onclick="window.navigateTo&&navigateTo(\'eqms\')" style="background:#f59e0b;color:#fff;border:none;border-radius:6px;padding:6px 12px;cursor:pointer;font-weight:600;white-space:nowrap">'+_t('Mở EQMS Suite →','Open EQMS Suite →')+'</button>'
+    +'</div>';
   html+='<div class="qeh-tabs">';
   TABS.forEach(function(tab){
     html+='<div class="qeh-tab'+(state.activeTab===tab.key?' active':'')+'" data-action="tab" data-tab="'+tab.key+'">'+_esc(_t(tab.vi,tab.en))+'</div>';

@@ -467,18 +467,18 @@ function moduleAccessPortalCatalog(){
     {id:'dictionary', group:'core', icon:'📖', labelEn:'Dictionary', labelVi:'Từ điển thuật ngữ', noteEn:'Shared terminology and definitions.', noteVi:'Thuật ngữ và định nghĩa dùng chung.', defaultAccess:'all'},
     {id:'access', group:'core', icon:'📋', labelEn:'Access matrix', labelVi:'Ma trận phân quyền', noteEn:'Personal access and permission matrix view.', noteVi:'Xem ma trận quyền truy cập cá nhân.', defaultAccess:'all'},
     {id:'deploy', group:'core', icon:'🚀', labelEn:'Operations deploy', labelVi:'Triển khai vận hành', noteEn:'Deployment overview entry.', noteVi:'Điểm vào cho điều phối triển khai.', defaultAccess:'all'},
-    {id:'exceptions', group:'quality', icon:'⚠️', labelEn:'Exception dashboard', labelVi:'Bảng ngoại lệ', noteEn:'Legacy exception dashboard entry.', noteVi:'Điểm vào bảng ngoại lệ cũ.', defaultAccess:'all'},
+    {id:'exceptions', group:'quality', icon:'⚠️', labelEn:'Exception dashboard', labelVi:'Bảng ngoại lệ', noteEn:'Legacy exception dashboard entry.', noteVi:'Điểm vào bảng ngoại lệ cũ.', defaultAccess:'all', deprecated:true, deprecatedNote:'Merged into EQMS Suite → NCR/CAPA tab'},
     {id:'orders', group:'production', icon:'📦', labelEn:'Orders', labelVi:'Đơn hàng', noteEn:'Sales / job / work order coordination.', noteVi:'Điều phối SO / JO / WO.', defaultAccess:'all'},
     {id:'dispatch', group:'production', icon:'📋', labelEn:'Production dispatch', labelVi:'Phân công sản xuất', noteEn:'Dispatching and production assignment.', noteVi:'Phân công và điều phối sản xuất.', defaultAccess:'all'},
     {id:'mes', group:'production', icon:'🏭', labelEn:'Shop floor', labelVi:'Xưởng sản xuất', noteEn:'Execution workspace for production.', noteVi:'Không gian thực thi sản xuất.', defaultAccess:'all'},
     {id:'mobile-shopfloor', group:'production', icon:'📱', labelEn:'Operator mobile', labelVi:'Công nhân di động', noteEn:'Mobile operator workflow.', noteVi:'Quy trình cho công nhân di động.', defaultAccess:'all'},
     {id:'quoting', group:'production', icon:'💰', labelEn:'Quoting', labelVi:'Báo giá', noteEn:'Quoting and estimation workflow.', noteVi:'Quy trình báo giá và ước tính.', defaultAccess:'all'},
     {id:'purchasing', group:'supply', icon:'🧾', labelEn:'Purchasing & IQC', labelVi:'Mua hàng & IQC', noteEn:'Purchasing, incoming quality and warehouse touchpoints.', noteVi:'Mua hàng, chất lượng đầu vào và kho.', defaultAccess:'roles', defaultRoles:[...PURCHASING_MODULE_DEFAULT_ROLES]},
-    {id:'quality-exceptions', group:'quality', icon:'🔴', labelEn:'Nonconformance', labelVi:'Sự không phù hợp', noteEn:'Exception and NCR workflow.', noteVi:'Quy trình ngoại lệ và NCR.', defaultAccess:'all'},
-    {id:'supplier-quality', group:'quality', icon:'🏪', labelEn:'Supplier quality', labelVi:'Chất lượng NCC', noteEn:'Supplier quality assurance.', noteVi:'Đảm bảo chất lượng nhà cung cấp.', defaultAccess:'all'},
-    {id:'fmea', group:'quality', icon:'⚡', labelEn:'FMEA & Control Plan', labelVi:'FMEA & Control Plan', noteEn:'Risk analysis and control planning.', noteVi:'Phân tích rủi ro và kế hoạch kiểm soát.', defaultAccess:'all'},
-    {id:'apqp-ppap', group:'quality', icon:'🎯', labelEn:'APQP / PPAP', labelVi:'APQP / PPAP', noteEn:'APQP and PPAP governance.', noteVi:'Điều hành APQP và PPAP.', defaultAccess:'all'},
-    {id:'ai-scheduling', group:'quality', icon:'🤖', labelEn:'AI quality', labelVi:'AI Chất lượng', noteEn:'AI-assisted quality tooling.', noteVi:'Công cụ chất lượng có hỗ trợ AI.', defaultAccess:'all'},
+    {id:'quality-exceptions', group:'quality', icon:'🔴', labelEn:'Nonconformance', labelVi:'Sự không phù hợp', noteEn:'[Deprecated] Use EQMS Suite → NCR/CAPA. Legacy NCR/exception workflow.', noteVi:'[Đã hợp nhất] Dùng EQMS Suite → NCR/CAPA. Quy trình NCR/ngoại lệ cũ.', defaultAccess:'all', deprecated:true, deprecatedNote:'Merged into EQMS Suite → NCR/CAPA'},
+    {id:'supplier-quality', group:'quality', icon:'🏪', labelEn:'Supplier quality', labelVi:'Chất lượng NCC', noteEn:'[Deprecated] Use EQMS Suite → Supplier Quality Network. Legacy supplier QA.', noteVi:'[Đã hợp nhất] Dùng EQMS Suite → Mạng lưới NCC. Đảm bảo chất lượng NCC cũ.', defaultAccess:'all', deprecated:true, deprecatedNote:'Merged into EQMS Suite → Suppliers'},
+    {id:'fmea', group:'quality', icon:'⚡', labelEn:'FMEA & Control Plan', labelVi:'FMEA & Control Plan', noteEn:'[Deprecated] Use EQMS Suite → Risk & FMEA. Legacy risk analysis and control planning.', noteVi:'[Đã hợp nhất] Dùng EQMS Suite → Rủi ro & FMEA. Phân tích rủi ro cũ.', defaultAccess:'all', deprecated:true, deprecatedNote:'Merged into EQMS Suite → Risks/FMEA'},
+    {id:'apqp-ppap', group:'quality', icon:'🎯', labelEn:'APQP / PPAP', labelVi:'APQP / PPAP', noteEn:'APQP and PPAP governance (IATF 16949). Shown in QUALITY sidebar section.', noteVi:'Điều hành APQP và PPAP (IATF 16949). Hiển thị trong mục CHẤT LƯỢNG sidebar.', defaultAccess:'all'},
+    {id:'ai-scheduling', group:'quality', icon:'🤖', labelEn:'AI scheduling & quality', labelVi:'AI Lập lịch & Chất lượng', noteEn:'[Sidebar hidden] AI scheduling (accessible from Orders) + AI quality (use EQMS Tower).', noteVi:'[Ẩn sidebar] AI lập lịch (từ Đơn hàng) + AI chất lượng (dùng EQMS Tower).', defaultAccess:'all', deprecated:true, deprecatedNote:'AI quality merged into EQMS Tower; scheduling accessible from Orders module'},
     {id:'eqms', group:'eqms', icon:'🏯', labelEn:'EQMS Suite', labelVi:'EQMS Suite', noteEn:'Enterprise Quality Management System — 22 world-class quality modules.', noteVi:'Hệ thống Quản lý Chất lượng Doanh nghiệp — 22 module chất lượng đẳng cấp.', defaultAccess:'all'},
     {id:'forms', group:'records', icon:'📋', labelEn:'Evidence control', labelVi:'Kiểm soát chứng cứ', noteEn:'Controlled forms and evidence capture.', noteVi:'Biểu mẫu kiểm soát và thu thập chứng cứ.', defaultAccess:'all'},
     /* 'evidence' nav removed — Evidence Vault is now inside "Kiểm soát chứng cứ" (forms module), Chứng cứ tab */
@@ -2182,18 +2182,13 @@ function renderSidebar(){
     }
     html += portalNavSectionHtml(lang==='en'?'SUPPLY CHAIN':'CHUỖI CUNG ỨNG', supplyButtons);
 
+    /* CHẤT LƯỢNG: EQMS Suite (hub chất lượng) + APQP/PPAP (pre-launch).
+     * Các module NCR, CAPA, FMEA, Supplier Quality, AI Quality đã được
+     * hợp nhất vào EQMS Suite — không còn hiển thị riêng trên sidebar. */
     const qualityButtons = [];
-    if(canUserAccessModule('quality-exceptions')) qualityButtons.push(portalNavButtonHtml('quality-exceptions', '🔴', lang==='en'?'Nonconformance':'Sự không phù hợp', {active: ['quality-exceptions','exceptions'].indexOf(currentPage)>=0}));
-    if(canUserAccessModule('supplier-quality')) qualityButtons.push(portalNavButtonHtml('supplier-quality', '🏪', lang==='en'?'Supplier Quality':'Chất lượng NCC', {active: currentPage==='supplier-quality'}));
-    if(canUserAccessModule('fmea')) qualityButtons.push(portalNavButtonHtml('fmea', '⚡', lang==='en'?'FMEA & Control Plan':'FMEA & Control Plan', {active: currentPage==='fmea'}));
+    if(canUserAccessModule('eqms')) qualityButtons.push(portalNavButtonHtml('eqms', '\u{1F3EF}', lang==='en'?'EQMS Suite':'EQMS Suite', {active: currentPage==='eqms'}));
     if(canUserAccessModule('apqp-ppap')) qualityButtons.push(portalNavButtonHtml('apqp-ppap', '🎯', lang==='en'?'APQP / PPAP':'APQP / PPAP', {active: currentPage==='apqp-ppap'}));
-    if(canUserAccessModule('ai-scheduling')) qualityButtons.push(portalNavButtonHtml('ai-scheduling', '🤖', lang==='en'?'AI Quality':'AI Chất lượng', {active: currentPage==='ai-scheduling'}));
     html += portalNavSectionHtml(lang==='en'?'QUALITY':'CHẤT LƯỢNG', qualityButtons);
-
-    /* EQMS Suite — World-Class Quality Management */
-    const eqmsButtons = [];
-    if(canUserAccessModule('eqms')) eqmsButtons.push(portalNavButtonHtml('eqms', '\u{1F3EF}', lang==='en'?'EQMS Suite':'EQMS Suite', {active: currentPage==='eqms'}));
-    if(eqmsButtons.length) html += portalNavSectionHtml(lang==='en'?'EQMS':'EQMS', eqmsButtons);
 
     const recordButtons = [];
     if(canUserAccessModule('forms')) recordButtons.push(portalNavButtonHtml('forms', '📋', lang==='en'?'Evidence Control':'Kiểm soát chứng cứ', {active: currentPage==='forms'}));
@@ -6869,12 +6864,15 @@ function renderModuleAccessScope(scope, roleOptions){
           <span>${escapeHtml(role.label)}</span>
         </label>`;
       }).join('');
-      return `<article class="module-access-row ${policy.enabled ? '' : 'is-disabled'}">
+      const deprecatedBadge = meta.deprecated
+        ? ` <span style="display:inline-block;font-size:0.7em;padding:1px 5px;border-radius:3px;background:rgba(255,160,0,0.15);color:#f59e0b;vertical-align:middle;font-weight:600">${lang==='en'?'Deprecated':'Đã hợp nhất'}</span>`
+        : '';
+      return `<article class="module-access-row ${policy.enabled ? '' : 'is-disabled'}${meta.deprecated ? ' is-deprecated' : ''}" style="${meta.deprecated ? 'opacity:0.65' : ''}">
         <div class="module-access-row-main">
           <label class="module-access-toggle">
             <input type="checkbox" ${policy.enabled ? 'checked' : ''} ${meta.locked ? 'disabled' : ''} onchange="setModuleAccessEnabled('${scope}','${meta.id}', this.checked)">
             <span class="module-access-toggle-copy">
-              <b>${escapeHtml(meta.icon || '•')} ${escapeHtml(lang==='en' ? meta.labelEn : meta.labelVi)}</b>
+              <b>${escapeHtml(meta.icon || '•')} ${escapeHtml(lang==='en' ? meta.labelEn : meta.labelVi)}</b>${deprecatedBadge}
               <small>${escapeHtml(lang==='en' ? meta.noteEn : meta.noteVi)}</small>
             </span>
           </label>

@@ -33092,3 +33092,316 @@ CREATE INDEX IF NOT EXISTS idx_eqms_risks_open        ON eqms_risk_register (ris
 
 COMMIT;
 -- <<< END MIGRATION: 136_eqms_worldclass_surface.sql
+
+-- >>> BEGIN MIGRATION: 137_eqms_schema_drift_reconcile.sql
+-- Migration 137: EQMS Schema Drift Reconciliation
+-- Registers 3 previously-untracked EQMS tables and adds 29 columns
+-- that were added post-migration-136 via ALTER TABLE outside migrations.
+-- All statements are idempotent (IF NOT EXISTS / ADD COLUMN IF NOT EXISTS).
+-- Generated: 2026-04-16
+
+-- ── Part 1: Register Previously-Unmanaged Tables ────────────────────────────
+
+CREATE TABLE IF NOT EXISTS eqms_quality_tower_snapshots (
+    id              uuid        NOT NULL DEFAULT gen_random_uuid(),
+    snapshot_at     timestamptz NOT NULL DEFAULT now(),
+    open_ncr_count  integer              DEFAULT 0,
+    open_capa_count integer              DEFAULT 0,
+    overdue_actions jsonb                DEFAULT '{}'::jsonb,
+    kpi_data        jsonb                DEFAULT '{}'::jsonb,
+    created_by      text,
+    created_at      timestamptz          DEFAULT now(),
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS eqms_supplier_quality_agreements (
+    id              uuid        NOT NULL DEFAULT gen_random_uuid(),
+    agreement_title text,
+    supplier_id     uuid,
+    review_date     date,
+    status          text                 DEFAULT 'active'::text,
+    created_at      timestamptz          DEFAULT now(),
+    PRIMARY KEY (id)
+);
+
+CREATE TABLE IF NOT EXISTS genealogy_threads (
+    thread_id      uuid        NOT NULL DEFAULT gen_random_uuid(),
+    lot_id         text,
+    product_id     text,
+    work_order_id  text,
+    frozen         boolean              DEFAULT false,
+    notes          text,
+    status         text                 DEFAULT 'active'::text,
+    version        integer              DEFAULT 1,
+    created_at     timestamptz          DEFAULT now(),
+    created_by     text,
+    updated_at     timestamptz          DEFAULT now(),
+    frozen_by      text,
+    frozen_at      timestamptz,
+    PRIMARY KEY (thread_id)
+);
+
+-- ── Part 2: Add Missing Columns to Existing EQMS Tables ─────────────────────
+
+-- eqms_complaints (5 columns)
+ALTER TABLE eqms_complaints ADD COLUMN IF NOT EXISTS updated_at            timestamptz DEFAULT now();
+ALTER TABLE eqms_complaints ADD COLUMN IF NOT EXISTS resolution_date       date;
+ALTER TABLE eqms_complaints ADD COLUMN IF NOT EXISTS updated_by            text;
+ALTER TABLE eqms_complaints ADD COLUMN IF NOT EXISTS investigation_summary text;
+ALTER TABLE eqms_complaints ADD COLUMN IF NOT EXISTS closure_reason        text;
+
+-- eqms_deviations (4 columns)
+ALTER TABLE eqms_deviations ADD COLUMN IF NOT EXISTS updated_at       timestamptz DEFAULT now();
+ALTER TABLE eqms_deviations ADD COLUMN IF NOT EXISTS updated_by       text;
+ALTER TABLE eqms_deviations ADD COLUMN IF NOT EXISTS containment_date date;
+ALTER TABLE eqms_deviations ADD COLUMN IF NOT EXISTS closure_reason   text;
+
+-- eqms_ncr_records (2 columns)
+ALTER TABLE eqms_ncr_records ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
+ALTER TABLE eqms_ncr_records ADD COLUMN IF NOT EXISTS due_date    date;
+
+-- eqms_capa_records (3 columns)
+ALTER TABLE eqms_capa_records ADD COLUMN IF NOT EXISTS updated_at        timestamptz DEFAULT now();
+ALTER TABLE eqms_capa_records ADD COLUMN IF NOT EXISTS target_close_date date;
+ALTER TABLE eqms_capa_records ADD COLUMN IF NOT EXISTS owner_user_id     text;
+
+-- eqms_change_controls (1 column)
+ALTER TABLE eqms_change_controls ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
+
+-- eqms_documents (2 columns)
+ALTER TABLE eqms_documents ADD COLUMN IF NOT EXISTS checked_out_by  varchar(120);
+ALTER TABLE eqms_documents ADD COLUMN IF NOT EXISTS checked_out_at  timestamptz;
+
+-- eqms_training_curricula (4 columns)
+ALTER TABLE eqms_training_curricula ADD COLUMN IF NOT EXISTS description               text;
+ALTER TABLE eqms_training_curricula ADD COLUMN IF NOT EXISTS qualification_requirements text;
+ALTER TABLE eqms_training_curricula ADD COLUMN IF NOT EXISTS validity_period_months    integer;
+ALTER TABLE eqms_training_curricula ADD COLUMN IF NOT EXISTS recurrence_months         integer;
+
+-- eqms_training_records (3 columns)
+ALTER TABLE eqms_training_records ADD COLUMN IF NOT EXISTS duration_hours numeric;
+ALTER TABLE eqms_training_records ADD COLUMN IF NOT EXISTS course_name   text;
+ALTER TABLE eqms_training_records ADD COLUMN IF NOT EXISTS updated_at    timestamptz DEFAULT now();
+
+-- eqms_audit_findings (3 columns)
+ALTER TABLE eqms_audit_findings ADD COLUMN IF NOT EXISTS updated_at timestamptz;
+ALTER TABLE eqms_audit_findings ADD COLUMN IF NOT EXISTS created_at timestamptz DEFAULT now();
+ALTER TABLE eqms_audit_findings ADD COLUMN IF NOT EXISTS version     integer     DEFAULT 1;
+
+-- eqms_scars (3 columns)
+ALTER TABLE eqms_scars ADD COLUMN IF NOT EXISTS updated_at timestamptz;
+ALTER TABLE eqms_scars ADD COLUMN IF NOT EXISTS created_by text;
+ALTER TABLE eqms_scars ADD COLUMN IF NOT EXISTS title      text;
+
+-- eqms_calibration_records (3 columns)
+ALTER TABLE eqms_calibration_records ADD COLUMN IF NOT EXISTS instrument_name      text;
+ALTER TABLE eqms_calibration_records ADD COLUMN IF NOT EXISTS responsible_user_id  text;
+ALTER TABLE eqms_calibration_records ADD COLUMN IF NOT EXISTS updated_at           timestamptz DEFAULT now();
+
+-- eqms_field_actions (3 columns)
+ALTER TABLE eqms_field_actions ADD COLUMN IF NOT EXISTS title                  text;
+ALTER TABLE eqms_field_actions ADD COLUMN IF NOT EXISTS target_completion_date date;
+ALTER TABLE eqms_field_actions ADD COLUMN IF NOT EXISTS owner_user_id          text;
+-- <<< END MIGRATION: 137_eqms_schema_drift_reconcile.sql
+
+-- >>> BEGIN MIGRATION: 138_eqms_performance_indexes.sql
+-- Migration 138: EQMS Performance Indexes
+-- Adds missing indexes to fix slow queries identified in PHP-FPM slow log
+-- (eqms_supplier_audits_query and eqms_supplier_audits_metrics taking 5-6s).
+-- All CREATE INDEX statements use IF NOT EXISTS for idempotency.
+-- Generated: 2026-04-16
+
+-- ── eqms_supplier_audits ─────────────────────────────────────────────────────
+-- Metrics queries filter only by status (not vendor_id) — current composite
+-- index (vendor_id, status) cannot be used for status-only scans.
+CREATE INDEX IF NOT EXISTS idx_eqms_supplier_audits_status
+    ON eqms_supplier_audits (status, created_at DESC);
+
+-- Year-to-date closed audits query: WHERE status='closed' AND actual_end >= ...
+CREATE INDEX IF NOT EXISTS idx_eqms_supplier_audits_closed_ytd
+    ON eqms_supplier_audits (status, actual_end DESC)
+    WHERE status = 'closed';
+
+-- Listing / search sorting by planned_date
+CREATE INDEX IF NOT EXISTS idx_eqms_supplier_audits_planned
+    ON eqms_supplier_audits (planned_date DESC NULLS LAST);
+
+-- ── eqms_scars ───────────────────────────────────────────────────────────────
+-- Overdue SCAR query: WHERE status NOT IN ('closed') AND response_due_date < now()
+CREATE INDEX IF NOT EXISTS idx_eqms_scars_overdue
+    ON eqms_scars (response_due_date)
+    WHERE status NOT IN ('closed');
+
+-- Critical SCARs: WHERE priority='critical' AND status != 'closed'
+CREATE INDEX IF NOT EXISTS idx_eqms_scars_priority_status
+    ON eqms_scars (priority, status);
+
+-- Closed YTD: WHERE status='closed' AND closed_at >= date_trunc('year',now())
+CREATE INDEX IF NOT EXISTS idx_eqms_scars_closed_ytd
+    ON eqms_scars (status, closed_at DESC)
+    WHERE status = 'closed';
+
+-- ── eqms_audits ──────────────────────────────────────────────────────────────
+-- Status-only count queries (planned/scheduled overdue, in_progress, closed YTD)
+CREATE INDEX IF NOT EXISTS idx_eqms_audits_status
+    ON eqms_audits (status, planned_date);
+
+CREATE INDEX IF NOT EXISTS idx_eqms_audits_closed_ytd
+    ON eqms_audits (status, actual_end DESC)
+    WHERE status = 'closed';
+
+-- ── eqms_complaints ──────────────────────────────────────────────────────────
+-- Quality tower and dashboard count: WHERE severity='critical' AND status NOT IN (...)
+CREATE INDEX IF NOT EXISTS idx_eqms_complaints_severity_status
+    ON eqms_complaints (severity, status);
+
+-- ── eqms_deviations ──────────────────────────────────────────────────────────
+-- Dashboard count: WHERE batch_id IS NOT NULL AND status NOT IN (...)
+CREATE INDEX IF NOT EXISTS idx_eqms_deviations_batch_open
+    ON eqms_deviations (batch_id)
+    WHERE batch_id IS NOT NULL AND status NOT IN ('closed', 'voided');
+
+-- ── eqms_training_records ─────────────────────────────────────────────────────
+-- Dashboard: COUNT by status (completed/verified vs not expired/waived)
+CREATE INDEX IF NOT EXISTS idx_eqms_training_records_status
+    ON eqms_training_records (status);
+
+-- ── eqms_capa_records ────────────────────────────────────────────────────────
+-- Dashboard open CAPAs (already has idx_eqms_capa_open partial index)
+-- Add overdue index: WHERE target_close_date < now() AND status NOT IN (closed)
+CREATE INDEX IF NOT EXISTS idx_eqms_capa_overdue
+    ON eqms_capa_records (target_close_date)
+    WHERE target_close_date IS NOT NULL
+      AND status NOT IN ('closed', 'cancelled');
+
+-- ── eqms_lab_investigations ───────────────────────────────────────────────────
+CREATE INDEX IF NOT EXISTS idx_eqms_lab_investigations_status
+    ON eqms_lab_investigations (status, created_at DESC);
+
+-- ── eqms_validation_projects ──────────────────────────────────────────────────
+CREATE INDEX IF NOT EXISTS idx_eqms_validation_projects_status
+    ON eqms_validation_projects (status, created_at DESC);
+
+-- ── eqms_field_actions ───────────────────────────────────────────────────────
+CREATE INDEX IF NOT EXISTS idx_eqms_field_actions_status
+    ON eqms_field_actions (status, created_at DESC);
+
+-- ── eqms_risk_register ───────────────────────────────────────────────────────
+CREATE INDEX IF NOT EXISTS idx_eqms_risk_register_status
+    ON eqms_risk_register (status, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_eqms_risk_register_severity
+    ON eqms_risk_register (severity, status);
+-- <<< END MIGRATION: 138_eqms_performance_indexes.sql
+
+-- >>> BEGIN MIGRATION: 139_eqms_runtime_contract_reconcile.sql
+-- Migration 139: EQMS runtime contract reconciliation
+-- Aligns EQMS portal/controller workflow fields with the governed PostgreSQL schema.
+-- Idempotent: all ALTER statements use IF NOT EXISTS where supported.
+
+-- IQC workflow states/results used by EqmsInspectionController.
+ALTER TYPE incoming_insp_status_enum ADD VALUE IF NOT EXISTS 'under_review';
+ALTER TYPE incoming_insp_status_enum ADD VALUE IF NOT EXISTS 'accepted';
+ALTER TYPE incoming_insp_status_enum ADD VALUE IF NOT EXISTS 'rejected';
+ALTER TYPE incoming_insp_status_enum ADD VALUE IF NOT EXISTS 'voided';
+
+ALTER TYPE incoming_insp_result_enum ADD VALUE IF NOT EXISTS 'pass';
+ALTER TYPE incoming_insp_result_enum ADD VALUE IF NOT EXISTS 'fail';
+ALTER TYPE incoming_insp_result_enum ADD VALUE IF NOT EXISTS 'conditional';
+
+ALTER TABLE incoming_inspections ADD COLUMN IF NOT EXISTS notes text;
+ALTER TABLE incoming_inspections ADD COLUMN IF NOT EXISTS inspector text;
+ALTER TABLE incoming_inspections ADD COLUMN IF NOT EXISTS started_at timestamptz;
+ALTER TABLE incoming_inspections ADD COLUMN IF NOT EXISTS remarks text;
+ALTER TABLE incoming_inspections ADD COLUMN IF NOT EXISTS accepted_by text;
+ALTER TABLE incoming_inspections ADD COLUMN IF NOT EXISTS accepted_at timestamptz;
+ALTER TABLE incoming_inspections ADD COLUMN IF NOT EXISTS rejected_by text;
+ALTER TABLE incoming_inspections ADD COLUMN IF NOT EXISTS rejected_at timestamptz;
+ALTER TABLE incoming_inspections ADD COLUMN IF NOT EXISTS reject_reason text;
+ALTER TABLE incoming_inspections ADD COLUMN IF NOT EXISTS hold_reason text;
+ALTER TABLE incoming_inspections ADD COLUMN IF NOT EXISTS void_reason text;
+ALTER TABLE incoming_inspections ADD COLUMN IF NOT EXISTS voided_at timestamptz;
+
+-- In-process inspection workflow surface used by the MES quality tab.
+ALTER TABLE inspection_lot ADD COLUMN IF NOT EXISTS work_order_id text;
+ALTER TABLE inspection_lot ADD COLUMN IF NOT EXISTS product_id text;
+ALTER TABLE inspection_lot ADD COLUMN IF NOT EXISTS operation_code text;
+ALTER TABLE inspection_lot ADD COLUMN IF NOT EXISTS status varchar(40) NOT NULL DEFAULT 'pending';
+ALTER TABLE inspection_lot ADD COLUMN IF NOT EXISTS notes text;
+ALTER TABLE inspection_lot ADD COLUMN IF NOT EXISTS started_at timestamptz;
+ALTER TABLE inspection_lot ADD COLUMN IF NOT EXISTS measurement_values jsonb NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE inspection_lot ADD COLUMN IF NOT EXISTS nc_flagged boolean NOT NULL DEFAULT false;
+ALTER TABLE inspection_lot ADD COLUMN IF NOT EXISTS nc_description text;
+ALTER TABLE inspection_lot ADD COLUMN IF NOT EXISTS accepted_by text;
+ALTER TABLE inspection_lot ADD COLUMN IF NOT EXISTS accepted_at timestamptz;
+ALTER TABLE inspection_lot ADD COLUMN IF NOT EXISTS rejected_by text;
+ALTER TABLE inspection_lot ADD COLUMN IF NOT EXISTS rejected_at timestamptz;
+ALTER TABLE inspection_lot ADD COLUMN IF NOT EXISTS reject_reason text;
+ALTER TABLE inspection_lot ADD COLUMN IF NOT EXISTS hold_reason text;
+
+CREATE INDEX IF NOT EXISTS idx_inspection_lot_status_runtime ON inspection_lot (status, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_inspection_lot_work_order_runtime ON inspection_lot (work_order_id) WHERE work_order_id IS NOT NULL;
+
+-- Standalone quality-agreement workspace lifecycle metadata.
+ALTER TABLE eqms_quality_agreements ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
+ALTER TABLE eqms_quality_agreements ADD COLUMN IF NOT EXISTS updated_by text;
+ALTER TABLE eqms_quality_agreements ADD COLUMN IF NOT EXISTS acknowledged_by text;
+ALTER TABLE eqms_quality_agreements ADD COLUMN IF NOT EXISTS acknowledged_at timestamptz;
+
+CREATE INDEX IF NOT EXISTS idx_eqms_quality_agreements_status_runtime ON eqms_quality_agreements (status, expiry_date);
+
+-- Governance metadata required by the Data Schema authority panel for EQMS tables.
+CREATE OR REPLACE FUNCTION set_row_version()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.row_version = COALESCE(OLD.row_version, 0) + 1;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DO $$
+DECLARE
+    table_name text;
+    safe_name text;
+BEGIN
+    FOR table_name IN
+        SELECT t.table_name
+        FROM information_schema.tables t
+        WHERE t.table_schema = 'public'
+          AND t.table_type = 'BASE TABLE'
+          AND t.table_name LIKE 'eqms\_%' ESCAPE '\'
+    LOOP
+        safe_name := left(regexp_replace(table_name, '[^a-zA-Z0-9_]', '_', 'g'), 45);
+
+        EXECUTE format(
+            'ALTER TABLE %I
+                ADD COLUMN IF NOT EXISTS org_company_code VARCHAR(30) REFERENCES org_companies(company_code),
+                ADD COLUMN IF NOT EXISTS org_legal_entity_code VARCHAR(30) REFERENCES org_legal_entities(legal_entity_code),
+                ADD COLUMN IF NOT EXISTS org_plant_id VARCHAR(30) REFERENCES org_plants(plant_id),
+                ADD COLUMN IF NOT EXISTS org_site_id VARCHAR(30) REFERENCES mes_sites(site_id),
+                ADD COLUMN IF NOT EXISTS source_system VARCHAR(40) NOT NULL DEFAULT ''QMS'',
+                ADD COLUMN IF NOT EXISTS source_record_id VARCHAR(120),
+                ADD COLUMN IF NOT EXISTS row_version BIGINT NOT NULL DEFAULT 1,
+                ADD COLUMN IF NOT EXISTS payload_schema_version VARCHAR(30) NOT NULL DEFAULT ''1.0''',
+            table_name
+        );
+
+        EXECUTE format(
+            'CREATE INDEX IF NOT EXISTS %I ON %I (source_system, source_record_id) WHERE source_record_id IS NOT NULL',
+            'idx_' || safe_name || '_lineage',
+            table_name
+        );
+        EXECUTE format(
+            'CREATE INDEX IF NOT EXISTS %I ON %I (org_company_code, org_legal_entity_code, org_plant_id, org_site_id)',
+            'idx_' || safe_name || '_org_scope',
+            table_name
+        );
+        EXECUTE format('DROP TRIGGER IF EXISTS %I ON %I', 'trg_' || safe_name || '_row_version', table_name);
+        EXECUTE format(
+            'CREATE TRIGGER %I BEFORE UPDATE ON %I FOR EACH ROW EXECUTE FUNCTION set_row_version()',
+            'trg_' || safe_name || '_row_version',
+            table_name
+        );
+    END LOOP;
+END $$;
+-- <<< END MIGRATION: 139_eqms_runtime_contract_reconcile.sql

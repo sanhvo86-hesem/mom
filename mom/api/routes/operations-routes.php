@@ -41,6 +41,8 @@ return static function (Router $router, string $dataDir): void {
     ]);
     
     // Exception Management
+    // @deprecated — Use EQMS Suite REST endpoints: /api/v1/eqms/ncr/*, /api/v1/eqms/capa/*
+    // Legacy routes kept for backward-compat; will be removed after data migration completes.
     $router->actions([
         'exception_dashboard'       => [ExceptionController::class, 'dashboard'],
         'exception_list'            => [ExceptionController::class, 'listAll'],
@@ -82,6 +84,8 @@ return static function (Router $router, string $dataDir): void {
     ]);
     
     // Supplier Quality Management
+    // @deprecated — Use EQMS Suite REST endpoints: /api/v1/eqms/suppliers/*, /api/v1/eqms/supplier-audits/*
+    // Legacy routes kept for backward-compat; IQC workflow being migrated to EQMS Suppliers module.
     $router->actions([
         'supplier_dashboard'        => [SupplierController::class, 'dashboard'],
         'supplier_scorecard_list'   => [SupplierController::class, 'listScorecards'],
@@ -127,6 +131,8 @@ return static function (Router $router, string $dataDir): void {
     ]);
     
     // FMEA & Control Plan
+    // @deprecated — Use EQMS Suite REST endpoints: /api/v1/eqms/fmea/*, /api/v1/eqms/risks/*
+    // Legacy routes kept for backward-compat; control_plan schema migration to eqms_* pending.
     $router->actions([
         'fmea_list'               => [FmeaController::class, 'listFmeas'],
         'fmea_detail'             => [FmeaController::class, 'getFmeaDetail'],

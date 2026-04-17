@@ -37,7 +37,12 @@
     if (window.csrfToken) opts.headers['X-CSRF-Token'] = window.csrfToken;
     if (method !== 'GET' && payload) opts.body = JSON.stringify(payload);
     return fetch(url, opts)
-      .then(function(r) { clearTimeout(timer); return r.json(); })
+      .then(function(r) {
+        clearTimeout(timer);
+        return r.json().then(function(data) {
+          return UTIL.normalizeApiResponse ? UTIL.normalizeApiResponse(data, r.status) : data;
+        });
+      })
       .catch(function(err) { clearTimeout(timer); if (err.name === 'AbortError') return { ok: false, error: 'timeout' }; throw err; });
   }
 
@@ -83,12 +88,12 @@
     activeTab: 'dashboard',
     // Dashboard
     filters: { product: '', process: '', work_center: '', characteristic: '', date_from: '', date_to: '' },
-    chartList: [], listTotal: 0, listPage: 1, listLoading: false,
+    chartList: [], listTotal: 0, listPage: 1, listLoading: false, listLoaded: false,
     // Chart detail
     selectedChart: null, selectedChartType: 'xbar',
     chartData: null, violations: [], detailLoading: false,
     // Capability
-    capabilityData: [], capFilter: { level: '' }, capLoading: false,
+    capabilityData: [], capFilter: { level: '' }, capLoading: false, capLoaded: false,
     // Metrics
     metrics: null, metricsLoading: false,
     // Container
@@ -111,12 +116,14 @@
       search: '', sort_by: 'created_at', sort_dir: 'DESC',
       filters: state.filters
     }).then(function(res) {
-      state.chartList = (res.data && (res.data.charts || res.data.spc_records)) || res.data || [];
+      state.chartList = res.data || res.charts || res.spc_records || [];
       state.listTotal = (res.pagination && res.pagination.total) || state.chartList.length;
       state.listLoading = false;
+      state.listLoaded = true;
       rerender();
     }).catch(function() {
       state.listLoading = false;
+      state.listLoaded = true;
       state.chartList = [];
       rerender();
     });
@@ -145,11 +152,13 @@
     restCall(API.query, {
       offset: 0, limit: 200, search: '', sort_by: 'characteristic', sort_dir: 'ASC', filters: {}
     }).then(function(res) {
-      state.capabilityData = (res.data && (res.data.charts || res.data.spc_records)) || res.data || [];
+      state.capabilityData = res.data || res.charts || res.spc_records || [];
       state.capLoading = false;
+      state.capLoaded = true;
       rerender();
     }).catch(function() {
       state.capLoading = false;
+      state.capLoaded = true;
       rerender();
     });
   }
@@ -194,10 +203,10 @@
     container.innerHTML = html;
     bindEvents(container);
 
-    if (state.activeTab === 'dashboard' && !state.chartList.length && !state.listLoading) {
+    if (state.activeTab === 'dashboard' && !state.listLoaded && !state.listLoading) {
       loadChartList();
     }
-    if (state.activeTab === 'capability' && !state.capabilityData.length && !state.capLoading) {
+    if (state.activeTab === 'capability' && !state.capLoaded && !state.capLoading) {
       loadCapabilityData();
     }
     if (state.activeTab === 'analytics' && !state.metrics && !state.metricsLoading) {
