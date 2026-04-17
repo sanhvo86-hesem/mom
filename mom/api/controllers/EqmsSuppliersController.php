@@ -1088,6 +1088,98 @@ final class EqmsSuppliersController extends EqmsBaseController
         ]);
     }
 
+    // ── IQC Sub-resource (Sprint 5B) ─────────────────────────────────────────
+
+    /**
+     * GET /suppliers/{id}/iqc — IQC aggregate summary for a supplier.
+     *
+     * Returns the pre-calculated IQC KPIs stored on eqms_supplier_profiles
+     * (iqc_* columns added in M142). No live aggregate computation here —
+     * the trigger sync_supplier_iqc_aggregates() keeps them current.
+     */
+    public function iqcSummary(): never
+    {
+        $user      = $this->requireAuth();
+        $this->requireAnyRole($user, $this->readRoles());
+        $profileId = $this->requirePathId();
+
+        $row = $this->data->query(
+            "SELECT sp.supplier_profile_id, sp.vendor_id, v.vendor_name,
+                    sp.iqc_sample_count_ytd, sp.iqc_defect_count_ytd,
+                    sp.iqc_reject_rate_ytd, sp.iqc_avg_defects_per_lot,
+                    sp.iqc_quality_level, sp.iqc_last_inspection_date,
+                    sp.iqc_last_result, sp.iqc_certifications_required
+             FROM eqms_supplier_profiles sp
+             LEFT JOIN vendors v ON v.vendor_id = sp.vendor_id::text
+             WHERE sp.supplier_profile_id = :id LIMIT 1",
+            [':id' => $profileId]
+        );
+        if (empty($row)) {
+            $this->error('supplier_profile_not_found', 404);
+        }
+
+        $this->success(['iqc_summary' => $row[0]]);
+    }
+
+    /**
+     * POST /suppliers/{id}/iqc/query — Paginated incoming inspection history.
+     *
+     * Reads from legacy incoming_inspections table (M035/M139) filtered to
+     * this supplier's vendor_id. The join uses sp.vendor_id::text = ii.vendor_id
+     * to bridge the UUID ↔ VARCHAR(50) type difference.
+     */
+    public function iqcHistory(): never
+    {
+        $user      = $this->requireAuth();
+        $this->requireAnyRole($user, $this->readRoles());
+        $profileId = $this->requirePathId();
+
+        $vendorId = $this->supplierVendorId($profileId);
+
+        $q      = $this->parseQueryBody();
+        $params = [':vid' => $vendorId, ':lim' => $q['limit'], ':off' => $q['offset']];
+
+        $conditions = ['ii.vendor_id = :vid'];
+        if (!empty($q['filters']['status'])) {
+            $conditions[] = "ii.status::text = :status";
+            $params[':status'] = $q['filters']['status'];
+        }
+        if (!empty($q['filters']['result'])) {
+            $conditions[] = "ii.result::text = :result";
+            $params[':result'] = $q['filters']['result'];
+        }
+        if (!empty($q['filters']['date_from'])) {
+            $conditions[] = "ii.received_date >= :date_from";
+            $params[':date_from'] = $q['filters']['date_from'];
+        }
+        if (!empty($q['filters']['date_to'])) {
+            $conditions[] = "ii.received_date <= :date_to";
+            $params[':date_to'] = $q['filters']['date_to'];
+        }
+        $where = implode(' AND ', $conditions);
+
+        $items = $this->data->query(
+            "SELECT ii.inspection_id, ii.inspection_number, ii.po_number,
+                    ii.lot_number, ii.received_date, ii.qty_received,
+                    ii.qty_accepted, ii.qty_rejected, ii.defects_found,
+                    ii.result::text AS result, ii.status::text AS status,
+                    ii.skip_lot_applied, ii.material_cert_received,
+                    ii.test_report_received, ii.notes, ii.created_at
+             FROM incoming_inspections ii
+             WHERE {$where}
+             ORDER BY ii.received_date DESC, ii.created_at DESC
+             LIMIT :lim OFFSET :off",
+            $params
+        ) ?? [];
+
+        $total = (int)($this->data->scalar(
+            "SELECT COUNT(*) FROM incoming_inspections ii WHERE {$where}",
+            array_diff_key($params, [':lim' => 0, ':off' => 0])
+        ) ?? 0);
+
+        $this->paginated('iqc_records', $items, $total, $q['offset'], $q['limit']);
+    }
+
     // ── Bulk Export ───────────────────────────────────────────────────────────
 
     /** POST /suppliers/export — Bulk export */

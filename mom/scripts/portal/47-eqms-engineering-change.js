@@ -118,6 +118,7 @@
     return fetch(url, {
       method: method,
       headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': window.csrfToken || '' },
+      credentials: 'include',
       body: method !== 'GET' ? JSON.stringify(payload || {}) : undefined,
       signal: controller.signal
     }).then(function(r) {
@@ -137,6 +138,7 @@
     return fetch(url, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': window.csrfToken || '' },
+      credentials: 'include',
       signal: controller.signal
     }).then(function(r) {
       clearTimeout(timer);

@@ -21,18 +21,18 @@
 
   /* ── API paths ────────────────────────────────────────────────────────── */
   var API = {
-    iqcQuery:       '/api/v1/mes/quality/iqc/query',
-    iqcDetail:      '/api/v1/mes/quality/iqc/',          // + {id}
-    iqcMetrics:     '/api/v1/mes/quality/iqc/metrics',
-    iqcAudit:       '/api/v1/mes/quality/iqc/',          // + {id}/audit
-    iqcSignatures:  '/api/v1/mes/quality/iqc/',          // + {id}/signatures
-    iqcExport:      '/api/v1/mes/quality/iqc/',           // + {id}/export
-    iqcAction:      '/api/v1/mes/quality/iqc/',           // + {id}/actions/{action}
-    ipQuery:        '/api/v1/mes/quality/inprocess/query',
-    ipDetail:       '/api/v1/mes/quality/inprocess/',     // + {id}
-    ipMetrics:      '/api/v1/mes/quality/inprocess/metrics',
-    ipExport:       '/api/v1/mes/quality/inprocess/',     // + {id}/export
-    ipAction:       '/api/v1/mes/quality/inprocess/'      // + {id}/actions/{action}
+    iqcQuery:       'api/v1/mes/quality/iqc/query',
+    iqcDetail:      'api/v1/mes/quality/iqc/',          // + {id}
+    iqcMetrics:     'api/v1/mes/quality/iqc/metrics',
+    iqcAudit:       'api/v1/mes/quality/iqc/',          // + {id}/audit
+    iqcSignatures:  'api/v1/mes/quality/iqc/',          // + {id}/signatures
+    iqcExport:      'api/v1/mes/quality/iqc/',           // + {id}/export
+    iqcAction:      'api/v1/mes/quality/iqc/',           // + {id}/actions/{action}
+    ipQuery:        'api/v1/mes/quality/inprocess/query',
+    ipDetail:       'api/v1/mes/quality/inprocess/',     // + {id}
+    ipMetrics:      'api/v1/mes/quality/inprocess/metrics',
+    ipExport:       'api/v1/mes/quality/inprocess/',     // + {id}/export
+    ipAction:       'api/v1/mes/quality/inprocess/'      // + {id}/actions/{action}
   };
 
   function restCall(url, payload, method, timeout) {
@@ -40,7 +40,7 @@
     timeout = timeout || 30000;
     var controller = new AbortController();
     var timer = setTimeout(function() { controller.abort(); }, timeout);
-    var opts = { method: method, headers: { 'Content-Type': 'application/json' }, signal: controller.signal };
+    var opts = { method: method, headers: { 'Content-Type': 'application/json' }, credentials: 'include', signal: controller.signal };
     if (window.csrfToken) opts.headers['X-CSRF-Token'] = window.csrfToken;
     if (method !== 'GET' && payload) opts.body = JSON.stringify(payload);
     return fetch(url, opts)

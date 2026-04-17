@@ -41,24 +41,26 @@ return static function (Router $router, string $dataDir): void {
     ]);
     
     // Exception Management
-    // @deprecated — Use EQMS Suite REST endpoints: /api/v1/eqms/ncr/*, /api/v1/eqms/capa/*
-    // Legacy routes kept for backward-compat; will be removed after data migration completes.
+    // @deprecated — Shimmed to LegacyQualityShimController → EQMS v4.0 data surface.
+    // Read ops return live data from eqms_ncr_records/eqms_capa_records + deprecated:true.
+    // Write ops return HTTP 410 Gone with new_endpoint pointer.
+    // Remove this block after all callers migrate to /api/v1/eqms/ncr/*, /api/v1/eqms/capa/*.
     $router->actions([
-        'exception_dashboard'       => [ExceptionController::class, 'dashboard'],
-        'exception_list'            => [ExceptionController::class, 'listAll'],
-        'exception_detail'          => [ExceptionController::class, 'detail'],
-        'exception_complaint_create'=> [ExceptionController::class, 'createComplaint'],
-        'exception_complaint_update'=> [ExceptionController::class, 'updateComplaint'],
-        'exception_mrb_create'      => [ExceptionController::class, 'createMrb'],
-        'exception_mrb_update'      => [ExceptionController::class, 'updateMrb'],
-        'exception_deviation_create'=> [ExceptionController::class, 'createDeviation'],
-        'exception_deviation_update'=> [ExceptionController::class, 'updateDeviation'],
-        'exception_concession_create' => [ExceptionController::class, 'createConcession'],
-        'exception_concession_update' => [ExceptionController::class, 'updateConcession'],
-        'exception_transition'      => [ExceptionController::class, 'transition'],
-        'exception_copq_summary'    => [ExceptionController::class, 'copqSummary'],
-        'exception_trends'          => [ExceptionController::class, 'trends'],
-        'exception_escalate'        => [ExceptionController::class, 'escalate'],
+        'exception_dashboard'         => [LegacyQualityShimController::class, 'exceptionDashboard'],
+        'exception_list'              => [LegacyQualityShimController::class, 'exceptionList'],
+        'exception_detail'            => [LegacyQualityShimController::class, 'exceptionDetail'],
+        'exception_complaint_create'  => [LegacyQualityShimController::class, 'exceptionComplaintCreate'],
+        'exception_complaint_update'  => [LegacyQualityShimController::class, 'exceptionComplaintUpdate'],
+        'exception_mrb_create'        => [LegacyQualityShimController::class, 'exceptionMrbCreate'],
+        'exception_mrb_update'        => [LegacyQualityShimController::class, 'exceptionMrbUpdate'],
+        'exception_deviation_create'  => [LegacyQualityShimController::class, 'exceptionDeviationCreate'],
+        'exception_deviation_update'  => [LegacyQualityShimController::class, 'exceptionDeviationUpdate'],
+        'exception_concession_create' => [LegacyQualityShimController::class, 'exceptionConcessionCreate'],
+        'exception_concession_update' => [LegacyQualityShimController::class, 'exceptionConcessionUpdate'],
+        'exception_transition'        => [LegacyQualityShimController::class, 'exceptionTransition'],
+        'exception_copq_summary'      => [LegacyQualityShimController::class, 'exceptionCopqSummary'],
+        'exception_trends'            => [LegacyQualityShimController::class, 'exceptionTrends'],
+        'exception_escalate'          => [LegacyQualityShimController::class, 'exceptionEscalate'],
     ]);
     
     // Finance control objects
@@ -84,26 +86,28 @@ return static function (Router $router, string $dataDir): void {
     ]);
     
     // Supplier Quality Management
-    // @deprecated — Use EQMS Suite REST endpoints: /api/v1/eqms/suppliers/*, /api/v1/eqms/supplier-audits/*
-    // Legacy routes kept for backward-compat; IQC workflow being migrated to EQMS Suppliers module.
+    // @deprecated — Shimmed to LegacyQualityShimController → EQMS v4.0 supplier surface.
+    // Read ops return live data from eqms_supplier_profiles/eqms_supplier_audits + deprecated:true.
+    // Write ops return HTTP 410 Gone with new_endpoint pointer.
+    // Remove this block after all callers migrate to /api/v1/eqms/suppliers/*, /api/v1/eqms/supplier-audits/*.
     $router->actions([
-        'supplier_dashboard'        => [SupplierController::class, 'dashboard'],
-        'supplier_scorecard_list'   => [SupplierController::class, 'listScorecards'],
-        'supplier_scorecard_detail' => [SupplierController::class, 'scorecardDetail'],
-        'supplier_scorecard_calc'   => [SupplierController::class, 'calculateScorecard'],
-        'supplier_incoming_list'    => [SupplierController::class, 'listIncoming'],
-        'supplier_incoming_create'  => [SupplierController::class, 'createIncoming'],
-        'supplier_incoming_update'  => [SupplierController::class, 'updateIncoming'],
-        'supplier_skip_lot_status'  => [SupplierController::class, 'skipLotStatus'],
-        'supplier_skip_lot_update'  => [SupplierController::class, 'updateSkipLot'],
-        'supplier_asl_list'         => [SupplierController::class, 'listAsl'],
-        'supplier_asl_upsert'       => [SupplierController::class, 'upsertAsl'],
-        'supplier_scar_list'        => [SupplierController::class, 'listScar'],
-        'supplier_scar_create'      => [SupplierController::class, 'createScar'],
-        'supplier_scar_update'      => [SupplierController::class, 'updateScar'],
-        'supplier_scar_transition'  => [SupplierController::class, 'scarTransition'],
-        'supplier_audit_list'       => [SupplierController::class, 'listAudits'],
-        'supplier_audit_upsert'     => [SupplierController::class, 'upsertAudit'],
+        'supplier_dashboard'        => [LegacyQualityShimController::class, 'supplierDashboard'],
+        'supplier_scorecard_list'   => [LegacyQualityShimController::class, 'supplierScorecardList'],
+        'supplier_scorecard_detail' => [LegacyQualityShimController::class, 'supplierScorecardDetail'],
+        'supplier_scorecard_calc'   => [LegacyQualityShimController::class, 'supplierScorecardCalc'],
+        'supplier_incoming_list'    => [LegacyQualityShimController::class, 'supplierIncomingList'],
+        'supplier_incoming_create'  => [LegacyQualityShimController::class, 'supplierIncomingCreate'],
+        'supplier_incoming_update'  => [LegacyQualityShimController::class, 'supplierIncomingUpdate'],
+        'supplier_skip_lot_status'  => [LegacyQualityShimController::class, 'supplierSkipLotStatus'],
+        'supplier_skip_lot_update'  => [LegacyQualityShimController::class, 'supplierSkipLotUpdate'],
+        'supplier_asl_list'         => [LegacyQualityShimController::class, 'supplierAslList'],
+        'supplier_asl_upsert'       => [LegacyQualityShimController::class, 'supplierAslUpsert'],
+        'supplier_scar_list'        => [LegacyQualityShimController::class, 'supplierScarList'],
+        'supplier_scar_create'      => [LegacyQualityShimController::class, 'supplierScarCreate'],
+        'supplier_scar_update'      => [LegacyQualityShimController::class, 'supplierScarUpdate'],
+        'supplier_scar_transition'  => [LegacyQualityShimController::class, 'supplierScarTransition'],
+        'supplier_audit_list'       => [LegacyQualityShimController::class, 'supplierAuditList'],
+        'supplier_audit_upsert'     => [LegacyQualityShimController::class, 'supplierAuditUpsert'],
     ]);
     
     // Quoting & Estimation
@@ -131,22 +135,24 @@ return static function (Router $router, string $dataDir): void {
     ]);
     
     // FMEA & Control Plan
-    // @deprecated — Use EQMS Suite REST endpoints: /api/v1/eqms/fmea/*, /api/v1/eqms/risks/*
-    // Legacy routes kept for backward-compat; control_plan schema migration to eqms_* pending.
+    // @deprecated — Shimmed to LegacyQualityShimController → EQMS v4.0 risks/fmea surface.
+    // Read ops return live data from fmea_records/failure_modes + deprecated:true.
+    // Write ops return HTTP 410 Gone with new_endpoint pointer.
+    // Remove this block after all callers migrate to /api/v1/eqms/risks/fmea/*.
     $router->actions([
-        'fmea_list'               => [FmeaController::class, 'listFmeas'],
-        'fmea_detail'             => [FmeaController::class, 'getFmeaDetail'],
-        'fmea_create'             => [FmeaController::class, 'createFmea'],
-        'fmea_update'             => [FmeaController::class, 'updateFmea'],
-        'fmea_add_failure_mode'   => [FmeaController::class, 'addFailureMode'],
-        'fmea_update_failure_mode'=> [FmeaController::class, 'updateFailureMode'],
-        'fmea_add_action'         => [FmeaController::class, 'addAction'],
-        'fmea_complete_action'    => [FmeaController::class, 'completeAction'],
-        'fmea_generate_cp'        => [FmeaController::class, 'generateControlPlan'],
-        'fmea_control_plans'      => [FmeaController::class, 'listControlPlans'],
-        'fmea_cp_detail'          => [FmeaController::class, 'getControlPlanDetail'],
-        'fmea_rpn_trend'          => [FmeaController::class, 'getRpnTrend'],
-        'fmea_link_ncr'           => [FmeaController::class, 'linkNcrToFmea'],
+        'fmea_list'               => [LegacyQualityShimController::class, 'fmeaList'],
+        'fmea_detail'             => [LegacyQualityShimController::class, 'fmeaDetail'],
+        'fmea_create'             => [LegacyQualityShimController::class, 'fmeaCreate'],
+        'fmea_update'             => [LegacyQualityShimController::class, 'fmeaUpdate'],
+        'fmea_add_failure_mode'   => [LegacyQualityShimController::class, 'fmeaAddFailureMode'],
+        'fmea_update_failure_mode'=> [LegacyQualityShimController::class, 'fmeaUpdateFailureMode'],
+        'fmea_add_action'         => [LegacyQualityShimController::class, 'fmeaAddAction'],
+        'fmea_complete_action'    => [LegacyQualityShimController::class, 'fmeaCompleteAction'],
+        'fmea_generate_cp'        => [LegacyQualityShimController::class, 'fmeaGenerateCp'],
+        'fmea_control_plans'      => [LegacyQualityShimController::class, 'fmeaControlPlans'],
+        'fmea_cp_detail'          => [LegacyQualityShimController::class, 'fmeaCpDetail'],
+        'fmea_rpn_trend'          => [LegacyQualityShimController::class, 'fmeaRpnTrend'],
+        'fmea_link_ncr'           => [LegacyQualityShimController::class, 'fmeaLinkNcr'],
     ]);
     
     // APQP / PPAP

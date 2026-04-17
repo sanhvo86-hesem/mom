@@ -2,7 +2,7 @@
     "_meta": {
         "domain": "unclassified",
         "table_count": 720,
-        "generated_at": "2026-04-17T01:32:11+00:00"
+        "generated_at": "2026-04-17T02:05:34+00:00"
     },
     "tables": {
         "ai_conversations": {
@@ -2538,7 +2538,8 @@
             "defined_in": "136_eqms_worldclass_surface.sql",
             "extended_in": [
                 "137_eqms_schema_drift_reconcile.sql",
-                "137_eqms_schema_drift_reconcile.sql"
+                "137_eqms_schema_drift_reconcile.sql",
+                "141_extend_eqms_documents_migrate_records.sql"
             ],
             "primary_key": "doc_id",
             "foreign_keys": [],
@@ -2971,7 +2972,9 @@
         },
         "eqms_supplier_profiles": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "142_eqms_supplier_iqc_aggregates.sql"
+            ],
             "primary_key": "supplier_profile_id",
             "foreign_keys": [],
             "contract": null

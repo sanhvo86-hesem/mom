@@ -109,7 +109,7 @@
     }
     var controller = new AbortController();
     var timer = setTimeout(function() { controller.abort(); }, timeout);
-    var opts = { method: 'GET', headers: { 'Content-Type': 'application/json' }, signal: controller.signal };
+    var opts = { method: 'GET', headers: { 'Content-Type': 'application/json' }, credentials: 'include', signal: controller.signal };
     if (window.csrfToken) opts.headers['X-CSRF-Token'] = window.csrfToken;
     return fetch(url, opts).then(function(r) {
       clearTimeout(timer);
@@ -970,7 +970,7 @@
 
   function handleExport(format) {
     if (!format) return;
-    var opts = { method: 'POST', headers: { 'Content-Type': 'application/json' } };
+    var opts = { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include' };
     if (window.csrfToken) opts.headers['X-CSRF-Token'] = window.csrfToken;
     opts.body = JSON.stringify({ format: format, filters: state.filters });
     fetch('api/v1/eqms/quality-tower/export', opts)

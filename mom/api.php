@@ -218,11 +218,12 @@ function ensure_dir(string $dir): void {
   }
 }
 
-function migrate_legacy_data_dir(string $legacyDir, string $targetDir): void {
+function migrate_legacy_data_dir(string $legacyDir, string $targetDir, bool $onlyWhenTargetUninitialized = false): void {
   $legacyNorm = rtrim(str_replace('\\', '/', $legacyDir), '/');
   $targetNorm = rtrim(str_replace('\\', '/', $targetDir), '/');
   if ($legacyNorm === $targetNorm) return;
   if (!is_dir($legacyDir)) return;
+  if ($onlyWhenTargetUninitialized && runtime_dir_has_bootstrap_files($targetDir)) return;
 
   ensure_dir($targetDir);
   $it = new RecursiveIteratorIterator(
@@ -15140,9 +15141,9 @@ if (defined('API_HELPERS_ONLY')) {
 
 // ---------- Boot ----------
 ensure_dir($DATA_DIR);
-migrate_legacy_data_dir($LEGACY_DATA_DIR, $DATA_DIR);
+migrate_legacy_data_dir($LEGACY_DATA_DIR, $DATA_DIR, true);
 if ($DATA_DIR === normalize_runtime_dir($LEGACY_DATA_DIR) && is_dir($LEGACY_COMPAT_DATA_DIR)) {
-  migrate_legacy_data_dir($LEGACY_COMPAT_DATA_DIR, $DATA_DIR);
+  migrate_legacy_data_dir($LEGACY_COMPAT_DATA_DIR, $DATA_DIR, true);
 }
 ensure_dir($CONF_DIR);
 ensure_dir($RL_DIR);

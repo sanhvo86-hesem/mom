@@ -9,6 +9,7 @@ let folderEditMode = false; // Toggle for file manager edit mode
 let docHeaderMetaCollapsed = true;
 const PENDING_AUTH_TTL_MS = 10 * 60 * 1000;
 let pendingAuthTimer = null;
+let loginSubmitInFlight = false;
 
 function syncCurrentUserRef(user){
   currentUser = user || null;
@@ -1652,6 +1653,14 @@ function setLoginStage(stage, msg='', pendingExpiresIn=null){
   }
 }
 
+function setLoginStageMessage(msg){
+  const stageMsg = document.getElementById('login-stage-msg');
+  if(stageMsg){
+    stageMsg.textContent = msg || '';
+    stageMsg.style.display = msg ? 'block' : 'none';
+  }
+}
+
 function toggleRecovery(show){
   const rec = document.getElementById('recovery-section');
   const toggle = document.getElementById('recovery-toggle');
@@ -1760,16 +1769,15 @@ async function onLoggedIn(res){
 }
 
 function setLoginChecking(isChecking, msg){
-  const user = document.getElementById('inp-user');
-  const pass = document.getElementById('inp-pin');
+  if(loginSubmitInFlight) return;
+  setLoginStageMessage(isChecking ? (msg || '') : '');
+}
+
+function setLoginSubmitting(isSubmitting, msg){
   const btn = document.getElementById('btn-login');
-  if(user) user.disabled = !!isChecking;
-  if(pass) pass.disabled = !!isChecking;
-  if(btn) btn.disabled = !!isChecking;
-  const stageMsg = document.getElementById('login-stage-msg');
-  if(stageMsg){
-    stageMsg.textContent = msg || '';
-    stageMsg.style.display = msg ? 'block' : 'none';
+  if(btn) btn.disabled = !!isSubmitting;
+  if(typeof msg === 'string'){
+    setLoginStageMessage(msg);
   }
 }
 
@@ -1920,15 +1928,32 @@ function getCatForDoc(doc){
 // - expire pending OTP/enroll sessions cleanly
 // - never render an "empty portal" when auth is incomplete
 async function doLogin(){
+  if(loginSubmitInFlight) return;
   const u = document.getElementById('inp-user').value.trim();
   const p = document.getElementById('inp-pin').value;
   const otp = (document.getElementById('inp-otp')?.value || '').trim();
   const recovery = (document.getElementById('inp-recovery')?.value || '').trim();
+  const startedStage = loginStage;
 
+  if(loginStage === 'password' && (!u || !p)){
+    showLoginError(lang==='en' ? 'Please enter username and password' : 'Vui lòng nhập tài khoản và mật khẩu');
+    return;
+  }
+  if(loginStage === 'enroll' && !otp){
+    showLoginError(lang==='en' ? 'Enter 6-digit code to confirm' : 'Nhập mã 6 số để xác nhận');
+    return;
+  }
+  if(loginStage === 'mfa' && !otp && !recovery){
+    showLoginError(lang==='en' ? 'Enter authenticator code or recovery code' : 'Nhập mã xác thực hoặc mã dự phòng');
+    return;
+  }
+
+  let keepStageMessage = false;
+  loginSubmitInFlight = true;
+  clearLoginError();
+  setLoginSubmitting(true, lang==='en' ? 'Signing in...' : 'Đang đăng nhập...');
   try{
     if(loginStage === 'password'){
-      if(!u || !p){ showLoginError(lang==='en' ? 'Please enter username and password' : 'Vui lòng nhập tài khoản và mật khẩu'); return; }
-
       const res = await apiCall('auth_login', {username:u, password:p});
       if(!res.ok){
         showLoginError(res.error || T('login_error'));
@@ -1942,15 +1967,19 @@ async function doLogin(){
         document.getElementById('enroll-secret').textContent = res.secret || '';
         document.getElementById('enroll-otpauth').textContent = res.otpauth_url || '';
         renderEnrollQR(res.otpauth_url || '');
+        keepStageMessage = true;
         showPendingAuthStage('enroll', lang==='en' ? 'Step 2: Enable 2FA and enter 6-digit code' : 'Bước 2: Bật 2FA và nhập mã 6 số', res.pending_expires_in);
         return;
       }
       if(res.mfa_required){
         _syncCsrf(res.csrf_token || csrfToken);
+        keepStageMessage = true;
         showPendingAuthStage('mfa', lang==='en' ? 'Enter 6-digit authenticator code' : 'Nhập mã xác thực 6 số từ Authenticator', res.pending_expires_in);
         return;
       }
       if(res.logged_in){
+        keepStageMessage = true;
+        setLoginStageMessage(lang==='en' ? 'Opening workspace...' : 'Đang mở hệ thống...');
         await onLoggedIn(res);
         return;
       }
@@ -1959,7 +1988,7 @@ async function doLogin(){
     }
 
     if(loginStage === 'enroll'){
-      if(!otp){ showLoginError(lang==='en' ? 'Enter 6-digit code to confirm' : 'Nhập mã 6 số để xác nhận'); return; }
+      setLoginStageMessage(lang==='en' ? 'Verifying authenticator...' : 'Đang xác minh Authenticator...');
       const res = await apiCall('auth_enroll_verify', {code: otp});
       if(!res.ok){
         if(res.error === 'unauthorized' || res.error === 'enroll_expired'){
@@ -1972,12 +2001,14 @@ async function doLogin(){
       if(res.recovery_codes && Array.isArray(res.recovery_codes)){
         showRecoveryCodes(res.recovery_codes);
       }
+      keepStageMessage = true;
+      setLoginStageMessage(lang==='en' ? 'Opening workspace...' : 'Đang mở hệ thống...');
       await onLoggedIn(res);
       return;
     }
 
     if(loginStage === 'mfa'){
-      if(!otp && !recovery){ showLoginError(lang==='en' ? 'Enter authenticator code or recovery code' : 'Nhập mã xác thực hoặc mã dự phòng'); return; }
+      setLoginStageMessage(lang==='en' ? 'Verifying code...' : 'Đang xác minh mã...');
       const res = await apiCall('auth_mfa_verify', {username:u, password:p, code: otp, recovery: recovery});
       if(!res.ok){
         if(res.error === 'mfa_expired' || res.error === 'unauthorized'){
@@ -1987,12 +2018,21 @@ async function doLogin(){
         }
         return;
       }
+      keepStageMessage = true;
+      setLoginStageMessage(lang==='en' ? 'Opening workspace...' : 'Đang mở hệ thống...');
       await onLoggedIn(res);
       return;
     }
   }catch(err){
     console.error(err);
     showLoginError(lang==='en' ? 'Cannot connect to server. Please try again.' : 'Không thể kết nối máy chủ. Vui lòng thử lại.');
+  }finally{
+    loginSubmitInFlight = false;
+    setLoginSubmitting(false, keepStageMessage ? null : '');
+    if(startedStage !== loginStage && (loginStage === 'mfa' || loginStage === 'enroll')){
+      const pass = document.getElementById('inp-pin');
+      if(pass) pass.disabled = true;
+    }
   }
 }
 
@@ -2019,18 +2059,21 @@ async function checkSession(){
   setLoginChecking(true, lang==='en' ? 'Checking session…' : 'Đang kiểm tra phiên đăng nhập…');
 
   let lastStatus = null;
-  const delays = [0, 350, 900, 1600];
+  const delays = [0, 500];
   for(let i=0;i<delays.length;i++){
     if(delays[i]) await new Promise(r=>setTimeout(r, delays[i]));
     try{
-      const s = await apiCall('status', null, 'GET', 8000);
+      const s = await apiCall('status', null, 'GET', 2500);
       lastStatus = s;
       if(s && s.logged_in){
         clearPendingAuthTimer();
         _syncCsrf(s.csrf_token || null);
         syncCurrentUserRef(s.user);
         setLoginChecking(false, '');
-        const geo = await requireGeolocation().catch(()=>({ok:false}));
+        await loadDataSettings().catch(()=>{});
+        const geo = DATA_SETTINGS.collect_gps
+          ? await requireGeolocation().catch(()=>({ok:false}))
+          : {ok:true, lat:null, lng:null, accuracy:null};
         startActivityTracking(geo);
         showApp();
         return;

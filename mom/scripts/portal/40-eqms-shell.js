@@ -181,10 +181,10 @@
   function apiCall(action, payload, method, timeout) {
     method = method || 'POST';
     timeout = timeout || 30000; // 30s default timeout
-    var url = 'api.php?action=' + encodeURIComponent(action);
+    var url = 'api/index.php?action=' + encodeURIComponent(action);
     var controller = new AbortController();
     var timer = setTimeout(function() { controller.abort(); }, timeout);
-    var opts = { method: method, headers: { 'Content-Type': 'application/json' }, signal: controller.signal };
+    var opts = { method: method, headers: { 'Content-Type': 'application/json' }, credentials: 'include', signal: controller.signal };
     if (window.csrfToken) opts.headers['X-CSRF-Token'] = window.csrfToken;
     if (method !== 'GET' && payload) opts.body = JSON.stringify(payload);
     if (method === 'GET' && payload) {
@@ -1131,8 +1131,8 @@
     config = config || {};
     method = method || 'POST';
     var timeout = config.timeout || 30000; // 30s default timeout
-    var url = 'api.php?action=' + encodeURIComponent(action);
-    var opts = { method: method, headers: { 'Content-Type': 'application/json' } };
+    var url = 'api/index.php?action=' + encodeURIComponent(action);
+    var opts = { method: method, headers: { 'Content-Type': 'application/json' }, credentials: 'include' };
     if (window.csrfToken) opts.headers['X-CSRF-Token'] = window.csrfToken;
     if (config.version) opts.headers['If-Match'] = '"' + config.version + '"';
     if (method !== 'GET' && payload) opts.body = JSON.stringify(payload);

@@ -344,6 +344,9 @@ return static function (Router $router, string $dataDir): void {
     $router->get ('/api/v1/eqms/suppliers/{id}/scars',                     EqmsSuppliersController::class, 'scars');
     $router->post('/api/v1/eqms/suppliers/{id}/actions/qualify',           EqmsSuppliersController::class, 'actionQualify');
     $router->post('/api/v1/eqms/suppliers/{id}/actions/disqualify',        EqmsSuppliersController::class, 'actionDisqualify');
+    // IQC sub-resource (Sprint 5B / M142) — reads incoming_inspections via supplier profile
+    $router->get ('/api/v1/eqms/suppliers/{id}/iqc',                       EqmsSuppliersController::class, 'iqcSummary');
+    $router->post('/api/v1/eqms/suppliers/{id}/iqc/query',                 EqmsSuppliersController::class, 'iqcHistory');
     $router->post('/api/v1/eqms/suppliers/export',                         EqmsSuppliersController::class, 'exportBulk');
 
     // ═══════════════════════════════════════════════════════════════════════════
