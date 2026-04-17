@@ -226,10 +226,10 @@ WHERE NOT EXISTS (
 UPDATE eqms_ncr_records enr
 SET linked_capa_id = ecr.capa_id
 FROM eqms_capa_records ecr
-JOIN ncr_records leg_ncr ON leg_ncr.ncr_id = enr.ncr_id
 JOIN capa_records leg_capa ON leg_capa.capa_id = ecr.capa_id
-    AND leg_capa.source_ncr_id = leg_ncr.ncr_number
-WHERE enr.linked_capa_id IS NULL;
+JOIN ncr_records leg_ncr ON leg_ncr.ncr_number = leg_capa.source_ncr_id
+WHERE enr.linked_capa_id IS NULL
+  AND leg_ncr.ncr_id = enr.ncr_id;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- PART 4: Migration audit log
