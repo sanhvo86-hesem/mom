@@ -188,47 +188,92 @@ COMMENT ON TABLE eqms_warranty_claims
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- AML approval type
-INSERT INTO mdm_reference_codes (code_set, display_name, is_active, sort_order)
-VALUES ('eqms.aml_approval_type', 'AML Approval Type', TRUE, 130)
-ON CONFLICT (code_set) DO NOTHING;
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.aml_approval_type',
+    'AML Approval Type',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 130, 'seed_migration', '146_eqms_sprint6b_aml_warranty')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
 
-INSERT INTO mdm_reference_code_values (code_set, code_value, display_label, sort_order)
-VALUES
-    ('eqms.aml_approval_type', 'full',          'Full Approval',           10),
-    ('eqms.aml_approval_type', 'conditional',   'Conditional Approval',    20),
-    ('eqms.aml_approval_type', 'developmental', 'Developmental',           30),
-    ('eqms.aml_approval_type', 'prototype',     'Prototype Only',          40)
-ON CONFLICT DO NOTHING;
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.aml_approval_type', 'full',          'Full Approval', 10),
+        ('eqms.aml_approval_type', 'conditional',   'Conditional Approval', 20),
+        ('eqms.aml_approval_type', 'developmental', 'Developmental', 30),
+        ('eqms.aml_approval_type', 'prototype',     'Prototype Only', 40)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '146_eqms_sprint6b_aml_warranty')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
 
 -- Warranty claim type
-INSERT INTO mdm_reference_codes (code_set, display_name, is_active, sort_order)
-VALUES ('eqms.warranty_claim_type', 'Warranty Claim Type', TRUE, 140)
-ON CONFLICT (code_set) DO NOTHING;
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.warranty_claim_type',
+    'Warranty Claim Type',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 140, 'seed_migration', '146_eqms_sprint6b_aml_warranty')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
 
-INSERT INTO mdm_reference_code_values (code_set, code_value, display_label, sort_order)
-VALUES
-    ('eqms.warranty_claim_type', 'warranty',        'Warranty Claim',          10),
-    ('eqms.warranty_claim_type', 'goodwill',        'Goodwill Adjustment',     20),
-    ('eqms.warranty_claim_type', 'field_return',    'Field Return',            30),
-    ('eqms.warranty_claim_type', 'recall',          'Product Recall',          40),
-    ('eqms.warranty_claim_type', 'debit_note',      'Debit Note',              50)
-ON CONFLICT DO NOTHING;
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.warranty_claim_type', 'warranty',     'Warranty Claim', 10),
+        ('eqms.warranty_claim_type', 'goodwill',     'Goodwill Adjustment', 20),
+        ('eqms.warranty_claim_type', 'field_return', 'Field Return', 30),
+        ('eqms.warranty_claim_type', 'recall',       'Product Recall', 40),
+        ('eqms.warranty_claim_type', 'debit_note',   'Debit Note', 50)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '146_eqms_sprint6b_aml_warranty')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
 
 -- Warranty failure mode categories
-INSERT INTO mdm_reference_codes (code_set, display_name, is_active, sort_order)
-VALUES ('eqms.warranty_failure_mode', 'Warranty Failure Mode', TRUE, 141)
-ON CONFLICT (code_set) DO NOTHING;
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.warranty_failure_mode',
+    'Warranty Failure Mode',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 141, 'seed_migration', '146_eqms_sprint6b_aml_warranty')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
 
-INSERT INTO mdm_reference_code_values (code_set, code_value, display_label, sort_order)
-VALUES
-    ('eqms.warranty_failure_mode', 'dimensional',      'Dimensional / Fit',       10),
-    ('eqms.warranty_failure_mode', 'material',         'Material / Chemistry',    20),
-    ('eqms.warranty_failure_mode', 'surface',          'Surface / Appearance',    30),
-    ('eqms.warranty_failure_mode', 'functional',       'Functional Failure',      40),
-    ('eqms.warranty_failure_mode', 'assembly',         'Assembly Error',          50),
-    ('eqms.warranty_failure_mode', 'packaging',        'Packaging / Labeling',    60),
-    ('eqms.warranty_failure_mode', 'unknown',          'Unknown',                 99)
-ON CONFLICT DO NOTHING;
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.warranty_failure_mode', 'dimensional', 'Dimensional / Fit', 10),
+        ('eqms.warranty_failure_mode', 'material',    'Material / Chemistry', 20),
+        ('eqms.warranty_failure_mode', 'surface',     'Surface / Appearance', 30),
+        ('eqms.warranty_failure_mode', 'functional',  'Functional Failure', 40),
+        ('eqms.warranty_failure_mode', 'assembly',    'Assembly Error', 50),
+        ('eqms.warranty_failure_mode', 'packaging',   'Packaging / Labeling', 60),
+        ('eqms.warranty_failure_mode', 'unknown',     'Unknown', 99)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '146_eqms_sprint6b_aml_warranty')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
 
 DO $$
 BEGIN

@@ -228,47 +228,92 @@ COMMENT ON TABLE eqms_sampling_plans
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- Lesson learned types
-INSERT INTO mdm_reference_codes (code_set, display_name, is_active, sort_order)
-VALUES ('eqms.lesson_type', 'Lesson Learned Type', TRUE, 150)
-ON CONFLICT (code_set) DO NOTHING;
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.lesson_type',
+    'Lesson Learned Type',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 150, 'seed_migration', '147_eqms_sprint6c_lessons_csat_sampling')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
 
-INSERT INTO mdm_reference_code_values (code_set, code_value, display_label, sort_order)
-VALUES
-    ('eqms.lesson_type', 'corrective',    'Corrective (What went wrong)',  10),
-    ('eqms.lesson_type', 'preventive',    'Preventive (Potential risk)',   20),
-    ('eqms.lesson_type', 'best_practice', 'Best Practice (What worked)',   30),
-    ('eqms.lesson_type', 'process_change','Process Change',                40),
-    ('eqms.lesson_type', 'design_change', 'Design/Engineering Change',     50),
-    ('eqms.lesson_type', 'audit_finding', 'Audit Finding',                 60)
-ON CONFLICT DO NOTHING;
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.lesson_type', 'corrective',     'Corrective (What went wrong)', 10),
+        ('eqms.lesson_type', 'preventive',     'Preventive (Potential risk)', 20),
+        ('eqms.lesson_type', 'best_practice',  'Best Practice (What worked)', 30),
+        ('eqms.lesson_type', 'process_change', 'Process Change', 40),
+        ('eqms.lesson_type', 'design_change',  'Design/Engineering Change', 50),
+        ('eqms.lesson_type', 'audit_finding',  'Audit Finding', 60)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '147_eqms_sprint6c_lessons_csat_sampling')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
 
 -- CSAT survey type
-INSERT INTO mdm_reference_codes (code_set, display_name, is_active, sort_order)
-VALUES ('eqms.csat_survey_type', 'CSAT Survey Type', TRUE, 160)
-ON CONFLICT (code_set) DO NOTHING;
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.csat_survey_type',
+    'CSAT Survey Type',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 160, 'seed_migration', '147_eqms_sprint6c_lessons_csat_sampling')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
 
-INSERT INTO mdm_reference_code_values (code_set, code_value, display_label, sort_order)
-VALUES
-    ('eqms.csat_survey_type', 'periodic',          'Periodic (Annual/Quarterly)',  10),
-    ('eqms.csat_survey_type', 'post_delivery',     'Post-Delivery',                20),
-    ('eqms.csat_survey_type', 'post_complaint',    'Post-Complaint Resolution',    30),
-    ('eqms.csat_survey_type', 'project_closeout',  'Project Closeout',             40),
-    ('eqms.csat_survey_type', 'ad_hoc',            'Ad Hoc',                       99)
-ON CONFLICT DO NOTHING;
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.csat_survey_type', 'periodic',         'Periodic (Annual/Quarterly)', 10),
+        ('eqms.csat_survey_type', 'post_delivery',    'Post-Delivery', 20),
+        ('eqms.csat_survey_type', 'post_complaint',   'Post-Complaint Resolution', 30),
+        ('eqms.csat_survey_type', 'project_closeout', 'Project Closeout', 40),
+        ('eqms.csat_survey_type', 'ad_hoc',           'Ad Hoc', 99)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '147_eqms_sprint6c_lessons_csat_sampling')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
 
 -- Sampling plan types
-INSERT INTO mdm_reference_codes (code_set, display_name, is_active, sort_order)
-VALUES ('eqms.sampling_plan_type', 'Sampling Plan Type', TRUE, 170)
-ON CONFLICT (code_set) DO NOTHING;
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.sampling_plan_type',
+    'Sampling Plan Type',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 170, 'seed_migration', '147_eqms_sprint6c_lessons_csat_sampling')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
 
-INSERT INTO mdm_reference_code_values (code_set, code_value, display_label, sort_order)
-VALUES
-    ('eqms.sampling_plan_type', 'incoming',     'Incoming (IQC)',           10),
-    ('eqms.sampling_plan_type', 'in_process',   'In-Process',               20),
-    ('eqms.sampling_plan_type', 'final',        'Final Inspection',         30),
-    ('eqms.sampling_plan_type', 'outgoing',     'Outgoing / Pre-ship',      40),
-    ('eqms.sampling_plan_type', 'skip_lot',     'Skip-Lot',                 50)
-ON CONFLICT DO NOTHING;
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.sampling_plan_type', 'incoming',   'Incoming (IQC)', 10),
+        ('eqms.sampling_plan_type', 'in_process', 'In-Process', 20),
+        ('eqms.sampling_plan_type', 'final',      'Final Inspection', 30),
+        ('eqms.sampling_plan_type', 'outgoing',   'Outgoing / Pre-ship', 40),
+        ('eqms.sampling_plan_type', 'skip_lot',   'Skip-Lot', 50)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '147_eqms_sprint6c_lessons_csat_sampling')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
 
 DO $$
 BEGIN

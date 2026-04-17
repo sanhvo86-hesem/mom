@@ -310,78 +310,153 @@ COMMENT ON TABLE eqms_special_characteristics
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- Concession types
-INSERT INTO mdm_reference_codes (code_set, display_name, is_active, sort_order)
-VALUES ('eqms.concession_type', 'Concession Type', TRUE, 100)
-ON CONFLICT (code_set) DO NOTHING;
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.concession_type',
+    'Concession Type',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 100, 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
 
-INSERT INTO mdm_reference_code_values (code_set, code_value, display_label, sort_order)
-VALUES
-    ('eqms.concession_type', 'material',        'Material Concession',     10),
-    ('eqms.concession_type', 'process',         'Process Deviation',       20),
-    ('eqms.concession_type', 'design',          'Design Deviation',        30),
-    ('eqms.concession_type', 'documentation',   'Documentation Waiver',    40),
-    ('eqms.concession_type', 'other',           'Other',                   99)
-ON CONFLICT DO NOTHING;
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.concession_type', 'material',      'Material Concession', 10),
+        ('eqms.concession_type', 'process',       'Process Deviation', 20),
+        ('eqms.concession_type', 'design',        'Design Deviation', 30),
+        ('eqms.concession_type', 'documentation', 'Documentation Waiver', 40),
+        ('eqms.concession_type', 'other',         'Other', 99)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
 
 -- Concession disposition
-INSERT INTO mdm_reference_codes (code_set, display_name, is_active, sort_order)
-VALUES ('eqms.concession_disposition', 'Concession Disposition', TRUE, 101)
-ON CONFLICT (code_set) DO NOTHING;
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.concession_disposition',
+    'Concession Disposition',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 101, 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
 
-INSERT INTO mdm_reference_code_values (code_set, code_value, display_label, sort_order)
-VALUES
-    ('eqms.concession_disposition', 'use_as_is',     'Use As-Is',           10),
-    ('eqms.concession_disposition', 'rework',         'Rework',              20),
-    ('eqms.concession_disposition', 'repair',         'Repair',              30),
-    ('eqms.concession_disposition', 'sort',           'Sort/Screen',         40),
-    ('eqms.concession_disposition', 'scrap',          'Scrap',               50),
-    ('eqms.concession_disposition', 'return_to_vendor','Return to Vendor',   60),
-    ('eqms.concession_disposition', 're_grade',       'Re-grade/Re-classify',70),
-    ('eqms.concession_disposition', 'pending',        'Pending Disposition', 80)
-ON CONFLICT DO NOTHING;
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.concession_disposition', 'use_as_is',        'Use As-Is', 10),
+        ('eqms.concession_disposition', 'rework',           'Rework', 20),
+        ('eqms.concession_disposition', 'repair',           'Repair', 30),
+        ('eqms.concession_disposition', 'sort',             'Sort/Screen', 40),
+        ('eqms.concession_disposition', 'scrap',            'Scrap', 50),
+        ('eqms.concession_disposition', 'return_to_vendor', 'Return to Vendor', 60),
+        ('eqms.concession_disposition', 're_grade',         'Re-grade/Re-classify', 70),
+        ('eqms.concession_disposition', 'pending',          'Pending Disposition', 80)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
 
 -- FAI type
-INSERT INTO mdm_reference_codes (code_set, display_name, is_active, sort_order)
-VALUES ('eqms.fai_type', 'FAI Type', TRUE, 110)
-ON CONFLICT (code_set) DO NOTHING;
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.fai_type',
+    'FAI Type',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 110, 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
 
-INSERT INTO mdm_reference_code_values (code_set, code_value, display_label, sort_order)
-VALUES
-    ('eqms.fai_type', 'full',          'Full FAI',               10),
-    ('eqms.fai_type', 'partial',       'Partial FAI',            20),
-    ('eqms.fai_type', 're_fai',        'Re-FAI',                 30),
-    ('eqms.fai_type', 'delta_fai',     'Delta FAI',              40),
-    ('eqms.fai_type', 'design_change', 'Design Change FAI',      50),
-    ('eqms.fai_type', 'supplier_change','Supplier Change FAI',   60)
-ON CONFLICT DO NOTHING;
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.fai_type', 'full',            'Full FAI', 10),
+        ('eqms.fai_type', 'partial',         'Partial FAI', 20),
+        ('eqms.fai_type', 're_fai',          'Re-FAI', 30),
+        ('eqms.fai_type', 'delta_fai',       'Delta FAI', 40),
+        ('eqms.fai_type', 'design_change',   'Design Change FAI', 50),
+        ('eqms.fai_type', 'supplier_change', 'Supplier Change FAI', 60)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
 
 -- FAI overall result
-INSERT INTO mdm_reference_codes (code_set, display_name, is_active, sort_order)
-VALUES ('eqms.fai_result', 'FAI Result', TRUE, 111)
-ON CONFLICT (code_set) DO NOTHING;
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.fai_result',
+    'FAI Result',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 111, 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
 
-INSERT INTO mdm_reference_code_values (code_set, code_value, display_label, sort_order)
-VALUES
-    ('eqms.fai_result', 'pass',                'Pass',                          10),
-    ('eqms.fai_result', 'fail',                'Fail',                          20),
-    ('eqms.fai_result', 'conditional_approval','Conditional Approval',          30),
-    ('eqms.fai_result', 'pending',             'Pending',                       40)
-ON CONFLICT DO NOTHING;
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.fai_result', 'pass',                 'Pass', 10),
+        ('eqms.fai_result', 'fail',                 'Fail', 20),
+        ('eqms.fai_result', 'conditional_approval', 'Conditional Approval', 30),
+        ('eqms.fai_result', 'pending',              'Pending', 40)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
 
 -- Special characteristic type
-INSERT INTO mdm_reference_codes (code_set, display_name, is_active, sort_order)
-VALUES ('eqms.sc_type', 'Special Characteristic Type', TRUE, 120)
-ON CONFLICT (code_set) DO NOTHING;
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.sc_type',
+    'Special Characteristic Type',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 120, 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
 
-INSERT INTO mdm_reference_code_values (code_set, code_value, display_label, sort_order)
-VALUES
-    ('eqms.sc_type', 'KPC',  'Key Product Characteristic (KPC)', 10),
-    ('eqms.sc_type', 'KCC',  'Key Control Characteristic (KCC)', 20),
-    ('eqms.sc_type', 'SC',   'Special Characteristic (SC)',       30),
-    ('eqms.sc_type', 'CC',   'Critical Characteristic (CC)',      40),
-    ('eqms.sc_type', 'SL',   'Safety/Legal (SL)',                 50),
-    ('eqms.sc_type', 'other','Other',                             99)
-ON CONFLICT DO NOTHING;
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.sc_type', 'KPC',   'Key Product Characteristic (KPC)', 10),
+        ('eqms.sc_type', 'KCC',   'Key Control Characteristic (KCC)', 20),
+        ('eqms.sc_type', 'SC',    'Special Characteristic (SC)', 30),
+        ('eqms.sc_type', 'CC',    'Critical Characteristic (CC)', 40),
+        ('eqms.sc_type', 'SL',    'Safety/Legal (SL)', 50),
+        ('eqms.sc_type', 'other', 'Other', 99)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- Audit log
