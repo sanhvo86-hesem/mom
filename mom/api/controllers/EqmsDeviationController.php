@@ -1066,4 +1066,91 @@ final class EqmsDeviationController extends EqmsBaseController
 
         $this->success(['deviation' => $this->fetchDeviation($id)]);
     }
+
+    // ── Cross-module Actions ──────────────────────────────────────────────────
+
+    /**
+     * POST /eqms/deviations/{id}/actions/escalate-risk
+     * Escalate a high-severity deviation to the Risk Register.
+     * Body optional: { risk_title, probability, impact, assigned_to }
+     */
+    public function actionEscalateRisk(): never
+    {
+        $user   = $this->requireAuth();
+        $this->requireAnyRole($user, $this->writeRoles());
+
+        $id     = $this->requirePathId('id', 'deviation_id');
+        $record = $this->fetchDeviation($id);
+
+        if (in_array($record['status'], ['closed', 'voided'], true)) {
+            $this->error('record_terminal', 409,
+                "Cannot escalate a closed or voided deviation to risk.");
+        }
+
+        // Check if already escalated
+        $existing = $this->data->scalar(
+            "SELECT risk_id FROM eqms_risk_register
+             WHERE source_type = 'deviation' AND source_id = :id LIMIT 1",
+            [':id' => $id]
+        );
+        if ($existing) {
+            $this->error('risk_already_escalated', 409,
+                "Deviation already escalated to Risk Register (risk_id: {$existing}).");
+        }
+
+        $body       = $this->jsonBody();
+        $actor      = (string)($user['username'] ?? $user['user'] ?? 'unknown');
+        $riskId     = $this->newUuid();
+        $riskNumber = 'RISK-' . strtoupper(substr($riskId, 0, 8));
+        $now        = $this->nowIso();
+        $title      = !empty($body['risk_title'])
+                      ? trim((string)$body['risk_title'])
+                      : 'Risk escalated from Deviation ' . ($record['deviation_number'] ?? $id);
+
+        $this->data->execute(
+            "INSERT INTO eqms_risk_register
+             (risk_id, risk_number, title, description, risk_category, source_type, source_id,
+              probability, impact, risk_score, assigned_to,
+              status, version, created_at, created_by)
+             VALUES
+             (:id, :num, :title, :desc, 'process', 'deviation', :src_id,
+              :prob, :impact,
+              (:prob::int * :impact2::int),
+              :assigned,
+              'identified', 1, :now, :by)",
+            [
+                ':id'       => $riskId,
+                ':num'      => $riskNumber,
+                ':title'    => $title,
+                ':desc'     => (string)($record['description'] ?? ''),
+                ':src_id'   => $id,
+                ':prob'     => (int)($body['probability'] ?? 3),
+                ':impact'   => (int)($body['impact'] ?? 3),
+                ':impact2'  => (int)($body['impact'] ?? 3),
+                ':assigned' => $body['assigned_to'] ?? null,
+                ':now'      => $now,
+                ':by'       => $actor,
+            ]
+        );
+
+        $this->data->execute(
+            "INSERT INTO eqms_record_links
+             (link_id, source_type, source_id, target_type, target_id, relationship_type, linked_by, linked_at)
+             VALUES (:lid, 'deviation', :dev_id, 'risk', :risk_id, 'escalated_risk', :by, now())
+             ON CONFLICT (source_type, source_id, target_type, target_id) DO NOTHING",
+            [':lid' => $this->newUuid(), ':dev_id' => $id, ':risk_id' => $riskId, ':by' => $actor]
+        );
+
+        $this->emitQualityEvent('eqms.deviation.risk_escalated', 'deviation', $id, [
+            'risk_id'     => $riskId,
+            'risk_number' => $riskNumber,
+        ], $user);
+
+        $risk = $this->data->query(
+            "SELECT risk_id, risk_number, title, status, risk_score FROM eqms_risk_register WHERE risk_id = :id",
+            [':id' => $riskId]
+        )[0] ?? [];
+
+        $this->success(['deviation' => $this->fetchDeviation($id), 'created_risk' => $risk], 201);
+    }
 }

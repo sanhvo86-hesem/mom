@@ -1600,3 +1600,377 @@
 [data-color-mode="dark"] .eqms-linked-item:hover { background: var(--hm-bg-secondary, #1e293b); }
 [data-color-mode="dark"] .eqms-search-results { background: var(--hm-bg-primary, #0f172a); border-color: var(--hm-border, #334155); }
 [data-color-mode="dark"] .eqms-error-diagnostic { background: var(--hm-bg-secondary, #1e293b); }
+
+/* ============================================================================
+   SPRINT 7D — MOBILE RESPONSIVE (3 breakpoints + hamburger navigation)
+   Breakpoints:
+     ≤1280px  Tablet landscape / small laptop
+     ≤768px   Tablet portrait / large phone (slide-out nav — already scaffolded)
+     ≤480px   Mobile phone portrait — bottom nav, single column, touch targets
+   ============================================================================ */
+
+/* --------------------------------------------------------------------------
+   34. MOBILE TOKENS
+   -------------------------------------------------------------------------- */
+:root {
+  --eqms-mobile-bottom-nav-h: 56px;
+  --eqms-touch-target: 44px;       /* WCAG 2.5.5 minimum */
+  --eqms-mobile-header-h: 52px;
+}
+
+/* --------------------------------------------------------------------------
+   35. HAMBURGER BUTTON (visible ≤1024px, used to open slide-out nav)
+   -------------------------------------------------------------------------- */
+.eqms-hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--eqms-touch-target);
+  height: var(--eqms-touch-target);
+  border: none;
+  background: transparent;
+  border-radius: var(--eqms-radius-md);
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background var(--eqms-transition-fast);
+}
+.eqms-hamburger:hover  { background: var(--hm-bg-hover, #f1f5f9); }
+.eqms-hamburger:active { background: var(--hm-bg-active, #e2e8f0); }
+.eqms-hamburger-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  pointer-events: none;
+}
+.eqms-hamburger-bar {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: var(--hm-text-primary, #1e293b);
+  border-radius: 2px;
+  transition: transform var(--eqms-transition), opacity var(--eqms-transition);
+}
+/* Animated X state */
+.eqms-nav.open ~ * .eqms-hamburger .eqms-hamburger-bar:nth-child(1),
+.eqms-hamburger.open .eqms-hamburger-bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.eqms-nav.open ~ * .eqms-hamburger .eqms-hamburger-bar:nth-child(2),
+.eqms-hamburger.open .eqms-hamburger-bar:nth-child(2) { opacity: 0; }
+.eqms-nav.open ~ * .eqms-hamburger .eqms-hamburger-bar:nth-child(3),
+.eqms-hamburger.open .eqms-hamburger-bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* --------------------------------------------------------------------------
+   36. BREAKPOINT ≤1280px — Tablet landscape / small laptop
+   -------------------------------------------------------------------------- */
+@media (max-width: 1280px) {
+  /* Narrower nav, hide text labels on nav items */
+  .eqms-nav { width: 200px; min-width: 200px; }
+
+  /* KPI row: allow 3 per row instead of all inline */
+  .eqms-kpi-row { grid-template-columns: repeat(3, 1fr); }
+
+  /* Detail layout: sidebar shrinks */
+  .eqms-detail-body { grid-template-columns: 1fr 280px; }
+
+  /* Module cards: 3 per row */
+  .eqms-module-cards { grid-template-columns: repeat(3, 1fr); }
+
+  /* Filter bar: wrap on overflow */
+  .eqms-filter-bar { flex-wrap: wrap; gap: var(--eqms-gap-sm); }
+
+  /* Wizard 4+ steps: allow wrapping */
+  .eqms-wizard-steps { flex-wrap: wrap; gap: 4px; }
+}
+
+/* --------------------------------------------------------------------------
+   37. BREAKPOINT ≤768px — Tablet portrait / large phone
+   Slide-out nav is already scaffolded in section 25. This section
+   enhances it with: mobile header bar, touch targets, column collapse.
+   -------------------------------------------------------------------------- */
+@media (max-width: 768px) {
+  /* Show hamburger button */
+  .eqms-hamburger { display: flex; }
+
+  /* Mobile header strip: hamburger + title + actions */
+  .eqms-mobile-header {
+    display: flex;
+    align-items: center;
+    gap: var(--eqms-gap-sm);
+    height: var(--eqms-mobile-header-h);
+    padding: 0 var(--eqms-gap-md);
+    background: var(--hm-bg-surface, #fff);
+    border-bottom: 1px solid var(--hm-border, #e2e8f0);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .eqms-mobile-header-title {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--hm-text-primary, #1e293b);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Content fills full width since nav slides over it */
+  .eqms-content { padding: var(--eqms-gap-md); }
+
+  /* Detail view: single column (sidebar stacks below) */
+  .eqms-detail-body { grid-template-columns: 1fr; gap: var(--eqms-gap-md); }
+  .eqms-detail-sidebar { border-left: none; border-top: 1px solid var(--hm-border, #e2e8f0); padding-top: var(--eqms-gap-md); }
+
+  /* KPI row: 2 per row */
+  .eqms-kpi-row { grid-template-columns: repeat(2, 1fr); }
+
+  /* Module cards: 2 per row */
+  .eqms-module-cards { grid-template-columns: repeat(2, 1fr); }
+
+  /* Filter bar collapses to column */
+  .eqms-filter-bar { flex-direction: column; align-items: stretch; }
+  .eqms-filter-bar .eqms-input,
+  .eqms-filter-bar select { width: 100%; }
+
+  /* Buttons: minimum touch target */
+  .eqms-btn {
+    min-height: var(--eqms-touch-target);
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+  .eqms-btn.sm { min-height: 36px; }
+
+  /* Data grid: horizontal scroll on small containers */
+  .eqms-grid-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .eqms-grid { min-width: 640px; }
+
+  /* Identity header: stack vertically */
+  .eqms-identity-header { flex-direction: column; align-items: flex-start; gap: var(--eqms-gap-sm); }
+  .eqms-identity-meta { flex-wrap: wrap; }
+
+  /* Wizard steps: compact pill form */
+  .eqms-wizard-steps { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; padding-bottom: 4px; }
+  .eqms-wizard-steps::-webkit-scrollbar { display: none; }
+  .eqms-wizard-step-label { display: none; }  /* hide text, show number only */
+  .eqms-wizard-step-num  { width: 28px; height: 28px; font-size: 12px; }
+
+  /* Tab strip: horizontal scroll */
+  .eqms-tabs { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
+  .eqms-tabs::-webkit-scrollbar { display: none; }
+  .eqms-tab { white-space: nowrap; flex-shrink: 0; min-height: 40px; }
+
+  /* Pagination: compact */
+  .eqms-pagination { flex-wrap: wrap; justify-content: center; }
+
+  /* Section headers: allow wrap */
+  .eqms-section-header { flex-wrap: wrap; gap: var(--eqms-gap-sm); }
+
+  /* Toolbar: stacks if needed */
+  .eqms-module-toolbar { flex-wrap: wrap; gap: var(--eqms-gap-sm); }
+  .eqms-module-toolbar-left,
+  .eqms-module-toolbar-right { flex-wrap: wrap; gap: 6px; }
+}
+
+/* --------------------------------------------------------------------------
+   38. BREAKPOINT ≤480px — Mobile phone portrait
+   Bottom navigation replaces slide-out for thumb-friendly use.
+   -------------------------------------------------------------------------- */
+@media (max-width: 480px) {
+  /* Hide slide-out nav entirely; use bottom nav instead */
+  .eqms-nav { display: none !important; }
+  .eqms-nav-backdrop { display: none !important; }
+  .eqms-hamburger { display: none !important; }
+
+  /* Reserve space for fixed bottom nav */
+  .eqms-content {
+    padding-bottom: calc(var(--eqms-mobile-bottom-nav-h) + var(--eqms-gap-md));
+  }
+
+  /* Bottom navigation bar */
+  .eqms-bottom-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: var(--eqms-mobile-bottom-nav-h);
+    background: var(--hm-bg-surface, #fff);
+    border-top: 1px solid var(--hm-border, #e2e8f0);
+    z-index: 300;
+    box-shadow: 0 -2px 12px rgba(0,0,0,.06);
+  }
+  .eqms-bottom-nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    cursor: pointer;
+    padding: 6px 4px;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    transition: background var(--eqms-transition-fast);
+  }
+  .eqms-bottom-nav-item:active { background: var(--hm-bg-hover, #f1f5f9); }
+  .eqms-bottom-nav-item.active .eqms-bottom-nav-icon { color: var(--hm-accent-primary, #3b82f6); }
+  .eqms-bottom-nav-item.active .eqms-bottom-nav-label { color: var(--hm-accent-primary, #3b82f6); font-weight: 600; }
+  .eqms-bottom-nav-icon  { font-size: 20px; color: var(--hm-text-tertiary, #94a3b8); }
+  .eqms-bottom-nav-label { font-size: 10px; color: var(--hm-text-tertiary, #94a3b8); }
+  .eqms-bottom-nav-badge {
+    position: absolute;
+    top: 4px;
+    right: calc(50% - 18px);
+    background: var(--eqms-critical, #dc2626);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 700;
+    border-radius: 10px;
+    padding: 1px 4px;
+    min-width: 14px;
+    text-align: center;
+  }
+
+  /* Full-width single column for everything */
+  .eqms-kpi-row { grid-template-columns: 1fr 1fr; gap: var(--eqms-gap-sm); }
+  .eqms-kpi-card { padding: var(--eqms-gap-md); }
+  .eqms-kpi-value { font-size: 20px; }
+  .eqms-module-cards { grid-template-columns: 1fr; }
+  .eqms-field-grid { grid-template-columns: 1fr; }
+  .eqms-wizard-nav { flex-direction: column; gap: var(--eqms-gap-sm); }
+  .eqms-wizard-nav .eqms-btn { width: 100%; }
+
+  /* Larger touch targets on action buttons */
+  .eqms-btn { min-height: var(--eqms-touch-target); font-size: 14px; }
+  .eqms-btn.sm { min-height: 40px; }
+
+  /* Detail actions: wrap & fill width */
+  .eqms-detail-actions { display: flex; flex-wrap: wrap; gap: var(--eqms-gap-sm); }
+  .eqms-detail-actions .eqms-btn { flex: 1; min-width: 120px; justify-content: center; }
+
+  /* Modal / overlay: full screen */
+  .eqms-modal { inset: 0; border-radius: 0; max-width: 100%; max-height: 100%; }
+  .eqms-modal-header { padding: var(--eqms-gap-md); }
+  .eqms-modal-body { padding: var(--eqms-gap-md); }
+
+  /* Tower new-module cards: 2×N */
+  .eqms-new-modules-row { grid-template-columns: 1fr 1fr; }
+
+  /* Risk heatmap: scrollable */
+  .eqms-risk-heatmap { overflow-x: auto; }
+}
+
+/* --------------------------------------------------------------------------
+   39. BOTTOM NAV — hidden on desktop (shown only via ≤480px media query)
+   -------------------------------------------------------------------------- */
+.eqms-bottom-nav { display: none; }
+
+/* --------------------------------------------------------------------------
+   40. MOBILE HEADER — hidden on desktop
+   -------------------------------------------------------------------------- */
+.eqms-mobile-header { display: none; }
+
+/* --------------------------------------------------------------------------
+   41. DARK MODE — mobile additions
+   -------------------------------------------------------------------------- */
+[data-color-mode="dark"] .eqms-mobile-header {
+  background: var(--hm-bg-surface, #1e293b);
+  border-bottom-color: var(--hm-border, #334155);
+}
+[data-color-mode="dark"] .eqms-bottom-nav {
+  background: var(--hm-bg-surface, #1e293b);
+  border-top-color: var(--hm-border, #334155);
+}
+[data-color-mode="dark"] .eqms-hamburger-bar { background: var(--hm-text-primary, #f1f5f9); }
+
+/* ============================================================================
+   SPRINT 7E — PERFORMANCE CSS
+   ============================================================================ */
+
+/* --------------------------------------------------------------------------
+   42. VIRTUAL SCROLL GRID
+   -------------------------------------------------------------------------- */
+.eqms-grid-virtual-info {
+  font-size: 11px;
+  color: var(--hm-text-tertiary, #94a3b8);
+  text-align: center;
+  padding: 6px;
+  border-top: 1px solid var(--hm-border-light, #f1f5f9);
+}
+
+/* --------------------------------------------------------------------------
+   43. MOBILE CARD VIEW — data-label reveals column headers on small screens
+   Uses the CSS "stacked table" pattern. Activated at ≤ 600px.
+   -------------------------------------------------------------------------- */
+@media (max-width: 600px) {
+  /* Switch the data grid from table to stacked cards */
+  .eqms-grid-wrapper { overflow-x: unset; }
+  .eqms-grid,
+  .eqms-grid thead,
+  .eqms-grid tbody,
+  .eqms-grid th,
+  .eqms-grid td,
+  .eqms-grid tr { display: block; }
+
+  .eqms-grid thead { display: none; } /* hide column headers; data-label takes over */
+
+  .eqms-grid tr {
+    border: 1px solid var(--hm-border, #e2e8f0);
+    border-radius: var(--eqms-radius-lg);
+    margin-bottom: 8px;
+    padding: 6px 0;
+    background: var(--hm-bg-card, #fff);
+  }
+
+  .eqms-grid td {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 5px 12px;
+    border: none;
+    border-bottom: 1px solid var(--hm-border-light, #f1f5f9);
+    font-size: 13px;
+  }
+  .eqms-grid td:last-child { border-bottom: none; }
+
+  /* Show the column label before each value */
+  .eqms-grid td::before {
+    content: attr(data-label);
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--hm-text-tertiary, #94a3b8);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding-top: 1px;
+  }
+
+  /* Truncated cells: allow wrap in card view */
+  .eqms-cell-truncate {
+    white-space: normal;
+    text-overflow: unset;
+    overflow: visible;
+  }
+
+  /* Virtual scroll: disable fixed height on mobile (cards are already compact) */
+  .eqms-grid-virtual { max-height: none !important; overflow-y: visible !important; }
+}
+
+/* --------------------------------------------------------------------------
+   44. CSS CONTAINMENT — improves paint performance for off-screen modules
+   -------------------------------------------------------------------------- */
+.eqms-module {
+  contain: layout style;
+}
+.eqms-detail-view,
+.eqms-queue-view,
+.eqms-analytics-view {
+  contain: layout;
+}

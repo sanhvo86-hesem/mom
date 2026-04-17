@@ -1022,4 +1022,88 @@ final class EqmsSupplierAuditsController extends EqmsBaseController
 
         $this->success(['scar_id' => $scarId, 'status' => 'closed']);
     }
+
+    // ── Cross-module Actions ──────────────────────────────────────────────────
+
+    /**
+     * POST /eqms/supplier-audits/{id}/scars/{scar_id}/actions/block-supplier-aml
+     * Block a supplier's AML entries due to a critical SCAR finding.
+     * Updates eqms_aml_records for the supplier to 'blocked' status.
+     * Body requires: { blocked_reason }
+     * Body optional: { part_number } — if set, only block entries for that part
+     */
+    public function scarActionBlockSupplierAml(): never
+    {
+        $user    = $this->requireAuth();
+        $this->requireAnyRole($user, $this->writeRoles());
+
+        $auditId = $this->requirePathId('id', 'audit_id');
+        $scarId  = $this->requirePathId('scar_id', 'scar_id');
+
+        // Load SCAR to get vendor_id
+        $scar = $this->data->query(
+            "SELECT * FROM eqms_scar_records WHERE scar_id = :id LIMIT 1",
+            [':id' => $scarId]
+        );
+        if (empty($scar)) {
+            $this->error('scar_not_found', 404, "SCAR '{$scarId}' not found.");
+        }
+        $scar = $scar[0];
+
+        if (empty($scar['vendor_id'])) {
+            $this->error('vendor_id_missing', 409,
+                "SCAR has no vendor_id — cannot block AML entries.");
+        }
+
+        $body        = $this->jsonBody();
+        $blockReason = trim((string)($body['blocked_reason'] ?? ''));
+        if ($blockReason === '') {
+            $this->error('blocked_reason_required', 400, "'blocked_reason' is required.");
+        }
+
+        $actor      = (string)($user['username'] ?? $user['user'] ?? 'unknown');
+        $now        = $this->nowIso();
+        $vendorId   = (string)$scar['vendor_id'];
+        $partFilter = !empty($body['part_number']) ? trim((string)$body['part_number']) : null;
+
+        $setParams = [
+            ':status'  => 'blocked',
+            ':reason'  => $blockReason,
+            ':by'      => $actor,
+            ':vendor'  => $vendorId,
+        ];
+
+        $where = "vendor_id = :vendor AND status = 'approved'";
+        if ($partFilter !== null) {
+            $where              .= ' AND part_number = :part';
+            $setParams[':part'] = $partFilter;
+        }
+
+        $this->data->execute(
+            "UPDATE eqms_aml_records
+             SET status = :status, blocked_reason = :reason,
+                 blocked_by = :by, blocked_at = now(), updated_at = now(), updated_by = :by
+             WHERE {$where}",
+            $setParams
+        );
+
+        $blockedCount = (int)($this->data->scalar(
+            "SELECT COUNT(*) FROM eqms_aml_records WHERE vendor_id = :vendor AND status = 'blocked'",
+            [':vendor' => $vendorId]
+        ) ?? 0);
+
+        $this->emitQualityEvent('eqms.scar.supplier_aml_blocked', self::SCAR_ENTITY_TYPE, $scarId, [
+            'vendor_id'     => $vendorId,
+            'part_filter'   => $partFilter,
+            'blocked_count' => $blockedCount,
+            'blocked_reason' => $blockReason,
+        ], $user);
+
+        $this->success([
+            'scar_id'       => $scarId,
+            'vendor_id'     => $vendorId,
+            'blocked_count' => $blockedCount,
+            'message'       => "{$blockedCount} AML entr" . ($blockedCount === 1 ? 'y' : 'ies') . " blocked for vendor '{$vendorId}'.",
+        ]);
+    }
 }

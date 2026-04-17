@@ -832,4 +832,97 @@ class EqmsCalibrationController extends EqmsBaseController
 
         $this->success(['msa' => $this->loadMsa($msaId)]);
     }
+
+    // ── Cross-module Actions ──────────────────────────────────────────────────
+
+    /**
+     * POST /eqms/calibration/{id}/actions/create-lab-investigation
+     * Escalate a calibration out-of-tolerance finding to an NCR for lab investigation.
+     * Body requires: { oot_description }
+     * Body optional: { assigned_to, severity }
+     *
+     * Business rule: calibration must have status 'out_of_tolerance' or 'overdue'.
+     */
+    public function actionCreateLabInvestigation(): never
+    {
+        $user    = $this->requireAuth();
+        $this->requireAnyRole($user, $this->eqmsWriteRoles());
+
+        $calId   = $this->requirePathId('id', 'calibration_id');
+        $cal     = $this->loadCalibration($calId);
+
+        $allowedStatuses = ['out_of_tolerance', 'overdue', 'failed'];
+        if (!in_array($cal['status'], $allowedStatuses, true)) {
+            $this->error('invalid_status_for_lab_investigation', 409,
+                "Lab investigation can only be created for calibrations with status: "
+                . implode(', ', $allowedStatuses) . ". Current: '{$cal['status']}'.");
+        }
+
+        // Prevent duplicate investigations
+        $existing = $this->data->scalar(
+            "SELECT ncr_id FROM eqms_ncr_records
+             WHERE source_type = 'calibration' AND source_id = :id
+               AND status NOT IN ('closed') LIMIT 1",
+            [':id' => $calId]
+        );
+        if ($existing) {
+            $this->error('investigation_already_open', 409,
+                "An open NCR investigation (ID: {$existing}) already exists for this calibration.");
+        }
+
+        $body     = $this->jsonBody();
+        $ootDesc  = trim((string)($body['oot_description'] ?? ''));
+        if ($ootDesc === '') {
+            $this->error('oot_description_required', 400,
+                "'oot_description' (out-of-tolerance description) is required.");
+        }
+
+        $actor      = (string)($user['username'] ?? $user['user'] ?? 'unknown');
+        $ncrId      = $this->newUuid();
+        $ncrNumber  = 'NCR-CAL-' . strtoupper(substr($ncrId, 0, 6));
+        $now        = $this->nowIso();
+        $severity   = in_array($body['severity'] ?? '', ['minor','major','critical'], true)
+                      ? $body['severity'] : 'major';
+        $title      = 'Lab Investigation: OOT calibration — ' . ($cal['instrument_id'] ?? $calId);
+
+        $this->data->execute(
+            "INSERT INTO eqms_ncr_records
+             (ncr_id, ncr_number, title, description, source, source_type, source_id,
+              severity, assigned_to, status, version, created_at, created_by)
+             VALUES
+             (:id, :num, :title, :desc, 'calibration', 'calibration', :src_id,
+              :sev, :assigned, 'submitted', 1, :now, :by)",
+            [
+                ':id'       => $ncrId,
+                ':num'      => $ncrNumber,
+                ':title'    => $title,
+                ':desc'     => $ootDesc,
+                ':src_id'   => $calId,
+                ':sev'      => $severity,
+                ':assigned' => $body['assigned_to'] ?? null,
+                ':now'      => $now,
+                ':by'       => $actor,
+            ]
+        );
+
+        $this->data->execute(
+            "INSERT INTO eqms_record_links
+             (link_id, source_type, source_id, target_type, target_id, relationship_type, linked_by, linked_at)
+             VALUES (:lid, 'calibration', :cal_id, 'ncr', :ncr_id, 'oot_investigation', :by, now())
+             ON CONFLICT (source_type, source_id, target_type, target_id) DO NOTHING",
+            [':lid' => $this->newUuid(), ':cal_id' => $calId, ':ncr_id' => $ncrId, ':by' => $actor]
+        );
+
+        $this->emitQualityEvent('eqms.calibration.lab_investigation_created', 'calibration', $calId, [
+            'ncr_id'     => $ncrId,
+            'ncr_number' => $ncrNumber,
+        ], $user);
+
+        $ncr = $this->data->query(
+            "SELECT ncr_id, ncr_number, title, status FROM eqms_ncr_records WHERE ncr_id = :id",
+            [':id' => $ncrId]
+        )[0] ?? [];
+
+        $this->success(['calibration' => $this->loadCalibration($calId), 'created_ncr' => $ncr], 201);
+    }
 }

@@ -825,4 +825,86 @@ class EqmsNcrController extends EqmsBaseController
         $updated = $this->loadNcr($ncrId);
         $this->success(['ncr' => $updated]);
     }
+
+    // ── Cross-module Actions ──────────────────────────────────────────────────
+
+    /**
+     * POST /eqms/ncr/{id}/actions/create-capa
+     * Auto-create a linked CAPA record from this NCR.
+     * Body optional: { severity, assigned_to, due_date, title_override }
+     */
+    public function actionCreateCapa(): never
+    {
+        $user  = $this->requireAuth();
+        $this->requireAnyRole($user, $this->ncrWriteRoles());
+
+        $ncrId = $this->requirePathId('id', 'ncr_id');
+        $ncr   = $this->loadNcr($ncrId);
+
+        if ($ncr['status'] === 'closed') {
+            $this->error('ncr_closed', 409, "Cannot create CAPA from a closed NCR.");
+        }
+
+        $existingCapa = $this->data->scalar(
+            "SELECT capa_id FROM eqms_capa_records WHERE source_type = 'ncr' AND source_id = :ncr_id LIMIT 1",
+            [':ncr_id' => $ncrId]
+        );
+        if ($existingCapa) {
+            $this->error('capa_already_exists', 409,
+                "A CAPA (ID: {$existingCapa}) is already linked to NCR '{$ncrId}'.");
+        }
+
+        $body       = $this->jsonBody();
+        $actor      = (string)($user['username'] ?? $user['user'] ?? 'unknown');
+        $capaId     = $this->newUuid();
+        $capaNumber = 'CAPA-' . strtoupper(substr($capaId, 0, 8));
+        $now        = $this->nowIso();
+        $severity   = in_array($body['severity'] ?? '', ['minor','major','critical'], true)
+                      ? $body['severity'] : 'major';
+        $title      = !empty($body['title_override'])
+                      ? trim((string)$body['title_override'])
+                      : 'CAPA for NCR ' . ($ncr['ncr_number'] ?? $ncrId);
+
+        $this->data->execute(
+            "INSERT INTO eqms_capa_records
+             (capa_id, capa_number, title, description, source_type, source_id,
+              severity, assigned_to, due_date, action_plan, status, version, created_at, created_by)
+             VALUES
+             (:id, :num, :title, :desc, 'ncr', :src_id,
+              :sev, :assigned, :due, '[]'::jsonb, 'initiated', 1, :now, :by)",
+            [
+                ':id'       => $capaId,
+                ':num'      => $capaNumber,
+                ':title'    => $title,
+                ':desc'     => (string)($ncr['description'] ?? ''),
+                ':src_id'   => $ncrId,
+                ':sev'      => $severity,
+                ':assigned' => $body['assigned_to'] ?? null,
+                ':due'      => $body['due_date'] ?? null,
+                ':now'      => $now,
+                ':by'       => $actor,
+            ]
+        );
+
+        $this->data->execute(
+            "INSERT INTO eqms_record_links
+             (link_id, source_type, source_id, target_type, target_id, relationship_type, linked_by, linked_at)
+             VALUES (:lid, 'ncr', :ncr_id, 'capa', :capa_id, 'spawned_capa', :by, now())
+             ON CONFLICT (source_type, source_id, target_type, target_id) DO NOTHING",
+            [':lid' => $this->newUuid(), ':ncr_id' => $ncrId, ':capa_id' => $capaId, ':by' => $actor]
+        );
+
+        $this->emitQualityEvent('eqms.ncr.capa_created', self::ENTITY_TYPE, $ncrId, [
+            'capa_id'     => $capaId,
+            'capa_number' => $capaNumber,
+            'severity'    => $severity,
+        ], $user);
+
+        $capa = $this->data->query(
+            "SELECT capa_id, capa_number, title, status, severity FROM eqms_capa_records WHERE capa_id = :id",
+            [':id' => $capaId]
+        )[0] ?? [];
+
+        $this->success(['ncr' => $this->loadNcr($ncrId), 'created_capa' => $capa], 201);
+    }
 }

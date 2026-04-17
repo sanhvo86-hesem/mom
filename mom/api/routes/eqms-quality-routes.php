@@ -42,6 +42,14 @@ return static function (Router $router, string $dataDir): void {
     $router->post('/api/v1/eqms/reference/options', EqmsReferenceController::class, 'options');
 
     // ═══════════════════════════════════════════════════════════════════════════
+    // REAL-TIME EVENTS STREAM — W3C Server-Sent Events (SSE)
+    // ═══════════════════════════════════════════════════════════════════════════
+    // GET  /api/v1/eqms/events/stream?channels=workflow,notifications&modules=complaints,capa
+    // Used by EqmsShell SSE engine to receive live workflow transitions,
+    // notification pings, dashboard KPI refreshes across all 31 EQMS modules.
+    $router->get('/api/v1/eqms/events/stream', EqmsEventsController::class, 'stream');
+
+    // ═══════════════════════════════════════════════════════════════════════════
     // MODULE M04-E: Customer Complaints (upgraded to eqms namespace)
     // ═══════════════════════════════════════════════════════════════════════════
     $router->post('/api/v1/eqms/customer-complaints/query',                EqmsComplaintsController::class, 'search');
@@ -646,4 +654,277 @@ return static function (Router $router, string $dataDir): void {
     $router->post('/api/v1/mom/traceability/genealogy/{id}/actions/expand-upstream',   EqmsGenealogyController::class, 'actionExpandUpstream');
     $router->post('/api/v1/mom/traceability/genealogy/{id}/actions/expand-downstream', EqmsGenealogyController::class, 'actionExpandDownstream');
     $router->post('/api/v1/mom/traceability/genealogy/{id}/actions/freeze-trace-report', EqmsGenealogyController::class, 'actionFreezeTraceReport');
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // MODULE M31-E: Concessions / Material Dispositions (IATF 16949 §8.7)
+    // ═══════════════════════════════════════════════════════════════════════════
+    $router->post('/api/v1/eqms/concessions/query',                           EqmsConcessionsController::class, 'search');
+    $router->get ('/api/v1/eqms/concessions/metrics',                         EqmsConcessionsController::class, 'metrics');
+    $router->post('/api/v1/eqms/concessions/lookup',                          EqmsConcessionsController::class, 'lookup');
+    $router->post('/api/v1/eqms/concessions',                                 EqmsConcessionsController::class, 'create');
+    $router->get ('/api/v1/eqms/concessions/{id}',                            EqmsConcessionsController::class, 'detail');
+    $router->patch('/api/v1/eqms/concessions/{id}',                           EqmsConcessionsController::class, 'update');
+    $router->get ('/api/v1/eqms/concessions/{id}/audit',                      EqmsConcessionsController::class, 'audit');
+    $router->get ('/api/v1/eqms/concessions/{id}/comments',                   EqmsConcessionsController::class, 'comments');
+    $router->post('/api/v1/eqms/concessions/{id}/comments',                   EqmsConcessionsController::class, 'comments');
+    $router->get ('/api/v1/eqms/concessions/{id}/attachments',                EqmsConcessionsController::class, 'attachments');
+    $router->post('/api/v1/eqms/concessions/{id}/attachments',                EqmsConcessionsController::class, 'attachments');
+    $router->get ('/api/v1/eqms/concessions/{id}/relationships',              EqmsConcessionsController::class, 'relationships');
+    $router->post('/api/v1/eqms/concessions/{id}/relationships/link',         EqmsConcessionsController::class, 'relationshipsLink');
+    $router->post('/api/v1/eqms/concessions/{id}/relationships/unlink',       EqmsConcessionsController::class, 'relationshipsUnlink');
+    $router->get ('/api/v1/eqms/concessions/{id}/available-actions',          EqmsConcessionsController::class, 'availableActions');
+    $router->get ('/api/v1/eqms/concessions/{id}/signatures',                 EqmsConcessionsController::class, 'signatures');
+    $router->post('/api/v1/eqms/concessions/{id}/signatures',                 EqmsConcessionsController::class, 'signatures');
+    $router->post('/api/v1/eqms/concessions/{id}/export',                     EqmsConcessionsController::class, 'export');
+    $router->post('/api/v1/eqms/concessions/export',                          EqmsConcessionsController::class, 'exportBulk');
+    $router->post('/api/v1/eqms/concessions/{id}/actions/submit',             EqmsConcessionsController::class, 'actionSubmit');
+    $router->post('/api/v1/eqms/concessions/{id}/actions/start-review',       EqmsConcessionsController::class, 'actionStartReview');
+    $router->post('/api/v1/eqms/concessions/{id}/actions/approve',            EqmsConcessionsController::class, 'actionApprove');
+    $router->post('/api/v1/eqms/concessions/{id}/actions/reject',             EqmsConcessionsController::class, 'actionReject');
+    $router->post('/api/v1/eqms/concessions/{id}/actions/request-info',       EqmsConcessionsController::class, 'actionRequestInfo');
+    $router->post('/api/v1/eqms/concessions/{id}/actions/submit-info',        EqmsConcessionsController::class, 'actionSubmitInfo');
+    $router->post('/api/v1/eqms/concessions/{id}/actions/close',              EqmsConcessionsController::class, 'actionClose');
+    $router->post('/api/v1/eqms/concessions/{id}/actions/revoke',             EqmsConcessionsController::class, 'actionRevoke');
+    $router->post('/api/v1/eqms/concessions/{id}/actions/withdraw',           EqmsConcessionsController::class, 'actionWithdraw');
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // MODULE M32-E: First Article Inspection (IATF 16949 §8.3.5 / AS9102B)
+    // ═══════════════════════════════════════════════════════════════════════════
+    $router->post('/api/v1/eqms/fai/query',                                   EqmsFaiController::class, 'search');
+    $router->get ('/api/v1/eqms/fai/metrics',                                 EqmsFaiController::class, 'metrics');
+    $router->post('/api/v1/eqms/fai/lookup',                                  EqmsFaiController::class, 'lookup');
+    $router->post('/api/v1/eqms/fai',                                         EqmsFaiController::class, 'create');
+    $router->get ('/api/v1/eqms/fai/{id}',                                    EqmsFaiController::class, 'detail');
+    $router->patch('/api/v1/eqms/fai/{id}',                                   EqmsFaiController::class, 'update');
+    $router->get ('/api/v1/eqms/fai/{id}/characteristics',                    EqmsFaiController::class, 'characteristics');
+    $router->post('/api/v1/eqms/fai/{id}/characteristics',                    EqmsFaiController::class, 'characteristics');
+    $router->get ('/api/v1/eqms/fai/{id}/audit',                              EqmsFaiController::class, 'audit');
+    $router->get ('/api/v1/eqms/fai/{id}/comments',                           EqmsFaiController::class, 'comments');
+    $router->post('/api/v1/eqms/fai/{id}/comments',                           EqmsFaiController::class, 'comments');
+    $router->get ('/api/v1/eqms/fai/{id}/attachments',                        EqmsFaiController::class, 'attachments');
+    $router->post('/api/v1/eqms/fai/{id}/attachments',                        EqmsFaiController::class, 'attachments');
+    $router->get ('/api/v1/eqms/fai/{id}/relationships',                      EqmsFaiController::class, 'relationships');
+    $router->post('/api/v1/eqms/fai/{id}/relationships/link',                 EqmsFaiController::class, 'relationshipsLink');
+    $router->post('/api/v1/eqms/fai/{id}/relationships/unlink',               EqmsFaiController::class, 'relationshipsUnlink');
+    $router->get ('/api/v1/eqms/fai/{id}/available-actions',                  EqmsFaiController::class, 'availableActions');
+    $router->get ('/api/v1/eqms/fai/{id}/signatures',                         EqmsFaiController::class, 'signatures');
+    $router->post('/api/v1/eqms/fai/{id}/signatures',                         EqmsFaiController::class, 'signatures');
+    $router->post('/api/v1/eqms/fai/{id}/export',                             EqmsFaiController::class, 'export');
+    $router->post('/api/v1/eqms/fai/export',                                  EqmsFaiController::class, 'exportBulk');
+    $router->post('/api/v1/eqms/fai/{id}/actions/submit',                     EqmsFaiController::class, 'actionSubmit');
+    $router->post('/api/v1/eqms/fai/{id}/actions/start-review',               EqmsFaiController::class, 'actionStartReview');
+    $router->post('/api/v1/eqms/fai/{id}/actions/approve',                    EqmsFaiController::class, 'actionApprove');
+    $router->post('/api/v1/eqms/fai/{id}/actions/reject',                     EqmsFaiController::class, 'actionReject');
+    $router->post('/api/v1/eqms/fai/{id}/actions/request-revision',           EqmsFaiController::class, 'actionRequestRevision');
+    $router->post('/api/v1/eqms/fai/{id}/actions/submit-revision',            EqmsFaiController::class, 'actionSubmitRevision');
+    $router->post('/api/v1/eqms/fai/{id}/actions/close',                      EqmsFaiController::class, 'actionClose');
+    $router->post('/api/v1/eqms/fai/{id}/actions/withdraw',                   EqmsFaiController::class, 'actionWithdraw');
+    $router->post('/api/v1/eqms/fai/{id}/actions/revoke',                     EqmsFaiController::class, 'actionRevoke');
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // MODULE M33-E: Special Characteristics — KPC/KCC/SC/CC (IATF 16949 §8.3.5.2)
+    // ═══════════════════════════════════════════════════════════════════════════
+    $router->post('/api/v1/eqms/special-characteristics/query',               EqmsSpecialCharsController::class, 'search');
+    $router->get ('/api/v1/eqms/special-characteristics/metrics',             EqmsSpecialCharsController::class, 'metrics');
+    $router->post('/api/v1/eqms/special-characteristics/lookup',              EqmsSpecialCharsController::class, 'lookup');
+    $router->post('/api/v1/eqms/special-characteristics',                     EqmsSpecialCharsController::class, 'create');
+    $router->get ('/api/v1/eqms/special-characteristics/{id}',                EqmsSpecialCharsController::class, 'detail');
+    $router->patch('/api/v1/eqms/special-characteristics/{id}',               EqmsSpecialCharsController::class, 'update');
+    $router->patch('/api/v1/eqms/special-characteristics/{id}/cpk',          EqmsSpecialCharsController::class, 'updateCpk');
+    $router->get ('/api/v1/eqms/special-characteristics/{id}/audit',          EqmsSpecialCharsController::class, 'audit');
+    $router->get ('/api/v1/eqms/special-characteristics/{id}/comments',       EqmsSpecialCharsController::class, 'comments');
+    $router->post('/api/v1/eqms/special-characteristics/{id}/comments',       EqmsSpecialCharsController::class, 'comments');
+    $router->get ('/api/v1/eqms/special-characteristics/{id}/attachments',    EqmsSpecialCharsController::class, 'attachments');
+    $router->post('/api/v1/eqms/special-characteristics/{id}/attachments',    EqmsSpecialCharsController::class, 'attachments');
+    $router->get ('/api/v1/eqms/special-characteristics/{id}/relationships',  EqmsSpecialCharsController::class, 'relationships');
+    $router->post('/api/v1/eqms/special-characteristics/{id}/relationships/link',   EqmsSpecialCharsController::class, 'relationshipsLink');
+    $router->post('/api/v1/eqms/special-characteristics/{id}/relationships/unlink', EqmsSpecialCharsController::class, 'relationshipsUnlink');
+    $router->get ('/api/v1/eqms/special-characteristics/{id}/available-actions',    EqmsSpecialCharsController::class, 'availableActions');
+    $router->get ('/api/v1/eqms/special-characteristics/{id}/signatures',     EqmsSpecialCharsController::class, 'signatures');
+    $router->post('/api/v1/eqms/special-characteristics/{id}/signatures',     EqmsSpecialCharsController::class, 'signatures');
+    $router->post('/api/v1/eqms/special-characteristics/{id}/export',         EqmsSpecialCharsController::class, 'export');
+    $router->post('/api/v1/eqms/special-characteristics/export',              EqmsSpecialCharsController::class, 'exportBulk');
+    $router->post('/api/v1/eqms/special-characteristics/{id}/actions/submit-for-review', EqmsSpecialCharsController::class, 'actionSubmitForReview');
+    $router->post('/api/v1/eqms/special-characteristics/{id}/actions/approve',           EqmsSpecialCharsController::class, 'actionApprove');
+    $router->post('/api/v1/eqms/special-characteristics/{id}/actions/reject',            EqmsSpecialCharsController::class, 'actionReject');
+    $router->post('/api/v1/eqms/special-characteristics/{id}/actions/request-revision',  EqmsSpecialCharsController::class, 'actionRequestRevision');
+    $router->post('/api/v1/eqms/special-characteristics/{id}/actions/submit-revision',   EqmsSpecialCharsController::class, 'actionSubmitRevision');
+    $router->post('/api/v1/eqms/special-characteristics/{id}/actions/obsolete',          EqmsSpecialCharsController::class, 'actionObsolete');
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // MODULE M34-E: AML — Approved Manufacturer/Supplier List (IATF 16949 §8.4.1)
+    // ═══════════════════════════════════════════════════════════════════════════
+    $router->post('/api/v1/eqms/aml/query',                                   EqmsAmlController::class, 'search');
+    $router->get ('/api/v1/eqms/aml/metrics',                                 EqmsAmlController::class, 'metrics');
+    $router->post('/api/v1/eqms/aml/lookup',                                  EqmsAmlController::class, 'lookup');
+    $router->get ('/api/v1/eqms/aml/check',                                   EqmsAmlController::class, 'checkApproval');
+    $router->post('/api/v1/eqms/aml/check',                                   EqmsAmlController::class, 'checkApproval');
+    $router->post('/api/v1/eqms/aml',                                         EqmsAmlController::class, 'create');
+    $router->get ('/api/v1/eqms/aml/{id}',                                    EqmsAmlController::class, 'detail');
+    $router->patch('/api/v1/eqms/aml/{id}',                                   EqmsAmlController::class, 'update');
+    $router->get ('/api/v1/eqms/aml/{id}/audit',                              EqmsAmlController::class, 'audit');
+    $router->get ('/api/v1/eqms/aml/{id}/comments',                           EqmsAmlController::class, 'comments');
+    $router->post('/api/v1/eqms/aml/{id}/comments',                           EqmsAmlController::class, 'comments');
+    $router->get ('/api/v1/eqms/aml/{id}/attachments',                        EqmsAmlController::class, 'attachments');
+    $router->post('/api/v1/eqms/aml/{id}/attachments',                        EqmsAmlController::class, 'attachments');
+    $router->get ('/api/v1/eqms/aml/{id}/relationships',                      EqmsAmlController::class, 'relationships');
+    $router->post('/api/v1/eqms/aml/{id}/relationships/link',                 EqmsAmlController::class, 'relationshipsLink');
+    $router->post('/api/v1/eqms/aml/{id}/relationships/unlink',               EqmsAmlController::class, 'relationshipsUnlink');
+    $router->get ('/api/v1/eqms/aml/{id}/available-actions',                  EqmsAmlController::class, 'availableActions');
+    $router->get ('/api/v1/eqms/aml/{id}/signatures',                         EqmsAmlController::class, 'signatures');
+    $router->post('/api/v1/eqms/aml/{id}/signatures',                         EqmsAmlController::class, 'signatures');
+    $router->post('/api/v1/eqms/aml/{id}/export',                             EqmsAmlController::class, 'export');
+    $router->post('/api/v1/eqms/aml/export',                                  EqmsAmlController::class, 'exportBulk');
+    $router->post('/api/v1/eqms/aml/{id}/actions/submit-for-approval',        EqmsAmlController::class, 'actionSubmitForApproval');
+    $router->post('/api/v1/eqms/aml/{id}/actions/approve',                    EqmsAmlController::class, 'actionApprove');
+    $router->post('/api/v1/eqms/aml/{id}/actions/reject',                     EqmsAmlController::class, 'actionReject');
+    $router->post('/api/v1/eqms/aml/{id}/actions/request-info',               EqmsAmlController::class, 'actionRequestInfo');
+    $router->post('/api/v1/eqms/aml/{id}/actions/submit-info',                EqmsAmlController::class, 'actionSubmitInfo');
+    $router->post('/api/v1/eqms/aml/{id}/actions/block',                      EqmsAmlController::class, 'actionBlock');
+    $router->post('/api/v1/eqms/aml/{id}/actions/unblock',                    EqmsAmlController::class, 'actionUnblock');
+    $router->post('/api/v1/eqms/aml/{id}/actions/obsolete',                   EqmsAmlController::class, 'actionObsolete');
+    $router->post('/api/v1/eqms/aml/{id}/actions/withdraw',                   EqmsAmlController::class, 'actionWithdraw');
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // MODULE M35-E: Warranty Claims (IATF 16949 §8.7.1)
+    // ═══════════════════════════════════════════════════════════════════════════
+    $router->post('/api/v1/eqms/warranty/query',                              EqmsWarrantyController::class, 'search');
+    $router->get ('/api/v1/eqms/warranty/metrics',                            EqmsWarrantyController::class, 'metrics');
+    $router->post('/api/v1/eqms/warranty/lookup',                             EqmsWarrantyController::class, 'lookup');
+    $router->post('/api/v1/eqms/warranty',                                    EqmsWarrantyController::class, 'create');
+    $router->get ('/api/v1/eqms/warranty/{id}',                               EqmsWarrantyController::class, 'detail');
+    $router->patch('/api/v1/eqms/warranty/{id}',                              EqmsWarrantyController::class, 'update');
+    $router->get ('/api/v1/eqms/warranty/{id}/audit',                         EqmsWarrantyController::class, 'audit');
+    $router->get ('/api/v1/eqms/warranty/{id}/comments',                      EqmsWarrantyController::class, 'comments');
+    $router->post('/api/v1/eqms/warranty/{id}/comments',                      EqmsWarrantyController::class, 'comments');
+    $router->get ('/api/v1/eqms/warranty/{id}/attachments',                   EqmsWarrantyController::class, 'attachments');
+    $router->post('/api/v1/eqms/warranty/{id}/attachments',                   EqmsWarrantyController::class, 'attachments');
+    $router->get ('/api/v1/eqms/warranty/{id}/relationships',                 EqmsWarrantyController::class, 'relationships');
+    $router->post('/api/v1/eqms/warranty/{id}/relationships/link',            EqmsWarrantyController::class, 'relationshipsLink');
+    $router->post('/api/v1/eqms/warranty/{id}/relationships/unlink',          EqmsWarrantyController::class, 'relationshipsUnlink');
+    $router->get ('/api/v1/eqms/warranty/{id}/available-actions',             EqmsWarrantyController::class, 'availableActions');
+    $router->get ('/api/v1/eqms/warranty/{id}/signatures',                    EqmsWarrantyController::class, 'signatures');
+    $router->post('/api/v1/eqms/warranty/{id}/signatures',                    EqmsWarrantyController::class, 'signatures');
+    $router->post('/api/v1/eqms/warranty/{id}/export',                        EqmsWarrantyController::class, 'export');
+    $router->post('/api/v1/eqms/warranty/export',                             EqmsWarrantyController::class, 'exportBulk');
+    $router->post('/api/v1/eqms/warranty/{id}/actions/assign',                EqmsWarrantyController::class, 'actionAssign');
+    $router->post('/api/v1/eqms/warranty/{id}/actions/record-containment',    EqmsWarrantyController::class, 'actionRecordContainment');
+    $router->post('/api/v1/eqms/warranty/{id}/actions/record-return-received', EqmsWarrantyController::class, 'actionRecordReturnReceived');
+    $router->post('/api/v1/eqms/warranty/{id}/actions/record-root-cause',     EqmsWarrantyController::class, 'actionRecordRootCause');
+    $router->post('/api/v1/eqms/warranty/{id}/actions/close',                 EqmsWarrantyController::class, 'actionClose');
+    $router->post('/api/v1/eqms/warranty/{id}/actions/reject-claim',          EqmsWarrantyController::class, 'actionRejectClaim');
+    $router->post('/api/v1/eqms/warranty/{id}/actions/reopen',                EqmsWarrantyController::class, 'actionReopen');
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // SPRINT 6B: Cross-module action routes
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    // NCR → CAPA auto-create
+    $router->post('/api/v1/eqms/ncr/{id}/actions/create-capa',                     EqmsNcrController::class, 'actionCreateCapa');
+
+    // Deviation → Risk escalation
+    $router->post('/api/v1/eqms/deviations/{id}/actions/escalate-risk',             EqmsDeviationController::class, 'actionEscalateRisk');
+
+    // Complaint → Risk escalation
+    $router->post('/api/v1/eqms/customer-complaints/{id}/actions/escalate-risk',    EqmsComplaintsController::class, 'actionEscalateRisk');
+
+    // Batch Release → NCR from exception
+    $router->post('/api/v1/eqms/batch-release/{id}/actions/create-ncr-from-exception', EqmsBatchReleaseController::class, 'actionCreateNcrFromException');
+
+    // Calibration → Lab investigation NCR
+    $router->post('/api/v1/eqms/calibration/{id}/actions/create-lab-investigation', EqmsCalibrationController::class, 'actionCreateLabInvestigation');
+
+    // Risk → Validation scope update request
+    $router->post('/api/v1/eqms/risks/{id}/actions/request-validation-scope-update', EqmsRisksController::class, 'actionRequestValidationScopeUpdate');
+
+    // Field Action → Genealogy expansion
+    $router->post('/api/v1/eqms/field-actions/{id}/actions/expand-genealogy',       EqmsFieldActionsController::class, 'actionExpandGenealogy');
+
+    // SCAR → Block supplier AML
+    $router->post('/api/v1/eqms/supplier-audits/{id}/scars/{scar_id}/actions/block-supplier-aml', EqmsSupplierAuditsController::class, 'scarActionBlockSupplierAml');
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // MODULE M36-E: Lessons Learned (ISO 9001:2015 §10.3)
+    // ═══════════════════════════════════════════════════════════════════════════
+    $router->post('/api/v1/eqms/lessons-learned/query',                         EqmsLessonsLearnedController::class, 'search');
+    $router->get ('/api/v1/eqms/lessons-learned/metrics',                       EqmsLessonsLearnedController::class, 'metrics');
+    $router->post('/api/v1/eqms/lessons-learned/lookup',                        EqmsLessonsLearnedController::class, 'lookup');
+    $router->post('/api/v1/eqms/lessons-learned',                               EqmsLessonsLearnedController::class, 'create');
+    $router->get ('/api/v1/eqms/lessons-learned/{id}',                          EqmsLessonsLearnedController::class, 'detail');
+    $router->patch('/api/v1/eqms/lessons-learned/{id}',                         EqmsLessonsLearnedController::class, 'update');
+    $router->get ('/api/v1/eqms/lessons-learned/{id}/audit',                    EqmsLessonsLearnedController::class, 'audit');
+    $router->get ('/api/v1/eqms/lessons-learned/{id}/comments',                 EqmsLessonsLearnedController::class, 'comments');
+    $router->post('/api/v1/eqms/lessons-learned/{id}/comments',                 EqmsLessonsLearnedController::class, 'comments');
+    $router->get ('/api/v1/eqms/lessons-learned/{id}/attachments',              EqmsLessonsLearnedController::class, 'attachments');
+    $router->post('/api/v1/eqms/lessons-learned/{id}/attachments',              EqmsLessonsLearnedController::class, 'attachments');
+    $router->get ('/api/v1/eqms/lessons-learned/{id}/relationships',            EqmsLessonsLearnedController::class, 'relationships');
+    $router->post('/api/v1/eqms/lessons-learned/{id}/relationships/link',       EqmsLessonsLearnedController::class, 'relationshipsLink');
+    $router->post('/api/v1/eqms/lessons-learned/{id}/relationships/unlink',     EqmsLessonsLearnedController::class, 'relationshipsUnlink');
+    $router->get ('/api/v1/eqms/lessons-learned/{id}/available-actions',        EqmsLessonsLearnedController::class, 'availableActions');
+    $router->post('/api/v1/eqms/lessons-learned/{id}/export',                   EqmsLessonsLearnedController::class, 'export');
+    $router->post('/api/v1/eqms/lessons-learned/export',                        EqmsLessonsLearnedController::class, 'exportBulk');
+    $router->post('/api/v1/eqms/lessons-learned/{id}/actions/submit-for-review',EqmsLessonsLearnedController::class, 'actionSubmitForReview');
+    $router->post('/api/v1/eqms/lessons-learned/{id}/actions/approve',          EqmsLessonsLearnedController::class, 'actionApprove');
+    $router->post('/api/v1/eqms/lessons-learned/{id}/actions/reject',           EqmsLessonsLearnedController::class, 'actionReject');
+    $router->post('/api/v1/eqms/lessons-learned/{id}/actions/request-revision', EqmsLessonsLearnedController::class, 'actionRequestRevision');
+    $router->post('/api/v1/eqms/lessons-learned/{id}/actions/submit-revision',  EqmsLessonsLearnedController::class, 'actionSubmitRevision');
+    $router->post('/api/v1/eqms/lessons-learned/{id}/actions/publish',          EqmsLessonsLearnedController::class, 'actionPublish');
+    $router->post('/api/v1/eqms/lessons-learned/{id}/actions/archive',          EqmsLessonsLearnedController::class, 'actionArchive');
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // MODULE M37-E: Customer Satisfaction CSAT (IATF 16949 §9.1.2)
+    // ═══════════════════════════════════════════════════════════════════════════
+    $router->post('/api/v1/eqms/customer-satisfaction/query',                   EqmsCsatController::class, 'search');
+    $router->get ('/api/v1/eqms/customer-satisfaction/metrics',                 EqmsCsatController::class, 'metrics');
+    $router->get ('/api/v1/eqms/customer-satisfaction/trend',                   EqmsCsatController::class, 'trend');
+    $router->post('/api/v1/eqms/customer-satisfaction/lookup',                  EqmsCsatController::class, 'lookup');
+    $router->post('/api/v1/eqms/customer-satisfaction',                         EqmsCsatController::class, 'create');
+    $router->get ('/api/v1/eqms/customer-satisfaction/{id}',                    EqmsCsatController::class, 'detail');
+    $router->patch('/api/v1/eqms/customer-satisfaction/{id}',                   EqmsCsatController::class, 'update');
+    $router->get ('/api/v1/eqms/customer-satisfaction/{id}/audit',              EqmsCsatController::class, 'audit');
+    $router->get ('/api/v1/eqms/customer-satisfaction/{id}/comments',           EqmsCsatController::class, 'comments');
+    $router->post('/api/v1/eqms/customer-satisfaction/{id}/comments',           EqmsCsatController::class, 'comments');
+    $router->get ('/api/v1/eqms/customer-satisfaction/{id}/attachments',        EqmsCsatController::class, 'attachments');
+    $router->post('/api/v1/eqms/customer-satisfaction/{id}/attachments',        EqmsCsatController::class, 'attachments');
+    $router->get ('/api/v1/eqms/customer-satisfaction/{id}/relationships',      EqmsCsatController::class, 'relationships');
+    $router->post('/api/v1/eqms/customer-satisfaction/{id}/relationships/link', EqmsCsatController::class, 'relationshipsLink');
+    $router->post('/api/v1/eqms/customer-satisfaction/{id}/relationships/unlink',EqmsCsatController::class, 'relationshipsUnlink');
+    $router->get ('/api/v1/eqms/customer-satisfaction/{id}/available-actions',  EqmsCsatController::class, 'availableActions');
+    $router->post('/api/v1/eqms/customer-satisfaction/{id}/export',             EqmsCsatController::class, 'export');
+    $router->post('/api/v1/eqms/customer-satisfaction/export',                  EqmsCsatController::class, 'exportBulk');
+    $router->post('/api/v1/eqms/customer-satisfaction/{id}/actions/dispatch',          EqmsCsatController::class, 'actionDispatch');
+    $router->post('/api/v1/eqms/customer-satisfaction/{id}/actions/record-response',   EqmsCsatController::class, 'actionRecordResponse');
+    $router->post('/api/v1/eqms/customer-satisfaction/{id}/actions/analyze',           EqmsCsatController::class, 'actionAnalyze');
+    $router->post('/api/v1/eqms/customer-satisfaction/{id}/actions/approve',           EqmsCsatController::class, 'actionApprove');
+    $router->post('/api/v1/eqms/customer-satisfaction/{id}/actions/close',             EqmsCsatController::class, 'actionClose');
+    $router->post('/api/v1/eqms/customer-satisfaction/{id}/actions/close-no-response', EqmsCsatController::class, 'actionCloseNoResponse');
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // MODULE M38-E: Sampling Plans (ANSI/ASQ Z1.4/Z1.9)
+    // ═══════════════════════════════════════════════════════════════════════════
+    $router->post('/api/v1/eqms/sampling-plans/query',                          EqmsSamplingPlansController::class, 'search');
+    $router->get ('/api/v1/eqms/sampling-plans/metrics',                        EqmsSamplingPlansController::class, 'metrics');
+    $router->post('/api/v1/eqms/sampling-plans/lookup',                         EqmsSamplingPlansController::class, 'lookup');
+    $router->get ('/api/v1/eqms/sampling-plans/lookup-for-part',                EqmsSamplingPlansController::class, 'lookupForPart');
+    $router->post('/api/v1/eqms/sampling-plans/lookup-for-part',                EqmsSamplingPlansController::class, 'lookupForPart');
+    $router->post('/api/v1/eqms/sampling-plans',                                EqmsSamplingPlansController::class, 'create');
+    $router->get ('/api/v1/eqms/sampling-plans/{id}',                           EqmsSamplingPlansController::class, 'detail');
+    $router->patch('/api/v1/eqms/sampling-plans/{id}',                          EqmsSamplingPlansController::class, 'update');
+    $router->get ('/api/v1/eqms/sampling-plans/{id}/audit',                     EqmsSamplingPlansController::class, 'audit');
+    $router->get ('/api/v1/eqms/sampling-plans/{id}/comments',                  EqmsSamplingPlansController::class, 'comments');
+    $router->post('/api/v1/eqms/sampling-plans/{id}/comments',                  EqmsSamplingPlansController::class, 'comments');
+    $router->get ('/api/v1/eqms/sampling-plans/{id}/attachments',               EqmsSamplingPlansController::class, 'attachments');
+    $router->post('/api/v1/eqms/sampling-plans/{id}/attachments',               EqmsSamplingPlansController::class, 'attachments');
+    $router->get ('/api/v1/eqms/sampling-plans/{id}/relationships',             EqmsSamplingPlansController::class, 'relationships');
+    $router->post('/api/v1/eqms/sampling-plans/{id}/relationships/link',        EqmsSamplingPlansController::class, 'relationshipsLink');
+    $router->post('/api/v1/eqms/sampling-plans/{id}/relationships/unlink',      EqmsSamplingPlansController::class, 'relationshipsUnlink');
+    $router->get ('/api/v1/eqms/sampling-plans/{id}/available-actions',         EqmsSamplingPlansController::class, 'availableActions');
+    $router->post('/api/v1/eqms/sampling-plans/{id}/export',                    EqmsSamplingPlansController::class, 'export');
+    $router->post('/api/v1/eqms/sampling-plans/export',                         EqmsSamplingPlansController::class, 'exportBulk');
+    $router->post('/api/v1/eqms/sampling-plans/{id}/actions/submit-for-approval', EqmsSamplingPlansController::class, 'actionSubmitForApproval');
+    $router->post('/api/v1/eqms/sampling-plans/{id}/actions/approve',           EqmsSamplingPlansController::class, 'actionApprove');
+    $router->post('/api/v1/eqms/sampling-plans/{id}/actions/reject',            EqmsSamplingPlansController::class, 'actionReject');
+    $router->post('/api/v1/eqms/sampling-plans/{id}/actions/request-revision',  EqmsSamplingPlansController::class, 'actionRequestRevision');
+    $router->post('/api/v1/eqms/sampling-plans/{id}/actions/submit-revision',   EqmsSamplingPlansController::class, 'actionSubmitRevision');
+    $router->post('/api/v1/eqms/sampling-plans/{id}/actions/obsolete',          EqmsSamplingPlansController::class, 'actionObsolete');
 };

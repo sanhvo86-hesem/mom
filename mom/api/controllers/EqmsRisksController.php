@@ -989,4 +989,58 @@ class EqmsRisksController extends EqmsBaseController
 
         $this->success(['fmea' => $this->loadFmea($fmeaId)]);
     }
+
+    // ── Cross-module Actions ──────────────────────────────────────────────────
+
+    /**
+     * POST /eqms/risks/{id}/actions/request-validation-scope-update
+     * Flag this risk as requiring a validation scope update (GAMP 5 §5, FDA 21 CFR Part 11).
+     * Creates a linked record in the validation management system or escalates existing FMEA.
+     * Body requires: { scope_update_description }
+     * Body optional: { validation_impact, assigned_to }
+     */
+    public function actionRequestValidationScopeUpdate(): never
+    {
+        $user   = $this->requireAuth();
+        $this->requireAnyRole($user, $this->eqmsValidationRoles());
+
+        $riskId = $this->requirePathId('id', 'risk_id');
+        $risk   = $this->loadRisk($riskId);
+
+        if (in_array($risk['status'], ['closed', 'mitigated', 'accepted'], true)) {
+            // Allow requesting scope update even on mitigated risks — regulatory requirement
+        }
+
+        $body       = $this->jsonBody();
+        $scopeDesc  = trim((string)($body['scope_update_description'] ?? ''));
+        if ($scopeDesc === '') {
+            $this->error('scope_update_description_required', 400,
+                "'scope_update_description' is required.");
+        }
+
+        $actor = (string)($user['username'] ?? $user['user'] ?? 'unknown');
+        $now   = $this->nowIso();
+
+        // Record the validation scope update request as a risk treatment note
+        $this->data->execute(
+            "UPDATE " . self::TABLE . "
+             SET mitigation_notes = COALESCE(mitigation_notes, '') || E'\n[VALIDATION SCOPE UPDATE REQUEST " . date('Y-m-d') . "] ' || :desc,
+                 updated_at = now(), updated_by = :by
+             WHERE risk_id = :id",
+            [':desc' => $scopeDesc, ':by' => $actor, ':id' => $riskId]
+        );
+
+        // Emit event so validation management system can pick it up via outbox
+        $this->emitQualityEvent('eqms.risk.validation_scope_update_requested', self::ENTITY_TYPE, $riskId, [
+            'risk_number'              => $risk['risk_number'] ?? $riskId,
+            'scope_update_description' => $scopeDesc,
+            'validation_impact'        => $body['validation_impact'] ?? 'tbd',
+            'requested_by'             => $actor,
+        ], $user);
+
+        $this->success([
+            'risk'    => $this->loadRisk($riskId),
+            'message' => 'Validation scope update request recorded and dispatched to validation management.',
+        ]);
+    }
 }

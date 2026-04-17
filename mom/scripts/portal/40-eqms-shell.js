@@ -191,11 +191,49 @@
     return data;
   }
 
+  // ── GET cache (Sprint 7E) ─────────────────────────────────────────────────
+  // Caches GET responses for 60 seconds to prevent redundant API calls when
+  // multiple modules request the same data (e.g. reference lists, metrics).
+  var _getCache = {};        // cacheKey -> { data, expiresAt }
+  var GET_CACHE_TTL_MS = 60 * 1000;
+
+  function _getCacheKey(action, payload) {
+    return action + '|' + (payload ? JSON.stringify(payload) : '');
+  }
+
+  function _getCached(action, payload) {
+    var key = _getCacheKey(action, payload);
+    var entry = _getCache[key];
+    if (entry && Date.now() < entry.expiresAt) return entry.data;
+    if (entry) delete _getCache[key];
+    return null;
+  }
+
+  function _setCached(action, payload, data) {
+    _getCache[_getCacheKey(action, payload)] = { data: data, expiresAt: Date.now() + GET_CACHE_TTL_MS };
+  }
+
+  function invalidateGetCache(actionPrefix) {
+    if (!actionPrefix) { _getCache = {}; return; }
+    Object.keys(_getCache).forEach(function(k) {
+      if (k.indexOf(actionPrefix) === 0) delete _getCache[k];
+    });
+  }
+
   // API wrapper
   function apiCall(action, payload, method, timeout) {
     method = method || 'POST';
     timeout = timeout || 30000; // 30s default timeout
     var url = 'api/index.php?action=' + encodeURIComponent(action);
+
+    // Sprint 7E: serve GET requests from 60-second in-memory cache
+    if (method === 'GET') {
+      var cached = _getCached(action, payload);
+      if (cached !== null) {
+        return Promise.resolve(cached);
+      }
+    }
+
     var controller = new AbortController();
     var timer = setTimeout(function() { controller.abort(); }, timeout);
     var opts = { method: method, headers: { 'Content-Type': 'application/json' }, credentials: 'include', signal: controller.signal };
@@ -208,7 +246,11 @@
     return fetch(url, opts).then(function(r) {
       clearTimeout(timer);
       return r.json().then(function(data) {
-        return normalizeApiResponse(data, r.status);
+        var normalized = normalizeApiResponse(data, r.status);
+        if (method === 'GET' && normalized && normalized.ok !== false) {
+          _setCached(action, payload, normalized);
+        }
+        return normalized;
       });
     }).catch(function(err) {
       clearTimeout(timer);
@@ -997,9 +1039,20 @@
   // =========================================================================
   // SHARED COMPONENT 9: renderDataGrid
   // =========================================================================
+  // Sprint 7E: virtual scroll threshold
+  var VIRTUAL_SCROLL_THRESHOLD = 150;
+
   function renderDataGrid(columns, data, config) {
     config = config || {};
-    var html = '<div class="eqms-grid-wrapper">';
+    var isLarge = data && data.length > VIRTUAL_SCROLL_THRESHOLD;
+
+    // Sprint 7E: wrap large grids in a scrollable container that triggers
+    // CSS content-visibility for off-screen rows (modern browser optimisation).
+    var wrapperAttrs = 'class="eqms-grid-wrapper' + (isLarge ? ' eqms-grid-virtual' : '') + '"';
+    if (isLarge) {
+      wrapperAttrs += ' style="overflow-y:auto;max-height:60vh"';
+    }
+    var html = '<div ' + wrapperAttrs + '>';
     html += '<table class="eqms-grid">';
     html += '<thead><tr>';
     if (config.selectable) html += '<th style="width:32px"><input type="checkbox" data-action="select-all"></th>';
@@ -1026,7 +1079,9 @@
           row.msa_id || row.investigation_id || row.inspection_id || row.spc_id ||
           row.batch_release_id || row.project_id || row.field_action_id ||
           row.thread_id || row.agreement_id || '';
-        html += '<tr data-id="' + esc(rowId) + '">';
+        // Sprint 7E: content-visibility on large grids
+        var rowStyle = isLarge ? ' style="content-visibility:auto;contain-intrinsic-size:auto 44px"' : '';
+        html += '<tr data-id="' + esc(rowId) + '"' + rowStyle + '>';
         if (config.selectable) html += '<td><input type="checkbox" data-action="select-row" data-id="' + esc(rowId) + '"></td>';
         columns.forEach(function(col) {
           var val = row[col.key];
@@ -1035,7 +1090,9 @@
           else if (col.type === 'date') cls = 'eqms-cell-date';
           else if (col.type === 'truncate') cls = 'eqms-cell-truncate';
 
-          html += '<td' + (cls ? ' class="' + cls + '"' : '') + '>';
+          // Sprint 7E: data-label for mobile card view
+          var colLabel = T(col.label || {});
+          html += '<td' + (cls ? ' class="' + cls + '"' : '') + ' data-label="' + esc(colLabel) + '">';
           if (col.type === 'badge') {
             html += '<span class="eqms-badge ' + slugify(val || '') + '">' + esc(val || '—') + '</span>';
           } else if (col.type === 'priority') {
@@ -1056,7 +1113,15 @@
         html += '</tr>';
       });
     }
-    html += '</tbody></table></div>';
+    html += '</tbody></table>';
+    // Sprint 7E: large grid row count indicator
+    if (isLarge) {
+      html += '<div class="eqms-grid-virtual-info">'
+        + T({ vi: 'Hiển thị ', en: 'Showing ' }) + data.length
+        + T({ vi: ' dòng — cuộn để xem thêm', en: ' rows — scroll to view all' })
+        + '</div>';
+    }
+    html += '</div>';
     return html;
   }
 
@@ -1923,6 +1988,200 @@
   }
 
   // =========================================================================
+  // REAL-TIME EVENTS ENGINE (SSE / polling fallback)
+  // =========================================================================
+  //
+  // Usage (from any module):
+  //   EqmsShell.events.subscribe('workflow', handler)   — attach handler
+  //   EqmsShell.events.unsubscribe('workflow', handler) — detach handler
+  //   EqmsShell.events.connect({ channels, modules, record_id })
+  //   EqmsShell.events.disconnect()
+  //
+  // Handlers receive: { type, ...payload }
+  // =========================================================================
+
+  var _sseSource          = null;
+  var _sseMode            = 'idle';      // 'idle' | 'stream' | 'polling'
+  var _ssePollTimer       = null;
+  var _sseRetryTimer      = null;
+  var _sseRetryCount      = 0;
+  var _sseMaxRetry        = 8;
+  var _sseOptions         = {};
+  var _sseHandlers        = {};          // eventType -> [fn, fn, ...]
+  var _sseGlobalHandlers  = [];          // called for every event
+
+  var SSE_RETRY_DELAYS = [1000, 2000, 4000, 8000, 15000, 30000, 60000, 120000];
+
+  function sseConnect(options) {
+    options = options || {};
+    _sseOptions = options;
+    _sseRetryCount = 0;
+    _sseDisconnect();
+    _sseOpen();
+  }
+
+  function sseDisconnect() {
+    _sseRetryCount = _sseMaxRetry; // prevent auto-reconnect
+    _sseDisconnect();
+  }
+
+  function _sseDisconnect() {
+    if (_ssePollTimer) { clearInterval(_ssePollTimer); _ssePollTimer = null; }
+    if (_sseRetryTimer) { clearTimeout(_sseRetryTimer); _sseRetryTimer = null; }
+    if (_sseSource) {
+      _sseSource.close();
+      _sseSource = null;
+    }
+    _sseMode = 'idle';
+  }
+
+  function _sseOpen() {
+    if (typeof EventSource === 'undefined') {
+      _sseStartPolling();
+      return;
+    }
+
+    var params = 'channels=' + encodeURIComponent((_sseOptions.channels || 'workflow,notifications'));
+    if (_sseOptions.modules)   params += '&modules='   + encodeURIComponent(_sseOptions.modules);
+    if (_sseOptions.record_id) params += '&record_id=' + encodeURIComponent(_sseOptions.record_id);
+
+    var url = 'api/index.php?action=eqms_events_stream&' + params;
+    // Direct REST endpoint (preferred when router supports it)
+    if (window.location && window.location.pathname) {
+      url = '/api/v1/eqms/events/stream?' + params;
+    }
+
+    try {
+      var src = new EventSource(url, { withCredentials: true });
+
+      src.addEventListener('connected', function(e) {
+        _sseRetryCount = 0;
+        var data = JSON.parse(e.data || '{}');
+        _sseMode = data.mode === 'polling' ? 'polling' : 'stream';
+        if (_sseMode === 'polling') {
+          src.close();
+          _sseSource = null;
+          _sseStartPolling(data.poll_interval || 60);
+        } else {
+          _sseMode = 'stream';
+        }
+        _sseDispatch('connected', data);
+      });
+
+      src.addEventListener('reconnect', function(e) {
+        var data = JSON.parse(e.data || '{}');
+        if (data.retry) src.dispatchEvent; // EventSource handles retry natively
+        _sseDispatch('reconnect', data);
+      });
+
+      src.addEventListener('error', function(e) {
+        _sseDispatch('error', { source: 'sse', readyState: src.readyState });
+      });
+
+      // Catch-all for unnamed 'message' events (fallback)
+      src.onmessage = function(e) {
+        try {
+          var payload = JSON.parse(e.data);
+          _sseDispatch(payload.type || 'message', payload);
+        } catch(err) {}
+      };
+
+      // Named event types from the server
+      var sseEventTypes = [
+        'workflow.transitioned', 'notification.new', 'dashboard.updated',
+        'mes.state_changed', 'dispatch.updated', 'ai.prediction.quality',
+        'record.updated', 'comment.added', 'attachment.added',
+        'assignment.changed', 'metric.refresh', 'error'
+      ];
+      sseEventTypes.forEach(function(type) {
+        src.addEventListener(type, function(e) {
+          try {
+            var payload = JSON.parse(e.data);
+            _sseDispatch(type, payload);
+          } catch(err) {}
+        });
+      });
+
+      src.onerror = function() {
+        if (src.readyState === EventSource.CLOSED) {
+          _sseSource = null;
+          _sseMode = 'idle';
+          _sseScheduleRetry();
+        }
+      };
+
+      _sseSource = src;
+      _sseMode = 'stream';
+    } catch(err) {
+      _sseStartPolling();
+    }
+  }
+
+  function _sseScheduleRetry() {
+    if (_sseRetryTimer) clearTimeout(_sseRetryTimer);
+    if (_sseRetryCount >= _sseMaxRetry) {
+      _sseStartPolling(120);
+      return;
+    }
+    var delay = SSE_RETRY_DELAYS[Math.min(_sseRetryCount, SSE_RETRY_DELAYS.length - 1)];
+    _sseRetryCount++;
+    _sseRetryTimer = setTimeout(function() { _sseOpen(); }, delay);
+  }
+
+  function _sseStartPolling(intervalSeconds) {
+    _sseMode = 'polling';
+    var ms = (intervalSeconds || 60) * 1000;
+    if (_ssePollTimer) clearInterval(_ssePollTimer);
+    _ssePollTimer = setInterval(function() {
+      _ssePollTick();
+    }, ms);
+  }
+
+  function _ssePollTick() {
+    var channels = (_sseOptions.channels || 'workflow,notifications').split(',');
+    var needsWorkflow = channels.indexOf('workflow') >= 0 || channels.indexOf('all') >= 0;
+    var needsDashboard = channels.indexOf('dashboard') >= 0 || channels.indexOf('all') >= 0;
+    if (needsDashboard && typeof loadCommandCenterData === 'function') {
+      loadCommandCenterData();
+    }
+    _sseDispatch('poll.tick', { ts: Date.now(), channels: channels });
+  }
+
+  function sseSubscribe(eventType, handler) {
+    if (eventType === '*') {
+      if (_sseGlobalHandlers.indexOf(handler) < 0) _sseGlobalHandlers.push(handler);
+      return;
+    }
+    if (!_sseHandlers[eventType]) _sseHandlers[eventType] = [];
+    if (_sseHandlers[eventType].indexOf(handler) < 0) _sseHandlers[eventType].push(handler);
+  }
+
+  function sseUnsubscribe(eventType, handler) {
+    if (eventType === '*') {
+      _sseGlobalHandlers = _sseGlobalHandlers.filter(function(h) { return h !== handler; });
+      return;
+    }
+    if (_sseHandlers[eventType]) {
+      _sseHandlers[eventType] = _sseHandlers[eventType].filter(function(h) { return h !== handler; });
+    }
+  }
+
+  function _sseDispatch(eventType, payload) {
+    var event = Object.assign({ type: eventType }, payload);
+    // Type-specific handlers
+    var handlers = _sseHandlers[eventType] || [];
+    handlers.forEach(function(h) { try { h(event); } catch(e) {} });
+    // Wildcard handlers
+    _sseGlobalHandlers.forEach(function(h) { try { h(event); } catch(e) {} });
+    // Workflow transitions auto-refresh the active module's queue
+    if (eventType === 'workflow.transitioned' && window.EqmsShell && typeof window.EqmsShell.onLiveEvent === 'function') {
+      window.EqmsShell.onLiveEvent(event);
+    }
+  }
+
+  function sseGetMode() { return _sseMode; }
+
+  // =========================================================================
   // PUBLIC API
   // =========================================================================
   window.EqmsModules = window.EqmsModules || {};
@@ -1988,8 +2247,19 @@
       hydrateReferenceControls: hydrateReferenceControls,
       inferReferenceKey: inferReferenceKey,
       normalizeApiResponse: normalizeApiResponse,
+      invalidateGetCache: invalidateGetCache,
       lang: _lang
-    }
+    },
+    // Real-time SSE event engine
+    events: {
+      connect:     sseConnect,
+      disconnect:  sseDisconnect,
+      subscribe:   sseSubscribe,
+      unsubscribe: sseUnsubscribe,
+      mode:        sseGetMode
+    },
+    // Called by _sseDispatch for workflow transitions — modules can override
+    onLiveEvent: null
   };
 
   // Register with portal router

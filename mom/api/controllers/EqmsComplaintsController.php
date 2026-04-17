@@ -1107,4 +1107,87 @@ final class EqmsComplaintsController extends EqmsBaseController
 
         $this->success(['complaint' => $this->fetchComplaint($id)]);
     }
+
+    // ── Cross-module Actions ──────────────────────────────────────────────────
+
+    /**
+     * POST /eqms/customer-complaints/{id}/actions/escalate-risk
+     * Escalate a high-severity complaint to the Risk Register.
+     * Body optional: { risk_title, probability, impact, assigned_to }
+     */
+    public function actionEscalateRisk(): never
+    {
+        $user   = $this->requireAuth();
+        $this->requireAnyRole($user, $this->writeRoles());
+
+        $id     = $this->requirePathId('id', 'complaint_id');
+        $record = $this->fetchComplaint($id);
+
+        if (in_array($record['status'], ['closed'], true)) {
+            $this->error('record_terminal', 409, "Cannot escalate a closed complaint to risk.");
+        }
+
+        $existing = $this->data->scalar(
+            "SELECT risk_id FROM eqms_risk_register
+             WHERE source_type = 'complaint' AND source_id = :id LIMIT 1",
+            [':id' => $id]
+        );
+        if ($existing) {
+            $this->error('risk_already_escalated', 409,
+                "Complaint already escalated to Risk Register (risk_id: {$existing}).");
+        }
+
+        $body       = $this->jsonBody();
+        $actor      = (string)($user['username'] ?? $user['user'] ?? 'unknown');
+        $riskId     = $this->newUuid();
+        $riskNumber = 'RISK-' . strtoupper(substr($riskId, 0, 8));
+        $now        = $this->nowIso();
+        $title      = !empty($body['risk_title'])
+                      ? trim((string)$body['risk_title'])
+                      : 'Risk escalated from Complaint ' . ($record['complaint_number'] ?? $id);
+
+        $this->data->execute(
+            "INSERT INTO eqms_risk_register
+             (risk_id, risk_number, title, description, risk_category, source_type, source_id,
+              probability, impact, risk_score, assigned_to,
+              status, version, created_at, created_by)
+             VALUES
+             (:id, :num, :title, :desc, 'customer', 'complaint', :src_id,
+              :prob, :impact, (:prob::int * :impact2::int), :assigned,
+              'identified', 1, :now, :by)",
+            [
+                ':id'       => $riskId,
+                ':num'      => $riskNumber,
+                ':title'    => $title,
+                ':desc'     => (string)($record['description'] ?? ''),
+                ':src_id'   => $id,
+                ':prob'     => (int)($body['probability'] ?? 3),
+                ':impact'   => (int)($body['impact'] ?? 4),
+                ':impact2'  => (int)($body['impact'] ?? 4),
+                ':assigned' => $body['assigned_to'] ?? null,
+                ':now'      => $now,
+                ':by'       => $actor,
+            ]
+        );
+
+        $this->data->execute(
+            "INSERT INTO eqms_record_links
+             (link_id, source_type, source_id, target_type, target_id, relationship_type, linked_by, linked_at)
+             VALUES (:lid, 'complaint', :comp_id, 'risk', :risk_id, 'escalated_risk', :by, now())
+             ON CONFLICT (source_type, source_id, target_type, target_id) DO NOTHING",
+            [':lid' => $this->newUuid(), ':comp_id' => $id, ':risk_id' => $riskId, ':by' => $actor]
+        );
+
+        $this->emitQualityEvent('eqms.complaint.risk_escalated', 'complaint', $id, [
+            'risk_id'     => $riskId,
+            'risk_number' => $riskNumber,
+        ], $user);
+
+        $risk = $this->data->query(
+            "SELECT risk_id, risk_number, title, status, risk_score FROM eqms_risk_register WHERE risk_id = :id",
+            [':id' => $riskId]
+        )[0] ?? [];
+
+        $this->success(['complaint' => $this->fetchComplaint($id), 'created_risk' => $risk], 201);
+    }
 }

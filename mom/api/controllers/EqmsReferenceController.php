@@ -362,6 +362,85 @@ final class EqmsReferenceController extends EqmsBaseController
             'order' => 'planned_date DESC NULLS LAST, audit_number',
             'meta' => "jsonb_build_object('audit_type', audit_type, 'standard_ref', standard_ref, 'status', status)",
         ],
+        // Sprint 6A — Concessions, FAI, Special Characteristics
+        'concessions' => [
+            'table' => 'eqms_concession_records',
+            'value' => 'concession_id::text',
+            'label' => "concession_number || ' - ' || title",
+            'search' => ['concession_number', 'title', 'concession_type', 'part_number', 'status'],
+            'order' => 'created_at DESC, concession_number',
+            'meta' => "jsonb_build_object('concession_type', concession_type, 'disposition', disposition, 'status', status)",
+        ],
+        'concession_records' => ['alias' => 'concessions'],
+        'fai_reports' => [
+            'table' => 'eqms_fai_reports',
+            'value' => 'fai_id::text',
+            'label' => "fai_number || ' - ' || title",
+            'search' => ['fai_number', 'title', 'fai_type', 'part_number', 'status'],
+            'order' => 'created_at DESC, fai_number',
+            'meta' => "jsonb_build_object('fai_type', fai_type, 'part_number', part_number, 'status', status)",
+        ],
+        'special_characteristics' => [
+            'table' => 'eqms_special_characteristics',
+            'value' => 'sc_id::text',
+            'label' => "sc_number || ' - ' || characteristic_name",
+            'search' => ['sc_number', 'characteristic_name', 'sc_type', 'part_number', 'status'],
+            'order' => 'sc_number',
+            'where' => "status = 'approved'",
+            'meta' => "jsonb_build_object('sc_type', sc_type, 'part_number', part_number, 'current_cpk', current_cpk, 'status', status)",
+        ],
+        // Sprint 6B — AML, Warranty Claims
+        'aml_records' => [
+            'table' => 'eqms_aml_records',
+            'value' => 'aml_id::text',
+            'label' => "aml_number || ' - ' || part_number || ' / ' || vendor_id",
+            'search' => ['aml_number', 'part_number', 'vendor_id', 'vendor_name', 'status'],
+            'order' => 'created_at DESC, aml_number',
+            'meta' => "jsonb_build_object('part_number', part_number, 'vendor_id', vendor_id, 'status', status)",
+        ],
+        'warranty_claims' => [
+            'table' => 'eqms_warranty_claims',
+            'value' => 'claim_id::text',
+            'label' => "claim_number || ' - ' || subject",
+            'search' => ['claim_number', 'subject', 'customer_name', 'status'],
+            'order' => 'created_at DESC, claim_number',
+            'meta' => "jsonb_build_object('customer_name', customer_name, 'status', status)",
+        ],
+        // Sprint 6C — Lessons Learned, CSAT, Sampling Plans
+        'lessons_learned' => [
+            'table' => 'eqms_lessons_learned',
+            'value' => 'lesson_id::text',
+            'label' => "lesson_number || ' - ' || title",
+            'search' => ['lesson_number', 'title', 'lesson_type', 'status'],
+            'order' => 'created_at DESC, lesson_number',
+            'where' => "status = 'published'",
+            'meta' => "jsonb_build_object('lesson_type', lesson_type, 'status', status)",
+        ],
+        'lessons_learned_all' => [
+            'table' => 'eqms_lessons_learned',
+            'value' => 'lesson_id::text',
+            'label' => "lesson_number || ' - ' || title",
+            'search' => ['lesson_number', 'title', 'lesson_type', 'status'],
+            'order' => 'created_at DESC, lesson_number',
+            'meta' => "jsonb_build_object('lesson_type', lesson_type, 'status', status)",
+        ],
+        'csat_surveys' => [
+            'table' => 'eqms_csat_surveys',
+            'value' => 'survey_id::text',
+            'label' => "survey_number || ' - ' || title",
+            'search' => ['survey_number', 'title', 'survey_type', 'customer_name', 'status'],
+            'order' => 'survey_date DESC, survey_number',
+            'meta' => "jsonb_build_object('survey_type', survey_type, 'customer_name', customer_name, 'status', status)",
+        ],
+        'sampling_plans' => [
+            'table' => 'eqms_sampling_plans',
+            'value' => 'plan_id::text',
+            'label' => "plan_number || ' - ' || title",
+            'search' => ['plan_number', 'title', 'plan_type', 'part_number', 'vendor_id', 'status'],
+            'order' => 'plan_number',
+            'where' => "status = 'approved'",
+            'meta' => "jsonb_build_object('plan_type', plan_type, 'part_number', part_number, 'status', status)",
+        ],
     ];
 
     /** @var array<string, string> */
@@ -587,6 +666,46 @@ final class EqmsReferenceController extends EqmsBaseController
         'vote' => 'eqms.vote',
         'impact' => 'eqms.impact',
         'quality_status' => 'eqms.quality_status',
+        // Sprint 6A entity FK aliases
+        'concession_id' => 'concessions',
+        'linked_concession_id' => 'concessions',
+        'fai_id' => 'fai_reports',
+        'linked_fai_id' => 'fai_reports',
+        'fai_report_id' => 'fai_reports',
+        'sc_id' => 'special_characteristics',
+        'special_characteristic_id' => 'special_characteristics',
+        // Sprint 6B entity FK aliases
+        'aml_id' => 'aml_records',
+        'aml_record_id' => 'aml_records',
+        'warranty_claim_id' => 'warranty_claims',
+        'linked_warranty_claim_id' => 'warranty_claims',
+        // Sprint 6C entity FK aliases
+        'lesson_id' => 'lessons_learned',
+        'linked_lesson_id' => 'lessons_learned',
+        'survey_id' => 'csat_surveys',
+        'csat_survey_id' => 'csat_surveys',
+        'sampling_plan_id' => 'sampling_plans',
+        'plan_id' => 'sampling_plans',
+        // Sprint 6A MDM code set aliases
+        'concession_type' => 'eqms.concession_type',
+        'concession_disposition' => 'eqms.concession_disposition',
+        'fai_type' => 'eqms.fai_type',
+        'fai_result' => 'eqms.fai_result',
+        'sc_type' => 'eqms.sc_type',
+        'characteristic_type' => 'eqms.sc_type',
+        // Sprint 6B MDM code set aliases
+        'aml_approval_type' => 'eqms.aml_approval_type',
+        'approval_class' => 'eqms.aml_approval_type',
+        'warranty_claim_type' => 'eqms.warranty_claim_type',
+        'claim_type' => 'eqms.warranty_claim_type',
+        'warranty_failure_mode' => 'eqms.warranty_failure_mode',
+        'failure_mode' => 'eqms.warranty_failure_mode',
+        // Sprint 6C MDM code set aliases
+        'lesson_type' => 'eqms.lesson_type',
+        'csat_survey_type' => 'eqms.csat_survey_type',
+        'survey_type' => 'eqms.csat_survey_type',
+        'sampling_plan_type' => 'eqms.sampling_plan_type',
+        'plan_type' => 'eqms.sampling_plan_type',
     ];
 
     /** @var array<string, list<array{0: string, 1: string}>> */
@@ -606,6 +725,14 @@ final class EqmsReferenceController extends EqmsBaseController
             ['eqms_quality_agreements', 'status'],
             ['eqms_batch_release', 'status'],
             ['eqms_field_actions', 'status'],
+            ['eqms_concession_records', 'status'],
+            ['eqms_fai_reports', 'status'],
+            ['eqms_special_characteristics', 'status'],
+            ['eqms_aml_records', 'status'],
+            ['eqms_warranty_claims', 'status'],
+            ['eqms_lessons_learned', 'status'],
+            ['eqms_csat_surveys', 'status'],
+            ['eqms_sampling_plans', 'status'],
         ],
         'eqms.severity' => [
             ['eqms_complaints', 'severity'],
@@ -1003,6 +1130,34 @@ final class EqmsReferenceController extends EqmsBaseController
                        status::text AS status,
                        created_at
                   FROM eqms_audits
+                UNION ALL
+                SELECT concession_id::text AS value,
+                       concession_number || ' - ' || title AS label,
+                       'concession'::text AS source_type,
+                       status::text AS status,
+                       created_at
+                  FROM eqms_concession_records
+                UNION ALL
+                SELECT fai_id::text AS value,
+                       fai_number || ' - ' || title AS label,
+                       'fai'::text AS source_type,
+                       status::text AS status,
+                       created_at
+                  FROM eqms_fai_reports
+                UNION ALL
+                SELECT claim_id::text AS value,
+                       claim_number || ' - ' || subject AS label,
+                       'warranty_claim'::text AS source_type,
+                       status::text AS status,
+                       created_at
+                  FROM eqms_warranty_claims
+                UNION ALL
+                SELECT lesson_id::text AS value,
+                       lesson_number || ' - ' || title AS label,
+                       'lesson_learned'::text AS source_type,
+                       status::text AS status,
+                       created_at
+                  FROM eqms_lessons_learned
              ) records
              WHERE {$where}
              ORDER BY created_at DESC

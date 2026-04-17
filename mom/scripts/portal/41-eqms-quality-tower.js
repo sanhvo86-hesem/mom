@@ -47,18 +47,24 @@
   var PRIORITY_COLORS      = { critical: '#dc2626', high: '#ea580c', medium: '#ca8a04', low: '#16a34a' };
 
   var MODULE_DEFS = [
-    { id: 'complaints',     label: { vi: 'Khiếu nại',          en: 'Complaints' },        icon: '\uD83D\uDCE2' },
-    { id: 'deviations',     label: { vi: 'Sai lệch',           en: 'Deviations' },         icon: '\u26A0\uFE0F' },
-    { id: 'ncr',            label: { vi: 'NCR',                 en: 'NCR / MRB' },          icon: '\uD83D\uDEAB' },
-    { id: 'capa',           label: { vi: 'CAPA',                en: 'CAPA' },               icon: '\uD83D\uDD27' },
-    { id: 'change-control', label: { vi: 'Thay đổi',            en: 'Change Control' },     icon: '\uD83D\uDD04' },
-    { id: 'audits',         label: { vi: 'Đánh giá',            en: 'Audits' },             icon: '\uD83D\uDD0D' },
-    { id: 'suppliers',      label: { vi: 'NCC',                 en: 'Suppliers' },           icon: '\uD83C\uDF10' },
-    { id: 'calibration',    label: { vi: 'Hiệu chuẩn',         en: 'Calibration' },        icon: '\uD83D\uDCCF' },
-    { id: 'lab-investigations', label: { vi: 'OOS/OOT',         en: 'Lab Investigations' }, icon: '\uD83D\uDD2C' },
-    { id: 'field-actions',  label: { vi: 'Hành động thực địa',  en: 'Field Actions' },      icon: '\uD83D\uDEA8' },
-    { id: 'batch-release',  label: { vi: 'Giải phóng lô',      en: 'Batch Release' },      icon: '\uD83D\uDCE6' },
-    { id: 'training',       label: { vi: 'Đào tạo',             en: 'Training' },           icon: '\uD83C\uDF93' }
+    { id: 'complaints',         label: { vi: 'Khiếu nại',           en: 'Complaints' },           icon: '\uD83D\uDCE2' },
+    { id: 'deviations',         label: { vi: 'Sai lệch',            en: 'Deviations' },            icon: '\u26A0\uFE0F' },
+    { id: 'ncr',                label: { vi: 'NCR',                  en: 'NCR / MRB' },             icon: '\uD83D\uDEAB' },
+    { id: 'capa',               label: { vi: 'CAPA',                 en: 'CAPA' },                  icon: '\uD83D\uDD27' },
+    { id: 'change-control',     label: { vi: 'Thay đổi',             en: 'Change Control' },        icon: '\uD83D\uDD04' },
+    { id: 'audits',             label: { vi: 'Đánh giá',             en: 'Audits' },                icon: '\uD83D\uDD0D' },
+    { id: 'suppliers',          label: { vi: 'NCC',                  en: 'Suppliers' },              icon: '\uD83C\uDF10' },
+    { id: 'calibration',        label: { vi: 'Hiệu chuẩn',          en: 'Calibration' },           icon: '\uD83D\uDCCF' },
+    { id: 'lab-investigations', label: { vi: 'OOS/OOT',              en: 'Lab Investigations' },    icon: '\uD83D\uDD2C' },
+    { id: 'field-actions',      label: { vi: 'Hành động thực địa',   en: 'Field Actions' },         icon: '\uD83D\uDEA8' },
+    { id: 'batch-release',      label: { vi: 'Giải phóng lô',       en: 'Batch Release' },         icon: '\uD83D\uDCE6' },
+    { id: 'training',           label: { vi: 'Đào tạo',              en: 'Training' },              icon: '\uD83C\uDF93' },
+    // Sprint 7C — new modules
+    { id: 'concessions',        label: { vi: 'Nhượng bộ',            en: 'Concessions' },           icon: '\uD83D\uDCDD' },
+    { id: 'fai',                label: { vi: 'Kiểm tra lần đầu',     en: 'First Article Insp.' },   icon: '\uD83D\uDDD2\uFE0F' },
+    { id: 'warranty',           label: { vi: 'Bảo hành',             en: 'Warranty Claims' },       icon: '\uD83D\uDEE0\uFE0F' },
+    { id: 'csat',               label: { vi: 'Hài lòng KH',          en: 'Customer Satisfaction' }, icon: '\u2B50' },
+    { id: 'sampling-plans',     label: { vi: 'Kế hoạch lấy mẫu',    en: 'Sampling Plans' },        icon: '\uD83D\uDCCA' }
   ];
 
   /* Role visibility configuration: which KPI cards each role can see */
@@ -67,32 +73,34 @@
     quality_manager:    ['all'],
     qa_manager:         ['all'],
     qms_manager:        ['all'],
-    quality_engineer:   ['open_ncr', 'open_capa', 'overdue_items', 'copq_mtd'],
-    process_engineer:   ['open_ncr', 'open_capa', 'copq_mtd'],
-    auditor:            ['audit_adherence', 'open_capa', 'overdue_items'],
-    compliance_manager: ['audit_adherence', 'overdue_items', 'open_capa'],
-    production_director:['open_ncr', 'copq_mtd', 'supplier_quality'],
-    engineering_manager:['open_ncr', 'open_capa', 'copq_mtd'],
-    supervisor:         ['open_ncr', 'overdue_items']
+    quality_engineer:   ['open_ncr','open_capa','overdue_items','copq_mtd','fpy_trend','escape_rate','open_concessions','fai_pass_rate'],
+    process_engineer:   ['open_ncr','open_capa','copq_mtd','fpy_trend','fai_pass_rate'],
+    auditor:            ['audit_adherence','open_capa','overdue_items','compliance_status'],
+    compliance_manager: ['audit_adherence','overdue_items','open_capa','compliance_status','mgmt_review'],
+    production_director:['open_ncr','copq_mtd','supplier_quality','supplier_scorecard','fpy_trend','escape_rate'],
+    engineering_manager:['open_ncr','open_capa','copq_mtd','fpy_trend','fai_pass_rate','open_concessions'],
+    supervisor:         ['open_ncr','overdue_items','fpy_trend']
   };
 
   // ── State ──
   var state = {
-    loading:        true,
-    error:          null,
-    dashboard:      null,      // from /dashboard
-    metrics:        null,      // from /metrics
-    overdueActions: null,      // from /overdue-actions
-    calendar:       null,      // from /compliance-calendar
+    loading:         true,
+    error:           null,
+    dashboard:       null,      // from /dashboard
+    metrics:         null,      // from /metrics
+    overdueActions:  null,      // from /overdue-actions
+    calendar:        null,      // from /compliance-calendar
+    extendedMetrics: null,      // from /extended-metrics (Sprint 7C)
     filters: {
       date_from:   '',
       date_to:     '',
       department:  '',
       priority:    ''
     },
-    lastFetchedAt:  null,
-    refreshTimer:   null,
-    chartModes:     {}         // chartId -> 'chart' | 'table'
+    lastFetchedAt:   null,
+    refreshTimer:    null,
+    chartModes:      {},        // chartId -> 'chart' | 'table'
+    sseSubscribed:   false
   };
 
   // ── API Layer ──
@@ -141,14 +149,16 @@
       apiFetch('dashboard',           filterParams),
       apiFetch('metrics',             filterParams),
       apiFetch('overdue-actions',     filterParams),
-      apiFetch('compliance-calendar', { days: 30 })
+      apiFetch('compliance-calendar', { days: 30 }),
+      apiFetch('extended-metrics',    filterParams)
     ]).then(function(results) {
-      state.dashboard      = results[0];
-      state.metrics        = results[1];
-      state.overdueActions = results[2];
-      state.calendar       = results[3];
-      state.loading        = false;
-      state.lastFetchedAt  = new Date();
+      state.dashboard        = results[0];
+      state.metrics          = results[1];
+      state.overdueActions   = results[2];
+      state.calendar         = results[3];
+      state.extendedMetrics  = results[4];
+      state.loading          = false;
+      state.lastFetchedAt    = new Date();
     }).catch(function(err) {
       state.loading = false;
       state.error   = err.message || 'Failed to load dashboard data';
@@ -282,6 +292,116 @@
         label: { vi: 'Tuân thủ lịch đánh giá', en: 'Audit Schedule Adherence' },
         value: auditAdherence != null ? auditAdherence + '%' : '\u2014',
         accent: auditAdherence != null ? (auditAdherence >= 95 ? 'success' : (auditAdherence >= 80 ? 'info' : 'warning')) : 'info',
+        freshness: getFreshnessClass()
+      });
+    }
+
+    // ── Sprint 7C: 10 new KPI cards ──────────────────────────────────────────
+    var xm = state.extendedMetrics || {};
+
+    if (isKpiVisible('fpy_trend')) {
+      var fpy = xm.fpy_current_pct;
+      var fpyPrev = xm.fpy_prev_pct;
+      var fpyDelta = (fpy != null && fpyPrev != null) ? (fpy - fpyPrev).toFixed(1) : null;
+      items.push({
+        label: { vi: 'FPY tháng này', en: 'First Pass Yield (MTD)' },
+        value: fpy != null ? fpy.toFixed(1) + '%' : '\u2014',
+        accent: fpy != null ? (fpy >= 98 ? 'success' : (fpy >= 95 ? 'info' : (fpy >= 90 ? 'warning' : 'critical'))) : 'info',
+        trendLabel: fpyDelta !== null ? (fpyDelta >= 0 ? '+' : '') + fpyDelta + '% vs tháng trước' : null,
+        freshness: getFreshnessClass()
+      });
+    }
+
+    if (isKpiVisible('escape_rate')) {
+      var escRate = xm.escape_rate_ppm;
+      items.push({
+        label: { vi: 'Tỉ lệ thoát lỗi (PPM)', en: 'Escape Rate (PPM)' },
+        value: escRate != null ? fmt(escRate) + ' ppm' : '\u2014',
+        accent: escRate != null ? (escRate === 0 ? 'success' : (escRate <= 50 ? 'info' : (escRate <= 200 ? 'warning' : 'critical'))) : 'info',
+        freshness: getFreshnessClass()
+      });
+    }
+
+    if (isKpiVisible('top_risks')) {
+      var criticalRisks = parseInt(xm.open_risks_critical || 0, 10);
+      var highRisks     = parseInt(xm.open_risks_high     || 0, 10);
+      items.push({
+        label: { vi: 'Rủi ro cao/nghiêm trọng', en: 'High / Critical Risks' },
+        value: fmt(criticalRisks + highRisks),
+        accent: criticalRisks > 0 ? 'critical' : (highRisks > 0 ? 'warning' : 'success'),
+        trendLabel: criticalRisks > 0 ? criticalRisks + ' ' + T({ vi: 'nghiêm trọng', en: 'critical' }) : null,
+        freshness: getFreshnessClass()
+      });
+    }
+
+    if (isKpiVisible('supplier_scorecard')) {
+      var scScore = xm.avg_supplier_scorecard_score;
+      items.push({
+        label: { vi: 'Điểm NCC trung bình', en: 'Avg Supplier Scorecard' },
+        value: scScore != null ? scScore.toFixed(0) + '/100' : '\u2014',
+        accent: scScore != null ? (scScore >= 85 ? 'success' : (scScore >= 70 ? 'info' : 'warning')) : 'info',
+        freshness: getFreshnessClass()
+      });
+    }
+
+    if (isKpiVisible('compliance_status')) {
+      var compPct = xm.overall_compliance_pct;
+      items.push({
+        label: { vi: 'Tuân thủ tổng thể', en: 'Overall Compliance Status' },
+        value: compPct != null ? compPct + '%' : '\u2014',
+        accent: compPct != null ? (compPct >= 95 ? 'success' : (compPct >= 80 ? 'warning' : 'critical')) : 'info',
+        freshness: getFreshnessClass()
+      });
+    }
+
+    if (isKpiVisible('mgmt_review')) {
+      var mgmtOverdue = parseInt(xm.overdue_mgmt_reviews || 0, 10);
+      items.push({
+        label: { vi: 'Xem xét quản lý quá hạn', en: 'Overdue Mgmt Reviews' },
+        value: fmt(mgmtOverdue),
+        accent: mgmtOverdue > 0 ? 'critical' : 'success',
+        freshness: getFreshnessClass()
+      });
+    }
+
+    if (isKpiVisible('open_concessions')) {
+      var openConc = parseInt(xm.open_concessions || (lc.open_concessions) || 0, 10);
+      items.push({
+        label: { vi: 'Nhượng bộ đang mở', en: 'Open Concessions' },
+        value: fmt(openConc),
+        accent: openConc > 5 ? 'warning' : (openConc > 0 ? 'info' : 'success'),
+        freshness: getFreshnessClass()
+      });
+    }
+
+    if (isKpiVisible('fai_pass_rate')) {
+      var faiPass = xm.fai_pass_rate_pct;
+      items.push({
+        label: { vi: 'Tỉ lệ FAI đạt', en: 'FAI Pass Rate' },
+        value: faiPass != null ? faiPass.toFixed(0) + '%' : '\u2014',
+        accent: faiPass != null ? (faiPass >= 95 ? 'success' : (faiPass >= 80 ? 'warning' : 'critical')) : 'info',
+        freshness: getFreshnessClass()
+      });
+    }
+
+    if (isKpiVisible('warranty_claims_mtd')) {
+      var warrantyClaims = parseInt(xm.warranty_claims_mtd || 0, 10);
+      var warrantyCost   = xm.warranty_cost_mtd;
+      items.push({
+        label: { vi: 'Bảo hành tháng này', en: 'Warranty Claims (MTD)' },
+        value: fmt(warrantyClaims),
+        accent: warrantyClaims > 10 ? 'critical' : (warrantyClaims > 3 ? 'warning' : 'success'),
+        trendLabel: warrantyCost != null ? '$' + fmt(warrantyCost) : null,
+        freshness: getFreshnessClass()
+      });
+    }
+
+    if (isKpiVisible('csat_avg_score')) {
+      var csatAvg = xm.csat_avg_score;
+      items.push({
+        label: { vi: 'CSAT trung bình', en: 'Avg Customer Satisfaction' },
+        value: csatAvg != null ? csatAvg.toFixed(1) + '/10' : '\u2014',
+        accent: csatAvg != null ? (csatAvg >= 8 ? 'success' : (csatAvg >= 6 ? 'warning' : 'critical')) : 'info',
         freshness: getFreshnessClass()
       });
     }
@@ -447,6 +567,30 @@
       ]
     );
 
+    // 5. FPY Trend (12 months) — Sprint 7C
+    html += renderSingleChart(
+      'tower-fpy-trend',
+      { vi: 'Xu hướng FPY (12 tháng)', en: 'First Pass Yield Trend (12 Months)' },
+      buildFpyTrendData(),
+      [
+        { key: 'month',  label: { vi: 'Tháng', en: 'Month' }, sortable: false },
+        { key: 'fpy',    label: { vi: 'FPY (%)', en: 'FPY (%)' } },
+        { key: 'target', label: { vi: 'Mục tiêu', en: 'Target' } }
+      ]
+    );
+
+    // 6. Escape Rate Trend (12 months) — Sprint 7C
+    html += renderSingleChart(
+      'tower-escape-rate',
+      { vi: 'Xu hướng tỉ lệ thoát lỗi (PPM)', en: 'Escape Rate Trend (PPM)' },
+      buildEscapeRateTrendData(),
+      [
+        { key: 'month',  label: { vi: 'Tháng', en: 'Month' }, sortable: false },
+        { key: 'ppm',    label: { vi: 'PPM', en: 'PPM' } },
+        { key: 'target', label: { vi: 'Mục tiêu', en: 'Target' } }
+      ]
+    );
+
     html += '</div>';
     return html;
   }
@@ -523,6 +667,212 @@
     ];
   }
 
+  function buildFpyTrendData() {
+    var xm   = state.extendedMetrics || {};
+    var hist = xm.fpy_monthly || [];
+    var now  = new Date();
+    var monthNames = lang() === 'vi'
+      ? ['Th1','Th2','Th3','Th4','Th5','Th6','Th7','Th8','Th9','Th10','Th11','Th12']
+      : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var rows = [];
+    for (var i = 11; i >= 0; i--) {
+      var dt    = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      var key   = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0');
+      var found = hist.find(function(r) { return r.month === key; });
+      rows.push({
+        month:  monthNames[dt.getMonth()] + ' ' + dt.getFullYear(),
+        fpy:    found ? found.fpy_pct.toFixed(1) + '%' : (i === 0 && xm.fpy_current_pct != null ? xm.fpy_current_pct.toFixed(1) + '%' : '\u2014'),
+        target: '98%'
+      });
+    }
+    return rows;
+  }
+
+  function buildEscapeRateTrendData() {
+    var xm   = state.extendedMetrics || {};
+    var hist = xm.escape_rate_monthly || [];
+    var now  = new Date();
+    var monthNames = lang() === 'vi'
+      ? ['Th1','Th2','Th3','Th4','Th5','Th6','Th7','Th8','Th9','Th10','Th11','Th12']
+      : ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+    var rows = [];
+    for (var i = 11; i >= 0; i--) {
+      var dt    = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      var key   = dt.getFullYear() + '-' + String(dt.getMonth() + 1).padStart(2, '0');
+      var found = hist.find(function(r) { return r.month === key; });
+      rows.push({
+        month:  monthNames[dt.getMonth()] + ' ' + dt.getFullYear(),
+        ppm:    found ? fmt(found.ppm) : (i === 0 && xm.escape_rate_ppm != null ? fmt(xm.escape_rate_ppm) : '\u2014'),
+        target: '50'
+      });
+    }
+    return rows;
+  }
+
+  // ── Render: Risk Heatmap ──
+  function renderRiskHeatmap() {
+    var xm = state.extendedMetrics || {};
+    var risks = xm.risk_heatmap || [];
+    if (!risks.length) {
+      return ui.renderEmptyState({
+        icon: '\uD83D\uDEE1\uFE0F',
+        title: { vi: 'Không có dữ liệu rủi ro', en: 'No risk data available' }
+      });
+    }
+
+    // 5×5 heatmap grid: likelihood (1-5) × severity (1-5)
+    var LEVELS = [1, 2, 3, 4, 5];
+    var cellCounts = {};
+    risks.forEach(function(r) {
+      var k = r.likelihood + ':' + r.severity;
+      cellCounts[k] = (cellCounts[k] || 0) + 1;
+    });
+
+    function riskColor(l, s) {
+      var score = l * s;
+      if (score >= 16) return '#dc2626';
+      if (score >= 9)  return '#ea580c';
+      if (score >= 4)  return '#ca8a04';
+      return '#16a34a';
+    }
+
+    var html = '<div class="eqms-risk-heatmap">';
+    // Y-axis label
+    html += '<div class="eqms-risk-heatmap-grid">';
+    // Column headers (severity 1–5)
+    html += '<div class="eqms-risk-axis-label"></div>';
+    LEVELS.forEach(function(s) {
+      html += '<div class="eqms-risk-col-header">' + esc(T({ vi: 'Mức', en: 'Sev' }) + ' ' + s) + '</div>';
+    });
+    // Rows: likelihood 5 down to 1
+    for (var li = 5; li >= 1; li--) {
+      html += '<div class="eqms-risk-row-header">' + esc(T({ vi: 'KN', en: 'Lik' }) + ' ' + li) + '</div>';
+      LEVELS.forEach(function(si) {
+        var count = cellCounts[li + ':' + si] || 0;
+        var bg    = riskColor(li, si);
+        var score = li * si;
+        var title = T({ vi: 'Khả năng', en: 'Likelihood' }) + ':' + li + ' × ' + T({ vi: 'Mức độ', en: 'Severity' }) + ':' + si + ' = ' + score + '. ' + count + ' rủi ro.';
+        html += '<div class="eqms-risk-cell" style="background:' + bg + ';opacity:' + (count > 0 ? 1 : 0.15) + '" title="' + esc(title) + '">';
+        if (count > 0) html += '<span>' + count + '</span>';
+        html += '</div>';
+      });
+    }
+    html += '</div>';
+
+    // Legend
+    var topRisks = risks.slice(0, 5);
+    if (topRisks.length) {
+      html += '<div class="eqms-risk-top-list" style="margin-top:12px">';
+      html += '<div style="font-size:12px;font-weight:600;margin-bottom:6px">' + T({ vi: 'Top rủi ro cần chú ý', en: 'Top risks to watch' }) + '</div>';
+      topRisks.forEach(function(r) {
+        var score = (r.likelihood || 1) * (r.severity || 1);
+        var color = riskColor(r.likelihood || 1, r.severity || 1);
+        html += '<div class="eqms-risk-top-item" style="display:flex;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid var(--hm-border,#e2e8f0)">';
+        html += '<span style="min-width:28px;text-align:center;font-weight:700;color:#fff;background:' + color + ';border-radius:4px;padding:1px 5px;font-size:11px">' + score + '</span>';
+        html += '<span style="flex:1;font-size:12px;color:var(--hm-text-primary,#0f172a)">' + esc(r.title || r.risk_id || '\u2014') + '</span>';
+        if (r.owner) html += '<span style="font-size:11px;color:var(--hm-text-secondary,#64748b)">' + esc(r.owner) + '</span>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+
+    html += '</div>';
+    return html;
+  }
+
+  // ── Render: Management Review Status ──
+  function renderMgmtReviewStatus() {
+    var xm = state.extendedMetrics || {};
+    var reviews = xm.mgmt_review_items || [];
+    if (!reviews.length) {
+      return ui.renderEmptyState({
+        icon: '\uD83D\uDCCB',
+        title: { vi: 'Không có xem xét quản lý quá hạn', en: 'No overdue management reviews' }
+      });
+    }
+    var html = '<div class="eqms-mgmt-review-list">';
+    reviews.slice(0, 6).forEach(function(item) {
+      var daysOverdue = parseInt(item.days_overdue || 0, 10);
+      var urgency = daysOverdue > 30 ? 'critical' : (daysOverdue > 14 ? 'warning' : '');
+      html += '<div class="eqms-calendar-item ' + urgency + '">';
+      html += '<span class="eqms-calendar-icon">\uD83D\uDCCB</span>';
+      html += '<div class="eqms-calendar-detail">';
+      html += '<div class="eqms-calendar-name">' + esc(item.title || item.review_id) + '</div>';
+      html += '<div class="eqms-calendar-type">' + esc(item.review_type || 'Management Review') + '</div>';
+      html += '</div>';
+      html += '<div class="eqms-calendar-date">';
+      html += '<div style="font-size:11px;color:#dc2626;font-weight:600">' + daysOverdue + 'd ' + T({ vi: 'quá hạn', en: 'overdue' }) + '</div>';
+      html += '</div>';
+      html += '</div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  // ── Render: New Modules Summary Row (Concessions / FAI / Warranty / CSAT) ──
+  function renderNewModulesSummary() {
+    var xm = state.extendedMetrics || {};
+    var lc = (state.dashboard || {}).live_counts || {};
+
+    var cards = [
+      {
+        id:    'concessions',
+        icon:  '\uD83D\uDCDD',
+        label: { vi: 'Nhượng bộ', en: 'Concessions' },
+        open:  parseInt(xm.open_concessions || lc.open_concessions || 0, 10),
+        extra: xm.concessions_approved_mtd != null ? T({ vi: 'Duyệt tháng này:', en: 'Approved MTD:' }) + ' ' + xm.concessions_approved_mtd : null,
+        accent: parseInt(xm.open_concessions || 0, 10) > 5 ? '#ea580c' : '#16a34a'
+      },
+      {
+        id:    'fai',
+        icon:  '\uD83D\uDDD2\uFE0F',
+        label: { vi: 'FAI', en: 'First Article Insp.' },
+        open:  parseInt(xm.open_fai || lc.open_fai || 0, 10),
+        extra: xm.fai_pass_rate_pct != null ? T({ vi: 'Pass rate:', en: 'Pass rate:' }) + ' ' + xm.fai_pass_rate_pct.toFixed(0) + '%' : null,
+        accent: xm.fai_pass_rate_pct != null && xm.fai_pass_rate_pct < 80 ? '#dc2626' : '#16a34a'
+      },
+      {
+        id:    'warranty',
+        icon:  '\uD83D\uDEE0\uFE0F',
+        label: { vi: 'Bảo hành', en: 'Warranty Claims' },
+        open:  parseInt(xm.warranty_claims_open || lc.warranty_claims_open || 0, 10),
+        extra: xm.warranty_claims_mtd != null ? T({ vi: 'Tháng này:', en: 'MTD:' }) + ' ' + xm.warranty_claims_mtd + ' | $' + fmt(xm.warranty_cost_mtd || 0) : null,
+        accent: parseInt(xm.warranty_claims_open || 0, 10) > 10 ? '#dc2626' : '#ca8a04'
+      },
+      {
+        id:    'csat',
+        icon:  '\u2B50',
+        label: { vi: 'CSAT', en: 'Customer Satisfaction' },
+        open:  parseInt(xm.csat_open_surveys || 0, 10),
+        extra: xm.csat_avg_score != null ? T({ vi: 'Điểm TB:', en: 'Avg score:' }) + ' ' + xm.csat_avg_score.toFixed(1) + '/10' : null,
+        accent: xm.csat_avg_score != null && xm.csat_avg_score < 6 ? '#dc2626' : '#16a34a'
+      },
+      {
+        id:    'sampling-plans',
+        icon:  '\uD83D\uDCCA',
+        label: { vi: 'Kế hoạch lấy mẫu', en: 'Sampling Plans' },
+        open:  parseInt(xm.approved_sampling_plans || 0, 10),
+        extra: xm.sampling_plans_pending != null ? T({ vi: 'Chờ duyệt:', en: 'Pending:' }) + ' ' + xm.sampling_plans_pending : null,
+        accent: '#3b82f6'
+      }
+    ];
+
+    var html = '<div class="eqms-new-modules-row">';
+    cards.forEach(function(card) {
+      html += '<div class="eqms-new-module-card" data-action="open-module" data-module="' + esc(card.id) + '" style="cursor:pointer">';
+      html += '<div class="eqms-new-module-icon" style="font-size:22px">' + card.icon + '</div>';
+      html += '<div class="eqms-new-module-body">';
+      html += '<div class="eqms-new-module-label">' + esc(T(card.label)) + '</div>';
+      html += '<div class="eqms-new-module-value" style="color:' + card.accent + ';font-weight:700;font-size:20px">' + fmt(card.open) + '</div>';
+      if (card.extra) {
+        html += '<div class="eqms-new-module-extra">' + esc(card.extra) + '</div>';
+      }
+      html += '</div></div>';
+    });
+    html += '</div>';
+    return html;
+  }
+
   // ── Render: Module Status Overview ──
   function renderModuleStatusGrid() {
     var d  = state.dashboard || {};
@@ -538,19 +888,25 @@
     });
 
     // Map live_counts keys to module ids
+    var xm = state.extendedMetrics || {};
     var countMap = {
-      'complaints':     parseInt(lc.open_complaints || 0, 10),
-      'deviations':     parseInt(lc.open_deviations || 0, 10),
-      'ncr':            parseInt(lc.open_ncr || 0, 10),
-      'capa':           parseInt(lc.open_capa || 0, 10),
-      'change-control': parseInt(lc.open_changes || 0, 10),
-      'audits':         parseInt(lc.open_audit_findings || 0, 10),
-      'suppliers':      parseInt(lc.open_scar || 0, 10),
-      'calibration':    parseInt(lc.overdue_calibrations || 0, 10),
+      'complaints':         parseInt(lc.open_complaints || 0, 10),
+      'deviations':         parseInt(lc.open_deviations || 0, 10),
+      'ncr':                parseInt(lc.open_ncr || 0, 10),
+      'capa':               parseInt(lc.open_capa || 0, 10),
+      'change-control':     parseInt(lc.open_changes || 0, 10),
+      'audits':             parseInt(lc.open_audit_findings || 0, 10),
+      'suppliers':          parseInt(lc.open_scar || 0, 10),
+      'calibration':        parseInt(lc.overdue_calibrations || 0, 10),
       'lab-investigations': parseInt(lc.open_lab_investigations || 0, 10),
-      'field-actions':  parseInt(lc.active_field_actions || 0, 10),
-      'batch-release':  parseInt(lc.pending_release || 0, 10),
-      'training':       parseInt(lc.overdue_training || 0, 10)
+      'field-actions':      parseInt(lc.active_field_actions || 0, 10),
+      'batch-release':      parseInt(lc.pending_release || 0, 10),
+      'training':           parseInt(lc.overdue_training || 0, 10),
+      'concessions':        parseInt(xm.open_concessions  || lc.open_concessions || 0, 10),
+      'fai':                parseInt(xm.open_fai          || lc.open_fai || 0, 10),
+      'warranty':           parseInt(xm.warranty_claims_open || lc.warranty_claims_open || 0, 10),
+      'csat':               parseInt(xm.csat_open_surveys || 0, 10),
+      'sampling-plans':     parseInt(xm.sampling_plans_pending || 0, 10)
     };
 
     var columns = [
@@ -717,6 +1073,28 @@
     state._container = container;
     state._context   = context || {};
 
+    // Wire SSE live-refresh once
+    if (!state.sseSubscribed && window.EqmsShell && window.EqmsShell.events) {
+      window.EqmsShell.events.subscribe('workflow.transitioned', function(ev) {
+        if (!state._container || !state._container.isConnected) return;
+        // Silently refresh counts when a quality record transitions
+        loadAllData().then(function() {
+          if (state._container && state._container.isConnected) {
+            renderDashboard(state._container);
+          }
+        });
+      });
+      window.EqmsShell.events.subscribe('dashboard.updated', function() {
+        if (!state._container || !state._container.isConnected) return;
+        loadAllData().then(function() {
+          if (state._container && state._container.isConnected) {
+            renderDashboard(state._container);
+          }
+        });
+      });
+      state.sseSubscribed = true;
+    }
+
     // First load
     if (state.loading && !state.lastFetchedAt) {
       container.innerHTML = ui.renderLoadingState({ vi: 'Đang tải Quality Tower...', en: 'Loading Quality Control Tower...' });
@@ -792,12 +1170,38 @@
 
     html += '</div>'; // end two-col
 
+    // ── New Modules Summary (Sprint 7C) ──
+    html += ui.renderSection(
+      { vi: 'Tổng quan module mới (Nhượng bộ / FAI / Bảo hành / CSAT)', en: 'New Modules Summary (Concessions / FAI / Warranty / CSAT)' },
+      renderNewModulesSummary(),
+      { headerActions: renderFreshnessIndicator(T({ vi: 'Module mới', en: 'New Modules' })) }
+    );
+
     // ── Trend Charts Section ──
     html += ui.renderSection(
       { vi: 'Biểu đồ xu hướng', en: 'Trend Charts' },
       renderTrendCharts(),
       { headerActions: renderFreshnessIndicator(T({ vi: 'Xu hướng', en: 'Trends' })) }
     );
+
+    // ── Risk Heatmap (Sprint 7C) ──
+    var xm = state.extendedMetrics || {};
+    if (xm.risk_heatmap || (xm.open_risks_critical != null)) {
+      html += ui.renderSection(
+        { vi: 'Bản đồ nhiệt rủi ro chất lượng', en: 'Quality Risk Heatmap' },
+        renderRiskHeatmap(),
+        { headerActions: renderFreshnessIndicator(T({ vi: 'Rủi ro', en: 'Risks' })) }
+      );
+    }
+
+    // ── Management Review Status (Sprint 7C) ──
+    if (xm.overdue_mgmt_reviews > 0 || (xm.mgmt_review_items && xm.mgmt_review_items.length)) {
+      html += ui.renderSection(
+        { vi: 'Xem xét quản lý quá hạn', en: 'Overdue Management Reviews' },
+        renderMgmtReviewStatus(),
+        { headerActions: renderFreshnessIndicator(T({ vi: 'Xem xét', en: 'Reviews' })) }
+      );
+    }
 
     // ── Module Status Overview ──
     html += ui.renderSection(
@@ -887,7 +1291,8 @@
     // Table fallback is default; if a chart library is present, render into
     // the container and toggle to chart view. Extend here as needed.
     if (typeof window.echarts === 'undefined' && typeof window.Chart === 'undefined') return;
-    ['tower-ncr-trend', 'tower-capa-effectiveness', 'tower-complaint-response', 'tower-supplier-trend'].forEach(function(id) {
+    ['tower-ncr-trend', 'tower-capa-effectiveness', 'tower-complaint-response', 'tower-supplier-trend',
+     'tower-fpy-trend', 'tower-escape-rate'].forEach(function(id) {
       var el = document.getElementById(id);
       if (!el) return;
       var wrapper = el.closest('.eqms-chart-container');
@@ -1069,7 +1474,20 @@
       '.eqms-aging-segment{display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;font-weight:600;transition:width .3s;min-width:0}' +
       '.eqms-aging-legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--hm-text-secondary,#64748b)}' +
       '.eqms-aging-legend-item{display:flex;align-items:center;gap:4px}' +
-      '.eqms-aging-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}';
+      '.eqms-aging-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}' +
+      // Sprint 7C — new module summary cards
+      '.eqms-new-modules-row{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}' +
+      '@media(max-width:1100px){.eqms-new-modules-row{grid-template-columns:repeat(3,1fr)}}' +
+      '@media(max-width:600px){.eqms-new-modules-row{grid-template-columns:repeat(2,1fr)}}' +
+      '.eqms-new-module-card{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border-radius:8px;border:1px solid var(--hm-border,#e2e8f0);background:var(--hm-bg-card,#fff);transition:box-shadow .15s}' +
+      '.eqms-new-module-card:hover{box-shadow:0 2px 12px rgba(0,0,0,.08)}' +
+      '.eqms-new-module-body{flex:1;min-width:0}' +
+      '.eqms-new-module-label{font-size:11px;color:var(--hm-text-secondary,#64748b);margin-bottom:2px;text-transform:uppercase;letter-spacing:.4px}' +
+      '.eqms-new-module-extra{font-size:11px;color:var(--hm-text-secondary,#64748b);margin-top:3px}' +
+      // Risk heatmap
+      '.eqms-risk-heatmap-grid{display:grid;grid-template-columns:40px repeat(5,44px);gap:3px;width:max-content}' +
+      '.eqms-risk-col-header,.eqms-risk-row-header{display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--hm-text-secondary,#64748b);font-weight:600}' +
+      '.eqms-risk-cell{width:44px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:4px;color:#fff;font-weight:700;font-size:12px;cursor:default}';
     document.head.appendChild(style);
   }
 

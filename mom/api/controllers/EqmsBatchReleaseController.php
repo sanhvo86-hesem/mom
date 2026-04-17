@@ -657,4 +657,83 @@ class EqmsBatchReleaseController extends EqmsBaseController
 
         $this->success(['batch_release' => $this->loadBatchRelease($brId)]);
     }
+
+    // ── Cross-module Actions ──────────────────────────────────────────────────
+
+    /**
+     * POST /eqms/batch-release/{id}/actions/create-ncr-from-exception
+     * Auto-create an NCR from a batch release exception (lot hold, reject finding).
+     * Body requires: { exception_description }
+     * Body optional: { ncr_title, severity, assigned_to }
+     */
+    public function actionCreateNcrFromException(): never
+    {
+        $user  = $this->requireAuth();
+        $this->requireAnyRole($user, $this->eqmsWriteRoles());
+
+        $brId  = $this->requirePathId('id', 'batch_release_id');
+        $br    = $this->loadBatchRelease($brId);
+
+        if (in_array($br['status'], ['released', 'shipped'], true)) {
+            $this->error('batch_already_released', 409,
+                "Cannot create NCR from a batch that is already released/shipped.");
+        }
+
+        $body    = $this->jsonBody();
+        $excDesc = trim((string)($body['exception_description'] ?? ''));
+        if ($excDesc === '') {
+            $this->error('exception_description_required', 400, "'exception_description' is required.");
+        }
+
+        $actor      = (string)($user['username'] ?? $user['user'] ?? 'unknown');
+        $ncrId      = $this->newUuid();
+        $ncrNumber  = 'NCR-BR-' . strtoupper(substr($ncrId, 0, 6));
+        $now        = $this->nowIso();
+        $severity   = in_array($body['severity'] ?? '', ['minor','major','critical'], true)
+                      ? $body['severity'] : 'major';
+        $title      = !empty($body['ncr_title'])
+                      ? trim((string)$body['ncr_title'])
+                      : 'NCR from Batch Release Exception: ' . ($br['batch_number'] ?? $brId);
+
+        $this->data->execute(
+            "INSERT INTO eqms_ncr_records
+             (ncr_id, ncr_number, title, description, source, lot_number, batch_number,
+              severity, assigned_to, status, version, created_at, created_by)
+             VALUES
+             (:id, :num, :title, :desc, 'batch_release', :lot, :batch,
+              :sev, :assigned, 'submitted', 1, :now, :by)",
+            [
+                ':id'       => $ncrId,
+                ':num'      => $ncrNumber,
+                ':title'    => $title,
+                ':desc'     => $excDesc,
+                ':lot'      => $br['lot_number'] ?? null,
+                ':batch'    => $br['batch_number'] ?? null,
+                ':sev'      => $severity,
+                ':assigned' => $body['assigned_to'] ?? null,
+                ':now'      => $now,
+                ':by'       => $actor,
+            ]
+        );
+
+        $this->data->execute(
+            "INSERT INTO eqms_record_links
+             (link_id, source_type, source_id, target_type, target_id, relationship_type, linked_by, linked_at)
+             VALUES (:lid, 'batch_release', :br_id, 'ncr', :ncr_id, 'exception_ncr', :by, now())
+             ON CONFLICT (source_type, source_id, target_type, target_id) DO NOTHING",
+            [':lid' => $this->newUuid(), ':br_id' => $brId, ':ncr_id' => $ncrId, ':by' => $actor]
+        );
+
+        $this->emitQualityEvent('eqms.batch_release.ncr_created', self::ENTITY_TYPE, $brId, [
+            'ncr_id'     => $ncrId,
+            'ncr_number' => $ncrNumber,
+        ], $user);
+
+        $ncr = $this->data->query(
+            "SELECT ncr_id, ncr_number, title, status, severity FROM eqms_ncr_records WHERE ncr_id = :id",
+            [':id' => $ncrId]
+        )[0] ?? [];
+
+        $this->success(['batch_release' => $this->loadBatchRelease($brId), 'created_ncr' => $ncr], 201);
+    }
 }

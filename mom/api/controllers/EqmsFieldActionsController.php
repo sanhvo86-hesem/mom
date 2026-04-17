@@ -627,4 +627,70 @@ class EqmsFieldActionsController extends EqmsBaseController
 
         $this->success(['field_action' => $this->loadFieldAction($faId)]);
     }
+
+    // ── Cross-module Actions ──────────────────────────────────────────────────
+
+    /**
+     * POST /eqms/field-actions/{id}/actions/expand-genealogy
+     * Request a traceability genealogy expansion for affected lots/serials
+     * in this field action. Creates a genealogy trace job linked to this field action.
+     * Body optional: { lot_numbers[], serial_numbers[], trace_depth }
+     */
+    public function actionExpandGenealogy(): never
+    {
+        $user  = $this->requireAuth();
+        $this->requireAnyRole($user, $this->fieldActionWriteRoles());
+
+        $faId  = $this->requirePathId('id', 'field_action_id');
+        $fa    = $this->loadFieldAction($faId);
+
+        if ($fa['status'] === 'closed') {
+            $this->error('field_action_closed', 409,
+                "Cannot expand genealogy for a closed field action.");
+        }
+
+        $body       = $this->jsonBody();
+        $lotNumbers = is_array($body['lot_numbers'] ?? null) ? $body['lot_numbers'] : [];
+        $serials    = is_array($body['serial_numbers'] ?? null) ? $body['serial_numbers'] : [];
+        $traceDepth = max(1, min(10, (int)($body['trace_depth'] ?? 3)));
+
+        $actor = (string)($user['username'] ?? $user['user'] ?? 'unknown');
+        $jobId = $this->newUuid();
+        $now   = $this->nowIso();
+
+        // Insert genealogy trace job — picked up by traceability worker
+        $this->data->execute(
+            "INSERT INTO eqms_export_jobs
+             (job_id, module, entity_id, requested_by, status, parameters, created_at)
+             VALUES (:jid, 'genealogy_trace', :fa_id, :by, 'pending',
+                     :params::jsonb, :now)",
+            [
+                ':jid'    => $jobId,
+                ':fa_id'  => $faId,
+                ':by'     => $actor,
+                ':params' => json_encode([
+                    'source_type'    => 'field_action',
+                    'source_id'      => $faId,
+                    'field_action_number' => $fa['field_action_number'] ?? null,
+                    'lot_numbers'    => $lotNumbers,
+                    'serial_numbers' => $serials,
+                    'trace_depth'    => $traceDepth,
+                ]),
+                ':now'    => $now,
+            ]
+        );
+
+        $this->emitQualityEvent('eqms.field_action.genealogy_expansion_requested', self::ENTITY_TYPE, $faId, [
+            'trace_job_id'   => $jobId,
+            'lot_count'      => count($lotNumbers),
+            'serial_count'   => count($serials),
+            'trace_depth'    => $traceDepth,
+        ], $user);
+
+        $this->success([
+            'field_action'   => $this->loadFieldAction($faId),
+            'trace_job_id'   => $jobId,
+            'message'        => "Genealogy trace job queued (job_id: {$jobId}). Results will appear in the Genealogy module.",
+        ]);
+    }
 }
