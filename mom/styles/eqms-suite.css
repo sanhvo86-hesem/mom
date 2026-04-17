@@ -870,6 +870,65 @@
 .eqms-btn.lg { height: 40px; font-size: 14px; padding: 0 20px; }
 
 /* --------------------------------------------------------------------------
+   9b. MODULE CHROME — Toolbar bar and screen-level tab switchers
+   Used by NCR, CAPA, Deviations (eqms-screen-tab pattern)
+   and all modules using eqms-module-toolbar pattern.
+   -------------------------------------------------------------------------- */
+.eqms-module-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--eqms-gap-md);
+  padding: var(--eqms-gap-sm) var(--eqms-gap-md);
+  border-bottom: 1px solid var(--hm-border, #e2e8f0);
+  flex-shrink: 0;
+}
+.eqms-module-toolbar-left,
+.eqms-module-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--eqms-gap-sm);
+}
+.eqms-module-header {
+  display: flex;
+  align-items: center;
+  gap: var(--eqms-gap-md);
+  padding: var(--eqms-gap-sm) var(--eqms-gap-md);
+  border-bottom: 1px solid var(--hm-border, #e2e8f0);
+  flex-shrink: 0;
+}
+.eqms-screen-tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--eqms-gap-xs);
+}
+.eqms-screen-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 var(--eqms-gap-md);
+  height: var(--hm-control-height, 32px);
+  border: 1px solid transparent;
+  border-radius: var(--eqms-radius-sm);
+  font-size: var(--hm-font-size-sm, 13px);
+  font-weight: 500;
+  cursor: pointer;
+  background: transparent;
+  color: var(--hm-text-secondary, #475569);
+  transition: background var(--eqms-transition-fast), color var(--eqms-transition-fast);
+  font-family: inherit;
+  white-space: nowrap;
+}
+.eqms-screen-tab:hover:not(.active) {
+  background: var(--hm-bg-hover, #f1f5f9);
+  color: var(--hm-text-primary, #1e293b);
+}
+.eqms-screen-tab.active {
+  background: var(--hm-brand-primary, #0c2d48);
+  color: var(--hm-text-inverse, #fff);
+}
+
+/* --------------------------------------------------------------------------
    10. DETAIL LAYOUT — Object page / evidence workspace
    -------------------------------------------------------------------------- */
 .eqms-detail {
