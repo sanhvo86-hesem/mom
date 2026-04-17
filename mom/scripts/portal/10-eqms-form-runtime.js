@@ -37,9 +37,17 @@ function api(action, payload, method){
 
 var runtimeReferenceCache = {};
 var runtimeReferencePending = {};
+var runtimeReferenceSearchTimers = {};
+var runtimeReferenceControlSeq = 0;
 
 function normalizeReferenceKey(key){
   return String(key || '').trim().toLowerCase().replace(/^registry:/, '').replace(/[\s-]+/g, '_');
+}
+
+function referenceCacheKey(key, search){
+  key = normalizeReferenceKey(key);
+  search = String(search || '').trim().toLowerCase();
+  return search ? key + '::' + search : key;
 }
 
 function inferRuntimeReferenceKey(field){
@@ -63,8 +71,43 @@ function inferRuntimeReferenceKey(field){
   };
   if(explicit) return registryMap[explicit] || explicit;
 
-  var source = normalizeReferenceKey(field.options_source || '');
+  var sourceReferenceMap = {
+    company_users: 'users',
+    users: 'users',
+    employees: 'employees',
+    suppliers: 'suppliers',
+    vendors: 'suppliers',
+    customers: 'customers',
+    customer_sites: 'customer_sites',
+    parts: 'items',
+    items: 'items',
+    revisions: 'item_revisions',
+    item_revisions: 'item_revisions',
+    warehouse_locations: 'warehouses',
+    warehouses: 'warehouses',
+    inventory_locations: 'inventory_locations',
+    sales_orders: 'sales_orders',
+    work_centers: 'work_centers',
+    machines: 'equipment',
+    equipment: 'equipment',
+    operators: 'users',
+    tooling_assets: 'tools',
+    tools: 'tools',
+    defect_catalog: 'eqms.defect_type',
+    capas: 'capa_records',
+    nc_program_releases: 'cnc_programs',
+    cnc_programs: 'cnc_programs',
+    job_orders: 'job_orders',
+    work_orders: 'work_orders',
+    incoterms: 'incoterms',
+    payment_terms: 'payment_terms',
+    shipping_methods: 'shipping_methods',
+    promise_policies: 'promise_policies'
+  };
+
+  var source = normalizeReferenceKey(field.options_source || field.lookup_source || '');
   if(source && registryMap[source]) return registryMap[source];
+  if(source && sourceReferenceMap[source]) return sourceReferenceMap[source];
 
   var key = normalizeReferenceKey(field.key || field.name || field.id || '');
   if(!key) return '';
@@ -78,6 +121,8 @@ function inferRuntimeReferenceKey(field){
     customer: 'customers',
     customer_id: 'customers',
     customer_name: 'customers',
+    customer_site: 'customer_sites',
+    customer_site_id: 'customer_sites',
     supplier: 'suppliers',
     supplier_id: 'suppliers',
     vendor: 'suppliers',
@@ -95,6 +140,11 @@ function inferRuntimeReferenceKey(field){
     plant_id: 'plants',
     lot: 'lots',
     lot_number: 'lots',
+    source_lot: 'lots',
+    source_lot_number: 'lots',
+    origin_lot: 'lots',
+    origin_lot_number: 'lots',
+    vendor_lot_number: 'lots',
     batch: 'lots',
     batch_number: 'lots',
     item: 'items',
@@ -105,15 +155,98 @@ function inferRuntimeReferenceKey(field){
     part_number: 'items',
     product: 'items',
     product_id: 'items',
+    product_name: 'items',
+    affected_product_id: 'items',
+    revision: 'item_revisions',
+    revision_id: 'item_revisions',
+    part_revision: 'item_revisions',
+    item_revision: 'item_revisions',
     work_center: 'work_centers',
     work_center_id: 'work_centers',
     warehouse: 'warehouses',
     warehouse_id: 'warehouses',
     location: 'inventory_locations',
     location_id: 'inventory_locations',
+    sales_order: 'sales_orders',
+    sales_order_number: 'sales_orders',
+    sales_order_id: 'sales_order_records',
+    so_number: 'sales_orders',
+    customer_po_number: 'sales_orders',
+    purchase_order: 'sales_orders',
+    incoterm: 'incoterms',
+    incoterm_code: 'incoterms',
+    payment_term: 'payment_terms',
+    payment_term_code: 'payment_terms',
+    shipping_method: 'shipping_methods',
+    shipping_method_id: 'shipping_methods',
+    promise_policy: 'promise_policies',
+    promise_policy_id: 'promise_policies',
     owner: 'users',
+    owner_user: 'users',
+    owner_user_id: 'users',
     assigned_to: 'users',
+    assignee: 'users',
+    assignee_id: 'users',
     responsible_party: 'users',
+    responsible_person: 'users',
+    responsible_user: 'users',
+    responsible_user_id: 'users',
+    lead_auditor: 'users',
+    auditor: 'users',
+    reviewer: 'users',
+    inspector: 'users',
+    analyst: 'users',
+    operator: 'users',
+    approver: 'users',
+    prepared_by: 'users',
+    issued_by: 'users',
+    approved_by: 'users',
+    reviewed_by: 'users',
+    verified_by: 'users',
+    performed_by: 'users',
+    detected_by: 'users',
+    requested_by: 'users',
+    requester: 'users',
+    requestor: 'users',
+    initiated_by: 'users',
+    originator: 'users',
+    reported_by: 'users',
+    submitted_by: 'users',
+    recorded_by: 'users',
+    closed_by: 'users',
+    signed_by: 'users',
+    accepted_by: 'users',
+    rejected_by: 'users',
+    new_action_owner: 'users',
+    initial_action_owner: 'users',
+    team_lead: 'users',
+    trainer: 'users',
+    instructor: 'users',
+    employee: 'employees',
+    employee_id: 'employees',
+    employee_name: 'employees',
+    trainee: 'employees',
+    trainee_id: 'employees',
+    equipment: 'equipment',
+    equipment_id: 'equipment',
+    equipment_system: 'equipment',
+    machine: 'equipment',
+    machine_id: 'equipment',
+    tool: 'tools',
+    tool_id: 'tools',
+    tooling: 'tools',
+    tooling_asset: 'tools',
+    work_order: 'work_orders',
+    work_order_number: 'work_orders',
+    work_order_id: 'work_order_records',
+    job_order: 'job_orders',
+    job_number: 'job_orders',
+    job_order_id: 'job_order_records',
+    program: 'cnc_programs',
+    program_number: 'cnc_programs',
+    cnc_program: 'cnc_programs',
+    nc_program: 'cnc_programs',
+    program_id: 'cnc_program_records',
     document_id: 'documents',
     doc_id: 'documents',
     capa_id: 'capa_records',
@@ -190,6 +323,7 @@ function inferRuntimeReferenceKey(field){
     level: 'eqms.capability_level',
     capability_level: 'eqms.capability_level',
     equipment_type: 'eqms.equipment_type',
+    machine_type: 'eqms.equipment_type',
     fmea_type: 'eqms.fmea_type',
     response_method: 'eqms.response_method',
     rt_type: 'eqms.rt_type',
@@ -197,6 +331,7 @@ function inferRuntimeReferenceKey(field){
   };
   if(exact[key]) return exact[key];
 
+  if(key.indexOf('customer_site') >= 0) return 'customer_sites';
   if(key.indexOf('customer') >= 0) return 'customers';
   if(key.indexOf('supplier') >= 0 || key.indexOf('vendor') >= 0) return 'suppliers';
   if(key.indexOf('department') >= 0 || key.indexOf('dept') >= 0) return 'departments';
@@ -205,10 +340,19 @@ function inferRuntimeReferenceKey(field){
   if(key.indexOf('area') >= 0) return 'areas';
   if(key.indexOf('plant') >= 0) return 'plants';
   if(key.indexOf('lot') >= 0 || key.indexOf('batch') >= 0) return 'lots';
+  if(key.indexOf('revision') >= 0) return 'item_revisions';
   if(key.indexOf('item') >= 0 || key.indexOf('part') >= 0 || key.indexOf('product') >= 0 || key.indexOf('material') >= 0) return 'items';
   if(key.indexOf('work_center') >= 0) return 'work_centers';
   if(key.indexOf('warehouse') >= 0) return 'warehouses';
   if(key.indexOf('location') >= 0) return 'inventory_locations';
+  if(/(^|_)(owner|assignee|assigned_to|responsible|auditor|reviewer|approver|verifier|inspector|analyst|operator|trainer|instructor|requester|requestor|originator|author|signer|team_lead|lead_auditor)($|_)/.test(key) || /_by$/.test(key)) return 'users';
+  if(/(^|_)(employee|trainee)($|_)/.test(key)) return 'employees';
+  if(key === 'equipment' || key === 'equipment_id' || key === 'equipment_system' || key === 'machine' || key === 'machine_id' || /_equipment_id$/.test(key) || /_machine_id$/.test(key)) return 'equipment';
+  if(key === 'tool' || key === 'tool_id' || key === 'tooling' || key === 'tooling_asset' || key.indexOf('tool_id') >= 0) return 'tools';
+  if(key.indexOf('sales_order') >= 0 || key.indexOf('so_number') >= 0 || key.indexOf('purchase_order') >= 0) return /_id$/.test(key) ? 'sales_order_records' : 'sales_orders';
+  if(key.indexOf('work_order') >= 0 || key.indexOf('workorder') >= 0) return /_id$/.test(key) ? 'work_order_records' : 'work_orders';
+  if(key.indexOf('job_order') >= 0 || key.indexOf('job_number') >= 0) return /_id$/.test(key) ? 'job_order_records' : 'job_orders';
+  if(key === 'program' || key === 'program_id' || key === 'program_number' || key.indexOf('cnc_program') >= 0 || key.indexOf('nc_program') >= 0) return /_id$/.test(key) ? 'cnc_program_records' : 'cnc_programs';
   if(field.type === 'select' || field.type === 'multi_select') return 'eqms.' + key;
   return '';
 }
@@ -219,8 +363,15 @@ function renderRuntimeReferenceSelect(id, field, value, ariaReq, ariaDesc, readO
   var current = multiple ? JSON.stringify(values) : String(value || '');
   var readonlyAttr = readOnly ? ' data-eqms-reference-readonly="1"' : '';
   var multiAttr = multiple ? ' multiple data-eqms-reference-multiple="1"' : '';
-  var html = '<select class="hm-input hm-select" id="' + esc(id) + '"' + multiAttr +
+  var selectRef = 'eqms-runtime-ref-' + (++runtimeReferenceControlSeq);
+  var html = '<div class="eqms-reference-picker" data-eqms-reference-picker="1">';
+  html += '<input type="search" class="eqms-reference-search" data-eqms-reference-search="' + esc(referenceKey) + '"' +
+    ' data-eqms-reference-target="' + esc(selectRef) + '"' +
+    ' placeholder="' + esc(t('Tìm trong DB...', 'Search DB...')) + '"' +
+    (readOnly ? ' disabled' : '') + '>';
+  html += '<select class="hm-input hm-select" id="' + esc(id) + '"' + multiAttr +
     ' data-eqms-reference="' + esc(referenceKey) + '"' +
+    ' data-eqms-reference-select-id="' + esc(selectRef) + '"' +
     ' data-current-value="' + esc(current) + '"' +
     ' data-empty-label="' + esc(t('Chọn', 'Select')) + '"' +
     readonlyAttr + ariaReq + ariaDesc + ' disabled>';
@@ -231,42 +382,52 @@ function renderRuntimeReferenceSelect(id, field, value, ariaReq, ariaDesc, readO
     html += '<option value="' + esc(current) + '" selected>' + esc(current) + '</option>';
   }
   html += '</select>';
+  html += '</div>';
   return html;
 }
 
-function loadRuntimeReferenceOptions(keys){
+function loadRuntimeReferenceOptions(keys, search){
   keys = (keys || []).map(normalizeReferenceKey).filter(Boolean);
   keys = keys.filter(function(k, i){ return keys.indexOf(k) === i; });
+  search = String(search || '').trim();
 
   if(window.EqmsShell && window.EqmsShell.util && typeof window.EqmsShell.util.loadReferenceOptions === 'function'){
-    return window.EqmsShell.util.loadReferenceOptions(keys);
+    return window.EqmsShell.util.loadReferenceOptions(keys, search);
   }
 
-  var missing = keys.filter(function(k){ return !runtimeReferenceCache[k] && !runtimeReferencePending[k]; });
+  var missing = keys.filter(function(k){
+    var cacheKey = referenceCacheKey(k, search);
+    return !runtimeReferenceCache[cacheKey] && !runtimeReferencePending[cacheKey];
+  });
   if(missing.length){
-    var request = api('eqms_reference_options', { keys: missing, limit: 200 }, 'POST').then(function(resp){
+    var request = api('eqms_reference_options', { keys: missing, limit: 200, q: search }, 'POST').then(function(resp){
       var references = (resp && (resp.references || resp.data)) || {};
       missing.forEach(function(k){
+        var cacheKey = referenceCacheKey(k, search);
         var entry = references[k] || {};
-        runtimeReferenceCache[k] = entry.ok === false
+        runtimeReferenceCache[cacheKey] = entry.ok === false
           ? { ok: false, options: [], error: entry.detail || entry.error || 'reference_load_failed' }
           : { ok: true, options: entry.options || [] };
-        delete runtimeReferencePending[k];
+        delete runtimeReferencePending[cacheKey];
       });
       return runtimeReferenceCache;
     }).catch(function(err){
       missing.forEach(function(k){
-        runtimeReferenceCache[k] = { ok: false, options: [], error: err.message || 'reference_load_failed' };
-        delete runtimeReferencePending[k];
+        var cacheKey = referenceCacheKey(k, search);
+        runtimeReferenceCache[cacheKey] = { ok: false, options: [], error: err.message || 'reference_load_failed' };
+        delete runtimeReferencePending[cacheKey];
       });
       return runtimeReferenceCache;
     });
-    missing.forEach(function(k){ runtimeReferencePending[k] = request; });
+    missing.forEach(function(k){ runtimeReferencePending[referenceCacheKey(k, search)] = request; });
   }
 
-  return Promise.all(keys.map(function(k){ return runtimeReferencePending[k] || Promise.resolve(runtimeReferenceCache[k]); })).then(function(){
+  return Promise.all(keys.map(function(k){
+    var cacheKey = referenceCacheKey(k, search);
+    return runtimeReferencePending[cacheKey] || Promise.resolve(runtimeReferenceCache[cacheKey]);
+  })).then(function(){
     var out = {};
-    keys.forEach(function(k){ out[k] = runtimeReferenceCache[k] || { ok: true, options: [] }; });
+    keys.forEach(function(k){ out[k] = runtimeReferenceCache[referenceCacheKey(k, search)] || { ok: true, options: [] }; });
     return out;
   });
 }
@@ -307,6 +468,7 @@ function hydrateRuntimeReferenceControls(root){
   if(window.EqmsShell && window.EqmsShell.util && typeof window.EqmsShell.util.hydrateReferenceControls === 'function'){
     return window.EqmsShell.util.hydrateReferenceControls(root || document);
   }
+  bindRuntimeReferenceControls(root || document);
   var controls = Array.prototype.slice.call((root || document).querySelectorAll('select[data-eqms-reference]'))
     .filter(function(el){ return el.getAttribute('data-eqms-reference-loaded') !== '1' && el.getAttribute('data-eqms-reference-loading') !== '1'; });
   if(!controls.length) return Promise.resolve({});
@@ -320,6 +482,49 @@ function hydrateRuntimeReferenceControls(root){
       el.removeAttribute('data-eqms-reference-loading');
     });
     return map;
+  });
+}
+
+function bindRuntimeReferenceControls(root){
+  root = root || document;
+  Array.prototype.slice.call(root.querySelectorAll('select[data-eqms-reference]')).forEach(function(select){
+    if(select.getAttribute('data-eqms-reference-bound') === '1') return;
+    select.setAttribute('data-eqms-reference-bound', '1');
+    select.addEventListener('change', function(){
+      if(select.hasAttribute('multiple')){
+        var values = Array.prototype.slice.call(select.selectedOptions || []).map(function(opt){ return opt.value; }).filter(Boolean);
+        select.setAttribute('data-current-value', JSON.stringify(values));
+      } else {
+        select.setAttribute('data-current-value', select.value || '');
+      }
+    });
+  });
+
+  Array.prototype.slice.call(root.querySelectorAll('input[data-eqms-reference-search]')).forEach(function(input){
+    if(input.getAttribute('data-eqms-reference-search-bound') === '1') return;
+    input.setAttribute('data-eqms-reference-search-bound', '1');
+    input.addEventListener('input', function(){
+      var key = normalizeReferenceKey(input.getAttribute('data-eqms-reference-search'));
+      var target = input.getAttribute('data-eqms-reference-target') || '';
+      var select = target
+        ? (root.querySelector('select[data-eqms-reference-select-id="' + target + '"]') || document.querySelector('select[data-eqms-reference-select-id="' + target + '"]'))
+        : null;
+      if(!key || !select) return;
+      var timerKey = target || key;
+      clearTimeout(runtimeReferenceSearchTimers[timerKey]);
+      runtimeReferenceSearchTimers[timerKey] = setTimeout(function(){
+        var query = String(input.value || '').trim();
+        var requestSeq = String(Date.now()) + '-' + Math.random();
+        select.setAttribute('data-eqms-reference-search-seq', requestSeq);
+        select.setAttribute('data-eqms-reference-loading', '1');
+        select.disabled = true;
+        loadRuntimeReferenceOptions([key], query).then(function(map){
+          if(select.getAttribute('data-eqms-reference-search-seq') !== requestSeq) return;
+          fillRuntimeReferenceSelect(select, map[key] || { ok: true, options: [] });
+          select.removeAttribute('data-eqms-reference-loading');
+        });
+      }, 250);
+    });
   });
 }
 
@@ -600,14 +805,23 @@ var FIELD_LOOKUP_HINTS = {
   part_number:'parts', part_id:'parts', part_revision:'revisions', revision_id:'revisions', revision:'revisions',
   incoterm_code:'incoterms', payment_term_code:'payment_terms', shipping_method_id:'shipping_methods',
   promise_policy_id:'promise_policies', routing_id:'routing_library', bom_id:'bom_library',
+  sales_order:'sales_orders', sales_order_id:'sales_order_records', sales_order_number:'sales_orders',
+  so_number:'sales_orders', purchase_order:'sales_orders', customer_po_number:'sales_orders',
   control_plan_id:'control_plans', inspection_plan_id:'inspection_plans', traveler_template_id:'traveler_templates',
   quality_gate_profile_id:'quality_gate_profiles', gate_template_id:'launch_gate_templates',
   warehouse_id:'warehouse_locations', defect_type:'defect_catalog', defect_code:'defect_catalog',
-  capa_number:'capas', work_center_id:'work_centers', machine_id:'machines', operator_id:'operators',
-  issued_by:'company_users', approved_by:'company_users', reviewed_by:'company_users', prepared_by:'company_users',
-  verified_by:'company_users', owner_user:'company_users', tool_id:'tooling_assets', assembly_id:'tool_assemblies',
+  capa_number:'capas', work_center_id:'work_centers', work_order_id:'work_order_records',
+  work_order_number:'work_orders', job_order_id:'job_order_records', job_number:'job_orders',
+  machine_id:'machines', equipment_id:'equipment', operator_id:'operators',
+  issued_by:'users', approved_by:'users', reviewed_by:'users', prepared_by:'users',
+  verified_by:'users', detected_by:'users', performed_by:'users', requested_by:'users',
+  owner_user:'users', owner_user_id:'users', assigned_to:'users', assignee:'users',
+  responsible_person:'users', lead_auditor:'users', auditor:'users', inspector:'users',
+  analyst:'users', team_lead:'users', trainer:'users', instructor:'users',
+  employee_id:'employees', trainee_id:'employees', tool_id:'tooling_assets', assembly_id:'tool_assemblies',
   reason_code:'downtime_reason_codes', resolution_code:'downtime_resolution_codes', adapter_id:'mes_connectivity_adapters',
-  alarm_code:'mes_alarm_catalog', playbook_id:'mes_alarm_playbooks', program_id:'nc_program_releases'
+  alarm_code:'mes_alarm_catalog', playbook_id:'mes_alarm_playbooks',
+  program_id:'cnc_program_records', program_number:'cnc_programs'
 };
 
 function ensureMasterData(){
@@ -628,8 +842,20 @@ function ensureMasterData(){
 
 function ensureCompanyDirectory(){
   if(companyDirectory) return Promise.resolve(companyDirectory);
-  return api('company_directory_list', {}, 'GET').then(function(resp){
-    companyDirectory = Array.isArray(resp && resp.users) ? resp.users : [];
+  return api('eqms_reference_options', { keys: ['users'], limit: 200 }, 'POST').then(function(resp){
+    var refs = (resp && (resp.references || resp.data)) || {};
+    var users = refs.users && Array.isArray(refs.users.options) ? refs.users.options : [];
+    companyDirectory = users.map(function(item){
+      var meta = (item && item.meta) || {};
+      return {
+        username: item.value || '',
+        name: item.label || item.value || '',
+        role: '',
+        dept: meta.dept_code || '',
+        title: '',
+        email: meta.email || ''
+      };
+    });
     return companyDirectory;
   }).catch(function(){
     companyDirectory = [];
@@ -1824,7 +2050,9 @@ function inferLookupSource(field){
   if(direct) return direct;
   var key = String(field.id || '').trim().toLowerCase();
   var label = String(field.label || field.label_en || '').trim().toLowerCase();
+  if(/(^|_)(equipment_type|machine_type|tool_type)($|_)/.test(key)) return '';
   if(/supplier/.test(key) || /supplier/.test(label)) return 'suppliers';
+  if(/customer_site/.test(key) || /customer site/.test(label)) return 'customer_sites';
   if(/customer/.test(key) || /customer/.test(label)) return 'customers';
   if(/part/.test(key) || /part/.test(label)) return 'parts';
   if(/revision/.test(key) || /revision/.test(label)) return 'revisions';
@@ -1833,11 +2061,17 @@ function inferLookupSource(field){
   if(/operator/.test(key) || /operator/.test(label)) return 'operators';
   if(/capa/.test(key) || /capa/.test(label)) return 'capas';
   if(/warehouse/.test(key) || /warehouse/.test(label)) return 'warehouse_locations';
+  if(/equipment|machine/.test(key) || /equipment|machine/.test(label)) return 'machines';
+  if(/tool/.test(key) || /tool/.test(label)) return 'tooling_assets';
+  if(/work_order|work order|workorder/.test(key) || /work order/.test(label)) return 'work_orders';
+  if(/job_order|job number|job_order/.test(key) || /job order|job number/.test(label)) return 'job_orders';
+  if(/cnc_program|nc_program|program_id|program number/.test(key) || /cnc program|nc program|program number/.test(label)) return 'nc_program_releases';
   if(/incoterm/.test(key) || /incoterm/.test(label)) return 'incoterms';
   if(/payment_term|payment/.test(key) || /payment term/.test(label)) return 'payment_terms';
   if(/shipping/.test(key) || /shipping/.test(label)) return 'shipping_methods';
   if(/defect/.test(key) || /defect/.test(label)) return 'defect_catalog';
-  if(/issued_by|approved_by|reviewed_by|prepared_by|verified_by|owner_user/.test(key)) return 'company_users';
+  if(/(^|_)(owner|assignee|assigned_to|responsible|auditor|reviewer|approver|verifier|inspector|analyst|operator|trainer|instructor|requester|requestor|originator|author|signer|team_lead|lead_auditor)($|_)|_by$/.test(key)) return 'users';
+  if(/(^|_)(employee|trainee)($|_)/.test(key)) return 'employees';
   return '';
 }
 
@@ -1850,6 +2084,16 @@ function normalizeSchemaLookups(schema){
     var source = inferLookupSource(nextField);
     if(source){
       nextField.lookup_source = source;
+    }
+
+    var referenceKey = inferRuntimeReferenceKey(nextField);
+    if(referenceKey && ['text', 'email', 'tel', 'phone', 'lookup', 'select', 'multi_select', undefined, ''].indexOf(nextField.type) >= 0){
+      nextField.reference = referenceKey;
+      if(nextField.type !== 'multi_select') nextField.type = 'select';
+      return nextField;
+    }
+
+    if(source){
       if(nextField.type === 'text' || nextField.type === 'email' || nextField.type === 'tel' || !nextField.type){
         nextField.type = 'lookup';
       }
@@ -2195,7 +2439,7 @@ window.openEqmsForm = function(formCode, container, options){
   container.innerHTML = '<div class="eqms-runtime" id="eqms-form-container"><div class="eqms-loading">Đang tải biểu mẫu...</div></div>';
   var runtime = container.querySelector('.eqms-runtime');
 
-	  Promise.all([loadSchema(formCode), ensureMasterData(), ensureCompanyDirectory()]).then(function(results){
+	  Promise.all([loadSchema(formCode), ensureMasterData()]).then(function(results){
     var schema = normalizeSchemaLookups(results[0]);
     if(!schema){
       runtime.innerHTML = '<div class="eqms-empty">' +

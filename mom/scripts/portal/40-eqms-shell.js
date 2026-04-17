@@ -222,10 +222,18 @@
   // DB-backed reference/dropdown hydration. No local option fallback is used.
   var referenceCache = {};
   var referencePending = {};
+  var referenceSearchTimers = {};
   var referenceHydrationScheduled = false;
+  var referenceControlSeq = 0;
 
   function normalizeReferenceKey(key) {
     return String(key || '').trim().toLowerCase().replace(/[\s-]+/g, '_');
+  }
+
+  function referenceCacheKey(key, search) {
+    key = normalizeReferenceKey(key);
+    search = String(search || '').trim().toLowerCase();
+    return search ? key + '::' + search : key;
   }
 
   function inferReferenceKey(field) {
@@ -242,6 +250,8 @@
       customer_id: 'customers',
       customer_name: 'customers',
       customer_destination: 'customers',
+      customer_site: 'customer_sites',
+      customer_site_id: 'customer_sites',
       supplier: 'suppliers',
       supplier_id: 'suppliers',
       vendor: 'suppliers',
@@ -263,6 +273,11 @@
       lot: 'lots',
       lot_number: 'lots',
       affected_lot_number: 'lots',
+      source_lot: 'lots',
+      source_lot_number: 'lots',
+      origin_lot: 'lots',
+      origin_lot_number: 'lots',
+      vendor_lot_number: 'lots',
       batch: 'lots',
       batch_id: 'lots',
       batch_number: 'lots',
@@ -276,18 +291,96 @@
       product_id: 'items',
       product_name: 'items',
       affected_product_id: 'items',
+      revision: 'item_revisions',
+      revision_id: 'item_revisions',
+      part_revision: 'item_revisions',
+      item_revision: 'item_revisions',
       work_center: 'work_centers',
       work_center_id: 'work_centers',
       warehouse: 'warehouses',
       warehouse_id: 'warehouses',
       location: 'inventory_locations',
       location_id: 'inventory_locations',
+      sales_order: 'sales_orders',
+      sales_order_number: 'sales_orders',
+      sales_order_id: 'sales_order_records',
+      so_number: 'sales_orders',
+      customer_po_number: 'sales_orders',
+      purchase_order: 'sales_orders',
+      incoterm: 'incoterms',
+      incoterm_code: 'incoterms',
+      payment_term: 'payment_terms',
+      payment_term_code: 'payment_terms',
+      shipping_method: 'shipping_methods',
+      shipping_method_id: 'shipping_methods',
+      promise_policy: 'promise_policies',
+      promise_policy_id: 'promise_policies',
       owner: 'users',
+      owner_user: 'users',
+      owner_user_id: 'users',
       assigned_to: 'users',
+      assignee: 'users',
+      assignee_id: 'users',
       responsible_party: 'users',
+      responsible_person: 'users',
+      responsible_user: 'users',
+      responsible_user_id: 'users',
       lead_auditor: 'users',
+      auditor: 'users',
+      reviewer: 'users',
+      inspector: 'users',
+      analyst: 'users',
+      operator: 'users',
       approver: 'users',
-      employee_id: 'users',
+      prepared_by: 'users',
+      issued_by: 'users',
+      approved_by: 'users',
+      reviewed_by: 'users',
+      verified_by: 'users',
+      performed_by: 'users',
+      detected_by: 'users',
+      requested_by: 'users',
+      requester: 'users',
+      requestor: 'users',
+      initiated_by: 'users',
+      originator: 'users',
+      reported_by: 'users',
+      submitted_by: 'users',
+      recorded_by: 'users',
+      closed_by: 'users',
+      signed_by: 'users',
+      accepted_by: 'users',
+      rejected_by: 'users',
+      new_action_owner: 'users',
+      initial_action_owner: 'users',
+      team_lead: 'users',
+      trainer: 'users',
+      instructor: 'users',
+      employee: 'employees',
+      employee_id: 'employees',
+      employee_name: 'employees',
+      trainee: 'employees',
+      trainee_id: 'employees',
+      equipment: 'equipment',
+      equipment_id: 'equipment',
+      equipment_system: 'equipment',
+      machine: 'equipment',
+      machine_id: 'equipment',
+      tool: 'tools',
+      tool_id: 'tools',
+      tooling: 'tools',
+      tooling_asset: 'tools',
+      work_order: 'work_orders',
+      work_order_number: 'work_orders',
+      work_order_id: 'work_order_records',
+      job_order: 'job_orders',
+      job_number: 'job_orders',
+      job_order_id: 'job_order_records',
+      program: 'cnc_programs',
+      program_number: 'cnc_programs',
+      cnc_program: 'cnc_programs',
+      nc_program: 'cnc_programs',
+      program_id: 'cnc_program_records',
       document_id: 'documents',
       doc_id: 'documents',
       change_control_id: 'change_controls',
@@ -364,6 +457,7 @@
       level: 'eqms.capability_level',
       capability_level: 'eqms.capability_level',
       equipment_type: 'eqms.equipment_type',
+      machine_type: 'eqms.equipment_type',
       fmea_type: 'eqms.fmea_type',
       response_method: 'eqms.response_method',
       rt_type: 'eqms.rt_type',
@@ -376,6 +470,7 @@
     };
     if (exact[key]) return exact[key];
 
+    if (key.indexOf('customer_site') >= 0) return 'customer_sites';
     if (key.indexOf('customer') >= 0) return 'customers';
     if (key.indexOf('supplier') >= 0 || key.indexOf('vendor') >= 0) return 'suppliers';
     if (key.indexOf('department') >= 0 || key.indexOf('dept') >= 0) return 'departments';
@@ -384,10 +479,19 @@
     if (key.indexOf('area') >= 0) return 'areas';
     if (key.indexOf('plant') >= 0) return 'plants';
     if (key.indexOf('lot') >= 0 || key.indexOf('batch') >= 0) return 'lots';
+    if (key.indexOf('revision') >= 0) return 'item_revisions';
     if (key.indexOf('item') >= 0 || key.indexOf('part') >= 0 || key.indexOf('product') >= 0 || key.indexOf('material') >= 0) return 'items';
     if (key.indexOf('work_center') >= 0) return 'work_centers';
     if (key.indexOf('warehouse') >= 0) return 'warehouses';
     if (key.indexOf('location') >= 0) return 'inventory_locations';
+    if (/(^|_)(owner|assignee|assigned_to|responsible|auditor|reviewer|approver|verifier|inspector|analyst|operator|trainer|instructor|requester|requestor|originator|author|signer|team_lead|lead_auditor)($|_)/.test(key) || /_by$/.test(key)) return 'users';
+    if (/(^|_)(employee|trainee)($|_)/.test(key)) return 'employees';
+    if (key === 'equipment' || key === 'equipment_id' || key === 'equipment_system' || key === 'machine' || key === 'machine_id' || /_equipment_id$/.test(key) || /_machine_id$/.test(key)) return 'equipment';
+    if (key === 'tool' || key === 'tool_id' || key === 'tooling' || key === 'tooling_asset' || key.indexOf('tool_id') >= 0) return 'tools';
+    if (key.indexOf('sales_order') >= 0 || key.indexOf('so_number') >= 0 || key.indexOf('purchase_order') >= 0) return /_id$/.test(key) ? 'sales_order_records' : 'sales_orders';
+    if (key.indexOf('work_order') >= 0 || key.indexOf('workorder') >= 0) return /_id$/.test(key) ? 'work_order_records' : 'work_orders';
+    if (key.indexOf('job_order') >= 0 || key.indexOf('job_number') >= 0) return /_id$/.test(key) ? 'job_order_records' : 'job_orders';
+    if (key === 'program' || key === 'program_id' || key === 'program_number' || key.indexOf('cnc_program') >= 0 || key.indexOf('nc_program') >= 0) return /_id$/.test(key) ? 'cnc_program_records' : 'cnc_programs';
     if (key.indexOf('document') >= 0 || key === 'doc') return 'documents';
 
     if (key === 'status' || /_status$/.test(key)) return 'eqms.status';
@@ -421,40 +525,47 @@
     }, 0);
   }
 
-  function loadReferenceOptions(keys) {
+  function loadReferenceOptions(keys, search) {
     keys = (keys || []).map(normalizeReferenceKey).filter(Boolean);
     keys = keys.filter(function(k, i) { return keys.indexOf(k) === i; });
-    var missing = keys.filter(function(k) { return !referenceCache[k] && !referencePending[k]; });
+    search = String(search || '').trim();
+    var missing = keys.filter(function(k) {
+      var cacheKey = referenceCacheKey(k, search);
+      return !referenceCache[cacheKey] && !referencePending[cacheKey];
+    });
     if (missing.length) {
-      var request = apiCall('eqms_reference_options', { keys: missing, limit: 200 }, 'POST', 15000)
+      var request = apiCall('eqms_reference_options', { keys: missing, limit: 200, q: search }, 'POST', 15000)
         .then(function(res) {
           var references = (res && (res.references || res.data)) || {};
           missing.forEach(function(k) {
+            var cacheKey = referenceCacheKey(k, search);
             var entry = references[k] || {};
             if (entry.ok === false) {
-              referenceCache[k] = { ok: false, options: [], error: entry.detail || entry.error || 'reference_load_failed' };
+              referenceCache[cacheKey] = { ok: false, options: [], error: entry.detail || entry.error || 'reference_load_failed' };
             } else {
-              referenceCache[k] = { ok: true, options: entry.options || [] };
+              referenceCache[cacheKey] = { ok: true, options: entry.options || [] };
             }
-            delete referencePending[k];
+            delete referencePending[cacheKey];
           });
           return referenceCache;
         })
         .catch(function(err) {
           missing.forEach(function(k) {
-            referenceCache[k] = { ok: false, options: [], error: err.message || 'reference_load_failed' };
-            delete referencePending[k];
+            var cacheKey = referenceCacheKey(k, search);
+            referenceCache[cacheKey] = { ok: false, options: [], error: err.message || 'reference_load_failed' };
+            delete referencePending[cacheKey];
           });
           return referenceCache;
         });
-      missing.forEach(function(k) { referencePending[k] = request; });
+      missing.forEach(function(k) { referencePending[referenceCacheKey(k, search)] = request; });
     }
 
     return Promise.all(keys.map(function(k) {
-      return referencePending[k] || Promise.resolve(referenceCache[k]);
+      var cacheKey = referenceCacheKey(k, search);
+      return referencePending[cacheKey] || Promise.resolve(referenceCache[cacheKey]);
     })).then(function() {
       var out = {};
-      keys.forEach(function(k) { out[k] = referenceCache[k] || { ok: true, options: [] }; });
+      keys.forEach(function(k) { out[k] = referenceCache[referenceCacheKey(k, search)] || { ok: true, options: [] }; });
       return out;
     });
   }
@@ -467,19 +578,28 @@
   function renderReferenceSelect(className, dataAttr, fieldKey, referenceKey, currentValue, emptyLabel, required, width) {
     scheduleReferenceHydration();
     var style = width ? ' style="width:' + esc(width) + '"' : '';
-    var html = '<select class="' + esc(className) + '" ' + dataAttr + '="' + esc(fieldKey) + '"' +
+    var selectRef = 'eqms-ref-' + (++referenceControlSeq);
+    var html = '<div class="eqms-reference-picker" data-eqms-reference-picker="1">';
+    html += '<input type="search" class="eqms-reference-search" data-eqms-reference-search="' + esc(referenceKey) + '"' +
+      ' data-eqms-reference-target="' + esc(selectRef) + '"' +
+      ' placeholder="' + esc(T({ vi: 'Tìm trong DB...', en: 'Search DB...' })) + '"' +
+      (style || '') + '>';
+    html += '<select class="' + esc(className) + '" ' + dataAttr + '="' + esc(fieldKey) + '"' +
       ' data-eqms-reference="' + esc(referenceKey) + '"' +
+      ' data-eqms-reference-select-id="' + esc(selectRef) + '"' +
       ' data-current-value="' + esc(currentValue || '') + '"' +
       ' data-empty-label="' + esc(emptyLabel) + '"' +
       (required ? ' required' : '') + style + ' disabled>';
     html += '<option value="">' + esc(T({ vi: 'Dang tai du lieu DB...', en: 'Loading DB data...' })) + '</option>';
     html += renderCurrentReferenceOption(currentValue || '');
     html += '</select>';
+    html += '</div>';
     return html;
   }
 
   function hydrateReferenceControls(root) {
     root = root || document;
+    bindReferenceControls(root);
     var controls = Array.prototype.slice.call(root.querySelectorAll('select[data-eqms-reference]'))
       .filter(function(el) { return el.getAttribute('data-eqms-reference-loaded') !== '1' && el.getAttribute('data-eqms-reference-loading') !== '1'; });
     if (!controls.length) return Promise.resolve({});
@@ -495,6 +615,48 @@
         fillReferenceControl(el, map[key] || { ok: true, options: [] });
       });
       return map;
+    });
+  }
+
+  function bindReferenceControls(root) {
+    root = root || document;
+    Array.prototype.slice.call(root.querySelectorAll('select[data-eqms-reference]')).forEach(function(select) {
+      if (select.getAttribute('data-eqms-reference-bound') === '1') return;
+      select.setAttribute('data-eqms-reference-bound', '1');
+      select.addEventListener('change', function() {
+        if (select.hasAttribute('multiple')) {
+          var values = Array.prototype.slice.call(select.selectedOptions || []).map(function(opt) { return opt.value; }).filter(Boolean);
+          select.setAttribute('data-current-value', JSON.stringify(values));
+        } else {
+          select.setAttribute('data-current-value', select.value || '');
+        }
+      });
+    });
+
+    Array.prototype.slice.call(root.querySelectorAll('input[data-eqms-reference-search]')).forEach(function(input) {
+      if (input.getAttribute('data-eqms-reference-search-bound') === '1') return;
+      input.setAttribute('data-eqms-reference-search-bound', '1');
+      input.addEventListener('input', function() {
+        var key = normalizeReferenceKey(input.getAttribute('data-eqms-reference-search'));
+        var target = input.getAttribute('data-eqms-reference-target') || '';
+        var select = target
+          ? (root.querySelector('select[data-eqms-reference-select-id="' + target + '"]') || document.querySelector('select[data-eqms-reference-select-id="' + target + '"]'))
+          : null;
+        if (!key || !select) return;
+        var timerKey = target || key;
+        clearTimeout(referenceSearchTimers[timerKey]);
+        referenceSearchTimers[timerKey] = setTimeout(function() {
+          var query = String(input.value || '').trim();
+          var requestSeq = String(Date.now()) + '-' + Math.random();
+          select.setAttribute('data-eqms-reference-search-seq', requestSeq);
+          select.setAttribute('data-eqms-reference-loading', '1');
+          select.disabled = true;
+          loadReferenceOptions([key], query).then(function(map) {
+            if (select.getAttribute('data-eqms-reference-search-seq') !== requestSeq) return;
+            fillReferenceControl(select, map[key] || { ok: true, options: [] });
+          });
+        }, 250);
+      });
     });
   }
 
