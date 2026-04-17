@@ -72,7 +72,8 @@
     signatures: [],
     wizard:     { step: 0, data: {} },
     loading:    false,
-    error:      null
+    error:      null,
+    queueSeq:   0
   };
 
   // ─── API helpers ────────────────────────────────────────────────────────
@@ -80,9 +81,104 @@
     return apiCall(action, payload);
   }
 
+  function safeApi(action, payload) {
+    return new Promise(function(resolve, reject) {
+      try {
+        resolve(api(action, payload));
+      } catch (err) {
+        reject(err);
+      }
+    });
+  }
+
+  function pickDefined(values, fallback) {
+    for (var i = 0; i < values.length; i++) {
+      if (values[i] !== null && values[i] !== undefined && values[i] !== '') return values[i];
+    }
+    return fallback;
+  }
+
+  function toCountMap(rows) {
+    var map = {};
+    if (!Array.isArray(rows)) return map;
+    rows.forEach(function(row) {
+      if (!row || typeof row !== 'object') return;
+      var key = String(row.status || row.source || row.severity || row.key || '');
+      if (!key) return;
+      map[key] = Number(row.count || row.total || 0) || 0;
+    });
+    return map;
+  }
+
+  function normalizeMetrics(raw) {
+    raw = raw && typeof raw === 'object' ? raw : {};
+    var byStatus = toCountMap(raw.by_status);
+
+    var totalOpen = pickDefined([
+      raw.total_open,
+      raw.open_count,
+      (byStatus.draft || 0) + (byStatus.submitted || 0) + (byStatus.under_review || 0) + (byStatus.mrb_review || 0) +
+        (byStatus.disposition_set || 0) + (byStatus.rework_in_progress || 0)
+    ], 0);
+    var pendingDisposition = pickDefined([
+      raw.pending_disposition,
+      (byStatus.under_review || 0) + (byStatus.mrb_review || 0)
+    ], 0);
+    var reworkActive = pickDefined([
+      raw.rework_active,
+      byStatus.rework_in_progress
+    ], 0);
+
+    return Object.assign({}, raw, {
+      total_open: Number(totalOpen) || 0,
+      pending_disposition: Number(pendingDisposition) || 0,
+      rework_active: Number(reworkActive) || 0,
+      copq_month: Number(pickDefined([raw.copq_month, raw.copq_current_month, raw.copq], 0)) || 0,
+      top_supplier: String(pickDefined([raw.top_supplier, raw.top_supplier_name], '—'))
+    });
+  }
+
+  function normalizeQueueRows(rows) {
+    if (!Array.isArray(rows)) return [];
+    return rows.map(function(row) {
+      row = row && typeof row === 'object' ? row : {};
+      return Object.assign({}, row, {
+        ncr_id: pickDefined([row.ncr_id, row.id, row.ncr_number], ''),
+        nc_type: pickDefined([row.nc_type, row.source], ''),
+        disposition: pickDefined([row.disposition, row.mrb_decision], ''),
+        part_number: pickDefined([row.part_number, row.item_id], ''),
+        supplier: pickDefined([row.supplier, row.vendor, row.source_supplier], ''),
+        quantity_rejected: pickDefined([row.quantity_rejected, row.qty_rejected, row.qty_affected], null)
+      });
+    });
+  }
+
+  function extractRows(res) {
+    if (res && Array.isArray(res.data)) return res.data;
+    if (res && Array.isArray(res.records)) return res.records;
+    if (res && Array.isArray(res.items)) return res.items;
+    if (res && res.data && Array.isArray(res.data.records)) return res.data.records;
+    if (res && res.data && Array.isArray(res.data.items)) return res.data.items;
+    return [];
+  }
+
+  function extractPagination(res, rowCount) {
+    var p = res && res.pagination && typeof res.pagination === 'object' ? res.pagination : {};
+    var total = Number(pickDefined([p.total, res && res.total], rowCount)) || 0;
+    var offset = Number(pickDefined([p.offset, res && res.offset], 0)) || 0;
+    var limit = Number(pickDefined([p.limit, res && res.limit], 25)) || 25;
+    return {
+      total: total,
+      offset: offset,
+      limit: limit,
+      has_more: !!pickDefined([p.has_more, res && res.has_more], (offset + rowCount) < total)
+    };
+  }
+
   function loadQueue() {
     state.loading = true;
     rerender();
+    var seq = ++state.queueSeq;
     var rawFilters = Object.assign({}, state.filters);
     var searchStr = rawFilters.search || '';
     delete rawFilters.search;
@@ -94,17 +190,35 @@
       offset: state.pagination ? (state.pagination.page || 0) * (state.pagination.limit || 25) : 0,
       limit:  state.pagination ? (state.pagination.limit || 25) : 25
     };
-    api('eqms_ncr_query', payload).then(function(res) {
+    var watchdog = setTimeout(function() {
+      if (seq !== state.queueSeq || !state.loading) return;
+      state.loading = false;
+      state.loaded = true;
+      state.error = T({ vi: 'Yeu cau tai du lieu qua thoi gian. Vui long thu lai.', en: 'Data request timed out. Please retry.' });
+      rerender();
+    }, 35000);
+
+    safeApi('eqms_ncr_query', payload).then(function(res) {
+      if (seq !== state.queueSeq) return;
+      clearTimeout(watchdog);
       state.loading = false;
       state.loaded  = true;
       if (res.success === false) { state.error = res.message || 'Query failed'; }
       else {
-        state.records    = res.data || res.records || [];
-        state.pagination = res.pagination || { total: (res.data || []).length, offset: 0, limit: 25 };
+        var rows = normalizeQueueRows(extractRows(res));
+        state.records = rows;
+        state.pagination = extractPagination(res, rows.length);
         state.error      = null;
       }
       rerender();
-    }).catch(function(e) { state.loading = false; state.loaded = true; state.error = e.message; rerender(); });
+    }).catch(function(e) {
+      if (seq !== state.queueSeq) return;
+      clearTimeout(watchdog);
+      state.loading = false;
+      state.loaded = true;
+      state.error = (e && e.message) ? e.message : 'Request failed';
+      rerender();
+    });
   }
 
   function loadDetail(id) {
@@ -155,8 +269,12 @@
   }
 
   function loadMetrics() {
-    api('eqms_ncr_metrics', state.filters).then(function(res) {
-      state.metrics = res.data || res;
+    safeApi('eqms_ncr_metrics', state.filters).then(function(res) {
+      var payload = (res && res.data) ? res.data : (res && res.metrics ? res.metrics : res);
+      state.metrics = normalizeMetrics(payload);
+      rerender();
+    }).catch(function() {
+      state.metrics = state.metrics || normalizeMetrics({});
       rerender();
     });
   }
