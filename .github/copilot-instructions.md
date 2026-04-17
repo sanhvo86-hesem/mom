@@ -17,7 +17,7 @@ NEVER place files at repo root. NEVER place reports or dev docs in `mom/docs/`.
 5. Full context loading protocol: see `CLAUDE.md`
 
 ## Code Conventions
-- PHP 8.2+, PSR-4, `declare(strict_types=1)`, `final class`
+- PHP 8.5+, PSR-4, `declare(strict_types=1)`, `final class`
 - Never suggest Laravel/Symfony/framework migration
 - Always add file-based fallback for infrastructure (Redis, RabbitMQ, S3)
 - Follow CacheService pattern: try primary → catch Throwable → fallback → log

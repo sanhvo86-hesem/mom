@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.5'
 
       - name: Block generated/runtime artifacts in controlled source
         run: php mom/tools/release/check_repo_boundary.php
@@ -64,5 +64,5 @@ jobs:
             cd mom
             composer install --no-dev --optimize-autoloader --no-interaction
             php scripts/postdeploy_healthcheck.php
-            sudo systemctl reload php-fpm || sudo systemctl reload php8.3-fpm || true
+            sudo systemctl reload php-fpm || sudo systemctl reload php8.5-fpm || true
             echo "Deploy completed at $(date)"

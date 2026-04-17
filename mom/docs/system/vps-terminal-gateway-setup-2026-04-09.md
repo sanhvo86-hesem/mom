@@ -68,7 +68,7 @@ DOMAIN=ops.example.com \
 APP_DIR=/srv/hesem-mom \
 PORTAL_DIR=/srv/hesem-mom/mom \
 NGINX_SITE=/etc/nginx/sites-available/hesem-mom \
-PHP_SOCK=/run/php/php8.3-fpm-hesem.sock \
+PHP_SOCK=/run/php/php8.5-fpm-hesem.sock \
 bash mom/ops/vps/install-terminal-gateway.sh
 ```
 

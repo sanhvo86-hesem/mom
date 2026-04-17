@@ -721,7 +721,7 @@ final class VpsService
                     'roles' => ['reverse-proxy', 'portal', 'postgres', 'terminal-gateway', 'observability', 'file-explorer'],
                     'services' => [
                         ['name' => 'nginx', 'label' => 'Nginx', 'kind' => 'systemd', 'unit_candidates' => ['nginx']],
-                        ['name' => 'php-fpm', 'label' => 'PHP-FPM', 'kind' => 'systemd', 'unit_candidates' => ['php8.2-fpm', 'php8.3-fpm', 'php8.4-fpm', 'php-fpm']],
+                        ['name' => 'php-fpm', 'label' => 'PHP-FPM', 'kind' => 'systemd', 'unit_candidates' => ['php8.5-fpm', 'php-fpm']],
                         ['name' => 'postgresql', 'label' => 'PostgreSQL', 'kind' => 'systemd', 'unit_candidates' => ['postgresql']],
                         ['name' => 'hesem-ttyd-primary', 'label' => 'Terminal gateway (primary)', 'kind' => 'systemd', 'unit_candidates' => ['hesem-ttyd-primary']],
                         ['name' => 'hesem-ttyd-readonly', 'label' => 'Terminal gateway (readonly)', 'kind' => 'systemd', 'unit_candidates' => ['hesem-ttyd-readonly']],
@@ -2763,7 +2763,7 @@ BASH;
             // --- Deployment actions (actionCatalog: git_pull, db_migrate, reload_php) ---
             'cd /var/www/eqms.hesemeng.com && git pull --ff-only 2>&1',
             'cd /var/www/eqms.hesemeng.com/mom && php database/migrate.php 2>&1',
-            "for v in php8.2-fpm php8.3-fpm php8.4-fpm php-fpm; do if systemctl is-active --quiet \$v 2>/dev/null; then systemctl reload \$v && echo \"Reloaded \$v\" && exit 0; fi; done; echo 'php_fpm_reload_failed'",
+            "for v in php8.5-fpm php-fpm; do if systemctl is-active --quiet \$v 2>/dev/null; then systemctl reload \$v && echo \"Reloaded \$v\" && exit 0; fi; done; echo 'php_fpm_reload_failed'",
         ];
 
         $command = trim($command);
@@ -3177,7 +3177,7 @@ BASH;
             ],
             'reload_php' => [
                 'label' => 'Reload PHP-FPM',
-                'command' => "for v in php8.2-fpm php8.3-fpm php8.4-fpm php-fpm; do if systemctl is-active --quiet \$v 2>/dev/null; then systemctl reload \$v && echo \"Reloaded \$v\" && exit 0; fi; done; echo 'php_fpm_reload_failed'",
+                'command' => "for v in php8.5-fpm php-fpm; do if systemctl is-active --quiet \$v 2>/dev/null; then systemctl reload \$v && echo \"Reloaded \$v\" && exit 0; fi; done; echo 'php_fpm_reload_failed'",
                 'requires_write' => true,
             ],
         ];

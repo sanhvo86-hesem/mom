@@ -183,7 +183,7 @@ resolve_php_sock() {
     fi
   done
 
-  printf '%s\n' "/run/php/php8.3-fpm-hesem.sock"
+  printf '%s\n' "/run/php/php8.5-fpm-hesem.sock"
 }
 
 resolve_domain() {

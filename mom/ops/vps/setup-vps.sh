@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # ============================================================================
 # HESEM MOM Portal — VPS Auto-Setup Script
-# Ubuntu 22.04 / 24.04 — Nginx + PHP 8.3-FPM + PostgreSQL 16 + Redis
+# Ubuntu 22.04 / 24.04 — Nginx + PHP 8.5-FPM + PostgreSQL 16 + Redis
 # ============================================================================
 # Usage: ssh root@103.110.87.55 'bash -s' < setup-vps.sh
 # ============================================================================
@@ -39,21 +39,21 @@ ufw allow 443/tcp   # HTTPS
 ufw --force enable
 echo "Firewall: SSH(22), HTTP(80), HTTPS(443) — enabled"
 
-# ── 3. PHP 8.3 ──────────────────────────────────────────────────────────────
-echo "[3/10] Installing PHP 8.3..."
+# ── 3. PHP 8.5 ──────────────────────────────────────────────────────────────
+echo "[3/10] Installing PHP 8.5..."
 add-apt-repository -y ppa:ondrej/php
 apt-get update -y
-apt-get install -y php8.3-fpm php8.3-cli php8.3-pgsql php8.3-curl \
-    php8.3-mbstring php8.3-xml php8.3-zip php8.3-gd php8.3-intl \
-    php8.3-bcmath php8.3-opcache php8.3-readline php8.3-redis \
-    php8.3-uuid php8.3-soap
+apt-get install -y php8.5-fpm php8.5-cli php8.5-pgsql php8.5-curl \
+    php8.5-mbstring php8.5-xml php8.5-zip php8.5-gd php8.5-intl \
+    php8.5-bcmath php8.5-readline php8.5-redis \
+    php8.5-uuid php8.5-soap
 
 # PHP-FPM optimization
-cat > /etc/php/8.3/fpm/pool.d/hesem.conf <<'PHPPOOL'
+cat > /etc/php/8.5/fpm/pool.d/hesem.conf <<'PHPPOOL'
 [hesem]
 user = www-data
 group = www-data
-listen = /run/php/php8.3-fpm-hesem.sock
+listen = /run/php/php8.5-fpm-hesem.sock
 listen.owner = www-data
 listen.group = www-data
 pm = dynamic
@@ -71,8 +71,8 @@ php_admin_value[opcache.max_accelerated_files] = 10000
 php_admin_value[opcache.validate_timestamps] = 0
 PHPPOOL
 
-systemctl restart php8.3-fpm
-systemctl enable php8.3-fpm
+systemctl restart php8.5-fpm
+systemctl enable php8.5-fpm
 
 # ── 4. PostgreSQL 16 ────────────────────────────────────────────────────────
 echo "[4/10] Installing PostgreSQL 16..."
@@ -164,7 +164,7 @@ server {
 
     location ~ \.php$ {
         include snippets/fastcgi-params.conf;
-        fastcgi_pass unix:/run/php/php8.3-fpm-hesem.sock;
+        fastcgi_pass unix:/run/php/php8.5-fpm-hesem.sock;
         fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
         fastcgi_param DOCUMENT_ROOT $realpath_root;
 
@@ -260,8 +260,8 @@ chmod -R 755 .
 chmod -R 775 mom/data
 
 echo "Clearing PHP OPcache..."
-php8.3 -r "opcache_reset();" 2>/dev/null || true
-systemctl reload php8.3-fpm
+php8.5 -r "opcache_reset();" 2>/dev/null || true
+systemctl reload php8.5-fpm
 
 echo "Deploy complete! $(date)"
 DEPLOY
@@ -284,7 +284,7 @@ echo ""
 echo " Deploy:    hesem-deploy"
 echo " Terminal:  bash /var/www/hesem-mom/mom/ops/vps/install-terminal-gateway.sh"
 echo " Observe:   bash /var/www/hesem-mom/mom/ops/vps/install-observability-stack.sh"
-echo " PHP-FPM:   systemctl status php8.3-fpm"
+echo " PHP-FPM:   systemctl status php8.5-fpm"
 echo " Nginx:     systemctl status nginx"
 echo " PostgreSQL: systemctl status postgresql"
 echo ""

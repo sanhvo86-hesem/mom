@@ -38,9 +38,8 @@ function migrate_load_runtime_env_from_pool(): void
 
     $candidates = array_values(array_filter([
         getenv('MOM_FPM_POOL_FILE') ?: null,
-        '/etc/php/8.2/fpm/pool.d/mom.conf',
-        '/etc/php/8.3/fpm/pool.d/mom.conf',
-        '/etc/php/8.1/fpm/pool.d/mom.conf',
+        '/etc/php/8.5/fpm/pool.d/mom.conf',
+        ...glob('/etc/php/8.5/fpm/pool.d/*.conf') ?: [],
     ], static fn($path) => is_string($path) && $path !== ''));
 
     foreach ($candidates as $poolFile) {

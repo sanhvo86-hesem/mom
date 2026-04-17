@@ -1,13 +1,13 @@
 {
     "_meta": {
-        "generated_at": "2026-04-17T06:35:24+00:00",
+        "generated_at": "2026-04-17T10:13:50+00:00",
         "generator": "tools/scripts/ai-index/generate.php",
         "description": "High-level project topology. Read this first to orient."
     },
     "project": {
         "name": "HESEM MOM ERP Portal",
         "stack": [
-            "PHP 8.2+",
+            "PHP 8.5+",
             "PostgreSQL",
             "Redis",
             "RabbitMQ"
@@ -23,11 +23,11 @@
         "MOM\\Database\\": "mom/database/"
     },
     "counts": {
-        "controllers": 78,
+        "controllers": 87,
         "services": 122,
         "middleware": 6,
-        "migrations": 146,
-        "db_tables": 805,
+        "migrations": 149,
+        "db_tables": 813,
         "contracts": 67,
         "action_routes": 0,
         "rest_routes": 0

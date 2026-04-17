@@ -121,7 +121,7 @@ while true; do
   echo "Host: $(hostname)"
   echo
   echo "Services"
-  systemctl is-active nginx php8.3-fpm postgresql redis-server 2>/dev/null || true
+  systemctl is-active nginx php8.5-fpm postgresql redis-server 2>/dev/null || true
   echo
   echo "Disk"
   df -h / 2>/dev/null || true

@@ -71,7 +71,7 @@ Grep "action_key" in .ai/route-map.json → get controller + method
 
 ## Project overview
 
-- **Stack:** PHP 8.2+, PostgreSQL, Redis, RabbitMQ
+- **Stack:** PHP 8.5+, PostgreSQL, Redis, RabbitMQ
 - **Entry point:** `mom/api/index.php`
 - **Autoload:** `mom/composer.json` (PSR-4)
 - **Namespaces:** `MOM\Api\Controllers\`, `MOM\Api\Services\`, `MOM\Services\`, `MOM\Database\`

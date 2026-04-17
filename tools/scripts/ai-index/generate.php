@@ -519,7 +519,7 @@ $repoMap = [
     ],
     'project' => [
         'name'        => 'HESEM MOM ERP Portal',
-        'stack'       => ['PHP 8.2+', 'PostgreSQL', 'Redis', 'RabbitMQ'],
+        'stack'       => ['PHP 8.5+', 'PostgreSQL', 'Redis', 'RabbitMQ'],
         'entry_point' => 'mom/api/index.php',
         'composer'    => 'mom/composer.json',
     ],

@@ -65,7 +65,7 @@ log "INFO" "═══ Deploy started ═══"
 
 # ── Pre-flight checks ────────────────────────────────────────────────────
 [ -d "$SITE_DIR/.git" ] || die "$SITE_DIR is not a git repository"
-command -v php8.2 >/dev/null 2>&1 || die "php8.2 not found"
+command -v php8.5 >/dev/null 2>&1 || die "php8.5 not found"
 detect_php_fpm_identity
 
 # ── Pull latest code ─────────────────────────────────────────────────────
@@ -150,7 +150,7 @@ fi
 log "INFO" "Clearing OPcache..."
 sanitize_php_fpm_pool_runtime_settings
 # Method 1: via PHP-FPM reload (recommended)
-systemctl reload php8.2-fpm 2>/dev/null && log "INFO" "PHP-FPM reloaded" || true
+systemctl reload php8.5-fpm 2>/dev/null && log "INFO" "PHP-FPM reloaded" || true
 
 log "INFO" "═══ Deploy completed ═══"
 echo ""

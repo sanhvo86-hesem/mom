@@ -127,7 +127,7 @@ fi
 
 # ── Step 5: Reload services ─────────────────────────────────────────────
 log "Reloading services..."
-systemctl reload php8.2-fpm
+systemctl reload php8.5-fpm
 systemctl reload nginx
 
 # ── Step 6: Verify ──────────────────────────────────────────────────────

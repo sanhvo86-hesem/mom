@@ -10,7 +10,7 @@
 #
 # What this script does:
 #   1. Creates deploy user
-#   2. Installs Nginx, PHP 8.2-FPM, PostgreSQL 16
+#   2. Installs Nginx, PHP 8.5-FPM, PostgreSQL 16
 #   3. Clones the QMS repository
 #   4. Configures Nginx server block
 #   5. Configures PHP-FPM pool
@@ -97,32 +97,32 @@ apt install -y -qq nginx
 systemctl enable nginx
 
 # ══════════════════════════════════════════════════════════════════════════
-# STEP 4: Install PHP 8.2-FPM
+# STEP 4: Install PHP 8.5-FPM
 # ══════════════════════════════════════════════════════════════════════════
-log "Installing PHP 8.2-FPM + extensions..."
+log "Installing PHP 8.5-FPM + extensions..."
 apt install -y -qq software-properties-common
 add-apt-repository -y ppa:ondrej/php 2>/dev/null
 apt update -qq
 apt install -y -qq \
-    php8.2-fpm \
-    php8.2-pgsql \
-    php8.2-mbstring \
-    php8.2-xml \
-    php8.2-curl \
-    php8.2-zip \
-    php8.2-gd \
-    php8.2-intl \
-    php8.2-opcache \
-    php8.2-readline \
-    php8.2-ctype
+    php8.5-fpm \
+    php8.5-cli \
+    php8.5-common \
+    php8.5-pgsql \
+    php8.5-mbstring \
+    php8.5-xml \
+    php8.5-curl \
+    php8.5-zip \
+    php8.5-gd \
+    php8.5-intl \
+    php8.5-readline
 
-systemctl enable php8.2-fpm
+systemctl enable php8.5-fpm
 
 # Create slow log directory
 mkdir -p /var/log/php-fpm
 chown www-data:www-data /var/log/php-fpm
 
-log "PHP 8.2-FPM installed"
+log "PHP 8.5-FPM installed"
 
 # ══════════════════════════════════════════════════════════════════════════
 # STEP 5: Install PostgreSQL 16
@@ -194,17 +194,17 @@ log "Nginx configured (HTTP-only until SSL is set up)"
 log "Configuring PHP-FPM pool..."
 
 # Copy pool config
-cp "$SITE_DIR/tools/vps-setup/php-fpm/mom.conf" /etc/php/8.2/fpm/pool.d/mom.conf
+cp "$SITE_DIR/tools/vps-setup/php-fpm/mom.conf" /etc/php/8.5/fpm/pool.d/mom.conf
 
 # Inject the generated DB password into both DB_PASSWORD (read by database/config.php)
 # and DB_PASS (legacy alias used by CLI migration tools).
 # Using | as sed delimiter to avoid issues if password contains slashes.
-sed -i "s|CHANGE_ME_STRONG_PASSWORD|$DB_PASS|g" /etc/php/8.2/fpm/pool.d/mom.conf
+sed -i "s|CHANGE_ME_STRONG_PASSWORD|$DB_PASS|g" /etc/php/8.5/fpm/pool.d/mom.conf
 
 # Remove default pool to avoid socket conflicts
-rm -f /etc/php/8.2/fpm/pool.d/www.conf
+rm -f /etc/php/8.5/fpm/pool.d/www.conf
 
-systemctl restart php8.2-fpm
+systemctl restart php8.5-fpm
 log "PHP-FPM pool configured"
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -313,7 +313,7 @@ $SITE_DIR/mom/data/*.log {
     create 664 www-data www-data
     sharedscripts
     postrotate
-        systemctl reload php8.2-fpm > /dev/null 2>&1 || true
+        systemctl reload php8.5-fpm > /dev/null 2>&1 || true
     endscript
 }
 LOGROTATE

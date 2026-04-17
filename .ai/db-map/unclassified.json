@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 720,
-        "generated_at": "2026-04-17T06:35:24+00:00"
+        "table_count": 728,
+        "generated_at": "2026-04-17T10:13:50+00:00"
     },
     "tables": {
         "ai_conversations": {
@@ -2287,6 +2287,13 @@
             ],
             "contract": null
         },
+        "eqms_aml_records": {
+            "defined_in": "146_eqms_sprint6b_aml_warranty.sql",
+            "extended_in": [],
+            "primary_key": "aml_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "eqms_attachments": {
             "defined_in": "136_eqms_worldclass_surface.sql",
             "extended_in": [],
@@ -2415,6 +2422,13 @@
             "foreign_keys": [],
             "contract": null
         },
+        "eqms_concession_records": {
+            "defined_in": "145_eqms_sprint6a_concessions_fai_sc.sql",
+            "extended_in": [],
+            "primary_key": "concession_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "eqms_controlled_copies": {
             "defined_in": "136_eqms_worldclass_surface.sql",
             "extended_in": [],
@@ -2431,6 +2445,13 @@
             "defined_in": "105_connected_governance_revision_training_execution.sql",
             "extended_in": [],
             "primary_key": "rollout_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_csat_surveys": {
+            "defined_in": "147_eqms_sprint6c_lessons_csat_sampling.sql",
+            "extended_in": [],
+            "primary_key": "survey_id",
             "foreign_keys": [],
             "contract": null
         },
@@ -2637,6 +2658,18 @@
             "foreign_keys": [],
             "contract": null
         },
+        "eqms_fai_characteristics": {
+            "defined_in": "145_eqms_sprint6a_concessions_fai_sc.sql",
+            "extended_in": [],
+            "primary_key": "char_id",
+            "foreign_keys": [
+                {
+                    "col": "fai_id",
+                    "ref": "eqms_fai_reports(fai_id)"
+                }
+            ],
+            "contract": null
+        },
         "eqms_field_actions": {
             "defined_in": "136_eqms_worldclass_surface.sql",
             "extended_in": [
@@ -2820,6 +2853,13 @@
             "foreign_keys": [],
             "contract": null
         },
+        "eqms_lessons_learned": {
+            "defined_in": "147_eqms_sprint6c_lessons_csat_sampling.sql",
+            "extended_in": [],
+            "primary_key": "lesson_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "eqms_msa_records": {
             "defined_in": "136_eqms_worldclass_surface.sql",
             "extended_in": [],
@@ -2933,6 +2973,13 @@
             ],
             "contract": null
         },
+        "eqms_sampling_plans": {
+            "defined_in": "147_eqms_sprint6c_lessons_csat_sampling.sql",
+            "extended_in": [],
+            "primary_key": "plan_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "eqms_scars": {
             "defined_in": "136_eqms_worldclass_surface.sql",
             "extended_in": [
@@ -2960,6 +3007,13 @@
             "defined_in": "136_eqms_worldclass_surface.sql",
             "extended_in": [],
             "primary_key": "ack_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "eqms_special_characteristics": {
+            "defined_in": "145_eqms_sprint6a_concessions_fai_sc.sql",
+            "extended_in": [],
+            "primary_key": "sc_id",
             "foreign_keys": [],
             "contract": null
         },
@@ -3095,6 +3149,13 @@
                     "ref": "eqms_validation_projects(project_id)"
                 }
             ],
+            "contract": null
+        },
+        "eqms_warranty_claims": {
+            "defined_in": "146_eqms_sprint6b_aml_warranty.sql",
+            "extended_in": [],
+            "primary_key": "claim_id",
+            "foreign_keys": [],
             "contract": null
         },
         "escalation_log": {
