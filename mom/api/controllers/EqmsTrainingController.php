@@ -212,7 +212,7 @@ final class EqmsTrainingController extends EqmsBaseController
         $qualificationCoverage = [];
         try {
             $qualificationCoverage = $this->data->query(
-                "SELECT COALESCE(c.role, 'Unassigned') AS entity,
+                "SELECT COALESCE(c.applicable_roles, 'Unassigned') AS entity,
                         'role'                           AS type,
                         COUNT(*) FILTER (WHERE tr.status IN ('completed','verified')) AS qualified,
                         COUNT(*)                                                       AS total,
@@ -326,7 +326,7 @@ final class EqmsTrainingController extends EqmsBaseController
         $this->requireAnyRole($user, $this->readRoles());
 
         $rows = $this->data->query(
-            "SELECT tm.employee_id, tm.curriculum_id, c.curriculum_name, c.department, c.role,
+            "SELECT tm.employee_id, tm.curriculum_id, c.curriculum_name, c.department, c.applicable_roles AS role,
                     tm.required, tm.completion_status, tm.last_completed_at, tm.next_due_at
              FROM eqms_training_matrix tm
              JOIN eqms_training_curricula c ON c.curriculum_id = tm.curriculum_id
@@ -358,7 +358,7 @@ final class EqmsTrainingController extends EqmsBaseController
         $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
 
         $rows = $this->data->query(
-            "SELECT curriculum_id, curriculum_name, department, role, effective_date,
+            "SELECT curriculum_id, curriculum_name, department, applicable_roles AS role, effective_date,
                     doc_ids, description, qualification_requirements,
                     validity_period_months, recurrence_months, status
              FROM eqms_training_curricula
@@ -555,7 +555,7 @@ final class EqmsTrainingController extends EqmsBaseController
                     c.curriculum_name,
                     c.description            AS curriculum_description,
                     c.department             AS curriculum_department,
-                    c.role                   AS curriculum_role,
+                    c.applicable_roles       AS curriculum_role,
                     c.doc_ids                AS curriculum_doc_ids,
                     c.validity_period_months AS validity_period,
                     c.recurrence_months      AS recurrence,

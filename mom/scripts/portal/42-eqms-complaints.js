@@ -160,6 +160,7 @@
     items: [],
     totalItems: 0,
     selectedIds: [],
+    loaded: false,
     loading: false,
     error: null,
     // Detail state
@@ -217,8 +218,8 @@
 
     bindEvents();
 
-    // Auto-load data
-    if (state.screen === 'queue' && !state.items.length && !state.loading) {
+    // Auto-load data (only on first render, not after every empty-result response)
+    if (state.screen === 'queue' && !state.loaded && !state.loading) {
       loadQueue();
     }
     if (state.screen === 'detail' && state.recordId && !state.record) {
@@ -987,6 +988,7 @@
 
     apiCall('eqms_complaints_query', payload).then(function(res) {
       state.loading = false;
+      state.loaded = true;
       if (res && res.success !== false) {
         state.items = res.complaints || res.data || [];
         state.totalItems = res.total || res.pagination && res.pagination.total || state.items.length;
@@ -996,6 +998,7 @@
       refreshUI();
     }).catch(function(err) {
       state.loading = false;
+      state.loaded = true;
       state.error = err.message || 'Network error';
       refreshUI();
     });

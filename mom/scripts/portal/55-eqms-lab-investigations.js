@@ -92,6 +92,7 @@
     page:       1,
     limit:      25,
     records:    [],
+    loaded:     false,
     total:      0,
     metrics:    null,
     detail:     null,
@@ -122,6 +123,7 @@
     };
     api('eqms_lab_investigations_query', payload).then(function(res) {
       state.loading = false;
+      state.loaded  = true;
       if (res.success === false) { state.error = res.message || 'Query failed'; }
       else {
         state.records = res.data || res.records || [];
@@ -129,7 +131,7 @@
         state.error   = null;
       }
       rerender();
-    }).catch(function(e) { state.loading = false; state.error = e.message; rerender(); });
+    }).catch(function(e) { state.loading = false; state.loaded = true; state.error = e.message; rerender(); });
   }
 
   function loadDetail(id) {
@@ -1061,8 +1063,8 @@
     _container = el;
     renderRoot();
 
-    // Initial data load on first render
-    if (state.screen === 'queue' && !state.records.length && !state.loading) {
+    // Initial data load on first render only (not after every empty-result response)
+    if (state.screen === 'queue' && !state.loaded && !state.loading) {
       loadQueue();
       loadMetrics();
     }

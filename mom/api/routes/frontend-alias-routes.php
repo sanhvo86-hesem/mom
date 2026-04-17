@@ -347,12 +347,16 @@ return static function (Router $router, string $dataDir): void {
     $router->actions([
         'eqms_calibration_query'      => [EqmsCalibrationController::class, 'search'],
         'eqms_calibration_detail'     => [EqmsCalibrationController::class, 'detail'],
+        'eqms_calibration_create'     => [EqmsCalibrationController::class, 'create'],
         'eqms_calibration_update'     => [EqmsCalibrationController::class, 'update'],
         'eqms_calibration_metrics'    => [EqmsCalibrationController::class, 'metrics'],
         'eqms_calibration_audit'      => [EqmsCalibrationController::class, 'audit'],
         'eqms_calibration_signatures' => [EqmsCalibrationController::class, 'signatures'],
+        'eqms_calibration_export'     => [EqmsCalibrationController::class, 'export'],
         'eqms_msa_query'              => [EqmsCalibrationController::class, 'msaQuery'],
-        'eqms_msa_detail'                        => [EqmsCalibrationController::class, 'msaDetail'],
+        'eqms_msa_detail'             => [EqmsCalibrationController::class, 'msaDetail'],
+        'eqms_msa_create'             => [EqmsCalibrationController::class, 'msaCreate'],
+        'eqms_msa_export'             => [EqmsCalibrationController::class, 'msaExport'],
         'eqms_calibration_action_start'          => [EqmsCalibrationController::class, 'actionStart'],
         'eqms_calibration_action_record_result'  => [EqmsCalibrationController::class, 'actionRecordResult'],
         'eqms_calibration_action_submit_review'  => [EqmsCalibrationController::class, 'actionSubmitReview'],
@@ -448,12 +452,12 @@ return static function (Router $router, string $dataDir): void {
 
     // Module 62: eqms-quality-agreements.js
     $router->actions([
-        'eqms_quality_agreements_query'      => [EqmsSuppliersController::class, 'qualityAgreements'],
+        'eqms_quality_agreements_query'      => [EqmsSuppliersController::class, 'qualityAgreementsSearch'],
         'eqms_quality_agreements_detail'     => [EqmsSuppliersController::class, 'qualityAgreements'],
         'eqms_quality_agreements_create'     => [EqmsSuppliersController::class, 'createQualityAgreement'],
         'eqms_quality_agreements_update'     => [EqmsSuppliersController::class, 'createQualityAgreement'],
         'eqms_quality_agreements_audit'      => [EqmsSuppliersController::class, 'audit'],
-        'eqms_quality_agreements_signatures' => [EqmsSuppliersController::class, 'qualityAgreements'],
+        'eqms_quality_agreements_signatures' => [EqmsSuppliersController::class, 'audit'],
         'eqms_quality_agreements_export'     => [EqmsSuppliersController::class, 'exportBulk'],
     ]);
 

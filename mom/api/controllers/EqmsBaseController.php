@@ -99,17 +99,50 @@ abstract class EqmsBaseController extends BaseController
     /**
      * Extract and validate a required path UUID/ID parameter.
      *
+     * Supports two call patterns:
+     *  - REST routing: router injects the value into $_GET['id'] (or the named key).
+     *  - Action-alias routing: frontend sends e.g. { deviation_id: "..." } in the
+     *    POST body instead of a plain 'id' key. When $name === 'id' and no 'id' value
+     *    is found, this method scans $_GET and the JSON body for a single *_id field
+     *    and uses that instead, so controllers don't need to know which call style
+     *    the frontend used.
+     *
      * @param string $name  $_GET key injected by the router (e.g. 'id').
      * @param string $label Human label for error messages (e.g. 'complaint_id').
      */
     protected function requirePathId(string $name = 'id', string $label = 'id'): string
     {
-        // Check $_GET first (REST path params), then JSON body (action-alias params)
+        // Primary: check the canonical key in $_GET (REST) or JSON body (action-alias)
         $raw = $this->input($name);
-        if ($raw === null || trim($raw) === '') {
-            $this->error("missing_{$label}", 400, "Path parameter '{$name}' is required.");
+        if ($raw !== null && trim($raw) !== '') {
+            return trim($raw);
         }
-        return trim($raw);
+
+        // Fallback (only when looking for 'id'): accept any single *_id parameter.
+        // This handles action-alias calls that send e.g. { deviation_id: "abc" }.
+        if ($name === 'id') {
+            // Check $_GET for a *_id key (REST path params injected under a different name)
+            foreach ($_GET as $k => $v) {
+                if ($k !== 'action' && $k !== 'id' && is_string($k) && str_ends_with($k, '_id')
+                    && is_string($v) && trim($v) !== '') {
+                    return trim($v);
+                }
+            }
+            // Check JSON body for exactly one *_id candidate
+            $body = $this->jsonBody();
+            $candidates = [];
+            foreach ($body as $k => $v) {
+                if ($k !== 'action' && $k !== 'id' && is_string($k) && str_ends_with($k, '_id')
+                    && is_scalar($v) && trim((string)$v) !== '') {
+                    $candidates[$k] = trim((string)$v);
+                }
+            }
+            if (count($candidates) === 1) {
+                return reset($candidates);
+            }
+        }
+
+        $this->error("missing_{$label}", 400, "Path parameter '{$name}' is required.");
     }
 
     // ── Optimistic Concurrency ───────────────────────────────────────────────

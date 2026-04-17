@@ -63,14 +63,25 @@ final class CsrfService
     public static function validate(): void
     {
         SessionService::init();
-        $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
-        if ($token === '' || empty($_SESSION['csrf']) || !hash_equals((string)$_SESSION['csrf'], (string)$token)) {
+        $token        = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
+        $sessionToken = (string)($_SESSION['csrf'] ?? '');
+        $generatedAt  = isset($_SESSION['csrf_generated_at']) ? (int)$_SESSION['csrf_generated_at'] : null;
+
+        // SEC-SESSION-002: Release session lock immediately after reading CSRF data.
+        // CsrfMiddleware runs before AuthMiddleware; holding the session lock through
+        // the entire controller execution serialises concurrent requests from the same
+        // browser tab/session and is the primary cause of EQMS tab load hangs.
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            session_write_close();
+        }
+
+        if ($token === '' || $sessionToken === '' || !hash_equals($sessionToken, $token)) {
             api_json(['ok' => false, 'error' => 'csrf_failed'], 403);
         }
 
         // SECURITY FIX PIPE-CSRF-002: Check token freshness
-        if (isset($_SESSION['csrf_generated_at'])) {
-            $tokenAge = time() - (int)$_SESSION['csrf_generated_at'];
+        if ($generatedAt !== null) {
+            $tokenAge = time() - $generatedAt;
             if ($tokenAge > 3600) {
                 api_json(['ok' => false, 'error' => 'csrf_expired'], 403);
             }

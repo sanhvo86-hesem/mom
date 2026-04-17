@@ -81,6 +81,7 @@
     sort:       { key: 'created_at', dir: 'desc' },
     page:       1,
     records:    [],
+    loaded:     false,
     pagination: null,
     metrics:    null,
     detail:     null,
@@ -116,6 +117,7 @@
     };
     api('eqms_capa_query', payload).then(function(res) {
       state.loading = false;
+      state.loaded  = true;
       if (res.success === false) { state.error = res.message || 'Query failed'; }
       else {
         state.records    = res.data || res.records || [];
@@ -123,7 +125,7 @@
         state.error      = null;
       }
       rerender();
-    }).catch(function(e) { state.loading = false; state.error = e.message; rerender(); });
+    }).catch(function(e) { state.loading = false; state.loaded = true; state.error = e.message; rerender(); });
   }
 
   function loadDetail(id) {
@@ -876,7 +878,8 @@
     container.innerHTML = html;
     bindEvents(container);
 
-    if (state.screen === 'queue' && !state.records.length && !state.loading) {
+    // Auto-load data (only on first render, not after every empty-result response)
+    if (state.screen === 'queue' && !state.loaded && !state.loading) {
       loadQueue();
       loadMetrics();
     }

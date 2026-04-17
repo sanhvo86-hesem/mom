@@ -338,7 +338,64 @@ final class EqmsSuppliersController extends EqmsBaseController
     }
 
     /**
-     * GET /suppliers/{id}/quality-agreements — List quality agreements.
+     * POST action:eqms_quality_agreements_query — Global list of quality agreements
+     * (used by standalone module 62-eqms-quality-agreements.js).
+     */
+    public function qualityAgreementsSearch(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->readRoles());
+
+        $body    = $this->jsonBody();
+        $filters = is_array($body['filters'] ?? null) ? $body['filters'] : [];
+        $offset  = max(0, (int)($body['offset'] ?? 0));
+        $limit   = min(200, max(1, (int)($body['limit'] ?? 25)));
+        $sortBy  = in_array($body['sort_by'] ?? '', ['effective_date', 'expiry_date', 'status', 'created_at'], true)
+                 ? $body['sort_by'] : 'created_at';
+        $sortDir = strtoupper($body['sort_dir'] ?? 'DESC') === 'ASC' ? 'ASC' : 'DESC';
+
+        $where  = [];
+        $params = [':lim' => $limit, ':off' => $offset];
+
+        if (!empty($filters['status'])) {
+            $where[] = 'qa.status = :status';
+            $params[':status'] = $filters['status'];
+        }
+        if (!empty($filters['supplier_id'])) {
+            $where[] = 'sp.vendor_id = :vendor_id';
+            $params[':vendor_id'] = $filters['supplier_id'];
+        }
+        if (!empty($body['search'])) {
+            $where[] = "(qa.title ILIKE :search OR qa.agreement_number ILIKE :search)";
+            $params[':search'] = '%' . $body['search'] . '%';
+        }
+
+        $whereClause = $where ? 'WHERE ' . implode(' AND ', $where) : '';
+
+        $rows = $this->data->query(
+            "SELECT qa.agreement_id, qa.agreement_number, qa.title,
+                    qa.vendor_id, sp.supplier_profile_id,
+                    qa.effective_date, qa.expiry_date, qa.status, qa.created_at
+             FROM eqms_quality_agreements qa
+             LEFT JOIN eqms_supplier_profiles sp ON sp.vendor_id = qa.vendor_id
+             {$whereClause}
+             ORDER BY qa.{$sortBy} {$sortDir}
+             LIMIT :lim OFFSET :off",
+            $params
+        ) ?? [];
+
+        $total = (int)($this->data->scalar(
+            "SELECT COUNT(*) FROM eqms_quality_agreements qa
+             LEFT JOIN eqms_supplier_profiles sp ON sp.vendor_id = qa.vendor_id
+             {$whereClause}",
+            array_diff_key($params, [':lim' => 0, ':off' => 0])
+        ) ?? 0);
+
+        $this->paginated('data', $rows, $total, $offset, $limit);
+    }
+
+    /**
+     * GET /suppliers/{id}/quality-agreements — List quality agreements for a supplier.
      */
     public function qualityAgreements(): never
     {
@@ -350,17 +407,17 @@ final class EqmsSuppliersController extends EqmsBaseController
         $limit  = min(200, max(1, (int)($this->query('limit', '50'))));
 
         $rows = $this->data->query(
-            "SELECT qa.agreement_id, qa.supplier_profile_id, qa.agreement_number,
-                    qa.title, qa.effective_date, qa.expiry_date, qa.status, qa.storage_ref, qa.created_at
+            "SELECT qa.agreement_id, qa.vendor_id, qa.agreement_number,
+                    qa.title, qa.effective_date, qa.expiry_date, qa.status, qa.created_at
              FROM eqms_quality_agreements qa
-             WHERE qa.supplier_profile_id = :id
+             WHERE qa.vendor_id = :id
              ORDER BY qa.effective_date DESC
              LIMIT :lim OFFSET :off",
             [':id' => $profileId, ':lim' => $limit, ':off' => $offset]
         ) ?? [];
 
         $total = (int)($this->data->scalar(
-            "SELECT COUNT(*) FROM eqms_quality_agreements WHERE supplier_profile_id = :id",
+            "SELECT COUNT(*) FROM eqms_quality_agreements WHERE vendor_id = :id",
             [':id' => $profileId]
         ) ?? 0);
 
