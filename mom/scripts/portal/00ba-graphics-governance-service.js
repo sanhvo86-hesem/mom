@@ -97,7 +97,8 @@ var _state = {
     label: 'Template registry baseline',
     source: 'frontend-preview-fallback'
   },
-  lastImpact: null
+  lastImpact: null,
+  lastProbeAt: null
 };
 
 function clone(value){
@@ -829,6 +830,48 @@ function refresh(seedTemplates){
   });
 }
 
+function probeOneEndpoint(name){
+  var endpoint = ENDPOINTS[name];
+  if(!endpoint || !window.fetch){
+    _state.endpointStatus[name] = 'fallback: fetch_unavailable';
+    return Promise.resolve();
+  }
+  var isPost = endpoint.method === 'POST';
+  var opts = {
+    method: endpoint.method || 'GET',
+    headers: { 'Content-Type':'application/json', 'Accept':'application/json' },
+    credentials: 'same-origin'
+  };
+  if(isPost){
+    var csrf = csrfHeaderValue();
+    if(csrf) opts.headers['X-CSRF-Token'] = csrf;
+    opts.body = JSON.stringify({ __probe__: true });
+  }
+  return fetch(apiUrl(endpoint, {}), opts).then(function(res){
+    var s = res.status;
+    if(res.ok || s === 400 || s === 422 || s === 428){
+      _state.endpointStatus[name] = 'online';
+      _state.backendAvailable = true;
+    } else if(s === 401 || s === 403){
+      _state.endpointStatus[name] = 'auth-blocked';
+      _state.backendAvailable = true;
+    } else if(s === 404){
+      _state.endpointStatus[name] = 'not-found';
+    } else {
+      _state.endpointStatus[name] = 'fallback: http_' + s;
+    }
+  }).catch(function(err){
+    _state.endpointStatus[name] = 'offline: ' + (err && err.message ? err.message : 'network_error');
+  });
+}
+
+function probeContracts(){
+  _state.lastProbeAt = nowIso();
+  return Promise.all(Object.keys(ENDPOINTS).map(probeOneEndpoint)).then(function(){
+    return { endpointStatus: clone(_state.endpointStatus), probedAt: _state.lastProbeAt };
+  });
+}
+
 function getSnapshot(seedTemplates){
   if(!_state.modules || !_state.modules.length) _state.modules = mergeModules([]);
   if(!_state.compliance || !_state.compliance.length) _state.compliance = fallbackCompliance(_state.modules);
@@ -848,6 +891,7 @@ function getSnapshot(seedTemplates){
     endpointStatus: clone(_state.endpointStatus),
     backendAvailable: _state.backendAvailable,
     lastLoadedAt: _state.lastLoadedAt,
+    lastProbeAt: _state.lastProbeAt,
     templates: templates,
     localCacheTemplates: clone(localCacheTemplates),
     draftTemplates: clone(localCacheTemplates.filter(function(tpl){ return String(tpl.sourceAuthority || '') === 'unsaved-draft-cache'; })),
@@ -1910,7 +1954,8 @@ window.HmGraphicsGovernance = {
   rollbackGraphicsRollout: rollbackGraphicsRollout,
   requestWaiver: requestWaiver,
   approveWaiver: approveWaiver,
-  expireWaiver: expireWaiver
+  expireWaiver: expireWaiver,
+  probeContracts: probeContracts
 };
 
 })();

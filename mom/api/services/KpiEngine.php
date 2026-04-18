@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MOM\Services;
 
+use InvalidArgumentException;
 use MOM\Database\Connection;
 use RuntimeException;
 
@@ -162,6 +163,8 @@ final readonly class DashboardData
  */
 final class KpiEngine
 {
+    private const KPI_AUTHORITY_REGISTRY_PATH = __DIR__ . '/../../data/registry/kpi-authority-registry.json';
+
     /** Metric codes for all supported KPIs. */
     public const METRIC_OEE                  = 'OEE';
     public const METRIC_OTD                  = 'OTD';
@@ -264,6 +267,7 @@ final class KpiEngine
     ];
 
     private Connection $db;
+    private ?array $kpiAuthorityRegistry = null;
 
     // ── Construction ────────────────────────────────────────────────────────
 
@@ -284,7 +288,7 @@ final class KpiEngine
      */
     public function calculateKpi(string $metricCode, DateRange $period, array $filters = []): KpiResult
     {
-        $metricCode = strtoupper(trim($metricCode));
+        $metricCode = $this->normalizeMetricCode($metricCode);
         $calculator = $this->getCalculator($metricCode);
         $breakdown  = $calculator($period, $filters);
 
@@ -338,7 +342,7 @@ final class KpiEngine
      */
     public function getKpiTrend(string $metricCode, DateRange $period, string $granularity = 'daily'): array
     {
-        $metricCode = strtoupper(trim($metricCode));
+        $metricCode = $this->normalizeMetricCode($metricCode);
 
         // Try stored snapshots first
         $stored = $this->loadTrendFromSnapshots($metricCode, $period, $granularity);
@@ -378,7 +382,7 @@ final class KpiEngine
      */
     public function getKpiTarget(string $metricCode): float
     {
-        $metricCode = strtoupper(trim($metricCode));
+        $metricCode = $this->normalizeMetricCode($metricCode);
         try {
             $row = $this->db->queryOne(
                 'SELECT target FROM kpi_definitions WHERE metric_code = :code AND is_active = TRUE',
@@ -401,7 +405,7 @@ final class KpiEngine
      */
     public function saveSnapshot(string $metricCode, KpiResult $result): void
     {
-        $metricCode = strtoupper(trim($metricCode));
+        $metricCode = $this->normalizeMetricCode($metricCode);
 
         $kpiId = $this->db->queryScalar(
             'SELECT kpi_id FROM kpi_definitions WHERE metric_code = :code',
@@ -1026,6 +1030,8 @@ final class KpiEngine
      */
     private function getCalculator(string $metricCode): callable
     {
+        $metricCode = $this->normalizeMetricCode($metricCode);
+
         return match ($metricCode) {
             self::METRIC_OEE                 => $this->calcOee(...),
             self::METRIC_OTD                 => $this->calcOtd(...),
@@ -1105,6 +1111,8 @@ final class KpiEngine
      */
     private function emptyResult(string $metricCode, DateRange $period): KpiResult
     {
+        $metricCode = $this->normalizeMetricCode($metricCode);
+
         return new KpiResult(
             metricCode:   $metricCode,
             value:        0.0,
@@ -1125,6 +1133,8 @@ final class KpiEngine
      */
     private function loadTrendFromSnapshots(string $metricCode, DateRange $period, string $granularity): array
     {
+        $metricCode = $this->normalizeMetricCode($metricCode);
+
         try {
             $truncFn = match ($granularity) {
                 'weekly'  => "date_trunc('week', ks.period_start)",
@@ -1204,6 +1214,11 @@ final class KpiEngine
      */
     private function registerKpiDefinition(string $metricCode): string
     {
+        $metricCode = $this->normalizeMetricCode($metricCode);
+        if (!in_array($metricCode, self::ALL_METRICS, true)) {
+            throw new InvalidArgumentException("KPI metric is not approved for KpiEngine auto-registration: {$metricCode}");
+        }
+
         $name   = str_replace('_', ' ', $metricCode);
         $target = self::DEFAULT_TARGETS[$metricCode] ?? 0;
         $unit   = self::UNITS[$metricCode] ?? '%';
@@ -1222,5 +1237,50 @@ final class KpiEngine
         );
 
         return (string) ($row['kpi_id'] ?? '');
+    }
+
+    /**
+     * Normalize approved legacy aliases to the single runtime metric code.
+     */
+    private function normalizeMetricCode(string $metricCode): string
+    {
+        $code = strtoupper(trim($metricCode));
+        if ($code === '') {
+            return $code;
+        }
+
+        $aliases = $this->loadKpiAuthorityRegistry()['legacy_aliases'] ?? [];
+        if (is_array($aliases)) {
+            $canonical = $aliases[$code] ?? null;
+            if (is_string($canonical) && trim($canonical) !== '') {
+                return strtoupper(trim($canonical));
+            }
+        }
+
+        return $code;
+    }
+
+    /**
+     * Load the governed KPI registry. Missing registry falls back to built-in constants.
+     *
+     * @return array<string, mixed>
+     */
+    private function loadKpiAuthorityRegistry(): array
+    {
+        if ($this->kpiAuthorityRegistry !== null) {
+            return $this->kpiAuthorityRegistry;
+        }
+
+        $this->kpiAuthorityRegistry = [];
+        if (!is_file(self::KPI_AUTHORITY_REGISTRY_PATH)) {
+            return $this->kpiAuthorityRegistry;
+        }
+
+        $payload = json_decode((string) file_get_contents(self::KPI_AUTHORITY_REGISTRY_PATH), true);
+        if (is_array($payload)) {
+            $this->kpiAuthorityRegistry = $payload;
+        }
+
+        return $this->kpiAuthorityRegistry;
     }
 }

@@ -69,6 +69,7 @@ mom/data/*
 !mom/data/registry/
 mom/data/registry/*
 !mom/data/registry/endpoint-catalog-index.json
+!mom/data/registry/kpi-authority-registry.json
 !mom/data/registry/api-params.json
 !mom/data/registry/canonical-backend-standardization-catalog.json
 !mom/data/registry/command-runtime-bindings.json

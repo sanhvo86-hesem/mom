@@ -1843,35 +1843,134 @@ window._admGraphicsRequestWaiver = function(){
   });
 };
 
+window._admGraphicsProbeContracts = function(){
+  var svc = graphicsSvc();
+  if(!svc || typeof svc.probeContracts !== 'function'){
+    if(typeof showToast === 'function') showToast(L('Graphics governance service chưa sẵn sàng.', 'Graphics governance service not ready.'), 'warning');
+    return;
+  }
+  announceGraphics(L('Đang probe tất cả endpoints...', 'Probing all endpoints...'));
+  svc.probeContracts().then(function(result){
+    var online = Object.values(result.endpointStatus || {}).filter(function(s){ return s === 'online'; }).length;
+    var total = Object.keys(result.endpointStatus || {}).length;
+    if(typeof showToast === 'function') showToast(online + '/' + total + ' endpoints online', online === total ? 'success' : 'warning');
+    renderAdminAppearance();
+  }).catch(function(){
+    if(typeof showToast === 'function') showToast(L('Probe thất bại.', 'Probe failed.'), 'error');
+    renderAdminAppearance();
+  });
+};
+
+window._admGraphicsForceRefresh = function(){
+  var svc = graphicsSvc();
+  if(!svc || typeof svc.refresh !== 'function'){
+    if(typeof showToast === 'function') showToast(L('Graphics governance service chưa sẵn sàng.', 'Graphics governance service not ready.'), 'warning');
+    return;
+  }
+  _graphicsRefreshStarted = false;
+  announceGraphics(L('Đang refresh live governance data...', 'Refreshing live governance data...'));
+  svc.refresh(BASE_TEMPLATE_PRESETS).then(function(){
+    if(typeof showToast === 'function') showToast(L('Governance data đã được cập nhật.', 'Governance data refreshed.'), 'success');
+    renderAdminAppearance();
+  }).catch(function(){
+    if(typeof showToast === 'function') showToast(L('Refresh thất bại.', 'Refresh failed.'), 'error');
+    renderAdminAppearance();
+  });
+};
+
 function joinList(items, emptyText){
   items = items || [];
   return items.length ? items.map(esc).join(', ') : esc(emptyText || '-');
 }
 
+function _contractStatusChip(state){
+  if(!state || state === 'not checked'){
+    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0">⬜ not checked</span>';
+  }
+  if(state === 'online'){
+    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#dcfce7;color:#166534;border:1px solid #86efac">✅ online</span>';
+  }
+  if(state === 'auth-blocked'){
+    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#fef9c3;color:#854d0e;border:1px solid #fde047">🔐 auth-blocked</span>';
+  }
+  if(state === 'not-found'){
+    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#fecaca;color:#991b1b;border:1px solid #fca5a5">❌ not-found</span>';
+  }
+  if(/^offline/.test(state)){
+    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5">🔴 '+esc(state)+'</span>';
+  }
+  return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#fef3c7;color:#92400e;border:1px solid #fcd34d">⚠️ '+esc(state)+'</span>';
+}
+
 function renderAuthorityStatusPanel(){
   var snap = graphicsSnapshot();
-  var endpointRows = Object.keys(snap.endpoints || {}).map(function(key){
-    var ep = snap.endpoints[key];
-    var state = snap.endpointStatus && snap.endpointStatus[key] ? snap.endpointStatus[key] : 'not checked';
+  var endpoints = snap.endpoints || {};
+  var statuses = snap.endpointStatus || {};
+
+  var totalOnline = 0, totalAuthBlocked = 0, totalNotFound = 0, totalOffline = 0, totalUnchecked = 0;
+  Object.keys(endpoints).forEach(function(k){
+    var s = statuses[k] || '';
+    if(s === 'online') totalOnline++;
+    else if(s === 'auth-blocked') totalAuthBlocked++;
+    else if(s === 'not-found') totalNotFound++;
+    else if(/^offline/.test(s)) totalOffline++;
+    else totalUnchecked++;
+  });
+
+  var probeBtn = '<button onclick="_admGraphicsProbeContracts()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid #e2e8f0;background:#ffffff;color:#1e293b">🔍 Probe all endpoints</button>';
+  var refreshBtn = '<button onclick="_admGraphicsForceRefresh()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid #e2e8f0;background:#ffffff;color:#1e293b">↻ Refresh live data</button>';
+  var lastRefresh = snap.lastLoadedAt ? '<span style="font-size:11px;color:var(--text-secondary)">Last refresh: '+esc(snap.lastLoadedAt.replace('T',' ').replace(/\.\d+Z$/,' UTC'))+'</span>' : '';
+  var lastProbe = (snap.lastProbeAt) ? '<span style="font-size:11px;color:var(--text-secondary)">Last probe: '+esc(snap.lastProbeAt.replace('T',' ').replace(/\.\d+Z$/,' UTC'))+'</span>' : '<span style="font-size:11px;color:var(--text-secondary)">Not probed yet — POST endpoints require manual probe</span>';
+
+  var actionBar = '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:14px">'
+    + probeBtn + refreshBtn + lastRefresh + lastProbe + '</div>';
+
+  var summaryCards = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:14px">'
+    + infoCard('✅ Online', String(totalOnline) + ' / ' + String(Object.keys(endpoints).length), totalOnline === Object.keys(endpoints).length ? 'full' : 'partial')
+    + infoCard('🔐 Auth-blocked', String(totalAuthBlocked), totalAuthBlocked ? 'preview' : 'neutral')
+    + infoCard('❌ Not found', String(totalNotFound), totalNotFound ? 'partial' : 'neutral')
+    + infoCard('🔴 Offline', String(totalOffline), totalOffline ? 'partial' : 'neutral')
+    + infoCard('⬜ Not checked', String(totalUnchecked), totalUnchecked ? 'preview' : 'neutral')
+    + infoCard(L('Registry authority', 'Registry authority'), snap.backendAvailable ? 'Backend online' : 'Backend offline', snap.backendAvailable ? 'full' : 'partial')
+    + '</div>';
+
+  var endpointRows = Object.keys(endpoints).map(function(key){
+    var ep = endpoints[key];
+    var state = statuses[key] || 'not checked';
+    var isPost = ep.method === 'POST';
+    var methodCell = isPost
+      ? '<span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:800;background:#fef3c7;color:#92400e;font-family:var(--font-mono)">POST</span>'
+      : '<span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:800;background:#e0f2fe;color:#075985;font-family:var(--font-mono)">GET</span>';
+    var noteCell = isPost && state === 'not checked'
+      ? '<span style="font-size:10px;color:#94a3b8;font-style:italic">mutation — probe to verify</span>'
+      : (isPost ? '<span style="font-size:10px;color:#94a3b8;font-style:italic">mutation</span>' : '');
     return '<tr>'
-      + '<td style="padding:8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px">'+esc(key)+'</td>'
-      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+esc(ep.method + ' api.php?action=' + ep.action)+'</td>'
-      + '<td style="padding:8px;border-bottom:1px solid var(--border)">'+statusChip(state === 'online' ? 'full' : 'partial', state)+'</td>'
+      + '<td style="padding:7px 8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px;white-space:nowrap">'+esc(key)+'</td>'
+      + '<td style="padding:7px 8px;border-bottom:1px solid var(--border)">'+methodCell+'</td>'
+      + '<td style="padding:7px 8px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text-secondary);font-family:var(--font-mono)">'+esc(ep.action)+'</td>'
+      + '<td style="padding:7px 8px;border-bottom:1px solid var(--border)">'+_contractStatusChip(state)+'</td>'
+      + '<td style="padding:7px 8px;border-bottom:1px solid var(--border)">'+noteCell+'</td>'
       + '</tr>';
   }).join('');
+
+  var authorityCards = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:14px">'
+    + infoCard('Standard 36', L('Production authority cho template, block, token, QA gate và release evidence.', 'Production authority for templates, blocks, tokens, QA gates, and release evidence.'), 'full')
+    + infoCard(L('Graphics governance', 'Graphics governance'), L('Admin Appearance là token editor + governance console.', 'Admin Appearance is token editor plus governance console.'), 'full')
+    + infoCard(L('Local cache policy', 'Local cache policy'), L('Chỉ dùng preview_cache và draft_cache cho preview/draft.', 'Only preview_cache and draft_cache are used for preview/draft.'), 'preview')
+    + '</div>';
+
   return sect(
-    L('Authority status', 'Authority status'),
-    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:12px">'
-      + infoCard('Standard 36', L('Production authority cho template, block, token, QA gate và release evidence.', 'Production authority for templates, blocks, tokens, QA gates, and release evidence.'), 'full')
-      + infoCard(L('Graphics governance', 'Graphics governance'), L('Admin Appearance là token editor + governance console; không thêm controls cho decoration một lần.', 'Admin Appearance is token editor plus governance console; no one-off decoration controls.'), 'full')
-      + infoCard(L('Registry authority', 'Registry authority'), snap.backendAvailable ? L('Backend endpoint online', 'Backend endpoint online') : L('Backend chưa online; local cache không được promote thành authority.', 'Backend is not online; local cache is not promoted to authority.'), snap.backendAvailable ? 'full' : 'partial')
-      + infoCard(L('Local cache policy', 'Local cache policy'), L('Chỉ dùng `hesem_graphics_template_preview_cache` và `hesem_graphics_template_draft_cache` cho preview/draft.', 'Only `hesem_graphics_template_preview_cache` and `hesem_graphics_template_draft_cache` are used for preview/draft.'), 'preview')
-      + '</div>'
-      + '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'
-      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Contract</th>'
-      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Expected endpoint</th>'
-      + '<th style="text-align:left;padding:8px;border-bottom:1px solid var(--border)">Status</th>'
-      + '</tr></thead><tbody>'+endpointRows+'</tbody></table>',
+    L('Contract Authority & Endpoint Health', 'Contract Authority & Endpoint Health'),
+    authorityCards
+    + actionBar
+    + summaryCards
+    + '<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'
+    + '<th style="text-align:left;padding:7px 8px;border-bottom:2px solid var(--border);font-size:11px">Contract</th>'
+    + '<th style="text-align:left;padding:7px 8px;border-bottom:2px solid var(--border);font-size:11px">Method</th>'
+    + '<th style="text-align:left;padding:7px 8px;border-bottom:2px solid var(--border);font-size:11px">Action</th>'
+    + '<th style="text-align:left;padding:7px 8px;border-bottom:2px solid var(--border);font-size:11px">Status</th>'
+    + '<th style="text-align:left;padding:7px 8px;border-bottom:2px solid var(--border);font-size:11px">Note</th>'
+    + '</tr></thead><tbody>'+endpointRows+'</tbody></table>',
     true,
     statusChip(snap.backendAvailable ? 'full' : 'partial', snap.registryAuthority || 'fallback')
   );

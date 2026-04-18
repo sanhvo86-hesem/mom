@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANNEX-125 - CNC Performance Operating System | HESEM MOM</title>
+<link rel="stylesheet" href="../../../../assets/style.css">
+<style>
+.page-body h1{font-size:24px;line-height:1.35;margin:0 0 10px}
+.page-body h2{font-size:18px;line-height:1.4;margin:18px 0 10px;color:var(--navy)}
+.page-body h3{font-size:14px;line-height:1.5;margin:12px 0 6px;color:var(--ink)}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:12px 0}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:12px 0}
+.card{border:1px solid var(--ln);border-radius:8px;padding:14px;background:#fff}
+.card h3{margin-top:0;color:var(--navy)}
+.tag{display:inline-block;padding:2px 8px;border:1px solid var(--ln);border-radius:999px;background:var(--bg2);font-size:11px;font-weight:700;margin:2px 4px 2px 0}
+.callout{border:1px solid #cfe0ff;border-left:4px solid #2563eb;border-radius:8px;background:#eef6ff;padding:12px 14px;margin:12px 0}
+.warn{border-color:#ffe066;border-left-color:#f59f00;background:#fff9db}
+.tight{margin:0;padding-left:18px}
+.tight li{margin:4px 0}
+.small{font-size:12px;color:var(--ink2)}
+@media(max-width:960px){.grid-2,.grid-3{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="../../../../mom/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
+<div class="fh-company"><a href="../../../../mom/portal.html">HESEM ENGINEERING</a><span>Tài liệu vận hành • Annex</span></div>
+</div>
+<div class="title"><strong class="doc-name">CNC Performance Operating System</strong></div>
+<div class="meta">
+<div class="row"><span><b>Mã:</b></span><span class="doc-code">ANNEX-125</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>CEO / QMS / PD</span></div>
+</div>
+</div>
+
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng để điều hành hiệu suất công ty gia công CNC theo Hoshin + BSC/KPI + TOC + Lean Daily Management + QMS/MES evidence. Tài liệu này không thay thế QMS, không thay đổi quyền phê duyệt chất lượng và không tạo quyền điều khiển máy.</div>
+<h1>ANNEX-125 - CNC Performance Operating System</h1>
+
+<div class="section">
+<h2>1. Nguyên tắc hệ điều hành</h2>
+<div class="callout">
+<b>Kết luận kiểm soát:</b> Không đổi hệ chính sang OKR. OKR chỉ được dùng như thẻ dự án cải tiến 60-90 ngày. Hệ điều hành chính là Hoshin Strategy Deployment + Lean Daily Management + Theory of Constraints; BSC/KPI là scorecard kiểm soát kết quả.
+</div>
+<ul class="tight">
+<li>QMS vẫn là hệ thống kiểm soát tuân thủ, chất lượng, hồ sơ và thẩm quyền phê duyệt.</li>
+<li>MOM/MES là nguồn sự thật thực thi: trạng thái job, operation, WIP, máy, inspection, hold/release và bằng chứng cổng kiểm soát.</li>
+<li>Bảng điều hành, phân tích và AI chỉ là read model hoặc khuyến nghị; không tự dispatch, release, approve hoặc đóng hồ sơ.</li>
+<li>Một KPI chỉ được dùng chính thức khi có mã chuẩn, owner, công thức, nguồn dữ liệu, cadence review và bằng chứng.</li>
+</ul>
+</div>
+
+<div class="section">
+<h2>2. Năm lớp điều hành</h2>
+<div class="grid-2">
+<div class="card">
+<h3>Layer 1 - Hoshin năm</h3>
+<p>Khóa 3-5 mục tiêu đột phá theo năm, X-Matrix, owner, nguồn lực và rủi ro. Không dùng quá nhiều mục tiêu. Mỗi mục tiêu phải có KPI doanh nghiệp và dự án cải tiến liên quan.</p>
+<p><span class="tag">Cadence: năm/quý</span><span class="tag">Owner: CEO</span><span class="tag">Evidence: X-Matrix</span></p>
+</div>
+<div class="card">
+<h3>Layer 2 - BSC scorecard quý/tháng</h3>
+<p>Giữ BSC làm bản đồ kết quả theo các góc nhìn tài chính, khách hàng, vận hành, con người/hệ thống. KPI cấp lãnh đạo giới hạn 12-15 chỉ số để tránh dashboard nhiễu.</p>
+<p><span class="tag">Cadence: tháng/quý</span><span class="tag">Owner: CEO/QMS/FIN</span><span class="tag">Evidence: scorecard snapshot</span></p>
+</div>
+<div class="card">
+<h3>Layer 3 - TOC bottleneck weekly</h3>
+<p>Mỗi tuần xác định ràng buộc hiện tại, buffer đỏ/vàng/xanh, lost hours tại ràng buộc và quyết định bảo vệ setup, fixture, gage, CMM cho ràng buộc.</p>
+<p><span class="tag">Cadence: tuần</span><span class="tag">Owner: PD/PPL/WKM</span><span class="tag">Evidence: constraint register</span></p>
+</div>
+<div class="card">
+<h3>Layer 4 - Lean Daily Management</h3>
+<p>Điều hành theo ca/ngày bằng board: safety, delivery, quality, capacity, action. Mọi vấn đề đỏ phải có owner, due time, containment và bằng chứng đóng.</p>
+<p><span class="tag">Cadence: ca/ngày</span><span class="tag">Owner: WKM/SL/PPL</span><span class="tag">Evidence: action log</span></p>
+</div>
+<div class="card">
+<h3>Layer 5 - QMS/MES gate evidence</h3>
+<p>Mỗi sự kiện có rủi ro chất lượng hoặc giao hàng phải gắn bằng chứng đúng cổng: setup, first-piece/FAI, IPQC, NCR/CAPA, final release, ship packet.</p>
+<p><span class="tag">Cadence: theo sự kiện</span><span class="tag">Owner: QA/QC/OPS</span><span class="tag">Evidence: gate record</span></p>
+</div>
+<div class="card">
+<h3>Vai trò OKR</h3>
+<p>OKR không là hệ KPI chính. Chỉ dùng cho dự án cải tiến có thời hạn, ví dụ giảm WIP đỏ trong 90 ngày hoặc tăng FAI first-pass cho một nhóm sản phẩm.</p>
+<p><span class="tag">Cadence: 60-90 ngày</span><span class="tag">Owner: project owner</span><span class="tag">Evidence: kaizen/CAPA project</span></p>
+</div>
+</div>
+</div>
+
+<div class="section">
+<h2>3. Scorecard lãnh đạo 15 KPI</h2>
+<p>Scorecard lãnh đạo phải nhỏ, đủ sắc và không thay thế từ điển KPI đầy đủ. Các KPI hiện tại trong ANNEX-122 được giữ; bộ dưới đây là mặt điều hành cấp CEO.</p>
+<div class="table-card"><table class="table">
+<thead><tr><th>KPI</th><th>Mục đích điều hành</th><th>Cadence</th><th>Nguồn bằng chứng</th></tr></thead>
+<tbody>
+<tr><td>OTD</td><td>Giữ lời hứa giao hàng.</td><td>Tháng/tuần khi đỏ</td><td>Shipment/job promise date</td></tr>
+<tr><td>FPY</td><td>Đo đúng ngay từ đầu, giảm rework/scrap.</td><td>Tháng</td><td>Inspection/job completion</td></tr>
+<tr><td>OEE bottleneck</td><td>Đo hiệu suất tại ràng buộc thật, không bình quân che mất nút thắt.</td><td>Tuần</td><td>Machine/OEE logs</td></tr>
+<tr><td>WIP aging</td><td>Nhìn job tồn lâu và rủi ro vỡ giao.</td><td>Ngày/tuần</td><td>WIP snapshot</td></tr>
+<tr><td>Setup first-pass</td><td>Đo setup ready-to-run đúng ngay lần đầu.</td><td>Tuần/tháng</td><td>Setup record</td></tr>
+<tr><td>FAI first-pass</td><td>Đo first-piece/FAI qua ngay lần đầu.</td><td>Tuần/tháng</td><td>FAI/IPQC record</td></tr>
+<tr><td>In-process reject</td><td>Chặn lỗi trong công đoạn trước khi final.</td><td>Tuần/tháng</td><td>IPQC/NCR</td></tr>
+<tr><td>COPQ</td><td>Lượng hóa chi phí chất lượng kém.</td><td>Tháng</td><td>NCR, scrap, rework, concession</td></tr>
+<tr><td>Repeat NCR</td><td>Đo lỗi lặp lại, không chỉ tốc độ đóng NCR.</td><td>Tháng</td><td>NCR/CAPA</td></tr>
+<tr><td>CAPA effectiveness</td><td>Chứng minh hành động khắc phục có hiệu lực.</td><td>Tháng/quý</td><td>CAPA verification</td></tr>
+<tr><td>Supplier OTD</td><td>Rủi ro vật tư/outsource với kế hoạch.</td><td>Tháng</td><td>PO receipt/supplier scorecard</td></tr>
+<tr><td>Supplier quality</td><td>Rủi ro incoming và special process.</td><td>Tháng</td><td>Incoming/NCR supplier</td></tr>
+<tr><td>Critical role certification</td><td>Đảm bảo vai trò setup, QC, CMM, planner, operator không là ràng buộc ẩn.</td><td>Tháng</td><td>Training/certification</td></tr>
+<tr><td>Safety incident</td><td>Không đổi sản lượng lấy rủi ro an toàn.</td><td>Tháng/ngay khi phát sinh</td><td>EHS incident log</td></tr>
+<tr><td>Throughput per constraint hour</td><td>Đo tiền/giá trị tạo ra trên giờ ràng buộc.</td><td>Tuần/tháng</td><td>Job revenue + constraint hours</td></tr>
+</tbody>
+</table></div>
+</div>
+
+<div class="section">
+<h2>4. Cách dùng số KPI</h2>
+<div class="grid-3">
+<div class="card"><h3>CEO</h3><p>12-15 KPI. Chỉ dùng để ra quyết định nguồn lực, ưu tiên cải tiến và review Hoshin.</p></div>
+<div class="card"><h3>Quản lý</h3><p>25-45 KPI. Bao gồm toàn bộ KPI ANNEX-122 và KPI vận hành được phê duyệt theo registry.</p></div>
+<div class="card"><h3>Hiện trường</h3><p>50+ metric thao tác. Dùng cho ca/ngày, nhưng không phải metric nào cũng được nâng lên scorecard công ty.</p></div>
+</div>
+<div class="callout warn">Không mở rộng dashboard bằng cách thêm số tùy ý. Mọi KPI mới phải đi qua ANNEX-127 và có data contract trước khi đưa vào hệ thống tính tự động.</div>
+</div>
+
+<div class="section">
+<h2>5. Benchmark anchors</h2>
+<ul class="tight small">
+<li>SAP Balanced Scorecard mô hình hóa strategy, objective, perspective, measure và initiative: <a href="https://help.sap.com/docs/SAP_ERP/32af182dce754f85af2e4cfcf876b8cf/b0a5cf535b804808e10000000a174cb4.html">SAP Help - Balanced Scorecard Elements</a>.</li>
+<li>SAP Theory of Constraints dùng critical constraint resource và drum-buffer-rope: <a href="https://help.sap.com/docs/SCMCSTOC/e152941d2dd14e62813b65953ae5bae1/91c473a45ff847d4a1ff0df5168f0a8d.html">SAP Help - Theory of Constraints</a>.</li>
+<li>NIST Baldrige xem Lean, Six Sigma, ISO và các công cụ cải tiến là bổ trợ trong một framework quản trị kết quả: <a href="https://www.nist.gov/baldrige/self-assessing/improvement-tools/integrating-baldrige-other-tools">NIST - Integrating Baldrige with Other Tools</a>.</li>
+<li>ISA-95 giữ ranh giới Level 3 MOM/MES và Level 4 business planning rõ ràng: <a href="https://www.isa.org/standards-and-publications/isa-standards/isa-95-standard">ISA - ISA-95 Standard</a>.</li>
+<li>OPC UA Machine Tools minh họa cách KPI máy cần job, quantity, status và order context để tính đúng: <a href="https://reference.opcfoundation.org/MachineTool/v101/docs/C">OPC Foundation - Machine Tool KPI Calculation</a>.</li>
+</ul>
+</div>
+
+<div class="section">
+<h2>6. Tài liệu liên kết</h2>
+<div class="table-card"><table class="table">
+<thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead>
+<tbody>
+<tr><td><a href="annex-122-kpi-cascade-dictionary.html">ANNEX-122</a></td><td>Từ điển 33 KPI hiện hữu.</td></tr>
+<tr><td><a href="annex-126-hoshin-strategy-deployment-and-catchball.html">ANNEX-126</a></td><td>Hoshin, catchball và X-Matrix.</td></tr>
+<tr><td><a href="annex-127-kpi-authority-registry-and-operational-metrics.html">ANNEX-127</a></td><td>Mã KPI chuẩn, alias legacy và quy tắc data contract.</td></tr>
+<tr><td><a href="../../05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a></td><td>TOC, constraint register, WIP và dispatch rules.</td></tr>
+<tr><td><a href="../../05-ANNEX-500/annex-504-tier-meeting-cadence-and-escalation-standard-work.html">ANNEX-504</a></td><td>Họp tầng và action log.</td></tr>
+</tbody>
+</table></div>
+</div>
+
+</div>
+</div>
+</div>
+<div class="no-screen print-disclaimer">Bản in không có đóng dấu kiểm soát phiên bản thì không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>

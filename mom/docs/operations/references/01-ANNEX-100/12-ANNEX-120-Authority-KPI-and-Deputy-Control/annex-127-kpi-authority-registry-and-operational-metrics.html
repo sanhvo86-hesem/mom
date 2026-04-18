@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANNEX-127 - KPI Authority Registry and Operational Metrics | HESEM MOM</title>
+<link rel="stylesheet" href="../../../../assets/style.css">
+<style>
+.page-body h1{font-size:24px;line-height:1.35;margin:0 0 10px}
+.page-body h2{font-size:18px;line-height:1.4;margin:18px 0 10px;color:var(--navy)}
+.page-body h3{font-size:14px;line-height:1.5;margin:12px 0 6px;color:var(--ink)}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:12px 0}
+.card{border:1px solid var(--ln);border-radius:8px;padding:14px;background:#fff}
+.callout{border:1px solid #cfe0ff;border-left:4px solid #2563eb;border-radius:8px;background:#eef6ff;padding:12px 14px;margin:12px 0}
+.danger{border-color:#ffc9c9;border-left-color:#e03131;background:#fff5f5}
+.tag{display:inline-block;padding:2px 8px;border:1px solid var(--ln);border-radius:999px;background:var(--bg2);font-size:11px;font-weight:700;margin:2px 4px 2px 0}
+.tight{margin:0;padding-left:18px}
+.tight li{margin:4px 0}
+.small{font-size:12px;color:var(--ink2)}
+td,th{vertical-align:top}
+@media(max-width:960px){.grid-2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body">
+<div class="form-header">
+<div class="fh-left">
+<a class="brand-logo" href="../../../../mom/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
+<div class="fh-company"><a href="../../../../mom/portal.html">HESEM ENGINEERING</a><span>Tài liệu vận hành • Annex</span></div>
+</div>
+<div class="title"><strong class="doc-name">KPI Authority Registry and Operational Metrics</strong></div>
+<div class="meta">
+<div class="row"><span><b>Mã:</b></span><span class="doc-code">ANNEX-127</span></div>
+<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
+<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
+<div class="row"><span><b>Chủ sở hữu:</b></span><span>QMS / Analytics Owner</span></div>
+</div>
+</div>
+
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng để kiểm soát mã KPI chuẩn, alias legacy, KPI hiện hữu trong ANNEX-122 và các metric CNC đề xuất trước khi đưa vào dashboard hoặc KpiEngine.</div>
+<h1>ANNEX-127 - KPI Authority Registry and Operational Metrics</h1>
+
+<div class="section">
+<h2>1. Nguồn chuẩn</h2>
+<div class="callout">
+<p><b>Registry chính thức:</b> <span class="code">mom/data/registry/kpi-authority-registry.json</span></p>
+<p>Registry này không thay thế ANNEX-122. ANNEX-122 giữ nội dung KPI cascade hiện hữu; registry khóa mã chuẩn, alias legacy và trạng thái metric để code/dashboard không tự sinh định nghĩa mới ngoài thẩm quyền.</p>
+</div>
+<div class="callout danger"><b>Chặn drift:</b> KpiEngine chỉ được auto-register các metric trong danh sách runtime approved sau khi normalize alias. KPI đề xuất như OEE_BOTTLENECK hoặc THROUGHPUT_PER_CONSTRAINT_HOUR phải có data contract trước khi tính tự động.</div>
+</div>
+
+<div class="section">
+<h2>2. Alias legacy bắt buộc</h2>
+<div class="table-card"><table class="table">
+<thead><tr><th>Alias cũ</th><th>Mã chuẩn</th><th>Lý do</th></tr></thead>
+<tbody>
+<tr><td>SCRAP</td><td>SCRAP_RATE</td><td>Tránh song song giữa seed data và runtime metric.</td></tr>
+<tr><td>CAPA-CLOSE</td><td>CAPA_CLOSURE</td><td>Chuẩn hóa format underscore cho metric runtime.</td></tr>
+<tr><td>CAL-COMP</td><td>CAL_COMPLIANCE</td><td>Khớp với mã tính trong KpiEngine.</td></tr>
+<tr><td>TRN-COMP</td><td>TRAINING_COMP</td><td>Khớp với mã tính trong KpiEngine.</td></tr>
+<tr><td>CCR</td><td>COMPLAINT_RATE</td><td>Không dùng CCR cho complaint vì CCR cũng dễ bị hiểu là critical constraint resource trong TOC.</td></tr>
+<tr><td>SQI</td><td>SUPPLIER_QUAL</td><td>Chuẩn hóa supplier quality metric.</td></tr>
+<tr><td>UTIL</td><td>MACHINE_UTIL</td><td>Khớp runtime utilization metric.</td></tr>
+<tr><td>SETUP</td><td>SETUP_RATIO</td><td>Khớp runtime setup time ratio metric.</td></tr>
+</tbody>
+</table></div>
+</div>
+
+<div class="section">
+<h2>3. Bộ runtime hiện hữu được giữ</h2>
+<p>Các KPI sau đang được KpiEngine tính trực tiếp và được giữ nguyên. Không đổi công thức trong tài liệu này.</p>
+<div class="grid-2">
+<div class="card"><span class="tag">Delivery</span><span class="tag">OTD</span><span class="tag">PUT_THRU</span><span class="tag">INV_TURNS</span></div>
+<div class="card"><span class="tag">Quality</span><span class="tag">FPY</span><span class="tag">DPMO</span><span class="tag">SCRAP_RATE</span><span class="tag">REWORK_RATE</span><span class="tag">NCR_RATE</span><span class="tag">COMPLAINT_RATE</span></div>
+<div class="card"><span class="tag">Equipment/Production</span><span class="tag">OEE</span><span class="tag">MACHINE_UTIL</span><span class="tag">SETUP_RATIO</span><span class="tag">LABOR_EFF</span></div>
+<div class="card"><span class="tag">Governance</span><span class="tag">COPQ</span><span class="tag">CAPA_CLOSURE</span><span class="tag">CAL_COMPLIANCE</span><span class="tag">TRAINING_COMP</span><span class="tag">SUPPLIER_OTD</span><span class="tag">SUPPLIER_QUAL</span></div>
+</div>
+</div>
+
+<div class="section">
+<h2>4. Giữ 33 KPI ANNEX-122 và lồng ghép KPI đề xuất</h2>
+<p>33 KPI trong ANNEX-122 được giữ như governance cascade. KPI đề xuất được gắn vào layer phù hợp thay vì trộn vào một danh sách phẳng.</p>
+<div class="table-card"><table class="table">
+<thead><tr><th>Layer</th><th>KPI/metric bổ sung</th><th>Trạng thái</th><th>Điều kiện nâng cấp</th></tr></thead>
+<tbody>
+<tr><td>Executive BSC</td><td>OEE_BOTTLENECK, WIP_AGING, SETUP_FIRST_PASS, FAI_FIRST_PASS, COPQ, REPEAT_NCR_RATE, CAPA_EFFECTIVENESS</td><td>Scorecard controlled</td><td>Có owner, target, monthly review và evidence.</td></tr>
+<tr><td>TOC weekly</td><td>BOTTLENECK_BUFFER_STATUS, THROUGHPUT_PER_CONSTRAINT_HOUR, CONSTRAINT_LOST_HOURS, WIP_BEFORE_CONSTRAINT</td><td>Staged data contract</td><td>Có constraint register, machine/job context và buffer rule.</td></tr>
+<tr><td>Lean daily</td><td>IN_PROCESS_REJECT_RATE, CYCLE_TIME_VARIANCE, MTBF, MTTR, downtime reason pareto</td><td>Staged data contract</td><td>Có shopfloor source, reason code và action log.</td></tr>
+<tr><td>QMS/MES event</td><td>FAI_FIRST_PASS, SETUP_FIRST_PASS, CAPA_EFFECTIVENESS, gate evidence completeness</td><td>Evidence controlled</td><td>Có form/gate record và quyền QA/QMS rõ.</td></tr>
+</tbody>
+</table></div>
+</div>
+
+<div class="section">
+<h2>5. Data contract trước khi tính tự động</h2>
+<div class="table-card"><table class="table">
+<thead><tr><th>Bước</th><th>Yêu cầu</th><th>Người duyệt</th></tr></thead>
+<tbody>
+<tr><td>1. Định nghĩa</td><td>Mã chuẩn, tên KPI, mục đích quyết định, higher/lower is better.</td><td>QMS + owner</td></tr>
+<tr><td>2. Công thức</td><td>Tử số, mẫu số, filter, kỳ tính, xử lý ngoại lệ, đơn vị.</td><td>QMS + Analytics</td></tr>
+<tr><td>3. Nguồn dữ liệu</td><td>Bảng/cột, hệ nguồn, owner dữ liệu, refresh cadence, trace link.</td><td>Data owner</td></tr>
+<tr><td>4. Evidence</td><td>Form, log, record hoặc snapshot chứng minh số liệu.</td><td>QMS/QA khi liên quan chất lượng</td></tr>
+<tr><td>5. Runtime</td><td>Test, migration/seed nếu cần, dashboard contract, rollback behavior.</td><td>Engineering owner</td></tr>
+</tbody>
+</table></div>
+</div>
+
+<div class="section">
+<h2>6. Quy tắc dashboard</h2>
+<ul class="tight">
+<li>Dashboard lãnh đạo không vượt 15 KPI nếu CEO chưa phê duyệt mở rộng.</li>
+<li>Dashboard quản lý có thể dùng toàn bộ ANNEX-122 và KPI staged đã có data contract.</li>
+<li>Metric hiện trường được phép nhiều hơn, nhưng phải ghi rõ là metric thao tác, không phải KPI công ty.</li>
+<li>Khi mã seed, dashboard hoặc báo cáo cũ dùng alias, hệ thống phải map về mã chuẩn trước khi lưu snapshot mới.</li>
+<li>Không dùng mã <span class="code">CCR</span> cho complaint trong tài liệu mới; <span class="code">CCR</span> chỉ nên dùng cho critical constraint resource nếu cần.</li>
+</ul>
+</div>
+
+<div class="section">
+<h2>7. Benchmark anchors</h2>
+<ul class="tight small">
+<li>Dassault DELMIA Apriso công bố nhiều lớp analytics với 200+ production measures/KPIs, 70+ machine indicators và 100+ quality measures/KPIs: <a href="https://www.3ds.com/products/delmia/apriso/analytics-reporting">DELMIA Apriso Analytics &amp; Reporting</a>.</li>
+<li>Siemens Opcenter Intelligence nhấn mạnh dữ liệu MOM/IoT được contextualize để tạo KPI dashboard và scorecard: <a href="https://www.siemens.com/en-us/products/opcenter/manufacturing-intelligence/">Siemens Opcenter Intelligence</a>.</li>
+<li>AVEVA MES nhấn mạnh OEE, schedule adherence, SPC quality KPIs và traceability: <a href="https://www.aveva.com/en/solutions/operations/what-is-a-mes/">AVEVA - What is MES</a>.</li>
+<li>Tulip nêu các KPI phổ biến như OEE, cycle time, FPY, defect rate, throughput và OTD, đồng thời khuyến nghị dashboard không quá tải: <a href="https://tulip.co/blog/manufacturing-kpis-key-production-metrics-you-should-know/">Tulip - Manufacturing KPIs</a>.</li>
+</ul>
+</div>
+
+<div class="section">
+<h2>8. Tài liệu liên kết</h2>
+<div class="table-card"><table class="table">
+<thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead>
+<tbody>
+<tr><td><a href="annex-122-kpi-cascade-dictionary.html">ANNEX-122</a></td><td>33 KPI cascade hiện hữu.</td></tr>
+<tr><td><a href="annex-125-cnc-performance-operating-system.html">ANNEX-125</a></td><td>Operating system 5 lớp.</td></tr>
+<tr><td><a href="annex-126-hoshin-strategy-deployment-and-catchball.html">ANNEX-126</a></td><td>Hoshin, catchball, X-Matrix.</td></tr>
+<tr><td><a href="../../05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a></td><td>TOC, dispatch, capacity, WIP.</td></tr>
+</tbody>
+</table></div>
+</div>
+
+</div>
+</div>
+</div>
+<div class="no-screen print-disclaimer">Bản in không có đóng dấu kiểm soát phiên bản thì không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
+</body>
+</html>
