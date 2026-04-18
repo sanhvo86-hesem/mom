@@ -249,6 +249,57 @@ NGINX
   sed -i "s|__READONLY_PORT__|${READONLY_PORT}|g" "$NGINX_SNIPPET"
 }
 
+remove_legacy_inline_terminal_locations() {
+  local site="$1"
+
+  if ! grep -Eq '^[[:space:]]*location[[:space:]]*=[[:space:]]*/_ops_auth/terminal-primary[[:space:]]*\{' "$site"; then
+    return
+  fi
+
+  backup_file "$site"
+
+  python3 - "$site" <<'PY'
+from pathlib import Path
+import re
+import sys
+
+site_path = Path(sys.argv[1])
+content = site_path.read_text()
+lines = content.splitlines(keepends=True)
+
+start_patterns = (
+    re.compile(r'^\s*location\s*=\s*/_ops_auth/terminal-primary\s*\{'),
+    re.compile(r'^\s*location\s*=\s*/_ops_auth/terminal-readonly\s*\{'),
+    re.compile(r'^\s*location\s+\^~\s*/ops/terminal/primary/\s*\{'),
+    re.compile(r'^\s*location\s+\^~\s*/ops/terminal/readonly/\s*\{'),
+)
+
+result = []
+skip_block = False
+brace_depth = 0
+
+for line in lines:
+    if not skip_block and any(pattern.search(line) for pattern in start_patterns):
+        skip_block = True
+        brace_depth = line.count('{') - line.count('}')
+        if brace_depth <= 0:
+            skip_block = False
+        continue
+
+    if skip_block:
+        brace_depth += line.count('{') - line.count('}')
+        if brace_depth <= 0:
+            skip_block = False
+        continue
+
+    result.append(line)
+
+updated = ''.join(result)
+updated = re.sub(r'\n{3,}', '\n\n', updated)
+site_path.write_text(updated)
+PY
+}
+
 reload_stack() {
   nginx -t
   systemctl reload nginx
@@ -286,6 +337,7 @@ install_ttyd
 write_wrapper_scripts
 write_systemd_units
 write_nginx_snippet
+remove_legacy_inline_terminal_locations "$NGINX_SITE"
 ensure_nginx_include "$NGINX_SITE" "$NGINX_SNIPPET"
 reload_stack
 print_summary
