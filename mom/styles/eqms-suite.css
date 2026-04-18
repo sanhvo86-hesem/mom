@@ -132,6 +132,42 @@
   --eqms-heatmap-cell-min-h:    48px;   /* heatmap cell minimum height */
   --eqms-input-progress-min:    4px;    /* progress bar min-width */
 
+  /* Layout sizes — tokenised from rule bodies */
+  --eqms-size-hairline:         2px;    /* timeline connectors, hamburger bar height */
+  --eqms-nav-accent-w:          3px;    /* nav item left accent stripe */
+  --eqms-tab-indicator-w:       2px;    /* tab underline indicator (matches hairline) */
+  --eqms-col-audit-time:        130px;  /* audit trail time column (section 11) */
+  --eqms-col-truncate:          240px;  /* cell text truncation max-width */
+  --eqms-comment-textarea-min:  60px;   /* comment input textarea min-height */
+  --eqms-chart-min-height:      300px;  /* chart container min-height */
+  --eqms-export-dropdown-min-w: 180px;  /* export dropdown min-width */
+  --eqms-search-max-h:          400px;  /* global search results dropdown max-height */
+  --eqms-inbox-min-h:           100px;  /* inbox list section min-height */
+  --eqms-state-view-min-h:      200px;  /* empty / loading / error state min-height */
+  --eqms-desc-max-w:            360px;  /* descriptive text max-width */
+  --eqms-scan-max-w:            480px;  /* scan input max-width */
+  --eqms-graph-min-h:           400px;  /* traceability graph canvas min-height */
+  --eqms-graph-node-min-w:      160px;  /* graph node card min-width */
+  --eqms-nav-w-tablet:          200px;  /* nav width at ≤1280px breakpoint */
+  --eqms-grid-scroll-min-w:     640px;  /* data grid min-width before horizontal scroll */
+  --eqms-detail-btn-min-w:      120px;  /* detail action button min-width on mobile */
+  --eqms-btn-sm-touch:          36px;   /* .eqms-btn.sm min-height in 1280px context */
+  --eqms-detail-sidebar-sm:     280px;  /* detail sidebar width at ≤1280px */
+
+  /* Grid layout minimum widths — card / component column break thresholds */
+  --eqms-card-min-w:            240px;  /* module landing card */
+  --eqms-kpi-card-min-w:        160px;  /* KPI metric card */
+  --eqms-field-min-w:           220px;  /* form field-grid column */
+  --eqms-sig-block-min-w:       200px;  /* signature block */
+  --eqms-attachment-min-w:      180px;  /* attachment card */
+
+  /* Typography */
+  --eqms-letter-spacing-label:  0.3px;  /* compact label letter-spacing */
+
+  /* Focus / interaction geometry */
+  --eqms-focus-outline-inset:   -2px;   /* outline-offset to draw focus ring inside border */
+  --eqms-badge-offset-half-icon: 18px;  /* half icon width for bottom-nav badge centering */
+
   /* Priority level colors — event queue, risk heatmap, overdue indicators */
   --eqms-priority-critical: var(--red);
   --eqms-priority-high: var(--orange, #ea580c);
@@ -336,7 +372,7 @@
   cursor: pointer;
   font-size: var(--text-sm);
   color: var(--text-secondary);
-  border-left: 3px solid transparent;
+  border-left: var(--eqms-nav-accent-w) solid transparent;
   transition: background var(--eqms-transition-fast), color var(--eqms-transition-fast);
   white-space: nowrap;
   overflow: hidden;
@@ -440,7 +476,7 @@
 }
 .eqms-module-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(var(--eqms-card-min-w), 1fr));
   gap: var(--eqms-gap-md);
 }
 .eqms-module-card {
@@ -585,7 +621,7 @@
 .eqms-state-label.completed { color: var(--eqms-approved); }
 .eqms-state-connector {
   width: var(--eqms-gap-20px, 20px);
-  height: 2px;
+  height: var(--eqms-size-hairline);
   background: var(--border);
   flex-shrink: 0;
 }
@@ -608,7 +644,7 @@
   font-weight: var(--eqms-font-weight-medium, 500);
   color: var(--text-secondary);
   cursor: pointer;
-  border-bottom: 2px solid transparent;
+  border-bottom: var(--eqms-tab-indicator-w) solid transparent;
   white-space: nowrap;
   transition: color var(--eqms-transition-fast), border-color var(--eqms-transition-fast);
 }
@@ -621,8 +657,8 @@
   font-weight: var(--eqms-font-weight-semibold, 600);
 }
 .eqms-tab:focus-visible {
-  outline: 2px solid var(--brand-2);
-  outline-offset: -2px;
+  outline: var(--focus-ring-width, 2px) solid var(--brand-2);
+  outline-offset: var(--eqms-focus-outline-inset);
   border-radius: var(--eqms-radius-sm, 4px);
 }
 .eqms-tab-badge {
@@ -687,7 +723,7 @@
    -------------------------------------------------------------------------- */
 .eqms-kpi-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(var(--eqms-kpi-card-min-w), 1fr));
   gap: var(--eqms-gap-md);
   padding: var(--eqms-gap-lg) var(--eqms-gap-xl);
 }
@@ -797,7 +833,7 @@
   color: var(--text-secondary);
 }
 .eqms-cell-truncate {
-  max-width: 240px;
+  max-width: var(--eqms-col-truncate);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -902,7 +938,7 @@
   gap: var(--eqms-gap-icon, 6px);
   padding: 0 var(--eqms-gap-md);
   height: var(--hds-control-h);
-  border: 1px solid transparent;
+  border: var(--btn-border-width, 1px) solid transparent;
   border-radius: var(--eqms-radius-sm);
   font-size: var(--text-sm);
   font-weight: var(--eqms-font-weight-medium, 500);
@@ -934,7 +970,7 @@
 }
 .eqms-btn.danger:hover:not(:disabled) { box-shadow: var(--eqms-shadow-danger); }
 .eqms-btn.sm { height: var(--eqms-size-btn-sm, 26px); font-size: var(--text-xs); padding: 0 var(--eqms-gap-sm, 8px); }
-.eqms-btn.lg { height: 40px; font-size: var(--text-base); padding: 0 var(--eqms-gap-20px, 20px); }
+.eqms-btn.lg { height: var(--hds-control-h-lg); font-size: var(--text-base); padding: 0 var(--eqms-gap-20px, 20px); }
 
 /* --------------------------------------------------------------------------
    9b. MODULE CHROME — Toolbar bar and screen-level tab switchers
@@ -975,7 +1011,7 @@
   gap: var(--eqms-gap-icon, 6px);
   padding: 0 var(--eqms-gap-md);
   height: var(--hds-control-h);
-  border: 1px solid transparent;
+  border: var(--btn-border-width, 1px) solid transparent;
   border-radius: var(--eqms-radius-sm);
   font-size: var(--text-sm);
   font-weight: var(--eqms-font-weight-medium, 500);
@@ -1037,7 +1073,7 @@
 /* Field grid (for detail forms) */
 .eqms-field-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(var(--eqms-field-min-w), 1fr));
   gap: var(--eqms-gap-md) var(--eqms-gap-xl);
 }
 .eqms-field {
@@ -1082,7 +1118,7 @@
 .eqms-audit-event:last-child { border-bottom: none; }
 .eqms-audit-time {
   flex-shrink: 0;
-  width: 130px;
+  width: var(--eqms-col-audit-time);
   font-family: var(--font-mono);
   color: var(--text-tertiary);
 }
@@ -1108,7 +1144,7 @@
    -------------------------------------------------------------------------- */
 .eqms-signature-panel {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(var(--eqms-sig-block-min-w), 1fr));
   gap: var(--eqms-gap-md);
 }
 .eqms-signature-block {
@@ -1203,7 +1239,7 @@
 }
 .eqms-comment-input textarea {
   flex: 1;
-  min-height: 60px;
+  min-height: var(--eqms-comment-textarea-min);
   padding: var(--eqms-gap-sm);
   border: 1px solid var(--border);
   border-radius: var(--eqms-radius-sm);
@@ -1217,7 +1253,7 @@
    -------------------------------------------------------------------------- */
 .eqms-attachments {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(var(--eqms-attachment-min-w), 1fr));
   gap: var(--eqms-gap-sm);
 }
 .eqms-attachment {
@@ -1363,7 +1399,7 @@
 .eqms-wizard-step.completed .eqms-wizard-step-label { color: var(--eqms-approved); }
 .eqms-wizard-connector {
   width: var(--eqms-gap-2xl, 32px);
-  height: 2px;
+  height: var(--eqms-size-hairline);
   background: var(--border);
   flex-shrink: 0;
 }
@@ -1440,7 +1476,7 @@
    -------------------------------------------------------------------------- */
 .eqms-chart-container {
   position: relative;
-  min-height: 300px;
+  min-height: var(--eqms-chart-min-height);
 }
 .eqms-chart-toggle {
   position: absolute;
@@ -1477,7 +1513,7 @@
   top: 100%;
   right: 0;
   margin-top: var(--eqms-gap-xs, 4px);
-  min-width: 180px;
+  min-width: var(--eqms-export-dropdown-min-w);
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--eqms-radius-md);
@@ -1509,7 +1545,7 @@
   text-align: center;
   gap: var(--eqms-gap-md);
   color: var(--text-tertiary);
-  min-height: 200px;
+  min-height: var(--eqms-state-view-min-h);
 }
 .eqms-empty-state-icon { font-size: var(--eqms-font-size-4xl, 40px); opacity: 0.5; }
 .eqms-empty-state-title {
@@ -1519,7 +1555,7 @@
 }
 .eqms-empty-state-desc {
   font-size: var(--text-sm);
-  max-width: 360px;
+  max-width: var(--eqms-desc-max-w);
 }
 
 .eqms-loading {
@@ -1527,7 +1563,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--eqms-gap-2xl);
-  min-height: 200px;
+  min-height: var(--eqms-state-view-min-h);
 }
 .eqms-spinner {
   width: var(--eqms-size-avatar-sm, 28px); height: var(--eqms-size-avatar-sm, 28px);
@@ -1569,7 +1605,7 @@
 }
 .eqms-scan-input {
   width: 100%;
-  max-width: 480px;
+  max-width: var(--eqms-scan-max-w);
   height: var(--eqms-header-height, 56px);
   font-size: var(--text-xl);
   text-align: center;
@@ -1624,11 +1660,11 @@
 .eqms-graph {
   position: relative;
   overflow: auto;
-  min-height: 400px;
+  min-height: var(--eqms-graph-min-h);
 }
 .eqms-graph-node {
   position: absolute;
-  min-width: 160px;
+  min-width: var(--eqms-graph-node-min-w);
   padding: var(--eqms-gap-sm) var(--eqms-gap-md);
   background: var(--bg-surface);
   border: 1px solid var(--border);
@@ -1715,7 +1751,7 @@
   .eqms-nav-item-badge,
   .eqms-nav-header span { display: none; }
   .eqms-nav-item { justify-content: center; padding: var(--eqms-gap-10px, 10px); }
-  .eqms-field-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+  .eqms-field-grid { grid-template-columns: repeat(auto-fill, minmax(var(--eqms-attachment-min-w), 1fr)); }
 }
 @media (max-width: 768px) {
   .eqms-nav {
@@ -1794,7 +1830,7 @@
   position: absolute; z-index: var(--eqms-z-dropdown, 100); left: var(--eqms-gap-lg); right: var(--eqms-gap-lg);
   background: var(--bg-surface); border: 1px solid var(--border);
   border-radius: var(--eqms-radius-lg, 8px); box-shadow: var(--shadow-lg);
-  max-height: 400px; overflow-y: auto; margin-top: var(--eqms-gap-xs, 4px);
+  max-height: var(--eqms-search-max-h); overflow-y: auto; margin-top: var(--eqms-gap-xs, 4px);
 }
 
 /* --------------------------------------------------------------------------
@@ -1815,7 +1851,7 @@
 .eqms-command-item.danger { border-left: 3px solid var(--red); }
 .eqms-command-item.warning { border-left: 3px solid var(--amber); }
 .eqms-command-item.info { border-left: 3px solid var(--blue); }
-.eqms-command-label { font-size: var(--eqms-font-size-2xs, 10px); color: var(--text-tertiary); white-space: nowrap; text-transform: uppercase; letter-spacing: 0.3px; }
+.eqms-command-label { font-size: var(--eqms-font-size-2xs, 10px); color: var(--text-tertiary); white-space: nowrap; text-transform: uppercase; letter-spacing: var(--eqms-letter-spacing-label); }
 .eqms-command-value { font-size: var(--text-md); font-weight: var(--eqms-font-weight-bold, 700); color: var(--text-primary); }
 
 /* --------------------------------------------------------------------------
@@ -1833,7 +1869,7 @@
 .eqms-inbox-category-icon { font-size: var(--text-base); }
 .eqms-inbox-category-label { color: var(--text-secondary); white-space: nowrap; }
 .eqms-inbox-category-count { font-weight: var(--eqms-font-weight-bold, 700); color: var(--text-primary); }
-.eqms-inbox-list { min-height: 100px; }
+.eqms-inbox-list { min-height: var(--eqms-inbox-min-h); }
 
 /* --------------------------------------------------------------------------
    31. BACKBONE: LINKED-RECORD GRAPH
@@ -1845,7 +1881,7 @@
 .eqms-linked-group-header {
   display: flex; align-items: center; justify-content: space-between; gap: var(--eqms-gap-sm, 8px);
   padding: var(--eqms-gap-icon, 6px) var(--eqms-gap-10px, 10px); font-size: var(--eqms-font-size-xs-plus, 12px); font-weight: var(--eqms-font-weight-semibold, 600); color: var(--text-secondary);
-  text-transform: uppercase; letter-spacing: 0.3px;
+  text-transform: uppercase; letter-spacing: var(--eqms-letter-spacing-label);
 }
 .eqms-linked-item {
   display: flex; align-items: center; gap: var(--eqms-gap-sm, 8px); padding: var(--eqms-gap-icon, 6px) var(--eqms-gap-10px, 10px) var(--eqms-gap-icon, 6px) var(--eqms-gap-20px, 20px); cursor: pointer;
@@ -1854,7 +1890,7 @@
 .eqms-linked-item:hover { background: var(--bg-page); }
 .eqms-linked-item-icon { font-size: var(--text-md); flex-shrink: 0; }
 .eqms-linked-item-info { display: flex; flex-direction: column; gap: var(--eqms-gap-1px, 1px); flex: 1; min-width: 0; }
-.eqms-linked-item-type { font-size: var(--eqms-font-size-2xs, 10px); text-transform: uppercase; color: var(--text-tertiary); letter-spacing: 0.3px; }
+.eqms-linked-item-type { font-size: var(--eqms-font-size-2xs, 10px); text-transform: uppercase; color: var(--text-tertiary); letter-spacing: var(--eqms-letter-spacing-label); }
 .eqms-linked-item-id { font-size: var(--eqms-font-size-xs-plus, 12px); font-weight: var(--eqms-font-weight-semibold, 600); color: var(--text-primary); }
 .eqms-linked-item-title { font-size: var(--eqms-font-size-xs-plus, 12px); color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
@@ -1926,7 +1962,7 @@
 .eqms-hamburger-bar {
   display: block;
   width: var(--eqms-gap-20px, 20px);
-  height: 2px;
+  height: var(--eqms-size-hairline);
   background: var(--text-primary);
   border-radius: var(--eqms-radius-xs, 2px);
   transition: transform var(--eqms-transition), opacity var(--eqms-transition);
@@ -1948,13 +1984,13 @@
    -------------------------------------------------------------------------- */
 @media (max-width: 1280px) {
   /* Narrower nav, hide text labels on nav items */
-  .eqms-nav { width: 200px; min-width: 200px; }
+  .eqms-nav { width: var(--eqms-nav-w-tablet); min-width: var(--eqms-nav-w-tablet); }
 
   /* KPI row: allow 3 per row instead of all inline */
   .eqms-kpi-row { grid-template-columns: repeat(3, 1fr); }
 
   /* Detail layout: sidebar shrinks */
-  .eqms-detail-body { grid-template-columns: 1fr 280px; }
+  .eqms-detail-body { grid-template-columns: 1fr var(--eqms-detail-sidebar-sm); }
 
   /* Module cards: 3 per row */
   .eqms-module-cards { grid-template-columns: repeat(3, 1fr); }
@@ -2022,11 +2058,11 @@
     padding-left: var(--eqms-gap-14px, 14px);
     padding-right: var(--eqms-gap-14px, 14px);
   }
-  .eqms-btn.sm { min-height: 36px; }
+  .eqms-btn.sm { min-height: var(--eqms-btn-sm-touch); }
 
   /* Data grid: horizontal scroll on small containers */
   .eqms-grid-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .eqms-grid { min-width: 640px; }
+  .eqms-grid { min-width: var(--eqms-grid-scroll-min-w); }
 
   /* Identity header: stack vertically */
   .eqms-identity-header { flex-direction: column; align-items: flex-start; gap: var(--eqms-gap-sm); }
@@ -2041,7 +2077,7 @@
   /* Tab strip: horizontal scroll */
   .eqms-tabs { overflow-x: auto; flex-wrap: nowrap; scrollbar-width: none; }
   .eqms-tabs::-webkit-scrollbar { display: none; }
-  .eqms-tab { white-space: nowrap; flex-shrink: 0; min-height: 40px; }
+  .eqms-tab { white-space: nowrap; flex-shrink: 0; min-height: var(--hds-control-h-lg); }
 
   /* Pagination: compact */
   .eqms-pagination { flex-wrap: wrap; justify-content: center; }
@@ -2105,7 +2141,7 @@
   .eqms-bottom-nav-badge {
     position: absolute;
     top: var(--eqms-gap-xs, 4px);
-    right: calc(50% - 18px);
+    right: calc(50% - var(--eqms-badge-offset-half-icon));
     background: var(--eqms-critical, #dc2626);
     color: var(--text-inverse);
     font-size: var(--eqms-font-size-micro, 9px);
@@ -2127,11 +2163,11 @@
 
   /* Larger touch targets on action buttons */
   .eqms-btn { min-height: var(--eqms-touch-target); font-size: var(--text-base); }
-  .eqms-btn.sm { min-height: 40px; }
+  .eqms-btn.sm { min-height: var(--hds-control-h-lg); }
 
   /* Detail actions: wrap & fill width */
   .eqms-detail-actions { display: flex; flex-wrap: wrap; gap: var(--eqms-gap-sm); }
-  .eqms-detail-actions .eqms-btn { flex: 1; min-width: 120px; justify-content: center; }
+  .eqms-detail-actions .eqms-btn { flex: 1; min-width: var(--eqms-detail-btn-min-w); justify-content: center; }
 
   /* Modal / overlay: full screen */
   .eqms-modal { inset: 0; border-radius: 0; max-width: 100%; max-height: 100%; }
@@ -2226,7 +2262,7 @@
     font-weight: var(--eqms-font-weight-semibold, 600);
     color: var(--text-tertiary);
     text-transform: uppercase;
-    letter-spacing: 0.3px;
+    letter-spacing: var(--eqms-letter-spacing-label);
     white-space: nowrap;
     flex-shrink: 0;
     padding-top: var(--eqms-gap-1px, 1px);
