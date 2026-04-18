@@ -688,6 +688,8 @@ function _applyCustomVars(){
   var customCSS = _resolveDeep('advanced.customCSS');
   _applyCustomCSS(customCSS || '');
 
+  _applyModuleOverrides(cfg);
+
   var previewVars = (_loadPreviewPrefs() || {})._cssVarPreviewOverrides || {};
   Object.keys(_previewCssVarsApplied).forEach(function(varName){
     if(!Object.prototype.hasOwnProperty.call(previewVars, varName)){
@@ -804,6 +806,37 @@ function _setVarMs(varName, cfg, path){
 }
 
 /** Inject custom CSS into a <style> tag */
+function _applyModuleOverrides(cfg){
+  var overrides = cfg && cfg.moduleOverrides;
+  var id = 'hds-module-overrides';
+  var el = document.getElementById(id);
+  if(!overrides || !Object.keys(overrides).length){
+    if(el) el.textContent = '';
+    return;
+  }
+  if(!el){
+    el = document.createElement('style');
+    el.id = id;
+    document.head.appendChild(el);
+  }
+  var blocks = [];
+  Object.keys(overrides).forEach(function(moduleId){
+    var entry = overrides[moduleId];
+    if(!entry || !entry.enabled) return;
+    var scope = (entry.scope || '').trim() || ('[data-module="' + moduleId + '"]');
+    var tokenLines = [];
+    var tokens = entry.tokens || {};
+    Object.keys(tokens).forEach(function(prop){
+      var val = String(tokens[prop] || '').trim();
+      if(val && /^--[A-Za-z0-9_-]+$/.test(prop.trim())) tokenLines.push('  ' + prop.trim() + ': ' + val + ';');
+    });
+    if(tokenLines.length) blocks.push(scope + ' {\n' + tokenLines.join('\n') + '\n}');
+    var raw = (entry.css || '').trim();
+    if(raw) blocks.push('/* module-override: ' + moduleId + ' */\n' + raw);
+  });
+  el.textContent = blocks.join('\n\n');
+}
+
 function _applyCustomCSS(css){
   var id = 'hm-theme-custom-css';
   var el = document.getElementById(id);

@@ -1905,6 +1905,269 @@ function _contractStatusChip(state){
   return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#fef3c7;color:#92400e;border:1px solid #fcd34d">⚠️ '+esc(state)+'</span>';
 }
 
+/* ─────────────────────────────────────────────────────────────────────────
+   MODULE COMPLIANCE EDITOR
+   Reads compliance matrix → shows violations per module → edits CSS override
+   stored in design-system-config.json ▸ moduleOverrides
+───────────────────────────────────────────────────────────────────────── */
+var _moduleOverrideDrafts = {};
+
+function _moduleOverrideGetCfg(){
+  var tm = (typeof HmTheme !== 'undefined') ? HmTheme : null;
+  var cfg = tm && typeof tm.getAdminConfig === 'function' ? tm.getAdminConfig() : {};
+  return cfg && cfg.moduleOverrides ? cfg.moduleOverrides : {};
+}
+
+function _moduleDebtScore(row){
+  return ((row.bridgeAliasDebt||0)*2) + ((row.privateCssDebt||0)*1.5) + ((row.hardcodedStyleDebt||0)*3) + (row.usesPrivateCssShell ? 20 : 0);
+}
+
+function _moduleComplianceBadge(row){
+  if(!row) return statusChip('neutral','unknown');
+  var s = row.linkageStatus || row.status || '';
+  if(s === 'full-admin-controlled' || s === 'full') return statusChip('full', L('Tuân thủ','Compliant'));
+  if(s === 'bridged-to-shared-tokens') return statusChip('preview', L('Bridged','Bridged'));
+  if(s === 'legacy-private-css') return statusChip('partial', L('Vi phạm','Non-compliant'));
+  if(s === 'blocked') return statusChip('partial', L('Blocked','Blocked'));
+  return statusChip('neutral', esc(s || 'unknown'));
+}
+
+function _moduleDebtBar(score){
+  var pct = Math.min(100, Math.round(score));
+  var color = pct < 20 ? '#22c55e' : pct < 50 ? '#f59e0b' : '#ef4444';
+  return '<div style="display:flex;align-items:center;gap:6px">'
+    + '<div style="flex:1;height:6px;border-radius:3px;background:#e2e8f0;overflow:hidden">'
+    + '<div style="height:100%;width:'+pct+'%;background:'+color+';border-radius:3px;transition:width .3s"></div>'
+    + '</div>'
+    + '<span style="font-size:10px;color:var(--text-secondary);min-width:28px;text-align:right">'+pct+'</span>'
+    + '</div>';
+}
+
+function _renderModuleOverrideEditor(moduleId, complianceRow){
+  var savedOverrides = _moduleOverrideGetCfg();
+  var saved = savedOverrides[moduleId] || {};
+  var draft = _moduleOverrideDrafts[moduleId] || null;
+  if(!draft){
+    _moduleOverrideDrafts[moduleId] = {
+      scope: saved.scope || '',
+      tokens: JSON.parse(JSON.stringify(saved.tokens || {})),
+      css: saved.css || '',
+      enabled: saved.enabled !== false && !!saved.scope
+    };
+    draft = _moduleOverrideDrafts[moduleId];
+  }
+  var hasOverride = !!saved.scope;
+  var isEnabled = hasOverride && saved.enabled !== false;
+
+  var tokenRows = Object.keys(draft.tokens).map(function(prop, i){
+    return '<tr>'
+      + '<td style="padding:4px 6px"><input type="text" value="'+esc(prop)+'" oninput="_admModuleOverrideTokenKey(\''+esc(moduleId)+'\','+i+',this.value)" style="width:100%;padding:3px 6px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:var(--font-mono);background:var(--bg-surface)"></td>'
+      + '<td style="padding:4px 6px"><input type="text" value="'+esc(draft.tokens[prop])+'" oninput="_admModuleOverrideTokenVal(\''+esc(moduleId)+'\','+i+',this.value)" style="width:100%;padding:3px 6px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:var(--font-mono);background:var(--bg-surface)"></td>'
+      + '<td style="padding:4px 6px;text-align:center"><button onclick="_admModuleOverrideTokenDel(\''+esc(moduleId)+'\','+i+')" style="padding:2px 8px;border:1px solid #fca5a5;border-radius:4px;background:#fff;color:#dc2626;font-size:11px;cursor:pointer">✕</button></td>'
+      + '</tr>';
+  }).join('');
+
+  return '<div id="mod-override-editor-'+esc(moduleId)+'" style="margin-top:12px;padding:14px;border:1px solid var(--border);border-radius:8px;background:var(--bg-surface-alt,var(--bg-hover))">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;flex-wrap:wrap">'
+    + '<div style="font-size:12px;font-weight:700;color:var(--text-primary)">🎨 Module CSS Override</div>'
+    + '<div style="display:flex;gap:6px;align-items:center">'
+    + (hasOverride ? '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:'+(isEnabled?'#dcfce7':'#f1f5f9')+';color:'+(isEnabled?'#166534':'#64748b')+';border:1px solid '+(isEnabled?'#86efac':'#e2e8f0')+';">'+(isEnabled?'● Enabled':'○ Disabled')+'</span>' : '')
+    + (hasOverride ? '<button onclick="_admModuleOverrideToggle(\''+esc(moduleId)+'\')" style="padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg-surface);color:var(--text-primary)">'+(isEnabled?L('Tắt','Disable'):L('Bật','Enable'))+'</button>' : '')
+    + (hasOverride ? '<button onclick="_admModuleOverrideDelete(\''+esc(moduleId)+'\')" style="padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #fca5a5;background:#fff;color:#dc2626">'+L('Xóa','Delete')+'</button>' : '')
+    + '</div>'
+    + '</div>'
+    + '<div style="margin-bottom:10px">'
+    + '<label style="display:block;font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:4px">'+L('CSS scope selector','CSS scope selector')+'</label>'
+    + '<input type="text" id="mod-scope-'+esc(moduleId)+'" placeholder=".module-class, [data-module=\'id\']" value="'+esc(draft.scope)+'" oninput="_admModuleOverrideDraftScope(\''+esc(moduleId)+'\',this.value)" style="width:100%;padding:6px 10px;border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:var(--font-mono);background:var(--bg-surface)">'
+    + '<div style="font-size:10px;color:var(--text-tertiary);margin-top:3px">'+L('CSS selector bao ngoài module — ví dụ: .eqms-suite, [data-route]','Outer CSS selector for the module — e.g. .eqms-suite, [data-route]')+'</div>'
+    + '</div>'
+    + '<div style="margin-bottom:10px">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
+    + '<label style="font-size:11px;font-weight:700;color:var(--text-secondary)">'+L('Token mappings (CSS custom properties)','Token mappings (CSS custom properties)')+'</label>'
+    + '<button onclick="_admModuleOverrideTokenAdd(\''+esc(moduleId)+'\')" style="padding:2px 10px;border:1px solid var(--border);border-radius:4px;font-size:11px;cursor:pointer;background:var(--bg-surface)">+ Add</button>'
+    + '</div>'
+    + '<table style="width:100%;border-collapse:collapse;font-size:11px"><thead><tr>'
+    + '<th style="text-align:left;padding:4px 6px;font-size:10px;color:var(--text-secondary);font-weight:700;border-bottom:1px solid var(--border)">CSS property</th>'
+    + '<th style="text-align:left;padding:4px 6px;font-size:10px;color:var(--text-secondary);font-weight:700;border-bottom:1px solid var(--border)">Value</th>'
+    + '<th style="width:40px;border-bottom:1px solid var(--border)"></th>'
+    + '</tr></thead><tbody id="mod-tokens-'+esc(moduleId)+'">'
+    + (tokenRows || '<tr><td colspan="3" style="padding:8px;color:var(--text-tertiary);font-size:11px;font-style:italic">'+L('Chưa có token mapping nào.','No token mappings yet.')+'</td></tr>')
+    + '</tbody></table>'
+    + '</div>'
+    + '<div style="margin-bottom:12px">'
+    + '<label style="display:block;font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:4px">'+L('Raw CSS (tùy chỉnh nâng cao)','Raw CSS (advanced override)')+'</label>'
+    + '<textarea id="mod-css-'+esc(moduleId)+'" rows="5" oninput="_admModuleOverrideDraftCss(\''+esc(moduleId)+'\',this.value)" style="width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:var(--font-mono);background:var(--bg-surface);resize:vertical;box-sizing:border-box" placeholder=".module-class .hm-table { background: var(--bg-surface); }">'+esc(draft.css)+'</textarea>'
+    + '<div style="font-size:10px;color:var(--text-tertiary);margin-top:3px">'+L('CSS tùy chỉnh nằm trong scope selector. Sẽ được inject sau token mappings.','Custom CSS within the scope. Injected after token mappings.')+'</div>'
+    + '</div>'
+    + '<div style="display:flex;gap:8px;justify-content:flex-end">'
+    + '<button onclick="_admModuleOverridePreview(\''+esc(moduleId)+'\')" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg-surface);color:var(--text-primary)">👁 '+L('Preview','Preview')+'</button>'
+    + '<button onclick="_admModuleOverrideSave(\''+esc(moduleId)+'\')" style="padding:6px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#1565c0;color:#fff">💾 '+L('Lưu override','Save override')+'</button>'
+    + '</div>'
+    + '</div>';
+}
+
+function renderModuleComplianceEditorPanel(){
+  var snap = graphicsSnapshot();
+  var compliance = snap.compliance || [];
+  var savedOverrides = _moduleOverrideGetCfg();
+
+  var overrideCount = Object.keys(savedOverrides).filter(function(k){ return savedOverrides[k] && savedOverrides[k].enabled; }).length;
+  var nonCompliant = compliance.filter(function(r){ return r.linkageStatus !== 'full-admin-controlled' && r.linkageStatus !== 'full'; });
+  var compliant = compliance.filter(function(r){ return r.linkageStatus === 'full-admin-controlled' || r.linkageStatus === 'full'; });
+
+  var summaryCards = '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:14px">'
+    + infoCard(L('Tổng module','Total modules'), String(compliance.length), 'neutral')
+    + infoCard(L('Tuân thủ','Compliant'), String(compliant.length), compliant.length === compliance.length ? 'full' : 'partial')
+    + infoCard(L('Vi phạm','Non-compliant'), String(nonCompliant.length), nonCompliant.length ? 'partial' : 'full')
+    + infoCard(L('Override đang bật','Active overrides'), String(overrideCount), overrideCount ? 'preview' : 'neutral')
+    + '</div>';
+
+  var moduleCards = compliance.map(function(row){
+    var moduleId = row.moduleId || '';
+    var score = _moduleDebtScore(row);
+    var hasOverride = !!(savedOverrides[moduleId] && savedOverrides[moduleId].scope);
+    var isNonCompliant = row.linkageStatus !== 'full-admin-controlled' && row.linkageStatus !== 'full';
+    var borderColor = isNonCompliant ? '#fca5a5' : '#bbf7d0';
+    var violations = [];
+    if(row.usesPrivateCssShell) violations.push(L('Shell CSS riêng (không dùng hm-*)','Private CSS shell (not using hm-*)'));
+    if(row.hardcodedStyleDebt > 0) violations.push(L('Hardcoded styles: ','Hardcoded styles: ') + row.hardcodedStyleDebt);
+    if(row.privateCssDebt > 0) violations.push(L('Private CSS tokens: ','Private CSS tokens: ') + row.privateCssDebt);
+    if(row.bridgeAliasDebt > 0) violations.push(L('Bridge alias debt: ','Bridge alias debt: ') + row.bridgeAliasDebt);
+    if(!row.consumesSharedTokens) violations.push(L('Không dùng shared tokens','Not consuming shared tokens'));
+    if(!row.consumesHmComponents) violations.push(L('Không dùng hm-* components','Not using hm-* components'));
+    (row.findings || []).forEach(function(f){ if(f && (f.message || f.code)) violations.push(f.message || f.code); });
+
+    return '<div id="mod-card-'+esc(moduleId)+'" style="border:1px solid '+borderColor+';border-radius:10px;overflow:hidden;background:var(--bg-surface)">'
+      + '<div style="padding:12px 14px;background:var(--bg-surface-alt,var(--bg-hover));display:flex;align-items:flex-start;justify-content:space-between;gap:10px;flex-wrap:wrap">'
+      + '<div>'
+      + '<div style="font-size:13px;font-weight:700;color:var(--text-primary)">'+esc(row.moduleName || moduleId)+'</div>'
+      + '<div style="font-size:11px;color:var(--text-secondary);margin-top:2px">'+esc(row.route || '')+(row.domain?' · '+esc(row.domain):'')+'</div>'
+      + '</div>'
+      + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">'
+      + _moduleComplianceBadge(row)
+      + (hasOverride ? statusChip('preview', L('Override active','Override active')) : '')
+      + '</div>'
+      + '</div>'
+      + '<div style="padding:12px 14px">'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">'
+      + '<div><div style="font-size:10px;color:var(--text-secondary);font-weight:700;margin-bottom:4px">'+L('Debt score','Debt score')+'</div>'+_moduleDebtBar(score)+'</div>'
+      + '<div><div style="font-size:10px;color:var(--text-secondary);font-weight:700;margin-bottom:4px">'+L('Linkage','Linkage')+'</div><div style="font-size:11px;color:var(--text-secondary);font-family:var(--font-mono)">'+esc(row.linkageStatus||'-')+'</div></div>'
+      + '</div>'
+      + (violations.length ? '<div style="margin-bottom:10px"><div style="font-size:10px;font-weight:700;color:var(--text-secondary);margin-bottom:6px">'+L('Vi phạm','Violations')+'</div>'
+        + '<ul style="margin:0;padding-left:16px">'
+        + violations.map(function(v){ return '<li style="font-size:11px;color:#dc2626;margin-bottom:2px">'+esc(String(v))+'</li>'; }).join('')
+        + '</ul></div>' : '<div style="font-size:11px;color:#22c55e;margin-bottom:10px">✓ '+L('Không có vi phạm được phát hiện','No violations detected')+'</div>')
+      + _renderModuleOverrideEditor(moduleId, row)
+      + '</div>'
+      + '</div>';
+  }).join('');
+
+  var empty = !compliance.length ? '<div style="padding:24px;text-align:center;color:var(--text-secondary);font-size:13px">'+L('Chưa có dữ liệu compliance. Nhấn "Refresh live data" ở panel trên.','No compliance data. Click "Refresh live data" in the panel above.')+'</div>' : '';
+
+  return sect(
+    L('Module Compliance Editor', 'Module Compliance Editor'),
+    '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;line-height:1.6">'
+    + L('Mỗi module có thể được cài CSS override scoped — token mappings + raw CSS — được inject thẳng vào trang qua ThemeManager mà không sửa code module. Override lưu vào design-system-config và áp dụng ngay.','Each module can have a scoped CSS override — token mappings + raw CSS — injected directly by ThemeManager without touching module source code. Overrides are saved to design-system-config and applied immediately.')
+    + '</div>'
+    + summaryCards
+    + (empty || '<div style="display:flex;flex-direction:column;gap:12px">'+moduleCards+'</div>'),
+    false,
+    statusChip('admin', L('CSS injection','CSS injection'))
+    + statusChip(nonCompliant.length ? 'partial' : 'full', nonCompliant.length + ' ' + L('vi phạm','non-compliant'))
+  );
+}
+
+window._admModuleOverrideDraftScope = function(moduleId, value){
+  if(!_moduleOverrideDrafts[moduleId]) _moduleOverrideDrafts[moduleId] = { scope:'', tokens:{}, css:'', enabled:true };
+  _moduleOverrideDrafts[moduleId].scope = value;
+};
+window._admModuleOverrideDraftCss = function(moduleId, value){
+  if(!_moduleOverrideDrafts[moduleId]) _moduleOverrideDrafts[moduleId] = { scope:'', tokens:{}, css:'', enabled:true };
+  _moduleOverrideDrafts[moduleId].css = value;
+};
+window._admModuleOverrideTokenAdd = function(moduleId){
+  if(!_moduleOverrideDrafts[moduleId]) _moduleOverrideDrafts[moduleId] = { scope:'', tokens:{}, css:'', enabled:true };
+  _moduleOverrideDrafts[moduleId].tokens['--new-prop'] = 'var(--token)';
+  var el = document.getElementById('mod-override-editor-'+moduleId);
+  if(el){ el.outerHTML = _renderModuleOverrideEditor(moduleId, null); }
+};
+window._admModuleOverrideTokenKey = function(moduleId, idx, newKey){
+  var draft = _moduleOverrideDrafts[moduleId];
+  if(!draft) return;
+  var keys = Object.keys(draft.tokens);
+  if(idx < 0 || idx >= keys.length) return;
+  var oldKey = keys[idx];
+  var val = draft.tokens[oldKey];
+  var rebuilt = {};
+  keys.forEach(function(k, i){ rebuilt[i === idx ? newKey : k] = draft.tokens[k]; });
+  draft.tokens = rebuilt;
+};
+window._admModuleOverrideTokenVal = function(moduleId, idx, newVal){
+  var draft = _moduleOverrideDrafts[moduleId];
+  if(!draft) return;
+  var keys = Object.keys(draft.tokens);
+  if(idx < 0 || idx >= keys.length) return;
+  draft.tokens[keys[idx]] = newVal;
+};
+window._admModuleOverrideTokenDel = function(moduleId, idx){
+  var draft = _moduleOverrideDrafts[moduleId];
+  if(!draft) return;
+  var keys = Object.keys(draft.tokens);
+  if(idx < 0 || idx >= keys.length) return;
+  delete draft.tokens[keys[idx]];
+  var el = document.getElementById('mod-override-editor-'+moduleId);
+  if(el){ el.outerHTML = _renderModuleOverrideEditor(moduleId, null); }
+};
+window._admModuleOverridePreview = function(moduleId){
+  var draft = _moduleOverrideDrafts[moduleId];
+  if(!draft || !draft.scope.trim()){ if(typeof showToast === 'function') showToast(L('Nhập scope selector trước.','Enter a scope selector first.'), 'warning'); return; }
+  var id = 'hds-module-override-preview-' + moduleId.replace(/[^a-z0-9]/gi,'-');
+  var el = document.getElementById(id);
+  if(!el){ el = document.createElement('style'); el.id = id; document.head.appendChild(el); }
+  var scope = draft.scope.trim();
+  var tokenLines = Object.keys(draft.tokens).map(function(p){ return '  '+p.trim()+': '+String(draft.tokens[p]||'')+';'; });
+  var block = tokenLines.length ? scope + ' {\n' + tokenLines.join('\n') + '\n}' : '';
+  el.textContent = (block ? block + '\n\n' : '') + (draft.css ? '/* preview */\n' + draft.css : '');
+  if(typeof showToast === 'function') showToast(L('Preview đang áp dụng — chưa lưu.','Preview applied — not yet saved.'), 'info');
+};
+window._admModuleOverrideSave = function(moduleId){
+  var draft = _moduleOverrideDrafts[moduleId];
+  if(!draft){ if(typeof showToast === 'function') showToast(L('Không có thay đổi để lưu.','Nothing to save.'), 'warning'); return; }
+  if(!draft.scope.trim()){ if(typeof showToast === 'function') showToast(L('Scope selector không được để trống.','Scope selector is required.'), 'warning'); return; }
+  var tm = (typeof HmTheme !== 'undefined') ? HmTheme : null;
+  if(!tm || typeof tm.getAdminConfig !== 'function' || typeof tm.saveAdminConfig !== 'function'){ if(typeof showToast === 'function') showToast(L('ThemeManager chưa sẵn sàng.','ThemeManager not ready.'), 'error'); return; }
+  var cfg = JSON.parse(JSON.stringify(tm.getAdminConfig() || {}));
+  if(!cfg.moduleOverrides) cfg.moduleOverrides = {};
+  cfg.moduleOverrides[moduleId] = { scope: draft.scope.trim(), tokens: draft.tokens, css: draft.css, enabled: draft.enabled !== false };
+  delete _moduleOverrideDrafts[moduleId];
+  tm.saveAdminConfig(cfg, function(ok){
+    if(typeof showToast === 'function') showToast(ok ? L('Module override đã lưu và áp dụng.','Module override saved and applied.') : L('Lưu thất bại — override đang ở trạng thái preview.','Save failed — override is in preview state.'), ok ? 'success' : 'error');
+    renderAdminAppearance();
+  });
+};
+window._admModuleOverrideToggle = function(moduleId){
+  var tm = (typeof HmTheme !== 'undefined') ? HmTheme : null;
+  if(!tm) return;
+  var cfg = JSON.parse(JSON.stringify(tm.getAdminConfig() || {}));
+  if(!cfg.moduleOverrides || !cfg.moduleOverrides[moduleId]) return;
+  cfg.moduleOverrides[moduleId].enabled = !cfg.moduleOverrides[moduleId].enabled;
+  tm.saveAdminConfig(cfg, function(ok){
+    if(typeof showToast === 'function') showToast(ok ? L('Đã cập nhật trạng thái override.','Override status updated.') : L('Lưu thất bại.','Save failed.'), ok ? 'success' : 'error');
+    renderAdminAppearance();
+  });
+};
+window._admModuleOverrideDelete = function(moduleId){
+  var tm = (typeof HmTheme !== 'undefined') ? HmTheme : null;
+  if(!tm) return;
+  var cfg = JSON.parse(JSON.stringify(tm.getAdminConfig() || {}));
+  if(cfg.moduleOverrides) delete cfg.moduleOverrides[moduleId];
+  delete _moduleOverrideDrafts[moduleId];
+  tm.saveAdminConfig(cfg, function(ok){
+    if(typeof showToast === 'function') showToast(ok ? L('Đã xóa override.','Override deleted.') : L('Lưu thất bại.','Save failed.'), ok ? 'success' : 'error');
+    renderAdminAppearance();
+  });
+};
+
 function renderAuthorityStatusPanel(){
   var snap = graphicsSnapshot();
   var endpoints = snap.endpoints || {};
@@ -3966,6 +4229,7 @@ function renderGovernance(){
 	  h += renderPolicyPacksPanel();
 	  h += renderAuditHistoryPanel(10);
 	  h += renderWaiverGovernancePanel();
+  h += renderModuleComplianceEditorPanel();
 
   h += sectionLead(
     L('Graphics governance theo backend authority đã được kích hoạt', 'Backend-authority graphics governance is now active'),
