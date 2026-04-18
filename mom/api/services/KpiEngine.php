@@ -1220,8 +1220,8 @@ final class KpiEngine
         }
 
         $name   = str_replace('_', ' ', $metricCode);
-        $target = self::DEFAULT_TARGETS[$metricCode] ?? 0;
-        $unit   = self::UNITS[$metricCode] ?? '%';
+        $target = self::DEFAULT_TARGETS[$metricCode];
+        $unit   = self::UNITS[$metricCode];
 
         $row = $this->db->insertReturning(
             "INSERT INTO kpi_definitions (metric_code, kpi_name, formula, unit, target, is_active)
