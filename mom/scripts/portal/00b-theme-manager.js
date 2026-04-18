@@ -551,6 +551,37 @@ function _applyCustomVars(){
   _setVar('--breadcrumb-color', cfg, 'components.breadcrumb.color');
   _setVar('--breadcrumb-active-color', cfg, 'components.breadcrumb.activeColor');
 
+  /* V4 — opacity state layers */
+  _setVarNumber('--opacity-hover',     cfg, 'effects.opacityHover');
+  _setVarNumber('--opacity-pressed',   cfg, 'effects.opacityPressed');
+  _setVarNumber('--opacity-selected',  cfg, 'effects.opacitySelected');
+  _setVarNumber('--opacity-disabled',  cfg, 'effects.opacityDisabled');
+  _setVarNumber('--opacity-muted',     cfg, 'effects.opacityMuted');
+
+  /* V4 — shadow scale extended (xs, lg, xl) */
+  _setVar('--shadow-xs', cfg, 'effects.shadowXs');
+  _setVar('--shadow-lg', cfg, 'effects.shadowLg');
+  _setVar('--shadow-xl', cfg, 'effects.shadowXl');
+
+  /* V4 — easing functions */
+  _setVar('--ease-out',    cfg, 'effects.easingOut');
+  _setVar('--ease-in-out', cfg, 'effects.easingInOut');
+  _setVar('--ease-spring', cfg, 'effects.easingSpring');
+  _setVar('--ease-sharp',  cfg, 'effects.easingSharp');
+
+  /* --radius-xs/3xl set via [data-radius] CSS preset selectors in density-darkmode.css */
+
+  /* V4 — responsive page padding */
+  _setVarPx('--page-pad-mobile',  cfg, 'layout.pagePadMobile');
+  _setVarPx('--page-pad-tablet',  cfg, 'layout.pagePadTablet');
+  _setVarPx('--page-pad-desktop', cfg, 'layout.pagePadDesktop');
+
+  /* V4 — special-purpose surface tokens */
+  _setVar('--bg-elevated', cfg, 'colorsLight.bgElevated');
+  _setVar('--bg-input',    cfg, 'colorsLight.bgInput');
+  _setVar('--bg-disabled', cfg, 'colorsLight.bgDisabled');
+  _setVar('--bg-overlay',  cfg, 'colorsLight.bgOverlay');
+
   /* EQMS domain — lifecycle state colors */
   _setVar('--eqms-draft',       cfg, 'eqms.lifecycle.draft');
   _setVar('--eqms-open',        cfg, 'eqms.lifecycle.open');

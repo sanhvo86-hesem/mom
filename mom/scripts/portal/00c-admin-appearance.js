@@ -170,7 +170,7 @@ window._admAppearanceSetTab = function(key){
 };
 
 window._admAppearanceTabKeydown = function(event){
-  var keys = ['templates','tokens','components','effects','governance','advanced','eqms','standard'];
+  var keys = ['templates','tokens','components','effects','governance','advanced','standard'];
   var idx = keys.indexOf(_subTab);
   if(idx < 0) idx = 0;
   var next = null;
@@ -1250,7 +1250,7 @@ var VISUAL_THEMES = [
 
 function normalizeSubTab(subTab){
   var aliases = { overview:'templates', typography:'tokens', colors:'tokens', layout:'tokens' };
-  var valid = { templates:1, tokens:1, components:1, effects:1, governance:1, advanced:1, eqms:1, standard:1 };
+  var valid = { templates:1, tokens:1, components:1, effects:1, governance:1, advanced:1, standard:1 };
   var resolved = aliases[subTab] || subTab || 'templates';
   return valid[resolved] ? resolved : 'templates';
 }
@@ -2867,184 +2867,6 @@ function renderTokens(){
 }
 
 /* ══════════════════════════════════════════════════════════════════════════ */
-/* ── SUB-TAB 8: EQMS SUITE ──────────────────────────────────────────────── */
-/* ══════════════════════════════════════════════════════════════════════════ */
-function renderEqms(){
-  var h = '';
-
-  h += sectionLead(
-    L('EQMS Suite — Graphics Control', 'EQMS Suite — Graphics Control'),
-    L('Điều khiển toàn bộ màu sắc đặc thù của EQMS: vòng đời, heatmap rủi ro, màu entity traceability và kích thước shell module. Tất cả token này được ThemeManager đẩy vào <html> style, module không cần hardcode.', 'Control all EQMS-specific colors: lifecycle states, risk heatmap, traceability entity colors, and module shell dimensions. All tokens are pushed by ThemeManager onto the <html> style — modules hardcode nothing.'),
-    statusChip('admin', 'eqms.*') + statusChip('full', L('Toàn bộ token', 'All tokens'))
-  );
-
-  /* ── Lifecycle state colors ─────────────────────────────────────────────── */
-  h += sect('🔄 ' + L('Màu trạng thái vòng đời', 'Lifecycle State Colors'),
-    colorPick('Draft', '--eqms-draft', 'eqms.lifecycle.draft', '#94a3b8')
-    + colorPick('Open', '--eqms-open', 'eqms.lifecycle.open', '#3b82f6')
-    + colorPick('In Progress', '--eqms-in-progress', 'eqms.lifecycle.inProgress', '#8b5cf6')
-    + colorPick('Pending', '--eqms-pending', 'eqms.lifecycle.pending', '#f59e0b')
-    + colorPick('Approved', '--eqms-approved', 'eqms.lifecycle.approved', '#10b981')
-    + colorPick('Closed', '--eqms-closed', 'eqms.lifecycle.closed', '#64748b')
-    + colorPick('Voided', '--eqms-voided', 'eqms.lifecycle.voided', '#dc2626')
-    + previewBox(L('Preview vòng đời', 'Preview lifecycle'),
-        '<div style="display:flex;gap:6px;flex-wrap:wrap">'
-        + ['Draft','Open','In Progress','Pending','Approved','Closed','Voided'].map(function(s, i){
-            var vars = ['--eqms-draft','--eqms-open','--eqms-in-progress','--eqms-pending','--eqms-approved','--eqms-closed','--eqms-voided'];
-            return '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;background:color-mix(in srgb,var('+vars[i]+') 12%,transparent);border:1px solid color-mix(in srgb,var('+vars[i]+') 30%,transparent);color:var('+vars[i]+');font-size:11px;font-weight:700"><span style="width:7px;height:7px;border-radius:50%;background:var('+vars[i]+');display:inline-block"></span>'+s+'</span>';
-          }).join('')
-        + '</div>'
-      )
-  , true, statusChip('full', L('7 trạng thái', '7 states')));
-
-  /* ── Risk heatmap palette ────────────────────────────────────────────────── */
-  h += sect('🟥 ' + L('Bảng màu heatmap rủi ro', 'Risk Heatmap Palette'),
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
-    + colorPick('Low — nền', '--eqms-heatmap-low-bg', 'eqms.heatmap.lowBg', '#dcfce7')
-    + colorPick('Low — chữ', '--eqms-heatmap-low-text', 'eqms.heatmap.lowText', '#166534')
-    + colorPick('Medium — nền', '--eqms-heatmap-medium-bg', 'eqms.heatmap.mediumBg', '#fef9c3')
-    + colorPick('Medium — chữ', '--eqms-heatmap-medium-text', 'eqms.heatmap.mediumText', '#854d0e')
-    + colorPick('High — nền', '--eqms-heatmap-high-bg', 'eqms.heatmap.highBg', '#fed7aa')
-    + colorPick('High — chữ', '--eqms-heatmap-high-text', 'eqms.heatmap.highText', '#9a3412')
-    + colorPick('Critical — nền', '--eqms-heatmap-critical-bg', 'eqms.heatmap.criticalBg', '#fecaca')
-    + colorPick('Critical — chữ', '--eqms-heatmap-critical-text', 'eqms.heatmap.criticalText', '#991b1b')
-    + '</div>'
-    + previewBox(L('Preview heatmap', 'Preview heatmap'),
-        '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">'
-        + [['Low','low'],['Medium','medium'],['High','high'],['Critical','critical']].map(function(r){
-            return '<div style="padding:10px 8px;border-radius:var(--radius-md);background:var(--eqms-heatmap-'+r[1]+'-bg);color:var(--eqms-heatmap-'+r[1]+'-text);text-align:center;font-size:11px;font-weight:700">'+r[0]+'<br><span style="font-size:16px;font-weight:800">3</span></div>';
-          }).join('')
-        + '</div>'
-      )
-  , false, statusChip('full', L('4×2 pairs', '4×2 pairs')));
-
-  /* ── Badge dark mode palette ─────────────────────────────────────────────── */
-  h += sect('🌙 ' + L('Màu badge dark mode', 'Badge Dark Mode Palette'),
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
-    + colorPick('Draft bg dark', '--eqms-state-draft-bg-dark', 'eqms.stateDark.draftBg', '#334155')
-    + colorPick('Draft text dark', '--eqms-state-draft-text-dark', 'eqms.stateDark.draftText', '#94a3b8')
-    + colorPick('Open bg dark', '--eqms-state-open-bg-dark', 'eqms.stateDark.openBg', '#1e3a5f')
-    + colorPick('Open text dark', '--eqms-state-open-text-dark', 'eqms.stateDark.openText', '#60a5fa')
-    + colorPick('Active bg dark', '--eqms-state-active-bg-dark', 'eqms.stateDark.activeBg', '#2e1065')
-    + colorPick('Active text dark', '--eqms-state-active-text-dark', 'eqms.stateDark.activeText', '#a78bfa')
-    + colorPick('Pending bg dark', '--eqms-state-pending-bg-dark', 'eqms.stateDark.pendingBg', '#451a03')
-    + colorPick('Pending text dark', '--eqms-state-pending-text-dark', 'eqms.stateDark.pendingText', '#fbbf24')
-    + colorPick('Approved bg dark', '--eqms-state-approved-bg-dark', 'eqms.stateDark.approvedBg', '#064e3b')
-    + colorPick('Approved text dark', '--eqms-state-approved-text-dark', 'eqms.stateDark.approvedText', '#34d399')
-    + colorPick('Voided bg dark', '--eqms-state-voided-bg-dark', 'eqms.stateDark.voidedBg', '#450a0a')
-    + colorPick('Voided text dark', '--eqms-state-voided-text-dark', 'eqms.stateDark.voidedText', '#f87171')
-    + '</div>'
-  , false, statusChip('full', L('6×2 pairs', '6×2 pairs')));
-
-  /* ── Entity type colors ──────────────────────────────────────────────────── */
-  h += sect('🔗 ' + L('Màu entity traceability (NCR, CAPA, Complaint…)', 'Traceability Entity Colors'),
-    sectionLead(
-      L('Quality entity color model', 'Quality entity color model'),
-      L('Mỗi entity type có màu riêng trong traceability graph và trong badges. Nhóm theo domain chức năng.', 'Each entity type has its own color in the traceability graph and badges. Grouped by functional domain.'),
-      statusChip('admin', L('40+ entities', '40+ entities'))
-    )
-    + '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin:12px 0 6px">📋 ' + L('Sự kiện chất lượng', 'Quality Events') + '</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
-    + colorPick('Complaint', '--eqms-entity-complaint', 'eqms.entity.complaint', '#ef4444')
-    + colorPick('NCR', '--eqms-entity-ncr', 'eqms.entity.ncr', '#dc2626')
-    + colorPick('MRB', '--eqms-entity-mrb', 'eqms.entity.mrb', '#b91c1c')
-    + colorPick('Deviation', '--eqms-entity-deviation', 'eqms.entity.deviation', '#f97316')
-    + colorPick('CAPA', '--eqms-entity-capa', 'eqms.entity.capa', '#8b5cf6')
-    + colorPick('Concession', '--eqms-entity-concession', 'eqms.entity.concession', '#fb923c')
-    + colorPick('Field Action', '--eqms-entity-field-action', 'eqms.entity.fieldAction', '#be123c')
-    + colorPick('Warranty', '--eqms-entity-warranty', 'eqms.entity.warranty', '#dc2626')
-    + '</div>'
-    + '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin:12px 0 6px">📝 ' + L('Thay đổi & Tài liệu', 'Change & Document') + '</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
-    + colorPick('Change Control', '--eqms-entity-change-control', 'eqms.entity.changeControl', '#3b82f6')
-    + colorPick('Eng Change', '--eqms-entity-eng-change', 'eqms.entity.engChange', '#2563eb')
-    + colorPick('Document', '--eqms-entity-document', 'eqms.entity.document', '#0ea5e9')
-    + colorPick('Validation', '--eqms-entity-validation', 'eqms.entity.validation', '#4338ca')
-    + colorPick('Evidence', '--eqms-entity-evidence', 'eqms.entity.evidence', '#64748b')
-    + colorPick('Approval', '--eqms-entity-approval', 'eqms.entity.approval', '#22c55e')
-    + colorPick('Signature', '--eqms-entity-signature', 'eqms.entity.signature', '#1d4ed8')
-    + colorPick('Lesson Learned', '--eqms-entity-lesson-learned', 'eqms.entity.lessonLearned', '#facc15')
-    + '</div>'
-    + '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin:12px 0 6px">🎓 ' + L('Đào tạo & Năng lực', 'Training & Competency') + '</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
-    + colorPick('Training', '--eqms-entity-training', 'eqms.entity.training', '#06b6d4')
-    + colorPick('Competency', '--eqms-entity-competency', 'eqms.entity.competency', '#0891b2')
-    + colorPick('Assessment', '--eqms-entity-assessment', 'eqms.entity.assessment', '#0e7490')
-    + colorPick('CSAT', '--eqms-entity-csat', 'eqms.entity.csat', '#f59e0b')
-    + '</div>'
-    + '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin:12px 0 6px">🔍 ' + L('Kiểm soát chất lượng', 'Quality Control') + '</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
-    + colorPick('IQC', '--eqms-entity-iqc', 'eqms.entity.iqc', '#16a34a')
-    + colorPick('Inspection Result', '--eqms-entity-inspection-result', 'eqms.entity.inspectionResult', '#15803d')
-    + colorPick('OOS', '--eqms-entity-oos', 'eqms.entity.oos', '#ca8a04')
-    + colorPick('SPC', '--eqms-entity-spc', 'eqms.entity.spc', '#0d9488')
-    + colorPick('Test Result', '--eqms-entity-test-result', 'eqms.entity.testResult', '#0f766e')
-    + colorPick('Lot Release', '--eqms-entity-lot-release', 'eqms.entity.lotRelease', '#0369a1')
-    + colorPick('Calibration', '--eqms-entity-calibration', 'eqms.entity.calibration', '#65a30d')
-    + colorPick('MSA', '--eqms-entity-msa', 'eqms.entity.msa', '#4d7c0f')
-    + colorPick('Sampling Plan', '--eqms-entity-sampling-plan', 'eqms.entity.samplingPlan', '#0891b2')
-    + '</div>'
-    + '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin:12px 0 6px">⚠️ ' + L('Rủi ro & Nhà cung cấp', 'Risk & Supplier') + '</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
-    + colorPick('Risk', '--eqms-entity-risk', 'eqms.entity.risk', '#ea580c')
-    + colorPick('FMEA', '--eqms-entity-fmea', 'eqms.entity.fmea', '#d97706')
-    + colorPick('Audit', '--eqms-entity-audit', 'eqms.entity.audit', '#059669')
-    + colorPick('Audit Finding', '--eqms-entity-finding', 'eqms.entity.finding', '#047857')
-    + colorPick('Audit Event', '--eqms-entity-audit-event', 'eqms.entity.auditEvent', '#475569')
-    + colorPick('Supplier', '--eqms-entity-supplier', 'eqms.entity.supplier', '#7c3aed')
-    + colorPick('Evaluation', '--eqms-entity-evaluation', 'eqms.entity.evaluation', '#6d28d9')
-    + colorPick('SCAR', '--eqms-entity-scar', 'eqms.entity.scar', '#9333ea')
-    + colorPick('Supplier Audit', '--eqms-entity-supplier-audit', 'eqms.entity.supplierAudit', '#a855f7')
-    + colorPick('Quality Agreement', '--eqms-entity-quality-agreement', 'eqms.entity.qualityAgreement', '#c084fc')
-    + colorPick('AML', '--eqms-entity-aml', 'eqms.entity.aml', '#16a34a')
-    + colorPick('Special Char', '--eqms-entity-special-char', 'eqms.entity.specialChar', '#7c3aed')
-    + colorPick('FAI', '--eqms-entity-fai', 'eqms.entity.fai', '#2563eb')
-    + colorPick('APQP', '--eqms-entity-apqp', 'eqms.entity.apqp', '#059669')
-    + '</div>'
-    + '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin:12px 0 6px">🔗 ' + L('Liên kết & Nhiệm vụ', 'Links & Tasks') + '</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
-    + colorPick('Linked', '--eqms-entity-linked', 'eqms.entity.linked', '#6366f1')
-    + colorPick('Task', '--eqms-entity-task', 'eqms.entity.task', '#f59e0b')
-    + colorPick('Comment', '--eqms-entity-comment', 'eqms.entity.comment', '#a3a3a3')
-    + '</div>'
-  , false, statusChip('admin', L('40+ entity', '40+ entity')));
-
-  /* ── Traceability link type colors ───────────────────────────────────────── */
-  h += sect('↔️ ' + L('Màu link traceability', 'Traceability Link Colors'),
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
-    + colorPick('Caused By', '--eqms-link-caused-by', 'eqms.link.causedBy', '#ef4444')
-    + colorPick('Related To', '--eqms-link-related-to', 'eqms.link.relatedTo', '#3b82f6')
-    + colorPick('Requires', '--eqms-link-requires', 'eqms.link.requires', '#f97316')
-    + colorPick('Verifies', '--eqms-link-verifies', 'eqms.link.verifies', '#22c55e')
-    + colorPick('Trains', '--eqms-link-trains', 'eqms.link.trains', '#06b6d4')
-    + colorPick('Releases', '--eqms-link-releases', 'eqms.link.releases', '#8b5cf6')
-    + colorPick('Sourced From', '--eqms-link-sourced-from', 'eqms.link.sourcedFrom', '#7c3aed')
-    + colorPick('Supersedes', '--eqms-link-supersedes', 'eqms.link.supersedes', '#64748b')
-    + colorPick('Contains', '--eqms-link-contains', 'eqms.link.contains', '#0ea5e9')
-    + colorPick('Implements', '--eqms-link-implements', 'eqms.link.implements', '#059669')
-    + colorPick('Mitigates', '--eqms-link-mitigates', 'eqms.link.mitigates', '#16a34a')
-    + '</div>'
-  , false, statusChip('full', L('11 link types', '11 link types')));
-
-  /* ── EQMS module shell dimensions ────────────────────────────────────────── */
-  h += sect('📐 ' + L('Kích thước shell EQMS', 'EQMS Shell Dimensions'),
-    slider(L('Nav width', 'Nav width'), '--eqms-nav-width', 'eqms.layout.navWidth', 200, 360, 260, 'px')
-    + slider(L('Nav collapsed', 'Nav collapsed'), '--eqms-nav-collapsed', 'eqms.layout.navCollapsed', 40, 80, 56, 'px')
-    + slider(L('Header height', 'Header height'), '--eqms-header-height', 'eqms.layout.headerHeight', 44, 72, 56, 'px')
-    + slider(L('Detail sidebar', 'Detail sidebar'), '--eqms-detail-sidebar', 'eqms.layout.detailSidebar', 240, 480, 320, 'px')
-    + slider(L('Filter bar height', 'Filter bar height'), '--eqms-filter-height', 'eqms.layout.filterHeight', 40, 72, 52, 'px')
-    + previewBox(L('Preview shell proportions', 'Preview shell proportions'),
-        '<div style="display:grid;grid-template-columns:var(--eqms-nav-collapsed,56px) 1fr;height:var(--eqms-header-height,56px);border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border)">'
-        + '<div style="background:var(--bg-sidebar-light,var(--brand));display:flex;align-items:center;justify-content:center"><span style="font-size:10px;color:#fff;opacity:.7">Nav</span></div>'
-        + '<div style="background:var(--bg-header);border-left:1px solid var(--border);display:flex;align-items:center;padding:0 12px;font-size:11px;color:var(--text-secondary)">Header — '+L('chiều cao phụ thuộc slider','height driven by slider')+'</div>'
-        + '</div>'
-      )
-  , false, statusChip('full', L('5 dimensions', '5 dimensions')));
-
-  return h;
-}
-
-/* ══════════════════════════════════════════════════════════════════════════ */
 /* ── RENDER MAIN ────────────────────────────────────────────────────────── */
 /* ══════════════════════════════════════════════════════════════════════════ */
 
@@ -3059,7 +2881,6 @@ function render(el, subTab, currentLang){
     {key:'effects', icon:'✨', label:T('effects')},
     {key:'governance', icon:'🛡️', label:T('governance')},
     {key:'advanced', icon:'🧩', label:T('advanced')},
-    {key:'eqms', icon:'🔬', label:L('EQMS Suite', 'EQMS Suite')},
     {key:'standard', icon:'📖', label:L('Chuẩn V4', 'V4 Standard')}
   ];
 
@@ -3088,7 +2909,6 @@ function render(el, subTab, currentLang){
     effects: renderEffects(),
     governance: renderGovernance(),
     advanced: renderAdvanced(),
-    eqms: renderEqms(),
     standard: renderStandard()
   };
   tabs.forEach(function(t){
@@ -3382,6 +3202,143 @@ function renderColors(){
     + previewBorderColors()
   , false);
 
+  /* V4 — special-purpose surface tokens */
+  h += sect('🖼️ '+L('Bề mặt đặc thù (V4)', 'Special-purpose surfaces (V4)'),
+    colorPick(L('Elevated surface', 'Elevated surface'), '--bg-elevated', 'colorsLight.bgElevated', '#fafbfc')
+    + colorPick(L('Input background', 'Input background'), '--bg-input', 'colorsLight.bgInput', '#ffffff')
+    + colorPick(L('Disabled field BG', 'Disabled field BG'), '--bg-disabled', 'colorsLight.bgDisabled', 'rgba(148,163,184,0.1)')
+    + colorPick(L('Overlay background', 'Overlay background'), '--bg-overlay', 'colorsLight.bgOverlay', 'rgba(15,23,42,0.5)')
+  , false, statusChip('preview', 'V4 special surfaces'));
+
+  /* EQMS — lifecycle state colors */
+  h += sect('🔄 '+L('EQMS — Màu trạng thái vòng đời', 'EQMS — Lifecycle State Colors'),
+    colorPick('Draft', '--eqms-draft', 'eqms.lifecycle.draft', '#94a3b8')
+    + colorPick('Open', '--eqms-open', 'eqms.lifecycle.open', '#3b82f6')
+    + colorPick('In Progress', '--eqms-in-progress', 'eqms.lifecycle.inProgress', '#8b5cf6')
+    + colorPick('Pending', '--eqms-pending', 'eqms.lifecycle.pending', '#f59e0b')
+    + colorPick('Approved', '--eqms-approved', 'eqms.lifecycle.approved', '#10b981')
+    + colorPick('Closed', '--eqms-closed', 'eqms.lifecycle.closed', '#64748b')
+    + colorPick('Voided', '--eqms-voided', 'eqms.lifecycle.voided', '#dc2626')
+    + previewBox(L('Preview vòng đời','Preview lifecycle'),
+        '<div style="display:flex;gap:6px;flex-wrap:wrap">'
+        + [['Draft','--eqms-draft'],['Open','--eqms-open'],['In Progress','--eqms-in-progress'],
+           ['Pending','--eqms-pending'],['Approved','--eqms-approved'],['Closed','--eqms-closed'],['Voided','--eqms-voided']
+          ].map(function(r){ return '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;background:color-mix(in srgb,var('+r[1]+') 12%,transparent);border:1px solid color-mix(in srgb,var('+r[1]+') 30%,transparent);color:var('+r[1]+');font-size:11px;font-weight:700"><span style="width:7px;height:7px;border-radius:50%;background:var('+r[1]+');display:inline-block"></span>'+r[0]+'</span>'; }).join('')
+        + '</div>')
+  , false, statusChip('full', 'EQMS · 7 states'));
+
+  /* EQMS — risk heatmap */
+  h += sect('🟥 '+L('EQMS — Heatmap rủi ro', 'EQMS — Risk Heatmap'),
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
+    + colorPick('Low BG', '--eqms-heatmap-low-bg', 'eqms.heatmap.lowBg', '#dcfce7')
+    + colorPick('Low text', '--eqms-heatmap-low-text', 'eqms.heatmap.lowText', '#166534')
+    + colorPick('Medium BG', '--eqms-heatmap-medium-bg', 'eqms.heatmap.mediumBg', '#fef9c3')
+    + colorPick('Medium text', '--eqms-heatmap-medium-text', 'eqms.heatmap.mediumText', '#854d0e')
+    + colorPick('High BG', '--eqms-heatmap-high-bg', 'eqms.heatmap.highBg', '#fed7aa')
+    + colorPick('High text', '--eqms-heatmap-high-text', 'eqms.heatmap.highText', '#9a3412')
+    + colorPick('Critical BG', '--eqms-heatmap-critical-bg', 'eqms.heatmap.criticalBg', '#fecaca')
+    + colorPick('Critical text', '--eqms-heatmap-critical-text', 'eqms.heatmap.criticalText', '#991b1b')
+    + '</div>'
+    + previewBox(L('Preview heatmap','Preview heatmap'),
+        '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">'
+        + [['Low','low'],['Medium','medium'],['High','high'],['Critical','critical']].map(function(r){
+            return '<div style="padding:10px 8px;border-radius:var(--radius-md);background:var(--eqms-heatmap-'+r[1]+'-bg);color:var(--eqms-heatmap-'+r[1]+'-text);text-align:center;font-size:11px;font-weight:700">'+r[0]+'<br><span style="font-size:16px;font-weight:800">3</span></div>';
+          }).join('')
+        + '</div>')
+  , false, statusChip('full', 'EQMS · 4×2 pairs'));
+
+  /* EQMS — badge dark mode */
+  h += sect('🌙 '+L('EQMS — Badge dark mode', 'EQMS — Badge Dark Mode'),
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
+    + colorPick('Draft BG dark', '--eqms-state-draft-bg-dark', 'eqms.stateDark.draftBg', '#334155')
+    + colorPick('Draft text dark', '--eqms-state-draft-text-dark', 'eqms.stateDark.draftText', '#94a3b8')
+    + colorPick('Open BG dark', '--eqms-state-open-bg-dark', 'eqms.stateDark.openBg', '#1e3a5f')
+    + colorPick('Open text dark', '--eqms-state-open-text-dark', 'eqms.stateDark.openText', '#60a5fa')
+    + colorPick('Active BG dark', '--eqms-state-active-bg-dark', 'eqms.stateDark.activeBg', '#2e1065')
+    + colorPick('Active text dark', '--eqms-state-active-text-dark', 'eqms.stateDark.activeText', '#a78bfa')
+    + colorPick('Pending BG dark', '--eqms-state-pending-bg-dark', 'eqms.stateDark.pendingBg', '#451a03')
+    + colorPick('Pending text dark', '--eqms-state-pending-text-dark', 'eqms.stateDark.pendingText', '#fbbf24')
+    + colorPick('Approved BG dark', '--eqms-state-approved-bg-dark', 'eqms.stateDark.approvedBg', '#064e3b')
+    + colorPick('Approved text dark', '--eqms-state-approved-text-dark', 'eqms.stateDark.approvedText', '#34d399')
+    + colorPick('Voided BG dark', '--eqms-state-voided-bg-dark', 'eqms.stateDark.voidedBg', '#450a0a')
+    + colorPick('Voided text dark', '--eqms-state-voided-text-dark', 'eqms.stateDark.voidedText', '#f87171')
+    + '</div>'
+  , false, statusChip('full', 'EQMS · 6×2 pairs'));
+
+  /* EQMS — entity type colors */
+  h += sect('🔗 '+L('EQMS — Entity type colors', 'EQMS — Entity type colors'),
+    '<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text-tertiary);margin:0 0 6px">'+L('Quality Events','Quality Events')+'</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
+    + colorPick('Complaint', '--eqms-entity-complaint', 'eqms.entity.complaint', '#ef4444')
+    + colorPick('NCR', '--eqms-entity-ncr', 'eqms.entity.ncr', '#dc2626')
+    + colorPick('MRB', '--eqms-entity-mrb', 'eqms.entity.mrb', '#b91c1c')
+    + colorPick('Deviation', '--eqms-entity-deviation', 'eqms.entity.deviation', '#f97316')
+    + colorPick('CAPA', '--eqms-entity-capa', 'eqms.entity.capa', '#8b5cf6')
+    + colorPick('Concession', '--eqms-entity-concession', 'eqms.entity.concession', '#fb923c')
+    + colorPick('Field Action', '--eqms-entity-field-action', 'eqms.entity.fieldAction', '#be123c')
+    + colorPick('Warranty', '--eqms-entity-warranty', 'eqms.entity.warranty', '#dc2626')
+    + '</div>'
+    + '<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text-tertiary);margin:10px 0 6px">'+L('Change & Document','Change & Document')+'</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
+    + colorPick('Change Control', '--eqms-entity-change-control', 'eqms.entity.changeControl', '#3b82f6')
+    + colorPick('Eng Change', '--eqms-entity-eng-change', 'eqms.entity.engChange', '#2563eb')
+    + colorPick('Document', '--eqms-entity-document', 'eqms.entity.document', '#0ea5e9')
+    + colorPick('Validation', '--eqms-entity-validation', 'eqms.entity.validation', '#4338ca')
+    + colorPick('Evidence', '--eqms-entity-evidence', 'eqms.entity.evidence', '#64748b')
+    + colorPick('Approval', '--eqms-entity-approval', 'eqms.entity.approval', '#22c55e')
+    + colorPick('Signature', '--eqms-entity-signature', 'eqms.entity.signature', '#1d4ed8')
+    + colorPick('Lesson Learned', '--eqms-entity-lesson-learned', 'eqms.entity.lessonLearned', '#facc15')
+    + '</div>'
+    + '<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text-tertiary);margin:10px 0 6px">'+L('Training & QC','Training & QC')+'</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
+    + colorPick('Training', '--eqms-entity-training', 'eqms.entity.training', '#06b6d4')
+    + colorPick('Competency', '--eqms-entity-competency', 'eqms.entity.competency', '#0891b2')
+    + colorPick('IQC', '--eqms-entity-iqc', 'eqms.entity.iqc', '#16a34a')
+    + colorPick('Inspection Result', '--eqms-entity-inspection-result', 'eqms.entity.inspectionResult', '#15803d')
+    + colorPick('OOS', '--eqms-entity-oos', 'eqms.entity.oos', '#ca8a04')
+    + colorPick('SPC', '--eqms-entity-spc', 'eqms.entity.spc', '#0d9488')
+    + colorPick('Test Result', '--eqms-entity-test-result', 'eqms.entity.testResult', '#0f766e')
+    + colorPick('Lot Release', '--eqms-entity-lot-release', 'eqms.entity.lotRelease', '#0369a1')
+    + colorPick('Calibration', '--eqms-entity-calibration', 'eqms.entity.calibration', '#65a30d')
+    + colorPick('MSA', '--eqms-entity-msa', 'eqms.entity.msa', '#4d7c0f')
+    + colorPick('FMEA', '--eqms-entity-fmea', 'eqms.entity.fmea', '#d97706')
+    + colorPick('CSAT', '--eqms-entity-csat', 'eqms.entity.csat', '#f59e0b')
+    + '</div>'
+    + '<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text-tertiary);margin:10px 0 6px">'+L('Risk & Supplier','Risk & Supplier')+'</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
+    + colorPick('Risk', '--eqms-entity-risk', 'eqms.entity.risk', '#ea580c')
+    + colorPick('Audit', '--eqms-entity-audit', 'eqms.entity.audit', '#059669')
+    + colorPick('Audit Finding', '--eqms-entity-finding', 'eqms.entity.finding', '#047857')
+    + colorPick('Audit Event', '--eqms-entity-audit-event', 'eqms.entity.auditEvent', '#475569')
+    + colorPick('Supplier', '--eqms-entity-supplier', 'eqms.entity.supplier', '#7c3aed')
+    + colorPick('SCAR', '--eqms-entity-scar', 'eqms.entity.scar', '#9333ea')
+    + colorPick('Supplier Audit', '--eqms-entity-supplier-audit', 'eqms.entity.supplierAudit', '#a855f7')
+    + colorPick('AML', '--eqms-entity-aml', 'eqms.entity.aml', '#16a34a')
+    + colorPick('FAI', '--eqms-entity-fai', 'eqms.entity.fai', '#2563eb')
+    + colorPick('APQP', '--eqms-entity-apqp', 'eqms.entity.apqp', '#059669')
+    + colorPick('Linked', '--eqms-entity-linked', 'eqms.entity.linked', '#6366f1')
+    + colorPick('Task', '--eqms-entity-task', 'eqms.entity.task', '#f59e0b')
+    + colorPick('Comment', '--eqms-entity-comment', 'eqms.entity.comment', '#a3a3a3')
+    + '</div>'
+  , false, statusChip('admin', 'EQMS · 40+ entities'));
+
+  /* EQMS — traceability link types */
+  h += sect('↔️ '+L('EQMS — Link type colors', 'EQMS — Traceability Link Colors'),
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
+    + colorPick('Caused By', '--eqms-link-caused-by', 'eqms.link.causedBy', '#ef4444')
+    + colorPick('Related To', '--eqms-link-related-to', 'eqms.link.relatedTo', '#3b82f6')
+    + colorPick('Requires', '--eqms-link-requires', 'eqms.link.requires', '#f97316')
+    + colorPick('Verifies', '--eqms-link-verifies', 'eqms.link.verifies', '#22c55e')
+    + colorPick('Trains', '--eqms-link-trains', 'eqms.link.trains', '#06b6d4')
+    + colorPick('Releases', '--eqms-link-releases', 'eqms.link.releases', '#8b5cf6')
+    + colorPick('Sourced From', '--eqms-link-sourced-from', 'eqms.link.sourcedFrom', '#7c3aed')
+    + colorPick('Supersedes', '--eqms-link-supersedes', 'eqms.link.supersedes', '#64748b')
+    + colorPick('Contains', '--eqms-link-contains', 'eqms.link.contains', '#0ea5e9')
+    + colorPick('Implements', '--eqms-link-implements', 'eqms.link.implements', '#059669')
+    + colorPick('Mitigates', '--eqms-link-mitigates', 'eqms.link.mitigates', '#16a34a')
+    + '</div>'
+  , false, statusChip('full', 'EQMS · 11 link types'));
+
   return h;
 }
 
@@ -3477,6 +3434,22 @@ function renderLayout(){
     + previewAdminLayoutTemplate()
   , false, statusChip('full', L('Admin console shell', 'Admin console shell')) + statusChip('admin', L('Preset + manual', 'Preset + manual')));
 
+  /* V4 — responsive page padding */
+  h += sect('📱 '+L('Padding trang responsive (V4)', 'Responsive page padding (V4)'),
+    slider('Mobile', '--page-pad-mobile', 'layout.pagePadMobile', 8, 24, 16, 'px')
+    + slider('Tablet', '--page-pad-tablet', 'layout.pagePadTablet', 16, 40, 24, 'px')
+    + slider('Desktop', '--page-pad-desktop', 'layout.pagePadDesktop', 20, 56, 32, 'px')
+  , false, statusChip('preview', 'V4 · responsive padding'));
+
+  /* EQMS — module shell dimensions */
+  h += sect('📐 '+L('EQMS — Kích thước shell module', 'EQMS — Module Shell Dimensions'),
+    slider(L('Nav width', 'Nav width'), '--eqms-nav-width', 'eqms.layout.navWidth', 200, 360, 260, 'px')
+    + slider(L('Nav collapsed', 'Nav collapsed'), '--eqms-nav-collapsed', 'eqms.layout.navCollapsed', 40, 80, 56, 'px')
+    + slider(L('Header height', 'Header height'), '--eqms-header-height', 'eqms.layout.headerHeight', 44, 72, 56, 'px')
+    + slider(L('Detail sidebar', 'Detail sidebar'), '--eqms-detail-sidebar', 'eqms.layout.detailSidebar', 240, 480, 320, 'px')
+    + slider(L('Filter bar height', 'Filter bar height'), '--eqms-filter-height', 'eqms.layout.filterHeight', 40, 72, 52, 'px')
+  , false, statusChip('full', 'EQMS · 5 dimensions'));
+
   h += sect('📊 '+T('zIndex')+' (read-only)',
     '<table style="width:100%;font-size:11px;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:4px 8px;border-bottom:1px solid var(--border)">Layer</th><th style="text-align:right;padding:4px 8px;border-bottom:1px solid var(--border)">Value</th></tr></thead><tbody>'
     +[['Base',1],['Dropdown',100],['Sticky',200],['Sidebar',300],['Header',400],['Overlay',1200],['Modal',1300],['Toast',1400],['Tooltip',1500]]
@@ -3547,6 +3520,45 @@ function renderEffects(){
     + slider('Overlay opacity', '--overlay-opacity', 'effects.overlayOpacity', 0, 1, 0.4, '', 0.05)
     + previewBackdrop()
   , false);
+
+  /* V4 — opacity state layers */
+  h += sect('🎭 '+L('Lớp opacity trạng thái (V4)', 'State opacity layers (V4)'),
+    slider(L('Hover layer', 'Hover layer'), '--opacity-hover', 'effects.opacityHover', 0, 0.2, 0.06, '', 0.005)
+    + slider(L('Pressed layer', 'Pressed layer'), '--opacity-pressed', 'effects.opacityPressed', 0, 0.3, 0.10, '', 0.005)
+    + slider(L('Selected layer', 'Selected layer'), '--opacity-selected', 'effects.opacitySelected', 0, 0.2, 0.08, '', 0.005)
+    + slider(L('Disabled', 'Disabled'), '--opacity-disabled', 'effects.opacityDisabled', 0.1, 0.8, 0.4, '', 0.05)
+    + slider(L('Muted', 'Muted'), '--opacity-muted', 'effects.opacityMuted', 0.3, 0.9, 0.6, '', 0.05)
+    + previewBox(L('Preview state layers','Preview state layers'),
+        '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">'
+        + '<button class="hm-btn hm-btn-primary" style="position:relative;overflow:hidden">Primary<span style="position:absolute;inset:0;background:rgba(0,0,0,var(--opacity-hover,0.06))"></span></button>'
+        + '<button class="hm-btn hm-btn-secondary" style="position:relative;overflow:hidden">Hover<span style="position:absolute;inset:0;background:rgba(0,0,0,var(--opacity-pressed,0.10))"></span></button>'
+        + '<span class="hm-badge" style="opacity:var(--opacity-muted,0.6)">Muted badge</span>'
+        + '<span class="hm-badge hm-badge-approved" style="opacity:var(--opacity-disabled,0.4)">Disabled</span>'
+        + '</div>')
+  , false, statusChip('preview', 'V4 · state layers'));
+
+  /* V4 — extended shadow scale */
+  h += sect('🌑 '+L('Shadow mở rộng (V4)', 'Extended shadow scale (V4)'),
+    textInput('Shadow XS', '--shadow-xs', 'effects.shadowXs', '0 1px 3px rgba(12,45,72,.04)')
+    + textInput('Shadow LG', '--shadow-lg', 'effects.shadowLg', '0 18px 40px rgba(15,23,42,.14),0 8px 20px rgba(15,23,42,.09)')
+    + textInput('Shadow XL', '--shadow-xl', 'effects.shadowXl', '0 24px 60px rgba(12,45,72,.16),0 12px 28px rgba(12,45,72,.08)')
+    + previewBox(L('Preview shadows','Preview shadows'),
+        '<div style="display:flex;gap:12px;flex-wrap:wrap">'
+        + '<div style="padding:10px 14px;border-radius:var(--radius-lg);background:var(--bg-surface);box-shadow:var(--shadow-xs)"><div style="font-size:10px;color:var(--text-tertiary)">XS</div></div>'
+        + '<div style="padding:10px 14px;border-radius:var(--radius-lg);background:var(--bg-surface);box-shadow:var(--shadow-sm)"><div style="font-size:10px;color:var(--text-tertiary)">SM</div></div>'
+        + '<div style="padding:10px 14px;border-radius:var(--radius-lg);background:var(--bg-surface);box-shadow:var(--shadow-md)"><div style="font-size:10px;color:var(--text-tertiary)">MD</div></div>'
+        + '<div style="padding:10px 14px;border-radius:var(--radius-lg);background:var(--bg-surface);box-shadow:var(--shadow-lg)"><div style="font-size:10px;color:var(--text-tertiary)">LG</div></div>'
+        + '<div style="padding:10px 14px;border-radius:var(--radius-lg);background:var(--bg-surface);box-shadow:var(--shadow-xl)"><div style="font-size:10px;color:var(--text-tertiary)">XL</div></div>'
+        + '</div>')
+  , false, statusChip('preview', 'V4 · xs / lg / xl'));
+
+  /* V4 — easing curves */
+  h += sect('↗️ '+L('Easing curves (V4)', 'Easing curves (V4)'),
+    textInput('Ease out', '--ease-out', 'effects.easingOut', 'cubic-bezier(0,0,0.2,1)')
+    + textInput('Ease in-out', '--ease-in-out', 'effects.easingInOut', 'cubic-bezier(0.4,0,0.2,1)')
+    + textInput('Ease spring', '--ease-spring', 'effects.easingSpring', 'cubic-bezier(0.34,1.56,0.64,1)')
+    + textInput('Ease sharp', '--ease-sharp', 'effects.easingSharp', 'cubic-bezier(0.2,0,0,1)')
+  , false, statusChip('preview', 'V4 · easing'));
 
   return h;
 }

@@ -82,7 +82,11 @@
         "border": "#e2e8f0",
         "borderFocus": "#1565c0",
         "borderError": "#dc2626",
-        "borderSuccess": "#16a34a"
+        "borderSuccess": "#16a34a",
+        "bgElevated": "#fafbfc",
+        "bgInput": "#ffffff",
+        "bgDisabled": "rgba(148,163,184,0.1)",
+        "bgOverlay": "rgba(15,23,42,0.5)"
     },
     "colorsDark": {
         "bgPage": "#0f172a",
@@ -96,7 +100,11 @@
         "textTertiary": "#64748b",
         "textLink": "#60a5fa",
         "border": "#334155",
-        "borderFocus": "#60a5fa"
+        "borderFocus": "#60a5fa",
+        "bgModal": "#1e293b",
+        "textInverse": "#0f172a",
+        "borderError": "#f87171",
+        "borderSuccess": "#22c55e"
     },
     "layout": {
         "sidebarW": 260,
@@ -104,7 +112,21 @@
         "headerH": 52,
         "contentMaxW": 1400,
         "modalMaxW": 800,
-        "modalSmMaxW": 480
+        "modalSmMaxW": 480,
+        "pagePadMobile": "16",
+        "pagePadTablet": "24",
+        "pagePadDesktop": "32",
+        "admin": {
+            "gapLg": "18px",
+            "gapMd": "14px",
+            "gapSm": "8px",
+            "panelPadding": "18px",
+            "cardPadding": "18px",
+            "rowPadding": "12px",
+            "panelRadius": "20px",
+            "surfaceRadius": "18px",
+            "nestedRadius": "14px"
+        }
     },
     "effects": {
         "focusRingWidth": 3,
@@ -124,7 +146,19 @@
         "motionFast": 100,
         "motionNormal": 150,
         "motionSlow": 250,
-        "motionSpring": 300
+        "motionSpring": 300,
+        "opacityHover": 0.06,
+        "opacityPressed": 0.1,
+        "opacitySelected": 0.08,
+        "opacityDisabled": 0.4,
+        "opacityMuted": 0.6,
+        "shadowXs": "0 1px 3px rgba(12,45,72,.04)",
+        "shadowLg": "0 18px 40px rgba(15,23,42,.14),0 8px 20px rgba(15,23,42,.09)",
+        "shadowXl": "0 24px 60px rgba(12,45,72,.16),0 12px 28px rgba(12,45,72,.08)",
+        "easingOut": "cubic-bezier(0,0,0.2,1)",
+        "easingInOut": "cubic-bezier(0.4,0,0.2,1)",
+        "easingSpring": "cubic-bezier(0.34,1.56,0.64,1)",
+        "easingSharp": "cubic-bezier(0.2,0,0,1)"
     },
     "shadows": "default",
     "advanced": {
@@ -138,7 +172,8 @@
             "paddingY": "2px",
             "borderWidth": "1px",
             "minWidth": "12px",
-            "letterSpacing": "0.02em"
+            "letterSpacing": "0.02em",
+            "fontWeight": 600
         },
         "tab": {
             "paddingY": "6px",
@@ -146,27 +181,34 @@
             "radius": "8px",
             "fontSize": "12px",
             "gap": "4px",
-            "borderWidth": "2px"
+            "borderWidth": "2px",
+            "fontWeight": 600,
+            "activeIndicator": "#1565c0"
         },
         "table": {
             "borderWidth": "1px",
-            "headerFontWeight": "800px",
-            "headerLetterSpacing": "0.05em"
+            "headerFontWeight": 800,
+            "headerLetterSpacing": "0.05em",
+            "headerBg": "#f1f5f9",
+            "stripeBg": "transparent",
+            "stripeAltBg": "rgba(0,0,0,0.02)"
         },
         "card": {
             "borderWidth": "0px",
             "headerPadding": "8px",
-            "bodyPadding": "8px"
+            "bodyPadding": "8px",
+            "headerBg": "transparent"
         },
         "badge": {
             "letterSpacing": "0.06em",
             "borderWidth": "1px",
             "minWidth": "0px",
-            "fontWeight": "800px"
+            "fontWeight": 800
         },
         "input": {
             "paddingY": "3px",
-            "borderWidth": "1px"
+            "borderWidth": "1px",
+            "bg": "#ffffff"
         },
         "icon": {
             "onlyScale": "1.5px",
@@ -175,120 +217,209 @@
             "onlyInset": "1px"
         },
         "pagination": {
-            "btnSize": "34px"
+            "btnSize": "34px",
+            "radius": "6px",
+            "fontSize": "13px",
+            "gap": "4px"
         },
         "isoNote": {
             "iconSize": "22px",
-            "fontSize": "12px"
+            "fontSize": "12px",
+            "bg": "#fffbeb",
+            "borderColor": "#fcd34d",
+            "borderLeftColor": "#f59e0b",
+            "borderLeftW": "4px",
+            "radius": "6px",
+            "padding": "10px"
+        },
+        "modal": {
+            "radius": "16px",
+            "padding": "24px",
+            "headerPadding": "16px"
+        },
+        "flow": {
+            "nodeBg": "#ffffff",
+            "nodeBorderW": "2px",
+            "nodeBorderColor": "#e2e8f0",
+            "nodeRadius": "8px",
+            "nodePadding": "12px",
+            "connectorColor": "#94a3b8",
+            "connectorWidth": "2px",
+            "arrowSize": "8px"
+        },
+        "isoBox": {
+            "bg": "#ffffff",
+            "borderW": "1px",
+            "radius": "8px",
+            "headerBg": "#f1f5f9",
+            "headerPadding": "10px",
+            "bodyPadding": "14px",
+            "fontSize": "13px"
+        },
+        "kpi": {
+            "borderWidth": "1px",
+            "iconSize": "24px",
+            "trendFontSize": "11px"
+        },
+        "progress": {
+            "height": "8px",
+            "radius": "9999px",
+            "bg": "#e2e8f0"
+        },
+        "tooltip": {
+            "bg": "#0f172a",
+            "color": "#ffffff",
+            "paddingY": "6px",
+            "paddingX": "10px",
+            "radius": "6px",
+            "fontSize": "11px",
+            "maxWidth": "280px"
+        },
+        "dropdown": {
+            "radius": "8px",
+            "itemPadding": "8px",
+            "itemFontSize": "13px",
+            "hoverBg": "#f8fafc"
+        },
+        "nav": {
+            "height": "36px",
+            "fontSize": "13px",
+            "iconSize": "16px",
+            "gap": "10px",
+            "radius": "8px"
+        },
+        "empty": {
+            "iconSize": "48px",
+            "iconOpacity": 0.4,
+            "titleFontSize": "16px",
+            "descFontSize": "13px"
+        },
+        "field": {
+            "gap": "16px",
+            "labelGap": "4px",
+            "groupGap": "24px",
+            "helperFontSize": "11px"
+        },
+        "breadcrumb": {
+            "fontSize": "13px",
+            "gap": "6px",
+            "color": "#94a3b8",
+            "activeColor": "#1e293b"
         }
+    },
+    "v4Surfaces": {
+        "bgElevated": "#fafbfc",
+        "bgInput": "#ffffff",
+        "bgDisabled": "rgba(148,163,184,0.1)",
+        "bgOverlay": "rgba(15,23,42,0.5)"
     },
     "eqms": {
         "lifecycle": {
-            "draft":      "#94a3b8",
-            "open":       "#3b82f6",
+            "draft": "#94a3b8",
+            "open": "#3b82f6",
             "inProgress": "#8b5cf6",
-            "pending":    "#f59e0b",
-            "approved":   "#10b981",
-            "closed":     "#64748b",
-            "voided":     "#dc2626"
+            "pending": "#f59e0b",
+            "approved": "#10b981",
+            "closed": "#64748b",
+            "voided": "#dc2626"
         },
         "heatmap": {
-            "lowBg":       "#dcfce7",
-            "lowText":     "#166534",
-            "mediumBg":    "#fef9c3",
-            "mediumText":  "#854d0e",
-            "highBg":      "#fed7aa",
-            "highText":    "#9a3412",
-            "criticalBg":  "#fecaca",
-            "criticalText":"#991b1b"
+            "lowBg": "#dcfce7",
+            "lowText": "#166534",
+            "mediumBg": "#fef9c3",
+            "mediumText": "#854d0e",
+            "highBg": "#fed7aa",
+            "highText": "#9a3412",
+            "criticalBg": "#fecaca",
+            "criticalText": "#991b1b"
         },
         "stateDark": {
-            "draftBg":     "#334155",
-            "draftText":   "#94a3b8",
-            "openBg":      "#1e3a5f",
-            "openText":    "#60a5fa",
-            "activeBg":    "#2e1065",
-            "activeText":  "#a78bfa",
-            "pendingBg":   "#451a03",
+            "draftBg": "#334155",
+            "draftText": "#94a3b8",
+            "openBg": "#1e3a5f",
+            "openText": "#60a5fa",
+            "activeBg": "#2e1065",
+            "activeText": "#a78bfa",
+            "pendingBg": "#451a03",
             "pendingText": "#fbbf24",
-            "approvedBg":  "#064e3b",
-            "approvedText":"#34d399",
-            "voidedBg":    "#450a0a",
-            "voidedText":  "#f87171"
+            "approvedBg": "#064e3b",
+            "approvedText": "#34d399",
+            "voidedBg": "#450a0a",
+            "voidedText": "#f87171"
         },
         "entity": {
-            "complaint":       "#ef4444",
-            "deviation":       "#f97316",
-            "ncr":             "#dc2626",
-            "mrb":             "#b91c1c",
-            "capa":            "#8b5cf6",
-            "changeControl":   "#3b82f6",
-            "engChange":       "#2563eb",
-            "document":        "#0ea5e9",
-            "training":        "#06b6d4",
-            "competency":      "#0891b2",
-            "assessment":      "#0e7490",
-            "audit":           "#059669",
-            "finding":         "#047857",
-            "supplier":        "#7c3aed",
-            "evaluation":      "#6d28d9",
-            "scar":            "#9333ea",
-            "supplierAudit":   "#a855f7",
-            "qualityAgreement":"#c084fc",
-            "risk":            "#ea580c",
-            "fmea":            "#d97706",
-            "calibration":     "#65a30d",
-            "msa":             "#4d7c0f",
-            "oos":             "#ca8a04",
-            "iqc":             "#16a34a",
-            "inspectionResult":"#15803d",
-            "spc":             "#0d9488",
-            "testResult":      "#0f766e",
-            "lotRelease":      "#0369a1",
-            "validation":      "#4338ca",
-            "fieldAction":     "#be123c",
-            "concession":      "#fb923c",
-            "lessonLearned":   "#facc15",
-            "csat":            "#f59e0b",
-            "aml":             "#16a34a",
-            "samplingPlan":    "#0891b2",
-            "warranty":        "#dc2626",
-            "specialChar":     "#7c3aed",
-            "fai":             "#2563eb",
-            "apqp":            "#059669",
-            "evidence":        "#64748b",
-            "approval":        "#22c55e",
-            "signature":       "#1d4ed8",
-            "auditEvent":      "#475569",
-            "linked":          "#6366f1",
-            "task":            "#f59e0b",
-            "comment":         "#a3a3a3"
+            "complaint": "#ef4444",
+            "deviation": "#f97316",
+            "ncr": "#dc2626",
+            "mrb": "#b91c1c",
+            "capa": "#8b5cf6",
+            "changeControl": "#3b82f6",
+            "engChange": "#2563eb",
+            "document": "#0ea5e9",
+            "training": "#06b6d4",
+            "competency": "#0891b2",
+            "assessment": "#0e7490",
+            "audit": "#059669",
+            "finding": "#047857",
+            "supplier": "#7c3aed",
+            "evaluation": "#6d28d9",
+            "scar": "#9333ea",
+            "supplierAudit": "#a855f7",
+            "qualityAgreement": "#c084fc",
+            "risk": "#ea580c",
+            "fmea": "#d97706",
+            "calibration": "#65a30d",
+            "msa": "#4d7c0f",
+            "oos": "#ca8a04",
+            "iqc": "#16a34a",
+            "inspectionResult": "#15803d",
+            "spc": "#0d9488",
+            "testResult": "#0f766e",
+            "lotRelease": "#0369a1",
+            "validation": "#4338ca",
+            "fieldAction": "#be123c",
+            "concession": "#fb923c",
+            "lessonLearned": "#facc15",
+            "csat": "#f59e0b",
+            "aml": "#16a34a",
+            "samplingPlan": "#0891b2",
+            "warranty": "#dc2626",
+            "specialChar": "#7c3aed",
+            "fai": "#2563eb",
+            "apqp": "#059669",
+            "evidence": "#64748b",
+            "approval": "#22c55e",
+            "signature": "#1d4ed8",
+            "auditEvent": "#475569",
+            "linked": "#6366f1",
+            "task": "#f59e0b",
+            "comment": "#a3a3a3"
         },
         "link": {
-            "causedBy":   "#ef4444",
-            "relatedTo":  "#3b82f6",
-            "requires":   "#f97316",
-            "verifies":   "#22c55e",
-            "trains":     "#06b6d4",
-            "releases":   "#8b5cf6",
-            "sourcedFrom":"#7c3aed",
+            "causedBy": "#ef4444",
+            "relatedTo": "#3b82f6",
+            "requires": "#f97316",
+            "verifies": "#22c55e",
+            "trains": "#06b6d4",
+            "releases": "#8b5cf6",
+            "sourcedFrom": "#7c3aed",
             "supersedes": "#64748b",
-            "contains":   "#0ea5e9",
+            "contains": "#0ea5e9",
             "implements": "#059669",
-            "mitigates":  "#16a34a"
+            "mitigates": "#16a34a"
         },
         "layout": {
-            "navWidth":      "260",
-            "navCollapsed":  "56",
-            "headerHeight":  "56",
+            "navWidth": "260",
+            "navCollapsed": "56",
+            "headerHeight": "56",
             "detailSidebar": "320",
-            "filterHeight":  "52"
+            "filterHeight": "52"
         }
     },
     "_meta": {
         "version": "2.0",
         "description": "Admin-configurable design system.",
-        "updatedAt": "2026-04-07T20:15:42+07:00",
+        "updatedAt": "2026-04-18T00:00:00+07:00",
         "updatedBy": "sanh.vo"
     }
 }
