@@ -1851,13 +1851,14 @@ window._admGraphicsProbeContracts = function(){
   }
   announceGraphics(L('Đang probe tất cả endpoints...', 'Probing all endpoints...'));
   svc.probeContracts().then(function(result){
-    var online = Object.values(result.endpointStatus || {}).filter(function(s){ return s === 'online'; }).length;
-    var total = Object.keys(result.endpointStatus || {}).length;
-    if(typeof showToast === 'function') showToast(online + '/' + total + ' endpoints online', online === total ? 'success' : 'warning');
-    renderAdminAppearance();
+    var statuses = result.endpointStatus || {};
+    var keys = Object.keys(statuses);
+    var online = keys.filter(function(k){ return statuses[k] === 'online'; }).length;
+    if(typeof showToast === 'function') showToast(online + '/' + keys.length + ' endpoints online', online === keys.length ? 'success' : 'warning');
+    _refreshAuthorityPanelOnly();
   }).catch(function(){
     if(typeof showToast === 'function') showToast(L('Probe thất bại.', 'Probe failed.'), 'error');
-    renderAdminAppearance();
+    _refreshAuthorityPanelOnly();
   });
 };
 
@@ -1867,14 +1868,16 @@ window._admGraphicsForceRefresh = function(){
     if(typeof showToast === 'function') showToast(L('Graphics governance service chưa sẵn sàng.', 'Graphics governance service not ready.'), 'warning');
     return;
   }
-  _graphicsRefreshStarted = false;
+  // Do NOT reset _graphicsRefreshStarted — that guard prevents ensureGraphicsRefresh()
+  // from starting another refresh after renderAdminAppearance() is called, which
+  // would create an infinite render loop.
   announceGraphics(L('Đang refresh live governance data...', 'Refreshing live governance data...'));
   svc.refresh(BASE_TEMPLATE_PRESETS).then(function(){
     if(typeof showToast === 'function') showToast(L('Governance data đã được cập nhật.', 'Governance data refreshed.'), 'success');
-    renderAdminAppearance();
+    _refreshAuthorityPanelOnly();
   }).catch(function(){
     if(typeof showToast === 'function') showToast(L('Refresh thất bại.', 'Refresh failed.'), 'error');
-    renderAdminAppearance();
+    _refreshAuthorityPanelOnly();
   });
 };
 
@@ -1974,6 +1977,16 @@ function renderAuthorityStatusPanel(){
     true,
     statusChip(snap.backendAvailable ? 'full' : 'partial', snap.registryAuthority || 'fallback')
   );
+}
+
+function renderAuthorityStatusPanelWrapped(){
+  return '<div id="adm-authority-panel">'+renderAuthorityStatusPanel()+'</div>';
+}
+
+function _refreshAuthorityPanelOnly(){
+  var el = document.getElementById('adm-authority-panel');
+  if(el){ el.innerHTML = renderAuthorityStatusPanel(); }
+  else { renderAdminAppearance(); }
 }
 
 function renderControlledRegistrySummary(){
@@ -2777,7 +2790,7 @@ function renderTemplateCard(tpl){
 
 function renderTemplateGallery(){
   var templates = getTemplates();
-  var h = renderAuthorityStatusPanel();
+  var h = renderAuthorityStatusPanelWrapped();
   h += sect(L('Template governance state machine', 'Template governance state machine'), templateStateMachine(), false, statusChip('admin', 'Standard 36'));
   h += '<div id="adm-graphics-impact-panel" style="margin-bottom:16px">'+renderImpactAnalysisPanel(false)+'</div>';
   h += renderRolloutControls(_selectedTemplate ? getTemplateById(_selectedTemplate) : null);
@@ -3938,7 +3951,7 @@ function renderGovernance(){
     L('Khu vực này tổng hợp authority status, impact analysis, compliance matrix, drift detector, audit history và waiver workflow theo Standard 36.', 'This area centralizes authority status, impact analysis, compliance matrix, drift detector, audit history, and waiver workflow under Standard 36.'),
     statusChip('admin', 'Standard 36') + statusChip('full', L('Governed behaviors', 'Governed behaviors'))
   );
-  h += renderAuthorityStatusPanel();
+  h += renderAuthorityStatusPanelWrapped();
 	  h += '<div id="adm-graphics-impact-panel" style="margin-bottom:16px">'+renderImpactAnalysisPanel(false)+'</div>';
 	  h += renderChangeSetPanel();
 	  h += renderLineageGraphPanel();
