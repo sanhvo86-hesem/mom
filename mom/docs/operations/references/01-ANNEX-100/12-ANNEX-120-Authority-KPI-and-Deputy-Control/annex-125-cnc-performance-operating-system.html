@@ -99,17 +99,17 @@
 <thead><tr><th>KPI</th><th>Mục đích điều hành</th><th>Cadence</th><th>Nguồn bằng chứng</th></tr></thead>
 <tbody>
 <tr><td>OTD</td><td>Giữ lời hứa giao hàng.</td><td>Tháng/tuần khi đỏ</td><td>Shipment/job promise date</td></tr>
+<tr><td>Complaint rate</td><td>Đo escape tới khách hàng; không đổi tốc độ lấy lỗi khách hàng.</td><td>Tháng/theo sự kiện</td><td>Complaint/NCR/CAPA link</td></tr>
+<tr><td>Gross margin by job family</td><td>Biết job/customer nào thật sự sinh lời, không chạy doanh thu bằng mọi giá.</td><td>Tháng/quý</td><td>Costing, invoice, job cost</td></tr>
 <tr><td>FPY</td><td>Đo đúng ngay từ đầu, giảm rework/scrap.</td><td>Tháng</td><td>Inspection/job completion</td></tr>
 <tr><td>OEE bottleneck</td><td>Đo hiệu suất tại ràng buộc thật, không bình quân che mất nút thắt.</td><td>Tuần</td><td>Machine/OEE logs</td></tr>
 <tr><td>WIP aging</td><td>Nhìn job tồn lâu và rủi ro vỡ giao.</td><td>Ngày/tuần</td><td>WIP snapshot</td></tr>
 <tr><td>Setup first-pass</td><td>Đo setup ready-to-run đúng ngay lần đầu.</td><td>Tuần/tháng</td><td>Setup record</td></tr>
 <tr><td>FAI first-pass</td><td>Đo first-piece/FAI qua ngay lần đầu.</td><td>Tuần/tháng</td><td>FAI/IPQC record</td></tr>
-<tr><td>In-process reject</td><td>Chặn lỗi trong công đoạn trước khi final.</td><td>Tuần/tháng</td><td>IPQC/NCR</td></tr>
 <tr><td>COPQ</td><td>Lượng hóa chi phí chất lượng kém.</td><td>Tháng</td><td>NCR, scrap, rework, concession</td></tr>
 <tr><td>Repeat NCR</td><td>Đo lỗi lặp lại, không chỉ tốc độ đóng NCR.</td><td>Tháng</td><td>NCR/CAPA</td></tr>
 <tr><td>CAPA effectiveness</td><td>Chứng minh hành động khắc phục có hiệu lực.</td><td>Tháng/quý</td><td>CAPA verification</td></tr>
-<tr><td>Supplier OTD</td><td>Rủi ro vật tư/outsource với kế hoạch.</td><td>Tháng</td><td>PO receipt/supplier scorecard</td></tr>
-<tr><td>Supplier quality</td><td>Rủi ro incoming và special process.</td><td>Tháng</td><td>Incoming/NCR supplier</td></tr>
+<tr><td>Supplier readiness</td><td>Gộp supplier OTD, incoming quality, SCAR aging và readiness để bảo vệ kế hoạch.</td><td>Tuần/tháng</td><td>PO receipt, incoming, SCAR, ASL</td></tr>
 <tr><td>Critical role certification</td><td>Đảm bảo vai trò setup, QC, CMM, planner, operator không là ràng buộc ẩn.</td><td>Tháng</td><td>Training/certification</td></tr>
 <tr><td>Safety incident</td><td>Không đổi sản lượng lấy rủi ro an toàn.</td><td>Tháng/ngay khi phát sinh</td><td>EHS incident log</td></tr>
 <tr><td>Throughput per constraint hour</td><td>Đo tiền/giá trị tạo ra trên giờ ràng buộc.</td><td>Tuần/tháng</td><td>Job revenue + constraint hours</td></tr>

@@ -32,7 +32,9 @@ Với công ty gia công cơ khí CNC, hệ KPI tốt nhất không phải là m
 
 ## Nhận Định Cho CNC
 
-KPI cấp lãnh đạo nên ít và có quyền quyết định rõ: OTD, FPY, OEE bottleneck, WIP aging, setup first-pass, FAI first-pass, in-process reject, COPQ, repeat NCR, CAPA effectiveness, supplier OTD/quality, critical-role certification, safety incident và throughput per constraint hour.
+KPI cấp lãnh đạo nên ít và có quyền quyết định rõ. Bộ tối ưu cho gia công CNC là 15 KPI: OTD, complaint rate, gross margin by job family, throughput per constraint hour, COPQ, FPY, OEE bottleneck, WIP aging, setup first-pass, FAI first-pass, repeat NCR, CAPA effectiveness, supplier readiness, critical-role certification coverage và recordable incident rate.
+
+Điểm chỉnh so với bộ trước là hạ `IN_PROCESS_REJECT_RATE` xuống Lean Daily / FPY drilldown, gộp `SUPPLIER_OTD` và `SUPPLIER_QUAL` thành `SUPPLIER_READINESS`, đồng thời đưa `GROSS_MARGIN_JOB_FAMILY` và `COMPLAINT_RATE` lên scorecard lãnh đạo. Cách này giảm thiên lệch vào chất lượng nội bộ và bổ sung trục tài chính/khách hàng đúng BSC.
 
 KPI cấp vận hành có thể nhiều hơn, nhưng phải chia lớp:
 
@@ -98,6 +100,30 @@ API KPI không được trả số giả cho metric chưa đủ data contract. E
 - `staged_data_contract`: đã đề xuất nhưng cần nguồn dữ liệu, formula, owner và test trước khi runtime.
 
 Endpoint catalog phải trả thêm `performance_governance_policy` và `performance_governance_audit` để frontend, dashboard và reviewer biết một metric có được gọi là KPI hay chưa.
+
+Từ 2026-04-18, catalog cũng phải trả per-metric operating contract:
+
+- `metric_type`
+- `usage_types`
+- `is_official_kpi`
+- `result_type`
+- `strategic_intent`
+- `motive`
+- `expected_result`
+- `decision_purpose`
+- `evaluation_use`
+- `evaluation_scope`
+- `accountable_owner`
+- `review_cadence`
+- `review_forum`
+- `rating_method`
+- `counter_metric`
+- `consequence`
+- `data_contract`
+- `anti_gaming_guardrail`
+- `controllability_scope`
+
+Nguyên tắc vận hành: metric nào không có ý đồ, động cơ hành vi, kết quả kỳ vọng, owner, evidence và consequence thì chưa được gọi KPI. Metric có thể rất quan trọng nhưng vẫn phải gọi đúng tên là operating metric, gate control metric, role performance measure hoặc health indicator.
 
 ## Đề Xuất Thực Thi
 

@@ -160,6 +160,19 @@ td,th{vertical-align:top}
 <li>Kỷ luật chỉ áp dụng cho hành vi kiểm soát được và có bằng chứng: giả dữ liệu, bỏ qua cổng bắt buộc, hành vi mất an toàn, tái phạm sau coaching hoặc cố ý không theo procedure đã ban hành.</li>
 <li>Không kỷ luật người vận hành vì kết quả ngoài phạm vi kiểm soát như thiếu vật tư, thay đổi khách hàng, lỗi máy, lỗi engineering, thiếu fixture/gage/CMM hoặc quyết định nguồn lực từ quản lý.</li>
 </ul>
+
+<h3>7.3 Metric operating contract</h3>
+<p>Mỗi metric trong <span class="code">GET /api/kpi/catalog</span> phải trả lời đủ 6 câu: đo để quyết định gì, muốn kéo hành vi nào, kết quả kỳ vọng là gì, ai sở hữu, bằng chứng ở đâu, lệch thì consequence nào. Nếu thiếu các câu này thì metric chỉ được xem là staged hoặc health indicator, chưa đủ điều kiện dùng làm KPI chính thức.</p>
+<div class="table-card"><table class="table">
+<thead><tr><th>Nhóm field</th><th>Field bắt buộc</th><th>Ý nghĩa kiểm soát</th></tr></thead>
+<tbody>
+<tr><td>Semantics</td><td><span class="code">metric_type</span>, <span class="code">usage_types</span>, <span class="code">result_type</span>, <span class="code">is_official_kpi</span></td><td>Phân biệt KPI chính thức, operating metric, gate metric, role measure và health indicator.</td></tr>
+<tr><td>Intent</td><td><span class="code">strategic_intent</span>, <span class="code">motive</span>, <span class="code">expected_result</span>, <span class="code">decision_purpose</span></td><td>Khóa ý đồ quản trị, động cơ hành vi mong muốn và quyết định phải phát sinh.</td></tr>
+<tr><td>Evaluation</td><td><span class="code">evaluation_use</span>, <span class="code">evaluation_scope</span>, <span class="code">rating_method</span>, <span class="code">review_forum</span></td><td>Chỉ metric có evaluation use được duyệt mới được gọi KPI.</td></tr>
+<tr><td>Evidence</td><td><span class="code">data_contract</span>, <span class="code">calculation_status</span>, <span class="code">data_confidence_level</span>, <span class="code">evidence_record</span></td><td>Cho biết backend tính được chưa, nguồn nào là bằng chứng và số có đáng tin đến mức nào.</td></tr>
+<tr><td>Consequence</td><td><span class="code">consequence</span>, <span class="code">counter_metric</span>, <span class="code">anti_gaming_guardrail</span>, <span class="code">controllability_scope</span></td><td>Chống dùng số thô để thưởng/phạt sai người và chống gaming.</td></tr>
+</tbody>
+</table></div>
 </div>
 
 <div class="section">
@@ -192,7 +205,7 @@ td,th{vertical-align:top}
 <div class="table-card"><table class="table">
 <thead><tr><th>API</th><th>Vai trò</th><th>Quy tắc</th></tr></thead>
 <tbody>
-<tr><td><span class="code">GET /api/kpi/catalog</span></td><td>Trả registry, alias, nhóm tài liệu, backend coverage và performance-governance policy.</td><td>Dùng trước khi thêm dashboard/widget mới hoặc gọi một chỉ số là KPI.</td></tr>
+<tr><td><span class="code">GET /api/kpi/catalog</span></td><td>Trả registry, alias, nhóm tài liệu, backend coverage, performance-governance policy và per-metric operating contract.</td><td>Dùng trước khi thêm dashboard/widget mới hoặc gọi một chỉ số là KPI; bắt buộc kiểm tra <span class="code">metric_type</span>, <span class="code">evaluation_use</span>, <span class="code">is_official_kpi</span> và <span class="code">calculation_status</span>.</td></tr>
 <tr><td><span class="code">GET /api/kpi/{metricCode}</span></td><td>Tính KPI runtime.</td><td>Chỉ trả số cho metric thuộc <span class="code">runtime_calculated_metrics</span>.</td></tr>
 <tr><td><span class="code">GET /api/kpi/{metricCode}/trend</span></td><td>Xu hướng KPI runtime.</td><td>Known non-runtime metric phải trả trạng thái thiếu data contract, không trả số giả.</td></tr>
 </tbody>
