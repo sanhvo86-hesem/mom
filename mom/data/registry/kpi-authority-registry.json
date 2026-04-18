@@ -45,7 +45,22 @@
     "SETUP": "SETUP_RATIO",
     "SETUP_TIME_RATIO": "SETUP_RATIO",
     "PUT_THROUGH": "PUT_THRU",
-    "THROUGHPUT_INDEX": "PUT_THRU"
+    "THROUGHPUT_INDEX": "PUT_THRU",
+    "CYCLE-VAR": "CYCLE_TIME_VARIANCE",
+    "CYCLE_VAR": "CYCLE_TIME_VARIANCE",
+    "PROMISE_RISK": "PROMISE_DATE_RISK",
+    "PROMISE_DATE": "PROMISE_DATE_RISK",
+    "QC_HOLD": "QC_HOLD_SLA",
+    "SHIP_PACKET": "SHIP_PACKET_COMPLETENESS",
+    "SHIP_PACKET_COMPLETE": "SHIP_PACKET_COMPLETENESS",
+    "DOWNTIME": "DOWNTIME_IMPACT",
+    "REPEAT_NCR": "REPEAT_NCR_RATE",
+    "IN_PROCESS_REJECT": "IN_PROCESS_REJECT_RATE",
+    "SETUP_FIRST_PASS_SUCCESS": "SETUP_FIRST_PASS",
+    "FAI_FIRST_PASS_RATE": "FAI_FIRST_PASS",
+    "INV_ACCURACY": "INVENTORY_ACCURACY",
+    "TIME_ENTRY": "TIME_ENTRY_COMPLIANCE",
+    "CHANGEOVER_TIME": "CHANGEOVER_TIME"
   },
   "executive_scorecard": [
     "OTD",
@@ -114,5 +129,79 @@
     {"canonical_code": "CYCLE_TIME_VARIANCE", "name": "Actual cycle time variance vs standard", "layer": "lean_daily", "status": "staged_data_contract"},
     {"canonical_code": "MTBF", "name": "Mean time between failures", "layer": "lean_daily", "status": "staged_data_contract"},
     {"canonical_code": "MTTR", "name": "Mean time to repair", "layer": "lean_daily", "status": "staged_data_contract"}
-  ]
+  ],
+  "dashboard_core_kpis": [
+    {"local_id": "KPI-01", "canonical_code": "OTD", "name": "OTD Release", "backend_status": "runtime_calculated", "primary_endpoint": "GET /api/kpi/OTD"},
+    {"local_id": "KPI-02", "canonical_code": "PROMISE_DATE_RISK", "name": "Promise-Date Risk", "backend_status": "staged_data_contract", "primary_endpoint": "GET /api/kpi/catalog"},
+    {"local_id": "KPI-03", "canonical_code": "WIP_AGING", "name": "WIP Aging", "backend_status": "widget_only", "primary_endpoint": "GET /api/dashboard/widget?widget_type=wip_aging"},
+    {"local_id": "KPI-04", "canonical_code": "PLAN_ADHERENCE", "name": "Dispatch/Plan Adherence", "backend_status": "staged_data_contract", "primary_endpoint": "GET /api/kpi/catalog"},
+    {"local_id": "KPI-05", "canonical_code": "FPY", "name": "First Pass Yield", "backend_status": "runtime_calculated", "primary_endpoint": "GET /api/kpi/FPY"},
+    {"local_id": "KPI-06", "canonical_code": "QC_HOLD_SLA", "name": "QC Hold SLA", "backend_status": "staged_data_contract", "primary_endpoint": "GET /api/kpi/catalog"},
+    {"local_id": "KPI-07", "canonical_code": "REPEAT_NCR_RATE", "name": "Repeat NCR Rate", "backend_status": "staged_data_contract", "primary_endpoint": "GET /api/kpi/catalog"},
+    {"local_id": "KPI-08", "canonical_code": "DOWNTIME_IMPACT", "name": "Downtime Impact", "backend_status": "staged_data_contract", "primary_endpoint": "GET /api/kpi/catalog"},
+    {"local_id": "KPI-09", "canonical_code": "SHIP_PACKET_COMPLETENESS", "name": "Ship Packet Completeness", "backend_status": "staged_data_contract", "primary_endpoint": "GET /api/kpi/catalog"},
+    {"local_id": "KPI-10", "canonical_code": "SUPPLIER_OTD", "name": "PO/Processor On-Time", "backend_status": "runtime_calculated_partial", "primary_endpoint": "GET /api/kpi/SUPPLIER_OTD"},
+    {"local_id": "KPI-11", "canonical_code": "INVENTORY_ACCURACY", "name": "Inventory Accuracy", "backend_status": "staged_data_contract", "primary_endpoint": "GET /api/kpi/catalog"},
+    {"local_id": "KPI-12", "canonical_code": "TIME_ENTRY_COMPLIANCE", "name": "Time Entry Compliance", "backend_status": "staged_data_contract", "primary_endpoint": "GET /api/kpi/catalog"}
+  ],
+  "gate_control_metrics": [
+    {"local_id": "KPI-G0-01", "canonical_code": "RFQ_TURNAROUND_TIME", "name": "RFQ Turnaround Time", "classification": "gate_metric_not_annex122_count"},
+    {"local_id": "KPI-G0-02", "canonical_code": "ORDER_REVIEW_RFT", "name": "Contract Review FTR", "classification": "gate_metric_not_annex122_count"},
+    {"local_id": "KPI-G1-01", "canonical_code": "ENGINEERING_RELEASE_RFT", "name": "Engineering First-Time-Right", "classification": "gate_metric_not_annex122_count"},
+    {"local_id": "KPI-G1-02", "canonical_code": "ECN_LEAD_TIME", "name": "ECN Lead Time", "classification": "gate_metric_not_annex122_count"},
+    {"local_id": "KPI-G2-01", "canonical_code": "IQC_PASS_RATE", "name": "IQC Pass Rate", "classification": "gate_metric_not_annex122_count"},
+    {"local_id": "KPI-G2-02", "canonical_code": "TRACEABILITY_COMPLETENESS", "name": "Traceability Completeness", "classification": "gate_metric_not_annex122_count"},
+    {"local_id": "KPI-G3-01", "canonical_code": "SETUP_FIRST_PASS", "name": "Setup First-Pass Success", "classification": "gate_metric_not_annex122_count"},
+    {"local_id": "KPI-G3-02", "canonical_code": "CHANGEOVER_TIME", "name": "Changeover Time", "classification": "gate_metric_not_annex122_count"},
+    {"local_id": "KPI-G4-01", "canonical_code": "FAI_FIRST_PASS", "name": "FAI First-Pass Rate", "classification": "gate_metric_not_annex122_count"},
+    {"local_id": "KPI-G4-02", "canonical_code": "FAI_CYCLE_TIME", "name": "FAI Cycle Time", "classification": "gate_metric_not_annex122_count"},
+    {"local_id": "KPI-G5-01", "canonical_code": "IN_PROCESS_REJECT_RATE", "name": "In-Process Rejection Rate", "classification": "gate_metric_not_annex122_count"},
+    {"local_id": "KPI-G5-02", "canonical_code": "SPC_SIGNAL_REACTION_TIME", "name": "SPC Signal Reaction Time", "classification": "gate_metric_not_annex122_count"},
+    {"local_id": "KPI-G6-01", "canonical_code": "SHIP_PACKET_COMPLETENESS", "name": "Release Package Completeness", "classification": "gate_metric_not_annex122_count"},
+    {"local_id": "KPI-G6-02", "canonical_code": "TRACEABILITY_DRILL_TIME", "name": "Traceability Drill Time", "classification": "gate_metric_not_annex122_count"},
+    {"local_id": "KPI-G7-01", "canonical_code": "OTD", "name": "On-Time Delivery", "classification": "gate_metric_not_annex122_count"},
+    {"local_id": "KPI-G7-02", "canonical_code": "SHIP_READY_TO_INVOICE_LT", "name": "Ship-to-Invoice Turnaround", "classification": "gate_metric_not_annex122_count"},
+    {"local_id": "KPI-ALL-01", "canonical_code": "COPQ", "name": "Cost of Poor Quality", "classification": "gate_metric_not_annex122_count"},
+    {"local_id": "KPI-ALL-02", "canonical_code": "FPY", "name": "First Pass Yield", "classification": "gate_metric_not_annex122_count"},
+    {"local_id": "KPI-ALL-03", "canonical_code": "OEE", "name": "Overall Equipment Effectiveness", "classification": "gate_metric_not_annex122_count"}
+  ],
+  "document_audit": {
+    "audit_report": "_reports/kpi/report-kpi-html-audit-2026-04-18.json",
+    "html_file_count": 413,
+    "files_with_kpi": 335,
+    "kpi_occurrences": 1909,
+    "likely_operational_kpi_ids": 59,
+    "kpi_row_candidates": 1521,
+    "interpretation": "The estate has broad KPI language, but only ANNEX-122 governance KPIs, ANNEX-110 dashboard KPIs, gate metrics, runtime metrics, and explicitly approved operational metrics are controlled KPI authority."
+  },
+  "role_measure_policy": {
+    "preferred_label": "Role Performance Measures",
+    "rule": "JD measures support performance review and OJT but are not official enterprise KPIs unless mapped to this registry.",
+    "recommended_per_role": "3-5 controlled measures",
+    "required_columns_when_revised": ["measure_name", "mapped_canonical_kpi", "evidence_source", "cadence", "owner"]
+  },
+  "data_contract_required_fields": [
+    "canonical_code",
+    "decision_purpose",
+    "formula_numerator",
+    "formula_denominator",
+    "unit",
+    "higher_or_lower_is_better",
+    "period_grain",
+    "source_system",
+    "source_table_or_record",
+    "drilldown_key",
+    "data_owner",
+    "process_owner",
+    "review_cadence",
+    "rag_thresholds",
+    "evidence_record",
+    "exception_rule"
+  ],
+  "backend_api_policy": {
+    "catalog_endpoint": "GET /api/kpi/catalog",
+    "calculation_endpoint": "GET /api/kpi/{metricCode}",
+    "trend_endpoint": "GET /api/kpi/{metricCode}/trend",
+    "rule": "Calculation endpoints are allowed only for runtime_calculated_metrics after alias normalization. Known non-runtime metrics must return catalog coverage and data-contract status, not a fake value."
+  }
 }

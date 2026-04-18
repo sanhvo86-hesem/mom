@@ -126,6 +126,7 @@ return static function (Router $router, string $dataDir): void {
         'dashboard_supplier'   => [DashboardController::class, 'supplier'],
         'dashboard_department' => [DashboardController::class, 'department'],
         'dashboard_widget'     => [DashboardController::class, 'widget'],
+        'kpi_catalog'          => [DashboardController::class, 'kpiCatalog'],
         'kpi_get'              => [DashboardController::class, 'kpiGet'],
         'kpi_trend'            => [DashboardController::class, 'kpiTrend'],
         'kpi_alerts'           => [DashboardController::class, 'kpiAlerts'],

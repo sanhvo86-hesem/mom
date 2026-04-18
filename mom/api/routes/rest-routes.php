@@ -150,6 +150,7 @@ return static function (Router $router, string $dataDir): void {
     
     // KPI
     $router->get('/api/kpi/alerts', DashboardController::class, 'kpiAlerts');
+    $router->get('/api/kpi/catalog', DashboardController::class, 'kpiCatalog');
     $router->get('/api/kpi/{metricCode}', DashboardController::class, 'kpiGet');
     $router->get('/api/kpi/{metricCode}/trend', DashboardController::class, 'kpiTrend');
     

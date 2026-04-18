@@ -108,7 +108,24 @@ td,th{vertical-align:top}
 </div>
 
 <div class="section">
-<h2>6. Quy tắc dashboard</h2>
+<h2>6. Audit tổng thể tài liệu HTML</h2>
+<p>Audit ngày 2026-04-18 quét toàn bộ <span class="code">mom/docs</span> bằng script <span class="code">tools/scripts/kpi/audit-html-kpis.php</span>. Report chi tiết nằm tại <span class="code">_reports/kpi/report-kpi-html-audit-2026-04-18.json</span>.</p>
+<div class="table-card"><table class="table">
+<thead><tr><th>Chỉ số audit</th><th>Kết quả</th><th>Nhận định kiểm soát</th></tr></thead>
+<tbody>
+<tr><td>HTML được quét</td><td>413 file</td><td>Đã bao phủ app-served QMS content.</td></tr>
+<tr><td>File có nhắc KPI/metric</td><td>335 file</td><td>KPI language rất rộng, không thể xem mọi nhắc tới KPI là KPI authority.</td></tr>
+<tr><td>Số lần xuất hiện từ KPI</td><td>1,909</td><td>Nhiều nội dung là đào tạo, JD, SOP/WI và hướng dẫn gate.</td></tr>
+<tr><td>Ứng viên row KPI/metric</td><td>1,521 row</td><td>Cần phân loại lại thành governance KPI, gate metric, operational metric, role measure.</td></tr>
+<tr><td>Likely operational KPI IDs</td><td>59 mã</td><td>Nhiều mã là local document ID, không phải canonical code.</td></tr>
+<tr><td>Runtime KPI backend hiện có</td><td>19 metric</td><td>Chỉ 19 metric được KpiEngine tính trực tiếp.</td></tr>
+</tbody>
+</table></div>
+<div class="callout"><b>Kết luận audit:</b> số lượng KPI trong tài liệu không thiếu; vấn đề chính là thiếu phân tầng authority và backend coverage rõ ràng. Từ thời điểm áp dụng annex này, tài liệu hiện trường/JD/training không được tự tạo KPI chính thức nếu chưa map registry.</div>
+</div>
+
+<div class="section">
+<h2>7. Quy tắc dashboard</h2>
 <ul class="tight">
 <li>Dashboard lãnh đạo không vượt 15 KPI nếu CEO chưa phê duyệt mở rộng.</li>
 <li>Dashboard quản lý có thể dùng toàn bộ ANNEX-122 và KPI staged đã có data contract.</li>
@@ -119,17 +136,31 @@ td,th{vertical-align:top}
 </div>
 
 <div class="section">
-<h2>7. Benchmark anchors</h2>
+<h2>8. Benchmark anchors chính thức</h2>
 <ul class="tight small">
-<li>Dassault DELMIA Apriso công bố nhiều lớp analytics với 200+ production measures/KPIs, 70+ machine indicators và 100+ quality measures/KPIs: <a href="https://www.3ds.com/products/delmia/apriso/analytics-reporting">DELMIA Apriso Analytics &amp; Reporting</a>.</li>
-<li>Siemens Opcenter Intelligence nhấn mạnh dữ liệu MOM/IoT được contextualize để tạo KPI dashboard và scorecard: <a href="https://www.siemens.com/en-us/products/opcenter/manufacturing-intelligence/">Siemens Opcenter Intelligence</a>.</li>
-<li>AVEVA MES nhấn mạnh OEE, schedule adherence, SPC quality KPIs và traceability: <a href="https://www.aveva.com/en/solutions/operations/what-is-a-mes/">AVEVA - What is MES</a>.</li>
-<li>Tulip nêu các KPI phổ biến như OEE, cycle time, FPY, defect rate, throughput và OTD, đồng thời khuyến nghị dashboard không quá tải: <a href="https://tulip.co/blog/manufacturing-kpis-key-production-metrics-you-should-know/">Tulip - Manufacturing KPIs</a>.</li>
+<li>ISA-95 tách Level 3 MOM/MES khỏi Level 4 ERP; KPI dashboard phải là read model, không thay execution truth: <a href="https://www.isa.org/standards-and-publications/isa-standards/isa-95-standard">ISA-95 Standard</a>.</li>
+<li>NIST Baldrige xem performance measurement là hệ tích hợp để planning, review và cải tiến, không chỉ là báo cáo số: <a href="https://www.nist.gov/baldrige/baldrige-criteria-commentary">Baldrige Criteria Commentary</a>.</li>
+<li>MTConnect cung cấp semantic model cho dữ liệu máy; dùng để cấp tín hiệu machine/OEE nhưng phải contextualize theo job/operation/gate: <a href="https://www.mtconnect.org/standard-download20181">MTConnect Standard</a>.</li>
+<li>SAP production quality KPI tách Availability, Performance, Quality và OEE; SAP planning KPI nhìn resource idle, load, setup, capacity và utilization: <a href="https://help.sap.com/docs/SAP_PROFITABILITY_PERFORMANCE_MANAGEMENT/7fa13890d47b4c69bbb62175e84e4aa8/894ac627ba26422eb92a9cd17db846e8.html">SAP Production Quality KPIs</a> / <a href="https://help.sap.com/docs/SAP_S4HANA_ON-PREMISE/f899ce30af9044299d573ea30b533f1c/55a4997f55b0455aa8239f6b50175097.html">SAP Monitor Production Plan Performance</a>.</li>
+<li>Siemens Opcenter OEE nhấn mạnh time model, reason tree, machine state, downtime và corrective action; đây là hướng cần cho CNC bottleneck/OEE layer: <a href="https://www.siemens.com/en-us/products/opcenter/execution/foundation-oee/">Siemens Opcenter Execution Foundation OEE</a>.</li>
 </ul>
 </div>
 
 <div class="section">
-<h2>8. Tài liệu liên kết</h2>
+<h2>9. API/backend coverage rule</h2>
+<div class="table-card"><table class="table">
+<thead><tr><th>API</th><th>Vai trò</th><th>Quy tắc</th></tr></thead>
+<tbody>
+<tr><td><span class="code">GET /api/kpi/catalog</span></td><td>Trả registry, alias, nhóm tài liệu và backend coverage.</td><td>Dùng trước khi thêm dashboard/widget mới.</td></tr>
+<tr><td><span class="code">GET /api/kpi/{metricCode}</span></td><td>Tính KPI runtime.</td><td>Chỉ trả số cho metric thuộc <span class="code">runtime_calculated_metrics</span>.</td></tr>
+<tr><td><span class="code">GET /api/kpi/{metricCode}/trend</span></td><td>Xu hướng KPI runtime.</td><td>Known non-runtime metric phải trả trạng thái thiếu data contract, không trả số giả.</td></tr>
+</tbody>
+</table></div>
+<div class="callout danger"><b>Không được làm:</b> thêm metric vào dashboard bằng cách để KpiEngine tự sinh definition. Metric mới phải qua data contract, migration/seed nếu cần, test và review QMS/Analytics.</div>
+</div>
+
+<div class="section">
+<h2>10. Tài liệu liên kết</h2>
 <div class="table-card"><table class="table">
 <thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead>
 <tbody>

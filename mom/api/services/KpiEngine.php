@@ -333,6 +333,147 @@ final class KpiEngine
     }
 
     /**
+     * Return the governed KPI catalog with backend calculation coverage.
+     *
+     * @return array<string, mixed>
+     */
+    public function getMetricCatalog(): array
+    {
+        $registry = $this->loadKpiAuthorityRegistry();
+        $aliases = $this->registryAliases($registry);
+        $catalog = [];
+
+        foreach (self::ALL_METRICS as $code) {
+            $this->upsertCatalogMetric($catalog, $code, 'runtime_calculated_metrics', [
+                'backend_status' => 'runtime_calculated',
+                'runtime_calculated' => true,
+            ], $aliases);
+        }
+
+        foreach ($this->registryRows($registry, 'annex122_governance_kpis') as $row) {
+            $code = $this->codeField($row, 'canonical_code');
+            if ($code === '') {
+                continue;
+            }
+            $this->upsertCatalogMetric($catalog, $code, 'annex122_governance_kpis', [
+                'name' => $this->stringField($row, 'name'),
+                'tier' => $this->stringField($row, 'tier'),
+                'registry_status' => $this->stringField($row, 'status'),
+                'annex122_no' => $row['no'] ?? null,
+            ], $aliases);
+        }
+
+        foreach ($this->registryRows($registry, 'proposed_operating_metrics') as $row) {
+            $code = $this->codeField($row, 'canonical_code');
+            if ($code === '') {
+                continue;
+            }
+            $this->upsertCatalogMetric($catalog, $code, 'proposed_operating_metrics', [
+                'name' => $this->stringField($row, 'name'),
+                'layer' => $this->stringField($row, 'layer'),
+                'registry_status' => $this->stringField($row, 'status'),
+            ], $aliases);
+        }
+
+        foreach ($this->registryStringList($registry, 'executive_scorecard') as $code) {
+            $this->upsertCatalogMetric($catalog, $code, 'executive_scorecard', [], $aliases);
+        }
+
+        foreach ($this->registryRows($registry, 'dashboard_core_kpis') as $row) {
+            $code = $this->codeField($row, 'canonical_code');
+            if ($code === '') {
+                continue;
+            }
+            $this->upsertCatalogMetric($catalog, $code, 'dashboard_core_kpis', [
+                'name' => $this->stringField($row, 'name'),
+                'local_id' => $this->stringField($row, 'local_id'),
+                'declared_backend_status' => $this->stringField($row, 'backend_status'),
+                'primary_endpoint' => $this->stringField($row, 'primary_endpoint'),
+            ], $aliases);
+        }
+
+        foreach ($this->registryRows($registry, 'gate_control_metrics') as $row) {
+            $code = $this->codeField($row, 'canonical_code');
+            if ($code === '') {
+                continue;
+            }
+            $this->upsertCatalogMetric($catalog, $code, 'gate_control_metrics', [
+                'name' => $this->stringField($row, 'name'),
+                'local_id' => $this->stringField($row, 'local_id'),
+                'classification' => $this->stringField($row, 'classification'),
+            ], $aliases);
+        }
+
+        ksort($catalog);
+
+        return [
+            'registry_id' => is_string($registry['registry_id'] ?? null) ? $registry['registry_id'] : null,
+            'registry_version' => is_string($registry['version'] ?? null) ? $registry['version'] : null,
+            'authority_rule' => is_string($registry['authority_rule'] ?? null) ? $registry['authority_rule'] : null,
+            'counts' => [
+                'runtime_calculated_metrics' => count(self::ALL_METRICS),
+                'known_metric_codes' => count($catalog),
+                'legacy_aliases' => count($aliases),
+                'annex122_governance_kpis' => count($this->registryRows($registry, 'annex122_governance_kpis')),
+                'dashboard_core_kpis' => count($this->registryRows($registry, 'dashboard_core_kpis')),
+                'gate_control_metrics' => count($this->registryRows($registry, 'gate_control_metrics')),
+                'proposed_operating_metrics' => count($this->registryRows($registry, 'proposed_operating_metrics')),
+            ],
+            'runtime_calculated_metrics' => self::ALL_METRICS,
+            'legacy_aliases' => $aliases,
+            'data_contract_required_fields' => $this->registryStringList($registry, 'data_contract_required_fields', false),
+            'role_measure_policy' => is_array($registry['role_measure_policy'] ?? null) ? $registry['role_measure_policy'] : [],
+            'document_audit' => is_array($registry['document_audit'] ?? null) ? $registry['document_audit'] : [],
+            'metrics' => array_values($catalog),
+        ];
+    }
+
+    /**
+     * Describe whether a metric is known and whether KpiEngine can calculate it now.
+     *
+     * @return array<string, mixed>
+     */
+    public function describeMetricSupport(string $metricCode): array
+    {
+        $requestedCode = strtoupper(trim($metricCode));
+        $canonicalCode = $this->normalizeMetricCode($requestedCode);
+        $catalog = $this->getMetricCatalog();
+        $metric = null;
+
+        foreach (($catalog['metrics'] ?? []) as $row) {
+            if (is_array($row) && ($row['canonical_code'] ?? null) === $canonicalCode) {
+                $metric = $row;
+                break;
+            }
+        }
+
+        $runtimeCalculated = in_array($canonicalCode, self::ALL_METRICS, true);
+        $knownMetric = $metric !== null || $runtimeCalculated;
+
+        return [
+            'requested_code' => $requestedCode,
+            'canonical_code' => $canonicalCode,
+            'alias_normalized' => $requestedCode !== $canonicalCode,
+            'known_metric' => $knownMetric,
+            'runtime_calculated' => $runtimeCalculated,
+            'backend_status' => $runtimeCalculated
+                ? 'runtime_calculated'
+                : ($knownMetric ? 'data_contract_required' : 'unknown_metric'),
+            'metric' => $metric,
+        ];
+    }
+
+    public function isRuntimeCalculatedMetric(string $metricCode): bool
+    {
+        return in_array($this->normalizeMetricCode($metricCode), self::ALL_METRICS, true);
+    }
+
+    public function isKnownMetricCode(string $metricCode): bool
+    {
+        return (bool) ($this->describeMetricSupport($metricCode)['known_metric'] ?? false);
+    }
+
+    /**
      * Get KPI trend data for charting (time-series).
      *
      * @param string    $metricCode  Metric code.
@@ -1282,5 +1423,149 @@ final class KpiEngine
         }
 
         return $this->kpiAuthorityRegistry;
+    }
+
+    /**
+     * @param array<string, mixed> $registry
+     * @return array<string, string>
+     */
+    private function registryAliases(array $registry): array
+    {
+        $aliases = [];
+        $rawAliases = $registry['legacy_aliases'] ?? [];
+        if (!is_array($rawAliases)) {
+            return $aliases;
+        }
+
+        foreach ($rawAliases as $alias => $canonical) {
+            if (!is_string($alias) || !is_string($canonical)) {
+                continue;
+            }
+            $alias = strtoupper(trim($alias));
+            $canonical = strtoupper(trim($canonical));
+            if ($alias !== '' && $canonical !== '') {
+                $aliases[$alias] = $canonical;
+            }
+        }
+
+        ksort($aliases);
+        return $aliases;
+    }
+
+    /**
+     * @param array<string, mixed> $registry
+     * @return array<int, array<string, mixed>>
+     */
+    private function registryRows(array $registry, string $key): array
+    {
+        $rows = $registry[$key] ?? [];
+        if (!is_array($rows)) {
+            return [];
+        }
+
+        return array_values(array_filter($rows, static fn(mixed $row): bool => is_array($row)));
+    }
+
+    /**
+     * @param array<string, mixed> $registry
+     * @return list<string>
+     */
+    private function registryStringList(array $registry, string $key, bool $uppercase = true): array
+    {
+        $values = $registry[$key] ?? [];
+        if (!is_array($values)) {
+            return [];
+        }
+
+        $list = [];
+        foreach ($values as $value) {
+            if (is_string($value) && trim($value) !== '') {
+                $value = trim($value);
+                $list[] = $uppercase ? strtoupper($value) : $value;
+            }
+        }
+
+        return array_values(array_unique($list));
+    }
+
+    /**
+     * @param array<string, mixed>  $catalog
+     * @param array<string, mixed>  $extra
+     * @param array<string, string> $aliases
+     */
+    private function upsertCatalogMetric(array &$catalog, string $metricCode, string $source, array $extra, array $aliases): void
+    {
+        $code = strtoupper(trim($metricCode));
+        if ($code === '') {
+            return;
+        }
+
+        $runtimeCalculated = in_array($code, self::ALL_METRICS, true);
+        $catalog[$code] ??= [
+            'canonical_code' => $code,
+            'name' => str_replace('_', ' ', $code),
+            'sources' => [],
+            'aliases' => [],
+            'local_ids' => [],
+            'runtime_calculated' => $runtimeCalculated,
+            'backend_status' => $runtimeCalculated ? 'runtime_calculated' : 'data_contract_required',
+            'unit' => self::UNITS[$code] ?? null,
+            'target' => self::DEFAULT_TARGETS[$code] ?? null,
+            'lower_is_better' => in_array($code, self::LOWER_IS_BETTER, true),
+        ];
+
+        if (!in_array($source, $catalog[$code]['sources'], true)) {
+            $catalog[$code]['sources'][] = $source;
+            sort($catalog[$code]['sources']);
+        }
+
+        foreach ($aliases as $alias => $canonical) {
+            if ($canonical === $code && !in_array($alias, $catalog[$code]['aliases'], true)) {
+                $catalog[$code]['aliases'][] = $alias;
+                sort($catalog[$code]['aliases']);
+            }
+        }
+
+        foreach ($extra as $key => $value) {
+            if ($value === null || $value === '') {
+                continue;
+            }
+            if ($key === 'backend_status' && $runtimeCalculated) {
+                continue;
+            }
+            if ($key === 'runtime_calculated') {
+                $catalog[$code][$key] = (bool) $value;
+                continue;
+            }
+            if ($key === 'local_id' && is_string($value)) {
+                $localId = trim($value);
+                if ($localId !== '') {
+                    $catalog[$code]['local_id'] ??= $localId;
+                    if (!in_array($localId, $catalog[$code]['local_ids'], true)) {
+                        $catalog[$code]['local_ids'][] = $localId;
+                        sort($catalog[$code]['local_ids']);
+                    }
+                }
+                continue;
+            }
+            $catalog[$code][$key] = $value;
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function stringField(array $row, string $key): string
+    {
+        $value = $row[$key] ?? '';
+        return is_string($value) ? trim($value) : '';
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function codeField(array $row, string $key): string
+    {
+        return strtoupper($this->stringField($row, $key));
     }
 }

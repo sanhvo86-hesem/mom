@@ -141,6 +141,7 @@ final class DashboardController extends BaseController
             'dashboard_supplier'   => $this->supplier(),
             'dashboard_department' => $this->department(),
             'dashboard_widget'     => $this->widget(),
+            'kpi_catalog'          => $this->kpiCatalog(),
             'kpi_get'              => $this->kpiGet(),
             'kpi_trend'            => $this->kpiTrend(),
             'kpi_alerts'           => $this->kpiAlerts(),
@@ -185,6 +186,10 @@ final class DashboardController extends BaseController
 
     private function handleKpiRest(?string $metricCode, ?string $subAction): never
     {
+        if ($metricCode === 'catalog') {
+            $this->kpiCatalog();
+        }
+
         if ($metricCode === 'alerts' || $metricCode === null) {
             $this->kpiAlerts();
         }
@@ -331,6 +336,18 @@ final class DashboardController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAnyRole($user, $this->analyticsReadRoles());
+        $support = $this->kpi->describeMetricSupport($code);
+        if (($support['known_metric'] ?? false) !== true) {
+            $this->error('unknown_kpi_metric', 404, 'Metric code is not present in the governed KPI registry.', [
+                'metric_support' => $support,
+            ]);
+        }
+        if (($support['runtime_calculated'] ?? false) !== true) {
+            $this->error('kpi_metric_not_runtime_calculated', 422, 'Metric exists in the KPI registry but does not yet have an approved runtime calculator/data contract.', [
+                'metric_support' => $support,
+            ]);
+        }
+
         $period = $this->parsePeriod();
         $filters = $this->parseKpiFilters();
 
@@ -362,6 +379,18 @@ final class DashboardController extends BaseController
     {
         $user = $this->requireAuth();
         $this->requireAnyRole($user, $this->analyticsReadRoles());
+        $support = $this->kpi->describeMetricSupport($code);
+        if (($support['known_metric'] ?? false) !== true) {
+            $this->error('unknown_kpi_metric', 404, 'Metric code is not present in the governed KPI registry.', [
+                'metric_support' => $support,
+            ]);
+        }
+        if (($support['runtime_calculated'] ?? false) !== true) {
+            $this->error('kpi_metric_not_runtime_calculated', 422, 'Metric exists in the KPI registry but does not yet have an approved runtime calculator/data contract.', [
+                'metric_support' => $support,
+            ]);
+        }
+
         $period      = $this->parsePeriod();
         $granularity = $this->query('granularity', 'daily');
 
@@ -371,6 +400,17 @@ final class DashboardController extends BaseController
             'granularity' => $granularity,
             'trend'       => $trend,
         ]);
+    }
+
+    /**
+     * GET /api/kpi/catalog
+     * ?action=kpi_catalog
+     */
+    public function kpiCatalog(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->analyticsReadRoles());
+        $this->success(['catalog' => $this->kpi->getMetricCatalog()]);
     }
 
     /**
