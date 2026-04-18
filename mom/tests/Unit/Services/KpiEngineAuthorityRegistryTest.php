@@ -75,6 +75,8 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
         $this->assertContains('canonical_code', $catalog['data_contract_required_fields'] ?? []);
         $this->assertContains('metric_type', $catalog['data_contract_required_fields'] ?? []);
         $this->assertContains('evaluation_use', $catalog['data_contract_required_fields'] ?? []);
+        $this->assertContains('scorecard_weight_pct', $catalog['metric_governance_schema']['required_catalog_fields'] ?? []);
+        $this->assertContains('quantitative_thresholds', $catalog['metric_governance_schema']['required_catalog_fields'] ?? []);
         $this->assertSame(
             'A measurement may be called KPI only when it has an approved evaluation use. If it is not used for evaluation, call it operating metric, control metric, gate metric, role performance measure, or health indicator.',
             $catalog['performance_governance_policy']['naming_rule'] ?? null,
@@ -84,6 +86,7 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
             $catalog['performance_governance_audit']['audit_report'] ?? null,
         );
         $this->assertContains('metric_type', $catalog['metric_governance_schema']['required_catalog_fields'] ?? []);
+        $this->assertSame('CNC-EXEC-BSC-15-2026', $catalog['scorecard_operating_model']['model_id'] ?? null);
 
         $metricsByCode = [];
         foreach (($catalog['metrics'] ?? []) as $metric) {
@@ -97,22 +100,62 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
             $this->assertNotEmpty($metric['decision_purpose'] ?? null, (string) ($metric['canonical_code'] ?? 'unknown'));
             $this->assertIsArray($metric['consequence'] ?? null, (string) ($metric['canonical_code'] ?? 'unknown'));
             $this->assertIsArray($metric['data_contract'] ?? null, (string) ($metric['canonical_code'] ?? 'unknown'));
+            $this->assertArrayHasKey('scorecard_weight_pct', $metric, (string) ($metric['canonical_code'] ?? 'unknown'));
+            $this->assertArrayHasKey('quantitative_thresholds', $metric, (string) ($metric['canonical_code'] ?? 'unknown'));
+            $this->assertArrayHasKey('rating_criteria', $metric, (string) ($metric['canonical_code'] ?? 'unknown'));
+            $this->assertArrayHasKey('reward_rule', $metric, (string) ($metric['canonical_code'] ?? 'unknown'));
+            $this->assertArrayHasKey('blocking_conditions', $metric, (string) ($metric['canonical_code'] ?? 'unknown'));
             $metricsByCode[$metric['canonical_code']] = $metric;
         }
 
         $this->assertSame('runtime_calculated', $metricsByCode['OTD']['backend_status'] ?? null);
         $this->assertTrue($metricsByCode['OTD']['is_official_kpi'] ?? false);
         $this->assertSame('company_scorecard', $metricsByCode['OTD']['evaluation_use'] ?? null);
+        $this->assertSame(10.0, $metricsByCode['OTD']['scorecard_weight_pct'] ?? null);
+        $this->assertSame(95, $metricsByCode['OTD']['quantitative_thresholds']['green_min'] ?? null);
         $this->assertContains('executive_scorecard', $metricsByCode['OTD']['usage_types'] ?? []);
         $this->assertContains('gate_control', $metricsByCode['OTD']['usage_types'] ?? []);
         $this->assertSame(false, $metricsByCode['OEE_BOTTLENECK']['runtime_calculated'] ?? null);
         $this->assertSame('staged_data_contract', $metricsByCode['OEE_BOTTLENECK']['calculation_status'] ?? null);
+        $this->assertSame(8.0, $metricsByCode['OEE_BOTTLENECK']['scorecard_weight_pct'] ?? null);
         $this->assertSame('gate_control_metric', $metricsByCode['SPC_SIGNAL_REACTION_TIME']['metric_type'] ?? null);
         $this->assertFalse($metricsByCode['SPC_SIGNAL_REACTION_TIME']['is_official_kpi'] ?? true);
         $this->assertSame('supplier_scorecard', $metricsByCode['SUPPLIER_READINESS']['evaluation_use'] ?? null);
+        $this->assertSame(5.0, $metricsByCode['SUPPLIER_READINESS']['scorecard_weight_pct'] ?? null);
+        $this->assertContains('recordable_incident', $metricsByCode['RECORDABLE_INCIDENT_RATE']['blocking_conditions'] ?? []);
         $this->assertContains('gate_control_metrics', $metricsByCode['FPY']['sources'] ?? []);
         $this->assertContains('KPI-05', $metricsByCode['FPY']['local_ids'] ?? []);
         $this->assertContains('KPI-ALL-02', $metricsByCode['FPY']['local_ids'] ?? []);
+    }
+
+    public function testExecutiveScorecardWeightsAndQuantitativeRulesAreComplete(): void
+    {
+        $registry = $this->readRegistry();
+        $scorecard = $registry['executive_scorecard'] ?? [];
+        $items = $registry['scorecard_operating_model']['executive_scorecard_items'] ?? [];
+        $this->assertIsArray($scorecard);
+        $this->assertIsArray($items);
+        $this->assertSame(15, count($items));
+
+        $itemsByCode = [];
+        $weightTotal = 0.0;
+        foreach ($items as $item) {
+            $this->assertIsArray($item);
+            $code = $item['canonical_code'] ?? null;
+            $this->assertIsString($code);
+            $itemsByCode[$code] = $item;
+            $weightTotal += (float) ($item['scorecard_weight_pct'] ?? 0);
+            $this->assertNotEmpty($item['quantitative_thresholds'] ?? [], $code);
+            $this->assertNotEmpty($item['rating_criteria'] ?? null, $code);
+            $this->assertNotEmpty($item['reward_rule'] ?? null, $code);
+            $this->assertNotEmpty($item['blocking_conditions'] ?? [], $code);
+        }
+
+        $this->assertEqualsWithDelta(100.0, $weightTotal, 0.0001);
+        foreach ($scorecard as $code) {
+            $this->assertIsString($code);
+            $this->assertArrayHasKey($code, $itemsByCode, "{$code} must have a scorecard operating rule.");
+        }
     }
 
     public function testMetricSupportSeparatesKnownNonRuntimeFromUnknownMetric(): void

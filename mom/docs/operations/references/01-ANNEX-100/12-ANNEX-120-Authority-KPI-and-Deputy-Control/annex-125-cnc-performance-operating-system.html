@@ -94,27 +94,28 @@
 
 <div class="section">
 <h2>3. Scorecard lãnh đạo 15 KPI</h2>
-<p>Scorecard lãnh đạo phải nhỏ, đủ sắc và không thay thế từ điển KPI đầy đủ. Các KPI hiện tại trong ANNEX-122 được giữ; bộ dưới đây là mặt điều hành cấp CEO.</p>
+<p>Scorecard lãnh đạo phải nhỏ, đủ sắc và không thay thế từ điển KPI đầy đủ. Các KPI hiện tại trong ANNEX-122 được giữ; bộ dưới đây là mặt điều hành cấp CEO. Weight tổng bằng 100%; safety, data integrity, customer escape và gate bypass là điều kiện chặn khen thưởng dù tổng điểm đạt.</p>
 <div class="table-card"><table class="table">
-<thead><tr><th>KPI</th><th>Mục đích điều hành</th><th>Cadence</th><th>Nguồn bằng chứng</th></tr></thead>
+<thead><tr><th>KPI</th><th>Weight</th><th>Target xanh</th><th>Vàng / đỏ</th><th>Tiêu chí đánh giá</th><th>Reward / blocker</th><th>Nguồn bằng chứng</th></tr></thead>
 <tbody>
-<tr><td>OTD</td><td>Giữ lời hứa giao hàng.</td><td>Tháng/tuần khi đỏ</td><td>Shipment/job promise date</td></tr>
-<tr><td>Complaint rate</td><td>Đo escape tới khách hàng; không đổi tốc độ lấy lỗi khách hàng.</td><td>Tháng/theo sự kiện</td><td>Complaint/NCR/CAPA link</td></tr>
-<tr><td>Gross margin by job family</td><td>Biết job/customer nào thật sự sinh lời, không chạy doanh thu bằng mọi giá.</td><td>Tháng/quý</td><td>Costing, invoice, job cost</td></tr>
-<tr><td>FPY</td><td>Đo đúng ngay từ đầu, giảm rework/scrap.</td><td>Tháng</td><td>Inspection/job completion</td></tr>
-<tr><td>OEE bottleneck</td><td>Đo hiệu suất tại ràng buộc thật, không bình quân che mất nút thắt.</td><td>Tuần</td><td>Machine/OEE logs</td></tr>
-<tr><td>WIP aging</td><td>Nhìn job tồn lâu và rủi ro vỡ giao.</td><td>Ngày/tuần</td><td>WIP snapshot</td></tr>
-<tr><td>Setup first-pass</td><td>Đo setup ready-to-run đúng ngay lần đầu.</td><td>Tuần/tháng</td><td>Setup record</td></tr>
-<tr><td>FAI first-pass</td><td>Đo first-piece/FAI qua ngay lần đầu.</td><td>Tuần/tháng</td><td>FAI/IPQC record</td></tr>
-<tr><td>COPQ</td><td>Lượng hóa chi phí chất lượng kém.</td><td>Tháng</td><td>NCR, scrap, rework, concession</td></tr>
-<tr><td>Repeat NCR</td><td>Đo lỗi lặp lại, không chỉ tốc độ đóng NCR.</td><td>Tháng</td><td>NCR/CAPA</td></tr>
-<tr><td>CAPA effectiveness</td><td>Chứng minh hành động khắc phục có hiệu lực.</td><td>Tháng/quý</td><td>CAPA verification</td></tr>
-<tr><td>Supplier readiness</td><td>Gộp supplier OTD, incoming quality, SCAR aging và readiness để bảo vệ kế hoạch.</td><td>Tuần/tháng</td><td>PO receipt, incoming, SCAR, ASL</td></tr>
-<tr><td>Critical role certification</td><td>Đảm bảo vai trò setup, QC, CMM, planner, operator không là ràng buộc ẩn.</td><td>Tháng</td><td>Training/certification</td></tr>
-<tr><td>Safety incident</td><td>Không đổi sản lượng lấy rủi ro an toàn.</td><td>Tháng/ngay khi phát sinh</td><td>EHS incident log</td></tr>
-<tr><td>Throughput per constraint hour</td><td>Đo tiền/giá trị tạo ra trên giờ ràng buộc.</td><td>Tuần/tháng</td><td>Job revenue + constraint hours</td></tr>
+<tr><td>OTD</td><td>10%</td><td>≥95%; stretch ≥98%</td><td>90-94.99% / &lt;90%</td><td>Đo job/order line giao theo ngày cam kết đã duyệt.</td><td>Chỉ eligible khi complaint, FPY và ship packet không đỏ.</td><td>Shipment/job promise date</td></tr>
+<tr><td>Complaint rate</td><td>8%</td><td>≤1/100 shipments; stretch 0</td><td>&gt;1-2 / &gt;2 hoặc major escape</td><td>Đếm complaint/escape đã xác nhận theo 100 shipment.</td><td>Major escape hoặc containment quá hạn chặn recognition.</td><td>Complaint/NCR/CAPA link</td></tr>
+<tr><td>Gross margin by job family</td><td>8%</td><td>≥28%; stretch ≥35%</td><td>22-27.99% / &lt;22%</td><td>Dùng cost bucket finance-approved, gồm COPQ/expedite.</td><td>Không eligible nếu loại chi phí không được duyệt.</td><td>Costing, invoice, job cost</td></tr>
+<tr><td>Throughput per constraint hour</td><td>8%</td><td>≥1.10 baseline; stretch ≥1.20</td><td>1.00-1.099 / &lt;1.00</td><td>Đo contribution/revenue trên giờ constraint theo baseline khóa.</td><td>Chặn nếu thiếu reason code hoặc đổi baseline không duyệt.</td><td>Job revenue + constraint hours</td></tr>
+<tr><td>COPQ</td><td>7%</td><td>≤2% sales; stretch ≤1%</td><td>&gt;2-4% / &gt;4%</td><td>Scrap, rework, concession, expedite và escape cost.</td><td>Không eligible nếu repeat NCR đỏ hoặc cost bị loại sai.</td><td>NCR, scrap, rework, concession</td></tr>
+<tr><td>FPY</td><td>8%</td><td>≥98%; stretch ≥99%</td><td>95-97.99% / &lt;95%</td><td>Dân số kiểm tra phải được phê duyệt, không bỏ sampling.</td><td>Inspection bypass hoặc customer escape chặn recognition.</td><td>Inspection/job completion</td></tr>
+<tr><td>OEE bottleneck</td><td>8%</td><td>≥80%; stretch ≥85%</td><td>70-79.99% / &lt;70%</td><td>Chỉ đo active constraint, đủ A/P/Q và loss reason tree.</td><td>Unsafe speed, maintenance bypass hoặc thiếu reason code chặn.</td><td>Machine/OEE logs</td></tr>
+<tr><td>WIP aging</td><td>6%</td><td>≤5% aged WIP; stretch ≤2%</td><td>&gt;5-10% / &gt;10%</td><td>Đo job quá tuổi theo work center, hold reason và owner.</td><td>Reset aging không bằng chứng hoặc WIP đỏ vô chủ chặn.</td><td>WIP snapshot</td></tr>
+<tr><td>Setup first-pass</td><td>6%</td><td>≥95%; stretch ≥98%</td><td>90-94.99% / &lt;90%</td><td>Tính lần submit setup đầu, không che prove-out loop.</td><td>Setup record thiếu hoặc giấu prove-out loop chặn.</td><td>Setup record</td></tr>
+<tr><td>FAI first-pass</td><td>7%</td><td>≥98%; stretch ≥99%</td><td>95-97.99% / &lt;95%</td><td>Tính first FAI/first-piece submission theo revision/operation.</td><td>FAI release bypass, sai revision hoặc sai gage chặn.</td><td>FAI/IPQC record</td></tr>
+<tr><td>Repeat NCR</td><td>6%</td><td>≤5%; stretch ≤2%</td><td>&gt;5-10% / &gt;10%</td><td>Đo recurrence theo defect family, root cause, process, supplier.</td><td>NCR suppression hoặc repeat major escape chặn.</td><td>NCR/CAPA</td></tr>
+<tr><td>CAPA effectiveness</td><td>6%</td><td>≥90%; stretch ≥95%</td><td>80-89.99% / &lt;80%</td><td>Chỉ tính sau 30/60/90-day effectiveness window.</td><td>CAPA đóng không có evidence hoặc tái phát chặn.</td><td>CAPA verification</td></tr>
+<tr><td>Supplier readiness</td><td>5%</td><td>≥90; stretch ≥95</td><td>80-89.99 / &lt;80</td><td>Composite: OTD 40%, quality 35%, SCAR 15%, ASL/audit 10%.</td><td>Critical shortage, supplier escape hoặc SCAR overdue chặn.</td><td>PO receipt, incoming, SCAR, ASL</td></tr>
+<tr><td>Critical role certification</td><td>4%</td><td>≥95%; stretch 100%</td><td>85-94.99% / &lt;85%</td><td>Coverage cho setup, CMM, QC release, planner, maintenance.</td><td>Unauthorized work hoặc critical role no-backup chặn.</td><td>Training/certification</td></tr>
+<tr><td>Safety incident</td><td>3%</td><td>0 recordable incident</td><td>0 recordable nhưng high-potential action overdue / &gt;0</td><td>Bất kỳ recordable incident là đỏ trong kỳ.</td><td>Safety là gate: open serious action chặn mọi monetary recognition.</td><td>EHS incident log</td></tr>
 </tbody>
 </table></div>
+<div class="callout"><b>Cách tính điểm:</b> stretch = 110% achievement, green = 100%, yellow = 50%, red/blocked = 0%. Tổng điểm công ty là tổng <span class="code">weight x achievement</span>. ≥90 xanh, 75-89.99 vàng, &lt;75 đỏ. Khen thưởng chỉ được xem xét sau calibration HR/QMS/CEO và không có blocker safety, quality escape, data integrity hoặc gate bypass.</div>
 </div>
 
 <div class="section">

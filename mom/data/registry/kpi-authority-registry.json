@@ -180,10 +180,10 @@
     "html_file_count": 413,
     "files_with_kpi": 297,
     "kpi_files_missing_evaluation_terms": 24,
-    "kpi_files_missing_recognition_terms": 108,
+    "kpi_files_missing_recognition_terms": 106,
     "kpi_files_missing_discipline_or_corrective_terms": 18,
     "kpi_files_missing_all_people_governance_terms": 5,
-    "kpi_table_rows_without_people_governance_terms": 71,
+    "kpi_table_rows_without_people_governance_terms": 78,
     "interpretation": "This is a conservative control audit. Missing local people-governance terms means the document must either rely on ANNEX-127 performance governance or rename the item to operating metric, control metric, gate metric, role measure, or health indicator."
   },
   "role_measure_policy": {
@@ -248,8 +248,13 @@
       "review_cadence",
       "review_forum",
       "rating_method",
+      "scorecard_weight_pct",
+      "quantitative_thresholds",
+      "rating_criteria",
       "counter_metric",
       "consequence",
+      "reward_rule",
+      "blocking_conditions",
       "data_contract",
       "anti_gaming_guardrail",
       "controllability_scope"
@@ -262,6 +267,59 @@
     "discipline_guardrail": "No direct discipline from an outcome metric. Discipline requires verified controllable behavior such as data falsification, bypassing a required gate, unsafe act, repeated non-compliance after coaching, or refusal to follow a released procedure.",
     "anti_gaming_guardrail": "Every rewardable KPI must be paired with a counter-metric or gate for safety, quality escape, customer impact, evidence integrity, and supervisor/QA review.",
     "controllability_scope": "Shared system outcome unless a documented event proves an individual's controllable behavior."
+  },
+  "scorecard_operating_model": {
+    "model_id": "CNC-EXEC-BSC-15-2026",
+    "scope": "executive_scorecard",
+    "cadence": "monthly scorecard, quarterly calibration, annual Hoshin refresh",
+    "weight_total_pct": 100,
+    "rating_scale": [
+      {"rating": "stretch", "points": 4, "achievement_pct": 110, "meaning": "Above target with clean evidence and no counter-metric breach."},
+      {"rating": "green", "points": 3, "achievement_pct": 100, "meaning": "Meets target with approved evidence."},
+      {"rating": "yellow", "points": 2, "achievement_pct": 50, "meaning": "Within tolerance but requires owner action."},
+      {"rating": "red", "points": 1, "achievement_pct": 0, "meaning": "Outside tolerance; requires containment, RCA, CAPA or resource review."},
+      {"rating": "blocked", "points": 0, "achievement_pct": 0, "meaning": "Safety, data integrity, customer escape, or gate bypass blocks recognition regardless of numeric result."}
+    ],
+    "company_score_bands": [
+      {"band": "green", "weighted_score_min": 90, "action": "eligible for calibrated recognition and standardization of best practice"},
+      {"band": "yellow", "weighted_score_min": 75, "weighted_score_max": 89.99, "action": "management review action plan required before monetary recognition"},
+      {"band": "red", "weighted_score_max": 74.99, "action": "no performance payout; resource review, RCA/CAPA or Hoshin adjustment required"}
+    ],
+    "reward_policy": {
+      "eligibility_rule": "Quarterly recognition may be considered only when weighted score is at least 90, no scorecard KPI is red for two consecutive periods, and no blocking condition is open.",
+      "recognition_bands": [
+        {"weighted_score_min": 95, "recognition": "full team recognition pool after HR/QMS/CEO calibration"},
+        {"weighted_score_min": 90, "weighted_score_max": 94.99, "recognition": "partial team recognition pool after calibration"},
+        {"weighted_score_min": 80, "weighted_score_max": 89.99, "recognition": "non-monetary recognition or kaizen resource priority only"},
+        {"weighted_score_max": 79.99, "recognition": "no performance recognition; corrective-action mode"}
+      ],
+      "blocking_conditions": [
+        "recordable_incident_or_serious_near_miss_with_open_action",
+        "verified_data_falsification",
+        "required_gate_bypass",
+        "customer_escape_without_containment",
+        "major_audit_nonconformance_overdue",
+        "open_red_quality_or_safety_counter_metric"
+      ],
+      "calibration_rule": "Final recognition and reward decisions require HR/QMS/CEO calibration. KPI output is an input, not an automatic payout or discipline engine."
+    },
+    "executive_scorecard_items": [
+      {"canonical_code": "OTD", "scorecard_weight_pct": 10, "unit": "percent", "target": 95, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 98, "green_min": 95, "yellow_min": 90, "red_below": 90}, "rating_criteria": "Measure shipped order lines or jobs against committed customer date after approved promise-date change control.", "reward_rule": "Eligible only when complaint rate, FPY and ship-packet counter-metrics are not red.", "blocking_conditions": ["customer_escape_without_containment", "promise_date_changed_without_approval"]},
+      {"canonical_code": "COMPLAINT_RATE", "scorecard_weight_pct": 8, "unit": "complaints_per_100_shipments", "target": 1, "higher_is_better": false, "quantitative_thresholds": {"stretch_max": 0, "green_max": 1, "yellow_max": 2, "red_above": 2}, "rating_criteria": "Count confirmed customer complaints or escapes per 100 shipments; major escape is red regardless of rate.", "reward_rule": "Blocks quality/delivery recognition when containment or customer response is overdue.", "blocking_conditions": ["major_customer_escape", "containment_overdue"]},
+      {"canonical_code": "GROSS_MARGIN_JOB_FAMILY", "scorecard_weight_pct": 8, "unit": "percent", "target": 28, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 35, "green_min": 28, "yellow_min": 22, "red_below": 22}, "rating_criteria": "Use finance-approved gross margin by job/customer/product family with COPQ and expedite cost included.", "reward_rule": "Eligible only when margin improvement does not come from hidden COPQ, late delivery or customer escape.", "blocking_conditions": ["unapproved_cost_exclusion", "copq_cost_bucket_not_approved"]},
+      {"canonical_code": "THROUGHPUT_PER_CONSTRAINT_HOUR", "scorecard_weight_pct": 8, "unit": "baseline_index", "target": 1.1, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 1.2, "green_min": 1.1, "yellow_min": 1, "red_below": 1}, "rating_criteria": "Compare contribution or revenue per active constraint hour against frozen baseline and approved job mix.", "reward_rule": "Eligible only when OTD, quality escape and WIP aging counter-metrics are not red.", "blocking_conditions": ["constraint_baseline_changed_without_approval", "bottleneck_oee_missing_reason_codes"]},
+      {"canonical_code": "COPQ", "scorecard_weight_pct": 7, "unit": "percent_of_sales", "target": 2, "higher_is_better": false, "quantitative_thresholds": {"stretch_max": 1, "green_max": 2, "yellow_max": 4, "red_above": 4}, "rating_criteria": "Use finance-approved cost buckets for scrap, rework, concession, expedite and escape cost.", "reward_rule": "Eligible only when NCR rate is not being suppressed and repeat NCR is not red.", "blocking_conditions": ["unapproved_quality_cost_adjustment", "repeat_ncr_red"]},
+      {"canonical_code": "FPY", "scorecard_weight_pct": 8, "unit": "percent", "target": 98, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 99, "green_min": 98, "yellow_min": 95, "red_below": 95}, "rating_criteria": "Count first-pass accepted units or operations using approved inspection population and no sampling bypass.", "reward_rule": "Eligible only when complaint rate, scrap and rework counter-metrics are not red.", "blocking_conditions": ["inspection_bypass", "customer_escape_without_containment"]},
+      {"canonical_code": "OEE_BOTTLENECK", "scorecard_weight_pct": 8, "unit": "percent", "target": 80, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 85, "green_min": 80, "yellow_min": 70, "red_below": 70}, "rating_criteria": "Calculate only for active constraint resource with availability, performance, quality and reason-code loss tree.", "reward_rule": "Eligible only when safety, scrap and maintenance-bypass counter-metrics are clean.", "blocking_conditions": ["unsafe_speed_or_bypass", "missing_downtime_reason_codes"]},
+      {"canonical_code": "WIP_AGING", "scorecard_weight_pct": 6, "unit": "aged_wip_percent", "target": 5, "higher_is_better": false, "quantitative_thresholds": {"stretch_max": 2, "green_max": 5, "yellow_max": 10, "red_above": 10}, "rating_criteria": "Measure released jobs over approved aging threshold by work center, hold reason and owner.", "reward_rule": "Eligible only when WIP aging is not reset by move transactions without physical progress.", "blocking_conditions": ["manual_age_reset_without_evidence", "unowned_red_wip"]},
+      {"canonical_code": "SETUP_FIRST_PASS", "scorecard_weight_pct": 6, "unit": "percent", "target": 95, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 98, "green_min": 95, "yellow_min": 90, "red_below": 90}, "rating_criteria": "Count setup ready-to-run first-pass acceptance using first submit, not after repeated undocumented prove-out loops.", "reward_rule": "Eligible only when FAI, setup scrap and rework counter-metrics are not red.", "blocking_conditions": ["prove_out_loop_hidden", "setup_record_missing"]},
+      {"canonical_code": "FAI_FIRST_PASS", "scorecard_weight_pct": 7, "unit": "percent", "target": 98, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 99, "green_min": 98, "yellow_min": 95, "red_below": 95}, "rating_criteria": "Count first FAI or first-piece submission outcome by part revision and operation.", "reward_rule": "Eligible only when no FAI hold/release bypass or customer escape is open.", "blocking_conditions": ["fai_release_bypass", "wrong_revision_or_gage_used"]},
+      {"canonical_code": "REPEAT_NCR_RATE", "scorecard_weight_pct": 6, "unit": "percent", "target": 5, "higher_is_better": false, "quantitative_thresholds": {"stretch_max": 2, "green_max": 5, "yellow_max": 10, "red_above": 10}, "rating_criteria": "Measure recurrence by defect family, root cause, process, supplier or customer after containment/CAPA window.", "reward_rule": "Eligible only when NCR creation is not suppressed and CAPA effectiveness is not red.", "blocking_conditions": ["ncr_suppression", "repeat_major_escape"]},
+      {"canonical_code": "CAPA_EFFECTIVENESS", "scorecard_weight_pct": 6, "unit": "percent", "target": 90, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 95, "green_min": 90, "yellow_min": 80, "red_below": 80}, "rating_criteria": "Count CAPA effective after 30/60/90-day verification window with recurrence evidence.", "reward_rule": "Eligible only when overdue repeat NCR and customer complaint counter-metrics are not red.", "blocking_conditions": ["capa_closed_without_effectiveness_evidence", "recurrence_after_capa"]},
+      {"canonical_code": "SUPPLIER_READINESS", "scorecard_weight_pct": 5, "unit": "composite_score", "target": 90, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 95, "green_min": 90, "yellow_min": 80, "red_below": 80}, "rating_criteria": "Composite: supplier OTD 40%, incoming quality 35%, SCAR aging 15%, ASL/audit/cert readiness 10%.", "reward_rule": "Eligible only when no critical shortage, incoming escape or overdue SCAR is open.", "blocking_conditions": ["critical_material_shortage", "supplier_escape_without_scar"]},
+      {"canonical_code": "CRITICAL_ROLE_CERT_COVERAGE", "scorecard_weight_pct": 4, "unit": "percent", "target": 95, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 100, "green_min": 95, "yellow_min": 85, "red_below": 85}, "rating_criteria": "Measure certified backup coverage for setup, CMM, QC release, planner, maintenance and critical operator roles.", "reward_rule": "Eligible only when training completion is backed by competence pass and no unauthorized work event is open.", "blocking_conditions": ["unauthorized_work_performed", "critical_role_no_backup"]},
+      {"canonical_code": "RECORDABLE_INCIDENT_RATE", "scorecard_weight_pct": 3, "unit": "count", "target": 0, "higher_is_better": false, "quantitative_thresholds": {"green_max": 0, "yellow_condition": "0 recordable incidents but high-potential near-miss action overdue", "red_above": 0}, "rating_criteria": "Any recordable incident is red for the period; serious near miss with overdue action blocks recognition.", "reward_rule": "Safety is a gate: any open serious safety action blocks monetary recognition regardless of total score.", "blocking_conditions": ["recordable_incident", "serious_near_miss_action_overdue", "unsafe_act_verified"]}
+    ]
   },
   "metric_governance_overrides": {
     "OTD": {

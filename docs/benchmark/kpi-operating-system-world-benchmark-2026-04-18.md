@@ -48,7 +48,7 @@ KPI cấp vận hành có thể nhiều hơn, nhưng phải chia lớp:
 
 ## Performance Governance
 
-Audit nội bộ ngày 2026-04-18 cho thấy sau khi giảm nhiễu alias `SETUP`, toàn bộ `mom/docs` có 297 file dùng ngôn ngữ KPI/metric trong ngữ cảnh KPI. Trong đó 24 file thiếu tín hiệu đánh giá/review, 108 file thiếu ghi nhận/khen thưởng, 18 file thiếu corrective/discipline và 71 dòng KPI/target thiếu people-governance tại dòng.
+Audit nội bộ ngày 2026-04-18 cho thấy sau khi giảm nhiễu alias `SETUP`, toàn bộ `mom/docs` có 297 file dùng ngôn ngữ KPI/metric trong ngữ cảnh KPI. Trong đó 24 file thiếu tín hiệu đánh giá/review, 106 file thiếu ghi nhận/khen thưởng, 18 file thiếu corrective/discipline và 78 dòng KPI/target thiếu people-governance tại dòng.
 
 Kết luận thực chiến: không nên sửa bằng cách thêm thưởng phạt vào mọi tài liệu. Cách tốt hơn là đưa một policy trung tâm vào ANNEX-127 và bắt mọi KPI chính thức khai báo đủ schema. Nếu một chỉ số không được dùng cho đánh giá thì rename ngay:
 
@@ -124,6 +124,32 @@ Từ 2026-04-18, catalog cũng phải trả per-metric operating contract:
 - `controllability_scope`
 
 Nguyên tắc vận hành: metric nào không có ý đồ, động cơ hành vi, kết quả kỳ vọng, owner, evidence và consequence thì chưa được gọi KPI. Metric có thể rất quan trọng nhưng vẫn phải gọi đúng tên là operating metric, gate control metric, role performance measure hoặc health indicator.
+
+## Trọng Số, Đánh Giá Và Khen Thưởng
+
+Mô hình thực chiến cho HESEM là `CNC-EXEC-BSC-15-2026`: 15 KPI lãnh đạo, tổng trọng số 100%, review monthly/quarterly. Weight đề xuất:
+
+| KPI | Weight |
+|---|---:|
+| OTD | 10% |
+| COMPLAINT_RATE | 8% |
+| GROSS_MARGIN_JOB_FAMILY | 8% |
+| THROUGHPUT_PER_CONSTRAINT_HOUR | 8% |
+| COPQ | 7% |
+| FPY | 8% |
+| OEE_BOTTLENECK | 8% |
+| WIP_AGING | 6% |
+| SETUP_FIRST_PASS | 6% |
+| FAI_FIRST_PASS | 7% |
+| REPEAT_NCR_RATE | 6% |
+| CAPA_EFFECTIVENESS | 6% |
+| SUPPLIER_READINESS | 5% |
+| CRITICAL_ROLE_CERT_COVERAGE | 4% |
+| RECORDABLE_INCIDENT_RATE | 3% |
+
+Rating dùng 5 trạng thái: stretch = 110% achievement, green = 100%, yellow = 50%, red = 0%, blocked = 0%. Tổng điểm = tổng `weight x achievement`. ≥90 là xanh, 75-89.99 là vàng, <75 là đỏ.
+
+Khen thưởng không được tự động hóa từ điểm KPI. KPI chỉ là input cho calibration HR/QMS/CEO. Điều kiện xem xét recognition: tổng điểm ≥90, không có KPI đỏ lặp lại, không có blocker mở. Blocker gồm recordable incident hoặc serious near miss action overdue, data falsification, gate bypass, customer escape chưa containment, major audit nonconformance quá hạn, hoặc counter-metric đỏ. Cách này bám đúng benchmark SAP SuccessFactors: rating, calibration và variable pay là workflow có kiểm soát, không phải lấy số thô để trả thưởng.
 
 ## Đề Xuất Thực Thi
 

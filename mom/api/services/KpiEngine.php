@@ -427,6 +427,7 @@ final class KpiEngine
             'performance_governance_policy' => is_array($registry['performance_governance_policy'] ?? null) ? $registry['performance_governance_policy'] : [],
             'metric_governance_schema' => is_array($registry['metric_governance_schema'] ?? null) ? $registry['metric_governance_schema'] : [],
             'metric_governance_defaults' => is_array($registry['metric_governance_defaults'] ?? null) ? $registry['metric_governance_defaults'] : [],
+            'scorecard_operating_model' => is_array($registry['scorecard_operating_model'] ?? null) ? $registry['scorecard_operating_model'] : [],
             'document_audit' => is_array($registry['document_audit'] ?? null) ? $registry['document_audit'] : [],
             'performance_governance_audit' => is_array($registry['performance_governance_audit'] ?? null) ? $registry['performance_governance_audit'] : [],
             'metrics' => array_values($catalog),
@@ -1509,12 +1510,13 @@ final class KpiEngine
     private function enrichCatalogGovernance(array &$catalog, array $registry): void
     {
         $overrides = $this->registryMetricGovernanceOverrides($registry);
+        $scorecardItems = $this->registryScorecardItems($registry);
         $defaults = is_array($registry['metric_governance_defaults'] ?? null)
             ? $registry['metric_governance_defaults']
             : [];
 
         foreach ($catalog as $code => &$metric) {
-            $override = $overrides[$code] ?? [];
+            $override = array_merge($scorecardItems[$code] ?? [], $overrides[$code] ?? []);
             $sources = $this->stringListFromValue($metric['sources'] ?? []);
             $usageTypes = $this->inferUsageTypes($sources);
             foreach ($this->stringListFromValue($override['usage_types'] ?? []) as $usageType) {
@@ -1568,6 +1570,7 @@ final class KpiEngine
             $this->applyGovernanceLists($metric, $override);
             $this->applyDataContract($metric, $override, $calculationStatus);
             $this->applyConsequence($metric, $override, $metricType, $defaults);
+            $this->applyScorecardRules($metric, $override);
         }
         unset($metric);
     }
@@ -1595,6 +1598,31 @@ final class KpiEngine
         }
 
         return $overrides;
+    }
+
+    /**
+     * @param array<string, mixed> $registry
+     * @return array<string, array<string, mixed>>
+     */
+    private function registryScorecardItems(array $registry): array
+    {
+        $model = $registry['scorecard_operating_model'] ?? [];
+        if (!is_array($model) || !is_array($model['executive_scorecard_items'] ?? null)) {
+            return [];
+        }
+
+        $items = [];
+        foreach ($model['executive_scorecard_items'] as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $code = $this->codeField($row, 'canonical_code');
+            if ($code !== '') {
+                $items[$code] = $row;
+            }
+        }
+
+        return $items;
     }
 
     /**
@@ -1856,6 +1884,37 @@ final class KpiEngine
             'corrective_action_rule' => $this->overrideOrDefault($override, 'corrective_action_rule', $this->defaultString($defaults, 'corrective_action_rule', 'Below-target result triggers review and corrective action before people discipline.')),
             'discipline_guardrail' => $this->overrideOrDefault($override, 'discipline_guardrail', $this->defaultString($defaults, 'discipline_guardrail', 'No direct discipline from outcome metric alone.')),
         ];
+    }
+
+    /**
+     * @param array<string, mixed> $metric
+     * @param array<string, mixed> $override
+     */
+    private function applyScorecardRules(array &$metric, array $override): void
+    {
+        $weight = $override['scorecard_weight_pct'] ?? null;
+        $metric['scorecard_weight_pct'] = is_int($weight) || is_float($weight) ? (float) $weight : null;
+        $metric['quantitative_thresholds'] = $this->arrayField($override, 'quantitative_thresholds');
+        $metric['rating_criteria'] = $this->overrideOrDefault($override, 'rating_criteria', '');
+        $metric['reward_rule'] = $this->overrideOrDefault($override, 'reward_rule', '');
+        $metric['blocking_conditions'] = $this->stringListFromValue($override['blocking_conditions'] ?? []);
+
+        if ($metric['rating_criteria'] === '' && ($metric['metric_type'] ?? null) === 'kpi') {
+            $metric['rating_criteria'] = 'Use approved scorecard RAG thresholds, source evidence, counter-metric review, and calibration before recognition or corrective action.';
+        }
+        if ($metric['reward_rule'] === '' && ($metric['metric_type'] ?? null) === 'kpi') {
+            $metric['reward_rule'] = 'Eligible only through balanced scorecard calibration with safety, quality, delivery and data-integrity blockers cleared.';
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     * @return array<int|string, mixed>
+     */
+    private function arrayField(array $row, string $key): array
+    {
+        $value = $row[$key] ?? [];
+        return is_array($value) ? $value : [];
     }
 
     /**
