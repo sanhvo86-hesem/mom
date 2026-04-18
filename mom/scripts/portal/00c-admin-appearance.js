@@ -170,7 +170,7 @@ window._admAppearanceSetTab = function(key){
 };
 
 window._admAppearanceTabKeydown = function(event){
-  var keys = ['templates','tokens','components','effects','governance','advanced'];
+  var keys = ['templates','tokens','components','effects','governance','advanced','eqms','standard'];
   var idx = keys.indexOf(_subTab);
   if(idx < 0) idx = 0;
   var next = null;
@@ -1250,7 +1250,9 @@ var VISUAL_THEMES = [
 
 function normalizeSubTab(subTab){
   var aliases = { overview:'templates', typography:'tokens', colors:'tokens', layout:'tokens' };
-  return aliases[subTab] || subTab || 'templates';
+  var valid = { templates:1, tokens:1, components:1, effects:1, governance:1, advanced:1, eqms:1, standard:1 };
+  var resolved = aliases[subTab] || subTab || 'templates';
+  return valid[resolved] ? resolved : 'templates';
 }
 
 function decodeHtmlText(v){
@@ -2865,6 +2867,184 @@ function renderTokens(){
 }
 
 /* ══════════════════════════════════════════════════════════════════════════ */
+/* ── SUB-TAB 8: EQMS SUITE ──────────────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════ */
+function renderEqms(){
+  var h = '';
+
+  h += sectionLead(
+    L('EQMS Suite — Graphics Control', 'EQMS Suite — Graphics Control'),
+    L('Điều khiển toàn bộ màu sắc đặc thù của EQMS: vòng đời, heatmap rủi ro, màu entity traceability và kích thước shell module. Tất cả token này được ThemeManager đẩy vào <html> style, module không cần hardcode.', 'Control all EQMS-specific colors: lifecycle states, risk heatmap, traceability entity colors, and module shell dimensions. All tokens are pushed by ThemeManager onto the <html> style — modules hardcode nothing.'),
+    statusChip('admin', 'eqms.*') + statusChip('full', L('Toàn bộ token', 'All tokens'))
+  );
+
+  /* ── Lifecycle state colors ─────────────────────────────────────────────── */
+  h += sect('🔄 ' + L('Màu trạng thái vòng đời', 'Lifecycle State Colors'),
+    colorPick('Draft', '--eqms-draft', 'eqms.lifecycle.draft', '#94a3b8')
+    + colorPick('Open', '--eqms-open', 'eqms.lifecycle.open', '#3b82f6')
+    + colorPick('In Progress', '--eqms-in-progress', 'eqms.lifecycle.inProgress', '#8b5cf6')
+    + colorPick('Pending', '--eqms-pending', 'eqms.lifecycle.pending', '#f59e0b')
+    + colorPick('Approved', '--eqms-approved', 'eqms.lifecycle.approved', '#10b981')
+    + colorPick('Closed', '--eqms-closed', 'eqms.lifecycle.closed', '#64748b')
+    + colorPick('Voided', '--eqms-voided', 'eqms.lifecycle.voided', '#dc2626')
+    + previewBox(L('Preview vòng đời', 'Preview lifecycle'),
+        '<div style="display:flex;gap:6px;flex-wrap:wrap">'
+        + ['Draft','Open','In Progress','Pending','Approved','Closed','Voided'].map(function(s, i){
+            var vars = ['--eqms-draft','--eqms-open','--eqms-in-progress','--eqms-pending','--eqms-approved','--eqms-closed','--eqms-voided'];
+            return '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;background:color-mix(in srgb,var('+vars[i]+') 12%,transparent);border:1px solid color-mix(in srgb,var('+vars[i]+') 30%,transparent);color:var('+vars[i]+');font-size:11px;font-weight:700"><span style="width:7px;height:7px;border-radius:50%;background:var('+vars[i]+');display:inline-block"></span>'+s+'</span>';
+          }).join('')
+        + '</div>'
+      )
+  , true, statusChip('full', L('7 trạng thái', '7 states')));
+
+  /* ── Risk heatmap palette ────────────────────────────────────────────────── */
+  h += sect('🟥 ' + L('Bảng màu heatmap rủi ro', 'Risk Heatmap Palette'),
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
+    + colorPick('Low — nền', '--eqms-heatmap-low-bg', 'eqms.heatmap.lowBg', '#dcfce7')
+    + colorPick('Low — chữ', '--eqms-heatmap-low-text', 'eqms.heatmap.lowText', '#166534')
+    + colorPick('Medium — nền', '--eqms-heatmap-medium-bg', 'eqms.heatmap.mediumBg', '#fef9c3')
+    + colorPick('Medium — chữ', '--eqms-heatmap-medium-text', 'eqms.heatmap.mediumText', '#854d0e')
+    + colorPick('High — nền', '--eqms-heatmap-high-bg', 'eqms.heatmap.highBg', '#fed7aa')
+    + colorPick('High — chữ', '--eqms-heatmap-high-text', 'eqms.heatmap.highText', '#9a3412')
+    + colorPick('Critical — nền', '--eqms-heatmap-critical-bg', 'eqms.heatmap.criticalBg', '#fecaca')
+    + colorPick('Critical — chữ', '--eqms-heatmap-critical-text', 'eqms.heatmap.criticalText', '#991b1b')
+    + '</div>'
+    + previewBox(L('Preview heatmap', 'Preview heatmap'),
+        '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">'
+        + [['Low','low'],['Medium','medium'],['High','high'],['Critical','critical']].map(function(r){
+            return '<div style="padding:10px 8px;border-radius:var(--radius-md);background:var(--eqms-heatmap-'+r[1]+'-bg);color:var(--eqms-heatmap-'+r[1]+'-text);text-align:center;font-size:11px;font-weight:700">'+r[0]+'<br><span style="font-size:16px;font-weight:800">3</span></div>';
+          }).join('')
+        + '</div>'
+      )
+  , false, statusChip('full', L('4×2 pairs', '4×2 pairs')));
+
+  /* ── Badge dark mode palette ─────────────────────────────────────────────── */
+  h += sect('🌙 ' + L('Màu badge dark mode', 'Badge Dark Mode Palette'),
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
+    + colorPick('Draft bg dark', '--eqms-state-draft-bg-dark', 'eqms.stateDark.draftBg', '#334155')
+    + colorPick('Draft text dark', '--eqms-state-draft-text-dark', 'eqms.stateDark.draftText', '#94a3b8')
+    + colorPick('Open bg dark', '--eqms-state-open-bg-dark', 'eqms.stateDark.openBg', '#1e3a5f')
+    + colorPick('Open text dark', '--eqms-state-open-text-dark', 'eqms.stateDark.openText', '#60a5fa')
+    + colorPick('Active bg dark', '--eqms-state-active-bg-dark', 'eqms.stateDark.activeBg', '#2e1065')
+    + colorPick('Active text dark', '--eqms-state-active-text-dark', 'eqms.stateDark.activeText', '#a78bfa')
+    + colorPick('Pending bg dark', '--eqms-state-pending-bg-dark', 'eqms.stateDark.pendingBg', '#451a03')
+    + colorPick('Pending text dark', '--eqms-state-pending-text-dark', 'eqms.stateDark.pendingText', '#fbbf24')
+    + colorPick('Approved bg dark', '--eqms-state-approved-bg-dark', 'eqms.stateDark.approvedBg', '#064e3b')
+    + colorPick('Approved text dark', '--eqms-state-approved-text-dark', 'eqms.stateDark.approvedText', '#34d399')
+    + colorPick('Voided bg dark', '--eqms-state-voided-bg-dark', 'eqms.stateDark.voidedBg', '#450a0a')
+    + colorPick('Voided text dark', '--eqms-state-voided-text-dark', 'eqms.stateDark.voidedText', '#f87171')
+    + '</div>'
+  , false, statusChip('full', L('6×2 pairs', '6×2 pairs')));
+
+  /* ── Entity type colors ──────────────────────────────────────────────────── */
+  h += sect('🔗 ' + L('Màu entity traceability (NCR, CAPA, Complaint…)', 'Traceability Entity Colors'),
+    sectionLead(
+      L('Quality entity color model', 'Quality entity color model'),
+      L('Mỗi entity type có màu riêng trong traceability graph và trong badges. Nhóm theo domain chức năng.', 'Each entity type has its own color in the traceability graph and badges. Grouped by functional domain.'),
+      statusChip('admin', L('40+ entities', '40+ entities'))
+    )
+    + '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin:12px 0 6px">📋 ' + L('Sự kiện chất lượng', 'Quality Events') + '</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
+    + colorPick('Complaint', '--eqms-entity-complaint', 'eqms.entity.complaint', '#ef4444')
+    + colorPick('NCR', '--eqms-entity-ncr', 'eqms.entity.ncr', '#dc2626')
+    + colorPick('MRB', '--eqms-entity-mrb', 'eqms.entity.mrb', '#b91c1c')
+    + colorPick('Deviation', '--eqms-entity-deviation', 'eqms.entity.deviation', '#f97316')
+    + colorPick('CAPA', '--eqms-entity-capa', 'eqms.entity.capa', '#8b5cf6')
+    + colorPick('Concession', '--eqms-entity-concession', 'eqms.entity.concession', '#fb923c')
+    + colorPick('Field Action', '--eqms-entity-field-action', 'eqms.entity.fieldAction', '#be123c')
+    + colorPick('Warranty', '--eqms-entity-warranty', 'eqms.entity.warranty', '#dc2626')
+    + '</div>'
+    + '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin:12px 0 6px">📝 ' + L('Thay đổi & Tài liệu', 'Change & Document') + '</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
+    + colorPick('Change Control', '--eqms-entity-change-control', 'eqms.entity.changeControl', '#3b82f6')
+    + colorPick('Eng Change', '--eqms-entity-eng-change', 'eqms.entity.engChange', '#2563eb')
+    + colorPick('Document', '--eqms-entity-document', 'eqms.entity.document', '#0ea5e9')
+    + colorPick('Validation', '--eqms-entity-validation', 'eqms.entity.validation', '#4338ca')
+    + colorPick('Evidence', '--eqms-entity-evidence', 'eqms.entity.evidence', '#64748b')
+    + colorPick('Approval', '--eqms-entity-approval', 'eqms.entity.approval', '#22c55e')
+    + colorPick('Signature', '--eqms-entity-signature', 'eqms.entity.signature', '#1d4ed8')
+    + colorPick('Lesson Learned', '--eqms-entity-lesson-learned', 'eqms.entity.lessonLearned', '#facc15')
+    + '</div>'
+    + '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin:12px 0 6px">🎓 ' + L('Đào tạo & Năng lực', 'Training & Competency') + '</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
+    + colorPick('Training', '--eqms-entity-training', 'eqms.entity.training', '#06b6d4')
+    + colorPick('Competency', '--eqms-entity-competency', 'eqms.entity.competency', '#0891b2')
+    + colorPick('Assessment', '--eqms-entity-assessment', 'eqms.entity.assessment', '#0e7490')
+    + colorPick('CSAT', '--eqms-entity-csat', 'eqms.entity.csat', '#f59e0b')
+    + '</div>'
+    + '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin:12px 0 6px">🔍 ' + L('Kiểm soát chất lượng', 'Quality Control') + '</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
+    + colorPick('IQC', '--eqms-entity-iqc', 'eqms.entity.iqc', '#16a34a')
+    + colorPick('Inspection Result', '--eqms-entity-inspection-result', 'eqms.entity.inspectionResult', '#15803d')
+    + colorPick('OOS', '--eqms-entity-oos', 'eqms.entity.oos', '#ca8a04')
+    + colorPick('SPC', '--eqms-entity-spc', 'eqms.entity.spc', '#0d9488')
+    + colorPick('Test Result', '--eqms-entity-test-result', 'eqms.entity.testResult', '#0f766e')
+    + colorPick('Lot Release', '--eqms-entity-lot-release', 'eqms.entity.lotRelease', '#0369a1')
+    + colorPick('Calibration', '--eqms-entity-calibration', 'eqms.entity.calibration', '#65a30d')
+    + colorPick('MSA', '--eqms-entity-msa', 'eqms.entity.msa', '#4d7c0f')
+    + colorPick('Sampling Plan', '--eqms-entity-sampling-plan', 'eqms.entity.samplingPlan', '#0891b2')
+    + '</div>'
+    + '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin:12px 0 6px">⚠️ ' + L('Rủi ro & Nhà cung cấp', 'Risk & Supplier') + '</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
+    + colorPick('Risk', '--eqms-entity-risk', 'eqms.entity.risk', '#ea580c')
+    + colorPick('FMEA', '--eqms-entity-fmea', 'eqms.entity.fmea', '#d97706')
+    + colorPick('Audit', '--eqms-entity-audit', 'eqms.entity.audit', '#059669')
+    + colorPick('Audit Finding', '--eqms-entity-finding', 'eqms.entity.finding', '#047857')
+    + colorPick('Audit Event', '--eqms-entity-audit-event', 'eqms.entity.auditEvent', '#475569')
+    + colorPick('Supplier', '--eqms-entity-supplier', 'eqms.entity.supplier', '#7c3aed')
+    + colorPick('Evaluation', '--eqms-entity-evaluation', 'eqms.entity.evaluation', '#6d28d9')
+    + colorPick('SCAR', '--eqms-entity-scar', 'eqms.entity.scar', '#9333ea')
+    + colorPick('Supplier Audit', '--eqms-entity-supplier-audit', 'eqms.entity.supplierAudit', '#a855f7')
+    + colorPick('Quality Agreement', '--eqms-entity-quality-agreement', 'eqms.entity.qualityAgreement', '#c084fc')
+    + colorPick('AML', '--eqms-entity-aml', 'eqms.entity.aml', '#16a34a')
+    + colorPick('Special Char', '--eqms-entity-special-char', 'eqms.entity.specialChar', '#7c3aed')
+    + colorPick('FAI', '--eqms-entity-fai', 'eqms.entity.fai', '#2563eb')
+    + colorPick('APQP', '--eqms-entity-apqp', 'eqms.entity.apqp', '#059669')
+    + '</div>'
+    + '<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin:12px 0 6px">🔗 ' + L('Liên kết & Nhiệm vụ', 'Links & Tasks') + '</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
+    + colorPick('Linked', '--eqms-entity-linked', 'eqms.entity.linked', '#6366f1')
+    + colorPick('Task', '--eqms-entity-task', 'eqms.entity.task', '#f59e0b')
+    + colorPick('Comment', '--eqms-entity-comment', 'eqms.entity.comment', '#a3a3a3')
+    + '</div>'
+  , false, statusChip('admin', L('40+ entity', '40+ entity')));
+
+  /* ── Traceability link type colors ───────────────────────────────────────── */
+  h += sect('↔️ ' + L('Màu link traceability', 'Traceability Link Colors'),
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
+    + colorPick('Caused By', '--eqms-link-caused-by', 'eqms.link.causedBy', '#ef4444')
+    + colorPick('Related To', '--eqms-link-related-to', 'eqms.link.relatedTo', '#3b82f6')
+    + colorPick('Requires', '--eqms-link-requires', 'eqms.link.requires', '#f97316')
+    + colorPick('Verifies', '--eqms-link-verifies', 'eqms.link.verifies', '#22c55e')
+    + colorPick('Trains', '--eqms-link-trains', 'eqms.link.trains', '#06b6d4')
+    + colorPick('Releases', '--eqms-link-releases', 'eqms.link.releases', '#8b5cf6')
+    + colorPick('Sourced From', '--eqms-link-sourced-from', 'eqms.link.sourcedFrom', '#7c3aed')
+    + colorPick('Supersedes', '--eqms-link-supersedes', 'eqms.link.supersedes', '#64748b')
+    + colorPick('Contains', '--eqms-link-contains', 'eqms.link.contains', '#0ea5e9')
+    + colorPick('Implements', '--eqms-link-implements', 'eqms.link.implements', '#059669')
+    + colorPick('Mitigates', '--eqms-link-mitigates', 'eqms.link.mitigates', '#16a34a')
+    + '</div>'
+  , false, statusChip('full', L('11 link types', '11 link types')));
+
+  /* ── EQMS module shell dimensions ────────────────────────────────────────── */
+  h += sect('📐 ' + L('Kích thước shell EQMS', 'EQMS Shell Dimensions'),
+    slider(L('Nav width', 'Nav width'), '--eqms-nav-width', 'eqms.layout.navWidth', 200, 360, 260, 'px')
+    + slider(L('Nav collapsed', 'Nav collapsed'), '--eqms-nav-collapsed', 'eqms.layout.navCollapsed', 40, 80, 56, 'px')
+    + slider(L('Header height', 'Header height'), '--eqms-header-height', 'eqms.layout.headerHeight', 44, 72, 56, 'px')
+    + slider(L('Detail sidebar', 'Detail sidebar'), '--eqms-detail-sidebar', 'eqms.layout.detailSidebar', 240, 480, 320, 'px')
+    + slider(L('Filter bar height', 'Filter bar height'), '--eqms-filter-height', 'eqms.layout.filterHeight', 40, 72, 52, 'px')
+    + previewBox(L('Preview shell proportions', 'Preview shell proportions'),
+        '<div style="display:grid;grid-template-columns:var(--eqms-nav-collapsed,56px) 1fr;height:var(--eqms-header-height,56px);border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border)">'
+        + '<div style="background:var(--bg-sidebar-light,var(--brand));display:flex;align-items:center;justify-content:center"><span style="font-size:10px;color:#fff;opacity:.7">Nav</span></div>'
+        + '<div style="background:var(--bg-header);border-left:1px solid var(--border);display:flex;align-items:center;padding:0 12px;font-size:11px;color:var(--text-secondary)">Header — '+L('chiều cao phụ thuộc slider','height driven by slider')+'</div>'
+        + '</div>'
+      )
+  , false, statusChip('full', L('5 dimensions', '5 dimensions')));
+
+  return h;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════ */
 /* ── RENDER MAIN ────────────────────────────────────────────────────────── */
 /* ══════════════════════════════════════════════════════════════════════════ */
 
@@ -2878,7 +3058,9 @@ function render(el, subTab, currentLang){
     {key:'components', icon:'🧱', label:T('components')},
     {key:'effects', icon:'✨', label:T('effects')},
     {key:'governance', icon:'🛡️', label:T('governance')},
-    {key:'advanced', icon:'🧩', label:T('advanced')}
+    {key:'advanced', icon:'🧩', label:T('advanced')},
+    {key:'eqms', icon:'🔬', label:L('EQMS Suite', 'EQMS Suite')},
+    {key:'standard', icon:'📖', label:L('Chuẩn V4', 'V4 Standard')}
   ];
 
   var h = '<div style="max-width:min(100%,1120px);margin:0 auto">';
@@ -2905,7 +3087,9 @@ function render(el, subTab, currentLang){
     components: renderComponents(),
     effects: renderEffects(),
     governance: renderGovernance(),
-    advanced: renderAdvanced()
+    advanced: renderAdvanced(),
+    eqms: renderEqms(),
+    standard: renderStandard()
   };
   tabs.forEach(function(t){
     var active = _subTab === t.key;
@@ -3879,6 +4063,169 @@ function renderAdvanced(){
     +'<code style="font-size:11px;background:var(--bg-surface-alt);padding:2px 6px;border-radius:3px">var(--border)</code>'
     +'</div>'
   , true);
+
+  return h;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* ── SUB-TAB 9: V4 DESIGN STANDARD ─────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════ */
+
+/* Global helper — navigate the embedded V4 iframe to an anchor without reloading */
+window._admV4Jump = function(anchor){
+  var V4_PATH = 'design/module-layout-template-design-system-v4.html';
+  var f = document.getElementById('adm-v4-standard-frame');
+  if(!f) return;
+  try {
+    if(f.contentDocument && f.contentDocument.readyState === 'complete'){
+      f.contentWindow.location.hash = anchor;
+    } else {
+      f.src = V4_PATH + '#' + anchor;
+    }
+  } catch(e){
+    f.src = V4_PATH + '#' + anchor;
+  }
+};
+
+function renderStandard(){
+  var V4_PATH = 'design/module-layout-template-design-system-v4.html';
+  var IID    = 'adm-v4-standard-frame';
+
+  /* Section groups — mirrors the TOC in V4 HTML */
+  var SECTIONS = [
+    { group: L('Nền tảng', 'Foundation'), items: [
+      {id:'summary',          label:L('Tóm tắt','Summary')},
+      {id:'architecture',     label:L('Kiến trúc','Architecture')},
+      {id:'standards',        label:L('Quy chuẩn','Standards')},
+      {id:'token-reference',  label:L('Tokens','Tokens')},
+      {id:'token-cascade',    label:L('Token Cascade','Token Cascade')},
+      {id:'visual-themes',    label:L('Themes','Themes')}
+    ]},
+    { group: L('Components', 'Components'), items: [
+      {id:'component-states', label:L('Trạng thái','States')},
+      {id:'density-modes',    label:L('Mật độ','Density')},
+      {id:'dark-mode-mapping',label:L('Dark Mode','Dark Mode')},
+      {id:'form-rules',       label:L('Forms','Forms')},
+      {id:'table-rules',      label:L('Tables','Tables')},
+      {id:'modal-rules',      label:L('Modals','Modals')},
+      {id:'nav-rules',        label:L('Navigation','Navigation')},
+      {id:'component-presets',label:L('Presets','Presets')}
+    ]},
+    { group: L('Template catalog', 'Template catalog'), items: [
+      {id:'zone-system',      label:L('Zones','Zones')},
+      {id:'block-engine',     label:L('Blocks','Blocks')},
+      {id:'block-schema',     label:L('Block Schema','Block Schema')},
+      {id:'cat-overview',     label:L('Tổng quan','Overview')},
+      {id:'cat-quality',      label:L('Quality','Quality')},
+      {id:'cat-production',   label:L('Production','Production')},
+      {id:'cat-engineering',  label:L('Engineering','Engineering')},
+      {id:'cat-purchasing',   label:L('Purchasing','Purchasing')},
+      {id:'cat-warehouse',    label:L('Warehouse','Warehouse')},
+      {id:'cat-finance',      label:L('Finance','Finance')},
+      {id:'cat-admin',        label:L('Admin','Admin')},
+      {id:'cat-cross',        label:L('Cross-module','Cross-module')}
+    ]},
+    { group: L('UX patterns', 'UX patterns'), items: [
+      {id:'accessibility',        label:L('ARIA','ARIA')},
+      {id:'error-patterns',       label:L('Lỗi','Errors')},
+      {id:'loading-patterns',     label:L('Loading','Loading')},
+      {id:'empty-states',         label:L('Trống','Empty')},
+      {id:'notification-patterns',label:L('Thông báo','Notifications')},
+      {id:'interaction-patterns', label:L('Tương tác','Interactions')},
+      {id:'keyboard-rules',       label:L('Phím tắt','Keyboard')},
+      {id:'responsive-rules',     label:L('Responsive','Responsive')},
+      {id:'icon-rules',           label:L('Icons','Icons')},
+      {id:'scroll-ux',            label:L('Scroll','Scroll')}
+    ]},
+    { group: L('Regulated / MES', 'Regulated / MES'), items: [
+      {id:'shop-floor-mode',          label:L('Xưởng SX','Shopfloor')},
+      {id:'compliance-forms',         label:L('21 CFR','21 CFR')},
+      {id:'manufacturing-precision',  label:L('MES chính xác','MES precision')},
+      {id:'regulatory-precision',     label:L('Tuân thủ','Regulatory')},
+      {id:'print-layouts',            label:L('In ấn','Print')},
+      {id:'realtime-dashboard',       label:L('Realtime','Realtime')},
+      {id:'operator-interface',       label:L('Operator','Operator')},
+      {id:'offline-pwa-shop-floor',   label:L('Offline/PWA','Offline/PWA')},
+      {id:'shift-handover-production',label:L('Handover','Handover')}
+    ]},
+    { group: L('Governance (Standard 36)', 'Governance (Standard 36)'), items: [
+      {id:'governance',                       label:L('Governance','Governance')},
+      {id:'standard-36-alignment-overview',   label:L('Authority','Authority')},
+      {id:'admin-graphics-control-plane',     label:L('Graphics Control','Graphics Control')},
+      {id:'module-archetypes-standard-36',    label:L('Archetypes','Archetypes')},
+      {id:'template-naming-standard-archetype',label:L('Template ID','Template ID')},
+      {id:'module-build-packet-standard-36',  label:L('Build Packet','Build Packet')},
+      {id:'block-contract-standard-36',       label:L('Block Contract','Block Contract')},
+      {id:'qa-gate-matrix-standard-36',       label:L('QA Gates','QA Gates')},
+      {id:'definition-of-done-standard-36',   label:L('DoD','DoD')},
+      {id:'runtime-api-spec',                 label:L('Runtime & API','Runtime & API')},
+      {id:'backend-graphics-authority-api-contract',label:L('Graphics API','Graphics API')},
+      {id:'inline-edit-interaction-pattern',  label:L('Inline Edit','Inline Edit')},
+      {id:'command-palette-pattern',          label:L('Command Palette','Command Palette')}
+    ]}
+  ];
+
+  var h = '';
+
+  h += sectionLead(
+    L('Module Layout Template Design System V4 — nhúng trực tiếp', 'Module Layout Template Design System V4 — embedded'),
+    L('Toàn bộ 90 section, 12,999 dòng của bản chuẩn thiết kế V4 được nhúng ngay vào đây. Click vào section muốn đọc, hoặc mở tab mới để xem toàn màn hình.', 'All 90 sections and 12,999 lines of the V4 design standard are embedded here. Click any section to navigate, or open a new tab for full-screen reading.'),
+    statusChip('admin', 'Single-source authority')
+    + statusChip('full', '90 sections')
+    + statusChip('full', '384+ tokens')
+    + statusChip('preview', '123 templates')
+  );
+
+  /* ── Quick-jump navigation ──────────────────────────────────────────────── */
+  h += '<div style="margin-bottom:14px;padding:12px 14px;border:1px solid var(--border);border-radius:var(--radius-lg);background:var(--bg-surface)">';
+  h += '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;flex-wrap:wrap">';
+  h += '<div style="font-size:11px;font-weight:800;color:var(--text-primary)">'+L('Nhảy nhanh đến section','Quick jump to section')+'</div>';
+  h += '<div style="display:flex;gap:6px;align-items:center">';
+  h += '<button type="button" onclick="(function(){var f=document.getElementById(\''+IID+'\');if(f)f.src=\''+V4_PATH+'\';})()" '
+    + 'style="padding:4px 10px;font-size:11px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--text-secondary);cursor:pointer">'+L('↺ Đầu trang','↺ Reset')+'</button>';
+  h += '<a href="'+V4_PATH+'" target="_blank" rel="noopener noreferrer" '
+    + 'style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;font-size:11px;font-weight:600;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface);color:var(--brand-2);text-decoration:none">'+L('↗ Tab mới','↗ New tab')+'</a>';
+  h += '</div></div>';
+
+  SECTIONS.forEach(function(grp){
+    h += '<div style="margin-bottom:8px">';
+    h += '<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--text-tertiary);margin-bottom:4px">'+esc(grp.group)+'</div>';
+    h += '<div style="display:flex;gap:4px;flex-wrap:wrap">';
+    grp.items.forEach(function(s){
+      h += '<button type="button" onclick="_admV4Jump(\''+esc(s.id)+'\')" '
+        + 'style="padding:3px 9px;font-size:10px;border:1px solid var(--border);border-radius:999px;background:var(--bg-surface-alt,var(--bg-hover));color:var(--text-secondary);cursor:pointer;white-space:nowrap;transition:background var(--transition-fast)" '
+        + 'onmouseover="this.style.background=\'var(--bg-hover)\';this.style.color=\'var(--brand-2)\'" '
+        + 'onmouseout="this.style.background=\'var(--bg-surface-alt,var(--bg-hover))\';this.style.color=\'var(--text-secondary)\'">'+esc(s.label)+'</button>';
+    });
+    h += '</div></div>';
+  });
+  h += '</div>';
+
+  /* ── Embedded iframe ────────────────────────────────────────────────────── */
+  h += '<div style="border:1px solid var(--border);border-radius:var(--radius-xl);overflow:hidden;box-shadow:var(--shadow-md)">';
+
+  /* Browser chrome bar */
+  h += '<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg-surface-alt,var(--bg-hover));border-bottom:1px solid var(--border)">';
+  h += '<div style="display:flex;gap:5px">'
+    + '<span style="width:11px;height:11px;border-radius:50%;background:var(--red,#dc2626);opacity:.7"></span>'
+    + '<span style="width:11px;height:11px;border-radius:50%;background:var(--amber,#d97706);opacity:.7"></span>'
+    + '<span style="width:11px;height:11px;border-radius:50%;background:var(--green,#16a34a);opacity:.7"></span>'
+    + '</div>';
+  h += '<div style="flex:1;margin:0 8px;padding:3px 10px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-md);font-size:10px;font-family:var(--font-mono,monospace);color:var(--text-tertiary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(V4_PATH)+'</div>';
+  h += '<a href="'+V4_PATH+'" target="_blank" rel="noopener noreferrer" title="'+L('Mở tab mới','Open new tab')+'" style="font-size:13px;color:var(--text-tertiary);text-decoration:none;line-height:1" onmouseover="this.style.color=\'var(--brand-2)\'" onmouseout="this.style.color=\'var(--text-tertiary)\'">↗</a>';
+  h += '</div>';
+
+  /* The iframe */
+  h += '<iframe id="'+IID+'" '
+    + 'src="'+V4_PATH+'" '
+    + 'title="'+L('HESEM Module Layout Template Design System V4','HESEM Module Layout Template Design System V4')+'" '
+    + 'style="width:100%;height:calc(100vh - 280px);min-height:640px;max-height:1200px;border:none;display:block" '
+    + 'loading="lazy">'
+    + '<p style="padding:20px;font-size:13px">'+L('Iframe không được hỗ trợ — ','Iframe not supported — ')
+    + '<a href="'+V4_PATH+'" target="_blank" rel="noopener noreferrer">'+L('mở file V4 trong tab mới','open V4 file in new tab')+'</a></p>'
+    + '</iframe>';
+
+  h += '</div>';
 
   return h;
 }

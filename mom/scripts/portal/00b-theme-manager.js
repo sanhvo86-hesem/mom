@@ -551,6 +551,107 @@ function _applyCustomVars(){
   _setVar('--breadcrumb-color', cfg, 'components.breadcrumb.color');
   _setVar('--breadcrumb-active-color', cfg, 'components.breadcrumb.activeColor');
 
+  /* EQMS domain — lifecycle state colors */
+  _setVar('--eqms-draft',       cfg, 'eqms.lifecycle.draft');
+  _setVar('--eqms-open',        cfg, 'eqms.lifecycle.open');
+  _setVar('--eqms-in-progress', cfg, 'eqms.lifecycle.inProgress');
+  _setVar('--eqms-pending',     cfg, 'eqms.lifecycle.pending');
+  _setVar('--eqms-approved',    cfg, 'eqms.lifecycle.approved');
+  _setVar('--eqms-closed',      cfg, 'eqms.lifecycle.closed');
+  _setVar('--eqms-voided',      cfg, 'eqms.lifecycle.voided');
+
+  /* EQMS domain — risk heatmap cell bg+text pairs */
+  _setVar('--eqms-heatmap-low-bg',        cfg, 'eqms.heatmap.lowBg');
+  _setVar('--eqms-heatmap-low-text',      cfg, 'eqms.heatmap.lowText');
+  _setVar('--eqms-heatmap-medium-bg',     cfg, 'eqms.heatmap.mediumBg');
+  _setVar('--eqms-heatmap-medium-text',   cfg, 'eqms.heatmap.mediumText');
+  _setVar('--eqms-heatmap-high-bg',       cfg, 'eqms.heatmap.highBg');
+  _setVar('--eqms-heatmap-high-text',     cfg, 'eqms.heatmap.highText');
+  _setVar('--eqms-heatmap-critical-bg',   cfg, 'eqms.heatmap.criticalBg');
+  _setVar('--eqms-heatmap-critical-text', cfg, 'eqms.heatmap.criticalText');
+
+  /* EQMS domain — badge state dark mode pairs */
+  _setVar('--eqms-state-draft-bg-dark',      cfg, 'eqms.stateDark.draftBg');
+  _setVar('--eqms-state-draft-text-dark',    cfg, 'eqms.stateDark.draftText');
+  _setVar('--eqms-state-open-bg-dark',       cfg, 'eqms.stateDark.openBg');
+  _setVar('--eqms-state-open-text-dark',     cfg, 'eqms.stateDark.openText');
+  _setVar('--eqms-state-active-bg-dark',     cfg, 'eqms.stateDark.activeBg');
+  _setVar('--eqms-state-active-text-dark',   cfg, 'eqms.stateDark.activeText');
+  _setVar('--eqms-state-pending-bg-dark',    cfg, 'eqms.stateDark.pendingBg');
+  _setVar('--eqms-state-pending-text-dark',  cfg, 'eqms.stateDark.pendingText');
+  _setVar('--eqms-state-approved-bg-dark',   cfg, 'eqms.stateDark.approvedBg');
+  _setVar('--eqms-state-approved-text-dark', cfg, 'eqms.stateDark.approvedText');
+  _setVar('--eqms-state-voided-bg-dark',     cfg, 'eqms.stateDark.voidedBg');
+  _setVar('--eqms-state-voided-text-dark',   cfg, 'eqms.stateDark.voidedText');
+
+  /* EQMS domain — entity type colors (traceability graph canonical model) */
+  _setVar('--eqms-entity-complaint',          cfg, 'eqms.entity.complaint');
+  _setVar('--eqms-entity-deviation',          cfg, 'eqms.entity.deviation');
+  _setVar('--eqms-entity-ncr',               cfg, 'eqms.entity.ncr');
+  _setVar('--eqms-entity-mrb',               cfg, 'eqms.entity.mrb');
+  _setVar('--eqms-entity-capa',              cfg, 'eqms.entity.capa');
+  _setVar('--eqms-entity-change-control',    cfg, 'eqms.entity.changeControl');
+  _setVar('--eqms-entity-eng-change',        cfg, 'eqms.entity.engChange');
+  _setVar('--eqms-entity-document',          cfg, 'eqms.entity.document');
+  _setVar('--eqms-entity-training',          cfg, 'eqms.entity.training');
+  _setVar('--eqms-entity-competency',        cfg, 'eqms.entity.competency');
+  _setVar('--eqms-entity-assessment',        cfg, 'eqms.entity.assessment');
+  _setVar('--eqms-entity-audit',             cfg, 'eqms.entity.audit');
+  _setVar('--eqms-entity-finding',           cfg, 'eqms.entity.finding');
+  _setVar('--eqms-entity-supplier',          cfg, 'eqms.entity.supplier');
+  _setVar('--eqms-entity-evaluation',        cfg, 'eqms.entity.evaluation');
+  _setVar('--eqms-entity-scar',              cfg, 'eqms.entity.scar');
+  _setVar('--eqms-entity-supplier-audit',    cfg, 'eqms.entity.supplierAudit');
+  _setVar('--eqms-entity-quality-agreement', cfg, 'eqms.entity.qualityAgreement');
+  _setVar('--eqms-entity-risk',              cfg, 'eqms.entity.risk');
+  _setVar('--eqms-entity-fmea',              cfg, 'eqms.entity.fmea');
+  _setVar('--eqms-entity-calibration',       cfg, 'eqms.entity.calibration');
+  _setVar('--eqms-entity-msa',               cfg, 'eqms.entity.msa');
+  _setVar('--eqms-entity-oos',               cfg, 'eqms.entity.oos');
+  _setVar('--eqms-entity-iqc',               cfg, 'eqms.entity.iqc');
+  _setVar('--eqms-entity-inspection-result', cfg, 'eqms.entity.inspectionResult');
+  _setVar('--eqms-entity-spc',               cfg, 'eqms.entity.spc');
+  _setVar('--eqms-entity-test-result',       cfg, 'eqms.entity.testResult');
+  _setVar('--eqms-entity-lot-release',       cfg, 'eqms.entity.lotRelease');
+  _setVar('--eqms-entity-validation',        cfg, 'eqms.entity.validation');
+  _setVar('--eqms-entity-field-action',      cfg, 'eqms.entity.fieldAction');
+  _setVar('--eqms-entity-concession',        cfg, 'eqms.entity.concession');
+  _setVar('--eqms-entity-lesson-learned',    cfg, 'eqms.entity.lessonLearned');
+  _setVar('--eqms-entity-csat',              cfg, 'eqms.entity.csat');
+  _setVar('--eqms-entity-aml',               cfg, 'eqms.entity.aml');
+  _setVar('--eqms-entity-sampling-plan',     cfg, 'eqms.entity.samplingPlan');
+  _setVar('--eqms-entity-warranty',          cfg, 'eqms.entity.warranty');
+  _setVar('--eqms-entity-special-char',      cfg, 'eqms.entity.specialChar');
+  _setVar('--eqms-entity-fai',               cfg, 'eqms.entity.fai');
+  _setVar('--eqms-entity-apqp',              cfg, 'eqms.entity.apqp');
+  _setVar('--eqms-entity-evidence',          cfg, 'eqms.entity.evidence');
+  _setVar('--eqms-entity-approval',          cfg, 'eqms.entity.approval');
+  _setVar('--eqms-entity-signature',         cfg, 'eqms.entity.signature');
+  _setVar('--eqms-entity-audit-event',       cfg, 'eqms.entity.auditEvent');
+  _setVar('--eqms-entity-linked',            cfg, 'eqms.entity.linked');
+  _setVar('--eqms-entity-task',              cfg, 'eqms.entity.task');
+  _setVar('--eqms-entity-comment',           cfg, 'eqms.entity.comment');
+
+  /* EQMS domain — traceability link type colors */
+  _setVar('--eqms-link-caused-by',    cfg, 'eqms.link.causedBy');
+  _setVar('--eqms-link-related-to',   cfg, 'eqms.link.relatedTo');
+  _setVar('--eqms-link-requires',     cfg, 'eqms.link.requires');
+  _setVar('--eqms-link-verifies',     cfg, 'eqms.link.verifies');
+  _setVar('--eqms-link-trains',       cfg, 'eqms.link.trains');
+  _setVar('--eqms-link-releases',     cfg, 'eqms.link.releases');
+  _setVar('--eqms-link-sourced-from', cfg, 'eqms.link.sourcedFrom');
+  _setVar('--eqms-link-supersedes',   cfg, 'eqms.link.supersedes');
+  _setVar('--eqms-link-contains',     cfg, 'eqms.link.contains');
+  _setVar('--eqms-link-implements',   cfg, 'eqms.link.implements');
+  _setVar('--eqms-link-mitigates',    cfg, 'eqms.link.mitigates');
+
+  /* EQMS domain — module shell layout dimensions */
+  _setVarPx('--eqms-nav-width',      cfg, 'eqms.layout.navWidth');
+  _setVarPx('--eqms-nav-collapsed',  cfg, 'eqms.layout.navCollapsed');
+  _setVarPx('--eqms-header-height',  cfg, 'eqms.layout.headerHeight');
+  _setVarPx('--eqms-detail-sidebar', cfg, 'eqms.layout.detailSidebar');
+  _setVarPx('--eqms-filter-height',  cfg, 'eqms.layout.filterHeight');
+
   /* Custom CSS injection is emergency/exception-only. It remains under Admin
      config and must be accompanied by waiver/governance evidence before rollout. */
   var customCSS = _resolveDeep('advanced.customCSS');
