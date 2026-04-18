@@ -109,7 +109,7 @@ td,th{vertical-align:top}
 
 <div class="section">
 <h2>6. Audit tổng thể tài liệu HTML</h2>
-<p>Audit ngày 2026-04-18 quét toàn bộ <span class="code">mom/docs</span> bằng script <span class="code">tools/scripts/kpi/audit-html-kpis.php</span>. Report chi tiết nằm tại <span class="code">_reports/kpi/report-kpi-html-audit-2026-04-18.json</span>.</p>
+<p>Audit ngày 2026-04-18 quét toàn bộ <span class="code">mom/docs</span> bằng script <span class="code">tools/scripts/kpi/audit-html-kpis.php</span>. Report chi tiết nằm tại <span class="code">_reports/kpi/report-kpi-html-audit-2026-04-18.json</span>. Audit bổ sung về đánh giá, ghi nhận và kỷ luật nằm tại <span class="code">_reports/kpi/report-kpi-performance-governance-2026-04-18.json</span>.</p>
 <div class="table-card"><table class="table">
 <thead><tr><th>Chỉ số audit</th><th>Kết quả</th><th>Nhận định kiểm soát</th></tr></thead>
 <tbody>
@@ -121,11 +121,49 @@ td,th{vertical-align:top}
 <tr><td>Runtime KPI backend hiện có</td><td>19 metric</td><td>Chỉ 19 metric được KpiEngine tính trực tiếp.</td></tr>
 </tbody>
 </table></div>
-<div class="callout"><b>Kết luận audit:</b> số lượng KPI trong tài liệu không thiếu; vấn đề chính là thiếu phân tầng authority và backend coverage rõ ràng. Từ thời điểm áp dụng annex này, tài liệu hiện trường/JD/training không được tự tạo KPI chính thức nếu chưa map registry.</div>
+<div class="callout"><b>Kết luận audit:</b> số lượng KPI trong tài liệu không thiếu; vấn đề chính là thiếu phân tầng authority, backend coverage và consequence logic rõ ràng. Từ thời điểm áp dụng annex này, tài liệu hiện trường/JD/training không được tự tạo KPI chính thức nếu chưa map registry và chưa có mục đích đánh giá.</div>
 </div>
 
 <div class="section">
-<h2>7. Quy tắc dashboard</h2>
+<h2>7. Quy tắc performance governance</h2>
+<div class="callout danger"><b>Nguyên tắc khóa:</b> Không dùng để đánh giá thì không gọi KPI. Nếu chỉ dùng để theo dõi, điều hành ca/ngày, giữ cổng chất lượng hoặc nhắc hành động thì đặt là metric, control metric, gate metric, role measure hoặc health indicator.</div>
+<div class="table-card"><table class="table">
+<thead><tr><th>Phát hiện audit</th><th>Kết quả</th><th>Việc phải làm</th></tr></thead>
+<tbody>
+<tr><td>File HTML được quét</td><td>413 file</td><td>Giữ report như evidence kiểm soát tài liệu.</td></tr>
+<tr><td>File có KPI/metric có ngữ cảnh KPI</td><td>297 file</td><td>Không tự xem toàn bộ là KPI chính thức; phải qua registry.</td></tr>
+<tr><td>Thiếu từ khóa đánh giá/review</td><td>24 file</td><td>Hoặc bổ sung evaluation use, hoặc đổi tên thành metric/control indicator.</td></tr>
+<tr><td>Thiếu ghi nhận/khen thưởng</td><td>108 file</td><td>Định nghĩa recognition rule ở policy trung tâm; không nhất thiết mỗi WI lặp lại.</td></tr>
+<tr><td>Thiếu kỷ luật/corrective-action</td><td>18 file</td><td>Bổ sung quy tắc coaching, CAPA, escalation, discipline guardrail.</td></tr>
+<tr><td>Thiếu toàn bộ people-governance signal</td><td>5 file</td><td>Rà soát trước: SOP-203, WI-511, WI-514, WI-515, training competency template.</td></tr>
+<tr><td>Row KPI/target thiếu people-governance tại dòng</td><td>71 row</td><td>Dùng policy trung tâm để map hoặc đổi nhãn row thành role/control metric.</td></tr>
+</tbody>
+</table></div>
+
+<h3>7.1 Phân loại bắt buộc</h3>
+<div class="table-card"><table class="table">
+<thead><tr><th>Nhãn được phép</th><th>Khi nào dùng</th><th>Consequence hợp lệ</th></tr></thead>
+<tbody>
+<tr><td>KPI</td><td>Có evaluation use được duyệt, owner, cadence, target, rating method và evidence.</td><td>Review kết quả, recognition hoặc corrective action theo balanced bundle.</td></tr>
+<tr><td>Operating Metric</td><td>Dùng để điều hành ca/ngày/tuần, phát hiện lệch và ra hành động nhanh.</td><td>Action log, escalation, coaching; không thưởng/phạt trực tiếp.</td></tr>
+<tr><td>Gate Control Metric</td><td>Dùng để hold/release, kiểm tra FAI, setup, ship packet, traceability hoặc certification gate.</td><td>Hold/release, NCR/CAPA hoặc retraining; kỷ luật chỉ khi bypass/gian dối/tái phạm.</td></tr>
+<tr><td>Role Performance Measure</td><td>Dùng trong JD, OJT, competency hoặc đánh giá vai trò.</td><td>Đánh giá năng lực, training, phân quyền; không thành KPI công ty nếu chưa map registry.</td></tr>
+<tr><td>Health Indicator</td><td>Chỉ theo dõi xu hướng hoặc cảnh báo sớm.</td><td>Review nhận biết; không rating, không thưởng, không kỷ luật.</td></tr>
+</tbody>
+</table></div>
+
+<h3>7.2 Cơ chế đánh giá, ghi nhận và kỷ luật</h3>
+<ul class="tight">
+<li>KPI cấp công ty và phòng ban phải được review theo BSC/Hoshin cadence; không dùng một KPI đơn lẻ để thưởng hoặc kỷ luật cá nhân.</li>
+<li>Ghi nhận/khen thưởng chỉ áp dụng khi có evidence, kết quả cân bằng và không vi phạm safety, quality, delivery, data integrity hoặc gate QMS/MES.</li>
+<li>Hiệu suất thấp trước tiên kích hoạt coaching, root cause, CAPA, training, resource escalation hoặc process redesign.</li>
+<li>Kỷ luật chỉ áp dụng cho hành vi kiểm soát được và có bằng chứng: giả dữ liệu, bỏ qua cổng bắt buộc, hành vi mất an toàn, tái phạm sau coaching hoặc cố ý không theo procedure đã ban hành.</li>
+<li>Không kỷ luật người vận hành vì kết quả ngoài phạm vi kiểm soát như thiếu vật tư, thay đổi khách hàng, lỗi máy, lỗi engineering, thiếu fixture/gage/CMM hoặc quyết định nguồn lực từ quản lý.</li>
+</ul>
+</div>
+
+<div class="section">
+<h2>8. Quy tắc dashboard</h2>
 <ul class="tight">
 <li>Dashboard lãnh đạo không vượt 15 KPI nếu CEO chưa phê duyệt mở rộng.</li>
 <li>Dashboard quản lý có thể dùng toàn bộ ANNEX-122 và KPI staged đã có data contract.</li>
@@ -136,22 +174,25 @@ td,th{vertical-align:top}
 </div>
 
 <div class="section">
-<h2>8. Benchmark anchors chính thức</h2>
+<h2>9. Benchmark anchors chính thức</h2>
 <ul class="tight small">
 <li>ISA-95 tách Level 3 MOM/MES khỏi Level 4 ERP; KPI dashboard phải là read model, không thay execution truth: <a href="https://www.isa.org/standards-and-publications/isa-standards/isa-95-standard">ISA-95 Standard</a>.</li>
 <li>NIST Baldrige xem performance measurement là hệ tích hợp để planning, review và cải tiến, không chỉ là báo cáo số: <a href="https://www.nist.gov/baldrige/baldrige-criteria-commentary">Baldrige Criteria Commentary</a>.</li>
+<li>NIST Baldrige gắn workforce performance management với compensation, recognition, development, safety và engagement; vì vậy KPI phải có guardrail trước khi dùng cho người: <a href="https://www.nist.gov/system/files/documents/2023/01/19/2023-2024-Baldrige-Criteria-Business-Nonprofit-Commentary.pdf">Baldrige Criteria Commentary PDF</a>.</li>
 <li>MTConnect cung cấp semantic model cho dữ liệu máy; dùng để cấp tín hiệu machine/OEE nhưng phải contextualize theo job/operation/gate: <a href="https://www.mtconnect.org/standard-download20181">MTConnect Standard</a>.</li>
 <li>SAP production quality KPI tách Availability, Performance, Quality và OEE; SAP planning KPI nhìn resource idle, load, setup, capacity và utilization: <a href="https://help.sap.com/docs/SAP_PROFITABILITY_PERFORMANCE_MANAGEMENT/7fa13890d47b4c69bbb62175e84e4aa8/894ac627ba26422eb92a9cd17db846e8.html">SAP Production Quality KPIs</a> / <a href="https://help.sap.com/docs/SAP_S4HANA_ON-PREMISE/f899ce30af9044299d573ea30b533f1c/55a4997f55b0455aa8239f6b50175097.html">SAP Monitor Production Plan Performance</a>.</li>
+<li>SAP SuccessFactors tách goal/performance rating, calibration, continuous feedback và variable pay thành các workflow có quyền và bước duyệt riêng: <a href="https://help.sap.com/docs/successfactors-performance-and-goals/implementing-and-managing-performance-management/rating-options">Performance Rating Options</a> / <a href="https://help.sap.com/docs/successfactors-performance-and-goals/implementing-and-managing-calibration/overview-of-calibration">Calibration</a> / <a href="https://help.sap.com/docs/successfactors-compensation/implementing-and-managing-variable-pay/configuring-rating-source-for-non-assignment-based-rating-programs">Variable Pay Rating Source</a>.</li>
+<li>Microsoft Viva Goals nhấn mạnh OKR check-in, owner, cadence và data integration; OKR phù hợp cho dự án cải tiến 60-90 ngày, không thay hệ KPI/QMS chính: <a href="https://learn.microsoft.com/en-us/viva/goals/viva-goals-healthy-okr-program/check-in-okrs-overview">Check in and update OKRs</a>.</li>
 <li>Siemens Opcenter OEE nhấn mạnh time model, reason tree, machine state, downtime và corrective action; đây là hướng cần cho CNC bottleneck/OEE layer: <a href="https://www.siemens.com/en-us/products/opcenter/execution/foundation-oee/">Siemens Opcenter Execution Foundation OEE</a>.</li>
 </ul>
 </div>
 
 <div class="section">
-<h2>9. API/backend coverage rule</h2>
+<h2>10. API/backend coverage rule</h2>
 <div class="table-card"><table class="table">
 <thead><tr><th>API</th><th>Vai trò</th><th>Quy tắc</th></tr></thead>
 <tbody>
-<tr><td><span class="code">GET /api/kpi/catalog</span></td><td>Trả registry, alias, nhóm tài liệu và backend coverage.</td><td>Dùng trước khi thêm dashboard/widget mới.</td></tr>
+<tr><td><span class="code">GET /api/kpi/catalog</span></td><td>Trả registry, alias, nhóm tài liệu, backend coverage và performance-governance policy.</td><td>Dùng trước khi thêm dashboard/widget mới hoặc gọi một chỉ số là KPI.</td></tr>
 <tr><td><span class="code">GET /api/kpi/{metricCode}</span></td><td>Tính KPI runtime.</td><td>Chỉ trả số cho metric thuộc <span class="code">runtime_calculated_metrics</span>.</td></tr>
 <tr><td><span class="code">GET /api/kpi/{metricCode}/trend</span></td><td>Xu hướng KPI runtime.</td><td>Known non-runtime metric phải trả trạng thái thiếu data contract, không trả số giả.</td></tr>
 </tbody>
@@ -160,7 +201,7 @@ td,th{vertical-align:top}
 </div>
 
 <div class="section">
-<h2>10. Tài liệu liên kết</h2>
+<h2>11. Tài liệu liên kết</h2>
 <div class="table-card"><table class="table">
 <thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead>
 <tbody>

@@ -404,6 +404,7 @@ final class KpiEngine
             ], $aliases);
         }
 
+        $this->enrichCatalogGovernance($catalog, $registry);
         ksort($catalog);
 
         return [
@@ -423,7 +424,11 @@ final class KpiEngine
             'legacy_aliases' => $aliases,
             'data_contract_required_fields' => $this->registryStringList($registry, 'data_contract_required_fields', false),
             'role_measure_policy' => is_array($registry['role_measure_policy'] ?? null) ? $registry['role_measure_policy'] : [],
+            'performance_governance_policy' => is_array($registry['performance_governance_policy'] ?? null) ? $registry['performance_governance_policy'] : [],
+            'metric_governance_schema' => is_array($registry['metric_governance_schema'] ?? null) ? $registry['metric_governance_schema'] : [],
+            'metric_governance_defaults' => is_array($registry['metric_governance_defaults'] ?? null) ? $registry['metric_governance_defaults'] : [],
             'document_audit' => is_array($registry['document_audit'] ?? null) ? $registry['document_audit'] : [],
+            'performance_governance_audit' => is_array($registry['performance_governance_audit'] ?? null) ? $registry['performance_governance_audit'] : [],
             'metrics' => array_values($catalog),
         ];
     }
@@ -449,6 +454,12 @@ final class KpiEngine
 
         $runtimeCalculated = in_array($canonicalCode, self::ALL_METRICS, true);
         $knownMetric = $metric !== null || $runtimeCalculated;
+        $backendStatus = $runtimeCalculated
+            ? 'runtime_calculated'
+            : ($knownMetric ? 'data_contract_required' : 'unknown_metric');
+        if (is_array($metric) && is_string($metric['calculation_status'] ?? null)) {
+            $backendStatus = $metric['calculation_status'];
+        }
 
         return [
             'requested_code' => $requestedCode,
@@ -456,9 +467,12 @@ final class KpiEngine
             'alias_normalized' => $requestedCode !== $canonicalCode,
             'known_metric' => $knownMetric,
             'runtime_calculated' => $runtimeCalculated,
-            'backend_status' => $runtimeCalculated
-                ? 'runtime_calculated'
-                : ($knownMetric ? 'data_contract_required' : 'unknown_metric'),
+            'backend_status' => $backendStatus,
+            'calculation_status' => $backendStatus,
+            'metric_type' => is_array($metric) ? ($metric['metric_type'] ?? null) : null,
+            'is_official_kpi' => is_array($metric) ? ($metric['is_official_kpi'] ?? null) : null,
+            'evaluation_use' => is_array($metric) ? ($metric['evaluation_use'] ?? null) : null,
+            'consequence' => is_array($metric) ? ($metric['consequence'] ?? null) : null,
             'metric' => $metric,
         ];
     }
@@ -1489,6 +1503,424 @@ final class KpiEngine
     }
 
     /**
+     * @param array<string, array<string, mixed>> $catalog
+     * @param array<string, mixed>                $registry
+     */
+    private function enrichCatalogGovernance(array &$catalog, array $registry): void
+    {
+        $overrides = $this->registryMetricGovernanceOverrides($registry);
+        $defaults = is_array($registry['metric_governance_defaults'] ?? null)
+            ? $registry['metric_governance_defaults']
+            : [];
+
+        foreach ($catalog as $code => &$metric) {
+            $override = $overrides[$code] ?? [];
+            $sources = $this->stringListFromValue($metric['sources'] ?? []);
+            $usageTypes = $this->inferUsageTypes($sources);
+            foreach ($this->stringListFromValue($override['usage_types'] ?? []) as $usageType) {
+                $usageTypes[] = $usageType;
+            }
+            $usageTypes = array_values(array_unique($usageTypes));
+            sort($usageTypes);
+
+            $metricType = $this->stringField($override, 'metric_type');
+            if ($metricType === '') {
+                $metricType = $this->inferMetricType($metric, $sources);
+            }
+
+            $evaluationUse = $this->stringField($override, 'evaluation_use');
+            if ($evaluationUse === '') {
+                $evaluationUse = $this->inferEvaluationUse($metric, $sources, $metricType);
+            }
+
+            $evaluationScope = $this->stringField($override, 'evaluation_scope');
+            if ($evaluationScope === '') {
+                $evaluationScope = $this->inferEvaluationScope($metric, $sources, $metricType);
+            }
+
+            $resultType = $this->stringField($override, 'result_type');
+            if ($resultType === '') {
+                $resultType = $this->inferResultType($metricType);
+            }
+
+            $calculationStatus = $this->stringField($override, 'calculation_status');
+            if ($calculationStatus === '') {
+                $calculationStatus = $this->inferCalculationStatus($metric);
+            }
+
+            $isOfficialKpi = $metricType === 'kpi';
+            $metric['metric_type'] = $metricType;
+            $metric['classification'] = $metricType;
+            $metric['usage_types'] = $usageTypes;
+            $metric['is_official_kpi'] = $isOfficialKpi;
+            $metric['result_type'] = $resultType;
+            $metric['evaluation_use'] = $evaluationUse;
+            $metric['evaluation_scope'] = $evaluationScope;
+            $metric['calculation_status'] = $calculationStatus;
+            $metric['backend_status'] = $calculationStatus;
+
+            $this->applyGovernanceText(
+                $metric,
+                $override,
+                $metricType,
+                $defaults,
+            );
+            $this->applyGovernanceLists($metric, $override);
+            $this->applyDataContract($metric, $override, $calculationStatus);
+            $this->applyConsequence($metric, $override, $metricType, $defaults);
+        }
+        unset($metric);
+    }
+
+    /**
+     * @param array<string, mixed> $registry
+     * @return array<string, array<string, mixed>>
+     */
+    private function registryMetricGovernanceOverrides(array $registry): array
+    {
+        $raw = $registry['metric_governance_overrides'] ?? [];
+        if (!is_array($raw)) {
+            return [];
+        }
+
+        $overrides = [];
+        foreach ($raw as $code => $row) {
+            if (!is_string($code) || !is_array($row)) {
+                continue;
+            }
+            $code = strtoupper(trim($code));
+            if ($code !== '') {
+                $overrides[$code] = $row;
+            }
+        }
+
+        return $overrides;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function stringListFromValue(mixed $value): array
+    {
+        if (!is_array($value)) {
+            return [];
+        }
+
+        $list = [];
+        foreach ($value as $item) {
+            if (is_string($item) && trim($item) !== '') {
+                $list[] = trim($item);
+            }
+        }
+
+        return array_values(array_unique($list));
+    }
+
+    /**
+     * @param list<string> $sources
+     * @return list<string>
+     */
+    private function inferUsageTypes(array $sources): array
+    {
+        $map = [
+            'runtime_calculated_metrics' => 'runtime_calculated',
+            'annex122_governance_kpis' => 'annex122_governance',
+            'proposed_operating_metrics' => 'proposed_operating',
+            'executive_scorecard' => 'executive_scorecard',
+            'dashboard_core_kpis' => 'dashboard_core',
+            'gate_control_metrics' => 'gate_control',
+        ];
+
+        $usageTypes = [];
+        foreach ($sources as $source) {
+            if (isset($map[$source])) {
+                $usageTypes[] = $map[$source];
+            }
+        }
+
+        return array_values(array_unique($usageTypes));
+    }
+
+    /**
+     * @param array<string, mixed> $metric
+     * @param list<string>         $sources
+     */
+    private function inferMetricType(array $metric, array $sources): string
+    {
+        if (in_array('executive_scorecard', $sources, true) || in_array('annex122_governance_kpis', $sources, true)) {
+            return 'kpi';
+        }
+        if (in_array('gate_control_metrics', $sources, true)) {
+            return 'gate_control_metric';
+        }
+        if (in_array('proposed_operating_metrics', $sources, true) || in_array('dashboard_core_kpis', $sources, true)) {
+            return 'operating_metric';
+        }
+        if (($metric['runtime_calculated'] ?? false) === true) {
+            return 'operating_metric';
+        }
+
+        return 'health_indicator';
+    }
+
+    /**
+     * @param array<string, mixed> $metric
+     * @param list<string>         $sources
+     */
+    private function inferEvaluationUse(array $metric, array $sources, string $metricType): string
+    {
+        if ($metricType === 'kpi') {
+            if (in_array('executive_scorecard', $sources, true) || $this->stringField($metric, 'tier') === 'company') {
+                return 'company_scorecard';
+            }
+            if ($this->stringField($metric, 'tier') === 'department' || $this->stringField($metric, 'tier') === 'value_stream') {
+                return 'department_scorecard';
+            }
+
+            return 'management_review';
+        }
+        if ($metricType === 'gate_control_metric' || $metricType === 'operating_metric') {
+            return 'process_control_review';
+        }
+        if ($metricType === 'role_performance_measure') {
+            return 'role_performance_measure';
+        }
+
+        return 'none';
+    }
+
+    /**
+     * @param array<string, mixed> $metric
+     * @param list<string>         $sources
+     */
+    private function inferEvaluationScope(array $metric, array $sources, string $metricType): string
+    {
+        $tier = $this->stringField($metric, 'tier');
+        if ($tier !== '') {
+            return $tier;
+        }
+
+        $layer = $this->stringField($metric, 'layer');
+        if ($layer !== '') {
+            return $layer;
+        }
+
+        if (in_array('executive_scorecard', $sources, true)) {
+            return 'company';
+        }
+        if ($metricType === 'gate_control_metric') {
+            return 'qms_mes_gate';
+        }
+
+        return 'process';
+    }
+
+    private function inferResultType(string $metricType): string
+    {
+        return match ($metricType) {
+            'kpi' => 'outcome',
+            'gate_control_metric' => 'gate',
+            'role_performance_measure' => 'compliance',
+            'health_indicator' => 'health',
+            default => 'driver',
+        };
+    }
+
+    /**
+     * @param array<string, mixed> $metric
+     */
+    private function inferCalculationStatus(array $metric): string
+    {
+        $declared = $this->stringField($metric, 'declared_backend_status');
+        if ($declared !== '') {
+            return $declared;
+        }
+
+        if (($metric['runtime_calculated'] ?? false) === true) {
+            return 'runtime_calculated';
+        }
+
+        $registryStatus = $this->stringField($metric, 'registry_status');
+        if ($registryStatus === 'staged_data_contract') {
+            return 'staged_data_contract';
+        }
+        if ($registryStatus === 'retained_from_annex122') {
+            return 'data_contract_required';
+        }
+
+        $backendStatus = $this->stringField($metric, 'backend_status');
+        if ($backendStatus !== '') {
+            return $backendStatus;
+        }
+
+        return 'data_contract_required';
+    }
+
+    /**
+     * @param array<string, mixed> $metric
+     * @param array<string, mixed> $override
+     * @param array<string, mixed> $defaults
+     */
+    private function applyGovernanceText(array &$metric, array $override, string $metricType, array $defaults): void
+    {
+        $name = is_string($metric['name'] ?? null) ? $metric['name'] : (string) ($metric['canonical_code'] ?? 'metric');
+        $metric['strategic_intent'] = $this->overrideOrDefault(
+            $override,
+            'strategic_intent',
+            $this->defaultStrategicIntent($metricType, $name),
+        );
+        $metric['motive'] = $this->overrideOrDefault(
+            $override,
+            'motive',
+            $this->defaultMotive($metricType),
+        );
+        $metric['expected_result'] = $this->overrideOrDefault(
+            $override,
+            'expected_result',
+            $this->defaultExpectedResult($metricType),
+        );
+        $metric['decision_purpose'] = $this->overrideOrDefault(
+            $override,
+            'decision_purpose',
+            $this->defaultDecisionPurpose($metricType),
+        );
+        $metric['accountable_owner'] = $this->overrideOrDefault($override, 'accountable_owner', 'Process owner defined by registry or source document');
+        $metric['review_cadence'] = $this->overrideOrDefault($override, 'review_cadence', 'per approved scorecard or tier review cadence');
+        $metric['review_forum'] = $this->overrideOrDefault($override, 'review_forum', $metricType === 'kpi' ? 'BSC/Hoshin or management review' : 'process control review');
+        $metric['rating_method'] = $this->overrideOrDefault($override, 'rating_method', $this->defaultString($defaults, 'rating_method', 'RAG plus owner review'));
+        $metric['anti_gaming_guardrail'] = $this->overrideOrDefault($override, 'anti_gaming_guardrail', $this->defaultString($defaults, 'anti_gaming_guardrail', 'Pair with safety, quality, delivery, and evidence integrity checks.'));
+        $metric['controllability_scope'] = $this->overrideOrDefault($override, 'controllability_scope', $this->defaultString($defaults, 'controllability_scope', 'Shared system outcome unless a documented event proves controllable behavior.'));
+        $metric['data_confidence_level'] = $this->overrideOrDefault($override, 'data_confidence_level', (string) ($metric['calculation_status'] ?? 'data_contract_required'));
+    }
+
+    /**
+     * @param array<string, mixed> $metric
+     * @param array<string, mixed> $override
+     */
+    private function applyGovernanceLists(array &$metric, array $override): void
+    {
+        $counterMetric = $override['counter_metric'] ?? null;
+        if (is_array($counterMetric)) {
+            $metric['counter_metric'] = array_values(array_filter($counterMetric, static fn(mixed $item): bool => is_string($item) && trim($item) !== ''));
+        } elseif (is_string($counterMetric) && trim($counterMetric) !== '') {
+            $metric['counter_metric'] = [trim($counterMetric)];
+        } elseif (($metric['metric_type'] ?? null) === 'kpi') {
+            $metric['counter_metric'] = ['SAFETY_QUALITY_DELIVERY_DATA_INTEGRITY_GATE'];
+        } else {
+            $metric['counter_metric'] = [];
+        }
+
+        $drilldowns = $override['drilldown_dimensions'] ?? null;
+        if (is_array($drilldowns)) {
+            $metric['drilldown_dimensions'] = array_values(array_filter($drilldowns, static fn(mixed $item): bool => is_string($item) && trim($item) !== ''));
+        } else {
+            $metric['drilldown_dimensions'] = [];
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $metric
+     * @param array<string, mixed> $override
+     */
+    private function applyDataContract(array &$metric, array $override, string $calculationStatus): void
+    {
+        $code = (string) ($metric['canonical_code'] ?? '');
+        $runtimeCalculated = ($metric['runtime_calculated'] ?? false) === true;
+        $primaryEndpoint = $this->stringField($metric, 'primary_endpoint');
+        if ($primaryEndpoint === '' && $runtimeCalculated) {
+            $primaryEndpoint = "GET /api/kpi/{$code}";
+        }
+
+        $metric['data_contract'] = [
+            'calculation_status' => $calculationStatus,
+            'calculation_endpoint' => $runtimeCalculated ? "GET /api/kpi/{$code}" : null,
+            'catalog_endpoint' => 'GET /api/kpi/catalog',
+            'primary_endpoint' => $primaryEndpoint !== '' ? $primaryEndpoint : 'GET /api/kpi/catalog',
+            'source_system' => $this->overrideOrDefault($override, 'source_system', 'approved MOM/MES/EQMS/ERP read model or staged data contract'),
+            'evidence_record' => $this->overrideOrDefault($override, 'evidence_record', 'source document, event log, form, snapshot, or governed data contract'),
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $metric
+     * @param array<string, mixed> $override
+     * @param array<string, mixed> $defaults
+     */
+    private function applyConsequence(array &$metric, array $override, string $metricType, array $defaults): void
+    {
+        $metric['consequence'] = [
+            'recognition_applicable' => $metricType === 'kpi',
+            'corrective_action_applicable' => $metricType !== 'health_indicator',
+            'discipline_applicable' => false,
+            'recognition_rule' => $this->overrideOrDefault($override, 'recognition_rule', $this->defaultString($defaults, 'recognition_rule', 'Recognition requires balanced evidence and calibration.')),
+            'corrective_action_rule' => $this->overrideOrDefault($override, 'corrective_action_rule', $this->defaultString($defaults, 'corrective_action_rule', 'Below-target result triggers review and corrective action before people discipline.')),
+            'discipline_guardrail' => $this->overrideOrDefault($override, 'discipline_guardrail', $this->defaultString($defaults, 'discipline_guardrail', 'No direct discipline from outcome metric alone.')),
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function overrideOrDefault(array $row, string $key, string $default): string
+    {
+        $value = $this->stringField($row, $key);
+        return $value !== '' ? $value : $default;
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function defaultString(array $row, string $key, string $default): string
+    {
+        $value = $row[$key] ?? null;
+        return is_string($value) && trim($value) !== '' ? trim($value) : $default;
+    }
+
+    private function defaultStrategicIntent(string $metricType, string $name): string
+    {
+        return match ($metricType) {
+            'kpi' => "Formal scorecard control for {$name}.",
+            'gate_control_metric' => "Gate control for {$name}.",
+            'role_performance_measure' => "Role capability control for {$name}.",
+            'health_indicator' => "Trend visibility for {$name}.",
+            default => "Operating control for {$name}.",
+        };
+    }
+
+    private function defaultMotive(string $metricType): string
+    {
+        return match ($metricType) {
+            'kpi' => 'Drive management decisions, balanced recognition, corrective action, and resource allocation.',
+            'gate_control_metric' => 'Prevent bypass, hold/release errors, and missing QMS/MES evidence.',
+            'role_performance_measure' => 'Drive coaching, certification, OJT, and role capability growth.',
+            'health_indicator' => 'Create awareness of trend risk without rating or people consequence.',
+            default => 'Detect drift early and trigger owner action, escalation, or coaching.',
+        };
+    }
+
+    private function defaultExpectedResult(string $metricType): string
+    {
+        return match ($metricType) {
+            'kpi' => 'Sustained business result improvement without weakening safety, quality, delivery, or data integrity.',
+            'gate_control_metric' => 'Controlled release decisions with complete evidence and fewer escaped issues.',
+            'role_performance_measure' => 'Improved role competence and stable work authorization.',
+            'health_indicator' => 'Earlier visibility of risk trends.',
+            default => 'Faster local reaction and fewer repeated process deviations.',
+        };
+    }
+
+    private function defaultDecisionPurpose(string $metricType): string
+    {
+        return match ($metricType) {
+            'kpi' => 'Set scorecard status, management review actions, and balanced improvement priorities.',
+            'gate_control_metric' => 'Decide hold, release, escalation, retraining, NCR, CAPA, or evidence correction.',
+            'role_performance_measure' => 'Decide coaching, OJT, certification, role level, or work authorization.',
+            'health_indicator' => 'Decide whether trend monitoring needs deeper review.',
+            default => 'Decide shift/day/week actions and escalation.',
+        };
+    }
+
+    /**
      * @param array<string, mixed>  $catalog
      * @param array<string, mixed>  $extra
      * @param array<string, string> $aliases
@@ -1507,6 +1939,7 @@ final class KpiEngine
             'sources' => [],
             'aliases' => [],
             'local_ids' => [],
+            'source_classifications' => [],
             'runtime_calculated' => $runtimeCalculated,
             'backend_status' => $runtimeCalculated ? 'runtime_calculated' : 'data_contract_required',
             'unit' => self::UNITS[$code] ?? null,
@@ -1535,6 +1968,14 @@ final class KpiEngine
             }
             if ($key === 'runtime_calculated') {
                 $catalog[$code][$key] = (bool) $value;
+                continue;
+            }
+            if ($key === 'classification' && is_string($value)) {
+                $classification = trim($value);
+                if ($classification !== '') {
+                    $catalog[$code]['source_classifications'][$source] = $classification;
+                    $catalog[$code]['legacy_classification'] ??= $classification;
+                }
                 continue;
             }
             if ($key === 'local_id' && is_string($value)) {

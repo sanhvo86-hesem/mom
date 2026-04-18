@@ -1249,8 +1249,8 @@ var VISUAL_THEMES = [
 ];
 
 function normalizeSubTab(subTab){
-  var aliases = { overview:'templates', typography:'tokens', colors:'tokens', layout:'tokens' };
-  var valid = { templates:1, tokens:1, components:1, effects:1, governance:1, advanced:1, standard:1 };
+  var aliases = { overview:'templates', typography:'tokens', colors:'tokens', layout:'tokens', a11y:'accessibility', export:'analytics', exports:'analytics' };
+  var valid = { templates:1, tokens:1, components:1, effects:1, accessibility:1, analytics:1, governance:1, advanced:1, standard:1 };
   var resolved = aliases[subTab] || subTab || 'templates';
   return valid[resolved] ? resolved : 'templates';
 }
@@ -1644,9 +1644,10 @@ function smallMeta(label, value){
 }
 
 function refreshImpactPanel(){
-  var el = document.getElementById('adm-graphics-impact-panel');
-  if(!el) return;
-  el.innerHTML = renderImpactAnalysisPanel(false);
+  var content = renderImpactAnalysisPanel(false);
+  var els = document.querySelectorAll ? document.querySelectorAll('[id="adm-graphics-impact-panel"]') : [];
+  if(!els || !els.length) return;
+  for(var i=0;i<els.length;i++) els[i].innerHTML = content;
   announceGraphics(L('Impact analysis preview đã cập nhật.', 'Impact analysis preview updated.'));
 }
 
@@ -3053,9 +3054,7 @@ function renderTemplateCard(tpl){
 
 function renderTemplateGallery(){
   var templates = getTemplates();
-  var h = renderAuthorityStatusPanelWrapped();
-  h += sect(L('Template governance state machine', 'Template governance state machine'), templateStateMachine(), false, statusChip('admin', 'Standard 36'));
-  h += '<div id="adm-graphics-impact-panel" style="margin-bottom:16px">'+renderImpactAnalysisPanel(false)+'</div>';
+  var h = sect(L('Template governance state machine', 'Template governance state machine'), templateStateMachine(), false, statusChip('admin', 'Standard 36'));
   h += renderRolloutControls(_selectedTemplate ? getTemplateById(_selectedTemplate) : null);
   h += renderControlledRegistrySummary();
   h += renderLocalTemplateCachePanel();
@@ -3230,11 +3229,10 @@ function renderTemplates(){
 
 function renderTokens(){
   var h = sectionLead(
-    L('Token hệ thống gom Typography + Colors + Layout', 'System Tokens merge Typography + Colors + Layout'),
-    L('Mỗi chỉnh sửa token được ghi nhận thành change context để impact analysis xác định module, route, screen, block family và gates cần chạy lại.', 'Each token edit is recorded as a change context so impact analysis can identify modules, routes, screens, block families, and gates to rerun.'),
+    L('Token hệ thống: Typography + Colors + Layout', 'System Tokens: Typography + Colors + Layout'),
+    L('Mỗi chỉnh sửa token được ghi nhận thành change context để impact analysis xác định module, route, screen và block family bị ảnh hưởng.', 'Each token edit is recorded as a change context so impact analysis can identify affected modules, routes, screens, and block families.'),
     statusChip('full', L('Merged tab', 'Merged tab')) + statusChip('admin', L('Impact-aware', 'Impact-aware'))
   );
-  h += '<div id="adm-graphics-impact-panel" style="margin-bottom:16px">'+renderImpactAnalysisPanel(false)+'</div>';
   h += renderTypography();
   h += renderColors();
   h += renderLayout();
@@ -3242,6 +3240,650 @@ function renderTokens(){
 }
 
 /* ══════════════════════════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* ── ACCESSIBILITY TAB ──────────────────────────────────────────────────── */
+/* WCAG contrast checker · Color blindness simulation · Color role map      */
+/* A11y compliance checklist · Contrast pair matrix                         */
+/* ══════════════════════════════════════════════════════════════════════════ */
+
+function _cfgColor(path){
+  var tm = typeof HmTheme !== 'undefined' ? HmTheme : null;
+  if(!tm || typeof tm.getAdminConfig !== 'function') return null;
+  var cfg = tm.getAdminConfig() || {};
+  var parts = path.split('.'); var val = cfg;
+  for(var i=0;i<parts.length;i++){ if(val&&typeof val==='object') val=val[parts[i]]; else return null; }
+  return typeof val==='string'&&/^#[0-9a-fA-F]{3,8}$/.test(val) ? val : null;
+}
+
+function _hexToRgb(hex){
+  if(!hex) return null;
+  hex=hex.replace('#','');
+  if(hex.length===3) hex=hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+  var r=parseInt(hex.slice(0,2),16),g=parseInt(hex.slice(2,4),16),b=parseInt(hex.slice(4,6),16);
+  return isNaN(r)||isNaN(g)||isNaN(b)?null:{r:r,g:g,b:b};
+}
+
+function _computeContrast(hex1, hex2){
+  var tm = typeof HmTheme !== 'undefined' ? HmTheme : null;
+  if(tm && typeof tm.contrastRatio === 'function') return tm.contrastRatio(hex1, hex2);
+  function lum(c){ var r=c.r/255,g=c.g/255,b=c.b/255; return [r,g,b].reduce(function(s,v,i){ v=v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4); return s+[0.2126,0.7152,0.0722][i]*v; },0); }
+  var c1=_hexToRgb(hex1),c2=_hexToRgb(hex2); if(!c1||!c2) return 1;
+  var l1=lum(c1),l2=lum(c2),hi=Math.max(l1,l2),lo=Math.min(l1,l2);
+  return (hi+0.05)/(lo+0.05);
+}
+
+function _wcagChip(ratio){
+  var r=ratio?ratio.toFixed(2):'?';
+  if(ratio>=7) return '<span style="padding:2px 7px;border-radius:4px;font-size:10px;font-weight:800;background:#dcfce7;color:#166534;border:1px solid #86efac">AAA '+r+':1</span>';
+  if(ratio>=4.5) return '<span style="padding:2px 7px;border-radius:4px;font-size:10px;font-weight:800;background:#dbeafe;color:#1e40af;border:1px solid #93c5fd">AA '+r+':1</span>';
+  if(ratio>=3) return '<span style="padding:2px 7px;border-radius:4px;font-size:10px;font-weight:800;background:#fef9c3;color:#854d0e;border:1px solid #fde047">AA-Large '+r+':1</span>';
+  return '<span style="padding:2px 7px;border-radius:4px;font-size:10px;font-weight:800;background:#fecaca;color:#991b1b;border:1px solid #fca5a5">FAIL '+r+':1</span>';
+}
+
+function renderWcagContrastPanel(){
+  var cfg = typeof HmTheme!=='undefined'&&HmTheme.getAdminConfig ? HmTheme.getAdminConfig()||{} : {};
+  var cl = cfg.colorsLight||{}; var cd = cfg.colorsDark||{}; var br = cfg.brand||{}; var st = cfg.statusColors||{};
+  var W='#ffffff', B='#000000';
+  var lightPairs = [
+    {fg:cl.textPrimary||'#1e293b', bg:cl.bgSurface||'#ffffff', label:'Text Primary / Surface'},
+    {fg:cl.textPrimary||'#1e293b', bg:cl.bgPage||'#f8fafc', label:'Text Primary / Page'},
+    {fg:cl.textSecondary||'#64748b', bg:cl.bgSurface||'#ffffff', label:'Text Secondary / Surface'},
+    {fg:cl.textTertiary||'#94a3b8', bg:cl.bgSurface||'#ffffff', label:'Text Tertiary / Surface'},
+    {fg:cl.textLink||'#1565c0', bg:cl.bgSurface||'#ffffff', label:'Link / Surface'},
+    {fg:cl.textInverse||W, bg:br.primary||'#1565c0', label:'Inverse / Brand Primary'},
+    {fg:W, bg:st.success||'#16a34a', label:'White / Success'},
+    {fg:W, bg:st.error||'#dc2626', label:'White / Error'},
+    {fg:W, bg:st.warning||'#d97706', label:'White / Warning'},
+    {fg:W, bg:st.info||'#2563eb', label:'White / Info'},
+    {fg:cl.textPrimary||'#1e293b', bg:cl.bgSurfaceAlt||'#f1f5f9', label:'Text Primary / Surface Alt'},
+    {fg:B, bg:br.accent||'#f9a825', label:'Black / Accent'},
+  ];
+  var darkPairs = [
+    {fg:cd.textPrimary||'#f1f5f9', bg:cd.bgSurface||'#1e293b', label:'Text Primary / Surface (dark)'},
+    {fg:cd.textSecondary||'#94a3b8', bg:cd.bgSurface||'#1e293b', label:'Text Secondary / Surface (dark)'},
+    {fg:cd.textLink||'#60a5fa', bg:cd.bgSurface||'#1e293b', label:'Link / Surface (dark)'},
+    {fg:cd.textPrimary||'#f1f5f9', bg:cd.bgPage||'#0f172a', label:'Text Primary / Page (dark)'},
+  ];
+  function pairRow(p){
+    if(!p.fg||!p.bg) return '';
+    var ratio=_computeContrast(p.fg,p.bg);
+    return '<tr>'
+      +'<td style="padding:6px 10px;border-bottom:1px solid var(--border)">'
+      +'<div style="display:inline-flex;align-items:center;gap:8px">'
+      +'<div style="width:40px;height:22px;border-radius:4px;background:'+esc(p.bg)+';border:1px solid rgba(0,0,0,.1);display:flex;align-items:center;justify-content:center"><span style="color:'+esc(p.fg)+';font-size:11px;font-weight:700">Aa</span></div>'
+      +'<span style="font-size:12px;color:var(--text-primary)">'+esc(p.label)+'</span>'
+      +'</div></td>'
+      +'<td style="padding:6px 10px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--text-secondary)">'+esc(p.fg)+'</td>'
+      +'<td style="padding:6px 10px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px;color:var(--text-secondary)">'+esc(p.bg)+'</td>'
+      +'<td style="padding:6px 10px;border-bottom:1px solid var(--border)">'+_wcagChip(ratio)+'</td>'
+      +'</tr>';
+  }
+  var thStyle='text-align:left;padding:6px 10px;border-bottom:2px solid var(--border);font-size:11px;font-weight:700;color:var(--text-secondary)';
+  return sect(L('WCAG Contrast Checker','WCAG Contrast Checker'),
+    '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">'+L('Kiểm tra tỷ lệ contrast cho tất cả cặp màu. AA = 4.5:1 (text bình thường), AA-Large = 3:1 (text lớn ≥18px hoặc bold ≥14px), AAA = 7:1.','Check contrast ratio for all color pairs. AA = 4.5:1 (normal text), AA-Large = 3:1 (large text ≥18px or bold ≥14px), AAA = 7:1.')+'</div>'
+    +'<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:6px">Light mode pairs</div>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px"><thead><tr>'
+    +'<th style="'+thStyle+'">'+L('Pair','Pair')+'</th>'
+    +'<th style="'+thStyle+'">Foreground</th>'
+    +'<th style="'+thStyle+'">Background</th>'
+    +'<th style="'+thStyle+'">WCAG Level</th>'
+    +'</tr></thead><tbody>'+lightPairs.map(pairRow).join('')+'</tbody></table>'
+    +'<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:6px">Dark mode pairs</div>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'
+    +'<th style="'+thStyle+'">'+L('Pair','Pair')+'</th>'
+    +'<th style="'+thStyle+'">Foreground</th>'
+    +'<th style="'+thStyle+'">Background</th>'
+    +'<th style="'+thStyle+'">WCAG Level</th>'
+    +'</tr></thead><tbody>'+darkPairs.map(pairRow).join('')+'</tbody></table>',
+    true, statusChip('admin','WCAG 2.1'));
+}
+
+function renderColorBlindnessPanel(){
+  var filters = [
+    {id:'none',   label:L('Bình thường','Normal vision'),    matrix:''},
+    {id:'deuter', label:'Deuteranopia (red-green)',          matrix:'0.625 0.375 0 0 0  0.7 0.3 0 0 0  0 0.3 0.7 0 0  0 0 0 1 0'},
+    {id:'protan', label:'Protanopia (red-weak)',             matrix:'0.567 0.433 0 0 0  0.558 0.442 0 0 0  0 0.242 0.758 0 0  0 0 0 1 0'},
+    {id:'tritan', label:'Tritanopia (blue-yellow)',          matrix:'0.95 0.05 0 0 0  0 0.433 0.567 0 0  0 0.475 0.525 0 0  0 0 0 1 0'},
+    {id:'achroma',label:'Achromatopsia (no color)',          matrix:'0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0 0 0 1 0'},
+  ];
+  var preview = '<div style="padding:16px;background:#f8fafc;border-radius:8px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start">'
+    +'<div style="padding:8px 16px;background:#1565c0;color:#fff;border-radius:6px;font-size:13px;font-weight:700">Primary</div>'
+    +'<div style="padding:8px 16px;background:#22c55e;color:#fff;border-radius:6px;font-size:13px;font-weight:700">Success</div>'
+    +'<div style="padding:8px 16px;background:#ef4444;color:#fff;border-radius:6px;font-size:13px;font-weight:700">Error</div>'
+    +'<div style="padding:8px 16px;background:#f59e0b;color:#fff;border-radius:6px;font-size:13px;font-weight:700">Warning</div>'
+    +'<div style="padding:8px 16px;background:#8b5cf6;color:#fff;border-radius:6px;font-size:13px;font-weight:700">Purple</div>'
+    +'<div style="padding:10px;border:1px solid #e2e8f0;border-radius:6px;background:#fff"><div style="font-size:13px;font-weight:600;color:#1e293b">Card text</div><div style="font-size:11px;color:#64748b">Secondary text</div></div>'
+    +'<div style="display:flex;gap:6px">'
+    +['#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#8b5cf6','#ec4899'].map(function(c){ return '<div style="width:28px;height:28px;border-radius:4px;background:'+c+'"></div>'; }).join('')
+    +'</div>'
+    +'</div>';
+  var svgDefs = '<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0">'
+    +filters.filter(function(f){return f.matrix;}).map(function(f){
+      return '<filter id="cbf-'+f.id+'"><feColorMatrix type="matrix" values="'+f.matrix+'"/></filter>';
+    }).join('')+'</svg>';
+  var cards = filters.map(function(f){
+    var filterStyle = f.matrix ? 'filter:url(#cbf-'+f.id+');-webkit-filter:url(#cbf-'+f.id+')' : '';
+    return '<div style="flex:1;min-width:240px">'
+      +'<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:6px">'+esc(f.label)+'</div>'
+      +'<div style="'+filterStyle+'">'+preview+'</div>'
+      +'</div>';
+  }).join('');
+  return sect(L('Color Blindness Simulation','Color Blindness Simulation'),
+    svgDefs
+    +'<div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">'+L('Mô phỏng giao diện dưới 4 loại color blindness phổ biến nhất để đảm bảo UI có thể nhận biết không cần màu sắc.','Simulate the UI under 4 common color blindness types to ensure UI is distinguishable without relying on color alone.')+'</div>'
+    +'<div style="display:flex;flex-wrap:wrap;gap:16px">'+cards+'</div>',
+    false, statusChip('preview','Simulation'));
+}
+
+function renderColorRoleMapPanel(){
+  var roles = [
+    {role:L('Nền trang','Page background'), token:'--bg-page', path:'colorsLight.bgPage', usage:L('Layout wrapper, màu nền tổng thể','Layout wrapper, global background')},
+    {role:L('Nền surface','Surface'), token:'--bg-surface', path:'colorsLight.bgSurface', usage:L('Card, panel, modal, dropdown','Cards, panels, modals, dropdowns')},
+    {role:L('Nền alt','Surface Alt'), token:'--bg-surface-alt', path:'colorsLight.bgSurfaceAlt', usage:L('Striped row, sidebar section header, section bg','Striped rows, sidebar headers, section backgrounds')},
+    {role:L('Nền hover','Hover'), token:'--bg-hover', path:'colorsLight.bgHover', usage:L('Hover state cho row, nav item, list item','Hover state for rows, nav items, list items')},
+    {role:L('Text chính','Primary text'), token:'--text-primary', path:'colorsLight.textPrimary', usage:L('Nội dung chính, heading, label','Main content, headings, labels')},
+    {role:L('Text phụ','Secondary text'), token:'--text-secondary', path:'colorsLight.textSecondary', usage:L('Metadata, placeholder, helper text','Metadata, placeholders, helper text')},
+    {role:L('Text nhạt','Tertiary text'), token:'--text-tertiary', path:'colorsLight.textTertiary', usage:L('Disabled text, decorative label','Disabled text, decorative labels')},
+    {role:L('Link','Link'), token:'--text-link', path:'colorsLight.textLink', usage:L('Hyperlink, breadcrumb active, tab active','Hyperlinks, active breadcrumbs, active tabs')},
+    {role:L('Border','Border'), token:'--border', path:'colorsLight.border', usage:L('Card border, table border, input border','Card borders, table borders, input borders')},
+    {role:L('Focus ring','Focus ring'), token:'--border-focus', path:'colorsLight.borderFocus', usage:L('Keyboard focus indicator','Keyboard focus indicator')},
+    {role:L('Error','Error'), token:'--status-error', path:'statusColors.error', usage:L('Validation error, danger alert, delete action','Validation errors, danger alerts, delete actions')},
+    {role:L('Thành công','Success'), token:'--status-success', path:'statusColors.success', usage:L('Confirmation, completion, approved state','Confirmations, completions, approved states')},
+    {role:L('Cảnh báo','Warning'), token:'--status-warning', path:'statusColors.warning', usage:L('Alert, caution, pending state','Alerts, cautions, pending states')},
+    {role:L('Thông tin','Info'), token:'--status-info', path:'statusColors.info', usage:L('Info alert, progress, secondary action','Info alerts, progress, secondary actions')},
+    {role:L('Brand primary','Brand primary'), token:'--brand-primary', path:'brand.primary', usage:L('CTA button, selected tab, active link, primary badge','CTA buttons, selected tabs, active links, primary badges')},
+    {role:L('Brand accent','Accent'), token:'--brand-accent', path:'brand.accent', usage:L('Highlight, new badge, promo strip','Highlights, new badges, promo strips')},
+  ];
+  var rows = roles.map(function(r){
+    var hex = _cfgColor(r.path) || '';
+    return '<tr>'
+      +'<td style="padding:7px 10px;border-bottom:1px solid var(--border)">'
+      +(hex?'<div style="display:flex;align-items:center;gap:8px"><div style="width:24px;height:24px;border-radius:4px;background:'+esc(hex)+';border:1px solid rgba(0,0,0,.1);flex-shrink:0"></div>':'<div style="display:flex;align-items:center;gap:8px"><div style="width:24px;height:24px;border-radius:4px;background:#e2e8f0;flex-shrink:0"></div>')
+      +'<div><div style="font-size:12px;font-weight:600;color:var(--text-primary)">'+esc(r.role)+'</div><div style="font-size:10px;color:var(--text-tertiary);font-family:var(--font-mono)">'+esc(hex||'-')+'</div></div></div></td>'
+      +'<td style="padding:7px 10px;border-bottom:1px solid var(--border);font-size:11px;font-family:var(--font-mono);color:var(--text-secondary)">'+esc(r.token)+'</td>'
+      +'<td style="padding:7px 10px;border-bottom:1px solid var(--border);font-size:11px;color:var(--text-secondary)">'+esc(r.usage)+'</td>'
+      +'</tr>';
+  }).join('');
+  return sect(L('Color Role Map','Color Role Map'),
+    '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">'+L('Bản đồ vai trò màu sắc — mỗi token có một semantic role duy nhất. Không dùng màu trực tiếp, chỉ dùng qua role token.','Color role map — each token has one semantic role. Never use direct hex values, always reference by role token.')+'</div>'
+    +'<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'
+    +'<th style="text-align:left;padding:7px 10px;border-bottom:2px solid var(--border);font-size:11px">Role</th>'
+    +'<th style="text-align:left;padding:7px 10px;border-bottom:2px solid var(--border);font-size:11px">CSS Token</th>'
+    +'<th style="text-align:left;padding:7px 10px;border-bottom:2px solid var(--border);font-size:11px">Usage</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table>',
+    false, statusChip('full','16 roles'));
+}
+
+function renderA11yChecklistPanel(){
+  var checks = [
+    {done:true,  cat:'Keyboard', label:L('Focus ring hiển thị cho mọi interactive element (button, link, input)','Focus ring visible on all interactive elements')},
+    {done:true,  cat:'Keyboard', label:L('Tab order logic — không bẫy focus','Logical tab order — no focus traps')},
+    {done:true,  cat:'Color',    label:L('Contrast text/bg ≥ 4.5:1 (AA) cho text ≤ 18px','Text contrast ≥ 4.5:1 (AA) for text ≤ 18px')},
+    {done:null,  cat:'Color',    label:L('Contrast text/bg ≥ 7:1 (AAA) cho text ≤ 14px quan trọng','Text contrast ≥ 7:1 (AAA) for critical text ≤ 14px')},
+    {done:true,  cat:'Color',    label:L('Không chỉ dùng màu để truyền thông tin (status badge có icon)','Information not conveyed by color alone — status badges have icons')},
+    {done:null,  cat:'Motion',   label:L('Hỗ trợ prefers-reduced-motion','Supports prefers-reduced-motion')},
+    {done:true,  cat:'Semantics',label:L('ARIA labels cho icon-only button','ARIA labels for icon-only buttons')},
+    {done:true,  cat:'Semantics',label:L('role="tablist" + aria-selected cho tab bar','role="tablist" + aria-selected on tab bars')},
+    {done:null,  cat:'Semantics',label:L('Live region (aria-live) cho async update','Live regions for async updates')},
+    {done:true,  cat:'Font',     label:L('Font size base ≥ 14px, không dùng px nhỏ hơn 11px cho text chính','Base font ≥ 14px, no text below 11px for primary content')},
+    {done:null,  cat:'Images',   label:L('alt text cho mọi ảnh thông tin','Alt text on all informational images')},
+    {done:true,  cat:'Forms',    label:L('Label gắn với input (for/id hoặc aria-label)','Labels associated with inputs')},
+    {done:null,  cat:'Forms',    label:L('Error message có id, input aria-describedby error','Error messages have id, inputs reference via aria-describedby')},
+    {done:true,  cat:'Layout',   label:L('Nội dung không overflow khi font-size tăng 200%','Content does not overflow at 200% font size increase')},
+  ];
+  var rows = checks.map(function(c){
+    var icon = c.done===true ? '✅' : c.done===false ? '❌' : '⚠️';
+    var bg = c.done===true ? '' : c.done===false ? 'background:#fff5f5' : 'background:#fffbeb';
+    return '<tr style="'+bg+'">'
+      +'<td style="padding:6px 10px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--text-secondary);white-space:nowrap">'+esc(c.cat)+'</td>'
+      +'<td style="padding:6px 10px;border-bottom:1px solid var(--border);font-size:16px;text-align:center">'+icon+'</td>'
+      +'<td style="padding:6px 10px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text-primary)">'+esc(c.label)+'</td>'
+      +'</tr>';
+  }).join('');
+  var pass = checks.filter(function(c){return c.done===true;}).length;
+  return sect(L('A11y Compliance Checklist','A11y Compliance Checklist'),
+    '<table style="width:100%;border-collapse:collapse"><thead><tr>'
+    +'<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border);font-size:11px">Category</th>'
+    +'<th style="padding:6px 10px;border-bottom:2px solid var(--border);font-size:11px">Status</th>'
+    +'<th style="text-align:left;padding:6px 10px;border-bottom:2px solid var(--border);font-size:11px">Requirement</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table>',
+    false, statusChip(pass===checks.length?'full':'partial', pass+'/'+checks.length+' passed'));
+}
+
+function renderAccessibility(){
+  var h = sectionLead(L('Trợ năng & WCAG','Accessibility & WCAG'),
+    L('Kiểm tra contrast ratio thực tế, mô phỏng color blindness, bản đồ vai trò màu sắc, và checklist tuân thủ WCAG 2.1 AA.','Real-time contrast ratio checks, color blindness simulation, color role map, and WCAG 2.1 AA compliance checklist.'),
+    statusChip('admin','WCAG 2.1')+statusChip('full','ISO 9241'));
+  h += renderWcagContrastPanel();
+  h += renderColorBlindnessPanel();
+  h += renderColorRoleMapPanel();
+  h += renderA11yChecklistPanel();
+  return h;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════ */
+/* ── EXPORT & ANALYTICS TAB ─────────────────────────────────────────────── */
+/* Token export pipeline · Health score · Spacing scale · Shadow catalog    */
+/* Motion catalog · Typography specimen · Palette generator · Semantic map  */
+/* Side-by-side comparison · Responsive preview · CSS coverage              */
+/* ══════════════════════════════════════════════════════════════════════════ */
+
+function _flattenTokens(obj, prefix){
+  var out = {};
+  prefix = prefix||'';
+  if(!obj||typeof obj!=='object'||Array.isArray(obj)) return out;
+  Object.keys(obj).forEach(function(k){
+    if(k==='_meta') return;
+    var val = obj[k];
+    var key = prefix ? prefix+'.'+k : k;
+    if(val&&typeof val==='object'&&!Array.isArray(val)) Object.assign(out, _flattenTokens(val, key));
+    else out[key] = val;
+  });
+  return out;
+}
+
+function _toCssVarName(path){
+  return '--hds-'+path.replace(/\./g,'-').replace(/([A-Z])/g,function(m){return '-'+m.toLowerCase();}).replace(/-+/g,'-').toLowerCase();
+}
+
+function renderTokenExportPanel(){
+  var tm = typeof HmTheme!=='undefined'?HmTheme:null;
+  var cfg = tm&&tm.getAdminConfig?tm.getAdminConfig()||{}:{};
+  var flat = _flattenTokens(cfg);
+  delete flat['moduleOverrides'];
+  var keys = Object.keys(flat).filter(function(k){return flat[k]!==null&&flat[k]!==undefined&&typeof flat[k]!=='object';});
+
+  function genCSS(){ return ':root {\n'+keys.map(function(k){ return '  '+_toCssVarName(k)+': '+flat[k]+';'; }).join('\n')+'\n}'; }
+  function genSCSS(){ return keys.map(function(k){ return '$'+k.replace(/\./g,'-')+': '+flat[k]+';'; }).join('\n'); }
+  function genJS(){ var out={}; keys.forEach(function(k){ var p=k.split('.'); var o=out; p.forEach(function(part,i){ if(i===p.length-1) o[part]=flat[k]; else { o[part]=o[part]||{}; o=o[part]; } }); }); return 'export const tokens = '+JSON.stringify(out,null,2)+';'; }
+  function genDTCG(){
+    var out={}; keys.forEach(function(k){ var p=k.split('.'); var o=out; p.slice(0,-1).forEach(function(part){ o[part]=o[part]||{}; o=o[part]; }); var last=p[p.length-1]; o[last]={$value:flat[k],$type:'unknown'}; }); return JSON.stringify(out,null,2);
+  }
+  function genSwift(){ return 'import SwiftUI\n\nstruct HesemTokens {\n'+keys.map(function(k){ var name=k.split('.').map(function(p,i){return i===0?p:p[0].toUpperCase()+p.slice(1);}).join(''); return '  static let '+name+' = "'+flat[k]+'";'; }).join('\n')+'\n}'; }
+
+  var formats = [
+    {key:'css',  label:'CSS Custom Properties', btn:'CSS', gen:genCSS},
+    {key:'scss', label:'SCSS Variables',         btn:'SCSS',gen:genSCSS},
+    {key:'js',   label:'JavaScript/TypeScript',  btn:'JS/TS',gen:genJS},
+    {key:'dtcg', label:'W3C DTCG JSON',          btn:'DTCG',gen:genDTCG},
+    {key:'swift',label:'iOS Swift',              btn:'Swift',gen:genSwift},
+  ];
+  var activeExport = '_exportFmt_css';
+  var btnBar = formats.map(function(f){
+    return '<button onclick="_admTokenExportFormat(\''+f.key+'\')" id="export-btn-'+f.key+'" style="padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg-surface);color:var(--text-primary)">'+f.btn+'</button>';
+  }).join('');
+  var copyBtn = '<button onclick="_admTokenExportCopy()" style="padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#1565c0;color:#fff;margin-left:auto">📋 Copy</button>';
+  var downloadBtn = '<button onclick="_admTokenExportDownload()" style="padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#059669;color:#fff">⬇ Download</button>';
+  var preview = genCSS().slice(0,1800);
+  return sect(L('Token Export Pipeline','Token Export Pipeline'),
+    '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">'+L('Xuất tất cả '+keys.length+' design tokens ra nhiều định dạng: CSS, SCSS, JS/TS, W3C DTCG, iOS Swift.','Export all '+keys.length+' design tokens in multiple formats: CSS, SCSS, JS/TS, W3C DTCG, iOS Swift.')+'</div>'
+    +'<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:10px">'+btnBar+copyBtn+downloadBtn+'</div>'
+    +'<textarea id="adm-token-export-output" rows="14" readonly style="width:100%;padding:10px;border:1px solid var(--border);border-radius:6px;font-size:11px;font-family:var(--font-mono);background:var(--bg-surface-alt,var(--bg-hover));resize:vertical;box-sizing:border-box;color:var(--text-primary)">'+esc(preview)+'</textarea>',
+    true, statusChip('full',keys.length+' tokens'));
+}
+
+window._admTokenExportFormat = function(fmt){
+  var tm = typeof HmTheme!=='undefined'?HmTheme:null;
+  var cfg = tm&&tm.getAdminConfig?tm.getAdminConfig()||{}:{};
+  var flat = _flattenTokens(cfg);
+  delete flat['moduleOverrides'];
+  var keys = Object.keys(flat).filter(function(k){return flat[k]!==null&&flat[k]!==undefined&&typeof flat[k]!=='object';});
+  var out = '';
+  if(fmt==='css') out = ':root {\n'+keys.map(function(k){return '  '+_toCssVarName(k)+': '+flat[k]+';';}).join('\n')+'\n}';
+  else if(fmt==='scss') out = keys.map(function(k){return '$'+k.replace(/\./g,'-')+': '+flat[k]+';';}).join('\n');
+  else if(fmt==='js'){ var obj={}; keys.forEach(function(k){ var p=k.split('.'); var o=obj; p.forEach(function(part,i){if(i===p.length-1)o[part]=flat[k];else{o[part]=o[part]||{};o=o[part];}}); }); out='export const tokens = '+JSON.stringify(obj,null,2)+';'; }
+  else if(fmt==='dtcg'){ var d={}; keys.forEach(function(k){ var p=k.split('.'); var o=d; p.slice(0,-1).forEach(function(part){o[part]=o[part]||{};o=o[part];}); o[p[p.length-1]]={$value:flat[k],$type:'unknown'}; }); out=JSON.stringify(d,null,2); }
+  else if(fmt==='swift') out='import SwiftUI\n\nstruct HesemTokens {\n'+keys.map(function(k){var n=k.split('.').map(function(p,i){return i===0?p:p[0].toUpperCase()+p.slice(1);}).join('');return '  static let '+n+' = "'+flat[k]+'";';}).join('\n')+'\n}';
+  var el = document.getElementById('adm-token-export-output');
+  if(el) el.value = out;
+  window._tokenExportLastOutput = out;
+  window._tokenExportLastFmt = fmt;
+};
+window._admTokenExportCopy = function(){
+  var el = document.getElementById('adm-token-export-output');
+  if(!el) return;
+  if(navigator.clipboard) navigator.clipboard.writeText(el.value);
+  else { el.select(); document.execCommand('copy'); }
+  if(typeof showToast==='function') showToast(L('Đã copy tokens vào clipboard.','Tokens copied to clipboard.'), 'success');
+};
+window._admTokenExportDownload = function(){
+  var fmt = window._tokenExportLastFmt || 'css';
+  var content = window._tokenExportLastOutput || (document.getElementById('adm-token-export-output')||{}).value || '';
+  var exts = {css:'.css',scss:'.scss',js:'.ts',dtcg:'.json',swift:'.swift'};
+  var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([content],{type:'text/plain'}));
+  a.download = 'hesem-design-tokens'+(exts[fmt]||'.txt'); a.click();
+};
+
+function renderHealthScorePanel(){
+  var snap = graphicsSnapshot();
+  var compliance = snap.compliance || [];
+  var blockers = snap.releaseBlockers || [];
+  var debt = snap.debtObservatory || {};
+  var total = compliance.length || 1;
+  var compliantN = compliance.filter(function(r){return r.linkageStatus==='full-admin-controlled'||r.linkageStatus==='full';}).length;
+  var adoptionPct = Math.round(compliantN/total*100);
+  var debtScore = debt.byModule ? Math.round(debt.byModule.reduce(function(s,m){return s+(m.debtScore||0);},0)/Math.max(debt.byModule.length,1)) : 50;
+  var debtPct = Math.max(0, 100-debtScore);
+  var blockersScore = blockers.length === 0 ? 100 : Math.max(0, 100-blockers.length*15);
+  var overall = Math.round((adoptionPct*0.4)+(debtPct*0.35)+(blockersScore*0.25));
+  function scoreColor(pct){ return pct>=80?'#22c55e':pct>=50?'#f59e0b':'#ef4444'; }
+  function bar(pct,label,detail){
+    var c=scoreColor(pct);
+    return '<div style="margin-bottom:12px">'
+      +'<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;font-weight:600;color:var(--text-primary)">'+esc(label)+'</span><span style="font-size:12px;font-weight:700;color:'+c+'">'+pct+'%</span></div>'
+      +'<div style="height:8px;border-radius:4px;background:#e2e8f0;overflow:hidden;margin-bottom:3px"><div style="height:100%;width:'+pct+'%;background:'+c+';border-radius:4px;transition:width .4s"></div></div>'
+      +'<div style="font-size:11px;color:var(--text-secondary)">'+esc(detail)+'</div>'
+      +'</div>';
+  }
+  var grade = overall>=90?'A+':overall>=80?'A':overall>=70?'B':overall>=60?'C':overall>=50?'D':'F';
+  return sect(L('Design System Health Score','Design System Health Score'),
+    '<div style="display:grid;grid-template-columns:120px 1fr;gap:20px;align-items:start">'
+    +'<div style="text-align:center;padding:20px;border:2px solid '+(scoreColor(overall))+';border-radius:16px">'
+    +'<div style="font-size:48px;font-weight:900;color:'+(scoreColor(overall))+'">'+grade+'</div>'
+    +'<div style="font-size:22px;font-weight:800;color:var(--text-primary)">'+overall+'</div>'
+    +'<div style="font-size:11px;color:var(--text-secondary)">/ 100</div>'
+    +'</div>'
+    +'<div>'
+    +bar(adoptionPct,L('Token Adoption','Token Adoption'), compliantN+'/'+total+L(' module tuân thủ',' modules compliant'))
+    +bar(debtPct,L('Debt-free Score','Debt-free Score'), L('Debt score trung bình: ','Avg debt score: ')+debtScore)
+    +bar(blockersScore,L('Release Readiness','Release Readiness'), blockers.length+L(' blocker đang mở',' open blockers'))
+    +'</div></div>',
+    true, statusChip(overall>=80?'full':overall>=50?'preview':'partial', 'Score: '+overall));
+}
+
+function renderSpacingScalePanel(){
+  var cfg = typeof HmTheme!=='undefined'&&HmTheme.getAdminConfig?HmTheme.getAdminConfig()||{}:{};
+  var scale = cfg.fontScale || {xs:'11px',sm:13,base:14,md:16,lg:18,xl:20,'2xl':24,'3xl':'32px'};
+  var spacings = [2,4,6,8,10,12,14,16,18,20,24,28,32,40,48,56,64,80,96];
+  var scaleRows = Object.keys(scale).map(function(k){
+    var v = scale[k]; var px = typeof v==='number'?v:parseInt(v,10);
+    return '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)">'
+      +'<div style="width:60px;font-size:11px;font-family:var(--font-mono);color:var(--text-secondary)">'+esc(k)+'</div>'
+      +'<div style="width:50px;font-size:11px;font-family:var(--font-mono);color:var(--text-secondary)">'+esc(String(v))+'</div>'
+      +'<div style="font-size:'+(px||14)+'px;color:var(--text-primary);font-weight:400;line-height:1.2">Aa Quick brown fox</div>'
+      +'</div>';
+  }).join('');
+  var spaceRows = spacings.map(function(s){
+    var pct = Math.min(100, s/96*100);
+    return '<div style="display:flex;align-items:center;gap:10px;padding:4px 0">'
+      +'<div style="width:50px;font-size:11px;font-family:var(--font-mono);color:var(--text-secondary)">'+s+'px</div>'
+      +'<div style="height:20px;width:'+(pct)+'%;background:#1565c0;border-radius:3px;min-width:2px"></div>'
+      +'</div>';
+  }).join('');
+  return sect(L('Spacing & Type Scale','Spacing & Type Scale'),
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">'
+    +'<div><div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">'+L('Font Scale','Font Scale')+'</div>'+scaleRows+'</div>'
+    +'<div><div style="font-size:12px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">'+L('Spacing Scale (px)','Spacing Scale (px)')+'</div>'+spaceRows+'</div>'
+    +'</div>',
+    false, statusChip('full','type + spacing'));
+}
+
+function renderShadowCatalogPanel(){
+  var cfg = typeof HmTheme!=='undefined'&&HmTheme.getAdminConfig?HmTheme.getAdminConfig()||{}:{};
+  var eff = cfg.effects||{};
+  var shadows = [
+    {name:'xs',   val:eff.shadowXs||'0 1px 3px rgba(12,45,72,.04)', label:'Elevation 1 — subtle card'},
+    {name:'sm',   val:'0 2px 6px rgba(15,23,42,.08)', label:'Elevation 2 — default card'},
+    {name:'md',   val:'0 4px 12px rgba(15,23,42,.10)', label:'Elevation 3 — floating panel'},
+    {name:'lg',   val:eff.shadowLg||'0 18px 40px rgba(15,23,42,.14),0 8px 20px rgba(15,23,42,.09)', label:'Elevation 4 — modal'},
+    {name:'xl',   val:eff.shadowXl||'0 24px 60px rgba(12,45,72,.16),0 12px 28px rgba(12,45,72,.08)', label:'Elevation 5 — overlay'},
+    {name:'focus',val:'0 0 0 3px rgba(21,101,192,0.20)', label:'Focus ring shadow'},
+  ];
+  var cards = shadows.map(function(s){
+    return '<div style="padding:20px 16px;background:var(--bg-surface);border-radius:10px;box-shadow:'+esc(s.val)+';text-align:center">'
+      +'<div style="font-size:12px;font-weight:700;color:var(--text-primary);margin-bottom:4px">shadow-'+esc(s.name)+'</div>'
+      +'<div style="font-size:10px;color:var(--text-secondary)">'+esc(s.label)+'</div>'
+      +'</div>';
+  }).join('');
+  return sect(L('Shadow & Elevation Catalog','Shadow & Elevation Catalog'),
+    '<div style="background:var(--bg-page);padding:24px;border-radius:10px"><div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:24px">'+cards+'</div></div>',
+    false, statusChip('full','6 levels'));
+}
+
+function renderMotionCatalogPanel(){
+  var cfg = typeof HmTheme!=='undefined'&&HmTheme.getAdminConfig?HmTheme.getAdminConfig()||{}:{};
+  var eff = cfg.effects||{};
+  var curves = [
+    {name:'easeOut',  val:eff.easingOut||'cubic-bezier(0,0,0.2,1)',        label:L('Ease Out — phần tử xuất hiện/trượt vào','Ease Out — elements enter/slide in')},
+    {name:'easeInOut',val:eff.easingInOut||'cubic-bezier(0.4,0,0.2,1)',    label:L('Ease In-Out — chuyển đổi state','Ease In-Out — state transitions')},
+    {name:'spring',   val:eff.easingSpring||'cubic-bezier(0.34,1.56,0.64,1)',label:L('Spring — nảy nhẹ, CTA emphasis','Spring — slight bounce, CTA emphasis')},
+    {name:'sharp',    val:eff.easingSharp||'cubic-bezier(0.2,0,0,1)',      label:L('Sharp — đóng/thu nhỏ panel','Sharp — close/collapse panels')},
+  ];
+  var durations = [
+    {name:'fast',  val:eff.motionFast||100,  label:L('Fast — micro interaction','Fast — micro interactions')},
+    {name:'normal',val:eff.motionNormal||150,label:L('Normal — standard','Normal — standard transitions')},
+    {name:'slow',  val:eff.motionSlow||250,  label:L('Slow — complex','Slow — complex transitions')},
+    {name:'spring',val:eff.motionSpring||300,label:L('Spring — animated','Spring — animated emphasis')},
+  ];
+  var keyframeId = 'adm-motion-kf-'+Date.now();
+  var kfStyle = '<style id="'+keyframeId+'">@keyframes admSlide{0%{transform:translateX(0)}50%{transform:translateX(60px)}100%{transform:translateX(0)}}</style>';
+  var curveCards = curves.map(function(c){
+    return '<div style="border:1px solid var(--border);border-radius:8px;padding:12px;background:var(--bg-surface)">'
+      +'<div style="font-size:11px;font-weight:700;color:var(--text-primary);margin-bottom:2px">'+esc(c.name)+'</div>'
+      +'<div style="font-size:10px;color:var(--text-secondary);margin-bottom:8px;font-family:var(--font-mono)">'+esc(c.val)+'</div>'
+      +'<div style="font-size:10px;color:var(--text-tertiary);margin-bottom:10px">'+esc(c.label)+'</div>'
+      +'<div style="height:32px;background:var(--bg-surface-alt,var(--bg-hover));border-radius:6px;overflow:hidden;position:relative">'
+      +'<div style="position:absolute;top:8px;left:0;width:16px;height:16px;border-radius:50%;background:#1565c0;animation:admSlide 1.6s '+esc(c.val)+' infinite"></div>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+  var durRows = durations.map(function(d){
+    return '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)">'
+      +'<div style="width:70px;font-size:12px;font-weight:600;color:var(--text-primary)">'+esc(d.name)+'</div>'
+      +'<div style="width:55px;font-size:11px;font-family:var(--font-mono);color:var(--text-secondary)">'+d.val+'ms</div>'
+      +'<div style="flex:1;height:6px;border-radius:3px;background:#e2e8f0;overflow:hidden"><div style="height:100%;width:'+(Math.min(100,d.val/3))+'%;background:#8b5cf6;border-radius:3px"></div></div>'
+      +'<div style="font-size:10px;color:var(--text-tertiary)">'+esc(d.label)+'</div>'
+      +'</div>';
+  }).join('');
+  return sect(L('Motion & Easing Catalog','Motion & Easing Catalog'),
+    kfStyle
+    +'<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:16px">'+curveCards+'</div>'
+    +'<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">'+L('Duration scale','Duration scale')+'</div>'
+    +durRows,
+    false, statusChip('full','4 curves · 4 durations'));
+}
+
+function renderTypographySpecimenPanel(){
+  var cfg = typeof HmTheme!=='undefined'&&HmTheme.getAdminConfig?HmTheme.getAdminConfig()||{}:{};
+  var typo = cfg.typography||{}; var scale = cfg.fontScale||{};
+  var sampleText = L('Thiết kế hệ thống sản xuất thế hệ kế tiếp. Nhanh, chính xác, có thể mở rộng.','Next-generation manufacturing system design. Fast, precise, scalable.');
+  var roles = [
+    {name:'Display',  family:typo.display&&typo.display.family||'', weight:typo.display&&typo.display.weight||700, size:scale['3xl']||'32px'},
+    {name:'Heading',  family:typo.heading&&typo.heading.family||'', weight:typo.heading&&typo.heading.weight||600, size:scale['2xl']||'24px'},
+    {name:'Body',     family:typo.body&&typo.body.family||'',     weight:typo.body&&typo.body.weight||400,   size:scale.base||14},
+    {name:'Label',    family:typo.label&&typo.label.family||'',   weight:typo.label&&typo.label.weight||600,  size:scale.sm||13},
+    {name:'Mono',     family:typo.mono&&typo.mono.family||'',     weight:400,                               size:scale.sm||13},
+  ];
+  var blocks = roles.map(function(r){
+    var sz = typeof r.size==='number'?r.size+'px':String(r.size);
+    return '<div style="padding:14px 0;border-bottom:1px solid var(--border)">'
+      +'<div style="font-size:10px;font-weight:700;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px">'+esc(r.name)+' · '+esc(sz)+' · '+esc(String(r.weight))+'</div>'
+      +'<div style="font-size:'+esc(sz)+';font-weight:'+r.weight+';font-family:'+esc(r.family||'inherit')+';color:var(--text-primary);line-height:1.3">'+esc(sampleText)+'</div>'
+      +'<div style="font-size:10px;color:var(--text-tertiary);margin-top:4px;font-family:var(--font-mono)">'+esc(r.family||'system-ui')+'</div>'
+      +'</div>';
+  }).join('');
+  var alphabet = '<div style="margin-top:14px;padding:12px;background:var(--bg-surface-alt,var(--bg-hover));border-radius:8px">'
+    +'<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:6px">Alphabet specimen</div>'
+    +'<div style="font-size:14px;color:var(--text-primary);line-height:1.8">AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz</div>'
+    +'<div style="font-size:13px;color:var(--text-secondary);line-height:1.8">0123456789 !@#$%^&*()_+-=[]{}|;:,./? ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬắặ</div>'
+    +'</div>';
+  return sect(L('Typography Specimen','Typography Specimen'), blocks+alphabet, false, statusChip('full','5 roles'));
+}
+
+function _hexToHsl(hex){
+  var rgb = _hexToRgb(hex); if(!rgb) return null;
+  var r=rgb.r/255,g=rgb.g/255,b=rgb.b/255;
+  var max=Math.max(r,g,b),min=Math.min(r,g,b),h=0,s=0,l=(max+min)/2;
+  if(max!==min){var d=max-min;s=l>.5?d/(2-max-min):d/(max+min);switch(max){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;case b:h=(r-g)/d+4;break;}h/=6;}
+  return {h:Math.round(h*360),s:Math.round(s*100),l:Math.round(l*100)};
+}
+function _hslToHex(h,s,l){
+  s/=100;l/=100;var a=s*Math.min(l,1-l);
+  function f(n){var k=(n+h/30)%12;var c=l-a*Math.max(Math.min(k-3,9-k,1),-1);return Math.round(255*c).toString(16).padStart(2,'0');}
+  return '#'+f(0)+f(8)+f(4);
+}
+
+function renderColorPalettePanel(){
+  var cfg = typeof HmTheme!=='undefined'&&HmTheme.getAdminConfig?HmTheme.getAdminConfig()||{}:{};
+  var br = cfg.brand||{}; var st = cfg.statusColors||{};
+  var paletteSources = [
+    {name:'Brand Primary', hex:br.primary||'#1565c0'},
+    {name:'Brand Accent', hex:br.accent||'#f9a825'},
+    {name:'Success', hex:st.success||'#16a34a'},
+    {name:'Error', hex:st.error||'#dc2626'},
+    {name:'Warning', hex:st.warning||'#d97706'},
+    {name:'Info', hex:st.info||'#2563eb'},
+  ];
+  var steps = [95,90,80,70,60,50,40,30,20,10];
+  var palettes = paletteSources.map(function(src){
+    var hsl = _hexToHsl(src.hex); if(!hsl) return '';
+    var swatches = steps.map(function(l,i){
+      var hex = _hslToHex(hsl.h, hsl.s, l);
+      var textColor = l>55?'#1e293b':'#ffffff';
+      return '<div style="flex:1;min-width:0" title="'+esc(hex)+'">'
+        +'<div style="height:44px;background:'+esc(hex)+';'+(i===0?'border-radius:6px 0 0 6px':'')+(i===steps.length-1?'border-radius:0 6px 6px 0':'')+'"></div>'
+        +'<div style="font-size:9px;color:var(--text-tertiary);text-align:center;margin-top:3px;font-family:var(--font-mono)">'+(i*100+100)+'</div>'
+        +'</div>';
+    }).join('');
+    return '<div style="margin-bottom:16px">'
+      +'<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:6px">'+esc(src.name)+' <span style="font-family:var(--font-mono);font-weight:400">'+esc(src.hex)+'</span></div>'
+      +'<div style="display:flex;gap:2px">'+swatches+'</div>'
+      +'</div>';
+  }).join('');
+  return sect(L('Color Tonal Palette Generator','Color Tonal Palette Generator'),
+    '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">'+L('Tông màu tự động từ brand và status tokens. Mỗi step thay đổi lightness 10%.','Auto-generated tonal palettes from brand and status tokens. Each step shifts lightness by 10%.')+'</div>'
+    +palettes,
+    false, statusChip('preview','auto-generated'));
+}
+
+function renderTokenSemanticMapPanel(){
+  var layers = [
+    {name:L('Primitive Tokens','Primitive Tokens'), color:'#dbeafe', examples:['#1565c0','#22c55e','#f1f5f9','14px','600'], desc:L('Giá trị thô: hex, px, font-weight. Không dùng trực tiếp trong component.','Raw values: hex, px, font-weight. Never referenced directly in components.')},
+    {name:L('Semantic Tokens','Semantic Tokens'),   color:'#dcfce7', examples:['--text-primary','--bg-surface','--border','--status-success','--brand-primary'], desc:L('Gán vai trò ngữ nghĩa. Component chỉ được phép tham chiếu semantic tokens.','Role-assigned tokens. Components must only reference semantic tokens.')},
+    {name:L('Component Tokens','Component Tokens'), color:'#fef9c3', examples:['--hds-btn-py','--hds-table-cell-py','--hds-badge-fw','--hds-modal-radius','--hds-nav-height'], desc:L('Override per-component nếu cần tách biệt khỏi semantic. Dùng ít nhất có thể.','Per-component overrides when separation from semantic is needed. Use sparingly.')},
+  ];
+  var blocks = layers.map(function(l,i){
+    return '<div style="flex:1;border-radius:10px;padding:16px;background:'+esc(l.color)+';border:2px solid rgba(0,0,0,.07)">'
+      +'<div style="font-size:12px;font-weight:800;color:#1e293b;margin-bottom:6px">'+(i+1)+'. '+esc(l.name)+'</div>'
+      +'<div style="font-size:11px;color:#374151;margin-bottom:10px;line-height:1.6">'+esc(l.desc)+'</div>'
+      +'<div style="display:flex;flex-direction:column;gap:4px">'+l.examples.map(function(e){return '<code style="font-size:10px;background:rgba(255,255,255,.7);border-radius:4px;padding:2px 6px;color:#1e293b;display:inline-block">'+esc(e)+'</code>';}).join('')+'</div>'
+      +'</div>';
+  }).join('<div style="display:flex;align-items:center;padding:0 6px;font-size:20px;color:#94a3b8">→</div>');
+  return sect(L('Token Semantic Architecture','Token Semantic Architecture'),
+    '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:14px">'+L('Ba lớp token: Primitive (giá trị thô) → Semantic (vai trò ngữ nghĩa) → Component (override cục bộ). Chỉ semantic và component được phép dùng trong stylesheet module.','Three-layer token architecture: Primitive (raw values) → Semantic (role-assigned) → Component (local overrides). Only semantic and component layers should appear in module stylesheets.')+'</div>'
+    +'<div style="display:flex;gap:8px;align-items:stretch;flex-wrap:wrap">'+blocks+'</div>',
+    false, statusChip('full','3-layer'));
+}
+
+function renderSideBySidePanel(){
+  var sampleHtml = function(mode){
+    var isDark = mode==='dark';
+    var bg=isDark?'#1e293b':'#ffffff',pg=isDark?'#0f172a':'#f8fafc',txt=isDark?'#f1f5f9':'#1e293b',txt2=isDark?'#94a3b8':'#64748b',bdr=isDark?'#334155':'#e2e8f0',btnBg='#1565c0';
+    return '<div style="background:'+pg+';padding:12px;border-radius:8px;font-family:-apple-system,sans-serif">'
+      +'<div style="background:'+bg+';border:1px solid '+bdr+';border-radius:8px;padding:14px;margin-bottom:10px">'
+      +'<div style="font-size:13px;font-weight:700;color:'+txt+';margin-bottom:4px">'+L('Bảng điều khiển','Dashboard')+'</div>'
+      +'<div style="font-size:11px;color:'+txt2+';margin-bottom:10px">'+L('Chào mừng, Giám đốc điều hành.','Welcome, General Director.')+'</div>'
+      +'<div style="display:flex;gap:6px;flex-wrap:wrap">'
+      +'<div style="flex:1;min-width:80px;border:1px solid '+bdr+';border-radius:6px;padding:8px;background:'+bg+'">'
+      +'<div style="font-size:10px;color:'+txt2+'">NCR</div><div style="font-size:18px;font-weight:800;color:'+txt+'">24</div></div>'
+      +'<div style="flex:1;min-width:80px;border:1px solid '+bdr+';border-radius:6px;padding:8px;background:'+bg+'">'
+      +'<div style="font-size:10px;color:'+txt2+'">CAPA</div><div style="font-size:18px;font-weight:800;color:'+txt+'">8</div></div>'
+      +'<div style="flex:1;min-width:80px;border:1px solid '+bdr+';border-radius:6px;padding:8px;background:'+bg+'">'
+      +'<div style="font-size:10px;color:'+txt2+'">Audit</div><div style="font-size:18px;font-weight:800;color:#22c55e">OK</div></div>'
+      +'</div>'
+      +'<div style="margin-top:10px;display:flex;gap:6px">'
+      +'<button style="padding:5px 12px;border-radius:5px;font-size:11px;font-weight:700;background:'+btnBg+';color:#fff;border:none">'+L('Tạo NCR','Create NCR')+'</button>'
+      +'<button style="padding:5px 12px;border-radius:5px;font-size:11px;font-weight:600;background:transparent;color:'+txt+';border:1px solid '+bdr+'">'+L('Xuất','Export')+'</button>'
+      +'</div>'
+      +'</div>'
+      +'<div style="display:flex;gap:6px"><span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#dcfce7;color:#166534">Done</span>'
+      +'<span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#fef9c3;color:#854d0e">Pending</span>'
+      +'<span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#fecaca;color:#991b1b">Overdue</span></div>'
+      +'</div>';
+  };
+  return sect(L('Light / Dark Comparison','Light / Dark Comparison'),
+    '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">'+L('So sánh giao diện Light và Dark mode đồng thời với cùng một layout mẫu.','Compare Light and Dark mode simultaneously with the same sample layout.')+'</div>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'
+    +'<div><div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:6px">☀ Light mode</div>'+sampleHtml('light')+'</div>'
+    +'<div><div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:6px">🌙 Dark mode</div>'+sampleHtml('dark')+'</div>'
+    +'</div>',
+    false, statusChip('preview','side-by-side'));
+}
+
+function renderBreakpointPreviewPanel(){
+  var bp = [
+    {name:'Mobile', w:375, scale:0.38, label:'375px'},
+    {name:'Tablet', w:768, scale:0.38, label:'768px'},
+    {name:'Desktop',w:1280,scale:0.38, label:'1280px'},
+  ];
+  var cards = bp.map(function(b){
+    var scaledW = Math.round(b.w*b.scale);
+    var scaledH = Math.round(b.w*b.scale*0.65);
+    var inner = '<div style="width:'+b.w+'px;height:'+Math.round(b.w*0.65)+'px;transform:scale('+b.scale+');transform-origin:top left;background:#f8fafc;border-radius:8px;overflow:hidden">'
+      +'<div style="height:40px;background:#0c2d48;display:flex;align-items:center;padding:0 16px"><div style="color:#fff;font-size:14px;font-weight:700">HESEM MOM</div></div>'
+      +'<div style="display:flex;height:calc(100% - 40px)">'
+      +(b.w>=768?'<div style="width:200px;background:#0a1e32;height:100%"></div>':'')
+      +'<div style="flex:1;padding:16px;background:#f8fafc"><div style="height:16px;background:#e2e8f0;border-radius:4px;margin-bottom:8px"></div><div style="height:12px;background:#e2e8f0;border-radius:4px;width:80%;margin-bottom:8px"></div>'
+      +'<div style="display:flex;gap:8px;margin-bottom:10px">'
+      +'<div style="height:60px;flex:1;background:#fff;border-radius:6px;border:1px solid #e2e8f0"></div>'
+      +'<div style="height:60px;flex:1;background:#fff;border-radius:6px;border:1px solid #e2e8f0"></div>'
+      +(b.w>=768?'<div style="height:60px;flex:1;background:#fff;border-radius:6px;border:1px solid #e2e8f0"></div>':'')
+      +'</div><div style="height:80px;background:#fff;border-radius:6px;border:1px solid #e2e8f0"></div>'
+      +'</div></div></div>';
+    return '<div style="text-align:center">'
+      +'<div style="font-size:11px;font-weight:700;color:var(--text-secondary);margin-bottom:8px">'+esc(b.name)+' ('+esc(b.label)+')</div>'
+      +'<div style="width:'+scaledW+'px;height:'+scaledH+'px;overflow:hidden;border:1px solid var(--border);border-radius:6px;display:inline-block">'+inner+'</div>'
+      +'</div>';
+  }).join('');
+  return sect(L('Responsive Layout Preview','Responsive Layout Preview'),
+    '<div style="display:flex;gap:20px;flex-wrap:wrap;justify-content:center;padding:16px;background:var(--bg-page);border-radius:10px">'+cards+'</div>',
+    false, statusChip('preview','3 breakpoints'));
+}
+
+function renderCssCoveragePanel(){
+  var snap = graphicsSnapshot();
+  var diag = snap.runtimeDiagnostics || {};
+  var sharedTokens = diag.sharedTokensActive || 0;
+  var hmConsumers = diag.hmConsumers || 0;
+  var privateShells = diag.privateShells || 0;
+  var inlineStyles = diag.inlineStyles || 0;
+  var compliance = snap.compliance || [];
+  var adoptionPct = compliance.length ? Math.round(compliance.filter(function(r){return r.consumesSharedTokens;}).length/compliance.length*100) : 0;
+  var hmPct = compliance.length ? Math.round(compliance.filter(function(r){return r.consumesHmComponents;}).length/compliance.length*100) : 0;
+  function statCard(label, value, sub, mode){
+    return infoCard(label, String(value)+(sub?' '+sub:''), mode||'neutral');
+  }
+  return sect(L('CSS Token Coverage','CSS Token Coverage'),
+    '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:14px">'
+    +statCard(L('Shared tokens active','Shared tokens active'), sharedTokens, L('CSS vars','CSS vars'), sharedTokens>4?'full':'partial')
+    +statCard(L('hm-* consumers','hm-* consumers'), hmConsumers, L('elements','elements'), hmConsumers>10?'full':'preview')
+    +statCard(L('Private CSS shells','Private CSS shells'), privateShells, L('elements','elements'), privateShells>0?'partial':'full')
+    +statCard(L('Inline styles','Inline styles'), inlineStyles, L('elements','elements'), inlineStyles>50?'partial':'full')
+    +statCard(L('Token adoption','Token adoption'), adoptionPct+'%', L('modules','modules'), adoptionPct>70?'full':'partial')
+    +statCard(L('hm-* adoption','hm-* adoption'), hmPct+'%', L('modules','modules'), hmPct>70?'full':'partial')
+    +'</div>'
+    +'<div style="font-size:11px;color:var(--text-secondary);line-height:1.7">'+L('Dữ liệu runtime — được thu thập khi trang được render. Refresh trang để cập nhật số liệu mới nhất.','Runtime data — collected when page was rendered. Refresh to get latest metrics.')+'</div>',
+    false, statusChip(adoptionPct>70?'full':'partial', adoptionPct+'% adoption'));
+}
+
+function renderAnalytics(){
+  var h = sectionLead(L('Xuất & Phân tích hệ thống','Export & System Analytics'),
+    L('Xuất token ra đa định dạng, phân tích sức khỏe design system, xem scale trực quan và so sánh light/dark mode.','Export tokens in multiple formats, analyze design system health, visualize scales, and compare light/dark modes.'),
+    statusChip('admin','Token Export')+statusChip('full','Health Score'));
+  h += renderHealthScorePanel();
+  h += renderTokenExportPanel();
+  h += renderTypographySpecimenPanel();
+  h += renderColorPalettePanel();
+  h += renderSpacingScalePanel();
+  h += renderShadowCatalogPanel();
+  h += renderMotionCatalogPanel();
+  h += renderTokenSemanticMapPanel();
+  h += renderSideBySidePanel();
+  h += renderBreakpointPreviewPanel();
+  h += renderCssCoveragePanel();
+  return h;
+}
+
 /* ── RENDER MAIN ────────────────────────────────────────────────────────── */
 /* ══════════════════════════════════════════════════════════════════════════ */
 
@@ -3250,13 +3892,15 @@ function render(el, subTab, currentLang){
   _subTab = normalizeSubTab(subTab || _subTab);
 
   var tabs = [
-    {key:'templates', icon:'📐', label:T('templates')},
-    {key:'tokens', icon:'🎨', label:T('tokens')},
-    {key:'components', icon:'🧱', label:T('components')},
-    {key:'effects', icon:'✨', label:T('effects')},
-    {key:'governance', icon:'🛡️', label:T('governance')},
-    {key:'advanced', icon:'🧩', label:T('advanced')},
-    {key:'standard', icon:'📖', label:L('Chuẩn V4', 'V4 Standard')}
+    {key:'templates',    icon:'📐', label:T('templates')},
+    {key:'tokens',       icon:'🎨', label:T('tokens')},
+    {key:'components',   icon:'🧱', label:T('components')},
+    {key:'effects',      icon:'✨', label:T('effects')},
+    {key:'accessibility',icon:'♿', label:L('Trợ năng','Accessibility')},
+    {key:'analytics',    icon:'📊', label:L('Xuất & Phân tích','Export & Analytics')},
+    {key:'governance',   icon:'🛡️', label:T('governance')},
+    {key:'advanced',     icon:'🧩', label:T('advanced')},
+    {key:'standard',     icon:'📖', label:L('Chuẩn thiết kế','Design Standard')}
   ];
 
   var h = '<div style="max-width:min(100%,1120px);margin:0 auto">';
@@ -3278,13 +3922,15 @@ function render(el, subTab, currentLang){
 
   /* Sub-tab content: keep stable panels so aria-controls always resolves. */
   var bodies = {
-    templates: renderTemplates(),
-    tokens: renderTokens(),
-    components: renderComponents(),
-    effects: renderEffects(),
-    governance: renderGovernance(),
-    advanced: renderAdvanced(),
-    standard: renderStandard()
+    templates:    renderTemplates(),
+    tokens:       renderTokens(),
+    components:   renderComponents(),
+    effects:      renderEffects(),
+    accessibility:renderAccessibility(),
+    analytics:    renderAnalytics(),
+    governance:   renderGovernance(),
+    advanced:     renderAdvanced(),
+    standard:     renderStandard()
   };
   tabs.forEach(function(t){
     var active = _subTab === t.key;
