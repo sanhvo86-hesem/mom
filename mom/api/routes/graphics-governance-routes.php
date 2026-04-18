@@ -48,6 +48,14 @@ return static function (Router $router, string $dataDir): void {
         'graphics_release_link_get'            => [GraphicsGovernanceController::class, 'releaseLink'],
         'graphics_release_evidence_pack_get'   => [GraphicsGovernanceController::class, 'releaseEvidencePack'],
 
+        // ── Graphics Authority (DB-backed token catalog) — 2026-04-18 rebuild ──
+        'graphics_token_catalog_list'          => [GraphicsGovernanceController::class, 'tokenCatalogList'],
+        'graphics_token_catalog_snapshot'      => [GraphicsGovernanceController::class, 'tokenCatalogSnapshot'],
+        'graphics_preview_scenes_list'         => [GraphicsGovernanceController::class, 'previewScenesList'],
+        'graphics_component_contract_list'     => [GraphicsGovernanceController::class, 'componentContractRegistry'],
+        'graphics_theme_schedule_list'         => [GraphicsGovernanceController::class, 'themeScheduleList'],
+        'graphics_simulation_run_record'       => [GraphicsGovernanceController::class, 'simulationRunRecord'],
+
         // Backward-compatible Admin Appearance aliases. These override the
         // older platform-route mapping so Admin cannot bypass graphics-specific
         // read/write permissions, CSRF/version handling, audit, or backend
@@ -129,6 +137,14 @@ return static function (Router $router, string $dataDir): void {
     $router->post('/api/graphics/rollouts/apply', GraphicsGovernanceController::class, 'applyRollout');
     $router->post('/api/graphics/rollouts/canary-apply', GraphicsGovernanceController::class, 'canaryApplyRollout');
     $router->post('/api/graphics/rollouts/rollback', GraphicsGovernanceController::class, 'rollbackRollout');
+
+    // ── Graphics Authority (DB-backed token catalog) ──
+    $router->get('/api/graphics/tokens/catalog',   GraphicsGovernanceController::class, 'tokenCatalogList');
+    $router->get('/api/graphics/tokens/snapshot',  GraphicsGovernanceController::class, 'tokenCatalogSnapshot');
+    $router->get('/api/graphics/preview-scenes',   GraphicsGovernanceController::class, 'previewScenesList');
+    $router->get('/api/graphics/component-contracts', GraphicsGovernanceController::class, 'componentContractRegistry');
+    $router->get('/api/graphics/theme-schedules',  GraphicsGovernanceController::class, 'themeScheduleList');
+    $router->post('/api/graphics/simulation-runs', GraphicsGovernanceController::class, 'simulationRunRecord');
 
     $router->get('/api/graphics/audit', GraphicsGovernanceController::class, 'auditHistory');
     $router->post('/api/graphics/waivers', GraphicsGovernanceController::class, 'createWaiver');

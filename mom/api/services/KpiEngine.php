@@ -421,6 +421,7 @@ final class KpiEngine
                 'proposed_operating_metrics' => count($this->registryRows($registry, 'proposed_operating_metrics')),
             ],
             'runtime_calculated_metrics' => self::ALL_METRICS,
+            'executive_scorecard' => $this->registryStringList($registry, 'executive_scorecard'),
             'legacy_aliases' => $aliases,
             'data_contract_required_fields' => $this->registryStringList($registry, 'data_contract_required_fields', false),
             'role_measure_policy' => is_array($registry['role_measure_policy'] ?? null) ? $registry['role_measure_policy'] : [],
@@ -1611,6 +1612,20 @@ final class KpiEngine
             return [];
         }
 
+        $contracts = [];
+        $rawContracts = $registry['scorecard_evidence_contracts'] ?? [];
+        if (is_array($rawContracts)) {
+            foreach ($rawContracts as $code => $row) {
+                if (!is_string($code) || !is_array($row)) {
+                    continue;
+                }
+                $code = strtoupper(trim($code));
+                if ($code !== '') {
+                    $contracts[$code] = $row;
+                }
+            }
+        }
+
         $items = [];
         foreach ($model['executive_scorecard_items'] as $row) {
             if (!is_array($row)) {
@@ -1618,7 +1633,7 @@ final class KpiEngine
             }
             $code = $this->codeField($row, 'canonical_code');
             if ($code !== '') {
-                $items[$code] = $row;
+                $items[$code] = array_merge($row, $contracts[$code] ?? []);
             }
         }
 
@@ -1865,7 +1880,13 @@ final class KpiEngine
             'catalog_endpoint' => 'GET /api/kpi/catalog',
             'primary_endpoint' => $primaryEndpoint !== '' ? $primaryEndpoint : 'GET /api/kpi/catalog',
             'source_system' => $this->overrideOrDefault($override, 'source_system', 'approved MOM/MES/EQMS/ERP read model or staged data contract'),
+            'source_table_or_record' => $this->overrideOrDefault($override, 'source_table_or_record', 'approved source table, event record, or staged data contract'),
             'evidence_record' => $this->overrideOrDefault($override, 'evidence_record', 'source document, event log, form, snapshot, or governed data contract'),
+            'authority_service_path' => $this->overrideOrDefault($override, 'authority_service_path', 'KpiEngine catalog data contract; execution truth remains MOM/MES/EQMS/ERP service path'),
+            'freshness_rule' => $this->overrideOrDefault($override, 'freshness_rule', 'per review cadence and approved close calendar'),
+            'lineage_rule' => $this->overrideOrDefault($override, 'lineage_rule', 'metric value must trace to approved source evidence before scorecard use'),
+            'data_contract_approval_id' => $this->nullableStringField($override, 'data_contract_approval_id'),
+            'evidence_manifest_id' => $this->nullableStringField($override, 'evidence_manifest_id'),
         ];
     }
 
@@ -1878,8 +1899,12 @@ final class KpiEngine
     {
         $metric['consequence'] = [
             'recognition_applicable' => $metricType === 'kpi',
+            'calibration_input_only' => $metricType === 'kpi',
+            'monetary_recognition_status' => $metricType === 'kpi' ? 'requires_scorecard_calibration' : 'not_applicable',
+            'recognition_decision_authority' => 'HR/QMS/CEO calibration, never automatic from a single metric value',
             'corrective_action_applicable' => $metricType !== 'health_indicator',
             'discipline_applicable' => false,
+            'discipline_from_metric' => false,
             'recognition_rule' => $this->overrideOrDefault($override, 'recognition_rule', $this->defaultString($defaults, 'recognition_rule', 'Recognition requires balanced evidence and calibration.')),
             'corrective_action_rule' => $this->overrideOrDefault($override, 'corrective_action_rule', $this->defaultString($defaults, 'corrective_action_rule', 'Below-target result triggers review and corrective action before people discipline.')),
             'discipline_guardrail' => $this->overrideOrDefault($override, 'discipline_guardrail', $this->defaultString($defaults, 'discipline_guardrail', 'No direct discipline from outcome metric alone.')),
@@ -1893,17 +1918,41 @@ final class KpiEngine
     private function applyScorecardRules(array &$metric, array $override): void
     {
         $weight = $override['scorecard_weight_pct'] ?? null;
+        $scorecardApplicable = is_int($weight) || is_float($weight);
+        $rewardRule = $this->overrideOrDefault($override, 'reward_rule', '');
+
+        $metric['scorecard_applicable'] = $scorecardApplicable;
         $metric['scorecard_weight_pct'] = is_int($weight) || is_float($weight) ? (float) $weight : null;
+        $metric['scorecard_unit'] = $this->nullableStringField($override, 'unit');
+        $metric['scorecard_target'] = $this->numericField($override, 'target');
+        $metric['scorecard_higher_is_better'] = $this->boolField($override, 'higher_is_better');
         $metric['quantitative_thresholds'] = $this->arrayField($override, 'quantitative_thresholds');
         $metric['rating_criteria'] = $this->overrideOrDefault($override, 'rating_criteria', '');
-        $metric['reward_rule'] = $this->overrideOrDefault($override, 'reward_rule', '');
+        $metric['reward_rule'] = $rewardRule;
         $metric['blocking_conditions'] = $this->stringListFromValue($override['blocking_conditions'] ?? []);
+        $metric['scorecard_scoring_status'] = $scorecardApplicable
+            ? $this->overrideOrDefault($override, 'scorecard_scoring_status', 'candidate_data_contract')
+            : 'not_applicable';
+        $metric['scorecard_contributes_to_reward'] = $scorecardApplicable
+            ? ($this->boolField($override, 'scorecard_contributes_to_reward') ?? false)
+            : false;
+        $metric['scorecard_governance_reason'] = $scorecardApplicable
+            ? $this->overrideOrDefault($override, 'scorecard_governance_reason', 'Executive scorecard item governed by scorecard_operating_model.')
+            : 'Not an executive scorecard item; use metric_type/evaluation_use/consequence for local control only.';
 
         if ($metric['rating_criteria'] === '' && ($metric['metric_type'] ?? null) === 'kpi') {
             $metric['rating_criteria'] = 'Use approved scorecard RAG thresholds, source evidence, counter-metric review, and calibration before recognition or corrective action.';
         }
         if ($metric['reward_rule'] === '' && ($metric['metric_type'] ?? null) === 'kpi') {
             $metric['reward_rule'] = 'Eligible only through balanced scorecard calibration with safety, quality, delivery and data-integrity blockers cleared.';
+        }
+        if ($metric['reward_rule'] !== '' && is_array($metric['consequence'] ?? null)) {
+            $metric['consequence']['recognition_rule'] = $metric['reward_rule'];
+            $metric['consequence']['recognition_applicable'] = $metric['scorecard_contributes_to_reward'];
+            $metric['consequence']['calibration_input_only'] = !$metric['scorecard_contributes_to_reward'];
+            $metric['consequence']['monetary_recognition_status'] = $metric['scorecard_contributes_to_reward']
+                ? 'eligible_after_hr_qms_ceo_calibration_and_blocker_check'
+                : (string) $metric['scorecard_scoring_status'];
         }
     }
 
@@ -1915,6 +1964,37 @@ final class KpiEngine
     {
         $value = $row[$key] ?? [];
         return is_array($value) ? $value : [];
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function nullableStringField(array $row, string $key): ?string
+    {
+        $value = $this->stringField($row, $key);
+        return $value !== '' ? $value : null;
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function numericField(array $row, string $key): ?float
+    {
+        $value = $row[$key] ?? null;
+        if (is_int($value) || is_float($value)) {
+            return (float) $value;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param array<string, mixed> $row
+     */
+    private function boolField(array $row, string $key): ?bool
+    {
+        $value = $row[$key] ?? null;
+        return is_bool($value) ? $value : null;
     }
 
     /**

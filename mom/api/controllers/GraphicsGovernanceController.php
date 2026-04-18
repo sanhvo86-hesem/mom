@@ -4,13 +4,16 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
+use MOM\Api\Services\DesignTokenCatalogService;
 use MOM\Api\Services\GraphicsGovernanceException;
+use MOM\Api\Services\GraphicsGovernanceRepository;
 use MOM\Api\Services\GraphicsGovernanceService;
 use Throwable;
 
 class GraphicsGovernanceController extends BaseController
 {
     private ?GraphicsGovernanceService $graphicsService = null;
+    private ?DesignTokenCatalogService $tokenCatalog = null;
 
     protected function error(string $error, int $code = 400, ?string $detail = null, array $extra = []): never
     {
@@ -23,6 +26,17 @@ class GraphicsGovernanceController extends BaseController
             $this->graphicsService = new GraphicsGovernanceService($this->rootDir, $this->dataDir);
         }
         return $this->graphicsService;
+    }
+
+    private function tokenCatalog(): DesignTokenCatalogService
+    {
+        if ($this->tokenCatalog === null) {
+            $this->tokenCatalog = new DesignTokenCatalogService(
+                $this->data,
+                new GraphicsGovernanceRepository($this->rootDir, $this->dataDir)
+            );
+        }
+        return $this->tokenCatalog;
     }
 
     public function getDesignConfig(): never
@@ -410,6 +424,115 @@ class GraphicsGovernanceController extends BaseController
         $user = $this->requireAuth();
         $this->requireGraphicsRead($user);
         $this->respond(fn(): array => $this->graphics()->graphicsReleaseEvidencePack());
+    }
+
+    // ── Token Catalog (Graphics Authority, DB-backed) ───────────────────────
+
+    public function tokenCatalogList(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireGraphicsRead($user);
+        $layer = $this->queryParam('layer');
+        $family = $this->queryParam('family');
+        $scope = $this->queryParam('component_scope');
+        $this->respond(fn(): array => [
+            'ok' => true,
+            'tokens' => $this->tokenCatalog()->listCatalog($layer, $family, $scope),
+            '_meta' => [
+                'authority' => 'graphics_token_catalog',
+                'mode' => $this->data->getMode(),
+                'capturedAt' => $this->nowIso(),
+            ],
+        ]);
+    }
+
+    public function tokenCatalogSnapshot(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireGraphicsRead($user);
+        $colorMode = (string)($this->queryParam('color_mode') ?? 'light');
+        $scope = [
+            'tenant'      => (string)($this->queryParam('tenant') ?? ''),
+            'environment' => (string)($this->queryParam('environment') ?? ''),
+            'role'        => (string)($user['role'] ?? ''),
+            'user'        => (string)($user['username'] ?? ''),
+        ];
+        $scope = array_filter($scope, static fn($v) => $v !== '');
+        $this->respond(fn(): array => [
+            'ok' => true,
+            'snapshot' => $this->tokenCatalog()->snapshotEffective($scope, $colorMode),
+            'color_mode' => $colorMode,
+            'scope' => $scope,
+            '_meta' => [
+                'authority' => 'graphics_token_value',
+                'mode' => $this->data->getMode(),
+                'capturedAt' => $this->nowIso(),
+            ],
+        ]);
+    }
+
+    public function previewScenesList(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireGraphicsRead($user);
+        $category = $this->queryParam('category');
+        $this->respond(fn(): array => [
+            'ok' => true,
+            'scenes' => $this->tokenCatalog()->listPreviewScenes($category),
+            '_meta' => ['authority' => 'graphics_preview_scene'],
+        ]);
+    }
+
+    public function componentContractRegistry(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireGraphicsRead($user);
+        $operatorVisible = $this->queryParam('operator_visible');
+        $filter = $operatorVisible === null ? null : filter_var($operatorVisible, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+        $this->respond(fn(): array => [
+            'ok' => true,
+            'contracts' => $this->tokenCatalog()->listComponentContracts($filter),
+            '_meta' => ['authority' => 'graphics_component_contract'],
+        ]);
+    }
+
+    public function themeScheduleList(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireGraphicsRead($user);
+        $this->respond(fn(): array => [
+            'ok' => true,
+            'schedules' => $this->tokenCatalog()->listThemeSchedules(),
+            '_meta' => ['authority' => 'graphics_theme_schedule'],
+        ]);
+    }
+
+    public function simulationRunRecord(): never
+    {
+        $user = $this->requireWriteRequest();
+        $body = $this->jsonBody();
+        $payload = is_array($body['run'] ?? null) ? (array)$body['run'] : $body;
+        $payload['initiated_by'] = $payload['initiated_by'] ?? (string)($user['username'] ?? '');
+        $runId = $this->tokenCatalog()->recordSimulationRun($payload);
+        $this->graphicsAudit('graphics.simulation.recorded', $runId, [
+            'run_id' => $runId,
+            'outcome' => $payload['outcome'] ?? 'reviewed',
+            'scenes_rendered' => $payload['scenes_rendered'] ?? [],
+        ], $user);
+        $this->success([
+            'ok' => true,
+            'run_id' => $runId,
+            '_meta' => ['authority' => 'graphics_simulation_run'],
+        ]);
+    }
+
+    private function queryParam(string $key): ?string
+    {
+        $value = $_GET[$key] ?? null;
+        if ($value === null || $value === '') {
+            return null;
+        }
+        return is_scalar($value) ? (string)$value : null;
     }
 
     /**

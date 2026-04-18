@@ -1409,9 +1409,9 @@ ON CONFLICT DO NOTHING;
 INSERT INTO kpi_definitions (metric_code, kpi_name, kpi_name_vi, unit, target, frequency) VALUES
     ('MTBF',   'Mean Time Between Failures',  'Thoi gian trung binh giua cac lan hong', 'hours', 500.0, 'monthly'),
     ('MTTR',   'Mean Time To Repair',         'Thoi gian trung binh de sua chua',       'hours', 2.0,   'monthly'),
-    ('UTIL',   'Machine Utilization',          'Ty le su dung may',                      '%',     80.0,  'daily'),
-    ('SETUP',  'Average Setup Time',           'Thoi gian setup trung binh',             'min',   45.0,  'weekly'),
-    ('CYCLE-VAR', 'Cycle Time Variance',       'Do lech thoi gian chu ky',               '%',     5.0,   'daily')
+    ('MACHINE_UTIL', 'Machine Utilization',    'Ty le su dung may',                      '%',     80.0,  'daily'),
+    ('SETUP_RATIO',  'Average Setup Time',     'Thoi gian setup trung binh',             'min',   45.0,  'weekly'),
+    ('CYCLE_TIME_VARIANCE', 'Cycle Time Variance', 'Do lech thoi gian chu ky',           '%',     5.0,   'daily')
 ON CONFLICT DO NOTHING;
 
 

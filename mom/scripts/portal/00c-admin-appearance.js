@@ -154,6 +154,12 @@ window._hmSet = function(cssVar, path, value){
       value
     );
   }
+  /* Graphics Authority bridge: route legacy writes through the new draft
+     buffer so GraphicsAuthority.preview.simulate() can replay them and
+     graphics_simulation_run captures evidence. No-op when 00bb isn't loaded. */
+  if(window.GraphicsAuthority && GraphicsAuthority.tokens && GraphicsAuthority.tokens.stage && path){
+    try { GraphicsAuthority.tokens.stage(path, value); } catch(_e){ /* swallow, legacy path must not throw */ }
+  }
 };
 window._hmSetWithUnit = function(cssVar, path, value, unit){
   var raw = value == null ? '' : String(value);

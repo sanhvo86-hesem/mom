@@ -131,6 +131,30 @@ Each AI tool reads a different config file. All of them point here.
 - Word/Excel documents
 - Generated reports or artifacts
 
+### Graphics Authority Link (no-hardcode rule)
+
+**Every UI module resolves visual parameters through the Graphics Authority.
+No hardcoded colors, font stacks, font sizes, spacing, radii, shadows, or
+motion durations are permitted in JS source, inline style, or HTML templates.**
+
+| Layer | Authority | Read API |
+|---|---|---|
+| Backend source-of-truth | `graphics_token_catalog` + `graphics_token_value` (migration `148_graphics_authority_tables.sql`) | `DesignTokenCatalogService::getEffectiveValue('token.key')` |
+| Backend legacy fallback | `mom/data/config/design-system-config.json` | Same service (auto-fallback in JSON_ONLY mode) |
+| Frontend runtime | `window.GraphicsAuthority.tokens.read('token.key', fallback)` | `mom/scripts/portal/00bb-graphics-authority.js` |
+| CSS | `var(--brand-primary)` etc. as declared in `graphics_token_catalog.css_variable` | n/a |
+| Admin UI widget | `ControlKit.renderDimensionSlider` / `renderColorSwatch` / `renderFontStackPicker` / `renderSegmentedOption` | Each widget auto-stages + exposes Simulate |
+
+Adding a new visual parameter:
+1. Write a migration inserting into `graphics_token_catalog` with `default_light`, `default_dark`, `default_high_contrast`, and (if applicable) `default_print`.
+2. Add the token_key to the matching `graphics_component_contract.overridable_tokens` if it belongs to a component.
+3. (Optional) Register a `graphics_preview_scene` so Simulation shows the parameter live.
+4. Consume via `GraphicsAuthority.tokens.read()` or CSS variable.
+
+Every `Save`/`Apply` on a graphics edit UI MUST flow through
+`GraphicsAuthority.preview.simulate()` which records a row in
+`graphics_simulation_run` (preview-before-commit evidence).
+
 ### Naming conventions
 
 | Convention | Example |

@@ -4,7 +4,7 @@
     "generatedAt": "2026-04-15T10:51:27.988Z",
     "description": "Runtime access policy generated from domain architecture and table-registry defaults.",
     "domainPolicyCount": 49,
-    "tableOverrideCount": 147
+    "tableOverrideCount": 148
   },
   "defaults": {
     "list": [
@@ -2708,6 +2708,40 @@
     }
   },
   "tables": {
+    "kpi_definitions": {
+      "list": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "detail": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
+      "create": [
+        "it_admin",
+        "ceo"
+      ],
+      "update": [
+        "it_admin",
+        "ceo"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo"
+      ],
+      "delete": [
+        "it_admin",
+        "ceo"
+      ],
+      "generic_mutation": "domain_command_required",
+      "authority": "KPI definitions are controlled by mom/data/registry/kpi-authority-registry.json and dedicated KPI authority service paths, not generic CRUD."
+    },
     "allocation_events": {
       "list": [
         "authenticated"

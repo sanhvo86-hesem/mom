@@ -12,6 +12,41 @@ Quick mandatory sequence every session:
 
 **NEVER create files at repo root. NEVER place reports inside `mom/docs/`.**
 
+## MANDATORY: Graphics Authority Link (no-hardcode rule)
+
+**Every UI module resolves visual parameters through the Graphics Authority.
+Never hardcode colors, font stacks, font sizes, spacing, radius, shadows,
+motion durations, or any other visual token in JS, inline style, or HTML.**
+
+- **Backend authority:** `graphics_token_catalog` + `graphics_token_value` tables
+  (migration `148_graphics_authority_tables.sql`). Legacy file authority:
+  `mom/data/config/design-system-config.json` — read via
+  `DesignTokenCatalogService` so both JSON_ONLY and POSTGRES_PRIMARY modes work.
+- **Frontend authority:** `window.GraphicsAuthority.tokens.read('<token_key>')`
+  in `mom/scripts/portal/00bb-graphics-authority.js`. For CSS, bind to the
+  `css_variable` declared in `graphics_token_catalog` (e.g. `--brand-primary`).
+- **Every edit widget must run a simulation scene before committing.** Use
+  `ControlKit.*` widget factories — they already stage into the draft buffer
+  and expose a Simulate button. Never build a new edit UI that writes directly
+  to `HmTheme.saveAdminConfig` or bypasses `PreviewScenes.openSimulationModal`.
+- **Adding a new visual parameter:** add a row to `graphics_token_catalog`
+  (via a new migration or the admin UI), declare it in the appropriate
+  `graphics_component_contract.overridable_tokens` array, add a renderer to
+  `PreviewScenes.renderers` if the parameter needs its own scene. Only then
+  may a UI module call `GraphicsAuthority.tokens.read()` on the new token_key.
+- **When editing an existing module:** before you add any visual literal,
+  search `graphics_token_catalog` for an existing token; if one exists, use
+  it; if not, add a token first. Hex colors in JS, `'16px'` string padding,
+  inline font-family strings, and hardcoded motion durations in diff review
+  will be rejected.
+- **Preview / simulation is non-optional.** Every "save" action in an admin
+  graphics UI MUST flow through `GraphicsAuthority.preview.simulate()` which
+  records a row in `graphics_simulation_run` as evidence.
+- **Bridge for legacy globals:** `_hmSet`, `_hmSetWithUnit`, and
+  `_admGraphicsMarkChange` are preserved as aliases that delegate to
+  `GraphicsAuthority.tokens.stage()` / `draft.recordChange()`. Do not call
+  them in new code; use the namespaced API.
+
 ## AI Context Loading Protocol
 
 **ALWAYS read the index files FIRST before opening any source file.**

@@ -59,8 +59,7 @@
     "SETUP_FIRST_PASS_SUCCESS": "SETUP_FIRST_PASS",
     "FAI_FIRST_PASS_RATE": "FAI_FIRST_PASS",
     "INV_ACCURACY": "INVENTORY_ACCURACY",
-    "TIME_ENTRY": "TIME_ENTRY_COMPLIANCE",
-    "CHANGEOVER_TIME": "CHANGEOVER_TIME"
+    "TIME_ENTRY": "TIME_ENTRY_COMPLIANCE"
   },
   "executive_scorecard": [
     "OTD",
@@ -170,20 +169,20 @@
     "audit_report": "_reports/kpi/report-kpi-html-audit-2026-04-18.json",
     "html_file_count": 413,
     "files_with_kpi": 335,
-    "kpi_occurrences": 1909,
+    "kpi_occurrences": 1944,
     "likely_operational_kpi_ids": 59,
-    "kpi_row_candidates": 1521,
+    "kpi_row_candidates": 1537,
     "interpretation": "The estate has broad KPI language, but only ANNEX-122 governance KPIs, ANNEX-110 dashboard KPIs, gate metrics, runtime metrics, and explicitly approved operational metrics are controlled KPI authority."
   },
   "performance_governance_audit": {
     "audit_report": "_reports/kpi/report-kpi-performance-governance-2026-04-18.json",
     "html_file_count": 413,
     "files_with_kpi": 297,
-    "kpi_files_missing_evaluation_terms": 24,
-    "kpi_files_missing_recognition_terms": 106,
-    "kpi_files_missing_discipline_or_corrective_terms": 18,
-    "kpi_files_missing_all_people_governance_terms": 5,
-    "kpi_table_rows_without_people_governance_terms": 78,
+    "kpi_files_missing_evaluation_terms": 19,
+    "kpi_files_missing_recognition_terms": 101,
+    "kpi_files_missing_discipline_or_corrective_terms": 13,
+    "kpi_files_missing_all_people_governance_terms": 0,
+    "kpi_table_rows_without_people_governance_terms": 75,
     "interpretation": "This is a conservative control audit. Missing local people-governance terms means the document must either rely on ANNEX-127 performance governance or rename the item to operating metric, control metric, gate metric, role measure, or health indicator."
   },
   "role_measure_policy": {
@@ -232,6 +231,7 @@
     "metric_types": ["kpi", "operating_metric", "gate_control_metric", "role_performance_measure", "health_indicator"],
     "result_types": ["outcome", "driver", "gate", "compliance", "health"],
     "calculation_statuses": ["runtime_calculated", "runtime_calculated_partial", "widget_only", "staged_data_contract", "data_contract_required", "not_calculated"],
+    "scorecard_scoring_statuses": ["active_runtime", "manual_governed", "candidate_data_contract", "gate_only", "not_applicable"],
     "required_catalog_fields": [
       "canonical_code",
       "metric_type",
@@ -258,6 +258,22 @@
       "data_contract",
       "anti_gaming_guardrail",
       "controllability_scope"
+    ],
+    "required_scorecard_item_fields": [
+      "canonical_code",
+      "scorecard_applicable",
+      "scorecard_weight_pct",
+      "scorecard_unit",
+      "scorecard_target",
+      "scorecard_higher_is_better",
+      "scorecard_scoring_status",
+      "scorecard_contributes_to_reward",
+      "quantitative_thresholds",
+      "rating_criteria",
+      "reward_rule",
+      "blocking_conditions",
+      "data_contract",
+      "consequence"
     ]
   },
   "metric_governance_defaults": {
@@ -286,11 +302,12 @@
       {"band": "red", "weighted_score_max": 74.99, "action": "no performance payout; resource review, RCA/CAPA or Hoshin adjustment required"}
     ],
     "reward_policy": {
-      "eligibility_rule": "Quarterly recognition may be considered only when weighted score is at least 90, no scorecard KPI is red for two consecutive periods, and no blocking condition is open.",
+      "eligibility_rule": "Quarterly monetary/team recognition may be considered only when weighted score is at least 90, no current scorecard KPI is red, every yellow KPI has a closed owner action plan, no candidate_data_contract KPI is counted for payout, and no blocking condition is open.",
+      "score_cap_rule": "If any current scorecard KPI is red, cap company score at yellow for management review and block monetary recognition. If a safety, quality escape, data integrity, or gate-bypass blocker is open, scorecard recognition is blocked regardless of numeric score.",
       "recognition_bands": [
         {"weighted_score_min": 95, "recognition": "full team recognition pool after HR/QMS/CEO calibration"},
         {"weighted_score_min": 90, "weighted_score_max": 94.99, "recognition": "partial team recognition pool after calibration"},
-        {"weighted_score_min": 80, "weighted_score_max": 89.99, "recognition": "non-monetary recognition or kaizen resource priority only"},
+        {"weighted_score_min": 80, "weighted_score_max": 89.99, "recognition": "kaizen resource priority or coaching acknowledgement only; no monetary performance recognition"},
         {"weighted_score_max": 79.99, "recognition": "no performance recognition; corrective-action mode"}
       ],
       "blocking_conditions": [
@@ -304,22 +321,86 @@
       "calibration_rule": "Final recognition and reward decisions require HR/QMS/CEO calibration. KPI output is an input, not an automatic payout or discipline engine."
     },
     "executive_scorecard_items": [
-      {"canonical_code": "OTD", "scorecard_weight_pct": 10, "unit": "percent", "target": 95, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 98, "green_min": 95, "yellow_min": 90, "red_below": 90}, "rating_criteria": "Measure shipped order lines or jobs against committed customer date after approved promise-date change control.", "reward_rule": "Eligible only when complaint rate, FPY and ship-packet counter-metrics are not red.", "blocking_conditions": ["customer_escape_without_containment", "promise_date_changed_without_approval"]},
+      {"canonical_code": "OTD", "scorecard_weight_pct": 11, "unit": "percent", "target": 95, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 98, "green_min": 95, "yellow_min": 90, "red_below": 90}, "rating_criteria": "Measure shipped order lines or jobs against committed customer date after approved promise-date change control.", "reward_rule": "Eligible only when complaint rate, FPY and ship-packet counter-metrics are not red.", "blocking_conditions": ["customer_escape_without_containment", "promise_date_changed_without_approval"]},
       {"canonical_code": "COMPLAINT_RATE", "scorecard_weight_pct": 8, "unit": "complaints_per_100_shipments", "target": 1, "higher_is_better": false, "quantitative_thresholds": {"stretch_max": 0, "green_max": 1, "yellow_max": 2, "red_above": 2}, "rating_criteria": "Count confirmed customer complaints or escapes per 100 shipments; major escape is red regardless of rate.", "reward_rule": "Blocks quality/delivery recognition when containment or customer response is overdue.", "blocking_conditions": ["major_customer_escape", "containment_overdue"]},
       {"canonical_code": "GROSS_MARGIN_JOB_FAMILY", "scorecard_weight_pct": 8, "unit": "percent", "target": 28, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 35, "green_min": 28, "yellow_min": 22, "red_below": 22}, "rating_criteria": "Use finance-approved gross margin by job/customer/product family with COPQ and expedite cost included.", "reward_rule": "Eligible only when margin improvement does not come from hidden COPQ, late delivery or customer escape.", "blocking_conditions": ["unapproved_cost_exclusion", "copq_cost_bucket_not_approved"]},
       {"canonical_code": "THROUGHPUT_PER_CONSTRAINT_HOUR", "scorecard_weight_pct": 8, "unit": "baseline_index", "target": 1.1, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 1.2, "green_min": 1.1, "yellow_min": 1, "red_below": 1}, "rating_criteria": "Compare contribution or revenue per active constraint hour against frozen baseline and approved job mix.", "reward_rule": "Eligible only when OTD, quality escape and WIP aging counter-metrics are not red.", "blocking_conditions": ["constraint_baseline_changed_without_approval", "bottleneck_oee_missing_reason_codes"]},
       {"canonical_code": "COPQ", "scorecard_weight_pct": 7, "unit": "percent_of_sales", "target": 2, "higher_is_better": false, "quantitative_thresholds": {"stretch_max": 1, "green_max": 2, "yellow_max": 4, "red_above": 4}, "rating_criteria": "Use finance-approved cost buckets for scrap, rework, concession, expedite and escape cost.", "reward_rule": "Eligible only when NCR rate is not being suppressed and repeat NCR is not red.", "blocking_conditions": ["unapproved_quality_cost_adjustment", "repeat_ncr_red"]},
-      {"canonical_code": "FPY", "scorecard_weight_pct": 8, "unit": "percent", "target": 98, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 99, "green_min": 98, "yellow_min": 95, "red_below": 95}, "rating_criteria": "Count first-pass accepted units or operations using approved inspection population and no sampling bypass.", "reward_rule": "Eligible only when complaint rate, scrap and rework counter-metrics are not red.", "blocking_conditions": ["inspection_bypass", "customer_escape_without_containment"]},
+      {"canonical_code": "FPY", "scorecard_weight_pct": 9, "unit": "percent", "target": 98, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 99, "green_min": 98, "yellow_min": 95, "red_below": 95}, "rating_criteria": "Count first-pass accepted units or operations using approved inspection population and no sampling bypass.", "reward_rule": "Eligible only when complaint rate, scrap and rework counter-metrics are not red.", "blocking_conditions": ["inspection_bypass", "customer_escape_without_containment"]},
       {"canonical_code": "OEE_BOTTLENECK", "scorecard_weight_pct": 8, "unit": "percent", "target": 80, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 85, "green_min": 80, "yellow_min": 70, "red_below": 70}, "rating_criteria": "Calculate only for active constraint resource with availability, performance, quality and reason-code loss tree.", "reward_rule": "Eligible only when safety, scrap and maintenance-bypass counter-metrics are clean.", "blocking_conditions": ["unsafe_speed_or_bypass", "missing_downtime_reason_codes"]},
       {"canonical_code": "WIP_AGING", "scorecard_weight_pct": 6, "unit": "aged_wip_percent", "target": 5, "higher_is_better": false, "quantitative_thresholds": {"stretch_max": 2, "green_max": 5, "yellow_max": 10, "red_above": 10}, "rating_criteria": "Measure released jobs over approved aging threshold by work center, hold reason and owner.", "reward_rule": "Eligible only when WIP aging is not reset by move transactions without physical progress.", "blocking_conditions": ["manual_age_reset_without_evidence", "unowned_red_wip"]},
       {"canonical_code": "SETUP_FIRST_PASS", "scorecard_weight_pct": 6, "unit": "percent", "target": 95, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 98, "green_min": 95, "yellow_min": 90, "red_below": 90}, "rating_criteria": "Count setup ready-to-run first-pass acceptance using first submit, not after repeated undocumented prove-out loops.", "reward_rule": "Eligible only when FAI, setup scrap and rework counter-metrics are not red.", "blocking_conditions": ["prove_out_loop_hidden", "setup_record_missing"]},
       {"canonical_code": "FAI_FIRST_PASS", "scorecard_weight_pct": 7, "unit": "percent", "target": 98, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 99, "green_min": 98, "yellow_min": 95, "red_below": 95}, "rating_criteria": "Count first FAI or first-piece submission outcome by part revision and operation.", "reward_rule": "Eligible only when no FAI hold/release bypass or customer escape is open.", "blocking_conditions": ["fai_release_bypass", "wrong_revision_or_gage_used"]},
       {"canonical_code": "REPEAT_NCR_RATE", "scorecard_weight_pct": 6, "unit": "percent", "target": 5, "higher_is_better": false, "quantitative_thresholds": {"stretch_max": 2, "green_max": 5, "yellow_max": 10, "red_above": 10}, "rating_criteria": "Measure recurrence by defect family, root cause, process, supplier or customer after containment/CAPA window.", "reward_rule": "Eligible only when NCR creation is not suppressed and CAPA effectiveness is not red.", "blocking_conditions": ["ncr_suppression", "repeat_major_escape"]},
-      {"canonical_code": "CAPA_EFFECTIVENESS", "scorecard_weight_pct": 6, "unit": "percent", "target": 90, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 95, "green_min": 90, "yellow_min": 80, "red_below": 80}, "rating_criteria": "Count CAPA effective after 30/60/90-day verification window with recurrence evidence.", "reward_rule": "Eligible only when overdue repeat NCR and customer complaint counter-metrics are not red.", "blocking_conditions": ["capa_closed_without_effectiveness_evidence", "recurrence_after_capa"]},
+      {"canonical_code": "CAPA_EFFECTIVENESS", "scorecard_weight_pct": 7, "unit": "percent", "target": 90, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 95, "green_min": 90, "yellow_min": 80, "red_below": 80}, "rating_criteria": "Count CAPA effective after 30/60/90-day verification window with recurrence evidence.", "reward_rule": "Eligible only when overdue repeat NCR and customer complaint counter-metrics are not red.", "blocking_conditions": ["capa_closed_without_effectiveness_evidence", "recurrence_after_capa"]},
       {"canonical_code": "SUPPLIER_READINESS", "scorecard_weight_pct": 5, "unit": "composite_score", "target": 90, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 95, "green_min": 90, "yellow_min": 80, "red_below": 80}, "rating_criteria": "Composite: supplier OTD 40%, incoming quality 35%, SCAR aging 15%, ASL/audit/cert readiness 10%.", "reward_rule": "Eligible only when no critical shortage, incoming escape or overdue SCAR is open.", "blocking_conditions": ["critical_material_shortage", "supplier_escape_without_scar"]},
       {"canonical_code": "CRITICAL_ROLE_CERT_COVERAGE", "scorecard_weight_pct": 4, "unit": "percent", "target": 95, "higher_is_better": true, "quantitative_thresholds": {"stretch_min": 100, "green_min": 95, "yellow_min": 85, "red_below": 85}, "rating_criteria": "Measure certified backup coverage for setup, CMM, QC release, planner, maintenance and critical operator roles.", "reward_rule": "Eligible only when training completion is backed by competence pass and no unauthorized work event is open.", "blocking_conditions": ["unauthorized_work_performed", "critical_role_no_backup"]},
-      {"canonical_code": "RECORDABLE_INCIDENT_RATE", "scorecard_weight_pct": 3, "unit": "count", "target": 0, "higher_is_better": false, "quantitative_thresholds": {"green_max": 0, "yellow_condition": "0 recordable incidents but high-potential near-miss action overdue", "red_above": 0}, "rating_criteria": "Any recordable incident is red for the period; serious near miss with overdue action blocks recognition.", "reward_rule": "Safety is a gate: any open serious safety action blocks monetary recognition regardless of total score.", "blocking_conditions": ["recordable_incident", "serious_near_miss_action_overdue", "unsafe_act_verified"]}
+      {"canonical_code": "RECORDABLE_INCIDENT_RATE", "scorecard_weight_pct": 0, "unit": "count", "target": 0, "higher_is_better": false, "quantitative_thresholds": {"green_max": 0, "yellow_condition": "0 recordable incidents but high-potential near-miss action overdue", "red_above": 0}, "rating_criteria": "Any recordable incident is red for the period; serious near miss with overdue action blocks recognition.", "reward_rule": "Safety is a non-tradeable gate: any open serious safety action blocks monetary recognition regardless of total score.", "blocking_conditions": ["recordable_incident", "serious_near_miss_action_overdue", "unsafe_act_verified"]}
     ]
+  },
+  "scorecard_evidence_contracts": {
+    "OTD": {"scorecard_scoring_status": "active_runtime", "scorecard_contributes_to_reward": true, "data_contract_approval_id": "KPI-DC-OTD-001", "evidence_manifest_id": "KPI-EV-OTD-001", "source_system": "ERP shipping plus approved promise-date change control", "source_table_or_record": "shipments; com_order_promises or approved promise revision record", "authority_service_path": "KpiEngine::calculateOtd with promise-date approval bridge", "evidence_record": "shipment record with frozen committed promise date and approved promise-date revision when changed", "freshness_rule": "monthly close; promise revisions approved before shipment is scored", "lineage_rule": "unapproved promise-date change blocks reward even when shipment is on revised date"},
+    "COMPLAINT_RATE": {"scorecard_scoring_status": "manual_governed", "scorecard_contributes_to_reward": true, "data_contract_approval_id": "KPI-DC-COMPLAINT-001", "evidence_manifest_id": "KPI-EV-COMPLAINT-001", "source_system": "EQMS customer complaint and escape lifecycle", "source_table_or_record": "eqms_complaints; customer_complaints; complaint containment evidence", "authority_service_path": "EQMS complaint command path; KpiEngine catalog contract until runtime formula is aligned", "evidence_record": "confirmed complaint/escape, shipment denominator, containment timestamp, customer response record", "freshness_rule": "event review within complaint SLA and monthly BSC close", "lineage_rule": "NCR proxy or PPM runtime value cannot be used for reward until reconciled to complaint authority"},
+    "GROSS_MARGIN_JOB_FAMILY": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-MARGIN-001", "source_system": "ERP finance quote/job-cost close", "source_table_or_record": "job cost close package; invoice/revenue ledger; COPQ allocation record", "authority_service_path": "Finance-approved management review pack", "evidence_record": "job-family revenue, material/labor/overhead, outsource, expedite and COPQ allocation", "freshness_rule": "monthly finance close only", "lineage_rule": "unapproved cost exclusions block scorecard use"},
+    "THROUGHPUT_PER_CONSTRAINT_HOUR": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-TOC-001", "source_system": "MOM planning plus approved TOC constraint register", "source_table_or_record": "aps_constraint_resources; constraint register; job mix baseline; constraint-hour evidence", "authority_service_path": "TOC weekly constraint review data contract", "evidence_record": "approved active constraint, frozen baseline, contribution/revenue and available constraint hours", "freshness_rule": "weekly constraint review before monthly BSC", "lineage_rule": "baseline or bottleneck changes after the fact block reward use"},
+    "COPQ": {"scorecard_scoring_status": "manual_governed", "scorecard_contributes_to_reward": true, "data_contract_approval_id": "KPI-DC-COPQ-001", "evidence_manifest_id": "KPI-EV-COPQ-001", "source_system": "EQMS quality cost plus finance-approved sales denominator", "source_table_or_record": "ncr_records quality-cost buckets; finance sales close; concession/rework/escape cost evidence", "authority_service_path": "Finance/QMS COPQ close package; KpiEngine catalog contract until runtime percent-of-sales formula is aligned", "evidence_record": "scrap, rework, concession, expedite and escape cost with finance approval; sales denominator", "freshness_rule": "monthly close after finance cost-bucket approval", "lineage_rule": "prevention/appraisal investment is separated from poor-quality cost for reward scoring"},
+    "FPY": {"scorecard_scoring_status": "active_runtime", "scorecard_contributes_to_reward": true, "data_contract_approval_id": "KPI-DC-FPY-001", "evidence_manifest_id": "KPI-EV-FPY-001", "source_system": "QMS/MES inspection event evidence", "source_table_or_record": "inspection_results; operation inspection event; sampling bypass record", "authority_service_path": "KpiEngine::calculateFpy with QMS/MES first-pass evidence bridge", "evidence_record": "first-submission inspection population, accepted/rejected result, defect family and sampling approval", "freshness_rule": "daily tier review and monthly BSC close", "lineage_rule": "rework or repeated submission cannot be counted as first pass"},
+    "OEE_BOTTLENECK": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-OEE-BN-001", "source_system": "MES OEE snapshots with active constraint binding", "source_table_or_record": "mes_oee_snapshots; aps_constraint_resources; constraint register", "authority_service_path": "MES performance read model with lineage to execution events", "evidence_record": "availability, performance, quality losses, reason-code completeness and active constraint version", "freshness_rule": "shift capture, weekly TOC review, monthly BSC close", "lineage_rule": "OEE without active-constraint approval or reason codes is not rewardable"},
+    "WIP_AGING": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-WIP-001", "source_system": "MES/WIP movement and hold-owner evidence", "source_table_or_record": "job_orders projection; operation movement events; hold reason and owner log", "authority_service_path": "Lean Daily Management WIP aging data contract", "evidence_record": "released WIP age, hold reason, owner, physical-progress event and age-reset evidence", "freshness_rule": "daily tier review and weekly constraint review", "lineage_rule": "manual age reset without physical progress blocks scorecard use"},
+    "SETUP_FIRST_PASS": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-SETUP-001", "source_system": "MES setup readiness and first-piece gate evidence", "source_table_or_record": "setup checklist; CNC program revision; first-piece gate decision event", "authority_service_path": "MES/QMS setup gate data contract", "evidence_record": "first setup submission, ready-to-run decision, failure reason and approved setup sheet/program/gage revision", "freshness_rule": "per setup event and daily tier review", "lineage_rule": "hidden prove-out loops or missing setup record block scorecard use"},
+    "FAI_FIRST_PASS": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-FAI-001", "source_system": "EQMS FAI and QMS/MES gate evidence", "source_table_or_record": "eqms_fai_reports; fai_records; first-piece gate decision event", "authority_service_path": "EQMS FAI release command path", "evidence_record": "first FAI/first-piece submission, revision, gage, inspection plan and release decision", "freshness_rule": "per event and monthly BSC close", "lineage_rule": "wrong revision, waived gate, or release bypass blocks reward use"},
+    "REPEAT_NCR_RATE": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-REPEAT-NCR-001", "source_system": "EQMS NCR recurrence and root-cause evidence", "source_table_or_record": "ncr_records; eqms event backbone; recurrence classification", "authority_service_path": "EQMS NCR/CAPA review data contract", "evidence_record": "defect family, root cause, recurrence window, containment and CAPA link", "freshness_rule": "monthly CAPA review and management review", "lineage_rule": "NCR suppression or unclassified recurrence blocks scorecard use"},
+    "CAPA_EFFECTIVENESS": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-CAPA-EFF-001", "source_system": "EQMS CAPA verification evidence", "source_table_or_record": "eqms_capa_records; capa_records; effectiveness_result; verification_evidence", "authority_service_path": "EQMS CAPA effectiveness command path", "evidence_record": "30/60/90-day verification result, recurrence check and approved evidence", "freshness_rule": "verification-window close and monthly BSC review", "lineage_rule": "CAPA closure without effectiveness evidence cannot be scored as effective"},
+    "SUPPLIER_READINESS": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-SUPPLIER-READINESS-001", "source_system": "Procurement supplier quality and incoming readiness", "source_table_or_record": "vendor_ratings; supplier OTD; incoming inspection; SCAR aging; ASL/audit/cert readiness", "authority_service_path": "Supplier recovery and SCAR review data contract", "evidence_record": "component scorecard: supplier OTD 40%, incoming quality 35%, SCAR aging 15%, ASL/audit/cert readiness 10%", "freshness_rule": "weekly supplier recovery and monthly BSC close", "lineage_rule": "critical shortage, supplier escape or overdue SCAR blocks scorecard use"},
+    "CRITICAL_ROLE_CERT_COVERAGE": {"scorecard_scoring_status": "candidate_data_contract", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-ROLE-CERT-001", "source_system": "Training/OJT certification authority", "source_table_or_record": "training_records; competency matrix; role authorization and backup coverage record", "authority_service_path": "Training certification gate data contract", "evidence_record": "critical role list, certified primary/backup, pass evidence and authorization status", "freshness_rule": "monthly workforce capability review and quarterly Hoshin", "lineage_rule": "training completion without competence pass cannot count as certification coverage"},
+    "RECORDABLE_INCIDENT_RATE": {"scorecard_scoring_status": "gate_only", "scorecard_contributes_to_reward": false, "data_contract_approval_id": null, "evidence_manifest_id": "KPI-EV-SAFETY-GATE-001", "source_system": "EHS incident and high-potential near-miss evidence", "source_table_or_record": "ehs_incidents; incident action closure record; safety classification evidence", "authority_service_path": "EHS incident review and corrective-action gate", "evidence_record": "recordability classification, high-potential near-miss flag, corrective action due/closed state and verification", "freshness_rule": "same-day incident review and monthly BSC gate review", "lineage_rule": "safety is gate-only; under-reporting, late classification or overdue serious action blocks recognition"}
+  },
+  "blocking_condition_registry": {
+    "rule": "Every scorecard blocking condition is a canonical condition id. A blocker stops recognition and triggers evidence review, containment, CAPA, resource escalation, or coaching; it is not automatic individual discipline.",
+    "groups": {
+      "safety": {
+        "condition_ids": ["recordable_incident_or_serious_near_miss_with_open_action", "recordable_incident", "serious_near_miss_action_overdue", "unsafe_act_verified", "unsafe_speed_or_bypass"],
+        "source_domain": "EHS / MOM execution",
+        "source_table_or_record": "ehs_incidents; safety observation; incident corrective-action record",
+        "open_predicate": "recordable or high-potential event is open, serious action is overdue, or verified unsafe act/bypass is not contained",
+        "waiver_authority": "No monetary-recognition waiver while safety action is open; HR/QMS/CEO may only classify uncontrollable cause after closure"
+      },
+      "quality_escape": {
+        "condition_ids": ["customer_escape_without_containment", "major_customer_escape", "containment_overdue", "supplier_escape_without_scar", "repeat_major_escape", "repeat_ncr_red"],
+        "source_domain": "EQMS complaints / NCR / supplier quality",
+        "source_table_or_record": "eqms_complaints; customer_complaints; ncr_records; scar record",
+        "open_predicate": "confirmed escape, overdue containment/SCAR, or repeat major issue remains open in the review period",
+        "waiver_authority": "QMS/CEO calibration after containment and customer-risk review"
+      },
+      "gate_bypass": {
+        "condition_ids": ["required_gate_bypass", "inspection_bypass", "fai_release_bypass", "wrong_revision_or_gage_used", "setup_record_missing", "prove_out_loop_hidden", "capa_closed_without_effectiveness_evidence", "recurrence_after_capa"],
+        "source_domain": "QMS/MES gate evidence",
+        "source_table_or_record": "FAI/first-piece gate; inspection result; setup checklist; CAPA verification evidence",
+        "open_predicate": "required gate missing, bypassed, waived without authority, or accepted with wrong revision/gage/evidence",
+        "waiver_authority": "QMS authority and management review; bypass/falsification may trigger discipline only after behavior evidence"
+      },
+      "data_integrity": {
+        "condition_ids": ["verified_data_falsification", "promise_date_changed_without_approval", "constraint_baseline_changed_without_approval", "manual_age_reset_without_evidence", "missing_downtime_reason_codes", "bottleneck_oee_missing_reason_codes", "unapproved_cost_exclusion", "unapproved_quality_cost_adjustment", "copq_cost_bucket_not_approved"],
+        "source_domain": "ERP/MOM/MES/EQMS audit and finance close",
+        "source_table_or_record": "audit trail; promise-date approval; constraint register; OEE reason-code log; finance cost-bucket approval",
+        "open_predicate": "required approval, reason code, baseline, finance approval, or source lineage is missing or disputed",
+        "waiver_authority": "Data owner plus QMS/Finance/CEO calibration after corrected evidence is posted"
+      },
+      "flow_and_readiness": {
+        "condition_ids": ["critical_material_shortage", "unowned_red_wip", "ncr_suppression", "critical_role_no_backup", "unauthorized_work_performed"],
+        "source_domain": "Planning / supplier readiness / training authority",
+        "source_table_or_record": "material shortage log; WIP hold owner; NCR classification; training authorization record",
+        "open_predicate": "red WIP, material shortage, suppressed NCR, missing critical backup, or unauthorized work remains open",
+        "waiver_authority": "Process owner, QMS and CEO calibration after resource/action plan is approved"
+      },
+      "audit": {
+        "condition_ids": ["major_audit_nonconformance_overdue", "open_red_quality_or_safety_counter_metric"],
+        "source_domain": "Audit risk / management review",
+        "source_table_or_record": "audit nonconformance; counter-metric scorecard",
+        "open_predicate": "major audit nonconformance or red safety/quality counter-metric is open past due",
+        "waiver_authority": "CEO/QMS management review after containment and due-date recovery plan"
+      }
+    }
   },
   "metric_governance_overrides": {
     "OTD": {
@@ -516,7 +597,7 @@
     },
     "SUPPLIER_READINESS": {
       "metric_type": "kpi",
-      "evaluation_use": "supplier_scorecard",
+      "evaluation_use": "company_scorecard",
       "evaluation_scope": "supplier_and_material_readiness",
       "result_type": "driver",
       "strategic_intent": "Measure whether suppliers and outsource processors are ready for the production plan.",

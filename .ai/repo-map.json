@@ -1,6 +1,6 @@
 {
     "_meta": {
-        "generated_at": "2026-04-18T14:44:08+00:00",
+        "generated_at": "2026-04-18T16:11:11+00:00",
         "generator": "tools/scripts/ai-index/generate.php",
         "description": "High-level project topology. Read this first to orient."
     },
@@ -24,10 +24,10 @@
     },
     "counts": {
         "controllers": 87,
-        "services": 122,
+        "services": 123,
         "middleware": 6,
-        "migrations": 149,
-        "db_tables": 813,
+        "migrations": 150,
+        "db_tables": 822,
         "contracts": 67,
         "action_routes": 0,
         "rest_routes": 0

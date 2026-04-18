@@ -70,6 +70,7 @@ class GenericCrudController extends BaseController
         'ap_invoice_lines',
         'inventory_transactions',
         'inventory_ledger',
+        'kpi_definitions',
         'stock_balances',
         'material_consumption',
         'mes_material_consumption',

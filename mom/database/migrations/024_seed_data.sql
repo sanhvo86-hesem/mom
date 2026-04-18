@@ -91,12 +91,12 @@ INSERT INTO kpi_definitions (metric_code, kpi_name, kpi_name_vi, unit, target, f
     ('FPY',   'First Pass Yield',              'Ty le dat lan dau',             '%', 95.0, 'weekly'),
     ('OEE',   'Overall Equipment Effectiveness','Hieu suat thiet bi tong the',  '%', 85.0, 'daily'),
     ('DPMO',  'Defects Per Million Opportunities','Loi tren trieu co hoi',      'ppm', 500, 'monthly'),
-    ('CAPA-CLOSE', 'CAPA Closure Rate',        'Ty le dong CAPA',              '%', 90.0, 'monthly'),
-    ('CAL-COMP',   'Calibration Compliance',   'Ty le tuan thu hieu chuan',    '%', 100.0, 'monthly'),
-    ('SCRAP',      'Scrap Rate',               'Ty le phe pham',               '%', 2.0,  'weekly'),
-    ('CCR',        'Customer Complaint Rate',   'Ty le khieu nai khach hang',   'ppm', 100, 'monthly'),
-    ('SQI',        'Supplier Quality Index',    'Chi so chat luong NCC',        '%', 95.0, 'quarterly'),
-    ('TRN-COMP',   'Training Completion Rate',  'Ty le hoan thanh dao tao',     '%', 100.0, 'quarterly');
+    ('CAPA_CLOSURE', 'CAPA Closure Rate',       'Ty le dong CAPA',              '%', 90.0, 'monthly'),
+    ('CAL_COMPLIANCE', 'Calibration Compliance', 'Ty le tuan thu hieu chuan',   '%', 100.0, 'monthly'),
+    ('SCRAP_RATE', 'Scrap Rate',                'Ty le phe pham',               '%', 2.0,  'weekly'),
+    ('COMPLAINT_RATE', 'Customer Complaint Rate','Ty le khieu nai khach hang',   'ppm', 100, 'monthly'),
+    ('SUPPLIER_QUAL', 'Supplier Quality Index',  'Chi so chat luong NCC',        '%', 95.0, 'quarterly'),
+    ('TRAINING_COMP', 'Training Completion Rate','Ty le hoan thanh dao tao',     '%', 100.0, 'quarterly');
 
 -- ---------------------------------------------------------------------------
 -- Initial record counters for current year

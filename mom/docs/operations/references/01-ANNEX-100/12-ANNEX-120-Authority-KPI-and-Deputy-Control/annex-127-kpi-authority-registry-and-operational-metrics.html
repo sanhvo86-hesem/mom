@@ -115,8 +115,8 @@ td,th{vertical-align:top}
 <tbody>
 <tr><td>HTML được quét</td><td>413 file</td><td>Đã bao phủ app-served QMS content.</td></tr>
 <tr><td>File có nhắc KPI/metric</td><td>335 file</td><td>KPI language rất rộng, không thể xem mọi nhắc tới KPI là KPI authority.</td></tr>
-<tr><td>Số lần xuất hiện từ KPI</td><td>1,909</td><td>Nhiều nội dung là đào tạo, JD, SOP/WI và hướng dẫn gate.</td></tr>
-<tr><td>Ứng viên row KPI/metric</td><td>1,521 row</td><td>Cần phân loại lại thành governance KPI, gate metric, operational metric, role measure.</td></tr>
+<tr><td>Số lần xuất hiện từ KPI</td><td>1,944</td><td>Nhiều nội dung là đào tạo, JD, SOP/WI và hướng dẫn gate.</td></tr>
+<tr><td>Ứng viên row KPI/metric</td><td>1,537 row</td><td>Cần phân loại lại thành governance KPI, gate metric, operational metric, role measure.</td></tr>
 <tr><td>Likely operational KPI IDs</td><td>59 mã</td><td>Nhiều mã là local document ID, không phải canonical code.</td></tr>
 <tr><td>Runtime KPI backend hiện có</td><td>19 metric</td><td>Chỉ 19 metric được KpiEngine tính trực tiếp.</td></tr>
 </tbody>
@@ -132,15 +132,26 @@ td,th{vertical-align:top}
 <tbody>
 <tr><td>File HTML được quét</td><td>413 file</td><td>Giữ report như evidence kiểm soát tài liệu.</td></tr>
 <tr><td>File có KPI/metric có ngữ cảnh KPI</td><td>297 file</td><td>Không tự xem toàn bộ là KPI chính thức; phải qua registry.</td></tr>
-<tr><td>Thiếu từ khóa đánh giá/review</td><td>24 file</td><td>Hoặc bổ sung evaluation use, hoặc đổi tên thành metric/control indicator.</td></tr>
-<tr><td>Thiếu ghi nhận/khen thưởng</td><td>106 file</td><td>Định nghĩa recognition rule ở policy trung tâm; không nhất thiết mỗi WI lặp lại.</td></tr>
-<tr><td>Thiếu kỷ luật/corrective-action</td><td>18 file</td><td>Bổ sung quy tắc coaching, CAPA, escalation, discipline guardrail.</td></tr>
-<tr><td>Thiếu toàn bộ people-governance signal</td><td>5 file</td><td>Rà soát trước: SOP-203, WI-511, WI-514, WI-515, training competency template.</td></tr>
-<tr><td>Row KPI/target thiếu people-governance tại dòng</td><td>78 row</td><td>Dùng policy trung tâm để map hoặc đổi nhãn row thành role/control metric.</td></tr>
+<tr><td>Thiếu từ khóa đánh giá/review</td><td>19 file</td><td>Hoặc bổ sung evaluation use, hoặc đổi tên thành metric/control indicator.</td></tr>
+<tr><td>Thiếu ghi nhận/khen thưởng</td><td>101 file</td><td>Định nghĩa recognition rule ở policy trung tâm; không nhất thiết mỗi WI lặp lại.</td></tr>
+<tr><td>Thiếu kỷ luật/corrective-action</td><td>13 file</td><td>Bổ sung quy tắc coaching, CAPA, escalation, discipline guardrail.</td></tr>
+<tr><td>Thiếu toàn bộ people-governance signal</td><td>0 file</td><td>Đã xử lý nhóm rủi ro cao: SOP-203, WI-511, WI-514, WI-515, training competency template và competency metrics.</td></tr>
+<tr><td>Row KPI/target thiếu people-governance tại dòng</td><td>75 row</td><td>Dùng policy trung tâm để map hoặc đổi nhãn row thành role/control metric.</td></tr>
 </tbody>
 </table></div>
 
-<h3>7.1 Phân loại bắt buộc</h3>
+<h3>7.1 Kế hoạch sửa chữa sau audit HTML</h3>
+<div class="table-card"><table class="table">
+<thead><tr><th>Đợt</th><th>Phạm vi</th><th>Quy tắc sửa</th><th>Evidence đóng</th></tr></thead>
+<tbody>
+<tr><td>Wave 1 - đã cập nhật</td><td>SOP-203, WI-511, WI-514, WI-515, training competency template và competency metrics.</td><td>Đổi nhãn KPI local thành gate/control metric hoặc role performance measure; bổ sung review, recognition, corrective action và discipline guardrail.</td><td>Audit còn 0 file thiếu toàn bộ people-governance signal.</td></tr>
+<tr><td>Wave 2 - row-level cleanup</td><td>75 dòng bảng KPI/target còn thiếu governance tại dòng, chủ yếu competency levels/modules và vài ANNEX/WI.</td><td>Trong training dùng "Role Performance Measure"; trong SOP/WI dùng "Gate Control Metric" hoặc "Operating Metric"; chỉ giữ chữ KPI khi dòng map được canonical registry, target, owner, rating và consequence.</td><td>Row findings trong report giảm theo từng batch; không cần thêm thưởng/phạt vào mọi dòng nếu tài liệu trỏ về policy trung tâm.</td></tr>
+<tr><td>Wave 3 - template/generator</td><td>Training modules C01-C19, competency level pages, department handbook và WI có cùng cấu trúc.</td><td>Sửa template sinh HTML để tự chèn block governance chuẩn; tránh vá thủ công 100+ file lặp lại.</td><td>File mới sinh lại không tạo thêm KPI giả; audit không tăng missing_all.</td></tr>
+<tr><td>Wave 4 - registry/API gate</td><td>KPI catalog, dashboard và generic CRUD.</td><td>Không cho tạo KPI ngoài registry; metric chưa có evaluation/consequence chỉ được trả là staged/health indicator, không dùng payout.</td><td><span class="code">GET /api/kpi/catalog</span> trả đủ classification, scorecard, data contract và consequence.</td></tr>
+</tbody>
+</table></div>
+
+<h3>7.2 Phân loại bắt buộc</h3>
 <div class="table-card"><table class="table">
 <thead><tr><th>Nhãn được phép</th><th>Khi nào dùng</th><th>Consequence hợp lệ</th></tr></thead>
 <tbody>
@@ -152,7 +163,7 @@ td,th{vertical-align:top}
 </tbody>
 </table></div>
 
-<h3>7.2 Cơ chế đánh giá, ghi nhận và kỷ luật</h3>
+<h3>7.3 Cơ chế đánh giá, ghi nhận và kỷ luật</h3>
 <ul class="tight">
 <li>KPI cấp công ty và phòng ban phải được review theo BSC/Hoshin cadence; không dùng một KPI đơn lẻ để thưởng hoặc kỷ luật cá nhân.</li>
 <li>Ghi nhận/khen thưởng chỉ áp dụng khi có evidence, kết quả cân bằng và không vi phạm safety, quality, delivery, data integrity hoặc gate QMS/MES.</li>
@@ -161,7 +172,7 @@ td,th{vertical-align:top}
 <li>Không kỷ luật người vận hành vì kết quả ngoài phạm vi kiểm soát như thiếu vật tư, thay đổi khách hàng, lỗi máy, lỗi engineering, thiếu fixture/gage/CMM hoặc quyết định nguồn lực từ quản lý.</li>
 </ul>
 
-<h3>7.3 Metric operating contract</h3>
+<h3>7.4 Metric operating contract</h3>
 <p>Mỗi metric trong <span class="code">GET /api/kpi/catalog</span> phải trả lời đủ 6 câu: đo để quyết định gì, muốn kéo hành vi nào, kết quả kỳ vọng là gì, ai sở hữu, bằng chứng ở đâu, lệch thì consequence nào. Nếu thiếu các câu này thì metric chỉ được xem là staged hoặc health indicator, chưa đủ điều kiện dùng làm KPI chính thức.</p>
 <div class="table-card"><table class="table">
 <thead><tr><th>Nhóm field</th><th>Field bắt buộc</th><th>Ý nghĩa kiểm soát</th></tr></thead>
@@ -169,19 +180,21 @@ td,th{vertical-align:top}
 <tr><td>Semantics</td><td><span class="code">metric_type</span>, <span class="code">usage_types</span>, <span class="code">result_type</span>, <span class="code">is_official_kpi</span></td><td>Phân biệt KPI chính thức, operating metric, gate metric, role measure và health indicator.</td></tr>
 <tr><td>Intent</td><td><span class="code">strategic_intent</span>, <span class="code">motive</span>, <span class="code">expected_result</span>, <span class="code">decision_purpose</span></td><td>Khóa ý đồ quản trị, động cơ hành vi mong muốn và quyết định phải phát sinh.</td></tr>
 <tr><td>Evaluation</td><td><span class="code">evaluation_use</span>, <span class="code">evaluation_scope</span>, <span class="code">rating_method</span>, <span class="code">review_forum</span></td><td>Chỉ metric có evaluation use được duyệt mới được gọi KPI.</td></tr>
-<tr><td>Evidence</td><td><span class="code">data_contract</span>, <span class="code">calculation_status</span>, <span class="code">data_confidence_level</span>, <span class="code">evidence_record</span></td><td>Cho biết backend tính được chưa, nguồn nào là bằng chứng và số có đáng tin đến mức nào.</td></tr>
+<tr><td>Evidence</td><td><span class="code">data_contract</span>, <span class="code">calculation_status</span>, <span class="code">source_table_or_record</span>, <span class="code">evidence_record</span>, <span class="code">lineage_rule</span></td><td>Cho biết backend tính được chưa, nguồn nào là bằng chứng, số có đáng tin đến mức nào và truy vết về authority nào.</td></tr>
+<tr><td>Scorecard</td><td><span class="code">scorecard_weight_pct</span>, <span class="code">scorecard_unit</span>, <span class="code">scorecard_target</span>, <span class="code">scorecard_scoring_status</span>, <span class="code">scorecard_contributes_to_reward</span></td><td>Tách target/unit scorecard khỏi target/unit runtime. Metric staged có thể hiển thị để điều hành nhưng chưa dùng payout.</td></tr>
 <tr><td>Consequence</td><td><span class="code">consequence</span>, <span class="code">counter_metric</span>, <span class="code">anti_gaming_guardrail</span>, <span class="code">controllability_scope</span></td><td>Chống dùng số thô để thưởng/phạt sai người và chống gaming.</td></tr>
 </tbody>
 </table></div>
 
-<h3>7.4 Trọng số, ngưỡng định lượng và reward gate</h3>
-<p>Scorecard lãnh đạo dùng model <span class="code">CNC-EXEC-BSC-15-2026</span>. Tổng weight bằng 100%. Mỗi KPI có target, ngưỡng xanh/vàng/đỏ, criteria đánh giá, reward rule và blocking conditions trong registry. Tài liệu khác chỉ được tham chiếu, không tự tạo trọng số riêng.</p>
+<h3>7.5 Trọng số, ngưỡng định lượng và reward gate</h3>
+<p>Scorecard lãnh đạo dùng model <span class="code">CNC-EXEC-BSC-15-2026</span>. Tổng weight bằng 100%, trong đó safety là gate 0 điểm và không thể bù bằng KPI khác. Mỗi KPI có target, ngưỡng xanh/vàng/đỏ, criteria đánh giá, reward rule, blocking conditions và scoring status trong registry. Tài liệu khác chỉ được tham chiếu, không tự tạo trọng số riêng.</p>
 <div class="table-card"><table class="table">
 <thead><tr><th>Thành phần</th><th>Quy tắc</th><th>Ý nghĩa thực chiến</th></tr></thead>
 <tbody>
-<tr><td>Rating</td><td>Stretch = 110%, green = 100%, yellow = 50%, red/blocked = 0% achievement.</td><td>Không để KPI đỏ vẫn bù điểm bằng KPI dễ; yellow vẫn có hành động bắt buộc.</td></tr>
-<tr><td>Company score</td><td>Tổng điểm = tổng <span class="code">weight x achievement</span>. ≥90 xanh, 75-89.99 vàng, &lt;75 đỏ.</td><td>CEO nhìn một điểm tổng nhưng vẫn drill down theo từng KPI và blocker.</td></tr>
-<tr><td>Reward eligibility</td><td>Chỉ xem xét khen thưởng khi tổng điểm ≥90, không có KPI đỏ lặp lại và không có blocker mở.</td><td>KPI là input cho calibration, không tự động trả tiền.</td></tr>
+<tr><td>Rating</td><td>Stretch = 110%, green = 100%, yellow = 50%, red/blocked = 0% achievement.</td><td>Red không được bù bởi KPI dễ; yellow luôn có hành động bắt buộc.</td></tr>
+<tr><td>Company score</td><td>Tổng điểm = tổng <span class="code">weight x achievement</span>. ≥90 xanh, 75-89.99 vàng, &lt;75 đỏ. Bất kỳ KPI đỏ hiện tại sẽ cap company score ở yellow.</td><td>CEO nhìn một điểm tổng nhưng vẫn drill down theo từng KPI và blocker.</td></tr>
+<tr><td>Scoring status</td><td><span class="code">active_runtime</span> và <span class="code">manual_governed</span> có thể là input calibration. <span class="code">candidate_data_contract</span> chưa dùng payout. <span class="code">gate_only</span> chỉ chặn reward.</td><td>Tránh thưởng bằng số chưa có authority/evidence.</td></tr>
+<tr><td>Reward eligibility</td><td>Chỉ xem xét monetary recognition khi tổng điểm ≥90, không có KPI đỏ hiện tại, mọi yellow có action plan đã đóng và không có blocker mở.</td><td>KPI là input cho calibration, không tự động trả tiền.</td></tr>
 <tr><td>Blocking conditions</td><td>Recordable incident, data falsification, gate bypass, customer escape chưa containment, audit major quá hạn hoặc counter-metric đỏ.</td><td>Safety, quality, data integrity và QMS gate luôn thắng điểm số.</td></tr>
 <tr><td>Discipline</td><td>Kỷ luật chỉ xét hành vi có bằng chứng trong phạm vi kiểm soát cá nhân.</td><td>Không phạt người vận hành vì outcome hệ thống ngoài tầm kiểm soát.</td></tr>
 </tbody>

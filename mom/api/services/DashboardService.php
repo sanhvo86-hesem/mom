@@ -64,29 +64,44 @@ final class DashboardService
      */
     public function getExecutiveDashboard(DateRange $period): array
     {
-        $topKpis = [
-            KpiEngine::METRIC_OEE,
-            KpiEngine::METRIC_OTD,
-            KpiEngine::METRIC_FPY,
-            KpiEngine::METRIC_SCRAP_RATE,
-            KpiEngine::METRIC_COPQ,
-            KpiEngine::METRIC_COMPLAINT_RATE,
-            KpiEngine::METRIC_CAPA_CLOSURE,
-            KpiEngine::METRIC_PUT_THRU_INDEX,
-        ];
+        $scorecard = $this->executiveScorecardMetrics();
 
         $kpis = [];
-        foreach ($topKpis as $code) {
-            try {
-                $kpis[$code] = $this->kpi->calculateKpi($code, $period)->toArray();
-            } catch (\Throwable) {
-                $kpis[$code] = ['metric_code' => $code, 'value' => null, 'status' => 'grey'];
+        foreach ($scorecard as $code => $metric) {
+            $scorecardStatus = (string) ($metric['scorecard_scoring_status'] ?? 'candidate_data_contract');
+            $runtimeCalculated = ($metric['runtime_calculated'] ?? false) === true;
+
+            if ($runtimeCalculated && $scorecardStatus === 'active_runtime') {
+                try {
+                    $kpis[$code] = $this->withScorecardGovernance(
+                        $this->kpi->calculateKpi($code, $period)->toArray(),
+                        $metric,
+                    );
+                    continue;
+                } catch (\Throwable) {
+                    // Fall through to governed placeholder so consumers still see contract state.
+                }
             }
+
+            $kpis[$code] = $this->withScorecardGovernance([
+                'metric_code' => $code,
+                'value' => null,
+                'status' => 'grey',
+                'unit' => $metric['scorecard_unit'] ?? $metric['unit'] ?? null,
+                'target' => $metric['scorecard_target'] ?? $metric['target'] ?? null,
+                'backend_status' => $metric['backend_status'] ?? 'data_contract_required',
+            ], $metric);
         }
 
         // Trend data for sparklines
         $trends = [];
-        foreach ([KpiEngine::METRIC_OEE, KpiEngine::METRIC_OTD, KpiEngine::METRIC_FPY] as $code) {
+        foreach ($scorecard as $code => $metric) {
+            if (($metric['runtime_calculated'] ?? false) !== true) {
+                continue;
+            }
+            if (($metric['scorecard_scoring_status'] ?? null) !== 'active_runtime') {
+                continue;
+            }
             $trends[$code] = $this->kpi->getKpiTrend($code, $period, 'weekly');
         }
 
@@ -98,6 +113,76 @@ final class DashboardService
             'alerts'    => $this->kpi->getKpiAlerts(),
             'summary'   => $this->buildExecutiveSummary($period),
         ];
+    }
+
+    /**
+     * @return array<string, array<string, mixed>>
+     */
+    private function executiveScorecardMetrics(): array
+    {
+        $catalog = $this->kpi->getMetricCatalog();
+        $metricsByCode = [];
+        foreach (($catalog['metrics'] ?? []) as $metric) {
+            if (!is_array($metric)) {
+                continue;
+            }
+            $code = (string) ($metric['canonical_code'] ?? '');
+            if ($code !== '') {
+                $metricsByCode[$code] = $metric;
+            }
+        }
+
+        $scorecard = [];
+        $items = $catalog['scorecard_operating_model']['executive_scorecard_items'] ?? [];
+        if (!is_array($items)) {
+            return $scorecard;
+        }
+
+        foreach ($items as $item) {
+            if (!is_array($item)) {
+                continue;
+            }
+            $code = (string) ($item['canonical_code'] ?? '');
+            if ($code === '') {
+                continue;
+            }
+            $scorecard[$code] = $metricsByCode[$code] ?? [
+                'canonical_code' => $code,
+                'runtime_calculated' => false,
+                'backend_status' => 'data_contract_required',
+                'scorecard_scoring_status' => 'candidate_data_contract',
+                'scorecard_contributes_to_reward' => false,
+            ];
+        }
+
+        return $scorecard;
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     * @param array<string, mixed> $metric
+     * @return array<string, mixed>
+     */
+    private function withScorecardGovernance(array $payload, array $metric): array
+    {
+        $payload['scorecard'] = [
+            'model_id' => 'CNC-EXEC-BSC-15-2026',
+            'weight_pct' => $metric['scorecard_weight_pct'] ?? null,
+            'unit' => $metric['scorecard_unit'] ?? $metric['unit'] ?? null,
+            'target' => $metric['scorecard_target'] ?? $metric['target'] ?? null,
+            'higher_is_better' => $metric['scorecard_higher_is_better'] ?? null,
+            'scoring_status' => $metric['scorecard_scoring_status'] ?? 'candidate_data_contract',
+            'contributes_to_reward' => $metric['scorecard_contributes_to_reward'] ?? false,
+            'thresholds' => $metric['quantitative_thresholds'] ?? [],
+            'rating_criteria' => $metric['rating_criteria'] ?? '',
+            'reward_rule' => $metric['reward_rule'] ?? '',
+            'blocking_conditions' => $metric['blocking_conditions'] ?? [],
+            'governance_reason' => $metric['scorecard_governance_reason'] ?? '',
+        ];
+        $payload['data_contract'] = $metric['data_contract'] ?? [];
+        $payload['consequence'] = $metric['consequence'] ?? [];
+
+        return $payload;
     }
 
     /**
