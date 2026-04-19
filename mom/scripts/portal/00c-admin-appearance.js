@@ -4229,16 +4229,16 @@ function renderColors(){
     + previewBorderColors()
   , false);
 
-  /* V4 — special-purpose surface tokens */
-  h += sect('🖼️ '+L('Bề mặt đặc thù (V4)', 'Special-purpose surfaces (V4)'),
+  /* Semantic surfaces (system-wide) — elevated / input / disabled / overlay */
+  h += sect('🖼️ '+L('Bề mặt ngữ nghĩa', 'Semantic surfaces & elevation'),
     colorPick(L('Elevated surface', 'Elevated surface'), '--bg-elevated', 'colorsLight.bgElevated', '#fafbfc')
     + colorPick(L('Input background', 'Input background'), '--bg-input', 'colorsLight.bgInput', '#ffffff')
     + colorPick(L('Disabled field BG', 'Disabled field BG'), '--bg-disabled', 'colorsLight.bgDisabled', 'rgba(148,163,184,0.1)')
     + colorPick(L('Overlay background', 'Overlay background'), '--bg-overlay', 'colorsLight.bgOverlay', 'rgba(15,23,42,0.5)')
-  , false, statusChip('preview', 'V4 special surfaces'));
+  , false, statusChip('preview', 'semantic.surfaces'));
 
-  /* EQMS — lifecycle state colors */
-  h += sect('🔄 '+L('EQMS — Màu trạng thái vòng đời', 'EQMS — Lifecycle State Colors'),
+  /* Business-process lifecycle state colors (system-wide: WO, NCR, CAPA, Doc, Training...) */
+  h += sect('🔄 '+L('Màu trạng thái vòng đời nghiệp vụ', 'Business lifecycle state colors'),
     colorPick('Draft', '--eqms-draft', 'eqms.lifecycle.draft', '#94a3b8')
     + colorPick('Open', '--eqms-open', 'eqms.lifecycle.open', '#3b82f6')
     + colorPick('In Progress', '--eqms-in-progress', 'eqms.lifecycle.inProgress', '#8b5cf6')
@@ -4254,8 +4254,8 @@ function renderColors(){
         + '</div>')
   , false, statusChip('full', 'EQMS · 7 states'));
 
-  /* EQMS — risk heatmap */
-  h += sect('🟥 '+L('EQMS — Heatmap rủi ro', 'EQMS — Risk Heatmap'),
+  /* Severity / risk heatmap (system-wide: risk, FMEA, SPC, OEE drill-down) */
+  h += sect('🟥 '+L('Heatmap mức độ / rủi ro', 'Severity & risk heatmap palette'),
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
     + colorPick('Low BG', '--eqms-heatmap-low-bg', 'eqms.heatmap.lowBg', '#dcfce7')
     + colorPick('Low text', '--eqms-heatmap-low-text', 'eqms.heatmap.lowText', '#166534')
@@ -4274,8 +4274,8 @@ function renderColors(){
         + '</div>')
   , false, statusChip('full', 'EQMS · 4×2 pairs'));
 
-  /* EQMS — badge dark mode */
-  h += sect('🌙 '+L('EQMS — Badge dark mode', 'EQMS — Badge Dark Mode'),
+  /* State badge colors — dark mode (system-wide) */
+  h += sect('🌙 '+L('Màu badge trạng thái (Dark mode)', 'State badge colors (dark mode)'),
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
     + colorPick('Draft BG dark', '--eqms-state-draft-bg-dark', 'eqms.stateDark.draftBg', '#334155')
     + colorPick('Draft text dark', '--eqms-state-draft-text-dark', 'eqms.stateDark.draftText', '#94a3b8')
@@ -4292,8 +4292,8 @@ function renderColors(){
     + '</div>'
   , false, statusChip('full', 'EQMS · 6×2 pairs'));
 
-  /* EQMS — entity type colors */
-  h += sect('🔗 '+L('EQMS — Entity type colors', 'EQMS — Entity type colors'),
+  /* Entity classification colors (system-wide: NCR, CAPA, WO, Part, Doc, Training, Audit...) */
+  h += sect('🔗 '+L('Màu phân loại thực thể', 'Entity classification colors'),
     '<div style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.05em;color:var(--text-tertiary);margin:0 0 6px">'+L('Quality Events','Quality Events')+'</div>'
     + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
     + colorPick('Complaint', '--eqms-entity-complaint', 'eqms.entity.complaint', '#ef4444')
@@ -4349,8 +4349,8 @@ function renderColors(){
     + '</div>'
   , false, statusChip('admin', 'EQMS · 40+ entities'));
 
-  /* EQMS — traceability link types */
-  h += sect('↔️ '+L('EQMS — Link type colors', 'EQMS — Traceability Link Colors'),
+  /* Traceability link colors (system-wide genealogy / cause / release / ...) */
+  h += sect('↔️ '+L('Màu liên kết truy xuất', 'Traceability link colors'),
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 16px">'
     + colorPick('Caused By', '--eqms-link-caused-by', 'eqms.link.causedBy', '#ef4444')
     + colorPick('Related To', '--eqms-link-related-to', 'eqms.link.relatedTo', '#3b82f6')
@@ -4462,14 +4462,14 @@ function renderLayout(){
   , false, statusChip('full', L('Admin console shell', 'Admin console shell')) + statusChip('admin', L('Preset + manual', 'Preset + manual')));
 
   /* V4 — responsive page padding */
-  h += sect('📱 '+L('Padding trang responsive (V4)', 'Responsive page padding (V4)'),
+  h += sect('📱 '+L('Padding trang responsive', 'Responsive page padding'),
     slider('Mobile', '--page-pad-mobile', 'layout.pagePadMobile', 8, 24, 16, 'px')
     + slider('Tablet', '--page-pad-tablet', 'layout.pagePadTablet', 16, 40, 24, 'px')
     + slider('Desktop', '--page-pad-desktop', 'layout.pagePadDesktop', 20, 56, 32, 'px')
   , false, statusChip('preview', 'V4 · responsive padding'));
 
-  /* EQMS — module shell dimensions */
-  h += sect('📐 '+L('EQMS — Kích thước shell module', 'EQMS — Module Shell Dimensions'),
+  /* Module shell dimensions (system-wide: nav width, header height, detail sidebar, filter bar) */
+  h += sect('📐 '+L('Kích thước shell module', 'Module shell dimensions'),
     slider(L('Nav width', 'Nav width'), '--eqms-nav-width', 'eqms.layout.navWidth', 200, 360, 260, 'px')
     + slider(L('Nav collapsed', 'Nav collapsed'), '--eqms-nav-collapsed', 'eqms.layout.navCollapsed', 40, 80, 56, 'px')
     + slider(L('Header height', 'Header height'), '--eqms-header-height', 'eqms.layout.headerHeight', 44, 72, 56, 'px')
@@ -4549,7 +4549,7 @@ function renderEffects(){
   , false);
 
   /* V4 — opacity state layers */
-  h += sect('🎭 '+L('Lớp opacity trạng thái (V4)', 'State opacity layers (V4)'),
+  h += sect('🎭 '+L('Opacity trạng thái', 'State opacity layers'),
     slider(L('Hover layer', 'Hover layer'), '--opacity-hover', 'effects.opacityHover', 0, 0.2, 0.06, '', 0.005)
     + slider(L('Pressed layer', 'Pressed layer'), '--opacity-pressed', 'effects.opacityPressed', 0, 0.3, 0.10, '', 0.005)
     + slider(L('Selected layer', 'Selected layer'), '--opacity-selected', 'effects.opacitySelected', 0, 0.2, 0.08, '', 0.005)
@@ -4565,7 +4565,7 @@ function renderEffects(){
   , false, statusChip('preview', 'V4 · state layers'));
 
   /* V4 — extended shadow scale */
-  h += sect('🌑 '+L('Shadow mở rộng (V4)', 'Extended shadow scale (V4)'),
+  h += sect('🌑 '+L('Shadow mở rộng', 'Extended shadow scale'),
     textInput('Shadow XS', '--shadow-xs', 'effects.shadowXs', '0 1px 3px rgba(12,45,72,.04)')
     + textInput('Shadow LG', '--shadow-lg', 'effects.shadowLg', '0 18px 40px rgba(15,23,42,.14),0 8px 20px rgba(15,23,42,.09)')
     + textInput('Shadow XL', '--shadow-xl', 'effects.shadowXl', '0 24px 60px rgba(12,45,72,.16),0 12px 28px rgba(12,45,72,.08)')
@@ -4580,7 +4580,7 @@ function renderEffects(){
   , false, statusChip('preview', 'V4 · xs / lg / xl'));
 
   /* V4 — easing curves */
-  h += sect('↗️ '+L('Easing curves (V4)', 'Easing curves (V4)'),
+  h += sect('↗️ '+L('Easing curves', 'Easing curves'),
     textInput('Ease out', '--ease-out', 'effects.easingOut', 'cubic-bezier(0,0,0.2,1)')
     + textInput('Ease in-out', '--ease-in-out', 'effects.easingInOut', 'cubic-bezier(0.4,0,0.2,1)')
     + textInput('Ease spring', '--ease-spring', 'effects.easingSpring', 'cubic-bezier(0.34,1.56,0.64,1)')

@@ -4,6 +4,17 @@
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. Existing ANNEX-122 KPIs are retained, legacy metric aliases are mapped to canonical codes, and proposed CNC operating metrics are staged without granting automatic runtime authority.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
+  "change_control_policy": {
+    "rule": "Any KPI or metric creation, rename, threshold change, scoring change, owner change, backend calculation change, or document placement change must update the KPI authority registry, ANNEX-128 system matrix, and every related SOP/WI/ANNEX/JD/training document in the same controlled change.",
+    "required_updates": [
+      "kpi_authority_registry",
+      "annex_128_kpi_system_matrix",
+      "source_or_related_operating_documents",
+      "api_catalog_or_data_contract_when_backend_affected",
+      "audit_report_evidence"
+    ],
+    "release_gate": "A KPI/metric change is not complete and must not be used for dashboard, evaluation, recognition, reward, corrective action, or discipline until the matrix and related documents are updated and the audit script is rerun."
+  },
   "runtime_calculated_metrics": [
     "OEE",
     "OTD",

@@ -283,6 +283,33 @@ var GraphicsAuthority = {
     },
     listThemeSchedules: function(){
       return _fetchJson(_api('graphics_theme_schedule_list')).then(function(r){ return (r && r.schedules) || []; });
+    },
+    runQaGates: function(payload){
+      /* Run the 19 Standard-36 QA gates server-side. Typically called
+         right before Commit to get authoritative blocker status. */
+      return _fetchJson(_api('graphics_qa_gate_run'), {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(payload || {})
+      });
+    }
+  },
+
+  /* ── Color-mode management ────────────────────────────────────────
+     Triad Light / Dark / HighContrast per Microsoft Fluent 2. Switches
+     data-color-mode on <html> (which our CSS overrides key off) AND
+     reloads the effective-token snapshot from the backend so the cached
+     token values flip. */
+  colorMode: {
+    supported: ['light','dark','high-contrast','print'],
+    current: function(){ return (_snapshotScope.color_mode || 'light'); },
+    set: function(mode){
+      mode = String(mode || 'light');
+      if(GraphicsAuthority.colorMode.supported.indexOf(mode) < 0) mode = 'light';
+      document.documentElement.setAttribute('data-color-mode', mode);
+      GraphicsAuthority.a11y.announce(GraphicsAuthority.i18n.bi(
+        'Đã chuyển color mode sang ', 'Color mode switched to ') + mode);
+      return GraphicsAuthority.snapshot.load(_snapshotScope.scope, mode);
     }
   },
 

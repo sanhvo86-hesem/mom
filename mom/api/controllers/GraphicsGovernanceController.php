@@ -8,12 +8,14 @@ use MOM\Api\Services\DesignTokenCatalogService;
 use MOM\Api\Services\GraphicsGovernanceException;
 use MOM\Api\Services\GraphicsGovernanceRepository;
 use MOM\Api\Services\GraphicsGovernanceService;
+use MOM\Api\Services\GraphicsQaGateRunner;
 use Throwable;
 
 class GraphicsGovernanceController extends BaseController
 {
     private ?GraphicsGovernanceService $graphicsService = null;
     private ?DesignTokenCatalogService $tokenCatalog = null;
+    private ?GraphicsQaGateRunner $qaGateRunner = null;
 
     protected function error(string $error, int $code = 400, ?string $detail = null, array $extra = []): never
     {
@@ -37,6 +39,14 @@ class GraphicsGovernanceController extends BaseController
             );
         }
         return $this->tokenCatalog;
+    }
+
+    private function qaGateRunner(): GraphicsQaGateRunner
+    {
+        if ($this->qaGateRunner === null) {
+            $this->qaGateRunner = new GraphicsQaGateRunner($this->data, $this->tokenCatalog());
+        }
+        return $this->qaGateRunner;
     }
 
     public function getDesignConfig(): never
@@ -523,6 +533,31 @@ class GraphicsGovernanceController extends BaseController
             'ok' => true,
             'run_id' => $runId,
             '_meta' => ['authority' => 'graphics_simulation_run'],
+        ]);
+    }
+
+    public function qaGateRun(): never
+    {
+        $user = $this->requireWriteRequest();
+        $body = $this->jsonBody();
+        $ctx = [
+            'rollout_id'        => isset($body['rollout_id']) && is_scalar($body['rollout_id']) ? (string)$body['rollout_id'] : null,
+            'simulation_run_id' => isset($body['simulation_run_id']) && is_scalar($body['simulation_run_id']) ? (string)$body['simulation_run_id'] : null,
+            'draft_changes'     => is_array($body['draft_changes'] ?? null) ? (array)$body['draft_changes'] : [],
+            'color_mode'        => isset($body['color_mode']) && is_scalar($body['color_mode']) ? (string)$body['color_mode'] : 'light',
+            'evaluator'         => 'automated:' . (string)($user['username'] ?? 'anonymous'),
+        ];
+        $summary = $this->qaGateRunner()->run($ctx);
+        $this->graphicsAudit('graphics.qa_gate.run', (string)($ctx['rollout_id'] ?? $ctx['simulation_run_id'] ?? 'preview'), [
+            'blockers' => $summary['blockers'],
+            'failed'   => $summary['failed'],
+            'warned'   => $summary['warned'],
+            'passed'   => $summary['passed'],
+        ], $user);
+        $this->success([
+            'ok' => true,
+            'summary' => $summary,
+            '_meta' => ['authority' => 'graphics_qa_gate_result'],
         ]);
     }
 

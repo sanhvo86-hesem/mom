@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 737,
-        "generated_at": "2026-04-18T16:11:11+00:00"
+        "table_count": 743,
+        "generated_at": "2026-04-19T01:26:30+00:00"
     },
     "tables": {
         "ai_conversations": {
@@ -4129,6 +4129,30 @@
             "foreign_keys": [],
             "contract": null
         },
+        "graphics_contrast_check": {
+            "defined_in": "149_graphics_v4_governance_tables.sql",
+            "extended_in": [],
+            "primary_key": "check_id",
+            "foreign_keys": [
+                {
+                    "col": "rollout_id",
+                    "ref": "graphics_rollout_scope(rollout_id)"
+                },
+                {
+                    "col": "simulation_run_id",
+                    "ref": "graphics_simulation_run(run_id)"
+                },
+                {
+                    "col": "text_token_key",
+                    "ref": "graphics_token_catalog(token_key)"
+                },
+                {
+                    "col": "bg_token_key",
+                    "ref": "graphics_token_catalog(token_key)"
+                }
+            ],
+            "contract": null
+        },
         "graphics_module_binding": {
             "defined_in": "148_graphics_authority_tables.sql",
             "extended_in": [],
@@ -4145,6 +4169,36 @@
             "defined_in": "148_graphics_authority_tables.sql",
             "extended_in": [],
             "primary_key": "scene_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "graphics_qa_gate_catalog": {
+            "defined_in": "149_graphics_v4_governance_tables.sql",
+            "extended_in": [],
+            "primary_key": "gate_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "graphics_qa_gate_result": {
+            "defined_in": "149_graphics_v4_governance_tables.sql",
+            "extended_in": [],
+            "primary_key": "result_id",
+            "foreign_keys": [
+                {
+                    "col": "rollout_id",
+                    "ref": "graphics_rollout_scope(rollout_id)"
+                },
+                {
+                    "col": "simulation_run_id",
+                    "ref": "graphics_simulation_run(run_id)"
+                }
+            ],
+            "contract": null
+        },
+        "graphics_regulated_entity": {
+            "defined_in": "149_graphics_v4_governance_tables.sql",
+            "extended_in": [],
+            "primary_key": "entity_registry_id",
             "foreign_keys": [],
             "contract": null
         },
@@ -4174,6 +4228,13 @@
             "foreign_keys": [],
             "contract": null
         },
+        "graphics_template_zone_binding": {
+            "defined_in": "149_graphics_v4_governance_tables.sql",
+            "extended_in": [],
+            "primary_key": "binding_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "graphics_theme_schedule": {
             "defined_in": "148_graphics_authority_tables.sql",
             "extended_in": [],
@@ -4189,6 +4250,22 @@
                 {
                     "col": "token_key",
                     "ref": "graphics_token_catalog(token_key)"
+                }
+            ],
+            "contract": null
+        },
+        "graphics_token_version": {
+            "defined_in": "149_graphics_v4_governance_tables.sql",
+            "extended_in": [],
+            "primary_key": "version_id",
+            "foreign_keys": [
+                {
+                    "col": "token_key",
+                    "ref": "graphics_token_catalog(token_key)"
+                },
+                {
+                    "col": "rollout_id",
+                    "ref": "graphics_rollout_scope(rollout_id)"
                 }
             ],
             "contract": null

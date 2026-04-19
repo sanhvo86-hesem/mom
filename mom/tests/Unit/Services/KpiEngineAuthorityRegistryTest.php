@@ -84,6 +84,10 @@ final class KpiEngineAuthorityRegistryTest extends TestCase
             $catalog['performance_governance_policy']['naming_rule'] ?? null,
         );
         $this->assertSame(
+            'A KPI/metric change is not complete and must not be used for dashboard, evaluation, recognition, reward, corrective action, or discipline until the matrix and related documents are updated and the audit script is rerun.',
+            $catalog['change_control_policy']['release_gate'] ?? null,
+        );
+        $this->assertSame(
             '_reports/kpi/report-kpi-performance-governance-2026-04-18.json',
             $catalog['performance_governance_audit']['audit_report'] ?? null,
         );

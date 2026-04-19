@@ -426,6 +426,7 @@ final class KpiEngine
             'data_contract_required_fields' => $this->registryStringList($registry, 'data_contract_required_fields', false),
             'role_measure_policy' => is_array($registry['role_measure_policy'] ?? null) ? $registry['role_measure_policy'] : [],
             'performance_governance_policy' => is_array($registry['performance_governance_policy'] ?? null) ? $registry['performance_governance_policy'] : [],
+            'change_control_policy' => is_array($registry['change_control_policy'] ?? null) ? $registry['change_control_policy'] : [],
             'metric_governance_schema' => is_array($registry['metric_governance_schema'] ?? null) ? $registry['metric_governance_schema'] : [],
             'metric_governance_defaults' => is_array($registry['metric_governance_defaults'] ?? null) ? $registry['metric_governance_defaults'] : [],
             'scorecard_operating_model' => is_array($registry['scorecard_operating_model'] ?? null) ? $registry['scorecard_operating_model'] : [],

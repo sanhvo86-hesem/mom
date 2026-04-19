@@ -398,3 +398,77 @@
   color: var(--text-secondary, #64748b);
   font-style: italic;
 }
+
+/* ── High-contrast color mode (V4 R-025) ────────────────────────────────
+   Activated by setting data-color-mode="high-contrast" on <html>. Forces
+   AAA-adjacent values regardless of whether the tenant has published a
+   high-contrast snapshot. Overrides baseline via CSS variables so any
+   module that resolves via var(--token) picks up the switch instantly. */
+html[data-color-mode="high-contrast"] {
+  --bg-page: #ffffff;
+  --bg-surface: #ffffff;
+  --bg-surface-alt: #f0f0f0;
+  --bg-hover: #e0e0e0;
+  --text-primary: #000000;
+  --text-secondary: #333333;
+  --text-tertiary: #555555;
+  --text-link: #0033a0;
+  --border-default: #000000;
+  --border-focus: #0033a0;
+  --brand-primary: #0033a0;
+  --brand-accent: #ff9900;
+  --shadow-xs: none;
+  --shadow-lg: 0 0 0 2px #000;
+  --shadow-xl: 0 0 0 3px #000;
+}
+
+/* ── Forced Colors mode (V4 R-020, R-075) ──────────────────────────────
+   Windows High Contrast / forced-colors media query. System replaces
+   colors; our job is to preserve structure by binding borders and focus
+   rings to keyword values (CanvasText, Highlight, etc.) instead of
+   opaque hex literals. The graphics runtime MUST NOT fight the system. */
+@media (forced-colors: active) {
+  :root {
+    --border-default: CanvasText;
+    --border-focus: Highlight;
+    --text-primary: CanvasText;
+    --text-secondary: GrayText;
+    --text-tertiary: GrayText;
+    --text-link: LinkText;
+    --text-inverse: Canvas;
+    --bg-page: Canvas;
+    --bg-surface: Canvas;
+    --bg-surface-alt: Canvas;
+    --bg-hover: Canvas;
+    --focus-ring-color: Highlight;
+    --shadow-xs: none;
+    --shadow-lg: none;
+    --shadow-xl: none;
+  }
+  /* Buttons and chips must keep a visible border; remove background fills
+     that the OS might repaint to Canvas and lose. */
+  .ck-demo-btn,
+  .ck-segment,
+  .ga-sim-commit,
+  .ga-sim-discard,
+  .ck-simulate {
+    border: 1px solid CanvasText !important;
+    background: Canvas !important;
+    color: CanvasText !important;
+    forced-color-adjust: none;
+  }
+  .ck-segment.is-active,
+  .ck-demo-btn:not(.ck-demo-btn-secondary):not(.ck-demo-btn-ghost),
+  .ga-sim-commit {
+    background: Highlight !important;
+    color: HighlightText !important;
+  }
+  .ck-wcag-pass,
+  .ck-wcag-fail,
+  .ga-sim-wcag-pass,
+  .ga-sim-wcag-fail {
+    border: 1px solid CanvasText !important;
+    background: Canvas !important;
+    color: CanvasText !important;
+  }
+}

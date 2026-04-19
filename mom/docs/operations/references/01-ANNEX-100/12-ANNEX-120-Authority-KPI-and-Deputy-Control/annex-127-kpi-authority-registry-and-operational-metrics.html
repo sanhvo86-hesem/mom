@@ -127,6 +127,7 @@ td,th{vertical-align:top}
 <div class="section">
 <h2>7. Quy tắc performance governance</h2>
 <div class="callout danger"><b>Nguyên tắc khóa:</b> Không dùng để đánh giá thì không gọi KPI. Nếu chỉ dùng để theo dõi, điều hành ca/ngày, giữ cổng chất lượng hoặc nhắc hành động thì đặt là metric, control metric, gate metric, role measure hoặc health indicator.</div>
+<div class="callout danger"><b>Nguyên tắc change-control:</b> Khi thêm, đổi tên, đổi target/ngưỡng, đổi trọng số, đổi owner, đổi công thức/backend hoặc di chuyển vị trí sử dụng của KPI/metric, phải cập nhật đồng thời registry KPI, ANNEX-128 KPI System Matrix và tất cả SOP/WI/ANNEX/JD/training liên quan. Nếu ANNEX-128 và tài liệu liên quan chưa cập nhật, thay đổi KPI chưa hoàn tất và chưa được dùng cho dashboard, đánh giá, ghi nhận, thưởng, corrective action hoặc kỷ luật.</div>
 <div class="table-card"><table class="table">
 <thead><tr><th>Phát hiện audit</th><th>Kết quả</th><th>Việc phải làm</th></tr></thead>
 <tbody>
@@ -232,11 +233,12 @@ td,th{vertical-align:top}
 <thead><tr><th>API</th><th>Vai trò</th><th>Quy tắc</th></tr></thead>
 <tbody>
 <tr><td><span class="code">GET /api/kpi/catalog</span></td><td>Trả registry, alias, nhóm tài liệu, backend coverage, performance-governance policy, scorecard operating model và per-metric operating contract.</td><td>Dùng trước khi thêm dashboard/widget mới hoặc gọi một chỉ số là KPI; bắt buộc kiểm tra <span class="code">metric_type</span>, <span class="code">evaluation_use</span>, <span class="code">is_official_kpi</span>, <span class="code">scorecard_weight_pct</span>, <span class="code">quantitative_thresholds</span> và <span class="code">calculation_status</span>.</td></tr>
+<tr><td><span class="code">change_control_policy</span></td><td>Quy tắc bắt buộc khi chỉnh hoặc thêm KPI/metric.</td><td>Mọi thay đổi KPI/metric phải đi kèm cập nhật registry, ANNEX-128, tài liệu nguồn/liên quan, API/data contract nếu ảnh hưởng backend và evidence audit. Không có cập nhật matrix thì không được coi là thay đổi hợp lệ.</td></tr>
 <tr><td><span class="code">GET /api/kpi/{metricCode}</span></td><td>Tính KPI runtime.</td><td>Chỉ trả số cho metric thuộc <span class="code">runtime_calculated_metrics</span>.</td></tr>
 <tr><td><span class="code">GET /api/kpi/{metricCode}/trend</span></td><td>Xu hướng KPI runtime.</td><td>Known non-runtime metric phải trả trạng thái thiếu data contract, không trả số giả.</td></tr>
 </tbody>
 </table></div>
-<div class="callout danger"><b>Không được làm:</b> thêm metric vào dashboard bằng cách để KpiEngine tự sinh definition. Metric mới phải qua data contract, migration/seed nếu cần, test và review QMS/Analytics.</div>
+<div class="callout danger"><b>Không được làm:</b> thêm metric vào dashboard bằng cách để KpiEngine tự sinh definition, hoặc sửa/thêm KPI trong một tài liệu mà không cập nhật ANNEX-128 và các tài liệu liên quan. Metric mới phải qua data contract, migration/seed nếu cần, test và review QMS/Analytics.</div>
 </div>
 
 <div class="section">
@@ -247,6 +249,7 @@ td,th{vertical-align:top}
 <tr><td><a href="annex-122-kpi-cascade-dictionary.html">ANNEX-122</a></td><td>33 KPI cascade hiện hữu.</td></tr>
 <tr><td><a href="annex-125-cnc-performance-operating-system.html">ANNEX-125</a></td><td>Operating system 5 lớp.</td></tr>
 <tr><td><a href="annex-126-hoshin-strategy-deployment-and-catchball.html">ANNEX-126</a></td><td>Hoshin, catchball, X-Matrix.</td></tr>
+<tr><td><a href="annex-128-kpi-system-matrix-and-document-usage.html">ANNEX-128</a></td><td>Ma trận KPI/metric toàn hệ thống: tài liệu sử dụng, số lần xuất hiện, target/ngưỡng, phân loại, link tài liệu và trạng thái data/evaluation.</td></tr>
 <tr><td><a href="../../05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a></td><td>TOC, dispatch, capacity, WIP.</td></tr>
 </tbody>
 </table></div>
