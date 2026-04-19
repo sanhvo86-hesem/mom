@@ -158,7 +158,10 @@ var GraphicsAuthority = {
     },
 
     /* Stage a change into the draft buffer (in-memory, not yet committed).
-       Triggers a visual preview through HmTheme.setPreviewVar for instant feedback. */
+       Triggers a visual preview through HmTheme.setPreviewVar for instant
+       feedback. When called from the legacy `_hmSet` bridge (00c-admin-
+       appearance.js) which has already written to HmTheme, pass
+       opts.skipPreview = true to avoid a double-write (V4 audit fix #3). */
     stage: function(tokenKey, value, opts){
       opts = opts || {};
       var token = GraphicsAuthority.catalog.find(tokenKey);
@@ -170,11 +173,13 @@ var GraphicsAuthority = {
 
       _draftChanges[tokenKey] = { from: prior, to: value, colorMode: colorMode };
 
-      if(cssVar && window.HmTheme && HmTheme.setPreviewVar){
-        HmTheme.setPreviewVar(cssVar, value);
-      }
-      if(window.HmTheme && HmTheme.setPreviewDeep){
-        HmTheme.setPreviewDeep(tokenKey, value);
+      if(!opts.skipPreview){
+        if(cssVar && window.HmTheme && HmTheme.setPreviewVar){
+          HmTheme.setPreviewVar(cssVar, value);
+        }
+        if(window.HmTheme && HmTheme.setPreviewDeep){
+          HmTheme.setPreviewDeep(tokenKey, value);
+        }
       }
       _emit('draft:staged', { tokenKey: tokenKey, value: value, colorMode: colorMode });
       return { tokenKey: tokenKey, value: value, colorMode: colorMode };
@@ -296,9 +301,12 @@ var GraphicsAuthority = {
   },
 
   /* ── Color-mode management ────────────────────────────────────────
-     Triad Light / Dark / HighContrast per Microsoft Fluent 2. Switches
-     data-color-mode on <html> (which our CSS overrides key off) AND
-     reloads the effective-token snapshot from the backend so the cached
+     Triad Light / Dark / HighContrast per Microsoft Fluent 2. HmTheme
+     (00b-theme-manager.js) is the single authority for the
+     data-color-mode / data-color-scheme-active attribute pair; we
+     delegate through HmTheme.setUserPreference so both attributes stay
+     in lockstep and the next HmTheme._apply() cannot silently revert
+     the switch. We then reload the effective-token snapshot so cached
      token values flip. */
   colorMode: {
     supported: ['light','dark','high-contrast','print'],
@@ -306,7 +314,12 @@ var GraphicsAuthority = {
     set: function(mode){
       mode = String(mode || 'light');
       if(GraphicsAuthority.colorMode.supported.indexOf(mode) < 0) mode = 'light';
-      document.documentElement.setAttribute('data-color-mode', mode);
+      if(window.HmTheme && typeof window.HmTheme.setUserPreference === 'function'){
+        try { window.HmTheme.setUserPreference('colorMode', mode); }
+        catch(_){ document.documentElement.setAttribute('data-color-mode', mode); }
+      } else {
+        document.documentElement.setAttribute('data-color-mode', mode);
+      }
       GraphicsAuthority.a11y.announce(GraphicsAuthority.i18n.bi(
         'Đã chuyển color mode sang ', 'Color mode switched to ') + mode);
       return GraphicsAuthority.snapshot.load(_snapshotScope.scope, mode);

@@ -328,7 +328,7 @@ final class GraphicsQaGateRunner
                     $result['status'],
                     $result['score'],
                     json_encode($result['findings']),
-                    $result['blocker'] ? 't' : 'f',
+                    (bool)$result['blocker'],
                     $result['evaluator'],
                     $result['evidence_url'],
                 ]
