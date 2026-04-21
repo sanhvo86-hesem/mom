@@ -59,7 +59,7 @@ ul.tight li {margin:4px 0;}
  </div>
  
  <div class="doc-content" id="docContent"><div class="form-sheet">
-<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi lựa chọn ý tưởng chống sai cho máy, setup, kiểm tra, clean-pack, giao vận và FOD control. Đây là thư viện giải pháp, không thay WI tại Point-of-use.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi lựa chọn ý tưởng chống sai cho máy, setup, kiểm tra, vệ sinh và đóng gói, giao vận và FOD control. Đây là thư viện giải pháp, không thay WI tại Point-of-use.</div>
  <h1>ANNEX-507 - Poka Yoke CNC Examples</h1>
  
 <div class="section"><h2>1. Cách dùng thư viện</h2>
@@ -73,10 +73,10 @@ ul.tight li {margin:4px 0;}
 <tr><td>Sai tool / sai bù trừ (offset) / bỏ sót bước setup</td><td>bắt buộc xác minh / đứng cạnh học việc / bảng kiểm ép buộc</td><td>Dry-run liên động an toàn / setup Photos</td><td>Kiểm tra bằng trí nhớ</td></tr>
 <tr><td>Nhầm nguyên vật liệu / hỗn hợp / lẫn lộn part / hỗn hợp / lẫn lộn lot</td><td>cách ly + scan + bin control</td><td>Màu / nhãn / layout</td><td>Để chung rồi "nhìn kỹ"</td></tr>
 <tr><td>Sai gage / sai data mục nhập / bỏ sót CTQ</td><td>Gage nhóm sản phẩm control / bắt buộc tính đầy đủ</td><td>Balloon / bảng kiểm / đồng cấp xác minh</td><td>Kiểm nMẫu hứng</td></tr>
-<tr><td>Sai clean-pack / sai giao vận label / thiếu phụ kiện</td><td>Pack lộ trình gia công + count khóa + scan-to-print</td><td>chứng kiến đánh dấu / mù / ẩn count</td><td>Đếm miệng / nhớ tay</td></tr>
+<tr><td>Sai vệ sinh và đóng gói / sai giao vận label / thiếu phụ kiện</td><td>Pack lộ trình gia công + count khóa + scan-to-print</td><td>chứng kiến đánh dấu / mù / ẩn count</td><td>Đếm miệng / nhớ tay</td></tr>
 </tbody></table></div></div>
 
-<div class="section"><h2>3. Thư viện ví dụ poka (chống sai) (chống sai)-giá đỡ (yoke) CNC / <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / WHS / clean-pack</h2>
+<div class="section"><h2>3. Thư viện ví dụ poka (chống sai) (chống sai)-giá đỡ (yoke) CNC / <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / WHS / vệ sinh và đóng gói</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>ID</th><th>Lỗi mục tiêu</th><th>Giải pháp mẫu</th><th>Áp dụng tốt nhất tại</th><th>Mức ưu tiên</th><th>Điều kiện để hiệu quả</th></tr></thead><tbody>
 <tr><td>PY-001</td><td>Nhầm program / nhầm revision</td><td>Scan phiếu công nghệ chỉ mở đúng thư mục program theo part-rev hiện hành; khóa chọn tay ngoài danh sách phát hành.</td><td>Machine loading / program call</td><td>M1</td><td>Phát hành chương trình (program release) và part-rev master phải sạch dữ liệu.</td></tr>
 <tr><td>PY-002</td><td>Nhầm fixture orientation</td><td>Asymmetric key / pin / stop block làm cho part chỉ vào một chiều.</td><td>Setup fixture</td><td>M1</td><td>Thiết kế fixture từ đầu hoặc retrofit được mà không làm mất datum.</td></tr>
@@ -88,7 +88,7 @@ ul.tight li {margin:4px 0;}
 <tr><td>PY-008</td><td>Ghi thiếu dữ liệu release</td><td>Form số không cho gửi khi thiếu field CTQ/qty/lot/Người phê duyệt bắt buộc.</td><td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> release / shipping pack</td><td>M2</td><td>Field mapping và luồng approval phải ổn định.</td></tr>
 <tr><td>PY-009</td><td>Nhầm material / mixed alloy</td><td>Bin màu + scan material cert / heat number trước khi cấp vào máy.</td><td>Receiving / vấn đề to job</td><td>M2</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span> phân khu và label nhiệt luyện/heat number rõ ràng.</td></tr>
 <tr><td>PY-010</td><td>Mixed part / mixed revision trên cùng khay</td><td>Khay 1 mã part-rev; mỗi vị trí khay có placard cố định; phải giữ tách tuyệt đối.</td><td>WIP staging</td><td>M1</td><td>Planning và operator tuân thủ rule WIP separation.</td></tr>
-<tr><td>PY-011</td><td>Quên cap / plug trước clean pack</td><td>Witness position + bảng kiểm 4 mắt cho cap/plug/desiccant/humidity card.</td><td>Clean pack</td><td>M2</td><td>Danh sách phụ kiện của từng job được chốt trước.</td></tr>
+<tr><td>PY-011</td><td>Quên cap / plug trước vệ sinh và đóng gói</td><td>Witness position + bảng kiểm 4 mắt cho cap/plug/desiccant/humidity card.</td><td>Vệ sinh và đóng gói</td><td>M2</td><td>Danh sách phụ kiện của từng job được chốt trước.</td></tr>
 <tr><td>PY-012</td><td>Sai số carton / sai kiện</td><td>Blind count + scan-to-print chỉ cho in label ngoài khi count đủ.</td><td>Packing / shipping</td><td>M2</td><td>Không in label trước khi hoàn tất đóng gói thực.</td></tr>
 <tr><td>PY-013</td><td>FOD còn sót trong machine / tray / chamber</td><td>Line-clearance token + tool accountability + witness khu sạch trước đóng cửa.</td><td>Machine close-out / clean build</td><td>M2</td><td>Danh mục dao cụ và line-clearance bảng kiểm luôn sẵn dùng.</td></tr>
 <tr><td>PY-014</td><td>Bỏ sót bàn giao thông tin ca</td><td>Board giao ca bắt buộc có machine trạng thái, hold lot, tool concern, abnormal note.</td><td>Bàn giao ca</td><td>M3</td><td>Người giao / nhận ca cùng ký và cùng đọc.</td></tr>

@@ -21,7 +21,7 @@
 <strong class="doc-name">27</strong>
 <span class="sub-vn"></span>
 </div>
-<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">SYS-OPS-27</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">SYS-OPS-27</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
 </div>
 <div class="doc-content" id="docContent">
 <div class="cover">
@@ -138,8 +138,8 @@
 <div class="small muted" style="margin-top:8px;">"Trích xuất gói hàng + mã băm/bảng kê gói (mã băm (hash)/bảng kê gói (bảng kê)" cần quy định chuẩn đóng gói và nơi lưu; mục này ghi M365/SharePoint → HESEM-QMS-SSOT tới khi phân xưởng chốt phương án.</div>
 </div>
 <div class="card">
-<span class="badge">5) Fail-nhanh quy tắc + STOP/TẠM GIỮ/CHẶN</span>
-<h2 class="h2" style="margin-top:12px;">3 luật fail-nhanh bắt buộc</h2>
+<span class="badge">5) Phát hiện lỗi sớm quy tắc + STOP/TẠM GIỮ/CHẶN</span>
+<h2 class="h2" style="margin-top:12px;">3 luật phát hiện lỗi sớm bắt buộc</h2>
 <ol style="margin:8px 0 0 0; padding-left:18px; line-height:1.8;">
 <li><b>CHẶN</b> ngay khi Tier-1 thiếu trạng thái Hồ sơ hoặc thiếu nhãn T1 trước Final/phê duyệt giao hàng.</li>
 <li><b>TẠM GIỮ</b> ngay khi phát hiện ghi đè hoặc đổi phiên bản mà không tạo phiên bản mới; chỉ PHÁT HÀNH khi có bản thay thế và log thay đổi.</li>
@@ -238,7 +238,7 @@
 <li>5 siêu dữ liệu bắt buộc của Tier-1 theo bộ mẫu cấu hình (SSOT) là gì?</li>
 <li>Loại nội dung nào mặc định gắn nhãn LAM-T1-10Y-HỒ SƠ? A. Vận hành Photos B. bộ hồ sơ giao hàng C. Điều phối log D. Thời gian dừng máy</li>
 <li>Khi file ở thư mục 07_Shipping-Đóng gói và loại nội dung "CoC / Chứng chỉ", nhãn nào phải dán?</li>
-<li>Khi phát hiện ghi đè file Tier-1, hành động đúng là gì theo fail-nhanh quy tắc?</li>
+<li>Khi phát hiện ghi đè file Tier-1, hành động đúng là gì theo phát hiện lỗi sớm quy tắc?</li>
 <li>tự động-áp dụng policy dán nhãn dựa điều kiện nào? (Chọn 2) A. Thư mục/path B. Loại nội dung/siêu dữ liệu C. Màu icon D. Thời tiết</li>
 <li>Khi tự dán nhãn dựa trên cột siêu dữ liệu, điều kiện hệ thống nào cần được xác nhận để policy tìm thấy cột? (Nêu 1 điểm kiểm soát)</li>
 <li>Quyết định xử lý rà soát phục vụ mục tiêu gì trong kiểm soát hồ sơ?</li>
@@ -368,7 +368,7 @@
 <li><b>Không chứng minh được thời hạn lưu</b> → chặn bằng MRR-01 và phê duyệt thay đổi.</li>
 <li><b>Hồ sơ Tier-1 không phải Hồ sơ</b> → chặn bằng CP4 và kiểm tra tại phê duyệt giao hàng Cổng kiểm soát.</li>
 <li><b>Thiếu siêu dữ liệu truy xuất nguồn gốc theo job/rev</b> → bắt buộc 5 cột; CHẶN khi thiếu.</li>
-<li><b>ghi đè file làm mất lịch sử</b> → fail-nhanh TẠM GIỮ + quy tắc đặt tên + quản lý phiên bản.</li>
+<li><b>ghi đè file làm mất lịch sử</b> → phát hiện lỗi sớm TẠM GIỮ + quy tắc đặt tên + quản lý phiên bản.</li>
 <li><b>Nhãn dán không nhất quán giữa thư mục</b> → dùng tự dán nhãn theo thư mục + loại nội dung; mô phỏng trước go-Live.</li>
 <li><b>Quyết định xử lý không có log quyết định</b> → MRR-07 bắt buộc.</li>
 <li><b>Trích xuất thiếu chứng cứ kèm theo</b> → bảng kiểm xuất + bảng kê gói (bảng kê) <b>M365/SharePoint → HESEM-QMS-SSOT</b>.</li>

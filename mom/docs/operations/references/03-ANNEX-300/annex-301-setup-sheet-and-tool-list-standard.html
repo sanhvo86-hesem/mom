@@ -66,8 +66,8 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
  <h1>ANNEX-301 - Phiếu setup and Danh mục dao cụ Standard</h1>
  
 <div class="section"><h2>1. Mục đích và quy tắc quản trị dữ liệu setup</h2>
-<p>ANNEX này khóa cấu trúc dữ liệu bắt buộc của <strong>Phiếu setup</strong>, <strong>Danh mục dao cụ</strong> và các phụ lục setup liên quan. Mọi gói phát hành dùng để setup, chứng minh-out, mẫu đầu (tiên chi tiết / sản phẩm), chuyển giao công việc, machine khởi động lại sau sự cố nghiêm trọng hoặc thiết lập lại mốc chuẩn đều phải dùng đúng cấu trúc dữ liệu này. Không được phát hành phiếu cài đặt theo kiểu mô tả tự do, thiếu trường khóa hoặc dựa vào trí nhớ của Người setup.</p>
-<div class="callout-danger"><strong>Điểm dừng phát hành:</strong> thiếu Part/Rev, thiếu nhóm máy (machine nhóm sản phẩm), thiếu fixture logic, thiếu WCS/đo bằng đầu dò phương pháp, thiếu danh sách dao cụ hoặc thiếu chứng minh-out note là <strong>không được phát hành</strong>. Nếu phát hành thiếu dữ liệu rồi mới bù bằng miệng ở phân xưởng thì phát hành đó không có giá trị.</div>
+<p>ANNEX này khóa cấu trúc dữ liệu bắt buộc của <strong>Phiếu setup</strong>, <strong>Danh mục dao cụ</strong> và các phụ lục setup liên quan. Mọi gói phát hành dùng để setup, chạy kiểm chứng, mẫu đầu (tiên chi tiết / sản phẩm), chuyển giao công việc, machine khởi động lại sau sự cố nghiêm trọng hoặc thiết lập lại mốc chuẩn đều phải dùng đúng cấu trúc dữ liệu này. Không được phát hành phiếu cài đặt theo kiểu mô tả tự do, thiếu trường khóa hoặc dựa vào trí nhớ của Người setup.</p>
+<div class="callout-danger"><strong>Điểm dừng phát hành:</strong> thiếu Part/Rev, thiếu nhóm máy (machine nhóm sản phẩm), thiếu fixture logic, thiếu WCS/đo bằng đầu dò phương pháp, thiếu danh sách dao cụ hoặc thiếu chạy kiểm chứng note là <strong>không được phát hành</strong>. Nếu phát hành thiếu dữ liệu rồi mới bù bằng miệng ở phân xưởng thì phát hành đó không có giá trị.</div>
 <div class="callout-info"><strong>Nguyên tắc:</strong> một phiếu cài đặt chỉ được dùng khi nó trả lời được đầy đủ 6 câu hỏi: <strong>chạy job nào</strong>, <strong>trên máy nào</strong>, <strong>kẹp như thế nào</strong>, <strong>lấy chuẩn ở đâu</strong>, <strong>dùng tool nào</strong>, và <strong>mở chu kỳ đầu như thế nào</strong>.</div>
 </div>
 
@@ -78,9 +78,9 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <tr><td>Nguyên vật liệu &amp; điều kiện</td><td>Nguyên vật liệu nhóm sản phẩm, hợp kim/cấp / hạng/ram (temper), mẻ nấu (heat)/lot ref khi áp dụng, thô/hoàn thành trạng thái, trước / ưu tiên công đoạn đặc biệt trạng thái, vệ sinh / sạch sẽ/chân không đánh dấu</td><td>Ngăn setup sai với part cần rule xử lý đặc biệt.</td></tr>
 <tr><td>gá kẹp chi tiết</td><td>Fixture ID/rev, jaw type/rev, chốt định vị sơ đồ / kế hoạch, stop pin, kẹp / gá kẹp điểm, mô-men xoắn giá trị, hỗ trợ điểm, Photos</td><td>Khóa logic gá và điều kiện giữ part ổn định.</td></tr>
 <tr><td>WCS / đo bằng đầu dò</td><td>Mốc chuẩn (mốc chuẩn (datum) chiến lược, định hướng / đào tạo hội nhập, WCS name, chủ / gốc không / bằng không source, đo bằng đầu dò cycle, cho phép bù trừ (offset) viết / ghi-back, quan trọng / nghiêm trọng bù trừ (bù trừ (offset)</td><td>Khóa logic lấy chuẩn, tránh trôi / sai lệch và tránh viết bù bù trừ (offset) vô kiểm soát.</td></tr>
-<tr><td>Danh mục dao cụ</td><td>Tool lắp ráp data, hốc / túi/trạm / vị trí làm việc, chị em / liên kết tool, cài đặt trước data, mài mòn/tuổi thọ / vòng đời rule, dung dịch làm mát (dung dịch làm nguội) chế độ, backup tooling</td><td>Khóa cấu hình dao để setup và chứng minh-out lặp lại được.</td></tr>
+<tr><td>Danh mục dao cụ</td><td>Tool lắp ráp data, hốc / túi/trạm / vị trí làm việc, chị em / liên kết tool, cài đặt trước data, mài mòn/tuổi thọ / vòng đời rule, dung dịch làm mát (dung dịch làm nguội) chế độ, backup tooling</td><td>Khóa cấu hình dao để setup và chạy kiểm chứng lặp lại được.</td></tr>
 <tr><td>Kiểm tra sơ đồ ánh xạ</td><td>CTQ đầu tiên, điểm kiểm tra trong quá trình, bắt buộc gage/CMM/trực quan aid, lấy mẫu kích hoạt, mẫu đầu note</td><td>Nối dữ liệu setup với cổng kiểm soát chất lượng và hồ sơ đo.</td></tr>
-<tr><td>Chứng minh-out / phát hành</td><td>Cycle start chế độ, ghi đè / bỏ qua cap, dry-run lộ trình gia công, đầu tiên-cut điều kiện, bắt buộc ký-off, tái xác nhận hiệu lực kích hoạt</td><td>Khóa cách mở máy an toàn và đúng cổng kiểm soát.</td></tr>
+<tr><td>Chạy kiểm chứng / phát hành</td><td>Cycle start chế độ, ghi đè / bỏ qua cap, dry-run lộ trình gia công, đầu tiên-cut điều kiện, bắt buộc ký-off, tái xác nhận hiệu lực kích hoạt</td><td>Khóa cách mở máy an toàn và đúng cổng kiểm soát.</td></tr>
 </tbody></table></div>
 </div>
 
@@ -130,7 +130,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <div class="section"><h2>7. Chuẩn Danh mục dao cụ chi tiết</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm trường</th><th>Nội dung bắt buộc</th><th>Từ chối khi</th></tr></thead><tbody>
 <tr><td>Nhận diện tool lắp ráp</td><td>Tool no., hốc / túi/trạm / vị trí làm việc, cán dao / đầu gá/trục gá (arbor)/ống kẹp (collet), dao cắt ID, mảnh dao (insert) cấp / hạng, dưỡng đo / đồng hồ đo chiều dài, dính / que-out, cân bằng / số dư/mô-men xoắn note nếu có</td><td>Chỉ ghi "EM10" hoặc "diễn tập 5mm" mà không có lắp ráp bối cảnh.</td></tr>
-<tr><td>Chức năng tool</td><td>thô/hoàn thành/khoan/tarô (taro ren) ren)/ren/vát mép/đầu dò (probe)/cắt / ngưỡng cắt, kênh nếu máy nhiều kênh</td><td>Không phân biệt tool thô và hoàn thành dẫn đến dùng nhầm tại chứng minh-out.</td></tr>
+<tr><td>Chức năng tool</td><td>thô/hoàn thành/khoan/tarô (taro ren) ren)/ren/vát mép/đầu dò (probe)/cắt / ngưỡng cắt, kênh nếu máy nhiều kênh</td><td>Không phân biệt tool thô và hoàn thành dẫn đến dùng nhầm tại chạy kiểm chứng.</td></tr>
 <tr><td>cài đặt trước data</td><td>cài đặt trước source, danh nghĩa chiều dài/bán kính, cho phép mài mòn dải / băng, không / bằng không tham chiếu, chị em / liên kết tool mối quan hệ</td><td>cài đặt trước bằng tay nhưng không có rule xác minh.</td></tr>
 <tr><td>Tool tuổi thọ / vòng đời</td><td>ban đầu tuổi thọ / vòng đời, cảnh báo ngưỡng, end-of-tuổi thọ / vòng đời ngưỡng, thay thế hành động, bắt buộc xác minh sau thay đổi</td><td>Không có ngưỡng hoặc không có hành động sau khi chạm ngưỡng.</td></tr>
 <tr><td>Dung dịch làm mát / phoi (chip) note</td><td>tưới tràn (flood)/MQL/xuyên suốt-trục chính (spindle)/air phun bi / thổi, vòi phun yêu cầu, phoi (chip) sơ tán lo nTại / vấn đề</td><td>Tool đặc biệt nhưng không nêu dung dịch làm mát chế độ.</td></tr>
@@ -144,15 +144,15 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </ul>
 </div>
 
-<div class="section"><h2>8. đo bằng đầu dò, WCS, quan trọng / nghiêm trọng bù trừ (bù trừ (offset) và chứng minh-out</h2>
+<div class="section"><h2>8. đo bằng đầu dò, WCS, quan trọng / nghiêm trọng bù trừ (bù trừ (offset) và chạy kiểm chứng</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mục</th><th>Yêu cầu dữ liệu</th></tr></thead><tbody>
 <tr><td>Mốc chuẩn (mốc chuẩn (datum) chiến lược</td><td>Phải chỉ rõ mốc chuẩn (datum) vật lý, mốc chuẩn (datum) logic trong chương trình, và mối liên hệ với bản vẽ/kế hoạch kiểm tra (plan).</td></tr>
 <tr><td>đầu dò (probe) cycle</td><td>Mã cycle, bề mặt chạm, dự kiến kết quả, logic đạt/không đạt, viết / ghi-back cho phép hay không.</td></tr>
 <tr><td>Quan trọng bù trừ (bù trừ (offset)</td><td>Danh sách bù trừ (offset) không được sửa bởi Operator hoặc chỉ được sửa trong biên độ hẹp; nêu rõ ai được sửa và phải log ở đâu.</td></tr>
-<tr><td>Chứng minh-out chế độ</td><td>Dry-run / đồ họa / đơn lẻ chặn / khóa / nhanh / chạy nhanh cap / trục chính (spindle) cap / đầu tiên-cut điểm giám sát / đặc điểm / tính năng-by-đặc điểm / tính năng phát hành.</td></tr>
-<tr><td>khởi động lại note</td><td>Rule quay lại chứng minh-out khi machine reset, chuyển giao công việc, tool thay thế, sự cố nghiêm trọng, fixture re-kẹp / gá kẹp hoặc thiết lập lại mốc chuẩn phiên bản.</td></tr>
+<tr><td>Chạy kiểm chứng chế độ</td><td>Dry-run / đồ họa / đơn lẻ chặn / khóa / nhanh / chạy nhanh cap / trục chính (spindle) cap / đầu tiên-cut điểm giám sát / đặc điểm / tính năng-by-đặc điểm / tính năng phát hành.</td></tr>
+<tr><td>khởi động lại note</td><td>Rule quay lại chạy kiểm chứng khi machine reset, chuyển giao công việc, tool thay thế, sự cố nghiêm trọng, fixture re-kẹp / gá kẹp hoặc thiết lập lại mốc chuẩn phiên bản.</td></tr>
 </tbody></table></div>
-<div class="keyline"><strong>Điểm bắt buộc:</strong> phiếu cài đặt phải chỉ ra chính xác <em>điểm bắt đầu chứng minh-out</em>, <em>điểm kết thúc chứng minh-out</em> và <em>điều kiện chuyển sang chạy sản lượng</em>. Không được ghi chung chung "run cẩn thận".</div>
+<div class="keyline"><strong>Điểm bắt buộc:</strong> phiếu cài đặt phải chỉ ra chính xác <em>điểm bắt đầu chạy kiểm chứng</em>, <em>điểm kết thúc chạy kiểm chứng</em> và <em>điều kiện chuyển sang chạy sản lượng</em>. Không được ghi chung chung "run cẩn thận".</div>
 </div>
 
 <div class="section"><h2>9. Sơ đồ ánh xạ với đo lường và hồ sơ bằng chứng</h2>
@@ -168,19 +168,19 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 
 <div class="section"><h2>10. Quy tắc thay đổi, thay thế / bãi bỏ và từ chối điều kiện</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Phải làm</th><th>Phải chặn</th></tr></thead><tbody>
-<tr><td>Đổi bù trừ (offset) logic / WCS / mốc chuẩn (datum) / định hướng / đào tạo hội nhập</td><td>Phát hành phiên bản mới, cập nhật chứng minh-out note và kích hoạt cổng kiểm soát liên quan.</td><td>Sửa miệng hoặc ghi bút tay tại máy rồi tiếp tục chạy hàng loạt.</td></tr>
+<tr><td>Đổi bù trừ (offset) logic / WCS / mốc chuẩn (datum) / định hướng / đào tạo hội nhập</td><td>Phát hành phiên bản mới, cập nhật chạy kiểm chứng note và kích hoạt cổng kiểm soát liên quan.</td><td>Sửa miệng hoặc ghi bút tay tại máy rồi tiếp tục chạy hàng loạt.</td></tr>
 <tr><td>Đổi fixture / jaw / stop / kẹp / gá kẹp chiến lược</td><td>Cập nhật ảnh, mô-men xoắn, chốt định vị, rủi ro note và phê duyệt lại.</td><td>Dùng fixture "Cần giống" mà không cập nhật sheet.</td></tr>
 <tr><td>Đổi tool lắp ráp / thay thế</td><td>Cập nhật Danh mục dao cụ phiên bản, chị em / liên kết tool logic, tuổi thọ / vòng đời dải / băng và bắt buộc xác minh.</td><td>Đổi tool rồi chỉ báo miệng cho ca sau.</td></tr>
 <tr><td>Machine chuyển giao</td><td>Tạo phụ lục bổ sung hoặc setup chặn / khóa mới cho nhóm máy (machine nhóm sản phẩm) đích.</td><td>Dùng nguyên phiếu cài đặt của nhóm máy (machine nhóm sản phẩm) khác.</td></tr>
 <tr><td>Hot fix tại phân xưởng</td><td>Quay về được kiểm soát thay đổi; mọi bản in cũ phải được thu hồi hoặc đánh dấu được thay thế.</td><td>Chạy theo bản cũ và hứa "sẽ sửa sau".</td></tr>
 </tbody></table></div>
-<div class="callout-danger"><strong>Từ chối điều kiện tổng hợp:</strong> thiếu trường bắt buộc; ảnh không đúng fixture; Danh mục dao cụ không khớp hốc / túi; không có chứng minh-out note; không chỉ ra CTQ đầu tiên; không xác định nhóm máy (machine nhóm sản phẩm); không có Người phát hành. Gặp một trong các điều kiện này, Tài liệu Control/<span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span> phải từ chối phát hành.</div>
+<div class="callout-danger"><strong>Từ chối điều kiện tổng hợp:</strong> thiếu trường bắt buộc; ảnh không đúng fixture; Danh mục dao cụ không khớp hốc / túi; không có chạy kiểm chứng note; không chỉ ra CTQ đầu tiên; không xác định nhóm máy (machine nhóm sản phẩm); không có Người phát hành. Gặp một trong các điều kiện này, Tài liệu Control/<span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span> phải từ chối phát hành.</div>
 </div>
 
 <div class="section"><h2>11. KPI, đánh giá móc và tài liệu liên kết</h2>
 <div class="kpi-grid">
 <div class="kpi-box"><strong>KPI</strong><div class="tiny" style="margin-top:6px;">Tỷ lệ phiếu cài đặt phát hành đúng ngay lần đầu; số lỗi setup do thiếu field; số lần machine chuyển giao phải sửa sheet; số sự cố liên quan sai WCS/danh sách dao cụ/fixture note.</div></div>
-<div class="kpi-box"><strong>Đánh giá móc</strong><div class="tiny" style="margin-top:6px;">nMẫu nhiên kiểm tra 3 job đang chạy: header đúng, nhóm máy (machine nhóm sản phẩm) đúng, fixture Photos đúng, danh sách dao cụ khớp hốc / túi, chứng minh-out note đủ, CTQ đầu tiên được chỉ rõ.</div></div>
+<div class="kpi-box"><strong>Đánh giá móc</strong><div class="tiny" style="margin-top:6px;">nMẫu nhiên kiểm tra 3 job đang chạy: header đúng, nhóm máy (machine nhóm sản phẩm) đúng, fixture Photos đúng, danh sách dao cụ khớp hốc / túi, chạy kiểm chứng note đủ, CTQ đầu tiên được chỉ rõ.</div></div>
 </div>
 <div class="callout-info"><strong>Tài liệu liên kết:</strong> <a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>, <a href="../05-ANNEX-500/annex-505-put-thru-index.html">ANNEX-505</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-512-3-axis-vertical-milling-guide.html">WI-512</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-513-5-axis-milling-guide.html">WI-513</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-514-cnc-turning-guide.html">WI-514</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-515-mill-turn-guide.html">WI-515</a>, <a href="../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a>, <a href="../../01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a>.</div>
 </div>

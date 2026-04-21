@@ -19,7 +19,7 @@
 <strong class="doc-name">04</strong>
 <span class="sub-vn"></span>
 </div>
-<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">SYS-OPS-04</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">SYS-OPS-04</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
 </div>
 <div class="doc-content" id="docContent"><div class="note-blue" style="margin:12px 0">
  <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — System Operations Guide</b>.
@@ -48,7 +48,7 @@
 <li><a href="#e2e">3) Vị trí trong chuỗi E2E + bàn giao + điểm chặn</a></li>
 <li><a href="#failure">4) Điểm đứt gãy (&gt;=10)</a></li>
 <li><a href="#controls">5) Biện pháp kiểm soát rủi ro (&gt;=6)</a></li>
-<li><a href="#failfast">6) Fail-nhanh quy tắc + STOP/TẠM GIỮ/CHẶN</a></li>
+<li><a href="#failfast">6) Phát hiện lỗi sớm quy tắc + STOP/TẠM GIỮ/CHẶN</a></li>
 <li><a href="#60s">7) Phản ứng 60 giây</a></li>
 <li><a href="#checklist">8) Bảng kiểm vận hành (≤15 bước)</a></li>
 <li><a href="#ojt">9) OJT thực chiến theo TWI</a></li>
@@ -66,7 +66,7 @@
 <h3>Lý do tồn tại (Cổng kiểm soát Logic)</h3>
 <ul>
 <li>Thiết lập "đường ray" để mọi quyết định vận hành có <b>dấu vết duyệt</b> (ApprovalHistory) và <b>dấu vết hệ thống</b> (IntegrationLogs) theo chuẩn đánh giá.</li>
-<li>Chặn các rủi ro Top rủi ro: sai phiên bản (Sai Rev), lẫn lộn (mix-up)/lẫn lô, thiếu/giả chứng từ, vượt qua cổng kiểm soát, ship sai, NCR/MRB không có bằng chứng.</li>
+<li>Chặn các rủi ro Top rủi ro: sai phiên bản (Sai Rev), lẫn lộn (nhầm lẫn)/lẫn lô, thiếu/giả chứng từ, vượt qua cổng kiểm soát, ship sai, NCR/MRB không có bằng chứng.</li>
 <li>Ổn định vận hành 2 ca/ngày, 6 ngày/tuần: kiểm tra theo nhịp ca, không đẻ thêm Người, không đẻ thêm file.</li>
 </ul>
 <h3>Ai chịu trách nhiệm (RACI theo vai trò)</h3>
@@ -189,7 +189,7 @@
 <h2>4) Điểm đứt gãy (tối thiểu 10 điểm gãy thực tế gắn với bước)</h2>
 <div class="table-card">
 <table class="table">
-<thead><tr><th>#</th><th>Điểm gãy</th><th>Bước E2E</th><th>Tín hiệu phát hiện</th><th>Hành động bắt buộc (fail-nhanh)</th></tr></thead>
+<thead><tr><th>#</th><th>Điểm gãy</th><th>Bước E2E</th><th>Tín hiệu phát hiện</th><th>Hành động bắt buộc (phát hiện lỗi sớm)</th></tr></thead>
 <tbody>
 <tr><td>1</td><td>Luồng sync bị tắt/không chạy theo lịch</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Planning and Control Function (Dieu do va kiem soat san xuat)"><span class="entity-code dept-code">D-PPC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a></span></td><td>IntegrationLogs trống &gt; 60 phút trong giờ ca</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> kích hoạt STOP dữ liệu; khóa quyết định theo phản chiếu / sao chép</td></tr>
 <tr><td>2</td><td>con trỏ LastSyncUtc bị tạm ứng / nâng cao dù run fail</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Planning and Control Function (Dieu do va kiem soat san xuat)"><span class="entity-code dept-code">D-PPC</span></a></span></td><td>Khoảng trống dữ liệu; JobIndex thiếu job mới</td><td>IT hoàn tác / quay lại con trỏ; ghi Sự cố + MRR</td></tr>
@@ -225,7 +225,7 @@
 </div>
 </div>
 <div class="section" id="failfast">
-<h2>6) Fail-nhanh quy tắc (≥3) + tiêu chí STOP/TẠM GIỮ/CHẶN</h2>
+<h2>6) Phát hiện lỗi sớm quy tắc (≥3) + tiêu chí STOP/TẠM GIỮ/CHẶN</h2>
 <div class="grid-2">
 <div>
 <h3>Định nghĩa trạng thái cưỡng chế</h3>
@@ -236,7 +236,7 @@
 </ul>
 </div>
 <div>
-<h3>Fail-nhanh quy tắc (cưỡng chế)</h3>
+<h3>Phát hiện lỗi sớm quy tắc (cưỡng chế)</h3>
 <ol>
 <li><b>Rule FF1 — phản chiếu / sao chép không tin cậy:</b> Khi IntegrationLogs(Thất bại) xảy ra 3 lần liên tiếp cho luồng sync trong giờ ca → <b>STOP dữ liệu</b>; <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span>/<span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> chuyển sang kiểm bằng Epicor trực tiếp phương án dự phòng: Epicor trực tiếp + export CSV vào SSOT..</li>
 <li><b>Rule FF2 — No bằng chứng:</b> Khi bất kỳ cổng kiểm soát hồ sơ (ShipRelease/NCR/CAPA/QC Hold) thiếu EvidenceFolderUrl hoặc thiếu file bắt buộc → <b>TẠM GIỮ/CHẶN</b> ngay tại hồ sơ; không mở ngoại lệ.</li>

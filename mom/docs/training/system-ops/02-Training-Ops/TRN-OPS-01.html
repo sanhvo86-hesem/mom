@@ -36,7 +36,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong class="doc-name">01</strong>
 <span class="sub-vn"></span>
 </div>
-<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">TRN-OPS-01</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">TRN-OPS-01</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
 </div>
 <div class="doc-content" id="docContent">
 <div class="note-blue" style="margin:12px 0">
@@ -89,7 +89,7 @@ sai Rev, lẫn lô, thiếu chứng từ, đo kiểm không kiểm soát, vượ
 <li><a href="#sec3">3) Vị trí trong chuỗi E2E &amp; luồng bàn giao</a></li>
 <li><a href="#sec4">4) Điểm đứt gãy (điểm gãy thực tế)</a></li>
 <li><a href="#sec5">5) Biện pháp kiểm soát rủi ro (điểm kiểm soát &amp; bằng chứng)</a></li>
-<li><a href="#sec6">6) Fail-nhanh quy tắc &amp; tiêu chí STOP/TẠM GIỮ/CHẶN</a></li>
+<li><a href="#sec6">6) Phát hiện lỗi sớm quy tắc &amp; tiêu chí STOP/TẠM GIỮ/CHẶN</a></li>
 <li><a href="#sec7">7) Phản ứng 60 giây</a></li>
 <li><a href="#sec8">8) Bảng kiểm vận hành (≤ 15 bước)</a></li>
 <li><a href="#sec9">9) OJT theo TWI: Job sự cố hỏng máy + Tiêu chí đánh giá L1–L4</a></li>
@@ -346,10 +346,10 @@ Bảng dưới xác định "khi nào đào tạo trở thành cổng".
 </table>
 </div>
 <div class="card" id="sec6">
-<h2 class="h2" style="margin-top:0;">6) Fail-nhanh quy tắc (≥ 3) + tiêu chí STOP/TẠM GIỮ/CHẶN</h2>
+<h2 class="h2" style="margin-top:0;">6) Phát hiện lỗi sớm quy tắc (≥ 3) + tiêu chí STOP/TẠM GIỮ/CHẶN</h2>
 <div class="grid-2">
 <div class="note">
-<strong>Fail-nhanh quy tắc</strong>
+<strong>Phát hiện lỗi sớm quy tắc</strong>
 <ul class="tight">
 <li><b>Rule F1:</b> phát hiện sai Rev trên tài liệu đào tạo → <b>STOP</b> lớp trong 60 giây, thu hồi bản sai, ghi nhận danh sách Người Received bản sai, tái đào tạo theo Rev đúng.</li>
 <li><b>Rule F2:</b> thiếu chữ ký điểm danh hoặc thiếu kết quả đánh giá → <b>CHẶN</b> công nhận level; Người học bị khóa quyền vận hành độc lập.</li>
@@ -369,7 +369,7 @@ Bảng dưới xác định "khi nào đào tạo trở thành cổng".
 </div>
 </div>
 <div class="card" id="sec7">
-<h2 class="h2" style="margin-top:0;">7) Phản ứng 60 giây (khi sai Rev/lẫn lộn (mix-up)/thiếu chứng từ/vượt qua cổng kiểm soát/rủi ro giao hàng)</h2>
+<h2 class="h2" style="margin-top:0;">7) Phản ứng 60 giây (khi sai Rev/lẫn lộn (nhầm lẫn)/thiếu chứng từ/vượt qua cổng kiểm soát/rủi ro giao hàng)</h2>
 <table class="table">
 <thead>
 <tr>

@@ -44,7 +44,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong class="doc-name">02</strong>
 <span class="sub-vn"></span>
 </div>
-<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">TRN-OPS-02</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">TRN-OPS-02</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
 </div>
 
 <!-- Form Header (tách rời doc-control) -->
@@ -56,7 +56,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <a href="#s3">3) Vị trí E2E &amp; bàn giao</a> •
  <a href="#s4">4) Điểm đứt gãy</a> •
  <a href="#s5">5) Biện pháp kiểm soát rủi ro</a> •
- <a href="#s6">6) Fail-nhanh</a> •
+ <a href="#s6">6) Phát hiện lỗi sớm</a> •
  <a href="#s7">7) Phản ứng 60 giây</a> •
  <a href="#s8">8) Bảng kiểm</a> •
  <a href="#s9">9) OJT TWI</a> •
@@ -99,7 +99,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <b>Mục đích</b>
 <ul class="tight">
 <li>Chuẩn hóa cách đánh giá năng lực theo 19 năng lực C01–C19 và Level L1–L4.</li>
-<li>Ràng buộc cấp quyền vận hành/cổng kiểm soát theo Level để chặn lỗi: sai Rev, lẫn lộn (mix-up), thiếu chứng từ, vượt qua cổng kiểm soát, ship rủi ro.</li>
+<li>Ràng buộc cấp quyền vận hành/cổng kiểm soát theo Level để chặn lỗi: sai Rev, lẫn lộn (nhầm lẫn), thiếu chứng từ, vượt qua cổng kiểm soát, ship rủi ro.</li>
 <li>Thiết lập luồng hồ sơ (MRR) để sẵn sàng đánh giá: truy xuất nguồn gốc được ai làm, làm trong phạm vi nào, bằng minh chứng gì, hiệu lực tới Ngày nào.</li>
 </ul>
 </div>
@@ -297,11 +297,11 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 </table>
 <!-- 6 -->
-<h2 id="s6">6) Fail-nhanh quy tắc (&gt;=3) + tiêu chí STOP/TẠM GIỮ/CHẶN</h2>
+<h2 id="s6">6) Phát hiện lỗi sớm quy tắc (&gt;=3) + tiêu chí STOP/TẠM GIỮ/CHẶN</h2>
 <div class="req">
 <span class="req-tag shall">PHẢI</span>
 <div>
- Fail-nhanh là luật dừng ngay tại hiện trường. Mọi cấp quản lý áp dụng thống nhất.
+ Phát hiện lỗi sớm là luật dừng ngay tại hiện trường. Mọi cấp quản lý áp dụng thống nhất.
  </div>
 </div>
 <ul class="tight">
@@ -320,7 +320,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><b>Khoanh vùng:</b> xác định phạm vi ảnh hưởng (job/WO, máy/cell, lô vật tư, gage, chứng từ, Người liên quan).</li>
 <li><b>Khóa bằng chứng:</b> chụp ảnh hiện trường, lưu file đang dùng, khóa bản in; ghi thời điểm phát hiện.</li>
 <li><b>Thông báo đúng kênh:</b> <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> + <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> (khi liên quan chất lượng/ship) + <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a> (khi liên quan chứng nhận).</li>
-<li><b>Quyết định cổng kiểm soát:</b> TẠM GIỮ/STOP/CHẶN theo fail-nhanh; ghi nhận trên MRR.</li>
+<li><b>Quyết định cổng kiểm soát:</b> TẠM GIỮ/STOP/CHẶN theo phát hiện lỗi sớm; ghi nhận trên MRR.</li>
 <li><b>Thay phương án:</b> chuyển Người đủ Level; thay gage đúng hiệu lực; phát hành lại tài liệu đúng phiên bản.</li>
 </ol>
 <!-- 8 -->
@@ -651,7 +651,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </li>
 <li>Nêu 2 ví dụ về vượt qua cổng kiểm soát trong bối cảnh đánh giá năng lực.</li>
 <li>Trong FRM-HR-TRN-006, "trạng thái" tối thiểu gồm các giá trị nào?</li>
-<li>Chọn đáp án đúng: Khi phát hiện lẫn lộn hồ sơ, luật fail-nhanh là:
+<li>Chọn đáp án đúng: Khi phát hiện lẫn lộn hồ sơ, luật phát hiện lỗi sớm là:
  <ul class="tight">
 <li>A. Cho phép sửa file name sau</li>
 <li>B. CHẶN bộ hồ sơ và mở NCR hồ sơ</li>
@@ -712,7 +712,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight">
 <li>Học viên hoàn tất 01 gói hồ sơ đánh giá cho chính phạm vi công việc của vai trò trong ca thực tế.</li>
 <li>Gói hồ sơ có đủ: bài kiểm tra nhanh + tình huống + quan sát thực hành + ghi rõ phạm vi/giới hạn quyền hạn + lưu MRR đúng quy tắc.</li>
-<li>Người đánh giá chấm theo FRM-HR-TRN-010; cổng kiểm soát fail-nhanh áp dụng trực tiếp.</li>
+<li>Người đánh giá chấm theo FRM-HR-TRN-010; cổng kiểm soát phát hiện lỗi sớm áp dụng trực tiếp.</li>
 </ul>
 </div>
 <table class="form-table">
@@ -720,7 +720,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th>Hạng mục bài test</th>
 <th>Tiêu chí đạt</th>
 <th>Minh chứng bắt buộc</th>
-<th>Fail-nhanh</th>
+<th>Phát hiện lỗi sớm</th>
 </tr>
 <tr>
 <td>Kiểm tra phiên bản &amp; Rev</td>
@@ -760,14 +760,14 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <ul class="tight">
 <li>Bài kiểm tra nhanh đạt ≥ 80% số điểm.</li>
 <li>Tình huống: quyết định cổng kiểm soát đúng 100% và ghi đủ MRR.</li>
-<li>Hiệu suất test: không vi phạm fail-nhanh; hoàn tất gói hồ sơ trong 1 ca làm việc; truy xuất nguồn gốc trong 2 phút.</li>
+<li>Hiệu suất test: không vi phạm phát hiện lỗi sớm; hoàn tất gói hồ sơ trong 1 ca làm việc; truy xuất nguồn gốc trong 2 phút.</li>
 <li>Phạm vi/giới hạn quyền hạn ghi rõ trên chứng nhận và đồng bộ Được ủy quyền Phạm vi.</li>
 </ul>
 </div>
 <div class="danger">
 <b>FAIL</b>
 <ul class="tight">
-<li>Vi phạm bất kỳ fail-nhanh nào.</li>
+<li>Vi phạm bất kỳ phát hiện lỗi sớm nào.</li>
 <li>Thiếu minh chứng bắt buộc hoặc thiếu chữ ký/ngày/WO tham chiếu.</li>
 <li>Không truy xuất nguồn gốc được hồ sơ trong 2 phút hoặc lưu sai nơi kiểm soát.</li>
 </ul>
@@ -846,7 +846,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>5</td>
 <td>Ký đạt khi không quan sát thực hành</td>
-<td>CP2 bắt buộc hiệu suất test; fail-nhanh hold khi thiếu quan sát</td>
+<td>CP2 bắt buộc hiệu suất test; phát hiện lỗi sớm hold khi thiếu quan sát</td>
 </tr>
 <tr>
 <td>6</td>
@@ -856,7 +856,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td>7</td>
 <td>Lẫn lộn hồ sơ (file name sai Người, mã NV thiếu)</td>
-<td>Fail-nhanh CHẶN (FF3) + quy tắc đặt tên + lấy mẫu CP6</td>
+<td>Phát hiện lỗi sớm CHẶN (FF3) + quy tắc đặt tên + lấy mẫu CP6</td>
 </tr>
 <tr>
 <td>8</td>

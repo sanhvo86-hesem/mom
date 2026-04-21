@@ -21,7 +21,7 @@
 <strong class="doc-name">20</strong>
 <span class="sub-vn"></span>
 </div>
-<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">SYS-OPS-20</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">SYS-OPS-20</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
 </div>
 
 <!-- 1) Header VI/EN + Form-Header (tách rời) -->
@@ -219,7 +219,7 @@
 <ul>
 <li><b>CHẶN</b> chạy loạt khi chưa có Mẫu đầu PASS.</li>
 <li><b>CHẶN</b> phát hành/giao hàng khi thiếu FAI pack theo hợp đồng hoặc khi thiếu Bộ bằng chứng tối thiểu.</li>
-<li><b>CHẶN</b> khi có rủi ro sai REV, lẫn lộn (mix-up) lô, thiếu/giả chứng chỉ, gage OOT, outsource chưa có cert.</li>
+<li><b>CHẶN</b> khi có rủi ro sai REV, lẫn lộn (nhầm lẫn) lô, thiếu/giả chứng chỉ, gage OOT, outsource chưa có cert.</li>
 </ul>
 </div>
 </div>
@@ -311,11 +311,11 @@
 </div>
 </div>
 <!-- 6) Fail-fast rules -->
-<h2 class="h2">6) Fail-nhanh quy tắc + tiêu chí STOP/TẠM GIỮ/CHẶN</h2>
+<h2 class="h2">6) Phát hiện lỗi sớm quy tắc + tiêu chí STOP/TẠM GIỮ/CHẶN</h2>
 <div class="card">
 <div class="grid-2">
 <div class="callout">
-<h3>Fail-nhanh quy tắc (tối thiểu 3)</h3>
+<h3>Phát hiện lỗi sớm quy tắc (tối thiểu 3)</h3>
 <ul>
 <li><b>Rule 1:</b> Khi phát hiện sai REV ở bất kỳ tài liệu nào → <b>STOP</b> máy, <b>TẠM GIỮ</b> toàn bộ WIP, mở NCR "REV không khớp".</li>
 <li><b>Rule 2:</b> Khi gage/CMM hết hạn hoặc không truy xuất nguồn gốc được tình trạng → <b>CHẶN</b> cổng kiểm soát đo; không được "đo tạm".</li>
@@ -643,7 +643,7 @@
 <div class="callout" style="margin-top:12px">
 <h3>ĐẠT/KHÔNG ĐẠT của bài hiệu suất test</h3>
 <ul>
-<li><b>PASS</b>: không vi phạm Fail-nhanh quy tắc; không thiếu MRR bắt buộc; quyết định cổng kiểm soát đúng trạng thái.</li>
+<li><b>PASS</b>: không vi phạm Phát hiện lỗi sớm quy tắc; không thiếu MRR bắt buộc; quyết định cổng kiểm soát đúng trạng thái.</li>
 <li><b>FAIL</b>: bất kỳ hành vi vượt qua cổng kiểm soát; dùng gage OOT; thiếu chứng chỉ bắt buộc; thiếu chữ ký/thiếu hồ sơ.</li>
 </ul>
 </div>

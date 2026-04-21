@@ -69,8 +69,8 @@ ul.tight li {margin:4px 0;}
 <strong>ÁP DỤNG KHI</strong><br>Dùng cho mọi khu vực lưu kho, khu vực chuẩn bị / sắp xếp, WIP, khu clean hold và thành phẩm chờ giao để duy trì đúng điều kiện, vị trí và thứ tự cấp phát.</div>
 <h1>WI-702 - Storage Environment Location and FIFO Control</h1>
 <section class="wi-section" id="wi-s1"><h2>1. Mục đích, phạm vi và quyền dừng</h2>
-<p>WI này khóa cách lưu kho, khu vực chuẩn bị / sắp xếp, giữ môi trường, bố trí vị trí, cấp phát FIFO/FEFO, hoàn trả hàng và phản ứng khi phát hiện bất thường đối với raw nguyên vật liệu, bán thành phẩm, thành phẩm, hàng clean-pack và vật tư đóng gói có kiểm soát. Mục tiêu là giữ đúng <strong>truy vết</strong>, đúng <strong>tình trạng bảo quản</strong>, đúng <strong>vị trí</strong> và đúng <strong>thứ tự cấp phát</strong> từ lúc hàng được nhập vị trí cho đến khi vấn đề cho công đoạn hoặc giao cho khách.</p>
-<p><strong>QUYỀN DỪNG:</strong> <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span>, IQC, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a>, Kế hoạch, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a> / <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Truong ca)"><span class="entity-code role-code">SL</span></a> và Người có thẩm quyền phát hành được quyền dừng cấp phát hoặc dừng chuyển vị trí khi phát hiện sai nhãn trạng thái, thiếu lot/mẻ nấu (heat), lệch môi trường, lô clean-pack mất niêm phong, dấu hiệu ăn mòn, lẫn phiên bản, lẫn vị trí hoặc tồn già vượt rule.</p>
+<p>WI này khóa cách lưu kho, khu vực chuẩn bị / sắp xếp, giữ môi trường, bố trí vị trí, cấp phát FIFO/FEFO, hoàn trả hàng và phản ứng khi phát hiện bất thường đối với raw nguyên vật liệu, bán thành phẩm, thành phẩm, hàng vệ sinh và đóng gói và vật tư đóng gói có kiểm soát. Mục tiêu là giữ đúng <strong>truy vết</strong>, đúng <strong>tình trạng bảo quản</strong>, đúng <strong>vị trí</strong> và đúng <strong>thứ tự cấp phát</strong> từ lúc hàng được nhập vị trí cho đến khi vấn đề cho công đoạn hoặc giao cho khách.</p>
+<p><strong>QUYỀN DỪNG:</strong> <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span>, IQC, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a>, Kế hoạch, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a> / <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Truong ca)"><span class="entity-code role-code">SL</span></a> và Người có thẩm quyền phát hành được quyền dừng cấp phát hoặc dừng chuyển vị trí khi phát hiện sai nhãn trạng thái, thiếu lot/mẻ nấu (heat), lệch môi trường, lô vệ sinh và đóng gói mất niêm phong, dấu hiệu ăn mòn, lẫn phiên bản, lẫn vị trí hoặc tồn già vượt rule.</p>
 <div class="callout-danger">
 <span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Lưu hàng cách nền, cách tường, trong giới hạn chịu tải, ghi nhận mọi vị trí tạm, cấp phát theo FIFO hoặc FEFO đã xác nhận và dùng đúng vật liệu ngăn cách cho part đã hoàn thiện bề mặt.</div></section><section class="wi-section" id="wi-s2"><h2>2. Rule phân vùng, trạng thái và quyền vận hành theo khu vực</h2>
 <div style="background:#FEF9C3;border-left: 3px solid #F59E0B;padding:0.5em 1em;margin:0.5em 0;font-size:0.85em">
@@ -125,7 +125,7 @@ ul.tight li {margin:4px 0;}
 </tr>
 <tr>
 <td>CLEAN</td>
-<td>Hàng sạch, chân không, low-hạt / phần tử, clean-pack</td>
+<td>Hàng sạch, chân không, low-hạt / phần tử, vệ sinh và đóng gói</td>
 <td>Nhân sự được chỉ định, có mặc đồ bảo hộ (gowning)/PPE phù hợp</td>
 <td>Clean trạng thái, niêm phong trạng thái, mở time nếu có, xử lý / vận chuyển note</td>
 <td>Chỉ được mở/đóng lại theo <a href="wi-714-clean-packaging-handling-and-preservation.html">WI-714</a> hoặc <a href="wi-716-vacuum-compatible-clean-build-and-bagging.html">WI-716</a>
@@ -169,7 +169,7 @@ ul.tight li {margin:4px 0;}
 <td>Khoanh vùng 100%; đánh giá lại toàn bộ khay chứa cùng lô nếu phát hiện một chi tiết bị chạm hỏng</td>
 </tr>
 <tr>
-<td>Hàng clean-pack / chân không-nhạy cảm</td>
+<td>Hàng vệ sinh và đóng gói / chân không-nhạy cảm</td>
 <td>Khu CLEAN hoặc tủ/kệ quy định; không để thùng thùng carton hở, bụi, dầu, mảnh phoi (chip), băng keo rời</td>
 <td>niêm phong nguyên vẹn, mở time, chất hút ẩm/HIC khi có yêu cầu, clean label</td>
 <td>TẠM GIỮ ngay; đánh giá tái làm sạch / re-pack / tái kiểm sạch trước khi phát hành lại</td>
@@ -201,7 +201,7 @@ ul.tight li {margin:4px 0;}
 <div class="step-item">
 <strong>Trả lại từ sản xuất.</strong><br>Hàng dư sau khi vấn đề, vật liệu thừa nguyên liệu, cân bằng / số dư của một phần lot hoặc part chưa gia công hết vận hành không được trả vào tồn kho dùng chung nếu thiếu nhãn cân bằng / số dư. Nhãn cân bằng / số dư tối thiểu phải có Job/WO, part/rev, lot/mẻ nấu (heat), qty còn lại, công đoạn Current và tình trạng có thể sử dụng / hold / làm lại.</div>
 <div class="step-item">
-<strong>tràn / khẩn cấp di chuyển.</strong><br>Khi phải dùng vị trí tràn do đầy tải hoặc sự cố mặt bằng, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="entity-code role-code">SCM</span></a> PHẢI mở quyền tràn, ghi vị trí chuẩn gốc, thời gian bắt đầu và điều kiện đưa hàng trở lại. Hàng clean-pack hoặc hàng đã final phát hành không được đẩy vào tràn bừa bãi cùng hàng thường.</div>
+<strong>tràn / khẩn cấp di chuyển.</strong><br>Khi phải dùng vị trí tràn do đầy tải hoặc sự cố mặt bằng, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="entity-code role-code">SCM</span></a> PHẢI mở quyền tràn, ghi vị trí chuẩn gốc, thời gian bắt đầu và điều kiện đưa hàng trở lại. Hàng vệ sinh và đóng gói hoặc hàng đã final phát hành không được đẩy vào tràn bừa bãi cùng hàng thường.</div>
 </div></section><section class="wi-section" id="wi-s5"><h2>5. FIFO/FEFO, tách / chia lot, vật liệu thừa và cấp phát theo Job</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr>
@@ -248,7 +248,7 @@ ul.tight li {margin:4px 0;}
 <li>Dùng pallet, thùng chứa, khay, vách ngăn, xốp / bọt, ống lót (sleeve) hoặc cap phù hợp với hình dạng part và bề mặt cần bảo vệ.</li>
 <li>Part có mặt ngoại quan / bề ngoài hoặc niêm phong / bịt kín mặt / bề mặt PHẢI đặt theo chiều đã quy định; nếu chưa có quy định thì mặt quan trọng không được làm mặt tỳ.</li>
 <li>Thanh tròn, ống, bar tồn kho PHẢI có chặn chống lăn; bó vật liệu dài PHẢI dùng giá đỡ / khung hoặc giá đỡ đúng tải.</li>
-<li>Hàng clean-pack chỉ được vận hành bởi Người có PPE/mặc đồ bảo hộ (gowning) phù hợp và khu vận hành đã dòng / chuyền-clear.</li>
+<li>Hàng vệ sinh và đóng gói chỉ được vận hành bởi Người có PPE/mặc đồ bảo hộ (gowning) phù hợp và khu vận hành đã dòng / chuyền-clear.</li>
 </ul>
 </div>
 <div class="card">
@@ -267,7 +267,7 @@ ul.tight li {margin:4px 0;}
 <div class="step-item">
 <strong>Thiếu nhãn / mất truy vết.</strong><br>Dừng cấp phát ngay. Chuyển lô sang QH, dán lý do hold, khoanh vùng toàn bộ khay/kệ liên quan và truy lại giao dịch Cần nhất. Không được tự viết tay lại lot/mẻ nấu (heat) nếu chưa chứng minh được nguồn gốc.</div>
 <div class="step-item">
-<strong>Ướt, rỉ, mốc, niêm phong vi phạm, bao rách.</strong><br>Tách lô ảnh hưởng, chụp bằng chứng, đánh giá mức lan rộng. Đối với clean-pack hoặc chân không-nhạy cảm, niêm phong vi phạm đồng nghĩa mất tình trạng clean trước đó cho đến khi <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> quyết định tái làm sạch và re-pack.</div>
+<strong>Ướt, rỉ, mốc, niêm phong vi phạm, bao rách.</strong><br>Tách lô ảnh hưởng, chụp bằng chứng, đánh giá mức lan rộng. Đối với vệ sinh và đóng gói hoặc chân không-nhạy cảm, niêm phong vi phạm đồng nghĩa mất tình trạng clean trước đó cho đến khi <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> quyết định tái làm sạch và re-pack.</div>
 <div class="step-item">
 <strong>Vị trí không khớp / hỗn hợp / lẫn lộn lot / hỗn hợp / lẫn lộn phiên bản.</strong><br>Dừng mọi vấn đề từ vị trí đó. Thực hiện quét / dọn dẹp cùng lối đi/kệ liên quan, đối chiếu count thực tế với giao dịch và đóng lại chỉ / duy nhất sau không khớp nguyên nhân gốc đã được ghi nhận.</div>
 <div class="step-item">
@@ -282,7 +282,7 @@ ul.tight li {margin:4px 0;}
 <li>
 <a download="" href="../../../mom/docs/forms/frm-700-maintenance/FRM-708_Environment_Log.xlsx">FRM-708</a> cho nhiệt độ/độ ẩm và sự kiện lệch chuẩn.</li>
 <li>Hồ sơ relocation/overflow/balance return khi phát sinh.</li>
-<li>Bằng chứng tạm giữ/phê duyệt cho lô nghi ngờ hoặc clean-pack bị ảnh hưởng.</li>
+<li>Bằng chứng tạm giữ/phê duyệt cho lô nghi ngờ hoặc vệ sinh và đóng gói bị ảnh hưởng.</li>
 </ul>
 </div>
 <div class="card">
@@ -290,7 +290,7 @@ ul.tight li {margin:4px 0;}
 <ul class="tight" style="padding-left:18px;">
 <li>Không có lot/mẻ nấu (heat)/phiên bản/vị trí rõ ràng.</li>
 <li>Mix lot, mix phiên bản, mix trạng thái trong cùng khay/kệ mà không có phân tách hợp lệ.</li>
-<li>Lô clean-pack mất niêm phong, quá mở time hoặc có dấu hiệu tái nhiễm bẩn.</li>
+<li>Lô vệ sinh và đóng gói mất niêm phong, quá mở time hoặc có dấu hiệu tái nhiễm bẩn.</li>
 <li>Tồn già hoặc vật tư kệ-tuổi thọ / vòng đời được kiểm soát vượt rule nhưng chưa có quyết định xử lý.</li>
 </ul>
 </div>
@@ -348,7 +348,7 @@ ul.tight li {margin:4px 0;}
 </tr>
 <tr>
 <td><a href="wi-714-clean-packaging-handling-and-preservation.html">WI-714</a></td>
-<td>Luật clean-pack, bảo quản và niêm phong/mở/niêm phong lại.</td>
+<td>Luật vệ sinh và đóng gói, bảo quản và niêm phong/mở/niêm phong lại.</td>
 </tr>
 <tr>
 <td><a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703</a></td>
@@ -367,7 +367,7 @@ ul.tight li {margin:4px 0;}
 <section class="wi-section" data-operating-rule="true" id="wi-s9"><h2>9. Quy tắc điều hành — Hạn chế lưu kho / lưu trữ lớp / phân loại và thẩm quyền-to-phát hành</h2>
 <div style="background:#FEF9C3;border-left: 3px solid #F59E0B;padding:0.5em 1em;margin:0.5em 0;font-size:0.85em">
 <strong>Reference:</strong> Chi tiết đầy đủ xem <a href="../../03-Reference/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html">ANNEX-703 — Hạn chế lưu kho / lưu trữ lớp / phân loại S0-S4</a>. WI này tóm tắt các quy tắc chính để vận hành nhanh tại hiện trường.</div>
-<p><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span> không được đối xử mọi vị trí như nhau. Ngay tại thời điểm phiếu nhận / biên nhận / put-cách xa / rời phải gán <b>lưu kho / lưu trữ class</b> cho lô hoặc khu: <b>S0</b> standard được kiểm soát tồn kho, <b>S1</b> kệ-tuổi thọ / vòng đời/FEFO, <b>S2</b> nhiệt ẩm nhạy, <b>S3</b> clean-pack/chân không-nhạy cảm, <b>S4</b> cách ly / biệt trữ/hạn chế truy cập. Mỗi class kéo theo rule riêng về vị trí được phép, Người được chạm, điều kiện di dời và Người có quyền nhả TẠM GIỮ.</p>
+<p><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span> không được đối xử mọi vị trí như nhau. Ngay tại thời điểm phiếu nhận / biên nhận / put-cách xa / rời phải gán <b>lưu kho / lưu trữ class</b> cho lô hoặc khu: <b>S0</b> standard được kiểm soát tồn kho, <b>S1</b> kệ-tuổi thọ / vòng đời/FEFO, <b>S2</b> nhiệt ẩm nhạy, <b>S3</b> vệ sinh và đóng gói/chân không-nhạy cảm, <b>S4</b> cách ly / biệt trữ/hạn chế truy cập. Mỗi class kéo theo rule riêng về vị trí được phép, Người được chạm, điều kiện di dời và Người có quyền nhả TẠM GIỮ.</p>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr>
 <th>Tình huống</th>
@@ -391,7 +391,7 @@ ul.tight li {margin:4px 0;}
 <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> hoặc nguyên vật liệu/<a class="entity-link bundle-link bundle-chip" data-bundle="OPS_SCOPE_OWNERS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-ops-scope-owners" title="Operational Scope Owners (Nhom dau moi so huu pham vi van hanh) — CS / EST / PPL / PD / ENGM / QA[QMR] / QMS / SCM / FIN / HR / EHS / ITA / WKM / SL / QCL / LOG"><span class="entity-code bundle-code">OPS_SCOPE_OWNERS</span></a>.</td>
 </tr>
 <tr>
-<td>vi phạm trên S3 clean-pack / chân không-nhạy cảm</td>
+<td>vi phạm trên S3 vệ sinh và đóng gói / chân không-nhạy cảm</td>
 <td>
 <a download="" href="../../../mom/docs/forms/frm-700-maintenance/FRM-708_Environment_Log.xlsx">FRM-708</a> + <a href="../../../mom/docs/forms/frm-700-maintenance/FRM-709_Clean_Packaging_Checklist.xlsx" download="">FRM-709</a> khi liên quan pack sạch</td>
 <td>Chuyển clean-hold; PHẢI chặn vấn đề, chặn ship và đánh giá re-clean / re-pack / re-xác minh.</td>

@@ -41,7 +41,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <strong class="doc-name">06</strong>
 <span class="sub-vn"></span>
 </div>
-<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">SYS-OPS-06</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">SYS-OPS-06</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
 </div>
 
 <!-- 1) Header VI/EN + Form-Header -->
@@ -76,7 +76,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li><a href="#sec3">3) Vị trí trong chuỗi E2E + bàn giao + điểm chặn</a></li>
 <li><a href="#sec4">4) Điểm đứt gãy (&gt;=10)</a></li>
 <li><a href="#sec5">5) Biện pháp kiểm soát rủi ro (&gt;=6)</a></li>
-<li><a href="#sec6">6) Fail-nhanh quy tắc + STOP/TẠM GIỮ/CHẶN</a></li>
+<li><a href="#sec6">6) Phát hiện lỗi sớm quy tắc + STOP/TẠM GIỮ/CHẶN</a></li>
 <li><a href="#sec7">7) Phản ứng 60 giây</a></li>
 <li><a href="#sec8">8) Bảng kiểm vận hành (&lt;=15 bước)</a></li>
 <li><a href="#sec9">9) OJT theo TWI</a></li>
@@ -282,7 +282,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td><strong>1) KPI trùng tên, khác định nghĩa</strong></td><td>Hai phòng báo OTD khác nhau trong cùng ngày</td><td>Quyết định sai; đánh giá kết luận "không kiểm soát đo lường"</td></tr>
 <tr><td><strong>2) Sai phiên bản</strong></td><td>JobIndex[RevisionNum] khác dữ liệu thực thi/bộ hồ sơ giao hàng (ship gói hồ sơ)</td><td>Ship sai; NCR nặng; truy vết gãy</td></tr>
-<tr><td><strong>3) Lẫn lộn (mix-up) JobNum</strong></td><td>Hồ sơ thiếu JobNum hoặc JobNum không tồn tại</td><td>KPI lệch; diễn tập‑xuống / Từng đứt; mất chứng cứ</td></tr>
+<tr><td><strong>3) Lẫn lộn (nhầm lẫn) JobNum</strong></td><td>Hồ sơ thiếu JobNum hoặc JobNum không tồn tại</td><td>KPI lệch; diễn tập‑xuống / Từng đứt; mất chứng cứ</td></tr>
 <tr><td><strong>4) trùng lặp hồ sơ</strong></td><td>Hai ShipRelease cùng PackID/SSCC; hoặc NCR trùng</td><td>KPI "đếm đôi"; báo động giả</td></tr>
 <tr><td><strong>5) thiếu bằng chứng link</strong></td><td>EvidenceFolderUrl/PacketFolderUrl trống</td><td>Không chứng minh; cổng kiểm soát không hợp lệ</td></tr>
 <tr><td><strong>6) Vượt qua hold</strong></td><td>ShipRelease trạng thái "Đã phê duyệt" khi QCHoldLog còn "Mở"</td><td>Ship rủi ro; vi phạm <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></td></tr>
@@ -359,7 +359,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </div>
 <!-- 6) Fail-fast rules -->
 <div class="card" id="sec6">
-<h2>6) Fail-nhanh quy tắc (≥3) + tiêu chí STOP/TẠM GIỮ/CHẶN</h2>
+<h2>6) Phát hiện lỗi sớm quy tắc (≥3) + tiêu chí STOP/TẠM GIỮ/CHẶN</h2>
 <p class="muted">Fail‑nhanh nghĩa là dừng sớm để tránh ship sai và tránh tạo dữ liệu rác. Quy tắc dưới đây áp dụng ngay lập tức.</p>
 <div class="table-card">
 <table class="table tight">
@@ -582,7 +582,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Khi một phòng ban dùng Excel riêng để báo KPI, hành động bắt buộc là gì?</li>
 <li>Trường dữ liệu nào trong ShipRelease liên quan trực tiếp tới đối soát SSCC?</li>
 <li>Khi KPI thay đổi công thức, MRR nào bắt buộc phải có?</li>
-<li>Khi xuất hiện trùng lặp ShipRelease theo PackID/SSCC, hành động fail-nhanh nào được kích hoạt?</li>
+<li>Khi xuất hiện trùng lặp ShipRelease theo PackID/SSCC, hành động phát hiện lỗi sớm nào được kích hoạt?</li>
 <li>Ai chịu trách nhiệm tạo StandupActions khi KPI báo bất ổn trong ca?</li>
 </ol>
 <h3>10.2 Tình huống (≥3 tình huống thật — có dữ kiện; yêu cầu quyết định TẠM GIỮ/GO và ghi MRR)</h3>
@@ -600,7 +600,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <h4 style="margin-top:0">Tình huống 3 — Làm mới lỗi trong ca</h4>
 <p><strong>Dữ kiện:</strong> Power BI làm mới fail 2 lần liên tiếp. cuối cùng làm mới vượt SLA. <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> chuẩn bị họp họp đứng / họp nhanh 8:00.</p>
-<p><strong>Yêu cầu:</strong> Kích hoạt fail-nhanh nào; chuyển họp sang "sổ tay / thủ công chế độ"; liệt kê MRR (ảnh lỗi, log alert, bảng họp đứng / họp nhanh ký) và trách nhiệm <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="SYSTEM_OWNERS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-system-owners" title="System Owners (Nhom so huu he thong) — ITA / ESA"><span class="entity-code bundle-code">SYSTEM_OWNERS</span></a></span>.</p>
+<p><strong>Yêu cầu:</strong> Kích hoạt phát hiện lỗi sớm nào; chuyển họp sang "sổ tay / thủ công chế độ"; liệt kê MRR (ảnh lỗi, log alert, bảng họp đứng / họp nhanh ký) và trách nhiệm <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="SYSTEM_OWNERS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-system-owners" title="System Owners (Nhom so huu he thong) — ITA / ESA"><span class="entity-code bundle-code">SYSTEM_OWNERS</span></a></span>.</p>
 </div>
 <h3>10.3 Hiệu suất test (bắt buộc — mô-đun có vận hành/cổng kiểm soát/duyệt)</h3>
 <div class="card">

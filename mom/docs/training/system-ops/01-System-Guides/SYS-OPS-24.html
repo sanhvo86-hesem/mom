@@ -21,7 +21,7 @@
 <strong class="doc-name">24</strong>
 <span class="sub-vn"></span>
 </div>
-<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">SYS-OPS-24</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Effective Date:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
+<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">SYS-OPS-24</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tong Giam doc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
 </div>
 <div class="doc-content" id="docContent">
 <div class="note-blue" style="margin:12px 0">
@@ -52,7 +52,7 @@
 <li><a href="#sec3">3) Vị trí trong chuỗi E2E &amp; luồng bàn giao</a></li>
 <li><a href="#sec4">4) Điểm đứt gãy</a></li>
 <li><a href="#sec5">5) Biện pháp kiểm soát rủi ro</a></li>
-<li><a href="#sec6">6) Fail-nhanh quy tắc</a></li>
+<li><a href="#sec6">6) Phát hiện lỗi sớm quy tắc</a></li>
 <li><a href="#sec7">7) Phản ứng 60 giây</a></li>
 <li><a href="#sec8">8) Bảng kiểm vận hành</a></li>
 <li><a href="#sec9">9) OJT TWI + Tiêu chí đánh giá</a></li>
@@ -68,7 +68,7 @@
 <h3>Trách nhiệm theo vai trò (áp dụng riêng + tiêu chí đạt khác nhau)</h3>
 <table class="form-table">
 <tr><th>Vai trò</th><th>Phần áp dụng riêng trong mô-đun</th><th>Tiêu chí đạt tối thiểu</th></tr>
-<tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html" title="CNC Operator (Nhan vien van hanh CNC)"><span class="entity-code role-code">OPR</span></a></span></td><td>Dùng đúng bản Released; tạo bằng chứng tại Point-of-use (ki-ốt/dòng / chuyền); phản ứng 60 giây khi phát hiện sai Rev/lẫn lộn (mix-up)</td><td>Thực hiện đúng 5 bước kiểm tra Rev trước vận hành + ghi MRR 01 tình huống TẠM GIỮ</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html" title="CNC Operator (Nhan vien van hanh CNC)"><span class="entity-code role-code">OPR</span></a></span></td><td>Dùng đúng bản Released; tạo bằng chứng tại Point-of-use (ki-ốt/dòng / chuyền); phản ứng 60 giây khi phát hiện sai Rev/lẫn lộn (nhầm lẫn)</td><td>Thực hiện đúng 5 bước kiểm tra Rev trước vận hành + ghi MRR 01 tình huống TẠM GIỮ</td></tr>
 <tr><td><b>Setup</b></td><td>Đối chiếu Rev giữa bản vẽ–phiếu cài đặt–program; khóa thay đổi sau kết thúc / đóng hồ sơ; nộp bằng chứng setup</td><td>Hoàn tất bảng kiểm step liên quan setup + tạo đủ bằng chứng theo đặt tên rule</td></tr>
 <tr><td><b><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></b></td><td>Quy tắc quản lý chương trình CNC theo Released/Draft; có thể truy xuất program đầu ra; chặn chạy program chưa Released</td><td>Thiết lập 01 tình huống "Released vs Draft" đạt acceptance test TC-01</td></tr>
 <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td>Kiểm tra tính toàn vẹn hồ sơ; truy xuất nguồn gốc hồ sơ ≤3 phút; phát hiện thiếu gói hồ sơ thì CHẶN Ship</td><td>Chạy 01 tình huống "bộ hồ sơ giao hàng (ship gói hồ sơ) thiếu IR" và ra quyết định CHẶN + ghi MRR</td></tr>
@@ -208,7 +208,7 @@
 </table>
 </div>
 <div class="card" id="sec6">
-<h2>6) Fail-nhanh quy tắc (STOP/TẠM GIỮ/CHẶN)</h2>
+<h2>6) Phát hiện lỗi sớm quy tắc (STOP/TẠM GIỮ/CHẶN)</h2>
 <ul>
 <li><b>CHẶN GO-Live</b> khi thiếu Xây dựng Sheet trạng thái <b>Đã xác nhận hiệu lực</b> hoặc thiếu bằng chứng gốc cho bất kỳ Cài đặt ID thuộc lớp chia sẻ/DLP/Lưu giữ/Truy cập.</li>
 <li><b>TẠM GIỮ JOB</b> khi phát hiện sai Rev (bản vẽ/program/phiếu cài đặt) hoặc Người dùng truy cập được Draft trong luồng sản xuất.</li>
@@ -334,7 +334,7 @@
 <tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện lên level</th><th>Quyền hạn được cấp</th></tr>
 <tr>
 <td><b>L1</b></td>
-<td>Đọc được Xây dựng Sheet; tìm được Cài đặt ID; nêu đúng điểm chặn và fail-nhanh quy tắc.</td>
+<td>Đọc được Xây dựng Sheet; tìm được Cài đặt ID; nêu đúng điểm chặn và phát hiện lỗi sớm quy tắc.</td>
 <td>Bài kiểm tra nhanh ≥ 80% và trả lời đúng 3 câu hỏi tình huống ngắn.</td>
 <td>Được tham gia vận hành dưới giám sát; không tự quyết định GO-Live/SHIP.</td>
 </tr>
