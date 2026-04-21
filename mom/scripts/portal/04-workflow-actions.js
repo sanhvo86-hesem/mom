@@ -966,6 +966,24 @@ function repairBrokenDocStyleArtifacts(docOrRoot){
   }
 }
 
+// Fix img src="../../assets/hesem-logo.svg" which resolves to a non-existent
+// /mom/docs/assets/ path when the document is served from its real URL.
+// Replace with the inline base64 already loaded in the portal's .logo-mark img.
+function repairIframeDocImages(docOrRoot){
+  try{
+    const isDoc = !!(docOrRoot && docOrRoot.nodeType === 9);
+    const root = isDoc ? docOrRoot.documentElement : docOrRoot;
+    if(!root || !root.querySelectorAll) return;
+    const logoSrc = (typeof document !== 'undefined' && document.querySelector)
+      ? (document.querySelector('.logo-mark img') || {}).src || ''
+      : '';
+    if(!logoSrc) return;
+    root.querySelectorAll('img[src*="hesem-logo"]').forEach(function(img){
+      if(img.src !== logoSrc) img.src = logoSrc;
+    });
+  }catch(e){}
+}
+
 function ensureIframeDocLanguageBridge(iframe){
   return new Promise(function(resolve){
     try{
@@ -976,6 +994,7 @@ function ensureIframeDocLanguageBridge(iframe){
         return;
       }
       try{ repairBrokenDocStyleArtifacts(idoc); }catch(_e){}
+      try{ repairIframeDocImages(idoc); }catch(_e){}
       if(iwin.HesemApp && typeof iwin.HesemApp.applyDocumentLanguage==='function'){
         resolve(true);
         return;
@@ -2015,6 +2034,7 @@ function loadDocContent(code){
       try{
         const idoc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
         try{ repairBrokenDocStyleArtifacts(idoc); }catch(_e){}
+        try{ repairIframeDocImages(idoc); }catch(_e){}
         if(edited && idoc){
           const dc = idoc.getElementById('docContent');
           if(dc) dc.innerHTML = edited;
