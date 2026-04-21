@@ -9397,8 +9397,10 @@ function renderAdminOrgChart(){
   const childrenByParent = {};
   const positionsByUnit = {};
   const employeesByPosition = {};
+  const employeesByEmployeeId = {};
   const portalUsersByPosition = {};
   const portalUsersByUnit = {};
+  const portalUsersByEmployeeId = {};
   const unitById = {};
 
   orgUnits.forEach(unit=>{
@@ -9413,6 +9415,8 @@ function renderAdminOrgChart(){
     positionsByUnit[unitId].push(position);
   });
   hcmEmployees.forEach(employee=>{
+    const employeeId = String(employee.employee_id || '').trim();
+    if(employeeId) employeesByEmployeeId[employeeId] = employee;
     const positionId = String(employee.hcm_position_id || '');
     if(!employeesByPosition[positionId]) employeesByPosition[positionId] = [];
     employeesByPosition[positionId].push(employee);
@@ -9426,6 +9430,11 @@ function renderAdminOrgChart(){
     });
     const unitId = String(resolved.orgUnitId || user.hcm_org_unit_id || '');
     const positionId = String(resolved.positionId || user.hcm_position_id || '');
+    const employeeId = String(user.employee_id || '').trim();
+    if(employeeId){
+      if(!portalUsersByEmployeeId[employeeId]) portalUsersByEmployeeId[employeeId] = [];
+      portalUsersByEmployeeId[employeeId].push(user);
+    }
     if(unitId){
       if(!portalUsersByUnit[unitId]) portalUsersByUnit[unitId] = [];
       portalUsersByUnit[unitId].push(user);
@@ -9437,6 +9446,88 @@ function renderAdminOrgChart(){
   });
 
   const unitMatchesFilter = {};
+  function employeeDisplayLabel(employee, linkedUsers){
+    const employeeMeta = safeJsonObject(employee && employee.metadata);
+    const userList = Array.isArray(linkedUsers) ? linkedUsers : [];
+    const preferredUser = userList.find(user=>String(user.name || '').trim()) || userList[0] || null;
+    const baseLabel = String(
+      (preferredUser && preferredUser.name)
+      || (employee && employee.employee_lookup_name)
+      || (employee && employee.employee_name)
+      || employeeMeta.employee_name
+      || employeeMeta.full_name
+      || (employee && employee.employee_id)
+      || 'employee'
+    ).trim();
+    const username = String((preferredUser && preferredUser.username) || '').trim();
+    if(baseLabel && username && baseLabel.toLowerCase() !== username.toLowerCase()){
+      return `${baseLabel} @${username}`;
+    }
+    if(baseLabel) return baseLabel;
+    return username ? `@${username}` : 'employee';
+  }
+  function portalUserDisplayLabel(user){
+    const name = String(user.name || '').trim();
+    const username = String(user.username || '').trim();
+    if(name && username && name.toLowerCase() !== username.toLowerCase()){
+      return `${name} @${username}`;
+    }
+    return name || (username ? `@${username}` : 'portal user');
+  }
+  function managerDisplayLabel(employeeId){
+    const normalizedEmployeeId = String(employeeId || '').trim();
+    if(!normalizedEmployeeId) return '—';
+    const linkedUsers = portalUsersByEmployeeId[normalizedEmployeeId] || [];
+    const employee = employeesByEmployeeId[normalizedEmployeeId] || {employee_id: normalizedEmployeeId};
+    const label = employeeDisplayLabel(employee, linkedUsers);
+    if(!label || label === normalizedEmployeeId) return normalizedEmployeeId;
+    return `${label} (${normalizedEmployeeId})`;
+  }
+  function positionPeople(positionId){
+    const assignedEmployees = employeesByPosition[positionId] || [];
+    const portalUsers = portalUsersByPosition[positionId] || [];
+    const linkedPortalUsernames = new Set();
+    const assignedEmployeeIds = new Set(
+      assignedEmployees
+        .map(employee => String(employee.employee_id || '').trim())
+        .filter(Boolean)
+    );
+    const people = [];
+
+    assignedEmployees.forEach((employee, index)=>{
+      const employeeId = String(employee.employee_id || '').trim();
+      const linkedUsers = employeeId
+        ? portalUsers.filter(user => String(user.employee_id || '').trim() === employeeId)
+        : [];
+      linkedUsers.forEach(user=>{
+        const usernameKey = String(user.username || '').trim().toLowerCase();
+        if(usernameKey) linkedPortalUsernames.add(usernameKey);
+      });
+      const fallbackUsers = employeeId ? (portalUsersByEmployeeId[employeeId] || []) : [];
+      people.push({
+        key: `employee:${employeeId || index}`,
+        label: employeeDisplayLabel(employee, linkedUsers.length ? linkedUsers : fallbackUsers),
+        tone: 'is-active',
+        title: [employeeId, ...linkedUsers.map(user=>`@${String(user.username || '').trim()}`).filter(Boolean)].join(' · ')
+      });
+    });
+
+    portalUsers.forEach((user, index)=>{
+      const username = String(user.username || '').trim();
+      const usernameKey = username.toLowerCase();
+      const employeeId = String(user.employee_id || '').trim();
+      if(usernameKey && linkedPortalUsernames.has(usernameKey)) return;
+      if(employeeId && assignedEmployeeIds.has(employeeId)) return;
+      people.push({
+        key: `portal:${usernameKey || employeeId || index}`,
+        label: portalUserDisplayLabel(user),
+        tone: '',
+        title: [username ? `@${username}` : '', employeeId].filter(Boolean).join(' · ')
+      });
+    });
+
+    return people;
+  }
   function matchesUnitSearch(unit){
     const unitId = String(unit.hcm_org_unit_id || '');
     const unitPositions = positionsByUnit[unitId] || [];
@@ -9449,6 +9540,13 @@ function renderAdminOrgChart(){
       ...unitPositions.map(position=>position.position_title),
       ...unitPositions.map(position=>position.position_code),
       ...unitPositions.map(position=>position.reports_to_position_title),
+      ...unitPositions.flatMap(position=>{
+        const positionId = String(position.hcm_position_id || '');
+        return (employeesByPosition[positionId] || []).map(employee=>{
+          const employeeId = String(employee.employee_id || '').trim();
+          return employeeDisplayLabel(employee, employeeId ? (portalUsersByEmployeeId[employeeId] || []) : []);
+        });
+      }),
       ...deptUsers.map(user=>user.name),
       ...deptUsers.map(user=>user.username)
     ]);
@@ -9477,13 +9575,15 @@ function renderAdminOrgChart(){
     const activePosition = String(position.status || 'active') !== 'inactive';
     const assignedEmployees = employeesByPosition[positionId] || [];
     const portalUsers = portalUsersByPosition[positionId] || [];
+    const people = positionPeople(positionId);
     const badges = [
       `<span class="admin-inline-badge ${activePosition ? 'is-active' : 'is-inactive'}">${activePosition ? 'active' : 'inactive'}</span>`,
       `<span class="admin-inline-badge">HC ${escapeHtml(String(position.required_headcount || 1))}</span>`,
       `<span class="admin-inline-badge">HCM ${assignedEmployees.length}</span>`,
-      `<span class="admin-inline-badge">Portal ${portalUsers.length}</span>`
-    ].join('');
-    const personCloud = [...assignedEmployees.map(emp=>`<span class="admin-inline-badge is-active">${escapeHtml(String(emp.employee_lookup_name || emp.employee_id || 'employee'))}</span>`), ...portalUsers.map(user=>`<span class="admin-inline-badge">@${escapeHtml(String(user.username || ''))}</span>`)].join('');
+      `<span class="admin-inline-badge">Portal ${portalUsers.length}</span>`,
+      people.length !== (assignedEmployees.length + portalUsers.length) ? `<span class="admin-inline-badge">People ${people.length}</span>` : ''
+    ].filter(Boolean).join('');
+    const personCloud = people.map(person=>`<span class="admin-inline-badge ${person.tone}"${person.title ? ` title="${escapeHtml(person.title)}"` : ''}>${escapeHtml(person.label)}</span>`).join('');
 
     return `<article class="admin-org-position ${activePosition ? '' : 'is-inactive'}">
       <div class="admin-org-position-head">
@@ -9523,7 +9623,7 @@ function renderAdminOrgChart(){
               </div>
               <div class="admin-org-node-summary">${unitPositions.length} vị trí • ${unitUsers.length} user portal • ${childUnits.length} đơn vị con</div>
             </div>
-            <div class="admin-org-node-manager">Manager employee: <b>${escapeHtml(String(unit.manager_employee_id || '—'))}</b></div>
+            <div class="admin-org-node-manager">Manager employee: <b>${escapeHtml(managerDisplayLabel(unit.manager_employee_id))}</b></div>
           </div>
           <div class="admin-org-node-body">
             ${positionHtml || '<div class="admin-org-placeholder">Đơn vị này chưa có vị trí nào trong HCM runtime.</div>'}
