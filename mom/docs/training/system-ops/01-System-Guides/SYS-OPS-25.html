@@ -58,7 +58,7 @@
 <strong>Mốc chuẩn HESEM bắt buộc bám theo</strong>
 <ul>
 <li><a href="../../../mom/docs/operations//01-SOPs//01-SOP-100//sop-104-data-governance-records-security-and-ip-protection.html">SOP-QMS-011 — Doanh nghiệp Data Phân loại &amp; Lưu kho Hướng dẫn</a></li>
-<li><a href="../../../mom/docs/operations//01-SOPs//01-SOP-100//sop-104-data-governance-records-security-and-ip-protection.html">SOP-QMS-011 — Data Governance &amp; Truy cập Standard</a></li>
+<li><a href="../../../mom/docs/operations//01-SOPs//01-SOP-100//sop-104-data-governance-records-security-and-ip-protection.html">SOP-QMS-011 — Quản trị dữ liệu &amp; Truy cập Standard</a></li>
 </ul>
 <div style="height:8px"></div>
 <strong>Thời lượng triển khai (khả thi 2 ca/ngày)</strong>
@@ -149,7 +149,7 @@
 <tbody>
 <tr><td><b>Công khai</b></td><td>danh mục năng lực, tài liệu giới thiệu</td><td>Chỉ dùng cho danh mục năng lực, tài liệu giới thiệu; PHẢI giữ hồ sơ QMS/WO ở mức phân loại cao hơn</td></tr>
 <tr><td><b>Nội bộ</b></td><td>SOP/WI nội bộ, biểu mẫu không chứa dữ liệu khách</td><td>Chỉ chia sẻ bên ngoài khi đã có phê duyệt</td></tr>
-<tr><td><b>Customer-Bảo mật</b></td><td>Drawing/spec/mô hình, dữ liệu đo, khiếu nại, CoC theo yêu cầu khách</td><td>Chỉ chia sẻ bên ngoài qua gói minh chứng; link có hết hạn; chỉ đọc</td></tr>
+<tr><td><b>Customer-Bảo mật</b></td><td>Bản vẽ/spec/mô hình, dữ liệu đo, khiếu nại, CoC theo yêu cầu khách</td><td>Chỉ chia sẻ bên ngoài qua gói minh chứng; link có hết hạn; chỉ đọc</td></tr>
 <tr><td><b>Hạn chế</b></td><td>CNC chương trình/ghi sổ / đăng, định giá/biên lợi nhuận, đánh giá các log, HR/Finance nhạy cảm</td><td>PHẢI chặn chia sẻ bên ngoài; giới hạn nghiêm ngặt theo nhóm; DLP chặn Exports</td></tr>
 </tbody>
 </table>
@@ -200,7 +200,7 @@
 <div class="vnum">2</div>
 <div class="vbody">
 <div class="vtitle">Kế hoạch → Kỹ thuật</div>
-<div class="vdesc"><b>Đầu vào:</b> drawing/spec/mô hình • <b>Đầu ra:</b> bộ định tuyến / lộ trình/setup pack/phát hành chương trình (program phát hành)</div>
+<div class="vdesc"><b>Đầu vào:</b> bản vẽ/spec/mô hình • <b>Đầu ra:</b> bộ định tuyến / lộ trình/setup pack/phát hành chương trình (program phát hành)</div>
 <div class="small muted">Điểm chặn: program/phiếu cài đặt thuộc <b>Hạn chế</b> và chỉ phát hành từ thư viện Chương trình (Hạn chế).</div>
 </div>
 </div>
@@ -242,7 +242,7 @@
 <table class="table">
 <thead><tr><th style="width:260px">Bàn giao</th><th>Đầu vào tối thiểu</th><th>Đầu ra/MRR bắt buộc</th></tr></thead>
 <tbody>
-<tr><td><b><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span> → Kế hoạch</b></td><td>RFQ/PO/NDA + drawing/spec + Rev</td><td>rà soát hợp đồng Hồ sơ + Customer Đầu vào lưu trong Hồ sơ công việc (đúng thư mục + tên)</td></tr>
+<tr><td><b><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span> → Kế hoạch</b></td><td>RFQ/PO/NDA + bản vẽ/spec + Rev</td><td>rà soát hợp đồng Hồ sơ + Customer Đầu vào lưu trong Hồ sơ công việc (đúng thư mục + tên)</td></tr>
 <tr><td><b>Kỹ thuật → Sản xuất</b></td><td>bộ định tuyến / lộ trình/phiếu cài đặt + program Released</td><td>Link "nguồn sự thật" program từ thư viện Hạn chế + dấu phát hành (note)</td></tr>
 <tr><td><b>Nhận hàng → Sản xuất</b></td><td>CoC/chứng chỉ vật liệu</td><td>Nguyên vật liệu pack: CoC + truy xuất nguồn gốc link đúng WO/Lot</td></tr>
 <tr><td><b>Sản xuất → QC/QA</b></td><td>IPQC các log + setup bằng chứng</td><td>IPQC hồ sơ + ảnh/bảng kiểm, lưu đúng khu vực, khóa khi kết thúc / đóng hồ sơ</td></tr>
@@ -337,7 +337,7 @@
 <tr><td>2</td><td>Gán mức phân loại: Công khai / Nội bộ / Customer-Bảo mật / Hạn chế.</td><td>Người tạo file</td><td>Nhãn phân loại trên file/thư viện</td><td>Để trống phân loại; gán sai "Nội bộ" cho dữ liệu khách</td></tr>
 <tr><td>3</td><td>Lưu file vào đúng nơi theo SOP: QMS-Được kiểm soát-Tài liệu / QMS-Hồ sơ / OPS-Job-Hồ sơ.</td><td>Người tạo file</td><td>Đường dẫn đúng site/thư viện/thư mục</td><td>Lưu OneDrive cá nhân/máy nội bộ / tại chỗ làm bản chính</td></tr>
 <tr><td>4</td><td>Đặt tên file có đủ: Customer, Part No, Phiên bản, WO/Lot, DocType, ngày.</td><td>Người tạo file</td><td>Tên file theo chuẩn</td><td>Dùng "final_v3"; thiếu REV/WO</td></tr>
-<tr><td>5</td><td>Đối với drawing/spec: chỉ lưu "Customer Đầu vào" trong Hồ sơ công việc; mọi bản phát hành nội bộ chỉ link.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td>Link "nguồn sự thật" + hồ sơ nhận file</td><td>Sao chép bản vẽ sang thư mục riêng để tiện</td></tr>
+<tr><td>5</td><td>Đối với bản vẽ/spec: chỉ lưu "Customer Đầu vào" trong Hồ sơ công việc; mọi bản phát hành nội bộ chỉ link.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td>Link "nguồn sự thật" + hồ sơ nhận file</td><td>Sao chép bản vẽ sang thư mục riêng để tiện</td></tr>
 <tr><td>6</td><td>Đối với CNC program/CAM/ghi sổ / đăng: lưu trong Chương trình (Hạn chế) và phát hành bản chạy.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></td><td>Phát hành note + đường dẫn program</td><td>Copy program qua USB giữa máy; chỉnh tại máy</td></tr>
 <tr><td>7</td><td>Đối với kiểm tra hồ sơ: phát hành vào Hồ sơ; khóa không sửa; đính chính bằng file mới có lý do.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>DCR hồ sơ/lưu giữ + log đính chính</td><td>ghi đè file để "đẹp số"</td></tr>
 <tr><td>8</td><td>Đối với nhà cung cấp cert/CoC: lưu QMS-Hồ sơ/Suppliers và gắn link vào Hồ sơ công việc/Nguyên vật liệu.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Purchasing Function (Bo phan Mua hang)"><span class="entity-code dept-code">D-PUR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td><td>Link cert + dấu nhận hàng</td><td>Để cert trong email/scan rời không truy xuất nguồn gốc</td></tr>
@@ -501,10 +501,10 @@
 <h3 class="h3" style="margin-top:0">10.2 Tình huống (3 tình huống thật) — yêu cầu quyết định TẠM GIỮ/GO và ghi MRR</h3>
 <details>
 <summary>Tình huống 1 — Sai Rev (Kỹ thuật → Sản xuất)</summary>
-<p><b>Dữ kiện:</b> Operator đang chuẩn bị chạy WO-31245, Part PN-8821. Trong Hồ sơ công việc có 2 file drawing: <code>WO31245_PN8821_RevA_DRAW_20260112.pdf</code> và <code>WO31245_PN8821_RevB_DRAW_20260201.pdf</code>. Phiếu setup đang tham chiếu RevA. <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span> báo Released program theo RevB.</p>
+<p><b>Dữ kiện:</b> Operator đang chuẩn bị chạy WO-31245, Part PN-8821. Trong Hồ sơ công việc có 2 file bản vẽ: <code>WO31245_PN8821_RevA_DRAW_20260112.pdf</code> và <code>WO31245_PN8821_RevB_DRAW_20260201.pdf</code>. Phiếu setup đang tham chiếu RevA. <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span> báo Released program theo RevB.</p>
 <p><b>Yêu cầu:</b> Ra quyết định <b>STOP/TẠM GIỮ/GO</b>. Ghi tối thiểu 3 MRR phải tạo ngay.</p>
 <ul class="iso-list">
-<li>Quyết định bắt buộc: <b>STOP</b> cho tới khi phiếu cài đặt và drawing thống nhất Rev.</li>
+<li>Quyết định bắt buộc: <b>STOP</b> cho tới khi phiếu cài đặt và bản vẽ thống nhất Rev.</li>
 <li>MRR: ảnh đường dẫn file + log dừng + cập nhật phiếu cài đặt bản mới có lý do + xác nhận phát hành program.</li>
 </ul>
 </details>
@@ -530,7 +530,7 @@
 <div class="card">
 <h3 class="h3" style="margin-top:0">10.3 Bài kiểm tra thực hành (bắt buộc) — bài test + tiêu chí đánh giá + ĐẠT/KHÔNG ĐẠT</h3>
 <div class="callout">
-<b>Mô tả bài test:</b> Người học thực hiện trên 01 WO/Lot mô phỏng: nhận 6 file (drawing/spec, bộ định tuyến / lộ trình, phiếu cài đặt, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a> file, CNC program, FQC báo cáo) và 1 yêu cầu chia sẻ cho "khách hàng" phạm vi 2 file. Người học phải lưu đúng khu vực, gán phân loại, đặt tên đúng, tạo gói minh chứng chia sẻ chỉ đọc có hết hạn, ghi log FRM-QMS-15, và thực hiện kết thúc / đóng hồ sơ khóa.
+<b>Mô tả bài test:</b> Người học thực hiện trên 01 WO/Lot mô phỏng: nhận 6 file (bản vẽ/spec, bộ định tuyến / lộ trình, phiếu cài đặt, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a> file, CNC program, FQC báo cáo) và 1 yêu cầu chia sẻ cho "khách hàng" phạm vi 2 file. Người học phải lưu đúng khu vực, gán phân loại, đặt tên đúng, tạo gói minh chứng chia sẻ chỉ đọc có hết hạn, ghi log FRM-QMS-15, và thực hiện kết thúc / đóng hồ sơ khóa.
  </div>
 <table class="table">
 <thead><tr><th style="width:280px">Hạng mục chấm</th><th>Tiêu chí ĐẠT</th><th style="width:220px">Lỗi KHÔNG ĐẠT ngay</th></tr></thead>
@@ -542,7 +542,7 @@
 </tr>
 <tr>
 <td><b>Phân loại</b></td>
-<td>Gán đúng 4 mức; CNC program là <b>Hạn chế</b>; drawing là <b>Customer-Bảo mật</b>.</td>
+<td>Gán đúng 4 mức; CNC program là <b>Hạn chế</b>; bản vẽ là <b>Customer-Bảo mật</b>.</td>
 <td>Gán "Nội bộ" cho CNC program hoặc chia sẻ file Hạn chế.</td>
 </tr>
 <tr>
@@ -592,7 +592,7 @@
 <table class="table">
 <thead><tr><th style="width:280px">MRR</th><th>Nội dung</th><th style="width:220px">Nơi lưu</th></tr></thead>
 <tbody>
-<tr><td><b>MRR-25-01</b></td><td>Ảnh chụp đường dẫn "nguồn sự thật" cho drawing/spec và program (Hạn chế).</td><td>Hồ sơ công việc/Closeout_Lock</td></tr>
+<tr><td><b>MRR-25-01</b></td><td>Ảnh chụp đường dẫn "nguồn sự thật" cho bản vẽ/spec và program (Hạn chế).</td><td>Hồ sơ công việc/Closeout_Lock</td></tr>
 <tr><td><b>MRR-25-02</b></td><td>Bảng kiểm vận hành mục 8 ký xác nhận (theo vai trò).</td><td>QMS-Hồ sơ/Training</td></tr>
 <tr><td><b>MRR-25-03</b></td><td>FRM-QMS-15 Truy cập DCR hồ sơ (cấp quyền/chia sẻ).</td><td>QMS-Hồ sơ/IT_Evidence</td></tr>
 <tr><td><b>MRR-25-04</b></td><td>Gói minh chứng chia sẻ chỉ đọc có hết hạn + danh sách Người được cấp.</td><td>Z_Audit_Evidence_Pack</td></tr>

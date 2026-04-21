@@ -88,7 +88,7 @@ td,th{vertical-align:top}
 <tr><td>Executive BSC</td><td>OEE_BOTTLENECK, WIP_AGING, SETUP_FIRST_PASS, FAI_FIRST_PASS, COPQ, REPEAT_NCR_RATE, CAPA_EFFECTIVENESS</td><td>Scorecard controlled</td><td>Có owner, target, monthly review và evidence.</td></tr>
 <tr><td>TOC weekly</td><td>BOTTLENECK_BUFFER_STATUS, THROUGHPUT_PER_CONSTRAINT_HOUR, CONSTRAINT_LOST_HOURS, WIP_BEFORE_CONSTRAINT</td><td>Staged data contract</td><td>Có constraint register, machine/job context và buffer rule.</td></tr>
 <tr><td>Lean daily</td><td>IN_PROCESS_REJECT_RATE, CYCLE_TIME_VARIANCE, MTBF, MTTR, thời gian dừng máy reason pareto</td><td>Staged data contract</td><td>Có hiện trường source, reason code và action log.</td></tr>
-<tr><td>QMS/MES event</td><td>FAI_FIRST_PASS, SETUP_FIRST_PASS, CAPA_EFFECTIVENESS, gate evidence completeness</td><td>Evidence controlled</td><td>Có form/gate record và quyền QA/QMS rõ.</td></tr>
+<tr><td>QMS/MES event</td><td>FAI_FIRST_PASS, SETUP_FIRST_PASS, CAPA_EFFECTIVENESS, gate tính đầy đủ bằng chứng</td><td>Evidence controlled</td><td>Có form/gate record và quyền QA/QMS rõ.</td></tr>
 </tbody>
 </table></div>
 </div>
@@ -100,7 +100,7 @@ td,th{vertical-align:top}
 <tbody>
 <tr><td>1. Định nghĩa</td><td>Mã chuẩn, tên KPI, mục đích quyết định, higher/lower is better.</td><td>QMS + owner</td></tr>
 <tr><td>2. Công thức</td><td>Tử số, mẫu số, filter, kỳ tính, xử lý ngoại lệ, đơn vị.</td><td>QMS + Analytics</td></tr>
-<tr><td>3. Nguồn dữ liệu</td><td>Bảng/cột, hệ nguồn, owner dữ liệu, refresh cadence, trace link.</td><td>Data owner</td></tr>
+<tr><td>3. Nguồn dữ liệu</td><td>Bảng/cột, hệ nguồn, owner dữ liệu, refresh cadence, trace link.</td><td>Chủ sở hữu dữ liệu</td></tr>
 <tr><td>4. Evidence</td><td>Form, log, record hoặc snapshot chứng minh số liệu.</td><td>QMS/QA khi liên quan chất lượng</td></tr>
 <tr><td>5. Runtime</td><td>Test, migration/seed nếu cần, dashboard contract, rollback behavior.</td><td>Engineering owner</td></tr>
 </tbody>
@@ -135,7 +135,7 @@ td,th{vertical-align:top}
 <tr><td>File có KPI/metric có ngữ cảnh KPI</td><td>297 file</td><td>Không tự xem toàn bộ là KPI chính thức; phải qua registry.</td></tr>
 <tr><td>Thiếu từ khóa đánh giá/review</td><td>19 file</td><td>Hoặc bổ sung evaluation use, hoặc đổi tên thành metric/control indicator.</td></tr>
 <tr><td>Thiếu ghi nhận/khen thưởng</td><td>101 file</td><td>Định nghĩa recognition rule ở policy trung tâm; không nhất thiết mỗi WI lặp lại.</td></tr>
-<tr><td>Thiếu kỷ luật/corrective-action</td><td>13 file</td><td>Bổ sung quy tắc coaching, CAPA, escalation, discipline guardrail.</td></tr>
+<tr><td>Thiếu kỷ luật/corrective-action</td><td>13 file</td><td>Bổ sung quy tắc coaching, CAPA, escalation, discipline rào chắn.</td></tr>
 <tr><td>Thiếu toàn bộ people-governance signal</td><td>0 file</td><td>Đã xử lý nhóm rủi ro cao: SOP-203, WI-511, WI-514, WI-515, training competency template và competency metrics.</td></tr>
 <tr><td>Row KPI/target thiếu people-governance tại dòng</td><td>75 row</td><td>Dùng policy trung tâm để map hoặc đổi nhãn row thành role/control metric.</td></tr>
 </tbody>
@@ -145,7 +145,7 @@ td,th{vertical-align:top}
 <div class="table-card"><table class="table">
 <thead><tr><th>Đợt</th><th>Phạm vi</th><th>Quy tắc sửa</th><th>Evidence đóng</th></tr></thead>
 <tbody>
-<tr><td>Wave 1 - đã cập nhật</td><td>SOP-203, WI-511, WI-514, WI-515, training competency template và competency metrics.</td><td>Đổi nhãn KPI local thành gate/control metric hoặc role performance measure; bổ sung review, recognition, hành động khắc phục và discipline guardrail.</td><td>Audit còn 0 file thiếu toàn bộ people-governance signal.</td></tr>
+<tr><td>Wave 1 - đã cập nhật</td><td>SOP-203, WI-511, WI-514, WI-515, training competency template và competency metrics.</td><td>Đổi nhãn KPI local thành gate/control metric hoặc role performance measure; bổ sung review, recognition, hành động khắc phục và discipline rào chắn.</td><td>Audit còn 0 file thiếu toàn bộ people-governance signal.</td></tr>
 <tr><td>Wave 2 - row-level cleanup</td><td>75 dòng bảng KPI/target còn thiếu governance tại dòng, chủ yếu competency levels/modules và vài ANNEX/WI.</td><td>Trong training dùng "Role Performance Measure"; trong SOP/WI dùng "Gate Control Metric" hoặc "Operating Metric"; chỉ giữ chữ KPI khi dòng map được canonical registry, target, owner, rating và consequence.</td><td>Row findings trong report giảm theo từng batch; không cần thêm thưởng/phạt vào mọi dòng nếu tài liệu trỏ về policy trung tâm.</td></tr>
 <tr><td>Wave 3 - template/generator</td><td>Training modules C01-C19, competency level pages, department handbook và WI có cùng cấu trúc.</td><td>Sửa template sinh HTML để tự chèn block governance chuẩn; tránh vá thủ công 100+ file lặp lại.</td><td>File mới sinh lại không tạo thêm KPI giả; audit không tăng missing_all.</td></tr>
 <tr><td>Wave 4 - registry/API gate</td><td>KPI catalog, dashboard và generic CRUD.</td><td>Không cho tạo KPI ngoài registry; metric chưa có evaluation/consequence chỉ được trả là staged/health indicator, không dùng payout.</td><td><span class="code">GET /api/kpi/catalog</span> trả đủ classification, scorecard, data contract và consequence.</td></tr>
@@ -167,7 +167,7 @@ td,th{vertical-align:top}
 <h3>7.3 Cơ chế đánh giá, ghi nhận và kỷ luật</h3>
 <ul class="tight">
 <li>KPI cấp công ty và phòng ban phải được review theo BSC/Hoshin cadence; không dùng một KPI đơn lẻ để thưởng hoặc kỷ luật cá nhân.</li>
-<li>Ghi nhận/khen thưởng chỉ áp dụng khi có evidence, kết quả cân bằng và không vi phạm safety, quality, delivery, data integrity hoặc gate QMS/MES.</li>
+<li>Ghi nhận/khen thưởng chỉ áp dụng khi có evidence, kết quả cân bằng và không vi phạm safety, quality, delivery, toàn vẹn dữ liệu hoặc gate QMS/MES.</li>
 <li>Hiệu suất thấp trước tiên kích hoạt coaching, nguyên nhân gốc, CAPA, training, resource escalation hoặc process redesign.</li>
 <li>Kỷ luật chỉ áp dụng cho hành vi kiểm soát được và có bằng chứng: giả dữ liệu, bỏ qua cổng bắt buộc, hành vi mất an toàn, tái phạm sau coaching hoặc cố ý không theo procedure đã ban hành.</li>
 <li>Không kỷ luật người vận hành vì kết quả ngoài phạm vi kiểm soát như thiếu vật tư, thay đổi khách hàng, lỗi máy, lỗi engineering, thiếu fixture/gage/CMM hoặc quyết định nguồn lực từ quản lý.</li>
@@ -196,7 +196,7 @@ td,th{vertical-align:top}
 <tr><td>Company score</td><td>Tổng điểm = tổng <span class="code">weight x achievement</span>. ≥90 xanh, 75-89.99 vàng, &lt;75 đỏ. Bất kỳ KPI đỏ hiện tại sẽ cap company score ở yellow.</td><td>CEO nhìn một điểm tổng nhưng vẫn drill down theo từng KPI và blocker.</td></tr>
 <tr><td>Scoring status</td><td><span class="code">active_runtime</span> và <span class="code">manual_governed</span> có thể là input calibration. <span class="code">candidate_data_contract</span> chưa dùng payout. <span class="code">gate_only</span> chỉ chặn reward.</td><td>Tránh thưởng bằng số chưa có authority/evidence.</td></tr>
 <tr><td>Reward eligibility</td><td>Chỉ xem xét monetary recognition khi tổng điểm ≥90, không có KPI đỏ hiện tại, mọi yellow có action plan đã đóng và không có blocker mở.</td><td>KPI là input cho calibration, không tự động trả tiền.</td></tr>
-<tr><td>Blocking conditions</td><td>Recordable incident, data falsification, gate bypass, customer escape chưa containment, audit major quá hạn hoặc counter-metric đỏ.</td><td>Safety, quality, data integrity và QMS gate luôn thắng điểm số.</td></tr>
+<tr><td>Blocking conditions</td><td>Recordable incident, data falsification, gate bypass, customer escape chưa bao vây, audit major quá hạn hoặc counter-metric đỏ.</td><td>Safety, quality, toàn vẹn dữ liệu và QMS gate luôn thắng điểm số.</td></tr>
 <tr><td>Discipline</td><td>Kỷ luật chỉ xét hành vi có bằng chứng trong phạm vi kiểm soát cá nhân.</td><td>Không phạt người vận hành vì outcome hệ thống ngoài tầm kiểm soát.</td></tr>
 </tbody>
 </table></div>
@@ -218,9 +218,9 @@ td,th{vertical-align:top}
 <ul class="tight small">
 <li>ISA-95 tách Level 3 MOM/MES khỏi Level 4 ERP; KPI dashboard phải là read model, không thay execution truth: <a href="https://www.isa.org/standards-and-publications/isa-standards/isa-95-standard">ISA-95 Standard</a>.</li>
 <li>NIST Baldrige xem performance measurement là hệ tích hợp để planning, review và cải tiến, không chỉ là báo cáo số: <a href="https://www.nist.gov/baldrige/baldrige-criteria-commentary">Baldrige Criteria Commentary</a>.</li>
-<li>NIST Baldrige gắn workforce performance management với compensation, recognition, development, safety và engagement; vì vậy KPI phải có guardrail trước khi dùng cho người: <a href="https://www.nist.gov/system/files/documents/2023/01/19/2023-2024-Baldrige-Criteria-Business-Nonprofit-Commentary.pdf">Baldrige Criteria Commentary PDF</a>.</li>
+<li>NIST Baldrige gắn workforce performance management với compensation, recognition, development, safety và engagement; vì vậy KPI phải có rào chắn trước khi dùng cho người: <a href="https://www.nist.gov/system/files/documents/2023/01/19/2023-2024-Baldrige-Criteria-Business-Nonprofit-Commentary.pdf">Baldrige Criteria Commentary PDF</a>.</li>
 <li>MTConnect cung cấp semantic model cho dữ liệu máy; dùng để cấp tín hiệu machine/OEE nhưng phải contextualize theo job/operation/gate: <a href="https://www.mtconnect.org/standard-download20181">MTConnect Standard</a>.</li>
-<li>SAP production quality KPI tách Availability, Performance, Quality và OEE; SAP planning KPI nhìn resource idle, load, setup, capacity và utilization: <a href="https://help.sap.com/docs/SAP_PROFITABILITY_PERFORMANCE_MANAGEMENT/7fa13890d47b4c69bbb62175e84e4aa8/894ac627ba26422eb92a9cd17db846e8.html">SAP Production Quality KPIs</a> / <a href="https://help.sap.com/docs/SAP_S4HANA_ON-PREMISE/f899ce30af9044299d573ea30b533f1c/55a4997f55b0455aa8239f6b50175097.html">SAP Monitor Production Plan Performance</a>.</li>
+<li>SAP production quality KPI tách Availability, Performance, Quality và OEE; SAP planning KPI nhìn resource idle, load, setup, capacity và utilization: <a href="https://help.sap.com/docs/SAP_PROFITABILITY_PERFORMANCE_MANAGEMENT/7fa13890d47b4c69bbb62175e84e4aa8/894ac627ba26422eb92a9cd17db846e8.html">SAP Production Quality KPIs</a> / <a href="https://help.sap.com/docs/SAP_S4HANA_ON-PREMISE/f899ce30af9044299d573ea30b533f1c/55a4997f55b0455aa8239f6b50175097.html">SAP Monitor Kế hoạch sản xuất Performance</a>.</li>
 <li>SAP SuccessFactors tách goal/performance rating, calibration, continuous feedback và variable pay thành các workflow có quyền và bước duyệt riêng: <a href="https://help.sap.com/docs/successfactors-performance-and-goals/implementing-and-managing-performance-management/rating-options">Performance Rating Options</a> / <a href="https://help.sap.com/docs/successfactors-performance-and-goals/implementing-and-managing-calibration/overview-of-calibration">Calibration</a> / <a href="https://help.sap.com/docs/successfactors-compensation/implementing-and-managing-variable-pay/configuring-rating-source-for-non-assignment-based-rating-programs">Variable Pay Rating Source</a>.</li>
 <li>Microsoft Viva Goals nhấn mạnh OKR check-in, owner, cadence và data integration; OKR phù hợp cho dự án cải tiến 60-90 ngày, không thay hệ KPI/QMS chính: <a href="https://learn.microsoft.com/en-us/viva/goals/viva-goals-healthy-okr-program/check-in-okrs-overview">Check in and update OKRs</a>.</li>
 <li>Siemens Opcenter OEE nhấn mạnh time model, reason tree, machine state, thời gian dừng máy và hành động khắc phục; đây là hướng cần cho CNC bottleneck/OEE layer: <a href="https://www.siemens.com/en-us/products/opcenter/execution/foundation-oee/">Siemens Opcenter Execution Foundation OEE</a>.</li>

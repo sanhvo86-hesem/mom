@@ -52,9 +52,9 @@
 <thead><tr><th>Kiến thức (K)</th><th>Kỹ năng (S)</th><th>Evidence (E)</th><th>Chỉ số (M)</th></tr></thead>
 <tbody>
 <tr>
-<td><ul><li>Hiểu FAI/balloon/kế hoạch kiểm tra (plan).</li><li>Hiểu căn chỉnh / liên kết mốc chuẩn (datum) trên CMM và version control.</li><li>Hiểu GR&amp;R cơ bản và cách đọc %GRR.</li></ul></td>
+<td><ul><li>Hiểu FAI/balloon/kế hoạch kiểm tra (plan).</li><li>Hiểu căn chỉnh / liên kết mốc chuẩn (datum) trên CMM và kiểm soát phiên bản.</li><li>Hiểu GR&amp;R cơ bản và cách đọc %GRR.</li></ul></td>
 <td><ul><li>Lập đặc tính list &amp; kế hoạch kiểm tra (plan) đơn giản.</li><li>Chạy đo theo plan/CMM program đúng rev.</li><li>Thực hiện GR&amp;R theo mẫu; đưa ra hành động.</li></ul></td>
-<td><ul><li>Balloon drawing + đặc tính list.</li><li>Báo cáo MSA/GR&amp;R (có kết luận).</li><li>Log phiên bản program/plan.</li></ul></td>
+<td><ul><li>Balloon bản vẽ + đặc tính list.</li><li>Báo cáo MSA/GR&amp;R (có kết luận).</li><li>Log phiên bản program/plan.</li></ul></td>
 <td><ul><li>FAI pass ≥85% (lỗi do đo/hồ sơ giảm).</li><li>Program control ≥95%.</li><li>MSA phạm vi bao phủ CTQ theo phạm vi ≥70%.</li></ul></td>
 </tr>
 </tbody>
@@ -126,12 +126,12 @@
 <tr><td>GD&amp;T/CTQ phức tạp</td><td>true vị trí / chức vụ, hồ sơ / biên dạng, độ đảo (runout)…</td><td>CMM + chiến lược căn chỉnh / liên kết theo mốc chuẩn (datum)</td><td>Sai mốc chuẩn (datum) = sai toàn bộ kết quả.</td></tr>
 </tbody>
 </table><h3>3.4 ALCOA+ và tính toàn vẹn dữ liệu đo (data tính toàn vẹn)</h3><p>Với ISO, dữ liệu đo chỉ có giá trị khi <strong>đúng – đủ – truy vết</strong>. Quy tắc ALCOA+ (Có thể quy cho, Rõ ràng / Dễ đọc, Đồng thời / Cùng thời điểm, Gốc / Ban đầu, Chính xác + Đầy đủ, nhất quán, Bền vững, Khả dụng) là "chuẩn đạo đức dữ liệu". Các lỗi hay gặp: ghi hồi tố cuối ca, thiếu ký tên, chỉnh số "cho đẹp", dùng file Excel không kiểm soát phiên bản.</p><h3>3.5 FAI/FAIR &amp; đánh số balloon: biến bản vẽ thành danh mục đặc tính đo</h3><p><strong>FAI</strong> (Kiểm tra sản phẩm đầu tiên Kiểm tra) là "bài kiểm tra năng lực" của cả chuỗi: bản vẽ → quy trình → gá → chương trình → đo → hồ sơ. Level 2 phải làm được:</p><ul>
-<li>Balloon drawing đúng phiên bản, đánh số đặc tính có hệ thống (CTQ ưu tiên).</li>
+<li>Balloon bản vẽ đúng phiên bản, đánh số đặc tính có hệ thống (CTQ ưu tiên).</li>
 <li>Lập <strong>đặc tính list</strong>: đặc tính, tiêu chí, phương pháp đo, tần suất, phản ứng plan.</li>
 <li>Phân tách: CTQ / key / ngoại quan / bề ngoài; đồng thời "đánh dấu / cờ" các note hay bị bỏ sót (mài bavia, cạnh / mép ngắt / nghỉ, clean, đánh dấu, đóng gói).</li>
 </ul><h3>3.6 CMM căn bản nhưng phải "đúng gốc": mốc chuẩn (datum), căn chỉnh / liên kết, đo bằng đầu dò chiến lược</h3><p>Ba nguồn sai số hay gặp nhất khi chạy CMM: (1) mốc chuẩn (datum)/căn chỉnh / liên kết sai, (2) đầu dò (probe)/đầu đo (stylus) không phù hợp, (3) chiến lược đo không đại diện (số điểm ít, hướng đo sai). Level 2 cần hiểu:</p><ul>
 <li>căn chỉnh / liên kết theo mốc chuẩn (datum) tham chiếu khung (3-2-1), tránh "tốt nhất-fit" không kiểm soát cho CTQ lắp ráp.</li>
-<li>Version control: program CMM phải có ID/rev, DCR hồ sơ; không chạy file "mới sửa nhanh" mà không lưu dấu (ISO 7.5 / 8.5.6).</li>
+<li>Kiểm soát phiên bản: program CMM phải có ID/rev, DCR hồ sơ; không chạy file "mới sửa nhanh" mà không lưu dấu (ISO 7.5 / 8.5.6).</li>
 <li>đào tạo / dạy-back: giải thích lại cho trưởng nhóm "vì sao chọn căn chỉnh / liên kết này" bằng ngôn ngữ chức năng lắp ráp.</li>
 </ul><h3>3.7 MSA thực dụng: thiết kế GR&amp;R để trả lời câu hỏi đúng</h3><p>MSA không phải làm để có báo cáo, mà để trả lời: <strong>Hệ đo này có đủ tốt để ra quyết định OK/NG cho CTQ không?</strong> Thiết kế tối thiểu (áp dụng): 10 part x 3 Operator x 2 thử Nhiệm. Sau đó đọc %GRR và hành động.</p><h2>4. Quy trình vận hành chuẩn (luồng dọc, dễ đọc)</h2><p class="small">Lưu đồ được thiết kế theo hướng dọc để đọc rõ khi in A4. chỉnh trực tiếp bằng HTML/CSS.</p><div class="vflow">
 <div class="vstep">
@@ -221,7 +221,7 @@
 <td>Khi FAI fail do lỗi đo/hồ sơ lặp ≥2 lần/tháng → dừng xét level</td>
 </tr>
 <tr>
-<td><strong>CMM program version control</strong></td>
+<td><strong>CMM program kiểm soát phiên bản</strong></td>
 <td class="mono">#program có ID+rev+log / tổng program sử dụng</td>
 <td>CMM/DNC kho lưu trữ đánh giá</td>
 <td>Tháng</td>
@@ -261,8 +261,8 @@
 <p class="small">Khách yêu cầu FAI cho chi tiết có 6 lỗ, true vị trí / chức vụ 0.05, mốc chuẩn (datum) A/B/C; bề mặt Ra 1.6; cạnh / mép ngắt / nghỉ 0.2–0.5. Bạn phải đảm bảo đo đúng và ra quyết định phát hành đúng.</p>
 <div class="grid">
 <div class="dl"><h4>Dữ liệu/đầu vào</h4><ul><li>Bản vẽ 2D/3D + note bề mặt/cạnh / mép.</li><li>PO yêu cầu FAI (FAIR) + IR kèm theo.</li><li>Thiết bị: panme, pin gage, CMM (khi có).</li></ul></div>
-<div class="dl"><h4>Nhiệm vụ</h4><ul><li>Tạo balloon drawing (đánh số đặc tính) cho bản vẽ phiên bản hiện hành.</li><li>Lập đặc tính list: tiêu chí, phương pháp đo, tần suất, phản ứng plan.</li><li>Đưa ra chiến lược CMM: căn chỉnh / liên kết theo mốc chuẩn (datum) A|B|C, chọn đầu dò (probe)/đầu đo (stylus), số điểm đo tối thiểu cho từng đặc tính.</li></ul></div>
-<div class="dl"><h4>Đầu ra/Evidence</h4><ul><li>Balloon drawing + đặc tính list (file PDF).</li><li>kế hoạch kiểm tra (plan) v1 (kèm tần suất &amp; phản ứng).</li><li>CMM program plan (phác thảo) + version control rule.</li></ul></div>
+<div class="dl"><h4>Nhiệm vụ</h4><ul><li>Tạo balloon bản vẽ (đánh số đặc tính) cho bản vẽ phiên bản hiện hành.</li><li>Lập đặc tính list: tiêu chí, phương pháp đo, tần suất, phản ứng plan.</li><li>Đưa ra chiến lược CMM: căn chỉnh / liên kết theo mốc chuẩn (datum) A|B|C, chọn đầu dò (probe)/đầu đo (stylus), số điểm đo tối thiểu cho từng đặc tính.</li></ul></div>
+<div class="dl"><h4>Đầu ra/Evidence</h4><ul><li>Balloon bản vẽ + đặc tính list (file PDF).</li><li>kế hoạch kiểm tra (plan) v1 (kèm tần suất &amp; phản ứng).</li><li>CMM program plan (phác thảo) + kiểm soát phiên bản rule.</li></ul></div>
 <div class="dl"><h4>Tiêu chí chấm</h4><ul><li>Balloon/đặc tính list đầy đủ, không bỏ sót note bản vẽ.</li><li>kế hoạch kiểm tra (plan) có logic đo/đủ điều kiện phát hành.</li><li>Giải thích rõ mốc chuẩn (datum)/căn chỉnh / liên kết và vì sao chọn chiến lược.</li></ul></div>
 </div>
 </div><div class="card">
@@ -293,7 +293,7 @@
 <tbody><tr><td>1</td><td>Kiểm tra tem hiệu chuẩn/ID thiết bị đo trước khi sử dụng (đúng dải đo, không hư hỏng).</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>2</td><td>Chuẩn bị điều kiện đo: làm sạch chi tiết, loại bỏ bavia, ổn định nhiệt độ khi cần.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>3</td><td>Thực hiện đo theo WI (đúng điểm đo, đúng lực đo, đúng số lần lặp).</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>4</td><td>Ghi hồ sơ ngay tại thời điểm đo (ALCOA+), đầy đủ job/rev/lot/thiết bị/ký tên.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>5</td><td>Gắn trạng thái OK/TẠM GIỮ/NG đúng quy định và cô lập sản phẩm TẠM GIỮ/NG.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>6</td><td>Giải thích được vì sao chọn phương pháp đo này (dung sai/CTQ).</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>7</td><td>Thực hiện truy xuất nguồn gốc 1 bộ hồ sơ FAI/đo cho 1 job trong thời gian mục tiêu.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>8</td><td>Xử lý tình huống sai lệch: tem hết hạn/đo dao động/thiết bị rơi → TẠM GIỮ + báo cáo vượt cấp.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr><tr><td>9</td><td>Tạo đặc tính list/kế hoạch kiểm tra (plan) đơn giản và thực hiện đo theo plan.</td><td class="small">☐ Đạt ☐ Chưa đạt</td><td class="small">Ghi chú/Minh chứng</td></tr></tbody>
 </table><h2>8. Kiểm tra đánh giá (bản thiết kế kiểm thử (test bản thiết kế) + bài kiểm tra nhanh mẫu)</h2><h3>8.1 Test bản thiết kế</h3><table class="table">
 <thead><tr><th>Nhóm nội dung</th><th>Số câu</th><th>Tỷ trọng</th></tr></thead>
-<tbody><tr><td>FAI/balloon/kiểm tra plan</td><td>6</td><td>25%</td></tr><tr><td>CMM căn bản + version control</td><td>6</td><td>25%</td></tr><tr><td>MSA/GRR cơ bản</td><td>6</td><td>25%</td></tr><tr><td>Tình huống phân tích</td><td>6</td><td>25%</td></tr></tbody>
+<tbody><tr><td>FAI/balloon/kiểm tra plan</td><td>6</td><td>25%</td></tr><tr><td>CMM căn bản + kiểm soát phiên bản</td><td>6</td><td>25%</td></tr><tr><td>MSA/GRR cơ bản</td><td>6</td><td>25%</td></tr><tr><td>Tình huống phân tích</td><td>6</td><td>25%</td></tr></tbody>
 </table><h3>8.2 Bài kiểm tra nhanh mẫu</h3><div class="quiz">
 <div class="card">
 <strong>Câu 1 (MCQ):</strong> FAI quan trọng nhất để chứng minh điều gì?
@@ -301,7 +301,7 @@
 <p class="small">FAI là 'quy trình xác nhận' thực tế.</p>
 </div>
 <div class="card">
-<strong>Câu 2 (MCQ):</strong> Balloon drawing dùng để làm gì?
+<strong>Câu 2 (MCQ):</strong> Balloon bản vẽ dùng để làm gì?
 <ol type="A"><li><strong>A.</strong> Trang trí bản vẽ</li><li><strong>B.</strong> Đánh số đặc tính để truy vết vào kiểm tra báo cáo/FAI</li><li><strong>C.</strong> Chỉ dùng cho bộ phận thiết kế</li><li><strong>D.</strong> Không cần trong lệnh sản xuất</li></ol>
 <p class="small">Liên kết đặc tính list.</p>
 </div>
@@ -311,7 +311,7 @@
 <p class="small">Sai mốc chuẩn (datum) = sai kết quả.</p>
 </div>
 <div class="card">
-<strong>Câu 4 (MCQ):</strong> Yêu cầu version control cho chương trình CMM thuộc ISO nào?
+<strong>Câu 4 (MCQ):</strong> Yêu cầu kiểm soát phiên bản cho chương trình CMM thuộc ISO nào?
 <ol type="A"><li><strong>A.</strong> 7.5 được lập thành tài liệu thông tin</li><li><strong>B.</strong> 8.4 nhà cung cấp</li><li><strong>C.</strong> 9.3 xem xét của lãnh đạo</li><li><strong>D.</strong> 10.1 cải tiến</li></ol>
 <p class="small">Tài liệu &amp; thay đổi.</p>
 </div>

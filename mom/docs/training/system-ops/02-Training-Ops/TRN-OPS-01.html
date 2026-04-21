@@ -76,7 +76,7 @@ sai Rev, lẫn lô, thiếu chứng từ, đo kiểm không kiểm soát, vượ
 <span class="role-chip"><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></span>
 </div>
 <ul class="tight" style="margin-top:10px">
-<li><b>Đầu vào bắt buộc:</b> yêu cầu năng lực theo vị trí (ma trận đào tạo (matrix), thay đổi tài liệu (SOP/WI/FRM), thay đổi Rev/drawing/spec, NCR do lỗi năng lực, yêu cầu khách hàng/hợp đồng.</li>
+<li><b>Đầu vào bắt buộc:</b> yêu cầu năng lực theo vị trí (ma trận đào tạo (matrix), thay đổi tài liệu (SOP/WI/FRM), thay đổi Rev/bản vẽ/spec, NCR do lỗi năng lực, yêu cầu khách hàng/hợp đồng.</li>
 <li><b>Đầu ra bắt buộc:</b> kế hoạch đào tạo (FRM-HR-TRN-001), danh sách tham dự (FRM-HR-TRN-002), bảng kiểm OJT (FRM-HR-TRN-003), đánh giá năng lực (FRM-HR-TRN-004), chứng nhận level (FRM-HR-TRN-005), cập nhật ma trận đào tạo (matrix).</li>
 <li><b>Thời lượng khung:</b> Lý thuyết 90 phút • Phân xưởng 60 phút • OJT 2 ca (chia 2 lần) • Đánh giá 60 phút.</li>
 </ul>
@@ -250,7 +250,7 @@ Bảng dưới xác định "khi nào đào tạo trở thành cổng".
 <strong>Đầu vào</strong>
 <ul class="tight">
 <li>Training cần (vai trò + kỹ năng + level mục tiêu) từ <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span>/QA.</li>
-<li>Danh mục tài liệu tham chiếu: SOP/WI/FRM/Drawing/Spec + Rev hiện hành.</li>
+<li>Danh mục tài liệu tham chiếu: SOP/WI/FRM/Bản vẽ/Spec + Rev hiện hành.</li>
 <li>Ràng buộc ca/kíp: ca A/ca B, giới hạn 2 ngày/tuần/vai trò.</li>
 </ul>
 </div>
@@ -422,7 +422,7 @@ Bảng dưới xác định "khi nào đào tạo trở thành cổng".
 <tbody>
 <tr><td>1</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td><td>Nhận diện nhu cầu đào tạo theo job/Rev/NCR và chốt phạm vi vai trò.</td><td>Phiếu yêu cầu đào tạo nội bộ (email/biên bản) + danh sách vai trò</td><td>Gom chung quá rộng, không khóa phạm vi</td></tr>
 <tr><td>2</td><td>HR/Training</td><td>Mở Training ID và chuẩn hóa tên lớp theo Mã mô-đun.</td><td>Training ID + tiêu đề lớp + lịch dự kiến</td><td>Đặt tên không theo chuẩn, khó truy xuất nguồn gốc</td></tr>
-<tr><td>3</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>Khóa tài liệu tham chiếu và Rev hiện hành.</td><td>Danh mục SOP/WI/FRM/Drawing/Spec + Rev</td><td>Thiếu Rev hoặc dùng bản in cũ</td></tr>
+<tr><td>3</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>Khóa tài liệu tham chiếu và Rev hiện hành.</td><td>Danh mục SOP/WI/FRM/Bản vẽ/Spec + Rev</td><td>Thiếu Rev hoặc dùng bản in cũ</td></tr>
 <tr><td>4</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td><td>Lập kế hoạch theo 2 ca, giữ giới hạn 2 ngày/tuần/vai trò, chốt Người thay dòng / chuyền.</td><td>FRM-HR-TRN-001 (kế hoạch) + danh sách trực thay dòng / chuyền</td><td>Không có Người thay dòng / chuyền, gây đứt sản xuất</td></tr>
 <tr><td>5</td><td>HR/Training</td><td>Chuẩn bị danh sách tham dự theo từng ca.</td><td>FRM-HR-TRN-002 (mỗi ca 01 bản)</td><td>Dùng 01 bản cho 2 ca, lẫn Người</td></tr>
 <tr><td>6</td><td>Người đào tạo/Người hướng dẫn</td><td>Giảng phần "cổng" (Rev/CTQ/truy xuất nguồn gốc) và yêu cầu minh chứng.</td><td>Tài liệu giảng dạy + ảnh lớp + log phát tài liệu</td><td>Giảng lý thuyết rời rạc, không gắn cổng kiểm soát</td></tr>

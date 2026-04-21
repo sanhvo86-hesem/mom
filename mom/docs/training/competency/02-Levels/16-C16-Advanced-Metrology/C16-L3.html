@@ -126,12 +126,12 @@
 <tr><td>GD&amp;T/CTQ phức tạp</td><td>true vị trí / chức vụ, hồ sơ / biên dạng, độ đảo (runout)…</td><td>CMM + chiến lược căn chỉnh / liên kết theo mốc chuẩn (datum)</td><td>Sai mốc chuẩn (datum) = sai toàn bộ kết quả.</td></tr>
 </tbody>
 </table><h3>3.4 ALCOA+ và tính toàn vẹn dữ liệu đo (data tính toàn vẹn)</h3><p>Với ISO, dữ liệu đo chỉ có giá trị khi <strong>đúng – đủ – truy vết</strong>. Quy tắc ALCOA+ (Có thể quy cho, Rõ ràng / Dễ đọc, Đồng thời / Cùng thời điểm, Gốc / Ban đầu, Chính xác + Đầy đủ, nhất quán, Bền vững, Khả dụng) là "chuẩn đạo đức dữ liệu". Các lỗi hay gặp: ghi hồi tố cuối ca, thiếu ký tên, chỉnh số "cho đẹp", dùng file Excel không kiểm soát phiên bản.</p><h3>3.5 FAI/FAIR &amp; đánh số balloon: biến bản vẽ thành danh mục đặc tính đo</h3><p><strong>FAI</strong> (Kiểm tra sản phẩm đầu tiên Kiểm tra) là "bài kiểm tra năng lực" của cả chuỗi: bản vẽ → quy trình → gá → chương trình → đo → hồ sơ. Level 2 phải làm được:</p><ul>
-<li>Balloon drawing đúng phiên bản, đánh số đặc tính có hệ thống (CTQ ưu tiên).</li>
+<li>Balloon bản vẽ đúng phiên bản, đánh số đặc tính có hệ thống (CTQ ưu tiên).</li>
 <li>Lập <strong>đặc tính list</strong>: đặc tính, tiêu chí, phương pháp đo, tần suất, phản ứng plan.</li>
 <li>Phân tách: CTQ / key / ngoại quan / bề ngoài; đồng thời "đánh dấu / cờ" các note hay bị bỏ sót (mài bavia, cạnh / mép ngắt / nghỉ, clean, đánh dấu, đóng gói).</li>
 </ul><h3>3.6 CMM căn bản nhưng phải "đúng gốc": mốc chuẩn (datum), căn chỉnh / liên kết, đo bằng đầu dò chiến lược</h3><p>Ba nguồn sai số hay gặp nhất khi chạy CMM: (1) mốc chuẩn (datum)/căn chỉnh / liên kết sai, (2) đầu dò (probe)/đầu đo (stylus) không phù hợp, (3) chiến lược đo không đại diện (số điểm ít, hướng đo sai). Level 2 cần hiểu:</p><ul>
 <li>căn chỉnh / liên kết theo mốc chuẩn (datum) tham chiếu khung (3-2-1), tránh "tốt nhất-fit" không kiểm soát cho CTQ lắp ráp.</li>
-<li>Version control: program CMM phải có ID/rev, DCR hồ sơ; không chạy file "mới sửa nhanh" mà không lưu dấu (ISO 7.5 / 8.5.6).</li>
+<li>Kiểm soát phiên bản: program CMM phải có ID/rev, DCR hồ sơ; không chạy file "mới sửa nhanh" mà không lưu dấu (ISO 7.5 / 8.5.6).</li>
 <li>đào tạo / dạy-back: giải thích lại cho trưởng nhóm "vì sao chọn căn chỉnh / liên kết này" bằng ngôn ngữ chức năng lắp ráp.</li>
 </ul><h3>3.7 MSA thực dụng: thiết kế GR&amp;R để trả lời câu hỏi đúng</h3><p>MSA không phải làm để có báo cáo, mà để trả lời: <strong>Hệ đo này có đủ tốt để ra quyết định OK/NG cho CTQ không?</strong> Thiết kế tối thiểu (áp dụng): 10 part x 3 Operator x 2 thử Nhiệm. Sau đó đọc %GRR và hành động.</p><h3>3.8 áp dụng dải bảo vệ &amp; Quyết định Rủi ro: khi nào cần "thu hẹp vùng chấp nhận"</h3><p>Trong dung sai chặt, khi độ không đảm bảo đo lớn, quyết định OK/NG dựa trên 1 lần đo sai. Level 3 phải biết dùng áp dụng dải bảo vệ theo nguyên tắc rủi ro:</p><ul>
 <li><strong>Rủi ro khách hàng</strong>: false chấp nhận (lọt lỗi) → ưu tiên giảm.</li>
@@ -232,7 +232,7 @@
 <td>Khi FAI fail do lỗi đo/hồ sơ lặp ≥2 lần/tháng → dừng xét level</td>
 </tr>
 <tr>
-<td><strong>CMM program version control</strong></td>
+<td><strong>CMM program kiểm soát phiên bản</strong></td>
 <td class="mono">#program có ID+rev+log / tổng program sử dụng</td>
 <td>CMM/DNC kho lưu trữ đánh giá</td>
 <td>Tháng</td>

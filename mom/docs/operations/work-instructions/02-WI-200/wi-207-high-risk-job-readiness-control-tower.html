@@ -69,7 +69,7 @@ ul.tight li {margin:4px 0;}
 <div class="section"><h2>2. Gói dữ liệu phải có trước cuộc họp</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm dữ liệu</th><th>Phải có</th><th>CHẶN khi</th></tr></thead><tbody>
 <tr><td>Thương mại / khách hàng</td><td>PO/dự báo, cam kết ship date, theo yêu cầu riêng của khách hàng yêu cầu, QPL, cert, đóng gói yêu cầu.</td><td>Chưa chốt Ngày giao, thiếu triển khai đầy đủ yêu cầu (flow-xuống / Từng) hoặc mâu thuẫn yêu cầu khách hàng.</td></tr>
-<tr><td>Mốc chuẩn kỹ thuật</td><td>Drawing/3D/rev, bộ định tuyến / lộ trình, NC/program mức sẵn sàng, phiếu cài đặt, danh sách dao cụ, kế hoạch kiểm soát/FMEA mức cần thiết.</td><td>Phiên bản chưa khóa, lộ trình gia công chưa rõ, chưa chốt program/setup chiến lược.</td></tr>
+<tr><td>Mốc chuẩn kỹ thuật</td><td>Bản vẽ/3D/rev, bộ định tuyến / lộ trình, NC/program mức sẵn sàng, phiếu cài đặt, danh sách dao cụ, kế hoạch kiểm soát/FMEA mức cần thiết.</td><td>Phiên bản chưa khóa, lộ trình gia công chưa rõ, chưa chốt program/setup chiến lược.</td></tr>
 <tr><td>Nguyên vật liệu &amp; source</td><td>Tình trạng raw nguyên vật liệu, mẻ nấu (heat)/lot, đã phê duyệt source, outsource Người xử lý, cert path.</td><td>Thiếu vật tư, thiếu cert, source chưa đã phê duyệt, công đoạn đặc biệt chưa chốt.</td></tr>
 <tr><td>Công suất &amp; thực thi</td><td>Máy dự kiến, ca chạy, fixture/tool/gage mức sẵn sàng, nút thắt / điểm nghẽn, thay thế / phương án khác lộ trình gia công, dự phòng.</td><td>Không có năng lực khả thi, fixture/gage chưa sẵn, thay thế / phương án khác plan rỗng.</td></tr>
 <tr><td>Quality và phê duyệt</td><td>Mẫu đầu (mẫu đầu (tiên chi tiết / sản phẩm)/FAI kích hoạt, kiểm tra phương pháp, vệ sinh / sạch sẽ/rò rỉ/bộ hồ sơ phê duyệt giao hàng, hồ sơ path.</td><td>Chưa chốt cổng kiểm soát người chịu trách nhiệm hoặc chưa có bằng chứng bắt buộc để phê duyệt.</td></tr>
@@ -87,7 +87,7 @@ ul.tight li {margin:4px 0;}
 <div class="section"><h2>4. Logic quyết định Ready / Đã chặn / RỦI RO GIAO HÀNG</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trạng thái</th><th>Điều kiện</th><th>Hành động bắt buộc</th></tr></thead><tbody>
 <tr><td><span class="badge-green">READY</span></td><td>Material, route, program, setup, gage, plan kiểm và hồ sơ release đều đã sẵn hoặc đã có bằng chứng xác nhận.</td><td>Cho vào dispatch board; kiểm theo cổng kiểm soát chuẩn.</td></tr>
-<tr><td><span class="badge-amber">READY WITH CONTROLS</span></td><td>Có rủi ro đã biết nhưng đã có containment hợp lệ như alternate machine, split lot, staged material, tăng sampling, daily trung tâm điều hành.</td><td>Ghi rõ control bổ sung, Người phụ trách, điều kiện dừng và thời điểm review tiếp.</td></tr>
+<tr><td><span class="badge-amber">READY WITH CONTROLS</span></td><td>Có rủi ro đã biết nhưng đã có bao vây hợp lệ như alternate machine, split lot, staged material, tăng sampling, daily trung tâm điều hành.</td><td>Ghi rõ control bổ sung, Người phụ trách, điều kiện dừng và thời điểm review tiếp.</td></tr>
 <tr><td><span class="badge-red">BLOCKED</span></td><td>Thiếu baseline, thiếu vật tư/chứng chỉ quan trọng, chưa chốt processor, chưa sẵn gage/fixture, open NCR ảnh hưởng CTQ, hoặc điều kiện mẫu đầu chưa sẵn.</td><td>Không dispatch; mở escalation theo <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</td></tr>
 <tr><td><span class="badge-red">RỦI RO GIAO HÀNG</span></td><td>Job đang chạy nhưng nguy cơ không đạt Ngày giao hoặc không kịp gói phát hành.</td><td>Chuyển sang họp tăng tần suất; ưu tiên nguồn lực; đánh giá OT/vendor/giao hàng một phầnment theo quyền hạn.</td></tr>
 </tbody></table></div>
@@ -97,7 +97,7 @@ ul.tight li {margin:4px 0;}
 <div class="card"><h3>Hồ sơ tối thiểu</h3><ul class="tight" style="padding-left:18px;">
 <li>Biên bản trung tâm điều hành, trạng thái từng trục mức sẵn sàng, action list có Người phụ trách và SLA.</li>
 <li>Link tới Hồ sơ công việc (hồ sơ công việc), bằng chứng còn thiếu, open hold, open shortage, open NCR liên quan.</li>
-<li>Quyết định split lot/giao hàng một phần/alternate route/temporary containment nếu có.</li>
+<li>Quyết định split lot/giao hàng một phần/alternate route/temporary bao vây nếu có.</li>
 </ul></div>
 <div class="card"><h3>KPI gợi buộc</h3><ul class="tight" style="padding-left:18px;">
 <li><strong>KPI-WI207-01</strong> Tỷ lệ Lệnh sản xuất cao-rủi ro được đánh giá trước điều phối xuất hàng.</li>

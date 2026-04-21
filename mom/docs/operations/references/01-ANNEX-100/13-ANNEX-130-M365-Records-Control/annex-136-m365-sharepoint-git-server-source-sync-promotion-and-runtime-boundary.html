@@ -55,7 +55,7 @@
  <div class="section">
  <h2>1. Mục đích, phạm vi và kết quả bắt buộc</h2>
  <p style="margin:8px 0;">ANNEX này xác lập kiến trúc bắt buộc để bộ tài liệu HESEM nằm trên M365 SharePoint theo cách vẫn hỗ trợ local authoring, Git promotion, server deployment, reverse sync và online-form governance mà không làm lẫn source với runtime data. Kết quả bắt buộc là: mọi Người biết bộ source docs nằm ở đâu trên SharePoint, local nào được phép sync, Git là gì trong chuỗi kiểm soát, server giữ cái gì, và dữ liệu nào tuyệt đối không được quay vào Git hay SharePoint source library.</p>
- <div class="callout"><strong>KẾT QUẢ BẮT BUỘC</strong>: bộ tài liệu nguồn có đúng một đường đi chuẩn <b>SharePoint local sync worktree → Git remote → server deploy</b>; mọi hotfix từ server phải quay lại <b>Git → SharePoint local sync</b>; runtime data, secret-bearing config, draft workflow binaries, session files, rate-limit state và form transaction data không được trộn vào controlled source library.</div>
+ <div class="callout"><strong>KẾT QUẢ BẮT BUỘC</strong>: bộ tài liệu nguồn có đúng một đường đi chuẩn <b>SharePoint local sync worktree → Git remote → server deploy</b>; mọi hotfix từ server phải quay lại <b>Git → SharePoint local sync</b>; runtime data, secret-bearing config, draft workflow binaries, session files, rate-limit state và form dữ liệu giao dịch không được trộn vào controlled source library.</div>
  <div class="keyline"><strong>Ranh giới tài liệu:</strong> <a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> khóa site/library/path; <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> khóa provisioning, permissions và automation; <a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> khóa field/list catalog; <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a> khóa file plan; <a href="../../../02-Work-Instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a> khóa tạo site/library/quyền; <a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a> khóa thao tác click-by-click cho local sync, Git và server.</div>
  </div>
 
@@ -182,7 +182,7 @@
  <tbody>
  <tr><td>Controlled source</td><td>Được sync SharePoint local, commit vào Git, pull xuống server.</td><td>HTML SOP/WI/ANNEX, portal scripts, static assets, released form definitions, approved config baselines.</td></tr>
  <tr><td>Runtime noise</td><td>Không commit, không sync ngược về source library, không dùng làm bằng chứng phát hành.</td><td><span class="code">mom/qms-data/form-workflow/</span>, <span class="code">sessions/</span>, <span class="code">ratelimit/</span>, <span class="code">php_error.log</span>, <span class="code">scan_cache.json</span>, <span class="code">config/users.json</span>.</td></tr>
- <tr><td>Form transaction data</td><td>Không đẩy vào Git source; phải route về records library hoặc server runtime record area theo <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>.</td><td>Online form submissions, approval payloads, generated response JSON, scan uploads, temporary entry stores.</td></tr>
+ <tr><td>Form dữ liệu giao dịch</td><td>Không đẩy vào Git source; phải route về records library hoặc server runtime record area theo <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>.</td><td>Online form submissions, approval payloads, generated response JSON, scan uploads, temporary entry stores.</td></tr>
  <tr><td>Server-specific secret/config</td><td>Không đặt trong SharePoint-synced worktree nếu chứa secret hoặc credential; phải lưu ở server-only control path được hạn chế.</td><td>SSH keys, deploy secrets, SMTP secrets, credential store, server-only override config.</td></tr>
  </tbody>
  </table>
@@ -199,7 +199,7 @@
  <tbody>
  <tr><td>Form definition / schema / release model</td><td><span class="code">QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span></td><td>Đi theo Git và SharePoint local sync như source khác.</td></tr>
  <tr><td>Draft binary / in-review binary / archived obsolete workbook</td><td>Server runtime area dưới <span class="code">mom/qms-data/form-workflow/</span> hoặc path runtime tương đương được duyệt</td><td>Không quay vào source library; chỉ lưu evidence/manifest/receipt ở records khi cần.</td></tr>
- <tr><td>Form entries / submissions / approvals / operational responses</td><td>Records libraries phù hợp tại <span class="code">HESEM-Records</span> hoặc runtime record area được phê duyệt</td><td>Không đi theo Git source. Chỉ route sang file plan chính thức hoặc runtime index có retention.</td></tr>
+ <tr><td>Form entries / submissions / approvals / operational responses</td><td>Records libraries phù hợp tại <span class="code">HESEM-Records</span> hoặc runtime record area được phê duyệt</td><td>Không đi theo Git source. Chỉ route sang file plan chính thức hoặc runtime index có thời hạn lưu trữ.</td></tr>
  </tbody>
  </table>
  </div>
@@ -217,7 +217,7 @@
  <tr><td><strong>3</strong></td><td>Server tạo PDF snapshot</td><td>Tên file bắt buộc: <span class="code">FRM-{code}_V{ver}_{phạm vi}_{YYYYMMDD}_{HHMM}-{UserID}.pdf</span></td></tr>
  <tr><td><strong>4</strong></td><td>Gán Record-ID (nếu cần)</td><td>Áp dụng cho NCR, CAPA, FAI và các loại hồ sơ yêu cầu mã định danh. Server gán từ atomic counter sử dụng <span class="code">LOCK_EX</span> để tránh trùng mã.</td></tr>
  <tr><td><strong>5</strong></td><td>Sync structured data lên SharePoint List</td><td>Server gọi Microsoft Graph API để tạo/cập nhật item trong SharePoint List tương ứng. Dữ liệu structured phục vụ dashboard và báo cáo.</td></tr>
- <tr><td><strong>6</strong></td><td>Upload PDF lên SharePoint Document Library</td><td>Server upload file PDF snapshot vào Document Library phù hợp theo file plan. PDF là evidence cho audit và retention.</td></tr>
+ <tr><td><strong>6</strong></td><td>Upload PDF lên SharePoint Document Library</td><td>Server upload file PDF snapshot vào Document Library phù hợp theo file plan. PDF là evidence cho audit và thời hạn lưu trữ.</td></tr>
  <tr><td><strong>7</strong></td><td>Ghi allocation log</td><td>Mọi Record-ID đã cấp được log vào <span class="code">qms-data/counters/_allocation_log.jsonl</span> (append-only, không sửa/xóa).</td></tr>
  </tbody>
  </table>
@@ -247,7 +247,7 @@
  <li>Worktree local vẫn chứa thư mục <span class="code">.git</span> trong vùng SharePoint sync.</li>
  <li>Chưa chứng minh được một vòng đầy đủ <span class="code">local sync → Git push → server pull → deploy receipt → local pull</span>.</li>
  <li>Runtime noise vẫn bị stage/commit trong quá trình sync thử Nhiệm.</li>
- <li>Chưa có rule route riêng cho online form source và online form transaction data.</li>
+ <li>Chưa có rule route riêng cho online form source và online form dữ liệu giao dịch.</li>
  <li>Chưa có WI thao tác cho admin endpoint và server operator.</li>
  </ul>
  </div>
@@ -260,7 +260,7 @@
  <tr><th>Nhóm</th><th>Tài liệu</th><th>Vai trò</th></tr>
  </thead>
  <tbody>
- <tr><td>SOP</td><td><a href="../../../01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a> ; <a href="../../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> ; <a href="../../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td><td>Khóa document control, data governance và change/configuration control.</td></tr>
+ <tr><td>SOP</td><td><a href="../../../01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a> ; <a href="../../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> ; <a href="../../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td><td>Khóa document control, quản trị dữ liệu và change/configuration control.</td></tr>
  <tr><td>WI</td><td><a href="../../../02-Work-Instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a> ; <a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a> ; <a href="../../../02-Work-Instructions/01-WI-100/wi-101-digital-online-forms-and-approvals.html">WI-101</a></td><td>Tạo site/library/quyền, thao tác sync/deploy, và điều khiển online forms.</td></tr>
  <tr><td>ANNEX</td><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> ; <a href="annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a> ; <a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> ; <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> ; <a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a> ; <a href="annex-138-sharepoint-local-sync-and-git-workspace-boundary.html">ANNEX-138</a> ; <a href="annex-137-evidence-and-records-naming-convention.html">ANNEX-137</a></td><td>Khóa metadata, flow, topology, permissions, file plan, local sync constraints và online form sync/evidence control.</td></tr>
  </tbody>

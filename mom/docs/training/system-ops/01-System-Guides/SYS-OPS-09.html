@@ -163,7 +163,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><td>4</td><td>Đẩy dấu chìm / hình chìm khi lỗi</td><td>IntegrationLogs Thất bại nhưng IntegrationSettings cập nhật</td><td>Mất hồ sơ vĩnh viễn</td><td>Khoá quyền cập nhật IntegrationSettings; điều tra luồng</td><td>IntegrationSettings lịch sử + IntegrationLogs</td></tr>
 <tr><td>5</td><td>Sai múi giờ/định dạng ngày</td><td>DueDate lệch 1 ngày</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span> sai ưu tiên</td><td>Chuẩn hoá UTC → nội bộ / tại chỗ; đã nhập cột trong Power truy vấn</td><td>Photos màn hình sơ đồ ánh xạ + bộ dữ liệu làm mới log</td></tr>
 <tr><td>6</td><td>Thiếu EvidenceFolderUrl</td><td>JobIndex.EvidenceFolderUrl rỗng</td><td>Đánh giá diễn tập fail, thiếu bằng chứng</td><td>Chạy lại tạo Hồ sơ công việc (tính bất biến (idempotent); khóa cổng kiểm soát liên quan</td><td>Link thư mục + cấu trúc thư mục đúng</td></tr>
-<tr><td>7</td><td>Nhầm Rev giữa Job và Part/REV Bản gốc</td><td>JobIndex.RevisionNum khác thư mục REV</td><td>Chạy sai chương trình/drawing</td><td>Hold ngay; mở QCHoldLog ReasonCode=WrongRev; kiểm tra Part/REV</td><td>QCHoldLog + ảnh/đường dẫn file Rev đúng</td></tr>
+<tr><td>7</td><td>Nhầm Rev giữa Job và Part/REV Bản gốc</td><td>JobIndex.RevisionNum khác thư mục REV</td><td>Chạy sai chương trình/bản vẽ</td><td>Hold ngay; mở QCHoldLog ReasonCode=WrongRev; kiểm tra Part/REV</td><td>QCHoldLog + ảnh/đường dẫn file Rev đúng</td></tr>
 <tr><td>8</td><td>Điều tiết SharePoint</td><td>Luồng fail 429/503</td><td>công việc tồn đọng, trễ dữ liệu</td><td>Giảm batch; bật thử lại/chờ lùi (backoff); giãn lịch; ghi IntegrationLogs</td><td>IntegrationLogs + thông số thử lại/batch</td></tr>
 <tr><td>9</td><td>Thiếu ApprovalHistory</td><td>Hồ sơ đóng nhưng không có ApprovalHistory</td><td>Không đánh giá được phê duyệt</td><td>Chặn đóng hồ sơ; chạy lại phê duyệt luồng; đào tạo lại Approver</td><td>ApprovalHistory + hồ sơ URL</td></tr>
 <tr><td>10</td><td>bộ hồ sơ giao hàng thiếu (cổng kiểm soát lỏng)</td><td>ShipRelease Người xác nhận FAIL hoặc PacketComplete=No</td><td>Ship sai/thiếu → khiếu nại khách</td><td>ĐÃ CHẶN + StandupAction S1; bổ sung chứng từ; re-xác nhận hiệu lực</td><td>ShipRelease + thư mục bộ hồ sơ giao hàng + Final IR/CoC</td></tr>
@@ -286,7 +286,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>1</td><td>Mở JobIndex bằng JobNum; đọc PartNum + RevisionNum + DueDate</td><td>Chặn nhầm job/nhầm rev ngay từ đầu</td></tr>
 <tr><td>2</td><td>Mở EvidenceFolderUrl; kiểm tra thư mục 04_Inspection-FAI và 07_Shipping-Đóng gói</td><td>Đánh giá diễn tập; cổng kiểm soát dựa bằng chứng</td></tr>
-<tr><td>3</td><td>Mở Part/REV Bản gốc link; đối chiếu file DWG/CAM đúng REV</td><td>Chặn chạy sai chương trình/drawing</td></tr>
+<tr><td>3</td><td>Mở Part/REV Bản gốc link; đối chiếu file DWG/CAM đúng REV</td><td>Chặn chạy sai chương trình/bản vẽ</td></tr>
 <tr><td>4</td><td>Ghi nhận kết quả vào bảng kiểm ca (ĐẠT/KHÔNG ĐẠT)</td><td>Giữ dấu vết kiểm soát</td></tr>
 </tbody>
 </table>

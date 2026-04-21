@@ -123,7 +123,7 @@
                 <div class="qf-error-msg scar-hidden" data-error-for="scar_date"></div>
               </div>
               <div class="qf-field">
-                <label class="qf-label" for="supplier_response_due_date">Supplier Response Due Date <span class="qf-required">*</span><span class="qf-label-vi">Hạn phản hồi nhà cung cấp</span></label>
+                <label class="qf-label" for="supplier_response_due_date">Supplier Response Hạn <span class="qf-required">*</span><span class="qf-label-vi">Hạn phản hồi nhà cung cấp</span></label>
                 <input class="qf-input" id="supplier_response_due_date" name="supplier_response_due_date" required type="date"/>
                 <span class="qf-dv" id="supplier_response_due_date__dv"></span>
                 <div class="qf-helper">Dùng để theo dõi quá hạn và escalations.</div>
@@ -202,7 +202,7 @@
           <div class="qf-section-header">
             <div>
               <div class="qf-section-title"><span class="qf-section-num">2</span> Quality Issue & Impact Quantification</div>
-              <div class="qf-section-subtitle">Mô tả lỗi rõ ràng, lượng hàng bị ảnh hưởng và mức độ nghiêm trọng để hành động containment và phản hồi được đặt đúng trọng tâm.</div>
+              <div class="qf-section-subtitle">Mô tả lỗi rõ ràng, lượng hàng bị ảnh hưởng và mức độ nghiêm trọng để hành động bao vây và phản hồi được đặt đúng trọng tâm.</div>
             </div>
           </div>
           <div class="qf-section-body">
@@ -268,13 +268,13 @@
         <section class="qf-section qf-section--warning">
           <div class="qf-section-header">
             <div>
-              <div class="qf-section-title"><span class="qf-section-num">3</span> Containment, Response Deadline & Issuance</div>
+              <div class="qf-section-title"><span class="qf-section-num">3</span> Bao vây, Response Deadline & Issuance</div>
               <div class="qf-section-subtitle">Ghi nhận hành động chặn lan rộng, chế độ phản hồi bắt buộc và trách nhiệm phát hành để kiểm soát vòng phản hồi nhà cung cấp.</div>
             </div>
           </div>
           <div class="qf-section-body">
             <div class="qf-field">
-              <label class="qf-label" for="containment_action">Containment Action <span class="qf-required">*</span><span class="qf-label-vi">Hành động ngăn chặn</span></label>
+              <label class="qf-label" for="containment_action">Bao vây Action <span class="qf-required">*</span><span class="qf-label-vi">Hành động ngăn chặn</span></label>
               <textarea class="qf-textarea" id="containment_action" name="containment_action" required placeholder="Ghi rõ cách cô lập hàng, xử lý tồn kho, chặn lô tiếp theo, thông báo nội bộ..." rows="4"></textarea>
               <span class="qf-dv" id="containment_action__dv"></span>
               <div class="qf-error-msg scar-hidden" data-error-for="containment_action"></div>
@@ -287,7 +287,7 @@
                   <span><span class="qf-label">Nguyên nhân gốc Required<span class="qf-label-vi">Yêu cầu phân tích nguyên nhân gốc</span></span></span>
                 </label>
                 <span class="qf-dv" id="root_cause_required__dv"></span>
-                <div class="qf-helper">Bỏ chọn chỉ khi QA quyết định containment-only hoặc xử lý rút gọn.</div>
+                <div class="qf-helper">Bỏ chọn chỉ khi QA quyết định bao vây-only hoặc xử lý rút gọn.</div>
               </div>
               <div class="qf-field">
                 <label class="qf-label" for="issued_by_lookup">Issued By <span class="qf-required">*</span><span class="qf-label-vi">Người phát hành</span></label>

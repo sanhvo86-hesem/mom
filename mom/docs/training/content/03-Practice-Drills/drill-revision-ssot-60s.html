@@ -56,7 +56,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="card">
 <span class="badge">Mục tiêu</span>
 <ul class="tight">
-<li>Truy xuất nguồn gốc đúng drawing/spec/mốc chuẩn/IR trong ≤ 60 giây.</li>
+<li>Truy xuất nguồn gốc đúng bản vẽ/spec/mốc chuẩn/IR trong ≤ 60 giây.</li>
 <li>Không dùng file rời, không dùng bản in cũ.</li>
 <li>KHI phát hiện sai REV: kích hoạt STOP và báo đúng tuyến.</li>
 </ul>
@@ -82,7 +82,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr><th style="width:60px;">#</th><th>Hành động</th><th style="width:150px;">người chịu trách nhiệm</th><th>MRR</th><th style="width:90px;">Cổng kiểm soát (gate)</th></tr>
 </thead>
 <tbody>
-<tr><td>1</td><td>Người đánh giá cung cấp JobNum. Học viên mở đúng Hồ sơ công việc (hồ sơ công việc) và đọc REV tại thư mục name.</td><td>Học viên</td><td>Photos màn hình đường dẫn + REV</td><td>STOP</td></tr><tr><td>2</td><td>Mở đúng drawing/spec thuộc phiên bản set hiện hành (file được kiểm soát).</td><td>Học viên</td><td>Link file drawing/spec</td><td>FAIL</td></tr><tr><td>3</td><td>Mở đúng bộ hồ sơ chuẩn (mốc chuẩn gói hàng): phiếu cài đặt hoặc kế hoạch kiểm tra (plan).</td><td>Học viên</td><td>Link mốc chuẩn file</td><td>FAIL</td></tr><tr><td>4</td><td>Mở đúng IR/FAI mới nhất và chỉ ra CTQ #1.</td><td>Học viên</td><td>Link IR/FAI + CTQ nổi bật / đánh dấu</td><td>FAIL</td></tr><tr><td>5</td><td>Khi có thay đổi: mở DCR hồ sơ/thông báo và chỉ ra tác động tới công đoạn đang làm.</td><td>Học viên</td><td>Link thay đổi hồ sơ</td><td>CHẶN</td></tr><tr><td>6</td><td>Người đánh giá bấm giờ: toàn bộ bước 1–4 hoàn tất ≤ 60 giây.</td><td>Người đánh giá</td><td>Time kết quả + ghi chú</td><td>FAIL</td></tr>
+<tr><td>1</td><td>Người đánh giá cung cấp JobNum. Học viên mở đúng Hồ sơ công việc (hồ sơ công việc) và đọc REV tại thư mục name.</td><td>Học viên</td><td>Photos màn hình đường dẫn + REV</td><td>STOP</td></tr><tr><td>2</td><td>Mở đúng bản vẽ/spec thuộc phiên bản set hiện hành (file được kiểm soát).</td><td>Học viên</td><td>Link file bản vẽ/spec</td><td>FAIL</td></tr><tr><td>3</td><td>Mở đúng bộ hồ sơ chuẩn (mốc chuẩn gói hàng): phiếu cài đặt hoặc kế hoạch kiểm tra (plan).</td><td>Học viên</td><td>Link mốc chuẩn file</td><td>FAIL</td></tr><tr><td>4</td><td>Mở đúng IR/FAI mới nhất và chỉ ra CTQ #1.</td><td>Học viên</td><td>Link IR/FAI + CTQ nổi bật / đánh dấu</td><td>FAIL</td></tr><tr><td>5</td><td>Khi có thay đổi: mở DCR hồ sơ/thông báo và chỉ ra tác động tới công đoạn đang làm.</td><td>Học viên</td><td>Link thay đổi hồ sơ</td><td>CHẶN</td></tr><tr><td>6</td><td>Người đánh giá bấm giờ: toàn bộ bước 1–4 hoàn tất ≤ 60 giây.</td><td>Người đánh giá</td><td>Time kết quả + ghi chú</td><td>FAIL</td></tr>
 </tbody>
 </table>
 </div>
@@ -102,7 +102,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <table class="table">
 <thead><tr><th style="width:210px;">Tiêu chí</th><th>Mô tả quan sát</th><th style="width:90px;">Điểm</th></tr></thead>
 <tbody>
-<tr><td><b>sửa / đúng vị trí</b></td><td>Mở đúng hồ sơ và đúng Record Folder type.</td><td>0/1/2</td></tr><tr><td><b>sửa / đúng phiên bản</b></td><td>REV tại thư mục name khớp drawing/spec đang mở.</td><td>0/1/2</td></tr><tr><td><b>sửa / đúng được kiểm soát file</b></td><td>Không dùng file rời; file có dấu vết kiểm soát.</td><td>0/1/2</td></tr><tr><td><b>tốc độ</b></td><td>Bước 1–4 hoàn tất ≤ 60 giây.</td><td>0/1/2</td></tr><tr><td><b>Đặt tên kỷ luật / chuyên ngành</b></td><td>File được chọn có tên đúng chuẩn; không có 'final-final'.</td><td>0/1/2</td></tr>
+<tr><td><b>sửa / đúng vị trí</b></td><td>Mở đúng hồ sơ và đúng Record Folder type.</td><td>0/1/2</td></tr><tr><td><b>sửa / đúng phiên bản</b></td><td>REV tại thư mục name khớp bản vẽ/spec đang mở.</td><td>0/1/2</td></tr><tr><td><b>sửa / đúng được kiểm soát file</b></td><td>Không dùng file rời; file có dấu vết kiểm soát.</td><td>0/1/2</td></tr><tr><td><b>tốc độ</b></td><td>Bước 1–4 hoàn tất ≤ 60 giây.</td><td>0/1/2</td></tr><tr><td><b>Đặt tên kỷ luật / chuyên ngành</b></td><td>File được chọn có tên đúng chuẩn; không có 'final-final'.</td><td>0/1/2</td></tr>
 </tbody>
 </table>
 </div>
@@ -111,7 +111,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <span class="badge">MRR tối thiểu</span>
 <ul class="tight">
 <li>01 Photos màn hình đường dẫn hồ sơ + REV.</li>
-<li>04 link SSOT: drawing/spec + mốc chuẩn + IR/FAI + DCR hồ sơ (KHI có).</li>
+<li>04 link SSOT: bản vẽ/spec + mốc chuẩn + IR/FAI + DCR hồ sơ (KHI có).</li>
 <li>01 note của Người đánh giá: thời gian + lỗi phát hiện + hành động chặn lặp.</li>
 </ul>
 </div>
