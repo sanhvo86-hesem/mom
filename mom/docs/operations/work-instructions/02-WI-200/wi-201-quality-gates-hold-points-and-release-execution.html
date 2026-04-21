@@ -46,14 +46,14 @@ ul.tight li { margin: 4px 0; }
         </div>
       
 
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng tại mọi checkpoint G0-G7 khi cần ra quyết định PASS, HOLD, release hoặc handoff cho Job CNC. Gate definition, authority matrix, QPL và escalation SLA phải tra tại SOP/ANNEX liên quan; WI này chỉ hướng dẫn thao tác thực thi tại hiện trường.</div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng tại mọi checkpoint G0-G7 khi cần ra quyết định PASS, HOLD, release hoặc bàn giao cho Job CNC. Gate definition, authority matrix, QPL và escalation SLA phải tra tại SOP/ANNEX liên quan; WI này chỉ hướng dẫn thao tác thực thi tại hiện trường.</div>
       <h1>WI-201 - Quality Gates Các điểm giữ lại and Release Execution</h1>
 
       <section id="wi-s1" class="wi-section">
         <h2>1. Mục đích</h2>
         <ul class="tight">
           <li>Giữ một cách ra quyết định thống nhất tại mọi checkpoint để Job chỉ đi tiếp khi bằng chứng tối thiểu đã sạch.</li>
-          <li>Chặn việc “cho chạy trước, bổ sung hồ sơ sau” bằng thao tác HOLD, ghi log và handoff rõ ngay tại điểm phát sinh.</li>
+          <li>Chặn việc “cho chạy trước, bổ sung hồ sơ sau” bằng thao tác HOLD, ghi log và bàn giao rõ ngay tại điểm phát sinh.</li>
           <li>Để người nhận việc sau thấy được trạng thái thật của Job, không phải đoán theo trí nhớ hay tin nhắn rời.</li>
         </ul>
         <div class="callout-danger"><strong>STOP</strong><br>Nếu không chứng minh được đúng Job, đúng Part/Rev, đúng lot hoặc đúng bộ bằng chứng của checkpoint hiện tại, phải đưa Job vào HOLD ngay. Không có ngoại lệ miệng và không dùng kinh nghiệm cá nhân để bỏ qua gate.</div>
@@ -74,7 +74,7 @@ ul.tight li { margin: 4px 0; }
             <h3>Không thay cho</h3>
             <ul class="tight">
               <li>Gate architecture, hold criteria theo cấp hệ thống hoặc authority matrix tại <a href="../../01-SOPs/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a>, <a href="../../03-Reference/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a>, <a href="../../03-Reference/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a> và <a href="../../03-Reference/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>.</li>
-              <li>Thao tác nhận hàng tại <a href="../07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a>, thao tác pre-run tại <a href="../05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a>, FAI tại <a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a> hoặc final/shipment handoff tại <a href="../06-WI-600/wi-605-final-inspection-coc-and-shipment-release-handoff.html">WI-605</a>.</li>
+              <li>Thao tác nhận hàng tại <a href="../07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html">WI-701</a>, thao tác pre-run tại <a href="../05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a>, FAI tại <a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a> hoặc final/shipment bàn giao tại <a href="../06-WI-600/wi-605-final-inspection-coc-and-shipment-release-handoff.html">WI-605</a>.</li>
             </ul>
           </div>
         </div>
@@ -198,7 +198,7 @@ ul.tight li { margin: 4px 0; }
         <div class="step-block">
           <h3>Bước 8: Bàn giao checkpoint kế tiếp</h3>
           <p>Bàn giao Job sang checkpoint hoặc WI kế tiếp cùng trạng thái hiện hành, link evidence và điểm còn phải theo dõi.</p>
-          <div class="note-soft">Lý do: handoff sạch giúp checkpoint sau không phải suy đoán tình trạng thật của Job.</div>
+          <div class="note-soft">Lý do: bàn giao sạch giúp checkpoint sau không phải suy đoán tình trạng thật của Job.</div>
         </div>
 
         <div class="step-block">
@@ -207,7 +207,7 @@ ul.tight li { margin: 4px 0; }
           <div class="note-soft">Lý do: offline không phải lý do để tồn tại hai phiên bản sự thật của cùng một quyết định gate.</div>
         </div>
 
-        <div class="callout-ok"><strong>Kết quả mong đợi</strong><br>Kết thúc WI-201, Job hoặc đã được giữ với lý do rõ và phạm vi rõ, hoặc đã được release sạch cùng dấu vết bằng chứng đủ để handoff sang checkpoint kế tiếp.</div>
+        <div class="callout-ok"><strong>Kết quả mong đợi</strong><br>Kết thúc WI-201, Job hoặc đã được giữ với lý do rõ và phạm vi rõ, hoặc đã được release sạch cùng dấu vết bằng chứng đủ để bàn giao sang checkpoint kế tiếp.</div>
       </section>
 
       <section id="wi-s6" class="wi-section">
@@ -225,7 +225,7 @@ ul.tight li { margin: 4px 0; }
             <tbody>
               <tr>
                 <td><a href="../../../mom/docs/forms/frm-200-purchase/FRM-203_Job_Tracking_Sheet.xlsx" download>FRM-203</a></td>
-                <td>Trạng thái Job, checkpoint hiện tại, điểm chờ và handoff chính.</td>
+                <td>Trạng thái Job, checkpoint hiện tại, điểm chờ và bàn giao chính.</td>
                 <td>Hồ sơ công việc hoặc thư mục điều độ có kiểm soát.</td>
                 <td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a> / <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a></td>
               </tr>
@@ -306,7 +306,7 @@ ul.tight li { margin: 4px 0; }
               </tr>
               <tr>
                 <td>WI-605</td>
-                <td>Kiểm tra cuối, CoC và shipment release handoff</td>
+                <td>Kiểm tra cuối, CoC và shipment release bàn giao</td>
                 <td><a href="../06-WI-600/wi-605-final-inspection-coc-and-shipment-release-handoff.html">Mở WI-605</a></td>
               </tr>
             </tbody>

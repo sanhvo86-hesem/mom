@@ -90,7 +90,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <h3>1A.2 Drum-buffer-rope rule</h3>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Thành phần TOC</th><th>Áp dụng trong CNC</th><th>Rule điều hành</th></tr></thead><tbody>
-<tr><td>Drum</td><td>Ràng buộc hiện tại: máy, CMM, setup team, fixture, gage, special process hoặc QA release.</td><td>Lịch của drum quyết định nhịp release. Không tối ưu máy không phải ràng buộc nếu làm tăng WIP trước drum.</td></tr>
+<tr><td>Drum</td><td>Ràng buộc hiện tại: máy, CMM, setup team, fixture, gage, quy trình đặc biệt hoặc QA release.</td><td>Lịch của drum quyết định nhịp release. Không tối ưu máy không phải ràng buộc nếu làm tăng WIP trước drum.</td></tr>
 <tr><td>Buffer</td><td>Job ready trước drum, đã đủ material, program, setup/fixture/gage, FAI/QA condition.</td><td>Buffer phải bảo đảm drum không đói việc, nhưng chỉ tính job thật sự ready.</td></tr>
 <tr><td>Rope</td><td>Rule release job từ upstream vào hệ.</td><td>Chỉ release job mới khi phù hợp nhịp drum và không phá WIP cap trước ràng buộc.</td></tr>
 </tbody></table></div>
