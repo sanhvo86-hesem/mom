@@ -1541,12 +1541,26 @@ def set_row_cell_by_match(
             set_element_html(cells[target_cell_index], html_fragment)
 
 
-def normalize_jd_purpose_intro(doc: etree._Element, role_code: str, role: dict) -> None:
+def normalize_jd_purpose_intro(doc: etree._Element, role_code: str, role: dict, current_filename: str = "") -> None:
     paragraphs = doc.xpath('//div[contains(@class,"jd-purpose")]/p[1]')
     if not paragraphs:
         return
     paragraph = paragraphs[0]
-    links = [deepcopy(anchor) for anchor in paragraph.xpath("./a")]
+    # Capture only ANNEX/SOP/WI references to preserve. Skip any <a> whose
+    # href resolves to the current JD file (those are intro-inlined role
+    # anchors injected by the role-code linker — re-appending them causes
+    # duplicate self-references to accumulate across repeated runs).
+    links: list = []
+    seen_hrefs: set = set()
+    for anchor in paragraph.xpath("./a"):
+        href = (anchor.get("href") or "").strip()
+        basename = href.rsplit("/", 1)[-1]
+        if current_filename and basename == current_filename:
+            continue  # skip self-references
+        if href in seen_hrefs:
+            continue  # skip exact duplicates
+        seen_hrefs.add(href)
+        links.append(deepcopy(anchor))
     for child in list(paragraph):
         paragraph.remove(child)
     paragraph.text = (
@@ -3921,7 +3935,7 @@ def normalize_jd_file(
     normalize_organization_shortlinks(doc, doc_path)
     normalize_reference_links(doc, doc_path, registry)
     normalize_local_link_separators(doc)
-    normalize_jd_purpose_intro(doc, role_code, role)
+    normalize_jd_purpose_intro(doc, role_code, role, doc_path.name)
     replace_text_fragments_filtered(doc, COMMON_PROSE_REPLACEMENTS, {"a"})
     replace_text_fragments_filtered(doc, JD_PROSE_REPLACEMENTS, {"a"})
     replace_regex_patterns(doc, COMMON_REGEX_REPLACEMENTS, {"a"})

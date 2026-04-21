@@ -98,13 +98,23 @@ b, strong { font-weight: 700; }
   grid-row: 2;
   display: flex;
   flex-wrap: wrap;
+  align-items: stretch;
   background: var(--bg2);
   border-top: 1px solid var(--gold);
 }
-.form-header .meta .row { display: flex; align-items: center; padding: 6px 16px; border-right: 1px solid var(--ln2); font-size: 11px; }
+.form-header .meta .row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-right: 1px solid var(--ln2);
+  font-size: 11px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
 .form-header .meta .row:last-child { border-right: none; }
 .form-header .meta .row b { color: var(--ink3); font-weight: 600; font-size: 9.5px; text-transform: uppercase; letter-spacing: .3px; margin-right: 6px; white-space: nowrap; }
-.form-header .meta .row span:last-child { color: var(--ink); font-weight: 600; white-space: nowrap; }
+.form-header .meta .row span:last-child { color: var(--ink); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .form-header .meta .row .doc-code { font-family: var(--mono); font-weight: 700; letter-spacing: .02em; }
 @media screen and (max-width: 600px) {
   .form-header { grid-template-columns: 1fr; }
