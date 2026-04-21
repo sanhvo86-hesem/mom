@@ -5,8 +5,8 @@
     "CEO": {
       "jd_code": "JD-CEO",
       "title_en": "Chief Executive Officer",
-      "title_vi": "Tong Giam doc",
-      "body_vi": "Tong Giam doc",
+      "title_vi": "Tổng Giám đốc",
+      "body_vi": "Tổng Giám đốc",
       "department": "Executive Department",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html",
       "hats_allowed": ["IC-BIZ"]
@@ -14,8 +14,8 @@
     "PD": {
       "jd_code": "JD-PD",
       "title_en": "Production Director",
-      "title_vi": "Giam doc san xuat",
-      "body_vi": "Giam doc san xuat",
+      "title_vi": "Giám đốc sản xuất",
+      "body_vi": "Giám đốc sản xuất",
       "department": "Production",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html",
       "hats_allowed": ["IC-PROD"]
@@ -23,8 +23,8 @@
     "CPS": {
       "jd_code": "JD-CPS",
       "title_en": "Cleaning and Packaging Supervisor",
-      "title_vi": "Giam sat ve sinh va dong goi",
-      "body_vi": "Giam sat ve sinh va dong goi",
+      "title_vi": "Giám sát vệ sinh và đóng gói",
+      "body_vi": "Giám sát vệ sinh và đóng gói",
       "department": "Production",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-and-packaging-supervisor.html",
       "hats_allowed": []
@@ -32,8 +32,8 @@
     "CPT": {
       "jd_code": "JD-CPT",
       "title_en": "Cleaning and Packaging Technician",
-      "title_vi": "Ky thuat vien ve sinh va dong goi",
-      "body_vi": "Ky thuat vien ve sinh va dong goi",
+      "title_vi": "Kỹ thuật viên vệ sinh và đóng gói",
+      "body_vi": "Kỹ thuật viên vệ sinh và đóng gói",
       "department": "Production",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-packaging-technician.html",
       "hats_allowed": []
@@ -41,8 +41,8 @@
     "OPR": {
       "jd_code": "JD-OPR",
       "title_en": "CNC Operator",
-      "title_vi": "Nhan vien van hanh CNC",
-      "body_vi": "Nhan vien van hanh CNC",
+      "title_vi": "Nhân viên vận hành CNC",
+      "body_vi": "Nhân viên vận hành CNC",
       "department": "Production",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html",
       "hats_allowed": []
@@ -50,8 +50,8 @@
     "WKM": {
       "jd_code": "JD-WKM",
       "title_en": "CNC Workshop Manager",
-      "title_vi": "Quan ly phan xuong CNC",
-      "body_vi": "Quan ly phan xuong CNC",
+      "title_vi": "Quản lý phân xưởng CNC",
+      "body_vi": "Quản lý phân xưởng CNC",
       "department": "Production",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html",
       "hats_allowed": []
@@ -59,8 +59,8 @@
     "DBL": {
       "jd_code": "JD-DBL",
       "title_en": "Deburr Team Lead",
-      "title_vi": "To truong pha ba via",
-      "body_vi": "To truong pha ba via",
+      "title_vi": "Tổ trưởng phá ba via",
+      "body_vi": "Tổ trưởng phá ba via",
       "department": "Production",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-deburr-team-lead.html",
       "hats_allowed": []
@@ -68,8 +68,8 @@
     "DBT": {
       "jd_code": "JD-DBT",
       "title_en": "Deburr Technician",
-      "title_vi": "Ky thuat vien pha ba via",
-      "body_vi": "Ky thuat vien pha ba via",
+      "title_vi": "Kỹ thuật viên phá ba via",
+      "body_vi": "Kỹ thuật viên phá ba via",
       "department": "Production",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-deburr-technician.html",
       "hats_allowed": []
@@ -77,8 +77,8 @@
     "MNT": {
       "jd_code": "JD-MNT",
       "title_en": "Maintenance Technician",
-      "title_vi": "Ky thuat vien bao tri",
-      "body_vi": "Ky thuat vien bao tri",
+      "title_vi": "Kỹ thuật viên bảo trì",
+      "body_vi": "Kỹ thuật viên bảo trì",
       "department": "Production",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html",
       "hats_allowed": []
@@ -86,8 +86,8 @@
     "PIE": {
       "jd_code": "JD-PIE",
       "title_en": "Production Engineer / Industrial Engineer",
-      "title_vi": "Ky su san xuat / ky su cong nghiep",
-      "body_vi": "Ky su san xuat / ky su cong nghiep",
+      "title_vi": "Kỹ sư sản xuất / kỹ sư công nghiệp",
+      "body_vi": "Kỹ sư sản xuất / kỹ sư công nghiệp",
       "department": "Production",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-engineer-industrial-engineer.html",
       "hats_allowed": ["CI"]
@@ -95,8 +95,8 @@
     "PPL": {
       "jd_code": "JD-PPL",
       "title_en": "Production Planner",
-      "title_vi": "Dieu do san xuat",
-      "body_vi": "Dieu do san xuat",
+      "title_vi": "Điều độ sản xuất",
+      "body_vi": "Điều độ sản xuất",
       "department": "Production",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html",
       "hats_allowed": []
@@ -104,8 +104,8 @@
     "SET": {
       "jd_code": "JD-SET",
       "title_en": "Setup Technician",
-      "title_vi": "Ky thuat vien setup",
-      "body_vi": "Ky thuat vien setup",
+      "title_vi": "Kỹ thuật viên setup",
+      "body_vi": "Kỹ thuật viên setup",
       "department": "Production",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html",
       "hats_allowed": []
@@ -113,8 +113,8 @@
     "SL": {
       "jd_code": "JD-SL",
       "title_en": "Shift Leader",
-      "title_vi": "Truong ca",
-      "body_vi": "Truong ca",
+      "title_vi": "Trưởng ca",
+      "body_vi": "Trưởng ca",
       "department": "Production",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html",
       "hats_allowed": []
@@ -122,8 +122,8 @@
     "CAM": {
       "jd_code": "JD-CAM",
       "title_en": "CAM / NC Programmer",
-      "title_vi": "Lap trinh vien CAM / NC",
-      "body_vi": "Lap trinh vien CAM / NC",
+      "title_vi": "Lập trình viên CAM / NC",
+      "body_vi": "Lập trình viên CAM / NC",
       "department": "Engineering",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html",
       "hats_allowed": []
@@ -131,8 +131,8 @@
     "DFM": {
       "jd_code": "JD-DFM",
       "title_en": "DFM Engineer",
-      "title_vi": "Ky su DFM",
-      "body_vi": "Ky su DFM",
+      "title_vi": "Kỹ sư DFM",
+      "body_vi": "Kỹ sư DFM",
       "department": "Engineering",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html",
       "hats_allowed": []
@@ -140,8 +140,8 @@
     "ENGM": {
       "jd_code": "JD-ENGM",
       "title_en": "Engineering Lead / Manager",
-      "title_vi": "Truong nhom / quan ly ky thuat",
-      "body_vi": "Truong nhom / quan ly ky thuat",
+      "title_vi": "Trưởng nhóm / quản lý kỹ thuật",
+      "body_vi": "Trưởng nhóm / quản lý kỹ thuật",
       "department": "Engineering",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html",
       "hats_allowed": []
@@ -149,8 +149,8 @@
     "PE": {
       "jd_code": "JD-PE",
       "title_en": "Process Engineer",
-      "title_vi": "Ky su quy trinh",
-      "body_vi": "Ky su quy trinh",
+      "title_vi": "Kỹ sư quy trình",
+      "body_vi": "Kỹ sư quy trình",
       "department": "Engineering",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html",
       "hats_allowed": []
@@ -158,8 +158,8 @@
     "IAO": {
       "jd_code": "JD-IAO",
       "title_en": "Internal Auditor (Outsource)",
-      "title_vi": "Danh gia vien noi bo thue ngoai",
-      "body_vi": "Danh gia vien noi bo thue ngoai",
+      "title_vi": "Đánh giá viên nội bộ thuê ngoài",
+      "body_vi": "Đánh giá viên nội bộ thuê ngoài",
       "department": "Quality",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-internal-auditor-outsource.html",
       "hats_allowed": []
@@ -167,8 +167,8 @@
     "MCS": {
       "jd_code": "JD-MCS",
       "title_en": "Metrology and Calibration Specialist",
-      "title_vi": "Chuyen vien do luong va hieu chuan",
-      "body_vi": "Chuyen vien do luong va hieu chuan",
+      "title_vi": "Chuyên viên đo lường và hiệu chuẩn",
+      "body_vi": "Chuyên viên đo lường và hiệu chuẩn",
       "department": "Quality",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html",
       "hats_allowed": []
@@ -176,8 +176,8 @@
     "QA": {
       "jd_code": "JD-QA",
       "title_en": "QA Manager",
-      "title_vi": "Truong bo phan dam bao chat luong",
-      "body_vi": "Truong bo phan dam bao chat luong",
+      "title_vi": "Trưởng bộ phận đảm bảo chất lượng",
+      "body_vi": "Trưởng bộ phận đảm bảo chất lượng",
       "department": "Quality",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html",
       "hats_allowed": ["QMR", "PSO"]
@@ -185,8 +185,8 @@
     "QC": {
       "jd_code": "JD-QC",
       "title_en": "QC Inspector / CMM Programmer-Operator",
-      "title_vi": "Nhan vien QC / lap trinh vien - van hanh CMM",
-      "body_vi": "Nhan vien QC / lap trinh vien - van hanh CMM",
+      "title_vi": "Nhân viên QC / lập trình viên - vận hành CMM",
+      "body_vi": "Nhân viên QC / lập trình viên - vận hành CMM",
       "department": "Quality",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html",
       "hats_allowed": []
@@ -194,8 +194,8 @@
     "QCL": {
       "jd_code": "JD-QCL",
       "title_en": "QC Inspector Lead",
-      "title_vi": "To truong QC",
-      "body_vi": "To truong QC",
+      "title_vi": "Tổ trưởng QC",
+      "body_vi": "Tổ trưởng QC",
       "department": "Quality",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html",
       "hats_allowed": []
@@ -203,8 +203,8 @@
     "QMS": {
       "jd_code": "JD-QMS",
       "title_en": "QMS Engineer",
-      "title_vi": "Ky su he thong QMS",
-      "body_vi": "Ky su he thong QMS",
+      "title_vi": "Kỹ sư hệ thống QMS",
+      "body_vi": "Kỹ sư hệ thống QMS",
       "department": "Quality",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html",
       "hats_allowed": ["DC", "LA"]
@@ -212,8 +212,8 @@
     "QE": {
       "jd_code": "JD-QE",
       "title_en": "Quality Engineer",
-      "title_vi": "Ky su chat luong",
-      "body_vi": "Ky su chat luong",
+      "title_vi": "Kỹ sư chất lượng",
+      "body_vi": "Kỹ sư chất lượng",
       "department": "Quality",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html",
       "hats_allowed": []
@@ -221,8 +221,8 @@
     "BUY": {
       "jd_code": "JD-BUY",
       "title_en": "Buyer / Purchasing",
-      "title_vi": "Nhan vien mua hang",
-      "body_vi": "Nhan vien mua hang",
+      "title_vi": "Nhân viên mua hàng",
+      "body_vi": "Nhân viên mua hàng",
       "department": "Supply Chain",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html",
       "hats_allowed": []
@@ -230,8 +230,8 @@
     "LOG": {
       "jd_code": "JD-LOG",
       "title_en": "Logistics / Shipping Coordinator",
-      "title_vi": "Dieu phoi logistics / giao nhan",
-      "body_vi": "Dieu phoi logistics / giao nhan",
+      "title_vi": "Điều phối logistics / giao nhận",
+      "body_vi": "Điều phối logistics / giao nhận",
       "department": "Supply Chain",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-logistics-shipping-coordinator.html",
       "hats_allowed": []
@@ -239,8 +239,8 @@
     "SCM": {
       "jd_code": "JD-SCM",
       "title_en": "Supply Chain Manager",
-      "title_vi": "Quan ly chuoi cung ung",
-      "body_vi": "Quan ly chuoi cung ung",
+      "title_vi": "Quản lý chuỗi cung ứng",
+      "body_vi": "Quản lý chuỗi cung ứng",
       "department": "Supply Chain",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html",
       "hats_allowed": []
@@ -248,8 +248,8 @@
     "TOOL": {
       "jd_code": "JD-TOOL",
       "title_en": "Tool Crib / Tool Storekeeper",
-      "title_vi": "Thu kho dao cu",
-      "body_vi": "Thu kho dao cu",
+      "title_vi": "Thủ kho dao cụ",
+      "body_vi": "Thủ kho dao cụ",
       "department": "Supply Chain",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-tool-crib-tool-storekeeper.html",
       "hats_allowed": []
@@ -257,8 +257,8 @@
     "WAR": {
       "jd_code": "JD-WAR",
       "title_en": "Warehouse Clerk",
-      "title_vi": "Nhan vien kho",
-      "body_vi": "Nhan vien kho",
+      "title_vi": "Nhân viên kho",
+      "body_vi": "Nhân viên kho",
       "department": "Supply Chain",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-warehouse-clerk.html",
       "hats_allowed": []
@@ -266,8 +266,8 @@
     "CS": {
       "jd_code": "JD-CS",
       "title_en": "Customer Service",
-      "title_vi": "Nhan vien dich vu khach hang",
-      "body_vi": "Nhan vien dich vu khach hang",
+      "title_vi": "Nhân viên dịch vụ khách hàng",
+      "body_vi": "Nhân viên dịch vụ khách hàng",
       "department": "Sales",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html",
       "hats_allowed": []
@@ -275,8 +275,8 @@
     "EST": {
       "jd_code": "JD-EST",
       "title_en": "Estimator",
-      "title_vi": "Nhan vien bao gia",
-      "body_vi": "Nhan vien bao gia",
+      "title_vi": "Nhân viên báo giá",
+      "body_vi": "Nhân viên báo giá",
       "department": "Sales",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html",
       "hats_allowed": []
@@ -284,8 +284,8 @@
     "APAR": {
       "jd_code": "JD-APAR",
       "title_en": "AP/AR and Payments Accountant",
-      "title_vi": "Ke toan cong no va thanh toan",
-      "body_vi": "Ke toan cong no va thanh toan",
+      "title_vi": "Kế toán công nợ và thanh toán",
+      "body_vi": "Kế toán công nợ và thanh toán",
       "department": "Finance",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-ap-ar-and-payments-accountant.html",
       "hats_allowed": []
@@ -293,8 +293,8 @@
     "FIN": {
       "jd_code": "JD-FIN",
       "title_en": "Finance Manager",
-      "title_vi": "Quan ly tai chinh",
-      "body_vi": "Quan ly tai chinh",
+      "title_vi": "Quản lý tài chính",
+      "body_vi": "Quản lý tài chính",
       "department": "Finance",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html",
       "hats_allowed": []
@@ -302,8 +302,8 @@
     "GLP": {
       "jd_code": "JD-GLP",
       "title_en": "General Ledger and Payroll Accountant",
-      "title_vi": "Ke toan tong hop va tien luong",
-      "body_vi": "Ke toan tong hop va tien luong",
+      "title_vi": "Kế toán tổng hợp và tiền lương",
+      "body_vi": "Kế toán tổng hợp và tiền lương",
       "department": "Finance",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/07-JD-Finance/jd-general-ledger-and-payroll-accountant.html",
       "hats_allowed": []
@@ -311,8 +311,8 @@
     "HR": {
       "jd_code": "JD-HR",
       "title_en": "HR Manager",
-      "title_vi": "Quan ly nhan su",
-      "body_vi": "Quan ly nhan su",
+      "title_vi": "Quản lý nhân sự",
+      "body_vi": "Quản lý nhân sự",
       "department": "HR",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html",
       "hats_allowed": []
@@ -320,8 +320,8 @@
     "EHS": {
       "jd_code": "JD-EHS",
       "title_en": "EHS Specialist",
-      "title_vi": "Chuyen vien EHS",
-      "body_vi": "Chuyen vien EHS",
+      "title_vi": "Chuyên viên EHS",
+      "body_vi": "Chuyên viên EHS",
       "department": "EHS",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html",
       "hats_allowed": ["IC-EHS"]
@@ -329,8 +329,8 @@
     "ESA": {
       "jd_code": "JD-ESA",
       "title_en": "Epicor System Administrator",
-      "title_vi": "Quan tri vien he thong Epicor",
-      "body_vi": "Quan tri vien he thong Epicor",
+      "title_vi": "Quản trị viên hệ thống Epicor",
+      "body_vi": "Quản trị viên hệ thống Epicor",
       "department": "IT",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html",
       "hats_allowed": ["IC-IT"]
@@ -338,8 +338,8 @@
     "ITA": {
       "jd_code": "JD-ITA",
       "title_en": "IT Admin",
-      "title_vi": "Quan tri vien CNTT",
-      "body_vi": "Quan tri vien CNTT",
+      "title_vi": "Quản trị viên CNTT",
+      "body_vi": "Quản trị viên CNTT",
       "department": "IT",
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html",
       "hats_allowed": ["IC-IT"]
@@ -348,8 +348,8 @@
   "departments": {
     "D-EXEC": {
       "title_en": "Executive Department",
-      "title_vi": "Phong Dieu hanh",
-      "body_vi": "phong Dieu hanh",
+      "title_vi": "Phòng Điều hành",
+      "body_vi": "phòng Điều hành",
       "type": "department",
       "parent_department": null,
       "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-executive-handbook.html",
@@ -357,8 +357,8 @@
     },
     "D-SCS": {
       "title_en": "Sales and Customer Service Department",
-      "title_vi": "Phong Kinh doanh va Dich vu khach hang",
-      "body_vi": "phong Kinh doanh va Dich vu khach hang",
+      "title_vi": "Phòng Kinh doanh và Dịch vụ khách hàng",
+      "body_vi": "phòng Kinh doanh và Dịch vụ khách hàng",
       "type": "department",
       "parent_department": null,
       "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html",
@@ -366,8 +366,8 @@
     },
     "D-ENG": {
       "title_en": "Engineering Department",
-      "title_vi": "Phong Ky thuat",
-      "body_vi": "phong Ky thuat",
+      "title_vi": "Phòng Kỹ thuật",
+      "body_vi": "phòng Kỹ thuật",
       "type": "department",
       "parent_department": null,
       "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-engineering-handbook.html",
@@ -375,8 +375,8 @@
     },
     "D-PROD": {
       "title_en": "Production Department",
-      "title_vi": "Phong San xuat",
-      "body_vi": "phong San xuat",
+      "title_vi": "Phòng Sản xuất",
+      "body_vi": "phòng Sản xuất",
       "type": "department",
       "parent_department": null,
       "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html",
@@ -384,8 +384,8 @@
     },
     "D-PPC": {
       "title_en": "Production Planning and Control Function",
-      "title_vi": "Dieu do va kiem soat san xuat",
-      "body_vi": "bo phan dieu do va kiem soat san xuat",
+      "title_vi": "Điều độ và kiểm soát sản xuất",
+      "body_vi": "bộ phận điều độ và kiểm soát sản xuất",
       "type": "subfunction",
       "parent_department": "D-PROD",
       "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html",
@@ -393,8 +393,8 @@
     },
     "D-MNT": {
       "title_en": "Maintenance Function",
-      "title_vi": "Bo phan Bao tri",
-      "body_vi": "bo phan Bao tri",
+      "title_vi": "Bộ phận Bảo trì",
+      "body_vi": "bộ phận Bảo trì",
       "type": "subfunction",
       "parent_department": "D-PROD",
       "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-production-handbook.html",
@@ -402,8 +402,8 @@
     },
     "D-QUAL": {
       "title_en": "Quality Department",
-      "title_vi": "Phong Chat luong",
-      "body_vi": "phong Chat luong",
+      "title_vi": "Phòng Chất lượng",
+      "body_vi": "phòng Chất lượng",
       "type": "department",
       "parent_department": null,
       "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-quality-handbook.html",
@@ -411,8 +411,8 @@
     },
     "D-SCM": {
       "title_en": "Supply Chain Department",
-      "title_vi": "Phong Chuoi cung ung",
-      "body_vi": "phong Chuoi cung ung",
+      "title_vi": "Phòng Chuỗi cung ứng",
+      "body_vi": "phòng Chuỗi cung ứng",
       "type": "department",
       "parent_department": null,
       "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html",
@@ -420,8 +420,8 @@
     },
     "D-PUR": {
       "title_en": "Purchasing Function",
-      "title_vi": "Bo phan Mua hang",
-      "body_vi": "bo phan Mua hang",
+      "title_vi": "Bộ phận Mua hàng",
+      "body_vi": "bộ phận Mua hàng",
       "type": "subfunction",
       "parent_department": "D-SCM",
       "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html",
@@ -429,8 +429,8 @@
     },
     "D-WHS": {
       "title_en": "Warehouse Function",
-      "title_vi": "Bo phan Kho",
-      "body_vi": "bo phan Kho",
+      "title_vi": "Bộ phận Kho",
+      "body_vi": "bộ phận Kho",
       "type": "subfunction",
       "parent_department": "D-SCM",
       "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html",
@@ -438,8 +438,8 @@
     },
     "D-TCR": {
       "title_en": "Tool Crib Function",
-      "title_vi": "Bo phan Kho dao cu",
-      "body_vi": "bo phan Kho dao cu",
+      "title_vi": "Bộ phận Kho dao cụ",
+      "body_vi": "bộ phận Kho dao cụ",
       "type": "subfunction",
       "parent_department": "D-SCM",
       "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html",
@@ -447,8 +447,8 @@
     },
     "D-LOG": {
       "title_en": "Logistics and Shipping Function",
-      "title_vi": "Bo phan Logistics va Giao van",
-      "body_vi": "bo phan Logistics va Giao van",
+      "title_vi": "Bộ phận Logistics và Giao vận",
+      "body_vi": "bộ phận Logistics và Giao vận",
       "type": "subfunction",
       "parent_department": "D-SCM",
       "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html",
@@ -456,8 +456,8 @@
     },
     "D-FIN": {
       "title_en": "Finance Department",
-      "title_vi": "Phong Tai chinh",
-      "body_vi": "phong Tai chinh",
+      "title_vi": "Phòng Tài chính",
+      "body_vi": "phòng Tài chính",
       "type": "department",
       "parent_department": null,
       "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-finance-handbook.html",
@@ -465,8 +465,8 @@
     },
     "D-HR": {
       "title_en": "Human Resources Department",
-      "title_vi": "Phong Nhan su",
-      "body_vi": "phong Nhan su",
+      "title_vi": "Phòng Nhân sự",
+      "body_vi": "phòng Nhân sự",
       "type": "department",
       "parent_department": null,
       "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-hr-handbook.html",
@@ -474,8 +474,8 @@
     },
     "D-EHS": {
       "title_en": "EHS Department",
-      "title_vi": "Phong EHS",
-      "body_vi": "phong EHS",
+      "title_vi": "Phòng EHS",
+      "body_vi": "phòng EHS",
       "type": "department",
       "parent_department": null,
       "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-ehs-handbook.html",
@@ -483,8 +483,8 @@
     },
     "D-IT": {
       "title_en": "IT Department",
-      "title_vi": "Phong CNTT",
-      "body_vi": "phong CNTT",
+      "title_vi": "Phòng CNTT",
+      "body_vi": "phòng CNTT",
       "type": "department",
       "parent_department": null,
       "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-it-handbook.html",
@@ -492,8 +492,8 @@
     },
     "D-ERP": {
       "title_en": "ERP Administration Function",
-      "title_vi": "Bo phan quan tri ERP",
-      "body_vi": "bo phan quan tri ERP",
+      "title_vi": "Bộ phận quản trị ERP",
+      "body_vi": "bộ phận quản trị ERP",
       "type": "subfunction",
       "parent_department": "D-IT",
       "handbook_path": "02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks/dept-epicor-handbook.html",
@@ -503,190 +503,190 @@
   "hats": {
     "QMR": {
       "label_en": "Quality Management Representative",
-      "label_vi": "Dai dien lanh dao ve chat luong",
+      "label_vi": "Đại diện lãnh đạo về chất lượng",
       "host_roles": ["QA"]
     },
     "DC": {
       "label_en": "Document Controller",
-      "label_vi": "Dieu phoi kiem soat tai lieu",
+      "label_vi": "Điều phối kiểm soát tài liệu",
       "host_roles": ["QMS"]
     },
     "LA": {
       "label_en": "Lead Auditor",
-      "label_vi": "Truong nhom danh gia",
+      "label_vi": "Trưởng nhóm đánh giá",
       "host_roles": ["QMS"]
     },
     "CI": {
       "label_en": "Continuous Improvement Lead",
-      "label_vi": "Dau moi cai tien lien tuc",
+      "label_vi": "Đầu mối cải tiến liên tục",
       "host_roles": ["PIE"]
     },
     "PSO": {
       "label_en": "Product Safety Officer",
-      "label_vi": "Dau moi an toan san pham",
+      "label_vi": "Đầu mối an toàn sản phẩm",
       "host_roles": ["QA"]
     },
     "IC-BIZ": {
       "label_en": "Incident Commander - Business",
-      "label_vi": "Chi huy xu ly su co cap doanh nghiep",
+      "label_vi": "Chỉ huy xử lý sự cố cấp doanh nghiệp",
       "host_roles": ["CEO"]
     },
     "IC-PROD": {
       "label_en": "Incident Commander - Production",
-      "label_vi": "Chi huy xu ly su co san xuat",
+      "label_vi": "Chỉ huy xử lý sự cố sản xuất",
       "host_roles": ["PD"]
     },
     "IC-EHS": {
       "label_en": "Incident Commander - EHS",
-      "label_vi": "Chi huy xu ly su co EHS",
+      "label_vi": "Chỉ huy xử lý sự cố EHS",
       "host_roles": ["EHS"]
     },
     "IC-IT": {
       "label_en": "Incident Commander - Digital / IT",
-      "label_vi": "Chi huy xu ly su co he thong so / CNTT",
+      "label_vi": "Chỉ huy xử lý sự cố hệ thống số / CNTT",
       "host_roles": ["ITA", "ESA"]
     }
   },
   "bundle_meta": {
     "FUNC_HEADS": {
       "label_en": "Function Heads",
-      "label_vi": "Nhom dau moi dieu hanh chuc nang",
+      "label_vi": "Nhóm đầu mối điều hành chức năng",
       "kind": "role bundle",
-      "use_vi": "Dung khi tai lieu dang noi toi lop dau moi dieu hanh cap chuc nang cua cac khoi chinh.",
-      "avoid_vi": "Khong dung thay nguoi phe duyet cu the neu da xac dinh duoc role ra quyet dinh."
+      "use_vi": "Dùng khi tài liệu đang nói tới lớp đầu mối điều hành cấp chức năng của các khối chính.",
+      "avoid_vi": "Không dùng thay người phê duyệt cụ thể nếu đã xác định được role ra quyết định."
     },
     "FUNC_OWNERS": {
       "label_en": "Functional Content Owners",
-      "label_vi": "Nhom so huu noi dung nghiep vu theo chuc nang",
+      "label_vi": "Nhóm sở hữu nội dung nghiệp vụ theo chức năng",
       "kind": "role bundle",
-      "use_vi": "Dung khi can goi ten lop actor so huu noi dung nghiep vu cua du lieu, KPI hoac quy tac giao dich.",
-      "avoid_vi": "Khong dung de che mo ranh gioi giua owner du lieu nghiep vu va role ky thuat he thong."
+      "use_vi": "Dùng khi cần gọi tên lớp actor sở hữu nội dung nghiệp vụ của dữ liệu, KPI hoặc quy tắc giao dịch.",
+      "avoid_vi": "Không dùng để che mờ ranh giới giữa owner dữ liệu nghiệp vụ và role kỹ thuật hệ thống."
     },
     "DATA_OWNERS": {
       "label_en": "Business Data Owners",
-      "label_vi": "Nhom so huu du lieu nghiep vu",
+      "label_vi": "Nhóm sở hữu dữ liệu nghiệp vụ",
       "kind": "role bundle",
-      "use_vi": "Dung khi tai lieu dang noi toi lop actor so huu du lieu nghiep vu, KPI, cau hinh giao dich hoac quy tac nghiep vu theo chuc nang.",
-      "avoid_vi": "Khong dung de thay owner he thong ky thuat, admin nen tang hay role phe duyet cu the."
+      "use_vi": "Dùng khi tài liệu đang nói tới lớp actor sở hữu dữ liệu nghiệp vụ, KPI, cấu hình giao dịch hoặc quy tắc nghiệp vụ theo chức năng.",
+      "avoid_vi": "Không dùng để thay owner hệ thống kỹ thuật, admin nền tảng hay role phê duyệt cụ thể."
     },
     "SYSTEM_OWNERS": {
       "label_en": "System Owners",
-      "label_vi": "Nhom so huu he thong",
+      "label_vi": "Nhóm sở hữu hệ thống",
       "kind": "role bundle",
-      "use_vi": "Dung khi tai lieu dang noi toi lop actor so huu nen tang he thong, quyen truy cap, tich hop va cau hinh ky thuat.",
-      "avoid_vi": "Khong dung de che mo owner du lieu nghiep vu hoac thay the named admin da duoc chi ro."
+      "use_vi": "Dùng khi tài liệu đang nói tới lớp actor sở hữu nền tảng hệ thống, quyền truy cập, tích hợp và cấu hình kỹ thuật.",
+      "avoid_vi": "Không dùng để che mờ owner dữ liệu nghiệp vụ hoặc thay thế named admin đã được chỉ rõ."
     },
     "TOP_MGMT": {
       "label_en": "Top Management",
-      "label_vi": "Ban lanh dao",
+      "label_vi": "Ban lãnh đạo",
       "kind": "role bundle",
-      "use_vi": "Dung cho lop lanh dao cap cao trong xem xet cua lanh dao, ra quyet dinh chien luoc va escalations cap cao.",
-      "avoid_vi": "Khong dung thay role phe duyet cu the khi ANNEX-120 da chi ro ai giu authority."
+      "use_vi": "Dùng cho lớp lãnh đạo cấp cao trong xem xét của lãnh đạo, ra quyết định chiến lược và escalations cấp cao.",
+      "avoid_vi": "Không dùng thay role phê duyệt cụ thể khi ANNEX-120 đã chỉ rõ ai giữ authority."
     },
     "DEPLOYMENT_STEERING": {
       "label_en": "Deployment Steering Group",
-      "label_vi": "Nhom chi dao trien khai lien chuc nang",
+      "label_vi": "Nhóm chỉ đạo triển khai liên chức năng",
       "kind": "role bundle",
-      "use_vi": "Dung cho nhom chi dao go-live, cutover, deployment va dong bo lien phong ban.",
-      "avoid_vi": "Khong dung de thay tung owner thuc thi, champion hay direct line manager tai hien truong."
+      "use_vi": "Dùng cho nhóm chỉ đạo go-live, cutover, deployment và đồng bộ liên phòng ban.",
+      "avoid_vi": "Không dùng để thay từng owner thực thi, champion hay direct line manager tại hiện trường."
     },
     "ALL_DEPTS": {
       "label_en": "All Departments",
-      "label_vi": "Toan bo phong ban va phan he da cong bo",
+      "label_vi": "Toàn bộ phòng ban và phân hệ đã công bố",
       "kind": "department bundle",
-      "use_vi": "Dung khi tai lieu dang noi toi pham vi bao phu toan doanh nghiep o muc mandate cap phong ban.",
-      "avoid_vi": "Khong dung cho phe duyet, hold/release hoac named accountability."
+      "use_vi": "Dùng khi tài liệu đang nói tới phạm vi bao phủ toàn doanh nghiệp ở mức mandate cấp phòng ban.",
+      "avoid_vi": "Không dùng cho phê duyệt, giữ lại / phát hành hoặc named accountability."
     },
     "SUPPORT_ENABLEMENT": {
       "label_en": "Support Enablement Functions",
-      "label_vi": "Nhom chuc nang ho tro nen",
+      "label_vi": "Nhóm chức năng hỗ trợ nền",
       "kind": "mixed bundle",
-      "use_vi": "Dung khi can gom nhom chuc nang ho tro vat tu, tai chinh, nhan su, an toan, CNTT va ERP de mo ta lop enablement chung.",
-      "avoid_vi": "Khong dung de thay the D-code hoac role cu the khi tai lieu da biet ro bo phan nao dang nhan viec."
+      "use_vi": "Dùng khi cần gom nhóm chức năng hỗ trợ vật tư, tài chính, nhân sự, an toàn, CNTT và ERP để mô tả lớp enablement chung.",
+      "avoid_vi": "Không dùng để thay thế D-code hoặc role cụ thể khi tài liệu đã biết rõ bộ phận nào đang nhận việc."
     },
     "AREA_LEADS": {
       "label_en": "Area Leads",
-      "label_vi": "Nhom dau moi khu vuc hien truong",
+      "label_vi": "Nhóm đầu mối khu vực hiện trường",
       "kind": "role bundle",
-      "use_vi": "Dung cho lop dau moi kiem soat theo khu vuc / khu thao tac tren san xuat.",
-      "avoid_vi": "Khong dung de thay direct line manager hay func head khi dang noi toi authority cap cao hon."
+      "use_vi": "Dùng cho lớp đầu mối kiểm soát theo khu vực / khu thao tác trên sản xuất.",
+      "avoid_vi": "Không dùng để thay direct line manager hay func head khi đang nói tới authority cấp cao hơn."
     },
     "POU_LEADS": {
       "label_en": "Point-of-Use Leads",
-      "label_vi": "Nhom dau moi tai diem dung",
+      "label_vi": "Nhóm đầu mối tại điểm dùng",
       "kind": "role bundle",
-      "use_vi": "Dung khi can goi lop actor kiem tai lieu, dung cu, vat tu va quy tac tai diem dung.",
-      "avoid_vi": "Khong dung de thay owner cua toan bo du lieu nghiep vu hoac owner phong ban."
+      "use_vi": "Dùng khi cần gọi lớp actor kiểm tài liệu, dụng cụ, vật tư và quy tắc tại điểm dùng.",
+      "avoid_vi": "Không dùng để thay owner của toàn bộ dữ liệu nghiệp vụ hoặc owner phòng ban."
     },
     "OPS_SCOPE_OWNERS": {
       "label_en": "Operational Scope Owners",
-      "label_vi": "Nhom dau moi so huu pham vi van hanh",
+      "label_vi": "Nhóm đầu mối sở hữu phạm vi vận hành",
       "kind": "role bundle",
-      "use_vi": "Dung cho lop actor so huu pham vi van hanh giao nhau giua nhieu chuc nang trong job-order CNC.",
-      "avoid_vi": "Khong dung de thay mot role duy nhat neu SOP/WI dang ap cho pham vi hep va da xac dinh duoc actor cu the."
+      "use_vi": "Dùng cho lớp actor sở hữu phạm vi vận hành giao nhau giữa nhiều chức năng trong job-order CNC.",
+      "avoid_vi": "Không dùng để thay một role duy nhất nếu SOP/WI đang áp cho phạm vi hẹp và đã xác định được actor cụ thể."
     },
     "FRONTLINE_LEADS": {
       "label_en": "Frontline Leads",
-      "label_vi": "Nhom dieu hanh tuyen dau",
+      "label_vi": "Nhóm điều hành tuyến đầu",
       "kind": "role bundle",
-      "use_vi": "Dung cho cac role lead / supervisor truc tiep kiem thuc thi tai xuong, tai diem dung hoac tai khu phu tro.",
-      "avoid_vi": "Khong dung de thay lead cap chuc nang hay phe duyet cap phong ban."
+      "use_vi": "Dùng cho các role lead / supervisor trực tiếp kèm thực thi tại xưởng, tại điểm dùng hoặc tại khu phụ trợ.",
+      "avoid_vi": "Không dùng để thay lead cấp chức năng hay phê duyệt cấp phòng ban."
     },
     "DEPLOYMENT_LEADS": {
       "label_en": "Deployment Leads",
-      "label_vi": "Nhom dau moi trien khai theo ca va phong ban",
+      "label_vi": "Nhóm đầu mối triển khai theo ca và phòng ban",
       "kind": "role bundle",
-      "use_vi": "Dung cho nhom champion / lead thuc thi rollout, training, adoption va go-live tai hien truong.",
-      "avoid_vi": "Khong dung de thay deployment steering group hoac owner KPI/MR."
+      "use_vi": "Dùng cho nhóm champion / lead thực thi rollout, training, adoption và go-live tại hiện trường.",
+      "avoid_vi": "Không dùng để thay deployment steering group hoặc owner KPI/MR."
     },
     "DIRECT_LINE_MGRS": {
       "label_en": "Direct Line Managers",
-      "label_vi": "Nhom quan ly truc tiep",
+      "label_vi": "Nhóm quản lý trực tiếp",
       "kind": "role bundle",
-      "use_vi": "Dung khi dang noi toi layer quan ly truc tiep phan cong, danh gia, backup activation va theo doi nang luc.",
-      "avoid_vi": "Khong dung de thay func heads khi tai lieu dang noi toi authority cap phong ban."
+      "use_vi": "Dùng khi đang nói tới layer quản lý trực tiếp phân công, đánh giá, backup activation và theo dõi năng lực.",
+      "avoid_vi": "Không dùng để thay func heads khi tài liệu đang nói tới authority cấp phòng ban."
     },
     "OJT_COACHES": {
       "label_en": "OJT Coaches",
-      "label_vi": "Nhom huan luyen OJT",
+      "label_vi": "Nhóm huấn luyện OJT",
       "kind": "role bundle",
-      "use_vi": "Dung cho lop actor duoc giao kem cap, huong dan thao tac va danh gia OJT theo pham vi duoc phe duyet.",
-      "avoid_vi": "Khong dung de thay named evaluator neu tai lieu da chi ro ro ai la nguoi danh gia."
+      "use_vi": "Dùng cho lớp actor được giao kèm cặp, hướng dẫn thao tác và đánh giá OJT theo phạm vi được phê duyệt.",
+      "avoid_vi": "Không dùng để thay named evaluator nếu tài liệu đã chỉ rõ ai là người đánh giá."
     },
     "KNOWLEDGE_SMES": {
       "label_en": "Knowledge SMEs",
-      "label_vi": "Nhom chuyen gia tri thuc",
+      "label_vi": "Nhóm chuyên gia tri thức",
       "kind": "role bundle",
-      "use_vi": "Dung cho nhom role giu tri thuc chuyen sau can chuyen giao, chuan hoa va tai su dung.",
-      "avoid_vi": "Khong dung thay func owner hoac direct line manager trong quyet dinh nhan su."
+      "use_vi": "Dùng cho nhóm role giữ tri thức chuyên sâu cần chuyển giao, chuẩn hóa và tái sử dụng.",
+      "avoid_vi": "Không dùng thay func owner hoặc direct line manager trong quyết định nhân sự."
     },
     "MR_REPORT_OWNERS": {
       "label_en": "Management Review Report Owners",
-      "label_vi": "Nhom chu tri goi bao cao MR va KPI",
+      "label_vi": "Nhóm chủ trì gói báo cáo MR và KPI",
       "kind": "role bundle",
-      "use_vi": "Dung cho lop role chot, nop va giai trinh goi bao cao KPI / MR.",
-      "avoid_vi": "Khong dung de thay role xac nhan nguon du lieu hoac ITA / ESA."
+      "use_vi": "Dùng cho lớp role chốt, nộp và giải trình gói báo cáo KPI / MR.",
+      "avoid_vi": "Không dùng để thay role xác nhận nguồn dữ liệu hoặc ITA / ESA."
     },
     "COMMERCIAL_FRONT": {
       "label_en": "Commercial Front",
-      "label_vi": "Nhom dau moi thuong mai",
+      "label_vi": "Nhóm đầu mối thương mại",
       "kind": "role bundle",
-      "use_vi": "Dung cho lop dau moi tiep nhan RFQ, xu ly thuong mai va dieu kien don hang.",
-      "avoid_vi": "Khong dung thay CEO khi tai lieu dang noi toi commitment vuot khung."
+      "use_vi": "Dùng cho lớp đầu mối tiếp nhận RFQ, xử lý thương mại và điều kiện đơn hàng.",
+      "avoid_vi": "Không dùng thay CEO khi tài liệu đang nói tới commitment vượt khung."
     },
     "QUALITY_CORE": {
       "label_en": "Quality Core",
-      "label_vi": "Nhom nong cot chat luong",
+      "label_vi": "Nhóm nòng cốt chất lượng",
       "kind": "role bundle",
-      "use_vi": "Dung khi tai lieu can gom nhom role cot loi cho inspection, release, NCR/CAPA va measurement confidence.",
-      "avoid_vi": "Khong dung de thay QA khi tai lieu dang noi toi final authority cua bo phan chat luong."
+      "use_vi": "Dùng khi tài liệu cần gom nhóm role cốt lõi cho inspection, release, NCR/CAPA và measurement confidence.",
+      "avoid_vi": "Không dùng để thay QA khi tài liệu đang nói tới final authority của bộ phận chất lượng."
     },
     "ENG_RELEASE_CORE": {
       "label_en": "Engineering Release Core",
-      "label_vi": "Nhom nong cot phat hanh ky thuat",
+      "label_vi": "Nhóm nòng cốt phát hành kỹ thuật",
       "kind": "role bundle",
-      "use_vi": "Dung cho lop role phoi hop DFM, process planning va program release.",
-      "avoid_vi": "Khong dung de thay ENGM neu tai lieu dang noi toi owner phat hanh ky thuat."
+      "use_vi": "Dùng cho lớp role phối hợp DFM, process planning và program release.",
+      "avoid_vi": "Không dùng để thay ENGM nếu tài liệu đang nói tới owner phát hành kỹ thuật."
     }
   },
   "bundles": {

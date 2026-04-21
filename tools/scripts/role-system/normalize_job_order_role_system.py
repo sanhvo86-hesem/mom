@@ -17,7 +17,39 @@ ROOT = Path(__file__).resolve().parents[3]
 REGISTRY_PATH = ROOT / "tools" / "data" / "role-registry-job-order-cnc.json"
 WORKBOOK_PATH = ROOT / "tools" / "data" / "qms-terminology-dictionary.xlsx"
 UNRESOLVED_REPORT = ROOT / "tools" / "data" / "role-normalization-unresolved.txt"
-BUNDLE_GLOSSARY_PATH = ROOT / "02-Tai-Lieu-He-Thong" / "03-Organization" / "04-RACI-Authority" / "role-and-department-bundles.html"
+
+LEGACY_DOC_ROOT_MAP = (
+    ("02-Tai-Lieu-He-Thong/01-Quality-Manual/", "mom/docs/system/quality-manual/"),
+    ("02-Tai-Lieu-He-Thong/02-Policies-Objectives/", "mom/docs/system/policies/"),
+    ("02-Tai-Lieu-He-Thong/03-Organization/", "mom/docs/system/organization/"),
+    ("03-Tai-Lieu-Van-Hanh/01-SOPs/", "mom/docs/operations/sops/"),
+    ("03-Tai-Lieu-Van-Hanh/02-Work-Instructions/", "mom/docs/operations/work-instructions/"),
+    ("03-Tai-Lieu-Van-Hanh/03-Reference/", "mom/docs/operations/references/"),
+    ("04-Bieu-Mau/", "mom/docs/forms/"),
+    ("10-Training-Academy/", "mom/docs/training/"),
+)
+
+
+def resolve_doc_path(relative_path: str) -> Path:
+    normalized = relative_path.replace("\\", "/")
+    direct = ROOT / normalized
+    if direct.exists():
+        return direct
+
+    for legacy_prefix, live_prefix in LEGACY_DOC_ROOT_MAP:
+        if not normalized.startswith(legacy_prefix):
+            continue
+        live = ROOT / (live_prefix + normalized[len(legacy_prefix):])
+        if live.exists():
+            return live
+        return live
+
+    return direct
+
+
+BUNDLE_GLOSSARY_PATH = resolve_doc_path(
+    "02-Tai-Lieu-He-Thong/03-Organization/04-RACI-Authority/role-and-department-bundles.html"
+)
 
 COMMON_LABEL_REPLACEMENTS = {
     "ANNEX-503 — CNC Vận hành Mô hình and Role Ranh giới": "ANNEX-503 — Mô hình vận hành CNC và ranh giới vai trò",
@@ -182,7 +214,7 @@ def entity_link(code: str, current_file: Path, registry: dict) -> str:
     if hat:
         title = f'{title} [{registry["hats"][hat]["label_en"]}]'
     target_key = "jd_path" if entity_type == "role" else "handbook_path"
-    target_abs = ROOT / meta[target_key]
+    target_abs = resolve_doc_path(meta[target_key])
     href = os.path.relpath(target_abs, current_file.parent).replace("\\", "/")
     link_class = "role-link" if entity_type == "role" else "dept-link"
     code_class = "role-code" if entity_type == "role" else "dept-code"
@@ -204,8 +236,8 @@ def bundle_meta(name: str, registry: dict) -> dict[str, str]:
         "label_en": name,
         "label_vi": name.replace("_", " ").title(),
         "kind": "bundle",
-        "use_vi": "Nhom actor explicit da duoc cong bo trong registry nguon.",
-        "avoid_vi": "Khong dung de che mo trach nhiem hoac thay the role / D-code cu the khi da xac dinh duoc actor that.",
+        "use_vi": "Nhóm actor explicit đã được công bố trong registry nguồn.",
+        "avoid_vi": "Không dùng để che mờ trách nhiệm hoặc thay thế role / D-code cụ thể khi đã xác định được actor thật.",
     }
 
 
@@ -561,8 +593,8 @@ def cleanup_known_render_artifacts_in_html(document: str) -> str:
 
 def generate_bundle_glossary(registry: dict) -> None:
     current_file = BUNDLE_GLOSSARY_PATH
-    title_text = "ORG-BUNDLE-001 — Thuat ngu nhom vai tro va nhom phong ban | HESEM QMS"
-    asset_href = os.path.relpath(ROOT / "assets" / "style.css", current_file.parent).replace("\\", "/")
+    title_text = "ORG-BUNDLE-001 - Role and Department Bundles | HESEM QMS"
+    asset_href = "../../../assets/style.css"
     head_assets = "\n".join([
         f'<link rel="stylesheet" href="{asset_href}">',
         "<style>",
@@ -605,15 +637,15 @@ def generate_bundle_glossary(registry: dict) -> None:
   <div class="page-body">
    <div class="form-header">
     <div class="fh-left">
-     <a class="brand-logo" href="../../../01-QMS-Portal/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
+     <a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
      <div class="fh-company">
-      <a href="../../../01-QMS-Portal/portal.html">HESEM ENGINEERING</a>
-      <span>Tai lieu he thong • To chuc</span>
+      <a href="../../../mom/portal.html">HESEM ENGINEERING</a>
+      <span>Tài liệu hệ thống • Tổ chức</span>
      </div>
     </div>
     <div class="title">
-     <strong>ORG-BUNDLE-001 — Thuat ngu nhom vai tro va nhom phong ban</strong>
-     <span class="sub-vn">Nguon cong bo de giai nghia cac bundle duoc phep dung trong SOP / WI / ANNEX / JD / RACI</span>
+     <strong class="doc-name">Role and Department Bundles</strong>
+     <span class="sub-vn">Nguồn công bố để giải nghĩa các bundle được phép dùng trong SOP / WI / ANNEX / JD / RACI</span>
     </div>
     <div class="meta">
      <div class="row"><span><b>Code:</b></span><span>ORG-BUNDLE-001</span></div>
@@ -625,18 +657,18 @@ def generate_bundle_glossary(registry: dict) -> None:
    <div class="doc-content" id="docContent">
     <div class="form-sheet">
      <div class="hero">
-      <h1>Bundle chi duoc dung khi da duoc cong bo, co thanh phan ro va co link giai nghia</h1>
-      <p>Tai lieu nay khoa nghia cua cac bundle trong mo hinh <b>job-order CNC</b>. Moi bundle phai truy ve duoc JD / D-code goc, co pham vi dung ro, va khong duoc dung de che mo authority hay named accountability.</p>
+      <h1>ORG-BUNDLE-001 - Role and Department Bundles</h1>
+      <p>Tài liệu này khóa nghĩa của các bundle trong mô hình <b>job-order CNC</b>. Mỗi bundle phải truy về được JD / D-code gốc, có phạm vi dùng rõ, và không được dùng để che mờ authority hay named accountability.</p>
      </div>
-     <div class="note"><b>Rule bat buoc:</b><br>Neu tai lieu da xac dinh duoc actor cu the thi phai dung role code hoac D-code. Chi dung bundle khi trach nhiem that su la lop actor lap lai da duoc cong bo. Moi bundle token dung doc lap trong noi dung hien thi phai link ve trang nay.</div>
-     <div class="toc"><div class="toc-title">Muc luc nhanh</div><div class="toc-grid">{''.join(toc_links)}</div></div>
-     <h2 class="h2">1. Danh muc bundle duoc cong bo</h2>
-     <div class="table-card"><table class="table"><colgroup><col style="width:15%"><col style="width:18%"><col style="width:12%"><col style="width:22%"><col style="width:18%"><col style="width:15%"></colgroup><thead><tr><th>Bundle code</th><th>Ten goi chuan</th><th>Loai</th><th>Duoc dung khi</th><th>Khong dung de che</th><th>Thanh phan</th></tr></thead><tbody>{''.join(table_rows)}</tbody></table></div>
-     <h2 class="h2">2. Nguyen tac doc bundle</h2>
+     <div class="note"><b>Quy tắc bắt buộc:</b><br>Nếu tài liệu đã xác định được actor cụ thể thì phải dùng role code hoặc D-code. Chỉ dùng bundle khi trách nhiệm thật sự là lớp actor lặp lại đã được công bố. Mọi bundle token dùng độc lập trong nội dung hiển thị phải link về trang này.</div>
+     <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid">{''.join(toc_links)}</div></div>
+     <h2 class="h2">1. Danh mục bundle được công bố</h2>
+     <div class="table-card"><table class="table bundle-registry-table"><colgroup><col style="width:15%"><col style="width:18%"><col style="width:12%"><col style="width:22%"><col style="width:18%"><col style="width:15%"></colgroup><thead><tr><th>Mã bundle</th><th>Tên gọi chuẩn</th><th>Loại</th><th>Được dùng khi</th><th>Không dùng để che</th><th>Thành phần</th></tr></thead><tbody>{''.join(table_rows)}</tbody></table></div>
+     <h2 class="h2">2. Nguyên tắc đọc bundle</h2>
      <ul class="tight">
-      <li>Bundle khong tao ra JD moi. Moi chip trong bundle van phai truy ve duoc JD hoac handbook goc.</li>
-      <li>Bundle cap role dung cho layer actor; bundle cap department dung cho mandate cap phong ban; bundle mixed chi dung khi tai lieu dang noi toi lop enablement hoac interface lien phong ban that su on dinh.</li>
-      <li>Neu mot o owner / approver / hold-release cell da biet ro actor cu the, phai bo bundle va doi ve role code / D-code dung layer.</li>
+      <li>Bundle không tạo ra JD mới. Mỗi chip trong bundle vẫn phải truy về được JD hoặc handbook gốc.</li>
+      <li>Bundle cấp role dùng cho layer actor; bundle cấp department dùng cho mandate cấp phòng ban; bundle mixed chỉ dùng khi tài liệu đang nói tới lớp enablement hoặc interface liên phòng ban thật sự ổn định.</li>
+      <li>Nếu một ô owner / approver / hold-release cell đã biết rõ actor cụ thể, phải bỏ bundle và đổi về role code / D-code đúng layer.</li>
      </ul>
     </div>
    </div>
@@ -1138,7 +1170,7 @@ def get_require_row_value_text(doc: etree._Element, label_tokens: tuple[str, ...
 def canonical_department_labels(registry: dict) -> dict[Path, str]:
     labels: dict[Path, str] = {}
     for code, meta in registry.get("departments", {}).items():
-        target = (ROOT / meta["handbook_path"]).resolve()
+        target = resolve_doc_path(meta["handbook_path"]).resolve()
         existing = labels.get(target)
         if existing is None or meta.get("type") == "department":
             labels[target] = code
@@ -1147,10 +1179,10 @@ def canonical_department_labels(registry: dict) -> dict[Path, str]:
 
 def normalize_organization_shortlinks(doc: etree._Element, current_file: Path) -> None:
     shortcuts = {
-        "../02-Department-Handbooks/": ROOT / "02-Tai-Lieu-He-Thong" / "03-Organization" / "02-Department-Handbooks",
-        "../03-Job-Descriptions/": ROOT / "02-Tai-Lieu-He-Thong" / "03-Organization" / "03-Job-Descriptions",
-        "../03-Organization/02-Department-Handbooks/": ROOT / "02-Tai-Lieu-He-Thong" / "03-Organization" / "02-Department-Handbooks",
-        "../03-Organization/03-Job-Descriptions/": ROOT / "02-Tai-Lieu-He-Thong" / "03-Organization" / "03-Job-Descriptions",
+        "../02-Department-Handbooks/": resolve_doc_path("02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks"),
+        "../03-Job-Descriptions/": resolve_doc_path("02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions"),
+        "../03-Organization/02-Department-Handbooks/": resolve_doc_path("02-Tai-Lieu-He-Thong/03-Organization/02-Department-Handbooks"),
+        "../03-Organization/03-Job-Descriptions/": resolve_doc_path("02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions"),
     }
     for anchor in doc.xpath('//a[@href]'):
         href = ((anchor.get("href") or "").strip()).replace("\\", "/")
@@ -1171,7 +1203,7 @@ def normalize_organization_shortlinks(doc: etree._Element, current_file: Path) -
 def normalize_reference_links(doc: etree._Element, current_file: Path, registry: dict) -> None:
     target_labels: dict[Path, str] = {}
     for code, meta in registry["roles"].items():
-        target_labels[(ROOT / meta["jd_path"]).resolve()] = meta["jd_code"]
+        target_labels[resolve_doc_path(meta["jd_path"]).resolve()] = meta["jd_code"]
     target_labels.update(canonical_department_labels(registry))
 
     for anchor in doc.xpath('//a[@href]'):
