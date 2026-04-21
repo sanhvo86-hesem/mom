@@ -966,20 +966,34 @@ function repairBrokenDocStyleArtifacts(docOrRoot){
   }
 }
 
-// Fix img src="../../assets/hesem-logo.svg" which resolves to a non-existent
-// /mom/docs/assets/ path when the document is served from its real URL.
-// Replace with the inline base64 already loaded in the portal's .logo-mark img.
+// Fix broken relative asset paths inside iframe document content.
+// Documents use paths like "../../assets/hesem-logo.svg" which resolve
+// correctly only from /mom/docs/<one-level>/ but NOT from deeper paths.
+// We rewrite any relative ../assets/ reference to an absolute /mom/assets/ URL.
 function repairIframeDocImages(docOrRoot){
   try{
     const isDoc = !!(docOrRoot && docOrRoot.nodeType === 9);
     const root = isDoc ? docOrRoot.documentElement : docOrRoot;
     if(!root || !root.querySelectorAll) return;
-    const logoSrc = (typeof document !== 'undefined' && document.querySelector)
-      ? (document.querySelector('.logo-mark img') || {}).src || ''
-      : '';
-    if(!logoSrc) return;
-    root.querySelectorAll('img[src*="hesem-logo"]').forEach(function(img){
-      if(img.src !== logoSrc) img.src = logoSrc;
+
+    // Derive the /mom/ base from the portal page URL (e.g. /mom/portal.html → /mom/)
+    const momBase = window.location.origin +
+      (window.location.pathname.replace(/\/portal\.html.*$/, '') || '/mom') + '/';
+
+    // Fix <img src="...assets/hesem-*"> with a relative path
+    root.querySelectorAll('img[src*="assets/hesem-"]').forEach(function(img){
+      const attr = img.getAttribute('src') || '';
+      if(attr.startsWith('data:') || attr.startsWith('http') || attr.startsWith('/')) return;
+      const filename = attr.split('/').pop();
+      img.src = momBase + 'assets/' + filename;
+    });
+
+    // Fix <link href="...assets/style*.css"> with a relative path
+    root.querySelectorAll('link[rel="stylesheet"][href*="assets/"]').forEach(function(link){
+      const attr = link.getAttribute('href') || '';
+      if(attr.startsWith('data:') || attr.startsWith('http') || attr.startsWith('/')) return;
+      const filename = attr.split('/').pop();
+      link.href = momBase + 'assets/' + filename;
     });
   }catch(e){}
 }
