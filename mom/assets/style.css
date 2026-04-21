@@ -250,11 +250,15 @@ h3:has(.proc-num) { margin-top: 28px; margin-bottom: 10px; display: flex; align-
 /* PILLAR CARDS — Strategic pillars / concept tiles (short-to-medium phrases, bilingual) */
 .pillar-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
   gap: 18px;
   margin: 20px 0 24px;
   align-items: stretch;
   counter-reset: pillar;
+}
+/* Landscape / wide viewports — keep the grid from going to 3 cols for 4-card layouts */
+@media (min-width: 1100px) {
+  .pillar-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 }
 .pillar-card {
   counter-increment: pillar;
