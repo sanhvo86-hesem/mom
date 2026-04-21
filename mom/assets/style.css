@@ -236,7 +236,7 @@ h3:has(.proc-num) { margin-top: 28px; margin-bottom: 10px; display: flex; align-
 .preface-block { background: var(--bg2); border: 1px solid var(--ln); border-radius: var(--r); padding: 20px 24px; margin: 20px 0; }
 .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
 
-/* METRIC CARDS — KPI display */
+/* METRIC CARDS — KPI display (short numeric / short keyword values only) */
 .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin: 16px 0; }
 .metric-card { text-align: center; padding: 16px 12px; border: 1px solid var(--ln); border-radius: var(--r); background: var(--bg); border-top: 3px solid var(--blue); }
 .metric-card .value { font-size: 26px; font-weight: 800; color: var(--navy); margin: 6px 0; line-height: 1.2; }
@@ -245,6 +245,51 @@ h3:has(.proc-num) { margin-top: 28px; margin-bottom: 10px; display: flex; align-
 .metric-card.green { border-top-color: var(--green); }
 .metric-card.gold { border-top-color: var(--gold); }
 .metric-card.red { border-top-color: var(--red); }
+
+/* PILLAR CARDS — Strategic pillars / concept tiles (short-to-medium phrases, bilingual) */
+.pillar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin: 18px 0; align-items: stretch; }
+.pillar-card {
+  position: relative;
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 20px 20px 20px 24px;
+  background: linear-gradient(180deg, #ffffff 0%, #fafbfd 100%);
+  border: 1px solid var(--ln);
+  border-radius: var(--r-lg);
+  box-shadow: 0 1px 2px rgba(12,45,72,.04);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+  overflow-wrap: anywhere; word-break: normal; hyphens: auto;
+}
+.pillar-card::before {
+  content: ''; position: absolute; top: 14px; bottom: 14px; left: 0; width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(180deg, var(--navy) 0%, var(--blue) 100%);
+}
+.pillar-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(12,45,72,.08);
+  border-color: rgba(21,101,192,.28);
+}
+.pillar-card .pillar-eyebrow {
+  font-size: 10px; font-weight: 800; color: var(--blue);
+  text-transform: uppercase; letter-spacing: .8px; line-height: 1.3;
+}
+.pillar-card .pillar-title {
+  font-size: 16px; font-weight: 700; color: var(--navy);
+  line-height: 1.35; letter-spacing: -.005em;
+}
+.pillar-card .pillar-desc {
+  font-size: 12px; color: var(--ink2); line-height: 1.55; margin-top: auto;
+}
+.pillar-card.green::before { background: linear-gradient(180deg, #145523 0%, var(--green) 100%); }
+.pillar-card.gold::before  { background: linear-gradient(180deg, #8a5a00 0%, var(--gold) 100%); }
+.pillar-card.red::before   { background: linear-gradient(180deg, #8a1d1d 0%, var(--red) 100%); }
+@media (max-width: 720px) {
+  .pillar-grid { grid-template-columns: 1fr; }
+}
+@media print {
+  .pillar-card { box-shadow: none; break-inside: avoid; }
+  .pillar-card:hover { transform: none; box-shadow: none; border-color: var(--ln); }
+}
 
 /* GATE CARDS — Internal step cards (S1–S5) */
 .gate-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin: 16px 0; }
