@@ -1589,7 +1589,7 @@ function renderDocumentHeader(form, allocation, schema){
   var extra = [allocation.record_id || '', form.sop_ref || '', form.online === false ? t('\u004e\u0067\u006f\u1ea1\u0069\u0020\u0074\u0075\u0079\u1ebf\u006e', 'Offline') : t('\u0054\u0072\u1ef1\u0063\u0020\u0074\u0075\u0079\u1ebf\u006e', 'Online')].filter(Boolean).join(' / ');
   return '<div class="form-header ec-doc-header">' +
     '<div class="fh-left">' +
-      '<a class="brand-logo" href="./portal.html"><img alt="HESEM Logo" src="./assets/hesem-logo.svg"></a>' +
+      '<a class="brand-logo" href="./portal.html"><img alt="HESEM Logo" src="' + ((typeof document!=='undefined'&&document.querySelector&&document.querySelector('.logo-mark img')&&document.querySelector('.logo-mark img').src)||'./assets/hesem-logo.svg') + '"></a>' +
     '</div>' +
     '<div class="title">' +
       '<strong class="doc-name">' + esc(title) + '</strong>' +

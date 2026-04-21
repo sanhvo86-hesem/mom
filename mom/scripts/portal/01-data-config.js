@@ -2424,6 +2424,11 @@ function postDocLanguageMessage(frame, payload){
 function setLang(l){
   lang = l;
   try{ localStorage.setItem('hesem_lang', l); }catch(e){}
+  try{
+    if(typeof apiCall==='function' && typeof currentUser!=='undefined' && currentUser && currentUser.username){
+      apiCall('user_set_language',{lang:l},'POST').catch(()=>{});
+    }
+  }catch(e){}
   document.getElementById('btn-lang-vi').className = l==='vi'?'active':'';
   document.getElementById('btn-lang-en').className = l==='en'?'active':'';
   // Google Translate UI is disabled on the portal.

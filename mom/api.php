@@ -15090,6 +15090,7 @@ function sanitize_user_for_client(array $user): array {
     'org_plant_id' => (string)($user['org_plant_id'] ?? ''),
     'org_site_id' => (string)($user['org_site_id'] ?? ''),
     'mfa'      => ['enabled' => (bool)(($user['mfa']['enabled'] ?? false))],
+    'portal_language' => (string)($user['portal_language'] ?? 'vi'),
     'updated_at' => (string)($user['updated_at'] ?? ''),
     'created_at' => (string)($user['created_at'] ?? ''),
   ];
@@ -18002,6 +18003,25 @@ if ($username === '') {
     require_csrf();
     destroy_auth_session();
     api_json(['ok' => true, 'logged_in' => false]);
+  }
+
+  case 'user_set_language': {
+    if ($method !== 'POST') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
+    $me = require_logged_in($store);
+    require_csrf();
+    $data = read_json_body();
+    $newLang = strtolower(trim((string)($data['lang'] ?? '')));
+    if (!in_array($newLang, ['vi', 'en'], true)) api_json(['ok' => false, 'error' => 'invalid_lang'], 400);
+    $uname = strtolower((string)($me['username'] ?? ''));
+    foreach ($store['users'] as &$_u) {
+      if (is_array($_u) && strtolower((string)($_u['username'] ?? '')) === $uname) {
+        $_u['portal_language'] = $newLang;
+        break;
+      }
+    }
+    unset($_u);
+    try { users_save($USERS_FILE, $store); } catch (Throwable $e) {}
+    api_json(['ok' => true]);
   }
 
   // ═══════════════════════════════════════════════════════════

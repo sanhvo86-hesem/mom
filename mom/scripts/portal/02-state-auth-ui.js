@@ -1701,6 +1701,7 @@ function fillLogin(username){
 async function onLoggedIn(res){
   _syncCsrf(res.csrf_token || csrfToken);
   syncCurrentUserRef(res.user || currentUser);
+  if(currentUser && currentUser.portal_language) try{ setLang(currentUser.portal_language); }catch(e){}
 
   if(!currentUser){
     // fallback: check status
@@ -2069,6 +2070,7 @@ async function checkSession(){
         clearPendingAuthTimer();
         _syncCsrf(s.csrf_token || null);
         syncCurrentUserRef(s.user);
+        if(s.user && s.user.portal_language) try{ setLang(s.user.portal_language); }catch(e){}
         setLoginChecking(false, '');
         await loadDataSettings().catch(()=>{});
         const geo = DATA_SETTINGS.collect_gps

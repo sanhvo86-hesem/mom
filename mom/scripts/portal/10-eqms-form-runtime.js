@@ -1495,7 +1495,7 @@ function renderForm(container){
   var ownerHtml = esc(schema.owner || '');
   var approverHtml = esc(schema.approver || '');
   html += '<div class="form-header">' +
-    '<div class="fh-left"><a class="brand-logo" href="portal.html"><img alt="HESEM Logo" src="../../assets/hesem-logo.svg" onerror="this.src=\'assets/hesem-logo.svg\'"/></a></div>' +
+    '<div class="fh-left"><a class="brand-logo" href="portal.html"><img alt="HESEM Logo" src="' + ((typeof document!=='undefined'&&document.querySelector&&document.querySelector('.logo-mark img')&&document.querySelector('.logo-mark img').src)||'../../assets/hesem-logo.svg') + '"/></a></div>' +
     '<div class="title">' +
       '<strong class="doc-name">' + esc(schema.title || schema.form_code) + '</strong>' +
       '<span class="sub-vn">' + esc(schema.description_vi || schema.title_vi || '') + '</span>' +
