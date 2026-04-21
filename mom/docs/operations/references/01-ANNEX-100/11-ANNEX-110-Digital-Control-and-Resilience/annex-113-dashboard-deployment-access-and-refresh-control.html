@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANNEX-113 - Dashboard Deployment Access and Refresh Control | HESEM MOM</title>
+<title>ANNEX-113 - Kiểm soát truy cập, phát hành và làm mới bảng điều khiển triển khai | HESEM MOM</title>
 <link href="../../../../assets/style.css" rel="stylesheet">
 <style>
 /* ═══ ANNEX-113 — Portal deploy dashboard design system ═══ */
@@ -106,8 +106,8 @@
     </div>
   </div>
   <div class="title">
-<strong class="doc-name">Dashboard Deployment Access and Refresh Control</strong>
-<span class="sub-vn">Xuyên suốt G0→G7 — Dashboard Deployment</span>
+<strong class="doc-name">Kiểm soát truy cập, phát hành và làm mới bảng điều khiển triển khai</strong>
+<span class="sub-vn">Xuyên suốt G0→G7 — quản trị bảng điều khiển phục vụ triển khai</span>
 </div>
   <div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">ANNEX-113</span></div>
 <div class="row"><span><b>Phiên bản:</b></span><span>V1</span></div>
@@ -119,9 +119,9 @@
 
 <!-- ═══ HERO ═══ -->
 <div class="d-hero">
-  <span class="kicker">Dashboard Governance</span>
-  <h1>ANNEX-113 - Dashboard Deployment Access and Refresh Control</h1>
-  <p>Áp dụng cho mọi dashboard dùng để điều hành triển khai, quản trị tài liệu, theo dõi readiness, vận hành hypercare, theo dõi KPI, publish bộ số điều hành và làm cửa truy cập tài liệu cho nhiều phòng ban.</p>
+  <span class="kicker">Quản trị bảng điều khiển triển khai</span>
+  <h1>ANNEX-113 - Kiểm soát truy cập, phát hành và làm mới bảng điều khiển triển khai</h1>
+  <p>Áp dụng cho mọi bảng điều khiển dùng để điều hành triển khai, quản trị tài liệu, theo dõi mức sẵn sàng, hỗ trợ tăng cường sau go-live, theo dõi KPI, công bố bộ số điều hành và làm cửa truy cập tài liệu cho nhiều phòng ban.</p>
   <div class="actions">
     <a href="annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a>
     <a href="../../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a>
@@ -129,7 +129,7 @@
   </div>
 </div>
 
-<div class="d-alert d-alert-warn"><b>Nguyên tắc:</b> Mọi dashboard dùng để ra quyết định điều hành phải chỉ rõ: owner, source-of-record, last refresh, phạm vi người xem, trạng thái ngoại lệ và đường dẫn tới tài liệu hành động. Thiếu một mục → không dùng làm nguồn quyết định chính.</div>
+<div class="d-alert d-alert-warn"><b>Nguyên tắc:</b> Mọi bảng điều khiển dùng để ra quyết định điều hành phải chỉ rõ: người chịu trách nhiệm, nguồn hồ sơ chuẩn, thời điểm làm mới gần nhất, phạm vi người xem, trạng thái ngoại lệ và đường dẫn tới tài liệu hành động. Thiếu một mục thì không được dùng làm nguồn quyết định chính.</div>
 
 <!-- ═══ 1. NGUYÊN TẮC GOVERNANCE ═══ -->
 <div class="d-sec">
@@ -144,19 +144,19 @@
       </ul>
     </div>
     <div class="d-card">
-      <h3>1.2 Managed self-service</h3>
+      <h3>1.2 Tự phục vụ có kiểm soát</h3>
       <ul>
-        <li>Người dùng được tự xem và tự phục vụ ở phạm vi đã công bố</li>
-        <li>Logic KPI, refresh, source mapping và publish do owner kiểm soát</li>
-        <li>Không để dashboard thành nơi ai cũng sửa trực tiếp production</li>
+        <li>Người dùng được tự xem và tự khai thác trong phạm vi đã công bố</li>
+        <li>Logic KPI, nhịp làm mới, ánh xạ nguồn và việc phát hành do người chịu trách nhiệm kiểm soát</li>
+        <li>Không để bảng điều khiển trở thành nơi ai cũng sửa trực tiếp dữ liệu vận hành chính thức</li>
       </ul>
     </div>
     <div class="d-card">
-      <h3>1.3 Dashboard phải có hành động</h3>
+      <h3>1.3 Bảng điều khiển phải dẫn tới hành động</h3>
       <ul>
-        <li>Mỗi khối số phải dẫn tới tài liệu, checklist hoặc owner tương ứng</li>
-        <li>Phục vụ manager, Champion và người dùng cuối theo ngữ cảnh riêng</li>
-        <li>Không giữ dashboard chỉ như một màn hình “đẹp để xem”</li>
+        <li>Mỗi khối số phải dẫn tới tài liệu, bảng kiểm hoặc đầu mối phụ trách tương ứng</li>
+        <li>Phải phục vụ đúng nhu cầu của quản lý, đầu mối triển khai và người dùng cuối theo từng ngữ cảnh</li>
+        <li>Không giữ bảng điều khiển chỉ như một màn hình đẹp để xem</li>
       </ul>
     </div>
   </div>
@@ -171,12 +171,12 @@
         <tr><th style="width:17%">Module</th><th style="width:20%">Người dùng chính</th><th style="width:35%">Phải hiển thị</th><th style="width:28%">Hành động phải có</th></tr>
       </thead>
       <tbody>
-        <tr><td><b>Executive view</b></td><td>Ban Giám đốc</td><td>Pha hiện tại, wave, KPI đỏ, issue nghiêm trọng, quyết định cần chốt</td><td>Mở gate pack, runbook, ma trận chuyển cấp</td></tr>
-        <tr><td><b>Dept navigator</b></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA[QMR]</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quản lý tài chính)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quản lý nhân sự)"><span class="entity-code role-code">HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)"><span class="entity-code role-code">EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td><td>Phòng ban, điểm vào tài liệu, SOP/WI chính, readiness</td><td>Mở handbook, playlist, quick cards, portal</td></tr>
-        <tr><td><b>Readiness heatmap</b></td><td>Steering, Command Center</td><td>Doc review, training, M365, Champion, pilot, go-live theo phòng ban</td><td>Cập nhật trạng thái, lọc wave, xem phòng bị chặn</td></tr>
-        <tr><td><b>Go/No-Go gate</b></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tổng Giám đốc)"><span class="entity-code role-code">CEO</span></a></span></td><td>Checklist pha hiện tại, blocker, owner, hạn, rollback trigger</td><td>Xem runbook, phê duyệt, chặn qua gate</td></tr>
-        <tr><td><b>Hypercare board</b></td><td>Command Center, Champion</td><td>Issue aging, severity, owner, ETA, giải pháp chữa cháy, status</td><td>Escalate, assign owner, review closure</td></tr>
-        <tr><td><b>Document hub</b></td><td>Tất cả phòng ban</td><td>Nhóm tài liệu theo vai trò và pha triển khai</td><td>Mở WI-105, WI-106, ANNEX-113, handbook, quick card</td></tr>
+        <tr><td><b>Màn hình điều hành cấp lãnh đạo</b></td><td>Ban Giám đốc</td><td>Pha hiện tại, đợt triển khai, KPI đỏ, sự cố nghiêm trọng, quyết định cần chốt</td><td>Mở bộ hồ sơ cổng quyết định, sổ tay go-live và ma trận chuyển cấp</td></tr>
+        <tr><td><b>Điều hướng theo phòng ban</b></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA[QMR]</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quản lý tài chính)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quản lý nhân sự)"><span class="entity-code role-code">HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)"><span class="entity-code role-code">EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td><td>Phòng ban, điểm vào tài liệu, SOP/WI chính, mức sẵn sàng</td><td>Mở sổ tay, lộ trình đọc, thẻ hướng dẫn nhanh và cổng truy cập</td></tr>
+        <tr><td><b>Bản đồ nhiệt mức sẵn sàng</b></td><td>Ban chỉ đạo, trung tâm điều hành</td><td>Rà soát tài liệu, đào tạo, M365, đầu mối triển khai, thí điểm, go-live theo phòng ban</td><td>Cập nhật trạng thái, lọc theo đợt triển khai, xem phòng ban bị chặn</td></tr>
+        <tr><td><b>Cổng quyết định Go/No-Go</b></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tổng Giám đốc)"><span class="entity-code role-code">CEO</span></a></span></td><td>Bảng kiểm pha hiện tại, điểm chặn, người phụ trách, hạn xử lý và mốc kích hoạt hoàn nguyên</td><td>Xem sổ tay go-live, phê duyệt quyết định và chặn qua cổng</td></tr>
+        <tr><td><b>Bảng theo dõi hỗ trợ tăng cường sau go-live</b></td><td>Trung tâm điều hành, đầu mối triển khai</td><td>Tuổi tồn sự cố, mức độ nghiêm trọng, người phụ trách, ETA, giải pháp tạm thời và trạng thái hiện hành</td><td>Chuyển cấp, giao việc cho người phụ trách và rà soát điều kiện đóng</td></tr>
+        <tr><td><b>Trung tâm tài liệu</b></td><td>Tất cả phòng ban</td><td>Nhóm tài liệu theo vai trò và pha triển khai</td><td>Mở WI-105, WI-106, ANNEX-113, sổ tay phòng ban và thẻ hướng dẫn nhanh</td></tr>
       </tbody>
     </table>
   </div>
@@ -190,42 +190,42 @@
       <h3>3.1 Metadata bắt buộc</h3>
       <ul>
         <li>Tên dashboard và mục đích sử dụng</li>
-        <li>owner nghiệp vụ và owner dữ liệu</li>
-        <li>Last refresh timestamp và trạng thái refresh</li>
-        <li>Source-of-record hoặc data source chính</li>
-        <li>Phiên bản hoặc class phát hành gần nhất</li>
+        <li>Người chịu trách nhiệm nghiệp vụ và người chịu trách nhiệm dữ liệu</li>
+        <li>Thời điểm làm mới gần nhất và trạng thái làm mới</li>
+        <li>Nguồn hồ sơ chuẩn hoặc nguồn dữ liệu chính</li>
+        <li>Phiên bản hoặc loại phát hành gần nhất</li>
       </ul>
     </div>
     <div class="d-card">
       <h3>3.2 Trạng thái vận hành bắt buộc</h3>
       <ul>
-        <li>Badge Current, Exception, Offline fallback hoặc Outdated</li>
-        <li>Thông điệp ngoại lệ nếu số đang dùng giải pháp chữa cháy</li>
-        <li>Contact hoặc owner khi người dùng cần hỗ trợ</li>
+        <li>Nhãn Hiện hành, Ngoại lệ, Đang dùng phương án dự phòng hoặc Lỗi thời</li>
+        <li>Thông điệp ngoại lệ nếu bộ số đang dùng giải pháp tạm thời</li>
+        <li>Đầu mối hỗ trợ hoặc người chịu trách nhiệm khi người dùng cần trợ giúp</li>
         <li>Link đến tài liệu hành động tương ứng</li>
       </ul>
     </div>
   </div>
-  <div class="d-alert d-alert-warn"><b>Rule:</b> Nếu không hiển thị last refresh và owner, người dùng không được dùng dashboard đó để chốt quyết định điều hành.</div>
+  <div class="d-alert d-alert-warn"><b>Quy tắc:</b> Nếu không hiển thị thời điểm làm mới gần nhất và người chịu trách nhiệm, người dùng không được dùng bảng điều khiển đó để chốt quyết định điều hành.</div>
 </div>
 
 <!-- ═══ 4. QUYỀN TRUY CẬP ═══ -->
 <div class="d-sec">
-  <div class="d-sec-head"><h2>4 — Quyền truy cập và publish</h2></div>
+  <div class="d-sec-head"><h2>4 — Quyền truy cập và phát hành</h2></div>
   <div class="d-table-wrap">
     <table class="d-table">
       <thead>
         <tr><th style="width:14%">Quyền</th><th style="width:30%">Dùng cho</th><th style="width:30%">Không bao gồm</th><th style="width:26%">Phê duyệt tối thiểu</th></tr>
       </thead>
       <tbody>
-        <tr><td><b>View</b></td><td>Xem dashboard, filter, mở tài liệu</td><td>Không sửa logic KPI hoặc publish</td><td>Role-based — <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a></td></tr>
-        <tr><td><b>Contributor</b></td><td>Tạo nháp, thử layout, chuẩn bị nội dung DEV/UAT</td><td>Không tự publish vào production</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhân viên dịch vụ khách hàng)"><span class="entity-code role-code">CS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhân viên báo giá)"><span class="entity-code role-code">EST</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA[QMR]</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quản lý tài chính)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quản lý nhân sự)"><span class="entity-code role-code">HR</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)"><span class="entity-code role-code">EHS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td></tr>
-        <tr><td><b>Publisher</b></td><td>Đưa bản được duyệt lên production</td><td>Không đổi source/quyền production khi chưa approval</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhân viên dịch vụ khách hàng)"><span class="entity-code role-code">CS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhân viên báo giá)"><span class="entity-code role-code">EST</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA[QMR]</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quản lý tài chính)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quản lý nhân sự)"><span class="entity-code role-code">HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)"><span class="entity-code role-code">EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quản trị viên hệ thống Epicor)"><span class="entity-code role-code">ESA</span></a></span></td></tr>
-        <tr><td><b>Admin</b></td><td>Quản trị access, refresh, environment, credential</td><td>Không thay owner nghiệp vụ được chỉ định hoặc đổi logic KPI</td><td>IT authority — <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></td></tr>
+        <tr><td><b>Xem</b></td><td>Xem bảng điều khiển, lọc dữ liệu, mở tài liệu</td><td>Không sửa logic KPI hoặc tự phát hành</td><td>Phân quyền theo vai trò — <a href="../10-ANNEX-100-Foundation-Maps-and-Control/annex-101-role-based-access-map.html">ANNEX-101</a></td></tr>
+        <tr><td><b>Soạn nháp</b></td><td>Tạo bản nháp, thử bố cục, chuẩn bị nội dung DEV/UAT</td><td>Không tự phát hành vào môi trường vận hành chính thức</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhân viên dịch vụ khách hàng)"><span class="entity-code role-code">CS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhân viên báo giá)"><span class="entity-code role-code">EST</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA[QMR]</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quản lý tài chính)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quản lý nhân sự)"><span class="entity-code role-code">HR</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)"><span class="entity-code role-code">EHS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td></tr>
+        <tr><td><b>Phát hành</b></td><td>Đưa bản đã duyệt lên môi trường vận hành chính thức</td><td>Không đổi nguồn dữ liệu hoặc quyền môi trường vận hành khi chưa có phê duyệt</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhân viên dịch vụ khách hàng)"><span class="entity-code role-code">CS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhân viên báo giá)"><span class="entity-code role-code">EST</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA[QMR]</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quản lý tài chính)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quản lý nhân sự)"><span class="entity-code role-code">HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)"><span class="entity-code role-code">EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quản trị viên hệ thống Epicor)"><span class="entity-code role-code">ESA</span></a></span></td></tr>
+        <tr><td><b>Quản trị</b></td><td>Quản trị quyền truy cập, nhịp làm mới, môi trường và thông tin xác thực</td><td>Không thay người chịu trách nhiệm nghiệp vụ đã được chỉ định hoặc tự đổi logic KPI</td><td>Thẩm quyền CNTT — <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></td></tr>
       </tbody>
     </table>
   </div>
-  <div class="d-alert d-alert-danger"><b>Cấm:</b> Cấp quyền publish/admin chỉ vì “để tiện” trong giai đoạn triển khai. Quyền tạm thời phải có ngày hết hạn và người thu hồi rõ.</div>
+  <div class="d-alert d-alert-danger"><b>Cấm:</b> Cấp quyền phát hành hoặc quản trị chỉ vì “để tiện” trong giai đoạn triển khai. Quyền tạm thời phải có ngày hết hạn và người thu hồi rõ.</div>
 </div>
 
 <!-- ═══ 5. REFRESH, FREEZE ═══ -->
@@ -243,12 +243,12 @@
       </tbody>
     </table>
   </div>
-  <div class="d-alert d-alert-ok"><b>Exception note tối thiểu:</b> phạm vi bị ảnh hưởng · nguồn thay thế · owner khắc phục · ETA khôi phục · thời điểm review lại.</div>
+  <div class="d-alert d-alert-ok"><b>Ghi chú ngoại lệ tối thiểu:</b> phạm vi bị ảnh hưởng · nguồn thay thế · người phụ trách khắc phục · ETA khôi phục · thời điểm rà soát lại.</div>
 </div>
 
 <!-- ═══ 6. QUẢN TRỊ THAY ĐỔI ═══ -->
 <div class="d-sec">
-  <div class="d-sec-head"><h2>6 — Quản trị thay đổi dashboard</h2><span>DEV → UAT → PROD</span></div>
+  <div class="d-sec-head"><h2>6 — Quản trị thay đổi bảng điều khiển</h2><span>DEV → UAT → PROD</span></div>
   <div class="g3">
     <div class="d-card">
       <h3>Class A — Giao diện</h3>
@@ -275,7 +275,7 @@
       </ul>
     </div>
   </div>
-  <div class="d-alert d-alert-warn"><b>Quy tắc phát hành:</b> Không sửa thẳng production trong giờ họp điều hành trừ khi đang xử lý sự cố được phê duyệt.</div>
+  <div class="d-alert d-alert-warn"><b>Quy tắc phát hành:</b> Không sửa thẳng môi trường vận hành chính thức trong giờ họp điều hành, trừ khi đang xử lý sự cố đã được phê duyệt.</div>
 </div>
 
 <!-- ═══ 7. KPI ═══ -->
