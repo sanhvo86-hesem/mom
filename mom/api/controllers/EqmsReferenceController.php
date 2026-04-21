@@ -269,7 +269,7 @@ final class EqmsReferenceController extends EqmsBaseController
             'search' => ['username', 'employee_id', 'email', 'full_name', 'full_name_vi', 'dept_code'],
             'order' => 'full_name',
             'where' => "status = 'active'",
-            'meta' => "jsonb_build_object('employee_id', employee_id, 'dept_code', dept_code, 'email', email)",
+            'meta' => "jsonb_build_object('employee_id', employee_id, 'dept_code', dept_code)",
         ],
         'company_users' => [
             'alias' => 'users',
@@ -952,6 +952,21 @@ final class EqmsReferenceController extends EqmsBaseController
         ],
     ];
 
+    private const DIRECTORY_REFERENCE_KEYS = [
+        'users',
+        'company_users',
+        'operators',
+        'employees',
+        'roles',
+    ];
+
+    private const RESTRICTED_DIRECTORY_REFERENCE_KEYS = [
+        'employees',
+        'roles',
+    ];
+
+    private const DIRECTORY_MIN_SEARCH_LENGTH = 2;
+
     public function options(): never
     {
         $user = $this->requireAuth();
@@ -979,12 +994,14 @@ final class EqmsReferenceController extends EqmsBaseController
         $references = [];
         foreach ($keys as $key) {
             $canonical = $this->canonicalKey($key);
+            $this->authorizeReferenceKey($user, $canonical, $search);
+            $effectiveLimit = $this->effectiveLimitForReferenceKey($user, $canonical, $limit);
             try {
                 $references[$key] = [
                     'key' => $canonical,
                     'ok' => true,
                     'source' => 'postgres',
-                    'options' => $this->loadOptions($canonical, $search, $limit),
+                    'options' => $this->loadOptions($canonical, $search, $effectiveLimit),
                 ];
             } catch (Throwable $e) {
                 $references[$key] = [
@@ -1106,6 +1123,71 @@ final class EqmsReferenceController extends EqmsBaseController
     private function isEmployeeReferenceKey(string $key): bool
     {
         return preg_match('/(^|_)(employee|trainee)($|_)/', $key) === 1;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function identityDirectoryRoles(): array
+    {
+        return array_values(array_unique(array_merge(admin_roles(), [
+            'it_admin',
+            'quality_manager',
+            'qa_manager',
+            'qms_manager',
+            'document_control',
+            'document_controller',
+            'compliance_manager',
+            'engineering_manager',
+            'production_manager',
+            'regulatory_affairs',
+        ])));
+    }
+
+    private function isDirectoryReferenceKey(string $key): bool
+    {
+        return in_array($key, self::DIRECTORY_REFERENCE_KEYS, true);
+    }
+
+    private function canAccessRestrictedDirectoryReference(array $user): bool
+    {
+        return $this->userHasAnyRole($user, $this->identityDirectoryRoles());
+    }
+
+    private function directorySearchLength(string $search): int
+    {
+        return function_exists('mb_strlen') ? mb_strlen($search) : strlen($search);
+    }
+
+    /**
+     * @param array<string, mixed> $user
+     */
+    private function authorizeReferenceKey(array $user, string $key, string $search): void
+    {
+        if (in_array($key, self::RESTRICTED_DIRECTORY_REFERENCE_KEYS, true) && !$this->canAccessRestrictedDirectoryReference($user)) {
+            $this->error('forbidden', 403, 'Reference source requires directory-read clearance.', [
+                'reference_key' => $key,
+            ]);
+        }
+
+        if ($this->isDirectoryReferenceKey($key) && $this->directorySearchLength($search) < self::DIRECTORY_MIN_SEARCH_LENGTH && !$this->canAccessRestrictedDirectoryReference($user)) {
+            $this->error('search_required', 400, 'Directory reference lookup requires at least 2 characters.', [
+                'reference_key' => $key,
+                'min_search_length' => self::DIRECTORY_MIN_SEARCH_LENGTH,
+            ]);
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $user
+     */
+    private function effectiveLimitForReferenceKey(array $user, string $key, int $limit): int
+    {
+        if ($this->isDirectoryReferenceKey($key) && !$this->canAccessRestrictedDirectoryReference($user)) {
+            return min($limit, 25);
+        }
+
+        return $limit;
     }
 
     /**

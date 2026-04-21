@@ -95,6 +95,21 @@ class GenericCrudController extends BaseController
         'audit_trail',
     ];
 
+    private const DEFAULT_AUTHENTICATED_READ_DENY_DOMAINS = [
+        'core_system',
+        'training_hr',
+        'hcm_workforce',
+        'quality_management',
+        'document_control',
+        'evidence_vault',
+        'sales',
+        'production',
+        'mes_execution',
+        'finance',
+        'finance_extended',
+        'finance_treasury',
+    ];
+
     private ?GenericCrudService $service = null;
     private ?IdempotencyService $idempotencyService = null;
     private ?array $runtimeAccessPolicy = null;
@@ -982,23 +997,80 @@ class GenericCrudController extends BaseController
      * @param array<string, mixed> $ctx
      * @return array<string, mixed>
      */
-    private function runtimePolicyScope(array $ctx): array
+    private function runtimePolicyMatch(array $ctx): array
     {
         $policy = $this->runtimeAccessPolicy();
         $table = strtolower(trim((string)($ctx['table'] ?? '')));
         $domain = strtolower(trim((string)($ctx['domain'] ?? '')));
 
-        foreach ([
-            is_array($policy['tables'][$table] ?? null) ? $policy['tables'][$table] : null,
-            is_array($policy['domains'][$domain] ?? null) ? $policy['domains'][$domain] : null,
-            is_array($policy['defaults'] ?? null) ? $policy['defaults'] : null,
-        ] as $scope) {
+        $matches = [
+            'table' => is_array($policy['tables'][$table] ?? null) ? $policy['tables'][$table] : null,
+            'domain' => is_array($policy['domains'][$domain] ?? null) ? $policy['domains'][$domain] : null,
+            'defaults' => is_array($policy['defaults'] ?? null) ? $policy['defaults'] : null,
+        ];
+
+        foreach ($matches as $source => $scope) {
             if (is_array($scope)) {
-                return $scope;
+                return [
+                    'source' => $source,
+                    'scope' => $scope,
+                ];
             }
         }
 
-        return [];
+        return [
+            'source' => 'none',
+            'scope' => [],
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $ctx
+     * @return array<string, mixed>
+     */
+    private function runtimePolicyScope(array $ctx): array
+    {
+        return (array)($this->runtimePolicyMatch($ctx)['scope'] ?? []);
+    }
+
+    /**
+     * @param array<int, string>|null $policyRoles
+     */
+    private function isAuthenticatedOnlyPolicy(?array $policyRoles): bool
+    {
+        return is_array($policyRoles)
+            && count($policyRoles) === 1
+            && strtolower(trim((string)$policyRoles[0])) === 'authenticated';
+    }
+
+    /**
+     * @param array<string, mixed> $ctx
+     * @param array<int, string>|null $policyRoles
+     */
+    private function shouldDenyDefaultAuthenticatedRead(array $ctx, ?array $policyRoles): bool
+    {
+        $kind = strtolower(trim((string)($ctx['kind'] ?? '')));
+        if (!in_array($kind, ['list', 'detail'], true) || !$this->isAuthenticatedOnlyPolicy($policyRoles)) {
+            return false;
+        }
+
+        $policySource = strtolower(trim((string)($this->runtimePolicyMatch($ctx)['source'] ?? 'none')));
+        if (in_array($policySource, ['table', 'none'], true)) {
+            return false;
+        }
+
+        $domain = strtolower(trim((string)($ctx['domain'] ?? '')));
+        if (in_array($domain, self::DEFAULT_AUTHENTICATED_READ_DENY_DOMAINS, true)) {
+            return true;
+        }
+
+        $tableMeta = is_array($ctx['tableMeta'] ?? null) ? (array)$ctx['tableMeta'] : [];
+        if ($this->tableScopeFields($tableMeta) === []) {
+            return true;
+        }
+
+        return trim((string)($tableMeta['statusColumn'] ?? '')) !== ''
+            || trim((string)($tableMeta['workflowId'] ?? '')) !== '';
     }
 
     /**
@@ -1121,6 +1193,14 @@ class GenericCrudController extends BaseController
 
         if ($policyRoles !== null) {
             if (in_array('authenticated', $policyRoles, true)) {
+                if ($this->shouldDenyDefaultAuthenticatedRead($ctx, $policyRoles)) {
+                    $this->error('forbidden', 403, 'Default authenticated generic read is disabled for sensitive runtime data. Add an explicit runtime policy or permission-matrix grant.', [
+                        'policy' => 'default_authenticated_read_denied',
+                        'permission_keys' => $permissions,
+                        'domain' => (string)($ctx['domain'] ?? ''),
+                        'table' => (string)($ctx['table'] ?? ''),
+                    ]);
+                }
                 $this->enforceDomainCommandBoundary($ctx, $user);
                 return;
             }

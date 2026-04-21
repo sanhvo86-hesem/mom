@@ -12,6 +12,11 @@ use ReflectionMethod;
 
 final class GenericCrudControllerRuntimeSafetyTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        $GLOBALS['RUNTIME_DATA_LAYER_OVERRIDE_FILE'] = (string) constant('QMS_TEST_DATA_DIR') . '/config/runtime_data_layer_override.test.json';
+    }
+
     protected function tearDown(): void
     {
         putenv('HESEM_ALLOW_GOVERNED_GENERIC_MUTATION');
@@ -59,6 +64,59 @@ final class GenericCrudControllerRuntimeSafetyTest extends TestCase
             'tableMeta' => [
                 'columns' => [],
                 'statusColumn' => 'so_status',
+            ],
+        ]);
+
+        $this->addToAssertionCount(1);
+    }
+
+    public function testDefaultAuthenticatedFallbackReadIsDeniedForSensitiveDomainWhenPermissionMatrixIsMissing(): void
+    {
+        $controller = $this->controller();
+
+        try {
+            $this->enforceRuntimePermission($controller, [
+                'username' => 'fallback-user',
+                'role' => 'unmapped_reader',
+                'roles' => ['unmapped_reader'],
+            ], [
+                'kind' => 'list',
+                'domain' => 'hcm_workforce',
+                'table' => 'hcm_payroll_runs',
+                'tableMeta' => [
+                    'columns' => [
+                        'run_id' => [],
+                        'org_site_id' => [],
+                        'status' => [],
+                    ],
+                    'statusColumn' => 'status',
+                ],
+            ]);
+            $this->fail('Sensitive default-authenticated runtime read was not denied.');
+        } catch (ExitException $e) {
+            $this->assertSame(403, $e->getStatusCode());
+            $this->assertSame('forbidden', $e->getPayload()['error'] ?? null);
+            $this->assertSame('default_authenticated_read_denied', $e->getPayload()['policy'] ?? null);
+        }
+    }
+
+    public function testDefaultAuthenticatedFallbackReadCanRemainAllowedForNonSensitiveScopedRead(): void
+    {
+        $controller = $this->controller();
+
+        $this->enforceRuntimePermission($controller, [
+            'username' => 'fallback-user',
+            'role' => 'document_control',
+            'roles' => ['document_control'],
+        ], [
+            'kind' => 'list',
+            'domain' => 'sandbox_demo',
+            'table' => 'portal_announcements',
+            'tableMeta' => [
+                'columns' => [
+                    'announcement_id' => [],
+                    'org_site_id' => [],
+                ],
             ],
         ]);
 
