@@ -44,7 +44,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </div>
 
 
- <div class="note"><strong>ÁP DỤNG CHO</strong><br>Mọi file lưu lên SharePoint: form đã điền, evidence sản xuất, engineering baseline, hồ sơ đào tạo, audit, calibration và tài sản. Naming convention thống nhất đảm bảo traceability theo AS9100 §8.5.2 và record control theo ISO 9001 §7.5.3. Tài liệu này là SSOT cho quy tắc đặt tên file trong toàn bộ hệ thống HESEM <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
+ <div class="note"><strong>ÁP DỤNG CHO</strong><br>Mọi file lưu lên SharePoint: form đã điền, evidence sản xuất, engineering baseline, hồ sơ đào tạo, audit, calibration và tài sản. Naming convention thống nhất đảm bảo truy xuất nguồn gốc theo AS9100 §8.5.2 và record control theo ISO 9001 §7.5.3. Tài liệu này là SSOT cho quy tắc đặt tên file trong toàn bộ hệ thống HESEM <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
  <h1>ANNEX-137 - Evidence and Records Naming Convention</h1>
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -54,10 +54,10 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <h2>1. Phạm vi và mục đích</h2>
  <p>ANNEX-137 quy định naming convention thống nhất cho <strong>MỌI file</strong> lưu lên SharePoint trong hệ thống HESEM <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a>. Quy tắc đặt tên đảm bảo:</p>
  <ul>
- <li><strong>Traceability</strong> theo AS9100 §8.5.2 — mỗi file có thể truy vết ngược về job, scope, người tạo, thời điểm tạo.</li>
+ <li><strong>Truy xuất nguồn gốc</strong> theo AS9100 §8.5.2 — mỗi file có thể truy vết ngược về job, phạm vi, người tạo, thời điểm tạo.</li>
  <li><strong>Record control</strong> theo ISO 9001 §7.5.3 — nhận dạng, lưu trữ, bảo vệ, truy xuất, thời hạn giữ và hủy.</li>
  <li><strong>Sort &amp; search</strong> — tên file sort theo thời gian tự nhiên, search bằng keyword trong SharePoint trả kết quả chính xác.</li>
- <li><strong>Audit readiness</strong> — đạt 60-second traceability test (xem Section 10).</li>
+ <li><strong>Audit readiness</strong> — đạt 60-second truy xuất nguồn gốc test (xem Section 10).</li>
  </ul>
  <p><strong>Phạm vi áp dụng:</strong> Toàn bộ nhân viên HESEM, nhà thầu phụ, và bất kỳ ai upload file lên hệ thống SharePoint của HESEM. Áp dụng cho tất cả các loại file: form đã điền, evidence sản xuất, engineering baseline, hồ sơ đào tạo, audit evidence, calibration certificate, supplier records, và asset records.</p>
  </div>
@@ -98,7 +98,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
 
  <!-- PATTERN 1 -->
  <h3>3.1 Pattern 1 — Form đã điền (Filled Form Record)</h3>
- <div class="pattern-box">FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}</div>
+ <div class="pattern-box">FRM-{code}_V{ver}_{phạm vi}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}</div>
  <div class="table-card">
  <table class="table">
  <thead>
@@ -112,7 +112,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <tbody>
  <tr><td><code>FRM-{code}</code></td><td>Luôn</td><td>Mã form theo registry</td><td>FRM-631</td></tr>
  <tr><td><code>V{ver}</code></td><td>Luôn</td><td>Version form blank đã dùng</td><td>V2.1</td></tr>
- <tr><td><code>{scope}</code></td><td>Luôn</td><td>Phạm vi (xem bảng Scope Code — Section 5)</td><td>JOB-2026-0042</td></tr>
+ <tr><td><code>{scope}</code></td><td>Luôn</td><td>Phạm vi (xem bảng Phạm vi Code — Section 5)</td><td>JOB-2026-0042</td></tr>
  <tr><td><code>{YYYYMMDD}</code></td><td>Luôn</td><td>Ngày điền/hoàn thành</td><td>20260327</td></tr>
  <tr><td><code>{HHMM}-{UserID}</code></td><td>Luôn</td><td>Giờ phút + mã người điền</td><td>0830-NVA</td></tr>
  <tr><td><code>.{ext}</code></td><td>Luôn</td><td>.xlsx hoặc .pdf (online auto)</td><td>.xlsx</td></tr>
@@ -177,7 +177,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
 
  <!-- PATTERN 4 -->
  <h3>3.4 Pattern 4 — Evidence không gắn Job (Non-job Evidence)</h3>
- <div class="pattern-box">{RecordType}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}</div>
+ <div class="pattern-box">{RecordType}_{phạm vi}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}</div>
  <div class="table-card">
  <table class="table">
  <thead>
@@ -234,8 +234,8 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </tr>
  </thead>
  <tbody>
- <tr><td><strong>BLANK</strong></td><td><code>FRM-{code}_{Title}_V{ver}.xlsx</code></td><td>Có Title, KHÔNG có scope/HHMM</td></tr>
- <tr><td><strong>FILLED</strong></td><td><code>FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.xlsx</code></td><td>Có scope + time, KHÔNG có Title</td></tr>
+ <tr><td><strong>BLANK</strong></td><td><code>FRM-{code}_{Title}_V{ver}.xlsx</code></td><td>Có Title, KHÔNG có phạm vi/HHMM</td></tr>
+ <tr><td><strong>FILLED</strong></td><td><code>FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.xlsx</code></td><td>Có phạm vi + time, KHÔNG có Title</td></tr>
  </tbody>
  </table>
  </div>
@@ -272,7 +272,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <div class="section">
  <h2>4. RecordType Code Dictionary</h2>
 
- <h3>4.1 Job Dossier Evidence</h3>
+ <h3>4.1 Hồ sơ công việc Evidence</h3>
  <div class="table-card">
  <table class="table">
  <thead>
@@ -287,7 +287,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <tr><td><code>CR</code></td><td>Contract Review</td><td>Kết quả xem xét hợp đồng</td></tr>
  <tr><td><code>MTR</code></td><td>Material Test Report</td><td>Mill cert, heat cert, CoA</td></tr>
  <tr><td><code>IQC</code></td><td>Incoming <a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a> Result</td><td>Kết quả kiểm tra đầu vào</td></tr>
- <tr><td><code>TRV</code></td><td>Traveler / Router</td><td>Scan phiếu theo dõi sản xuất</td></tr>
+ <tr><td><code>TRV</code></td><td>Phiếu công nghệ / Router</td><td>Scan phiếu theo dõi sản xuất</td></tr>
  <tr><td><code>CMM</code></td><td>CMM / Measurement Data</td><td>Dữ liệu đo CMM, caliper, mic</td></tr>
  <tr><td><code>FAI-BALLOON</code></td><td>Ballooned Drawing</td><td>Bản vẽ đánh số balloon</td></tr>
  <tr><td><code>COC</code></td><td>Certificate of Conformance</td><td>Chứng nhận phù hợp</td></tr>
@@ -295,12 +295,12 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <tr><td><code>SHIP-LABEL</code></td><td>Shipping Label / SSCC</td><td>Nhãn vận chuyển</td></tr>
  <tr><td><code>POD</code></td><td>Proof of Delivery</td><td>Bằng chứng giao hàng</td></tr>
  <tr><td><code>CONCESSION</code></td><td>Deviation / Waiver</td><td>Phê duyệt nhượng bộ</td></tr>
- <tr><td><code>REWORK</code></td><td>Rework Evidence</td><td>Bằng chứng làm lại + tái kiểm</td></tr>
+ <tr><td><code>REWORK</code></td><td>Gia công lại Evidence</td><td>Bằng chứng làm lại + tái kiểm</td></tr>
  <tr><td><code>CUST-APPR</code></td><td>Customer Approval</td><td>Email/doc khách hàng phê duyệt</td></tr>
- <tr><td><code>PROVEOUT</code></td><td>Prove-out Evidence</td><td>Ghi chú chạy thử đầu tiên</td></tr>
+ <tr><td><code>PROVEOUT</code></td><td>Chạy kiểm chứng Evidence</td><td>Ghi chú chạy thử đầu tiên</td></tr>
  <tr><td><code>OFFSET-LOG</code></td><td>Offset Change Log</td><td>Log thay đổi offset máy</td></tr>
- <tr><td><code>TOOL-WEAR</code></td><td>Tool Wear Record</td><td>Ghi nhận mòn dao</td></tr>
- <tr><td><code>DOWNTIME</code></td><td>Downtime Record</td><td>Ghi nhận dừng máy</td></tr>
+ <tr><td><code>TOOL-WEAR</code></td><td>Mòn dao Record</td><td>Ghi nhận mòn dao</td></tr>
+ <tr><td><code>DOWNTIME</code></td><td>Thời gian dừng máy Record</td><td>Ghi nhận dừng máy</td></tr>
  </tbody>
  </table>
  </div>
@@ -339,11 +339,11 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></td><td><a class="entity-link role-link" href="../../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a> Source File</td></tr>
  <tr><td><code>MODEL</code></td><td>CAD Model (STEP, IGES)</td></tr>
  <tr><td><code>DWG</code></td><td>Drawing (PDF)</td></tr>
- <tr><td><code>SETUP</code></td><td>Setup Sheet + Tool List (FRM-302)</td></tr>
+ <tr><td><code>SETUP</code></td><td>Phiếu setup + Danh mục dao cụ (FRM-302)</td></tr>
  <tr><td><code>INSP</code></td><td>Inspection Program</td></tr>
  <tr><td><code>FIXTURE</code></td><td>Fixture / Jig Drawing</td></tr>
  <tr><td><code>SIM</code></td><td>Simulation Evidence</td></tr>
- <tr><td><code>CTRL-PLAN</code></td><td>Control Plan</td></tr>
+ <tr><td><code>CTRL-PLAN</code></td><td>Kế hoạch kiểm soát</td></tr>
  </tbody>
  </table>
  </div>
@@ -417,7 +417,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <tbody>
  <tr><td><code>SUP-CERT</code></td><td>Supplier process certificate</td></tr>
  <tr><td><code>SUP-AUDIT</code></td><td>Supplier audit report</td></tr>
- <tr><td><code>SCAR</code></td><td>Supplier corrective action report</td></tr>
+ <tr><td><code>SCAR</code></td><td>Supplier hành động khắc phục report</td></tr>
  <tr><td><code>SUP-EVAL</code></td><td>Supplier evaluation</td></tr>
  </tbody>
  </table>
@@ -428,12 +428,12 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
      SECTION 5 — Scope Code Dictionary
      ═══════════════════════════════════════════════════════════════ -->
  <div class="section">
- <h2>5. Scope Code Dictionary</h2>
+ <h2>5. Phạm vi Code Dictionary</h2>
  <div class="table-card">
  <table class="table">
  <thead>
  <tr>
- <th>Scope type</th>
+ <th>Phạm vi type</th>
  <th>Format</th>
  <th>Ví dụ</th>
  </tr>
@@ -550,7 +550,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </tr>
  </thead>
  <tbody>
- <tr><td>Cùng người, cùng phút, cùng RecordType, cùng scope</td><td>Giống</td><td>Giống</td><td><strong>Không xảy ra</strong> — 1 người không tạo 2 file cùng loại cùng phút</td></tr>
+ <tr><td>Cùng người, cùng phút, cùng RecordType, cùng phạm vi</td><td>Giống</td><td>Giống</td><td><strong>Không xảy ra</strong> — 1 người không tạo 2 file cùng loại cùng phút</td></tr>
  <tr><td>Khác người, cùng phút</td><td>Giống</td><td><strong>Khác</strong></td><td>Unique</td></tr>
  <tr><td>Cùng người, khác phút</td><td><strong>Khác</strong></td><td>Giống</td><td>Unique</td></tr>
  </tbody>
@@ -674,7 +674,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </ul>
 
  <h3>8.3 Phân biệt blank vs filled nhìn từ tên file</h3>
- <div class="pattern-box">BLANK: FRM-{code}_{Title}_V{ver}.xlsx           ← Có Title, KHÔNG có scope/HHMM<br>FILLED: FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.xlsx ← Có scope + time, KHÔNG có Title</div>
+ <div class="pattern-box">BLANK: FRM-{code}_{Title}_V{ver}.xlsx           ← Có Title, KHÔNG có phạm vi/HHMM<br>FILLED: FRM-{code}_V{ver}_{phạm vi}_{YYYYMMDD}_{HHMM}-{UserID}.xlsx ← Có phạm vi + time, KHÔNG có Title</div>
  </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -711,7 +711,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
      SECTION 10 — 60-second traceability test
      ═══════════════════════════════════════════════════════════════ -->
  <div class="section">
- <h2>10. 60-second traceability test (AS9100 compliance)</h2>
+ <h2>10. 60-second truy xuất nguồn gốc test (AS9100 compliance)</h2>
 
  <h3>10.1 Kịch bản 1 — FAI report cho job cụ thể</h3>
  <p><strong>Auditor hỏi:</strong> "Show me the FAI report for job 0042, part 714XXXX rev A"</p>
@@ -773,10 +773,10 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <tbody>
  <tr><td><a href="../../../01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a></td><td>Document and Data Control</td><td>Quy trình kiểm soát tài liệu, version control tổng thể</td></tr>
  <tr><td><a href="../../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></td><td>Data Governance, Records Security and IP Protection</td><td>Quản trị dữ liệu, bảo mật hồ sơ, bảo vệ IP</td></tr>
- <tr><td><a href="../../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td><td>Engineering Release, Baseline Package and Job Snapshot Control</td><td>Kiểm soát engineering baseline, version release</td></tr>
+ <tr><td><a href="../../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td><td>Phát hành kỹ thuật, Baseline Package and Job Snapshot Control</td><td>Kiểm soát engineering baseline, version release</td></tr>
  <tr><td><a href="../../../02-Work-Instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a></td><td>Thiết lập SharePoint hồ sơ địa điểm / site, thư viện và quyền truy cập click-by-click</td><td>Thiết lập site hồ sơ, thư viện và quyền truy cập có kiểm soát</td></tr>
  <tr><td><a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a></td><td>M365 SharePoint local sync, Git và server deployment control</td><td>Kiểm soát local sync, Git và boundary triển khai hệ thống</td></tr>
- <tr><td><a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Job Dossier Evidence Pack and Record Completeness</td><td>Gói evidence theo job, kiểm tra đầy đủ hồ sơ</td></tr>
+ <tr><td><a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Hồ sơ công việc Gói bằng chứng and Record Completeness</td><td>Gói evidence theo job, kiểm tra đầy đủ hồ sơ</td></tr>
  <tr><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></td><td>M365 Records Metadata, List Schema and Register Catalog</td><td>Schema metadata, danh mục list trên SharePoint</td></tr>
  <tr><td><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></td><td>M365 Records Site Topology, Library and Folder Blueprint</td><td>Cấu trúc site, thư viện, thư mục trên SharePoint</td></tr>
  <tr><td><a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></td><td>M365 Operational Records File Plan by Department, Role and Job</td><td>File plan chi tiết theo phòng ban, JD và job gate</td></tr>

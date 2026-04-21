@@ -74,7 +74,7 @@
 <h3>Job sự cố hỏng máy (Step / Điểm then chốt / Lý do)</h3>
 <div class="table-card"><table class="table"><thead><tr><th>Step</th><th>Vận hành</th><th>Điểm then chốt</th><th>Lý do</th></tr></thead><tbody><tr><td>1</td><td>Mở đúng Hồ sơ công việc trên SSOT</td><td>Đúng JobNum; đúng cấu trúc thư mục</td><td>Ngăn lẫn job và mất truy vết</td></tr><tr><td>2</td><td>Xác nhận PartNo/REV hợp lệ</td><td>Đối chiếu Part-REV-Bản gốc; ghi REV vào hồ sơ</td><td>Ngăn sản xuất theo bản lỗi thời</td></tr><tr><td>3</td><td>Điền biểu mẫu theo template</td><td>Không tự đổi cột; ghi rõ Người tạo + thời điểm</td><td>Đảm bảo dữ liệu đọc được và dấu vết kiểm toán</td></tr><tr><td>4</td><td>Upload bằng chứng đúng tên</td><td>Tên file đủ JobNum/PartNo/REV/DocType/Date/Seq</td><td>Truy xuất nguồn gốc 60 giây</td></tr><tr><td>5</td><td>Cập nhật trạng thái ERP</td><td>Giao dịch đúng công đoạn; không để trễ cập nhật</td><td>WIP &amp; ưu tiên đúng</td></tr><tr><td>6</td><td>Kích hoạt hold khi có ngoại lệ</td><td>Tag + lý do code + log</td><td>Chặn vượt qua cổng kiểm soát</td></tr></tbody></table></div>
 <h3>OJT đầu ra bắt buộc</h3>
-<ul><li>01 Hồ sơ công việc mẫu chứa tối thiểu 05 bằng chứng: Traveler/Setup/Kiểm tra/Nguyên vật liệu cert (mẫu)/Điều phối note.</li><li>01 log ngoại lệ (TẠM GIỮ) cho tình huống sai REV và 01 hành động đóng trong ngày.</li></ul>
+<ul><li>01 Hồ sơ công việc mẫu chứa tối thiểu 05 bằng chứng: Phiếu công nghệ/Setup/Kiểm tra/Nguyên vật liệu cert (mẫu)/Điều phối note.</li><li>01 log ngoại lệ (TẠM GIỮ) cho tình huống sai REV và 01 hành động đóng trong ngày.</li></ul>
 <h3>Tiêu chí đánh giá L1–L4 (hành vi quan sát được)</h3>
 <div class="table-card"><table class="table rubric"><thead><tr><th>Level</th><th>Hành vi quan sát được</th><th>Điều kiện đạt</th></tr></thead><tbody><tr><td><strong>L1</strong></td><td>Ghi đúng – lưu đúng – truy xuất nguồn gốc đúng</td><td>Không lỗi JobNum/REV; bằng chứng đúng tên; truy xuất nguồn gốc ≤ 60 giây</td></tr><tr><td><strong>L2</strong></td><td>Đối soát dữ liệu và tạo báo cáo đơn giản</td><td>Tạo 01 báo cáo tiến độ/WIP có dấu thời gian; phát hiện ≥ 3 lỗi dữ liệu và sửa đúng quy trình</td></tr><tr><td><strong>L3</strong></td><td>Phân tích &amp; chuẩn hóa báo cáo</td><td>Pareto/xu hướng; chuẩn hóa template; huấn luyện 01 Người dùng đúng</td></tr><tr><td><strong>L4</strong></td><td>Governance dữ liệu liên phòng</td><td>Data từ điển + bảng điều khiển; truy cập/lưu giữ quản trị; xử lý sự cố</td></tr></tbody></table></div>
 <h2>10) Đánh giá</h2>
@@ -84,8 +84,8 @@
 <details>
 <summary>Sai REV giữa Job Theo dõi Sheet và bản vẽ</summary>
 <div class="grid">
-<div class="dl"><h4>Dữ kiện</h4><ul><li>JobNum: J12345 • PartNo: PN7788</li><li>Traveler ghi REV A; Part-REV-Bản gốc đang là REV B</li><li>Đã chuẩn bị dao và gá xong</li></ul></div>
-<div class="dl"><h4>Yêu cầu</h4><p><strong>Ra quyết định GO/TẠM GIỮ/STOP và ghi MRR bắt buộc.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>STOP vận hành; kích hoạt TẠM GIỮ với lý do 'REV không khớp'.</li><li>Chụp bằng chứng: ảnh Part-REV-Bản gốc và traveler.</li><li>Tạo FRM-QMS-022 Thay đổi Thông báo hoặc yêu cầu Kỹ thuật phát hành đúng bản; cập nhật Job Pack trước khi chạy.</li></ul></div>
+<div class="dl"><h4>Dữ kiện</h4><ul><li>JobNum: J12345 • PartNo: PN7788</li><li>Phiếu công nghệ ghi REV A; Part-REV-Bản gốc đang là REV B</li><li>Đã chuẩn bị dao và gá xong</li></ul></div>
+<div class="dl"><h4>Yêu cầu</h4><p><strong>Ra quyết định GO/TẠM GIỮ/STOP và ghi MRR bắt buộc.</strong></p><h4>Đáp án chuẩn vận hành</h4><ul><li>STOP vận hành; kích hoạt TẠM GIỮ với lý do 'REV không khớp'.</li><li>Chụp bằng chứng: ảnh Part-REV-Bản gốc và phiếu công nghệ.</li><li>Tạo FRM-QMS-022 Thay đổi Thông báo hoặc yêu cầu Kỹ thuật phát hành đúng bản; cập nhật Job Pack trước khi chạy.</li></ul></div>
 </div>
 </details>
 <details>

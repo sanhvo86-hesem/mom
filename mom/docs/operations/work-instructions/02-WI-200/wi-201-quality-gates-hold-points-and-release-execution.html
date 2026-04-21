@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WI-201 - Quality Gates Hold Points and Release Execution | HESEM MOM</title>
+<title>WI-201 - Quality Gates Các điểm giữ lại and Release Execution | HESEM MOM</title>
 <link rel="stylesheet" href="../../../assets/style.css">
 <style>
 .page-body h1 { font-size: 24px; line-height: 1.35; margin: 0 0 10px; }
@@ -36,7 +36,7 @@ ul.tight li { margin: 4px 0; }
           </div>
         </div>
         <div class="title">
-<strong class="doc-name">Quality Gates Hold Points and Release Execution</strong>
+<strong class="doc-name">Quality Gates Các điểm giữ lại and Release Execution</strong>
 </div>
         <div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">WI-201</span></div>
 <div class="row"><span><b>Phiên bản:</b></span><span>V1</span></div>
@@ -47,7 +47,7 @@ ul.tight li { margin: 4px 0; }
       
 
       <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng tại mọi checkpoint G0-G7 khi cần ra quyết định PASS, HOLD, release hoặc handoff cho Job CNC. Gate definition, authority matrix, QPL và escalation SLA phải tra tại SOP/ANNEX liên quan; WI này chỉ hướng dẫn thao tác thực thi tại hiện trường.</div>
-      <h1>WI-201 - Quality Gates Hold Points and Release Execution</h1>
+      <h1>WI-201 - Quality Gates Các điểm giữ lại and Release Execution</h1>
 
       <section id="wi-s1" class="wi-section">
         <h2>1. Mục đích</h2>
@@ -66,7 +66,7 @@ ul.tight li { margin: 4px 0; }
             <h3>Áp dụng cho</h3>
             <ul class="tight">
               <li><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a>, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Truong ca)"><span class="entity-code role-code">SL</span></a>, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a>, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (To truong QC)"><span class="entity-code role-code">QCL</span></a>, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> và các vai trò được giao giữ gate theo job.</li>
-              <li>Mọi checkpoint G0-G7 của mô hình CNC job-order, gồm contract release, engineering release, IQC, setup, FAI, IPQC, final inspection và shipment release.</li>
+              <li>Mọi checkpoint G0-G7 của mô hình CNC job-order, gồm contract release, phát hành kỹ thuật, IQC, setup, FAI, IPQC, kiểm tra cuối và shipment release.</li>
               <li>Cả trường hợp online bình thường lẫn chế độ offline phải dùng fallback kit.</li>
             </ul>
           </div>
@@ -93,8 +93,8 @@ ul.tight li { margin: 4px 0; }
             </thead>
             <tbody>
               <tr>
-                <td>Job dossier hiện hành</td>
-                <td>Traveler, released set, current gate status, evidence pack link và record phát sinh của Job.</td>
+                <td>Hồ sơ công việc hiện hành</td>
+                <td>Phiếu công nghệ, released set, current gate status, gói bằng chứng link và record phát sinh của Job.</td>
                 <td>Phải là bộ đang hiệu lực trong SSOT và khớp với SoR.</td>
               </tr>
               <tr>
@@ -130,15 +130,15 @@ ul.tight li { margin: 4px 0; }
             <tbody>
               <tr>
                 <td>Trigger</td>
-                <td>Chỉ mở WI khi Job đang tới một checkpoint thật, có quyết định PASS/HOLD/RELEASE cần được ghi nhận hoặc cần bàn giao sang checkpoint kế tiếp.</td>
+                <td>Chỉ mở WI khi Job đang tới một checkpoint thật, có quyết định PASS/Giữ lại / phát hành cần được ghi nhận hoặc cần bàn giao sang checkpoint kế tiếp.</td>
               </tr>
               <tr>
                 <td>Evidence tối thiểu</td>
-                <td>Người giữ gate phải mở được evidence của checkpoint hiện tại trong SSOT hoặc fallback kit và đối chiếu được với part, lot, traveler hay shipment thực tế.</td>
+                <td>Người giữ gate phải mở được evidence của checkpoint hiện tại trong SSOT hoặc fallback kit và đối chiếu được với part, lot, phiếu công nghệ hay shipment thực tế.</td>
               </tr>
               <tr>
                 <td>Stop condition</td>
-                <td>Dừng ngay nếu có lệch Part/Rev, lệch lot/heat, thiếu cert, thiếu release record, thiếu traceability hoặc thiếu người ký đúng thẩm quyền.</td>
+                <td>Dừng ngay nếu có lệch Part/Rev, lệch lot/heat, thiếu cert, thiếu release record, thiếu truy xuất nguồn gốc hoặc thiếu người ký đúng thẩm quyền.</td>
               </tr>
               <tr>
                 <td>Release authority</td>
@@ -161,13 +161,13 @@ ul.tight li { margin: 4px 0; }
 
         <div class="step-block">
           <h3>Bước 2: Mở bộ hồ sơ gate hiện hành</h3>
-          <p>Mở đúng job dossier, traveler và record của checkpoint hiện tại trong SSOT hoặc fallback kit được kiểm soát.</p>
+          <p>Mở đúng hồ sơ công việc, phiếu công nghệ và record của checkpoint hiện tại trong SSOT hoặc fallback kit được kiểm soát.</p>
           <div class="note-soft">Lý do: người giữ gate phải nhìn cùng một nguồn hồ sơ trước khi kết luận PASS hay HOLD.</div>
         </div>
 
         <div class="step-block">
           <h3>Bước 3: Đối chiếu trạng thái Job</h3>
-          <p>Đối chiếu Job, Part/Rev, lot hoặc heat, số lượng và trạng thái vật lý của part hay shipment với SoR, traveler và record đang mở.</p>
+          <p>Đối chiếu Job, Part/Rev, lot hoặc heat, số lượng và trạng thái vật lý của part hay shipment với SoR, phiếu công nghệ và record đang mở.</p>
           <div class="note-soft">Lý do: nếu trạng thái thực tế lệch trạng thái trên hồ sơ thì mọi quyết định release sau đó đều mất giá trị.</div>
         </div>
 
@@ -226,19 +226,19 @@ ul.tight li { margin: 4px 0; }
               <tr>
                 <td><a href="../../../mom/docs/forms/frm-200-purchase/FRM-203_Job_Tracking_Sheet.xlsx" download>FRM-203</a></td>
                 <td>Trạng thái Job, checkpoint hiện tại, điểm chờ và handoff chính.</td>
-                <td>Job dossier hoặc thư mục điều độ có kiểm soát.</td>
+                <td>Hồ sơ công việc hoặc thư mục điều độ có kiểm soát.</td>
                 <td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a> / <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a></td>
               </tr>
               <tr>
                 <td><a href="../../../mom/docs/forms/frm-200-purchase/FRM-205_Job_Dossier_Evidence_Index.xlsx" download>FRM-205</a></td>
-                <td>Chỉ mục evidence pack theo checkpoint và link hồ sơ bắt buộc.</td>
+                <td>Chỉ mục gói bằng chứng theo checkpoint và link hồ sơ bắt buộc.</td>
                 <td>SSOT của Job.</td>
                 <td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Ky su he thong QMS)"><span class="entity-code role-code">QMS</span></a> / <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></td>
               </tr>
               <tr>
                 <td><a href="../../../mom/docs/forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx" download>FRM-413</a></td>
                 <td>Điểm HOLD, phạm vi ảnh hưởng, người giữ, hướng xử lý và điều kiện gỡ HOLD.</td>
-                <td>Hold log có kiểm soát và link về Job dossier.</td>
+                <td>Hold log có kiểm soát và link về Hồ sơ công việc.</td>
                 <td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></td>
               </tr>
               <tr>
@@ -286,12 +286,12 @@ ul.tight li { margin: 4px 0; }
               </tr>
               <tr>
                 <td>WI-203</td>
-                <td>Job dossier, evidence pack và record completeness</td>
+                <td>Hồ sơ công việc, gói bằng chứng và record completeness</td>
                 <td><a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">Mở WI-203</a></td>
               </tr>
               <tr>
                 <td>WI-302</td>
-                <td>First piece, FAI execution và evidence pack</td>
+                <td>Mẫu đầu tiên, FAI execution và gói bằng chứng</td>
                 <td><a href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">Mở WI-302</a></td>
               </tr>
               <tr>
@@ -301,12 +301,12 @@ ul.tight li { margin: 4px 0; }
               </tr>
               <tr>
                 <td>WI-701</td>
-                <td>Receiving, IQC, traceability và put-away</td>
+                <td>Receiving, IQC, truy xuất nguồn gốc và put-away</td>
                 <td><a href="../07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html">Mở WI-701</a></td>
               </tr>
               <tr>
                 <td>WI-605</td>
-                <td>Final inspection, CoC và shipment release handoff</td>
+                <td>Kiểm tra cuối, CoC và shipment release handoff</td>
                 <td><a href="../06-WI-600/wi-605-final-inspection-coc-and-shipment-release-handoff.html">Mở WI-605</a></td>
               </tr>
             </tbody>

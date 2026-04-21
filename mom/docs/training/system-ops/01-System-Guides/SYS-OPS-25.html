@@ -246,7 +246,7 @@
 <tr><td><b>Kỹ thuật → Sản xuất</b></td><td>bộ định tuyến / lộ trình/phiếu cài đặt + program Released</td><td>Link "nguồn sự thật" program từ thư viện Hạn chế + dấu phát hành (note)</td></tr>
 <tr><td><b>Nhận hàng → Sản xuất</b></td><td>CoC/chứng chỉ vật liệu</td><td>Nguyên vật liệu pack: CoC + truy xuất nguồn gốc link đúng WO/Lot</td></tr>
 <tr><td><b>Sản xuất → QC/QA</b></td><td>IPQC các log + setup bằng chứng</td><td>IPQC hồ sơ + ảnh/bảng kiểm, lưu đúng khu vực, khóa khi kết thúc / đóng hồ sơ</td></tr>
-<tr><td><b><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> → External (đánh giá/khách hàng)</b></td><td>Scope đánh giá + danh mục bằng chứng</td><td>Bộ bằng chứng chỉ đọc có hết hạn + log quyền truy cập (FRM-QMS-15/17)</td></tr>
+<tr><td><b><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> → External (đánh giá/khách hàng)</b></td><td>Phạm vi đánh giá + danh mục bằng chứng</td><td>Bộ bằng chứng chỉ đọc có hết hạn + log quyền truy cập (FRM-QMS-15/17)</td></tr>
 </tbody>
 </table>
 </div>
@@ -454,7 +454,7 @@
 </tr>
 <tr>
 <td><b>L4</b></td>
-<td>Thiết kế/chuẩn hóa cấu trúc dữ liệu; xử lý sự cố rò rỉ; điều phối truy cập rà soát; cung cấp gói minh chứng đánh giá theo scope.</td>
+<td>Thiết kế/chuẩn hóa cấu trúc dữ liệu; xử lý sự cố rò rỉ; điều phối truy cập rà soát; cung cấp gói minh chứng đánh giá theo phạm vi.</td>
 <td>Chủ trì 01 rà soát quyền truy cập hàng quý + 01 sự cố diễn tập + đánh giá pass không phát hiện trọng yếu.</td>
 <td>Được làm Data Người quản lý/<a class="entity-link bundle-link bundle-chip" data-bundle="OPS_SCOPE_OWNERS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-ops-scope-owners" title="Operational Scope Owners (Nhom dau moi so huu pham vi van hanh) — CS / EST / PPL / PD / ENGM / QA[QMR] / QMS / SCM / FIN / HR / EHS / ITA / WKM / SL / QCL / LOG"><span class="entity-code bundle-code">OPS_SCOPE_OWNERS</span></a>; được yêu cầu IT thay đổi cấu hình mốc chuẩn (có phê duyệt).</td>
 </tr>
@@ -501,7 +501,7 @@
 <h3 class="h3" style="margin-top:0">10.2 Tình huống (3 tình huống thật) — yêu cầu quyết định TẠM GIỮ/GO và ghi MRR</h3>
 <details>
 <summary>Tình huống 1 — Sai Rev (Kỹ thuật → Sản xuất)</summary>
-<p><b>Dữ kiện:</b> Operator đang chuẩn bị chạy WO-31245, Part PN-8821. Trong Hồ sơ công việc có 2 file drawing: <code>WO31245_PN8821_RevA_DRAW_20260112.pdf</code> và <code>WO31245_PN8821_RevB_DRAW_20260201.pdf</code>. Setup sheet đang tham chiếu RevA. <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span> báo Released program theo RevB.</p>
+<p><b>Dữ kiện:</b> Operator đang chuẩn bị chạy WO-31245, Part PN-8821. Trong Hồ sơ công việc có 2 file drawing: <code>WO31245_PN8821_RevA_DRAW_20260112.pdf</code> và <code>WO31245_PN8821_RevB_DRAW_20260201.pdf</code>. Phiếu setup đang tham chiếu RevA. <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span> báo Released program theo RevB.</p>
 <p><b>Yêu cầu:</b> Ra quyết định <b>STOP/TẠM GIỮ/GO</b>. Ghi tối thiểu 3 MRR phải tạo ngay.</p>
 <ul class="iso-list">
 <li>Quyết định bắt buộc: <b>STOP</b> cho tới khi phiếu cài đặt và drawing thống nhất Rev.</li>
@@ -631,7 +631,7 @@
 <tr><td>6</td><td>Dữ liệu nhạy cảm (program/định giá) được chia sẻ hoặc lưu sai mức.</td><td>Vi phạm phân loại dữ liệu.</td><td>PHẢI chặn chia sẻ Hạn chế; thư viện Hạn chế giới hạn download; kiểm tra định kỳ.</td></tr>
 <tr><td>7</td><td>Thiếu CoC/chứng chỉ/truy xuất nguồn gốc liên kết WO/Lot.</td><td>Không chứng minh nguồn gốc vật liệu.</td><td>Cổng chặn Nhận hàng → Sản xuất: không phát vật tư khi thiếu cert đúng nơi.</td></tr>
 <tr><td>8</td><td>Không chứng minh rà soát quyền truy cập hàng quý (không có gói minh chứng).</td><td>đánh giá không đạt quản trị.</td><td>FRM-QMS-17 bắt buộc hàng quý; lưu trong QMS-Hồ sơ/IT_Evidence.</td></tr>
-<tr><td>9</td><td>Chia sẻ bên ngoài ngoài gói minh chứng (chia sẻ cả thư mục/hồ sơ công việc).</td><td>Phạm vi lộ dữ liệu vượt scope.</td><td>Fail-nhanh CHẶN; đào tạo lại bắt buộc; log sự cố.</td></tr>
+<tr><td>9</td><td>Chia sẻ bên ngoài ngoài gói minh chứng (chia sẻ cả thư mục/hồ sơ công việc).</td><td>Phạm vi lộ dữ liệu vượt phạm vi.</td><td>Fail-nhanh CHẶN; đào tạo lại bắt buộc; log sự cố.</td></tr>
 <tr><td>10</td><td>Không đóng băng WIP thành hồ sơ khi kết thúc / đóng hồ sơ.</td><td>Hồ sơ thay đổi sau giao hàng.</td><td>kết thúc / đóng hồ sơ khóa bắt buộc; <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> ký; <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> kiểm tra.</td></tr>
 </tbody>
 </table>

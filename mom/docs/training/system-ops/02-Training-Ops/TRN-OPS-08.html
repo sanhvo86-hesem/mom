@@ -88,10 +88,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <tr><td><b>PO / Drawing</b></td><td>Khách gửi bản vẽ mới nhưng PO ghi cũ</td><td>Review hợp đồng <a download="" href="../../../mom/docs/forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM‑QA‑001</a> + đóng băng</td></tr>
  <tr><td><b><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a> source</b></td><td>File CAM/NC lấy từ Personal Folder</td><td>Bộ hồ sơ chuẩn (SSOT) + bảng kê tổng kiểm tra</td></tr>
  <tr><td><b>Đăng / Ghi sổ / Machine</b></td><td>Chạy nhầm ghi sổ / đăng, nhầm machine cấu hình</td><td>Phát hành chương trình (program phát hành) control (PROC‑CNC‑002)</td></tr>
- <tr><td><b>Setup sheet</b></td><td>Setup sheet không cập nhật rev</td><td>Setup sheet phát hành &amp; rà soát đồng cấp</td></tr>
+ <tr><td><b>Phiếu setup</b></td><td>Phiếu setup không cập nhật rev</td><td>Phiếu setup phát hành &amp; rà soát đồng cấp</td></tr>
  <tr><td><b>On-machine program</b></td><td>Operator dùng program cũ lưu trên máy</td><td>Chỉ chạy program từ vị trí kiểm soát; xác minh ID/Rev</td></tr>
  <tr><td><b>CMM program</b></td><td>Chương trình đo không khớp drawing rev</td><td>Phát hành chương trình kiểm tra (phát hành chương trình) <a download="" href="../../../mom/docs/forms/frm-300-technical/FRM-305_Inspection_Program_Release_Checklist.xlsx">FRM‑QA‑016</a></td></tr>
- <tr><td><b>As-đã xây dựng hồ sơ</b></td><td>Bộ hồ sơ giao hàng (ship gói hồ sơ) thiếu chứng chỉ outsource đúng scope</td><td>cấu hình đánh giá <a download="" href="../../../mom/docs/forms/frm-100-sales/FRM-163_Configuration_Audit_Checklist.xlsx">FRM‑QA‑017</a> + cổng kiểm soát G6</td></tr>
+ <tr><td><b>As-đã xây dựng hồ sơ</b></td><td>Bộ hồ sơ giao hàng (ship gói hồ sơ) thiếu chứng chỉ outsource đúng phạm vi</td><td>cấu hình đánh giá <a download="" href="../../../mom/docs/forms/frm-100-sales/FRM-163_Configuration_Audit_Checklist.xlsx">FRM‑QA‑017</a> + cổng kiểm soát G6</td></tr>
  </tbody>
  </table>
  </div>
@@ -135,12 +135,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <ol class="list">
  <li>Part/Rev trên PO = Part/Rev trên drawing/spec?</li>
  <li>Bộ hồ sơ chuẩn có bảng kê/tổng kiểm tra và đúng Part/Rev?</li>
- <li>Setup sheet hiển thị Program ID/Rev/Tool list/không / bằng không điểm?</li>
+ <li>Phiếu setup hiển thị Program ID/Rev/Danh mục dao cụ/không / bằng không điểm?</li>
  <li>Chương trình trên máy = program phát hành (ID/Rev)?</li>
  <li>kế hoạch kiểm tra (plan) có CTQ phương pháp + gage "xanh lá"?</li>
  <li>Nếu dùng CMM: FRM‑<a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a>‑016 pass và báo cáo đo có Program ID/Rev?</li>
- <li>Nếu outsource: APL/scope/cert truy vết đầy đủ?</li>
- <li>Traveler/nhãn phản ánh đúng Rev &amp; truy vết lot?</li>
+ <li>Nếu outsource: APL/phạm vi/cert truy vết đầy đủ?</li>
+ <li>Phiếu công nghệ/nhãn phản ánh đúng Rev &amp; truy vết lot?</li>
  <li>Hồ sơ công việc (hồ sơ công việc) đặt đúng thư mục &amp; đặt tên?</li>
  <li>Nếu phát hiện không khớp ở bất kỳ điểm nào → STOP/TẠM GIỮ &amp; báo cáo vượt cấp.</li>
  </ol>

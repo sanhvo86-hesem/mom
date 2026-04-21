@@ -220,7 +220,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>Sai Rev nghi ngờ</td>
-<td>So JobNum/Rev trên traveler ↔ JobIndex; mở Part/REV Bản gốc; dừng máy; gắn tag TẠM GIỮ</td>
+<td>So JobNum/Rev trên phiếu công nghệ ↔ JobIndex; mở Part/REV Bản gốc; dừng máy; gắn tag TẠM GIỮ</td>
 <td>Operator/<span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Ky thuat vien setup)"><span class="entity-code role-code">SET</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td>
 <td>QCHoldLog ReasonCode=WrongRev + ảnh file Rev đúng</td>
 </tr>
@@ -300,7 +300,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr><td>1</td><td>Dừng vận hành; gắn tag TẠM GIỮ vào lô/chi tiết</td><td>Chặn sai hỏng lan rộng</td></tr>
 <tr><td>2</td><td>Tạo QCHoldLog: JobNum, ReasonCode, Ngăn chặn, Mức nghiêm trọng</td><td>dấu vết kiểm toán + SLA xử lý</td></tr>
-<tr><td>3</td><td>Đính bằng chứng: ảnh traveler + link file Rev đúng</td><td>Giảm tranh luận, tăng tốc quyết định</td></tr>
+<tr><td>3</td><td>Đính bằng chứng: ảnh phiếu công nghệ + link file Rev đúng</td><td>Giảm tranh luận, tăng tốc quyết định</td></tr>
 <tr><td>4</td><td>Thông báo supervisor; cập nhật StandupAction khi Mức nghiêm trọng CTQ</td><td>Ưu tiên xử lý theo Tier</td></tr>
 </tbody>
 </table>
@@ -465,7 +465,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tbody>
 <tr>
 <td>SC-01: Sai Rev do dữ liệu cũ</td>
-<td>JobIndex Rev=E, traveler ghi Rev=F</td>
+<td>JobIndex Rev=E, phiếu công nghệ ghi Rev=F</td>
 <td>Dừng; QCHoldLog WrongRev; kiểm tra Epicor + Part/REV; cập nhật StandupAction</td>
 <td>Không chạy/không ship sai Rev; nguyên nhân gốc rõ</td>
 <td>QCHoldLog + link file Rev đúng + ảnh Epicor</td>

@@ -48,7 +48,7 @@ ul.tight li { margin: 4px 0; }
         </div>
       
 
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng để tra mô hình vận hành CNC job-order của HESEM, xác định block công việc, family máy, điểm gọi đúng WI/FRM và ranh giới vai trò tại setup, pre-run, first piece, restart, transfer và ship. Đây là annex map/topology, không thay cho authority matrix chi tiết và không thay cho WI thao tác.</div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng để tra mô hình vận hành CNC job-order của HESEM, xác định block công việc, family máy, điểm gọi đúng WI/FRM và ranh giới vai trò tại setup, pre-run, mẫu đầu tiên, restart, transfer và ship. Đây là annex map/topology, không thay cho authority matrix chi tiết và không thay cho WI thao tác.</div>
       <h1>ANNEX-503 - CNC Operating Model and Role Boundary</h1>
 
       <section id="annex-iso-map" class="annex-section">
@@ -117,9 +117,9 @@ ul.tight li { margin: 4px 0; }
         <h2>2. Bản đồ vận hành CNC job-order</h2>
         <div class="flow-row">
           <span class="flow-chip">Bộ hồ sơ phát hành</span>
-          <span class="flow-chip">Setup / Changeover</span>
+          <span class="flow-chip">Setup / Chuyển công đoạn</span>
           <span class="flow-chip">Pre-run gate</span>
-          <span class="flow-chip">First piece / FAI</span>
+          <span class="flow-chip">Mẫu đầu tiên / FAI</span>
           <span class="flow-chip">Run / Transfer / Restart</span>
           <span class="flow-chip">Final / Ship release</span>
         </div>
@@ -136,12 +136,12 @@ ul.tight li { margin: 4px 0; }
             <tbody>
               <tr>
                 <td>Phát hành bộ hồ sơ</td>
-                <td>Khóa đúng Part/Rev, program, setup sheet, route, plan đo và bundle chứng từ.</td>
+                <td>Khóa đúng Part/Rev, program, phiếu setup, route, plan đo và bundle chứng từ.</td>
                 <td><a href="../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a>, <a href="../../01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a>, <a href="../../../mom/docs/forms/frm-500-production/FRM-501_Planning_Release_Checklist.xlsx" download>FRM-501</a></td>
                 <td>Released set sạch để chuyển xuống setup.</td>
               </tr>
               <tr>
-                <td>Setup / Changeover</td>
+                <td>Setup / Chuyển công đoạn</td>
                 <td>Đưa máy vào trạng thái ready-to-run đúng dữ liệu, đúng fixture, đúng tool và đúng WCS.</td>
                 <td><a href="../../02-Work-Instructions/05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a>, <a href="../../../mom/docs/forms/frm-500-production/FRM-514_SMED_Changeover_Record.xlsx" download>FRM-514</a></td>
                 <td>Máy sẵn sàng sang quick-check pre-run.</td>
@@ -153,14 +153,14 @@ ul.tight li { margin: 4px 0; }
                 <td>Quyết định PASS hoặc HOLD trước first cut.</td>
               </tr>
               <tr>
-                <td>First piece / FAI</td>
+                <td>Mẫu đầu tiên / FAI</td>
                 <td>Xác nhận part đầu đủ điều kiện mở lô theo mức rủi ro.</td>
                 <td><a href="../../02-Work-Instructions/03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a>, <a href="../../../mom/docs/forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx" download>FRM-511</a></td>
                 <td>Part đầu được release hoặc giữ lô.</td>
               </tr>
               <tr>
                 <td>Transfer / Restart</td>
-                <td>Giữ nguyên traceability và quyết định lại mức tái xác nhận khi đổi người, đổi máy hoặc restart.</td>
+                <td>Giữ nguyên truy xuất nguồn gốc và quyết định lại mức tái xác nhận khi đổi người, đổi máy hoặc restart.</td>
                 <td><a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a>, <a href="../../02-Work-Instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a>, <a href="../../../mom/docs/forms/frm-500-production/FRM-518_Work_Transfer_Validation_Record.xlsx" download>FRM-518</a></td>
                 <td>Máy nhận việc có điều kiện chạy lại rõ ràng.</td>
               </tr>
@@ -197,7 +197,7 @@ ul.tight li { margin: 4px 0; }
               <tr>
                 <td>5-axis mill</td>
                 <td>Sai góc quay, va chạm đầu trục, sai home hoặc sai clearance khi index.</td>
-                <td>Trục quay, fixture reach, chương trình prove-out và vùng cấm chạm.</td>
+                <td>Trục quay, fixture reach, chương trình chạy kiểm chứng và vùng cấm chạm.</td>
                 <td><a href="../../02-Work-Instructions/05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a>, <a href="../../02-Work-Instructions/03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a></td>
               </tr>
               <tr>
@@ -232,7 +232,7 @@ ul.tight li { margin: 4px 0; }
             </thead>
             <tbody>
               <tr>
-                <td>Chuẩn bị setup và changeover</td>
+                <td>Chuẩn bị setup và chuyển công đoạn</td>
                 <td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Ky thuat vien setup)"><span class="entity-code role-code">SET</span></a> / <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a></td>
                 <td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a>, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html" title="Maintenance Technician (Ky thuat vien bao tri)"><span class="entity-code role-code">MNT</span></a></td>
                 <td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Ky thuat vien setup)"><span class="entity-code role-code">SET</span></a>, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a></td>
@@ -244,7 +244,7 @@ ul.tight li { margin: 4px 0; }
                 <td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html" title="CNC Operator (Nhan vien van hanh CNC)"><span class="entity-code role-code">OPR</span></a>, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Ky thuat vien setup)"><span class="entity-code role-code">SET</span></a>, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Truong ca)"><span class="entity-code role-code">SL</span></a></td>
               </tr>
               <tr>
-                <td>First piece / FAI</td>
+                <td>Mẫu đầu tiên / FAI</td>
                 <td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a> / <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></td>
                 <td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Ky thuat vien setup)"><span class="entity-code role-code">SET</span></a>, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a></td>
                 <td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a>, <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></td>
@@ -290,7 +290,7 @@ ul.tight li { margin: 4px 0; }
                 <td><a href="../../../mom/docs/forms/frm-500-production/FRM-519_Job_Packet_Quick_Check_and_Pre_Run_Verification.xlsx" download>FRM-519</a></td>
               </tr>
               <tr>
-                <td>Mở lô sau setup, sau thay đổi lớn hoặc khi khách yêu cầu first piece/FAI</td>
+                <td>Mở lô sau setup, sau thay đổi lớn hoặc khi khách yêu cầu mẫu đầu tiên/FAI</td>
                 <td><a href="../../02-Work-Instructions/03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a></td>
                 <td><a href="../../../mom/docs/forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx" download>FRM-511</a></td>
               </tr>

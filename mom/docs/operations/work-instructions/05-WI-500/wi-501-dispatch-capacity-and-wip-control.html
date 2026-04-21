@@ -88,9 +88,9 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>3. Bảng kiểm phát hành điều phối xuất hàng cho từng trung tâm gia công</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Điểm kiểm</th><th>đạt khi</th><th>FAIL thì làm gì</th></tr></thead><tbody>
-<tr><td>Job/Rev/Op đúng SoR</td><td>Không có mismatch giữa traveler, dispatch, snapshot và phát hành kỹ thuật</td><td>HOLD job; trả về <a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a> / <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a> để sửa packet</td></tr>
+<tr><td>Job/Rev/Op đúng SoR</td><td>Không có mismatch giữa phiếu công nghệ, dispatch, snapshot và phát hành kỹ thuật</td><td>HOLD job; trả về <a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a> / <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a> để sửa packet</td></tr>
 <tr><td>Material ready</td><td>Đủ qty, đúng lot/heat/condition, reservation hoặc staging đã xác nhận</td><td>Gắn HR01-MAT; không xếp vào vị trí chạy</td></tr>
-<tr><td>Setup / tool / fixture ready</td><td>Có setup sheet, tool list, prove-out plan, fixture/jaw đúng</td><td>Gắn HR03-TOL; dời lịch hoặc chuyển sang cell khác nếu hợp lệ</td></tr>
+<tr><td>Setup / tool / fixture ready</td><td>Có phiếu setup, danh mục dao cụ, chạy kiểm chứng plan, fixture/jaw đúng</td><td>Gắn HR03-TOL; dời lịch hoặc chuyển sang cell khác nếu hợp lệ</td></tr>
 <tr><td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> / cổng kiểm soát ready</td><td>QPL, CTQ plan, mẫu đầu / FAI / leak / clean cổng kiểm soát đã rõ Người nhận</td><td>Gắn HR04-QA; không phát hành chạy mù</td></tr>
 <tr><td>Machine / capacity ready</td><td>Machine không down/hard hold; queued hours sau khi thêm job vẫn trong cap</td><td>Dừng phát hành thêm; review resequence hoặc rebalance</td></tr>
 <tr><td>Outsource / downstream coupling ready</td><td>Job không đẩy nghẽn sang công đoạn sau hoặc outsource chưa có slot</td><td>Giữ lại hoặc phát hành có điều kiện kèm quyết định rõ</td></tr>
@@ -110,7 +110,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 <div class="section"><h2>4A. Quy tắc xếp thứ tự mặc định theo họ công đoạn</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Họ công đoạn</th><th>Ưu tiên xếp thứ tự khi cùng class</th><th>Không được quên</th></tr></thead><tbody>
 <tr><td>5-trục / phay-lượt / quay</td><td>Ưu tiên job có mức sẵn sàng đầy đủ, fixture sẵn, chứng minh-out ngắn hơn, và không làm đứt chuỗi QA/mẫu đầu của ca</td><td>Không xếp xen job mới vào giữa hai chứng minh-out đang mở nếu làm tăng rủi ro sự cố nghiêm trọng hoặc trễ nút thắt / điểm nghẽn.</td></tr>
-<tr><td>3-trục / tiện</td><td>Ưu tiên theo due + setup nhóm sản phẩm Cần nhau để giảm chuyển đổi (changeover), nhưng không được bỏ qua job P1 đã ready đầy đủ</td><td>Không gom tối ưu setup đến mức để job Cần due bị trễ.</td></tr>
+<tr><td>3-trục / tiện</td><td>Ưu tiên theo due + setup nhóm sản phẩm Cần nhau để giảm chuyển đổi (chuyển công đoạn), nhưng không được bỏ qua job P1 đã ready đầy đủ</td><td>Không gom tối ưu setup đến mức để job Cần due bị trễ.</td></tr>
 <tr><td>Hoàn thiện / mài bavia / clean</td><td>Ưu tiên theo rủi ro của bề mặt và công đoạn sau cổng kiểm soát; part đã Cần ship hoặc chờ <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> phải được hút trước</td><td>Không đẩy part chân không/clean chờ lẫn với part thường làm tăng xử lý / vận chuyển rủi ro.</td></tr>
 <tr><td>Kiểm tra cuối / phê duyệt giao hàng (phê duyệt giao hàng)</td><td>Ưu tiên theo ship cửa sổ / khung thời gian, cổng kiểm soát đã đủ hồ sơ và mức độ ảnh hưởng khách hàng</td><td>Không nhận thêm lot khi gói hồ sơ còn thiếu; phải trả về người chịu trách nhiệm công đoạn trước để đóng hồ sơ.</td></tr>
 </tbody></table></div>
@@ -176,7 +176,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>12. Hồ sơ điều độ tối thiểu của một ca</h2>
 <ul class="tight">
-<li>Dispatch list đã phát hành cho từng nhóm máy (machine family) hoặc cell.</li>
+<li>Danh sách điều phối đã phát hành cho từng nhóm máy (machine family) hoặc cell.</li>
 <li>Snapshot tuổi tồn WIP (tuổi tồn / tuổi tồn) có Người phụ trách và action cho mọi item đỏ/đen.</li>
 <li>nhật ký hành động của họp đầu ca/giữa ca nếu có hot-job, machine down, shortage hoặc cổng kiểm soát bất thường.</li>
 <li>Decision note cho mọi lần phá cửa sổ khóa kế hoạch (freeze window / cửa sổ khóa kế hoạch), resequence, split lot, outsource khẩn hoặc giao hàng một phần.</li>

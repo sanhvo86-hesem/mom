@@ -50,7 +50,7 @@
 </div>
 <ul class="tight">
 <li>QMS vẫn là hệ thống kiểm soát tuân thủ, chất lượng, hồ sơ và thẩm quyền phê duyệt.</li>
-<li>MOM/MES là nguồn sự thật thực thi: trạng thái job, operation, WIP, máy, inspection, hold/release và bằng chứng cổng kiểm soát.</li>
+<li>MOM/MES là nguồn sự thật thực thi: trạng thái job, operation, WIP, máy, inspection, giữ lại / phát hành và bằng chứng cổng kiểm soát.</li>
 <li>Bảng điều hành, phân tích và AI chỉ là read model hoặc khuyến nghị; không tự dispatch, release, approve hoặc đóng hồ sơ.</li>
 <li>Một KPI chỉ được dùng chính thức khi có mã chuẩn, owner, công thức, nguồn dữ liệu, cadence review và bằng chứng.</li>
 </ul>
@@ -81,7 +81,7 @@
 </div>
 <div class="card">
 <h3>Layer 5 - QMS/MES gate evidence</h3>
-<p>Mỗi sự kiện có rủi ro chất lượng hoặc giao hàng phải gắn bằng chứng đúng cổng: setup, first-piece/FAI, IPQC, NCR/CAPA, final release, ship packet.</p>
+<p>Mỗi sự kiện có rủi ro chất lượng hoặc giao hàng phải gắn bằng chứng đúng cổng: setup, mẫu đầu tiên/FAI, IPQC, NCR/CAPA, final release, ship packet.</p>
 <p><span class="tag">Cadence: theo sự kiện</span><span class="tag">Owner: QA/QC/OPS</span><span class="tag">Evidence: gate record</span></p>
 </div>
 <div class="card">
@@ -106,8 +106,8 @@
 <tr><td><span class="code">FPY</span></td><td>9%</td><td>active_runtime</td><td>≥98%; yellow 95-97.99%; red &lt;95%</td><td>QA/OPS; first-pass inspection population</td><td>Inspection bypass or customer escape blocks recognition.</td></tr>
 <tr><td><span class="code">OEE_BOTTLENECK</span></td><td>8%</td><td>candidate_data_contract</td><td>≥80%; yellow 70-79.99%; red &lt;70%</td><td>OPS/Maintenance; MES OEE + active constraint</td><td>Not payout-scored until constraint binding and reason-code contract are approved.</td></tr>
 <tr><td><span class="code">WIP_AGING</span></td><td>6%</td><td>candidate_data_contract</td><td>≤5% aged WIP; red &gt;10%</td><td>Planning/OPS; WIP movement + hold owner</td><td>Age reset without physical-progress evidence blocks score.</td></tr>
-<tr><td><span class="code">SETUP_FIRST_PASS</span></td><td>6%</td><td>candidate_data_contract</td><td>≥95%; yellow 90-94.99%; red &lt;90%</td><td>OPS/Engineering/QA; setup gate record</td><td>Hidden prove-out loop or missing setup record blocks score.</td></tr>
-<tr><td><span class="code">FAI_FIRST_PASS</span></td><td>7%</td><td>candidate_data_contract</td><td>≥98%; yellow 95-97.99%; red &lt;95%</td><td>QA/Engineering/OPS; FAI/first-piece gate</td><td>Release bypass, wrong revision or wrong gage blocks score.</td></tr>
+<tr><td><span class="code">SETUP_FIRST_PASS</span></td><td>6%</td><td>candidate_data_contract</td><td>≥95%; yellow 90-94.99%; red &lt;90%</td><td>OPS/Engineering/QA; setup gate record</td><td>Hidden chạy kiểm chứng loop or missing setup record blocks score.</td></tr>
+<tr><td><span class="code">FAI_FIRST_PASS</span></td><td>7%</td><td>candidate_data_contract</td><td>≥98%; yellow 95-97.99%; red &lt;95%</td><td>QA/Engineering/OPS; FAI/mẫu đầu tiên gate</td><td>Release bypass, wrong revision or wrong gage blocks score.</td></tr>
 <tr><td><span class="code">REPEAT_NCR_RATE</span></td><td>6%</td><td>candidate_data_contract</td><td>≤5%; red &gt;10%</td><td>QA; NCR recurrence evidence</td><td>NCR suppression or repeat major escape blocks score.</td></tr>
 <tr><td><span class="code">CAPA_EFFECTIVENESS</span></td><td>7%</td><td>candidate_data_contract</td><td>≥90%; yellow 80-89.99%; red &lt;80%</td><td>QA; 30/60/90-day CAPA verification</td><td>Closure without effectiveness evidence cannot score.</td></tr>
 <tr><td><span class="code">SUPPLIER_READINESS</span></td><td>5%</td><td>candidate_data_contract</td><td>≥90 composite; red &lt;80</td><td>Supply Chain/QA; OTD, incoming quality, SCAR, ASL</td><td>Critical shortage, supplier escape or overdue SCAR blocks score.</td></tr>

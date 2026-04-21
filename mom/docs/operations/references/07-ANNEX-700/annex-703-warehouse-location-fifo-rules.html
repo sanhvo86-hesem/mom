@@ -76,12 +76,12 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <p>ANNEX này là chuẩn vận hành bắt buộc để quản lý vị trí kho, zoning, nhãn vị trí, staging, put-away, relocation, FIFO/FEFO, shelf-life, cycle count và điều chỉnh tồn. Warehouse, IQC, Production, Planning và <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> PHẢI dùng cùng một logic location, cùng một quy tắc nhận diện trạng thái và cùng một nguồn dữ liệu. Epicor là Nguồn chuẩn cho giao dịch tồn. M365 là SSOT cho bằng chứng điều chỉnh, biên bản đếm và hồ sơ điều tra.</p>
 <div class="callout-danger">
 <span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Duy trì vị trí hợp lệ cho mọi vật tư, tách rõ từng lot, heat và expiry trong mỗi bao trong, chỉ lấy hàng từ zone HOLD, QH, RET hoặc CLEAN-BREACH sau khi đã có release và thực hiện mọi điều chỉnh tồn bằng giao dịch hoặc hồ sơ kiểm soát chính thức.</div>
-<div class="callout-info"><strong>Ranh gioi:</strong> ANNEX nay khoa zoning, location, FIFO/FEFO, overflow va cycle-count rule. Thao tac nhan hang, put-away, bao quan va phan ung tai diem dung van theo WI-701 va WI-702; khong bien ANNEX nay thanh huong dan thao tac tung buoc cho shopfloor.</div>
+<div class="callout-info"><strong>Ranh gioi:</strong> ANNEX nay khoa zoning, location, FIFO/FEFO, overflow va cycle-count rule. Thao tac nhan hang, put-away, bao quan va phan ung tai diem dung van theo WI-701 va WI-702; khong bien ANNEX nay thanh huong dan thao tac tung buoc cho hiện trường.</div>
 <div class="matrix">
 <div class="card">
 <strong>Nguyên tắc 1</strong><br>Một location chỉ có giá trị khi có mã vị trí hợp lệ, nhãn quét được và giao dịch đã ghi nhận trong hệ thống.</div>
 <div class="card">
-<strong>Nguyên tắc 2</strong><br>Một bao trong chỉ được đại diện cho một Part–Rev–Lot/Heat–Trạng thái, trừ khi ANNEX này quy định khác và traceability vẫn không đứt.</div>
+<strong>Nguyên tắc 2</strong><br>Một bao trong chỉ được đại diện cho một Part–Rev–Lot/Heat–Trạng thái, trừ khi ANNEX này quy định khác và truy xuất nguồn gốc vẫn không đứt.</div>
 <div class="card">
 <strong>Nguyên tắc 3</strong><br>FIFO là mặc định cho hàng không hạn dùng. FEFO là bắt buộc cho hàng có shelf-life, hóa chất, vật tư bảo quản, kit sạch và bất kỳ vật tư nào khách hàng quy định hạn dùng.</div>
 <div class="card">
@@ -137,7 +137,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <td>Kit đã cấp cho Job, bán thành phẩm có WIP card</td>
 <td>Không chứa raw stock chưa cấp Job</td>
 <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td>
-<td>Trace theo Job / Traveler / WIP card</td>
+<td>Trace theo Job / Phiếu công nghệ / WIP card</td>
 </tr>
 <tr>
 <td>FG</td>
@@ -260,7 +260,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tr>
 <tr>
 <td>Put-away vào vị trí đang có hàng</td>
-<td>Chỉ được thực hiện khi cùng Part/Rev, cùng trạng thái và traceability vẫn tách được. Nếu khác lot/heat hoặc khác expiry thì PHẢI tách bằng bin/inner bag/card riêng hoặc chuyển location khác.</td>
+<td>Chỉ được thực hiện khi cùng Part/Rev, cùng trạng thái và truy xuất nguồn gốc vẫn tách được. Nếu khác lot/heat hoặc khác expiry thì PHẢI tách bằng bin/inner bag/card riêng hoặc chuyển location khác.</td>
 </tr>
 <tr>
 <td>Relocation nội bộ</td>
@@ -276,7 +276,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tr>
 <tr>
 <td>Vật tư trả về từ Production</td>
-<td>Phải vào RET hoặc zone được chỉ định; không nhập thẳng lại RM nếu chưa review quantity, label, condition, nhiễm bẩn risk và traceability.</td>
+<td>Phải vào RET hoặc zone được chỉ định; không nhập thẳng lại RM nếu chưa review quantity, label, condition, nhiễm bẩn risk và truy xuất nguồn gốc.</td>
 </tr>
 <tr>
 <td>Mixed box / partial box</td>
@@ -321,7 +321,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </tr>
 <tr>
 <td>Customer supplied material</td>
-<td>Theo rule của khách + traceability gốc</td>
+<td>Theo rule của khách + truy xuất nguồn gốc gốc</td>
 <td>Nếu khách yêu cầu sử dụng theo lot/heat cụ thể thì PHẢI tách riêng, không trộn hoặc hoán đổi.</td>
 </tr>
 </tbody>
@@ -341,7 +341,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr>
 <td>90–180 ngày</td>
 <td>Vàng nhạt</td>
-<td>Planning review cho job có thời gian dẫn (lead time) dài; không mua mới nếu tồn hiện tại đủ dùng.</td>
+<td>Planning review cho job có thời gian dẫn (thời gian giao) dài; không mua mới nếu tồn hiện tại đủ dùng.</td>
 </tr>
 <tr>
 <td>30–89 ngày</td>
@@ -357,12 +357,12 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr>
 <td>0 Ngày hoặc âm</td>
 <td>QH</td>
-<td>Chuyển Quarantine/Hold; PHẢI chặn vấn đề; xử lý theo disposition.</td>
+<td>Chuyển Quarantine/Hold; PHẢI chặn vấn đề; xử lý theo quyết định xử lý.</td>
 </tr>
 </tbody>
 </table></div>
 <div class="keyline">
-<strong>Ngoại lệ FIFO/FEFO</strong><br>Ngoại lệ chỉ được mở khi có lý do kỹ thuật: customer lot reservation, physical compatibility, cut remnant cùng setup, sample retention, hoặc requirement traceability đặc biệt. Ngoại lệ PHẢI ghi rõ lý do, Người phê duyệt và job áp dụng. Không dùng ngoại lệ để "tiện tay lấy hàng Cần cửa".</div></section>
+<strong>Ngoại lệ FIFO/FEFO</strong><br>Ngoại lệ chỉ được mở khi có lý do kỹ thuật: customer lot reservation, physical compatibility, cut remnant cùng setup, sample retention, hoặc requirement truy xuất nguồn gốc đặc biệt. Ngoại lệ PHẢI ghi rõ lý do, Người phê duyệt và job áp dụng. Không dùng ngoại lệ để "tiện tay lấy hàng Cần cửa".</div></section>
 <section class="annex-section"><h2>5. Cycle count, điều chỉnh tồn và hồ sơ bắt buộc</h2>
 <p>Cycle count là công cụ duy trì độ tin cậy tồn kho, không phải thủ tục đối phó cuối tháng. Mọi vị trí A/B/C đều có tần suất tối thiểu; ngoài ra phải kích hoạt đếm bổ sung khi có tín hiệu bất thường.</p>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
@@ -487,7 +487,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="kpi-box">
 <strong>Gate/control metric 3</strong><br>Số giờ đóng điều tra lệch tồn và số lần pick fail do sai vị trí phải lên bảng điều khiển.</div>
 <div class="kpi-box">
-<strong>Governance rule</strong><br><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="entity-code role-code">SCM</span></a> review tối thiểu tháng một lần các location vi phạm lặp lại. Good catch được ghi nhận; lệch lặp lại mở corrective action/retraining. Kỷ luật chỉ áp dụng khi cố ý bypass FIFO/location gate hoặc làm sai evidence.</div>
+<strong>Governance rule</strong><br><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quan ly chuoi cung ung)"><span class="entity-code role-code">SCM</span></a> review tối thiểu tháng một lần các location vi phạm lặp lại. Good catch được ghi nhận; lệch lặp lại mở hành động khắc phục/retraining. Kỷ luật chỉ áp dụng khi cố ý bypass FIFO/location gate hoặc làm sai evidence.</div>
 </div>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
 <thead><tr>
@@ -567,7 +567,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <td>Tủ / tủ / khu vực có giám sát phù hợp.</td>
 <td>
 <a download="" href="../../../mom/docs/forms/frm-700-maintenance/FRM-708_Environment_Log.xlsx">FRM-708</a>.</td>
-<td>TẠM GIỮ bị ảnh hưởng tồn kho cho tới disposition.</td>
+<td>TẠM GIỮ bị ảnh hưởng tồn kho cho tới quyết định xử lý.</td>
 </tr>
 <tr>
 <td>S3 Clean-pack / chân không</td>
@@ -580,7 +580,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <td>S4 Hạn chế / cách ly / biệt trữ</td>
 <td>Chỉ Người được giao quyền mới được chạm hoặc di chuyển.</td>
 <td>
-<a download="" href="../../../mom/docs/forms/frm-700-maintenance/FRM-708_Environment_Log.xlsx">FRM-708</a> hoặc hold/disposition hồ sơ liên quan.</td>
+<a download="" href="../../../mom/docs/forms/frm-700-maintenance/FRM-708_Environment_Log.xlsx">FRM-708</a> hoặc hold/quyết định xử lý hồ sơ liên quan.</td>
 <td>Không phát hành chỉ bằng việc đổi vị trí hoặc dán nhãn lại.</td>
 </tr>
 </tbody>

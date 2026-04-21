@@ -119,13 +119,13 @@
 </tr>
 <tr>
 <td><b>Setup</b></td>
-<td>Triển khai thay đổi gá/không / bằng không/dao; chạy thử; đối chiếu traveler/phiếu cài đặt đúng Rev; ký xác nhận.</td>
+<td>Triển khai thay đổi gá/không / bằng không/dao; chạy thử; đối chiếu phiếu công nghệ/phiếu cài đặt đúng Rev; ký xác nhận.</td>
 <td>Setup bảng kiểm ký; ảnh setup; hồ sơ chạy thử.</td>
 </tr>
 <tr>
 <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html" title="CNC Operator (Nhan vien van hanh CNC)"><span class="entity-code role-code">OPR</span></a></span></td>
-<td>Chạy theo traveler/phiếu cài đặt Released; kiểm tra nhãn Rev tại máy; dừng khi phát hiện không khớp; giữ WIP.</td>
-<td>Traveler ký; nhãn TẠM GIỮ; log dừng máy theo 60 giây.</td>
+<td>Chạy theo phiếu công nghệ/phiếu cài đặt Released; kiểm tra nhãn Rev tại máy; dừng khi phát hiện không khớp; giữ WIP.</td>
+<td>Phiếu công nghệ ký; nhãn TẠM GIỮ; log dừng máy theo 60 giây.</td>
 </tr>
 <tr>
 <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td>
@@ -189,7 +189,7 @@
 <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Planning and Control Function (Dieu do va kiem soat san xuat)"><span class="entity-code dept-code">D-PPC</span></a></span></td>
 <td>Yêu cầu cut-in, tách job theo Rev</td>
 <td>Cut-in rõ theo lot/số sê-ri/date</td>
-<td>Không có cut-in → <b>TẠM GIỮ</b> WIP + không phát hành traveler</td>
+<td>Không có cut-in → <b>TẠM GIỮ</b> WIP + không phát hành phiếu công nghệ</td>
 </tr>
 <tr>
 <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a></span></td>
@@ -213,7 +213,7 @@
 <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a></span></td>
 <td>Thực thi cut-in</td>
 <td>Setup/Operator chạy đúng Rev; log triển khai</td>
-<td>Traveler/Setup sheet không khớp Rev → <b>DỪNG</b> ngay</td>
+<td>Phiếu công nghệ/Phiếu setup không khớp Rev → <b>DỪNG</b> ngay</td>
 </tr>
 <tr>
 <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td>
@@ -238,7 +238,7 @@
 <li>Không dùng Thay đổi Tác động Matrix → bỏ sót tool/gage/NCC/WIP.</li>
 <li>Cut-in không rõ (lot/số sê-ri/date) → WIP lẫn Rev, ship lẫn Rev.</li>
 <li>Program phát hành không có tổng kiểm tra (mã kiểm)/version → chạy nhầm file cũ tại máy.</li>
-<li>Setup sheet/traveler không cập nhật đồng bộ → Operator chạy theo giấy cũ.</li>
+<li>Phiếu setup/phiếu công nghệ không cập nhật đồng bộ → Operator chạy theo giấy cũ.</li>
 <li><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span> không cách ly tồn/WIP theo Rev → xuất nhầm vật tư/lô cũ.</li>
 <li>PO không luồng-xuống / Từng thay đổi cho NCC → NCC giao lô không đúng spec/lớp phủ / mạ.</li>
 <li>Thiết bị đo hết hạn hiệu chuẩn/OOT → kết quả Mẫu đầu không tin cậy.</li>
@@ -317,7 +317,7 @@
 <div class="card">
 <h3 class="h3" style="margin-top:0">FF1 — Sai phiên bản</h3>
 <ul>
-<li>Khi traveler/phiếu cài đặt/drawing/label tại máy không trùng Rev → <b>DỪNG</b> ngay, treo WIP, Mọi <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> + <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a>.</li>
+<li>Khi phiếu công nghệ/phiếu cài đặt/drawing/label tại máy không trùng Rev → <b>DỪNG</b> ngay, treo WIP, Mọi <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> + <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a>.</li>
 <li>Không được chạy "cho xong" để kịp tiến độ.</li>
 </ul>
 </div>
@@ -366,7 +366,7 @@
 <tr><td>3</td><td>Hoàn thành Thay đổi Tác động Matrix đủ hạng mục: CTQ, program, fixture, gage, NCC, WIP.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phong Ky thuat)"><span class="entity-code dept-code">D-ENG</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phong San xuat)"><span class="entity-code dept-code">D-PROD</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Purchasing Function (Bo phan Mua hang)"><span class="entity-code dept-code">D-PUR</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td><td>FRM-QMS-006 ký đủ</td><td>Bỏ sót WIP/truy xuất nguồn gốc hoặc thiết bị đo.</td></tr>
 <tr><td>4</td><td>Chốt phê duyệt theo mức: C1/C2/C3/Khẩn cấp; khi cần có xác nhận khách.</td><td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> + cấp phê duyệt</td><td>Chữ ký/biên bản CCB</td><td>Thiếu chữ ký bắt buộc.</td></tr>
 <tr><td>5</td><td>Chốt cut-in theo lot/số sê-ri/date; lập danh sách job bị ảnh hưởng.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>Cut-in hồ sơ</td><td>Cut-in ghi "từ nay" không có mốc.</td></tr>
-<tr><td>6</td><td>Cập nhật tài liệu/dữ liệu: traveler, phiếu cài đặt, kế hoạch kiểm tra (plan), label, program.</td><td>Kiểm soát tài liệu (Doc Control)/QA + Kỹ thuật</td><td>Danh mục cập nhật trong FRM-QMS-022</td><td>Cập nhật một phần, bỏ sót label/pack.</td></tr>
+<tr><td>6</td><td>Cập nhật tài liệu/dữ liệu: phiếu công nghệ, phiếu cài đặt, kế hoạch kiểm tra (plan), label, program.</td><td>Kiểm soát tài liệu (Doc Control)/QA + Kỹ thuật</td><td>Danh mục cập nhật trong FRM-QMS-022</td><td>Cập nhật một phần, bỏ sót label/pack.</td></tr>
 <tr><td>7</td><td>Khóa &amp; thu hồi bản cũ tại phân xưởng/kho; dán Rev mới tại máy.</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td><td>Log thu hồi + ảnh hiện trường</td><td>Bản cũ còn treo tại máy.</td></tr>
 <tr><td>8</td><td>Luồng-xuống / Từng thay đổi cho NCC/thuê ngoài qua PO; chốt yêu cầu cert.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Purchasing Function (Bo phan Mua hang)"><span class="entity-code dept-code">D-PUR</span></a></span></td><td>PO phiên bản + yêu cầu cert</td><td>PO không ghi Rev/spec mới.</td></tr>
 <tr><td>9</td><td>cách ly tồn/WIP theo Rev; nhãn TẠM GIỮ/SỬA HÀNG; quyết định xử lý WIP.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td><td>Biên bản cách ly + list lot</td><td>Lẫn lô trong cùng kệ.</td></tr>
@@ -443,7 +443,7 @@
 <tbody>
 <tr>
 <td><b>L1</b></td>
-<td>Nhận diện được thay đổi và kích hoạt 60 giây; biết đọc Rev trên traveler/drawing/program.</td>
+<td>Nhận diện được thay đổi và kích hoạt 60 giây; biết đọc Rev trên phiếu công nghệ/drawing/program.</td>
 <td>Bài kiểm tra nhanh đạt ngưỡng theo vai trò; được phép báo cáo &amp; dừng khi thấy không khớp.</td>
 </tr>
 <tr>
@@ -470,7 +470,7 @@
 <h3 class="h3" style="margin-top:0">10.1 Bài kiểm tra nhanh (≥20 câu) — trắc Nhiệm + tình huống ngắn</h3>
 <ol>
 <li>[Trắc Nhiệm] Mục tiêu cốt lõi của quản lý thay đổi trong phân xưởng CNC là gì? A) Tăng tốc độ chạy máy B) Tạo bằng chứng và chặn sai Rev/lẫn lộn C) Giảm số biểu mẫu D) Tối đa hóa outsource</li>
-<li>[Trắc Nhiệm] Khi traveler tại máy ghi Rev B nhưng drawing phát hành ghi Rev C, hành động đúng là gì? A) Chạy theo traveler B) DỪNG và kích hoạt 60 giây C) Sửa tay traveler D) Bỏ qua vì chỉ khác chữ</li>
+<li>[Trắc Nhiệm] Khi phiếu công nghệ tại máy ghi Rev B nhưng drawing phát hành ghi Rev C, hành động đúng là gì? A) Chạy theo phiếu công nghệ B) DỪNG và kích hoạt 60 giây C) Sửa tay phiếu công nghệ D) Bỏ qua vì chỉ khác chữ</li>
 <li>[Trắc Nhiệm] Thay đổi Tác động Matrix bắt buộc tối thiểu gồm hạng mục nào? A) CTQ B) Program C) WIP/truy xuất nguồn gốc D) Tất cả các đáp án</li>
 <li>[Trắc Nhiệm] Thay đổi đổi lớp phủ / mạ/công đoạn đặc biệt rơi vào mức nào theo logic nội bộ? A) C3 B) C2 C) C1 D) Không cần phân loại</li>
 <li>[Trắc Nhiệm] Evidence "Không có bằng chứng = không qua cổng" áp dụng mạnh nhất tại cổng kiểm soát nào? A) Ship cổng kiểm soát B) Cổng kiểm soát phát hành program/tài liệu C) Cổng kiểm soát Mẫu đầu/FAI D) Tất cả các cổng kiểm soát</li>
@@ -482,7 +482,7 @@
 <li>[Tình huống ngắn] Khi phát hiện gage đo CTQ hết hạn hiệu chuẩn trong lúc đang đo Mẫu đầu, trạng thái cổng kiểm soát là gì và ai phải được gọi?</li>
 <li>[Tình huống ngắn] Khi program mới Released nhưng máy đang chạy file tên Cần giống, vận hành khóa nguồn lỗi là gì?</li>
 <li>[Tình huống ngắn] Khi kho phát hiện tồn cùng part nhưng khác Rev đặt chung kệ, hành động bắt buộc trong 60 giây là gì?</li>
-<li>[Trắc Nhiệm] Khi thay đổi lộ trình gia công/thứ tự nguyên công, bắt buộc cập nhật gì? A) Chỉ traveler B) Traveler + phiếu cài đặt + kế hoạch kiểm tra (plan) C) Chỉ program D) Chỉ PO</li>
+<li>[Trắc Nhiệm] Khi thay đổi lộ trình gia công/thứ tự nguyên công, bắt buộc cập nhật gì? A) Chỉ phiếu công nghệ B) Phiếu công nghệ + phiếu cài đặt + kế hoạch kiểm tra (plan) C) Chỉ program D) Chỉ PO</li>
 <li>[Trắc Nhiệm] Khi thay đổi phát sinh từ NCR/MRB, tài liệu điều phối bắt buộc là gì? A) MRB quyết định + CR/Thông báo B) Chỉ email C) Chỉ họp miệng D) Không cần vì đã NCR</li>
 <li>[Trắc Nhiệm] "Mẫu đầu" trong bối cảnh thay đổi quản lý dùng để làm gì? A) Trang trí hồ sơ B) Chứng minh sản phẩm phù hợp sau thay đổi C) Tăng số lượng mẫu D) Thay thế FAI luôn</li>
 <li>[Trắc Nhiệm] Khi thiếu chữ ký phê duyệt bắt buộc trên CR, trạng thái đúng là gì? A) GO B) TẠM GIỮ/CHẶN C) Ship trước D) Đợi cuối tuần ký</li>
@@ -553,7 +553,7 @@
 <table class="table tight">
 <thead><tr><th style="width:180px;">Vai trò</th><th style="width:200px;">Ngưỡng bài kiểm tra nhanh</th><th style="width:220px;">Tình huống</th><th>Bài kiểm tra thực hành / OJT đầu ra</th></tr></thead>
 <tbody>
-<tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html" title="CNC Operator (Nhan vien van hanh CNC)"><span class="entity-code role-code">OPR</span></a></span></td><td>≥80%</td><td>Đúng quyết định TẠM GIỮ/GO trong Tình huống 1</td><td>Thực hiện 60 giây đúng; ký traveler đúng Rev; tạo log TẠM GIỮ.</td></tr>
+<tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html" title="CNC Operator (Nhan vien van hanh CNC)"><span class="entity-code role-code">OPR</span></a></span></td><td>≥80%</td><td>Đúng quyết định TẠM GIỮ/GO trong Tình huống 1</td><td>Thực hiện 60 giây đúng; ký phiếu công nghệ đúng Rev; tạo log TẠM GIỮ.</td></tr>
 <tr><td>Setup</td><td>≥85%</td><td>Đúng Tình huống 2</td><td>Dry-run + setup bảng kiểm; xác nhận Rev/không / bằng không; ảnh setup.</td></tr>
 <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lap trinh vien CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></td><td>≥90%</td><td>Đúng Tình huống 2</td><td>Phát hành program có tổng kiểm tra (mã kiểm); khóa bản cũ; cập nhật phiếu cài đặt.</td></tr>
 <tr><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></span></td><td>≥90%</td><td>Đúng cả 3 tình huống</td><td>Lập xác nhận plan; Mẫu đầu/FAI; xác nhận gage hợp lệ; ký ĐẠT/KHÔNG ĐẠT.</td></tr>
@@ -576,7 +576,7 @@
 <li><b>FRM-QMS-022</b> — Tài liệu/Data Thay đổi Thông báo (mã CR).</li>
 <li><b>FRM-QMS-006</b> — Thay đổi Tác động Matrix (đủ chữ ký liên phòng).</li>
 <li><b>FRM-SAL-003</b> — Customer Thay đổi Đơn hàng Review (khi thay đổi từ khách).</li>
-<li>Danh mục tài liệu cập nhật: traveler, phiếu cài đặt, kế hoạch kiểm tra (plan), label, lộ trình gia công.</li>
+<li>Danh mục tài liệu cập nhật: phiếu công nghệ, phiếu cài đặt, kế hoạch kiểm tra (plan), label, lộ trình gia công.</li>
 <li>Evidence program: file name + version + tổng kiểm tra (mã kiểm) + log phát hành.</li>
 <li>Evidence xác nhận: Mẫu đầu/IR/CMM/FAI (theo mức) + kết luận ĐẠT/KHÔNG ĐẠT.</li>
 <li>Evidence WIP cách ly: ảnh nhãn TẠM GIỮ/SỬA HÀNG + list lot/số sê-ri + quyết định xử lý.</li>

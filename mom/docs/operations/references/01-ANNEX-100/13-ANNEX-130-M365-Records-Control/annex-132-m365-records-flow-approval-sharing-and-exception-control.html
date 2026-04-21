@@ -68,7 +68,7 @@
  <tr><td>Log-first</td><td>Mọi flow phải ghi run log, approval log hoặc register close-out trước khi được xem là hoàn tất.</td></tr>
  <tr><td>Idempotent</td><td>Flow phải chặn tạo trùng thư mục, trùng package, trùng manifest, trùng deploy receipt hoặc trùng reverse-sync close-out.</td></tr>
  <tr><td>Approval-before-state-change</td><td>Không đổi trạng thái chính thức sang Approved, Released, Provisioned, Deployed hoặc Closed khi chưa có approver hợp lệ và evidence URL hợp lệ.</td></tr>
- <tr><td>System-of-record protection</td><td>Flow không được thay giao dịch Epicor. Flow chỉ tạo records, approvals, routing, notifications, manifests và evidence logs.</td></tr>
+ <tr><td>System-of-record protection</td><td>Flow không được thay giao dịch Epicor. Flow chỉ tạo records, approvals, tuyến công nghệ, notifications, manifests và evidence logs.</td></tr>
  <tr><td>Source-runtime boundary</td><td>Flow source promotion không được chạm runtime payload; flow runtime không được ghi ngược vào source library trừ reverse-sync process được duyệt.</td></tr>
  <tr><td>No silent failure</td><td>Mọi failure phải để lại log có ErrorCategory, ErrorDetail, owner và next action.</td></tr>
  </tbody>
@@ -105,7 +105,7 @@
  </thead>
  <tbody>
  <tr><td>Records provisioning</td><td>Request tạo zone/job/employee/system/source</td><td>Provisioned path, permissions, metadata defaults</td><td>M365-Record-Provisioning-Requests</td></tr>
- <tr><td>Approval routing</td><td>Item cần phê duyệt</td><td>Decision history, status change, approver evidence</td><td>Approval history + run log</td></tr>
+ <tr><td>Approval tuyến công nghệ</td><td>Item cần phê duyệt</td><td>Decision history, status change, approver evidence</td><td>Approval history + run log</td></tr>
  <tr><td>External sharing</td><td>Approved external package request</td><td>Specific-people link, expiry, revoke trail</td><td>External-Share-Approval-Log</td></tr>
  <tr><td>Source promotion</td><td>Approved source change / release candidate</td><td>Release manifest, promotion status, approved commit</td><td>QMS-Source-Promotion-Register</td></tr>
  <tr><td>Server deployment</td><td>Approved manifest ready for deploy</td><td>Deploy receipt, smoke verification, rollback evidence</td><td>Server-Deploy-Register</td></tr>
@@ -159,7 +159,7 @@
  <tr><td>2</td><td>Flow kiểm tra target path thuộc <span class="code">QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span>.</td><td>Validated boundary</td></tr>
  <tr><td>3</td><td>Approval theo QMS/IT rule.</td><td>Approved / Rejected</td></tr>
  <tr><td>4</td><td>Tạo release manifest tại <span class="code">02-Release-Manifests/{YYYY}/</span>.</td><td>Manifest URL</td></tr>
- <tr><td>5</td><td>Ghi <span class="code">QMS-Source-Promotion-Register</span> với commit, approver, scope và status.</td><td>Promotion log</td></tr>
+ <tr><td>5</td><td>Ghi <span class="code">QMS-Source-Promotion-Register</span> với commit, approver, phạm vi và status.</td><td>Promotion log</td></tr>
  </tbody>
  </table>
  </div>

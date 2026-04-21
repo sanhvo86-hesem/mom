@@ -71,7 +71,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 
 <div class="section"><h2>2. Từ điển dữ liệu bắt buộc</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trường dữ liệu</th><th>Bắt buộc</th><th>Nguồn dữ liệu chuẩn</th><th>Quy tắc</th></tr></thead><tbody>
-<tr><td>PackID</td><td>Có</td><td>Epicor/WHS giao dịch</td><td>Duy nhất trong lô giao hàng scope; không đổi sau xác nhận giao hàng.</td></tr>
+<tr><td>PackID</td><td>Có</td><td>Epicor/WHS giao dịch</td><td>Duy nhất trong lô giao hàng phạm vi; không đổi sau xác nhận giao hàng.</td></tr>
 <tr><td>SSCC (AI 00)</td><td>Có khi dùng hậu cần label</td><td>Dịch vụ cấp mã được kiểm soát</td><td>18 số, kiểm tra chữ số hợp lệ, duy nhất toàn cục trong vòng đời quản lý của công ty.</td></tr>
 <tr><td>Lô giao hàng / Đơn hàng / Phát hành</td><td>Có</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bo phan quan tri ERP)"><span class="entity-code dept-code">D-ERP</span></a></span></td><td>Phải khớp ship-to, hóa đơn / bảng kê-to, điều kiện giao hàng.</td></tr>
 <tr><td>JobNum / PartNo / Rev</td><td>Có</td><td>Epicor + được kiểm soát phát hành set</td><td>Không được ship sai phiên bản; phiên bản phải khớp hồ sơ chất lượng phát hành.</td></tr>
@@ -99,7 +99,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Phiên bản đối soát</td><td>Part/Rev trên nhãn khớp phát hành set và bộ hồ sơ giao hàng</td><td>Sai rev hoặc lẫn nhiều rev trong một hậu cần đơn vị không được phép</td></tr>
 <tr><td>con / phụ thuộc-cha / gốc mối quan hệ</td><td>Cấu trúc thùng thùng carton/pallet rõ ràng và quét ra đúng</td><td>cha / gốc không mở được con / phụ thuộc hoặc con / phụ thuộc mất quan hệ</td></tr>
 <tr><td>Evidence đối soát</td><td>CoC/cert/đóng gói bảng kiểm/ảnh kiện đầy đủ khi áp dụng</td><td>Thiếu hồ sơ bắt buộc hoặc link hỏng</td></tr>
-<tr><td>Trạng thái đối soát</td><td>Không còn hold, không còn nghi ngờ chưa xử lý</td><td>Có hold mở hoặc vấn đề chưa disposition</td></tr>
+<tr><td>Trạng thái đối soát</td><td>Không còn hold, không còn nghi ngờ chưa xử lý</td><td>Có hold mở hoặc vấn đề chưa quyết định xử lý</td></tr>
 </tbody></table></div>
 <p>Chi tiết đóng gói vật lý và label layout xem <a href="annex-702-packaging-labeling-spec.html">ANNEX-702</a>. Hướng dẫn vận hành tại Point-of-use sẽ theo <a href="../../02-Work-Instructions/02-WI-200/wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a>, <a href="../../02-Work-Instructions/02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a> hoặc WI phê duyệt giao hàng tương ứng.</p></div>
 

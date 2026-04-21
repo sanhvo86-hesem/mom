@@ -106,7 +106,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="kpi-box">
 <b>Kích hoạt</b>
 <ul class="tight">
-<li>Khi nhân sự mới vào phân xưởng, chuyển bộ phận, đổi scope máy/công đoạn, đổi cấp độ phức tạp.</li>
+<li>Khi nhân sự mới vào phân xưởng, chuyển bộ phận, đổi phạm vi máy/công đoạn, đổi cấp độ phức tạp.</li>
 <li>Khi phát sinh NCR/MRB liên quan vận hành/đo/duyệt; xử lý CAPA yêu cầu tái đánh giá.</li>
 <li>Khi nhân sự nghỉ gián đoạn dài Ngày hoặc có thay đổi lớn về tiêu chuẩn, bản vẽ, phương pháp đo, quy trình.</li>
 <li>Khi đến kỳ tái chứng nhận theo chu kỳ trên chứng nhận Level và log theo dõi.</li>
@@ -179,8 +179,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>Mô-đun TRN-OPS-02 nằm ở đâu?</h3>
 <ul class="tight">
 <li><b>Cổng kiểm soát trước Sản xuất:</b> xác nhận Operator / set-up / lập trình nằm trong phạm vi chứng nhận hợp lệ.</li>
-<li><b>Cổng kiểm soát trước QC/QA ký-off:</b> xác nhận Người đo/duyệt có thẩm quyền Level đúng scope (gage/phương pháp/CTQ).</li>
-<li><b>Cổng kiểm soát trước Ship:</b> xác nhận Người phát hành phiếu kê đóng gói/CoC/truy xuất nguồn gốc có chứng nhận scope phù hợp; chặn giao hàng khi hồ sơ năng lực thiếu.</li>
+<li><b>Cổng kiểm soát trước QC/QA ký-off:</b> xác nhận Người đo/duyệt có thẩm quyền Level đúng phạm vi (gage/phương pháp/CTQ).</li>
+<li><b>Cổng kiểm soát trước Ship:</b> xác nhận Người phát hành phiếu kê đóng gói/CoC/truy xuất nguồn gốc có chứng nhận phạm vi phù hợp; chặn giao hàng khi hồ sơ năng lực thiếu.</li>
 <li><b>Cổng kiểm soát sau NCR/MRB:</b> tái đánh giá năng lực bắt buộc khi NCR liên quan vận hành/đo/duyệt; cập nhật log tái chứng nhận.</li>
 </ul>
 <h3>Luồng bàn giao (Đầu vào/Đầu ra)</h3>
@@ -194,10 +194,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>H1 — Yêu cầu đánh giá</td>
-<td>Danh sách nhân sự cần đánh giá; scope máy/công đoạn; Level mục tiêu theo ma trận</td>
+<td>Danh sách nhân sự cần đánh giá; phạm vi máy/công đoạn; Level mục tiêu theo ma trận</td>
 <td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> + <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a></td>
 <td>Phiếu kế hoạch đánh giá (MRR)</td>
-<td>KHÔNG ĐƯỢC lên lịch chạy job mới khi chưa có kế hoạch đánh giá cho scope mới</td>
+<td>KHÔNG ĐƯỢC lên lịch chạy job mới khi chưa có kế hoạch đánh giá cho phạm vi mới</td>
 </tr>
 <tr>
 <td>H2 — Thực hiện đánh giá</td>
@@ -218,25 +218,25 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Hồ sơ căn cứ: TRN-004 + TRN-010 + OJT + job minh chứng</td>
 <td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a> + Trưởng bộ phận</td>
 <td>FRM-HR-TRN-005 (chứng nhận Level)</td>
-<td>Không có chứng nhận hợp lệ → CHẶN phân công theo scope</td>
+<td>Không có chứng nhận hợp lệ → CHẶN phân công theo phạm vi</td>
 </tr>
 <tr>
 <td>H5 — Theo dõi tái chứng nhận</td>
 <td>Danh sách chứng nhận; Ngày hết hạn; trạng thái</td>
 <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phong Nhan su)"><span class="entity-code dept-code">D-HR</span></a></span></td>
 <td>FRM-HR-TRN-006 (theo dõi log) + cảnh báo</td>
-<td>Quá hạn → STOP giao việc thuộc scope chứng nhận</td>
+<td>Quá hạn → STOP giao việc thuộc phạm vi chứng nhận</td>
 </tr>
 </table>
 <!-- 4 -->
 <h2 id="s4">4) Điểm đứt gãy (tối thiểu 10 điểm gãy thực tế)</h2>
 <ol class="tight">
-<li>Phân công Người làm công đoạn CTQ khi chứng nhận hết hạn hoặc scope không khớp máy/công đoạn/vật liệu.</li>
+<li>Phân công Người làm công đoạn CTQ khi chứng nhận hết hạn hoặc phạm vi không khớp máy/công đoạn/vật liệu.</li>
 <li>Ký đạt tiêu chí đánh giá khi thiếu WO/Job minh chứng hoặc thiếu bản ghi đo lường.</li>
 <li>Dùng tiêu chí đánh giá lỗi phiên bản; tiêu chí Level thay đổi nhưng không phát hành lại.</li>
 <li>Đánh giá chỉ dựa trên bài kiểm tra nhanh; thiếu hiệu suất test cho vận hành/cổng kiểm soát/đo/duyệt.</li>
 <li>Người đánh giá có xung đột lợi ích; tự chấm cho bản thân hoặc chấm để kịp tiến độ.</li>
-<li>Không ghi rõ phạm vi chứng nhận; dẫn tới bố trí sai (ví dụ: chạy máy 5 trục trong khi scope chỉ 3 trục).</li>
+<li>Không ghi rõ phạm vi chứng nhận; dẫn tới bố trí sai (ví dụ: chạy máy 5 trục trong khi phạm vi chỉ 3 trục).</li>
 <li>Không cập nhật log theo dõi tái chứng nhận; cảnh báo hết hạn bị bỏ qua.</li>
 <li>Thiếu truy xuất nguồn gốc phiên bản: WO ghi Rev A, chứng nhận/đánh giá tham chiếu Rev B.</li>
 <li>Lẫn lộn hồ sơ: ghép nhầm tiêu chí đánh giá của Người khác; thiếu mã NV; file name sai quy tắc.</li>
@@ -254,10 +254,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th>Evidence/MRR bắt buộc</th>
 </tr>
 <tr>
-<td>CP1 — Cổng kiểm soát phân công theo danh sách "Được ủy quyền Scope"</td>
+<td>CP1 — Cổng kiểm soát phân công theo danh sách "Được ủy quyền Phạm vi"</td>
 <td>Chặn bố trí sai năng lực; chặn vượt qua cổng kiểm soát</td>
 <td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span></td>
-<td>Danh sách Được ủy quyền Scope cập nhật theo chứng nhận (đính kèm FRM-HR-TRN-005)</td>
+<td>Danh sách Được ủy quyền Phạm vi cập nhật theo chứng nhận (đính kèm FRM-HR-TRN-005)</td>
 </tr>
 <tr>
 <td>CP2 — Hiệu suất test bắt buộc cho vận hành/cổng kiểm soát/đo/duyệt</td>
@@ -267,9 +267,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>CP3 — Review chéo kết quả Level trước phát hành chứng nhận</td>
-<td>Chặn thiên vị; chặn sai scope</td>
+<td>Chặn thiên vị; chặn sai phạm vi</td>
 <td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a> + Trưởng bộ phận</td>
-<td>Biên bản rà soát + dấu kiểm "scope rõ" trên FRM-HR-TRN-005</td>
+<td>Biên bản rà soát + dấu kiểm "phạm vi rõ" trên FRM-HR-TRN-005</td>
 </tr>
 <tr>
 <td>CP4 — Thu hồi quyền khi hết hạn/vi phạm cổng kiểm soát</td>
@@ -305,7 +305,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  </div>
 </div>
 <ul class="tight">
-<li><b>FF1 — STOP:</b> Khi Performer không có chứng nhận Level hợp lệ theo scope máy/công đoạn/đo/duyệt → dừng giao việc ngay, thay Người, khóa quyền vận hành.</li>
+<li><b>FF1 — STOP:</b> Khi Performer không có chứng nhận Level hợp lệ theo phạm vi máy/công đoạn/đo/duyệt → dừng giao việc ngay, thay Người, khóa quyền vận hành.</li>
 <li><b>FF2 — TẠM GIỮ:</b> Khi hồ sơ đánh giá thiếu minh chứng bắt buộc (WO/Job, bản ghi đo, chữ ký Người đánh giá, Ngày đánh giá) → giữ trạng thái "chưa đạt", không phát hành chứng nhận.</li>
 <li><b>FF3 — CHẶN:</b> Khi phát hiện sai Rev hoặc lẫn lộn hồ sơ (mã NV không khớp, file name sai Người, WO tham chiếu sai) → khóa bộ hồ sơ, mở NCR hồ sơ, đánh giá lại.</li>
 <li><b>FF4 — STOP:</b> Khi hiệu suất test liên quan đo lường dùng gage OOT/OOC hoặc chưa có chứng chỉ hiệu chuẩn hợp lệ → dừng bài test, tạm đình chỉ quyền đo lường.</li>
@@ -335,10 +335,10 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>1</td>
-<td>Xác định scope đánh giá (máy/công đoạn/vật liệu/mức phức tạp) và Level mục tiêu theo ma trận C01–C19</td>
+<td>Xác định phạm vi đánh giá (máy/công đoạn/vật liệu/mức phức tạp) và Level mục tiêu theo ma trận C01–C19</td>
 <td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td>
-<td>Kế hoạch đánh giá + danh sách scope (MRR)</td>
-<td>Scope ghi chung chung, thiếu mã máy/cell</td>
+<td>Kế hoạch đánh giá + danh sách phạm vi (MRR)</td>
+<td>Phạm vi ghi chung chung, thiếu mã máy/cell</td>
 </tr>
 <tr>
 <td>2</td>
@@ -356,7 +356,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>4</td>
-<td>Tổ chức bài kiểm tra nhanh kiến thức theo scope (K) và lưu kết quả</td>
+<td>Tổ chức bài kiểm tra nhanh kiến thức theo phạm vi (K) và lưu kết quả</td>
 <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Truong nhom / quan ly ky thuat)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html" title="Process Engineer (Ky su quy trinh)"><span class="entity-code role-code">PE</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html" title="Quality Engineer (Ky su chat luong)"><span class="entity-code role-code">QE</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html" title="Metrology and Calibration Specialist (Chuyen vien do luong va hieu chuan)"><span class="entity-code role-code">MCS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quan ly phan xuong CNC)"><span class="entity-code role-code">WKM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Truong ca)"><span class="entity-code role-code">SL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Ky thuat vien setup)"><span class="entity-code role-code">SET</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (To truong QC)"><span class="entity-code role-code">QCL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-maintenance-technician.html" title="Maintenance Technician (Ky thuat vien bao tri)"><span class="entity-code role-code">MNT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-tool-crib-tool-storekeeper.html" title="Tool Crib / Tool Storekeeper (Thu kho dao cu)"><span class="entity-code role-code">TOOL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quan tri vien he thong Epicor)"><span class="entity-code role-code">ESA</span></a></span></td>
 <td>Bài làm bài kiểm tra nhanh + điểm + ký tên</td>
 <td>Thiếu mã NV, thiếu ghi ngày</td>
@@ -379,8 +379,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>7</td>
 <td>Chấm Level theo tiêu chí quan sát được (L1–L4) và ghi rõ giới hạn quyền hạn theo vai trò</td>
 <td>Người đánh giá</td>
-<td>FRM-HR-TRN-010 đầy đủ; ghi scope/giới hạn</td>
-<td>Ghi Level nhưng bỏ trống giới hạn scope</td>
+<td>FRM-HR-TRN-010 đầy đủ; ghi phạm vi/giới hạn</td>
+<td>Ghi Level nhưng bỏ trống giới hạn phạm vi</td>
 </tr>
 <tr>
 <td>8</td>
@@ -391,7 +391,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>9</td>
-<td>Review chéo trước cấp chứng nhận: kiểm scope, kiểm bằng chứng, kiểm chữ ký</td>
+<td>Review chéo trước cấp chứng nhận: kiểm phạm vi, kiểm bằng chứng, kiểm chữ ký</td>
 <td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a> + Trưởng bộ phận</td>
 <td>Biên bản rà soát; bảng kiểm rà soát</td>
 <td>Review bằng miệng, không có hồ sơ</td>
@@ -412,9 +412,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>12</td>
-<td>Cập nhật danh sách Được ủy quyền Scope để cổng kiểm soát phân công và cổng kiểm soát ký-off</td>
+<td>Cập nhật danh sách Được ủy quyền Phạm vi để cổng kiểm soát phân công và cổng kiểm soát ký-off</td>
 <td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span> + <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span> + <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></td>
-<td>Danh sách Được ủy quyền Scope có Ngày cập nhật</td>
+<td>Danh sách Được ủy quyền Phạm vi có Ngày cập nhật</td>
 <td>Danh sách không đồng bộ với chứng nhận</td>
 </tr>
 <tr>
@@ -457,9 +457,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <th>Lý do</th>
 </tr>
 <tr>
-<td>1. Chốt scope &amp; Level mục tiêu</td>
+<td>1. Chốt phạm vi &amp; Level mục tiêu</td>
 <td>Ghi đúng mã máy/cell/công đoạn/vật liệu; bám ma trận C01–C19; gắn CTQ/cổng kiểm soát</td>
-<td>Scope rõ để tránh bố trí sai năng lực và để đánh giá truy xuất nguồn gốc</td>
+<td>Phạm vi rõ để tránh bố trí sai năng lực và để đánh giá truy xuất nguồn gốc</td>
 </tr>
 <tr>
 <td>2. Khóa phiên bản tài liệu đánh giá</td>
@@ -488,7 +488,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>7. Ghi rõ quyền hạn theo vai trò</td>
-<td>Quyền vận hành/đo/duyệt/phát hành gắn Level; ghi giới hạn scope</td>
+<td>Quyền vận hành/đo/duyệt/phát hành gắn Level; ghi giới hạn phạm vi</td>
 <td>Cổng kiểm soát phân quyền rõ để giảm rủi ro</td>
 </tr>
 <tr>
@@ -497,7 +497,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td>Hồ sơ sẵn sàng đánh giá, truy xuất nguồn gốc nhanh</td>
 </tr>
 <tr>
-<td>9. Cập nhật log &amp; danh sách Được ủy quyền Scope</td>
+<td>9. Cập nhật log &amp; danh sách Được ủy quyền Phạm vi</td>
 <td>Cập nhật ngay; phát cảnh báo sắp hết hạn; đồng bộ phân công</td>
 <td>Không để chứng nhận hết hạn nhưng vẫn giao việc</td>
 </tr>
@@ -516,7 +516,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <b>L2 — Làm được</b>
 <ul class="tight">
 <li>Thực hiện độc lập theo SOP/WI đúng Rev; tự kiểm tra điểm trọng yếu theo bảng kiểm.</li>
-<li>Được giao việc trong scope L2 đã ghi rõ; không vượt phạm vi chứng nhận.</li>
+<li>Được giao việc trong phạm vi L2 đã ghi rõ; không vượt phạm vi chứng nhận.</li>
 <li>Quyền hạn: vận hành/đo/ghi nhận trong phạm vi; không phê duyệt ngoại lệ.</li>
 </ul>
 </div>
@@ -524,7 +524,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <b>L3 — Ổn định</b>
 <ul class="tight">
 <li>Thực hiện ổn định qua nhiều job; phát hiện lệch chuẩn và chặn lỗi trước khi chuyển công đoạn.</li>
-<li>Được giao việc có độ phức tạp cao hơn trong scope; được giao hướng dẫn tại chỗ.</li>
+<li>Được giao việc có độ phức tạp cao hơn trong phạm vi; được giao hướng dẫn tại chỗ.</li>
 <li>Quyền hạn: xác nhận tự-kiểm tra, kích hoạt hành động khắc phục trong phạm vi nhóm.</li>
 </ul>
 </div>
@@ -537,7 +537,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 </div>
-<h3>Tiêu chí riêng theo vai trò (scope + thẩm quyền)</h3>
+<h3>Tiêu chí riêng theo vai trò (phạm vi + thẩm quyền)</h3>
 <table class="form-table">
 <tr>
 <th>Vai trò</th>
@@ -573,7 +573,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a></span></td>
 <td>Review hồ sơ chất lượng; xác nhận cổng kiểm soát theo danh mục thẩm quyền</td>
 <td>Điều phối NCR/MRB; xác nhận CAPA hiệu lực; chặn ship rủi ro</td>
-<td>Phê duyệt disposition theo thẩm quyền; dẫn dắt đánh giá nội bộ và hiệu chuẩn đánh giá</td>
+<td>Phê duyệt quyết định xử lý theo thẩm quyền; dẫn dắt đánh giá nội bộ và hiệu chuẩn đánh giá</td>
 </tr>
 <tr>
 <td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td>
@@ -589,7 +589,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span></td>
-<td>Lập kế hoạch theo năng lực máy/Người; không phát hành khi thiếu Được ủy quyền Scope</td>
+<td>Lập kế hoạch theo năng lực máy/Người; không phát hành khi thiếu Được ủy quyền Phạm vi</td>
 <td>Điều phối ưu tiên; chặn vượt qua cổng kiểm soát; báo cáo vượt cấp khi rủi ro OTD</td>
 <td>Phê duyệt thay đổi kế hoạch lớn theo thẩm quyền; chuẩn hóa quy tắc phát hành</td>
 </tr>
@@ -608,12 +608,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <tr>
 <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhan vien bao gia)"><span class="entity-code role-code">EST</span></a></span></td>
 <td>Ghi nhận yêu cầu khách hàng đúng; kiểm soát phiên bản hợp đồng/tài liệu</td>
-<td>Chặn cam kết sai; báo cáo vượt cấp rủi ro spec/thời gian dẫn (lead time); ghi nhận thay đổi có kiểm soát</td>
+<td>Chặn cam kết sai; báo cáo vượt cấp rủi ro spec/thời gian dẫn (thời gian giao); ghi nhận thay đổi có kiểm soát</td>
 <td>Phê duyệt điều khoản thương mại theo thẩm quyền; chuẩn hóa bàn giao báo giá→plan</td>
 </tr>
 <tr>
 <td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td>
-<td>Phân công theo Được ủy quyền Scope; kiểm soát cổng kiểm soát tại hiện trường</td>
+<td>Phân công theo Được ủy quyền Phạm vi; kiểm soát cổng kiểm soát tại hiện trường</td>
 <td>Ra quyết định TẠM GIỮ/STOP/CHẶN; kích hoạt 60 giây; điều phối nguồn lực</td>
 <td>Đánh giá và ký tiêu chí đánh giá theo phạm vi; dẫn dắt rà soát chéo và hiệu chuẩn chấm Level</td>
 </tr>
@@ -637,7 +637,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </li>
 <li>Điều kiện nào khiến trạng thái hồ sơ bị TẠM GIỮ ngay lập tức?</li>
 <li>Khi phát hiện chứng nhận hết hạn trong ca sản xuất, phản ứng 60 giây bước 1 và bước 2 là gì?</li>
-<li>Scope trên chứng nhận Level bắt buộc ghi các trường nào để chặn bố trí sai?</li>
+<li>Phạm vi trên chứng nhận Level bắt buộc ghi các trường nào để chặn bố trí sai?</li>
 <li>Ai là Người chịu trách nhiệm cuối cùng (A) trong phát hành chứng nhận Level?</li>
 <li>Định nghĩa L2 theo mô-đun này gắn với quyền hạn gì?</li>
 <li>Định nghĩa L4 theo mô-đun này gắn với vai trò Người đánh giá như thế nào?</li>
@@ -645,7 +645,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Chọn đáp án đúng: Hiệu suất test áp dụng cho đối tượng nào?
  <ul class="tight">
 <li>A. Chỉ Operator</li>
-<li>B. Tất cả vai trò khi công việc có vận hành/cổng kiểm soát/đo/duyệt thuộc scope chứng nhận</li>
+<li>B. Tất cả vai trò khi công việc có vận hành/cổng kiểm soát/đo/duyệt thuộc phạm vi chứng nhận</li>
 <li>C. Chỉ bộ phận văn phòng</li>
 </ul>
 </li>
@@ -659,12 +659,12 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </li>
 <li>Nêu 3 Điểm đứt gãy có khả năng dẫn tới ship rủi ro.</li>
-<li>Ai thực hiện CP1 "Cổng kiểm soát phân công theo Được ủy quyền Scope"?</li>
+<li>Ai thực hiện CP1 "Cổng kiểm soát phân công theo Được ủy quyền Phạm vi"?</li>
 <li>Khi bài hiệu suất test dùng gage OOT, hành động theo FF4 là gì?</li>
 <li>Chọn đáp án đúng: Review chéo trước cấp chứng nhận nhằm mục tiêu nào?
  <ul class="tight">
 <li>A. Tăng điểm cho học viên</li>
-<li>B. Chặn thiên vị và chặn sai scope</li>
+<li>B. Chặn thiên vị và chặn sai phạm vi</li>
 <li>C. Đủ thủ tục cho đẹp</li>
 </ul>
 </li>
@@ -691,17 +691,17 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </ul>
 </div>
 <div class="no-break">
-<div class="callout"><b>Tình huống 2 — Lẫn lộn scope chứng nhận tại <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></b></div>
+<div class="callout"><b>Tình huống 2 — Lẫn lộn phạm vi chứng nhận tại <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a></b></div>
 <ul class="tight">
-<li><b>Dữ kiện:</b> <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a> ký chấp nhận kích thước CTQ bằng CMM. Chứng nhận Level ghi scope "tay / thủ công dụng cụ + thước cặp/panme / thước đo vi lượng". Không có scope CMM. Job đang sát lịch ship.</li>
+<li><b>Dữ kiện:</b> <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a> ký chấp nhận kích thước CTQ bằng CMM. Chứng nhận Level ghi phạm vi "tay / thủ công dụng cụ + thước cặp/panme / thước đo vi lượng". Không có phạm vi CMM. Job đang sát lịch ship.</li>
 <li><b>Quyết định bắt buộc:</b> Chọn TẠM GIỮ/GO/STOP/CHẶN và ghi hành động thay thế để bảo vệ ship.</li>
-<li><b>MRR bắt buộc:</b> Bản chụp chứng nhận scope; IR được ký lại bởi Người có scope CMM; cập nhật log tái chứng nhận cho <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a>.</li>
+<li><b>MRR bắt buộc:</b> Bản chụp chứng nhận phạm vi; IR được ký lại bởi Người có phạm vi CMM; cập nhật log tái chứng nhận cho <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhan vien QC / lap trinh vien - van hanh CMM)"><span class="entity-code role-code">QC</span></a>.</li>
 </ul>
 </div>
 <div class="no-break">
 <div class="callout"><b>Tình huống 3 — Hết hạn chứng nhận tại <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span> trước Ship</b></div>
 <ul class="tight">
-<li><b>Dữ kiện:</b> Nhân sự <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span> phụ trách dán nhãn &amp; phát hành phiếu kê đóng gói có chứng nhận scope truy xuất nguồn gốc hết hạn hôm qua. Lot/batch đã đóng kiện.</li>
+<li><b>Dữ kiện:</b> Nhân sự <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bo phan Kho)"><span class="entity-code dept-code">D-WHS</span></a></span> phụ trách dán nhãn &amp; phát hành phiếu kê đóng gói có chứng nhận phạm vi truy xuất nguồn gốc hết hạn hôm qua. Lot/batch đã đóng kiện.</li>
 <li><b>Quyết định bắt buộc:</b> Chọn TẠM GIỮ/GO/STOP/CHẶN và ghi phản ứng 60 giây.</li>
 <li><b>MRR bắt buộc:</b> Log FRM-HR-TRN-006 cập nhật trạng thái quá hạn; biên bản thu hồi quyền; phát hành lại bởi Người còn hiệu lực.</li>
 </ul>
@@ -710,8 +710,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note">
 <b>Bài test chuẩn (áp dụng cho mọi vai trò)</b>
 <ul class="tight">
-<li>Học viên hoàn tất 01 gói hồ sơ đánh giá cho chính scope công việc của vai trò trong ca thực tế.</li>
-<li>Gói hồ sơ có đủ: bài kiểm tra nhanh + tình huống + quan sát thực hành + ghi rõ scope/giới hạn quyền hạn + lưu MRR đúng quy tắc.</li>
+<li>Học viên hoàn tất 01 gói hồ sơ đánh giá cho chính phạm vi công việc của vai trò trong ca thực tế.</li>
+<li>Gói hồ sơ có đủ: bài kiểm tra nhanh + tình huống + quan sát thực hành + ghi rõ phạm vi/giới hạn quyền hạn + lưu MRR đúng quy tắc.</li>
 <li>Người đánh giá chấm theo FRM-HR-TRN-010; cổng kiểm soát fail-nhanh áp dụng trực tiếp.</li>
 </ul>
 </div>
@@ -730,9 +730,9 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>Thực hiện vận hành/cổng kiểm soát đúng vai trò</td>
-<td>Thực hiện đúng WI/SOP; không vượt scope</td>
+<td>Thực hiện đúng WI/SOP; không vượt phạm vi</td>
 <td>Quan sát trực tiếp; chữ ký Người đánh giá</td>
-<td>Vượt scope → STOP</td>
+<td>Vượt phạm vi → STOP</td>
 </tr>
 <tr>
 <td>Ghi nhận minh chứng</td>
@@ -761,7 +761,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <li>Bài kiểm tra nhanh đạt ≥ 80% số điểm.</li>
 <li>Tình huống: quyết định cổng kiểm soát đúng 100% và ghi đủ MRR.</li>
 <li>Hiệu suất test: không vi phạm fail-nhanh; hoàn tất gói hồ sơ trong 1 ca làm việc; truy xuất nguồn gốc trong 2 phút.</li>
-<li>Scope/giới hạn quyền hạn ghi rõ trên chứng nhận và đồng bộ Được ủy quyền Scope.</li>
+<li>Phạm vi/giới hạn quyền hạn ghi rõ trên chứng nhận và đồng bộ Được ủy quyền Phạm vi.</li>
 </ul>
 </div>
 <div class="danger">
@@ -778,18 +778,18 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <h3>12.1 Danh sách hồ sơ bắt buộc</h3>
 <ul class="tight">
 <li>FRM-HR-TRN-010 — đánh giá Tiêu chí đánh giá (kèm minh chứng).</li>
-<li>FRM-HR-TRN-004 — Năng lực Đánh giá Biểu mẫu (tổng hợp C01–C19 theo scope).</li>
-<li>FRM-HR-TRN-005 — Kỹ năng Level Chứng chỉ (ghi rõ scope/giới hạn/thẩm quyền).</li>
+<li>FRM-HR-TRN-004 — Năng lực Đánh giá Biểu mẫu (tổng hợp C01–C19 theo phạm vi).</li>
+<li>FRM-HR-TRN-005 — Kỹ năng Level Chứng chỉ (ghi rõ phạm vi/giới hạn/thẩm quyền).</li>
 <li>FRM-HR-TRN-006 — Re-Chứng nhận Theo dõi Log (cập nhật trạng thái).</li>
 <li>Bài làm bài kiểm tra nhanh + phiếu tình huống + bằng chứng WO/Job/IR/FAI liên quan.</li>
 <li>Biên bản rà soát chéo trước cấp chứng nhận.</li>
 </ul>
 <h3>12.2 Quy tắc đặt tên</h3>
 <div class="note">
-<div class="mono"><b>TRN-OPS-02</b>_<b>{Dept}</b>_<b>{Vai trò}</b>_<b>{EmpID}</b>_<b>{Scope}</b>_<b>{YYYYMMDD}</b>_<b>{sản phẩm / hiện vật}</b>_V0</div>
+<div class="mono"><b>TRN-OPS-02</b>_<b>{Dept}</b>_<b>{Vai trò}</b>_<b>{EmpID}</b>_<b>{Phạm vi}</b>_<b>{YYYYMMDD}</b>_<b>{sản phẩm / hiện vật}</b>_V0</div>
 <div class="small muted" style="margin-top:6px;">
  sản phẩm / hiện vật: tiêu chí đánh giá-TRN010 | đánh giá-TRN004 | CERT-TRN005 | NHẬT KÝ-TRN006 | BÀI KIỂM TRA NHANH | tình huống | BẰNG CHỨNG
- • Scope ghi mã máy/cell/công đoạn (không ghi chung chung).
+ • Phạm vi ghi mã máy/cell/công đoạn (không ghi chung chung).
  </div>
 </div>
 <h3>12.3 Nơi lưu (SharePoint)</h3>
@@ -805,7 +805,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <td><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a> (edit), <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> (đọc), Trưởng bộ phận (đọc), Đánh giá viên (đọc)</td>
 </tr>
 <tr>
-<td>Được ủy quyền Scope dùng cho phân công</td>
+<td>Được ủy quyền Phạm vi dùng cho phân công</td>
 <td>M365/SharePoint → HESEM-QMS-SSOT SharePoint List: AuthorizedScope</td>
 <td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhom dieu hanh tuyen dau) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span>/<span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Dieu do san xuat)"><span class="entity-code role-code">PPL</span></a></span> (đọc), <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quan ly nhan su)"><span class="entity-code role-code">HR</span></a> (edit), <a class="entity-link role-link" href="../../../mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Truong bo phan dam bao chat luong)"><span class="entity-code role-code">QA</span></a> (đọc)</td>
 </tr>
@@ -830,8 +830,8 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 </tr>
 <tr>
 <td>2</td>
-<td>Chứng nhận ghi scope mơ hồ, không chặn bố trí sai</td>
-<td>Review chéo (CP3) + quy tắc scope bắt buộc trên FRM-HR-TRN-005</td>
+<td>Chứng nhận ghi phạm vi mơ hồ, không chặn bố trí sai</td>
+<td>Review chéo (CP3) + quy tắc phạm vi bắt buộc trên FRM-HR-TRN-005</td>
 </tr>
 <tr>
 <td>3</td>
