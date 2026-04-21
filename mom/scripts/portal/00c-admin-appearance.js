@@ -156,9 +156,12 @@ window._hmSet = function(cssVar, path, value){
   }
   /* Graphics Authority bridge: route legacy writes through the new draft
      buffer so GraphicsAuthority.preview.simulate() can replay them and
-     graphics_simulation_run captures evidence. No-op when 00bb isn't loaded. */
+     graphics_simulation_run captures evidence. No-op when 00bb isn't loaded.
+     skipPreview=true — this function already wrote to HmTheme above; letting
+     stage() call HmTheme again would double the preview pipeline. */
   if(window.GraphicsAuthority && GraphicsAuthority.tokens && GraphicsAuthority.tokens.stage && path){
-    try { GraphicsAuthority.tokens.stage(path, value); } catch(_e){ /* swallow, legacy path must not throw */ }
+    try { GraphicsAuthority.tokens.stage(path, value, { skipPreview: true }); }
+    catch(_e){ /* swallow, legacy path must not throw */ }
   }
 };
 window._hmSetWithUnit = function(cssVar, path, value, unit){
@@ -4252,7 +4255,7 @@ function renderColors(){
            ['Pending','--eqms-pending'],['Approved','--eqms-approved'],['Closed','--eqms-closed'],['Voided','--eqms-voided']
           ].map(function(r){ return '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:999px;background:color-mix(in srgb,var('+r[1]+') 12%,transparent);border:1px solid color-mix(in srgb,var('+r[1]+') 30%,transparent);color:var('+r[1]+');font-size:11px;font-weight:700"><span style="width:7px;height:7px;border-radius:50%;background:var('+r[1]+');display:inline-block"></span>'+r[0]+'</span>'; }).join('')
         + '</div>')
-  , false, statusChip('full', 'EQMS · 7 states'));
+  , false, statusChip('full', L('7 trạng thái', '7 states')));
 
   /* Severity / risk heatmap (system-wide: risk, FMEA, SPC, OEE drill-down) */
   h += sect('🟥 '+L('Heatmap mức độ / rủi ro', 'Severity & risk heatmap palette'),
@@ -4272,7 +4275,7 @@ function renderColors(){
             return '<div style="padding:10px 8px;border-radius:var(--radius-md);background:var(--eqms-heatmap-'+r[1]+'-bg);color:var(--eqms-heatmap-'+r[1]+'-text);text-align:center;font-size:11px;font-weight:700">'+r[0]+'<br><span style="font-size:16px;font-weight:800">3</span></div>';
           }).join('')
         + '</div>')
-  , false, statusChip('full', 'EQMS · 4×2 pairs'));
+  , false, statusChip('full', L('4×2 cặp màu', '4×2 pairs')));
 
   /* State badge colors — dark mode (system-wide) */
   h += sect('🌙 '+L('Màu badge trạng thái (Dark mode)', 'State badge colors (dark mode)'),
@@ -4290,7 +4293,7 @@ function renderColors(){
     + colorPick('Voided BG dark', '--eqms-state-voided-bg-dark', 'eqms.stateDark.voidedBg', '#450a0a')
     + colorPick('Voided text dark', '--eqms-state-voided-text-dark', 'eqms.stateDark.voidedText', '#f87171')
     + '</div>'
-  , false, statusChip('full', 'EQMS · 6×2 pairs'));
+  , false, statusChip('full', L('6×2 cặp màu', '6×2 pairs')));
 
   /* Entity classification colors (system-wide: NCR, CAPA, WO, Part, Doc, Training, Audit...) */
   h += sect('🔗 '+L('Màu phân loại thực thể', 'Entity classification colors'),
@@ -4347,7 +4350,7 @@ function renderColors(){
     + colorPick('Task', '--eqms-entity-task', 'eqms.entity.task', '#f59e0b')
     + colorPick('Comment', '--eqms-entity-comment', 'eqms.entity.comment', '#a3a3a3')
     + '</div>'
-  , false, statusChip('admin', 'EQMS · 40+ entities'));
+  , false, statusChip('admin', L('40+ thực thể', '40+ entities')));
 
   /* Traceability link colors (system-wide genealogy / cause / release / ...) */
   h += sect('↔️ '+L('Màu liên kết truy xuất', 'Traceability link colors'),
@@ -4364,7 +4367,7 @@ function renderColors(){
     + colorPick('Implements', '--eqms-link-implements', 'eqms.link.implements', '#059669')
     + colorPick('Mitigates', '--eqms-link-mitigates', 'eqms.link.mitigates', '#16a34a')
     + '</div>'
-  , false, statusChip('full', 'EQMS · 11 link types'));
+  , false, statusChip('full', L('11 loại liên kết', '11 link types')));
 
   return h;
 }
@@ -4466,7 +4469,7 @@ function renderLayout(){
     slider('Mobile', '--page-pad-mobile', 'layout.pagePadMobile', 8, 24, 16, 'px')
     + slider('Tablet', '--page-pad-tablet', 'layout.pagePadTablet', 16, 40, 24, 'px')
     + slider('Desktop', '--page-pad-desktop', 'layout.pagePadDesktop', 20, 56, 32, 'px')
-  , false, statusChip('preview', 'V4 · responsive padding'));
+  , false, statusChip('preview', L('Padding responsive', 'Responsive padding')));
 
   /* Module shell dimensions (system-wide: nav width, header height, detail sidebar, filter bar) */
   h += sect('📐 '+L('Kích thước shell module', 'Module shell dimensions'),
@@ -4475,7 +4478,7 @@ function renderLayout(){
     + slider(L('Header height', 'Header height'), '--eqms-header-height', 'eqms.layout.headerHeight', 44, 72, 56, 'px')
     + slider(L('Detail sidebar', 'Detail sidebar'), '--eqms-detail-sidebar', 'eqms.layout.detailSidebar', 240, 480, 320, 'px')
     + slider(L('Filter bar height', 'Filter bar height'), '--eqms-filter-height', 'eqms.layout.filterHeight', 40, 72, 52, 'px')
-  , false, statusChip('full', 'EQMS · 5 dimensions'));
+  , false, statusChip('full', L('5 kích thước', '5 dimensions')));
 
   h += sect('📊 '+T('zIndex')+' (read-only)',
     '<table style="width:100%;font-size:11px;border-collapse:collapse"><thead><tr><th style="text-align:left;padding:4px 8px;border-bottom:1px solid var(--border)">Layer</th><th style="text-align:right;padding:4px 8px;border-bottom:1px solid var(--border)">Value</th></tr></thead><tbody>'
@@ -4562,7 +4565,7 @@ function renderEffects(){
         + '<span class="hm-badge" style="opacity:var(--opacity-muted,0.6)">Muted badge</span>'
         + '<span class="hm-badge hm-badge-approved" style="opacity:var(--opacity-disabled,0.4)">Disabled</span>'
         + '</div>')
-  , false, statusChip('preview', 'V4 · state layers'));
+  , false, statusChip('preview', L('State layers', 'State layers')));
 
   /* V4 — extended shadow scale */
   h += sect('🌑 '+L('Shadow mở rộng', 'Extended shadow scale'),
@@ -4577,7 +4580,7 @@ function renderEffects(){
         + '<div style="padding:10px 14px;border-radius:var(--radius-lg);background:var(--bg-surface);box-shadow:var(--shadow-lg)"><div style="font-size:10px;color:var(--text-tertiary)">LG</div></div>'
         + '<div style="padding:10px 14px;border-radius:var(--radius-lg);background:var(--bg-surface);box-shadow:var(--shadow-xl)"><div style="font-size:10px;color:var(--text-tertiary)">XL</div></div>'
         + '</div>')
-  , false, statusChip('preview', 'V4 · xs / lg / xl'));
+  , false, statusChip('preview', L('xs / lg / xl', 'xs / lg / xl')));
 
   /* V4 — easing curves */
   h += sect('↗️ '+L('Easing curves', 'Easing curves'),
@@ -4585,7 +4588,7 @@ function renderEffects(){
     + textInput('Ease in-out', '--ease-in-out', 'effects.easingInOut', 'cubic-bezier(0.4,0,0.2,1)')
     + textInput('Ease spring', '--ease-spring', 'effects.easingSpring', 'cubic-bezier(0.34,1.56,0.64,1)')
     + textInput('Ease sharp', '--ease-sharp', 'effects.easingSharp', 'cubic-bezier(0.2,0,0,1)')
-  , false, statusChip('preview', 'V4 · easing'));
+  , false, statusChip('preview', L('Easing curves', 'Easing curves')));
 
   return h;
 }

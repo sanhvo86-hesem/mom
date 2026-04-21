@@ -344,7 +344,7 @@ INSERT INTO graphics_token_catalog (token_key, css_variable, layer, family, subf
 ('status.warning.light', '--status-warning',  'semantic','color','status','hex','#d97706','#fbbf24','#cc6600','#663300',3.0,'colorsLight.bgSurface','Warning state color'),
 ('status.info.light',    '--status-info',     'semantic','color','status','hex','#2563eb','#60a5fa','#0033cc','#003399',4.5,'colorsLight.bgSurface','Info state color'),
 ('status.purple.light',  '--status-purple',   'semantic','color','status','hex','#7c3aed','#a78bfa','#5500cc','#330066',4.5,'colorsLight.bgSurface','Purple accent status'),
-('status.cyan.light',    '--status-cyan',     'semantic','color','status','hex','#0891b2','#22d3ee','#006688','#003344',4.5,'colorsLight.bgSurface','Cyan accent status')
+('status.cyan.light',    '--status-cyan',     'semantic','color','status','hex','#0891b2','#22d3ee','#006688','#003344',3.0,'colorsLight.bgSurface','Cyan accent status (non-text; WCAG non-text contrast 3:1 applies)')
 ON CONFLICT (token_key) DO NOTHING;
 
 -- ── Light mode surfaces ────────────────────────────────────────────────────

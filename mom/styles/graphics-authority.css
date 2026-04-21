@@ -6,6 +6,45 @@
    the widgets themselves participate in the theming pipeline (meta-consistency).
    ============================================================================ */
 
+/* ── CSS variable bridge (V4 audit fix #2, 2026-04-19) ────────────────────
+   portal.main.css (legacy) uses shorthand names like --bg, --text, --brand-2,
+   --green, --red. The Graphics Authority catalog publishes long names like
+   --bg-page, --text-primary, --brand-primary, --status-success, --status-error.
+   Without this bridge, a DB-driven rollout would update the long names but
+   consumer modules keyed on the shorthand would still render the old values.
+   These :root aliases make the authority long name the source of truth; the
+   shorthand inherits from it.
+
+   Load order: graphics-authority.css loads AFTER density-darkmode.css (which
+   re-declares long names in its own blocks), so these aliases win at
+   :root-level specificity while density-darkmode.css still overrides inside
+   its scoped selectors. */
+:root {
+  /* Surface & layering */
+  --bg:          var(--bg-page,       #f8fafc);
+  --surface:     var(--bg-surface,    #ffffff);
+  --surface-alt: var(--bg-surface-alt,#f1f5f9);
+
+  /* Text ramp */
+  --text:   var(--text-primary,   #1e293b);
+  --text-2: var(--text-secondary, #64748b);
+  --text-3: var(--text-tertiary,  #94a3b8);
+
+  /* Borders */
+  --border: var(--border-default, #e2e8f0);
+
+  /* Brand — legacy --brand-2 was the mid accent; the catalog names it
+     --brand-primary. Legacy --brand was the deep navy; catalog --brand-dark. */
+  --brand-2: var(--brand-primary, #1565c0);
+  --brand:   var(--brand-dark,    #0c2d48);
+
+  /* Status colours */
+  --green:  var(--status-success, #16a34a);
+  --red:    var(--status-error,   #dc2626);
+  --yellow: var(--status-warning, #d97706);
+  --blue:   var(--status-info,    #2563eb);
+}
+
 /* ── ControlKit widgets ──────────────────────────────────────────────── */
 .ck-row {
   display: grid;
