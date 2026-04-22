@@ -3943,10 +3943,27 @@ async function doSaveDocEdit(oldCode){
   const titleChanged = newTitle !== originalTitle;
   const descChanged = desc !== originalDesc;
 
+  // The portal DOCS registry sometimes stores the filename-derived long
+  // code (e.g. "QMS-MAN-001-QMS-MANUAL") while the backend scan cache is
+  // keyed on the canonical short form (e.g. "QMS-MAN-001"). Resolve to the
+  // backend's canonical key first: prefer __rawCode when present, otherwise
+  // fall back to the DOCS.code, and always send the file path for unambiguous
+  // identification.
+  const backendCode = String(currentDocMeta.__rawCode || currentDocMeta.code || oldCode);
+  const backendPath = String(currentDocMeta.path || '');
+
   // Rename file + sync header title when code, standard title, or header note changes
   if(codeChanged || titleChanged || descChanged){
     try {
-      const res = await apiCall('rename_doc', {old_code: oldCode, new_code: newCode, new_title: newTitle, new_desc: desc});
+      const res = await apiCall('rename_doc', {
+        old_code: backendCode,
+        old_path: backendPath,
+        path: backendPath,
+        code: backendCode,
+        new_code: newCode,
+        new_title: newTitle,
+        new_desc: desc
+      });
       if(res && res.ok){
         // Mirror the edit into the DCC control plane (dcc_document_header)
         // so the portal header renderer sees the authoritative data.
