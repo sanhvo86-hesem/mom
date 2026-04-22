@@ -2,7 +2,7 @@
     "_meta": {
         "domain": "integration_resilience",
         "table_count": 1,
-        "generated_at": "2026-04-22T01:09:11+00:00"
+        "generated_at": "2026-04-22T12:03:46+00:00"
     },
     "tables": {
         "mes_erp_reconciliation_exceptions": {

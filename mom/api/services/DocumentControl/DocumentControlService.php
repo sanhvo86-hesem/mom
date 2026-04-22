@@ -50,6 +50,85 @@ final class DocumentControlService
 
     public function __construct(private DataLayer $data) {}
 
+    // ── Code canonicalisation ──────────────────────────────────────────────
+
+    /**
+     * Normalise a user-entered document code.
+     *
+     * Historic filenames frequently bake a verbose title into the code, e.g.
+     *     QMS-MAN-001-QMS-MANUAL      → QMS-MAN-001
+     *     POL-QMS-001-QUALITY-POLICY  → POL-QMS-001
+     *     SOP-606-QUALITY-AUDIT       → SOP-606
+     *     FRM-403-SCAR                → FRM-403
+     *
+     * The rule is: keep the leading type-code family (upper-case, hyphen +
+     * digits family matches) and drop everything after the numeric tail.
+     * When the input does not match a recognised family we uppercase-trim
+     * and return as-is so the user can still persist unusual codes.
+     */
+    public static function canonicalizeCode(string $raw): string
+    {
+        $clean = strtoupper(trim($raw));
+        if ($clean === '') {
+            return '';
+        }
+
+        // Recognise every type family currently issued by the portal.
+        // Order matters — put longer prefixes first to avoid partial matches.
+        $families = [
+            'QMS-MAN',
+            'QMS-GDL',
+            'POL-QMS',
+            'POL',
+            'SOP',
+            'WI',
+            'ANNEX',
+            'FRM',
+            'REF',
+            'JD',
+            'DEPT',
+            'ORG',
+            'RACI',
+            'TRN',
+            'MRR',
+            'SYS-OPS',
+            'TRN-OPS',
+        ];
+
+        foreach ($families as $family) {
+            $escaped = preg_quote($family, '/');
+            if (preg_match('/^(' . $escaped . '-[A-Z0-9]+(?:-[A-Z0-9]+)?)/i', $clean, $m)) {
+                return strtoupper($m[1]);
+            }
+        }
+
+        return $clean;
+    }
+
+    /**
+     * Derive a doc_type enum value from a canonical code. Falls back to REF
+     * for unrecognised prefixes so the NOT NULL constraint never trips.
+     */
+    public static function deriveDocType(string $canonicalCode): string
+    {
+        $upper = strtoupper($canonicalCode);
+        if (str_starts_with($upper, 'QMS-MAN')) return 'MAN';
+        if (str_starts_with($upper, 'POL-'))    return 'POL';
+        if ($upper === 'POL' || str_starts_with($upper, 'POL-')) return 'POL';
+        if (str_starts_with($upper, 'SOP-'))    return 'SOP';
+        if (str_starts_with($upper, 'WI-'))     return 'WI';
+        if (str_starts_with($upper, 'ANNEX-'))  return 'ANNEX';
+        if (str_starts_with($upper, 'FRM-'))    return 'FRM';
+        if (str_starts_with($upper, 'JD-'))     return 'JD';
+        if (str_starts_with($upper, 'DEPT-'))   return 'DEPT';
+        if (str_starts_with($upper, 'ORG-'))    return 'ORG';
+        if (str_starts_with($upper, 'RACI-'))   return 'ORG';
+        if (str_starts_with($upper, 'TRN'))     return 'TRN';
+        if (str_starts_with($upper, 'SYS-OPS')) return 'REF';
+        if (str_starts_with($upper, 'MRR'))     return 'REF';
+        return 'REF';
+    }
+
     // ── Label registry ─────────────────────────────────────────────────────
 
     /**
@@ -151,6 +230,81 @@ final class DocumentControlService
             throw new RuntimeException('dcc_document_not_found:' . $docCode);
         }
         return $row[0];
+    }
+
+    /**
+     * Upsert a document header from the portal "Edit Document" dialog.
+     *
+     * - Canonicalises the supplied doc_code (strips redundant suffixes).
+     * - Creates a new row with sane defaults if the header does not exist
+     *   (doc_type derived from prefix, revision V0, today as effective_date,
+     *   QA owner, CEO approver, status draft).
+     * - Otherwise patches only the dialog-editable fields (title, subtitle).
+     *
+     * The ID normalisation happens here as well as in the frontend so the
+     * database always receives a clean code regardless of the client path.
+     *
+     * @param array{doc_code: string, title?: string, subtitle?: string,
+     *              owner_role_code?: string, approver_role_code?: string,
+     *              revision?: string, effective_date?: string,
+     *              doc_type?: string, iso_clause?: string,
+     *              metadata?: array} $input
+     * @return array{header: array<string, mixed>, canonical_code: string,
+     *                raw_code: string, created: bool}
+     */
+    public function upsertHeader(array $input, string $actor): array
+    {
+        $rawCode = (string)($input['doc_code'] ?? '');
+        if (trim($rawCode) === '') {
+            throw new InvalidArgumentException('dcc_upsert_missing_doc_code');
+        }
+        $canonical = self::canonicalizeCode($rawCode);
+        if ($canonical === '') {
+            throw new InvalidArgumentException('dcc_upsert_invalid_doc_code');
+        }
+
+        $existing = $this->data->query(
+            "SELECT doc_code, status FROM dcc_document_header WHERE doc_code = :c LIMIT 1",
+            [':c' => $canonical]
+        ) ?? [];
+
+        if ($existing !== []) {
+            if ($existing[0]['status'] === 'obsolete') {
+                throw new RuntimeException('dcc_document_obsolete_readonly');
+            }
+            $patch = array_intersect_key($input, array_flip([
+                'title', 'subtitle', 'iso_clause',
+                'owner_role_code', 'approver_role_code', 'metadata',
+            ]));
+            $header = $this->updateHeader($canonical, $patch, $actor);
+            return [
+                'header'         => $header,
+                'canonical_code' => $canonical,
+                'raw_code'       => $rawCode,
+                'created'        => false,
+            ];
+        }
+
+        $header = $this->createHeader([
+            'doc_code'           => $canonical,
+            'title'              => trim((string)($input['title'] ?? $canonical)),
+            'subtitle'           => isset($input['subtitle']) ? trim((string)$input['subtitle']) : null,
+            'doc_type'           => $input['doc_type'] ?? self::deriveDocType($canonical),
+            'revision'           => $input['revision'] ?? 'V0',
+            'effective_date'     => $input['effective_date'] ?? date('Y-m-d'),
+            'owner_role_code'    => $input['owner_role_code']    ?? 'QA',
+            'approver_role_code' => $input['approver_role_code'] ?? 'CEO',
+            'iso_clause'         => $input['iso_clause'] ?? null,
+            'status'             => 'draft',
+            'metadata'           => $input['metadata'] ?? (object)[],
+        ], $actor);
+
+        return [
+            'header'         => $header,
+            'canonical_code' => $canonical,
+            'raw_code'       => $rawCode,
+            'created'        => true,
+        ];
     }
 
     /**

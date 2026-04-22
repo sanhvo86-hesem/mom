@@ -3902,8 +3902,31 @@ function openDocEditDialog(code){
   modal.addEventListener('click',e=>{ if(e.target===modal) modal.remove(); });
 }
 
+/**
+ * Normalise a user-entered document code for the DCC control plane.
+ * Strips redundant title suffixes so "QMS-MAN-001-QMS-MANUAL" becomes
+ * "QMS-MAN-001", "POL-QMS-001-QUALITY-POLICY" becomes "POL-QMS-001", etc.
+ * Mirrors DocumentControlService::canonicalizeCode() on the backend.
+ */
+function canonicalizeDocCode(raw){
+  var clean = String(raw || '').toUpperCase().trim();
+  if(!clean) return '';
+  var families = [
+    'QMS-MAN','QMS-GDL','POL-QMS','POL','SOP','WI','ANNEX','FRM','REF',
+    'JD','DEPT','ORG','RACI','TRN','MRR','SYS-OPS','TRN-OPS'
+  ];
+  for(var i=0;i<families.length;i++){
+    var esc = families[i].replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+    var re = new RegExp('^(' + esc + '-[A-Z0-9]+(?:-[A-Z0-9]+)?)', 'i');
+    var m = clean.match(re);
+    if(m) return m[1].toUpperCase();
+  }
+  return clean;
+}
+
 async function doSaveDocEdit(oldCode){
-  const newCode = (document.getElementById('de-code')?.value||'').trim();
+  var newCodeRaw = (document.getElementById('de-code')?.value||'').trim();
+  var newCode = canonicalizeDocCode(newCodeRaw);
   const titleEl = document.getElementById('de-title');
   const newTitle = (titleEl?.value||'').trim();
   const originalTitle = (titleEl?.dataset?.original||'').trim();
@@ -3925,6 +3948,23 @@ async function doSaveDocEdit(oldCode){
     try {
       const res = await apiCall('rename_doc', {old_code: oldCode, new_code: newCode, new_title: newTitle, new_desc: desc});
       if(res && res.ok){
+        // Mirror the edit into the DCC control plane (dcc_document_header)
+        // so the portal header renderer sees the authoritative data.
+        try {
+          await fetch('/api/v1/dcc/documents/upsert', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+            body: JSON.stringify({
+              doc_code: newCode,
+              title:    newTitle || newCode,
+              subtitle: desc || null
+            })
+          });
+        } catch(dccErr){
+          console.warn('[DCC] upsert failed (non-fatal):', dccErr);
+        }
+
         showToast(`✅ ${lang==='en'?'Saved':'Đã lưu'}`);
         document.getElementById('doc-edit-modal')?.remove();
         await rescanDocs(); renderDocuments(); renderSidebar();

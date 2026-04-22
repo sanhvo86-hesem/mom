@@ -32,6 +32,7 @@ return static function (Router $router, string $dataDir): void {
     // ── Header CRUD ────────────────────────────────────────────────────────
     $router->get ('/api/v1/dcc/documents',                                       DocumentControlController::class, 'listHeaders');
     $router->post('/api/v1/dcc/documents',                                       DocumentControlController::class, 'createHeader');
+    $router->post('/api/v1/dcc/documents/upsert',                                DocumentControlController::class, 'upsertHeader');
     $router->get ('/api/v1/dcc/documents/{doc_code}/header',                     DocumentControlController::class, 'getHeader');
     $router->patch('/api/v1/dcc/documents/{doc_code}/header',                    DocumentControlController::class, 'updateHeader');
     $router->get ('/api/v1/dcc/documents/{doc_code}/revisions',                  DocumentControlController::class, 'listRevisions');

@@ -134,6 +134,35 @@ final class DocumentControlController extends EqmsBaseController
         $this->success(['header' => $result], 201);
     }
 
+    /**
+     * POST /api/v1/dcc/documents/upsert
+     *
+     * Canonicalises the supplied doc_code and creates the DCC header row if
+     * it does not exist, otherwise patches the dialog-editable fields.
+     * Used by the portal "Chỉnh Sửa Tài Liệu" modal to mirror filename-level
+     * edits into the DCC control plane with a normalised ID.
+     */
+    public function upsertHeader(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->writeRoles());
+        $body = $this->jsonBody();
+        try {
+            $result = $this->service()->upsertHeader($body, $this->actor($user));
+        } catch (InvalidArgumentException $e) {
+            $this->error('dcc_invalid_input', 422, $e->getMessage());
+        } catch (RuntimeException $e) {
+            $msg = $e->getMessage();
+            if (str_starts_with($msg, 'dcc_document_obsolete_readonly')) {
+                $this->error('dcc_document_obsolete_readonly', 409, $msg);
+            }
+            $this->error('dcc_upsert_failed', 400, $msg);
+        } catch (Throwable $e) {
+            $this->error('dcc_upsert_failed', 500, $e->getMessage());
+        }
+        $this->success($result, $result['created'] ? 201 : 200);
+    }
+
     /** GET /api/v1/dcc/documents/{doc_code}/header */
     public function getHeader(): never
     {
