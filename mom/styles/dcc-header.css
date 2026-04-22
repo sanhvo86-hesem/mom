@@ -120,6 +120,20 @@
     font-weight: 400;
     line-height: 1.35;
     margin: 0;
+    /* Explicit full-width + normal wrapping so long Vietnamese descriptions
+       are never clipped with an ellipsis, regardless of ancestor rules. */
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    max-width: none;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.dcc-header__titles {
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: 100%;
 }
 
 /* ── Ribbon (the label/value cells) ─────────────────────────────────────── */
