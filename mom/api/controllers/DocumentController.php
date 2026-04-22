@@ -1201,7 +1201,7 @@ class DocumentController extends BaseController
     {
         $map = [
             'QA' => ['kind' => 'role', 'code' => 'QA', 'path' => 'mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html', 'title' => 'QA Manager (Truong bo phan dam bao chat luong)'],
-            'QMS' => ['kind' => 'role', 'code' => 'QMS', 'path' => 'mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html', 'title' => 'QMS Engineer (Ky su he thong QMS)'],
+            'QMS' => ['kind' => 'label', 'code' => 'QMS', 'path' => null, 'title' => 'Quality Management System'],
             'CEO' => ['kind' => 'role', 'code' => 'CEO', 'path' => 'mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html', 'title' => 'Chief Executive Officer (Tong Giam doc)'],
             'PD' => ['kind' => 'role', 'code' => 'PD', 'path' => 'mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html', 'title' => 'Production Director (Giam doc san xuat)'],
             'ENGM' => ['kind' => 'role', 'code' => 'ENGM', 'path' => 'mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html', 'title' => 'Engineering Lead / Manager (Truong nhom / quan ly ky thuat)'],
@@ -1230,11 +1230,19 @@ class DocumentController extends BaseController
                 continue;
             }
             $entry = $map[$token];
-            $href = htmlspecialchars($rootBase . $entry['path'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-            $title = htmlspecialchars($entry['title'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
             $code = htmlspecialchars($entry['code'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-            $linkClass = $entry['kind'] === 'dept' ? 'entity-link dept-link' : 'entity-link role-link';
             $codeClass = $entry['kind'] === 'dept' ? 'entity-code dept-code' : 'entity-code role-code';
+
+            // Bare "QMS" is the system acronym in most document headers, not a job title.
+            if ($entry['kind'] === 'label') {
+                $title = htmlspecialchars($entry['title'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+                $chips[] = '<span class="' . $codeClass . '" title="' . $title . '">' . $code . '</span>';
+                continue;
+            }
+
+            $href = htmlspecialchars($rootBase . (string)$entry['path'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $title = htmlspecialchars($entry['title'], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            $linkClass = $entry['kind'] === 'dept' ? 'entity-link dept-link' : 'entity-link role-link';
             $chips[] = '<a class="' . $linkClass . '" href="' . $href . '" title="' . $title . '"><span class="' . $codeClass . '">' . $code . '</span></a>';
         }
 

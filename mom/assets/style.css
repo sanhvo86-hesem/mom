@@ -429,6 +429,28 @@ h2.h2 + p:has(+ .pillar-grid) {
   content: ", ";
   color: var(--ink2);
 }
+.inline-doc-list {
+  line-height: 1.7;
+}
+.inline-doc-list .inline-tag {
+  display: inline !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-size: inherit !important;
+  font-weight: inherit !important;
+  line-height: inherit !important;
+}
+.inline-doc-list .inline-tag + .inline-tag::before {
+  content: ", ";
+  color: var(--ink2);
+}
+.inline-doc-list a {
+  white-space: nowrap;
+}
 /* Keep document/form references compact in related-document tables. */
 .table-card td > a + br,
 .table-block td > a + br,

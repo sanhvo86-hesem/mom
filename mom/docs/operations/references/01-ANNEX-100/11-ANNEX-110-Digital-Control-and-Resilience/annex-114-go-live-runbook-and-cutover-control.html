@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ANNEX-114 - Go Live Runbook and Cutover Control | HESEM MOM</title>
+<title>ANNEX-114 - Sổ tay điều hành triển khai chính thức và kiểm soát chuyển đổi | HESEM MOM</title>
 <link href="../../../../assets/style.css" rel="stylesheet">
 <style>
 .hero{border:1px solid var(--ln);border-radius:var(--r-lg);padding:18px 20px;background:linear-gradient(135deg,#f7fbff 0%,#fff9ef 100%);margin:0 0 18px;}
@@ -41,7 +41,7 @@
  </div>
  </div>
  <div class="title">
-<strong class="doc-name">Go Live Runbook and Cutover Control</strong>
+<strong class="doc-name">Sổ tay điều hành triển khai chính thức và kiểm soát chuyển đổi</strong>
 </div>
  <div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">ANNEX-114</span></div>
 <div class="row"><span><b>Phiên bản:</b></span><span>V1</span></div>
@@ -51,17 +51,17 @@
  </div>
 
 
-<div class="note"><strong>ÁP DỤNG KHI</strong><br>Áp dụng cho mọi go-live hoặc cutover liên quan đến tài liệu vận hành, M365 hồ sơ, dashboard điều hành, tuyến công nghệ metadata, access production, gói phát hành, workflow, pilot chuyển sang production và bàn giao sang hypercare.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Áp dụng cho mọi đợt đưa vào vận hành chính thức hoặc chuyển đổi chính thức liên quan đến tài liệu vận hành, hồ sơ M365, bảng điều khiển điều hành, siêu dữ liệu tuyến hồ sơ, quyền truy cập môi trường chính thức, gói phát hành, quy trình mới, giai đoạn thí điểm chuyển sang vận hành chính thức và giai đoạn hỗ trợ tăng cường sau triển khai.</div>
 
 <div class="hero">
- <h1>ANNEX-114 - Go Live Runbook and Cutover Control</h1>
- <p>Mọi go-live phải có runbook theo mốc thời gian, Người chỉ huy, severity rõ, rollback trigger rõ, kênh liên lạc rõ và bằng chứng rõ. Không cho phép triển khai kiểu "ai rảnh thì xử lý" hoặc chỉ dựa vào chat nhóm.</p>
+ <h1>ANNEX-114 - Sổ tay điều hành triển khai chính thức và kiểm soát chuyển đổi</h1>
+ <p>Mọi đợt đưa vào vận hành chính thức phải có sổ tay điều hành theo mốc thời gian, người chỉ huy rõ, mức độ sự cố rõ, mốc kích hoạt hoàn nguyên rõ, kênh liên lạc rõ và bằng chứng rõ. Không cho phép triển khai theo kiểu "ai rảnh thì xử lý" hoặc chỉ dựa vào chat nhóm.</p>
 </div>
 
-<div class="callout"><strong>PHẢI</strong><br>Go-live chỉ được phép diễn ra khi đã chốt đủ 6 lớp: Người quyết định, Người vận hành, dữ liệu nguồn, dashboard trạng thái, fallback và kênh hỗ trợ Người dùng. Thiếu một lớp thì dừng go-live.</div>
+<div class="callout"><strong>PHẢI</strong><br>Đợt triển khai chính thức chỉ được phép diễn ra khi đã chốt đủ 6 lớp: người quyết định, người vận hành, dữ liệu nguồn, bảng điều khiển trạng thái, phương án dự phòng và kênh hỗ trợ người dùng. Thiếu một lớp thì dừng triển khai.</div>
 
 <div class="section">
- <h2>1. Vai trò trong cutover và hypercare</h2>
+ <h2>1. Vai trò trong chuyển đổi và hỗ trợ tăng cường</h2>
  <div class="table-card">
  <table class="matrix-table">
  <thead>
@@ -69,45 +69,45 @@
  <th>Vai trò</th>
  <th>Trách nhiệm chính</th>
  <th>Điểm dừng / quyền quyết</th>
- <th>Giao ca / backup</th>
+ <th>Bàn giao / người thay thế</th>
  </tr>
  </thead>
  <tbody>
  <tr>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tổng Giám đốc)"><span class="entity-code role-code">CEO</span></a></span></td>
- <td>Quyết định Go/No-Go ở cấp công ty, cho phép rollback nếu ảnh hưởng sản xuất</td>
- <td>Dừng go-live hoặc rollback toàn cục</td>
- <td>Deputy theo <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></td>
+ <td>Quyết định triển khai hay dừng triển khai ở cấp công ty, cho phép hoàn nguyên nếu ảnh hưởng sản xuất</td>
+ <td>Dừng triển khai hoặc hoàn nguyên toàn cục</td>
+ <td>Người thay thế theo <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a></td>
  </tr>
  <tr>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a></span></td>
  <td>Điều phối toàn bộ hoạt động theo từng mốc thời gian và cập nhật trạng thái chung</td>
  <td>Dừng chuyển bước khi chưa đủ điều kiện của mốc trước</td>
- <td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a> backup theo rota cutover</td>
+ <td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a> thay ca theo lịch chuyển đổi</td>
  </tr>
  <tr>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td>
- <td>Điều hành issue board, severity, owner, ETA và thông tin tới phòng ban</td>
- <td>Nâng severity, Mọi support, yêu cầu fallback cục bộ</td>
- <td>Shift Lead còn lại</td>
+ <td>Điều hành sổ theo dõi sự cố, phân loại mức độ, chỉ định người phụ trách, hạn xử lý dự kiến và thông tin tới phòng ban</td>
+ <td>Nâng mức độ sự cố, huy động hỗ trợ liên phòng ban, yêu cầu phương án dự phòng cục bộ</td>
+ <td>Trưởng ca còn lại</td>
  </tr>
  <tr>
  <td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FUNC_OWNERS" href="../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-owners" title="Functional Content Owners (Nhóm sở hữu nội dung nghiệp vụ theo chức năng) — CS / EST / PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA"><span class="entity-code bundle-code">FUNC_OWNERS</span></a></span></td>
- <td>Xác nhận Người dùng phòng mình sẵn sàng và xử lý issue nghiệp vụ</td>
- <td>Không cho phòng mình vào go-live nếu chưa pass training hoặc OJT</td>
+ <td>Xác nhận người dùng của phòng mình đã sẵn sàng và xử lý sự cố nghiệp vụ phát sinh</td>
+ <td>Không cho phòng mình vào triển khai chính thức nếu chưa đạt đào tạo hoặc OJT</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="DEPLOYMENT_LEADS" href="../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-deployment-leads" title="Deployment Leads (Nhóm đầu mối triển khai theo ca và phòng ban) — WKM / SL / DBL / CPS / QCL / HR"><span class="entity-code bundle-code">DEPLOYMENT_LEADS</span></a></span></td>
  </tr>
  <tr>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quản trị viên hệ thống Epicor)"><span class="entity-code role-code">ESA</span></a></span></td>
- <td>Access, metadata, portal, refresh, backup, rollback kỹ thuật</td>
- <td>Khóa publish, chặn access production, kích hoạt fallback số</td>
+ <td>Quyền truy cập, siêu dữ liệu, cổng tra cứu, làm mới dữ liệu, sao lưu và hoàn nguyên kỹ thuật</td>
+ <td>Khóa phát hành, chặn quyền truy cập môi trường chính thức, kích hoạt phương án dự phòng số</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quản trị viên hệ thống Epicor)"><span class="entity-code role-code">ESA</span></a></span></td>
  </tr>
  <tr>
  <td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="DEPLOYMENT_LEADS" href="../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-deployment-leads" title="Deployment Leads (Nhóm đầu mối triển khai theo ca và phòng ban) — WKM / SL / DBL / CPS / QCL / HR"><span class="entity-code bundle-code">DEPLOYMENT_LEADS</span></a></span></td>
- <td>Phân công Champion theo ca, thu issue hiện trường, hỗ trợ tại điểm dùng</td>
- <td>Báo no-go ở mức cell/line/shift nếu coverage không đủ</td>
- <td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)"><span class="entity-code role-code">WKM</span></a> / <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Trưởng ca)"><span class="entity-code role-code">SL</span></a> / <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-deburr-team-lead.html" title="Deburr Team Lead (Tổ trưởng phá ba via)"><span class="entity-code role-code">DBL</span></a> / <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-and-packaging-supervisor.html" title="Cleaning and Packaging Supervisor (Giám sát vệ sinh và đóng gói)"><span class="entity-code role-code">CPS</span></a> / <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (Tổ trưởng QC)"><span class="entity-code role-code">QCL</span></a> backup theo ca</td>
+ <td>Phân công đầu mối hỗ trợ theo ca, thu nhận sự cố hiện trường và hỗ trợ tại điểm dùng</td>
+ <td>Đề nghị dừng triển khai ở cấp điểm dùng, khu vực hoặc ca nếu độ phủ hỗ trợ không đủ</td>
+ <td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)"><span class="entity-code role-code">WKM</span></a> / <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Trưởng ca)"><span class="entity-code role-code">SL</span></a> / <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-deburr-team-lead.html" title="Deburr Team Lead (Tổ trưởng phá ba via)"><span class="entity-code role-code">DBL</span></a> / <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-and-packaging-supervisor.html" title="Cleaning and Packaging Supervisor (Giám sát vệ sinh và đóng gói)"><span class="entity-code role-code">CPS</span></a> / <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (Tổ trưởng QC)"><span class="entity-code role-code">QCL</span></a> thay ca theo lịch</td>
  </tr>
  </tbody>
  </table>
@@ -115,63 +115,63 @@
 </div>
 
 <div class="section">
- <h2>2. Trình tự cutover theo thời gian</h2>
- <div class="timeline-step"><strong>T-30 đến T-14:</strong> Khóa phạm vi, owner, danh sách phòng ban vào wave, backlog thay đổi, kế hoạch giao tiếp, danh sách tài liệu hiệu lực, mô hình access, plan fallback và rollback.</div>
- <div class="timeline-step"><strong>T-14 đến T-7:</strong> Hoàn thành manager briefing, Champion bootcamp, test metadata, test dashboard, load baseline KPI, kiểm link portal, phát QR, test 3 tình huống truy xuất thật.</div>
- <div class="timeline-step"><strong>T-7 đến T-2:</strong> Freeze các thay đổi không bắt buộc, ký UAT, chốt danh sách support, diễn tập rollback, kiểm backup, chốt hotline và Người trực từng ca.</div>
- <div class="timeline-step"><strong>T-1:</strong> Họp Go/No-Go cuối, xác nhận checklist, kiểm last refresh dashboard, phát thông báo cuối cho Người dùng, chụp snapshot trạng thái trước go-live.</div>
- <div class="timeline-step"><strong>Day 0:</strong> Thực hiện cutover theo giờ, kích hoạt command center, theo dõi giao dịch đầu tiên, đóng hoặc escalate issue theo severity, ra quyết định tiếp tục hoặc rollback.</div>
- <div class="timeline-step"><strong>D+1 đến D+14:</strong> Hypercare theo ca và theo ngày, rà issue aging, giảm support dựa trên dữ liệu pass, khóa bài học kinh nghiệm và chuẩn bị hypercare exit.</div>
+ <h2>2. Trình tự chuyển đổi theo thời gian</h2>
+ <div class="timeline-step"><strong>T-30 đến T-14:</strong> Chốt phạm vi, người phụ trách, danh sách phòng ban vào từng đợt, tồn đọng thay đổi, kế hoạch truyền thông, danh mục tài liệu hiệu lực, mô hình phân quyền, phương án dự phòng và kịch bản hoàn nguyên.</div>
+ <div class="timeline-step"><strong>T-14 đến T-7:</strong> Hoàn thành họp thống nhất với quản lý, huấn luyện đầu mối hỗ trợ, thử siêu dữ liệu, thử bảng điều khiển, nạp đường cơ sở KPI, kiểm liên kết cổng tra cứu, phát mã QR và thử 3 tình huống truy xuất thật.</div>
+ <div class="timeline-step"><strong>T-7 đến T-2:</strong> Đóng băng các thay đổi không bắt buộc, ký UAT, chốt danh sách hỗ trợ, diễn tập hoàn nguyên, kiểm sao lưu và chốt hotline cùng người trực theo từng ca.</div>
+ <div class="timeline-step"><strong>T-1:</strong> Họp quyết định triển khai cuối, xác nhận bảng kiểm, kiểm thời điểm làm mới gần nhất của bảng điều khiển, phát thông báo cuối cho người dùng và chụp ảnh trạng thái trước khi triển khai.</div>
+ <div class="timeline-step"><strong>Ngày 0:</strong> Thực hiện chuyển đổi theo giờ, kích hoạt trung tâm điều hành, theo dõi giao dịch đầu tiên, đóng hoặc leo thang sự cố theo mức độ và ra quyết định tiếp tục hay hoàn nguyên.</div>
+ <div class="timeline-step"><strong>D+1 đến D+14:</strong> Hỗ trợ tăng cường theo ca và theo ngày, rà tuổi tồn sự cố, chỉ giảm hỗ trợ khi dữ liệu xác nhận đã đạt và chốt bài học kinh nghiệm trước khi kết thúc giai đoạn tăng cường.</div>
 </div>
 
 <div class="section">
- <h2>3. Checklist Go/No-Go bắt buộc</h2>
+ <h2>3. Bảng kiểm Go/No-Go bắt buộc</h2>
  <div class="table-card">
  <table class="matrix-table">
  <thead>
  <tr>
  <th>Nhóm điều kiện</th>
  <th>Điểm kiểm bắt buộc</th>
- <th>Owner xác nhận</th>
- <th>No-go nếu</th>
+ <th>Người xác nhận</th>
+ <th>Không được triển khai nếu</th>
  </tr>
  </thead>
  <tbody>
  <tr>
- <td>People</td>
- <td>Manager pass, Champion coverage đủ theo ca, Người dùng trọng yếu pass OJT</td>
+ <td>Con người</td>
+ <td>Quản lý xác nhận đạt, đầu mối hỗ trợ đủ theo ca, người dùng trọng yếu đã hoàn tất OJT</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FUNC_HEADS" href="../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-heads" title="Function Heads (Nhóm đầu mối điều hành chức năng) — PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA"><span class="entity-code bundle-code">FUNC_HEADS</span></a></span></td>
- <td>Không đủ Champion hoặc user trọng yếu chưa pass</td>
+ <td>Không đủ đầu mối hỗ trợ hoặc người dùng trọng yếu chưa đạt</td>
  </tr>
  <tr>
- <td>Documents</td>
- <td>Handbook, SOP, WI, QR, playlist, FRM và ANNEX đã đồng bộ bản hiệu lực</td>
+ <td>Tài liệu</td>
+ <td>Sổ tay, SOP, WI, mã QR, danh sách video, FRM và ANNEX đã đồng bộ đúng phiên bản hiệu lực</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td>
  <td>Link chết, tài liệu sai phiên bản, QR trỏ sai</td>
  </tr>
  <tr>
- <td>Digital</td>
- <td>Permission, metadata, folder tuyến công nghệ, thời hạn lưu trữ, backup, offline kit đã sẵn sàng</td>
+ <td>Hạ tầng số</td>
+ <td>Phân quyền, siêu dữ liệu, thư mục theo tuyến công nghệ, thời hạn lưu trữ, sao lưu và bộ công cụ làm việc ngoại tuyến đã sẵn sàng</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td>
- <td>Không truy cập được hoặc sai quyền production</td>
+ <td>Không truy cập được hoặc sai quyền ở môi trường chính thức</td>
  </tr>
  <tr>
- <td>Data &amp; dashboard</td>
- <td>Dashboard có owner, source, last refresh, exception rule, baseline KPI</td>
+ <td>Dữ liệu và bảng điều khiển</td>
+ <td>Bảng điều khiển có người chịu trách nhiệm, nguồn dữ liệu, thời điểm làm mới gần nhất, quy tắc ngoại lệ và đường cơ sở KPI</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="MR_REPORT_OWNERS" href="../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-mr-report-owners" title="Management Review Report Owners (Nhóm chủ trì gói báo cáo MR và KPI) — CS / EST / PD / ENGM / QA[QMR] / QMS / SCM / FIN / HR / EHS / ITA"><span class="entity-code bundle-code">MR_REPORT_OWNERS</span></a></span></td>
  <td>Số không đáng tin hoặc không có nguồn thay thế được công bố</td>
  </tr>
  <tr>
- <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-finance-handbook.html" title="Finance Department (Phòng Tài chính)"><span class="entity-code dept-code">D-FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phòng Nhân sự)"><span class="entity-code dept-code">D-HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phòng EHS)"><span class="entity-code dept-code">D-EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bộ phận quản trị ERP)"><span class="entity-code dept-code">D-ERP</span></a></span></td>
- <td>Command center rota, contact list, severity matrix, issue log, escalation SLA</td>
+ <td>Hỗ trợ và xử lý sự cố</td>
+ <td>Lịch trực trung tâm điều hành, danh sách liên hệ, ma trận mức độ nghiêm trọng, sổ theo dõi sự cố và thời hạn leo thang</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td>
- <td>Không có Người trực hoặc không có kênh xử lý issue</td>
+ <td>Không có người trực hoặc không có kênh xử lý sự cố</td>
  </tr>
  <tr>
- <td>Rollback</td>
- <td>Đã diễn tập rollback và đã chốt trigger rõ</td>
+ <td>Hoàn nguyên</td>
+ <td>Đã diễn tập hoàn nguyên và đã chốt rõ mốc kích hoạt</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quản trị viên hệ thống Epicor)"><span class="entity-code role-code">ESA</span></a></span></td>
- <td>Chưa kiểm được fallback hoặc rollback path</td>
+ <td>Chưa kiểm được đường quay về chuẩn hoặc kịch bản hoàn nguyên</td>
  </tr>
  </tbody>
  </table>
@@ -179,59 +179,59 @@
 </div>
 
 <div class="section">
- <h2>4. Lịch điều hành Day 0 theo mốc giờ</h2>
+ <h2>4. Lịch điều hành ngày triển khai chính thức theo mốc giờ</h2>
  <div class="table-card">
  <table class="matrix-table">
  <thead>
  <tr>
  <th>Thời điểm</th>
  <th>Hoạt động</th>
- <th>Owner</th>
+ <th>Người phụ trách</th>
  <th>Đầu ra</th>
  </tr>
  </thead>
  <tbody>
  <tr>
  <td>06:30-07:00</td>
- <td>Command center mở ca, kiểm contact list, kiểm dashboard status, xác nhận Champion hiện diện</td>
+ <td>Trung tâm điều hành mở ca, kiểm danh sách liên hệ, kiểm trạng thái bảng điều khiển và xác nhận đầu mối triển khai có mặt</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td>
- <td>Bảng trạng thái Ngày go-live ở trạng thái xanh hoặc có exception được chấp nhận</td>
+ <td>Bảng trạng thái ngày triển khai ở mức xanh hoặc đã công bố ngoại lệ chấp nhận được</td>
  </tr>
  <tr>
  <td>07:00-07:30</td>
- <td>Go-live briefing đầu ca: nhắc phạm vi, rule dừng, kênh hỗ trợ và rollback trigger</td>
+ <td>Họp đầu ca cho ngày triển khai: nhắc phạm vi, nguyên tắc dừng, kênh hỗ trợ và mốc kích hoạt hoàn nguyên</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a></span></td>
- <td>Tất cả owner biết mốc giao việc và kênh báo issue</td>
+ <td>Tất cả người phụ trách biết mốc giao việc và kênh báo sự cố</td>
  </tr>
  <tr>
  <td>07:30-09:00</td>
- <td>Quan sát giao dịch đầu tiên, job đầu tiên, upload đầu tiên, truy xuất đầu tiên</td>
+ <td>Quan sát giao dịch đầu tiên, lệnh công việc đầu tiên, lần tải lên đầu tiên và lượt truy xuất đầu tiên</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA[QMR]</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quản lý tài chính)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quản lý nhân sự)"><span class="entity-code role-code">HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)"><span class="entity-code role-code">EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)"><span class="entity-code role-code">WKM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Trưởng ca)"><span class="entity-code role-code">SL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-deburr-team-lead.html" title="Deburr Team Lead (Tổ trưởng phá ba via)"><span class="entity-code role-code">DBL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-and-packaging-supervisor.html" title="Cleaning and Packaging Supervisor (Giám sát vệ sinh và đóng gói)"><span class="entity-code role-code">CPS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (Tổ trưởng QC)"><span class="entity-code role-code">QCL</span></a></span></td>
- <td>First transaction log và first issue list</td>
+ <td>Nhật ký giao dịch đầu tiên và danh sách sự cố đầu tiên</td>
  </tr>
  <tr>
  <td>09:00-11:00</td>
- <td>Xử lý issue ưu tiên cao, khóa ngay lỗi wrong-document, wrong-vị trí, wrong-revision</td>
+ <td>Xử lý sự cố ưu tiên cao, khóa ngay lỗi dùng sai tài liệu, sai vị trí lưu và sai phiên bản</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td>
- <td>Issue board cập nhật severity và owner</td>
+ <td>Bảng sự cố cập nhật mức độ nghiêm trọng và người phụ trách</td>
  </tr>
  <tr>
  <td>12:00</td>
- <td>Mid-shift review: quyết tiếp tục, giới hạn phạm vi hoặc rollback cục bộ</td>
+ <td>Rà giữa ca: quyết định tiếp tục, giới hạn phạm vi hoặc hoàn nguyên cục bộ</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tổng Giám đốc)"><span class="entity-code role-code">CEO</span></a></span></td>
  <td>Quyết định giữa ca và thông báo chính thức</td>
  </tr>
  <tr>
  <td>14:00-16:00</td>
- <td>Rà adoption tại điểm dùng, kiểm 3 phút truy xuất, kiểm completeness hồ sơ</td>
+ <td>Rà mức độ chấp nhận tại điểm dùng, kiểm khả năng truy xuất trong 3 phút và kiểm tính đầy đủ của hồ sơ</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)"><span class="entity-code role-code">WKM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Trưởng ca)"><span class="entity-code role-code">SL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-deburr-team-lead.html" title="Deburr Team Lead (Tổ trưởng phá ba via)"><span class="entity-code role-code">DBL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-and-packaging-supervisor.html" title="Cleaning and Packaging Supervisor (Giám sát vệ sinh và đóng gói)"><span class="entity-code role-code">CPS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (Tổ trưởng QC)"><span class="entity-code role-code">QCL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quản lý nhân sự)"><span class="entity-code role-code">HR</span></a></span></td>
- <td>Readiness by department và issue aging</td>
+ <td>Mức sẵn sàng theo phòng ban và tuổi tồn sự cố</td>
  </tr>
  <tr>
  <td>17:00</td>
- <td>End-of-day review, chốt issue mở sang D+1, xác định <a class="entity-link bundle-link bundle-chip" data-bundle="SUPPORT_ENABLEMENT" href="../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-support-enablement" title="Support Enablement Functions (Nhóm chức năng hỗ trợ nền) — SCM / D-FIN / D-HR / D-EHS / D-IT / D-ERP"><span class="entity-code bundle-code">SUPPORT_ENABLEMENT</span></a> tăng cường ban đêm nếu cần</td>
+ <td>Rà cuối ngày, chốt sự cố mở sang D+1, xác định <a class="entity-link bundle-link bundle-chip" data-bundle="SUPPORT_ENABLEMENT" href="../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-support-enablement" title="Support Enablement Functions (Nhóm chức năng hỗ trợ nền) — SCM / D-FIN / D-HR / D-EHS / D-IT / D-ERP"><span class="entity-code bundle-code">SUPPORT_ENABLEMENT</span></a> tăng cường ban đêm nếu cần</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td>
- <td>Daily cutover report và kế hoạch D+1</td>
+ <td>Báo cáo chuyển đổi trong ngày và kế hoạch D+1</td>
  </tr>
  </tbody>
  </table>
@@ -239,7 +239,7 @@
 </div>
 
 <div class="section">
- <h2>5. Severity và phản ứng bắt buộc</h2>
+ <h2>5. Mức độ sự cố và phản ứng bắt buộc</h2>
  <div class="table-card">
  <table class="matrix-table">
  <thead>
@@ -252,119 +252,119 @@
  </thead>
  <tbody>
  <tr>
- <td>Sev-1</td>
- <td>Dừng sản xuất, không phát hành hàng được, sai revision có nguy cơ thoát gate, mất truy cập diện rộng</td>
- <td>Dừng phạm vi bị ảnh hưởng, kích hoạt fallback hoặc rollback, thông báo Sponsor ngay</td>
+ <td>Mức 1 (Sev-1)</td>
+ <td>Dừng sản xuất, không thể phát hành hàng, sai phiên bản có nguy cơ vượt cổng kiểm soát, mất truy cập diện rộng</td>
+ <td>Dừng phạm vi bị ảnh hưởng, kích hoạt phương án dự phòng hoặc hoàn nguyên, báo người bảo trợ ngay</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tổng Giám đốc)"><span class="entity-code role-code">CEO</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">·</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td>
  </tr>
  <tr>
- <td>Sev-2</td>
- <td>Phòng ban vẫn chạy được nhưng phải làm vòng tránh tạm thời, dashboard hoặc route hồ sơ có lỗi lớn</td>
- <td>Kích hoạt owner xử lý ngay, giới hạn phạm vi, ghi exception note, review trong 30 phút</td>
+ <td>Mức 2 (Sev-2)</td>
+ <td>Phòng ban vẫn chạy được nhưng phải dùng cách làm vòng tránh tạm thời; bảng điều khiển hoặc tuyến hồ sơ có lỗi lớn</td>
+ <td>Kích hoạt người phụ trách xử lý ngay, giới hạn phạm vi, ghi chú ngoại lệ và rà trong 30 phút</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td>
  </tr>
  <tr>
- <td>Sev-3</td>
- <td>Lỗi hướng dẫn, lỗi link cục bộ, lỗi UI, lỗi cần hỗ trợ tại chỗ nhưng chưa ảnh hưởng quyết định chính</td>
- <td>Giao cho Champion hoặc owner liên quan, xử lý trong Ngày hoặc đưa vào backlog hypercare</td>
+ <td>Mức 3 (Sev-3)</td>
+ <td>Lỗi hướng dẫn, lỗi liên kết cục bộ, lỗi giao diện hoặc lỗi cần hỗ trợ tại chỗ nhưng chưa ảnh hưởng quyết định chính</td>
+ <td>Giao cho đầu mối triển khai hoặc người phụ trách liên quan, xử lý trong ngày hoặc đưa vào danh sách tồn hỗ trợ tăng cường</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA[QMR]</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quản lý tài chính)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quản lý nhân sự)"><span class="entity-code role-code">HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)"><span class="entity-code role-code">EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)"><span class="entity-code role-code">WKM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Trưởng ca)"><span class="entity-code role-code">SL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-deburr-team-lead.html" title="Deburr Team Lead (Tổ trưởng phá ba via)"><span class="entity-code role-code">DBL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cleaning-and-packaging-supervisor.html" title="Cleaning and Packaging Supervisor (Giám sát vệ sinh và đóng gói)"><span class="entity-code role-code">CPS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (Tổ trưởng QC)"><span class="entity-code role-code">QCL</span></a></span></td>
  </tr>
  </tbody>
  </table>
  </div>
- <div class="danger"><strong>Rule:</strong> mọi Sev-1 phải có mốc quyết định tiếp tục hay rollback trong vòng 30 phút kể từ lúc xác nhận.</div>
+ <div class="danger"><strong>Quy tắc:</strong> mọi sự cố mức 1 phải có mốc quyết định tiếp tục hay hoàn nguyên trong vòng 30 phút kể từ lúc xác nhận.</div>
 </div>
 
 <div class="section">
- <h2>6. Rollback trigger và fallback</h2>
+ <h2>6. Mốc kích hoạt hoàn nguyên và phương án dự phòng</h2>
  <ul class="tight">
- <li>Kích hoạt rollback khi hệ thống mới làm mất khả năng truy hồ sơ, phát hành hàng, kiểm soát revision hoặc bảo mật dữ liệu.</li>
- <li>Kích hoạt fallback khi business vẫn phải tiếp tục nhưng lớp số hóa hoặc dashboard chưa đáng tin.</li>
- <li>Fallback phải quay về nguồn đã được phê duyệt trong <a href="annex-118-offline-fallback-kit.html">ANNEX-118</a>, không tự chế biểu mẫu ngoài luồng.</li>
- <li>Rollback hoặc fallback phải ghi rõ phạm vi, thời điểm bắt đầu, Người phê duyệt, Người thực hiện và tiêu chí quay lại trạng thái chuẩn.</li>
+ <li>Kích hoạt hoàn nguyên khi hệ thống mới làm mất khả năng truy hồ sơ, phát hành hàng, kiểm soát phiên bản hoặc bảo mật dữ liệu.</li>
+ <li>Kích hoạt phương án dự phòng khi hoạt động vẫn phải tiếp tục nhưng lớp số hóa hoặc bảng điều khiển chưa đáng tin.</li>
+ <li>Phương án dự phòng phải quay về nguồn đã được phê duyệt trong <a href="annex-118-offline-fallback-kit.html">ANNEX-118</a>, không tự chế biểu mẫu ngoài luồng.</li>
+ <li>Hoàn nguyên hoặc phương án dự phòng phải ghi rõ phạm vi, thời điểm bắt đầu, người phê duyệt, người thực hiện và tiêu chí quay lại trạng thái chuẩn.</li>
  </ul>
- <div class="ok"><strong>Khái niệm đúng:</strong> rollback bảo vệ sản xuất; fallback bảo vệ tính liên tục; exception note bảo vệ tính minh bạch; không mục nào được dùng để che lỗi.</div>
+ <div class="ok"><strong>Khái niệm đúng:</strong> hoàn nguyên bảo vệ sản xuất; phương án dự phòng bảo vệ tính liên tục; ghi chú ngoại lệ bảo vệ tính minh bạch; không mục nào được dùng để che lỗi.</div>
 </div>
 
 <div class="section">
- <h2>7. Kế hoạch hypercare D+1 đến D+14</h2>
+ <h2>7. Kế hoạch hỗ trợ tăng cường D+1 đến D+14</h2>
  <div class="grid-3">
  <div class="card-lite">
  <h3>D+1 đến D+3</h3>
  <span class="chip"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-finance-handbook.html" title="Finance Department (Phòng Tài chính)"><span class="entity-code dept-code">D-FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phòng Nhân sự)"><span class="entity-code dept-code">D-HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phòng EHS)"><span class="entity-code dept-code">D-EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bộ phận quản trị ERP)"><span class="entity-code dept-code">D-ERP</span></a></span> tăng cường</span>
  <ul class="tight">
- <li>Champion hiện diện tại điểm dùng trọng yếu.</li>
- <li>Review issue mỗi ca.</li>
- <li>Chưa giảm bất kỳ lớp hỗ trợ nào nếu còn issue Sev-1 hoặc Sev-2 mở.</li>
+ <li>Đầu mối hỗ trợ hiện diện tại các điểm dùng trọng yếu.</li>
+ <li>Rà sự cố ở mỗi ca.</li>
+ <li>Chưa giảm bất kỳ lớp hỗ trợ nào nếu còn sự cố mức 1 hoặc mức 2 đang mở.</li>
  </ul>
  </div>
  <div class="card-lite">
  <h3>D+4 đến D+7</h3>
  <span class="chip">Ổn định có kiểm soát</span>
  <ul class="tight">
- <li>Giảm hỗ trợ chỉ ở khu vực đã pass liên tiếp.</li>
- <li>Rà wrong-document, wrong-vị trí, retrieval time và issue aging.</li>
- <li>Đóng bài học kinh nghiệm đầu tiên vào tài liệu hoặc dashboard.</li>
+ <li>Chỉ giảm hỗ trợ ở khu vực đã đạt ổn định liên tiếp.</li>
+ <li>Rà lỗi dùng sai tài liệu, sai vị trí lưu, thời gian truy xuất và tuổi tồn sự cố.</li>
+ <li>Đóng bài học kinh nghiệm đầu tiên vào tài liệu hoặc bảng điều khiển.</li>
  </ul>
  </div>
  <div class="card-lite">
  <h3>D+8 đến D+14</h3>
  <span class="chip">Chuẩn bị bàn giao</span>
  <ul class="tight">
- <li>Chốt owner vận hành thường xuyên.</li>
- <li>Rà metrics hypercare exit.</li>
- <li>Đóng support tạm thời và chuyển sang cadence thường xuyên.</li>
+ <li>Chốt người chịu trách nhiệm vận hành thường xuyên.</li>
+ <li>Rà chỉ số kết thúc hỗ trợ tăng cường.</li>
+ <li>Đóng hỗ trợ tạm thời và chuyển sang nhịp điều hành thường xuyên.</li>
  </ul>
  </div>
  </div>
 </div>
 
 <div class="section">
- <h2>8. Điều kiện thoát hypercare</h2>
+ <h2>8. Điều kiện kết thúc hỗ trợ tăng cường</h2>
  <ul class="tight">
- <li>Không còn issue Sev-1 mở.</li>
- <li>Issue Sev-2 còn lại đã có giải pháp chữa cháy ổn định, owner rõ và thời hạn đóng rõ.</li>
- <li>Người dùng của wave đang xét tự truy xuất tài liệu và hồ sơ trong ngưỡng mục tiêu.</li>
- <li>Dashboard có last refresh, owner, source và exception note hoạt động đúng.</li>
- <li><a class="entity-link bundle-link bundle-chip" data-bundle="FUNC_HEADS" href="../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-heads" title="Function Heads (Nhóm đầu mối điều hành chức năng) — PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA"><span class="entity-code bundle-code">FUNC_HEADS</span></a> xác nhận phòng ban đã vận hành độc lập được mà không cần Champion túc trực liên tục.</li>
+ <li>Không còn sự cố mức 1 đang mở.</li>
+ <li>Sự cố mức 2 còn lại đã có giải pháp tạm ổn định, người phụ trách rõ và thời hạn đóng rõ.</li>
+ <li>Người dùng của đợt triển khai đang xét tự truy xuất tài liệu và hồ sơ trong ngưỡng mục tiêu.</li>
+ <li>Bảng điều khiển có thời điểm làm mới gần nhất, người chịu trách nhiệm, nguồn chuẩn và ghi chú ngoại lệ hoạt động đúng.</li>
+ <li><a class="entity-link bundle-link bundle-chip" data-bundle="FUNC_HEADS" href="../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-heads" title="Function Heads (Nhóm đầu mối điều hành chức năng) — PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA"><span class="entity-code bundle-code">FUNC_HEADS</span></a> xác nhận phòng ban đã vận hành độc lập được mà không cần đầu mối hỗ trợ túc trực liên tục.</li>
  </ul>
 </div>
 
 <div class="section">
- <h2>9. Bằng chứng phải lưu trong runbook pack</h2>
+ <h2>9. Bằng chứng phải lưu trong bộ hồ sơ điều hành triển khai</h2>
  <div class="table-card">
  <table class="matrix-table">
  <thead>
  <tr>
  <th>Thành phần</th>
  <th>Nội dung tối thiểu</th>
- <th>Owner</th>
+ <th>Người phụ trách</th>
  </tr>
  </thead>
  <tbody>
  <tr>
- <td>Go/No-Go sign-off</td>
- <td>Checklist pass/fail, quyết định, điều kiện kèm theo, chữ ký hoặc log phê duyệt</td>
+ <td>Phiếu chấp thuận Go/No-Go</td>
+ <td>Bảng kiểm đạt/không đạt, quyết định, điều kiện kèm theo, chữ ký hoặc nhật ký phê duyệt</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tổng Giám đốc)"><span class="entity-code role-code">CEO</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a></span></td>
  </tr>
  <tr>
- <td>Cutover timeline</td>
- <td>Mốc giờ, bước thực hiện, trạng thái hoàn thành, issue phát sinh</td>
+ <td>Lịch chuyển đổi</td>
+ <td>Mốc giờ, bước thực hiện, trạng thái hoàn thành và sự cố phát sinh</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a></span></td>
  </tr>
  <tr>
- <td>Issue board</td>
- <td>Severity, owner, ETA, nguyên nhân gốc tạm thời, trạng thái đóng</td>
+ <td>Bảng theo dõi sự cố</td>
+ <td>Mức độ nghiêm trọng, người phụ trách, hạn xử lý dự kiến, nguyên nhân gốc tạm thời và trạng thái đóng</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td>
  </tr>
  <tr>
- <td>Rollback / fallback record</td>
- <td>Trigger, phạm vi, thời điểm, Người phê duyệt, thời điểm phục hồi</td>
+ <td>Biên bản hoàn nguyên / dự phòng</td>
+ <td>Mốc kích hoạt, phạm vi, thời điểm, người phê duyệt và thời điểm phục hồi</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td>
  </tr>
  <tr>
- <td>Hypercare report</td>
- <td>KPI, issue aging, adoption, readiness by department, exit decision</td>
+ <td>Báo cáo hỗ trợ tăng cường</td>
+ <td>KPI, tuổi tồn sự cố, mức độ chấp nhận, mức sẵn sàng theo phòng ban và quyết định kết thúc</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td>
  </tr>
  </tbody>
@@ -385,19 +385,19 @@
  <tbody>
  <tr>
  <td>Kế hoạch triển khai</td>
- <td><a href="../../../02-Work-Instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html">WI-106</a><br><a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html">ANNEX-119</a></td>
+ <td><a href="../../../02-Work-Instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html">WI-106</a>, <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html">ANNEX-119</a></td>
  </tr>
  <tr>
- <td>Dashboard và dữ liệu</td>
- <td><a href="annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a><br><a href="annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a></td>
+ <td>Bảng điều khiển và dữ liệu</td>
+ <td><a href="annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a>, <a href="annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a></td>
  </tr>
  <tr>
- <td>Escalation và fallback</td>
- <td><a href="annex-117-escalation-matrix-and-sla.html">ANNEX-117</a><br><a href="annex-118-offline-fallback-kit.html">ANNEX-118</a><br><a href="../../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></td>
+ <td>Leo thang và dự phòng</td>
+ <td><a href="annex-117-escalation-matrix-and-sla.html">ANNEX-117</a>, <a href="annex-118-offline-fallback-kit.html">ANNEX-118</a>, <a href="../../../01-SOPs/01-SOP-100/sop-108-operational-contingency-plan.html">SOP-108</a></td>
  </tr>
  <tr>
- <td>Điều hướng và evidence</td>
- <td><a href="../../../02-Work-Instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a><br><a href="../../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a><br><a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td>
+ <td>Điều hướng và bằng chứng</td>
+ <td><a href="../../../02-Work-Instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a>, <a href="../../../02-Work-Instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a>, <a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td>
  </tr>
  </tbody>
  </table>

@@ -48,13 +48,13 @@
  </div>
 
 
- <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi thiết kế, phê duyệt, vận hành hoặc audit mọi flow M365 liên quan đến provision records, external sharing, source promotion, server deploy, reverse sync, online forms và exception handling. ANNEX này khóa toàn bộ cơ chế run log, approval log, manifest log và close-out log.</div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi thiết kế, phê duyệt, vận hành hoặc đánh giá mọi flow M365 liên quan đến provisioning hồ sơ, chia sẻ ra ngoài, source promotion, server deployment, reverse sync, online form và exception handling. ANNEX này khóa cơ chế run log, approval log, manifest log và close-out log cho toàn bộ cụm M365 Records.</div>
  <h1>ANNEX-132 - M365 Records Flow Approval Sharing and Exception Control</h1>
 
  <div class="section">
  <h2>1. Mục đích và kết quả bắt buộc</h2>
- <p style="margin:8px 0;">ANNEX này xác lập bộ flow control bắt buộc cho records governance và source governance. Kết quả bắt buộc là: mọi flow đều truy được ai kích hoạt, ai phê duyệt, đầu vào nào được dùng, output nằm ở đâu, lỗi gì đã xảy ra, bằng chứng đóng vòng nằm ở đâu và khi nào được phép đóng. Không có flow nào được vận hành kiểu "chạy được là đủ".</p>
- <div class="keyline"><strong>Ranh giới tài liệu:</strong> <a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> khóa field và registers; <a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> khóa site/library/path; <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> khóa provisioning algorithms; <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> khóa source, Git, server và runtime boundary; <a href="../../../02-Work-Instructions/01-WI-100/wi-101-digital-online-forms-and-approvals.html">WI-101</a> khóa online forms; <a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a> khóa thao tác sync/deploy.</div>
+ <p style="margin:8px 0;">ANNEX này xác lập bộ kiểm soát flow bắt buộc cho records governance và source governance. Kết quả cần đạt là: mọi flow đều truy được ai khởi tạo, ai phê duyệt, đầu vào nào được dùng, đầu ra nằm ở đâu, lỗi gì đã xảy ra, bằng chứng close-out nằm ở đâu và điều kiện nào mới được phép đóng. Không có flow nào được vận hành theo kiểu "chạy được là đủ".</p>
+ <div class="keyline"><strong>Ranh giới tài liệu:</strong> <a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> khóa field và register; <a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> khóa site, library và path; <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> khóa logic provisioning; <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> khóa ranh giới source, Git, server và runtime; <a href="../../../02-Work-Instructions/01-WI-100/wi-101-digital-online-forms-and-approvals.html">WI-101</a> khóa online form; <a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a> khóa thao tác sync và deploy.</div>
  </div>
 
  <div class="section">
@@ -65,12 +65,12 @@
  <tr><th>Quy tắc</th><th>Yêu cầu bắt buộc</th></tr>
  </thead>
  <tbody>
- <tr><td>Log-first</td><td>Mọi flow phải ghi run log, approval log hoặc register close-out trước khi được xem là hoàn tất.</td></tr>
- <tr><td>Idempotent</td><td>Flow phải chặn tạo trùng thư mục, trùng package, trùng manifest, trùng deploy receipt hoặc trùng reverse-sync close-out.</td></tr>
- <tr><td>Approval-before-state-change</td><td>Không đổi trạng thái chính thức sang Approved, Released, Provisioned, Deployed hoặc Closed khi chưa có approver hợp lệ và evidence URL hợp lệ.</td></tr>
- <tr><td>System-of-record protection</td><td>Flow không được thay giao dịch Epicor. Flow chỉ tạo records, approvals, tuyến công nghệ, notifications, manifests và evidence logs.</td></tr>
- <tr><td>Source-runtime boundary</td><td>Flow source promotion không được chạm runtime payload; flow runtime không được ghi ngược vào source library trừ reverse-sync process được duyệt.</td></tr>
- <tr><td>No silent failure</td><td>Mọi failure phải để lại log có ErrorCategory, ErrorDetail, owner và next action.</td></tr>
+ <tr><td>Log-first</td><td>Mọi flow phải để lại run log, approval log hoặc register close-out trước khi được xem là hoàn tất.</td></tr>
+ <tr><td>Idempotent</td><td>Flow phải chặn việc tạo trùng thư mục, trùng package, trùng manifest, trùng deploy receipt hoặc trùng reverse-sync close-out.</td></tr>
+ <tr><td>Approval-before-state-change</td><td>Không được đổi trạng thái chính thức sang <span class="code">Approved</span>, <span class="code">Released</span>, <span class="code">Provisioned</span>, <span class="code">Deployed</span> hoặc <span class="code">Closed</span> khi chưa có approver hợp lệ và bằng chứng hợp lệ.</td></tr>
+ <tr><td>System-of-record protection</td><td>Flow không được thay cho giao dịch Epicor. Flow chỉ tạo hồ sơ, phê duyệt, thông báo, manifest và nhật ký bằng chứng.</td></tr>
+ <tr><td>Source-runtime boundary</td><td>Flow source promotion không được chạm vào runtime payload; flow runtime không được ghi ngược vào source library trừ reverse-sync process đã được duyệt.</td></tr>
+ <tr><td>No silent failure</td><td>Mọi lỗi phải để lại log có <span class="code">ErrorCategory</span>, <span class="code">ErrorDetail</span>, owner và hành động tiếp theo.</td></tr>
  </tbody>
  </table>
  </div>
@@ -84,16 +84,16 @@
  <tr><th>Register / log</th><th>Mục đích</th><th>Khóa tự nhiên</th><th>Owner</th></tr>
  </thead>
  <tbody>
- <tr><td><span class="code">M365-Record-Provisioning-Requests</span></td><td>Provision requests cho company, department, job, people, system zones</td><td>RequestId</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td></tr>
- <tr><td><span class="code">External-Share-Approval-Log</span></td><td>External sharing approval, expiry và revoke trail</td><td>ShareRequestId</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td></tr>
- <tr><td><span class="code">QMS-Source-Promotion-Register</span></td><td>Source change, release manifest và approved promotion log</td><td>SourceChangeId</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td></tr>
- <tr><td><span class="code">Server-Deploy-Register</span></td><td>Server deploy receipts, smoke verification và rollback trail</td><td>DeployId</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td></tr>
- <tr><td><span class="code">Reverse-Sync-Register</span></td><td>Server hotfix intake, commit-back trail, local pull close-out</td><td>ReverseSyncId</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td></tr>
- <tr><td><span class="code">Automation-Run-Log</span></td><td>Flow execution history, retries, failures, durations</td><td>RunId</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td></tr>
+ <tr><td><span class="code">M365-Record-Provisioning-Requests</span></td><td>Ghi nhận toàn bộ yêu cầu provisioning cho zone công ty, phòng ban, job, nhân sự và system</td><td>RequestId</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td></tr>
+ <tr><td><span class="code">External-Share-Approval-Log</span></td><td>Ghi nhận phê duyệt chia sẻ ra ngoài, thời hạn hết hiệu lực và vết thu hồi</td><td>ShareRequestId</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td></tr>
+ <tr><td><span class="code">QMS-Source-Promotion-Register</span></td><td>Ghi nhận source change, release manifest và trạng thái promotion đã được duyệt</td><td>SourceChangeId</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td></tr>
+ <tr><td><span class="code">Server-Deploy-Register</span></td><td>Ghi nhận deploy receipt, xác minh smoke test và dấu vết rollback</td><td>DeployId</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td></tr>
+ <tr><td><span class="code">Reverse-Sync-Register</span></td><td>Ghi nhận intake hotfix trên server, commit-back và close-out local pull</td><td>ReverseSyncId</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td></tr>
+ <tr><td><span class="code">Automation-Run-Log</span></td><td>Lịch sử chạy flow, các lần thử lại, lỗi phát sinh và thời lượng xử lý</td><td>RunId</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td></tr>
  </tbody>
  </table>
  </div>
- <div class="keyline"><strong>Rule log:</strong> log phải chứa tối thiểu <span class="code">RequestType</span>, <span class="code">RecordZone</span>, <span class="code">TargetUrl</span>, <span class="code">FlowRunId</span>, <span class="code">Status</span>, <span class="code">RequestedBy</span>, <span class="code">Approver</span>, <span class="code">CommitId</span> hoặc <span class="code">EvidenceUrl</span> khi áp dụng.</div>
+ <div class="keyline"><strong>Quy tắc log:</strong> mỗi log phải chứa tối thiểu <span class="code">RequestType</span>, <span class="code">RecordZone</span>, <span class="code">TargetUrl</span>, <span class="code">FlowRunId</span>, <span class="code">Status</span>, <span class="code">RequestedBy</span>, <span class="code">Approver</span> và thêm <span class="code">CommitId</span> hoặc <span class="code">EvidenceUrl</span> khi có áp dụng.</div>
  </div>
 
  <div class="section">
@@ -104,12 +104,12 @@
  <tr><th>Flow family</th><th>Trigger</th><th>Output</th><th>Register chính</th></tr>
  </thead>
  <tbody>
- <tr><td>Records provisioning</td><td>Request tạo zone/job/employee/system/source</td><td>Provisioned path, permissions, metadata defaults</td><td>M365-Record-Provisioning-Requests</td></tr>
- <tr><td>Approval tuyến công nghệ</td><td>Item cần phê duyệt</td><td>Decision history, status change, approver evidence</td><td>Approval history + run log</td></tr>
- <tr><td>External sharing</td><td>Approved external package request</td><td>Specific-people link, expiry, revoke trail</td><td>External-Share-Approval-Log</td></tr>
- <tr><td>Source promotion</td><td>Approved source change / release candidate</td><td>Release manifest, promotion status, approved commit</td><td>QMS-Source-Promotion-Register</td></tr>
- <tr><td>Server deployment</td><td>Approved manifest ready for deploy</td><td>Deploy receipt, smoke verification, rollback evidence</td><td>Server-Deploy-Register</td></tr>
- <tr><td>Reverse sync</td><td>Server hotfix detected</td><td>Reverse-sync intake, commit-back proof, local pull close-out</td><td>Reverse-Sync-Register</td></tr>
+ <tr><td>Records provisioning</td><td>Request tạo zone, job dossier, employee dossier, system zone hoặc source workspace</td><td>Provisioned path, permission và metadata mặc định</td><td>M365-Record-Provisioning-Requests</td></tr>
+ <tr><td>Approval control</td><td>Item hoặc package cần phê duyệt</td><td>Lịch sử quyết định, đổi trạng thái và bằng chứng người duyệt</td><td>Approval history + run log</td></tr>
+ <tr><td>External sharing</td><td>Yêu cầu chia sẻ ra ngoài đã được duyệt</td><td>Liên kết <span class="code">Specific people</span>, ngày hết hạn và vết thu hồi</td><td>External-Share-Approval-Log</td></tr>
+ <tr><td>Source promotion</td><td>Source change hoặc release candidate đã được duyệt</td><td>Release manifest, trạng thái promotion và commit đã duyệt</td><td>QMS-Source-Promotion-Register</td></tr>
+ <tr><td>Server deployment</td><td>Manifest đã duyệt và sẵn sàng deploy</td><td>Deploy receipt, xác minh smoke test và bằng chứng rollback</td><td>Server-Deploy-Register</td></tr>
+ <tr><td>Reverse sync</td><td>Phát hiện hotfix phát sinh trên server</td><td>Intake reverse-sync, bằng chứng commit-back và close-out local pull</td><td>Reverse-Sync-Register</td></tr>
  </tbody>
  </table>
  </div>
@@ -123,11 +123,11 @@
  <tr><th>Đối tượng</th><th>Người khởi tạo</th><th>Người duyệt tối thiểu</th><th>Không chấp nhận</th></tr>
  </thead>
  <tbody>
- <tr><td>Provision department/job/system zone</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a> / IT / owner group</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td><td>Khởi tạo xong tự đóng không có approver độc lập</td></tr>
+ <tr><td>Provision department/job/system zone</td><td>QMS / IT / owner group</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td><td>Người khởi tạo tự đóng yêu cầu mà không có approver độc lập</td></tr>
  <tr><td>External sharing</td><td>Owner của package</td><td>Chủ sở hữu dữ liệu + IT/QMS</td><td>Anonymous link, no expiry, no recipient identity</td></tr>
- <tr><td>Source promotion</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a> / Portal editor / IT</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a> hoặc delegate được chỉ định</td><td>Promote khi thiếu commit reference hoặc thiếu release note</td></tr>
+ <tr><td>Source promotion</td><td>QMS / Portal editor / IT</td><td>QMS hoặc delegate được chỉ định</td><td>Promote khi thiếu commit reference, thiếu release note hoặc chưa xác định phạm vi ảnh hưởng</td></tr>
  <tr><td>Server deploy</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a> + change approver theo SOP-106</td><td>Deploy thẳng khi chưa có manifest hoặc chưa có smoke plan</td></tr>
- <tr><td>Reverse sync close-out</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a> hoặc delegate được chỉ định</td><td>Đóng hotfix khi chưa commit back hoặc local chưa pull</td></tr>
+ <tr><td>Reverse sync close-out</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td><td>QMS hoặc delegate được chỉ định</td><td>Đóng hotfix khi chưa commit back hoặc local chưa pull</td></tr>
  </tbody>
  </table>
  </div>
@@ -138,11 +138,11 @@
  <div class="step-box">
  <h3>Trình tự bắt buộc</h3>
  <ol style="margin:8px 0; padding-left:20px;">
- <li>Tạo request có <span class="code">TargetUrl</span>, recipient identity, reason, expiry date và approver.</li>
- <li>Flow xác nhận target nằm trong controlled library được phép share.</li>
- <li>Flow gửi approval. Chỉ khi Approved mới tạo <span class="code">Specific people</span> link.</li>
- <li>Flow ghi log vào <span class="code">External-Share-Approval-Log</span> và tạo clean-up reminder.</li>
- <li>Khi hết hạn hoặc revoke, flow cập nhật status và evidence close-out.</li>
+ <li>Tạo request có <span class="code">TargetUrl</span>, danh tính người nhận, lý do chia sẻ, ngày hết hạn và approver.</li>
+ <li>Flow xác nhận target nằm trong controlled library được phép chia sẻ.</li>
+ <li>Flow gửi approval. Chỉ khi trạng thái là <span class="code">Approved</span> mới được tạo liên kết <span class="code">Specific people</span>.</li>
+ <li>Flow ghi log vào <span class="code">External-Share-Approval-Log</span> và tạo nhắc việc clean-up.</li>
+ <li>Khi hết hạn hoặc bị thu hồi, flow phải cập nhật trạng thái và ghi bằng chứng close-out.</li>
  </ol>
  </div>
  </div>
@@ -155,11 +155,11 @@
  <tr><th>Bước</th><th>Hành động bắt buộc</th><th>Output</th></tr>
  </thead>
  <tbody>
- <tr><td>1</td><td>Nhận source change request có <span class="code">CommitId</span>, <span class="code">GitRef</span>, summary, impacted documents/pages/forms.</td><td>SourceChangeId</td></tr>
- <tr><td>2</td><td>Flow kiểm tra target path thuộc <span class="code">QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span>.</td><td>Validated boundary</td></tr>
- <tr><td>3</td><td>Approval theo QMS/IT rule.</td><td>Approved / Rejected</td></tr>
+ <tr><td>1</td><td>Nhận source change request có <span class="code">CommitId</span>, <span class="code">GitRef</span>, tóm tắt thay đổi và phạm vi tài liệu hoặc form bị ảnh hưởng.</td><td>SourceChangeId</td></tr>
+ <tr><td>2</td><td>Flow kiểm tra target path có thuộc <span class="code">QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span> hay không.</td><td>Validated boundary</td></tr>
+ <tr><td>3</td><td>Chạy phê duyệt theo rule của QMS và IT.</td><td>Approved / Rejected</td></tr>
  <tr><td>4</td><td>Tạo release manifest tại <span class="code">02-Release-Manifests/{YYYY}/</span>.</td><td>Manifest URL</td></tr>
- <tr><td>5</td><td>Ghi <span class="code">QMS-Source-Promotion-Register</span> với commit, approver, phạm vi và status.</td><td>Promotion log</td></tr>
+ <tr><td>5</td><td>Ghi <span class="code">QMS-Source-Promotion-Register</span> với commit, approver, phạm vi và trạng thái xử lý.</td><td>Promotion log</td></tr>
  </tbody>
  </table>
  </div>
@@ -173,11 +173,11 @@
  <tr><th>Bước</th><th>Hành động bắt buộc</th><th>Output</th></tr>
  </thead>
  <tbody>
- <tr><td>1</td><td>Chỉ nhận deploy từ manifest đã Approved.</td><td>Deploy request</td></tr>
- <tr><td>2</td><td>Server operator pull/deploy đúng commit/tag đã ghi trong manifest.</td><td>Deploy executed</td></tr>
- <tr><td>3</td><td>Chạy smoke test, kiểm point-of-use và rollback readiness.</td><td>Smoke evidence</td></tr>
- <tr><td>4</td><td>Ghi deploy receipt vào <span class="code">03-Server-Deploy-Receipts/{YYYY}/</span> và update <span class="code">Server-Deploy-Register</span>.</td><td>Deploy receipt</td></tr>
- <tr><td>5</td><td>Chỉ đóng khi <span class="code">DeployState = SmokeVerified</span> hoặc <span class="code">RolledBack</span>.</td><td>Closed status</td></tr>
+ <tr><td>1</td><td>Chỉ nhận deploy từ manifest đã ở trạng thái <span class="code">Approved</span>.</td><td>Deploy request</td></tr>
+ <tr><td>2</td><td>Server operator phải pull hoặc deploy đúng commit hoặc tag đã ghi trong manifest.</td><td>Deploy executed</td></tr>
+ <tr><td>3</td><td>Chạy smoke test, kiểm tra point-of-use và xác nhận khả năng rollback.</td><td>Smoke evidence</td></tr>
+ <tr><td>4</td><td>Ghi deploy receipt vào <span class="code">03-Server-Deploy-Receipts/{YYYY}/</span> và cập nhật <span class="code">Server-Deploy-Register</span>.</td><td>Deploy receipt</td></tr>
+ <tr><td>5</td><td>Chỉ được đóng khi <span class="code">DeployState = SmokeVerified</span> hoặc <span class="code">RolledBack</span>.</td><td>Closed status</td></tr>
  </tbody>
  </table>
  </div>
@@ -191,15 +191,15 @@
  <tr><th>Bước</th><th>Hành động bắt buộc</th><th>Output</th></tr>
  </thead>
  <tbody>
- <tr><td>1</td><td>Khi phát hiện hotfix trên server, tạo intake record ngay.</td><td>ReverseSyncId</td></tr>
+ <tr><td>1</td><td>Khi phát hiện hotfix trên server, phải tạo intake record ngay trong cùng ca.</td><td>ReverseSyncId</td></tr>
  <tr><td>2</td><td>Commit và push thay đổi từ server về Git remote.</td><td>CommitId</td></tr>
- <tr><td>3</td><td>Local admin endpoint pull về SharePoint-synced worktree.</td><td>Local pull evidence</td></tr>
- <tr><td>4</td><td>Ghi close-out vào <span class="code">04-Reverse-Sync-Intake/{YYYY}/</span> và register.</td><td>Reverse-sync close-out</td></tr>
- <tr><td>5</td><td>Chỉ đóng khi <span class="code">ReverseSyncState = Closed</span>.</td><td>Closed status</td></tr>
+ <tr><td>3</td><td>Endpoint quản trị tại local phải pull về SharePoint-synced worktree và để lại bằng chứng.</td><td>Local pull evidence</td></tr>
+ <tr><td>4</td><td>Ghi close-out vào <span class="code">04-Reverse-Sync-Intake/{YYYY}/</span> và cập nhật register.</td><td>Reverse-sync close-out</td></tr>
+ <tr><td>5</td><td>Chỉ được đóng khi <span class="code">ReverseSyncState = Closed</span>.</td><td>Closed status</td></tr>
  </tbody>
  </table>
  </div>
- <div class="keyline"><strong>Rule khẩn:</strong> không giữ thay đổi meaningful trên server quá một ca làm việc mà chưa commit back. Nếu không commit back được, phải mở exception theo SOP-106 và SOP-104.</div>
+ <div class="keyline"><strong>Quy tắc khẩn:</strong> không được giữ thay đổi có ý nghĩa trên server quá một ca làm việc mà chưa commit back. Nếu chưa commit back được, phải mở exception theo SOP-106 và SOP-104.</div>
  </div>
 
  <div class="section">
@@ -211,18 +211,18 @@
  </thead>
  <tbody>
  <tr><td>Form definition / released schema / source template</td><td><span class="code">QMS-Source-Control</span></td><td>Source promotion + deploy</td></tr>
- <tr><td>Form submissions / approvals / operational responses</td><td>Records libraries hoặc runtime record area được duyệt</td><td>Operational flow + approval logging</td></tr>
- <tr><td>Workflow draft binaries / runtime archives / sessions</td><td><span class="code">mom/qms-data/...</span> hoặc server runtime path</td><td>Không vào source flow; chỉ route vào records nếu có evidence requirement</td></tr>
+ <tr><td>Form submissions / approvals / operational responses</td><td>Records libraries hoặc runtime record area đã được duyệt</td><td>Operational flow + approval logging</td></tr>
+ <tr><td>Workflow draft binaries / runtime archives / sessions</td><td><span class="code">mom/qms-data/...</span> hoặc server runtime path</td><td>Không đi vào source flow; chỉ route vào records khi có yêu cầu bằng chứng chính thức</td></tr>
  </tbody>
  </table>
  </div>
  </div>
 
  <div class="section">
- <h2>11. Exception handling và no-go-live</h2>
+ <h2>11. Exception handling và điều kiện no-go-live</h2>
  <div class="two-col">
  <div class="figure-box">
- <h3>Exception bắt buộc mở</h3>
+ <h3>Phải mở exception khi</h3>
  <ul>
  <li>Thiếu approver hợp lệ</li>
  <li>Deploy không truy được manifest</li>
@@ -234,11 +234,11 @@
  <div class="figure-box">
  <h3>Không được go-live khi</h3>
  <ul>
- <li>Chưa có run log/register cho flow đang dùng</li>
- <li>Chưa test negative path và retry path</li>
- <li>Chưa chứng minh idempotent behavior</li>
- <li>Chưa rõ owner, approver, backup owner</li>
- <li>Chưa có smoke test và rollback evidence cho deploy flow</li>
+ <li>Chưa có run log hoặc register cho flow đang dùng</li>
+ <li>Chưa kiểm thử luồng lỗi và luồng thử lại</li>
+ <li>Chưa chứng minh được tính idempotent</li>
+ <li>Chưa xác định rõ owner, approver và backup owner</li>
+ <li>Chưa có smoke test và bằng chứng rollback cho deploy flow</li>
  </ul>
  </div>
  </div>
@@ -252,9 +252,9 @@
  <tr><th>Nhóm</th><th>Tài liệu</th><th>Vai trò</th></tr>
  </thead>
  <tbody>
- <tr><td>SOP</td><td><a href="../../../01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a> ; <a href="../../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> ; <a href="../../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a> ; <a href="../../../01-SOPs/01-SOP-100/sop-107-communication-management.html">SOP-107</a></td><td>Khóa document control, governance, change control và communication.</td></tr>
- <tr><td>WI</td><td><a href="../../../02-Work-Instructions/01-WI-100/wi-101-digital-online-forms-and-approvals.html">WI-101</a> ; <a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a></td><td>Khóa online forms và thao tác sync/deploy.</td></tr>
- <tr><td>ANNEX</td><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> ; <a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> ; <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> ; <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> ; <a href="../11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a></td><td>Khóa metadata, topology, provisioning, boundary và offline fallback.</td></tr>
+ <tr><td>SOP</td><td><a href="../../../01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a> ; <a href="../../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a> ; <a href="../../../01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a> ; <a href="../../../01-SOPs/01-SOP-100/sop-107-communication-management.html">SOP-107</a></td><td>Khóa document control, governance, change control và communication control.</td></tr>
+ <tr><td>WI</td><td><a href="../../../02-Work-Instructions/01-WI-100/wi-101-digital-online-forms-and-approvals.html">WI-101</a> ; <a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a></td><td>Khóa thao tác online form và thao tác sync hoặc deploy.</td></tr>
+ <tr><td>ANNEX</td><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a> ; <a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> ; <a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> ; <a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> ; <a href="../11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a></td><td>Khóa metadata, topology, provisioning, boundary và phương án offline fallback.</td></tr>
  </tbody>
  </table>
  </div>

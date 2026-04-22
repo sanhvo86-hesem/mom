@@ -77,7 +77,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <tr><td>Source mốc chuẩn</td><td>Bản vẽ no., mô hình/CAD ref, phiếu công nghệ ref, program ID/version, phiếu cài đặt version, danh sách dao cụ version, AML/Người xử lý ràng buộc</td><td>Chứng minh bộ tài liệu phát hành là bộ đúng và đầy đủ.</td></tr>
 <tr><td>Nguyên vật liệu &amp; điều kiện</td><td>Nguyên vật liệu nhóm sản phẩm, hợp kim/cấp / hạng/ram (temper), mẻ nấu (heat)/lot ref khi áp dụng, thô/hoàn thành trạng thái, trước / ưu tiên công đoạn đặc biệt trạng thái, vệ sinh / sạch sẽ/chân không đánh dấu</td><td>Ngăn setup sai với part cần rule xử lý đặc biệt.</td></tr>
 <tr><td>gá kẹp chi tiết</td><td>Fixture ID/rev, jaw type/rev, chốt định vị sơ đồ / kế hoạch, stop pin, kẹp / gá kẹp điểm, mô-men xoắn giá trị, hỗ trợ điểm, Photos</td><td>Khóa logic gá và điều kiện giữ part ổn định.</td></tr>
-<tr><td>WCS / đo bằng đầu dò</td><td>Mốc chuẩn (mốc chuẩn (datum) chiến lược, định hướng / đào tạo hội nhập, WCS name, chủ / gốc không / bằng không source, đo bằng đầu dò cycle, cho phép bù trừ (offset) viết / ghi-back, quan trọng / nghiêm trọng bù trừ (bù trừ (offset)</td><td>Khóa logic lấy chuẩn, tránh trôi / sai lệch và tránh viết bù bù trừ (offset) vô kiểm soát.</td></tr>
+<tr><td>WCS / đo bằng đầu dò</td><td>Mốc chuẩn (datum) chiến lược, định hướng / đào tạo hội nhập, WCS name, chủ / gốc không / bằng không source, đo bằng đầu dò cycle, cho phép bù trừ (offset) viết / ghi-back, giá trị bù trừ (offset) quan trọng / nghiêm trọng</td><td>Khóa logic lấy chuẩn, tránh trôi / sai lệch và tránh viết bù trừ (offset) vô kiểm soát.</td></tr>
 <tr><td>Danh mục dao cụ</td><td>Tool lắp ráp data, hốc / túi/trạm / vị trí làm việc, chị em / liên kết tool, cài đặt trước data, mài mòn/tuổi thọ / vòng đời rule, dung dịch làm mát (dung dịch làm nguội) chế độ, backup tooling</td><td>Khóa cấu hình dao để setup và chạy kiểm chứng lặp lại được.</td></tr>
 <tr><td>Kiểm tra sơ đồ ánh xạ</td><td>CTQ đầu tiên, điểm kiểm tra trong quá trình, bắt buộc gage/CMM/trực quan aid, lấy mẫu kích hoạt, mẫu đầu note</td><td>Nối dữ liệu setup với cổng kiểm soát chất lượng và hồ sơ đo.</td></tr>
 <tr><td>Chạy kiểm chứng / phát hành</td><td>Cycle start chế độ, ghi đè / bỏ qua cap, dry-run lộ trình gia công, đầu tiên-cut điều kiện, bắt buộc ký-off, tái xác nhận hiệu lực kích hoạt</td><td>Khóa cách mở máy an toàn và đúng cổng kiểm soát.</td></tr>
@@ -102,7 +102,7 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 <tr><td>Vận hành chặn / khóa ID</td><td>Setup no., nhóm máy (machine nhóm sản phẩm), machine size bao bì / phong bì nếu quan trọng, fixture ID/rev, program main/sub program list</td><td>Dùng để khóa đúng cấu hình thực tế của từng công đoạn.</td></tr>
 <tr><td>định hướng / đào tạo hội nhập</td><td>Mặt A/B/C hoặc top/tuyến đầu/quyền / đúng; ảnh minh họa và mũi tên định hướng phải thống nhất với bản vẽ</td><td>Phải dùng ảnh minh họa và mũi tên định hướng; không mô tả chỉ bằng chữ khi có nguy cơ đảo mặt.</td></tr>
 <tr><td>kẹp / gá kẹp chiến lược</td><td>Điểm tỳ, điểm kẹp, thứ tự kẹp, lực/mô-men xoắn, mềm jaw hồ sơ / biên dạng, hỗ trợ/còn lại / nghỉ pad, chống-phiếu / trượt note</td><td>Phải chỉ rõ vùng phải tránh kẹp và vùng dễ biến dạng.</td></tr>
-<tr><td>Cut truy cập / lắp chặt (interference fit) fit)</td><td>Vùng cắt bị che, thông quan / giải phóng, an toàn rút về mặt phẳng, quay va chạm note, ụ sau (tailstock)/sub-trục chính (spindle) điều kiện nếu có</td><td>Thiếu khe hở cho 5-trục/phay-lượt / quay là lý do TẠM GIỮ phát hành.</td></tr>
+<tr><td>Cut truy cập / giao thoa (interference)</td><td>Vùng cắt bị che, thông quan / giải phóng, an toàn rút về mặt phẳng, quay va chạm note, ụ sau (tailstock)/sub-trục chính (spindle) điều kiện nếu có</td><td>Thiếu khe hở cho 5-trục/phay-lượt / quay là lý do TẠM GIỮ phát hành.</td></tr>
 <tr><td>chuyển giao / re-kẹp / gá kẹp</td><td>Điều kiện bàn giao qua setup sau, mốc chuẩn (datum) mang / chuyển-trên / vượt quá, tồn kho dung sai cho phép còn lại, chưa hoàn thành quan trọng / nghiêm trọng bề mặt</td><td>Khóa logic giữa setup trước và setup sau.</td></tr>
 </tbody></table></div>
 </div>
@@ -144,11 +144,11 @@ ul.tight li {margin:4px 0;}hr.sep {border:none; border-top:1px solid var(--ln2);
 </ul>
 </div>
 
-<div class="section"><h2>8. đo bằng đầu dò, WCS, quan trọng / nghiêm trọng bù trừ (bù trừ (offset) và chạy kiểm chứng</h2>
+<div class="section"><h2>8. đo bằng đầu dò, WCS, giá trị bù trừ (offset) quan trọng / nghiêm trọng và chạy kiểm chứng</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Mục</th><th>Yêu cầu dữ liệu</th></tr></thead><tbody>
-<tr><td>Mốc chuẩn (mốc chuẩn (datum) chiến lược</td><td>Phải chỉ rõ mốc chuẩn (datum) vật lý, mốc chuẩn (datum) logic trong chương trình, và mối liên hệ với bản vẽ/kế hoạch kiểm tra (plan).</td></tr>
+<tr><td>Mốc chuẩn (datum) chiến lược</td><td>Phải chỉ rõ mốc chuẩn (datum) vật lý, mốc chuẩn (datum) logic trong chương trình, và mối liên hệ với bản vẽ/kế hoạch kiểm tra (plan).</td></tr>
 <tr><td>đầu dò (probe) cycle</td><td>Mã cycle, bề mặt chạm, dự kiến kết quả, logic đạt/không đạt, viết / ghi-back cho phép hay không.</td></tr>
-<tr><td>Quan trọng bù trừ (bù trừ (offset)</td><td>Danh sách bù trừ (offset) không được sửa bởi Operator hoặc chỉ được sửa trong biên độ hẹp; nêu rõ ai được sửa và phải log ở đâu.</td></tr>
+<tr><td>Giá trị bù trừ (offset) quan trọng / nghiêm trọng</td><td>Danh sách bù trừ (offset) không được sửa bởi Operator hoặc chỉ được sửa trong biên độ hẹp; nêu rõ ai được sửa và phải log ở đâu.</td></tr>
 <tr><td>Chạy kiểm chứng chế độ</td><td>Dry-run / đồ họa / đơn lẻ chặn / khóa / nhanh / chạy nhanh cap / trục chính (spindle) cap / đầu tiên-cut điểm giám sát / đặc điểm / tính năng-by-đặc điểm / tính năng phát hành.</td></tr>
 <tr><td>khởi động lại note</td><td>Rule quay lại chạy kiểm chứng khi machine reset, chuyển giao công việc, tool thay thế, sự cố nghiêm trọng, fixture re-kẹp / gá kẹp hoặc thiết lập lại mốc chuẩn phiên bản.</td></tr>
 </tbody></table></div>

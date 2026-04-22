@@ -33,7 +33,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </div>
  </div>
  <div class="title">
-<strong class="doc-name">Evidence and Records Naming Convention</strong>
+<strong class="doc-name">Quy ước đặt tên evidence và hồ sơ</strong>
 <span class="muted">Evidence and Records Naming Convention</span>
 </div>
  <div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">ANNEX-137</span></div>
@@ -44,7 +44,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </div>
 
 
- <div class="note"><strong>ÁP DỤNG CHO</strong><br>Mọi file lưu lên SharePoint: form đã điền, evidence sản xuất, engineering baseline, hồ sơ đào tạo, audit, calibration và tài sản. Naming convention thống nhất đảm bảo truy xuất nguồn gốc theo AS9100 §8.5.2 và record control theo ISO 9001 §7.5.3. Tài liệu này là SSOT cho quy tắc đặt tên file trong toàn bộ hệ thống HESEM <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
+ <div class="note"><strong>ÁP DỤNG CHO</strong><br>Mọi file lưu trên SharePoint, gồm form đã điền, bằng chứng sản xuất, engineering baseline, hồ sơ đào tạo, hồ sơ đánh giá, calibration và hồ sơ tài sản. Quy ước đặt tên thống nhất giúp truy xuất nguồn gốc theo AS9100 §8.5.2 và kiểm soát hồ sơ theo ISO 9001 §7.5.3. Tài liệu này là SSOT cho toàn bộ quy tắc đặt tên file trong hệ thống HESEM QMS.</div>
  <h1>ANNEX-137 - Evidence and Records Naming Convention</h1>
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -52,14 +52,14 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
      ═══════════════════════════════════════════════════════════════ -->
  <div class="section">
  <h2>1. Phạm vi và mục đích</h2>
- <p>ANNEX-137 quy định naming convention thống nhất cho <strong>MỌI file</strong> lưu lên SharePoint trong hệ thống HESEM <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a>. Quy tắc đặt tên đảm bảo:</p>
+ <p>ANNEX-137 quy định quy ước đặt tên thống nhất cho <strong>MỌI file</strong> lưu trên SharePoint trong hệ thống HESEM QMS. Quy tắc đặt tên này bảo đảm:</p>
  <ul>
  <li><strong>Truy xuất nguồn gốc</strong> theo AS9100 §8.5.2 — mỗi file có thể truy vết ngược về job, phạm vi, người tạo, thời điểm tạo.</li>
- <li><strong>Record control</strong> theo ISO 9001 §7.5.3 — nhận dạng, lưu trữ, bảo vệ, truy xuất, thời hạn giữ và hủy.</li>
- <li><strong>Sort &amp; search</strong> — tên file sort theo thời gian tự nhiên, search bằng keyword trong SharePoint trả kết quả chính xác.</li>
- <li><strong>Sẵn sàng đánh giá</strong> — đạt 60-second truy xuất nguồn gốc test (xem Section 10).</li>
+ <li><strong>Record control</strong> theo ISO 9001 §7.5.3: nhận dạng, lưu trữ, bảo vệ, truy xuất, thời hạn giữ và hủy.</li>
+ <li><strong>Tìm kiếm và sắp xếp</strong>: tên file tự sắp theo thời gian và cho kết quả tìm kiếm chính xác trên SharePoint.</li>
+ <li><strong>Sẵn sàng đánh giá</strong>: đạt bài kiểm tra truy xuất nguồn gốc trong 60 giây ở Mục 10.</li>
  </ul>
- <p><strong>Phạm vi áp dụng:</strong> Toàn bộ nhân viên HESEM, nhà thầu phụ, và bất kỳ ai upload file lên hệ thống SharePoint của HESEM. Áp dụng cho tất cả các loại file: form đã điền, evidence sản xuất, engineering baseline, hồ sơ đào tạo, audit evidence, calibration certificate, supplier records, và asset records.</p>
+ <p><strong>Phạm vi áp dụng:</strong> Toàn bộ nhân viên HESEM, nhà thầu phụ và bất kỳ ai tải file lên hệ thống SharePoint của HESEM. Áp dụng cho mọi loại file: form đã điền, bằng chứng sản xuất, engineering baseline, hồ sơ đào tạo, bằng chứng đánh giá, calibration certificate, supplier records và asset records.</p>
  </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -77,12 +77,12 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </tr>
  </thead>
  <tbody>
- <tr><td>1</td><td>English only</td><td>Không dấu tiếng Việt, không Unicode ngoài ASCII</td></tr>
+ <tr><td>1</td><td>English only</td><td>Tên file không dùng dấu tiếng Việt và không dùng ký tự ngoài ASCII</td></tr>
  <tr><td>2</td><td>Ký tự cho phép</td><td><code>A-Z</code>, <code>a-z</code>, <code>0-9</code>, hyphen (<code>-</code>), underscore (<code>_</code>), dot (<code>.</code>)</td></tr>
  <tr><td>3</td><td>Phân cách segment</td><td>Underscore (<code>_</code>)</td></tr>
  <tr><td>4</td><td>Phân cách từ trong segment</td><td>Hyphen (<code>-</code>)</td></tr>
- <tr><td>5</td><td>Date format</td><td><code>YYYYMMDD</code> (compact, sort tốt)</td></tr>
- <tr><td>6</td><td>Time format</td><td><code>HHMM</code> (24h format)</td></tr>
+ <tr><td>5</td><td>Date format</td><td><code>YYYYMMDD</code> để tên file tự sắp theo thời gian</td></tr>
+ <tr><td>6</td><td>Time format</td><td><code>HHMM</code> theo định dạng 24 giờ</td></tr>
  <tr><td>7</td><td>Tên file tối đa</td><td>120 ký tự (bao gồm extension)</td></tr>
  <tr><td>8</td><td>KHÔNG được dùng</td><td>Dấu cách, dấu ngoặc <code>( ) [ ] { }</code>, ký tự đặc biệt <code>! @ # $ % ^ &amp; * + =</code></td></tr>
  </tbody>
@@ -98,7 +98,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
 
  <!-- PATTERN 1 -->
  <h3>3.1 Pattern 1 — Form đã điền (Filled Form Record)</h3>
- <div class="pattern-box">FRM-{code}_V{ver}_{phạm vi}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}</div>
+ <div class="pattern-box">FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}</div>
  <div class="table-card">
  <table class="table">
  <thead>
@@ -171,13 +171,13 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </tbody>
  </table>
  </div>
- <p><strong>Lưu ý:</strong> Engineering baseline KHÔNG dùng <code>{HHMM}-{UserID}</code> vì chỉ 1 người release tại 1 thời điểm (có approval gate FRM-306). Dùng <code>V{ver}</code> là đủ unique.</p>
+ <p><strong>Lưu ý:</strong> Engineering baseline không dùng <code>{HHMM}-{UserID}</code> vì tại một thời điểm chỉ có một bản release được phép đi qua gate phê duyệt FRM-306. Trong trường hợp này, <code>V{ver}</code> là đủ để bảo đảm tính duy nhất.</p>
  <p><strong>Ví dụ thực tế:</strong></p>
  <div class="pattern-box">NC_714XXXX-REVA_OP10_5AX_V3.nc<br>NC_714XXXX-REVA_OP20_TURN_V3.nc<br>CAM_714XXXX-REVA_OP10_5AX_V3.mcam<br>CAM_714XXXX-REVA_OP20_TURN_V3.f3d<br>SETUP_714XXXX-REVA_OP10_5AX_V3.xlsx<br>INSP_714XXXX-REVA_ALL_CMM_V2.dcc<br>MODEL_714XXXX-REVA_ALL_V1.step<br>DWG_714XXXX-REVA_ALL_V1.pdf<br>FIXTURE_714XXXX-REVA_OP10_5AX_V1.pdf<br>SIM_714XXXX-REVA_OP10_5AX_V3.mp4<br>CTRL-PLAN_714XXXX-REVA_ALL_V2.xlsx</div>
 
  <!-- PATTERN 4 -->
  <h3>3.4 Pattern 4 — Evidence không gắn Job (Non-job Evidence)</h3>
- <div class="pattern-box">{RecordType}_{phạm vi}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}</div>
+ <div class="pattern-box">{RecordType}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.{ext}</div>
  <div class="table-card">
  <table class="table">
  <thead>
@@ -348,7 +348,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </table>
  </div>
 
- <h3>4.4 <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a> Governance</h3>
+ <h3>4.4 QMS Governance</h3>
  <div class="table-card">
  <table class="table">
  <thead>
@@ -508,7 +508,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <tr><td>(Role-based)</td><td>Setup Technician #1</td><td><code>SET1</code></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)"><span class="entity-code dept-code">D-PROD</span></a></span></td></tr>
  <tr><td>(Role-based)</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a> Inspector #1</td><td><code>QC1</code></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phòng Chất lượng)"><span class="entity-code dept-code">D-QUAL</span></a></span></td></tr>
  <tr><td>(Role-based)</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html" title="Quality Engineer (Kỹ sư chất lượng)"><span class="entity-code role-code">QE</span></a> #1</td><td><code>QA1</code></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phòng Chất lượng)"><span class="entity-code dept-code">D-QUAL</span></a></span></td></tr>
- <tr><td>(Role-based)</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a> Representative #1</td><td><code>QMS1</code></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td></tr>
+ <tr><td>(Role-based)</td><td>QMS Representative #1</td><td><code>QMS1</code></td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td></tr>
  <tr><td>(Role-based)</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a> Officer #1</td><td><code>SCM1</code></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Supply Chain Department (Phòng Chuỗi cung ứng)"><span class="entity-code dept-code">D-SCM</span></a></span></td></tr>
  <tr><td>(Role-based)</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quản lý nhân sự)"><span class="entity-code role-code">HR</span></a> Officer #1</td><td><code>HR1</code></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phòng Nhân sự)"><span class="entity-code dept-code">D-HR</span></a></span></td></tr>
  <tr><td>(Role-based)</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="entity-code role-code">ENGM</span></a> #1</td><td><code>ENG1</code></td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)"><span class="entity-code dept-code">D-ENG</span></a></span></td></tr>
@@ -521,7 +521,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </table>
  </div>
 
- <h3>6.3 Tại sao dùng <code>{HHMM}-{UserID}</code> thay vì <code>{seq}_{RoleCode}</code></h3>
+ <h3>6.3 Vì sao dùng <code>{HHMM}-{UserID}</code> thay cho <code>{seq}_{RoleCode}</code></h3>
  <div class="table-card">
  <table class="table">
  <thead>
@@ -531,14 +531,14 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </tr>
  </thead>
  <tbody>
- <tr><td>Nhiều người upload cùng lúc → ai quản seq?</td><td>HHMM + UserID tự unique, không cần phối hợp</td></tr>
- <tr><td>2 <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a> inspector cùng role code "<a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a>" → trùng</td><td>UserID unique per person → NVA ≠ TBH</td></tr>
- <tr><td>Phải đếm file hiện có trước khi đặt tên</td><td>Chỉ cần nhìn đồng hồ + biết UserID mình</td></tr>
+ <tr><td>Nhiều người tải lên cùng lúc thì ai sẽ quản số thứ tự?</td><td><code>HHMM + UserID</code> tự tạo khác biệt, không cần phối hợp đếm số.</td></tr>
+ <tr><td>Hai <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a> inspector cùng dùng role code <span class="code">QC</span> sẽ bị trùng</td><td><span class="code">UserID</span> là duy nhất theo từng người, ví dụ <span class="code">NVA</span> khác <span class="code">TBH</span>.</td></tr>
+ <tr><td>Phải đếm số file hiện có trước khi đặt tên</td><td>Chỉ cần nhìn đồng hồ và dùng đúng <span class="code">UserID</span> của mình.</td></tr>
  </tbody>
  </table>
  </div>
 
- <h3>6.4 Uniqueness guarantee</h3>
+ <h3>6.4 Cơ chế bảo đảm tính duy nhất</h3>
  <div class="table-card">
  <table class="table">
  <thead>
@@ -550,9 +550,9 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </tr>
  </thead>
  <tbody>
- <tr><td>Cùng người, cùng phút, cùng RecordType, cùng phạm vi</td><td>Giống</td><td>Giống</td><td><strong>Không xảy ra</strong> — 1 người không tạo 2 file cùng loại cùng phút</td></tr>
- <tr><td>Khác người, cùng phút</td><td>Giống</td><td><strong>Khác</strong></td><td>Unique</td></tr>
- <tr><td>Cùng người, khác phút</td><td><strong>Khác</strong></td><td>Giống</td><td>Unique</td></tr>
+ <tr><td>Cùng người, cùng phút, cùng RecordType, cùng phạm vi</td><td>Giống</td><td>Giống</td><td><strong>Không nên xảy ra</strong>; nếu phát sinh, người tạo phải tách thời điểm hoặc phạm vi để tránh trùng.</td></tr>
+ <tr><td>Khác người, cùng phút</td><td>Giống</td><td><strong>Khác</strong></td><td>Vẫn duy nhất.</td></tr>
+ <tr><td>Cùng người, khác phút</td><td><strong>Khác</strong></td><td>Giống</td><td>Vẫn duy nhất.</td></tr>
  </tbody>
  </table>
  </div>
@@ -562,7 +562,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
      SECTION 7 — Record-ID — Server atomic counter
      ═══════════════════════════════════════════════════════════════ -->
  <div class="section">
- <h2>7. Record-ID — Server atomic counter</h2>
+ <h2>7. Record-ID và bộ đếm cấp mã trên server</h2>
 
  <h3>7.1 Khi nào cần Record-ID</h3>
  <div class="table-card">
@@ -576,12 +576,12 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </tr>
  </thead>
  <tbody>
- <tr><td>NCR</td><td>CÓ</td><td>NCR-2026-043</td><td>Server atomic counter</td></tr>
- <tr><td>CAPA</td><td>CÓ</td><td>CAPA-2026-008</td><td>Server atomic counter</td></tr>
- <tr><td>FAI</td><td>CÓ</td><td>FAI-2026-016</td><td>Server atomic counter</td></tr>
- <tr><td>Training event</td><td>CÓ</td><td>TRN-2026-028</td><td>Server atomic counter</td></tr>
- <tr><td>Audit</td><td>CÓ</td><td>AUD-2026-IA03</td><td>Server atomic counter</td></tr>
- <tr><td>ECR/ECO</td><td>CÓ</td><td>ECR-2026-012</td><td>Server atomic counter</td></tr>
+ <tr><td>NCR</td><td>CÓ</td><td>NCR-2026-043</td><td>Bộ đếm cấp mã trên server</td></tr>
+ <tr><td>CAPA</td><td>CÓ</td><td>CAPA-2026-008</td><td>Bộ đếm cấp mã trên server</td></tr>
+ <tr><td>FAI</td><td>CÓ</td><td>FAI-2026-016</td><td>Bộ đếm cấp mã trên server</td></tr>
+ <tr><td>Training event</td><td>CÓ</td><td>TRN-2026-028</td><td>Bộ đếm cấp mã trên server</td></tr>
+ <tr><td>Audit</td><td>CÓ</td><td>AUD-2026-IA03</td><td>Bộ đếm cấp mã trên server</td></tr>
+ <tr><td>ECR/ECO</td><td>CÓ</td><td>ECR-2026-012</td><td>Bộ đếm cấp mã trên server</td></tr>
  <tr><td>Lệnh công việc</td><td>CÓ (từ Epicor)</td><td>JOB-2026-0042</td><td>Epicor SoR</td></tr>
  <tr><td>Photos, scans</td><td>KHÔNG</td><td>(dùng HHMM-UserID)</td><td>Người upload</td></tr>
  <tr><td>CMM data</td><td>KHÔNG</td><td>(dùng HHMM-UserID)</td><td>Người upload</td></tr>
@@ -614,7 +614,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </div>
 
  <h3>7.3 Cơ chế Server atomic counter</h3>
- <p>File lock (<code>LOCK_EX</code>) đảm bảo chỉ 1 process đọc/ghi tại 1 thời điểm → không race condition. Cấu trúc lưu trữ counter:</p>
+ <p>Khóa file <span class="code">LOCK_EX</span> bảo đảm tại một thời điểm chỉ có một process được đọc hoặc ghi, nhờ đó tránh race condition. Cấu trúc lưu bộ đếm như sau:</p>
  <div class="pattern-box">qms-data/counters/<br> &amp;boxvr;&amp;horbar; NCR-2026.txt  → "043"<br> &amp;boxvr;&amp;horbar; CAPA-2026.txt → "008"<br> &amp;boxvr;&amp;horbar; FAI-2026.txt  → "016"<br> &amp;boxvr;&amp;horbar; TRN-2026.txt  → "028"<br> &amp;boxvr;&amp;horbar; AUD-2026.txt  → "003"<br> &amp;boxvr;&amp;horbar; ECR-2026.txt  → "012"<br> &amp;boxur;&amp;horbar; IMP-2026.txt  → "005"</div>
 
  <h3>7.4 Luồng lấy Record-ID</h3>
@@ -640,11 +640,11 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <div class="section">
  <h2>8. Form kiểm soát phiên bản</h2>
 
- <h3>8.1 Form blank download — version stamp</h3>
- <p>Khi user tải form blank từ web portal:</p>
+ <h3>8.1 Form blank download và version stamp</h3>
+ <p>Khi người dùng tải form blank từ web portal:</p>
  <ul>
- <li>Filename <strong>BẮT BUỘC</strong> có <code>V{ver}</code>: <code>FRM-302_Setup-Sheet-and-Tool-List_V3.2.xlsx</code></li>
- <li>Server inject metadata vào sheet ẩn <code>_QMS_CONTROL</code>:</li>
+ <li>Tên file <strong>BẮT BUỘC</strong> có <code>V{ver}</code>, ví dụ <code>FRM-302_Setup-Sheet-and-Tool-List_V3.2.xlsx</code>.</li>
+ <li>Server ghi metadata vào sheet ẩn <code>_QMS_CONTROL</code>:</li>
  </ul>
  <div class="table-card">
  <table class="table">
@@ -657,7 +657,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </thead>
  <tbody>
  <tr><td><code>form_code</code></td><td>Mã form</td><td>FRM-302</td></tr>
- <tr><td><code>version</code></td><td>Version form blank</td><td>3.2</td></tr>
+ <tr><td><code>version</code></td><td>Phiên bản form blank</td><td>3.2</td></tr>
  <tr><td><code>checksum</code></td><td>SHA-256 checksum</td><td>a1b2c3...</td></tr>
  <tr><td><code>downloaded_by</code></td><td>UserID người tải</td><td>SET1</td></tr>
  <tr><td><code>downloaded_at</code></td><td>Thời điểm tải</td><td>2026-03-27T09:00:00+07:00</td></tr>
@@ -668,20 +668,20 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
 
  <h3>8.2 Form filled upload — version validation</h3>
  <ul>
- <li>SharePoint metadata column <code>Form-Version</code> phải khớp active version trong <code>form_control_registry</code>.</li>
- <li>Nếu version cũ → FLAG <code>Version-Valid = OBSOLETE</code> + notify uploader.</li>
- <li>Monthly audit: query files where <code>Version-Valid = OBSOLETE</code> → action required.</li>
+ <li>SharePoint metadata column <code>Form-Version</code> phải khớp active version trong <span class="code">form_control_registry</span>.</li>
+ <li>Nếu dùng phiên bản cũ thì phải gắn cờ <code>Version-Valid = OBSOLETE</code> và thông báo cho người tải lên.</li>
+ <li>Đánh giá định kỳ hàng tháng phải truy các file có <code>Version-Valid = OBSOLETE</code> để xử lý.</li>
  </ul>
 
  <h3>8.3 Phân biệt blank vs filled nhìn từ tên file</h3>
- <div class="pattern-box">BLANK: FRM-{code}_{Title}_V{ver}.xlsx           ← Có Title, KHÔNG có phạm vi/HHMM<br>FILLED: FRM-{code}_V{ver}_{phạm vi}_{YYYYMMDD}_{HHMM}-{UserID}.xlsx ← Có phạm vi + time, KHÔNG có Title</div>
+ <div class="pattern-box">BLANK: FRM-{code}_{Title}_V{ver}.xlsx           ← Có Title, KHÔNG có phạm vi/HHMM<br>FILLED: FRM-{code}_V{ver}_{scope}_{YYYYMMDD}_{HHMM}-{UserID}.xlsx ← Có phạm vi + time, KHÔNG có Title</div>
  </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
      SECTION 9 — Validation rules (fail-fast)
      ═══════════════════════════════════════════════════════════════ -->
  <div class="section">
- <h2>9. Validation rules (fail-fast)</h2>
+ <h2>9. Quy tắc kiểm tra tên file theo nguyên tắc fail-fast</h2>
  <div class="table-card">
  <table class="table">
  <thead>
@@ -694,12 +694,12 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <tr><td>Tên file chứa dấu cách hoặc ký tự đặc biệt</td><td><strong>REJECT</strong></td></tr>
  <tr><td>Tên file không có date segment (<code>YYYYMMDD</code>)</td><td><strong>REJECT</strong></td></tr>
  <tr><td>Filled form không có <code>V{ver}</code></td><td><strong>REJECT</strong></td></tr>
- <tr><td>Filled form version ≠ current active version</td><td><strong>FLAG OBSOLETE</strong></td></tr>
+ <tr><td>Filled form version khác current active version</td><td><strong>FLAG OBSOLETE</strong></td></tr>
  <tr><td>Job evidence không có <code>JOB-{YYYY}-{nnnn}</code></td><td><strong>REJECT</strong></td></tr>
  <tr><td>Engineering baseline không có <code>V{ver}</code></td><td><strong>REJECT</strong></td></tr>
  <tr><td>File trùng tên đã tồn tại (cùng tên, cùng folder)</td><td><strong>REJECT</strong></td></tr>
  <tr><td>Tên file &gt; 120 ký tự</td><td><strong>WARN</strong></td></tr>
- <tr><td>RecordType code không trong dictionary (Section 4)</td><td><strong>FLAG</strong></td></tr>
+ <tr><td>RecordType code không có trong dictionary ở Mục 4</td><td><strong>FLAG</strong></td></tr>
  <tr><td>Date format sai (không phải <code>YYYYMMDD</code>)</td><td><strong>REJECT</strong></td></tr>
  <tr><td>Part number trong file ≠ Part number trong folder</td><td><strong>REJECT</strong></td></tr>
  </tbody>
@@ -711,10 +711,10 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
      SECTION 10 — 60-second traceability test
      ═══════════════════════════════════════════════════════════════ -->
  <div class="section">
- <h2>10. 60-second truy xuất nguồn gốc test (AS9100 compliance)</h2>
+ <h2>10. Bài kiểm tra truy xuất nguồn gốc trong 60 giây</h2>
 
  <h3>10.1 Kịch bản 1 — FAI report cho job cụ thể</h3>
- <p><strong>Auditor hỏi:</strong> "Show me the FAI report for job 0042, part 714XXXX rev A"</p>
+ <p><strong>Câu hỏi của auditor:</strong> "Show me the FAI report for job 0042, part 714XXXX rev A"</p>
  <div class="table-card">
  <table class="table">
  <thead>
@@ -727,16 +727,16 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <tbody>
  <tr><td>1</td><td>Mở HESEM-Job-Evidence → Job-Dossiers → 2026</td><td>5s</td></tr>
  <tr><td>2</td><td>Tìm folder <code>JOB-2026-0042_714XXXX-REVA</code></td><td>5s</td></tr>
- <tr><td>3</td><td>Filter metadata: Gate = G4-FAI hoặc search "FRM-311"</td><td>5s</td></tr>
- <tr><td>4</td><td>Thấy: <code>FRM-311_V1.0_JOB-2026-0042_20260327_0900-QC1.xlsx</code><br>→ Biết: FAI form V1.0, ngày 27/3/2026 lúc 9:00, QC1 điền</td><td>ngay</td></tr>
- <tr><td>5</td><td>Kèm: <code>CMM_JOB-2026-0042_714XXXX-REVA-OP10_20260327_0905-QC1.csv</code><br>→ CMM data OP10, cùng ngày, cùng inspector</td><td>ngay</td></tr>
+ <tr><td>3</td><td>Lọc metadata theo Gate = G4-FAI hoặc tìm <code>FRM-311</code></td><td>5s</td></tr>
+ <tr><td>4</td><td>Thấy <code>FRM-311_V1.0_JOB-2026-0042_20260327_0900-QC1.xlsx</code><br>→ biết đây là FAI form V1.0, được điền ngày 27/03/2026 lúc 09:00 bởi QC1</td><td>ngay</td></tr>
+ <tr><td>5</td><td>Kèm <code>CMM_JOB-2026-0042_714XXXX-REVA-OP10_20260327_0905-QC1.csv</code><br>→ biết đây là dữ liệu CMM cho OP10, cùng ngày và cùng người kiểm tra</td><td>ngay</td></tr>
  </tbody>
  </table>
  </div>
  <p><strong>TỔNG: &lt; 20 giây</strong> (yêu cầu &lt; 60 giây)</p>
 
  <h3>10.2 Kịch bản 2 — Tất cả NCR cho khách hàng trong Q1</h3>
- <p><strong>Auditor hỏi:</strong> "Show me all NCRs for Lam Research in Q1 2026"</p>
+ <p><strong>Câu hỏi của auditor:</strong> "Show me all NCRs for Lam Research in Q1 2026"</p>
  <div class="table-card">
  <table class="table">
  <thead>
@@ -748,8 +748,8 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </thead>
  <tbody>
  <tr><td>1</td><td>Mở HESEM-Records → Quality-Records</td><td>3s</td></tr>
- <tr><td>2</td><td>Filter: Record-Type = NCR, Customer = Lam-Research, Year = 2026</td><td>5s</td></tr>
- <tr><td>3</td><td>Sort by date → thấy danh sách tất cả NCR</td><td>ngay</td></tr>
+ <tr><td>2</td><td>Lọc theo Record-Type = NCR, Customer = Lam-Research, Year = 2026</td><td>5s</td></tr>
+ <tr><td>3</td><td>Sắp theo ngày và thấy ngay danh sách tất cả NCR</td><td>ngay</td></tr>
  </tbody>
  </table>
  </div>
@@ -771,16 +771,16 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </tr>
  </thead>
  <tbody>
- <tr><td><a href="../../../01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a></td><td>Document and Data Control</td><td>Quy trình kiểm soát tài liệu, kiểm soát phiên bản tổng thể</td></tr>
- <tr><td><a href="../../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></td><td>Quản trị dữ liệu, Records Security and IP Protection</td><td>Quản trị dữ liệu, bảo mật hồ sơ, bảo vệ IP</td></tr>
- <tr><td><a href="../../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td><td>Phát hành kỹ thuật, Baseline Package and Snapshot công việc Control</td><td>Kiểm soát engineering baseline, version release</td></tr>
- <tr><td><a href="../../../02-Work-Instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a></td><td>Thiết lập SharePoint hồ sơ địa điểm / site, thư viện và quyền truy cập click-by-click</td><td>Thiết lập site hồ sơ, thư viện và quyền truy cập có kiểm soát</td></tr>
- <tr><td><a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a></td><td>M365 SharePoint local sync, Git và server deployment control</td><td>Kiểm soát local sync, Git và boundary triển khai hệ thống</td></tr>
- <tr><td><a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Hồ sơ công việc Gói bằng chứng and Record Completeness</td><td>Gói evidence theo job, kiểm tra đầy đủ hồ sơ</td></tr>
- <tr><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></td><td>M365 Records Metadata, List Schema and Register Catalog</td><td>Schema metadata, danh mục list trên SharePoint</td></tr>
- <tr><td><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></td><td>M365 Records Site Topology, Library and Folder Blueprint</td><td>Cấu trúc site, thư viện, thư mục trên SharePoint</td></tr>
- <tr><td><a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></td><td>M365 Operational Records File Plan by Department, Role and Job</td><td>File plan chi tiết theo phòng ban, JD và job gate</td></tr>
- <tr><td><a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a></td><td>M365 SharePoint-Git-Server Source Sync, Promotion and Runtime Boundary</td><td>Ranh giới đồng bộ source giữa SharePoint, Git, Server</td></tr>
+ <tr><td><a href="../../../01-SOPs/01-SOP-100/sop-101-document-and-data-control.html">SOP-101</a></td><td>Document and Data Control</td><td>Quy trình kiểm soát tài liệu và kiểm soát phiên bản tổng thể</td></tr>
+ <tr><td><a href="../../../01-SOPs/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html">SOP-104</a></td><td>Data Governance, Records Security and IP Protection</td><td>Quản trị dữ liệu, bảo mật hồ sơ và bảo vệ tài sản trí tuệ</td></tr>
+ <tr><td><a href="../../../01-SOPs/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td><td>Engineering Release, Baseline Package and Job Snapshot Control</td><td>Kiểm soát engineering baseline và version release</td></tr>
+ <tr><td><a href="../../../02-Work-Instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a></td><td>SharePoint record sites, libraries and permissions</td><td>Thiết lập site hồ sơ, thư viện và quyền truy cập có kiểm soát</td></tr>
+ <tr><td><a href="../../../02-Work-Instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a></td><td>M365 SharePoint local sync, Git and server deployment control</td><td>Kiểm soát local sync, Git và boundary triển khai hệ thống</td></tr>
+ <tr><td><a href="../../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Job dossier evidence pack and record completeness</td><td>Gói bằng chứng theo job và kiểm tra tính đầy đủ của hồ sơ</td></tr>
+ <tr><td><a href="annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a></td><td>M365 Records metadata, list schema and register catalog</td><td>Schema metadata và danh mục list trên SharePoint</td></tr>
+ <tr><td><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a></td><td>M365 Records site topology, library and folder blueprint</td><td>Cấu trúc site, thư viện và thư mục trên SharePoint</td></tr>
+ <tr><td><a href="annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a></td><td>M365 operational records file plan by department, role and job</td><td>File plan chi tiết theo phòng ban, vai trò và job gate</td></tr>
+ <tr><td><a href="annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a></td><td>M365 SharePoint-Git-Server source sync, promotion and runtime boundary</td><td>Ranh giới đồng bộ source giữa SharePoint, Git và server</td></tr>
  <tr><td>core-standards/14</td><td>M365 SharePoint Architecture</td><td>Kiến trúc SharePoint tổng thể</td></tr>
  <tr><td>core-standards/15</td><td>Evidence and Records Naming</td><td>Tài liệu nguồn cho ANNEX-137 này</td></tr>
  </tbody>
@@ -791,6 +791,6 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </div>
  </div>
 </div>
-<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a>.</div>
+<div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>
