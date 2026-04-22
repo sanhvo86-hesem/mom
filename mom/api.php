@@ -332,9 +332,42 @@ function is_inside_root(string $absPath, string $rootDir): bool {
 
 function is_reserved_root_segment(string $relPath): bool {
   $relPath = safe_rel_path($relPath);
+
+  // Allow the portal's controlled document corpus — every QMS doc lives under
+  // mom/docs/{system,operations,forms,training,...}. The "mom" top-level
+  // directory itself is reserved, so we only white-list its docs subtree.
+  if (str_starts_with($relPath, 'mom/docs/') && !str_starts_with($relPath, 'mom/docs/glossary/')) {
+    return false;
+  }
+
+  // First-segment guards keep the legacy contract (reject non-doc edits that
+  // would otherwise clobber application source, generated reports, etc.).
   $first = explode('/', $relPath, 2)[0] ?? '';
-  $reserved = ['mom', 'assets', 'mom/docs/glossary', 'archive', '_Deleted', '.git'];
-  return in_array($first, $reserved, true);
+  $reservedFirstSegments = ['assets', 'archive', '_Deleted', '.git'];
+  if (in_array($first, $reservedFirstSegments, true)) {
+    return true;
+  }
+
+  // Deny any sensitive subtree of the application root itself so the dialog
+  // can never point at PHP, JS, SQL, CSS or runtime-data files.
+  $reservedMomSubtrees = [
+    'mom/api', 'mom/scripts', 'mom/styles', 'mom/database',
+    'mom/assets', 'mom/data', 'mom/ops', 'mom/tools',
+    'mom/vendor', 'mom/release', 'mom/contracts',
+    'mom/docs/glossary',
+  ];
+  foreach ($reservedMomSubtrees as $sub) {
+    if ($relPath === $sub || str_starts_with($relPath, $sub . '/')) {
+      return true;
+    }
+  }
+
+  // Bare "mom" or paths that resolve to an application file at the mom root
+  // (e.g. "mom/portal.html", "mom/sw.js") remain off-limits.
+  if ($relPath === 'mom' || ($first === 'mom' && !str_starts_with($relPath, 'mom/docs/'))) {
+    return true;
+  }
+  return false;
 }
 
 function first_existing_rel_dir(array $candidates, string $rootDir): string {
