@@ -63,11 +63,11 @@
 }
 
 .dcc-header {
+    /* Stacked layout: title block on top, orange separator, ribbon below. */
     display: grid;
-    grid-template-columns: minmax(240px, 1fr) auto;
-    align-items: center;
+    grid-template-columns: 1fr;
     background: var(--dcc-bg);
-    border-top: 2px solid var(--dcc-border);
+    border-top: 1px solid var(--dcc-sep-color);
     border-bottom: 1px solid var(--dcc-sep-color);
     font-family: var(--font-body, -apple-system, "Segoe UI", sans-serif);
     color: var(--dcc-value-color);
@@ -79,8 +79,10 @@
     display: flex;
     align-items: center;
     gap: calc(var(--dcc-cell-gap) * 2);
-    padding: calc(var(--dcc-pad-y) * 1.5) var(--dcc-pad-x);
+    padding: calc(var(--dcc-pad-y) * 2) calc(var(--dcc-pad-x) * 1.5);
     min-width: 0;
+    /* Orange separator line between title block and metadata ribbon */
+    border-bottom: 2px solid var(--dcc-border);
 }
 
 .dcc-header__logo {
@@ -113,14 +115,11 @@
 }
 
 .dcc-header__subtitle {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--text-secondary, #64748b);
     font-weight: 400;
-    line-height: 1.3;
+    line-height: 1.35;
     margin: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
 }
 
 /* ── Ribbon (the label/value cells) ─────────────────────────────────────── */
@@ -226,17 +225,20 @@
 /* ── Responsive: on narrow viewports let the ribbon wrap cleanly ───────── */
 
 @media (max-width: 900px) {
-    .dcc-header {
-        grid-template-columns: 1fr;
-    }
     .dcc-header__ribbon {
         flex-wrap: wrap;
     }
     .dcc-header__cell {
-        border-right: 0;
-        border-bottom: var(--dcc-sep-width) solid var(--dcc-sep-color);
+        /* When cells wrap, keep vertical separator only where the next cell is
+           on the same line — rely on the pipe between row-neighbours only. */
+        border-right: var(--dcc-sep-width) solid var(--dcc-sep-color);
     }
     .dcc-header__cell:last-child {
-        border-bottom: 0;
+        border-right: 0;
     }
+}
+
+/* Increase title prominence once the title block has the full row */
+.dcc-header__title {
+    font-size: 22px;
 }
