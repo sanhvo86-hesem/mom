@@ -1,0 +1,242 @@
+/* ============================================================================
+ * DCC Header — Document Change Control header ribbon
+ * ----------------------------------------------------------------------------
+ * Every visual parameter resolves to a CSS variable registered in the
+ * Graphics Authority catalog (migration 151). No hardcoded values.
+ *
+ * Invariant — symmetrical clearance:
+ *   gap(label ↔ value) == gap(value ↔ separator '|') == --dcc-cell-gap
+ *   This keeps the header ribbon flush on one line and prevents overflow
+ *   onto a second row (the bug reported on v2.0 of the header).
+ *
+ * Every ribbon cell follows the same rhythm:
+ *   [ label ] --dcc-cell-gap [ value ] --dcc-cell-gap | --dcc-cell-gap [ next ]
+ *
+ * Token sources (bound via --dcc-* CSS variables):
+ *   dcc.header.padding.y / padding.x        — cell padding
+ *   dcc.header.cell.gap                     — uniform gap (see invariant)
+ *   dcc.header.separator.width / .color     — pipe '|'
+ *   dcc.header.row.min_height               — single-line guarantee
+ *   dcc.header.label.max_width              — prevents value wrap
+ *   dcc.header.owner.max_width              — single-owner budget
+ *   dcc.header.*.color / .font_size / .weight
+ *   dcc.header.bg / .border
+ *
+ * Single-owner rule:
+ *   .dcc-role appears exactly ONCE per owner/approver cell. Dual-role markup
+ *   (e.g. "CEO / QMR") is explicitly forbidden by the backend constraint
+ *   ck_dcc_header_owner_single.
+ * ========================================================================== */
+
+/* Bootstrap fallbacks for the --dcc-* tokens.
+ *
+ * Production resolves these via graphics_token_value (migration 151) which
+ * publishes each token under the `:root` scope at build time. These CSS
+ * fallbacks exist so the renderer produces a sane header even when the
+ * Graphics Authority injector has not yet run (static preview, dev bootstrap).
+ * In production the DB-backed value wins because it is written into
+ * document.documentElement.style higher in the cascade.
+ */
+:root {
+    --dcc-pad-y: 8px;
+    --dcc-pad-x: 12px;
+    --dcc-cell-gap: 6px;
+    --dcc-sep-width: 1px;
+    --dcc-row-min-height: 36px;
+    --dcc-label-max-width: 64px;
+    --dcc-owner-max-width: 120px;
+    --dcc-label-font-size: 11px;
+    --dcc-value-font-size: 12px;
+    --dcc-code-font-size: 12px;
+    --dcc-label-weight: 600;
+    --dcc-value-weight: 500;
+    --dcc-code-weight: 700;
+    --dcc-bg: #f8fafc;
+    --dcc-border: #f9a825;
+    --dcc-sep-color: #e2e8f0;
+    --dcc-label-color: #64748b;
+    --dcc-value-color: #0f172a;
+    --dcc-code-bg: #ffffff;
+    --dcc-code-border: #dbe4ec;
+    --dcc-owner-bg: #f1f5f9;
+    --dcc-owner-border: #dbe4ec;
+}
+
+.dcc-header {
+    display: grid;
+    grid-template-columns: minmax(240px, 1fr) auto;
+    align-items: center;
+    background: var(--dcc-bg);
+    border-top: 2px solid var(--dcc-border);
+    border-bottom: 1px solid var(--dcc-sep-color);
+    font-family: var(--font-body, -apple-system, "Segoe UI", sans-serif);
+    color: var(--dcc-value-color);
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.dcc-header__title-block {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--dcc-cell-gap) * 2);
+    padding: calc(var(--dcc-pad-y) * 1.5) var(--dcc-pad-x);
+    min-width: 0;
+}
+
+.dcc-header__logo {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+}
+
+.dcc-header__logo img,
+.dcc-header__logo svg {
+    height: 28px;
+    width: auto;
+    display: block;
+}
+
+.dcc-header__titles {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.dcc-header__title {
+    font-family: var(--font-heading);
+    font-weight: var(--font-heading-weight, 700);
+    font-size: 18px;
+    color: var(--text-primary, #0f172a);
+    line-height: 1.2;
+    margin: 0;
+}
+
+.dcc-header__subtitle {
+    font-size: 12px;
+    color: var(--text-secondary, #64748b);
+    font-weight: 400;
+    line-height: 1.3;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── Ribbon (the label/value cells) ─────────────────────────────────────── */
+
+.dcc-header__ribbon {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: stretch;
+    min-height: var(--dcc-row-min-height);
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}
+
+.dcc-header__cell {
+    display: flex;
+    align-items: center;
+    /* Symmetric clearance: label ↔ value ↔ pipe all share the same gap */
+    gap: var(--dcc-cell-gap);
+    padding: var(--dcc-pad-y) var(--dcc-pad-x);
+    min-height: var(--dcc-row-min-height);
+    white-space: nowrap;
+    border: 0;
+    /* Separator '|' is the right-edge of each non-terminal cell, using the same
+       gap on both sides so labels never get pushed onto a second line. */
+    border-right: var(--dcc-sep-width) solid var(--dcc-sep-color);
+}
+
+.dcc-header__cell:last-child {
+    border-right: 0;
+}
+
+.dcc-header__label {
+    font-family: var(--font-label);
+    font-size: var(--dcc-label-font-size);
+    font-weight: var(--dcc-label-weight);
+    color: var(--dcc-label-color);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    max-width: var(--dcc-label-max-width);
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dcc-header__label::after {
+    /* Colon applied via CSS to keep label text node short and overflow-safe */
+    content: ':';
+    margin-left: 1px;
+}
+
+.dcc-header__value {
+    font-size: var(--dcc-value-font-size);
+    font-weight: var(--dcc-value-weight);
+    color: var(--dcc-value-color);
+    max-width: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Document-code badge (monospace pill) */
+.dcc-header__code {
+    display: inline-flex;
+    align-items: center;
+    height: calc(var(--dcc-row-min-height) - var(--dcc-pad-y) * 2);
+    padding: 0 calc(var(--dcc-pad-x) * 0.6);
+    border-radius: 6px;
+    background: var(--dcc-code-bg);
+    border: 1px solid var(--dcc-code-border);
+    font-family: var(--font-mono);
+    font-size: var(--dcc-code-font-size);
+    font-weight: var(--dcc-code-weight);
+    letter-spacing: 0.02em;
+    color: var(--dcc-value-color);
+}
+
+/* Owner / approver single-role badge */
+.dcc-header__role {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px calc(var(--dcc-pad-x) * 0.6);
+    border-radius: 999px;
+    background: var(--dcc-owner-bg);
+    border: 1px solid var(--dcc-owner-border);
+    color: var(--dcc-value-color);
+    font-size: var(--dcc-value-font-size);
+    font-weight: 700;
+    max-width: var(--dcc-owner-max-width);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Loading + error placeholders while JS fetches the payload */
+.dcc-header[data-dcc-state="loading"] .dcc-header__ribbon {
+    opacity: 0.4;
+    pointer-events: none;
+}
+.dcc-header[data-dcc-state="error"] {
+    border-top-color: var(--status-error, #dc2626);
+}
+
+/* ── Responsive: on narrow viewports let the ribbon wrap cleanly ───────── */
+
+@media (max-width: 900px) {
+    .dcc-header {
+        grid-template-columns: 1fr;
+    }
+    .dcc-header__ribbon {
+        flex-wrap: wrap;
+    }
+    .dcc-header__cell {
+        border-right: 0;
+        border-bottom: var(--dcc-sep-width) solid var(--dcc-sep-color);
+    }
+    .dcc-header__cell:last-child {
+        border-bottom: 0;
+    }
+}

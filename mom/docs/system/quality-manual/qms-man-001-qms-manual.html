@@ -3,6 +3,8 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>QMS-MAN-001 - QMS Manual | HESEM MOM</title>
 <link href="../../assets/style.css" rel="stylesheet">
+<link href="../../../styles/dcc-header.css" rel="stylesheet">
+<script defer src="../../../scripts/portal/11-dcc-header-renderer.js"></script>
 <link rel="stylesheet" crossorigin="anonymous" href="https://ff.kis.v2.scr.kaspersky-labs.com/E3E8934C-235A-4B0E-825A-35A08381A191/abn/main.css?attr=aHR0cHM6Ly9xbXMuaGVzZW0uY29tLnZuLzAyLVRhaS1MaWV1LUhlLVRob25nLzAxLVF1YWxpdHktTWFudWFsL3Ftcy1tYW4tMDAxLXFtcy1tYW51YWwuaHRtbD90PTE3NzQ0MDkxMjM5OTA"><style> .chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;}
 .tight li{margin:4px 0;}
@@ -73,20 +75,12 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 <div class="container">
 <div class="page">
 <div class="page-body">
-<div class="form-header">
-<div class="fh-left">
-<a class="brand-logo" href="../../mom/portal.html"><img alt="HESEM Logo" src="../../assets/hesem-logo.svg"></a>
-<div class="fh-company">
-<a href="../../mom/portal.html">HESEM ENGINEERING</a>
-<span>Tài liệu kiểm soát</span>
-</div>
-</div>
-<div class="title">
-<strong class="doc-name">QMS Manual</strong>
-<span class="sub-vn">Sổ tay QMS</span>
-</div>
-<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">QMS-MAN-001</span></div><div class="row"><span><b>Version:</b></span><span>V2.0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>2026-03-25</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tổng Giám đốc)"><span class="entity-code role-code">CEO</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA[QMR]</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tổng Giám đốc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
-</div>
+<!-- DCC Document Change Control header (values served by /api/v1/dcc; bootstrap seed is preview-only) -->
+<div class="dcc-header"
+     data-dcc-doc-code="QMS-MAN-001"
+     data-dcc-locale="en"
+     data-dcc-logo="/assets/hesem-logo.svg"
+     data-dcc-bootstrap='{"header":{"doc_code":"QMS-MAN-001","title":"QMS Manual","subtitle":"Integrated Quality Management System \u2014 governance overview","doc_type":"MAN","revision":"V0","effective_date":"2026-04-13","owner_role_code":"QMR","approver_role_code":"CEO","iso_clause":"ISO 9001:2026 §4","status":"released"},"labels":{"doc_id":{"short":"ID","long":"Document ID","sort":10},"revision":{"short":"Rev","long":"Revision","sort":20},"effective_date":{"short":"Eff","long":"Effective date","sort":30},"owner":{"short":"Owner","long":"Owner","sort":40},"approver":{"short":"Appr","long":"Approved by","sort":50}}}'></div>
 <div class="doc-content" id="docContent"><div class="form-sheet">
 <div class="iso-map"><div class="iso-title">Chuẩn mực áp dụng / nguyên tắc bắt buộc</div><div class="req"><span class="req-tag shall">PHẢI</span><div>QMS được thiết kế theo tư duy quá trình, kiểm soát rủi ro, bằng chứng phù hợp và trách nhiệm cuối cùng của HESEM đối với đầu ra đã giao cho khách hàng. <span class="iso-clause">§4</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Các quá trình chính phải được vận hành theo ranh giới trách nhiệm, thẩm quyền, RACI, cổng kiểm soát chất lượng (gate), nguồn chuẩn duy nhất và dữ liệu tối thiểu đã được chuẩn hóa; không thay bằng thói quen cá nhân hoặc chỉ đạo miệng. <span class="iso-clause">§4</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Hệ thống phải ngăn lỗi từ đầu vào, chuẩn bị đủ điều kiện trước khi chạy và giữ kiểm soát xuyên suốt quá trình; không dồn trách nhiệm cho kiểm tra cuối. <span class="iso-clause">§4</span></div></div></div>
 <div class="preface-block"><div class="grid-2"><div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="card"><div class="card-title">Định vị của sổ tay</div><p>Sổ tay này là tài liệu cấp 1 của hệ thống, dùng để quy định khung quản trị cho doanh nghiệp gia công CNC chính xác theo mô hình <b>lệnh sản xuất / chủng loại cao (cao-mix)</b>. Tài liệu giải thích logic điều hành, ranh giới trách nhiệm, kiến trúc dữ liệu và mối liên kết giữa chính sách – SOP – WI – biểu mẫu – hồ sơ.</p></div></div></div><div class="ed-qms-block" data-qms-kind="callout" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="callout"><div class="card-title">Trục điều hành bắt buộc</div><p>Tài liệu này quy định rõ <b>ranh giới trách nhiệm</b>, <b>nguồn chuẩn duy nhất</b>, <b>thẩm quyền cổng kiểm soát</b>, <b>phê duyệt theo bằng chứng</b>, <b>kiểm soát dữ liệu</b>, <b>ứng phó gián đoạn</b> và <b>bố trí Người thay thế</b>.</p></div></div></div></div></div>

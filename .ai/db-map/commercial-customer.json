@@ -2,7 +2,7 @@
     "_meta": {
         "domain": "commercial_customer",
         "table_count": 6,
-        "generated_at": "2026-04-21T13:24:31+00:00"
+        "generated_at": "2026-04-22T01:09:11+00:00"
     },
     "tables": {
         "crm_customer_touchpoints": {

@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "quality_improvement",
-        "table_count": 15,
-        "generated_at": "2026-04-21T13:24:31+00:00"
+        "table_count": 18,
+        "generated_at": "2026-04-22T01:09:11+00:00"
     },
     "tables": {
         "apqp_gate_reviews": {
@@ -154,6 +154,41 @@
                 }
             ],
             "contract": "quality_improvement.control-plans"
+        },
+        "dcc_document_change_notice": {
+            "defined_in": "150_dcc_document_change_control.sql",
+            "extended_in": [],
+            "primary_key": "dcn_id",
+            "foreign_keys": [
+                {
+                    "col": "dcn_number",
+                    "ref": "dcc_document_change_request(dcr_id)"
+                },
+                {
+                    "col": "doc_code",
+                    "ref": "dcc_document_header(doc_code)"
+                }
+            ],
+            "contract": "quality_improvement.document_control"
+        },
+        "dcc_document_change_request": {
+            "defined_in": "150_dcc_document_change_control.sql",
+            "extended_in": [],
+            "primary_key": "dcr_id",
+            "foreign_keys": [
+                {
+                    "col": "dcr_number",
+                    "ref": "dcc_document_header(doc_code)"
+                }
+            ],
+            "contract": "quality_improvement.document_control"
+        },
+        "dcc_document_revision_history": {
+            "defined_in": "150_dcc_document_change_control.sql",
+            "extended_in": [],
+            "primary_key": "history_id",
+            "foreign_keys": [],
+            "contract": "quality_improvement.document_control"
         },
         "deviations": {
             "defined_in": "034_exception_management.sql",

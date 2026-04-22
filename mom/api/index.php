@@ -318,6 +318,7 @@ $routeModules = [
     __DIR__ . '/routes/graphics-governance-routes.php',
     __DIR__ . '/routes/eqms-control-plane-routes.php',
     __DIR__ . '/routes/eqms-quality-routes.php',        // EQMS World-Class Surface (v4.0)
+    __DIR__ . '/routes/dcc-routes.php',                 // DCC — Document Change Control (v4.1)
     __DIR__ . '/routes/generic-runtime-routes.php',
     __DIR__ . '/routes/frontend-alias-routes.php',
     __DIR__ . '/routes/rest-routes.php',

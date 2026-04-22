@@ -1,6 +1,6 @@
 {
     "_meta": {
-        "generated_at": "2026-04-21T13:24:31+00:00",
+        "generated_at": "2026-04-22T01:09:11+00:00",
         "description": "Domain contract objects: canonical resource, primary table, lifecycle status, workflow state model.",
         "contracts_dir": "mom/contracts/objects/",
         "usage": "Find which domain owns a resource and which table stores it. Use primary_table for SQL queries."
@@ -1139,6 +1139,27 @@
                 "state_model": "deviations_exception_status"
             },
             "contract_dir": "mom/contracts/objects/quality_improvement--deviations"
+        },
+        {
+            "resource": "quality_improvement.document_control",
+            "canonical_name": "dcc_document_header",
+            "display_name": "Document Change Control (DCC)",
+            "domain": "quality_improvement",
+            "purpose": "Govern version control of QMS controlled documents (Manual, Policy, SOP, WI, Form, Annex, Handbook, JD). Distinct from Engineering Change Control (ECC = plm_change_*) which governs parts/BOMs/items.",
+            "primary_table": "dcc_document_header",
+            "primary_key": "header_id",
+            "status_field": "status",
+            "child_tables": [
+                "dcc_document_change_request",
+                "dcc_document_change_notice",
+                "dcc_document_revision_history"
+            ],
+            "object_role": "lifecycle_owner",
+            "workflow": {
+                "implemented": true,
+                "state_model": "dcc_document_header_status"
+            },
+            "contract_dir": "mom/contracts/objects/quality_improvement--document-control"
         },
         {
             "resource": "quality_improvement.fqc-inspections",

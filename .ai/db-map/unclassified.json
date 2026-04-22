@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 743,
-        "generated_at": "2026-04-21T13:24:31+00:00"
+        "table_count": 744,
+        "generated_at": "2026-04-22T01:09:11+00:00"
     },
     "tables": {
         "ai_conversations": {
@@ -1368,6 +1368,13 @@
                     "ref": "retention_policies(policy_id)"
                 }
             ],
+            "contract": null
+        },
+        "dcc_document_header_label": {
+            "defined_in": "150_dcc_document_change_control.sql",
+            "extended_in": [],
+            "primary_key": "label_id",
+            "foreign_keys": [],
             "contract": null
         },
         "demand": {

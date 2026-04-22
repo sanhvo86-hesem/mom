@@ -1,0 +1,155 @@
+{
+  "version": "1.0",
+  "canonicalResource": "quality_improvement.document_control",
+  "canonicalName": "dcc_document_header",
+  "displayName": "Document Change Control (DCC)",
+  "purpose": "Govern version control of QMS controlled documents (Manual, Policy, SOP, WI, Form, Annex, Handbook, JD). Distinct from Engineering Change Control (ECC = plm_change_*) which governs parts/BOMs/items.",
+  "ownerDomain": "quality_improvement",
+  "objectRole": "lifecycle_owner",
+  "ownerTeam": "quality_assurance",
+  "distinctionNote": "DCC governs *documents*. ECC (plm_change_*) governs *parts and bills of materials*. The two workflows never share tables or route prefixes.",
+  "storage": {
+    "primaryTable": "dcc_document_header",
+    "primaryKey": "header_id",
+    "statusField": "status",
+    "childTables": [
+      "dcc_document_change_request",
+      "dcc_document_change_notice",
+      "dcc_document_revision_history"
+    ],
+    "referenceTables": [
+      "dcc_document_header_label"
+    ],
+    "legacyTables": [
+      "eqms_documents",
+      "eqms_document_family",
+      "eqms_document_revision"
+    ],
+    "legacyTablesToIsolate": []
+  },
+  "identity": {
+    "strategy": "doc_code",
+    "naturalKeys": [
+      "doc_code"
+    ],
+    "codePattern": "^[A-Z]{2,5}-[A-Z]{2,5}-\\d{3,4}$",
+    "codeExamples": [
+      "QMS-MAN-001",
+      "SOP-606",
+      "FRM-403",
+      "WI-250",
+      "DEPT-QA",
+      "JD-QMR"
+    ]
+  },
+  "governance": {
+    "usageZone": "qms_controlled_information",
+    "gateType": "documented_information_control_gate",
+    "auditClass": "part_11_part_820_40_audit_trail",
+    "continuousImprovementLoop": "management_review",
+    "retentionClass": "quality_record_10y",
+    "standards": [
+      "ISO 9001:2015 §7.5",
+      "AS9100D §7.5",
+      "IATF 16949 §7.5",
+      "ISO 13485 §4.2",
+      "FDA 21 CFR Part 820.40",
+      "FDA 21 CFR Part 11"
+    ],
+    "evidenceRequirements": [
+      "revision_history_entry",
+      "release_signature_event",
+      "approved_change_notice"
+    ],
+    "kpiSignals": [
+      "document_release_lead_time",
+      "expired_document_rate",
+      "unacknowledged_controlled_copy_rate"
+    ],
+    "autoAuditChecks": [
+      "dcc_release_requires_dcn",
+      "dcc_header_single_owner_only",
+      "dcc_header_single_approver_only",
+      "dcc_revision_follows_semver_pattern",
+      "dcc_effective_date_not_backdated_without_dcn"
+    ]
+  },
+  "workflow": {
+    "implemented": true,
+    "truthStatus": "implemented_runtime",
+    "source": "dcc_document_header.status",
+    "stateModelKey": "dcc_document_header_status",
+    "lifecycleMode": "guarded_transition_runtime",
+    "workflowName": "DCC — Document Change Control",
+    "workflowDistinction": "Do not conflate with ECC — ECC is plm_change_orders (parts). DCC is dcc_document_change_notice (documents).",
+    "states": [
+      { "value": "draft",      "label": "Draft",      "labelEn": "Draft",      "allowedTransitionsFrom": [] },
+      { "value": "in_review",  "label": "In Review",  "labelEn": "In Review",  "allowedTransitionsFrom": ["draft"] },
+      { "value": "approved",   "label": "Approved",   "labelEn": "Approved",   "allowedTransitionsFrom": ["in_review"] },
+      { "value": "released",   "label": "Released",   "labelEn": "Released",   "allowedTransitionsFrom": ["approved"] },
+      { "value": "superseded", "label": "Superseded", "labelEn": "Superseded", "allowedTransitionsFrom": ["released"] },
+      { "value": "obsolete",   "label": "Obsolete",   "labelEn": "Obsolete",   "allowedTransitionsFrom": ["released", "superseded"] }
+    ],
+    "commands": [
+      { "command": "submit_review",  "targetState": "in_review",  "description": "Submit the current draft for review.",                                  "idempotencyScope": "resource+transition" },
+      { "command": "approve",        "targetState": "approved",   "description": "Reviewer approves the drafted revision.",                               "idempotencyScope": "resource+transition", "preconditions": ["dcr_approved"] },
+      { "command": "release",        "targetState": "released",   "description": "Release authority signs the DCN and publishes the new revision.",      "idempotencyScope": "resource+transition", "preconditions": ["dcn_issued", "signature_event"] },
+      { "command": "supersede",      "targetState": "superseded", "description": "Mark the current revision as superseded by a newer released revision.", "idempotencyScope": "resource+transition" },
+      { "command": "obsolete",       "targetState": "obsolete",   "description": "Retire the document from the controlled corpus.",                      "idempotencyScope": "resource+transition" }
+    ]
+  },
+  "integration": {
+    "upstreamObjects": [
+      "quality_improvement.document_change_request",
+      "quality_improvement.document_change_notice"
+    ],
+    "downstreamObjects": [
+      "training_and_competence.training_assignments",
+      "quality_improvement.controlled_copies",
+      "quality_improvement.document_acknowledgements"
+    ],
+    "crossDomainDistinctions": [
+      {
+        "domain": "part_lifecycle_management",
+        "conflictingObject": "plm_change_orders",
+        "note": "ECC (parts) uses plm_change_* tables. DCC (documents) uses dcc_document_* tables. Never cross these namespaces."
+      }
+    ]
+  },
+  "api": {
+    "basePath": "/api/v1/dcc",
+    "endpoints": [
+      { "method": "GET",   "path": "/api/v1/dcc/labels",                                 "handler": "DocumentControlController::labels",            "purpose": "Return label registry for current locale." },
+      { "method": "GET",   "path": "/api/v1/dcc/documents",                              "handler": "DocumentControlController::listHeaders",       "purpose": "List all DCC document headers." },
+      { "method": "POST",  "path": "/api/v1/dcc/documents",                              "handler": "DocumentControlController::createHeader",      "purpose": "Create a new controlled-document header." },
+      { "method": "GET",   "path": "/api/v1/dcc/documents/{doc_code}/header",            "handler": "DocumentControlController::getHeader",         "purpose": "Return the header projection consumed by the portal renderer." },
+      { "method": "PATCH", "path": "/api/v1/dcc/documents/{doc_code}/header",            "handler": "DocumentControlController::updateHeader",      "purpose": "Patch metadata on an existing header." },
+      { "method": "GET",   "path": "/api/v1/dcc/documents/{doc_code}/revisions",         "handler": "DocumentControlController::listRevisions",     "purpose": "Return append-only revision history." },
+      { "method": "POST",  "path": "/api/v1/dcc/documents/{doc_code}/actions/submit-review", "handler": "DocumentControlController::actionSubmitReview", "purpose": "Move draft into in_review." },
+      { "method": "POST",  "path": "/api/v1/dcc/documents/{doc_code}/actions/approve",      "handler": "DocumentControlController::actionApprove",      "purpose": "Approve the in-review revision." },
+      { "method": "POST",  "path": "/api/v1/dcc/documents/{doc_code}/actions/release",      "handler": "DocumentControlController::actionRelease",      "purpose": "Release approved revision after DCN issuance." },
+      { "method": "POST",  "path": "/api/v1/dcc/documents/{doc_code}/actions/supersede",    "handler": "DocumentControlController::actionSupersede",    "purpose": "Mark released revision as superseded." },
+      { "method": "POST",  "path": "/api/v1/dcc/documents/{doc_code}/actions/obsolete",     "handler": "DocumentControlController::actionObsolete",     "purpose": "Mark document obsolete." },
+      { "method": "POST",  "path": "/api/v1/dcc/change-requests",                           "handler": "DocumentControlController::createDcr",          "purpose": "Create a DCR (Document Change Request)." },
+      { "method": "GET",   "path": "/api/v1/dcc/change-requests/{dcr_id}",                  "handler": "DocumentControlController::getDcr",             "purpose": "Retrieve a DCR." },
+      { "method": "POST",  "path": "/api/v1/dcc/change-requests/{dcr_id}/approve",          "handler": "DocumentControlController::approveDcr",         "purpose": "Approve a DCR." },
+      { "method": "POST",  "path": "/api/v1/dcc/change-requests/{dcr_id}/reject",           "handler": "DocumentControlController::rejectDcr",          "purpose": "Reject a DCR." },
+      { "method": "POST",  "path": "/api/v1/dcc/change-notices",                            "handler": "DocumentControlController::issueDcn",           "purpose": "Issue a DCN authorising release." },
+      { "method": "GET",   "path": "/api/v1/dcc/change-notices/{dcn_id}",                   "handler": "DocumentControlController::getDcn",             "purpose": "Retrieve a DCN." }
+    ]
+  },
+  "fieldMap": {
+    "header": {
+      "doc_code":         { "type": "string",   "required": true,  "label_key": "doc_id",         "maxLength": 80 },
+      "title":            { "type": "string",   "required": true,  "label_key": null,             "maxLength": 512 },
+      "subtitle":         { "type": "string",   "required": false, "label_key": null,             "maxLength": 512 },
+      "doc_type":         { "type": "enum",     "required": true,  "label_key": null,             "values": ["MAN","POL","SOP","WI","FRM","ANNEX","JD","DEPT","ORG","REF","TRN"] },
+      "revision":         { "type": "string",   "required": true,  "label_key": "revision",       "pattern": "^V[0-9]+(\\.[0-9]+)?$" },
+      "effective_date":   { "type": "date",     "required": true,  "label_key": "effective_date", "format": "YYYY-MM-DD" },
+      "owner_role_code":  { "type": "string",   "required": true,  "label_key": "owner",          "cardinality": "single", "rejectSeparators": ["/","|",",",";"," "] },
+      "approver_role_code":{ "type": "string",  "required": true,  "label_key": "approver",       "cardinality": "single", "rejectSeparators": ["/","|",",",";"," "] },
+      "iso_clause":       { "type": "string",   "required": false, "label_key": "iso_clause",     "maxLength": 60 },
+      "status":           { "type": "enum",     "required": true,  "label_key": null,             "values": ["draft","in_review","approved","released","superseded","obsolete"] }
+    }
+  }
+}
