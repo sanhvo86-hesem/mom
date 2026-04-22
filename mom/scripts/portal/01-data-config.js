@@ -1630,8 +1630,39 @@ function deriveDocCodeFromPath(doc){
   const relPath = String(doc?.path || '').split(/[?#]/)[0];
   const base = (relPath.split('/').pop() || '').replace(/\.[^.]+$/, '');
   if(!base) return '';
-  const match = base.match(/^((?:SOP|FRM|WI|ANNEX)-\d{3}|(?:JD|DEPT|RACI|AUTHORITY|POL|QMS|TRN|SYS|LAB|FORM|MRR)(?:-[A-Z0-9]+)+)(?:[-_]|$)/i);
-  return match ? String(match[1] || '').toUpperCase() : '';
+
+  // Mirror the backend's scan_extract_code() — return the SHORT canonical form
+  // and stop at the numeric tail so filenames such as
+  //     qms-man-001-qms-manual.html    → QMS-MAN-001
+  //     pol-qms-001-quality-policy.html → POL-QMS-001
+  //     annex-hr-lab-007-safety.html   → ANNEX-HR-LAB-007
+  // return the same code the backend's scan_cache.json is keyed on.
+  const patterns = [
+    /^(sop-\d{3})/i,
+    /^(frm-\d{3})/i,
+    /^(wi-\d{3})/i,
+    /^(annex-\d{3})/i,
+    /^(ref-\d{3})/i,
+    /^(qms-man-\d+)/i,
+    /^(qms-gdl-\d+)/i,
+    /^(frm-hr-jd-[a-z]+-\d+)/i,
+    /^(frm-hr-trn-\d+)/i,
+    /^(annex-dep-[a-z]+-\d+)/i,
+    /^(annex-(?:job|org)-\d+)/i,
+    /^(annex-hr-lab-\d+)/i,
+    /^((?:sop|proc|wi|frm|annex|pol|qms|dept)-[a-z]+-\d+)/i,
+    /^(jd-[a-z0-9-]+)/i,
+    /^(dept-[a-z0-9-]+)/i,
+    /^(raci-[a-z0-9-]+)/i,
+    /^(authority-[a-z0-9-]+)/i,
+  ];
+  for (let i = 0; i < patterns.length; i++) {
+    const m = base.match(patterns[i]);
+    if (m) return String(m[1] || '').toUpperCase();
+  }
+  // Last-resort fallback — sanitise the raw stem the same way scan_extract_code
+  // does at its tail, so unknown prefixes still yield a usable code.
+  return base.toUpperCase().replace(/[^A-Z0-9-]+/g, '-').replace(/-+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
 }
 
 function looksLikeFilenameSlugTitle(text){
