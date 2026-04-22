@@ -3967,17 +3967,25 @@ async function doSaveDocEdit(oldCode){
       if(res && res.ok){
         // Mirror the edit into the DCC control plane (dcc_document_header)
         // so the portal header renderer sees the authoritative data.
+        // The CSRF middleware enforces a token on every state-changing call,
+        // so we attach the same header that apiCall() sends above.
         try {
-          await fetch('/api/v1/dcc/documents/upsert', {
+          var dccHeaders = {'Content-Type': 'application/json', 'Accept': 'application/json'};
+          if (window.csrfToken) dccHeaders['X-CSRF-Token'] = window.csrfToken;
+          var dccRes = await fetch('/api/v1/dcc/documents/upsert', {
             method: 'POST',
             credentials: 'same-origin',
-            headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+            headers: dccHeaders,
             body: JSON.stringify({
               doc_code: newCode,
               title:    newTitle || newCode,
               subtitle: desc || null
             })
           });
+          if (!dccRes.ok) {
+            var dccErrBody = await dccRes.text().catch(function(){ return ''; });
+            console.warn('[DCC] upsert HTTP ' + dccRes.status + ':', dccErrBody);
+          }
         } catch(dccErr){
           console.warn('[DCC] upsert failed (non-fatal):', dccErr);
         }
