@@ -42,6 +42,8 @@
     --dcc-pad-x: 12px;
     --dcc-cell-gap: 6px;
     --dcc-sep-width: 1px;
+    --dcc-border-radius: 16px;
+    --dcc-accent-rule: 1px;
     --dcc-row-min-height: 36px;
     --dcc-label-max-width: 64px;
     --dcc-owner-max-width: 120px;
@@ -63,12 +65,16 @@
 }
 
 .dcc-header {
-    /* Stacked layout: title block on top, orange separator, ribbon below. */
+    /* Stacked layout inside a rounded card:
+         row 1 — title block (logo + title + Vietnamese description)
+         row 2 — metadata ribbon (ID | Rev | Eff | Owner | Appr)
+       Border wraps all four sides; child corners clipped by overflow:hidden. */
     display: grid;
     grid-template-columns: 1fr;
     background: var(--dcc-bg);
-    border-top: 1px solid var(--dcc-sep-color);
-    border-bottom: 1px solid var(--dcc-sep-color);
+    border: 1px solid var(--dcc-sep-color);
+    border-radius: var(--dcc-border-radius);
+    overflow: hidden;
     font-family: var(--font-body, -apple-system, "Segoe UI", sans-serif);
     color: var(--dcc-value-color);
     width: 100%;
@@ -81,8 +87,8 @@
     gap: calc(var(--dcc-cell-gap) * 2);
     padding: calc(var(--dcc-pad-y) * 2) calc(var(--dcc-pad-x) * 1.5);
     min-width: 0;
-    /* Orange separator line between title block and metadata ribbon */
-    border-bottom: 2px solid var(--dcc-border);
+    /* Slim orange separator line between title block and metadata ribbon */
+    border-bottom: var(--dcc-accent-rule) solid var(--dcc-border);
 }
 
 .dcc-header__logo {
