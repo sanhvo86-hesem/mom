@@ -75,10 +75,11 @@ ON CONFLICT (token_key) DO NOTHING;
 -- ─────────────────────────────────────────────────────────────────────────────
 
 INSERT INTO graphics_component_contract
-    (module_key, display_name, description, overridable_tokens)
+    (component_key, display_name_en, display_name_vi, description, overridable_tokens)
 VALUES
     ('dcc.header',
      'DCC Document Header',
+     'Tiêu đề tài liệu DCC',
      'Header ribbon rendered atop every controlled QMS document by the portal. Reads tokens live from Graphics Authority; no hardcoded values permitted.',
      ARRAY[
         'dcc.header.padding.y',
@@ -104,7 +105,7 @@ VALUES
         'dcc.header.owner.bg',
         'dcc.header.owner.border'
      ])
-ON CONFLICT (module_key) DO NOTHING;
+ON CONFLICT (component_key) DO NOTHING;
 
 -- ─────────────────────────────────────────────────────────────────────────────
 -- PART 3 — Seed organization-default published token values so CSS variables
