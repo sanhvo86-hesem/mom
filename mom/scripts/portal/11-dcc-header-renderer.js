@@ -273,6 +273,11 @@ function renderAll(root){
 }
 
 function bootstrap(){
+    try {
+        console.log('[DccHeader] renderer loaded at', new Date().toISOString(),
+                    'readyState=', document.readyState,
+                    'placeholders=', document.querySelectorAll('.dcc-header[data-dcc-doc-code]').length);
+    } catch(e){}
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function(){ renderAll(document); });
     } else {
