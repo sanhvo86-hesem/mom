@@ -3,8 +3,25 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>QMS-MAN-001 - QMS Manual | HESEM MOM</title>
 <link href="../../assets/style.css" rel="stylesheet">
-<link href="../../../styles/dcc-header.css" rel="stylesheet">
-<script defer src="../../../scripts/portal/11-dcc-header-renderer.js"></script>
+<script>
+/* DCC Header bootstrap — computes absolute URLs from location.pathname so the
+ * stylesheet + renderer load correctly regardless of how the document is
+ * served (direct, portal iframe + <base href="../"> injection, doc_stream, …).
+ * Using absolute URLs bypasses any <base> tag that would otherwise skew
+ * relative href/src resolution up by one directory level. */
+(function () {
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css';
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js';
+  document.head.appendChild(js);
+})();
+</script>
 <link rel="stylesheet" crossorigin="anonymous" href="https://ff.kis.v2.scr.kaspersky-labs.com/E3E8934C-235A-4B0E-825A-35A08381A191/abn/main.css?attr=aHR0cHM6Ly9xbXMuaGVzZW0uY29tLnZuLzAyLVRhaS1MaWV1LUhlLVRob25nLzAxLVF1YWxpdHktTWFudWFsL3Ftcy1tYW4tMDAxLXFtcy1tYW51YWwuaHRtbD90PTE3NzQ0MDkxMjM5OTA"><style> .chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;}
 .tight li{margin:4px 0;}
