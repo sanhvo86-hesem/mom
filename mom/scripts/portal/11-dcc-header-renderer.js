@@ -27,6 +27,65 @@
 var API_PREFIX = '/api/v1/dcc';
 var DEFAULT_LOCALE = 'en';
 
+/* ── Self-discovery: derive base paths from our own script URL ────────── */
+var _scriptUrl = (function(){
+    try {
+        if (document.currentScript && document.currentScript.src) {
+            return document.currentScript.src;
+        }
+    } catch (e) {}
+    try {
+        var list = document.querySelectorAll('script[src*="11-dcc-header-renderer.js"]');
+        if (list.length) return list[list.length - 1].src;
+    } catch (e) {}
+    return '';
+})();
+
+function _appBase(){
+    // Renderer URL looks like `<origin><appBase>/scripts/portal/11-dcc-header-renderer.js`.
+    // Strip the known suffix to recover the application base, which is the
+    // deployment-specific prefix the browser needs for assets and the API.
+    // Local preview: appBase = ''. VPS deployment: appBase = '/mom'.
+    var match = _scriptUrl.match(/^(.*?)\/scripts\/portal\/11-dcc-header-renderer\.js/);
+    if (match && match[1]) {
+        try {
+            return new URL(match[1]).pathname.replace(/\/$/, '');
+        } catch (e) {
+            return match[1].replace(/^https?:\/\/[^/]+/, '').replace(/\/$/, '');
+        }
+    }
+    return '';
+}
+
+var APP_BASE = _appBase();
+
+function _assetUrl(relative){
+    var clean = String(relative || '').replace(/^\/+/, '');
+    return APP_BASE + '/' + clean;
+}
+
+/* ── Self-inject the stylesheet (path-independent) ─────────────────────── */
+(function _ensureStylesheet(){
+    try {
+        if (document.querySelector('link[data-dcc-header-stylesheet]')) return;
+        var correctHref = _assetUrl('styles/dcc-header.css');
+        // If a plain <link> exists from legacy markup, REPLACE its href —
+        // pre-4.1 HTML shipped a relative path that breaks once the document
+        // is served through the portal's streaming pipeline.
+        var existing = document.querySelector('link[rel="stylesheet"][href*="dcc-header"]');
+        if (existing) {
+            existing.href = correctHref;
+            existing.setAttribute('data-dcc-header-stylesheet', '1');
+            return;
+        }
+        var link = document.createElement('link');
+        link.rel = 'stylesheet';
+        link.href = correctHref;
+        link.setAttribute('data-dcc-header-stylesheet', '1');
+        (document.head || document.documentElement).appendChild(link);
+    } catch (e) {}
+})();
+
 /* ── Label-registry cache (per-locale) ─────────────────────────────────── */
 var _labelsCache = {}; // locale -> {label_key: {short, long, sort}}
 var _labelsPending = {}; // locale -> Promise
@@ -159,7 +218,12 @@ function _renderInto(container, header, labels){
     // Title block (logo + titles)
     var titleBlock = _el('div', 'dcc-header__title-block');
     var logo = _el('div', 'dcc-header__logo');
-    var logoSrc = container.getAttribute('data-dcc-logo') || '/mom/assets/hesem-logo.svg';
+    var logoSrc = container.getAttribute('data-dcc-logo') || _assetUrl('assets/hesem-logo.svg');
+    // If a relative-path logo was provided but it would resolve wrong under
+    // the portal's streaming pipeline, fall back to the derived absolute URL.
+    if (logoSrc.indexOf('://') === -1 && logoSrc.charAt(0) !== '/') {
+        logoSrc = _assetUrl('assets/hesem-logo.svg');
+    }
     var img = document.createElement('img');
     img.src = logoSrc;
     img.alt = 'HESEM';
