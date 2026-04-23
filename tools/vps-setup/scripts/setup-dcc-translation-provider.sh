@@ -26,6 +26,8 @@ ARGOS_VERSION="${ARGOS_VERSION:-1.11.0}"
 BS4_VERSION="${BS4_VERSION:-4.14.3}"
 LXML_VERSION="${LXML_VERSION:-6.1.0}"
 SCRIPT_PATH="$SITE_DIR/tools/scripts/translation/dcc_argos_vi_to_en.py"
+PHP_FPM_POOL_CONF="${PHP_FPM_POOL_CONF:-}"
+RELOAD_PHP_FPM="${RELOAD_PHP_FPM:-0}"
 
 echo "[dcc-translation] site_dir=$SITE_DIR"
 echo "[dcc-translation] venv_dir=$VENV_DIR"
@@ -69,13 +71,48 @@ if [ ! -f "$SCRIPT_PATH" ]; then
   exit 1
 fi
 
+if [ -n "$PHP_FPM_POOL_CONF" ]; then
+  [ -f "$PHP_FPM_POOL_CONF" ] || { echo "PHP-FPM pool config not found: $PHP_FPM_POOL_CONF" >&2; exit 1; }
+  python3 - "$PHP_FPM_POOL_CONF" "$VENV_DIR/bin/python $SCRIPT_PATH" <<'PY'
+from pathlib import Path
+import re
+import sys
+
+pool = Path(sys.argv[1])
+command = sys.argv[2]
+text = pool.read_text(encoding="utf-8")
+
+def upsert(name: str, value: str, source: str) -> str:
+    pattern = re.compile(rf'^env\[{re.escape(name)}\]\s*=.*$', re.M)
+    line = f'env[{name}]       = {value}'
+    if pattern.search(source):
+        return pattern.sub(line, source)
+    if not source.endswith('\n'):
+        source += '\n'
+    return source + line + '\n'
+
+text = upsert('DCC_TRANSLATION_DRIVER', 'command', text)
+text = upsert('DCC_TRANSLATION_COMMAND', command, text)
+pool.write_text(text, encoding="utf-8")
+PY
+
+  if [ "$RELOAD_PHP_FPM" = "1" ]; then
+    systemctl reload php8.5-fpm
+    echo "[dcc-translation] php8.5-fpm reloaded"
+  else
+    echo "[dcc-translation] pool env updated at $PHP_FPM_POOL_CONF"
+    echo "[dcc-translation] reload php8.5-fpm to activate the new env"
+  fi
+fi
+
 cat <<EOF
 
 [dcc-translation] install complete
 
-Set these PHP-FPM environment variables:
+PHP-FPM environment variables:
   env[DCC_TRANSLATION_DRIVER] = command
   env[DCC_TRANSLATION_COMMAND] = $VENV_DIR/bin/python $SCRIPT_PATH
 
-Then reload PHP-FPM.
+$( [ -n "$PHP_FPM_POOL_CONF" ] && printf 'Pool config: %s\n' "$PHP_FPM_POOL_CONF" || printf 'Update your PHP-FPM pool config with the values above.\n' )
+Then run the post-deploy healthcheck or deploy script to verify the translation probe.
 EOF

@@ -193,6 +193,217 @@ function http_status_check(string $apiUrl): array
     return ['code' => $code, 'ok' => $ok, 'body' => (string)$body];
 }
 
+function resolve_php_fpm_pool_conf(): string
+{
+    $opt = trim((string)(opt('php-fpm-pool-conf') ?? ''));
+    if ($opt !== '') {
+        return $opt;
+    }
+    $env = trim((string)(getenv('PHP_FPM_POOL_CONF') ?: ''));
+    if ($env !== '') {
+        return $env;
+    }
+    return '/etc/php/8.5/fpm/pool.d/mom.conf';
+}
+
+function pool_env_value(string $poolConf, string $name): ?string
+{
+    if (!is_file($poolConf)) {
+        return null;
+    }
+    $pattern = '/^env\[' . preg_quote($name, '/') . '\]\s*=\s*(.+)$/mi';
+    $raw = (string)@file_get_contents($poolConf);
+    if ($raw === '' || !preg_match($pattern, $raw, $m)) {
+        return null;
+    }
+    return trim((string)$m[1]);
+}
+
+function command_probe(string $command, string $cwd, array $payload, int $timeoutSeconds = 30): array
+{
+    $spec = [
+        0 => ['pipe', 'r'],
+        1 => ['pipe', 'w'],
+        2 => ['pipe', 'w'],
+    ];
+    $process = @proc_open(['/bin/sh', '-lc', $command], $spec, $pipes, $cwd);
+    if (!is_resource($process)) {
+        return ['ok' => false, 'reason' => 'spawn_failed', 'message' => 'Unable to spawn configured translation command.'];
+    }
+
+    $stdin = $pipes[0] ?? null;
+    $stdout = $pipes[1] ?? null;
+    $stderr = $pipes[2] ?? null;
+    if (is_resource($stdin)) stream_set_blocking($stdin, false);
+    if (is_resource($stdout)) stream_set_blocking($stdout, false);
+    if (is_resource($stderr)) stream_set_blocking($stderr, false);
+
+    $encoded = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if (!is_string($encoded)) {
+        if (is_resource($stdin)) fclose($stdin);
+        if (is_resource($stdout)) fclose($stdout);
+        if (is_resource($stderr)) fclose($stderr);
+        proc_close($process);
+        return ['ok' => false, 'reason' => 'payload_encode_failed', 'message' => 'Failed to encode translation probe payload.'];
+    }
+
+    $stdinOffset = 0;
+    $stdinBytes = strlen($encoded);
+    $stdinClosed = !is_resource($stdin);
+    $stdoutBody = '';
+    $stderrBody = '';
+    $deadline = microtime(true) + max(1, min(120, $timeoutSeconds));
+
+    while (true) {
+        $status = proc_get_status($process);
+        $running = is_array($status) ? (bool)$status['running'] : false;
+        $read = [];
+        $write = [];
+        $except = [];
+
+        if (is_resource($stdout)) $read[] = $stdout;
+        if (is_resource($stderr)) $read[] = $stderr;
+        if (!$stdinClosed && is_resource($stdin) && $stdinOffset < $stdinBytes) $write[] = $stdin;
+
+        if (!$running && $read === [] && $write === []) {
+            break;
+        }
+        if ($read === [] && $write === []) {
+            usleep(10000);
+            continue;
+        }
+
+        $remaining = $deadline - microtime(true);
+        if ($remaining <= 0) {
+            if (is_resource($stdin)) fclose($stdin);
+            if (is_resource($stdout)) fclose($stdout);
+            if (is_resource($stderr)) fclose($stderr);
+            @proc_terminate($process);
+            @proc_close($process);
+            return ['ok' => false, 'reason' => 'timeout', 'message' => 'Translation probe timed out.'];
+        }
+
+        $waitSeconds = (int)floor($remaining);
+        $waitMicros = (int)(($remaining - $waitSeconds) * 1_000_000);
+        if ($waitSeconds === 0) $waitMicros = min(max($waitMicros, 1), 200000);
+        $selected = @stream_select($read, $write, $except, $waitSeconds, $waitMicros);
+        if ($selected === false) {
+            usleep(10000);
+            continue;
+        }
+
+        if (!$stdinClosed && is_resource($stdin) && in_array($stdin, $write, true)) {
+            $chunk = substr($encoded, $stdinOffset, 65536);
+            $written = @fwrite($stdin, $chunk);
+            if ($written === false) {
+                fclose($stdin);
+                if (is_resource($stdout)) fclose($stdout);
+                if (is_resource($stderr)) fclose($stderr);
+                @proc_terminate($process);
+                @proc_close($process);
+                return ['ok' => false, 'reason' => 'stdin_failed', 'message' => 'Translation probe could not write to stdin.'];
+            }
+            if ($written > 0) $stdinOffset += $written;
+            if ($stdinOffset >= $stdinBytes) {
+                fclose($stdin);
+                $stdin = null;
+                $stdinClosed = true;
+            }
+        }
+
+        if (is_resource($stdout) && in_array($stdout, $read, true)) {
+            $chunk = stream_get_contents($stdout);
+            if (is_string($chunk) && $chunk !== '') $stdoutBody .= $chunk;
+            if (feof($stdout)) {
+                fclose($stdout);
+                $stdout = null;
+            }
+        }
+        if (is_resource($stderr) && in_array($stderr, $read, true)) {
+            $chunk = stream_get_contents($stderr);
+            if (is_string($chunk) && $chunk !== '') $stderrBody .= $chunk;
+            if (feof($stderr)) {
+                fclose($stderr);
+                $stderr = null;
+            }
+        }
+    }
+
+    if (is_resource($stdin)) fclose($stdin);
+    if (is_resource($stdout)) {
+        $stdoutBody .= (string)stream_get_contents($stdout);
+        fclose($stdout);
+    }
+    if (is_resource($stderr)) {
+        $stderrBody .= (string)stream_get_contents($stderr);
+        fclose($stderr);
+    }
+
+    $exitCode = proc_close($process);
+    $decoded = json_decode($stdoutBody, true);
+    if ($exitCode !== 0 || !is_array($decoded) || ($decoded['ok'] ?? false) !== true) {
+        return [
+            'ok' => false,
+            'reason' => 'probe_failed',
+            'message' => trim($stderrBody) !== '' ? trim($stderrBody) : ((trim($stdoutBody) !== '') ? trim($stdoutBody) : 'Translation probe did not return compliant JSON.'),
+        ];
+    }
+
+    return [
+        'ok' => true,
+        'provider' => (string)($decoded['provider'] ?? ''),
+        'engine_version' => (string)($decoded['engine_version'] ?? ''),
+    ];
+}
+
+function dcc_translation_probe(array $paths): array
+{
+    $poolConf = resolve_php_fpm_pool_conf();
+    if (!is_file($poolConf)) {
+        return ['checked' => false, 'warning' => "PHP-FPM pool config not found: {$poolConf}"];
+    }
+
+    $driver = trim((string)(pool_env_value($poolConf, 'DCC_TRANSLATION_DRIVER') ?? ''));
+    $command = trim((string)(pool_env_value($poolConf, 'DCC_TRANSLATION_COMMAND') ?? ''));
+
+    if ($driver === '') {
+        return ['checked' => true, 'ok' => false, 'message' => 'DCC translation driver is not configured in PHP-FPM pool env.'];
+    }
+    if (strtolower($driver) !== 'command') {
+        return ['checked' => true, 'ok' => false, 'message' => "Unsupported DCC translation driver in PHP-FPM pool env: {$driver}"];
+    }
+    if ($command === '') {
+        return ['checked' => true, 'ok' => false, 'message' => 'DCC translation command is not configured in PHP-FPM pool env.'];
+    }
+
+    $probe = command_probe($command, $paths['root_dir'], [
+        'doc_code' => 'HEALTHCHECK-DCC-TRANSLATION',
+        'source_locale' => 'vi',
+        'target_locale' => 'en',
+        'trigger' => 'healthcheck',
+        'source_status' => 'released',
+        'source_revision' => '0.0',
+        'dcc_revision' => 'V0.0',
+        'base_rel_path' => 'mom/docs/system/quality-manual/qms-man-001-qms-manual.html',
+        'artifact_rel_path' => 'mom/docs/system/quality-manual/_healthcheck-qms-man-001.en.html',
+        'title' => 'Healthcheck',
+        'subtitle' => null,
+        'source_html' => '<!DOCTYPE html><html lang=\"vi\"><body><p>Tai lieu kiem soat thu nghiem.</p></body></html>',
+        'glossary_path' => $paths['base_dir'] . '/data/glossary/dict-data.json',
+    ], 30);
+
+    return [
+        'checked' => true,
+        'ok' => (bool)($probe['ok'] ?? false),
+        'message' => (string)($probe['message'] ?? ''),
+        'provider' => (string)($probe['provider'] ?? ''),
+        'engine_version' => (string)($probe['engine_version'] ?? ''),
+        'pool_conf' => $poolConf,
+        'driver' => $driver,
+        'command' => $command,
+    ];
+}
+
 $p = resolve_paths();
 $critical = [];
 $warnings = [];
@@ -263,6 +474,13 @@ if ($url !== null && $url !== '') {
     }
 }
 
+$dcc = dcc_translation_probe($p);
+if (($dcc['checked'] ?? false) && !($dcc['ok'] ?? false)) {
+    $critical[] = 'DCC translation probe failed: ' . ($dcc['message'] ?? 'unknown error');
+} elseif (($dcc['checked'] ?? false) === false && isset($dcc['warning'])) {
+    $warnings[] = (string)$dcc['warning'];
+}
+
 echo "=== HESEM MOM Post-Deploy Health Check ===\n";
 echo "BASE_DIR: {$p['base_dir']}\n";
 echo "DATA_DIR: {$p['data_dir']} ({$p['data_source']})\n";
@@ -278,6 +496,17 @@ if ($http !== null) {
     echo "API status URL: {$url}\n";
     echo "API status code: {$http['code']}\n";
     echo "API payload valid: " . yesNo($http['ok']) . "\n";
+}
+if (($dcc['checked'] ?? false) === true) {
+    echo "DCC translation pool env: YES\n";
+    echo "DCC translation driver: " . ($dcc['driver'] ?? '') . "\n";
+    echo "DCC translation probe: " . yesNo((bool)($dcc['ok'] ?? false)) . "\n";
+    if (!empty($dcc['provider'])) {
+        echo "DCC translation provider: {$dcc['provider']}\n";
+    }
+    if (!empty($dcc['engine_version'])) {
+        echo "DCC translation engine: {$dcc['engine_version']}\n";
+    }
 }
 
 if ($warnings) {

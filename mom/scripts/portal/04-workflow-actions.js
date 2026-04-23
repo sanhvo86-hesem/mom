@@ -976,13 +976,10 @@ async function ensureDocEnglishLocaleArtifact(doc, options){
   }
   const code = String(doc.code || '').trim();
   if(!opts.force && translationState !== '' && translationState !== 'missing'){
-    if(translationState !== 'blocked'){
-      return { ok: true, skipped: true, reason: 'locale_state_not_bootstrappable', translationState };
-    }
     const now = Date.now();
     const lastAttempt = Number(__DOC_ENGLISH_LOCALE_LAST_ATTEMPT[code] || 0);
     if(lastAttempt > 0 && (now - lastAttempt) < 30000){
-      return { ok: true, skipped: true, reason: 'locale_blocked_retry_cooldown', translationState };
+      return { ok: true, skipped: true, reason: 'locale_retry_cooldown', translationState };
     }
   }
 

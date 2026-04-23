@@ -263,7 +263,11 @@ fi
 # ── Clear OPcache ────────────────────────────────────────────────────────
 log "INFO" "Clearing OPcache..."
 sanitize_php_fpm_pool_runtime_settings
-systemctl reload php8.5-fpm 2>/dev/null && log "INFO" "PHP-FPM reloaded" || true
+if systemctl reload php8.5-fpm 2>/dev/null; then
+    log "INFO" "PHP-FPM reloaded"
+else
+    die "PHP-FPM reload failed; aborting before healthcheck because runtime env may be stale"
+fi
 
 # ── Post-deploy healthcheck (rolls back on failure) ──────────────────────
 HEALTHCHECK_SCRIPT="$SITE_DIR/mom/scripts/postdeploy_healthcheck.php"
