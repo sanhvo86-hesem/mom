@@ -624,7 +624,11 @@ final class DocumentLocaleAutomationService
         }
 
         $suffix = "\n...[truncated]";
-        $allowed = max(0, $remaining - strlen($suffix));
+        if ($remaining <= strlen($suffix)) {
+            return $buffer . substr($suffix, 0, $remaining);
+        }
+
+        $allowed = $remaining - strlen($suffix);
         return $buffer . substr($chunk, 0, $allowed) . $suffix;
     }
 

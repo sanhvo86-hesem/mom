@@ -142,6 +142,28 @@ PHP);
         $this->assertStringContainsString('truncated', (string)$result['message']);
     }
 
+    public function testBoundedOutputAppendNeverExceedsConfiguredCap(): void
+    {
+        $service = $this->newService();
+        $method = new ReflectionMethod(DocumentLocaleAutomationService::class, 'appendBoundedCommandOutput');
+        set_error_handler(
+            static function (int $severity, string $message): bool {
+                return $severity === E_DEPRECATED
+                    && str_contains($message, 'ReflectionMethod::setAccessible');
+            }
+        );
+        try {
+            $method->setAccessible(true);
+            $nearCap = str_repeat('A', 131060);
+            $result = $method->invoke($service, $nearCap, str_repeat('B', 200));
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertIsString($result);
+        $this->assertLessThanOrEqual(131072, strlen($result));
+    }
+
     private function newService(): DocumentLocaleAutomationService
     {
         $baseDir = realpath(__DIR__ . '/../../..');
