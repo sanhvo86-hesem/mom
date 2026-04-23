@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env node
+#!/usr/bin/env node
 import fs from 'fs';
 import path from 'path';
 import {
@@ -15,7 +15,8 @@ import {
 } from './reference-data.mjs';
 
 const root = process.cwd();
-const regDir = path.join(root, '01-QMS-Portal', 'qms-data', 'registry');
+const momRoot = path.join(root, 'mom');
+const regDir = path.join(momRoot, 'data', 'registry');
 const dataFieldsPath = path.join(regDir, 'data-fields.json');
 const apiParamsPath = path.join(regDir, 'api-params.json');
 const statusPath = path.join(regDir, 'status-options.json');
@@ -33,10 +34,10 @@ const complianceCrosswalkPath = path.join(regDir, 'compliance-crosswalk.json');
 const qualityReportPath = path.join(regDir, 'registry-quality-report.json');
 const unitLibraryPath = path.join(regDir, 'unit-library.json');
 const identifierPatternsPath = path.join(regDir, 'identifier-patterns.json');
-const varLibPath = path.join(root, '01-QMS-Portal', 'qms-data', 'config', 'variable_library.json');
-const apiCatalogPath = path.join(root, '01-QMS-Portal', 'scripts', 'portal', '00-block-engine.js');
-const apiIndexPath = path.join(root, '01-QMS-Portal', 'api', 'index.php');
-const controllersDir = path.join(root, '01-QMS-Portal', 'api', 'controllers');
+const varLibPath = path.join(momRoot, 'data', 'config', 'variable_library.json');
+const apiCatalogPath = path.join(momRoot, 'scripts', 'portal', '00-block-engine.js');
+const routesDir = path.join(momRoot, 'api', 'routes');
+const controllersDir = path.join(momRoot, 'api', 'controllers');
 
 const readJson = (p) => JSON.parse(fs.readFileSync(p, 'utf8'));
 const writeJson = (p, v) => fs.writeFileSync(p, JSON.stringify(v, null, 2) + '\n', 'utf8');
@@ -135,8 +136,12 @@ const catalogText = fs.readFileSync(apiCatalogPath, 'utf8');
 const jsCatalog = [...catalogText.matchAll(/action:'([^']+)',\s*method:'([^']+)',\s*label:'([^']+)',\s*module:'([^']+)'/g)]
   .map((m) => ({ action: m[1], method: m[2], label: m[3], module: m[4] }));
 const jsCatalogMap = Object.fromEntries(jsCatalog.map((entry) => [entry.action, entry]));
-const apiIndexText = fs.readFileSync(apiIndexPath, 'utf8');
-const phpRoutes = [...apiIndexText.matchAll(/'([^']+)'\s*=>\s*\[([A-Za-z0-9_\\]+)::class,\s*'([^']+)'\]/g)]
+const routeSourceText = fs.readdirSync(routesDir)
+  .filter((entry) => entry.endsWith('.php'))
+  .sort()
+  .map((entry) => fs.readFileSync(path.join(routesDir, entry), 'utf8'))
+  .join('\n');
+const phpRoutes = [...routeSourceText.matchAll(/'([^']+)'\s*=>\s*\[([A-Za-z0-9_\\]+)::class,\s*'([^']+)'\]/g)]
   .map((m) => ({
     action: m[1],
     controller: m[2].split('\\').pop(),
@@ -552,28 +557,23 @@ const specialFieldSpecs = {
     { key: 'user', type: 'json' },
     { key: 'csrf_token', type: 'string' },
   ],
-  admin_git_sync: [
-    { key: 'pushed', type: 'boolean' },
+  admin_git_status: [
+    { key: 'repo_path', type: 'string' },
+    { key: 'remote_url', type: 'string' },
     { key: 'branch', type: 'string' },
-    { key: 'files', type: 'json' },
-    { key: 'status', type: 'json' },
-    { key: 'status_entries', type: 'json' },
-    { key: 'message', type: 'string' },
-    { key: 'commit_output', type: 'textarea' },
-    { key: 'push_output', type: 'textarea' },
-    { key: 'head_before', type: 'string' },
-    { key: 'head_after', type: 'string' },
-  ],
-  admin_git_pull: [
-    { key: 'pulled', type: 'boolean' },
-    { key: 'branch', type: 'string' },
-    { key: 'message', type: 'string' },
-    { key: 'before_head', type: 'string' },
-    { key: 'after_head', type: 'string' },
-    { key: 'changed_files', type: 'json' },
-    { key: 'presync', type: 'json' },
-    { key: 'fetch_output', type: 'textarea' },
-    { key: 'pull_output', type: 'textarea' },
+    { key: 'remote_branch', type: 'string' },
+    { key: 'head', type: 'json' },
+    { key: 'remote_head', type: 'json' },
+    { key: 'ahead_count', type: 'integer' },
+    { key: 'behind_count', type: 'integer' },
+    { key: 'working_tree_clean', type: 'boolean' },
+    { key: 'meaningful_dirty_count', type: 'integer' },
+    { key: 'meaningful_dirty_paths', type: 'json' },
+    { key: 'meaningful_dirty_entries', type: 'json' },
+    { key: 'remote_origin_hash', type: 'string' },
+    { key: 'remote_ref_stale', type: 'boolean' },
+    { key: 'fetch_error', type: 'string' },
+    { key: 'server_time', type: 'datetime' },
   ],
   admin_clear_site_cache: [
     { key: 'message', type: 'string' },
@@ -720,15 +720,10 @@ const specialApiSpecs = {
     ],
     response: { type: 'object', fields: ['ok', 'logged_in', 'user', 'csrf_token'], pagination: false },
   },
-  admin_git_sync: {
-    descriptionEn: 'Commit and push meaningful local document changes',
+  admin_git_status: {
+    descriptionEn: 'Read live repository status from the VPS without modifying the working tree',
     params: [],
-    response: { type: 'object', fields: specialFieldSpecs.admin_git_sync.map((f) => f.key), pagination: false },
-  },
-  admin_git_pull: {
-    descriptionEn: 'Fetch and pull the latest portal changes from the remote repository',
-    params: [],
-    response: { type: 'object', fields: specialFieldSpecs.admin_git_pull.map((f) => f.key), pagination: false },
+    response: { type: 'object', fields: specialFieldSpecs.admin_git_status.map((f) => f.key), pagination: false },
   },
   admin_clear_site_cache: {
     descriptionEn: 'Request origin and browser cache invalidation',

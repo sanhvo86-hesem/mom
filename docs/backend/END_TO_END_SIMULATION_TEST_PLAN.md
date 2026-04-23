@@ -266,7 +266,7 @@ Negative tests:
 | FE-003 | `DELETE /api/runtime/quality_management/ncr_records/{id}` | `403 forbidden` for unprivileged product role; `409 domain_command_required` for otherwise authorized/admin caller. |
 | FE-004 | `POST /api/runtime/finance/ap_invoices/{id}/transition` | `403 forbidden` for unprivileged product role; `409 domain_command_required` for otherwise authorized/admin caller. |
 | FE-005 | `schema_studio_apply_migration` | `403 admin_only` for product role. |
-| FE-006 | `admin_git_discard_local` | `403 admin_only` and requires re-auth for admin. |
+| FE-006 | `admin_git_status` | `403 admin_only` for product role. |
 
 ## Regression Checklist
 

@@ -97,13 +97,14 @@ apt install -y -qq nginx
 systemctl enable nginx
 
 # ══════════════════════════════════════════════════════════════════════════
-# STEP 4: Install PHP 8.5-FPM
+# STEP 4: Install PHP 8.5-FPM + Composer
 # ══════════════════════════════════════════════════════════════════════════
-log "Installing PHP 8.5-FPM + extensions..."
+log "Installing PHP 8.5-FPM, Composer, and extensions..."
 apt install -y -qq software-properties-common
 add-apt-repository -y ppa:ondrej/php 2>/dev/null
 apt update -qq
 apt install -y -qq \
+    composer \
     php8.5-fpm \
     php8.5-cli \
     php8.5-common \
@@ -122,7 +123,7 @@ systemctl enable php8.5-fpm
 mkdir -p /var/log/php-fpm
 chown www-data:www-data /var/log/php-fpm
 
-log "PHP 8.5-FPM installed"
+log "PHP 8.5-FPM and Composer installed"
 
 # ══════════════════════════════════════════════════════════════════════════
 # STEP 5: Install PostgreSQL 16
@@ -291,12 +292,18 @@ systemctl restart fail2ban
 log "Fail2Ban configured"
 
 # ══════════════════════════════════════════════════════════════════════════
-# STEP 13: Deploy Script
+# STEP 13: Deploy Pipeline
 # ══════════════════════════════════════════════════════════════════════════
-log "Installing deploy script..."
-cp "$SITE_DIR/tools/vps-setup/scripts/deploy.sh" /var/www/deploy.sh
-chmod +x /var/www/deploy.sh
-log "Deploy script installed at /var/www/deploy.sh"
+log "Registering deploy pipeline entrypoint..."
+chmod +x "$SITE_DIR/tools/vps-setup/scripts/deploy.sh"
+rm -f /var/www/deploy.sh
+cat > /etc/sudoers.d/qms-deploy <<SUDOERS
+$DEPLOY_USER ALL=(root) NOPASSWD: /usr/bin/bash $SITE_DIR/tools/vps-setup/scripts/deploy.sh
+SUDOERS
+chmod 440 /etc/sudoers.d/qms-deploy
+visudo -cf /etc/sudoers.d/qms-deploy >/dev/null
+log "Deploy script registered at $SITE_DIR/tools/vps-setup/scripts/deploy.sh"
+log "NOPASSWD sudo rule installed at /etc/sudoers.d/qms-deploy"
 
 # ══════════════════════════════════════════════════════════════════════════
 # STEP 14: Log Rotation
@@ -415,7 +422,8 @@ echo "     scp data-backup.tar.gz deploy@VPS:/tmp/"
 echo "     cd $SITE_DIR && tar xzf /tmp/data-backup.tar.gz"
 echo "  4. Copy private config to /var/www/data-private/config/"
 echo "  5. Test: https://$DOMAIN"
-echo "  6. Future deploys: sudo bash /var/www/deploy.sh"
+echo "  6. Future deploys: sudo bash $SITE_DIR/tools/vps-setup/scripts/deploy.sh"
+echo "     GitHub Actions uses the same script through /etc/sudoers.d/qms-deploy"
 echo ""
 echo "  DB credentials: cat /root/.mom-db-credentials"
 echo "══════════════════════════════════════════════════════════════"

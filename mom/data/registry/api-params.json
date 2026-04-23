@@ -2516,66 +2516,12 @@
       "pagination": false
     }
   },
-  "admin_git_sync": {
-    "method": "POST",
-    "module": "Quản trị",
-    "description": "Đồng bộ Git",
-    "descriptionEn": "Commit and push meaningful local document changes",
-    "params": [],
-    "response": {
-      "type": "object",
-      "fields": [
-        "pushed",
-        "branch",
-        "files",
-        "status",
-        "status_entries",
-        "message",
-        "commit_output",
-        "push_output",
-        "head_before",
-        "head_after"
-      ],
-      "pagination": false
-    }
-  },
   "admin_git_status": {
     "method": "GET",
     "module": "Administration",
     "description": "Admin Git Status",
-    "descriptionEn": "Execute action for Admin Git Status",
-    "params": [
-      {
-        "key": "admin_id",
-        "type": "string",
-        "required": true,
-        "description": "Primary identifier for Admin Id"
-      },
-      {
-        "key": "target_status",
-        "type": "string",
-        "required": true,
-        "description": "Target status"
-      },
-      {
-        "key": "comment",
-        "type": "string",
-        "required": false,
-        "description": "Operator comment"
-      },
-      {
-        "key": "reason_code",
-        "type": "string",
-        "required": false,
-        "description": "Reason code"
-      },
-      {
-        "key": "effective_at",
-        "type": "string",
-        "required": false,
-        "description": "Effective timestamp"
-      }
-    ],
+    "descriptionEn": "Read live repository status from the VPS without modifying the working tree",
+    "params": [],
     "response": {
       "type": "object",
       "fields": [
@@ -2584,90 +2530,17 @@
         "branch",
         "remote_branch",
         "head",
-        "hash",
-        "short_hash",
-        "subject",
-        "author_name",
-        "author_email",
-        "committed_at",
         "remote_head",
         "ahead_count",
         "behind_count",
         "working_tree_clean",
         "meaningful_dirty_count",
         "meaningful_dirty_paths",
-        "admin_id"
-      ],
-      "pagination": false
-    }
-  },
-  "admin_git_pull": {
-    "method": "POST",
-    "module": "Quản trị",
-    "description": "Git pull",
-    "descriptionEn": "Fetch and pull the latest portal changes from the remote repository",
-    "params": [],
-    "response": {
-      "type": "object",
-      "fields": [
-        "pulled",
-        "branch",
-        "message",
-        "before_head",
-        "after_head",
-        "changed_files",
-        "presync",
-        "fetch_output",
-        "pull_output"
-      ],
-      "pagination": false
-    }
-  },
-  "admin_git_discard_local": {
-    "method": "POST",
-    "module": "Administration",
-    "description": "Admin Git Discard Local",
-    "descriptionEn": "Execute action for Admin Git Discard Local",
-    "params": [
-      {
-        "key": "sync_direction",
-        "type": "string",
-        "required": false,
-        "description": "Sync direction"
-      },
-      {
-        "key": "sync_domain",
-        "type": "string",
-        "required": false,
-        "description": "Sync domain"
-      },
-      {
-        "key": "retry_failed",
-        "type": "boolean",
-        "required": false,
-        "description": "Retry failed records"
-      },
-      {
-        "key": "limit",
-        "type": "integer",
-        "required": false,
-        "description": "Batch size"
-      },
-      {
-        "key": "dry_run",
-        "type": "boolean",
-        "required": false,
-        "description": "Simulate without commit"
-      }
-    ],
-    "response": {
-      "type": "object",
-      "fields": [
-        "discarded",
-        "branch",
-        "message",
-        "discarded_paths",
-        "admin_id"
+        "meaningful_dirty_entries",
+        "remote_origin_hash",
+        "remote_ref_stale",
+        "fetch_error",
+        "server_time"
       ],
       "pagination": false
     }

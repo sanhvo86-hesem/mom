@@ -5584,13 +5584,13 @@ function renderAdminSyncPanelV2(){
     ? [
         'Push commits to <code>main</code> on GitHub (locally or via PR merge).',
         'GitHub Actions runs <code>.github/workflows/deploy.yml</code>: validates code, then SSHs into the VPS and runs <code>tools/vps-setup/scripts/deploy.sh</code>.',
-        'The deploy script tags a rollback point, fetches origin, resets the working tree, copies private config, fixes permissions, runs DB migrations, and reloads PHP-FPM.',
+        'The deploy script tags a rollback point, fetches origin, refreshes Composer dependencies, copies private config, fixes permissions, runs DB migrations, reloads PHP-FPM, and then runs the healthcheck.',
         'For an out-of-band deploy: SSH to the VPS and run <code>sudo bash /var/www/eqms.hesemeng.com/tools/vps-setup/scripts/deploy.sh</code>.'
       ]
     : [
         'Đẩy commit lên <code>main</code> trên GitHub (commit local hoặc merge PR).',
         'GitHub Actions chạy <code>.github/workflows/deploy.yml</code>: validate code, sau đó SSH vào VPS và gọi <code>tools/vps-setup/scripts/deploy.sh</code>.',
-        'Script deploy tạo tag rollback, fetch origin, reset working tree, copy private config, sửa permission, chạy DB migration và reload PHP-FPM.',
+        'Script deploy tạo tag rollback, fetch origin, làm mới Composer dependencies, copy private config, sửa permission, chạy DB migration, reload PHP-FPM rồi chạy healthcheck.',
         'Khi cần deploy thủ công: SSH vào VPS rồi chạy <code>sudo bash /var/www/eqms.hesemeng.com/tools/vps-setup/scripts/deploy.sh</code>.'
       ];
 

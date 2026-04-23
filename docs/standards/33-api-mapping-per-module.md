@@ -694,8 +694,7 @@
 │ Portal config save→ POST admin_portal_display_config_save    │
 │ Data settings get → GET get_data_settings                    │
 │ Data settings save→ POST save_data_settings                  │
-│ Git sync         → POST admin_git_sync                       │
-│ Git pull         → POST admin_git_pull                       │
+│ Git status       → GET admin_git_status                      │
 │ Clear cache      → POST admin_clear_site_cache               │
 ```
 

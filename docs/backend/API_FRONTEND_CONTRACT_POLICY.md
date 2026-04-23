@@ -92,7 +92,7 @@ These must be denied to product frontend and populated in `destructive-endpoint-
 | `doc_delete_drafts`, `doc_delete_version` | Document-control admin only. |
 | `delete_doc`, `delete_folder` | Document-control admin only; archive/evidence required. |
 | `admin_user_delete`, `admin_user_reset_password` | Security admin only with re-auth/evidence. |
-| `admin_git_discard_local`, `admin_git_pull`, `admin_git_sync` | Ops admin only; never product UI. |
+| `admin_git_status` | Ops admin only; read-only repo status, never a product-UI deploy path. |
 | `dict_delete` | Admin only. |
 | `master_data_delete` | MDM admin only with dependency, release freeze, and e-signature. |
 | `module_schema_delete`, `module_schema_reset` | Admin/control-plane only. |

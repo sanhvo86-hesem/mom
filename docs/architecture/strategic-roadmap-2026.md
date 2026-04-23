@@ -42,15 +42,15 @@
 | Document type registry | `qms-data/config/document_type_registry.json` (10 departments, 13 record types) |
 | Variable library | `qms-data/config/variable_library.json` (1,061 variables, 53 categories) |
 | Dictionary | `11-Glossary/dict-data.json` + `dict-data.js` |
-| Deployment | cPanel shared hosting, git-based deploy via `admin_git_sync` / `admin_git_pull` |
+| Deployment | Ubuntu VPS, GitHub Actions SSH into `tools/vps-setup/scripts/deploy.sh`; portal only exposes read-only `admin_git_status` |
 
-### 1.2 API Endpoint Inventory (55 action cases)
+### 1.2 API Endpoint Inventory (selected action cases)
 
 **Authentication (4):** `status`, `auth_login`, `auth_mfa_verify`, `auth_enroll_verify`, `auth_logout`
 
 **Admin -- Users (4):** `admin_users_list`, `admin_user_upsert`, `admin_user_delete`, `admin_user_reset_password`
 
-**Admin -- System (6):** `admin_git_sync`, `admin_git_pull`, `admin_clear_site_cache`, `role_perms_get`, `admin_role_perms_save`, `get_data_settings`, `save_data_settings`
+**Admin -- System (6):** `admin_git_status`, `admin_clear_site_cache`, `role_perms_get`, `admin_role_perms_save`, `get_data_settings`, `save_data_settings`
 
 **Admin -- Display (4):** `docs_visibility_get`, `admin_docs_visibility_save`, `admin_portal_display_config_get`, `admin_portal_display_config_save`
 
@@ -594,7 +594,7 @@ action=record_id_next    -> POST   /v1/records/next-id
   FormController.php          -- form_upload_draft, form_version_stream,
                                  online_form_list, online_form_schema, online_form_submit, online_form_entries
   RecordController.php        -- record_id_registry, record_id_next, record_id_peek
-  AdminController.php         -- admin_git_sync, admin_git_pull, admin_clear_site_cache,
+  AdminController.php         -- admin_git_status, admin_clear_site_cache,
                                  admin_docs_visibility_save, admin_portal_display_config_get,
                                  admin_portal_display_config_save, get_data_settings, save_data_settings,
                                  db_health_check

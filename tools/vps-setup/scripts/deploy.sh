@@ -30,6 +30,7 @@ SKIP_HEALTHCHECK="${SKIP_HEALTHCHECK:-0}"
 SKIP_ROLLBACK="${SKIP_ROLLBACK:-0}"
 LOCK_FILE="${LOCK_FILE:-/var/run/qms-deploy.lock}"
 ROLLBACK_TAG_PREFIX="deploy-rollback"
+DB_SCHEMA_MAY_HAVE_CHANGED="0"
 
 # ── Helpers ───────────────────────────────────────────────────────────────
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') [$1] $2" | tee -a "$LOG"; }
@@ -115,6 +116,11 @@ prune_rollback_tags() {
 
 # Roll back to the pre-deploy tag if the healthcheck fails.
 rollback_to_tag() {
+    if [ "$DB_SCHEMA_MAY_HAVE_CHANGED" = "1" ]; then
+        log "ERROR" "Auto code rollback suppressed because DB migrations already ran; schema rollback is not automatic."
+        log "WARN" "Leave the current code in place, inspect the migration/healthcheck failure, and only redeploy after fixing origin/$BRANCH."
+        return
+    fi
     if [ "$SKIP_ROLLBACK" = "1" ]; then
         log "WARN" "SKIP_ROLLBACK=1 — leaving the failed deploy in place"
         return
@@ -132,6 +138,23 @@ rollback_to_tag() {
     log "WARN" "Rollback complete. Investigate the failed deploy before retrying."
 }
 
+run_composer_install() {
+    log "INFO" "Refreshing production Composer dependencies..."
+    if COMPOSER_ALLOW_SUPERUSER=1 composer install \
+        --working-dir="$SITE_DIR/mom" \
+        --no-dev \
+        --optimize-autoloader \
+        --no-interaction \
+        --prefer-dist >>"$LOG" 2>&1; then
+        log "INFO" "Composer dependencies refreshed"
+        return
+    fi
+
+    log "ERROR" "Composer install failed — attempting rollback"
+    rollback_to_tag
+    die "Deploy aborted: composer install failed (see $LOG for details)"
+}
+
 acquire_lock
 
 log "INFO" "═══ Deploy started (branch=$BRANCH, site=$SITE_DIR) ═══"
@@ -139,8 +162,12 @@ log "INFO" "═══ Deploy started (branch=$BRANCH, site=$SITE_DIR) ═══"
 # ── Pre-flight checks ────────────────────────────────────────────────────
 [ -d "$SITE_DIR/.git" ] || die "$SITE_DIR is not a git repository"
 command -v php8.5 >/dev/null 2>&1 || die "php8.5 not found"
+command -v composer >/dev/null 2>&1 || die "composer not found (required to refresh vendor on deploy)"
 command -v flock >/dev/null 2>&1 || die "flock not found (required for safe concurrent deploys)"
 detect_php_fpm_identity
+if [ "$RUN_DB_MIGRATIONS" = "1" ] && [ "$SKIP_ROLLBACK" != "1" ]; then
+    log "WARN" "DB migrations are enabled. If healthcheck fails after migrations, auto code rollback will be suppressed because schema rollback is not automatic."
+fi
 
 # ── Capture rollback point BEFORE any change ─────────────────────────────
 cd "$SITE_DIR"
@@ -158,6 +185,8 @@ if [ "$BEFORE" = "$AFTER" ]; then
 else
     log "INFO" "Updated: $(echo "$BEFORE" | head -c 8) → $(echo "$AFTER" | head -c 8)"
 fi
+
+run_composer_install
 
 # ── Copy private config that lives outside the repo ──────────────────────
 if [ -d "$PRIVATE_DATA/config" ]; then
@@ -222,6 +251,7 @@ restore_git_executable_bits
 
 # ── Run governed database migrations before PHP-FPM serves the new release ──
 if [ "$RUN_DB_MIGRATIONS" = "1" ]; then
+    DB_SCHEMA_MAY_HAVE_CHANGED="1"
     log "INFO" "Running governed DB migrations and schema smoke..."
     RUN_DB_MIGRATIONS="$RUN_DB_MIGRATIONS" \
     RUN_DB_SCHEMA_SMOKE="$RUN_DB_SCHEMA_SMOKE" \
