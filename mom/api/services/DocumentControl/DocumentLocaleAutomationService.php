@@ -26,6 +26,8 @@ final class DocumentLocaleAutomationService
     private const DRIVER_COMMAND = 'command';
     private const DEFAULT_COMMAND_TIMEOUT_SECONDS = 120;
     private const COMMAND_IO_POLL_MICROSECONDS = 200000;
+    private const MAX_COMMAND_OUTPUT_BYTES = 131072;
+    private const MAX_COMMAND_MESSAGE_BYTES = 4096;
 
     public function __construct(
         private DataLayer $data,
@@ -506,7 +508,7 @@ final class DocumentLocaleAutomationService
             if (is_resource($stdout) && in_array($stdout, $read, true)) {
                 $chunk = stream_get_contents($stdout);
                 if (is_string($chunk) && $chunk !== '') {
-                    $stdoutBody .= $chunk;
+                    $stdoutBody = $this->appendBoundedCommandOutput($stdoutBody, $chunk);
                 }
                 if (feof($stdout)) {
                     fclose($stdout);
@@ -516,7 +518,7 @@ final class DocumentLocaleAutomationService
             if (is_resource($stderr) && in_array($stderr, $read, true)) {
                 $chunk = stream_get_contents($stderr);
                 if (is_string($chunk) && $chunk !== '') {
-                    $stderrBody .= $chunk;
+                    $stderrBody = $this->appendBoundedCommandOutput($stderrBody, $chunk);
                 }
                 if (feof($stderr)) {
                     fclose($stderr);
@@ -528,8 +530,12 @@ final class DocumentLocaleAutomationService
         if (is_resource($stdin)) {
             fclose($stdin);
         }
-        $stdoutBody .= is_resource($stdout) ? (string)stream_get_contents($stdout) : '';
-        $stderrBody .= is_resource($stderr) ? (string)stream_get_contents($stderr) : '';
+        $stdoutBody = is_resource($stdout)
+            ? $this->appendBoundedCommandOutput($stdoutBody, (string)stream_get_contents($stdout))
+            : $stdoutBody;
+        $stderrBody = is_resource($stderr)
+            ? $this->appendBoundedCommandOutput($stderrBody, (string)stream_get_contents($stderr))
+            : $stderrBody;
         if (is_resource($stdout)) {
             fclose($stdout);
         }
@@ -546,7 +552,11 @@ final class DocumentLocaleAutomationService
                 'engine_version' => 'command_error',
                 'glossary_version' => $this->glossaryVersion(),
                 'reason' => 'translation_command_failed',
-                'message' => trim($stderrBody) !== '' ? trim($stderrBody) : 'The configured translation command failed or returned invalid JSON.',
+                'message' => $this->boundedCommandMessage(
+                    $stderrBody,
+                    $stdoutBody,
+                    'The configured translation command failed or returned invalid JSON.'
+                ),
             ];
         }
 
@@ -582,11 +592,11 @@ final class DocumentLocaleAutomationService
             fclose($stdin);
         }
         if (is_resource($stdout)) {
-            $stdoutBody .= (string)stream_get_contents($stdout);
+            $stdoutBody = $this->appendBoundedCommandOutput($stdoutBody, (string)stream_get_contents($stdout));
             fclose($stdout);
         }
         if (is_resource($stderr)) {
-            $stderrBody .= (string)stream_get_contents($stderr);
+            $stderrBody = $this->appendBoundedCommandOutput($stderrBody, (string)stream_get_contents($stderr));
             fclose($stderr);
         }
         @proc_terminate($process);
@@ -598,10 +608,39 @@ final class DocumentLocaleAutomationService
             'engine_version' => $engineVersion,
             'glossary_version' => $this->glossaryVersion(),
             'reason' => $reason,
-            'message' => trim($stderrBody) !== ''
-                ? trim($stderrBody)
-                : (trim($stdoutBody) !== '' ? trim($stdoutBody) : $fallbackMessage),
+            'message' => $this->boundedCommandMessage($stderrBody, $stdoutBody, $fallbackMessage),
         ];
+    }
+
+    private function appendBoundedCommandOutput(string $buffer, string $chunk): string
+    {
+        if ($chunk === '' || strlen($buffer) >= self::MAX_COMMAND_OUTPUT_BYTES) {
+            return $buffer;
+        }
+
+        $remaining = self::MAX_COMMAND_OUTPUT_BYTES - strlen($buffer);
+        if (strlen($chunk) <= $remaining) {
+            return $buffer . $chunk;
+        }
+
+        $suffix = "\n...[truncated]";
+        $allowed = max(0, $remaining - strlen($suffix));
+        return $buffer . substr($chunk, 0, $allowed) . $suffix;
+    }
+
+    private function boundedCommandMessage(string $stderrBody, string $stdoutBody, string $fallbackMessage): string
+    {
+        $candidate = trim($stderrBody) !== ''
+            ? trim($stderrBody)
+            : (trim($stdoutBody) !== '' ? trim($stdoutBody) : $fallbackMessage);
+
+        if (strlen($candidate) <= self::MAX_COMMAND_MESSAGE_BYTES) {
+            return $candidate;
+        }
+
+        $suffix = ' ...[truncated]';
+        $allowed = max(0, self::MAX_COMMAND_MESSAGE_BYTES - strlen($suffix));
+        return substr($candidate, 0, $allowed) . $suffix;
     }
 
     private function normalizeRepoRelativePath(string $path): string

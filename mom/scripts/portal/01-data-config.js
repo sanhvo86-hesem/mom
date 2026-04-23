@@ -1416,6 +1416,8 @@ function applyDocsTreeResponse(res, options={}){
 let __DCC_HEADER_CACHE = {};          // map: canonical doc_code → {title, subtitle, revision, status, owner_role_code, approver_role_code, effective_date}
 let __DCC_OVERLAY_IN_FLIGHT = false;  // dedupe concurrent fetches
 let __DCC_OVERLAY_LOADED = false;     // true after first successful fetch
+let __DCC_OVERLAY_PENDING_OPTIONS = null;
+let __DCC_OVERLAY_FETCH_PROMISE = null;
 
 function overlayDocsWithDccCache(docs){
   if (!Array.isArray(docs)) return;
@@ -1471,66 +1473,85 @@ function overlayDocsWithDccCache(docs){
 }
 
 async function refreshDccOverlayFromServer(options={}){
-  if (__DCC_OVERLAY_IN_FLIGHT) return;
+  const requestOptions = (options && typeof options === 'object') ? options : {};
+  if (__DCC_OVERLAY_IN_FLIGHT) {
+    const pendingRefreshUi = !__DCC_OVERLAY_PENDING_OPTIONS || __DCC_OVERLAY_PENDING_OPTIONS.refreshUi !== false;
+    const requestRefreshUi = requestOptions.refreshUi !== false;
+    __DCC_OVERLAY_PENDING_OPTIONS = { refreshUi: pendingRefreshUi || requestRefreshUi };
+    return __DCC_OVERLAY_FETCH_PROMISE || Promise.resolve();
+  }
   __DCC_OVERLAY_IN_FLIGHT = true;
-  try {
-    const locale = lang === 'en' ? 'en' : 'vi';
-    const pageSize = 250;
-    const rows = [];
-    for (let offset = 0; ; offset += pageSize) {
-      const url = '/api/v1/dcc/documents?limit=' + pageSize + '&offset=' + offset + '&locale=' + encodeURIComponent(locale);
-      const res = await fetch(url, {credentials: 'same-origin', headers: {'Accept': 'application/json'}, cache: 'no-store'});
-      if (!res.ok) {
-        // 401/403 just means the user isn't logged in yet — don't spam the console.
-        if (res.status !== 401 && res.status !== 403) {
-          console.warn('[DCC] overlay fetch HTTP ' + res.status);
+  __DCC_OVERLAY_FETCH_PROMISE = (async function(){
+    let currentOptions = requestOptions;
+    do {
+      __DCC_OVERLAY_PENDING_OPTIONS = null;
+      try {
+        const locale = lang === 'en' ? 'en' : 'vi';
+        const pageSize = 250;
+        const rows = [];
+        for (let offset = 0; ; offset += pageSize) {
+          const url = '/api/v1/dcc/documents?limit=' + pageSize + '&offset=' + offset + '&locale=' + encodeURIComponent(locale);
+          const res = await fetch(url, {credentials: 'same-origin', headers: {'Accept': 'application/json'}, cache: 'no-store'});
+          if (!res.ok) {
+            // 401/403 just means the user isn't logged in yet — don't spam the console.
+            if (res.status !== 401 && res.status !== 403) {
+              console.warn('[DCC] overlay fetch HTTP ' + res.status);
+            }
+            return;
+          }
+          const body = await res.json().catch(() => null);
+          // The controller's success wrapper may nest items under `data.items`, or
+          // return `{items: [...]}` directly. Try every plausible shape.
+          const pageRows = (body && body.data && Array.isArray(body.data.items)) ? body.data.items
+                         : (body && Array.isArray(body.items))                   ? body.items
+                         : (body && Array.isArray(body.headers))                 ? body.headers
+                         : (body && body.data && Array.isArray(body.data))       ? body.data
+                         : (Array.isArray(body) ? body : []);
+          rows.push.apply(rows, pageRows);
+          if (pageRows.length < pageSize) break;
         }
-        return;
+        const next = {};
+        for (let i = 0; i < rows.length; i++) {
+          const r = rows[i];
+          if (!r || !r.doc_code) continue;
+          const key = String(r.doc_code).toUpperCase();
+          next[key] = {
+            title:              r.title || '',
+            subtitle:           r.subtitle || '',
+            revision:           r.revision || '',
+            status:             r.status || '',
+            owner_role_code:    r.owner_role_code || '',
+            approver_role_code: r.approver_role_code || '',
+            effective_date:     r.effective_date || '',
+            locale_variant_exists: !!r.locale_variant_exists,
+            is_locale_fallback: !!r.is_locale_fallback,
+            artifact_rel_path:  r.artifact_rel_path || '',
+            translation_state:  r.translation_state || ''
+          };
+        }
+        const changed = JSON.stringify(next) !== JSON.stringify(__DCC_HEADER_CACHE);
+        __DCC_HEADER_CACHE = next;
+        __DCC_OVERLAY_LOADED = true;
+        if (Array.isArray(DOCS) && DOCS.length) {
+          overlayDocsWithDccCache(DOCS);
+          if (currentOptions.refreshUi !== false && changed) {
+            try { refreshPortalDocsUiAfterSync(); } catch(e){}
+          }
+        }
+        try { console.log('[DCC] overlay loaded ' + Object.keys(next).length + ' rows' + (changed ? ' (changed)' : '')); } catch(e){}
+      } catch (e) {
+        console.warn('[DCC] overlay fetch failed (non-fatal)', e);
       }
-      const body = await res.json().catch(() => null);
-      // The controller's success wrapper may nest items under `data.items`, or
-      // return `{items: [...]}` directly. Try every plausible shape.
-      const pageRows = (body && body.data && Array.isArray(body.data.items)) ? body.data.items
-                     : (body && Array.isArray(body.items))                   ? body.items
-                     : (body && Array.isArray(body.headers))                 ? body.headers
-                     : (body && body.data && Array.isArray(body.data))       ? body.data
-                     : (Array.isArray(body) ? body : []);
-      rows.push.apply(rows, pageRows);
-      if (pageRows.length < pageSize) break;
-    }
-    const next = {};
-    for (let i = 0; i < rows.length; i++) {
-      const r = rows[i];
-      if (!r || !r.doc_code) continue;
-      const key = String(r.doc_code).toUpperCase();
-      next[key] = {
-        title:              r.title || '',
-        subtitle:           r.subtitle || '',
-        revision:           r.revision || '',
-        status:             r.status || '',
-        owner_role_code:    r.owner_role_code || '',
-        approver_role_code: r.approver_role_code || '',
-        effective_date:     r.effective_date || '',
-        locale_variant_exists: !!r.locale_variant_exists,
-        is_locale_fallback: !!r.is_locale_fallback,
-        artifact_rel_path:  r.artifact_rel_path || '',
-        translation_state:  r.translation_state || ''
-      };
-    }
-    const changed = JSON.stringify(next) !== JSON.stringify(__DCC_HEADER_CACHE);
-    __DCC_HEADER_CACHE = next;
-    __DCC_OVERLAY_LOADED = true;
-    if (Array.isArray(DOCS) && DOCS.length) {
-      overlayDocsWithDccCache(DOCS);
-      if (options.refreshUi !== false && changed) {
-        try { refreshPortalDocsUiAfterSync(); } catch(e){}
-      }
-    }
-    try { console.log('[DCC] overlay loaded ' + Object.keys(next).length + ' rows' + (changed ? ' (changed)' : '')); } catch(e){}
-  } catch (e) {
-    console.warn('[DCC] overlay fetch failed (non-fatal)', e);
+      if (!__DCC_OVERLAY_PENDING_OPTIONS) break;
+      currentOptions = __DCC_OVERLAY_PENDING_OPTIONS;
+    } while (true);
+  })();
+  try {
+    return await __DCC_OVERLAY_FETCH_PROMISE;
   } finally {
     __DCC_OVERLAY_IN_FLIGHT = false;
+    __DCC_OVERLAY_FETCH_PROMISE = null;
+    __DCC_OVERLAY_PENDING_OPTIONS = null;
   }
 }
 

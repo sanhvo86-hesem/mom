@@ -123,6 +123,25 @@ PHP);
         $this->assertSame('command_timeout', $result['engine_version']);
     }
 
+    public function testCommandProviderBoundsLargeErrorPayload(): void
+    {
+        $service = $this->newService();
+        $command = PHP_BINARY . ' -r ' . escapeshellarg(<<<'PHP'
+fwrite(STDERR, str_repeat('X', 400000));
+exit(1);
+PHP);
+
+        $result = $this->invokeRunCommandProvider($service, $command, [
+            'doc_code' => 'SOP-502',
+            'source_html' => '<p>Error payload</p>',
+        ]);
+
+        $this->assertFalse($result['ok']);
+        $this->assertSame('translation_command_failed', $result['reason']);
+        $this->assertLessThanOrEqual(4096, strlen((string)$result['message']));
+        $this->assertStringContainsString('truncated', (string)$result['message']);
+    }
+
     private function newService(): DocumentLocaleAutomationService
     {
         $baseDir = realpath(__DIR__ . '/../../..');
