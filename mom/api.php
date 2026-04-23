@@ -3064,7 +3064,12 @@ function portal_sync_doc_title_blocks(string $html, string $docCode, string $tit
       } elseif ($subtitleText !== '') {
         $subtitleHtml = '<span class="sub-vn">' . htmlspecialchars($subtitleText, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '</span>';
       }
-      return '<div class="title"><strong class="doc-name">' . $safeDocName . '</strong>' . $subtitleHtml . ($mutedMatch[0] ?? '') . '</div>';
+      // NOTE: separate sibling spans with a space so legacy selectors that
+      // don't set `display: block` still render as "title<space>subtitle"
+      // rather than concatenating into "titlesubtitle" (ISO §4 map block).
+      $joiner = $subtitleHtml !== '' ? ' ' : '';
+      $mutedPrefix = ($mutedMatch[0] ?? '') !== '' ? ' ' : '';
+      return '<div class="title"><strong class="doc-name">' . $safeDocName . '</strong>' . $joiner . $subtitleHtml . $mutedPrefix . ($mutedMatch[0] ?? '') . '</div>';
     },
     $html,
     1
@@ -14176,16 +14181,6 @@ function git_qms_data_relative_path(string $path): string {
   return $p;
 }
 
-function git_qms_data_path_variants(string $suffix): array {
-  $clean = ltrim(str_replace('\\', '/', trim($suffix)), '/');
-  if ($clean === '') return [];
-  return array_values(array_unique([
-    $clean,
-    'mom/' . $clean,
-    '1-QMS-Portal/' . $clean,
-  ]));
-}
-
 function git_is_runtime_noise_path(string $path): bool {
   $p = git_qms_data_relative_path($path);
   if ($p === '') return false;
@@ -14234,18 +14229,6 @@ function git_filter_non_runtime_status_lines(array $statusLines, bool $excludePr
   return $kept;
 }
 
-function git_filter_non_runtime_paths(array $paths, bool $excludePresyncTelemetry = false): array {
-  $kept = [];
-  foreach ($paths as $path) {
-    if (!is_string($path) || trim($path) === '') continue;
-    $norm = str_replace('\\', '/', trim($path));
-    if (git_is_runtime_noise_path($norm)) continue;
-    if ($excludePresyncTelemetry && git_is_presync_telemetry_path($norm)) continue;
-    $kept[] = $norm;
-  }
-  return $kept;
-}
-
 function git_collect_paths_from_status_lines(array $statusLines): array {
   $paths = [];
   foreach ($statusLines as $line) {
@@ -14254,18 +14237,6 @@ function git_collect_paths_from_status_lines(array $statusLines): array {
     if ($path !== '') $paths[] = $path;
   }
   return array_values(array_unique($paths));
-}
-
-function git_join_paths_for_error(array $paths, int $max = 12): string {
-  $clean = array_values(array_filter(array_map(static function($p){
-    return is_string($p) ? trim(str_replace('\\', '/', $p)) : '';
-  }, $paths), static fn($p) => $p !== ''));
-  if (empty($clean)) return '';
-  $slice = array_slice($clean, 0, $max);
-  $extra = count($clean) - count($slice);
-  $msg = implode(', ', $slice);
-  if ($extra > 0) $msg .= ', ... (+' . $extra . ')';
-  return $msg;
 }
 
 function git_head_commit(string $repoReal, string $ref = 'HEAD'): string {
@@ -14327,27 +14298,54 @@ function git_repository_status(string $repoDir, bool $fetchRemote = false): arra
   $remoteBranch = 'origin/' . $branch;
   $remoteUrl = git_remote_url($repoReal);
 
+  // The status panel never writes to .git/. We use `git ls-remote` (network
+  // read-only — it stores nothing inside .git) to learn the live origin tip,
+  // so PHP-FPM does not need write permission on .git/FETCH_HEAD or
+  // .git/objects. This keeps the deploy user as the only writer of the repo.
+  $remoteOriginHash = '';
   $fetchError = '';
   if ($fetchRemote && $remoteUrl !== '' && $branch !== '') {
-    $fetchCode = 0;
-    $fetchOut = git_command(['fetch', 'origin', $branch], $repoReal, $fetchCode);
-    if ($fetchCode !== 0) {
-      $fetchError = 'git_fetch_failed' . ($fetchOut !== '' ? ': ' . $fetchOut : '');
+    $lsRemoteCode = 0;
+    $lsRemoteOut = git_command(['ls-remote', '--heads', 'origin', $branch], $repoReal, $lsRemoteCode);
+    if ($lsRemoteCode !== 0) {
+      $fetchError = 'git_lsremote_failed' . ($lsRemoteOut !== '' ? ': ' . $lsRemoteOut : '');
+    } else {
+      $firstLine = strtok($lsRemoteOut, "\n");
+      if (is_string($firstLine) && preg_match('/^([0-9a-f]{40})\s/', $firstLine, $m)) {
+        $remoteOriginHash = $m[1];
+      }
     }
   }
 
   $head = git_commit_overview($repoReal, 'HEAD');
-  $remoteHead = git_commit_overview($repoReal, $remoteBranch);
+
+  // Prefer the live origin tip discovered via ls-remote, but only if its
+  // commit object actually lives in the local repo. Otherwise fall back to
+  // the cached origin/<branch> ref so ahead/behind counts still mean
+  // something — they may be slightly stale until the next deploy fetch.
+  $remoteHashForCompare = $remoteBranch;
+  $remoteRefStale = false;
+  if ($remoteOriginHash !== '') {
+    $existsCode = 0;
+    git_command(['cat-file', '-e', $remoteOriginHash . '^{commit}'], $repoReal, $existsCode);
+    if ($existsCode === 0) {
+      $remoteHashForCompare = $remoteOriginHash;
+    } else {
+      // Live origin has commits the local repo has not fetched yet.
+      $remoteRefStale = true;
+    }
+  }
+  $remoteHead = git_commit_overview($repoReal, $remoteHashForCompare);
 
   $aheadCount = 0;
   $behindCount = 0;
   if ((string)($remoteHead['hash'] ?? '') !== '') {
     $aheadCode = 0;
-    $aheadOut = git_command(['rev-list', '--count', $remoteBranch . '..' . $branch], $repoReal, $aheadCode);
+    $aheadOut = git_command(['rev-list', '--count', $remoteHashForCompare . '..' . $branch], $repoReal, $aheadCode);
     if ($aheadCode === 0) $aheadCount = (int)trim($aheadOut);
 
     $behindCode = 0;
-    $behindOut = git_command(['rev-list', '--count', $branch . '..' . $remoteBranch], $repoReal, $behindCode);
+    $behindOut = git_command(['rev-list', '--count', $branch . '..' . $remoteHashForCompare], $repoReal, $behindCode);
     if ($behindCode === 0) $behindCount = (int)trim($behindOut);
   }
 
@@ -14360,7 +14358,6 @@ function git_repository_status(string $repoDir, bool $fetchRemote = false): arra
   $meaningfulLines = git_filter_non_runtime_status_lines($statusLines, true);
   $meaningfulEntries = git_parse_status_entries($meaningfulLines);
   $meaningfulPaths = git_collect_paths_from_status_lines($meaningfulLines);
-  $cpanelYmlExists = is_file($repoReal . DIRECTORY_SEPARATOR . 'cpanel.yml');
 
   return [
     'repo_path' => str_replace('\\', '/', $repoReal),
@@ -14375,8 +14372,8 @@ function git_repository_status(string $repoDir, bool $fetchRemote = false): arra
     'meaningful_dirty_count' => count($meaningfulEntries),
     'meaningful_dirty_paths' => $meaningfulPaths,
     'meaningful_dirty_entries' => $meaningfulEntries,
-    'cpanel_yml_exists' => $cpanelYmlExists,
-    'deploy_ready' => $cpanelYmlExists && empty($meaningfulLines),
+    'remote_origin_hash' => $remoteOriginHash,
+    'remote_ref_stale' => $remoteRefStale,
     'fetch_error' => $fetchError,
   ];
 }
@@ -14393,505 +14390,6 @@ function git_parse_status_entries(array $statusLines): array {
     ];
   }
   return $entries;
-}
-
-function git_parse_name_status_output(string $text): array {
-  $entries = [];
-  foreach (split_nonempty_lines($text) as $line) {
-    $parts = preg_split("/\t+/", trim((string)$line));
-    if (!is_array($parts) || count($parts) < 2) continue;
-    $status = strtoupper(trim((string)$parts[0]));
-    if ($status === '') continue;
-    if (count($parts) >= 3) {
-      $oldPath = str_replace('\\', '/', trim((string)$parts[1]));
-      $path = str_replace('\\', '/', trim((string)$parts[2]));
-    } else {
-      $oldPath = '';
-      $path = str_replace('\\', '/', trim((string)$parts[1]));
-    }
-    if ($path === '') continue;
-    $entries[] = [
-      'status' => $status,
-      'path' => $path,
-      'old_path' => $oldPath,
-    ];
-  }
-  return $entries;
-}
-
-function git_cleanup_runtime_noise(string $repoReal): void {
-  $statusCode = 0;
-  $statusOut = git_command(['status', '--porcelain', '--untracked-files=all'], $repoReal, $statusCode);
-  if ($statusCode !== 0) return;
-  $statusLines = split_nonempty_lines($statusOut);
-
-  $trackedRuntimePaths = [];
-  foreach ($statusLines as $line) {
-    if (!is_string($line) || strlen($line) < 3) continue;
-    $xy = substr($line, 0, 2);
-    $path = git_status_entry_path($line);
-    if ($path === '' || !git_is_runtime_noise_path($path)) continue;
-    if ($xy !== '??') {
-      $trackedRuntimePaths[] = $path;
-    }
-  }
-  $trackedRuntimePaths = array_values(array_unique($trackedRuntimePaths));
-  if (!empty($trackedRuntimePaths)) {
-    $restoreCode = 0;
-    git_command(['restore', '--staged', '--worktree', '--', ...$trackedRuntimePaths], $repoReal, $restoreCode);
-  }
-
-  // Clean untracked runtime files/dirs in known noisy locations.
-  $cleanTargets = [
-    'data/audit.log',
-    'data/form-workflow',
-    'data/sessions',
-    'data/ratelimit',
-    'data/allocations',
-    'data/counters',
-    'data/online-forms/drafts',
-    'data/online-forms/audit',
-    'data/php_error.log',
-    'data/scan_cache.json',
-  ];
-  foreach ($cleanTargets as $target) {
-    foreach (git_qms_data_path_variants($target) as $variant) {
-      $cleanCode = 0;
-      git_command(['clean', '-fd', '--', $variant], $repoReal, $cleanCode);
-    }
-  }
-
-  // Ensure tracked runtime file returns to HEAD state.
-  foreach (git_qms_data_path_variants('data/config/users.json') as $variant) {
-    $usersRestoreCode = 0;
-    git_command(['restore', '--', $variant], $repoReal, $usersRestoreCode);
-  }
-}
-
-function git_is_tracked_path(string $repoReal, string $path): bool {
-  $clean = str_replace('\\', '/', trim($path));
-  if ($clean === '') return false;
-  $code = 0;
-  git_command(['ls-files', '--error-unmatch', '--', $clean], $repoReal, $code);
-  return $code === 0;
-}
-
-function git_discard_meaningful_local_changes(string $repoDir): array {
-  $repoReal = realpath($repoDir);
-  if ($repoReal === false || !is_dir($repoReal)) {
-    throw new RuntimeException('repo_not_found');
-  }
-
-  $checkCode = 0;
-  $checkOut = git_command(['rev-parse', '--is-inside-work-tree'], $repoReal, $checkCode);
-  if ($checkCode !== 0 || trim($checkOut) !== 'true') {
-    throw new RuntimeException('not_a_git_repo');
-  }
-
-  git_cleanup_runtime_noise($repoReal);
-
-  $branchCode = 0;
-  $branch = trim((string)git_command(['branch', '--show-current'], $repoReal, $branchCode));
-  if ($branchCode !== 0 || $branch === '') $branch = 'main';
-  $headBefore = git_head_commit($repoReal);
-
-  $statusCode = 0;
-  $statusOut = git_command(['status', '--porcelain', '--untracked-files=all'], $repoReal, $statusCode);
-  if ($statusCode !== 0) {
-    throw new RuntimeException('git_status_failed');
-  }
-
-  $statusLines = split_nonempty_lines($statusOut);
-  $meaningfulLines = git_filter_non_runtime_status_lines($statusLines, true);
-  $meaningfulPaths = git_filter_non_runtime_paths(git_collect_paths_from_status_lines($meaningfulLines), true);
-
-  if (empty($meaningfulPaths)) {
-    return [
-      'discarded' => false,
-      'branch' => $branch,
-      'message' => 'No meaningful local change needed to be discarded.',
-      'discarded_paths' => [],
-      'restored_paths' => [],
-      'removed_paths' => [],
-      'remaining_paths' => [],
-      'before_head' => $headBefore,
-      'after_head' => $headBefore,
-    ];
-  }
-
-  // Build a map of path => status-code from porcelain output so we can
-  // reliably classify tracked vs untracked without calling git ls-files
-  // for each file (which can give wrong results on some cPanel git builds).
-  $statusCodeMap = [];
-  foreach ($meaningfulLines as $line) {
-    if (!is_string($line) || strlen($line) < 3) continue;
-    $xy = substr($line, 0, 2);
-    $p  = git_status_entry_path($line);
-    if ($p !== '') $statusCodeMap[$p] = $xy;
-  }
-
-  $tracked = [];
-  $untracked = [];
-  foreach ($meaningfulPaths as $path) {
-    $xy = $statusCodeMap[$path] ?? null;
-    // '??' is the only porcelain code that means truly untracked.
-    // Everything else (M, A, D, R, C, U, combinations) is tracked.
-    if ($xy === '??' || $xy === null) {
-      $untracked[] = $path;
-    } else {
-      $tracked[] = $path;
-    }
-  }
-  $tracked = array_values(array_unique($tracked));
-  $untracked = array_values(array_unique($untracked));
-
-  // --- Restore tracked files to HEAD ---
-  if (!empty($tracked)) {
-    // Try git restore first (git >= 2.23), fall back to git checkout.
-    $restoreCode = 0;
-    $restoreOut = git_command(['restore', '--source=HEAD', '--staged', '--worktree', '--', ...$tracked], $repoReal, $restoreCode);
-    if ($restoreCode !== 0) {
-      // Fallback: git checkout HEAD -- <paths>
-      $checkoutCode = 0;
-      $checkoutOut = git_command(['checkout', 'HEAD', '--', ...$tracked], $repoReal, $checkoutCode);
-      if ($checkoutCode !== 0) {
-        throw new RuntimeException('git_discard_failed' . ($checkoutOut !== '' ? ': ' . $checkoutOut : ''));
-      }
-    }
-  }
-
-  // --- Remove untracked files ---
-  if (!empty($untracked)) {
-    $cleanCode = 0;
-    $cleanOut = git_command(['clean', '-fd', '--', ...$untracked], $repoReal, $cleanCode);
-    if ($cleanCode !== 0) {
-      throw new RuntimeException('git_discard_failed' . ($cleanOut !== '' ? ': ' . $cleanOut : ''));
-    }
-  }
-
-  // --- Nuclear fallback: if files still remain, force reset ---
-  $midStatusCode = 0;
-  $midStatusOut = git_command(['status', '--porcelain', '--untracked-files=all'], $repoReal, $midStatusCode);
-  if ($midStatusCode === 0) {
-    $midLines = git_filter_non_runtime_status_lines(split_nonempty_lines($midStatusOut), true);
-    $midPaths = git_filter_non_runtime_paths(git_collect_paths_from_status_lines($midLines), true);
-    if (!empty($midPaths)) {
-      // Some files survived — force-checkout + clean everything meaningful
-      $resetCode = 0;
-      git_command(['checkout', 'HEAD', '--', '.'], $repoReal, $resetCode);
-      $cleanAllCode = 0;
-      git_command(['clean', '-fd'], $repoReal, $cleanAllCode);
-    }
-  }
-
-  $afterStatusCode = 0;
-  $afterStatusOut = git_command(['status', '--porcelain', '--untracked-files=all'], $repoReal, $afterStatusCode);
-  if ($afterStatusCode !== 0) {
-    throw new RuntimeException('git_status_failed');
-  }
-
-  $remainingLines = git_filter_non_runtime_status_lines(split_nonempty_lines($afterStatusOut), true);
-  $remainingPaths = git_filter_non_runtime_paths(git_collect_paths_from_status_lines($remainingLines), true);
-
-  return [
-    'discarded' => !empty($tracked) || !empty($untracked),
-    'branch' => $branch,
-    'message' => empty($remainingPaths)
-      ? 'Meaningful local repository changes were discarded. The branch is clean for remote update.'
-      : 'Some meaningful local repository changes remain after discard. Review them before updating from remote.',
-    'discarded_paths' => $meaningfulPaths,
-    'restored_paths' => $tracked,
-    'removed_paths' => $untracked,
-    'remaining_paths' => $remainingPaths,
-    'before_head' => $headBefore,
-    'after_head' => git_head_commit($repoReal),
-  ];
-}
-
-function git_unstage_paths(string $repoReal, array $paths): void {
-  $clean = array_values(array_unique(array_filter(array_map(static function($path){
-    if (!is_string($path) || trim($path) === '') return '';
-    return str_replace('\\', '/', trim($path));
-  }, $paths), static fn($path) => $path !== '')));
-  if (empty($clean)) return;
-
-  $restoreCode = 0;
-  $restoreOut = git_command(['restore', '--staged', '--', ...$clean], $repoReal, $restoreCode);
-  if ($restoreCode !== 0) {
-    throw new RuntimeException('git_restore_staged_failed' . ($restoreOut !== '' ? ': ' . $restoreOut : ''));
-  }
-}
-
-function git_sync_commit_author(array $me): array {
-  $name = trim((string)($me['name'] ?? $me['username'] ?? 'Portal Sync'));
-  if ($name === '') $name = 'Portal Sync';
-
-  $username = strtolower(trim((string)($me['username'] ?? '')));
-  if ($username === '') {
-    $username = strtolower($name);
-  }
-  $username = preg_replace('/[^a-z0-9._-]+/i', '-', $username) ?? 'portal';
-  $username = trim($username, '.-');
-  if ($username === '') $username = 'portal';
-
-  return [
-    'name' => $name,
-    'email' => 'portal+' . $username . '@local.invalid',
-  ];
-}
-
-function git_sync_documents(array $me, string $repoDir, array $options = []): array {
-  $repoReal = realpath($repoDir);
-  if ($repoReal === false || !is_dir($repoReal)) {
-    throw new RuntimeException('repo_not_found');
-  }
-  $excludePresyncTelemetry = !empty($options['exclude_presync_telemetry']);
-
-  $checkCode = 0;
-  $checkOut = git_command(['rev-parse', '--is-inside-work-tree'], $repoReal, $checkCode);
-  if ($checkCode !== 0 || trim($checkOut) !== 'true') {
-    throw new RuntimeException('not_a_git_repo');
-  }
-
-  $branchCode = 0;
-  $branch = trim((string)git_command(['branch', '--show-current'], $repoReal, $branchCode));
-  if ($branchCode !== 0 || $branch === '') $branch = 'main';
-
-  // Validate branch name to prevent shell injection
-  if (!preg_match('/^[a-zA-Z0-9_\-\/\.]{1,100}$/', $branch)) {
-    throw new RuntimeException('invalid_git_branch_name');
-  }
-
-  $headBefore = git_head_commit($repoReal);
-
-  $statusArgs = ['status', '--porcelain', '--untracked-files=all'];
-  $statusCode = 0;
-  $statusOut = git_command($statusArgs, $repoReal, $statusCode);
-  if ($statusCode !== 0) {
-    throw new RuntimeException('git_status_failed');
-  }
-  $statusLines = git_filter_non_runtime_status_lines(split_nonempty_lines($statusOut), $excludePresyncTelemetry);
-  $statusEntries = git_parse_status_entries($statusLines);
-  if (empty($statusLines)) {
-    $aheadCode = 0;
-    $aheadOut = git_command(['rev-list', '--count', 'origin/' . $branch . '..' . $branch], $repoReal, $aheadCode);
-    $aheadCount = $aheadCode === 0 ? (int)trim($aheadOut) : 0;
-    if ($aheadCount > 0) {
-      // Pull first to integrate remote changes before pushing
-      $pullCode = 0;
-      $pullOut = git_command(['pull', '--rebase', 'origin', $branch], $repoReal, $pullCode);
-      if ($pullCode !== 0) {
-        // If rebase fails, try regular pull
-        git_command(['rebase', '--abort'], $repoReal, $pullCode);
-        $pullCode = 0;
-        $pullOut = git_command(['pull', '--no-rebase', 'origin', $branch], $repoReal, $pullCode);
-        if ($pullCode !== 0) {
-          throw new RuntimeException('git_presync_pull_failed' . ($pullOut !== '' ? ': ' . $pullOut : ''));
-        }
-      }
-      $pushCode = 0;
-      $pushOut = git_command(['push', 'origin', $branch], $repoReal, $pushCode);
-      if ($pushCode !== 0) {
-        throw new RuntimeException('git_push_failed' . ($pushOut !== '' ? ': ' . $pushOut : ''));
-      }
-      return [
-        'pushed' => true,
-        'branch' => $branch,
-        'files' => [],
-        'message' => 'Existing local commits pushed to origin/' . $branch,
-        'status' => [],
-        'status_entries' => [],
-        'commit_output' => '',
-        'push_output' => $pushOut,
-        'head_before' => $headBefore,
-        'head_after' => git_head_commit($repoReal),
-      ];
-    }
-    return [
-      'pushed' => false,
-      'branch' => $branch,
-      'files' => [],
-      'message' => 'No non-runtime changes to sync.',
-      'status' => [],
-      'status_entries' => [],
-      'commit_output' => '',
-      'push_output' => '',
-      'head_before' => $headBefore,
-      'head_after' => $headBefore,
-    ];
-  }
-
-  // Stage all changes first, then runtime noise will be removed from index/worktree.
-  $addArgs = ['add', '-A', '--', '.'];
-  $addCode = 0;
-  $addOut = git_command($addArgs, $repoReal, $addCode);
-  if ($addCode !== 0) {
-    throw new RuntimeException('git_add_failed' . ($addOut !== '' ? ': ' . $addOut : ''));
-  }
-
-  // Ensure runtime files never get committed even after add -A.
-  git_cleanup_runtime_noise($repoReal);
-
-  if ($excludePresyncTelemetry) {
-    $cachedNamesCode = 0;
-    $cachedNamesOut = git_command(['diff', '--cached', '--name-only', '--'], $repoReal, $cachedNamesCode);
-    if ($cachedNamesCode !== 0) {
-      throw new RuntimeException('git_diff_cached_failed');
-    }
-    $telemetryPaths = array_values(array_filter(split_nonempty_lines($cachedNamesOut), 'git_is_presync_telemetry_path'));
-    if (!empty($telemetryPaths)) {
-      git_unstage_paths($repoReal, $telemetryPaths);
-    }
-  }
-
-  $filesCode = 0;
-  $filesOut = git_command(['diff', '--cached', '--name-only', '--'], $repoReal, $filesCode);
-  if ($filesCode !== 0) {
-    throw new RuntimeException('git_diff_cached_failed');
-  }
-  $files = git_filter_non_runtime_paths(split_nonempty_lines($filesOut), $excludePresyncTelemetry);
-  if (empty($files)) {
-    return [
-      'pushed' => false,
-      'branch' => $branch,
-      'files' => [],
-      'message' => 'No staged non-runtime changes to sync.',
-      'status' => $statusLines,
-      'status_entries' => $statusEntries,
-      'commit_output' => '',
-      'push_output' => '',
-      'head_before' => $headBefore,
-      'head_after' => $headBefore,
-    ];
-  }
-
-  $actor = strtolower((string)($me['username'] ?? 'portal'));
-  $actor = preg_replace('/[^a-z0-9._-]+/i', '-', $actor) ?: 'portal';
-  $commitMessage = sprintf('docs: portal sync by %s %s UTC', $actor, gmdate('Y-m-d H:i:s'));
-  $author = git_sync_commit_author($me);
-
-  $commitCode = 0;
-  $commitOut = git_command([
-    '-c', 'user.name=' . (string)$author['name'],
-    '-c', 'user.email=' . (string)$author['email'],
-    'commit', '-m', $commitMessage
-  ], $repoReal, $commitCode);
-  if ($commitCode !== 0) {
-    throw new RuntimeException('git_commit_failed' . ($commitOut !== '' ? ': ' . $commitOut : ''));
-  }
-
-  // Pull remote changes before pushing to avoid non-fast-forward errors
-  $prePullCode = 0;
-  $prePullOut = git_command(['pull', '--rebase', 'origin', $branch], $repoReal, $prePullCode);
-  if ($prePullCode !== 0) {
-    git_command(['rebase', '--abort'], $repoReal, $prePullCode);
-    $prePullCode = 0;
-    $prePullOut = git_command(['pull', '--no-rebase', 'origin', $branch], $repoReal, $prePullCode);
-  }
-
-  $pushCode = 0;
-  $pushOut = git_command(['push', 'origin', $branch], $repoReal, $pushCode);
-  if ($pushCode !== 0) {
-    throw new RuntimeException('git_push_failed' . ($pushOut !== '' ? ': ' . $pushOut : ''));
-  }
-
-  return [
-    'pushed' => true,
-    'branch' => $branch,
-    'files' => $files,
-    'message' => 'Document changes pushed to origin/' . $branch,
-    'status' => $statusLines,
-    'status_entries' => $statusEntries,
-    'commit_output' => $commitOut,
-    'push_output' => $pushOut,
-    'head_before' => $headBefore,
-    'head_after' => git_head_commit($repoReal),
-  ];
-}
-
-function git_pull_portal(string $repoDir, ?array $me = null): array {
-  $repoReal = realpath($repoDir);
-  if ($repoReal === false || !is_dir($repoReal)) {
-    throw new RuntimeException('repo_not_found');
-  }
-
-  $checkCode = 0;
-  $checkOut = git_command(['rev-parse', '--is-inside-work-tree'], $repoReal, $checkCode);
-  if ($checkCode !== 0 || trim($checkOut) !== 'true') {
-    throw new RuntimeException('not_a_git_repo');
-  }
-
-  // Auto-clean runtime noise so pull can run without manual cleanup.
-  git_cleanup_runtime_noise($repoReal);
-
-  $branchCode = 0;
-  $branch = trim((string)git_command(['branch', '--show-current'], $repoReal, $branchCode));
-  if ($branchCode !== 0 || $branch === '') $branch = 'main';
-
-  // Validate branch name to prevent shell injection
-  if (!preg_match('/^[a-zA-Z0-9_\-\/\.]{1,100}$/', $branch)) {
-    throw new RuntimeException('invalid_git_branch_name');
-  }
-
-  $headBefore = git_head_commit($repoReal);
-
-  // Fetch remote state.
-  $fetchCode = 0;
-  $fetchOut = git_command(['fetch', 'origin', $branch], $repoReal, $fetchCode);
-  if ($fetchCode !== 0) {
-    throw new RuntimeException('git_fetch_failed' . ($fetchOut !== '' ? ': ' . $fetchOut : ''));
-  }
-
-  // Check if remote has new commits (compare local HEAD vs origin).
-  $localHead = trim((string)git_command(['rev-parse', $branch], $repoReal, $code));
-  $remoteHead = trim((string)git_command(['rev-parse', 'origin/' . $branch], $repoReal, $code));
-  if ($localHead === $remoteHead) {
-    return [
-      'pulled' => false,
-      'branch' => $branch,
-      'message' => 'Repository is already up to date with origin/' . $branch,
-      'before_head' => $headBefore,
-      'after_head' => $headBefore,
-      'changed_files' => [],
-      'presync' => null,
-      'fetch_output' => $fetchOut,
-      'pull_output' => $fetchOut,
-    ];
-  }
-
-  // Force-reset local branch to match remote — works regardless of dirty
-  // working tree, staged changes, or diverged branches (same behaviour as
-  // cPanel Git Version Control "Update from Remote").
-  $resetCode = 0;
-  $pullOut = git_command(['reset', '--hard', 'origin/' . $branch], $repoReal, $resetCode);
-  if ($resetCode !== 0) {
-    throw new RuntimeException('git_pull_failed' . ($pullOut !== '' ? ': ' . $pullOut : ''));
-  }
-
-  // Clean leftover untracked files that are no longer in the remote tree.
-  git_command(['clean', '-fd'], $repoReal, $cleanCode);
-
-  $headAfter = git_head_commit($repoReal);
-  $changedFiles = [];
-  if ($headBefore !== '' && $headAfter !== '' && $headBefore !== $headAfter) {
-    $changedCode = 0;
-    $changedOut = git_command(['diff', '--name-status', $headBefore . '..' . $headAfter], $repoReal, $changedCode);
-    if ($changedCode === 0) {
-      $changedFiles = git_parse_name_status_output($changedOut);
-    }
-  }
-
-  return [
-    'pulled' => true,
-    'branch' => $branch,
-    'message' => 'Repository updated from origin/' . $branch,
-    'before_head' => $headBefore,
-    'after_head' => $headAfter,
-    'changed_files' => $changedFiles,
-    'presync' => null,
-    'fetch_output' => $fetchOut,
-    'pull_output' => trim($fetchOut . ($fetchOut !== '' && $pullOut !== '' ? "\n" : '') . $pullOut),
-  ];
 }
 
 // ---------- Rate limit (simple) ----------
@@ -15337,232 +14835,6 @@ switch ($action) {
       ? portal_load_role_docs($PORTAL_CONFIG_JS_FILE, $PORTAL_ROLE_DOCS_FILE)
       : portal_save_role_docs($PORTAL_ROLE_DOCS_FILE, $roleDocsInput, $PORTAL_CONFIG_JS_FILE);
     api_json(['ok' => true, 'perms' => $clean, 'role_docs' => $roleDocs, 'server_time' => now_iso()]);
-  }
-
-  case 'admin_git_sync': {
-    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
-    $me = require_logged_in($store);
-    require_csrf();
-    if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
-
-    try {
-      $result = git_sync_documents($me, $ROOT_DIR);
-      api_json([
-        'ok' => true,
-        'pushed' => (bool)($result['pushed'] ?? false),
-        'branch' => (string)($result['branch'] ?? 'main'),
-        'files' => array_values(array_map('strval', $result['files'] ?? [])),
-        'status' => array_values(array_map('strval', $result['status'] ?? [])),
-        'status_entries' => array_values(array_map(static function($row){
-          return [
-            'xy' => (string)($row['xy'] ?? ''),
-            'path' => (string)($row['path'] ?? ''),
-          ];
-        }, $result['status_entries'] ?? [])),
-        'message' => (string)($result['message'] ?? ''),
-        'commit_output' => (string)($result['commit_output'] ?? ''),
-        'push_output' => (string)($result['push_output'] ?? ''),
-        'head_before' => (string)($result['head_before'] ?? ''),
-        'head_after' => (string)($result['head_after'] ?? ''),
-        'server_time' => now_iso(),
-      ]);
-    } catch (Throwable $e) {
-      @error_log('[API] admin_git_sync failed: ' . $e->getMessage());
-      $message = $e->getMessage();
-      $error = match (true) {
-        str_starts_with($message, 'exec_unavailable') => 'exec_unavailable',
-        str_starts_with($message, 'repo_not_found') => 'repo_not_found',
-        str_starts_with($message, 'not_a_git_repo') => 'not_a_git_repo',
-        str_starts_with($message, 'staged_changes_present') => 'staged_changes_present',
-        str_starts_with($message, 'git_add_failed') => 'git_add_failed',
-        str_starts_with($message, 'git_commit_failed') => 'git_commit_failed',
-        str_starts_with($message, 'git_push_failed') => 'git_push_failed',
-        str_starts_with($message, 'git_status_failed') => 'git_status_failed',
-        str_starts_with($message, 'git_index_check_failed') => 'git_index_check_failed',
-        str_starts_with($message, 'git_diff_cached_failed') => 'git_diff_cached_failed',
-        str_starts_with($message, 'git_restore_staged_failed') => 'git_restore_staged_failed',
-        default => 'git_sync_failed',
-      };
-      api_json([
-        'ok' => false,
-        'error' => $error,
-        'detail' => $message,
-        'server_time' => now_iso(),
-      ], 500);
-    }
-  }
-
-  case 'admin_git_status': {
-    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
-    $me = require_logged_in($store);
-    if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
-
-    try {
-      $result = git_repository_status($ROOT_DIR, true);
-      api_json([
-        'ok' => true,
-        'repo_path' => (string)($result['repo_path'] ?? ''),
-        'remote_url' => (string)($result['remote_url'] ?? ''),
-        'branch' => (string)($result['branch'] ?? 'main'),
-        'remote_branch' => (string)($result['remote_branch'] ?? ''),
-        'head' => is_array($result['head'] ?? null) ? [
-          'hash' => (string)($result['head']['hash'] ?? ''),
-          'short_hash' => (string)($result['head']['short_hash'] ?? ''),
-          'subject' => (string)($result['head']['subject'] ?? ''),
-          'author_name' => (string)($result['head']['author_name'] ?? ''),
-          'author_email' => (string)($result['head']['author_email'] ?? ''),
-          'committed_at' => (string)($result['head']['committed_at'] ?? ''),
-        ] : null,
-        'remote_head' => is_array($result['remote_head'] ?? null) ? [
-          'hash' => (string)($result['remote_head']['hash'] ?? ''),
-          'short_hash' => (string)($result['remote_head']['short_hash'] ?? ''),
-          'subject' => (string)($result['remote_head']['subject'] ?? ''),
-          'author_name' => (string)($result['remote_head']['author_name'] ?? ''),
-          'author_email' => (string)($result['remote_head']['author_email'] ?? ''),
-          'committed_at' => (string)($result['remote_head']['committed_at'] ?? ''),
-        ] : null,
-        'ahead_count' => (int)($result['ahead_count'] ?? 0),
-        'behind_count' => (int)($result['behind_count'] ?? 0),
-        'working_tree_clean' => (bool)($result['working_tree_clean'] ?? false),
-        'meaningful_dirty_count' => (int)($result['meaningful_dirty_count'] ?? 0),
-        'meaningful_dirty_paths' => array_values(array_map('strval', $result['meaningful_dirty_paths'] ?? [])),
-        'meaningful_dirty_entries' => array_values(array_map(static function($row){
-          return [
-            'xy' => (string)($row['xy'] ?? ''),
-            'path' => (string)($row['path'] ?? ''),
-          ];
-        }, $result['meaningful_dirty_entries'] ?? [])),
-        'cpanel_yml_exists' => (bool)($result['cpanel_yml_exists'] ?? false),
-        'deploy_ready' => (bool)($result['deploy_ready'] ?? false),
-        'fetch_error' => (string)($result['fetch_error'] ?? ''),
-        'server_time' => now_iso(),
-      ]);
-    } catch (Throwable $e) {
-      @error_log('[API] admin_git_status failed: ' . $e->getMessage());
-      $message = $e->getMessage();
-      $error = match (true) {
-        str_starts_with($message, 'exec_unavailable') => 'exec_unavailable',
-        str_starts_with($message, 'repo_not_found') => 'repo_not_found',
-        str_starts_with($message, 'not_a_git_repo') => 'not_a_git_repo',
-        str_starts_with($message, 'git_status_failed') => 'git_status_failed',
-        default => 'git_status_failed',
-      };
-      api_json([
-        'ok' => false,
-        'error' => $error,
-        'detail' => $message,
-        'server_time' => now_iso(),
-      ], 500);
-    }
-  }
-
-  case 'admin_git_pull': {
-    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
-    $me = require_logged_in($store);
-    require_csrf();
-    if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
-
-    try {
-      $result = git_pull_portal($ROOT_DIR, $me);
-      api_json([
-        'ok' => true,
-        'pulled' => (bool)($result['pulled'] ?? false),
-        'branch' => (string)($result['branch'] ?? 'main'),
-        'message' => (string)($result['message'] ?? ''),
-        'before_head' => (string)($result['before_head'] ?? ''),
-        'after_head' => (string)($result['after_head'] ?? ''),
-        'changed_files' => array_values(array_map(static function($row){
-          return [
-            'status' => (string)($row['status'] ?? ''),
-            'path' => (string)($row['path'] ?? ''),
-            'old_path' => (string)($row['old_path'] ?? ''),
-          ];
-        }, $result['changed_files'] ?? [])),
-        'presync' => is_array($result['presync'] ?? null) ? [
-          'pushed' => (bool)($result['presync']['pushed'] ?? false),
-          'branch' => (string)($result['presync']['branch'] ?? ''),
-          'files' => array_values(array_map('strval', $result['presync']['files'] ?? [])),
-          'status' => array_values(array_map('strval', $result['presync']['status'] ?? [])),
-          'status_entries' => array_values(array_map(static function($row){
-            return [
-              'xy' => (string)($row['xy'] ?? ''),
-              'path' => (string)($row['path'] ?? ''),
-            ];
-          }, $result['presync']['status_entries'] ?? [])),
-          'message' => (string)($result['presync']['message'] ?? ''),
-          'commit_output' => (string)($result['presync']['commit_output'] ?? ''),
-          'push_output' => (string)($result['presync']['push_output'] ?? ''),
-          'head_before' => (string)($result['presync']['head_before'] ?? ''),
-          'head_after' => (string)($result['presync']['head_after'] ?? ''),
-        ] : null,
-        'fetch_output' => (string)($result['fetch_output'] ?? ''),
-        'pull_output' => (string)($result['pull_output'] ?? ''),
-        'server_time' => now_iso(),
-      ]);
-    } catch (Throwable $e) {
-      @error_log('[API] admin_git_pull failed: ' . $e->getMessage());
-      $message = $e->getMessage();
-      $error = match (true) {
-        str_starts_with($message, 'exec_unavailable') => 'exec_unavailable',
-        str_starts_with($message, 'repo_not_found') => 'repo_not_found',
-        str_starts_with($message, 'not_a_git_repo') => 'not_a_git_repo',
-        str_starts_with($message, 'staged_changes_present') => 'staged_changes_present',
-        str_starts_with($message, 'working_tree_dirty') => 'working_tree_dirty',
-        str_starts_with($message, 'git_presync_failed') => 'git_presync_failed',
-        str_starts_with($message, 'git_fetch_failed') => 'git_fetch_failed',
-        str_starts_with($message, 'git_pull_failed') => 'git_pull_failed',
-        str_starts_with($message, 'git_status_failed') => 'git_status_failed',
-        str_starts_with($message, 'git_index_check_failed') => 'git_index_check_failed',
-        default => 'git_pull_failed',
-      };
-      api_json([
-        'ok' => false,
-        'error' => $error,
-        'detail' => $message,
-        'server_time' => now_iso(),
-      ], 500);
-    }
-  }
-
-  case 'admin_git_discard_local': {
-    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
-    $me = require_logged_in($store);
-    require_csrf();
-    if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
-
-    try {
-      $result = git_discard_meaningful_local_changes($ROOT_DIR);
-      api_json([
-        'ok' => true,
-        'discarded' => (bool)($result['discarded'] ?? false),
-        'branch' => (string)($result['branch'] ?? 'main'),
-        'message' => (string)($result['message'] ?? ''),
-        'discarded_paths' => array_values(array_map('strval', $result['discarded_paths'] ?? [])),
-        'restored_paths' => array_values(array_map('strval', $result['restored_paths'] ?? [])),
-        'removed_paths' => array_values(array_map('strval', $result['removed_paths'] ?? [])),
-        'remaining_paths' => array_values(array_map('strval', $result['remaining_paths'] ?? [])),
-        'before_head' => (string)($result['before_head'] ?? ''),
-        'after_head' => (string)($result['after_head'] ?? ''),
-        'server_time' => now_iso(),
-      ]);
-    } catch (Throwable $e) {
-      @error_log('[API] admin_git_discard_local failed: ' . $e->getMessage());
-      $message = $e->getMessage();
-      $error = match (true) {
-        str_starts_with($message, 'exec_unavailable') => 'exec_unavailable',
-        str_starts_with($message, 'repo_not_found') => 'repo_not_found',
-        str_starts_with($message, 'not_a_git_repo') => 'not_a_git_repo',
-        str_starts_with($message, 'git_status_failed') => 'git_status_failed',
-        str_starts_with($message, 'git_discard_failed') => 'git_discard_failed',
-        default => 'git_discard_failed',
-      };
-      api_json([
-        'ok' => false,
-        'error' => $error,
-        'detail' => $message,
-        'server_time' => now_iso(),
-      ], 500);
-    }
   }
 
   case 'admin_clear_site_cache': {
@@ -19293,6 +18565,14 @@ if ($username === '') {
     require_logged_in($store);
     $descFile = $DATA_DIR . '/config/doc_descriptions.json';
     $descs = is_file($descFile) ? (json_decode(file_get_contents($descFile), true) ?: []) : [];
+    // Defensive: strip any empty / whitespace-only keys before returning. A
+    // historical bug allowed `""` keys to leak into the file, which then
+    // matched every doc via the loose-prefix fallback in getDocDesc().
+    if (is_array($descs)) {
+      foreach (array_keys($descs) as $k) {
+        if (trim((string)$k) === '') unset($descs[$k]);
+      }
+    }
     api_json(['ok' => true, 'descriptions' => $descs]);
   }
 
@@ -19604,13 +18884,17 @@ if ($username === '') {
         $descs = is_file($descFile) ? (@json_decode(@file_get_contents($descFile), true) ?: []) : [];
         if (!is_array($descs)) $descs = [];
         $effectiveDescCode = $newCode !== '' ? $newCode : $oldCode;
-        if ($newCode !== '' && $newCode !== $oldCode && array_key_exists($oldCode, $descs) && !array_key_exists($newCode, $descs)) {
+        // Defensive: never write an empty key. A historical bug allowed
+        // `$descs[""]` rows that then matched every doc via the loose-prefix
+        // fallback in getDocDesc(); guard the writer too so the fix sticks.
+        $effectiveDescCodeIsValid = trim((string)$effectiveDescCode) !== '';
+        if ($effectiveDescCodeIsValid && $newCode !== '' && $newCode !== $oldCode && array_key_exists($oldCode, $descs) && !array_key_exists($newCode, $descs)) {
           $descs[$newCode] = $descs[$oldCode];
           unset($descs[$oldCode]);
-        } elseif ($newCode !== '' && $newCode !== $oldCode) {
+        } elseif ($effectiveDescCodeIsValid && $newCode !== '' && $newCode !== $oldCode) {
           unset($descs[$oldCode]);
         }
-        if ($descProvided) {
+        if ($descProvided && $effectiveDescCodeIsValid) {
           if ($newDesc === '') unset($descs[$effectiveDescCode]);
           else $descs[$effectiveDescCode] = $newDesc;
         }

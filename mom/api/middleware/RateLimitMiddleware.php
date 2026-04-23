@@ -64,8 +64,6 @@ class RateLimitMiddleware
             'auth_login'         => ['max' => 10, 'window' => 300],
             'auth_mfa_verify'    => ['max' => 10, 'window' => 300],
             'auth_enroll_verify' => ['max' => 10, 'window' => 300],
-            'admin_git_sync'     => ['max' => 5,  'window' => 60],
-            'admin_git_pull'     => ['max' => 5,  'window' => 60],
         ], $endpointLimits);
 
         // These actions are only reachable through nginx internal auth_request

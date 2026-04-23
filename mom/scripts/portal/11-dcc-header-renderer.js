@@ -27,6 +27,46 @@
 var API_PREFIX = '/api/v1/dcc';
 var DEFAULT_LOCALE = 'en';
 
+/* ── Canonical doc-code extractor (mirrors backend scan_extract_code) ─────
+ * Derive the SHORT canonical doc code from the current document URL's
+ * basename. Used as the authoritative source for which DCC row to fetch,
+ * so a file rename (e.g. qms-man-001-qms-manual.html → qms-man-0012-...)
+ * self-heals the ribbon on next load without needing to rewrite the HTML
+ * body's data-dcc-doc-code attribute. */
+var _DOC_CODE_PATTERNS = [
+    /^(sop-\d{3})/i,
+    /^(frm-\d{3})/i,
+    /^(wi-\d{3})/i,
+    /^(annex-\d{3})/i,
+    /^(ref-\d{3})/i,
+    /^(qms-man-\d+)/i,
+    /^(qms-gdl-\d+)/i,
+    /^(pol-qms-\d+)/i,
+    /^(frm-hr-jd-[a-z]+-\d+)/i,
+    /^(frm-hr-trn-\d+)/i,
+    /^(annex-dep-[a-z]+-\d+)/i,
+    /^(annex-(?:job|org)-\d+)/i,
+    /^(annex-hr-lab-\d+)/i,
+    /^((?:sop|proc|wi|frm|annex|pol|qms|dept)-[a-z]+-\d+)/i,
+    /^(jd-[a-z0-9-]+)/i,
+    /^(dept-[a-z0-9-]+)/i,
+    /^(raci-[a-z0-9-]+)/i,
+    /^(authority-[a-z0-9-]+)/i
+];
+
+function _docCodeFromUrl(){
+    try {
+        var path = (window.location && window.location.pathname) || '';
+        var basename = (path.split('/').pop() || '').replace(/\.[^.]+$/, '');
+        if (!basename) return '';
+        for (var i = 0; i < _DOC_CODE_PATTERNS.length; i++) {
+            var m = basename.match(_DOC_CODE_PATTERNS[i]);
+            if (m && m[1]) return String(m[1]).toUpperCase();
+        }
+    } catch(e) {}
+    return '';
+}
+
 /* ── Self-discovery: derive base paths from our own script URL ────────── */
 var _scriptUrl = (function(){
     try {
@@ -284,7 +324,18 @@ function render(container){
     if (!container || !(container instanceof Element)) {
         return Promise.reject(new Error('dcc_invalid_container'));
     }
-    var docCode = container.getAttribute('data-dcc-doc-code');
+    /* URL-derived code is authoritative. The static data attribute is only a
+     * fallback for cases where the filename doesn't match any known pattern.
+     * This prevents the ribbon from showing stale data after a rename: the
+     * DB row is keyed by doc_code, and rename_doc updates the filename but
+     * not the inline data attribute, so the URL is the only reliable anchor. */
+    var urlCode = _docCodeFromUrl();
+    var attrCode = container.getAttribute('data-dcc-doc-code') || '';
+    var docCode = urlCode || attrCode;
+    if (urlCode && attrCode && urlCode !== attrCode) {
+        // Heal the attribute for any downstream consumer that still reads it.
+        try { container.setAttribute('data-dcc-doc-code', urlCode); } catch(e){}
+    }
     var locale = container.getAttribute('data-dcc-locale') || DEFAULT_LOCALE;
     if (!docCode) {
         _renderError(container, new Error('missing_data_dcc_doc_code_attribute'));
@@ -292,8 +343,13 @@ function render(container){
     }
 
     // Immediate bootstrap paint (if present) so the ribbon doesn't flicker
-    // while we fetch the authoritative payload from the backend.
+    // while we fetch the authoritative payload from the backend. Suppress the
+    // seed when it disagrees with the URL-derived code — the seed is stale
+    // after a rename and showing it briefly would flash the old title on-screen.
     var bootstrap = _readBootstrap(container);
+    if (bootstrap && bootstrap.header && urlCode && attrCode && urlCode !== attrCode) {
+        bootstrap = null;
+    }
     if (bootstrap && bootstrap.header) {
         var seedLabels = bootstrap.labels || {};
         try { _renderInto(container, bootstrap.header, seedLabels); } catch(e){}

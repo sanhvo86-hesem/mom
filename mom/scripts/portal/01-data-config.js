@@ -1372,6 +1372,11 @@ function applyDocsTreeResponse(res, options={}){
   }catch(e){}
   const changed = nextFingerprint !== lastDocsSyncFingerprint || configChanged;
 
+  /* Synchronously overlay whatever DCC values we have cached so the
+   * listing paints correctly on first render. The async fetch below will
+   * then refresh the cache and re-paint if anything changed. */
+  overlayDocsWithDccCache(nextDocs);
+
   DOCS = nextDocs;
   DOCS_LOADED = true;
   FOLDER_TREE = nextTree;
@@ -1382,9 +1387,123 @@ function applyDocsTreeResponse(res, options={}){
     refreshPortalDocsUiAfterSync();
   }
 
+  /* Kick off the DCC header fetch in the background. When it completes we
+   * apply DB values (title/subtitle) over the filename-derived defaults
+   * and trigger a UI refresh. This keeps the DB as the authoritative
+   * source for display while the filesystem scan remains the source of
+   * truth for which files physically exist. */
+  refreshDccOverlayFromServer({refreshUi: !!options.refreshUi});
+
   console.log('[QMS] Loaded ' + DOCS.length + ' documents from server' + (res.cached ? ' (cached)' : '') + ', tree: ' + FOLDER_TREE.length + ' nodes');
   return {changed, count: DOCS.length, cached: !!res.cached};
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+ * DCC OVERLAY — DB as source of truth for document display metadata
+ * ───────────────────────────────────────────────────────────────────────────
+ * The portal scans the filesystem (api.php?action=scan_folders) to discover
+ * which documents physically exist. Titles and descriptions, however, live
+ * in the dcc_document_header table and must be displayed exactly as stored
+ * so that an edit through the "Chỉnh Sửa Tài Liệu" dialog propagates from
+ * DB → listing card / breadcrumb / doc-viewer header on the next render.
+ *
+ * We fetch /api/v1/dcc/documents, cache the result, and overlay whenever
+ * DOCS is repopulated. Writes happen via the DCC upsert endpoint inside
+ * doSaveDocEdit() — this overlay is the READ side. No hardcoding anywhere;
+ * every value comes from either the filesystem (for the code slug) or the
+ * DB (for human-editable fields).
+ * ═══════════════════════════════════════════════════════════════════════ */
+let __DCC_HEADER_CACHE = {};          // map: canonical doc_code → {title, subtitle, revision, status, owner_role_code, approver_role_code, effective_date}
+let __DCC_OVERLAY_IN_FLIGHT = false;  // dedupe concurrent fetches
+let __DCC_OVERLAY_LOADED = false;     // true after first successful fetch
+
+function overlayDocsWithDccCache(docs){
+  if (!Array.isArray(docs)) return;
+  const map = __DCC_HEADER_CACHE || {};
+  /* SCOPE: the filesystem (filename) is the authoritative source for
+   * everything except the two fields the user edits explicitly in the
+   * "Chỉnh Sửa Tài Liệu" dialog — doc_code (ID) and Vietnamese description
+   * (subtitle). For those two, the DB is the single source of truth; the
+   * portal listing, breadcrumb, and doc-viewer header all read them via
+   * __displayCode / __displayDesc which take priority over filename defaults. */
+  for (let i = 0; i < docs.length; i++) {
+    const d = docs[i];
+    if (!d) continue;
+    const code = String(d.code || '').toUpperCase();
+    const row = code && map[code];
+    if (!row) continue;
+    // Keep title driven by the filesystem (filename-derived). Do NOT set
+    // standard_title here — the user wants the filename to remain master
+    // for the on-screen title.
+    // DB subtitle wins over doc_descriptions.json and folder desc. Set
+    // __displayDesc which is the top-priority slot in getDocDisplayDescription().
+    if (row.subtitle) d.__displayDesc = row.subtitle;
+    // Surface DCC metadata for any consumer that wants it (does not change
+    // title display). The ribbon renderer reads directly from the API.
+    if (row.revision)           d.__dccRevision       = row.revision;
+    if (row.status)              d.__dccStatus         = row.status;
+    if (row.owner_role_code)     d.__dccOwner          = row.owner_role_code;
+    if (row.approver_role_code)  d.__dccApprover       = row.approver_role_code;
+    if (row.effective_date)      d.__dccEffectiveDate  = row.effective_date;
+    d.__dccLinked = true;
+  }
+}
+
+async function refreshDccOverlayFromServer(options={}){
+  if (__DCC_OVERLAY_IN_FLIGHT) return;
+  __DCC_OVERLAY_IN_FLIGHT = true;
+  try {
+    const url = '/api/v1/dcc/documents?limit=500';
+    const res = await fetch(url, {credentials: 'same-origin', headers: {'Accept': 'application/json'}, cache: 'no-store'});
+    if (!res.ok) {
+      // 401/403 just means the user isn't logged in yet — don't spam the console.
+      if (res.status !== 401 && res.status !== 403) {
+        console.warn('[DCC] overlay fetch HTTP ' + res.status);
+      }
+      return;
+    }
+    const body = await res.json().catch(() => null);
+    // The controller's success wrapper may nest items under `data.items`, or
+    // return `{items: [...]}` directly. Try every plausible shape.
+    const rows = (body && body.data && Array.isArray(body.data.items)) ? body.data.items
+               : (body && Array.isArray(body.items))                   ? body.items
+               : (body && Array.isArray(body.headers))                 ? body.headers
+               : (body && body.data && Array.isArray(body.data))       ? body.data
+               : (Array.isArray(body) ? body : []);
+    const next = {};
+    for (let i = 0; i < rows.length; i++) {
+      const r = rows[i];
+      if (!r || !r.doc_code) continue;
+      const key = String(r.doc_code).toUpperCase();
+      next[key] = {
+        title:              r.title || '',
+        subtitle:           r.subtitle || '',
+        revision:           r.revision || '',
+        status:             r.status || '',
+        owner_role_code:    r.owner_role_code || '',
+        approver_role_code: r.approver_role_code || '',
+        effective_date:     r.effective_date || ''
+      };
+    }
+    const changed = JSON.stringify(next) !== JSON.stringify(__DCC_HEADER_CACHE);
+    __DCC_HEADER_CACHE = next;
+    __DCC_OVERLAY_LOADED = true;
+    if (Array.isArray(DOCS) && DOCS.length) {
+      overlayDocsWithDccCache(DOCS);
+      if (options.refreshUi !== false && changed) {
+        try { refreshPortalDocsUiAfterSync(); } catch(e){}
+      }
+    }
+    try { console.log('[DCC] overlay loaded ' + Object.keys(next).length + ' rows' + (changed ? ' (changed)' : '')); } catch(e){}
+  } catch (e) {
+    console.warn('[DCC] overlay fetch failed (non-fatal)', e);
+  } finally {
+    __DCC_OVERLAY_IN_FLIGHT = false;
+  }
+}
+
+// Exposed so doSaveDocEdit() can force an immediate refresh after a save.
+window.refreshDccOverlayFromServer = refreshDccOverlayFromServer;
 
 function shouldPauseLiveDocsSync(){
   try{
@@ -1515,7 +1634,13 @@ function getDocDesc(code){
   if(DOC_DESCS[upper]) return DOC_DESCS[upper];
   const slug = upper.replace(/_/g, '-');
   if(DOC_DESCS[slug]) return DOC_DESCS[slug];
+  /* Defensive: skip empty / too-short keys. A corrupt entry like
+   * `DOC_DESCS[""] = "Sổ khóa audit..."` would otherwise match every doc
+   * because `"ANY".startsWith("")` is always true, leaking that text into
+   * unrelated cards. We require the key to have a recognisable code
+   * shape (≥ 3 alphanumerics) before honouring the loose-prefix match. */
   for(const k in DOC_DESCS){
+    if(!k || k.length < 3) continue;
     if(k.startsWith(upper) || upper.startsWith(k)) return DOC_DESCS[k];
   }
   try{

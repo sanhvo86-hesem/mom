@@ -2176,8 +2176,6 @@ var API_CATALOG = [
   { action:'customer_portal_users',   method:'GET',  label:'Danh sách user cổng KH',       module:'Quản trị' },
   { action:'customer_portal_user_create',method:'POST',label:'Tạo user cổng KH',           module:'Quản trị' },
   { action:'customer_portal_analytics',method:'GET', label:'Thống kê cổng KH',              module:'Quản trị' },
-  { action:'admin_git_sync',          method:'POST', label:'Đồng bộ Git',                   module:'Quản trị' },
-  { action:'admin_git_pull',          method:'POST', label:'Git pull',                       module:'Quản trị' },
   { action:'admin_clear_site_cache',  method:'POST', label:'Xóa cache hệ thống',            module:'Quản trị' },
 
   /* ═══ 🔐 XÁC THỰC (Auth) ═════════════════════════════════════════════ */

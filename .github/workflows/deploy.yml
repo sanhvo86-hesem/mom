@@ -56,13 +56,12 @@ jobs:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
+          # Requires the SSH user to have a NOPASSWD sudo rule for the deploy
+          # script. Provision once during VPS setup, e.g.:
+          #   echo "${VPS_USER} ALL=(root) NOPASSWD: /usr/bin/bash ${DEPLOY_PATH}/tools/vps-setup/scripts/deploy.sh" \
+          #     | sudo tee /etc/sudoers.d/qms-deploy
+          # `sudo -n` fails fast (instead of hanging) if NOPASSWD is missing.
           script: |
-            cd ${{ secrets.DEPLOY_PATH }}
-            git fetch origin main
-            git checkout main
-            git pull origin main
-            cd mom
-            composer install --no-dev --optimize-autoloader --no-interaction
-            php scripts/postdeploy_healthcheck.php
-            sudo systemctl reload php-fpm || sudo systemctl reload php8.5-fpm || true
+            set -euo pipefail
+            sudo -n bash ${{ secrets.DEPLOY_PATH }}/tools/vps-setup/scripts/deploy.sh
             echo "Deploy completed at $(date)"

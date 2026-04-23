@@ -1,25 +1,49 @@
 #!/bin/bash
 # =============================================================================
-# HESEM MOM Portal - Deploy Script
-# Replaces .cpanel.yml deployment pipeline.
-# Usage: sudo bash /var/www/deploy.sh
+# HESEM MOM Portal — Production Deploy Script (single source of truth)
+#
+# Replaces the legacy .cpanel.yml pipeline. The portal does not write to the
+# repo working tree; deployments come either from GitHub Actions
+# (.github/workflows/deploy.yml) calling this script over SSH, or from an
+# operator running it manually as the deploy user.
+#
+# Usage:
+#   sudo bash /var/www/eqms.hesemeng.com/tools/vps-setup/scripts/deploy.sh
+#
+# Environment overrides:
+#   SITE_DIR, BRANCH, DEPLOY_USER, WEB_USER, WEB_GROUP, RUN_DB_MIGRATIONS,
+#   RUN_DB_SCHEMA_SMOKE, SKIP_HEALTHCHECK, SKIP_ROLLBACK
 # =============================================================================
 set -euo pipefail
 
 # ── Configuration ─────────────────────────────────────────────────────────
-SITE_DIR="/var/www/eqms.hesemeng.com"
-PRIVATE_DATA="/var/www/data-private"
-BRANCH="main"
-LOG="/var/log/qms-deploy.log"
-DEPLOY_USER="deploy"
+SITE_DIR="${SITE_DIR:-/var/www/eqms.hesemeng.com}"
+PRIVATE_DATA="${PRIVATE_DATA:-/var/www/data-private}"
+BRANCH="${BRANCH:-main}"
+LOG="${LOG:-/var/log/qms-deploy.log}"
+DEPLOY_USER="${DEPLOY_USER:-deploy}"
 WEB_USER="${WEB_USER:-}"
 WEB_GROUP="${WEB_GROUP:-}"
 RUN_DB_MIGRATIONS="${RUN_DB_MIGRATIONS:-1}"
 RUN_DB_SCHEMA_SMOKE="${RUN_DB_SCHEMA_SMOKE:-1}"
+SKIP_HEALTHCHECK="${SKIP_HEALTHCHECK:-0}"
+SKIP_ROLLBACK="${SKIP_ROLLBACK:-0}"
+LOCK_FILE="${LOCK_FILE:-/var/run/qms-deploy.lock}"
+ROLLBACK_TAG_PREFIX="deploy-rollback"
 
 # ── Helpers ───────────────────────────────────────────────────────────────
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') [$1] $2" | tee -a "$LOG"; }
 die() { log "ERROR" "$1"; exit 1; }
+
+# Acquire a non-blocking advisory lock so two deploys cannot interleave
+# (GitHub Actions concurrency + manual deploy is a real failure mode).
+acquire_lock() {
+    exec 9>"$LOCK_FILE" || die "Cannot open lock file $LOCK_FILE"
+    if ! flock -n 9; then
+        die "Another deploy is already running (lock $LOCK_FILE held). Aborting."
+    fi
+    log "INFO" "Deploy lock acquired ($LOCK_FILE)"
+}
 
 detect_php_fpm_identity() {
     local conf user group
@@ -61,15 +85,68 @@ sanitize_php_fpm_pool_runtime_settings() {
     done
 }
 
-log "INFO" "═══ Deploy started ═══"
+# Tag the current HEAD before we change anything so a healthcheck failure can
+# roll back to a known-good revision. Tags are local-only (not pushed).
+ROLLBACK_TAG=""
+create_rollback_tag() {
+    local current_head
+    current_head="$(git -C "$SITE_DIR" rev-parse HEAD 2>/dev/null || echo '')"
+    [ -n "$current_head" ] || return 0
+    ROLLBACK_TAG="${ROLLBACK_TAG_PREFIX}-$(date +%Y%m%d-%H%M%S)"
+    if git -C "$SITE_DIR" tag "$ROLLBACK_TAG" "$current_head" 2>>"$LOG"; then
+        log "INFO" "Rollback tag created: $ROLLBACK_TAG -> $(echo "$current_head" | head -c 8)"
+    else
+        log "WARN" "Could not create rollback tag (continuing without it)"
+        ROLLBACK_TAG=""
+    fi
+}
+
+# Prune old rollback tags so we keep only the last 10.
+prune_rollback_tags() {
+    git -C "$SITE_DIR" tag --list "${ROLLBACK_TAG_PREFIX}-*" \
+        | sort \
+        | head -n -10 \
+        | while IFS= read -r old_tag; do
+            [ -n "$old_tag" ] || continue
+            git -C "$SITE_DIR" tag -d "$old_tag" >/dev/null 2>&1 \
+                && log "INFO" "Pruned old rollback tag: $old_tag" || true
+        done
+}
+
+# Roll back to the pre-deploy tag if the healthcheck fails.
+rollback_to_tag() {
+    if [ "$SKIP_ROLLBACK" = "1" ]; then
+        log "WARN" "SKIP_ROLLBACK=1 — leaving the failed deploy in place"
+        return
+    fi
+    if [ -z "$ROLLBACK_TAG" ]; then
+        log "ERROR" "No rollback tag available — cannot auto-recover"
+        return
+    fi
+    log "WARN" "Rolling back to $ROLLBACK_TAG"
+    git -C "$SITE_DIR" reset --hard "$ROLLBACK_TAG" --quiet || {
+        log "ERROR" "Rollback git reset failed"
+        return
+    }
+    systemctl reload php8.5-fpm 2>/dev/null && log "INFO" "PHP-FPM reloaded after rollback" || true
+    log "WARN" "Rollback complete. Investigate the failed deploy before retrying."
+}
+
+acquire_lock
+
+log "INFO" "═══ Deploy started (branch=$BRANCH, site=$SITE_DIR) ═══"
 
 # ── Pre-flight checks ────────────────────────────────────────────────────
 [ -d "$SITE_DIR/.git" ] || die "$SITE_DIR is not a git repository"
 command -v php8.5 >/dev/null 2>&1 || die "php8.5 not found"
+command -v flock >/dev/null 2>&1 || die "flock not found (required for safe concurrent deploys)"
 detect_php_fpm_identity
 
-# ── Pull latest code ─────────────────────────────────────────────────────
+# ── Capture rollback point BEFORE any change ─────────────────────────────
 cd "$SITE_DIR"
+create_rollback_tag
+
+# ── Pull latest code ─────────────────────────────────────────────────────
 log "INFO" "Fetching origin/$BRANCH..."
 git fetch origin "$BRANCH" --quiet
 BEFORE=$(git rev-parse HEAD)
@@ -82,7 +159,7 @@ else
     log "INFO" "Updated: $(echo "$BEFORE" | head -c 8) → $(echo "$AFTER" | head -c 8)"
 fi
 
-# ── Copy private config (mirrors .cpanel.yml logic) ──────────────────────
+# ── Copy private config that lives outside the repo ──────────────────────
 if [ -d "$PRIVATE_DATA/config" ]; then
     log "INFO" "Copying private config..."
     cp -n "$PRIVATE_DATA/config/"*.json \
@@ -95,6 +172,13 @@ chown -R "$DEPLOY_USER:$WEB_GROUP" "$SITE_DIR"
 find "$SITE_DIR" -type d -exec chmod 755 {} +
 find "$SITE_DIR" -type f -exec chmod 644 {} +
 restore_git_executable_bits
+
+# .git/ stays owned by $DEPLOY_USER:$WEB_GROUP with default 755/644 — the
+# portal status panel only runs `git ls-remote` (network read-only, never
+# touches .git/) so PHP-FPM does not need write access to the repo metadata.
+# Anyone widening these bits to g+w opens an RCE-to-persistence primitive
+# via .git/hooks/, so resist that even if a future feature seems to require
+# it. Use a separate read-only working copy if you ever need it.
 
 # Writable directories (PHP-FPM writes here through the configured pool user/group)
 for dir in uploads online-forms allocations form-workflow/state; do
@@ -149,10 +233,29 @@ fi
 # ── Clear OPcache ────────────────────────────────────────────────────────
 log "INFO" "Clearing OPcache..."
 sanitize_php_fpm_pool_runtime_settings
-# Method 1: via PHP-FPM reload (recommended)
 systemctl reload php8.5-fpm 2>/dev/null && log "INFO" "PHP-FPM reloaded" || true
+
+# ── Post-deploy healthcheck (rolls back on failure) ──────────────────────
+HEALTHCHECK_SCRIPT="$SITE_DIR/mom/scripts/postdeploy_healthcheck.php"
+if [ "$SKIP_HEALTHCHECK" = "1" ]; then
+    log "WARN" "SKIP_HEALTHCHECK=1 — skipping post-deploy verification"
+elif [ -f "$HEALTHCHECK_SCRIPT" ]; then
+    log "INFO" "Running post-deploy healthcheck..."
+    if php8.5 "$HEALTHCHECK_SCRIPT" >>"$LOG" 2>&1; then
+        log "INFO" "Healthcheck passed"
+    else
+        log "ERROR" "Healthcheck FAILED — initiating rollback"
+        rollback_to_tag
+        die "Deploy aborted: healthcheck failed (see $LOG for details)"
+    fi
+else
+    log "WARN" "No healthcheck script at $HEALTHCHECK_SCRIPT — skipping"
+fi
+
+prune_rollback_tags
 
 log "INFO" "═══ Deploy completed ═══"
 echo ""
 echo "Current revision: $(git rev-parse --short HEAD)"
-echo "Deploy log: $LOG"
+[ -n "$ROLLBACK_TAG" ] && echo "Rollback tag:     $ROLLBACK_TAG"
+echo "Deploy log:       $LOG"

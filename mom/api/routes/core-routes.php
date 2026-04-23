@@ -82,10 +82,7 @@ return static function (Router $router, string $dataDir): void {
     
     // Admin
     $router->actions([
-        'admin_git_sync'                   => [AdminController::class, 'gitSync'],
         'admin_git_status'                 => [AdminController::class, 'gitStatus'],
-        'admin_git_pull'                   => [AdminController::class, 'gitPull'],
-        'admin_git_discard_local'          => [AdminController::class, 'gitDiscardLocal'],
         'admin_clear_site_cache'           => [AdminController::class, 'clearCache'],
         'get_data_settings'                => [AdminController::class, 'getSettings'],
         'save_data_settings'               => [AdminController::class, 'saveSettings'],

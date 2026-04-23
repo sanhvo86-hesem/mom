@@ -1891,6 +1891,33 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 /* Hide sync indicator and offline bar */
 #qms-sync-indicator, #qms-offline-bar { display: none !important; }
 
+/* ═══ ISO-map title block — stack doc-name above sub-vn ═══════════════
+ * `.iso-map .title` hosts the rewritten `<strong class="doc-name">` and
+ * `<span class="sub-vn">` emitted by portal_sync_doc_title_blocks. The
+ * siblings are inline by default, which produces "TitleSubtitle" when they
+ * are glued together by DOM serialisation. Force a block cascade so they
+ * always stack vertically — keeps rename output readable even if a future
+ * edit strips the whitespace between the sibling tags. */
+.iso-map .title { display: block; }
+.iso-map .title .doc-name {
+  display: block;
+  font-weight: 600;
+}
+.iso-map .title .sub-vn {
+  display: block;
+  margin-top: 2px;
+  font-weight: 400;
+  color: #475569;
+}
+.iso-map .title .muted {
+  display: block;
+  margin-top: 4px;
+  color: #94a3b8;
+  font-size: 11px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
 /* ═══ TEMPLATE GALLERY ═══ */
 .tpl-gallery-grid {
   display: grid;

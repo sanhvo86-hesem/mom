@@ -72,32 +72,39 @@ final class DocumentControlService
         if ($clean === '') {
             return '';
         }
+        // Strip any trailing extension a paste might include
+        $clean = preg_replace('/\.[A-Z0-9]+$/', '', $clean) ?? $clean;
 
-        // Recognise every type family currently issued by the portal.
-        // Order matters — put longer prefixes first to avoid partial matches.
-        $families = [
-            'QMS-MAN',
-            'QMS-GDL',
-            'POL-QMS',
-            'POL',
-            'SOP',
-            'WI',
-            'ANNEX',
-            'FRM',
-            'REF',
-            'JD',
-            'DEPT',
-            'ORG',
-            'RACI',
-            'TRN',
-            'MRR',
-            'SYS-OPS',
-            'TRN-OPS',
+        /*
+         * Use SPECIFIC patterns — same as scan_extract_code() in the filesystem
+         * scanner and deriveDocCodeFromPath() in the portal. A generic greedy
+         * pattern like `^(FAM-[A-Z0-9]+(?:-[A-Z0-9]+)?)` mis-parses
+         * "QMS-MAN-001-QMS-MANUAL" as "QMS-MAN-001-QMS" because the first
+         * character class captures "001" and the optional group captures "-QMS".
+         * Numeric-tail families must stop at the first digit group.
+         */
+        $patterns = [
+            '/^(SOP-\d{3})/',
+            '/^(FRM-\d{3})/',
+            '/^(WI-\d{3})/',
+            '/^(ANNEX-\d{3})/',
+            '/^(REF-\d{3})/',
+            '/^(QMS-MAN-\d+)/',
+            '/^(QMS-GDL-\d+)/',
+            '/^(POL-QMS-\d+)/',
+            '/^(FRM-HR-JD-[A-Z]+-\d+)/',
+            '/^(FRM-HR-TRN-\d+)/',
+            '/^(ANNEX-DEP-[A-Z]+-\d+)/',
+            '/^(ANNEX-(?:JOB|ORG)-\d+)/',
+            '/^(ANNEX-HR-LAB-\d+)/',
+            '/^((?:SOP|PROC|WI|FRM|ANNEX|POL|QMS|DEPT)-[A-Z]+-\d+)/',
+            '/^(JD-[A-Z0-9-]+)/',
+            '/^(DEPT-[A-Z0-9-]+)/',
+            '/^(RACI-[A-Z0-9-]+)/',
+            '/^(AUTHORITY-[A-Z0-9-]+)/',
         ];
-
-        foreach ($families as $family) {
-            $escaped = preg_quote($family, '/');
-            if (preg_match('/^(' . $escaped . '-[A-Z0-9]+(?:-[A-Z0-9]+)?)/i', $clean, $m)) {
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $clean, $m)) {
                 return strtoupper($m[1]);
             }
         }
@@ -263,6 +270,39 @@ final class DocumentControlService
             throw new InvalidArgumentException('dcc_upsert_invalid_doc_code');
         }
 
+        /* Honour old_doc_code: when the portal is renaming a document, the
+         * client sends both the prior canonical code and the new one. If
+         * the old row exists and the new code differs, rename in place via
+         * the ON UPDATE CASCADE chain (dcc_document_change_request,
+         * dcc_document_change_notice, dcc_document_revision_history all
+         * follow). This keeps the row count stable across edits and prevents
+         * orphans like QMS-MAN-001 + QMS-MAN-0012 from piling up. */
+        $oldCanonical = '';
+        if (isset($input['old_doc_code']) && trim((string)$input['old_doc_code']) !== '') {
+            $oldCanonical = self::canonicalizeCode((string)$input['old_doc_code']);
+        }
+        if ($oldCanonical !== '' && $oldCanonical !== $canonical) {
+            $oldExisting = $this->data->query(
+                "SELECT doc_code FROM dcc_document_header WHERE doc_code = :c LIMIT 1",
+                [':c' => $oldCanonical]
+            ) ?? [];
+            if ($oldExisting !== []) {
+                $newCollision = $this->data->query(
+                    "SELECT doc_code FROM dcc_document_header WHERE doc_code = :c LIMIT 1",
+                    [':c' => $canonical]
+                ) ?? [];
+                if ($newCollision === []) {
+                    $this->data->execute(
+                        "UPDATE dcc_document_header SET doc_code = :new, updated_by = :actor WHERE doc_code = :old",
+                        [':new' => $canonical, ':old' => $oldCanonical, ':actor' => $actor]
+                    );
+                }
+                // If new already exists we fall through to the patch branch below,
+                // which will just update title/subtitle on the existing row and
+                // leave the old row alone (cleanup is a separate operation).
+            }
+        }
+
         $existing = $this->data->query(
             "SELECT doc_code, status FROM dcc_document_header WHERE doc_code = :c LIMIT 1",
             [':c' => $canonical]
@@ -370,7 +410,7 @@ final class DocumentControlService
         }
         $limit  = max(1, min(500, $limit));
         $offset = max(0, $offset);
-        $sql = "SELECT doc_code, title, doc_type, revision, effective_date,
+        $sql = "SELECT doc_code, title, subtitle, doc_type, revision, effective_date,
                        owner_role_code, approver_role_code, status, updated_at
                 FROM dcc_document_header
                 WHERE " . implode(' AND ', $where) . "
