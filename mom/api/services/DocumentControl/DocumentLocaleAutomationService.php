@@ -356,9 +356,11 @@ final class DocumentLocaleAutomationService
     private function runCommandProvider(string $command, array $payload): array
     {
         $spec = [
-            0 => ['pipe', 'w'],
-            1 => ['pipe', 'r'],
-            2 => ['pipe', 'r'],
+            // proc_open pipe modes are defined from the child-process side:
+            // stdin must be readable by the child, stdout/stderr writable.
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
         ];
 
         $process = @proc_open(['/bin/sh', '-lc', $command], $spec, $pipes, $this->rootDir);
