@@ -4,6 +4,26 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>ANNEX-403 - Approved Processor List | HESEM MOM</title>
+<script>
+/* DCC Header bootstrap — computes absolute URLs from location.pathname so the
+ * stylesheet + renderer load correctly regardless of how the document is
+ * served (direct, portal iframe + <base href="../"> injection, doc_stream, …).
+ * The explicit `?v=…` query string busts browser + service-worker caches
+ * whenever the DCC header CSS or renderer ships a new revision. */
+(function () {
+  var DCC_VERSION = '2026-04-23-1';
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css?v=' + DCC_VERSION;
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(js);
+})();
+</script>
 <link href="../../../assets/style.css" rel="stylesheet">
 <style>
  h1, h2, h3 { break-after: avoid; page-break-after: avoid; } tr, td, th { break-inside: avoid; page-break-inside: avoid; }
@@ -41,26 +61,15 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="container">
 <div class="page">
 <div class="page-body">
-<div class="form-header">
-<div class="fh-left">
-<a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
-<div class="fh-company">
-<a href="../../../mom/portal.html">HESEM ENGINEERING</a>
-<span>Tài liệu vận hành • Annex</span>
-</div>
-</div>
-<div class="title">
-<strong class="doc-name">Approved Processor List</strong>
-</div>
-<div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">ANNEX-403</span></div>
-<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Supply Chain Department (Phòng Chuỗi cung ứng)"><span class="entity-code dept-code">D-SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a></span></span></div>
-<div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tổng Giám đốc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
-</div>
+<!-- DCC Document Change Control header (values served by /api/v1/dcc; bootstrap seed is preview-only) -->
+<div class="dcc-header"
+     data-dcc-doc-code="ANNEX-403"
+     data-dcc-locale="vi"
+     data-dcc-logo="../../../../assets/hesem-logo.svg"
+     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;ANNEX-403&quot;,&quot;title&quot;:&quot;Approved Processor List&quot;,&quot;subtitle&quot;:&quot;Tài liệu tham chiếu / chuẩn bổ trợ cho approved processor list, scope approval và rule tạm ngưng.&quot;,&quot;doc_type&quot;:&quot;ANNEX&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
 
 <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi phê duyệt processor, phát hành PO outsource/công đoạn đặc biệt, review expiry/phạm vi/customer restriction, xử lý suspend/block và release hàng nhận về.</div>
-<h1>ANNEX-403 - Approved Processor List</h1>
+
 <div class="section"><h2>1. Mục đích, phạm vi và nguyên tắc khóa processor</h2><p>ANNEX này quản lý danh sách processor được phép dùng cho công đoạn outsource và công đoạn đặc biệt có ảnh hưởng đến chất lượng, tuân thủ, clean/vacuum condition hoặc truy xuất nguồn gốc của job. Không phát hành PO, không chuyển hàng đi outsource, không release hàng nhận về nếu processor không có trong APL hoặc phạm vi không khớp với công đoạn đang đặt.</p><div class="callout-danger"><strong>BLOCK</strong> processor không có trong APL; phạm vi cert không khớp quy trình/spec đang mua; cert hết hạn tại thời điểm xử lý job; customer/CSR yêu cầu nguồn cụ thể nhưng PO chọn nguồn khác; có dấu hiệu sub-tier không khai báo; cert/CoC có dữ liệu giả hoặc không truy xuất được.</div><div class="matrix"><div class="card"><strong>Nguyên tắc 1</strong><br>APL quản lý theo site cụ thể, không theo tên công ty chung chung. Cùng một tập đoàn nhưng khác nhà máy xử lý được xem là processor khác nhau.</div><div class="card"><strong>Nguyên tắc 2</strong><br>Approved cho quy trình nào chỉ có giá trị cho đúng quy trình đó. Approved anodize không tự động cho plating, cleaning hoặc heat treat.</div><div class="card"><strong>Nguyên tắc 3</strong><br>Customer phạm vi, CSR, Nadcap hoặc approval đặc biệt có ưu tiên cao hơn trạng thái approved nội bộ.</div><div class="card"><strong>Nguyên tắc 4</strong><br>Fallback source chỉ được dùng khi đã nằm trong APL và đúng phạm vi. Không tự ý "đổi sang chỗ quen biết" để cứu tiến độ.</div></div></div>
 <div class="section"><h2>2. Cấu trúc master register APL</h2><p>APL live phải được duy trì như master register có kiểm soát. Danh sách in, ảnh chụp màn hình cũ hoặc file Excel rời không được coi là nguồn chuẩn nếu không khớp với register hiện hành.</p><div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Field APL bắt buộc</th><th>Ý nghĩa vận hành</th><th>Rule</th></tr></thead><tbody><tr><td>Processor ID / site code</td><td>Nhận diện duy nhất theo site thực hiện công đoạn</td><td>Không gom nhiều site vào một dòng duy nhất.</td></tr><tr><td>Tên pháp lý + địa chỉ site</td><td>Xác định đúng địa điểm xử lý</td><td>Nếu chuyển site phải xem như processor mới.</td></tr><tr><td>Quy trình family / detailed phạm vi</td><td>Anodize, passivation, plating, cleaning, heat treat, NDT, outsource machining, weld/braze, leak test...</td><td>Phạm vi phải đủ chi tiết tới mức có thể so khớp với spec khách hàng/HESEM.</td></tr><tr><td>Spec / standard / revision được phép</td><td>MIL, ASTM, AMS, customer spec, internal spec</td><td>Không release PO nếu spec đang mua nằm ngoài phạm vi.</td></tr><tr><td>Customer phạm vi / CSR restriction</td><td>Khách hàng nào cho phép, khách hàng nào không cho phép, source-only</td><td>Customer-controlled source phải đánh dấu rõ.</td></tr><tr><td>Certification / accreditation bằng chứng</td><td>ISO 9001, Nadcap, customer approval, quy trình cert, đánh giá hồ sơ</td><td>Phải có Ngày hiệu lực và Ngày hết hạn.</td></tr><tr><td>Risk class / trạng thái</td><td>R1-R4; Approved / Conditional / Probation / Suspend / Block</td><td>Trạng thái quyết định có được phát hành PO hay không.</td></tr><tr><td>thời gian dẫn (thời gian giao) chuẩn / backup source</td><td>Thông tin điều độ và dự phòng</td><td>R1 critical nên có backup source; nếu không có phải khai báo nguồn đơn (single-source / nguồn đơn) risk.</td></tr><tr><td>Receipt cổng kiểm soát requirement</td><td>Bộ chứng từ chứng nhận, thickness/hardness/test report, first-lot approval, kiểm tra đầu vào level</td><td>Dùng để chặn hàng nhận về khi thiếu.</td></tr><tr><td>Last satisfactory lot / last đánh giá / next review</td><td>Theo dõi tình trạng thực tế</td><td>Quá hạn review phải chuyển tối thiểu sang Hold-for-review.</td></tr></tbody></table></div><div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>SSOT đề nghị</th><th>Đường dẫn</th></tr></thead><tbody><tr><td>APL Register (List)</td><td>M365: CNC-IMS-HUB/Lists/PUR-Approved-Processor-List</td></tr><tr><td>Bằng chứng (đánh giá/cert phạm vi)</td><td>M365: CNC-IMS-HUB/QMS-Hồ sơ/PUR/APL-Bằng chứng/<processor>/</processor></td></tr></tbody></table></div></div>
 <div class="section"><h2>3. Trạng thái model và rule chọn processor</h2><div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Trạng thái</th><th>Được phát hành PO?</th><th>Điều kiện sử dụng</th></tr></thead><tbody><tr><td>Approved</td><td>Có</td><td>Phạm vi, cert, customer requirement và review còn hiệu lực; receipt cổng kiểm soát đã định nghĩa rõ.</td></tr><tr><td>Conditional</td><td>Có điều kiện</td><td>Chỉ dùng cho đúng điều kiện đã ghi: first-lot only, họ chi tiết cụ thể, customer cụ thể, hoặc cần 100% xác minh đầu vào.</td></tr><tr><td>Probation</td><td>Hạn chế</td><td>Chỉ dùng khi <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html" title="Buyer / Purchasing (Nhân viên mua hàng)"><span class="entity-code role-code">BUY</span></a> + <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> phê duyệt cho từng job; phải có bao vây plan và review sau từng lô.</td></tr><tr><td>Suspend</td><td>Không</td><td>Tạm dừng do cert hết hạn, NCR major, pending đánh giá, unresolved SCAR, quy trình drift hoặc supplier change chưa review.</td></tr><tr><td>Block</td><td>Không</td><td>PHẢI loại khỏi sử dụng khi có fake cert, repeat escape, unapproved sub-tier, customer ban, mất năng lực hoặc vi phạm nghiêm trọng.</td></tr></tbody></table></div><div class="callout-warn"><strong>Quy tắc áp dụng</strong> Một processor ở trạng thái Suspend hoặc Block không được dùng làm fallback. Nếu job đang chạy mà processor bị Suspend, Planning/Purchasing phải dừng phát hành lô mới, đánh giá WIP/outbound lot đang treo và escalte theo ANNEX-117 trong ngày.</div></div>

@@ -3,30 +3,36 @@
 <head>
 <meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>23 | HESEM MOM</title>
+<script>
+/* DCC Header bootstrap — computes absolute URLs from location.pathname so the
+ * stylesheet + renderer load correctly regardless of how the document is
+ * served (direct, portal iframe + <base href="../"> injection, doc_stream, …).
+ * The explicit `?v=…` query string busts browser + service-worker caches
+ * whenever the DCC header CSS or renderer ships a new revision. */
+(function () {
+  var DCC_VERSION = '2026-04-23-1';
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css?v=' + DCC_VERSION;
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(js);
+})();
+</script>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
 <link rel="stylesheet" href="../../../../assets/style.css"></head>
 <body>
 <div class="container"><div class="page"><div class="page-body">
-<div class="form-header">
-<div class="fh-left">
- <a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
- <div class="fh-company">
- <a href="../../../mom/portal.html">HESEM ENGINEERING</a>
- <span>Tài liệu kiểm soát</span>
- </div>
-</div>
-<div class="title">
-<strong class="doc-name">23</strong>
-<span class="sub-vn"></span>
-</div>
-<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">SYS-OPS-23</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Kỹ thuật viên setup)"><span class="entity-code role-code">SET</span></a></span></span><td>Phát hành hồ sơ + phiếu cài đặt ký xác nhận</td><td>Copy file <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lập trình viên CAM / NC)"><span class="entity-code role-code">CAM</span></a> rời, không link chủ / gốc</td>
-<tr><td>12</td><td>Lưu kiểm tra hồ sơ đúng thư viện + lưu giữ</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a></span></td><td>IR/FAI/CMM PDF có label</td><td>Lưu trên máy cá nhân rồi gửi email</td></tr>
-<tr><td>13</td><td>Dựng Bộ bằng chứng chỉ đọc tại Z_Audit_Evidence_Pack + hết hạn</td><td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> / QMS + <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhân viên báo giá)"><span class="entity-code role-code">EST</span></a></span></td><td>Bộ bằng chứng + log chia sẻ (FRM log)</td><td>Gửi file rời qua email</td></tr>
-<tr><td>14</td><td>Chạy truy vấn đánh giá log cho sự kiện trọng yếu (chia sẻ/download/delete)</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a></span></td><td>Kết quả truy vấn + biên bản xử lý</td><td>Chạy xong không lưu bằng chứng</td></tr>
-<tr><td>15</td><td>Đóng hồ sơ job: đóng băng WIP → hồ sơ</td><td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> / QMS + <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhóm điều hành tuyến đầu) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></td><td>Biên bản kết thúc / đóng hồ sơ + trạng thái "đã đóng băng"</td><td>kết thúc / đóng hồ sơ xong vẫn sửa file</td></tr>
-
-
-</div></div></div></div><!-- /container/page/page-body -->
+<!-- DCC Document Change Control header (values served by /api/v1/dcc; bootstrap seed is preview-only) -->
+<div class="dcc-header"
+     data-dcc-doc-code="SYS-OPS-23"
+     data-dcc-locale="vi"
+     data-dcc-logo="../../../../assets/hesem-logo.svg"
+     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;SYS-OPS-23&quot;,&quot;title&quot;:&quot;23&quot;,&quot;subtitle&quot;:&quot;Tài liệu đào tạo &amp; năng lực&quot;,&quot;doc_type&quot;:&quot;REF&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div></div><!-- /container/page/page-body -->
 
 <script src="../../../assets/app.js"></script>
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>

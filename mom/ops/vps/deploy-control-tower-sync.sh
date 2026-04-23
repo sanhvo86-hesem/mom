@@ -247,6 +247,24 @@ reload_runtime() {
   run_remote_cmd "set -e; nginx -t >/dev/null; systemctl reload nginx; php_fpm_service=\$(systemctl list-units --type=service --all 'php*-fpm.service' --no-legend 2>/dev/null | awk '{print \$1}' | head -n 1 || true); if [ -n \"\$php_fpm_service\" ]; then systemctl reload \"\$php_fpm_service\"; fi"
 }
 
+# Re-apply DCC header standardisation after every deploy. The rsync step above
+# brings local doc HTML files (which are ALWAYS in pre-DCC form because the
+# repo's source-of-truth docs are authored without the runtime injection)
+# onto the VPS, clobbering the in-place migration. Running migrate.php here
+# is idempotent and restores the canonical DCC ribbon for every controlled
+# document in <1s per file. The DB password comes from PHP-FPM's pool env.
+run_dcc_batch_migrate() {
+  if [ "${RUN_DCC_BATCH:-1}" != "1" ]; then
+    echo "==> Skipping DCC batch migrate (RUN_DCC_BATCH=0)"
+    return
+  fi
+  echo "==> Re-apply DCC header standardisation across mom/docs/**"
+  run_remote_cmd "set -e; cd '${APP_DIR}'; \
+    DB_PASS=\$(grep -h '^env\\\\[DB_PASS\\\\]' /etc/php/*/fpm/pool.d/*.conf 2>/dev/null | head -n1 | sed -E 's/.*=\\\\s*//') ; \
+    if [ -z \"\$DB_PASS\" ]; then echo '[dcc-batch] DB_PASS env not found in PHP-FPM pool, skipping' >&2; exit 0; fi; \
+    DB_PASS=\"\$DB_PASS\" php mom/tools/dcc-batch/migrate.php 2>&1 | tail -15"
+}
+
 remote_smoke() {
   if [ "$RUN_REMOTE_SMOKE" != "1" ]; then
     return
@@ -294,5 +312,6 @@ run_db_migrations
 run_installers
 fix_permissions
 reload_runtime
+run_dcc_batch_migrate
 remote_smoke
 print_summary

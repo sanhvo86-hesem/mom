@@ -4,6 +4,26 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ANNEX-506 - FOD Prevention Program | HESEM MOM</title>
+<script>
+/* DCC Header bootstrap — computes absolute URLs from location.pathname so the
+ * stylesheet + renderer load correctly regardless of how the document is
+ * served (direct, portal iframe + <base href="../"> injection, doc_stream, …).
+ * The explicit `?v=…` query string busts browser + service-worker caches
+ * whenever the DCC header CSS or renderer ships a new revision. */
+(function () {
+  var DCC_VERSION = '2026-04-23-1';
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css?v=' + DCC_VERSION;
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(js);
+})();
+</script>
 <link rel="stylesheet" href="../../../assets/style.css">
 <style>
 
@@ -43,26 +63,15 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="container">
  <div class="page">
  <div class="page-body">
- <div class="form-header">
- <div class="fh-left">
- <a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
- <div class="fh-company">
- <a href="../../../mom/portal.html">HESEM ENGINEERING</a>
- <span>Tài liệu vận hành • Annex</span>
- </div>
- </div>
- <div class="title">
-<strong class="doc-name">FOD Prevention Program</strong>
-</div>
- <div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">ANNEX-506</span></div>
-<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a></span></span></div>
-<div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tổng Giám đốc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
- </div>
+ <!-- DCC Document Change Control header (values served by /api/v1/dcc; bootstrap seed is preview-only) -->
+<div class="dcc-header"
+     data-dcc-doc-code="ANNEX-506"
+     data-dcc-locale="vi"
+     data-dcc-logo="../../../../assets/hesem-logo.svg"
+     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;ANNEX-506&quot;,&quot;title&quot;:&quot;FOD Prevention Program&quot;,&quot;subtitle&quot;:&quot;Tài liệu tham chiếu / chuẩn bổ trợ cho chương trình phòng ngừa fod.&quot;,&quot;doc_type&quot;:&quot;ANNEX&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
  
  <div class="note"><strong>ÁP DỤNG KHI</strong><br>Áp dụng cho mọi khu vực có khả năng phát sinh hoặc mang theo dị vật: gia công, setup, kiểm tra, vệ sinh và đóng gói, kho, xuất đi, outsource và nhận hàng.</div>
- <h1>ANNEX-506 - FOD Prevention Program</h1>
+ 
  <div class="section"><h2>1. Mục đích và cách dùng</h2><p>ANNEX này thiết lập chương trình phòng ngừa FOD cho toàn bộ dòng chảy Job: gia công, đo lường, vệ sinh, đóng gói, lưu kho, outsource và nhận lại. Tài liệu này dùng để chuẩn hóa mức kiểm soát, cách đánh giá, cách phân vùng, tiêu chí chấp nhận khu vực và cách xử lý khi phát hiện FOD hoặc nghi ngờ sản phẩm thoát / bỏ qua do FOD.</p><div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> Xem FOD là trách nhiệm của mọi bộ phận chạm vào sản phẩm, dụng cụ, bao gói và khu vực làm việc, và kiểm soát FOD trước mỗi lần chuyển bước.</div></div><div class="section"><h2>2. Từ điển FOD và phân vùng kiểm soát</h2><h3>2.1 FOD phải nhận diện</h3><ul><li><strong>Kim loại:</strong> phoi (chip), mạt mài, bavia rời, mảnh mảnh dao (insert), mảnh dao, phoi vụn, sạn từ bàn kẹp/jaw.</li><li><strong>Phi kim:</strong> giẻ lau, giấy, băng keo, nylon, zip tie, xốp / bọt vụn, tem rơi, mảnh bút đánh dấu.</li><li><strong>Phần cứng nhỏ:</strong> vít, dài đen, pin, chốt, miếng chêm (shim), đầu kẹp, ốc chêm.</li><li><strong>Ô nhiễm do vận hành:</strong> dầu bẩn, dấu tay, lông găng, tóc, bụi đóng gói, vật lạ trong túi/khay/hộp.</li></ul><h3>2.2 Phân vùng kiểm soát</h3><div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Vùng</th><th>Mô tả</th><th>Yêu cầu bắt buộc</th><th>Tần suất kiểm</th></tr></thead><tbody><tr><td>Khu vực A — Clean/quan trọng / nghiêm trọng</td><td>Chi tiết đã hoàn thiện, chi tiết chân không/bán dẫn, khu vệ sinh và đóng gói, khu rò rỉ/vệ sinh / sạch sẽ</td><td>Không để đồ cá nhân; dòng / chuyền-thông quan / giải phóng trước và sau Job; cuối cùng-xem / tra cứu 100%; dụng cụ riêng theo khu</td><td>Đầu ca, trước đổi Job, trước đóng gói, cuối ca</td></tr>
 <tr><td>Khu vực B — Được kiểm soát gia công cơ khí</td><td>Máy CNC, khu setup, bàn gá, CMM, khu làm lại được phê duyệt</td><td>5S theo ca; khay phoi (chip) riêng; dụng cụ có đứng cạnh học việc/ID; vệ sinh trước mẫu đầu (tiên chi tiết / sản phẩm) và trước bàn giao</td><td>Đầu ca, sau chuyển đổi (chuyển công đoạn), khi kết thúc Job</td></tr>
 <tr><td>Khu vực C — Tổng / Chung hậu cần</td><td>Khu khu vực chuẩn bị / sắp xếp, kho, xuất đi, nhận hàng, khu chờ outsource</td><td>cách ly rõ; vật tư bao gói sạch; không để vật lạ trong hậu cần đơn vị</td><td>Mỗi đợt đóng gói/nhập/xuất</td></tr>

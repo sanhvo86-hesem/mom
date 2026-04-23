@@ -4,6 +4,26 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>ANNEX-401 - Supplier Risk Model and Scorecard Method | HESEM MOM</title>
+<script>
+/* DCC Header bootstrap — computes absolute URLs from location.pathname so the
+ * stylesheet + renderer load correctly regardless of how the document is
+ * served (direct, portal iframe + <base href="../"> injection, doc_stream, …).
+ * The explicit `?v=…` query string busts browser + service-worker caches
+ * whenever the DCC header CSS or renderer ships a new revision. */
+(function () {
+  var DCC_VERSION = '2026-04-23-1';
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css?v=' + DCC_VERSION;
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(js);
+})();
+</script>
 <link href="../../../assets/style.css" rel="stylesheet">
 <style>
  h1, h2, h3 { break-after: avoid; page-break-after: avoid; } tr, td, th { break-inside: avoid; page-break-inside: avoid; }
@@ -40,26 +60,15 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <body>
 <div class="container">
 <div class="page">
-<div class="page-body"><div class="form-header">
-<div class="fh-left">
-<a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
-<div class="fh-company">
-<a href="../../../mom/portal.html">HESEM ENGINEERING</a>
-<span>Tài liệu vận hành • Annex</span>
-</div>
-</div>
-<div class="title">
-<strong class="doc-name">Mô hình rủi ro và phương pháp thẻ điểm nhà cung cấp</strong>
-</div>
-<div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">ANNEX-401</span></div>
-<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Supply Chain Department (Phòng Chuỗi cung ứng)"><span class="entity-code dept-code">D-SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a></span></span></div>
-<div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tổng Giám đốc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
-</div>
+<div class="page-body"><!-- DCC Document Change Control header (values served by /api/v1/dcc; bootstrap seed is preview-only) -->
+<div class="dcc-header"
+     data-dcc-doc-code="ANNEX-401"
+     data-dcc-locale="vi"
+     data-dcc-logo="../../../../assets/hesem-logo.svg"
+     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;ANNEX-401&quot;,&quot;title&quot;:&quot;Mô hình rủi ro và phương pháp thẻ điểm nhà cung cấp&quot;,&quot;subtitle&quot;:&quot;Tài liệu tham chiếu / chuẩn bổ trợ cho mô hình rủi ro nhà cung cấp và phương pháp scorecard.&quot;,&quot;doc_type&quot;:&quot;ANNEX&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
 
 <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi lựa chọn nguồn cung mới, tái đánh giá nhà cung cấp hiện hữu, rà soát định kỳ, quyết định áp dụng trạng thái thử việc hoặc chặn, xác định mức kiểm soát đầu vào khi nhận hàng, và xem xét nhu cầu nguồn kép hoặc phương án dự phòng.</div>
-<h1>ANNEX-401 - Mô hình rủi ro và phương pháp thẻ điểm nhà cung cấp</h1>
+
 <div class="callout-info"><b>Nguyên tắc nền:</b> Nhà cung cấp không được đánh giá chỉ theo giá và thời gian giao hàng. Mọi nguồn cung ảnh hưởng tới CTQ, truy xuất nguồn gốc, tính toàn vẹn của chứng chỉ, công đoạn đặc biệt, độ ổn định giao hàng hoặc yêu cầu khách hàng PHẢI đi qua mô hình rủi ro và thẻ điểm này trước khi cấp PO hoặc cho phép đưa vào sản xuất.</div>
 <h2>1. Mục đích và phạm vi áp dụng</h2>
 <p>ANNEX này quy định hai lớp kiểm soát song song: <b>(1) mức rủi ro nền của nhà cung cấp</b> và <b>(2) hiệu năng thực tế theo thẻ điểm</b>. Hai lớp này cùng quyết định trạng thái nhà cung cấp, tần suất rà soát, mức xác minh đầu vào, nhu cầu nguồn kép, việc kích hoạt thử việc hoặc chặn, và điều kiện phục hồi.</p>

@@ -3,70 +3,35 @@
 <head>
 <meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>14 | HESEM MOM</title>
+<script>
+/* DCC Header bootstrap — computes absolute URLs from location.pathname so the
+ * stylesheet + renderer load correctly regardless of how the document is
+ * served (direct, portal iframe + <base href="../"> injection, doc_stream, …).
+ * The explicit `?v=…` query string busts browser + service-worker caches
+ * whenever the DCC header CSS or renderer ships a new revision. */
+(function () {
+  var DCC_VERSION = '2026-04-23-1';
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css?v=' + DCC_VERSION;
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(js);
+})();
+</script>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
 <link rel="stylesheet" href="../../../../assets/style.css"></head>
 <body>
 <div class="container"><div class="page"><div class="page-body">
-<div class="form-header">
-<div class="fh-left">
- <a class="brand-logo" href="../../../mom/portal.html"><img alt="HESEM Logo" src="../../../assets/hesem-logo.svg"></a>
- <div class="fh-company">
- <a href="../../../mom/portal.html">HESEM ENGINEERING</a>
- <span>Tài liệu kiểm soát</span>
- </div>
-</div>
-<div class="title">
-<strong class="doc-name">14</strong>
-<span class="sub-vn"></span>
-</div>
-<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">SYS-OPS-14</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Kỹ thuật viên setup)"><span class="entity-code role-code">SET</span></a></span>
-
-<tr>
-<td>Nhận hàng gói hồ sơ + chứng chỉ</td>
-<td><code>REC-[PO]-[Lot]-[YYYYMMDD]</code></td>
-<td>M365/SharePoint → HESEM-QMS-SSOT Nhận hàng hồ sơ</td>
-<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bộ phận Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></td>
-</tr>
-<tr>
-<td>IR/FAI/IPQC/FQC</td>
-<td><code>IR-[WO]-[Op]-[YYYYMMDD]</code></td>
-<td>M365/SharePoint → HESEM-QMS-SSOT <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a> kiểm tra hồ sơ</td>
-<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a></span></td>
-</tr>
-<tr>
-<td>Bộ hồ sơ giao hàng bảng kiểm</td>
-<td><code>SHIP-[WO]-[Customer]-[YYYYMMDD]</code></td>
-<td>M365/SharePoint → HESEM-QMS-SSOT Giao vận hồ sơ</td>
-<td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bộ phận Kho)"><span class="entity-code dept-code">D-WHS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a></span></td>
-</tr>
-<tr>
-<td>Thay đổi Tác động Matrix (khi thay đổi)</td>
-<td><code>CIM-[ID]-[YYYYMMDD]</code></td>
-<td>M365/SharePoint → CNC-IMS-HUB → QMS-Được kiểm soát-Tài liệu → biểu mẫu</td>
-<td>người chịu trách nhiệm thay đổi + <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a></td>
-</tr>
-<tr>
-<td>NCR/CAPA/MRB (khi NG)</td>
-<td><code>NCR-[ID]-[YYYYMMDD]</code> / <code>CAPA-[ID]</code></td>
-<td>M365/SharePoint → HESEM-QMS-SSOT NCR/CAPA kho lưu trữ</td>
-<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a></span></td>
-</tr>
-<tr>
-<td>Hồ sơ đào tạo (chuyên cần / điểm danh + OJT + test)</td>
-<td><code>TRN-SYS-OPS-14-[Name]-[YYYYMMDD]</code></td>
-<td>M365/SharePoint → HESEM-QMS-SSOT Training hồ sơ</td>
-<td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td>
-</tr>
-
-
-<div class="req"><span class="req-tag shall">PHẢI</span>
-<div>
- Khi hệ thống lưu trữ chưa sẵn sàng, owner hệ thống <b>PHẢI</b> điền M365/SharePoint → HESEM-QMS-SSOT ngay trong bảng MRR và đóng trong vòng 30 Ngày kể từ Ngày phát hành mô-đun.
- </div></div></div>
-</div>
-<script src="../../../assets/app.js"></script>
-<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
-
-</div></div></div>
+<!-- DCC Document Change Control header (values served by /api/v1/dcc; bootstrap seed is preview-only) -->
+<div class="dcc-header"
+     data-dcc-doc-code="SYS-OPS-14"
+     data-dcc-locale="vi"
+     data-dcc-logo="../../../../assets/hesem-logo.svg"
+     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;SYS-OPS-14&quot;,&quot;title&quot;:&quot;14&quot;,&quot;subtitle&quot;:&quot;Tài liệu đào tạo &amp; năng lực&quot;,&quot;doc_type&quot;:&quot;REF&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div></div></div>
 </body>
 </html>
