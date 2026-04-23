@@ -811,9 +811,9 @@ pre, code, .mono {
   overflow-wrap: anywhere;
 }
 
-/* --- Google Translate UI hard-hide (VI→EN silent translation) --- */
-/* We use Google Translate only to translate document content (when requested).
-   The banner/menu/tooltips must never show in either Vietnamese or English mode. */
+/* --- Legacy translator UI cleanup --- */
+/* Defensive hide only. Controlled document delivery now uses locale artifacts,
+   not browser live translation. */
 iframe.goog-te-banner-frame,
 iframe.goog-te-menu-frame,
 .goog-te-banner-frame,
@@ -833,7 +833,7 @@ html, body {
   padding-top: 0 !important;
 }
 
-/* Hide Google Translate UI (new classes) */
+/* Hide legacy translator UI classes */
 [class^="VIpgJd-"],[class*=" VIpgJd-"],[class*="VIpgJd-"]{display:none!important;}
 html,body{top:0!important;}
 

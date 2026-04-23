@@ -8,7 +8,7 @@ Every controlled HTML document should include all three runtime markers below:
 
 1. `class="form-header"`
 2. `id="docContent"`
-3. `<script src="../../../assets/app.js"></script>`
+3. `<script src="../../../assets/app.js"></script>` or the correct relative equivalent for that document path
 
 Inside `.form-header .title`, the controlled schema is:
 
@@ -22,6 +22,23 @@ These markers are required so the portal viewer can:
 - extract the document body through `docContent`
 - keep document-side runtime behaviors aligned with the viewer
 - preserve document code typography without collapsing code and title into one plain-text node
+- keep document locale markers aligned with the viewer without using browser live translation
+
+## Runtime rule
+
+`assets/app.js` is a locale bridge and runtime hardening script.
+
+It must not:
+
+- load Google Translate
+- mutate document text through browser MT
+- persist absolute production-host URLs into controlled HTML
+
+It may:
+
+- expose document locale to the portal/viewer
+- rerender locale-aware DCC metadata
+- apply document layout/table/runtime fixes
 
 ## What is excluded
 

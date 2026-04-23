@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 744,
-        "generated_at": "2026-04-22T12:03:45+00:00"
+        "table_count": 745,
+        "generated_at": "2026-04-23T04:17:47+00:00"
     },
     "tables": {
         "ai_conversations": {
@@ -1375,6 +1375,18 @@
             "extended_in": [],
             "primary_key": "label_id",
             "foreign_keys": [],
+            "contract": null
+        },
+        "dcc_document_locale_variant": {
+            "defined_in": "152_dcc_document_locale_variants.sql",
+            "extended_in": [],
+            "primary_key": "locale_variant_id",
+            "foreign_keys": [
+                {
+                    "col": "doc_code",
+                    "ref": "dcc_document_header(doc_code)"
+                }
+            ],
             "contract": null
         },
         "demand": {

@@ -45,21 +45,9 @@ final class DocumentHeaderService
      *     labels: array<string, array{short: string, long: string, sort: int}>
      * }
      */
-    public function render(string $docCode, string $locale = 'en'): array
+    public function render(string $docCode, string $locale = 'vi'): array
     {
-        $rows = $this->data->query(
-            "SELECT doc_code, title, subtitle, doc_type, revision, effective_date,
-                    owner_role_code, approver_role_code, iso_clause, status
-             FROM dcc_document_header
-             WHERE doc_code = :c
-             LIMIT 1",
-            [':c' => $docCode]
-        ) ?? [];
-
-        if ($rows === []) {
-            throw new RuntimeException('dcc_document_not_found:' . $docCode);
-        }
-        $header = $rows[0];
+        $header = (new DocumentControlService($this->data))->getLocalizedHeader($docCode, $locale);
         $header['labels'] = $this->labelsFor($locale);
         $header['effective_date'] = $this->formatIsoDate($header['effective_date'] ?? null);
         return $header;
@@ -72,7 +60,7 @@ final class DocumentHeaderService
      */
     public function labelsFor(string $locale): array
     {
-        $locale = strtolower(trim($locale)) ?: 'en';
+        $locale = $this->normaliseLocale($locale);
         $rows = $this->data->query(
             "SELECT label_key, short_label, long_label, sort_order
              FROM dcc_document_header_label
@@ -94,6 +82,17 @@ final class DocumentHeaderService
             ];
         }
         return $out;
+    }
+
+    private function normaliseLocale(string $locale): string
+    {
+        $locale = strtolower(trim($locale));
+        if ($locale === '') {
+            return 'vi';
+        }
+        $locale = str_replace('_', '-', $locale);
+        $parts = explode('-', $locale, 2);
+        return $parts[0] !== '' ? $parts[0] : 'vi';
     }
 
     private function formatIsoDate(mixed $value): string

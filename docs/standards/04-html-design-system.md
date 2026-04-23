@@ -778,9 +778,21 @@ Multiple documents override grid at 960px in `<style>` builtin:
 
 ---
 
-## 14. Google Translate (completely hidden)
+## 14. Document Locale Delivery
 
-Style.css has a CSS block that hides the entire Google Translate UI (banner, menu, tooltip, balloon). This allows using the Google Translate API to translate content without displaying the translation interface.
+Controlled documents must not rely on browser live translation.
+
+Allowed model:
+
+- Vietnamese canonical source
+- explicit English artifact
+- locale-aware metadata projection
+
+Forbidden model:
+
+- Google Translate
+- hidden browser translation widgets
+- DOM mutation after render as the publication mechanism
 
 ---
 

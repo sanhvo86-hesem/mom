@@ -711,8 +711,17 @@ function openVersionPreview(code, idx){
   const versions=getDocVersions(code);
   const v=versions[idx];
   const doc=DOCS.find(d=>d.code===code);
-  const accessUrl=getVersionAccessUrl(doc,v);
-  if(!v || !accessUrl) return;
+  const accessUrl=(typeof getVersionLocaleAccessUrl==='function')
+    ? getVersionLocaleAccessUrl(doc,v)
+    : getVersionAccessUrl(doc,v);
+  if(!v || !accessUrl){
+    if(lang==='en'){
+      showToast(lang==='en'
+        ? 'English version history preview is available only for the current published locale artifact'
+        : 'Lịch sử phiên bản tiếng Anh chỉ khả dụng cho artifact locale hiện hành đã phát hành');
+    }
+    return;
+  }
   const isWorkbook = (typeof isDownloadOnlyDoc==='function') ? isDownloadOnlyDoc(doc) : false;
 
   const overlay=document.createElement('div');
@@ -768,7 +777,7 @@ function openVersionPreview(code, idx){
     overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.remove();});
     return;
   }
-  // Sync language (VI/EN) for the preview iframe
+  // Sync locale metadata for the preview iframe when the loaded artifact supports it.
   try{
     const fr=overlay.querySelector('iframe');
     if(fr){

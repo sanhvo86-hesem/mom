@@ -14,6 +14,8 @@
    - KHÔNG BAO GIỜ viết tiếng Việt không dấu (Tong quan → Tổng quan)
    - Labels, placeholders, tooltips, error messages: Vietnamese có dấu
    - Block catalog labels: Vietnamese có dấu
+   - Exception bắt buộc: controlled document language switching phải tuân theo `37-document-translation-publication-workflow.md`
+   - `_t(...)` áp dụng cho portal shell/runtime UI; không được dùng như cơ chế browser live translation cho document body
 
 3. **Database migrations**: English
    - Table names, column names: English

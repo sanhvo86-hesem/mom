@@ -156,8 +156,8 @@ function startEdit(code){
     const doc=(typeof window._resolveDocRecord === 'function') ? window._resolveDocRecord(code) : DOCS.find(d=>d.code===code);
     if(!doc||!canEdit(doc)) return;
     const resolvedCode = String(doc.code || '').trim();
-    // Safety: do not allow editing while Google Translate is active (EN mode)
-    // to avoid saving translated DOM back into the Vietnamese master HTML.
+    // Safety: do not allow editing while a non-canonical locale view is active
+    // to avoid saving translated or preview DOM back into the Vietnamese master HTML.
     if(lang==='en'){
       showToast(lang==='en'?'↩ Switch to Vietnamese to edit':'↩ Vui lòng chuyển về tiếng Việt để chỉnh sửa');
       try{ setLang('vi'); }catch(e){}
@@ -856,6 +856,7 @@ function relPrefixForDocPath(docPath){
   try{
     if(!docPath) return '';
     const parts = String(docPath).split('/').filter(Boolean);
+    if(parts[0] === 'mom') parts.shift();
     const depth = Math.max(0, parts.length - 1);
     return '../'.repeat(depth);
   }catch(e){ return ''; }
@@ -863,10 +864,58 @@ function relPrefixForDocPath(docPath){
 
 function qmsDocAppBridgeUrl(){
   try{
-    return new URL('../assets/app.js', window.location.href).href;
+    const basePath = String(window.location.pathname || '').replace(/\/portal\.html.*$/,'').replace(/\/$/,'');
+    return (basePath || '/mom') + '/assets/app.js';
   }catch(e){
-    return '../assets/app.js';
+    return '/mom/assets/app.js';
   }
+}
+
+function isRenderableLocaleArtifactState(state){
+  const normalized = String(state || '').trim().toLowerCase();
+  return normalized === 'machine_preview'
+    || normalized === 'review_pending'
+    || normalized === 'reviewed'
+    || normalized === 'released';
+}
+
+function getDocLocaleView(doc){
+  const locale = lang === 'en' ? 'en' : 'vi';
+  const baseFile = String(doc && doc.path || '').trim();
+  if(!doc) return { locale: locale, mode: 'source', file: '', available: false, translationState: 'missing' };
+  if(locale !== 'en'){
+    return {
+      locale: 'vi',
+      mode: 'source',
+      file: baseFile,
+      available: !!baseFile,
+      translationState: 'source',
+      localeVariantExists: true,
+      isLocaleFallback: false
+    };
+  }
+  const artifactPath = String(doc.__dccArtifactPath || '').trim();
+  const translationState = String(doc.__dccTranslationState || '').trim().toLowerCase();
+  if(artifactPath && isRenderableLocaleArtifactState(translationState)){
+    return {
+      locale: 'en',
+      mode: 'artifact',
+      file: artifactPath,
+      available: true,
+      translationState: translationState || 'released',
+      localeVariantExists: !!doc.__dccLocaleVariantExists,
+      isLocaleFallback: !!doc.__dccLocaleFallback
+    };
+  }
+  return {
+    locale: 'en',
+    mode: 'unavailable',
+    file: '',
+    available: false,
+    translationState: translationState || 'missing',
+    localeVariantExists: !!doc.__dccLocaleVariantExists,
+    isLocaleFallback: true
+  };
 }
 
 function qmsLooksLikeStrayDocCss(text){
@@ -966,6 +1015,46 @@ function repairBrokenDocStyleArtifacts(docOrRoot){
   }
 }
 
+function stripTransientRuntimeArtifacts(docOrRoot){
+  try{
+    const isDoc = !!(docOrRoot && docOrRoot.nodeType === 9);
+    const root = isDoc ? docOrRoot.documentElement : docOrRoot;
+    if(!root || !root.querySelectorAll) return false;
+    let removed = false;
+    const selectors = [
+      'link[href*="kaspersky-labs.com"]',
+      'script[src*="kaspersky-labs.com"]',
+      'style.abn_style',
+      'style#portal-doc-viewer-zoom-style',
+      'link[data-dcc-header-stylesheet]',
+      'style[data-qms-runtime-transient="1"]',
+      'link[data-qms-runtime-transient="1"]',
+      'script[data-qms-runtime-transient="1"]'
+    ];
+    root.querySelectorAll(selectors.join(',')).forEach(function(node){
+      if(node && node.parentNode){
+        node.parentNode.removeChild(node);
+        removed = true;
+      }
+    });
+    const html = (root.tagName === 'HTML') ? root : root.querySelector('html');
+    if(html){
+      html.setAttribute('lang', 'vi');
+      html.removeAttribute('data-qms-view-lang');
+      if(html.classList && html.classList.contains('js-ready')){
+        html.classList.remove('js-ready');
+      }
+    }
+    const body = root.querySelector('body');
+    if(body){
+      body.removeAttribute('data-qms-view-lang');
+    }
+    return removed;
+  }catch(e){
+    return false;
+  }
+}
+
 // Fix broken relative asset paths inside iframe document content.
 // Documents use paths like "../../assets/hesem-logo.svg" which resolve
 // correctly only from /mom/docs/<one-level>/ but NOT from deeper paths.
@@ -1013,6 +1102,7 @@ function ensureIframeDocLanguageBridge(iframe){
         resolve(true);
         return;
       }
+      var desiredSrc = qmsDocAppBridgeUrl();
       var existing = idoc.querySelector('script[data-qms-portal-bridge="1"], script[src*="/assets/app.js"], script[src*="assets/app.js"]');
       var done = false;
       function finish(ok){
@@ -1024,6 +1114,12 @@ function ensureIframeDocLanguageBridge(iframe){
         return !!(iwin.HesemApp && typeof iwin.HesemApp.applyDocumentLanguage==='function');
       }
       if(existing){
+        try{
+          existing.src = desiredSrc;
+          existing.async = true;
+          existing.defer = true;
+          existing.setAttribute('data-qms-portal-bridge', '1');
+        }catch(_normalizeErr){}
         if(checkReady()){
           finish(true);
           return;
@@ -1034,7 +1130,7 @@ function ensureIframeDocLanguageBridge(iframe){
         return;
       }
       var script = idoc.createElement('script');
-      script.src = qmsDocAppBridgeUrl();
+      script.src = desiredSrc;
       script.async = true;
       script.defer = true;
       script.setAttribute('data-qms-portal-bridge', '1');
@@ -1103,11 +1199,28 @@ function scheduleIframeDocumentLanguageSync(iframe, targetLang){
 function ensureDocHtmlHasLanguageBridge(clone, docPath){
   try{
     if(!clone) return;
-    if(clone.querySelector('script[src*="/assets/app.js"], script[src*="assets/app.js"]')) return;
+    const desiredSrc = relPrefixForDocPath(docPath) + 'assets/app.js';
+    const scripts = Array.from(clone.querySelectorAll('script[data-qms-portal-bridge="1"], script[src*="/assets/app.js"], script[src*="assets/app.js"]'));
+    if(scripts.length){
+      scripts.forEach(function(node, index){
+        if(index === 0){
+          node.setAttribute('src', desiredSrc);
+          node.setAttribute('data-qms-portal-bridge', '1');
+          node.async = true;
+          node.defer = true;
+          return;
+        }
+        if(node.parentNode) node.parentNode.removeChild(node);
+      });
+      return;
+    }
     const body = clone.querySelector('body') || clone;
     if(!body) return;
     const script = clone.ownerDocument.createElement('script');
-    script.setAttribute('src', relPrefixForDocPath(docPath) + 'assets/app.js');
+    script.setAttribute('src', desiredSrc);
+    script.setAttribute('data-qms-portal-bridge', '1');
+    script.async = true;
+    script.defer = true;
     body.appendChild(script);
   }catch(e){}
 }
@@ -1207,6 +1320,7 @@ function buildFullDocHtmlFromIframe(editedInnerHtml, docPath){
         }
       }catch(_e){}
 
+      stripTransientRuntimeArtifacts(clone);
       repairBrokenDocStyleArtifacts(clone);
       ensureDocHtmlHasLanguageBridge(clone, docPath);
 
@@ -1684,6 +1798,11 @@ async function rejectDoc(code){
 async function restoreVersion(code, idx){
   const doc=DOCS.find(d=>d.code===code);
   if(!doc) return;
+  if(lang==='en'){
+    showToast(lang==='en'?'↩ Switch to Vietnamese to restore a source revision':'↩ Vui lòng chuyển về tiếng Việt để khôi phục bản gốc');
+    try{ setLang('vi'); }catch(e){}
+    return;
+  }
   if(typeof isDownloadOnlyDoc==='function' && isDownloadOnlyDoc(doc)){
     showToast(lang==='en'?'Restore to draft is not available for workbook versions. Start a new revision and upload a workbook draft instead.':'Khôi phục thành nháp chưa áp dụng cho workbook. Hãy bắt đầu phiên bản mới rồi upload workbook nháp.');
     return;
@@ -1740,9 +1859,8 @@ function getLatestWorkingFile(code){
 
 function getDocViewFile(doc){
   if(!doc) return null;
-  // Master view must always point to the current released file (version history "Hiện tại")
-  // to keep sidebar/header/document metadata consistent.
-  return doc.path;
+  const localeView = getDocLocaleView(doc);
+  return localeView.available ? localeView.file : null;
 }
 
 let viewerDocZoom = 100;
@@ -1937,6 +2055,7 @@ function loadDocContent(code){
   const doc=(typeof window._resolveDocRecord === 'function') ? window._resolveDocRecord(code) : DOCS.find(d=>d.code===code);
   if(!doc) return;
   const resolvedCode = String(doc.code || '').trim();
+  const localeView = getDocLocaleView(doc);
 
   const edited=getEditedHtml(resolvedCode);
   const iframe=document.getElementById('doc-iframe');
@@ -1956,12 +2075,56 @@ function loadDocContent(code){
   }catch(e){}
 
   if(typeof isDownloadOnlyDoc==='function' && isDownloadOnlyDoc(doc)){
+    if(lang==='en' && !localeView.available){
+      iframe.onload=function(){
+        if(loading) loading.style.display='none';
+        iframe.style.opacity='1';
+      };
+      iframe.srcdoc = `<!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <style>
+            body{margin:0;background:var(--bg-surface-alt,#f8fafc);font-family:Segoe UI,Arial,sans-serif;color:var(--text-primary,#0f172a)}
+            .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+            .card{max-width:760px;background:#fff;border:1px solid #dbe3ef;border-radius:20px;padding:28px;box-shadow:0 16px 40px rgba(15,23,42,.06)}
+            .eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin-bottom:10px}
+            h1{margin:0 0 12px;font-size:28px;line-height:1.2}
+            p{margin:0 0 16px;line-height:1.7;color:#475569}
+            .actions{display:flex;gap:12px;flex-wrap:wrap}
+            .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:12px;text-decoration:none;font-weight:700;border:1px solid #cbd5e1;background:#fff;color:#0f172a;cursor:pointer;font:inherit}
+            .btn.primary{background:#0f766e;color:#fff;border-color:#0f766e}
+          </style>
+        </head>
+        <body>
+          <div class="wrap">
+            <div class="card">
+              <div class="eyebrow">Locale artifact required</div>
+              <h1>English translation is not published yet</h1>
+              <p>This controlled file does not have a published English artifact yet. The portal will not open the Vietnamese source while the English tab is active.</p>
+              <div class="actions">
+                <button class="btn primary" type="button" onclick="parent.setLang('vi')">View Vietnamese source</button>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>`;
+      setTimeout(function(){
+        if(loading && loading.style.display!=='none'){ loading.style.display='none'; iframe.style.opacity='1'; }
+      }, 300);
+      return;
+    }
     const state=getDocState(resolvedCode)||{};
     const versions=getDocVersions(resolvedCode)||[];
     const currentEntry=versions.find(v=>isCurrentVersionEntry(doc,v)) || versions.find(v=>v && (v.status==='approved' || v.status==='initial_release')) || null;
     const workingEntry=versions.find(v=>v && (v.status==='draft' || v.status==='in_review')) || null;
-    const currentUrl=currentEntry ? getVersionAccessUrl(doc,currentEntry) : buildDocStreamUrl(doc,true);
-    const workingUrl=workingEntry ? getVersionAccessUrl(doc,workingEntry) : '';
+    const currentUrl=(lang==='en' && localeView.available && localeView.file)
+      ? buildDocStreamUrl(doc,true,localeView.file)
+      : (currentEntry ? getVersionAccessUrl(doc,currentEntry) : buildDocStreamUrl(doc,true));
+    const workingUrl=(lang==='en')
+      ? ''
+      : (workingEntry ? getVersionAccessUrl(doc,workingEntry) : '');
     const revision=String(getDocRevision(doc)||'0');
     const status=String(getDocStatus(doc)||'approved');
     const title=(typeof escapeHtml==='function') ? escapeHtml(getDocDisplayTitle(doc)||doc.title||doc.code) : (getDocDisplayTitle(doc)||doc.title||doc.code);
@@ -1988,7 +2151,7 @@ function loadDocContent(code){
       iframe.style.opacity='1';
     };
     iframe.srcdoc = `<!DOCTYPE html>
-      <html lang="vi">
+      <html lang="${lang==='en'?'en':'vi'}">
       <head>
         <meta charset="utf-8">
         <style>
@@ -2040,7 +2203,50 @@ function loadDocContent(code){
   // Load the best file (live approved OR archive working copy), then inject any
   // unsaved local edits (editor-only) on top.
   setTimeout(function(){
-    const viewFile = getDocViewFile(doc) || doc.path;
+    const localeView = getDocLocaleView(doc);
+    const viewFile = localeView.file;
+    if(!localeView.available || !viewFile){
+      iframe.onload=function(){
+        if(loading) loading.style.display='none';
+        iframe.style.opacity='1';
+      };
+      iframe.srcdoc = `<!DOCTYPE html>
+        <html lang="${lang==='en'?'en':'vi'}">
+        <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <style>
+            body{margin:0;background:var(--bg-surface-alt,#f8fafc);font-family:Segoe UI,Arial,sans-serif;color:var(--text-primary,#0f172a)}
+            .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+            .card{max-width:760px;background:#fff;border:1px solid #dbe3ef;border-radius:20px;padding:28px;box-shadow:0 16px 40px rgba(15,23,42,.06)}
+            .eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin-bottom:10px}
+            h1{margin:0 0 12px;font-size:28px;line-height:1.2}
+            p{margin:0 0 16px;line-height:1.7;color:#475569}
+            .actions{display:flex;gap:12px;flex-wrap:wrap}
+            .btn{display:inline-flex;align-items:center;justify-content:center;padding:12px 18px;border-radius:12px;text-decoration:none;font-weight:700;border:1px solid #cbd5e1;background:#fff;color:#0f172a;cursor:pointer;font:inherit}
+            .btn.primary{background:#0f766e;color:#fff;border-color:#0f766e}
+          </style>
+        </head>
+        <body>
+          <div class="wrap">
+            <div class="card">
+              <div class="eyebrow">${lang==='en' ? 'Locale artifact required' : 'Cần artifact ngôn ngữ'}</div>
+              <h1>${lang==='en' ? 'English translation is not published yet' : 'Bản tiếng Anh chưa được phát hành'}</h1>
+              <p>${lang==='en'
+                ? 'This controlled document does not have a published English artifact yet. The portal fails closed instead of rendering browser-translated or mixed-language content.'
+                : 'Tài liệu kiểm soát này chưa có artifact tiếng Anh được phát hành. Portal fail-closed thay vì render nội dung dịch live hoặc trộn ngôn ngữ.'}</p>
+              <div class="actions">
+                <button class="btn primary" type="button" onclick="parent.setLang('vi')">${lang==='en' ? 'View Vietnamese source' : 'Xem nguồn tiếng Việt'}</button>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>`;
+      setTimeout(function(){
+        if(loading && loading.style.display!=='none'){ loading.style.display='none'; iframe.style.opacity='1'; }
+      }, 300);
+      return;
+    }
     const src='../'+viewFile;
     const bust='t='+Date.now();
     iframe.src = src + (src.indexOf('?')>=0 ? '&' : '?') + bust;
@@ -2070,9 +2276,8 @@ function loadDocContent(code){
             }, 1200);
           }
         }catch(e){}
-        // Sync language after injection, even for legacy docs that never loaded assets/app.js.
-        // Retry a few times in EN mode because Google Translate inside the iframe
-        // can initialize asynchronously after the document load event.
+        // Keep the iframe document aware of the active locale so DCC/header
+        // components can re-render from authoritative locale data.
         try{ scheduleIframeDocumentLanguageSync(iframe, lang); }catch(e){}
         try{ if(typeof attachIframeLinkBridge==='function') attachIframeLinkBridge(iframe, doc, viewFile); }catch(e){}
         try{ attachIframeViewerZoom(iframe); }catch(e){}

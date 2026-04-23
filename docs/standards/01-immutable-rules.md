@@ -237,7 +237,7 @@ The following rules are permanently locked in and apply to all QMS documents:
 
 2. **Do not arbitrarily rename files/slugs/document codes.** Do not rename manually or rename locally outside of control. If you need to change the standard name, it can only be done through the governments rename flow locked at `23-portal-standard-title-filename-ssot.md` to synchronize filename + SSOT title + header + link update.
 
-3. **Only Vietnamese content displayed to users.** File names, HTML attributes, CSS selectors, JS identifier/logic remain in English; but every Vietnamese UI string in HTML/JS must have full marks.
+3. **Vietnamese canonical source, controlled locale artifacts for other languages.** File names, HTML attributes, CSS selectors, JS identifier/logic remain in English; Vietnamese source content remains the editable master; other locales must be delivered as controlled artifacts according to `37-document-translation-publication-workflow.md`.
 
 4. **Only keep department names, terms, and abbreviations when absolutely necessary.** Prioritize Vietnamese for content, keep English only for abbreviations and terms that do not have exact equivalents.
 

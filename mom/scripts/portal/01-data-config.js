@@ -1429,6 +1429,12 @@ function overlayDocsWithDccCache(docs){
   for (let i = 0; i < docs.length; i++) {
     const d = docs[i];
     if (!d) continue;
+    d.__dccLocale = lang === 'en' ? 'en' : 'vi';
+    d.__dccArtifactPath = '';
+    d.__dccTranslationState = '';
+    d.__dccLocaleFallback = false;
+    d.__dccLocaleVariantExists = false;
+    d.__dccLocaleUnavailable = false;
     const code = String(d.code || '').toUpperCase();
     const row = code && map[code];
     if (!row) continue;
@@ -1437,7 +1443,12 @@ function overlayDocsWithDccCache(docs){
     // for the on-screen title.
     // DB subtitle wins over doc_descriptions.json and folder desc. Set
     // __displayDesc which is the top-priority slot in getDocDisplayDescription().
-    if (row.subtitle) d.__displayDesc = row.subtitle;
+    const translationMissing = (lang === 'en') && !!row.is_locale_fallback && !row.locale_variant_exists;
+    d.__dccLocaleVariantExists = !!row.locale_variant_exists;
+    d.__dccLocaleFallback = !!row.is_locale_fallback;
+    d.__dccLocaleUnavailable = translationMissing;
+    if (translationMissing) d.__displayDesc = '';
+    else if (row.subtitle) d.__displayDesc = row.subtitle;
     // Surface DCC metadata for any consumer that wants it (does not change
     // title display). The ribbon renderer reads directly from the API.
     if (row.revision)           d.__dccRevision       = row.revision;
@@ -1445,6 +1456,8 @@ function overlayDocsWithDccCache(docs){
     if (row.owner_role_code)     d.__dccOwner          = row.owner_role_code;
     if (row.approver_role_code)  d.__dccApprover       = row.approver_role_code;
     if (row.effective_date)      d.__dccEffectiveDate  = row.effective_date;
+    if (row.artifact_rel_path)   d.__dccArtifactPath   = row.artifact_rel_path;
+    if (row.translation_state)   d.__dccTranslationState = row.translation_state;
     d.__dccLinked = true;
   }
 }
@@ -1453,23 +1466,30 @@ async function refreshDccOverlayFromServer(options={}){
   if (__DCC_OVERLAY_IN_FLIGHT) return;
   __DCC_OVERLAY_IN_FLIGHT = true;
   try {
-    const url = '/api/v1/dcc/documents?limit=500';
-    const res = await fetch(url, {credentials: 'same-origin', headers: {'Accept': 'application/json'}, cache: 'no-store'});
-    if (!res.ok) {
-      // 401/403 just means the user isn't logged in yet — don't spam the console.
-      if (res.status !== 401 && res.status !== 403) {
-        console.warn('[DCC] overlay fetch HTTP ' + res.status);
+    const locale = lang === 'en' ? 'en' : 'vi';
+    const pageSize = 250;
+    const rows = [];
+    for (let offset = 0; ; offset += pageSize) {
+      const url = '/api/v1/dcc/documents?limit=' + pageSize + '&offset=' + offset + '&locale=' + encodeURIComponent(locale);
+      const res = await fetch(url, {credentials: 'same-origin', headers: {'Accept': 'application/json'}, cache: 'no-store'});
+      if (!res.ok) {
+        // 401/403 just means the user isn't logged in yet — don't spam the console.
+        if (res.status !== 401 && res.status !== 403) {
+          console.warn('[DCC] overlay fetch HTTP ' + res.status);
+        }
+        return;
       }
-      return;
+      const body = await res.json().catch(() => null);
+      // The controller's success wrapper may nest items under `data.items`, or
+      // return `{items: [...]}` directly. Try every plausible shape.
+      const pageRows = (body && body.data && Array.isArray(body.data.items)) ? body.data.items
+                     : (body && Array.isArray(body.items))                   ? body.items
+                     : (body && Array.isArray(body.headers))                 ? body.headers
+                     : (body && body.data && Array.isArray(body.data))       ? body.data
+                     : (Array.isArray(body) ? body : []);
+      rows.push.apply(rows, pageRows);
+      if (pageRows.length < pageSize) break;
     }
-    const body = await res.json().catch(() => null);
-    // The controller's success wrapper may nest items under `data.items`, or
-    // return `{items: [...]}` directly. Try every plausible shape.
-    const rows = (body && body.data && Array.isArray(body.data.items)) ? body.data.items
-               : (body && Array.isArray(body.items))                   ? body.items
-               : (body && Array.isArray(body.headers))                 ? body.headers
-               : (body && body.data && Array.isArray(body.data))       ? body.data
-               : (Array.isArray(body) ? body : []);
     const next = {};
     for (let i = 0; i < rows.length; i++) {
       const r = rows[i];
@@ -1482,7 +1502,11 @@ async function refreshDccOverlayFromServer(options={}){
         status:             r.status || '',
         owner_role_code:    r.owner_role_code || '',
         approver_role_code: r.approver_role_code || '',
-        effective_date:     r.effective_date || ''
+        effective_date:     r.effective_date || '',
+        locale_variant_exists: !!r.locale_variant_exists,
+        is_locale_fallback: !!r.is_locale_fallback,
+        artifact_rel_path:  r.artifact_rel_path || '',
+        translation_state:  r.translation_state || ''
       };
     }
     const changed = JSON.stringify(next) !== JSON.stringify(__DCC_HEADER_CACHE);
@@ -1876,6 +1900,7 @@ function getDocStandardTitle(doc){
 
 function getDocDisplayDescription(doc){
   if(!doc) return '';
+  if(lang==='en' && doc.__dccLocaleUnavailable) return '';
   const runtimeDesc = String(doc.__displayDesc || '').trim();
   if(runtimeDesc) return runtimeDesc;
   const explicitDesc = String(getDocDesc(doc.code) || '').trim();
@@ -2587,22 +2612,9 @@ function setLang(l){
   }catch(e){}
   document.getElementById('btn-lang-vi').className = l==='vi'?'active':'';
   document.getElementById('btn-lang-en').className = l==='en'?'active':'';
-  // Google Translate UI is disabled on the portal.
-  // Document translation (VI→EN) is handled inside each document via /assets/app.js.
-  // Sync language to ALL document iframes (main viewer + version preview)
-  try{
-    const frames=[];
-    const main=document.getElementById('doc-iframe');
-    if(main) frames.push(main);
-    document.querySelectorAll('.vp-overlay iframe').forEach(f=>frames.push(f));
-    frames.forEach(f=>{
-      try{
-        if(typeof scheduleIframeDocumentLanguageSync==='function') scheduleIframeDocumentLanguageSync(f, l);
-        else if(typeof syncIframeDocumentLanguage==='function') syncIframeDocumentLanguage(f, l);
-        else postDocLanguageMessage(f, {type:'setLang',lang:l});
-      }catch(_e){}
-    });
-  }catch(e){}
+  // Locale switching is handled by portal rerender + locale-aware document artifacts.
+  // Do not mutate iframe DOM through live translation.
+  try{ document.querySelectorAll('.vp-overlay').forEach(el=>el.remove()); }catch(e){}
   // Update sidebar footer
   const ct = document.getElementById('collapse-text');
   if(ct) ct.textContent = T('collapse');
@@ -2637,6 +2649,17 @@ function setLang(l){
   if(currentPage==='access') renderAccessMatrix();
   if(currentPage==='admin') renderAdmin();
   try{ if(typeof fixMojibakeDom==='function') fixMojibakeDom(document.body); }catch(e){}
+  try{
+    Promise.resolve(refreshDccOverlayFromServer({refreshUi:false})).then(function(){
+      try{
+        if(currentPage==='documents') renderDocuments();
+      }catch(_e){}
+      const dv2=document.getElementById('doc-viewer');
+      if(dv2&&dv2.classList.contains('active')&&currentDoc&&!editMode){
+        try{ openDocPreview(currentDoc); }catch(_e){}
+      }
+    }).catch(function(){});
+  }catch(e){}
   // If doc viewer is open, refresh its header and workflow
   const dv=document.getElementById('doc-viewer');
   if(dv&&dv.classList.contains('active')&&currentDoc){
@@ -2645,22 +2668,11 @@ function setLang(l){
       updateDocViewerHeader(doc);
       renderWorkflowPanel(doc);
       renderVersionHistory(doc);
-      // Keep the current iframe mounted and re-sync language in place.
-      // Reload only if the viewer has not loaded any document yet.
+      // Reload using the locale-aware view selector so the viewer swaps to the
+      // correct artifact instead of mutating the current DOM in place.
       if(!editMode){
         try{
-          const iframe = document.getElementById('doc-iframe');
-          const iframeReady = !!(iframe && (
-            iframe.getAttribute('src') ||
-            iframe.getAttribute('srcdoc') ||
-            (iframe.contentDocument && iframe.contentDocument.body && iframe.contentDocument.body.childNodes.length)
-          ));
-          if(iframeReady){
-            if(typeof scheduleIframeDocumentLanguageSync==='function') scheduleIframeDocumentLanguageSync(iframe, l);
-            else if(typeof syncIframeDocumentLanguage==='function') syncIframeDocumentLanguage(iframe, l);
-          }else{
-            loadDocContent(currentDoc);
-          }
+          loadDocContent(currentDoc);
         }catch(e){}
       }
     }

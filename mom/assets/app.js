@@ -3,140 +3,7 @@
   var _qmsApplyingTables = false;
   var _qmsTableDebounce = null;
   var _qmsResizeDebounce = null;
-  var _qmsTranslateReady = null;
-  var _qmsTranslateComboWait = null;
   var _qmsDocLang = 'vi';
-  var _qmsReloadingForVietnamese = false;
-
-  function setGoogTransCookieValue(raw) {
-    var host = String(window.location.hostname || '').trim();
-    var attrs = '; path=/; SameSite=Lax';
-    document.cookie = 'googtrans=' + raw + attrs;
-    if (host && host.indexOf('.') > -1) {
-      document.cookie = 'googtrans=' + raw + attrs + '; domain=' + host;
-      var bare = host.replace(/^www\./i, '');
-      if (bare && bare !== host) {
-        document.cookie = 'googtrans=' + raw + attrs + '; domain=' + bare;
-      }
-    }
-  }
-
-  function clearGoogTransCookie() {
-    setGoogTransCookieValue('; expires=Thu, 01 Jan 1970 00:00:00 GMT');
-  }
-
-  function ensureTranslateHost() {
-    var host = document.getElementById('qms-google-translate');
-    if (host) return host;
-    host = document.createElement('div');
-    host.id = 'qms-google-translate';
-    host.setAttribute('aria-hidden', 'true');
-    host.style.cssText = 'position:fixed;left:-9999px;top:-9999px;width:1px;height:1px;overflow:hidden;opacity:0;pointer-events:none';
-    document.body.appendChild(host);
-    return host;
-  }
-
-  function ensureGoogleTranslateReady() {
-    if (_qmsTranslateReady) return _qmsTranslateReady;
-    _qmsTranslateReady = new Promise(function (resolve, reject) {
-      var timeoutId = 0;
-
-      function fail(err) {
-        if (timeoutId) clearTimeout(timeoutId);
-        reject(err instanceof Error ? err : new Error(String(err || 'translate_init_failed')));
-      }
-
-      function boot() {
-        try {
-          ensureTranslateHost();
-          if (!(window.google && window.google.translate && window.google.translate.TranslateElement)) {
-            fail(new Error('translate_api_missing'));
-            return;
-          }
-          if (!window._qmsGoogleTranslateInstance) {
-            window._qmsGoogleTranslateInstance = new window.google.translate.TranslateElement({
-              pageLanguage: 'vi',
-              includedLanguages: 'en,vi',
-              autoDisplay: false,
-              multilanguagePage: false
-            }, 'qms-google-translate');
-          }
-          if (timeoutId) clearTimeout(timeoutId);
-          resolve(window._qmsGoogleTranslateInstance);
-        } catch (err) {
-          fail(err);
-        }
-      }
-
-      timeoutId = window.setTimeout(function () {
-        fail(new Error('translate_init_timeout'));
-      }, 15000);
-
-      if (window.google && window.google.translate && window.google.translate.TranslateElement) {
-        boot();
-        return;
-      }
-
-      var prevInit = window.googleTranslateElementInit;
-      window.googleTranslateElementInit = function () {
-        try { if (typeof prevInit === 'function') prevInit(); } catch (_e) {}
-        boot();
-      };
-
-      var script = document.querySelector('script[data-qms-google-translate="1"]');
-      if (script) return;
-
-      script = document.createElement('script');
-      script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-      script.async = true;
-      script.defer = true;
-      script.setAttribute('data-qms-google-translate', '1');
-      script.onerror = function () {
-        fail(new Error('translate_script_load_failed'));
-      };
-      document.head.appendChild(script);
-    });
-    _qmsTranslateReady = _qmsTranslateReady.catch(function (err) {
-      _qmsTranslateReady = null;
-      throw err;
-    });
-    return _qmsTranslateReady;
-  }
-
-  function waitForTranslateCombo() {
-    if (_qmsTranslateComboWait) return _qmsTranslateComboWait;
-    _qmsTranslateComboWait = new Promise(function (resolve, reject) {
-      var started = Date.now();
-      (function poll() {
-        var combo = document.querySelector('select.goog-te-combo');
-        if (combo) {
-          resolve(combo);
-          return;
-        }
-        if ((Date.now() - started) > 12000) {
-          reject(new Error('translate_combo_missing'));
-          return;
-        }
-        setTimeout(poll, 120);
-      })();
-    });
-    _qmsTranslateComboWait = _qmsTranslateComboWait.catch(function (err) {
-      _qmsTranslateComboWait = null;
-      throw err;
-    });
-    return _qmsTranslateComboWait;
-  }
-
-  function dispatchNativeChange(el) {
-    if (!el) return;
-    try {
-      el.dispatchEvent(new Event('change', { bubbles: true }));
-    } catch (_e) {
-      var evt = document.createEvent('HTMLEvents');
-      evt.initEvent('change', true, false);
-      el.dispatchEvent(evt);
-    }
-  }
 
   var _qmsTrustedParentOrigin = window.location.origin;
 
@@ -153,44 +20,69 @@
     } catch (_e) {}
   }
 
-  function applyEnglishView() {
-    setGoogTransCookieValue('/vi/en');
-    return ensureGoogleTranslateReady()
-      .then(waitForTranslateCombo)
-      .then(function (combo) {
-        if (combo.value !== 'en') {
-          combo.value = 'en';
-          dispatchNativeChange(combo);
-        }
-        document.documentElement.lang = 'en';
-        document.documentElement.setAttribute('data-qms-view-lang', 'en');
-        return true;
-      });
+  function setDocumentLocaleAttributes(target) {
+    var locale = target === 'en' ? 'en' : 'vi';
+    _qmsDocLang = locale;
+    document.documentElement.lang = locale;
+    document.documentElement.setAttribute('data-qms-view-lang', locale);
+    try {
+      if (document.body) document.body.setAttribute('data-qms-view-lang', locale);
+    } catch (_e) {}
   }
 
-  function applyVietnameseView() {
-    clearGoogTransCookie();
-    document.documentElement.lang = 'vi';
-    document.documentElement.setAttribute('data-qms-view-lang', 'vi');
-    var combo = document.querySelector('select.goog-te-combo');
-    var translated = document.documentElement.classList.contains('translated-ltr')
-      || document.body.classList.contains('translated-ltr')
-      || !!(combo && combo.value && combo.value !== 'vi');
-    if (translated && !_qmsReloadingForVietnamese) {
-      _qmsReloadingForVietnamese = true;
-      window.location.reload();
+  function isEmbeddedPortalDocument() {
+    try {
+      if (window.self !== window.top) return true;
+    } catch (_e) {
+      return true;
     }
-    return Promise.resolve(true);
+    return !!window.frameElement;
+  }
+
+  function isEnglishArtifactDocument() {
+    try {
+      if (/\/_[^/]+\.en\.html?$/.test(String(window.location.pathname || '').toLowerCase())) {
+        return true;
+      }
+      if (/[?&](?:lang|locale)=en(?:[&#]|$)/i.test(String(window.location.search || ''))) {
+        return true;
+      }
+      var htmlAttr = String((document.documentElement && document.documentElement.getAttribute('data-qms-locale-artifact')) || '').toLowerCase();
+      if (htmlAttr === 'en') return true;
+      var htmlLang = String((document.documentElement && document.documentElement.getAttribute('lang')) || '').toLowerCase();
+      if (htmlLang === 'en') return true;
+      var header = document.querySelector('.dcc-header[data-dcc-locale]');
+      if (header && String(header.getAttribute('data-dcc-locale') || '').toLowerCase() === 'en') {
+        return true;
+      }
+    } catch (_e) {}
+    return false;
+  }
+
+  function normaliseRequestedLanguage(nextLang) {
+    var locale = nextLang === 'en' ? 'en' : 'vi';
+    if (locale === 'en' && !isEnglishArtifactDocument()) {
+      return 'vi';
+    }
+    return locale;
+  }
+
+  function rerenderDccHeaders(target) {
+    try {
+      if (!(window.DccHeader && typeof window.DccHeader.render === 'function')) return;
+      var headers = document.querySelectorAll('.dcc-header');
+      for (var i = 0; i < headers.length; i++) {
+        headers[i].setAttribute('data-dcc-locale', target);
+        window.DccHeader.render(headers[i]);
+      }
+    } catch (_e) {}
   }
 
   function applyDocumentLanguage(nextLang) {
-    var target = nextLang === 'en' ? 'en' : 'vi';
-    _qmsDocLang = target;
-    if (target === 'vi') return applyVietnameseView();
-    return applyEnglishView().catch(function (err) {
-      try { console.warn('[QMS][translate]', err && err.message ? err.message : err); } catch (_e) {}
-      return false;
-    });
+    var target = normaliseRequestedLanguage(nextLang);
+    setDocumentLocaleAttributes(target);
+    rerenderDccHeaders(target);
+    return Promise.resolve(true);
   }
 
   function initMessageBridge() {
@@ -210,18 +102,19 @@
   }
 
   function initDocumentLanguage() {
-    var stored = 'vi';
-    try { stored = String(localStorage.getItem('hesem_lang') || 'vi').toLowerCase(); } catch (_e) {}
-    _qmsDocLang = stored === 'en' ? 'en' : 'vi';
-    if (_qmsDocLang === 'en') {
-      setTimeout(function () {
-        applyDocumentLanguage('en');
-      }, 60);
-    } else {
-      clearGoogTransCookie();
-      document.documentElement.lang = 'vi';
-      document.documentElement.setAttribute('data-qms-view-lang', 'vi');
+    var initial = 'vi';
+    if (isEnglishArtifactDocument()) {
+      initial = 'en';
+    } else if (isEmbeddedPortalDocument()) {
+      var stored = 'vi';
+      try { stored = String(localStorage.getItem('hesem_lang') || 'vi').toLowerCase(); } catch (_e) {}
+      initial = normaliseRequestedLanguage(stored === 'en' ? 'en' : 'vi');
     }
+    _qmsDocLang = initial;
+    setDocumentLocaleAttributes(_qmsDocLang);
+    setTimeout(function () {
+      rerenderDccHeaders(_qmsDocLang);
+    }, 60);
   }
 
   function initCurrentYear() {

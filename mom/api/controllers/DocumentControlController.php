@@ -27,8 +27,6 @@ use Throwable;
  */
 final class DocumentControlController extends EqmsBaseController
 {
-    private const MODULE = 'document_control';
-
     // ── Role policy ──────────────────────────────────────────────────────────
 
     private function readRoles(): array
@@ -91,7 +89,7 @@ final class DocumentControlController extends EqmsBaseController
     public function labels(): never
     {
         $this->requireAuth();
-        $locale = $this->query('locale', 'en') ?? 'en';
+        $locale = $this->query('locale', 'vi') ?? 'vi';
         $rows = $this->service()->listLabels($locale);
         $this->success([
             'locale' => $locale,
@@ -106,6 +104,7 @@ final class DocumentControlController extends EqmsBaseController
     {
         $user = $this->requireAuth();
         $this->requireAnyRole($user, $this->readRoles());
+        $locale = $this->query('locale', 'vi') ?? 'vi';
         $filters = [
             'doc_type'        => $this->query('doc_type'),
             'status'          => $this->query('status'),
@@ -114,8 +113,8 @@ final class DocumentControlController extends EqmsBaseController
         ];
         $limit  = (int)($this->query('limit') ?? 100);
         $offset = (int)($this->query('offset') ?? 0);
-        $items  = $this->service()->listHeaders($filters, $limit, $offset);
-        $this->success(['items' => $items]);
+        $items  = $this->service()->listLocalizedHeaders($filters, $limit, $offset, $locale);
+        $this->success(['locale' => $locale, 'items' => $items]);
     }
 
     /** POST /api/v1/dcc/documents */
@@ -166,15 +165,51 @@ final class DocumentControlController extends EqmsBaseController
     /** GET /api/v1/dcc/documents/{doc_code}/header */
     public function getHeader(): never
     {
-        $this->requireAuth();
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->readRoles());
         $docCode = $this->requirePathId('doc_code', 'doc_code');
-        $locale  = $this->query('locale', 'en') ?? 'en';
+        $locale  = $this->query('locale', 'vi') ?? 'vi';
         try {
             $payload = $this->headerService()->render($docCode, $locale);
         } catch (RuntimeException $e) {
             $this->error('dcc_document_not_found', 404, $e->getMessage());
         }
         $this->success(['header' => $payload]);
+    }
+
+    /** GET /api/v1/dcc/documents/{doc_code}/locales/{locale} */
+    public function getLocaleVariant(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->readRoles());
+        $docCode = $this->requirePathId('doc_code', 'doc_code');
+        $locale  = $this->requirePathId('locale', 'locale');
+        try {
+            $payload = $this->service()->getLocaleVariantProjection($docCode, $locale);
+        } catch (RuntimeException $e) {
+            $this->error('dcc_document_not_found', 404, $e->getMessage());
+        }
+        $this->success(['locale_variant' => $payload]);
+    }
+
+    /** PUT /api/v1/dcc/documents/{doc_code}/locales/{locale} */
+    public function upsertLocaleVariant(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->writeRoles());
+        $docCode = $this->requirePathId('doc_code', 'doc_code');
+        $locale  = $this->requirePathId('locale', 'locale');
+        $body    = $this->jsonBody();
+        try {
+            $result = $this->service()->upsertLocaleVariant($docCode, $locale, $body, $this->actor($user));
+        } catch (InvalidArgumentException $e) {
+            $this->error('dcc_locale_variant_invalid', 422, $e->getMessage());
+        } catch (RuntimeException $e) {
+            $this->error('dcc_locale_variant_conflict', 409, $e->getMessage());
+        } catch (Throwable $e) {
+            $this->error('dcc_locale_variant_failed', 500, $e->getMessage());
+        }
+        $this->success(['locale_variant' => $result]);
     }
 
     /** PATCH /api/v1/dcc/documents/{doc_code}/header */

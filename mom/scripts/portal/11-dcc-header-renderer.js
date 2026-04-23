@@ -11,7 +11,7 @@
  * Usage — drop a placeholder inside an HTML document:
  *   <div class="dcc-header"
  *        data-dcc-doc-code="QMS-MAN-001"
- *        data-dcc-locale="en"></div>
+ *        data-dcc-locale="vi"></div>
  *
  * The renderer auto-boots on DOMContentLoaded; you may also call
  *   window.DccHeader.render(container)  — for late-added nodes.
@@ -25,7 +25,7 @@
 'use strict';
 
 var API_PREFIX = '/api/v1/dcc';
-var DEFAULT_LOCALE = 'en';
+var DEFAULT_LOCALE = 'vi';
 
 /* ── Canonical doc-code extractor (mirrors backend scan_extract_code) ─────
  * Derive the SHORT canonical doc code from the current document URL's
@@ -336,7 +336,10 @@ function render(container){
         // Heal the attribute for any downstream consumer that still reads it.
         try { container.setAttribute('data-dcc-doc-code', urlCode); } catch(e){}
     }
-    var locale = container.getAttribute('data-dcc-locale') || DEFAULT_LOCALE;
+    var locale = container.getAttribute('data-dcc-locale')
+        || document.documentElement.getAttribute('data-qms-view-lang')
+        || document.documentElement.lang
+        || DEFAULT_LOCALE;
     if (!docCode) {
         _renderError(container, new Error('missing_data_dcc_doc_code_attribute'));
         return Promise.reject(new Error('missing_data_dcc_doc_code_attribute'));

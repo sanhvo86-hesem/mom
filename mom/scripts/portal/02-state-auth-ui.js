@@ -2708,6 +2708,17 @@ function triggerDownloadUrl(url){
 
 function triggerDocDownload(doc){
   if(!doc || !doc.path) return;
+  const localeView = (typeof getDocLocaleView === 'function') ? getDocLocaleView(doc) : null;
+  if(localeView && localeView.available && localeView.file){
+    triggerDownloadUrl(buildDocStreamUrl(doc, true, localeView.file));
+    return;
+  }
+  if(lang==='en'){
+    showToast(lang==='en'
+      ? 'English artifact is not published for this document yet'
+      : 'Bản tiếng Anh của tài liệu này chưa được phát hành');
+    return;
+  }
   triggerDownloadUrl(buildDocStreamUrl(doc, true));
 }
 
@@ -2728,8 +2739,21 @@ function getVersionAccessUrl(doc, version){
   return '';
 }
 
+function getVersionLocaleAccessUrl(doc, version){
+  const rawUrl = getVersionAccessUrl(doc, version);
+  if(!rawUrl) return '';
+  if(lang!=='en') return rawUrl;
+  const localeView = (typeof getDocLocaleView === 'function') ? getDocLocaleView(doc) : null;
+  if(!localeView || !localeView.available || !localeView.file) return '';
+  if(typeof isCurrentVersionEntry === 'function' && !isCurrentVersionEntry(doc, version)) return '';
+  if(typeof isDownloadOnlyDoc === 'function' && isDownloadOnlyDoc(doc)){
+    return buildDocStreamUrl(doc, true, localeView.file);
+  }
+  return '../' + String(localeView.file).replace(/^\/+/, '');
+}
+
 function versionHasAccess(doc, version){
-  return !!getVersionAccessUrl(doc, version);
+  return !!getVersionLocaleAccessUrl(doc, version);
 }
 
 function isCurrentVersionEntry(doc, version){
@@ -3005,7 +3029,10 @@ function updateDocViewerHeader(doc){
   const status = getDocStatus(doc);
   const rev = getDocRevision(doc);
   const state = getDocState(doc.code);
-  const viewFile = getDocViewFile(doc) || doc.path;
+  const localeView = (typeof getDocLocaleView === 'function')
+    ? getDocLocaleView(doc)
+    : { locale:(lang==='en'?'en':'vi'), available:true, file:(doc.path||''), translationState:'source' };
+  const viewFile = localeView.available ? localeView.file : '';
   const hasWorkingDraft = (((typeof docHasWorkingVersion==='function') ? docHasWorkingVersion(doc.code) : false)
     || ((typeof getEditedHtml==='function') && !!getEditedHtml(doc.code)));
 
@@ -3037,6 +3064,16 @@ function updateDocViewerHeader(doc){
   const displayCode = (typeof getDocDisplayCode === 'function') ? getDocDisplayCode(doc) : String(doc.code || '').trim();
   const displayTitle = getDocDisplayTitle(doc);
   const displayDesc = getDocDisplayDescription(doc);
+  const localeStatusNote = (function(){
+    if(localeView.locale !== 'en') return '';
+    if(!localeView.available){
+      return '<div class="dv-meta-note locale warn"><span class="dv-meta-note-label">' + (lang==='en'?'Language':'Ngôn ngữ') + '</span><b>' + (lang==='en'?'English pending':'Tiếng Anh chờ phát hành') + '</b><span>' + (lang==='en'?'Portal is blocked from showing mixed-language content.':'Portal đang chặn hiển thị nội dung trộn ngôn ngữ.') + '</span></div>';
+    }
+    const label = localeView.translationState === 'released'
+      ? (lang==='en'?'English released':'Bản tiếng Anh phát hành')
+      : (lang==='en'?'English preview artifact':'Artifact tiếng Anh preview');
+    return '<div class="dv-meta-note locale info"><span class="dv-meta-note-label">' + (lang==='en'?'Language':'Ngôn ngữ') + '</span><b>' + label + '</b><span>' + String(localeView.translationState || '').replace(/_/g,' ') + '</span></div>';
+  })();
   const isWorkbook = isDownloadOnlyDoc(doc);
   const detailToggleLabel = docHeaderMetaCollapsed
     ? (lang==='en' ? 'Show details' : 'Hiện chi tiết')
@@ -3060,12 +3097,12 @@ function updateDocViewerHeader(doc){
     ? `<div class="dv-action-group dv-nav-actions">
           ${detailToggleHtml}
           ${renderDocHeaderButton(T('back'), 'back', 'neutral', 'closeDocViewer()')}
-          ${renderDocHeaderButton(lang==='en'?'Download':'Tải về', 'download', 'neutral', `downloadCurrentDoc('${doc.code}')`)}
+          ${localeView.available ? renderDocHeaderButton(lang==='en'?'Download':'Tải về', 'download', 'neutral', `downloadCurrentDoc('${doc.code}')`) : renderDocHeaderButton(lang==='en'?'View Vietnamese':'Xem tiếng Việt', 'locale', 'neutral', `setLang('vi')`)}
        </div>`
     : `<div class="dv-action-group dv-nav-actions">
           ${detailToggleHtml}
           ${renderDocHeaderButton(T('back'), 'back', 'neutral', 'closeDocViewer()')}
-          ${renderDocHeaderButton(T('open_tab'), 'external', 'neutral', `window.open('../${viewFile}','_blank')`)}
+          ${localeView.available ? renderDocHeaderButton(T('open_tab'), 'external', 'neutral', `window.open('../${viewFile}','_blank')`) : renderDocHeaderButton(lang==='en'?'View Vietnamese':'Xem tiếng Việt', 'locale', 'neutral', `setLang('vi')`)}
        </div>`;
 
   const headerEl = document.getElementById('doc-viewer-header');
@@ -3079,10 +3116,10 @@ function updateDocViewerHeader(doc){
     <div class="dv-top">
       <div class="dv-title-area">
         <div class="dv-code" style="color:${cat.color}">${displayCode} <span style="display:inline-block;padding:2px 10px;border-radius:10px;font-size:10px;font-weight:700;background:${statusColor(status)}18;color:${statusColor(status)}">${statusLabel(status)}</span></div>
-        <div class="dv-name">${displayTitle}</div>
-        ${displayDesc ? `<div class="dv-desc">${displayDesc}</div>` : ''}
-      </div>
-    </div>
+	        <div class="dv-name">${displayTitle}</div>
+	        ${displayDesc ? `<div class="dv-desc">${displayDesc}</div>` : ''}
+	      </div>
+	    </div>
     <div class="dv-meta${docHeaderMetaCollapsed ? ' is-collapsed' : ''}">
       <div class="dv-meta-grid">
         <div class="dv-meta-item"><span class="dv-meta-label">${T('code_label')}</span><div class="dv-meta-value"><b>${displayCode}</b></div></div>
@@ -3092,8 +3129,8 @@ function updateDocViewerHeader(doc){
         <div class="dv-meta-item"><span class="dv-meta-label">${T('approver')}</span><div class="dv-meta-value"><b>${(state&&state.approver)?state.approver:T('gd')}</b>${approverEditButton}</div></div>
         <div class="dv-meta-item"><span class="dv-meta-label">${T('status')}</span><div class="dv-meta-value"><b style="color:${statusColor(status)}">${statusLabel(status)}</b></div></div>
       </div>
-      ${activityNotes ? `<div class="dv-meta-notes">${activityNotes}</div>` : ''}
-    </div>`;
+	      ${(activityNotes || localeStatusNote) ? `<div class="dv-meta-notes">${activityNotes}${localeStatusNote ? localeStatusNote : ''}</div>` : ''}
+	    </div>`;
   syncDocViewerDetailVisibility();
 }
 

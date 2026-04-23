@@ -20,7 +20,7 @@
 ```
 tools/
 ├── engines/                          → Engine tái sử dụng (giữ vĩnh viễn)
-│   ├── context_translate_engine.py  → Dịch Anh→Việt có ngữ cảnh
+│   ├── context_translate_engine.py  → Editorial/translation support engine; publication authority still comes from controlled locale artifacts
 │   ├── fill_missing_translations.py → Điền bản dịch thiếu
 │   ├── translate_en_to_vi.py        → Dịch trực tiếp EN→VI
 │   ├── create_dictionary.py         → Xây dựng từ điển
@@ -28,7 +28,7 @@ tools/
 │
 ├── scripts/                          → Scripts chạy một lần hoặc theo đợt
 │   ├── form-repair/                 → Sửa lỗi Excel forms
-│   ├── translation/                 → Dịch theo batch (có date-stamp)
+│   ├── translation/                 → Dịch theo batch / build artifact locale (có date-stamp)
 │   ├── encoding/                    → Sửa mojibake/encoding
 │   ├── link-repair/                 → Sửa broken links & doc codes
 │   ├── language-polish/             → Polish ngôn ngữ Việt
@@ -76,7 +76,7 @@ _reports/
 │   ├── cnc-job-order-iso-as9100-practicality-assessment-2026-03-22.md
 │   └── security-hardening-audit-2026-03-22.md
 │
-├── translation/                      → Tiến độ dịch thuật & inventories
+├── translation/                      → Tiến độ dịch thuật, artifact inventories, drift/regeneration reports
 │   ├── translation-progress-summary-20260324.md
 │   ├── translation-01-qms-portal-20260324.md
 │   ├── translation-01-qms-portal-20260324.json

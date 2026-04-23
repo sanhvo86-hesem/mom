@@ -132,11 +132,11 @@ qms.hesem.com.vn/
 │
 ├── tools/                                  → Công cụ hỗ trợ (chi tiết: 11-ai-tooling-and-reports.md)
 │   ├── engines/                           → Engine tái sử dụng (giữ vĩnh viễn)
-│   │   ├── context_translate_engine.py   → Engine dịch Anh→Việt
+│   │   ├── context_translate_engine.py   → Engine editorial/translation support; locale publication still follows standard 37
 │   │   └── ...
 │   ├── scripts/                           → Scripts chạy một lần theo đợt
 │   │   ├── form-repair/                  → Sửa lỗi Excel forms
-│   │   ├── translation/                  → Dịch theo batch
+│   │   ├── translation/                  → Dịch theo batch / artifact prep theo workflow chuẩn
 │   │   ├── encoding/                     → Sửa mojibake/encoding
 │   │   ├── link-repair/                  → Sửa broken links
 │   │   ├── language-polish/              → Polish ngôn ngữ Việt
@@ -148,6 +148,12 @@ qms.hesem.com.vn/
 │   └── legacy/                            → Scripts cũ chưa phân loại
 │
 ├── _reports/                               → Output & báo cáo AI-generated (chi tiết: 11-ai-tooling-and-reports.md)
+
+Locale artifact rule:
+
+- controlled English HTML artifact must use hidden-sibling naming such as `_sop-501-example.en.html`
+- artifact lives beside the Vietnamese source unless a stricter controlled store is declared later
+- artifact file must not appear as a standalone scanned document
 │   ├── analysis/                          → Phân tích chiến lược & expert reviews
 │   ├── translation/                       → Tiến độ dịch thuật
 │   ├── link-repair/                       → Tracking sửa broken links

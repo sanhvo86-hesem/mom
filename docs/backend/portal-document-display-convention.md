@@ -8,7 +8,7 @@ Every document card in the portal should render in this order:
 
 1. `Document code`
 2. `Standard title / file name` in English
-3. `Vietnamese description`
+3. locale-specific subtitle/description from the authoritative locale projection
 
 This applies to:
 
@@ -26,14 +26,20 @@ The portal uses these helpers:
 
 Display title priority:
 
-1. Keep `doc.title` when it is already an English standard title.
-2. If a legacy HTML file still uses a Vietnamese `<title>`, derive the English title from the file name/path.
+1. Keep SSOT standard title / filename authority per `23-portal-standard-title-filename-ssot.md`.
+2. Do not invent an English title by browser translation.
 
 Display description priority:
 
-1. `01-QMS-Portal/qms-data/config/doc_descriptions.json`
-2. Legacy localized HTML title when it differs from the English display title
-3. `01-QMS-Portal/qms-data/config/folder_descriptions.json`
+1. `dcc_document_locale_variant` when a locale variant exists
+2. canonical DCC subtitle when the active locale is the canonical source
+3. explicit runtime config fallback only for legacy Vietnamese display, never as English publication authority
+
+## Locale delivery rule
+
+- The portal must not use browser live translation.
+- The portal must not infer English body content from Vietnamese HTML at render time.
+- If the user requests English and no English artifact exists, the viewer must fail closed.
 
 ## Boundary rule
 

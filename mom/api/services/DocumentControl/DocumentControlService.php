@@ -48,6 +48,12 @@ final class DocumentControlService
 
     private const REVISION_PATTERN = '/^V\d+(\.\d+)?$/';
 
+    /** @var array<string, string|null> */
+    private array $sourceDocumentPathCache = [];
+
+    /** @var array<string, string> */
+    private array $sourceDocumentHashCache = [];
+
     public function __construct(private DataLayer $data) {}
 
     // ── Code canonicalisation ──────────────────────────────────────────────
@@ -120,7 +126,6 @@ final class DocumentControlService
     {
         $upper = strtoupper($canonicalCode);
         if (str_starts_with($upper, 'QMS-MAN')) return 'MAN';
-        if (str_starts_with($upper, 'POL-'))    return 'POL';
         if ($upper === 'POL' || str_starts_with($upper, 'POL-')) return 'POL';
         if (str_starts_with($upper, 'SOP-'))    return 'SOP';
         if (str_starts_with($upper, 'WI-'))     return 'WI';
@@ -193,7 +198,7 @@ final class DocumentControlService
                 ':approver'       => $input['approver_role_code'],
                 ':iso_clause'     => $input['iso_clause'] ?? null,
                 ':status'         => $input['status'] ?? 'draft',
-                ':locale_default' => $input['locale_default'] ?? 'en',
+                ':locale_default' => $input['locale_default'] ?? 'vi',
                 ':metadata'       => json_encode($input['metadata'] ?? (object)[], JSON_UNESCAPED_UNICODE),
                 ':actor'          => $actor,
             ]
@@ -237,6 +242,17 @@ final class DocumentControlService
             throw new RuntimeException('dcc_document_not_found:' . $docCode);
         }
         return $row[0];
+    }
+
+    /**
+     * Return the header projection merged with a locale variant when present.
+     *
+     * @return array<string, mixed>
+     */
+    public function getLocalizedHeader(string $docCode, string $locale = 'vi'): array
+    {
+        $header = $this->getHeader($docCode);
+        return $this->applyLocaleVariant($header, $locale);
     }
 
     /**
@@ -396,6 +412,14 @@ final class DocumentControlService
      */
     public function listHeaders(array $filters = [], int $limit = 100, int $offset = 0): array
     {
+        return $this->listLocalizedHeaders($filters, $limit, $offset, 'vi');
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    public function listLocalizedHeaders(array $filters = [], int $limit = 100, int $offset = 0, string $locale = 'vi'): array
+    {
         $where  = ['1=1'];
         $params = [];
         foreach (['doc_type', 'status', 'owner_role_code'] as $f) {
@@ -416,7 +440,83 @@ final class DocumentControlService
                 WHERE " . implode(' AND ', $where) . "
                 ORDER BY doc_code
                 LIMIT $limit OFFSET $offset";
-        return $this->data->query($sql, $params) ?? [];
+        $rows = $this->data->query($sql, $params) ?? [];
+        $out = [];
+        foreach ($rows as $row) {
+            $out[] = $this->applyLocaleVariant($row, $locale);
+        }
+        return $out;
+    }
+
+    /**
+     * Return one locale-variant projection for a document.
+     *
+     * @return array<string, mixed>
+     */
+    public function getLocaleVariantProjection(string $docCode, string $locale): array
+    {
+        $header = $this->getHeader($docCode);
+        return $this->buildLocaleVariantProjection($header, $locale, $this->fetchLocaleVariantRow($docCode, $locale));
+    }
+
+    /**
+     * Create or update a locale variant row.
+     *
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
+     */
+    public function upsertLocaleVariant(string $docCode, string $locale, array $input, string $actor): array
+    {
+        $header = $this->getHeader($docCode);
+        $locale = $this->normaliseLocale($locale);
+        if ($locale === '' || $locale === 'vi') {
+            throw new InvalidArgumentException('dcc_locale_variant_noncanonical_locale_required');
+        }
+        $patch = $this->normaliseLocaleVariantPatch($input);
+        if ($patch === []) {
+            return $this->buildLocaleVariantProjection($header, $locale, $this->fetchLocaleVariantRow($docCode, $locale));
+        }
+
+        $existing = $this->fetchLocaleVariantRow($docCode, $locale);
+        if ($existing === []) {
+            $columns = ['doc_code', 'locale', 'created_by', 'updated_by'];
+            $values  = [':doc_code', ':locale', ':actor', ':actor'];
+            $params  = [
+                ':doc_code' => $docCode,
+                ':locale'   => $locale,
+                ':actor'    => $actor,
+            ];
+            foreach ($patch as $key => $value) {
+                $columns[] = $key;
+                $values[] = ':' . $key;
+                $params[':' . $key] = $value;
+            }
+            $sql = 'INSERT INTO dcc_document_locale_variant (' . implode(', ', $columns) . ')
+                    VALUES (' . implode(', ', $values) . ')';
+            $this->data->execute($sql, $params);
+        } else {
+            $sets = ['updated_by = :actor'];
+            $params = [
+                ':doc_code' => $docCode,
+                ':locale'   => $locale,
+                ':actor'    => $actor,
+            ];
+            foreach ($patch as $key => $value) {
+                if ($key === 'metadata') {
+                    $sets[] = 'metadata = CAST(:metadata AS jsonb)';
+                    $params[':metadata'] = $value;
+                    continue;
+                }
+                $sets[] = $key . ' = :' . $key;
+                $params[':' . $key] = $value;
+            }
+            $sql = 'UPDATE dcc_document_locale_variant
+                    SET ' . implode(', ', $sets) . '
+                    WHERE doc_code = :doc_code AND locale = :locale';
+            $this->data->execute($sql, $params);
+        }
+
+        return $this->buildLocaleVariantProjection($header, $locale, $this->fetchLocaleVariantRow($docCode, $locale));
     }
 
     /** @return list<array<string, mixed>> */
@@ -739,11 +839,268 @@ final class DocumentControlService
     {
         $locale = strtolower(trim($locale));
         if ($locale === '') {
-            return 'en';
+            return 'vi';
         }
-        // Accept en, vi, en-us, en_US → normalise to first segment for DB lookup
         $locale = str_replace('_', '-', $locale);
-        return $locale;
+        $parts = explode('-', $locale, 2);
+        return $parts[0] !== '' ? $parts[0] : 'vi';
+    }
+
+    /** @param array<string, mixed> $header */
+    private function applyLocaleVariant(array $header, string $locale): array
+    {
+        return $this->buildLocaleVariantProjection(
+            $header,
+            $locale,
+            $this->fetchLocaleVariantRow((string)($header['doc_code'] ?? ''), $locale)
+        );
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function fetchLocaleVariantRow(string $docCode, string $locale): array
+    {
+        $locale = $this->normaliseLocale($locale);
+        if ($docCode === '' || $locale === '' || $locale === 'vi') {
+            return [];
+        }
+        $rows = $this->data->query(
+            "SELECT doc_code, locale, title, subtitle, artifact_rel_path,
+                    artifact_source_revision, artifact_source_hash_sha256,
+                    translation_state, translation_provider, glossary_version,
+                    engine_version, reviewer_party_id, reviewed_at, published_at,
+                    metadata, created_at, created_by, updated_at, updated_by
+             FROM dcc_document_locale_variant
+             WHERE doc_code = :c AND locale = :loc
+             LIMIT 1",
+            [':c' => $docCode, ':loc' => $locale]
+        ) ?? [];
+        return $rows[0] ?? [];
+    }
+
+    /**
+     * @param array<string, mixed> $header
+     * @param array<string, mixed> $variant
+     * @return array<string, mixed>
+     */
+    private function buildLocaleVariantProjection(array $header, string $locale, array $variant): array
+    {
+        $locale = $this->normaliseLocale($locale);
+        $exists = $variant !== [];
+        $state = $exists
+            ? strtolower(trim((string)($variant['translation_state'] ?? 'machine_preview')))
+            : ($locale === 'vi' ? 'source' : 'missing');
+        $artifactPath = $exists ? trim((string)($variant['artifact_rel_path'] ?? '')) : '';
+        $renderableStates = ['machine_preview', 'review_pending', 'reviewed', 'released'];
+        $sourceRevision = trim((string)($variant['artifact_source_revision'] ?? ''));
+        $headerRevision = trim((string)($header['revision'] ?? ''));
+        $revisionMatches = ($sourceRevision === '') || ($headerRevision !== '' && $sourceRevision === $headerRevision);
+        $sourceHashMatches = $exists ? $this->sourceHashMatchesCurrentSource((string)($header['doc_code'] ?? ''), $variant) : true;
+        $publishedOk = $state !== 'released' || !empty($variant['published_at']);
+        $renderable = $exists
+            && $locale !== 'vi'
+            && $artifactPath !== ''
+            && in_array($state, $renderableStates, true)
+            && $revisionMatches
+            && $sourceHashMatches
+            && $publishedOk;
+        $out = $header;
+        $out['locale'] = $locale;
+        $out['source_title'] = $header['title'] ?? '';
+        $out['source_subtitle'] = $header['subtitle'] ?? null;
+        $out['locale_variant_exists'] = $exists;
+        $out['locale_renderable'] = $renderable;
+        $out['is_locale_fallback'] = ($locale === 'vi') ? false : !$renderable;
+        $out['translation_state'] = $state;
+        $out['artifact_rel_path'] = $renderable ? $artifactPath : null;
+        $out['artifact_source_revision'] = $exists ? ($variant['artifact_source_revision'] ?? null) : null;
+        $out['artifact_source_hash_sha256'] = $exists ? ($variant['artifact_source_hash_sha256'] ?? null) : null;
+        $out['translation_provider'] = $exists ? ($variant['translation_provider'] ?? null) : null;
+        $out['glossary_version'] = $exists ? ($variant['glossary_version'] ?? null) : null;
+        $out['engine_version'] = $exists ? ($variant['engine_version'] ?? null) : null;
+        $out['reviewer_party_id'] = $exists ? ($variant['reviewer_party_id'] ?? null) : null;
+        $out['reviewed_at'] = $exists ? ($variant['reviewed_at'] ?? null) : null;
+        $out['published_at'] = $renderable ? ($variant['published_at'] ?? null) : null;
+        $out['locale_metadata'] = $exists ? ($variant['metadata'] ?? []) : [];
+        $out['locale_revision_matches_source'] = $exists ? $revisionMatches : true;
+        $out['locale_source_hash_matches'] = $exists ? $sourceHashMatches : true;
+
+        if ($renderable) {
+            if (array_key_exists('title', $variant) && trim((string)$variant['title']) !== '') {
+                $out['title'] = trim((string)$variant['title']);
+            }
+            if (array_key_exists('subtitle', $variant)) {
+                $subtitle = $variant['subtitle'];
+                $out['subtitle'] = ($subtitle === null || trim((string)$subtitle) === '')
+                    ? null
+                    : trim((string)$subtitle);
+            }
+        }
+
+        return $out;
+    }
+
+    /**
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
+     */
+    private function normaliseLocaleVariantPatch(array $input): array
+    {
+        $allowed = [
+            'title',
+            'subtitle',
+            'artifact_rel_path',
+            'artifact_source_revision',
+            'artifact_source_hash_sha256',
+            'translation_state',
+            'translation_provider',
+            'glossary_version',
+            'engine_version',
+            'reviewer_party_id',
+            'reviewed_at',
+            'published_at',
+            'metadata',
+        ];
+
+        $patch = [];
+        foreach ($allowed as $key) {
+            if (!array_key_exists($key, $input)) {
+                continue;
+            }
+            $value = $input[$key];
+            if ($key === 'metadata') {
+                $patch['metadata'] = json_encode($value ?? (object)[], JSON_UNESCAPED_UNICODE);
+                continue;
+            }
+            if ($key === 'artifact_rel_path') {
+                $patch[$key] = $this->normaliseArtifactRelativePath($value);
+                continue;
+            }
+            if ($key === 'translation_state') {
+                $state = strtolower(trim((string)$value));
+                $valid = ['machine_preview', 'review_pending', 'reviewed', 'released', 'superseded', 'blocked'];
+                if (!in_array($state, $valid, true)) {
+                    throw new InvalidArgumentException('dcc_locale_variant_invalid_state');
+                }
+                $patch[$key] = $state;
+                continue;
+            }
+            if ($value === null) {
+                $patch[$key] = null;
+                continue;
+            }
+            $patch[$key] = trim((string)$value);
+        }
+
+        return $patch;
+    }
+
+    private function normaliseArtifactRelativePath(mixed $value): ?string
+    {
+        if ($value === null) {
+            return null;
+        }
+        $path = str_replace('\\', '/', trim((string)$value));
+        $path = ltrim($path, '/');
+        if ($path === '') {
+            return null;
+        }
+        if (str_contains($path, '..')) {
+            throw new InvalidArgumentException('dcc_locale_variant_invalid_artifact_path');
+        }
+        if (!preg_match('/\.(html?|pdf|docx|xlsx|pptx)$/i', $path)) {
+            throw new InvalidArgumentException('dcc_locale_variant_invalid_artifact_extension');
+        }
+        return $path;
+    }
+
+    /**
+     * @param array<string, mixed> $variant
+     */
+    private function sourceHashMatchesCurrentSource(string $docCode, array $variant): bool
+    {
+        $expected = strtolower(trim((string)($variant['artifact_source_hash_sha256'] ?? '')));
+        if ($expected === '') {
+            return false;
+        }
+        $current = $this->sourceDocumentHashFor($docCode);
+        if ($current === '') {
+            return false;
+        }
+        return hash_equals($expected, $current);
+    }
+
+    private function sourceDocumentHashFor(string $docCode): string
+    {
+        $canonical = self::canonicalizeCode($docCode);
+        if ($canonical === '') {
+            return '';
+        }
+        if (array_key_exists($canonical, $this->sourceDocumentHashCache)) {
+            return $this->sourceDocumentHashCache[$canonical];
+        }
+        $path = $this->sourceDocumentPathFor($canonical);
+        if ($path === null || $path === '' || !is_file($path)) {
+            $this->sourceDocumentHashCache[$canonical] = '';
+            return '';
+        }
+        $hash = @hash_file('sha256', $path);
+        $normalized = is_string($hash) ? strtolower(trim($hash)) : '';
+        $this->sourceDocumentHashCache[$canonical] = $normalized;
+        return $normalized;
+    }
+
+    private function sourceDocumentPathFor(string $docCode): ?string
+    {
+        $canonical = self::canonicalizeCode($docCode);
+        if ($canonical === '') {
+            return null;
+        }
+        if (array_key_exists($canonical, $this->sourceDocumentPathCache)) {
+            return $this->sourceDocumentPathCache[$canonical];
+        }
+        $docsRoot = dirname(__DIR__, 3) . '/docs';
+        $scanRoots = [
+            $docsRoot . '/system',
+            $docsRoot . '/operations',
+            $docsRoot . '/forms',
+            $docsRoot . '/training',
+        ];
+        foreach ($scanRoots as $root) {
+            if (!is_dir($root)) {
+                continue;
+            }
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::LEAVES_ONLY,
+                \RecursiveIteratorIterator::CATCH_GET_CHILD
+            );
+            foreach ($iterator as $file) {
+                if (!$file instanceof \SplFileInfo || !$file->isFile()) {
+                    continue;
+                }
+                $filename = (string)$file->getFilename();
+                if (strtolower(pathinfo($filename, PATHINFO_EXTENSION)) !== 'html') {
+                    continue;
+                }
+                if (str_starts_with($filename, '_')) {
+                    continue;
+                }
+                $normalizedPath = str_replace('\\', '/', (string)$file->getPathname());
+                if (str_contains($normalizedPath, '/_Archive/')) {
+                    continue;
+                }
+                $candidate = self::canonicalizeCode((string)pathinfo($filename, PATHINFO_FILENAME));
+                if ($candidate !== $canonical) {
+                    continue;
+                }
+                $this->sourceDocumentPathCache[$canonical] = $normalizedPath;
+                return $normalizedPath;
+            }
+        }
+        $this->sourceDocumentPathCache[$canonical] = null;
+        return null;
     }
 
     private function nextDcrNumber(): string

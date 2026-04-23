@@ -35,6 +35,8 @@ return static function (Router $router, string $dataDir): void {
     $router->post('/api/v1/dcc/documents/upsert',                                DocumentControlController::class, 'upsertHeader');
     $router->get ('/api/v1/dcc/documents/{doc_code}/header',                     DocumentControlController::class, 'getHeader');
     $router->patch('/api/v1/dcc/documents/{doc_code}/header',                    DocumentControlController::class, 'updateHeader');
+    $router->get ('/api/v1/dcc/documents/{doc_code}/locales/{locale}',           DocumentControlController::class, 'getLocaleVariant');
+    $router->put ('/api/v1/dcc/documents/{doc_code}/locales/{locale}',           DocumentControlController::class, 'upsertLocaleVariant');
     $router->get ('/api/v1/dcc/documents/{doc_code}/revisions',                  DocumentControlController::class, 'listRevisions');
 
     // ── State-machine actions ──────────────────────────────────────────────

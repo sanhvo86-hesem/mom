@@ -1,7 +1,11 @@
 # 03 — Language and translation rules
 
-> Full rules for translating and editing QMS content from English to Vietnamese.
-> Applies to both manual translation and automatic translation using `context_translate_engine.py`.
+> Full rules for editorial transformation and editing when non-canonical English reference or draft content is turned into authoritative Vietnamese QMS content.
+> Applies to manual editorial work and to controlled draft-support tooling such as `context_translate_engine.py`.
+>
+> Runtime note:
+> This file governs editorial language transformation and Vietnamese publication quality.
+> Controlled document locale switching, English artifacts, and portal language delivery are governed by `37-document-translation-publication-workflow.md`.
 
 ---
 
@@ -612,18 +616,24 @@ Some English words have multiple Vietnamese meanings depending on the context. *
 
 ---
 
-## G. Automatic translation tool
+## G. Editorial translation support tool
 
-### G2. Main engine: `context_translate_engine.py`
+### G2. Editorial engine: `context_translate_engine.py`
 
 **Location:** `tools/engines/context_translate_engine.py`
 
 **Function:**
-- Translate text node in HTML file from English to Vietnamese
+- Transform English draft/reference text nodes in HTML into Vietnamese authoring draft
 - Only translate text content — don't touch HTML tags, attributes, CSS, JS
 - Use the longest-match-first algorithm to handle multi-word phrases
 - Respect the list of abbreviations (keep the English intact)
 - Load dictionary from Excel file
+
+**Boundary:**
+- This engine is for editorial preparation only.
+- It must not be used as portal runtime translation.
+- It must not be treated as the publication mechanism for English locale artifacts.
+- Controlled document locale switching and English artifact publication are governed by `37-document-translation-publication-workflow.md`.
 
 **How ​​to run:**
 ```bash

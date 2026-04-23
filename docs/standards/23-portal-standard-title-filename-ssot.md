@@ -10,17 +10,19 @@
 4. SSOT value must stay aligned with document header title (`<title>`, header `.doc-name`, first `<h1>`).
 5. `Mã tài liệu` in portal edit flow must stay aligned with header meta code.
 6. `Mô tả tiếng Việt` in portal edit flow must stay aligned with the header note/subtitle (`.sub-vn`).
+7. Naming SSOT is not authoring SSOT; English filename/title authority does not make English body content the editable master source.
 
 ## B. Non-Negotiable Constraints
 
 1. Do not translate SSOT title to Vietnamese.
 2. Do not keep a separate Vietnamese title in the SSOT field.
 3. Vietnamese text belongs in `Mô tả tiếng Việt` only.
-4. Any change to SSOT title must trigger physical rename + cross-reference update.
-5. Header `.doc-name` must render SSOT title only; it must not prepend the document code and must not contain Vietnamese translation text.
-6. Browser `<title>` and first `<h1>` may include `CODE - SSOT title`, but the visible header title block must render only the SSOT title in English/ASCII.
-7. Header actor rows (`Chủ sở hữu`, `Phê duyệt`) must render linked JD/department chips, not raw plain text.
-8. This header rule applies equally to published WI/ANNEX/SOP/FRM/JD pages and portal-generated online form runtimes.
+4. English locale artifacts must be governed by `37-document-translation-publication-workflow.md`, not by filename heuristics or browser translation.
+5. Any change to SSOT title must trigger physical rename + cross-reference update.
+6. Header `.doc-name` must render SSOT title only; it must not prepend the document code and must not contain Vietnamese translation text.
+7. Browser `<title>` and first `<h1>` may include `CODE - SSOT title`, but the visible header title block must render only the SSOT title in English/ASCII.
+8. Header actor rows (`Chủ sở hữu`, `Phê duyệt`) must render linked JD/department chips, not raw plain text.
+9. This header rule applies equally to published WI/ANNEX/SOP/FRM/JD pages and portal-generated online form runtimes.
 
 ## C. Rename Behavior Standard
 

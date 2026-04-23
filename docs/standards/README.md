@@ -28,7 +28,8 @@ The `core-standards/` directory contains immutable rules, naming conventions, di
 |---|------|----------|
 | 1 | `01-immutable-rules.md` | Rules that should NEVER be broken — read first |
 | 2 | `02-folder-and-naming.md` | Full directory map and file naming conventions |
-| 3 | `03-language-and-translation.md` | Language rules, translation, dictionary of terms |
+| 3 | `03-language-and-translation.md` | Editorial Vietnamese-writing rules, draft transformation, terminology dictionary |
+| 4 | `37-document-translation-publication-workflow.md` | Controlled document locale switching and English artifact workflow |
 
 **Ghi nhớ:** Đọc `01-immutable-rules.md` trước khi làm bất kỳ điều gì. File này chứa các quy tắc mà nếu vi phạm sẽ phá vỡ tính nhất quán của toàn bộ hệ thống.
 
@@ -44,7 +45,7 @@ The `core-standards/` directory contains immutable rules, naming conventions, di
 |---|------|----------|
 | 01 | `01-immutable-rules.md` | Immutable rules: file names, abbreviations, brand colors, SSOT, SharePoint List names, Internal Column names |
 | 02 | `02-folder-and-naming.md` | Directory tree to level 3, naming pattern SOP/WI/ANNEX/JD/FRM/Training |
-| 03 | `03-language-and-translation.md` | Translate English→Vietnamese, 100+ abbreviations kept the same, multi-meaning words |
+| 03 | `03-language-and-translation.md` | Editorial transformation into Vietnamese, 100+ abbreviations kept the same, multi-meaning words |
 | 04 | `04-html-design-system.md` | **CSS design system v13** — variables, table, note, badge, metric, gate, print |
 | 05 | `05-html-templates.md` | Copy-paste template for SOP/WI/ANNEX/JD/Training/Handbook |
 | 06 | `06-excel-form-standards.md` | 6 types of Excel forms (A-F), specs, dropdowns |
@@ -87,6 +88,7 @@ These files are mandatory for frontend/runtime module work. For conflicts, `36-f
 | 34 | `34-module-builder-architecture.md` | Module Builder architecture, gap audit and block roadmap |
 | 35 | `35-language-convention.md` | Language convention for runtime/frontend text |
 | 36 | `36-frontend-module-layout-template-standard.md` | **Mandatory frontend module layout/template SSOT: authority map, template contract, block contract, visual rules, accessibility, audit and QA gates** |
+| 37 | `37-document-translation-publication-workflow.md` | **Mandatory controlled-document translation workflow: VI canonical source, EN artifact, no browser live translation** |
 
 Graphics control-plane authority is documented in `mom/docs/module-layout-template-design-system-v4.html`; the registry-side projection and release linkage are mirrored in `mom/docs/schema-authority-model.md`.
 
@@ -191,7 +193,7 @@ Graphics control-plane authority is documented in `mom/docs/module-layout-templa
 |------|--------|-------|
 | `general_note.md` | Root repo | Backward compatibility notes for AI & Editor — for summary use only; If deviant, follow `core-standards/` |
 | `rule_update_content.md` | Root repo | Old snapshot of 23 locked rules + graphics required — used to trace history, no win `core-standards/` |
-| `tools/engines/context_translate_engine.py` | `tools/engines/` | English→Vietnamese automatic translation tool |
+| `tools/engines/context_translate_engine.py` | `tools/engines/` | Editorial draft-support tool for transforming English reference/draft text into Vietnamese; not a runtime or EN-publication mechanism |
 | `tools/data/qms-terminology-dictionary.xlsx` | `tools/data/` | QMS glossary of terms |
 | `tools/data/remaining-english-words.xlsx` | `tools/data/` | List of English words to be translated (5008 entries) |
 

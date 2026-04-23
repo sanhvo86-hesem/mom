@@ -1781,9 +1781,9 @@ body.ed-shape-placement,#editor-area.ed-shape-placement{cursor:crosshair}
 @keyframes toastIn{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 
 /* ============================================================
-   Google Translate UI — FORCE HIDE (portal-level)
-   - Translation is triggered inside document iframes (VI → EN only).
-   - Do NOT show any Google Translate banner/toolbar in either language.
+   Legacy translator UI cleanup (portal-level)
+   - Defensive hide only: if a legacy translator banner/toolbar appears,
+     keep it invisible in both languages.
    ============================================================ */
 iframe.goog-te-banner-frame,
 iframe.goog-te-menu-frame,
