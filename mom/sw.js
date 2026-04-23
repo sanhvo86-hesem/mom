@@ -68,6 +68,7 @@ const PRECACHE_URLS = [
   '/mom/styles/form-runtime-frm-403.css',
   '/mom/styles/gateway-landing.css',
   '/mom/assets/css/mobile.css',
+  '/mom/scripts/portal/00-version-check.js',
   '/mom/scripts/portal/01-data-config.js',
   '/mom/scripts/portal/02-state-auth-ui.js',
   '/mom/scripts/portal/03-editor-core.js',

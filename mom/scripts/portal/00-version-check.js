@@ -47,6 +47,8 @@
   var reloadInProgress = false;
   var lastFetchAt      = 0;
   var deferCount       = 0;
+  var deferTimerId     = null;
+  var cooldownTimerId  = null;
 
   // ── Toast (no DOM dependencies — runs even if 02-state-auth-ui hasn't loaded) ─
   function renderToast(headline, body) {
@@ -112,6 +114,7 @@
     document.body && document.body.appendChild(t);
     var btn = document.getElementById('hesem-version-toast-reload');
     if (btn) btn.addEventListener('click', function () {
+      clearDeferredTimer();
       pendingVersion = newVersion || pendingVersion;
       if (pendingVersion) baselineVersion = pendingVersion;
       deferCount = 0;
@@ -130,6 +133,8 @@
   // Clear caches BEFORE reload so the new HTML is fetched from the network.
   // Trigger SW.update() so the next install kicks in.
   async function hardReload() {
+    clearDeferredTimer();
+    clearCooldownTimer();
     try {
       if ('caches' in window && caches.keys) {
         var keys = await caches.keys();
@@ -162,7 +167,11 @@
     // Throttle to avoid hammering the origin if visibilitychange fires
     // repeatedly (eg. window manager focus thrash).
     var now = Date.now();
-    if (now - lastFetchAt < MIN_FETCH_INTERVAL_MS) return null;
+    if (now - lastFetchAt < MIN_FETCH_INTERVAL_MS) {
+      queueCooldownRetry(MIN_FETCH_INTERVAL_MS - (now - lastFetchAt));
+      return null;
+    }
+    clearCooldownTimer();
     lastFetchAt = now;
 
     try {
@@ -193,7 +202,29 @@
     catch (e) { return true; }
   }
 
+  function clearDeferredTimer() {
+    if (deferTimerId === null) return;
+    clearTimeout(deferTimerId);
+    deferTimerId = null;
+  }
+
+  function clearCooldownTimer() {
+    if (cooldownTimerId === null) return;
+    clearTimeout(cooldownTimerId);
+    cooldownTimerId = null;
+  }
+
+  function queueCooldownRetry(waitMs) {
+    if (reloadInProgress || deferTimerId !== null || cooldownTimerId !== null) return;
+    var delay = Math.max(250, Number(waitMs) || MIN_FETCH_INTERVAL_MS);
+    cooldownTimerId = setTimeout(function () {
+      cooldownTimerId = null;
+      checkAndMaybeReload();
+    }, delay);
+  }
+
   function deferReload(newVersion) {
+    clearCooldownTimer();
     pendingVersion = newVersion || pendingVersion;
     reloadInProgress = false;
     deferCount++;
@@ -202,10 +233,16 @@
       return;
     }
     showDeferredToast(pendingVersion || newVersion);
-    setTimeout(checkAndMaybeReload, DEFER_WHEN_BUSY_MS);
+    clearDeferredTimer();
+    deferTimerId = setTimeout(function () {
+      deferTimerId = null;
+      checkAndMaybeReload();
+    }, DEFER_WHEN_BUSY_MS);
   }
 
   function scheduleReload(newVersion) {
+    clearDeferredTimer();
+    clearCooldownTimer();
     pendingVersion = newVersion;
     reloadInProgress = true;
     deferCount = 0;

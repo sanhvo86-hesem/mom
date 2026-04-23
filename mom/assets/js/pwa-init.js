@@ -23,10 +23,8 @@
   // ── Configuration ───────────────────────────────────────────────────────
 
   const SW_PATH      = '/mom/sw.js';
-  const SW_VERSION   = '1.3.45';
   const SW_SCOPE     = '/mom/';
   const UPDATE_CHECK_INTERVAL_MS = 60 * 60 * 1000; // 1 hour
-  const SW_RELOAD_MARKER = `mom_sw_reloaded_${SW_VERSION}`;
 
 
   // ── State ───────────────────────────────────────────────────────────────
@@ -53,7 +51,13 @@
     }
 
     try {
-      swRegistration = await navigator.serviceWorker.register(`${SW_PATH}?v=${encodeURIComponent(SW_VERSION)}`, { scope: SW_SCOPE });
+      // Let sw-build-tag.js drive update detection instead of a stale
+      // hard-coded query param. updateViaCache='none' ensures the browser
+      // revalidates both sw.js and importScripts() dependencies on update().
+      swRegistration = await navigator.serviceWorker.register(SW_PATH, {
+        scope: SW_SCOPE,
+        updateViaCache: 'none'
+      });
       console.log('[PWA] Service worker registered, scope:', swRegistration.scope);
 
       if (swRegistration.waiting) {
@@ -89,14 +93,8 @@
       // Handle controller change (new SW took over).
       navigator.serviceWorker.addEventListener('controllerchange', () => {
         console.log('[PWA] Controller changed, new service worker active');
-        try {
-          if (sessionStorage.getItem(SW_RELOAD_MARKER) !== '1') {
-            sessionStorage.setItem(SW_RELOAD_MARKER, '1');
-            window.location.reload();
-          }
-        } catch (err) {
-          window.location.reload();
-        }
+        // 00-version-check.js owns the reload policy so unsaved-form and
+        // in-flight-write guards are honoured before the page is torn down.
       });
 
       swRegistration.update().catch((err) => {
