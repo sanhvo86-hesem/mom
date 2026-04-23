@@ -24,6 +24,8 @@ final class DocumentLocaleAutomationService
 {
     private const TARGET_LOCALE = 'en';
     private const DRIVER_COMMAND = 'command';
+    private const DEFAULT_COMMAND_TIMEOUT_SECONDS = 120;
+    private const COMMAND_IO_POLL_MICROSECONDS = 200000;
 
     public function __construct(
         private DataLayer $data,
@@ -378,6 +380,15 @@ final class DocumentLocaleAutomationService
         $stdin = $pipes[0] ?? null;
         $stdout = $pipes[1] ?? null;
         $stderr = $pipes[2] ?? null;
+        if (is_resource($stdin)) {
+            stream_set_blocking($stdin, false);
+        }
+        if (is_resource($stdout)) {
+            stream_set_blocking($stdout, false);
+        }
+        if (is_resource($stderr)) {
+            stream_set_blocking($stderr, false);
+        }
 
         $encoded = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
         if (!is_string($encoded)) {
@@ -401,12 +412,124 @@ final class DocumentLocaleAutomationService
             ];
         }
 
+        $stdoutBody = '';
+        $stderrBody = '';
+        $stdinBytes = strlen($encoded);
+        $stdinOffset = 0;
+        $stdinClosed = !is_resource($stdin);
+        $deadline = microtime(true) + $this->commandTimeoutSeconds();
+
+        while (true) {
+            $running = false;
+            $status = proc_get_status($process);
+            if (is_array($status)) {
+                $running = (bool)$status['running'];
+            }
+
+            $read = [];
+            $write = [];
+            $except = [];
+
+            if (is_resource($stdout)) {
+                $read[] = $stdout;
+            }
+            if (is_resource($stderr)) {
+                $read[] = $stderr;
+            }
+            if (!$stdinClosed && is_resource($stdin) && $stdinOffset < $stdinBytes) {
+                $write[] = $stdin;
+            }
+
+            if (!$running && $read === [] && $write === []) {
+                break;
+            }
+            if ($read === [] && $write === []) {
+                usleep(10_000);
+                continue;
+            }
+
+            $remaining = $deadline - microtime(true);
+            if ($remaining <= 0) {
+                return $this->abortCommandProvider(
+                    $process,
+                    $stdin,
+                    $stdout,
+                    $stderr,
+                    $stdoutBody,
+                    $stderrBody,
+                    'translation_command_timed_out',
+                    'Translation command timed out before producing a compliant locale artifact.',
+                    'command_timeout'
+                );
+            }
+
+            $waitSeconds = (int)floor($remaining);
+            $waitMicros = (int)(($remaining - $waitSeconds) * 1_000_000);
+            if ($waitSeconds === 0 && $waitMicros <= 0) {
+                $waitMicros = self::COMMAND_IO_POLL_MICROSECONDS;
+            } elseif ($waitSeconds === 0) {
+                $waitMicros = min($waitMicros, self::COMMAND_IO_POLL_MICROSECONDS);
+            }
+
+            $selected = @stream_select($read, $write, $except, $waitSeconds, $waitMicros);
+            if ($selected === false) {
+                usleep(10_000);
+                continue;
+            }
+
+            if (!$stdinClosed && is_resource($stdin) && in_array($stdin, $write, true)) {
+                $chunk = substr($encoded, $stdinOffset, 65536);
+                $written = @fwrite($stdin, $chunk);
+                if ($written === false) {
+                    return $this->abortCommandProvider(
+                        $process,
+                        $stdin,
+                        $stdout,
+                        $stderr,
+                        $stdoutBody,
+                        $stderrBody,
+                        'translation_command_stdin_failed',
+                        'Translation command stdin write failed.',
+                        'command_stdin_failed'
+                    );
+                }
+                if ($written > 0) {
+                    $stdinOffset += $written;
+                }
+                if ($stdinOffset >= $stdinBytes) {
+                    fclose($stdin);
+                    $stdin = null;
+                    $stdinClosed = true;
+                }
+            }
+
+            if (is_resource($stdout) && in_array($stdout, $read, true)) {
+                $chunk = stream_get_contents($stdout);
+                if (is_string($chunk) && $chunk !== '') {
+                    $stdoutBody .= $chunk;
+                }
+                if (feof($stdout)) {
+                    fclose($stdout);
+                    $stdout = null;
+                }
+            }
+            if (is_resource($stderr) && in_array($stderr, $read, true)) {
+                $chunk = stream_get_contents($stderr);
+                if (is_string($chunk) && $chunk !== '') {
+                    $stderrBody .= $chunk;
+                }
+                if (feof($stderr)) {
+                    fclose($stderr);
+                    $stderr = null;
+                }
+            }
+        }
+
         if (is_resource($stdin)) {
-            fwrite($stdin, $encoded);
             fclose($stdin);
         }
-        $stdoutBody = is_resource($stdout) ? (string)stream_get_contents($stdout) : '';
-        $stderrBody = is_resource($stderr) ? (string)stream_get_contents($stderr) : '';
+        $stdoutBody .= is_resource($stdout) ? (string)stream_get_contents($stdout) : '';
+        $stderrBody .= is_resource($stderr) ? (string)stream_get_contents($stderr) : '';
         if (is_resource($stdout)) {
             fclose($stdout);
         }
@@ -428,6 +551,57 @@ final class DocumentLocaleAutomationService
         }
 
         return $decoded;
+    }
+
+    private function commandTimeoutSeconds(): int
+    {
+        $raw = trim((string)(getenv('DCC_TRANSLATION_COMMAND_TIMEOUT_SECONDS') ?: ''));
+        $value = ctype_digit($raw) ? (int)$raw : self::DEFAULT_COMMAND_TIMEOUT_SECONDS;
+        return max(1, min(600, $value));
+    }
+
+    /**
+     * @param resource $process
+     * @param resource|null $stdin
+     * @param resource|null $stdout
+     * @param resource|null $stderr
+     * @return array<string, mixed>
+     */
+    private function abortCommandProvider(
+        $process,
+        $stdin,
+        $stdout,
+        $stderr,
+        string $stdoutBody,
+        string $stderrBody,
+        string $reason,
+        string $fallbackMessage,
+        string $engineVersion
+    ): array {
+        if (is_resource($stdin)) {
+            fclose($stdin);
+        }
+        if (is_resource($stdout)) {
+            $stdoutBody .= (string)stream_get_contents($stdout);
+            fclose($stdout);
+        }
+        if (is_resource($stderr)) {
+            $stderrBody .= (string)stream_get_contents($stderr);
+            fclose($stderr);
+        }
+        @proc_terminate($process);
+        @proc_close($process);
+
+        return [
+            'ok' => false,
+            'provider' => 'command',
+            'engine_version' => $engineVersion,
+            'glossary_version' => $this->glossaryVersion(),
+            'reason' => $reason,
+            'message' => trim($stderrBody) !== ''
+                ? trim($stderrBody)
+                : (trim($stdoutBody) !== '' ? trim($stdoutBody) : $fallbackMessage),
+        ];
     }
 
     private function normalizeRepoRelativePath(string $path): string
