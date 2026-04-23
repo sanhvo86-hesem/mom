@@ -62,6 +62,9 @@ final class DocumentLocaleAutomationService
         $sourceStatus = $this->normaliseSourceStatus((string)($input['source_status'] ?? 'draft'));
         $sourceRevision = $this->normaliseRevision((string)($input['revision'] ?? '0.0'));
         $dccRevision = $this->toDccRevision($sourceRevision);
+        $workingPreview = in_array($sourceStatus, ['draft', 'in_review'], true);
+        $existingVariant = $this->fetchLocaleVariant($docCode, self::TARGET_LOCALE);
+        $releasedSnapshot = $workingPreview ? $this->releasedSnapshotFrom($existingVariant) : null;
 
         $catalog = $this->resolveCatalogMetadata($docCode, $baseRel);
         $title = trim((string)($input['title'] ?? ($catalog['title'] ?? '')));
@@ -74,7 +77,11 @@ final class DocumentLocaleAutomationService
 
         $normalizedSourceHtml = $this->normalizeSourceHtml($sourceHtml);
         $sourceHash = strtolower(hash('sha256', $normalizedSourceHtml));
-        $artifactRelPath = $this->hiddenSiblingArtifactPath($baseRel, self::TARGET_LOCALE);
+        $artifactRelPath = $this->hiddenSiblingArtifactPath(
+            $baseRel,
+            self::TARGET_LOCALE,
+            $workingPreview ? $sourceRevision : null
+        );
 
         $this->syncHeaderBaseline([
             'doc_code' => $docCode,
@@ -104,6 +111,22 @@ final class DocumentLocaleAutomationService
         $dcc = new DocumentControlService($this->data);
         if (!$attempt['ok']) {
             $this->deleteArtifactIfExists($artifactRelPath);
+            $metadata = [
+                'auto_sync' => true,
+                'target_locale' => self::TARGET_LOCALE,
+                'trigger' => $trigger,
+                'source_status' => $sourceStatus,
+                'source_revision' => $sourceRevision,
+                'dcc_revision' => $dccRevision,
+                'source_base_rel_path' => $baseRel,
+                'artifact_scope' => $workingPreview ? 'working_preview' : 'current_revision',
+                'blocked_reason' => (string)($attempt['reason'] ?? 'translation_provider_not_configured'),
+                'blocked_message' => (string)($attempt['message'] ?? 'No compliant internal translation provider is configured.'),
+                'last_attempt_at' => gmdate(DATE_ATOM),
+            ];
+            if ($releasedSnapshot !== null) {
+                $metadata['released_snapshot'] = $releasedSnapshot;
+            }
             $variant = $dcc->upsertLocaleVariant($docCode, self::TARGET_LOCALE, [
                 'title' => $title,
                 'subtitle' => null,
@@ -115,18 +138,7 @@ final class DocumentLocaleAutomationService
                 'glossary_version' => (string)($attempt['glossary_version'] ?? $this->glossaryVersion()),
                 'engine_version' => (string)($attempt['engine_version'] ?? 'unconfigured'),
                 'published_at' => null,
-                'metadata' => [
-                    'auto_sync' => true,
-                    'target_locale' => self::TARGET_LOCALE,
-                    'trigger' => $trigger,
-                    'source_status' => $sourceStatus,
-                    'source_revision' => $sourceRevision,
-                    'dcc_revision' => $dccRevision,
-                    'source_base_rel_path' => $baseRel,
-                    'blocked_reason' => (string)($attempt['reason'] ?? 'translation_provider_not_configured'),
-                    'blocked_message' => (string)($attempt['message'] ?? 'No compliant internal translation provider is configured.'),
-                    'last_attempt_at' => gmdate(DATE_ATOM),
-                ],
+                'metadata' => $metadata,
             ], $actor);
 
             return [
@@ -151,6 +163,23 @@ final class DocumentLocaleAutomationService
             (string)($attempt['translation_state'] ?? ($trigger === 'approve_release' ? 'review_pending' : 'machine_preview')),
             $trigger === 'approve_release' ? 'review_pending' : 'machine_preview'
         );
+        $metadata = [
+            'auto_sync' => true,
+            'target_locale' => self::TARGET_LOCALE,
+            'trigger' => $trigger,
+            'source_status' => $sourceStatus,
+            'source_revision' => $sourceRevision,
+            'dcc_revision' => $dccRevision,
+            'source_base_rel_path' => $baseRel,
+            'artifact_strategy' => $workingPreview
+                ? 'hidden_sibling_locale_artifact_revision_preview'
+                : 'hidden_sibling_locale_artifact',
+            'artifact_scope' => $workingPreview ? 'working_preview' : 'current_revision',
+            'last_generated_at' => gmdate(DATE_ATOM),
+        ];
+        if ($releasedSnapshot !== null) {
+            $metadata['released_snapshot'] = $releasedSnapshot;
+        }
 
         $variant = $dcc->upsertLocaleVariant($docCode, self::TARGET_LOCALE, [
             'title' => $this->nullableText($attempt['title'] ?? $title),
@@ -163,17 +192,7 @@ final class DocumentLocaleAutomationService
             'glossary_version' => (string)($attempt['glossary_version'] ?? $this->glossaryVersion()),
             'engine_version' => (string)($attempt['engine_version'] ?? 'command'),
             'published_at' => $state === 'released' ? gmdate(DATE_ATOM) : null,
-            'metadata' => [
-                'auto_sync' => true,
-                'target_locale' => self::TARGET_LOCALE,
-                'trigger' => $trigger,
-                'source_status' => $sourceStatus,
-                'source_revision' => $sourceRevision,
-                'dcc_revision' => $dccRevision,
-                'source_base_rel_path' => $baseRel,
-                'artifact_strategy' => 'hidden_sibling_locale_artifact',
-                'last_generated_at' => gmdate(DATE_ATOM),
-            ],
+            'metadata' => $metadata,
         ], $actor);
 
         return [
@@ -183,6 +202,57 @@ final class DocumentLocaleAutomationService
             'artifact_rel_path' => $artifactRelPath,
             'locale_variant' => $variant,
         ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    public function restoreReleasedSnapshot(string $docCode, string $actor): array
+    {
+        $docCode = DocumentControlService::canonicalizeCode($docCode);
+        if ($docCode === '') {
+            throw new InvalidArgumentException('dcc_locale_restore_missing_doc_code');
+        }
+
+        $actor = trim($actor) !== '' ? trim($actor) : 'system';
+        $existing = $this->fetchLocaleVariant($docCode, self::TARGET_LOCALE);
+        $snapshot = $this->releasedSnapshotFrom($existing);
+        if ($snapshot === null) {
+            return ['ok' => false, 'restored' => false, 'reason' => 'released_snapshot_missing'];
+        }
+
+        $snapshotPath = $this->normalizeRepoRelativePath((string)($snapshot['artifact_rel_path'] ?? ''));
+        if ($snapshotPath === '' || !is_file($this->rootDir . '/' . $snapshotPath)) {
+            return ['ok' => false, 'restored' => false, 'reason' => 'released_snapshot_artifact_missing'];
+        }
+
+        $currentPath = $this->normalizeRepoRelativePath((string)($existing['artifact_rel_path'] ?? ''));
+        if ($currentPath !== '' && $currentPath !== $snapshotPath) {
+            $this->deleteArtifactIfExists($currentPath);
+        }
+
+        $metadata = $this->normalizeVariantMetadata($existing['metadata'] ?? []);
+        unset($metadata['released_snapshot']);
+        $metadata['restored_from_released_snapshot_at'] = gmdate(DATE_ATOM);
+
+        $dcc = new DocumentControlService($this->data);
+        $variant = $dcc->upsertLocaleVariant($docCode, self::TARGET_LOCALE, [
+            'title' => $this->nullableText($snapshot['title'] ?? null),
+            'subtitle' => $this->nullableText($snapshot['subtitle'] ?? null),
+            'artifact_rel_path' => $snapshotPath,
+            'artifact_source_revision' => $snapshot['artifact_source_revision'] ?? null,
+            'artifact_source_hash_sha256' => $snapshot['artifact_source_hash_sha256'] ?? null,
+            'translation_state' => (string)($snapshot['translation_state'] ?? 'released'),
+            'translation_provider' => $snapshot['translation_provider'] ?? null,
+            'glossary_version' => $snapshot['glossary_version'] ?? null,
+            'engine_version' => $snapshot['engine_version'] ?? null,
+            'reviewer_party_id' => $snapshot['reviewer_party_id'] ?? null,
+            'reviewed_at' => $snapshot['reviewed_at'] ?? null,
+            'published_at' => $snapshot['published_at'] ?? null,
+            'metadata' => $metadata,
+        ], $actor);
+
+        return ['ok' => true, 'restored' => true, 'locale_variant' => $variant];
     }
 
     /**
@@ -365,13 +435,22 @@ final class DocumentLocaleAutomationService
         return $normalized;
     }
 
-    private function hiddenSiblingArtifactPath(string $baseRelPath, string $locale): string
+    private function hiddenSiblingArtifactPath(string $baseRelPath, string $locale, ?string $revision = null): string
     {
         $dir = str_replace('\\', '/', dirname($baseRelPath));
         $filename = basename($baseRelPath);
         $extension = strtolower((string)pathinfo($filename, PATHINFO_EXTENSION));
         $stem = (string)pathinfo($filename, PATHINFO_FILENAME);
-        $artifactFile = '_' . $stem . '.' . strtolower($locale) . '.' . $extension;
+        $suffix = '';
+        if ($revision !== null && trim($revision) !== '') {
+            $revSlug = strtolower(trim($revision));
+            $revSlug = preg_replace('/[^a-z0-9]+/i', '_', $revSlug) ?? $revSlug;
+            $revSlug = trim($revSlug, '_');
+            if ($revSlug !== '') {
+                $suffix = '.preview_r' . $revSlug;
+            }
+        }
+        $artifactFile = '_' . $stem . $suffix . '.' . strtolower($locale) . '.' . $extension;
         return ($dir === '.' || $dir === '') ? $artifactFile : ($dir . '/' . $artifactFile);
     }
 
@@ -424,6 +503,84 @@ final class DocumentLocaleAutomationService
         if (is_file($abs)) {
             @unlink($abs);
         }
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function fetchLocaleVariant(string $docCode, string $locale): array
+    {
+        $rows = $this->data->query(
+            "SELECT doc_code, locale, title, subtitle, artifact_rel_path,
+                    artifact_source_revision, artifact_source_hash_sha256,
+                    translation_state, translation_provider, glossary_version,
+                    engine_version, reviewer_party_id, reviewed_at, published_at,
+                    metadata
+             FROM dcc_document_locale_variant
+             WHERE doc_code = :c AND locale = :loc
+             LIMIT 1",
+            [':c' => $docCode, ':loc' => $locale]
+        ) ?? [];
+
+        $row = $rows[0] ?? [];
+        if (!is_array($row)) {
+            return [];
+        }
+        $row['metadata'] = $this->normalizeVariantMetadata($row['metadata'] ?? []);
+        return $row;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function normalizeVariantMetadata(mixed $value): array
+    {
+        if (is_array($value)) {
+            return $value;
+        }
+        if (is_string($value)) {
+            $decoded = json_decode($value, true);
+            return is_array($decoded) ? $decoded : [];
+        }
+        return [];
+    }
+
+    /**
+     * @param array<string, mixed> $variant
+     * @return array<string, mixed>|null
+     */
+    private function releasedSnapshotFrom(array $variant): ?array
+    {
+        if ($variant === []) {
+            return null;
+        }
+
+        $metadata = $this->normalizeVariantMetadata($variant['metadata'] ?? []);
+        $snapshot = $metadata['released_snapshot'] ?? null;
+        if (is_array($snapshot) && trim((string)($snapshot['artifact_rel_path'] ?? '')) !== '') {
+            return $snapshot;
+        }
+
+        $state = strtolower(trim((string)($variant['translation_state'] ?? '')));
+        $artifactPath = trim((string)($variant['artifact_rel_path'] ?? ''));
+        if ($artifactPath === '' || ($state !== 'released' && empty($variant['published_at']))) {
+            return null;
+        }
+
+        return [
+            'title' => $this->nullableText($variant['title'] ?? null),
+            'subtitle' => $this->nullableText($variant['subtitle'] ?? null),
+            'artifact_rel_path' => $artifactPath,
+            'artifact_source_revision' => $variant['artifact_source_revision'] ?? null,
+            'artifact_source_hash_sha256' => $variant['artifact_source_hash_sha256'] ?? null,
+            'translation_state' => $state !== '' ? $state : 'released',
+            'translation_provider' => $variant['translation_provider'] ?? null,
+            'glossary_version' => $variant['glossary_version'] ?? null,
+            'engine_version' => $variant['engine_version'] ?? null,
+            'reviewer_party_id' => $variant['reviewer_party_id'] ?? null,
+            'reviewed_at' => $variant['reviewed_at'] ?? null,
+            'published_at' => $variant['published_at'] ?? null,
+        ];
     }
 
     /**

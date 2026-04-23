@@ -467,10 +467,11 @@ paths:
       operationId: docCreate
       tags: [Documents]
       summary: Create a new document
+      deprecated: true
       description: |
-        Create a new document with an initial HTML draft. Requires document editor permission.
-
-        **Legacy action:** `doc_create`
+        Compatibility description for document creation.
+        Portal/frontend code must use the canonical control-plane endpoint
+        `POST /api/v1/eqms/control-plane/documents/create` for file-backed authoring.
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
       requestBody:
@@ -534,24 +535,83 @@ paths:
                 error: "code_exists"
                 server_time: "2025-06-01T08:00:00+00:00"
 
-  /api/documents/{code}/versions:
+  /api/v1/eqms/control-plane/documents/create:
+    post:
+      operationId: docCreateCanonical
+      tags: [Documents]
+      summary: Create a new document on the canonical authoring path
+      description: |
+        Create a new document with an initial HTML draft on the canonical
+        control-plane authoring surface.
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DocCreateRequest'
+            example:
+              code: "SOP-999"
+              title: "New Procedure"
+              cat: "SOP"
+              owner: "QA/QMS"
+              folder: ""
+              revision: "0.0"
+      responses:
+        '200':
+          description: Document created.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      code:
+                        type: string
+                      path:
+                        type: string
+                      folder:
+                        type: string
+                      file_name:
+                        type: string
+                      revision:
+                        type: string
+                      draft_rel:
+                        type: string
+                      locale_translation:
+                        type: object
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Document code already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/eqms/control-plane/documents/versions:
     get:
       operationId: docsListVersions
       tags: [Documents]
-      summary: List all versions of a document
+      summary: List all versions of a document on the canonical authoring path
       description: |
-        Returns the version manifest and workflow state for a document.
-
-        **Legacy action:** `doc_versions_list`
+        Returns the version manifest and workflow state for a document on the
+        canonical control-plane authoring surface.
       parameters:
         - name: code
-          in: path
+          in: query
           required: true
           schema:
             type: string
           description: Document code (e.g. SOP-101).
           example: "SOP-101"
-        - name: path
+        - name: base_path
           in: query
           required: true
           schema:
@@ -652,17 +712,17 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
 
-  # ── Document action endpoints (legacy POST actions) ──
+  # ── Canonical control-plane document authoring endpoints ──
 
-  /?action=doc_save_draft:
+  /api/v1/eqms/control-plane/documents/save-draft:
     post:
       operationId: docSaveDraft
       tags: [Documents]
       summary: Save a working draft
       description: |
-        Save HTML content as a working draft for an existing document.
-
-        **Legacy action:** `doc_save_draft`
+        Save HTML content as a working draft for an existing document on the
+        canonical control-plane authoring surface.
+        `base_path` is the preferred request field; legacy `path` remains a compatibility alias.
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
       requestBody:
@@ -671,7 +731,7 @@ paths:
           application/json:
             schema:
               type: object
-              required: [code, html, path]
+              required: [code, html, base_path]
               properties:
                 code:
                   type: string
@@ -680,9 +740,12 @@ paths:
                 html:
                   type: string
                   description: Full HTML content of the draft.
-                path:
+                base_path:
                   type: string
                   description: Relative path to the base document file.
+                path:
+                  type: string
+                  description: Legacy compatibility alias for `base_path`.
       responses:
         '200':
           description: Draft saved.
@@ -697,20 +760,22 @@ paths:
                         type: string
                       revision:
                         type: string
+                      locale_translation:
+                        type: object
         '401':
           $ref: '#/components/responses/Unauthorized'
         '403':
           $ref: '#/components/responses/Forbidden'
 
-  /?action=doc_submit_review:
+  /api/v1/eqms/control-plane/documents/submit-review:
     post:
       operationId: docSubmitReview
       tags: [Documents]
       summary: Submit document for review
       description: |
-        Submit a document for review/approval. Optionally include updated HTML content.
-
-        **Legacy action:** `doc_submit_review`
+        Submit a document for review/approval on the canonical control-plane
+        authoring surface. `base_path` is the preferred request field; legacy
+        `path` remains a compatibility alias.
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
       requestBody:
@@ -719,15 +784,18 @@ paths:
           application/json:
             schema:
               type: object
-              required: [code, path]
+              required: [code, base_path]
               properties:
                 code:
                   type: string
                 html:
                   type: string
                   description: Optional updated HTML content.
+                base_path:
+                  type: string
                 path:
                   type: string
+                  description: Legacy compatibility alias for `base_path`.
                 note:
                   type: string
                   description: Review note.
@@ -750,17 +818,19 @@ paths:
                         example: "in_review"
                       revision:
                         type: string
+                      locale_translation:
+                        type: object
 
-  /?action=doc_approve:
+  /api/v1/eqms/control-plane/documents/approve:
     post:
       operationId: docApprove
       tags: [Documents]
       summary: Approve a document
       description: |
-        Approve a document that is in review. Publishes the approved version to the live file.
-        Requires approver role.
-
-        **Legacy action:** `doc_approve`
+        Approve a document that is in review on the canonical control-plane
+        authoring surface. Publishes the approved version to the live file and
+        triggers locale sync. `base_path` is the preferred request field;
+        legacy `path` remains a compatibility alias.
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
       requestBody:
@@ -769,12 +839,15 @@ paths:
           application/json:
             schema:
               type: object
-              required: [code, path]
+              required: [code, base_path]
               properties:
                 code:
                   type: string
+                base_path:
+                  type: string
                 path:
                   type: string
+                  description: Legacy compatibility alias for `base_path`.
                 effective_date:
                   type: string
                   format: date
@@ -799,20 +872,22 @@ paths:
                         example: "approved"
                       revision:
                         type: string
+                      locale_translation:
+                        type: object
         '403':
           $ref: '#/components/responses/Forbidden'
         '404':
           description: Document not found.
 
-  /?action=doc_reject:
+  /api/v1/eqms/control-plane/documents/reject:
     post:
       operationId: docReject
       tags: [Documents]
       summary: Reject a document review
       description: |
-        Reject a document submission, reverting it to draft status. Requires approver role.
-
-        **Legacy action:** `doc_reject`
+        Reject a document submission, reverting it to draft status on the
+        canonical control-plane authoring surface. `base_path` is the preferred
+        request field; legacy `path` remains a compatibility alias.
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
       requestBody:
@@ -821,12 +896,15 @@ paths:
           application/json:
             schema:
               type: object
-              required: [code, path]
+              required: [code, base_path]
               properties:
                 code:
                   type: string
+                base_path:
+                  type: string
                 path:
                   type: string
+                  description: Legacy compatibility alias for `base_path`.
                 reason:
                   type: string
                   description: Rejection reason.
@@ -851,10 +929,11 @@ paths:
       operationId: docUpdateMeta
       tags: [Documents]
       summary: Update document metadata
+      deprecated: true
       description: |
-        Update metadata fields (title, owner, cat, effective_date, delivery_mode) for a document.
-
-        **Legacy action:** `doc_update_meta`
+        Legacy compatibility surface for document metadata updates.
+        Portal/frontend code must not use legacy `?action=doc_update_meta` writes;
+        governed metadata changes belong on canonical DCC/control-plane paths.
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
       requestBody:
@@ -894,15 +973,15 @@ paths:
                       updated:
                         type: boolean
 
-  /?action=doc_delete_drafts:
+  /api/v1/eqms/control-plane/documents/delete-drafts:
     post:
       operationId: docDeleteDrafts
       tags: [Documents]
       summary: Delete all draft versions (admin)
       description: |
-        Delete all draft version files for a document. Admin only.
-
-        **Legacy action:** `doc_delete_drafts`
+        Delete all draft version files for a document on the canonical
+        control-plane authoring surface. Admin only. `base_path` is the
+        preferred request field; legacy `path` remains a compatibility alias.
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
       requestBody:
@@ -911,12 +990,15 @@ paths:
           application/json:
             schema:
               type: object
-              required: [code, path]
+              required: [code, base_path]
               properties:
                 code:
                   type: string
+                base_path:
+                  type: string
                 path:
                   type: string
+                  description: Legacy compatibility alias for `base_path`.
       responses:
         '200':
           description: Drafts deleted.
@@ -932,15 +1014,15 @@ paths:
                       state:
                         $ref: '#/components/schemas/DocState'
 
-  /?action=doc_delete_version:
+  /api/v1/eqms/control-plane/documents/delete-version:
     post:
       operationId: docDeleteVersion
       tags: [Documents]
       summary: Delete a specific version entry (admin)
       description: |
-        Delete a specific version from the manifest and remove its file. Admin only.
-
-        **Legacy action:** `doc_delete_version`
+        Delete a specific version from the manifest and remove its file on the
+        canonical control-plane authoring surface. Admin only. `base_path` is
+        the preferred request field; legacy `path` remains a compatibility alias.
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
       requestBody:
@@ -949,12 +1031,15 @@ paths:
           application/json:
             schema:
               type: object
-              required: [code, path, version]
+              required: [code, base_path, version]
               properties:
                 code:
                   type: string
+                base_path:
+                  type: string
                 path:
                   type: string
+                  description: Legacy compatibility alias for `base_path`.
                 version:
                   type: string
                   description: Version string (e.g. "v1.0").
@@ -973,15 +1058,16 @@ paths:
                       state:
                         $ref: '#/components/schemas/DocState'
 
-  /?action=doc_start_new_revision:
+  /api/v1/eqms/control-plane/documents/start-new-revision:
     post:
       operationId: docStartNewRevision
       tags: [Documents]
       summary: Start a new revision cycle
       description: |
-        Increment the document revision (minor or major) and create a new draft from the live file.
-
-        **Legacy action:** `doc_start_new_revision`
+        Increment the document revision (minor or major) and create a new draft
+        from the live file on the canonical control-plane authoring surface.
+        `base_path` is the preferred request field; legacy `path` remains a
+        compatibility alias.
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
       requestBody:
@@ -990,12 +1076,15 @@ paths:
           application/json:
             schema:
               type: object
-              required: [code, path]
+              required: [code, base_path]
               properties:
                 code:
                   type: string
+                base_path:
+                  type: string
                 path:
                   type: string
+                  description: Legacy compatibility alias for `base_path`.
                 update_type:
                   type: string
                   enum: [minor, major]

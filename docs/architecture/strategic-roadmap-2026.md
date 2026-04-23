@@ -54,9 +54,9 @@
 
 **Admin -- Display (4):** `docs_visibility_get`, `admin_docs_visibility_save`, `admin_portal_display_config_get`, `admin_portal_display_config_save`
 
-**Documents -- CRUD (8):** `doc_create`, `docs_snapshot`, `doc_versions_list`, `doc_start_new_revision`, `doc_save_draft`, `doc_update_meta`, `doc_delete_drafts`, `doc_delete_version`
+**Documents -- CRUD (8):** legacy controller/audit labels `doc_create`, `docs_snapshot`, `doc_versions_list`, `doc_start_new_revision`, `doc_save_draft`, `doc_update_meta`, `doc_delete_drafts`, `doc_delete_version`
 
-**Documents -- Workflow (3):** `doc_submit_review`, `doc_approve`, `doc_reject`
+**Documents -- Workflow (3):** legacy controller/audit labels `doc_submit_review`, `doc_approve`, `doc_reject`
 
 **Documents -- Files (5):** `delete_doc`, `delete_folder`, `create_folder`, `move_doc`, `rename_doc`, `rename_folder`
 
@@ -541,8 +541,8 @@ Testing approach: PHPUnit 10+ with a dedicated test PostgreSQL database (can use
 ```
 
 The router supports two styles simultaneously:
-- **Legacy:** `api.php?action=doc_create` (existing, keep working)
-- **RESTful:** `api.php/v1/documents` with HTTP verbs (new)
+- **Legacy controller/action labels:** preserved internally for compatibility and audit naming, but product/frontend document writes must not target `?action=doc_*`
+- **REST/control-plane:** canonical portal/frontend document authoring goes through `/api/v1/eqms/control-plane/documents/*`
 
 Implementation:
 ```php
@@ -561,20 +561,20 @@ Action-to-route mapping (subset):
 ```
 action=status            -> GET    /v1/auth/status
 action=auth_login        -> POST   /v1/auth/login
-action=doc_create        -> POST   /v1/documents
+action=doc_create        -> POST   /api/v1/eqms/control-plane/documents/create
 action=docs_snapshot     -> GET    /v1/documents
-action=doc_approve       -> POST   /v1/documents/{id}/approve
+action=doc_approve       -> POST   /api/v1/eqms/control-plane/documents/approve
 action=online_form_list  -> GET    /v1/forms
 action=record_id_next    -> POST   /v1/records/next-id
 ```
 
 **Files to modify:**
 - `01-QMS-Portal/api.php` -- replace the giant `switch ($action)` with `$router->dispatch()`. The switch body is extracted into controller methods.
-- `01-QMS-Portal/.htaccess` -- add RewriteRule for clean URLs (optional, legacy `?action=` continues to work).
+- `01-QMS-Portal/.htaccess` -- add RewriteRule for clean URLs.
 
 **Success criteria:**
-- All 55 existing `?action=` calls continue to work identically.
-- New `/v1/` routes are available in parallel.
+- Product/frontend document writes use the canonical `/api/v1/eqms/control-plane/documents/*` surface.
+- Legacy `?action=doc_*` write routes remain policy-blocked for portal/frontend use.
 - 404 response for unknown routes/actions.
 
 ### Task 2.2: Create Domain Controllers

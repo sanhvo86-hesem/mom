@@ -775,7 +775,7 @@ async function saveDraftSilent(code){
     const fullHtml = buildFullDocHtmlFromIframe(innerHtml, doc.path);
     const st = getDocState(code) || {};
     const revision = String(st.revision || doc.rev || '0');
-    const res = await apiCall('doc_save_draft', {code: code, base_path: doc.path, revision, note: 'Auto-save before navigation', html: fullHtml});
+    const res = await controlPlaneDocumentAuthoringRequest('save-draft', {code: code, base_path: doc.path, revision, note: 'Auto-save before navigation', html: fullHtml});
     if(res && res.ok){
       SERVER_DOC_STATE[doc.code] = res.state;
       if(res.versions) setDocVersions(doc.code, res.versions);
@@ -884,11 +884,14 @@ function getDocLocaleView(doc){
   const baseFile = String(doc && doc.path || '').trim();
   if(!doc) return { locale: locale, mode: 'source', file: '', available: false, translationState: 'missing' };
   if(locale !== 'en'){
+    const workingFile = String(getLatestWorkingFile(doc.code) || '').trim();
+    const status = String(getDocStatus(doc) || '').trim().toLowerCase();
+    const activeFile = ((status === 'draft' || status === 'in_review' || status === 'pending_approval') && workingFile) ? workingFile : baseFile;
     return {
       locale: 'vi',
       mode: 'source',
-      file: baseFile,
-      available: !!baseFile,
+      file: activeFile,
+      available: !!activeFile,
       translationState: 'source',
       localeVariantExists: true,
       isLocaleFallback: false
@@ -1397,7 +1400,7 @@ const innerHtml = _getCurrentEditorInnerHtml();
     const st = getDocState(code) || {};
     const revision = String(st.revision || doc.rev || '0');
 
-    const res = await apiCall('doc_save_draft', {code: code, base_path: doc.path, revision, note: note||'', html: fullHtml});
+    const res = await controlPlaneDocumentAuthoringRequest('save-draft', {code: code, base_path: doc.path, revision, note: note||'', html: fullHtml});
     if(res && res.ok){
       SERVER_DOC_STATE[doc.code] = res.state;
       if(res.versions) setDocVersions(doc.code, res.versions);
@@ -1640,7 +1643,7 @@ async function submitWorkbookForReview(code){
     );
     if(note === null) return;
     const updateType = String(state.updateType || 'minor') === 'major' ? 'major' : 'minor';
-    const res = await apiCall('doc_submit_review', {code: doc.code, base_path: doc.path, revision, updateType, note: note || ''});
+    const res = await controlPlaneDocumentAuthoringRequest('submit-review', {code: doc.code, base_path: doc.path, revision, updateType, note: note || ''});
     if(res && res.ok){
       if(res.state) setDocState(code, res.state);
       if(res.versions) setDocVersions(code, res.versions);
@@ -1707,7 +1710,7 @@ async function confirmSubmitForReview(code){
     const st=getDocState(code)||{status:'draft',revision:doc.rev||'0'};
     const rev = st.revision || doc.rev || '0';
 
-    const res = await apiCall('doc_submit_review', {code: code, base_path: doc.path, revision: rev, updateType: updateType, note: changeNote||'', html: fullHtml});
+    const res = await controlPlaneDocumentAuthoringRequest('submit-review', {code: code, base_path: doc.path, revision: rev, updateType: updateType, note: changeNote||'', html: fullHtml});
     if(res && res.ok){
       if(res.state) setDocState(code, res.state);
       if(res.versions) setDocVersions(code, res.versions);
@@ -1773,7 +1776,7 @@ async function approveDoc(code){
 
     if(!confirm(msg)) return;
 
-    const res = await apiCall('doc_approve', {
+    const res = await controlPlaneDocumentAuthoringRequest('approve', {
       code: doc.code,
       base_path: doc.path,
       prevRevision: prevRev,
@@ -1807,7 +1810,7 @@ async function rejectDoc(code){
     const doc=DOCS.find(d=>d.code===code);
     if(!doc) return;
 
-    const res = await apiCall('doc_reject', {code: code, base_path: doc.path, reason: reason||''});
+    const res = await controlPlaneDocumentAuthoringRequest('reject', {code: code, base_path: doc.path, reason: reason||''});
     if(res && res.ok){
       if(res.state) setDocState(code, res.state);
       // Reload versions/state from server to keep folder-sync
@@ -1855,7 +1858,7 @@ async function restoreVersion(code, idx){
     const rev = (v.version||'v0').replace(/^v/i,'') || '0';
     const note = (lang==='en'?'Restored from ':'Khôi phục từ ') + (v.version||'');
 
-    const res = await apiCall('doc_save_draft', {code: code, base_path: doc.path, revision: rev, note: note, html: html});
+    const res = await controlPlaneDocumentAuthoringRequest('save-draft', {code: code, base_path: doc.path, revision: rev, note: note, html: html});
     if(res && res.ok){
       if(res.state) setDocState(code, res.state);
       if(res.versions) setDocVersions(code, res.versions);

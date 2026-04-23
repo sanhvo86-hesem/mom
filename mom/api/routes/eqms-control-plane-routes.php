@@ -12,6 +12,15 @@ return static function (Router $router, string $dataDir): void {
     $router->post('/api/v1/eqms/control-plane/commands', EqmsControlPlaneController::class, 'submitCommand');
     $router->get('/api/v1/eqms/control-plane/commands/{command_id}', EqmsControlPlaneController::class, 'getCommand');
     $router->post('/api/v1/eqms/control-plane/commands/validate', EqmsControlPlaneController::class, 'validateCommand');
+    $router->post('/api/v1/eqms/control-plane/documents/create', CanonicalDocumentAuthoringController::class, 'create');
+    $router->post('/api/v1/eqms/control-plane/documents/save-draft', CanonicalDocumentAuthoringController::class, 'saveDraft');
+    $router->post('/api/v1/eqms/control-plane/documents/submit-review', CanonicalDocumentAuthoringController::class, 'submitReview');
+    $router->post('/api/v1/eqms/control-plane/documents/approve', CanonicalDocumentAuthoringController::class, 'approve');
+    $router->post('/api/v1/eqms/control-plane/documents/reject', CanonicalDocumentAuthoringController::class, 'reject');
+    $router->post('/api/v1/eqms/control-plane/documents/delete-drafts', CanonicalDocumentAuthoringController::class, 'deleteDrafts');
+    $router->post('/api/v1/eqms/control-plane/documents/delete-version', CanonicalDocumentAuthoringController::class, 'deleteVersion');
+    $router->post('/api/v1/eqms/control-plane/documents/start-new-revision', CanonicalDocumentAuthoringController::class, 'startNewRevision');
+    $router->get('/api/v1/eqms/control-plane/documents/versions', CanonicalDocumentAuthoringController::class, 'listVersions');
     $router->post('/api/v1/eqms/documents/revisions', EqmsControlPlaneController::class, 'createDocumentRevision');
     $router->post('/api/v1/eqms/documents/read-acknowledgements', EqmsControlPlaneController::class, 'acknowledgeDocumentRead');
     $router->post('/api/v1/eqms/documents/revisions/supersede', EqmsControlPlaneController::class, 'supersedeDocumentRevision');

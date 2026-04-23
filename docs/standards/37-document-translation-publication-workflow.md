@@ -21,7 +21,7 @@ It does **not** replace the editorial Vietnamese-writing rules in `03-language-a
 2. `en` is a published locale artifact, not a second editable source.
 3. Browser live translation is forbidden.
 4. Google Translate, DOM mutation, hidden browser widgets, or post-render text replacement must never be used as the controlled English mechanism.
-5. The portal must fail closed when `en` is requested but no approved/published English artifact exists.
+5. The portal must fail closed when `en` is requested but no matching English locale artifact exists.
 6. Fail-closed means:
    - no fallback to browser-translated DOM
    - no mixed `English title + Vietnamese body`
@@ -59,13 +59,15 @@ When the user switches to English:
 1. Frontend shell rerenders from locale resources.
 2. DCC metadata is fetched with locale-aware projection.
 3. Document viewer loads the `en` artifact if and only if the locale variant says it is renderable.
-4. If no valid English artifact exists, the viewer shows an explicit unavailable state.
+4. A renderable English artifact may be a read-only preview (`machine_preview`, `review_pending`, `reviewed`) or a released artifact.
+5. If no valid English artifact exists, the viewer shows an explicit unavailable state.
 
 When the user switches to Vietnamese:
 
 1. Frontend shell rerenders from locale resources.
 2. DCC metadata returns to Vietnamese/default projection.
-3. Document viewer loads the canonical Vietnamese source.
+3. For `approved/released`, document viewer loads the canonical Vietnamese source.
+4. For `draft/in_review`, Vietnamese and English views must resolve against the same active working source carrier/revision baseline.
 
 ## 5. Locale Variant States
 
@@ -81,6 +83,8 @@ Allowed `translation_state` values:
 Render rule:
 
 - `machine_preview`, `review_pending`, `reviewed`, `released` may render only when a valid artifact exists.
+- Renderability is driven by DCC locale projection, not by browser locale alone.
+- For `draft` and `in_review`, a hash-matching English artifact may remain renderable even if the working revision number has just advanced, as long as the current working source body still matches the artifact baseline.
 - `superseded` and `blocked` must not render as the active locale view.
 - missing row = no locale artifact published.
 
@@ -92,14 +96,17 @@ Required pattern:
 
 - source: `mom/docs/.../sop-501-example.html`
 - English artifact: `mom/docs/.../_sop-501-example.en.html`
+- working preview artifact: `mom/docs/.../_sop-501-example.preview_r1_1.en.html`
 
 Rules:
 
 1. Artifact filename begins with `_`.
 2. Artifact keeps the same folder as the source file unless a stricter controlled store is defined later.
 3. Artifact keeps the same relative link environment as the source file.
-4. Artifact is never scanned as a normal document card.
-5. Artifact paths must never use hardcoded absolute production hosts.
+4. Draft/in-review preview artifacts may be revision-scoped hidden siblings, but they must still start with `_` and remain scan-safe.
+5. Released artifact path must remain stable; draft/review preview generation must not overwrite or delete the last released English artifact before the source lifecycle actually advances.
+6. Artifact is never scanned as a normal document card.
+7. Artifact paths must never use hardcoded absolute production hosts.
 
 ## 7. Header And Metadata Rule
 
@@ -135,17 +142,18 @@ The automation trigger for English generation MUST live on the backend command/s
 
 Rules:
 
-1. The trigger fires after create/save/approve writes the Vietnamese source successfully.
-2. The Vietnamese save result is authoritative even if translation fails.
-3. The translation provider must be internal/on-prem/repo-local.
-4. AI or SaaS translators may be plugged in only when governance explicitly allows the document content to leave the private boundary.
-5. If no compliant internal provider is configured, the backend MUST still upsert a locale-variant row with:
+1. The trigger fires after create/save/submit-review/approve writes the Vietnamese source successfully.
+2. The canonical runtime path for file-backed authoring is the control-plane REST surface under `/api/v1/eqms/control-plane/documents/*`, not the legacy `?action=doc_*` routes.
+3. The Vietnamese save result is authoritative even if translation fails.
+4. The translation provider must be internal/on-prem/repo-local.
+5. AI or SaaS translators may be plugged in only when governance explicitly allows the document content to leave the private boundary.
+6. If no compliant internal provider is configured, the backend MUST still upsert a locale-variant row with:
    - current source revision
    - current source hash
    - `translation_state = blocked`
    - a machine-readable blocked reason in metadata
-6. The backend MUST NOT fake an English artifact when no provider exists.
-7. The frontend English tab must surface `blocked` truthfully instead of pretending the artifact is simply published-later content.
+7. The backend MUST NOT fake an English artifact when no provider exists.
+8. The frontend English tab must surface `blocked` truthfully instead of pretending the artifact is simply published-later content.
 
 ### 9.2 Provider contract rule
 
@@ -176,7 +184,8 @@ That means:
 
 1. hash comparison for locale renderability must use the active working draft when the document lifecycle is `draft` or `in_review`;
 2. archive-only path rewrites such as injected archive `<base href>` must be normalized out before hashing;
-3. starting a new revision without content changes must not falsely invalidate a still-matching English artifact.
+3. starting a new revision without content changes must not falsely invalidate a still-matching English artifact;
+4. exact revision equality is not enough by itself to invalidate a draft/in-review English preview when the current working source hash still matches the artifact baseline.
 
 ## 10. Drift And Regeneration Rule
 

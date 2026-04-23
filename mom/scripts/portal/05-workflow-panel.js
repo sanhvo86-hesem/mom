@@ -55,7 +55,7 @@ async function startNewRevision(code){
   }
 
   try{
-    const res = await apiCall('doc_start_new_revision', {code: doc.code, base_path: doc.path, updateType});
+    const res = await controlPlaneDocumentAuthoringRequest('start-new-revision', {code: doc.code, base_path: doc.path, updateType});
     if(res && res.ok){
       SERVER_DOC_STATE[doc.code] = res.state;
       if(res.versions) setDocVersions(doc.code, res.versions);
@@ -87,7 +87,7 @@ async function deleteDraft(code){
 
   // Delete server-backed draft/review files inside /archive (ISO-style)
   try{
-    const res = await apiCall('doc_delete_drafts', {code, base_path: doc.path});
+    const res = await controlPlaneDocumentAuthoringRequest('delete-drafts', {code, base_path: doc.path});
     if(res && res.ok){
       if(res.versions) setDocVersions(code, res.versions);
       if(res.state){
@@ -130,7 +130,7 @@ async function clearDraftHistory(code){
   if(!confirm(msg)) return;
 
   try{
-    const res = await apiCall('doc_delete_drafts', {code, base_path: doc.path});
+    const res = await controlPlaneDocumentAuthoringRequest('delete-drafts', {code, base_path: doc.path});
     if(res && res.ok){
       if(res.versions) setDocVersions(code, res.versions);
       if(res.state){
@@ -314,14 +314,15 @@ function canDeleteVersion(docCode,v){
 async function deleteVersion(code,idx){
   const versions=getDocVersions(code);
   if(!versions[idx]) return;
+  const doc=DOCS.find(d=>d.code===code);
+  if(!doc) return;
   const v=versions[idx];
   if(!confirm((lang==='en'?'Permanently delete version ':'Xóa vĩnh viễn phiên bản ')+v.version+'?')) return;
   try{
-    const res = await apiCall('doc_delete_version', {code: code, base_path: doc.path, id: v.id});
+    const res = await controlPlaneDocumentAuthoringRequest('delete-version', {code: code, base_path: doc.path, version: v.version});
     if(res && res.ok){
       if(res.versions) setDocVersions(code, res.versions);
       showToast(lang==='en'?'🗑 Version '+v.version+' deleted':'🗑 Đã xóa phiên bản '+v.version);
-      const doc=DOCS.find(d=>d.code===code);
       renderVersionHistory(doc);
       return;
     }
@@ -338,9 +339,9 @@ async function bulkDeleteExpired(){
     // Delete from oldest to newest to keep indexes stable
     for(let i=versions.length-1; i>=0; i--){
       const v=versions[i];
-      if(v && canDeleteVersion(d.code,v) && v.id){
+      if(v && canDeleteVersion(d.code,v) && v.version){
         try{
-          const res = await apiCall('doc_delete_version', {code: d.code, base_path: d.path, id: v.id});
+          const res = await controlPlaneDocumentAuthoringRequest('delete-version', {code: d.code, base_path: d.path, version: v.version});
           if(res && res.ok && res.versions){
             setDocVersions(d.code, res.versions);
             count++;

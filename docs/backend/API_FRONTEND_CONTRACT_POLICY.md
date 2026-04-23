@@ -89,7 +89,7 @@ These must be denied to product frontend and populated in `destructive-endpoint-
 | --- | --- |
 | `DELETE /api/runtime/{domain}/{table}/{id}` | Blocked for all governed domains. |
 | `{domain}.{table}.delete` | Blocked unless non-governed admin table with owner approval. |
-| `doc_delete_drafts`, `doc_delete_version` | Document-control admin only. |
+| `/api/v1/eqms/control-plane/documents/delete-drafts`, `/api/v1/eqms/control-plane/documents/delete-version` | Document-control admin only. Legacy `doc_*` write actions are policy-blocked. |
 | `delete_doc`, `delete_folder` | Document-control admin only; archive/evidence required. |
 | `admin_user_delete`, `admin_user_reset_password` | Security admin only with re-auth/evidence. |
 | `admin_git_status` | Ops admin only; read-only repo status, never a product-UI deploy path. |

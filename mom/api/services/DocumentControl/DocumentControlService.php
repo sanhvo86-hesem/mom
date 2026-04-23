@@ -898,14 +898,17 @@ final class DocumentControlService
         $renderableStates = ['machine_preview', 'review_pending', 'reviewed', 'released'];
         $sourceRevision = trim((string)($variant['artifact_source_revision'] ?? ''));
         $headerRevision = trim((string)($header['revision'] ?? ''));
+        $headerStatus = strtolower(trim((string)($header['status'] ?? '')));
         $revisionMatches = ($sourceRevision === '') || ($headerRevision !== '' && $sourceRevision === $headerRevision);
         $sourceHashMatches = $exists ? $this->sourceHashMatchesCurrentSource((string)($header['doc_code'] ?? ''), $variant) : true;
+        $draftLifecycle = in_array($headerStatus, ['draft', 'in_review', 'pending_approval'], true);
+        $sourceBaselineCompatible = $revisionMatches || ($draftLifecycle && $sourceHashMatches);
         $publishedOk = $state !== 'released' || !empty($variant['published_at']);
         $renderable = $exists
             && $locale !== 'vi'
             && $artifactPath !== ''
             && in_array($state, $renderableStates, true)
-            && $revisionMatches
+            && $sourceBaselineCompatible
             && $sourceHashMatches
             && $publishedOk;
         $out = $header;
@@ -928,6 +931,7 @@ final class DocumentControlService
         $out['locale_metadata'] = $exists ? ($variant['metadata'] ?? []) : [];
         $out['locale_revision_matches_source'] = $exists ? $revisionMatches : true;
         $out['locale_source_hash_matches'] = $exists ? $sourceHashMatches : true;
+        $out['locale_source_baseline_compatible'] = $exists ? $sourceBaselineCompatible : true;
 
         if ($renderable) {
             if (array_key_exists('title', $variant) && trim((string)$variant['title']) !== '') {

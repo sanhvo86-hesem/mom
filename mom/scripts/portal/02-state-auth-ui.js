@@ -896,7 +896,7 @@ async function refreshAllDocStatesFromServer(){
 async function refreshDocFromServer(code){
   try{
     const doc = DOCS.find(d=>d.code===code);
-    const res = await apiCall('doc_versions_list', {code, base_path: doc?doc.path:''});
+    const res = await controlPlaneDocumentAuthoringRequest('versions', {code, base_path: doc?doc.path:''}, 'GET');
     if(res && res.ok){
       if(res.state) SERVER_DOC_STATE[code]=res.state;
       SERVER_DOC_VERSIONS[code]=Array.isArray(res.versions)?res.versions:[];
@@ -1125,6 +1125,7 @@ function apiRequest(path, options={}){
   const headers = Object.assign({}, options.headers || {});
   const controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
   const opts = {method, credentials:'include', headers};
+  const isWrite = (method !== 'GET' && method !== 'HEAD');
   if(controller) opts.signal = controller.signal;
   let url = path;
   if(!/^https?:\/\//i.test(url) && !url.startsWith('/')){
@@ -1148,6 +1149,7 @@ function apiRequest(path, options={}){
   if(csrfToken) opts.headers['X-CSRF-Token'] = csrfToken;
 
   let timer = null;
+  if(isWrite) _apiInFlightWrites++;
   return (async ()=>{
     try{
       if(controller && timeoutMs > 0){
@@ -1160,8 +1162,21 @@ function apiRequest(path, options={}){
       return data;
     }finally{
       if(timer) clearTimeout(timer);
+      if(isWrite && _apiInFlightWrites > 0) _apiInFlightWrites--;
     }
   })();
+}
+
+function controlPlaneDocumentAuthoringPath(action){
+  return '/api/v1/eqms/control-plane/documents/' + String(action || '').replace(/^\/+/, '');
+}
+
+async function controlPlaneDocumentAuthoringRequest(action, payload=null, method='POST', timeoutMs=45000){
+  return await apiRequest(controlPlaneDocumentAuthoringPath(action), {
+    method,
+    payload,
+    timeoutMs
+  });
 }
 
 function runtimeApiPath(domain, table, recordId=''){
@@ -3703,7 +3718,7 @@ async function doQuickCreateDoc(folder, cat){
   if(!title){ showToast(lang==='en'?'Enter title':'Nhập tiêu đề'); return; }
   if(!ensureEnglishStandardTitle(title)) return;
   try {
-    const res = await apiCall('doc_create', {code, title, cat, owner, folder, revision:'0.0'});
+    const res = await controlPlaneDocumentAuthoringRequest('create', {code, title, cat, owner, folder, revision:'0.0'});
     if(res && res.ok){
       showToast('✅ ' + code);
       document.getElementById('quick-create-modal')?.remove();
@@ -4706,7 +4721,7 @@ async function submitCreateDoc(cat){
   }
 
   try{
-    const res=await apiCall('doc_create',{code,title,cat,owner,folder,revision});
+    const res=await controlPlaneDocumentAuthoringRequest('create',{code,title,cat,owner,folder,revision});
     if(res && res.ok && res.doc){
       await rescanDocs();
       if(!DOCS.find(d=>d.code===res.doc.code)) DOCS.push(res.doc);

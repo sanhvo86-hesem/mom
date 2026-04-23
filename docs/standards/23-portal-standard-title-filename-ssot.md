@@ -1,6 +1,6 @@
 # 23 - Portal Standard Title and Filename SSOT
 
-> Scope: `01-QMS-Portal` document management UI + API (`doc_create`, `rename_doc`, scan cache).
+> Scope: `01-QMS-Portal` document management UI + API (canonical document create flow, `rename_doc`, scan cache).
 
 ## A. Root Rule (Mandatory)
 

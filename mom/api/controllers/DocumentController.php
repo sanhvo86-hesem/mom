@@ -20,6 +20,18 @@ use Throwable;
  */
 class DocumentController extends BaseController
 {
+    protected bool $enforceLegacyWriteGuard = true;
+
+    protected function suspendLegacyWriteGuard(): void
+    {
+        $this->enforceLegacyWriteGuard = false;
+    }
+
+    protected function restoreLegacyWriteGuard(): void
+    {
+        $this->enforceLegacyWriteGuard = true;
+    }
+
     private function localeAutomation(): DocumentLocaleAutomationService
     {
         static $svc = null;
@@ -31,6 +43,9 @@ class DocumentController extends BaseController
 
     private function denyLegacyDocumentWrite(string $operation): void
     {
+        if (!$this->enforceLegacyWriteGuard) {
+            return;
+        }
         $decision = (new LegacyWriteSurfacePolicy())->assess('document_files', $operation);
         $this->error($decision['error_code'], $decision['status'], $decision['message'], [
             'canonical_path' => $decision['canonical_path'],
@@ -162,7 +177,7 @@ class DocumentController extends BaseController
             save_doc_manifest($this->rootDir, $baseRel, $manifest);
 
             // Register in custom docs
-            $custom[] = [
+            $docRecord = [
                 'code'     => $code,
                 'title'    => $title,
                 'cat'      => $cat,
@@ -173,6 +188,7 @@ class DocumentController extends BaseController
                 'owner'    => $owner !== '' ? $owner : 'QA/QMS',
                 'ext'      => 'html',
             ];
+            $custom[] = $docRecord;
             $customDocsFile = $this->confDir . '/docs_custom.json';
             save_custom_docs($customDocsFile, $custom);
             $this->invalidateScanCache();
@@ -203,6 +219,9 @@ class DocumentController extends BaseController
                 'file_name' => $fileName,
                 'revision'  => $revision,
                 'draft_rel' => $draftRel,
+                'doc'       => $docRecord,
+                'state'     => $state,
+                'versions'  => $manifest['versions'] ?? [],
                 'locale_translation' => $localeTranslation,
             ]);
         } catch (Throwable $e) {
@@ -229,9 +248,9 @@ class DocumentController extends BaseController
         require_doc_workflow_editor($me, $rolePermsFile);
 
         $data = $this->jsonBody();
-        $code = strtoupper(trim((string)($data['code'] ?? '')));
+        $code = $this->workflowDocumentCode($data);
         $html = (string)($data['html'] ?? '');
-        $path = trim((string)($data['path'] ?? ''));
+        $path = $this->workflowPayloadPath($data);
 
         if ($code === '') $this->error('missing_code', 400);
         if ($html === '') $this->error('missing_html', 400);
@@ -307,6 +326,8 @@ class DocumentController extends BaseController
         $this->success([
             'draft_rel' => $draftRel,
             'revision' => $revision,
+            'state' => $state,
+            'versions' => $versions,
             'locale_translation' => $localeTranslation,
         ]);
     }
@@ -328,11 +349,11 @@ class DocumentController extends BaseController
         require_doc_workflow_editor($me, $rolePermsFile);
 
         $data     = $this->jsonBody();
-        $code     = strtoupper(trim((string)($data['code'] ?? '')));
-        $path     = trim((string)($data['path'] ?? ''));
+        $code     = $this->workflowDocumentCode($data);
+        $path     = $this->workflowPayloadPath($data);
         $html     = (string)($data['html'] ?? '');
         $note     = trim((string)($data['note'] ?? ''));
-        $updateType = trim((string)($data['update_type'] ?? 'minor'));
+        $updateType = trim((string)($data['update_type'] ?? ($data['updateType'] ?? 'minor')));
 
         if ($code === '') $this->error('missing_code', 400);
         if ($path === '') $this->error('missing_path', 400);
@@ -346,8 +367,10 @@ class DocumentController extends BaseController
         $revision = (string)($state['revision'] ?? '0.0');
 
         // Store the in_review version
+        $reviewRel = '';
         if ($html !== '') {
-            store_version_file($baseRel, $revision, 'in_review', $this->rootDir, $html);
+            $reviewAbs = store_version_file($baseRel, $revision, 'in_review', $this->rootDir, $html);
+            $reviewRel = rel_path($reviewAbs, $this->rootDir);
         }
 
         // Update state
@@ -360,13 +383,33 @@ class DocumentController extends BaseController
         // Update manifest
         $manifest = load_doc_manifest($this->rootDir, $baseRel, $archiveDir, $code);
         $versions = $manifest['versions'] ?? [];
-        array_unshift($versions, [
-            'status'  => 'in_review',
-            'version' => 'v' . $revision,
-            'date'    => $this->humanDt(),
-            'by'      => (string)($me['name'] ?? $me['username'] ?? ''),
-            'note'    => $note ?: 'Submitted for review',
-        ]);
+        $found = false;
+        foreach ($versions as &$v) {
+            if (!is_array($v)) {
+                continue;
+            }
+            if (($v['status'] ?? '') === 'in_review' && ($v['version'] ?? '') === 'v' . $revision) {
+                $v['date'] = $this->humanDt();
+                $v['by'] = (string)($me['name'] ?? $me['username'] ?? '');
+                $v['note'] = $note ?: 'Submitted for review';
+                if ($reviewRel !== '') {
+                    $v['file'] = $reviewRel;
+                }
+                $found = true;
+                break;
+            }
+        }
+        unset($v);
+        if (!$found) {
+            array_unshift($versions, [
+                'status'  => 'in_review',
+                'version' => 'v' . $revision,
+                'date'    => $this->humanDt(),
+                'by'      => (string)($me['name'] ?? $me['username'] ?? ''),
+                'file'    => $reviewRel !== '' ? $reviewRel : null,
+                'note'    => $note ?: 'Submitted for review',
+            ]);
+        }
         $manifest['versions'] = $versions;
         save_doc_manifest($this->rootDir, $baseRel, $manifest);
 
@@ -374,8 +417,36 @@ class DocumentController extends BaseController
         $customDocsFile = $this->confDir . '/docs_custom.json';
         patch_custom_doc_entries($customDocsFile, $code, ['status' => 'in_review']);
 
+        $this->syncDccHeaderBaseline($code, $baseRel, $state, (string)($me['username'] ?? 'system'));
+        $catalog = $this->resolveDocumentCatalogEntry($code, $baseRel);
+        $localeTranslation = [];
+        if ($html !== '') {
+            try {
+                $localeTranslation = $this->localeAutomation()->syncEnglishMachinePreview([
+                    'doc_code' => $code,
+                    'base_rel_path' => $baseRel,
+                    'source_html' => $html,
+                    'source_status' => 'in_review',
+                    'revision' => $revision,
+                    'trigger' => 'submit_review',
+                    'actor' => (string)($me['username'] ?? 'system'),
+                    'title' => (string)($catalog['title'] ?? $code),
+                    'subtitle' => $catalog['description'] ?? null,
+                    'effective_date' => $catalog['effective_date'] ?? null,
+                ]);
+            } catch (Throwable $e) {
+                @error_log('[DocumentLocaleAutomationService] submitReview sync failed for ' . $code . ': ' . $e->getMessage());
+            }
+        }
+
         $this->auditLog('doc_submit_review', ['code' => $code, 'update_type' => $updateType]);
-        $this->success(['status' => 'in_review', 'revision' => $revision]);
+        $this->success([
+            'status' => 'in_review',
+            'revision' => $revision,
+            'state' => $state,
+            'versions' => $versions,
+            'locale_translation' => $localeTranslation,
+        ]);
     }
 
     /**
@@ -393,8 +464,8 @@ class DocumentController extends BaseController
         require_doc_workflow_approver($me);
 
         $data         = $this->jsonBody();
-        $code         = strtoupper(trim((string)($data['code'] ?? '')));
-        $path         = trim((string)($data['path'] ?? ''));
+        $code         = $this->workflowDocumentCode($data);
+        $path         = $this->workflowPayloadPath($data);
         $effectiveDate = trim((string)($data['effective_date'] ?? ''));
         $note         = trim((string)($data['note'] ?? ''));
 
@@ -508,6 +579,8 @@ class DocumentController extends BaseController
         $this->success([
             'status' => 'approved',
             'revision' => $revision,
+            'state' => $state,
+            'versions' => $versions,
             'locale_translation' => $localeTranslation,
         ]);
     }
@@ -527,8 +600,8 @@ class DocumentController extends BaseController
         require_doc_workflow_approver($me);
 
         $data   = $this->jsonBody();
-        $code   = strtoupper(trim((string)($data['code'] ?? '')));
-        $path   = trim((string)($data['path'] ?? ''));
+        $code   = $this->workflowDocumentCode($data);
+        $path   = $this->workflowPayloadPath($data);
         $reason = trim((string)($data['reason'] ?? ''));
 
         if ($code === '') $this->error('missing_code', 400);
@@ -567,9 +640,15 @@ class DocumentController extends BaseController
         // Update custom docs
         $customDocsFile = $this->confDir . '/docs_custom.json';
         patch_custom_doc_entries($customDocsFile, $code, ['status' => 'draft']);
+        $this->syncDccHeaderBaseline($code, $baseRel, $state, (string)($me['username'] ?? 'system'));
 
         $this->auditLog('doc_reject', ['code' => $code, 'reason' => $reason]);
-        $this->success(['status' => 'draft', 'revision' => $revision]);
+        $this->success([
+            'status' => 'draft',
+            'revision' => $revision,
+            'state' => $state,
+            'versions' => $versions,
+        ]);
     }
 
     /**
@@ -630,8 +709,8 @@ class DocumentController extends BaseController
         $this->requireAdmin($me);
 
         $data = $this->jsonBody();
-        $code = strtoupper(trim((string)($data['code'] ?? '')));
-        $path = trim((string)($data['path'] ?? ''));
+        $code = $this->workflowDocumentCode($data);
+        $path = $this->workflowPayloadPath($data);
 
         if ($code === '') $this->error('missing_code', 400);
         if ($path === '') $this->error('missing_path', 400);
@@ -677,9 +756,17 @@ class DocumentController extends BaseController
 
         $customDocsFile = $this->confDir . '/docs_custom.json';
         patch_custom_doc_entries($customDocsFile, $code, ['status' => $state['status'] ?? 'draft']);
+        $this->syncDccHeaderBaseline($code, $baseRel, $state, (string)($me['username'] ?? 'system'));
+        if (strtolower(trim((string)($state['status'] ?? ''))) === 'approved') {
+            try {
+                $this->localeAutomation()->restoreReleasedSnapshot($code, (string)($me['username'] ?? 'system'));
+            } catch (Throwable $e) {
+                @error_log('[DocumentLocaleAutomationService] deleteDrafts restore failed for ' . $code . ': ' . $e->getMessage());
+            }
+        }
 
         $this->auditLog('doc_delete_drafts', ['code' => $code, 'removed' => $removed]);
-        $this->success(['removed' => $removed, 'state' => $state]);
+        $this->success(['removed' => $removed, 'state' => $state, 'versions' => $kept]);
     }
 
     /**
@@ -697,9 +784,9 @@ class DocumentController extends BaseController
         $this->requireAdmin($me);
 
         $data    = $this->jsonBody();
-        $code    = strtoupper(trim((string)($data['code'] ?? '')));
-        $path    = trim((string)($data['path'] ?? ''));
-        $version = trim((string)($data['version'] ?? ''));
+        $code    = $this->workflowDocumentCode($data);
+        $path    = $this->workflowPayloadPath($data);
+        $version = trim((string)($data['version'] ?? ($data['id'] ?? '')));
 
         if ($code === '' || $path === '' || $version === '') {
             $this->error('missing_params', 400);
@@ -735,9 +822,17 @@ class DocumentController extends BaseController
         $state = load_doc_state($this->rootDir, $baseRel, $archiveDir, $code) ?? [];
         $state = doc_recompute_release_state($kept, $state);
         save_doc_state($this->rootDir, $baseRel, $state);
+        $this->syncDccHeaderBaseline($code, $baseRel, $state, (string)($me['username'] ?? 'system'));
+        if (strtolower(trim((string)($state['status'] ?? ''))) === 'approved') {
+            try {
+                $this->localeAutomation()->restoreReleasedSnapshot($code, (string)($me['username'] ?? 'system'));
+            } catch (Throwable $e) {
+                @error_log('[DocumentLocaleAutomationService] deleteVersion restore failed for ' . $code . ': ' . $e->getMessage());
+            }
+        }
 
         $this->auditLog('doc_delete_version', ['code' => $code, 'version' => $version]);
-        $this->success(['deleted' => $deleted, 'state' => $state]);
+        $this->success(['deleted' => $deleted, 'state' => $state, 'versions' => $kept]);
     }
 
     /**
@@ -751,8 +846,8 @@ class DocumentController extends BaseController
     {
         $me = $this->requireAuth();
 
-        $code = strtoupper(trim((string)($this->query('code') ?? '')));
-        $path = trim((string)($this->query('path') ?? ''));
+        $code = $this->workflowDocumentCode();
+        $path = $this->workflowQueryPath();
 
         if ($code === '') $this->error('missing_code', 400);
         if ($path === '') $this->error('missing_path', 400);
@@ -781,14 +876,15 @@ class DocumentController extends BaseController
     {
         $me = $this->requireAuth();
         $this->requireCsrf();
+        $this->denyLegacyDocumentWrite('start_new_revision');
 
         $rolePermsFile = $this->confDir . '/role_permissions.json';
         require_doc_workflow_editor($me, $rolePermsFile);
 
         $data       = $this->jsonBody();
-        $code       = strtoupper(trim((string)($data['code'] ?? '')));
-        $path       = trim((string)($data['path'] ?? ''));
-        $updateType = strtolower(trim((string)($data['update_type'] ?? 'minor')));
+        $code       = $this->workflowDocumentCode($data);
+        $path       = $this->workflowPayloadPath($data);
+        $updateType = strtolower(trim((string)($data['update_type'] ?? ($data['updateType'] ?? 'minor'))));
 
         if ($code === '') $this->error('missing_code', 400);
         if ($path === '') $this->error('missing_path', 400);
@@ -820,8 +916,10 @@ class DocumentController extends BaseController
             $html = (string)@file_get_contents($liveFile);
         }
 
+        $draftRel = '';
         if ($html !== '') {
-            store_version_file($baseRel, $newRevision, 'draft', $this->rootDir, $html);
+            $draftAbs = store_version_file($baseRel, $newRevision, 'draft', $this->rootDir, $html);
+            $draftRel = rel_path($draftAbs, $this->rootDir);
         }
 
         $state['status']   = 'draft';
@@ -836,6 +934,7 @@ class DocumentController extends BaseController
             'version' => 'v' . $newRevision,
             'date'    => $this->humanDt(),
             'by'      => (string)($me['name'] ?? $me['username'] ?? ''),
+            'file'    => $draftRel !== '' ? $draftRel : null,
             'note'    => ucfirst($updateType) . ' revision started',
         ]);
         $manifest['versions'] = $versions;
@@ -843,9 +942,10 @@ class DocumentController extends BaseController
 
         $customDocsFile = $this->confDir . '/docs_custom.json';
         patch_custom_doc_entries($customDocsFile, $code, ['status' => 'draft', 'rev' => $newRevision]);
+        $this->syncDccHeaderBaseline($code, $baseRel, $state, (string)($me['username'] ?? 'system'));
 
         $this->auditLog('doc_start_new_revision', ['code' => $code, 'revision' => $newRevision]);
-        $this->success(['revision' => $newRevision, 'state' => $state]);
+        $this->success(['revision' => $newRevision, 'state' => $state, 'versions' => $versions]);
     }
 
     /**
@@ -1105,6 +1205,66 @@ class DocumentController extends BaseController
         }
 
         return $baseRel;
+    }
+
+    /**
+     * @param array<string, mixed>|null $data
+     */
+    private function workflowDocumentCode(?array $data = null): string
+    {
+        $payload = is_array($data) ? $data : $this->jsonBody();
+        $code = trim((string)($payload['code'] ?? ($this->query('code') ?? ($this->query('doc_code') ?? ''))));
+        return strtoupper($code);
+    }
+
+    /**
+     * @param array<string, mixed>|null $data
+     */
+    private function workflowPayloadPath(?array $data = null): string
+    {
+        $payload = is_array($data) ? $data : $this->jsonBody();
+        return trim((string)($payload['path'] ?? ($payload['base_path'] ?? '')));
+    }
+
+    private function workflowQueryPath(): string
+    {
+        return trim((string)($this->query('path') ?? ($this->query('base_path') ?? '')));
+    }
+
+    /**
+     * @param array<string, mixed> $state
+     */
+    private function syncDccHeaderBaseline(string $code, string $baseRel, array $state, string $actor): void
+    {
+        try {
+            $catalog = $this->resolveDocumentCatalogEntry($code, $baseRel);
+            $rawRevision = trim((string)($state['released_revision'] ?? ($state['revision'] ?? ($catalog['rev'] ?? '0.0'))));
+            $rawRevision = preg_replace('/^[vV]\s*/', '', $rawRevision) ?? $rawRevision;
+            if ($rawRevision === '') {
+                $rawRevision = '0.0';
+            }
+            if (!str_starts_with(strtoupper($rawRevision), 'V')) {
+                $rawRevision = 'V' . $rawRevision;
+            }
+
+            $status = strtolower(trim((string)($state['status'] ?? ($catalog['status'] ?? 'draft'))));
+            $effectiveDate = trim((string)($state['effective_date'] ?? ($catalog['effective_date'] ?? '')));
+            if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $effectiveDate)) {
+                $effectiveDate = gmdate('Y-m-d');
+            }
+
+            (new \MOM\Services\DocumentControl\DocumentControlService($this->data))->upsertHeader([
+                'doc_code' => $code,
+                'title' => (string)($catalog['title'] ?? $code),
+                'subtitle' => $catalog['description'] ?? null,
+                'doc_type' => \MOM\Services\DocumentControl\DocumentControlService::deriveDocType($code),
+                'revision' => $rawRevision,
+                'effective_date' => $effectiveDate,
+                'status' => $status !== '' ? $status : 'draft',
+            ], $actor !== '' ? $actor : 'system');
+        } catch (Throwable $e) {
+            @error_log('[DocumentController] DCC header baseline sync failed for ' . $code . ': ' . $e->getMessage());
+        }
     }
 
     /**

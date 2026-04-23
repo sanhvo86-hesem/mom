@@ -325,9 +325,50 @@ function extract_placeholder_code(string $html): ?string
     return null;
 }
 
+/**
+ * Locate a `<div…>…</div>` block whose opening tag matches $openRegex
+ * and walk forward with a depth counter so nested children don't trip
+ * non-greedy matchers. Returns `[start_offset, end_offset_exclusive]`
+ * for the entire block, or null if no match.
+ */
+function consume_balanced_div_block(string $html, string $openRegex): ?array
+{
+    if (!preg_match($openRegex, $html, $m, PREG_OFFSET_CAPTURE)) {
+        return null;
+    }
+    $blockStart = (int)$m[0][1];
+    $openLen    = strlen($m[0][0]);
+    $depth      = 1;
+    $scan       = $blockStart + $openLen;
+    $end        = strlen($html);
+    while ($scan < $end && $depth > 0) {
+        $nextOpen  = stripos($html, '<div', $scan);
+        $nextClose = stripos($html, '</div', $scan);
+        if ($nextClose === false) return null;
+        if ($nextOpen !== false && $nextOpen < $nextClose) {
+            $boundary = $html[$nextOpen + 4] ?? '';
+            if ($boundary === ' ' || $boundary === '>' || $boundary === "\t" || $boundary === "\n" || $boundary === "\r") {
+                $depth++;
+            }
+            $scan = $nextOpen + 4;
+        } else {
+            $depth--;
+            $closeEnd = strpos($html, '>', $nextClose);
+            if ($closeEnd === false) return null;
+            $scan = $closeEnd + 1;
+            if ($depth === 0) {
+                return [$blockStart, $scan];
+            }
+        }
+    }
+    return null;
+}
+
 function has_legacy_form_header(string $html): bool
 {
-    return preg_match('/<div[^>]*class=["\'][^"\']*\bform-header\b[^"\']*["\']/i', $html) === 1;
+    // Both `form-header` (HESEM legacy) and `doc-header` (SYS-OPS variant)
+    // are duplicate-ribbon wrappers that must be stripped.
+    return preg_match('/<div[^>]*class=["\'][^"\']*\b(form-header|doc-header)\b[^"\']*["\']/i', $html) === 1;
 }
 
 function has_legacy_title_block_outside_dcc(string $html): bool
@@ -492,23 +533,18 @@ function inject_or_replace_placeholder(string $html, string $placeholder): strin
         );
         return is_string($next) ? $next : $html;
     }
-    // Case 2: replace legacy form-header
+    // Case 2: replace legacy form-header OR doc-header (SYS-OPS variant).
+    // Both wrap the same kind of duplicate content: brand+title+meta. We use
+    // a balanced-div consumer because the outer `doc-header` block in
+    // SYS-OPS-01.html nests several children (`.doc-header-top`, `.brand`,
+    // `.titles`, `.meta-row`, etc.) and a non-greedy `.*?</div>` would close
+    // at the FIRST inner `</div>`, leaving the rest of the wrapper orphaned.
     if (has_legacy_form_header($html)) {
-        $next = preg_replace(
-            '#<div[^>]*class=["\'][^"\']*\bform-header\b[^"\']*["\'][^>]*>.*?</div>\s*</div>#is',  // form-header > inner > /form-header (greedy enough)
-            $placeholder,
-            $html,
-            1
-        );
-        if (is_string($next) && $next !== $html) return $next;
-        // Fallback: try simpler closing
-        $next = preg_replace(
-            '#<div[^>]*class=["\'][^"\']*\bform-header\b[^"\']*["\'][^>]*>.*?</div>#is',
-            $placeholder,
-            $html,
-            1
-        );
-        if (is_string($next)) return $next;
+        $consumed = consume_balanced_div_block($html, '#<div[^>]*class=["\'][^"\']*\b(form-header|doc-header)\b[^"\']*["\'][^>]*>#i');
+        if ($consumed !== null) {
+            [$start, $end] = $consumed;
+            return substr($html, 0, $start) . $placeholder . substr($html, $end);
+        }
     }
     // Case 3: insert at start of page-body
     $next = preg_replace(
@@ -577,6 +613,24 @@ function clean_iso_title_concat(string $html): string
  * `inject_or_replace_placeholder`. Variant (4) is handled by
  * `strip_legacy_title_meta_after_placeholder`.
  */
+/**
+ * Strip ANY `<div class="form-header">` or `<div class="doc-header">` block
+ * found in the body, regardless of where it sits. Used as an idempotent
+ * cleanup pass so docs that already have a `dcc-header` placeholder but
+ * still carry a duplicate legacy header somewhere downstream get cleaned.
+ */
+function strip_legacy_form_or_doc_header(string $html): string
+{
+    $regex = '#<div[^>]*class=["\'][^"\']*\b(form-header|doc-header)\b[^"\']*["\'][^>]*>#i';
+    while (true) {
+        $consumed = consume_balanced_div_block($html, $regex);
+        if ($consumed === null) break;
+        [$start, $end] = $consumed;
+        $html = substr($html, 0, $start) . substr($html, $end);
+    }
+    return $html;
+}
+
 function strip_redundant_title_blocks(string $html, string $code): string
 {
     if ($code === '') return $html;
@@ -591,12 +645,17 @@ function strip_redundant_title_blocks(string $html, string $code): string
     if (is_string($next)) $html = $next;
 
     // (1) Standalone `<h1>CODE - Title</h1>` — only strip when it's the top
-    //     of body content (within the first 4096 chars after dcc-header)
+    //     of body content (within the first 4096 chars after dcc-header).
+    //     Match is code-AGNOSTIC: any `<h1>XXX-NNN - …</h1>` shape is
+    //     considered a redundant header by definition (the DCC ribbon
+    //     already shows ID + Title). This handles cases where the H1's
+    //     code differs from the filename-derived code (e.g.
+    //     assessment-matrix.html has H1 "TRN-FRM-03 - Assessment Matrix").
     if (preg_match('#<div[^>]*class="[^"]*\bdcc-header\b[^"]*"[^>]*></div>(.{0,4096})#is', $html, $m, PREG_OFFSET_CAPTURE)) {
         $startAt = (int)$m[0][1] + strlen($m[0][0]) - strlen($m[1][0]);
         $window  = $m[1][0];
         $stripped = preg_replace(
-            '#<h1\b[^>]*>\s*' . $codeRe . '\s*[-–][^<]*</h1>#i',
+            '#<h1\b[^>]*>\s*[A-Z][A-Z0-9]+(?:-[A-Z0-9]+)+\s*[-–][^<]*</h1>#i',
             '',
             $window,
             1

@@ -628,9 +628,17 @@
 ## MODULE 9: 📁 TÀI LIỆU (`/documents`)
 ```
 │ (Existing module — đã hoàn chỉnh)                            │
-│ doc_create, doc_save_draft, doc_submit_review                 │
-│ doc_approve, doc_reject, doc_update_meta                      │
-│ doc_versions_list, doc_start_new_revision                     │
+│ Canonical write surface:                                      │
+│ /api/v1/eqms/control-plane/documents/create                   │
+│ /api/v1/eqms/control-plane/documents/save-draft               │
+│ /api/v1/eqms/control-plane/documents/submit-review            │
+│ /api/v1/eqms/control-plane/documents/approve                  │
+│ /api/v1/eqms/control-plane/documents/reject                   │
+│ /api/v1/eqms/control-plane/documents/versions                 │
+│ /api/v1/eqms/control-plane/documents/start-new-revision       │
+│ /api/v1/eqms/control-plane/documents/delete-drafts            │
+│ /api/v1/eqms/control-plane/documents/delete-version           │
+│ Legacy `doc_*` names remain audit/controller labels only.     │
 │ doc_stream, docs_custom_list                                  │
 │ doc_descriptions_get, save_doc_description                    │
 │ docs_visibility_get, admin_docs_visibility_save               │

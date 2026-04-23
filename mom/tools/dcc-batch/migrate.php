@@ -50,6 +50,7 @@ use function MOM\Tools\DccBatch\inject_or_replace_bootstrap;
 use function MOM\Tools\DccBatch\inject_or_replace_placeholder;
 use function MOM\Tools\DccBatch\clean_iso_title_concat;
 use function MOM\Tools\DccBatch\strip_legacy_title_meta_after_placeholder;
+use function MOM\Tools\DccBatch\strip_legacy_form_or_doc_header;
 use function MOM\Tools\DccBatch\strip_redundant_title_blocks;
 use function MOM\Tools\DccBatch\build_placeholder;
 use function MOM\Tools\DccBatch\logo_path_for;
@@ -198,6 +199,13 @@ foreach (walk_docs($ROOT_DIR) as $abs) {
             $candidate = inject_or_replace_placeholder($next, $placeholder);
             if ($candidate !== $next) { $next = $candidate; $changes[] = 'placeholder'; }
         }
+
+        // Strip any leftover `<div class="form-header">` or `<div class="doc-header">`
+        // block ANYWHERE in the body. Idempotent — handles cases where
+        // dcc-header was injected previously but the legacy wrapper still sits
+        // downstream (SYS-OPS-01 had this exact shape).
+        $candidate = strip_legacy_form_or_doc_header($next);
+        if ($candidate !== $next) { $next = $candidate; $changes[] = 'strip_legacy_form_or_doc_header'; }
 
         // Strip the flattened legacy title + meta blocks that may sit
         // immediately AFTER the dcc-header placeholder (common in SOPs).

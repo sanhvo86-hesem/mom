@@ -12,7 +12,8 @@ The platform must support:
 
 - `vi` canonical source for controlled document editing
 - `en` read-only locale artifact for viewing
-- backend-triggered English auto-sync after create/save/approve
+- backend-triggered English auto-sync after create/save/submit-review/approve
+- canonical control-plane authoring under `/api/v1/eqms/control-plane/documents/*`
 - locale-aware DCC metadata
 - fail-closed behavior when English artifact is missing
 - zero browser live translation
@@ -40,13 +41,17 @@ The platform must support:
 You must inspect and challenge at least these areas:
 
 - `mom/assets/app.js`
+- `mom/scripts/portal/00-block-engine.js`
 - `mom/scripts/portal/01-data-config.js`
 - `mom/scripts/portal/02-state-auth-ui.js`
 - `mom/scripts/portal/04-workflow-actions.js`
 - `mom/scripts/portal/11-dcc-header-renderer.js`
+- `mom/scripts/portal/05-workflow-panel.js`
 - `mom/api/controllers/DocumentControlController.php`
 - `mom/api/controllers/DocumentController.php`
+- `mom/api/controllers/CanonicalDocumentAuthoringController.php`
 - `mom/api/routes/dcc-routes.php`
+- `mom/api/routes/eqms-control-plane-routes.php`
 - `mom/api/services/DocumentControl/DocumentControlService.php`
 - `mom/api/services/DocumentControl/DocumentHeaderService.php`
 - `mom/api/services/DocumentControl/DocumentLocaleAutomationService.php`
@@ -67,6 +72,9 @@ Also inspect any rename/move/delete flow that can break `artifact_rel_path`.
 8. Are any standards/docs still contradicting the no-live-translation model?
 9. Does create/save/approve trigger a backend locale-sync attempt without risking Vietnamese source persistence?
 10. When no internal provider is configured, does the repo record `blocked` state truthfully instead of inventing an EN artifact?
+11. Does the portal use `controlPlaneDocumentAuthoringRequest(...)` everywhere for file-backed authoring instead of falling back to `?action=doc_*` writes?
+12. Can a draft or in-review document keep rendering a hash-matching English artifact after `start-new-revision` without exposing stale mixed-language content?
+13. Can draft/review auto-translation overwrite or delete the last released English artifact before release, or fail to restore it when the workflow returns to the released baseline?
 
 ## Required output shape
 
@@ -110,7 +118,8 @@ Confirm the final state with grep or equivalent:
 - no new `data-dcc-locale="en"` hardcoded into canonical Vietnamese docs unless explicitly justified
 - no `https://qms.hesem.com.vn/assets/app.js` in active controlled source
 - no fallback path that opens Vietnamese source while English tab is active and no English artifact exists
-- auto-translation trigger logic lives on backend save/create/approve orchestration, not on browser-side DOM translation
+- auto-translation trigger logic lives on backend create/save/submit-review/approve orchestration, not on browser-side DOM translation
+- file-backed authoring writes route through `/api/v1/eqms/control-plane/documents/*`
 
 ## Fix quality bar
 
