@@ -191,6 +191,14 @@ self.addEventListener('fetch', (event) => {
   // Skip non-GET requests (POST form submissions handled by Background Sync).
   if (request.method !== 'GET') return;
 
+  // Deploy metadata must never be served from Cache Storage. The portal's
+  // version checker appends a cache-busting query string, and caching those
+  // URLs would grow the static cache forever while risking stale reads.
+  if (isDeployMetadataRequest(url)) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
   // Route to appropriate caching strategy based on request type.
   if (isApiRequest(url)) {
     event.respondWith(networkFirst(request, CACHES.api));
@@ -261,6 +269,11 @@ function isAppShellRequest(url) {
          url.pathname.includes('/scripts/portal/') ||
          url.pathname.includes('/assets/js/') ||
          url.pathname.includes('/styles/');
+}
+
+function isDeployMetadataRequest(url) {
+  return url.pathname === '/mom/build-info.json' ||
+         url.pathname === '/mom/sw-build-tag.js';
 }
 
 

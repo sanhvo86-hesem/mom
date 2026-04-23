@@ -33,15 +33,17 @@
   // ── Tunables ─────────────────────────────────────────────────────────────
   // Build-info lives at the published root because /mom/data/* is blocked
   // by nginx (see tools/vps-setup/nginx/eqms.hesemeng.com.conf).
-  var BUILD_INFO_URL    = '/mom/build-info.json';
-  var CHECK_INTERVAL_MS = 5 * 60 * 1000;  // 5 min — light, far below CDN/edge rate limits
-  var GRACE_BEFORE_RELOAD_MS = 8000;       // 8 s — long enough to finish a save click
-  var DEFER_WHEN_BUSY_MS    = 60 * 1000;  // 1 min — re-check after deferring for unsaved edits
-  var MAX_DEFER_COUNT       = 30;          // 30 deferrals (~30 min) → switch to manual CTA
-  var STORAGE_KEY       = 'hesem_portal_build_version';
+  var BUILD_INFO_URL         = '/mom/build-info.json';
+  var CHECK_INTERVAL_MS      = 5 * 60 * 1000;  // 5 min — light, far below CDN/edge rate limits
+  var MIN_FETCH_INTERVAL_MS  = 60 * 1000;      // Hard floor: never poll build-info >1/min
+  var GRACE_BEFORE_RELOAD_MS = 8000;           // 8 s — long enough to finish a save click
+  var DEFER_WHEN_BUSY_MS     = 60 * 1000;      // 1 min — re-check after deferring for unsaved edits
+  var MAX_DEFER_COUNT        = 30;             // 30 deferrals (~30 min) → switch to manual CTA
+  var STORAGE_KEY            = 'hesem_portal_build_version';
 
   // ── State ────────────────────────────────────────────────────────────────
   var baselineVersion = null;
+  var pendingVersion  = null;
   var reloadInProgress = false;
   var lastFetchAt      = 0;
   var deferCount       = 0;
@@ -110,6 +112,9 @@
     document.body && document.body.appendChild(t);
     var btn = document.getElementById('hesem-version-toast-reload');
     if (btn) btn.addEventListener('click', function () {
+      pendingVersion = newVersion || pendingVersion;
+      if (pendingVersion) baselineVersion = pendingVersion;
+      deferCount = 0;
       reloadInProgress = true;
       hardReload();
     });
@@ -157,7 +162,7 @@
     // Throttle to avoid hammering the origin if visibilitychange fires
     // repeatedly (eg. window manager focus thrash).
     var now = Date.now();
-    if (now - lastFetchAt < 1500) return null;
+    if (now - lastFetchAt < MIN_FETCH_INTERVAL_MS) return null;
     lastFetchAt = now;
 
     try {
@@ -188,6 +193,35 @@
     catch (e) { return true; }
   }
 
+  function deferReload(newVersion) {
+    pendingVersion = newVersion || pendingVersion;
+    reloadInProgress = false;
+    deferCount++;
+    if (deferCount >= MAX_DEFER_COUNT) {
+      showManualReloadCta(pendingVersion || newVersion);
+      return;
+    }
+    showDeferredToast(pendingVersion || newVersion);
+    setTimeout(checkAndMaybeReload, DEFER_WHEN_BUSY_MS);
+  }
+
+  function scheduleReload(newVersion) {
+    pendingVersion = newVersion;
+    reloadInProgress = true;
+    deferCount = 0;
+    showReloadToast(newVersion);
+    setTimeout(function () {
+      if (!reloadInProgress) return;
+      if (!canReloadNow()) {
+        deferReload(pendingVersion || newVersion);
+        return;
+      }
+      baselineVersion = pendingVersion || newVersion;
+      pendingVersion = null;
+      hardReload();
+    }, GRACE_BEFORE_RELOAD_MS);
+  }
+
   async function checkAndMaybeReload() {
     if (reloadInProgress) return;
     var live = await fetchPublishedVersion();
@@ -213,27 +247,14 @@
     // Live sha differs from what we've been showing. Honour any registered
     // "do not reload, user is editing" guards before tearing the page down.
     if (!canReloadNow()) {
-      deferCount++;
-      if (deferCount >= MAX_DEFER_COUNT) {
-        // Give up auto-retrying — the user has been editing for ~30 minutes.
-        // Show a sticky CTA they can click when ready. Do NOT mutate
-        // baselineVersion so the diff persists if they ignore the toast.
-        showManualReloadCta(live);
-        return;
-      }
-      showDeferredToast(live);
       // Re-poll soon. Do NOT mutate baselineVersion yet — we want the next
       // check to still see a diff so we re-attempt the reload once the
       // user finishes saving.
-      setTimeout(checkAndMaybeReload, DEFER_WHEN_BUSY_MS);
+      deferReload(live);
       return;
     }
 
-    reloadInProgress = true;
-    baselineVersion = live;
-    deferCount = 0;
-    showReloadToast(live);
-    setTimeout(hardReload, GRACE_BEFORE_RELOAD_MS);
+    scheduleReload(live);
   }
 
   // ── Boot ────────────────────────────────────────────────────────────────

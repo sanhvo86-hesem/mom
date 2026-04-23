@@ -284,24 +284,32 @@ fi
 
 prune_rollback_tags
 
-# ── Publish build-info so the portal frontend can detect a new release ─────
-# 00-version-check.js polls this file and triggers an automatic hard-reload
-# in any open browser tab when the sha changes — so users do not have to
-# F5 after a deploy. Lives at the published web root (sibling to
-# portal.html); /mom/data/ is blocked by nginx and so cannot be used.
+# ── Publish deploy metadata for portal auto hard-reload ───────────────────
+# sw-build-tag.js is imported by mom/sw.js. It must land BEFORE build-info.json
+# so the frontend only sees the new sha after the SW update signal is already
+# available. build-info.json is therefore the publish barrier.
 BUILD_INFO="$SITE_DIR/mom/build-info.json"
 SHORT_SHA="$(git -C "$SITE_DIR" rev-parse --short HEAD)"
 FULL_SHA="$(git -C "$SITE_DIR" rev-parse HEAD)"
 DEPLOYED_AT_ISO="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-log "INFO" "Publishing build-info.json (sha=$SHORT_SHA)..."
-# Write to a tempfile then mv into place: same-fs rename is atomic on POSIX,
-# so a concurrent fetch from 00-version-check.js never observes a partial
-# write (otherwise it would JSON.parse-fail and silently retry on next poll).
 BUILD_INFO_TMP="${BUILD_INFO}.tmp.$$"
 SW_BUILD_TAG_FILE="$SITE_DIR/mom/sw-build-tag.js"
 SW_BUILD_TAG_TMP="${SW_BUILD_TAG_FILE}.tmp.$$"
 # Belt-and-suspenders cleanup if the script dies between cat and mv.
 trap 'rm -f "$BUILD_INFO_TMP" "$SW_BUILD_TAG_TMP" 2>/dev/null || true' EXIT
+
+log "INFO" "Publishing sw-build-tag.js (sha=$SHORT_SHA)..."
+cat > "$SW_BUILD_TAG_TMP" <<JS
+self.__SW_BUILD_TAG = '$FULL_SHA';
+JS
+chown "$DEPLOY_USER:$WEB_GROUP" "$SW_BUILD_TAG_TMP"
+chmod 644 "$SW_BUILD_TAG_TMP"
+mv -f "$SW_BUILD_TAG_TMP" "$SW_BUILD_TAG_FILE"
+
+log "INFO" "Publishing build-info.json (sha=$SHORT_SHA)..."
+# Write to a tempfile then mv into place: same-fs rename is atomic on POSIX,
+# so a concurrent fetch from 00-version-check.js never observes a partial
+# write (otherwise it would JSON.parse-fail and silently retry on next poll).
 cat > "$BUILD_INFO_TMP" <<JSON
 {
   "version":     "$SHORT_SHA",
@@ -314,18 +322,6 @@ JSON
 chown "$DEPLOY_USER:$WEB_GROUP" "$BUILD_INFO_TMP"
 chmod 644 "$BUILD_INFO_TMP"
 mv -f "$BUILD_INFO_TMP" "$BUILD_INFO"
-
-# sw-build-tag.js is imported by mom/sw.js. Bumping the SHA here changes the
-# effective bytes the browser hashes for service-worker update detection,
-# so every deploy triggers an SW activate event → cache eviction →
-# NEW_VERSION postMessage to all open clients.
-log "INFO" "Publishing sw-build-tag.js (sha=$SHORT_SHA)..."
-cat > "$SW_BUILD_TAG_TMP" <<JS
-self.__SW_BUILD_TAG = '$SHORT_SHA';
-JS
-chown "$DEPLOY_USER:$WEB_GROUP" "$SW_BUILD_TAG_TMP"
-chmod 644 "$SW_BUILD_TAG_TMP"
-mv -f "$SW_BUILD_TAG_TMP" "$SW_BUILD_TAG_FILE"
 
 log "INFO" "═══ Deploy completed ═══"
 echo ""
