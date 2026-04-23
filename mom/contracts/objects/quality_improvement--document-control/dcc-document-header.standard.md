@@ -143,6 +143,33 @@ Direct SQL writes are forbidden outside the migrate tool.
 
 ---
 
+## 2.6 Subtitle (Vietnamese description) — source-of-truth chain
+
+The Vietnamese subtitle that appears under the title in the header ribbon
+has FOUR potential storage locations. They MUST stay in sync. Authority
+order (highest wins on render):
+
+| # | Location                                              | Used by                                       | Notes                                              |
+| - | ----------------------------------------------------- | --------------------------------------------- | -------------------------------------------------- |
+| 1 | `dcc_document_header.subtitle` (PostgreSQL)           | DCC ribbon renderer (live, via API)           | **Render authority.** Empty here → no subtitle on screen. |
+| 2 | `data-dcc-bootstrap.header.subtitle` (HTML attribute) | First-paint flash before API responds         | Should match (1). Migrate seeds it from (1) at injection time. |
+| 3 | `doc_descriptions.json[doc_code]` (legacy file)       | Listing-card description (legacy fallback)    | Mirror of (1). `rename_doc` writes to both.        |
+| 4 | `<span class="sub-vn">…</span>` (legacy HTML markup)  | Pre-DCC layout only — should not exist anymore | Migrate strips this when injecting the placeholder. |
+
+When the migration tool seeds (1) for a new doc, it walks this priority
+chain to find the best available value:
+**`<span class="sub-vn">` → bootstrap seed → `doc_descriptions.json[code]` → null.**
+
+When the user edits a doc via the portal "Chỉnh Sửa Tài Liệu" modal:
+1. `rename_doc` writes the new value to **(3)**.
+2. `POST /api/v1/dcc/documents/upsert` writes the new value to **(1)**.
+3. The renderer re-fetches and updates the on-screen ribbon.
+
+**Never edit (2) or (4) directly.** (2) is overwritten by (1) on every
+render; (4) is forbidden post-migration (§2.4).
+
+---
+
 ## 3. Edit flow (what happens when a user clicks "Chỉnh Sửa Tài Liệu")
 
 ```

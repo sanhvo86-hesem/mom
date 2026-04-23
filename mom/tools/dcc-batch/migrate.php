@@ -153,9 +153,24 @@ foreach (walk_docs($ROOT_DIR) as $abs) {
     }
 
     // ── Extract metadata BEFORE we mutate the HTML, so we can use legacy
-    //    title/subtitle as the seed for the DB row when it is missing. ──
+    //    title/subtitle as the seed for the DB row when it is missing.
+    //
+    //    Subtitle priority chain:
+    //      1. <span class="sub-vn">           (extract_subtitle, in lib)
+    //      2. data-dcc-bootstrap seed         (extract_subtitle, in lib)
+    //      3. doc_descriptions.json[code]     (this script, file-based fallback)
+    //
+    //    The legacy listing card already reads (3) so authors who set a
+    //    description via the old "Save description" path expect it to flow
+    //    into the DCC ribbon too.
     $extractedTitle    = extract_title($html, $code, $abs);
     $extractedSubtitle = extract_subtitle($html);
+    if ($extractedSubtitle === null) {
+        $fromDesc = $docDescriptions[$code] ?? null;
+        if (is_string($fromDesc) && trim($fromDesc) !== '') {
+            $extractedSubtitle = trim($fromDesc);
+        }
+    }
 
     // ── HTML pass ──────────────────────────────────────────────────────
     if (!$opts['no_html']) {

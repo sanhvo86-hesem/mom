@@ -254,13 +254,31 @@ function extract_title(string $html, string $code, string $absPath): string
 
 /**
  * Extract the Vietnamese subtitle from an existing HTML file. Tries (in
- * order): legacy `<span class="sub-vn">`, then null when nothing meaningful.
+ * order):
+ *   1. legacy `<span class="sub-vn">` block
+ *   2. existing DCC bootstrap seed JSON (`data-dcc-bootstrap.header.subtitle`)
+ *   3. null when nothing meaningful exists
+ *
+ * Note: the `doc_descriptions.json` fallback is applied at a higher layer
+ * (migrate.php) so the lib stays I/O-free. Do not add file reads here.
  */
 function extract_subtitle(string $html): ?string
 {
+    // 1) Legacy sub-vn span
     if (preg_match('/<span[^>]*class=["\'][^"\']*\bsub-vn\b[^"\']*["\'][^>]*>(.*?)<\/span>/isu', $html, $m)) {
         $candidate = clean_text((string)$m[1]);
         if ($candidate !== '') return $candidate;
+    }
+    // 2) Existing bootstrap seed JSON. The seed is HTML-attribute-encoded
+    //    (single quotes around the attr, JSON inside). Pull the attr value
+    //    then JSON-decode.
+    if (preg_match('/data-dcc-bootstrap\s*=\s*([\'"])(.*?)\1/is', $html, $m)) {
+        $raw  = html_entity_decode((string)$m[2], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $seed = json_decode($raw, true);
+        if (is_array($seed) && isset($seed['header']['subtitle'])) {
+            $candidate = trim((string)$seed['header']['subtitle']);
+            if ($candidate !== '') return $candidate;
+        }
     }
     return null;
 }
