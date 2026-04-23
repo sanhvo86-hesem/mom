@@ -70,11 +70,12 @@ Also inspect any rename/move/delete flow that can break `artifact_rel_path`.
 6. Can a move/rename/delete silently orphan locale artifacts?
 7. Are non-HTML files handled safely when English artifact is missing?
 8. Are any standards/docs still contradicting the no-live-translation model?
-9. Does create/save/approve trigger a backend locale-sync attempt without risking Vietnamese source persistence?
+9. Does create/save/submit-review/approve trigger a backend locale-sync attempt without risking Vietnamese source persistence?
 10. When no internal provider is configured, does the repo record `blocked` state truthfully instead of inventing an EN artifact?
 11. Does the portal use `controlPlaneDocumentAuthoringRequest(...)` everywhere for file-backed authoring instead of falling back to `?action=doc_*` writes?
 12. Can a draft or in-review document keep rendering a hash-matching English artifact after `start-new-revision` without exposing stale mixed-language content?
 13. Can draft/review auto-translation overwrite or delete the last released English artifact before release, or fail to restore it when the workflow returns to the released baseline?
+14. Do `vi` and `en` draft/in-review views resolve against the same active working source carrier/revision baseline?
 
 ## Required output shape
 

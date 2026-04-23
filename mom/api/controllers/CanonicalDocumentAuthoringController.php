@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
-use RuntimeException;
-
 /**
  * Canonical control-plane bridge for file-backed QMS document authoring.
  *
@@ -23,7 +21,6 @@ final class CanonicalDocumentAuthoringController extends DocumentController
         } finally {
             $this->restoreLegacyWriteGuard();
         }
-        throw new RuntimeException('canonical_document_authoring_unreachable');
     }
 
     public function saveDraft(): never
@@ -34,7 +31,6 @@ final class CanonicalDocumentAuthoringController extends DocumentController
         } finally {
             $this->restoreLegacyWriteGuard();
         }
-        throw new RuntimeException('canonical_document_authoring_unreachable');
     }
 
     public function submitReview(): never
@@ -45,7 +41,6 @@ final class CanonicalDocumentAuthoringController extends DocumentController
         } finally {
             $this->restoreLegacyWriteGuard();
         }
-        throw new RuntimeException('canonical_document_authoring_unreachable');
     }
 
     public function approve(): never
@@ -56,7 +51,6 @@ final class CanonicalDocumentAuthoringController extends DocumentController
         } finally {
             $this->restoreLegacyWriteGuard();
         }
-        throw new RuntimeException('canonical_document_authoring_unreachable');
     }
 
     public function reject(): never
@@ -67,7 +61,6 @@ final class CanonicalDocumentAuthoringController extends DocumentController
         } finally {
             $this->restoreLegacyWriteGuard();
         }
-        throw new RuntimeException('canonical_document_authoring_unreachable');
     }
 
     public function deleteDrafts(): never
@@ -78,7 +71,6 @@ final class CanonicalDocumentAuthoringController extends DocumentController
         } finally {
             $this->restoreLegacyWriteGuard();
         }
-        throw new RuntimeException('canonical_document_authoring_unreachable');
     }
 
     public function deleteVersion(): never
@@ -89,7 +81,6 @@ final class CanonicalDocumentAuthoringController extends DocumentController
         } finally {
             $this->restoreLegacyWriteGuard();
         }
-        throw new RuntimeException('canonical_document_authoring_unreachable');
     }
 
     public function startNewRevision(): never
@@ -100,6 +91,5 @@ final class CanonicalDocumentAuthoringController extends DocumentController
         } finally {
             $this->restoreLegacyWriteGuard();
         }
-        throw new RuntimeException('canonical_document_authoring_unreachable');
     }
 }
