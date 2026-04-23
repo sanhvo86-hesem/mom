@@ -159,9 +159,12 @@ final class DocumentLocaleAutomationService
 
         $this->writeArtifact($artifactRelPath, $artifactHtml);
 
+        $defaultState = in_array($trigger, ['submit_review', 'approve_release'], true)
+            ? 'review_pending'
+            : 'machine_preview';
         $state = $this->normaliseVariantState(
-            (string)($attempt['translation_state'] ?? ($trigger === 'approve_release' ? 'review_pending' : 'machine_preview')),
-            $trigger === 'approve_release' ? 'review_pending' : 'machine_preview'
+            (string)($attempt['translation_state'] ?? $defaultState),
+            $defaultState
         );
         $metadata = [
             'auto_sync' => true,

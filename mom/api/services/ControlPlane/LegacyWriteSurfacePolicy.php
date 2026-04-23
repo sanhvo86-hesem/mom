@@ -55,8 +55,12 @@ final class LegacyWriteSurfacePolicy
 
     private function canonicalPath(string $surface): string
     {
+        // document_files is the file-backed authoring surface; the actual
+        // REST endpoints are wired under `/api/v1/eqms/control-plane/documents/*`
+        // (see mom/api/routes/eqms-control-plane-routes.php lines 15-23 and
+        // docs/standards/37-document-translation-publication-workflow.md §9.1.2).
         return match ($surface) {
-            'document_files' => '/api/v1/eqms/control-plane/commands',
+            'document_files' => '/api/v1/eqms/control-plane/documents/*',
             'online_form_json' => '/api/v1/eqms/control-plane/commands',
             'evidence_vault_json' => '/api/v1/eqms/control-plane/commands',
             'product_passport_json' => '/api/v1/eqms/genealogy/commands',

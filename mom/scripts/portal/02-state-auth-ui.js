@@ -3200,14 +3200,13 @@ async function editDocMeta(code, field){
     state[field] = newVal.trim();
     setDocState(code, state);
     
-    // Sync to server
-    try{
-      await apiCall('doc_update_meta', {code, base_path: doc.path, field, value: newVal.trim()});
-    }catch(e){ console.warn('doc_update_meta sync error:', e); }
-    
+    // Do not hit the blocked legacy metadata-write surface. This quick edit is
+    // currently a local workspace affordance until owner/approver display labels
+    // are mapped onto a canonical DCC role-code contract.
+
     // Refresh header
     updateDocViewerHeader(doc);
-    showToast((lang==='en'?'Updated ':'Đã cập nhật ') + field);
+    showToast((lang==='en'?'Updated locally: ':'Đã cập nhật cục bộ: ') + field);
   }catch(err){
     console.error('editDocMeta error:', err);
   }

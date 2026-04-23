@@ -419,13 +419,24 @@ class DocumentController extends BaseController
 
         $this->syncDccHeaderBaseline($code, $baseRel, $state, (string)($me['username'] ?? 'system'));
         $catalog = $this->resolveDocumentCatalogEntry($code, $baseRel);
+
+        // Workbook/non-HTML submit flows omit `html`; in that case the
+        // canonical source content still lives in the newest in_review /
+        // draft archive entry for this revision. Load it so the backend EN
+        // auto-sync fires on every submit-review exactly like create / save
+        // / approve, per docs/standards/37 §9.1.1.
+        $sourceHtml = $html;
+        if ($sourceHtml === '') {
+            $sourceHtml = $this->loadWorkflowWorkingHtml($baseRel, $revision, $versions);
+        }
+
         $localeTranslation = [];
-        if ($html !== '') {
+        if ($sourceHtml !== '') {
             try {
                 $localeTranslation = $this->localeAutomation()->syncEnglishMachinePreview([
                     'doc_code' => $code,
                     'base_rel_path' => $baseRel,
-                    'source_html' => $html,
+                    'source_html' => $sourceHtml,
                     'source_status' => 'in_review',
                     'revision' => $revision,
                     'trigger' => 'submit_review',
@@ -1229,6 +1240,50 @@ class DocumentController extends BaseController
     private function workflowQueryPath(): string
     {
         return trim((string)($this->query('path') ?? ($this->query('base_path') ?? '')));
+    }
+
+    /**
+     * Load the current working HTML for a document at the given revision.
+     *
+     * Prefers a matching `in_review` archive entry, then the `draft` entry,
+     * and finally the live source file. Used by submit-review when the
+     * client omits `html` (e.g. workbook submit) so the backend EN
+     * auto-sync can still run on the current canonical source per §9.1.1.
+     *
+     * @param array<int, mixed> $versions
+     */
+    private function loadWorkflowWorkingHtml(string $baseRel, string $revision, array $versions): string
+    {
+        $targetVersion = 'v' . ltrim(trim($revision), 'vV');
+        foreach (['in_review', 'draft'] as $wantStatus) {
+            foreach ($versions as $v) {
+                if (!is_array($v)) continue;
+                if (($v['status'] ?? '') !== $wantStatus) continue;
+                if (($v['version'] ?? '') !== $targetVersion) continue;
+                $file = (string)($v['file'] ?? '');
+                if ($file === '') continue;
+                try {
+                    $abs = join_in_root($this->rootDir, $file);
+                    if (is_file($abs)) {
+                        $content = (string)@file_get_contents($abs);
+                        if ($content !== '') {
+                            return $content;
+                        }
+                    }
+                } catch (Throwable $e) {
+                    // skip unreadable archive rows
+                }
+            }
+        }
+        try {
+            $liveAbs = join_in_root($this->rootDir, $baseRel);
+            if (is_file($liveAbs)) {
+                return (string)@file_get_contents($liveAbs);
+            }
+        } catch (Throwable $e) {
+            // fall through
+        }
+        return '';
     }
 
     /**

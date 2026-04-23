@@ -71,8 +71,24 @@ function _documentControlPlanePath(action){
   }
 }
 
+function _resolveApiPathTemplate(path, payload){
+  var resolved = String(path || '');
+  var docCode = '';
+  if(resolved.indexOf('{doc_code}') === -1) return resolved;
+  if(payload && typeof payload === 'object'){
+    docCode = String(
+      payload.doc_code
+      || payload.code
+      || (payload.data && (payload.data.doc_code || payload.data.code))
+      || ''
+    ).trim();
+  }
+  return resolved.replace(/\{doc_code\}/g, encodeURIComponent(docCode));
+}
+
 function _api(action, payload, method){
   var resolved = _documentControlPlanePath(action) || action;
+  resolved = _resolveApiPathTemplate(resolved, payload||{});
   var httpMethod = (method || 'POST').toUpperCase();
   var headers = {'Content-Type':'application/json'};
   var url = resolved;
@@ -2187,7 +2203,6 @@ var API_CATALOG = [
   { action:'/api/v1/eqms/control-plane/documents/submit-review',       method:'POST', label:'Nộp xem xét',                module:'Tài liệu' },
   { action:'/api/v1/eqms/control-plane/documents/approve',             method:'POST', label:'Phê duyệt tài liệu',         module:'Tài liệu' },
   { action:'/api/v1/eqms/control-plane/documents/reject',              method:'POST', label:'Từ chối tài liệu',            module:'Tài liệu' },
-  { action:'doc_update_meta',         method:'POST', label:'Cập nhật metadata',           module:'Tài liệu' },
   { action:'/api/v1/eqms/control-plane/documents/versions',            method:'GET',  label:'Danh sách phiên bản',         module:'Tài liệu' },
   { action:'/api/v1/eqms/control-plane/documents/start-new-revision',  method:'POST', label:'Bắt đầu revision mới',        module:'Tài liệu' },
   { action:'doc_stream',              method:'GET',  label:'Tải file tài liệu',            module:'Tài liệu' },
@@ -3761,7 +3776,7 @@ BLOCK_TEMPLATES['tpl-doc-approval-flow'] = _tplMeta('action-status-flow', 'Luồ
       _tplTransition('draft', 'review', 'Gửi duyệt', 'Submit for Review', '/api/v1/eqms/control-plane/documents/submit-review', 'author', true, 'Gửi tài liệu sang bước review?'),
       _tplTransition('review', 'approved', 'Phê duyệt', 'Approve', '/api/v1/eqms/control-plane/documents/approve', 'approver', true, 'Phê duyệt tài liệu này?'),
       _tplTransition('review', 'draft', 'Trả về sửa', 'Return to Draft', '/api/v1/eqms/control-plane/documents/reject', 'approver', true, 'Trả tài liệu về draft để chỉnh sửa?'),
-      _tplTransition('approved', 'superseded', 'Thay thế', 'Supersede', 'doc_update_meta', 'document_control', false, 'Đánh dấu tài liệu đã bị thay thế?')
+      _tplTransition('approved', 'superseded', 'Thay thế', 'Supersede', '/api/v1/dcc/documents/{doc_code}/actions/supersede', 'document_control', false, 'Đánh dấu tài liệu đã bị thay thế?')
     ]
   }
 });
