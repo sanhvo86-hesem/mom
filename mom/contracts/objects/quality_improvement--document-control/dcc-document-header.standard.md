@@ -187,17 +187,27 @@ in listing card and breadcrumb.
 
 ## 4. Tools
 
-| Tool                                | Purpose                                                          |
-| ----------------------------------- | ---------------------------------------------------------------- |
-| `mom/tools/dcc-batch/audit.php`     | Read-only deep check; exits non-zero on violations.              |
-| `mom/tools/dcc-batch/migrate.php`   | Idempotent migrate / fix. Apply the standard to legacy docs.     |
-| `mom/tools/dcc-batch/lib.php`       | Shared utilities (filename → code, title extraction, etc.).      |
+| Tool                                       | Purpose                                                                |
+| ------------------------------------------ | ---------------------------------------------------------------------- |
+| `mom/tools/dcc-batch/audit.php`            | Read-only structural check (C1–C10). Exits non-zero on violations.     |
+| `mom/tools/dcc-batch/migrate.php`          | Idempotent migrate / fix. Applies the standard to legacy docs.         |
+| `mom/tools/dcc-batch/verify-headers.php`   | Simulates the rendered ribbon per row; verifies template conformance.  |
+| `mom/tools/dcc-batch/lib.php`              | Shared utilities (filename → code, title extraction, HTML mutators).   |
+
+**Scope:** HTML files only. Excel forms (`*.xlsx`) are NOT covered by these
+tools — they cannot host an inline `<script>` and continue to use the
+legacy `doc_descriptions.json` + `scan_cache` flow for the listing card.
+The `audit` and `verify-headers` tools intentionally skip non-HTML.
 
 Common invocations (from project root, `DB_PASS` set):
 
 ```bash
-# Check compliance, exit 1 if anything violates
+# Check structural compliance (C1–C10), exit 1 if anything violates
 DB_PASS=… php mom/tools/dcc-batch/audit.php
+
+# Simulate the rendered ribbon for every doc and verify template conformance
+DB_PASS=… php mom/tools/dcc-batch/verify-headers.php
+DB_PASS=… php mom/tools/dcc-batch/verify-headers.php --verbose      # show 3 sample renders
 
 # Preview what migrate would do for SOP-* docs only
 DB_PASS=… php mom/tools/dcc-batch/migrate.php --dry-run --filter-prefix=SOP --verbose
@@ -208,6 +218,22 @@ DB_PASS=… php mom/tools/dcc-batch/migrate.php
 # Force re-injection (bumps DCC_VERSION cache-bust everywhere)
 DB_PASS=… php mom/tools/dcc-batch/migrate.php --force-bootstrap
 ```
+
+The verifier also checks per-row template invariants:
+
+| Code  | Invariant                                                          |
+| ----- | ------------------------------------------------------------------ |
+| T1    | `title` non-empty AND not equal to bare `doc_code`                 |
+| T2    | `doc_code` matches `^[A-Z][A-Z0-9]+(?:-[A-Z0-9]+)*$`               |
+| T3    | `doc_type` ∈ {MAN,POL,SOP,WI,FRM,ANNEX,JD,DEPT,ORG,REF,TRN}         |
+| T4    | `revision` matches `^V\d+(\.\d+)?$`                                 |
+| T5    | `effective_date` matches `^\d{4}-\d{2}-\d{2}$`                      |
+| T6    | `owner_role_code` non-empty, single-role (no `/,;|whitespace`)      |
+| T7    | `approver_role_code` non-empty, single-role                         |
+| T8    | `status` ∈ {draft, in_review, approved, released, superseded, obsolete} |
+| T9    | `subtitle` is null OR a trimmed non-empty string                   |
+| T10   | (HTML only) `data-dcc-doc-code` matches DB doc_code                 |
+| X     | No DB orphan rows; no file-on-disk without DB row                  |
 
 After any change to `dcc-header.css` or `11-dcc-header-renderer.js`, bump
 the `DCC_VERSION` constant in `mom/tools/dcc-batch/lib.php` AND run

@@ -247,113 +247,194 @@ h3:has(.proc-num) { margin-top: 28px; margin-bottom: 10px; display: flex; align-
 .metric-card.gold { border-top-color: var(--gold); }
 .metric-card.red { border-top-color: var(--red); }
 
-/* PILLAR CARDS — Strategic pillars / concept tiles (short-to-medium phrases, bilingual) */
+/* ──────────────────────────────────────────────────────────────
+   PILLAR CARDS v3 — Premium strategic-pillar / concept tiles
+   Design: Linear / Stripe / Mercury inspired. Generous white-
+   space, layered shadows, circular number badge, colored dot
+   indicator, refined hover state.
+   ────────────────────────────────────────────────────────────── */
 .pillar-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-  gap: 18px;
-  margin: 20px 0 24px;
+  gap: 20px;
+  margin: 22px 0 28px;
   align-items: stretch;
   counter-reset: pillar;
 }
-/* Landscape / wide viewports — keep the grid from going to 3 cols for 4-card layouts */
 @media (min-width: 1100px) {
   .pillar-grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
 }
+
 .pillar-card {
   counter-increment: pillar;
   position: relative;
-  display: flex; flex-direction: column; gap: 10px;
-  padding: 22px 22px 22px 26px;
-  background: linear-gradient(165deg, #ffffff 0%, #f5f8fd 100%);
-  border: 1px solid rgba(21,101,192,.14);
-  border-radius: 14px;
-  box-shadow: 0 1px 2px rgba(12,45,72,.04), 0 2px 8px rgba(12,45,72,.03);
-  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  display: flex; flex-direction: column; gap: 12px;
+  padding: 26px 26px 24px 30px;
+  background: #ffffff;
+  border: 1px solid #e6ebf2;
+  border-radius: 16px;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.9) inset,
+    0 1px 2px rgba(12,45,72,.04),
+    0 8px 24px -16px rgba(12,45,72,.10);
+  transition: transform .28s cubic-bezier(.4,0,.2,1),
+              box-shadow .28s cubic-bezier(.4,0,.2,1),
+              border-color .28s cubic-bezier(.4,0,.2,1);
   overflow: hidden;
   overflow-wrap: anywhere; word-break: normal; hyphens: auto;
 }
-/* Left accent rail — full height, gradient navy→blue */
+
+/* Left accent bar — crisp gradient with subtle glow */
 .pillar-card::before {
-  content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 4px;
-  background: linear-gradient(180deg, var(--navy) 0%, var(--blue) 55%, #42a5f5 100%);
+  content: '';
+  position: absolute; top: 0; bottom: 0; left: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--navy) 0%, var(--blue) 50%, #4dabf7 100%);
+  box-shadow: 2px 0 16px -4px rgba(21,101,192,.28);
 }
-/* Auto-numbered chip in top-right */
+
+/* Circular number badge — upper-right */
 .pillar-card::after {
   content: counter(pillar, decimal-leading-zero);
-  position: absolute; top: 14px; right: 16px;
+  position: absolute; top: 18px; right: 20px;
+  width: 32px; height: 32px;
+  display: flex; align-items: center; justify-content: center;
   font-family: var(--mono);
   font-size: 11px; font-weight: 700;
-  color: rgba(21,101,192,.36);
-  letter-spacing: .05em;
+  color: var(--blue);
+  background: rgba(21,101,192,.06);
+  border: 1px solid rgba(21,101,192,.16);
+  border-radius: 50%;
+  letter-spacing: 0;
+  transition: all .28s cubic-bezier(.4,0,.2,1);
   pointer-events: none;
 }
-.pillar-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(12,45,72,.09), 0 2px 6px rgba(12,45,72,.04);
-  border-color: rgba(21,101,192,.32);
-}
-.pillar-card:hover::after { color: var(--blue); }
 
+.pillar-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(21,101,192,.28);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.9) inset,
+    0 4px 10px rgba(12,45,72,.05),
+    0 22px 44px -18px rgba(12,45,72,.15);
+}
+.pillar-card:hover::after {
+  color: #ffffff;
+  background: var(--blue);
+  border-color: var(--blue);
+  box-shadow: 0 4px 12px -2px rgba(21,101,192,.45);
+}
+
+/* Eyebrow — small-caps category tag with a colored dot */
 .pillar-card .pillar-eyebrow,
 .pillar-card > .label {
-  font-size: 10px; font-weight: 800; color: var(--blue);
-  text-transform: uppercase; letter-spacing: .85px; line-height: 1.35;
+  display: flex; align-items: center; gap: 8px;
+  font-size: 10px; font-weight: 700; color: var(--blue);
+  text-transform: uppercase; letter-spacing: 1.1px; line-height: 1.45;
   order: 1;
-  padding-right: 36px; /* keep clear of the number chip */
+  padding-right: 44px; /* clear space for the circular chip */
 }
+.pillar-card .pillar-eyebrow::before,
+.pillar-card > .label::before {
+  content: '';
+  flex-shrink: 0;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 0 3px rgba(21,101,192,.16);
+}
+
+/* Title — the pillar statement itself */
 .pillar-card .pillar-title,
 .pillar-card > .value {
-  font-size: 17px; font-weight: 700; color: var(--navy);
-  line-height: 1.32; letter-spacing: -.01em;
+  font-size: 18px; font-weight: 700; color: var(--navy);
+  line-height: 1.3; letter-spacing: -.015em;
   order: 2;
 }
+
+/* Optional supporting description */
 .pillar-card .pillar-desc,
 .pillar-card > .sub {
-  font-size: 12.5px; color: var(--ink2); line-height: 1.6;
-  margin-top: 4px;
+  font-size: 13px; color: var(--ink2); line-height: 1.62;
+  margin-top: 2px;
   order: 3;
 }
-/* Color variants — recolor the rail + eyebrow + number chip */
-.pillar-card.green::before { background: linear-gradient(180deg, #145523 0%, var(--green) 55%, #51cf66 100%); }
+
+/* Color variants recolor the accent bar, the dot, and the eyebrow */
+.pillar-card.green::before { background: linear-gradient(180deg, #145523 0%, var(--green) 50%, #51cf66 100%); box-shadow: 2px 0 16px -4px rgba(47,158,68,.28); }
 .pillar-card.green .pillar-eyebrow, .pillar-card.green > .label { color: var(--green); }
-.pillar-card.gold::before  { background: linear-gradient(180deg, #8a5a00 0%, var(--gold) 55%, #ffc94d 100%); }
+.pillar-card.green .pillar-eyebrow::before, .pillar-card.green > .label::before { background: var(--green); box-shadow: 0 0 0 3px rgba(47,158,68,.16); }
+
+.pillar-card.gold::before { background: linear-gradient(180deg, #8a5a00 0%, var(--gold) 50%, #ffc94d 100%); box-shadow: 2px 0 16px -4px rgba(249,168,37,.28); }
 .pillar-card.gold .pillar-eyebrow, .pillar-card.gold > .label { color: #8a5a00; }
-.pillar-card.red::before   { background: linear-gradient(180deg, #8a1d1d 0%, var(--red) 55%, #ff6b6b 100%); }
+.pillar-card.gold .pillar-eyebrow::before, .pillar-card.gold > .label::before { background: var(--gold); box-shadow: 0 0 0 3px rgba(249,168,37,.18); }
+
+.pillar-card.red::before { background: linear-gradient(180deg, #8a1d1d 0%, var(--red) 50%, #ff6b6b 100%); box-shadow: 2px 0 16px -4px rgba(224,49,49,.28); }
 .pillar-card.red .pillar-eyebrow, .pillar-card.red > .label { color: var(--red); }
+.pillar-card.red .pillar-eyebrow::before, .pillar-card.red > .label::before { background: var(--red); box-shadow: 0 0 0 3px rgba(224,49,49,.16); }
 
 @media (max-width: 720px) {
   .pillar-grid { grid-template-columns: 1fr; gap: 14px; }
-  .pillar-card { padding: 18px 18px 18px 22px; }
+  .pillar-card { padding: 20px 20px 20px 24px; }
+  .pillar-card::after { top: 14px; right: 14px; width: 28px; height: 28px; font-size: 10px; }
 }
 @media print {
-  .pillar-card { box-shadow: none; break-inside: avoid; background: #fff; }
-  .pillar-card:hover { transform: none; box-shadow: none; border-color: rgba(21,101,192,.14); }
-  .pillar-card::after { color: rgba(21,101,192,.32); }
+  .pillar-card { box-shadow: none; break-inside: avoid; transform: none; }
+  .pillar-card:hover { transform: none; box-shadow: none; border-color: #e6ebf2; }
+  .pillar-card:hover::after { background: rgba(21,101,192,.06); color: var(--blue); }
 }
 
-/* OBJECTIVE HERO — Typographic treatment for "Mục tiêu" sections.
-   Applies when an h2 (class .h2) is immediately followed by a <p> then .pillar-grid.
-   The <p> between h2 and pillar-grid becomes a bold mission-statement lead.
-   No HTML changes needed — pure CSS pattern. */
+/* ──────────────────────────────────────────────────────────────
+   OBJECTIVE HERO — "Mục tiêu" section treatment.
+   When an H2 is followed by a <p> then a .pillar-grid, the <p>
+   is styled as a quote-card mission statement (pure CSS via
+   :has() — no HTML edits). Safari/older browsers fall back
+   gracefully to plain paragraph.
+   ────────────────────────────────────────────────────────────── */
 .h2 + p:has(+ .pillar-grid),
 h2.h2 + p:has(+ .pillar-grid) {
   position: relative;
-  font-size: 14.5px;
-  line-height: 1.7;
-  color: var(--ink);
+  font-size: 15px;
   font-weight: 500;
-  margin: 14px 0 4px;
-  padding: 14px 18px 14px 20px;
-  background: linear-gradient(90deg, rgba(21,101,192,.05) 0%, rgba(21,101,192,0) 60%);
-  border-left: 3px solid var(--blue);
-  border-radius: 0 var(--r) var(--r) 0;
+  line-height: 1.72;
+  color: var(--ink);
+  margin: 16px 0 6px;
+  padding: 20px 26px 20px 30px;
+  background: linear-gradient(135deg, rgba(21,101,192,.05) 0%, rgba(21,101,192,.01) 100%);
+  border: 1px solid rgba(21,101,192,.12);
+  border-left: 4px solid var(--blue);
+  border-radius: 0 12px 12px 0;
+  box-shadow: 0 2px 12px -6px rgba(12,45,72,.08);
+}
+.h2 + p:has(+ .pillar-grid)::before {
+  content: '';
+  position: absolute;
+  top: 18px; left: 14px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+  box-shadow: 0 0 0 4px rgba(21,101,192,.14);
+  display: none; /* subtle marker, kept as hook for future */
 }
 .h2 + p:has(+ .pillar-grid) b,
-.h2 + p:has(+ .pillar-grid) strong { color: var(--navy); }
-/* Safari/old browsers fallback: plain paragraph, no visual regression */
+.h2 + p:has(+ .pillar-grid) strong { color: var(--navy); font-weight: 700; }
+
+/* Enhance the H2 that precedes the objective hero: slightly tighter margin */
+.h2:has(+ p + .pillar-grid) {
+  margin-bottom: 6px;
+  color: var(--navy);
+}
+.h2:has(+ p + .pillar-grid)::after {
+  content: '';
+  display: inline-block;
+  width: 40px; height: 2px;
+  margin-left: 12px; vertical-align: middle;
+  background: linear-gradient(90deg, var(--blue) 0%, rgba(21,101,192,0) 100%);
+  border-radius: 2px;
+}
+
 @supports not selector(:has(+ .pillar-grid)) {
-  .h2 + p { /* no-op */ }
+  /* Graceful no-op */
 }
 
 /* GATE CARDS — Internal step cards (S1–S5) */

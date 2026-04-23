@@ -35,7 +35,9 @@ declare(strict_types=1);
 require __DIR__ . '/lib.php';
 
 use function MOM\Tools\DccBatch\walk_docs;
+use function MOM\Tools\DccBatch\is_html_path;
 use function MOM\Tools\DccBatch\code_from_filename;
+use function MOM\Tools\DccBatch\code_from_filename_loose;
 use function MOM\Tools\DccBatch\doc_type_from_code;
 use function MOM\Tools\DccBatch\extract_title;
 use function MOM\Tools\DccBatch\extract_subtitle;
@@ -51,6 +53,7 @@ use function MOM\Tools\DccBatch\strip_legacy_title_meta_after_placeholder;
 use function MOM\Tools\DccBatch\build_placeholder;
 use function MOM\Tools\DccBatch\logo_path_for;
 use function MOM\Tools\DccBatch\build_data_layer;
+use function MOM\Tools\DccBatch\load_doc_descriptions;
 
 $ROOT_DIR = realpath(__DIR__ . '/../../..');
 
@@ -88,10 +91,14 @@ $stats = [
     'db_errors'        => 0,
 ];
 
+$docDescriptions = load_doc_descriptions($ROOT_DIR);
+
 $processed = 0;
 foreach (walk_docs($ROOT_DIR) as $abs) {
     $rel  = substr($abs, strlen($ROOT_DIR) + 1);
-    $code = code_from_filename($abs);
+    // Loose extraction handles both standard (FRM-403) and underscore-separated
+    // form filenames (FRM-403_SCAR.xlsx) which are common in mom/docs/forms/.
+    $code = is_html_path($abs) ? code_from_filename($abs) : code_from_filename_loose($abs);
     if ($code === '') {
         $stats['skipped_no_code']++;
         if ($opts['verbose']) echo "[skip] no code → $rel\n";
@@ -104,6 +111,33 @@ foreach (walk_docs($ROOT_DIR) as $abs) {
     $stats['inspected']++;
     $changes = [];
 
+    /* ════════════════════════════════════════════════════════════════════
+     * NON-HTML BRANCH: Excel forms etc. — DB-only pass.
+     * Excel files cannot host an HTML script, so we just ensure a DB row
+     * exists. Title comes from filename; subtitle from doc_descriptions.json.
+     * ════════════════════════════════════════════════════════════════════ */
+    if (!is_html_path($abs)) {
+        $stats['nonhtml_inspected'] = ($stats['nonhtml_inspected'] ?? 0) + 1;
+        $extractedTitle    = title_from_filename_for_form($abs, $code);
+        $extractedSubtitle = $docDescriptions[$code] ?? null;
+        if ($subtitleStr = ($extractedSubtitle ? trim((string)$extractedSubtitle) : '')) {
+            $extractedSubtitle = $subtitleStr;
+        } else {
+            $extractedSubtitle = null;
+        }
+        if ($dl && !$opts['no_db']) {
+            upsert_db_row($dl, $dbHeaders, $stats, $opts, $code, $extractedTitle, $extractedSubtitle);
+        }
+        if ($opts['limit'] > 0 && ++$processed >= $opts['limit']) {
+            echo "[info] hit --limit={$opts['limit']}, stopping.\n";
+            break;
+        }
+        continue;
+    }
+
+    /* ════════════════════════════════════════════════════════════════════
+     * HTML BRANCH: full DCC pattern (head + body + DB row)
+     * ════════════════════════════════════════════════════════════════════ */
     $html = @file_get_contents($abs);
     if (!is_string($html)) {
         $stats['html_errors']++;
@@ -178,73 +212,9 @@ foreach (walk_docs($ROOT_DIR) as $abs) {
         }
     }
 
-    // ── DB pass ────────────────────────────────────────────────────────
+    // ── DB pass (HTML branch) ──────────────────────────────────────────
     if ($dl && !$opts['no_db']) {
-        $key = strtoupper($code);
-        $existing = $dbHeaders[$key] ?? null;
-        $title    = $extractedTitle !== '' ? $extractedTitle : $code;
-        $subtitle = $extractedSubtitle;
-        $docType  = doc_type_from_code($code);
-
-        if (!$existing) {
-            if ($opts['dry_run']) {
-                $stats['db_inserted']++;
-                echo "[dry ] would INSERT db row $code\n";
-            } else {
-                try {
-                    $dl->execute(
-                        "INSERT INTO dcc_document_header
-                         (doc_code, title, subtitle, doc_type, revision, effective_date,
-                          owner_role_code, approver_role_code, status, locale_default,
-                          metadata, created_at, created_by, updated_at, updated_by)
-                         VALUES
-                         (:c, :t, :s, :dt, 'V0', CURRENT_DATE,
-                          'QA', 'CEO', 'draft', 'vi',
-                          '{}'::jsonb, now(), 'dcc-batch', now(), 'dcc-batch')",
-                        [':c' => $code, ':t' => $title, ':s' => $subtitle, ':dt' => $docType]
-                    );
-                    $dbHeaders[$key] = [
-                        'doc_code' => $code, 'title' => $title,
-                        'subtitle' => $subtitle, 'doc_type' => $docType,
-                    ];
-                    $stats['db_inserted']++;
-                    if ($opts['verbose']) echo "[ok  ] db INSERT $code\n";
-                } catch (\Throwable $e) {
-                    $stats['db_errors']++;
-                    echo "[err ] db INSERT failed $code: " . $e->getMessage() . "\n";
-                }
-            }
-        } else {
-            $needsUpdate = false;
-            $set = []; $params = [':c' => $code];
-            if (trim((string)$existing['title']) === '' || strtoupper(trim((string)$existing['title'])) === strtoupper($code)) {
-                $set[] = "title = :t"; $params[':t'] = $title; $needsUpdate = true;
-            }
-            $existingDocType = (string)($existing['doc_type'] ?? '');
-            $validDocTypes = ['MAN','POL','SOP','WI','FRM','ANNEX','JD','DEPT','ORG','REF','TRN'];
-            if ($existingDocType === '' || !in_array($existingDocType, $validDocTypes, true)) {
-                $set[] = "doc_type = :dt"; $params[':dt'] = $docType; $needsUpdate = true;
-            }
-            if ($needsUpdate) {
-                if ($opts['dry_run']) {
-                    $stats['db_updated']++;
-                    echo "[dry ] would UPDATE db row $code\n";
-                } else {
-                    try {
-                        $set[] = "updated_by = 'dcc-batch'";
-                        $sql = "UPDATE dcc_document_header SET " . implode(', ', $set) . " WHERE doc_code = :c";
-                        $dl->execute($sql, $params);
-                        $stats['db_updated']++;
-                        if ($opts['verbose']) echo "[ok  ] db UPDATE $code\n";
-                    } catch (\Throwable $e) {
-                        $stats['db_errors']++;
-                        echo "[err ] db UPDATE failed $code: " . $e->getMessage() . "\n";
-                    }
-                }
-            } else {
-                $stats['db_unchanged']++;
-            }
-        }
+        upsert_db_row($dl, $dbHeaders, $stats, $opts, $code, $extractedTitle, $extractedSubtitle);
     }
 
     if ($opts['limit'] > 0 && ++$processed >= $opts['limit']) {
@@ -263,6 +233,108 @@ echo "============================================================\n";
 exit(($stats['html_errors'] + $stats['db_errors']) > 0 ? 1 : 0);
 
 /* ──────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Derive a human-readable title from a form filename like
+ *   `FRM-101_Master_Document_Register.xlsx`
+ * Strips the leading code, replaces underscores/dashes with spaces, and
+ * applies title case. Returns the bare code if nothing meaningful remains.
+ */
+function title_from_filename_for_form(string $absPath, string $code): string
+{
+    $stem = preg_replace('/\.[^.]+$/', '', basename($absPath)) ?? basename($absPath);
+    // Strip leading code with optional separator
+    $stem = preg_replace('/^' . preg_quote($code, '/') . '[_\-]?/i', '', (string)$stem) ?? $stem;
+    if (trim((string)$stem) === '') return $code;
+    $words = preg_split('/[_\-]+/u', strtolower((string)$stem)) ?: [];
+    $words = array_map('ucfirst', $words);
+    $title = trim(implode(' ', $words));
+    return $title !== '' ? $title : $code;
+}
+
+/**
+ * Idempotent INSERT/UPDATE helper for `dcc_document_header`.
+ * Mutates $stats and $dbHeaders in place; honours $opts['dry_run'].
+ */
+function upsert_db_row(
+    \MOM\Database\DataLayer $dl,
+    array &$dbHeaders,
+    array &$stats,
+    array $opts,
+    string $code,
+    string $title,
+    ?string $subtitle
+): void {
+    $key      = strtoupper($code);
+    $existing = $dbHeaders[$key] ?? null;
+    $title    = $title !== '' ? $title : $code;
+    $docType  = \MOM\Tools\DccBatch\doc_type_from_code($code);
+    $validDocTypes = ['MAN','POL','SOP','WI','FRM','ANNEX','JD','DEPT','ORG','REF','TRN'];
+
+    if (!$existing) {
+        if ($opts['dry_run']) {
+            $stats['db_inserted']++;
+            echo "[dry ] would INSERT db row $code\n";
+            return;
+        }
+        try {
+            $dl->execute(
+                "INSERT INTO dcc_document_header
+                 (doc_code, title, subtitle, doc_type, revision, effective_date,
+                  owner_role_code, approver_role_code, status, locale_default,
+                  metadata, created_at, created_by, updated_at, updated_by)
+                 VALUES
+                 (:c, :t, :s, :dt, 'V0', CURRENT_DATE,
+                  'QA', 'CEO', 'draft', 'vi',
+                  '{}'::jsonb, now(), 'dcc-batch', now(), 'dcc-batch')",
+                [':c' => $code, ':t' => $title, ':s' => $subtitle, ':dt' => $docType]
+            );
+            $dbHeaders[$key] = [
+                'doc_code' => $code, 'title' => $title,
+                'subtitle' => $subtitle, 'doc_type' => $docType,
+            ];
+            $stats['db_inserted']++;
+            if ($opts['verbose']) echo "[ok  ] db INSERT $code\n";
+        } catch (\Throwable $e) {
+            $stats['db_errors']++;
+            echo "[err ] db INSERT failed $code: " . $e->getMessage() . "\n";
+        }
+        return;
+    }
+
+    $needsUpdate = false;
+    $set = [];
+    $params = [':c' => $code];
+    if (trim((string)$existing['title']) === '' || strtoupper(trim((string)$existing['title'])) === strtoupper($code)) {
+        $set[] = "title = :t"; $params[':t'] = $title; $needsUpdate = true;
+    }
+    $existingDocType = (string)($existing['doc_type'] ?? '');
+    if ($existingDocType === '' || !in_array($existingDocType, $validDocTypes, true)) {
+        $set[] = "doc_type = :dt"; $params[':dt'] = $docType; $needsUpdate = true;
+    }
+    if ($subtitle !== null && trim((string)($existing['subtitle'] ?? '')) === '') {
+        $set[] = "subtitle = :s"; $params[':s'] = $subtitle; $needsUpdate = true;
+    }
+    if (!$needsUpdate) {
+        $stats['db_unchanged']++;
+        return;
+    }
+    if ($opts['dry_run']) {
+        $stats['db_updated']++;
+        echo "[dry ] would UPDATE db row $code\n";
+        return;
+    }
+    try {
+        $set[] = "updated_by = 'dcc-batch'";
+        $sql = "UPDATE dcc_document_header SET " . implode(', ', $set) . " WHERE doc_code = :c";
+        $dl->execute($sql, $params);
+        $stats['db_updated']++;
+        if ($opts['verbose']) echo "[ok  ] db UPDATE $code\n";
+    } catch (\Throwable $e) {
+        $stats['db_errors']++;
+        echo "[err ] db UPDATE failed $code: " . $e->getMessage() . "\n";
+    }
+}
 
 function parse_argv(array $argv): array
 {

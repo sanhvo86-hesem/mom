@@ -37,7 +37,9 @@ declare(strict_types=1);
 require __DIR__ . '/lib.php';
 
 use function MOM\Tools\DccBatch\walk_docs;
+use function MOM\Tools\DccBatch\is_html_path;
 use function MOM\Tools\DccBatch\code_from_filename;
+use function MOM\Tools\DccBatch\code_from_filename_loose;
 use function MOM\Tools\DccBatch\has_dcc_bootstrap;
 use function MOM\Tools\DccBatch\has_dcc_placeholder;
 use function MOM\Tools\DccBatch\extract_placeholder_code;
@@ -85,10 +87,12 @@ $validDocTypes = ['MAN','POL','SOP','WI','FRM','ANNEX','JD','DEPT','ORG','REF','
 $total = 0;
 $compliant = 0;
 foreach (walk_docs($ROOT_DIR) as $abs) {
-    $rel = substr($abs, strlen($ROOT_DIR) + 1);
-    $entry = ['path' => $rel, 'violations' => [], 'code' => null];
+    $rel    = substr($abs, strlen($ROOT_DIR) + 1);
+    $isHtml = is_html_path($abs);
+    $entry  = ['path' => $rel, 'violations' => [], 'code' => null, 'kind' => $isHtml ? 'html' : 'nonhtml'];
 
-    $code = code_from_filename($abs);
+    // Use loose code derivation for non-HTML (forms named FRM-101_…).
+    $code = $isHtml ? code_from_filename($abs) : code_from_filename_loose($abs);
     if ($code === '') {
         $entry['violations'][] = 'C2_no_canonical_code';
         $buckets['C2_no_canonical_code']++;
@@ -104,6 +108,36 @@ foreach (walk_docs($ROOT_DIR) as $abs) {
     $entry['code'] = $code;
     $total++;
 
+    /* ════════════════════════════════════════════════════════════════════
+     * NON-HTML BRANCH: only DB checks apply (no HTML to inspect).
+     * Excel forms are valid controlled docs but cannot host an HTML script.
+     * ════════════════════════════════════════════════════════════════════ */
+    if (!$isHtml) {
+        if ($dl) {
+            $row = $dbHeaders[strtoupper($code)] ?? null;
+            if (!$row) {
+                $entry['violations'][] = 'C8_missing_db_row';
+                $buckets['C8_missing_db_row']++;
+            } else {
+                $title = trim((string)$row['title']);
+                if ($title === '' || strtoupper($title) === strtoupper($code)) {
+                    $entry['violations'][] = 'C9_empty_db_title';
+                    $buckets['C9_empty_db_title']++;
+                }
+                if (!in_array((string)$row['doc_type'], $validDocTypes, true)) {
+                    $entry['violations'][] = 'C10_invalid_db_doc_type:' . $row['doc_type'];
+                    $buckets['C10_invalid_db_doc_type']++;
+                }
+            }
+        }
+        if (empty($entry['violations'])) $compliant++;
+        $results[] = $entry;
+        continue;
+    }
+
+    /* ════════════════════════════════════════════════════════════════════
+     * HTML BRANCH: full DCC pattern (head + body + DB row + no legacy)
+     * ════════════════════════════════════════════════════════════════════ */
     $html = @file_get_contents($abs);
     if (!is_string($html) || $html === '') {
         $entry['violations'][] = 'C1_unreadable';
@@ -111,7 +145,6 @@ foreach (walk_docs($ROOT_DIR) as $abs) {
         $results[] = $entry;
         continue;
     }
-    // Skip malformed fragments (no <head> = partial include, not a real doc)
     if (!preg_match('#<head\b#i', $html)) {
         $entry['violations'][] = 'SKIP_malformed_no_head';
         $buckets['SKIP_malformed_no_head'] = ($buckets['SKIP_malformed_no_head'] ?? 0) + 1;

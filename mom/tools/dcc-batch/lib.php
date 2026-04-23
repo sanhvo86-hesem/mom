@@ -63,7 +63,21 @@ const SKIP_FILENAME_PATTERNS = [
 /* ── Filesystem walker ─────────────────────────────────────────────────── */
 
 /**
- * Yield every controlled HTML file under `mom/docs/`.
+ * File extensions we treat as controlled documents.
+ *
+ * Scope: HTML only. Excel forms (.xlsx etc.) are NOT migrated — they cannot
+ * host an inline `<script>` and the user has explicitly scoped this tool to
+ * HTML documents. Excel forms continue to use the legacy
+ * doc_descriptions.json + scan_cache flow for the listing card.
+ */
+const CONTROLLED_EXTENSIONS = ['html'];
+
+/**
+ * Yield every controlled file under `mom/docs/`.
+ *
+ * Includes HTML (which gets full DCC header injection) AND Excel forms
+ * (which get a DB row only — they can't host an inline HTML script).
+ * Use `is_html_path()` to discriminate.
  *
  * @return \Generator<string>  Absolute paths.
  */
@@ -79,7 +93,7 @@ function walk_docs(string $rootDir): \Generator
     );
     foreach ($iter as $f) {
         if (!$f->isFile()) continue;
-        if (strtolower($f->getExtension()) !== 'html') continue;
+        if (!in_array(strtolower($f->getExtension()), CONTROLLED_EXTENSIONS, true)) continue;
         $abs  = (string)$f->getPathname();
         $name = $f->getFilename();
         $relativeFromBase = substr($abs, strlen($base));
@@ -95,6 +109,42 @@ function walk_docs(string $rootDir): \Generator
         }
         yield $abs;
     }
+}
+
+function is_html_path(string $absPath): bool
+{
+    return strtolower(pathinfo($absPath, PATHINFO_EXTENSION)) === 'html';
+}
+
+/**
+ * Try to derive a code for files whose names don't match our standard
+ * filename patterns. Excel forms use SHOUTY underscored names like
+ *   `FRM-101_Master_Document_Register.xlsx`
+ * which `code_from_filename` already handles via the FRM-NNN pattern, but
+ * some legacy entries use lower-cased names — normalise them first.
+ */
+function code_from_filename_loose(string $absPath): string
+{
+    $code = code_from_filename($absPath);
+    if ($code !== '') return $code;
+    // Fallback: take the leading SHOUTY token before the first underscore
+    $stem = strtoupper((string)preg_replace('/\.[^.]+$/', '', basename($absPath)));
+    if (preg_match('/^([A-Z]+-\d+)/', $stem, $m)) return $m[1];
+    return '';
+}
+
+/**
+ * Read a doc-descriptions sidecar JSON (legacy doc_descriptions.json) and
+ * return a code → description map. Used as a fallback subtitle source for
+ * Excel forms that have no `<span class="sub-vn">` to scrape.
+ */
+function load_doc_descriptions(string $rootDir): array
+{
+    $file = rtrim($rootDir, '/') . '/mom/data/config/doc_descriptions.json';
+    if (!is_file($file)) return [];
+    $raw  = @file_get_contents($file);
+    $data = $raw === false ? null : json_decode($raw, true);
+    return is_array($data) ? $data : [];
 }
 
 /* ── Code derivation (mirrors DocumentControlService::canonicalizeCode) ── */
