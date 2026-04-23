@@ -924,6 +924,75 @@ paths:
                       revision:
                         type: string
 
+  /api/v1/eqms/control-plane/documents/ensure-locale:
+    post:
+      operationId: docEnsureLocale
+      tags: [Documents]
+      summary: Ensure a locale artifact exists for the current source baseline
+      description: |
+        Bootstrap or refresh the English locale artifact for an existing
+        file-backed controlled document on the canonical control-plane
+        authoring surface. This endpoint never edits the Vietnamese source;
+        it only requests backend locale generation from the current canonical
+        source snapshot when an authorized document editor or admin needs English
+        viewing to become available for a legacy document.
+      parameters:
+        - $ref: '#/components/parameters/CsrfHeader'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [code, base_path]
+              properties:
+                code:
+                  type: string
+                base_path:
+                  type: string
+                path:
+                  type: string
+                  description: Legacy compatibility alias for `base_path`.
+                locale:
+                  type: string
+                  enum: [en]
+                target_locale:
+                  type: string
+                  enum: [en]
+                  description: Legacy compatibility alias for `locale`.
+                force:
+                  type: boolean
+                  default: false
+      responses:
+        '200':
+          description: Locale artifact is already renderable or a new locale-sync attempt was recorded.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/SuccessEnvelope'
+                  - type: object
+                    properties:
+                      code:
+                        type: string
+                      locale:
+                        type: string
+                        example: "en"
+                      noop:
+                        type: boolean
+                      reason:
+                        type: string
+                      translation:
+                        type: object
+                      locale_variant:
+                        type: object
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          description: Source HTML could not be resolved for locale bootstrap.
+
   /?action=doc_update_meta:
     post:
       operationId: docUpdateMeta

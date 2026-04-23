@@ -1,8 +1,9 @@
 # Prompt — Translation Workflow Reaudit and Remediation
 
-You are auditing the HESEM MOM/QMS repo at:
+You are auditing the HESEM MOM/QMS repo in the current runtime checkout root provided by the caller/runtime.
 
-`/Users/a10/Documents/mom`
+Use that checkout path for all commands and file references.
+Do not hardcode `/Users/a10/Documents/mom`.
 
 Your task is to **deeply reaudit and then fix** the controlled-document translation workflow.
 
@@ -57,6 +58,9 @@ You must inspect and challenge at least these areas:
 - `mom/api/services/DocumentControl/DocumentLocaleAutomationService.php`
 - `mom/database/migrations/150_dcc_document_change_control.sql`
 - `mom/database/migrations/152_dcc_document_locale_variants.sql`
+- `tools/scripts/translation/dcc_argos_vi_to_en.py`
+- `tools/vps-setup/scripts/setup-dcc-translation-provider.sh`
+- `tools/vps-setup/php-fpm/mom.conf`
 
 Also inspect any rename/move/delete flow that can break `artifact_rel_path`.
 
@@ -76,6 +80,9 @@ Also inspect any rename/move/delete flow that can break `artifact_rel_path`.
 12. Can a draft or in-review document keep rendering a hash-matching English artifact after `start-new-revision` without exposing stale mixed-language content?
 13. Can draft/review auto-translation overwrite or delete the last released English artifact before release, or fail to restore it when the workflow returns to the released baseline?
 14. Do `vi` and `en` draft/in-review views resolve against the same active working source carrier/revision baseline?
+15. Can a legacy document with no locale row self-bootstrap an EN machine preview through the governed backend path?
+16. Is the configured provider path repo-local/on-prem and reproducible from repo truth instead of manual tribal setup?
+17. Does workflow-edit authority for save/submit/bootstrap align between frontend and backend, or is it still incorrectly tied only to create-doc permission?
 
 ## Required output shape
 
@@ -101,15 +108,16 @@ If you find a second-wave issue created or exposed by the first fix, fix it too.
 
 Run the maximum safe subset:
 
-- `./composer analyse -- --memory-limit=1G`
-- `./composer test`
-- `./composer check`
+- `composer --working-dir=mom analyse -- --memory-limit=1G`
+- `composer --working-dir=mom test`
+- `composer --working-dir=mom check`
 
 If full suite is blocked, run targeted validation at minimum:
 
 - `php -l` on touched PHP files
 - targeted JS/grep checks for removed Google Translate / host-specific bridge URLs
 - targeted migration syntax review
+- live/runtime proof review for translation provider enablement, rather than inferring enablement from template config alone
 
 ## Mandatory grep checks
 
@@ -121,6 +129,7 @@ Confirm the final state with grep or equivalent:
 - no fallback path that opens Vietnamese source while English tab is active and no English artifact exists
 - auto-translation trigger logic lives on backend create/save/submit-review/approve orchestration, not on browser-side DOM translation
 - file-backed authoring writes route through `/api/v1/eqms/control-plane/documents/*`
+- `tools/vps-setup/php-fpm/mom.conf` is treated as template guidance only unless active runtime env proves enablement
 
 ## Fix quality bar
 

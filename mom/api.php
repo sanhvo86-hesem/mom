@@ -749,6 +749,7 @@ function normalize_permission_value_list($value): array {
 
 function sanitize_role_permission_row(array $row): array {
   $clean = [
+    'canEditDocs' => (bool)($row['canEditDocs'] ?? false),
     'canCreateDocs' => (bool)($row['canCreateDocs'] ?? false),
   ];
 
@@ -772,7 +773,7 @@ function sanitize_role_permission_row(array $row): array {
 
   foreach ($row as $key => $value) {
     $permissionKey = trim((string)$key);
-    if ($permissionKey === '' || in_array($permissionKey, ['canCreateDocs', 'allowAllPermissions', 'permissions', 'permission_keys', 'grants', 'denies'], true)) {
+    if ($permissionKey === '' || in_array($permissionKey, ['canEditDocs', 'canCreateDocs', 'allowAllPermissions', 'permissions', 'permission_keys', 'grants', 'denies'], true)) {
       continue;
     }
     if (!is_bool($value)) continue;
@@ -809,7 +810,7 @@ function default_role_permissions(): array {
   $noGenericCrudRole = static function (bool $canCreateDocs = false) use ($scopedRole): array {
     return $scopedRole([], $canCreateDocs);
   };
-  return [
+  $defaults = [
     'ceo' => sanitize_role_permission_row([
       'canCreateDocs' => true,
       'allowAllPermissions' => true,
@@ -1080,10 +1081,39 @@ function default_role_permissions(): array {
       'tooling_lifecycle.*',
     ], true),
   ];
+
+  foreach ([
+    'ceo',
+    'it_admin',
+    'qa_manager',
+    'quality_manager',
+    'qms_engineer',
+    'production_director',
+    'cnc_workshop_manager',
+    'engineering_manager',
+    'engineering_lead',
+    'process_engineer',
+    'cam_nc_programmer',
+    'quality_engineer',
+    'supply_chain_manager',
+    'finance_manager',
+    'hr_manager',
+    'epicor_admin',
+  ] as $role) {
+    if (isset($defaults[$role]) && is_array($defaults[$role])) {
+      $defaults[$role]['canEditDocs'] = true;
+    }
+  }
+
+  return $defaults;
 }
 
 function merge_role_permission_row(array $base, array $override): array {
   $merged = $base;
+
+  if (array_key_exists('canEditDocs', $override)) {
+    $merged['canEditDocs'] = (bool)$override['canEditDocs'];
+  }
 
   if (array_key_exists('canCreateDocs', $override)) {
     $merged['canCreateDocs'] = (bool)$override['canCreateDocs'];
@@ -1568,14 +1598,50 @@ function save_role_permissions(string $file, array $perms): void {
   portal_system_config_shadow_write('role_permissions', $perms);
 }
 
+function role_can_edit_docs(array $user, string $file): bool {
+  if (role_can_create_docs($user, $file)) {
+    return true;
+  }
+
+  $role = (string)($user['role'] ?? '');
+  $mRole = migrate_role($role);
+  $perms = load_role_permissions($file);
+  $entry = $perms[$role] ?? (($mRole !== '') ? ($perms[$mRole] ?? null) : null);
+  if (is_array($entry) && array_key_exists('canEditDocs', $entry)) {
+    return (bool)$entry['canEditDocs'];
+  }
+
+  $editors = [
+    'qa_manager',
+    'quality_manager',
+    'qms_engineer',
+    'ceo',
+    'it_admin',
+    'production_director',
+    'cnc_workshop_manager',
+    'engineering_manager',
+    'engineering_lead',
+    'process_engineer',
+    'cam_nc_programmer',
+    'quality_engineer',
+    'supply_chain_manager',
+    'finance_manager',
+    'hr_manager',
+    'epicor_admin',
+  ];
+
+  return in_array($role, $editors, true) || in_array($mRole, $editors, true);
+}
+
 function role_can_create_docs(array $user, string $file): bool {
   $role = (string)($user['role'] ?? '');
+  $mRole = migrate_role($role);
   $perms = load_role_permissions($file);
-  if (isset($perms[$role]) && is_array($perms[$role]) && array_key_exists('canCreateDocs', $perms[$role])) {
-    return (bool)$perms[$role]['canCreateDocs'];
+  $entry = $perms[$role] ?? (($mRole !== '') ? ($perms[$mRole] ?? null) : null);
+  if (is_array($entry) && array_key_exists('canCreateDocs', $entry)) {
+    return (bool)$entry['canCreateDocs'];
   }
   // Hard fallback (safe)
-  $mRole = migrate_role($role);
   $creators = ['qa_manager', 'ceo', 'qms_engineer', 'it_admin', 'production_director'];
   return in_array($role, $creators, true) || in_array($mRole, $creators, true);
 }
@@ -1755,7 +1821,7 @@ function user_is_admin(array $user): bool {
 
 function require_doc_workflow_editor(array $user, string $rolePermFile): void {
   if (user_is_admin($user)) return;
-  if (role_can_create_docs($user, $rolePermFile)) return;
+  if (role_can_edit_docs($user, $rolePermFile)) return;
   api_json(['ok' => false, 'error' => 'forbidden'], 403);
 }
 
@@ -2574,6 +2640,60 @@ function portal_filter_docs_for_user(array $docs, array $user, string $portalCon
     if (portal_can_access_doc($user, $doc, $roleDocs, $hiddenUpper, $displayConfig)) $out[] = $doc;
   }
   return $out;
+}
+
+function portal_find_managed_doc(array $displayConfig, string $code, string $relPath, string $rootDir, string $dataDir, string $customDocsFile, string $formControlRegistryFile): ?array {
+  $allDocs = [];
+  $cacheFile = $dataDir . '/scan_cache.json';
+  if (is_file($cacheFile)) {
+    $cached = json_decode((string)@file_get_contents($cacheFile), true);
+    if (is_array($cached['docs'] ?? null)) {
+      $allDocs = $cached['docs'];
+    }
+  }
+
+  $allDocs = array_merge(
+    $allDocs,
+    load_custom_docs($customDocsFile),
+    load_form_control_registry_docs($formControlRegistryFile, $rootDir, portal_display_config_enabled_extensions($displayConfig))
+  );
+  $allDocs = portal_dedupe_docs($allDocs);
+
+  $requestedCode = strtoupper(trim($code));
+  $normalizedPath = str_replace('\\', '/', trim($relPath));
+  foreach ($allDocs as $candidate) {
+    if (!is_array($candidate)) continue;
+    $candidateCode = strtoupper(trim((string)($candidate['code'] ?? '')));
+    $candidatePath = str_replace('\\', '/', (string)($candidate['path'] ?? ''));
+    if ($candidatePath === $normalizedPath || ($requestedCode !== '' && $candidateCode === $requestedCode)) {
+      return $candidate;
+    }
+  }
+
+  return null;
+}
+
+function portal_require_workflow_doc_access(array $user, string $code, string $relPath, string $rootDir, string $dataDir, string $customDocsFile, string $formControlRegistryFile, string $docVisFile, string $portalConfigJsFile, string $displayConfigFile): array {
+  try {
+    $normalizedRelPath = safe_rel_path($relPath);
+  } catch (Throwable $e) {
+    api_json(['ok' => false, 'error' => 'invalid_path'], 400);
+  }
+
+  $displayConfig = portal_load_display_config($displayConfigFile);
+  $doc = portal_find_managed_doc($displayConfig, $code, $normalizedRelPath, $rootDir, $dataDir, $customDocsFile, $formControlRegistryFile);
+  if (!is_array($doc)) {
+    api_json(['ok' => false, 'error' => 'doc_not_registered'], 404);
+  }
+
+  $hidden = array_values(array_map(function($value) {
+    return strtoupper((string)$value);
+  }, load_doc_visibility($docVisFile)));
+  if (!portal_can_access_doc($user, $doc, portal_load_role_docs($portalConfigJsFile), $hidden, $displayConfig)) {
+    api_json(['ok' => false, 'error' => 'forbidden'], 403);
+  }
+
+  return $doc;
 }
 
 function portal_supported_doc_extensions(): array {
@@ -15462,6 +15582,7 @@ switch ($action) {
     if (trim($basePath) === '') api_json(['ok' => false, 'error' => 'missing_base_path'], 400);
 
     $baseRel = safe_rel_path($basePath);
+    portal_require_workflow_doc_access($me, $code, $baseRel, $ROOT_DIR, $DATA_DIR, $CUSTOM_DOCS_FILE, $FORM_CONTROL_REGISTRY_FILE, $DOC_VIS_FILE, $PORTAL_CONFIG_JS_FILE, $PORTAL_DISPLAY_CONFIG_FILE);
     $formEntry = form_registry_get_entry($FORM_CONTROL_REGISTRY_FILE, $code, $baseRel);
     if (is_array($formEntry)) {
       $state = form_load_state($DATA_DIR, $ROOT_DIR, $formEntry);
@@ -15673,7 +15794,9 @@ case 'doc_save_draft': {
     if (trim($basePath) === '') api_json(['ok' => false, 'error' => 'missing_base_path'], 400);
     if (strlen(trim($html)) < 30) api_json(['ok' => false, 'error' => 'missing_html'], 400);
 
-    $info = doc_store_info($ROOT_DIR, $basePath);
+    $baseRel = safe_rel_path($basePath);
+    portal_require_workflow_doc_access($me, $code, $baseRel, $ROOT_DIR, $DATA_DIR, $CUSTOM_DOCS_FILE, $FORM_CONTROL_REGISTRY_FILE, $DOC_VIS_FILE, $PORTAL_CONFIG_JS_FILE, $PORTAL_DISPLAY_CONFIG_FILE);
+    $info = doc_store_info($ROOT_DIR, $baseRel);
     ensure_dir($info['archiveAbsDir']);
     $ts = ts_compact();
     $revFmt = fmt_rev($revision);
@@ -15689,13 +15812,13 @@ case 'doc_save_draft': {
     }
 
     $dt = human_dt();
-    $state = load_doc_state($ROOT_DIR, $basePath, $ARCHIVE_DIR, $code) ?? [];
+    $state = load_doc_state($ROOT_DIR, $baseRel, $ARCHIVE_DIR, $code) ?? [];
     $state['status'] = 'draft';
     $state['revision'] = $revision;
     $state['lastEdit'] = ['by' => (string)($me['name'] ?? $me['username'] ?? ''), 'role' => (string)($me['role'] ?? ''), 'date' => $dt, 'note' => $note];
-    save_doc_state($ROOT_DIR, $basePath, $state);
+    save_doc_state($ROOT_DIR, $baseRel, $state);
 
-    $manifest = load_doc_manifest($ROOT_DIR, $basePath, $ARCHIVE_DIR, $code);
+    $manifest = load_doc_manifest($ROOT_DIR, $baseRel, $ARCHIVE_DIR, $code);
     $entry = [
       'id' => $ts . '_draft',
       'version' => 'v' . $revision,
@@ -15715,7 +15838,7 @@ case 'doc_save_draft': {
     array_unshift($versions, $entry);
     if (count($versions) > 200) $versions = array_slice($versions, 0, 200);
     $manifest['versions'] = $versions;
-    save_doc_manifest($ROOT_DIR, $basePath, $manifest);
+    save_doc_manifest($ROOT_DIR, $baseRel, $manifest);
 
     api_json(['ok' => true, 'code' => $code, 'state' => $state, 'versions' => $versions, 'server_time' => now_iso()]);
   }
@@ -15859,6 +15982,7 @@ case 'doc_save_draft': {
     if (trim($code) === '') api_json(['ok' => false, 'error' => 'missing_code'], 400);
     if (trim($basePath) === '') api_json(['ok' => false, 'error' => 'missing_base_path'], 400);
     $baseRel = safe_rel_path($basePath);
+    portal_require_workflow_doc_access($me, $code, $baseRel, $ROOT_DIR, $DATA_DIR, $CUSTOM_DOCS_FILE, $FORM_CONTROL_REGISTRY_FILE, $DOC_VIS_FILE, $PORTAL_CONFIG_JS_FILE, $PORTAL_DISPLAY_CONFIG_FILE);
     $formEntry = form_registry_get_entry($FORM_CONTROL_REGISTRY_FILE, $code, $baseRel);
     if (is_array($formEntry)) {
       $state = form_load_state($DATA_DIR, $ROOT_DIR, $formEntry);

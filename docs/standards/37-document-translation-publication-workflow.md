@@ -121,6 +121,8 @@ Rules:
 2. English view is read-only.
 3. Save / submit / approve flows must not serialize translated DOM back into canonical source.
 4. Any runtime that is currently in `en` must switch back to `vi` before edit/save/submit.
+5. Existing-document edit/save/submit/bootstrap authority follows document-editor authority (`canEditDocs` or stricter), not only create-document authority.
+6. New-document creation remains separately governed by create-document authority (`canCreateDocs` or stricter).
 
 ## 9. Translation Production Workflow
 
@@ -144,16 +146,17 @@ Rules:
 
 1. The trigger fires after create/save/submit-review/approve writes the Vietnamese source successfully.
 2. The canonical runtime path for file-backed authoring is the control-plane REST surface under `/api/v1/eqms/control-plane/documents/*`, not the legacy `?action=doc_*` routes.
-3. The Vietnamese save result is authoritative even if translation fails.
-4. The translation provider must be internal/on-prem/repo-local.
-5. AI or SaaS translators may be plugged in only when governance explicitly allows the document content to leave the private boundary.
-6. If no compliant internal provider is configured, the backend MUST still upsert a locale-variant row with:
+3. Backend workflow-edit gates for save/submit/bootstrap must accept governed document editors, not only document creators.
+4. The Vietnamese save result is authoritative even if translation fails.
+5. The translation provider must be internal/on-prem/repo-local.
+6. AI or SaaS translators may be plugged in only when governance explicitly allows the document content to leave the private boundary.
+7. If no compliant internal provider is configured, the backend MUST still upsert a locale-variant row with:
    - current source revision
    - current source hash
    - `translation_state = blocked`
    - a machine-readable blocked reason in metadata
-7. The backend MUST NOT fake an English artifact when no provider exists.
-8. The frontend English tab must surface `blocked` truthfully instead of pretending the artifact is simply published-later content.
+8. The backend MUST NOT fake an English artifact when no provider exists.
+9. The frontend English tab must surface `blocked` truthfully instead of pretending the artifact is simply published-later content.
 
 ### 9.2 Provider contract rule
 
@@ -165,16 +168,32 @@ The preferred runtime contract is:
    - source locale / target locale
    - current revision
    - current normalized source HTML
-   - glossary path/version
-   - trigger reason (`create`, `save_draft`, `approve_release`, ...)
+   - approved repo-local glossary path/version
+   - trigger reason (`create`, `save_draft`, `submit_review`, `approve_release`, `bootstrap_locale`, ...)
 3. Provider returns:
    - full English artifact HTML
    - optional localized subtitle/title
    - provider name
    - engine version
-   - glossary version
+   - glossary version derived from the resolved glossary file actually used
    - target `translation_state`
 4. Backend writes hidden-sibling artifact and upserts the locale row.
+
+### 9.2.1 Provider setup rule
+
+1. The provider command must be reproducible from repo truth, not tribal knowledge.
+2. Repo-local provider scripts belong under `tools/scripts/translation/`.
+3. VPS/bootstrap setup for provider dependencies belongs under `tools/vps-setup/scripts/`.
+4. PHP-FPM/runtime environment must point `DCC_TRANSLATION_COMMAND` at a concrete repo-local command, typically:
+   - provider venv Python
+   - repo-local provider script
+5. Provider dependency versions must be pinned, and model artifacts must be integrity-checked; floating installs are not sufficient for controlled runtime reproducibility.
+6. Template config under `tools/vps-setup/php-fpm/mom.conf` is setup guidance only; it is not proof that live runtime is enabled.
+7. Approved glossary paths must resolve under the repo-local glossary root; arbitrary filesystem paths must be rejected or normalized to the default glossary file.
+8. Bootstrap/install helpers should default to pre-seeded local model artifacts; any network download source must be explicit and operator-provided.
+9. Live runtime enablement must be proven from active process environment, active PHP-FPM pool config, or request behavior; commented template files are not sufficient proof.
+10. If the provider runtime or model is missing, the system must fail into `blocked` truthfully.
+11. `machine_preview` output may be rough and still useful, but it must remain non-authoritative until human review/release.
 
 ### 9.3 Working-draft hash rule
 
@@ -186,6 +205,18 @@ That means:
 2. archive-only path rewrites such as injected archive `<base href>` must be normalized out before hashing;
 3. starting a new revision without content changes must not falsely invalidate a still-matching English artifact;
 4. exact revision equality is not enough by itself to invalidate a draft/in-review English preview when the current working source hash still matches the artifact baseline.
+
+### 9.4 Legacy bootstrap and backfill rule
+
+Older controlled documents created before locale auto-sync existed must still be able to obtain an English artifact without reopening the Vietnamese editor.
+
+Rules:
+
+1. The portal may trigger a governed backend `ensure-locale` / bootstrap command when English is requested for a legacy HTML document with no locale artifact yet.
+2. This bootstrap path must use the current canonical Vietnamese source snapshot; it must never translate rendered iframe DOM.
+3. Bootstrap may create a `machine_preview` artifact for view purposes, but it must not silently mark the artifact as released.
+4. Bootstrap success must refresh DCC locale projection and rerender the viewer against the new artifact.
+5. Bootstrap failure must leave the viewer fail-closed and surface truthful `missing` or `blocked` state.
 
 ## 10. Drift And Regeneration Rule
 

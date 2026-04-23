@@ -52,6 +52,7 @@ final class InputSanitizer
     public static function rolePermissionRow(array $row): array
     {
         $clean = [
+            'canEditDocs' => (bool)($row['canEditDocs'] ?? false),
             'canCreateDocs' => (bool)($row['canCreateDocs'] ?? false),
         ];
 
@@ -75,7 +76,7 @@ final class InputSanitizer
 
         foreach ($row as $key => $value) {
             $permissionKey = trim((string)$key);
-            if ($permissionKey === '' || in_array($permissionKey, ['canCreateDocs', 'allowAllPermissions', 'permissions', 'permission_keys', 'grants', 'denies'], true)) {
+            if ($permissionKey === '' || in_array($permissionKey, ['canEditDocs', 'canCreateDocs', 'allowAllPermissions', 'permissions', 'permission_keys', 'grants', 'denies'], true)) {
                 continue;
             }
             if (!is_bool($value)) continue;

@@ -952,6 +952,9 @@ async function loadRolePermsFromServer(){
     if(res && res.ok && res.perms){
       Object.keys(res.perms).forEach(r=>{
         if(!ROLES[r]) return;
+        if(res.perms[r] && typeof res.perms[r].canEditDocs!=='undefined'){
+          ROLES[r].canEditDocs = !!res.perms[r].canEditDocs;
+        }
         if(res.perms[r] && typeof res.perms[r].canCreateDocs!=='undefined'){
           ROLES[r].canCreateDocs = !!res.perms[r].canCreateDocs;
         }
@@ -966,7 +969,10 @@ async function loadRolePermsFromServer(){
 async function saveRolePermsToServer(){
   const perms={};
   Object.keys(ROLES).forEach(r=>{
-    perms[r]={ canCreateDocs: !!ROLES[r].canCreateDocs };
+    perms[r]={
+      canEditDocs: !!ROLES[r].canEditDocs,
+      canCreateDocs: !!ROLES[r].canCreateDocs
+    };
   });
   const res = await apiCall('admin_role_perms_save',{
     perms,
@@ -976,6 +982,9 @@ async function saveRolePermsToServer(){
     if(res.perms && typeof res.perms === 'object'){
       Object.keys(res.perms).forEach(r=>{
         if(!ROLES[r]) return;
+        if(res.perms[r] && typeof res.perms[r].canEditDocs!=='undefined'){
+          ROLES[r].canEditDocs = !!res.perms[r].canEditDocs;
+        }
         if(res.perms[r] && typeof res.perms[r].canCreateDocs!=='undefined'){
           ROLES[r].canCreateDocs = !!res.perms[r].canCreateDocs;
         }
@@ -2874,19 +2883,31 @@ async function openDoc(code){
   updateDocViewerHeader(doc);
   renderWorkflowPanel(doc);
   renderVersionHistory(doc);
+  const openRenderToken = `${resolvedCode}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
+  window.__DOC_VIEW_RENDER_TOKEN = openRenderToken;
 
   // Load current document HTML immediately
   loadDocContent(doc);
+  try{
+    if(lang === 'en' && typeof triggerDocEnglishLocaleBootstrap === 'function'){
+      triggerDocEnglishLocaleBootstrap(doc);
+    }
+  }catch(e){}
 
   // Background: refresh server-backed state + versions, then re-render once
   try{
     refreshDocFromServer(resolvedCode).then(()=>{
       try{
-        updateDocViewerHeader(doc);
-        renderWorkflowPanel(doc);
-        renderVersionHistory(doc);
+        if(currentDoc !== resolvedCode) return;
+        if(window.__DOC_VIEW_RENDER_TOKEN !== openRenderToken) return;
+        const latestDoc = resolveDocRecord(resolvedCode) || doc;
+        if(isDocHidden(latestDoc.code) && !isAdmin()) return;
+        if(!canAccessDoc(latestDoc.code)) return;
+        updateDocViewerHeader(latestDoc);
+        renderWorkflowPanel(latestDoc);
+        renderVersionHistory(latestDoc);
         // Re-load iframe in case the resolved view file changed (draft / inreview / archive)
-        loadDocContent(doc);
+        loadDocContent(latestDoc);
       }catch(e){}
     }).catch(()=>{});
   }catch(e){}
@@ -2899,21 +2920,35 @@ async function openDocPreview(code){
     const doc = resolveDocRecord(code);
     if(!doc) return;
     const resolvedCode = String(doc.code || '').trim();
+    if(isDocHidden(doc.code) && !isAdmin()) return;
+    if(!canAccessDoc(doc.code)) return;
+    const previewRenderToken = `${resolvedCode}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
+    window.__DOC_VIEW_RENDER_TOKEN = previewRenderToken;
     // Pull the latest server state/versions to keep folder-sync accurate
     try{ await refreshDocFromServer(resolvedCode); }catch(e){}
+    if(currentDoc && currentDoc !== resolvedCode) return;
+    if(window.__DOC_VIEW_RENDER_TOKEN !== previewRenderToken) return;
+    const latestDoc = resolveDocRecord(resolvedCode) || doc;
+    if(isDocHidden(latestDoc.code) && !isAdmin()) return;
+    if(!canAccessDoc(latestDoc.code)) return;
 
     // Ensure doc viewer is active
     currentDoc = resolvedCode;
-    window.currentDocPath = String(doc.path || '');
+    window.currentDocPath = String(latestDoc.path || '');
     setDocHeaderMetaCollapsed(true);
     const viewer = document.getElementById('doc-viewer');
     if(viewer) viewer.classList.add('active');
 
     // Re-render UI blocks
-    updateDocViewerHeader(doc);
-    renderWorkflowPanel(doc);
-    renderVersionHistory(doc);
-    loadDocContent(doc);
+    updateDocViewerHeader(latestDoc);
+    renderWorkflowPanel(latestDoc);
+    renderVersionHistory(latestDoc);
+    loadDocContent(latestDoc);
+    try{
+      if(lang === 'en' && typeof triggerDocEnglishLocaleBootstrap === 'function'){
+        triggerDocEnglishLocaleBootstrap(latestDoc);
+      }
+    }catch(e){}
   }catch(err){
     console.error('openDocPreview error:', err);
   }

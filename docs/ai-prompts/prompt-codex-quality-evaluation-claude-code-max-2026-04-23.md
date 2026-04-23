@@ -1,8 +1,9 @@
 # Prompt — Claude Code MAX Quality Evaluation of Codex Translation Remediation
 
-You are auditing the HESEM MOM/QMS repo at:
+You are auditing the HESEM MOM/QMS repo in the current runtime checkout root provided by the caller/runtime.
 
-`/Users/a10/Documents/mom`
+Use that checkout path for all commands and file references.
+Do not hardcode `/Users/a10/Documents/mom`.
 
 Your job is not only to audit the controlled-document translation workflow.
 Your job is to **evaluate the quality of Codex's remediation work itself** by checking whether the repo truth now matches the claimed architecture, standards, and validation story.
@@ -56,6 +57,9 @@ You must verify repo truth. Do **not** trust prior summaries, claims, or closure
 - `mom/api/openapi.yaml`
 - `mom/database/migrations/150_dcc_document_change_control.sql`
 - `mom/database/migrations/152_dcc_document_locale_variants.sql`
+- `tools/scripts/translation/dcc_argos_vi_to_en.py`
+- `tools/vps-setup/scripts/setup-dcc-translation-provider.sh`
+- `tools/vps-setup/php-fpm/mom.conf`
 
 ## Audit questions
 
@@ -71,6 +75,8 @@ You must verify repo truth. Do **not** trust prior summaries, claims, or closure
 10. Are repo docs/standards/openapi/api-reference now aligned with the canonical control-plane authoring surface?
 11. Did Codex introduce any new architectural shortcut, partial closure, or misleading documentation while claiming completion?
 12. Did Codex run an honest validation set and report real blockers accurately, instead of hiding debt behind vague language?
+13. Did Codex provide a repo-truth internal provider path for legacy bootstrap and post-save EN machine preview, or leave the runtime blocked on undocumented server-only setup?
+14. Did Codex align workflow-edit authority for save/submit/bootstrap between frontend and backend, or leave it incorrectly tied only to create-doc permission?
 
 ## Hard constraints
 
@@ -104,8 +110,8 @@ If your first fix exposes a second-wave issue, fix that too.
 
 Run the maximum safe subset:
 
-- `./mom/composer --working-dir=mom analyse -- --memory-limit=1G`
-- `./mom/composer --working-dir=mom test`
+- `composer --working-dir=mom analyse -- --memory-limit=1G`
+- `composer --working-dir=mom test`
 - `php tools/scripts/ai-index/generate.php --verbose`
 
 If full analysis is blocked, still run at minimum:
@@ -113,6 +119,7 @@ If full analysis is blocked, still run at minimum:
 - `php -l` on touched PHP files
 - `node --check` on touched JS files
 - targeted grep checks for legacy write paths, Google Translate, and host-specific bridge URLs
+- proof that any claimed translation-provider enablement comes from active runtime state, not commented template config alone
 
 ## Mandatory grep checks
 
@@ -129,6 +136,7 @@ Confirm the final state with grep or equivalent:
 - no active runtime `?action=doc_start_new_revision`
 - no active controlled source `https://qms.hesem.com.vn/assets/app.js`
 - canonical file-backed authoring writes route through `/api/v1/eqms/control-plane/documents/*`
+- `tools/vps-setup/php-fpm/mom.conf` is treated as template guidance only unless active runtime state proves enablement
 
 ## Final deliverable
 

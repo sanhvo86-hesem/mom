@@ -487,6 +487,10 @@ smoke_assert(user_has_any_permission(['role' => 'finance_manager'], ['advanced_p
 smoke_assert(user_has_any_permission(['role' => 'qms_engineer'], ['registry.read'], $rolePermsFile) === true, 'QMS engineer should have registry read permission.');
 smoke_assert(user_has_any_permission(['role' => 'production_planner'], ['advanced_planning.aps_planning_scenarios.update'], $rolePermsFile) === true, 'Production planner should retain APS write permission.');
 smoke_assert(user_has_any_permission(['role' => 'developer'], ['schema_studio.write'], $rolePermsFile) === true, 'Developer should retain Schema Studio write permission.');
+smoke_assert(role_can_edit_docs(['role' => 'process_engineer'], $rolePermsFile) === true, 'Process engineer should retain document edit authority.');
+smoke_assert(role_can_edit_docs(['role' => 'quality_engineer'], $rolePermsFile) === true, 'Quality engineer should retain document edit authority.');
+smoke_assert(role_can_edit_docs(['role' => 'warehouse_clerk'], $rolePermsFile) === false, 'Warehouse clerk should not receive document edit authority.');
+smoke_assert(role_can_create_docs(['role' => 'process_engineer'], $rolePermsFile) === false, 'Process engineer should not gain create-doc authority.');
 
 $genericPermissionStore = [
     'settings' => ['require_mfa' => false],

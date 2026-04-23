@@ -41,6 +41,7 @@ class InputSanitizerTest extends TestCase
     public function testRolePermissionRowBasic(): void
     {
         $row = [
+            'canEditDocs' => true,
             'canCreateDocs' => true,
             'permissions' => ['quality.*', 'orders.read'],
             'denies' => ['admin.*'],
@@ -48,6 +49,7 @@ class InputSanitizerTest extends TestCase
 
         $clean = InputSanitizer::rolePermissionRow($row);
 
+        $this->assertTrue($clean['canEditDocs']);
         $this->assertTrue($clean['canCreateDocs']);
         $this->assertSame(['quality.*', 'orders.read'], $clean['permissions']);
         $this->assertSame(['admin.*'], $clean['denies']);
@@ -62,6 +64,7 @@ class InputSanitizerTest extends TestCase
     public function testRolePermissionRowBooleanFlags(): void
     {
         $row = [
+            'canEditDocs' => true,
             'canCreateDocs' => false,
             'canApprove' => true,
             'canDelete' => false,
@@ -70,6 +73,7 @@ class InputSanitizerTest extends TestCase
 
         $clean = InputSanitizer::rolePermissionRow($row);
 
+        $this->assertTrue($clean['canEditDocs']);
         $this->assertFalse($clean['canCreateDocs']);
         $this->assertTrue($clean['canApprove']);
         $this->assertFalse($clean['canDelete']);
