@@ -1064,6 +1064,12 @@ async function apiCall(action, payload=null, method='POST', timeoutMs=45000){
     if(query) url += '&' + query;
   }
 
+  // Track writes so the auto-reload mechanism (00-version-check.js) can
+  // defer until after the save completes. Reads are not tracked — losing
+  // a re-fetchable read on reload is harmless.
+  const isWrite = (method !== 'GET' && method !== 'HEAD');
+  if (isWrite) _apiInFlightWrites++;
+
   let timer = null;
   try{
     if(controller && timeoutMs && timeoutMs > 0){
@@ -1076,6 +1082,7 @@ async function apiCall(action, payload=null, method='POST', timeoutMs=45000){
     return data;
   }finally{
     if(timer) clearTimeout(timer);
+    if (isWrite && _apiInFlightWrites > 0) _apiInFlightWrites--;
   }
 }
 
@@ -1086,6 +1093,9 @@ async function apiCallFormData(action, formData, timeoutMs=120000){
   if(controller) opts.signal = controller.signal;
   if(csrfToken) opts.headers['X-CSRF-Token'] = csrfToken;
   opts.body = formData;
+  // FormData uploads are always writes — track them for the auto-reload
+  // guard the same way apiCall() above does.
+  _apiInFlightWrites++;
   let timer = null;
   try{
     if(controller && timeoutMs && timeoutMs > 0){
@@ -1098,6 +1108,7 @@ async function apiCallFormData(action, formData, timeoutMs=120000){
     return data;
   }finally{
     if(timer) clearTimeout(timer);
+    if (_apiInFlightWrites > 0) _apiInFlightWrites--;
   }
 }
 
@@ -5284,6 +5295,37 @@ let adminTab = 'users';
 let adminUserViewMode = 'cards'; // 'cards' or 'list'
 let adminEditRole = 'ceo';
 let adminUnsaved = false;
+
+// In-flight write counter — incremented by the apiCall() wrapper for any
+// POST/PUT/PATCH/DELETE so canReloadNow() can refuse to reload while a save
+// is on the wire (otherwise the request aborts and the user sees a partial
+// commit). Reads (GET) don't bump the counter — losing a re-fetchable read
+// is harmless.
+let _apiInFlightWrites = 0;
+
+// Bridge for 00-version-check.js — when a backend deploy publishes a new
+// build sha, the version checker calls this to ask "is it safe to reload
+// the user's tab right now?". Returning false defers the auto-reload by
+// 60s so admin edits in progress are not destroyed mid-typing.
+//
+// Other modules can extend the answer by adding their own dirty checks:
+//   const prev = window.__hesemPortalCanReloadNow;
+//   window.__hesemPortalCanReloadNow = () => prev() && !myFormDirty();
+window.__hesemPortalCanReloadNow = function () {
+  if (adminUnsaved) return false;
+  if (_apiInFlightWrites > 0) return false;
+  // Graphics draft buffer (00bb-graphics-authority.js): isEmpty() === false
+  // means the user has an unsaved theme/token edit in flight.
+  try {
+    if (window.GraphicsAuthority
+        && GraphicsAuthority.draft
+        && typeof GraphicsAuthority.draft.isEmpty === 'function'
+        && !GraphicsAuthority.draft.isEmpty()) {
+      return false;
+    }
+  } catch (e) { /* be permissive — better to reload than to wedge */ }
+  return true;
+};
 let adminManualRuntimeState = {
   loading:false,
   loaded:false,

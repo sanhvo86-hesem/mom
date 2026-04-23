@@ -21,16 +21,32 @@
 
 // ── Cache Configuration ─────────────────────────────────────────────────────
 
-const CACHE_VERSION = 'v1.3.49';
+// Per-deploy build tag from sw-build-tag.js (written by deploy.sh). The
+// browser's SW update logic byte-diffs sw.js AND every importScripts() URL,
+// so each deploy bumps the effective hash → activate event fires → cache
+// names that include CACHE_BUILD become unique → stale precache evicted.
+// Without this, sw.js bytes stay identical across deploys and the SW never
+// reinstalls, so caches.delete in the version-check fallback was the only
+// thing forcing fresh fetches.
+try {
+  importScripts('./sw-build-tag.js');
+} catch (e) {
+  // Local dev / first deploy: file not yet published. Fall back to a
+  // synthetic tag so caches still namespace correctly.
+  self.__SW_BUILD_TAG = 'dev';
+}
+
+const CACHE_VERSION = 'v1.3.51';
+const CACHE_BUILD   = self.__SW_BUILD_TAG || 'dev';
 const CACHE_PREFIX  = 'hesem-mom';
 
 /** Named caches with version stamps. */
 const CACHES = {
-  static:  `${CACHE_PREFIX}-static-${CACHE_VERSION}`,
-  api:     `${CACHE_PREFIX}-api-${CACHE_VERSION}`,
-  schema:  `${CACHE_PREFIX}-schema-${CACHE_VERSION}`,
-  images:  `${CACHE_PREFIX}-images-${CACHE_VERSION}`,
-  fonts:   `${CACHE_PREFIX}-fonts-${CACHE_VERSION}`,
+  static:  `${CACHE_PREFIX}-static-${CACHE_VERSION}-${CACHE_BUILD}`,
+  api:     `${CACHE_PREFIX}-api-${CACHE_VERSION}-${CACHE_BUILD}`,
+  schema:  `${CACHE_PREFIX}-schema-${CACHE_VERSION}-${CACHE_BUILD}`,
+  images:  `${CACHE_PREFIX}-images-${CACHE_VERSION}-${CACHE_BUILD}`,
+  fonts:   `${CACHE_PREFIX}-fonts-${CACHE_VERSION}-${CACHE_BUILD}`,
 };
 
 /** Maximum items per cache before eviction kicks in. */
@@ -139,6 +155,25 @@ self.addEventListener('activate', (event) => {
       .then(() => {
         // Immediately take control of all open clients.
         return self.clients.claim();
+      })
+      .then(() => {
+        // Broadcast a NEW_VERSION ping so 00-version-check.js triggers an
+        // immediate build-info refetch instead of waiting for its 5-min
+        // poll. Hard-reload still happens client-side after the version
+        // diff is confirmed against /mom/build-info.json.
+        return self.clients.matchAll({ includeUncontrolled: true })
+          .then((clients) => {
+            clients.forEach((client) => {
+              try {
+                client.postMessage({
+                  type: 'NEW_VERSION',
+                  cache_version: CACHE_VERSION,
+                  activated_at: new Date().toISOString()
+                });
+              } catch (e) { /* swallow — best-effort signal */ }
+            });
+          })
+          .catch(() => null);
       })
   );
 });

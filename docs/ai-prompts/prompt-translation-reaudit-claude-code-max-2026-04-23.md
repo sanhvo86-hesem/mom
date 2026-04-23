@@ -12,6 +12,7 @@ The platform must support:
 
 - `vi` canonical source for controlled document editing
 - `en` read-only locale artifact for viewing
+- backend-triggered English auto-sync after create/save/approve
 - locale-aware DCC metadata
 - fail-closed behavior when English artifact is missing
 - zero browser live translation
@@ -32,6 +33,7 @@ The platform must support:
 3. Do **not** hardcode absolute production URLs into controlled HTML.
 4. Do **not** create locale artifacts as standalone scanned documents.
 5. Do **not** treat English filename/title SSOT as proof that English body content is canonical.
+6. Do **not** fake successful English publication when no compliant internal translator is configured.
 
 ## Audit focus
 
@@ -43,9 +45,11 @@ You must inspect and challenge at least these areas:
 - `mom/scripts/portal/04-workflow-actions.js`
 - `mom/scripts/portal/11-dcc-header-renderer.js`
 - `mom/api/controllers/DocumentControlController.php`
+- `mom/api/controllers/DocumentController.php`
 - `mom/api/routes/dcc-routes.php`
 - `mom/api/services/DocumentControl/DocumentControlService.php`
 - `mom/api/services/DocumentControl/DocumentHeaderService.php`
+- `mom/api/services/DocumentControl/DocumentLocaleAutomationService.php`
 - `mom/database/migrations/150_dcc_document_change_control.sql`
 - `mom/database/migrations/152_dcc_document_locale_variants.sql`
 
@@ -61,6 +65,8 @@ Also inspect any rename/move/delete flow that can break `artifact_rel_path`.
 6. Can a move/rename/delete silently orphan locale artifacts?
 7. Are non-HTML files handled safely when English artifact is missing?
 8. Are any standards/docs still contradicting the no-live-translation model?
+9. Does create/save/approve trigger a backend locale-sync attempt without risking Vietnamese source persistence?
+10. When no internal provider is configured, does the repo record `blocked` state truthfully instead of inventing an EN artifact?
 
 ## Required output shape
 
@@ -104,6 +110,7 @@ Confirm the final state with grep or equivalent:
 - no new `data-dcc-locale="en"` hardcoded into canonical Vietnamese docs unless explicitly justified
 - no `https://qms.hesem.com.vn/assets/app.js` in active controlled source
 - no fallback path that opens Vietnamese source while English tab is active and no English artifact exists
+- auto-translation trigger logic lives on backend save/create/approve orchestration, not on browser-side DOM translation
 
 ## Fix quality bar
 

@@ -50,6 +50,7 @@ use function MOM\Tools\DccBatch\inject_or_replace_bootstrap;
 use function MOM\Tools\DccBatch\inject_or_replace_placeholder;
 use function MOM\Tools\DccBatch\clean_iso_title_concat;
 use function MOM\Tools\DccBatch\strip_legacy_title_meta_after_placeholder;
+use function MOM\Tools\DccBatch\strip_redundant_title_blocks;
 use function MOM\Tools\DccBatch\build_placeholder;
 use function MOM\Tools\DccBatch\logo_path_for;
 use function MOM\Tools\DccBatch\build_data_layer;
@@ -203,6 +204,12 @@ foreach (walk_docs($ROOT_DIR) as $abs) {
         // This must run AFTER inject_or_replace_placeholder so the anchor exists.
         $candidate = strip_legacy_title_meta_after_placeholder($next);
         if ($candidate !== $next) { $next = $candidate; $changes[] = 'strip_legacy_title_meta'; }
+
+        // Strip redundant title blocks ANYWHERE in the body that visually
+        // duplicate the DCC ribbon (h1 with "CODE - Title", or POL-style
+        // card+badge+h1+mini-note overview wrapper).
+        $candidate = strip_redundant_title_blocks($next, $code);
+        if ($candidate !== $next) { $next = $candidate; $changes[] = 'strip_redundant_titles'; }
 
         if (has_legacy_title_block_outside_dcc($next)) {
             $candidate = clean_iso_title_concat($next);

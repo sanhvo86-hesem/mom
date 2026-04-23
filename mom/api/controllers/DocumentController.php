@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
+use MOM\Services\DocumentControl\DocumentLocaleAutomationService;
 use MOM\Services\ControlPlane\LegacyWriteSurfacePolicy;
 use RuntimeException;
 use Throwable;
@@ -19,6 +20,15 @@ use Throwable;
  */
 class DocumentController extends BaseController
 {
+    private function localeAutomation(): DocumentLocaleAutomationService
+    {
+        static $svc = null;
+        if ($svc === null) {
+            $svc = new DocumentLocaleAutomationService($this->data, $this->rootDir);
+        }
+        return $svc;
+    }
+
     private function denyLegacyDocumentWrite(string $operation): void
     {
         $decision = (new LegacyWriteSurfacePolicy())->assess('document_files', $operation);
@@ -167,6 +177,23 @@ class DocumentController extends BaseController
             save_custom_docs($customDocsFile, $custom);
             $this->invalidateScanCache();
 
+            $localeTranslation = [];
+            try {
+                $localeTranslation = $this->localeAutomation()->syncEnglishMachinePreview([
+                    'doc_code' => $code,
+                    'base_rel_path' => $baseRel,
+                    'source_html' => $docHtml,
+                    'source_status' => 'draft',
+                    'revision' => $revision,
+                    'trigger' => 'create',
+                    'actor' => (string)($me['username'] ?? 'system'),
+                    'title' => $title,
+                    'effective_date' => date('Y-m-d'),
+                ]);
+            } catch (Throwable $e) {
+                @error_log('[DocumentLocaleAutomationService] create sync failed for ' . $code . ': ' . $e->getMessage());
+            }
+
             $this->auditLog('doc_create', ['code' => $code, 'title' => $title]);
 
             $this->success([
@@ -176,6 +203,7 @@ class DocumentController extends BaseController
                 'file_name' => $fileName,
                 'revision'  => $revision,
                 'draft_rel' => $draftRel,
+                'locale_translation' => $localeTranslation,
             ]);
         } catch (Throwable $e) {
             $this->rethrowResponse($e);
@@ -256,8 +284,31 @@ class DocumentController extends BaseController
         $manifest['versions'] = $versions;
         save_doc_manifest($this->rootDir, $baseRel, $manifest);
 
+        $catalog = $this->resolveDocumentCatalogEntry($code, $baseRel);
+        $localeTranslation = [];
+        try {
+            $localeTranslation = $this->localeAutomation()->syncEnglishMachinePreview([
+                'doc_code' => $code,
+                'base_rel_path' => $baseRel,
+                'source_html' => $html,
+                'source_status' => $status === 'draft' ? 'draft' : $status,
+                'revision' => $revision,
+                'trigger' => 'save_draft',
+                'actor' => (string)($me['username'] ?? 'system'),
+                'title' => (string)($catalog['title'] ?? $code),
+                'subtitle' => $catalog['description'] ?? null,
+                'effective_date' => $catalog['effective_date'] ?? null,
+            ]);
+        } catch (Throwable $e) {
+            @error_log('[DocumentLocaleAutomationService] saveDraft sync failed for ' . $code . ': ' . $e->getMessage());
+        }
+
         $this->auditLog('doc_save_draft', ['code' => $code]);
-        $this->success(['draft_rel' => $draftRel, 'revision' => $revision]);
+        $this->success([
+            'draft_rel' => $draftRel,
+            'revision' => $revision,
+            'locale_translation' => $localeTranslation,
+        ]);
     }
 
     /**
@@ -434,8 +485,31 @@ class DocumentController extends BaseController
         ]);
         $this->invalidateScanCache();
 
+        $catalog = $this->resolveDocumentCatalogEntry($code, $baseRel);
+        $localeTranslation = [];
+        try {
+            $localeTranslation = $this->localeAutomation()->syncEnglishMachinePreview([
+                'doc_code' => $code,
+                'base_rel_path' => $baseRel,
+                'source_html' => is_string($approvedHtml ?? null) ? $approvedHtml : ((string)@file_get_contents($liveFile)),
+                'source_status' => 'approved',
+                'revision' => $revision,
+                'trigger' => 'approve_release',
+                'actor' => (string)($me['username'] ?? 'system'),
+                'title' => (string)($catalog['title'] ?? $code),
+                'subtitle' => $catalog['description'] ?? null,
+                'effective_date' => $effectiveDate !== '' ? $effectiveDate : ($catalog['effective_date'] ?? null),
+            ]);
+        } catch (Throwable $e) {
+            @error_log('[DocumentLocaleAutomationService] approve sync failed for ' . $code . ': ' . $e->getMessage());
+        }
+
         $this->auditLog('doc_approve', ['code' => $code, 'revision' => $revision]);
-        $this->success(['status' => 'approved', 'revision' => $revision]);
+        $this->success([
+            'status' => 'approved',
+            'revision' => $revision,
+            'locale_translation' => $localeTranslation,
+        ]);
     }
 
     /**
@@ -1041,6 +1115,27 @@ class DocumentController extends BaseController
     private function portalConfigJsFile(): string
     {
         return $this->rootDir . '/mom/scripts/portal/01-data-config.js';
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function resolveDocumentCatalogEntry(string $code, string $baseRel): array
+    {
+        $items = load_custom_docs($this->confDir . '/docs_custom.json');
+        $canonical = \MOM\Services\DocumentControl\DocumentControlService::canonicalizeCode($code);
+        $normalizedPath = str_replace('\\', '/', trim($baseRel));
+        foreach ($items as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $rowCode = \MOM\Services\DocumentControl\DocumentControlService::canonicalizeCode((string)($row['code'] ?? ''));
+            $rowPath = str_replace('\\', '/', trim((string)($row['path'] ?? '')));
+            if (($rowCode !== '' && $rowCode === $canonical) || ($rowPath !== '' && $rowPath === $normalizedPath)) {
+                return $row;
+            }
+        }
+        return [];
     }
 
     /**

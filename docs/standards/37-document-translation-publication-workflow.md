@@ -121,11 +121,62 @@ Required flow:
 
 1. Edit Vietnamese canonical source.
 2. Save and validate canonical source.
-3. Generate or update English artifact.
-4. Update `dcc_document_locale_variant` with localized subtitle/title and artifact path.
-5. Set `translation_state`.
-6. Review terminology, links, and controlled header content.
-7. Publish/release English artifact only after the source revision and artifact match.
+3. Backend accepts the save on the canonical path first; English generation must never block Vietnamese persistence.
+4. Backend automatically triggers English locale sync for the saved source revision.
+5. Generate or update English artifact.
+6. Update `dcc_document_locale_variant` with localized subtitle/title and artifact path.
+7. Set `translation_state`.
+8. Review terminology, links, and controlled header content.
+9. Publish/release English artifact only after the source revision and artifact match.
+
+### 9.1 Save-trigger automation rule
+
+The automation trigger for English generation MUST live on the backend command/save path, not in frontend DOM code.
+
+Rules:
+
+1. The trigger fires after create/save/approve writes the Vietnamese source successfully.
+2. The Vietnamese save result is authoritative even if translation fails.
+3. The translation provider must be internal/on-prem/repo-local.
+4. AI or SaaS translators may be plugged in only when governance explicitly allows the document content to leave the private boundary.
+5. If no compliant internal provider is configured, the backend MUST still upsert a locale-variant row with:
+   - current source revision
+   - current source hash
+   - `translation_state = blocked`
+   - a machine-readable blocked reason in metadata
+6. The backend MUST NOT fake an English artifact when no provider exists.
+7. The frontend English tab must surface `blocked` truthfully instead of pretending the artifact is simply published-later content.
+
+### 9.2 Provider contract rule
+
+The preferred runtime contract is:
+
+1. Backend saves Vietnamese source.
+2. Backend calls a trusted translation provider contract with:
+   - `doc_code`
+   - source locale / target locale
+   - current revision
+   - current normalized source HTML
+   - glossary path/version
+   - trigger reason (`create`, `save_draft`, `approve_release`, ...)
+3. Provider returns:
+   - full English artifact HTML
+   - optional localized subtitle/title
+   - provider name
+   - engine version
+   - glossary version
+   - target `translation_state`
+4. Backend writes hidden-sibling artifact and upserts the locale row.
+
+### 9.3 Working-draft hash rule
+
+For draft and in-review documents, source-hash truth must follow the current working source, not only the last released live file.
+
+That means:
+
+1. hash comparison for locale renderability must use the active working draft when the document lifecycle is `draft` or `in_review`;
+2. archive-only path rewrites such as injected archive `<base href>` must be normalized out before hashing;
+3. starting a new revision without content changes must not falsely invalidate a still-matching English artifact.
 
 ## 10. Drift And Regeneration Rule
 
@@ -140,6 +191,7 @@ Minimum tracked fields:
 - `engine_version`
 
 If these do not match the current source baseline, the English artifact must not be presented as released truth.
+If regeneration is attempted but no compliant provider is available, the locale row must move to `blocked` truthfully.
 
 ## 11. Terminology And No-Translate Rule
 

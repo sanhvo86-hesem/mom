@@ -51,6 +51,9 @@ final class DocumentControlService
     /** @var array<string, string|null> */
     private array $sourceDocumentPathCache = [];
 
+    /** @var array<string, string|null> */
+    private array $activeSourceDocumentPathCache = [];
+
     /** @var array<string, string> */
     private array $sourceDocumentHashCache = [];
 
@@ -1040,15 +1043,80 @@ final class DocumentControlService
         if (array_key_exists($canonical, $this->sourceDocumentHashCache)) {
             return $this->sourceDocumentHashCache[$canonical];
         }
-        $path = $this->sourceDocumentPathFor($canonical);
+        $path = $this->activeSourceDocumentPathFor($canonical);
         if ($path === null || $path === '' || !is_file($path)) {
             $this->sourceDocumentHashCache[$canonical] = '';
             return '';
         }
-        $hash = @hash_file('sha256', $path);
-        $normalized = is_string($hash) ? strtolower(trim($hash)) : '';
+        $normalized = $this->normalisedDocumentHashFromFile($path);
         $this->sourceDocumentHashCache[$canonical] = $normalized;
         return $normalized;
+    }
+
+    private function activeSourceDocumentPathFor(string $docCode): ?string
+    {
+        $canonical = self::canonicalizeCode($docCode);
+        if ($canonical === '') {
+            return null;
+        }
+        if (array_key_exists($canonical, $this->activeSourceDocumentPathCache)) {
+            return $this->activeSourceDocumentPathCache[$canonical];
+        }
+
+        $livePath = $this->sourceDocumentPathFor($canonical);
+        if ($livePath === null || $livePath === '') {
+            $this->activeSourceDocumentPathCache[$canonical] = null;
+            return null;
+        }
+
+        $rootDir = dirname(__DIR__, 4);
+        $baseRel = $this->relativeRepoPath($livePath, $rootDir);
+        if ($baseRel === null || !function_exists('load_doc_state') || !function_exists('load_doc_manifest')) {
+            $this->activeSourceDocumentPathCache[$canonical] = $livePath;
+            return $livePath;
+        }
+
+        $state = \load_doc_state($rootDir, $baseRel, $rootDir . '/archive', $canonical) ?? [];
+        $status = strtolower(trim((string)($state['status'] ?? '')));
+        if (!in_array($status, ['draft', 'in_review'], true)) {
+            $this->activeSourceDocumentPathCache[$canonical] = $livePath;
+            return $livePath;
+        }
+
+        $revision = strtolower(ltrim(trim((string)($state['revision'] ?? '')), 'vV'));
+        $manifest = \load_doc_manifest($rootDir, $baseRel, $rootDir . '/archive', $canonical);
+        $versions = is_array($manifest['versions'] ?? null) ? $manifest['versions'] : [];
+
+        foreach ($versions as $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $rowStatus = strtolower(trim((string)($row['status'] ?? '')));
+            if (!in_array($rowStatus, ['draft', 'in_review'], true)) {
+                continue;
+            }
+            $rowRevision = strtolower(ltrim(trim((string)($row['version'] ?? '')), 'vV'));
+            if ($revision !== '' && $rowRevision !== '' && $rowRevision !== $revision) {
+                continue;
+            }
+            $fileRel = trim((string)($row['file'] ?? ''));
+            if ($fileRel === '') {
+                continue;
+            }
+            $fileRel = ltrim(str_replace('\\', '/', $fileRel), '/');
+            if ($fileRel === '' || str_contains($fileRel, '..')) {
+                continue;
+            }
+            $candidate = $rootDir . '/' . $fileRel;
+            if (is_file($candidate)) {
+                $normalized = str_replace('\\', '/', $candidate);
+                $this->activeSourceDocumentPathCache[$canonical] = $normalized;
+                return $normalized;
+            }
+        }
+
+        $this->activeSourceDocumentPathCache[$canonical] = $livePath;
+        return $livePath;
     }
 
     private function sourceDocumentPathFor(string $docCode): ?string
@@ -1101,6 +1169,30 @@ final class DocumentControlService
         }
         $this->sourceDocumentPathCache[$canonical] = null;
         return null;
+    }
+
+    private function relativeRepoPath(string $absolutePath, string $rootDir): ?string
+    {
+        $normalizedPath = str_replace('\\', '/', $absolutePath);
+        $normalizedRoot = rtrim(str_replace('\\', '/', $rootDir), '/');
+        $prefix = $normalizedRoot . '/';
+        if (!str_starts_with($normalizedPath, $prefix)) {
+            return null;
+        }
+        return substr($normalizedPath, strlen($prefix));
+    }
+
+    private function normalisedDocumentHashFromFile(string $absolutePath): string
+    {
+        $html = @file_get_contents($absolutePath);
+        if (!is_string($html) || $html === '') {
+            return '';
+        }
+        $normalized = function_exists('strip_base_href_archive')
+            ? (string)\strip_base_href_archive($html)
+            : $html;
+        $normalized = trim(str_replace("\r\n", "\n", $normalized));
+        return strtolower(hash('sha256', $normalized));
     }
 
     private function nextDcrNumber(): string

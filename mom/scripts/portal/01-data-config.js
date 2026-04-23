@@ -1443,12 +1443,20 @@ function overlayDocsWithDccCache(docs){
     // for the on-screen title.
     // DB subtitle wins over doc_descriptions.json and folder desc. Set
     // __displayDesc which is the top-priority slot in getDocDisplayDescription().
+    /* The DB `subtitle` column stores the canonical Vietnamese description.
+     * When the user selects English UI mode, the API flags rows without an
+     * English locale-variant as `is_locale_fallback=true`. We still want to
+     * SHOW the Vietnamese description in that case (better than blank);
+     * the `__dccLocaleUnavailable` flag is preserved so any locale-aware
+     * consumer that prefers a hard gate can still read it. The listing
+     * card and breadcrumb render via `__displayDesc`, which is always
+     * populated from the source subtitle so users see meaningful text in
+     * both EN and VI modes until proper EN translations are authored. */
     const translationMissing = (lang === 'en') && !!row.is_locale_fallback && !row.locale_variant_exists;
     d.__dccLocaleVariantExists = !!row.locale_variant_exists;
     d.__dccLocaleFallback = !!row.is_locale_fallback;
     d.__dccLocaleUnavailable = translationMissing;
-    if (translationMissing) d.__displayDesc = '';
-    else if (row.subtitle) d.__displayDesc = row.subtitle;
+    if (row.subtitle) d.__displayDesc = row.subtitle;
     // Surface DCC metadata for any consumer that wants it (does not change
     // title display). The ribbon renderer reads directly from the API.
     if (row.revision)           d.__dccRevision       = row.revision;
@@ -1900,7 +1908,12 @@ function getDocStandardTitle(doc){
 
 function getDocDisplayDescription(doc){
   if(!doc) return '';
-  if(lang==='en' && doc.__dccLocaleUnavailable) return '';
+  /* Removed the `lang==='en' && __dccLocaleUnavailable → return ''` gate.
+   * The Vietnamese subtitle is the canonical description; even in English
+   * UI mode users want to see it (better than blank) until English locale
+   * variants are authored. The `__dccLocaleUnavailable` flag is still set
+   * by the overlay for any consumer that needs to detect "no EN translation
+   * available" — it just no longer suppresses the listing card line. */
   const runtimeDesc = String(doc.__displayDesc || '').trim();
   if(runtimeDesc) return runtimeDesc;
   const explicitDesc = String(getDocDesc(doc.code) || '').trim();

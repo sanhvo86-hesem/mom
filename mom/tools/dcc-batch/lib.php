@@ -165,6 +165,8 @@ const CODE_PATTERNS = [
     '/^(ANNEX-(?:JOB|ORG)-\d+)/',
     '/^(ANNEX-HR-LAB-\d+)/',
     '/^((?:SOP|PROC|WI|FRM|ANNEX|POL|QMS|DEPT)-[A-Z]+-\d+)/',
+    '/^(MRR-G?\d+)/',
+    '/^(SYS-OPS-\d+)/',
     '/^(JD-[A-Z0-9-]+)/',
     '/^(DEPT-[A-Z0-9-]+)/',
     '/^(RACI-[A-Z0-9-]+)/',
@@ -561,6 +563,76 @@ function clean_iso_title_concat(string $html): string
  * Implementation walks the string with a balanced-div counter so it handles
  * arbitrary nesting inside `.meta` (which contains `<div class="row">` rows).
  */
+/**
+ * Strip every visual block that DUPLICATES the DCC ribbon's content. The
+ * ribbon already shows: code badge, title, subtitle. So anywhere in the
+ * body that repeats those values must be removed:
+ *
+ *   1. `<h1>CODE - Title</h1>` standalone heading at the top of body
+ *   2. `<div class="card"><div class="badge">CODE</div><h1>CODE - Title</h1><p class="mini-note">…</p></div>`
+ *   3. Old `<div class="form-header">…</div>` wrapper (handled elsewhere)
+ *   4. Old `<div class="title">…</div>` + `<div class="meta">…</div>` siblings
+ *
+ * This function removes (1) and (2). Variant (3) is handled by
+ * `inject_or_replace_placeholder`. Variant (4) is handled by
+ * `strip_legacy_title_meta_after_placeholder`.
+ */
+function strip_redundant_title_blocks(string $html, string $code): string
+{
+    if ($code === '') return $html;
+    $codeRe = preg_quote($code, '#');
+
+    // (2) The `card+badge` overview block (POL-QMS layout).
+    $next = preg_replace_callback(
+        '#<div\s+class="card">\s*<div\s+class="badge">[^<]*<span\s+class="dot"></span>' . $codeRe . '\s*</div>\s*<h1\b[^>]*>\s*' . $codeRe . '\s*[-–][^<]*</h1>\s*<p\s+class="mini-note">[^<]*</p>\s*</div>#i',
+        function () { return ''; },
+        $html
+    );
+    if (is_string($next)) $html = $next;
+
+    // (1) Standalone `<h1>CODE - Title</h1>` — only strip when it's the top
+    //     of body content (within the first 4096 chars after dcc-header)
+    if (preg_match('#<div[^>]*class="[^"]*\bdcc-header\b[^"]*"[^>]*></div>(.{0,4096})#is', $html, $m, PREG_OFFSET_CAPTURE)) {
+        $startAt = (int)$m[0][1] + strlen($m[0][0]) - strlen($m[1][0]);
+        $window  = $m[1][0];
+        $stripped = preg_replace(
+            '#<h1\b[^>]*>\s*' . $codeRe . '\s*[-–][^<]*</h1>#i',
+            '',
+            $window,
+            1
+        );
+        if (is_string($stripped) && $stripped !== $window) {
+            $html = substr($html, 0, $startAt) . $stripped . substr($html, $startAt + strlen($window));
+        }
+    }
+
+    // (3) Legacy `<div class="title"><strong>CODE — …</strong>…</div>` block
+    //     used by SYS-OPS guides. The strong tag carries the code prefix.
+    //     Strip the entire <div class="title">…</div> when its first child
+    //     is a <strong> whose text starts with the canonical code.
+    $next = preg_replace_callback(
+        '#<div\s+class="title">\s*<strong\b[^>]*>\s*' . $codeRe . '\s*[—–-][^<]*</strong>.*?</div>#isu',
+        function () { return ''; },
+        $html
+    );
+    if (is_string($next)) $html = $next;
+
+    // (4) Legacy `<div class="meta"> <div class="row">Code/Version/TrainingID…</div>…</div>`
+    //     that follows variant (3) in SYS-OPS guides. Strip any meta block
+    //     whose first row contains the canonical code.
+    $next = preg_replace_callback(
+        '#<div\s+class="meta">\s*(?:<div\s+class="row">.*?</div>\s*){1,8}</div>#isu',
+        function (array $m) use ($codeRe): string {
+            // Only strip if a row mentions the code, otherwise it's content
+            return preg_match('#' . $codeRe . '#', $m[0]) ? '' : $m[0];
+        },
+        $html
+    );
+    if (is_string($next)) $html = $next;
+
+    return $html;
+}
+
 function strip_legacy_title_meta_after_placeholder(string $html): string
 {
     if (!has_dcc_placeholder($html)) {
@@ -577,9 +649,19 @@ function strip_legacy_title_meta_after_placeholder(string $html): string
         while ($cursor + $ws < strlen($html) && ctype_space($html[$cursor + $ws])) {
             $ws++;
         }
-        $look = substr($html, $cursor + $ws, 200);
-        if (!preg_match('#^<div[^>]*class=["\'][^"\']*\b(title|meta)\b[^"\']*["\'][^>]*>#i', $look, $hm)) {
+        $look = substr($html, $cursor + $ws, 400);
+        // Variant A: legacy `<div class="title">` or `<div class="meta">` (SOP layout)
+        // Variant B: legacy `<div class="card"><div class="badge">CODE</div><h1>…</h1><p class="mini-note">…</p></div>`
+        //            (Policy / overview-card layout — used by POL-QMS-001/002)
+        $isVariantA = (bool)preg_match('#^<div[^>]*class=["\'][^"\']*\b(title|meta)\b[^"\']*["\'][^>]*>#i', $look, $hm);
+        $isVariantB = !$isVariantA
+            && (bool)preg_match('#^<div[^>]*class=["\'][^"\']*\bcard\b[^"\']*["\'][^>]*>\s*<div[^>]*class=["\'][^"\']*\bbadge\b[^"\']*["\'][^>]*>#i', $look);
+        if (!$isVariantA && !$isVariantB) {
             break;
+        }
+        if ($isVariantB) {
+            // Match the full card opening tag
+            preg_match('#^<div[^>]*class=["\'][^"\']*\bcard\b[^"\']*["\'][^>]*>#i', $look, $hm);
         }
         $blockStart = $cursor + $ws;
         $openLen    = strlen($hm[0]);

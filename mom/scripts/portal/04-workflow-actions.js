@@ -918,6 +918,38 @@ function getDocLocaleView(doc){
   };
 }
 
+function getEnglishLocaleUnavailableCopy(localeView){
+  const state = String(localeView && localeView.translationState || '').trim().toLowerCase();
+  if(state === 'blocked'){
+    return {
+      eyebrowEn: 'Translation blocked',
+      eyebrowVi: 'Dịch thuật đang bị chặn',
+      titleEn: 'English translation is blocked for this revision',
+      titleVi: 'Bản dịch tiếng Anh đang bị chặn cho revision này',
+      bodyEn: 'The backend recorded the translation trigger, but no compliant internal provider published an English artifact for the current source revision yet.',
+      bodyVi: 'Backend đã ghi nhận yêu cầu dịch, nhưng chưa có provider nội bộ phù hợp phát hành artifact tiếng Anh cho revision nguồn hiện tại.'
+    };
+  }
+  if(state !== '' && state !== 'missing'){
+    return {
+      eyebrowEn: 'Translation pending',
+      eyebrowVi: 'Bản dịch đang chờ xử lý',
+      titleEn: 'English translation is being prepared',
+      titleVi: 'Bản dịch tiếng Anh đang được chuẩn bị',
+      bodyEn: 'The portal will stay fail-closed until a valid English locale artifact is generated for the current source revision.',
+      bodyVi: 'Portal sẽ tiếp tục fail-closed cho tới khi có artifact tiếng Anh hợp lệ cho revision nguồn hiện tại.'
+    };
+  }
+  return {
+    eyebrowEn: 'Locale artifact required',
+    eyebrowVi: 'Cần artifact ngôn ngữ',
+    titleEn: 'English translation is not published yet',
+    titleVi: 'Bản tiếng Anh chưa được phát hành',
+    bodyEn: 'This controlled document does not have a published English artifact yet. The portal fails closed instead of rendering browser-translated or mixed-language content.',
+    bodyVi: 'Tài liệu kiểm soát này chưa có artifact tiếng Anh được phát hành. Portal fail-closed thay vì render nội dung dịch live hoặc trộn ngôn ngữ.'
+  };
+}
+
 function qmsLooksLikeStrayDocCss(text){
   const s = String(text || '');
   if(!s) return false;
@@ -2076,6 +2108,7 @@ function loadDocContent(code){
 
   if(typeof isDownloadOnlyDoc==='function' && isDownloadOnlyDoc(doc)){
     if(lang==='en' && !localeView.available){
+      const unavailableCopy = getEnglishLocaleUnavailableCopy(localeView);
       iframe.onload=function(){
         if(loading) loading.style.display='none';
         iframe.style.opacity='1';
@@ -2100,9 +2133,9 @@ function loadDocContent(code){
         <body>
           <div class="wrap">
             <div class="card">
-              <div class="eyebrow">Locale artifact required</div>
-              <h1>English translation is not published yet</h1>
-              <p>This controlled file does not have a published English artifact yet. The portal will not open the Vietnamese source while the English tab is active.</p>
+              <div class="eyebrow">${unavailableCopy.eyebrowEn}</div>
+              <h1>${unavailableCopy.titleEn}</h1>
+              <p>${unavailableCopy.bodyEn}</p>
               <div class="actions">
                 <button class="btn primary" type="button" onclick="parent.setLang('vi')">View Vietnamese source</button>
               </div>
@@ -2206,6 +2239,7 @@ function loadDocContent(code){
     const localeView = getDocLocaleView(doc);
     const viewFile = localeView.file;
     if(!localeView.available || !viewFile){
+      const unavailableCopy = getEnglishLocaleUnavailableCopy(localeView);
       iframe.onload=function(){
         if(loading) loading.style.display='none';
         iframe.style.opacity='1';
@@ -2230,11 +2264,9 @@ function loadDocContent(code){
         <body>
           <div class="wrap">
             <div class="card">
-              <div class="eyebrow">${lang==='en' ? 'Locale artifact required' : 'Cần artifact ngôn ngữ'}</div>
-              <h1>${lang==='en' ? 'English translation is not published yet' : 'Bản tiếng Anh chưa được phát hành'}</h1>
-              <p>${lang==='en'
-                ? 'This controlled document does not have a published English artifact yet. The portal fails closed instead of rendering browser-translated or mixed-language content.'
-                : 'Tài liệu kiểm soát này chưa có artifact tiếng Anh được phát hành. Portal fail-closed thay vì render nội dung dịch live hoặc trộn ngôn ngữ.'}</p>
+              <div class="eyebrow">${lang==='en' ? unavailableCopy.eyebrowEn : unavailableCopy.eyebrowVi}</div>
+              <h1>${lang==='en' ? unavailableCopy.titleEn : unavailableCopy.titleVi}</h1>
+              <p>${lang==='en' ? unavailableCopy.bodyEn : unavailableCopy.bodyVi}</p>
               <div class="actions">
                 <button class="btn primary" type="button" onclick="parent.setLang('vi')">${lang==='en' ? 'View Vietnamese source' : 'Xem nguồn tiếng Việt'}</button>
               </div>
