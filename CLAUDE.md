@@ -47,6 +47,37 @@ motion durations, or any other visual token in JS, inline style, or HTML.**
   `GraphicsAuthority.tokens.stage()` / `draft.recordChange()`. Do not call
   them in new code; use the namespaced API.
 
+## MANDATORY: DCC Document Header Standard (controlled docs under mom/docs/**)
+
+**Every controlled QMS document under `mom/docs/**` MUST satisfy the DCC
+header pattern.** No exceptions for new authorship.
+
+- **Spec:** `mom/contracts/objects/quality_improvement--document-control/dcc-document-header.standard.md`
+- **Audit (executable test):** `php mom/tools/dcc-batch/audit.php`
+- **Migrate / fix (idempotent):** `php mom/tools/dcc-batch/migrate.php`
+
+In short:
+- Filename starts with the canonical doc code (e.g. `qms-man-001-…html`).
+- `<head>` contains the DCC bootstrap `<script>` (after `</title>`).
+- `<body>` contains a single `<div class="dcc-header" data-dcc-doc-code="…">`
+  near the top of `<div class="page-body">`.
+- A row exists in `dcc_document_header` keyed on the canonical code.
+- NO legacy `<div class="form-header">`, `<div class="title">`, or
+  `<div class="meta">` blocks remain.
+
+**Filename is master** for: filename, slug, on-screen title in listing card.
+**DB is master** for: doc_code (ID badge), VN subtitle, revision, owner,
+approver, effective_date, status. Renderer
+`mom/scripts/portal/11-dcc-header-renderer.js` fetches DB values via
+`GET /api/v1/dcc/documents/{code}/header`.
+
+When creating a new doc, copy the head bootstrap + body placeholder verbatim
+from a recent peer (e.g. `mom/docs/operations/sops/01-SOP-100/sop-102-…html`).
+When editing title / description, use the portal "Chỉnh Sửa Tài Liệu" modal —
+it routes through `rename_doc` + DCC upsert. Never edit the inline
+`data-dcc-bootstrap` JSON directly; the renderer overrides it on every
+render so the edit will be lost.
+
 ## AI Context Loading Protocol
 
 **ALWAYS read the index files FIRST before opening any source file.**
