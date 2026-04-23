@@ -2154,7 +2154,7 @@ function loadDocContent(code){
     const state=getDocState(resolvedCode)||{};
     const versions=getDocVersions(resolvedCode)||[];
     const currentEntry=versions.find(v=>isCurrentVersionEntry(doc,v)) || versions.find(v=>v && (v.status==='approved' || v.status==='initial_release')) || null;
-    const workingEntry=versions.find(v=>v && (v.status==='draft' || v.status==='in_review')) || null;
+    const workingEntry=versions.find(v=>v && (v.status==='draft' || v.status==='in_review' || v.status==='pending_approval')) || null;
     const currentUrl=(lang==='en' && localeView.available && localeView.file)
       ? buildDocStreamUrl(doc,true,localeView.file)
       : (currentEntry ? getVersionAccessUrl(doc,currentEntry) : buildDocStreamUrl(doc,true));

@@ -53,13 +53,58 @@ function _readDataPath(source, path){
 }
 
 /** Internal API wrapper — delegates to global apiCall() when available */
+function _documentControlPlanePath(action){
+  var normalized = String(action || '');
+  var suffix = '';
+  if(normalized.indexOf('doc_') === 0) suffix = normalized.slice(4);
+  switch(suffix){
+    case 'create': return '/api/v1/eqms/control-plane/documents/create';
+    case 'save_draft': return '/api/v1/eqms/control-plane/documents/save-draft';
+    case 'submit_review': return '/api/v1/eqms/control-plane/documents/submit-review';
+    case 'approve': return '/api/v1/eqms/control-plane/documents/approve';
+    case 'reject': return '/api/v1/eqms/control-plane/documents/reject';
+    case 'versions_list': return '/api/v1/eqms/control-plane/documents/versions';
+    case 'start_new_revision': return '/api/v1/eqms/control-plane/documents/start-new-revision';
+    case 'delete_drafts': return '/api/v1/eqms/control-plane/documents/delete-drafts';
+    case 'delete_version': return '/api/v1/eqms/control-plane/documents/delete-version';
+    default: return '';
+  }
+}
+
 function _api(action, payload, method){
-  if(typeof apiCall==='function') return apiCall(action, payload||{}, method||'POST', 30000);
-  return fetch('api.php?action='+encodeURIComponent(action),{
-    method: method||'POST', credentials:'include',
-    headers:{'Content-Type':'application/json',
-      ...(typeof csrfToken!=='undefined'&&csrfToken?{'X-CSRF-Token':csrfToken}:{})},
-    body:(method||'POST')==='GET'?undefined:JSON.stringify(payload||{})
+  var resolved = _documentControlPlanePath(action) || action;
+  var httpMethod = (method || 'POST').toUpperCase();
+  var headers = {'Content-Type':'application/json'};
+  var url = resolved;
+  var body = undefined;
+  var params;
+  if(typeof csrfToken!=='undefined'&&csrfToken) headers['X-CSRF-Token'] = csrfToken;
+  if(typeof apiRequest==='function' && typeof resolved === 'string' && resolved.indexOf('/api/') === 0){
+    return apiRequest(resolved, { method:httpMethod, payload:payload||{}, timeoutMs:30000 });
+  }
+  if(typeof apiCall==='function' && !(typeof resolved === 'string' && resolved.indexOf('/api/') === 0)){
+    return apiCall(resolved, payload||{}, httpMethod, 30000);
+  }
+  if(typeof resolved === 'string' && resolved.indexOf('/api/') !== 0){
+    url = 'api.php?action='+encodeURIComponent(resolved);
+  }
+  if(httpMethod === 'GET' && payload){
+    params = new URLSearchParams();
+    Object.keys(payload).forEach(function(key){
+      var value = payload[key];
+      if(value === undefined || value === null || value === '') return;
+      params.append(key, typeof value === 'object' ? JSON.stringify(value) : String(value));
+    });
+    if(String(params).length){
+      url += (url.indexOf('?') >= 0 ? '&' : '?') + String(params);
+    }
+  }else if(httpMethod !== 'GET'){
+    body = JSON.stringify(payload||{});
+  }
+  return fetch(url,{
+    method: httpMethod, credentials:'include',
+    headers: headers,
+    body: body
   }).then(function(r){ return r.json(); });
 }
 
@@ -2137,14 +2182,14 @@ var API_CATALOG = [
   { action:'dashboard_supplier',      method:'GET',  label:'Dashboard NCC',                module:'Báo cáo' },
 
   /* ═══ 📁 TÀI LIỆU (Documents) ════════════════════════════════════════ */
-  { action:'doc_create',              method:'POST', label:'Tạo tài liệu',               module:'Tài liệu' },
-  { action:'doc_save_draft',          method:'POST', label:'Lưu bản nháp',               module:'Tài liệu' },
-  { action:'doc_submit_review',       method:'POST', label:'Nộp xem xét',                module:'Tài liệu' },
-  { action:'doc_approve',             method:'POST', label:'Phê duyệt tài liệu',         module:'Tài liệu' },
-  { action:'doc_reject',              method:'POST', label:'Từ chối tài liệu',            module:'Tài liệu' },
+  { action:'/api/v1/eqms/control-plane/documents/create',              method:'POST', label:'Tạo tài liệu',               module:'Tài liệu' },
+  { action:'/api/v1/eqms/control-plane/documents/save-draft',          method:'POST', label:'Lưu bản nháp',               module:'Tài liệu' },
+  { action:'/api/v1/eqms/control-plane/documents/submit-review',       method:'POST', label:'Nộp xem xét',                module:'Tài liệu' },
+  { action:'/api/v1/eqms/control-plane/documents/approve',             method:'POST', label:'Phê duyệt tài liệu',         module:'Tài liệu' },
+  { action:'/api/v1/eqms/control-plane/documents/reject',              method:'POST', label:'Từ chối tài liệu',            module:'Tài liệu' },
   { action:'doc_update_meta',         method:'POST', label:'Cập nhật metadata',           module:'Tài liệu' },
-  { action:'doc_versions_list',       method:'GET',  label:'Danh sách phiên bản',         module:'Tài liệu' },
-  { action:'doc_start_new_revision',  method:'POST', label:'Bắt đầu revision mới',        module:'Tài liệu' },
+  { action:'/api/v1/eqms/control-plane/documents/versions',            method:'GET',  label:'Danh sách phiên bản',         module:'Tài liệu' },
+  { action:'/api/v1/eqms/control-plane/documents/start-new-revision',  method:'POST', label:'Bắt đầu revision mới',        module:'Tài liệu' },
   { action:'doc_stream',              method:'GET',  label:'Tải file tài liệu',            module:'Tài liệu' },
   { action:'docs_custom_list',        method:'GET',  label:'Danh sách tài liệu',          module:'Tài liệu' },
   { action:'docs_snapshot',           method:'POST', label:'Snapshot tài liệu',            module:'Tài liệu' },
@@ -3691,7 +3736,7 @@ BLOCK_TEMPLATES['tpl-doc-registry-table'] = _tplMeta('data-table', 'Bảng đăn
 });
 
 BLOCK_TEMPLATES['tpl-doc-create-form'] = _tplMeta('form-wizard', 'Wizard tạo tài liệu', 'Document Create Wizard', 'Wizard 3 bước để tạo tài liệu, nhập nội dung và chọn tuyến phê duyệt.', 'documents', {
-  dataSource: _tplSource('doc_create', 'POST'),
+  dataSource: _tplSource('/api/v1/eqms/control-plane/documents/create', 'POST'),
   wizard: {
     showProgress: true,
     allowSkip: false,
@@ -3701,8 +3746,8 @@ BLOCK_TEMPLATES['tpl-doc-create-form'] = _tplMeta('form-wizard', 'Wizard tạo t
       _tplStep('content', 'Nội dung', 'Content', 'notes,doc_title,doc_title_vi,doc_category'),
       _tplStep('approval', 'Phê duyệt', 'Approval Route', 'author,department,rev')
     ],
-    saveDraft: { api:'doc_save_draft', method:'POST' },
-    submit: { api:'doc_submit_review', method:'POST' }
+    saveDraft: { api:'/api/v1/eqms/control-plane/documents/save-draft', method:'POST' },
+    submit: { api:'/api/v1/eqms/control-plane/documents/submit-review', method:'POST' }
   }
 });
 
@@ -3713,16 +3758,16 @@ BLOCK_TEMPLATES['tpl-doc-approval-flow'] = _tplMeta('action-status-flow', 'Luồ
     showHistory: true,
     escalationRole: 'qa_manager',
     transitions: [
-      _tplTransition('draft', 'review', 'Gửi duyệt', 'Submit for Review', 'doc_submit_review', 'author', true, 'Gửi tài liệu sang bước review?'),
-      _tplTransition('review', 'approved', 'Phê duyệt', 'Approve', 'doc_approve', 'approver', true, 'Phê duyệt tài liệu này?'),
-      _tplTransition('review', 'draft', 'Trả về sửa', 'Return to Draft', 'doc_reject', 'approver', true, 'Trả tài liệu về draft để chỉnh sửa?'),
+      _tplTransition('draft', 'review', 'Gửi duyệt', 'Submit for Review', '/api/v1/eqms/control-plane/documents/submit-review', 'author', true, 'Gửi tài liệu sang bước review?'),
+      _tplTransition('review', 'approved', 'Phê duyệt', 'Approve', '/api/v1/eqms/control-plane/documents/approve', 'approver', true, 'Phê duyệt tài liệu này?'),
+      _tplTransition('review', 'draft', 'Trả về sửa', 'Return to Draft', '/api/v1/eqms/control-plane/documents/reject', 'approver', true, 'Trả tài liệu về draft để chỉnh sửa?'),
       _tplTransition('approved', 'superseded', 'Thay thế', 'Supersede', 'doc_update_meta', 'document_control', false, 'Đánh dấu tài liệu đã bị thay thế?')
     ]
   }
 });
 
 BLOCK_TEMPLATES['tpl-doc-related-list'] = _tplMeta('data-list', 'Danh sách phiên bản liên quan', 'Related Document Versions', 'Danh sách phiên bản tài liệu liên quan với thay đổi revision và workflow status.', 'documents', {
-  dataSource: _tplSource('doc_versions_list', 'GET'),
+  dataSource: _tplSource('/api/v1/eqms/control-plane/documents/versions', 'GET'),
   dataKey: 'items',
   titleKey: 'doc_id',
   subtitleKey: 'revision',
