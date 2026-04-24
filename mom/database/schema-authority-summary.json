@@ -1,16 +1,16 @@
 {
     "schema_authority": {
         "version": "1.0.0",
-        "declared_at": "2026-04-17T01:27:44+00:00",
-        "authoritative_schema_source": "database/migrations/*.sql (001–139)",
+        "declared_at": "2026-04-24T08:04:03+00:00",
+        "authoritative_schema_source": "database/migrations/*.sql (001–155)",
         "authoritative_schema_file": "database/schema.sql",
         "authority_scope": "platform_global",
-        "table_count": 803,
-        "registry_table_count": 800,
-        "registry_contract_table_count": 800,
-        "schema_snapshot_create_table_count": 818,
-        "schema_snapshot_physical_table_count": 816,
-        "schema_snapshot_logical_table_count": 803,
+        "table_count": 837,
+        "registry_table_count": 837,
+        "registry_contract_table_count": 837,
+        "schema_snapshot_create_table_count": 852,
+        "schema_snapshot_physical_table_count": 850,
+        "schema_snapshot_logical_table_count": 837,
         "schema_snapshot_partition_table_count": 13,
         "partition_tables_excluded_from_contract_registry": [
             "audit_events_2026_q1",
@@ -27,9 +27,9 @@
             "labor_txn_2026_h2",
             "labor_txn_default"
         ],
-        "migration_range": "001–139",
-        "migration_count": 141,
-        "migrations_role": "executable_source_of_truth — sequential DDL applied in order 001–139",
+        "migration_range": "001–155",
+        "migration_count": 155,
+        "migrations_role": "executable_source_of_truth — sequential DDL applied in order 001–155",
         "snapshot_role": "generated_aggregate — built by build_schema_snapshot.php from migrations, for quick reference only",
         "snapshot_generator": "database/build_schema_snapshot.php",
         "reference_sql_artifacts": [
@@ -49,7 +49,7 @@
         "generation_drift_relationship": "schema.sql MUST be regenerated from migrations after any migration change. Drift = schema.sql out of date, not a truth conflict.",
         "anti_parallel_authority_statement": "There is exactly ONE schema authority chain: migrations → schema.sql (snapshot). Blueprint and spec SQL files are design inputs, NOT parallel authorities. No table definition outside migrations is authoritative.",
         "registry_dependency": "Full table-registry publication is intended to derive logical runtime-contract table metadata from schema.sql via generate-table-architecture.mjs. Physical partition children are storage implementation details and must not be counted as frontend/runtime contract entities. Registry does not modify schema; schema does not depend on registry.",
-        "registry_publication_state": "registry_bootstrap_or_partial_publication_table_count_differs_from_schema_snapshot",
+        "registry_publication_state": "registry_table_count_matches_schema_snapshot",
         "drift_verifier": "tools/verify_schema_authority.py"
     }
 }

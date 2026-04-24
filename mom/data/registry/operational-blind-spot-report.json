@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-15T10:51:51.968Z",
+    "generatedAt": "2026-04-24T08:04:07.735Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "description": "Operational blind-spot assessment mapped to current backend governance signals."
   },
@@ -11,7 +11,7 @@
     "high": 0,
     "medium": 0,
     "watch": 15,
-    "idempotency_mentions": 22190,
+    "idempotency_mentions": 24373,
     "idempotency_contract_coverage_ratio": 1.0,
     "default_retry_safe_ratio": 1.0,
     "create_endpoints_requiring_client_key": 0,
@@ -183,10 +183,10 @@
     ],
     "unused_candidate_entities": [],
     "idempotency_runtime_contract": {
-      "mutating_endpoint_count": 2666,
-      "idempotent_endpoint_count": 2666,
+      "mutating_endpoint_count": 2931,
+      "idempotent_endpoint_count": 2931,
       "idempotency_contract_coverage_ratio": 1.0,
-      "default_retry_safe_endpoint_count": 2666,
+      "default_retry_safe_endpoint_count": 2931,
       "default_retry_safe_ratio": 1.0,
       "create_endpoints_requiring_client_key": 0
     }
@@ -199,12 +199,12 @@
       "current_severity": "watch",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 22190,
-        "optimistic_concurrency_mentions": 8364,
-        "mutating_endpoint_count": 2666,
-        "idempotent_endpoint_count": 2666,
+        "idempotency_mentions": 24373,
+        "optimistic_concurrency_mentions": 9186,
+        "mutating_endpoint_count": 2931,
+        "idempotent_endpoint_count": 2931,
         "idempotency_contract_coverage_ratio": 1.0,
-        "default_retry_safe_endpoint_count": 2666,
+        "default_retry_safe_endpoint_count": 2931,
         "default_retry_safe_ratio": 1.0,
         "create_endpoints_requiring_client_key": 0
       },
@@ -219,9 +219,9 @@
         "Optimistic concurrency, If-Match preconditions, and row-version evidence are all present broadly enough that this is no longer an active structural blind spot."
       ],
       "evidence": {
-        "optimistic_concurrency_mentions": 8364,
+        "optimistic_concurrency_mentions": 9186,
         "if_match_mentions": 3396,
-        "row_version_mentions": 27025
+        "row_version_mentions": 27784
       },
       "required_controls": []
     },
@@ -338,7 +338,7 @@
       "current_severity": "watch",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 22190
+        "idempotency_mentions": 24373
       },
       "required_controls": []
     },
@@ -363,8 +363,8 @@
       ],
       "evidence": {
         "policy_has_job_heartbeat_requirement": true,
-        "heartbeat_mentions": 33,
-        "escalation_mentions": 587
+        "heartbeat_mentions": 59,
+        "escalation_mentions": 597
       },
       "required_controls": []
     },

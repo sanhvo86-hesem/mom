@@ -2,52 +2,52 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-15T10:51:33.151Z",
+    "generatedAt": "2026-04-24T08:04:04.401Z",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
     "publication_run_id": "c544a828-8ff5-44a4-9d02-0e0814d38afa",
-    "enterpriseAuthorityGeneratedAt": "2026-04-15T10:51:39.273626+00:00",
-    "enterpriseFrontendSimulationGeneratedAt": "2026-04-15T10:51:39.440417+00:00"
+    "enterpriseAuthorityGeneratedAt": "2026-04-24T08:04:08.770168+00:00",
+    "enterpriseFrontendSimulationGeneratedAt": "2026-04-24T08:04:08.939549+00:00"
   },
   "coverage": {
-    "router_actions": 4214,
-    "field_registry_actions": 4207,
-    "field_definitions": 56385,
-    "unique_field_keys": 5232,
-    "status_sets": 878,
-    "workflow_count": 336,
-    "relation_edges": 3468,
-    "validation_rules": 48786,
-    "formula_count": 1357,
-    "domain_pack_count": 4631,
-    "scalar_record_endpoints": 4070,
+    "router_actions": 4625,
+    "field_registry_actions": 5430,
+    "field_definitions": 83205,
+    "unique_field_keys": 5265,
+    "status_sets": 971,
+    "workflow_count": 379,
+    "relation_edges": 3517,
+    "validation_rules": 59226,
+    "formula_count": 1476,
+    "domain_pack_count": 5069,
+    "scalar_record_endpoints": 4481,
     "workflow_runtime_modes": {
-      "stateless": 368,
-      "generic_status_only": 46,
+      "stateless": 395,
+      "generic_status_only": 49,
       "guarded_transition_runtime": 5,
-      "persisted": 345,
+      "persisted": 388,
       "unknown": 12
     },
     "deletion_modes": {
       "hard_delete": 12,
       "soft_delete": 63,
-      "archive_only": 701
+      "archive_only": 774
     },
     "workflow_engine_bridge": {
-      "ready": 345,
+      "ready": 388,
       "blocked": 0,
-      "unneeded": 431
+      "unneeded": 461
     },
     "frontend_foundation": {
-      "entity_count": 775,
-      "ready_entities": 775,
+      "entity_count": 848,
+      "ready_entities": 848,
       "partial_entities": 0,
       "blocked_entities": 0,
-      "workflow_ready_entities": 388,
-      "related_ready_entities": 738,
-      "analytics_ready_entities": 374,
+      "workflow_ready_entities": 434,
+      "related_ready_entities": 780,
+      "analytics_ready_entities": 416,
       "planning_console_entities": 34,
-      "operator_console_entities": 67
+      "operator_console_entities": 68
     },
     "wave0_governance": {
       "total_frontend_entities": 775,
@@ -72,7 +72,7 @@
       "high": 0,
       "medium": 0,
       "watch": 15,
-      "idempotency_mentions": 22190,
+      "idempotency_mentions": 24373,
       "idempotency_contract_coverage_ratio": 1.0,
       "default_retry_safe_ratio": 1.0,
       "create_endpoints_requiring_client_key": 0,
@@ -165,12 +165,12 @@
       "high": 0,
       "medium": 0,
       "watch": 12,
-      "idempotency_mentions": 22222,
+      "idempotency_mentions": 24405,
       "idempotency_contract_coverage_ratio": 1.0,
       "default_retry_safe_ratio": 1.0,
       "create_endpoints_requiring_client_key": 0,
       "compensation_markers": 5,
-      "correction_markers": 2259,
+      "correction_markers": 2413,
       "period_close_mentions": 40,
       "credit_memo_mentions": 24,
       "debit_memo_mentions": 24,
@@ -182,14 +182,14 @@
       "status": "watch",
       "finding_count": 2,
       "p0_p1_finding_count": 0,
-      "table_governance_overlay_count": 764,
+      "table_governance_overlay_count": 837,
       "missing_owner_role": 0,
       "missing_system_of_record": 0,
       "hard_delete_endpoint_count": 0,
       "quarantined_delete_endpoint_count": 0,
       "runtime_unsafe_exposed_endpoint_count": 0,
-      "runtime_unsafe_blocked_endpoint_count": 1035,
-      "generic_runtime_classification_count": 555,
+      "runtime_unsafe_blocked_endpoint_count": 1164,
+      "generic_runtime_classification_count": 591,
       "bound_command_runtime_binding_count": 276,
       "unbound_command_runtime_binding_count": 0
     },
@@ -220,15 +220,15 @@
   "assets": {
     "data-fields-index.json": {
       "kind": "field-registry-index",
-      "records": 4207
+      "records": 5430
     },
     "endpoint-catalog.json": {
       "kind": "endpoint-catalog",
-      "records": 4214
+      "records": 4625
     },
     "endpoint-catalog-index.json": {
       "kind": "endpoint-catalog-index",
-      "records": 4214
+      "records": 4625
     },
     "runtime-access-policy.json": {
       "kind": "runtime-access-policy",
@@ -236,23 +236,23 @@
     },
     "domain-field-packs.json": {
       "kind": "pack-library",
-      "records": 4631
+      "records": 5069
     },
     "relation-map.json": {
       "kind": "relation-map",
-      "records": 3468
+      "records": 3517
     },
     "frontend-foundation-catalog.json": {
       "kind": "frontend-foundation-catalog",
-      "records": 775
+      "records": 848
     },
     "workflow-library.json": {
       "kind": "workflow-library",
-      "records": 336
+      "records": 379
     },
     "status-options.json": {
       "kind": "status-library",
-      "records": 878
+      "records": 971
     },
     "field-types.json": {
       "kind": "field-types",
@@ -260,11 +260,11 @@
     },
     "validation-rules.json": {
       "kind": "validation-rules",
-      "records": 48786
+      "records": 59226
     },
     "computed-formulas.json": {
       "kind": "formula-library",
-      "records": 1357
+      "records": 1476
     },
     "registry-manifest.json": {
       "kind": "manifest",
@@ -380,11 +380,11 @@
     },
     "endpoint-governance-classification.json": {
       "kind": "endpoint-governance-classification",
-      "records": 4214
+      "records": 4625
     },
     "table-governance-overlay.json": {
       "kind": "table-governance-overlay",
-      "records": 764
+      "records": 837
     },
     "enterprise-event-contract-map.json": {
       "kind": "enterprise-event-contract-map",

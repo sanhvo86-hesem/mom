@@ -2,7 +2,7 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-15T10:51:33.151Z",
+    "generatedAt": "2026-04-24T08:04:04.401Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
@@ -10,15 +10,15 @@
     "publication_run_id": "c544a828-8ff5-44a4-9d02-0e0814d38afa"
   },
   "summary": {
-    "endpoint_count": 4214,
-    "pack_count": 4631,
-    "relation_edge_count": 3468,
-    "workflow_count": 336,
-    "status_set_count": 878,
-    "validation_rule_count": 48786,
-    "formula_count": 1357,
-    "formula_reference_count": 1357,
-    "field_context_count": 56385,
+    "endpoint_count": 4625,
+    "pack_count": 5069,
+    "relation_edge_count": 3517,
+    "workflow_count": 379,
+    "status_set_count": 971,
+    "validation_rule_count": 59226,
+    "formula_count": 1476,
+    "formula_reference_count": 1476,
+    "field_context_count": 83205,
     "row_version_tables": 617,
     "org_scoped_tables": 577,
     "composite_pk_tables": 21,
@@ -29,32 +29,32 @@
     "org_scope_contract_issues": 0,
     "contract_issues": 0,
     "workflow_alignment_issues": 0,
-    "transition_runtime_warnings": 345,
-    "workflow_engine_bridge_ready": 345,
+    "transition_runtime_warnings": 388,
+    "workflow_engine_bridge_ready": 388,
     "workflow_engine_bridge_blocked": 0,
-    "archive_only_tables": 701,
+    "archive_only_tables": 774,
     "soft_delete_tables": 63,
     "hard_delete_tables": 0,
     "workflow_lifecycle_modes": {
-      "stateless": 368,
-      "generic_status_only": 46,
+      "stateless": 395,
+      "generic_status_only": 49,
       "guarded_transition_runtime": 5,
-      "persisted": 345,
+      "persisted": 388,
       "unknown": 0
     },
-    "frontend_foundation_entities": 775,
-    "frontend_ready_entities": 775,
+    "frontend_foundation_entities": 848,
+    "frontend_ready_entities": 848,
     "frontend_partial_entities": 0,
     "frontend_blocked_entities": 0,
     "frontend_archive_isolation_entities": 6,
-    "frontend_publishable_entities": 769,
+    "frontend_publishable_entities": 842,
     "frontend_unpublishable_entities": 0,
-    "schema_authority_table_count": 764,
+    "schema_authority_table_count": 837,
     "schema_authority_partition_table_count": 13,
-    "schema_authority_physical_table_count": 777,
-    "attachment_contract_entities": 762,
-    "comment_contract_entities": 762,
-    "activity_contract_entities": 584,
+    "schema_authority_physical_table_count": 850,
+    "attachment_contract_entities": 835,
+    "comment_contract_entities": 835,
+    "activity_contract_entities": 585,
     "publishability_ready": true,
     "publishability_review_required_entities": 0
   },
@@ -78,44 +78,44 @@
     {
       "id": "tables_have_fields",
       "passed": true,
-      "actual": 764,
-      "target": 764
+      "actual": 837,
+      "target": 837
     },
     {
       "id": "tables_have_endpoint_catalog",
       "passed": true,
-      "actual": 764,
-      "target": 764
+      "actual": 837,
+      "target": 837
     },
     {
       "id": "tables_have_pack",
       "passed": true,
-      "actual": 764,
-      "target": 764
+      "actual": 837,
+      "target": 837
     },
     {
       "id": "fk_edges_covered",
       "passed": true,
-      "actual": 3468,
-      "target": 3468
+      "actual": 3517,
+      "target": 3517
     },
     {
       "id": "workflow_coverage",
       "passed": true,
-      "actual": 479,
-      "target": 479
+      "actual": 528,
+      "target": 528
     },
     {
       "id": "status_coverage",
       "passed": true,
-      "actual": 383,
-      "target": 383
+      "actual": 429,
+      "target": 429
     },
     {
       "id": "scalar_pk_tables",
       "passed": true,
-      "actual": 743,
-      "target": 732
+      "actual": 816,
+      "target": 805
     },
     {
       "id": "optimistic_concurrency_contracts",
@@ -144,8 +144,8 @@
     {
       "id": "frontend_foundation_coverage",
       "passed": true,
-      "actual": 775,
-      "target": 764
+      "actual": 848,
+      "target": 837
     },
     {
       "id": "no_unsupported_record_endpoints",
@@ -168,7 +168,7 @@
     {
       "id": "workflow_count_target",
       "passed": true,
-      "actual": 336,
+      "actual": 379,
       "target": 60
     },
     {
@@ -180,26 +180,26 @@
     {
       "id": "status_set_target",
       "passed": true,
-      "actual": 878,
+      "actual": 971,
       "target": 180
     },
     {
       "id": "validation_rule_target",
       "passed": true,
-      "actual": 48786,
+      "actual": 59226,
       "target": 5000
     },
     {
       "id": "formula_target",
       "passed": true,
-      "actual": 1357,
+      "actual": 1476,
       "target": 200
     },
     {
       "id": "formula_reference_target",
       "passed": true,
-      "actual": 1357,
-      "target": 1357
+      "actual": 1476,
+      "target": 1476
     }
   ],
   "warnings": {

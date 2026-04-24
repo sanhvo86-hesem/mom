@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-15T10:51:53.468Z",
+    "generatedAt": "2026-04-24T08:04:10.057Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -24,8 +24,8 @@
     "purpose": "Segmented runtime contract read model for bounded-memory reads and targeted rebuild verification.",
     "segmentId": "relations",
     "sourceArtifact": "data/registry/system-contract-runtime-projections.json",
-    "sourceSha256": "bfd78f8d03eb2516180cd62fcce1478a408c897ce89399eefd54f952caac7247",
-    "sourceGeneratedAt": "2026-04-15T10:51:53.468Z",
+    "sourceSha256": "b4931d975c011d28dc8757332c68ba8f2caa2f04fa185fd7b17ce6542804ca18",
+    "sourceGeneratedAt": "2026-04-24T08:04:10.057Z",
     "writePolicy": "generated_segment_do_not_edit",
     "revisionGuard": "sourceSha256"
   },
@@ -14240,6 +14240,342 @@
       "cascadeActions": []
     },
     {
+      "id": "rel_dcc_doc_type_catalog_default_owner_role_dcc_role_catalog_role_code",
+      "from": {
+        "entity": "dcc_doc_type_catalog",
+        "field": "default_owner_role"
+      },
+      "to": {
+        "entity": "dcc_role_catalog",
+        "field": "role_code"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_dcc_doc_type_catalog_default_owner_role",
+      "nullable": true,
+      "label": "Dcc Doc Loại danh mục → Dcc vai trò danh mục",
+      "labelEn": "Dcc Doc Type Catalog → Dcc Role Catalog",
+      "domain": "document_control -> document_control",
+      "fromDomain": "document_control",
+      "toDomain": "document_control",
+      "sourceColumn": "default_owner_role",
+      "targetColumn": "role_code",
+      "lookupEntity": "dcc_role_catalog",
+      "lookupEndpoint": "document_control.dcc_role_catalog.list",
+      "displayField": "role_code",
+      "valueField": "role_code",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_dcc_doc_type_catalog_default_approver_role_dcc_role_catalog_role_code",
+      "from": {
+        "entity": "dcc_doc_type_catalog",
+        "field": "default_approver_role"
+      },
+      "to": {
+        "entity": "dcc_role_catalog",
+        "field": "role_code"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_dcc_doc_type_catalog_default_approver_role",
+      "nullable": true,
+      "label": "Dcc Doc Loại danh mục → Dcc vai trò danh mục",
+      "labelEn": "Dcc Doc Type Catalog → Dcc Role Catalog",
+      "domain": "document_control -> document_control",
+      "fromDomain": "document_control",
+      "toDomain": "document_control",
+      "sourceColumn": "default_approver_role",
+      "targetColumn": "role_code",
+      "lookupEntity": "dcc_role_catalog",
+      "lookupEndpoint": "document_control.dcc_role_catalog.list",
+      "displayField": "role_code",
+      "valueField": "role_code",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_dcc_document_change_notice_dcr_id_dcc_document_change_request_dcr_id",
+      "from": {
+        "entity": "dcc_document_change_notice",
+        "field": "dcr_id"
+      },
+      "to": {
+        "entity": "dcc_document_change_request",
+        "field": "dcr_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_dcc_document_change_notice_dcr_id",
+      "nullable": false,
+      "label": "Dcc Tài liệu thay đổi Notice → Dcc Tài liệu thay đổi yêu cầu",
+      "labelEn": "Dcc Document Change Notice → Dcc Document Change Request",
+      "domain": "document_control -> document_control",
+      "fromDomain": "document_control",
+      "toDomain": "document_control",
+      "sourceColumn": "dcr_id",
+      "targetColumn": "dcr_id",
+      "lookupEntity": "dcc_document_change_request",
+      "lookupEndpoint": "document_control.dcc_document_change_request.list",
+      "displayField": "approver_role_code",
+      "valueField": "dcr_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_dcc_document_change_notice_doc_code_dcc_document_header_doc_code",
+      "from": {
+        "entity": "dcc_document_change_notice",
+        "field": "doc_code"
+      },
+      "to": {
+        "entity": "dcc_document_header",
+        "field": "doc_code"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_dcc_document_change_notice_doc_code",
+      "nullable": false,
+      "label": "Dcc Tài liệu thay đổi Notice → Dcc Tài liệu Header",
+      "labelEn": "Dcc Document Change Notice → Dcc Document Header",
+      "domain": "document_control -> document_control",
+      "fromDomain": "document_control",
+      "toDomain": "document_control",
+      "sourceColumn": "doc_code",
+      "targetColumn": "doc_code",
+      "lookupEntity": "dcc_document_header",
+      "lookupEndpoint": "document_control.dcc_document_header.list",
+      "displayField": "title",
+      "valueField": "doc_code",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_dcc_document_change_request_doc_code_dcc_document_header_doc_code",
+      "from": {
+        "entity": "dcc_document_change_request",
+        "field": "doc_code"
+      },
+      "to": {
+        "entity": "dcc_document_header",
+        "field": "doc_code"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_dcc_document_change_request_doc_code",
+      "nullable": false,
+      "label": "Dcc Tài liệu thay đổi yêu cầu → Dcc Tài liệu Header",
+      "labelEn": "Dcc Document Change Request → Dcc Document Header",
+      "domain": "document_control -> document_control",
+      "fromDomain": "document_control",
+      "toDomain": "document_control",
+      "sourceColumn": "doc_code",
+      "targetColumn": "doc_code",
+      "lookupEntity": "dcc_document_header",
+      "lookupEndpoint": "document_control.dcc_document_header.list",
+      "displayField": "title",
+      "valueField": "doc_code",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_dcc_document_header_owner_role_code_dcc_role_catalog_role_code",
+      "from": {
+        "entity": "dcc_document_header",
+        "field": "owner_role_code"
+      },
+      "to": {
+        "entity": "dcc_role_catalog",
+        "field": "role_code"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_dcc_document_header_owner_role_code",
+      "nullable": false,
+      "label": "Dcc Tài liệu Header → Dcc vai trò danh mục",
+      "labelEn": "Dcc Document Header → Dcc Role Catalog",
+      "domain": "document_control -> document_control",
+      "fromDomain": "document_control",
+      "toDomain": "document_control",
+      "sourceColumn": "owner_role_code",
+      "targetColumn": "role_code",
+      "lookupEntity": "dcc_role_catalog",
+      "lookupEndpoint": "document_control.dcc_role_catalog.list",
+      "displayField": "role_code",
+      "valueField": "role_code",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_dcc_document_header_approver_role_code_dcc_role_catalog_role_code",
+      "from": {
+        "entity": "dcc_document_header",
+        "field": "approver_role_code"
+      },
+      "to": {
+        "entity": "dcc_role_catalog",
+        "field": "role_code"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_dcc_document_header_approver_role_code",
+      "nullable": false,
+      "label": "Dcc Tài liệu Header → Dcc vai trò danh mục",
+      "labelEn": "Dcc Document Header → Dcc Role Catalog",
+      "domain": "document_control -> document_control",
+      "fromDomain": "document_control",
+      "toDomain": "document_control",
+      "sourceColumn": "approver_role_code",
+      "targetColumn": "role_code",
+      "lookupEntity": "dcc_role_catalog",
+      "lookupEndpoint": "document_control.dcc_role_catalog.list",
+      "displayField": "role_code",
+      "valueField": "role_code",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_dcc_document_locale_variant_doc_code_dcc_document_header_doc_code",
+      "from": {
+        "entity": "dcc_document_locale_variant",
+        "field": "doc_code"
+      },
+      "to": {
+        "entity": "dcc_document_header",
+        "field": "doc_code"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_dcc_document_locale_variant_doc_code",
+      "nullable": false,
+      "label": "Dcc Tài liệu Locale Variant → Dcc Tài liệu Header",
+      "labelEn": "Dcc Document Locale Variant → Dcc Document Header",
+      "domain": "document_control -> document_control",
+      "fromDomain": "document_control",
+      "toDomain": "document_control",
+      "sourceColumn": "doc_code",
+      "targetColumn": "doc_code",
+      "lookupEntity": "dcc_document_header",
+      "lookupEndpoint": "document_control.dcc_document_header.list",
+      "displayField": "title",
+      "valueField": "doc_code",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_dcc_document_revision_doc_code_dcc_document_header_doc_code",
+      "from": {
+        "entity": "dcc_document_revision",
+        "field": "doc_code"
+      },
+      "to": {
+        "entity": "dcc_document_header",
+        "field": "doc_code"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_dcc_document_revision_doc_code",
+      "nullable": false,
+      "label": "Dcc Tài liệu Phiên bản → Dcc Tài liệu Header",
+      "labelEn": "Dcc Document Revision → Dcc Document Header",
+      "domain": "document_control -> document_control",
+      "fromDomain": "document_control",
+      "toDomain": "document_control",
+      "sourceColumn": "doc_code",
+      "targetColumn": "doc_code",
+      "lookupEntity": "dcc_document_header",
+      "lookupEndpoint": "document_control.dcc_document_header.list",
+      "displayField": "title",
+      "valueField": "doc_code",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_dcc_document_revision_dcr_id_dcc_document_change_request_dcr_id",
+      "from": {
+        "entity": "dcc_document_revision",
+        "field": "dcr_id"
+      },
+      "to": {
+        "entity": "dcc_document_change_request",
+        "field": "dcr_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_dcc_document_revision_dcr_id",
+      "nullable": true,
+      "label": "Dcc Tài liệu Phiên bản → Dcc Tài liệu thay đổi yêu cầu",
+      "labelEn": "Dcc Document Revision → Dcc Document Change Request",
+      "domain": "document_control -> document_control",
+      "fromDomain": "document_control",
+      "toDomain": "document_control",
+      "sourceColumn": "dcr_id",
+      "targetColumn": "dcr_id",
+      "lookupEntity": "dcc_document_change_request",
+      "lookupEndpoint": "document_control.dcc_document_change_request.list",
+      "displayField": "approver_role_code",
+      "valueField": "dcr_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_dcc_document_revision_dcn_id_dcc_document_change_notice_dcn_id",
+      "from": {
+        "entity": "dcc_document_revision",
+        "field": "dcn_id"
+      },
+      "to": {
+        "entity": "dcc_document_change_notice",
+        "field": "dcn_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_dcc_document_revision_dcn_id",
+      "nullable": true,
+      "label": "Dcc Tài liệu Phiên bản → Dcc Tài liệu thay đổi Notice",
+      "labelEn": "Dcc Document Revision → Dcc Document Change Notice",
+      "domain": "document_control -> document_control",
+      "fromDomain": "document_control",
+      "toDomain": "document_control",
+      "sourceColumn": "dcn_id",
+      "targetColumn": "dcn_id",
+      "lookupEntity": "dcc_document_change_notice",
+      "lookupEndpoint": "document_control.dcc_document_change_notice.list",
+      "displayField": "doc_code",
+      "valueField": "dcn_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_dcc_document_revision_superseded_by_dcc_document_revision_revision_id",
+      "from": {
+        "entity": "dcc_document_revision",
+        "field": "superseded_by"
+      },
+      "to": {
+        "entity": "dcc_document_revision",
+        "field": "revision_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_dcc_document_revision_superseded_by",
+      "nullable": true,
+      "label": "Dcc Tài liệu Phiên bản → Dcc Tài liệu Phiên bản",
+      "labelEn": "Dcc Document Revision → Dcc Document Revision",
+      "domain": "document_control -> document_control",
+      "fromDomain": "document_control",
+      "toDomain": "document_control",
+      "sourceColumn": "superseded_by",
+      "targetColumn": "revision_id",
+      "lookupEntity": "dcc_document_revision",
+      "lookupEndpoint": "document_control.dcc_document_revision.list",
+      "displayField": "doc_code",
+      "valueField": "revision_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
       "id": "rel_demand_item_site_id_item_site_item_site_id",
       "from": {
         "entity": "demand",
@@ -22108,6 +22444,90 @@
       "cascadeActions": []
     },
     {
+      "id": "rel_eqms_audit_findings_audit_id_eqms_audits_audit_id",
+      "from": {
+        "entity": "eqms_audit_findings",
+        "field": "audit_id"
+      },
+      "to": {
+        "entity": "eqms_audits",
+        "field": "audit_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_audit_findings_audit_id",
+      "nullable": false,
+      "label": "Eqm Đánh giá phát hiện → Eqm Đánh giá",
+      "labelEn": "Eqms Audit Findings → Eqms Audits",
+      "domain": "quality_management -> quality_management",
+      "fromDomain": "quality_management",
+      "toDomain": "quality_management",
+      "sourceColumn": "audit_id",
+      "targetColumn": "audit_id",
+      "lookupEntity": "eqms_audits",
+      "lookupEndpoint": "quality_management.eqms_audits.list",
+      "displayField": "audit_number",
+      "valueField": "audit_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_batch_release_lot_id_lot_master_lot_number",
+      "from": {
+        "entity": "eqms_batch_release",
+        "field": "lot_id"
+      },
+      "to": {
+        "entity": "lot_master",
+        "field": "lot_number"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_batch_release_lot_id",
+      "nullable": true,
+      "label": "Eqm Lô Phát hành → Lô chuẩn",
+      "labelEn": "Eqms Batch Release → Lot Master",
+      "domain": "quality_management -> inventory",
+      "fromDomain": "quality_management",
+      "toDomain": "inventory",
+      "sourceColumn": "lot_id",
+      "targetColumn": "lot_number",
+      "lookupEntity": "lot_master",
+      "lookupEndpoint": "inventory.lot_master.list",
+      "displayField": "org_company_code",
+      "valueField": "lot_number",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_batch_release_product_id_items_item_id",
+      "from": {
+        "entity": "eqms_batch_release",
+        "field": "product_id"
+      },
+      "to": {
+        "entity": "items",
+        "field": "item_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_batch_release_product_id",
+      "nullable": true,
+      "label": "Eqm Lô Phát hành → Mã hàng",
+      "labelEn": "Eqms Batch Release → Items",
+      "domain": "quality_management -> master_data",
+      "fromDomain": "quality_management",
+      "toDomain": "master_data",
+      "sourceColumn": "product_id",
+      "targetColumn": "item_id",
+      "lookupEntity": "items",
+      "lookupEndpoint": "master_data.items.list",
+      "displayField": "buyer_code",
+      "valueField": "item_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
       "id": "rel_eqms_change_affected_object_plm_change_order_id_plm_change_orders_plm_change_order_id",
       "from": {
         "entity": "eqms_change_affected_object",
@@ -22216,6 +22636,118 @@
       "lookupEndpoint": "record_system.governed_route_registry.list",
       "displayField": "required_command_name",
       "valueField": "governed_route_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_complaints_customer_id_customers_customer_id",
+      "from": {
+        "entity": "eqms_complaints",
+        "field": "customer_id"
+      },
+      "to": {
+        "entity": "customers",
+        "field": "customer_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_complaints_customer_id",
+      "nullable": true,
+      "label": "Eqm khiếu nại → Khách hàng",
+      "labelEn": "Eqms Complaints → Customers",
+      "domain": "quality_management -> sales",
+      "fromDomain": "quality_management",
+      "toDomain": "sales",
+      "sourceColumn": "customer_id",
+      "targetColumn": "customer_id",
+      "lookupEntity": "customers",
+      "lookupEndpoint": "sales.customers.list",
+      "displayField": "customer_name",
+      "valueField": "customer_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_complaints_affected_product_id_items_item_id",
+      "from": {
+        "entity": "eqms_complaints",
+        "field": "affected_product_id"
+      },
+      "to": {
+        "entity": "items",
+        "field": "item_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_complaints_affected_product_id",
+      "nullable": true,
+      "label": "Eqm khiếu nại → Mã hàng",
+      "labelEn": "Eqms Complaints → Items",
+      "domain": "quality_management -> master_data",
+      "fromDomain": "quality_management",
+      "toDomain": "master_data",
+      "sourceColumn": "affected_product_id",
+      "targetColumn": "item_id",
+      "lookupEntity": "items",
+      "lookupEndpoint": "master_data.items.list",
+      "displayField": "buyer_code",
+      "valueField": "item_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_controlled_copies_doc_id_eqms_documents_doc_id",
+      "from": {
+        "entity": "eqms_controlled_copies",
+        "field": "doc_id"
+      },
+      "to": {
+        "entity": "eqms_documents",
+        "field": "doc_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_controlled_copies_doc_id",
+      "nullable": false,
+      "label": "Eqm Controlled Copy → Eqm Tài liệu",
+      "labelEn": "Eqms Controlled Copies → Eqms Documents",
+      "domain": "quality_management -> quality_management",
+      "fromDomain": "quality_management",
+      "toDomain": "quality_management",
+      "sourceColumn": "doc_id",
+      "targetColumn": "doc_id",
+      "lookupEntity": "eqms_documents",
+      "lookupEndpoint": "quality_management.eqms_documents.list",
+      "displayField": "title",
+      "valueField": "doc_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_document_acknowledgements_doc_id_eqms_documents_doc_id",
+      "from": {
+        "entity": "eqms_document_acknowledgements",
+        "field": "doc_id"
+      },
+      "to": {
+        "entity": "eqms_documents",
+        "field": "doc_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_document_acknowledgements_doc_id",
+      "nullable": false,
+      "label": "Eqm Tài liệu Acknowledgement → Eqm Tài liệu",
+      "labelEn": "Eqms Document Acknowledgements → Eqms Documents",
+      "domain": "quality_management -> quality_management",
+      "fromDomain": "quality_management",
+      "toDomain": "quality_management",
+      "sourceColumn": "doc_id",
+      "targetColumn": "doc_id",
+      "lookupEntity": "eqms_documents",
+      "lookupEndpoint": "quality_management.eqms_documents.list",
+      "displayField": "title",
+      "valueField": "doc_id",
       "digitalThread": true,
       "cascadeActions": []
     },
@@ -22720,6 +23252,34 @@
       "lookupEndpoint": "evidence_vault.eqms_evidence_manifest.list",
       "displayField": "created_at",
       "valueField": "evidence_manifest_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_fai_characteristics_fai_id_eqms_fai_reports_fai_id",
+      "from": {
+        "entity": "eqms_fai_characteristics",
+        "field": "fai_id"
+      },
+      "to": {
+        "entity": "eqms_fai_reports",
+        "field": "fai_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_fai_characteristics_fai_id",
+      "nullable": false,
+      "label": "Eqm FAI đặc tính → Eqm FAI Báo cáo",
+      "labelEn": "Eqms FAI Characteristics → Eqms FAI Reports",
+      "domain": "quality_management -> quality_management",
+      "fromDomain": "quality_management",
+      "toDomain": "quality_management",
+      "sourceColumn": "fai_id",
+      "targetColumn": "fai_id",
+      "lookupEntity": "eqms_fai_reports",
+      "lookupEndpoint": "quality_management.eqms_fai_reports.list",
+      "displayField": "title",
+      "valueField": "fai_id",
       "digitalThread": true,
       "cascadeActions": []
     },
@@ -23312,6 +23872,62 @@
       "cascadeActions": []
     },
     {
+      "id": "rel_eqms_lab_investigations_product_id_items_item_id",
+      "from": {
+        "entity": "eqms_lab_investigations",
+        "field": "product_id"
+      },
+      "to": {
+        "entity": "items",
+        "field": "item_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_lab_investigations_product_id",
+      "nullable": true,
+      "label": "Eqm Lab Investigation → Mã hàng",
+      "labelEn": "Eqms Lab Investigations → Items",
+      "domain": "quality_management -> master_data",
+      "fromDomain": "quality_management",
+      "toDomain": "master_data",
+      "sourceColumn": "product_id",
+      "targetColumn": "item_id",
+      "lookupEntity": "items",
+      "lookupEndpoint": "master_data.items.list",
+      "displayField": "buyer_code",
+      "valueField": "item_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_ncr_records_item_id_items_item_id",
+      "from": {
+        "entity": "eqms_ncr_records",
+        "field": "item_id"
+      },
+      "to": {
+        "entity": "items",
+        "field": "item_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_ncr_records_item_id",
+      "nullable": true,
+      "label": "Eqm NCR hồ sơ → Mã hàng",
+      "labelEn": "Eqms NCR Records → Items",
+      "domain": "quality_management -> master_data",
+      "fromDomain": "quality_management",
+      "toDomain": "master_data",
+      "sourceColumn": "item_id",
+      "targetColumn": "item_id",
+      "lookupEntity": "items",
+      "lookupEndpoint": "master_data.items.list",
+      "displayField": "buyer_code",
+      "valueField": "item_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
       "id": "rel_eqms_publication_event_publication_job_id_eqms_publication_job_publication_job_id",
       "from": {
         "entity": "eqms_publication_event",
@@ -23424,6 +24040,34 @@
       "cascadeActions": []
     },
     {
+      "id": "rel_eqms_quality_agreements_vendor_id_vendors_vendor_id",
+      "from": {
+        "entity": "eqms_quality_agreements",
+        "field": "vendor_id"
+      },
+      "to": {
+        "entity": "vendors",
+        "field": "vendor_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_quality_agreements_vendor_id",
+      "nullable": false,
+      "label": "Eqm Chất lượng Agreement → Nhà cung cấp",
+      "labelEn": "Eqms Quality Agreements → Vendors",
+      "domain": "quality_management -> purchasing",
+      "fromDomain": "quality_management",
+      "toDomain": "purchasing",
+      "sourceColumn": "vendor_id",
+      "targetColumn": "vendor_id",
+      "lookupEntity": "vendors",
+      "lookupEndpoint": "purchasing.vendors.list",
+      "displayField": "vendor_name",
+      "valueField": "vendor_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
       "id": "rel_eqms_retention_lock_created_by_users_user_id",
       "from": {
         "entity": "eqms_retention_lock",
@@ -23452,6 +24096,230 @@
       "cascadeActions": []
     },
     {
+      "id": "rel_eqms_risks_controls_risk_id_eqms_risk_register_risk_id",
+      "from": {
+        "entity": "eqms_risks_controls",
+        "field": "risk_id"
+      },
+      "to": {
+        "entity": "eqms_risk_register",
+        "field": "risk_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_risks_controls_risk_id",
+      "nullable": false,
+      "label": "Eqm Rủi ro Kiểm soát → Eqm Rủi ro Register",
+      "labelEn": "Eqms Risks Controls → Eqms Risk Register",
+      "domain": "quality_management -> quality_management",
+      "fromDomain": "quality_management",
+      "toDomain": "quality_management",
+      "sourceColumn": "risk_id",
+      "targetColumn": "risk_id",
+      "lookupEntity": "eqms_risk_register",
+      "lookupEndpoint": "quality_management.eqms_risk_register.list",
+      "displayField": "risk_title",
+      "valueField": "risk_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_scars_supplier_audit_id_eqms_supplier_audits_supplier_audit_id",
+      "from": {
+        "entity": "eqms_scars",
+        "field": "supplier_audit_id"
+      },
+      "to": {
+        "entity": "eqms_supplier_audits",
+        "field": "supplier_audit_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_scars_supplier_audit_id",
+      "nullable": true,
+      "label": "Eqm Scar → Eqm Nhà cung cấp Đánh giá",
+      "labelEn": "Eqms Scars → Eqms Supplier Audits",
+      "domain": "quality_management -> quality_management",
+      "fromDomain": "quality_management",
+      "toDomain": "quality_management",
+      "sourceColumn": "supplier_audit_id",
+      "targetColumn": "supplier_audit_id",
+      "lookupEntity": "eqms_supplier_audits",
+      "lookupEndpoint": "quality_management.eqms_supplier_audits.list",
+      "displayField": "supplier_audit_number",
+      "valueField": "supplier_audit_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_scars_vendor_id_vendors_vendor_id",
+      "from": {
+        "entity": "eqms_scars",
+        "field": "vendor_id"
+      },
+      "to": {
+        "entity": "vendors",
+        "field": "vendor_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_scars_vendor_id",
+      "nullable": false,
+      "label": "Eqm Scar → Nhà cung cấp",
+      "labelEn": "Eqms Scars → Vendors",
+      "domain": "quality_management -> purchasing",
+      "fromDomain": "quality_management",
+      "toDomain": "purchasing",
+      "sourceColumn": "vendor_id",
+      "targetColumn": "vendor_id",
+      "lookupEntity": "vendors",
+      "lookupEndpoint": "purchasing.vendors.list",
+      "displayField": "vendor_name",
+      "valueField": "vendor_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_supplier_audits_vendor_id_vendors_vendor_id",
+      "from": {
+        "entity": "eqms_supplier_audits",
+        "field": "vendor_id"
+      },
+      "to": {
+        "entity": "vendors",
+        "field": "vendor_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_supplier_audits_vendor_id",
+      "nullable": false,
+      "label": "Eqm Nhà cung cấp Đánh giá → Nhà cung cấp",
+      "labelEn": "Eqms Supplier Audits → Vendors",
+      "domain": "quality_management -> purchasing",
+      "fromDomain": "quality_management",
+      "toDomain": "purchasing",
+      "sourceColumn": "vendor_id",
+      "targetColumn": "vendor_id",
+      "lookupEntity": "vendors",
+      "lookupEndpoint": "purchasing.vendors.list",
+      "displayField": "vendor_name",
+      "valueField": "vendor_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_supplier_profiles_vendor_id_vendors_vendor_id",
+      "from": {
+        "entity": "eqms_supplier_profiles",
+        "field": "vendor_id"
+      },
+      "to": {
+        "entity": "vendors",
+        "field": "vendor_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_supplier_profiles_vendor_id",
+      "nullable": false,
+      "label": "Eqm Nhà cung cấp hồ sơ → Nhà cung cấp",
+      "labelEn": "Eqms Supplier Profiles → Vendors",
+      "domain": "quality_management -> purchasing",
+      "fromDomain": "quality_management",
+      "toDomain": "purchasing",
+      "sourceColumn": "vendor_id",
+      "targetColumn": "vendor_id",
+      "lookupEntity": "vendors",
+      "lookupEndpoint": "purchasing.vendors.list",
+      "displayField": "vendor_name",
+      "valueField": "vendor_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_supplier_qualification_events_supplier_profile_id_eqms_supplier_profiles_supplier_profile_id",
+      "from": {
+        "entity": "eqms_supplier_qualification_events",
+        "field": "supplier_profile_id"
+      },
+      "to": {
+        "entity": "eqms_supplier_profiles",
+        "field": "supplier_profile_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_supplier_qualification_events_supplier_profile_id",
+      "nullable": false,
+      "label": "Eqm Nhà cung cấp Qualification sự kiện → Eqm Nhà cung cấp hồ sơ",
+      "labelEn": "Eqms Supplier Qualification Events → Eqms Supplier Profiles",
+      "domain": "quality_management -> quality_management",
+      "fromDomain": "quality_management",
+      "toDomain": "quality_management",
+      "sourceColumn": "supplier_profile_id",
+      "targetColumn": "supplier_profile_id",
+      "lookupEntity": "eqms_supplier_profiles",
+      "lookupEndpoint": "quality_management.eqms_supplier_profiles.list",
+      "displayField": "approved_categories",
+      "valueField": "supplier_profile_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_supplier_quality_agreements_supplier_id_vendors_vendor_id",
+      "from": {
+        "entity": "eqms_supplier_quality_agreements",
+        "field": "supplier_id"
+      },
+      "to": {
+        "entity": "vendors",
+        "field": "vendor_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_supplier_quality_agreements_supplier_id",
+      "nullable": true,
+      "label": "Eqm Nhà cung cấp Chất lượng Agreement → Nhà cung cấp",
+      "labelEn": "Eqms Supplier Quality Agreements → Vendors",
+      "domain": "quality_management -> purchasing",
+      "fromDomain": "quality_management",
+      "toDomain": "purchasing",
+      "sourceColumn": "supplier_id",
+      "targetColumn": "vendor_id",
+      "lookupEntity": "vendors",
+      "lookupEndpoint": "purchasing.vendors.list",
+      "displayField": "vendor_name",
+      "valueField": "vendor_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_training_matrix_curriculum_id_eqms_training_curricula_curriculum_id",
+      "from": {
+        "entity": "eqms_training_matrix",
+        "field": "curriculum_id"
+      },
+      "to": {
+        "entity": "eqms_training_curricula",
+        "field": "curriculum_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_training_matrix_curriculum_id",
+      "nullable": false,
+      "label": "Eqm Đào tạo ma trận → Eqm Đào tạo Curricula",
+      "labelEn": "Eqms Training Matrix → Eqms Training Curricula",
+      "domain": "quality_management -> quality_management",
+      "fromDomain": "quality_management",
+      "toDomain": "quality_management",
+      "sourceColumn": "curriculum_id",
+      "targetColumn": "curriculum_id",
+      "lookupEntity": "eqms_training_curricula",
+      "lookupEndpoint": "quality_management.eqms_training_curricula.list",
+      "displayField": "curriculum_name",
+      "valueField": "curriculum_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
       "id": "rel_eqms_training_obligation_rollout_id_eqms_controlled_revision_rollout_rollout_id",
       "from": {
         "entity": "eqms_training_obligation",
@@ -23476,6 +24344,146 @@
       "lookupEndpoint": "quality_management.eqms_controlled_revision_rollout.list",
       "displayField": "org_company_code",
       "valueField": "rollout_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_training_records_curriculum_id_eqms_training_curricula_curriculum_id",
+      "from": {
+        "entity": "eqms_training_records",
+        "field": "curriculum_id"
+      },
+      "to": {
+        "entity": "eqms_training_curricula",
+        "field": "curriculum_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_training_records_curriculum_id",
+      "nullable": true,
+      "label": "Eqm Đào tạo hồ sơ → Eqm Đào tạo Curricula",
+      "labelEn": "Eqms Training Records → Eqms Training Curricula",
+      "domain": "quality_management -> quality_management",
+      "fromDomain": "quality_management",
+      "toDomain": "quality_management",
+      "sourceColumn": "curriculum_id",
+      "targetColumn": "curriculum_id",
+      "lookupEntity": "eqms_training_curricula",
+      "lookupEndpoint": "quality_management.eqms_training_curricula.list",
+      "displayField": "curriculum_name",
+      "valueField": "curriculum_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_training_records_document_id_eqms_documents_doc_id",
+      "from": {
+        "entity": "eqms_training_records",
+        "field": "document_id"
+      },
+      "to": {
+        "entity": "eqms_documents",
+        "field": "doc_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_training_records_document_id",
+      "nullable": true,
+      "label": "Eqm Đào tạo hồ sơ → Eqm Tài liệu",
+      "labelEn": "Eqms Training Records → Eqms Documents",
+      "domain": "quality_management -> quality_management",
+      "fromDomain": "quality_management",
+      "toDomain": "quality_management",
+      "sourceColumn": "document_id",
+      "targetColumn": "doc_id",
+      "lookupEntity": "eqms_documents",
+      "lookupEndpoint": "quality_management.eqms_documents.list",
+      "displayField": "title",
+      "valueField": "doc_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_validation_executions_protocol_id_eqms_validation_protocols_protocol_id",
+      "from": {
+        "entity": "eqms_validation_executions",
+        "field": "protocol_id"
+      },
+      "to": {
+        "entity": "eqms_validation_protocols",
+        "field": "protocol_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_validation_executions_protocol_id",
+      "nullable": false,
+      "label": "Eqm Kiểm tra tính hợp lệ Thực thi → Eqm Kiểm tra tính hợp lệ Protocol",
+      "labelEn": "Eqms Validation Executions → Eqms Validation Protocols",
+      "domain": "quality_management -> quality_management",
+      "fromDomain": "quality_management",
+      "toDomain": "quality_management",
+      "sourceColumn": "protocol_id",
+      "targetColumn": "protocol_id",
+      "lookupEntity": "eqms_validation_protocols",
+      "lookupEndpoint": "quality_management.eqms_validation_protocols.list",
+      "displayField": "protocol_number",
+      "valueField": "protocol_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_validation_protocols_project_id_eqms_validation_projects_project_id",
+      "from": {
+        "entity": "eqms_validation_protocols",
+        "field": "project_id"
+      },
+      "to": {
+        "entity": "eqms_validation_projects",
+        "field": "project_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_validation_protocols_project_id",
+      "nullable": false,
+      "label": "Eqm Kiểm tra tính hợp lệ Protocol → Eqm Kiểm tra tính hợp lệ dự án",
+      "labelEn": "Eqms Validation Protocols → Eqms Validation Projects",
+      "domain": "quality_management -> quality_management",
+      "fromDomain": "quality_management",
+      "toDomain": "quality_management",
+      "sourceColumn": "project_id",
+      "targetColumn": "project_id",
+      "lookupEntity": "eqms_validation_projects",
+      "lookupEndpoint": "quality_management.eqms_validation_projects.list",
+      "displayField": "project_name",
+      "valueField": "project_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_eqms_validation_requirements_project_id_eqms_validation_projects_project_id",
+      "from": {
+        "entity": "eqms_validation_requirements",
+        "field": "project_id"
+      },
+      "to": {
+        "entity": "eqms_validation_projects",
+        "field": "project_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_eqms_validation_requirements_project_id",
+      "nullable": false,
+      "label": "Eqm Kiểm tra tính hợp lệ yêu cầu → Eqm Kiểm tra tính hợp lệ dự án",
+      "labelEn": "Eqms Validation Requirements → Eqms Validation Projects",
+      "domain": "quality_management -> quality_management",
+      "fromDomain": "quality_management",
+      "toDomain": "quality_management",
+      "sourceColumn": "project_id",
+      "targetColumn": "project_id",
+      "lookupEntity": "eqms_validation_projects",
+      "lookupEndpoint": "quality_management.eqms_validation_projects.list",
+      "displayField": "project_name",
+      "valueField": "project_id",
       "digitalThread": true,
       "cascadeActions": []
     },
@@ -31858,6 +32866,370 @@
       "cascadeActions": []
     },
     {
+      "id": "rel_graphics_contrast_check_rollout_id_graphics_rollout_scope_rollout_id",
+      "from": {
+        "entity": "graphics_contrast_check",
+        "field": "rollout_id"
+      },
+      "to": {
+        "entity": "graphics_rollout_scope",
+        "field": "rollout_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_graphics_contrast_check_rollout_id",
+      "nullable": true,
+      "label": "Graphic Contrast kiểm tra → Graphic Rollout phạm vi",
+      "labelEn": "Graphics Contrast Check → Graphics Rollout Scope",
+      "domain": "system_infrastructure -> system_infrastructure",
+      "fromDomain": "system_infrastructure",
+      "toDomain": "system_infrastructure",
+      "sourceColumn": "rollout_id",
+      "targetColumn": "rollout_id",
+      "lookupEntity": "graphics_rollout_scope",
+      "lookupEndpoint": "system_infrastructure.graphics_rollout_scope.list",
+      "displayField": "applied_at",
+      "valueField": "rollout_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_graphics_contrast_check_simulation_run_id_graphics_simulation_run_run_id",
+      "from": {
+        "entity": "graphics_contrast_check",
+        "field": "simulation_run_id"
+      },
+      "to": {
+        "entity": "graphics_simulation_run",
+        "field": "run_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_graphics_contrast_check_simulation_run_id",
+      "nullable": true,
+      "label": "Graphic Contrast kiểm tra → Graphic Simulation lần chạy",
+      "labelEn": "Graphics Contrast Check → Graphics Simulation Run",
+      "domain": "system_infrastructure -> system_infrastructure",
+      "fromDomain": "system_infrastructure",
+      "toDomain": "system_infrastructure",
+      "sourceColumn": "simulation_run_id",
+      "targetColumn": "run_id",
+      "lookupEntity": "graphics_simulation_run",
+      "lookupEndpoint": "system_infrastructure.graphics_simulation_run.list",
+      "displayField": "color_mode",
+      "valueField": "run_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_graphics_contrast_check_text_token_key_graphics_token_catalog_token_key",
+      "from": {
+        "entity": "graphics_contrast_check",
+        "field": "text_token_key"
+      },
+      "to": {
+        "entity": "graphics_token_catalog",
+        "field": "token_key"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_graphics_contrast_check_text_token_key",
+      "nullable": false,
+      "label": "Graphic Contrast kiểm tra → Graphic Token danh mục",
+      "labelEn": "Graphics Contrast Check → Graphics Token Catalog",
+      "domain": "system_infrastructure -> system_infrastructure",
+      "fromDomain": "system_infrastructure",
+      "toDomain": "system_infrastructure",
+      "sourceColumn": "text_token_key",
+      "targetColumn": "token_key",
+      "lookupEntity": "graphics_token_catalog",
+      "lookupEndpoint": "system_infrastructure.graphics_token_catalog.list",
+      "displayField": "alias_of",
+      "valueField": "token_key",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_graphics_contrast_check_bg_token_key_graphics_token_catalog_token_key",
+      "from": {
+        "entity": "graphics_contrast_check",
+        "field": "bg_token_key"
+      },
+      "to": {
+        "entity": "graphics_token_catalog",
+        "field": "token_key"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_graphics_contrast_check_bg_token_key",
+      "nullable": false,
+      "label": "Graphic Contrast kiểm tra → Graphic Token danh mục",
+      "labelEn": "Graphics Contrast Check → Graphics Token Catalog",
+      "domain": "system_infrastructure -> system_infrastructure",
+      "fromDomain": "system_infrastructure",
+      "toDomain": "system_infrastructure",
+      "sourceColumn": "bg_token_key",
+      "targetColumn": "token_key",
+      "lookupEntity": "graphics_token_catalog",
+      "lookupEndpoint": "system_infrastructure.graphics_token_catalog.list",
+      "displayField": "alias_of",
+      "valueField": "token_key",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_graphics_module_binding_token_key_graphics_token_catalog_token_key",
+      "from": {
+        "entity": "graphics_module_binding",
+        "field": "token_key"
+      },
+      "to": {
+        "entity": "graphics_token_catalog",
+        "field": "token_key"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_graphics_module_binding_token_key",
+      "nullable": false,
+      "label": "Graphic Module Binding → Graphic Token danh mục",
+      "labelEn": "Graphics Module Binding → Graphics Token Catalog",
+      "domain": "system_infrastructure -> system_infrastructure",
+      "fromDomain": "system_infrastructure",
+      "toDomain": "system_infrastructure",
+      "sourceColumn": "token_key",
+      "targetColumn": "token_key",
+      "lookupEntity": "graphics_token_catalog",
+      "lookupEndpoint": "system_infrastructure.graphics_token_catalog.list",
+      "displayField": "alias_of",
+      "valueField": "token_key",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_graphics_qa_gate_result_rollout_id_graphics_rollout_scope_rollout_id",
+      "from": {
+        "entity": "graphics_qa_gate_result",
+        "field": "rollout_id"
+      },
+      "to": {
+        "entity": "graphics_rollout_scope",
+        "field": "rollout_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_graphics_qa_gate_result_rollout_id",
+      "nullable": true,
+      "label": "Graphic Qa cổng kết quả → Graphic Rollout phạm vi",
+      "labelEn": "Graphics Qa Gate Result → Graphics Rollout Scope",
+      "domain": "system_infrastructure -> system_infrastructure",
+      "fromDomain": "system_infrastructure",
+      "toDomain": "system_infrastructure",
+      "sourceColumn": "rollout_id",
+      "targetColumn": "rollout_id",
+      "lookupEntity": "graphics_rollout_scope",
+      "lookupEndpoint": "system_infrastructure.graphics_rollout_scope.list",
+      "displayField": "applied_at",
+      "valueField": "rollout_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_graphics_qa_gate_result_simulation_run_id_graphics_simulation_run_run_id",
+      "from": {
+        "entity": "graphics_qa_gate_result",
+        "field": "simulation_run_id"
+      },
+      "to": {
+        "entity": "graphics_simulation_run",
+        "field": "run_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_graphics_qa_gate_result_simulation_run_id",
+      "nullable": true,
+      "label": "Graphic Qa cổng kết quả → Graphic Simulation lần chạy",
+      "labelEn": "Graphics Qa Gate Result → Graphics Simulation Run",
+      "domain": "system_infrastructure -> system_infrastructure",
+      "fromDomain": "system_infrastructure",
+      "toDomain": "system_infrastructure",
+      "sourceColumn": "simulation_run_id",
+      "targetColumn": "run_id",
+      "lookupEntity": "graphics_simulation_run",
+      "lookupEndpoint": "system_infrastructure.graphics_simulation_run.list",
+      "displayField": "color_mode",
+      "valueField": "run_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_graphics_rollout_scope_simulation_run_id_graphics_simulation_run_run_id",
+      "from": {
+        "entity": "graphics_rollout_scope",
+        "field": "simulation_run_id"
+      },
+      "to": {
+        "entity": "graphics_simulation_run",
+        "field": "run_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_graphics_rollout_scope_simulation_run_id",
+      "nullable": true,
+      "label": "Graphic Rollout phạm vi → Graphic Simulation lần chạy",
+      "labelEn": "Graphics Rollout Scope → Graphics Simulation Run",
+      "domain": "system_infrastructure -> system_infrastructure",
+      "fromDomain": "system_infrastructure",
+      "toDomain": "system_infrastructure",
+      "sourceColumn": "simulation_run_id",
+      "targetColumn": "run_id",
+      "lookupEntity": "graphics_simulation_run",
+      "lookupEndpoint": "system_infrastructure.graphics_simulation_run.list",
+      "displayField": "color_mode",
+      "valueField": "run_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_graphics_token_value_token_key_graphics_token_catalog_token_key",
+      "from": {
+        "entity": "graphics_token_value",
+        "field": "token_key"
+      },
+      "to": {
+        "entity": "graphics_token_catalog",
+        "field": "token_key"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_graphics_token_value_token_key",
+      "nullable": false,
+      "label": "Graphic Token Giá trị → Graphic Token danh mục",
+      "labelEn": "Graphics Token Value → Graphics Token Catalog",
+      "domain": "system_infrastructure -> system_infrastructure",
+      "fromDomain": "system_infrastructure",
+      "toDomain": "system_infrastructure",
+      "sourceColumn": "token_key",
+      "targetColumn": "token_key",
+      "lookupEntity": "graphics_token_catalog",
+      "lookupEndpoint": "system_infrastructure.graphics_token_catalog.list",
+      "displayField": "alias_of",
+      "valueField": "token_key",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_graphics_token_version_token_key_graphics_token_catalog_token_key",
+      "from": {
+        "entity": "graphics_token_version",
+        "field": "token_key"
+      },
+      "to": {
+        "entity": "graphics_token_catalog",
+        "field": "token_key"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_graphics_token_version_token_key",
+      "nullable": false,
+      "label": "Graphic Token phiên bản → Graphic Token danh mục",
+      "labelEn": "Graphics Token Version → Graphics Token Catalog",
+      "domain": "system_infrastructure -> system_infrastructure",
+      "fromDomain": "system_infrastructure",
+      "toDomain": "system_infrastructure",
+      "sourceColumn": "token_key",
+      "targetColumn": "token_key",
+      "lookupEntity": "graphics_token_catalog",
+      "lookupEndpoint": "system_infrastructure.graphics_token_catalog.list",
+      "displayField": "alias_of",
+      "valueField": "token_key",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_graphics_token_version_rollout_id_graphics_rollout_scope_rollout_id",
+      "from": {
+        "entity": "graphics_token_version",
+        "field": "rollout_id"
+      },
+      "to": {
+        "entity": "graphics_rollout_scope",
+        "field": "rollout_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_graphics_token_version_rollout_id",
+      "nullable": true,
+      "label": "Graphic Token phiên bản → Graphic Rollout phạm vi",
+      "labelEn": "Graphics Token Version → Graphics Rollout Scope",
+      "domain": "system_infrastructure -> system_infrastructure",
+      "fromDomain": "system_infrastructure",
+      "toDomain": "system_infrastructure",
+      "sourceColumn": "rollout_id",
+      "targetColumn": "rollout_id",
+      "lookupEntity": "graphics_rollout_scope",
+      "lookupEndpoint": "system_infrastructure.graphics_rollout_scope.list",
+      "displayField": "applied_at",
+      "valueField": "rollout_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_graphics_wcag_check_rollout_id_graphics_rollout_scope_rollout_id",
+      "from": {
+        "entity": "graphics_wcag_check",
+        "field": "rollout_id"
+      },
+      "to": {
+        "entity": "graphics_rollout_scope",
+        "field": "rollout_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_graphics_wcag_check_rollout_id",
+      "nullable": true,
+      "label": "Graphic Wcag kiểm tra → Graphic Rollout phạm vi",
+      "labelEn": "Graphics Wcag Check → Graphics Rollout Scope",
+      "domain": "system_infrastructure -> system_infrastructure",
+      "fromDomain": "system_infrastructure",
+      "toDomain": "system_infrastructure",
+      "sourceColumn": "rollout_id",
+      "targetColumn": "rollout_id",
+      "lookupEntity": "graphics_rollout_scope",
+      "lookupEndpoint": "system_infrastructure.graphics_rollout_scope.list",
+      "displayField": "applied_at",
+      "valueField": "rollout_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_graphics_wcag_check_simulation_run_id_graphics_simulation_run_run_id",
+      "from": {
+        "entity": "graphics_wcag_check",
+        "field": "simulation_run_id"
+      },
+      "to": {
+        "entity": "graphics_simulation_run",
+        "field": "run_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_graphics_wcag_check_simulation_run_id",
+      "nullable": true,
+      "label": "Graphic Wcag kiểm tra → Graphic Simulation lần chạy",
+      "labelEn": "Graphics Wcag Check → Graphics Simulation Run",
+      "domain": "system_infrastructure -> system_infrastructure",
+      "fromDomain": "system_infrastructure",
+      "toDomain": "system_infrastructure",
+      "sourceColumn": "simulation_run_id",
+      "targetColumn": "run_id",
+      "lookupEntity": "graphics_simulation_run",
+      "lookupEndpoint": "system_infrastructure.graphics_simulation_run.list",
+      "displayField": "color_mode",
+      "valueField": "run_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
       "id": "rel_hcm_attendance_records_employee_id_hcm_employees_employee_id",
       "from": {
         "entity": "hcm_attendance_records",
@@ -35212,7 +36584,7 @@
       "targetColumn": "inspection_lot_id",
       "lookupEntity": "inspection_lot",
       "lookupEndpoint": "quality_management.inspection_lot.list",
-      "displayField": "org_company_code",
+      "displayField": "operation_code",
       "valueField": "inspection_lot_id",
       "digitalThread": true,
       "cascadeActions": []

@@ -46,6 +46,12 @@ const viTokens = {
 };
 
 function readJson(filePath) { return JSON.parse(fs.readFileSync(filePath, 'utf8')); }
+function readFirstJson(paths) {
+  for (const filePath of paths) {
+    if (fs.existsSync(filePath)) return readJson(filePath);
+  }
+  throw new Error(`Missing required JSON input. Tried: ${paths.join(', ')}`);
+}
 function writeJson(filePath, value) { fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8'); }
 function toSnakeCase(value) { return String(value ?? '').replace(/([a-z0-9])([A-Z])/g, '$1_$2').replace(/[.\-\s/]+/g, '_').replace(/__+/g, '_').replace(/^_+|_+$/g, '').toLowerCase(); }
 function loadWave1LifecycleNormalization() {
@@ -162,7 +168,10 @@ const context = {
   statusOptions: readJson(path.join(registryDir, 'status-options.json')),
   endpointCatalog: readJson(path.join(registryDir, 'endpoint-catalog.json')).endpoints,
   wave1LifecycleNormalization: loadWave1LifecycleNormalization(),
-  baselineColumns: readJson(path.join(docsDir, 'table_columns.json')),
+  baselineColumns: readFirstJson([
+    path.join(registryDir, 'table-columns.json'),
+    path.join(docsDir, 'table_columns.json'),
+  ]),
   parsed: parseMigrations(),
 };
 

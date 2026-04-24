@@ -1,8 +1,8 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-15T10:51:21.194Z",
-    "description": "Resolution plan for 0 orphan registry fields and 462 orphan DB column names."
+    "generatedAt": "2026-04-24T08:03:59.417Z",
+    "description": "Resolution plan for 0 orphan registry fields and 609 orphan DB column names."
   },
   "orphan_fields": {
     "computed": {
@@ -39,8 +39,21 @@
   "orphan_columns": {
     "needs_field_def": {
       "description": "Columns thực tế nhưng chưa có field definition trong registry.",
-      "count": 372,
+      "count": 509,
       "columns": [
+        {
+          "column": "username",
+          "tables": [
+            "users"
+          ],
+          "suggestedLabel": "Tên đăng nhập",
+          "suggestedLabelEn": "Username",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(50)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
         {
           "column": "item_class",
           "tables": [
@@ -129,6 +142,19 @@
           "suggestedType": "string",
           "dbTypes": [
             "VARCHAR(100)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "hs_tariff_code",
+          "tables": [
+            "items"
+          ],
+          "suggestedLabel": "Mã Hs Tariff",
+          "suggestedLabelEn": "Hs Tariff Code",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(20)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -354,6 +380,19 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "work_center_name_vi",
+          "tables": [
+            "work_centers"
+          ],
+          "suggestedLabel": "Trung tâm tên Vi công việc",
+          "suggestedLabelEn": "Work Center Name Vi",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(150)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "work_center_type",
           "tables": [
             "work_centers"
@@ -393,6 +432,58 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "queue_time_default",
+          "tables": [
+            "work_centers"
+          ],
+          "suggestedLabel": "Hàng đợi thời gian Default",
+          "suggestedLabelEn": "Queue Time Default",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "NUMERIC(8,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "setup_time_std",
+          "tables": [
+            "routing_operations"
+          ],
+          "suggestedLabel": "Thiết lập thời gian Std",
+          "suggestedLabelEn": "Setup Time Std",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "NUMERIC(8,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "run_time_std",
+          "tables": [
+            "routing_operations"
+          ],
+          "suggestedLabel": "Lần chạy thời gian Std",
+          "suggestedLabelEn": "Run Time Std",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "NUMERIC(8,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "run_time_per_unit",
+          "tables": [
+            "routing_operations"
+          ],
+          "suggestedLabel": "Lần chạy thời gian Per Đơn vị",
+          "suggestedLabelEn": "Run Time Per Unit",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "NUMERIC(10,4)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "overhead_rate",
           "tables": [
             "routing_operations"
@@ -406,6 +497,32 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "queue_time_hours",
+          "tables": [
+            "routing_operations"
+          ],
+          "suggestedLabel": "Hàng đợi thời gian giờ",
+          "suggestedLabelEn": "Queue Time Hours",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "NUMERIC(8,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "wait_time_hours",
+          "tables": [
+            "routing_operations"
+          ],
+          "suggestedLabel": "Wait thời gian giờ",
+          "suggestedLabelEn": "Wait Time Hours",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "NUMERIC(8,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "overlap_pct",
           "tables": [
             "routing_operations"
@@ -415,6 +532,19 @@
           "suggestedType": "percentage",
           "dbTypes": [
             "NUMERIC(5,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "overlap_qty",
+          "tables": [
+            "routing_operations"
+          ],
+          "suggestedLabel": "Số lượng Overlap",
+          "suggestedLabelEn": "Overlap Qty",
+          "suggestedType": "number",
+          "dbTypes": [
+            "NUMERIC(10,2)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -520,6 +650,19 @@
           "suggestedType": "string",
           "dbTypes": [
             "VARCHAR(100)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "industry_code",
+          "tables": [
+            "customers"
+          ],
+          "suggestedLabel": "Mã ngành",
+          "suggestedLabelEn": "Industry Code",
+          "suggestedType": "string",
+          "dbTypes": [
+            "INDUSTRY_CODE_ENUM"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -793,6 +936,19 @@
           "suggestedType": "textarea",
           "dbTypes": [
             "INT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "vendor_name_vi",
+          "tables": [
+            "vendors"
+          ],
+          "suggestedLabel": "Nhà cung cấp tên Vi",
+          "suggestedLabelEn": "Vendor Name Vi",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(200)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -1109,6 +1265,32 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "lot_number_assigned",
+          "tables": [
+            "job_orders"
+          ],
+          "suggestedLabel": "Lô Số Được giao",
+          "suggestedLabelEn": "Lot Number Assigned",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(100)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "serial_number_range",
+          "tables": [
+            "job_orders"
+          ],
+          "suggestedLabel": "Số sê-ri Số Range",
+          "suggestedLabelEn": "Serial Number Range",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(100)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "routing_revision_used",
           "tables": [
             "job_orders"
@@ -1330,6 +1512,19 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "traceability_profile_code",
+          "tables": [
+            "job_orders"
+          ],
+          "suggestedLabel": "Mã Truy xuất nguồn gốc hồ sơ",
+          "suggestedLabelEn": "Traceability Profile Code",
+          "suggestedType": "file",
+          "dbTypes": [
+            "VARCHAR(50)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "yield_percent",
           "tables": [
             "job_orders"
@@ -1352,6 +1547,89 @@
           "suggestedType": "datetime",
           "dbTypes": [
             "NUMERIC(8,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "setup_time_actual",
+          "tables": [
+            "job_operations",
+            "mes_operation_execution"
+          ],
+          "suggestedLabel": "Thiết lập thời gian thực tế",
+          "suggestedLabelEn": "Setup Time Actual",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "NUMERIC(10,2)",
+            "NUMERIC(8,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "run_time_planned",
+          "tables": [
+            "job_operations"
+          ],
+          "suggestedLabel": "Lần chạy thời gian Kế hoạch",
+          "suggestedLabelEn": "Run Time Planned",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "NUMERIC(8,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "run_time_actual",
+          "tables": [
+            "job_operations",
+            "mes_operation_execution"
+          ],
+          "suggestedLabel": "Lần chạy thời gian thực tế",
+          "suggestedLabelEn": "Run Time Actual",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "NUMERIC(10,2)",
+            "NUMERIC(8,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "qty_completed",
+          "tables": [
+            "job_operations",
+            "mes_machine_snapshot"
+          ],
+          "suggestedLabel": "Số lượng hoàn thành",
+          "suggestedLabelEn": "Completed Quantity",
+          "suggestedType": "number",
+          "dbTypes": [
+            "NUMERIC(12,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "qty_scrapped",
+          "tables": [
+            "job_operations"
+          ],
+          "suggestedLabel": "Số lượng phế phẩm",
+          "suggestedLabelEn": "Scrapped Quantity",
+          "suggestedType": "number",
+          "dbTypes": [
+            "NUMERIC(12,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "qty_reworked",
+          "tables": [
+            "job_operations"
+          ],
+          "suggestedLabel": "Số lượng Reworked",
+          "suggestedLabelEn": "Qty Reworked",
+          "suggestedType": "number",
+          "dbTypes": [
+            "NUMERIC(12,2)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -1457,6 +1735,20 @@
           "suggestedType": "select",
           "dbTypes": [
             "VARCHAR(30)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "qty_good",
+          "tables": [
+            "labor_transactions",
+            "mes_operation_execution"
+          ],
+          "suggestedLabel": "Số lượng Good",
+          "suggestedLabelEn": "Qty Good",
+          "suggestedType": "number",
+          "dbTypes": [
+            "NUMERIC(12,2)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -1606,6 +1898,19 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "sequence_number",
+          "tables": [
+            "production_schedule"
+          ],
+          "suggestedLabel": "Số thứ tự",
+          "suggestedLabelEn": "Sequence Number",
+          "suggestedType": "number",
+          "dbTypes": [
+            "INT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "priority_rank",
           "tables": [
             "production_schedule"
@@ -1615,6 +1920,19 @@
           "suggestedType": "select",
           "dbTypes": [
             "INT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "schedule_qty",
+          "tables": [
+            "production_schedule"
+          ],
+          "suggestedLabel": "Số lượng lịch",
+          "suggestedLabelEn": "Schedule Qty",
+          "suggestedType": "number",
+          "dbTypes": [
+            "NUMERIC(12,2)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -1632,6 +1950,19 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "overtime_available",
+          "tables": [
+            "production_schedule"
+          ],
+          "suggestedLabel": "Overtime Khả dụng",
+          "suggestedLabelEn": "Overtime Available",
+          "suggestedType": "number",
+          "dbTypes": [
+            "NUMERIC(8,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "reschedule_recommendation",
           "tables": [
             "production_schedule"
@@ -1641,6 +1972,19 @@
           "suggestedType": "string",
           "dbTypes": [
             "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "reschedule_date",
+          "tables": [
+            "production_schedule"
+          ],
+          "suggestedLabel": "Ngày Reschedule",
+          "suggestedLabelEn": "Reschedule Date",
+          "suggestedType": "date",
+          "dbTypes": [
+            "DATE"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -1680,6 +2024,32 @@
           "suggestedType": "string",
           "dbTypes": [
             "VARCHAR(50)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "subgroup_number",
+          "tables": [
+            "spc_data"
+          ],
+          "suggestedLabel": "Số Subgroup",
+          "suggestedLabelEn": "Subgroup Number",
+          "suggestedType": "number",
+          "dbTypes": [
+            "INT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "sample_value",
+          "tables": [
+            "spc_data"
+          ],
+          "suggestedLabel": "Mẫu Giá trị",
+          "suggestedLabelEn": "Sample Value",
+          "suggestedType": "currency",
+          "dbTypes": [
+            "NUMERIC(14,6)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -1739,13 +2109,41 @@
         {
           "column": "quantity_affected",
           "tables": [
+            "eqms_concession_records",
             "ncr_records"
           ],
           "suggestedLabel": "Số lượng bị ảnh hưởng",
           "suggestedLabelEn": "Quantity Affected",
           "suggestedType": "number",
           "dbTypes": [
-            "NUMERIC(12,2)"
+            "NUMERIC(12,2)",
+            "NUMERIC(14,4)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "ppap_submission_date",
+          "tables": [
+            "npi_projects"
+          ],
+          "suggestedLabel": "Ngày PPAP bản nộp",
+          "suggestedLabelEn": "PPAP Submission Date",
+          "suggestedType": "date",
+          "dbTypes": [
+            "DATE"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "run_at_rate_date",
+          "tables": [
+            "npi_projects"
+          ],
+          "suggestedLabel": "Ngày lần chạy lúc Tỷ lệ",
+          "suggestedLabelEn": "Run At Rate Date",
+          "suggestedType": "date",
+          "dbTypes": [
+            "DATE"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -1759,6 +2157,32 @@
           "suggestedType": "select",
           "dbTypes": [
             "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "prototype_qty",
+          "tables": [
+            "npi_projects"
+          ],
+          "suggestedLabel": "Số lượng Prototype",
+          "suggestedLabelEn": "Prototype Qty",
+          "suggestedType": "select",
+          "dbTypes": [
+            "INT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "pilot_lot_number",
+          "tables": [
+            "npi_projects"
+          ],
+          "suggestedLabel": "Số Pilot Lô",
+          "suggestedLabelEn": "Pilot Lot Number",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(100)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -1811,6 +2235,32 @@
           "suggestedType": "string",
           "dbTypes": [
             "PM_FREQUENCY_ENUM"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "pm_last_date",
+          "tables": [
+            "equipment"
+          ],
+          "suggestedLabel": "Ngày PM Last",
+          "suggestedLabelEn": "PM Last Date",
+          "suggestedType": "date",
+          "dbTypes": [
+            "DATE"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "pm_next_date",
+          "tables": [
+            "equipment"
+          ],
+          "suggestedLabel": "Ngày PM Next",
+          "suggestedLabelEn": "PM Next Date",
+          "suggestedType": "date",
+          "dbTypes": [
+            "DATE"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -2028,6 +2478,32 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "remedy_code",
+          "tables": [
+            "maintenance_work_orders"
+          ],
+          "suggestedLabel": "Mã Remedy",
+          "suggestedLabelEn": "Remedy Code",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(50)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "parts_cost",
+          "tables": [
+            "maintenance_work_orders"
+          ],
+          "suggestedLabel": "Phụ tùng Chi phí",
+          "suggestedLabelEn": "Parts Cost",
+          "suggestedType": "currency",
+          "dbTypes": [
+            "NUMERIC(12,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "vibration_level",
           "tables": [
             "maintenance_work_orders"
@@ -2054,6 +2530,19 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "spare_part_qty",
+          "tables": [
+            "maintenance_work_orders"
+          ],
+          "suggestedLabel": "Số lượng dự phòng phụ tùng",
+          "suggestedLabelEn": "Spare Part Qty",
+          "suggestedType": "number",
+          "dbTypes": [
+            "INT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "pm_trigger_type",
           "tables": [
             "maintenance_work_orders"
@@ -2063,6 +2552,19 @@
           "suggestedType": "select",
           "dbTypes": [
             "VARCHAR(30)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "pm_trigger_value",
+          "tables": [
+            "maintenance_work_orders"
+          ],
+          "suggestedLabel": "PM Trigger Giá trị",
+          "suggestedLabelEn": "PM Trigger Value",
+          "suggestedType": "currency",
+          "dbTypes": [
+            "NUMERIC(10,2)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -2314,12 +2816,51 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "tool_cost",
+          "tables": [
+            "tools"
+          ],
+          "suggestedLabel": "Dao cụ Chi phí",
+          "suggestedLabelEn": "Tool Cost",
+          "suggestedType": "currency",
+          "dbTypes": [
+            "NUMERIC(12,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "tool_reorder_point",
           "tables": [
             "tools"
           ],
           "suggestedLabel": "Dao cụ Reorder Point",
           "suggestedLabelEn": "Tool Reorder Point",
+          "suggestedType": "number",
+          "dbTypes": [
+            "INT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "tool_reorder_qty",
+          "tables": [
+            "tools"
+          ],
+          "suggestedLabel": "Số lượng Dao cụ Reorder",
+          "suggestedLabelEn": "Tool Reorder Qty",
+          "suggestedType": "number",
+          "dbTypes": [
+            "INT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "tool_on_hand_qty",
+          "tables": [
+            "tools"
+          ],
+          "suggestedLabel": "Số lượng Dao cụ On Hand",
+          "suggestedLabelEn": "Tool On Hand Qty",
           "suggestedType": "number",
           "dbTypes": [
             "INT"
@@ -2614,6 +3155,19 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "reference_number",
+          "tables": [
+            "gl_transactions"
+          ],
+          "suggestedLabel": "Số tham chiếu",
+          "suggestedLabelEn": "Reference Number",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(100)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "so_reference",
           "tables": [
             "ap_ar_invoices"
@@ -2640,6 +3194,32 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "shipment_code",
+          "tables": [
+            "shipments"
+          ],
+          "suggestedLabel": "Mã lô giao",
+          "suggestedLabelEn": "Shipment Code",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(50)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "waybill_number",
+          "tables": [
+            "shipments"
+          ],
+          "suggestedLabel": "Số Waybill",
+          "suggestedLabelEn": "Waybill Number",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(100)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "ship_to_address",
           "tables": [
             "shipments"
@@ -2649,6 +3229,19 @@
           "suggestedType": "string",
           "dbTypes": [
             "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "packing_list_number",
+          "tables": [
+            "shipments"
+          ],
+          "suggestedLabel": "Số đóng gói Danh sách",
+          "suggestedLabelEn": "Packing List Number",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(100)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -2797,6 +3390,19 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "planned_order_code",
+          "tables": [
+            "mrp_planned_orders"
+          ],
+          "suggestedLabel": "Mã Kế hoạch đơn hàng",
+          "suggestedLabelEn": "Planned Order Code",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(50)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "planned_order_type",
           "tables": [
             "mrp_planned_orders"
@@ -2858,6 +3464,19 @@
           "suggestedType": "number",
           "dbTypes": [
             "NUMERIC(12,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "purchasing_lead_time",
+          "tables": [
+            "mrp_planned_orders"
+          ],
+          "suggestedLabel": "Mua hàng khách hàng tiềm năng thời gian",
+          "suggestedLabelEn": "Purchasing Lead Time",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "INT"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -3005,19 +3624,6 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
-          "column": "oee_mtd",
-          "tables": [
-            "mes_equipment_extended"
-          ],
-          "suggestedLabel": "OEE Mtd",
-          "suggestedLabelEn": "OEE Mtd",
-          "suggestedType": "number",
-          "dbTypes": [
-            "NUMERIC(5,2)"
-          ],
-          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
-        },
-        {
           "column": "spindle_speed_rpm",
           "tables": [
             "mes_machine_telemetry"
@@ -3110,6 +3716,19 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "tool_number",
+          "tables": [
+            "mes_machine_telemetry"
+          ],
+          "suggestedLabel": "Số Dao cụ",
+          "suggestedLabelEn": "Tool Number",
+          "suggestedType": "number",
+          "dbTypes": [
+            "INT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "parts_count_shift",
           "tables": [
             "mes_machine_telemetry"
@@ -3136,12 +3755,103 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "related_job_number",
+          "tables": [
+            "mes_machine_alarms"
+          ],
+          "suggestedLabel": "Số Related Lệnh",
+          "suggestedLabelEn": "Related Job Number",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(50)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "total_good_qty",
+          "tables": [
+            "mes_job_execution"
+          ],
+          "suggestedLabel": "Số lượng Tổng Good",
+          "suggestedLabelEn": "Total Good Qty",
+          "suggestedType": "number",
+          "dbTypes": [
+            "NUMERIC(12,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "total_scrap_qty",
+          "tables": [
+            "mes_job_execution"
+          ],
+          "suggestedLabel": "Số lượng Tổng Phế phẩm",
+          "suggestedLabelEn": "Total Scrap Qty",
+          "suggestedType": "number",
+          "dbTypes": [
+            "NUMERIC(12,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "total_rework_qty",
+          "tables": [
+            "mes_job_execution"
+          ],
+          "suggestedLabel": "Số lượng Tổng Rework",
+          "suggestedLabelEn": "Total Rework Qty",
+          "suggestedType": "number",
+          "dbTypes": [
+            "NUMERIC(12,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "total_setup_time_sec",
           "tables": [
             "mes_job_execution"
           ],
           "suggestedLabel": "Tổng thiết lập thời gian Sec",
           "suggestedLabelEn": "Total Setup Time Sec",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "NUMERIC(12,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "total_run_time_sec",
+          "tables": [
+            "mes_job_execution"
+          ],
+          "suggestedLabel": "Tổng lần chạy thời gian Sec",
+          "suggestedLabelEn": "Total Run Time Sec",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "NUMERIC(12,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "total_idle_time_sec",
+          "tables": [
+            "mes_job_execution"
+          ],
+          "suggestedLabel": "Tổng Idle thời gian Sec",
+          "suggestedLabelEn": "Total Idle Time Sec",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "NUMERIC(12,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "total_down_time_sec",
+          "tables": [
+            "mes_job_execution"
+          ],
+          "suggestedLabel": "Tổng Down thời gian Sec",
+          "suggestedLabelEn": "Total Down Time Sec",
           "suggestedType": "datetime",
           "dbTypes": [
             "NUMERIC(12,2)"
@@ -3266,6 +3976,32 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "scrap_reason_codes",
+          "tables": [
+            "mes_operation_execution"
+          ],
+          "suggestedLabel": "Phế phẩm Lý do Mã",
+          "suggestedLabelEn": "Scrap Reason Codes",
+          "suggestedType": "select",
+          "dbTypes": [
+            "JSONB"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "rework_reason_codes",
+          "tables": [
+            "mes_operation_execution"
+          ],
+          "suggestedLabel": "Rework Lý do Mã",
+          "suggestedLabelEn": "Rework Reason Codes",
+          "suggestedType": "select",
+          "dbTypes": [
+            "JSONB"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "tool_list_used",
           "tables": [
             "mes_cycle_events"
@@ -3292,19 +4028,6 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
-          "column": "performance",
-          "tables": [
-            "mes_oee_snapshots"
-          ],
-          "suggestedLabel": "Hiệu năng",
-          "suggestedLabelEn": "Performance",
-          "suggestedType": "number",
-          "dbTypes": [
-            "NUMERIC(5,4)"
-          ],
-          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
-        },
-        {
           "column": "rework_pieces",
           "tables": [
             "mes_oee_snapshots"
@@ -3327,6 +4050,19 @@
           "suggestedType": "number",
           "dbTypes": [
             "NUMERIC(5,4)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "primary_job_number",
+          "tables": [
+            "mes_oee_snapshots"
+          ],
+          "suggestedLabel": "Số chính Lệnh",
+          "suggestedLabelEn": "Primary Job Number",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(50)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -3418,6 +4154,20 @@
           "suggestedType": "boolean",
           "dbTypes": [
             "BOOLEAN"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "root_cause_code",
+          "tables": [
+            "lean_andon_events",
+            "mes_downtime_events"
+          ],
+          "suggestedLabel": "Mã Gốc Cause",
+          "suggestedLabelEn": "Root Cause Code",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(50)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -3591,19 +4341,6 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
-          "column": "total_parts_good",
-          "tables": [
-            "mes_production_kpi_daily"
-          ],
-          "suggestedLabel": "Tổng phụ tùng Good",
-          "suggestedLabelEn": "Total Parts Good",
-          "suggestedType": "number",
-          "dbTypes": [
-            "NUMERIC(12,2)"
-          ],
-          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
-        },
-        {
           "column": "total_parts_scrap",
           "tables": [
             "mes_production_kpi_daily"
@@ -3626,45 +4363,6 @@
           "suggestedType": "number",
           "dbTypes": [
             "NUMERIC(12,2)"
-          ],
-          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
-        },
-        {
-          "column": "top_downtime_reasons",
-          "tables": [
-            "mes_production_kpi_daily"
-          ],
-          "suggestedLabel": "Top Downtime Lý do",
-          "suggestedLabelEn": "Top Downtime Reasons",
-          "suggestedType": "json",
-          "dbTypes": [
-            "JSONB"
-          ],
-          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
-        },
-        {
-          "column": "top_scrap_reasons",
-          "tables": [
-            "mes_production_kpi_daily"
-          ],
-          "suggestedLabel": "Top Phế phẩm Lý do",
-          "suggestedLabelEn": "Top Scrap Reasons",
-          "suggestedType": "json",
-          "dbTypes": [
-            "JSONB"
-          ],
-          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
-        },
-        {
-          "column": "standard_cost_total",
-          "tables": [
-            "mes_cost_tracking"
-          ],
-          "suggestedLabel": "Tiêu chuẩn Chi phí Tổng",
-          "suggestedLabelEn": "Standard Cost Total",
-          "suggestedType": "currency",
-          "dbTypes": [
-            "NUMERIC(14,2)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -3747,6 +4445,58 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "remarks",
+          "tables": [
+            "incoming_inspections"
+          ],
+          "suggestedLabel": "Remark",
+          "suggestedLabelEn": "Remarks",
+          "suggestedType": "string",
+          "dbTypes": [
+            "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "void_reason",
+          "tables": [
+            "incoming_inspections"
+          ],
+          "suggestedLabel": "Void Lý do",
+          "suggestedLabelEn": "Void Reason",
+          "suggestedType": "string",
+          "dbTypes": [
+            "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "voided_at",
+          "tables": [
+            "incoming_inspections"
+          ],
+          "suggestedLabel": "Voided lúc",
+          "suggestedLabelEn": "Voided At",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "TIMESTAMPTZ"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "root_cause_due_date",
+          "tables": [
+            "scar_records"
+          ],
+          "suggestedLabel": "Ngày Gốc Cause Hạn",
+          "suggestedLabelEn": "Root Cause Due Date",
+          "suggestedType": "date",
+          "dbTypes": [
+            "DATE"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "verification_due_date",
           "tables": [
             "scar_records"
@@ -3821,6 +4571,45 @@
           "suggestedType": "number",
           "dbTypes": [
             "INT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "total_material_cost",
+          "tables": [
+            "quotes"
+          ],
+          "suggestedLabel": "Tổng Vật liệu Chi phí",
+          "suggestedLabelEn": "Total Material Cost",
+          "suggestedType": "currency",
+          "dbTypes": [
+            "NUMERIC(14,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "total_labor_cost",
+          "tables": [
+            "quotes"
+          ],
+          "suggestedLabel": "Tổng Nhân công Chi phí",
+          "suggestedLabelEn": "Total Labor Cost",
+          "suggestedType": "currency",
+          "dbTypes": [
+            "NUMERIC(14,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "total_tooling_cost",
+          "tables": [
+            "quotes"
+          ],
+          "suggestedLabel": "Tổng tooling Chi phí",
+          "suggestedLabelEn": "Total Tooling Cost",
+          "suggestedType": "currency",
+          "dbTypes": [
+            "NUMERIC(14,2)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -3929,6 +4718,19 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "tooling_cost",
+          "tables": [
+            "quote_lines"
+          ],
+          "suggestedLabel": "Chi phí tooling",
+          "suggestedLabelEn": "Tooling Cost",
+          "suggestedType": "currency",
+          "dbTypes": [
+            "NUMERIC(14,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "special_requirements",
           "tables": [
             "quote_lines"
@@ -3968,6 +4770,32 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "passport_number",
+          "tables": [
+            "product_passports"
+          ],
+          "suggestedLabel": "Số hộ chiếu",
+          "suggestedLabelEn": "Passport Number",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(50)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "qr_code_data",
+          "tables": [
+            "product_passports"
+          ],
+          "suggestedLabel": "Qr Mã Dữ liệu",
+          "suggestedLabelEn": "Qr Code Data",
+          "suggestedType": "string",
+          "dbTypes": [
+            "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "test_report_references",
           "tables": [
             "product_passports"
@@ -4003,6 +4831,19 @@
           "suggestedType": "datetime",
           "dbTypes": [
             "NUMERIC(10,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "threshold_value",
+          "tables": [
+            "quality_predictions"
+          ],
+          "suggestedLabel": "Threshold Giá trị",
+          "suggestedLabelEn": "Threshold Value",
+          "suggestedType": "currency",
+          "dbTypes": [
+            "NUMERIC(14,6)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -4177,19 +5018,6 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
-          "column": "root_cause_description",
-          "tables": [
-            "capa_8d_steps"
-          ],
-          "suggestedLabel": "Mô tả nguyên nhân gốc",
-          "suggestedLabelEn": "Root Cause Description",
-          "suggestedType": "textarea",
-          "dbTypes": [
-            "TEXT"
-          ],
-          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
-        },
-        {
           "column": "risk_of_unintended_effects",
           "tables": [
             "capa_8d_steps"
@@ -4205,7 +5033,8 @@
         {
           "column": "training_completed",
           "tables": [
-            "capa_8d_steps"
+            "capa_8d_steps",
+            "eqms_lessons_learned"
           ],
           "suggestedLabel": "Đào tạo hoàn tất",
           "suggestedLabelEn": "Training Completed",
@@ -4294,15 +5123,28 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
-          "column": "study_type",
+          "column": "metric_name",
           "tables": [
-            "calibration_grr_studies"
+            "lean_kaizen_events"
           ],
-          "suggestedLabel": "Study Loại",
-          "suggestedLabelEn": "Study Type",
-          "suggestedType": "select",
+          "suggestedLabel": "Chỉ số tên",
+          "suggestedLabelEn": "Metric Name",
+          "suggestedType": "string",
           "dbTypes": [
-            "VARCHAR(20)"
+            "VARCHAR(100)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "metric_target_value",
+          "tables": [
+            "lean_kaizen_events"
+          ],
+          "suggestedLabel": "Chỉ số Mục tiêu Giá trị",
+          "suggestedLabelEn": "Metric Target Value",
+          "suggestedType": "currency",
+          "dbTypes": [
+            "NUMERIC(12,4)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -4411,6 +5253,45 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "time_to_contain_hours",
+          "tables": [
+            "lean_qrqc_events"
+          ],
+          "suggestedLabel": "Thời gian đến Contain giờ",
+          "suggestedLabelEn": "Time To Contain Hours",
+          "suggestedType": "duration",
+          "dbTypes": [
+            "NUMERIC(6,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "time_to_resolve_hours",
+          "tables": [
+            "lean_qrqc_events"
+          ],
+          "suggestedLabel": "Thời gian đến Resolve giờ",
+          "suggestedLabelEn": "Time To Resolve Hours",
+          "suggestedType": "duration",
+          "dbTypes": [
+            "NUMERIC(6,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "trigger_datetime",
+          "tables": [
+            "lean_andon_events"
+          ],
+          "suggestedLabel": "Trigger Datetime",
+          "suggestedLabelEn": "Trigger Datetime",
+          "suggestedType": "date",
+          "dbTypes": [
+            "TIMESTAMPTZ"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "work_order",
           "tables": [
             "lean_andon_events"
@@ -4420,6 +5301,19 @@
           "suggestedType": "string",
           "dbTypes": [
             "VARCHAR(50)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "response_time_sec",
+          "tables": [
+            "lean_andon_events"
+          ],
+          "suggestedLabel": "Response thời gian Sec",
+          "suggestedLabelEn": "Response Time Sec",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "INT"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -4489,6 +5383,19 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "to_part_number",
+          "tables": [
+            "lean_smed_events"
+          ],
+          "suggestedLabel": "Số đến phụ tùng",
+          "suggestedLabelEn": "To Part Number",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(50)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "step2_conversion",
           "tables": [
             "lean_smed_events"
@@ -4511,6 +5418,19 @@
           "suggestedType": "json",
           "dbTypes": [
             "JSONB"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "trial_setup_time_min",
+          "tables": [
+            "lean_smed_events"
+          ],
+          "suggestedLabel": "Trial thiết lập thời gian Min",
+          "suggestedLabelEn": "Trial Setup Time Min",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "NUMERIC(8,1)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -4563,6 +5483,19 @@
           "suggestedType": "select",
           "dbTypes": [
             "VARCHAR(10)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "started_on_time",
+          "tables": [
+            "lean_tier_meetings"
+          ],
+          "suggestedLabel": "Started On thời gian",
+          "suggestedLabelEn": "Started On Time",
+          "suggestedType": "boolean",
+          "dbTypes": [
+            "BOOLEAN"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -4658,6 +5591,19 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "valuation_date",
+          "tables": [
+            "inventory_valuations"
+          ],
+          "suggestedLabel": "Ngày Valuation",
+          "suggestedLabelEn": "Valuation Date",
+          "suggestedType": "date",
+          "dbTypes": [
+            "DATE"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "valuation_method",
           "tables": [
             "inventory_valuations"
@@ -4667,6 +5613,19 @@
           "suggestedType": "select",
           "dbTypes": [
             "VARCHAR(30)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "unit_cost_base",
+          "tables": [
+            "inventory_valuations"
+          ],
+          "suggestedLabel": "Đơn vị Chi phí cơ sở",
+          "suggestedLabelEn": "Unit Cost Base",
+          "suggestedType": "currency",
+          "dbTypes": [
+            "NUMERIC(18,6)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -4697,15 +5656,15 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
-          "column": "performance_pct",
+          "column": "runtime_minutes",
           "tables": [
             "plant_performance_snapshots"
           ],
-          "suggestedLabel": "Tỷ lệ Hiệu năng",
-          "suggestedLabelEn": "Performance Pct",
-          "suggestedType": "percentage",
+          "suggestedLabel": "Runtime phút",
+          "suggestedLabelEn": "Runtime Minutes",
+          "suggestedType": "duration",
           "dbTypes": [
-            "NUMERIC(6,2)"
+            "NUMERIC(12,2)"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -4751,6 +5710,32 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "parent_lot_number",
+          "tables": [
+            "mes_operational_event_ledger"
+          ],
+          "suggestedLabel": "Số cha Lô",
+          "suggestedLabelEn": "Parent Lot Number",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(120)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "parent_serial_number",
+          "tables": [
+            "mes_operational_event_ledger"
+          ],
+          "suggestedLabel": "Số cha Số sê-ri",
+          "suggestedLabelEn": "Parent Serial Number",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(120)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "packet_type",
           "tables": [
             "mes_trusted_release_record"
@@ -4791,6 +5776,19 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "release_decision_code",
+          "tables": [
+            "mes_trusted_release_record"
+          ],
+          "suggestedLabel": "Mã Phát hành Decision",
+          "suggestedLabelEn": "Release Decision Code",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(40)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "release_decision_reason",
           "tables": [
             "mes_trusted_release_record"
@@ -4800,19 +5798,6 @@
           "suggestedType": "string",
           "dbTypes": [
             "TEXT"
-          ],
-          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
-        },
-        {
-          "column": "packet_payload",
-          "tables": [
-            "mes_trusted_release_record"
-          ],
-          "suggestedLabel": "Packet gói dữ liệu",
-          "suggestedLabelEn": "Packet Payload",
-          "suggestedType": "textarea",
-          "dbTypes": [
-            "JSONB"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
@@ -4869,6 +5854,19 @@
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         },
         {
+          "column": "required_qualification_code",
+          "tables": [
+            "eqms_controlled_revision_rollout"
+          ],
+          "suggestedLabel": "Mã bắt buộc Qualification",
+          "suggestedLabelEn": "Required Qualification Code",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(120)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
           "column": "training_obligation",
           "tables": [
             "eqms_execution_entitlement_decision"
@@ -4893,6 +5891,804 @@
             "JSONB"
           ],
           "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "response_sent_at",
+          "tables": [
+            "eqms_complaints"
+          ],
+          "suggestedLabel": "Response Sent lúc",
+          "suggestedLabelEn": "Response Sent At",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "TIMESTAMPTZ"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "d7_preventive",
+          "tables": [
+            "eqms_complaints"
+          ],
+          "suggestedLabel": "D7 Preventive",
+          "suggestedLabelEn": "D7 Preventive",
+          "suggestedType": "string",
+          "dbTypes": [
+            "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "d8_recognition",
+          "tables": [
+            "eqms_complaints"
+          ],
+          "suggestedLabel": "D8 Recognition",
+          "suggestedLabelEn": "D8 Recognition",
+          "suggestedType": "string",
+          "dbTypes": [
+            "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "resolution_date",
+          "tables": [
+            "eqms_complaints"
+          ],
+          "suggestedLabel": "Ngày Resolution",
+          "suggestedLabelEn": "Resolution Date",
+          "suggestedType": "date",
+          "dbTypes": [
+            "DATE"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "voided_reason",
+          "tables": [
+            "eqms_deviations"
+          ],
+          "suggestedLabel": "Voided Lý do",
+          "suggestedLabelEn": "Voided Reason",
+          "suggestedType": "string",
+          "dbTypes": [
+            "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "quantity_unit",
+          "tables": [
+            "eqms_concession_records",
+            "eqms_warranty_claims"
+          ],
+          "suggestedLabel": "Số lượng Đơn vị",
+          "suggestedLabelEn": "Quantity Unit",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(30)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "source_ncr_number",
+          "tables": [
+            "eqms_concession_records"
+          ],
+          "suggestedLabel": "Số Nguồn NCR",
+          "suggestedLabelEn": "Source NCR Number",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(80)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "nonconformance_description",
+          "tables": [
+            "eqms_concession_records"
+          ],
+          "suggestedLabel": "Không phù hợp Mô tả",
+          "suggestedLabelEn": "Nonconformance Description",
+          "suggestedType": "textarea",
+          "dbTypes": [
+            "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "proposed_disposition",
+          "tables": [
+            "eqms_concession_records"
+          ],
+          "suggestedLabel": "Proposed Xử lý",
+          "suggestedLabelEn": "Proposed Disposition",
+          "suggestedType": "string",
+          "dbTypes": [
+            "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "max_quantity",
+          "tables": [
+            "eqms_concession_records"
+          ],
+          "suggestedLabel": "Số lượng Max",
+          "suggestedLabelEn": "Max Quantity",
+          "suggestedType": "number",
+          "dbTypes": [
+            "NUMERIC(14,4)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "quantity_used",
+          "tables": [
+            "eqms_concession_records"
+          ],
+          "suggestedLabel": "Số lượng Used",
+          "suggestedLabelEn": "Quantity Used",
+          "suggestedType": "number",
+          "dbTypes": [
+            "NUMERIC(14,4)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "requires_ncr",
+          "tables": [
+            "eqms_concession_records"
+          ],
+          "suggestedLabel": "Require NCR",
+          "suggestedLabelEn": "Requires NCR",
+          "suggestedType": "boolean",
+          "dbTypes": [
+            "BOOLEAN"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "regulatory_notification_required",
+          "tables": [
+            "eqms_concession_records"
+          ],
+          "suggestedLabel": "Yêu cầu quy định thông báo",
+          "suggestedLabelEn": "Regulatory Notification Required",
+          "suggestedType": "boolean",
+          "dbTypes": [
+            "BOOLEAN"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "regulatory_ref",
+          "tables": [
+            "eqms_concession_records"
+          ],
+          "suggestedLabel": "Quy định tham chiếu",
+          "suggestedLabelEn": "Regulatory Ref",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(200)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "rejected_reason",
+          "tables": [
+            "eqms_concession_records",
+            "eqms_fai_reports"
+          ],
+          "suggestedLabel": "Rejected Lý do",
+          "suggestedLabelEn": "Rejected Reason",
+          "suggestedType": "string",
+          "dbTypes": [
+            "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "pass_count",
+          "tables": [
+            "eqms_fai_reports"
+          ],
+          "suggestedLabel": "Pas Số lượng",
+          "suggestedLabelEn": "Pass Count",
+          "suggestedType": "number",
+          "dbTypes": [
+            "INTEGER"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "requires_esig",
+          "tables": [
+            "eqms_fai_reports"
+          ],
+          "suggestedLabel": "Require Esig",
+          "suggestedLabelEn": "Requires Esig",
+          "suggestedType": "boolean",
+          "dbTypes": [
+            "BOOLEAN"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "regulatory_basis",
+          "tables": [
+            "eqms_fai_reports",
+            "eqms_special_characteristics"
+          ],
+          "suggestedLabel": "Quy định Basis",
+          "suggestedLabelEn": "Regulatory Basis",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(200)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "revision_required_notes",
+          "tables": [
+            "eqms_fai_reports"
+          ],
+          "suggestedLabel": "Phiên bản bắt buộc Ghi chú",
+          "suggestedLabelEn": "Revision Required Notes",
+          "suggestedType": "textarea",
+          "dbTypes": [
+            "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "sc_number",
+          "tables": [
+            "eqms_special_characteristics"
+          ],
+          "suggestedLabel": "Số Sc",
+          "suggestedLabelEn": "Sc Number",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(80)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "safety_critical",
+          "tables": [
+            "eqms_special_characteristics"
+          ],
+          "suggestedLabel": "An toàn Trọng yếu",
+          "suggestedLabelEn": "Safety Critical",
+          "suggestedType": "boolean",
+          "dbTypes": [
+            "BOOLEAN"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "operation_number",
+          "tables": [
+            "eqms_special_characteristics"
+          ],
+          "suggestedLabel": "Số Công đoạn",
+          "suggestedLabelEn": "Operation Number",
+          "suggestedType": "percentage",
+          "dbTypes": [
+            "VARCHAR(40)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "ppk_requirement",
+          "tables": [
+            "eqms_special_characteristics"
+          ],
+          "suggestedLabel": "Ppk yêu cầu",
+          "suggestedLabelEn": "Ppk Requirement",
+          "suggestedType": "number",
+          "dbTypes": [
+            "NUMERIC(6,3)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "pfmea_ref",
+          "tables": [
+            "eqms_special_characteristics"
+          ],
+          "suggestedLabel": "Pfmea tham chiếu",
+          "suggestedLabelEn": "Pfmea Ref",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(120)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "obsoleted_by",
+          "tables": [
+            "eqms_aml_records",
+            "eqms_special_characteristics"
+          ],
+          "suggestedLabel": "Obsoleted bởi",
+          "suggestedLabelEn": "Obsoleted By",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(120)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "obsoleted_at",
+          "tables": [
+            "eqms_aml_records",
+            "eqms_special_characteristics"
+          ],
+          "suggestedLabel": "Obsoleted lúc",
+          "suggestedLabelEn": "Obsoleted At",
+          "suggestedType": "datetime",
+          "dbTypes": [
+            "TIMESTAMPTZ"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "obsolete_reason",
+          "tables": [
+            "eqms_special_characteristics"
+          ],
+          "suggestedLabel": "Obsolete Lý do",
+          "suggestedLabelEn": "Obsolete Reason",
+          "suggestedType": "string",
+          "dbTypes": [
+            "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "qualification_standard",
+          "tables": [
+            "eqms_aml_records"
+          ],
+          "suggestedLabel": "Qualification tiêu chuẩn",
+          "suggestedLabelEn": "Qualification Standard",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(200)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "restricted",
+          "tables": [
+            "eqms_aml_records"
+          ],
+          "suggestedLabel": "Hạn chế",
+          "suggestedLabelEn": "Restricted",
+          "suggestedType": "boolean",
+          "dbTypes": [
+            "BOOLEAN"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "restrictions_notes",
+          "tables": [
+            "eqms_aml_records"
+          ],
+          "suggestedLabel": "Restriction Ghi chú",
+          "suggestedLabelEn": "Restrictions Notes",
+          "suggestedType": "textarea",
+          "dbTypes": [
+            "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "max_annual_quantity",
+          "tables": [
+            "eqms_aml_records"
+          ],
+          "suggestedLabel": "Số lượng Max Annual",
+          "suggestedLabelEn": "Max Annual Quantity",
+          "suggestedType": "number",
+          "dbTypes": [
+            "NUMERIC(14,4)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "max_quantity_unit",
+          "tables": [
+            "eqms_aml_records"
+          ],
+          "suggestedLabel": "Max Số lượng Đơn vị",
+          "suggestedLabelEn": "Max Quantity Unit",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(30)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "renewal_required",
+          "tables": [
+            "eqms_aml_records"
+          ],
+          "suggestedLabel": "Yêu cầu Renewal",
+          "suggestedLabelEn": "Renewal Required",
+          "suggestedType": "boolean",
+          "dbTypes": [
+            "BOOLEAN"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "quantity_claimed",
+          "tables": [
+            "eqms_warranty_claims"
+          ],
+          "suggestedLabel": "Số lượng Claimed",
+          "suggestedLabelEn": "Quantity Claimed",
+          "suggestedType": "currency",
+          "dbTypes": [
+            "NUMERIC(14,4)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "failure_date",
+          "tables": [
+            "eqms_warranty_claims"
+          ],
+          "suggestedLabel": "Ngày lỗi",
+          "suggestedLabelEn": "Failure Date",
+          "suggestedType": "date",
+          "dbTypes": [
+            "DATE"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "failure_mileage",
+          "tables": [
+            "eqms_warranty_claims"
+          ],
+          "suggestedLabel": "Lỗi Mileage",
+          "suggestedLabelEn": "Failure Mileage",
+          "suggestedType": "number",
+          "dbTypes": [
+            "INTEGER"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "vehicle_vin",
+          "tables": [
+            "eqms_warranty_claims"
+          ],
+          "suggestedLabel": "Vehicle Vin",
+          "suggestedLabelEn": "Vehicle Vin",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(50)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "return_required",
+          "tables": [
+            "eqms_warranty_claims"
+          ],
+          "suggestedLabel": "Yêu cầu trả về",
+          "suggestedLabelEn": "Return Required",
+          "suggestedType": "boolean",
+          "dbTypes": [
+            "BOOLEAN"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "return_tracking_number",
+          "tables": [
+            "eqms_warranty_claims"
+          ],
+          "suggestedLabel": "Số trả về theo dõi",
+          "suggestedLabelEn": "Return Tracking Number",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(120)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "return_received_date",
+          "tables": [
+            "eqms_warranty_claims"
+          ],
+          "suggestedLabel": "Ngày trả về Đã nhận",
+          "suggestedLabelEn": "Return Received Date",
+          "suggestedType": "date",
+          "dbTypes": [
+            "DATE"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "parts_returned",
+          "tables": [
+            "eqms_warranty_claims"
+          ],
+          "suggestedLabel": "Phụ tùng Returned",
+          "suggestedLabelEn": "Parts Returned",
+          "suggestedType": "boolean",
+          "dbTypes": [
+            "BOOLEAN"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "root_cause_category",
+          "tables": [
+            "eqms_warranty_claims"
+          ],
+          "suggestedLabel": "Danh mục nguyên nhân gốc",
+          "suggestedLabelEn": "Root Cause Category",
+          "suggestedType": "select",
+          "dbTypes": [
+            "VARCHAR(100)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "source_ref",
+          "tables": [
+            "eqms_lessons_learned"
+          ],
+          "suggestedLabel": "Nguồn tham chiếu",
+          "suggestedLabelEn": "Source Ref",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(200)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "what_happened",
+          "tables": [
+            "eqms_lessons_learned"
+          ],
+          "suggestedLabel": "What Happened",
+          "suggestedLabelEn": "What Happened",
+          "suggestedType": "string",
+          "dbTypes": [
+            "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "what_worked_well",
+          "tables": [
+            "eqms_lessons_learned"
+          ],
+          "suggestedLabel": "What Worked Well",
+          "suggestedLabelEn": "What Worked Well",
+          "suggestedType": "string",
+          "dbTypes": [
+            "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "what_could_improve",
+          "tables": [
+            "eqms_lessons_learned"
+          ],
+          "suggestedLabel": "What Could Improve",
+          "suggestedLabelEn": "What Could Improve",
+          "suggestedType": "string",
+          "dbTypes": [
+            "TEXT"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "time_impact_hours",
+          "tables": [
+            "eqms_lessons_learned"
+          ],
+          "suggestedLabel": "Thời gian Impact giờ",
+          "suggestedLabelEn": "Time Impact Hours",
+          "suggestedType": "duration",
+          "dbTypes": [
+            "NUMERIC(10,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "training_required",
+          "tables": [
+            "eqms_lessons_learned"
+          ],
+          "suggestedLabel": "Yêu cầu đào tạo",
+          "suggestedLabelEn": "Training Required",
+          "suggestedType": "boolean",
+          "dbTypes": [
+            "BOOLEAN"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "survey_number",
+          "tables": [
+            "eqms_csat_surveys"
+          ],
+          "suggestedLabel": "Số Survey",
+          "suggestedLabelEn": "Survey Number",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(80)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "survey_type",
+          "tables": [
+            "eqms_csat_surveys"
+          ],
+          "suggestedLabel": "Survey Loại",
+          "suggestedLabelEn": "Survey Type",
+          "suggestedType": "select",
+          "dbTypes": [
+            "VARCHAR(40)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "survey_period",
+          "tables": [
+            "eqms_csat_surveys"
+          ],
+          "suggestedLabel": "Survey kỳ",
+          "suggestedLabelEn": "Survey Period",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(40)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "survey_date",
+          "tables": [
+            "eqms_csat_surveys"
+          ],
+          "suggestedLabel": "Ngày Survey",
+          "suggestedLabelEn": "Survey Date",
+          "suggestedType": "date",
+          "dbTypes": [
+            "DATE"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "survey_method",
+          "tables": [
+            "eqms_csat_surveys"
+          ],
+          "suggestedLabel": "Survey Phương pháp",
+          "suggestedLabelEn": "Survey Method",
+          "suggestedType": "select",
+          "dbTypes": [
+            "VARCHAR(40)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "standard",
+          "tables": [
+            "eqms_sampling_plans"
+          ],
+          "suggestedLabel": "Tiêu chuẩn",
+          "suggestedLabelEn": "Standard",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(40)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "sampling_type",
+          "tables": [
+            "eqms_sampling_plans"
+          ],
+          "suggestedLabel": "Sampling Loại",
+          "suggestedLabelEn": "Sampling Type",
+          "suggestedType": "select",
+          "dbTypes": [
+            "VARCHAR(20)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "sample_size_code",
+          "tables": [
+            "eqms_sampling_plans"
+          ],
+          "suggestedLabel": "Mã mẫu kích thước",
+          "suggestedLabelEn": "Sample Size Code",
+          "suggestedType": "string",
+          "dbTypes": [
+            "CHAR(2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "tightened_trigger_rejects",
+          "tables": [
+            "eqms_sampling_plans"
+          ],
+          "suggestedLabel": "Tightened Trigger Reject",
+          "suggestedLabelEn": "Tightened Trigger Rejects",
+          "suggestedType": "number",
+          "dbTypes": [
+            "INTEGER"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "skip_lot_trigger_accepts",
+          "tables": [
+            "eqms_sampling_plans"
+          ],
+          "suggestedLabel": "Skip Lô Trigger Accept",
+          "suggestedLabelEn": "Skip Lot Trigger Accepts",
+          "suggestedType": "number",
+          "dbTypes": [
+            "INTEGER"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "value_type",
+          "tables": [
+            "graphics_token_catalog"
+          ],
+          "suggestedLabel": "Giá trị Loại",
+          "suggestedLabelEn": "Value Type",
+          "suggestedType": "select",
+          "dbTypes": [
+            "VARCHAR(20)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "wcag_min_contrast",
+          "tables": [
+            "graphics_token_catalog"
+          ],
+          "suggestedLabel": "Wcag Min Contrast",
+          "suggestedLabelEn": "Wcag Min Contrast",
+          "suggestedType": "number",
+          "dbTypes": [
+            "NUMERIC(4,2)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
+        },
+        {
+          "column": "wcag_pair_token",
+          "tables": [
+            "graphics_token_catalog"
+          ],
+          "suggestedLabel": "Wcag Pair Token",
+          "suggestedLabelEn": "Wcag Pair Token",
+          "suggestedType": "string",
+          "dbTypes": [
+            "VARCHAR(200)"
+          ],
+          "reason": "Real persisted column without a registry field definition; should be surfaced to Module Builder."
         }
       ]
     },
@@ -4903,7 +6699,7 @@
     },
     "pk_fk_columns": {
       "description": "Primary key / foreign key / technical identifiers nên có quy ước reference chung trong registry.",
-      "count": 90,
+      "count": 100,
       "columns": [
         {
           "column": "supervisor_id",
@@ -5028,16 +6824,6 @@
           "role": "foreign_key"
         },
         {
-          "column": "rating_id",
-          "tables": [
-            "vendor_ratings"
-          ],
-          "dbTypes": [
-            "UUID"
-          ],
-          "role": "primary_key"
-        },
-        {
           "column": "requisition_id",
           "tables": [
             "purchase_orders"
@@ -5056,6 +6842,17 @@
             "VARCHAR(50)"
           ],
           "role": "foreign_key"
+        },
+        {
+          "column": "txn_id",
+          "tables": [
+            "inventory_transactions",
+            "tool_transactions"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
         },
         {
           "column": "reference_id",
@@ -5087,17 +6884,6 @@
             "UUID"
           ],
           "role": "foreign_key"
-        },
-        {
-          "column": "plan_id",
-          "tables": [
-            "inspection_plans",
-            "inspection_results"
-          ],
-          "dbTypes": [
-            "UUID"
-          ],
-          "role": "pk_fk"
         },
         {
           "column": "spc_id",
@@ -5152,6 +6938,7 @@
         {
           "column": "training_id",
           "tables": [
+            "eqms_training_records",
             "training_records"
           ],
           "dbTypes": [
@@ -5220,9 +7007,9 @@
           "role": "foreign_key"
         },
         {
-          "column": "variable_id",
+          "column": "planned_order_id",
           "tables": [
-            "variable_registry"
+            "mrp_planned_orders"
           ],
           "dbTypes": [
             "UUID"
@@ -5230,9 +7017,9 @@
           "role": "primary_key"
         },
         {
-          "column": "tag_id",
+          "column": "variable_id",
           "tables": [
-            "tags"
+            "variable_registry"
           ],
           "dbTypes": [
             "UUID"
@@ -5260,32 +7047,22 @@
           "role": "primary_key"
         },
         {
-          "column": "measurement_id",
-          "tables": [
-            "mes_inline_measurements"
-          ],
-          "dbTypes": [
-            "BIGINT"
-          ],
-          "role": "primary_key"
-        },
-        {
-          "column": "limit_id",
-          "tables": [
-            "mes_spc_control_limits"
-          ],
-          "dbTypes": [
-            "UUID"
-          ],
-          "role": "primary_key"
-        },
-        {
           "column": "violation_id",
           "tables": [
             "mes_spc_violations"
           ],
           "dbTypes": [
             "BIGINT"
+          ],
+          "role": "primary_key"
+        },
+        {
+          "column": "tracking_id",
+          "tables": [
+            "mes_wip_location"
+          ],
+          "dbTypes": [
+            "UUID"
           ],
           "role": "primary_key"
         },
@@ -5330,9 +7107,9 @@
           "role": "foreign_key"
         },
         {
-          "column": "otd_id",
+          "column": "subscription_id",
           "tables": [
-            "mes_on_time_delivery"
+            "mes_event_subscriptions"
           ],
           "dbTypes": [
             "UUID"
@@ -5340,9 +7117,29 @@
           "role": "primary_key"
         },
         {
-          "column": "subscription_id",
+          "column": "sync_run_id",
           "tables": [
-            "mes_event_subscriptions"
+            "mes_erp_sync_runs"
+          ],
+          "dbTypes": [
+            "VARCHAR(80)"
+          ],
+          "role": "primary_key"
+        },
+        {
+          "column": "reconciliation_id",
+          "tables": [
+            "mes_erp_reconciliation_exceptions"
+          ],
+          "dbTypes": [
+            "VARCHAR(80)"
+          ],
+          "role": "primary_key"
+        },
+        {
+          "column": "shipment_release_id",
+          "tables": [
+            "shipment_releases"
           ],
           "dbTypes": [
             "UUID"
@@ -5370,18 +7167,9 @@
           "role": "primary_key"
         },
         {
-          "column": "template_id",
-          "tables": [
-            "material_cost_templates"
-          ],
-          "dbTypes": [
-            "UUID"
-          ],
-          "role": "primary_key"
-        },
-        {
           "column": "token_id",
           "tables": [
+            "graphics_token_catalog",
             "portal_access_tokens"
           ],
           "dbTypes": [
@@ -5390,9 +7178,10 @@
           "role": "primary_key"
         },
         {
-          "column": "view_id",
+          "column": "submission_id",
           "tables": [
-            "portal_order_views"
+            "portal_complaint_submissions",
+            "ppap_submissions"
           ],
           "dbTypes": [
             "UUID"
@@ -5420,6 +7209,26 @@
           "role": "foreign_key"
         },
         {
+          "column": "oqc_id",
+          "tables": [
+            "oqc_inspections"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
+        },
+        {
+          "column": "pm_equipment_id",
+          "tables": [
+            "pm_equipment_master"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
+        },
+        {
           "column": "spare_inventory_id",
           "tables": [
             "pm_spare_parts_inventory"
@@ -5440,9 +7249,9 @@
           "role": "primary_key"
         },
         {
-          "column": "plm_design_review_id",
+          "column": "plm_deviation_permit_id",
           "tables": [
-            "plm_design_reviews"
+            "plm_deviation_permits"
           ],
           "dbTypes": [
             "UUID"
@@ -5450,9 +7259,9 @@
           "role": "primary_key"
         },
         {
-          "column": "tms_freight_quote_id",
+          "column": "plm_obsolescence_tracking_id",
           "tables": [
-            "tms_freight_quotes"
+            "plm_obsolescence_tracking"
           ],
           "dbTypes": [
             "UUID"
@@ -5460,9 +7269,39 @@
           "role": "primary_key"
         },
         {
-          "column": "tms_customs_document_id",
+          "column": "wms_bin_content_id",
           "tables": [
-            "tms_customs_documents"
+            "wms_bin_contents"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
+        },
+        {
+          "column": "wms_putaway_rule_id",
+          "tables": [
+            "wms_putaway_rules"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
+        },
+        {
+          "column": "wms_quarantine_hold_id",
+          "tables": [
+            "wms_quarantine_holds"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
+        },
+        {
+          "column": "wms_handling_unit_id",
+          "tables": [
+            "wms_material_handling_units"
           ],
           "dbTypes": [
             "UUID"
@@ -5480,16 +7319,6 @@
           "role": "primary_key"
         },
         {
-          "column": "tms_dangerous_good_id",
-          "tables": [
-            "tms_dangerous_goods"
-          ],
-          "dbTypes": [
-            "UUID"
-          ],
-          "role": "primary_key"
-        },
-        {
           "column": "srm_supplier_capability_id",
           "tables": [
             "srm_supplier_capabilities"
@@ -5500,9 +7329,9 @@
           "role": "primary_key"
         },
         {
-          "column": "srm_supplier_capacity_id",
+          "column": "tooling_preset_id",
           "tables": [
-            "srm_supplier_capacity"
+            "tooling_presets"
           ],
           "dbTypes": [
             "UUID"
@@ -5510,9 +7339,9 @@
           "role": "primary_key"
         },
         {
-          "column": "srm_vmi_id",
+          "column": "tooling_regrind_cycle_id",
           "tables": [
-            "srm_vendor_managed_inventory"
+            "tooling_regrind_cycles"
           ],
           "dbTypes": [
             "UUID"
@@ -5520,9 +7349,9 @@
           "role": "primary_key"
         },
         {
-          "column": "tooling_component_id",
+          "column": "svc_warranty_claim_id",
           "tables": [
-            "tooling_components"
+            "svc_warranty_claims"
           ],
           "dbTypes": [
             "UUID"
@@ -5530,9 +7359,9 @@
           "role": "primary_key"
         },
         {
-          "column": "tooling_crib_transaction_id",
+          "column": "svc_return_authorization_id",
           "tables": [
-            "tooling_crib_transactions"
+            "svc_return_authorizations"
           ],
           "dbTypes": [
             "UUID"
@@ -5540,69 +7369,9 @@
           "role": "primary_key"
         },
         {
-          "column": "tooling_life_measurement_id",
+          "column": "step_id",
           "tables": [
-            "tooling_life_measurements"
-          ],
-          "dbTypes": [
-            "UUID"
-          ],
-          "role": "primary_key"
-        },
-        {
-          "column": "supply_replenishment_policy_id",
-          "tables": [
-            "supply_replenishment_policies"
-          ],
-          "dbTypes": [
-            "UUID"
-          ],
-          "role": "primary_key"
-        },
-        {
-          "column": "trace_material_certificate_id",
-          "tables": [
-            "trace_material_certificates"
-          ],
-          "dbTypes": [
-            "UUID"
-          ],
-          "role": "primary_key"
-        },
-        {
-          "column": "trace_heat_lot_register_id",
-          "tables": [
-            "trace_heat_lot_register"
-          ],
-          "dbTypes": [
-            "UUID"
-          ],
-          "role": "primary_key"
-        },
-        {
-          "column": "trade_end_use_certificate_id",
-          "tables": [
-            "trade_end_use_certificates"
-          ],
-          "dbTypes": [
-            "UUID"
-          ],
-          "role": "primary_key"
-        },
-        {
-          "column": "trade_import_bond_id",
-          "tables": [
-            "trade_import_bonds"
-          ],
-          "dbTypes": [
-            "UUID"
-          ],
-          "role": "primary_key"
-        },
-        {
-          "column": "mrb_decision_id",
-          "tables": [
-            "ncr_mrb_decisions"
+            "capa_8d_steps"
           ],
           "dbTypes": [
             "UUID"
@@ -5618,6 +7387,16 @@
             "UUID"
           ],
           "role": "foreign_key"
+        },
+        {
+          "column": "qrqc_id",
+          "tables": [
+            "lean_qrqc_events"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
         },
         {
           "column": "station_id",
@@ -5650,31 +7429,9 @@
           "role": "foreign_key"
         },
         {
-          "column": "work_instruction_id",
+          "column": "smed_id",
           "tables": [
-            "eqms_controlled_revision_rollout",
-            "work_instruction"
-          ],
-          "dbTypes": [
-            "UUID",
-            "VARCHAR(160)"
-          ],
-          "role": "primary_key"
-        },
-        {
-          "column": "wip_ledger_id",
-          "tables": [
-            "wip_ledger"
-          ],
-          "dbTypes": [
-            "UUID"
-          ],
-          "role": "primary_key"
-        },
-        {
-          "column": "signature_id",
-          "tables": [
-            "electronic_signatures"
+            "lean_smed_events"
           ],
           "dbTypes": [
             "UUID"
@@ -5784,6 +7541,16 @@
           "role": "primary_key"
         },
         {
+          "column": "packet_id",
+          "tables": [
+            "mes_trusted_release_record"
+          ],
+          "dbTypes": [
+            "VARCHAR(120)"
+          ],
+          "role": "primary_key"
+        },
+        {
           "column": "target_aggregate_id",
           "tables": [
             "eqms_execution_entitlement_decision",
@@ -5793,6 +7560,17 @@
             "VARCHAR(160)"
           ],
           "role": "foreign_key"
+        },
+        {
+          "column": "training_obligation_id",
+          "tables": [
+            "eqms_execution_entitlement_decision",
+            "eqms_training_obligation"
+          ],
+          "dbTypes": [
+            "VARCHAR(120)"
+          ],
+          "role": "primary_key"
         },
         {
           "column": "qualification_assertion_id",
@@ -5805,9 +7583,129 @@
           "role": "foreign_key"
         },
         {
-          "column": "submission_validation_error_id",
+          "column": "outbox_event_id",
           "tables": [
-            "submission_validation_errors"
+            "outbox_events"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
+        },
+        {
+          "column": "traceability_exception_id",
+          "tables": [
+            "traceability_exceptions"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
+        },
+        {
+          "column": "traceability_5m_obligation_id",
+          "tables": [
+            "traceability_5m_obligations"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
+        },
+        {
+          "column": "traceability_5m_policy_rule_id",
+          "tables": [
+            "traceability_5m_policy_rules"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
+        },
+        {
+          "column": "linked_field_action_id",
+          "tables": [
+            "eqms_complaints"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "foreign_key"
+        },
+        {
+          "column": "previous_fai_id",
+          "tables": [
+            "eqms_fai_reports"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "foreign_key"
+        },
+        {
+          "column": "ppap_submission_id",
+          "tables": [
+            "eqms_fai_reports"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "foreign_key"
+        },
+        {
+          "column": "sc_id",
+          "tables": [
+            "eqms_special_characteristics"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "primary_key"
+        },
+        {
+          "column": "qualification_fai_id",
+          "tables": [
+            "eqms_aml_records"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "foreign_key"
+        },
+        {
+          "column": "qualification_ppap_id",
+          "tables": [
+            "eqms_aml_records"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "foreign_key"
+        },
+        {
+          "column": "qualification_audit_id",
+          "tables": [
+            "eqms_aml_records"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "foreign_key"
+        },
+        {
+          "column": "linked_scar_id",
+          "tables": [
+            "eqms_warranty_claims"
+          ],
+          "dbTypes": [
+            "UUID"
+          ],
+          "role": "foreign_key"
+        },
+        {
+          "column": "survey_id",
+          "tables": [
+            "eqms_csat_surveys"
           ],
           "dbTypes": [
             "UUID"

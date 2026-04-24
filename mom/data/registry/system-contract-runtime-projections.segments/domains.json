@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-15T10:51:53.468Z",
+    "generatedAt": "2026-04-24T08:04:10.057Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -24,8 +24,8 @@
     "purpose": "Segmented runtime contract read model for bounded-memory reads and targeted rebuild verification.",
     "segmentId": "domains",
     "sourceArtifact": "data/registry/system-contract-runtime-projections.json",
-    "sourceSha256": "bfd78f8d03eb2516180cd62fcce1478a408c897ce89399eefd54f952caac7247",
-    "sourceGeneratedAt": "2026-04-15T10:51:53.468Z",
+    "sourceSha256": "b4931d975c011d28dc8757332c68ba8f2caa2f04fa185fd7b17ce6542804ca18",
+    "sourceGeneratedAt": "2026-04-24T08:04:10.057Z",
     "writePolicy": "generated_segment_do_not_edit",
     "revisionGuard": "sourceSha256"
   },
@@ -81,7 +81,7 @@
     },
     {
       "domain": "document_control",
-      "tableCount": 17
+      "tableCount": 26
     },
     {
       "domain": "ehs_sustainability",
@@ -177,7 +177,7 @@
     },
     {
       "domain": "quality_management",
-      "tableCount": 37
+      "tableCount": 84
     },
     {
       "domain": "record_system",
@@ -201,7 +201,7 @@
     },
     {
       "domain": "system_infrastructure",
-      "tableCount": 19
+      "tableCount": 35
     },
     {
       "domain": "tooling_lifecycle",
@@ -209,7 +209,7 @@
     },
     {
       "domain": "traceability_serialization",
-      "tableCount": 22
+      "tableCount": 23
     },
     {
       "domain": "trade_compliance",

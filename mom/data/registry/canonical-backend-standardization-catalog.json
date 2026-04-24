@@ -1,10 +1,10 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-15T10:51:50.526Z",
+    "generatedAt": "2026-04-24T08:04:03.537Z",
     "source": "mom/contracts/objects/*/contract.json",
     "authority": "authored_object_contracts",
     "domainCount": 12,
-    "resourceCount": 67,
+    "resourceCount": 68,
     "sourcePaths": [
       "contracts/objects/analytics--inventory-balance-snapshots/contract.json",
       "contracts/objects/analytics--mes-oee-snapshots/contract.json",
@@ -65,6 +65,7 @@
       "contracts/objects/quality_improvement--control-plans/contract.json",
       "contracts/objects/quality_improvement--corrective-actions/contract.json",
       "contracts/objects/quality_improvement--deviations/contract.json",
+      "contracts/objects/quality_improvement--document-control/contract.json",
       "contracts/objects/quality_improvement--fqc-inspections/contract.json",
       "contracts/objects/quality_improvement--improvement-actions/contract.json",
       "contracts/objects/quality_improvement--msa-studies/contract.json",
@@ -3568,6 +3569,69 @@
           "runtime_exposure_status": "compatibility_alias_api",
           "purpose": "Control temporary process, product, or documentation deviations so exception handling remains explicit, time-bounded, and auditable instead of disappearing inside generic status notes.",
           "source_contract": "contracts/objects/quality_improvement--deviations/contract.json"
+        },
+        "document_control": {
+          "canonical_resource": "quality_improvement.document_control",
+          "display_name": "Document Change Control (DCC)",
+          "canonical_name": "dcc_document_header",
+          "pattern": "lifecycle_owner",
+          "table": "dcc_document_header",
+          "primary_key": "header_id",
+          "status_column": "status",
+          "result_column": null,
+          "child_tables": [
+            "dcc_document_change_notice",
+            "dcc_document_change_request",
+            "dcc_document_revision",
+            "dcc_document_revision_history"
+          ],
+          "legacy_tables": [
+            "eqms_document_family",
+            "eqms_document_revision",
+            "eqms_documents"
+          ],
+          "legacy_tables_to_isolate": [],
+          "alias_only": null,
+          "canonical_successor_resource": null,
+          "e_signature_required": null,
+          "reason_code_field": null,
+          "timeboxed_expiry_required": null,
+          "release_snapshot_of": null,
+          "usage_zone": "qms_controlled_information",
+          "gate_type": "documented_information_control_gate",
+          "audit_class": "part_11_part_820_40_audit_trail",
+          "retention_class": "quality_record_10y",
+          "recommended_actions": [],
+          "evidence_requirements": [
+            "approved_change_notice",
+            "release_signature_event",
+            "revision_history_entry"
+          ],
+          "kpi_signals": [
+            "document_release_lead_time",
+            "expired_document_rate",
+            "unacknowledged_controlled_copy_rate"
+          ],
+          "auto_audit_checks": [
+            "dcc_effective_date_not_backdated_without_dcn",
+            "dcc_header_single_approver_only",
+            "dcc_header_single_owner_only",
+            "dcc_release_requires_dcn",
+            "dcc_revision_follows_semver_pattern"
+          ],
+          "upstream_objects": [
+            "quality_improvement.document_change_notice",
+            "quality_improvement.document_change_request"
+          ],
+          "downstream_objects": [
+            "quality_improvement.controlled_copies",
+            "quality_improvement.document_acknowledgements",
+            "training_and_competence.training_assignments"
+          ],
+          "key_relationships": [],
+          "runtime_exposure_status": "",
+          "purpose": "Govern version control of QMS controlled documents (Manual, Policy, SOP, WI, Form, Annex, Handbook, JD). Distinct from Engineering Change Control (ECC = plm_change_*) which governs parts/BOMs/items.",
+          "source_contract": "contracts/objects/quality_improvement--document-control/contract.json"
         },
         "fqc-inspections": {
           "canonical_resource": "quality_improvement.fqc-inspections",

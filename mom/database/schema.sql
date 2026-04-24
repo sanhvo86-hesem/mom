@@ -3971,12 +3971,12 @@ INSERT INTO kpi_definitions (metric_code, kpi_name, kpi_name_vi, unit, target, f
     ('FPY',   'First Pass Yield',              'Ty le dat lan dau',             '%', 95.0, 'weekly'),
     ('OEE',   'Overall Equipment Effectiveness','Hieu suat thiet bi tong the',  '%', 85.0, 'daily'),
     ('DPMO',  'Defects Per Million Opportunities','Loi tren trieu co hoi',      'ppm', 500, 'monthly'),
-    ('CAPA-CLOSE', 'CAPA Closure Rate',        'Ty le dong CAPA',              '%', 90.0, 'monthly'),
-    ('CAL-COMP',   'Calibration Compliance',   'Ty le tuan thu hieu chuan',    '%', 100.0, 'monthly'),
-    ('SCRAP',      'Scrap Rate',               'Ty le phe pham',               '%', 2.0,  'weekly'),
-    ('CCR',        'Customer Complaint Rate',   'Ty le khieu nai khach hang',   'ppm', 100, 'monthly'),
-    ('SQI',        'Supplier Quality Index',    'Chi so chat luong NCC',        '%', 95.0, 'quarterly'),
-    ('TRN-COMP',   'Training Completion Rate',  'Ty le hoan thanh dao tao',     '%', 100.0, 'quarterly');
+    ('CAPA_CLOSURE', 'CAPA Closure Rate',       'Ty le dong CAPA',              '%', 90.0, 'monthly'),
+    ('CAL_COMPLIANCE', 'Calibration Compliance', 'Ty le tuan thu hieu chuan',   '%', 100.0, 'monthly'),
+    ('SCRAP_RATE', 'Scrap Rate',                'Ty le phe pham',               '%', 2.0,  'weekly'),
+    ('COMPLAINT_RATE', 'Customer Complaint Rate','Ty le khieu nai khach hang',   'ppm', 100, 'monthly'),
+    ('SUPPLIER_QUAL', 'Supplier Quality Index',  'Chi so chat luong NCC',        '%', 95.0, 'quarterly'),
+    ('TRAINING_COMP', 'Training Completion Rate','Ty le hoan thanh dao tao',     '%', 100.0, 'quarterly');
 
 -- ---------------------------------------------------------------------------
 -- Initial record counters for current year
@@ -5418,9 +5418,9 @@ ON CONFLICT DO NOTHING;
 INSERT INTO kpi_definitions (metric_code, kpi_name, kpi_name_vi, unit, target, frequency) VALUES
     ('MTBF',   'Mean Time Between Failures',  'Thoi gian trung binh giua cac lan hong', 'hours', 500.0, 'monthly'),
     ('MTTR',   'Mean Time To Repair',         'Thoi gian trung binh de sua chua',       'hours', 2.0,   'monthly'),
-    ('UTIL',   'Machine Utilization',          'Ty le su dung may',                      '%',     80.0,  'daily'),
-    ('SETUP',  'Average Setup Time',           'Thoi gian setup trung binh',             'min',   45.0,  'weekly'),
-    ('CYCLE-VAR', 'Cycle Time Variance',       'Do lech thoi gian chu ky',               '%',     5.0,   'daily')
+    ('MACHINE_UTIL', 'Machine Utilization',    'Ty le su dung may',                      '%',     80.0,  'daily'),
+    ('SETUP_RATIO',  'Average Setup Time',     'Thoi gian setup trung binh',             'min',   45.0,  'weekly'),
+    ('CYCLE_TIME_VARIANCE', 'Cycle Time Variance', 'Do lech thoi gian chu ky',           '%',     5.0,   'daily')
 ON CONFLICT DO NOTHING;
 
 
@@ -33405,3 +33405,4139 @@ BEGIN
     END LOOP;
 END $$;
 -- <<< END MIGRATION: 139_eqms_runtime_contract_reconcile.sql
+
+-- >>> BEGIN MIGRATION: 140_migrate_ncr_capa_to_eqms.sql
+-- ============================================================================
+-- Migration 140: Migrate legacy NCR & CAPA records → EQMS v4.0 surface
+-- ============================================================================
+-- Safe:       INSERT … WHERE NOT EXISTS — idempotent, re-runnable
+-- Direction:  ncr_records  → eqms_ncr_records
+--             capa_records → eqms_capa_records
+-- Source:     Legacy tables preserved (no DELETE); data is additive.
+-- Author:     System — module-consolidation sprint 4
+-- Date:       2026-04-17
+-- ============================================================================
+
+BEGIN;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 1: ncr_records → eqms_ncr_records
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Column mapping:
+--   ncr_id            → ncr_id           (UUID, same value)
+--   ncr_number        → ncr_number       (VARCHAR, same value)
+--   defect_description→ title + description
+--   severity (INT)    → severity (VARCHAR): ≥8=critical, 5-7=major, <5=minor
+--   nonconformance_source→ source (VARCHAR)
+--   job_number        → job_number
+--   quantity_affected → qty_affected
+--   containment_action→ containment_action
+--   root_cause        → root_cause
+--   disposition       → disposition (enum→varchar lowercase)
+--   ncr_status        → status
+--   created_at        → created_at + detected_at
+-- ─────────────────────────────────────────────────────────────────────────────
+
+INSERT INTO eqms_ncr_records (
+    ncr_id,
+    ncr_number,
+    title,
+    description,
+    severity,
+    source,
+    job_number,
+    qty_affected,
+    detected_at,
+    containment_action,
+    root_cause,
+    disposition,
+    status,
+    version,
+    created_at,
+    created_by
+)
+SELECT
+    n.ncr_id,
+    n.ncr_number,
+    -- title: first 512 chars of defect_description (NOT NULL)
+    LEFT(COALESCE(n.defect_description, 'Migrated NCR'), 512),
+    -- description: full defect_description (NOT NULL)
+    COALESCE(n.defect_description, 'Migrated from legacy ncr_records'),
+    -- severity: map INT 1-10 → categorical string
+    CASE
+        WHEN n.severity IS NULL          THEN 'minor'
+        WHEN n.severity >= 8             THEN 'critical'
+        WHEN n.severity >= 5             THEN 'major'
+        ELSE                                  'minor'
+    END,
+    -- source: map nc_source_enum → eqms source values
+    CASE n.nonconformance_source::text
+        WHEN 'In-Process'       THEN 'production'
+        WHEN 'Final Inspection' THEN 'production'
+        WHEN 'Customer Return'  THEN 'customer'
+        WHEN 'Incoming'         THEN 'receiving'
+        WHEN 'Audit Finding'    THEN 'audit'
+        WHEN 'Supplier'         THEN 'receiving'
+        ELSE                         'production'
+    END,
+    n.job_number,
+    n.quantity_affected,
+    -- detected_at: use created_at as best approximation
+    n.created_at,
+    n.containment_action,
+    n.root_cause,
+    -- disposition: map ncr_disposition_enum → eqms disposition varchar
+    CASE n.disposition::text
+        WHEN 'Use As-Is'          THEN 'use_as_is'
+        WHEN 'Rework'             THEN 'rework'
+        WHEN 'Repair'             THEN 'repair'
+        WHEN 'Scrap'              THEN 'scrap'
+        WHEN 'Return to Supplier' THEN 'return_to_vendor'
+        WHEN 'Concession'         THEN 'use_as_is'
+        ELSE NULL
+    END,
+    -- status: map ncr_status_enum → EQMS state machine states
+    -- draft/submitted/under_review/mrb_review/disposition_set/rework_in_progress/closed
+    CASE n.ncr_status::text
+        WHEN 'Open'                 THEN 'submitted'
+        WHEN 'Contained'            THEN 'submitted'
+        WHEN 'Under Investigation'  THEN 'under_review'
+        WHEN 'CAPA Assigned'        THEN 'disposition_set'
+        WHEN 'Closed'               THEN 'closed'
+        WHEN 'Verified'             THEN 'closed'
+        ELSE                             'submitted'
+    END,
+    1,
+    n.created_at,
+    'system_migration'
+FROM ncr_records n
+WHERE NOT EXISTS (
+    SELECT 1 FROM eqms_ncr_records e WHERE e.ncr_id = n.ncr_id
+);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 2: capa_records → eqms_capa_records
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Column mapping:
+--   capa_id           → capa_id           (UUID, same value)
+--   record_id         → capa_number       (VARCHAR, existing formatted ID)
+--   corrective_action → title + description (combined)
+--   preventive_action → description suffix
+--   source_ncr_id     → source_type='ncr', source_id=resolved ncr_id UUID
+--   root_cause_method → root_cause_method (enum→varchar lowercase)
+--   root_cause        → root_cause_description
+--   corrective+preventive → action_plan (JSONB array)
+--   target_date       → due_date
+--   capa_status       → status
+-- ─────────────────────────────────────────────────────────────────────────────
+
+INSERT INTO eqms_capa_records (
+    capa_id,
+    capa_number,
+    title,
+    description,
+    source_type,
+    source_id,
+    severity,
+    root_cause_method,
+    root_cause_description,
+    action_plan,
+    due_date,
+    status,
+    version,
+    created_at,
+    created_by
+)
+SELECT
+    c.capa_id,
+    -- capa_number: use record_id (already unique formatted string), fallback to generated
+    COALESCE(
+        NULLIF(TRIM(c.record_id), ''),
+        'CAPA-MIG-' || TO_CHAR(c.created_at, 'YYYYMMDD') || '-' || SUBSTR(c.capa_id::text, 1, 8)
+    ),
+    -- title: first 512 chars of corrective_action or root_cause
+    LEFT(COALESCE(
+        NULLIF(TRIM(c.corrective_action), ''),
+        NULLIF(TRIM(c.root_cause), ''),
+        'Legacy CAPA'
+    ), 512),
+    -- description: combine corrective + preventive actions
+    CASE
+        WHEN c.corrective_action IS NOT NULL AND c.preventive_action IS NOT NULL
+            THEN c.corrective_action || E'\n\n[Hành động phòng ngừa / Preventive Action]\n' || c.preventive_action
+        WHEN c.corrective_action IS NOT NULL THEN c.corrective_action
+        WHEN c.preventive_action IS NOT NULL THEN c.preventive_action
+        ELSE 'Migrated from legacy capa_records'
+    END,
+    -- source_type
+    CASE WHEN c.source_ncr_id IS NOT NULL THEN 'ncr' ELSE 'other' END,
+    -- source_id: resolve ncr UUID from ncr_number FK
+    n.ncr_id,
+    -- severity: legacy CAPA has no severity → default minor
+    'minor',
+    -- root_cause_method: map enum → eqms values (5why, fishbone, fault_tree, other)
+    CASE c.root_cause_method::text
+        WHEN '5-Why'    THEN '5why'
+        WHEN 'Fishbone' THEN 'fishbone'
+        WHEN 'FTA'      THEN 'fault_tree'
+        ELSE                 'other'
+    END,
+    c.root_cause,
+    -- action_plan: JSONB array from corrective + preventive action fields
+    COALESCE(
+        (
+            SELECT jsonb_agg(item)
+            FROM (
+                SELECT jsonb_build_object(
+                    'desc',        c.corrective_action,
+                    'responsible', 'migrated',
+                    'due_date',    c.target_date::text,
+                    'status',      CASE WHEN c.completion_date IS NOT NULL THEN 'completed' ELSE 'open' END
+                ) AS item
+                WHERE c.corrective_action IS NOT NULL
+                UNION ALL
+                SELECT jsonb_build_object(
+                    'desc',        c.preventive_action,
+                    'responsible', 'migrated',
+                    'due_date',    c.target_date::text,
+                    'status',      CASE WHEN c.completion_date IS NOT NULL THEN 'completed' ELSE 'open' END
+                ) AS item
+                WHERE c.preventive_action IS NOT NULL
+            ) sub
+        ),
+        '[]'::jsonb
+    ),
+    c.target_date,
+    -- status: map capa_status_enum → EQMS CAPA state machine
+    -- draft/initiated/analysis/action_planning/pending_approval/approved/implementation/effectiveness_review/closed/cancelled
+    CASE c.capa_status::text
+        WHEN 'Open'                 THEN 'initiated'
+        WHEN 'In Progress'          THEN 'analysis'
+        WHEN 'Implemented'          THEN 'implementation'
+        WHEN 'Verification Pending' THEN 'effectiveness_review'
+        WHEN 'Closed Effective'     THEN 'closed'
+        WHEN 'Closed Not Effective' THEN 'closed'
+        ELSE                             'initiated'
+    END,
+    1,
+    c.created_at,
+    'system_migration'
+FROM capa_records c
+LEFT JOIN ncr_records n ON n.ncr_number = c.source_ncr_id
+WHERE NOT EXISTS (
+    SELECT 1 FROM eqms_capa_records e WHERE e.capa_id = c.capa_id
+);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 3: Update eqms_ncr_records.linked_capa_id for migrated NCRs
+-- Links NCR → CAPA now that both sets are in eqms tables
+-- ─────────────────────────────────────────────────────────────────────────────
+UPDATE eqms_ncr_records enr
+SET linked_capa_id = ecr.capa_id
+FROM eqms_capa_records ecr
+JOIN capa_records leg_capa ON leg_capa.capa_id = ecr.capa_id
+JOIN ncr_records leg_ncr ON leg_ncr.ncr_number = leg_capa.source_ncr_id
+WHERE enr.linked_capa_id IS NULL
+  AND leg_ncr.ncr_id = enr.ncr_id;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 4: Migration audit log
+-- ─────────────────────────────────────────────────────────────────────────────
+DO $$
+DECLARE
+    v_ncr_migrated  INTEGER;
+    v_capa_migrated INTEGER;
+    v_ncr_total     INTEGER;
+    v_capa_total    INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO v_ncr_total  FROM ncr_records;
+    SELECT COUNT(*) INTO v_capa_total FROM capa_records;
+    SELECT COUNT(*) INTO v_ncr_migrated  FROM eqms_ncr_records  WHERE created_by = 'system_migration';
+    SELECT COUNT(*) INTO v_capa_migrated FROM eqms_capa_records WHERE created_by = 'system_migration';
+    RAISE NOTICE '[Migration 140] NCR:  %/% rows migrated to eqms_ncr_records',  v_ncr_migrated,  v_ncr_total;
+    RAISE NOTICE '[Migration 140] CAPA: %/% rows migrated to eqms_capa_records', v_capa_migrated, v_capa_total;
+END;
+$$;
+
+COMMIT;
+-- <<< END MIGRATION: 140_migrate_ncr_capa_to_eqms.sql
+
+-- >>> BEGIN MIGRATION: 141_extend_eqms_documents_migrate_records.sql
+-- ============================================================================
+-- Migration 141: Extend eqms_documents + migrate legacy records → EQMS surface
+-- ============================================================================
+-- Safe:       Column additions use IF NOT EXISTS; INSERT uses WHERE NOT EXISTS
+-- Direction:  records (document-like types) → eqms_documents
+-- Scope:      Only record_type values that are evidence/document records;
+--             NCR/CAPA/RISK/SCAR are excluded (already migrated in M140/M136).
+-- Source:     Legacy records table preserved (no DELETE); data is additive.
+-- Author:     System — module-consolidation sprint 5
+-- Date:       2026-04-17
+-- ============================================================================
+
+BEGIN;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 1: Extend eqms_documents with Evidence Control columns
+-- ─────────────────────────────────────────────────────────────────────────────
+-- evidence_type  : original record_type from legacy records table (lineage)
+-- linked_exception_id : link to a related NCR/CAPA record (nullable)
+-- source_record_id    : legacy records.record_id for traceability (VARCHAR 120)
+-- updated_at / updated_by : audit trail columns
+-- form_code           : form template reference migrated from records.form_code
+-- ─────────────────────────────────────────────────────────────────────────────
+
+ALTER TABLE eqms_documents
+    ADD COLUMN IF NOT EXISTS evidence_type       VARCHAR(60),
+    ADD COLUMN IF NOT EXISTS linked_exception_id UUID,
+    ADD COLUMN IF NOT EXISTS source_record_id    VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS updated_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
+    ADD COLUMN IF NOT EXISTS updated_by          VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS form_code           VARCHAR(20);
+
+COMMENT ON COLUMN eqms_documents.evidence_type
+    IS 'Original record_type from legacy records registry (lineage tracing).';
+COMMENT ON COLUMN eqms_documents.linked_exception_id
+    IS 'UUID of related eqms_ncr_records or eqms_capa_records (nullable foreign key).';
+COMMENT ON COLUMN eqms_documents.source_record_id
+    IS 'Legacy records.record_id — preserved for lineage; NULL for native EQMS docs.';
+COMMENT ON COLUMN eqms_documents.form_code
+    IS 'Form template reference (from legacy records.form_code).';
+
+-- Index to support lookups by source_record_id (lineage queries)
+CREATE INDEX IF NOT EXISTS idx_eqms_docs_source_record
+    ON eqms_documents (source_record_id)
+    WHERE source_record_id IS NOT NULL;
+
+-- Index to support linked_exception_id FK lookups
+CREATE INDEX IF NOT EXISTS idx_eqms_docs_linked_exception
+    ON eqms_documents (linked_exception_id)
+    WHERE linked_exception_id IS NOT NULL;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 2: Migrate legacy records → eqms_documents
+-- ─────────────────────────────────────────────────────────────────────────────
+--
+-- Inclusion criteria (document-type evidence records only):
+--   FAI               → First Article Inspection report
+--   TRN               → Training record / competency log
+--   AUD               → Internal audit report
+--   ECR               → Engineering Change Request document
+--   CAL               → Calibration record
+--   IMP               → Improvement/Kaizen record
+--   MR                → Management Review minutes
+--   SOP-NUMBER        → Standard Operating Procedure document
+--   WORK-INSTRUCTION-NUMBER → Work Instruction document
+--   ANNEX-NUMBER      → Annex / appendix document
+--   MATERIAL-CERT     → Material certificate / CoC
+--   CONTROL-PLAN      → Control plan document
+--   MSA               → Measurement System Analysis study
+--   SPC-STUDY         → Statistical Process Control study
+--   PFMEA             → Process FMEA document
+--
+-- Excluded (already handled by dedicated EQMS modules):
+--   NCR, CAPA         → eqms_ncr_records, eqms_capa_records (migration 140)
+--   SCAR              → eqms_supplier_audits (EqmsSupplierAuditsController)
+--   RISK              → eqms_risk_register (EqmsRisksController)
+--   CONCESSION, DEVIATION, REWORK, RMA → eqms_deviations/ncr
+--   CUSTOMER-COMPLAINT → eqms_complaints
+--   SUPPLIER-AUDIT    → eqms_supplier_audits
+--   PART/TOOL/GAGE/FIXTURE-NUMBER → master data (not documents)
+--   DOWNTIME, PO-EXCEPTION, PM-ORDER, CM-ORDER, SPARE-PART, NPI → ops/maintenance
+-- ─────────────────────────────────────────────────────────────────────────────
+
+INSERT INTO eqms_documents (
+    doc_number,
+    title,
+    document_type,
+    department,
+    owner,
+    revision_code,
+    effective_date,
+    expiry_date,
+    storage_ref,
+    form_code,
+    status,
+    version,
+    created_at,
+    created_by,
+    updated_at,
+    evidence_type,
+    source_record_id
+)
+SELECT
+    -- doc_number: use record_id directly (≤50 chars, already unique formatted string)
+    r.record_id,
+
+    -- title: prefer explicit title, fallback to "TYPE — ID"
+    COALESCE(
+        NULLIF(TRIM(r.title), ''),
+        r.record_type::text || ' — ' || r.record_id
+    ),
+
+    -- document_type: map record_type_enum → eqms document type vocabulary
+    CASE r.record_type::text
+        WHEN 'FAI'                      THEN 'first_article_inspection'
+        WHEN 'TRN'                      THEN 'training_record'
+        WHEN 'AUD'                      THEN 'audit_report'
+        WHEN 'ECR'                      THEN 'engineering_change'
+        WHEN 'CAL'                      THEN 'calibration_record'
+        WHEN 'IMP'                      THEN 'improvement_record'
+        WHEN 'MR'                       THEN 'management_review'
+        WHEN 'SOP-NUMBER'               THEN 'SOP'
+        WHEN 'WORK-INSTRUCTION-NUMBER'  THEN 'WI'
+        WHEN 'ANNEX-NUMBER'             THEN 'annex'
+        WHEN 'MATERIAL-CERT'            THEN 'material_cert'
+        WHEN 'CONTROL-PLAN'             THEN 'control_plan'
+        WHEN 'MSA'                      THEN 'MSA_study'
+        WHEN 'SPC-STUDY'                THEN 'SPC_study'
+        WHEN 'PFMEA'                    THEN 'PFMEA'
+        ELSE                                 'other'
+    END,
+
+    -- department: direct from dept_code (VARCHAR → VARCHAR)
+    r.dept_code::text,
+
+    -- owner: resolve UUID → username; NULL if unassigned
+    (SELECT u.username FROM users u WHERE u.user_id = r.assigned_to LIMIT 1),
+
+    -- revision_code: default '00' (records table has no revision concept)
+    '00',
+
+    -- effective_date: valid_from (best approximation for effective date)
+    r.valid_from::date,
+
+    -- expiry_date: valid_to if set, else due_date (both represent a deadline)
+    COALESCE(r.valid_to::date, r.due_date),
+
+    -- storage_ref: external file location from sharepoint_path
+    r.sharepoint_path,
+
+    -- form_code: preserve form template reference
+    r.form_code,
+
+    -- status: map record_status enum → EQMS document lifecycle
+    -- EQMS doc states: draft | in_review | pending_approval | approved | released | obsolete
+    CASE r.status::text
+        WHEN 'open'               THEN 'draft'
+        WHEN 'in_progress'        THEN 'in_review'
+        WHEN 'pending_review'     THEN 'in_review'
+        WHEN 'pending_approval'   THEN 'pending_approval'
+        WHEN 'closed'             THEN 'released'
+        WHEN 'cancelled'          THEN 'obsolete'
+        WHEN 'on_hold'            THEN 'draft'
+        ELSE                           'draft'
+    END,
+
+    -- version: default 1 (legacy records have no document version counter)
+    1,
+
+    -- created_at: preserve original timestamp
+    r.created_at,
+
+    -- created_by: resolve UUID → username; fallback to sentinel for tracing
+    COALESCE(
+        (SELECT u.username FROM users u WHERE u.user_id = r.created_by LIMIT 1),
+        'system_migration'
+    ),
+
+    -- updated_at: use records.updated_at
+    r.updated_at,
+
+    -- evidence_type: preserve original record_type for lineage
+    r.record_type::text,
+
+    -- source_record_id: preserve original primary key for lineage
+    r.record_id
+
+FROM records r
+WHERE r.record_type::text IN (
+    'FAI', 'TRN', 'AUD', 'ECR', 'CAL', 'IMP', 'MR',
+    'SOP-NUMBER', 'WORK-INSTRUCTION-NUMBER', 'ANNEX-NUMBER',
+    'MATERIAL-CERT', 'CONTROL-PLAN', 'MSA', 'SPC-STUDY', 'PFMEA'
+)
+AND NOT EXISTS (
+    SELECT 1 FROM eqms_documents d WHERE d.source_record_id = r.record_id
+);
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 3: Link migrated documents to their parent NCR (where capa_link / source_record
+--         resolves to a migrated NCR in eqms_ncr_records)
+-- ─────────────────────────────────────────────────────────────────────────────
+UPDATE eqms_documents d
+SET    linked_exception_id = n.ncr_id
+FROM   records r
+JOIN   eqms_ncr_records n ON n.ncr_number = r.source_record
+WHERE  d.source_record_id  = r.record_id
+AND    r.source_record     IS NOT NULL
+AND    d.linked_exception_id IS NULL;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 4: Migration audit log
+-- ─────────────────────────────────────────────────────────────────────────────
+DO $$
+DECLARE
+    v_migrated   INTEGER;
+    v_eligible   INTEGER;
+    v_linked     INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO v_eligible
+    FROM records
+    WHERE record_type::text IN (
+        'FAI', 'TRN', 'AUD', 'ECR', 'CAL', 'IMP', 'MR',
+        'SOP-NUMBER', 'WORK-INSTRUCTION-NUMBER', 'ANNEX-NUMBER',
+        'MATERIAL-CERT', 'CONTROL-PLAN', 'MSA', 'SPC-STUDY', 'PFMEA'
+    );
+
+    SELECT COUNT(*) INTO v_migrated
+    FROM eqms_documents WHERE source_record_id IS NOT NULL;
+
+    SELECT COUNT(*) INTO v_linked
+    FROM eqms_documents WHERE linked_exception_id IS NOT NULL AND source_record_id IS NOT NULL;
+
+    RAISE NOTICE '[Migration 141] eqms_documents: %/% eligible records migrated; % linked to NCR',
+        v_migrated, v_eligible, v_linked;
+END;
+$$;
+
+COMMIT;
+-- <<< END MIGRATION: 141_extend_eqms_documents_migrate_records.sql
+
+-- >>> BEGIN MIGRATION: 142_eqms_supplier_iqc_aggregates.sql
+-- ============================================================================
+-- Migration 142: Add IQC Quality Aggregates to EQMS Supplier Profiles
+-- ============================================================================
+-- Purpose:   Expose Incoming Quality Control (IQC) metrics on the EQMS
+--            supplier surface without migrating granular records.
+--            The legacy incoming_inspections table (M035/M139) remains the
+--            source of truth; these columns are derived aggregates.
+-- Strategy:  Additive columns + trigger for real-time sync + backfill.
+-- Source:    incoming_inspections → eqms_supplier_profiles (IQC columns only)
+-- Author:    System — module-consolidation sprint 5B
+-- Date:      2026-04-17
+--
+-- Type note: incoming_inspections.vendor_id is VARCHAR(50) (M035).
+--            eqms_supplier_profiles.vendor_id is UUID (M136).
+--            Join uses sp.vendor_id::text = ii.vendor_id throughout.
+-- ============================================================================
+
+BEGIN;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 1: Add IQC aggregate columns to eqms_supplier_profiles
+-- ─────────────────────────────────────────────────────────────────────────────
+
+ALTER TABLE eqms_supplier_profiles
+    ADD COLUMN IF NOT EXISTS iqc_sample_count_ytd     INTEGER     NOT NULL DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS iqc_defect_count_ytd     INTEGER     NOT NULL DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS iqc_reject_rate_ytd      NUMERIC(5,2) NOT NULL DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS iqc_avg_defects_per_lot  NUMERIC(8,2) NOT NULL DEFAULT 0,
+    ADD COLUMN IF NOT EXISTS iqc_quality_level        VARCHAR(20)  NOT NULL DEFAULT 'normal',
+    ADD COLUMN IF NOT EXISTS iqc_last_inspection_date DATE,
+    ADD COLUMN IF NOT EXISTS iqc_last_result          VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS iqc_certifications_required JSONB     NOT NULL DEFAULT '{}'::jsonb;
+
+COMMENT ON COLUMN eqms_supplier_profiles.iqc_sample_count_ytd
+    IS 'Count of incoming inspection lots inspected in the current calendar year.';
+COMMENT ON COLUMN eqms_supplier_profiles.iqc_defect_count_ytd
+    IS 'Total defects found across all lots in the current calendar year.';
+COMMENT ON COLUMN eqms_supplier_profiles.iqc_reject_rate_ytd
+    IS 'Percent of lots rejected (result=reject) YTD — used for skip-lot classification.';
+COMMENT ON COLUMN eqms_supplier_profiles.iqc_avg_defects_per_lot
+    IS 'Average defects per lot inspected YTD.';
+COMMENT ON COLUMN eqms_supplier_profiles.iqc_quality_level
+    IS 'Derived inspection intensity: normal|tightened|reduced|skip.';
+COMMENT ON COLUMN eqms_supplier_profiles.iqc_last_inspection_date
+    IS 'Date of the most recent completed incoming inspection for this supplier.';
+COMMENT ON COLUMN eqms_supplier_profiles.iqc_last_result
+    IS 'Result of the most recent completed incoming inspection.';
+COMMENT ON COLUMN eqms_supplier_profiles.iqc_certifications_required
+    IS 'Required documentation flags: {"coc": bool, "material_cert": bool, "test_report": bool}.';
+
+-- Index for quality level queries (e.g. find all tightened suppliers)
+CREATE INDEX IF NOT EXISTS idx_eqms_supplier_iqc_level
+    ON eqms_supplier_profiles (iqc_quality_level)
+    WHERE iqc_quality_level <> 'normal';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 2: Trigger function — sync IQC aggregates on inspection change
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Fires AFTER INSERT OR UPDATE on incoming_inspections.
+-- Recalculates YTD metrics for the affected vendor and updates the profile.
+-- Handles vendor_id type mismatch: incoming.vendor_id VARCHAR(50) ↔ UUID.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE OR REPLACE FUNCTION sync_supplier_iqc_aggregates()
+RETURNS TRIGGER AS $$
+DECLARE
+    v_vendor_id    TEXT;
+    v_ytd_start    TIMESTAMPTZ;
+    v_sample_count INTEGER;
+    v_defect_count INTEGER;
+    v_reject_count INTEGER;
+    v_reject_rate  NUMERIC(5,2);
+    v_avg_defects  NUMERIC(8,2);
+    v_quality_lvl  VARCHAR(20);
+    v_last_date    DATE;
+    v_last_result  VARCHAR(40);
+BEGIN
+    v_vendor_id := NEW.vendor_id;
+    v_ytd_start := date_trunc('year', now());
+
+    -- Calculate YTD aggregates for this vendor
+    SELECT
+        COUNT(*)::INTEGER,
+        COALESCE(SUM(defects_found), 0)::INTEGER,
+        COUNT(*) FILTER (WHERE result::text = 'reject')::INTEGER
+    INTO
+        v_sample_count, v_defect_count, v_reject_count
+    FROM incoming_inspections
+    WHERE vendor_id = v_vendor_id
+      AND created_at >= v_ytd_start;
+
+    -- Reject rate (0 if no samples)
+    v_reject_rate := CASE
+        WHEN v_sample_count > 0 THEN ROUND((v_reject_count::NUMERIC / v_sample_count) * 100, 2)
+        ELSE 0
+    END;
+
+    -- Average defects per lot
+    v_avg_defects := CASE
+        WHEN v_sample_count > 0 THEN ROUND(v_defect_count::NUMERIC / v_sample_count, 2)
+        ELSE 0
+    END;
+
+    -- Quality level classification:
+    --   reject_rate > 10%                    → tightened
+    --   reject_rate 5-10% OR avg_defects > 2 → tightened
+    --   sample_count >= 20 AND rate < 1%     → reduced
+    --   sample_count >= 50 AND rate = 0      → skip
+    --   otherwise                            → normal
+    v_quality_lvl := CASE
+        WHEN v_reject_rate > 10                                   THEN 'tightened'
+        WHEN v_reject_rate >= 5  OR v_avg_defects > 2            THEN 'tightened'
+        WHEN v_sample_count >= 50 AND v_reject_rate = 0           THEN 'skip'
+        WHEN v_sample_count >= 20 AND v_reject_rate < 1           THEN 'reduced'
+        ELSE                                                           'normal'
+    END;
+
+    -- Most recent inspection date and result for this vendor
+    SELECT received_date, result::text
+    INTO v_last_date, v_last_result
+    FROM incoming_inspections
+    WHERE vendor_id = v_vendor_id
+    ORDER BY received_date DESC, created_at DESC
+    LIMIT 1;
+
+    -- Update the EQMS supplier profile (join via vendor_id type cast)
+    UPDATE eqms_supplier_profiles sp
+    SET
+        iqc_sample_count_ytd    = v_sample_count,
+        iqc_defect_count_ytd    = v_defect_count,
+        iqc_reject_rate_ytd     = v_reject_rate,
+        iqc_avg_defects_per_lot = v_avg_defects,
+        iqc_quality_level       = v_quality_lvl,
+        iqc_last_inspection_date = v_last_date,
+        iqc_last_result         = v_last_result,
+        updated_at              = now()
+    WHERE sp.vendor_id::text = v_vendor_id;
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Attach trigger to incoming_inspections table
+DROP TRIGGER IF EXISTS trg_sync_supplier_iqc ON incoming_inspections;
+CREATE TRIGGER trg_sync_supplier_iqc
+    AFTER INSERT OR UPDATE ON incoming_inspections
+    FOR EACH ROW
+    EXECUTE FUNCTION sync_supplier_iqc_aggregates();
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 3: Backfill IQC aggregates from existing incoming_inspections data
+-- ─────────────────────────────────────────────────────────────────────────────
+
+UPDATE eqms_supplier_profiles sp
+SET
+    iqc_sample_count_ytd = agg.sample_count,
+    iqc_defect_count_ytd = agg.defect_count,
+    iqc_reject_rate_ytd  = CASE
+        WHEN agg.sample_count > 0
+            THEN ROUND((agg.reject_count::NUMERIC / agg.sample_count) * 100, 2)
+        ELSE 0
+    END,
+    iqc_avg_defects_per_lot = CASE
+        WHEN agg.sample_count > 0
+            THEN ROUND(agg.defect_count::NUMERIC / agg.sample_count, 2)
+        ELSE 0
+    END,
+    iqc_quality_level = CASE
+        WHEN agg.sample_count = 0                                                THEN 'normal'
+        WHEN (agg.reject_count::NUMERIC / agg.sample_count) > 0.10              THEN 'tightened'
+        WHEN (agg.reject_count::NUMERIC / agg.sample_count) >= 0.05
+             OR (agg.defect_count::NUMERIC / agg.sample_count) > 2              THEN 'tightened'
+        WHEN agg.sample_count >= 50
+             AND agg.reject_count = 0                                            THEN 'skip'
+        WHEN agg.sample_count >= 20
+             AND (agg.reject_count::NUMERIC / agg.sample_count) < 0.01          THEN 'reduced'
+        ELSE                                                                          'normal'
+    END,
+    iqc_last_inspection_date = last_insp.received_date,
+    iqc_last_result          = last_insp.result_text,
+    updated_at               = now()
+FROM (
+    SELECT
+        vendor_id,
+        COUNT(*)::INTEGER                                               AS sample_count,
+        COALESCE(SUM(defects_found), 0)::INTEGER                       AS defect_count,
+        COUNT(*) FILTER (WHERE result::text = 'reject')::INTEGER       AS reject_count
+    FROM incoming_inspections
+    WHERE created_at >= date_trunc('year', now())
+    GROUP BY vendor_id
+) agg
+-- Most recent inspection per vendor
+LEFT JOIN LATERAL (
+    SELECT received_date, result::text AS result_text
+    FROM incoming_inspections ii2
+    WHERE ii2.vendor_id = agg.vendor_id
+    ORDER BY received_date DESC, created_at DESC
+    LIMIT 1
+) last_insp ON TRUE
+WHERE sp.vendor_id::text = agg.vendor_id;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 4: Register IQC sub-resource routes in eqms-quality-routes
+-- ─────────────────────────────────────────────────────────────────────────────
+-- NOTE: Route file changes are applied via eqms-quality-routes.php (Sprint 5B-routes).
+-- This comment documents the intended new routes:
+--   GET  /api/v1/eqms/suppliers/{id}/iqc          → iqcSummary() (profile aggregates)
+--   POST /api/v1/eqms/suppliers/{id}/iqc/query    → iqcHistory() (inspection list)
+-- These methods are added to EqmsSuppliersController in the route registration phase.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 5: Audit log
+-- ─────────────────────────────────────────────────────────────────────────────
+DO $$
+DECLARE
+    v_updated  INTEGER;
+    v_total    INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO v_total  FROM eqms_supplier_profiles;
+    SELECT COUNT(*) INTO v_updated FROM eqms_supplier_profiles WHERE iqc_sample_count_ytd > 0;
+    RAISE NOTICE '[Migration 142] IQC aggregates: % supplier profiles updated from incoming_inspections (% total profiles)',
+        v_updated, v_total;
+END;
+$$;
+
+COMMIT;
+-- <<< END MIGRATION: 142_eqms_supplier_iqc_aggregates.sql
+
+-- >>> BEGIN MIGRATION: 143_eqms_mdm_reference_codes.sql
+-- Migration: 143_eqms_mdm_reference_codes.sql
+-- Description: Seed governed EQMS reference-code sets for DB-backed dropdowns.
+-- Dependencies: 064_master_data_governance.sql
+-- Rollback: DELETE FROM mdm_reference_code_values WHERE mdm_reference_code_id IN (SELECT mdm_reference_code_id FROM mdm_reference_codes WHERE code_set LIKE 'eqms.%'); DELETE FROM mdm_reference_codes WHERE code_set LIKE 'eqms.%';
+
+BEGIN;
+
+CREATE TEMP TABLE _eqms_reference_seed (
+    code_set    VARCHAR(50)  NOT NULL,
+    description VARCHAR(200) NOT NULL,
+    code_value  VARCHAR(80)  NOT NULL,
+    value_label VARCHAR(200) NOT NULL,
+    sort_order  INT          NOT NULL
+) ON COMMIT DROP;
+
+INSERT INTO _eqms_reference_seed (code_set, description, code_value, value_label, sort_order) VALUES
+('eqms.status', 'Common governed EQMS workflow states.', 'draft', 'Draft', 10),
+('eqms.status', 'Common governed EQMS workflow states.', 'open', 'Open', 20),
+('eqms.status', 'Common governed EQMS workflow states.', 'in_progress', 'In progress', 30),
+('eqms.status', 'Common governed EQMS workflow states.', 'under_review', 'Under review', 40),
+('eqms.status', 'Common governed EQMS workflow states.', 'pending_approval', 'Pending approval', 50),
+('eqms.status', 'Common governed EQMS workflow states.', 'approved', 'Approved', 60),
+('eqms.status', 'Common governed EQMS workflow states.', 'active', 'Active', 70),
+('eqms.status', 'Common governed EQMS workflow states.', 'assigned', 'Assigned', 80),
+('eqms.status', 'Common governed EQMS workflow states.', 'completed', 'Completed', 90),
+('eqms.status', 'Common governed EQMS workflow states.', 'closed', 'Closed', 100),
+('eqms.status', 'Common governed EQMS workflow states.', 'cancelled', 'Cancelled', 110),
+('eqms.status', 'Common governed EQMS workflow states.', 'rejected', 'Rejected', 120),
+('eqms.status', 'Common governed EQMS workflow states.', 'on_hold', 'On hold', 130),
+('eqms.status', 'Common governed EQMS workflow states.', 'overdue', 'Overdue', 140),
+('eqms.status', 'Common governed EQMS workflow states.', 'expired', 'Expired', 150),
+
+('eqms.severity', 'EQMS severity levels.', 'critical', 'Critical', 10),
+('eqms.severity', 'EQMS severity levels.', 'major', 'Major', 20),
+('eqms.severity', 'EQMS severity levels.', 'minor', 'Minor', 30),
+('eqms.severity', 'EQMS severity levels.', 'high', 'High', 40),
+('eqms.severity', 'EQMS severity levels.', 'medium', 'Medium', 50),
+('eqms.severity', 'EQMS severity levels.', 'low', 'Low', 60),
+
+('eqms.priority', 'EQMS priority levels.', 'critical', 'Critical', 10),
+('eqms.priority', 'EQMS priority levels.', 'high', 'High', 20),
+('eqms.priority', 'EQMS priority levels.', 'medium', 'Medium', 30),
+('eqms.priority', 'EQMS priority levels.', 'low', 'Low', 40),
+
+('eqms.source_type', 'EQMS source and trigger types.', 'customer', 'Customer', 10),
+('eqms.source_type', 'EQMS source and trigger types.', 'field', 'Field', 20),
+('eqms.source_type', 'EQMS source and trigger types.', 'distributor', 'Distributor', 30),
+('eqms.source_type', 'EQMS source and trigger types.', 'internal', 'Internal', 40),
+('eqms.source_type', 'EQMS source and trigger types.', 'production', 'Production', 50),
+('eqms.source_type', 'EQMS source and trigger types.', 'receiving', 'Receiving inspection', 60),
+('eqms.source_type', 'EQMS source and trigger types.', 'audit', 'Audit', 70),
+('eqms.source_type', 'EQMS source and trigger types.', 'process', 'Process', 80),
+('eqms.source_type', 'EQMS source and trigger types.', 'ncr', 'NCR', 90),
+('eqms.source_type', 'EQMS source and trigger types.', 'complaint', 'Complaint', 100),
+('eqms.source_type', 'EQMS source and trigger types.', 'deviation', 'Deviation', 110),
+('eqms.source_type', 'EQMS source and trigger types.', 'spc', 'SPC signal', 120),
+('eqms.source_type', 'EQMS source and trigger types.', 'other', 'Other', 130),
+
+('eqms.change_type', 'EQMS change-control types.', 'document', 'Document', 10),
+('eqms.change_type', 'EQMS change-control types.', 'process', 'Process', 20),
+('eqms.change_type', 'EQMS change-control types.', 'product', 'Product', 30),
+('eqms.change_type', 'EQMS change-control types.', 'equipment', 'Equipment', 40),
+('eqms.change_type', 'EQMS change-control types.', 'system', 'System', 50),
+('eqms.change_type', 'EQMS change-control types.', 'quality', 'Quality system', 60),
+('eqms.change_type', 'EQMS change-control types.', 'regulatory', 'Regulatory', 70),
+('eqms.change_type', 'EQMS change-control types.', 'facility', 'Facility', 80),
+('eqms.change_type', 'EQMS change-control types.', 'design', 'Design', 90),
+('eqms.change_type', 'EQMS change-control types.', 'material', 'Material', 100),
+('eqms.change_type', 'EQMS change-control types.', 'tooling', 'Tooling', 110),
+('eqms.change_type', 'EQMS change-control types.', 'supplier', 'Supplier', 120),
+
+('eqms.change_category', 'EQMS engineering/change categories.', 'major', 'Major', 10),
+('eqms.change_category', 'EQMS engineering/change categories.', 'minor', 'Minor', 20),
+('eqms.change_category', 'EQMS engineering/change categories.', 'administrative', 'Administrative', 30),
+('eqms.change_category', 'EQMS engineering/change categories.', 'design', 'Design', 40),
+('eqms.change_category', 'EQMS engineering/change categories.', 'material', 'Material', 50),
+('eqms.change_category', 'EQMS engineering/change categories.', 'process', 'Process', 60),
+('eqms.change_category', 'EQMS engineering/change categories.', 'tooling', 'Tooling', 70),
+('eqms.change_category', 'EQMS engineering/change categories.', 'supplier', 'Supplier', 80),
+
+('eqms.deviation_type', 'EQMS deviation types.', 'planned', 'Planned', 10),
+('eqms.deviation_type', 'EQMS deviation types.', 'unplanned', 'Unplanned', 20),
+('eqms.deviation_type', 'EQMS deviation types.', 'emergency', 'Emergency', 30),
+('eqms.deviation_type', 'EQMS deviation types.', 'process', 'Process', 40),
+('eqms.deviation_type', 'EQMS deviation types.', 'product', 'Product', 50),
+('eqms.deviation_type', 'EQMS deviation types.', 'material', 'Material', 60),
+('eqms.deviation_type', 'EQMS deviation types.', 'system', 'System', 70),
+('eqms.deviation_type', 'EQMS deviation types.', 'environmental', 'Environmental', 80),
+
+('eqms.document_type', 'EQMS document types.', 'SOP', 'SOP', 10),
+('eqms.document_type', 'EQMS document types.', 'WI', 'Work instruction', 20),
+('eqms.document_type', 'EQMS document types.', 'form', 'Form', 30),
+('eqms.document_type', 'EQMS document types.', 'policy', 'Policy', 40),
+('eqms.document_type', 'EQMS document types.', 'spec', 'Specification', 50),
+('eqms.document_type', 'EQMS document types.', 'record', 'Record', 60),
+('eqms.document_type', 'EQMS document types.', 'procedure', 'Procedure', 70),
+('eqms.document_type', 'EQMS document types.', 'manual', 'Manual', 80),
+
+('eqms.audit_type', 'EQMS audit types.', 'internal', 'Internal', 10),
+('eqms.audit_type', 'EQMS audit types.', 'external', 'External', 20),
+('eqms.audit_type', 'EQMS audit types.', 'supplier', 'Supplier', 30),
+('eqms.audit_type', 'EQMS audit types.', 'regulatory', 'Regulatory', 40),
+('eqms.audit_type', 'EQMS audit types.', 'onsite', 'Onsite', 50),
+('eqms.audit_type', 'EQMS audit types.', 'remote', 'Remote', 60),
+('eqms.audit_type', 'EQMS audit types.', 'document', 'Document', 70),
+
+('eqms.standard_ref', 'Quality management standard references.', 'ISO 9001', 'ISO 9001', 10),
+('eqms.standard_ref', 'Quality management standard references.', 'ISO 13485', 'ISO 13485', 20),
+('eqms.standard_ref', 'Quality management standard references.', 'AS9100D', 'AS9100D', 30),
+('eqms.standard_ref', 'Quality management standard references.', 'IATF 16949', 'IATF 16949', 40),
+('eqms.standard_ref', 'Quality management standard references.', 'FDA 21 CFR 820', 'FDA 21 CFR 820', 50),
+('eqms.standard_ref', 'Quality management standard references.', 'ISO 14001', 'ISO 14001', 60),
+('eqms.standard_ref', 'Quality management standard references.', 'ISO 45001', 'ISO 45001', 70),
+
+('eqms.risk_level', 'EQMS qualitative risk levels.', 'critical', 'Critical', 10),
+('eqms.risk_level', 'EQMS qualitative risk levels.', 'high', 'High', 20),
+('eqms.risk_level', 'EQMS qualitative risk levels.', 'medium', 'Medium', 30),
+('eqms.risk_level', 'EQMS qualitative risk levels.', 'low', 'Low', 40),
+('eqms.risk_level', 'EQMS qualitative risk levels.', 'negligible', 'Negligible', 50),
+
+('eqms.disposition', 'NCR and batch disposition decisions.', 'rework', 'Rework', 10),
+('eqms.disposition', 'NCR and batch disposition decisions.', 'repair', 'Repair', 20),
+('eqms.disposition', 'NCR and batch disposition decisions.', 'use_as_is', 'Use as is', 30),
+('eqms.disposition', 'NCR and batch disposition decisions.', 'return_to_vendor', 'Return to vendor', 40),
+('eqms.disposition', 'NCR and batch disposition decisions.', 'scrap', 'Scrap', 50),
+('eqms.disposition', 'NCR and batch disposition decisions.', 'release', 'Release', 60),
+('eqms.disposition', 'NCR and batch disposition decisions.', 'conditional_release', 'Conditional release', 70),
+('eqms.disposition', 'NCR and batch disposition decisions.', 'hold', 'Hold', 80),
+('eqms.disposition', 'NCR and batch disposition decisions.', 'reject', 'Reject', 90),
+
+('eqms.training_type', 'EQMS training delivery types.', 'read_and_sign', 'Read and sign', 10),
+('eqms.training_type', 'EQMS training delivery types.', 'instructor_led', 'Instructor led', 20),
+('eqms.training_type', 'EQMS training delivery types.', 'online', 'Online', 30),
+('eqms.training_type', 'EQMS training delivery types.', 'on_the_job', 'On the job', 40),
+('eqms.training_type', 'EQMS training delivery types.', 'exam', 'Exam', 50),
+
+('eqms.category', 'Common EQMS category values.', 'visual', 'Visual', 10),
+('eqms.category', 'Common EQMS category values.', 'dimensional', 'Dimensional', 20),
+('eqms.category', 'Common EQMS category values.', 'functional', 'Functional', 30),
+('eqms.category', 'Common EQMS category values.', 'material', 'Material', 40),
+('eqms.category', 'Common EQMS category values.', 'contamination', 'Contamination', 50),
+('eqms.category', 'Common EQMS category values.', 'documentation', 'Documentation', 60),
+('eqms.category', 'Common EQMS category values.', 'process', 'Process', 70),
+('eqms.category', 'Common EQMS category values.', 'product', 'Product', 80),
+('eqms.category', 'Common EQMS category values.', 'supplier', 'Supplier', 90),
+('eqms.category', 'Common EQMS category values.', 'regulatory', 'Regulatory', 100),
+('eqms.category', 'Common EQMS category values.', 'system', 'System', 110),
+('eqms.category', 'Common EQMS category values.', 'major', 'Major', 120),
+('eqms.category', 'Common EQMS category values.', 'minor', 'Minor', 130),
+('eqms.category', 'Common EQMS category values.', 'observation', 'Observation', 140),
+('eqms.category', 'Common EQMS category values.', 'opportunity', 'Opportunity', 150),
+
+('eqms.release_type', 'EQMS batch-release decision types.', 'standard', 'Standard release', 10),
+('eqms.release_type', 'EQMS batch-release decision types.', 'expedited', 'Expedited release', 20),
+('eqms.release_type', 'EQMS batch-release decision types.', 'conditional', 'Conditional release', 30),
+
+('eqms.action_type', 'EQMS field-action types.', 'recall', 'Recall', 10),
+('eqms.action_type', 'EQMS field-action types.', 'field_safety_notice', 'Field safety notice', 20),
+('eqms.action_type', 'EQMS field-action types.', 'advisory', 'Advisory', 30),
+('eqms.action_type', 'EQMS field-action types.', 'investigation', 'Investigation', 40),
+
+('eqms.boolean', 'Generic governed yes-no values.', 'yes', 'Yes', 10),
+('eqms.boolean', 'Generic governed yes-no values.', 'no', 'No', 20),
+
+('eqms.type', 'Generic EQMS type values for legacy forms.', 'corrective', 'Corrective', 10),
+('eqms.type', 'Generic EQMS type values for legacy forms.', 'preventive', 'Preventive', 20),
+('eqms.type', 'Generic EQMS type values for legacy forms.', 'document', 'Document', 30),
+('eqms.type', 'Generic EQMS type values for legacy forms.', 'process', 'Process', 40),
+('eqms.type', 'Generic EQMS type values for legacy forms.', 'product', 'Product', 50),
+('eqms.type', 'Generic EQMS type values for legacy forms.', 'equipment', 'Equipment', 60),
+('eqms.type', 'Generic EQMS type values for legacy forms.', 'system', 'System', 70),
+('eqms.type', 'Generic EQMS type values for legacy forms.', 'supplier', 'Supplier', 80),
+('eqms.type', 'Generic EQMS type values for legacy forms.', 'internal', 'Internal', 90),
+('eqms.type', 'Generic EQMS type values for legacy forms.', 'external', 'External', 100),
+('eqms.type', 'Generic EQMS type values for legacy forms.', 'regulatory', 'Regulatory', 110),
+
+('eqms.classification', 'EQMS classification values.', 'internal', 'Internal', 10),
+('eqms.classification', 'EQMS classification values.', 'confidential', 'Confidential', 20),
+('eqms.classification', 'EQMS classification values.', 'restricted', 'Restricted', 30),
+('eqms.classification', 'EQMS classification values.', 'process', 'Process', 40),
+('eqms.classification', 'EQMS classification values.', 'product', 'Product', 50),
+('eqms.classification', 'EQMS classification values.', 'material', 'Material', 60),
+('eqms.classification', 'EQMS classification values.', 'system', 'System', 70),
+('eqms.classification', 'EQMS classification values.', 'environmental', 'Environmental', 80),
+('eqms.classification', 'EQMS classification values.', 'voluntary', 'Voluntary', 90),
+('eqms.classification', 'EQMS classification values.', 'mandatory', 'Mandatory', 100),
+
+('eqms.nc_type', 'NCR nonconformance types.', 'product', 'Product', 10),
+('eqms.nc_type', 'NCR nonconformance types.', 'process', 'Process', 20),
+('eqms.nc_type', 'NCR nonconformance types.', 'material', 'Material', 30),
+('eqms.nc_type', 'NCR nonconformance types.', 'supplier', 'Supplier', 40),
+('eqms.nc_type', 'NCR nonconformance types.', 'documentation', 'Documentation', 50),
+('eqms.nc_type', 'NCR nonconformance types.', 'customer', 'Customer', 60),
+
+('eqms.defect_type', 'EQMS defect types.', 'visual', 'Visual', 10),
+('eqms.defect_type', 'EQMS defect types.', 'dimensional', 'Dimensional', 20),
+('eqms.defect_type', 'EQMS defect types.', 'functional', 'Functional', 30),
+('eqms.defect_type', 'EQMS defect types.', 'material', 'Material', 40),
+('eqms.defect_type', 'EQMS defect types.', 'contamination', 'Contamination', 50),
+('eqms.defect_type', 'EQMS defect types.', 'documentation', 'Documentation', 60),
+('eqms.defect_type', 'EQMS defect types.', 'other', 'Other', 70),
+
+('eqms.detection_method', 'EQMS detection methods.', 'customer_report', 'Customer report', 10),
+('eqms.detection_method', 'EQMS detection methods.', 'field_service', 'Field service', 20),
+('eqms.detection_method', 'EQMS detection methods.', 'incoming_inspection', 'Incoming inspection', 30),
+('eqms.detection_method', 'EQMS detection methods.', 'in_process', 'In-process inspection', 40),
+('eqms.detection_method', 'EQMS detection methods.', 'final_inspection', 'Final inspection', 50),
+('eqms.detection_method', 'EQMS detection methods.', 'audit', 'Audit', 60),
+('eqms.detection_method', 'EQMS detection methods.', 'spc', 'SPC signal', 70),
+('eqms.detection_method', 'EQMS detection methods.', 'other', 'Other', 80),
+
+('eqms.detection_point', 'EQMS detection points.', 'receiving', 'Receiving', 10),
+('eqms.detection_point', 'EQMS detection points.', 'in_process', 'In process', 20),
+('eqms.detection_point', 'EQMS detection points.', 'final_inspection', 'Final inspection', 30),
+('eqms.detection_point', 'EQMS detection points.', 'customer', 'Customer', 40),
+('eqms.detection_point', 'EQMS detection points.', 'audit', 'Audit', 50),
+('eqms.detection_point', 'EQMS detection points.', 'field', 'Field', 60),
+
+('eqms.regulatory_impact', 'EQMS regulatory impact levels.', 'none', 'None', 10),
+('eqms.regulatory_impact', 'EQMS regulatory impact levels.', 'low', 'Low', 20),
+('eqms.regulatory_impact', 'EQMS regulatory impact levels.', 'medium', 'Medium', 30),
+('eqms.regulatory_impact', 'EQMS regulatory impact levels.', 'high', 'High', 40),
+('eqms.regulatory_impact', 'EQMS regulatory impact levels.', 'critical', 'Critical', 50),
+('eqms.regulatory_impact', 'EQMS regulatory impact levels.', 'yes', 'Yes', 60),
+('eqms.regulatory_impact', 'EQMS regulatory impact levels.', 'no', 'No', 70),
+
+('eqms.effectiveness', 'EQMS effectiveness outcomes.', 'pending', 'Pending', 10),
+('eqms.effectiveness', 'EQMS effectiveness outcomes.', 'not_due', 'Not due', 20),
+('eqms.effectiveness', 'EQMS effectiveness outcomes.', 'effective', 'Effective', 30),
+('eqms.effectiveness', 'EQMS effectiveness outcomes.', 'partially_effective', 'Partially effective', 40),
+('eqms.effectiveness', 'EQMS effectiveness outcomes.', 'ineffective', 'Ineffective', 50),
+
+('eqms.training_matrix_status', 'Training matrix status values.', 'qualified', 'Qualified', 10),
+('eqms.training_matrix_status', 'Training matrix status values.', 'due_soon', 'Due soon', 20),
+('eqms.training_matrix_status', 'Training matrix status values.', 'overdue', 'Overdue', 30),
+('eqms.training_matrix_status', 'Training matrix status values.', 'not_assigned', 'Not assigned', 40),
+
+('eqms.overdue_filter', 'EQMS overdue filter values.', 'overdue', 'Overdue only', 10),
+('eqms.overdue_filter', 'EQMS overdue filter values.', 'all', 'All records', 20),
+
+('eqms.control_status', 'EQMS control status values.', 'effective', 'Effective', 10),
+('eqms.control_status', 'EQMS control status values.', 'partially_effective', 'Partially effective', 20),
+('eqms.control_status', 'EQMS control status values.', 'ineffective', 'Ineffective', 30),
+('eqms.control_status', 'EQMS control status values.', 'pending', 'Pending', 40),
+('eqms.control_status', 'EQMS control status values.', 'retired', 'Retired', 50),
+
+('eqms.outcome', 'EQMS outcome values.', 'accepted', 'Accepted', 10),
+('eqms.outcome', 'EQMS outcome values.', 'rejected', 'Rejected', 20),
+('eqms.outcome', 'EQMS outcome values.', 'requires_action', 'Requires action', 30),
+('eqms.outcome', 'EQMS outcome values.', 'effective', 'Effective', 40),
+('eqms.outcome', 'EQMS outcome values.', 'ineffective', 'Ineffective', 50),
+
+('eqms.strategic_classification', 'Supplier strategic classification values.', 'strategic', 'Strategic', 10),
+('eqms.strategic_classification', 'Supplier strategic classification values.', 'preferred', 'Preferred', 20),
+('eqms.strategic_classification', 'Supplier strategic classification values.', 'approved', 'Approved', 30),
+('eqms.strategic_classification', 'Supplier strategic classification values.', 'conditional', 'Conditional', 40),
+('eqms.strategic_classification', 'Supplier strategic classification values.', 'development', 'Development', 50),
+('eqms.strategic_classification', 'Supplier strategic classification values.', 'disqualified', 'Disqualified', 60),
+
+('eqms.checklist_template', 'EQMS audit checklist templates.', 'iso9001', 'ISO 9001', 10),
+('eqms.checklist_template', 'EQMS audit checklist templates.', 'as9100', 'AS9100', 20),
+('eqms.checklist_template', 'EQMS audit checklist templates.', 'iatf16949', 'IATF 16949', 30),
+('eqms.checklist_template', 'EQMS audit checklist templates.', 'iso13485', 'ISO 13485', 40),
+('eqms.checklist_template', 'EQMS audit checklist templates.', 'process_audit', 'Process audit', 50),
+('eqms.checklist_template', 'EQMS audit checklist templates.', 'supplier_audit', 'Supplier audit', 60),
+
+('eqms.validation_type', 'EQMS validation types.', 'iq', 'IQ', 10),
+('eqms.validation_type', 'EQMS validation types.', 'oq', 'OQ', 20),
+('eqms.validation_type', 'EQMS validation types.', 'pq', 'PQ', 30),
+('eqms.validation_type', 'EQMS validation types.', 'csv', 'CSV', 40),
+('eqms.validation_type', 'EQMS validation types.', 'cleaning', 'Cleaning validation', 50),
+('eqms.validation_type', 'EQMS validation types.', 'process_validation', 'Process validation', 60),
+('eqms.validation_type', 'EQMS validation types.', 'method_validation', 'Method validation', 70),
+
+('eqms.requirement_priority', 'EQMS requirement priority values.', 'critical', 'Critical', 10),
+('eqms.requirement_priority', 'EQMS requirement priority values.', 'high', 'High', 20),
+('eqms.requirement_priority', 'EQMS requirement priority values.', 'medium', 'Medium', 30),
+('eqms.requirement_priority', 'EQMS requirement priority values.', 'low', 'Low', 40),
+
+('eqms.requirement_type', 'EQMS requirement types.', 'user', 'User', 10),
+('eqms.requirement_type', 'EQMS requirement types.', 'business', 'Business', 20),
+('eqms.requirement_type', 'EQMS requirement types.', 'functional', 'Functional', 30),
+('eqms.requirement_type', 'EQMS requirement types.', 'regulatory', 'Regulatory', 40),
+('eqms.requirement_type', 'EQMS requirement types.', 'data', 'Data', 50),
+('eqms.requirement_type', 'EQMS requirement types.', 'security', 'Security', 60),
+('eqms.requirement_type', 'EQMS requirement types.', 'integration', 'Integration', 70),
+
+('eqms.execution_status', 'EQMS execution status values.', 'not_started', 'Not started', 10),
+('eqms.execution_status', 'EQMS execution status values.', 'in_progress', 'In progress', 20),
+('eqms.execution_status', 'EQMS execution status values.', 'pass', 'Pass', 30),
+('eqms.execution_status', 'EQMS execution status values.', 'fail', 'Fail', 40),
+('eqms.execution_status', 'EQMS execution status values.', 'blocked', 'Blocked', 50),
+('eqms.execution_status', 'EQMS execution status values.', 'deviation', 'Deviation', 60),
+
+('eqms.hazard_class', 'EQMS health hazard classifications.', 'none', 'None', 10),
+('eqms.hazard_class', 'EQMS health hazard classifications.', 'class_i', 'Class I', 20),
+('eqms.hazard_class', 'EQMS health hazard classifications.', 'class_ii', 'Class II', 30),
+('eqms.hazard_class', 'EQMS health hazard classifications.', 'class_iii', 'Class III', 40),
+('eqms.hazard_class', 'EQMS health hazard classifications.', 'low', 'Low', 50),
+('eqms.hazard_class', 'EQMS health hazard classifications.', 'medium', 'Medium', 60),
+('eqms.hazard_class', 'EQMS health hazard classifications.', 'high', 'High', 70),
+
+('eqms.urgency', 'EQMS urgency values.', 'routine', 'Routine', 10),
+('eqms.urgency', 'EQMS urgency values.', 'urgent', 'Urgent', 20),
+('eqms.urgency', 'EQMS urgency values.', 'emergency', 'Emergency', 30),
+('eqms.urgency', 'EQMS urgency values.', 'critical', 'Critical', 40),
+
+('eqms.capability_level', 'Supplier and process capability levels.', 'capable', 'Capable', 10),
+('eqms.capability_level', 'Supplier and process capability levels.', 'conditional', 'Conditional', 20),
+('eqms.capability_level', 'Supplier and process capability levels.', 'not_capable', 'Not capable', 30),
+
+('eqms.due_status', 'EQMS due-date status values.', 'not_due', 'Not due', 10),
+('eqms.due_status', 'EQMS due-date status values.', 'due_soon', 'Due soon', 20),
+('eqms.due_status', 'EQMS due-date status values.', 'due', 'Due', 30),
+('eqms.due_status', 'EQMS due-date status values.', 'overdue', 'Overdue', 40),
+('eqms.due_status', 'EQMS due-date status values.', 'completed', 'Completed', 50),
+
+('eqms.equipment_type', 'EQMS equipment type values.', 'cnc_machine', 'CNC machine', 10),
+('eqms.equipment_type', 'EQMS equipment type values.', 'measurement_device', 'Measurement device', 20),
+('eqms.equipment_type', 'EQMS equipment type values.', 'fixture', 'Fixture', 30),
+('eqms.equipment_type', 'EQMS equipment type values.', 'tooling', 'Tooling', 40),
+('eqms.equipment_type', 'EQMS equipment type values.', 'software', 'Software', 50),
+('eqms.equipment_type', 'EQMS equipment type values.', 'utility', 'Utility', 60),
+
+('eqms.fmea_type', 'EQMS FMEA type values.', 'dfmea', 'DFMEA', 10),
+('eqms.fmea_type', 'EQMS FMEA type values.', 'pfmea', 'PFMEA', 20),
+('eqms.fmea_type', 'EQMS FMEA type values.', 'process', 'Process FMEA', 30),
+('eqms.fmea_type', 'EQMS FMEA type values.', 'design', 'Design FMEA', 40),
+('eqms.fmea_type', 'EQMS FMEA type values.', 'machine', 'Machine FMEA', 50),
+
+('eqms.response_method', 'EQMS response method values.', 'containment', 'Containment', 10),
+('eqms.response_method', 'EQMS response method values.', 'correction', 'Correction', 20),
+('eqms.response_method', 'EQMS response method values.', 'corrective_action', 'Corrective action', 30),
+('eqms.response_method', 'EQMS response method values.', 'preventive_action', 'Preventive action', 40),
+('eqms.response_method', 'EQMS response method values.', 'notification', 'Notification', 50),
+
+('eqms.rt_type', 'EQMS risk and traceability type values.', 'risk', 'Risk', 10),
+('eqms.rt_type', 'EQMS risk and traceability type values.', 'requirement', 'Requirement', 20),
+('eqms.rt_type', 'EQMS risk and traceability type values.', 'test', 'Test', 30),
+('eqms.rt_type', 'EQMS risk and traceability type values.', 'trace', 'Trace', 40),
+('eqms.rt_type', 'EQMS risk and traceability type values.', 'evidence', 'Evidence', 50),
+
+('eqms.study_type', 'EQMS SPC and study type values.', 'capability', 'Capability study', 10),
+('eqms.study_type', 'EQMS SPC and study type values.', 'gage_rr', 'Gage R&R', 20),
+('eqms.study_type', 'EQMS SPC and study type values.', 'msa', 'MSA', 30),
+('eqms.study_type', 'EQMS SPC and study type values.', 'control_chart', 'Control chart', 40),
+('eqms.study_type', 'EQMS SPC and study type values.', 'stability', 'Stability study', 50),
+
+('eqms.scope', 'EQMS scope values.', 'product', 'Product', 10),
+('eqms.scope', 'EQMS scope values.', 'process', 'Process', 20),
+('eqms.scope', 'EQMS scope values.', 'site', 'Site', 30),
+('eqms.scope', 'EQMS scope values.', 'supplier', 'Supplier', 40),
+('eqms.scope', 'EQMS scope values.', 'customer', 'Customer', 50),
+('eqms.scope', 'EQMS scope values.', 'system', 'System', 60),
+
+('eqms.format', 'EQMS document copy formats.', 'paper', 'Paper', 10),
+('eqms.format', 'EQMS document copy formats.', 'electronic', 'Electronic', 20),
+('eqms.format', 'EQMS document copy formats.', 'controlled_pdf', 'Controlled PDF', 30),
+
+('eqms.decision', 'EQMS review decision values.', 'approve', 'Approve', 10),
+('eqms.decision', 'EQMS review decision values.', 'reject', 'Reject', 20),
+('eqms.decision', 'EQMS review decision values.', 'revise', 'Revise', 30),
+('eqms.decision', 'EQMS review decision values.', 'defer', 'Defer', 40),
+
+('eqms.vote', 'EQMS board vote values.', 'approve', 'Approve', 10),
+('eqms.vote', 'EQMS board vote values.', 'reject', 'Reject', 20),
+('eqms.vote', 'EQMS board vote values.', 'abstain', 'Abstain', 30),
+
+('eqms.impact', 'EQMS impact values.', 'none', 'None', 10),
+('eqms.impact', 'EQMS impact values.', 'low', 'Low', 20),
+('eqms.impact', 'EQMS impact values.', 'medium', 'Medium', 30),
+('eqms.impact', 'EQMS impact values.', 'high', 'High', 40),
+('eqms.impact', 'EQMS impact values.', 'critical', 'Critical', 50),
+
+('eqms.quality_status', 'EQMS quality status values.', 'accepted', 'Accepted', 10),
+('eqms.quality_status', 'EQMS quality status values.', 'hold', 'Hold', 20),
+('eqms.quality_status', 'EQMS quality status values.', 'rejected', 'Rejected', 30),
+('eqms.quality_status', 'EQMS quality status values.', 'released', 'Released', 40);
+
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+SELECT
+    code_set,
+    MAX(description) AS description,
+    jsonb_build_object(
+        'domain', 'eqms',
+        'authority', 'mdm_reference_codes',
+        'seed_migration', '143_eqms_mdm_reference_codes'
+    ) AS metadata
+FROM _eqms_reference_seed
+GROUP BY code_set
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
+
+INSERT INTO mdm_reference_code_values (
+    mdm_reference_code_id,
+    code_value,
+    value_label,
+    sort_order,
+    metadata
+)
+SELECT
+    c.mdm_reference_code_id,
+    s.code_value,
+    s.value_label,
+    s.sort_order,
+    jsonb_build_object(
+        'domain', 'eqms',
+        'authority', 'mdm_reference_codes',
+        'seed_migration', '143_eqms_mdm_reference_codes'
+    ) AS metadata
+FROM _eqms_reference_seed s
+JOIN mdm_reference_codes c
+  ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
+
+COMMIT;
+-- <<< END MIGRATION: 143_eqms_mdm_reference_codes.sql
+
+-- >>> BEGIN MIGRATION: 144_eqms_master_reference_alignment.sql
+-- Migration: 144_eqms_master_reference_alignment.sql
+-- Description: Align EQMS business-reference columns with master-data code IDs.
+-- Dependencies: 006_erp_master_data.sql, 007_customers_sales.sql, 008_vendors_purchasing.sql, 009_inventory.sql, 136_eqms_worldclass_surface.sql
+-- Rollback: manual only; changing business reference types back to UUID can lose master-code values.
+
+BEGIN;
+
+-- Master data tables in this platform use business codes, not UUIDs:
+-- customers.customer_id, vendors.vendor_id, items.item_id, lot_master.lot_number.
+-- EQMS controllers and dropdowns exchange those same business codes, so EQMS
+-- operational reference columns must use compatible text/varchar types.
+
+ALTER TABLE eqms_complaints
+    ALTER COLUMN customer_id TYPE VARCHAR(50) USING NULLIF(customer_id::text, '')::VARCHAR(50),
+    ALTER COLUMN affected_product_id TYPE VARCHAR(50) USING NULLIF(affected_product_id::text, '')::VARCHAR(50);
+
+ALTER TABLE eqms_ncr_records
+    ALTER COLUMN item_id TYPE VARCHAR(50) USING NULLIF(item_id::text, '')::VARCHAR(50);
+
+ALTER TABLE eqms_supplier_profiles
+    ALTER COLUMN vendor_id TYPE VARCHAR(50) USING NULLIF(vendor_id::text, '')::VARCHAR(50);
+
+ALTER TABLE eqms_quality_agreements
+    ALTER COLUMN vendor_id TYPE VARCHAR(50) USING NULLIF(vendor_id::text, '')::VARCHAR(50);
+
+ALTER TABLE eqms_supplier_audits
+    ALTER COLUMN vendor_id TYPE VARCHAR(50) USING NULLIF(vendor_id::text, '')::VARCHAR(50);
+
+ALTER TABLE eqms_scars
+    ALTER COLUMN vendor_id TYPE VARCHAR(50) USING NULLIF(vendor_id::text, '')::VARCHAR(50);
+
+ALTER TABLE eqms_lab_investigations
+    ALTER COLUMN product_id TYPE VARCHAR(50) USING NULLIF(product_id::text, '')::VARCHAR(50);
+
+ALTER TABLE eqms_batch_release
+    ALTER COLUMN lot_id TYPE VARCHAR(100) USING NULLIF(lot_id::text, '')::VARCHAR(100),
+    ALTER COLUMN product_id TYPE VARCHAR(50) USING NULLIF(product_id::text, '')::VARCHAR(50);
+
+ALTER TABLE eqms_deviations
+    ALTER COLUMN batch_id TYPE VARCHAR(100) USING NULLIF(batch_id::text, '')::VARCHAR(100);
+
+ALTER TABLE IF EXISTS eqms_supplier_quality_agreements
+    ALTER COLUMN supplier_id TYPE VARCHAR(50) USING NULLIF(supplier_id::text, '')::VARCHAR(50);
+
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_eqms_complaints_customer_master') THEN
+        ALTER TABLE eqms_complaints
+            ADD CONSTRAINT fk_eqms_complaints_customer_master
+            FOREIGN KEY (customer_id) REFERENCES customers(customer_id) NOT VALID;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_eqms_complaints_product_master') THEN
+        ALTER TABLE eqms_complaints
+            ADD CONSTRAINT fk_eqms_complaints_product_master
+            FOREIGN KEY (affected_product_id) REFERENCES items(item_id) NOT VALID;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_eqms_ncr_item_master') THEN
+        ALTER TABLE eqms_ncr_records
+            ADD CONSTRAINT fk_eqms_ncr_item_master
+            FOREIGN KEY (item_id) REFERENCES items(item_id) NOT VALID;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_eqms_supplier_profiles_vendor_master') THEN
+        ALTER TABLE eqms_supplier_profiles
+            ADD CONSTRAINT fk_eqms_supplier_profiles_vendor_master
+            FOREIGN KEY (vendor_id) REFERENCES vendors(vendor_id) NOT VALID;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_eqms_quality_agreements_vendor_master') THEN
+        ALTER TABLE eqms_quality_agreements
+            ADD CONSTRAINT fk_eqms_quality_agreements_vendor_master
+            FOREIGN KEY (vendor_id) REFERENCES vendors(vendor_id) NOT VALID;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_eqms_supplier_audits_vendor_master') THEN
+        ALTER TABLE eqms_supplier_audits
+            ADD CONSTRAINT fk_eqms_supplier_audits_vendor_master
+            FOREIGN KEY (vendor_id) REFERENCES vendors(vendor_id) NOT VALID;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_eqms_scars_vendor_master') THEN
+        ALTER TABLE eqms_scars
+            ADD CONSTRAINT fk_eqms_scars_vendor_master
+            FOREIGN KEY (vendor_id) REFERENCES vendors(vendor_id) NOT VALID;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_eqms_lab_product_master') THEN
+        ALTER TABLE eqms_lab_investigations
+            ADD CONSTRAINT fk_eqms_lab_product_master
+            FOREIGN KEY (product_id) REFERENCES items(item_id) NOT VALID;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_eqms_batch_lot_master') THEN
+        ALTER TABLE eqms_batch_release
+            ADD CONSTRAINT fk_eqms_batch_lot_master
+            FOREIGN KEY (lot_id) REFERENCES lot_master(lot_number) NOT VALID;
+    END IF;
+
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_eqms_batch_product_master') THEN
+        ALTER TABLE eqms_batch_release
+            ADD CONSTRAINT fk_eqms_batch_product_master
+            FOREIGN KEY (product_id) REFERENCES items(item_id) NOT VALID;
+    END IF;
+
+    IF to_regclass('public.eqms_supplier_quality_agreements') IS NOT NULL
+       AND NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'fk_eqms_supplier_quality_agreements_supplier_master') THEN
+        ALTER TABLE eqms_supplier_quality_agreements
+            ADD CONSTRAINT fk_eqms_supplier_quality_agreements_supplier_master
+            FOREIGN KEY (supplier_id) REFERENCES vendors(vendor_id) NOT VALID;
+    END IF;
+END $$;
+
+COMMIT;
+-- <<< END MIGRATION: 144_eqms_master_reference_alignment.sql
+
+-- >>> BEGIN MIGRATION: 145_eqms_sprint6a_concessions_fai_sc.sql
+-- ============================================================================
+-- Migration 143: EQMS Sprint 6A — Concessions, FAI Reports, Special Characteristics
+-- ============================================================================
+-- Purpose:   Add three IATF 16949 mandatory quality modules to the EQMS suite.
+--            These modules were previously stubs with no tables or routes.
+-- Standards: IATF 16949 §8.7 (concessions), §8.3.5 (FAI), §8.3.5.2 (SC)
+-- Author:    System — module-consolidation sprint 6A
+-- Date:      2026-04-17
+-- ============================================================================
+
+BEGIN;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 1: eqms_concession_records
+-- Material and process deviation/concession dispositions.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS eqms_concession_records (
+    concession_id               UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    concession_number           VARCHAR(80)  NOT NULL UNIQUE,
+    title                       VARCHAR(512) NOT NULL,
+    description                 TEXT         NOT NULL DEFAULT '',
+
+    -- Classification
+    concession_type             VARCHAR(40)  NOT NULL DEFAULT 'material',
+    disposition                 VARCHAR(40)  NOT NULL DEFAULT 'use_as_is',
+
+    -- Affected material / lot
+    affected_part_number        VARCHAR(120),
+    affected_part_revision      VARCHAR(40),
+    affected_lot_number         VARCHAR(120),
+    quantity_affected           NUMERIC(14,4),
+    quantity_unit               VARCHAR(30),
+    affected_process            VARCHAR(200),
+
+    -- Source linkage
+    source_ncr_id               UUID,
+    source_ncr_number           VARCHAR(80),
+    nonconformance_description  TEXT         NOT NULL DEFAULT '',
+
+    -- Disposition details
+    proposed_disposition        TEXT         NOT NULL DEFAULT '',
+    disposition_rationale       TEXT         NOT NULL DEFAULT '',
+    containment_action          TEXT,
+    rework_instructions         TEXT,
+
+    -- Customer approval
+    customer_approval_required  BOOLEAN      NOT NULL DEFAULT FALSE,
+    customer_id                 VARCHAR(120),
+    customer_approval_ref       VARCHAR(200),
+    customer_approval_date      DATE,
+    customer_approver           VARCHAR(120),
+
+    -- Engineering approval
+    engineering_approved_by     VARCHAR(120),
+    engineering_approved_at     TIMESTAMPTZ,
+
+    -- Validity
+    effective_date              DATE,
+    expiry_date                 DATE,
+    max_quantity                NUMERIC(14,4),
+    quantity_used               NUMERIC(14,4) NOT NULL DEFAULT 0,
+
+    -- Regulaory
+    requires_ncr                BOOLEAN      NOT NULL DEFAULT FALSE,
+    regulatory_notification_required BOOLEAN NOT NULL DEFAULT FALSE,
+    regulatory_ref              VARCHAR(200),
+
+    -- Signatures (e-sig references)
+    submitted_by                VARCHAR(120),
+    submitted_at                TIMESTAMPTZ,
+    reviewed_by                 VARCHAR(120),
+    reviewed_at                 TIMESTAMPTZ,
+    approved_by                 VARCHAR(120),
+    approved_at                 TIMESTAMPTZ,
+    rejected_reason             TEXT,
+
+    -- Standard audit fields
+    status                      VARCHAR(40)  NOT NULL DEFAULT 'draft',
+    version                     INTEGER      NOT NULL DEFAULT 1,
+    created_at                  TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    created_by                  VARCHAR(120) NOT NULL,
+    updated_at                  TIMESTAMPTZ  DEFAULT now(),
+    updated_by                  VARCHAR(120)
+);
+
+CREATE INDEX IF NOT EXISTS idx_concession_status
+    ON eqms_concession_records (status);
+CREATE INDEX IF NOT EXISTS idx_concession_part
+    ON eqms_concession_records (affected_part_number)
+    WHERE affected_part_number IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_concession_lot
+    ON eqms_concession_records (affected_lot_number)
+    WHERE affected_lot_number IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_concession_ncr
+    ON eqms_concession_records (source_ncr_id)
+    WHERE source_ncr_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_concession_created
+    ON eqms_concession_records (created_at DESC);
+
+COMMENT ON TABLE eqms_concession_records
+    IS 'IATF 16949 §8.7 — Material/process concession and deviation dispositions.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 2: eqms_fai_reports
+-- First Article Inspection reports per AS9102B / IATF 16949 §8.3.5.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS eqms_fai_reports (
+    fai_id                      UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    fai_number                  VARCHAR(80)  NOT NULL UNIQUE,
+    title                       VARCHAR(512) NOT NULL,
+    description                 TEXT         NOT NULL DEFAULT '',
+
+    -- Subject
+    part_number                 VARCHAR(120) NOT NULL,
+    part_revision               VARCHAR(40),
+    part_description            VARCHAR(300),
+    drawing_number              VARCHAR(120),
+    drawing_revision            VARCHAR(40),
+
+    -- Parties
+    vendor_id                   VARCHAR(120),
+    supplier_name               VARCHAR(200),
+    customer_id                 VARCHAR(120),
+    customer_name               VARCHAR(200),
+    internal_part               BOOLEAN      NOT NULL DEFAULT TRUE,
+
+    -- FAI classification
+    fai_type                    VARCHAR(40)  NOT NULL DEFAULT 'full',
+    fai_reason                  VARCHAR(200),
+    previous_fai_id             UUID,
+    ballooned_drawing_ref       VARCHAR(300),
+
+    -- Inspection scope
+    inspection_date             DATE,
+    inspector                   VARCHAR(120),
+    inspection_location         VARCHAR(200),
+    characteristic_count        INTEGER      NOT NULL DEFAULT 0,
+    pass_count                  INTEGER      NOT NULL DEFAULT 0,
+    fail_count                  INTEGER      NOT NULL DEFAULT 0,
+    open_discrepancy_count      INTEGER      NOT NULL DEFAULT 0,
+
+    -- Result
+    overall_result              VARCHAR(40),
+    conditional_approval_ref    VARCHAR(200),
+
+    -- PPAP linkage (AS9102B §1.1)
+    ppap_level                  INTEGER,
+    ppap_submission_id          UUID,
+
+    -- Regulatory
+    requires_esig               BOOLEAN      NOT NULL DEFAULT FALSE,
+    regulatory_basis            VARCHAR(200),
+
+    -- Approval chain
+    submitted_by                VARCHAR(120),
+    submitted_at                TIMESTAMPTZ,
+    reviewed_by                 VARCHAR(120),
+    reviewed_at                 TIMESTAMPTZ,
+    approved_by                 VARCHAR(120),
+    approved_at                 TIMESTAMPTZ,
+    rejected_reason             TEXT,
+    revision_required_notes     TEXT,
+
+    -- Inline characteristic data (JSON for compact storage; detail rows in eqms_fai_characteristics)
+    characteristics_summary     JSONB        NOT NULL DEFAULT '[]'::jsonb,
+
+    -- Standard audit fields
+    status                      VARCHAR(40)  NOT NULL DEFAULT 'draft',
+    version                     INTEGER      NOT NULL DEFAULT 1,
+    created_at                  TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    created_by                  VARCHAR(120) NOT NULL,
+    updated_at                  TIMESTAMPTZ  DEFAULT now(),
+    updated_by                  VARCHAR(120)
+);
+
+CREATE INDEX IF NOT EXISTS idx_fai_status
+    ON eqms_fai_reports (status);
+CREATE INDEX IF NOT EXISTS idx_fai_part
+    ON eqms_fai_reports (part_number);
+CREATE INDEX IF NOT EXISTS idx_fai_vendor
+    ON eqms_fai_reports (vendor_id)
+    WHERE vendor_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_fai_created
+    ON eqms_fai_reports (created_at DESC);
+
+COMMENT ON TABLE eqms_fai_reports
+    IS 'IATF 16949 §8.3.5 / AS9102B — First Article Inspection reports.';
+
+-- FAI characteristic line items (separate table for large FAI packages)
+CREATE TABLE IF NOT EXISTS eqms_fai_characteristics (
+    char_id                     UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    fai_id                      UUID         NOT NULL REFERENCES eqms_fai_reports(fai_id) ON DELETE CASCADE,
+    balloon_number              VARCHAR(20),
+    characteristic_name         VARCHAR(300) NOT NULL,
+    characteristic_type         VARCHAR(40),
+    nominal_value               NUMERIC(18,6),
+    tolerance_upper             NUMERIC(18,6),
+    tolerance_lower             NUMERIC(18,6),
+    unit_of_measure             VARCHAR(30),
+    measurement_method          VARCHAR(200),
+    measured_value              NUMERIC(18,6),
+    measurement_tool_id         VARCHAR(120),
+    result                      VARCHAR(20),
+    discrepancy_notes           TEXT,
+    sort_order                  INTEGER      NOT NULL DEFAULT 0,
+    created_at                  TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    created_by                  VARCHAR(120) NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_fai_char_fai_id
+    ON eqms_fai_characteristics (fai_id);
+
+COMMENT ON TABLE eqms_fai_characteristics
+    IS 'Line-item characteristic measurements for an FAI report (AS9102B Form 2/3).';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 3: eqms_special_characteristics
+-- Key Product Characteristics (KPC/KCC/SC/CC) per IATF 16949 §8.3.5.2.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS eqms_special_characteristics (
+    sc_id                       UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    sc_number                   VARCHAR(80)  NOT NULL UNIQUE,
+    title                       VARCHAR(512) NOT NULL,
+    description                 TEXT         NOT NULL DEFAULT '',
+
+    -- Classification
+    characteristic_type         VARCHAR(40)  NOT NULL DEFAULT 'SC',
+    symbol                      VARCHAR(20),
+    safety_critical             BOOLEAN      NOT NULL DEFAULT FALSE,
+    regulatory_basis            VARCHAR(200),
+
+    -- Subject
+    part_number                 VARCHAR(120) NOT NULL,
+    part_revision               VARCHAR(40),
+    part_description            VARCHAR(300),
+    process_name                VARCHAR(200),
+    operation_number            VARCHAR(40),
+    drawing_number              VARCHAR(120),
+    balloon_number              VARCHAR(20),
+
+    -- Specification
+    characteristic_name         VARCHAR(300) NOT NULL,
+    nominal_value               NUMERIC(18,6),
+    tolerance_upper             NUMERIC(18,6),
+    tolerance_lower             NUMERIC(18,6),
+    unit_of_measure             VARCHAR(30),
+    target_value                NUMERIC(18,6),
+
+    -- Control requirements
+    control_method              VARCHAR(200),
+    measurement_system          VARCHAR(200),
+    gage_id                     VARCHAR(120),
+    measurement_frequency       VARCHAR(100),
+    sample_size                 INTEGER,
+    reaction_plan               TEXT,
+
+    -- Capability requirements
+    cpk_requirement             NUMERIC(6,3),
+    ppk_requirement             NUMERIC(6,3),
+    current_cpk                 NUMERIC(6,3),
+    last_capability_study_date  DATE,
+
+    -- Control plan linkage
+    control_plan_id             UUID,
+    control_plan_ref            VARCHAR(120),
+    pfmea_id                    UUID,
+    pfmea_ref                   VARCHAR(120),
+
+    -- Customer requirement
+    customer_id                 VARCHAR(120),
+    customer_requirement_ref    VARCHAR(200),
+    customer_symbol             VARCHAR(40),
+
+    -- Approval chain
+    approved_by                 VARCHAR(120),
+    approved_at                 TIMESTAMPTZ,
+    obsoleted_by                VARCHAR(120),
+    obsoleted_at                TIMESTAMPTZ,
+    obsolete_reason             TEXT,
+
+    -- Standard audit fields
+    status                      VARCHAR(40)  NOT NULL DEFAULT 'draft',
+    version                     INTEGER      NOT NULL DEFAULT 1,
+    created_at                  TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    created_by                  VARCHAR(120) NOT NULL,
+    updated_at                  TIMESTAMPTZ  DEFAULT now(),
+    updated_by                  VARCHAR(120)
+);
+
+CREATE INDEX IF NOT EXISTS idx_sc_status
+    ON eqms_special_characteristics (status);
+CREATE INDEX IF NOT EXISTS idx_sc_part
+    ON eqms_special_characteristics (part_number);
+CREATE INDEX IF NOT EXISTS idx_sc_type
+    ON eqms_special_characteristics (characteristic_type);
+CREATE INDEX IF NOT EXISTS idx_sc_safety_critical
+    ON eqms_special_characteristics (safety_critical)
+    WHERE safety_critical = TRUE;
+CREATE INDEX IF NOT EXISTS idx_sc_created
+    ON eqms_special_characteristics (created_at DESC);
+
+COMMENT ON TABLE eqms_special_characteristics
+    IS 'IATF 16949 §8.3.5.2 — Key Product/Control Characteristics (KPC/KCC/SC/CC).';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- MDM seed data: reference code sets for all three modules
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- Concession types
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.concession_type',
+    'Concession Type',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 100, 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
+
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.concession_type', 'material',      'Material Concession', 10),
+        ('eqms.concession_type', 'process',       'Process Deviation', 20),
+        ('eqms.concession_type', 'design',        'Design Deviation', 30),
+        ('eqms.concession_type', 'documentation', 'Documentation Waiver', 40),
+        ('eqms.concession_type', 'other',         'Other', 99)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
+
+-- Concession disposition
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.concession_disposition',
+    'Concession Disposition',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 101, 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
+
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.concession_disposition', 'use_as_is',        'Use As-Is', 10),
+        ('eqms.concession_disposition', 'rework',           'Rework', 20),
+        ('eqms.concession_disposition', 'repair',           'Repair', 30),
+        ('eqms.concession_disposition', 'sort',             'Sort/Screen', 40),
+        ('eqms.concession_disposition', 'scrap',            'Scrap', 50),
+        ('eqms.concession_disposition', 'return_to_vendor', 'Return to Vendor', 60),
+        ('eqms.concession_disposition', 're_grade',         'Re-grade/Re-classify', 70),
+        ('eqms.concession_disposition', 'pending',          'Pending Disposition', 80)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
+
+-- FAI type
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.fai_type',
+    'FAI Type',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 110, 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
+
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.fai_type', 'full',            'Full FAI', 10),
+        ('eqms.fai_type', 'partial',         'Partial FAI', 20),
+        ('eqms.fai_type', 're_fai',          'Re-FAI', 30),
+        ('eqms.fai_type', 'delta_fai',       'Delta FAI', 40),
+        ('eqms.fai_type', 'design_change',   'Design Change FAI', 50),
+        ('eqms.fai_type', 'supplier_change', 'Supplier Change FAI', 60)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
+
+-- FAI overall result
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.fai_result',
+    'FAI Result',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 111, 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
+
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.fai_result', 'pass',                 'Pass', 10),
+        ('eqms.fai_result', 'fail',                 'Fail', 20),
+        ('eqms.fai_result', 'conditional_approval', 'Conditional Approval', 30),
+        ('eqms.fai_result', 'pending',              'Pending', 40)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
+
+-- Special characteristic type
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.sc_type',
+    'Special Characteristic Type',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 120, 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
+
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.sc_type', 'KPC',   'Key Product Characteristic (KPC)', 10),
+        ('eqms.sc_type', 'KCC',   'Key Control Characteristic (KCC)', 20),
+        ('eqms.sc_type', 'SC',    'Special Characteristic (SC)', 30),
+        ('eqms.sc_type', 'CC',    'Critical Characteristic (CC)', 40),
+        ('eqms.sc_type', 'SL',    'Safety/Legal (SL)', 50),
+        ('eqms.sc_type', 'other', 'Other', 99)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '145_eqms_sprint6a_concessions_fai_sc')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Audit log
+-- ─────────────────────────────────────────────────────────────────────────────
+
+DO $$
+BEGIN
+    RAISE NOTICE '[Migration 143] Sprint 6A: eqms_concession_records, eqms_fai_reports, eqms_fai_characteristics, eqms_special_characteristics created with indexes and MDM seed data.';
+END;
+$$;
+
+COMMIT;
+-- <<< END MIGRATION: 145_eqms_sprint6a_concessions_fai_sc.sql
+
+-- >>> BEGIN MIGRATION: 146_eqms_sprint6b_aml_warranty.sql
+-- ============================================================================
+-- Migration 146: EQMS Sprint 6B — Approved Manufacturer List (AML) + Warranty Claims
+-- ============================================================================
+-- Purpose:   Add two additional IATF 16949 required quality modules.
+--            AML controls which suppliers/manufacturers are approved for each part.
+--            Warranty Claims tracks field returns and customer warranty dispositions.
+-- Standards: IATF 16949 §8.4.1 (AML), §8.7.1 (warranty/field returns)
+-- Author:    System — module-consolidation sprint 6B
+-- Date:      2026-04-17
+-- ============================================================================
+
+BEGIN;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 1: eqms_aml_records
+-- Approved Manufacturer / Approved Supplier List entries.
+-- One row per (part_number, vendor_id) approval.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS eqms_aml_records (
+    aml_id                      UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    aml_number                  VARCHAR(80)  NOT NULL UNIQUE,
+    title                       VARCHAR(512) NOT NULL,
+    description                 TEXT         NOT NULL DEFAULT '',
+
+    -- Approved item
+    part_number                 VARCHAR(120) NOT NULL,
+    part_revision               VARCHAR(40),
+    part_description            VARCHAR(300),
+    item_id                     UUID,
+    commodity_code              VARCHAR(80),
+
+    -- Approved manufacturer/supplier
+    vendor_id                   VARCHAR(120) NOT NULL,
+    manufacturer_name           VARCHAR(300),
+    manufacturer_site           VARCHAR(300),
+    manufacturer_part_number    VARCHAR(120),
+    manufacturer_part_revision  VARCHAR(40),
+
+    -- Approval scope
+    approval_type               VARCHAR(40)  NOT NULL DEFAULT 'full',
+    approval_basis              TEXT,
+    qualification_standard      VARCHAR(200),
+    customer_approved           BOOLEAN      NOT NULL DEFAULT FALSE,
+    customer_id                 VARCHAR(120),
+    customer_approval_ref       VARCHAR(200),
+
+    -- Restrictions / conditions
+    restricted                  BOOLEAN      NOT NULL DEFAULT FALSE,
+    restrictions_notes          TEXT,
+    max_annual_quantity         NUMERIC(14,4),
+    max_quantity_unit            VARCHAR(30),
+
+    -- Validity
+    effective_date              DATE,
+    expiry_date                 DATE,
+    renewal_required            BOOLEAN      NOT NULL DEFAULT FALSE,
+
+    -- Qualification evidence
+    qualification_fai_id        UUID,
+    qualification_ppap_id       UUID,
+    qualification_audit_id      UUID,
+
+    -- Approval chain
+    approved_by                 VARCHAR(120),
+    approved_at                 TIMESTAMPTZ,
+    blocked_by                  VARCHAR(120),
+    blocked_at                  TIMESTAMPTZ,
+    blocked_reason              TEXT,
+    obsoleted_by                VARCHAR(120),
+    obsoleted_at                TIMESTAMPTZ,
+
+    -- Standard audit fields
+    status                      VARCHAR(40)  NOT NULL DEFAULT 'draft',
+    version                     INTEGER      NOT NULL DEFAULT 1,
+    created_at                  TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    created_by                  VARCHAR(120) NOT NULL,
+    updated_at                  TIMESTAMPTZ  DEFAULT now(),
+    updated_by                  VARCHAR(120)
+);
+
+CREATE INDEX IF NOT EXISTS idx_aml_status
+    ON eqms_aml_records (status);
+CREATE INDEX IF NOT EXISTS idx_aml_part
+    ON eqms_aml_records (part_number);
+CREATE INDEX IF NOT EXISTS idx_aml_vendor
+    ON eqms_aml_records (vendor_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_aml_part_vendor_active
+    ON eqms_aml_records (part_number, vendor_id, status)
+    WHERE status = 'approved';
+CREATE INDEX IF NOT EXISTS idx_aml_created
+    ON eqms_aml_records (created_at DESC);
+
+COMMENT ON TABLE eqms_aml_records
+    IS 'IATF 16949 §8.4.1 — Approved Manufacturer/Supplier List entries per part-vendor combination.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 2: eqms_warranty_claims
+-- Customer warranty and field return claims.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS eqms_warranty_claims (
+    claim_id                    UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    claim_number                VARCHAR(80)  NOT NULL UNIQUE,
+    title                       VARCHAR(512) NOT NULL,
+    description                 TEXT         NOT NULL DEFAULT '',
+
+    -- Claim origin
+    claim_type                  VARCHAR(40)  NOT NULL DEFAULT 'warranty',
+    claim_source                VARCHAR(40)  NOT NULL DEFAULT 'customer',
+    customer_id                 VARCHAR(120),
+    customer_name               VARCHAR(300),
+    customer_claim_ref          VARCHAR(200),
+    claim_date                  DATE         NOT NULL,
+
+    -- Failed item
+    part_number                 VARCHAR(120),
+    part_revision               VARCHAR(40),
+    serial_number               VARCHAR(200),
+    lot_number                  VARCHAR(120),
+    quantity_claimed            NUMERIC(14,4),
+    quantity_unit               VARCHAR(30),
+    failure_description         TEXT         NOT NULL DEFAULT '',
+    failure_mode                VARCHAR(200),
+    failure_date                DATE,
+    failure_mileage             INTEGER,
+    vehicle_vin                 VARCHAR(50),
+
+    -- Financial
+    claim_amount                NUMERIC(14,2),
+    claim_currency              CHAR(3)      DEFAULT 'USD',
+    approved_amount             NUMERIC(14,2),
+    debit_note_ref              VARCHAR(120),
+
+    -- Disposition
+    disposition                 VARCHAR(40),
+    return_required             BOOLEAN      NOT NULL DEFAULT FALSE,
+    return_tracking_number      VARCHAR(120),
+    return_received_date        DATE,
+    parts_returned              BOOLEAN      NOT NULL DEFAULT FALSE,
+
+    -- Root cause & containment
+    root_cause_category         VARCHAR(100),
+    root_cause_description      TEXT,
+    containment_action          TEXT,
+    corrective_action_ref       VARCHAR(200),
+    linked_ncr_id               UUID,
+    linked_capa_id              UUID,
+    linked_scar_id              UUID,
+
+    -- 8D linkage
+    eight_d_ref                 VARCHAR(120),
+
+    -- Closure
+    closed_by                   VARCHAR(120),
+    closed_at                   TIMESTAMPTZ,
+    closure_notes               TEXT,
+    customer_acceptance_ref     VARCHAR(200),
+
+    -- Standard audit fields
+    status                      VARCHAR(40)  NOT NULL DEFAULT 'open',
+    version                     INTEGER      NOT NULL DEFAULT 1,
+    created_at                  TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    created_by                  VARCHAR(120) NOT NULL,
+    updated_at                  TIMESTAMPTZ  DEFAULT now(),
+    updated_by                  VARCHAR(120)
+);
+
+CREATE INDEX IF NOT EXISTS idx_warranty_status
+    ON eqms_warranty_claims (status);
+CREATE INDEX IF NOT EXISTS idx_warranty_customer
+    ON eqms_warranty_claims (customer_id)
+    WHERE customer_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_warranty_part
+    ON eqms_warranty_claims (part_number)
+    WHERE part_number IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_warranty_lot
+    ON eqms_warranty_claims (lot_number)
+    WHERE lot_number IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_warranty_created
+    ON eqms_warranty_claims (created_at DESC);
+
+COMMENT ON TABLE eqms_warranty_claims
+    IS 'IATF 16949 §8.7.1 — Customer warranty and field return claims with 8D traceability.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- MDM seed data
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- AML approval type
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.aml_approval_type',
+    'AML Approval Type',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 130, 'seed_migration', '146_eqms_sprint6b_aml_warranty')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
+
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.aml_approval_type', 'full',          'Full Approval', 10),
+        ('eqms.aml_approval_type', 'conditional',   'Conditional Approval', 20),
+        ('eqms.aml_approval_type', 'developmental', 'Developmental', 30),
+        ('eqms.aml_approval_type', 'prototype',     'Prototype Only', 40)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '146_eqms_sprint6b_aml_warranty')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
+
+-- Warranty claim type
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.warranty_claim_type',
+    'Warranty Claim Type',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 140, 'seed_migration', '146_eqms_sprint6b_aml_warranty')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
+
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.warranty_claim_type', 'warranty',     'Warranty Claim', 10),
+        ('eqms.warranty_claim_type', 'goodwill',     'Goodwill Adjustment', 20),
+        ('eqms.warranty_claim_type', 'field_return', 'Field Return', 30),
+        ('eqms.warranty_claim_type', 'recall',       'Product Recall', 40),
+        ('eqms.warranty_claim_type', 'debit_note',   'Debit Note', 50)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '146_eqms_sprint6b_aml_warranty')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
+
+-- Warranty failure mode categories
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.warranty_failure_mode',
+    'Warranty Failure Mode',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 141, 'seed_migration', '146_eqms_sprint6b_aml_warranty')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
+
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.warranty_failure_mode', 'dimensional', 'Dimensional / Fit', 10),
+        ('eqms.warranty_failure_mode', 'material',    'Material / Chemistry', 20),
+        ('eqms.warranty_failure_mode', 'surface',     'Surface / Appearance', 30),
+        ('eqms.warranty_failure_mode', 'functional',  'Functional Failure', 40),
+        ('eqms.warranty_failure_mode', 'assembly',    'Assembly Error', 50),
+        ('eqms.warranty_failure_mode', 'packaging',   'Packaging / Labeling', 60),
+        ('eqms.warranty_failure_mode', 'unknown',     'Unknown', 99)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '146_eqms_sprint6b_aml_warranty')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
+
+DO $$
+BEGIN
+    RAISE NOTICE '[Migration 146] Sprint 6B: eqms_aml_records and eqms_warranty_claims created with indexes and MDM seed data.';
+END;
+$$;
+
+COMMIT;
+-- <<< END MIGRATION: 146_eqms_sprint6b_aml_warranty.sql
+
+-- >>> BEGIN MIGRATION: 147_eqms_sprint6c_lessons_csat_sampling.sql
+-- ============================================================================
+-- Migration 147: EQMS Sprint 6C — Lessons Learned, CSAT, Sampling Plans
+-- ============================================================================
+-- Purpose:   Create tables for 3 remaining stub EQMS modules.
+-- Standards: ISO 9001:2015 §10.3 (lessons learned), IATF 16949 §9.1.2 (CSAT),
+--            ANSI/ASQ Z1.4 / Z1.9 (sampling plans), IATF 16949 §8.6.2 (incoming)
+-- Author:    System — module-consolidation sprint 6C
+-- Date:      2026-04-17
+-- ============================================================================
+
+BEGIN;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 1: eqms_lessons_learned
+-- Knowledge capture from quality events, audits, and project reviews.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS eqms_lessons_learned (
+    lesson_id                   UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    lesson_number               VARCHAR(80)  NOT NULL UNIQUE,
+    title                       VARCHAR(512) NOT NULL,
+    description                 TEXT         NOT NULL DEFAULT '',
+
+    -- Classification
+    lesson_type                 VARCHAR(40)  NOT NULL DEFAULT 'corrective',
+    category                    VARCHAR(100),
+    source_type                 VARCHAR(60),
+    source_id                   UUID,
+    source_ref                  VARCHAR(200),
+
+    -- Knowledge content
+    what_happened               TEXT         NOT NULL DEFAULT '',
+    root_cause_summary          TEXT,
+    what_worked_well            TEXT,
+    what_could_improve          TEXT,
+    recommended_action          TEXT,
+    action_taken                TEXT,
+    prevention_mechanism        VARCHAR(300),
+
+    -- Applicability
+    applicable_processes        JSONB        NOT NULL DEFAULT '[]'::jsonb,
+    applicable_products         JSONB        NOT NULL DEFAULT '[]'::jsonb,
+    applicable_sites            JSONB        NOT NULL DEFAULT '[]'::jsonb,
+
+    -- Impact
+    cost_impact                 NUMERIC(14,2),
+    time_impact_hours           NUMERIC(10,2),
+    risk_reduction_score        INTEGER,
+
+    -- Dissemination
+    shared_with_team            BOOLEAN      NOT NULL DEFAULT FALSE,
+    shared_date                 DATE,
+    training_required           BOOLEAN      NOT NULL DEFAULT FALSE,
+    training_completed          BOOLEAN      NOT NULL DEFAULT FALSE,
+    knowledge_base_ref          VARCHAR(300),
+
+    -- Approval
+    reviewed_by                 VARCHAR(120),
+    reviewed_at                 TIMESTAMPTZ,
+    approved_by                 VARCHAR(120),
+    approved_at                 TIMESTAMPTZ,
+
+    -- Standard audit fields
+    status                      VARCHAR(40)  NOT NULL DEFAULT 'draft',
+    version                     INTEGER      NOT NULL DEFAULT 1,
+    created_at                  TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    created_by                  VARCHAR(120) NOT NULL,
+    updated_at                  TIMESTAMPTZ  DEFAULT now(),
+    updated_by                  VARCHAR(120)
+);
+
+CREATE INDEX IF NOT EXISTS idx_ll_status
+    ON eqms_lessons_learned (status);
+CREATE INDEX IF NOT EXISTS idx_ll_type
+    ON eqms_lessons_learned (lesson_type);
+CREATE INDEX IF NOT EXISTS idx_ll_source
+    ON eqms_lessons_learned (source_type, source_id)
+    WHERE source_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_ll_created
+    ON eqms_lessons_learned (created_at DESC);
+
+COMMENT ON TABLE eqms_lessons_learned
+    IS 'ISO 9001:2015 §10.3 — Lessons learned from quality events for continual improvement.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 2: eqms_csat_surveys
+-- Customer Satisfaction survey campaigns and results.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS eqms_csat_surveys (
+    survey_id                   UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    survey_number               VARCHAR(80)  NOT NULL UNIQUE,
+    title                       VARCHAR(512) NOT NULL,
+    description                 TEXT         NOT NULL DEFAULT '',
+
+    -- Survey scope
+    survey_type                 VARCHAR(40)  NOT NULL DEFAULT 'periodic',
+    survey_period               VARCHAR(40),
+    customer_id                 VARCHAR(120),
+    customer_name               VARCHAR(300),
+    survey_date                 DATE         NOT NULL,
+    response_due_date           DATE,
+
+    -- Survey instrument
+    survey_method               VARCHAR(40)  NOT NULL DEFAULT 'questionnaire',
+    questionnaire_ref           VARCHAR(300),
+    evaluator                   VARCHAR(120),
+
+    -- Results aggregate
+    responses_sent              INTEGER      NOT NULL DEFAULT 0,
+    responses_received          INTEGER      NOT NULL DEFAULT 0,
+    overall_score               NUMERIC(5,2),
+    score_scale                 VARCHAR(20)  NOT NULL DEFAULT '1-10',
+    nps_score                   INTEGER,
+
+    -- Category scores (JSONB array of {category, score, comments})
+    category_scores             JSONB        NOT NULL DEFAULT '[]'::jsonb,
+
+    -- Key findings
+    strengths_summary           TEXT,
+    improvement_areas           TEXT,
+    customer_verbatim           TEXT,
+
+    -- Actions
+    action_required             BOOLEAN      NOT NULL DEFAULT FALSE,
+    action_description          TEXT,
+    linked_capa_id              UUID,
+    linked_complaint_id         UUID,
+
+    -- Standard audit fields
+    status                      VARCHAR(40)  NOT NULL DEFAULT 'draft',
+    version                     INTEGER      NOT NULL DEFAULT 1,
+    created_at                  TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    created_by                  VARCHAR(120) NOT NULL,
+    updated_at                  TIMESTAMPTZ  DEFAULT now(),
+    updated_by                  VARCHAR(120)
+);
+
+CREATE INDEX IF NOT EXISTS idx_csat_status
+    ON eqms_csat_surveys (status);
+CREATE INDEX IF NOT EXISTS idx_csat_customer
+    ON eqms_csat_surveys (customer_id)
+    WHERE customer_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_csat_date
+    ON eqms_csat_surveys (survey_date DESC);
+CREATE INDEX IF NOT EXISTS idx_csat_score
+    ON eqms_csat_surveys (overall_score)
+    WHERE overall_score IS NOT NULL;
+
+COMMENT ON TABLE eqms_csat_surveys
+    IS 'IATF 16949 §9.1.2 — Customer Satisfaction surveys and monitoring.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 3: eqms_sampling_plans
+-- AQL-based sampling plans per ANSI/ASQ Z1.4 and Z1.9.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS eqms_sampling_plans (
+    plan_id                     UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    plan_number                 VARCHAR(80)  NOT NULL UNIQUE,
+    title                       VARCHAR(512) NOT NULL,
+    description                 TEXT         NOT NULL DEFAULT '',
+
+    -- Plan scope
+    plan_type                   VARCHAR(40)  NOT NULL DEFAULT 'incoming',
+    part_number                 VARCHAR(120),
+    part_revision               VARCHAR(40),
+    vendor_id                   VARCHAR(120),
+    process_name                VARCHAR(200),
+
+    -- Standard
+    standard                    VARCHAR(40)  NOT NULL DEFAULT 'ANSI_Z1.4',
+    inspection_level            VARCHAR(20)  NOT NULL DEFAULT 'II',
+    aql_critical                NUMERIC(5,3),
+    aql_major                   NUMERIC(5,3),
+    aql_minor                   NUMERIC(5,3),
+    sampling_type               VARCHAR(20)  NOT NULL DEFAULT 'single',
+
+    -- Decision rule
+    lot_size_min                INTEGER,
+    lot_size_max                INTEGER,
+    sample_size                 INTEGER,
+    sample_size_code            CHAR(2),
+    accept_number               INTEGER,
+    reject_number               INTEGER,
+
+    -- Classification thresholds (for auto skip-lot)
+    tightened_trigger_rejects   INTEGER      NOT NULL DEFAULT 2,
+    reduced_trigger_accepts     INTEGER      NOT NULL DEFAULT 10,
+    skip_lot_trigger_accepts    INTEGER      NOT NULL DEFAULT 20,
+
+    -- Characteristic linkage
+    linked_sc_ids               JSONB        NOT NULL DEFAULT '[]'::jsonb,
+
+    -- Approval
+    approved_by                 VARCHAR(120),
+    approved_at                 TIMESTAMPTZ,
+    effective_date              DATE,
+    review_date                 DATE,
+
+    -- Standard audit fields
+    status                      VARCHAR(40)  NOT NULL DEFAULT 'draft',
+    version                     INTEGER      NOT NULL DEFAULT 1,
+    created_at                  TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    created_by                  VARCHAR(120) NOT NULL,
+    updated_at                  TIMESTAMPTZ  DEFAULT now(),
+    updated_by                  VARCHAR(120)
+);
+
+CREATE INDEX IF NOT EXISTS idx_sp_status
+    ON eqms_sampling_plans (status);
+CREATE INDEX IF NOT EXISTS idx_sp_part
+    ON eqms_sampling_plans (part_number)
+    WHERE part_number IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_sp_vendor
+    ON eqms_sampling_plans (vendor_id)
+    WHERE vendor_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_sp_type
+    ON eqms_sampling_plans (plan_type);
+CREATE INDEX IF NOT EXISTS idx_sp_created
+    ON eqms_sampling_plans (created_at DESC);
+
+COMMENT ON TABLE eqms_sampling_plans
+    IS 'ANSI/ASQ Z1.4/Z1.9 — AQL-based sampling plans for incoming, process, and final inspection.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- MDM seed data
+-- ─────────────────────────────────────────────────────────────────────────────
+
+-- Lesson learned types
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.lesson_type',
+    'Lesson Learned Type',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 150, 'seed_migration', '147_eqms_sprint6c_lessons_csat_sampling')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
+
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.lesson_type', 'corrective',     'Corrective (What went wrong)', 10),
+        ('eqms.lesson_type', 'preventive',     'Preventive (Potential risk)', 20),
+        ('eqms.lesson_type', 'best_practice',  'Best Practice (What worked)', 30),
+        ('eqms.lesson_type', 'process_change', 'Process Change', 40),
+        ('eqms.lesson_type', 'design_change',  'Design/Engineering Change', 50),
+        ('eqms.lesson_type', 'audit_finding',  'Audit Finding', 60)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '147_eqms_sprint6c_lessons_csat_sampling')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
+
+-- CSAT survey type
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.csat_survey_type',
+    'CSAT Survey Type',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 160, 'seed_migration', '147_eqms_sprint6c_lessons_csat_sampling')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
+
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.csat_survey_type', 'periodic',         'Periodic (Annual/Quarterly)', 10),
+        ('eqms.csat_survey_type', 'post_delivery',    'Post-Delivery', 20),
+        ('eqms.csat_survey_type', 'post_complaint',   'Post-Complaint Resolution', 30),
+        ('eqms.csat_survey_type', 'project_closeout', 'Project Closeout', 40),
+        ('eqms.csat_survey_type', 'ad_hoc',           'Ad Hoc', 99)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '147_eqms_sprint6c_lessons_csat_sampling')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
+
+-- Sampling plan types
+INSERT INTO mdm_reference_codes (code_set, description, metadata)
+VALUES (
+    'eqms.sampling_plan_type',
+    'Sampling Plan Type',
+    jsonb_build_object('domain', 'eqms', 'is_active', true, 'sort_order', 170, 'seed_migration', '147_eqms_sprint6c_lessons_csat_sampling')
+)
+ON CONFLICT (code_set) DO UPDATE
+SET description = EXCLUDED.description,
+    metadata = mdm_reference_codes.metadata || EXCLUDED.metadata;
+
+WITH seed(code_set, code_value, value_label, sort_order) AS (
+    VALUES
+        ('eqms.sampling_plan_type', 'incoming',   'Incoming (IQC)', 10),
+        ('eqms.sampling_plan_type', 'in_process', 'In-Process', 20),
+        ('eqms.sampling_plan_type', 'final',      'Final Inspection', 30),
+        ('eqms.sampling_plan_type', 'outgoing',   'Outgoing / Pre-ship', 40),
+        ('eqms.sampling_plan_type', 'skip_lot',   'Skip-Lot', 50)
+)
+INSERT INTO mdm_reference_code_values (mdm_reference_code_id, code_value, value_label, sort_order, metadata)
+SELECT c.mdm_reference_code_id, s.code_value, s.value_label, s.sort_order,
+       jsonb_build_object('domain', 'eqms', 'seed_migration', '147_eqms_sprint6c_lessons_csat_sampling')
+FROM seed s
+JOIN mdm_reference_codes c ON c.code_set = s.code_set
+ON CONFLICT (mdm_reference_code_id, code_value) DO UPDATE
+SET value_label = EXCLUDED.value_label,
+    sort_order = EXCLUDED.sort_order,
+    metadata = mdm_reference_code_values.metadata || EXCLUDED.metadata;
+
+DO $$
+BEGIN
+    RAISE NOTICE '[Migration 147] Sprint 6C: eqms_lessons_learned, eqms_csat_surveys, eqms_sampling_plans created.';
+END;
+$$;
+
+COMMIT;
+-- <<< END MIGRATION: 147_eqms_sprint6c_lessons_csat_sampling.sql
+
+-- >>> BEGIN MIGRATION: 148_graphics_authority_tables.sql
+-- ============================================================================
+-- Migration 148: Graphics Control Plane — DB Authority Tables
+-- ============================================================================
+-- Purpose:   Move every hardcoded graphic parameter (colors, typography,
+--            spacing, components, effects) out of the JSON file and into a
+--            versioned, auditable relational authority. This migration is the
+--            foundation of the "no-hardcode" rule: every UI module resolves
+--            visual parameters through graphics_design_tokens, never through
+--            inline literals.
+--
+-- Patterns:  Inspired by SAP Theme Designer (global/semantic/control layers),
+--            Microsoft Fluent 2 (token-by-reference chain, Light/Dark/HC
+--            triad), Salesforce SLDS (component override whitelist),
+--            Material 3 (dynamic ramp from seed), Atlassian Design Tokens.
+--
+-- Mode:      Compatible with DataLayer SHADOW_WRITE → POSTGRES_PRIMARY ladder.
+--            Canonical authority is mom/data/config/design-system-config.json
+--            during JSON_ONLY; shadow-written to these tables once SHADOW_WRITE
+--            is active; POSTGRES_PRIMARY reads from these tables and falls back
+--            to JSON on error.
+--
+-- Standards: WCAG 2.2 AA/AAA, ISA-95 operator/supervisor role separation,
+--            IATF 16949 §7.1.5 (documented visual standard evidence).
+--
+-- Author:    Graphics Control Plane rebuild
+-- Date:      2026-04-18
+-- ============================================================================
+
+BEGIN;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 1: graphics_token_catalog
+-- Registry of every design token the platform exposes. Each row is one
+-- admin-tunable parameter (color, font size, spacing, radius, etc.).
+-- Layer taxonomy follows SAP/Fluent: global → semantic → component.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS graphics_token_catalog (
+    token_id            UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    token_key           VARCHAR(200) NOT NULL UNIQUE,     -- dot-path: brand.primary, components.btn.paddingX
+    css_variable        VARCHAR(120),                      -- --brand-primary, --btn-padding-x (nullable for pure state tokens)
+    layer               VARCHAR(20)  NOT NULL,            -- global | semantic | component
+    family              VARCHAR(60)  NOT NULL,            -- color | typography | spacing | sizing | effect | motion | shadow | radius | opacity | state
+    subfamily           VARCHAR(80),                      -- brand | status | surface | text | border | heading | body | ...
+    component_scope     VARCHAR(80),                      -- NULL for shared tokens; 'btn', 'table', 'card' for component tokens
+    value_type          VARCHAR(20)  NOT NULL,            -- hex | rgba | px | rem | em | unitless | keyword | shadow-expr | easing-expr
+    min_numeric         NUMERIC,                          -- for numeric tokens: slider min
+    max_numeric         NUMERIC,                          -- slider max
+    step_numeric        NUMERIC,                          -- slider step
+    unit                VARCHAR(8),                       -- px / rem / em / % / ms / s (null for colors/keywords)
+    allowed_keywords    TEXT[],                           -- enum of allowed keyword values (e.g. ['none','uppercase','capitalize'])
+    default_light       TEXT,                             -- default value for light mode
+    default_dark        TEXT,                             -- default value for dark mode (may equal light if neutral)
+    default_high_contrast TEXT,                           -- mandatory WCAG AAA value (Fluent rule: every token has HC fallback)
+    default_print       TEXT,                             -- print-mode override (for PDF/ISO reports)
+    alias_of            VARCHAR(200),                     -- if this is an alias token, points to the canonical token_key
+    wcag_min_contrast   NUMERIC(4,2),                     -- minimum contrast vs its paired surface (4.5 for text, 3.0 for large)
+    wcag_pair_token     VARCHAR(200),                     -- the surface/foreground token this must contrast against
+    description         TEXT,
+    tags                TEXT[],                           -- ['brand','status','dashboard','operator-station']
+    is_deprecated       BOOLEAN      NOT NULL DEFAULT FALSE,
+    deprecation_note    TEXT,
+    source_authority    VARCHAR(120) NOT NULL DEFAULT 'design-system-config.json',
+    created_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    updated_by          VARCHAR(120)
+);
+
+CREATE INDEX IF NOT EXISTS idx_graphics_token_catalog_layer     ON graphics_token_catalog(layer);
+CREATE INDEX IF NOT EXISTS idx_graphics_token_catalog_family    ON graphics_token_catalog(family);
+CREATE INDEX IF NOT EXISTS idx_graphics_token_catalog_component ON graphics_token_catalog(component_scope);
+CREATE INDEX IF NOT EXISTS idx_graphics_token_catalog_css_var   ON graphics_token_catalog(css_variable);
+
+COMMENT ON TABLE  graphics_token_catalog IS 'Registry of every design token; one row = one admin-tunable visual parameter. No UI module is permitted to hardcode a value in place of a token_key lookup.';
+COMMENT ON COLUMN graphics_token_catalog.default_high_contrast IS 'Mandatory per Fluent 2: every token must have a WCAG AAA high-contrast fallback.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 2: graphics_token_value
+-- The *effective* value of each token, scoped by tenant/role/environment/
+-- theme-variant. This is what the runtime reads.
+-- Scope hierarchy (most specific wins):
+--   per-role > per-environment > per-tenant > organization-default
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS graphics_token_value (
+    value_id            UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    token_key           VARCHAR(200) NOT NULL REFERENCES graphics_token_catalog(token_key) ON UPDATE CASCADE ON DELETE CASCADE,
+    scope_type          VARCHAR(30)  NOT NULL,            -- organization | tenant | environment | role | user
+    scope_id            VARCHAR(120) NOT NULL DEFAULT 'default',
+    color_mode          VARCHAR(20)  NOT NULL DEFAULT 'light',  -- light | dark | high-contrast | print | andon | colorblind-*
+    value               TEXT         NOT NULL,
+    draft_value         TEXT,                             -- staged change not yet committed (SAP Save vs Publish)
+    is_published        BOOLEAN      NOT NULL DEFAULT TRUE,
+    published_at        TIMESTAMPTZ,
+    published_by        VARCHAR(120),
+    version             INTEGER      NOT NULL DEFAULT 1,
+    rollout_id          UUID,                             -- links to graphics_rollout.rollout_id when staged via rollout
+    created_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_graphics_token_value_scope UNIQUE (token_key, scope_type, scope_id, color_mode)
+);
+
+CREATE INDEX IF NOT EXISTS idx_graphics_token_value_scope       ON graphics_token_value(scope_type, scope_id);
+CREATE INDEX IF NOT EXISTS idx_graphics_token_value_color_mode  ON graphics_token_value(color_mode);
+CREATE INDEX IF NOT EXISTS idx_graphics_token_value_rollout     ON graphics_token_value(rollout_id);
+
+COMMENT ON TABLE graphics_token_value IS 'Effective (and staged) values for every token across scope + color mode. Scope most-specific-wins resolution: user > role > environment > tenant > organization default.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 3: graphics_component_contract
+-- Per-component whitelist of overridable tokens (SLDS hook model). A UI
+-- component declares which tokens it consumes; admin UI may only expose
+-- those tokens for editing.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS graphics_component_contract (
+    contract_id         UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    component_key       VARCHAR(80)  NOT NULL UNIQUE,     -- btn | table | card | badge | modal | flow | isoBox | kpi | ...
+    display_name_en     VARCHAR(120) NOT NULL,
+    display_name_vi     VARCHAR(120) NOT NULL,
+    description         TEXT,
+    overridable_tokens  TEXT[]       NOT NULL DEFAULT '{}',    -- array of token_key the admin UI may tune for this component
+    inherits_from       VARCHAR(80),                       -- parent component (e.g. 'primaryBtn' inherits from 'btn')
+    preview_scene_key   VARCHAR(80),                       -- which PreviewScenes.components.* renders this
+    is_operator_visible BOOLEAN      NOT NULL DEFAULT FALSE,-- can operator role see it (vs admin-only)
+    a11y_requirements   JSONB        NOT NULL DEFAULT '{}'::jsonb,
+    created_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE graphics_component_contract IS 'Per-component whitelist of tokens exposed to admin tuning (SLDS Theming Hooks model). Prevents free-for-all CSS.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 4: graphics_preview_scene
+-- Registry of replayable preview scenes (SAP sample-page iframe model).
+-- Each scene renders a gallery of components with the currently staged tokens
+-- so the admin can simulate before committing.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS graphics_preview_scene (
+    scene_id            UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    scene_key           VARCHAR(80)  NOT NULL UNIQUE,     -- typography.family | color.brand | components.button | ...
+    category            VARCHAR(40)  NOT NULL,            -- typography | color | layout | effects | components | dashboard
+    display_name_en     VARCHAR(160) NOT NULL,
+    display_name_vi     VARCHAR(160) NOT NULL,
+    description         TEXT,
+    renderer            VARCHAR(80)  NOT NULL,            -- JS function key under window.PreviewScenes.*
+    tokens_observed     TEXT[]       NOT NULL DEFAULT '{}',    -- tokens this scene depends on (for reactivity)
+    projection_mode     VARCHAR(20)  DEFAULT 'desktop',   -- desktop | tablet | mobile | andon-4k
+    colorblind_filter   VARCHAR(40),                       -- none | deuteranopia | protanopia | tritanopia | achromatopsia
+    sort_order          INTEGER      NOT NULL DEFAULT 100,
+    is_default          BOOLEAN      NOT NULL DEFAULT FALSE,
+    created_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_graphics_preview_scene_category ON graphics_preview_scene(category);
+
+COMMENT ON TABLE graphics_preview_scene IS 'Replayable preview scenes (SAP sample-page model). Every edit widget opens at least one scene as simulation before commit.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 5: graphics_simulation_run
+-- Every "Preview before commit" click logs a simulation run. This is the
+-- evidence trail for "every edit has a preview" requirement.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS graphics_simulation_run (
+    run_id              UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    run_label           VARCHAR(200),
+    initiated_by        VARCHAR(120),
+    initiated_at        TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    staged_changes      JSONB        NOT NULL DEFAULT '{}'::jsonb,   -- token_key → {from, to}
+    scope_type          VARCHAR(30)  NOT NULL DEFAULT 'organization',
+    scope_id            VARCHAR(120) NOT NULL DEFAULT 'default',
+    color_mode          VARCHAR(20)  NOT NULL DEFAULT 'light',
+    scenes_rendered     TEXT[]       NOT NULL DEFAULT '{}',
+    wcag_report         JSONB,                            -- contrast pass/fail per token pair
+    colorblind_reports  JSONB,                            -- per filter: any pair that became indistinguishable
+    screen_reader_findings JSONB,                         -- AXE-core findings on the gallery
+    outcome             VARCHAR(20)  NOT NULL DEFAULT 'reviewed',     -- reviewed | committed | discarded | failed-gates
+    committed_rollout_id UUID,
+    notes               TEXT,
+    expires_at          TIMESTAMPTZ
+);
+
+CREATE INDEX IF NOT EXISTS idx_graphics_simulation_run_initiator ON graphics_simulation_run(initiated_by);
+CREATE INDEX IF NOT EXISTS idx_graphics_simulation_run_outcome   ON graphics_simulation_run(outcome);
+
+COMMENT ON TABLE graphics_simulation_run IS 'Evidence trail: every edit widget stages changes and runs one simulation_run before committing. Enforces the "preview-before-commit" rule.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 6: graphics_rollout_scope
+-- Rollout orchestration: draft → stage → canary → apply → rollback.
+-- Mirrors SAP Save/Publish/Activate split with retain-previous rollback.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS graphics_rollout_scope (
+    rollout_id          UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    rollout_label       VARCHAR(200) NOT NULL,
+    description         TEXT,
+    state               VARCHAR(30)  NOT NULL DEFAULT 'draft',     -- draft | staged | canary | applied | rolled-back | superseded
+    scope_mode          VARCHAR(40)  NOT NULL,                      -- preview-only | canary-module-group | canary-domain | environment-stage | global-apply
+    scope_targets       JSONB        NOT NULL DEFAULT '{}'::jsonb,  -- {modules:[], domains:[], environments:[], roles:[]}
+    changeset           JSONB        NOT NULL DEFAULT '{}'::jsonb,  -- token_key → {from, to, color_mode}
+    prior_snapshot      JSONB,                                       -- snapshot of prior values for 1-click rollback
+    canary_percentage   NUMERIC(5,2),
+    staged_by           VARCHAR(120),
+    staged_at           TIMESTAMPTZ,
+    approved_by         VARCHAR(120),
+    approved_at         TIMESTAMPTZ,
+    applied_at          TIMESTAMPTZ,
+    rolled_back_by      VARCHAR(120),
+    rolled_back_at      TIMESTAMPTZ,
+    simulation_run_id   UUID         REFERENCES graphics_simulation_run(run_id) ON DELETE SET NULL,
+    waiver_id           UUID,
+    wcag_gate_status    VARCHAR(20)  NOT NULL DEFAULT 'pending',    -- pending | pass | fail | waived
+    created_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_graphics_rollout_state ON graphics_rollout_scope(state);
+
+COMMENT ON TABLE graphics_rollout_scope IS 'Rollout orchestration. SAP Save/Publish/Activate split with retain-previous rollback. Every canary/apply attaches a simulation_run for evidence.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 7: graphics_theme_schedule
+-- Shift-scheduled theme swaps (Andon Day / Night / Maintenance-Amber).
+-- Missing from SAP/Fluent/Siemens — a genuine differentiator for MES.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS graphics_theme_schedule (
+    schedule_id         UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    schedule_name       VARCHAR(120) NOT NULL UNIQUE,
+    description         TEXT,
+    trigger_type        VARCHAR(30)  NOT NULL,                      -- shift | time-of-day | event | manual
+    trigger_config      JSONB        NOT NULL DEFAULT '{}'::jsonb,  -- {shift:'A', startTime:'06:00', endTime:'14:00', daysOfWeek:[1,2,3,4,5]}
+    target_color_mode   VARCHAR(20)  NOT NULL,                      -- light | dark | andon | maintenance-amber | high-contrast
+    scope_type          VARCHAR(30)  NOT NULL DEFAULT 'tenant',
+    scope_id            VARCHAR(120) NOT NULL DEFAULT 'default',
+    is_active           BOOLEAN      NOT NULL DEFAULT TRUE,
+    priority            INTEGER      NOT NULL DEFAULT 100,
+    applies_to_roles    TEXT[],
+    next_fire_at        TIMESTAMPTZ,
+    last_fired_at       TIMESTAMPTZ,
+    created_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE graphics_theme_schedule IS 'Shift-scheduled theme swap (Andon Day/Night/Maintenance-Amber). Manufacturing-specific differentiator.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 8: graphics_saved_experiment
+-- Named A/B theme drafts (SAP retain-previous model extended).
+-- Admins can save a named experiment, diff against production, promote.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS graphics_saved_experiment (
+    experiment_id       UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    experiment_key      VARCHAR(160) NOT NULL UNIQUE,
+    title               VARCHAR(200) NOT NULL,
+    description         TEXT,
+    base_ref            VARCHAR(120) NOT NULL DEFAULT 'production',  -- production | experiment:<key>
+    changeset           JSONB        NOT NULL DEFAULT '{}'::jsonb,
+    tags                TEXT[],
+    owner               VARCHAR(120),
+    is_archived         BOOLEAN      NOT NULL DEFAULT FALSE,
+    created_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE graphics_saved_experiment IS 'Named A/B theme draft slots. Diff + promote + archive.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 9: graphics_wcag_check
+-- Materialized WCAG contrast + colorblind indistinguishability report per
+-- rollout. Gates publish per Fluent "every token has HC fallback" rule.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS graphics_wcag_check (
+    check_id            UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    rollout_id          UUID         REFERENCES graphics_rollout_scope(rollout_id) ON DELETE CASCADE,
+    simulation_run_id   UUID         REFERENCES graphics_simulation_run(run_id)    ON DELETE SET NULL,
+    token_key           VARCHAR(200) NOT NULL,
+    paired_token_key    VARCHAR(200),
+    color_mode          VARCHAR(20)  NOT NULL,
+    contrast_ratio      NUMERIC(5,2),
+    wcag_level          VARCHAR(10),             -- AA | AAA | FAIL
+    is_large_text       BOOLEAN      NOT NULL DEFAULT FALSE,
+    colorblind_indistinguishable JSONB,          -- {deuteranopia:bool, protanopia:bool, tritanopia:bool}
+    blocker             BOOLEAN      NOT NULL DEFAULT FALSE,
+    waiver_id           UUID,
+    checked_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_graphics_wcag_check_rollout ON graphics_wcag_check(rollout_id);
+CREATE INDEX IF NOT EXISTS idx_graphics_wcag_check_blocker ON graphics_wcag_check(blocker);
+
+COMMENT ON TABLE graphics_wcag_check IS 'WCAG 2.2 contrast + colorblind check per token pair per rollout. Any blocker=true prevents apply unless waived.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 10: graphics_module_binding
+-- Which UI modules consume which tokens. Populated by a static scanner (grep
+-- of portal scripts for GraphicsAuthority.tokens.read('x')). Used by impact
+-- analysis: "if I change color.brand.primary, which modules are affected?"
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS graphics_module_binding (
+    binding_id          UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    module_key          VARCHAR(120) NOT NULL,            -- e.g. '14-mes-control-center', '10-eqms-form-runtime'
+    token_key           VARCHAR(200) NOT NULL REFERENCES graphics_token_catalog(token_key) ON UPDATE CASCADE ON DELETE CASCADE,
+    binding_type        VARCHAR(30)  NOT NULL,            -- css-variable | direct-read | preview-only
+    source_location     VARCHAR(300),                      -- file:line for traceability
+    observed_at         TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_graphics_module_binding UNIQUE (module_key, token_key, binding_type)
+);
+
+CREATE INDEX IF NOT EXISTS idx_graphics_module_binding_token  ON graphics_module_binding(token_key);
+CREATE INDEX IF NOT EXISTS idx_graphics_module_binding_module ON graphics_module_binding(module_key);
+
+COMMENT ON TABLE graphics_module_binding IS 'Scanner-populated: which module consumes which token. Drives impact analysis when a token changes.';
+
+-- ═══════════════════════════════════════════════════════════════════════════
+-- SEED DATA — migrate the 56+ hardcoded values into DB
+-- ═══════════════════════════════════════════════════════════════════════════
+-- All values sourced from mom/data/config/design-system-config.json as of
+-- 2026-04-18. Any future change to this seed must be done through a new
+-- migration, never by editing inline literals.
+-- ---------------------------------------------------------------------------
+
+-- ── Global brand tokens ────────────────────────────────────────────────────
+INSERT INTO graphics_token_catalog (token_key, css_variable, layer, family, subfamily, value_type, default_light, default_dark, default_high_contrast, default_print, description, tags) VALUES
+('brand.primary',       '--brand-primary',       'global', 'color', 'brand', 'hex', '#1565c0', '#1e88e5', '#0033a0', '#000000', 'Primary brand color',            ARRAY['brand']),
+('brand.light',         '--brand-light',         'global', 'color', 'brand', 'hex', '#1e88e5', '#42a5f5', '#0055cc', '#333333', 'Brand light variant',            ARRAY['brand']),
+('brand.dark',          '--brand-dark',          'global', 'color', 'brand', 'hex', '#0c2d48', '#0a1e32', '#000a1a', '#000000', 'Brand dark variant',             ARRAY['brand']),
+('brand.darkest',       '--brand-darkest',       'global', 'color', 'brand', 'hex', '#0a1e32', '#050d18', '#000000', '#000000', 'Brand darkest variant',          ARRAY['brand']),
+('brand.accent',        '--brand-accent',        'global', 'color', 'brand', 'hex', '#f9a825', '#fbbf24', '#ff9900', '#000000', 'Brand accent color',             ARRAY['brand']),
+('brand.accentLight',   '--brand-accent-light',  'global', 'color', 'brand', 'hex', '#fdd835', '#fde047', '#ffcc00', '#333333', 'Brand accent light variant',     ARRAY['brand']),
+('brand.sidebarBg',     '--brand-sidebar-bg',    'semantic','color','surface','hex', '#0c2d48', '#0a1628', '#000000', '#ffffff', 'Sidebar background anchor',     ARRAY['brand','surface'])
+ON CONFLICT (token_key) DO NOTHING;
+
+-- ── Status colors (light) ──────────────────────────────────────────────────
+INSERT INTO graphics_token_catalog (token_key, css_variable, layer, family, subfamily, value_type, default_light, default_dark, default_high_contrast, default_print, wcag_min_contrast, wcag_pair_token, description) VALUES
+('status.success.light', '--status-success',  'semantic','color','status','hex','#16a34a','#22c55e','#008800','#006600',3.0,'colorsLight.bgSurface','Success state color'),
+('status.error.light',   '--status-error',    'semantic','color','status','hex','#dc2626','#f87171','#cc0000','#990000',4.5,'colorsLight.bgSurface','Error state color'),
+('status.warning.light', '--status-warning',  'semantic','color','status','hex','#d97706','#fbbf24','#cc6600','#663300',3.0,'colorsLight.bgSurface','Warning state color'),
+('status.info.light',    '--status-info',     'semantic','color','status','hex','#2563eb','#60a5fa','#0033cc','#003399',4.5,'colorsLight.bgSurface','Info state color'),
+('status.purple.light',  '--status-purple',   'semantic','color','status','hex','#7c3aed','#a78bfa','#5500cc','#330066',4.5,'colorsLight.bgSurface','Purple accent status'),
+('status.cyan.light',    '--status-cyan',     'semantic','color','status','hex','#0891b2','#22d3ee','#006688','#003344',3.0,'colorsLight.bgSurface','Cyan accent status (non-text; WCAG non-text contrast 3:1 applies)')
+ON CONFLICT (token_key) DO NOTHING;
+
+-- ── Light mode surfaces ────────────────────────────────────────────────────
+INSERT INTO graphics_token_catalog (token_key, css_variable, layer, family, subfamily, value_type, default_light, default_dark, default_high_contrast, default_print, description) VALUES
+('colorsLight.bgPage',       '--bg-page',        'semantic','color','surface','hex','#f8fafc','#0f172a','#ffffff','#ffffff','Page background'),
+('colorsLight.bgSurface',    '--bg-surface',     'semantic','color','surface','hex','#ffffff','#1e293b','#ffffff','#ffffff','Primary surface'),
+('colorsLight.bgSurfaceAlt', '--bg-surface-alt', 'semantic','color','surface','hex','#f1f5f9','#162032','#f0f0f0','#fafafa','Alt surface'),
+('colorsLight.bgHeader',     '--bg-header',      'semantic','color','surface','hex','#ffffff','#1e293b','#ffffff','#ffffff','Header surface'),
+('colorsLight.bgModal',      '--bg-modal',       'semantic','color','surface','hex','#ffffff','#1e293b','#ffffff','#ffffff','Modal surface'),
+('colorsLight.bgHover',      '--bg-hover',       'semantic','color','surface','hex','#f8fafc','#263348','#eeeeee','#f5f5f5','Hover surface'),
+('colorsLight.textPrimary',  '--text-primary',   'semantic','color','text',   'hex','#1e293b','#f1f5f9','#000000','#000000','Primary text'),
+('colorsLight.textSecondary','--text-secondary', 'semantic','color','text',   'hex','#64748b','#94a3b8','#333333','#333333','Secondary text'),
+('colorsLight.textTertiary', '--text-tertiary',  'semantic','color','text',   'hex','#94a3b8','#64748b','#444444','#555555','Tertiary text'),
+('colorsLight.textLink',     '--text-link',      'semantic','color','text',   'hex','#1565c0','#60a5fa','#0033a0','#0000cc','Link text'),
+('colorsLight.textInverse',  '--text-inverse',   'semantic','color','text',   'hex','#ffffff','#0f172a','#ffffff','#ffffff','Inverse text'),
+('colorsLight.border',       '--border-default', 'semantic','color','border', 'hex','#e2e8f0','#334155','#000000','#999999','Default border'),
+('colorsLight.borderFocus',  '--border-focus',   'semantic','color','border', 'hex','#1565c0','#60a5fa','#0033a0','#000000','Focus border'),
+('colorsLight.borderError',  '--border-error',   'semantic','color','border', 'hex','#dc2626','#f87171','#cc0000','#990000','Error border'),
+('colorsLight.borderSuccess','--border-success', 'semantic','color','border', 'hex','#16a34a','#22c55e','#008800','#006600','Success border')
+ON CONFLICT (token_key) DO NOTHING;
+
+-- ── Typography (font stacks) ───────────────────────────────────────────────
+INSERT INTO graphics_token_catalog (token_key, css_variable, layer, family, subfamily, value_type, default_light, default_dark, default_high_contrast, description) VALUES
+('typography.display.family', '--font-display', 'semantic','typography','display','keyword',
+ '-apple-system, "Segoe UI", "Noto Sans", Arial, Helvetica, sans-serif',
+ '-apple-system, "Segoe UI", "Noto Sans", Arial, Helvetica, sans-serif',
+ '"Atkinson Hyperlegible", "Segoe UI", Arial, sans-serif',
+ 'Display / Hero font stack'),
+('typography.heading.family', '--font-heading', 'semantic','typography','heading','keyword',
+ '-apple-system, "Segoe UI", "Noto Sans", Arial, Helvetica, sans-serif',
+ '-apple-system, "Segoe UI", "Noto Sans", Arial, Helvetica, sans-serif',
+ '"Atkinson Hyperlegible", "Segoe UI", Arial, sans-serif',
+ 'Heading font stack'),
+('typography.body.family',    '--font-body',    'semantic','typography','body',   'keyword',
+ '-apple-system, "Segoe UI", "Noto Sans", Arial, Helvetica, sans-serif',
+ '-apple-system, "Segoe UI", "Noto Sans", Arial, Helvetica, sans-serif',
+ '"Atkinson Hyperlegible", "Segoe UI", Arial, sans-serif',
+ 'Body font stack'),
+('typography.label.family',   '--font-label',   'semantic','typography','label',  'keyword',
+ '-apple-system, "Segoe UI", "Noto Sans", Arial, Helvetica, sans-serif',
+ '-apple-system, "Segoe UI", "Noto Sans", Arial, Helvetica, sans-serif',
+ '"Atkinson Hyperlegible", "Segoe UI", Arial, sans-serif',
+ 'Label / Caption font stack'),
+('typography.mono.family',    '--font-mono',    'semantic','typography','mono',   'keyword',
+ '"JetBrains Mono", "Fira Code", "Cascadia Code", "SF Mono", Consolas, monospace',
+ '"JetBrains Mono", "Fira Code", "Cascadia Code", "SF Mono", Consolas, monospace',
+ '"JetBrains Mono", "Fira Code", Consolas, monospace',
+ 'Monospace font stack')
+ON CONFLICT (token_key) DO NOTHING;
+
+-- ── Typography weights & modifiers ─────────────────────────────────────────
+INSERT INTO graphics_token_catalog (token_key, css_variable, layer, family, subfamily, value_type, min_numeric, max_numeric, step_numeric, default_light, default_dark, default_high_contrast, description) VALUES
+('typography.display.weight', '--font-display-weight', 'semantic','typography','display','unitless',100,900,100,'700','700','900','Display weight'),
+('typography.heading.weight', '--font-heading-weight', 'semantic','typography','heading','unitless',100,900,100,'600','600','800','Heading weight'),
+('typography.body.weight',    '--font-body-weight',    'semantic','typography','body',   'unitless',100,900,100,'400','400','500','Body weight'),
+('typography.label.weight',   '--font-label-weight',   'semantic','typography','label',  'unitless',100,900,100,'600','600','800','Label weight')
+ON CONFLICT (token_key) DO NOTHING;
+
+INSERT INTO graphics_token_catalog (token_key, css_variable, layer, family, subfamily, value_type, unit, min_numeric, max_numeric, step_numeric, default_light, default_dark, default_high_contrast, description) VALUES
+('fontScale.xs',  '--font-xs',  'global','typography','scale','px','px',8, 48,1,'11','11','13','Extra small'),
+('fontScale.sm',  '--font-sm',  'global','typography','scale','px','px',8, 48,1,'13','13','15','Small'),
+('fontScale.base','--font-base','global','typography','scale','px','px',8, 48,1,'14','14','16','Base'),
+('fontScale.md',  '--font-md',  'global','typography','scale','px','px',8, 48,1,'16','16','18','Medium'),
+('fontScale.lg',  '--font-lg',  'global','typography','scale','px','px',8, 48,1,'18','18','20','Large'),
+('fontScale.xl',  '--font-xl',  'global','typography','scale','px','px',8, 48,1,'20','20','22','Extra large'),
+('fontScale.2xl', '--font-2xl', 'global','typography','scale','px','px',8, 64,1,'24','24','26','2x large'),
+('fontScale.3xl', '--font-3xl', 'global','typography','scale','px','px',8, 96,1,'32','32','36','3x large')
+ON CONFLICT (token_key) DO NOTHING;
+
+INSERT INTO graphics_token_catalog (token_key, css_variable, layer, family, subfamily, value_type, min_numeric, max_numeric, step_numeric, default_light, default_dark, default_high_contrast, description) VALUES
+('lineHeight.tight',   '--leading-tight',   'global','typography','line-height','unitless',1.0,3.0,0.05,'1.25','1.25','1.5','Tight line-height'),
+('lineHeight.normal',  '--leading-normal',  'global','typography','line-height','unitless',1.0,3.0,0.05,'1.5','1.5','1.75','Normal line-height'),
+('lineHeight.relaxed', '--leading-relaxed', 'global','typography','line-height','unitless',1.0,3.0,0.05,'1.75','1.75','2.0','Relaxed line-height')
+ON CONFLICT (token_key) DO NOTHING;
+
+-- ── Layout dimensions ──────────────────────────────────────────────────────
+INSERT INTO graphics_token_catalog (token_key, css_variable, layer, family, subfamily, value_type, unit, min_numeric, max_numeric, step_numeric, default_light, default_dark, default_high_contrast, description) VALUES
+('layout.sidebarW',        '--sidebar-w',         'global','sizing','layout','px','px',180,480,4,'260','260','300','Sidebar width expanded'),
+('layout.sidebarCollapsed','--sidebar-collapsed', 'global','sizing','layout','px','px',40,120, 4, '56', '56', '72','Sidebar width collapsed'),
+('layout.headerH',         '--header-h',          'global','sizing','layout','px','px',40,120, 4, '52', '52', '64','Header height'),
+('layout.contentMaxW',     '--content-max-w',     'global','sizing','layout','px','px',960,2400,20,'1400','1400','1400','Content max width'),
+('layout.modalMaxW',       '--modal-max-w',       'global','sizing','layout','px','px',480,1600,20,'800','800','800','Modal max width'),
+('layout.modalSmMaxW',     '--modal-sm-max-w',    'global','sizing','layout','px','px',320,960, 20,'480','480','480','Small modal max width')
+ON CONFLICT (token_key) DO NOTHING;
+
+-- ── Effects (focus, selection, motion, opacity) ────────────────────────────
+INSERT INTO graphics_token_catalog (token_key, css_variable, layer, family, subfamily, value_type, unit, min_numeric, max_numeric, step_numeric, default_light, default_dark, default_high_contrast, description) VALUES
+('effects.focusRingWidth', '--focus-ring-width',  'global','effect','focus',    'px','px', 0,  8, 1, '3',   '3',   '4',   'Focus ring width'),
+('effects.focusRingOffset','--focus-ring-offset', 'global','effect','focus',    'px','px', 0,  8, 1, '0',   '0',   '2',   'Focus ring offset'),
+('effects.scrollbarWidth', '--scrollbar-width',   'global','effect','scrollbar','px','px', 0, 24, 1, '8',   '8',  '14',   'Scrollbar width'),
+('effects.scrollbarRadius','--scrollbar-radius',  'global','effect','scrollbar','px','px', 0, 12, 1, '4',   '4',   '0',   'Scrollbar radius'),
+('effects.motionFast',     '--motion-fast',       'global','motion','duration', 'ms','ms', 0,500,10, '100', '100','0',   'Motion fast duration'),
+('effects.motionNormal',   '--motion-normal',     'global','motion','duration', 'ms','ms', 0,800,10, '150', '150','0',   'Motion normal duration'),
+('effects.motionSlow',     '--motion-slow',       'global','motion','duration', 'ms','ms', 0,1200,10,'250', '250','0',   'Motion slow duration'),
+('effects.motionSpring',   '--motion-spring',     'global','motion','duration', 'ms','ms', 0,1600,10,'300', '300','0',   'Motion spring duration'),
+('effects.opacityHover',   '--opacity-hover',     'global','opacity','state',   'unitless',NULL,0,1,0.01,'0.06','0.06','0.2','Hover overlay opacity'),
+('effects.opacityPressed', '--opacity-pressed',   'global','opacity','state',   'unitless',NULL,0,1,0.01,'0.1', '0.1', '0.3','Pressed overlay opacity'),
+('effects.opacitySelected','--opacity-selected',  'global','opacity','state',   'unitless',NULL,0,1,0.01,'0.08','0.08','0.25','Selected overlay opacity'),
+('effects.opacityDisabled','--opacity-disabled',  'global','opacity','state',   'unitless',NULL,0,1,0.01,'0.4', '0.4', '0.35','Disabled overlay opacity'),
+('effects.opacityMuted',   '--opacity-muted',     'global','opacity','state',   'unitless',NULL,0,1,0.01,'0.6', '0.6', '0.5', 'Muted overlay opacity')
+ON CONFLICT (token_key) DO NOTHING;
+
+INSERT INTO graphics_token_catalog (token_key, css_variable, layer, family, subfamily, value_type, default_light, default_dark, default_high_contrast, description) VALUES
+('effects.focusRingColor', '--focus-ring-color', 'semantic','color','focus',    'rgba','rgba(21,101,192,0.12)','rgba(96,165,250,0.22)','rgba(0,51,160,0.6)','Focus ring color'),
+('effects.selectionBg',    '--selection-bg',     'semantic','color','selection','hex', '#3b82f6','#60a5fa','#0033a0','Text selection background'),
+('effects.selectionColor', '--selection-color',  'semantic','color','selection','hex', '#ffffff','#ffffff','#ffffff','Text selection foreground'),
+('effects.caretColor',     '--caret-color',      'semantic','color','caret',    'hex', '#1565c0','#60a5fa','#000000','Caret color'),
+('effects.placeholderColor','--placeholder-color','semantic','color','placeholder','hex','#94a3b8','#64748b','#555555','Placeholder color'),
+('effects.scrollbarTrack', '--scrollbar-track',  'semantic','color','scrollbar','hex', '#f1f5f9','#162032','#ffffff','Scrollbar track color'),
+('effects.scrollbarThumb', '--scrollbar-thumb',  'semantic','color','scrollbar','hex', '#cbd5e1','#475569','#000000','Scrollbar thumb color'),
+('effects.shadowXs',       '--shadow-xs',        'semantic','shadow','card',    'shadow-expr','0 1px 3px rgba(12,45,72,.04)','0 1px 3px rgba(0,0,0,.3)','none','Extra-small shadow'),
+('effects.shadowLg',       '--shadow-lg',        'semantic','shadow','card',    'shadow-expr','0 18px 40px rgba(15,23,42,.14),0 8px 20px rgba(15,23,42,.09)','0 18px 40px rgba(0,0,0,.5),0 8px 20px rgba(0,0,0,.3)','none','Large shadow'),
+('effects.shadowXl',       '--shadow-xl',        'semantic','shadow','modal',   'shadow-expr','0 24px 60px rgba(12,45,72,.16),0 12px 28px rgba(12,45,72,.08)','0 24px 60px rgba(0,0,0,.6),0 12px 28px rgba(0,0,0,.4)','none','Extra-large shadow'),
+('effects.easingOut',      '--easing-out',       'global','motion','easing',    'easing-expr','cubic-bezier(0,0,0.2,1)','cubic-bezier(0,0,0.2,1)','linear','Ease-out curve'),
+('effects.easingInOut',    '--easing-in-out',    'global','motion','easing',    'easing-expr','cubic-bezier(0.4,0,0.2,1)','cubic-bezier(0.4,0,0.2,1)','linear','Ease-in-out curve'),
+('effects.easingSpring',   '--easing-spring',    'global','motion','easing',    'easing-expr','cubic-bezier(0.34,1.56,0.64,1)','cubic-bezier(0.34,1.56,0.64,1)','linear','Spring curve'),
+('effects.easingSharp',    '--easing-sharp',     'global','motion','easing',    'easing-expr','cubic-bezier(0.2,0,0,1)','cubic-bezier(0.2,0,0,1)','linear','Sharp curve')
+ON CONFLICT (token_key) DO NOTHING;
+
+-- ── Component contracts (per-component overridable token whitelists) ───────
+INSERT INTO graphics_component_contract (component_key, display_name_en, display_name_vi, overridable_tokens, preview_scene_key, is_operator_visible) VALUES
+('btn',        'Button',         'Nút bấm',       ARRAY['components.btn.paddingX','components.btn.paddingY','components.btn.gap','components.btn.borderWidth','components.btn.minWidth','components.btn.letterSpacing','components.btn.fontWeight'], 'components.button',    TRUE),
+('tab',        'Tab',            'Tab',           ARRAY['components.tab.paddingY','components.tab.paddingX','components.tab.radius','components.tab.fontSize','components.tab.gap','components.tab.borderWidth','components.tab.fontWeight','components.tab.activeIndicator'], 'components.tab',    TRUE),
+('table',      'Table',          'Bảng dữ liệu', ARRAY['components.table.borderWidth','components.table.headerFontWeight','components.table.headerLetterSpacing','components.table.headerBg','components.table.stripeBg','components.table.stripeAltBg'], 'components.table',   TRUE),
+('card',       'Card',           'Thẻ',           ARRAY['components.card.borderWidth','components.card.headerPadding','components.card.bodyPadding','components.card.headerBg'], 'components.card',   TRUE),
+('badge',      'Badge',          'Huy hiệu',     ARRAY['components.badge.letterSpacing','components.badge.borderWidth','components.badge.minWidth','components.badge.fontWeight'], 'components.badge',   TRUE),
+('input',      'Input',          'Ô nhập',       ARRAY['components.input.paddingY','components.input.borderWidth','components.input.bg'], 'components.input',  TRUE),
+('modal',      'Modal',          'Hộp thoại',    ARRAY['components.modal.radius','components.modal.padding','components.modal.headerPadding'], 'components.modal',   FALSE),
+('flow',       'Flowchart',      'Lưu đồ',       ARRAY['components.flow.nodeBg','components.flow.nodeBorderW','components.flow.nodeBorderColor','components.flow.nodeRadius','components.flow.nodePadding','components.flow.connectorColor','components.flow.connectorWidth','components.flow.arrowSize'], 'components.flow', FALSE),
+('isoBox',     'ISO Box',        'Hộp ISO',      ARRAY['components.isoBox.bg','components.isoBox.borderW','components.isoBox.radius','components.isoBox.headerBg','components.isoBox.headerPadding','components.isoBox.bodyPadding','components.isoBox.fontSize'], 'components.isoBox', FALSE),
+('isoNote',    'ISO Note',       'Ghi chú ISO',  ARRAY['components.isoNote.iconSize','components.isoNote.fontSize','components.isoNote.bg','components.isoNote.borderColor','components.isoNote.borderLeftColor','components.isoNote.borderLeftW','components.isoNote.radius','components.isoNote.padding'], 'components.isoNote', FALSE),
+('kpi',        'KPI Card',       'Thẻ KPI',      ARRAY['components.kpi.borderWidth','components.kpi.iconSize','components.kpi.trendFontSize'], 'components.kpi',     TRUE),
+('tooltip',    'Tooltip',        'Chú thích nổi', ARRAY['components.tooltip.bg','components.tooltip.color','components.tooltip.paddingY','components.tooltip.paddingX','components.tooltip.radius','components.tooltip.fontSize','components.tooltip.maxWidth'], 'components.tooltip', FALSE),
+('dropdown',   'Dropdown',       'Menu thả',      ARRAY['components.dropdown.radius','components.dropdown.itemPadding','components.dropdown.itemFontSize','components.dropdown.hoverBg'], 'components.dropdown', FALSE),
+('nav',        'Navigation',     'Điều hướng',   ARRAY['components.nav.height','components.nav.fontSize','components.nav.iconSize','components.nav.gap','components.nav.radius'], 'components.nav',    TRUE),
+('pagination', 'Pagination',     'Phân trang',   ARRAY['components.pagination.btnSize','components.pagination.radius','components.pagination.fontSize','components.pagination.gap'], 'components.pagination', TRUE),
+('progress',   'Progress Bar',   'Thanh tiến độ',ARRAY['components.progress.height','components.progress.radius','components.progress.bg'], 'components.progress', TRUE),
+('empty',      'Empty State',    'Trạng thái rỗng',ARRAY['components.empty.iconSize','components.empty.iconOpacity','components.empty.titleFontSize','components.empty.descFontSize'], 'components.empty', FALSE),
+('field',      'Form Field',     'Trường biểu mẫu',ARRAY['components.field.gap','components.field.labelGap','components.field.groupGap','components.field.helperFontSize'], 'components.field', TRUE),
+('breadcrumb', 'Breadcrumb',     'Đường dẫn',    ARRAY['components.breadcrumb.fontSize','components.breadcrumb.gap','components.breadcrumb.color','components.breadcrumb.activeColor'], 'components.breadcrumb', TRUE)
+ON CONFLICT (component_key) DO NOTHING;
+
+-- ── Preview scenes (SAP sample-page model) ─────────────────────────────────
+INSERT INTO graphics_preview_scene (scene_key, category, display_name_en, display_name_vi, renderer, tokens_observed, sort_order, is_default) VALUES
+('typography.family',      'typography','Typography Family',     'Họ phông chữ',      'typographyFamily',      ARRAY['typography.display.family','typography.heading.family','typography.body.family','typography.label.family','typography.mono.family'], 10, TRUE),
+('typography.scale',       'typography','Typography Scale',      'Thang cỡ chữ',      'typographyScale',       ARRAY['fontScale.xs','fontScale.sm','fontScale.base','fontScale.md','fontScale.lg','fontScale.xl','fontScale.2xl','fontScale.3xl'], 20, TRUE),
+('typography.lineHeight',  'typography','Line Height',           'Chiều cao dòng',    'typographyLineHeight',  ARRAY['lineHeight.tight','lineHeight.normal','lineHeight.relaxed'], 30, FALSE),
+('color.brand',            'color',     'Brand Color Scene',     'Màu thương hiệu',   'colorBrand',            ARRAY['brand.primary','brand.light','brand.dark','brand.accent','brand.accentLight'], 40, TRUE),
+('color.status',           'color',     'Status Color Scene',    'Màu trạng thái',    'colorStatus',           ARRAY['status.success.light','status.error.light','status.warning.light','status.info.light','status.purple.light','status.cyan.light'], 50, TRUE),
+('color.surfaces',         'color',     'Surface Stack',         'Bề mặt',            'colorSurfaces',         ARRAY['colorsLight.bgPage','colorsLight.bgSurface','colorsLight.bgSurfaceAlt','colorsLight.bgHeader','colorsLight.bgModal','colorsLight.bgHover'], 60, TRUE),
+('layout.radius',          'layout',    'Radius Scale',          'Thang bo góc',      'layoutRadius',          ARRAY['layout.admin.panelRadius','layout.admin.surfaceRadius','layout.admin.nestedRadius'], 70, FALSE),
+('layout.spacing',         'layout',    'Spacing Scale',         'Thang khoảng cách', 'layoutSpacing',         ARRAY['layout.admin.gapLg','layout.admin.gapMd','layout.admin.gapSm','layout.admin.panelPadding','layout.admin.cardPadding','layout.admin.rowPadding'], 80, FALSE),
+('effects.motion',         'effects',   'Motion Scene',          'Chuyển động',       'effectsMotion',         ARRAY['effects.motionFast','effects.motionNormal','effects.motionSlow','effects.motionSpring','effects.easingOut','effects.easingInOut','effects.easingSpring','effects.easingSharp'], 90, FALSE),
+('effects.focusRing',      'effects',   'Focus Ring Scene',      'Viền focus',        'effectsFocusRing',      ARRAY['effects.focusRingWidth','effects.focusRingOffset','effects.focusRingColor'], 100, FALSE),
+('dashboard.andonProjection','dashboard','Andon 4K Projection',  'Chiếu Andon 4K',    'dashboardAndon',        ARRAY['colorsLight.bgPage','colorsLight.bgSurface','brand.primary','status.success.light','status.error.light','status.warning.light'], 110, FALSE),
+('components.button',      'components','Button Gallery',        'Nút bấm',           'componentButton',       ARRAY['components.btn.paddingX','components.btn.paddingY','components.btn.borderWidth'], 200, TRUE),
+('components.table',       'components','Table Gallery',         'Bảng',              'componentTable',        ARRAY['components.table.borderWidth','components.table.headerBg','components.table.stripeBg','components.table.stripeAltBg'], 210, TRUE),
+('components.card',        'components','Card Gallery',          'Thẻ',               'componentCard',         ARRAY['components.card.borderWidth','components.card.headerPadding','components.card.bodyPadding'], 220, TRUE),
+('components.kpi',         'components','KPI Card Gallery',      'Thẻ KPI',           'componentKpi',          ARRAY['components.kpi.borderWidth','components.kpi.iconSize','components.kpi.trendFontSize'], 230, TRUE),
+('components.modal',       'components','Modal Gallery',         'Hộp thoại',         'componentModal',        ARRAY['components.modal.radius','components.modal.padding','components.modal.headerPadding'], 240, FALSE)
+ON CONFLICT (scene_key) DO NOTHING;
+
+-- ── Default rollout values (organization scope, light + dark + high-contrast) ──
+INSERT INTO graphics_token_value (token_key, scope_type, scope_id, color_mode, value, is_published, published_at, published_by, version)
+SELECT token_key, 'organization', 'default', 'light', COALESCE(default_light,''), TRUE, NOW(), 'migration:148', 1
+FROM graphics_token_catalog
+WHERE default_light IS NOT NULL
+ON CONFLICT (token_key, scope_type, scope_id, color_mode) DO NOTHING;
+
+INSERT INTO graphics_token_value (token_key, scope_type, scope_id, color_mode, value, is_published, published_at, published_by, version)
+SELECT token_key, 'organization', 'default', 'dark', COALESCE(default_dark,''), TRUE, NOW(), 'migration:148', 1
+FROM graphics_token_catalog
+WHERE default_dark IS NOT NULL
+ON CONFLICT (token_key, scope_type, scope_id, color_mode) DO NOTHING;
+
+INSERT INTO graphics_token_value (token_key, scope_type, scope_id, color_mode, value, is_published, published_at, published_by, version)
+SELECT token_key, 'organization', 'default', 'high-contrast', COALESCE(default_high_contrast,''), TRUE, NOW(), 'migration:148', 1
+FROM graphics_token_catalog
+WHERE default_high_contrast IS NOT NULL
+ON CONFLICT (token_key, scope_type, scope_id, color_mode) DO NOTHING;
+
+INSERT INTO graphics_token_value (token_key, scope_type, scope_id, color_mode, value, is_published, published_at, published_by, version)
+SELECT token_key, 'organization', 'default', 'print', COALESCE(default_print, default_light,''), TRUE, NOW(), 'migration:148', 1
+FROM graphics_token_catalog
+WHERE default_print IS NOT NULL OR default_light IS NOT NULL
+ON CONFLICT (token_key, scope_type, scope_id, color_mode) DO NOTHING;
+
+-- ── Theme schedule seeds (Day / Night / Maintenance shifts) ────────────────
+INSERT INTO graphics_theme_schedule (schedule_name, description, trigger_type, trigger_config, target_color_mode, scope_type, scope_id, priority) VALUES
+('shift.day',         'Day-shift bright theme',      'shift', '{"shift":"A","startTime":"06:00","endTime":"14:00","daysOfWeek":[1,2,3,4,5,6]}'::jsonb, 'light',            'tenant','default', 100),
+('shift.swing',       'Swing-shift balanced theme',  'shift', '{"shift":"B","startTime":"14:00","endTime":"22:00","daysOfWeek":[1,2,3,4,5,6]}'::jsonb, 'light',            'tenant','default', 100),
+('shift.night',       'Night-shift dimmed theme',    'shift', '{"shift":"C","startTime":"22:00","endTime":"06:00","daysOfWeek":[1,2,3,4,5,6,7]}'::jsonb,'dark',             'tenant','default', 100),
+('maintenance.amber', 'Maintenance amber overlay',   'event', '{"eventKey":"maintenance-window"}'::jsonb,                                                 'maintenance-amber','tenant','default', 150)
+ON CONFLICT (schedule_name) DO NOTHING;
+
+COMMIT;
+
+-- ============================================================================
+-- Migration 148 complete. Next steps:
+-- 1. Backend: DesignTokenCatalogService.php reads these tables via DataLayer.
+-- 2. Repository: writeDesignConfig() now also shadow-writes to graphics_token_value.
+-- 3. Frontend: GraphicsAuthority.tokens.read() resolves values from these tables.
+-- 4. Scanner: populate graphics_module_binding by grepping portal scripts for
+--    GraphicsAuthority.tokens.read() calls.
+-- ============================================================================
+-- <<< END MIGRATION: 148_graphics_authority_tables.sql
+
+-- >>> BEGIN MIGRATION: 149_graphics_v4_governance_tables.sql
+-- ============================================================================
+-- Migration 149: Graphics Authority — V4 governance extension
+-- ============================================================================
+-- Purpose:   Implement 5 missing V4 governance features identified by the
+--            rules-extraction pass (_reports/agent-audits/graphics-v4-rules-
+--            extraction-2026-04-19.md):
+--              1. Token version history (R-084) — rollback evidence
+--              2. QA gate runner (R-082) — persist 19-gate results
+--              3. Contrast audit matrix (R-016/R-017/R-019) — text×bg pairs
+--              4. Template zone × allowedBlocks binding (R-041, R-089)
+--              5. Regulated entity registry (R-086, R-106) — 21 CFR / AS9100
+--
+-- Pattern:   SAP Save/Publish/Activate + retain-previous; SLDS component
+--            contracts; Fluent triad (Light/Dark/HighContrast mandatory).
+--
+-- Author:    Graphics Control Plane rebuild — V4 conformance pass
+-- Date:      2026-04-19
+-- ============================================================================
+
+BEGIN;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 1: graphics_token_version
+-- Snapshot per mutation of graphics_token_value. Fuels 7-day rollback
+-- (V4 rule R-084). Write path: Repository/Service on commit; retention policy
+-- trims rows older than retain_days (default 7 for non-critical, indefinite
+-- for regulated tokens).
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS graphics_token_version (
+    version_id          UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    token_key           VARCHAR(200) NOT NULL REFERENCES graphics_token_catalog(token_key) ON UPDATE CASCADE ON DELETE CASCADE,
+    scope_type          VARCHAR(30)  NOT NULL,
+    scope_id            VARCHAR(120) NOT NULL,
+    color_mode          VARCHAR(20)  NOT NULL,
+    value               TEXT         NOT NULL,
+    version_number      INTEGER      NOT NULL,
+    rollout_id          UUID         REFERENCES graphics_rollout_scope(rollout_id) ON DELETE SET NULL,
+    captured_at         TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    captured_by         VARCHAR(120),
+    retain_days         INTEGER      NOT NULL DEFAULT 7,
+    regulated_scope     TEXT[]       NOT NULL DEFAULT '{}',   -- ['21_CFR_11','AS9100'] — prevents auto-trim
+    reason              TEXT,
+    CONSTRAINT uq_graphics_token_version_order UNIQUE (token_key, scope_type, scope_id, color_mode, version_number)
+);
+
+CREATE INDEX IF NOT EXISTS idx_graphics_token_version_captured_at ON graphics_token_version(captured_at);
+CREATE INDEX IF NOT EXISTS idx_graphics_token_version_rollout     ON graphics_token_version(rollout_id);
+CREATE INDEX IF NOT EXISTS idx_graphics_token_version_key         ON graphics_token_version(token_key);
+
+COMMENT ON TABLE  graphics_token_version IS 'Append-only history of token_value mutations. Fuels 1-click rollback (V4 R-084). 7-day default retention; regulated tokens retained indefinitely.';
+COMMENT ON COLUMN graphics_token_version.regulated_scope IS 'If non-empty the row is regulated (21 CFR 11, AS9100, IATF 16949) and MUST NOT be auto-trimmed.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 2: graphics_qa_gate_result
+-- Persists the 19-gate Standard-36 QA run per rollout (V4 R-082).
+-- Gates:
+--   G01 schema_validation   G02 template_match      G03 token_consistency
+--   G04 dark_mode_sync      G05 contrast_aa         G06 wcag_22
+--   G07 focus_ring          G08 responsive          G09 density
+--   G10 manufacturing       G11 print_output        G12 perf_budget
+--   G13 rollback_safety     G14 audit_trail         G15 naming_standard
+--   G16 build_packet        G17 block_contract      G18 release_signoff
+--   G19 platform_specific
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS graphics_qa_gate_result (
+    result_id           UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    rollout_id          UUID         REFERENCES graphics_rollout_scope(rollout_id) ON DELETE CASCADE,
+    simulation_run_id   UUID         REFERENCES graphics_simulation_run(run_id)    ON DELETE SET NULL,
+    gate_id             VARCHAR(10)  NOT NULL,    -- G01..G19
+    gate_name           VARCHAR(80)  NOT NULL,
+    status              VARCHAR(20)  NOT NULL,    -- pass | warn | fail | skip | waived
+    score               NUMERIC(5,2),             -- 0..100 when applicable
+    findings            JSONB        NOT NULL DEFAULT '[]'::jsonb,
+    blocker             BOOLEAN      NOT NULL DEFAULT FALSE,
+    waiver_id           UUID,
+    evaluator           VARCHAR(120),             -- 'automated:contrast', 'reviewer:<username>'
+    evaluated_at        TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    evidence_url        TEXT,
+    CONSTRAINT uq_graphics_qa_gate_result UNIQUE (rollout_id, gate_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_graphics_qa_gate_rollout ON graphics_qa_gate_result(rollout_id);
+CREATE INDEX IF NOT EXISTS idx_graphics_qa_gate_blocker ON graphics_qa_gate_result(blocker);
+CREATE INDEX IF NOT EXISTS idx_graphics_qa_gate_status  ON graphics_qa_gate_result(status);
+
+COMMENT ON TABLE graphics_qa_gate_result IS 'Per-rollout result for each of the 19 Standard-36 QA gates. A blocker=true row prevents graphics_rollout_scope from transitioning to applied unless waived.';
+
+-- Seed the 19 gates into a lookup (helps UI display; values repeated per row for query simplicity)
+CREATE TABLE IF NOT EXISTS graphics_qa_gate_catalog (
+    gate_id             VARCHAR(10)  PRIMARY KEY,
+    gate_name           VARCHAR(80)  NOT NULL,
+    category            VARCHAR(30)  NOT NULL,   -- schema | visual | a11y | perf | compliance
+    is_automated        BOOLEAN      NOT NULL DEFAULT FALSE,
+    default_blocker     BOOLEAN      NOT NULL DEFAULT TRUE,
+    description         TEXT
+);
+
+INSERT INTO graphics_qa_gate_catalog (gate_id, gate_name, category, is_automated, default_blocker, description) VALUES
+('G01','Schema validation','schema',TRUE, TRUE, 'design-system-config and token catalog validate against JSON-Schema'),
+('G02','Template match','schema',TRUE, TRUE, 'Selected template archetype matches module archetype per naming standard'),
+('G03','Token consistency','schema',TRUE, TRUE, 'Every consumed token key exists in graphics_token_catalog'),
+('G04','Dark mode sync','visual',TRUE, TRUE, 'Every token has a default_dark value (Fluent triad rule)'),
+('G05','Contrast AA','a11y',TRUE, TRUE, 'WCAG AA contrast on all (text, surface) pairs; see graphics_contrast_check'),
+('G06','WCAG 2.2','a11y',TRUE, FALSE,'axe-core scan on the component gallery'),
+('G07','Focus ring','a11y',TRUE, TRUE, 'Focus ring ≥3:1 against every --bg-* surface'),
+('G08','Responsive','visual',FALSE,TRUE, 'Grid collapses 4→2→1 at tokens’ breakpoints; reflow @320px / @400%'),
+('G09','Density','visual',FALSE,FALSE,'Compact density preserves ≥24×24 touch targets'),
+('G10','Manufacturing','compliance',FALSE,FALSE,'Machine-status theme invariance; ISO 3864 safety colors'),
+('G11','Print output','visual',FALSE,TRUE, '@media print forces B&W, removes shadows, 11pt minimum'),
+('G12','Perf budget','perf',TRUE, FALSE,'Bundle < 256 KB gzip for portal theme CSS'),
+('G13','Rollback safety','compliance',TRUE, TRUE, 'prior_snapshot present and restorable'),
+('G14','Audit trail','compliance',TRUE, TRUE, 'Simulation run and audit events written before apply'),
+('G15','Naming standard','schema',TRUE, FALSE,'Tokens match --{category}-{name}-{variant}'),
+('G16','Build packet','schema',TRUE, FALSE,'Module build packet carries all 24 required fields'),
+('G17','Block contract','schema',TRUE, FALSE,'Block carries 14 required contract fields'),
+('G18','Release signoff','compliance',FALSE,TRUE, 'CAB / approver recorded in rollout_scope.approved_by'),
+('G19','Platform specific','visual',FALSE,FALSE,'Mobile scanner / shopfloor-board / andon projection tested')
+ON CONFLICT (gate_id) DO NOTHING;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 3: graphics_contrast_check
+-- Materialized WCAG 2.2 contrast audit row per (rollout × text_token × bg_token
+-- × color_mode). Gates rollout apply; feeds admin contrast matrix UI.
+-- Replaces the ad-hoc JSON in graphics_simulation_run.wcag_report when the
+-- check needs to be queryable.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS graphics_contrast_check (
+    check_id            UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    rollout_id          UUID         REFERENCES graphics_rollout_scope(rollout_id) ON DELETE CASCADE,
+    simulation_run_id   UUID         REFERENCES graphics_simulation_run(run_id)    ON DELETE SET NULL,
+    text_token_key      VARCHAR(200) NOT NULL REFERENCES graphics_token_catalog(token_key) ON UPDATE CASCADE ON DELETE CASCADE,
+    bg_token_key        VARCHAR(200) NOT NULL REFERENCES graphics_token_catalog(token_key) ON UPDATE CASCADE ON DELETE CASCADE,
+    color_mode          VARCHAR(20)  NOT NULL,
+    text_value          TEXT         NOT NULL,
+    bg_value            TEXT         NOT NULL,
+    contrast_ratio      NUMERIC(6,3) NOT NULL,
+    wcag_level          VARCHAR(10)  NOT NULL,         -- AAA | AA | AA-large | FAIL
+    is_large_text       BOOLEAN      NOT NULL DEFAULT FALSE,
+    required_min        NUMERIC(4,2) NOT NULL DEFAULT 4.50,
+    blocker             BOOLEAN      NOT NULL DEFAULT FALSE,
+    colorblind_sim      JSONB,                          -- {deuteranopia:ratio, protanopia:ratio, tritanopia:ratio, achromatopsia:ratio}
+    checked_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_graphics_contrast_check UNIQUE (rollout_id, text_token_key, bg_token_key, color_mode)
+);
+
+CREATE INDEX IF NOT EXISTS idx_graphics_contrast_rollout ON graphics_contrast_check(rollout_id);
+CREATE INDEX IF NOT EXISTS idx_graphics_contrast_blocker ON graphics_contrast_check(blocker);
+CREATE INDEX IF NOT EXISTS idx_graphics_contrast_level   ON graphics_contrast_check(wcag_level);
+
+COMMENT ON TABLE graphics_contrast_check IS 'WCAG AA/AAA contrast row per (text_token × bg_token × color_mode × rollout). Drives the admin contrast matrix and the G05 QA gate.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 4: graphics_template_zone_binding
+-- Per-template whitelist of which block types may render in which zone
+-- (V4 R-041, R-089). Populated by template seed; block engine reads and
+-- rejects unknown block/zone combinations at runtime.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS graphics_template_zone_binding (
+    binding_id          UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    template_id         VARCHAR(120) NOT NULL,
+    template_version    VARCHAR(30)  NOT NULL,
+    zone_key            VARCHAR(60)  NOT NULL,       -- header | main | sidebar | kpi-bar | filter | footer | chart-area | scroll-sticky
+    allowed_block_types TEXT[]       NOT NULL DEFAULT '{}',
+    required_block_types TEXT[]      NOT NULL DEFAULT '{}',
+    max_blocks          INTEGER,
+    responsive_visible  JSONB        NOT NULL DEFAULT '{"mobile":true,"tablet":true,"desktop":true}'::jsonb,
+    priority_weight     INTEGER      NOT NULL DEFAULT 100,
+    a11y_landmark       VARCHAR(40),                  -- banner | main | navigation | complementary | contentinfo
+    created_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    CONSTRAINT uq_graphics_template_zone UNIQUE (template_id, template_version, zone_key)
+);
+
+CREATE INDEX IF NOT EXISTS idx_graphics_template_zone_template ON graphics_template_zone_binding(template_id);
+
+COMMENT ON TABLE graphics_template_zone_binding IS 'Zone×allowed_block_types whitelist per template version (V4 R-041/R-089). Block engine MUST reject any block whose type is not allowed in the target zone.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- TABLE 5: graphics_regulated_entity
+-- Registry of entity types that fall under 21 CFR Part 11 / AS9100 / IATF
+-- 16949 / GDPR. The Change-Control gate routes mutations on these entity
+-- types through explicit approval (V4 R-086, R-106).
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS graphics_regulated_entity (
+    entity_registry_id  UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    entity_key          VARCHAR(80)  NOT NULL UNIQUE,   -- ncr | capa | wo | doc_controlled | training | calibration | ...
+    display_name        VARCHAR(120) NOT NULL,
+    regulatory_scope    TEXT[]       NOT NULL,           -- ['21_CFR_11','AS9100','IATF_16949','GDPR','ISO_9001','FDA_820']
+    esignature_required BOOLEAN      NOT NULL DEFAULT TRUE,
+    audit_trail_required BOOLEAN     NOT NULL DEFAULT TRUE,
+    retention_days      INTEGER      NOT NULL DEFAULT 3650,   -- 10 years default for 21 CFR Part 11
+    change_control_required BOOLEAN  NOT NULL DEFAULT TRUE,
+    change_control_board VARCHAR(120),                   -- role key that approves changes
+    immutable_once_approved BOOLEAN  NOT NULL DEFAULT TRUE,
+    notes               TEXT,
+    created_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW(),
+    updated_at          TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+);
+
+COMMENT ON TABLE graphics_regulated_entity IS 'Which entity types trigger 21 CFR Part 11 / AS9100 / IATF 16949 gates. Consumed by the change-control router, audit service, and token version retention policy.';
+
+-- Seed the most common regulated entities (conservative — everything defaults
+-- to "regulated" so a reviewer must explicitly opt a new entity out).
+INSERT INTO graphics_regulated_entity (entity_key, display_name, regulatory_scope, esignature_required, retention_days, change_control_board, notes) VALUES
+('ncr',               'Non-conformance report',        ARRAY['21_CFR_11','AS9100','IATF_16949','ISO_9001'], TRUE, 3650, 'role.quality_manager', 'NCR full 21 CFR Part 11'),
+('capa',              'Corrective & preventive action',ARRAY['21_CFR_11','AS9100','IATF_16949','ISO_9001'], TRUE, 3650, 'role.quality_manager', 'CAPA full 21 CFR Part 11'),
+('complaint',         'Customer complaint',            ARRAY['21_CFR_11','ISO_9001'], TRUE, 3650, 'role.customer_quality', 'Customer voice — full regulated'),
+('deviation',         'Deviation',                     ARRAY['21_CFR_11','AS9100','IATF_16949'], TRUE, 3650, 'role.quality_manager', ''),
+('change_control',    'Engineering change control',    ARRAY['21_CFR_11','AS9100','IATF_16949'], TRUE, 3650, 'role.change_control_board', ''),
+('doc_controlled',    'Controlled document',           ARRAY['21_CFR_11','AS9100','IATF_16949','ISO_9001'], TRUE, 3650, 'role.document_control', ''),
+('training',          'Training record',               ARRAY['21_CFR_11','AS9100','IATF_16949'], TRUE, 3650, 'role.training_lead', ''),
+('competency',        'Competency assessment',         ARRAY['AS9100','IATF_16949'], TRUE, 3650, 'role.training_lead', ''),
+('calibration',       'Calibration record',            ARRAY['21_CFR_11','AS9100','IATF_16949','ISO_9001'], TRUE, 3650, 'role.calibration_lead', ''),
+('audit',             'Audit (internal/external)',     ARRAY['AS9100','IATF_16949','ISO_9001'], TRUE, 3650, 'role.quality_manager', ''),
+('validation',        'Process/software validation',   ARRAY['21_CFR_11','AS9100'], TRUE, 3650, 'role.validation_lead', ''),
+('fai',               'First article inspection',      ARRAY['AS9100','IATF_16949'], TRUE, 3650, 'role.quality_engineer', 'AS9102 FAI'),
+('esignature',        'Electronic signature record',   ARRAY['21_CFR_11'], TRUE, 3650, 'role.system', 'Immutable, indefinite retention recommended'),
+('lot_release',       'Lot release',                   ARRAY['21_CFR_11','AS9100','IATF_16949'], TRUE, 3650, 'role.quality_manager', ''),
+('supplier',          'Supplier master',               ARRAY['AS9100','IATF_16949','ISO_9001'], FALSE, 3650, 'role.procurement_lead', ''),
+('scar',              'Supplier corrective action',    ARRAY['AS9100','IATF_16949','ISO_9001'], TRUE, 3650, 'role.supplier_quality', '')
+ON CONFLICT (entity_key) DO NOTHING;
+
+COMMIT;
+
+-- ============================================================================
+-- Migration 149 complete. Acceptance criteria:
+-- • graphics_token_version populated on every graphics_token_value update
+--   (wired from DesignTokenCatalogService::publishRollout + rollbackRollout)
+-- • graphics_qa_gate_result rows created by QaGateRunnerService (one per G01..G19
+--   per rollout). Any blocker=true row prevents applied transition.
+-- • graphics_contrast_check rows created by ContrastAuditService — matrix
+--   of every text_token × bg_token × color_mode for the staged change set.
+-- • graphics_template_zone_binding consulted by block engine before rendering
+--   every block; a block outside its zone whitelist MUST throw at runtime.
+-- • graphics_regulated_entity consulted by change-control gate before a
+--   regulated entity's related token can move from draft → applied.
+-- ============================================================================
+-- <<< END MIGRATION: 149_graphics_v4_governance_tables.sql
+
+-- >>> BEGIN MIGRATION: 150_dcc_document_change_control.sql
+-- ============================================================================
+-- Migration 150: DCC — Document Change Control
+-- ============================================================================
+-- Purpose:
+--   Canonical backend for the *Document* version-control workflow (DCC),
+--   distinct from the *Engineering Change Control* workflow (ECC = plm_change_*).
+--
+--   DCC governs QMS controlled information: Manual, Policy, SOP, WI, Form,
+--   Annex, Department Handbook, Job Description, Training Matrix, etc.
+--   ECC governs parts/BOMs/items/routings (handled by plm_change_orders).
+--
+--   DCC introduces:
+--     • dcc_document_header_label   — i18n-aware registry of header labels
+--                                     (ID, Rev, Eff, Owner, Appr) so the
+--                                     frontend header renderer never hardcodes
+--                                     a Vietnamese string. Labels are looked
+--                                     up by label_key + locale.
+--     • dcc_document_header         — flattened per-document header projection
+--                                     consumed by the portal renderer
+--                                     (/api/v1/dcc/documents/{code}/header).
+--                                     Source of truth; no hardcode in HTML.
+--     • dcc_document_change_request — DCR: formal request to edit or supersede
+--                                     a QMS document. Distinct from plm_change_requests
+--                                     to prevent ECC / DCC conflation.
+--     • dcc_document_change_notice  — DCN: approved change notice that
+--                                     authorises a new revision to be released.
+--     • dcc_document_revision_history — append-only log of every revision
+--                                     transition (draft → review → approved →
+--                                     released → superseded → obsolete) for
+--                                     FDA 21 CFR Part 11 audit evidence.
+--
+--   The existing eqms_documents + eqms_document_family + eqms_document_revision
+--   tables (migrations 102, 136, 141) remain authoritative for regulated QMS
+--   records. DCC tables reference eqms_documents.doc_id when available and
+--   fall back to VARCHAR doc_code for legacy HTML-backed documents that have
+--   not yet been migrated into eqms_documents.
+--
+-- Standards:
+--   • ISO 9001:2015 §7.5 Documented Information (Document Control)
+--   • AS9100D §7.5
+--   • FDA 21 CFR Part 820.40 (Document Controls)
+--   • FDA 21 CFR Part 11 (Electronic Records / Electronic Signatures)
+--
+-- Safety:
+--   Additive only. All DDL guarded with IF NOT EXISTS. All seed data guarded
+--   with ON CONFLICT DO NOTHING. No destructive writes to existing tables.
+--
+-- Rollback (reverse order):
+--   DROP TABLE IF EXISTS
+--     dcc_document_revision_history,
+--     dcc_document_change_notice,
+--     dcc_document_change_request,
+--     dcc_document_header,
+--     dcc_document_header_label
+--   CASCADE;
+--
+-- Author: HESEM QMS Module — DCC sprint
+-- Date:   2026-04-22
+-- ============================================================================
+
+BEGIN;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 1 — dcc_document_header_label
+-- i18n registry so the frontend renderer never hardcodes a Vietnamese
+-- string (e.g. "Ngày hiệu lực"). The renderer issues
+--   GET /api/v1/dcc/labels?locale=en
+-- and receives {ID, Rev, Eff, Owner, Appr, ...}.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS dcc_document_header_label (
+    label_id         UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    label_key        VARCHAR(40)  NOT NULL,          -- e.g. 'doc_id', 'revision', 'effective_date'
+    locale           VARCHAR(10)  NOT NULL,          -- BCP-47 (en, vi, en-US)
+    short_label      VARCHAR(24)  NOT NULL,          -- compact header text ("ID", "Rev", "Eff")
+    long_label       VARCHAR(120) NOT NULL,          -- full label ("Document ID", "Effective date")
+    help_text        TEXT,                           -- tooltip for admins
+    sort_order       SMALLINT     NOT NULL DEFAULT 0,
+    is_active        BOOLEAN      NOT NULL DEFAULT TRUE,
+    created_at       TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    updated_at       TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    UNIQUE (label_key, locale)
+);
+
+CREATE INDEX IF NOT EXISTS idx_dcc_label_locale
+    ON dcc_document_header_label (locale, sort_order)
+    WHERE is_active = TRUE;
+
+COMMENT ON TABLE  dcc_document_header_label
+    IS 'DCC: i18n registry for document header labels consumed by the portal header renderer. No hardcode allowed.';
+COMMENT ON COLUMN dcc_document_header_label.short_label
+    IS 'Compact label shown in the header ribbon (budget: ≤5 chars). Overflow-safe.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 2 — dcc_document_header
+-- Per-document header projection. Every HTML document's top ribbon
+-- (ID | Rev | Eff | Owner | Appr) reads from this table via
+-- /api/v1/dcc/documents/{doc_code}/header. One row per controlled document.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS dcc_document_header (
+    header_id          UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    doc_code           VARCHAR(80)  NOT NULL UNIQUE,    -- canonical human code (e.g. QMS-MAN-001)
+    eqms_doc_id        UUID,                            -- FK to eqms_documents.doc_id when migrated; nullable for legacy
+    title              VARCHAR(512) NOT NULL,
+    subtitle           VARCHAR(512),                    -- secondary line shown under the title
+    doc_type           VARCHAR(40)  NOT NULL,           -- MAN / POL / SOP / WI / FRM / ANNEX / JD / DEPT / ORG / REF / TRN
+    revision           VARCHAR(20)  NOT NULL DEFAULT 'V0',    -- currently-effective revision label
+    effective_date     DATE         NOT NULL,           -- currently-effective date (ISO)
+    owner_role_code    VARCHAR(40)  NOT NULL,           -- SINGLE owner role (e.g. QMR, QA, CEO). DCC forbids dual-owner.
+    approver_role_code VARCHAR(40)  NOT NULL,           -- SINGLE approver role (e.g. CEO, MD)
+    iso_clause         VARCHAR(60),                     -- e.g. 'ISO 9001:2026 §4.2'
+    status             VARCHAR(30)  NOT NULL DEFAULT 'draft',
+                                                        -- draft | in_review | approved | released | superseded | obsolete
+    locale_default     VARCHAR(10)  NOT NULL DEFAULT 'en',
+    metadata           JSONB        NOT NULL DEFAULT '{}'::jsonb,
+    created_at         TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    created_by         VARCHAR(120) NOT NULL DEFAULT 'system',
+    updated_at         TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    updated_by         VARCHAR(120) NOT NULL DEFAULT 'system',
+    CONSTRAINT ck_dcc_header_owner_single
+        CHECK (owner_role_code !~ '[/,;|]' AND position(' ' in owner_role_code) = 0),
+    CONSTRAINT ck_dcc_header_approver_single
+        CHECK (approver_role_code !~ '[/,;|]' AND position(' ' in approver_role_code) = 0),
+    CONSTRAINT ck_dcc_header_status
+        CHECK (status IN ('draft', 'in_review', 'approved', 'released', 'superseded', 'obsolete')),
+    CONSTRAINT ck_dcc_header_revision
+        CHECK (revision ~ '^V[0-9]+(\.[0-9]+)?$')
+);
+
+CREATE INDEX IF NOT EXISTS idx_dcc_header_doc_code
+    ON dcc_document_header (doc_code);
+
+CREATE INDEX IF NOT EXISTS idx_dcc_header_doc_type_status
+    ON dcc_document_header (doc_type, status);
+
+CREATE INDEX IF NOT EXISTS idx_dcc_header_effective_date
+    ON dcc_document_header (effective_date DESC);
+
+CREATE INDEX IF NOT EXISTS idx_dcc_header_owner_role
+    ON dcc_document_header (owner_role_code);
+
+COMMENT ON TABLE  dcc_document_header
+    IS 'DCC: canonical header projection for every controlled QMS document. Consumed by portal header renderer. HTML MUST NOT hardcode these values.';
+COMMENT ON COLUMN dcc_document_header.owner_role_code
+    IS 'SINGLE owner role code. Multiple owners are explicitly forbidden by ck_dcc_header_owner_single.';
+COMMENT ON COLUMN dcc_document_header.revision
+    IS 'Revision label (V0, V1, V1.1, V2.0 ...). Constrained to pattern V<major>[.<minor>].';
+COMMENT ON COLUMN dcc_document_header.effective_date
+    IS 'Date the current revision becomes effective. Append-only history kept in dcc_document_revision_history.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 3 — dcc_document_change_request  (DCR)
+-- Formal request to create/edit/supersede a DCC document. The author records
+-- impact, reason, affected clauses; reviewer + approver authorise issuance.
+-- Distinct from plm_change_requests to prevent ECC / DCC conflation.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS dcc_document_change_request (
+    dcr_id             UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    dcr_number         VARCHAR(40)  NOT NULL UNIQUE,    -- e.g. DCR-2026-0041
+    doc_code           VARCHAR(80)  NOT NULL REFERENCES dcc_document_header(doc_code) ON UPDATE CASCADE,
+    change_type        VARCHAR(30)  NOT NULL,           -- create | revise | supersede | obsolete
+    requested_revision VARCHAR(20)  NOT NULL,           -- proposed next revision label
+    reason             TEXT         NOT NULL,
+    impact_assessment  TEXT,
+    linked_ecr         VARCHAR(40),                     -- optional link to an ECC ECR/ECO number
+    requested_by       VARCHAR(120) NOT NULL,
+    requested_at       TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    reviewer_role_code VARCHAR(40),
+    reviewer_party_id  VARCHAR(120),
+    reviewed_at        TIMESTAMPTZ,
+    approver_role_code VARCHAR(40),
+    approver_party_id  VARCHAR(120),
+    approved_at        TIMESTAMPTZ,
+    target_effective_date DATE,
+    status             VARCHAR(30)  NOT NULL DEFAULT 'submitted',
+    rejection_reason   TEXT,
+    metadata           JSONB        NOT NULL DEFAULT '{}'::jsonb,
+    CONSTRAINT ck_dcc_dcr_change_type
+        CHECK (change_type IN ('create', 'revise', 'supersede', 'obsolete')),
+    CONSTRAINT ck_dcc_dcr_status
+        CHECK (status IN ('draft', 'submitted', 'in_review', 'approved', 'rejected', 'cancelled', 'withdrawn'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_dcc_dcr_doc_code
+    ON dcc_document_change_request (doc_code, requested_at DESC);
+CREATE INDEX IF NOT EXISTS idx_dcc_dcr_status
+    ON dcc_document_change_request (status, requested_at DESC);
+
+COMMENT ON TABLE dcc_document_change_request
+    IS 'DCC: formal Document Change Request. Distinct from plm_change_requests (ECC).';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 4 — dcc_document_change_notice  (DCN)
+-- Approved change notice authorising a new revision release. Enforces the
+-- DCC-side equivalent of plm_change_orders, but scoped to documents only.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS dcc_document_change_notice (
+    dcn_id             UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    dcn_number         VARCHAR(40)  NOT NULL UNIQUE,    -- e.g. DCN-2026-0017
+    dcr_id             UUID         NOT NULL REFERENCES dcc_document_change_request(dcr_id),
+    doc_code           VARCHAR(80)  NOT NULL REFERENCES dcc_document_header(doc_code) ON UPDATE CASCADE,
+    from_revision      VARCHAR(20),
+    to_revision        VARCHAR(20)  NOT NULL,
+    effective_date     DATE         NOT NULL,
+    release_authority  VARCHAR(40)  NOT NULL,           -- single role code of signer
+    signature_event_id UUID,                            -- FK to eqms_electronic_signature_event (if present)
+    manifest_hash_sha256 VARCHAR(128),
+    status             VARCHAR(30)  NOT NULL DEFAULT 'issued',
+    issued_at          TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    metadata           JSONB        NOT NULL DEFAULT '{}'::jsonb,
+    CONSTRAINT ck_dcc_dcn_status
+        CHECK (status IN ('issued', 'released', 'cancelled', 'superseded'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_dcc_dcn_doc_code
+    ON dcc_document_change_notice (doc_code, issued_at DESC);
+CREATE INDEX IF NOT EXISTS idx_dcc_dcn_dcr
+    ON dcc_document_change_notice (dcr_id);
+
+COMMENT ON TABLE dcc_document_change_notice
+    IS 'DCC: Document Change Notice. Authorises release of a new revision following an approved DCR.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 5 — dcc_document_revision_history
+-- Append-only log of every state transition for FDA 21 CFR Part 11 evidence.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS dcc_document_revision_history (
+    history_id         UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    doc_code           VARCHAR(80)  NOT NULL,
+    revision           VARCHAR(20)  NOT NULL,
+    previous_revision  VARCHAR(20),
+    from_status        VARCHAR(30),
+    to_status          VARCHAR(30)  NOT NULL,
+    effective_date     DATE,
+    actor_party_id     VARCHAR(120) NOT NULL,
+    actor_role_code    VARCHAR(40),
+    dcr_id             UUID,
+    dcn_id             UUID,
+    note               TEXT,
+    recorded_at        TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    CONSTRAINT ck_dcc_history_transition
+        CHECK (to_status IN ('draft', 'in_review', 'approved', 'released', 'superseded', 'obsolete'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_dcc_history_doc_code
+    ON dcc_document_revision_history (doc_code, recorded_at DESC);
+CREATE INDEX IF NOT EXISTS idx_dcc_history_dcr
+    ON dcc_document_revision_history (dcr_id)
+    WHERE dcr_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_dcc_history_dcn
+    ON dcc_document_revision_history (dcn_id)
+    WHERE dcn_id IS NOT NULL;
+
+COMMENT ON TABLE dcc_document_revision_history
+    IS 'DCC: append-only revision lifecycle history. Immutable; do not UPDATE or DELETE rows.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 6 — Seed default label registry (English + Vietnamese)
+-- English short labels are the primary default per the DCC spec:
+-- ID / Rev / Eff / Owner / Appr. Vietnamese long labels preserved for admin UI.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+INSERT INTO dcc_document_header_label
+    (label_key,      locale, short_label, long_label,        help_text,                                        sort_order)
+VALUES
+    ('doc_id',       'en',   'ID',        'Document ID',     'Canonical document code (e.g. QMS-MAN-001).',   10),
+    ('revision',     'en',   'Rev',       'Revision',        'Currently effective revision label.',           20),
+    ('effective_date','en',  'Eff',       'Effective date',  'Date the current revision takes effect.',       30),
+    ('owner',        'en',   'Owner',     'Owner',           'Single role accountable for the document.',     40),
+    ('approver',     'en',   'Appr',      'Approved by',     'Single role that signed the release.',          50),
+    ('iso_clause',   'en',   'ISO',       'ISO clause',      'Primary ISO / AS / IATF clause reference.',     60),
+    ('doc_id',       'vi',   'ID',        'Mã tài liệu',     'Mã tài liệu (vd. QMS-MAN-001).',                 10),
+    ('revision',     'vi',   'Rev',       'Phiên bản',       'Phiên bản hiệu lực hiện tại.',                   20),
+    ('effective_date','vi',  'Eff',       'Ngày hiệu lực',   'Ngày phiên bản này có hiệu lực.',                30),
+    ('owner',        'vi',   'Owner',     'Chủ sở hữu',      'Một vai trò chịu trách nhiệm duy nhất.',          40),
+    ('approver',     'vi',   'Appr',      'Phê duyệt',       'Một vai trò ký phê duyệt duy nhất.',              50),
+    ('iso_clause',   'vi',   'ISO',       'Điều khoản ISO',  'Điều khoản ISO/AS/IATF tham chiếu chính.',        60)
+ON CONFLICT (label_key, locale) DO NOTHING;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 7 — updated_at trigger for dcc_document_header and label registry
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE OR REPLACE FUNCTION dcc_touch_updated_at()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at := now();
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_dcc_header_touch ON dcc_document_header;
+CREATE TRIGGER trg_dcc_header_touch
+    BEFORE UPDATE ON dcc_document_header
+    FOR EACH ROW EXECUTE FUNCTION dcc_touch_updated_at();
+
+DROP TRIGGER IF EXISTS trg_dcc_label_touch ON dcc_document_header_label;
+CREATE TRIGGER trg_dcc_label_touch
+    BEFORE UPDATE ON dcc_document_header_label
+    FOR EACH ROW EXECUTE FUNCTION dcc_touch_updated_at();
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 8 — Immutable append-only guard on revision history
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE OR REPLACE FUNCTION dcc_history_forbid_mutation()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE EXCEPTION 'dcc_document_revision_history is append-only; % forbidden', TG_OP
+        USING ERRCODE = 'feature_not_supported';
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_dcc_history_immutable_upd ON dcc_document_revision_history;
+CREATE TRIGGER trg_dcc_history_immutable_upd
+    BEFORE UPDATE ON dcc_document_revision_history
+    FOR EACH ROW EXECUTE FUNCTION dcc_history_forbid_mutation();
+
+DROP TRIGGER IF EXISTS trg_dcc_history_immutable_del ON dcc_document_revision_history;
+CREATE TRIGGER trg_dcc_history_immutable_del
+    BEFORE DELETE ON dcc_document_revision_history
+    FOR EACH ROW EXECUTE FUNCTION dcc_history_forbid_mutation();
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 9 — Migration audit summary
+-- ─────────────────────────────────────────────────────────────────────────────
+
+DO $$
+DECLARE
+    v_labels INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO v_labels FROM dcc_document_header_label WHERE is_active = TRUE;
+    RAISE NOTICE '[Migration 150] DCC tables created; % active header labels seeded.', v_labels;
+END;
+$$;
+
+COMMIT;
+-- <<< END MIGRATION: 150_dcc_document_change_control.sql
+
+-- >>> BEGIN MIGRATION: 151_dcc_header_graphics_tokens.sql
+-- ============================================================================
+-- Migration 151: DCC Header — Graphics Authority tokens
+-- ============================================================================
+-- Purpose:
+--   Register every visual parameter used by the DCC header renderer
+--   (mom/scripts/portal/11-dcc-header-renderer.js + mom/styles/dcc-header.css)
+--   with the Graphics Authority (graphics_token_catalog) so NOTHING is
+--   hardcoded in CSS/JS. All spacing, colors, font-sizes, weights, and
+--   separator widths come from this catalog via --dcc-* CSS variables.
+--
+--   Core invariant:
+--     gap(label ↔ value)  ==  gap(value ↔ separator '|')
+--   Both sides of the separator get the same `--dcc-cell-gap` token, which
+--   prevents the overflow-onto-next-line issue reported for the v2.0 layout.
+--
+--   Five functional zones on the header:
+--     ID  ➜  Rev  ➜  Eff  ➜  Owner  ➜  Appr
+--   Each zone respects the same gap/padding/separator tokens.
+--
+-- Standards: ISO 9241-112 (presentation of information), WCAG 2.2 AA contrast.
+-- Safety:    Additive only. ON CONFLICT DO NOTHING guards on every insert.
+-- Date:      2026-04-22
+-- ============================================================================
+
+BEGIN;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 1 — Register the DCC header token keys
+-- ─────────────────────────────────────────────────────────────────────────────
+
+INSERT INTO graphics_token_catalog
+    (token_key,                       css_variable,            layer,    family,      subfamily, value_type, unit, min_numeric, max_numeric, step_numeric, default_light, default_dark, default_high_contrast, description)
+VALUES
+    ('dcc.header.padding.y',          '--dcc-pad-y',           'component','spacing','dcc_header','dimension','px',  0,   32, 1,  '8',      '8',      '10',    'Vertical padding inside each header cell.'),
+    ('dcc.header.padding.x',          '--dcc-pad-x',           'component','spacing','dcc_header','dimension','px',  0,   40, 1, '12',     '12',     '14',    'Horizontal padding inside each header cell.'),
+    ('dcc.header.cell.gap',           '--dcc-cell-gap',        'component','spacing','dcc_header','dimension','px',  0,   24, 1,  '6',      '6',      '8',    'Gap between label, value, and separator pipe. Applied uniformly on both sides of the separator to prevent overflow.'),
+    ('dcc.header.separator.width',    '--dcc-sep-width',       'component','spacing','dcc_header','dimension','px',  0,    4, 1,  '1',      '1',      '2',    'Thickness of the vertical separator pipe between header cells.'),
+    ('dcc.header.border.radius',      '--dcc-border-radius',   'component','spacing','dcc_header','dimension','px',  0,   32, 1, '16',     '16',     '12',    'Corner radius of the DCC header card.'),
+    ('dcc.header.accent.rule.width',  '--dcc-accent-rule',     'component','spacing','dcc_header','dimension','px',  0,    4, 1,  '1',      '1',      '2',    'Thickness of the orange accent rule between title block and ribbon.'),
+    ('dcc.header.row.min_height',     '--dcc-row-min-height',  'component','spacing','dcc_header','dimension','px', 28,   64, 1, '36',     '36',     '40',    'Minimum height of a header row; guarantees no vertical overflow for a single-line cell.'),
+    ('dcc.header.label.max_width',    '--dcc-label-max-width', 'component','spacing','dcc_header','dimension','px', 24,  120, 1, '64',     '64',     '72',    'Maximum width of the short-label slot; keeps labels from pushing the value onto a second line.'),
+    ('dcc.header.owner.max_width',    '--dcc-owner-max-width', 'component','spacing','dcc_header','dimension','px', 48,  280, 1,'120',    '120',    '140',    'Maximum width of the single-owner badge (dual owner explicitly forbidden).')
+ON CONFLICT (token_key) DO NOTHING;
+
+INSERT INTO graphics_token_catalog
+    (token_key,                       css_variable,            layer,    family,       subfamily, value_type, unit, min_numeric, max_numeric, step_numeric, default_light, default_dark, default_high_contrast, description)
+VALUES
+    ('dcc.header.label.font_size',    '--dcc-label-font-size', 'component','typography','dcc_header','dimension','px', 10,  16, 1, '11',     '11',     '12',    'Font size for the short label (ID / Rev / Eff / Owner / Appr).'),
+    ('dcc.header.value.font_size',    '--dcc-value-font-size', 'component','typography','dcc_header','dimension','px', 11,  18, 1, '12',     '12',     '13',    'Font size for the value segment.'),
+    ('dcc.header.code.font_size',     '--dcc-code-font-size',  'component','typography','dcc_header','dimension','px', 11,  18, 1, '12',     '12',     '13',    'Font size for the document-code badge.')
+ON CONFLICT (token_key) DO NOTHING;
+
+INSERT INTO graphics_token_catalog
+    (token_key,                        css_variable,            layer,    family,       subfamily, value_type, min_numeric, max_numeric, step_numeric, default_light, default_dark, default_high_contrast, description)
+VALUES
+    ('dcc.header.label.font_weight',   '--dcc-label-weight',    'component','typography','dcc_header','unitless', 100, 900, 100, '600', '600', '700', 'Weight of the short label text.'),
+    ('dcc.header.value.font_weight',   '--dcc-value-weight',    'component','typography','dcc_header','unitless', 100, 900, 100, '500', '500', '600', 'Weight of the value segment text.'),
+    ('dcc.header.code.font_weight',    '--dcc-code-weight',     'component','typography','dcc_header','unitless', 100, 900, 100, '700', '700', '800', 'Weight of the document-code badge.')
+ON CONFLICT (token_key) DO NOTHING;
+
+INSERT INTO graphics_token_catalog
+    (token_key,                        css_variable,            layer,    family,  subfamily, value_type, default_light, default_dark, default_high_contrast, default_print, description)
+VALUES
+    ('dcc.header.bg',                  '--dcc-bg',              'component','color','dcc_header','hex', '#f8fafc', '#1e293b', '#ffffff', '#ffffff', 'Header container background.'),
+    ('dcc.header.border',              '--dcc-border',          'component','color','dcc_header','hex', '#f9a825', '#fbbf24', '#000000', '#333333', 'Top accent border under the title.'),
+    ('dcc.header.separator.color',     '--dcc-sep-color',       'component','color','dcc_header','hex', '#e2e8f0', '#334155', '#000000', '#888888', 'Separator pipe color.'),
+    ('dcc.header.label.color',         '--dcc-label-color',     'component','color','dcc_header','hex', '#64748b', '#94a3b8', '#222222', '#333333', 'Short-label text color.'),
+    ('dcc.header.value.color',         '--dcc-value-color',     'component','color','dcc_header','hex', '#0f172a', '#f1f5f9', '#000000', '#000000', 'Value text color.'),
+    ('dcc.header.code.bg',             '--dcc-code-bg',         'component','color','dcc_header','hex', '#ffffff', '#0f172a', '#ffffff', '#ffffff', 'Document-code badge background.'),
+    ('dcc.header.code.border',         '--dcc-code-border',     'component','color','dcc_header','hex', '#dbe4ec', '#334155', '#000000', '#999999', 'Document-code badge border.'),
+    ('dcc.header.owner.bg',            '--dcc-owner-bg',        'component','color','dcc_header','hex', '#f1f5f9', '#0f172a', '#ffffff', '#ffffff', 'Owner / approver role badge background.'),
+    ('dcc.header.owner.border',        '--dcc-owner-border',    'component','color','dcc_header','hex', '#dbe4ec', '#334155', '#000000', '#999999', 'Owner / approver role badge border.')
+ON CONFLICT (token_key) DO NOTHING;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 2 — Register the DCC header as a graphics component contract
+-- ─────────────────────────────────────────────────────────────────────────────
+
+INSERT INTO graphics_component_contract
+    (component_key, display_name_en, display_name_vi, description, overridable_tokens)
+VALUES
+    ('dcc.header',
+     'DCC Document Header',
+     'Tiêu đề tài liệu DCC',
+     'Header ribbon rendered atop every controlled QMS document by the portal. Reads tokens live from Graphics Authority; no hardcoded values permitted.',
+     ARRAY[
+        'dcc.header.padding.y',
+        'dcc.header.padding.x',
+        'dcc.header.cell.gap',
+        'dcc.header.separator.width',
+        'dcc.header.row.min_height',
+        'dcc.header.label.max_width',
+        'dcc.header.owner.max_width',
+        'dcc.header.label.font_size',
+        'dcc.header.value.font_size',
+        'dcc.header.code.font_size',
+        'dcc.header.label.font_weight',
+        'dcc.header.value.font_weight',
+        'dcc.header.code.font_weight',
+        'dcc.header.bg',
+        'dcc.header.border',
+        'dcc.header.separator.color',
+        'dcc.header.label.color',
+        'dcc.header.value.color',
+        'dcc.header.code.bg',
+        'dcc.header.code.border',
+        'dcc.header.owner.bg',
+        'dcc.header.owner.border'
+     ])
+ON CONFLICT (component_key) DO NOTHING;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 3 — Seed organization-default published token values so CSS variables
+-- resolve immediately (otherwise --dcc-* would be undefined on first render).
+-- ─────────────────────────────────────────────────────────────────────────────
+
+INSERT INTO graphics_token_value
+    (token_key, scope_type, scope_id, color_mode, value, is_published, published_at, published_by, version)
+SELECT c.token_key, 'organization', 'default', 'light', COALESCE(c.default_light, ''),
+       TRUE, now(), 'migration:151', 1
+FROM graphics_token_catalog c
+WHERE c.token_key LIKE 'dcc.header.%'
+ON CONFLICT (token_key, scope_type, scope_id, color_mode) DO NOTHING;
+
+INSERT INTO graphics_token_value
+    (token_key, scope_type, scope_id, color_mode, value, is_published, published_at, published_by, version)
+SELECT c.token_key, 'organization', 'default', 'dark', COALESCE(c.default_dark, ''),
+       TRUE, now(), 'migration:151', 1
+FROM graphics_token_catalog c
+WHERE c.token_key LIKE 'dcc.header.%'
+ON CONFLICT (token_key, scope_type, scope_id, color_mode) DO NOTHING;
+
+INSERT INTO graphics_token_value
+    (token_key, scope_type, scope_id, color_mode, value, is_published, published_at, published_by, version)
+SELECT c.token_key, 'organization', 'default', 'high_contrast', COALESCE(c.default_high_contrast, ''),
+       TRUE, now(), 'migration:151', 1
+FROM graphics_token_catalog c
+WHERE c.token_key LIKE 'dcc.header.%'
+ON CONFLICT (token_key, scope_type, scope_id, color_mode) DO NOTHING;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 4 — Audit summary
+-- ─────────────────────────────────────────────────────────────────────────────
+
+DO $$
+DECLARE
+    v_tokens INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO v_tokens FROM graphics_token_catalog WHERE token_key LIKE 'dcc.header.%';
+    RAISE NOTICE '[Migration 151] DCC header tokens registered: %', v_tokens;
+END;
+$$;
+
+COMMIT;
+-- <<< END MIGRATION: 151_dcc_header_graphics_tokens.sql
+
+-- >>> BEGIN MIGRATION: 152_dcc_document_locale_variants.sql
+-- ============================================================================
+-- Migration 152: DCC document locale variants and translation artifacts
+-- ============================================================================
+-- Purpose:
+--   Introduce an authoritative locale layer for controlled QMS documents so
+--   the portal can switch language without browser-side DOM translation.
+--
+-- Core rules:
+--   - The canonical document body remains the Vietnamese source edited in the
+--     existing controlled HTML file.
+--   - Non-canonical locales (for example English) are stored as explicit
+--     locale variants with their own metadata projection and optional artifact.
+--   - The portal must render an artifact only when an artifact path exists and
+--     the variant state allows publication. No Google Translate / live DOM
+--     mutation is permitted.
+--
+-- Standards:
+--   ISO 9001:2015 §7.5, AS9100D §7.5, FDA 21 CFR Part 11, FDA 21 CFR 820.40.
+-- Date:
+--   2026-04-23
+-- ============================================================================
+
+BEGIN;
+
+ALTER TABLE dcc_document_header
+    ALTER COLUMN locale_default SET DEFAULT 'vi';
+
+CREATE TABLE IF NOT EXISTS dcc_document_locale_variant (
+    locale_variant_id      UUID          PRIMARY KEY DEFAULT gen_random_uuid(),
+    doc_code               VARCHAR(80)   NOT NULL REFERENCES dcc_document_header(doc_code) ON UPDATE CASCADE ON DELETE CASCADE,
+    locale                 VARCHAR(10)   NOT NULL,
+    title                  VARCHAR(512),
+    subtitle               VARCHAR(512),
+    artifact_rel_path      VARCHAR(1024),
+    artifact_source_revision VARCHAR(20),
+    artifact_source_hash_sha256 VARCHAR(128),
+    translation_state      VARCHAR(30)   NOT NULL DEFAULT 'machine_preview',
+    translation_provider   VARCHAR(120),
+    glossary_version       VARCHAR(80),
+    engine_version         VARCHAR(80),
+    reviewer_party_id      VARCHAR(120),
+    reviewed_at            TIMESTAMPTZ,
+    published_at           TIMESTAMPTZ,
+    metadata               JSONB         NOT NULL DEFAULT '{}'::jsonb,
+    created_at             TIMESTAMPTZ   NOT NULL DEFAULT now(),
+    created_by             VARCHAR(120)  NOT NULL DEFAULT 'system',
+    updated_at             TIMESTAMPTZ   NOT NULL DEFAULT now(),
+    updated_by             VARCHAR(120)  NOT NULL DEFAULT 'system',
+    UNIQUE (doc_code, locale),
+    CONSTRAINT ck_dcc_doc_locale_variant_state
+        CHECK (translation_state IN (
+            'machine_preview',
+            'review_pending',
+            'reviewed',
+            'released',
+            'superseded',
+            'blocked'
+        )),
+    CONSTRAINT ck_dcc_doc_locale_variant_artifact_extension
+        CHECK (
+            artifact_rel_path IS NULL
+            OR artifact_rel_path ~ '\.(html?|pdf|docx|xlsx|pptx)$'
+        )
+);
+
+CREATE INDEX IF NOT EXISTS idx_dcc_doc_locale_variant_locale
+    ON dcc_document_locale_variant (locale, translation_state, published_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_dcc_doc_locale_variant_doc
+    ON dcc_document_locale_variant (doc_code, locale);
+
+COMMENT ON TABLE dcc_document_locale_variant
+    IS 'DCC: locale-specific document metadata and optional published artifact path. Browser live translation is forbidden; frontend must use these rows.';
+COMMENT ON COLUMN dcc_document_locale_variant.artifact_rel_path
+    IS 'Repository-relative path to the published locale artifact, typically a hidden sibling file such as _filename.en.html so the main scan excludes it.';
+COMMENT ON COLUMN dcc_document_locale_variant.translation_state
+    IS 'machine_preview | review_pending | reviewed | released | superseded | blocked. Only reviewed/released or explicitly allowed preview states should render.';
+COMMENT ON COLUMN dcc_document_locale_variant.artifact_source_hash_sha256
+    IS 'Hash of the canonical source content used to generate this locale artifact; used for drift detection and retranslate queues.';
+
+DROP TRIGGER IF EXISTS trg_dcc_doc_locale_variant_touch ON dcc_document_locale_variant;
+CREATE TRIGGER trg_dcc_doc_locale_variant_touch
+    BEFORE UPDATE ON dcc_document_locale_variant
+    FOR EACH ROW EXECUTE FUNCTION dcc_touch_updated_at();
+
+COMMIT;
+-- <<< END MIGRATION: 152_dcc_document_locale_variants.sql
+
+-- >>> BEGIN MIGRATION: 153_dcc_consolidation_sequence_reservation.sql
+-- Migration 153: DCC consolidation sequence reservation
+--
+-- No-op placeholder. The DCC consolidation DDL was finalized in
+-- 155_dcc_consolidation.sql after 152_dcc_document_locale_variants.sql.
+-- This file preserves the contiguous migration numbering contract.
+-- <<< END MIGRATION: 153_dcc_consolidation_sequence_reservation.sql
+
+-- >>> BEGIN MIGRATION: 154_dcc_consolidation_sequence_reservation.sql
+-- Migration 154: DCC consolidation sequence reservation
+--
+-- No-op placeholder. The DCC consolidation DDL was finalized in
+-- 155_dcc_consolidation.sql after 152_dcc_document_locale_variants.sql.
+-- This file preserves the contiguous migration numbering contract.
+-- <<< END MIGRATION: 154_dcc_consolidation_sequence_reservation.sql
+
+-- >>> BEGIN MIGRATION: 155_dcc_consolidation.sql
+-- ============================================================================
+-- Migration 155: DCC — Consolidation (Role catalog, Revision table, Filename link)
+-- ============================================================================
+-- Purpose:
+--   Close the gap between the legacy JSON stores (state.json / manifest.json /
+--   docs_custom.json) and the DCC control plane introduced by migration 150.
+--   Prior to this migration the renderer ribbon showed values seeded once by
+--   `mom/tools/dcc-batch/migrate.php` (hardcoded 'V0', 'QA', 'CEO') and never
+--   updated by the approve/release workflow. This migration introduces the
+--   structures needed to drive every UI surface from the database:
+--
+--     • dcc_role_catalog         — replaces hardcoded owner/approver lists in
+--                                  02-state-auth-ui.js (`['QA/QMS','Production',
+--                                  …]`, `['Tổng Giám Đốc','QMR',…]`).
+--     • dcc_doc_type_catalog     — replaces hardcoded DOC_TYPES list in
+--                                  48-eqms-documents.js.
+--     • dcc_document_revision    — immutable per-release row capturing the
+--                                  authoritative history (revision + effective
+--                                  date + approver + signature + content hash
+--                                  + filename at the time of release).
+--                                  dcc_document_revision_history stays as the
+--                                  state-transition audit log; dcc_document_revision
+--                                  stores the released bodies themselves.
+--     • dcc_document_header      — gains filename / filesystem_path /
+--                                  filename_checksum columns to anchor the
+--                                  filename↔DB contract.
+--     • dcc_document_header_label — seeded with additional keys used by the
+--                                  viewer header (status, doc_type, title).
+--
+--   After this migration, `DocumentControlService::release()` must INSERT a
+--   row into dcc_document_revision and flip prior `is_current` to FALSE.
+--   The legacy `DocumentController::approve()` path will be bridged to DCC
+--   in the same tranche (PHP code change, not SQL).
+--
+-- Standards:
+--   ISO 9001:2015 §7.5 • AS9100D §7.5 • IATF 16949 §7.5
+--   FDA 21 CFR Part 820.40 (Document Controls)
+--   FDA 21 CFR Part 11    (Electronic Records / Signatures)
+--
+-- Safety:
+--   Additive only. All DDL guarded with IF NOT EXISTS. All seed data
+--   guarded with ON CONFLICT DO NOTHING. No destructive writes.
+--
+-- Rollback (reverse order):
+--   DROP TABLE IF EXISTS
+--     dcc_document_revision,
+--     dcc_doc_type_catalog,
+--     dcc_role_catalog
+--   CASCADE;
+--   ALTER TABLE dcc_document_header
+--     DROP COLUMN IF EXISTS filename,
+--     DROP COLUMN IF EXISTS filesystem_path,
+--     DROP COLUMN IF EXISTS filename_checksum;
+--
+-- Author: HESEM QMS Module — DCC consolidation sprint
+-- Date:   2026-04-24
+-- ============================================================================
+
+BEGIN;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 1 — dcc_role_catalog
+-- Source of truth for the owner / approver dropdowns. Single-role invariant
+-- is enforced by the same regex the header table uses, so a catalog entry
+-- cannot accidentally introduce `QA/QMS` or `CEO, MD` into the system.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS dcc_role_catalog (
+    role_code        VARCHAR(40)  PRIMARY KEY,
+    label_vi         VARCHAR(120) NOT NULL,
+    label_en         VARCHAR(120) NOT NULL,
+    role_class       VARCHAR(20)  NOT NULL,
+    description      TEXT,
+    is_active        BOOLEAN      NOT NULL DEFAULT TRUE,
+    sort_order       SMALLINT     NOT NULL DEFAULT 0,
+    created_at       TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    updated_at       TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    CONSTRAINT ck_dcc_role_single
+        CHECK (role_code !~ '[/,;|]' AND position(' ' in role_code) = 0),
+    CONSTRAINT ck_dcc_role_class
+        CHECK (role_class IN ('owner', 'approver', 'both'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_dcc_role_class
+    ON dcc_role_catalog (role_class, sort_order)
+    WHERE is_active = TRUE;
+
+COMMENT ON TABLE  dcc_role_catalog
+    IS 'DCC: registry of owner / approver role codes. Source of truth for dropdowns. Single-role invariant enforced at DB level.';
+COMMENT ON COLUMN dcc_role_catalog.role_class
+    IS 'owner | approver | both. Filters which dropdown a role appears in.';
+
+DROP TRIGGER IF EXISTS trg_dcc_role_touch ON dcc_role_catalog;
+CREATE TRIGGER trg_dcc_role_touch
+    BEFORE UPDATE ON dcc_role_catalog
+    FOR EACH ROW EXECUTE FUNCTION dcc_touch_updated_at();
+
+-- Seed: HESEM canonical role set (no multi-role strings; "QA/QMS" is split
+-- into two separate entries 'QA' and 'QMS'; the portal picker displays the
+-- localized label which may read "QA / QMS" but the stored role_code is
+-- always single-token).
+INSERT INTO dcc_role_catalog
+    (role_code, label_vi,                         label_en,                         role_class, sort_order)
+VALUES
+    ('QA',        'QA — Đảm bảo chất lượng',        'QA — Quality Assurance',           'both',      10),
+    ('QMS',       'QMS — Quản lý hệ thống chất lượng','QMS — Quality Management System', 'both',      11),
+    ('QMR',       'QMR — Đại diện lãnh đạo chất lượng','QMR — Quality Management Rep',  'approver',  12),
+    ('QC',        'QC — Kiểm soát chất lượng',      'QC — Quality Control',             'owner',     13),
+    ('CEO',       'Tổng Giám Đốc',                  'Chief Executive Officer',           'approver',  20),
+    ('MD',        'Giám Đốc Điều Hành',             'Managing Director',                 'approver',  21),
+    ('GM',        'General Manager',                'General Manager',                   'approver',  22),
+    ('COO',       'Giám Đốc Vận Hành',              'Chief Operating Officer',           'approver',  23),
+    ('PROD',      'Sản xuất',                       'Production',                        'owner',     30),
+    ('ENG',       'Kỹ thuật',                       'Engineering',                       'owner',     31),
+    ('MAINT',     'Bảo trì',                        'Maintenance',                       'owner',     32),
+    ('WH',        'Kho',                            'Warehouse',                         'owner',     33),
+    ('PLAN',      'Kế hoạch',                       'Planning',                          'owner',     34),
+    ('PUR',       'Mua hàng',                       'Purchasing',                        'owner',     35),
+    ('SAL',       'Kinh doanh',                     'Sales',                             'owner',     36),
+    ('HR',        'Nhân sự',                        'Human Resources',                   'owner',     37),
+    ('FIN',       'Tài chính',                      'Finance',                           'owner',     38),
+    ('IT',        'Công nghệ thông tin',            'Information Technology',            'owner',     39),
+    ('EHS',       'An toàn & Môi trường',           'Environment, Health & Safety',      'owner',     40),
+    ('DC',        'Kiểm soát tài liệu',             'Document Control',                  'owner',     41)
+ON CONFLICT (role_code) DO NOTHING;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 2 — dcc_doc_type_catalog
+-- Source of truth for the document-type dropdown. Each row pairs with a
+-- filename-family regex and sensible defaults for owner/approver, so new
+-- documents inherit a correct baseline instead of the hardcoded QA/CEO.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS dcc_doc_type_catalog (
+    doc_type              VARCHAR(40)  PRIMARY KEY,
+    label_vi              VARCHAR(120) NOT NULL,
+    label_en              VARCHAR(120) NOT NULL,
+    family_pattern        VARCHAR(120) NOT NULL,
+    default_owner_role    VARCHAR(40)  REFERENCES dcc_role_catalog(role_code),
+    default_approver_role VARCHAR(40)  REFERENCES dcc_role_catalog(role_code),
+    sort_order            SMALLINT     NOT NULL DEFAULT 0,
+    is_active             BOOLEAN      NOT NULL DEFAULT TRUE,
+    created_at            TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    updated_at            TIMESTAMPTZ  NOT NULL DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_dcc_doc_type_active
+    ON dcc_doc_type_catalog (sort_order)
+    WHERE is_active = TRUE;
+
+COMMENT ON TABLE dcc_doc_type_catalog
+    IS 'DCC: registry of document types (MAN, POL, SOP, WI, …). Drives the type dropdown and defaulting of owner/approver for new documents.';
+
+DROP TRIGGER IF EXISTS trg_dcc_doc_type_touch ON dcc_doc_type_catalog;
+CREATE TRIGGER trg_dcc_doc_type_touch
+    BEFORE UPDATE ON dcc_doc_type_catalog
+    FOR EACH ROW EXECUTE FUNCTION dcc_touch_updated_at();
+
+INSERT INTO dcc_doc_type_catalog
+    (doc_type, label_vi,                 label_en,               family_pattern,       default_owner_role, default_approver_role, sort_order)
+VALUES
+    ('MAN',   'Sổ tay',                   'Manual',                '^qms-man-\d+',       'QMS',   'CEO', 10),
+    ('POL',   'Chính sách',               'Policy',                '^pol-',              'QMS',   'CEO', 20),
+    ('SOP',   'Quy trình',                'Standard Operating Procedure', '^sop-\d+',   'QA',    'QMR', 30),
+    ('WI',    'Hướng dẫn công việc',      'Work Instruction',      '^wi-\d+',            'PROD',  'QA',  40),
+    ('FRM',   'Biểu mẫu',                 'Form',                  '^frm-',              'QA',    'QA',  50),
+    ('ANNEX', 'Phụ lục',                  'Annex',                 '^annex-',            'QMS',   'QMR', 60),
+    ('JD',    'Mô tả công việc',          'Job Description',       '^jd-',               'HR',    'CEO', 70),
+    ('DEPT',  'Cẩm nang phòng ban',       'Department Handbook',   '^dept-',             'HR',    'CEO', 80),
+    ('ORG',   'Sơ đồ tổ chức',            'Organisation Chart',    '^(org|raci|authority)-', 'HR', 'CEO', 90),
+    ('REF',   'Tham chiếu',               'Reference',             '^ref-',              'DC',    'QMR', 100),
+    ('TRN',   'Đào tạo',                  'Training',              '^trn-',              'HR',    'QMR', 110)
+ON CONFLICT (doc_type) DO NOTHING;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 3 — dcc_document_header: filename anchor columns
+-- These columns bind every header row to a single file on disk. Unique index
+-- on filename prevents a rename from creating a duplicate header row silently.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+ALTER TABLE dcc_document_header
+    ADD COLUMN IF NOT EXISTS filename          VARCHAR(200);
+
+ALTER TABLE dcc_document_header
+    ADD COLUMN IF NOT EXISTS filesystem_path   VARCHAR(400);
+
+ALTER TABLE dcc_document_header
+    ADD COLUMN IF NOT EXISTS filename_checksum VARCHAR(64);
+
+CREATE UNIQUE INDEX IF NOT EXISTS ux_dcc_header_filename
+    ON dcc_document_header (filename)
+    WHERE filename IS NOT NULL;
+
+COMMENT ON COLUMN dcc_document_header.filename
+    IS 'Current filesystem basename (e.g. qms-man-001-qms-manual.html). Filename is master for code + slug; this column keeps DB aware of the current name so `rename_doc` can assert filename uniqueness without scanning disk.';
+COMMENT ON COLUMN dcc_document_header.filesystem_path
+    IS 'Current path relative to repo root (e.g. mom/docs/system/qms-man-001-qms-manual.html).';
+COMMENT ON COLUMN dcc_document_header.filename_checksum
+    IS 'sha256 of the filename at last observation. Used by audit.php to detect drift between scan cache and DB.';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 4 — dcc_document_revision
+-- One row per released revision. This is the immutable body-level history,
+-- distinct from dcc_document_revision_history (which is the state-transition
+-- log). Here we capture: what content was released, when, by whom, under
+-- which DCN, with which signature, and which was current at the time.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS dcc_document_revision (
+    revision_id        UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    doc_code           VARCHAR(80)  NOT NULL REFERENCES dcc_document_header(doc_code) ON UPDATE CASCADE,
+    revision           VARCHAR(20)  NOT NULL,
+    update_type        VARCHAR(10)  NOT NULL DEFAULT 'minor',
+    effective_date     DATE         NOT NULL,
+    content_sha256     VARCHAR(64),
+    content_path       VARCHAR(400),
+    filename           VARCHAR(200),
+    dcr_id             UUID         REFERENCES dcc_document_change_request(dcr_id),
+    dcn_id             UUID         REFERENCES dcc_document_change_notice(dcn_id),
+    approved_by        VARCHAR(120) NOT NULL,
+    approved_at        TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    released_by        VARCHAR(120),
+    released_at        TIMESTAMPTZ,
+    signature_event_id UUID,
+    superseded_by      UUID         REFERENCES dcc_document_revision(revision_id),
+    is_current         BOOLEAN      NOT NULL DEFAULT FALSE,
+    note               TEXT,
+    metadata           JSONB        NOT NULL DEFAULT '{}'::jsonb,
+    CONSTRAINT ck_dcc_revision_pattern
+        CHECK (revision ~ '^V[0-9]+(\.[0-9]+)?$'),
+    CONSTRAINT ck_dcc_revision_update_type
+        CHECK (update_type IN ('major', 'minor', 'patch')),
+    CONSTRAINT uq_dcc_revision_doc_rev
+        UNIQUE (doc_code, revision)
+);
+
+-- Only one "current" revision per document.
+CREATE UNIQUE INDEX IF NOT EXISTS ux_dcc_revision_is_current
+    ON dcc_document_revision (doc_code)
+    WHERE is_current = TRUE;
+
+CREATE INDEX IF NOT EXISTS idx_dcc_revision_doc_released
+    ON dcc_document_revision (doc_code, released_at DESC)
+    WHERE released_at IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_dcc_revision_dcn
+    ON dcc_document_revision (dcn_id)
+    WHERE dcn_id IS NOT NULL;
+
+COMMENT ON TABLE  dcc_document_revision
+    IS 'DCC: immutable per-revision record. One row per approved/released revision. is_current flips on release; prior row flips to FALSE. Paired with dcc_document_revision_history (state-transition log).';
+COMMENT ON COLUMN dcc_document_revision.content_sha256
+    IS 'sha256 of the released HTML at the moment of release. Evidence for FDA 21 CFR Part 11 §11.10(e) integrity checks.';
+COMMENT ON COLUMN dcc_document_revision.signature_event_id
+    IS 'FK to eqms_electronic_signature_event when electronic signature is captured (Part 11 §11.70).';
+
+-- Append-only guard on body-critical fields. Small mutable surface allowed
+-- for is_current and superseded_by — those are flipped by release() /
+-- supersede() workflows — but the history-defining fields cannot change.
+CREATE OR REPLACE FUNCTION dcc_revision_forbid_mutation()
+RETURNS TRIGGER AS $$
+BEGIN
+    IF NEW.doc_code          IS DISTINCT FROM OLD.doc_code          THEN
+        RAISE EXCEPTION 'dcc_document_revision.doc_code is immutable';
+    END IF;
+    IF NEW.revision          IS DISTINCT FROM OLD.revision          THEN
+        RAISE EXCEPTION 'dcc_document_revision.revision is immutable';
+    END IF;
+    IF NEW.content_sha256    IS DISTINCT FROM OLD.content_sha256
+       AND OLD.content_sha256 IS NOT NULL THEN
+        RAISE EXCEPTION 'dcc_document_revision.content_sha256 is immutable once set';
+    END IF;
+    IF NEW.approved_by       IS DISTINCT FROM OLD.approved_by
+       AND OLD.approved_by    IS NOT NULL THEN
+        RAISE EXCEPTION 'dcc_document_revision.approved_by is immutable once set';
+    END IF;
+    IF NEW.approved_at       IS DISTINCT FROM OLD.approved_at
+       AND OLD.approved_at    IS NOT NULL THEN
+        RAISE EXCEPTION 'dcc_document_revision.approved_at is immutable once set';
+    END IF;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_dcc_revision_immutable ON dcc_document_revision;
+CREATE TRIGGER trg_dcc_revision_immutable
+    BEFORE UPDATE ON dcc_document_revision
+    FOR EACH ROW EXECUTE FUNCTION dcc_revision_forbid_mutation();
+
+-- DELETE forbidden outright — Part 11 append-only.
+CREATE OR REPLACE FUNCTION dcc_revision_forbid_delete()
+RETURNS TRIGGER AS $$
+BEGIN
+    RAISE EXCEPTION 'dcc_document_revision is append-only; DELETE forbidden';
+END;
+$$ LANGUAGE plpgsql;
+
+DROP TRIGGER IF EXISTS trg_dcc_revision_no_delete ON dcc_document_revision;
+CREATE TRIGGER trg_dcc_revision_no_delete
+    BEFORE DELETE ON dcc_document_revision
+    FOR EACH ROW EXECUTE FUNCTION dcc_revision_forbid_delete();
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 5 — FK constraint on owner / approver role codes
+-- Upgrade the header table to reference the role catalog. Header rows
+-- previously persisted free-text role codes; the regex CHECK still stops
+-- multi-role strings, but referencing the catalog means a typo ('QAA') or a
+-- retired role ('PQM') can no longer leak into a header row.
+--
+-- Deferred: the ALTER is NOT VALID so existing rows are accepted as-is.
+-- A follow-up script (validated after backfill) will run VALIDATE CONSTRAINT.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conname = 'fk_dcc_header_owner_role'
+    ) THEN
+        ALTER TABLE dcc_document_header
+            ADD CONSTRAINT fk_dcc_header_owner_role
+            FOREIGN KEY (owner_role_code) REFERENCES dcc_role_catalog(role_code)
+            NOT VALID;
+    END IF;
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conname = 'fk_dcc_header_approver_role'
+    ) THEN
+        ALTER TABLE dcc_document_header
+            ADD CONSTRAINT fk_dcc_header_approver_role
+            FOREIGN KEY (approver_role_code) REFERENCES dcc_role_catalog(role_code)
+            NOT VALID;
+    END IF;
+END;
+$$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 6 — Extend dcc_document_header_label with additional keys
+-- The viewer ribbon needs title / status / doc_type strings, which the
+-- original seed in migration 150 did not cover. Legacy frontend used
+-- `T('gd')`, `T('owner')`, etc.; those go away once the labels live here.
+-- ─────────────────────────────────────────────────────────────────────────────
+
+INSERT INTO dcc_document_header_label
+    (label_key,    locale, short_label, long_label,              help_text,                                           sort_order)
+VALUES
+    ('title',       'en',  'Title',     'Document title',        'Full human-readable title.',                         5),
+    ('title',       'vi',  'Tên',       'Tên tài liệu',          'Tên đầy đủ của tài liệu.',                            5),
+    ('status',      'en',  'Status',    'Status',                'Lifecycle state.',                                   70),
+    ('status',      'vi',  'TT',        'Trạng thái',            'Trạng thái chu kỳ sống.',                             70),
+    ('doc_type',    'en',  'Type',      'Document type',         'Category (MAN, SOP, WI, …).',                        80),
+    ('doc_type',    'vi',  'Loại',      'Loại tài liệu',         'Phân loại tài liệu.',                                 80),
+    ('update_type', 'en',  'Change',    'Change type',           'Major / minor / patch update.',                      85),
+    ('update_type', 'vi',  'Thay đổi',  'Loại thay đổi',         'Major / minor / patch.',                              85)
+ON CONFLICT (label_key, locale) DO NOTHING;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- PART 7 — Post-migration audit summary
+-- ─────────────────────────────────────────────────────────────────────────────
+
+DO $$
+DECLARE
+    v_roles      INTEGER;
+    v_doc_types  INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO v_roles     FROM dcc_role_catalog     WHERE is_active = TRUE;
+    SELECT COUNT(*) INTO v_doc_types FROM dcc_doc_type_catalog WHERE is_active = TRUE;
+    RAISE NOTICE '[Migration 155] % active roles, % active doc types seeded.', v_roles, v_doc_types;
+END;
+$$;
+
+COMMIT;
+-- <<< END MIGRATION: 155_dcc_consolidation.sql

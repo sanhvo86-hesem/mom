@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Computed formula library expanded from computed field registry and table-level KPI coverage.",
-    "generatedAt": "2026-04-15T10:51:27.289Z",
-    "formulaCount": 1357
+    "generatedAt": "2026-04-24T08:04:03.777Z",
+    "formulaCount": 1476
   },
   "total_line_amount": {
     "formulaId": "total_line_amount",
@@ -29799,6 +29799,2505 @@
       {
         "type": "endpoint",
         "id": "mes_execution.production_derived_events.list"
+      }
+    ]
+  },
+  "f_dcc_doc_type_catalog_record_count": {
+    "formulaId": "f_dcc_doc_type_catalog_record_count",
+    "name": "Dcc Doc Loại danh mục - Số bản ghi",
+    "nameEn": "Dcc Doc Type Catalog Record Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM dcc_doc_type_catalog",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "dcc_doc_type_catalog_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.dcc_doc_type_catalog.list"
+      }
+    ]
+  },
+  "f_dcc_document_change_notice_record_count": {
+    "formulaId": "f_dcc_document_change_notice_record_count",
+    "name": "Dcc Tài liệu thay đổi Notice - Số bản ghi",
+    "nameEn": "Dcc Document Change Notice Record Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM dcc_document_change_notice",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "dcc_document_change_notice_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.dcc_document_change_notice.list"
+      }
+    ]
+  },
+  "f_dcc_document_change_notice_closed_count": {
+    "formulaId": "f_dcc_document_change_notice_closed_count",
+    "name": "Dcc Tài liệu thay đổi Notice - Số hồ sơ đã đóng",
+    "nameEn": "Dcc Document Change Notice Closed Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM dcc_document_change_notice",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "dcc_document_change_notice_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.dcc_document_change_notice.transition"
+      }
+    ]
+  },
+  "f_dcc_document_change_request_record_count": {
+    "formulaId": "f_dcc_document_change_request_record_count",
+    "name": "Dcc Tài liệu thay đổi yêu cầu - Số bản ghi",
+    "nameEn": "Dcc Document Change Request Record Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM dcc_document_change_request",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "dcc_document_change_request_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.dcc_document_change_request.list"
+      }
+    ]
+  },
+  "f_dcc_document_change_request_closed_count": {
+    "formulaId": "f_dcc_document_change_request_closed_count",
+    "name": "Dcc Tài liệu thay đổi yêu cầu - Số hồ sơ đã đóng",
+    "nameEn": "Dcc Document Change Request Closed Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM dcc_document_change_request",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "dcc_document_change_request_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.dcc_document_change_request.transition"
+      }
+    ]
+  },
+  "f_dcc_document_header_record_count": {
+    "formulaId": "f_dcc_document_header_record_count",
+    "name": "Dcc Tài liệu Header - Số bản ghi",
+    "nameEn": "Dcc Document Header Record Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM dcc_document_header",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "dcc_document_header_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.dcc_document_header.list"
+      }
+    ]
+  },
+  "f_dcc_document_header_closed_count": {
+    "formulaId": "f_dcc_document_header_closed_count",
+    "name": "Dcc Tài liệu Header - Số hồ sơ đã đóng",
+    "nameEn": "Dcc Document Header Closed Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM dcc_document_header",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "dcc_document_header_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.dcc_document_header.transition"
+      }
+    ]
+  },
+  "f_dcc_document_header_label_record_count": {
+    "formulaId": "f_dcc_document_header_label_record_count",
+    "name": "Dcc Tài liệu Header nhãn - Số bản ghi",
+    "nameEn": "Dcc Document Header Label Record Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM dcc_document_header_label",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "dcc_document_header_label_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.dcc_document_header_label.list"
+      }
+    ]
+  },
+  "f_dcc_document_locale_variant_record_count": {
+    "formulaId": "f_dcc_document_locale_variant_record_count",
+    "name": "Dcc Tài liệu Locale Variant - Số bản ghi",
+    "nameEn": "Dcc Document Locale Variant Record Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM dcc_document_locale_variant",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "dcc_document_locale_variant_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.dcc_document_locale_variant.list"
+      }
+    ]
+  },
+  "f_dcc_document_locale_variant_closed_count": {
+    "formulaId": "f_dcc_document_locale_variant_closed_count",
+    "name": "Dcc Tài liệu Locale Variant - Số hồ sơ đã đóng",
+    "nameEn": "Dcc Document Locale Variant Closed Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE translation_state IN ('closed','completed','archived','paid','delivered')) FROM dcc_document_locale_variant",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "dcc_document_locale_variant_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.dcc_document_locale_variant.transition"
+      }
+    ]
+  },
+  "f_dcc_document_revision_record_count": {
+    "formulaId": "f_dcc_document_revision_record_count",
+    "name": "Dcc Tài liệu Phiên bản - Số bản ghi",
+    "nameEn": "Dcc Document Revision Record Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM dcc_document_revision",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "dcc_document_revision_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.dcc_document_revision.list"
+      }
+    ]
+  },
+  "f_dcc_document_revision_history_record_count": {
+    "formulaId": "f_dcc_document_revision_history_record_count",
+    "name": "Dcc Tài liệu Phiên bản lịch sử - Số bản ghi",
+    "nameEn": "Dcc Document Revision History Record Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM dcc_document_revision_history",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "dcc_document_revision_history_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.dcc_document_revision_history.list"
+      }
+    ]
+  },
+  "f_dcc_document_revision_history_closed_count": {
+    "formulaId": "f_dcc_document_revision_history_closed_count",
+    "name": "Dcc Tài liệu Phiên bản lịch sử - Số hồ sơ đã đóng",
+    "nameEn": "Dcc Document Revision History Closed Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE to_status IN ('closed','completed','archived','paid','delivered')) FROM dcc_document_revision_history",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "dcc_document_revision_history_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.dcc_document_revision_history.transition"
+      }
+    ]
+  },
+  "f_dcc_role_catalog_record_count": {
+    "formulaId": "f_dcc_role_catalog_record_count",
+    "name": "Dcc vai trò danh mục - Số bản ghi",
+    "nameEn": "Dcc Role Catalog Record Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM dcc_role_catalog",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "dcc_role_catalog_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.dcc_role_catalog.list"
+      }
+    ]
+  },
+  "f_eqms_aml_records_record_count": {
+    "formulaId": "f_eqms_aml_records_record_count",
+    "name": "Eqm Aml hồ sơ - Số bản ghi",
+    "nameEn": "Eqms Aml Records Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_aml_records",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_aml_records_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_aml_records.list"
+      }
+    ]
+  },
+  "f_eqms_aml_records_closed_count": {
+    "formulaId": "f_eqms_aml_records_closed_count",
+    "name": "Eqm Aml hồ sơ - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Aml Records Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_aml_records",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_aml_records_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_aml_records.transition"
+      }
+    ]
+  },
+  "f_eqms_attachments_record_count": {
+    "formulaId": "f_eqms_attachments_record_count",
+    "name": "Eqm Tệp đính kèm - Số bản ghi",
+    "nameEn": "Eqms Attachments Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_attachments",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_attachments_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_attachments.list"
+      }
+    ]
+  },
+  "f_eqms_audit_findings_record_count": {
+    "formulaId": "f_eqms_audit_findings_record_count",
+    "name": "Eqm Đánh giá phát hiện - Số bản ghi",
+    "nameEn": "Eqms Audit Findings Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_audit_findings",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_audit_findings_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_audit_findings.list"
+      }
+    ]
+  },
+  "f_eqms_audit_findings_closed_count": {
+    "formulaId": "f_eqms_audit_findings_closed_count",
+    "name": "Eqm Đánh giá phát hiện - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Audit Findings Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_audit_findings",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_audit_findings_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_audit_findings.transition"
+      }
+    ]
+  },
+  "f_eqms_audits_record_count": {
+    "formulaId": "f_eqms_audits_record_count",
+    "name": "Eqm Đánh giá - Số bản ghi",
+    "nameEn": "Eqms Audits Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_audits",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_audits_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_audits.list"
+      }
+    ]
+  },
+  "f_eqms_audits_closed_count": {
+    "formulaId": "f_eqms_audits_closed_count",
+    "name": "Eqm Đánh giá - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Audits Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_audits",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_audits_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_audits.transition"
+      }
+    ]
+  },
+  "f_eqms_batch_release_record_count": {
+    "formulaId": "f_eqms_batch_release_record_count",
+    "name": "Eqm Lô Phát hành - Số bản ghi",
+    "nameEn": "Eqms Batch Release Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_batch_release",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_batch_release_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_batch_release.list"
+      }
+    ]
+  },
+  "f_eqms_batch_release_closed_count": {
+    "formulaId": "f_eqms_batch_release_closed_count",
+    "name": "Eqm Lô Phát hành - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Batch Release Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_batch_release",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_batch_release_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_batch_release.transition"
+      }
+    ]
+  },
+  "f_eqms_calibration_records_record_count": {
+    "formulaId": "f_eqms_calibration_records_record_count",
+    "name": "Eqm hiệu chuẩn hồ sơ - Số bản ghi",
+    "nameEn": "Eqms Calibration Records Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_calibration_records",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_calibration_records_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_calibration_records.list"
+      }
+    ]
+  },
+  "f_eqms_calibration_records_closed_count": {
+    "formulaId": "f_eqms_calibration_records_closed_count",
+    "name": "Eqm hiệu chuẩn hồ sơ - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Calibration Records Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_calibration_records",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_calibration_records_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_calibration_records.transition"
+      }
+    ]
+  },
+  "f_eqms_capa_records_record_count": {
+    "formulaId": "f_eqms_capa_records_record_count",
+    "name": "Eqm CAPA hồ sơ - Số bản ghi",
+    "nameEn": "Eqms CAPA Records Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_capa_records",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_capa_records_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_capa_records.list"
+      }
+    ]
+  },
+  "f_eqms_capa_records_closed_count": {
+    "formulaId": "f_eqms_capa_records_closed_count",
+    "name": "Eqm CAPA hồ sơ - Số hồ sơ đã đóng",
+    "nameEn": "Eqms CAPA Records Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_capa_records",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_capa_records_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_capa_records.transition"
+      }
+    ]
+  },
+  "f_eqms_change_controls_record_count": {
+    "formulaId": "f_eqms_change_controls_record_count",
+    "name": "Eqm thay đổi Kiểm soát - Số bản ghi",
+    "nameEn": "Eqms Change Controls Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_change_controls",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_change_controls_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_change_controls.list"
+      }
+    ]
+  },
+  "f_eqms_change_controls_closed_count": {
+    "formulaId": "f_eqms_change_controls_closed_count",
+    "name": "Eqm thay đổi Kiểm soát - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Change Controls Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_change_controls",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_change_controls_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_change_controls.transition"
+      }
+    ]
+  },
+  "f_eqms_comments_record_count": {
+    "formulaId": "f_eqms_comments_record_count",
+    "name": "Eqm bình luận - Số bản ghi",
+    "nameEn": "Eqms Comments Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_comments",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_comments_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_comments.list"
+      }
+    ]
+  },
+  "f_eqms_complaints_record_count": {
+    "formulaId": "f_eqms_complaints_record_count",
+    "name": "Eqm khiếu nại - Số bản ghi",
+    "nameEn": "Eqms Complaints Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_complaints",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_complaints_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_complaints.list"
+      }
+    ]
+  },
+  "f_eqms_complaints_closed_count": {
+    "formulaId": "f_eqms_complaints_closed_count",
+    "name": "Eqm khiếu nại - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Complaints Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_complaints",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_complaints_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_complaints.transition"
+      }
+    ]
+  },
+  "f_eqms_concession_records_record_count": {
+    "formulaId": "f_eqms_concession_records_record_count",
+    "name": "Eqm nhượng bộ hồ sơ - Số bản ghi",
+    "nameEn": "Eqms Concession Records Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_concession_records",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_concession_records_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_concession_records.list"
+      }
+    ]
+  },
+  "f_eqms_concession_records_closed_count": {
+    "formulaId": "f_eqms_concession_records_closed_count",
+    "name": "Eqm nhượng bộ hồ sơ - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Concession Records Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_concession_records",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_concession_records_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_concession_records.transition"
+      }
+    ]
+  },
+  "f_eqms_controlled_copies_record_count": {
+    "formulaId": "f_eqms_controlled_copies_record_count",
+    "name": "Eqm Controlled Copy - Số bản ghi",
+    "nameEn": "Eqms Controlled Copies Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_controlled_copies",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_controlled_copies_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_controlled_copies.list"
+      }
+    ]
+  },
+  "f_eqms_controlled_copies_closed_count": {
+    "formulaId": "f_eqms_controlled_copies_closed_count",
+    "name": "Eqm Controlled Copy - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Controlled Copies Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_controlled_copies",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_controlled_copies_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_controlled_copies.transition"
+      }
+    ]
+  },
+  "f_eqms_csat_surveys_record_count": {
+    "formulaId": "f_eqms_csat_surveys_record_count",
+    "name": "Eqm Csat Survey - Số bản ghi",
+    "nameEn": "Eqms Csat Surveys Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_csat_surveys",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_csat_surveys_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_csat_surveys.list"
+      }
+    ]
+  },
+  "f_eqms_csat_surveys_closed_count": {
+    "formulaId": "f_eqms_csat_surveys_closed_count",
+    "name": "Eqm Csat Survey - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Csat Surveys Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_csat_surveys",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_csat_surveys_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_csat_surveys.transition"
+      }
+    ]
+  },
+  "f_eqms_deviations_record_count": {
+    "formulaId": "f_eqms_deviations_record_count",
+    "name": "Eqm sai lệch - Số bản ghi",
+    "nameEn": "Eqms Deviations Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_deviations",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_deviations_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_deviations.list"
+      }
+    ]
+  },
+  "f_eqms_deviations_closed_count": {
+    "formulaId": "f_eqms_deviations_closed_count",
+    "name": "Eqm sai lệch - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Deviations Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_deviations",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_deviations_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_deviations.transition"
+      }
+    ]
+  },
+  "f_eqms_document_acknowledgements_record_count": {
+    "formulaId": "f_eqms_document_acknowledgements_record_count",
+    "name": "Eqm Tài liệu Acknowledgement - Số bản ghi",
+    "nameEn": "Eqms Document Acknowledgements Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_document_acknowledgements",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_document_acknowledgements_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_document_acknowledgements.list"
+      }
+    ]
+  },
+  "f_eqms_document_acknowledgements_closed_count": {
+    "formulaId": "f_eqms_document_acknowledgements_closed_count",
+    "name": "Eqm Tài liệu Acknowledgement - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Document Acknowledgements Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_document_acknowledgements",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_document_acknowledgements_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_document_acknowledgements.transition"
+      }
+    ]
+  },
+  "f_eqms_documents_record_count": {
+    "formulaId": "f_eqms_documents_record_count",
+    "name": "Eqm Tài liệu - Số bản ghi",
+    "nameEn": "Eqms Documents Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_documents",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_documents_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_documents.list"
+      }
+    ]
+  },
+  "f_eqms_documents_closed_count": {
+    "formulaId": "f_eqms_documents_closed_count",
+    "name": "Eqm Tài liệu - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Documents Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_documents",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_documents_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_documents.transition"
+      }
+    ]
+  },
+  "f_eqms_engineering_changes_record_count": {
+    "formulaId": "f_eqms_engineering_changes_record_count",
+    "name": "Eqm Kỹ thuật thay đổi - Số bản ghi",
+    "nameEn": "Eqms Engineering Changes Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_engineering_changes",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_engineering_changes_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_engineering_changes.list"
+      }
+    ]
+  },
+  "f_eqms_engineering_changes_closed_count": {
+    "formulaId": "f_eqms_engineering_changes_closed_count",
+    "name": "Eqm Kỹ thuật thay đổi - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Engineering Changes Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_engineering_changes",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_engineering_changes_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_engineering_changes.transition"
+      }
+    ]
+  },
+  "f_eqms_export_jobs_record_count": {
+    "formulaId": "f_eqms_export_jobs_record_count",
+    "name": "Eqm Xuất khẩu Lệnh - Số bản ghi",
+    "nameEn": "Eqms Export Jobs Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_export_jobs",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_export_jobs_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_export_jobs.list"
+      }
+    ]
+  },
+  "f_eqms_export_jobs_closed_count": {
+    "formulaId": "f_eqms_export_jobs_closed_count",
+    "name": "Eqm Xuất khẩu Lệnh - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Export Jobs Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_export_jobs",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_export_jobs_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_export_jobs.transition"
+      }
+    ]
+  },
+  "f_eqms_fai_characteristics_record_count": {
+    "formulaId": "f_eqms_fai_characteristics_record_count",
+    "name": "Eqm FAI đặc tính - Số bản ghi",
+    "nameEn": "Eqms FAI Characteristics Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_fai_characteristics",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_fai_characteristics_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_fai_characteristics.list"
+      }
+    ]
+  },
+  "f_eqms_fai_reports_record_count": {
+    "formulaId": "f_eqms_fai_reports_record_count",
+    "name": "Eqm FAI Báo cáo - Số bản ghi",
+    "nameEn": "Eqms FAI Reports Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_fai_reports",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_fai_reports_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_fai_reports.list"
+      }
+    ]
+  },
+  "f_eqms_fai_reports_closed_count": {
+    "formulaId": "f_eqms_fai_reports_closed_count",
+    "name": "Eqm FAI Báo cáo - Số hồ sơ đã đóng",
+    "nameEn": "Eqms FAI Reports Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_fai_reports",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_fai_reports_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_fai_reports.transition"
+      }
+    ]
+  },
+  "f_eqms_field_actions_record_count": {
+    "formulaId": "f_eqms_field_actions_record_count",
+    "name": "Eqm Field Hành động - Số bản ghi",
+    "nameEn": "Eqms Field Actions Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_field_actions",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_field_actions_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_field_actions.list"
+      }
+    ]
+  },
+  "f_eqms_field_actions_closed_count": {
+    "formulaId": "f_eqms_field_actions_closed_count",
+    "name": "Eqm Field Hành động - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Field Actions Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_field_actions",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_field_actions_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_field_actions.transition"
+      }
+    ]
+  },
+  "f_eqms_lab_investigations_record_count": {
+    "formulaId": "f_eqms_lab_investigations_record_count",
+    "name": "Eqm Lab Investigation - Số bản ghi",
+    "nameEn": "Eqms Lab Investigations Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_lab_investigations",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_lab_investigations_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_lab_investigations.list"
+      }
+    ]
+  },
+  "f_eqms_lab_investigations_closed_count": {
+    "formulaId": "f_eqms_lab_investigations_closed_count",
+    "name": "Eqm Lab Investigation - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Lab Investigations Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_lab_investigations",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_lab_investigations_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_lab_investigations.transition"
+      }
+    ]
+  },
+  "f_eqms_lessons_learned_record_count": {
+    "formulaId": "f_eqms_lessons_learned_record_count",
+    "name": "Eqm Lesson Learned - Số bản ghi",
+    "nameEn": "Eqms Lessons Learned Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_lessons_learned",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_lessons_learned_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_lessons_learned.list"
+      }
+    ]
+  },
+  "f_eqms_lessons_learned_closed_count": {
+    "formulaId": "f_eqms_lessons_learned_closed_count",
+    "name": "Eqm Lesson Learned - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Lessons Learned Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_lessons_learned",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_lessons_learned_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_lessons_learned.transition"
+      }
+    ]
+  },
+  "f_eqms_msa_records_record_count": {
+    "formulaId": "f_eqms_msa_records_record_count",
+    "name": "Eqm Msa hồ sơ - Số bản ghi",
+    "nameEn": "Eqms Msa Records Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_msa_records",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_msa_records_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_msa_records.list"
+      }
+    ]
+  },
+  "f_eqms_msa_records_closed_count": {
+    "formulaId": "f_eqms_msa_records_closed_count",
+    "name": "Eqm Msa hồ sơ - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Msa Records Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_msa_records",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_msa_records_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_msa_records.transition"
+      }
+    ]
+  },
+  "f_eqms_ncr_records_record_count": {
+    "formulaId": "f_eqms_ncr_records_record_count",
+    "name": "Eqm NCR hồ sơ - Số bản ghi",
+    "nameEn": "Eqms NCR Records Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_ncr_records",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_ncr_records_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_ncr_records.list"
+      }
+    ]
+  },
+  "f_eqms_ncr_records_closed_count": {
+    "formulaId": "f_eqms_ncr_records_closed_count",
+    "name": "Eqm NCR hồ sơ - Số hồ sơ đã đóng",
+    "nameEn": "Eqms NCR Records Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_ncr_records",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_ncr_records_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_ncr_records.transition"
+      }
+    ]
+  },
+  "f_eqms_quality_agreements_record_count": {
+    "formulaId": "f_eqms_quality_agreements_record_count",
+    "name": "Eqm Chất lượng Agreement - Số bản ghi",
+    "nameEn": "Eqms Quality Agreements Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_quality_agreements",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_quality_agreements_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_quality_agreements.list"
+      }
+    ]
+  },
+  "f_eqms_quality_agreements_closed_count": {
+    "formulaId": "f_eqms_quality_agreements_closed_count",
+    "name": "Eqm Chất lượng Agreement - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Quality Agreements Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_quality_agreements",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_quality_agreements_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_quality_agreements.transition"
+      }
+    ]
+  },
+  "f_eqms_quality_tower_snapshots_record_count": {
+    "formulaId": "f_eqms_quality_tower_snapshots_record_count",
+    "name": "Eqm Chất lượng Tower ảnh chụp - Số bản ghi",
+    "nameEn": "Eqms Quality Tower Snapshots Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_quality_tower_snapshots",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_quality_tower_snapshots_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_quality_tower_snapshots.list"
+      }
+    ]
+  },
+  "f_eqms_record_links_record_count": {
+    "formulaId": "f_eqms_record_links_record_count",
+    "name": "Eqm hồ sơ liên kết - Số bản ghi",
+    "nameEn": "Eqms Record Links Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_record_links",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_record_links_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_record_links.list"
+      }
+    ]
+  },
+  "f_eqms_risk_register_record_count": {
+    "formulaId": "f_eqms_risk_register_record_count",
+    "name": "Eqm Rủi ro Register - Số bản ghi",
+    "nameEn": "Eqms Risk Register Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_risk_register",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_risk_register_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_risk_register.list"
+      }
+    ]
+  },
+  "f_eqms_risk_register_closed_count": {
+    "formulaId": "f_eqms_risk_register_closed_count",
+    "name": "Eqm Rủi ro Register - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Risk Register Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_risk_register",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_risk_register_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_risk_register.transition"
+      }
+    ]
+  },
+  "f_eqms_risks_controls_record_count": {
+    "formulaId": "f_eqms_risks_controls_record_count",
+    "name": "Eqm Rủi ro Kiểm soát - Số bản ghi",
+    "nameEn": "Eqms Risks Controls Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_risks_controls",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_risks_controls_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_risks_controls.list"
+      }
+    ]
+  },
+  "f_eqms_risks_controls_closed_count": {
+    "formulaId": "f_eqms_risks_controls_closed_count",
+    "name": "Eqm Rủi ro Kiểm soát - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Risks Controls Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_risks_controls",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_risks_controls_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_risks_controls.transition"
+      }
+    ]
+  },
+  "f_eqms_sampling_plans_record_count": {
+    "formulaId": "f_eqms_sampling_plans_record_count",
+    "name": "Eqm Sampling kế hoạch - Số bản ghi",
+    "nameEn": "Eqms Sampling Plans Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_sampling_plans",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_sampling_plans_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_sampling_plans.list"
+      }
+    ]
+  },
+  "f_eqms_sampling_plans_closed_count": {
+    "formulaId": "f_eqms_sampling_plans_closed_count",
+    "name": "Eqm Sampling kế hoạch - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Sampling Plans Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_sampling_plans",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_sampling_plans_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_sampling_plans.transition"
+      }
+    ]
+  },
+  "f_eqms_scars_record_count": {
+    "formulaId": "f_eqms_scars_record_count",
+    "name": "Eqm Scar - Số bản ghi",
+    "nameEn": "Eqms Scars Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_scars",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_scars_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_scars.list"
+      }
+    ]
+  },
+  "f_eqms_scars_closed_count": {
+    "formulaId": "f_eqms_scars_closed_count",
+    "name": "Eqm Scar - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Scars Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_scars",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_scars_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_scars.transition"
+      }
+    ]
+  },
+  "f_eqms_signatures_record_count": {
+    "formulaId": "f_eqms_signatures_record_count",
+    "name": "Eqm Chữ ký - Số bản ghi",
+    "nameEn": "Eqms Signatures Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_signatures",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_signatures_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_signatures.list"
+      }
+    ]
+  },
+  "f_eqms_spc_violation_acks_record_count": {
+    "formulaId": "f_eqms_spc_violation_acks_record_count",
+    "name": "Eqm SPC vi phạm Ack - Số bản ghi",
+    "nameEn": "Eqms SPC Violation Acks Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_spc_violation_acks",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_spc_violation_acks_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_spc_violation_acks.list"
+      }
+    ]
+  },
+  "f_eqms_special_characteristics_record_count": {
+    "formulaId": "f_eqms_special_characteristics_record_count",
+    "name": "Eqm Đặc biệt đặc tính - Số bản ghi",
+    "nameEn": "Eqms Special Characteristics Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_special_characteristics",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_special_characteristics_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_special_characteristics.list"
+      }
+    ]
+  },
+  "f_eqms_special_characteristics_closed_count": {
+    "formulaId": "f_eqms_special_characteristics_closed_count",
+    "name": "Eqm Đặc biệt đặc tính - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Special Characteristics Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_special_characteristics",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_special_characteristics_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_special_characteristics.transition"
+      }
+    ]
+  },
+  "f_eqms_supplier_audits_record_count": {
+    "formulaId": "f_eqms_supplier_audits_record_count",
+    "name": "Eqm Nhà cung cấp Đánh giá - Số bản ghi",
+    "nameEn": "Eqms Supplier Audits Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_supplier_audits",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_supplier_audits_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_supplier_audits.list"
+      }
+    ]
+  },
+  "f_eqms_supplier_audits_closed_count": {
+    "formulaId": "f_eqms_supplier_audits_closed_count",
+    "name": "Eqm Nhà cung cấp Đánh giá - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Supplier Audits Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_supplier_audits",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_supplier_audits_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_supplier_audits.transition"
+      }
+    ]
+  },
+  "f_eqms_supplier_profiles_record_count": {
+    "formulaId": "f_eqms_supplier_profiles_record_count",
+    "name": "Eqm Nhà cung cấp hồ sơ - Số bản ghi",
+    "nameEn": "Eqms Supplier Profiles Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_supplier_profiles",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_supplier_profiles_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_supplier_profiles.list"
+      }
+    ]
+  },
+  "f_eqms_supplier_profiles_closed_count": {
+    "formulaId": "f_eqms_supplier_profiles_closed_count",
+    "name": "Eqm Nhà cung cấp hồ sơ - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Supplier Profiles Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE qualification_status IN ('closed','completed','archived','paid','delivered')) FROM eqms_supplier_profiles",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_supplier_profiles_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_supplier_profiles.transition"
+      }
+    ]
+  },
+  "f_eqms_supplier_qualification_events_record_count": {
+    "formulaId": "f_eqms_supplier_qualification_events_record_count",
+    "name": "Eqm Nhà cung cấp Qualification sự kiện - Số bản ghi",
+    "nameEn": "Eqms Supplier Qualification Events Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_supplier_qualification_events",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_supplier_qualification_events_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_supplier_qualification_events.list"
+      }
+    ]
+  },
+  "f_eqms_supplier_quality_agreements_record_count": {
+    "formulaId": "f_eqms_supplier_quality_agreements_record_count",
+    "name": "Eqm Nhà cung cấp Chất lượng Agreement - Số bản ghi",
+    "nameEn": "Eqms Supplier Quality Agreements Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_supplier_quality_agreements",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_supplier_quality_agreements_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_supplier_quality_agreements.list"
+      }
+    ]
+  },
+  "f_eqms_supplier_quality_agreements_closed_count": {
+    "formulaId": "f_eqms_supplier_quality_agreements_closed_count",
+    "name": "Eqm Nhà cung cấp Chất lượng Agreement - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Supplier Quality Agreements Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_supplier_quality_agreements",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_supplier_quality_agreements_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_supplier_quality_agreements.transition"
+      }
+    ]
+  },
+  "f_eqms_training_curricula_record_count": {
+    "formulaId": "f_eqms_training_curricula_record_count",
+    "name": "Eqm Đào tạo Curricula - Số bản ghi",
+    "nameEn": "Eqms Training Curricula Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_training_curricula",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_training_curricula_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_training_curricula.list"
+      }
+    ]
+  },
+  "f_eqms_training_curricula_closed_count": {
+    "formulaId": "f_eqms_training_curricula_closed_count",
+    "name": "Eqm Đào tạo Curricula - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Training Curricula Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_training_curricula",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_training_curricula_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_training_curricula.transition"
+      }
+    ]
+  },
+  "f_eqms_training_matrix_record_count": {
+    "formulaId": "f_eqms_training_matrix_record_count",
+    "name": "Eqm Đào tạo ma trận - Số bản ghi",
+    "nameEn": "Eqms Training Matrix Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_training_matrix",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_training_matrix_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_training_matrix.list"
+      }
+    ]
+  },
+  "f_eqms_training_matrix_closed_count": {
+    "formulaId": "f_eqms_training_matrix_closed_count",
+    "name": "Eqm Đào tạo ma trận - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Training Matrix Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE completion_status IN ('closed','completed','archived','paid','delivered')) FROM eqms_training_matrix",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_training_matrix_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_training_matrix.transition"
+      }
+    ]
+  },
+  "f_eqms_training_records_record_count": {
+    "formulaId": "f_eqms_training_records_record_count",
+    "name": "Eqm Đào tạo hồ sơ - Số bản ghi",
+    "nameEn": "Eqms Training Records Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_training_records",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_training_records_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_training_records.list"
+      }
+    ]
+  },
+  "f_eqms_training_records_closed_count": {
+    "formulaId": "f_eqms_training_records_closed_count",
+    "name": "Eqm Đào tạo hồ sơ - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Training Records Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_training_records",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_training_records_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_training_records.transition"
+      }
+    ]
+  },
+  "f_eqms_validation_executions_record_count": {
+    "formulaId": "f_eqms_validation_executions_record_count",
+    "name": "Eqm Kiểm tra tính hợp lệ Thực thi - Số bản ghi",
+    "nameEn": "Eqms Validation Executions Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_validation_executions",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_validation_executions_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_validation_executions.list"
+      }
+    ]
+  },
+  "f_eqms_validation_executions_closed_count": {
+    "formulaId": "f_eqms_validation_executions_closed_count",
+    "name": "Eqm Kiểm tra tính hợp lệ Thực thi - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Validation Executions Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_validation_executions",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_validation_executions_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_validation_executions.transition"
+      }
+    ]
+  },
+  "f_eqms_validation_projects_record_count": {
+    "formulaId": "f_eqms_validation_projects_record_count",
+    "name": "Eqm Kiểm tra tính hợp lệ dự án - Số bản ghi",
+    "nameEn": "Eqms Validation Projects Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_validation_projects",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_validation_projects_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_validation_projects.list"
+      }
+    ]
+  },
+  "f_eqms_validation_projects_closed_count": {
+    "formulaId": "f_eqms_validation_projects_closed_count",
+    "name": "Eqm Kiểm tra tính hợp lệ dự án - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Validation Projects Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_validation_projects",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_validation_projects_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_validation_projects.transition"
+      }
+    ]
+  },
+  "f_eqms_validation_protocols_record_count": {
+    "formulaId": "f_eqms_validation_protocols_record_count",
+    "name": "Eqm Kiểm tra tính hợp lệ Protocol - Số bản ghi",
+    "nameEn": "Eqms Validation Protocols Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_validation_protocols",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_validation_protocols_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_validation_protocols.list"
+      }
+    ]
+  },
+  "f_eqms_validation_protocols_closed_count": {
+    "formulaId": "f_eqms_validation_protocols_closed_count",
+    "name": "Eqm Kiểm tra tính hợp lệ Protocol - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Validation Protocols Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_validation_protocols",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_validation_protocols_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_validation_protocols.transition"
+      }
+    ]
+  },
+  "f_eqms_validation_requirements_record_count": {
+    "formulaId": "f_eqms_validation_requirements_record_count",
+    "name": "Eqm Kiểm tra tính hợp lệ yêu cầu - Số bản ghi",
+    "nameEn": "Eqms Validation Requirements Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_validation_requirements",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_validation_requirements_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_validation_requirements.list"
+      }
+    ]
+  },
+  "f_eqms_warranty_claims_record_count": {
+    "formulaId": "f_eqms_warranty_claims_record_count",
+    "name": "Eqm Warranty khiếu nại - Số bản ghi",
+    "nameEn": "Eqms Warranty Claims Record Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM eqms_warranty_claims",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_warranty_claims_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_warranty_claims.list"
+      }
+    ]
+  },
+  "f_eqms_warranty_claims_closed_count": {
+    "formulaId": "f_eqms_warranty_claims_closed_count",
+    "name": "Eqm Warranty khiếu nại - Số hồ sơ đã đóng",
+    "nameEn": "Eqms Warranty Claims Closed Count",
+    "category": "quality",
+    "domain": "quality_management",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM eqms_warranty_claims",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "eqms_warranty_claims_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "quality_management.eqms_warranty_claims.transition"
+      }
+    ]
+  },
+  "f_genealogy_threads_record_count": {
+    "formulaId": "f_genealogy_threads_record_count",
+    "name": "Phả hệ luồng - Số bản ghi",
+    "nameEn": "Genealogy Threads Record Count",
+    "category": "system",
+    "domain": "traceability_serialization",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM genealogy_threads",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "genealogy_threads_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "traceability_serialization.genealogy_threads.list"
+      }
+    ]
+  },
+  "f_genealogy_threads_closed_count": {
+    "formulaId": "f_genealogy_threads_closed_count",
+    "name": "Phả hệ luồng - Số hồ sơ đã đóng",
+    "nameEn": "Genealogy Threads Closed Count",
+    "category": "system",
+    "domain": "traceability_serialization",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM genealogy_threads",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "genealogy_threads_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "traceability_serialization.genealogy_threads.transition"
+      }
+    ]
+  },
+  "f_graphics_component_contract_record_count": {
+    "formulaId": "f_graphics_component_contract_record_count",
+    "name": "Graphic thành phần hợp đồng - Số bản ghi",
+    "nameEn": "Graphics Component Contract Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM graphics_component_contract",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "graphics_component_contract_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.graphics_component_contract.list"
+      }
+    ]
+  },
+  "f_graphics_contrast_check_record_count": {
+    "formulaId": "f_graphics_contrast_check_record_count",
+    "name": "Graphic Contrast kiểm tra - Số bản ghi",
+    "nameEn": "Graphics Contrast Check Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM graphics_contrast_check",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "graphics_contrast_check_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.graphics_contrast_check.list"
+      }
+    ]
+  },
+  "f_graphics_module_binding_record_count": {
+    "formulaId": "f_graphics_module_binding_record_count",
+    "name": "Graphic Module Binding - Số bản ghi",
+    "nameEn": "Graphics Module Binding Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM graphics_module_binding",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "graphics_module_binding_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.graphics_module_binding.list"
+      }
+    ]
+  },
+  "f_graphics_preview_scene_record_count": {
+    "formulaId": "f_graphics_preview_scene_record_count",
+    "name": "Graphic Preview Scene - Số bản ghi",
+    "nameEn": "Graphics Preview Scene Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM graphics_preview_scene",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "graphics_preview_scene_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.graphics_preview_scene.list"
+      }
+    ]
+  },
+  "f_graphics_qa_gate_catalog_record_count": {
+    "formulaId": "f_graphics_qa_gate_catalog_record_count",
+    "name": "Graphic Qa cổng danh mục - Số bản ghi",
+    "nameEn": "Graphics Qa Gate Catalog Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM graphics_qa_gate_catalog",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "graphics_qa_gate_catalog_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.graphics_qa_gate_catalog.list"
+      }
+    ]
+  },
+  "f_graphics_qa_gate_result_record_count": {
+    "formulaId": "f_graphics_qa_gate_result_record_count",
+    "name": "Graphic Qa cổng kết quả - Số bản ghi",
+    "nameEn": "Graphics Qa Gate Result Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM graphics_qa_gate_result",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "graphics_qa_gate_result_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.graphics_qa_gate_result.list"
+      }
+    ]
+  },
+  "f_graphics_qa_gate_result_closed_count": {
+    "formulaId": "f_graphics_qa_gate_result_closed_count",
+    "name": "Graphic Qa cổng kết quả - Số hồ sơ đã đóng",
+    "nameEn": "Graphics Qa Gate Result Closed Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM graphics_qa_gate_result",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "graphics_qa_gate_result_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.graphics_qa_gate_result.transition"
+      }
+    ]
+  },
+  "f_graphics_regulated_entity_record_count": {
+    "formulaId": "f_graphics_regulated_entity_record_count",
+    "name": "Graphic Regulated đối tượng - Số bản ghi",
+    "nameEn": "Graphics Regulated Entity Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM graphics_regulated_entity",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "graphics_regulated_entity_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.graphics_regulated_entity.list"
+      }
+    ]
+  },
+  "f_graphics_rollout_scope_record_count": {
+    "formulaId": "f_graphics_rollout_scope_record_count",
+    "name": "Graphic Rollout phạm vi - Số bản ghi",
+    "nameEn": "Graphics Rollout Scope Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM graphics_rollout_scope",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "graphics_rollout_scope_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.graphics_rollout_scope.list"
+      }
+    ]
+  },
+  "f_graphics_rollout_scope_closed_count": {
+    "formulaId": "f_graphics_rollout_scope_closed_count",
+    "name": "Graphic Rollout phạm vi - Số hồ sơ đã đóng",
+    "nameEn": "Graphics Rollout Scope Closed Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE wcag_gate_status IN ('closed','completed','archived','paid','delivered')) FROM graphics_rollout_scope",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "graphics_rollout_scope_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.graphics_rollout_scope.transition"
+      }
+    ]
+  },
+  "f_graphics_saved_experiment_record_count": {
+    "formulaId": "f_graphics_saved_experiment_record_count",
+    "name": "Graphic Saved Experiment - Số bản ghi",
+    "nameEn": "Graphics Saved Experiment Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM graphics_saved_experiment",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "graphics_saved_experiment_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.graphics_saved_experiment.list"
+      }
+    ]
+  },
+  "f_graphics_simulation_run_record_count": {
+    "formulaId": "f_graphics_simulation_run_record_count",
+    "name": "Graphic Simulation lần chạy - Số bản ghi",
+    "nameEn": "Graphics Simulation Run Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM graphics_simulation_run",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "graphics_simulation_run_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.graphics_simulation_run.list"
+      }
+    ]
+  },
+  "f_graphics_template_zone_binding_record_count": {
+    "formulaId": "f_graphics_template_zone_binding_record_count",
+    "name": "Graphic mẫu khu Binding - Số bản ghi",
+    "nameEn": "Graphics Template Zone Binding Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM graphics_template_zone_binding",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "graphics_template_zone_binding_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.graphics_template_zone_binding.list"
+      }
+    ]
+  },
+  "f_graphics_theme_schedule_record_count": {
+    "formulaId": "f_graphics_theme_schedule_record_count",
+    "name": "Graphic Theme lịch - Số bản ghi",
+    "nameEn": "Graphics Theme Schedule Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM graphics_theme_schedule",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "graphics_theme_schedule_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.graphics_theme_schedule.list"
+      }
+    ]
+  },
+  "f_graphics_token_catalog_record_count": {
+    "formulaId": "f_graphics_token_catalog_record_count",
+    "name": "Graphic Token danh mục - Số bản ghi",
+    "nameEn": "Graphics Token Catalog Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM graphics_token_catalog",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "graphics_token_catalog_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.graphics_token_catalog.list"
+      }
+    ]
+  },
+  "f_graphics_token_value_record_count": {
+    "formulaId": "f_graphics_token_value_record_count",
+    "name": "Graphic Token Giá trị - Số bản ghi",
+    "nameEn": "Graphics Token Value Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM graphics_token_value",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "graphics_token_value_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.graphics_token_value.list"
+      }
+    ]
+  },
+  "f_graphics_token_version_record_count": {
+    "formulaId": "f_graphics_token_version_record_count",
+    "name": "Graphic Token phiên bản - Số bản ghi",
+    "nameEn": "Graphics Token Version Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM graphics_token_version",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "graphics_token_version_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.graphics_token_version.list"
+      }
+    ]
+  },
+  "f_graphics_wcag_check_record_count": {
+    "formulaId": "f_graphics_wcag_check_record_count",
+    "name": "Graphic Wcag kiểm tra - Số bản ghi",
+    "nameEn": "Graphics Wcag Check Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM graphics_wcag_check",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "graphics_wcag_check_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.graphics_wcag_check.list"
       }
     ]
   }

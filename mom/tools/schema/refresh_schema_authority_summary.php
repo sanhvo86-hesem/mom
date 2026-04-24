@@ -101,6 +101,8 @@ sort($migrationNumbers);
 if ($migrationNumbers === []) {
     throw new RuntimeException('No migration files found.');
 }
+$migrationNumbers = array_values(array_unique($migrationNumbers));
+sort($migrationNumbers);
 
 $minMigration = min($migrationNumbers);
 $maxMigration = max($migrationNumbers);

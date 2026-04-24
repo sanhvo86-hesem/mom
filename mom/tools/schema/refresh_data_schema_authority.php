@@ -193,11 +193,18 @@ if ($designId === 'system_contract_registry') {
         $workspaceManifest = invoke_private($controller, 'updateEnterpriseRegistryArtifacts', [$workspaceBundle, null]);
     }
 }
+run_refresh_command(['php', $portalRoot . '/database/build_schema_snapshot.php'], $projectRoot);
+run_refresh_command(['node', $portalRoot . '/tools/registry/generate-table-architecture.mjs'], $projectRoot);
 run_refresh_command(['php', $portalRoot . '/tools/schema/refresh_schema_authority_summary.php'], $projectRoot);
 run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_canonical_backend_standardization_catalog.py'], $projectRoot);
 run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_data_fields_from_table_registry.py'], $projectRoot);
+run_refresh_command(['node', $portalRoot . '/tools/registry/generate-workflow-governance.mjs'], $projectRoot);
+run_refresh_command(['node', $portalRoot . '/tools/registry/generate-module-builder-registry.mjs'], $projectRoot);
 run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_operational_blind_spot_report.py'], $projectRoot);
 run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_operational_stress_report.py'], $projectRoot);
+run_refresh_command(['python3', $portalRoot . '/tools/registry/enterprise_registry_doctor.py'], $projectRoot);
+run_refresh_command(['python3', $portalRoot . '/tools/registry/enterprise_frontend_simulator.py'], $projectRoot);
+run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_global_erp_mom_capability_audit.py'], $projectRoot);
 run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_system_contract_authority.py'], $projectRoot);
 run_refresh_command(['python3', $portalRoot . '/tools/registry/generate_publication_truth_summaries.py'], $projectRoot);
 if (!is_dir($myProjectRoot)) {

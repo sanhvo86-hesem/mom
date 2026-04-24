@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-15T10:51:53.468Z",
+    "generatedAt": "2026-04-24T08:04:10.057Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -24,8 +24,8 @@
     "purpose": "Segmented runtime contract read model for bounded-memory reads and targeted rebuild verification.",
     "segmentId": "endpointBindings",
     "sourceArtifact": "data/registry/system-contract-runtime-projections.json",
-    "sourceSha256": "bfd78f8d03eb2516180cd62fcce1478a408c897ce89399eefd54f952caac7247",
-    "sourceGeneratedAt": "2026-04-15T10:51:53.468Z",
+    "sourceSha256": "b4931d975c011d28dc8757332c68ba8f2caa2f04fa185fd7b17ce6542804ca18",
+    "sourceGeneratedAt": "2026-04-24T08:04:10.057Z",
     "writePolicy": "generated_segment_do_not_edit",
     "revisionGuard": "sourceSha256"
   },
@@ -3126,6 +3126,282 @@
       ]
     },
     {
+      "tableKey": "public.dcc_doc_type_catalog",
+      "table": "dcc_doc_type_catalog",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "document_control.dcc_doc_type_catalog.create",
+        "document_control.dcc_doc_type_catalog.delete",
+        "document_control.dcc_doc_type_catalog.detail",
+        "document_control.dcc_doc_type_catalog.list",
+        "document_control.dcc_doc_type_catalog.update"
+      ],
+      "paths": [
+        "/api/runtime/document_control/dcc_doc_type_catalog",
+        "/api/runtime/document_control/dcc_doc_type_catalog/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.dcc_document_change_notice",
+      "table": "dcc_document_change_notice",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "document_control.dcc_document_change_notice.create",
+        "document_control.dcc_document_change_notice.delete",
+        "document_control.dcc_document_change_notice.detail",
+        "document_control.dcc_document_change_notice.list",
+        "document_control.dcc_document_change_notice.transition",
+        "document_control.dcc_document_change_notice.update"
+      ],
+      "paths": [
+        "/api/runtime/document_control/dcc_document_change_notice",
+        "/api/runtime/document_control/dcc_document_change_notice/{id}",
+        "/api/runtime/document_control/dcc_document_change_notice/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.dcc_document_change_request",
+      "table": "dcc_document_change_request",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "document_control.dcc_document_change_request.create",
+        "document_control.dcc_document_change_request.delete",
+        "document_control.dcc_document_change_request.detail",
+        "document_control.dcc_document_change_request.list",
+        "document_control.dcc_document_change_request.transition",
+        "document_control.dcc_document_change_request.update"
+      ],
+      "paths": [
+        "/api/runtime/document_control/dcc_document_change_request",
+        "/api/runtime/document_control/dcc_document_change_request/{id}",
+        "/api/runtime/document_control/dcc_document_change_request/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.dcc_document_header",
+      "table": "dcc_document_header",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "document_control.dcc_document_header.create",
+        "document_control.dcc_document_header.delete",
+        "document_control.dcc_document_header.detail",
+        "document_control.dcc_document_header.list",
+        "document_control.dcc_document_header.transition",
+        "document_control.dcc_document_header.update"
+      ],
+      "paths": [
+        "/api/runtime/document_control/dcc_document_header",
+        "/api/runtime/document_control/dcc_document_header/{id}",
+        "/api/runtime/document_control/dcc_document_header/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.dcc_document_header_label",
+      "table": "dcc_document_header_label",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "document_control.dcc_document_header_label.create",
+        "document_control.dcc_document_header_label.delete",
+        "document_control.dcc_document_header_label.detail",
+        "document_control.dcc_document_header_label.list",
+        "document_control.dcc_document_header_label.update"
+      ],
+      "paths": [
+        "/api/runtime/document_control/dcc_document_header_label",
+        "/api/runtime/document_control/dcc_document_header_label/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.dcc_document_locale_variant",
+      "table": "dcc_document_locale_variant",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "document_control.dcc_document_locale_variant.create",
+        "document_control.dcc_document_locale_variant.delete",
+        "document_control.dcc_document_locale_variant.detail",
+        "document_control.dcc_document_locale_variant.list",
+        "document_control.dcc_document_locale_variant.transition",
+        "document_control.dcc_document_locale_variant.update"
+      ],
+      "paths": [
+        "/api/runtime/document_control/dcc_document_locale_variant",
+        "/api/runtime/document_control/dcc_document_locale_variant/{id}",
+        "/api/runtime/document_control/dcc_document_locale_variant/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.dcc_document_revision",
+      "table": "dcc_document_revision",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "document_control.dcc_document_revision.create",
+        "document_control.dcc_document_revision.delete",
+        "document_control.dcc_document_revision.detail",
+        "document_control.dcc_document_revision.list",
+        "document_control.dcc_document_revision.update"
+      ],
+      "paths": [
+        "/api/runtime/document_control/dcc_document_revision",
+        "/api/runtime/document_control/dcc_document_revision/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.dcc_document_revision_history",
+      "table": "dcc_document_revision_history",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "document_control.dcc_document_revision_history.create",
+        "document_control.dcc_document_revision_history.delete",
+        "document_control.dcc_document_revision_history.detail",
+        "document_control.dcc_document_revision_history.list",
+        "document_control.dcc_document_revision_history.transition",
+        "document_control.dcc_document_revision_history.update"
+      ],
+      "paths": [
+        "/api/runtime/document_control/dcc_document_revision_history",
+        "/api/runtime/document_control/dcc_document_revision_history/{id}",
+        "/api/runtime/document_control/dcc_document_revision_history/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.dcc_role_catalog",
+      "table": "dcc_role_catalog",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "document_control.dcc_role_catalog.create",
+        "document_control.dcc_role_catalog.delete",
+        "document_control.dcc_role_catalog.detail",
+        "document_control.dcc_role_catalog.list",
+        "document_control.dcc_role_catalog.update"
+      ],
+      "paths": [
+        "/api/runtime/document_control/dcc_role_catalog",
+        "/api/runtime/document_control/dcc_role_catalog/{id}"
+      ]
+    },
+    {
       "tableKey": "public.demand",
       "table": "demand",
       "endpointCount": 6,
@@ -5292,6 +5568,227 @@
       ]
     },
     {
+      "tableKey": "public.eqms_aml_records",
+      "table": "eqms_aml_records",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_aml_records.create",
+        "quality_management.eqms_aml_records.delete",
+        "quality_management.eqms_aml_records.detail",
+        "quality_management.eqms_aml_records.list",
+        "quality_management.eqms_aml_records.transition",
+        "quality_management.eqms_aml_records.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_aml_records",
+        "/api/runtime/quality_management/eqms_aml_records/{id}",
+        "/api/runtime/quality_management/eqms_aml_records/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_attachments",
+      "table": "eqms_attachments",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_attachments.create",
+        "quality_management.eqms_attachments.delete",
+        "quality_management.eqms_attachments.detail",
+        "quality_management.eqms_attachments.list",
+        "quality_management.eqms_attachments.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_attachments",
+        "/api/runtime/quality_management/eqms_attachments/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_audit_findings",
+      "table": "eqms_audit_findings",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_audit_findings.create",
+        "quality_management.eqms_audit_findings.delete",
+        "quality_management.eqms_audit_findings.detail",
+        "quality_management.eqms_audit_findings.list",
+        "quality_management.eqms_audit_findings.transition",
+        "quality_management.eqms_audit_findings.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_audit_findings",
+        "/api/runtime/quality_management/eqms_audit_findings/{id}",
+        "/api/runtime/quality_management/eqms_audit_findings/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_audits",
+      "table": "eqms_audits",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_audits.create",
+        "quality_management.eqms_audits.delete",
+        "quality_management.eqms_audits.detail",
+        "quality_management.eqms_audits.list",
+        "quality_management.eqms_audits.transition",
+        "quality_management.eqms_audits.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_audits",
+        "/api/runtime/quality_management/eqms_audits/{id}",
+        "/api/runtime/quality_management/eqms_audits/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_batch_release",
+      "table": "eqms_batch_release",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_batch_release.create",
+        "quality_management.eqms_batch_release.delete",
+        "quality_management.eqms_batch_release.detail",
+        "quality_management.eqms_batch_release.list",
+        "quality_management.eqms_batch_release.transition",
+        "quality_management.eqms_batch_release.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_batch_release",
+        "/api/runtime/quality_management/eqms_batch_release/{id}",
+        "/api/runtime/quality_management/eqms_batch_release/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_calibration_records",
+      "table": "eqms_calibration_records",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_calibration_records.create",
+        "quality_management.eqms_calibration_records.delete",
+        "quality_management.eqms_calibration_records.detail",
+        "quality_management.eqms_calibration_records.list",
+        "quality_management.eqms_calibration_records.transition",
+        "quality_management.eqms_calibration_records.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_calibration_records",
+        "/api/runtime/quality_management/eqms_calibration_records/{id}",
+        "/api/runtime/quality_management/eqms_calibration_records/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_capa_records",
+      "table": "eqms_capa_records",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_capa_records.create",
+        "quality_management.eqms_capa_records.delete",
+        "quality_management.eqms_capa_records.detail",
+        "quality_management.eqms_capa_records.list",
+        "quality_management.eqms_capa_records.transition",
+        "quality_management.eqms_capa_records.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_capa_records",
+        "/api/runtime/quality_management/eqms_capa_records/{id}",
+        "/api/runtime/quality_management/eqms_capa_records/{id}/transition"
+      ]
+    },
+    {
       "tableKey": "public.eqms_change_affected_object",
       "table": "eqms_change_affected_object",
       "endpointCount": 5,
@@ -5318,6 +5815,38 @@
       "paths": [
         "/api/runtime/plm_change_control/eqms_change_affected_object",
         "/api/runtime/plm_change_control/eqms_change_affected_object/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_change_controls",
+      "table": "eqms_change_controls",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_change_controls.create",
+        "quality_management.eqms_change_controls.delete",
+        "quality_management.eqms_change_controls.detail",
+        "quality_management.eqms_change_controls.list",
+        "quality_management.eqms_change_controls.transition",
+        "quality_management.eqms_change_controls.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_change_controls",
+        "/api/runtime/quality_management/eqms_change_controls/{id}",
+        "/api/runtime/quality_management/eqms_change_controls/{id}/transition"
       ]
     },
     {
@@ -5382,6 +5911,131 @@
       ]
     },
     {
+      "tableKey": "public.eqms_comments",
+      "table": "eqms_comments",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_comments.create",
+        "quality_management.eqms_comments.delete",
+        "quality_management.eqms_comments.detail",
+        "quality_management.eqms_comments.list",
+        "quality_management.eqms_comments.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_comments",
+        "/api/runtime/quality_management/eqms_comments/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_complaints",
+      "table": "eqms_complaints",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_complaints.create",
+        "quality_management.eqms_complaints.delete",
+        "quality_management.eqms_complaints.detail",
+        "quality_management.eqms_complaints.list",
+        "quality_management.eqms_complaints.transition",
+        "quality_management.eqms_complaints.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_complaints",
+        "/api/runtime/quality_management/eqms_complaints/{id}",
+        "/api/runtime/quality_management/eqms_complaints/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_concession_records",
+      "table": "eqms_concession_records",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_concession_records.create",
+        "quality_management.eqms_concession_records.delete",
+        "quality_management.eqms_concession_records.detail",
+        "quality_management.eqms_concession_records.list",
+        "quality_management.eqms_concession_records.transition",
+        "quality_management.eqms_concession_records.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_concession_records",
+        "/api/runtime/quality_management/eqms_concession_records/{id}",
+        "/api/runtime/quality_management/eqms_concession_records/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_controlled_copies",
+      "table": "eqms_controlled_copies",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_controlled_copies.create",
+        "quality_management.eqms_controlled_copies.delete",
+        "quality_management.eqms_controlled_copies.detail",
+        "quality_management.eqms_controlled_copies.list",
+        "quality_management.eqms_controlled_copies.transition",
+        "quality_management.eqms_controlled_copies.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_controlled_copies",
+        "/api/runtime/quality_management/eqms_controlled_copies/{id}",
+        "/api/runtime/quality_management/eqms_controlled_copies/{id}/transition"
+      ]
+    },
+    {
       "tableKey": "public.eqms_controlled_revision_rollout",
       "table": "eqms_controlled_revision_rollout",
       "endpointCount": 6,
@@ -5411,6 +6065,102 @@
         "/api/runtime/quality_management/eqms_controlled_revision_rollout",
         "/api/runtime/quality_management/eqms_controlled_revision_rollout/{id}",
         "/api/runtime/quality_management/eqms_controlled_revision_rollout/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_csat_surveys",
+      "table": "eqms_csat_surveys",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_csat_surveys.create",
+        "quality_management.eqms_csat_surveys.delete",
+        "quality_management.eqms_csat_surveys.detail",
+        "quality_management.eqms_csat_surveys.list",
+        "quality_management.eqms_csat_surveys.transition",
+        "quality_management.eqms_csat_surveys.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_csat_surveys",
+        "/api/runtime/quality_management/eqms_csat_surveys/{id}",
+        "/api/runtime/quality_management/eqms_csat_surveys/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_deviations",
+      "table": "eqms_deviations",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_deviations.create",
+        "quality_management.eqms_deviations.delete",
+        "quality_management.eqms_deviations.detail",
+        "quality_management.eqms_deviations.list",
+        "quality_management.eqms_deviations.transition",
+        "quality_management.eqms_deviations.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_deviations",
+        "/api/runtime/quality_management/eqms_deviations/{id}",
+        "/api/runtime/quality_management/eqms_deviations/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_document_acknowledgements",
+      "table": "eqms_document_acknowledgements",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_document_acknowledgements.create",
+        "quality_management.eqms_document_acknowledgements.delete",
+        "quality_management.eqms_document_acknowledgements.detail",
+        "quality_management.eqms_document_acknowledgements.list",
+        "quality_management.eqms_document_acknowledgements.transition",
+        "quality_management.eqms_document_acknowledgements.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_document_acknowledgements",
+        "/api/runtime/quality_management/eqms_document_acknowledgements/{id}",
+        "/api/runtime/quality_management/eqms_document_acknowledgements/{id}/transition"
       ]
     },
     {
@@ -5565,6 +6315,38 @@
       ]
     },
     {
+      "tableKey": "public.eqms_documents",
+      "table": "eqms_documents",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_documents.create",
+        "quality_management.eqms_documents.delete",
+        "quality_management.eqms_documents.detail",
+        "quality_management.eqms_documents.list",
+        "quality_management.eqms_documents.transition",
+        "quality_management.eqms_documents.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_documents",
+        "/api/runtime/quality_management/eqms_documents/{id}",
+        "/api/runtime/quality_management/eqms_documents/{id}/transition"
+      ]
+    },
+    {
       "tableKey": "public.eqms_electronic_signature_event",
       "table": "eqms_electronic_signature_event",
       "endpointCount": 5,
@@ -5591,6 +6373,38 @@
       "paths": [
         "/api/runtime/foundation_governance/eqms_electronic_signature_event",
         "/api/runtime/foundation_governance/eqms_electronic_signature_event/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_engineering_changes",
+      "table": "eqms_engineering_changes",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_engineering_changes.create",
+        "quality_management.eqms_engineering_changes.delete",
+        "quality_management.eqms_engineering_changes.detail",
+        "quality_management.eqms_engineering_changes.list",
+        "quality_management.eqms_engineering_changes.transition",
+        "quality_management.eqms_engineering_changes.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_engineering_changes",
+        "/api/runtime/quality_management/eqms_engineering_changes/{id}",
+        "/api/runtime/quality_management/eqms_engineering_changes/{id}/transition"
       ]
     },
     {
@@ -5742,6 +6556,131 @@
         "/api/runtime/mes_execution/eqms_execution_entitlement_decision",
         "/api/runtime/mes_execution/eqms_execution_entitlement_decision/{id}",
         "/api/runtime/mes_execution/eqms_execution_entitlement_decision/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_export_jobs",
+      "table": "eqms_export_jobs",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_export_jobs.create",
+        "quality_management.eqms_export_jobs.delete",
+        "quality_management.eqms_export_jobs.detail",
+        "quality_management.eqms_export_jobs.list",
+        "quality_management.eqms_export_jobs.transition",
+        "quality_management.eqms_export_jobs.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_export_jobs",
+        "/api/runtime/quality_management/eqms_export_jobs/{id}",
+        "/api/runtime/quality_management/eqms_export_jobs/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_fai_characteristics",
+      "table": "eqms_fai_characteristics",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_fai_characteristics.create",
+        "quality_management.eqms_fai_characteristics.delete",
+        "quality_management.eqms_fai_characteristics.detail",
+        "quality_management.eqms_fai_characteristics.list",
+        "quality_management.eqms_fai_characteristics.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_fai_characteristics",
+        "/api/runtime/quality_management/eqms_fai_characteristics/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_fai_reports",
+      "table": "eqms_fai_reports",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_fai_reports.create",
+        "quality_management.eqms_fai_reports.delete",
+        "quality_management.eqms_fai_reports.detail",
+        "quality_management.eqms_fai_reports.list",
+        "quality_management.eqms_fai_reports.transition",
+        "quality_management.eqms_fai_reports.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_fai_reports",
+        "/api/runtime/quality_management/eqms_fai_reports/{id}",
+        "/api/runtime/quality_management/eqms_fai_reports/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_field_actions",
+      "table": "eqms_field_actions",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_field_actions.create",
+        "quality_management.eqms_field_actions.delete",
+        "quality_management.eqms_field_actions.detail",
+        "quality_management.eqms_field_actions.list",
+        "quality_management.eqms_field_actions.transition",
+        "quality_management.eqms_field_actions.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_field_actions",
+        "/api/runtime/quality_management/eqms_field_actions/{id}",
+        "/api/runtime/quality_management/eqms_field_actions/{id}/transition"
       ]
     },
     {
@@ -6091,6 +7030,134 @@
       ]
     },
     {
+      "tableKey": "public.eqms_lab_investigations",
+      "table": "eqms_lab_investigations",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_lab_investigations.create",
+        "quality_management.eqms_lab_investigations.delete",
+        "quality_management.eqms_lab_investigations.detail",
+        "quality_management.eqms_lab_investigations.list",
+        "quality_management.eqms_lab_investigations.transition",
+        "quality_management.eqms_lab_investigations.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_lab_investigations",
+        "/api/runtime/quality_management/eqms_lab_investigations/{id}",
+        "/api/runtime/quality_management/eqms_lab_investigations/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_lessons_learned",
+      "table": "eqms_lessons_learned",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_lessons_learned.create",
+        "quality_management.eqms_lessons_learned.delete",
+        "quality_management.eqms_lessons_learned.detail",
+        "quality_management.eqms_lessons_learned.list",
+        "quality_management.eqms_lessons_learned.transition",
+        "quality_management.eqms_lessons_learned.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_lessons_learned",
+        "/api/runtime/quality_management/eqms_lessons_learned/{id}",
+        "/api/runtime/quality_management/eqms_lessons_learned/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_msa_records",
+      "table": "eqms_msa_records",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_msa_records.create",
+        "quality_management.eqms_msa_records.delete",
+        "quality_management.eqms_msa_records.detail",
+        "quality_management.eqms_msa_records.list",
+        "quality_management.eqms_msa_records.transition",
+        "quality_management.eqms_msa_records.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_msa_records",
+        "/api/runtime/quality_management/eqms_msa_records/{id}",
+        "/api/runtime/quality_management/eqms_msa_records/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_ncr_records",
+      "table": "eqms_ncr_records",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_ncr_records.create",
+        "quality_management.eqms_ncr_records.delete",
+        "quality_management.eqms_ncr_records.detail",
+        "quality_management.eqms_ncr_records.list",
+        "quality_management.eqms_ncr_records.transition",
+        "quality_management.eqms_ncr_records.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_ncr_records",
+        "/api/runtime/quality_management/eqms_ncr_records/{id}",
+        "/api/runtime/quality_management/eqms_ncr_records/{id}/transition"
+      ]
+    },
+    {
       "tableKey": "public.eqms_publication_event",
       "table": "eqms_publication_event",
       "endpointCount": 5,
@@ -6181,6 +7248,96 @@
       ]
     },
     {
+      "tableKey": "public.eqms_quality_agreements",
+      "table": "eqms_quality_agreements",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_quality_agreements.create",
+        "quality_management.eqms_quality_agreements.delete",
+        "quality_management.eqms_quality_agreements.detail",
+        "quality_management.eqms_quality_agreements.list",
+        "quality_management.eqms_quality_agreements.transition",
+        "quality_management.eqms_quality_agreements.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_quality_agreements",
+        "/api/runtime/quality_management/eqms_quality_agreements/{id}",
+        "/api/runtime/quality_management/eqms_quality_agreements/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_quality_tower_snapshots",
+      "table": "eqms_quality_tower_snapshots",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_quality_tower_snapshots.create",
+        "quality_management.eqms_quality_tower_snapshots.delete",
+        "quality_management.eqms_quality_tower_snapshots.detail",
+        "quality_management.eqms_quality_tower_snapshots.list",
+        "quality_management.eqms_quality_tower_snapshots.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_quality_tower_snapshots",
+        "/api/runtime/quality_management/eqms_quality_tower_snapshots/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_record_links",
+      "table": "eqms_record_links",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_record_links.create",
+        "quality_management.eqms_record_links.delete",
+        "quality_management.eqms_record_links.detail",
+        "quality_management.eqms_record_links.list",
+        "quality_management.eqms_record_links.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_record_links",
+        "/api/runtime/quality_management/eqms_record_links/{id}"
+      ]
+    },
+    {
       "tableKey": "public.eqms_retention_lock",
       "table": "eqms_retention_lock",
       "endpointCount": 5,
@@ -6207,6 +7364,413 @@
       "paths": [
         "/api/runtime/record_system/eqms_retention_lock",
         "/api/runtime/record_system/eqms_retention_lock/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_risk_register",
+      "table": "eqms_risk_register",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_risk_register.create",
+        "quality_management.eqms_risk_register.delete",
+        "quality_management.eqms_risk_register.detail",
+        "quality_management.eqms_risk_register.list",
+        "quality_management.eqms_risk_register.transition",
+        "quality_management.eqms_risk_register.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_risk_register",
+        "/api/runtime/quality_management/eqms_risk_register/{id}",
+        "/api/runtime/quality_management/eqms_risk_register/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_risks_controls",
+      "table": "eqms_risks_controls",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_risks_controls.create",
+        "quality_management.eqms_risks_controls.delete",
+        "quality_management.eqms_risks_controls.detail",
+        "quality_management.eqms_risks_controls.list",
+        "quality_management.eqms_risks_controls.transition",
+        "quality_management.eqms_risks_controls.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_risks_controls",
+        "/api/runtime/quality_management/eqms_risks_controls/{id}",
+        "/api/runtime/quality_management/eqms_risks_controls/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_sampling_plans",
+      "table": "eqms_sampling_plans",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_sampling_plans.create",
+        "quality_management.eqms_sampling_plans.delete",
+        "quality_management.eqms_sampling_plans.detail",
+        "quality_management.eqms_sampling_plans.list",
+        "quality_management.eqms_sampling_plans.transition",
+        "quality_management.eqms_sampling_plans.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_sampling_plans",
+        "/api/runtime/quality_management/eqms_sampling_plans/{id}",
+        "/api/runtime/quality_management/eqms_sampling_plans/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_scars",
+      "table": "eqms_scars",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_scars.create",
+        "quality_management.eqms_scars.delete",
+        "quality_management.eqms_scars.detail",
+        "quality_management.eqms_scars.list",
+        "quality_management.eqms_scars.transition",
+        "quality_management.eqms_scars.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_scars",
+        "/api/runtime/quality_management/eqms_scars/{id}",
+        "/api/runtime/quality_management/eqms_scars/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_signatures",
+      "table": "eqms_signatures",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_signatures.create",
+        "quality_management.eqms_signatures.delete",
+        "quality_management.eqms_signatures.detail",
+        "quality_management.eqms_signatures.list",
+        "quality_management.eqms_signatures.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_signatures",
+        "/api/runtime/quality_management/eqms_signatures/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_spc_violation_acks",
+      "table": "eqms_spc_violation_acks",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_spc_violation_acks.create",
+        "quality_management.eqms_spc_violation_acks.delete",
+        "quality_management.eqms_spc_violation_acks.detail",
+        "quality_management.eqms_spc_violation_acks.list",
+        "quality_management.eqms_spc_violation_acks.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_spc_violation_acks",
+        "/api/runtime/quality_management/eqms_spc_violation_acks/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_special_characteristics",
+      "table": "eqms_special_characteristics",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_special_characteristics.create",
+        "quality_management.eqms_special_characteristics.delete",
+        "quality_management.eqms_special_characteristics.detail",
+        "quality_management.eqms_special_characteristics.list",
+        "quality_management.eqms_special_characteristics.transition",
+        "quality_management.eqms_special_characteristics.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_special_characteristics",
+        "/api/runtime/quality_management/eqms_special_characteristics/{id}",
+        "/api/runtime/quality_management/eqms_special_characteristics/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_supplier_audits",
+      "table": "eqms_supplier_audits",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_supplier_audits.create",
+        "quality_management.eqms_supplier_audits.delete",
+        "quality_management.eqms_supplier_audits.detail",
+        "quality_management.eqms_supplier_audits.list",
+        "quality_management.eqms_supplier_audits.transition",
+        "quality_management.eqms_supplier_audits.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_supplier_audits",
+        "/api/runtime/quality_management/eqms_supplier_audits/{id}",
+        "/api/runtime/quality_management/eqms_supplier_audits/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_supplier_profiles",
+      "table": "eqms_supplier_profiles",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_supplier_profiles.create",
+        "quality_management.eqms_supplier_profiles.delete",
+        "quality_management.eqms_supplier_profiles.detail",
+        "quality_management.eqms_supplier_profiles.list",
+        "quality_management.eqms_supplier_profiles.transition",
+        "quality_management.eqms_supplier_profiles.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_supplier_profiles",
+        "/api/runtime/quality_management/eqms_supplier_profiles/{id}",
+        "/api/runtime/quality_management/eqms_supplier_profiles/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_supplier_qualification_events",
+      "table": "eqms_supplier_qualification_events",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_supplier_qualification_events.create",
+        "quality_management.eqms_supplier_qualification_events.delete",
+        "quality_management.eqms_supplier_qualification_events.detail",
+        "quality_management.eqms_supplier_qualification_events.list",
+        "quality_management.eqms_supplier_qualification_events.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_supplier_qualification_events",
+        "/api/runtime/quality_management/eqms_supplier_qualification_events/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_supplier_quality_agreements",
+      "table": "eqms_supplier_quality_agreements",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_supplier_quality_agreements.create",
+        "quality_management.eqms_supplier_quality_agreements.delete",
+        "quality_management.eqms_supplier_quality_agreements.detail",
+        "quality_management.eqms_supplier_quality_agreements.list",
+        "quality_management.eqms_supplier_quality_agreements.transition",
+        "quality_management.eqms_supplier_quality_agreements.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_supplier_quality_agreements",
+        "/api/runtime/quality_management/eqms_supplier_quality_agreements/{id}",
+        "/api/runtime/quality_management/eqms_supplier_quality_agreements/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_training_curricula",
+      "table": "eqms_training_curricula",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_training_curricula.create",
+        "quality_management.eqms_training_curricula.delete",
+        "quality_management.eqms_training_curricula.detail",
+        "quality_management.eqms_training_curricula.list",
+        "quality_management.eqms_training_curricula.transition",
+        "quality_management.eqms_training_curricula.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_training_curricula",
+        "/api/runtime/quality_management/eqms_training_curricula/{id}",
+        "/api/runtime/quality_management/eqms_training_curricula/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_training_matrix",
+      "table": "eqms_training_matrix",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_training_matrix.create",
+        "quality_management.eqms_training_matrix.delete",
+        "quality_management.eqms_training_matrix.detail",
+        "quality_management.eqms_training_matrix.list",
+        "quality_management.eqms_training_matrix.transition",
+        "quality_management.eqms_training_matrix.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_training_matrix",
+        "/api/runtime/quality_management/eqms_training_matrix/{id}",
+        "/api/runtime/quality_management/eqms_training_matrix/{id}/transition"
       ]
     },
     {
@@ -6239,6 +7803,195 @@
         "/api/runtime/training_hr/eqms_training_obligation",
         "/api/runtime/training_hr/eqms_training_obligation/{id}",
         "/api/runtime/training_hr/eqms_training_obligation/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_training_records",
+      "table": "eqms_training_records",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_training_records.create",
+        "quality_management.eqms_training_records.delete",
+        "quality_management.eqms_training_records.detail",
+        "quality_management.eqms_training_records.list",
+        "quality_management.eqms_training_records.transition",
+        "quality_management.eqms_training_records.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_training_records",
+        "/api/runtime/quality_management/eqms_training_records/{id}",
+        "/api/runtime/quality_management/eqms_training_records/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_validation_executions",
+      "table": "eqms_validation_executions",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_validation_executions.create",
+        "quality_management.eqms_validation_executions.delete",
+        "quality_management.eqms_validation_executions.detail",
+        "quality_management.eqms_validation_executions.list",
+        "quality_management.eqms_validation_executions.transition",
+        "quality_management.eqms_validation_executions.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_validation_executions",
+        "/api/runtime/quality_management/eqms_validation_executions/{id}",
+        "/api/runtime/quality_management/eqms_validation_executions/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_validation_projects",
+      "table": "eqms_validation_projects",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_validation_projects.create",
+        "quality_management.eqms_validation_projects.delete",
+        "quality_management.eqms_validation_projects.detail",
+        "quality_management.eqms_validation_projects.list",
+        "quality_management.eqms_validation_projects.transition",
+        "quality_management.eqms_validation_projects.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_validation_projects",
+        "/api/runtime/quality_management/eqms_validation_projects/{id}",
+        "/api/runtime/quality_management/eqms_validation_projects/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_validation_protocols",
+      "table": "eqms_validation_protocols",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_validation_protocols.create",
+        "quality_management.eqms_validation_protocols.delete",
+        "quality_management.eqms_validation_protocols.detail",
+        "quality_management.eqms_validation_protocols.list",
+        "quality_management.eqms_validation_protocols.transition",
+        "quality_management.eqms_validation_protocols.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_validation_protocols",
+        "/api/runtime/quality_management/eqms_validation_protocols/{id}",
+        "/api/runtime/quality_management/eqms_validation_protocols/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_validation_requirements",
+      "table": "eqms_validation_requirements",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_validation_requirements.create",
+        "quality_management.eqms_validation_requirements.delete",
+        "quality_management.eqms_validation_requirements.detail",
+        "quality_management.eqms_validation_requirements.list",
+        "quality_management.eqms_validation_requirements.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_validation_requirements",
+        "/api/runtime/quality_management/eqms_validation_requirements/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.eqms_warranty_claims",
+      "table": "eqms_warranty_claims",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "quality_management.eqms_warranty_claims.create",
+        "quality_management.eqms_warranty_claims.delete",
+        "quality_management.eqms_warranty_claims.detail",
+        "quality_management.eqms_warranty_claims.list",
+        "quality_management.eqms_warranty_claims.transition",
+        "quality_management.eqms_warranty_claims.update"
+      ],
+      "paths": [
+        "/api/runtime/quality_management/eqms_warranty_claims",
+        "/api/runtime/quality_management/eqms_warranty_claims/{id}",
+        "/api/runtime/quality_management/eqms_warranty_claims/{id}/transition"
       ]
     },
     {
@@ -8165,6 +9918,38 @@
       ]
     },
     {
+      "tableKey": "public.genealogy_threads",
+      "table": "genealogy_threads",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "traceability_serialization.genealogy_threads.create",
+        "traceability_serialization.genealogy_threads.delete",
+        "traceability_serialization.genealogy_threads.detail",
+        "traceability_serialization.genealogy_threads.list",
+        "traceability_serialization.genealogy_threads.transition",
+        "traceability_serialization.genealogy_threads.update"
+      ],
+      "paths": [
+        "/api/runtime/traceability_serialization/genealogy_threads",
+        "/api/runtime/traceability_serialization/genealogy_threads/{id}",
+        "/api/runtime/traceability_serialization/genealogy_threads/{id}/transition"
+      ]
+    },
+    {
       "tableKey": "public.gl_transactions",
       "table": "gl_transactions",
       "endpointCount": 5,
@@ -8223,6 +10008,476 @@
         "/api/runtime/record_system/governed_route_registry",
         "/api/runtime/record_system/governed_route_registry/{id}",
         "/api/runtime/record_system/governed_route_registry/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.graphics_component_contract",
+      "table": "graphics_component_contract",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "system_infrastructure.graphics_component_contract.create",
+        "system_infrastructure.graphics_component_contract.delete",
+        "system_infrastructure.graphics_component_contract.detail",
+        "system_infrastructure.graphics_component_contract.list",
+        "system_infrastructure.graphics_component_contract.update"
+      ],
+      "paths": [
+        "/api/runtime/system_infrastructure/graphics_component_contract",
+        "/api/runtime/system_infrastructure/graphics_component_contract/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.graphics_contrast_check",
+      "table": "graphics_contrast_check",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "system_infrastructure.graphics_contrast_check.create",
+        "system_infrastructure.graphics_contrast_check.delete",
+        "system_infrastructure.graphics_contrast_check.detail",
+        "system_infrastructure.graphics_contrast_check.list",
+        "system_infrastructure.graphics_contrast_check.update"
+      ],
+      "paths": [
+        "/api/runtime/system_infrastructure/graphics_contrast_check",
+        "/api/runtime/system_infrastructure/graphics_contrast_check/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.graphics_module_binding",
+      "table": "graphics_module_binding",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "system_infrastructure.graphics_module_binding.create",
+        "system_infrastructure.graphics_module_binding.delete",
+        "system_infrastructure.graphics_module_binding.detail",
+        "system_infrastructure.graphics_module_binding.list",
+        "system_infrastructure.graphics_module_binding.update"
+      ],
+      "paths": [
+        "/api/runtime/system_infrastructure/graphics_module_binding",
+        "/api/runtime/system_infrastructure/graphics_module_binding/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.graphics_preview_scene",
+      "table": "graphics_preview_scene",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "system_infrastructure.graphics_preview_scene.create",
+        "system_infrastructure.graphics_preview_scene.delete",
+        "system_infrastructure.graphics_preview_scene.detail",
+        "system_infrastructure.graphics_preview_scene.list",
+        "system_infrastructure.graphics_preview_scene.update"
+      ],
+      "paths": [
+        "/api/runtime/system_infrastructure/graphics_preview_scene",
+        "/api/runtime/system_infrastructure/graphics_preview_scene/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.graphics_qa_gate_catalog",
+      "table": "graphics_qa_gate_catalog",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "system_infrastructure.graphics_qa_gate_catalog.create",
+        "system_infrastructure.graphics_qa_gate_catalog.delete",
+        "system_infrastructure.graphics_qa_gate_catalog.detail",
+        "system_infrastructure.graphics_qa_gate_catalog.list",
+        "system_infrastructure.graphics_qa_gate_catalog.update"
+      ],
+      "paths": [
+        "/api/runtime/system_infrastructure/graphics_qa_gate_catalog",
+        "/api/runtime/system_infrastructure/graphics_qa_gate_catalog/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.graphics_qa_gate_result",
+      "table": "graphics_qa_gate_result",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "system_infrastructure.graphics_qa_gate_result.create",
+        "system_infrastructure.graphics_qa_gate_result.delete",
+        "system_infrastructure.graphics_qa_gate_result.detail",
+        "system_infrastructure.graphics_qa_gate_result.list",
+        "system_infrastructure.graphics_qa_gate_result.transition",
+        "system_infrastructure.graphics_qa_gate_result.update"
+      ],
+      "paths": [
+        "/api/runtime/system_infrastructure/graphics_qa_gate_result",
+        "/api/runtime/system_infrastructure/graphics_qa_gate_result/{id}",
+        "/api/runtime/system_infrastructure/graphics_qa_gate_result/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.graphics_regulated_entity",
+      "table": "graphics_regulated_entity",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "system_infrastructure.graphics_regulated_entity.create",
+        "system_infrastructure.graphics_regulated_entity.delete",
+        "system_infrastructure.graphics_regulated_entity.detail",
+        "system_infrastructure.graphics_regulated_entity.list",
+        "system_infrastructure.graphics_regulated_entity.update"
+      ],
+      "paths": [
+        "/api/runtime/system_infrastructure/graphics_regulated_entity",
+        "/api/runtime/system_infrastructure/graphics_regulated_entity/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.graphics_rollout_scope",
+      "table": "graphics_rollout_scope",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "system_infrastructure.graphics_rollout_scope.create",
+        "system_infrastructure.graphics_rollout_scope.delete",
+        "system_infrastructure.graphics_rollout_scope.detail",
+        "system_infrastructure.graphics_rollout_scope.list",
+        "system_infrastructure.graphics_rollout_scope.transition",
+        "system_infrastructure.graphics_rollout_scope.update"
+      ],
+      "paths": [
+        "/api/runtime/system_infrastructure/graphics_rollout_scope",
+        "/api/runtime/system_infrastructure/graphics_rollout_scope/{id}",
+        "/api/runtime/system_infrastructure/graphics_rollout_scope/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.graphics_saved_experiment",
+      "table": "graphics_saved_experiment",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "system_infrastructure.graphics_saved_experiment.create",
+        "system_infrastructure.graphics_saved_experiment.delete",
+        "system_infrastructure.graphics_saved_experiment.detail",
+        "system_infrastructure.graphics_saved_experiment.list",
+        "system_infrastructure.graphics_saved_experiment.update"
+      ],
+      "paths": [
+        "/api/runtime/system_infrastructure/graphics_saved_experiment",
+        "/api/runtime/system_infrastructure/graphics_saved_experiment/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.graphics_simulation_run",
+      "table": "graphics_simulation_run",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "system_infrastructure.graphics_simulation_run.create",
+        "system_infrastructure.graphics_simulation_run.delete",
+        "system_infrastructure.graphics_simulation_run.detail",
+        "system_infrastructure.graphics_simulation_run.list",
+        "system_infrastructure.graphics_simulation_run.update"
+      ],
+      "paths": [
+        "/api/runtime/system_infrastructure/graphics_simulation_run",
+        "/api/runtime/system_infrastructure/graphics_simulation_run/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.graphics_template_zone_binding",
+      "table": "graphics_template_zone_binding",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "system_infrastructure.graphics_template_zone_binding.create",
+        "system_infrastructure.graphics_template_zone_binding.delete",
+        "system_infrastructure.graphics_template_zone_binding.detail",
+        "system_infrastructure.graphics_template_zone_binding.list",
+        "system_infrastructure.graphics_template_zone_binding.update"
+      ],
+      "paths": [
+        "/api/runtime/system_infrastructure/graphics_template_zone_binding",
+        "/api/runtime/system_infrastructure/graphics_template_zone_binding/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.graphics_theme_schedule",
+      "table": "graphics_theme_schedule",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "system_infrastructure.graphics_theme_schedule.create",
+        "system_infrastructure.graphics_theme_schedule.delete",
+        "system_infrastructure.graphics_theme_schedule.detail",
+        "system_infrastructure.graphics_theme_schedule.list",
+        "system_infrastructure.graphics_theme_schedule.update"
+      ],
+      "paths": [
+        "/api/runtime/system_infrastructure/graphics_theme_schedule",
+        "/api/runtime/system_infrastructure/graphics_theme_schedule/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.graphics_token_catalog",
+      "table": "graphics_token_catalog",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "system_infrastructure.graphics_token_catalog.create",
+        "system_infrastructure.graphics_token_catalog.delete",
+        "system_infrastructure.graphics_token_catalog.detail",
+        "system_infrastructure.graphics_token_catalog.list",
+        "system_infrastructure.graphics_token_catalog.update"
+      ],
+      "paths": [
+        "/api/runtime/system_infrastructure/graphics_token_catalog",
+        "/api/runtime/system_infrastructure/graphics_token_catalog/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.graphics_token_value",
+      "table": "graphics_token_value",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "system_infrastructure.graphics_token_value.create",
+        "system_infrastructure.graphics_token_value.delete",
+        "system_infrastructure.graphics_token_value.detail",
+        "system_infrastructure.graphics_token_value.list",
+        "system_infrastructure.graphics_token_value.update"
+      ],
+      "paths": [
+        "/api/runtime/system_infrastructure/graphics_token_value",
+        "/api/runtime/system_infrastructure/graphics_token_value/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.graphics_token_version",
+      "table": "graphics_token_version",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "system_infrastructure.graphics_token_version.create",
+        "system_infrastructure.graphics_token_version.delete",
+        "system_infrastructure.graphics_token_version.detail",
+        "system_infrastructure.graphics_token_version.list",
+        "system_infrastructure.graphics_token_version.update"
+      ],
+      "paths": [
+        "/api/runtime/system_infrastructure/graphics_token_version",
+        "/api/runtime/system_infrastructure/graphics_token_version/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.graphics_wcag_check",
+      "table": "graphics_wcag_check",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "system_infrastructure.graphics_wcag_check.create",
+        "system_infrastructure.graphics_wcag_check.delete",
+        "system_infrastructure.graphics_wcag_check.detail",
+        "system_infrastructure.graphics_wcag_check.list",
+        "system_infrastructure.graphics_wcag_check.update"
+      ],
+      "paths": [
+        "/api/runtime/system_infrastructure/graphics_wcag_check",
+        "/api/runtime/system_infrastructure/graphics_wcag_check/{id}"
       ]
     },
     {

@@ -1,10 +1,10 @@
 {
     "_meta": {
-        "generatedAt": "2026-04-15T10:51:54+00:00",
+        "generatedAt": "2026-04-24T08:04:10+00:00",
         "sourceMode": "portal_only",
         "sourceAvailable": false,
         "sourceRoot": "/Users/a10/Documents/mom/../my-project",
-        "portalTables": 764,
+        "portalTables": 837,
         "myProjectTables": 0,
         "gaps": 0,
         "note": "External my-project source is unavailable in this workspace; migration-gap comparison is intentionally skipped."

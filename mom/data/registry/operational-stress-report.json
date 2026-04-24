@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-15T10:51:52.052Z",
+    "generatedAt": "2026-04-24T08:04:07.781Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "description": "Operational stress assessment for real-world backend failure and recovery conditions."
   },
@@ -11,12 +11,12 @@
     "high": 0,
     "medium": 0,
     "watch": 12,
-    "idempotency_mentions": 22222,
+    "idempotency_mentions": 24405,
     "idempotency_contract_coverage_ratio": 1.0,
     "default_retry_safe_ratio": 1.0,
     "create_endpoints_requiring_client_key": 0,
     "compensation_markers": 5,
-    "correction_markers": 2259,
+    "correction_markers": 2413,
     "period_close_mentions": 40,
     "credit_memo_mentions": 24,
     "debit_memo_mentions": 24,
@@ -45,35 +45,35 @@
   },
   "current_local_signals": {
     "signal_counts": {
-      "idempotency_mentions": 22222,
-      "optimistic_concurrency_mentions": 8364,
+      "idempotency_mentions": 24405,
+      "optimistic_concurrency_mentions": 9186,
       "if_match_mentions": 3402,
-      "row_version_mentions": 27025,
+      "row_version_mentions": 27784,
       "compensation_markers": 5,
-      "correction_markers": 2259,
-      "effective_dating_markers": 834,
-      "override_mentions": 139,
-      "waiver_mentions": 196,
-      "heartbeat_mentions": 33,
-      "quarantine_mentions": 364,
-      "disposition_mentions": 786,
+      "correction_markers": 2413,
+      "effective_dating_markers": 1061,
+      "override_mentions": 154,
+      "waiver_mentions": 245,
+      "heartbeat_mentions": 59,
+      "quarantine_mentions": 381,
+      "disposition_mentions": 940,
       "period_close_mentions": 40,
       "credit_memo_mentions": 24,
       "debit_memo_mentions": 24,
       "backdate_exception_mentions": 35,
-      "archive_mentions": 27622,
-      "snapshot_mentions": 1458,
-      "esign_mentions": 441,
-      "cycle_count_mentions": 342
+      "archive_mentions": 30324,
+      "snapshot_mentions": 1637,
+      "esign_mentions": 452,
+      "cycle_count_mentions": 343
     },
     "idempotency_runtime_contract": {
-      "mutating_endpoint_count": 2666,
-      "idempotent_endpoint_count": 2666,
+      "mutating_endpoint_count": 2931,
+      "idempotent_endpoint_count": 2931,
       "idempotency_contract_coverage_ratio": 1.0,
-      "default_retry_safe_endpoint_count": 2666,
+      "default_retry_safe_endpoint_count": 2931,
       "default_retry_safe_ratio": 1.0,
       "create_endpoints_requiring_client_key": 0,
-      "response_replay_documented_count": 2666
+      "response_replay_documented_count": 2931
     },
     "override_resources": [
       "quality_improvement.concessions",
@@ -105,16 +105,16 @@
       "current_severity": "watch",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 22222,
+        "idempotency_mentions": 24405,
         "if_match_mentions": 3402,
-        "row_version_mentions": 27025,
-        "mutating_endpoint_count": 2666,
-        "idempotent_endpoint_count": 2666,
+        "row_version_mentions": 27784,
+        "mutating_endpoint_count": 2931,
+        "idempotent_endpoint_count": 2931,
         "idempotency_contract_coverage_ratio": 1.0,
-        "default_retry_safe_endpoint_count": 2666,
+        "default_retry_safe_endpoint_count": 2931,
         "default_retry_safe_ratio": 1.0,
         "create_endpoints_requiring_client_key": 0,
-        "response_replay_documented_count": 2666
+        "response_replay_documented_count": 2931
       },
       "required_controls": []
     },
@@ -128,7 +128,7 @@
       ],
       "evidence": {
         "compensation_markers": 5,
-        "correction_markers": 2259,
+        "correction_markers": 2413,
         "reconciliation_resources": [
           "integration_resilience.reconciliation-exceptions"
         ]
@@ -163,8 +163,8 @@
         "Effective dating and release-snapshot resources are both present at meaningful breadth, so the remaining risk is no longer an active design blocker."
       ],
       "evidence": {
-        "effective_dating_markers": 834,
-        "snapshot_mentions": 1458,
+        "effective_dating_markers": 1061,
+        "snapshot_mentions": 1637,
         "snapshot_resources": [
           "analytics.inventory-balance-snapshots",
           "analytics.mes-oee-snapshots",
@@ -199,9 +199,9 @@
         "Typed, signed, timeboxed override resources are now explicit, so the remaining risk is governance execution quality rather than missing platform structure."
       ],
       "evidence": {
-        "override_mentions": 139,
-        "waiver_mentions": 196,
-        "esign_mentions": 441,
+        "override_mentions": 154,
+        "waiver_mentions": 245,
+        "esign_mentions": 452,
         "override_resources": [
           "quality_improvement.concessions",
           "quality_improvement.deviations",
@@ -222,8 +222,8 @@
         "Heartbeat visibility, retry controls, and reconciliation resources now exist together, so this path no longer represents an active architecture gap."
       ],
       "evidence": {
-        "heartbeat_mentions": 33,
-        "idempotency_mentions": 22222,
+        "heartbeat_mentions": 59,
+        "idempotency_mentions": 24405,
         "compensation_markers": 5,
         "reconciliation_resources": [
           "integration_resilience.reconciliation-exceptions"
@@ -240,9 +240,9 @@
         "Archive, correction, and signature evidence are all first-class, so continuity risk has moved into residual-watch territory."
       ],
       "evidence": {
-        "archive_mentions": 27622,
-        "correction_markers": 2259,
-        "esign_mentions": 441
+        "archive_mentions": 30324,
+        "correction_markers": 2413,
+        "esign_mentions": 452
       },
       "required_controls": []
     },
@@ -255,7 +255,7 @@
         "Cycle-count resources are now modeled alongside inventory truth, so discrepancy handling is no longer an active structural gap."
       ],
       "evidence": {
-        "cycle_count_mentions": 342,
+        "cycle_count_mentions": 343,
         "cycle_resources": [
           "inventory_logistics.cycle-count-plans"
         ],

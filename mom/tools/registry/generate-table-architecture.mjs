@@ -997,6 +997,7 @@ const tableDomainOverrides = {
   emergency_change_controls: 'plm_change_control',
   rollback_requirements: 'plm_change_control',
   genealogy_edge_facts: 'traceability_serialization',
+  genealogy_threads: 'traceability_serialization',
   traceability_5m_obligations: 'traceability_serialization',
 };
 
@@ -1654,6 +1655,11 @@ function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, 'utf8'));
 }
 
+function readJsonOr(filePath, fallback) {
+  if (!fs.existsSync(filePath)) return fallback;
+  return readJson(filePath);
+}
+
 function writeJson(filePath, value) {
   fs.writeFileSync(filePath, `${JSON.stringify(value, null, 2)}\n`, 'utf8');
 }
@@ -2228,7 +2234,7 @@ function parseCreateTableStatement(stmt, tables, migration) {
 
 function parseAlterTableStatement(stmt, tables, migration) {
   const masked = maskSingleQuotedLiterals(stmt);
-  const match = masked.match(/ALTER\s+TABLE\s+(?:ONLY\s+)?("?[\w.]+"?)/i);
+  const match = masked.match(/ALTER\s+TABLE\s+(?:ONLY\s+)?(?:IF\s+EXISTS\s+)?("?[\w.]+"?)/i);
   if (!match) return false;
   if (!/\bADD\s+(?:COLUMN|CONSTRAINT|PRIMARY\s+KEY|UNIQUE|FOREIGN\s+KEY)\b/i.test(masked)
       && !/\bALTER\s+(?:COLUMN\s+)?"?[\w]+"?\s+(?:SET\s+DATA\s+)?TYPE\b/i.test(masked)) {
@@ -2344,7 +2350,7 @@ function collectRegistryMaps() {
   const statusOptions = readJson(path.join(registryDir, 'status-options.json'));
   const computedFormulas = readJson(path.join(registryDir, 'computed-formulas.json'));
   const relationMap = readJson(path.join(registryDir, 'relation-map.json'));
-  const auditReport = readJson(path.join(docsDir, 'schema-field-audit-full.json'));
+  const auditReport = readJsonOr(path.join(docsDir, 'schema-field-audit-full.json'), { orphan_fields: { genuine: [] } });
 
   const fieldByKey = new Map();
   const fieldByDbColumn = new Map();
@@ -2440,6 +2446,9 @@ function inferDomain(tableName, migration) {
   if (/^trade_/.test(tableName)) return 'trade_compliance';
   if (/^calibration_/.test(tableName)) return 'calibration_equipment';
   if (/^lean_/.test(tableName)) return 'lean_manufacturing';
+  if (/^eqms_/.test(tableName)) return 'quality_management';
+  if (/^dcc_/.test(tableName)) return 'document_control';
+  if (/^graphics_/.test(tableName)) return 'system_infrastructure';
   if (/^org_/.test(tableName)) return 'foundation_governance';
   if (/^retention_/.test(tableName) || /^source_system_/.test(tableName) || /^data_archival_/.test(tableName)) return 'master_data_governance';
   if (/^integration_/.test(tableName)) return 'system_infrastructure';
@@ -3361,7 +3370,7 @@ function main() {
   writeJson(path.join(registryDir, 'domain-architecture.json'), domainArchitecture);
   writeJson(path.join(registryDir, 'orphan-resolution.json'), orphanResolution);
   writeJson(
-    path.join(docsDir, 'table_columns.json'),
+    path.join(registryDir, 'table-columns.json'),
     Object.fromEntries(
       [...parsed.tables.values()]
         .sort((left, right) => left.tableName.localeCompare(right.tableName))
