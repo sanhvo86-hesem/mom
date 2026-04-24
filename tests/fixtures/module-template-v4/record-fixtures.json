@@ -1,0 +1,14 @@
+{
+  "records": [
+    {
+      "resource_family": "quotations",
+      "record_id": "QUO-DEMO-001",
+      "state": "draft"
+    },
+    {
+      "resource_family": "nonconformance-cases",
+      "record_id": "NQCASE-DEMO-001",
+      "state": "triage"
+    }
+  ]
+}

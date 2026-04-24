@@ -1,0 +1,15 @@
+{
+  "states": [
+    "loading",
+    "empty",
+    "filter-empty",
+    "stale",
+    "degraded",
+    "offline",
+    "conflict",
+    "invalid-query",
+    "no-access",
+    "partial-access",
+    "bridge"
+  ]
+}

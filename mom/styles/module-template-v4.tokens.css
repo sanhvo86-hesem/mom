@@ -1,0 +1,54 @@
+/* HESEM Operations Platform — module-template-v4 token layer.
+   Additive. Uses only --hmv4-* custom properties and hmv4-* selectors. */
+:root {
+  --hmv4-bg: var(--bg-page, var(--bg, #f4f6f8));
+  --hmv4-surface: var(--bg-surface, var(--surface, #ffffff));
+  --hmv4-surface-alt: var(--bg-surface-alt, #f8fafc);
+  --hmv4-border: var(--border, #d8dee6);
+  --hmv4-border-strong: var(--border-strong, #b8c0cc);
+  --hmv4-text: var(--text-primary, var(--text, #17202a));
+  --hmv4-text-2: var(--text-secondary, #475569);
+  --hmv4-text-3: var(--text-tertiary, #748094);
+  --hmv4-brand: var(--brand, #0c2d48);
+  --hmv4-accent: var(--brand-2, #1565c0);
+  --hmv4-success: var(--green, #2e7d32);
+  --hmv4-warning: var(--amber, #f59e0b);
+  --hmv4-danger: var(--red, #dc2626);
+  --hmv4-info: var(--blue, #2563eb);
+  --hmv4-radius-sm: var(--radius-sm, 6px);
+  --hmv4-radius-md: var(--radius-md, 10px);
+  --hmv4-radius-lg: var(--radius-lg, 14px);
+  --hmv4-space-1: var(--space-1, 4px);
+  --hmv4-space-2: var(--space-2, 8px);
+  --hmv4-space-3: var(--space-3, 12px);
+  --hmv4-space-4: var(--space-4, 16px);
+  --hmv4-space-5: var(--space-5, 24px);
+  --hmv4-header-h: var(--header-h, 56px);
+  --hmv4-sidebar-w: var(--sidebar-w, 280px);
+  --hmv4-sidebar-w-collapsed: 72px;
+  --hmv4-shadow-sm: 0 1px 2px rgb(15 23 42 / .08);
+  --hmv4-shadow-md: 0 8px 24px rgb(15 23 42 / .10);
+  --hmv4-font-sans: var(--font-sans, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  --hmv4-focus-ring: 0 0 0 3px color-mix(in srgb, var(--hmv4-accent) 28%, transparent);
+}
+
+[data-density="compact"] {
+  --hmv4-space-3: 10px;
+  --hmv4-space-4: 14px;
+  --hmv4-header-h: 52px;
+}
+
+[data-color-mode="dark"], [data-theme="dark"] {
+  --hmv4-bg: var(--bg-page, #0f172a);
+  --hmv4-surface: var(--bg-surface, #111827);
+  --hmv4-surface-alt: #1f2937;
+  --hmv4-border: #334155;
+  --hmv4-border-strong: #475569;
+  --hmv4-text: #f8fafc;
+  --hmv4-text-2: #cbd5e1;
+  --hmv4-text-3: #94a3b8;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root { --hmv4-transition: none; }
+}

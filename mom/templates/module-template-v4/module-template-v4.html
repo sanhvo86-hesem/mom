@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en" class="hmv4-document" data-hm-shell="ops" data-route-class="SH">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="light dark" />
+  <title>HESEM Operations Platform — module-template-v4</title>
+  <link rel="stylesheet" href="/styles/module-template-v4.tokens.css" />
+  <link rel="stylesheet" href="/styles/module-template-v4.css" />
+</head>
+<body class="hmv4-body" data-hm-shell="ops">
+  <a class="hmv4-skip-link" href="#hmv4-content">Skip to main content</a>
+
+  <div id="hmv4-ops-shell" class="hmv4-ops-shell" data-hm-shell="ops" data-hm-component="ops-shell" data-route-class="SH" data-bridge-policy="canonical">
+    <header class="hmv4-top-shell-header" data-hm-region="top_shell_header" data-hm-slot="top-shell-header">
+      <a class="hmv4-brand" href="/ops" aria-label="HESEM Operations Platform home">
+        <span class="hmv4-brand-mark" aria-hidden="true">H</span>
+        <span class="hmv4-brand-text">HESEM Operations Platform</span>
+      </a>
+      <div class="hmv4-global-actions" data-hm-slot="global-actions">
+        <label class="hmv4-search" for="hmv4-global-search">
+          <span class="hmv4-visually-hidden">Global search</span>
+          <input id="hmv4-global-search" type="search" placeholder="Search records, workspaces, documents…" data-hm-component="global-search" />
+        </label>
+        <button type="button" class="hmv4-icon-button" data-action-intent="open-notifications" aria-label="Notifications">●</button>
+      </div>
+    </header>
+
+    <aside class="hmv4-left-navigation-rail" data-hm-region="left_navigation_rail" aria-label="Operations navigation">
+      <nav class="hmv4-nav" data-hm-component="left-nav"></nav>
+    </aside>
+
+    <main id="hmv4-content" class="hmv4-main" data-hm-region="content_canvas" tabindex="-1">
+      <nav class="hmv4-breadcrumb-row" data-hm-region="breadcrumb_row" aria-label="Breadcrumb"></nav>
+      <header class="hmv4-page-header-zone" data-hm-region="page_header_zone"></header>
+      <section class="hmv4-page-command-bar" data-hm-region="page_command_bar" aria-label="Page commands" hidden></section>
+      <section class="hmv4-content-canvas" data-hm-slot="route-content"></section>
+    </main>
+
+    <aside class="hmv4-contextual-side-zone" data-hm-region="contextual_side_zone" hidden></aside>
+    <footer class="hmv4-bottom-status-sync-rail" data-hm-region="bottom_status_sync_rail" hidden aria-live="polite"></footer>
+  </div>
+
+  <template id="hmv4-template-feedback">
+    <div class="hmv4-feedback" data-hm-component="feedback" data-feedback-state="info" role="status">
+      <strong data-hm-slot="feedback-title"></strong>
+      <p data-hm-slot="feedback-body"></p>
+    </div>
+  </template>
+
+  <template id="hmv4-template-card">
+    <article class="hmv4-card" data-hm-component="card">
+      <h3 data-hm-slot="card-title"></h3>
+      <p data-hm-slot="card-body"></p>
+      <a class="hmv4-card-link" data-hm-slot="card-link"></a>
+    </article>
+  </template>
+
+  <script src="/scripts/portal/71-module-template-v4-routes.js"></script>
+  <script src="/scripts/portal/72-module-template-v4-bridge.js"></script>
+  <script src="/scripts/portal/73-module-template-v4-renderers.js"></script>
+  <script src="/scripts/portal/70-module-template-v4-hydration.js"></script>
+</body>
+</html>

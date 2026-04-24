@@ -1,0 +1,15 @@
+{
+  "viewports": [
+    "desktop",
+    "tablet",
+    "mobile"
+  ],
+  "themes": [
+    "light",
+    "dark"
+  ],
+  "density": [
+    "default",
+    "compact"
+  ]
+}

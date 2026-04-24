@@ -1,0 +1,10 @@
+{
+  "requirements": [
+    "skip-link",
+    "breadcrumb aria-label",
+    "aria-current",
+    "tablist roles",
+    "focus-visible",
+    "no fixture prod load"
+  ]
+}

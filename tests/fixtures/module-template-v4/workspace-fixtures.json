@@ -1,0 +1,14 @@
+{
+  "families": [
+    "queue",
+    "board",
+    "tower",
+    "explorer",
+    "matrix",
+    "packet",
+    "dashboard",
+    "monitor",
+    "analytics",
+    "archive"
+  ]
+}

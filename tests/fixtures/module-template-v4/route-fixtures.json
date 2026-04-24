@@ -1,0 +1,11 @@
+{
+  "SH": "/ops",
+  "DL": "/ops/quality-operations",
+  "ML": "/ops/quality-operations/quality-tower",
+  "AC": "/ops/records/quotations",
+  "AR": "/ops/records/quotations/QUO-DEMO-001",
+  "ERD": "/ops/records/controlled-documents/CDOC-DEMO-001/drafts/DRAFT-1",
+  "NRD": "/ops/customer-order-commit/rfq-quote-studio/drafts/DRAFT-NEW-1",
+  "WS": "/ops/planning-scheduling/dispatch-board/board",
+  "SFW": "/ops/quality-operations/metrology-release-trace/explorer/lots/LOT-DEMO-001"
+}

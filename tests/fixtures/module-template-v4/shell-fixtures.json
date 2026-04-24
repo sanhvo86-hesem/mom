@@ -1,0 +1,13 @@
+{
+  "shell": "/ops",
+  "zones": [
+    "top_shell_header",
+    "left_navigation_rail",
+    "breadcrumb_row",
+    "page_header_zone",
+    "page_command_bar",
+    "content_canvas",
+    "contextual_side_zone",
+    "bottom_status_sync_rail"
+  ]
+}

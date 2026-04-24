@@ -1,0 +1,16 @@
+{
+  "pageKeys": [
+    "dashboard",
+    "orders",
+    "dispatch",
+    "eqms"
+  ],
+  "eqmsModules": [
+    "quality-tower",
+    "ncr",
+    "capa",
+    "inspection",
+    "batch-release",
+    "genealogy"
+  ]
+}
