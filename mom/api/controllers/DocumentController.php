@@ -1773,9 +1773,36 @@ class DocumentController extends BaseController
      */
     private function resolveDocumentCatalogEntry(string $code, string $baseRel): array
     {
-        $items = load_custom_docs($this->confDir . '/docs_custom.json');
         $canonical = \MOM\Services\DocumentControl\DocumentControlService::canonicalizeCode($code);
         $normalizedPath = str_replace('\\', '/', trim($baseRel));
+        $customDocs = load_custom_docs($this->confDir . '/docs_custom.json');
+        $resolved = $this->findDocumentCatalogMatch($customDocs, $canonical, $normalizedPath);
+        if ($resolved === []) {
+            $displayConfig = portal_load_display_config($this->confDir . '/portal_display_config.json');
+            $resolved = $this->findDocumentCatalogMatch($this->managedDocumentCatalog($displayConfig), $canonical, $normalizedPath);
+        }
+        if ($resolved === []) {
+            return [];
+        }
+
+        $docDescriptions = $this->loadLegacyDocDescriptions();
+        if (
+            trim((string)($resolved['description'] ?? '')) === ''
+            && $canonical !== ''
+            && isset($docDescriptions[$canonical])
+        ) {
+            $resolved['description'] = $docDescriptions[$canonical];
+        }
+
+        return $resolved;
+    }
+
+    /**
+     * @param array<int, mixed> $items
+     * @return array<string, mixed>
+     */
+    private function findDocumentCatalogMatch(array $items, string $canonical, string $normalizedPath): array
+    {
         foreach ($items as $row) {
             if (!is_array($row)) {
                 continue;
@@ -1787,6 +1814,40 @@ class DocumentController extends BaseController
             }
         }
         return [];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function loadLegacyDocDescriptions(): array
+    {
+        static $cache = null;
+        if (is_array($cache)) {
+            return $cache;
+        }
+
+        $file = $this->confDir . '/doc_descriptions.json';
+        if (!is_file($file)) {
+            $cache = [];
+            return $cache;
+        }
+
+        $decoded = json_decode((string)@file_get_contents($file), true);
+        if (!is_array($decoded)) {
+            $cache = [];
+            return $cache;
+        }
+
+        $cache = [];
+        foreach ($decoded as $docCode => $description) {
+            $canonical = \MOM\Services\DocumentControl\DocumentControlService::canonicalizeCode((string)$docCode);
+            $value = trim((string)$description);
+            if ($canonical !== '' && $value !== '') {
+                $cache[$canonical] = $value;
+            }
+        }
+
+        return $cache;
     }
 
     private function assertWorkflowDocumentAccess(array $user, string $code, string $baseRel): void
