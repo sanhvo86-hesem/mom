@@ -20,6 +20,7 @@ return static function (Router $router, string $dataDir): void {
     $router->post('/api/v1/eqms/control-plane/documents/delete-drafts', CanonicalDocumentAuthoringController::class, 'deleteDrafts');
     $router->post('/api/v1/eqms/control-plane/documents/delete-version', CanonicalDocumentAuthoringController::class, 'deleteVersion');
     $router->post('/api/v1/eqms/control-plane/documents/start-new-revision', CanonicalDocumentAuthoringController::class, 'startNewRevision');
+    $router->post('/api/v1/eqms/control-plane/documents/ensure-locale', CanonicalDocumentAuthoringController::class, 'ensureLocale');
     $router->get('/api/v1/eqms/control-plane/documents/versions', CanonicalDocumentAuthoringController::class, 'listVersions');
     $router->post('/api/v1/eqms/documents/revisions', EqmsControlPlaneController::class, 'createDocumentRevision');
     $router->post('/api/v1/eqms/documents/read-acknowledgements', EqmsControlPlaneController::class, 'acknowledgeDocumentRead');

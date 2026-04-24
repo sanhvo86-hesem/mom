@@ -92,4 +92,14 @@ final class CanonicalDocumentAuthoringController extends DocumentController
             $this->restoreLegacyWriteGuard();
         }
     }
+
+    public function ensureLocale(): never
+    {
+        $this->suspendLegacyWriteGuard();
+        try {
+            parent::ensureLocale();
+        } finally {
+            $this->restoreLegacyWriteGuard();
+        }
+    }
 }

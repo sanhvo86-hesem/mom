@@ -176,6 +176,17 @@ The preferred runtime contract is:
    - target `translation_state`
 4. Backend writes hidden-sibling artifact and upserts the locale row.
 
+### 9.2.1 Provider setup rule
+
+1. The provider command must be reproducible from repo truth, not tribal knowledge.
+2. Repo-local provider scripts belong under `tools/scripts/translation/`.
+3. VPS/bootstrap setup for provider dependencies belongs under `tools/vps-setup/scripts/`.
+4. PHP-FPM/runtime environment must point `DCC_TRANSLATION_COMMAND` at a concrete repo-local command, typically:
+   - provider venv Python
+   - repo-local provider script
+5. If the provider runtime or model is missing, the system must fail into `blocked` truthfully.
+6. `machine_preview` output may be rough and still useful, but it must remain non-authoritative until human review/release.
+
 ### 9.3 Working-draft hash rule
 
 For draft and in-review documents, source-hash truth must follow the current working source, not only the last released live file.
@@ -186,6 +197,18 @@ That means:
 2. archive-only path rewrites such as injected archive `<base href>` must be normalized out before hashing;
 3. starting a new revision without content changes must not falsely invalidate a still-matching English artifact;
 4. exact revision equality is not enough by itself to invalidate a draft/in-review English preview when the current working source hash still matches the artifact baseline.
+
+### 9.4 Legacy bootstrap and backfill rule
+
+Older controlled documents created before locale auto-sync existed must still be able to obtain an English artifact without reopening the Vietnamese editor.
+
+Rules:
+
+1. The portal may trigger a governed backend `ensure-locale` / bootstrap command when English is requested for a legacy HTML document with no locale artifact yet.
+2. This bootstrap path must use the current canonical Vietnamese source snapshot; it must never translate rendered iframe DOM.
+3. Bootstrap may create a `machine_preview` artifact for view purposes, but it must not silently mark the artifact as released.
+4. Bootstrap success must refresh DCC locale projection and rerender the viewer against the new artifact.
+5. Bootstrap failure must leave the viewer fail-closed and surface truthful `missing` or `blocked` state.
 
 ## 10. Drift And Regeneration Rule
 

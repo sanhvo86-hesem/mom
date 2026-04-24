@@ -953,6 +953,82 @@ function getEnglishLocaleUnavailableCopy(localeView){
   };
 }
 
+const __DOC_ENGLISH_LOCALE_BOOTSTRAP = Object.create(null);
+
+function isHtmlDocEligibleForLocaleBootstrap(doc){
+  if(!doc) return false;
+  const ext = String(doc.ext || '').trim().toLowerCase();
+  const path = String(doc.path || '').trim().toLowerCase();
+  return ext === 'html' || ext === 'htm' || /\.html?$/.test(path);
+}
+
+async function ensureDocEnglishLocaleArtifact(doc, options){
+  const opts = options && typeof options === 'object' ? options : {};
+  if(lang !== 'en') return { ok: true, skipped: true, reason: 'locale_not_en' };
+  if(!doc || !isHtmlDocEligibleForLocaleBootstrap(doc)) return { ok: true, skipped: true, reason: 'doc_not_bootstrap_eligible' };
+  if(typeof controlPlaneDocumentAuthoringRequest !== 'function') return { ok: false, skipped: true, reason: 'control_plane_request_helper_missing' };
+
+  const localeView = getDocLocaleView(doc);
+  const translationState = String(localeView && localeView.translationState || '').trim().toLowerCase();
+  if(localeView && localeView.available){
+    return { ok: true, skipped: true, reason: 'locale_artifact_already_available', translationState: translationState || 'released' };
+  }
+  if(!opts.force && translationState !== '' && translationState !== 'missing'){
+    return { ok: true, skipped: true, reason: 'locale_state_not_bootstrappable', translationState };
+  }
+
+  const code = String(doc.code || '').trim();
+  const basePath = String(doc.path || '').trim();
+  if(!code || !basePath){
+    return { ok: false, skipped: true, reason: 'missing_code_or_path' };
+  }
+
+  if(__DOC_ENGLISH_LOCALE_BOOTSTRAP[code]){
+    return await __DOC_ENGLISH_LOCALE_BOOTSTRAP[code];
+  }
+
+  const task = (async function(){
+    const res = await controlPlaneDocumentAuthoringRequest('ensure-locale', {
+      code: code,
+      base_path: basePath,
+      locale: 'en',
+      force: !!opts.force
+    }, 'POST', 120000);
+
+    if(res && res.ok && typeof refreshDccOverlayFromServer === 'function'){
+      try{ await refreshDccOverlayFromServer({refreshUi:false}); }catch(e){}
+    }
+    return res;
+  })();
+
+  __DOC_ENGLISH_LOCALE_BOOTSTRAP[code] = task;
+  try{
+    return await task;
+  } finally {
+    delete __DOC_ENGLISH_LOCALE_BOOTSTRAP[code];
+  }
+}
+
+function triggerDocEnglishLocaleBootstrap(doc, options){
+  if(lang !== 'en' || !doc) return;
+  ensureDocEnglishLocaleArtifact(doc, options).then(function(res){
+    if(!res || res.ok === false) return;
+    if(editMode) return;
+    const code = String(doc.code || '').trim();
+    if(!code || currentDoc !== code) return;
+    const latestDoc = (typeof window._resolveDocRecord === 'function') ? window._resolveDocRecord(code) : doc;
+    try{ updateDocViewerHeader(latestDoc); }catch(e){}
+    try{ renderWorkflowPanel(latestDoc); }catch(e){}
+    try{ renderVersionHistory(latestDoc); }catch(e){}
+    try{ loadDocContent(latestDoc); }catch(e){}
+  }).catch(function(err){
+    try{ console.warn('[Locale bootstrap] English ensure failed', err); }catch(e){}
+  });
+}
+
+window.ensureDocEnglishLocaleArtifact = ensureDocEnglishLocaleArtifact;
+window.triggerDocEnglishLocaleBootstrap = triggerDocEnglishLocaleBootstrap;
+
 function qmsLooksLikeStrayDocCss(text){
   const s = String(text || '');
   if(!s) return false;

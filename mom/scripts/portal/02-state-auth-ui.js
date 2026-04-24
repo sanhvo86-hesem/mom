@@ -2877,6 +2877,11 @@ async function openDoc(code){
 
   // Load current document HTML immediately
   loadDocContent(doc);
+  try{
+    if(lang === 'en' && typeof triggerDocEnglishLocaleBootstrap === 'function'){
+      triggerDocEnglishLocaleBootstrap(doc);
+    }
+  }catch(e){}
 
   // Background: refresh server-backed state + versions, then re-render once
   try{
@@ -2914,6 +2919,11 @@ async function openDocPreview(code){
     renderWorkflowPanel(doc);
     renderVersionHistory(doc);
     loadDocContent(doc);
+    try{
+      if(lang === 'en' && typeof triggerDocEnglishLocaleBootstrap === 'function'){
+        triggerDocEnglishLocaleBootstrap(doc);
+      }
+    }catch(e){}
   }catch(err){
     console.error('openDocPreview error:', err);
   }

@@ -56,6 +56,9 @@ You must verify repo truth. Do **not** trust prior summaries, claims, or closure
 - `mom/api/openapi.yaml`
 - `mom/database/migrations/150_dcc_document_change_control.sql`
 - `mom/database/migrations/152_dcc_document_locale_variants.sql`
+- `tools/scripts/translation/dcc_argos_vi_to_en.py`
+- `tools/vps-setup/scripts/setup-dcc-translation-provider.sh`
+- `tools/vps-setup/php-fpm/mom.conf`
 
 ## Audit questions
 
@@ -71,6 +74,7 @@ You must verify repo truth. Do **not** trust prior summaries, claims, or closure
 10. Are repo docs/standards/openapi/api-reference now aligned with the canonical control-plane authoring surface?
 11. Did Codex introduce any new architectural shortcut, partial closure, or misleading documentation while claiming completion?
 12. Did Codex run an honest validation set and report real blockers accurately, instead of hiding debt behind vague language?
+13. Did Codex provide a repo-truth internal provider path for legacy bootstrap and post-save EN machine preview, or leave the runtime blocked on undocumented server-only setup?
 
 ## Hard constraints
 

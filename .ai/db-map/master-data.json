@@ -2,7 +2,7 @@
     "_meta": {
         "domain": "master_data",
         "table_count": 8,
-        "generated_at": "2026-04-23T06:51:26+00:00"
+        "generated_at": "2026-04-23T08:58:01+00:00"
     },
     "tables": {
         "calibration_oot_investigations": {

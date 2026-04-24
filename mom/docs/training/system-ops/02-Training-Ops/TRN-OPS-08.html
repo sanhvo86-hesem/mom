@@ -54,41 +54,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
  <div class="note-blue" style="margin:12px 0">
  <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — Training Operations</b>.
 </div>
-<div class="card">
- <div class="grid-2">
- <div>
- <div class="badge"><span class="dot"></span>Mô-đun TRN-OPS-08</div>
- 
- <p class="muted">
- Mục tiêu: giảm "sai phiên bản / sai program" về <b>0</b> bằng 3 lớp kiểm soát:
- <b>(1) Bộ hồ sơ chuẩn (mốc chuẩn gói hàng)</b> (đúng file, đúng Rev),
- <b>(2) Cổng kiểm soát (gate) kiểm tra</b> (Kế hoạch phát hành → Job khởi động → Mẫu đầu (tiên chi tiết / sản phẩm),
- <b>(3) Cấu hình đánh giá</b> (đối chiếu as‑đã xây dựng ↔ yêu cầu).
- </p>
- </div>
- <div class="note">
- <strong>Thông tin triển khai</strong>
- <ul>
- <li><strong>Đối tượng (bắt buộc):</strong> <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lập trình viên CAM / NC)"><span class="entity-code role-code">CAM</span></a></span>/CAM, Setup/Trưởng nhóm, QC/QA (CMM), <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Điều độ sản xuất)"><span class="entity-code role-code">PPL</span></a></span>/Nhân viên điều phối, <span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhóm điều hành tuyến đầu) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span>.</li>
- <li><strong>Thời lượng:</strong> 60' lý thuyết + 60' phân xưởng trên 1 job thật + 15' bài kiểm tra nhanh.</li>
- <li><strong>Tài liệu nền:</strong> <a href="../../../operations/01-SOPs/01-SOP-100/sop-106-change-and-configuration-management.html">SOP‑QMS‑020</a>, <a href="../../../operations/sops/05-SOP-500/sop-502-cnc-machining-operations.html">PROC‑CNC‑002</a>, <a download="" href="../../../forms/frm-100-sales/FRM-163_Configuration_Audit_Checklist.xlsx">FRM‑QA‑017</a>, <a href="../../../operations/02-Work-Instructions/02-WI-200">WI‑OPS‑001</a>.</li>
- </ul>
- <div class="mini"><b>Thông điệp:</b> Nếu không chứng minh được đúng Rev → <b>STOP/TẠM GIỮ</b>.</div>
- </div>
- </div>
 
- <div class="toc">
- <strong>Mục lục nhanh</strong>
- <ul>
- <li><a href="#where">2) Rev có thể sai ở đâu? (điểm đứt gãy)</a></li>
- <li><a href="#controls">3) kiểm soát thực chiến (mốc chuẩn + cổng + đánh giá)</a></li>
- <li><a href="#checklist">4) Bảng kiểm 10 điểm (job‑level)</a></li>
- <li><a href="#workshop">5) Phân xưởng: làm cấu hình đánh giá trong 15 phút</a></li>
- <li><a href="#assessment">6) Đánh giá (bài kiểm tra nhanh + tình huống)</a></li>
- <li><a href="#records">7) Hồ sơ bắt buộc</a></li>
- </ul>
- </div>
- </div>
 
  <div class="card" id="where">
  <h2>2) Rev có thể sai ở đâu? (điểm đứt gãy)</h2>

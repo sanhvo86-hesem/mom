@@ -628,6 +628,55 @@ function strip_legacy_form_or_doc_header(string $html): string
         [$start, $end] = $consumed;
         $html = substr($html, 0, $start) . substr($html, $end);
     }
+    // Also strip any `<div class="fh-*">…</div>` fragment blocks left over
+    // from a partial form-header demolition (TRN-OPS-03 had `fh-sub`,
+    // `fh-kv`, `fh-right`). These are the meta-row pieces that originally
+    // lived inside `form-header` but were promoted to siblings when the
+    // wrapper was hand-removed.
+    $fhRegex = '#<div[^>]*class=["\'][^"\']*\bfh-[a-z]+\b[^"\']*["\'][^>]*>#i';
+    while (true) {
+        $consumed = consume_balanced_div_block($html, $fhRegex);
+        if ($consumed === null) break;
+        [$start, $end] = $consumed;
+        $html = substr($html, 0, $start) . substr($html, $end);
+    }
+    return $html;
+}
+
+/**
+ * Strip stray closing `</div>` tags that sit IMMEDIATELY after the
+ * dcc-header placeholder. These appear when a previous strip pass removed
+ * the OPENING `<div class="form-header">` but left the CLOSING `</div>`
+ * orphaned in place, which over-closes the surrounding `page-body` wrapper
+ * and breaks the DOM tree (visually subtle but corrupts layout cascade).
+ *
+ * Walk forward from the placeholder end, skipping whitespace, and remove
+ * up to N stray close-divs that aren't preceded by a matching opener
+ * within our window.
+ */
+function strip_orphan_close_div_after_placeholder(string $html): string
+{
+    if (!preg_match('#<div[^>]*class=["\'][^"\']*\bdcc-header\b[^"\']*["\'][^>]*></div>#i', $html, $m, PREG_OFFSET_CAPTURE)) {
+        return $html;
+    }
+    $cursor = (int)$m[0][1] + strlen($m[0][0]);
+    // Walk through up to 4 stray closers
+    for ($n = 0; $n < 4; $n++) {
+        $ws = 0;
+        while ($cursor + $ws < strlen($html) && ctype_space($html[$cursor + $ws])) {
+            $ws++;
+        }
+        $look = substr($html, $cursor + $ws, 8);
+        if (preg_match('#^</div\s*>#i', $look, $cm)) {
+            // Confirmed stray close-div at the head of body — drop it.
+            $start = $cursor + $ws;
+            $end   = $start + strlen($cm[0]);
+            $html  = substr($html, 0, $start) . substr($html, $end);
+            // Cursor stays the same; loop again in case there are several.
+        } else {
+            break;
+        }
+    }
     return $html;
 }
 
@@ -646,22 +695,48 @@ function strip_redundant_title_blocks(string $html, string $code): string
 
     // (1) Standalone `<h1>CODE - Title</h1>` — only strip when it's the top
     //     of body content (within the first 4096 chars after dcc-header).
-    //     Match is code-AGNOSTIC: any `<h1>XXX-NNN - …</h1>` shape is
-    //     considered a redundant header by definition (the DCC ribbon
-    //     already shows ID + Title). This handles cases where the H1's
-    //     code differs from the filename-derived code (e.g.
-    //     assessment-matrix.html has H1 "TRN-FRM-03 - Assessment Matrix").
+    //     Match is code-AGNOSTIC: any `<h1>SHORTCODE - …</h1>` shape is
+    //     a redundant header by definition (the DCC ribbon already shows
+    //     ID + Title). Accept BOTH multi-segment codes (TRN-FRM-03) and
+    //     single-segment codes (C01, MRR-G2 → 1+ segment with digits).
+    //     Pattern: starts with letter, has 2+ alphanumeric/dashes, then
+    //     a separator dash, then any text.
     if (preg_match('#<div[^>]*class="[^"]*\bdcc-header\b[^"]*"[^>]*></div>(.{0,4096})#is', $html, $m, PREG_OFFSET_CAPTURE)) {
         $startAt = (int)$m[0][1] + strlen($m[0][0]) - strlen($m[1][0]);
         $window  = $m[1][0];
+        // Strip any h1 whose first token looks like a code (≥2 alphanumeric
+        // chars containing at least one digit, optionally with dashes).
         $stripped = preg_replace(
-            '#<h1\b[^>]*>\s*[A-Z][A-Z0-9]+(?:-[A-Z0-9]+)+\s*[-–][^<]*</h1>#i',
+            '#<h1\b[^>]*>\s*([A-Z][A-Z0-9-]*\d[A-Z0-9-]*)\s*[-–][^<]*</h1>#i',
             '',
             $window,
             1
         );
         if (is_string($stripped) && $stripped !== $window) {
             $html = substr($html, 0, $startAt) . $stripped . substr($html, $startAt + strlen($window));
+        }
+    }
+
+    // (5) "Hero card with grid-2 wrapper" used by C01–C19 module overview
+    //     pages. Original structure was:
+    //       <div class="card"><div class="grid-2"><div>
+    //         <div class="badge">…CODE…</div>
+    //         <h1>CODE - CODE</h1>          ← may have been stripped
+    //         <p class="muted">…</p>
+    //       </div>…</div></div>
+    //     The h1 is OPTIONAL here because variant (1) already strips it.
+    //     Anchor: card → grid-2 → div → badge containing the doc code.
+    //     Strip the entire OUTER `<div class="card">…</div>` via balanced
+    //     consumer. The DCC ribbon now owns the badge identity.
+    $needle = '#<div\s+class="card">\s*<div\s+class="grid-2">\s*<div>\s*<div\s+class="badge">[^<]*<span\s+class="dot"></span>[^<]*' . $codeRe . '[^<]*</div>#i';
+    if (preg_match($needle, $html, $m2, PREG_OFFSET_CAPTURE)) {
+        $startBlock = (int)$m2[0][1];
+        $consumed = consume_balanced_div_block(substr($html, $startBlock), '#^<div\s+class="card">#i');
+        if ($consumed !== null) {
+            [$rs, $re_end] = $consumed;
+            $html = substr($html, 0, $startBlock + $rs)
+                  . ''
+                  . substr($html, $startBlock + $re_end);
         }
     }
 

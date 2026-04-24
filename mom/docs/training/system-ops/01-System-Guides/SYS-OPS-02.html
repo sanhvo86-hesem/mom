@@ -62,52 +62,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note-blue" style="margin:12px 0">
  <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — System Operations Guide</b>.
 </div>
-<div class="card">
-<div class="grid-2">
-<div>
-<div class="badge"><span class="dot"></span>Mô-đun SYS-OPS-02</div>
 
-<p class="lead"><b>Từ "giấy tờ rời rạc" → "bằng chứng truy xuất nguồn gốc 60 giây".</b> Mô-đun này chuẩn hoá cách <b>tạo, lưu, liên kết, gắn siêu dữ liệu, gắn nhãn lưu trữ</b> để đảm bảo mọi phòng ban làm đúng một chuẩn và không bao giờ "lạc REV".</p>
-<div class="callout">
-<b>Quy tắc ranh giới (bắt buộc):</b> Dữ liệu <b>MES time mục nhập</b> nằm trong Epicor (Nguồn chuẩn) → M365 chỉ phản chiếu để bảng điều khiển/điều tra; <b>không lưu bản copy time mục nhập</b> trong SharePoint trừ khi là hồ sơ sự cố có phê duyệt.
- </div>
-</div>
-<div class="note">
-<strong>Đối tượng &amp; điều kiện triển khai</strong>
-<ul>
-<li><b>Áp dụng:</b>
-<span class="role-tag">CNC Operator</span><span class="role-tag">Setup</span><span class="role-tag"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lập trình viên CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></span><span class="role-tag"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a></span><span class="role-tag"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a></span>
-<span class="role-tag"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bộ phận Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></span><span class="role-tag"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html" title="Buyer / Purchasing (Nhân viên mua hàng)"><span class="entity-code role-code">BUY</span></a></span></span><span class="role-tag"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Điều độ sản xuất)"><span class="entity-code role-code">PPL</span></a></span></span><span class="role-tag"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Maintenance Function (Bộ phận Bảo trì)"><span class="entity-code dept-code">D-MNT</span></a></span></span><span class="role-tag"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)"><span class="entity-code role-code">EHS</span></a></span>
-<span class="role-tag"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhân viên báo giá)"><span class="entity-code role-code">EST</span></a></span></span><span class="role-tag"><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhóm điều hành tuyến đầu) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></span>
-</li>
-<li><b>Thời lượng YÊU CẦU:</b> Lý thuyết 90 phút • Thực hành 90 phút • OJT 120 phút (chia 2 ca/ngày, tối đa 2 ngày/tuần/nhân sự).</li>
-<li><b>Điều kiện trước:</b> Đã học WI-OPS-008 (Hồ sơ công việc Governance) và nắm quy tắc đặt tên file (ANNEX-QMS-003).</li>
-<li><b>Kích hoạt học:</b> (1) có job mới, (2) có Part/REV mới hoặc đổi REV, (3) chuẩn bị outsource/phê duyệt giao hàng (phê duyệt giao hàng).</li>
-</ul>
-<div class="warn" style="margin-top:10px">
-<b>Nguyên tắc kiểm soát:</b> Khi thiếu hồ sơ tối thiểu (MRR) hoặc metadata bắt buộc → <b>HOLD</b> ngay tại cổng kiểm soát, không "linh động".
- </div>
-</div>
-</div>
-<div class="toc">
-<strong>Mục lục nhanh</strong>
-<ul>
-<li><a href="#s2">2) Mục tiêu &amp; bối cảnh (vì sao phải làm đúng)</a></li>
-<li><a href="#s3">3) Vị trí trong chuỗi E2E Lệnh sản xuất (bàn giao &amp; điểm chặn)</a></li>
-<li><a href="#s4">4) Điểm đứt gãy hay gặp gặp (≥ 10) – dấu hiệu &amp; hậu quả</a></li>
-<li><a href="#s5">5) Biện pháp kiểm soát rủi ro (≥ 6) – kiểm soát trọng yếu theo vai trò</a></li>
-<li><a href="#s6">6) Dừng sớm (phát hiện lỗi sớm) quy tắc (≥ 3) – điều kiện dừng việc</a></li>
-<li><a href="#s7">7) "60-thứ hai / giây phản ứng" – xử lý nhanh khi phát hiện lỗi</a></li>
-<li><a href="#s8">8) Bảng kiểm triển khai (≤ 15 bước) – ai làm, minh chứng, lỗi hay gặp</a></li>
-<li><a href="#s9">9) OJT (TWI) + tiêu chí đánh giá đánh giá L1–L4 theo vai trò</a></li>
-<li><a href="#s10">10) Đánh giá pack: bài kiểm tra nhanh (≥ 20) + tình huống (≥ 3) + hiệu suất test</a></li>
-<li><a href="#s11">11) Tiêu chí ĐẠT/KHÔNG ĐẠT</a></li>
-<li><a href="#s12">12) MRR tối thiểu (hồ sơ) – loại hồ sơ, đặt tên, nơi lưu</a></li>
-<li><a href="#s13">13) Đánh giá phát hiện hay gặp gặp (≥ 8) &amp; cách phòng ngừa</a></li>
-<li><a href="#s14">14) DCR hồ sơ</a></li>
-</ul>
-</div>
-</div>
 <!-- 2) PURPOSE & CONTEXT -->
 <div class="card" id="s2">
 <h2>2) Mục tiêu &amp; bối cảnh (vì sao phải làm đúng)</h2>

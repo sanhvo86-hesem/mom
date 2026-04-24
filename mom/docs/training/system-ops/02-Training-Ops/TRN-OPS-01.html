@@ -54,65 +54,7 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
 <div class="note-blue" style="margin:12px 0">
  <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — Training Operations</b>.
 </div>
-<div class="card">
-<div class="grid-2">
-<div>
-<div class="badge"><span class="dot"></span>System Ops • TRN-OPS-01</div>
 
-<p class="lead" style="margin-bottom:10px">
-Mô-đun này thiết lập <b>cổng kiểm soát đào tạo</b> theo nguyên tắc: <b>không có minh chứng = không qua cổng</b>.
-Mục tiêu là bảo vệ xưởng CNC gia công theo đơn (job shop) khỏi các rủi ro "chết Người" do thiếu năng lực và thiếu hồ sơ:
-sai Rev, lẫn lô, thiếu chứng từ, đo kiểm không kiểm soát, vượt qua cổng kiểm soát, ship rủi ro.
-</p>
-<div class="tag blue">Áp dụng 2 ca/Ngày • 6 ngày/tuần</div>
-<div class="tag">Tối đa 2 ngày/tuần/vai trò</div>
-<div class="tag">MRR bắt buộc</div>
-</div>
-<div class="note">
-<strong>Thông tin triển khai</strong>
-<ul class="tight">
-<li><b>Đối tượng bắt buộc:</b></li>
-</ul>
-<div>
-<span class="role-chip">CNC Operator</span>
-<span class="role-chip">Setup</span>
-<span class="role-chip"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lập trình viên CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></span>
-<span class="role-chip"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a></span>
-<span class="role-chip"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a></span>
-<span class="role-chip"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bộ phận Kho)"><span class="entity-code dept-code">D-WHS</span></a></span></span>
-<span class="role-chip"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html" title="Buyer / Purchasing (Nhân viên mua hàng)"><span class="entity-code role-code">BUY</span></a></span></span>
-<span class="role-chip"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Điều độ sản xuất)"><span class="entity-code role-code">PPL</span></a></span></span>
-<span class="role-chip"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Maintenance Function (Bộ phận Bảo trì)"><span class="entity-code dept-code">D-MNT</span></a></span></span>
-<span class="role-chip"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)"><span class="entity-code role-code">EHS</span></a></span>
-<span class="role-chip"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhân viên báo giá)"><span class="entity-code role-code">EST</span></a></span></span>
-<span class="role-chip"><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="FRONTLINE_LEADS" href="../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-frontline-leads" title="Frontline Leads (Nhóm điều hành tuyến đầu) — WKM / SL / DBL / CPS / QCL"><span class="entity-code bundle-code">FRONTLINE_LEADS</span></a></span></span>
-</div>
-<ul class="tight" style="margin-top:10px">
-<li><b>Đầu vào bắt buộc:</b> yêu cầu năng lực theo vị trí (ma trận đào tạo (matrix), thay đổi tài liệu (SOP/WI/FRM), thay đổi Rev/bản vẽ/spec, NCR do lỗi năng lực, yêu cầu khách hàng/hợp đồng.</li>
-<li><b>Đầu ra bắt buộc:</b> kế hoạch đào tạo (FRM-HR-TRN-001), danh sách tham dự (FRM-HR-TRN-002), bảng kiểm OJT (FRM-HR-TRN-003), đánh giá năng lực (FRM-HR-TRN-004), chứng nhận level (FRM-HR-TRN-005), cập nhật ma trận đào tạo (matrix).</li>
-<li><b>Thời lượng khung:</b> Lý thuyết 90 phút • Phân xưởng 60 phút • OJT 2 ca (chia 2 lần) • Đánh giá 60 phút.</li>
-</ul>
-</div>
-</div>
-<div class="toc">
-<strong>Mục lục nhanh</strong>
-<ul>
-<li><a href="#sec2">2) Mục đích &amp; bối cảnh vận hành</a></li>
-<li><a href="#sec3">3) Vị trí trong chuỗi E2E &amp; luồng bàn giao</a></li>
-<li><a href="#sec4">4) Điểm đứt gãy (điểm gãy thực tế)</a></li>
-<li><a href="#sec5">5) Biện pháp kiểm soát rủi ro (điểm kiểm soát &amp; bằng chứng)</a></li>
-<li><a href="#sec6">6) Phát hiện lỗi sớm quy tắc &amp; tiêu chí STOP/TẠM GIỮ/CHẶN</a></li>
-<li><a href="#sec7">7) Phản ứng 60 giây</a></li>
-<li><a href="#sec8">8) Bảng kiểm vận hành (≤ 15 bước)</a></li>
-<li><a href="#sec9">9) OJT theo TWI: Job sự cố hỏng máy + Tiêu chí đánh giá L1–L4</a></li>
-<li><a href="#sec10">10) Đánh giá: Bài kiểm tra nhanh + Tình huống + Hiệu suất test</a></li>
-<li><a href="#sec11">11) ĐẠT/KHÔNG ĐẠT tiêu chí</a></li>
-<li><a href="#sec12">12) MRR tối thiểu: hồ sơ, quy tắc đặt tên, nơi lưu</a></li>
-<li><a href="#sec13">13) Chung đánh giá phát hiện &amp; phòng ngừa</a></li>
-<li><a href="#sec14">14) DCR hồ sơ</a></li>
-</ul>
-</div>
-</div>
 <div class="card" id="sec2">
 <h2 class="h2" style="margin-top:0;">2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <p class="lead">

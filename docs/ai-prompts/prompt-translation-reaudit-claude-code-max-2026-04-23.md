@@ -57,6 +57,9 @@ You must inspect and challenge at least these areas:
 - `mom/api/services/DocumentControl/DocumentLocaleAutomationService.php`
 - `mom/database/migrations/150_dcc_document_change_control.sql`
 - `mom/database/migrations/152_dcc_document_locale_variants.sql`
+- `tools/scripts/translation/dcc_argos_vi_to_en.py`
+- `tools/vps-setup/scripts/setup-dcc-translation-provider.sh`
+- `tools/vps-setup/php-fpm/mom.conf`
 
 Also inspect any rename/move/delete flow that can break `artifact_rel_path`.
 
@@ -76,6 +79,8 @@ Also inspect any rename/move/delete flow that can break `artifact_rel_path`.
 12. Can a draft or in-review document keep rendering a hash-matching English artifact after `start-new-revision` without exposing stale mixed-language content?
 13. Can draft/review auto-translation overwrite or delete the last released English artifact before release, or fail to restore it when the workflow returns to the released baseline?
 14. Do `vi` and `en` draft/in-review views resolve against the same active working source carrier/revision baseline?
+15. Can a legacy document with no locale row self-bootstrap an EN machine preview through the governed backend path?
+16. Is the configured provider path repo-local/on-prem and reproducible from repo truth instead of manual tribal setup?
 
 ## Required output shape
 

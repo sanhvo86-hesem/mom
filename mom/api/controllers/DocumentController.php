@@ -663,6 +663,111 @@ class DocumentController extends BaseController
     }
 
     /**
+     * POST ensureLocale — Bootstrap a locale artifact for an existing document.
+     *
+     * Canonical control-plane use case:
+     * - legacy released documents created before locale auto-sync existed
+     * - first English open on a document that has no EN locale artifact yet
+     *
+     * This path never edits the Vietnamese source. It only asks the backend
+     * to generate or refresh a derived locale artifact from the current
+     * canonical source snapshot when the caller is authorized to manage docs.
+     *
+     * @return never
+     */
+    public function ensureLocale(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+
+        $rolePermsFile = $this->confDir . '/role_permissions.json';
+        require_doc_workflow_editor($me, $rolePermsFile);
+
+        $data = $this->jsonBody();
+        $code = $this->workflowDocumentCode($data);
+        $path = $this->workflowPayloadPath($data);
+        $locale = strtolower(trim((string)($data['locale'] ?? ($data['target_locale'] ?? 'en'))));
+        $force = filter_var($data['force'] ?? false, FILTER_VALIDATE_BOOLEAN);
+
+        if ($code === '') {
+            $this->error('missing_code', 400);
+        }
+        if ($path === '') {
+            $this->error('missing_path', 400);
+        }
+        if ($locale !== 'en') {
+            $this->error('unsupported_locale', 422);
+        }
+
+        $baseRel = $this->resolveManagedDocumentPath($code, $path);
+        $projection = null;
+        try {
+            $projection = (new \MOM\Services\DocumentControl\DocumentControlService($this->data))
+                ->getLocalizedHeader($code, $locale);
+        } catch (Throwable $e) {
+            $projection = null;
+        }
+
+        if (!$force && is_array($projection) && !empty($projection['locale_renderable'])) {
+            $this->success([
+                'code' => $code,
+                'locale' => $locale,
+                'noop' => true,
+                'reason' => 'locale_artifact_already_renderable',
+                'locale_variant' => $projection,
+            ]);
+        }
+
+        $source = $this->resolveLocaleBootstrapSource($code, $baseRel);
+        if ($source['source_html'] === '') {
+            $this->error('missing_source_html', 409);
+        }
+
+        $localeTranslation = [];
+        try {
+            $localeTranslation = $this->localeAutomation()->syncEnglishMachinePreview([
+                'doc_code' => $code,
+                'base_rel_path' => $baseRel,
+                'source_html' => $source['source_html'],
+                'source_status' => $source['source_status'],
+                'revision' => $source['revision'],
+                'trigger' => 'bootstrap_locale',
+                'actor' => (string)($me['username'] ?? 'system'),
+                'title' => $source['title'],
+                'subtitle' => $source['subtitle'],
+                'effective_date' => $source['effective_date'],
+            ]);
+        } catch (Throwable $e) {
+            @error_log('[DocumentLocaleAutomationService] ensureLocale sync failed for ' . $code . ': ' . $e->getMessage());
+            $this->error('locale_bootstrap_failed', 500, $e->getMessage());
+        }
+
+        $freshProjection = null;
+        try {
+            $freshProjection = (new \MOM\Services\DocumentControl\DocumentControlService($this->data))
+                ->getLocalizedHeader($code, $locale);
+        } catch (Throwable $e) {
+            $freshProjection = null;
+        }
+
+        $this->auditLog('doc_locale_bootstrap', [
+            'code' => $code,
+            'locale' => $locale,
+            'source_status' => $source['source_status'],
+            'revision' => $source['revision'],
+            'translation_state' => $localeTranslation['translation_state'] ?? null,
+        ]);
+
+        $this->success([
+            'code' => $code,
+            'locale' => $locale,
+            'noop' => false,
+            'translation' => $localeTranslation,
+            'locale_variant' => $freshProjection,
+        ]);
+    }
+
+    /**
      * POST updateMeta â€” Update document metadata (title, owner, etc.).
      *
      * Legacy action: `doc_update_meta`
@@ -1284,6 +1389,68 @@ class DocumentController extends BaseController
             // fall through
         }
         return '';
+    }
+
+    /**
+     * @return array{source_html: string, source_status: string, revision: string, title: string, subtitle: ?string, effective_date: ?string}
+     */
+    private function resolveLocaleBootstrapSource(string $code, string $baseRel): array
+    {
+        $archiveDir = $this->rootDir . '/archive';
+        $state = load_doc_state($this->rootDir, $baseRel, $archiveDir, $code);
+        if (!is_array($state)) {
+            $state = [];
+        }
+
+        $catalog = $this->resolveDocumentCatalogEntry($code, $baseRel);
+        $manifest = load_doc_manifest($this->rootDir, $baseRel, $archiveDir, $code);
+        $versions = is_array($manifest['versions'] ?? null) ? $manifest['versions'] : [];
+
+        $rawRevision = trim((string)($state['released_revision'] ?? ($state['revision'] ?? ($catalog['rev'] ?? '0.0'))));
+        $rawRevision = preg_replace('/^[vV]\s*/', '', $rawRevision) ?? $rawRevision;
+        if ($rawRevision === '') {
+            $rawRevision = '0.0';
+        }
+        if (!str_contains($rawRevision, '.')) {
+            $rawRevision .= '.0';
+        }
+
+        $status = strtolower(trim((string)($state['status'] ?? ($catalog['status'] ?? 'approved'))));
+        if ($status === '') {
+            $status = 'approved';
+        }
+        if ($status === 'pending_approval') {
+            $status = 'in_review';
+        }
+
+        $sourceHtml = '';
+        if (in_array($status, ['draft', 'in_review'], true)) {
+            $sourceHtml = $this->loadWorkflowWorkingHtml($baseRel, $rawRevision, $versions);
+        }
+        if ($sourceHtml === '') {
+            try {
+                $liveAbs = join_in_root($this->rootDir, $baseRel);
+                if (is_file($liveAbs)) {
+                    $sourceHtml = (string)@file_get_contents($liveAbs);
+                }
+            } catch (Throwable $e) {
+                $sourceHtml = '';
+            }
+        }
+
+        $effectiveDate = trim((string)($state['effective_date'] ?? ($catalog['effective_date'] ?? '')));
+        if ($effectiveDate !== '' && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $effectiveDate)) {
+            $effectiveDate = gmdate('Y-m-d');
+        }
+
+        return [
+            'source_html' => $sourceHtml,
+            'source_status' => $status,
+            'revision' => $rawRevision,
+            'title' => (string)($catalog['title'] ?? $code),
+            'subtitle' => isset($catalog['description']) ? (string)$catalog['description'] : null,
+            'effective_date' => $effectiveDate !== '' ? $effectiveDate : null,
+        ];
     }
 
     /**

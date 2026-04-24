@@ -51,6 +51,7 @@ use function MOM\Tools\DccBatch\inject_or_replace_placeholder;
 use function MOM\Tools\DccBatch\clean_iso_title_concat;
 use function MOM\Tools\DccBatch\strip_legacy_title_meta_after_placeholder;
 use function MOM\Tools\DccBatch\strip_legacy_form_or_doc_header;
+use function MOM\Tools\DccBatch\strip_orphan_close_div_after_placeholder;
 use function MOM\Tools\DccBatch\strip_redundant_title_blocks;
 use function MOM\Tools\DccBatch\build_placeholder;
 use function MOM\Tools\DccBatch\logo_path_for;
@@ -206,6 +207,12 @@ foreach (walk_docs($ROOT_DIR) as $abs) {
         // downstream (SYS-OPS-01 had this exact shape).
         $candidate = strip_legacy_form_or_doc_header($next);
         if ($candidate !== $next) { $next = $candidate; $changes[] = 'strip_legacy_form_or_doc_header'; }
+
+        // Strip stray `</div>` orphaned right after the dcc-header placeholder.
+        // Some earlier strip passes removed the OPENING tag of a legacy wrapper
+        // but left its closing tag, which over-closes the page-body wrapper.
+        $candidate = strip_orphan_close_div_after_placeholder($next);
+        if ($candidate !== $next) { $next = $candidate; $changes[] = 'strip_orphan_close_div'; }
 
         // Strip the flattened legacy title + meta blocks that may sit
         // immediately AFTER the dcc-header placeholder (common in SOPs).
