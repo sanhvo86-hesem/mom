@@ -2,22 +2,22 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-24T08:04:04.401Z",
+    "generatedAt": "2026-04-24T08:27:15.189Z",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
     "publication_run_id": "c544a828-8ff5-44a4-9d02-0e0814d38afa",
-    "enterpriseAuthorityGeneratedAt": "2026-04-24T08:04:08.770168+00:00",
-    "enterpriseFrontendSimulationGeneratedAt": "2026-04-24T08:04:08.939549+00:00"
+    "enterpriseAuthorityGeneratedAt": "2026-04-24T08:27:19.645408+00:00",
+    "enterpriseFrontendSimulationGeneratedAt": "2026-04-24T08:27:19.821998+00:00"
   },
   "coverage": {
     "router_actions": 4625,
     "field_registry_actions": 5430,
-    "field_definitions": 83205,
+    "field_definitions": 85512,
     "unique_field_keys": 5265,
     "status_sets": 971,
     "workflow_count": 379,
-    "relation_edges": 3517,
-    "validation_rules": 59226,
+    "relation_edges": 3773,
+    "validation_rules": 60506,
     "formula_count": 1476,
     "domain_pack_count": 5069,
     "scalar_record_endpoints": 4481,
@@ -44,7 +44,7 @@
       "partial_entities": 0,
       "blocked_entities": 0,
       "workflow_ready_entities": 434,
-      "related_ready_entities": 780,
+      "related_ready_entities": 811,
       "analytics_ready_entities": 416,
       "planning_console_entities": 34,
       "operator_console_entities": 68
@@ -240,7 +240,7 @@
     },
     "relation-map.json": {
       "kind": "relation-map",
-      "records": 3517
+      "records": 3773
     },
     "frontend-foundation-catalog.json": {
       "kind": "frontend-foundation-catalog",
@@ -260,7 +260,7 @@
     },
     "validation-rules.json": {
       "kind": "validation-rules",
-      "records": 59226
+      "records": 60506
     },
     "computed-formulas.json": {
       "kind": "formula-library",

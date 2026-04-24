@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-24T08:04:10.057Z",
+    "generatedAt": "2026-04-24T08:27:20.938Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -29,7 +29,7 @@
     "authoritativePhysicalTableCount": 850,
     "authoritativePartitionTableCount": 13,
     "schemaAuthorityRegistryTableCount": 837,
-    "relationCount": 3517,
+    "relationCount": 3773,
     "relationEntityCount": 837,
     "endpointCount": 4625,
     "endpointBoundTableCount": 837,
@@ -52,10 +52,10 @@
     "graphicsGovernanceReleaseBlocked": false,
     "releaseReadinessScore": 100,
     "projectionCount": 837,
-    "fieldCount": 16031,
+    "fieldCount": 16543,
     "canonicalCoveragePercent": 100,
     "registrySyncScore": 100,
-    "rlsTableCount": 577
+    "rlsTableCount": 641
   },
   "artifacts": {
     "runtimeProjections": "data/registry/system-contract-runtime-projections.json",
@@ -74,10 +74,10 @@
     "targetedRebuildPolicy": "Rebuild changed authority sections and refresh checksums before release.",
     "summary": {
       "segmentCount": 7,
-      "sourceSizeBytes": 11983146,
-      "totalSegmentSizeBytes": 11991466,
+      "sourceSizeBytes": 12451166,
+      "totalSegmentSizeBytes": 12459486,
       "largestSegmentId": "tables",
-      "largestSegmentSizeBytes": 7341703,
+      "largestSegmentSizeBytes": 7546610,
       "allSegmentsChecksummed": true,
       "segmentedReadReady": true,
       "revisionGuard": "sourceSha256",

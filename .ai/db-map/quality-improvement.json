@@ -2,7 +2,7 @@
     "_meta": {
         "domain": "quality_improvement",
         "table_count": 20,
-        "generated_at": "2026-04-24T08:05:24+00:00"
+        "generated_at": "2026-04-24T08:28:37+00:00"
     },
     "tables": {
         "apqp_gate_reviews": {
@@ -157,7 +157,9 @@
         },
         "dcc_document_change_notice": {
             "defined_in": "150_dcc_document_change_control.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "dcn_id",
             "foreign_keys": [
                 {
@@ -173,7 +175,9 @@
         },
         "dcc_document_change_request": {
             "defined_in": "150_dcc_document_change_control.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "dcr_id",
             "foreign_keys": [
                 {
@@ -188,7 +192,8 @@
             "extended_in": [
                 "155_dcc_consolidation.sql",
                 "155_dcc_consolidation.sql",
-                "155_dcc_consolidation.sql"
+                "155_dcc_consolidation.sql",
+                "156_live_schema_drift_governance_reconcile.sql"
             ],
             "primary_key": "",
             "foreign_keys": [],
@@ -196,7 +201,9 @@
         },
         "dcc_document_revision": {
             "defined_in": "155_dcc_consolidation.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "revision_id",
             "foreign_keys": [
                 {
@@ -220,7 +227,9 @@
         },
         "dcc_document_revision_history": {
             "defined_in": "150_dcc_document_change_control.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "history_id",
             "foreign_keys": [],
             "contract": "quality_improvement.document_control"
@@ -264,7 +273,8 @@
         "fmea_records": {
             "defined_in": "042_fmea_apqp_control_plan_mobile.sql",
             "extended_in": [
-                "070_enterprise_governance_uplift.sql"
+                "070_enterprise_governance_uplift.sql",
+                "156_live_schema_drift_governance_reconcile.sql"
             ],
             "primary_key": "fmea_id",
             "foreign_keys": [

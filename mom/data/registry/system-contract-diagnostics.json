@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-24T08:04:10.057Z",
+    "generatedAt": "2026-04-24T08:27:20.938Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -29,7 +29,7 @@
     "authoritativePhysicalTableCount": 850,
     "authoritativePartitionTableCount": 13,
     "schemaAuthorityRegistryTableCount": 837,
-    "relationCount": 3517,
+    "relationCount": 3773,
     "relationEntityCount": 837,
     "endpointCount": 4625,
     "endpointBoundTableCount": 837,

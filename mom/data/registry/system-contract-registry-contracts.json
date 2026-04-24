@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-24T08:04:10.057Z",
+    "generatedAt": "2026-04-24T08:27:20.938Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -29,7 +29,7 @@
     "authoritativePhysicalTableCount": 850,
     "authoritativePartitionTableCount": 13,
     "schemaAuthorityRegistryTableCount": 837,
-    "relationCount": 3517,
+    "relationCount": 3773,
     "relationEntityCount": 837,
     "endpointCount": 4625,
     "endpointBoundTableCount": 837,
@@ -3461,7 +3461,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 10,
+      "columnCount": 18,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -3479,7 +3479,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.dcc_document_change_notice",
@@ -3492,74 +3492,6 @@
       "statusColumn": "status",
       "statusSet": "dcc_document_change_notice_status",
       "workflowId": "wf_dcc_document_change_notice",
-      "workflowPresent": true,
-      "supportTable": false,
-      "columnCount": 13,
-      "endpointCount": 6,
-      "runtimeExposure": {
-        "list": true,
-        "detail": true,
-        "create": true,
-        "update": true,
-        "delete": true,
-        "transition": true,
-        "export": false
-      },
-      "operationKinds": {
-        "create": 1,
-        "delete": 1,
-        "detail": 1,
-        "list": 1,
-        "transition": 1,
-        "update": 1
-      },
-      "governanceMissingCount": 8
-    },
-    {
-      "tableKey": "public.dcc_document_change_request",
-      "table": "dcc_document_change_request",
-      "schema": "public",
-      "domain": "document_control",
-      "label": "Dcc Tài liệu thay đổi yêu cầu",
-      "labelEn": "Dcc Document Change Request",
-      "primaryKey": "dcr_id",
-      "statusColumn": "status",
-      "statusSet": "dcc_document_change_request_status",
-      "workflowId": "wf_dcc_document_change_request",
-      "workflowPresent": true,
-      "supportTable": false,
-      "columnCount": 20,
-      "endpointCount": 6,
-      "runtimeExposure": {
-        "list": true,
-        "detail": true,
-        "create": true,
-        "update": true,
-        "delete": true,
-        "transition": true,
-        "export": false
-      },
-      "operationKinds": {
-        "create": 1,
-        "delete": 1,
-        "detail": 1,
-        "list": 1,
-        "transition": 1,
-        "update": 1
-      },
-      "governanceMissingCount": 8
-    },
-    {
-      "tableKey": "public.dcc_document_header",
-      "table": "dcc_document_header",
-      "schema": "public",
-      "domain": "document_control",
-      "label": "Dcc Tài liệu Header",
-      "labelEn": "Dcc Document Header",
-      "primaryKey": "header_id",
-      "statusColumn": "status",
-      "statusSet": "dcc_document_header_status",
-      "workflowId": "wf_dcc_document_header",
       "workflowPresent": true,
       "supportTable": false,
       "columnCount": 21,
@@ -3581,7 +3513,75 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.dcc_document_change_request",
+      "table": "dcc_document_change_request",
+      "schema": "public",
+      "domain": "document_control",
+      "label": "Dcc Tài liệu thay đổi yêu cầu",
+      "labelEn": "Dcc Document Change Request",
+      "primaryKey": "dcr_id",
+      "statusColumn": "status",
+      "statusSet": "dcc_document_change_request_status",
+      "workflowId": "wf_dcc_document_change_request",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 28,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.dcc_document_header",
+      "table": "dcc_document_header",
+      "schema": "public",
+      "domain": "document_control",
+      "label": "Dcc Tài liệu Header",
+      "labelEn": "Dcc Document Header",
+      "primaryKey": "header_id",
+      "statusColumn": "status",
+      "statusSet": "dcc_document_header_status",
+      "workflowId": "wf_dcc_document_header",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 29,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.dcc_document_header_label",
@@ -3596,7 +3596,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 10,
+      "columnCount": 18,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -3614,7 +3614,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.dcc_document_locale_variant",
@@ -3629,7 +3629,7 @@
       "workflowId": "wf_dcc_document_locale_variant",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 20,
+      "columnCount": 28,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -3648,7 +3648,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.dcc_document_revision",
@@ -3663,7 +3663,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 19,
+      "columnCount": 27,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -3681,7 +3681,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.dcc_document_revision_history",
@@ -3696,7 +3696,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 13,
+      "columnCount": 21,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -3715,7 +3715,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.dcc_role_catalog",
@@ -3730,7 +3730,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 9,
+      "columnCount": 17,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -3748,7 +3748,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.demand",
@@ -6165,7 +6165,7 @@
       "workflowId": "wf_eqms_aml_record",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 43,
+      "columnCount": 51,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -6184,7 +6184,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_attachments",
@@ -6199,7 +6199,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 9,
+      "columnCount": 17,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -6217,7 +6217,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_audit_findings",
@@ -6232,7 +6232,7 @@
       "workflowId": "wf_eqms_audit_finding",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 16,
+      "columnCount": 24,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -6251,7 +6251,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_audits",
@@ -6266,7 +6266,7 @@
       "workflowId": "wf_eqms_audit",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 16,
+      "columnCount": 24,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -6285,7 +6285,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_batch_release",
@@ -6334,7 +6334,7 @@
       "workflowId": "wf_eqms_calibration_record",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 26,
+      "columnCount": 34,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -6353,7 +6353,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_capa_records",
@@ -6368,7 +6368,7 @@
       "workflowId": "wf_eqms_capa_record",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 27,
+      "columnCount": 35,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -6387,7 +6387,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_change_affected_object",
@@ -6435,7 +6435,7 @@
       "workflowId": "wf_eqms_change_control",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 25,
+      "columnCount": 33,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -6454,7 +6454,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_change_resulting_object",
@@ -6536,7 +6536,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 7,
+      "columnCount": 15,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -6554,7 +6554,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_complaints",
@@ -6603,7 +6603,7 @@
       "workflowId": "wf_eqms_concession_record",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 46,
+      "columnCount": 54,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -6622,7 +6622,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_controlled_copies",
@@ -6637,7 +6637,7 @@
       "workflowId": "wf_eqms_controlled_copy",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 10,
+      "columnCount": 18,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -6656,7 +6656,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_controlled_revision_rollout",
@@ -6705,7 +6705,7 @@
       "workflowId": "wf_eqms_csat_survey",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 32,
+      "columnCount": 40,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -6724,7 +6724,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_deviations",
@@ -6739,7 +6739,7 @@
       "workflowId": "wf_eqms_deviation",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 28,
+      "columnCount": 36,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -6758,7 +6758,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_document_acknowledgements",
@@ -6773,7 +6773,7 @@
       "workflowId": "wf_eqms_document_acknowledgement",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -6792,7 +6792,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_document_distribution",
@@ -6974,7 +6974,7 @@
       "workflowId": "wf_eqms_document",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 28,
+      "columnCount": 35,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -6993,7 +6993,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 7
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_electronic_signature_event",
@@ -7041,7 +7041,7 @@
       "workflowId": "wf_eqms_engineering_change",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 21,
+      "columnCount": 29,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -7060,7 +7060,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_evidence_artifact",
@@ -7242,7 +7242,7 @@
       "workflowId": "wf_eqms_export_job",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 11,
+      "columnCount": 19,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -7261,7 +7261,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_fai_characteristics",
@@ -7276,7 +7276,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 17,
+      "columnCount": 25,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -7294,7 +7294,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_fai_reports",
@@ -7309,7 +7309,7 @@
       "workflowId": "wf_eqms_fai_report",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 46,
+      "columnCount": 54,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -7328,7 +7328,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_field_actions",
@@ -7343,7 +7343,7 @@
       "workflowId": "wf_eqms_field_action",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 25,
+      "columnCount": 33,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -7362,7 +7362,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_field_change_authorization",
@@ -7783,7 +7783,7 @@
       "workflowId": "wf_eqms_lessons_learned",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 37,
+      "columnCount": 45,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -7802,7 +7802,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_msa_records",
@@ -7817,7 +7817,7 @@
       "workflowId": "wf_eqms_msa_record",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 21,
+      "columnCount": 29,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -7836,7 +7836,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_ncr_records",
@@ -8019,7 +8019,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -8037,7 +8037,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_record_links",
@@ -8052,7 +8052,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -8070,7 +8070,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_retention_lock",
@@ -8118,7 +8118,7 @@
       "workflowId": "wf_eqms_risk_register",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 17,
+      "columnCount": 25,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -8137,7 +8137,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_risks_controls",
@@ -8152,7 +8152,7 @@
       "workflowId": "wf_eqms_risks_control",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 12,
+      "columnCount": 20,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -8171,7 +8171,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_sampling_plans",
@@ -8186,7 +8186,7 @@
       "workflowId": "wf_eqms_sampling_plan",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 35,
+      "columnCount": 43,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -8205,7 +8205,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_scars",
@@ -8254,7 +8254,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -8272,7 +8272,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_spc_violation_acks",
@@ -8287,7 +8287,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 8,
+      "columnCount": 16,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -8305,7 +8305,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_special_characteristics",
@@ -8320,7 +8320,7 @@
       "workflowId": "wf_eqms_special_characteristic",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 49,
+      "columnCount": 57,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -8339,7 +8339,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_supplier_audits",
@@ -8422,7 +8422,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 7,
+      "columnCount": 15,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -8440,7 +8440,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_supplier_quality_agreements",
@@ -8489,7 +8489,7 @@
       "workflowId": "wf_eqms_training_curricula",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 14,
+      "columnCount": 22,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -8508,7 +8508,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_training_matrix",
@@ -8523,7 +8523,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 7,
+      "columnCount": 15,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -8542,7 +8542,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_training_obligation",
@@ -8591,7 +8591,7 @@
       "workflowId": "wf_eqms_training_record",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 25,
+      "columnCount": 33,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -8610,7 +8610,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_validation_executions",
@@ -8625,7 +8625,7 @@
       "workflowId": "wf_eqms_validation_execution",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 15,
+      "columnCount": 23,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -8644,7 +8644,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_validation_projects",
@@ -8659,7 +8659,7 @@
       "workflowId": "wf_eqms_validation_project",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 10,
+      "columnCount": 18,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -8678,7 +8678,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_validation_protocols",
@@ -8693,7 +8693,7 @@
       "workflowId": "wf_eqms_validation_protocol",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 10,
+      "columnCount": 18,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -8712,7 +8712,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_validation_requirements",
@@ -8727,7 +8727,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": true,
-      "columnCount": 6,
+      "columnCount": 14,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -8745,7 +8745,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.eqms_warranty_claims",
@@ -8760,7 +8760,7 @@
       "workflowId": "wf_eqms_warranty_claim",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 48,
+      "columnCount": 56,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -8779,7 +8779,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.equipment",
@@ -10299,7 +10299,7 @@
       "workflowId": "wf_fmea",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 29,
+      "columnCount": 30,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -10908,7 +10908,7 @@
       "workflowId": "wf_genealogy_thread",
       "workflowPresent": true,
       "supportTable": false,
-      "columnCount": 13,
+      "columnCount": 21,
       "endpointCount": 6,
       "runtimeExposure": {
         "list": true,
@@ -10927,7 +10927,7 @@
         "transition": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.gl_transactions",
@@ -11009,7 +11009,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 12,
+      "columnCount": 20,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -11027,7 +11027,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.graphics_contrast_check",
@@ -11042,7 +11042,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 15,
+      "columnCount": 23,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -11060,7 +11060,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.graphics_module_binding",
@@ -11070,371 +11070,6 @@
       "label": "Graphic Module Binding",
       "labelEn": "Graphics Module Binding",
       "primaryKey": "binding_id",
-      "statusColumn": null,
-      "statusSet": null,
-      "workflowId": null,
-      "workflowPresent": false,
-      "supportTable": false,
-      "columnCount": 6,
-      "endpointCount": 5,
-      "runtimeExposure": {
-        "list": true,
-        "detail": true,
-        "create": true,
-        "update": true,
-        "delete": true,
-        "transition": false,
-        "export": false
-      },
-      "operationKinds": {
-        "create": 1,
-        "delete": 1,
-        "detail": 1,
-        "list": 1,
-        "update": 1
-      },
-      "governanceMissingCount": 8
-    },
-    {
-      "tableKey": "public.graphics_preview_scene",
-      "table": "graphics_preview_scene",
-      "schema": "public",
-      "domain": "system_infrastructure",
-      "label": "Graphic Preview Scene",
-      "labelEn": "Graphics Preview Scene",
-      "primaryKey": "scene_id",
-      "statusColumn": null,
-      "statusSet": null,
-      "workflowId": null,
-      "workflowPresent": false,
-      "supportTable": false,
-      "columnCount": 13,
-      "endpointCount": 5,
-      "runtimeExposure": {
-        "list": true,
-        "detail": true,
-        "create": true,
-        "update": true,
-        "delete": true,
-        "transition": false,
-        "export": false
-      },
-      "operationKinds": {
-        "create": 1,
-        "delete": 1,
-        "detail": 1,
-        "list": 1,
-        "update": 1
-      },
-      "governanceMissingCount": 8
-    },
-    {
-      "tableKey": "public.graphics_qa_gate_catalog",
-      "table": "graphics_qa_gate_catalog",
-      "schema": "public",
-      "domain": "system_infrastructure",
-      "label": "Graphic Qa cổng danh mục",
-      "labelEn": "Graphics Qa Gate Catalog",
-      "primaryKey": "gate_id",
-      "statusColumn": null,
-      "statusSet": null,
-      "workflowId": null,
-      "workflowPresent": false,
-      "supportTable": false,
-      "columnCount": 6,
-      "endpointCount": 5,
-      "runtimeExposure": {
-        "list": true,
-        "detail": true,
-        "create": true,
-        "update": true,
-        "delete": true,
-        "transition": false,
-        "export": false
-      },
-      "operationKinds": {
-        "create": 1,
-        "delete": 1,
-        "detail": 1,
-        "list": 1,
-        "update": 1
-      },
-      "governanceMissingCount": 8
-    },
-    {
-      "tableKey": "public.graphics_qa_gate_result",
-      "table": "graphics_qa_gate_result",
-      "schema": "public",
-      "domain": "system_infrastructure",
-      "label": "Graphic Qa cổng kết quả",
-      "labelEn": "Graphics Qa Gate Result",
-      "primaryKey": "result_id",
-      "statusColumn": "status",
-      "statusSet": "graphics_qa_gate_result_status",
-      "workflowId": null,
-      "workflowPresent": false,
-      "supportTable": true,
-      "columnCount": 13,
-      "endpointCount": 6,
-      "runtimeExposure": {
-        "list": true,
-        "detail": true,
-        "create": true,
-        "update": true,
-        "delete": true,
-        "transition": true,
-        "export": false
-      },
-      "operationKinds": {
-        "create": 1,
-        "delete": 1,
-        "detail": 1,
-        "list": 1,
-        "transition": 1,
-        "update": 1
-      },
-      "governanceMissingCount": 8
-    },
-    {
-      "tableKey": "public.graphics_regulated_entity",
-      "table": "graphics_regulated_entity",
-      "schema": "public",
-      "domain": "system_infrastructure",
-      "label": "Graphic Regulated đối tượng",
-      "labelEn": "Graphics Regulated Entity",
-      "primaryKey": "entity_registry_id",
-      "statusColumn": null,
-      "statusSet": null,
-      "workflowId": null,
-      "workflowPresent": false,
-      "supportTable": false,
-      "columnCount": 13,
-      "endpointCount": 5,
-      "runtimeExposure": {
-        "list": true,
-        "detail": true,
-        "create": true,
-        "update": true,
-        "delete": true,
-        "transition": false,
-        "export": false
-      },
-      "operationKinds": {
-        "create": 1,
-        "delete": 1,
-        "detail": 1,
-        "list": 1,
-        "update": 1
-      },
-      "governanceMissingCount": 8
-    },
-    {
-      "tableKey": "public.graphics_rollout_scope",
-      "table": "graphics_rollout_scope",
-      "schema": "public",
-      "domain": "system_infrastructure",
-      "label": "Graphic Rollout phạm vi",
-      "labelEn": "Graphics Rollout Scope",
-      "primaryKey": "rollout_id",
-      "statusColumn": "wcag_gate_status",
-      "statusSet": "graphics_rollout_scope_wcag_gate_status",
-      "workflowId": "wf_graphics_rollout_scope",
-      "workflowPresent": true,
-      "supportTable": false,
-      "columnCount": 21,
-      "endpointCount": 6,
-      "runtimeExposure": {
-        "list": true,
-        "detail": true,
-        "create": true,
-        "update": true,
-        "delete": true,
-        "transition": true,
-        "export": false
-      },
-      "operationKinds": {
-        "create": 1,
-        "delete": 1,
-        "detail": 1,
-        "list": 1,
-        "transition": 1,
-        "update": 1
-      },
-      "governanceMissingCount": 8
-    },
-    {
-      "tableKey": "public.graphics_saved_experiment",
-      "table": "graphics_saved_experiment",
-      "schema": "public",
-      "domain": "system_infrastructure",
-      "label": "Graphic Saved Experiment",
-      "labelEn": "Graphics Saved Experiment",
-      "primaryKey": "experiment_id",
-      "statusColumn": null,
-      "statusSet": null,
-      "workflowId": null,
-      "workflowPresent": false,
-      "supportTable": false,
-      "columnCount": 11,
-      "endpointCount": 5,
-      "runtimeExposure": {
-        "list": true,
-        "detail": true,
-        "create": true,
-        "update": true,
-        "delete": true,
-        "transition": false,
-        "export": false
-      },
-      "operationKinds": {
-        "create": 1,
-        "delete": 1,
-        "detail": 1,
-        "list": 1,
-        "update": 1
-      },
-      "governanceMissingCount": 8
-    },
-    {
-      "tableKey": "public.graphics_simulation_run",
-      "table": "graphics_simulation_run",
-      "schema": "public",
-      "domain": "system_infrastructure",
-      "label": "Graphic Simulation lần chạy",
-      "labelEn": "Graphics Simulation Run",
-      "primaryKey": "run_id",
-      "statusColumn": null,
-      "statusSet": null,
-      "workflowId": null,
-      "workflowPresent": false,
-      "supportTable": false,
-      "columnCount": 16,
-      "endpointCount": 5,
-      "runtimeExposure": {
-        "list": true,
-        "detail": true,
-        "create": true,
-        "update": true,
-        "delete": true,
-        "transition": false,
-        "export": false
-      },
-      "operationKinds": {
-        "create": 1,
-        "delete": 1,
-        "detail": 1,
-        "list": 1,
-        "update": 1
-      },
-      "governanceMissingCount": 8
-    },
-    {
-      "tableKey": "public.graphics_template_zone_binding",
-      "table": "graphics_template_zone_binding",
-      "schema": "public",
-      "domain": "system_infrastructure",
-      "label": "Graphic mẫu khu Binding",
-      "labelEn": "Graphics Template Zone Binding",
-      "primaryKey": "binding_id",
-      "statusColumn": null,
-      "statusSet": null,
-      "workflowId": null,
-      "workflowPresent": false,
-      "supportTable": false,
-      "columnCount": 11,
-      "endpointCount": 5,
-      "runtimeExposure": {
-        "list": true,
-        "detail": true,
-        "create": true,
-        "update": true,
-        "delete": true,
-        "transition": false,
-        "export": false
-      },
-      "operationKinds": {
-        "create": 1,
-        "delete": 1,
-        "detail": 1,
-        "list": 1,
-        "update": 1
-      },
-      "governanceMissingCount": 8
-    },
-    {
-      "tableKey": "public.graphics_theme_schedule",
-      "table": "graphics_theme_schedule",
-      "schema": "public",
-      "domain": "system_infrastructure",
-      "label": "Graphic Theme lịch",
-      "labelEn": "Graphics Theme Schedule",
-      "primaryKey": "schedule_id",
-      "statusColumn": null,
-      "statusSet": null,
-      "workflowId": null,
-      "workflowPresent": false,
-      "supportTable": false,
-      "columnCount": 15,
-      "endpointCount": 5,
-      "runtimeExposure": {
-        "list": true,
-        "detail": true,
-        "create": true,
-        "update": true,
-        "delete": true,
-        "transition": false,
-        "export": false
-      },
-      "operationKinds": {
-        "create": 1,
-        "delete": 1,
-        "detail": 1,
-        "list": 1,
-        "update": 1
-      },
-      "governanceMissingCount": 8
-    },
-    {
-      "tableKey": "public.graphics_token_catalog",
-      "table": "graphics_token_catalog",
-      "schema": "public",
-      "domain": "system_infrastructure",
-      "label": "Graphic Token danh mục",
-      "labelEn": "Graphics Token Catalog",
-      "primaryKey": "token_id",
-      "statusColumn": null,
-      "statusSet": null,
-      "workflowId": null,
-      "workflowPresent": false,
-      "supportTable": false,
-      "columnCount": 28,
-      "endpointCount": 5,
-      "runtimeExposure": {
-        "list": true,
-        "detail": true,
-        "create": true,
-        "update": true,
-        "delete": true,
-        "transition": false,
-        "export": false
-      },
-      "operationKinds": {
-        "create": 1,
-        "delete": 1,
-        "detail": 1,
-        "list": 1,
-        "update": 1
-      },
-      "governanceMissingCount": 8
-    },
-    {
-      "tableKey": "public.graphics_token_value",
-      "table": "graphics_token_value",
-      "schema": "public",
-      "domain": "system_infrastructure",
-      "label": "Graphic Token Giá trị",
-      "labelEn": "Graphics Token Value",
-      "primaryKey": "value_id",
       "statusColumn": null,
       "statusSet": null,
       "workflowId": null,
@@ -11458,7 +11093,372 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.graphics_preview_scene",
+      "table": "graphics_preview_scene",
+      "schema": "public",
+      "domain": "system_infrastructure",
+      "label": "Graphic Preview Scene",
+      "labelEn": "Graphics Preview Scene",
+      "primaryKey": "scene_id",
+      "statusColumn": null,
+      "statusSet": null,
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": false,
+      "columnCount": 21,
+      "endpointCount": 5,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": false,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.graphics_qa_gate_catalog",
+      "table": "graphics_qa_gate_catalog",
+      "schema": "public",
+      "domain": "system_infrastructure",
+      "label": "Graphic Qa cổng danh mục",
+      "labelEn": "Graphics Qa Gate Catalog",
+      "primaryKey": "gate_id",
+      "statusColumn": null,
+      "statusSet": null,
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": false,
+      "columnCount": 14,
+      "endpointCount": 5,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": false,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.graphics_qa_gate_result",
+      "table": "graphics_qa_gate_result",
+      "schema": "public",
+      "domain": "system_infrastructure",
+      "label": "Graphic Qa cổng kết quả",
+      "labelEn": "Graphics Qa Gate Result",
+      "primaryKey": "result_id",
+      "statusColumn": "status",
+      "statusSet": "graphics_qa_gate_result_status",
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": true,
+      "columnCount": 21,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.graphics_regulated_entity",
+      "table": "graphics_regulated_entity",
+      "schema": "public",
+      "domain": "system_infrastructure",
+      "label": "Graphic Regulated đối tượng",
+      "labelEn": "Graphics Regulated Entity",
+      "primaryKey": "entity_registry_id",
+      "statusColumn": null,
+      "statusSet": null,
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": false,
+      "columnCount": 21,
+      "endpointCount": 5,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": false,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.graphics_rollout_scope",
+      "table": "graphics_rollout_scope",
+      "schema": "public",
+      "domain": "system_infrastructure",
+      "label": "Graphic Rollout phạm vi",
+      "labelEn": "Graphics Rollout Scope",
+      "primaryKey": "rollout_id",
+      "statusColumn": "wcag_gate_status",
+      "statusSet": "graphics_rollout_scope_wcag_gate_status",
+      "workflowId": "wf_graphics_rollout_scope",
+      "workflowPresent": true,
+      "supportTable": false,
+      "columnCount": 29,
+      "endpointCount": 6,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": true,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.graphics_saved_experiment",
+      "table": "graphics_saved_experiment",
+      "schema": "public",
+      "domain": "system_infrastructure",
+      "label": "Graphic Saved Experiment",
+      "labelEn": "Graphics Saved Experiment",
+      "primaryKey": "experiment_id",
+      "statusColumn": null,
+      "statusSet": null,
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": false,
+      "columnCount": 19,
+      "endpointCount": 5,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": false,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.graphics_simulation_run",
+      "table": "graphics_simulation_run",
+      "schema": "public",
+      "domain": "system_infrastructure",
+      "label": "Graphic Simulation lần chạy",
+      "labelEn": "Graphics Simulation Run",
+      "primaryKey": "run_id",
+      "statusColumn": null,
+      "statusSet": null,
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": false,
+      "columnCount": 24,
+      "endpointCount": 5,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": false,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.graphics_template_zone_binding",
+      "table": "graphics_template_zone_binding",
+      "schema": "public",
+      "domain": "system_infrastructure",
+      "label": "Graphic mẫu khu Binding",
+      "labelEn": "Graphics Template Zone Binding",
+      "primaryKey": "binding_id",
+      "statusColumn": null,
+      "statusSet": null,
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": false,
+      "columnCount": 19,
+      "endpointCount": 5,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": false,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.graphics_theme_schedule",
+      "table": "graphics_theme_schedule",
+      "schema": "public",
+      "domain": "system_infrastructure",
+      "label": "Graphic Theme lịch",
+      "labelEn": "Graphics Theme Schedule",
+      "primaryKey": "schedule_id",
+      "statusColumn": null,
+      "statusSet": null,
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": false,
+      "columnCount": 23,
+      "endpointCount": 5,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": false,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.graphics_token_catalog",
+      "table": "graphics_token_catalog",
+      "schema": "public",
+      "domain": "system_infrastructure",
+      "label": "Graphic Token danh mục",
+      "labelEn": "Graphics Token Catalog",
+      "primaryKey": "token_id",
+      "statusColumn": null,
+      "statusSet": null,
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": false,
+      "columnCount": 36,
+      "endpointCount": 5,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": false,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
+    },
+    {
+      "tableKey": "public.graphics_token_value",
+      "table": "graphics_token_value",
+      "schema": "public",
+      "domain": "system_infrastructure",
+      "label": "Graphic Token Giá trị",
+      "labelEn": "Graphics Token Value",
+      "primaryKey": "value_id",
+      "statusColumn": null,
+      "statusSet": null,
+      "workflowId": null,
+      "workflowPresent": false,
+      "supportTable": false,
+      "columnCount": 22,
+      "endpointCount": 5,
+      "runtimeExposure": {
+        "list": true,
+        "detail": true,
+        "create": true,
+        "update": true,
+        "delete": true,
+        "transition": false,
+        "export": false
+      },
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.graphics_token_version",
@@ -11473,7 +11473,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 13,
+      "columnCount": 21,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -11491,7 +11491,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.graphics_wcag_check",
@@ -11506,7 +11506,7 @@
       "workflowId": null,
       "workflowPresent": false,
       "supportTable": false,
-      "columnCount": 13,
+      "columnCount": 21,
       "endpointCount": 5,
       "runtimeExposure": {
         "list": true,
@@ -11524,7 +11524,7 @@
         "list": 1,
         "update": 1
       },
-      "governanceMissingCount": 8
+      "governanceMissingCount": 0
     },
     {
       "tableKey": "public.hcm_attendance_records",

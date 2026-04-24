@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-24T08:04:07.735Z",
+    "generatedAt": "2026-04-24T08:27:18.557Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "description": "Operational blind-spot assessment mapped to current backend governance signals."
   },
@@ -220,8 +220,8 @@
       ],
       "evidence": {
         "optimistic_concurrency_mentions": 9186,
-        "if_match_mentions": 3396,
-        "row_version_mentions": 27784
+        "if_match_mentions": 3753,
+        "row_version_mentions": 30704
       },
       "required_controls": []
     },

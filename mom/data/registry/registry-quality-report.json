@@ -2,7 +2,7 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-24T08:04:04.401Z",
+    "generatedAt": "2026-04-24T08:27:15.189Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
@@ -12,15 +12,15 @@
   "summary": {
     "endpoint_count": 4625,
     "pack_count": 5069,
-    "relation_edge_count": 3517,
+    "relation_edge_count": 3773,
     "workflow_count": 379,
     "status_set_count": 971,
-    "validation_rule_count": 59226,
+    "validation_rule_count": 60506,
     "formula_count": 1476,
     "formula_reference_count": 1476,
-    "field_context_count": 83205,
-    "row_version_tables": 617,
-    "org_scoped_tables": 577,
+    "field_context_count": 85512,
+    "row_version_tables": 681,
+    "org_scoped_tables": 641,
     "composite_pk_tables": 21,
     "missing_primary_key_tables": 0,
     "unsupported_record_endpoints": 0,
@@ -54,7 +54,7 @@
     "schema_authority_physical_table_count": 850,
     "attachment_contract_entities": 835,
     "comment_contract_entities": 835,
-    "activity_contract_entities": 585,
+    "activity_contract_entities": 648,
     "publishability_ready": true,
     "publishability_review_required_entities": 0
   },
@@ -96,8 +96,8 @@
     {
       "id": "fk_edges_covered",
       "passed": true,
-      "actual": 3517,
-      "target": 3517
+      "actual": 3773,
+      "target": 3773
     },
     {
       "id": "workflow_coverage",
@@ -186,7 +186,7 @@
     {
       "id": "validation_rule_target",
       "passed": true,
-      "actual": 59226,
+      "actual": 60506,
       "target": 5000
     },
     {

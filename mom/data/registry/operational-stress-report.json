@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-24T08:04:07.781Z",
+    "generatedAt": "2026-04-24T08:27:18.612Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "description": "Operational stress assessment for real-world backend failure and recovery conditions."
   },
@@ -47,8 +47,8 @@
     "signal_counts": {
       "idempotency_mentions": 24405,
       "optimistic_concurrency_mentions": 9186,
-      "if_match_mentions": 3402,
-      "row_version_mentions": 27784,
+      "if_match_mentions": 3759,
+      "row_version_mentions": 30704,
       "compensation_markers": 5,
       "correction_markers": 2413,
       "effective_dating_markers": 1061,
@@ -106,8 +106,8 @@
       "rationale": [],
       "evidence": {
         "idempotency_mentions": 24405,
-        "if_match_mentions": 3402,
-        "row_version_mentions": 27784,
+        "if_match_mentions": 3759,
+        "row_version_mentions": 30704,
         "mutating_endpoint_count": 2931,
         "idempotent_endpoint_count": 2931,
         "idempotency_contract_coverage_ratio": 1.0,

@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-24T08:04:08.770168+00:00",
+    "generatedAt": "2026-04-24T08:27:19.645408+00:00",
     "sourceArtifacts": [
       "mom/data/registry/table-registry.json",
       "mom/data/registry/endpoint-governance-classification.json",
@@ -5053,6 +5053,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -5102,6 +5103,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -5243,6 +5245,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -5292,6 +5295,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -8726,6 +8730,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -8775,6 +8780,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -8870,6 +8876,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -8968,6 +8975,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -9017,6 +9025,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -9110,6 +9119,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -9251,6 +9261,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -9345,6 +9356,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -9493,6 +9505,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -9542,6 +9555,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -9879,6 +9893,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -9972,6 +9987,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -10256,6 +10272,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -10351,6 +10368,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -10400,6 +10418,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -11018,6 +11037,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -11067,6 +11087,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -11355,6 +11376,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -11401,6 +11423,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -11492,6 +11515,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -11591,6 +11615,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -11690,6 +11715,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -11735,6 +11761,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -11780,6 +11807,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -12020,6 +12048,7 @@
       "qualityProfile": {
         "profile": "iso8000_core",
         "checks": [
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -12262,6 +12291,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -12406,6 +12436,7 @@
         "checks": [
           "audit_trail_required",
           "correction_not_overwrite",
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -15421,6 +15452,7 @@
       "qualityProfile": {
         "profile": "iso8000_core",
         "checks": [
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -15561,6 +15593,7 @@
       "qualityProfile": {
         "profile": "iso8000_core",
         "checks": [
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -15692,6 +15725,7 @@
       "qualityProfile": {
         "profile": "iso8000_core",
         "checks": [
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -15735,6 +15769,7 @@
       "qualityProfile": {
         "profile": "iso8000_core",
         "checks": [
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present"
@@ -15825,6 +15860,7 @@
       "qualityProfile": {
         "profile": "iso8000_core",
         "checks": [
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -15916,6 +15952,7 @@
       "qualityProfile": {
         "profile": "iso8000_core",
         "checks": [
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -15959,6 +15996,7 @@
       "qualityProfile": {
         "profile": "iso8000_core",
         "checks": [
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -16002,6 +16040,7 @@
       "qualityProfile": {
         "profile": "iso8000_core",
         "checks": [
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -16045,6 +16084,7 @@
       "qualityProfile": {
         "profile": "iso8000_core",
         "checks": [
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",
@@ -16088,6 +16128,7 @@
       "qualityProfile": {
         "profile": "iso8000_core",
         "checks": [
+          "foreign_key_integrity",
           "owner_present",
           "primary_key_present",
           "system_of_record_present",

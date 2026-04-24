@@ -2,7 +2,7 @@
   "_meta": {
     "version": "4.0",
     "description": "Workflow library expanded from table-registry and domain-driven lifecycle heuristics.",
-    "generatedAt": "2026-04-24T08:04:03.777Z",
+    "generatedAt": "2026-04-24T08:27:14.538Z",
     "workflowCount": 379
   },
   "workflows": {
@@ -8757,6 +8757,10 @@
         "dcc_document_change_notice",
         "dcc_document_change_request",
         "dcc_document_header",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites",
         "dcc_document_revision"
       ],
       "stateField": "status",
@@ -8869,6 +8873,10 @@
       "relatedTables": [
         "dcc_document_change_request",
         "dcc_document_header",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites",
         "dcc_document_change_notice",
         "dcc_document_revision"
       ],
@@ -8982,6 +8990,10 @@
       "relatedTables": [
         "dcc_document_header",
         "dcc_role_catalog",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites",
         "dcc_document_change_notice",
         "dcc_document_change_request",
         "dcc_document_locale_variant",
@@ -9098,7 +9110,11 @@
       "primaryTable": "dcc_document_locale_variant",
       "relatedTables": [
         "dcc_document_locale_variant",
-        "dcc_document_header"
+        "dcc_document_header",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "translation_state",
       "statusSet": "dcc_document_locale_variant_translation_state",
@@ -12994,7 +13010,11 @@
       "standard": "AS9100",
       "primaryTable": "eqms_aml_records",
       "relatedTables": [
-        "eqms_aml_records"
+        "eqms_aml_records",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_aml_records_status",
@@ -13100,7 +13120,11 @@
       "primaryTable": "eqms_audit_findings",
       "relatedTables": [
         "eqms_audit_findings",
-        "eqms_audits"
+        "eqms_audits",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_audit_findings_status",
@@ -13208,6 +13232,10 @@
       "primaryTable": "eqms_audits",
       "relatedTables": [
         "eqms_audits",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites",
         "eqms_audit_findings"
       ],
       "stateField": "status",
@@ -13425,7 +13453,11 @@
       "standard": "AS9100",
       "primaryTable": "eqms_calibration_records",
       "relatedTables": [
-        "eqms_calibration_records"
+        "eqms_calibration_records",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_calibration_records_status",
@@ -13530,7 +13562,11 @@
       "standard": "AS9100",
       "primaryTable": "eqms_capa_records",
       "relatedTables": [
-        "eqms_capa_records"
+        "eqms_capa_records",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_capa_records_status",
@@ -13635,7 +13671,11 @@
       "standard": "AS9100",
       "primaryTable": "eqms_change_controls",
       "relatedTables": [
-        "eqms_change_controls"
+        "eqms_change_controls",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_change_controls_status",
@@ -13962,7 +14002,11 @@
       "standard": "AS9100",
       "primaryTable": "eqms_concession_records",
       "relatedTables": [
-        "eqms_concession_records"
+        "eqms_concession_records",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_concession_records_status",
@@ -14068,7 +14112,11 @@
       "primaryTable": "eqms_controlled_copies",
       "relatedTables": [
         "eqms_controlled_copies",
-        "eqms_documents"
+        "eqms_documents",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_controlled_copies_status",
@@ -14283,7 +14331,11 @@
       "standard": "AS9100",
       "primaryTable": "eqms_csat_surveys",
       "relatedTables": [
-        "eqms_csat_surveys"
+        "eqms_csat_surveys",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_csat_surveys_status",
@@ -14388,7 +14440,11 @@
       "standard": "AS9100",
       "primaryTable": "eqms_deviations",
       "relatedTables": [
-        "eqms_deviations"
+        "eqms_deviations",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_deviations_status",
@@ -14494,7 +14550,11 @@
       "primaryTable": "eqms_document_acknowledgements",
       "relatedTables": [
         "eqms_document_acknowledgements",
-        "eqms_documents"
+        "eqms_documents",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_document_acknowledgements_status",
@@ -14834,6 +14894,10 @@
       "primaryTable": "eqms_documents",
       "relatedTables": [
         "eqms_documents",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites",
         "eqms_controlled_copies",
         "eqms_document_acknowledgements",
         "eqms_training_records"
@@ -14945,7 +15009,11 @@
       "standard": "AS9100",
       "primaryTable": "eqms_engineering_changes",
       "relatedTables": [
-        "eqms_engineering_changes"
+        "eqms_engineering_changes",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_engineering_changes_status",
@@ -15265,7 +15333,11 @@
       "standard": "AS9100",
       "primaryTable": "eqms_export_jobs",
       "relatedTables": [
-        "eqms_export_jobs"
+        "eqms_export_jobs",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_export_jobs_status",
@@ -15371,6 +15443,10 @@
       "primaryTable": "eqms_fai_reports",
       "relatedTables": [
         "eqms_fai_reports",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites",
         "eqms_fai_characteristics"
       ],
       "stateField": "status",
@@ -15478,7 +15554,11 @@
       "standard": "AS9100",
       "primaryTable": "eqms_field_actions",
       "relatedTables": [
-        "eqms_field_actions"
+        "eqms_field_actions",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_field_actions_status",
@@ -16821,7 +16901,11 @@
       "standard": "AS9100",
       "primaryTable": "eqms_lessons_learned",
       "relatedTables": [
-        "eqms_lessons_learned"
+        "eqms_lessons_learned",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_lessons_learned_status",
@@ -16926,7 +17010,11 @@
       "standard": "AS9100",
       "primaryTable": "eqms_msa_records",
       "relatedTables": [
-        "eqms_msa_records"
+        "eqms_msa_records",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_msa_records_status",
@@ -17363,6 +17451,10 @@
       "primaryTable": "eqms_risk_register",
       "relatedTables": [
         "eqms_risk_register",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites",
         "eqms_risks_controls"
       ],
       "stateField": "status",
@@ -17471,7 +17563,11 @@
       "primaryTable": "eqms_risks_controls",
       "relatedTables": [
         "eqms_risks_controls",
-        "eqms_risk_register"
+        "eqms_risk_register",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_risks_controls_status",
@@ -17578,7 +17674,11 @@
       "standard": "AS9100",
       "primaryTable": "eqms_sampling_plans",
       "relatedTables": [
-        "eqms_sampling_plans"
+        "eqms_sampling_plans",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_sampling_plans_status",
@@ -17793,7 +17893,11 @@
       "standard": "AS9100",
       "primaryTable": "eqms_special_characteristics",
       "relatedTables": [
-        "eqms_special_characteristics"
+        "eqms_special_characteristics",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_special_characteristics_status",
@@ -18284,6 +18388,10 @@
       "primaryTable": "eqms_training_curricula",
       "relatedTables": [
         "eqms_training_curricula",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites",
         "eqms_training_matrix",
         "eqms_training_records"
       ],
@@ -18503,7 +18611,11 @@
       "relatedTables": [
         "eqms_training_records",
         "eqms_training_curricula",
-        "eqms_documents"
+        "eqms_documents",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_training_records_status",
@@ -18612,7 +18724,11 @@
       "primaryTable": "eqms_validation_executions",
       "relatedTables": [
         "eqms_validation_executions",
-        "eqms_validation_protocols"
+        "eqms_validation_protocols",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_validation_executions_status",
@@ -18720,6 +18836,10 @@
       "primaryTable": "eqms_validation_projects",
       "relatedTables": [
         "eqms_validation_projects",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites",
         "eqms_validation_protocols",
         "eqms_validation_requirements"
       ],
@@ -18831,6 +18951,10 @@
       "relatedTables": [
         "eqms_validation_protocols",
         "eqms_validation_projects",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites",
         "eqms_validation_executions"
       ],
       "stateField": "status",
@@ -18940,7 +19064,11 @@
       "standard": "AS9100",
       "primaryTable": "eqms_warranty_claims",
       "relatedTables": [
-        "eqms_warranty_claims"
+        "eqms_warranty_claims",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "eqms_warranty_claims_status",
@@ -23063,7 +23191,11 @@
       "standard": "internal",
       "primaryTable": "genealogy_threads",
       "relatedTables": [
-        "genealogy_threads"
+        "genealogy_threads",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites"
       ],
       "stateField": "status",
       "statusSet": "genealogy_threads_status",
@@ -23278,6 +23410,10 @@
       "relatedTables": [
         "graphics_rollout_scope",
         "graphics_simulation_run",
+        "org_companies",
+        "org_legal_entities",
+        "org_plants",
+        "mes_sites",
         "graphics_contrast_check",
         "graphics_qa_gate_result",
         "graphics_token_version",
@@ -35202,6 +35338,15 @@
         "customer_sites",
         "customers",
         "data_archival_runs",
+        "dcc_doc_type_catalog",
+        "dcc_document_change_notice",
+        "dcc_document_change_request",
+        "dcc_document_header",
+        "dcc_document_header_label",
+        "dcc_document_locale_variant",
+        "dcc_document_revision",
+        "dcc_document_revision_history",
+        "dcc_role_catalog",
         "demand",
         "demand_classifications",
         "demand_history_buckets",
@@ -35244,6 +35389,44 @@
         "eng_time_standards",
         "eng_work_instructions",
         "engineering_change_requests",
+        "eqms_aml_records",
+        "eqms_attachments",
+        "eqms_audit_findings",
+        "eqms_audits",
+        "eqms_calibration_records",
+        "eqms_capa_records",
+        "eqms_change_controls",
+        "eqms_comments",
+        "eqms_concession_records",
+        "eqms_controlled_copies",
+        "eqms_csat_surveys",
+        "eqms_deviations",
+        "eqms_document_acknowledgements",
+        "eqms_documents",
+        "eqms_engineering_changes",
+        "eqms_export_jobs",
+        "eqms_fai_characteristics",
+        "eqms_fai_reports",
+        "eqms_field_actions",
+        "eqms_lessons_learned",
+        "eqms_msa_records",
+        "eqms_quality_tower_snapshots",
+        "eqms_record_links",
+        "eqms_risk_register",
+        "eqms_risks_controls",
+        "eqms_sampling_plans",
+        "eqms_signatures",
+        "eqms_spc_violation_acks",
+        "eqms_special_characteristics",
+        "eqms_supplier_qualification_events",
+        "eqms_training_curricula",
+        "eqms_training_matrix",
+        "eqms_training_records",
+        "eqms_validation_executions",
+        "eqms_validation_projects",
+        "eqms_validation_protocols",
+        "eqms_validation_requirements",
+        "eqms_warranty_claims",
         "equipment",
         "escalation_rules",
         "evidence_chain_custody",
@@ -35287,7 +35470,24 @@
         "form_schemas",
         "freight_orders",
         "genealogy_link",
+        "genealogy_threads",
         "gl_transactions",
+        "graphics_component_contract",
+        "graphics_contrast_check",
+        "graphics_module_binding",
+        "graphics_preview_scene",
+        "graphics_qa_gate_catalog",
+        "graphics_qa_gate_result",
+        "graphics_regulated_entity",
+        "graphics_rollout_scope",
+        "graphics_saved_experiment",
+        "graphics_simulation_run",
+        "graphics_template_zone_binding",
+        "graphics_theme_schedule",
+        "graphics_token_catalog",
+        "graphics_token_value",
+        "graphics_token_version",
+        "graphics_wcag_check",
         "hcm_attendance_records",
         "hcm_certifications",
         "hcm_disciplinary_actions",
@@ -36651,6 +36851,15 @@
         "customer_sites",
         "customers",
         "data_archival_runs",
+        "dcc_doc_type_catalog",
+        "dcc_document_change_notice",
+        "dcc_document_change_request",
+        "dcc_document_header",
+        "dcc_document_header_label",
+        "dcc_document_locale_variant",
+        "dcc_document_revision",
+        "dcc_document_revision_history",
+        "dcc_role_catalog",
         "demand",
         "demand_classifications",
         "demand_history_buckets",
@@ -36693,6 +36902,44 @@
         "eng_time_standards",
         "eng_work_instructions",
         "engineering_change_requests",
+        "eqms_aml_records",
+        "eqms_attachments",
+        "eqms_audit_findings",
+        "eqms_audits",
+        "eqms_calibration_records",
+        "eqms_capa_records",
+        "eqms_change_controls",
+        "eqms_comments",
+        "eqms_concession_records",
+        "eqms_controlled_copies",
+        "eqms_csat_surveys",
+        "eqms_deviations",
+        "eqms_document_acknowledgements",
+        "eqms_documents",
+        "eqms_engineering_changes",
+        "eqms_export_jobs",
+        "eqms_fai_characteristics",
+        "eqms_fai_reports",
+        "eqms_field_actions",
+        "eqms_lessons_learned",
+        "eqms_msa_records",
+        "eqms_quality_tower_snapshots",
+        "eqms_record_links",
+        "eqms_risk_register",
+        "eqms_risks_controls",
+        "eqms_sampling_plans",
+        "eqms_signatures",
+        "eqms_spc_violation_acks",
+        "eqms_special_characteristics",
+        "eqms_supplier_qualification_events",
+        "eqms_training_curricula",
+        "eqms_training_matrix",
+        "eqms_training_records",
+        "eqms_validation_executions",
+        "eqms_validation_projects",
+        "eqms_validation_protocols",
+        "eqms_validation_requirements",
+        "eqms_warranty_claims",
         "equipment",
         "escalation_rules",
         "evidence_chain_custody",
@@ -36736,7 +36983,24 @@
         "form_schemas",
         "freight_orders",
         "genealogy_link",
+        "genealogy_threads",
         "gl_transactions",
+        "graphics_component_contract",
+        "graphics_contrast_check",
+        "graphics_module_binding",
+        "graphics_preview_scene",
+        "graphics_qa_gate_catalog",
+        "graphics_qa_gate_result",
+        "graphics_regulated_entity",
+        "graphics_rollout_scope",
+        "graphics_saved_experiment",
+        "graphics_simulation_run",
+        "graphics_template_zone_binding",
+        "graphics_theme_schedule",
+        "graphics_token_catalog",
+        "graphics_token_value",
+        "graphics_token_version",
+        "graphics_wcag_check",
         "hcm_attendance_records",
         "hcm_certifications",
         "hcm_disciplinary_actions",

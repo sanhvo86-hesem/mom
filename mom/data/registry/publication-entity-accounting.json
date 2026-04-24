@@ -1,6 +1,6 @@
 {
   "entity_accounting": {
-    "generated_at": "2026-04-24T08:04:10.784Z",
+    "generated_at": "2026-04-24T08:27:21.667Z",
     "publication_run_id": "c544a828-8ff5-44a4-9d02-0e0814d38afa",
     "purpose": "Explains the current relationship between registered tables, frontend entities, readiness state, and field coverage after canonical publication.",
     "schema_tables": {

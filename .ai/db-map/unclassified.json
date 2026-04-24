@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 746,
-        "generated_at": "2026-04-24T08:05:24+00:00"
+        "table_count": 749,
+        "generated_at": "2026-04-24T08:28:37+00:00"
     },
     "tables": {
         "ai_conversations": {
@@ -1372,7 +1372,9 @@
         },
         "dcc_doc_type_catalog": {
             "defined_in": "155_dcc_consolidation.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "doc_type",
             "foreign_keys": [
                 {
@@ -1388,14 +1390,18 @@
         },
         "dcc_document_header_label": {
             "defined_in": "150_dcc_document_change_control.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "label_id",
             "foreign_keys": [],
             "contract": null
         },
         "dcc_document_locale_variant": {
             "defined_in": "152_dcc_document_locale_variants.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "locale_variant_id",
             "foreign_keys": [
                 {
@@ -1403,6 +1409,15 @@
                     "ref": "dcc_document_header(doc_code)"
                 }
             ],
+            "contract": null
+        },
+        "dcc_role_catalog": {
+            "defined_in": null,
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
+            "primary_key": "",
+            "foreign_keys": [],
             "contract": null
         },
         "demand": {
@@ -2324,14 +2339,18 @@
         },
         "eqms_aml_records": {
             "defined_in": "146_eqms_sprint6b_aml_warranty.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "aml_id",
             "foreign_keys": [],
             "contract": null
         },
         "eqms_attachments": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "attachment_id",
             "foreign_keys": [],
             "contract": null
@@ -2341,7 +2360,8 @@
             "extended_in": [
                 "137_eqms_schema_drift_reconcile.sql",
                 "137_eqms_schema_drift_reconcile.sql",
-                "137_eqms_schema_drift_reconcile.sql"
+                "137_eqms_schema_drift_reconcile.sql",
+                "156_live_schema_drift_governance_reconcile.sql"
             ],
             "primary_key": "finding_id",
             "foreign_keys": [
@@ -2354,7 +2374,9 @@
         },
         "eqms_audits": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "audit_id",
             "foreign_keys": [],
             "contract": null
@@ -2371,7 +2393,8 @@
             "extended_in": [
                 "137_eqms_schema_drift_reconcile.sql",
                 "137_eqms_schema_drift_reconcile.sql",
-                "137_eqms_schema_drift_reconcile.sql"
+                "137_eqms_schema_drift_reconcile.sql",
+                "156_live_schema_drift_governance_reconcile.sql"
             ],
             "primary_key": "calibration_id",
             "foreign_keys": [],
@@ -2382,7 +2405,8 @@
             "extended_in": [
                 "137_eqms_schema_drift_reconcile.sql",
                 "137_eqms_schema_drift_reconcile.sql",
-                "137_eqms_schema_drift_reconcile.sql"
+                "137_eqms_schema_drift_reconcile.sql",
+                "156_live_schema_drift_governance_reconcile.sql"
             ],
             "primary_key": "capa_id",
             "foreign_keys": [],
@@ -2403,7 +2427,8 @@
         "eqms_change_controls": {
             "defined_in": "136_eqms_worldclass_surface.sql",
             "extended_in": [
-                "137_eqms_schema_drift_reconcile.sql"
+                "137_eqms_schema_drift_reconcile.sql",
+                "156_live_schema_drift_governance_reconcile.sql"
             ],
             "primary_key": "change_control_id",
             "foreign_keys": [],
@@ -2439,7 +2464,9 @@
         },
         "eqms_comments": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "comment_id",
             "foreign_keys": [],
             "contract": null
@@ -2459,14 +2486,18 @@
         },
         "eqms_concession_records": {
             "defined_in": "145_eqms_sprint6a_concessions_fai_sc.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "concession_id",
             "foreign_keys": [],
             "contract": null
         },
         "eqms_controlled_copies": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "copy_id",
             "foreign_keys": [
                 {
@@ -2485,7 +2516,9 @@
         },
         "eqms_csat_surveys": {
             "defined_in": "147_eqms_sprint6c_lessons_csat_sampling.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "survey_id",
             "foreign_keys": [],
             "contract": null
@@ -2496,7 +2529,8 @@
                 "137_eqms_schema_drift_reconcile.sql",
                 "137_eqms_schema_drift_reconcile.sql",
                 "137_eqms_schema_drift_reconcile.sql",
-                "137_eqms_schema_drift_reconcile.sql"
+                "137_eqms_schema_drift_reconcile.sql",
+                "156_live_schema_drift_governance_reconcile.sql"
             ],
             "primary_key": "deviation_id",
             "foreign_keys": [],
@@ -2504,7 +2538,9 @@
         },
         "eqms_document_acknowledgements": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "ack_id",
             "foreign_keys": [
                 {
@@ -2595,7 +2631,8 @@
             "extended_in": [
                 "137_eqms_schema_drift_reconcile.sql",
                 "137_eqms_schema_drift_reconcile.sql",
-                "141_extend_eqms_documents_migrate_records.sql"
+                "141_extend_eqms_documents_migrate_records.sql",
+                "156_live_schema_drift_governance_reconcile.sql"
             ],
             "primary_key": "doc_id",
             "foreign_keys": [],
@@ -2615,7 +2652,9 @@
         },
         "eqms_engineering_changes": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "ec_id",
             "foreign_keys": [],
             "contract": null
@@ -2688,14 +2727,18 @@
         },
         "eqms_export_jobs": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "job_id",
             "foreign_keys": [],
             "contract": null
         },
         "eqms_fai_characteristics": {
             "defined_in": "145_eqms_sprint6a_concessions_fai_sc.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "char_id",
             "foreign_keys": [
                 {
@@ -2705,12 +2748,22 @@
             ],
             "contract": null
         },
+        "eqms_fai_reports": {
+            "defined_in": null,
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
+            "primary_key": "",
+            "foreign_keys": [],
+            "contract": null
+        },
         "eqms_field_actions": {
             "defined_in": "136_eqms_worldclass_surface.sql",
             "extended_in": [
                 "137_eqms_schema_drift_reconcile.sql",
                 "137_eqms_schema_drift_reconcile.sql",
-                "137_eqms_schema_drift_reconcile.sql"
+                "137_eqms_schema_drift_reconcile.sql",
+                "156_live_schema_drift_governance_reconcile.sql"
             ],
             "primary_key": "field_action_id",
             "foreign_keys": [],
@@ -2890,14 +2943,18 @@
         },
         "eqms_lessons_learned": {
             "defined_in": "147_eqms_sprint6c_lessons_csat_sampling.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "lesson_id",
             "foreign_keys": [],
             "contract": null
         },
         "eqms_msa_records": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "msa_id",
             "foreign_keys": [],
             "contract": null
@@ -2965,14 +3022,18 @@
         },
         "eqms_quality_tower_snapshots": {
             "defined_in": "137_eqms_schema_drift_reconcile.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "id",
             "foreign_keys": [],
             "contract": null
         },
         "eqms_record_links": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "link_id",
             "foreign_keys": [],
             "contract": null
@@ -2991,14 +3052,18 @@
         },
         "eqms_risk_register": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "risk_id",
             "foreign_keys": [],
             "contract": null
         },
         "eqms_risks_controls": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "control_id",
             "foreign_keys": [
                 {
@@ -3010,7 +3075,9 @@
         },
         "eqms_sampling_plans": {
             "defined_in": "147_eqms_sprint6c_lessons_csat_sampling.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "plan_id",
             "foreign_keys": [],
             "contract": null
@@ -3033,21 +3100,27 @@
         },
         "eqms_signatures": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "signature_id",
             "foreign_keys": [],
             "contract": null
         },
         "eqms_spc_violation_acks": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "ack_id",
             "foreign_keys": [],
             "contract": null
         },
         "eqms_special_characteristics": {
             "defined_in": "145_eqms_sprint6a_concessions_fai_sc.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "sc_id",
             "foreign_keys": [],
             "contract": null
@@ -3070,7 +3143,9 @@
         },
         "eqms_supplier_qualification_events": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "event_id",
             "foreign_keys": [
                 {
@@ -3093,7 +3168,8 @@
                 "137_eqms_schema_drift_reconcile.sql",
                 "137_eqms_schema_drift_reconcile.sql",
                 "137_eqms_schema_drift_reconcile.sql",
-                "137_eqms_schema_drift_reconcile.sql"
+                "137_eqms_schema_drift_reconcile.sql",
+                "156_live_schema_drift_governance_reconcile.sql"
             ],
             "primary_key": "curriculum_id",
             "foreign_keys": [],
@@ -3101,7 +3177,9 @@
         },
         "eqms_training_matrix": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "matrix_id",
             "foreign_keys": [
                 {
@@ -3128,7 +3206,8 @@
             "extended_in": [
                 "137_eqms_schema_drift_reconcile.sql",
                 "137_eqms_schema_drift_reconcile.sql",
-                "137_eqms_schema_drift_reconcile.sql"
+                "137_eqms_schema_drift_reconcile.sql",
+                "156_live_schema_drift_governance_reconcile.sql"
             ],
             "primary_key": "training_id",
             "foreign_keys": [
@@ -3145,7 +3224,9 @@
         },
         "eqms_validation_executions": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "execution_id",
             "foreign_keys": [
                 {
@@ -3157,14 +3238,18 @@
         },
         "eqms_validation_projects": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "project_id",
             "foreign_keys": [],
             "contract": null
         },
         "eqms_validation_protocols": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "protocol_id",
             "foreign_keys": [
                 {
@@ -3176,7 +3261,9 @@
         },
         "eqms_validation_requirements": {
             "defined_in": "136_eqms_worldclass_surface.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "requirement_id",
             "foreign_keys": [
                 {
@@ -3188,7 +3275,9 @@
         },
         "eqms_warranty_claims": {
             "defined_in": "146_eqms_sprint6b_aml_warranty.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "claim_id",
             "foreign_keys": [],
             "contract": null
@@ -4125,7 +4214,9 @@
         },
         "genealogy_threads": {
             "defined_in": "137_eqms_schema_drift_reconcile.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "thread_id",
             "foreign_keys": [],
             "contract": null
@@ -4159,14 +4250,18 @@
         },
         "graphics_component_contract": {
             "defined_in": "148_graphics_authority_tables.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "contract_id",
             "foreign_keys": [],
             "contract": null
         },
         "graphics_contrast_check": {
             "defined_in": "149_graphics_v4_governance_tables.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "check_id",
             "foreign_keys": [
                 {
@@ -4190,7 +4285,9 @@
         },
         "graphics_module_binding": {
             "defined_in": "148_graphics_authority_tables.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "binding_id",
             "foreign_keys": [
                 {
@@ -4202,21 +4299,27 @@
         },
         "graphics_preview_scene": {
             "defined_in": "148_graphics_authority_tables.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "scene_id",
             "foreign_keys": [],
             "contract": null
         },
         "graphics_qa_gate_catalog": {
             "defined_in": "149_graphics_v4_governance_tables.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "gate_id",
             "foreign_keys": [],
             "contract": null
         },
         "graphics_qa_gate_result": {
             "defined_in": "149_graphics_v4_governance_tables.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "result_id",
             "foreign_keys": [
                 {
@@ -4232,14 +4335,18 @@
         },
         "graphics_regulated_entity": {
             "defined_in": "149_graphics_v4_governance_tables.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "entity_registry_id",
             "foreign_keys": [],
             "contract": null
         },
         "graphics_rollout_scope": {
             "defined_in": "148_graphics_authority_tables.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "rollout_id",
             "foreign_keys": [
                 {
@@ -4251,35 +4358,54 @@
         },
         "graphics_saved_experiment": {
             "defined_in": "148_graphics_authority_tables.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "experiment_id",
             "foreign_keys": [],
             "contract": null
         },
         "graphics_simulation_run": {
             "defined_in": "148_graphics_authority_tables.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "run_id",
             "foreign_keys": [],
             "contract": null
         },
         "graphics_template_zone_binding": {
             "defined_in": "149_graphics_v4_governance_tables.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "binding_id",
             "foreign_keys": [],
             "contract": null
         },
         "graphics_theme_schedule": {
             "defined_in": "148_graphics_authority_tables.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "schedule_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "graphics_token_catalog": {
+            "defined_in": null,
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
+            "primary_key": "",
             "foreign_keys": [],
             "contract": null
         },
         "graphics_token_value": {
             "defined_in": "148_graphics_authority_tables.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "value_id",
             "foreign_keys": [
                 {
@@ -4291,7 +4417,9 @@
         },
         "graphics_token_version": {
             "defined_in": "149_graphics_v4_governance_tables.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "version_id",
             "foreign_keys": [
                 {
@@ -4307,7 +4435,9 @@
         },
         "graphics_wcag_check": {
             "defined_in": "148_graphics_authority_tables.sql",
-            "extended_in": [],
+            "extended_in": [
+                "156_live_schema_drift_governance_reconcile.sql"
+            ],
             "primary_key": "check_id",
             "foreign_keys": [
                 {
