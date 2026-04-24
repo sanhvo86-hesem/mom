@@ -333,7 +333,7 @@ def build_translation_plan(text: str):
         return {
             "original": text,
             "literals": literals,
-            "parts": [("raw", protected)],
+            "parts": [("raw", protected, "", "")],
             "cores": [],
         }
     parts = re.split(r"(__DCC_LITERAL_\d+__)", protected)
@@ -435,7 +435,13 @@ def translate_core_map(cores: Iterable[str], translator) -> Dict[str, str]:
 
 def render_translation_plan(plan, translated_cores: Dict[str, str]) -> str:
     out_parts: List[str] = []
-    for kind, first, second, third in plan["parts"]:
+    for part in plan["parts"]:
+        if not isinstance(part, (list, tuple)) or not part:
+            continue
+        kind = str(part[0])
+        first = str(part[1]) if len(part) > 1 else ""
+        second = str(part[2]) if len(part) > 2 else ""
+        third = str(part[3]) if len(part) > 3 else ""
         if kind == "literal":
             out_parts.append(first)
             continue
