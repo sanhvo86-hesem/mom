@@ -219,6 +219,77 @@ function pool_env_value(string $poolConf, string $name): ?string
     return trim((string)$m[1]);
 }
 
+function pool_conf_value(string $poolConf, string $name): ?string
+{
+    if (!is_file($poolConf)) {
+        return null;
+    }
+    $pattern = '/^' . preg_quote($name, '/') . '\s*=\s*(.+)$/mi';
+    $raw = (string)@file_get_contents($poolConf);
+    if ($raw === '' || !preg_match($pattern, $raw, $m)) {
+        return null;
+    }
+    return trim((string)$m[1]);
+}
+
+function pool_identity(string $poolConf): array
+{
+    return [
+        'user' => trim((string)(pool_conf_value($poolConf, 'user') ?? '')),
+        'group' => trim((string)(pool_conf_value($poolConf, 'group') ?? '')),
+    ];
+}
+
+function nearest_existing_path(string $path): string
+{
+    $current = normalize_runtime_dir($path);
+    while ($current !== '' && !file_exists($current)) {
+        $next = dirname($current);
+        if ($next === $current) {
+            break;
+        }
+        $current = normalize_runtime_dir($next);
+    }
+    return $current;
+}
+
+function path_writable_for_identity(string $path, string $user, string $group): bool
+{
+    $probe = nearest_existing_path($path);
+    if ($probe === '' || !file_exists($probe)) {
+        return false;
+    }
+
+    $perms = @fileperms($probe);
+    $owner = @fileowner($probe);
+    $fileGroup = @filegroup($probe);
+    if ($perms === false || $owner === false || $fileGroup === false) {
+        return false;
+    }
+
+    $userInfo = function_exists('posix_getpwnam') ? @posix_getpwnam($user) : false;
+    $groupInfo = function_exists('posix_getgrnam') ? @posix_getgrnam($group) : false;
+    if (!is_array($userInfo) || !isset($userInfo['uid'])) {
+        return false;
+    }
+
+    $uid = (int)$userInfo['uid'];
+    $gid = is_array($groupInfo) && isset($groupInfo['gid'])
+        ? (int)$groupInfo['gid']
+        : (isset($userInfo['gid']) ? (int)$userInfo['gid'] : -1);
+
+    if ($uid === 0) {
+        return true;
+    }
+    if ((int)$owner === $uid) {
+        return (bool)($perms & 0x0080);
+    }
+    if ((int)$fileGroup === $gid) {
+        return (bool)($perms & 0x0010);
+    }
+    return (bool)($perms & 0x0002);
+}
+
 function command_probe(string $command, string $cwd, array $payload, int $timeoutSeconds = 30): array
 {
     $spec = [
@@ -404,6 +475,54 @@ function dcc_translation_probe(array $paths): array
     ];
 }
 
+function dcc_translation_surface_probe(array $paths): array
+{
+    $poolConf = resolve_php_fpm_pool_conf();
+    if (!is_file($poolConf)) {
+        return ['checked' => false, 'warning' => "PHP-FPM pool config not found: {$poolConf}"];
+    }
+
+    $identity = pool_identity($poolConf);
+    $user = trim((string)($identity['user'] ?? ''));
+    $group = trim((string)($identity['group'] ?? ''));
+    if ($user === '' || $group === '') {
+        return ['checked' => false, 'warning' => 'PHP-FPM pool user/group is not declared.'];
+    }
+
+    $docRoots = [
+        $paths['base_dir'] . '/docs/system',
+        $paths['base_dir'] . '/docs/operations',
+        $paths['base_dir'] . '/docs/forms',
+        $paths['base_dir'] . '/docs/training',
+    ];
+    $unwritable = [];
+    foreach ($docRoots as $root) {
+        if (!is_dir($root)) {
+            $unwritable[] = $root . ' (missing)';
+            continue;
+        }
+        if (!path_writable_for_identity($root, $user, $group)) {
+            $unwritable[] = $root;
+        }
+    }
+
+    $runtimeHome = trim((string)(pool_env_value($poolConf, 'DCC_TRANSLATION_RUNTIME_HOME') ?? ''));
+    if ($runtimeHome === '') {
+        $runtimeHome = $paths['cache_dir'] . '/dcc-translation-runtime';
+    }
+
+    return [
+        'checked' => true,
+        'ok' => $unwritable === [] && path_writable_for_identity($runtimeHome, $user, $group),
+        'pool_user' => $user,
+        'pool_group' => $group,
+        'doc_roots_writable' => $unwritable === [],
+        'unwritable_doc_roots' => $unwritable,
+        'runtime_home' => $runtimeHome,
+        'runtime_home_writable' => path_writable_for_identity($runtimeHome, $user, $group),
+    ];
+}
+
 $p = resolve_paths();
 $critical = [];
 $warnings = [];
@@ -480,6 +599,19 @@ if (($dcc['checked'] ?? false) && !($dcc['ok'] ?? false)) {
 } elseif (($dcc['checked'] ?? false) === false && isset($dcc['warning'])) {
     $warnings[] = (string)$dcc['warning'];
 }
+$dccSurface = dcc_translation_surface_probe($p);
+if (($dccSurface['checked'] ?? false) && !($dccSurface['ok'] ?? false)) {
+    $details = [];
+    if (!($dccSurface['doc_roots_writable'] ?? false)) {
+        $details[] = 'doc roots not writable for PHP-FPM user';
+    }
+    if (!($dccSurface['runtime_home_writable'] ?? false)) {
+        $details[] = 'translation runtime home not writable';
+    }
+    $critical[] = 'DCC translation runtime surface failed: ' . implode('; ', $details);
+} elseif (($dccSurface['checked'] ?? false) === false && isset($dccSurface['warning'])) {
+    $warnings[] = (string)$dccSurface['warning'];
+}
 
 echo "=== HESEM MOM Post-Deploy Health Check ===\n";
 echo "BASE_DIR: {$p['base_dir']}\n";
@@ -506,6 +638,15 @@ if (($dcc['checked'] ?? false) === true) {
     }
     if (!empty($dcc['engine_version'])) {
         echo "DCC translation engine: {$dcc['engine_version']}\n";
+    }
+}
+if (($dccSurface['checked'] ?? false) === true) {
+    echo "DCC translation pool user: " . ($dccSurface['pool_user'] ?? '') . "\n";
+    echo "DCC translation doc roots writable: " . yesNo((bool)($dccSurface['doc_roots_writable'] ?? false)) . "\n";
+    echo "DCC translation runtime home: " . ($dccSurface['runtime_home'] ?? '') . "\n";
+    echo "DCC translation runtime writable: " . yesNo((bool)($dccSurface['runtime_home_writable'] ?? false)) . "\n";
+    if (!empty($dccSurface['unwritable_doc_roots'])) {
+        echo "DCC translation unwritable doc roots: " . implode(', ', (array)$dccSurface['unwritable_doc_roots']) . "\n";
     }
 }
 

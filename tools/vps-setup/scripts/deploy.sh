@@ -232,6 +232,34 @@ for runtime_dir in sessions ratelimit cache; do
     find "$runtime_path" -type f -exec chmod 660 {} +
 done
 
+# Controlled-document content is an application-managed surface, not immutable
+# code. The editor, archive, and derived locale artifacts all write beside the
+# source documents, so only these content trees stay group-writable for the
+# PHP-FPM pool while the rest of the repository remains locked down.
+for content_dir in \
+    "$SITE_DIR/mom/docs/system" \
+    "$SITE_DIR/mom/docs/operations" \
+    "$SITE_DIR/mom/docs/forms" \
+    "$SITE_DIR/mom/docs/training" \
+    "$SITE_DIR/archive"; do
+    [ -d "$content_dir" ] || continue
+    chown -R "$DEPLOY_USER:$WEB_GROUP" "$content_dir"
+    find "$content_dir" -type d -exec chmod 2775 {} +
+    find "$content_dir" -type f -exec chmod 664 {} +
+done
+
+# Keep only the document-workflow registry files writable. The wider config
+# directory remains read-only so the deploy surface stays narrow and auditable.
+for config_file in \
+    "$SITE_DIR/mom/data/config/docs_custom.json" \
+    "$SITE_DIR/mom/data/config/docs_visibility.json" \
+    "$SITE_DIR/mom/data/config/form_control_registry.json" \
+    "$SITE_DIR/mom/data/config/portal_display_config.json"; do
+    [ -e "$config_file" ] || continue
+    chown "$DEPLOY_USER:$WEB_GROUP" "$config_file"
+    chmod 664 "$config_file"
+done
+
 # Ensure log files are writable
 for logfile in php_error.log audit.log db_queries.log; do
     target="$SITE_DIR/mom/data/$logfile"

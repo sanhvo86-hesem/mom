@@ -1826,15 +1826,54 @@ class DocumentController extends BaseController
      */
     private function findManagedDocumentByPath(string $relPath, array $displayConfig): ?array
     {
+        $normalizedPath = str_replace('\\', '/', trim($relPath));
         foreach ($this->managedDocumentCatalog($displayConfig) as $candidate) {
             if (!is_array($candidate)) {
                 continue;
             }
 
             $candidatePath = str_replace('\\', '/', (string)($candidate['path'] ?? ''));
-            if ($candidatePath === $relPath) {
+            if ($candidatePath === $normalizedPath) {
                 return $candidate;
             }
+        }
+
+        $rows = $this->data->query(
+            "SELECT doc_code
+             FROM dcc_document_locale_variant
+             WHERE artifact_rel_path = :path
+             LIMIT 1",
+            [':path' => $normalizedPath]
+        ) ?? [];
+        $docCode = trim((string)($rows[0]['doc_code'] ?? ''));
+        if ($docCode === '') {
+            return null;
+        }
+
+        return $this->findManagedDocumentByCode($docCode, $displayConfig);
+    }
+
+    private function findManagedDocumentByCode(string $code, array $displayConfig): ?array
+    {
+        $canonical = \MOM\Services\DocumentControl\DocumentControlService::canonicalizeCode($code);
+        if ($canonical === '') {
+            return null;
+        }
+
+        foreach ($this->managedDocumentCatalog($displayConfig) as $candidate) {
+            if (!is_array($candidate)) {
+                continue;
+            }
+
+            $candidateCode = \MOM\Services\DocumentControl\DocumentControlService::canonicalizeCode((string)($candidate['code'] ?? ''));
+            if ($candidateCode === $canonical) {
+                return $candidate;
+            }
+        }
+
+        $fallback = $this->resolveDocumentCatalogEntry($canonical, '');
+        if ($fallback !== []) {
+            return $fallback;
         }
 
         return null;

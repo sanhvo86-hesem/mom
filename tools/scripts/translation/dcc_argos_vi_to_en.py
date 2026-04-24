@@ -18,6 +18,45 @@ from html import unescape
 from pathlib import Path
 from typing import Dict, Iterable, List, Tuple
 
+ROOT = Path(__file__).resolve().parents[3]
+
+
+def ensure_runtime_home_env() -> None:
+    configured_home = os.environ.get("DCC_TRANSLATION_RUNTIME_HOME", "").strip()
+    env_home = os.environ.get("HOME", "").strip()
+    chosen_home = Path(configured_home).expanduser() if configured_home else None
+
+    if chosen_home is None:
+        if env_home:
+            candidate = Path(env_home).expanduser()
+            if candidate.exists() and os.access(candidate, os.W_OK):
+                chosen_home = candidate
+            elif not candidate.exists() and os.access(str(candidate.parent), os.W_OK):
+                chosen_home = candidate
+        if chosen_home is None:
+            chosen_home = ROOT / "mom" / "data" / "cache" / "dcc-translation-runtime"
+
+    data_home = Path(os.environ.get("XDG_DATA_HOME", "").strip() or (chosen_home / ".local" / "share")).expanduser()
+    cache_home = Path(os.environ.get("XDG_CACHE_HOME", "").strip() or (chosen_home / ".cache")).expanduser()
+    config_home = Path(os.environ.get("XDG_CONFIG_HOME", "").strip() or (chosen_home / ".config")).expanduser()
+
+    for path in (chosen_home, data_home, cache_home, config_home):
+        try:
+            path.mkdir(parents=True, exist_ok=True)
+        except Exception:
+            # Keep the env pointing at the intended runtime home so any later
+            # Argos import failure reports the real permission problem.
+            pass
+
+    os.environ["DCC_TRANSLATION_RUNTIME_HOME"] = str(chosen_home)
+    os.environ["HOME"] = str(chosen_home)
+    os.environ["XDG_DATA_HOME"] = str(data_home)
+    os.environ["XDG_CACHE_HOME"] = str(cache_home)
+    os.environ["XDG_CONFIG_HOME"] = str(config_home)
+
+
+ensure_runtime_home_env()
+
 try:
     from bs4 import BeautifulSoup, NavigableString
 except Exception as exc:  # pragma: no cover - runtime guard
@@ -53,7 +92,6 @@ except Exception as exc:  # pragma: no cover - runtime guard
     raise SystemExit(0)
 
 
-ROOT = Path(__file__).resolve().parents[3]
 GLOSSARY_PATH = ROOT / "mom" / "data" / "glossary" / "dict-data.json"
 SKIP_TAGS = {
     "script",
