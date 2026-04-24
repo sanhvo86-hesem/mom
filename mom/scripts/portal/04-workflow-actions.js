@@ -295,6 +295,10 @@ function startEdit(code){
       const st=document.getElementById('ed-status-save');
       if(st){st.textContent=(lang==='en'?'Ready':'Sẵn sàng');st.className='';}
       renderWorkflowPanel(doc);
+      // Refresh the top toolbar so edit-mode buttons (Save / Submit / Cancel)
+      // replace the view-mode actions. Without this the header still shows
+      // the "Create new revision / Open tab" buttons from view mode.
+      try{ updateDocViewerHeader(doc); }catch(e){}
     }
     
     if(saved){
@@ -841,7 +845,13 @@ function cancelEdit(){
   if(edFullscreen){edToggleFullscreen();}
   document.getElementById('doc-iframe').style.display='';
   var doc=DOCS.find(function(d){return d.code===code;});
-  if(doc){renderWorkflowPanel(doc);renderVersionHistory(doc);}
+  if(doc){
+    renderWorkflowPanel(doc);
+    renderVersionHistory(doc);
+    // Refresh toolbar so edit-mode buttons disappear and view-mode buttons
+    // (New revision / Back / Open tab) come back.
+    try{ updateDocViewerHeader(doc); }catch(e){}
+  }
 }
 
 // Build a FULL HTML document for server-side archive/publish.
