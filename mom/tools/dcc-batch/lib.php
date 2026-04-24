@@ -35,7 +35,7 @@ namespace MOM\Tools\DccBatch;
 /* ── Constants ─────────────────────────────────────────────────────────── */
 
 /** The cache-bust version stamp baked into the head bootstrap. */
-const DCC_VERSION = '2026-04-23-1';
+const DCC_VERSION = '2026-04-24-1';
 
 /** Comment that flags the placeholder; lets us locate it idempotently. */
 const DCC_PLACEHOLDER_COMMENT = '<!-- DCC Document Change Control header (values served by /api/v1/dcc; bootstrap seed is preview-only) -->';
@@ -660,19 +660,33 @@ function strip_orphan_close_div_after_placeholder(string $html): string
         return $html;
     }
     $cursor = (int)$m[0][1] + strlen($m[0][0]);
-    // Walk through up to 4 stray closers
+    // Walk through up to 4 stray closers, hopping over whitespace AND
+    // HTML comments (legacy strip passes left `<!-- FORM HEADER -->`
+    // markers behind in SYS-OPS-01/15 along with an orphan `</div>`).
     for ($n = 0; $n < 4; $n++) {
-        $ws = 0;
-        while ($cursor + $ws < strlen($html) && ctype_space($html[$cursor + $ws])) {
-            $ws++;
+        // Skip whitespace + HTML comments
+        while (true) {
+            $advanced = false;
+            // Skip whitespace
+            while ($cursor < strlen($html) && ctype_space($html[$cursor])) {
+                $cursor++;
+                $advanced = true;
+            }
+            // Skip HTML comment
+            if (substr($html, $cursor, 4) === '<!--') {
+                $end = strpos($html, '-->', $cursor + 4);
+                if ($end === false) break 2;
+                // Drop the comment too — it's residue from the legacy header
+                $html = substr($html, 0, $cursor) . substr($html, $end + 3);
+                $advanced = true;
+            }
+            if (!$advanced) break;
         }
-        $look = substr($html, $cursor + $ws, 8);
+        $look = substr($html, $cursor, 8);
         if (preg_match('#^</div\s*>#i', $look, $cm)) {
-            // Confirmed stray close-div at the head of body — drop it.
-            $start = $cursor + $ws;
-            $end   = $start + strlen($cm[0]);
-            $html  = substr($html, 0, $start) . substr($html, $end);
-            // Cursor stays the same; loop again in case there are several.
+            $end = $cursor + strlen($cm[0]);
+            $html = substr($html, 0, $cursor) . substr($html, $end);
+            // Loop again — there may be more stray closers
         } else {
             break;
         }

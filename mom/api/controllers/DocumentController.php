@@ -1364,7 +1364,19 @@ class DocumentController extends BaseController
             $this->error('invalid_base_path', 400);
         }
         if (!filename_matches_doc_code(basename($baseRel), $code)) {
-            $this->error('code_path_mismatch', 400);
+            $catalog = $this->resolveDocumentCatalogEntry($code, $baseRel);
+            if ($catalog === []) {
+                try {
+                    $header = (new \MOM\Services\DocumentControl\DocumentControlService($this->data))
+                        ->getHeader($code);
+                    $anchoredPath = trim(str_replace('\\', '/', (string)($header['filesystem_path'] ?? '')));
+                    if ($anchoredPath === '' || $anchoredPath !== $baseRel) {
+                        $this->error('code_path_mismatch', 400);
+                    }
+                } catch (Throwable $e) {
+                    $this->error('code_path_mismatch', 400);
+                }
+            }
         }
 
         return $baseRel;

@@ -96,17 +96,41 @@
     display: inline-flex;
     align-items: center;
     justify-content: flex-start;
-    min-width: max-content;
+    /* Reserve a fixed slot regardless of whether the inner img loads.
+     * Keeps title alignment identical across docs even when the logo
+     * fails to fetch (e.g. wrong relative path, missing asset). */
+    width: 120px !important;
+    height: 36px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
 }
 
+/* Lock logo dimensions with !important so legacy doc CSS (`assets/style.css`)
+ * cannot override and inflate the logo to natural SVG size. The reported bug
+ * (POL-QMS-002 huge logo) was caused by external CSS overriding `height:auto`. */
 .dcc-header__logo img,
 .dcc-header__logo svg {
-    height: 28px;
-    width: auto;
-    max-width: none;
-    flex-shrink: 0;
-    object-fit: contain;
-    display: block;
+    height: 32px !important;
+    max-height: 32px !important;
+    width: auto !important;
+    max-width: 120px !important;
+    flex-shrink: 0 !important;
+    object-fit: contain !important;
+    display: block !important;
+}
+
+/* Visual fallback when the <img> fails to load and onerror removes it.
+ * The logo div retains its 120x36 slot; we render a styled "HESEM" text
+ * via ::before so the title block stays aligned and the brand is still
+ * visible. The img, if it loads, sits ON TOP of the ::before. */
+.dcc-header__logo:empty::before,
+.dcc-header__logo:not(:has(img))::before {
+    content: 'HESEM';
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: #1e3a8a;
+    letter-spacing: 0.5px;
 }
 
 .dcc-header__titles {
@@ -204,7 +228,11 @@
     text-overflow: ellipsis;
 }
 
-/* Document-code badge (monospace pill) */
+/* Document-code badge (monospace pill).
+ * Long JD/DEPT codes (e.g. JD-CLEANING-AND-PACKAGING-SUPERVISOR) get
+ * truncated with an ellipsis so they don't push the rest of the ribbon
+ * onto a second line. The full code is exposed via the `title` attribute
+ * (set by the renderer) so users can hover to read it. */
 .dcc-header__code {
     display: inline-flex;
     align-items: center;
@@ -218,6 +246,10 @@
     font-weight: var(--dcc-code-weight);
     letter-spacing: 0.02em;
     color: var(--dcc-value-color);
+    max-width: 280px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 /* Owner / approver single-role badge */

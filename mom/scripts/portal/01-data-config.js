@@ -1413,7 +1413,7 @@ function applyDocsTreeResponse(res, options={}){
  * every value comes from either the filesystem (for the code slug) or the
  * DB (for human-editable fields).
  * ═══════════════════════════════════════════════════════════════════════ */
-let __DCC_HEADER_CACHE = {};          // map: canonical doc_code → {title, subtitle, revision, status, owner_role_code, approver_role_code, effective_date}
+let __DCC_HEADER_CACHE = {};          // map: canonical doc_code/path → DCC header projection
 let __DCC_OVERLAY_IN_FLIGHT = false;  // dedupe concurrent fetches
 let __DCC_OVERLAY_LOADED = false;     // true after first successful fetch
 let __DCC_OVERLAY_PENDING_OPTIONS = null;
@@ -1432,13 +1432,19 @@ function overlayDocsWithDccCache(docs){
     const d = docs[i];
     if (!d) continue;
     d.__dccLocale = lang === 'en' ? 'en' : 'vi';
+    d.__dccDocCode = '';
     d.__dccArtifactPath = '';
     d.__dccTranslationState = '';
     d.__dccLocaleFallback = false;
     d.__dccLocaleVariantExists = false;
     d.__dccLocaleUnavailable = false;
+    d.__dccLocaleArtifactPresent = false;
     const code = String(d.code || '').toUpperCase();
-    const row = code && map[code];
+    const path = String(d.path || '').trim().toLowerCase();
+    const filename = path ? path.split('/').pop() : '';
+    const row = (code && map[code])
+      || (path && map['path:' + path])
+      || (filename && map['file:' + filename]);
     if (!row) continue;
     // Keep title driven by the filesystem (filename-derived). Do NOT set
     // standard_title here — the user wants the filename to remain master
@@ -1455,9 +1461,11 @@ function overlayDocsWithDccCache(docs){
      * populated from the source subtitle so users see meaningful text in
      * both EN and VI modes until proper EN translations are authored. */
     const translationMissing = (lang === 'en') && !!row.is_locale_fallback && !row.locale_variant_exists;
+    d.__dccDocCode = row.doc_code || code;
     d.__dccLocaleVariantExists = !!row.locale_variant_exists;
     d.__dccLocaleFallback = !!row.is_locale_fallback;
     d.__dccLocaleUnavailable = translationMissing;
+    d.__dccLocaleArtifactPresent = !!row.locale_artifact_present;
     if (row.subtitle) d.__displayDesc = row.subtitle;
     // Surface DCC metadata for any consumer that wants it (does not change
     // title display). The ribbon renderer reads directly from the API.
@@ -1515,7 +1523,8 @@ async function refreshDccOverlayFromServer(options={}){
           const r = rows[i];
           if (!r || !r.doc_code) continue;
           const key = String(r.doc_code).toUpperCase();
-          next[key] = {
+          const entry = {
+            doc_code:            r.doc_code || key,
             title:              r.title || '',
             subtitle:           r.subtitle || '',
             revision:           r.revision || '',
@@ -1523,11 +1532,19 @@ async function refreshDccOverlayFromServer(options={}){
             owner_role_code:    r.owner_role_code || '',
             approver_role_code: r.approver_role_code || '',
             effective_date:     r.effective_date || '',
+            filename:           r.filename || '',
+            filesystem_path:    r.filesystem_path || '',
             locale_variant_exists: !!r.locale_variant_exists,
             is_locale_fallback: !!r.is_locale_fallback,
+            locale_artifact_present: !!r.locale_artifact_present,
             artifact_rel_path:  r.artifact_rel_path || '',
             translation_state:  r.translation_state || ''
           };
+          next[key] = entry;
+          const rowPath = String(entry.filesystem_path || '').trim().toLowerCase();
+          const rowFilename = String(entry.filename || '').trim().toLowerCase();
+          if (rowPath) next['path:' + rowPath] = entry;
+          if (rowFilename) next['file:' + rowFilename] = entry;
         }
         const changed = JSON.stringify(next) !== JSON.stringify(__DCC_HEADER_CACHE);
         __DCC_HEADER_CACHE = next;

@@ -257,6 +257,9 @@ function _roleBadge(role){
 
 function _codeBadge(code){
     var badge = _el('span', 'dcc-header__code', code);
+    // Expose the FULL code via title so long JD/DEPT codes that get
+    // CSS-truncated to 280px with an ellipsis are still readable on hover.
+    if (code) badge.setAttribute('title', String(code));
     return badge;
 }
 
@@ -269,16 +272,25 @@ function _renderInto(container, header, labels){
     // Title block (logo + titles)
     var titleBlock = _el('div', 'dcc-header__title-block');
     var logo = _el('div', 'dcc-header__logo');
-    var logoSrc = container.getAttribute('data-dcc-logo') || _assetUrl('assets/hesem-logo.svg');
-    // If a relative-path logo was provided but it would resolve wrong under
-    // the portal's streaming pipeline, fall back to the derived absolute URL.
-    if (logoSrc.indexOf('://') === -1 && logoSrc.charAt(0) !== '/') {
-        logoSrc = _assetUrl('assets/hesem-logo.svg');
-    }
+    /* IGNORE the per-doc data-dcc-logo attribute. Different docs were
+     * authored at different folder depths and ship inconsistent relative
+     * paths (../../../ vs ../../../../../) that resolve differently under
+     * the portal's doc_stream pipeline, leading to broken/missing logos.
+     * The renderer ALWAYS computes the absolute URL itself so every doc
+     * loads the same logo from the same place — `<APP_BASE>/assets/hesem-logo.svg`. */
+    var logoSrc = _assetUrl('assets/hesem-logo.svg');
     var img = document.createElement('img');
     img.src = logoSrc;
     img.alt = 'HESEM';
-    img.onerror = function(){ logo.removeChild(img); };
+    img.width = 100;     // intrinsic hint; CSS still wins
+    img.height = 32;
+    /* On load failure, leave the .dcc-header__logo div EMPTY (don't remove
+     * the slot). The CSS `:empty::before` rule renders a styled "HESEM"
+     * text fallback so the title block stays correctly aligned and the
+     * brand identity is preserved. */
+    img.onerror = function(){
+        try { if (img.parentNode) img.parentNode.removeChild(img); } catch(e){}
+    };
     logo.appendChild(img);
     titleBlock.appendChild(logo);
 

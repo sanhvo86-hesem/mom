@@ -119,6 +119,8 @@ final class DocumentControlService
             '/^(ANNEX-DEP-[A-Z]+-\d+)/',
             '/^(ANNEX-(?:JOB|ORG)-\d+)/',
             '/^(ANNEX-HR-LAB-\d+)/',
+            '/^(MRR-G\d+)/',
+            '/^(MRR-\d{2})/',
             '/^((?:SOP|PROC|WI|FRM|ANNEX|POL|QMS|DEPT)-[A-Z]+-\d+)/',
             '/^(JD-[A-Z0-9-]+)/',
             '/^(DEPT-[A-Z0-9-]+)/',
@@ -247,6 +249,7 @@ final class DocumentControlService
             "SELECT header_id, doc_code, eqms_doc_id, title, subtitle, doc_type,
                     revision, effective_date, owner_role_code, approver_role_code,
                     iso_clause, status, locale_default, metadata,
+                    filename, filesystem_path,
                     created_at, created_by, updated_at, updated_by
              FROM dcc_document_header
              WHERE doc_code = :c
@@ -451,7 +454,8 @@ final class DocumentControlService
         $limit  = max(1, min(500, $limit));
         $offset = max(0, $offset);
         $sql = "SELECT doc_code, title, subtitle, doc_type, revision, effective_date,
-                       owner_role_code, approver_role_code, status, updated_at
+                       owner_role_code, approver_role_code, status,
+                       filename, filesystem_path, updated_at
                 FROM dcc_document_header
                 WHERE " . implode(' AND ', $where) . "
                 ORDER BY doc_code
@@ -1199,6 +1203,19 @@ final class DocumentControlService
         $out['locale_revision_matches_source'] = $exists ? $revisionMatches : true;
         $out['locale_source_hash_matches'] = $exists ? $sourceHashMatches : true;
         $out['locale_source_baseline_compatible'] = $exists ? $sourceBaselineCompatible : true;
+        $filesystemPath = trim((string)($header['filesystem_path'] ?? ''));
+        if ($filesystemPath === '') {
+            $sourcePath = $this->sourceDocumentPathFor((string)($header['doc_code'] ?? ''));
+            $filesystemPath = $sourcePath !== null
+                ? (string)($this->relativeRepoPath($sourcePath, $this->data->getRootDir()) ?? '')
+                : '';
+        }
+        $filename = trim((string)($header['filename'] ?? ''));
+        if ($filename === '' && $filesystemPath !== '') {
+            $filename = basename($filesystemPath);
+        }
+        $out['filename'] = $filename !== '' ? $filename : null;
+        $out['filesystem_path'] = $filesystemPath !== '' ? $filesystemPath : null;
 
         if ($renderable) {
             if (array_key_exists('title', $variant) && trim((string)$variant['title']) !== '') {

@@ -36,7 +36,7 @@ try {
   self.__SW_BUILD_TAG = 'dev';
 }
 
-const CACHE_VERSION = 'v1.3.51';
+const CACHE_VERSION = 'v1.3.52';
 const CACHE_BUILD   = self.__SW_BUILD_TAG || 'dev';
 const CACHE_PREFIX  = 'hesem-mom';
 

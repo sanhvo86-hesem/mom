@@ -916,6 +916,7 @@ function getDocLocaleView(doc){
       file: artifactPath,
       available: true,
       translationState: translationState || 'released',
+      localeArtifactPresent: !!doc.__dccLocaleArtifactPresent,
       localeVariantExists: !!doc.__dccLocaleVariantExists,
       isLocaleFallback: !!doc.__dccLocaleFallback
     };
@@ -926,6 +927,7 @@ function getDocLocaleView(doc){
     file: '',
     available: false,
     translationState: translationState || 'missing',
+    localeArtifactPresent: !!doc.__dccLocaleArtifactPresent,
     localeVariantExists: !!doc.__dccLocaleVariantExists,
     isLocaleFallback: true
   };
@@ -985,11 +987,12 @@ async function ensureDocEnglishLocaleArtifact(doc, options){
     return { ok: true, skipped: true, reason: 'locale_artifact_already_available', translationState: translationState || 'released' };
   }
   const staleRenderableVariant = !!(localeView && !localeView.available && localeView.localeVariantExists && isRenderableLocaleArtifactState(translationState));
-  if(!opts.force && translationState !== '' && translationState !== 'missing' && !staleRenderableVariant){
+  const blockedVariantRetry = translationState === 'blocked';
+  if(!opts.force && !blockedVariantRetry && translationState !== '' && translationState !== 'missing' && !staleRenderableVariant){
     return { ok: true, skipped: true, reason: 'locale_state_not_bootstrappable', translationState };
   }
 
-  const code = String(doc.code || '').trim();
+  const code = String(doc.__dccDocCode || doc.code || '').trim();
   const basePath = String(doc.path || '').trim();
   if(!code || !basePath){
     return { ok: false, skipped: true, reason: 'missing_code_or_path' };
@@ -1004,7 +1007,7 @@ async function ensureDocEnglishLocaleArtifact(doc, options){
       code: code,
       base_path: basePath,
       locale: 'en',
-      force: !!opts.force
+      force: !!opts.force || blockedVariantRetry
     }, 'POST', 300000);
 
     if(res && res.ok && typeof refreshDccOverlayFromServer === 'function'){
