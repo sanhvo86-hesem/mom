@@ -1687,6 +1687,29 @@ class DocumentController extends BaseController
                     throw $e;
                 }
             }
+
+            // Legacy "approve" is the terminal publish step (no separate DCN /
+            // release ceremony in the file-backed workflow). Project the
+            // approved revision directly onto the header so the DCC ribbon
+            // always reflects the latest approved body, not the seeded V0/V1.
+            // Without this, the viewer shows V1.0 forever even after multiple
+            // approve cycles bump the legacy manifest to V2.0, V3.0, …
+            $this->data->execute(
+                "UPDATE dcc_document_header
+                 SET revision = :rev,
+                     effective_date = :eff,
+                     updated_by = :actor
+                 WHERE doc_code = :c",
+                [
+                    ':rev'   => $normalisedRev,
+                    ':eff'   => $effective,
+                    ':actor' => $actor !== '' ? $actor : 'system',
+                    ':c'     => $canonical,
+                ]
+            );
+            // Flip is_current on the just-recorded revision so /revisions and
+            // the unique-current-per-doc index reflect the projection.
+            $svc->markRevisionCurrent($canonical, $normalisedRev, $actor !== '' ? $actor : 'system');
         } catch (Throwable $e) {
             @error_log('[dcc-bridge] approve ' . $code . ' failed: ' . $e->getMessage());
         }
