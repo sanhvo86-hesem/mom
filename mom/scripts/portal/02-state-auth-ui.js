@@ -3147,12 +3147,7 @@ function updateDocViewerHeader(doc){
     'dv-detail-toggle',
     `aria-expanded="${docHeaderMetaCollapsed?'false':'true'}"`
   );
-  const ownerEditButton = canEdit(doc)
-    ? '<button class="dv-meta-edit" onclick="event.stopPropagation();editDocMeta(\''+doc.code+'\',\'owner\')" title="'+(lang==='en'?'Edit owner':'Chỉnh chủ sở hữu')+'">'+(lang==='en'?'Edit':'Sửa')+'</button>'
-    : '';
-  const approverEditButton = canEdit(doc)
-    ? '<button class="dv-meta-edit" onclick="event.stopPropagation();editDocMeta(\''+doc.code+'\',\'approver\')" title="'+(lang==='en'?'Edit approver':'Chỉnh người duyệt')+'">'+(lang==='en'?'Edit':'Sửa')+'</button>'
-    : '';
+  const canEditMeta = canEdit(doc);
   const activityNotes = [submittedMeta, lastEditMeta, approvedMeta].filter(Boolean).join('');
   const navActionsHtml = isWorkbook
     ? `<div class="dv-action-group dv-nav-actions">
@@ -3173,6 +3168,8 @@ function updateDocViewerHeader(doc){
       ${navActionsHtml}
     </div>
   `);
+  const safeDocCode = escapeHtml(doc.code);
+  const safeLocale = escapeHtml(lang==='en' ? 'en' : 'vi');
   headerEl.innerHTML = `
     <div class="dv-top">
       <div class="dv-title-area">
@@ -3182,69 +3179,184 @@ function updateDocViewerHeader(doc){
 	      </div>
 	    </div>
     <div class="dv-meta${docHeaderMetaCollapsed ? ' is-collapsed' : ''}">
-      <div class="dv-meta-grid">
-        <div class="dv-meta-item"><span class="dv-meta-label">${T('code_label')}</span><div class="dv-meta-value"><b>${displayCode}</b></div></div>
-        <div class="dv-meta-item"><span class="dv-meta-label">${T('revision_label')}</span><div class="dv-meta-value"><b style="color:${statusColor(status)}">v${rev}</b></div></div>
-        <div class="dv-meta-item"><span class="dv-meta-label">${T('type')}</span><div class="dv-meta-value"><b>${catLabel(cat)}</b></div></div>
-        <div class="dv-meta-item"><span class="dv-meta-label">${T('owner')}</span><div class="dv-meta-value"><b>${(state&&state.owner)?state.owner:doc.owner}</b>${ownerEditButton}</div></div>
-        <div class="dv-meta-item"><span class="dv-meta-label">${T('approver')}</span><div class="dv-meta-value"><b>${(state&&state.approver)?state.approver:T('gd')}</b>${approverEditButton}</div></div>
-        <div class="dv-meta-item"><span class="dv-meta-label">${T('status')}</span><div class="dv-meta-value"><b style="color:${statusColor(status)}">${statusLabel(status)}</b></div></div>
-      </div>
+      <div class="dcc-header"
+           data-dcc-doc-code="${safeDocCode}"
+           data-dcc-locale="${safeLocale}"
+           data-dcc-variant="viewer-inline"></div>
 	      ${(activityNotes || localeStatusNote) ? `<div class="dv-meta-notes">${activityNotes}${localeStatusNote ? localeStatusNote : ''}</div>` : ''}
 	    </div>`;
+  const dccEl = headerEl.querySelector('.dcc-header');
+  if (dccEl && window.DccHeader && typeof window.DccHeader.render === 'function') {
+    Promise.resolve(window.DccHeader.render(dccEl))
+      .then(function(){ if (canEditMeta) _injectDccMetaEditButtons(dccEl, doc.code); })
+      .catch(function(){ /* renderer already paints its own error box */ });
+  }
   syncDocViewerDetailVisibility();
+}
+
+/* Inject owner/approver pencil buttons next to the DCC ribbon cells. Kept as
+ * a DOM hook (rather than baked into the renderer) so the renderer stays
+ * read-only and the edit affordance is viewer-scoped. Idempotent — guards
+ * against duplicate buttons if render() is called twice for the same node. */
+function _injectDccMetaEditButtons(dccEl, docCode){
+  if (!dccEl || !docCode) return;
+  var ribbon = dccEl.querySelector('.dcc-header__ribbon');
+  if (!ribbon) return;
+  var specs = [
+    { cell:'owner',    title: lang==='en' ? 'Edit owner'    : 'Chỉnh chủ sở hữu' },
+    { cell:'approver', title: lang==='en' ? 'Edit approver' : 'Chỉnh người duyệt' }
+  ];
+  for (var i = 0; i < specs.length; i++) {
+    var spec = specs[i];
+    var target = ribbon.querySelector('[data-dcc-cell="' + spec.cell + '"]');
+    if (!target) continue;
+    if (target.querySelector('.dv-meta-edit[data-dcc-edit]')) continue;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'dv-meta-edit';
+    btn.setAttribute('data-dcc-edit', spec.cell);
+    btn.setAttribute('title', spec.title);
+    btn.textContent = lang==='en' ? 'Edit' : 'Sửa';
+    (function(codeVal, field){
+      btn.addEventListener('click', function(ev){
+        ev.stopPropagation();
+        editDocMeta(codeVal, field);
+      });
+    })(docCode, spec.cell);
+    target.appendChild(btn);
+  }
 }
 
 // ═══════════════════════════════════════════════════
 // RENDER PAGES
 // ═══════════════════════════════════════════════════
 
-// Edit doc metadata (owner, approver) - synced to server state
+/* ── DCC role catalog cache (owner/approver pickers) ────────────────────
+ * In-memory only; keyed by class ('owner'|'approver'). Not cleared on logout —
+ * role codes are non-sensitive catalog data. Reload of the page re-fetches. */
+const _dccRoleCache = Object.create(null);
+
+function _dccRolesFetch(cls){
+  const key = String(cls || 'all');
+  if (_dccRoleCache[key]) return Promise.resolve(_dccRoleCache[key]);
+  const url = '/api/v1/dcc/roles?class=' + encodeURIComponent(key);
+  return fetch(url, { credentials:'same-origin', headers:{ 'Accept':'application/json' } })
+    .then(function(res){
+      if (!res.ok) throw new Error('dcc_roles_http_' + res.status);
+      return res.json();
+    })
+    .then(function(body){
+      const roles = (body && Array.isArray(body.roles)) ? body.roles : [];
+      _dccRoleCache[key] = roles;
+      return roles;
+    });
+}
+
+// Edit doc metadata (owner, approver) — routed through DCC role catalog.
 async function editDocMeta(code, field){
   try{
     const doc = DOCS.find(d=>d.code===code);
     if(!doc) return;
-    const state = getDocState(code) || {};
-    
-    // Build options for the field
-    let currentVal = '';
-    let title = '';
-    let options = [];
-    
-    if(field === 'owner'){
-      currentVal = (state.owner || doc.owner || '');
-      title = lang==='en'?'Edit Document Owner':'Chỉnh sửa Chủ sở hữu';
-      // Build department list from CATEGORIES or known departments
-      options = ['QA/QMS','Production','Engineering','Sales','Purchasing','HR/Admin','IT','Finance','Warehouse','Planning','Quality','Maintenance','Management'];
-    } else if(field === 'approver'){
-      currentVal = (state.approver || (lang==='en'?'General Director':'Tổng Giám Đốc'));
-      title = lang==='en'?'Edit Approver':'Chỉnh sửa Người phê duyệt';
-      options = [lang==='en'?'General Director':'Tổng Giám Đốc', 'QMR', 'QA Manager', 'Production Manager', 'Engineering Manager'];
-      // Add admin users if available
-      try{
-        if(typeof adminUsers !== 'undefined' && Array.isArray(adminUsers)){
-          adminUsers.forEach(u=>{ if(u.name && !options.includes(u.name)) options.push(u.name); });
-        }
-      }catch(e){}
-    }
-    
-    const newVal = prompt(title + '\n\n' + (lang==='en'?'Current':'Hiện tại') + ': ' + currentVal + '\n\n' + (lang==='en'?'Options':'Tùy chọn') + ': ' + options.join(', ') + '\n\n' + (lang==='en'?'Enter new value:':'Nhập giá trị mới:'), currentVal);
-    if(newVal === null || newVal.trim() === '' || newVal.trim() === currentVal) return;
-    
-    // Update state
-    state[field] = newVal.trim();
-    setDocState(code, state);
-    
-    // Do not hit the blocked legacy metadata-write surface. This quick edit is
-    // currently a local workspace affordance until owner/approver display labels
-    // are mapped onto a canonical DCC role-code contract.
+    if(field !== 'owner' && field !== 'approver') return;
 
-    // Refresh header
-    updateDocViewerHeader(doc);
-    showToast((lang==='en'?'Updated locally: ':'Đã cập nhật cục bộ: ') + field);
+    const roles = await _dccRolesFetch(field);
+    if(!roles.length){
+      showToast(lang==='en' ? '⚠ No roles available' : '⚠ Chưa có vai trò khả dụng');
+      return;
+    }
+
+    const title = field === 'owner'
+      ? (lang==='en' ? 'Edit Document Owner' : 'Chỉnh sửa Chủ sở hữu')
+      : (lang==='en' ? 'Edit Approver'       : 'Chỉnh sửa Người phê duyệt');
+    const payloadKey = field === 'owner' ? 'owner_role_code' : 'approver_role_code';
+
+    let currentCode = '';
+    try {
+      const hdrUrl = '/api/v1/dcc/documents/' + encodeURIComponent(code) + '/header?locale=' + encodeURIComponent(lang==='en'?'en':'vi');
+      const hdrRes = await fetch(hdrUrl, { credentials:'same-origin', headers:{ 'Accept':'application/json' } });
+      if (hdrRes.ok) {
+        const hdrBody = await hdrRes.json();
+        const hdr = hdrBody && hdrBody.header ? hdrBody.header : {};
+        currentCode = String((field === 'owner' ? hdr.owner_role_code : hdr.approver_role_code) || '');
+      }
+    } catch(e){ /* non-fatal: picker still works without prefill */ }
+
+    _openDccRolePicker({
+      title: title,
+      roles: roles,
+      currentCode: currentCode,
+      onSubmit: async function(selected){
+        if(!selected || selected === currentCode) return;
+        const headers = { 'Content-Type':'application/json', 'Accept':'application/json' };
+        if (window.csrfToken) headers['X-CSRF-Token'] = window.csrfToken;
+        const body = {}; body[payloadKey] = selected;
+        const patchUrl = '/api/v1/dcc/documents/' + encodeURIComponent(code) + '/header';
+        const res = await fetch(patchUrl, {
+          method:'PATCH',
+          credentials:'same-origin',
+          headers: headers,
+          body: JSON.stringify(body)
+        });
+        if(!res.ok){
+          const errText = await res.text().catch(function(){ return ''; });
+          console.warn('[DCC] PATCH header failed', res.status, errText);
+          showToast(lang==='en' ? '⚠ Save failed' : '⚠ Lưu thất bại');
+          return;
+        }
+        showToast(lang==='en' ? 'Saved' : 'Đã lưu');
+        const headerEl = document.getElementById('doc-viewer-header');
+        const dccEl = headerEl ? headerEl.querySelector('.dcc-header') : null;
+        if (dccEl && window.DccHeader && typeof window.DccHeader.render === 'function') {
+          try { await window.DccHeader.render(dccEl); } catch(e){}
+        }
+        try { updateDocViewerHeader(doc); } catch(e){}
+      }
+    });
   }catch(err){
     console.error('editDocMeta error:', err);
+    showToast(lang==='en' ? '⚠ Could not load roles' : '⚠ Không tải được vai trò');
   }
+}
+
+function _openDccRolePicker(cfg){
+  document.getElementById('dcc-role-picker-modal')?.remove();
+  const modal = document.createElement('div');
+  modal.className = 'modal-overlay';
+  modal.id = 'dcc-role-picker-modal';
+  const opts = cfg.roles.map(function(r){
+    const label = (lang==='en' ? (r.label_en || r.label_vi) : (r.label_vi || r.label_en)) || r.role_code;
+    const selAttr = (r.role_code === cfg.currentCode) ? ' selected' : '';
+    return '<option value="' + escapeHtml(r.role_code) + '"' + selAttr + '>' + escapeHtml(r.role_code) + ' — ' + escapeHtml(label) + '</option>';
+  }).join('');
+  modal.innerHTML = `
+    <div class="modal" style="max-width:480px">
+      <div class="modal-header">
+        <div class="modal-title">${escapeHtml(cfg.title)}</div>
+        <button class="icon-btn" onclick="document.getElementById('dcc-role-picker-modal')?.remove()">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-field">
+          <label>${lang==='en' ? 'Role' : 'Vai trò'}</label>
+          <select id="dcc-role-picker-select" style="width:100%;padding:8px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:#fff">
+            ${opts}
+          </select>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:var(--text-3)">${lang==='en' ? 'Values flow from the DCC role catalog.' : 'Giá trị lấy từ danh mục vai trò DCC.'}</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-admin" id="dcc-role-picker-cancel">${lang==='en' ? 'Cancel' : 'Hủy'}</button>
+        <button class="btn-admin primary" id="dcc-role-picker-save">${lang==='en' ? 'Save' : 'Lưu'}</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+  modal.addEventListener('click', function(ev){ if(ev.target === modal) modal.remove(); });
+  modal.querySelector('#dcc-role-picker-cancel').addEventListener('click', function(){ modal.remove(); });
+  modal.querySelector('#dcc-role-picker-save').addEventListener('click', async function(){
+    const sel = modal.querySelector('#dcc-role-picker-select');
+    const chosen = sel ? sel.value : '';
+    modal.remove();
+    try { await cfg.onSubmit(chosen); } catch(e){ console.error('role picker submit', e); }
+  });
 }
 
 function renderDashboard(){

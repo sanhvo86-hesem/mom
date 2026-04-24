@@ -2,7 +2,7 @@
     "_meta": {
         "domain": "procurement_supplier_quality",
         "table_count": 12,
-        "generated_at": "2026-04-23T08:58:01+00:00"
+        "generated_at": "2026-04-24T03:23:43+00:00"
     },
     "tables": {
         "incoming_inspection_results": {

@@ -82,6 +82,26 @@ if ($dl) {
     }
 }
 
+/* Pre-load doc-type defaults from dcc_doc_type_catalog (migration 155).
+ * When the catalog is missing (older DB), fall back to the classic QA/CEO. */
+$docTypeDefaults = [];
+if ($dl) {
+    try {
+        $rows = $dl->query(
+            "SELECT doc_type, default_owner_role, default_approver_role
+             FROM dcc_doc_type_catalog WHERE is_active = TRUE"
+        ) ?? [];
+        foreach ($rows as $r) {
+            $docTypeDefaults[strtoupper((string)$r['doc_type'])] = [
+                'owner'    => trim((string)($r['default_owner_role']    ?? '')),
+                'approver' => trim((string)($r['default_approver_role'] ?? '')),
+            ];
+        }
+    } catch (\Throwable $e) {
+        // Catalog missing — use hard-coded fallbacks below.
+    }
+}
+
 $stats = [
     'inspected'        => 0,
     'skipped_no_code'  => 0,
@@ -129,7 +149,7 @@ foreach (walk_docs($ROOT_DIR) as $abs) {
             $extractedSubtitle = null;
         }
         if ($dl && !$opts['no_db']) {
-            upsert_db_row($dl, $dbHeaders, $stats, $opts, $code, $extractedTitle, $extractedSubtitle);
+            upsert_db_row($dl, $dbHeaders, $stats, $opts, $code, $extractedTitle, $extractedSubtitle, $abs, $ROOT_DIR, $docTypeDefaults);
         }
         if ($opts['limit'] > 0 && ++$processed >= $opts['limit']) {
             echo "[info] hit --limit={$opts['limit']}, stopping.\n";
@@ -251,7 +271,7 @@ foreach (walk_docs($ROOT_DIR) as $abs) {
 
     // ── DB pass (HTML branch) ──────────────────────────────────────────
     if ($dl && !$opts['no_db']) {
-        upsert_db_row($dl, $dbHeaders, $stats, $opts, $code, $extractedTitle, $extractedSubtitle);
+        upsert_db_row($dl, $dbHeaders, $stats, $opts, $code, $extractedTitle, $extractedSubtitle, $abs, $ROOT_DIR, $docTypeDefaults);
     }
 
     if ($opts['limit'] > 0 && ++$processed >= $opts['limit']) {
@@ -292,6 +312,12 @@ function title_from_filename_for_form(string $absPath, string $code): string
 /**
  * Idempotent INSERT/UPDATE helper for `dcc_document_header`.
  * Mutates $stats and $dbHeaders in place; honours $opts['dry_run'].
+ *
+ * When inserting, $absPath is used to probe for a legacy `_state.json`
+ * sidecar so the row is seeded with the real revision / effective date /
+ * owner / approver / status instead of the hard-coded V0 / QA / CEO /
+ * draft tuple. $docTypeDefaults supplies catalog-backed defaults per
+ * doc_type when legacy state is absent.
  */
 function upsert_db_row(
     \MOM\Database\DataLayer $dl,
@@ -300,7 +326,10 @@ function upsert_db_row(
     array $opts,
     string $code,
     string $title,
-    ?string $subtitle
+    ?string $subtitle,
+    string $absPath = '',
+    string $rootDir = '',
+    array $docTypeDefaults = []
 ): void {
     $key      = strtoupper($code);
     $existing = $dbHeaders[$key] ?? null;
@@ -309,9 +338,42 @@ function upsert_db_row(
     $validDocTypes = ['MAN','POL','SOP','WI','FRM','ANNEX','JD','DEPT','ORG','REF','TRN'];
 
     if (!$existing) {
+        // Probe legacy state so the new header inherits real history.
+        $legacy = ($absPath !== '' && $rootDir !== '')
+            ? read_legacy_state_for_insert($rootDir, $absPath)
+            : null;
+        $catalogDefault = $docTypeDefaults[strtoupper($docType)] ?? [];
+        $ownerDef    = trim((string)($catalogDefault['owner']    ?? '')) ?: 'QA';
+        $approverDef = trim((string)($catalogDefault['approver'] ?? '')) ?: 'CEO';
+
+        $revision  = 'V0';
+        $effective = date('Y-m-d');
+        $owner     = $ownerDef;
+        $approver  = $approverDef;
+        $status    = 'draft';
+
+        if (is_array($legacy)) {
+            $revCandidate = migrate_normalise_revision((string)($legacy['revision'] ?? ''));
+            if ($revCandidate !== '') $revision = $revCandidate;
+            if (!empty($legacy['effective_date'])) {
+                $effective = migrate_extract_effective_date((string)$legacy['effective_date']);
+            } elseif (!empty($legacy['updated_at'])) {
+                $effective = migrate_extract_effective_date((string)$legacy['updated_at']);
+            }
+            if (!empty($legacy['owner'])) {
+                $owner = migrate_normalise_role((string)$legacy['owner'], $ownerDef, 'owner_role_code', $code, $stats);
+            }
+            if (!empty($legacy['approver'])) {
+                $approver = migrate_normalise_role((string)$legacy['approver'], $approverDef, 'approver_role_code', $code, $stats);
+            }
+            if (!empty($legacy['status'])) {
+                $status = migrate_normalise_status((string)$legacy['status']);
+            }
+        }
+
         if ($opts['dry_run']) {
             $stats['db_inserted']++;
-            echo "[dry ] would INSERT db row $code\n";
+            echo "[dry ] would INSERT db row $code (rev=$revision status=$status owner=$owner)\n";
             return;
         }
         try {
@@ -321,17 +383,27 @@ function upsert_db_row(
                   owner_role_code, approver_role_code, status, locale_default,
                   metadata, created_at, created_by, updated_at, updated_by)
                  VALUES
-                 (:c, :t, :s, :dt, 'V0', CURRENT_DATE,
-                  'QA', 'CEO', 'draft', 'vi',
+                 (:c, :t, :s, :dt, :r, :e,
+                  :o, :a, :st, 'vi',
                   '{}'::jsonb, now(), 'dcc-batch', now(), 'dcc-batch')",
-                [':c' => $code, ':t' => $title, ':s' => $subtitle, ':dt' => $docType]
+                [
+                    ':c'  => $code,
+                    ':t'  => $title,
+                    ':s'  => $subtitle,
+                    ':dt' => $docType,
+                    ':r'  => $revision,
+                    ':e'  => $effective,
+                    ':o'  => $owner,
+                    ':a'  => $approver,
+                    ':st' => $status,
+                ]
             );
             $dbHeaders[$key] = [
                 'doc_code' => $code, 'title' => $title,
                 'subtitle' => $subtitle, 'doc_type' => $docType,
             ];
             $stats['db_inserted']++;
-            if ($opts['verbose']) echo "[ok  ] db INSERT $code\n";
+            if ($opts['verbose']) echo "[ok  ] db INSERT $code (rev=$revision status=$status owner=$owner)\n";
         } catch (\Throwable $e) {
             $stats['db_errors']++;
             echo "[err ] db INSERT failed $code: " . $e->getMessage() . "\n";
@@ -371,6 +443,93 @@ function upsert_db_row(
         $stats['db_errors']++;
         echo "[err ] db UPDATE failed $code: " . $e->getMessage() . "\n";
     }
+}
+
+/**
+ * Locate and decode the legacy `_state.json` beside a controlled HTML doc.
+ * Returns null when no file is found. The shape is the one written by
+ * `save_doc_state` in mom/api.php — a small dictionary with revision /
+ * status / updated_at / has_release / released_revision keys.
+ *
+ * We probe two layouts: the current per-doc `_Archive` folder and the
+ * historic registry at `mom/data/registry/doc-state/<code>.json`.
+ */
+function read_legacy_state_for_insert(string $rootDir, string $absPath): ?array
+{
+    $rootDir = rtrim(str_replace('\\', '/', $rootDir), '/');
+    $absPath = str_replace('\\', '/', $absPath);
+    if (!str_starts_with($absPath, $rootDir . '/')) {
+        return null;
+    }
+    $baseRel  = substr($absPath, strlen($rootDir) + 1);
+    $dir      = dirname($baseRel);
+    if ($dir === '.' || $dir === '/') $dir = '';
+    $baseName = pathinfo($baseRel, PATHINFO_FILENAME);
+    $stateAbs = $rootDir . '/' . ($dir !== '' ? $dir . '/' : '') . '_Archive/' . $baseName . '_state.json';
+    $candidates = [$stateAbs];
+    if (preg_match('/^([A-Z]+(?:-[A-Z0-9]+)*-\d+)/i', basename($baseName), $m)) {
+        $candidates[] = $rootDir . '/mom/data/registry/doc-state/' . strtoupper($m[1]) . '.json';
+    }
+    foreach ($candidates as $file) {
+        if (!is_file($file)) continue;
+        $raw = @file_get_contents($file);
+        if (!is_string($raw)) continue;
+        $data = json_decode($raw, true);
+        if (is_array($data)) return $data;
+    }
+    return null;
+}
+
+function migrate_normalise_revision(string $raw): string
+{
+    $raw = trim($raw);
+    if ($raw === '') return '';
+    $raw = preg_replace('/^[vV]+/', '', $raw) ?? $raw;
+    if (!preg_match('/^\d+(\.\d+)?$/', $raw)) return '';
+    return 'V' . $raw;
+}
+
+function migrate_normalise_status(string $raw): string
+{
+    $raw = strtolower(trim($raw));
+    if ($raw === '') return 'draft';
+    $mapping = [
+        'approved'         => 'released',
+        'effective'        => 'released',
+        'initial_release'  => 'released',
+        'released'         => 'released',
+        'draft'            => 'draft',
+        'in_review'        => 'in_review',
+        'pending_approval' => 'in_review',
+        'superseded'       => 'superseded',
+        'obsolete'         => 'obsolete',
+    ];
+    return $mapping[$raw] ?? 'draft';
+}
+
+function migrate_extract_effective_date(string $raw): string
+{
+    $raw = trim($raw);
+    if ($raw === '') return date('Y-m-d');
+    if (preg_match('/^(\d{4}-\d{2}-\d{2})/', $raw, $m)) {
+        return $m[1];
+    }
+    $ts = strtotime($raw);
+    return $ts !== false ? date('Y-m-d', $ts) : date('Y-m-d');
+}
+
+function migrate_normalise_role(string $raw, string $fallback, string $field, string $code, array &$stats): string
+{
+    $raw = trim($raw);
+    if ($raw === '') return $fallback;
+    if (preg_match('#[/,;|\s]#', $raw)) {
+        $first = preg_split('#[/,;|\s]+#', $raw)[0] ?? $raw;
+        $first = strtoupper(trim($first));
+        echo "[warn] $code: $field was '$raw', split to '$first'\n";
+        $stats['db_warnings'] = ($stats['db_warnings'] ?? 0) + 1;
+        return $first !== '' ? $first : $fallback;
+    }
+    return strtoupper($raw);
 }
 
 function parse_argv(array $argv): array

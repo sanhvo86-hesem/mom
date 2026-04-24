@@ -1,6 +1,6 @@
 {
     "_meta": {
-        "generated_at": "2026-04-23T08:58:01+00:00",
+        "generated_at": "2026-04-24T03:23:43+00:00",
         "description": "Domain contract objects: canonical resource, primary table, lifecycle status, workflow state model.",
         "contracts_dir": "mom/contracts/objects/",
         "usage": "Find which domain owns a resource and which table stores it. Use primary_table for SQL queries."
@@ -1152,6 +1152,7 @@
             "child_tables": [
                 "dcc_document_change_request",
                 "dcc_document_change_notice",
+                "dcc_document_revision",
                 "dcc_document_revision_history"
             ],
             "object_role": "lifecycle_owner",

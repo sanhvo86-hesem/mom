@@ -29,6 +29,13 @@ return static function (Router $router, string $dataDir): void {
     // ── Label registry ─────────────────────────────────────────────────────
     $router->get ('/api/v1/dcc/labels',                                          DocumentControlController::class, 'labels');
 
+    // ── Role + doc-type catalogs (migration 155) ───────────────────────────
+    // Replace hardcoded owner/approver/doc-type lists previously embedded in
+    // JS modules (02-state-auth-ui.js, 48-eqms-documents.js). Every picker in
+    // the portal now fetches its options from these endpoints.
+    $router->get ('/api/v1/dcc/roles',                                           DocumentControlController::class, 'listRoles');
+    $router->get ('/api/v1/dcc/doc-types',                                       DocumentControlController::class, 'listDocTypes');
+
     // ── Header CRUD ────────────────────────────────────────────────────────
     $router->get ('/api/v1/dcc/documents',                                       DocumentControlController::class, 'listHeaders');
     $router->post('/api/v1/dcc/documents',                                       DocumentControlController::class, 'createHeader');

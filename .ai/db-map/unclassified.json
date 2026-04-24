@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 745,
-        "generated_at": "2026-04-23T08:58:01+00:00"
+        "table_count": 746,
+        "generated_at": "2026-04-24T03:23:43+00:00"
     },
     "tables": {
         "ai_conversations": {
@@ -1366,6 +1366,22 @@
                 {
                     "col": "policy_id",
                     "ref": "retention_policies(policy_id)"
+                }
+            ],
+            "contract": null
+        },
+        "dcc_doc_type_catalog": {
+            "defined_in": "155_dcc_consolidation.sql",
+            "extended_in": [],
+            "primary_key": "doc_type",
+            "foreign_keys": [
+                {
+                    "col": "default_owner_role",
+                    "ref": "dcc_role_catalog(role_code)"
+                },
+                {
+                    "col": "default_approver_role",
+                    "ref": "dcc_role_catalog(role_code)"
                 }
             ],
             "contract": null

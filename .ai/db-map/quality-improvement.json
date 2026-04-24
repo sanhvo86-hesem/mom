@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "quality_improvement",
-        "table_count": 18,
-        "generated_at": "2026-04-23T08:58:01+00:00"
+        "table_count": 20,
+        "generated_at": "2026-04-24T03:23:43+00:00"
     },
     "tables": {
         "apqp_gate_reviews": {
@@ -179,6 +179,41 @@
                 {
                     "col": "dcr_number",
                     "ref": "dcc_document_header(doc_code)"
+                }
+            ],
+            "contract": "quality_improvement.document_control"
+        },
+        "dcc_document_header": {
+            "defined_in": null,
+            "extended_in": [
+                "155_dcc_consolidation.sql",
+                "155_dcc_consolidation.sql",
+                "155_dcc_consolidation.sql"
+            ],
+            "primary_key": "",
+            "foreign_keys": [],
+            "contract": "quality_improvement.document_control"
+        },
+        "dcc_document_revision": {
+            "defined_in": "155_dcc_consolidation.sql",
+            "extended_in": [],
+            "primary_key": "revision_id",
+            "foreign_keys": [
+                {
+                    "col": "doc_code",
+                    "ref": "dcc_document_header(doc_code)"
+                },
+                {
+                    "col": "dcr_id",
+                    "ref": "dcc_document_change_request(dcr_id)"
+                },
+                {
+                    "col": "dcn_id",
+                    "ref": "dcc_document_change_notice(dcn_id)"
+                },
+                {
+                    "col": "superseded_by",
+                    "ref": "dcc_document_revision(revision_id)"
                 }
             ],
             "contract": "quality_improvement.document_control"

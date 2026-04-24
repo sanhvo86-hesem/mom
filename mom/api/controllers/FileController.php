@@ -529,6 +529,16 @@ class FileController extends BaseController
             'path' => $newRel,
         ]);
 
+        // DCC bridge: keep the dcc_document_header filename anchor aligned with
+        // disk so the DB-first projection reports the correct filename after a
+        // rename. Wrapped in try/catch — legacy success proceeds regardless.
+        \MOM\Api\Controllers\DocumentController::bridgeDccRename(
+            $this->data,
+            $newCode !== '' ? $newCode : $code,
+            $newRel,
+            basename($newRel)
+        );
+
         $this->invalidateScanCache();
         $this->auditLog('rename_doc', ['code' => $code, 'old' => $srcRel, 'new' => $newRel]);
         $this->success(['old_path' => $srcRel, 'new_path' => $newRel]);

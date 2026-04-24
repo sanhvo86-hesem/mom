@@ -19026,6 +19026,22 @@ if ($username === '') {
       }
       invalidate_scan_cache($DATA_DIR);
 
+      // DCC bridge: keep the dcc_document_header filename + filesystem_path +
+      // filename_checksum aligned with disk so the DB-first projection no
+      // longer serves a stale filename after rename. Wrapped in try/catch —
+      // legacy success proceeds regardless.
+      try {
+        $effectiveRenameCode = $newCode !== '' ? $newCode : $oldCode;
+        \MOM\Api\Controllers\DocumentController::bridgeDccRename(
+          runtime_data_layer(),
+          $effectiveRenameCode,
+          $renamedRel,
+          basename($renamedRel)
+        );
+      } catch (Throwable $e) {
+        @error_log('[dcc-bridge] rename api.php ' . ($oldCode ?? '') . ' failed: ' . $e->getMessage());
+      }
+
       api_json(['ok' => true, 'new_path' => $renamedRel, 'updated_files' => $updated]);
 
     } catch (Throwable $e) {

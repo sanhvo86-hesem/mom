@@ -2489,7 +2489,6 @@ const I = {
   approve_btn:{vi:'✓ Phê duyệt',en:'✓ Approve'},
   type:{vi:'Loại',en:'Type'},
   approver:{vi:'Phê duyệt',en:'Approver'},
-  gd:{vi:'General Manager (EXE-01)',en:'General Manager (EXE-01)'},
   status_active:{vi:'✓ Hiệu lực',en:'✓ Active'},
   status_draft:{vi:'◐ Dự thảo Draft',en:'◐ Draft Draft'},
   loading_doc:{vi:'Đang tải tài liệu...',en:'Loading document...'},

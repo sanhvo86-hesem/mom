@@ -15,10 +15,13 @@
     "childTables": [
       "dcc_document_change_request",
       "dcc_document_change_notice",
+      "dcc_document_revision",
       "dcc_document_revision_history"
     ],
     "referenceTables": [
-      "dcc_document_header_label"
+      "dcc_document_header_label",
+      "dcc_role_catalog",
+      "dcc_doc_type_catalog"
     ],
     "legacyTables": [
       "eqms_documents",
@@ -120,6 +123,8 @@
     "basePath": "/api/v1/dcc",
     "endpoints": [
       { "method": "GET",   "path": "/api/v1/dcc/labels",                                 "handler": "DocumentControlController::labels",            "purpose": "Return label registry for current locale." },
+      { "method": "GET",   "path": "/api/v1/dcc/roles",                                  "handler": "DocumentControlController::listRoles",         "purpose": "List owner/approver roles from dcc_role_catalog. Replaces hardcoded JS lists." },
+      { "method": "GET",   "path": "/api/v1/dcc/doc-types",                              "handler": "DocumentControlController::listDocTypes",      "purpose": "List document types from dcc_doc_type_catalog. Replaces hardcoded JS DOC_TYPES." },
       { "method": "GET",   "path": "/api/v1/dcc/documents",                              "handler": "DocumentControlController::listHeaders",       "purpose": "List all DCC document headers." },
       { "method": "POST",  "path": "/api/v1/dcc/documents",                              "handler": "DocumentControlController::createHeader",      "purpose": "Create a new controlled-document header." },
       { "method": "GET",   "path": "/api/v1/dcc/documents/{doc_code}/header",            "handler": "DocumentControlController::getHeader",         "purpose": "Return the header projection consumed by the portal renderer." },

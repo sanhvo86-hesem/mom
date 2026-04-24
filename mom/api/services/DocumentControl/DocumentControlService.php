@@ -522,10 +522,22 @@ final class DocumentControlService
         return $this->buildLocaleVariantProjection($header, $locale, $this->fetchLocaleVariantRow($docCode, $locale));
     }
 
-    /** @return list<array<string, mixed>> */
+    /**
+     * @return array{bodies: list<array<string, mixed>>, transitions: list<array<string, mixed>>}
+     */
     public function listRevisions(string $docCode): array
     {
-        return $this->data->query(
+        $bodies = $this->data->query(
+            "SELECT revision_id, revision, update_type, effective_date,
+                    content_sha256, filename, dcr_id, dcn_id,
+                    approved_by, approved_at, released_by, released_at,
+                    signature_event_id, is_current, note
+             FROM dcc_document_revision
+             WHERE doc_code = :c
+             ORDER BY approved_at DESC, revision DESC",
+            [':c' => $docCode]
+        ) ?? [];
+        $transitions = $this->data->query(
             "SELECT history_id, revision, previous_revision, from_status, to_status,
                     effective_date, actor_party_id, actor_role_code,
                     dcr_id, dcn_id, note, recorded_at
@@ -534,6 +546,176 @@ final class DocumentControlService
              ORDER BY recorded_at DESC",
             [':c' => $docCode]
         ) ?? [];
+        return [
+            'bodies'      => $bodies,
+            'transitions' => $transitions,
+        ];
+    }
+
+    // ── Role & doc-type catalogs (replace hardcoded JS lists) ──────────────
+
+    /**
+     * List active roles for the owner/approver pickers. Replaces the
+     * hardcoded `['QA/QMS','Production',…]` list in 02-state-auth-ui.js.
+     *
+     * @param string $class One of 'owner' | 'approver' | 'both' | 'all'.
+     * @return list<array{role_code: string, label_vi: string, label_en: string, role_class: string, sort_order: int}>
+     */
+    public function listRoles(string $class = 'all'): array
+    {
+        $class = strtolower(trim($class));
+        if (!in_array($class, ['owner', 'approver', 'both', 'all'], true)) {
+            throw new InvalidArgumentException('dcc_invalid_role_class');
+        }
+        $sql  = "SELECT role_code, label_vi, label_en, role_class, sort_order
+                 FROM dcc_role_catalog
+                 WHERE is_active = TRUE";
+        $args = [];
+        if ($class === 'owner') {
+            $sql .= " AND role_class IN ('owner', 'both')";
+        } elseif ($class === 'approver') {
+            $sql .= " AND role_class IN ('approver', 'both')";
+        } elseif ($class === 'both') {
+            $sql .= " AND role_class = 'both'";
+        }
+        $sql .= " ORDER BY sort_order, role_code";
+        return $this->data->query($sql, $args) ?? [];
+    }
+
+    /**
+     * List active document types for the type dropdown. Replaces the
+     * hardcoded `DOC_TYPES` list in 48-eqms-documents.js.
+     *
+     * @return list<array{doc_type: string, label_vi: string, label_en: string,
+     *     family_pattern: string, default_owner_role: ?string,
+     *     default_approver_role: ?string, sort_order: int}>
+     */
+    public function listDocTypes(): array
+    {
+        return $this->data->query(
+            "SELECT doc_type, label_vi, label_en, family_pattern,
+                    default_owner_role, default_approver_role, sort_order
+             FROM dcc_doc_type_catalog
+             WHERE is_active = TRUE
+             ORDER BY sort_order, doc_type"
+        ) ?? [];
+    }
+
+    // ── Revision body records (migration 155) ──────────────────────────────
+
+    /**
+     * Record a released / approved revision body. Idempotent on
+     * (doc_code, revision). Called from release() and from the legacy-bridge
+     * in DocumentController::approve() so the DCC table stays aligned with
+     * the filesystem store during the transition period.
+     *
+     * Fields not stored on approve (signature_event_id, released_by,
+     * released_at) are populated by release() in a follow-up UPDATE.
+     *
+     * @param array{revision: string, update_type?: string,
+     *     effective_date?: string, content_sha256?: ?string,
+     *     content_path?: ?string, filename?: ?string,
+     *     dcr_id?: ?string, dcn_id?: ?string, note?: ?string} $input
+     * @return array<string, mixed> The inserted or existing row.
+     */
+    public function recordRevision(string $docCode, array $input, string $actor): array
+    {
+        if (empty($input['revision'])) {
+            throw new InvalidArgumentException('dcc_record_revision_missing_revision');
+        }
+        $this->assertValidRevision((string)$input['revision']);
+
+        $updateType = strtolower((string)($input['update_type'] ?? 'minor'));
+        if (!in_array($updateType, ['major', 'minor', 'patch'], true)) {
+            throw new InvalidArgumentException('dcc_record_revision_invalid_update_type');
+        }
+
+        $effective = (string)($input['effective_date'] ?? date('Y-m-d'));
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $effective)) {
+            throw new InvalidArgumentException('dcc_record_revision_invalid_effective_date');
+        }
+
+        $existing = $this->data->query(
+            "SELECT * FROM dcc_document_revision
+             WHERE doc_code = :c AND revision = :r LIMIT 1",
+            [':c' => $docCode, ':r' => $input['revision']]
+        ) ?? [];
+        if ($existing !== []) {
+            return $existing[0];
+        }
+
+        $this->data->execute(
+            "INSERT INTO dcc_document_revision
+                 (doc_code, revision, update_type, effective_date,
+                  content_sha256, content_path, filename,
+                  dcr_id, dcn_id, approved_by, note)
+             VALUES
+                 (:c, :rev, :utype, :eff,
+                  :sha, :path, :file,
+                  :dcr, :dcn, :actor, :note)",
+            [
+                ':c'     => $docCode,
+                ':rev'   => $input['revision'],
+                ':utype' => $updateType,
+                ':eff'   => $effective,
+                ':sha'   => $input['content_sha256'] ?? null,
+                ':path'  => $input['content_path']   ?? null,
+                ':file'  => $input['filename']       ?? null,
+                ':dcr'   => $input['dcr_id']         ?? null,
+                ':dcn'   => $input['dcn_id']         ?? null,
+                ':actor' => $actor,
+                ':note'  => $input['note']           ?? null,
+            ]
+        );
+        $row = $this->data->query(
+            "SELECT * FROM dcc_document_revision
+             WHERE doc_code = :c AND revision = :r LIMIT 1",
+            [':c' => $docCode, ':r' => $input['revision']]
+        ) ?? [];
+        return $row[0] ?? [];
+    }
+
+    /**
+     * Flip the current-revision flag. Exactly one row per doc_code has
+     * is_current = TRUE; this method atomically clears any prior flag and
+     * raises it on the targeted revision.
+     */
+    public function markRevisionCurrent(string $docCode, string $revision, string $actor): void
+    {
+        $this->data->execute(
+            "UPDATE dcc_document_revision
+             SET is_current = FALSE
+             WHERE doc_code = :c AND is_current = TRUE AND revision <> :r",
+            [':c' => $docCode, ':r' => $revision]
+        );
+        $this->data->execute(
+            "UPDATE dcc_document_revision
+             SET is_current = TRUE,
+                 released_by = COALESCE(released_by, :actor),
+                 released_at = COALESCE(released_at, now())
+             WHERE doc_code = :c AND revision = :r",
+            [':c' => $docCode, ':r' => $revision, ':actor' => $actor]
+        );
+    }
+
+    /**
+     * Update the filename / filesystem_path anchor on the header row.
+     * Called from the rename pipeline so the DB stays consistent with disk.
+     */
+    public function updateFilenameAnchor(string $docCode, ?string $filename, ?string $filesystemPath): void
+    {
+        $checksum = $filename !== null ? hash('sha256', $filename) : null;
+        $this->data->execute(
+            "UPDATE dcc_document_header
+             SET filename = :fn, filesystem_path = :fp, filename_checksum = :fc
+             WHERE doc_code = :c",
+            [
+                ':fn' => $filename,
+                ':fp' => $filesystemPath,
+                ':fc' => $checksum,
+                ':c'  => $docCode,
+            ]
+        );
     }
 
     // ── State machine transitions ──────────────────────────────────────────
@@ -552,7 +734,9 @@ final class DocumentControlService
     {
         // Verify DCN exists and matches this doc.
         $dcn = $this->data->query(
-            "SELECT dcn_id, doc_code, to_revision, effective_date FROM dcc_document_change_notice
+            "SELECT dcn_id, doc_code, to_revision, effective_date,
+                    signature_event_id, manifest_hash_sha256
+             FROM dcc_document_change_notice
              WHERE dcn_id = :id LIMIT 1",
             [':id' => $dcnId]
         ) ?? [];
@@ -563,18 +747,49 @@ final class DocumentControlService
             throw new RuntimeException('dcc_dcn_document_mismatch');
         }
 
+        $targetRevision = (string)$dcn[0]['to_revision'];
+        $effectiveDate  = (string)$dcn[0]['effective_date'];
+
+        // 1) Ensure a dcc_document_revision row exists for the target revision
+        //    (idempotent — approve() normally inserts it first).
+        $this->recordRevision($docCode, [
+            'revision'       => $targetRevision,
+            'effective_date' => $effectiveDate,
+            'dcn_id'         => $dcnId,
+            'content_sha256' => $dcn[0]['manifest_hash_sha256'] ?? null,
+            'note'           => $note ?? 'released_via_dcn',
+        ], $actor);
+
+        // 2) Mark this revision current, stamp released_by + released_at,
+        //    attach signature_event_id if DCN carried one.
+        $this->markRevisionCurrent($docCode, $targetRevision, $actor);
+        if (!empty($dcn[0]['signature_event_id'])) {
+            $this->data->execute(
+                "UPDATE dcc_document_revision
+                 SET signature_event_id = :sig
+                 WHERE doc_code = :c AND revision = :r",
+                [
+                    ':sig' => $dcn[0]['signature_event_id'],
+                    ':c'   => $docCode,
+                    ':r'   => $targetRevision,
+                ]
+            );
+        }
+
+        // 3) Update header projection.
         $this->data->execute(
             "UPDATE dcc_document_header
              SET revision = :rev, effective_date = :eff, updated_by = :actor
              WHERE doc_code = :c",
             [
-                ':rev'   => $dcn[0]['to_revision'],
-                ':eff'   => $dcn[0]['effective_date'],
+                ':rev'   => $targetRevision,
+                ':eff'   => $effectiveDate,
                 ':actor' => $actor,
                 ':c'     => $docCode,
             ]
         );
 
+        // 4) Mark DCN as released.
         $this->data->execute(
             "UPDATE dcc_document_change_notice SET status = 'released' WHERE dcn_id = :id",
             [':id' => $dcnId]

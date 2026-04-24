@@ -130,12 +130,14 @@ on the canonical code. Required columns:
 | `doc_code`              | Canonical from filename (must match `data-dcc-doc-code`).                 |
 | `title`                 | Human-readable title (English or Vietnamese, never the bare code).        |
 | `subtitle`              | Vietnamese descriptor (optional, but recommended).                        |
-| `doc_type`              | One of `MAN, POL, SOP, WI, FRM, ANNEX, JD, DEPT, ORG, REF, TRN`.          |
+| `doc_type`              | Row in `dcc_doc_type_catalog` (`MAN, POL, SOP, WI, FRM, ANNEX, JD, DEPT, ORG, REF, TRN`). |
 | `revision`              | `V0`, `V1`, `V2`, … (regex `^V\d+(\.\d+)?$`).                             |
 | `effective_date`        | ISO date (`YYYY-MM-DD`).                                                  |
-| `owner_role_code`       | Single role (no `/`, `,`, `;`, `|`, or whitespace). Default `QA`.         |
-| `approver_role_code`    | Single role. Default `CEO`.                                               |
+| `owner_role_code`       | FK → `dcc_role_catalog.role_code` (single role — regex still rejects `/`, `,`, `;`, `|`, whitespace). Default comes from `dcc_doc_type_catalog.default_owner_role` for this doc_type. |
+| `approver_role_code`    | FK → `dcc_role_catalog.role_code` (single role). Default from `dcc_doc_type_catalog.default_approver_role`. |
 | `status`                | `draft → in_review → approved → released → superseded → obsolete`.        |
+| `filename`              | Current filename on disk (migration 155). Filename is master for slug; DB tracks it to enforce uniqueness. |
+| `filesystem_path`       | Path relative to repo root. Populated by rename pipeline.                 |
 
 Rows are CREATED via `POST /api/v1/dcc/documents/upsert` (preferred) or
 the batch tool. UPDATES go through `PATCH /api/v1/dcc/documents/{code}/header`.

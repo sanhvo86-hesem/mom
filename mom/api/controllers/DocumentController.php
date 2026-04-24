@@ -420,6 +420,15 @@ class DocumentController extends BaseController
         patch_custom_doc_entries($customDocsFile, $code, ['status' => 'in_review']);
 
         $this->syncDccHeaderBaseline($code, $baseRel, $state, (string)($me['username'] ?? 'system'));
+
+        // DCC bridge: mirror draft→in_review transition so the DCC header
+        // projection tracks the legacy state.
+        $this->bridgeDccSubmitReview(
+            $code,
+            $baseRel,
+            (string)($me['username'] ?? 'system'),
+            $note
+        );
         $catalog = $this->resolveDocumentCatalogEntry($code, $baseRel);
 
         // Workbook/non-HTML submit flows omit `html`; in that case the
@@ -571,6 +580,27 @@ class DocumentController extends BaseController
         $this->invalidateScanCache();
 
         $catalog = $this->resolveDocumentCatalogEntry($code, $baseRel);
+
+        // DCC bridge: mirror the legacy approve into the DCC control plane so
+        // the dcc_document_header row no longer lingers at seeded defaults
+        // (v2.0 vs V0.0, QA/QMS vs QA, CEO vs General Manager). Failure is
+        // error-logged; the legacy success path proceeds regardless.
+        $approvedBodyForBridge = is_string($approvedHtml ?? null)
+            ? (string)$approvedHtml
+            : ((string)@file_get_contents($liveFile));
+        $this->bridgeDccApprove(
+            $code,
+            $baseRel,
+            $revision,
+            $approvedBodyForBridge,
+            $effectiveDate,
+            $updateType,
+            $liveFile,
+            (string)($me['username'] ?? 'system'),
+            (string)($catalog['title'] ?? ''),
+            $note
+        );
+
         $localeTranslation = [];
         try {
             $localeTranslation = $this->localeAutomation()->syncEnglishMachinePreview([
@@ -655,6 +685,13 @@ class DocumentController extends BaseController
         $customDocsFile = $this->confDir . '/docs_custom.json';
         patch_custom_doc_entries($customDocsFile, $code, ['status' => 'draft']);
         $this->syncDccHeaderBaseline($code, $baseRel, $state, (string)($me['username'] ?? 'system'));
+
+        // DCC bridge: reject is legacy approved→draft, which is not a named
+        // DCC transition (DCC uses in_review→draft). The private history
+        // recorder is not publicly exposed, so this is a no-op at the DCC
+        // state-machine level — the header baseline sync above keeps the
+        // revision/effective-date projection fresh.
+        $this->bridgeDccReject($code, $baseRel, (string)($me['username'] ?? 'system'), $reason);
 
         $this->auditLog('doc_reject', ['code' => $code, 'reason' => $reason]);
         $this->success([
@@ -1063,6 +1100,12 @@ class DocumentController extends BaseController
         $customDocsFile = $this->confDir . '/docs_custom.json';
         patch_custom_doc_entries($customDocsFile, $code, ['status' => 'draft', 'rev' => $newRevision]);
         $this->syncDccHeaderBaseline($code, $baseRel, $state, (string)($me['username'] ?? 'system'));
+
+        // DCC bridge: starting a new revision draft does NOT change the DCC
+        // state. The DCC header stays 'released' until the next submitReview
+        // drives it back into 'in_review', so there is no transition to mirror
+        // here. syncDccHeaderBaseline() above refreshes the revision/date
+        // projection; no further DCC write is needed.
 
         $this->auditLog('doc_start_new_revision', ['code' => $code, 'revision' => $newRevision]);
         $this->success(['revision' => $newRevision, 'state' => $state, 'versions' => $versions]);
@@ -1490,6 +1533,205 @@ class DocumentController extends BaseController
             ], $actor !== '' ? $actor : 'system');
         } catch (Throwable $e) {
             @error_log('[DocumentController] DCC header baseline sync failed for ' . $code . ': ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Normalise a legacy revision string into the canonical DCC form.
+     *
+     * Legacy JSON stores revisions as "2.0" or "v2.0"; the DCC catalog
+     * requires the canonical form "V2.0" (upper-case V + numeric pattern).
+     *
+     * @param string $revision Raw revision from state.json.
+     * @return string Canonical revision (e.g. V2.0).
+     */
+    private function normaliseDccRevision(string $revision): string
+    {
+        $trimmed = trim($revision);
+        if ($trimmed === '') {
+            $trimmed = '0.0';
+        }
+        $stripped = preg_replace('/^[vV]\s*/', '', $trimmed) ?? $trimmed;
+        if ($stripped === '') {
+            $stripped = '0.0';
+        }
+        return 'V' . $stripped;
+    }
+
+    /**
+     * DCC bridge: ensure a header row exists for a legacy doc code, using
+     * sensible defaults derived from the catalog / doc-type heuristics.
+     *
+     * Called from approve() and submitReview() before emitting a state
+     * transition. The DocumentControlService::upsertHeader() handles the
+     * "already exists" case without overwriting existing owner/approver.
+     *
+     * @param string $code    Canonical doc code.
+     * @param string $baseRel Relative path to the live file.
+     * @param string $actor   Acting username (for created_by/updated_by).
+     * @param string $title   Optional override; falls back to catalog title.
+     * @return \MOM\Services\DocumentControl\DocumentControlService
+     */
+    private function ensureDccHeader(
+        string $code,
+        string $baseRel,
+        string $actor,
+        string $title = ''
+    ): \MOM\Services\DocumentControl\DocumentControlService {
+        $svc = new \MOM\Services\DocumentControl\DocumentControlService($this->data);
+        $catalog = $this->resolveDocumentCatalogEntry($code, $baseRel);
+        $resolvedTitle = $title !== '' ? $title : (string)($catalog['title'] ?? $code);
+        $svc->upsertHeader([
+            'doc_code' => $code,
+            'title' => $resolvedTitle,
+            'subtitle' => $catalog['description'] ?? null,
+            'doc_type' => \MOM\Services\DocumentControl\DocumentControlService::deriveDocType($code),
+        ], $actor !== '' ? $actor : 'system');
+        return $svc;
+    }
+
+    /**
+     * DCC bridge for DocumentController::submitReview().
+     *
+     * After the filesystem submit-review succeeds, mirror the transition
+     * into the DCC control plane. Failures are logged but never roll back
+     * the legacy write — DCC remains transitional until the file store
+     * retires.
+     */
+    private function bridgeDccSubmitReview(string $code, string $baseRel, string $actor, string $note = ''): void
+    {
+        try {
+            $canonical = \MOM\Services\DocumentControl\DocumentControlService::canonicalizeCode($code);
+            if ($canonical === '') {
+                return;
+            }
+            $svc = $this->ensureDccHeader($canonical, $baseRel, $actor);
+            try {
+                $svc->submitReview($canonical, $actor !== '' ? $actor : 'system', null, $note !== '' ? $note : null);
+            } catch (RuntimeException $e) {
+                if (!str_starts_with($e->getMessage(), 'dcc_invalid_transition')) {
+                    throw $e;
+                }
+                // Legacy races where the doc is already past in_review. Silent.
+            }
+        } catch (Throwable $e) {
+            @error_log('[dcc-bridge] submitReview ' . $code . ' failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * DCC bridge for DocumentController::approve().
+     *
+     * Emits a revision body insert and a draft→in_review→approved transition
+     * chain in the DCC schema so the header row no longer lingers at the
+     * seeded defaults. Idempotent on (doc_code, revision) via
+     * DocumentControlService::recordRevision().
+     *
+     * @param string $approvedHtml   Approved live-file HTML body (for content_sha256).
+     * @param string $effectiveDate  ISO date or '' to use today.
+     * @param string $updateType     major/minor/patch (legacy default: minor).
+     * @param string $liveFile       Absolute live-file path (for filename anchor).
+     */
+    private function bridgeDccApprove(
+        string $code,
+        string $baseRel,
+        string $revision,
+        string $approvedHtml,
+        string $effectiveDate,
+        string $updateType,
+        string $liveFile,
+        string $actor,
+        string $title = '',
+        string $note = ''
+    ): void {
+        try {
+            $canonical = \MOM\Services\DocumentControl\DocumentControlService::canonicalizeCode($code);
+            if ($canonical === '') {
+                return;
+            }
+            $normalisedRev = $this->normaliseDccRevision($revision);
+            $effective = $effectiveDate !== '' ? $effectiveDate : date('Y-m-d');
+            $uType = strtolower(trim($updateType));
+            if (!in_array($uType, ['major', 'minor', 'patch'], true)) {
+                $uType = 'minor';
+            }
+
+            $svc = $this->ensureDccHeader($canonical, $baseRel, $actor, $title);
+
+            $svc->recordRevision(
+                $canonical,
+                [
+                    'revision' => $normalisedRev,
+                    'effective_date' => $effective,
+                    'update_type' => $uType,
+                    'content_sha256' => $approvedHtml !== '' ? hash('sha256', $approvedHtml) : null,
+                    'content_path' => $baseRel,
+                    'filename' => $liveFile !== '' ? basename($liveFile) : null,
+                    'note' => $note !== '' ? $note : null,
+                ],
+                $actor !== '' ? $actor : 'system'
+            );
+
+            try {
+                $svc->approve(
+                    $canonical,
+                    $actor !== '' ? $actor : 'system',
+                    'QA_APPROVER',
+                    null,
+                    $note !== '' ? $note : null
+                );
+            } catch (RuntimeException $e) {
+                // Already past 'approved' (e.g. released then re-approved via
+                // legacy) — silent per transition-window contract.
+                if (!str_starts_with($e->getMessage(), 'dcc_invalid_transition')) {
+                    throw $e;
+                }
+            }
+        } catch (Throwable $e) {
+            @error_log('[dcc-bridge] approve ' . $code . ' failed: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * DCC bridge for DocumentController::reject().
+     *
+     * NOTE: "reject" maps to a legacy approved→draft transition which is not
+     * a named DCC transition (DCC expresses this as in_review→draft). The
+     * private DCC history recorder is not publicly exposed, so we skip
+     * explicit DCC mirroring here and rely on syncDccHeaderBaseline() in
+     * the caller to refresh the header projection. TODO: once
+     * DocumentControlService exposes a public `revertToDraft()`, wire it in.
+     */
+    private function bridgeDccReject(string $code, string $baseRel, string $actor, string $reason = ''): void
+    {
+        // Intentional no-op for DCC transitions; header baseline sync already
+        // runs in the caller. See method docblock for the TODO reference.
+        unset($baseRel, $actor, $reason, $code);
+    }
+
+    /**
+     * DCC bridge for the rename_doc pipeline.
+     *
+     * Called from the legacy rename flow (mom/api.php case 'rename_doc' and
+     * FileController::renameDoc) after the JSON store has been updated. The
+     * DCC header stores the filename + filesystem_path + checksum so file
+     * moves remain observable in the DB-first projection.
+     */
+    public static function bridgeDccRename(
+        \MOM\Database\DataLayer $data,
+        string $effectiveCode,
+        string $renamedRel,
+        string $newFilename
+    ): void {
+        try {
+            $canonical = \MOM\Services\DocumentControl\DocumentControlService::canonicalizeCode($effectiveCode);
+            if ($canonical === '') {
+                return;
+            }
+            (new \MOM\Services\DocumentControl\DocumentControlService($data))
+                ->updateFilenameAnchor($canonical, $newFilename, $renamedRel);
+        } catch (Throwable $e) {
+            @error_log('[dcc-bridge] rename ' . $effectiveCode . ' failed: ' . $e->getMessage());
         }
     }
 

@@ -97,6 +97,34 @@ final class DocumentControlController extends EqmsBaseController
         ]);
     }
 
+    // ── Role + doc-type catalogs (migration 155) ─────────────────────────────
+
+    /** GET /api/v1/dcc/roles?class=owner|approver|both|all */
+    public function listRoles(): never
+    {
+        $this->requireAuth();
+        $class = strtolower(trim((string)($this->query('class', 'all') ?? 'all')));
+        try {
+            $rows = $this->service()->listRoles($class);
+        } catch (InvalidArgumentException $e) {
+            $this->error('dcc_invalid_role_class', 422, $e->getMessage());
+        }
+        $this->success([
+            'class' => $class,
+            'roles' => $rows,
+        ]);
+    }
+
+    /** GET /api/v1/dcc/doc-types */
+    public function listDocTypes(): never
+    {
+        $this->requireAuth();
+        $rows = $this->service()->listDocTypes();
+        $this->success([
+            'doc_types' => $rows,
+        ]);
+    }
+
     // ── Header CRUD ──────────────────────────────────────────────────────────
 
     /** GET /api/v1/dcc/documents */
@@ -229,13 +257,25 @@ final class DocumentControlController extends EqmsBaseController
         $this->success(['header' => $result]);
     }
 
-    /** GET /api/v1/dcc/documents/{doc_code}/revisions */
+    /**
+     * GET /api/v1/dcc/documents/{doc_code}/revisions
+     *
+     * Returns two lists:
+     *   - `bodies`      → immutable per-release rows (dcc_document_revision)
+     *   - `transitions` → append-only state-transition log (dcc_document_revision_history)
+     * Older consumers read `history` which aliases `transitions`.
+     */
     public function listRevisions(): never
     {
         $this->requireAuth();
         $docCode = $this->requirePathId('doc_code', 'doc_code');
-        $rows = $this->service()->listRevisions($docCode);
-        $this->success(['doc_code' => $docCode, 'history' => $rows]);
+        $result = $this->service()->listRevisions($docCode);
+        $this->success([
+            'doc_code'    => $docCode,
+            'bodies'      => $result['bodies']      ?? [],
+            'transitions' => $result['transitions'] ?? [],
+            'history'     => $result['transitions'] ?? [],
+        ]);
     }
 
     // ── State machine actions ───────────────────────────────────────────────
