@@ -2290,7 +2290,14 @@ function loadDocContent(code){
     const status=String(getDocStatus(doc)||'approved');
     const title=(typeof escapeHtml==='function') ? escapeHtml(getDocDisplayTitle(doc)||doc.title||doc.code) : (getDocDisplayTitle(doc)||doc.title||doc.code);
     const desc=(typeof escapeHtml==='function') ? escapeHtml(getDocDisplayDescription(doc)||'') : (getDocDisplayDescription(doc)||'');
-    const owner=(typeof escapeHtml==='function') ? escapeHtml(String((state&&state.owner)||doc.owner||'QA/QMS')) : String((state&&state.owner)||doc.owner||'QA/QMS');
+    // Prefer the cached DCC header owner (single-role, DB-authoritative). Fall
+    // back to legacy state only when DCC has not yet populated for this doc.
+    // The final '—' placeholder is chosen over a hardcoded role like 'QA/QMS'
+    // because DCC forbids multi-role strings; showing a dash flags missing
+    // DB data instead of implying a default that fails the CHECK constraint.
+    const dccCache=(window.DccHeader && typeof window.DccHeader.getCached==='function') ? window.DccHeader.getCached(doc.code) : null;
+    const ownerRaw=(dccCache && dccCache.owner_role_code) || (state&&state.owner) || doc.owner || '—';
+    const owner=(typeof escapeHtml==='function') ? escapeHtml(String(ownerRaw)) : String(ownerRaw);
     const docExt=String(doc.ext || '').toLowerCase();
     const docTypeLabel=docExt==='pdf'
       ? (lang==='en' ? 'Controlled PDF file' : 'Tai lieu PDF duoc kiem soat')

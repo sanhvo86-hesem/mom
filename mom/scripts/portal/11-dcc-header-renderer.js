@@ -189,6 +189,16 @@ function _loadLabels(locale){
     return _labelsPending[key];
 }
 
+/* ── Per-doc header cache ─────────────────────────────────────────────────
+ * Small in-memory cache of the most recent header payload per doc_code,
+ * keyed by code (locale-agnostic — metadata is the same across locales;
+ * only labels change). Exposed via window.DccHeader.getCached() so other
+ * portal modules can read the authoritative owner/approver/revision
+ * without issuing a duplicate round-trip, and without reaching for the
+ * legacy SERVER_DOC_STATE store.
+ */
+var _headerCache = Object.create(null);
+
 function _loadHeader(docCode, locale){
     var url = _apiUrl(
         API_PREFIX + '/documents/' + encodeURIComponent(docCode) +
@@ -198,6 +208,7 @@ function _loadHeader(docCode, locale){
         if (!body || !body.header) {
             throw new Error('dcc_header_missing_in_response');
         }
+        _headerCache[String(docCode).toUpperCase()] = body.header;
         return body.header;
     });
 }
@@ -411,7 +422,19 @@ function bootstrap(){
 window.DccHeader = {
     render: render,
     renderAll: renderAll,
-    _clearCache: function(){ _labelsCache = {}; _labelsPending = {}; }
+    /**
+     * Read the last-fetched header payload for a doc_code. Returns null if
+     * the renderer has not yet fetched that doc. Callers must treat a null
+     * result as "use your fallback chain"; never synthesize a default.
+     */
+    getCached: function(docCode){
+        if (!docCode) return null;
+        var key = String(docCode).toUpperCase();
+        return _headerCache[key] || null;
+    },
+    _clearCache: function(){
+        _labelsCache = {}; _labelsPending = {}; _headerCache = Object.create(null);
+    }
 };
 
 bootstrap();
