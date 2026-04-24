@@ -24,7 +24,7 @@ final class DocumentLocaleAutomationService
 {
     private const TARGET_LOCALE = 'en';
     private const DRIVER_COMMAND = 'command';
-    private const DEFAULT_COMMAND_TIMEOUT_SECONDS = 120;
+    private const DEFAULT_COMMAND_TIMEOUT_SECONDS = 300;
     private const COMMAND_IO_POLL_MICROSECONDS = 200000;
     private const MAX_COMMAND_OUTPUT_BYTES = 131072;
     private const MAX_COMMAND_MESSAGE_BYTES = 4096;
@@ -86,6 +86,10 @@ final class DocumentLocaleAutomationService
             self::TARGET_LOCALE,
             $workingPreview ? $sourceRevision : null
         );
+        $defaultState = in_array($trigger, ['submit_review', 'approve_release'], true)
+            ? 'review_pending'
+            : 'machine_preview';
+        $dcc = new DocumentControlService($this->data);
 
         $this->syncHeaderBaseline([
             'doc_code' => $docCode,
@@ -95,6 +99,32 @@ final class DocumentLocaleAutomationService
             'effective_date' => $effectiveDate,
             'status' => $sourceStatus,
         ], $actor);
+
+        $reused = $this->restoreCurrentSourceArtifactIfAvailable(
+            $dcc,
+            $docCode,
+            $actor,
+            $title,
+            $subtitle,
+            $dccRevision,
+            $sourceHash,
+            $artifactRelPath,
+            $existingVariant,
+            $defaultState,
+            [
+                'auto_sync' => true,
+                'target_locale' => self::TARGET_LOCALE,
+                'trigger' => $trigger,
+                'source_status' => $sourceStatus,
+                'source_revision' => $sourceRevision,
+                'dcc_revision' => $dccRevision,
+                'source_base_rel_path' => $baseRel,
+                'artifact_scope' => $workingPreview ? 'working_preview' : 'current_revision',
+            ]
+        );
+        if ($reused !== null) {
+            return $reused;
+        }
 
         $attempt = $this->runConfiguredProvider([
             'doc_code' => $docCode,
@@ -112,8 +142,35 @@ final class DocumentLocaleAutomationService
             'glossary_path' => $this->glossaryPath(),
         ]);
 
-        $dcc = new DocumentControlService($this->data);
         if (!$attempt['ok']) {
+            $restored = $this->restoreCurrentSourceArtifactIfAvailable(
+                $dcc,
+                $docCode,
+                $actor,
+                $title,
+                $subtitle,
+                $dccRevision,
+                $sourceHash,
+                $artifactRelPath,
+                $existingVariant,
+                $defaultState,
+                [
+                    'auto_sync' => true,
+                    'target_locale' => self::TARGET_LOCALE,
+                    'trigger' => $trigger,
+                    'source_status' => $sourceStatus,
+                    'source_revision' => $sourceRevision,
+                    'dcc_revision' => $dccRevision,
+                    'source_base_rel_path' => $baseRel,
+                    'artifact_scope' => $workingPreview ? 'working_preview' : 'current_revision',
+                    'restored_after_provider_failure_at' => gmdate(DATE_ATOM),
+                    'provider_failure_reason' => (string)($attempt['reason'] ?? 'translation_provider_failed'),
+                ]
+            );
+            if ($restored !== null) {
+                return $restored;
+            }
+
             $this->deleteArtifactIfExists($artifactRelPath);
             $metadata = [
                 'auto_sync' => true,
@@ -162,10 +219,8 @@ final class DocumentLocaleAutomationService
         }
 
         $this->writeArtifact($artifactRelPath, $artifactHtml);
+        $this->writeRuntimeArtifactCache($docCode, self::TARGET_LOCALE, $sourceHash, $artifactHtml);
 
-        $defaultState = in_array($trigger, ['submit_review', 'approve_release'], true)
-            ? 'review_pending'
-            : 'machine_preview';
         $state = $this->normaliseVariantState(
             (string)($attempt['translation_state'] ?? $defaultState),
             $defaultState
@@ -208,6 +263,243 @@ final class DocumentLocaleAutomationService
             'translation_state' => $state,
             'artifact_rel_path' => $artifactRelPath,
             'locale_variant' => $variant,
+        ];
+    }
+
+    /**
+     * Queue English locale generation without blocking the caller on heavy MT runtime.
+     *
+     * Vietnamese remains the only editable source; this method records honest
+     * locale state in DB immediately, then dispatches a background worker to
+     * build/update the derived English artifact.
+     *
+     * @param array<string, mixed> $input
+     * @return array<string, mixed>
+     */
+    public function scheduleEnglishMachinePreview(array $input): array
+    {
+        $docCode = DocumentControlService::canonicalizeCode((string)($input['doc_code'] ?? ''));
+        if ($docCode === '') {
+            throw new InvalidArgumentException('dcc_locale_automation_missing_doc_code');
+        }
+
+        $baseRel = $this->normalizeRepoRelativePath((string)($input['base_rel_path'] ?? ''));
+        if ($baseRel === '') {
+            throw new InvalidArgumentException('dcc_locale_automation_missing_base_rel_path');
+        }
+
+        $sourceHtml = (string)($input['source_html'] ?? '');
+        if (trim($sourceHtml) === '') {
+            throw new InvalidArgumentException('dcc_locale_automation_missing_source_html');
+        }
+
+        $actor = trim((string)($input['actor'] ?? ''));
+        if ($actor === '') {
+            $actor = 'system';
+        }
+
+        $trigger = $this->normalizeTrigger((string)($input['trigger'] ?? 'manual'));
+        $sourceStatus = $this->normaliseSourceStatus((string)($input['source_status'] ?? 'draft'));
+        $sourceRevision = $this->normaliseRevision((string)($input['revision'] ?? '0.0'));
+        $dccRevision = $this->toDccRevision($sourceRevision);
+        $workingPreview = in_array($sourceStatus, ['draft', 'in_review'], true);
+        $existingVariant = $this->fetchLocaleVariant($docCode, self::TARGET_LOCALE);
+        $releasedSnapshot = $workingPreview ? $this->releasedSnapshotFrom($existingVariant) : null;
+        $catalog = $this->resolveCatalogMetadata($docCode, $baseRel);
+        $title = trim((string)($input['title'] ?? ($catalog['title'] ?? '')));
+        if ($title === '') {
+            $title = $docCode;
+        }
+        $subtitle = $this->nullableText($input['subtitle'] ?? ($catalog['description'] ?? null));
+        $effectiveDate = $this->normaliseIsoDate($input['effective_date'] ?? ($catalog['effective_date'] ?? null))
+            ?? gmdate('Y-m-d');
+        $normalizedSourceHtml = $this->normalizeSourceHtml($sourceHtml);
+        $sourceHash = strtolower(hash('sha256', $normalizedSourceHtml));
+        $artifactRelPath = $this->hiddenSiblingArtifactPath(
+            $baseRel,
+            self::TARGET_LOCALE,
+            $workingPreview ? $sourceRevision : null
+        );
+        $defaultState = in_array($trigger, ['submit_review', 'approve_release'], true)
+            ? 'review_pending'
+            : 'machine_preview';
+        $dcc = new DocumentControlService($this->data);
+
+        $this->syncHeaderBaseline([
+            'doc_code' => $docCode,
+            'title' => $title,
+            'subtitle' => $subtitle,
+            'revision' => $dccRevision,
+            'effective_date' => $effectiveDate,
+            'status' => $sourceStatus,
+        ], $actor);
+
+        $reused = $this->restoreCurrentSourceArtifactIfAvailable(
+            $dcc,
+            $docCode,
+            $actor,
+            $title,
+            $subtitle,
+            $dccRevision,
+            $sourceHash,
+            $artifactRelPath,
+            $existingVariant,
+            $defaultState,
+            [
+                'auto_sync' => true,
+                'target_locale' => self::TARGET_LOCALE,
+                'trigger' => $trigger,
+                'source_status' => $sourceStatus,
+                'source_revision' => $sourceRevision,
+                'dcc_revision' => $dccRevision,
+                'source_base_rel_path' => $baseRel,
+                'artifact_scope' => $workingPreview ? 'working_preview' : 'current_revision',
+            ]
+        );
+        if ($reused !== null) {
+            $reused['queued'] = false;
+            return $reused;
+        }
+
+        $provider = $this->configuredProviderStatus();
+        if (!$provider['ok']) {
+            $metadata = [
+                'auto_sync' => true,
+                'target_locale' => self::TARGET_LOCALE,
+                'trigger' => $trigger,
+                'source_status' => $sourceStatus,
+                'source_revision' => $sourceRevision,
+                'dcc_revision' => $dccRevision,
+                'source_base_rel_path' => $baseRel,
+                'artifact_scope' => $workingPreview ? 'working_preview' : 'current_revision',
+                'blocked_reason' => (string)($provider['reason'] ?? 'translation_provider_not_configured'),
+                'blocked_message' => (string)($provider['message'] ?? 'No compliant internal translation provider is configured.'),
+                'last_attempt_at' => gmdate(DATE_ATOM),
+            ];
+            if ($releasedSnapshot !== null) {
+                $metadata['released_snapshot'] = $releasedSnapshot;
+            }
+            $variant = $dcc->upsertLocaleVariant($docCode, self::TARGET_LOCALE, [
+                'title' => $title,
+                'subtitle' => null,
+                'artifact_rel_path' => null,
+                'artifact_source_revision' => $dccRevision,
+                'artifact_source_hash_sha256' => $sourceHash,
+                'translation_state' => 'blocked',
+                'translation_provider' => (string)($provider['provider'] ?? 'unconfigured'),
+                'glossary_version' => (string)($provider['glossary_version'] ?? $this->glossaryVersion()),
+                'engine_version' => (string)($provider['engine_version'] ?? 'unconfigured'),
+                'published_at' => null,
+                'metadata' => $metadata,
+            ], $actor);
+
+            return [
+                'ok' => false,
+                'doc_code' => $docCode,
+                'translation_state' => 'blocked',
+                'artifact_rel_path' => null,
+                'locale_variant' => $variant,
+                'reason' => (string)($provider['reason'] ?? 'translation_provider_not_configured'),
+                'message' => (string)($provider['message'] ?? 'English auto-translation is blocked until an internal provider is configured.'),
+            ];
+        }
+
+        $jobPayload = [
+            'doc_code' => $docCode,
+            'base_rel_path' => $baseRel,
+            'source_html' => $normalizedSourceHtml,
+            'source_status' => $sourceStatus,
+            'revision' => $sourceRevision,
+            'trigger' => $trigger,
+            'actor' => $actor,
+            'title' => $title,
+            'subtitle' => $subtitle,
+            'effective_date' => $effectiveDate,
+        ];
+        $jobPath = $this->writeQueuedTranslationJob($docCode, self::TARGET_LOCALE, $sourceHash, $jobPayload);
+        $spawned = $this->spawnQueuedTranslationWorker($jobPath);
+        if (!$spawned) {
+            $metadata = [
+                'auto_sync' => true,
+                'target_locale' => self::TARGET_LOCALE,
+                'trigger' => $trigger,
+                'source_status' => $sourceStatus,
+                'source_revision' => $sourceRevision,
+                'dcc_revision' => $dccRevision,
+                'source_base_rel_path' => $baseRel,
+                'artifact_scope' => $workingPreview ? 'working_preview' : 'current_revision',
+                'blocked_reason' => 'translation_worker_spawn_failed',
+                'blocked_message' => 'Background translation worker could not be started.',
+                'last_attempt_at' => gmdate(DATE_ATOM),
+                'queue_job_path' => $this->relativeToRoot($jobPath),
+            ];
+            if ($releasedSnapshot !== null) {
+                $metadata['released_snapshot'] = $releasedSnapshot;
+            }
+            $variant = $dcc->upsertLocaleVariant($docCode, self::TARGET_LOCALE, [
+                'title' => $title,
+                'subtitle' => $subtitle,
+                'artifact_rel_path' => null,
+                'artifact_source_revision' => $dccRevision,
+                'artifact_source_hash_sha256' => $sourceHash,
+                'translation_state' => 'blocked',
+                'translation_provider' => (string)($provider['provider'] ?? 'command'),
+                'glossary_version' => (string)($provider['glossary_version'] ?? $this->glossaryVersion()),
+                'engine_version' => 'worker_spawn_failed',
+                'published_at' => null,
+                'metadata' => $metadata,
+            ], $actor);
+
+            return [
+                'ok' => false,
+                'doc_code' => $docCode,
+                'translation_state' => 'blocked',
+                'artifact_rel_path' => null,
+                'locale_variant' => $variant,
+                'reason' => 'translation_worker_spawn_failed',
+                'message' => 'English auto-translation worker could not be started.',
+            ];
+        }
+
+        $metadata = [
+            'auto_sync' => true,
+            'target_locale' => self::TARGET_LOCALE,
+            'trigger' => $trigger,
+            'source_status' => $sourceStatus,
+            'source_revision' => $sourceRevision,
+            'dcc_revision' => $dccRevision,
+            'source_base_rel_path' => $baseRel,
+            'artifact_scope' => $workingPreview ? 'working_preview' : 'current_revision',
+            'queued_at' => gmdate(DATE_ATOM),
+            'queue_job_path' => $this->relativeToRoot($jobPath),
+            'queue_spawned' => $spawned,
+        ];
+        if ($releasedSnapshot !== null) {
+            $metadata['released_snapshot'] = $releasedSnapshot;
+        }
+
+        $variant = $dcc->upsertLocaleVariant($docCode, self::TARGET_LOCALE, [
+            'title' => $title,
+            'subtitle' => $subtitle,
+            'artifact_rel_path' => null,
+            'artifact_source_revision' => $dccRevision,
+            'artifact_source_hash_sha256' => $sourceHash,
+            'translation_state' => $defaultState,
+            'translation_provider' => (string)($provider['provider'] ?? 'command'),
+            'glossary_version' => (string)($provider['glossary_version'] ?? $this->glossaryVersion()),
+            'engine_version' => 'queued_background_worker',
+            'published_at' => null,
+            'metadata' => $metadata,
+        ], $actor);
+
+        return [
+            'ok' => true,
+            'doc_code' => $docCode,
+            'translation_state' => $defaultState,
+            'artifact_rel_path' => null,
+            'locale_variant' => $variant,
+            'queued' => true,
+            'queue_spawned' => $spawned,
         ];
     }
 
@@ -725,6 +1017,326 @@ final class DocumentLocaleAutomationService
         if (is_file($abs)) {
             @unlink($abs);
         }
+    }
+
+    private function artifactExists(string $artifactRelPath): bool
+    {
+        $artifactRelPath = $this->normalizeRepoRelativePath($artifactRelPath);
+        if ($artifactRelPath === '') {
+            return false;
+        }
+
+        return is_file($this->rootDir . '/' . $artifactRelPath);
+    }
+
+    private function runtimeArtifactCachePath(string $docCode, string $locale, string $sourceHash): string
+    {
+        $safeCode = preg_replace('/[^A-Z0-9._-]+/i', '-', DocumentControlService::canonicalizeCode($docCode)) ?? 'DOC';
+        $safeHash = preg_replace('/[^a-f0-9]+/i', '', strtolower($sourceHash)) ?? '';
+        $safeLocale = preg_replace('/[^a-z0-9_-]+/i', '', strtolower($locale)) ?? '';
+        if ($safeLocale === '') {
+            $safeLocale = self::TARGET_LOCALE;
+        }
+        if ($safeHash === '') {
+            throw new InvalidArgumentException('dcc_locale_automation_invalid_source_hash');
+        }
+
+        return $this->rootDir . '/mom/data/cache/dcc-locale-artifacts/' . $safeLocale . '/' . $safeCode . '/' . $safeHash . '.html';
+    }
+
+    private function writeRuntimeArtifactCache(string $docCode, string $locale, string $sourceHash, string $html): void
+    {
+        $cachePath = $this->runtimeArtifactCachePath($docCode, $locale, $sourceHash);
+        $dir = dirname($cachePath);
+        if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) {
+            throw new RuntimeException('dcc_locale_automation_cache_dir_create_failed');
+        }
+        if (@file_put_contents($cachePath, $html, LOCK_EX) === false) {
+            throw new RuntimeException('dcc_locale_automation_cache_write_failed');
+        }
+    }
+
+    private function restoreArtifactFromRuntimeCache(
+        string $docCode,
+        string $locale,
+        string $sourceHash,
+        string $artifactRelPath
+    ): bool {
+        $cachePath = $this->runtimeArtifactCachePath($docCode, $locale, $sourceHash);
+        if (!is_file($cachePath)) {
+            return false;
+        }
+
+        $html = @file_get_contents($cachePath);
+        if (!is_string($html) || trim($html) === '') {
+            return false;
+        }
+
+        $this->writeArtifact($artifactRelPath, $html);
+        return true;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function configuredProviderStatus(): array
+    {
+        $driver = strtolower(trim((string)(getenv('DCC_TRANSLATION_DRIVER') ?: '')));
+        if ($driver === '' || in_array($driver, ['disabled', 'off', 'none'], true)) {
+            return [
+                'ok' => false,
+                'provider' => 'unconfigured',
+                'engine_version' => 'unconfigured',
+                'glossary_version' => $this->glossaryVersion(),
+                'reason' => 'translation_provider_not_configured',
+                'message' => 'No compliant internal translation provider is configured for DCC auto-translation.',
+            ];
+        }
+
+        if ($driver !== self::DRIVER_COMMAND) {
+            return [
+                'ok' => false,
+                'provider' => $driver,
+                'engine_version' => 'unsupported_driver',
+                'glossary_version' => $this->glossaryVersion(),
+                'reason' => 'translation_provider_driver_unsupported',
+                'message' => 'Configured DCC translation driver is unsupported.',
+            ];
+        }
+
+        $command = trim((string)(getenv('DCC_TRANSLATION_COMMAND') ?: ''));
+        if ($command === '') {
+            return [
+                'ok' => false,
+                'provider' => 'command',
+                'engine_version' => 'unconfigured_command',
+                'glossary_version' => $this->glossaryVersion(),
+                'reason' => 'translation_command_missing',
+                'message' => 'DCC_TRANSLATION_COMMAND is not configured.',
+            ];
+        }
+
+        return [
+            'ok' => true,
+            'provider' => 'command',
+            'engine_version' => 'queued_background_worker',
+            'glossary_version' => $this->glossaryVersion(),
+            'command' => $command,
+        ];
+    }
+
+    private function queuedTranslationJobPath(string $docCode, string $locale, string $sourceHash): string
+    {
+        $safeCode = preg_replace('/[^A-Z0-9._-]+/i', '-', DocumentControlService::canonicalizeCode($docCode)) ?? 'DOC';
+        $safeHash = preg_replace('/[^a-f0-9]+/i', '', strtolower($sourceHash)) ?? '';
+        $safeLocale = preg_replace('/[^a-z0-9_-]+/i', '', strtolower($locale)) ?? '';
+        if ($safeLocale === '') {
+            $safeLocale = self::TARGET_LOCALE;
+        }
+        if ($safeHash === '') {
+            throw new InvalidArgumentException('dcc_locale_automation_invalid_source_hash');
+        }
+
+        return $this->rootDir . '/mom/data/cache/dcc-locale-jobs/' . $safeLocale . '/' . $safeCode . '/' . $safeHash . '.json';
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function writeQueuedTranslationJob(string $docCode, string $locale, string $sourceHash, array $payload): string
+    {
+        $jobPath = $this->queuedTranslationJobPath($docCode, $locale, $sourceHash);
+        $dir = dirname($jobPath);
+        if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) {
+            throw new RuntimeException('dcc_locale_automation_queue_dir_create_failed');
+        }
+
+        $encoded = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+        if (!is_string($encoded)) {
+            throw new RuntimeException('dcc_locale_automation_queue_payload_encode_failed');
+        }
+        if (@file_put_contents($jobPath, $encoded, LOCK_EX) === false) {
+            throw new RuntimeException('dcc_locale_automation_queue_write_failed');
+        }
+
+        return $jobPath;
+    }
+
+    private function spawnQueuedTranslationWorker(string $jobPath): bool
+    {
+        $worker = $this->rootDir . '/tools/scripts/translation/dcc_locale_job_worker.php';
+        if (!is_file($worker)) {
+            return false;
+        }
+
+        $phpBinary = $this->resolvePhpCliBinary();
+        if ($phpBinary === '') {
+            return false;
+        }
+
+        $logFile = $this->rootDir . '/mom/data/php_error.log';
+        $command = sprintf(
+            'cd %s && nohup %s %s %s >> %s 2>&1 < /dev/null &',
+            escapeshellarg($this->rootDir),
+            escapeshellarg($phpBinary),
+            escapeshellarg($worker),
+            escapeshellarg($jobPath),
+            escapeshellarg($logFile)
+        );
+        $process = @proc_open(['/bin/sh', '-lc', $command], [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ], $pipes, $this->rootDir);
+        if (!is_resource($process)) {
+            return false;
+        }
+        foreach ($pipes as $pipe) {
+            if (is_resource($pipe)) {
+                fclose($pipe);
+            }
+        }
+        @proc_close($process);
+        return true;
+    }
+
+    private function resolvePhpCliBinary(): string
+    {
+        $configured = trim((string)(getenv('PHP_CLI_BINARY') ?: ''));
+        if ($configured !== '') {
+            return $configured;
+        }
+
+        foreach (['php8.5', 'php'] as $candidate) {
+            $resolved = trim((string)@shell_exec('command -v ' . escapeshellarg($candidate) . ' 2>/dev/null'));
+            if ($resolved !== '') {
+                return $resolved;
+            }
+        }
+
+        return '';
+    }
+
+    private function relativeToRoot(string $absPath): string
+    {
+        $normalizedRoot = rtrim(str_replace('\\', '/', $this->rootDir), '/');
+        $normalizedAbs = str_replace('\\', '/', $absPath);
+        if ($normalizedRoot !== '' && str_starts_with($normalizedAbs, $normalizedRoot . '/')) {
+            return substr($normalizedAbs, strlen($normalizedRoot) + 1);
+        }
+        return $normalizedAbs;
+    }
+
+    private function existingVariantMatchesCurrentSource(array $variant, string $dccRevision, string $sourceHash): bool
+    {
+        if ($variant === []) {
+            return false;
+        }
+
+        $variantRevision = trim((string)($variant['artifact_source_revision'] ?? ''));
+        if ($variantRevision !== '' && $variantRevision !== $dccRevision) {
+            return false;
+        }
+
+        $variantHash = strtolower(trim((string)($variant['artifact_source_hash_sha256'] ?? '')));
+        return $variantHash !== '' && hash_equals($variantHash, $sourceHash);
+    }
+
+    private function isRenderableVariantState(string $state): bool
+    {
+        return in_array(
+            $this->normaliseVariantState($state, 'missing'),
+            ['machine_preview', 'review_pending', 'reviewed', 'released'],
+            true
+        );
+    }
+
+    /**
+     * @param array<string, mixed> $existingVariant
+     * @param array<string, mixed> $metadataPatch
+     * @return array<string, mixed>|null
+     */
+    private function restoreCurrentSourceArtifactIfAvailable(
+        DocumentControlService $dcc,
+        string $docCode,
+        string $actor,
+        string $title,
+        ?string $subtitle,
+        string $dccRevision,
+        string $sourceHash,
+        string $artifactRelPath,
+        array $existingVariant,
+        string $fallbackState,
+        array $metadataPatch
+    ): ?array {
+        if (!$this->existingVariantMatchesCurrentSource($existingVariant, $dccRevision, $sourceHash)) {
+            return null;
+        }
+
+        $existingArtifactPath = $this->normalizeRepoRelativePath((string)($existingVariant['artifact_rel_path'] ?? ''));
+        $artifactReady = $this->artifactExists($artifactRelPath);
+        if (!$artifactReady && $existingArtifactPath !== '' && $existingArtifactPath !== $artifactRelPath && $this->artifactExists($existingArtifactPath)) {
+            $html = @file_get_contents($this->rootDir . '/' . $existingArtifactPath);
+            if (is_string($html) && trim($html) !== '') {
+                $this->writeArtifact($artifactRelPath, $html);
+                $artifactReady = true;
+            }
+        }
+        if (!$artifactReady) {
+            $artifactReady = $this->restoreArtifactFromRuntimeCache($docCode, self::TARGET_LOCALE, $sourceHash, $artifactRelPath);
+        }
+        if (!$artifactReady) {
+            return null;
+        }
+
+        $state = $this->normaliseVariantState((string)($existingVariant['translation_state'] ?? $fallbackState), $fallbackState);
+        if (!$this->isRenderableVariantState($state)) {
+            $state = $fallbackState;
+        }
+
+        $metadata = $this->normalizeVariantMetadata($existingVariant['metadata'] ?? []);
+        foreach ($metadataPatch as $key => $value) {
+            $metadata[$key] = $value;
+        }
+        $metadata['restored_from_runtime_cache_at'] = gmdate(DATE_ATOM);
+
+        $provider = trim((string)($existingVariant['translation_provider'] ?? ''));
+        if ($provider === '' || $provider === 'unconfigured') {
+            $provider = 'runtime_cache';
+        }
+        $engineVersion = trim((string)($existingVariant['engine_version'] ?? ''));
+        if ($engineVersion === '' || $engineVersion === 'unconfigured') {
+            $engineVersion = 'runtime_cache_restore';
+        }
+        $glossaryVersion = trim((string)($existingVariant['glossary_version'] ?? ''));
+        if ($glossaryVersion === '') {
+            $glossaryVersion = $this->glossaryVersion();
+        }
+
+        $variant = $dcc->upsertLocaleVariant($docCode, self::TARGET_LOCALE, [
+            'title' => $this->nullableText($existingVariant['title'] ?? $title) ?? $title,
+            'subtitle' => $this->nullableText($existingVariant['subtitle'] ?? $subtitle),
+            'artifact_rel_path' => $artifactRelPath,
+            'artifact_source_revision' => $dccRevision,
+            'artifact_source_hash_sha256' => $sourceHash,
+            'translation_state' => $state,
+            'translation_provider' => $provider,
+            'glossary_version' => $glossaryVersion,
+            'engine_version' => $engineVersion,
+            'reviewer_party_id' => $existingVariant['reviewer_party_id'] ?? null,
+            'reviewed_at' => $existingVariant['reviewed_at'] ?? null,
+            'published_at' => $state === 'released' ? ($existingVariant['published_at'] ?? gmdate(DATE_ATOM)) : null,
+            'metadata' => $metadata,
+        ], $actor);
+
+        return [
+            'ok' => true,
+            'doc_code' => $docCode,
+            'translation_state' => $state,
+            'artifact_rel_path' => $artifactRelPath,
+            'locale_variant' => $variant,
+            'restored_from_runtime_cache' => true,
+        ];
     }
 
     /**

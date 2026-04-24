@@ -238,6 +238,58 @@ final class DocumentControlServiceConsolidationTest extends TestCase
         $this->assertSame('SOP-606', $updates[0]['params'][':c']);
     }
 
+    public function testLocalizedHeaderFailsClosedWhenArtifactFileIsMissing(): void
+    {
+        $this->data->queueRow('SELECT header_id, doc_code, eqms_doc_id, title, subtitle, doc_type', [[
+            'header_id' => 'hdr-1',
+            'doc_code' => 'QMS-MAN-001',
+            'title' => 'QMS Manual',
+            'subtitle' => null,
+            'doc_type' => 'MAN',
+            'revision' => 'V0.0',
+            'effective_date' => '2026-04-23',
+            'owner_role_code' => 'QA',
+            'approver_role_code' => 'CEO',
+            'iso_clause' => null,
+            'status' => 'released',
+            'locale_default' => 'vi',
+            'metadata' => '{}',
+            'created_at' => '2026-04-23 00:00:00+07',
+            'created_by' => 'qa.alice',
+            'updated_at' => '2026-04-23 00:00:00+07',
+            'updated_by' => 'qa.alice',
+        ]]);
+        $this->data->queueRow('SELECT doc_code, locale, title, subtitle, artifact_rel_path', [[
+            'doc_code' => 'QMS-MAN-001',
+            'locale' => 'en',
+            'title' => 'QMS Manual',
+            'subtitle' => null,
+            'artifact_rel_path' => 'mom/docs/system/quality-manual/_qms-man-001-qms-manual.en.html',
+            'artifact_source_revision' => 'V0.0',
+            'artifact_source_hash_sha256' => '',
+            'translation_state' => 'machine_preview',
+            'translation_provider' => 'argos_local_vi_en',
+            'glossary_version' => 'repo_glossary:test',
+            'engine_version' => 'argos_local_vi_en_v1',
+            'reviewer_party_id' => null,
+            'reviewed_at' => null,
+            'published_at' => null,
+            'metadata' => '{}',
+            'created_at' => '2026-04-23 00:00:00+07',
+            'created_by' => 'qa.alice',
+            'updated_at' => '2026-04-23 00:00:00+07',
+            'updated_by' => 'qa.alice',
+        ]]);
+
+        $result = $this->service->getLocalizedHeader('QMS-MAN-001', 'en');
+
+        $this->assertTrue($result['locale_variant_exists']);
+        $this->assertFalse($result['locale_artifact_present']);
+        $this->assertFalse($result['locale_renderable']);
+        $this->assertNull($result['artifact_rel_path']);
+        $this->assertTrue($result['is_locale_fallback']);
+    }
+
     public function testCanonicalizeCodeStripsVerboseTitle(): void
     {
         $this->assertSame('QMS-MAN-001', DocumentControlService::canonicalizeCode('QMS-MAN-001-QMS-MANUAL'));

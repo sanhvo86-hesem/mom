@@ -3864,7 +3864,7 @@ async function doQuickCreateDoc(folder, cat){
   if(!title){ showToast(lang==='en'?'Enter title':'Nhập tiêu đề'); return; }
   if(!ensureEnglishStandardTitle(title)) return;
   try {
-    const res = await controlPlaneDocumentAuthoringRequest('create', {code, title, cat, owner, folder, revision:'0.0'});
+    const res = await controlPlaneDocumentAuthoringRequest('create', {code, title, cat, owner, folder, revision:'0.0'}, 'POST', 300000);
     if(res && res.ok){
       showToast('✅ ' + code);
       document.getElementById('quick-create-modal')?.remove();
@@ -4867,7 +4867,7 @@ async function submitCreateDoc(cat){
   }
 
   try{
-    const res=await controlPlaneDocumentAuthoringRequest('create',{code,title,cat,owner,folder,revision});
+    const res=await controlPlaneDocumentAuthoringRequest('create',{code,title,cat,owner,folder,revision}, 'POST', 300000);
     if(res && res.ok && res.doc){
       await rescanDocs();
       if(!DOCS.find(d=>d.code===res.doc.code)) DOCS.push(res.doc);

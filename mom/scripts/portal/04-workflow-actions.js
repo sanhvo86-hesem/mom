@@ -775,7 +775,7 @@ async function saveDraftSilent(code){
     const fullHtml = buildFullDocHtmlFromIframe(innerHtml, doc.path);
     const st = getDocState(code) || {};
     const revision = String(st.revision || doc.rev || '0');
-    const res = await controlPlaneDocumentAuthoringRequest('save-draft', {code: code, base_path: doc.path, revision, note: 'Auto-save before navigation', html: fullHtml});
+    const res = await controlPlaneDocumentAuthoringRequest('save-draft', {code: code, base_path: doc.path, revision, note: 'Auto-save before navigation', html: fullHtml}, 'POST', 300000);
     if(res && res.ok){
       SERVER_DOC_STATE[doc.code] = res.state;
       if(res.versions) setDocVersions(doc.code, res.versions);
@@ -954,6 +954,7 @@ function getEnglishLocaleUnavailableCopy(localeView){
 }
 
 const __DOC_ENGLISH_LOCALE_BOOTSTRAP = Object.create(null);
+const __DOC_ENGLISH_LOCALE_POLL_TOKENS = Object.create(null);
 
 function isHtmlDocEligibleForLocaleBootstrap(doc){
   if(!doc) return false;
@@ -973,7 +974,8 @@ async function ensureDocEnglishLocaleArtifact(doc, options){
   if(localeView && localeView.available){
     return { ok: true, skipped: true, reason: 'locale_artifact_already_available', translationState: translationState || 'released' };
   }
-  if(!opts.force && translationState !== '' && translationState !== 'missing'){
+  const staleRenderableVariant = !!(localeView && !localeView.available && localeView.localeVariantExists && isRenderableLocaleArtifactState(translationState));
+  if(!opts.force && translationState !== '' && translationState !== 'missing' && !staleRenderableVariant){
     return { ok: true, skipped: true, reason: 'locale_state_not_bootstrappable', translationState };
   }
 
@@ -993,7 +995,7 @@ async function ensureDocEnglishLocaleArtifact(doc, options){
       base_path: basePath,
       locale: 'en',
       force: !!opts.force
-    }, 'POST', 120000);
+    }, 'POST', 300000);
 
     if(res && res.ok && typeof refreshDccOverlayFromServer === 'function'){
       try{ await refreshDccOverlayFromServer({refreshUi:false}); }catch(e){}
@@ -1013,8 +1015,11 @@ function triggerDocEnglishLocaleBootstrap(doc, options){
   if(lang !== 'en' || !doc) return;
   ensureDocEnglishLocaleArtifact(doc, options).then(function(res){
     if(!res || res.ok === false) return;
-    if(editMode) return;
     const code = String(doc.code || '').trim();
+    if(code){
+      scheduleDocEnglishLocalePolling(code);
+    }
+    if(editMode) return;
     if(!code || currentDoc !== code) return;
     const latestDoc = (typeof window._resolveDocRecord === 'function') ? window._resolveDocRecord(code) : doc;
     try{ updateDocViewerHeader(latestDoc); }catch(e){}
@@ -1028,6 +1033,34 @@ function triggerDocEnglishLocaleBootstrap(doc, options){
 
 window.ensureDocEnglishLocaleArtifact = ensureDocEnglishLocaleArtifact;
 window.triggerDocEnglishLocaleBootstrap = triggerDocEnglishLocaleBootstrap;
+
+function scheduleDocEnglishLocalePolling(code){
+  const docCode = String(code || '').trim();
+  if(!docCode) return;
+  const token = String(Date.now()) + ':' + Math.random().toString(36).slice(2);
+  __DOC_ENGLISH_LOCALE_POLL_TOKENS[docCode] = token;
+  [5000, 15000, 30000, 60000, 120000, 240000].forEach(function(delay){
+    setTimeout(async function(){
+      if(__DOC_ENGLISH_LOCALE_POLL_TOKENS[docCode] !== token) return;
+      if(lang !== 'en' || editMode || currentDoc !== docCode) return;
+      try{
+        if(typeof refreshDccOverlayFromServer === 'function'){
+          await refreshDccOverlayFromServer({refreshUi:false});
+        }
+      }catch(e){}
+      const latestDoc = (typeof window._resolveDocRecord === 'function') ? window._resolveDocRecord(docCode) : (DOCS.find(function(d){ return d && d.code === docCode; }) || null);
+      if(!latestDoc) return;
+      const localeView = getDocLocaleView(latestDoc);
+      if(localeView && localeView.available){
+        delete __DOC_ENGLISH_LOCALE_POLL_TOKENS[docCode];
+        try{ updateDocViewerHeader(latestDoc); }catch(e){}
+        try{ renderWorkflowPanel(latestDoc); }catch(e){}
+        try{ renderVersionHistory(latestDoc); }catch(e){}
+        try{ loadDocContent(latestDoc); }catch(e){}
+      }
+    }, delay);
+  });
+}
 
 function qmsLooksLikeStrayDocCss(text){
   const s = String(text || '');
@@ -1476,7 +1509,7 @@ const innerHtml = _getCurrentEditorInnerHtml();
     const st = getDocState(code) || {};
     const revision = String(st.revision || doc.rev || '0');
 
-    const res = await controlPlaneDocumentAuthoringRequest('save-draft', {code: code, base_path: doc.path, revision, note: note||'', html: fullHtml});
+    const res = await controlPlaneDocumentAuthoringRequest('save-draft', {code: code, base_path: doc.path, revision, note: note||'', html: fullHtml}, 'POST', 300000);
     if(res && res.ok){
       SERVER_DOC_STATE[doc.code] = res.state;
       if(res.versions) setDocVersions(doc.code, res.versions);
@@ -1719,7 +1752,7 @@ async function submitWorkbookForReview(code){
     );
     if(note === null) return;
     const updateType = String(state.updateType || 'minor') === 'major' ? 'major' : 'minor';
-    const res = await controlPlaneDocumentAuthoringRequest('submit-review', {code: doc.code, base_path: doc.path, revision, updateType, note: note || ''});
+    const res = await controlPlaneDocumentAuthoringRequest('submit-review', {code: doc.code, base_path: doc.path, revision, updateType, note: note || ''}, 'POST', 300000);
     if(res && res.ok){
       if(res.state) setDocState(code, res.state);
       if(res.versions) setDocVersions(code, res.versions);
@@ -1786,7 +1819,7 @@ async function confirmSubmitForReview(code){
     const st=getDocState(code)||{status:'draft',revision:doc.rev||'0'};
     const rev = st.revision || doc.rev || '0';
 
-    const res = await controlPlaneDocumentAuthoringRequest('submit-review', {code: code, base_path: doc.path, revision: rev, updateType: updateType, note: changeNote||'', html: fullHtml});
+    const res = await controlPlaneDocumentAuthoringRequest('submit-review', {code: code, base_path: doc.path, revision: rev, updateType: updateType, note: changeNote||'', html: fullHtml}, 'POST', 300000);
     if(res && res.ok){
       if(res.state) setDocState(code, res.state);
       if(res.versions) setDocVersions(code, res.versions);
@@ -1858,7 +1891,7 @@ async function approveDoc(code){
       prevRevision: prevRev,
       newRevision: newRevision,
       updateType: updateType
-    });
+    }, 'POST', 300000);
 
     if(res && res.ok){
       SERVER_DOC_STATE[doc.code] = res.state;
@@ -1934,7 +1967,7 @@ async function restoreVersion(code, idx){
     const rev = (v.version||'v0').replace(/^v/i,'') || '0';
     const note = (lang==='en'?'Restored from ':'Khôi phục từ ') + (v.version||'');
 
-    const res = await controlPlaneDocumentAuthoringRequest('save-draft', {code: code, base_path: doc.path, revision: rev, note: note, html: html});
+    const res = await controlPlaneDocumentAuthoringRequest('save-draft', {code: code, base_path: doc.path, revision: rev, note: note, html: html}, 'POST', 300000);
     if(res && res.ok){
       if(res.state) setDocState(code, res.state);
       if(res.versions) setDocVersions(code, res.versions);

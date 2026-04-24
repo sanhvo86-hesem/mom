@@ -195,7 +195,7 @@ class DocumentController extends BaseController
 
             $localeTranslation = [];
             try {
-                $localeTranslation = $this->localeAutomation()->syncEnglishMachinePreview([
+                $localeTranslation = $this->localeAutomation()->scheduleEnglishMachinePreview([
                     'doc_code' => $code,
                     'base_rel_path' => $baseRel,
                     'source_html' => $docHtml,
@@ -307,7 +307,7 @@ class DocumentController extends BaseController
         $catalog = $this->resolveDocumentCatalogEntry($code, $baseRel);
         $localeTranslation = [];
         try {
-            $localeTranslation = $this->localeAutomation()->syncEnglishMachinePreview([
+            $localeTranslation = $this->localeAutomation()->scheduleEnglishMachinePreview([
                 'doc_code' => $code,
                 'base_rel_path' => $baseRel,
                 'source_html' => $html,
@@ -444,7 +444,7 @@ class DocumentController extends BaseController
         $localeTranslation = [];
         if ($sourceHtml !== '') {
             try {
-                $localeTranslation = $this->localeAutomation()->syncEnglishMachinePreview([
+                $localeTranslation = $this->localeAutomation()->scheduleEnglishMachinePreview([
                     'doc_code' => $code,
                     'base_rel_path' => $baseRel,
                     'source_html' => $sourceHtml,
@@ -603,7 +603,7 @@ class DocumentController extends BaseController
 
         $localeTranslation = [];
         try {
-            $localeTranslation = $this->localeAutomation()->syncEnglishMachinePreview([
+            $localeTranslation = $this->localeAutomation()->scheduleEnglishMachinePreview([
                 'doc_code' => $code,
                 'base_rel_path' => $baseRel,
                 'source_html' => is_string($approvedHtml ?? null) ? $approvedHtml : ((string)@file_get_contents($liveFile)),
@@ -765,7 +765,7 @@ class DocumentController extends BaseController
 
         $localeTranslation = [];
         try {
-            $localeTranslation = $this->localeAutomation()->syncEnglishMachinePreview([
+            $localeTranslation = $this->localeAutomation()->scheduleEnglishMachinePreview([
                 'doc_code' => $code,
                 'base_rel_path' => $baseRel,
                 'source_html' => $source['source_html'],

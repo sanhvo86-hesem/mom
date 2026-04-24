@@ -157,6 +157,8 @@ POST_FIXES = [
     ("the source", "the source"),
     ("inters with", "stop deviation at"),
 ]
+SEGMENT_BATCH_SIZE = 24
+SEGMENT_BATCH_MAX_CHARS = 3600
 
 _translator = None
 _glossary_phrases: List[Tuple[str, str]] | None = None
@@ -279,39 +281,141 @@ def cleanup_translation(text: str) -> str:
     return cleaned.strip()
 
 
-def translate_text(text: str, translator) -> str:
+def build_translation_plan(text: str):
     if normalize_phrase(text) == "":
-        return text
+        return None
     if not VIETNAMESE_CHAR_RE.search(text):
-        return text
+        return None
     literals: Dict[str, str] = {}
     next_index = [0]
     protected = protect_glossary_phrases(text, literals, next_index)
     protected = protect_regex_literals(protected, literals, next_index)
     plain = re.sub(r"__DCC_LITERAL_\d+__", " ", protected)
     if not VIETNAMESE_CHAR_RE.search(plain):
-        return restore_literals(protected, literals)
+        return {
+            "original": text,
+            "literals": literals,
+            "parts": [("raw", protected)],
+            "cores": [],
+        }
     parts = re.split(r"(__DCC_LITERAL_\d+__)", protected)
-    out_parts: List[str] = []
+    template: List[Tuple[str, str, str, str]] = []
+    cores: List[str] = []
     for part in parts:
         if part == "":
             continue
         if re.fullmatch(r"__DCC_LITERAL_\d+__", part):
-            out_parts.append(part)
+            template.append(("literal", part, "", ""))
             continue
         if not re.search(r"[A-Za-zÀ-ỹ]", part):
-            out_parts.append(part)
+            template.append(("raw", part, "", ""))
             continue
         leading = re.match(r"^\s*", part).group(0)
         trailing = re.search(r"\s*$", part).group(0)
         core = part.strip()
         if core == "":
-            out_parts.append(part)
+            template.append(("raw", part, "", ""))
             continue
-        out_parts.append(leading + translator.translate(core) + trailing)
-    translated = "".join(out_parts)
-    restored = restore_literals(translated, literals)
+        template.append(("core", leading, core, trailing))
+        cores.append(core)
+    return {
+        "original": text,
+        "literals": literals,
+        "parts": template,
+        "cores": cores,
+    }
+
+
+def parse_batched_translation_output(text: str, expected_count: int):
+    markers = list(re.finditer(r"ID(\d{4})\s*:+", text))
+    if len(markers) < expected_count:
+        return None
+    values: Dict[int, str] = {}
+    for index, marker in enumerate(markers):
+        key = int(marker.group(1))
+        if key < 1 or key > expected_count or key in values:
+            continue
+        start = marker.end()
+        end = markers[index + 1].start() if index + 1 < len(markers) else len(text)
+        values[key] = text[start:end].strip()
+    if len(values) != expected_count:
+        return None
+    return [values[i] for i in range(1, expected_count + 1)]
+
+
+def translate_batch(segments: List[str], translator) -> Dict[str, str]:
+    if not segments:
+        return {}
+
+    payload_lines = [f"ID{index + 1:04d}::{segment}" for index, segment in enumerate(segments)]
+    translated = translator.translate("\n".join(payload_lines))
+    parsed = parse_batched_translation_output(translated, len(segments))
+    if parsed is None:
+        return {}
+    return {
+        segments[index]: cleanup_translation(parsed[index])
+        for index in range(len(segments))
+    }
+
+
+def translate_core_map(cores: Iterable[str], translator) -> Dict[str, str]:
+    ordered = []
+    seen = set()
+    for core in cores:
+        if core in seen:
+            continue
+        seen.add(core)
+        ordered.append(core)
+
+    translated_map: Dict[str, str] = {}
+    batch: List[str] = []
+    batch_chars = 0
+
+    def flush_batch() -> None:
+        nonlocal batch, batch_chars
+        if not batch:
+            return
+        batched = translate_batch(batch, translator)
+        if len(batched) != len(batch):
+            for item in batch:
+                translated_map[item] = cleanup_translation(translator.translate(item))
+        else:
+            translated_map.update(batched)
+        batch = []
+        batch_chars = 0
+
+    for core in ordered:
+        estimated = len(core) + 12
+        if batch and (len(batch) >= SEGMENT_BATCH_SIZE or (batch_chars + estimated) > SEGMENT_BATCH_MAX_CHARS):
+            flush_batch()
+        batch.append(core)
+        batch_chars += estimated
+
+    flush_batch()
+    return translated_map
+
+
+def render_translation_plan(plan, translated_cores: Dict[str, str]) -> str:
+    out_parts: List[str] = []
+    for kind, first, second, third in plan["parts"]:
+        if kind == "literal":
+            out_parts.append(first)
+            continue
+        if kind == "raw":
+            out_parts.append(first)
+            continue
+        translated = translated_cores.get(second, second)
+        out_parts.append(first + translated + third)
+    restored = restore_literals("".join(out_parts), plan["literals"])
     return cleanup_translation(restored)
+
+
+def translate_text(text: str, translator) -> str:
+    plan = build_translation_plan(text)
+    if plan is None:
+        return text
+    translated_cores = translate_core_map(plan["cores"], translator) if plan["cores"] else {}
+    return render_translation_plan(plan, translated_cores)
 
 
 def translate_bootstrap_seed(soup: BeautifulSoup, translator) -> None:
@@ -354,11 +458,22 @@ def translate_html(source_html: str, title: str, subtitle: str) -> Dict[str, str
 
     translate_bootstrap_seed(soup, translator)
 
+    node_plans = []
+    unique_cores: List[str] = []
     for node in list(soup.find_all(string=True)):
         if should_skip_text_node(node):
             continue
         original = str(node)
-        translated = translate_text(original, translator)
+        plan = build_translation_plan(original)
+        if plan is None:
+            continue
+        node_plans.append((node, plan))
+        unique_cores.extend(plan["cores"])
+
+    translated_cores = translate_core_map(unique_cores, translator)
+    for node, plan in node_plans:
+        original = str(node)
+        translated = render_translation_plan(plan, translated_cores)
         if translated != original:
             node.replace_with(translated)
 

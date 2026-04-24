@@ -1165,12 +1165,14 @@ final class DocumentControlService
         $headerStatus = strtolower(trim((string)($header['status'] ?? '')));
         $revisionMatches = ($sourceRevision === '') || ($headerRevision !== '' && $sourceRevision === $headerRevision);
         $sourceHashMatches = $exists ? $this->sourceHashMatchesCurrentSource((string)($header['doc_code'] ?? ''), $variant) : true;
+        $artifactPresent = $exists ? $this->localeArtifactExists($artifactPath) : false;
         $draftLifecycle = in_array($headerStatus, ['draft', 'in_review', 'pending_approval'], true);
         $sourceBaselineCompatible = $revisionMatches || ($draftLifecycle && $sourceHashMatches);
         $publishedOk = $state !== 'released' || !empty($variant['published_at']);
         $renderable = $exists
             && $locale !== 'vi'
             && $artifactPath !== ''
+            && $artifactPresent
             && in_array($state, $renderableStates, true)
             && $sourceBaselineCompatible
             && $sourceHashMatches
@@ -1183,6 +1185,7 @@ final class DocumentControlService
         $out['locale_renderable'] = $renderable;
         $out['is_locale_fallback'] = ($locale === 'vi') ? false : !$renderable;
         $out['translation_state'] = $state;
+        $out['locale_artifact_present'] = $artifactPresent;
         $out['artifact_rel_path'] = $renderable ? $artifactPath : null;
         $out['artifact_source_revision'] = $exists ? ($variant['artifact_source_revision'] ?? null) : null;
         $out['artifact_source_hash_sha256'] = $exists ? ($variant['artifact_source_hash_sha256'] ?? null) : null;
@@ -1300,6 +1303,25 @@ final class DocumentControlService
             return false;
         }
         return hash_equals($expected, $current);
+    }
+
+    private function localeArtifactExists(string $artifactPath): bool
+    {
+        $normalized = str_replace('\\', '/', trim($artifactPath));
+        $normalized = ltrim($normalized, '/');
+        if ($normalized === '' || str_contains($normalized, '..')) {
+            return false;
+        }
+
+        $rootDir = method_exists($this->data, 'getRootDir')
+            ? (string)$this->data->getRootDir()
+            : dirname(__DIR__, 5);
+        $rootDir = rtrim(str_replace('\\', '/', $rootDir), '/');
+        if ($rootDir === '') {
+            return false;
+        }
+
+        return is_file($rootDir . '/' . $normalized);
     }
 
     private function sourceDocumentHashFor(string $docCode): string

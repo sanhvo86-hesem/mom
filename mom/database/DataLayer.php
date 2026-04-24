@@ -183,6 +183,17 @@ class DataLayer
     }
 
     /**
+     * Get the project root path.
+     *
+     * This is intentionally exposed for controlled services that must verify
+     * runtime filesystem artifacts against repository-relative DB paths.
+     */
+    public function getRootDir(): string
+    {
+        return $this->rootDir;
+    }
+
+    /**
      * Return a runtime summary of the active storage mode and PostgreSQL reachability.
      *
      * This is safe to call from JSON_ONLY mode and useful for runtime observability.
