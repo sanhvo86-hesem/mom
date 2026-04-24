@@ -114,6 +114,44 @@ final class DocumentControlServiceConsolidationTest extends TestCase
         $this->service->release('SOP-606', 'qa.alice', 'QA_APPROVER', 'DCN-2026-0001', null);
     }
 
+    public function testCreateDcrNormalisesUpdateAliasToRevise(): void
+    {
+        $this->data->queueRow('SELECT * FROM dcc_document_change_request', [[
+            'dcr_id' => 'dcr-1',
+            'dcr_number' => 'DCR-2026-0001',
+            'change_type' => 'revise',
+            'metadata' => '{"requested_update_type":"minor_update"}',
+        ]]);
+
+        $this->service->createDcr([
+            'doc_code' => 'SOP-606',
+            'change_type' => 'minor_update',
+            'requested_revision' => 'V1.0',
+            'reason' => 'simulation release',
+        ], 'qa.alice');
+
+        $inserts = $this->data->findExecutes('INSERT INTO dcc_document_change_request');
+        $this->assertCount(1, $inserts);
+        $this->assertSame('revise', $inserts[0]['params'][':ctype']);
+        $this->assertSame(
+            '{"requested_update_type":"minor_update"}',
+            $inserts[0]['params'][':metadata']
+        );
+    }
+
+    public function testCreateDcrRejectsUnknownChangeType(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('dcc_dcr_invalid_change_type');
+
+        $this->service->createDcr([
+            'doc_code' => 'SOP-606',
+            'change_type' => 'surprise',
+            'requested_revision' => 'V1.0',
+            'reason' => 'invalid alias',
+        ], 'qa.alice');
+    }
+
     public function testReleaseRecordsRevisionAndFlipsCurrent(): void
     {
         $this->data->queueRow('SELECT dcn_id, doc_code, to_revision', [[

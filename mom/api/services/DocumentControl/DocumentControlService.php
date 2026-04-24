@@ -46,6 +46,19 @@ final class DocumentControlService
         'MAN', 'POL', 'SOP', 'WI', 'FRM', 'ANNEX', 'JD', 'DEPT', 'ORG', 'REF', 'TRN',
     ];
 
+    private const VALID_DCR_CHANGE_TYPES = [
+        'create', 'revise', 'supersede', 'obsolete',
+    ];
+
+    private const DCR_CHANGE_TYPE_ALIASES = [
+        'major'        => 'revise',
+        'minor'        => 'revise',
+        'patch'        => 'revise',
+        'major_update' => 'revise',
+        'minor_update' => 'revise',
+        'patch_update' => 'revise',
+    ];
+
     private const REVISION_PATTERN = '/^V\d+(\.\d+)?$/';
 
     /** @var array<string, string|null> */
@@ -820,6 +833,7 @@ final class DocumentControlService
                 throw new InvalidArgumentException("dcc_dcr_missing_$k");
             }
         }
+        $normalised = $this->normaliseDcrChangeTypeInput($input);
         $this->assertValidRevision($input['requested_revision']);
 
         $dcrNumber = $input['dcr_number'] ?? $this->nextDcrNumber();
@@ -834,7 +848,7 @@ final class DocumentControlService
             [
                 ':num'           => $dcrNumber,
                 ':c'             => $input['doc_code'],
-                ':ctype'         => $input['change_type'],
+                ':ctype'         => $normalised['change_type'],
                 ':rev'           => $input['requested_revision'],
                 ':reason'        => $input['reason'],
                 ':impact'        => $input['impact_assessment'] ?? null,
@@ -842,7 +856,7 @@ final class DocumentControlService
                 ':actor'         => $actor,
                 ':reviewer_role' => $input['reviewer_role_code'] ?? null,
                 ':target_eff'    => $input['target_effective_date'] ?? null,
-                ':metadata'      => json_encode($input['metadata'] ?? (object)[], JSON_UNESCAPED_UNICODE),
+                ':metadata'      => json_encode($normalised['metadata'], JSON_UNESCAPED_UNICODE),
             ]
         );
 
@@ -1040,6 +1054,41 @@ final class DocumentControlService
         if (!preg_match(self::REVISION_PATTERN, $rev)) {
             throw new InvalidArgumentException('dcc_invalid_revision_pattern');
         }
+    }
+
+    /**
+     * Canonicalise legacy UI / bridge aliases onto the DB-backed DCR enum.
+     *
+     * @param array<string, mixed> $input
+     * @return array{change_type: string, metadata: array<string, mixed>|object}
+     */
+    private function normaliseDcrChangeTypeInput(array $input): array
+    {
+        $raw = strtolower(trim((string)($input['change_type'] ?? '')));
+        if ($raw === '') {
+            throw new InvalidArgumentException('dcc_dcr_missing_change_type');
+        }
+
+        $metadata = $input['metadata'] ?? (object)[];
+        if (is_object($metadata)) {
+            $metadata = (array)$metadata;
+        } elseif (!is_array($metadata)) {
+            $metadata = ['raw_metadata' => $metadata];
+        }
+
+        if (isset(self::DCR_CHANGE_TYPE_ALIASES[$raw])) {
+            $metadata['requested_update_type'] = $metadata['requested_update_type'] ?? $raw;
+            $raw = self::DCR_CHANGE_TYPE_ALIASES[$raw];
+        }
+
+        if (!in_array($raw, self::VALID_DCR_CHANGE_TYPES, true)) {
+            throw new InvalidArgumentException('dcc_dcr_invalid_change_type');
+        }
+
+        return [
+            'change_type' => $raw,
+            'metadata'    => $metadata === [] ? (object)[] : $metadata,
+        ];
     }
 
     private function assertSingleRole(string $field, string $role): void

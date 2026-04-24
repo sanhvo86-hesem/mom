@@ -53,7 +53,12 @@ use function MOM\Tools\DccBatch\walk_docs;
 use function MOM\Tools\DccBatch\is_html_path;
 use function MOM\Tools\DccBatch\code_from_filename;
 use function MOM\Tools\DccBatch\code_from_filename_loose;
+use function MOM\Tools\DccBatch\clean_text;
 use function MOM\Tools\DccBatch\doc_type_from_code;
+use function MOM\Tools\DccBatch\extract_subtitle;
+use function MOM\Tools\DccBatch\extract_title;
+use function MOM\Tools\DccBatch\strip_brand_suffix;
+use function MOM\Tools\DccBatch\strip_code_prefix;
 use function MOM\Tools\DccBatch\build_data_layer;
 
 $ROOT_DIR = realpath(__DIR__ . '/../../..');
@@ -140,6 +145,7 @@ foreach (walk_docs($ROOT_DIR) as $abs) {
                 $service,
                 $dl,
                 $code,
+                $abs,
                 $state ?? [],
                 $docTypeCatalog,
                 $opts,
@@ -487,6 +493,7 @@ function upsert_header_from_legacy(
     DocumentControlService $service,
     \MOM\Database\DataLayer $dl,
     string $code,
+    string $absPath,
     array $state,
     array $docTypeCatalog,
     array $opts,
@@ -503,13 +510,20 @@ function upsert_header_from_legacy(
     if ($revision === '') $revision = 'V0';
     $status    = normalise_status($state['status'] ?? null);
     $effective = extract_effective_date((string)($state['effective_date'] ?? ($state['updated_at'] ?? '')));
+    $html      = @file_get_contents($absPath);
+    $derivedTitle = is_string($html) && $html !== ''
+        ? derive_backfill_title($html, $code, $absPath)
+        : $code;
+    $derivedSubtitle = is_string($html) && $html !== ''
+        ? extract_subtitle($html)
+        : null;
 
     $owner     = normalise_role($state['owner']    ?? null, $ownerDef,    'owner_role_code',    $code, $warnings, $stats);
     $approver  = normalise_role($state['approver'] ?? null, $approverDef, 'approver_role_code', $code, $warnings, $stats);
 
     $existing = $dl->query(
         "SELECT doc_code, title, subtitle, revision, status, owner_role_code,
-                approver_role_code, effective_date
+                approver_role_code, effective_date, updated_by
          FROM dcc_document_header WHERE doc_code = :c LIMIT 1",
         [':c' => $code]
     ) ?? [];
@@ -525,18 +539,20 @@ function upsert_header_from_legacy(
         $dl->execute(
             "INSERT INTO dcc_document_header
                 (doc_code, title, doc_type, revision, effective_date,
-                 owner_role_code, approver_role_code, status, locale_default,
+                 subtitle, owner_role_code, approver_role_code, status, locale_default,
                  metadata, created_at, created_by, updated_at, updated_by)
              VALUES
                 (:c, :t, :dt, :r, :e,
+                 :sub,
                  :o, :a, :s, 'vi',
                  '{}'::jsonb, now(), 'dcc-backfill', now(), 'dcc-backfill')",
             [
                 ':c'  => $code,
-                ':t'  => $code,  // placeholder title; migrate.php owns authoritative title.
+                ':t'  => $derivedTitle !== '' ? $derivedTitle : $code,
                 ':dt' => $docType,
                 ':r'  => $revision,
                 ':e'  => $effective,
+                ':sub' => $derivedSubtitle,
                 ':o'  => $owner,
                 ':a'  => $approver,
                 ':s'  => $status,
@@ -556,6 +572,19 @@ function upsert_header_from_legacy(
     if ($cmp((string)$current['revision'], $revision)) {
         $sets[] = 'revision = :r';
         $params[':r'] = $revision;
+    }
+    $currentTitle = trim((string)($current['title'] ?? ''));
+    $currentUpdatedBy = trim((string)($current['updated_by'] ?? ''));
+    if (($currentTitle === '' || strtoupper($currentTitle) === $code || $currentUpdatedBy === 'dcc-backfill')
+        && $derivedTitle !== ''
+        && strtoupper($derivedTitle) !== $code) {
+        $sets[] = 'title = :t';
+        $params[':t'] = $derivedTitle;
+    }
+    $currentSubtitle = trim((string)($current['subtitle'] ?? ''));
+    if ($currentSubtitle === '' && $derivedSubtitle !== null && trim($derivedSubtitle) !== '') {
+        $sets[] = 'subtitle = :sub';
+        $params[':sub'] = $derivedSubtitle;
     }
     if ((string)($current['effective_date'] ?? '') !== $effective) {
         $sets[] = 'effective_date = :e';
@@ -588,6 +617,29 @@ function upsert_header_from_legacy(
     $dl->execute($sql, $params);
     $stats['headers_upserted']++;
     if ($opts['verbose']) echo "[ok  ] UPDATE header $code (" . implode(',', $sets) . ")\n";
+}
+
+function derive_backfill_title(string $html, string $code, string $absPath): string
+{
+    if (preg_match('/data-dcc-bootstrap\s*=\s*([\'"])(.*?)\1/is', $html, $m)) {
+        $raw = html_entity_decode((string)$m[2], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $seed = json_decode($raw, true);
+        if (is_array($seed) && isset($seed['header']['title'])) {
+            $candidate = strip_brand_suffix(strip_code_prefix(clean_text((string)$seed['header']['title']), $code));
+            if ($candidate !== '' && strtoupper($candidate) !== strtoupper($code)) {
+                return $candidate;
+            }
+        }
+    }
+
+    if (preg_match('/<title[^>]*>(.*?)<\/title>/isu', $html, $m)) {
+        $candidate = strip_brand_suffix(strip_code_prefix(clean_text((string)$m[1]), $code));
+        if ($candidate !== '' && strtoupper($candidate) !== strtoupper($code)) {
+            return $candidate;
+        }
+    }
+
+    return extract_title($html, $code, $absPath);
 }
 
 /**
