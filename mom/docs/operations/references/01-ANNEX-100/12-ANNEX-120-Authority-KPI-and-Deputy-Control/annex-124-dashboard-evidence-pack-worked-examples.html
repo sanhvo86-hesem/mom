@@ -4,6 +4,26 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>ANNEX-124 - Dashboard Gói bằng chứng Worked Examples | HESEM MOM</title>
+<script>
+/* DCC Header bootstrap — computes absolute URLs from location.pathname so the
+ * stylesheet + renderer load correctly regardless of how the document is
+ * served (direct, portal iframe + <base href="../"> injection, doc_stream, …).
+ * The explicit `?v=…` query string busts browser + service-worker caches
+ * whenever the DCC header CSS or renderer ships a new revision. */
+(function () {
+  var DCC_VERSION = '2026-04-23-1';
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css?v=' + DCC_VERSION;
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(js);
+})();
+</script>
 <link href="../../../../assets/style.css" rel="stylesheet">
 <style>
 
@@ -71,27 +91,15 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 </head>
 <body>
 <div class="container"><div class="page landscape"><div class="page-body">
-<div class="form-header">
-<div class="fh-left">
-<a class="brand-logo" href="../../../../mom/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
-<div class="fh-company">
-<a href="../../../../mom/portal.html">HESEM ENGINEERING</a>
-<span>Tài liệu vận hành • Annex</span>
-</div>
-</div>
-<div class="title">
-<strong class="doc-name">Dashboard Gói bằng chứng Worked Examples</strong>
-<span class="sub-vn">Ví dụ mẫu cho đóng băng-date pack, ngoại lệ-note pack, hàng quý truy cập-bộ hồ sơ rà soát và quản lý-bộ hồ sơ rà soát.</span>
-</div>
-<div class="meta"><div class="row"><span><b>Mã:</b></span><span class="doc-code">ANNEX-124</span></div>
-<div class="row"><span><b>Phiên bản:</b></span><span>V0</span></div>
-<div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div>
-<div class="row"><span><b>Chủ sở hữu:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></span></div>
-<div class="row"><span><b>Phê duyệt:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tổng Giám đốc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
-</div>
+<!-- DCC Document Change Control header (values served by /api/v1/dcc; bootstrap seed is preview-only) -->
+<div class="dcc-header"
+     data-dcc-doc-code="ANNEX-124"
+     data-dcc-locale="vi"
+     data-dcc-logo="../../../../../assets/hesem-logo.svg"
+     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;ANNEX-124&quot;,&quot;title&quot;:&quot;Dashboard Gói bằng chứng Worked Examples&quot;,&quot;subtitle&quot;:&quot;Ví dụ mẫu cho đóng băng-date pack, ngoại lệ-note pack, hàng quý truy cập-bộ hồ sơ rà soát và quản lý-bộ hồ sơ rà soát.&quot;,&quot;doc_type&quot;:&quot;ANNEX&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
 
 <div class="doc-content" id="docContent"><div class="form-sheet">
-<div class="hero"><h1>ANNEX-124 - Dashboard Gói bằng chứng Worked Examples</h1><p>Phụ lục này không tạo thêm một lớp giấy tờ mới. Nó cung cấp <b>ví dụ mẫu dùng ngay</b> cho đóng băng-date pack, ngoại lệ-note pack, hàng quý truy cập-bộ hồ sơ rà soát và quản lý-bộ hồ sơ rà soát, để đội vận hành hiểu cụ thể một pack "đủ dùng" phải trông như thế nào, chứa gì và khóa siêu dữ liệu ra sao.</p></div>
+<div class="hero"><p>Phụ lục này không tạo thêm một lớp giấy tờ mới. Nó cung cấp <b>ví dụ mẫu dùng ngay</b> cho đóng băng-date pack, ngoại lệ-note pack, hàng quý truy cập-bộ hồ sơ rà soát và quản lý-bộ hồ sơ rà soát, để đội vận hành hiểu cụ thể một pack "đủ dùng" phải trông như thế nào, chứa gì và khóa siêu dữ liệu ra sao.</p></div>
 <div class="note"><b>Đọc cùng</b><br><a href="../11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html">ANNEX-113</a>, <a href="../../../02-Work-Instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a>, <a download="" href="../../../../forms/frm-100-sales/FRM-111_Quarterly_Access_Review.xlsx">FRM-111</a>, <a download="" href="../../../../forms/frm-900-admin/FRM-911_Management_Review_Minutes.xlsx">FRM-911</a> và <a href="../11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html">ANNEX-118</a>.</div>
 <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#a1">1. Mục đích và ranh giới</a><a href="#a2">2. Đã thực hiện ví dụ A — đóng băng-date pack</a><a href="#a3">3. Đã thực hiện ví dụ B — ngoại lệ-note pack</a><a href="#a4">4. Đã thực hiện ví dụ C — hàng quý truy cập-bộ hồ sơ rà soát</a><a href="#a5">5. Đã thực hiện ví dụ D — quản lý-bộ hồ sơ rà soát</a><a href="#a5e">5E. Đã thực hiện ví dụ E — năng lực / phó note</a><a href="#a6">6. Đặt tên, siêu dữ liệu và bằng chứng quy tắc</a><a href="#a7">7. Liên kết tài liệu và cách dùng</a></div></div>
 <h2 class="h2" id="a1">1. Mục đích và ranh giới</h2>

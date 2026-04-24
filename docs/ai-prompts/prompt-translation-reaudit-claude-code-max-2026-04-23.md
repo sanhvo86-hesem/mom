@@ -82,7 +82,6 @@ Also inspect any rename/move/delete flow that can break `artifact_rel_path`.
 14. Do `vi` and `en` draft/in-review views resolve against the same active working source carrier/revision baseline?
 15. Can a legacy document with no locale row self-bootstrap an EN machine preview through the governed backend path?
 16. Is the configured provider path repo-local/on-prem and reproducible from repo truth instead of manual tribal setup?
-17. Does workflow-edit authority for save/submit/bootstrap align between frontend and backend, or is it still incorrectly tied only to create-doc permission?
 
 ## Required output shape
 

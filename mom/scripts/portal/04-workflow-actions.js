@@ -954,7 +954,6 @@ function getEnglishLocaleUnavailableCopy(localeView){
 }
 
 const __DOC_ENGLISH_LOCALE_BOOTSTRAP = Object.create(null);
-const __DOC_ENGLISH_LOCALE_LAST_ATTEMPT = Object.create(null);
 
 function isHtmlDocEligibleForLocaleBootstrap(doc){
   if(!doc) return false;
@@ -974,32 +973,11 @@ async function ensureDocEnglishLocaleArtifact(doc, options){
   if(localeView && localeView.available){
     return { ok: true, skipped: true, reason: 'locale_artifact_already_available', translationState: translationState || 'released' };
   }
-  const code = String(doc.code || '').trim();
   if(!opts.force && translationState !== '' && translationState !== 'missing'){
-    const now = Date.now();
-    const lastAttempt = Number(__DOC_ENGLISH_LOCALE_LAST_ATTEMPT[code] || 0);
-    if(lastAttempt > 0 && (now - lastAttempt) < 30000){
-      return { ok: true, skipped: true, reason: 'locale_retry_cooldown', translationState };
-    }
+    return { ok: true, skipped: true, reason: 'locale_state_not_bootstrappable', translationState };
   }
 
-  if(!currentUser){
-    return { ok: true, skipped: true, reason: 'locale_bootstrap_requires_auth', translationState };
-  }
-  if(typeof isDocHidden === 'function' && isDocHidden(code) && !(typeof isAdmin === 'function' && isAdmin())){
-    return { ok: true, skipped: true, reason: 'locale_bootstrap_hidden_doc', translationState };
-  }
-  if(typeof canAccessDoc === 'function' && !canAccessDoc(code)){
-    return { ok: true, skipped: true, reason: 'locale_bootstrap_doc_access_denied', translationState };
-  }
-  const role = (typeof ROLES === 'object' && currentUser && currentUser.role) ? (ROLES[currentUser.role] || {}) : {};
-  if(!opts.force && !(role && (role.admin || role.canEditDocs))){
-    return { ok: true, skipped: true, reason: 'locale_bootstrap_not_permitted', translationState };
-  }
-
-  if(!code){
-    return { ok: false, skipped: true, reason: 'missing_code_or_path', translationState };
-  }
+  const code = String(doc.code || '').trim();
   const basePath = String(doc.path || '').trim();
   if(!code || !basePath){
     return { ok: false, skipped: true, reason: 'missing_code_or_path' };
@@ -1010,7 +988,6 @@ async function ensureDocEnglishLocaleArtifact(doc, options){
   }
 
   const task = (async function(){
-    __DOC_ENGLISH_LOCALE_LAST_ATTEMPT[code] = Date.now();
     const res = await controlPlaneDocumentAuthoringRequest('ensure-locale', {
       code: code,
       base_path: basePath,
@@ -1040,8 +1017,6 @@ function triggerDocEnglishLocaleBootstrap(doc, options){
     const code = String(doc.code || '').trim();
     if(!code || currentDoc !== code) return;
     const latestDoc = (typeof window._resolveDocRecord === 'function') ? window._resolveDocRecord(code) : doc;
-    if(typeof isDocHidden === 'function' && isDocHidden(code) && !(typeof isAdmin === 'function' && isAdmin())) return;
-    if(typeof canAccessDoc === 'function' && !canAccessDoc(code)) return;
     try{ updateDocViewerHeader(latestDoc); }catch(e){}
     try{ renderWorkflowPanel(latestDoc); }catch(e){}
     try{ renderVersionHistory(latestDoc); }catch(e){}

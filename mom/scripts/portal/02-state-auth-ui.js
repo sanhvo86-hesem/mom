@@ -2940,13 +2940,13 @@ async function openDocPreview(code){
     if(viewer) viewer.classList.add('active');
 
     // Re-render UI blocks
-    updateDocViewerHeader(latestDoc);
-    renderWorkflowPanel(latestDoc);
-    renderVersionHistory(latestDoc);
-    loadDocContent(latestDoc);
+    updateDocViewerHeader(doc);
+    renderWorkflowPanel(doc);
+    renderVersionHistory(doc);
+    loadDocContent(doc);
     try{
       if(lang === 'en' && typeof triggerDocEnglishLocaleBootstrap === 'function'){
-        triggerDocEnglishLocaleBootstrap(latestDoc);
+        triggerDocEnglishLocaleBootstrap(doc);
       }
     }catch(e){}
   }catch(err){

@@ -934,7 +934,7 @@ paths:
         file-backed controlled document on the canonical control-plane
         authoring surface. This endpoint never edits the Vietnamese source;
         it only requests backend locale generation from the current canonical
-        source snapshot when an authorized document editor or admin needs English
+        source snapshot when an authorized document manager needs English
         viewing to become available for a legacy document.
       parameters:
         - $ref: '#/components/parameters/CsrfHeader'
@@ -944,7 +944,7 @@ paths:
           application/json:
             schema:
               type: object
-              required: [code, base_path]
+              required: [code, base_path, locale]
               properties:
                 code:
                   type: string

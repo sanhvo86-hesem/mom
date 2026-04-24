@@ -3,25 +3,37 @@
 <head>
 <meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>C18-L3 | HESEM MOM</title>
+<script>
+/* DCC Header bootstrap — computes absolute URLs from location.pathname so the
+ * stylesheet + renderer load correctly regardless of how the document is
+ * served (direct, portal iframe + <base href="../"> injection, doc_stream, …).
+ * The explicit `?v=…` query string busts browser + service-worker caches
+ * whenever the DCC header CSS or renderer ships a new revision. */
+(function () {
+  var DCC_VERSION = '2026-04-23-1';
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css?v=' + DCC_VERSION;
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(js);
+})();
+</script>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
 <link rel="stylesheet" href="../../../../../assets/style.css"></head>
 <body>
 <div class="container"><div class="page"><div class="page-body">
-<div class="form-header">
-<div class="fh-left">
- <a class="brand-logo" href="../../../../mom/portal.html"><img alt="HESEM Logo" src="../../../../assets/hesem-logo.svg"></a>
- <div class="fh-company">
- <a href="../../../../mom/portal.html">HESEM ENGINEERING</a>
- <span>Tài liệu kiểm soát</span>
- </div>
-</div>
-<div class="title">
-<strong class="doc-name">C18-L3</strong>
-<span class="sub-vn"></span>
-</div>
-<div class="meta"><div class="row"><span><b>Code:</b></span><span class="doc-code">C18-L3</span></div><div class="row"><span><b>Version:</b></span><span>V0</span></div><div class="row"><span><b>Ngày hiệu lực:</b></span><span>Theo quyết định ban hành</span></div><div class="row"><span><b>Owner:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></span></div><div class="row"><span><b>Approved by:</b></span><span><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tổng Giám đốc)"><span class="entity-code role-code">CEO</span></a></span></span></div></div>
-</div>
-<div class="doc-content" id="docContent"><h1>C18-L3 - C18-L3</h1><div class="note-blue" style="margin:12px 0">
+<!-- DCC Document Change Control header (values served by /api/v1/dcc; bootstrap seed is preview-only) -->
+<div class="dcc-header"
+     data-dcc-doc-code="C18-L3"
+     data-dcc-locale="vi"
+     data-dcc-logo="../../../../../assets/hesem-logo.svg"
+     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;C18-L3&quot;,&quot;title&quot;:&quot;Mục tiêu huấn luyện&quot;,&quot;subtitle&quot;:&quot;Đào tạo cấp độ Chuyên sâu (Level 3)&quot;,&quot;doc_type&quot;:&quot;REF&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
+<div class="doc-content" id="docContent"><div class="note-blue" style="margin:12px 0">
  <b>🗺️ Hệ thống 8 cổng (G0→G7):</b> Tài liệu đào tạo này vận hành <b>xuyên suốt (G0→G7) — Advanced Competency Module</b>.
 </div>
 <div class="card">

@@ -10,7 +10,6 @@ This script is intentionally repo-local and on-prem friendly:
 
 from __future__ import annotations
 
-import hashlib
 import json
 import os
 import re
@@ -55,8 +54,7 @@ except Exception as exc:  # pragma: no cover - runtime guard
 
 
 ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_GLOSSARY_PATH = ROOT / "mom" / "data" / "glossary" / "dict-data.json"
-DEFAULT_GLOSSARY_ROOT = DEFAULT_GLOSSARY_PATH.parent
+GLOSSARY_PATH = ROOT / "mom" / "data" / "glossary" / "dict-data.json"
 SKIP_TAGS = {
     "script",
     "style",
@@ -161,7 +159,7 @@ POST_FIXES = [
 ]
 
 _translator = None
-_glossary_phrases: Dict[str, List[Tuple[str, str]]] = {}
+_glossary_phrases: List[Tuple[str, str]] | None = None
 
 
 def read_payload() -> Dict[str, object]:
@@ -187,27 +185,14 @@ def load_translator():
     return _translator
 
 
-def resolve_glossary_path(raw_path: str) -> Path:
-    candidate = Path(raw_path.strip()) if raw_path else DEFAULT_GLOSSARY_PATH
-    try:
-        resolved = candidate.resolve(strict=False)
-    except Exception:
-        return DEFAULT_GLOSSARY_PATH
-    if resolved == DEFAULT_GLOSSARY_PATH:
-        return resolved
-    if DEFAULT_GLOSSARY_ROOT in resolved.parents and resolved.suffix.lower() == ".json":
-        return resolved
-    return DEFAULT_GLOSSARY_PATH
-
-
-def load_glossary_phrases(glossary_path: Path) -> List[Tuple[str, str]]:
-    cache_key = str(glossary_path)
-    if cache_key in _glossary_phrases:
-        return _glossary_phrases[cache_key]
+def load_glossary_phrases() -> List[Tuple[str, str]]:
+    global _glossary_phrases
+    if _glossary_phrases is not None:
+        return _glossary_phrases
     phrases: List[Tuple[str, str]] = list(CORE_PHRASES)
-    if glossary_path.is_file():
+    if GLOSSARY_PATH.is_file():
         try:
-            data = json.loads(glossary_path.read_text(encoding="utf-8"))
+            data = json.loads(GLOSSARY_PATH.read_text(encoding="utf-8"))
         except Exception:
             data = []
         if isinstance(data, list):
@@ -228,19 +213,8 @@ def load_glossary_phrases(glossary_path: Path) -> List[Tuple[str, str]]:
     for src, dst in phrases:
         deduped.setdefault(src.casefold(), (src, dst))
     ordered = sorted(deduped.values(), key=lambda item: len(item[0]), reverse=True)
-    _glossary_phrases[cache_key] = ordered
+    _glossary_phrases = ordered
     return ordered
-
-
-def derive_glossary_version(glossary_path: Path) -> str:
-    if not glossary_path.is_file():
-        return "repo_glossary_missing"
-    label = "repo_glossary" if glossary_path == DEFAULT_GLOSSARY_PATH else glossary_path.stem
-    try:
-        digest = hashlib.sha256(glossary_path.read_bytes()).hexdigest()[:12]
-    except Exception:
-        return f"{label}:unreadable"
-    return f"{label}:{digest}"
 
 
 def normalize_phrase(value: str) -> str:
@@ -272,9 +246,9 @@ def protect_regex_literals(text: str, literals: Dict[str, str], next_index: List
     return protected
 
 
-def protect_glossary_phrases(text: str, glossary_path: Path, literals: Dict[str, str], next_index: List[int]) -> str:
+def protect_glossary_phrases(text: str, literals: Dict[str, str], next_index: List[int]) -> str:
     protected = text
-    for source, target in load_glossary_phrases(glossary_path):
+    for source, target in load_glossary_phrases():
         if source.casefold() not in protected.casefold():
             continue
         pattern = re.compile(re.escape(source), re.I)
@@ -305,14 +279,14 @@ def cleanup_translation(text: str) -> str:
     return cleaned.strip()
 
 
-def translate_text(text: str, translator, glossary_path: Path) -> str:
+def translate_text(text: str, translator) -> str:
     if normalize_phrase(text) == "":
         return text
     if not VIETNAMESE_CHAR_RE.search(text):
         return text
     literals: Dict[str, str] = {}
     next_index = [0]
-    protected = protect_glossary_phrases(text, glossary_path, literals, next_index)
+    protected = protect_glossary_phrases(text, literals, next_index)
     protected = protect_regex_literals(protected, literals, next_index)
     plain = re.sub(r"__DCC_LITERAL_\d+__", " ", protected)
     if not VIETNAMESE_CHAR_RE.search(plain):
@@ -340,7 +314,7 @@ def translate_text(text: str, translator, glossary_path: Path) -> str:
     return cleanup_translation(restored)
 
 
-def translate_bootstrap_seed(soup: BeautifulSoup, translator, glossary_path: Path) -> None:
+def translate_bootstrap_seed(soup: BeautifulSoup, translator) -> None:
     header = soup.select_one(".dcc-header[data-dcc-bootstrap]")
     if header is None:
         return
@@ -356,14 +330,14 @@ def translate_bootstrap_seed(soup: BeautifulSoup, translator, glossary_path: Pat
         title = str(header_meta.get("title", "")).strip()
         subtitle = str(header_meta.get("subtitle", "")).strip()
         if title and VIETNAMESE_CHAR_RE.search(title):
-            header_meta["title"] = translate_text(title, translator, glossary_path)
+            header_meta["title"] = translate_text(title, translator)
         if subtitle:
-            header_meta["subtitle"] = translate_text(subtitle, translator, glossary_path)
+            header_meta["subtitle"] = translate_text(subtitle, translator)
     header["data-dcc-bootstrap"] = json.dumps(payload, ensure_ascii=False)
     header["data-dcc-locale"] = "en"
 
 
-def translate_html(source_html: str, title: str, subtitle: str, glossary_path: Path) -> Dict[str, str]:
+def translate_html(source_html: str, title: str, subtitle: str) -> Dict[str, str]:
     translator = load_translator()
     soup = BeautifulSoup(source_html, "html.parser")
 
@@ -376,20 +350,20 @@ def translate_html(source_html: str, title: str, subtitle: str, glossary_path: P
 
     title_tag = soup.find("title")
     if title_tag and title_tag.string:
-        title_tag.string.replace_with(translate_text(str(title_tag.string), translator, glossary_path))
+        title_tag.string.replace_with(translate_text(str(title_tag.string), translator))
 
-    translate_bootstrap_seed(soup, translator, glossary_path)
+    translate_bootstrap_seed(soup, translator)
 
     for node in list(soup.find_all(string=True)):
         if should_skip_text_node(node):
             continue
         original = str(node)
-        translated = translate_text(original, translator, glossary_path)
+        translated = translate_text(original, translator)
         if translated != original:
             node.replace_with(translated)
 
-    translated_title = title if re.fullmatch(r"[\x00-\x7F\s.,:;()/_-]+", title or "") else translate_text(title, translator, glossary_path)
-    translated_subtitle = translate_text(subtitle, translator, glossary_path) if subtitle else ""
+    translated_title = title if re.fullmatch(r"[\x00-\x7F\s.,:;()/_-]+", title or "") else translate_text(title, translator)
+    translated_subtitle = translate_text(subtitle, translator) if subtitle else ""
 
     return {
         "html": str(soup),
@@ -403,12 +377,6 @@ def main() -> int:
     source_html = str(payload.get("source_html", "") or "")
     title = str(payload.get("title", "") or "")
     subtitle = str(payload.get("subtitle", "") or "")
-    doc_code = str(payload.get("doc_code", "") or "").strip()
-    source_locale = str(payload.get("source_locale", "vi") or "vi").strip().lower()
-    target_locale = str(payload.get("target_locale", "en") or "en").strip().lower()
-    revision = str(payload.get("source_revision") or payload.get("revision") or "").strip()
-    trigger = str(payload.get("trigger", "") or "").strip()
-    glossary_path = resolve_glossary_path(str(payload.get("glossary_path", "") or ""))
     if source_html.strip() == "":
         print(
             json.dumps(
@@ -423,23 +391,9 @@ def main() -> int:
             )
         )
         return 0
-    if source_locale not in ("", "vi") or target_locale != "en":
-        print(
-            json.dumps(
-                {
-                    "ok": False,
-                    "provider": "argos_local_vi_en",
-                    "engine_version": "unsupported_locale_pair",
-                    "reason": "unsupported_locale_pair",
-                    "message": f"Unsupported locale pair: {source_locale or 'vi'}->{target_locale}",
-                },
-                ensure_ascii=False,
-            )
-        )
-        return 0
 
     try:
-        translated = translate_html(source_html, title, subtitle, glossary_path)
+        translated = translate_html(source_html, title, subtitle)
     except Exception as exc:
         print(
             json.dumps(
@@ -461,13 +415,8 @@ def main() -> int:
                 "ok": True,
                 "provider": "argos_local_vi_en",
                 "engine_version": "argos_local_vi_en_v1",
-                "glossary_version": derive_glossary_version(glossary_path),
+                "glossary_version": str(payload.get("glossary_version", "") or "repo_glossary"),
                 "translation_state": "machine_preview",
-                "doc_code": doc_code,
-                "source_locale": source_locale or "vi",
-                "target_locale": target_locale,
-                "source_revision": revision,
-                "trigger": trigger,
                 "title": translated["title"],
                 "subtitle": translated["subtitle"],
                 "html": translated["html"],

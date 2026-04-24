@@ -76,7 +76,6 @@ You must verify repo truth. Do **not** trust prior summaries, claims, or closure
 11. Did Codex introduce any new architectural shortcut, partial closure, or misleading documentation while claiming completion?
 12. Did Codex run an honest validation set and report real blockers accurately, instead of hiding debt behind vague language?
 13. Did Codex provide a repo-truth internal provider path for legacy bootstrap and post-save EN machine preview, or leave the runtime blocked on undocumented server-only setup?
-14. Did Codex align workflow-edit authority for save/submit/bootstrap between frontend and backend, or leave it incorrectly tied only to create-doc permission?
 
 ## Hard constraints
 

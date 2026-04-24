@@ -187,13 +187,8 @@ The preferred runtime contract is:
 4. PHP-FPM/runtime environment must point `DCC_TRANSLATION_COMMAND` at a concrete repo-local command, typically:
    - provider venv Python
    - repo-local provider script
-5. Provider dependency versions must be pinned, and model artifacts must be integrity-checked; floating installs are not sufficient for controlled runtime reproducibility.
-6. Template config under `tools/vps-setup/php-fpm/mom.conf` is setup guidance only; it is not proof that live runtime is enabled.
-7. Approved glossary paths must resolve under the repo-local glossary root; arbitrary filesystem paths must be rejected or normalized to the default glossary file.
-8. Bootstrap/install helpers should default to pre-seeded local model artifacts; any network download source must be explicit and operator-provided.
-9. Live runtime enablement must be proven from active process environment, active PHP-FPM pool config, or request behavior; commented template files are not sufficient proof.
-10. If the provider runtime or model is missing, the system must fail into `blocked` truthfully.
-11. `machine_preview` output may be rough and still useful, but it must remain non-authoritative until human review/release.
+5. If the provider runtime or model is missing, the system must fail into `blocked` truthfully.
+6. `machine_preview` output may be rough and still useful, but it must remain non-authoritative until human review/release.
 
 ### 9.3 Working-draft hash rule
 

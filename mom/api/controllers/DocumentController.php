@@ -674,8 +674,7 @@ class DocumentController extends BaseController
      *
      * This path never edits the Vietnamese source. It only asks the backend
      * to generate or refresh a derived locale artifact from the current
-     * canonical source snapshot when the caller is authorized to edit
-     * controlled documents or holds admin authority.
+     * canonical source snapshot when the caller is authorized to manage docs.
      *
      * @return never
      */
@@ -704,7 +703,6 @@ class DocumentController extends BaseController
         }
 
         $baseRel = $this->resolveManagedDocumentPath($code, $path);
-        $this->assertWorkflowDocumentAccess($me, $code, $baseRel);
         $projection = null;
         try {
             $projection = (new \MOM\Services\DocumentControl\DocumentControlService($this->data))
@@ -1412,25 +1410,7 @@ class DocumentController extends BaseController
         $manifest = load_doc_manifest($this->rootDir, $baseRel, $archiveDir, $code);
         $versions = is_array($manifest['versions'] ?? null) ? $manifest['versions'] : [];
 
-        $workingEntry = null;
-        foreach ($versions as $version) {
-            if (!is_array($version)) {
-                continue;
-            }
-            $versionStatus = strtolower(trim((string)($version['status'] ?? '')));
-            if ($versionStatus === 'pending_approval') {
-                $versionStatus = 'in_review';
-            }
-            if (in_array($versionStatus, ['in_review', 'draft'], true)) {
-                $workingEntry = $version;
-                break;
-            }
-        }
-
-        $rawRevision = trim((string)(
-            ($workingEntry['version'] ?? '')
-            ?: ($state['revision'] ?? ($state['released_revision'] ?? ($catalog['rev'] ?? '0.0')))
-        ));
+        $rawRevision = trim((string)($state['released_revision'] ?? ($state['revision'] ?? ($catalog['rev'] ?? '0.0'))));
         $rawRevision = preg_replace('/^[vV]\s*/', '', $rawRevision) ?? $rawRevision;
         if ($rawRevision === '') {
             $rawRevision = '0.0';
@@ -1439,7 +1419,7 @@ class DocumentController extends BaseController
             $rawRevision .= '.0';
         }
 
-        $status = strtolower(trim((string)(($workingEntry['status'] ?? '') ?: ($state['status'] ?? ($catalog['status'] ?? 'approved')))));
+        $status = strtolower(trim((string)($state['status'] ?? ($catalog['status'] ?? 'approved'))));
         if ($status === '') {
             $status = 'approved';
         }
@@ -1448,7 +1428,7 @@ class DocumentController extends BaseController
         }
 
         $sourceHtml = '';
-        if (in_array($status, ['draft', 'in_review'], true) || $workingEntry !== null) {
+        if (in_array($status, ['draft', 'in_review'], true)) {
             $sourceHtml = $this->loadWorkflowWorkingHtml($baseRel, $rawRevision, $versions);
         }
         if ($sourceHtml === '') {
