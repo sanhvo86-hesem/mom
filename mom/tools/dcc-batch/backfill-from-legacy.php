@@ -57,6 +57,7 @@ use function MOM\Tools\DccBatch\clean_text;
 use function MOM\Tools\DccBatch\doc_type_from_code;
 use function MOM\Tools\DccBatch\extract_subtitle;
 use function MOM\Tools\DccBatch\extract_title;
+use function MOM\Tools\DccBatch\load_doc_descriptions;
 use function MOM\Tools\DccBatch\strip_brand_suffix;
 use function MOM\Tools\DccBatch\strip_code_prefix;
 use function MOM\Tools\DccBatch\build_data_layer;
@@ -78,6 +79,8 @@ if (!$dl) {
 $service = new DocumentControlService($dl);
 
 $docTypeCatalog = load_doc_type_defaults($dl);
+$customDocsByCode = load_custom_doc_catalog($ROOT_DIR);
+$docDescriptions = load_doc_descriptions($ROOT_DIR);
 
 $stats = [
     'inspected'           => 0,
@@ -126,8 +129,10 @@ foreach (walk_docs($ROOT_DIR) as $abs) {
     $statePaths    = legacy_state_paths($ROOT_DIR, $baseRel);
     $state         = read_first_existing_json($statePaths['state']);
     $manifest      = read_first_existing_json($statePaths['manifest']);
+    $catalogEntry  = $customDocsByCode[$code] ?? [];
+    $legacyDesc    = isset($docDescriptions[$code]) ? (string)$docDescriptions[$code] : null;
 
-    if ($state === null && $manifest === null) {
+    if ($state === null && $manifest === null && $catalogEntry === [] && ($legacyDesc === null || trim($legacyDesc) === '')) {
         $stats['skipped_no_state']++;
         if ($opts['verbose']) echo "[skip] no legacy state for $code ($rel)\n";
         // We still anchor filename when state is absent — filename contract
@@ -147,6 +152,8 @@ foreach (walk_docs($ROOT_DIR) as $abs) {
                 $code,
                 $abs,
                 $state ?? [],
+                $catalogEntry,
+                $legacyDesc,
                 $docTypeCatalog,
                 $opts,
                 $stats,
@@ -215,7 +222,7 @@ foreach (walk_docs($ROOT_DIR) as $abs) {
 
         // Pick highest released revision to flag as current.
         if (!empty($releasedTracks)) {
-            $current = pick_current_revision($releasedTracks, $state);
+            $current = pick_current_revision($releasedTracks, $state, $catalogEntry);
             if ($current !== '') {
                 if ($opts['dry_run']) {
                     $stats['current_flags_set']++;
@@ -325,6 +332,57 @@ function read_first_existing_json(array $candidates): ?array
         if (is_array($data)) return $data;
     }
     return null;
+}
+
+/**
+ * Load the runtime-style docs_custom catalog, preferring the ignored local
+ * override file when present and falling back to the tracked baseline.
+ *
+ * @return array<string, array<string, mixed>>
+ */
+function load_custom_doc_catalog(string $rootDir): array
+{
+    $candidates = [
+        rtrim($rootDir, '/') . '/mom/data/config/docs_custom.local.json',
+        rtrim($rootDir, '/') . '/mom/data/config/docs_custom.json',
+    ];
+    foreach ($candidates as $file) {
+        $docs = parse_custom_doc_catalog($file);
+        if ($docs !== []) {
+            return $docs;
+        }
+    }
+    return [];
+}
+
+/**
+ * @return array<string, array<string, mixed>>
+ */
+function parse_custom_doc_catalog(string $file): array
+{
+    if (!is_file($file)) {
+        return [];
+    }
+    $raw = @file_get_contents($file);
+    $data = $raw === false ? null : json_decode($raw, true);
+    if (!is_array($data)) {
+        return [];
+    }
+    $rows = isset($data['docs']) && is_array($data['docs'])
+        ? $data['docs']
+        : (array_is_list($data) ? $data : []);
+    $out = [];
+    foreach ($rows as $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $code = strtoupper(trim((string)($row['code'] ?? '')));
+        if ($code === '') {
+            continue;
+        }
+        $out[$code] = $row;
+    }
+    return $out;
 }
 
 function rel_from_root(string $abs, string $rootDir): string
@@ -446,10 +504,11 @@ function extract_effective_date(string $raw): string
  *   2. state.revision (normalised)  — only when state.has_release is truthy
  *   3. highest versioned revision in the released list
  *
- * @param list<string>           $released
+ * @param list<string>              $released
  * @param array<string, mixed>|null $state
+ * @param array<string, mixed>      $legacyCatalog
  */
-function pick_current_revision(array $released, ?array $state): string
+function pick_current_revision(array $released, ?array $state, array $legacyCatalog = []): string
 {
     if (is_array($state)) {
         if (!empty($state['released_revision'])) {
@@ -460,6 +519,10 @@ function pick_current_revision(array $released, ?array $state): string
             $r = normalise_revision((string)$state['revision']);
             if ($r !== '' && in_array($r, $released, true)) return $r;
         }
+    }
+    if (!empty($legacyCatalog['rev'])) {
+        $r = normalise_revision((string)$legacyCatalog['rev']);
+        if ($r !== '' && in_array($r, $released, true)) return $r;
     }
     // Highest numeric rank.
     usort($released, static function (string $a, string $b): int {
@@ -485,6 +548,7 @@ function revision_rank(string $r): float
  * authoritatively owns so we do not clobber portal edits.
  *
  * @param array<string, mixed>                                  $state
+ * @param array<string, mixed>                                  $legacyCatalog
  * @param array<string, array{owner: string, approver: string}> $docTypeCatalog
  * @param array<string, int>                                    $stats
  * @param array<int, string>                                    $warnings
@@ -495,6 +559,8 @@ function upsert_header_from_legacy(
     string $code,
     string $absPath,
     array $state,
+    array $legacyCatalog,
+    ?string $legacyDescription,
     array $docTypeCatalog,
     array $opts,
     array &$stats,
@@ -506,20 +572,26 @@ function upsert_header_from_legacy(
     $ownerDef    = $defaults['owner']    ?? 'QA';
     $approverDef = $defaults['approver'] ?? 'CEO';
 
-    $revision  = normalise_revision((string)($state['revision'] ?? ''));
+    $revision  = normalise_revision((string)($state['revision'] ?? ($state['released_revision'] ?? ($legacyCatalog['rev'] ?? ''))));
     if ($revision === '') $revision = 'V0';
-    $status    = normalise_status($state['status'] ?? null);
+    $status    = normalise_status($state['status'] ?? ($legacyCatalog['status'] ?? null));
     $effective = extract_effective_date((string)($state['effective_date'] ?? ($state['updated_at'] ?? '')));
     $html      = @file_get_contents($absPath);
-    $derivedTitle = is_string($html) && $html !== ''
-        ? derive_backfill_title($html, $code, $absPath)
-        : $code;
-    $derivedSubtitle = is_string($html) && $html !== ''
-        ? extract_subtitle($html)
-        : null;
+    $catalogTitle = trim((string)($legacyCatalog['title'] ?? ''));
+    $catalogSubtitle = trim((string)($legacyCatalog['description'] ?? ($legacyDescription ?? '')));
+    $derivedTitle = derive_backfill_title(
+        is_string($html) ? $html : '',
+        $code,
+        $absPath,
+        $catalogTitle
+    );
+    $derivedSubtitle = derive_backfill_subtitle(
+        is_string($html) ? $html : '',
+        $catalogSubtitle
+    );
 
-    $owner     = normalise_role($state['owner']    ?? null, $ownerDef,    'owner_role_code',    $code, $warnings, $stats);
-    $approver  = normalise_role($state['approver'] ?? null, $approverDef, 'approver_role_code', $code, $warnings, $stats);
+    $owner     = normalise_role((string)($state['owner'] ?? ($legacyCatalog['owner'] ?? '')), $ownerDef, 'owner_role_code', $code, $warnings, $stats);
+    $approver  = normalise_role((string)($state['approver'] ?? ($legacyCatalog['approver'] ?? ($legacyCatalog['approved_by'] ?? ''))), $approverDef, 'approver_role_code', $code, $warnings, $stats);
 
     $existing = $dl->query(
         "SELECT doc_code, title, subtitle, revision, status, owner_role_code,
@@ -619,8 +691,13 @@ function upsert_header_from_legacy(
     if ($opts['verbose']) echo "[ok  ] UPDATE header $code (" . implode(',', $sets) . ")\n";
 }
 
-function derive_backfill_title(string $html, string $code, string $absPath): string
+function derive_backfill_title(string $html, string $code, string $absPath, string $catalogTitle = ''): string
 {
+    $catalogTitle = strip_brand_suffix(strip_code_prefix(clean_text($catalogTitle), $code));
+    if ($catalogTitle !== '' && strtoupper($catalogTitle) !== strtoupper($code)) {
+        return $catalogTitle;
+    }
+
     if (preg_match('/data-dcc-bootstrap\s*=\s*([\'"])(.*?)\1/is', $html, $m)) {
         $raw = html_entity_decode((string)$m[2], ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $seed = json_decode($raw, true);
@@ -640,6 +717,20 @@ function derive_backfill_title(string $html, string $code, string $absPath): str
     }
 
     return extract_title($html, $code, $absPath);
+}
+
+function derive_backfill_subtitle(string $html, string $catalogSubtitle = ''): ?string
+{
+    $catalogSubtitle = clean_text($catalogSubtitle);
+    if ($catalogSubtitle !== '') {
+        return $catalogSubtitle;
+    }
+    $subtitle = extract_subtitle($html);
+    if ($subtitle === null) {
+        return null;
+    }
+    $subtitle = clean_text($subtitle);
+    return $subtitle !== '' ? $subtitle : null;
 }
 
 /**
