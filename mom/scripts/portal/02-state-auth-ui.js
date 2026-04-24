@@ -2804,7 +2804,7 @@ async function openDoc(code){
   // Ensure no stray overlay blocks the UI
   try{ document.querySelectorAll('.vp-overlay').forEach(el=>el.remove()); }catch(e){}
 
-  const doc = resolveDocRecord(code);
+  let doc = resolveDocRecord(code);
   if(!doc) return;
   const resolvedCode = String(doc.code || '').trim();
 
@@ -2887,12 +2887,48 @@ async function openDoc(code){
   window.__DOC_VIEW_RENDER_TOKEN = openRenderToken;
 
   // Load current document HTML immediately
+  const initialLocaleSignature = (function(){
+    try{
+      const lv = getDocLocaleView(doc);
+      return [lv.locale, lv.mode, lv.file || '', lv.translationState || ''].join('|');
+    }catch(e){
+      return '';
+    }
+  })();
   loadDocContent(doc);
   try{
     if(lang === 'en' && typeof triggerDocEnglishLocaleBootstrap === 'function'){
       triggerDocEnglishLocaleBootstrap(doc);
     }
   }catch(e){}
+
+  if(lang === 'en' && typeof refreshDccOverlayForDocFromServer === 'function'){
+    try{
+      refreshDccOverlayForDocFromServer(resolvedCode, {refreshUi:false}).then(()=>{
+        try{
+          if(currentDoc !== resolvedCode) return;
+          if(window.__DOC_VIEW_RENDER_TOKEN !== openRenderToken) return;
+          const latestDoc = resolveDocRecord(resolvedCode) || doc;
+          if(isDocHidden(latestDoc.code) && !isAdmin()) return;
+          if(!canAccessDoc(latestDoc.code)) return;
+          const latestLocaleSignature = (function(){
+            try{
+              const lv = getDocLocaleView(latestDoc);
+              return [lv.locale, lv.mode, lv.file || '', lv.translationState || ''].join('|');
+            }catch(e){
+              return '';
+            }
+          })();
+          if(latestLocaleSignature && latestLocaleSignature !== initialLocaleSignature){
+            updateDocViewerHeader(latestDoc);
+            renderWorkflowPanel(latestDoc);
+            renderVersionHistory(latestDoc);
+            loadDocContent(latestDoc);
+          }
+        }catch(e){}
+      }).catch(()=>{});
+    }catch(e){}
+  }
 
   // Background: refresh server-backed state + versions, then re-render once
   try{
@@ -2906,8 +2942,19 @@ async function openDoc(code){
         updateDocViewerHeader(latestDoc);
         renderWorkflowPanel(latestDoc);
         renderVersionHistory(latestDoc);
-        // Re-load iframe in case the resolved view file changed (draft / inreview / archive)
-        loadDocContent(latestDoc);
+        // Re-load iframe only if the locale-selected file/state actually
+        // changed. Repainting the same iframe is the visible "EN/VI jitter".
+        const latestLocaleSignature = (function(){
+          try{
+            const lv = getDocLocaleView(latestDoc);
+            return [lv.locale, lv.mode, lv.file || '', lv.translationState || ''].join('|');
+          }catch(e){
+            return '';
+          }
+        })();
+        if(latestLocaleSignature && latestLocaleSignature !== initialLocaleSignature){
+          loadDocContent(latestDoc);
+        }
       }catch(e){}
     }).catch(()=>{});
   }catch(e){}
@@ -2940,13 +2987,13 @@ async function openDocPreview(code){
     if(viewer) viewer.classList.add('active');
 
     // Re-render UI blocks
-    updateDocViewerHeader(doc);
-    renderWorkflowPanel(doc);
-    renderVersionHistory(doc);
-    loadDocContent(doc);
+    updateDocViewerHeader(latestDoc);
+    renderWorkflowPanel(latestDoc);
+    renderVersionHistory(latestDoc);
+    loadDocContent(latestDoc);
     try{
       if(lang === 'en' && typeof triggerDocEnglishLocaleBootstrap === 'function'){
-        triggerDocEnglishLocaleBootstrap(doc);
+        triggerDocEnglishLocaleBootstrap(latestDoc);
       }
     }catch(e){}
   }catch(err){

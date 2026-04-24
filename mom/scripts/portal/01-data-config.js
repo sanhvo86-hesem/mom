@@ -1419,6 +1419,34 @@ let __DCC_OVERLAY_LOADED = false;     // true after first successful fetch
 let __DCC_OVERLAY_PENDING_OPTIONS = null;
 let __DCC_OVERLAY_FETCH_PROMISE = null;
 
+function upsertDccOverlayCacheEntry(target, row){
+  if (!target || !row || !row.doc_code) return false;
+  const key = String(row.doc_code).toUpperCase();
+  const entry = {
+    doc_code:            row.doc_code || key,
+    title:              row.title || '',
+    subtitle:           row.subtitle || '',
+    revision:           row.revision || '',
+    status:             row.status || '',
+    owner_role_code:    row.owner_role_code || '',
+    approver_role_code: row.approver_role_code || '',
+    effective_date:     row.effective_date || '',
+    filename:           row.filename || '',
+    filesystem_path:    row.filesystem_path || '',
+    locale_variant_exists: !!row.locale_variant_exists,
+    is_locale_fallback: !!row.is_locale_fallback,
+    locale_artifact_present: !!row.locale_artifact_present,
+    artifact_rel_path:  row.artifact_rel_path || '',
+    translation_state:  row.translation_state || ''
+  };
+  target[key] = entry;
+  const rowPath = String(entry.filesystem_path || '').trim().toLowerCase();
+  const rowFilename = String(entry.filename || '').trim().toLowerCase();
+  if (rowPath) target['path:' + rowPath] = entry;
+  if (rowFilename) target['file:' + rowFilename] = entry;
+  return true;
+}
+
 function overlayDocsWithDccCache(docs){
   if (!Array.isArray(docs)) return;
   const map = __DCC_HEADER_CACHE || {};
@@ -1520,31 +1548,7 @@ async function refreshDccOverlayFromServer(options={}){
         }
         const next = {};
         for (let i = 0; i < rows.length; i++) {
-          const r = rows[i];
-          if (!r || !r.doc_code) continue;
-          const key = String(r.doc_code).toUpperCase();
-          const entry = {
-            doc_code:            r.doc_code || key,
-            title:              r.title || '',
-            subtitle:           r.subtitle || '',
-            revision:           r.revision || '',
-            status:             r.status || '',
-            owner_role_code:    r.owner_role_code || '',
-            approver_role_code: r.approver_role_code || '',
-            effective_date:     r.effective_date || '',
-            filename:           r.filename || '',
-            filesystem_path:    r.filesystem_path || '',
-            locale_variant_exists: !!r.locale_variant_exists,
-            is_locale_fallback: !!r.is_locale_fallback,
-            locale_artifact_present: !!r.locale_artifact_present,
-            artifact_rel_path:  r.artifact_rel_path || '',
-            translation_state:  r.translation_state || ''
-          };
-          next[key] = entry;
-          const rowPath = String(entry.filesystem_path || '').trim().toLowerCase();
-          const rowFilename = String(entry.filename || '').trim().toLowerCase();
-          if (rowPath) next['path:' + rowPath] = entry;
-          if (rowFilename) next['file:' + rowFilename] = entry;
+          upsertDccOverlayCacheEntry(next, rows[i]);
         }
         const changed = JSON.stringify(next) !== JSON.stringify(__DCC_HEADER_CACHE);
         __DCC_HEADER_CACHE = next;
@@ -1572,8 +1576,48 @@ async function refreshDccOverlayFromServer(options={}){
   }
 }
 
+async function refreshDccOverlayForDocFromServer(code, options={}){
+  const requestOptions = (options && typeof options === 'object') ? options : {};
+  const docCode = String(code || '').trim();
+  if (!docCode) return null;
+  try {
+    const locale = lang === 'en' ? 'en' : 'vi';
+    const url = '/api/v1/dcc/documents/' + encodeURIComponent(docCode) + '/header?locale=' + encodeURIComponent(locale);
+    const res = await fetch(url, {credentials: 'same-origin', headers: {'Accept': 'application/json'}, cache: 'no-store'});
+    if (!res.ok) {
+      if (res.status !== 401 && res.status !== 403 && res.status !== 404) {
+        console.warn('[DCC] header fetch HTTP ' + res.status);
+      }
+      return null;
+    }
+    const body = await res.json().catch(() => null);
+    const row = (body && body.data && body.data.header) ? body.data.header
+              : (body && body.header) ? body.header
+              : (body && body.data && body.data.doc_code) ? body.data
+              : (body && body.doc_code) ? body
+              : null;
+    if (!row || !row.doc_code) return null;
+    const next = Object.assign({}, __DCC_HEADER_CACHE || {});
+    const changed = upsertDccOverlayCacheEntry(next, row)
+      && JSON.stringify(next) !== JSON.stringify(__DCC_HEADER_CACHE || {});
+    __DCC_HEADER_CACHE = next;
+    __DCC_OVERLAY_LOADED = true;
+    if (Array.isArray(DOCS) && DOCS.length) {
+      overlayDocsWithDccCache(DOCS);
+      if (requestOptions.refreshUi !== false && changed) {
+        try { refreshPortalDocsUiAfterSync(); } catch(e){}
+      }
+    }
+    return row;
+  } catch(e) {
+    console.warn('[DCC] header fetch failed (non-fatal)', e);
+  }
+  return null;
+}
+
 // Exposed so doSaveDocEdit() can force an immediate refresh after a save.
 window.refreshDccOverlayFromServer = refreshDccOverlayFromServer;
+window.refreshDccOverlayForDocFromServer = refreshDccOverlayForDocFromServer;
 
 function shouldPauseLiveDocsSync(){
   try{
@@ -2652,6 +2696,43 @@ function postDocLanguageMessage(frame, payload){
   }
 }
 
+function renderEnglishLocaleSwitchPendingCard(){
+  const iframe=document.getElementById('doc-iframe');
+  const loading=document.getElementById('iframe-loading');
+  if(loading) loading.style.display='none';
+  if(!iframe) return;
+  iframe.onload=function(){
+    if(loading) loading.style.display='none';
+    iframe.style.opacity='1';
+  };
+  try{ iframe.removeAttribute('src'); }catch(e){}
+  iframe.style.opacity='1';
+  iframe.srcdoc = `<!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <style>
+        body{margin:0;background:#f8fafc;font-family:Segoe UI,Arial,sans-serif;color:#0f172a}
+        .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+        .card{max-width:760px;background:#fff;border:1px solid #dbe3ef;border-radius:20px;padding:28px;box-shadow:0 16px 40px rgba(15,23,42,.06)}
+        .eyebrow{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#64748b;margin-bottom:10px}
+        h1{margin:0 0 12px;font-size:28px;line-height:1.2}
+        p{margin:0;line-height:1.7;color:#475569}
+      </style>
+    </head>
+    <body>
+      <div class="wrap">
+        <div class="card">
+          <div class="eyebrow">Loading locale projection</div>
+          <h1>Preparing English view</h1>
+          <p>The portal is loading the backend-published English artifact or fail-closed language status.</p>
+        </div>
+      </div>
+    </body>
+    </html>`;
+}
+
 function setLang(l){
   lang = l;
   try{ localStorage.setItem('hesem_lang', l); }catch(e){}
@@ -2699,8 +2780,41 @@ function setLang(l){
   if(currentPage==='access') renderAccessMatrix();
   if(currentPage==='admin') renderAdmin();
   try{ if(typeof fixMojibakeDom==='function') fixMojibakeDom(document.body); }catch(e){}
+  const dv=document.getElementById('doc-viewer');
+  const viewerOpen = !!(dv&&dv.classList.contains('active')&&currentDoc);
+  if(viewerOpen && l==='en' && !editMode){
+    try{ renderEnglishLocaleSwitchPendingCard(); }catch(e){}
+    try{
+      const localeRefresh = (typeof refreshDccOverlayForDocFromServer === 'function')
+        ? refreshDccOverlayForDocFromServer(currentDoc, {refreshUi:false})
+        : refreshDccOverlayFromServer({refreshUi:false});
+      Promise.resolve(localeRefresh).then(function(){
+        try{
+          if(currentPage==='documents') renderDocuments();
+          if(currentDoc&&!editMode) openDocPreview(currentDoc);
+        }catch(_e){}
+      }).catch(function(){
+        try{ if(currentDoc&&!editMode) loadDocContent(currentDoc); }catch(_e){}
+      });
+      if(typeof refreshDccOverlayFromServer === 'function'){
+        Promise.resolve(refreshDccOverlayFromServer({refreshUi:false})).then(function(){
+          try{ if(currentPage==='documents') renderDocuments(); }catch(_e){}
+        }).catch(function(){});
+      }
+    }catch(e){}
+    const doc=DOCS.find(d=>d.code===currentDoc);
+    if(doc){
+      try{ updateDocViewerHeader(doc); }catch(e){}
+      try{ renderWorkflowPanel(doc); }catch(e){}
+      try{ renderVersionHistory(doc); }catch(e){}
+    }
+    return;
+  }
   try{
-    Promise.resolve(refreshDccOverlayFromServer({refreshUi:false})).then(function(){
+    const localeRefresh = (viewerOpen && currentDoc && typeof refreshDccOverlayForDocFromServer === 'function')
+      ? refreshDccOverlayForDocFromServer(currentDoc, {refreshUi:false})
+      : refreshDccOverlayFromServer({refreshUi:false});
+    Promise.resolve(localeRefresh).then(function(){
       try{
         if(currentPage==='documents') renderDocuments();
       }catch(_e){}
@@ -2709,9 +2823,13 @@ function setLang(l){
         try{ openDocPreview(currentDoc); }catch(_e){}
       }
     }).catch(function(){});
+    if(viewerOpen && currentDoc && typeof refreshDccOverlayFromServer === 'function'){
+      Promise.resolve(refreshDccOverlayFromServer({refreshUi:false})).then(function(){
+        try{ if(currentPage==='documents') renderDocuments(); }catch(_e){}
+      }).catch(function(){});
+    }
   }catch(e){}
   // If doc viewer is open, refresh its header and workflow
-  const dv=document.getElementById('doc-viewer');
   if(dv&&dv.classList.contains('active')&&currentDoc){
     const doc=DOCS.find(d=>d.code===currentDoc);
     if(doc){

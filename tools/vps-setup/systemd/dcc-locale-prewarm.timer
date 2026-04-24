@@ -1,0 +1,12 @@
+[Unit]
+Description=Run HESEM MOM DCC English locale prewarm
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+AccuracySec=30s
+Unit=dcc-locale-prewarm.service
+Persistent=true
+
+[Install]
+WantedBy=timers.target

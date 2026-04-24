@@ -1495,11 +1495,15 @@ final class DocumentControlService
         if (!is_string($html) || $html === '') {
             return '';
         }
-        $normalized = function_exists('strip_base_href_archive')
-            ? (string)\strip_base_href_archive($html)
-            : $html;
+        $normalized = $this->stripArchiveBaseHref($html);
         $normalized = trim(str_replace("\r\n", "\n", $normalized));
         return strtolower(hash('sha256', $normalized));
+    }
+
+    private function stripArchiveBaseHref(string $html): string
+    {
+        $out = preg_replace('/<base\s+[^>]*href=["\']\.\.\/["\'][^>]*>\s*/i', '', $html, 1);
+        return is_string($out) ? $out : $html;
     }
 
     private function nextDcrNumber(): string

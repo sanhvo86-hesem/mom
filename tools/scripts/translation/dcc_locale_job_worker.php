@@ -16,11 +16,20 @@ if (!is_string($rootDir) || $rootDir === '') {
     exit(1);
 }
 
-$jobPath = $argv[1] ?? '';
-$jobPath = is_string($jobPath) ? trim($jobPath) : '';
+$workerArgs = parseWorkerArgs($argv);
+$jobPath = $workerArgs['job_path'];
 if ($jobPath === '' || !is_file($jobPath)) {
     fwrite(STDERR, "Missing job file\n");
     exit(1);
+}
+
+$fpmEnvPath = $workerArgs['fpm_env'];
+if ($fpmEnvPath === '') {
+    $defaultFpmEnvPath = '/etc/php/8.5/fpm/pool.d/mom.conf';
+    $fpmEnvPath = is_file($defaultFpmEnvPath) ? $defaultFpmEnvPath : '';
+}
+if ($fpmEnvPath !== '') {
+    loadFpmEnv($fpmEnvPath);
 }
 
 $queueLock = acquireQueueWorkerLock($rootDir);
@@ -33,6 +42,7 @@ require_once $rootDir . '/mom/api/services/DocumentControl/DocumentControlServic
 require_once $rootDir . '/mom/api/services/DocumentControl/DocumentLocaleAutomationService.php';
 
 $data = new DataLayer($rootDir . '/mom/data', $rootDir);
+$dcc = new MOM\Services\DocumentControl\DocumentControlService($data);
 $service = new DocumentLocaleAutomationService($data, $rootDir);
 
 try {
@@ -41,7 +51,7 @@ try {
     while ($idlePasses < 2) {
         $processedAny = false;
         foreach (jobPathsToDrain($rootDir, $seedJobPath) as $candidate) {
-            $processedAny = processQueuedJob($candidate, $service) || $processedAny;
+            $processedAny = processQueuedJob($candidate, $service, $dcc, $rootDir) || $processedAny;
         }
         $seedJobPath = '';
         if ($processedAny) {
@@ -104,6 +114,66 @@ function configuredWorkerSlotCount(): int
 }
 
 /**
+ * @param list<string> $argv
+ * @return array{job_path: string, fpm_env: string}
+ */
+function parseWorkerArgs(array $argv): array
+{
+    $jobPath = '';
+    $fpmEnvPath = '';
+    $args = array_values(array_slice($argv, 1));
+    $count = count($args);
+    for ($i = 0; $i < $count; $i++) {
+        $arg = $args[$i];
+        $arg = is_string($arg) ? trim($arg) : '';
+        if ($arg === '') {
+            continue;
+        }
+        if (str_starts_with($arg, '--fpm-env=')) {
+            $fpmEnvPath = trim(substr($arg, strlen('--fpm-env=')));
+            continue;
+        }
+        if ($arg === '--fpm-env') {
+            $next = $args[$i + 1] ?? '';
+            $fpmEnvPath = is_string($next) ? trim($next) : '';
+            $i++;
+            continue;
+        }
+        if (str_starts_with($arg, '--')) {
+            continue;
+        }
+        if ($jobPath === '') {
+            $jobPath = $arg;
+        }
+    }
+
+    return [
+        'job_path' => normalizeJobPath($jobPath),
+        'fpm_env' => normalizeJobPath($fpmEnvPath),
+    ];
+}
+
+function loadFpmEnv(string $path): void
+{
+    if (!is_file($path)) {
+        fwrite(STDERR, "FPM env file not found: {$path}\n");
+        exit(1);
+    }
+    foreach (file($path) ?: [] as $line) {
+        if (!preg_match('/^\s*env\[([^\]]+)\]\s*=\s*(.*)\s*$/', $line, $m)) {
+            continue;
+        }
+        $key = trim($m[1]);
+        $value = trim($m[2]);
+        if ($key === '') {
+            continue;
+        }
+        putenv($key . '=' . $value);
+        $_ENV[$key] = $value;
+    }
+}
+
+/**
  * @return list<string>
  */
 function jobPathsToDrain(string $rootDir, string $requestedJobPath): array
@@ -133,7 +203,10 @@ function jobPathsToDrain(string $rootDir, string $requestedJobPath): array
             if ($path === '' || !str_ends_with($path, '.json')) {
                 continue;
             }
-            $found[$path] = (int)$item->getMTime();
+            $found[$path] = [
+                'size' => max(0, (int)$item->getSize()),
+                'mtime' => (int)$item->getMTime(),
+            ];
         }
     } catch (Throwable $e) {
         @error_log('[DCC locale worker] queue scan failed: ' . $e->getMessage());
@@ -144,7 +217,9 @@ function jobPathsToDrain(string $rootDir, string $requestedJobPath): array
         unset($found[$requestedJobPath]);
     }
 
-    asort($found, SORT_NUMERIC);
+    uasort($found, static function (array $a, array $b): int {
+        return ($a['size'] <=> $b['size']) ?: ($a['mtime'] <=> $b['mtime']);
+    });
     foreach (array_keys($found) as $path) {
         $jobs[] = $path;
     }
@@ -152,7 +227,12 @@ function jobPathsToDrain(string $rootDir, string $requestedJobPath): array
     return $jobs;
 }
 
-function processQueuedJob(string $jobPath, DocumentLocaleAutomationService $service): bool
+function processQueuedJob(
+    string $jobPath,
+    DocumentLocaleAutomationService $service,
+    MOM\Services\DocumentControl\DocumentControlService $dcc,
+    string $rootDir
+): bool
 {
     $jobPath = normalizeJobPath($jobPath);
     if ($jobPath === '' || !is_file($jobPath)) {
@@ -185,6 +265,7 @@ function processQueuedJob(string $jobPath, DocumentLocaleAutomationService $serv
         return true;
     } catch (Throwable $e) {
         @error_log('[DCC locale worker] ' . $jobPath . ' :: ' . $e->getMessage());
+        recordQueuedJobFailure($jobPath, $payload ?? [], $dcc, $rootDir, $e);
     } finally {
         @flock($lock, LOCK_UN);
         fclose($lock);
@@ -192,6 +273,112 @@ function processQueuedJob(string $jobPath, DocumentLocaleAutomationService $serv
     }
 
     return false;
+}
+
+/**
+ * @param array<string, mixed> $payload
+ */
+function recordQueuedJobFailure(
+    string $jobPath,
+    array $payload,
+    MOM\Services\DocumentControl\DocumentControlService $dcc,
+    string $rootDir,
+    Throwable $error
+): void
+{
+    $attempts = max(0, (int)($payload['attempts'] ?? 0)) + 1;
+    $maxAttemptsRaw = trim((string)(getenv('DCC_TRANSLATION_JOB_MAX_ATTEMPTS') ?: '3'));
+    $maxAttempts = ctype_digit($maxAttemptsRaw) ? max(1, min(10, (int)$maxAttemptsRaw)) : 3;
+    $payload['attempts'] = $attempts;
+    $payload['last_error'] = $error->getMessage();
+    $payload['last_attempt_at'] = gmdate(DATE_ATOM);
+
+    if ($attempts < $maxAttempts) {
+        $encoded = json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        if (is_string($encoded)) {
+            @file_put_contents($jobPath, $encoded, LOCK_EX);
+        }
+        return;
+    }
+
+    markQueuedVariantBlocked($payload, $dcc, $rootDir, $jobPath, $attempts, $error);
+    $failedPath = $jobPath . '.failed';
+    @rename($jobPath, $failedPath);
+}
+
+/**
+ * @param array<string, mixed> $payload
+ */
+function markQueuedVariantBlocked(
+    array $payload,
+    MOM\Services\DocumentControl\DocumentControlService $dcc,
+    string $rootDir,
+    string $jobPath,
+    int $attempts,
+    Throwable $error
+): void
+{
+    $docCode = MOM\Services\DocumentControl\DocumentControlService::canonicalizeCode((string)($payload['doc_code'] ?? ''));
+    if ($docCode === '') {
+        return;
+    }
+    $sourceHtml = trim(str_replace("\r\n", "\n", (string)($payload['source_html'] ?? '')));
+    if ($sourceHtml === '') {
+        return;
+    }
+    $revision = normaliseQueuedDccRevision((string)($payload['revision'] ?? '0.0'));
+    $actor = trim((string)($payload['actor'] ?? 'system.locale-worker'));
+    if ($actor === '') {
+        $actor = 'system.locale-worker';
+    }
+    $metadata = [
+        'auto_sync' => true,
+        'target_locale' => 'en',
+        'trigger' => (string)($payload['trigger'] ?? 'locale_worker'),
+        'source_status' => (string)($payload['source_status'] ?? 'draft'),
+        'source_revision' => (string)($payload['revision'] ?? '0.0'),
+        'dcc_revision' => $revision,
+        'source_base_rel_path' => (string)($payload['base_rel_path'] ?? ''),
+        'blocked_reason' => 'translation_worker_attempts_exhausted',
+        'blocked_message' => $error->getMessage(),
+        'queue_attempts' => $attempts,
+        'queue_job_path' => relativeWorkerPath($rootDir, $jobPath),
+        'last_attempt_at' => gmdate(DATE_ATOM),
+    ];
+    try {
+        $dcc->upsertLocaleVariant($docCode, 'en', [
+            'title' => (string)($payload['title'] ?? $docCode),
+            'subtitle' => $payload['subtitle'] ?? null,
+            'artifact_rel_path' => null,
+            'artifact_source_revision' => $revision,
+            'artifact_source_hash_sha256' => strtolower(hash('sha256', $sourceHtml)),
+            'translation_state' => 'blocked',
+            'translation_provider' => 'command',
+            'glossary_version' => 'repo_glossary',
+            'engine_version' => 'worker_failed',
+            'published_at' => null,
+            'metadata' => $metadata,
+        ], $actor);
+    } catch (Throwable $markError) {
+        @error_log('[DCC locale worker] unable to mark blocked for ' . $docCode . ': ' . $markError->getMessage());
+    }
+}
+
+function normaliseQueuedDccRevision(string $revision): string
+{
+    $normalized = trim($revision);
+    if ($normalized === '') {
+        return 'V0.0';
+    }
+    $normalized = ltrim($normalized, 'vV');
+    return 'V' . $normalized;
+}
+
+function relativeWorkerPath(string $rootDir, string $path): string
+{
+    $root = rtrim(str_replace('\\', '/', $rootDir), '/') . '/';
+    $normalized = str_replace('\\', '/', $path);
+    return str_starts_with($normalized, $root) ? substr($normalized, strlen($root)) : $normalized;
 }
 
 function normalizeJobPath(string $jobPath): string

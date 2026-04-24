@@ -197,8 +197,8 @@ POST_FIXES = [
     ("the source", "the source"),
     ("inters with", "stop deviation at"),
 ]
-SEGMENT_BATCH_SIZE = 48
-SEGMENT_BATCH_MAX_CHARS = 9000
+SEGMENT_BATCH_SIZE = 16
+SEGMENT_BATCH_MAX_CHARS = 2200
 CACHE_SCHEMA_VERSION = "argos_local_vi_en_v1"
 
 _translator = None

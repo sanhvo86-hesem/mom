@@ -7,6 +7,7 @@ namespace MOM\Services\DocumentControl;
 use InvalidArgumentException;
 use MOM\Database\DataLayer;
 use RuntimeException;
+use Throwable;
 
 /**
  * Automates non-authoritative locale artifact generation for controlled docs.
@@ -219,7 +220,15 @@ final class DocumentLocaleAutomationService
         }
 
         $this->writeArtifact($artifactRelPath, $artifactHtml);
-        $this->writeRuntimeArtifactCache($docCode, self::TARGET_LOCALE, $sourceHash, $artifactHtml);
+        $cacheMetadata = [];
+        try {
+            $this->writeRuntimeArtifactCache($docCode, self::TARGET_LOCALE, $sourceHash, $artifactHtml);
+            $cacheMetadata['runtime_cache_written_at'] = gmdate(DATE_ATOM);
+        } catch (Throwable $cacheError) {
+            @error_log('[DCC locale automation] runtime cache write failed for ' . $docCode . ': ' . $cacheError->getMessage());
+            $cacheMetadata['runtime_cache_write_failed'] = true;
+            $cacheMetadata['runtime_cache_error'] = $cacheError->getMessage();
+        }
 
         $state = $this->normaliseVariantState(
             (string)($attempt['translation_state'] ?? $defaultState),
@@ -239,6 +248,7 @@ final class DocumentLocaleAutomationService
             'artifact_scope' => $workingPreview ? 'working_preview' : 'current_revision',
             'last_generated_at' => gmdate(DATE_ATOM),
         ];
+        $metadata = array_merge($metadata, $cacheMetadata);
         if ($releasedSnapshot !== null) {
             $metadata['released_snapshot'] = $releasedSnapshot;
         }
@@ -315,6 +325,11 @@ final class DocumentLocaleAutomationService
             ?? gmdate('Y-m-d');
         $normalizedSourceHtml = $this->normalizeSourceHtml($sourceHtml);
         $sourceHash = strtolower(hash('sha256', $normalizedSourceHtml));
+        $spawnWorker = $input['spawn_worker'] ?? true;
+        if (!is_bool($spawnWorker)) {
+            $parsedSpawnWorker = filter_var($spawnWorker, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            $spawnWorker = $parsedSpawnWorker ?? true;
+        }
         $artifactRelPath = $this->hiddenSiblingArtifactPath(
             $baseRel,
             self::TARGET_LOCALE,
@@ -417,8 +432,8 @@ final class DocumentLocaleAutomationService
             'effective_date' => $effectiveDate,
         ];
         $jobPath = $this->writeQueuedTranslationJob($docCode, self::TARGET_LOCALE, $sourceHash, $jobPayload);
-        $spawned = $this->spawnQueuedTranslationWorker($jobPath);
-        if (!$spawned) {
+        $spawned = $spawnWorker ? $this->spawnQueuedTranslationWorker($jobPath) : false;
+        if ($spawnWorker && !$spawned) {
             $metadata = [
                 'auto_sync' => true,
                 'target_locale' => self::TARGET_LOCALE,
@@ -474,6 +489,9 @@ final class DocumentLocaleAutomationService
             'queue_job_path' => $this->relativeToRoot($jobPath),
             'queue_spawned' => $spawned,
         ];
+        if (!$spawnWorker) {
+            $metadata['queue_spawn_deferred'] = true;
+        }
         if ($releasedSnapshot !== null) {
             $metadata['released_snapshot'] = $releasedSnapshot;
         }
@@ -970,18 +988,27 @@ final class DocumentLocaleAutomationService
 
     private function normalizeSourceHtml(string $html): string
     {
-        $normalized = function_exists('strip_base_href_archive')
-            ? (string)\strip_base_href_archive($html)
-            : $html;
+        $normalized = $this->stripArchiveBaseHref($html);
         $normalized = str_replace("\r\n", "\n", $normalized);
         return trim($normalized);
+    }
+
+    private function stripArchiveBaseHref(string $html): string
+    {
+        $out = preg_replace('/<base\s+[^>]*href=["\']\.\.\/["\'][^>]*>\s*/i', '', $html, 1);
+        return is_string($out) ? $out : $html;
     }
 
     private function normalizeArtifactHtml(string $html): string
     {
         $normalized = trim($html);
-        if ($normalized === '' || stripos($normalized, '<html') === false) {
+        if ($normalized === '') {
             return '';
+        }
+        if (stripos($normalized, '<html') === false) {
+            return '<!doctype html><html lang="en" data-qms-locale-artifact="en"><head><meta charset="utf-8"></head><body>'
+                . $normalized
+                . '</body></html>';
         }
 
         return (string)preg_replace_callback(

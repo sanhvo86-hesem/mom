@@ -17,7 +17,10 @@ MODEL_FILE="${MODEL_FILE:-$MODEL_DIR/translate-vi_en-1_9.argosmodel}"
 RUNTIME_HOME="${RUNTIME_HOME:-$PRIVATE_DATA/translation-runtime}"
 WEB_USER="${WEB_USER:-www-data}"
 WEB_GROUP="${WEB_GROUP:-www-data}"
+FPM_POOL_CONF="${FPM_POOL_CONF:-/etc/php/8.5/fpm/pool.d/mom.conf}"
 SCRIPT_PATH="$SITE_DIR/tools/scripts/translation/dcc_argos_vi_to_en.py"
+PREWARM_SERVICE_SRC="$SITE_DIR/tools/vps-setup/systemd/dcc-locale-prewarm.service"
+PREWARM_TIMER_SRC="$SITE_DIR/tools/vps-setup/systemd/dcc-locale-prewarm.timer"
 
 echo "[dcc-translation] site_dir=$SITE_DIR"
 echo "[dcc-translation] venv_dir=$VENV_DIR"
@@ -58,6 +61,24 @@ if [ ! -f "$SCRIPT_PATH" ]; then
   exit 1
 fi
 
+if command -v systemctl >/dev/null 2>&1 \
+  && [ -f "$PREWARM_SERVICE_SRC" ] \
+  && [ -f "$PREWARM_TIMER_SRC" ]; then
+  echo "[dcc-translation] installing locale prewarm systemd timer..."
+  sed "s#/var/www/eqms.hesemeng.com#$SITE_DIR#g; s#/etc/php/8.5/fpm/pool.d/mom.conf#$FPM_POOL_CONF#g" \
+    "$PREWARM_SERVICE_SRC" > /etc/systemd/system/dcc-locale-prewarm.service
+  chmod 0644 /etc/systemd/system/dcc-locale-prewarm.service
+  install -m 0644 "$PREWARM_TIMER_SRC" /etc/systemd/system/dcc-locale-prewarm.timer
+  systemctl daemon-reload
+  if [ -f "$FPM_POOL_CONF" ] \
+    && grep -Eq '^[[:space:]]*env\[DCC_TRANSLATION_DRIVER\][[:space:]]*=[[:space:]]*command[[:space:]]*$' "$FPM_POOL_CONF" \
+    && grep -Eq '^[[:space:]]*env\[DCC_TRANSLATION_COMMAND\][[:space:]]*=' "$FPM_POOL_CONF"; then
+    systemctl enable --now dcc-locale-prewarm.timer
+  else
+    echo "[dcc-translation] prewarm timer installed but not enabled because provider env is not configured in $FPM_POOL_CONF"
+  fi
+fi
+
 cat <<EOF
 
 [dcc-translation] install complete
@@ -66,6 +87,11 @@ Set these PHP-FPM environment variables:
   env[DCC_TRANSLATION_DRIVER] = command
   env[DCC_TRANSLATION_RUNTIME_HOME] = $RUNTIME_HOME
   env[DCC_TRANSLATION_COMMAND] = $VENV_DIR/bin/python $SCRIPT_PATH
+  env[DCC_TRANSLATION_WORKER_SLOTS] = 4
+  env[DCC_TRANSLATION_COMMAND_TIMEOUT_SECONDS] = 1800
+  env[DCC_TRANSLATION_JOB_MAX_ATTEMPTS] = 3
 
 Then reload PHP-FPM.
+After PHP-FPM env is configured, enable proactive prewarm:
+  systemctl enable --now dcc-locale-prewarm.timer
 EOF

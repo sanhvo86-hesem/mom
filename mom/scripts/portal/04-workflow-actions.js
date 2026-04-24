@@ -1027,6 +1027,14 @@ async function ensureDocEnglishLocaleArtifact(doc, options){
 
 function triggerDocEnglishLocaleBootstrap(doc, options){
   if(lang !== 'en' || !doc) return;
+  const beforeLocaleSignature = (function(){
+    try{
+      const lv = getDocLocaleView(doc);
+      return [lv.locale, lv.mode, lv.file || '', lv.translationState || ''].join('|');
+    }catch(e){
+      return '';
+    }
+  })();
   ensureDocEnglishLocaleArtifact(doc, options).then(function(res){
     if(!res || res.ok === false) return;
     const code = String(doc.code || '').trim();
@@ -1039,7 +1047,15 @@ function triggerDocEnglishLocaleBootstrap(doc, options){
     try{ updateDocViewerHeader(latestDoc); }catch(e){}
     try{ renderWorkflowPanel(latestDoc); }catch(e){}
     try{ renderVersionHistory(latestDoc); }catch(e){}
-    try{ loadDocContent(latestDoc); }catch(e){}
+    try{
+      const latestLocaleView = getDocLocaleView(latestDoc);
+      const latestLocaleSignature = latestLocaleView
+        ? [latestLocaleView.locale, latestLocaleView.mode, latestLocaleView.file || '', latestLocaleView.translationState || ''].join('|')
+        : '';
+      if(latestLocaleView && (latestLocaleView.available || latestLocaleSignature !== beforeLocaleSignature)){
+        loadDocContent(latestDoc);
+      }
+    }catch(e){}
   }).catch(function(err){
     try{ console.warn('[Locale bootstrap] English ensure failed', err); }catch(e){}
   });
@@ -2224,7 +2240,7 @@ function loadDocContent(code){
   const resolvedCode = String(doc.code || '').trim();
   const localeView = getDocLocaleView(doc);
 
-  const edited=getEditedHtml(resolvedCode);
+  const edited = lang === 'en' ? '' : getEditedHtml(resolvedCode);
   const iframe=document.getElementById('doc-iframe');
   const loading=document.getElementById('iframe-loading');
 

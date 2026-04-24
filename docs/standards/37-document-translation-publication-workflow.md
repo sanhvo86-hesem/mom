@@ -213,6 +213,38 @@ Rules:
 4. Bootstrap success must refresh DCC locale projection and rerender the viewer against the new artifact.
 5. Bootstrap failure must leave the viewer fail-closed and surface truthful `missing` or `blocked` state.
 
+### 9.5 Proactive prewarm rule
+
+English generation must not depend on the user opening the English tab.
+Opening the English tab is a read path; it may request a last-resort bootstrap
+for legacy gaps, but the normal production path is proactive.
+
+Rules:
+
+1. Create/save-draft/submit-review/approve must enqueue English generation after the Vietnamese source write succeeds.
+2. A scheduled backend prewarm job must scan all controlled DCC HTML documents, compute the current normalized source hash, and compare it with `dcc_document_locale_variant.artifact_source_hash_sha256`.
+3. If the locale row is missing, blocked, stale, points to a missing artifact path, or has a source hash mismatch, the prewarm job must enqueue a translation job.
+4. Prewarm must store queued jobs in backend-controlled queue storage and start a bounded number of background workers; it must not run unbounded provider calls inside a request or a page open.
+5. Worker concurrency must be governed by runtime configuration such as `DCC_TRANSLATION_WORKER_SLOTS`; adding workers must not overload PHP-FPM or the VPS.
+6. The prewarm service must be installed as VPS/system service or equivalent scheduler, not as browser JavaScript.
+7. Repeated prewarm runs must be idempotent: a matching queued job or renderable current artifact must not create duplicate work.
+8. The English tab must prefer the already-published backend artifact and must not wait for provider execution in the foreground.
+9. If prewarm is still processing, the portal shows pending/block truthfully and continues polling projection metadata without rendering Vietnamese body content in the English viewer.
+10. Queue drain order should prioritize smaller source jobs first, then older jobs, so a few large manuals cannot block fast publication of many short training/forms artifacts.
+
+### 9.6 Anti-flicker locale viewer rule
+
+When `lang=en`, the portal must never load the Vietnamese source iframe first and then replace it with English or pending state. That behavior creates visible mixed-language jitter and undermines fail-closed trust.
+
+Rules:
+
+1. Before rendering a document iframe in English mode, the portal must refresh the DCC locale projection or use an already fresh projection.
+2. If the projection has a renderable artifact, load only that artifact.
+3. If the projection is missing, stale, blocked, or pending, load only the explicit unavailable/pending card.
+4. Do not post `setLang('en')` into a Vietnamese source iframe as a translation mechanism.
+5. Do not reload the iframe when a background refresh returns the same locale mode, file path, and translation state.
+6. Polling may reload the iframe only after the projection changes from unavailable/pending to a renderable English artifact.
+
 ## 10. Drift And Regeneration Rule
 
 Whenever the Vietnamese source changes, the English locale variant must be treated as stale until regenerated or re-approved.
@@ -263,6 +295,8 @@ Before closing any translation-related change:
 4. edit/save/submit in `en` is blocked.
 5. no controlled HTML contains a hardcoded production bridge URL.
 6. no new artifact file is discoverable as a standalone scanned document.
+7. prewarm/backfill dry-run reports stale/missing artifacts by source hash.
+8. English viewer does not flash or reload through Vietnamese source content during locale switch.
 
 ## 14. Read Together With
 

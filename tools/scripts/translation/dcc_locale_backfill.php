@@ -28,7 +28,11 @@ $options = getopt('', [
     'fpm-env::',
     'force',
     'limit::',
+    'max-queue::',
+    'no-spawn-per-job',
     'only-missing-job',
+    'start-workers::',
+    'worker-slots::',
 ]);
 if (!is_array($options)) {
     $options = [];
@@ -42,12 +46,26 @@ $onlyCode = DocumentControlService::canonicalizeCode((string)($options['code'] ?
 $dryRun = array_key_exists('dry-run', $options);
 $force = array_key_exists('force', $options);
 $onlyMissingJob = array_key_exists('only-missing-job', $options);
+$spawnPerJob = !array_key_exists('no-spawn-per-job', $options);
 $limit = isset($options['limit']) && ctype_digit((string)$options['limit'])
     ? max(1, (int)$options['limit'])
     : 0;
+$maxQueue = isset($options['max-queue']) && ctype_digit((string)$options['max-queue'])
+    ? max(0, (int)$options['max-queue'])
+    : 0;
+$startWorkers = isset($options['start-workers']) && ctype_digit((string)$options['start-workers'])
+    ? max(0, min(8, (int)$options['start-workers']))
+    : 0;
+$workerSlots = isset($options['worker-slots']) && ctype_digit((string)$options['worker-slots'])
+    ? max(1, min(8, (int)$options['worker-slots']))
+    : max(1, $startWorkers);
 $fpmEnvPath = trim((string)($options['fpm-env'] ?? ''));
 if ($fpmEnvPath !== '') {
     loadFpmEnv($fpmEnvPath);
+}
+if ($workerSlots > 0) {
+    putenv('DCC_TRANSLATION_WORKER_SLOTS=' . $workerSlots);
+    $_ENV['DCC_TRANSLATION_WORKER_SLOTS'] = (string)$workerSlots;
 }
 
 if (!function_exists('strip_base_href_archive')) {
@@ -68,10 +86,14 @@ $stats = [
     'skipped_ready' => 0,
     'skipped_no_source' => 0,
     'skipped_job_exists' => 0,
+    'skipped_queue_limit' => 0,
     'errors' => 0,
+    'workers_started' => 0,
 ];
 $results = [];
 $processed = 0;
+$initialQueueCount = countQueuedJobs($rootDir);
+$currentQueueCount = $initialQueueCount;
 
 for ($offset = 0; ; $offset += 500) {
     $rows = $dcc->listLocalizedHeaders([], 500, $offset, 'en');
@@ -102,24 +124,35 @@ for ($offset = 0; ; $offset += 500) {
         }
 
         $rawVariant = fetchLocaleVariant($data, $docCode);
-        if (!$force && variantArtifactReady($rootDir, $rawVariant)) {
+        $normalizedSource = trim(str_replace("\r\n", "\n", strip_base_href_archive($sourceHtml)));
+        $sourceHash = strtolower(hash('sha256', $normalizedSource));
+        $readiness = localeReadiness($rootDir, $rawVariant, $sourceHash);
+        if (!$force && $readiness['ready']) {
             $stats['skipped_ready']++;
-            $results[] = ['doc_code' => $docCode, 'status' => 'skipped_ready'];
+            $results[] = ['doc_code' => $docCode, 'status' => 'skipped_ready', 'reason' => $readiness['reason']];
             continue;
         }
 
-        $normalizedSource = trim(str_replace("\r\n", "\n", strip_base_href_archive($sourceHtml)));
-        $sourceHash = strtolower(hash('sha256', $normalizedSource));
         $jobPath = queuedTranslationJobPath($rootDir, $docCode, 'en', $sourceHash);
         if ($onlyMissingJob && is_file($jobPath)) {
             $stats['skipped_job_exists']++;
             $results[] = ['doc_code' => $docCode, 'status' => 'skipped_job_exists'];
             continue;
         }
+        if ($maxQueue > 0 && $currentQueueCount >= $maxQueue) {
+            $stats['skipped_queue_limit']++;
+            $results[] = ['doc_code' => $docCode, 'status' => 'skipped_queue_limit', 'reason' => $readiness['reason']];
+            continue;
+        }
 
         if ($dryRun) {
             $stats['queued']++;
-            $results[] = ['doc_code' => $docCode, 'status' => 'would_queue', 'path' => $sourceRelPath];
+            $results[] = [
+                'doc_code' => $docCode,
+                'status' => 'would_queue',
+                'reason' => $readiness['reason'],
+                'path' => $sourceRelPath,
+            ];
             continue;
         }
 
@@ -135,11 +168,29 @@ for ($offset = 0; ; $offset += 500) {
                 'title' => (string)($row['source_title'] ?? ($row['title'] ?? $docCode)),
                 'subtitle' => $row['source_subtitle'] ?? ($row['subtitle'] ?? null),
                 'effective_date' => $row['effective_date'] ?? null,
+                'spawn_worker' => $spawnPerJob,
             ]);
-            $stats['queued']++;
+            if (($out['ok'] ?? true) === false) {
+                $stats['errors']++;
+                $results[] = [
+                    'doc_code' => $docCode,
+                    'status' => 'error',
+                    'reason' => $out['reason'] ?? 'locale_schedule_failed',
+                    'message' => $out['message'] ?? null,
+                    'translation_state' => $out['translation_state'] ?? null,
+                ];
+                continue;
+            }
+            if (!empty($out['queued'])) {
+                $stats['queued']++;
+            }
+            if (!empty($out['queued'])) {
+                $currentQueueCount++;
+            }
             $results[] = [
                 'doc_code' => $docCode,
                 'status' => !empty($out['queued']) ? 'queued' : 'restored_or_noop',
+                'reason' => $readiness['reason'],
                 'translation_state' => $out['translation_state'] ?? null,
             ];
         } catch (Throwable $e) {
@@ -153,11 +204,20 @@ for ($offset = 0; ; $offset += 500) {
     }
 }
 
+if (!$dryRun && $startWorkers > 0) {
+    $stats['workers_started'] = startQueuedWorkers($rootDir, $startWorkers, $fpmEnvPath);
+}
+
 echo json_encode([
     'ok' => $stats['errors'] === 0,
     'dry_run' => $dryRun,
     'force' => $force,
     'only_missing_job' => $onlyMissingJob,
+    'spawn_per_job' => $spawnPerJob,
+    'start_workers' => $startWorkers,
+    'worker_slots' => $workerSlots,
+    'queue_count_before' => $initialQueueCount,
+    'queue_count_after' => countQueuedJobs($rootDir),
     'stats' => $stats,
     'results' => array_slice($results, 0, 100),
 ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n";
@@ -199,7 +259,7 @@ function normalizeRepoRelativePath(string $path): string
 function fetchLocaleVariant(DataLayer $data, string $docCode): array
 {
     $rows = $data->query(
-        "SELECT artifact_rel_path, translation_state
+        "SELECT artifact_rel_path, artifact_source_hash_sha256, translation_state
          FROM dcc_document_locale_variant
          WHERE doc_code = :doc_code AND locale = 'en'
          LIMIT 1",
@@ -211,15 +271,27 @@ function fetchLocaleVariant(DataLayer $data, string $docCode): array
 
 /**
  * @param array<string, mixed> $variant
+ * @return array{ready: bool, reason: string}
  */
-function variantArtifactReady(string $rootDir, array $variant): bool
+function localeReadiness(string $rootDir, array $variant, string $sourceHash): array
 {
     $state = strtolower(trim((string)($variant['translation_state'] ?? '')));
     if (!in_array($state, ['machine_preview', 'review_pending', 'reviewed', 'released'], true)) {
-        return false;
+        return ['ready' => false, 'reason' => $state !== '' ? 'state_' . $state : 'variant_missing'];
+    }
+    $variantHash = strtolower(trim((string)($variant['artifact_source_hash_sha256'] ?? '')));
+    if ($variantHash === '' || !hash_equals($variantHash, $sourceHash)) {
+        return ['ready' => false, 'reason' => 'source_hash_changed'];
     }
     $artifactRelPath = normalizeRepoRelativePath((string)($variant['artifact_rel_path'] ?? ''));
-    return $artifactRelPath !== '' && is_file($rootDir . '/' . $artifactRelPath);
+    if ($artifactRelPath === '') {
+        return ['ready' => false, 'reason' => 'artifact_path_missing'];
+    }
+    if (!is_file($rootDir . '/' . $artifactRelPath)) {
+        return ['ready' => false, 'reason' => 'artifact_file_missing'];
+    }
+
+    return ['ready' => true, 'reason' => 'current_artifact_ready'];
 }
 
 function queuedTranslationJobPath(string $rootDir, string $docCode, string $locale, string $sourceHash): string
@@ -228,4 +300,83 @@ function queuedTranslationJobPath(string $rootDir, string $docCode, string $loca
     $safeLocale = preg_replace('/[^a-z0-9_-]+/i', '', strtolower($locale)) ?? 'en';
     $safeHash = preg_replace('/[^a-f0-9]+/i', '', strtolower($sourceHash)) ?? '';
     return rtrim($rootDir, '/') . '/mom/data/cache/dcc-locale-jobs/' . $safeLocale . '/' . $safeCode . '/' . $safeHash . '.json';
+}
+
+function countQueuedJobs(string $rootDir): int
+{
+    return count(listQueuedJobs($rootDir, PHP_INT_MAX));
+}
+
+/**
+ * @return list<string>
+ */
+function listQueuedJobs(string $rootDir, int $limit): array
+{
+    $queueRoot = rtrim($rootDir, '/') . '/mom/data/cache/dcc-locale-jobs';
+    if (!is_dir($queueRoot) || $limit <= 0) {
+        return [];
+    }
+    $jobs = [];
+    try {
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($queueRoot, FilesystemIterator::SKIP_DOTS)
+        );
+        foreach ($iterator as $item) {
+            if (!$item instanceof SplFileInfo || !$item->isFile()) {
+                continue;
+            }
+            $path = str_replace('\\', '/', $item->getPathname());
+            if (!str_ends_with($path, '.json')) {
+                continue;
+            }
+            $jobs[$path] = [
+                'size' => max(0, (int)$item->getSize()),
+                'mtime' => (int)$item->getMTime(),
+            ];
+        }
+    } catch (Throwable) {
+        return [];
+    }
+    uasort($jobs, static function (array $a, array $b): int {
+        return ($a['size'] <=> $b['size']) ?: ($a['mtime'] <=> $b['mtime']);
+    });
+    return array_slice(array_keys($jobs), 0, $limit);
+}
+
+function startQueuedWorkers(string $rootDir, int $count, string $fpmEnvPath = ''): int
+{
+    $worker = rtrim($rootDir, '/') . '/tools/scripts/translation/dcc_locale_job_worker.php';
+    if (!is_file($worker)) {
+        return 0;
+    }
+    $php = trim((string)@shell_exec('command -v php8.5 2>/dev/null')) ?: PHP_BINARY;
+    $log = rtrim($rootDir, '/') . '/mom/data/php_error.log';
+    $started = 0;
+    foreach (listQueuedJobs($rootDir, $count) as $jobPath) {
+        $command = sprintf(
+            'cd %s && nohup %s %s %s%s >> %s 2>&1 < /dev/null &',
+            escapeshellarg($rootDir),
+            escapeshellarg($php),
+            escapeshellarg($worker),
+            escapeshellarg($jobPath),
+            $fpmEnvPath !== '' ? ' --fpm-env=' . escapeshellarg($fpmEnvPath) : '',
+            escapeshellarg($log)
+        );
+        $process = @proc_open(['/bin/sh', '-lc', $command], [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ], $pipes, $rootDir);
+        if (!is_resource($process)) {
+            continue;
+        }
+        foreach ($pipes as $pipe) {
+            if (is_resource($pipe)) {
+                fclose($pipe);
+            }
+        }
+        @proc_close($process);
+        $started++;
+    }
+    return $started;
 }
