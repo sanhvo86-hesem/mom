@@ -1,0 +1,39 @@
+version: 0.7
+registry_status: preview_seed
+source_step: Step 8.5 V7
+
+screens:
+  - screen_id: shell.home
+    route_class: SH
+    screen_family: shell
+    template_archetype: shell-home
+    authority_class: shell
+    primary_roles:
+      - production_director
+      - qa_manager
+      - planner
+      - operator
+    device_classes:
+      - desktop_large
+      - desktop_standard
+      - tablet_landscape
+    required_regions:
+      - top_shell_header
+      - left_navigation_rail
+      - breadcrumb_row
+      - page_header_zone
+      - content_canvas
+
+  - screen_id: record.nonconformance-cases.detail
+    route_class: AR
+    screen_family: record
+    template_archetype: record-shell-governed-quality-case
+    authority_class: authoritative
+    resource_family: nonconformance-cases
+    required_regions:
+      - breadcrumb_row
+      - identity_header
+      - lifecycle_strip
+      - action_bar
+      - content_tabs
+      - contextual_side_zone

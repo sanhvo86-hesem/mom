@@ -1,0 +1,47 @@
+version: 0.7
+registry_status: preview_seed
+source_step: Step 8.5 V7
+
+components:
+  - component: ops-shell
+    required:
+      - data-hm-shell
+      - data-hm-component
+      - data-route-class
+      - data-state-class
+    allowed_route_classes:
+      - SH
+      - DL
+      - ML
+      - AC
+      - AR
+      - ERD
+      - NRD
+      - WS
+      - SFW
+
+  - component: record-shell
+    required:
+      - data-hm-component
+      - data-route-class
+      - data-root-code
+      - data-resource-family
+      - data-record-id
+      - data-authority-class
+      - data-binding-source
+      - data-state-class
+      - data-freshness-class
+      - data-lifecycle-state
+      - data-record-version
+
+  - component: workspace-shell
+    required:
+      - data-hm-component
+      - data-route-class
+      - data-domain
+      - data-module
+      - data-workspace-family
+      - data-authority-class
+      - data-binding-source
+      - data-freshness-class
+      - data-requires-reanchor

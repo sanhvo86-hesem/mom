@@ -1,0 +1,16 @@
+version: 0.7
+registry_status: preview_seed
+source_step: Step 8.5 V7
+
+telemetry_events:
+  - hmv4.boot.started
+  - hmv4.boot.noop
+  - hmv4.route.parsed
+  - hmv4.route.invalid
+  - hmv4.query.cleaned
+  - hmv4.alias.resolved
+  - hmv4.alias.unmapped
+  - hmv4.hydration.completed
+  - hmv4.hydration.failed
+  - hmv4.workspace.reanchor_required
+  - hmv4.rollback.ready

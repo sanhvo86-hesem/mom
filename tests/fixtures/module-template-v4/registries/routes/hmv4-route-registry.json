@@ -1,0 +1,40 @@
+{
+  "version": "0.7",
+  "registry_status": "preview_seed",
+  "authority_level": "non_production_reference",
+  "source_step": "Step 8.5 V7",
+  "platform": "HESEM Operations Platform",
+  "shell_base": "/ops",
+  "routes": [
+    {
+      "route_id": "shell.home",
+      "route_class": "SH",
+      "canonical_pattern": "/ops",
+      "authority_class": "shell",
+      "allowed_query_keys": ["ctx_return"],
+      "default_query": {},
+      "renderer_ref": "renderShellHome"
+    },
+    {
+      "route_id": "record.nonconformance-cases.detail",
+      "route_class": "AR",
+      "canonical_pattern": "/ops/records/nonconformance-cases/{record_id}",
+      "authority_class": "authoritative_record",
+      "path_params": ["record_id"],
+      "allowed_query_keys": ["tab", "mode", "panel", "focus", "ctx_return", "ctx_source"],
+      "default_query": { "tab": "overview", "mode": "display" },
+      "renderer_ref": "renderRecordShell",
+      "required_access": ["nonconformance-cases:read"]
+    },
+    {
+      "route_id": "workspace.dispatch.board",
+      "route_class": "WS",
+      "canonical_pattern": "/ops/planning-scheduling/dispatch-board/board",
+      "authority_class": "projection_workspace",
+      "allowed_query_keys": ["view", "scope", "from", "to", "panel", "focus", "ctx_return"],
+      "default_query": { "view": "default" },
+      "reanchor_required": true,
+      "renderer_ref": "renderWorkspace"
+    }
+  ]
+}

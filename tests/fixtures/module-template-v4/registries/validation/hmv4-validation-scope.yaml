@@ -1,0 +1,15 @@
+version: 0.7
+registry_status: preview_seed
+source_step: Step 8.5 V7
+
+validation_scope:
+  - architecture_static
+  - workflow_static
+  - api_contract_static
+  - route_contract_static
+  - html_semantic_static
+  - runtime_syntax
+  - browser_smoke
+  - accessibility
+  - security_smoke
+  - rollback

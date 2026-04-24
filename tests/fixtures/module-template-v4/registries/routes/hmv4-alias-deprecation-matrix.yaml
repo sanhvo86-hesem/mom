@@ -1,0 +1,22 @@
+version: 0.7
+registry_status: preview_seed
+source_step: Step 8.5 V7
+
+aliases:
+  - alias_type: page_key
+    source_alias: dispatch
+    canonical_route: /ops/planning-scheduling/dispatch-board/board
+    policy: redirect_then_deprecate
+    redirect_behavior: replaceState
+    deprecation_status: active
+    telemetry_event: ops.route.alias_used
+    risk: medium
+
+  - alias_type: eqms_module_id
+    source_alias: ncr
+    canonical_route: /ops/records/nonconformance-cases
+    policy: redirect_then_deprecate
+    redirect_behavior: replaceState
+    deprecation_status: warning
+    telemetry_event: ops.route.alias_used
+    risk: high

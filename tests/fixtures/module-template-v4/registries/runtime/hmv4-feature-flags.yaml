@@ -1,0 +1,18 @@
+version: 0.7
+registry_status: preview_seed
+source_step: Step 8.5 V7
+
+flags:
+  HMV4_PREVIEW_ENABLED:
+    default: false
+    production_safe_default: true
+  HMV4_ROUTE_BRIDGE_ENABLED:
+    default: true
+  HMV4_DEBUG:
+    default: false
+  HMV4_FIXTURE_MODE:
+    default: false
+    production_forbidden: true
+  HMV4_DISABLE_MUTATION_LAUNCHERS:
+    default: true
+    production_safe_default: true

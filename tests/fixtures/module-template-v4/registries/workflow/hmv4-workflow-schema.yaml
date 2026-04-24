@@ -1,0 +1,44 @@
+version: 0.7
+registry_status: preview_seed
+authority_level: non_production_reference
+source_step: Step 8.5 V7
+platform: HESEM Operations Platform
+
+workflows:
+  - root_code: NQCASE
+    resource_family: nonconformance-cases
+    initial_state: draft
+    terminal_states:
+      - closed
+      - cancelled
+      - voided
+    transitions:
+      - action: submit
+        from: draft
+        to: triaged
+        guards:
+          - required_fields_present
+          - subject_ref_valid
+        roles:
+          - quality_engineer
+          - qa_manager
+        evidence_required: true
+        signature_required: false
+        events:
+          - nqcase.submitted
+      - action: approve_disposition
+        from: disposition_pending
+        to: disposition_approved
+        guards:
+          - containment_recorded
+          - investigation_complete
+          - disposition_selected
+          - no_open_evidence_gaps
+        roles:
+          - qa_manager
+          - mrb_chair
+        evidence_required: true
+        signature_required: true
+        signature_meaning: approve_nonconformance_disposition
+        events:
+          - nqcase.disposition_approved

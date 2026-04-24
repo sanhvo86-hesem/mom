@@ -1,0 +1,70 @@
+version: 0.7
+registry_status: preview_seed
+authority_level: non_production_reference
+source_step: Step 8.5 V7
+platform: HESEM Operations Platform
+staging_path: tests/fixtures/module-template-v4/registries
+do_not_use_as_backend_authority_until_promoted: true
+
+roots:
+  - root_code: DISP
+    root_name: Dispatch Target
+    canonical_resource_family: dispatch-targets
+    owner_bc: BC4
+    root_archetype: live_execution
+    authority_type: authoritative_root
+    workflow_depth: heavy
+    operational_criticality: critical
+    compliance_criticality: medium
+    projections:
+      - dispatch-board
+      - operator-work-queue
+    forbidden_write_surfaces:
+      - dispatch-board
+      - operator-work-queue
+
+  - root_code: NQCASE
+    root_name: Nonconformance / Deviation / Concession Case
+    canonical_resource_family: nonconformance-cases
+    owner_bc: BC5
+    root_archetype: governed_quality_case
+    authority_type: authoritative_root
+    workflow_depth: heavy
+    operational_criticality: high
+    compliance_criticality: high
+    projections:
+      - quality-tower
+      - hold-release-board
+    forbidden_write_surfaces:
+      - quality-tower
+      - hold-release-board
+
+  - root_code: BREL
+    root_name: Batch / Lot Release
+    canonical_resource_family: batch-releases
+    owner_bc: BC5
+    root_archetype: governed_release
+    authority_type: authoritative_root
+    workflow_depth: heavy
+    operational_criticality: high
+    compliance_criticality: high
+    projections:
+      - release-board
+      - release-packet
+    forbidden_write_surfaces:
+      - release-board
+      - release-packet
+
+  - root_code: IREV
+    root_name: Item Revision
+    canonical_resource_family: item-revisions
+    owner_bc: BC2
+    root_archetype: definition_revision
+    authority_type: authoritative_root
+    workflow_depth: heavy
+    projections:
+      - revision-readiness
+      - effectivity-preview
+    forbidden_write_surfaces:
+      - revision-readiness
+      - effectivity-preview

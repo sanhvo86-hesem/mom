@@ -1,0 +1,27 @@
+version: 0.7
+registry_status: preview_seed
+source_step: Step 8.5 V7
+
+checks:
+  - code: repo_root_confirmed
+    required: true
+    command: pwd
+  - code: portal_html_exists
+    required: true
+    command: test -f mom/portal.html
+  - code: no_existing_unclassified_v4_files
+    required: true
+    command: find . -maxdepth 6 -iname '*module-template-v4*' -print
+  - code: no_fixture_production_load
+    required: true
+    command: grep -n "74-module-template-v4-fixtures" mom/portal.html
+    expected: no_match
+  - code: forbidden_files_clean
+    required: true
+    forbidden_files:
+      - mom/styles/portal.main.css
+      - mom/styles/eqms-suite.css
+      - mom/styles/density-darkmode.css
+      - mom/scripts/portal/01-module-router.js
+      - mom/scripts/portal/02-state-auth-ui.js
+      - mom/scripts/portal/40-eqms-shell.js

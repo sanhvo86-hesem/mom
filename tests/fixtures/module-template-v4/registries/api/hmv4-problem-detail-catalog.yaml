@@ -1,0 +1,16 @@
+version: 0.7
+registry_status: preview_seed
+source_step: Step 8.5 V7
+problem_codes:
+  - hmv4.invalid_transition
+  - hmv4.guard_failed
+  - hmv4.permission_denied
+  - hmv4.stale_version
+  - hmv4.idempotency_conflict
+  - hmv4.signature_required
+  - hmv4.evidence_required
+  - hmv4.record_locked
+  - hmv4.projection_not_authority
+  - hmv4.bridge_deprecated
+  - hmv4.invalid_query_state
+  - hmv4.async_job_failed

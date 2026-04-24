@@ -1,0 +1,48 @@
+version: 0.7
+registry_status: preview_seed
+authority_level: non_production_reference
+source_step: Step 8.5 V7
+platform: HESEM Operations Platform
+
+api_contracts:
+  - operation_id: nonconformance_cases.get
+    api_family: nonconformance-cases
+    root_code: NQCASE
+    resource_family: nonconformance-cases
+    owner_bc: BC5
+    authority_class: authoritative
+    operation_family: read
+    method: GET
+    path_template: /api/v1/nonconformance-cases/{id}
+    idempotency_required: false
+    if_match_required: false
+    evidence_required: false
+    signature_required: false
+    audit_level: standard
+    problem_codes:
+      - hmv4.permission_denied
+      - hmv4.unknown_resource_family
+
+  - operation_id: nonconformance_cases.transition.approve_disposition
+    api_family: nonconformance-cases
+    root_code: NQCASE
+    resource_family: nonconformance-cases
+    owner_bc: BC5
+    authority_class: authoritative
+    operation_family: transition
+    method: POST
+    path_template: /api/v1/nonconformance-cases/{id}/actions/approve-disposition
+    idempotency_required: true
+    if_match_required: true
+    evidence_required: true
+    signature_required: true
+    audit_level: regulated
+    problem_codes:
+      - hmv4.invalid_transition
+      - hmv4.guard_failed
+      - hmv4.permission_denied
+      - hmv4.stale_version
+      - hmv4.signature_required
+      - hmv4.evidence_required
+    events_emitted:
+      - nqcase.disposition_approved

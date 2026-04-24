@@ -1,0 +1,17 @@
+version: 0.7
+registry_status: preview_seed
+source_step: Step 8.5 V7
+
+security_controls:
+  - code: data_attributes_not_authority
+    severity: blocker
+  - code: query_whitelist_required
+    severity: blocker
+  - code: no_fixture_production_load
+    severity: blocker
+  - code: no_untrusted_html_injection
+    severity: blocker
+  - code: csrf_required_for_browser_mutation
+    severity: blocker
+  - code: telemetry_redacts_sensitive_ids
+    severity: warning
