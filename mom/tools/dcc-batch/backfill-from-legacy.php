@@ -57,6 +57,7 @@ use function MOM\Tools\DccBatch\clean_text;
 use function MOM\Tools\DccBatch\doc_type_from_code;
 use function MOM\Tools\DccBatch\extract_subtitle;
 use function MOM\Tools\DccBatch\extract_title;
+use function MOM\Tools\DccBatch\load_doc_descriptions;
 use function MOM\Tools\DccBatch\strip_brand_suffix;
 use function MOM\Tools\DccBatch\strip_code_prefix;
 use function MOM\Tools\DccBatch\build_data_layer;
@@ -78,6 +79,8 @@ if (!$dl) {
 $service = new DocumentControlService($dl);
 
 $docTypeCatalog = load_doc_type_defaults($dl);
+$customDocsByCode = load_custom_doc_catalog($ROOT_DIR);
+$docDescriptions = load_doc_descriptions($ROOT_DIR);
 
 $stats = [
     'inspected'           => 0,
@@ -126,8 +129,10 @@ foreach (walk_docs($ROOT_DIR) as $abs) {
     $statePaths    = legacy_state_paths($ROOT_DIR, $baseRel);
     $state         = read_first_existing_json($statePaths['state']);
     $manifest      = read_first_existing_json($statePaths['manifest']);
+    $catalogEntry  = $customDocsByCode[$code] ?? [];
+    $legacyDesc    = isset($docDescriptions[$code]) ? (string)$docDescriptions[$code] : null;
 
-    if ($state === null && $manifest === null) {
+    if ($state === null && $manifest === null && $catalogEntry === [] && ($legacyDesc === null || trim($legacyDesc) === '')) {
         $stats['skipped_no_state']++;
         if ($opts['verbose']) echo "[skip] no legacy state for $code ($rel)\n";
         // We still anchor filename when state is absent — filename contract
@@ -147,6 +152,8 @@ foreach (walk_docs($ROOT_DIR) as $abs) {
                 $code,
                 $abs,
                 $state ?? [],
+                $catalogEntry,
+                $legacyDesc,
                 $docTypeCatalog,
                 $opts,
                 $stats,
@@ -215,7 +222,7 @@ foreach (walk_docs($ROOT_DIR) as $abs) {
 
         // Pick highest released revision to flag as current.
         if (!empty($releasedTracks)) {
-            $current = pick_current_revision($releasedTracks, $state);
+            $current = pick_current_revision($releasedTracks, $state, $catalogEntry);
             if ($current !== '') {
                 if ($opts['dry_run']) {
                     $stats['current_flags_set']++;
@@ -325,6 +332,57 @@ function read_first_existing_json(array $candidates): ?array
         if (is_array($data)) return $data;
     }
     return null;
+}
+
+/**
+ * Load the runtime-style docs_custom catalog, preferring the ignored local
+ * override file when present and falling back to the tracked baseline.
+ *
+ * @return array<string, array<string, mixed>>
+ */
+function load_custom_doc_catalog(string $rootDir): array
+{
+    $candidates = [
+        rtrim($rootDir, '/') . '/mom/data/config/docs_custom.local.json',
+        rtrim($rootDir, '/') . '/mom/data/config/docs_custom.json',
+    ];
+    foreach ($candidates as $file) {
+        $docs = parse_custom_doc_catalog($file);
+        if ($docs !== []) {
+            return $docs;
+        }
+    }
+    return [];
+}
+
+/**
+ * @return array<string, array<string, mixed>>
+ */
+function parse_custom_doc_catalog(string $file): array
+{
+    if (!is_file($file)) {
+        return [];
+    }
+    $raw = @file_get_contents($file);
+    $data = $raw === false ? null : json_decode($raw, true);
+    if (!is_array($data)) {
+        return [];
+    }
+    $rows = isset($data['docs']) && is_array($data['docs'])
+        ? $data['docs']
+        : (array_is_list($data) ? $data : []);
+    $out = [];
+    foreach ($rows as $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+        $code = strtoupper(trim((string)($row['code'] ?? '')));
+        if ($code === '') {
+            continue;
+        }
+        $out[$code] = $row;
+    }
+    return $out;
 }
 
 function rel_from_root(string $abs, string $rootDir): string
@@ -446,10 +504,11 @@ function extract_effective_date(string $raw): string
  *   2. state.revision (normalised)  — only when state.has_release is truthy
  *   3. highest versioned revision in the released list
  *
- * @param list<string>           $released
+ * @param list<string>              $released
  * @param array<string, mixed>|null $state
+ * @param array<string, mixed>      $legacyCatalog
  */
-function pick_current_revision(array $released, ?array $state): string
+function pick_current_revision(array $released, ?array $state, array $legacyCatalog = []): string
 {
     if (is_array($state)) {
         if (!empty($state['released_revision'])) {
@@ -460,6 +519,10 @@ function pick_current_revision(array $released, ?array $state): string
             $r = normalise_revision((string)$state['revision']);
             if ($r !== '' && in_array($r, $released, true)) return $r;
         }
+    }
+    if (!empty($legacyCatalog['rev'])) {
+        $r = normalise_revision((string)$legacyCatalog['rev']);
+        if ($r !== '' && in_array($r, $released, true)) return $r;
     }
     // Highest numeric rank.
     usort($released, static function (string $a, string $b): int {

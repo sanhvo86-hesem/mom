@@ -7,9 +7,9 @@ declare(strict_types=1);
  * =========================================
  *
  * Exercises the DocumentControlService against a live database using a
- * dedicated `DCC-SIM-TEST-*` namespace. Each scenario first removes any
- * prior simulation state (revisions → history → DCN → DCR → header, in
- * FK dependency order) before running its assertions.
+ * dedicated `DCC-SIM-TEST-*` namespace. Each run gets a unique suffix so the
+ * harness never depends on privileged trigger-disable cleanup against the
+ * append-only audit tables.
  *
  * Scenarios:
  *   --scenario=fresh          Create → patch → submit → approve → DCN →
@@ -26,6 +26,8 @@ declare(strict_types=1);
  *   --scenario=rename         Confirm updateFilenameAnchor rewrites the
  *                             filename column, maintains the unique index,
  *                             and clears the old value.
+ *   --scenario=locale         Confirm metadata stays locale-invariant while
+ *                             label registries differ between vi and en.
  *   --scenario=all            Run each scenario in order.
  *
  * Output is colour-coded (ANSI) for direct reading in a terminal; a final
@@ -65,11 +67,12 @@ $results = [
 ];
 
 $scenarios = match ($opts['scenario']) {
-    'all'          => ['fresh', 'bad-writes', 'audit-trail', 'rename'],
+    'all'          => ['fresh', 'bad-writes', 'audit-trail', 'rename', 'locale'],
     'fresh',
     'bad-writes',
     'audit-trail',
-    'rename'       => [$opts['scenario']],
+    'rename',
+    'locale'       => [$opts['scenario']],
     default        => null,
 };
 if ($scenarios === null) {
@@ -85,6 +88,7 @@ foreach ($scenarios as $scenario) {
             'bad-writes'  => scenario_bad_writes($service, $dl, $results),
             'audit-trail' => scenario_audit_trail($service, $dl, $results),
             'rename'      => scenario_rename($service, $dl, $results),
+            'locale'      => scenario_locale($service, $dl, $results),
         };
     } catch (\Throwable $e) {
         fail($results, "scenario $scenario aborted: " . $e->getMessage());
@@ -118,8 +122,7 @@ function parse_argv(array $argv): array
 
 function scenario_fresh(DocumentControlService $svc, \MOM\Database\DataLayer $dl, array &$results): void
 {
-    $code = 'DCC-SIM-TEST-001';
-    reset_sim_doc($dl, $code);
+    $code = sim_code('001');
 
     // Step 1: upsert creates the header.
     $out = $svc->upsertHeader([
@@ -192,8 +195,7 @@ function scenario_fresh(DocumentControlService $svc, \MOM\Database\DataLayer $dl
 
 function scenario_bad_writes(DocumentControlService $svc, \MOM\Database\DataLayer $dl, array &$results): void
 {
-    $code = 'DCC-SIM-TEST-002';
-    reset_sim_doc($dl, $code);
+    $code = sim_code('002');
 
     // Bootstrap a baseline row so we can drive multi-role / transition checks.
     $svc->upsertHeader([
@@ -255,8 +257,7 @@ function scenario_bad_writes(DocumentControlService $svc, \MOM\Database\DataLaye
 
 function scenario_audit_trail(DocumentControlService $svc, \MOM\Database\DataLayer $dl, array &$results): void
 {
-    $code = 'DCC-SIM-TEST-003';
-    reset_sim_doc($dl, $code);
+    $code = sim_code('003');
 
     // Run a minimal end-to-end cycle.
     $svc->upsertHeader([
@@ -335,8 +336,7 @@ function scenario_audit_trail(DocumentControlService $svc, \MOM\Database\DataLay
 
 function scenario_rename(DocumentControlService $svc, \MOM\Database\DataLayer $dl, array &$results): void
 {
-    $code = 'DCC-SIM-TEST-004';
-    reset_sim_doc($dl, $code);
+    $code = sim_code('004');
 
     $svc->upsertHeader([
         'doc_code' => $code,
@@ -369,70 +369,86 @@ function scenario_rename(DocumentControlService $svc, \MOM\Database\DataLayer $d
     // Uniqueness invariant: inserting a second header sharing the same
     // filename must fail. We use a raw INSERT because the service has no
     // path that sets filename on create.
-    reset_sim_doc($dl, 'DCC-SIM-TEST-005');
+    $collisionCode = sim_code('005');
     $svc->upsertHeader([
-        'doc_code' => 'DCC-SIM-TEST-005',
+        'doc_code' => $collisionCode,
         'title'    => 'rename sim collision',
         'doc_type' => 'SOP',
     ], 'sim-actor');
     $collided = false;
     try {
-        $svc->updateFilenameAnchor('DCC-SIM-TEST-005', 'dcc-sim-test-004-renamed.html', 'mom/docs/system/dcc-sim-test-004-renamed.html');
+        $svc->updateFilenameAnchor($collisionCode, 'dcc-sim-test-004-renamed.html', 'mom/docs/system/dcc-sim-test-004-renamed.html');
     } catch (\Throwable $e) {
         $collided = true;
     }
     assert_eq($results, $collided, true, 'unique filename index blocks duplicate anchor');
-
-    reset_sim_doc($dl, 'DCC-SIM-TEST-005');
 }
 
-/* ── Support: cleanup & assertions ─────────────────────────────────────── */
+/* ── Scenario: locale invariance ───────────────────────────────────────── */
 
-/**
- * Delete every DCC artefact for a simulation doc in FK-safe order. Called
- * at the start of each scenario and after the rename uniqueness check.
- */
-function reset_sim_doc(\MOM\Database\DataLayer $dl, string $code): void
+function scenario_locale(DocumentControlService $svc, \MOM\Database\DataLayer $dl, array &$results): void
 {
-    // Revisions → history → DCN → DCR → header. dcc_document_revision has a
-    // "DELETE forbidden" trigger, so we disable it temporarily using the
-    // trigger manipulation helper. This is a simulation-only utility.
-    try {
-        $dl->execute("ALTER TABLE dcc_document_revision DISABLE TRIGGER trg_dcc_revision_no_delete");
-    } catch (\Throwable $e) {
-        // Table or trigger may not exist in local test DB — push through.
+    $code = sim_code('006');
+
+    $svc->upsertHeader([
+        'doc_code' => $code,
+        'title'    => 'locale sim',
+        'subtitle' => 'Phu de locale',
+        'doc_type' => 'SOP',
+    ], 'sim-actor');
+
+    $vi = $svc->getLocalizedHeader($code, 'vi');
+    $en = $svc->getLocalizedHeader($code, 'en');
+
+    foreach (['title', 'subtitle', 'owner_role_code', 'approver_role_code', 'revision', 'effective_date', 'status'] as $field) {
+        assert_eq(
+            $results,
+            $en[$field] ?? null,
+            $vi[$field] ?? null,
+            "localized header keeps metadata invariant for $field"
+        );
     }
-    try {
-        $dl->execute("DELETE FROM dcc_document_revision WHERE doc_code = :c", [':c' => $code]);
-    } catch (\Throwable $e) {
-        // If the table is missing (pre-155) ignore.
-    } finally {
-        try {
-            $dl->execute("ALTER TABLE dcc_document_revision ENABLE TRIGGER trg_dcc_revision_no_delete");
-        } catch (\Throwable $e) {
-            // ignore
+
+    $labelsVi = labels_by_key($svc->listLabels('vi'));
+    $labelsEn = labels_by_key($svc->listLabels('en'));
+    assert_eq(
+        $results,
+        isset($labelsVi['owner']) && isset($labelsEn['owner']),
+        true,
+        'owner label exists in vi and en'
+    );
+    if (isset($labelsVi['owner'], $labelsEn['owner'])) {
+        assert_eq(
+            $results,
+            (string)($labelsVi['owner']['long_label'] ?? '') !== (string)($labelsEn['owner']['long_label'] ?? ''),
+            true,
+            'owner label text differs between vi and en'
+        );
+    }
+}
+
+/* ── Support: helpers & assertions ─────────────────────────────────────── */
+
+function sim_code(string $suffix): string
+{
+    static $token = null;
+    if ($token === null) {
+        $token = strtoupper(bin2hex(random_bytes(3)));
+    }
+    return 'DCC-SIM-TEST-' . $suffix . '-' . $token;
+}
+
+/** @param list<array<string, mixed>> $rows */
+function labels_by_key(array $rows): array
+{
+    $out = [];
+    foreach ($rows as $row) {
+        $key = strtolower(trim((string)($row['label_key'] ?? '')));
+        if ($key !== '') {
+            $out[$key] = $row;
         }
     }
-    try {
-        $dl->execute("DELETE FROM dcc_document_revision_history WHERE doc_code = :c", [':c' => $code]);
-    } catch (\Throwable $e) {
-        // ignore
-    }
-    try {
-        $dl->execute("DELETE FROM dcc_document_change_notice WHERE doc_code = :c", [':c' => $code]);
-    } catch (\Throwable $e) {
-        // ignore
-    }
-    try {
-        $dl->execute("DELETE FROM dcc_document_change_request WHERE doc_code = :c", [':c' => $code]);
-    } catch (\Throwable $e) {
-        // ignore
-    }
-    try {
-        $dl->execute("DELETE FROM dcc_document_header WHERE doc_code = :c", [':c' => $code]);
-    } catch (\Throwable $e) {
-        // ignore
-    }
+    return $out;
 }
 
 function assert_eq(array &$results, mixed $actual, mixed $expected, string $message): void

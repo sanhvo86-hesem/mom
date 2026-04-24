@@ -67,6 +67,7 @@ $fileByCode = [];
 foreach (walk_docs($ROOT_DIR) as $abs) {
     $code = is_html_path($abs) ? code_from_filename($abs) : code_from_filename_loose($abs);
     if ($code === '') continue;
+    if (is_simulation_code($code)) continue;
     $fileByCode[strtoupper($code)] = $abs;
 }
 
@@ -101,6 +102,7 @@ $total = 0;
 $passed = 0;
 
 foreach ($dbByCode as $key => $row) {
+    if (is_simulation_code($key)) continue;
     if ($opts['filter_prefix'] !== '' && !str_starts_with($key, $opts['filter_prefix'])) continue;
     $total++;
     $entry = ['doc_code' => $row['doc_code'], 'fails' => [], 'simulated' => null];
@@ -178,6 +180,7 @@ foreach ($dbByCode as $key => $row) {
 
 // Also detect orphan files (file exists but no DB row)
 foreach ($fileByCode as $key => $abs) {
+    if (is_simulation_code($key)) continue;
     if (isset($dbByCode[$key])) continue;
     if ($opts['filter_prefix'] !== '' && !str_starts_with($key, $opts['filter_prefix'])) continue;
     $buckets['X_orphan_file']++;
@@ -203,6 +206,11 @@ if ($opts['json']) {
 exit(($total - $passed) > 0 ? 1 : 0);
 
 /* ──────────────────────────────────────────────────────────────────── */
+
+function is_simulation_code(string $code): bool
+{
+    return str_starts_with(strtoupper(trim($code)), 'DCC-SIM-TEST-');
+}
 
 /**
  * Build a plain-text snapshot of what the DCC ribbon will render for this
