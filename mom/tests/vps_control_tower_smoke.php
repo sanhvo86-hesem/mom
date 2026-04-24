@@ -130,6 +130,45 @@ try {
     smoke_assert($service->terminalRequiresWrite('local-vps', 'readonly') === false, 'Readonly terminal should not require write access.');
     smoke_assert($service->observabilityRequiresWrite('local-vps', 'netdata') === false, 'Netdata panel should stay read-only.');
     smoke_assert(($service->getObservabilityPanel('local-vps', 'grafana')['url'] ?? null) === '/ops/grafana/', 'Grafana panel URL should be preserved.');
+
+    if (shell_exec_available()) {
+        $fakeSystemdDir = $tmpDataDir . '/fake-systemd';
+        @mkdir($fakeSystemdDir, 0775, true);
+        $fakeSystemctl = $fakeSystemdDir . '/systemctl';
+        file_put_contents($fakeSystemctl, <<<'SH'
+#!/bin/sh
+if [ "$1" = "is-active" ]; then
+  case "$2" in
+    php8.2-fpm) echo inactive; exit 3 ;;
+    php8.5-fpm) echo active; exit 0 ;;
+    *) echo unknown; exit 3 ;;
+  esac
+fi
+echo unknown
+exit 3
+SH);
+        chmod($fakeSystemctl, 0755);
+        $originalPath = (string)(getenv('PATH') ?: '');
+        putenv('PATH=' . $fakeSystemdDir . PATH_SEPARATOR . $originalPath);
+        try {
+            $probeServices = new ReflectionMethod(VpsService::class, 'probeServices');
+            $serviceProbe = $probeServices->invoke($service, [
+                'mode' => 'local',
+                'services' => [[
+                    'name' => 'php-fpm',
+                    'unit_candidates' => ['php8.2-fpm', 'php8.5-fpm'],
+                ]],
+            ]);
+            smoke_assert(
+                (($serviceProbe['statuses'][0] ?? [])['status'] ?? null) === 'active'
+                && (($serviceProbe['statuses'][0] ?? [])['resolved_unit'] ?? null) === 'php8.5-fpm',
+                'Service probe should prefer active php8.5-fpm over stale inactive php8.2-fpm.'
+            );
+        } finally {
+            putenv('PATH=' . $originalPath);
+        }
+    }
+
     $setupAsset = $service->resolveAsset('./docs/system/vps-terminal-gateway-setup-2026-04-09.md');
     smoke_assert(($setupAsset['kind'] ?? null) === 'markdown', 'Setup markdown should resolve as a markdown asset.');
     smoke_assert(is_file((string)($setupAsset['absolute_path'] ?? '')), 'Resolved asset should point to a real file.');

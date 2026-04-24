@@ -2070,7 +2070,7 @@ BASH;
             }
 
             $loop = implode(' ', array_map('escapeshellarg', $units));
-            $parts[] = "if command -v systemctl >/dev/null 2>&1; then resolved=''; state=''; for unit in {$loop}; do current_state=\"\$(systemctl is-active \"\$unit\" 2>/dev/null || true)\"; if [ -n \"\$current_state\" ] && [ \"\$current_state\" != 'unknown' ]; then resolved=\"\$unit\"; state=\"\$current_state\"; break; fi; done; [ -n \"\$state\" ] || state='unknown'; printf '__SERVICE__|{$index}|%s|%s\\n' \"\$resolved\" \"\$state\"; else printf '__SERVICE__|{$index}||unavailable\\n'; fi";
+            $parts[] = "if command -v systemctl >/dev/null 2>&1; then resolved=''; state=''; for unit in {$loop}; do current_state=\"\$(systemctl is-active \"\$unit\" 2>/dev/null || true)\"; if [ \"\$current_state\" = 'active' ]; then resolved=\"\$unit\"; state='active'; break; fi; if [ -z \"\$state\" ] && [ -n \"\$current_state\" ] && [ \"\$current_state\" != 'unknown' ]; then resolved=\"\$unit\"; state=\"\$current_state\"; fi; done; [ -n \"\$state\" ] || state='unknown'; printf '__SERVICE__|{$index}|%s|%s\\n' \"\$resolved\" \"\$state\"; else printf '__SERVICE__|{$index}||unavailable\\n'; fi";
         }
 
         if ($parts === []) {

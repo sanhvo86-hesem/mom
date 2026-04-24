@@ -250,7 +250,7 @@
           "name": "php-fpm",
           "label": "PHP-FPM",
           "kind": "systemd",
-          "unit_candidates": ["php8.2-fpm", "php8.3-fpm", "php8.4-fpm", "php-fpm"]
+          "unit_candidates": ["php8.5-fpm", "php-fpm"]
         },
         {
           "name": "postgresql",
