@@ -7,6 +7,7 @@ namespace MOM\Tests\Unit\Services;
 use MOM\Database\DataLayer;
 use MOM\Services\DocumentControl\DocumentLocaleAutomationService;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 use ReflectionMethod;
 
 final class DocumentLocaleAutomationServiceTest extends TestCase
@@ -145,6 +146,10 @@ PHP);
     public function testBoundedOutputAppendNeverExceedsConfiguredCap(): void
     {
         $service = $this->newService();
+        $class = new ReflectionClass(DocumentLocaleAutomationService::class);
+        $constant = $class->getReflectionConstant('MAX_COMMAND_OUTPUT_BYTES');
+        $this->assertNotFalse($constant);
+        $cap = (int)$constant->getValue();
         $method = new ReflectionMethod(DocumentLocaleAutomationService::class, 'appendBoundedCommandOutput');
         set_error_handler(
             static function (int $severity, string $message): bool {
@@ -161,7 +166,8 @@ PHP);
         }
 
         $this->assertIsString($result);
-        $this->assertLessThanOrEqual(131072, strlen($result));
+        $this->assertLessThanOrEqual($cap, strlen($result));
+        $this->assertGreaterThan(131072, strlen($result));
     }
 
     private function newService(): DocumentLocaleAutomationService

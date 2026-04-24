@@ -24,9 +24,9 @@ final class DocumentLocaleAutomationService
 {
     private const TARGET_LOCALE = 'en';
     private const DRIVER_COMMAND = 'command';
-    private const DEFAULT_COMMAND_TIMEOUT_SECONDS = 300;
+    private const DEFAULT_COMMAND_TIMEOUT_SECONDS = 1800;
     private const COMMAND_IO_POLL_MICROSECONDS = 200000;
-    private const MAX_COMMAND_OUTPUT_BYTES = 131072;
+    private const MAX_COMMAND_OUTPUT_BYTES = 33554432;
     private const MAX_COMMAND_MESSAGE_BYTES = 4096;
 
     public function __construct(
@@ -659,7 +659,7 @@ final class DocumentLocaleAutomationService
             2 => ['pipe', 'w'],
         ];
 
-        $process = @proc_open(['/bin/sh', '-lc', $command], $spec, $pipes, $this->rootDir);
+        $process = @proc_open(['/bin/sh', '-lc', 'exec ' . $command], $spec, $pipes, $this->rootDir);
         if (!is_resource($process)) {
             return [
                 'ok' => false,
@@ -859,7 +859,7 @@ final class DocumentLocaleAutomationService
     {
         $raw = trim((string)(getenv('DCC_TRANSLATION_COMMAND_TIMEOUT_SECONDS') ?: ''));
         $value = ctype_digit($raw) ? (int)$raw : self::DEFAULT_COMMAND_TIMEOUT_SECONDS;
-        return max(1, min(600, $value));
+        return max(1, min(3600, $value));
     }
 
     /**

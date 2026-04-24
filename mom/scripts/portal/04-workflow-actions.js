@@ -987,8 +987,9 @@ async function ensureDocEnglishLocaleArtifact(doc, options){
     return { ok: true, skipped: true, reason: 'locale_artifact_already_available', translationState: translationState || 'released' };
   }
   const staleRenderableVariant = !!(localeView && !localeView.available && localeView.localeVariantExists && isRenderableLocaleArtifactState(translationState));
+  const unpublishedPreviewRetry = !!(localeView && localeView.localeVariantExists && !localeView.localeArtifactPresent && isRenderableLocaleArtifactState(translationState));
   const blockedVariantRetry = translationState === 'blocked';
-  if(!opts.force && !blockedVariantRetry && translationState !== '' && translationState !== 'missing' && !staleRenderableVariant){
+  if(!opts.force && !blockedVariantRetry && !unpublishedPreviewRetry && translationState !== '' && translationState !== 'missing' && !staleRenderableVariant){
     return { ok: true, skipped: true, reason: 'locale_state_not_bootstrappable', translationState };
   }
 

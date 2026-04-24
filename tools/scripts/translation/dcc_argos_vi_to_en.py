@@ -11,8 +11,10 @@ This script is intentionally repo-local and on-prem friendly:
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import re
+import sqlite3
 import sys
 from html import unescape
 from pathlib import Path
@@ -195,11 +197,13 @@ POST_FIXES = [
     ("the source", "the source"),
     ("inters with", "stop deviation at"),
 ]
-SEGMENT_BATCH_SIZE = 24
-SEGMENT_BATCH_MAX_CHARS = 3600
+SEGMENT_BATCH_SIZE = 48
+SEGMENT_BATCH_MAX_CHARS = 9000
+CACHE_SCHEMA_VERSION = "argos_local_vi_en_v1"
 
 _translator = None
 _glossary_phrases: List[Tuple[str, str]] | None = None
+_cache_disabled = False
 
 
 def read_payload() -> Dict[str, object]:
@@ -365,8 +369,8 @@ def build_translation_plan(text: str):
 
 
 def parse_batched_translation_output(text: str, expected_count: int):
-    markers = list(re.finditer(r"ID(\d{4})\s*:+", text))
-    if len(markers) < expected_count:
+    markers = list(re.finditer(r"(?m)(?:^|\n)\s*(?:ID)?\[?(\d{4})\]?\s*:*\s*", text))
+    if not markers:
         return None
     values: Dict[int, str] = {}
     for index, marker in enumerate(markers):
@@ -376,16 +380,16 @@ def parse_batched_translation_output(text: str, expected_count: int):
         start = marker.end()
         end = markers[index + 1].start() if index + 1 < len(markers) else len(text)
         values[key] = text[start:end].strip()
-    if len(values) != expected_count:
+    if not values:
         return None
-    return [values[i] for i in range(1, expected_count + 1)]
+    return [values.get(i, "") for i in range(1, expected_count + 1)]
 
 
 def translate_batch(segments: List[str], translator) -> Dict[str, str]:
     if not segments:
         return {}
 
-    payload_lines = [f"ID{index + 1:04d}::{segment}" for index, segment in enumerate(segments)]
+    payload_lines = [f"[{index + 1:04d}] {segment}" for index, segment in enumerate(segments)]
     translated = translator.translate("\n".join(payload_lines))
     parsed = parse_batched_translation_output(translated, len(segments))
     if parsed is None:
@@ -393,7 +397,99 @@ def translate_batch(segments: List[str], translator) -> Dict[str, str]:
     return {
         segments[index]: cleanup_translation(parsed[index])
         for index in range(len(segments))
+        if parsed[index].strip()
     }
+
+
+def translation_cache_path() -> Path:
+    runtime_home = Path(os.environ.get("DCC_TRANSLATION_RUNTIME_HOME", "") or (ROOT / "mom" / "data" / "cache" / "dcc-translation-runtime"))
+    return runtime_home / "segment-cache.sqlite3"
+
+
+def cache_key(segment: str) -> str:
+    return hashlib.sha256((CACHE_SCHEMA_VERSION + "\n" + segment).encode("utf-8")).hexdigest()
+
+
+def open_cache():
+    global _cache_disabled
+    if _cache_disabled:
+        return None
+    path = translation_cache_path()
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        conn = sqlite3.connect(str(path), timeout=30)
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS segment_translation_cache ("
+            "cache_key TEXT PRIMARY KEY, "
+            "source_text TEXT NOT NULL, "
+            "translated_text TEXT NOT NULL, "
+            "engine_version TEXT NOT NULL, "
+            "updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)"
+        )
+        return conn
+    except Exception:
+        _cache_disabled = True
+        return None
+
+
+def load_cached_translations(segments: List[str]) -> Dict[str, str]:
+    conn = open_cache()
+    if conn is None or not segments:
+        return {}
+    try:
+        keys = {cache_key(segment): segment for segment in segments}
+        out: Dict[str, str] = {}
+        key_items = list(keys.items())
+        for start in range(0, len(key_items), 400):
+            chunk = key_items[start : start + 400]
+            placeholders = ",".join("?" for _ in chunk)
+            rows = conn.execute(
+                f"SELECT cache_key, translated_text FROM segment_translation_cache WHERE cache_key IN ({placeholders})",
+                [key for key, _segment in chunk],
+            ).fetchall()
+            for key, translated in rows:
+                segment = keys.get(str(key))
+                if segment is not None and isinstance(translated, str) and translated.strip():
+                    out[segment] = translated
+        return out
+    except Exception:
+        return {}
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
+
+
+def store_cached_translations(translated_map: Dict[str, str]) -> None:
+    conn = open_cache()
+    if conn is None or not translated_map:
+        return
+    try:
+        rows = [
+            (cache_key(source), source, translated, CACHE_SCHEMA_VERSION)
+            for source, translated in translated_map.items()
+            if source and translated
+        ]
+        conn.executemany(
+            "INSERT INTO segment_translation_cache "
+            "(cache_key, source_text, translated_text, engine_version, updated_at) "
+            "VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP) "
+            "ON CONFLICT(cache_key) DO UPDATE SET "
+            "translated_text=excluded.translated_text, "
+            "engine_version=excluded.engine_version, "
+            "updated_at=CURRENT_TIMESTAMP",
+            rows,
+        )
+        conn.commit()
+    except Exception:
+        pass
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
 
 
 def translate_core_map(cores: Iterable[str], translator) -> Dict[str, str]:
@@ -405,7 +501,8 @@ def translate_core_map(cores: Iterable[str], translator) -> Dict[str, str]:
         seen.add(core)
         ordered.append(core)
 
-    translated_map: Dict[str, str] = {}
+    translated_map: Dict[str, str] = load_cached_translations(ordered)
+    newly_translated: Dict[str, str] = {}
     batch: List[str] = []
     batch_chars = 0
 
@@ -414,15 +511,19 @@ def translate_core_map(cores: Iterable[str], translator) -> Dict[str, str]:
         if not batch:
             return
         batched = translate_batch(batch, translator)
-        if len(batched) != len(batch):
-            for item in batch:
-                translated_map[item] = cleanup_translation(translator.translate(item))
-        else:
-            translated_map.update(batched)
+        translated_map.update(batched)
+        newly_translated.update(batched)
+        for item in batch:
+            if item not in batched:
+                translated = cleanup_translation(translator.translate(item))
+                translated_map[item] = translated
+                newly_translated[item] = translated
         batch = []
         batch_chars = 0
 
     for core in ordered:
+        if core in translated_map:
+            continue
         estimated = len(core) + 12
         if batch and (len(batch) >= SEGMENT_BATCH_SIZE or (batch_chars + estimated) > SEGMENT_BATCH_MAX_CHARS):
             flush_batch()
@@ -430,6 +531,7 @@ def translate_core_map(cores: Iterable[str], translator) -> Dict[str, str]:
         batch_chars += estimated
 
     flush_batch()
+    store_cached_translations(newly_translated)
     return translated_map
 
 

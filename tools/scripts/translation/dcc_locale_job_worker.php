@@ -23,14 +23,8 @@ if ($jobPath === '' || !is_file($jobPath)) {
     exit(1);
 }
 
-$queueLockPath = $rootDir . '/mom/data/cache/dcc-locale-jobs/.worker-global.lock';
-$queueLock = @fopen($queueLockPath, 'c');
-if (!is_resource($queueLock)) {
-    fwrite(STDERR, "Unable to open queue lock file\n");
-    exit(1);
-}
-if (!@flock($queueLock, LOCK_EX | LOCK_NB)) {
-    fclose($queueLock);
+$queueLock = acquireQueueWorkerLock($rootDir);
+if ($queueLock === null) {
     exit(0);
 }
 
@@ -61,15 +55,53 @@ try {
     }
 } catch (Throwable $e) {
     @error_log('[DCC locale worker] ' . $e->getMessage());
-    @flock($queueLock, LOCK_UN);
-    fclose($queueLock);
+    releaseQueueWorkerLock($queueLock);
     exit(1);
 }
 
-@flock($queueLock, LOCK_UN);
-fclose($queueLock);
+releaseQueueWorkerLock($queueLock);
 
 exit(0);
+
+/**
+ * @return array{handle: resource, slot: int}|null
+ */
+function acquireQueueWorkerLock(string $rootDir): ?array
+{
+    $slotCount = configuredWorkerSlotCount();
+    for ($slot = 0; $slot < $slotCount; $slot++) {
+        $queueLockPath = $rootDir . '/mom/data/cache/dcc-locale-jobs/.worker-global.' . $slot . '.lock';
+        $queueLock = @fopen($queueLockPath, 'c');
+        if (!is_resource($queueLock)) {
+            continue;
+        }
+        if (@flock($queueLock, LOCK_EX | LOCK_NB)) {
+            return ['handle' => $queueLock, 'slot' => $slot];
+        }
+        fclose($queueLock);
+    }
+
+    return null;
+}
+
+/**
+ * @param array{handle: resource, slot: int} $queueLock
+ */
+function releaseQueueWorkerLock(array $queueLock): void
+{
+    $handle = $queueLock['handle'];
+    if (is_resource($handle)) {
+        @flock($handle, LOCK_UN);
+        fclose($handle);
+    }
+}
+
+function configuredWorkerSlotCount(): int
+{
+    $raw = trim((string)(getenv('DCC_TRANSLATION_WORKER_SLOTS') ?: '1'));
+    $slots = ctype_digit($raw) ? (int)$raw : 1;
+    return max(1, min(4, $slots));
+}
 
 /**
  * @return list<string>
