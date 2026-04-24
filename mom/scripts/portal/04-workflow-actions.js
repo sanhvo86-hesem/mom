@@ -1049,7 +1049,10 @@ function scheduleDocEnglishLocalePolling(code){
   if(!docCode) return;
   const token = String(Date.now()) + ':' + Math.random().toString(36).slice(2);
   __DOC_ENGLISH_LOCALE_POLL_TOKENS[docCode] = token;
-  [5000, 15000, 30000, 60000, 120000, 240000].forEach(function(delay){
+  // Large controlled manuals can take slightly longer than the original
+  // 4-minute ceiling on CPU-only on-prem MT. Keep polling long enough for
+  // the queued artifact to surface without forcing a hard refresh.
+  [5000, 15000, 30000, 60000, 120000, 240000, 300000, 420000, 600000].forEach(function(delay){
     setTimeout(async function(){
       if(__DOC_ENGLISH_LOCALE_POLL_TOKENS[docCode] !== token) return;
       if(lang !== 'en' || editMode || currentDoc !== docCode) return;
