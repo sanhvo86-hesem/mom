@@ -7,3 +7,7 @@
 *.php text eol=lf
 *.py text eol=lf
 *.sql text eol=lf
+
+# Visual regression baselines - binary, do not normalize line endings
+tests/e2e/**/*.png binary
+*.png binary

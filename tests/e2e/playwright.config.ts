@@ -7,8 +7,10 @@ export default defineConfig({
   expect: {
     timeout: 5_000,
     toHaveScreenshot: {
-      maxDiffPixels: 200,
-      threshold: 0.15,
+      // Allow up to 100 differing pixels and 10% per-channel tolerance
+      // for anti-alias jitter and sub-pixel font rendering across runs.
+      maxDiffPixels: 100,
+      threshold: 0.1,
       animations: 'disabled'
     }
   },
@@ -20,7 +22,7 @@ export default defineConfig({
     ['html', { outputFolder: '../../.codex-playwright/module-template-v4-report', open: 'never' }]
   ],
   outputDir: '../../.codex-playwright/module-template-v4-results',
-  snapshotPathTemplate: '__snapshots__/{testFilePath}/{arg}-{projectName}{ext}',
+  snapshotPathTemplate: '{testFilePath}-snapshots/{arg}-{projectName}{ext}',
   use: {
     baseURL: 'http://127.0.0.1:8091',
     trace: 'retain-on-failure',
