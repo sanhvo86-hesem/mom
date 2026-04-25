@@ -205,7 +205,13 @@ function _loadLabels(locale){
     function _cachedHeader(docCode, locale){
         var code = String(docCode || '').toUpperCase();
         if (!code) return null;
-        return _headerCache[_cacheKey(code, locale)] || _latestHeaderByDoc[code] || null;
+        return _headerCache[_cacheKey(code, locale)] || null;
+    }
+
+    function _cachedHeaderAnyLocale(docCode){
+        var code = String(docCode || '').toUpperCase();
+        if (!code) return null;
+        return _latestHeaderByDoc[code] || null;
     }
 
 function _loadHeader(docCode, locale){
@@ -467,10 +473,10 @@ window.DccHeader = {
      * the renderer has not yet fetched that doc. Callers must treat a null
      * result as "use your fallback chain"; never synthesize a default.
      */
-        getCached: function(docCode){
+        getCached: function(docCode, locale){
             if (!docCode) return null;
-            var key = String(docCode).toUpperCase();
-            return _latestHeaderByDoc[key] || null;
+            if (locale) return _cachedHeader(docCode, locale);
+            return _cachedHeaderAnyLocale(docCode);
         },
         _clearCache: function(){
             _labelsCache = {};

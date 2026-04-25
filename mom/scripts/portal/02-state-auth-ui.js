@@ -2965,6 +2965,9 @@ async function openDoc(code){
   editingDoc=null;
   currentDoc=resolvedCode;
   window.currentDocPath = String(doc.path || '');
+  const openViewTxn = (typeof beginPortalDocViewTransaction === 'function')
+    ? beginPortalDocViewTransaction('open-doc', doc, lang)
+    : null;
   setDocHeaderMetaCollapsed(true);
   try{ if(typeof resetDocViewerZoom==='function') resetDocViewerZoom(); }catch(e){}
   edFullscreen=false;
@@ -3008,7 +3011,9 @@ async function openDoc(code){
   updateDocViewerHeader(doc);
   renderWorkflowPanel(doc);
   renderVersionHistory(doc);
-  const openRenderToken = `${resolvedCode}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
+  const openRenderToken = openViewTxn
+    ? openViewTxn.token
+    : `${resolvedCode}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
   window.__DOC_VIEW_RENDER_TOKEN = openRenderToken;
 
   // Load current document HTML immediately
@@ -3033,6 +3038,7 @@ async function openDoc(code){
         try{
           if(currentDoc !== resolvedCode) return;
           if(window.__DOC_VIEW_RENDER_TOKEN !== openRenderToken) return;
+          if(openViewTxn && !isPortalDocViewTransactionCurrent(openViewTxn, resolvedCode)) return;
           const latestDoc = resolveDocRecord(resolvedCode) || doc;
           if(isDocHidden(latestDoc.code) && !isAdmin()) return;
           if(!canAccessDoc(latestDoc.code)) return;
@@ -3061,6 +3067,7 @@ async function openDoc(code){
       try{
         if(currentDoc !== resolvedCode) return;
         if(window.__DOC_VIEW_RENDER_TOKEN !== openRenderToken) return;
+        if(openViewTxn && !isPortalDocViewTransactionCurrent(openViewTxn, resolvedCode)) return;
         const latestDoc = resolveDocRecord(resolvedCode) || doc;
         if(isDocHidden(latestDoc.code) && !isAdmin()) return;
         if(!canAccessDoc(latestDoc.code)) return;
@@ -3094,12 +3101,18 @@ async function openDocPreview(code){
     const resolvedCode = String(doc.code || '').trim();
     if(isDocHidden(doc.code) && !isAdmin()) return;
     if(!canAccessDoc(doc.code)) return;
-    const previewRenderToken = `${resolvedCode}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
+    const previewViewTxn = (typeof beginPortalDocViewTransaction === 'function')
+      ? beginPortalDocViewTransaction('open-doc-preview', doc, lang)
+      : null;
+    const previewRenderToken = previewViewTxn
+      ? previewViewTxn.token
+      : `${resolvedCode}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
     window.__DOC_VIEW_RENDER_TOKEN = previewRenderToken;
     // Pull the latest server state/versions to keep folder-sync accurate
     try{ await refreshDocFromServer(resolvedCode); }catch(e){}
     if(currentDoc !== resolvedCode) return;
     if(window.__DOC_VIEW_RENDER_TOKEN !== previewRenderToken) return;
+    if(previewViewTxn && !isPortalDocViewTransactionCurrent(previewViewTxn, resolvedCode)) return;
     const latestDoc = resolveDocRecord(resolvedCode) || doc;
     if(isDocHidden(latestDoc.code) && !isAdmin()) return;
     if(!canAccessDoc(latestDoc.code)) return;
@@ -3148,6 +3161,7 @@ function closeDocViewer(){
   editMode=false;
   editingDoc=null;
   currentDoc=null;
+  try{ if(typeof clearPortalDocViewTransaction === 'function') clearPortalDocViewTransaction('close-doc-viewer'); }catch(e){}
   setDocHeaderMetaCollapsed(true);
   try{ if(typeof resetDocViewerZoom==='function') resetDocViewerZoom(); }catch(e){}
   // Clean up iframe state to prevent stale content
@@ -3229,9 +3243,14 @@ function applyRuntimeDocDisplayMetadata(doc, meta){
   const desc = String(meta.desc || '').trim();
   if(code) doc.__displayCode = code;
   if(title) doc.__displayTitle = title;
-  if(desc) doc.__displayDesc = desc;
+  if(desc) {
+    doc.__displayDesc = desc;
+    doc.__displayDescLocale = lang === 'en' ? 'en' : 'vi';
+  }
 
   if(String(currentDoc || '') !== String(doc.code || '')) return;
+  const viewTxn = (typeof getPortalDocViewTransaction === 'function') ? getPortalDocViewTransaction() : null;
+  if(viewTxn && typeof isPortalDocViewTransactionCurrent === 'function' && !isPortalDocViewTransactionCurrent(viewTxn, doc)) return;
 
   try{
     const bc = document.getElementById('header-breadcrumb');
@@ -3366,8 +3385,13 @@ function updateDocViewerHeader(doc){
 	    </div>`;
   const dccEl = headerEl.querySelector('.dcc-header');
   if (dccEl && window.DccHeader && typeof window.DccHeader.render === 'function') {
+    const headerViewTxn = (typeof getPortalDocViewTransaction === 'function') ? getPortalDocViewTransaction() : null;
     Promise.resolve(window.DccHeader.render(dccEl))
-      .then(function(){ if (canEditMeta) _injectDccMetaEditButtons(dccEl, doc.code); })
+      .then(function(){
+        if(headerViewTxn && typeof isPortalDocViewTransactionCurrent === 'function' && !isPortalDocViewTransactionCurrent(headerViewTxn, doc)) return;
+        if(!dccEl.isConnected) return;
+        if (canEditMeta) _injectDccMetaEditButtons(dccEl, doc.code);
+      })
       .catch(function(){ /* renderer already paints its own error box */ });
   }
   syncDocViewerDetailVisibility();

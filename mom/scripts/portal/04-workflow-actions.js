@@ -755,6 +755,7 @@ function closeDocViewerForce(){
   editMode=false;
   editingDoc=null;
   currentDoc=null;
+  try{ if(typeof clearPortalDocViewTransaction === 'function') clearPortalDocViewTransaction('close-doc-viewer-force'); }catch(e){}
   edClearInjectedDocShellStyles();
   try{ resetDocViewerZoom(); }catch(e){}
   var iframe=document.getElementById('doc-iframe');
@@ -1033,6 +1034,7 @@ async function ensureDocEnglishLocaleArtifact(doc, options){
 
 function triggerDocEnglishLocaleBootstrap(doc, options){
   if(lang !== 'en' || !doc) return;
+  const viewTxn = (typeof getPortalDocViewTransaction === 'function') ? getPortalDocViewTransaction() : null;
   const beforeLocaleSignature = (function(){
     try{
       const lv = getDocLocaleView(doc);
@@ -1049,6 +1051,7 @@ function triggerDocEnglishLocaleBootstrap(doc, options){
     }
     if(editMode) return;
     if(!code || currentDoc !== code) return;
+    if(viewTxn && typeof isPortalDocViewTransactionCurrent === 'function' && !isPortalDocViewTransactionCurrent(viewTxn, doc, 'en')) return;
     const latestDoc = (typeof window._resolveDocRecord === 'function') ? window._resolveDocRecord(code) : doc;
     try{ updateDocViewerHeader(latestDoc); }catch(e){}
     try{ renderWorkflowPanel(latestDoc); }catch(e){}
@@ -1074,6 +1077,7 @@ function scheduleDocEnglishLocalePolling(code){
   const docCode = String(code || '').trim();
   if(!docCode) return;
   const token = String(Date.now()) + ':' + Math.random().toString(36).slice(2);
+  const viewTxn = (typeof getPortalDocViewTransaction === 'function') ? getPortalDocViewTransaction() : null;
   __DOC_ENGLISH_LOCALE_POLL_TOKENS[docCode] = token;
   // Large controlled manuals can take slightly longer than the original
   // 4-minute ceiling on CPU-only on-prem MT. Keep polling long enough for
@@ -1082,6 +1086,7 @@ function scheduleDocEnglishLocalePolling(code){
     setTimeout(async function(){
       if(__DOC_ENGLISH_LOCALE_POLL_TOKENS[docCode] !== token) return;
       if(lang !== 'en' || editMode || currentDoc !== docCode) return;
+      if(viewTxn && typeof isPortalDocViewTransactionCurrent === 'function' && !isPortalDocViewTransactionCurrent(viewTxn, docCode, 'en')) return;
       try{
         if(typeof refreshDccOverlayFromServer === 'function'){
           await refreshDccOverlayFromServer({refreshUi:false});
@@ -2259,7 +2264,7 @@ function defaultDccBootstrapLabels(){
   };
 }
 
-function syncIframeDccBootstrapMetadata(idoc, doc){
+function syncIframeDccBootstrapMetadata(idoc, doc, locale){
   if(!idoc || !doc) return false;
   const headerEl = idoc.querySelector('.dcc-header');
   if(!headerEl) return false;
@@ -2278,7 +2283,7 @@ function syncIframeDccBootstrapMetadata(idoc, doc){
   try{
     headerEl.setAttribute('data-dcc-bootstrap', JSON.stringify(payload));
     if(meta.doc_code) headerEl.setAttribute('data-dcc-doc-code', meta.doc_code);
-    headerEl.setAttribute('data-dcc-locale', lang === 'en' ? 'en' : 'vi');
+    headerEl.setAttribute('data-dcc-locale', locale === 'en' ? 'en' : 'vi');
     headerEl.setAttribute('data-dcc-bootstrap-source', 'portal-authoritative');
   }catch(_e){}
   return true;
@@ -2290,7 +2295,7 @@ function syncIframeDocumentHeaderMetadata(idoc, doc, options){
     const opts = (options && typeof options === 'object') ? options : {};
     const activeLocale = opts.locale === 'en' ? 'en' : (lang === 'en' ? 'en' : 'vi');
     if(activeLocale === 'en'){
-      syncIframeDccBootstrapMetadata(idoc, doc);
+      syncIframeDccBootstrapMetadata(idoc, doc, activeLocale);
     }
     const publishedMeta = activeLocale === 'en' ? {code:'', title:'', desc:''} : extractIframePublishedDocMetadata(idoc);
     const authoritative = getAuthoritativeDccHeaderMeta(doc);
@@ -2367,9 +2372,10 @@ function createDocIframeLoadContext(iframe, doc, localeView){
   const path = qmsNormalizeDocLoadPath(doc && doc.path);
   const file = qmsNormalizeDocLoadPath(localeView && localeView.file);
   const signature = getDocIframeLoadSignature(doc, localeView);
+  const viewTxn = (typeof getPortalDocViewTransaction === 'function') ? getPortalDocViewTransaction() : null;
   const seq = ++__QMS_DOC_IFRAME_LOAD_SEQ;
   const token = [seq, activeLang, code, path, file, Date.now(), Math.random().toString(36).slice(2)].join('|');
-  const ctx = {token, seq, lang: activeLang, code, path, file, signature};
+  const ctx = {token, seq, lang: activeLang, code, path, file, signature, viewToken: viewTxn && viewTxn.token ? viewTxn.token : ''};
   try{
     if(iframe){
       iframe.__qmsDocLoadToken = token;
@@ -2408,6 +2414,11 @@ function isCurrentDocIframeLoad(iframe, ctx){
     if(String(currentDoc || '').trim() !== ctx.code) return false;
     const currentPath = qmsNormalizeDocLoadPath(window.currentDocPath || '');
     if(ctx.path && currentPath && currentPath !== ctx.path) return false;
+    if(ctx.viewToken && typeof getPortalDocViewTransaction === 'function'){
+      const viewTxn = getPortalDocViewTransaction();
+      if(!viewTxn || viewTxn.token !== ctx.viewToken) return false;
+      if(typeof isPortalDocViewTransactionCurrent === 'function' && !isPortalDocViewTransactionCurrent(viewTxn, {code: ctx.code, path: ctx.path}, ctx.lang)) return false;
+    }
     return true;
   }catch(e){
     return false;
@@ -2673,7 +2684,7 @@ function loadDocContent(code){
           if(dc) dc.innerHTML = edited;
           else if(idoc.body) idoc.body.innerHTML = edited;
         }
-        try{ syncIframeDocumentHeaderMetadata(idoc, doc, {locale: lang}); }catch(_e){}
+        try{ syncIframeDocumentHeaderMetadata(idoc, doc, {locale: loadCtx.lang}); }catch(_e){}
         try{
           if(idoc && typeof edApplyGlobalTablePolicyToDocument==='function'){
             edApplyGlobalTablePolicyToDocument(idoc, {force:true, source:'view-load'});
@@ -2691,9 +2702,13 @@ function loadDocContent(code){
             }, 1200);
           }
         }catch(e){}
-        // Keep the iframe document aware of the active locale so DCC/header
-        // components can re-render from authoritative locale data.
-        try{ scheduleIframeDocumentLanguageSync(iframe, loadCtx.lang, loadCtx.token); }catch(e){}
+        try{
+          if(idoc && idoc.documentElement){
+            idoc.documentElement.lang = loadCtx.lang;
+            idoc.documentElement.setAttribute('data-qms-view-lang', loadCtx.lang);
+          }
+          if(idoc && idoc.body) idoc.body.setAttribute('data-qms-view-lang', loadCtx.lang);
+        }catch(e){}
         try{ if(typeof attachIframeLinkBridge==='function') attachIframeLinkBridge(iframe, doc, viewFile); }catch(e){}
         try{ attachIframeViewerZoom(iframe); }catch(e){}
         try{ resetIframeViewerScroll(idoc); }catch(e){}

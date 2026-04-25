@@ -1345,6 +1345,105 @@ function isPortalDocViewerOpen(){
   }
 }
 
+let __QMS_DOC_VIEW_TXN_SEQ = 0;
+let __QMS_ACTIVE_DOC_VIEW_TXN = null;
+
+function normalizePortalViewLang(value){
+  return value === 'en' ? 'en' : 'vi';
+}
+
+function normalizePortalViewPath(path){
+  try{
+    if(typeof normalizeDocRelativePath === 'function'){
+      return normalizeDocRelativePath(path);
+    }
+  }catch(e){}
+  try{
+    return String(path || '').trim().replace(/\\/g, '/').replace(/^\/+/, '').replace(/^\.\//, '');
+  }catch(e){
+    return '';
+  }
+}
+
+function resolvePortalDocViewIdentity(docOrCode){
+  let doc = null;
+  try{
+    if(docOrCode && typeof docOrCode === 'object'){
+      doc = docOrCode;
+    }else if(typeof window._resolveDocRecord === 'function'){
+      doc = window._resolveDocRecord(docOrCode);
+    }else if(Array.isArray(DOCS)){
+      const raw = String(docOrCode || '').trim();
+      doc = DOCS.find(d => String(d && d.code || '').trim() === raw) || null;
+    }
+  }catch(e){
+    doc = null;
+  }
+  const code = String((doc && doc.code) || (typeof docOrCode === 'string' ? docOrCode : '') || '').trim();
+  const path = normalizePortalViewPath((doc && doc.path) || window.currentDocPath || '');
+  return {doc, code, path};
+}
+
+function beginPortalDocViewTransaction(reason, docOrCode, langOverride){
+  const identity = resolvePortalDocViewIdentity(docOrCode);
+  const activeLang = normalizePortalViewLang(langOverride || lang);
+  const seq = ++__QMS_DOC_VIEW_TXN_SEQ;
+  const token = [seq, activeLang, identity.code, identity.path, Date.now(), Math.random().toString(36).slice(2)].join('|');
+  const txn = {
+    token,
+    seq,
+    lang: activeLang,
+    code: identity.code,
+    path: identity.path,
+    reason: String(reason || 'doc-view'),
+    createdAt: Date.now()
+  };
+  __QMS_ACTIVE_DOC_VIEW_TXN = txn;
+  try{
+    window.__QMS_ACTIVE_DOC_VIEW_TXN = txn;
+    window.__DOC_VIEW_RENDER_TOKEN = token;
+  }catch(e){}
+  return txn;
+}
+
+function getPortalDocViewTransaction(){
+  return __QMS_ACTIVE_DOC_VIEW_TXN || null;
+}
+
+function isPortalDocViewTransactionCurrent(txn, docOrCode, langOverride){
+  try{
+    if(!txn || !__QMS_ACTIVE_DOC_VIEW_TXN || __QMS_ACTIVE_DOC_VIEW_TXN.token !== txn.token) return false;
+    const activeLang = normalizePortalViewLang(langOverride || lang);
+    if(activeLang !== txn.lang) return false;
+    if(String(currentDoc || '').trim() !== String(txn.code || '').trim()) return false;
+    const currentPath = normalizePortalViewPath(window.currentDocPath || '');
+    if(txn.path && currentPath && txn.path !== currentPath) return false;
+    if(docOrCode){
+      const identity = resolvePortalDocViewIdentity(docOrCode);
+      if(identity.code && identity.code !== txn.code) return false;
+      if(identity.path && txn.path && identity.path !== txn.path) return false;
+    }
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+
+function clearPortalDocViewTransaction(reason){
+  try{
+    __QMS_ACTIVE_DOC_VIEW_TXN = null;
+    window.__QMS_ACTIVE_DOC_VIEW_TXN = null;
+    if(reason && window.__QMS_DEBUG_DOC_VIEW_TXN){
+      console.debug('[QMS] cleared doc view transaction:', reason);
+    }
+  }catch(e){}
+}
+
+window.beginPortalDocViewTransaction = beginPortalDocViewTransaction;
+window.getPortalDocViewTransaction = getPortalDocViewTransaction;
+window.isPortalDocViewTransactionCurrent = isPortalDocViewTransactionCurrent;
+window.clearPortalDocViewTransaction = clearPortalDocViewTransaction;
+
 function assertPortalShellLayout(reason){
   try{
     const root = document.documentElement;
@@ -1418,8 +1517,14 @@ function refreshPortalDocsUiAfterSync(){
   try{
     const dv = document.getElementById('doc-viewer');
     if(dv && dv.classList.contains('active') && currentDoc){
-      const doc = DOCS.find(d => String(d?.code || '') === String(currentDoc));
+      const doc = (typeof window._resolveDocRecord === 'function')
+        ? window._resolveDocRecord(currentDoc)
+        : DOCS.find(d => String(d?.code || '') === String(currentDoc));
+      const viewTxn = typeof getPortalDocViewTransaction === 'function'
+        ? getPortalDocViewTransaction()
+        : null;
       if(doc){
+        if(viewTxn && !isPortalDocViewTransactionCurrent(viewTxn, doc)) return;
         if(typeof updateDocViewerHeader==='function') updateDocViewerHeader(doc);
         if(typeof renderWorkflowPanel==='function') renderWorkflowPanel(doc);
         if(typeof renderVersionHistory==='function') renderVersionHistory(doc);
@@ -1494,6 +1599,7 @@ function applyDocsTreeResponse(res, options={}){
  * DB (for human-editable fields).
  * ═══════════════════════════════════════════════════════════════════════ */
 let __DCC_HEADER_CACHE = {};          // map: canonical doc_code/path → DCC header projection
+let __DCC_HEADER_CACHE_BY_LOCALE = {vi: {}, en: {}}; // prevents VI/EN projection bleed
 let __DCC_OVERLAY_IN_FLIGHT = false;  // dedupe concurrent fetches
 let __DCC_OVERLAY_LOADED = false;     // true after first successful fetch
 let __DCC_OVERLAY_PENDING_OPTIONS = null;
@@ -1529,7 +1635,9 @@ function upsertDccOverlayCacheEntry(target, row){
 
 function overlayDocsWithDccCache(docs){
   if (!Array.isArray(docs)) return;
-  const map = __DCC_HEADER_CACHE || {};
+  const activeLocale = lang === 'en' ? 'en' : 'vi';
+  const map = (__DCC_HEADER_CACHE_BY_LOCALE && __DCC_HEADER_CACHE_BY_LOCALE[activeLocale]) || {};
+  __DCC_HEADER_CACHE = map;
   /* SCOPE: the filesystem (filename) is the authoritative source for
    * everything except the two fields the user edits explicitly in the
    * "Chỉnh Sửa Tài Liệu" dialog — doc_code (ID) and Vietnamese description
@@ -1547,6 +1655,11 @@ function overlayDocsWithDccCache(docs){
     d.__dccLocaleVariantExists = false;
     d.__dccLocaleUnavailable = false;
     d.__dccLocaleArtifactPresent = false;
+    d.__dccLinked = false;
+    delete d.__displayCode;
+    delete d.__displayTitle;
+    delete d.__displayDesc;
+    delete d.__displayDescLocale;
     const code = String(d.code || '').toUpperCase();
     const path = String(d.path || '').trim().toLowerCase();
     const filename = path ? path.split('/').pop() : '';
@@ -1574,7 +1687,11 @@ function overlayDocsWithDccCache(docs){
     d.__dccLocaleFallback = !!row.is_locale_fallback;
     d.__dccLocaleUnavailable = translationMissing;
     d.__dccLocaleArtifactPresent = !!row.locale_artifact_present;
-    if (row.subtitle) d.__displayDesc = row.subtitle;
+    if (row.doc_code) d.__displayCode = row.doc_code;
+    if (row.subtitle) {
+      d.__displayDesc = row.subtitle;
+      d.__displayDescLocale = activeLocale;
+    }
     // Surface DCC metadata for any consumer that wants it (does not change
     // title display). The ribbon renderer reads directly from the API.
     if (row.revision)           d.__dccRevision       = row.revision;
@@ -1630,10 +1747,14 @@ async function refreshDccOverlayFromServer(options={}){
         for (let i = 0; i < rows.length; i++) {
           upsertDccOverlayCacheEntry(next, rows[i]);
         }
-        const changed = JSON.stringify(next) !== JSON.stringify(__DCC_HEADER_CACHE);
-        __DCC_HEADER_CACHE = next;
+        const previousForLocale = (__DCC_HEADER_CACHE_BY_LOCALE && __DCC_HEADER_CACHE_BY_LOCALE[locale]) || {};
+        const changed = JSON.stringify(next) !== JSON.stringify(previousForLocale);
+        __DCC_HEADER_CACHE_BY_LOCALE[locale] = next;
+        if ((lang === 'en' ? 'en' : 'vi') === locale) {
+          __DCC_HEADER_CACHE = next;
+        }
         __DCC_OVERLAY_LOADED = true;
-        if (Array.isArray(DOCS) && DOCS.length) {
+        if ((lang === 'en' ? 'en' : 'vi') === locale && Array.isArray(DOCS) && DOCS.length) {
           overlayDocsWithDccCache(DOCS);
           if (currentOptions.refreshUi !== false && changed) {
             try { refreshPortalDocsUiAfterSync(); } catch(e){}
@@ -1677,12 +1798,15 @@ async function refreshDccOverlayForDocFromServer(code, options={}){
               : (body && body.doc_code) ? body
               : null;
     if (!row || !row.doc_code) return null;
-    const next = Object.assign({}, __DCC_HEADER_CACHE || {});
+    const next = Object.assign({}, (__DCC_HEADER_CACHE_BY_LOCALE && __DCC_HEADER_CACHE_BY_LOCALE[locale]) || {});
     const changed = upsertDccOverlayCacheEntry(next, row)
-      && JSON.stringify(next) !== JSON.stringify(__DCC_HEADER_CACHE || {});
-    __DCC_HEADER_CACHE = next;
+      && JSON.stringify(next) !== JSON.stringify((__DCC_HEADER_CACHE_BY_LOCALE && __DCC_HEADER_CACHE_BY_LOCALE[locale]) || {});
+    __DCC_HEADER_CACHE_BY_LOCALE[locale] = next;
+    if ((lang === 'en' ? 'en' : 'vi') === locale) {
+      __DCC_HEADER_CACHE = next;
+    }
     __DCC_OVERLAY_LOADED = true;
-    if (Array.isArray(DOCS) && DOCS.length) {
+    if ((lang === 'en' ? 'en' : 'vi') === locale && Array.isArray(DOCS) && DOCS.length) {
       overlayDocsWithDccCache(DOCS);
       if (requestOptions.refreshUi !== false && changed) {
         try { refreshPortalDocsUiAfterSync(); } catch(e){}
@@ -2077,7 +2201,11 @@ function getDocDisplayDescription(doc){
    * variants are authored. The `__dccLocaleUnavailable` flag is still set
    * by the overlay for any consumer that needs to detect "no EN translation
    * available" — it just no longer suppresses the listing card line. */
-  const runtimeDesc = String(doc.__displayDesc || '').trim();
+  const runtimeDescLocale = String(doc.__displayDescLocale || '').trim();
+  const activeLocale = lang === 'en' ? 'en' : 'vi';
+  const runtimeDesc = (!runtimeDescLocale || runtimeDescLocale === activeLocale)
+    ? String(doc.__displayDesc || '').trim()
+    : '';
   if(runtimeDesc) return runtimeDesc;
   const explicitDesc = String(getDocDesc(doc.code) || '').trim();
   if(explicitDesc) return explicitDesc;
@@ -2878,7 +3006,12 @@ function setLang(l){
 
   const switchToken = viewerOpenDocCode + ':' + l + ':' + Date.now() + ':' + Math.random().toString(36).slice(2);
   window.__QMS_LANG_SWITCH_TOKEN = switchToken;
-  const doc=DOCS.find(d=>String(d && d.code || '').trim()===viewerOpenDocCode);
+  const doc=(typeof window._resolveDocRecord === 'function')
+    ? window._resolveDocRecord(viewerOpenDocCode)
+    : DOCS.find(d=>String(d && d.code || '').trim()===viewerOpenDocCode);
+  const viewTxn = (typeof beginPortalDocViewTransaction === 'function')
+    ? beginPortalDocViewTransaction('set-lang', doc || viewerOpenDocCode, l)
+    : null;
   if(doc){
     try{ updateDocViewerHeader(doc); }catch(e){}
     try{ renderWorkflowPanel(doc); }catch(e){}
@@ -2891,6 +3024,7 @@ function setLang(l){
     Promise.resolve(localeRefresh).then(function(){
       try{
         if(window.__QMS_LANG_SWITCH_TOKEN !== switchToken) return;
+        if(viewTxn && !isPortalDocViewTransactionCurrent(viewTxn, viewerOpenDocCode, l)) return;
         if(lang !== l || String(currentDoc || '').trim() !== viewerOpenDocCode) return;
         const latestDoc = (typeof window._resolveDocRecord === 'function')
           ? window._resolveDocRecord(viewerOpenDocCode)
@@ -2905,6 +3039,7 @@ function setLang(l){
     }).catch(function(){
       try{
         if(window.__QMS_LANG_SWITCH_TOKEN !== switchToken) return;
+        if(viewTxn && !isPortalDocViewTransactionCurrent(viewTxn, viewerOpenDocCode, l)) return;
         if(lang !== l || String(currentDoc || '').trim() !== viewerOpenDocCode) return;
         if(viewerOpenDocCode&&!editMode) loadDocContent(viewerOpenDocCode);
       }catch(_e){}
