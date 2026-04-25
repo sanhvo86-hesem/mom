@@ -5,7 +5,11 @@ __pycache__/
 *.py[cod]
 
 # Generated analysis/build/test artifacts
-_reports/
+_reports/*
+# Whitelist tracked QA evidence for the module-template-v4 slice program
+# (Slice 1 dispatch board, Slice 2 nonconformance, future Wave 1 slices).
+# Reviewed off-line by external evaluators; required to be visible on GitHub.
+!_reports/module-template-v4/
 _build/
 _Deleted/
 .tmp/
