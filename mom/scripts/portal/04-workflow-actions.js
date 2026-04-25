@@ -755,10 +755,17 @@ function closeDocViewerForce(){
   editMode=false;
   editingDoc=null;
   currentDoc=null;
+  try{ if(typeof clearPortalDocViewTransaction === 'function') clearPortalDocViewTransaction('close-doc-viewer-force'); }catch(e){}
   edClearInjectedDocShellStyles();
   try{ resetDocViewerZoom(); }catch(e){}
   var iframe=document.getElementById('doc-iframe');
   iframe.onload=null;
+  iframe.__qmsDocLoadToken='';
+  iframe.__qmsLangSyncToken='';
+  try{
+    window.__QMS_DOC_IFRAME_LOAD_TOKEN='';
+    window.__QMS_ACTIVE_DOC_CONTENT_SIGNATURE='';
+  }catch(e){}
   iframe.removeAttribute('srcdoc');
   iframe.removeAttribute('src');
   iframe.style.opacity='1';
@@ -1027,6 +1034,7 @@ async function ensureDocEnglishLocaleArtifact(doc, options){
 
 function triggerDocEnglishLocaleBootstrap(doc, options){
   if(lang !== 'en' || !doc) return;
+  const viewTxn = (typeof getPortalDocViewTransaction === 'function') ? getPortalDocViewTransaction() : null;
   const beforeLocaleSignature = (function(){
     try{
       const lv = getDocLocaleView(doc);
@@ -1043,6 +1051,7 @@ function triggerDocEnglishLocaleBootstrap(doc, options){
     }
     if(editMode) return;
     if(!code || currentDoc !== code) return;
+    if(viewTxn && typeof isPortalDocViewTransactionCurrent === 'function' && !isPortalDocViewTransactionCurrent(viewTxn, doc, 'en')) return;
     const latestDoc = (typeof window._resolveDocRecord === 'function') ? window._resolveDocRecord(code) : doc;
     try{ updateDocViewerHeader(latestDoc); }catch(e){}
     try{ renderWorkflowPanel(latestDoc); }catch(e){}
@@ -1068,6 +1077,7 @@ function scheduleDocEnglishLocalePolling(code){
   const docCode = String(code || '').trim();
   if(!docCode) return;
   const token = String(Date.now()) + ':' + Math.random().toString(36).slice(2);
+  const viewTxn = (typeof getPortalDocViewTransaction === 'function') ? getPortalDocViewTransaction() : null;
   __DOC_ENGLISH_LOCALE_POLL_TOKENS[docCode] = token;
   // Large controlled manuals can take slightly longer than the original
   // 4-minute ceiling on CPU-only on-prem MT. Keep polling long enough for
@@ -1076,6 +1086,7 @@ function scheduleDocEnglishLocalePolling(code){
     setTimeout(async function(){
       if(__DOC_ENGLISH_LOCALE_POLL_TOKENS[docCode] !== token) return;
       if(lang !== 'en' || editMode || currentDoc !== docCode) return;
+      if(viewTxn && typeof isPortalDocViewTransactionCurrent === 'function' && !isPortalDocViewTransactionCurrent(viewTxn, docCode, 'en')) return;
       try{
         if(typeof refreshDccOverlayFromServer === 'function'){
           await refreshDccOverlayFromServer({refreshUi:false});
@@ -1344,7 +1355,7 @@ function syncIframeDocumentLanguage(iframe, targetLang){
   });
 }
 
-function scheduleIframeDocumentLanguageSync(iframe, targetLang){
+function scheduleIframeDocumentLanguageSync(iframe, targetLang, expectedDocLoadToken){
   if(!iframe) return Promise.resolve(false);
   const normalizedLang = targetLang === 'en' ? 'en' : 'vi';
   const syncToken = String(Date.now()) + ':' + Math.random().toString(36).slice(2);
@@ -1356,6 +1367,10 @@ function scheduleIframeDocumentLanguageSync(iframe, targetLang){
       return new Promise(function(resolve){
         function runSync(){
           if(!iframe || iframe.__qmsLangSyncToken !== syncToken){
+            resolve(lastResult);
+            return;
+          }
+          if(expectedDocLoadToken && iframe.__qmsDocLoadToken !== expectedDocLoadToken){
             resolve(lastResult);
             return;
           }
@@ -1868,6 +1883,7 @@ async function confirmSubmitForReview(code){
       document.getElementById('editor-container').classList.remove('ed-fullscreen');
       document.getElementById('doc-iframe').style.display='';
 
+      if(String(currentDoc || '') !== String(code || '')) return;
       loadDocContent(code);
 
       const toastType=updateType==='major'?'🔄 MAJOR':'📝 MINOR';
@@ -1958,6 +1974,7 @@ async function rejectDoc(code){
       // Reload versions/state from server to keep folder-sync
       await refreshDocFromServer(code);
       showToast(lang==='en'?'↩ Rejected — returned to author':'↩ Đã trả lại — về tác giả');
+      if(String(currentDoc || '') !== String(code || '')) return;
       renderWorkflowPanel(doc);
       renderVersionHistory(doc);
       updateDocViewerHeader(doc);
@@ -2196,13 +2213,95 @@ function ensureIframeHeaderTitleStructure(idoc, titleWrap, code, title, desc){
   }
 }
 
-function syncIframeDocumentHeaderMetadata(idoc, doc){
+function normalizeDccHeaderRevisionValue(raw){
+  const value = String(raw || '').trim();
+  if(!value) return '';
+  return /^v/i.test(value) ? value.toUpperCase() : ('V' + value);
+}
+
+function deriveDccDocTypeForHeader(code){
+  const value = String(code || '').toUpperCase();
+  if(value.indexOf('QMS-MAN-') === 0) return 'MAN';
+  if(value.indexOf('POL-QMS-') === 0 || value.indexOf('POL-') === 0) return 'POL';
+  if(value.indexOf('SOP-') === 0) return 'SOP';
+  if(value.indexOf('WI-') === 0) return 'WI';
+  if(value.indexOf('FRM-') === 0) return 'FRM';
+  if(value.indexOf('ANNEX-') === 0) return 'ANNEX';
+  if(value.indexOf('DEPT-') === 0 || value.indexOf('RACI-') === 0) return 'ORG';
+  return value.split('-')[0] || 'DOC';
+}
+
+function getAuthoritativeDccHeaderMeta(doc){
+  const code = String((typeof getDocDisplayCode === 'function' ? getDocDisplayCode(doc) : (doc && doc.code)) || '').trim();
+  const title = String((typeof getDocDisplayTitle === 'function' ? getDocDisplayTitle(doc) : (doc && doc.title)) || code || '').trim();
+  const desc = String((typeof getDocDisplayDescription === 'function' ? getDocDisplayDescription(doc) : '') || '').trim();
+  const dccCache = (window.DccHeader && typeof window.DccHeader.getCached === 'function' && doc)
+    ? window.DccHeader.getCached(doc.code || code)
+    : null;
+  const state = (typeof getDocState === 'function' && doc) ? (getDocState(doc.code) || {}) : {};
+  const status = String((doc && doc.__dccStatus) || (typeof getDocStatus === 'function' && doc ? getDocStatus(doc) : '') || '').trim();
+  return {
+    doc_code: code,
+    title: title,
+    subtitle: desc,
+    doc_type: deriveDccDocTypeForHeader(code),
+    revision: normalizeDccHeaderRevisionValue((doc && doc.__dccRevision) || (dccCache && dccCache.revision) || (typeof getDocRevision === 'function' && doc ? getDocRevision(doc) : '')),
+    effective_date: String((doc && doc.__dccEffectiveDate) || (dccCache && dccCache.effective_date) || '').trim(),
+    owner_role_code: String((doc && doc.__dccOwner) || (dccCache && dccCache.owner_role_code) || state.owner || (doc && doc.owner) || '').trim(),
+    approver_role_code: String((doc && doc.__dccApprover) || (dccCache && dccCache.approver_role_code) || state.approver || (doc && doc.approver) || '').trim(),
+    iso_clause: String((dccCache && dccCache.iso_clause) || (doc && doc.iso_clause) || '').trim() || null,
+    status: status || String((dccCache && dccCache.status) || '').trim() || 'draft'
+  };
+}
+
+function defaultDccBootstrapLabels(){
+  return {
+    doc_id: {short:'ID', long:'Document ID', sort:10},
+    revision: {short:'Rev', long:'Revision', sort:20},
+    effective_date: {short:'Eff', long:'Effective date', sort:30},
+    owner: {short:'Owner', long:'Owner', sort:40},
+    approver: {short:'Appr', long:'Approved by', sort:50}
+  };
+}
+
+function syncIframeDccBootstrapMetadata(idoc, doc, locale){
+  if(!idoc || !doc) return false;
+  const headerEl = idoc.querySelector('.dcc-header');
+  if(!headerEl) return false;
+  const meta = getAuthoritativeDccHeaderMeta(doc);
+  let payload = {};
+  try{
+    const raw = headerEl.getAttribute('data-dcc-bootstrap') || '';
+    payload = raw ? JSON.parse(raw) : {};
+  }catch(_e){
+    payload = {};
+  }
+  if(!payload || typeof payload !== 'object') payload = {};
+  if(!payload.header || typeof payload.header !== 'object') payload.header = {};
+  payload.header = Object.assign({}, payload.header, meta);
+  payload.labels = (payload.labels && typeof payload.labels === 'object') ? payload.labels : defaultDccBootstrapLabels();
+  try{
+    headerEl.setAttribute('data-dcc-bootstrap', JSON.stringify(payload));
+    if(meta.doc_code) headerEl.setAttribute('data-dcc-doc-code', meta.doc_code);
+    headerEl.setAttribute('data-dcc-locale', locale === 'en' ? 'en' : 'vi');
+    headerEl.setAttribute('data-dcc-bootstrap-source', 'portal-authoritative');
+  }catch(_e){}
+  return true;
+}
+
+function syncIframeDocumentHeaderMetadata(idoc, doc, options){
   if(!idoc || !doc) return;
   try{
-    const publishedMeta = extractIframePublishedDocMetadata(idoc);
-    const code = String(((typeof getDocDisplayCode === 'function' ? getDocDisplayCode(doc) : doc.code) || publishedMeta.code || '')).trim();
-    const title = String(((typeof getDocDisplayTitle === 'function' ? getDocDisplayTitle(doc) : (doc.title || '')) || publishedMeta.title || '')).trim();
-    const desc = String(((typeof getDocDisplayDescription === 'function' ? getDocDisplayDescription(doc) : '') || publishedMeta.desc || '')).trim();
+    const opts = (options && typeof options === 'object') ? options : {};
+    const activeLocale = opts.locale === 'en' ? 'en' : (lang === 'en' ? 'en' : 'vi');
+    if(activeLocale === 'en'){
+      syncIframeDccBootstrapMetadata(idoc, doc, activeLocale);
+    }
+    const publishedMeta = activeLocale === 'en' ? {code:'', title:'', desc:''} : extractIframePublishedDocMetadata(idoc);
+    const authoritative = getAuthoritativeDccHeaderMeta(doc);
+    const code = String(authoritative.doc_code || publishedMeta.code || '').trim();
+    const title = String(authoritative.title || publishedMeta.title || '').trim();
+    const desc = String(authoritative.subtitle || publishedMeta.desc || '').trim();
 
     const titleWrap = idoc.querySelector('.form-header .title');
     if(titleWrap){
@@ -2214,18 +2313,138 @@ function syncIframeDocumentHeaderMetadata(idoc, doc){
       try{
         const labelEl = row.querySelector('b');
         const valueEl = row.querySelector('span:last-child');
-        const label = String(labelEl ? labelEl.textContent : '').trim();
+        const label = String(labelEl ? labelEl.textContent : '').trim().replace(/:$/, '');
         if(valueEl && /\b(code|mã)\b/i.test(label) && code){
           valueEl.textContent = code;
           if(valueEl.classList) valueEl.classList.add('doc-code');
+        }else if(valueEl && /\b(version|revision|rev|phiên bản)\b/i.test(label) && authoritative.revision){
+          valueEl.textContent = authoritative.revision;
+        }else if(valueEl && /\b(effective date|effective|eff|hiệu lực)\b/i.test(label) && authoritative.effective_date){
+          valueEl.textContent = authoritative.effective_date;
+        }else if(valueEl && /\b(owner|chủ sở hữu)\b/i.test(label) && authoritative.owner_role_code){
+          valueEl.textContent = authoritative.owner_role_code;
+        }else if(valueEl && /\b(approver|approved by|appr|người duyệt|phê duyệt)\b/i.test(label) && authoritative.approver_role_code){
+          valueEl.textContent = authoritative.approver_role_code;
         }
       }catch(_e){}
     });
 
-    if(typeof applyRuntimeDocDisplayMetadata === 'function'){
+    const allowParentSync = opts.allowParentMetadataSync !== false && activeLocale !== 'en';
+    if(allowParentSync && typeof applyRuntimeDocDisplayMetadata === 'function'){
       applyRuntimeDocDisplayMetadata(doc, {code, title, desc});
     }
   }catch(e){}
+}
+
+let __QMS_DOC_IFRAME_LOAD_SEQ = 0;
+
+function qmsNormalizeDocLoadPath(path){
+  try{
+    if(typeof normalizeDocRelativePath === 'function'){
+      return normalizeDocRelativePath(path);
+    }
+  }catch(e){}
+  try{
+    return String(path || '')
+      .trim()
+      .replace(/\\/g, '/')
+      .replace(/^\/+/, '')
+      .replace(/^\.\//, '');
+  }catch(e){
+    return '';
+  }
+}
+
+function getDocIframeLoadSignature(doc, localeView){
+  const activeLang = lang === 'en' ? 'en' : 'vi';
+  const code = String(doc && doc.code || '').trim();
+  const path = qmsNormalizeDocLoadPath(doc && doc.path);
+  const mode = String(localeView && localeView.mode || '').trim();
+  const file = qmsNormalizeDocLoadPath(localeView && localeView.file);
+  const state = String(localeView && localeView.translationState || '').trim();
+  return [activeLang, code, path, mode, file, state].join('|');
+}
+window.getDocIframeLoadSignature = getDocIframeLoadSignature;
+
+function createDocIframeLoadContext(iframe, doc, localeView){
+  const activeLang = lang === 'en' ? 'en' : 'vi';
+  const code = String(doc && doc.code || '').trim();
+  const path = qmsNormalizeDocLoadPath(doc && doc.path);
+  const file = qmsNormalizeDocLoadPath(localeView && localeView.file);
+  const signature = getDocIframeLoadSignature(doc, localeView);
+  const viewTxn = (typeof getPortalDocViewTransaction === 'function') ? getPortalDocViewTransaction() : null;
+  const seq = ++__QMS_DOC_IFRAME_LOAD_SEQ;
+  const token = [seq, activeLang, code, path, file, Date.now(), Math.random().toString(36).slice(2)].join('|');
+  const ctx = {token, seq, lang: activeLang, code, path, file, signature, viewToken: viewTxn && viewTxn.token ? viewTxn.token : ''};
+  try{
+    if(iframe){
+      iframe.__qmsDocLoadToken = token;
+      iframe.__qmsDocLoadContext = ctx;
+      iframe.__qmsDocLoadCode = code;
+      iframe.__qmsDocLoadPath = path;
+      iframe.__qmsDocLoadLang = activeLang;
+      iframe.__qmsDocLoadFile = file;
+      iframe.__qmsDocLoadSignature = signature;
+      iframe.__qmsLangSyncToken = '';
+    }
+    window.__QMS_DOC_IFRAME_LOAD_TOKEN = token;
+    window.__QMS_ACTIVE_DOC_CONTENT_SIGNATURE = signature;
+  }catch(e){}
+  return ctx;
+}
+
+function updateDocIframeLoadContextFile(iframe, ctx, localeView){
+  if(!ctx) return;
+  const file = qmsNormalizeDocLoadPath(localeView && localeView.file);
+  ctx.file = file;
+  ctx.signature = getDocIframeLoadSignature({code: ctx.code, path: ctx.path}, localeView);
+  try{
+    if(iframe && iframe.__qmsDocLoadToken === ctx.token){
+      iframe.__qmsDocLoadFile = file;
+      iframe.__qmsDocLoadSignature = ctx.signature;
+      window.__QMS_ACTIVE_DOC_CONTENT_SIGNATURE = ctx.signature;
+    }
+  }catch(e){}
+}
+
+function isCurrentDocIframeLoad(iframe, ctx){
+  try{
+    if(!iframe || !ctx || iframe.__qmsDocLoadToken !== ctx.token) return false;
+    if((lang === 'en' ? 'en' : 'vi') !== ctx.lang) return false;
+    if(String(currentDoc || '').trim() !== ctx.code) return false;
+    const currentPath = qmsNormalizeDocLoadPath(window.currentDocPath || '');
+    if(ctx.path && currentPath && currentPath !== ctx.path) return false;
+    if(ctx.viewToken && typeof getPortalDocViewTransaction === 'function'){
+      const viewTxn = getPortalDocViewTransaction();
+      if(!viewTxn || viewTxn.token !== ctx.viewToken) return false;
+      if(typeof isPortalDocViewTransactionCurrent === 'function' && !isPortalDocViewTransactionCurrent(viewTxn, {code: ctx.code, path: ctx.path}, ctx.lang)) return false;
+    }
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+
+function isIframeDocumentLocationForLoad(idoc, ctx){
+  try{
+    if(!idoc || !ctx || !ctx.file) return true;
+    const loc = idoc.location || (idoc.defaultView && idoc.defaultView.location) || null;
+    const rawPath = loc ? String(loc.pathname || '') : '';
+    const loadedPath = qmsNormalizeDocLoadPath(rawPath ? decodeURIComponent(rawPath) : '');
+    const expectedPath = qmsNormalizeDocLoadPath(ctx.file);
+    if(!loadedPath || !expectedPath) return false;
+    return loadedPath === expectedPath || loadedPath.endsWith('/' + expectedPath);
+  }catch(e){
+    return false;
+  }
+}
+
+function finishDocIframeLoad(iframe, loading, ctx){
+  if(!isCurrentDocIframeLoad(iframe, ctx)) return false;
+  if(loading) loading.style.display = 'none';
+  if(iframe) iframe.style.opacity = '1';
+  try{ if(typeof schedulePortalShellLayoutAssert === 'function') schedulePortalShellLayoutAssert('doc-iframe-loaded'); }catch(e){}
+  return true;
 }
 
 function loadDocContent(code){
@@ -2238,11 +2457,23 @@ function loadDocContent(code){
     return;
   }
   const resolvedCode = String(doc.code || '').trim();
+  if(String(currentDoc || '').trim() !== resolvedCode) return;
   const localeView = getDocLocaleView(doc);
 
   const edited = lang === 'en' ? '' : getEditedHtml(resolvedCode);
   const iframe=document.getElementById('doc-iframe');
   const loading=document.getElementById('iframe-loading');
+  if(!iframe) return;
+  const nextSignature = getDocIframeLoadSignature(doc, localeView);
+  const activeSignature = String(window.__QMS_ACTIVE_DOC_CONTENT_SIGNATURE || '');
+  const frameHasActiveLoad = String(iframe.__qmsDocLoadSignature || '') === nextSignature;
+  const frameHasPayload = !!(iframe.getAttribute('src') || iframe.getAttribute('srcdoc') || iframe.__qmsDocLoadToken);
+  if(nextSignature && activeSignature === nextSignature && frameHasActiveLoad && frameHasPayload){
+    try{ if(typeof schedulePortalShellLayoutAssert === 'function') schedulePortalShellLayoutAssert('doc-load-skip-same-signature'); }catch(e){}
+    return;
+  }
+  const loadCtx = createDocIframeLoadContext(iframe, doc, localeView);
+  try{ if(typeof schedulePortalShellLayoutAssert === 'function') schedulePortalShellLayoutAssert('doc-load-start'); }catch(e){}
 
   // Show loading indicator while refreshing the iframe
   if(loading){
@@ -2253,6 +2484,7 @@ function loadDocContent(code){
 
   try{
     iframe.onload=null;
+    iframe.__qmsLangSyncToken='';
     iframe.removeAttribute('srcdoc');
     iframe.removeAttribute('src');
   }catch(e){}
@@ -2261,8 +2493,7 @@ function loadDocContent(code){
     if(lang==='en' && !localeView.available){
       const unavailableCopy = getEnglishLocaleUnavailableCopy(localeView);
       iframe.onload=function(){
-        if(loading) loading.style.display='none';
-        iframe.style.opacity='1';
+        finishDocIframeLoad(iframe, loading, loadCtx);
       };
       iframe.srcdoc = `<!DOCTYPE html>
         <html lang="en">
@@ -2295,7 +2526,7 @@ function loadDocContent(code){
         </body>
         </html>`;
       setTimeout(function(){
-        if(loading && loading.style.display!=='none'){ loading.style.display='none'; iframe.style.opacity='1'; }
+        if(loading && loading.style.display!=='none') finishDocIframeLoad(iframe, loading, loadCtx);
       }, 300);
       return;
     }
@@ -2337,9 +2568,9 @@ function loadDocContent(code){
       ? 'Non-HTML controlled files are version-managed through private staging, review, approval, and immutable archive. Use the buttons below to retrieve the current released file or the latest working copy.'
       : 'Cac tep khong phai HTML duoc kiem soat phien ban qua private staging, review, approval va immutable archive. Dung cac nut ben duoi de tai file phat hanh hien hanh hoac ban lam viec moi nhat.';
     iframe.onload=function(){
+      if(!isCurrentDocIframeLoad(iframe, loadCtx)) return;
       try{ attachIframeViewerZoom(iframe); }catch(e){}
-      if(loading) loading.style.display='none';
-      iframe.style.opacity='1';
+      finishDocIframeLoad(iframe, loading, loadCtx);
     };
     iframe.srcdoc = `<!DOCTYPE html>
       <html lang="${lang==='en'?'en':'vi'}">
@@ -2386,7 +2617,7 @@ function loadDocContent(code){
       </body>
       </html>`;
     setTimeout(function(){
-      if(loading && loading.style.display!=='none'){ loading.style.display='none'; iframe.style.opacity='1'; }
+      if(loading && loading.style.display!=='none') finishDocIframeLoad(iframe, loading, loadCtx);
     }, 5000);
     return;
   }
@@ -2394,13 +2625,14 @@ function loadDocContent(code){
   // Load the best file (live approved OR archive working copy), then inject any
   // unsaved local edits (editor-only) on top.
   setTimeout(function(){
+    if(!isCurrentDocIframeLoad(iframe, loadCtx)) return;
     const localeView = getDocLocaleView(doc);
+    updateDocIframeLoadContextFile(iframe, loadCtx, localeView);
     const viewFile = localeView.file;
     if(!localeView.available || !viewFile){
       const unavailableCopy = getEnglishLocaleUnavailableCopy(localeView);
       iframe.onload=function(){
-        if(loading) loading.style.display='none';
-        iframe.style.opacity='1';
+        finishDocIframeLoad(iframe, loading, loadCtx);
       };
       iframe.srcdoc = `<!DOCTYPE html>
         <html lang="${lang==='en'?'en':'vi'}">
@@ -2433,16 +2665,18 @@ function loadDocContent(code){
         </body>
         </html>`;
       setTimeout(function(){
-        if(loading && loading.style.display!=='none'){ loading.style.display='none'; iframe.style.opacity='1'; }
+        if(loading && loading.style.display!=='none') finishDocIframeLoad(iframe, loading, loadCtx);
       }, 300);
       return;
     }
+    if(!isCurrentDocIframeLoad(iframe, loadCtx)) return;
     const src='../'+viewFile;
     const bust='t='+Date.now();
-    iframe.src = src + (src.indexOf('?')>=0 ? '&' : '?') + bust;
     iframe.onload=function(){
+      if(!isCurrentDocIframeLoad(iframe, loadCtx)) return;
       try{
         const idoc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
+        if(!isIframeDocumentLocationForLoad(idoc, loadCtx)) return;
         try{ repairBrokenDocStyleArtifacts(idoc); }catch(_e){}
         try{ repairIframeDocImages(idoc); }catch(_e){}
         if(edited && idoc){
@@ -2450,35 +2684,41 @@ function loadDocContent(code){
           if(dc) dc.innerHTML = edited;
           else if(idoc.body) idoc.body.innerHTML = edited;
         }
-        try{ syncIframeDocumentHeaderMetadata(idoc, doc); }catch(_e){}
+        try{ syncIframeDocumentHeaderMetadata(idoc, doc, {locale: loadCtx.lang}); }catch(_e){}
         try{
           if(idoc && typeof edApplyGlobalTablePolicyToDocument==='function'){
             edApplyGlobalTablePolicyToDocument(idoc, {force:true, source:'view-load'});
             // Re-run after initial render so late layout changes (fonts/images)
             // cannot push table width beyond page frame.
             setTimeout(function(){
+              if(!isCurrentDocIframeLoad(iframe, loadCtx)) return;
               try{ edApplyGlobalTablePolicyToDocument(idoc, {force:true, source:'view-load-late-1'}); }catch(_e){}
               try{ resetIframeViewerScroll(idoc); }catch(_e){}
             }, 220);
             setTimeout(function(){
+              if(!isCurrentDocIframeLoad(iframe, loadCtx)) return;
               try{ edApplyGlobalTablePolicyToDocument(idoc, {force:true, source:'view-load-late-2'}); }catch(_e){}
               try{ resetIframeViewerScroll(idoc); }catch(_e){}
             }, 1200);
           }
         }catch(e){}
-        // Keep the iframe document aware of the active locale so DCC/header
-        // components can re-render from authoritative locale data.
-        try{ scheduleIframeDocumentLanguageSync(iframe, lang); }catch(e){}
+        try{
+          if(idoc && idoc.documentElement){
+            idoc.documentElement.lang = loadCtx.lang;
+            idoc.documentElement.setAttribute('data-qms-view-lang', loadCtx.lang);
+          }
+          if(idoc && idoc.body) idoc.body.setAttribute('data-qms-view-lang', loadCtx.lang);
+        }catch(e){}
         try{ if(typeof attachIframeLinkBridge==='function') attachIframeLinkBridge(iframe, doc, viewFile); }catch(e){}
         try{ attachIframeViewerZoom(iframe); }catch(e){}
         try{ resetIframeViewerScroll(idoc); }catch(e){}
       }catch(e){}
-      if(loading) loading.style.display='none';
-      iframe.style.opacity='1';
+      finishDocIframeLoad(iframe, loading, loadCtx);
     };
+    iframe.src = src + (src.indexOf('?')>=0 ? '&' : '?') + bust;
     // Fallback
     setTimeout(function(){
-      if(loading && loading.style.display!=='none'){ loading.style.display='none'; iframe.style.opacity='1'; }
+      if(loading && loading.style.display!=='none') finishDocIframeLoad(iframe, loading, loadCtx);
     }, 5000);
   }, 30);
 }

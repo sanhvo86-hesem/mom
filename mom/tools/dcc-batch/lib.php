@@ -430,8 +430,8 @@ function logo_path_for(string $absPath, string $rootDir): string
 }
 
 /**
- * Build the body placeholder. Bootstrap seed is best-effort; the renderer
- * will overwrite from the API once it loads.
+ * Build the body placeholder. Bootstrap seed is offline-only; the renderer
+ * will fetch authoritative revision/owner/effective-date from the API.
  */
 function build_placeholder(string $code, string $title, ?string $subtitle, string $logoPath, string $locale = DCC_DEFAULT_LOCALE): string
 {
@@ -441,12 +441,12 @@ function build_placeholder(string $code, string $title, ?string $subtitle, strin
             'title'              => $title,
             'subtitle'           => $subtitle,
             'doc_type'           => doc_type_from_code($code),
-            'revision'           => 'V0',
-            'effective_date'     => date('Y-m-d'),
-            'owner_role_code'    => 'QA',
-            'approver_role_code' => 'CEO',
+            'revision'           => '',
+            'effective_date'     => '',
+            'owner_role_code'    => '',
+            'approver_role_code' => '',
             'iso_clause'         => null,
-            'status'             => 'draft',
+            'status'             => '',
         ],
         'labels' => [
             'doc_id'         => ['short' => 'ID',    'long' => 'Document ID',     'sort' => 10],

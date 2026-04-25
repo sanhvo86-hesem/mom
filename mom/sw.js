@@ -36,7 +36,7 @@ try {
   self.__SW_BUILD_TAG = 'dev';
 }
 
-const CACHE_VERSION = 'v1.3.52';
+const CACHE_VERSION = 'v1.3.56';
 const CACHE_BUILD   = self.__SW_BUILD_TAG || 'dev';
 const CACHE_PREFIX  = 'hesem-mom';
 
@@ -83,6 +83,7 @@ const PRECACHE_URLS = [
   '/mom/scripts/portal/09b-form-fill-download.js',
   '/mom/scripts/portal/33-vps-control-tower.js',
   '/mom/scripts/portal/10-eqms-form-runtime.js',
+  '/mom/scripts/portal/11-dcc-header-renderer.js',
   '/mom/scripts/form-runtimes/frm-403-scar.js',
   '/mom/scripts/portal/10-upload-validator.js',
   '/mom/scripts/portal/90-qrcodegen.js',
@@ -93,6 +94,9 @@ const PRECACHE_URLS = [
   '/mom/assets/js/barcode-scanner.js',
   '/mom/assets/js/pwa-init.js',
   '/mom/manifest.json',
+  '/mom/styles/dcc-header.css',
+  '/mom/assets/style_scoped.css',
+  '/mom/assets/style.css',
   '/mom/form-runtimes/frm-403-scar.html',
   '/mom/docs/forms/frm-400-quality/FRM-403-SCAR_Supplier_Corrective_Action_Request.html',
   '/assets/style_scoped.css',
@@ -210,7 +214,7 @@ self.addEventListener('fetch', (event) => {
   } else if (isImageRequest(url)) {
     event.respondWith(cacheFirst(request, CACHES.images));
   } else if (isAppShellRequest(url)) {
-    event.respondWith(networkFirst(request, CACHES.static));
+    event.respondWith(networkFirstFresh(request, CACHES.static));
   } else {
     event.respondWith(cacheFirst(request, CACHES.static));
   }
@@ -327,6 +331,39 @@ async function networkFirst(request, cacheName) {
     return networkResponse;
   } catch (err) {
     console.warn('[SW] Network-first falling back to cache:', request.url);
+    const cached = await caches.match(request);
+    if (cached) return cached;
+    return offlineFallback(request);
+  }
+}
+
+/**
+ * Fresh network-first strategy for app-shell assets. This deliberately asks
+ * the browser HTTP cache for a revalidated copy before falling back to Cache
+ * Storage, so changed JS/CSS/HTML cannot keep running after deploy just
+ * because portal.html still references an old query string.
+ *
+ * @param {Request} request
+ * @param {string}  cacheName
+ * @returns {Promise<Response>}
+ */
+async function networkFirstFresh(request, cacheName) {
+  try {
+    let freshRequest = request;
+    try {
+      freshRequest = new Request(request, { cache: 'reload' });
+    } catch (e) {
+      freshRequest = request;
+    }
+    const networkResponse = await fetch(freshRequest);
+    if (networkResponse.ok) {
+      const cache = await caches.open(cacheName);
+      cache.put(request, networkResponse.clone());
+      await enforceLimit(cacheName);
+    }
+    return networkResponse;
+  } catch (err) {
+    console.warn('[SW] Fresh network-first falling back to cache:', request.url);
     const cached = await caches.match(request);
     if (cached) return cached;
     return offlineFallback(request);

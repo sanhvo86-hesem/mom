@@ -7,6 +7,8 @@ let searchQuery = '';
 let currentFolderPath = []; // Hierarchical navigation: ['08-Organization','03-Job-Descriptions','01-JD-EXE']
 let folderEditMode = false; // Toggle for file manager edit mode
 let docHeaderMetaCollapsed = true;
+const PORTAL_VIEW_STATE_KEY = 'hesem_portal_view_state_v1';
+const PORTAL_VIEW_STATE_TTL_MS = 12 * 60 * 60 * 1000;
 const PENDING_AUTH_TTL_MS = 10 * 60 * 1000;
 let pendingAuthTimer = null;
 let loginSubmitInFlight = false;
@@ -21,6 +23,127 @@ function syncCurrentUserRef(user){
 }
 
 syncCurrentUserRef(null);
+
+function portalViewStateStore(){
+  try{ return window.sessionStorage || null; }catch(e){ return null; }
+}
+
+function normalizePortalViewFolderPath(value){
+  try{
+    return Array.isArray(value)
+      ? value.map(v => String(v || '').trim()).filter(Boolean).slice(0, 12)
+      : [];
+  }catch(e){
+    return [];
+  }
+}
+
+function readPortalViewState(){
+  try{
+    const store = portalViewStateStore();
+    if(!store) return null;
+    const raw = store.getItem(PORTAL_VIEW_STATE_KEY);
+    if(!raw) return null;
+    const state = JSON.parse(raw);
+    if(!state || typeof state !== 'object') return null;
+    const savedAt = Number(state.savedAt || 0);
+    if(!savedAt || (Date.now() - savedAt) > PORTAL_VIEW_STATE_TTL_MS){
+      store.removeItem(PORTAL_VIEW_STATE_KEY);
+      return null;
+    }
+    return state;
+  }catch(e){
+    return null;
+  }
+}
+
+function writePortalViewState(state){
+  try{
+    const store = portalViewStateStore();
+    if(!store) return;
+    store.setItem(PORTAL_VIEW_STATE_KEY, JSON.stringify(state || {}));
+  }catch(e){}
+}
+
+function persistPortalViewState(reason='update'){
+  try{
+    const viewer = document.getElementById('doc-viewer');
+    const activeDocCode = String(currentDoc || '').trim();
+    const doc = activeDocCode && typeof DOCS !== 'undefined' && Array.isArray(DOCS)
+      ? (DOCS.find(d => String(d && d.code || '').trim() === activeDocCode) || null)
+      : null;
+    const viewerOpen = !!(viewer && viewer.classList.contains('active') && activeDocCode);
+    const state = {
+      savedAt: Date.now(),
+      reason: String(reason || 'update'),
+      lang: String(lang || 'vi') === 'en' ? 'en' : 'vi',
+      page: String(currentPage || 'dashboard'),
+      filter: String(currentFilter || 'ALL'),
+      folderPath: normalizePortalViewFolderPath(currentFolderPath),
+      type: viewerOpen ? 'doc' : 'page'
+    };
+    if(viewerOpen){
+      state.page = state.page || 'documents';
+      state.docCode = activeDocCode;
+      state.docPath = String(window.currentDocPath || (doc && doc.path) || '');
+    }
+    writePortalViewState(state);
+  }catch(e){}
+}
+
+async function restorePortalViewAfterBoot(){
+  const state = readPortalViewState();
+  if(!state){
+    navigateTo('dashboard');
+    return false;
+  }
+
+  const nextLang = String(state.lang || '').trim();
+  if(nextLang === 'en' || nextLang === 'vi'){
+    lang = nextLang;
+    try{ localStorage.setItem('hesem_lang', nextLang); }catch(e){}
+    try{ initLang(); }catch(e){}
+  }
+
+  const savedFilter = String(state.filter || 'ALL').trim() || 'ALL';
+  const savedFolderPath = normalizePortalViewFolderPath(state.folderPath);
+
+  if(state.type === 'doc'){
+    try{
+      const docRef = {code:String(state.docCode || '').trim(), path:String(state.docPath || '').trim()};
+      const doc = (typeof resolveDocRecord === 'function')
+        ? resolveDocRecord(docRef)
+        : (typeof DOCS !== 'undefined' && Array.isArray(DOCS) ? DOCS.find(d => String(d && d.path || '') === docRef.path || String(d && d.code || '') === docRef.code) : null);
+      if(doc && !(typeof isDocHidden === 'function' && isDocHidden(doc.code) && !isAdmin())
+          && !(typeof canAccessDoc === 'function' && !canAccessDoc(doc.code))){
+        const restoredPage = String(state.page || 'documents').trim() || 'documents';
+        currentPage = restoredPage === 'dashboard' ? 'documents' : restoredPage;
+        currentFilter = savedFilter;
+        currentFolderPath = savedFolderPath;
+        try{ renderSidebar(); }catch(e){}
+        try{ syncSidebarToggleState(); }catch(e){}
+        await openDoc(doc);
+        return true;
+      }
+    }catch(e){}
+  }
+
+  currentFolderPath = savedFolderPath;
+  const restoredPage = String(state.page || 'dashboard').trim() || 'dashboard';
+  if(restoredPage === 'documents'){
+    currentFilter = savedFilter;
+    navigateTo('documents', undefined, true);
+  }else{
+    navigateTo(restoredPage, undefined, true);
+  }
+  return true;
+}
+
+window.__hesemPortalBeforeHardReload = function(){
+  persistPortalViewState('before-hard-reload');
+};
+window.__hesemPortalPersistViewState = persistPortalViewState;
+window.__hesemPortalRestoreViewAfterBoot = restorePortalViewAfterBoot;
 
 function clearPendingAuthTimer(){
   if(pendingAuthTimer){
@@ -2207,7 +2330,7 @@ async function showApp(){
 
   renderSidebar();
   syncSidebarToggleState();
-  navigateTo('dashboard');
+  await restorePortalViewAfterBoot();
   loadUsersFromServerIfAdmin();
   try{ if(typeof startLiveDocsSync==='function') startLiveDocsSync(); }catch(e){}
 }
@@ -2578,6 +2701,7 @@ function navigateTo(page, filter, bypassGuard){
   
   document.getElementById('page-'+page).classList.add('active');
   renderSidebar();
+  persistPortalViewState('navigate');
 }
 
 function isDownloadOnlyDoc(doc){
@@ -2841,6 +2965,9 @@ async function openDoc(code){
   editingDoc=null;
   currentDoc=resolvedCode;
   window.currentDocPath = String(doc.path || '');
+  const openViewTxn = (typeof beginPortalDocViewTransaction === 'function')
+    ? beginPortalDocViewTransaction('open-doc', doc, lang)
+    : null;
   setDocHeaderMetaCollapsed(true);
   try{ if(typeof resetDocViewerZoom==='function') resetDocViewerZoom(); }catch(e){}
   edFullscreen=false;
@@ -2850,6 +2977,7 @@ async function openDoc(code){
   document.querySelectorAll('#content > .page').forEach(p=>p.classList.remove('active'));
   const viewer = document.getElementById('doc-viewer');
   if(viewer) viewer.classList.add('active');
+  persistPortalViewState('open-doc');
 
   const bc = document.getElementById('header-breadcrumb');
   if(bc){
@@ -2883,7 +3011,9 @@ async function openDoc(code){
   updateDocViewerHeader(doc);
   renderWorkflowPanel(doc);
   renderVersionHistory(doc);
-  const openRenderToken = `${resolvedCode}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
+  const openRenderToken = openViewTxn
+    ? openViewTxn.token
+    : `${resolvedCode}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
   window.__DOC_VIEW_RENDER_TOKEN = openRenderToken;
 
   // Load current document HTML immediately
@@ -2908,6 +3038,7 @@ async function openDoc(code){
         try{
           if(currentDoc !== resolvedCode) return;
           if(window.__DOC_VIEW_RENDER_TOKEN !== openRenderToken) return;
+          if(openViewTxn && !isPortalDocViewTransactionCurrent(openViewTxn, resolvedCode)) return;
           const latestDoc = resolveDocRecord(resolvedCode) || doc;
           if(isDocHidden(latestDoc.code) && !isAdmin()) return;
           if(!canAccessDoc(latestDoc.code)) return;
@@ -2936,6 +3067,7 @@ async function openDoc(code){
       try{
         if(currentDoc !== resolvedCode) return;
         if(window.__DOC_VIEW_RENDER_TOKEN !== openRenderToken) return;
+        if(openViewTxn && !isPortalDocViewTransactionCurrent(openViewTxn, resolvedCode)) return;
         const latestDoc = resolveDocRecord(resolvedCode) || doc;
         if(isDocHidden(latestDoc.code) && !isAdmin()) return;
         if(!canAccessDoc(latestDoc.code)) return;
@@ -2969,12 +3101,18 @@ async function openDocPreview(code){
     const resolvedCode = String(doc.code || '').trim();
     if(isDocHidden(doc.code) && !isAdmin()) return;
     if(!canAccessDoc(doc.code)) return;
-    const previewRenderToken = `${resolvedCode}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
+    const previewViewTxn = (typeof beginPortalDocViewTransaction === 'function')
+      ? beginPortalDocViewTransaction('open-doc-preview', doc, lang)
+      : null;
+    const previewRenderToken = previewViewTxn
+      ? previewViewTxn.token
+      : `${resolvedCode}:${Date.now()}:${Math.random().toString(36).slice(2)}`;
     window.__DOC_VIEW_RENDER_TOKEN = previewRenderToken;
     // Pull the latest server state/versions to keep folder-sync accurate
     try{ await refreshDocFromServer(resolvedCode); }catch(e){}
-    if(currentDoc && currentDoc !== resolvedCode) return;
+    if(currentDoc !== resolvedCode) return;
     if(window.__DOC_VIEW_RENDER_TOKEN !== previewRenderToken) return;
+    if(previewViewTxn && !isPortalDocViewTransactionCurrent(previewViewTxn, resolvedCode)) return;
     const latestDoc = resolveDocRecord(resolvedCode) || doc;
     if(isDocHidden(latestDoc.code) && !isAdmin()) return;
     if(!canAccessDoc(latestDoc.code)) return;
@@ -2985,6 +3123,7 @@ async function openDocPreview(code){
     setDocHeaderMetaCollapsed(true);
     const viewer = document.getElementById('doc-viewer');
     if(viewer) viewer.classList.add('active');
+    persistPortalViewState('open-doc-preview');
 
     // Re-render UI blocks
     updateDocViewerHeader(latestDoc);
@@ -3022,11 +3161,18 @@ function closeDocViewer(){
   editMode=false;
   editingDoc=null;
   currentDoc=null;
+  try{ if(typeof clearPortalDocViewTransaction === 'function') clearPortalDocViewTransaction('close-doc-viewer'); }catch(e){}
   setDocHeaderMetaCollapsed(true);
   try{ if(typeof resetDocViewerZoom==='function') resetDocViewerZoom(); }catch(e){}
   // Clean up iframe state to prevent stale content
   var iframe=document.getElementById('doc-iframe');
   iframe.onload=null;
+  iframe.__qmsDocLoadToken='';
+  iframe.__qmsLangSyncToken='';
+  try{
+    window.__QMS_DOC_IFRAME_LOAD_TOKEN='';
+    window.__QMS_ACTIVE_DOC_CONTENT_SIGNATURE='';
+  }catch(e){}
   iframe.removeAttribute('srcdoc');
   iframe.removeAttribute('src');
   iframe.style.opacity='1';
@@ -3097,9 +3243,14 @@ function applyRuntimeDocDisplayMetadata(doc, meta){
   const desc = String(meta.desc || '').trim();
   if(code) doc.__displayCode = code;
   if(title) doc.__displayTitle = title;
-  if(desc) doc.__displayDesc = desc;
+  if(desc) {
+    doc.__displayDesc = desc;
+    doc.__displayDescLocale = lang === 'en' ? 'en' : 'vi';
+  }
 
   if(String(currentDoc || '') !== String(doc.code || '')) return;
+  const viewTxn = (typeof getPortalDocViewTransaction === 'function') ? getPortalDocViewTransaction() : null;
+  if(viewTxn && typeof isPortalDocViewTransactionCurrent === 'function' && !isPortalDocViewTransactionCurrent(viewTxn, doc)) return;
 
   try{
     const bc = document.getElementById('header-breadcrumb');
@@ -3234,8 +3385,13 @@ function updateDocViewerHeader(doc){
 	    </div>`;
   const dccEl = headerEl.querySelector('.dcc-header');
   if (dccEl && window.DccHeader && typeof window.DccHeader.render === 'function') {
+    const headerViewTxn = (typeof getPortalDocViewTransaction === 'function') ? getPortalDocViewTransaction() : null;
     Promise.resolve(window.DccHeader.render(dccEl))
-      .then(function(){ if (canEditMeta) _injectDccMetaEditButtons(dccEl, doc.code); })
+      .then(function(){
+        if(headerViewTxn && typeof isPortalDocViewTransactionCurrent === 'function' && !isPortalDocViewTransactionCurrent(headerViewTxn, doc)) return;
+        if(!dccEl.isConnected) return;
+        if (canEditMeta) _injectDccMetaEditButtons(dccEl, doc.code);
+      })
       .catch(function(){ /* renderer already paints its own error box */ });
   }
   syncDocViewerDetailVisibility();

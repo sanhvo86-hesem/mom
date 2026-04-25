@@ -218,6 +218,12 @@ final class DocumentLocaleAutomationService
         if ($artifactHtml === '') {
             throw new RuntimeException('dcc_locale_automation_empty_artifact_html');
         }
+        $artifactTitle = $this->nullableText($attempt['title'] ?? null) ?? $title;
+        $artifactSubtitle = $this->nullableText($attempt['subtitle'] ?? null) ?? $subtitle;
+        $artifactHtml = $this->injectDccBootstrapMetadata(
+            $artifactHtml,
+            $this->buildArtifactBootstrapHeader($dcc, $docCode, $artifactTitle, $artifactSubtitle)
+        );
 
         $this->writeArtifact($artifactRelPath, $artifactHtml);
         $cacheMetadata = [];
@@ -573,6 +579,49 @@ final class DocumentLocaleAutomationService
     }
 
     /**
+     * Refresh the embedded offline bootstrap in an existing English artifact.
+     *
+     * The bootstrap is not source of truth, but stale values can still flash or
+     * mislead when the API is unreachable. This keeps existing artifacts aligned
+     * with the DCC header projection without re-running machine translation.
+     *
+     * @return array<string, mixed>
+     */
+    public function refreshEnglishArtifactBootstrap(string $docCode): array
+    {
+        $docCode = DocumentControlService::canonicalizeCode($docCode);
+        if ($docCode === '') {
+            throw new InvalidArgumentException('dcc_locale_refresh_missing_doc_code');
+        }
+
+        $dcc = new DocumentControlService($this->data);
+        $projection = $dcc->getLocaleVariantProjection($docCode, self::TARGET_LOCALE);
+        $artifactRelPath = $this->normalizeRepoRelativePath((string)($projection['artifact_rel_path'] ?? ''));
+        if ($artifactRelPath === '') {
+            return [
+                'ok' => false,
+                'doc_code' => $docCode,
+                'changed' => false,
+                'reason' => 'english_artifact_not_renderable',
+            ];
+        }
+
+        $title = $this->nullableText($projection['title'] ?? null)
+            ?? $this->nullableText($projection['source_title'] ?? null)
+            ?? $docCode;
+        $subtitle = $this->nullableText($projection['subtitle'] ?? null)
+            ?? $this->nullableText($projection['source_subtitle'] ?? null);
+        $changed = $this->refreshArtifactDccBootstrapMetadata($dcc, $docCode, $artifactRelPath, $title, $subtitle);
+
+        return [
+            'ok' => true,
+            'doc_code' => $docCode,
+            'changed' => $changed,
+            'artifact_rel_path' => $artifactRelPath,
+        ];
+    }
+
+    /**
      * @param array<string, mixed> $header
      */
     private function syncHeaderBaseline(array $header, string $actor): void
@@ -594,29 +643,6 @@ final class DocumentLocaleAutomationService
             'effective_date' => $effectiveDate,
             'status' => $status,
         ], $actor);
-
-        $params = [
-            ':doc_code' => $docCode,
-            ':revision' => $revision,
-            ':effective_date' => $effectiveDate,
-            ':status' => $status,
-            ':actor' => $actor,
-            ':title' => $title,
-            ':subtitle' => $subtitle,
-            ':subtitle_present' => $subtitle !== null ? 1 : 0,
-        ];
-
-        $this->data->execute(
-            "UPDATE dcc_document_header
-             SET revision = :revision,
-                 effective_date = :effective_date,
-                 status = :status,
-                 title = COALESCE(NULLIF(:title, ''), title),
-                 subtitle = CASE WHEN :subtitle_present = 1 THEN :subtitle ELSE subtitle END,
-                 updated_by = :actor
-             WHERE doc_code = :doc_code",
-            $params
-        );
     }
 
     /**
@@ -1026,6 +1052,136 @@ final class DocumentLocaleAutomationService
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
+    private function buildArtifactBootstrapHeader(
+        DocumentControlService $dcc,
+        string $docCode,
+        string $artifactTitle,
+        ?string $artifactSubtitle
+    ): array {
+        $current = [];
+        try {
+            $current = $dcc->getHeader($docCode);
+        } catch (Throwable) {
+            $current = [];
+        }
+
+        $title = $this->nullableText($artifactTitle)
+            ?? $this->nullableText($current['title'] ?? null)
+            ?? $docCode;
+        $subtitle = $this->nullableText($artifactSubtitle)
+            ?? $this->nullableText($current['subtitle'] ?? null);
+        $effectiveDate = $this->normaliseIsoDate($current['effective_date'] ?? null) ?? gmdate('Y-m-d');
+
+        return [
+            'doc_code' => DocumentControlService::canonicalizeCode((string)($current['doc_code'] ?? $docCode)),
+            'title' => $title,
+            'subtitle' => $subtitle,
+            'doc_type' => (string)($current['doc_type'] ?? DocumentControlService::deriveDocType($docCode)),
+            'revision' => $this->toDccRevision((string)($current['revision'] ?? '')),
+            'effective_date' => $effectiveDate,
+            'owner_role_code' => trim((string)($current['owner_role_code'] ?? '')),
+            'approver_role_code' => trim((string)($current['approver_role_code'] ?? '')),
+            'iso_clause' => $this->nullableText($current['iso_clause'] ?? null),
+            'status' => $this->normaliseSourceStatus((string)($current['status'] ?? 'draft')),
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $header
+     */
+    private function injectDccBootstrapMetadata(string $html, array $header): string
+    {
+        $payload = [
+            'header' => $header,
+            'labels' => $this->defaultDccBootstrapLabels(),
+        ];
+        $json = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if (!is_string($json)) {
+            return $html;
+        }
+
+        $count = 0;
+        $out = preg_replace_callback(
+            '/<div\b(?=[^>]*\bdcc-header\b)[^>]*>/i',
+            function (array $matches) use ($json, $header): string {
+                $tag = (string)$matches[0];
+                $tag = $this->upsertHtmlAttribute($tag, 'data-dcc-bootstrap', $json);
+                $tag = $this->upsertHtmlAttribute($tag, 'data-dcc-doc-code', (string)($header['doc_code'] ?? ''));
+                $tag = $this->upsertHtmlAttribute($tag, 'data-dcc-locale', self::TARGET_LOCALE);
+                return $tag;
+            },
+            $html,
+            1,
+            $count
+        );
+
+        return $count > 0 && is_string($out) ? $out : $html;
+    }
+
+    /**
+     * @return array<string, array{short: string, long: string, sort: int}>
+     */
+    private function defaultDccBootstrapLabels(): array
+    {
+        return [
+            'doc_id' => ['short' => 'ID', 'long' => 'Document ID', 'sort' => 10],
+            'revision' => ['short' => 'Rev', 'long' => 'Revision', 'sort' => 20],
+            'effective_date' => ['short' => 'Eff', 'long' => 'Effective date', 'sort' => 30],
+            'owner' => ['short' => 'Owner', 'long' => 'Owner', 'sort' => 40],
+            'approver' => ['short' => 'Appr', 'long' => 'Approved by', 'sort' => 50],
+        ];
+    }
+
+    private function upsertHtmlAttribute(string $tag, string $name, string $value): string
+    {
+        $escaped = htmlspecialchars($value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $attr = ' ' . $name . '="' . $escaped . '"';
+        $pattern = '/\s+' . preg_quote($name, '/') . '\s*=\s*(?:"[^"]*"|\'[^\']*\')/i';
+        if (preg_match($pattern, $tag) === 1) {
+            return preg_replace($pattern, $attr, $tag, 1) ?? $tag;
+        }
+
+        return preg_replace('/(\s*\/?>)$/', $attr . '$1', $tag, 1) ?? $tag;
+    }
+
+    private function refreshArtifactDccBootstrapMetadata(
+        DocumentControlService $dcc,
+        string $docCode,
+        string $artifactRelPath,
+        string $artifactTitle,
+        ?string $artifactSubtitle
+    ): bool {
+        $artifactRelPath = $this->normalizeRepoRelativePath($artifactRelPath);
+        if ($artifactRelPath === '') {
+            return false;
+        }
+
+        $abs = $this->rootDir . '/' . $artifactRelPath;
+        $html = @file_get_contents($abs);
+        if (!is_string($html) || trim($html) === '') {
+            return false;
+        }
+
+        $normalized = $this->normalizeArtifactHtml($html);
+        if ($normalized === '') {
+            return false;
+        }
+
+        $patched = $this->injectDccBootstrapMetadata(
+            $normalized,
+            $this->buildArtifactBootstrapHeader($dcc, $docCode, $artifactTitle, $artifactSubtitle)
+        );
+        if ($patched !== $html) {
+            $this->writeArtifact($artifactRelPath, $patched);
+            return true;
+        }
+
+        return false;
+    }
+
     private function writeArtifact(string $artifactRelPath, string $html): void
     {
         $abs = $this->rootDir . '/' . $artifactRelPath;
@@ -1315,6 +1471,10 @@ final class DocumentLocaleAutomationService
         if (!$artifactReady) {
             return null;
         }
+
+        $artifactTitle = $this->nullableText($existingVariant['title'] ?? null) ?? $title;
+        $artifactSubtitle = $this->nullableText($existingVariant['subtitle'] ?? null) ?? $subtitle;
+        $this->refreshArtifactDccBootstrapMetadata($dcc, $docCode, $artifactRelPath, $artifactTitle, $artifactSubtitle);
 
         $state = $this->normaliseVariantState((string)($existingVariant['translation_state'] ?? $fallbackState), $fallbackState);
         if (!$this->isRenderableVariantState($state)) {

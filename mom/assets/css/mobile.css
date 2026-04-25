@@ -167,10 +167,11 @@ textarea {
     margin-bottom: 24px;
   }
 
-  /* -- Sidebar (hidden on mobile, use bottom nav) ----------------------- */
+  /* -- Legacy sidebar (hidden on mobile, use bottom nav) ----------------
+     Do not target #sidebar: the current portal owns it as the mobile drawer.
+     Hiding it here with !important makes navigation disappear after resize. */
 
-  .sidebar,
-  #sidebar {
+  .sidebar:not(#sidebar) {
     display: none !important;
   }
 

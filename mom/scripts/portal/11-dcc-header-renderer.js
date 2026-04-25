@@ -144,6 +144,7 @@ function _apiUrl(path){
 
 function _fetchJson(url, opts){
     var options = Object.assign({
+        cache: 'no-store',
         credentials: 'same-origin',
         headers: { 'Accept': 'application/json' }
     }, opts || {});
@@ -189,29 +190,45 @@ function _loadLabels(locale){
     return _labelsPending[key];
 }
 
-/* ── Per-doc header cache ─────────────────────────────────────────────────
- * Small in-memory cache of the most recent header payload per doc_code,
- * keyed by code (locale-agnostic — metadata is the same across locales;
- * only labels change). Exposed via window.DccHeader.getCached() so other
- * portal modules can read the authoritative owner/approver/revision
- * without issuing a duplicate round-trip, and without reaching for the
- * legacy SERVER_DOC_STATE store.
- */
-var _headerCache = Object.create(null);
+    /* ── Per-doc header cache ─────────────────────────────────────────────────
+     * Header metadata is fetched from the backend API and cached by code+locale.
+     * The latest per-code payload remains exposed for callers that only need
+     * locale-neutral fields such as owner/approver/revision.
+     */
+    var _headerCache = Object.create(null);
+    var _latestHeaderByDoc = Object.create(null);
+
+    function _cacheKey(docCode, locale){
+        return String(docCode || '').toUpperCase() + '|' + String(locale || DEFAULT_LOCALE).toLowerCase();
+    }
+
+    function _cachedHeader(docCode, locale){
+        var code = String(docCode || '').toUpperCase();
+        if (!code) return null;
+        return _headerCache[_cacheKey(code, locale)] || null;
+    }
+
+    function _cachedHeaderAnyLocale(docCode){
+        var code = String(docCode || '').toUpperCase();
+        if (!code) return null;
+        return _latestHeaderByDoc[code] || null;
+    }
 
 function _loadHeader(docCode, locale){
     var url = _apiUrl(
         API_PREFIX + '/documents/' + encodeURIComponent(docCode) +
         '/header?locale=' + encodeURIComponent(locale || DEFAULT_LOCALE)
     );
-    return _fetchJson(url).then(function(body){
-        if (!body || !body.header) {
-            throw new Error('dcc_header_missing_in_response');
-        }
-        _headerCache[String(docCode).toUpperCase()] = body.header;
-        return body.header;
-    });
-}
+        return _fetchJson(url).then(function(body){
+            if (!body || !body.header) {
+                throw new Error('dcc_header_missing_in_response');
+            }
+            var code = String(docCode).toUpperCase();
+            _headerCache[_cacheKey(code, locale)] = body.header;
+            _latestHeaderByDoc[code] = body.header;
+            return body.header;
+        });
+    }
 
 /* ── Rendering helpers ─────────────────────────────────────────────────── */
 
@@ -368,18 +385,22 @@ function render(container){
         return Promise.reject(new Error('missing_data_dcc_doc_code_attribute'));
     }
 
-    // Immediate bootstrap paint (if present) so the ribbon doesn't flicker
-    // while we fetch the authoritative payload from the backend. Suppress the
-    // seed when it disagrees with the URL-derived code — the seed is stale
-    // after a rename and showing it briefly would flash the old title on-screen.
+    var renderToken = String(Date.now()) + ':' + Math.random().toString(36).slice(2);
+    container.__dccRenderToken = renderToken;
+
+    // Never repaint a visible header from static bootstrap during normal
+    // runtime. Many controlled-doc HTML files carry old V0 bootstrap seeds;
+    // painting those on every retry causes the English header to flash between
+    // stale HTML metadata and the DB/API projection. Bootstrap is retained only
+    // as an offline fallback when no API payload has ever been fetched.
     var bootstrap = _readBootstrap(container);
     if (bootstrap && bootstrap.header && urlCode && attrCode && urlCode !== attrCode) {
         bootstrap = null;
     }
-    if (bootstrap && bootstrap.header) {
-        var seedLabels = bootstrap.labels || {};
-        try { _renderInto(container, bootstrap.header, seedLabels); } catch(e){}
-        container.setAttribute('data-dcc-state', 'bootstrap');
+    var cached = _cachedHeader(docCode, locale);
+    if (cached) {
+        try { _renderInto(container, cached, _labelsCache[String(locale || DEFAULT_LOCALE).toLowerCase()] || {}); } catch(e){}
+        container.setAttribute('data-dcc-state', 'cached');
     } else {
         container.setAttribute('data-dcc-state', 'loading');
     }
@@ -388,14 +409,27 @@ function render(container){
         _loadHeader(docCode, locale),
         _loadLabels(locale)
     ]).then(function(results){
+        if (container.__dccRenderToken !== renderToken) {
+            return results[0];
+        }
         var header = results[0];
         var labels = results[1];
         _renderInto(container, header, labels);
         return header;
     }).catch(function(err){
-        // If we already painted from bootstrap, keep that on-screen rather
-        // than blanking the header when the backend is offline.
+        if (container.__dccRenderToken !== renderToken) {
+            return cached || (bootstrap && bootstrap.header) || null;
+        }
+        if (cached) {
+            try { _renderInto(container, cached, _labelsCache[String(locale || DEFAULT_LOCALE).toLowerCase()] || {}); } catch(e){}
+            container.setAttribute('data-dcc-state', 'cached-offline');
+            return cached;
+        }
+        // Offline-only fallback. Do not use this path during successful API
+        // renders because static seeds are not the DCC source of truth.
         if (bootstrap && bootstrap.header) {
+            var seedLabels = bootstrap.labels || {};
+            try { _renderInto(container, bootstrap.header, seedLabels); } catch(e){}
             container.setAttribute('data-dcc-state', 'bootstrap-only');
             console.warn('[DccHeader] API unreachable; rendered from bootstrap seed', err);
             return bootstrap.header;
@@ -439,15 +473,18 @@ window.DccHeader = {
      * the renderer has not yet fetched that doc. Callers must treat a null
      * result as "use your fallback chain"; never synthesize a default.
      */
-    getCached: function(docCode){
-        if (!docCode) return null;
-        var key = String(docCode).toUpperCase();
-        return _headerCache[key] || null;
-    },
-    _clearCache: function(){
-        _labelsCache = {}; _labelsPending = {}; _headerCache = Object.create(null);
-    }
-};
+        getCached: function(docCode, locale){
+            if (!docCode) return null;
+            if (locale) return _cachedHeader(docCode, locale);
+            return _cachedHeaderAnyLocale(docCode);
+        },
+        _clearCache: function(){
+            _labelsCache = {};
+            _labelsPending = {};
+            _headerCache = Object.create(null);
+            _latestHeaderByDoc = Object.create(null);
+        }
+    };
 
 bootstrap();
 })();

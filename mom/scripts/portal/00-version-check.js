@@ -136,6 +136,15 @@
     clearDeferredTimer();
     clearCooldownTimer();
     try {
+      if (typeof window.__hesemPortalBeforeHardReload === 'function') {
+        window.__hesemPortalBeforeHardReload({
+          reason: 'version-check',
+          baselineVersion: baselineVersion,
+          pendingVersion: pendingVersion
+        });
+      }
+    } catch (e) { /* swallow — reload must remain best-effort */ }
+    try {
       if ('caches' in window && caches.keys) {
         var keys = await caches.keys();
         await Promise.all(keys.map(function (k) {
@@ -265,14 +274,17 @@
     if (!live) return;
 
     if (baselineVersion === null) {
-      // First successful read — record the baseline. localStorage holds the
-      // last sha we ever observed for this origin; we always adopt the live
-      // sha as the new baseline (whether or not it matches) so subsequent
-      // diffs only fire on changes that happen AFTER this page load. The
-      // localStorage write itself is the loop guard: if a previous reload
-      // already updated it to `live`, we never re-trigger.
+      // First successful read. If this tab was restored from an old app shell
+      // but build-info already points at a newer deploy, do not "adopt" the
+      // live sha as baseline. Force one hard reload so the browser loads the
+      // matching portal.html/JS/CSS set instead of continuing with stale code.
       try {
         var stored = localStorage.getItem(STORAGE_KEY);
+        if (stored && stored !== live) {
+          baselineVersion = stored;
+          scheduleReload(live);
+          return;
+        }
         if (stored !== live) localStorage.setItem(STORAGE_KEY, live);
       } catch (e) { /* private mode etc. — fall through */ }
       baselineVersion = live;
