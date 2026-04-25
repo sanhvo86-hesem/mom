@@ -1353,7 +1353,16 @@ function refreshPortalDocsUiAfterSync(){
         if(typeof updateDocViewerHeader==='function') updateDocViewerHeader(doc);
         if(typeof renderWorkflowPanel==='function') renderWorkflowPanel(doc);
         if(typeof renderVersionHistory==='function') renderVersionHistory(doc);
-        if(!editMode && typeof loadDocContent==='function') loadDocContent(currentDoc);
+        if(!editMode && typeof loadDocContent==='function'){
+          let shouldReload = true;
+          try{
+            if(typeof getDocIframeLoadSignature === 'function' && typeof getDocLocaleView === 'function'){
+              const nextSignature = getDocIframeLoadSignature(doc, getDocLocaleView(doc));
+              shouldReload = !nextSignature || nextSignature !== String(window.__QMS_ACTIVE_DOC_CONTENT_SIGNATURE || '');
+            }
+          }catch(_e){ shouldReload = true; }
+          if(shouldReload) loadDocContent(currentDoc);
+        }
       }
     }
   }catch(e){}
@@ -2782,19 +2791,24 @@ function setLang(l){
   try{ if(typeof fixMojibakeDom==='function') fixMojibakeDom(document.body); }catch(e){}
   const dv=document.getElementById('doc-viewer');
   const viewerOpen = !!(dv&&dv.classList.contains('active')&&currentDoc);
+  const viewerOpenDocCode = viewerOpen ? String(currentDoc || '').trim() : '';
   if(viewerOpen && l==='en' && !editMode){
     try{ renderEnglishLocaleSwitchPendingCard(); }catch(e){}
     try{
       const localeRefresh = (typeof refreshDccOverlayForDocFromServer === 'function')
-        ? refreshDccOverlayForDocFromServer(currentDoc, {refreshUi:false})
+        ? refreshDccOverlayForDocFromServer(viewerOpenDocCode, {refreshUi:false})
         : refreshDccOverlayFromServer({refreshUi:false});
       Promise.resolve(localeRefresh).then(function(){
         try{
+          if(lang !== l || String(currentDoc || '').trim() !== viewerOpenDocCode) return;
           if(currentPage==='documents') renderDocuments();
-          if(currentDoc&&!editMode) openDocPreview(currentDoc);
+          if(viewerOpenDocCode&&!editMode) openDocPreview(viewerOpenDocCode);
         }catch(_e){}
       }).catch(function(){
-        try{ if(currentDoc&&!editMode) loadDocContent(currentDoc); }catch(_e){}
+        try{
+          if(lang !== l || String(currentDoc || '').trim() !== viewerOpenDocCode) return;
+          if(viewerOpenDocCode&&!editMode) loadDocContent(viewerOpenDocCode);
+        }catch(_e){}
       });
       if(typeof refreshDccOverlayFromServer === 'function'){
         Promise.resolve(refreshDccOverlayFromServer({refreshUi:false})).then(function(){
@@ -2812,15 +2826,16 @@ function setLang(l){
   }
   try{
     const localeRefresh = (viewerOpen && currentDoc && typeof refreshDccOverlayForDocFromServer === 'function')
-      ? refreshDccOverlayForDocFromServer(currentDoc, {refreshUi:false})
+      ? refreshDccOverlayForDocFromServer(viewerOpenDocCode, {refreshUi:false})
       : refreshDccOverlayFromServer({refreshUi:false});
     Promise.resolve(localeRefresh).then(function(){
       try{
+        if(viewerOpenDocCode && (lang !== l || String(currentDoc || '').trim() !== viewerOpenDocCode)) return;
         if(currentPage==='documents') renderDocuments();
       }catch(_e){}
       const dv2=document.getElementById('doc-viewer');
-      if(dv2&&dv2.classList.contains('active')&&currentDoc&&!editMode){
-        try{ openDocPreview(currentDoc); }catch(_e){}
+      if(dv2&&dv2.classList.contains('active')&&viewerOpenDocCode&&!editMode&&String(currentDoc || '').trim()===viewerOpenDocCode){
+        try{ openDocPreview(viewerOpenDocCode); }catch(_e){}
       }
     }).catch(function(){});
     if(viewerOpen && currentDoc && typeof refreshDccOverlayFromServer === 'function'){

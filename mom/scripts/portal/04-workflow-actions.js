@@ -759,6 +759,12 @@ function closeDocViewerForce(){
   try{ resetDocViewerZoom(); }catch(e){}
   var iframe=document.getElementById('doc-iframe');
   iframe.onload=null;
+  iframe.__qmsDocLoadToken='';
+  iframe.__qmsLangSyncToken='';
+  try{
+    window.__QMS_DOC_IFRAME_LOAD_TOKEN='';
+    window.__QMS_ACTIVE_DOC_CONTENT_SIGNATURE='';
+  }catch(e){}
   iframe.removeAttribute('srcdoc');
   iframe.removeAttribute('src');
   iframe.style.opacity='1';
@@ -1344,7 +1350,7 @@ function syncIframeDocumentLanguage(iframe, targetLang){
   });
 }
 
-function scheduleIframeDocumentLanguageSync(iframe, targetLang){
+function scheduleIframeDocumentLanguageSync(iframe, targetLang, expectedDocLoadToken){
   if(!iframe) return Promise.resolve(false);
   const normalizedLang = targetLang === 'en' ? 'en' : 'vi';
   const syncToken = String(Date.now()) + ':' + Math.random().toString(36).slice(2);
@@ -1356,6 +1362,10 @@ function scheduleIframeDocumentLanguageSync(iframe, targetLang){
       return new Promise(function(resolve){
         function runSync(){
           if(!iframe || iframe.__qmsLangSyncToken !== syncToken){
+            resolve(lastResult);
+            return;
+          }
+          if(expectedDocLoadToken && iframe.__qmsDocLoadToken !== expectedDocLoadToken){
             resolve(lastResult);
             return;
           }
@@ -1868,6 +1878,7 @@ async function confirmSubmitForReview(code){
       document.getElementById('editor-container').classList.remove('ed-fullscreen');
       document.getElementById('doc-iframe').style.display='';
 
+      if(String(currentDoc || '') !== String(code || '')) return;
       loadDocContent(code);
 
       const toastType=updateType==='major'?'🔄 MAJOR':'📝 MINOR';
@@ -1958,6 +1969,7 @@ async function rejectDoc(code){
       // Reload versions/state from server to keep folder-sync
       await refreshDocFromServer(code);
       showToast(lang==='en'?'↩ Rejected — returned to author':'↩ Đã trả lại — về tác giả');
+      if(String(currentDoc || '') !== String(code || '')) return;
       renderWorkflowPanel(doc);
       renderVersionHistory(doc);
       updateDocViewerHeader(doc);
@@ -2322,6 +2334,110 @@ function syncIframeDocumentHeaderMetadata(idoc, doc, options){
   }catch(e){}
 }
 
+let __QMS_DOC_IFRAME_LOAD_SEQ = 0;
+
+function qmsNormalizeDocLoadPath(path){
+  try{
+    if(typeof normalizeDocRelativePath === 'function'){
+      return normalizeDocRelativePath(path);
+    }
+  }catch(e){}
+  try{
+    return String(path || '')
+      .trim()
+      .replace(/\\/g, '/')
+      .replace(/^\/+/, '')
+      .replace(/^\.\//, '');
+  }catch(e){
+    return '';
+  }
+}
+
+function getDocIframeLoadSignature(doc, localeView){
+  const activeLang = lang === 'en' ? 'en' : 'vi';
+  const code = String(doc && doc.code || '').trim();
+  const path = qmsNormalizeDocLoadPath(doc && doc.path);
+  const mode = String(localeView && localeView.mode || '').trim();
+  const file = qmsNormalizeDocLoadPath(localeView && localeView.file);
+  const state = String(localeView && localeView.translationState || '').trim();
+  return [activeLang, code, path, mode, file, state].join('|');
+}
+window.getDocIframeLoadSignature = getDocIframeLoadSignature;
+
+function createDocIframeLoadContext(iframe, doc, localeView){
+  const activeLang = lang === 'en' ? 'en' : 'vi';
+  const code = String(doc && doc.code || '').trim();
+  const path = qmsNormalizeDocLoadPath(doc && doc.path);
+  const file = qmsNormalizeDocLoadPath(localeView && localeView.file);
+  const signature = getDocIframeLoadSignature(doc, localeView);
+  const seq = ++__QMS_DOC_IFRAME_LOAD_SEQ;
+  const token = [seq, activeLang, code, path, file, Date.now(), Math.random().toString(36).slice(2)].join('|');
+  const ctx = {token, seq, lang: activeLang, code, path, file, signature};
+  try{
+    if(iframe){
+      iframe.__qmsDocLoadToken = token;
+      iframe.__qmsDocLoadContext = ctx;
+      iframe.__qmsDocLoadCode = code;
+      iframe.__qmsDocLoadPath = path;
+      iframe.__qmsDocLoadLang = activeLang;
+      iframe.__qmsDocLoadFile = file;
+      iframe.__qmsDocLoadSignature = signature;
+      iframe.__qmsLangSyncToken = '';
+    }
+    window.__QMS_DOC_IFRAME_LOAD_TOKEN = token;
+    window.__QMS_ACTIVE_DOC_CONTENT_SIGNATURE = signature;
+  }catch(e){}
+  return ctx;
+}
+
+function updateDocIframeLoadContextFile(iframe, ctx, localeView){
+  if(!ctx) return;
+  const file = qmsNormalizeDocLoadPath(localeView && localeView.file);
+  ctx.file = file;
+  ctx.signature = getDocIframeLoadSignature({code: ctx.code, path: ctx.path}, localeView);
+  try{
+    if(iframe && iframe.__qmsDocLoadToken === ctx.token){
+      iframe.__qmsDocLoadFile = file;
+      iframe.__qmsDocLoadSignature = ctx.signature;
+      window.__QMS_ACTIVE_DOC_CONTENT_SIGNATURE = ctx.signature;
+    }
+  }catch(e){}
+}
+
+function isCurrentDocIframeLoad(iframe, ctx){
+  try{
+    if(!iframe || !ctx || iframe.__qmsDocLoadToken !== ctx.token) return false;
+    if((lang === 'en' ? 'en' : 'vi') !== ctx.lang) return false;
+    if(String(currentDoc || '').trim() !== ctx.code) return false;
+    const currentPath = qmsNormalizeDocLoadPath(window.currentDocPath || '');
+    if(ctx.path && currentPath && currentPath !== ctx.path) return false;
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+
+function isIframeDocumentLocationForLoad(idoc, ctx){
+  try{
+    if(!idoc || !ctx || !ctx.file) return true;
+    const loc = idoc.location || (idoc.defaultView && idoc.defaultView.location) || null;
+    const rawPath = loc ? String(loc.pathname || '') : '';
+    const loadedPath = qmsNormalizeDocLoadPath(rawPath ? decodeURIComponent(rawPath) : '');
+    const expectedPath = qmsNormalizeDocLoadPath(ctx.file);
+    if(!loadedPath || !expectedPath) return false;
+    return loadedPath === expectedPath || loadedPath.endsWith('/' + expectedPath);
+  }catch(e){
+    return false;
+  }
+}
+
+function finishDocIframeLoad(iframe, loading, ctx){
+  if(!isCurrentDocIframeLoad(iframe, ctx)) return false;
+  if(loading) loading.style.display = 'none';
+  if(iframe) iframe.style.opacity = '1';
+  return true;
+}
+
 function loadDocContent(code){
   const doc=(typeof window._resolveDocRecord === 'function') ? window._resolveDocRecord(code) : DOCS.find(d=>d.code===code);
   if(!doc) return;
@@ -2332,11 +2448,14 @@ function loadDocContent(code){
     return;
   }
   const resolvedCode = String(doc.code || '').trim();
+  if(String(currentDoc || '').trim() !== resolvedCode) return;
   const localeView = getDocLocaleView(doc);
 
   const edited = lang === 'en' ? '' : getEditedHtml(resolvedCode);
   const iframe=document.getElementById('doc-iframe');
   const loading=document.getElementById('iframe-loading');
+  if(!iframe) return;
+  const loadCtx = createDocIframeLoadContext(iframe, doc, localeView);
 
   // Show loading indicator while refreshing the iframe
   if(loading){
@@ -2347,6 +2466,7 @@ function loadDocContent(code){
 
   try{
     iframe.onload=null;
+    iframe.__qmsLangSyncToken='';
     iframe.removeAttribute('srcdoc');
     iframe.removeAttribute('src');
   }catch(e){}
@@ -2355,8 +2475,7 @@ function loadDocContent(code){
     if(lang==='en' && !localeView.available){
       const unavailableCopy = getEnglishLocaleUnavailableCopy(localeView);
       iframe.onload=function(){
-        if(loading) loading.style.display='none';
-        iframe.style.opacity='1';
+        finishDocIframeLoad(iframe, loading, loadCtx);
       };
       iframe.srcdoc = `<!DOCTYPE html>
         <html lang="en">
@@ -2389,7 +2508,7 @@ function loadDocContent(code){
         </body>
         </html>`;
       setTimeout(function(){
-        if(loading && loading.style.display!=='none'){ loading.style.display='none'; iframe.style.opacity='1'; }
+        if(loading && loading.style.display!=='none') finishDocIframeLoad(iframe, loading, loadCtx);
       }, 300);
       return;
     }
@@ -2431,9 +2550,9 @@ function loadDocContent(code){
       ? 'Non-HTML controlled files are version-managed through private staging, review, approval, and immutable archive. Use the buttons below to retrieve the current released file or the latest working copy.'
       : 'Cac tep khong phai HTML duoc kiem soat phien ban qua private staging, review, approval va immutable archive. Dung cac nut ben duoi de tai file phat hanh hien hanh hoac ban lam viec moi nhat.';
     iframe.onload=function(){
+      if(!isCurrentDocIframeLoad(iframe, loadCtx)) return;
       try{ attachIframeViewerZoom(iframe); }catch(e){}
-      if(loading) loading.style.display='none';
-      iframe.style.opacity='1';
+      finishDocIframeLoad(iframe, loading, loadCtx);
     };
     iframe.srcdoc = `<!DOCTYPE html>
       <html lang="${lang==='en'?'en':'vi'}">
@@ -2480,7 +2599,7 @@ function loadDocContent(code){
       </body>
       </html>`;
     setTimeout(function(){
-      if(loading && loading.style.display!=='none'){ loading.style.display='none'; iframe.style.opacity='1'; }
+      if(loading && loading.style.display!=='none') finishDocIframeLoad(iframe, loading, loadCtx);
     }, 5000);
     return;
   }
@@ -2488,13 +2607,14 @@ function loadDocContent(code){
   // Load the best file (live approved OR archive working copy), then inject any
   // unsaved local edits (editor-only) on top.
   setTimeout(function(){
+    if(!isCurrentDocIframeLoad(iframe, loadCtx)) return;
     const localeView = getDocLocaleView(doc);
+    updateDocIframeLoadContextFile(iframe, loadCtx, localeView);
     const viewFile = localeView.file;
     if(!localeView.available || !viewFile){
       const unavailableCopy = getEnglishLocaleUnavailableCopy(localeView);
       iframe.onload=function(){
-        if(loading) loading.style.display='none';
-        iframe.style.opacity='1';
+        finishDocIframeLoad(iframe, loading, loadCtx);
       };
       iframe.srcdoc = `<!DOCTYPE html>
         <html lang="${lang==='en'?'en':'vi'}">
@@ -2527,16 +2647,18 @@ function loadDocContent(code){
         </body>
         </html>`;
       setTimeout(function(){
-        if(loading && loading.style.display!=='none'){ loading.style.display='none'; iframe.style.opacity='1'; }
+        if(loading && loading.style.display!=='none') finishDocIframeLoad(iframe, loading, loadCtx);
       }, 300);
       return;
     }
+    if(!isCurrentDocIframeLoad(iframe, loadCtx)) return;
     const src='../'+viewFile;
     const bust='t='+Date.now();
-    iframe.src = src + (src.indexOf('?')>=0 ? '&' : '?') + bust;
     iframe.onload=function(){
+      if(!isCurrentDocIframeLoad(iframe, loadCtx)) return;
       try{
         const idoc = iframe.contentDocument || (iframe.contentWindow && iframe.contentWindow.document);
+        if(!isIframeDocumentLocationForLoad(idoc, loadCtx)) return;
         try{ repairBrokenDocStyleArtifacts(idoc); }catch(_e){}
         try{ repairIframeDocImages(idoc); }catch(_e){}
         if(edited && idoc){
@@ -2551,10 +2673,12 @@ function loadDocContent(code){
             // Re-run after initial render so late layout changes (fonts/images)
             // cannot push table width beyond page frame.
             setTimeout(function(){
+              if(!isCurrentDocIframeLoad(iframe, loadCtx)) return;
               try{ edApplyGlobalTablePolicyToDocument(idoc, {force:true, source:'view-load-late-1'}); }catch(_e){}
               try{ resetIframeViewerScroll(idoc); }catch(_e){}
             }, 220);
             setTimeout(function(){
+              if(!isCurrentDocIframeLoad(iframe, loadCtx)) return;
               try{ edApplyGlobalTablePolicyToDocument(idoc, {force:true, source:'view-load-late-2'}); }catch(_e){}
               try{ resetIframeViewerScroll(idoc); }catch(_e){}
             }, 1200);
@@ -2562,17 +2686,17 @@ function loadDocContent(code){
         }catch(e){}
         // Keep the iframe document aware of the active locale so DCC/header
         // components can re-render from authoritative locale data.
-        try{ scheduleIframeDocumentLanguageSync(iframe, lang); }catch(e){}
+        try{ scheduleIframeDocumentLanguageSync(iframe, loadCtx.lang, loadCtx.token); }catch(e){}
         try{ if(typeof attachIframeLinkBridge==='function') attachIframeLinkBridge(iframe, doc, viewFile); }catch(e){}
         try{ attachIframeViewerZoom(iframe); }catch(e){}
         try{ resetIframeViewerScroll(idoc); }catch(e){}
       }catch(e){}
-      if(loading) loading.style.display='none';
-      iframe.style.opacity='1';
+      finishDocIframeLoad(iframe, loading, loadCtx);
     };
+    iframe.src = src + (src.indexOf('?')>=0 ? '&' : '?') + bust;
     // Fallback
     setTimeout(function(){
-      if(loading && loading.style.display!=='none'){ loading.style.display='none'; iframe.style.opacity='1'; }
+      if(loading && loading.style.display!=='none') finishDocIframeLoad(iframe, loading, loadCtx);
     }, 5000);
   }, 30);
 }

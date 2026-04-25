@@ -2973,7 +2973,7 @@ async function openDocPreview(code){
     window.__DOC_VIEW_RENDER_TOKEN = previewRenderToken;
     // Pull the latest server state/versions to keep folder-sync accurate
     try{ await refreshDocFromServer(resolvedCode); }catch(e){}
-    if(currentDoc && currentDoc !== resolvedCode) return;
+    if(currentDoc !== resolvedCode) return;
     if(window.__DOC_VIEW_RENDER_TOKEN !== previewRenderToken) return;
     const latestDoc = resolveDocRecord(resolvedCode) || doc;
     if(isDocHidden(latestDoc.code) && !isAdmin()) return;
@@ -3027,6 +3027,12 @@ function closeDocViewer(){
   // Clean up iframe state to prevent stale content
   var iframe=document.getElementById('doc-iframe');
   iframe.onload=null;
+  iframe.__qmsDocLoadToken='';
+  iframe.__qmsLangSyncToken='';
+  try{
+    window.__QMS_DOC_IFRAME_LOAD_TOKEN='';
+    window.__QMS_ACTIVE_DOC_CONTENT_SIGNATURE='';
+  }catch(e){}
   iframe.removeAttribute('srcdoc');
   iframe.removeAttribute('src');
   iframe.style.opacity='1';
