@@ -228,8 +228,11 @@ final class DocumentLocaleAutomationService
         $this->writeArtifact($artifactRelPath, $artifactHtml);
         $cacheMetadata = [];
         try {
-            $this->writeRuntimeArtifactCache($docCode, self::TARGET_LOCALE, $sourceHash, $artifactHtml);
-            $cacheMetadata['runtime_cache_written_at'] = gmdate(DATE_ATOM);
+            if ($this->writeRuntimeArtifactCache($docCode, self::TARGET_LOCALE, $sourceHash, $artifactHtml)) {
+                $cacheMetadata['runtime_cache_written_at'] = gmdate(DATE_ATOM);
+            } else {
+                $cacheMetadata['runtime_cache_write_failed'] = true;
+            }
         } catch (Throwable $cacheError) {
             @error_log('[DCC locale automation] runtime cache write failed for ' . $docCode . ': ' . $cacheError->getMessage());
             $cacheMetadata['runtime_cache_write_failed'] = true;
@@ -1227,16 +1230,21 @@ final class DocumentLocaleAutomationService
         return $this->rootDir . '/mom/data/cache/dcc-locale-artifacts/' . $safeLocale . '/' . $safeCode . '/' . $safeHash . '.html';
     }
 
-    private function writeRuntimeArtifactCache(string $docCode, string $locale, string $sourceHash, string $html): void
+    private function writeRuntimeArtifactCache(string $docCode, string $locale, string $sourceHash, string $html): bool
     {
         $cachePath = $this->runtimeArtifactCachePath($docCode, $locale, $sourceHash);
         $dir = dirname($cachePath);
         if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) {
-            throw new RuntimeException('dcc_locale_automation_cache_dir_create_failed');
+            @error_log('[DCC locale automation] runtime cache directory create failed: ' . $dir);
+            return false;
         }
+        @chmod($dir, 0775);
         if (@file_put_contents($cachePath, $html, LOCK_EX) === false) {
-            throw new RuntimeException('dcc_locale_automation_cache_write_failed');
+            @error_log('[DCC locale automation] runtime cache write failed: ' . $cachePath);
+            return false;
         }
+        @chmod($cachePath, 0664);
+        return true;
     }
 
     private function restoreArtifactFromRuntimeCache(

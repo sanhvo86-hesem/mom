@@ -32,6 +32,7 @@ $options = getopt('', [
     'no-spawn-per-job',
     'only-missing-job',
     'start-workers::',
+    'wait-for-workers',
     'worker-slots::',
 ]);
 if (!is_array($options)) {
@@ -47,6 +48,7 @@ $dryRun = array_key_exists('dry-run', $options);
 $force = array_key_exists('force', $options);
 $onlyMissingJob = array_key_exists('only-missing-job', $options);
 $spawnPerJob = !array_key_exists('no-spawn-per-job', $options);
+$waitForWorkers = array_key_exists('wait-for-workers', $options);
 $limit = isset($options['limit']) && ctype_digit((string)$options['limit'])
     ? max(1, (int)$options['limit'])
     : 0;
@@ -89,6 +91,7 @@ $stats = [
     'skipped_queue_limit' => 0,
     'errors' => 0,
     'workers_started' => 0,
+    'worker_exit_codes' => [],
 ];
 $results = [];
 $processed = 0;
@@ -205,7 +208,14 @@ for ($offset = 0; ; $offset += 500) {
 }
 
 if (!$dryRun && $startWorkers > 0) {
-    $stats['workers_started'] = startQueuedWorkers($rootDir, $startWorkers, $fpmEnvPath);
+    $workerResult = startQueuedWorkers($rootDir, $startWorkers, $fpmEnvPath, $waitForWorkers);
+    $stats['workers_started'] = $workerResult['started'];
+    $stats['worker_exit_codes'] = $workerResult['exit_codes'];
+    foreach ($workerResult['exit_codes'] as $exitCode) {
+        if ($exitCode !== 0) {
+            $stats['errors']++;
+        }
+    }
 }
 
 echo json_encode([
@@ -215,6 +225,7 @@ echo json_encode([
     'only_missing_job' => $onlyMissingJob,
     'spawn_per_job' => $spawnPerJob,
     'start_workers' => $startWorkers,
+    'wait_for_workers' => $waitForWorkers,
     'worker_slots' => $workerSlots,
     'queue_count_before' => $initialQueueCount,
     'queue_count_after' => countQueuedJobs($rootDir),
@@ -343,16 +354,44 @@ function listQueuedJobs(string $rootDir, int $limit): array
     return array_slice(array_keys($jobs), 0, $limit);
 }
 
-function startQueuedWorkers(string $rootDir, int $count, string $fpmEnvPath = ''): int
+/**
+ * @return array{started: int, exit_codes: list<int|null>}
+ */
+function startQueuedWorkers(string $rootDir, int $count, string $fpmEnvPath = '', bool $waitForWorkers = false): array
 {
     $worker = rtrim($rootDir, '/') . '/tools/scripts/translation/dcc_locale_job_worker.php';
     if (!is_file($worker)) {
-        return 0;
+        return ['started' => 0, 'exit_codes' => []];
     }
     $php = trim((string)@shell_exec('command -v php8.5 2>/dev/null')) ?: PHP_BINARY;
     $log = rtrim($rootDir, '/') . '/mom/data/php_error.log';
     $started = 0;
+    $exitCodes = [];
+    $foregroundProcesses = [];
     foreach (listQueuedJobs($rootDir, $count) as $jobPath) {
+        if ($waitForWorkers) {
+            $command = [$php, $worker, $jobPath];
+            if ($fpmEnvPath !== '') {
+                $command[] = '--fpm-env=' . $fpmEnvPath;
+            }
+            $process = @proc_open($command, [
+                0 => ['file', '/dev/null', 'r'],
+                1 => ['file', $log, 'a'],
+                2 => ['file', $log, 'a'],
+            ], $pipes, $rootDir);
+            if (!is_resource($process)) {
+                continue;
+            }
+            foreach ($pipes as $pipe) {
+                if (is_resource($pipe)) {
+                    fclose($pipe);
+                }
+            }
+            $foregroundProcesses[] = $process;
+            $started++;
+            continue;
+        }
+
         $command = sprintf(
             'cd %s && nohup %s %s %s%s >> %s 2>&1 < /dev/null &',
             escapeshellarg($rootDir),
@@ -378,5 +417,11 @@ function startQueuedWorkers(string $rootDir, int $count, string $fpmEnvPath = ''
         @proc_close($process);
         $started++;
     }
-    return $started;
+
+    foreach ($foregroundProcesses as $process) {
+        $exit = @proc_close($process);
+        $exitCodes[] = is_int($exit) ? $exit : null;
+    }
+
+    return ['started' => $started, 'exit_codes' => $exitCodes];
 }

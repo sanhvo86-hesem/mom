@@ -166,6 +166,8 @@ run_dcc_locale_prewarm_kick() {
 
     local script="$SITE_DIR/tools/scripts/translation/dcc_locale_backfill.php"
     local fpm_conf="/etc/php/8.5/fpm/pool.d/mom.conf"
+    local service_src="$SITE_DIR/tools/vps-setup/systemd/dcc-locale-prewarm.service"
+    local timer_src="$SITE_DIR/tools/vps-setup/systemd/dcc-locale-prewarm.timer"
     local workers="$DCC_LOCALE_PREWARM_WORKERS"
     local max_queue="$DCC_LOCALE_PREWARM_MAX_QUEUE"
 
@@ -189,6 +191,23 @@ run_dcc_locale_prewarm_kick() {
         return
     fi
 
+    if command -v systemctl >/dev/null 2>&1 && [ -f "$service_src" ]; then
+        log "INFO" "Installing DCC locale prewarm systemd unit from deployed source..."
+        if sed "s#/var/www/eqms.hesemeng.com#$SITE_DIR#g; s#/etc/php/8.5/fpm/pool.d/mom.conf#$fpm_conf#g" \
+            "$service_src" > /etc/systemd/system/dcc-locale-prewarm.service; then
+            chmod 0644 /etc/systemd/system/dcc-locale-prewarm.service
+            if [ -f "$timer_src" ]; then
+                install -m 0644 "$timer_src" /etc/systemd/system/dcc-locale-prewarm.timer
+            fi
+            systemctl daemon-reload || true
+            if [ -f "$timer_src" ]; then
+                systemctl enable --now dcc-locale-prewarm.timer >/dev/null 2>&1 || true
+            fi
+        else
+            log "WARN" "Could not install dcc-locale-prewarm.service from $service_src"
+        fi
+    fi
+
     log "INFO" "Starting DCC English locale prewarm (workers=$workers, max_queue=$max_queue)..."
     if command -v systemctl >/dev/null 2>&1 && [ -f "/etc/systemd/system/dcc-locale-prewarm.service" ]; then
         systemctl start --no-block dcc-locale-prewarm.service \
@@ -207,6 +226,7 @@ run_dcc_locale_prewarm_kick() {
                 --only-missing-job \
                 --no-spawn-per-job \
                 --start-workers="$workers" \
+                --wait-for-workers \
                 --worker-slots="$workers" \
                 --max-queue="$max_queue" \
                 --actor=system.locale-prewarm >>"$LOG" 2>&1 \

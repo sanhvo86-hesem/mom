@@ -234,6 +234,9 @@ Rules:
 10. Queue drain order should prioritize smaller source jobs first, then older jobs, so a few large manuals cannot block fast publication of many short training/forms artifacts.
 11. Deploy must kick the prewarm service after healthcheck when the internal provider is configured.
 12. Healthcheck must report queued/failed locale jobs and active workers so operators cannot confuse "provider configured" with "all English artifacts ready".
+13. System schedulers must run translation workers as managed foreground children or dedicated worker services; a `oneshot` service must not start orphaned `nohup` workers that systemd can kill when the parent exits.
+14. Runtime artifact cache is an acceleration layer only. Cache write failure must be logged and surfaced in metadata, but it must not prevent hidden-sibling artifact publication or DCC locale-variant upsert when the primary artifact write succeeds.
+15. The recommended operating model is batch/asynchronous document translation: source hash detection, queued provider work, durable artifact publication, and pure-read locale switching.
 
 ### 9.6 Anti-flicker locale viewer rule
 

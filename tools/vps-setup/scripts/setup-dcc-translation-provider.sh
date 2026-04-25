@@ -91,6 +91,22 @@ if id "$WEB_USER" >/dev/null 2>&1; then
   chown -R "$WEB_USER:$WEB_GROUP" "$RUNTIME_HOME"
 fi
 
+mkdir -p \
+  "$SITE_DIR/mom/data/cache/dcc-locale-jobs/en" \
+  "$SITE_DIR/mom/data/cache/dcc-locale-artifacts/en"
+touch "$SITE_DIR/mom/data/php_error.log"
+if id "$WEB_USER" >/dev/null 2>&1; then
+  chown -R "$WEB_USER:$WEB_GROUP" \
+    "$SITE_DIR/mom/data/cache/dcc-locale-jobs" \
+    "$SITE_DIR/mom/data/cache/dcc-locale-artifacts"
+  chown "$WEB_USER:$WEB_GROUP" "$SITE_DIR/mom/data/php_error.log"
+fi
+find "$SITE_DIR/mom/data/cache/dcc-locale-jobs" "$SITE_DIR/mom/data/cache/dcc-locale-artifacts" \
+  -type d -exec chmod 2775 {} +
+find "$SITE_DIR/mom/data/cache/dcc-locale-jobs" "$SITE_DIR/mom/data/cache/dcc-locale-artifacts" \
+  -type f -exec chmod 0664 {} +
+chmod 0664 "$SITE_DIR/mom/data/php_error.log"
+
 if [ ! -f "$SCRIPT_PATH" ]; then
   echo "Provider script missing: $SCRIPT_PATH" >&2
   exit 1
