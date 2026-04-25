@@ -158,6 +158,15 @@ run_composer_install() {
     die "Deploy aborted: composer install failed (see $LOG for details)"
 }
 
+stop_dcc_locale_prewarm_for_deploy() {
+    if command -v systemctl >/dev/null 2>&1 && systemctl is-active --quiet dcc-locale-prewarm.service; then
+        log "INFO" "Stopping active DCC locale prewarm before code reset..."
+        systemctl stop dcc-locale-prewarm.service \
+            && log "INFO" "DCC locale prewarm stopped for deploy" \
+            || log "WARN" "Could not stop active dcc-locale-prewarm.service before deploy"
+    fi
+}
+
 run_dcc_locale_prewarm_kick() {
     if [ "$DCC_LOCALE_PREWARM_ON_DEPLOY" != "1" ]; then
         log "INFO" "DCC English locale prewarm skipped (DCC_LOCALE_PREWARM_ON_DEPLOY=$DCC_LOCALE_PREWARM_ON_DEPLOY)"
@@ -255,6 +264,7 @@ fi
 # ── Capture rollback point BEFORE any change ─────────────────────────────
 cd "$SITE_DIR"
 create_rollback_tag
+stop_dcc_locale_prewarm_for_deploy
 
 # ── Pull latest code ─────────────────────────────────────────────────────
 log "INFO" "Fetching origin/$BRANCH..."

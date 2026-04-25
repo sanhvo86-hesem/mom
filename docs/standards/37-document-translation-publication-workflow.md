@@ -231,7 +231,7 @@ Rules:
 7. Repeated prewarm runs must be idempotent: a matching queued job or renderable current artifact must not create duplicate work.
 8. The English tab must prefer the already-published backend artifact and must not wait for provider execution in the foreground.
 9. If prewarm is still processing, the portal shows pending/block truthfully and continues polling projection metadata without rendering Vietnamese body content in the English viewer.
-10. Queue drain order should prioritize smaller source jobs first, then older jobs, so a few large manuals cannot block fast publication of many short training/forms artifacts.
+10. Queue drain order should prioritize controlled-document taxonomy first (`QMS-MAN`, `POL`, `DEPT`, `SOP`, `WI`, `ANNEX`, forms/training), then smaller source jobs, then older jobs. Critical manual/policy pages must not sit behind low-priority short drills.
 11. Deploy must kick the prewarm service after healthcheck when the internal provider is configured.
 12. Healthcheck must report queued/failed locale jobs and active workers so operators cannot confuse "provider configured" with "all English artifacts ready".
 13. System schedulers must run translation workers as managed foreground children or dedicated worker services; a `oneshot` service must not start orphaned `nohup` workers that systemd can kill when the parent exits.

@@ -204,6 +204,7 @@ function jobPathsToDrain(string $rootDir, string $requestedJobPath): array
                 continue;
             }
             $found[$path] = [
+                'priority' => queuedJobPriority($path),
                 'size' => max(0, (int)$item->getSize()),
                 'mtime' => (int)$item->getMTime(),
             ];
@@ -218,13 +219,48 @@ function jobPathsToDrain(string $rootDir, string $requestedJobPath): array
     }
 
     uasort($found, static function (array $a, array $b): int {
-        return ($a['size'] <=> $b['size']) ?: ($a['mtime'] <=> $b['mtime']);
+        return ($a['priority'] <=> $b['priority'])
+            ?: ($a['size'] <=> $b['size'])
+            ?: ($a['mtime'] <=> $b['mtime']);
     });
     foreach (array_keys($found) as $path) {
         $jobs[] = $path;
     }
 
     return $jobs;
+}
+
+function queuedJobPriority(string $jobPath): int
+{
+    $docCode = strtoupper((string)basename(dirname($jobPath)));
+    if ($docCode === '') {
+        return 90;
+    }
+    if (str_starts_with($docCode, 'QMS-MAN')) {
+        return 0;
+    }
+    if (str_starts_with($docCode, 'POL-')) {
+        return 1;
+    }
+    if (str_starts_with($docCode, 'DEPT-')) {
+        return 2;
+    }
+    if (str_starts_with($docCode, 'SOP-')) {
+        return 3;
+    }
+    if (str_starts_with($docCode, 'WI-')) {
+        return 4;
+    }
+    if (str_starts_with($docCode, 'ANNEX-')) {
+        return 5;
+    }
+    if (str_starts_with($docCode, 'FRM-') || str_contains($docCode, 'FORM')) {
+        return 6;
+    }
+    if (str_starts_with($docCode, 'TRN-') || str_contains($docCode, 'TRAINING')) {
+        return 7;
+    }
+    return 20;
 }
 
 function processQueuedJob(
