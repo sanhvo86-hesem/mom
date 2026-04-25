@@ -579,6 +579,49 @@ final class DocumentLocaleAutomationService
     }
 
     /**
+     * Refresh the embedded offline bootstrap in an existing English artifact.
+     *
+     * The bootstrap is not source of truth, but stale values can still flash or
+     * mislead when the API is unreachable. This keeps existing artifacts aligned
+     * with the DCC header projection without re-running machine translation.
+     *
+     * @return array<string, mixed>
+     */
+    public function refreshEnglishArtifactBootstrap(string $docCode): array
+    {
+        $docCode = DocumentControlService::canonicalizeCode($docCode);
+        if ($docCode === '') {
+            throw new InvalidArgumentException('dcc_locale_refresh_missing_doc_code');
+        }
+
+        $dcc = new DocumentControlService($this->data);
+        $projection = $dcc->getLocaleVariantProjection($docCode, self::TARGET_LOCALE);
+        $artifactRelPath = $this->normalizeRepoRelativePath((string)($projection['artifact_rel_path'] ?? ''));
+        if ($artifactRelPath === '') {
+            return [
+                'ok' => false,
+                'doc_code' => $docCode,
+                'changed' => false,
+                'reason' => 'english_artifact_not_renderable',
+            ];
+        }
+
+        $title = $this->nullableText($projection['title'] ?? null)
+            ?? $this->nullableText($projection['source_title'] ?? null)
+            ?? $docCode;
+        $subtitle = $this->nullableText($projection['subtitle'] ?? null)
+            ?? $this->nullableText($projection['source_subtitle'] ?? null);
+        $changed = $this->refreshArtifactDccBootstrapMetadata($dcc, $docCode, $artifactRelPath, $title, $subtitle);
+
+        return [
+            'ok' => true,
+            'doc_code' => $docCode,
+            'changed' => $changed,
+            'artifact_rel_path' => $artifactRelPath,
+        ];
+    }
+
+    /**
      * @param array<string, mixed> $header
      */
     private function syncHeaderBaseline(array $header, string $actor): void
@@ -1110,21 +1153,21 @@ final class DocumentLocaleAutomationService
         string $artifactRelPath,
         string $artifactTitle,
         ?string $artifactSubtitle
-    ): void {
+    ): bool {
         $artifactRelPath = $this->normalizeRepoRelativePath($artifactRelPath);
         if ($artifactRelPath === '') {
-            return;
+            return false;
         }
 
         $abs = $this->rootDir . '/' . $artifactRelPath;
         $html = @file_get_contents($abs);
         if (!is_string($html) || trim($html) === '') {
-            return;
+            return false;
         }
 
         $normalized = $this->normalizeArtifactHtml($html);
         if ($normalized === '') {
-            return;
+            return false;
         }
 
         $patched = $this->injectDccBootstrapMetadata(
@@ -1133,7 +1176,10 @@ final class DocumentLocaleAutomationService
         );
         if ($patched !== $html) {
             $this->writeArtifact($artifactRelPath, $patched);
+            return true;
         }
+
+        return false;
     }
 
     private function writeArtifact(string $artifactRelPath, string $html): void
