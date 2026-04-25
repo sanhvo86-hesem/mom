@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>HMV4 INSP Fixture</title>
+<link rel="stylesheet" href="../../../../mom/styles/module-template-v4.tokens.css">
+<link rel="stylesheet" href="../../../../mom/styles/module-template-v4.css">
+</head><body>
+<div id="hmv4-fixture-root"></div>
+<script type="application/json" data-hmv4-fixture-route>
+{"fixtureId":"authoritative-record-shell-insp-overview","path":"/ops/records/inspections/INSP-001?tab=overview","routeClass":"AR","expectedRenderer":"renderInspRecord","coverage":["insp_overview","authoritative_record","no_mutation"]}
+</script>
+<script type="application/json" data-hmv4-insp-record-fixture>
+{"version":"0.1","authorityClass":"authoritative","resourceFamily":"inspections","rootCode":"INSP","records":{"INSP-001":{"recordId":"INSP-001","rootCode":"INSP","title":"First-piece inspection on WO-3011 OP-30","inspectionSubtype":"first_piece","state":"completed","severity":"minor","workOrderId":"WO-3011","lotId":"LOT-2026-04","partNumber":"PN-2042 Rev B","supplier":null,"freshness":"fixture_current","stateMessage":"Read-only prototype. Mutation outside fixture.","lifecycle":[["draft","complete"],["in-progress","complete"],["completed","current"],["reviewed","pending"],["closed","locked"]],"characteristics":[{"name":"Hole diameter","target":"10.00 mm","tolerance":"±0.02 mm","sampleSize":5},{"name":"Surface roughness","target":"Ra 1.6","tolerance":"Ra ≤ 1.6","sampleSize":3}],"sampleResults":[{"characteristic":"Hole diameter","result":"PASS","samples":[{"value":"10.005 mm","judgment":"pass"},{"value":"9.995 mm","judgment":"pass"},{"value":"10.010 mm","judgment":"pass"},{"value":"9.990 mm","judgment":"pass"},{"value":"10.000 mm","judgment":"pass"}]},{"characteristic":"Surface roughness","result":"FAIL","samples":[{"value":"Ra 1.4","judgment":"pass"},{"value":"Ra 1.5","judgment":"pass"},{"value":"Ra 1.9","judgment":"fail"}]}],"nonconformanceFlags":[{"characteristic":"Surface roughness","severity":"minor","escalatedToNcId":"NC-001"}],"evidence":[{"type":"measurement-report","label":"CMM report INSP-001-CMM"}],"relatedRecords":[{"resourceFamily":"nonconformance-cases","recordId":"NC-001","label":"NC-001 (escalated)"},{"resourceFamily":"work-orders","recordId":"WO-3011","label":"WO-3011"},{"resourceFamily":"lots","recordId":"LOT-2026-04","label":"LOT-2026-04"}],"limitations":[]}},"states":{"conflict":{"freshness":"fixture_conflict","stateMessage":"Conflict: result was edited offline."},"partial_access":{"stateMessage":"Partial-access fixture.","limitations":["Sample values masked for cross-team operators.","Evidence links masked for current role."]},"degraded":{"freshness":"fixture_stale","stateMessage":"Degraded fixture."}}}
+</script>
+<script>(function(){var node=document.querySelector('[data-hmv4-insp-record-fixture]');if(!node)return;try{window.HMV4_INSP_RECORD_FIXTURE=JSON.parse(node.textContent||'{}');}catch(e){console.warn('[HMV4 fixture] invalid INSP fixture',e);}})();</script>
+<script>window.HMV4_PREVIEW_ENABLED=true;</script>
+<script src="../../../../mom/scripts/portal/71-module-template-v4-routes.js"></script>
+<script src="../../../../mom/scripts/portal/72-module-template-v4-bridge.js"></script>
+<script src="../../../../mom/scripts/portal/73-module-template-v4-renderers.js"></script>
+<script src="../../../../mom/scripts/portal/70-module-template-v4-hydration.js"></script>
+<script>(function(){var node=document.querySelector('[data-hmv4-fixture-route]');if(!node)return;try{var route=JSON.parse(node.textContent||'{}');window.HMV4_FIXTURE_ROUTE_CONTEXT=route;if(route.path&&window.history)history.replaceState(history.state||{},'',route.path);}catch(e){console.warn('[HMV4 fixture] invalid route context',e);}})();</script>
+</body></html>
