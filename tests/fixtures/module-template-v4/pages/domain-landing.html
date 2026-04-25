@@ -1,34 +1,172 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><title>HMV4 Fixture</title>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>HMV4 Fixture - Domain Landing Unknown</title>
 <link rel="stylesheet" href="../../../../mom/styles/module-template-v4.tokens.css">
 <link rel="stylesheet" href="../../../../mom/styles/module-template-v4.css">
-</head><body>
+</head>
+<body>
 <div id="hmv4-fixture-root"></div>
+<script type="application/json" data-hmv4-nav-shell-fixture>
+{
+  "version": "0.1",
+  "domains": [
+    {
+      "key": "quality-compliance",
+      "name": "Quality & Compliance",
+      "summary": "Nonconformance, CAPA, batch release, change control, controlled documents.",
+      "modules": ["quality-case-management", "capa", "batch-release", "controlled-documents"]
+    },
+    {
+      "key": "shopfloor-execution",
+      "name": "Shopfloor Execution",
+      "summary": "Dispatch, work orders, in-process inspection.",
+      "modules": ["dispatch-board", "work-orders"]
+    },
+    {
+      "key": "people-skill-ehs",
+      "name": "Workforce, Documents & Training",
+      "summary": "Training, qualification matrix, skill certification.",
+      "modules": ["training-competency"]
+    }
+  ],
+  "modules": [
+    {
+      "key": "quality-case-management",
+      "name": "Quality Case Management",
+      "summary": "Nonconformance, deviation, concession.",
+      "tiles": [
+        {
+          "kind": "record-collection",
+          "label": "Open NC cases",
+          "href": "/ops/records/nonconformance-cases",
+          "summary": "All authoritative NC records."
+        },
+        {
+          "kind": "workspace",
+          "label": "Case board",
+          "href": "/ops/quality-compliance/quality-case-management/board",
+          "summary": "Triage and disposition projection."
+        }
+      ]
+    },
+    {
+      "key": "capa",
+      "name": "CAPA",
+      "summary": "Corrective and preventive actions.",
+      "tiles": [
+        {
+          "kind": "record-collection",
+          "label": "Open CAPA records",
+          "href": "/ops/records/capas",
+          "summary": "All authoritative CAPA records."
+        }
+      ]
+    },
+    {
+      "key": "batch-release",
+      "name": "Batch Release",
+      "summary": "Release authority and packet review.",
+      "tiles": [
+        {
+          "kind": "record-collection",
+          "label": "Pending releases",
+          "href": "/ops/records/batch-releases",
+          "summary": "Records awaiting release decision."
+        }
+      ]
+    },
+    {
+      "key": "controlled-documents",
+      "name": "Controlled Documents",
+      "summary": "Document change control and effective revisions.",
+      "tiles": [
+        {
+          "kind": "record-collection",
+          "label": "Effective documents",
+          "href": "/ops/records/controlled-documents",
+          "summary": "Released revisions in force."
+        }
+      ]
+    },
+    {
+      "key": "dispatch-board",
+      "name": "Dispatch Board",
+      "summary": "Live dispatch projection - read-only.",
+      "tiles": [
+        {
+          "kind": "workspace",
+          "label": "Board",
+          "href": "/ops/planning-scheduling/dispatch-board/board",
+          "summary": "Live dispatch state."
+        },
+        {
+          "kind": "workspace",
+          "label": "Dashboard",
+          "href": "/ops/planning-scheduling/dispatch-board/dashboard",
+          "summary": "KPIs and rollups."
+        }
+      ]
+    },
+    {
+      "key": "work-orders",
+      "name": "Work Orders",
+      "summary": "WO record lifecycle - fixture only.",
+      "tiles": []
+    },
+    {
+      "key": "training-competency",
+      "name": "Training & Competency",
+      "summary": "Operator qualification readiness.",
+      "tiles": [
+        {
+          "kind": "workspace",
+          "label": "Matrix",
+          "href": "/ops/people-skill-ehs/training-competency/matrix",
+          "summary": "Operator x qualification status grid."
+        }
+      ]
+    }
+  ]
+}
+</script>
 <script type="application/json" data-hmv4-fixture-route>
 {
   "fixtureId": "domain-landing",
-  "path": "/ops/quality-operations",
+  "path": "/ops/unknown-domain",
   "routeClass": "DL",
-  "expectedRenderer": "renderDomain",
-  "coverage": ["domain_landing"]
+  "params": {
+    "domain": "unknown-domain"
+  },
+  "expectedRenderer": "renderDomainLanding",
+  "coverage": [
+    "domain_landing",
+    "unknown_domain"
+  ]
 }
 </script>
-<script>window.HMV4_PREVIEW_ENABLED=true;</script>
+<script>
+(function(){
+  window.HMV4_PREVIEW_ENABLED = true;
+  var fixtureNode = document.querySelector('[data-hmv4-nav-shell-fixture]');
+  if(fixtureNode){
+    try { window.HMV4_NAV_SHELL_FIXTURE = JSON.parse(fixtureNode.textContent || '{}'); }
+    catch(e) { console.warn('[HMV4 fixture] invalid nav shell fixture', e); }
+  }
+  var routeNode = document.querySelector('[data-hmv4-fixture-route]');
+  if(routeNode){
+    try {
+      var route = JSON.parse(routeNode.textContent || '{}');
+      window.HMV4_FIXTURE_ROUTE_CONTEXT = route;
+      if(route.path && window.history) history.replaceState(history.state || {}, '', route.path);
+    } catch(e) { console.warn('[HMV4 fixture] invalid route context', e); }
+  }
+})();
+</script>
 <script src="../../../../mom/scripts/portal/71-module-template-v4-routes.js"></script>
 <script src="../../../../mom/scripts/portal/72-module-template-v4-bridge.js"></script>
 <script src="../../../../mom/scripts/portal/73-module-template-v4-renderers.js"></script>
 <script src="../../../../mom/scripts/portal/70-module-template-v4-hydration.js"></script>
-<script>
-(function(){
-  var node = document.querySelector('[data-hmv4-fixture-route]');
-  if(!node) return;
-  try {
-    var route = JSON.parse(node.textContent || '{}');
-    window.HMV4_FIXTURE_ROUTE_CONTEXT = route;
-    if(route.path && window.history) history.replaceState(history.state || {}, '', route.path);
-  } catch(e) {
-    console.warn('[HMV4 fixture] invalid route context', e);
-  }
-})();
-</script>
-</body></html>
+</body>
+</html>
