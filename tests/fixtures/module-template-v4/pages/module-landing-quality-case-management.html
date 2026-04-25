@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>HMV4 Fixture — Module Landing Quality Case Management</title>
+<link rel="stylesheet" href="../../../../mom/styles/module-template-v4.tokens.css">
+<link rel="stylesheet" href="../../../../mom/styles/module-template-v4.css">
+</head><body>
+<div id="hmv4-fixture-root"></div>
+<script type="application/json" data-hmv4-fixture-route>
+{
+  "fixtureId": "module-landing-quality-case-management",
+  "path": "/ops/quality-operations/quality-case-management",
+  "routeClass": "ML",
+  "expectedRenderer": "renderModule",
+  "domainKey": "quality-operations",
+  "moduleKey": "quality-case-management",
+  "coverage": ["module_landing", "ready_module_tiles", "record_open_link"]
+}
+</script>
+<script>window.HMV4_PREVIEW_ENABLED=true;</script>
+<script src="../../../../mom/scripts/portal/71-module-template-v4-routes.js"></script>
+<script src="../../../../mom/scripts/portal/72-module-template-v4-bridge.js"></script>
+<script src="../../../../mom/scripts/portal/73-module-template-v4-renderers.js"></script>
+<script>
+(function(){
+  function loadHydration(){
+    var s = document.createElement('script');
+    s.src = '../../../../mom/scripts/portal/70-module-template-v4-hydration.js';
+    document.body.appendChild(s);
+  }
+  var rNode = document.querySelector('[data-hmv4-fixture-route]');
+  if(rNode){
+    try {
+      var route = JSON.parse(rNode.textContent || '{}');
+      window.HMV4_FIXTURE_ROUTE_CONTEXT = route;
+      if(route.path && window.history) history.replaceState(history.state || {}, '', route.path);
+    } catch(e) { console.warn('[HMV4 fixture] invalid route context', e); }
+  }
+  if(window.fetch){
+    window.fetch('/tests/fixtures/module-template-v4/nav-shell-fixtures.json').then(function(r){ return r.ok ? r.json() : null; }).then(function(data){
+      if(data) window.HMV4_NAV_SHELL_FIXTURE = data;
+      loadHydration();
+    }).catch(function(){ loadHydration(); });
+  } else {
+    loadHydration();
+  }
+})();
+</script>
+</body></html>

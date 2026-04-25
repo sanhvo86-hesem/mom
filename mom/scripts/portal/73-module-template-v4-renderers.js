@@ -37,21 +37,69 @@
     if(chips && chips.length){ html += '<div class="hmv4-chip-row">'+chips.map(function(c){return '<span class="hmv4-chip">'+esc(c)+'</span>';}).join('')+'</div>'; }
     return html + '</div>';
   }
+  function navFixture(){ return window.HMV4_NAV_SHELL_FIXTURE || null; }
+  function fixtureDomains(){
+    var f = navFixture();
+    if(f && Array.isArray(f.domains)) return f.domains.map(function(d){ return [d.key, d.name]; });
+    return domains;
+  }
+  function fixtureModulesForDomain(domainKey){
+    var f = navFixture();
+    if(f && Array.isArray(f.modules)){
+      return f.modules.filter(function(m){ return m.domainKey === domainKey; }).map(function(m){ return [m.key, m.name, m.subtitle || '']; });
+    }
+    var inline = modules[domainKey] || [];
+    return inline.map(function(m){ return [m[0], m[1], '']; });
+  }
+  function fixtureModuleTiles(moduleKey){
+    var f = navFixture();
+    if(f && f.moduleLandingTiles && f.moduleLandingTiles[moduleKey]) return f.moduleLandingTiles[moduleKey];
+    return null;
+  }
   function renderShellHome(){
-    return '<section class="hmv4-shell-home" data-route-class="SH">' +
-      '<div class="hmv4-grid">' + domains.map(function(d){ return '<article class="hmv4-card"><h3>'+esc(d[1])+'</h3><p>Open domain landing.</p><a class="hmv4-card-link" href="/ops/'+esc(d[0])+'">Open '+esc(d[1])+'</a></article>'; }).join('') + '</div></section>';
+    var list = fixtureDomains();
+    return '<section class="hmv4-shell-home" data-route-class="SH" data-domain-tile-count="'+list.length+'">' +
+      '<div class="hmv4-grid">' + list.map(function(d){ return '<article class="hmv4-card" data-hmv4-domain-tile="'+esc(d[0])+'"><h3>'+esc(d[1])+'</h3><p>Open domain landing.</p><a class="hmv4-card-link" data-hmv4-domain-link href="/ops/'+esc(d[0])+'">Open '+esc(d[1])+'</a></article>'; }).join('') + '</div></section>';
   }
   function renderDomain(route){
     var d = route.params.domain || 'operations';
-    var list = modules[d] || [];
-    return '<section class="hmv4-domain-landing" data-route-class="DL" data-domain="'+esc(d)+'"><div class="hmv4-grid">' +
-      (list.length ? list.map(function(m){ return '<article class="hmv4-card"><h3>'+esc(m[1])+'</h3><p>Module landing and workspace entry.</p><a class="hmv4-card-link" href="/ops/'+esc(d)+'/'+esc(m[0])+'">Open module</a></article>'; }).join('') : '<div class="hmv4-feedback" data-feedback-state="info"><strong>Domain ready</strong><p>No module fixture has been staged for this domain yet.</p></div>') + '</div></section>';
+    var list = fixtureModulesForDomain(d);
+    return '<section class="hmv4-domain-landing" data-route-class="DL" data-domain="'+esc(d)+'" data-module-tile-count="'+list.length+'"><div class="hmv4-grid">' +
+      (list.length ? list.map(function(m){
+        var sub = m[2] ? '<p>'+esc(m[2])+'</p>' : '<p>Module landing and workspace entry.</p>';
+        return '<article class="hmv4-card" data-hmv4-module-tile="'+esc(m[0])+'"><h3>'+esc(m[1])+'</h3>'+sub+'<a class="hmv4-card-link" data-hmv4-module-link href="/ops/'+esc(d)+'/'+esc(m[0])+'">Open module</a></article>';
+      }).join('') : '<div class="hmv4-feedback" data-feedback-state="info" data-hmv4-empty-domain><strong>Domain ready</strong><p>No module fixture has been staged for this domain yet.</p></div>') + '</div></section>';
   }
   function renderModule(route){
     var p = route.params;
-    return '<section class="hmv4-module-landing" data-route-class="ML" data-domain="'+esc(p.domain)+'" data-module="'+esc(p.module)+'">' +
-      '<div class="hmv4-grid"><article class="hmv4-card"><h3>Primary workspace</h3><p>Open the default board/queue for this module.</p><a href="/ops/'+esc(p.domain)+'/'+esc(p.module)+'/queue">Open queue</a></article>' +
-      '<article class="hmv4-card"><h3>Records</h3><p>Open authoritative collection through /ops/records.</p><a href="/ops/records/quotations">Open sample collection</a></article></div></section>';
+    var tiles = fixtureModuleTiles(p.module);
+    if(!tiles){
+      return '<section class="hmv4-module-landing" data-route-class="ML" data-domain="'+esc(p.domain)+'" data-module="'+esc(p.module)+'" data-module-tile-state="empty">' +
+        '<div class="hmv4-feedback" data-feedback-state="info" data-hmv4-empty-module><strong>Module ready</strong><p>No workspace or record fixture has been staged for this module yet.</p></div></section>';
+    }
+    var primary = tiles.primaryWorkspace;
+    var workspaces = (tiles.additionalWorkspaces || []).slice();
+    var recordCollection = tiles.recordCollection;
+    var recent = tiles.recentRecords || [];
+    var html = '<section class="hmv4-module-landing" data-route-class="ML" data-domain="'+esc(p.domain)+'" data-module="'+esc(p.module)+'" data-module-tile-state="ready"><div class="hmv4-grid">';
+    if(primary){
+      html += '<article class="hmv4-card" data-hmv4-module-workspace="primary"><h3>'+esc(primary.label || 'Primary workspace')+'</h3><p>'+esc(primary.subtitle || 'Open the default workspace for this module.')+'</p><a class="hmv4-card-link" data-hmv4-workspace-link href="/ops/'+esc(p.domain)+'/'+esc(p.module)+'/'+esc(primary.family)+'">Open '+esc(primary.family)+'</a></article>';
+    }
+    workspaces.forEach(function(ws){
+      html += '<article class="hmv4-card" data-hmv4-module-workspace="'+esc(ws.family)+'"><h3>'+esc(ws.label || ws.family)+'</h3><p>'+esc(ws.subtitle || 'Workspace projection.')+'</p><a class="hmv4-card-link" data-hmv4-workspace-link href="/ops/'+esc(p.domain)+'/'+esc(p.module)+'/'+esc(ws.family)+'">Open '+esc(ws.family)+'</a></article>';
+    });
+    if(recordCollection){
+      html += '<article class="hmv4-card" data-hmv4-module-collection="'+esc(recordCollection.family)+'"><h3>'+esc(recordCollection.label || 'Records')+'</h3><p>'+esc(recordCollection.subtitle || 'Open authoritative collection.')+'</p><a class="hmv4-card-link" data-hmv4-collection-link href="/ops/records/'+esc(recordCollection.family)+'">Open collection</a></article>';
+    }
+    if(recent.length){
+      html += '<article class="hmv4-card" data-hmv4-module-recent><h3>Recent records</h3><ul class="hmv4-link-list">';
+      recent.forEach(function(r){
+        html += '<li><a data-hmv4-record-link href="/ops/records/'+esc(r.family)+'/'+esc(r.id)+'?tab=overview">'+esc(r.label || r.id)+'</a></li>';
+      });
+      html += '</ul></article>';
+    }
+    html += '</div></section>';
+    return html;
   }
   function renderCollection(route){
     var rf = route.params.resource_family || 'records';
@@ -254,9 +302,92 @@
       }).join('') : '<div class="hmv4-feedback" data-feedback-state="warning"><strong>No projection staged</strong><p>No dispatch board fixture data was found for this route.</p></div>')+
       '</div></section>';
   }
+  function getTrainingMatrixProjection(){
+    var projection = window.HMV4_TRAINING_MATRIX_PROJECTION || readJsonFixture('[data-hmv4-training-matrix-fixture]');
+    if(!projection || !Array.isArray(projection.operators)){
+      return {
+        projectionId: 'training-matrix-empty-projection',
+        freshness: 'fixture_missing',
+        reanchorMessage: 'Open the training record before issuing or completing certification.',
+        summary: { qualified: 0, expiring: 0, expired: 0, in_training: 0, not_required: 0 },
+        qualifications: [],
+        operators: []
+      };
+    }
+    return projection;
+  }
+  function isTrainingMatrixRoute(route){
+    return route && route.params && route.params.domain === 'people-skill-ehs' && route.params.module === 'training-competency' && route.params.workspace_family === 'matrix';
+  }
+  var trainingStatusFeedback = { qualified: 'success', expiring: 'warning', expired: 'danger', in_training: 'info', not_required: 'info' };
+  function renderTrainingStatusCell(cell){
+    var status = cell.status || 'not_required';
+    var feedback = trainingStatusFeedback[status] || 'info';
+    var recordHref = cell.evidence_link || (cell.training_record_id ? '/ops/records/training-records/'+cell.training_record_id+'?tab=overview' : null);
+    var html = '<td role="gridcell" data-hmv4-training-cell data-training-status="'+esc(status)+'" data-feedback-state="'+esc(feedback)+'" data-label="'+esc(cell.qualification_code || '')+'">' +
+      '<span class="hmv4-chip" data-hmv4-training-status-text>'+esc(status)+'</span>';
+    if(cell.last_certified_at) html += ' <span data-hmv4-training-last-cert>Last: '+esc(cell.last_certified_at)+'</span>';
+    if(cell.expires_at) html += ' <span data-hmv4-training-expires>Expires: '+esc(cell.expires_at)+'</span>';
+    if(recordHref) html += ' <a data-hmv4-record-link href="'+esc(recordHref)+'">Open record</a>';
+    return html + '</td>';
+  }
+  function renderTrainingMatrixWorkspace(route){
+    var projection = getTrainingMatrixProjection();
+    var qualifications = Array.isArray(projection.qualifications) ? projection.qualifications : [];
+    var operators = Array.isArray(projection.operators) ? projection.operators : [];
+    var summary = projection.summary || {};
+    var freshness = projection.freshness || 'fixture_current';
+    var state = projection.state || (freshness === 'fixture_current' ? 'current' : 'degraded');
+    var limitations = Array.isArray(projection.limitations) ? projection.limitations : [];
+    var query = route.query || {};
+    var filterKeys = ['view','scope','lane','group_by','q'];
+    var activeFilters = filterKeys.filter(function(k){ return query[k]; }).map(function(k){ return [k, query[k]]; });
+    var html = '<section class="hmv4-workspace-shell" aria-label="Training matrix projection workspace" data-route-class="WS" data-domain="people-skill-ehs" data-module="training-competency" data-workspace-family="matrix" data-hmv4-training-matrix data-authority-class="projection" data-resource-family="training-records" data-root-code="TRAIN" data-requires-reanchor="true" data-projection-id="'+esc(projection.projectionId || 'training-matrix-projection')+'" data-projection-freshness="'+esc(freshness)+'" data-projection-state="'+esc(state)+'" data-query-view="'+esc(query.view || 'default')+'">' +
+      '<header class="hmv4-workspace-header"><h1 class="hmv4-workspace-title">Training matrix</h1><p class="hmv4-workspace-subtitle">Read-only qualification projection. Certification and completion must re-anchor to training-record authority.</p></header>'+
+      '<div class="hmv4-feedback" data-feedback-state="warning" role="status" id="hmv4-training-reanchor-note"><strong>Projection only</strong><p>'+esc(projection.reanchorMessage || 'Open the training record before issuing or completing certification.')+'</p></div>'+
+      '<div class="hmv4-feedback" data-feedback-state="'+(state === 'current' ? 'success' : 'warning')+'" role="status" data-hmv4-training-freshness><strong>Projection state</strong><p>'+esc(state)+' / '+esc(freshness)+'</p></div>'+
+      (limitations.length ? '<div class="hmv4-feedback" data-feedback-state="warning" role="status" data-hmv4-training-access><strong>Access limitation</strong><p>'+limitations.map(esc).join(' ')+'</p></div>' : '')+
+      '<div class="hmv4-chip-row" data-hmv4-training-filters aria-label="Active subject filters">'+
+      (activeFilters.length ? activeFilters.map(function(f){ return '<span class="hmv4-chip">'+esc(f[0])+': '+esc(f[1])+'</span>'; }).join('') : '<span class="hmv4-chip" data-hmv4-training-filters-empty>All operators (no filter)</span>')+
+      '</div>'+
+      '<div class="hmv4-grid" aria-label="Training matrix summary">'+
+      ['qualified','expiring','expired','in_training','not_required'].map(function(key){
+        return '<article class="hmv4-card"><h3>'+esc(key)+'</h3><p data-hmv4-training-summary="'+esc(key)+'">'+esc(summary[key] || 0)+' operators</p></article>';
+      }).join('')+
+      '</div>'+
+      '<div class="hmv4-grid" data-hmv4-training-readonly-actions>'+
+      '<article class="hmv4-card"><h3>Issue qualification</h3><p>Issue qualification is unavailable from this projection.</p><button type="button" disabled data-hmv4-mutation-intent="train-issue-qualification" aria-describedby="hmv4-training-reanchor-note">Issue qualification disabled</button></article>'+
+      '<article class="hmv4-card"><h3>Schedule training</h3><p>Schedule training is unavailable from this projection.</p><button type="button" disabled data-hmv4-mutation-intent="train-schedule-training" aria-describedby="hmv4-training-reanchor-note">Schedule training disabled</button></article>'+
+      '<article class="hmv4-card"><h3>Acknowledge / Sign</h3><p>Acknowledgement and e-sign are out of scope for this projection.</p><button type="button" disabled data-hmv4-mutation-intent="train-acknowledge" aria-describedby="hmv4-training-reanchor-note">Acknowledge disabled</button></article>'+
+      '</div>';
+    if(operators.length && qualifications.length){
+      html += '<table class="hmv4-data-table" role="grid" aria-label="Training matrix" data-hmv4-training-matrix-grid>'+
+        '<thead><tr role="row"><th scope="col" role="columnheader">Operator</th><th scope="col" role="columnheader">Role</th><th scope="col" role="columnheader">Team</th>'+
+        qualifications.map(function(q){ return '<th scope="col" role="columnheader" data-hmv4-training-qual="'+esc(q.code)+'">'+esc(q.name || q.code)+'</th>'; }).join('')+
+        '</tr></thead><tbody>'+
+        operators.map(function(op){
+          var cells = Array.isArray(op.cells) ? op.cells : [];
+          var cellByCode = {};
+          cells.forEach(function(c){ cellByCode[c.qualification_code] = c; });
+          return '<tr role="row" data-hmv4-training-operator data-operator-id="'+esc(op.id)+'">'+
+            '<td role="rowheader" data-label="Operator">'+esc(op.name || op.id)+'</td>'+
+            '<td role="cell" data-label="Role">'+esc(op.role || 'unassigned')+'</td>'+
+            '<td role="cell" data-label="Team">'+esc(op.team || 'unassigned')+'</td>'+
+            qualifications.map(function(q){
+              return renderTrainingStatusCell(cellByCode[q.code] || { status: 'not_required', qualification_code: q.code });
+            }).join('')+
+            '</tr>';
+        }).join('')+
+        '</tbody></table>';
+    } else {
+      html += '<div class="hmv4-feedback" data-feedback-state="info" data-hmv4-training-empty><strong>No operators in scope</strong><p>This fixture has no matrix rows. Adjust filters or open authoritative training records.</p></div>';
+    }
+    return html + '</section>';
+  }
   function renderWorkspace(route){
     var p = route.params;
     if(isDispatchBoardRoute(route)) return renderDispatchBoardWorkspace(route);
+    if(isTrainingMatrixRoute(route)) return renderTrainingMatrixWorkspace(route);
     return '<section class="hmv4-workspace-shell" data-route-class="'+esc(route.routeClass)+'" data-domain="'+esc(p.domain)+'" data-module="'+esc(p.module)+'" data-workspace-family="'+esc(p.workspace_family)+'" data-authority-class="projection" data-requires-reanchor="true">' +
       '<header class="hmv4-workspace-header"><h1 class="hmv4-workspace-title">'+esc(p.workspace_family)+' workspace</h1><p class="hmv4-workspace-subtitle">Projection workspace. Mutations must re-anchor to authoritative record shells.</p></header>'+
       '<div class="hmv4-feedback" data-feedback-state="warning"><strong>Projection surface</strong><p>Rows/cards are not command anchors. Open the record before mutation.</p></div>'+
@@ -289,5 +420,5 @@
     if(!nav) return;
     nav.innerHTML = '<div class="hmv4-nav-section"><h2 class="hmv4-nav-section-title">Domains</h2>' + domains.map(function(d){ return '<a class="hmv4-nav-link" href="/ops/'+esc(d[0])+'">'+esc(d[1])+'</a>'; }).join('') + '</div>';
   }
-  window.Hmv4Renderers = { renderRoute: renderRoute, applyShell: applyShell, renderNav: renderNav, renderDispatchBoardWorkspace: renderDispatchBoardWorkspace, renderNonconformanceRecord: renderNonconformanceRecord, domains: domains, modules: modules };
+  window.Hmv4Renderers = { renderRoute: renderRoute, applyShell: applyShell, renderNav: renderNav, renderDispatchBoardWorkspace: renderDispatchBoardWorkspace, renderTrainingMatrixWorkspace: renderTrainingMatrixWorkspace, renderNonconformanceRecord: renderNonconformanceRecord, domains: domains, modules: modules };
 })();

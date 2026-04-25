@@ -1,0 +1,61 @@
+{
+  "version": "0.1",
+  "frozenVocabularyRef": "docs/adr/0002-frozen-vocabulary.md",
+  "domains": [
+    { "key": "executive-performance", "name": "Executive & Performance" },
+    { "key": "customer-order-commit", "name": "Customer, RFQ & Order Commit" },
+    { "key": "npi-engineering-product-definition", "name": "NPI / Engineering & Product Definition" },
+    { "key": "supply-chain-intralogistics", "name": "Supply Chain & Intralogistics" },
+    { "key": "planning-scheduling", "name": "Planning & Scheduling" },
+    { "key": "shopfloor-execution", "name": "Shopfloor Execution" },
+    { "key": "quality-operations", "name": "Quality Operations" },
+    { "key": "asset-reliability-maintenance", "name": "Asset Reliability & Maintenance" },
+    { "key": "shipping-customer-field-quality", "name": "Shipping, Customer Service & Field Quality" },
+    { "key": "finance-cost", "name": "Finance & Cost" },
+    { "key": "people-skill-ehs", "name": "People, Skill & EHS" },
+    { "key": "document-change-compliance", "name": "Document, Change & Compliance" },
+    { "key": "continuous-improvement-knowledge", "name": "Continuous Improvement & Knowledge" },
+    { "key": "platform-data-administration", "name": "Platform, Data & Administration" }
+  ],
+  "modules": [
+    { "key": "customer-360", "domainKey": "customer-order-commit", "name": "Customer 360", "subtitle": "Account directory and contact tower" },
+    { "key": "rfq-quote-studio", "domainKey": "customer-order-commit", "name": "RFQ & Quote Studio", "subtitle": "Quotation lifecycle" },
+    { "key": "contract-commitment-board", "domainKey": "customer-order-commit", "name": "Contract / Commitment Board", "subtitle": "Active customer contracts" },
+    { "key": "demand-orchestrator", "domainKey": "planning-scheduling", "name": "Demand Orchestrator", "subtitle": "Forecast and order intake" },
+    { "key": "aps-finite-scheduler", "domainKey": "planning-scheduling", "name": "APS / Finite Scheduler", "subtitle": "Finite capacity scheduling" },
+    { "key": "dispatch-board", "domainKey": "planning-scheduling", "name": "Dispatch Board", "subtitle": "Read-only projection of work cells" },
+    { "key": "recovery-console", "domainKey": "planning-scheduling", "name": "Recovery Console", "subtitle": "Schedule recovery" },
+    { "key": "wo-console", "domainKey": "shopfloor-execution", "name": "WO Console", "subtitle": "Work order execution" },
+    { "key": "machine-oee-control", "domainKey": "shopfloor-execution", "name": "Machine & OEE Control", "subtitle": "OEE and downtime" },
+    { "key": "nc-release-dnc", "domainKey": "shopfloor-execution", "name": "NC Release / DNC", "subtitle": "Nonconformance release" },
+    { "key": "connected-worker-andon", "domainKey": "shopfloor-execution", "name": "Connected Worker & Andon", "subtitle": "Andon and operator escalation" },
+    { "key": "quality-tower", "domainKey": "quality-operations", "name": "Quality Tower", "subtitle": "Operational visibility" },
+    { "key": "inspection-spc", "domainKey": "quality-operations", "name": "Inspection & SPC", "subtitle": "In-process inspection" },
+    { "key": "quality-case-management", "domainKey": "quality-operations", "name": "Quality Case Management", "subtitle": "Nonconformance, deviation and concession" },
+    { "key": "capa-effectiveness", "domainKey": "quality-operations", "name": "CAPA & Effectiveness", "subtitle": "Corrective and preventive actions" },
+    { "key": "metrology-release-trace", "domainKey": "quality-operations", "name": "Metrology / Release / Trace", "subtitle": "Batch release and genealogy" },
+    { "key": "foundation-services-studio", "domainKey": "platform-data-administration", "name": "Foundation Services Studio", "subtitle": "Schemas and modules" },
+    { "key": "administration-runtime", "domainKey": "platform-data-administration", "name": "Administration & Runtime", "subtitle": "Operational administration" }
+  ],
+  "moduleLandingTiles": {
+    "dispatch-board": {
+      "primaryWorkspace": { "family": "board", "label": "Open dispatch board", "subtitle": "Read-only projection of current shift" },
+      "additionalWorkspaces": [],
+      "recordCollection": { "family": "dispatch-targets", "label": "Open dispatch records", "subtitle": "Authoritative dispatch targets" },
+      "recentRecords": [
+        { "family": "dispatch-targets", "id": "DISP-001", "label": "DISP-001 — current shift" },
+        { "family": "dispatch-targets", "id": "DISP-011", "label": "DISP-011 — degraded shift" }
+      ]
+    },
+    "quality-case-management": {
+      "primaryWorkspace": { "family": "queue", "label": "Open triage queue", "subtitle": "Cases awaiting triage" },
+      "additionalWorkspaces": [
+        { "family": "tower", "label": "Open Quality Tower", "subtitle": "Operational visibility" }
+      ],
+      "recordCollection": { "family": "nonconformance-cases", "label": "Open nonconformance records", "subtitle": "Authoritative quality cases" },
+      "recentRecords": [
+        { "family": "nonconformance-cases", "id": "NC-001", "label": "NC-001 — Dimensional NC on OP-30" }
+      ]
+    }
+  }
+}
