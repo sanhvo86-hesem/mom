@@ -4190,9 +4190,10 @@ paths:
 
   /api/v1/commercial/customer-purchase-orders:
     get:
-      operationId: listCustomerPurchaseOrders
+      operationId: listCustomerPurchaseOrdersLegacy
       tags: [Commercial]
-      summary: List customer purchase orders
+      deprecated: true
+      summary: 'List customer purchase orders (deprecated — 301 → /api/v1/customer-purchase-orders)'
       description: |
         Returns the canonical commercial-demand objects extracted from customer PO commitments and linked Sales Orders.
       security:
@@ -4209,9 +4210,10 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
     post:
-      operationId: createCustomerPurchaseOrder
+      operationId: createCustomerPurchaseOrderLegacy
       tags: [Commercial]
-      summary: Create a customer purchase order
+      deprecated: true
+      summary: 'Create a customer purchase order (deprecated — 301 → /api/v1/customer-purchase-orders)'
       description: |
         Captures a customer commercial commitment as a first-class lifecycle owner.
         Safe retries are supported through `Idempotency-Key`.
@@ -4248,9 +4250,10 @@ paths:
 
   /api/v1/commercial/customer-purchase-orders/{customerPoId}:
     get:
-      operationId: getCustomerPurchaseOrder
+      operationId: getCustomerPurchaseOrderLegacy
       tags: [Commercial]
-      summary: Get a single customer purchase order
+      deprecated: true
+      summary: 'Get a customer purchase order (deprecated — 301 → /api/v1/customer-purchase-orders/{customerPoId})'
       security:
         - sessionCookie: []
       parameters:
@@ -4275,9 +4278,147 @@ paths:
 
   /api/v1/commercial/customer-purchase-orders/{customerPoId}:transition:
     post:
+      operationId: transitionCustomerPurchaseOrderLegacy
+      tags: [Commercial]
+      deprecated: true
+      summary: 'Transition a customer purchase order (deprecated — 301 → /api/v1/customer-purchase-orders/{customerPoId}:transition)'
+      description: |
+        Executes a governed customer-PO lifecycle transition such as acknowledge, confirm, cancel, or close.
+        Safe retries are supported through `Idempotency-Key`.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - name: customerPoId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransitionCustomerPurchaseOrderRequest'
+      responses:
+        '200':
+          description: Customer purchase order transitioned.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPurchaseOrderEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequestProblem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  # ─────────────────────────────────────────────────────────────────────────────
+  # CPO canonical paths (ADR-0008, Stream C.3, 2026-04-26)
+  # Legacy /api/v1/commercial/customer-purchase-orders emits 301 to these paths.
+  # ─────────────────────────────────────────────────────────────────────────────
+
+  /api/v1/customer-purchase-orders:
+    get:
+      operationId: listCustomerPurchaseOrders
+      tags: [Commercial]
+      summary: List customer purchase orders (canonical path per ADR-0008)
+      description: |
+        Returns customer PO collection. Canonical path — legacy
+        /api/v1/commercial/customer-purchase-orders emits 301 to here.
+      security:
+        - sessionCookie: []
+      responses:
+        '200':
+          description: Customer purchase order list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPurchaseOrderConnection'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+    post:
+      operationId: createCustomerPurchaseOrder
+      tags: [Commercial]
+      summary: Create a customer purchase order (canonical path per ADR-0008)
+      description: |
+        Captures a customer commercial commitment as a first-class lifecycle owner.
+        Safe retries are supported through `Idempotency-Key`.
+      security:
+        - sessionCookie: []
+          csrfHeader: []
+      parameters:
+        - name: Idempotency-Key
+          in: header
+          required: false
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCustomerPurchaseOrderRequest'
+      responses:
+        '201':
+          description: Customer purchase order created.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPurchaseOrderEnvelope'
+        '400':
+          $ref: '#/components/responses/BadRequestProblem'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+
+  /api/v1/customer-purchase-orders/{customerPoId}:
+    get:
+      operationId: getCustomerPurchaseOrder
+      tags: [Commercial]
+      summary: Get a customer purchase order (canonical path per ADR-0008)
+      security:
+        - sessionCookie: []
+      parameters:
+        - name: customerPoId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Customer purchase order detail.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CustomerPurchaseOrderEnvelope'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  '/api/v1/customer-purchase-orders/{customerPoId}:transition':
+    post:
       operationId: transitionCustomerPurchaseOrder
       tags: [Commercial]
-      summary: Transition a customer purchase order
+      summary: Transition a customer purchase order (canonical path per ADR-0008)
       description: |
         Executes a governed customer-PO lifecycle transition such as acknowledge, confirm, cancel, or close.
         Safe retries are supported through `Idempotency-Key`.

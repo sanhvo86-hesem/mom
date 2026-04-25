@@ -232,6 +232,41 @@ final class CustomerPurchaseOrderController extends BaseController
         ];
     }
 
+    // ── Canonical-path redirect helpers (ADR-0008, Stream C.3) ───────────────
+
+    public function redirectLegacyListCustomerPurchaseOrders(): never
+    {
+        $this->redirectToCanonicalCpoPath('/api/v1/customer-purchase-orders');
+    }
+
+    public function redirectLegacyGetCustomerPurchaseOrder(): never
+    {
+        $customerPoId = trim((string)($this->query('customerPoId') ?? ''));
+        if ($customerPoId === '') {
+            $this->error('missing_customer_po_id', 400);
+        }
+        $this->redirectToCanonicalCpoPath('/api/v1/customer-purchase-orders/' . rawurlencode($customerPoId));
+    }
+
+    public function redirectLegacyCreateCustomerPurchaseOrder(): never
+    {
+        $this->redirectToCanonicalCpoPath('/api/v1/customer-purchase-orders');
+    }
+
+    public function redirectLegacyTransitionCustomerPurchaseOrder(): never
+    {
+        $customerPoId = trim((string)($this->query('customerPoId') ?? ''));
+        if ($customerPoId === '') {
+            $this->error('missing_customer_po_id', 400);
+        }
+        $this->redirectToCanonicalCpoPath('/api/v1/customer-purchase-orders/' . rawurlencode($customerPoId) . ':transition');
+    }
+
+    private function redirectToCanonicalCpoPath(string $target): never
+    {
+        $this->emptyResponse(301, ['Location' => $target]);
+    }
+
     public function listPurchaseOrders(): never
     {
         $user = $this->requireAuth();
