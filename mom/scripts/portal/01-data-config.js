@@ -2683,6 +2683,9 @@ const I = {
   dictionary:{vi:'Từ điển thuật ngữ',en:'Glossary'},
   doc_types:{vi:'LOẠI TÀI LIỆU',en:'DOCUMENT TYPES'},
   collapse:{vi:'Thu gọn',en:'Collapse'},
+  expand:{vi:'Mở rộng',en:'Expand'},
+  collapse_menu:{vi:'Thu gọn menu',en:'Collapse menu'},
+  expand_menu:{vi:'Mở rộng menu',en:'Expand menu'},
   // Header / Breadcrumb
   bc_dashboard:{vi:'Dashboard',en:'Dashboard'},
   bc_documents:{vi:'Tài liệu',en:'Documents'},
@@ -2946,6 +2949,7 @@ function setLang(l){
   l = l === 'en' ? 'en' : 'vi';
   lang = l;
   try{ localStorage.setItem('hesem_lang', l); }catch(e){}
+  try{ window.dispatchEvent(new CustomEvent('hesem:lang-change', {detail:{lang:l}})); }catch(e){}
   try{ if(typeof window.__hesemPortalPersistViewState === 'function') window.__hesemPortalPersistViewState('set-lang'); }catch(e){}
   try{
     if(typeof apiCall==='function' && typeof currentUser!=='undefined' && currentUser && currentUser.username){
@@ -2954,11 +2958,22 @@ function setLang(l){
   }catch(e){}
   const viBtn = document.getElementById('btn-lang-vi');
   const enBtn = document.getElementById('btn-lang-en');
-  if(viBtn) viBtn.className = l==='vi'?'active':'';
-  if(enBtn) enBtn.className = l==='en'?'active':'';
+  if(viBtn){
+    viBtn.className = l==='vi'?'active':'';
+    viBtn.setAttribute('aria-pressed', l==='vi'?'true':'false');
+    viBtn.setAttribute('title', 'Tiếng Việt');
+    viBtn.setAttribute('aria-label', 'Tiếng Việt');
+  }
+  if(enBtn){
+    enBtn.className = l==='en'?'active':'';
+    enBtn.setAttribute('aria-pressed', l==='en'?'true':'false');
+    enBtn.setAttribute('title', 'English');
+    enBtn.setAttribute('aria-label', 'English');
+  }
   try{ document.querySelectorAll('.vp-overlay').forEach(el=>el.remove()); }catch(e){}
   const ct = document.getElementById('collapse-text');
   if(ct) ct.textContent = T('collapse');
+  try{ if(typeof syncSidebarToggleState === 'function') syncSidebarToggleState(); }catch(e){}
   const ab = document.getElementById('dd-access-btn');
   if(ab) ab.textContent = T('access_matrix');
   const lb = document.getElementById('dd-logout-btn');
@@ -3013,6 +3028,7 @@ function setLang(l){
     ? beginPortalDocViewTransaction('set-lang', doc || viewerOpenDocCode, l)
     : null;
   if(doc){
+    try{ if(typeof renderDocViewerBreadcrumb === 'function') renderDocViewerBreadcrumb(doc); }catch(e){}
     try{ updateDocViewerHeader(doc); }catch(e){}
     try{ renderWorkflowPanel(doc); }catch(e){}
     try{ renderVersionHistory(doc); }catch(e){}
@@ -3038,6 +3054,7 @@ function setLang(l){
           ? window._resolveDocRecord(viewerOpenDocCode)
           : DOCS.find(d=>String(d && d.code || '').trim()===viewerOpenDocCode);
         if(latestDoc){
+          try{ if(typeof renderDocViewerBreadcrumb === 'function') renderDocViewerBreadcrumb(latestDoc); }catch(_e){}
           updateDocViewerHeader(latestDoc);
           renderWorkflowPanel(latestDoc);
           renderVersionHistory(latestDoc);
@@ -3058,8 +3075,17 @@ function setLang(l){
 
 function initLang(){
   try{ const s=localStorage.getItem('hesem_lang'); if(s)lang=s; }catch(e){}
-  document.getElementById('btn-lang-vi').className = lang==='vi'?'active':'';
-  document.getElementById('btn-lang-en').className = lang==='en'?'active':'';
+  const viBtn = document.getElementById('btn-lang-vi');
+  const enBtn = document.getElementById('btn-lang-en');
+  if(viBtn){
+    viBtn.className = lang==='vi'?'active':'';
+    viBtn.setAttribute('aria-pressed', lang==='vi'?'true':'false');
+  }
+  if(enBtn){
+    enBtn.className = lang==='en'?'active':'';
+    enBtn.setAttribute('aria-pressed', lang==='en'?'true':'false');
+  }
+  try{ if(typeof syncSidebarToggleState === 'function') syncSidebarToggleState(); }catch(e){}
 }
 
 // ═══════════════════════════════════════════════════

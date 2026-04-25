@@ -348,7 +348,26 @@
     bar.id = 'mom-offline-bar';
     bar.setAttribute('role', 'alert');
     bar.setAttribute('aria-live', 'assertive');
-    bar.textContent = 'Bạn đang offline. Dữ liệu đã lưu vẫn có thể truy cập.';
+    function getPortalLang() {
+      try{
+        const globalLang = String(window.lang || '').trim();
+        if(globalLang === 'en' || globalLang === 'vi') return globalLang;
+      }catch (_e) {}
+      try{
+        const storedLang = String(localStorage.getItem('hesem_lang') || '').trim();
+        if(storedLang === 'en' || storedLang === 'vi') return storedLang;
+      }catch (_e) {}
+      return 'vi';
+    }
+    function offlineText() {
+      return getPortalLang() === 'en'
+        ? 'You are offline. Cached data remains available.'
+        : 'Bạn đang offline. Dữ liệu đã lưu vẫn có thể truy cập.';
+    }
+    function syncOfflineText() {
+      bar.textContent = offlineText();
+    }
+    syncOfflineText();
     bar.style.cssText = `
       position:fixed;top:0;left:0;right:0;z-index:9999;
       padding:8px 16px;text-align:center;
@@ -357,8 +376,13 @@
       transform:translateY(-100%);transition:transform .3s ease;
     `;
     document.body.appendChild(bar);
+    window.addEventListener('hesem:lang-change', syncOfflineText);
+    window.addEventListener('storage', function (event) {
+      if (event && event.key === 'hesem_lang') syncOfflineText();
+    });
 
     function updateBar() {
+      syncOfflineText();
       if (navigator.onLine) {
         bar.style.transform = 'translateY(-100%)';
         document.body.style.paddingTop = '';
