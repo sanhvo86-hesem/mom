@@ -736,4 +736,21 @@ class EqmsBatchReleaseController extends EqmsBaseController
 
         $this->success(['batch_release' => $this->loadBatchRelease($brId), 'created_ncr' => $ncr], 201);
     }
+
+    /**
+     * Plural-form GET-list wrapper. Delegates to existing search().
+     *
+     * Added 2026-04-25 per ADR-0008 (EQMS plural-form canonical paths).
+     * Frontend HMV4 uses /api/v1/<plural-resource> via this wrapper;
+     * legacy /api/v1/eqms/<singular>/query continues to serve POST-body
+     * filtered queries.
+     */
+    public function query(string $key = '', ?string $default = null): ?string
+    {
+        if ($key !== '') {
+            return parent::query($key, $default);
+        }
+
+        $this->search();
+    }
 }

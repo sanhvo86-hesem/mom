@@ -148,6 +148,10 @@ tags:
       Browser localStorage is cache only; the backend registry/design artifacts are authority.
       Error responses are `application/problem+json` and include `code`, `status`,
       `detail`, optional field errors and release blocker context where applicable.
+  - name: EQMS Plural Aliases
+    description: |
+      Plural-form canonical aliases for HMV4 EQMS integration per ADR-0008.
+      Existing /api/v1/eqms/<singular> paths remain live.
   - name: EQMS Control Plane
     description: |
       Canonical portal-first EQMS control-plane endpoints for document control,
@@ -155,6 +159,629 @@ tags:
       monitor, audit packs, change authority, and genealogy graph reads.
 
 paths:
+  # EQMS plural-form REST aliases (ADR-0008)
+  /api/v1/nonconformance-cases:
+    get:
+      operationId: eqmsPluralNonconformanceCasesQuery
+      tags: [EQMS Plural Aliases]
+      summary: List nonconformance cases
+      description: "Plural-form alias for /api/v1/eqms/ncr/query. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing NCR search projection.
+    post:
+      operationId: eqmsPluralNonconformanceCasesCreate
+      tags: [EQMS Plural Aliases]
+      summary: Create nonconformance case
+      description: "Plural-form alias for /api/v1/eqms/ncr. Canonical per ADR-0008."
+      responses:
+        '201':
+          description: Existing NCR create response.
+  '/api/v1/nonconformance-cases/{id}:contain':
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: eqmsPluralNonconformanceCasesContain
+      tags: [EQMS Plural Aliases]
+      summary: Contain nonconformance case
+      description: "Plural-form alias for /api/v1/eqms/ncr/{id}/actions/contain. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing NCR containment action response.
+  '/api/v1/nonconformance-cases/{id}:investigate':
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: eqmsPluralNonconformanceCasesInvestigate
+      tags: [EQMS Plural Aliases]
+      summary: Investigate nonconformance case
+      description: "Plural-form alias for /api/v1/eqms/ncr/{id}/actions/investigate. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing NCR investigation action response.
+  '/api/v1/nonconformance-cases/{id}:close':
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: eqmsPluralNonconformanceCasesClose
+      tags: [EQMS Plural Aliases]
+      summary: Close nonconformance case
+      description: "Plural-form alias for /api/v1/eqms/ncr/{id}/actions/close. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing NCR close action response.
+  '/api/v1/nonconformance-cases/{id}:reopen':
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: eqmsPluralNonconformanceCasesReopen
+      tags: [EQMS Plural Aliases]
+      summary: Reopen nonconformance case
+      description: "Plural-form alias for /api/v1/eqms/ncr/{id}/actions/reopen. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing NCR reopen action response.
+  /api/v1/nonconformance-cases/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: eqmsPluralNonconformanceCasesDetail
+      tags: [EQMS Plural Aliases]
+      summary: Get nonconformance case
+      description: "Plural-form alias for /api/v1/eqms/ncr/{id}. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing NCR detail response.
+    patch:
+      operationId: eqmsPluralNonconformanceCasesUpdate
+      tags: [EQMS Plural Aliases]
+      summary: Update nonconformance case
+      description: "Plural-form alias for /api/v1/eqms/ncr/{id}. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing NCR update response.
+  /api/v1/nonconformance-cases/{id}/audit:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: eqmsPluralNonconformanceCasesAudit
+      tags: [EQMS Plural Aliases]
+      summary: Get nonconformance case audit
+      description: "Plural-form alias for /api/v1/eqms/ncr/{id}/audit. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing NCR audit response.
+  /api/v1/nonconformance-cases/{id}/comments:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: eqmsPluralNonconformanceCasesCommentsList
+      tags: [EQMS Plural Aliases]
+      summary: List nonconformance case comments
+      description: "Plural-form alias for /api/v1/eqms/ncr/{id}/comments. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing NCR comments response.
+    post:
+      operationId: eqmsPluralNonconformanceCasesCommentsCreate
+      tags: [EQMS Plural Aliases]
+      summary: Add nonconformance case comment
+      description: "Plural-form alias for /api/v1/eqms/ncr/{id}/comments. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing NCR comments response.
+  /api/v1/nonconformance-cases/{id}/attachments:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: eqmsPluralNonconformanceCasesAttachmentsList
+      tags: [EQMS Plural Aliases]
+      summary: List nonconformance case attachments
+      description: "Plural-form alias for /api/v1/eqms/ncr/{id}/attachments. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing NCR attachments response.
+    post:
+      operationId: eqmsPluralNonconformanceCasesAttachmentsCreate
+      tags: [EQMS Plural Aliases]
+      summary: Add nonconformance case attachment
+      description: "Plural-form alias for /api/v1/eqms/ncr/{id}/attachments. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing NCR attachments response.
+
+  /api/v1/capas:
+    get:
+      operationId: eqmsPluralCapasQuery
+      tags: [EQMS Plural Aliases]
+      summary: List CAPAs
+      description: "Plural-form alias for /api/v1/eqms/capa/query. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing CAPA search projection.
+    post:
+      operationId: eqmsPluralCapasCreate
+      tags: [EQMS Plural Aliases]
+      summary: Create CAPA
+      description: "Plural-form alias for /api/v1/eqms/capa. Canonical per ADR-0008."
+      responses:
+        '201':
+          description: Existing CAPA create response.
+  '/api/v1/capas/{id}:start-analysis':
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: eqmsPluralCapasStartAnalysis
+      tags: [EQMS Plural Aliases]
+      summary: Start CAPA analysis
+      description: "Plural-form alias for /api/v1/eqms/capa/{id}/actions/start-analysis. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing CAPA start-analysis action response.
+  '/api/v1/capas/{id}:close':
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: eqmsPluralCapasClose
+      tags: [EQMS Plural Aliases]
+      summary: Close CAPA
+      description: "Plural-form alias for /api/v1/eqms/capa/{id}/actions/close. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing CAPA close action response.
+  '/api/v1/capas/{id}:cancel':
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: eqmsPluralCapasCancel
+      tags: [EQMS Plural Aliases]
+      summary: Cancel CAPA
+      description: "Plural-form alias for /api/v1/eqms/capa/{id}/actions/cancel. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing CAPA cancel action response.
+  /api/v1/capas/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: eqmsPluralCapasDetail
+      tags: [EQMS Plural Aliases]
+      summary: Get CAPA
+      description: "Plural-form alias for /api/v1/eqms/capa/{id}. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing CAPA detail response.
+    patch:
+      operationId: eqmsPluralCapasUpdate
+      tags: [EQMS Plural Aliases]
+      summary: Update CAPA
+      description: "Plural-form alias for /api/v1/eqms/capa/{id}. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing CAPA update response.
+  /api/v1/capas/{id}/audit:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: eqmsPluralCapasAudit
+      tags: [EQMS Plural Aliases]
+      summary: Get CAPA audit
+      description: "Plural-form alias for /api/v1/eqms/capa/{id}/audit. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing CAPA audit response.
+  /api/v1/capas/{id}/comments:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: eqmsPluralCapasCommentsList
+      tags: [EQMS Plural Aliases]
+      summary: List CAPA comments
+      description: "Plural-form alias for /api/v1/eqms/capa/{id}/comments. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing CAPA comments response.
+    post:
+      operationId: eqmsPluralCapasCommentsCreate
+      tags: [EQMS Plural Aliases]
+      summary: Add CAPA comment
+      description: "Plural-form alias for /api/v1/eqms/capa/{id}/comments. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing CAPA comments response.
+  /api/v1/capas/{id}/attachments:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: eqmsPluralCapasAttachmentsList
+      tags: [EQMS Plural Aliases]
+      summary: List CAPA attachments
+      description: "Plural-form alias for /api/v1/eqms/capa/{id}/attachments. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing CAPA attachments response.
+    post:
+      operationId: eqmsPluralCapasAttachmentsCreate
+      tags: [EQMS Plural Aliases]
+      summary: Add CAPA attachment
+      description: "Plural-form alias for /api/v1/eqms/capa/{id}/attachments. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing CAPA attachments response.
+
+  /api/v1/controlled-documents:
+    get:
+      operationId: eqmsPluralControlledDocumentsQuery
+      tags: [EQMS Plural Aliases]
+      summary: List controlled documents
+      description: "Plural-form alias for /api/v1/eqms/documents/query. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing controlled-document search projection.
+    post:
+      operationId: eqmsPluralControlledDocumentsCreate
+      tags: [EQMS Plural Aliases]
+      summary: Create controlled document
+      description: "Plural-form alias for /api/v1/eqms/documents. Canonical per ADR-0008."
+      responses:
+        '201':
+          description: Existing controlled-document create response.
+  '/api/v1/controlled-documents/{id}:approve':
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: eqmsPluralControlledDocumentsApprove
+      tags: [EQMS Plural Aliases]
+      summary: Approve controlled document
+      description: "Plural-form alias for /api/v1/eqms/documents/{id}/actions/approve. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing controlled-document approve action response.
+  '/api/v1/controlled-documents/{id}:release':
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: eqmsPluralControlledDocumentsRelease
+      tags: [EQMS Plural Aliases]
+      summary: Release controlled document
+      description: "Plural-form alias for /api/v1/eqms/documents/{id}/actions/release. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing controlled-document release action response.
+  /api/v1/controlled-documents/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: eqmsPluralControlledDocumentsDetail
+      tags: [EQMS Plural Aliases]
+      summary: Get controlled document
+      description: "Plural-form alias for /api/v1/eqms/documents/{id}. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing controlled-document detail response.
+    patch:
+      operationId: eqmsPluralControlledDocumentsUpdate
+      tags: [EQMS Plural Aliases]
+      summary: Update controlled document
+      description: "Plural-form alias for /api/v1/eqms/documents/{id}. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing controlled-document update response.
+  /api/v1/controlled-documents/{id}/audit:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: eqmsPluralControlledDocumentsAudit
+      tags: [EQMS Plural Aliases]
+      summary: Get controlled document audit
+      description: "Plural-form alias for /api/v1/eqms/documents/{id}/audit. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing controlled-document audit response.
+  /api/v1/controlled-documents/{id}/comments:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: eqmsPluralControlledDocumentsCommentsList
+      tags: [EQMS Plural Aliases]
+      summary: List controlled document comments
+      description: "Plural-form alias for /api/v1/eqms/documents/{id}/comments. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing controlled-document comments response.
+    post:
+      operationId: eqmsPluralControlledDocumentsCommentsCreate
+      tags: [EQMS Plural Aliases]
+      summary: Add controlled document comment
+      description: "Plural-form alias for /api/v1/eqms/documents/{id}/comments. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing controlled-document comments response.
+  /api/v1/controlled-documents/{id}/attachments:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: eqmsPluralControlledDocumentsAttachmentsList
+      tags: [EQMS Plural Aliases]
+      summary: List controlled document attachments
+      description: "Plural-form alias for /api/v1/eqms/documents/{id}/attachments. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing controlled-document attachments response.
+    post:
+      operationId: eqmsPluralControlledDocumentsAttachmentsCreate
+      tags: [EQMS Plural Aliases]
+      summary: Add controlled document attachment
+      description: "Plural-form alias for /api/v1/eqms/documents/{id}/attachments. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing controlled-document attachments response.
+
+  /api/v1/inspections:
+    get:
+      operationId: eqmsPluralInspectionsQuery
+      tags: [EQMS Plural Aliases]
+      summary: List inspections
+      description: "Plural-form alias for split inspection projections. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing IQC or in-process inspection search projection.
+  '/api/v1/inspections/{id}:flag-nonconformance':
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: eqmsPluralInspectionsFlagNonconformance
+      tags: [EQMS Plural Aliases]
+      summary: Flag inspection nonconformance
+      description: "Plural-form alias for /api/v1/mes/quality/inprocess/{id}/actions/flag-nonconformance. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing in-process inspection flag action response.
+
+  /api/v1/batch-releases:
+    get:
+      operationId: eqmsPluralBatchReleasesQuery
+      tags: [EQMS Plural Aliases]
+      summary: List batch releases
+      description: "Plural-form alias for /api/v1/eqms/batch-release/query. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing batch-release search projection.
+  '/api/v1/batch-releases/{id}:approve-release':
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: eqmsPluralBatchReleasesApproveRelease
+      tags: [EQMS Plural Aliases]
+      summary: Approve batch release
+      description: "Plural-form alias for /api/v1/eqms/batch-release/{id}/actions/approve-release. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing batch-release approve action response.
+  '/api/v1/batch-releases/{id}:market-ship':
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: eqmsPluralBatchReleasesMarketShip
+      tags: [EQMS Plural Aliases]
+      summary: Market-ship batch release
+      description: "Plural-form alias for /api/v1/eqms/batch-release/{id}/actions/market-ship. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing batch-release market-ship action response.
+  /api/v1/batch-releases/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: eqmsPluralBatchReleasesDetail
+      tags: [EQMS Plural Aliases]
+      summary: Get batch release
+      description: "Plural-form alias for /api/v1/eqms/batch-release/{id}. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing batch-release detail response.
+
+  /api/v1/engineering-changes:
+    get:
+      operationId: eqmsPluralEngineeringChangesQuery
+      tags: [EQMS Plural Aliases]
+      summary: List engineering changes
+      description: "Plural-form alias for /api/v1/eqms/engineering-change/query. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing engineering-change search projection.
+    post:
+      operationId: eqmsPluralEngineeringChangesCreate
+      tags: [EQMS Plural Aliases]
+      summary: Create engineering change
+      description: "Plural-form alias for /api/v1/eqms/engineering-change. Canonical per ADR-0008."
+      responses:
+        '201':
+          description: Existing engineering-change create response.
+  /api/v1/engineering-changes/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: eqmsPluralEngineeringChangesDetail
+      tags: [EQMS Plural Aliases]
+      summary: Get engineering change
+      description: "Plural-form alias for /api/v1/eqms/engineering-change/{id}. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing engineering-change detail response.
+    patch:
+      operationId: eqmsPluralEngineeringChangesUpdate
+      tags: [EQMS Plural Aliases]
+      summary: Update engineering change
+      description: "Plural-form alias for /api/v1/eqms/engineering-change/{id}. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing engineering-change update response.
+  /api/v1/engineering-changes/{id}/audit:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: eqmsPluralEngineeringChangesAudit
+      tags: [EQMS Plural Aliases]
+      summary: Get engineering change audit
+      description: "Plural-form alias for /api/v1/eqms/engineering-change/{id}/audit. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing engineering-change audit response.
+
+  /api/v1/training-records:
+    get:
+      operationId: eqmsPluralTrainingRecordsQuery
+      tags: [EQMS Plural Aliases]
+      summary: List training records
+      description: "Plural-form alias for /api/v1/eqms/training/query. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing training search projection.
+    post:
+      operationId: eqmsPluralTrainingRecordsCreate
+      tags: [EQMS Plural Aliases]
+      summary: Create training record
+      description: "Plural-form alias for /api/v1/eqms/training. Canonical per ADR-0008."
+      responses:
+        '201':
+          description: Existing training create response.
+  /api/v1/training-records/matrix:
+    get:
+      operationId: eqmsPluralTrainingRecordsMatrix
+      tags: [EQMS Plural Aliases]
+      summary: Get training matrix
+      description: "Plural-form alias for /api/v1/eqms/training/matrix. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing training matrix response.
+  /api/v1/training-records/curricula:
+    get:
+      operationId: eqmsPluralTrainingRecordsCurricula
+      tags: [EQMS Plural Aliases]
+      summary: Get training curricula
+      description: "Plural-form alias for /api/v1/eqms/training/curricula. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing training curricula response.
+  /api/v1/training-records/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: eqmsPluralTrainingRecordsDetail
+      tags: [EQMS Plural Aliases]
+      summary: Get training record
+      description: "Plural-form alias for /api/v1/eqms/training/{id}. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing training detail response.
+    patch:
+      operationId: eqmsPluralTrainingRecordsUpdate
+      tags: [EQMS Plural Aliases]
+      summary: Update training record
+      description: "Plural-form alias for /api/v1/eqms/training/{id}. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing training update response.
+  /api/v1/training-records/{id}/audit:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: eqmsPluralTrainingRecordsAudit
+      tags: [EQMS Plural Aliases]
+      summary: Get training record audit
+      description: "Plural-form alias for /api/v1/eqms/training/{id}/audit. Canonical per ADR-0008."
+      responses:
+        '200':
+          description: Existing training audit response.
+
   # ═══════════════════════════════════════════════════════════════════════════
   # AUTH
   # ═══════════════════════════════════════════════════════════════════════════
