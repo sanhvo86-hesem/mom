@@ -9,6 +9,16 @@ const ncTabFixtures = [
   ['signatures', 'authoritative-record-shell-nc-signatures.html', 'Signatures'],
 ] as const;
 
+const capaTabFixtures = [
+  ['analysis', 'authoritative-record-shell-capa-analysis.html'],
+  ['actions', 'authoritative-record-shell-capa-actions.html'],
+  ['verification', 'authoritative-record-shell-capa-verification.html'],
+  ['effectiveness', 'authoritative-record-shell-capa-effectiveness.html'],
+  ['related', 'authoritative-record-shell-capa-related.html'],
+  ['audit', 'authoritative-record-shell-capa-audit.html'],
+  ['signatures', 'authoritative-record-shell-capa-signatures.html'],
+] as const;
+
 test.describe('module-template-v4 preview smoke', () => {
   test('keeps production portal inert without fixture script', async ({ page }) => {
     await page.goto('/mom/portal.html');
@@ -138,6 +148,18 @@ test.describe('module-template-v4 preview smoke', () => {
     expect(parsed.rejectedQuery).toEqual([]);
   });
 
+  test('parses CAPA route as authoritative record shell', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const parsed = await page.evaluate(() =>
+      (window as any).Hmv4Routes.parsePath('/ops/records/capas/CAPA-001', '?tab=overview'),
+    );
+    expect(parsed.routeClass).toBe('AR');
+    expect(parsed.params.resource_family).toBe('capas');
+    expect(parsed.params.record_id).toBe('CAPA-001');
+    expect(parsed.query.tab).toBe('overview');
+    expect(parsed.rejectedQuery).toEqual([]);
+  });
+
   for (const [tab, fixturePage, panelHeading] of ncTabFixtures) {
     test(`renders nonconformance ${tab} tab as read-only authoritative shell`, async ({ page }) => {
       await page.goto(`/tests/fixtures/module-template-v4/pages/${fixturePage}`);
@@ -191,6 +213,65 @@ test.describe('module-template-v4 preview smoke', () => {
       buttons.filter((button) => !(button as HTMLButtonElement).disabled).length,
     );
     expect(enabledMutationCount).toBe(0);
+  });
+
+  test('renders CAPA overview tab as authoritative shell', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-capa-overview.html');
+    const root = page.locator('[data-hmv4-capa-record]');
+    await expect(root).toBeVisible();
+    await expect(root).toHaveAttribute('data-route-class', 'AR');
+    await expect(root).toHaveAttribute('data-authority-class', 'authoritative');
+    await expect(root).toHaveAttribute('data-resource-family', 'capas');
+    await expect(root).toHaveAttribute('data-root-code', 'CAPA');
+    await expect(root).toHaveAttribute('data-record-id', 'CAPA-001');
+    await expect(root).toHaveAttribute('data-query-tab', 'overview');
+    await expect(page.locator('[data-hmv4-capa-panel="overview"]:not([hidden])')).toBeVisible();
+    await expect(page.locator('[data-hmv4-mutation-intent]')).toHaveCount(10);
+    await expect(page.locator('[data-hmv4-mutation-intent]:not([disabled])')).toHaveCount(0);
+  });
+
+  for (const [tab, fixturePage] of capaTabFixtures) {
+    test(`renders CAPA ${tab} tab as read-only authoritative shell`, async ({ page }) => {
+      await page.goto(`/tests/fixtures/module-template-v4/pages/${fixturePage}`);
+      const shell = page.locator('[data-hmv4-capa-record]');
+      await expect(shell).toBeVisible();
+      await expect(shell).toHaveAttribute('data-route-class', 'AR');
+      await expect(shell).toHaveAttribute('data-authority-class', 'authoritative');
+      await expect(shell).toHaveAttribute('data-resource-family', 'capas');
+      await expect(shell).toHaveAttribute('data-root-code', 'CAPA');
+      await expect(shell).toHaveAttribute('data-record-id', 'CAPA-001');
+      await expect(shell).toHaveAttribute('data-query-tab', tab);
+      await expect(page.locator(`[role="tab"][data-tab="${tab}"]`)).toHaveAttribute('aria-selected', 'true');
+      await expect(page.locator(`[data-hmv4-capa-panel="${tab}"]:not([hidden])`)).toBeVisible();
+      await expect(page.locator('[data-hmv4-mutation-intent]')).toHaveCount(10);
+      await expect(page.locator('[data-hmv4-mutation-intent]:not([disabled])')).toHaveCount(0);
+    });
+  }
+
+  test('renders CAPA conflict fixture with visible conflict posture', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-capa-conflict.html');
+    const shell = page.locator('[data-hmv4-capa-record]');
+    await expect(shell).toHaveAttribute('data-fixture-state', 'conflict');
+    await expect(shell).toHaveAttribute('data-fixture-freshness', 'fixture_conflict');
+    await expect(page.locator('[data-hmv4-capa-state]')).toContainText('Conflict detected');
+    await expect(page.locator('[data-hmv4-mutation-intent]:not([disabled])')).toHaveCount(0);
+  });
+
+  test('renders CAPA partial-access fixture with visible limitation', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-capa-partial-access.html');
+    const shell = page.locator('[data-hmv4-capa-record]');
+    await expect(shell).toHaveAttribute('data-fixture-state', 'partial_access');
+    await expect(page.locator('[data-hmv4-capa-partial]')).toContainText('Action assignees are masked');
+    await expect(page.locator('[data-hmv4-mutation-intent]:not([disabled])')).toHaveCount(0);
+  });
+
+  test('renders CAPA degraded fixture without enabling mutation', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-capa-degraded.html');
+    const shell = page.locator('[data-hmv4-capa-record]');
+    await expect(shell).toHaveAttribute('data-fixture-state', 'degraded');
+    await expect(shell).toHaveAttribute('data-fixture-freshness', 'fixture_stale');
+    await expect(page.locator('[data-hmv4-capa-state]')).toContainText('Degraded/offline fixture');
+    await expect(page.locator('[data-hmv4-mutation-intent]:not([disabled])')).toHaveCount(0);
   });
 
   test('parses training matrix route as workspace with allowed view query', async ({ page }) => {

@@ -1,0 +1,61 @@
+{
+  "version": "0.1",
+  "authorityClass": "authoritative",
+  "resourceFamily": "capas",
+  "rootCode": "CAPA",
+  "records": {
+    "CAPA-001": {
+      "recordId": "CAPA-001",
+      "rootCode": "CAPA",
+      "title": "Operator training gap on operation OP-30",
+      "summary": "CAPA opened from NC-001 dimensional issue. Containment complete; root cause analysis in progress.",
+      "severity": "major",
+      "state": "analysis",
+      "owner": "Quality Engineer",
+      "dueDate": "2026-06-30",
+      "linkedNcId": "NC-001",
+      "freshness": "fixture_current",
+      "stateMessage": "Read-only prototype shell. Governed CAPA actions must remain outside this fixture.",
+      "lifecycle": [
+        ["draft", "complete"],
+        ["analysis", "current"],
+        ["action-planning", "pending"],
+        ["execution", "locked"],
+        ["verification", "locked"],
+        ["effectiveness", "locked"],
+        ["closed", "locked"]
+      ],
+      "rootCauses": [
+        { "category": "Training", "text": "Operator OP-1002 had expired QUAL_INJ_BASIC certification." },
+        { "category": "Process", "text": "Pre-shift competency check did not run on this date." }
+      ],
+      "actionPlan": [
+        { "title": "Re-certify OP-1002", "owner": "Training Lead", "dueDate": "2026-05-15", "status": "in_progress" },
+        { "title": "Add daily competency check to shift handoff", "owner": "Production Supervisor", "dueDate": "2026-05-30", "status": "planned" }
+      ],
+      "verifications": [],
+      "effectivenessChecks": [],
+      "relatedRecords": [
+        { "resourceFamily": "nonconformance-cases", "recordId": "NC-001", "label": "NC-001 dimensional NC" },
+        { "resourceFamily": "training-records", "recordId": "TR-7003", "label": "TR-7003 OP-1002 training certification" }
+      ]
+    }
+  },
+  "states": {
+    "conflict": {
+      "freshness": "fixture_conflict",
+      "stateMessage": "Conflict detected. Reconcile in the governed CAPA workflow."
+    },
+    "partial_access": {
+      "stateMessage": "Partial-access fixture. Some action assignees masked.",
+      "limitations": [
+        "Action assignees are masked for cross-team operators.",
+        "Verification details are masked for the current role."
+      ]
+    },
+    "degraded": {
+      "freshness": "fixture_stale",
+      "stateMessage": "Degraded/offline fixture. Refresh from authority before acting."
+    }
+  }
+}
