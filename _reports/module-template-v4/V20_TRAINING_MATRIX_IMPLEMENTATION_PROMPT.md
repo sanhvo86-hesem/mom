@@ -1,24 +1,21 @@
-# V20_CODEX_TRAINING_MATRIX_THIRD_SLICE_IMPLEMENTATION_PROMPT.md
+# V20 Training Matrix Implementation Prompt Draft
 
-## 1. Purpose
+## Purpose
 
-Paste this into Codex local AFTER all 4 are true:
+Use this prompt only after the user explicitly approves:
 
-1. V19 QA returned `NONCONFORMANCE_QA_PASS_READY_FOR_THIRD_SLICE_PLANNING`
-2. V20 planning prompt has been executed and 7 V20 artifacts approved
-3. Wave 1 sequencing roadmap reviewed (Slice 3 = TRAIN)
-4. User explicitly says: `Proceed with Training Matrix Workspace third-slice prototype implementation.`
+```text
+Proceed with Training Matrix Workspace third-slice prototype implementation.
+```
 
-This is development/prototype work only. The HESEM MOM/MES/eQMS system
-is not production yet.
+This implements a development/prototype third slice only. The HESEM MOM/MES/eQMS system is not production yet.
 
-## 2. Codex role
+## Codex Role
 
 ```text
 You are in local repo sanhvo86-hesem/mom.
 
-You are implementing the approved Training Matrix Workspace third-slice
-prototype.
+You are implementing the approved Training Matrix Workspace third-slice prototype.
 
 Do not switch current portal navigation.
 Do not implement backend APIs.
@@ -28,21 +25,15 @@ Do not implement training completion submit/acknowledge.
 Do not execute e-sign challenge.
 ```
 
-## 3. Required base
+## Required Base
 
-Branch:
-
-```text
-codex/training-matrix-third-slice-from-nc-qa
-```
-
-Created from:
+Work from:
 
 ```text
 codex/second-slice-planning-from-dispatch-qa
 ```
 
-Verify HEAD includes commits:
+HEAD must include:
 
 ```text
 567e365b docs(module-template-v4): track Slice 1+2 QA evidence and V20 plan
@@ -50,15 +41,15 @@ Verify HEAD includes commits:
 9289ef89 Harden dispatch board projection QA fixtures
 ```
 
-If not on the correct branch base, stop and ask.
+If the branch/base is wrong or unrelated dirty runtime files exist, stop and report.
 
-## 4. Target route and posture
+## Target Route And Posture
 
 ```text
 /ops/people-skill-ehs/training-competency/matrix
 ```
 
-Required posture rendered by `73-module-template-v4-renderers.js`:
+Render required attributes:
 
 ```text
 data-route-class="WS"
@@ -68,7 +59,7 @@ data-root-code="TRAIN"
 data-requires-reanchor="true"
 ```
 
-Optional subject filters (fixture-only):
+Supported fixture-only filters:
 
 ```text
 ?team=<team_id>
@@ -77,7 +68,7 @@ Optional subject filters (fixture-only):
 ?status=qualified|expiring|expired|in_training|not_required
 ```
 
-## 5. Allowed files
+## Allowed Files
 
 Allowed:
 
@@ -86,7 +77,7 @@ mom/scripts/portal/73-module-template-v4-renderers.js
 mom/scripts/portal/72-module-template-v4-bridge.js
 tests/e2e/module-template-v4*.spec.ts
 tests/fixtures/module-template-v4/**
-_reports/module-template-v4/S20_*.md
+_reports/module-template-v4/**
 ```
 
 Only if strictly needed and v4-scoped:
@@ -108,113 +99,114 @@ mom/scripts/portal/02-state-auth-ui.js
 mom/scripts/portal/40-eqms-shell.js
 ```
 
-## 6. Required render behavior
+## Required Implementation Behavior
 
-Implement `renderTrainingMatrixWorkspace(route)` in
-`73-module-template-v4-renderers.js`:
+Implement only a read-only Training Matrix projection workspace.
 
-- Workspace shell with breadcrumb, identity header, projection metadata
-- Matrix grid:
-  - rows = operators (10-30 in fixture)
-  - columns = qualifications (5-10 in fixture)
-  - cells = status enum: qualified / expiring (≤30d) / expired / in_training / not_required
-- Status cells use visible text + color (no color-only)
-- Filter chips displayed and reflect URL state (no submit-mutation)
-- Re-anchor messaging: "This is a read-only projection. Open record detail
-  for action."
-- Record-open links route to `/ops/records/training-records/{id}?tab=overview`
-- Disabled mutation controls if any "issue qualification" or "schedule
-  training" link present, with `data-hmv4-mutation-intent` only
+Required renderer:
 
-Required fixture states:
+```text
+renderTrainingMatrixWorkspace(route)
+```
 
-- happy current
-- empty (no operators in scope)
-- conflict (offline edit collision)
-- partial-access (some columns/rows masked)
-- degraded (stale data warning)
+Required behavior:
 
-## 7. Safe bridge alias behavior (no changes from V18)
+```text
+workspace shell with accessible heading and projection metadata
+operator rows
+qualification/status cells
+visible status text for qualified, expiring, expired, in_training, not_required
+fixture-only filter display
+empty fixture state
+degraded fixture state
+partial-access fixture state
+optional conflict fixture state if implementation includes it
+record-open links to /ops/records/training-records/{id}?tab=overview
+read-only/re-anchor messaging
+no certification mutation
+no training completion mutation
+no acknowledgement mutation
+no e-sign execution
+no backend fetch/XHR
+```
 
-`training` alias in `72-module-template-v4-bridge.js`:
+Mutation-looking controls, if any, must be disabled and carry only safe marker metadata:
 
-- Without subject context: maps to canonical workspace route (existing)
-- With explicit `record_id` context: redirects to AR record route
-- Unknown alias: `unmapped_needs_decision`
+```text
+data-hmv4-mutation-intent
+```
 
-The bridge code change for V20 should be minimal — only add if context
-disambiguation requires.
+## Bridge Alias Behavior
 
-## 8. Required fixtures
+`training` alias should resolve canonically to the Training Matrix workspace or existing module route according to the frozen route grammar.
 
-Create:
+Unknown aliases must remain:
+
+```text
+unmapped_needs_decision
+```
+
+Do not change `ncr` bridge policy:
+
+```text
+ncr without explicit record context must not invent a record ID.
+context-backed ncr may route to an authoritative nonconformance record shell.
+```
+
+## Required Fixtures
+
+Create/update:
 
 ```text
 tests/fixtures/module-template-v4/training-matrix-fixtures.json
 tests/fixtures/module-template-v4/pages/workspace-training-matrix.html
 tests/fixtures/module-template-v4/pages/workspace-training-matrix-empty.html
-tests/fixtures/module-template-v4/pages/workspace-training-matrix-conflict.html
-tests/fixtures/module-template-v4/pages/workspace-training-matrix-partial-access.html
 tests/fixtures/module-template-v4/pages/workspace-training-matrix-degraded.html
+tests/fixtures/module-template-v4/pages/workspace-training-matrix-partial-access.html
 ```
 
-`training-matrix-fixtures.json` schema:
+Optional if implementing explicit conflict coverage:
 
-```json
-{
-  "version": "0.1",
-  "authorityClass": "projection",
-  "resourceFamily": "training-records",
-  "rootCode": "TRAIN",
-  "operators": [
-    { "id": "OP-1001", "name": "Nguyen Van A", "team": "T-MOLD", "role": "MOLD_OP" }
-  ],
-  "qualifications": [
-    { "code": "QUAL_INJ_BASIC", "name": "Injection Molding Basics", "renewMonths": 12 }
-  ],
-  "matrix": [
-    { "operatorId": "OP-1001", "qualificationCode": "QUAL_INJ_BASIC", "status": "qualified", "lastCertifiedAt": "2025-12-15", "expiresAt": "2026-12-15", "evidenceLink": null }
-  ],
-  "states": {
-    "empty": { "operators": [], "matrix": [] },
-    "conflict": { "stateMessage": "Offline edit detected; reconcile in record." },
-    "partial_access": { "limitations": ["Some operators are masked for current role."] },
-    "degraded": { "freshness": "fixture_stale", "stateMessage": "Stale projection. Refresh from authority." }
-  }
-}
+```text
+tests/fixtures/module-template-v4/pages/workspace-training-matrix-conflict.html
 ```
 
-## 9. Required E2E
+## Required E2E Checks
 
-Add tests to `tests/e2e/module-template-v4.spec.ts` and
-`tests/e2e/module-template-v4-bridge.spec.ts`:
+Add/update checks for:
 
-- route parses as `WS`
-- shell has `data-authority-class="projection"`
-- shell has `data-requires-reanchor="true"`
-- matrix renders rows × columns with status cells
-- empty fixture renders empty-state copy
-- conflict fixture renders visible conflict
-- partial-access fixture renders visible limitation
-- degraded fixture renders without enabling mutation
-- record-open link routes to `/ops/records/training-records/{id}?tab=overview`
-- bridge alias `training` continues to resolve canonically
-- unknown alias remains `unmapped_needs_decision`
-- current portal remains inert by default
-- `74-module-template-v4-fixtures.js` remains absent from `mom/portal.html`
+```text
+route parses as WS
+shell has data-authority-class="projection"
+shell has data-requires-reanchor="true"
+shell has data-resource-family="training-records"
+shell has data-root-code="TRAIN"
+matrix renders operator rows and qualification cells
+status text is visible and not color-only
+empty fixture renders empty-state copy without enabling mutation
+degraded fixture renders degraded posture
+partial-access fixture renders limitation text
+mutation-looking controls absent or disabled with data-hmv4-mutation-intent
+record-open links route to /ops/records/training-records/{id}?tab=overview
+bridge alias training resolves canonically
+unknown alias remains unmapped_needs_decision
+current portal remains inert by default
+74-module-template-v4-fixtures.js remains absent from mom/portal.html
+```
 
-Total: extend existing 23 tests by ~10 → target 33 passing tests.
+## Required Checks
 
-## 10. Required checks
+From `tests/e2e`:
 
 ```bash
-# In tests/e2e
-cd tests/e2e
 npm install --no-package-lock
 npm run test:hmv4 -- --project=chromium
 rm -rf node_modules
+```
 
-# From repo root
+From repo root:
+
+```bash
 node --check mom/scripts/portal/70-module-template-v4-hydration.js
 node --check mom/scripts/portal/71-module-template-v4-routes.js
 node --check mom/scripts/portal/72-module-template-v4-bridge.js
@@ -224,18 +216,22 @@ node --check mom/scripts/portal/74-module-template-v4-fixtures.js
 grep -n "74-module-template-v4-fixtures" mom/portal.html && echo "FAIL fixture production load" || echo "PASS no fixture production load"
 
 git diff --name-only | grep -E 'mom/styles/(portal.main|eqms-suite|density-darkmode)\.css|mom/scripts/portal/(01-module-router|02-state-auth-ui|40-eqms-shell)\.js|mom/portal\.html' && echo "FAIL forbidden diff" || echo "PASS forbidden diff"
+
+python3 - <<'PY'
+import json, pathlib, sys
+for p in pathlib.Path('tests/fixtures/module-template-v4').rglob('*.json'):
+    try:
+        json.loads(p.read_text())
+        print('PASS json', p)
+    except Exception as e:
+        print('FAIL json', p, e)
+        sys.exit(1)
+PY
 ```
 
-Graphics Authority compliance check:
+## Rollback
 
-```bash
-grep -nE '#[0-9a-fA-F]{3,8}\b' mom/scripts/portal/73-module-template-v4-renderers.js | grep -v "^.*://" | grep -v "^.*//.*"
-# Expect: zero matches in V20 additions
-```
-
-## 11. Rollback constraints
-
-Third-slice rollback v4-scoped only:
+Third-slice-only rollback must be v4-scoped:
 
 ```bash
 git checkout -- \
@@ -244,39 +240,17 @@ git checkout -- \
   tests/e2e/module-template-v4*.spec.ts
 
 rm -f tests/fixtures/module-template-v4/training-matrix-fixtures.json
-rm -f tests/fixtures/module-template-v4/pages/workspace-training-matrix-*.html
+rm -f tests/fixtures/module-template-v4/pages/workspace-training-matrix*.html
 ```
 
-Do not remove Slice 1 (Dispatch) or Slice 2 (Nonconformance) files.
+Do not remove Dispatch Board or Nonconformance second-slice files.
 
-## 12. Required output
+## Required Output
 
 Generate:
 
 ```text
 S20_TRAINING_MATRIX_THIRD_SLICE_IMPLEMENTATION_REPORT.md
-```
-
-Sections:
-
-```text
-## Summary
-## Branch and working tree
-## Files changed
-## Training matrix route behavior
-## Workspace projection authority checks
-## Read-only / no-mutation checks
-## Bridge alias checks
-## Fixture coverage
-## E2E result
-## JS syntax result
-## JSON fixture result
-## Current portal safety result
-## Forbidden diff result
-## Graphics Authority compliance result
-## Rollback notes
-## Remaining warnings
-## Decision
 ```
 
 Decision must be one of:
@@ -287,23 +261,4 @@ TRAINING_MATRIX_THIRD_SLICE_PASS_WITH_WARNINGS
 TRAINING_MATRIX_THIRD_SLICE_FAIL_BLOCK_NEXT
 ```
 
-## 13. Non-production wording
-
-Use:
-
-```text
-development/prototype
-current portal safety
-pre-production readiness
-third-slice prototype
-limited Wave 1 implementation
-```
-
-Avoid:
-
-```text
-production go-live
-production cutover
-production release
-validated production system
-```
+Do not start fourth-slice planning.
