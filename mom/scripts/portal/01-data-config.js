@@ -3016,6 +3016,14 @@ function setLang(l){
     try{ updateDocViewerHeader(doc); }catch(e){}
     try{ renderWorkflowPanel(doc); }catch(e){}
     try{ renderVersionHistory(doc); }catch(e){}
+    try{
+      // The language switch must be atomic from the user's perspective: once
+      // the shell is in the target language, the old-locale iframe must stop
+      // being visible immediately. Backend refresh may refine the selected
+      // artifact later, but it must not be the first step that changes content.
+      if(viewTxn && !isPortalDocViewTransactionCurrent(viewTxn, doc, l)) return;
+      if(viewerOpenDocCode && !editMode) loadDocContent(doc);
+    }catch(e){}
   }
   try{
     const localeRefresh = (typeof refreshDccOverlayForDocFromServer === 'function')
@@ -3033,8 +3041,8 @@ function setLang(l){
           updateDocViewerHeader(latestDoc);
           renderWorkflowPanel(latestDoc);
           renderVersionHistory(latestDoc);
+          loadDocContent(latestDoc);
         }
-        if(viewerOpenDocCode&&!editMode) openDocPreview(viewerOpenDocCode);
       }catch(_e){}
     }).catch(function(){
       try{
