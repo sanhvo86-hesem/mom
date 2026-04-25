@@ -47,6 +47,87 @@ motion durations, or any other visual token in JS, inline style, or HTML.**
   `GraphicsAuthority.tokens.stage()` / `draft.recordChange()`. Do not call
   them in new code; use the namespaced API.
 
+## MANDATORY: HMV4 Wave 1 Frontend Slice Program
+
+The frontend redesign of HESEM Operations Platform follows a slice-based
+prototype program known as **module-template-v4** (HMV4). Each slice is
+one root × one pattern (workspace projection or authoritative record
+shell).
+
+**Reference documents** (always read these first):
+- `_reports/module-template-v4/STRATEGIC_MASTER.md` — strategy + roadmap
+- `_reports/module-template-v4/EXECUTIVE_REVIEW_FOR_GPT_PRO.md` — current state
+- `_reports/module-template-v4/WAVE1_18_ROOT_SLICE_SEQUENCING_ROADMAP.md` — slice order
+- `_reports/module-template-v4/UPGRADE_PROMPTS_MASTER_INDEX.md` — execution prompts
+- `docs/adr/` — frozen architectural decisions
+
+**Pre-production posture (FROZEN per ADR-0001)**:
+- HMV4 is development/prototype only
+- Wording: use `development/prototype`, `current portal safety`,
+  `pre-production readiness`; AVOID `production go-live`,
+  `production cutover`, `production release`
+- All HMV4 surfaces feature-flagged INERT by default
+- Fixture data only (no live API)
+- No `mom/qms-data` registry promotion without explicit approval
+
+**Forbidden files** (NEVER modify in HMV4 slice work, per ADR-0004):
+- `mom/portal.html` (only feature-flag insertion allowed)
+- `mom/styles/portal.main.css`
+- `mom/styles/eqms-suite.css`
+- `mom/styles/density-darkmode.css`
+- `mom/scripts/portal/01-module-router.js`
+- `mom/scripts/portal/02-state-auth-ui.js`
+- `mom/scripts/portal/40-eqms-shell.js`
+
+**HMV4 source files**:
+- `mom/scripts/portal/70-module-template-v4-hydration.js`
+- `mom/scripts/portal/71-module-template-v4-routes.js`
+- `mom/scripts/portal/72-module-template-v4-bridge.js`
+- `mom/scripts/portal/73-module-template-v4-renderers.js`
+- `mom/scripts/portal/74-module-template-v4-fixtures.js` (fixture-only,
+  NEVER loaded by `mom/portal.html`)
+- `mom/styles/module-template-v4.tokens.css`
+- `mom/styles/module-template-v4.css`
+- `mom/templates/module-template-v4/module-template-v4.html`
+- `tests/e2e/module-template-v4*.spec.ts` (4+ spec files)
+- `tests/fixtures/module-template-v4/**` (JSON + HTML fixtures)
+
+**Slice cycle** (per ADR-0005):
+
+Each slice progresses through: planning → approval → implementation →
+QA. Each step has its own Codex prompt with explicit allowed/forbidden
+files and required output decision phrase. Reference prompt packs in
+`_reports/module-template-v4/UPGRADE_PROMPT_PACK_<N>_*.md`.
+
+**Quality gates per slice** (must all PASS):
+1. Node syntax 70-74 (`node --check`)
+2. JSON fixture parse (Python `json.loads` over `tests/fixtures/module-template-v4/**/*.json`)
+3. Forbidden diff guard (`git diff --name-only | grep <forbidden patterns>` → no match)
+4. No fixture production load (`grep "74-module-template-v4-fixtures" mom/portal.html` → no match)
+5. Portal feature flag inert by default (`HMV4_PREVIEW_ENABLED=false`,
+   `HMV4_FIXTURE_MODE=false`, `HMV4_DISABLE_MUTATION_LAUNCHERS=true`)
+6. Playwright E2E 100% pass (`tests/e2e && npm run test:hmv4 -- --project=chromium`)
+7. Graphics Authority compliance (no hex/px in JS, per ADR-0009)
+
+**18 Wave 1 roots and current slice progression**:
+
+- Slice 1: DISP (Dispatch Board, WS) — DONE
+- Slice 2: NQCASE (Nonconformance Case Record Shell, AR) — DONE
+- Slice 3: TRAIN (Training Matrix Workspace) — IN PROGRESS
+- Slices 4–8: CAPA, CDOC, INSP, BREL, ECO (quality stream)
+- Slices 9–12: JO, SO, WO, CPO (transactional stream)
+- Slices 13–18: PO, QUO, PREC, LOT, IREV, MWO (RED roots, full backend)
+
+**When opening this repo cold**:
+1. Read `_reports/module-template-v4/STRATEGIC_MASTER.md` and
+   `_reports/module-template-v4/EXECUTIVE_REVIEW_FOR_GPT_PRO.md` first
+2. Identify current slice from
+   `_reports/module-template-v4/WAVE1_18_ROOT_SLICE_SEQUENCING_ROADMAP.md`
+3. Honor forbidden file list above
+4. Use frozen vocabulary (14 domains, 18 roots, 9 route classes — per
+   ADR-0002)
+5. Maintain pre-production wording
+
 ## MANDATORY: DCC Document Header Standard (controlled docs under mom/docs/**)
 
 **Every controlled QMS document under `mom/docs/**` MUST satisfy the DCC
