@@ -2279,10 +2279,7 @@ function syncIframeDccBootstrapMetadata(idoc, doc){
     headerEl.setAttribute('data-dcc-bootstrap', JSON.stringify(payload));
     if(meta.doc_code) headerEl.setAttribute('data-dcc-doc-code', meta.doc_code);
     headerEl.setAttribute('data-dcc-locale', lang === 'en' ? 'en' : 'vi');
-    const iwin = idoc.defaultView || null;
-    if(iwin && iwin.DccHeader && typeof iwin.DccHeader.render === 'function'){
-      Promise.resolve(iwin.DccHeader.render(headerEl)).catch(function(){});
-    }
+    headerEl.setAttribute('data-dcc-bootstrap-source', 'portal-authoritative');
   }catch(_e){}
   return true;
 }
@@ -2435,6 +2432,7 @@ function finishDocIframeLoad(iframe, loading, ctx){
   if(!isCurrentDocIframeLoad(iframe, ctx)) return false;
   if(loading) loading.style.display = 'none';
   if(iframe) iframe.style.opacity = '1';
+  try{ if(typeof schedulePortalShellLayoutAssert === 'function') schedulePortalShellLayoutAssert('doc-iframe-loaded'); }catch(e){}
   return true;
 }
 
@@ -2455,7 +2453,16 @@ function loadDocContent(code){
   const iframe=document.getElementById('doc-iframe');
   const loading=document.getElementById('iframe-loading');
   if(!iframe) return;
+  const nextSignature = getDocIframeLoadSignature(doc, localeView);
+  const activeSignature = String(window.__QMS_ACTIVE_DOC_CONTENT_SIGNATURE || '');
+  const frameHasActiveLoad = String(iframe.__qmsDocLoadSignature || '') === nextSignature;
+  const frameHasPayload = !!(iframe.getAttribute('src') || iframe.getAttribute('srcdoc') || iframe.__qmsDocLoadToken);
+  if(nextSignature && activeSignature === nextSignature && frameHasActiveLoad && frameHasPayload){
+    try{ if(typeof schedulePortalShellLayoutAssert === 'function') schedulePortalShellLayoutAssert('doc-load-skip-same-signature'); }catch(e){}
+    return;
+  }
   const loadCtx = createDocIframeLoadContext(iframe, doc, localeView);
+  try{ if(typeof schedulePortalShellLayoutAssert === 'function') schedulePortalShellLayoutAssert('doc-load-start'); }catch(e){}
 
   // Show loading indicator while refreshing the iframe
   if(loading){

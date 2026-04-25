@@ -144,6 +144,7 @@ function _apiUrl(path){
 
 function _fetchJson(url, opts){
     var options = Object.assign({
+        cache: 'no-store',
         credentials: 'same-origin',
         headers: { 'Accept': 'application/json' }
     }, opts || {});

@@ -17,6 +17,7 @@
   --font:-apple-system,'Segoe UI',Tahoma,'Noto Sans',Arial,Helvetica,sans-serif;
   --mono:'SF Mono','Cascadia Code','Fira Code',monospace;
 }
+html,body{width:100%;max-width:100%;overflow:hidden}
 body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:var(--leading-normal,1.5);overflow:hidden;height:100vh}
 a{color:var(--brand-2);text-decoration:none}
 input,button,select{font-family:var(--font);font-size:14px}
@@ -62,12 +63,12 @@ button{cursor:pointer;border:none;background:none;appearance:none;-webkit-appear
 #login-box .demo-btn .role{color:var(--text-3);font-size:10px}
 
 /* ═══ MAIN LAYOUT ═══ */
-#app{display:none;height:100vh;flex-direction:row}
-#app.active{display:flex}
+#app{display:none;height:100vh;flex-direction:row;min-width:0}
+#app.active{display:flex;width:100vw;max-width:100vw;overflow:hidden}
 
 /* ═══ SIDEBAR ═══ */
-#sidebar{width:var(--sidebar-w);background:var(--brand);color:#fff;display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:width .2s}
-#sidebar.collapsed{width:var(--sidebar-w-collapsed,56px)}
+#sidebar{width:var(--sidebar-w);min-width:var(--sidebar-w);max-width:var(--sidebar-w);background:var(--brand);color:#fff;display:flex;flex-direction:column;flex-shrink:0;overflow:hidden;transition:width .2s}
+#sidebar.collapsed{width:var(--sidebar-w-collapsed,56px);min-width:var(--sidebar-w-collapsed,56px);max-width:var(--sidebar-w-collapsed,56px)}
 #sidebar .sidebar-header{height:var(--header-h);padding:0 14px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.08)}
 /* Logo: ~20% smaller, keep fully visible (no clipping) and visually centered */
 #sidebar .sidebar-header .logo-mark{width:35px;height:35px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;padding:1px}
@@ -116,8 +117,8 @@ button{cursor:pointer;border:none;background:none;appearance:none;-webkit-appear
 #sidebar.collapsed .sidebar-toggle .icon svg{transform:rotate(180deg)}
 
 /* ═══ MAIN AREA ═══ */
-#main{flex:1;display:flex;flex-direction:column;min-width:0}
-#header{height:var(--header-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;gap:8px}
+#main{flex:1;display:flex;flex-direction:column;min-width:0;overflow:hidden}
+#header{height:var(--header-h);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;gap:8px;min-width:0}
 #header .breadcrumb{display:flex;align-items:center;gap:var(--breadcrumb-gap,6px);font-size:var(--breadcrumb-font-size,13px);color:var(--breadcrumb-color,var(--text-3));flex:1;min-width:0}
 #header .breadcrumb .current{color:var(--breadcrumb-active-color,var(--text));font-weight:600}
 #header .doc-header-toolbar{display:none;align-items:center;justify-content:flex-end;flex:0 1 auto;min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
@@ -142,7 +143,7 @@ button{cursor:pointer;border:none;background:none;appearance:none;-webkit-appear
 .user-dropdown button.dd-btn:hover{background:var(--dropdown-item-hover-bg,#f8f9fa)}
 .user-dropdown button.dd-btn.danger{color:var(--red)}
 
-#content{flex:1;min-height:0;overflow-y:auto;overflow-x:hidden}
+#content{flex:1;min-height:0;min-width:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
 #content.admin-scroll-lock{overflow:hidden}
 
 /* ═══ DASHBOARD ═══ */
@@ -214,7 +215,7 @@ button{cursor:pointer;border:none;background:none;appearance:none;-webkit-appear
 .doc-status.draft{background:#fff8e1;color:var(--amber)}
 
 /* ═══ DOCUMENT VIEWER ═══ */
-#doc-viewer{display:none;height:100%;overflow:hidden}
+#doc-viewer{display:none;height:100%;min-width:0;overflow:hidden}
 #doc-viewer.active{display:flex;flex-direction:column}
 #doc-viewer-header{background:linear-gradient(180deg,#ffffff 0%,#fcfdff 100%);border-bottom:1px solid #dce4ee;padding:10px 16px 8px;flex-shrink:0;overflow-y:auto;max-height:27%;transition:padding .2s ease,max-height .2s ease;box-shadow:inset 0 1px 0 rgba(255,255,255,.9)}
 #doc-viewer-header.details-collapsed{padding-top:7px;padding-bottom:7px}
@@ -268,8 +269,8 @@ button{cursor:pointer;border:none;background:none;appearance:none;-webkit-appear
 .dv-actions button:hover{background:#f8f9fa}
 .dv-actions .btn-approve{background:var(--green);color:#fff;border-color:var(--green)}
 .dv-actions .btn-approve:hover{opacity:.9}
-#doc-iframe-wrap{flex:1;position:relative;background:#e9ecef;min-height:0;overflow:hidden}
-#doc-iframe{width:100%;height:100%;border:none}
+#doc-iframe-wrap{flex:1;position:relative;background:#e9ecef;min-height:0;min-width:0;overflow:hidden}
+#doc-iframe{width:100%;height:100%;border:none;display:block}
 #editor-container{position:absolute;top:0;left:0;right:0;bottom:0;display:none}
 .iframe-loading{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;color:var(--text-3)}
 .iframe-loading .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--brand-2);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
@@ -355,9 +356,9 @@ button{cursor:pointer;border:none;background:none;appearance:none;-webkit-appear
   .mobile-login-header .mlh-text span{font-size:10px;color:rgba(255,255,255,.5);letter-spacing:1px}
 
   /* Sidebar overlay on mobile */
-  #sidebar{position:fixed;z-index:999;height:100vh;left:0;top:0;width:280px;transform:translateX(-100%);transition:transform .25s ease;padding-top:env(safe-area-inset-top,0)}
+  #sidebar{position:fixed;z-index:999;height:100vh;left:0;top:0;width:280px;min-width:280px;max-width:280px;transform:translateX(-100%);transition:transform .25s ease;padding-top:env(safe-area-inset-top,0)}
   #sidebar.mobile-open{transform:translateX(0)}
-  #sidebar.collapsed{width:280px;transform:translateX(-100%)}
+  #sidebar.collapsed{width:280px;min-width:280px;max-width:280px;transform:translateX(-100%)}
   #sidebar.collapsed.mobile-open{transform:translateX(0)}
   .collapsed .sidebar-header .text{display:block}
   .collapsed .nav-section-title{display:block}
