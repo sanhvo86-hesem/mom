@@ -69,8 +69,69 @@
       tabs.map(function(t){return '<section class="hmv4-tabpanel" role="tabpanel" aria-labelledby="tab-'+t+'" '+(t===tab?'':'hidden')+'><div class="hmv4-section"><h3>'+esc(t)+'</h3><p>Placeholder for '+esc(t)+' section.</p></div></section>';}).join('')+
       '</article>';
   }
+  function readJsonFixture(selector){
+    var node = document.querySelector(selector);
+    if(!node) return null;
+    try { return JSON.parse(node.textContent || '{}'); } catch(e) { return null; }
+  }
+  function getDispatchProjection(){
+    var projection = window.HMV4_DISPATCH_BOARD_PROJECTION || readJsonFixture('[data-hmv4-dispatch-board-fixture]');
+    if(!projection || !Array.isArray(projection.lanes)){
+      return {
+        projectionId: 'dispatch-board-empty-projection',
+        freshness: 'fixture_missing',
+        reanchorMessage: 'Open the dispatch target record before mutation.',
+        summary: { ready: 0, running: 0, blocked: 0, stale: 0 },
+        lanes: []
+      };
+    }
+    return projection;
+  }
+  function isDispatchBoardRoute(route){
+    return route && route.params && route.params.domain === 'planning-scheduling' && route.params.module === 'dispatch-board' && route.params.workspace_family === 'board';
+  }
+  function renderDispatchCard(card){
+    var signals = Array.isArray(card.signals) ? card.signals : [];
+    return '<article class="hmv4-card" data-hmv4-dispatch-card data-dispatch-target-id="'+esc(card.id)+'" data-mutation-posture="'+esc(card.mutationPosture || 'reanchor_required')+'">' +
+      '<h3>'+esc(card.title || card.id)+'</h3>'+
+      '<p><strong>Status:</strong> '+esc(card.status || 'unknown')+'</p>'+
+      '<p><strong>Work center:</strong> '+esc(card.workCenter || 'unassigned')+'</p>'+
+      '<p><strong>Priority:</strong> '+esc(card.priority || 'normal')+' | <strong>Due:</strong> '+esc(card.due || 'not scheduled')+'</p>'+
+      (signals.length ? '<p><strong>Signals:</strong> '+signals.map(esc).join(', ')+'</p>' : '')+
+      '<div class="hmv4-feedback" data-feedback-state="warning" role="status"><strong>Read-only projection</strong><p>'+esc(card.reanchorMessage || 'Open the dispatch target record before mutation.')+'</p></div>'+
+      '<p><a data-hmv4-record-link href="'+esc(card.recordHref || '/ops/records/dispatch-targets/'+(card.id || 'DISP-UNKNOWN')+'?tab=overview')+'">Open dispatch target record</a></p>'+
+      '<button type="button" disabled data-hmv4-mutation-intent="dispatch-start" aria-describedby="hmv4-dispatch-reanchor-note">Start disabled</button> '+
+      '<button type="button" disabled data-hmv4-mutation-intent="dispatch-resequence" aria-describedby="hmv4-dispatch-reanchor-note">Resequence disabled</button>'+
+      '</article>';
+  }
+  function renderDispatchBoardWorkspace(route){
+    var projection = getDispatchProjection();
+    var lanes = projection.lanes || [];
+    var summary = projection.summary || {};
+    var view = route.query.view || 'default';
+    return '<section class="hmv4-workspace-shell" data-route-class="WS" data-domain="planning-scheduling" data-module="dispatch-board" data-workspace-family="board" data-hmv4-dispatch-board data-authority-class="projection" data-requires-reanchor="true" data-projection-id="'+esc(projection.projectionId || 'dispatch-board-projection')+'" data-query-view="'+esc(view)+'">' +
+      '<header class="hmv4-workspace-header"><h1 class="hmv4-workspace-title">Dispatch Board</h1><p class="hmv4-workspace-subtitle">Read-only projection workspace. Live dispatch actions must re-anchor to authoritative records.</p></header>'+
+      '<div class="hmv4-feedback" data-feedback-state="warning" role="status" id="hmv4-dispatch-reanchor-note"><strong>Projection only</strong><p>'+esc(projection.reanchorMessage || 'Open the dispatch target record before mutation.')+'</p></div>'+
+      '<div class="hmv4-grid" aria-label="Dispatch board summary">'+
+        '<article class="hmv4-card"><h3>Ready</h3><p data-hmv4-summary="ready">'+esc(summary.ready || 0)+' targets</p></article>'+
+        '<article class="hmv4-card"><h3>Running</h3><p data-hmv4-summary="running">'+esc(summary.running || 0)+' targets</p></article>'+
+        '<article class="hmv4-card"><h3>Blocked</h3><p data-hmv4-summary="blocked">'+esc(summary.blocked || 0)+' targets</p></article>'+
+        '<article class="hmv4-card"><h3>Stale</h3><p data-hmv4-summary="stale">'+esc(summary.stale || 0)+' targets need review</p></article>'+
+      '</div>'+
+      '<div class="hmv4-grid" data-hmv4-dispatch-lanes>'+
+      (lanes.length ? lanes.map(function(lane){
+        var cards = Array.isArray(lane.cards) ? lane.cards : [];
+        return '<section class="hmv4-section" data-hmv4-dispatch-lane="'+esc(lane.id)+'" aria-label="'+esc(lane.title || lane.id)+' lane">'+
+          '<h3>'+esc(lane.title || lane.id)+'</h3>'+
+          '<p>'+esc(lane.description || 'Read-only dispatch targets for this lane.')+'</p>'+
+          (cards.length ? cards.map(renderDispatchCard).join('') : '<div class="hmv4-feedback" data-feedback-state="info"><strong>No targets</strong><p>This lane has no fixture targets.</p></div>')+
+          '</section>';
+      }).join('') : '<div class="hmv4-feedback" data-feedback-state="warning"><strong>No projection staged</strong><p>No dispatch board fixture data was found for this route.</p></div>')+
+      '</div></section>';
+  }
   function renderWorkspace(route){
     var p = route.params;
+    if(isDispatchBoardRoute(route)) return renderDispatchBoardWorkspace(route);
     return '<section class="hmv4-workspace-shell" data-route-class="'+esc(route.routeClass)+'" data-domain="'+esc(p.domain)+'" data-module="'+esc(p.module)+'" data-workspace-family="'+esc(p.workspace_family)+'" data-authority-class="projection" data-requires-reanchor="true">' +
       '<header class="hmv4-workspace-header"><h1 class="hmv4-workspace-title">'+esc(p.workspace_family)+' workspace</h1><p class="hmv4-workspace-subtitle">Projection workspace. Mutations must re-anchor to authoritative record shells.</p></header>'+
       '<div class="hmv4-feedback" data-feedback-state="warning"><strong>Projection surface</strong><p>Rows/cards are not command anchors. Open the record before mutation.</p></div>'+
@@ -103,5 +164,5 @@
     if(!nav) return;
     nav.innerHTML = '<div class="hmv4-nav-section"><h2 class="hmv4-nav-section-title">Domains</h2>' + domains.map(function(d){ return '<a class="hmv4-nav-link" href="/ops/'+esc(d[0])+'">'+esc(d[1])+'</a>'; }).join('') + '</div>';
   }
-  window.Hmv4Renderers = { renderRoute: renderRoute, applyShell: applyShell, renderNav: renderNav, domains: domains, modules: modules };
+  window.Hmv4Renderers = { renderRoute: renderRoute, applyShell: applyShell, renderNav: renderNav, renderDispatchBoardWorkspace: renderDispatchBoardWorkspace, domains: domains, modules: modules };
 })();

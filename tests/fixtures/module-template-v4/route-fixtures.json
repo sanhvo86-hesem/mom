@@ -4,8 +4,67 @@
   "ML": "/ops/quality-operations/quality-tower",
   "AC": "/ops/records/quotations",
   "AR": "/ops/records/quotations/QUO-DEMO-001",
+  "AR_NC": "/ops/records/nonconformance-cases/NC-001?tab=overview",
   "ERD": "/ops/records/controlled-documents/CDOC-DEMO-001/drafts/DRAFT-1",
   "NRD": "/ops/customer-order-commit/rfq-quote-studio/drafts/DRAFT-NEW-1",
   "WS": "/ops/planning-scheduling/dispatch-board/board",
-  "SFW": "/ops/quality-operations/metrology-release-trace/explorer/lots/LOT-DEMO-001"
+  "WS_DEFAULT_VIEW": "/ops/planning-scheduling/dispatch-board/board?view=default",
+  "SFW": "/ops/quality-operations/metrology-release-trace/explorer/lots/LOT-DEMO-001",
+  "_visualRouteContexts": [
+    {
+      "fixturePage": "shell-home.html",
+      "path": "/ops",
+      "routeClass": "SH",
+      "expectedRenderer": "renderShellHome",
+      "coverage": ["shell"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell.html",
+      "path": "/ops/records/nonconformance-cases/NC-001?tab=overview",
+      "routeClass": "AR",
+      "expectedRenderer": "renderRecord",
+      "coverage": ["required_record_route"]
+    },
+    {
+      "fixturePage": "workspace-board.html",
+      "path": "/ops/planning-scheduling/dispatch-board/board",
+      "routeClass": "WS",
+      "expectedRenderer": "renderWorkspace",
+      "coverage": ["required_dispatch_board"]
+    },
+    {
+      "fixturePage": "workspace-dashboard.html",
+      "path": "/ops/planning-scheduling/dispatch-board/board?view=default",
+      "routeClass": "WS",
+      "expectedRenderer": "renderWorkspace",
+      "coverage": ["required_dispatch_board_default_view"]
+    },
+    {
+      "fixturePage": "bridge-alias.html",
+      "path": "/ops/planning-scheduling/dispatch-board/board",
+      "routeClass": "WS",
+      "expectedRenderer": "renderWorkspace",
+      "legacyAlias": "dispatch",
+      "expectedBridge": "dispatch_to_canonical_workspace",
+      "canonicalPath": "/ops/planning-scheduling/dispatch-board/board",
+      "coverage": ["legacy_dispatch_alias"]
+    },
+    {
+      "fixturePage": "unknown-alias.html",
+      "path": "/mom/portal.html?page=legacy-unknown&hmv4=1",
+      "routeClass": "UNKNOWN",
+      "expectedRenderer": "unmappedNeedsDecision",
+      "legacyAlias": "legacy-unknown",
+      "expectedBridge": "unmapped_needs_decision",
+      "coverage": ["unknown_alias"]
+    },
+    {
+      "fixturePage": "degraded-states.html",
+      "path": "/ops/records/nonconformance-cases/NC-001?tab=overview&panel=conflict&focus=offline",
+      "routeClass": "AR",
+      "expectedRenderer": "renderRecord",
+      "stateCoverage": ["degraded", "offline", "conflict"],
+      "coverage": ["degraded_offline_conflict"]
+    }
+  ]
 }

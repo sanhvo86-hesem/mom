@@ -1,0 +1,14 @@
+{
+  "name": "hesem-mom-module-template-v4-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "playwright test",
+    "test:hmv4": "playwright test module-template-v4*.spec.ts",
+    "test:headed": "playwright test --headed",
+    "install:browsers": "playwright install"
+  },
+  "devDependencies": {
+    "@playwright/test": "latest"
+  }
+}

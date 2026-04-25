@@ -6,11 +6,13 @@
 <div id="hmv4-fixture-root"></div>
 <script type="application/json" data-hmv4-fixture-route>
 {
-  "fixtureId": "shell-home",
-  "path": "/ops",
-  "routeClass": "SH",
-  "expectedRenderer": "renderShellHome",
-  "coverage": ["shell"]
+  "fixtureId": "unknown-alias",
+  "path": "/mom/portal.html?page=legacy-unknown&hmv4=1",
+  "routeClass": "UNKNOWN",
+  "expectedRenderer": "unmappedNeedsDecision",
+  "legacyAlias": "legacy-unknown",
+  "expectedBridge": "unmapped_needs_decision",
+  "coverage": ["unknown_alias"]
 }
 </script>
 <script>window.HMV4_PREVIEW_ENABLED=true;</script>

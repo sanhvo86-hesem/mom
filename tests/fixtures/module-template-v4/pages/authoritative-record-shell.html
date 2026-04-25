@@ -4,9 +4,31 @@
 <link rel="stylesheet" href="../../../../mom/styles/module-template-v4.css">
 </head><body>
 <div id="hmv4-fixture-root"></div>
+<script type="application/json" data-hmv4-fixture-route>
+{
+  "fixtureId": "authoritative-record-shell",
+  "path": "/ops/records/nonconformance-cases/NC-001?tab=overview",
+  "routeClass": "AR",
+  "expectedRenderer": "renderRecord",
+  "coverage": ["authoritative_record", "required_record_route"]
+}
+</script>
 <script>window.HMV4_PREVIEW_ENABLED=true;</script>
 <script src="../../../../mom/scripts/portal/71-module-template-v4-routes.js"></script>
 <script src="../../../../mom/scripts/portal/72-module-template-v4-bridge.js"></script>
 <script src="../../../../mom/scripts/portal/73-module-template-v4-renderers.js"></script>
 <script src="../../../../mom/scripts/portal/70-module-template-v4-hydration.js"></script>
+<script>
+(function(){
+  var node = document.querySelector('[data-hmv4-fixture-route]');
+  if(!node) return;
+  try {
+    var route = JSON.parse(node.textContent || '{}');
+    window.HMV4_FIXTURE_ROUTE_CONTEXT = route;
+    if(route.path && window.history) history.replaceState(history.state || {}, '', route.path);
+  } catch(e) {
+    console.warn('[HMV4 fixture] invalid route context', e);
+  }
+})();
+</script>
 </body></html>

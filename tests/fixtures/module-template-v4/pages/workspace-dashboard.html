@@ -4,9 +4,79 @@
 <link rel="stylesheet" href="../../../../mom/styles/module-template-v4.css">
 </head><body>
 <div id="hmv4-fixture-root"></div>
+<script type="application/json" data-hmv4-fixture-route>
+{
+  "fixtureId": "workspace-dashboard",
+  "path": "/ops/planning-scheduling/dispatch-board/board?view=default",
+  "routeClass": "WS",
+  "expectedRenderer": "renderWorkspace",
+  "coverage": ["workspace_dashboard", "required_dispatch_board_default_view"]
+}
+</script>
+<script type="application/json" data-hmv4-dispatch-board-fixture>
+{
+  "projectionId": "DISP-BOARD-FIXTURE-DEFAULT-VIEW",
+  "route": "/ops/planning-scheduling/dispatch-board/board?view=default",
+  "authorityClass": "projection",
+  "requiresReanchor": true,
+  "freshness": "fixture_current",
+  "reanchorMessage": "Open the dispatch target record before mutation.",
+  "summary": {
+    "ready": 2,
+    "running": 1,
+    "blocked": 1,
+    "stale": 1
+  },
+  "lanes": [
+    {
+      "id": "ready",
+      "title": "Ready",
+      "description": "Default board view projection targets.",
+      "cards": [
+        {
+          "id": "DISP-001",
+          "title": "JO-1001 / OP-20",
+          "workCenter": "VMC-01",
+          "priority": "high",
+          "status": "Ready",
+          "due": "Today 14:00",
+          "recordHref": "/ops/records/dispatch-targets/DISP-001?tab=overview",
+          "mutationPosture": "reanchor_required",
+          "reanchorMessage": "Open DISP-001 before starting or resequencing work.",
+          "signals": ["material ready", "inspection plan linked"]
+        }
+      ]
+    }
+  ]
+}
+</script>
+<script>
+(function(){
+  var node = document.querySelector('[data-hmv4-dispatch-board-fixture]');
+  if(!node) return;
+  try {
+    window.HMV4_DISPATCH_BOARD_PROJECTION = JSON.parse(node.textContent || '{}');
+  } catch(e) {
+    console.warn('[HMV4 fixture] invalid dispatch projection', e);
+  }
+})();
+</script>
 <script>window.HMV4_PREVIEW_ENABLED=true;</script>
 <script src="../../../../mom/scripts/portal/71-module-template-v4-routes.js"></script>
 <script src="../../../../mom/scripts/portal/72-module-template-v4-bridge.js"></script>
 <script src="../../../../mom/scripts/portal/73-module-template-v4-renderers.js"></script>
 <script src="../../../../mom/scripts/portal/70-module-template-v4-hydration.js"></script>
+<script>
+(function(){
+  var node = document.querySelector('[data-hmv4-fixture-route]');
+  if(!node) return;
+  try {
+    var route = JSON.parse(node.textContent || '{}');
+    window.HMV4_FIXTURE_ROUTE_CONTEXT = route;
+    if(route.path && window.history) history.replaceState(history.state || {}, '', route.path);
+  } catch(e) {
+    console.warn('[HMV4 fixture] invalid route context', e);
+  }
+})();
+</script>
 </body></html>
