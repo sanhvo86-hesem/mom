@@ -40,6 +40,22 @@
       "coverage": ["required_dispatch_board_default_view"]
     },
     {
+      "fixturePage": "workspace-board-empty.html",
+      "path": "/ops/planning-scheduling/dispatch-board/board?view=empty",
+      "routeClass": "WS",
+      "expectedRenderer": "renderDispatchBoardWorkspace",
+      "stateCoverage": ["empty"],
+      "coverage": ["dispatch_board_empty", "required_dispatch_board_empty_view"]
+    },
+    {
+      "fixturePage": "workspace-board-degraded.html",
+      "path": "/ops/planning-scheduling/dispatch-board/board?view=degraded&focus=offline",
+      "routeClass": "WS",
+      "expectedRenderer": "renderDispatchBoardWorkspace",
+      "stateCoverage": ["stale", "degraded", "offline"],
+      "coverage": ["dispatch_board_stale_degraded", "required_dispatch_board_degraded_view"]
+    },
+    {
       "fixturePage": "bridge-alias.html",
       "path": "/ops/planning-scheduling/dispatch-board/board",
       "routeClass": "WS",

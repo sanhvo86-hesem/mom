@@ -4,6 +4,13 @@
   "authorityClass": "projection",
   "requiresReanchor": true,
   "freshness": "fixture_current",
+  "coverageIndex": {
+    "happyDispatchBoard": "tests/fixtures/module-template-v4/pages/workspace-board.html",
+    "emptyBoard": "tests/fixtures/module-template-v4/pages/workspace-board-empty.html",
+    "staleDegradedBoard": "tests/fixtures/module-template-v4/pages/workspace-board-degraded.html",
+    "dispatchAlias": "tests/fixtures/module-template-v4/pages/bridge-alias.html",
+    "unknownAlias": "tests/fixtures/module-template-v4/pages/unknown-alias.html"
+  },
   "reanchorMessage": "Open the dispatch target record before mutation.",
   "summary": {
     "ready": 2,

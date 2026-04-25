@@ -25,6 +25,7 @@ test.describe('module-template-v4 preview smoke', () => {
     await expect(board).toBeVisible();
     await expect(board).toHaveAttribute('data-authority-class', 'projection');
     await expect(board).toHaveAttribute('data-requires-reanchor', 'true');
+    await expect(board).toHaveAttribute('data-projection-state', 'current');
     await expect(page.getByRole('heading', { name: 'Dispatch Board' })).toBeVisible();
     await expect(page.locator('[data-hmv4-dispatch-card]')).toHaveCount(3);
     await expect(page.locator('[data-hmv4-dispatch-card][href]')).toHaveCount(0);
@@ -38,6 +39,32 @@ test.describe('module-template-v4 preview smoke', () => {
 
     const recordHref = await page.locator('[data-hmv4-record-link]').first().getAttribute('href');
     expect(recordHref).toContain('/ops/records/dispatch-targets/DISP-001?tab=overview');
+  });
+
+  test('renders empty dispatch board without mutation controls', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/workspace-board-empty.html');
+    const board = page.locator('[data-hmv4-dispatch-board]');
+    await expect(board).toBeVisible();
+    await expect(board).toHaveAttribute('data-authority-class', 'projection');
+    await expect(board).toHaveAttribute('data-projection-state', 'empty');
+    await expect(page.locator('[data-hmv4-dispatch-card]')).toHaveCount(0);
+    await expect(page.locator('[data-hmv4-mutation-intent]')).toHaveCount(0);
+    await expect(page.getByText('No targets')).toHaveCount(3);
+  });
+
+  test('renders degraded dispatch board with visible stale state and re-anchor links', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/workspace-board-degraded.html');
+    const board = page.locator('[data-hmv4-dispatch-board]');
+    await expect(board).toBeVisible();
+    await expect(board).toHaveAttribute('data-authority-class', 'projection');
+    await expect(board).toHaveAttribute('data-projection-freshness', 'fixture_stale');
+    await expect(board).toHaveAttribute('data-projection-state', 'degraded_offline');
+    await expect(page.locator('[data-hmv4-dispatch-freshness]')).toContainText('degraded_offline / fixture_stale');
+    await expect(page.locator('[data-hmv4-dispatch-card]')).toHaveCount(2);
+    await expect(page.getByText('Blocked / hold')).toBeVisible();
+    await expect(page.getByText('offline sync pending')).toBeVisible();
+    const recordHref = await page.locator('[data-hmv4-record-link]').last().getAttribute('href');
+    expect(recordHref).toContain('/ops/records/dispatch-targets/DISP-011?tab=overview');
   });
 
   test('parses dispatch board route as workspace with allowed view query', async ({ page }) => {
