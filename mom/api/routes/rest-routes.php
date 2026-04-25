@@ -104,11 +104,21 @@ return static function (Router $router, string $dataDir): void {
     $router->get('/api/v1/finance/debit-memos/{debitMemoId}', FinanceController::class, 'getDebitMemo');
     $router->post('/api/v1/finance/debit-memos', FinanceController::class, 'createDebitMemo');
     
-    // Commercial customer purchase-order objects
-    $router->get('/api/v1/commercial/customer-purchase-orders', CustomerPurchaseOrderController::class, 'listPurchaseOrders');
-    $router->get('/api/v1/commercial/customer-purchase-orders/{customerPoId}', CustomerPurchaseOrderController::class, 'getPurchaseOrder');
-    $router->post('/api/v1/commercial/customer-purchase-orders', CustomerPurchaseOrderController::class, 'createPurchaseOrder');
-    $router->post('/api/v1/commercial/customer-purchase-orders/{customerPoId}:transition', CustomerPurchaseOrderController::class, 'transitionPurchaseOrder');
+    // Commercial customer purchase-order objects (legacy /commercial/ namespace — kept live, emits 301 to canonical)
+    $router->get('/api/v1/commercial/customer-purchase-orders', CustomerPurchaseOrderController::class, 'redirectLegacyListCustomerPurchaseOrders');
+    $router->get('/api/v1/commercial/customer-purchase-orders/{customerPoId}', CustomerPurchaseOrderController::class, 'redirectLegacyGetCustomerPurchaseOrder');
+    $router->post('/api/v1/commercial/customer-purchase-orders', CustomerPurchaseOrderController::class, 'redirectLegacyCreateCustomerPurchaseOrder');
+    $router->post('/api/v1/commercial/customer-purchase-orders/{customerPoId}:transition', CustomerPurchaseOrderController::class, 'redirectLegacyTransitionCustomerPurchaseOrder');
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // CPO canonical path (ADR-0008, Stream C.3, 2026-04-26)
+    // /api/v1/customer-purchase-orders — no /commercial/ prefix.
+    // Legacy /api/v1/commercial/customer-purchase-orders emits 301 to here.
+    // ─────────────────────────────────────────────────────────────────────────
+    $router->get('/api/v1/customer-purchase-orders', CustomerPurchaseOrderController::class, 'listPurchaseOrders');
+    $router->post('/api/v1/customer-purchase-orders', CustomerPurchaseOrderController::class, 'createPurchaseOrder');
+    $router->get('/api/v1/customer-purchase-orders/{customerPoId}', CustomerPurchaseOrderController::class, 'getPurchaseOrder');
+    $router->post('/api/v1/customer-purchase-orders/{customerPoId}:transition', CustomerPurchaseOrderController::class, 'transitionPurchaseOrder');
     
     // Folders
     $router->get('/api/folders', FileController::class, 'scanFolders');
