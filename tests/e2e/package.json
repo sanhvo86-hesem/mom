@@ -5,6 +5,7 @@
   "scripts": {
     "test": "playwright test",
     "test:hmv4": "playwright test module-template-v4*.spec.ts",
+    "test:live-api": "playwright test module-template-v4-live-api.spec.ts --project=chromium",
     "test:a11y": "playwright test module-template-v4-axe.spec.ts --project=chromium",
     "test:visual": "playwright test module-template-v4-visual.spec.ts --project=chromium",
     "test:visual-update": "playwright test module-template-v4-visual.spec.ts --project=chromium --update-snapshots=all",

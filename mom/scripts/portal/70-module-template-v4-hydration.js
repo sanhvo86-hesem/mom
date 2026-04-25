@@ -2,6 +2,87 @@
    Feature-flagged. No-op unless HMV4_PREVIEW_ENABLED or /ops path. */
 (function(){
   'use strict';
+  if(typeof window !== 'undefined' && typeof window.HMV4_LIVE_API_ENABLED === 'undefined') window.HMV4_LIVE_API_ENABLED = false;
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+  function readLiveApiFlag(){
+    if(typeof window === 'undefined') return false;
+    if(window.HMV4_LIVE_API_ENABLED === true) return true;
+    try {
+      var url = new URL(window.location.href);
+      if(url.searchParams.get('hmv4-live-api') === '1') return true;
+    } catch(_) {}
+    if(document.body && document.body.getAttribute('data-hmv4-live-api') === 'true') return true;
+    return false;
+  }
+  function fetchLiveNonconformance(recordId){
+    if(!recordId) return Promise.reject(new Error('missing record id'));
+    return fetch('/api/v1/nonconformance-cases/' + encodeURIComponent(recordId), {
+      credentials: 'include',
+      redirect: 'manual',
+      headers: { 'Accept': 'application/json' }
+    }).then(function(res){
+      if(!res.ok){ throw new Error('live api status ' + res.status); }
+      return res.json();
+    }).then(function(payload){
+      return (payload && payload.data) ? payload.data : payload;
+    });
+  }
+  function normalizeLifecycle(lifecycle){
+    if(!Array.isArray(lifecycle)) return [];
+    return lifecycle.map(function(stage){
+      if(Array.isArray(stage)) return stage;
+      return [stage.name || stage.stage || stage.status || 'stage', stage.state || stage.status || 'pending'];
+    });
+  }
+  function adaptLiveNcToFixtureShape(live){
+    if(!live) return null;
+    var recordId = live.id || live.record_id || live.code;
+    return {
+      recordId: recordId,
+      rootCode: 'NQCASE',
+      title: live.title || live.summary || ('Nonconformance ' + (recordId || '')),
+      subtype: live.subtype || live.kind || 'nonconformance',
+      status: live.state || live.status,
+      severity: live.severity,
+      state: 'live',
+      freshness: 'live_current',
+      owner: (live.owner && (live.owner.name || live.owner)) || null,
+      source: live.source,
+      part: live.part_number || live.part,
+      lot: live.lot,
+      workOrder: live.work_order_id || live.workOrder,
+      stateMessage: 'Live API mode. Read-only display. Mutation actions remain disabled.',
+      lifecycle: normalizeLifecycle(live.lifecycle)
+    };
+  }
+  function isLiveNonconformanceRoute(route){
+    return route && route.routeClass === 'AR' && route.params && route.params.resource_family === 'nonconformance-cases';
+  }
+  function renderLiveNonconformance(shell, route){
+    var content = shell.querySelector('[data-hm-slot="route-content"]');
+    if(!content) return false;
+    var recordId = route.params && route.params.record_id;
+    content.innerHTML = '<article class="hmv4-record-shell hmv4-record-shell--loading" data-hmv4-live-api-loading="true" data-hmv4-record-id="' + esc(recordId) + '"><p>Loading from /api/v1/nonconformance-cases/' + esc(recordId) + '...</p></article>';
+    fetchLiveNonconformance(recordId)
+      .then(function(live){
+        var adapted = adaptLiveNcToFixtureShape(live);
+        window.HMV4_NONCONFORMANCE_CASE_FIXTURE = { records: {} };
+        window.HMV4_NONCONFORMANCE_CASE_FIXTURE.records[recordId] = adapted;
+        content.innerHTML = window.Hmv4Renderers.renderRoute(route);
+        var root = content.querySelector('[data-hmv4-nonconformance-record]');
+        if(root){
+          root.setAttribute('data-hmv4-source', 'live-api');
+          root.setAttribute('data-fixture-state', 'live');
+        }
+      })
+      .catch(function(err){
+        content.innerHTML = '<article class="hmv4-record-shell hmv4-record-shell--error" data-hmv4-live-api-error="true" data-hmv4-record-id="' + esc(recordId) + '">' +
+          '<header class="hmv4-record-identity"><h1 class="hmv4-record-title">' + esc(recordId) + ' - live API unavailable</h1></header>' +
+          '<p class="hmv4-feedback" data-feedback-state="warning" role="status">Live API unavailable. Falling back to fixture display. Detail: ' + esc(err && err.message ? String(err.message) : 'unknown error') + '. Refresh to retry, or remove ?hmv4-live-api=1 to use fixture display.</p>' +
+        '</article>';
+      });
+    return true;
+  }
   function isPreview(){ return !!window.HMV4_PREVIEW_ENABLED || location.pathname.indexOf('/ops') === 0; }
   function ensureShell(){
     var shell = document.getElementById('hmv4-ops-shell');
@@ -52,11 +133,17 @@
     shell.setAttribute('data-route-class', route.routeClass || 'UNKNOWN');
     if(window.Hmv4Renderers.renderNav) window.Hmv4Renderers.renderNav(shell.querySelector('[data-hm-component="left-nav"]'));
     window.Hmv4Renderers.applyShell(shell, route);
+    if(isLiveNonconformanceRoute(route) && readLiveApiFlag()) renderLiveNonconformance(shell, route);
     updateTabs(shell);
     var close = shell.querySelector('[data-hmv4-close-preview]');
     if(close) close.addEventListener('click', function(){ location.href = location.pathname.replace(/^\/ops\/?/, '/') || '/'; });
     if(route.rejectedQuery && route.rejectedQuery.length && window.history){ history.replaceState(history.state || {}, '', route.canonicalPath + (new URLSearchParams(route.query).toString() ? '?' + new URLSearchParams(route.query).toString() : '')); }
   }
+  window.Hmv4LiveApi = {
+    enabled: readLiveApiFlag,
+    fetchNonconformance: fetchLiveNonconformance,
+    adaptNcToFixtureShape: adaptLiveNcToFixtureShape
+  };
   window.HMModuleTemplateV4Hydration = { hydrate: hydrate, ensureShell: ensureShell };
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hydrate); else hydrate();
 })();
