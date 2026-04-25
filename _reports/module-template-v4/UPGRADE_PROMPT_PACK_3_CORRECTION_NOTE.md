@@ -230,7 +230,15 @@ Each RED root requires: migration + service + controller + routes + OpenAPI + co
 | C3 CPO rename | ❌ Errors | Apply method-name fixes; drop PUT or escalate as logic change |
 | C4 RED roots | ❌ Path error | Fix archive paths; reconsider 2–3 day estimate per root |
 
-**Update 2026-04-25 (later same day)**: All 4 prompts have now been patched inline in `UPGRADE_PROMPT_PACK_3_BACKEND_ALIGNMENT.md`. The fixes embed the correctsubstitutions and relax the controller-forbidden constraints where additive wrappers are required. Operators should still review the 3 open policy questions in the Errata banner of that file before pasting.
+**Update 2026-04-25 (later same day)**: All 4 prompts have now been patched inline in `UPGRADE_PROMPT_PACK_3_BACKEND_ALIGNMENT.md`. The fixes embed the correct substitutions and relax the controller-forbidden constraints where additive wrappers are required.
+
+**Update 2026-04-25 (final)**: The three open policy questions have been resolved in the Errata banner of the patched pack:
+
+- **Q1 → ADD `query()` wrappers** on the 7 EQMS controllers (preserves frozen Step 3 GET-list contract; cheaper than pivoting to POST search).
+- **Q2 → DROP PUT update** on customer-purchase-orders permanently from C3 (legacy `/commercial/` route never had PUT either; schedule a separate ticket if frontend later needs edit).
+- **Q3 → USE `/tmp/hesem-archive/asset {2,3}/`** with the existing bail-out guard (C4 won't run until after Slice 8; vendoring per-root excerpts is premature).
+
+Pack 3 is now fully decision-locked. C1/C2/C3/C4 can be pasted verbatim.
 
 ---
 

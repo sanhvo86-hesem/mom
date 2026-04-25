@@ -42,19 +42,33 @@ Summary of inline changes:
   to `/tmp/hesem-archive/asset {2,3}/STEP{2,3}_*_MASTER.md`; explicit
   bail-out guard added when paths are missing.
 
-Open policy questions for the operator (do not paste blindly):
-1. **Q1 (C1)**: confirm scope expansion — adding `query()` wrappers on the
-   7 EQMS controllers is additive (no existing logic changes), but
-   contradicts the original "do not modify EQMS controllers" rule.
-   Alternative: keep controllers untouched and ship `POST /api/v1/<plural>/query`
-   → `search` instead of `GET /api/v1/<plural>` → `query`. The frozen-token
-   contract favors GET; pick option A unless you want to revisit Step 3.
-2. **Q2 (C3)**: PUT update on customer-purchase-orders is dropped from
-   the alias scope. Schedule a separate task to add `updatePurchaseOrder()`
-   if frontend needs it.
-3. **Q3 (C4)**: archive path `/tmp/hesem-archive/asset {2,3}/` is on the
-   developer's local machine. Either ensure these are present before
-   running C4, or vendor STEP2/STEP3 master excerpts into the repo.
+Resolved policy decisions (locked in this revision):
+1. **Q1 (C1) — RESOLVED**: ADD additive `query()` wrappers on the 7 EQMS
+   controllers. Rationale: the frozen Step 3 vocabulary mandates GET for
+   list endpoints (per ADR-0002 "Frozen vocabulary"); pivoting to
+   `POST /api/v1/<plural>/query` would break that contract. Seven thin
+   additive wrappers (one per EQMS controller, ~3 lines each, all
+   delegating to existing `search()`) is the smaller cost. The original
+   "do not modify EQMS controllers" rule is relaxed to "do not modify
+   any EXISTING method on EQMS controllers".
+2. **Q2 (C3) — RESOLVED**: DROP PUT update on customer-purchase-orders
+   permanently from the alias scope. Rationale: the legacy
+   `/api/v1/commercial/customer-purchase-orders` route never registered
+   PUT either (verified at `mom/api/routes/rest-routes.php:108-111`).
+   Adding `updatePurchaseOrder()` should be a separate task driven by
+   an actual frontend need, not retroactively wedged into a path-rename
+   PR. If/when CPO frontend grows an "edit" flow, schedule a dedicated
+   ticket — do not block C3 on it.
+3. **Q3 (C4) — RESOLVED**: USE the existing `/tmp/hesem-archive/asset {2,3}/`
+   paths with the bail-out guard already in place at C4 Step 1/2.
+   Rationale: C4 is gated behind Slice 8 landing (many slices away
+   from current Slice 3 focus on Training Matrix). Vendoring 6 per-root
+   STEP2/STEP3 excerpts now is premature optimization. If `/tmp` proves
+   unreliable when C4 actually runs (e.g., fresh clone, CI machine),
+   vendor at that point — the bail-out will surface the issue cleanly.
+
+These decisions are now embedded in the prompt blocks below and require
+no further operator action. Paste C1/C2/C3/C4 verbatim into Codex.
 
 ---
 
