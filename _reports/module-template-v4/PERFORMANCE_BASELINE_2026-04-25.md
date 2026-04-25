@@ -8,13 +8,13 @@ Local-machine run; treat as a relative baseline, not absolute SLI.
 
 | Page | FCP | LCP | CLS | TBT | DCL | Load | Total | Transfer | Reqs |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| shell-home | 60ms | 60ms | 0.000 | 0ms | 31ms | 32ms | 593ms | 62 KB | 7 |
-| workspace-board | 36ms | 36ms | 0.000 | 0ms | 9ms | 10ms | 575ms | 64 KB | 7 |
-| workspace-board-degraded | 36ms | 36ms | 0.000 | 0ms | 9ms | 10ms | 518ms | 64 KB | 7 |
-| nc-overview | 48ms | 48ms | 0.000 | 0ms | 14ms | 14ms | 569ms | 62 KB | 7 |
-| nc-conflict | 52ms | 52ms | 0.000 | 0ms | 18ms | 19ms | 544ms | 62 KB | 7 |
-| nc-degraded | 36ms | 36ms | 0.000 | 0ms | 9ms | 10ms | 525ms | 62 KB | 7 |
-| portal-baseline | 120ms | 120ms | 0.003 | 2ms | 544ms | 0ms | 560ms | 10854 KB | 127 |
+| shell-home | 424ms | 424ms | 0.000 | 0ms | 394ms | 394ms | 915ms | 62 KB | 7 |
+| workspace-board | 180ms | 180ms | 0.000 | 0ms | 149ms | 150ms | 664ms | 64 KB | 7 |
+| workspace-board-degraded | 120ms | 120ms | 0.000 | 0ms | 86ms | 86ms | 674ms | 64 KB | 7 |
+| nc-overview | 68ms | 68ms | 0.000 | 0ms | 36ms | 37ms | 597ms | 62 KB | 7 |
+| nc-conflict | 52ms | 52ms | 0.000 | 0ms | 20ms | 20ms | 549ms | 62 KB | 7 |
+| nc-degraded | 60ms | 60ms | 0.000 | 0ms | 21ms | 23ms | 578ms | 62 KB | 7 |
+| portal-baseline | 84ms | 84ms | 0.003 | 0ms | 626ms | 0ms | 637ms | 10831 KB | 126 |
 
 ## Thresholds
 
