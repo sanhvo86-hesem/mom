@@ -9,6 +9,13 @@
       "resource_family": "nonconformance-cases",
       "record_id": "NQCASE-DEMO-001",
       "state": "triage"
+    },
+    {
+      "resource_family": "nonconformance-cases",
+      "record_id": "NC-001",
+      "root_code": "NQCASE",
+      "state": "triaged",
+      "fixture": "tests/fixtures/module-template-v4/nonconformance-case-fixtures.json"
     }
   ]
 }

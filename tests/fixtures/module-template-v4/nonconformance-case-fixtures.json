@@ -1,0 +1,63 @@
+{
+  "version": "0.1",
+  "authorityClass": "authoritative",
+  "resourceFamily": "nonconformance-cases",
+  "rootCode": "NQCASE",
+  "records": {
+    "NC-001": {
+      "recordId": "NC-001",
+      "title": "Dimensional nonconformance on operation OP-30",
+      "subtype": "Material nonconformance",
+      "status": "triaged",
+      "severity": "major",
+      "state": "current",
+      "freshness": "fixture_current",
+      "owner": "QA Engineer",
+      "source": "In-process inspection",
+      "part": "PN-2042 Rev B",
+      "lot": "LOT-2026-04",
+      "workOrder": "WO-3011",
+      "stateMessage": "Read-only prototype shell. Governed actions must remain outside this fixture.",
+      "lifecycle": [
+        ["opened", "complete"],
+        ["triaged", "current"],
+        ["investigation", "pending"],
+        ["disposition", "locked"],
+        ["closure", "locked"]
+      ],
+      "coverage": [
+        "identity_header",
+        "lifecycle_strip",
+        "overview",
+        "investigation",
+        "evidence",
+        "related",
+        "audit",
+        "signatures",
+        "no_mutation"
+      ]
+    }
+  },
+  "states": {
+    "conflict": {
+      "state": "conflict",
+      "freshness": "fixture_conflict",
+      "stateMessage": "Conflict detected. Offline changes must be reconciled in the governed record workflow."
+    },
+    "partial_access": {
+      "state": "partial_access",
+      "freshness": "fixture_current",
+      "stateMessage": "Partial-access fixture. Restricted sections are visible only as read-only limitations.",
+      "limitations": [
+        "Investigation notes are restricted for the current role.",
+        "Signature details are masked in this fixture state."
+      ]
+    },
+    "degraded_offline": {
+      "state": "degraded_offline",
+      "freshness": "fixture_stale",
+      "stateMessage": "Degraded/offline fixture. This shell must not perform governed actions until the record is reloaded from authority."
+    }
+  }
+}
+

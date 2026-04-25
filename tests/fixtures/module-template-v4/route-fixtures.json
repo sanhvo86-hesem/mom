@@ -26,6 +26,48 @@
       "coverage": ["required_record_route"]
     },
     {
+      "fixturePage": "authoritative-record-shell-nc-overview.html",
+      "path": "/ops/records/nonconformance-cases/NC-001?tab=overview",
+      "routeClass": "AR",
+      "expectedRenderer": "renderNonconformanceRecord",
+      "coverage": ["nc_overview", "authoritative_record", "no_mutation"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell-nc-investigation.html",
+      "path": "/ops/records/nonconformance-cases/NC-001?tab=investigation",
+      "routeClass": "AR",
+      "expectedRenderer": "renderNonconformanceRecord",
+      "coverage": ["nc_investigation", "authoritative_record", "no_mutation"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell-nc-evidence.html",
+      "path": "/ops/records/nonconformance-cases/NC-001?tab=evidence",
+      "routeClass": "AR",
+      "expectedRenderer": "renderNonconformanceRecord",
+      "coverage": ["nc_evidence", "authoritative_record", "no_mutation"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell-nc-related.html",
+      "path": "/ops/records/nonconformance-cases/NC-001?tab=related",
+      "routeClass": "AR",
+      "expectedRenderer": "renderNonconformanceRecord",
+      "coverage": ["nc_related", "authoritative_record", "no_mutation"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell-nc-audit.html",
+      "path": "/ops/records/nonconformance-cases/NC-001?tab=audit",
+      "routeClass": "AR",
+      "expectedRenderer": "renderNonconformanceRecord",
+      "coverage": ["nc_audit", "authoritative_record", "no_mutation"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell-nc-signatures.html",
+      "path": "/ops/records/nonconformance-cases/NC-001?tab=signatures",
+      "routeClass": "AR",
+      "expectedRenderer": "renderNonconformanceRecord",
+      "coverage": ["nc_signatures", "authoritative_record", "no_mutation"]
+    },
+    {
       "fixturePage": "workspace-board.html",
       "path": "/ops/planning-scheduling/dispatch-board/board",
       "routeClass": "WS",
@@ -81,6 +123,30 @@
       "expectedRenderer": "renderRecord",
       "stateCoverage": ["degraded", "offline", "conflict"],
       "coverage": ["degraded_offline_conflict"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell-nc-conflict.html",
+      "path": "/ops/records/nonconformance-cases/NC-001?tab=overview&panel=conflict&focus=offline",
+      "routeClass": "AR",
+      "expectedRenderer": "renderNonconformanceRecord",
+      "stateCoverage": ["conflict", "offline"],
+      "coverage": ["nc_conflict", "authoritative_record", "no_mutation"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell-nc-partial-access.html",
+      "path": "/ops/records/nonconformance-cases/NC-001?tab=overview&panel=partial-access",
+      "routeClass": "AR",
+      "expectedRenderer": "renderNonconformanceRecord",
+      "stateCoverage": ["partial_access"],
+      "coverage": ["nc_partial_access", "authoritative_record", "no_mutation"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell-nc-degraded.html",
+      "path": "/ops/records/nonconformance-cases/NC-001?tab=overview&focus=offline",
+      "routeClass": "AR",
+      "expectedRenderer": "renderNonconformanceRecord",
+      "stateCoverage": ["degraded", "offline"],
+      "coverage": ["nc_degraded", "authoritative_record", "no_mutation"]
     }
   ]
 }
