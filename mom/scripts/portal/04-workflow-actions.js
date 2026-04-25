@@ -2299,10 +2299,18 @@ function syncIframeDocumentHeaderMetadata(idoc, doc, options){
       try{
         const labelEl = row.querySelector('b');
         const valueEl = row.querySelector('span:last-child');
-        const label = String(labelEl ? labelEl.textContent : '').trim();
+        const label = String(labelEl ? labelEl.textContent : '').trim().replace(/:$/, '');
         if(valueEl && /\b(code|mã)\b/i.test(label) && code){
           valueEl.textContent = code;
           if(valueEl.classList) valueEl.classList.add('doc-code');
+        }else if(valueEl && /\b(version|revision|rev|phiên bản)\b/i.test(label) && authoritative.revision){
+          valueEl.textContent = authoritative.revision;
+        }else if(valueEl && /\b(effective date|effective|eff|hiệu lực)\b/i.test(label) && authoritative.effective_date){
+          valueEl.textContent = authoritative.effective_date;
+        }else if(valueEl && /\b(owner|chủ sở hữu)\b/i.test(label) && authoritative.owner_role_code){
+          valueEl.textContent = authoritative.owner_role_code;
+        }else if(valueEl && /\b(approver|approved by|appr|người duyệt|phê duyệt)\b/i.test(label) && authoritative.approver_role_code){
+          valueEl.textContent = authoritative.approver_role_code;
         }
       }catch(_e){}
     });
