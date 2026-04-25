@@ -273,6 +273,43 @@ function renderDocHeaderButton(label, icon, tone, onClick, extraClass='', extraA
   return `<button class="dv-btn${toneClass}${className}"${attrs} onclick="${onClick}"><span class="dv-btn-ico">${getDocHeaderIcon(icon)}</span><span class="dv-btn-label">${cleanLabel}</span></button>`;
 }
 
+function renderDocViewerBreadcrumb(doc){
+  const bc = document.getElementById('header-breadcrumb');
+  if(!bc || !doc) return;
+  const docCode = String((doc && doc.code) || currentDoc || '').trim();
+  const displayTitle = (typeof getDocDisplayTitle === 'function') ? getDocDisplayTitle(doc) : String((doc && doc.title) || '').trim();
+  const displayCode = (typeof getDocDisplayCode === 'function') ? getDocDisplayCode(doc) : docCode;
+  const safe = (typeof escapeHtml === 'function') ? escapeHtml : function(v){
+    return String(v || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  };
+  const filterId = String(currentFilter || 'ALL').trim();
+  let bcHtml = `<span style="cursor:pointer;font-size:16px" onclick="currentFilter='ALL';currentFolderPath=[];navigateTo('documents')">🏠</span>`;
+  if(filterId && filterId !== 'ALL'){
+    const cat = Array.isArray(CATEGORIES) ? CATEGORIES.find(c => String(c && c.id || '') === filterId) : null;
+    const rawCatLabel = cat && typeof catLabel === 'function' ? catLabel(cat) : (cat ? String(cat.label || filterId) : filterId);
+    const catText = String(rawCatLabel || filterId).split('(')[0].trim() || filterId;
+    bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span>`;
+    bcHtml += `<span style="cursor:pointer;color:var(--accent);font-weight:600" onclick="currentFolderPath=[];navigateTo('documents','${safe(filterId)}')">${cat ? safe(cat.icon || '') : ''} ${safe(catText)}</span>`;
+  }
+  const folders = Array.isArray(currentFolderPath) ? currentFolderPath : [];
+  for(let i=0; i<folders.length; i++){
+    const seg = String(folders[i] || '').trim();
+    if(!seg) continue;
+    const label = (typeof getSubfolderLabel === 'function') ? getSubfolderLabel(seg) : seg;
+    bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span>`;
+    bcHtml += `<span style="cursor:pointer;color:var(--accent);font-weight:600" onclick="currentFolderPath=currentFolderPath.slice(0,${i+1});navigateTo('documents')">${safe(label)}</span>`;
+  }
+  bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span><span style="font-weight:700">${safe(displayCode)}</span>`;
+  if(displayTitle && displayTitle.toUpperCase() !== String(displayCode || '').toUpperCase()){
+    bcHtml += `<span style="color:var(--text-3);margin:0 6px">•</span><span class="current">${safe(displayTitle)}</span>`;
+  }
+  bc.innerHTML = bcHtml;
+  bc.style.display = 'flex';
+  bc.style.alignItems = 'center';
+  bc.style.flex = '1';
+}
+window.renderDocViewerBreadcrumb = renderDocViewerBreadcrumb;
+
 // Server-backed (folder-based) document workflow state + DCR record
 // NOTE: This replaces the old sessionStorage-only versioning for ISO compliance.
 const SERVER_DOC_STATE = {};      // code -> state
@@ -2979,33 +3016,7 @@ async function openDoc(code){
   if(viewer) viewer.classList.add('active');
   persistPortalViewState('open-doc');
 
-  const bc = document.getElementById('header-breadcrumb');
-  if(bc){
-    let bcHtml = `<span style="cursor:pointer;font-size:16px" onclick="currentFilter='ALL';currentFolderPath=[];navigateTo('documents')">🏠</span>`;
-    // Add category if we came from one
-    if(currentFilter && currentFilter !== 'ALL'){
-      const cat = CATEGORIES.find(c=>c.id===currentFilter);
-      bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span>`;
-      bcHtml += `<span style="cursor:pointer;color:var(--accent);font-weight:600" onclick="currentFolderPath=[];navigateTo('documents','${currentFilter}')">${cat?cat.icon:''} ${cat?catLabel(cat).split('(')[0].trim():currentFilter}</span>`;
-    }
-    // Add folder path
-    for(let i=0; i<currentFolderPath.length; i++){
-      const seg = currentFolderPath[i];
-      const label = getSubfolderLabel(seg);
-      bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span>`;
-      bcHtml += `<span style="cursor:pointer;color:var(--accent);font-weight:600" onclick="currentFolderPath=currentFolderPath.slice(0,${i+1});navigateTo('documents')">${label}</span>`;
-    }
-    const safeCode = (typeof escapeHtml === 'function') ? escapeHtml(displayCode) : displayCode;
-    const safeTitle = (typeof escapeHtml === 'function') ? escapeHtml(displayTitle) : displayTitle;
-    bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span><span style="font-weight:700">${safeCode}</span>`;
-    if(displayTitle && displayTitle.toUpperCase() !== displayCode.toUpperCase()){
-      bcHtml += `<span style="color:var(--text-3);margin:0 6px">•</span><span class="current">${safeTitle}</span>`;
-    }
-    bc.innerHTML = bcHtml;
-    bc.style.display = 'flex';
-    bc.style.alignItems = 'center';
-    bc.style.flex = '1';
-  }
+  renderDocViewerBreadcrumb(doc);
 
   // Render UI immediately (do NOT block on server-side version scan)
   updateDocViewerHeader(doc);
@@ -3051,6 +3062,7 @@ async function openDoc(code){
             }
           })();
           if(latestLocaleSignature && latestLocaleSignature !== initialLocaleSignature){
+            renderDocViewerBreadcrumb(latestDoc);
             updateDocViewerHeader(latestDoc);
             renderWorkflowPanel(latestDoc);
             renderVersionHistory(latestDoc);
@@ -3071,6 +3083,7 @@ async function openDoc(code){
         const latestDoc = resolveDocRecord(resolvedCode) || doc;
         if(isDocHidden(latestDoc.code) && !isAdmin()) return;
         if(!canAccessDoc(latestDoc.code)) return;
+        renderDocViewerBreadcrumb(latestDoc);
         updateDocViewerHeader(latestDoc);
         renderWorkflowPanel(latestDoc);
         renderVersionHistory(latestDoc);
@@ -3135,6 +3148,7 @@ async function openDocPreview(code, options){
     persistPortalViewState('open-doc-preview');
 
     // Re-render UI blocks
+    renderDocViewerBreadcrumb(latestDoc);
     updateDocViewerHeader(latestDoc);
     renderWorkflowPanel(latestDoc);
     renderVersionHistory(latestDoc);
@@ -3261,32 +3275,7 @@ function applyRuntimeDocDisplayMetadata(doc, meta){
   const viewTxn = (typeof getPortalDocViewTransaction === 'function') ? getPortalDocViewTransaction() : null;
   if(viewTxn && typeof isPortalDocViewTransactionCurrent === 'function' && !isPortalDocViewTransactionCurrent(viewTxn, doc)) return;
 
-  try{
-    const bc = document.getElementById('header-breadcrumb');
-    if(bc){
-      const displayCode = (typeof getDocDisplayCode === 'function') ? getDocDisplayCode(doc) : String(doc.code || '').trim();
-      const displayTitle = getDocDisplayTitle(doc);
-      let bcHtml = `<span style="cursor:pointer;font-size:16px" onclick="currentFilter='ALL';currentFolderPath=[];navigateTo('documents')">🏠</span>`;
-      if(currentFilter && currentFilter !== 'ALL'){
-        const cat = CATEGORIES.find(c=>c.id===currentFilter);
-        bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span>`;
-        bcHtml += `<span style="cursor:pointer;color:var(--accent);font-weight:600" onclick="currentFolderPath=[];navigateTo('documents','${currentFilter}')">${cat?cat.icon:''} ${cat?catLabel(cat).split('(')[0].trim():currentFilter}</span>`;
-      }
-      for(let i=0; i<currentFolderPath.length; i++){
-        const seg = currentFolderPath[i];
-        const label = getSubfolderLabel(seg);
-        bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span>`;
-        bcHtml += `<span style="cursor:pointer;color:var(--accent);font-weight:600" onclick="currentFolderPath=currentFolderPath.slice(0,${i+1});navigateTo('documents')">${label}</span>`;
-      }
-      const safeCode = (typeof escapeHtml === 'function') ? escapeHtml(displayCode) : displayCode;
-      const safeTitle = (typeof escapeHtml === 'function') ? escapeHtml(displayTitle) : displayTitle;
-      bcHtml += `<span style="color:var(--text-3);margin:0 4px">›</span><span style="font-weight:700">${safeCode}</span>`;
-      if(displayTitle && displayTitle.toUpperCase() !== displayCode.toUpperCase()){
-        bcHtml += `<span style="color:var(--text-3);margin:0 6px">•</span><span class="current">${safeTitle}</span>`;
-      }
-      bc.innerHTML = bcHtml;
-    }
-  }catch(e){}
+  try{ renderDocViewerBreadcrumb(doc); }catch(e){}
 
   try{ updateDocViewerHeader(doc); }catch(e){}
 }
@@ -5620,11 +5609,11 @@ function syncSidebarToggleState(){
   const toggleText = document.getElementById('collapse-text');
   if(!sidebar || !toggleBtn || !toggleText) return;
   const collapsed = sidebar.classList.contains('collapsed');
-  const label = collapsed ? 'M\u1edf r\u1ed9ng menu' : 'Thu g\u1ecdn menu';
+  const label = collapsed ? (typeof T === 'function' ? T('expand_menu') : 'M\u1edf r\u1ed9ng menu') : (typeof T === 'function' ? T('collapse_menu') : 'Thu g\u1ecdn menu');
   toggleBtn.setAttribute('aria-label', label);
   toggleBtn.setAttribute('title', label);
   toggleBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-  toggleText.textContent = collapsed ? 'M\u1edf r\u1ed9ng' : 'Thu g\u1ecdn';
+  toggleText.textContent = collapsed ? (typeof T === 'function' ? T('expand') : 'M\u1edf r\u1ed9ng') : (typeof T === 'function' ? T('collapse') : 'Thu g\u1ecdn');
 }
 
 function toggleSidebar(){
