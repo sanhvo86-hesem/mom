@@ -523,6 +523,54 @@ function dcc_translation_surface_probe(array $paths): array
     ];
 }
 
+function dcc_translation_queue_probe(array $paths): array
+{
+    $queueRoot = normalize_runtime_dir($paths['cache_dir'] . '/dcc-locale-jobs');
+    $queued = 0;
+    $failed = 0;
+    if (is_dir($queueRoot)) {
+        try {
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($queueRoot, FilesystemIterator::SKIP_DOTS)
+            );
+            foreach ($iterator as $item) {
+                if (!$item instanceof SplFileInfo || !$item->isFile()) {
+                    continue;
+                }
+                $path = str_replace('\\', '/', $item->getPathname());
+                if (str_ends_with($path, '.json')) {
+                    $queued++;
+                } elseif (str_ends_with($path, '.failed')) {
+                    $failed++;
+                }
+            }
+        } catch (Throwable) {
+            return ['checked' => false, 'warning' => 'DCC translation queue could not be scanned.'];
+        }
+    }
+
+    $activeWorkers = 0;
+    $rawWorkers = @shell_exec("pgrep -fc 'dcc_locale_job_worker\\.php' 2>/dev/null");
+    if (is_string($rawWorkers) && trim($rawWorkers) !== '') {
+        $activeWorkers = max(0, (int)trim($rawWorkers));
+    }
+
+    $timerState = '';
+    if (PHP_OS_FAMILY !== 'Windows') {
+        $rawTimer = @shell_exec('systemctl is-active dcc-locale-prewarm.timer 2>/dev/null');
+        $timerState = is_string($rawTimer) ? trim($rawTimer) : '';
+    }
+
+    return [
+        'checked' => true,
+        'queue_root' => $queueRoot,
+        'queued' => $queued,
+        'failed' => $failed,
+        'active_workers' => $activeWorkers,
+        'timer_state' => $timerState,
+    ];
+}
+
 $p = resolve_paths();
 $critical = [];
 $warnings = [];
@@ -612,6 +660,15 @@ if (($dccSurface['checked'] ?? false) && !($dccSurface['ok'] ?? false)) {
 } elseif (($dccSurface['checked'] ?? false) === false && isset($dccSurface['warning'])) {
     $warnings[] = (string)$dccSurface['warning'];
 }
+$dccQueue = dcc_translation_queue_probe($p);
+if (($dccQueue['checked'] ?? false) && (int)($dccQueue['queued'] ?? 0) > 0) {
+    $warnings[] = 'DCC English locale prewarm still has ' . (int)$dccQueue['queued'] . ' queued artifact job(s).';
+}
+if (($dccQueue['checked'] ?? false) && (int)($dccQueue['failed'] ?? 0) > 0) {
+    $warnings[] = 'DCC English locale prewarm has ' . (int)$dccQueue['failed'] . ' failed job artifact(s).';
+} elseif (($dccQueue['checked'] ?? false) === false && isset($dccQueue['warning'])) {
+    $warnings[] = (string)$dccQueue['warning'];
+}
 
 echo "=== HESEM MOM Post-Deploy Health Check ===\n";
 echo "BASE_DIR: {$p['base_dir']}\n";
@@ -647,6 +704,15 @@ if (($dccSurface['checked'] ?? false) === true) {
     echo "DCC translation runtime writable: " . yesNo((bool)($dccSurface['runtime_home_writable'] ?? false)) . "\n";
     if (!empty($dccSurface['unwritable_doc_roots'])) {
         echo "DCC translation unwritable doc roots: " . implode(', ', (array)$dccSurface['unwritable_doc_roots']) . "\n";
+    }
+}
+if (($dccQueue['checked'] ?? false) === true) {
+    echo "DCC translation queue root: " . ($dccQueue['queue_root'] ?? '') . "\n";
+    echo "DCC translation queued jobs: " . (int)($dccQueue['queued'] ?? 0) . "\n";
+    echo "DCC translation failed jobs: " . (int)($dccQueue['failed'] ?? 0) . "\n";
+    echo "DCC translation active workers: " . (int)($dccQueue['active_workers'] ?? 0) . "\n";
+    if (!empty($dccQueue['timer_state'])) {
+        echo "DCC translation prewarm timer: " . ($dccQueue['timer_state'] ?? '') . "\n";
     }
 }
 

@@ -201,23 +201,24 @@ That means:
 3. starting a new revision without content changes must not falsely invalidate a still-matching English artifact;
 4. exact revision equality is not enough by itself to invalidate a draft/in-review English preview when the current working source hash still matches the artifact baseline.
 
-### 9.4 Legacy bootstrap and backfill rule
+### 9.4 Legacy backfill rule
 
 Older controlled documents created before locale auto-sync existed must still be able to obtain an English artifact without reopening the Vietnamese editor.
 
 Rules:
 
-1. The portal may trigger a governed backend `ensure-locale` / bootstrap command when English is requested for a legacy HTML document with no locale artifact yet.
-2. This bootstrap path must use the current canonical Vietnamese source snapshot; it must never translate rendered iframe DOM.
-3. Bootstrap may create a `machine_preview` artifact for view purposes, but it must not silently mark the artifact as released.
-4. Bootstrap success must refresh DCC locale projection and rerender the viewer against the new artifact.
-5. Bootstrap failure must leave the viewer fail-closed and surface truthful `missing` or `blocked` state.
+1. Legacy bootstrap/backfill belongs to backend scripts, scheduled workers, admin repair tools, or deploy/prewarm jobs.
+2. Normal portal viewing must not trigger translation provider execution.
+3. Backfill must use the current canonical Vietnamese source snapshot; it must never translate rendered iframe DOM.
+4. Backfill may create a `machine_preview` artifact for view purposes, but it must not silently mark the artifact as released.
+5. Backfill success must refresh DCC locale projection so the next English read loads the stored artifact directly.
+6. Backfill failure must leave the viewer fail-closed and surface truthful `missing`, `pending`, or `blocked` state.
 
 ### 9.5 Proactive prewarm rule
 
 English generation must not depend on the user opening the English tab.
-Opening the English tab is a read path; it may request a last-resort bootstrap
-for legacy gaps, but the normal production path is proactive.
+Opening the English tab is a pure read path. It must not enqueue, spawn, or call
+the translation provider.
 
 Rules:
 
@@ -231,6 +232,8 @@ Rules:
 8. The English tab must prefer the already-published backend artifact and must not wait for provider execution in the foreground.
 9. If prewarm is still processing, the portal shows pending/block truthfully and continues polling projection metadata without rendering Vietnamese body content in the English viewer.
 10. Queue drain order should prioritize smaller source jobs first, then older jobs, so a few large manuals cannot block fast publication of many short training/forms artifacts.
+11. Deploy must kick the prewarm service after healthcheck when the internal provider is configured.
+12. Healthcheck must report queued/failed locale jobs and active workers so operators cannot confuse "provider configured" with "all English artifacts ready".
 
 ### 9.6 Anti-flicker locale viewer rule
 

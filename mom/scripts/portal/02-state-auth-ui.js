@@ -3037,11 +3037,6 @@ async function openDoc(code){
     }
   })();
   loadDocContent(doc);
-  try{
-    if(lang === 'en' && typeof triggerDocEnglishLocaleBootstrap === 'function'){
-      triggerDocEnglishLocaleBootstrap(doc);
-    }
-  }catch(e){}
 
   if(lang === 'en' && typeof refreshDccOverlayForDocFromServer === 'function'){
     try{
@@ -3153,11 +3148,6 @@ async function openDocPreview(code, options){
     renderWorkflowPanel(latestDoc);
     renderVersionHistory(latestDoc);
     loadDocContent(latestDoc);
-    try{
-      if(lang === 'en' && typeof triggerDocEnglishLocaleBootstrap === 'function'){
-        triggerDocEnglishLocaleBootstrap(latestDoc);
-      }
-    }catch(e){}
   }catch(err){
     console.error('openDocPreview error:', err);
   }

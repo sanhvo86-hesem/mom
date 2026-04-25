@@ -28,6 +28,9 @@ RUN_DB_MIGRATIONS="${RUN_DB_MIGRATIONS:-1}"
 RUN_DB_SCHEMA_SMOKE="${RUN_DB_SCHEMA_SMOKE:-1}"
 SKIP_HEALTHCHECK="${SKIP_HEALTHCHECK:-0}"
 SKIP_ROLLBACK="${SKIP_ROLLBACK:-0}"
+DCC_LOCALE_PREWARM_ON_DEPLOY="${DCC_LOCALE_PREWARM_ON_DEPLOY:-1}"
+DCC_LOCALE_PREWARM_WORKERS="${DCC_LOCALE_PREWARM_WORKERS:-4}"
+DCC_LOCALE_PREWARM_MAX_QUEUE="${DCC_LOCALE_PREWARM_MAX_QUEUE:-1000}"
 LOCK_FILE="${LOCK_FILE:-/var/run/qms-deploy.lock}"
 ROLLBACK_TAG_PREFIX="deploy-rollback"
 DB_SCHEMA_MAY_HAVE_CHANGED="0"
@@ -153,6 +156,66 @@ run_composer_install() {
     log "ERROR" "Composer install failed — attempting rollback"
     rollback_to_tag
     die "Deploy aborted: composer install failed (see $LOG for details)"
+}
+
+run_dcc_locale_prewarm_kick() {
+    if [ "$DCC_LOCALE_PREWARM_ON_DEPLOY" != "1" ]; then
+        log "INFO" "DCC English locale prewarm skipped (DCC_LOCALE_PREWARM_ON_DEPLOY=$DCC_LOCALE_PREWARM_ON_DEPLOY)"
+        return
+    fi
+
+    local script="$SITE_DIR/tools/scripts/translation/dcc_locale_backfill.php"
+    local fpm_conf="/etc/php/8.5/fpm/pool.d/mom.conf"
+    local workers="$DCC_LOCALE_PREWARM_WORKERS"
+    local max_queue="$DCC_LOCALE_PREWARM_MAX_QUEUE"
+
+    [[ "$workers" =~ ^[0-9]+$ ]] || workers="4"
+    [[ "$max_queue" =~ ^[0-9]+$ ]] || max_queue="1000"
+    [ "$workers" -ge 1 ] || workers="1"
+    [ "$workers" -le 4 ] || workers="4"
+    [ "$max_queue" -ge 1 ] || max_queue="1000"
+
+    if [ ! -f "$script" ]; then
+        log "WARN" "DCC locale prewarm script not found: $script"
+        return
+    fi
+    if [ ! -f "$fpm_conf" ]; then
+        log "WARN" "DCC locale prewarm skipped; FPM env file not found: $fpm_conf"
+        return
+    fi
+    if ! grep -Eq '^[[:space:]]*env\[DCC_TRANSLATION_DRIVER\][[:space:]]*=[[:space:]]*command[[:space:]]*$' "$fpm_conf" \
+        || ! grep -Eq '^[[:space:]]*env\[DCC_TRANSLATION_COMMAND\][[:space:]]*=' "$fpm_conf"; then
+        log "WARN" "DCC locale prewarm skipped; internal command provider is not configured in $fpm_conf"
+        return
+    fi
+
+    log "INFO" "Starting DCC English locale prewarm (workers=$workers, max_queue=$max_queue)..."
+    if command -v systemctl >/dev/null 2>&1 && [ -f "/etc/systemd/system/dcc-locale-prewarm.service" ]; then
+        systemctl start --no-block dcc-locale-prewarm.service \
+            && log "INFO" "DCC locale prewarm service started asynchronously" \
+            || log "WARN" "Could not start dcc-locale-prewarm.service"
+        return
+    fi
+
+    if command -v runuser >/dev/null 2>&1; then
+        runuser -u "$WEB_USER" -- env \
+            DCC_TRANSLATION_WORKER_SLOTS="$workers" \
+            DCC_TRANSLATION_COMMAND_TIMEOUT_SECONDS=1800 \
+            DCC_TRANSLATION_JOB_MAX_ATTEMPTS=3 \
+            php8.5 "$script" \
+                --fpm-env="$fpm_conf" \
+                --only-missing-job \
+                --no-spawn-per-job \
+                --start-workers="$workers" \
+                --worker-slots="$workers" \
+                --max-queue="$max_queue" \
+                --actor=system.locale-prewarm >>"$LOG" 2>&1 \
+            && log "INFO" "DCC locale prewarm workers started" \
+            || log "WARN" "DCC locale prewarm kick failed (see $LOG)"
+        return
+    fi
+
+    log "WARN" "DCC locale prewarm could not start because neither systemd nor runuser is available"
 }
 
 acquire_lock
@@ -313,6 +376,8 @@ elif [ -f "$HEALTHCHECK_SCRIPT" ]; then
 else
     log "WARN" "No healthcheck script at $HEALTHCHECK_SCRIPT — skipping"
 fi
+
+run_dcc_locale_prewarm_kick
 
 prune_rollback_tags
 
