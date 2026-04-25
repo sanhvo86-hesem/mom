@@ -3094,15 +3094,24 @@ async function openDoc(code){
 
 // Refresh the currently-open document preview (header, workflow, DCR record, iframe)
 // without navigating away. This is used after server-side state changes (approve/new revision).
-async function openDocPreview(code){
+async function openDocPreview(code, options){
   try{
+    const opts = (options && typeof options === 'object') ? options : {};
     const doc = resolveDocRecord(code);
     if(!doc) return;
     const resolvedCode = String(doc.code || '').trim();
+    const currentBeforePreview = String(currentDoc || '').trim();
+    if(currentBeforePreview !== resolvedCode){
+      const allowedFrom = String(opts.allowFromCode || '').trim();
+      if(!allowedFrom || allowedFrom !== currentBeforePreview) return;
+      currentDoc = resolvedCode;
+      window.currentDocPath = String(doc.path || '');
+    }
     if(isDocHidden(doc.code) && !isAdmin()) return;
     if(!canAccessDoc(doc.code)) return;
+    const previewLang = lang === 'en' ? 'en' : 'vi';
     const previewViewTxn = (typeof beginPortalDocViewTransaction === 'function')
-      ? beginPortalDocViewTransaction('open-doc-preview', doc, lang)
+      ? beginPortalDocViewTransaction('open-doc-preview', doc, previewLang)
       : null;
     const previewRenderToken = previewViewTxn
       ? previewViewTxn.token
@@ -3112,7 +3121,7 @@ async function openDocPreview(code){
     try{ await refreshDocFromServer(resolvedCode); }catch(e){}
     if(currentDoc !== resolvedCode) return;
     if(window.__DOC_VIEW_RENDER_TOKEN !== previewRenderToken) return;
-    if(previewViewTxn && !isPortalDocViewTransactionCurrent(previewViewTxn, resolvedCode)) return;
+    if(previewViewTxn && !isPortalDocViewTransactionCurrent(previewViewTxn, doc, previewLang)) return;
     const latestDoc = resolveDocRecord(resolvedCode) || doc;
     if(isDocHidden(latestDoc.code) && !isAdmin()) return;
     if(!canAccessDoc(latestDoc.code)) return;
@@ -3461,8 +3470,24 @@ async function editDocMeta(code, field){
     const doc = DOCS.find(d=>d.code===code);
     if(!doc) return;
     if(field !== 'owner' && field !== 'approver') return;
+    const editCode = String(doc.code || code || '').trim();
+    const editLang = lang === 'en' ? 'en' : 'vi';
+    const editViewTxn = (typeof getPortalDocViewTransaction === 'function') ? getPortalDocViewTransaction() : null;
+    const isStillActiveDocMetaView = function(){
+      try{
+        if(String(currentDoc || '').trim() !== editCode) return false;
+        if((lang === 'en' ? 'en' : 'vi') !== editLang) return false;
+        if(editViewTxn && typeof isPortalDocViewTransactionCurrent === 'function'){
+          return isPortalDocViewTransactionCurrent(editViewTxn, doc, editLang);
+        }
+        return true;
+      }catch(e){
+        return false;
+      }
+    };
 
     const roles = await _dccRolesFetch(field);
+    if(!isStillActiveDocMetaView()) return;
     if(!roles.length){
       showToast(lang==='en' ? '⚠ No roles available' : '⚠ Chưa có vai trò khả dụng');
       return;
@@ -3483,6 +3508,7 @@ async function editDocMeta(code, field){
         currentCode = String((field === 'owner' ? hdr.owner_role_code : hdr.approver_role_code) || '');
       }
     } catch(e){ /* non-fatal: picker still works without prefill */ }
+    if(!isStillActiveDocMetaView()) return;
 
     _openDccRolePicker({
       title: title,
@@ -3490,6 +3516,10 @@ async function editDocMeta(code, field){
       currentCode: currentCode,
       onSubmit: async function(selected){
         if(!selected || selected === currentCode) return;
+        if(!isStillActiveDocMetaView()){
+          try{ document.getElementById('dcc-role-picker-modal')?.remove(); }catch(e){}
+          return;
+        }
         const headers = { 'Content-Type':'application/json', 'Accept':'application/json' };
         if (window.csrfToken) headers['X-CSRF-Token'] = window.csrfToken;
         const body = {}; body[payloadKey] = selected;
@@ -3506,12 +3536,16 @@ async function editDocMeta(code, field){
           showToast(lang==='en' ? '⚠ Save failed' : '⚠ Lưu thất bại');
           return;
         }
+        if(!isStillActiveDocMetaView()) return;
         showToast(lang==='en' ? 'Saved' : 'Đã lưu');
         const headerEl = document.getElementById('doc-viewer-header');
         const dccEl = headerEl ? headerEl.querySelector('.dcc-header') : null;
-        if (dccEl && window.DccHeader && typeof window.DccHeader.render === 'function') {
+        const dccCode = dccEl ? String(dccEl.getAttribute('data-dcc-doc-code') || '').trim() : '';
+        const dccLocale = dccEl ? String(dccEl.getAttribute('data-dcc-locale') || '').trim() : '';
+        if (dccEl && dccCode === editCode && dccLocale === editLang && window.DccHeader && typeof window.DccHeader.render === 'function') {
           try { await window.DccHeader.render(dccEl); } catch(e){}
         }
+        if(!isStillActiveDocMetaView()) return;
         try { updateDocViewerHeader(doc); } catch(e){}
       }
     });
@@ -4446,7 +4480,7 @@ async function doSaveDocEdit(oldCode){
         } catch(e){}
         await rescanDocs(); renderDocuments(); renderSidebar();
         if(currentDoc && (currentDoc===oldCode || currentDoc===newCode)){
-          try{ await openDocPreview(newCode || oldCode); }catch(e){}
+          try{ await openDocPreview(newCode || oldCode, {allowFromCode: oldCode}); }catch(e){}
         }
         return;
       } else {
