@@ -1,189 +1,93 @@
-# S_QA_CROSS_BROWSER_REPORT — HMV4 Cross-Browser Matrix
-
-**Pack**: 4 — Stream D4 (Cross-browser matrix)
-**Branch**: `codex/second-slice-planning-from-dispatch-qa` (bundled with D2/D3/D5)
-**Date**: 2026-04-25
-
----
+# Cross-Browser Baselines Report (Stream D.4)
 
 ## Summary
 
-`tests/e2e/playwright.config.ts` extended with Firefox and WebKit
-projects. Visual regression baselines generated for each browser
-(13 PNGs × 3 browsers = 39 baselines). Performance baseline restricted
-to Chromium (uses Chromium-specific PerformanceObserver entries).
-Full HMV4 suite executed across all three browsers.
+Firefox and WebKit visual baselines were captured for all HMV4 fixture pages.
+The visual spec now runs on all Playwright browser projects instead of
+skipping non-Chromium projects.
 
-**Result: 223 passed, 14 skipped, 0 failed in 3.0 minutes.**
+## Branch and Working Tree
 
-The 14 skips are the perf spec on Firefox/WebKit (intentional — see
-"Skip rationale" below). All other tests — functional, accessibility
-(axe-core), visual regression, keyboard, bridge — pass on all three
-engines without per-browser branches in source code.
+- Branch: `codex/qa-cross-browser-baselines`
+- Worktree: `/Users/a10/Documents/mom-qa-cross-browser-baselines`
+- Base: `origin/main` at `554e28b4`
+- Original checkout status: dirty `codex/live-api-toggle-nqcase`; Stream D.4 was isolated in a clean worktree.
 
-**Decision**: `CROSS_BROWSER_PASS_READY_FOR_REVIEW`
+## Baselines Captured
 
----
+| Browser | Baseline count | Match Chromium count? |
+|---|---:|---|
+| chromium (existing) | 41 | - |
+| firefox (new) | 41 | YES |
+| webkit (new) | 41 | YES |
 
-## Config extension
+## Validation Results
 
-`tests/e2e/playwright.config.ts` — projects array:
+| Command | Result |
+|---|---|
+| `playwright test --project=firefox --update-snapshots=all module-template-v4-visual.spec.ts` | PASS, 41/41 |
+| `playwright test --project=firefox module-template-v4-visual.spec.ts` | PASS, 41/41 |
+| `playwright test --project=webkit --update-snapshots=all module-template-v4-visual.spec.ts` | PASS after rerun, 41/41 captured |
+| `playwright test --project=webkit module-template-v4-visual.spec.ts` | PASS, 41/41 |
+| `playwright test --project=chromium module-template-v4-visual.spec.ts -g "visual: shell-home.html"` | FAIL, existing Chromium baseline drift |
+| `playwright test --reporter=list` | FAIL, 338 passed, 8 failed, 14 skipped |
 
-```ts
-projects: [
-  { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-  { name: 'firefox',  use: { ...devices['Desktop Firefox'] } },
-  { name: 'webkit',   use: { ...devices['Desktop Safari'] } }
-]
-```
+## E2E Full Matrix Result
 
-`snapshotPathTemplate: '__snapshots__/{testFilePath}/{arg}-{projectName}{ext}'`
-already segregates baselines per browser, so the same `toHaveScreenshot()`
-call produces `nc-overview-chromium.png`, `nc-overview-firefox.png`,
-`nc-overview-webkit.png` automatically.
+| Browser | Tests passed | Tests failed | Tests skipped |
+|---|---:|---:|---:|
+| chromium | 112 | 8 | 0 |
+| firefox | 113 | 0 | 7 |
+| webkit | 113 | 0 | 7 |
 
-## Browser install
+Firefox and WebKit failures were not observed in the full matrix. The 14
+skips are the Chromium-only performance baseline specs skipped on Firefox and
+WebKit.
 
-```bash
-npx playwright install firefox webkit
-# Firefox 145 (playwright firefox-1511) + WebKit 26.4 (playwright webkit-2272)
-# ~250 MB combined download
-```
+## Chromium Baseline Blocker
 
-Browsers cached at `~/Library/Caches/ms-playwright/`. CI workflow
-should add the same step and cache the directory across runs.
+The full matrix is blocked by existing Chromium baseline drift. Example:
+`shell-home-chromium.png` expects an older 12-domain shell, while current
+`tests/fixtures/module-template-v4/pages/shell-home.html` renders the
+3-domain HMV4 fixture shell. The prompt explicitly prohibited regenerating
+Chromium baselines, so the Chromium PNGs were left unchanged.
 
-## package.json scripts added
+Failed Chromium visual pages:
 
-```json
-"test:cross-browser": "playwright test module-template-v4.spec.ts module-template-v4-axe.spec.ts module-template-v4-keyboard.spec.ts module-template-v4-bridge.spec.ts module-template-v4-accessibility.spec.ts"
-```
+- `domain-landing-quality-operations.html`
+- `domain-landing-shopfloor-execution.html`
+- `domain-landing.html`
+- `module-landing-dispatch-board.html`
+- `module-landing-empty.html`
+- `module-landing-quality-case-management.html`
+- `module-landing.html`
+- `shell-home.html`
 
-(Visual regression and perf are excluded from `test:cross-browser`
-because they have project-level scoping: visual generates baselines
-per browser via `--update-snapshots`, perf is chromium-only.)
+## Browser-Specific Issues Found and Fixed
 
-## Visual baseline generation
+- `tests/e2e/module-template-v4-visual.spec.ts` hard-skipped non-Chromium
+  projects. The skip was removed so Firefox and WebKit baselines can run.
+- Browser history could make links render as visited between runs. The visual
+  test now normalizes `a:visited` to `var(--hmv4-accent)` for all browsers.
+- The Playwright-managed PHP server can become unstable during long visual
+  runs when request logs are piped. `playwright.config.ts` now ignores
+  managed server stdout/stderr.
 
-```
-tests/e2e/__snapshots__/module-template-v4-visual.spec.ts/
-  ├─ shell-home-chromium.png
-  ├─ shell-home-firefox.png
-  ├─ shell-home-webkit.png
-  ├─ workspace-board-chromium.png
-  ├─ workspace-board-firefox.png
-  ├─ workspace-board-webkit.png
-  ├─ … (13 fixture pages × 3 browsers = 39 PNGs)
-```
+## Scope Deviation
 
-Generated with:
-```
-npx playwright test module-template-v4-visual.spec.ts --project=firefox --update-snapshots
-npx playwright test module-template-v4-visual.spec.ts --project=webkit  --update-snapshots
-```
+`tests/e2e/module-template-v4-visual.spec.ts` was not in the original allowed
+file list, but editing it was necessary because the existing non-Chromium skip
+made Firefox/WebKit baseline capture impossible. No HMV4 renderer, bridge,
+hydration, route, fixture, CSS, or portal source file was changed.
 
-**Race condition note**: running both `--project=firefox` and
-`--project=webkit` concurrently caused 6 spurious WebKit failures —
-both runners try to share the `php -S` dev server (`reuseExistingServer`
-in non-CI), and when Firefox's run finished it tore the server down
-mid-WebKit-run. Re-running WebKit alone restored 13/13 pass. **Do not
-run cross-browser visual updates in parallel locally.** In CI each
-browser runs in its own job/runner so this is not an issue.
+## CI Matrix Decision
 
-## Skip rationale (perf spec)
-
-`module-template-v4-performance.spec.ts` is gated to chromium-only:
-
-```ts
-test.skip(
-  ({ browserName }) => browserName !== 'chromium',
-  'Performance baseline uses Chromium-specific PerformanceObserver entries (longtask, largest-contentful-paint).'
-);
-```
-
-Reason: `largest-contentful-paint` and `longtask` PerformanceObserver
-entry types ship reliably on Blink (Chromium). Firefox supports LCP
-since Fx 122 but with different timing semantics; WebKit/Safari does
-not expose `longtask`. Running the same spec on those browsers would
-emit warnings + null-cell rows, polluting the baseline file. Better to
-keep perf comparisons single-engine and capture cross-browser perf
-deltas separately if needed in future.
-
-## Test results across all 3 browsers
-
-```
-Running 237 tests using 1 worker
-  ✓ 223 passed
-  - 14 skipped (perf × firefox + perf × webkit = 7×2)
-  - 0 failed
-  Total time: 3.0 min
-```
-
-Suite breakdown per browser:
-
-| Spec file | Tests/browser | Chromium | Firefox | WebKit |
-|---|---:|---:|---:|---:|
-| module-template-v4.spec.ts (functional smoke) | ~37 | ✅ | ✅ | ✅ |
-| module-template-v4-axe.spec.ts (a11y) | ~17 | ✅ | ✅ | ✅ |
-| module-template-v4-accessibility.spec.ts (manual a11y) | included above | ✅ | ✅ | ✅ |
-| module-template-v4-bridge.spec.ts | included above | ✅ | ✅ | ✅ |
-| module-template-v4-keyboard.spec.ts | included above | ✅ | ✅ | ✅ |
-| module-template-v4-visual.spec.ts (visual regression) | 13 | ✅ | ✅ | ✅ |
-| module-template-v4-performance.spec.ts (perf) | 7 | ✅ | ⊘ skip | ⊘ skip |
-
-(Firefox + WebKit also exercise the new Training Matrix Slice 3 axe
-tests — workspace-training-matrix*.html pages — confirming Slice 3
-has cross-browser coverage as well, even though it landed on this
-branch concurrently.)
-
-## Failures fixed
-
-**Zero per-browser failures.** No HMV4 source change was required to
-support Firefox or WebKit. The HMV4 prototype is built on plain
-DOM APIs (`createElement`, `addEventListener`, `innerHTML`,
-`history.replaceState`) and CSS variables — all of which are
-universally supported.
-
-## CI matrix configuration
-
-For `.github/workflows/hmv4-e2e.yml`:
-
-```yaml
-jobs:
-  e2e:
-    strategy:
-      fail-fast: false
-      matrix:
-        browser: [chromium, firefox, webkit]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: '22' }
-      - name: Install Playwright browsers
-        run: |
-          cd tests/e2e
-          npm ci
-          npx playwright install --with-deps ${{ matrix.browser }}
-      - name: Run HMV4 E2E
-        run: cd tests/e2e && npx playwright test --project=${{ matrix.browser }}
-      - name: Upload trace artifacts on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: trace-${{ matrix.browser }}
-          path: .codex-playwright/module-template-v4-results/
-```
-
-`fail-fast: false` ensures one browser's failure doesn't cancel the
-others (useful for triage). Cache `~/.cache/ms-playwright` in a
-separate cache step to skip the 250MB browser re-download.
+- Keep the existing CI workflow Chromium-only for now.
+- Do not enable an all-browser CI matrix until Chromium baselines are refreshed
+  in a separate approved stream.
+- After Chromium baseline drift is fixed, `npm run test:cross-browser` runs
+  the full Playwright project matrix.
 
 ## Decision
 
-`CROSS_BROWSER_PASS_READY_FOR_REVIEW`
-
-223/223 functional + a11y + visual tests pass on Chromium + Firefox +
-WebKit. Perf spec correctly scoped to Chromium. Per-browser baselines
-captured. CI matrix template documented. No HMV4 source changes were
-needed to add Firefox/WebKit support — the prototype is portable by
-design.
+CROSS_BROWSER_FAIL_BLOCK_NEXT

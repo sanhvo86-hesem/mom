@@ -32,7 +32,10 @@ async function stabilize(page: Page): Promise<void> {
   });
 
   await page.addStyleTag({
-    content: '*, *::before, *::after { transition: none !important; animation: none !important; caret-color: transparent !important; }'
+    content: [
+      '*, *::before, *::after { transition: none !important; animation: none !important; caret-color: transparent !important; }',
+      'a:visited { color: var(--hmv4-accent) !important; }'
+    ].join('\n')
   });
 
   await page.evaluate(() => {
@@ -51,7 +54,6 @@ async function stabilize(page: Page): Promise<void> {
 
 test.describe('module-template-v4 visual regression', () => {
   test.use({ viewport: { width: 1280, height: 800 } });
-  test.skip(({ browserName }) => browserName !== 'chromium', 'Chromium visual baselines only in this slice.');
 
   for (const fixturePage of fixturePages) {
     test(`visual: ${fixturePage}`, async ({ page }) => {

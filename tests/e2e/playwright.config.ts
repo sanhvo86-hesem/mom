@@ -34,8 +34,8 @@ export default defineConfig({
     url: 'http://127.0.0.1:8091/mom/portal.html',
     reuseExistingServer: !process.env.CI,
     timeout: 15_000,
-    stdout: 'pipe',
-    stderr: 'pipe'
+    stdout: 'ignore',
+    stderr: 'ignore'
   },
   projects: [
     {
