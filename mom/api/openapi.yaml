@@ -132,6 +132,10 @@ tags:
     description: |
       Commercial demand objects -- customer purchase orders and quote-to-order commitment controls.
       Doi tuong cau thuong mai -- PO khach hang va kiem soat cam ket quote-to-order.
+  - name: Transactional Orders
+    description: |
+      Canonical plural-form SO/JO/WO endpoints for ADR-0008 transactional order integration.
+      Legacy /api/orders/{sales,jobs,work} paths redirect to these routes.
   - name: Traceability
     description: |
       Lot, serial, supplier-quality impact, containment, and genealogy read models.
@@ -159,6 +163,160 @@ tags:
       monitor, audit packs, change authority, and genealogy graph reads.
 
 paths:
+  # Transactional plural-form canonical paths (ADR-0008, Stream C.2)
+  /api/v1/sales-orders:
+    get:
+      operationId: transactionalSalesOrdersList
+      tags: [Transactional Orders]
+      summary: List sales orders
+      description: "Canonical plural-form sales-order list. Delegates to existing OrderController::listSalesOrders."
+      responses:
+        '200':
+          description: Sales order collection.
+    post:
+      operationId: transactionalSalesOrdersCreate
+      tags: [Transactional Orders]
+      summary: Create sales order
+      description: "Canonical plural-form sales-order create. Delegates to existing OrderController::createSalesOrder."
+      responses:
+        '201':
+          description: Sales order created.
+  /api/v1/sales-orders/{soNumber}:
+    parameters:
+      - name: soNumber
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: transactionalSalesOrdersDetail
+      tags: [Transactional Orders]
+      summary: Get sales order detail
+      responses:
+        '200':
+          description: Sales order detail.
+    patch:
+      operationId: transactionalSalesOrdersUpdate
+      tags: [Transactional Orders]
+      summary: Update sales order
+      responses:
+        '200':
+          description: Sales order updated.
+  '/api/v1/sales-orders/{soNumber}:transition':
+    parameters:
+      - name: soNumber
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: transactionalSalesOrdersTransition
+      tags: [Transactional Orders]
+      summary: Transition sales order
+      responses:
+        '200':
+          description: Sales order transition result.
+
+  /api/v1/job-orders:
+    get:
+      operationId: transactionalJobOrdersList
+      tags: [Transactional Orders]
+      summary: List job orders
+      description: "Canonical plural-form job-order list. Delegates to existing OrderController::listJobOrders."
+      responses:
+        '200':
+          description: Job order collection.
+    post:
+      operationId: transactionalJobOrdersCreate
+      tags: [Transactional Orders]
+      summary: Create job order
+      description: "Canonical plural-form job-order create. Delegates to existing OrderController::createJobOrder."
+      responses:
+        '201':
+          description: Job order created.
+  /api/v1/job-orders/{joNumber}:
+    parameters:
+      - name: joNumber
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: transactionalJobOrdersDetail
+      tags: [Transactional Orders]
+      summary: Get job order detail
+      responses:
+        '200':
+          description: Job order detail.
+    patch:
+      operationId: transactionalJobOrdersUpdate
+      tags: [Transactional Orders]
+      summary: Update job order
+      responses:
+        '200':
+          description: Job order updated.
+  '/api/v1/job-orders/{joNumber}:transition':
+    parameters:
+      - name: joNumber
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: transactionalJobOrdersTransition
+      tags: [Transactional Orders]
+      summary: Transition job order
+      responses:
+        '200':
+          description: Job order transition result.
+
+  /api/v1/work-orders:
+    get:
+      operationId: transactionalWorkOrdersList
+      tags: [Transactional Orders]
+      summary: List work orders
+      description: "Canonical plural-form work-order list backed by the existing SO/JO/WO projection."
+      responses:
+        '200':
+          description: Work order collection.
+    post:
+      operationId: transactionalWorkOrdersCreate
+      tags: [Transactional Orders]
+      summary: Create work order
+      description: "Canonical plural-form work-order create. Delegates to existing OrderController::createWorkOrder."
+      responses:
+        '201':
+          description: Work order created.
+  /api/v1/work-orders/{woNumber}:
+    parameters:
+      - name: woNumber
+        in: path
+        required: true
+        schema: { type: string }
+    get:
+      operationId: transactionalWorkOrdersDetail
+      tags: [Transactional Orders]
+      summary: Get work order detail
+      responses:
+        '200':
+          description: Work order detail.
+    patch:
+      operationId: transactionalWorkOrdersUpdate
+      tags: [Transactional Orders]
+      summary: Update work order
+      responses:
+        '200':
+          description: Work order updated.
+  '/api/v1/work-orders/{woNumber}:transition':
+    parameters:
+      - name: woNumber
+        in: path
+        required: true
+        schema: { type: string }
+    post:
+      operationId: transactionalWorkOrdersTransition
+      tags: [Transactional Orders]
+      summary: Transition work order
+      responses:
+        '200':
+          description: Work order transition result.
+
   # EQMS plural-form REST aliases (ADR-0008)
   /api/v1/nonconformance-cases:
     get:
