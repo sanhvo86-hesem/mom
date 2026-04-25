@@ -160,17 +160,39 @@ return static function (Router $router, string $dataDir): void {
     $router->get('/api/spc/alerts', DashboardController::class, 'spcAlerts');
     $router->get('/api/spc/summary', DashboardController::class, 'spcSummary');
     
-    // Orders
-    $router->get('/api/orders/sales', OrderController::class, 'listSalesOrders');
-    $router->post('/api/orders/sales', OrderController::class, 'createSalesOrder');
-    $router->get('/api/orders/sales/{soNumber}', OrderController::class, 'getSalesOrderDetail');
-    $router->put('/api/orders/sales/{soNumber}', OrderController::class, 'updateSalesOrder');
-    $router->get('/api/orders/jobs', OrderController::class, 'listJobOrders');
-    $router->post('/api/orders/jobs', OrderController::class, 'createJobOrder');
-    $router->get('/api/orders/jobs/{joNumber}', OrderController::class, 'getJobOrderDetail');
-    $router->put('/api/orders/jobs/{joNumber}', OrderController::class, 'updateJobOrder');
-    $router->post('/api/orders/work', OrderController::class, 'createWorkOrder');
-    $router->put('/api/orders/work/{woNumber}', OrderController::class, 'updateWorkOrder');
+    // Transactional plural-form REST routes (ADR-0008, Stream C.2, 2026-04-25)
+    // SO / JO / WO canonical paths delegate to existing OrderController behavior.
+    $router->get('/api/v1/sales-orders', OrderController::class, 'listSalesOrders');
+    $router->post('/api/v1/sales-orders', OrderController::class, 'createSalesOrder');
+    $router->get('/api/v1/sales-orders/{soNumber}', OrderController::class, 'getSalesOrderDetailForPath');
+    $router->patch('/api/v1/sales-orders/{soNumber}', OrderController::class, 'updateSalesOrderForPath');
+    $router->post('/api/v1/sales-orders/{soNumber}:transition', OrderController::class, 'transitionSalesOrder');
+
+    $router->get('/api/v1/job-orders', OrderController::class, 'listJobOrders');
+    $router->post('/api/v1/job-orders', OrderController::class, 'createJobOrder');
+    $router->get('/api/v1/job-orders/{joNumber}', OrderController::class, 'getJobOrderDetailForPath');
+    $router->patch('/api/v1/job-orders/{joNumber}', OrderController::class, 'updateJobOrderForPath');
+    $router->post('/api/v1/job-orders/{joNumber}:transition', OrderController::class, 'transitionJobOrder');
+
+    $router->get('/api/v1/work-orders', OrderController::class, 'listWorkOrders');
+    $router->post('/api/v1/work-orders', OrderController::class, 'createWorkOrder');
+    $router->get('/api/v1/work-orders/{woNumber}', OrderController::class, 'getWorkOrderDetail');
+    $router->patch('/api/v1/work-orders/{woNumber}', OrderController::class, 'updateWorkOrderForPath');
+    $router->post('/api/v1/work-orders/{woNumber}:transition', OrderController::class, 'transitionWorkOrder');
+
+    // Legacy /api/orders/{sales,jobs,work} paths redirect to canonical ADR-0008 paths.
+    $router->get('/api/orders/sales', OrderController::class, 'redirectLegacySalesOrders');
+    $router->post('/api/orders/sales', OrderController::class, 'redirectLegacySalesOrders');
+    $router->get('/api/orders/sales/{soNumber}', OrderController::class, 'redirectLegacySalesOrderDetail');
+    $router->put('/api/orders/sales/{soNumber}', OrderController::class, 'redirectLegacySalesOrderDetail');
+    $router->get('/api/orders/jobs', OrderController::class, 'redirectLegacyJobOrders');
+    $router->post('/api/orders/jobs', OrderController::class, 'redirectLegacyJobOrders');
+    $router->get('/api/orders/jobs/{joNumber}', OrderController::class, 'redirectLegacyJobOrderDetail');
+    $router->put('/api/orders/jobs/{joNumber}', OrderController::class, 'redirectLegacyJobOrderDetail');
+    $router->get('/api/orders/work', OrderController::class, 'redirectLegacyWorkOrders');
+    $router->post('/api/orders/work', OrderController::class, 'redirectLegacyWorkOrders');
+    $router->get('/api/orders/work/{woNumber}', OrderController::class, 'redirectLegacyWorkOrderDetail');
+    $router->put('/api/orders/work/{woNumber}', OrderController::class, 'redirectLegacyWorkOrderDetail');
     $router->post('/api/orders/transition', OrderController::class, 'transition');
     $router->get('/api/orders/hierarchy', OrderController::class, 'getHierarchy');
     $router->get('/api/orders/timeline', OrderController::class, 'getTimeline');

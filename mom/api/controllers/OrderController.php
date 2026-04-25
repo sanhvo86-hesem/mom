@@ -1694,4 +1694,234 @@ class OrderController extends BaseController
             $this->error('shipment_gate_override_list_failed', 500, $e->getMessage());
         }
     }
+
+    // Transactional plural-form REST wrappers (ADR-0008, Stream C.2).
+
+    public function getSalesOrderDetailForPath(): never
+    {
+        $this->bindQueryAlias('soNumber', 'so_number');
+        $this->getSalesOrderDetail();
+    }
+
+    public function updateSalesOrderForPath(): never
+    {
+        $this->bindQueryAlias('soNumber', 'so_number');
+        $this->updateSalesOrder();
+    }
+
+    public function getJobOrderDetailForPath(): never
+    {
+        $this->bindQueryAlias('joNumber', 'jo_number');
+        $this->getJobOrderDetail();
+    }
+
+    public function updateJobOrderForPath(): never
+    {
+        $this->bindQueryAlias('joNumber', 'jo_number');
+        $this->updateJobOrder();
+    }
+
+    public function listWorkOrders(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireOrderPermission($user, 'wo_read');
+
+        $joNumber = trim((string)($this->query('jo_number') ?? $this->query('joNumber') ?? ''));
+        $status = strtolower(trim((string)($this->query('status') ?? '')));
+        $machineId = trim((string)($this->query('machine_id') ?? ''));
+        $workCenterId = trim((string)($this->query('work_center_id') ?? ''));
+        $offset = max(0, (int)($this->query('offset', '0')));
+        $limit = min(200, max(1, (int)($this->query('limit', '50'))));
+
+        try {
+            $workOrders = [];
+            foreach ($this->orderService()->getHierarchy(null) as $salesOrder) {
+                foreach ((array)($salesOrder['job_orders'] ?? []) as $jobOrder) {
+                    if (!is_array($jobOrder)) {
+                        continue;
+                    }
+
+                    foreach ((array)($jobOrder['work_orders'] ?? []) as $workOrder) {
+                        if (!is_array($workOrder)) {
+                            continue;
+                        }
+
+                        if ($joNumber !== '' && (string)($workOrder['jo_number'] ?? '') !== $joNumber) {
+                            continue;
+                        }
+                        if ($status !== '' && strtolower((string)($workOrder['status'] ?? '')) !== $status) {
+                            continue;
+                        }
+                        if ($machineId !== '' && (string)($workOrder['machine_id'] ?? '') !== $machineId) {
+                            continue;
+                        }
+                        if ($workCenterId !== '' && (string)($workOrder['work_center_id'] ?? '') !== $workCenterId) {
+                            continue;
+                        }
+
+                        $workOrder['so_number'] = (string)($salesOrder['so_number'] ?? $workOrder['so_number'] ?? '');
+                        $workOrder['jo_number'] = (string)($jobOrder['jo_number'] ?? $workOrder['jo_number'] ?? '');
+                        $workOrders[] = $workOrder;
+                    }
+                }
+            }
+
+            usort(
+                $workOrders,
+                static fn(array $a, array $b): int => strcmp((string)($b['scheduled_start'] ?? ''), (string)($a['scheduled_start'] ?? '')),
+            );
+
+            $total = count($workOrders);
+            $this->paginated('work_orders', array_slice($workOrders, $offset, $limit), $total, $offset, $limit);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('wo_list_failed', 500, $e->getMessage());
+        }
+    }
+
+    public function getWorkOrderDetail(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireOrderPermission($user, 'wo_read');
+
+        $this->bindQueryAlias('woNumber', 'wo_number');
+        $woNumber = trim((string)($this->query('wo_number') ?? ''));
+        if ($woNumber === '') {
+            $this->error('missing_wo_number', 400);
+        }
+
+        try {
+            foreach ($this->orderService()->getHierarchy(null) as $salesOrder) {
+                foreach ((array)($salesOrder['job_orders'] ?? []) as $jobOrder) {
+                    if (!is_array($jobOrder)) {
+                        continue;
+                    }
+
+                    foreach ((array)($jobOrder['work_orders'] ?? []) as $workOrder) {
+                        if (!is_array($workOrder) || (string)($workOrder['wo_number'] ?? '') !== $woNumber) {
+                            continue;
+                        }
+
+                        $workOrder['so_number'] = (string)($salesOrder['so_number'] ?? $workOrder['so_number'] ?? '');
+                        $workOrder['jo_number'] = (string)($jobOrder['jo_number'] ?? $workOrder['jo_number'] ?? '');
+                        $this->success(['work_order' => $workOrder]);
+                    }
+                }
+            }
+
+            $workOrder = $this->findWorkOrderForHold($woNumber);
+            if ($workOrder === null) {
+                $this->error('not_found', 404, "Work Order {$woNumber} not found.");
+            }
+
+            $this->success(['work_order' => $workOrder]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('wo_detail_failed', 500, $e->getMessage());
+        }
+    }
+
+    public function updateWorkOrderForPath(): never
+    {
+        $this->bindQueryAlias('woNumber', 'wo_number');
+        $this->updateWorkOrder();
+    }
+
+    public function transitionSalesOrder(): never
+    {
+        $this->bindTransitionPayload('so', $this->requiredPathParam('soNumber', 'missing_so_number'));
+        $this->transition();
+    }
+
+    public function transitionJobOrder(): never
+    {
+        $this->bindTransitionPayload('jo', $this->requiredPathParam('joNumber', 'missing_jo_number'));
+        $this->transition();
+    }
+
+    public function transitionWorkOrder(): never
+    {
+        $this->bindTransitionPayload('wo', $this->requiredPathParam('woNumber', 'missing_wo_number'));
+        $this->transition();
+    }
+
+    public function redirectLegacySalesOrders(): never
+    {
+        $this->redirectToCanonicalTransactionalPath('/api/v1/sales-orders');
+    }
+
+    public function redirectLegacySalesOrderDetail(): never
+    {
+        $this->redirectToCanonicalTransactionalPath('/api/v1/sales-orders/' . rawurlencode($this->requiredPathParam('soNumber', 'missing_so_number')));
+    }
+
+    public function redirectLegacyJobOrders(): never
+    {
+        $this->redirectToCanonicalTransactionalPath('/api/v1/job-orders');
+    }
+
+    public function redirectLegacyJobOrderDetail(): never
+    {
+        $this->redirectToCanonicalTransactionalPath('/api/v1/job-orders/' . rawurlencode($this->requiredPathParam('joNumber', 'missing_jo_number')));
+    }
+
+    public function redirectLegacyWorkOrders(): never
+    {
+        $this->redirectToCanonicalTransactionalPath('/api/v1/work-orders');
+    }
+
+    public function redirectLegacyWorkOrderDetail(): never
+    {
+        $this->redirectToCanonicalTransactionalPath('/api/v1/work-orders/' . rawurlencode($this->requiredPathParam('woNumber', 'missing_wo_number')));
+    }
+
+    private function bindQueryAlias(string $sourceKey, string $targetKey): void
+    {
+        if (isset($_GET[$sourceKey]) && !isset($_GET[$targetKey])) {
+            $_GET[$targetKey] = (string)$_GET[$sourceKey];
+        }
+    }
+
+    private function requiredPathParam(string $key, string $errorCode): string
+    {
+        $value = trim((string)($this->query($key) ?? ''));
+        if ($value === '') {
+            $this->error($errorCode, 400);
+        }
+
+        return $value;
+    }
+
+    private function bindTransitionPayload(string $orderType, string $orderId): void
+    {
+        if (!array_key_exists('__mom_raw_input', $GLOBALS)) {
+            $raw = @file_get_contents('php://input');
+            $GLOBALS['__mom_raw_input'] = $raw !== false ? $raw : '';
+        }
+
+        $rawBody = (string)$GLOBALS['__mom_raw_input'];
+        $body = [];
+        if (trim($rawBody) !== '') {
+            $decoded = json_decode($rawBody, true);
+            if (!is_array($decoded)) {
+                $this->error('invalid_json_body', 400, 'Request body must be a JSON object or array');
+            }
+            $body = $decoded;
+        }
+
+        $body['order_type'] = $orderType;
+        $body['order_id'] = $orderId;
+
+        $encoded = json_encode($body, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if ($encoded === false) {
+            $this->error('invalid_transition_payload', 400);
+        }
+
+        $GLOBALS['__mom_raw_input'] = $encoded;
+    }
+
+    private function redirectToCanonicalTransactionalPath(string $target): never
+    {
+        $this->emptyResponse(301, ['Location' => $target]);
+    }
 }
