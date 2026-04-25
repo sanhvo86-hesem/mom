@@ -2818,6 +2818,7 @@ function setLang(l){
   l = l === 'en' ? 'en' : 'vi';
   lang = l;
   try{ localStorage.setItem('hesem_lang', l); }catch(e){}
+  try{ if(typeof window.__hesemPortalPersistViewState === 'function') window.__hesemPortalPersistViewState('set-lang'); }catch(e){}
   try{
     if(typeof apiCall==='function' && typeof currentUser!=='undefined' && currentUser && currentUser.username){
       apiCall('user_set_language',{lang:l},'POST').catch(()=>{});

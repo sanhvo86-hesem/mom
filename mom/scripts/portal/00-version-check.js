@@ -136,6 +136,15 @@
     clearDeferredTimer();
     clearCooldownTimer();
     try {
+      if (typeof window.__hesemPortalBeforeHardReload === 'function') {
+        window.__hesemPortalBeforeHardReload({
+          reason: 'version-check',
+          baselineVersion: baselineVersion,
+          pendingVersion: pendingVersion
+        });
+      }
+    } catch (e) { /* swallow — reload must remain best-effort */ }
+    try {
       if ('caches' in window && caches.keys) {
         var keys = await caches.keys();
         await Promise.all(keys.map(function (k) {
