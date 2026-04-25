@@ -260,9 +260,192 @@
       nonconformanceTabs.map(function(t){return '<section class="hmv4-tabpanel" role="tabpanel" aria-labelledby="tab-'+t+'" '+(t===tab?'':'hidden')+' data-hmv4-nc-panel="'+esc(t)+'">'+renderNcPanel(t, record)+'</section>';}).join('')+
       '</article>';
   }
+  var capaTabs = ['overview','analysis','actions','verification','effectiveness','related','audit','signatures'];
+  function normaliseCapaTab(tab){
+    return capaTabs.indexOf(tab) >= 0 ? tab : 'overview';
+  }
+  function defaultCapaRecord(recordId){
+    return {
+      recordId: recordId || 'CAPA-001',
+      rootCode: 'CAPA',
+      title: 'Operator training gap on operation OP-30',
+      summary: 'CAPA opened from NC-001 dimensional issue. Containment complete; root cause analysis in progress.',
+      severity: 'major',
+      state: 'analysis',
+      owner: 'Quality Engineer',
+      dueDate: '2026-06-30',
+      linkedNcId: 'NC-001',
+      lifecycle: [
+        ['draft','complete'],
+        ['analysis','current'],
+        ['action-planning','pending'],
+        ['execution','locked'],
+        ['verification','locked'],
+        ['effectiveness','locked'],
+        ['closed','locked']
+      ],
+      stateMessage: 'Read-only prototype shell. Governed CAPA actions must remain outside this fixture.',
+      freshness: 'fixture_current',
+      rootCauses: [
+        { category: 'Training', text: 'Operator OP-1002 had expired QUAL_INJ_BASIC certification.' },
+        { category: 'Process', text: 'Pre-shift competency check did not run on this date.' }
+      ],
+      actionPlan: [
+        { title: 'Re-certify OP-1002', owner: 'Training Lead', dueDate: '2026-05-15', status: 'in_progress' },
+        { title: 'Add daily competency check to shift handoff', owner: 'Production Supervisor', dueDate: '2026-05-30', status: 'planned' }
+      ],
+      verifications: [],
+      effectivenessChecks: [],
+      relatedRecords: [
+        { resourceFamily: 'nonconformance-cases', recordId: 'NC-001', label: 'NC-001 dimensional NC' },
+        { resourceFamily: 'training-records', recordId: 'TR-7003', label: 'TR-7003 OP-1002 training certification' }
+      ],
+      limitations: []
+    };
+  }
+  function getCapaRecord(route){
+    var p = route.params || {};
+    var recordId = p.record_id || 'CAPA-001';
+    var fixture = window.HMV4_CAPA_RECORD_FIXTURE || readJsonFixture('[data-hmv4-capa-record-fixture]') || {};
+    var record = defaultCapaRecord(recordId);
+    if(fixture.records && fixture.records[recordId]) mergeRecord(record, fixture.records[recordId]);
+    if(fixture.record) mergeRecord(record, fixture.record);
+    if(fixture.state) record.state = fixture.state;
+    if(fixture.freshness) record.freshness = fixture.freshness;
+    if(fixture.stateMessage) record.stateMessage = fixture.stateMessage;
+    if(fixture.limitations) record.limitations = fixture.limitations;
+    var state = (route.query && route.query.state) || fixture.state || record.state || 'analysis';
+    var stateOverlay = (fixture.states || {})[state] || null;
+    if(stateOverlay){
+      record.state = state;
+      if(stateOverlay.freshness) record.freshness = stateOverlay.freshness;
+      if(stateOverlay.stateMessage) record.stateMessage = stateOverlay.stateMessage;
+      if(stateOverlay.limitations) record.limitations = stateOverlay.limitations;
+    }
+    record.recordId = recordId;
+    record.rootCode = 'CAPA';
+    return record;
+  }
+  function renderCapaPanel(tab, record){
+    var capaActions = record.actionPlan || [];
+    var rootCauses = record.rootCauses || [];
+    var verifications = record.verifications || [];
+    var effectivenessChecks = record.effectivenessChecks || [];
+
+    if(tab === 'overview'){
+      return '<div class="hmv4-section"><h3>Overview</h3>' +
+        '<p>'+esc(record.summary || 'CAPA opened from upstream NQCASE. Read-only overview fixture.')+'</p>' +
+        '<dl class="hmv4-meta-grid">' +
+          '<dt>Linked NC</dt><dd>'+esc(record.linkedNcId || '-')+'</dd>' +
+          '<dt>Severity</dt><dd>'+esc(record.severity || '-')+'</dd>' +
+          '<dt>Owner</dt><dd>'+esc(record.owner || '-')+'</dd>' +
+          '<dt>Due date</dt><dd>'+esc(record.dueDate || '-')+'</dd>' +
+        '</dl></div>';
+    }
+    if(tab === 'analysis'){
+      if(rootCauses.length === 0) return '<div class="hmv4-section"><h3>Root cause analysis</h3><p class="hmv4-text-2">No root causes recorded. Read-only placeholder.</p></div>';
+      return '<div class="hmv4-section"><h3>Root cause analysis</h3><ul class="hmv4-list">' +
+        rootCauses.map(function(rc){return '<li><strong>'+esc(rc.category)+'</strong>: '+esc(rc.text)+'</li>';}).join('') +
+        '</ul></div>';
+    }
+    if(tab === 'actions'){
+      if(capaActions.length === 0) return '<div class="hmv4-section"><h3>Action plan</h3><p class="hmv4-text-2">No actions planned. Read-only placeholder.</p></div>';
+      return '<div class="hmv4-section"><h3>Action plan</h3><table class="hmv4-data-table"><thead><tr><th>Action</th><th>Owner</th><th>Due</th><th>Status</th></tr></thead><tbody>' +
+        capaActions.map(function(a){return '<tr><td>'+esc(a.title)+'</td><td>'+esc(a.owner)+'</td><td>'+esc(a.dueDate)+'</td><td>'+esc(a.status)+'</td></tr>';}).join('') +
+        '</tbody></table></div>';
+    }
+    if(tab === 'verification'){
+      if(verifications.length === 0) return '<div class="hmv4-section"><h3>Verification</h3><p class="hmv4-text-2">No verifications recorded. Read-only placeholder.</p></div>';
+      return '<div class="hmv4-section"><h3>Verification</h3><ul class="hmv4-list">' +
+        verifications.map(function(v){return '<li>'+esc(v.summary)+' - '+esc(v.verifiedBy)+' on '+esc(v.verifiedAt)+'</li>';}).join('') +
+        '</ul></div>';
+    }
+    if(tab === 'effectiveness'){
+      if(effectivenessChecks.length === 0) return '<div class="hmv4-section"><h3>Effectiveness check</h3><p class="hmv4-text-2">No effectiveness checks recorded. Read-only placeholder.</p></div>';
+      return '<div class="hmv4-section"><h3>Effectiveness check</h3><ul class="hmv4-list">' +
+        effectivenessChecks.map(function(e){return '<li>'+esc(e.summary)+' - result: '+esc(e.result)+'</li>';}).join('') +
+        '</ul></div>';
+    }
+    if(tab === 'related'){
+      var related = record.relatedRecords || [];
+      if(related.length === 0) return '<div class="hmv4-section"><h3>Related records</h3><p class="hmv4-text-2">No related records. Read-only placeholder.</p></div>';
+      return '<div class="hmv4-section"><h3>Related records</h3><ul class="hmv4-list">' +
+        related.map(function(r){return '<li><a href="/ops/records/'+esc(r.resourceFamily)+'/'+esc(r.recordId)+'?tab=overview" data-hmv4-record-open="'+esc(r.resourceFamily)+'" data-hmv4-record-id="'+esc(r.recordId)+'">'+esc(r.label)+'</a></li>';}).join('') +
+        '</ul></div>';
+    }
+    if(tab === 'audit') return '<div class="hmv4-section"><h3>Audit trail</h3><p class="hmv4-text-2">Read-only placeholder. Audit events surface in production via /api/v1/capas/{id}/audit.</p></div>';
+    if(tab === 'signatures') return '<div class="hmv4-section"><h3>Signatures</h3><p class="hmv4-text-2">Read-only placeholder. e-Signatures (21 CFR Part 11) surface in production via /api/v1/electronic-signatures.</p></div>';
+    return '<div class="hmv4-section"><p>Unknown tab.</p></div>';
+  }
+  function renderCapaMutationButton(intent, label, noteId){
+    return '<button class="hmv4-button" type="button" disabled aria-disabled="true" aria-describedby="'+esc(noteId)+'" data-hmv4-mutation-intent="'+esc(intent)+'">'+esc(label)+'</button>';
+  }
+  function renderCapaRecord(route){
+    var p = route.params || {};
+    var q = route.query || {};
+    var tab = normaliseCapaTab(q.tab || 'overview');
+    var recordId = p.record_id || 'CAPA-001';
+    var record = getCapaRecord(route);
+    var state = record.state || 'analysis';
+    var freshness = record.freshness || 'fixture_current';
+    var limitations = record.limitations || [];
+    var lifecycle = record.lifecycle || [];
+    var noteId = 'hmv4-capa-mutation-note';
+
+    var head =
+      '<section class="hmv4-record-identity">' +
+        '<h1 class="hmv4-record-title">'+esc(recordId)+'</h1>' +
+        '<p class="hmv4-record-subtitle">'+esc(record.title)+'</p>' +
+        '<dl class="hmv4-meta-grid">' +
+          '<dt>Severity</dt><dd>'+esc(record.severity || '')+'</dd>' +
+          '<dt>State</dt><dd>'+esc(state)+'</dd>' +
+          '<dt>Owner</dt><dd>'+esc(record.owner || '')+'</dd>' +
+          '<dt>Linked NC</dt><dd>'+esc(record.linkedNcId || '-')+'</dd>' +
+        '</dl>' +
+        (record.stateMessage ? '<p class="hmv4-feedback" data-feedback-state="bridge" role="status" data-hmv4-capa-state>'+esc(record.stateMessage)+'</p>' : '') +
+      '</section>';
+
+    var lifecycleStrip = '<ol class="hmv4-lifecycle-strip" data-hmv4-capa-lifecycle aria-label="CAPA lifecycle">' +
+      lifecycle.map(function(s){return '<li data-lifecycle-state="'+esc(s[1] || 'pending')+'"><strong>'+esc(s[0])+'</strong><span>'+esc(s[1] || 'pending')+'</span></li>';}).join('') +
+      '</ol>';
+
+    var partialAccessNotice = '';
+    if(state === 'partial_access' && limitations.length){
+      partialAccessNotice =
+        '<section class="hmv4-feedback" data-feedback-state="warning" role="status" data-hmv4-capa-partial>' +
+          '<strong>Partial access</strong>' +
+          '<ul>'+limitations.map(function(l){return '<li>'+esc(l)+'</li>';}).join('')+'</ul>' +
+        '</section>';
+    }
+
+    var intents = [
+      ['capa-start-analysis','Start analysis'],
+      ['capa-record-root-cause','Record root cause'],
+      ['capa-add-action-plan','Add action plan'],
+      ['capa-assign-action','Assign action'],
+      ['capa-submit-approval','Submit for approval'],
+      ['capa-submit-verification','Submit verification'],
+      ['capa-record-effectiveness','Record effectiveness'],
+      ['capa-close','Close CAPA'],
+      ['capa-cancel','Cancel CAPA'],
+      ['capa-esign','e-Sign']
+    ];
+    var disabledLaunchers =
+      '<section class="hmv4-toolbar" aria-label="Disabled CAPA mutation launchers" data-hmv4-capa-launchers>' +
+        intents.map(function(intent){ return renderCapaMutationButton(intent[0], intent[1] + ' disabled', noteId); }).join('') +
+        '<span class="hmv4-feedback" data-feedback-state="warning" role="note" id="'+esc(noteId)+'">Mutation actions are disabled in this read-only prototype. Governed approval, verification, effectiveness, closure, cancellation, and e-sign execution remain outside fixture scope.</span>' +
+      '</section>';
+
+    return '<article class="hmv4-record-shell hmv4-record-shell--display hmv4-record-shell--capa" data-hmv4-capa-record data-route-class="AR" data-resource-family="capas" data-root-code="CAPA" data-record-id="'+esc(recordId)+'" data-authority-class="authoritative" data-query-tab="'+esc(tab)+'" data-fixture-state="'+esc(state)+'" data-fixture-freshness="'+esc(freshness)+'">' +
+      head + lifecycleStrip + partialAccessNotice + disabledLaunchers +
+      '<div class="hmv4-tablist" role="tablist" aria-label="CAPA case details">' + capaTabs.map(function(t){return '<button class="hmv4-tab" role="tab" aria-selected="'+(t===tab)+'" data-tab="'+t+'" id="tab-capa-'+t+'">'+esc(t)+'</button>';}).join('') + '</div>' +
+      capaTabs.map(function(t){return '<section class="hmv4-tabpanel" role="tabpanel" aria-labelledby="tab-capa-'+t+'" '+(t===tab?'':'hidden')+' data-hmv4-capa-panel="'+esc(t)+'">'+renderCapaPanel(t, record)+'</section>';}).join('') +
+      '</article>';
+  }
   function renderRecord(route){
     var p = route.params, tab = route.query.tab || 'overview';
     if(p.resource_family === 'nonconformance-cases') return renderNonconformanceRecord(route);
+    if(p.resource_family === 'capas') return renderCapaRecord(route);
     var tabs = ['overview','workflow','related','evidence','comments','audit'];
     return '<article class="hmv4-record-shell hmv4-record-shell--display" data-route-class="AR" data-resource-family="'+esc(p.resource_family)+'" data-record-id="'+esc(p.record_id)+'" data-authority-class="authoritative" data-query-tab="'+esc(tab)+'">' +
       '<section class="hmv4-record-identity"><h1 class="hmv4-record-title">'+esc(p.record_id)+'</h1><p class="hmv4-record-subtitle">'+esc(p.resource_family)+' authoritative record shell</p></section>'+
@@ -463,6 +646,7 @@
     renderDispatchBoardWorkspace: renderDispatchBoardWorkspace,
     renderTrainingMatrixWorkspace: renderTrainingMatrixWorkspace,
     renderNonconformanceRecord: renderNonconformanceRecord,
+    renderCapaRecord: renderCapaRecord,
     domains: domains,
     modules: modules
   });

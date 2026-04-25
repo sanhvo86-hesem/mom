@@ -5,6 +5,7 @@
   "AC": "/ops/records/quotations",
   "AR": "/ops/records/quotations/QUO-DEMO-001",
   "AR_NC": "/ops/records/nonconformance-cases/NC-001?tab=overview",
+  "AR_CAPA": "/ops/records/capas/CAPA-001?tab=overview",
   "ERD": "/ops/records/controlled-documents/CDOC-DEMO-001/drafts/DRAFT-1",
   "NRD": "/ops/customer-order-commit/rfq-quote-studio/drafts/DRAFT-NEW-1",
   "WS": "/ops/planning-scheduling/dispatch-board/board",
@@ -66,6 +67,62 @@
       "routeClass": "AR",
       "expectedRenderer": "renderNonconformanceRecord",
       "coverage": ["nc_signatures", "authoritative_record", "no_mutation"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell-capa-overview.html",
+      "path": "/ops/records/capas/CAPA-001?tab=overview",
+      "routeClass": "AR",
+      "expectedRenderer": "renderCapaRecord",
+      "coverage": ["capa_overview", "authoritative_record", "no_mutation"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell-capa-analysis.html",
+      "path": "/ops/records/capas/CAPA-001?tab=analysis",
+      "routeClass": "AR",
+      "expectedRenderer": "renderCapaRecord",
+      "coverage": ["capa_analysis", "authoritative_record", "no_mutation"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell-capa-actions.html",
+      "path": "/ops/records/capas/CAPA-001?tab=actions",
+      "routeClass": "AR",
+      "expectedRenderer": "renderCapaRecord",
+      "coverage": ["capa_actions", "authoritative_record", "no_mutation"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell-capa-verification.html",
+      "path": "/ops/records/capas/CAPA-001?tab=verification",
+      "routeClass": "AR",
+      "expectedRenderer": "renderCapaRecord",
+      "coverage": ["capa_verification", "authoritative_record", "no_mutation"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell-capa-effectiveness.html",
+      "path": "/ops/records/capas/CAPA-001?tab=effectiveness",
+      "routeClass": "AR",
+      "expectedRenderer": "renderCapaRecord",
+      "coverage": ["capa_effectiveness", "authoritative_record", "no_mutation"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell-capa-related.html",
+      "path": "/ops/records/capas/CAPA-001?tab=related",
+      "routeClass": "AR",
+      "expectedRenderer": "renderCapaRecord",
+      "coverage": ["capa_related", "authoritative_record", "no_mutation"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell-capa-audit.html",
+      "path": "/ops/records/capas/CAPA-001?tab=audit",
+      "routeClass": "AR",
+      "expectedRenderer": "renderCapaRecord",
+      "coverage": ["capa_audit", "authoritative_record", "no_mutation"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell-capa-signatures.html",
+      "path": "/ops/records/capas/CAPA-001?tab=signatures",
+      "routeClass": "AR",
+      "expectedRenderer": "renderCapaRecord",
+      "coverage": ["capa_signatures", "authoritative_record", "no_mutation"]
     },
     {
       "fixturePage": "workspace-board.html",
@@ -147,6 +204,30 @@
       "expectedRenderer": "renderNonconformanceRecord",
       "stateCoverage": ["degraded", "offline"],
       "coverage": ["nc_degraded", "authoritative_record", "no_mutation"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell-capa-conflict.html",
+      "path": "/ops/records/capas/CAPA-001?tab=overview&panel=conflict&focus=offline",
+      "routeClass": "AR",
+      "expectedRenderer": "renderCapaRecord",
+      "stateCoverage": ["conflict", "offline"],
+      "coverage": ["capa_conflict", "authoritative_record", "no_mutation"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell-capa-partial-access.html",
+      "path": "/ops/records/capas/CAPA-001?tab=overview&panel=partial-access",
+      "routeClass": "AR",
+      "expectedRenderer": "renderCapaRecord",
+      "stateCoverage": ["partial_access"],
+      "coverage": ["capa_partial_access", "authoritative_record", "no_mutation"]
+    },
+    {
+      "fixturePage": "authoritative-record-shell-capa-degraded.html",
+      "path": "/ops/records/capas/CAPA-001?tab=overview&focus=offline",
+      "routeClass": "AR",
+      "expectedRenderer": "renderCapaRecord",
+      "stateCoverage": ["degraded", "offline"],
+      "coverage": ["capa_degraded", "authoritative_record", "no_mutation"]
     }
   ]
 }

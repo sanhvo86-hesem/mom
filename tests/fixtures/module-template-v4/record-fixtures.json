@@ -16,6 +16,13 @@
       "root_code": "NQCASE",
       "state": "triaged",
       "fixture": "tests/fixtures/module-template-v4/nonconformance-case-fixtures.json"
+    },
+    {
+      "resource_family": "capas",
+      "record_id": "CAPA-001",
+      "root_code": "CAPA",
+      "state": "analysis",
+      "fixture": "tests/fixtures/module-template-v4/capa-record-fixtures.json"
     }
   ]
 }

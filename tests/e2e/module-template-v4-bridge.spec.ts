@@ -40,4 +40,18 @@ test.describe('module-template-v4 bridge adapter', () => {
     expect(unmapped.url).toBeNull();
     expect(unmapped.reason).toBe('no_eqms_alias');
   });
+
+  test('maps capa to record shell only with explicit record context', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const noContext = await page.evaluate(() => (window as any).Hmv4Bridge.resolveEqmsModule('capa'));
+    expect(noContext.policy).toBe('redirect_then_deprecate');
+    expect(noContext.url).toContain('/ops/quality-operations/capa-effectiveness');
+    expect(noContext.url).not.toContain('/ops/records/capas/');
+
+    const withContext = await page.evaluate(() =>
+      (window as any).Hmv4Bridge.resolveEqmsModule('capa', { recordId: 'CAPA-001', tab: 'overview' }),
+    );
+    expect(withContext.policy).toBe('redirect_record_context_only');
+    expect(withContext.url).toContain('/ops/records/capas/CAPA-001?tab=overview');
+  });
 });
