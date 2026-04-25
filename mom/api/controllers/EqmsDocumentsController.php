@@ -1007,4 +1007,21 @@ final class EqmsDocumentsController extends EqmsBaseController
             ['acknowledged_by' => $actor, 'acknowledged_at' => $now], $user);
         $this->success(['acknowledged' => true, 'acknowledged_by' => $actor, 'acknowledged_at' => $now]);
     }
+
+    /**
+     * Plural-form GET-list wrapper. Delegates to existing search().
+     *
+     * Added 2026-04-25 per ADR-0008 (EQMS plural-form canonical paths).
+     * Frontend HMV4 uses /api/v1/<plural-resource> via this wrapper;
+     * legacy /api/v1/eqms/<singular>/query continues to serve POST-body
+     * filtered queries.
+     */
+    public function query(string $key = '', ?string $default = null): ?string
+    {
+        if ($key !== '') {
+            return parent::query($key, $default);
+        }
+
+        $this->search();
+    }
 }

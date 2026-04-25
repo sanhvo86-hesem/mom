@@ -212,4 +212,76 @@ return static function (Router $router, string $dataDir): void {
     $router->get('/api/evidence/{id}/custody', EvidenceController::class, 'chainOfCustody');
     $router->get('/api/evidence/verify', EvidenceController::class, 'verifyChain');
     $router->get('/api/evidence/search', EvidenceController::class, 'search');
+
+    // EQMS plural-form REST aliases (ADR-0008, 2026-04-25)
+    // Frontend HMV4 Step 3 vocabulary uses these canonical paths.
+    // Existing /api/v1/eqms/<singular> paths remain live.
+
+    // NQCASE -> /api/v1/nonconformance-cases
+    $router->get('/api/v1/nonconformance-cases', EqmsNcrController::class, 'query');
+    $router->post('/api/v1/nonconformance-cases', EqmsNcrController::class, 'create');
+    $router->post('/api/v1/nonconformance-cases/{id}:contain', EqmsNcrController::class, 'actionContain');
+    $router->post('/api/v1/nonconformance-cases/{id}:investigate', EqmsNcrController::class, 'actionInvestigate');
+    $router->post('/api/v1/nonconformance-cases/{id}:close', EqmsNcrController::class, 'actionClose');
+    $router->post('/api/v1/nonconformance-cases/{id}:reopen', EqmsNcrController::class, 'actionReopen');
+    $router->get('/api/v1/nonconformance-cases/{id}', EqmsNcrController::class, 'detail');
+    $router->patch('/api/v1/nonconformance-cases/{id}', EqmsNcrController::class, 'update');
+    $router->get('/api/v1/nonconformance-cases/{id}/audit', EqmsNcrController::class, 'audit');
+    $router->get('/api/v1/nonconformance-cases/{id}/comments', EqmsNcrController::class, 'comments');
+    $router->post('/api/v1/nonconformance-cases/{id}/comments', EqmsNcrController::class, 'comments');
+    $router->get('/api/v1/nonconformance-cases/{id}/attachments', EqmsNcrController::class, 'attachments');
+    $router->post('/api/v1/nonconformance-cases/{id}/attachments', EqmsNcrController::class, 'attachments');
+
+    // CAPA -> /api/v1/capas
+    $router->get('/api/v1/capas', EqmsCapaController::class, 'query');
+    $router->post('/api/v1/capas', EqmsCapaController::class, 'create');
+    $router->post('/api/v1/capas/{id}:start-analysis', EqmsCapaController::class, 'actionStartAnalysis');
+    $router->post('/api/v1/capas/{id}:close', EqmsCapaController::class, 'actionClose');
+    $router->post('/api/v1/capas/{id}:cancel', EqmsCapaController::class, 'actionCancel');
+    $router->get('/api/v1/capas/{id}', EqmsCapaController::class, 'detail');
+    $router->patch('/api/v1/capas/{id}', EqmsCapaController::class, 'update');
+    $router->get('/api/v1/capas/{id}/audit', EqmsCapaController::class, 'audit');
+    $router->get('/api/v1/capas/{id}/comments', EqmsCapaController::class, 'comments');
+    $router->post('/api/v1/capas/{id}/comments', EqmsCapaController::class, 'comments');
+    $router->get('/api/v1/capas/{id}/attachments', EqmsCapaController::class, 'attachments');
+    $router->post('/api/v1/capas/{id}/attachments', EqmsCapaController::class, 'attachments');
+
+    // CDOC -> /api/v1/controlled-documents
+    $router->get('/api/v1/controlled-documents', EqmsDocumentsController::class, 'query');
+    $router->post('/api/v1/controlled-documents', EqmsDocumentsController::class, 'create');
+    $router->post('/api/v1/controlled-documents/{id}:approve', EqmsDocumentsController::class, 'actionApprove');
+    $router->post('/api/v1/controlled-documents/{id}:release', EqmsDocumentsController::class, 'actionRelease');
+    $router->get('/api/v1/controlled-documents/{id}', EqmsDocumentsController::class, 'detail');
+    $router->patch('/api/v1/controlled-documents/{id}', EqmsDocumentsController::class, 'update');
+    $router->get('/api/v1/controlled-documents/{id}/audit', EqmsDocumentsController::class, 'audit');
+    $router->get('/api/v1/controlled-documents/{id}/comments', EqmsDocumentsController::class, 'comments');
+    $router->post('/api/v1/controlled-documents/{id}/comments', EqmsDocumentsController::class, 'comments');
+    $router->get('/api/v1/controlled-documents/{id}/attachments', EqmsDocumentsController::class, 'attachments');
+    $router->post('/api/v1/controlled-documents/{id}/attachments', EqmsDocumentsController::class, 'attachments');
+
+    // INSP -> /api/v1/inspections
+    $router->get('/api/v1/inspections', EqmsInspectionController::class, 'query');
+    $router->post('/api/v1/inspections/{id}:flag-nonconformance', EqmsInspectionController::class, 'inprocessActionFlagNc');
+
+    // BREL -> /api/v1/batch-releases
+    $router->get('/api/v1/batch-releases', EqmsBatchReleaseController::class, 'query');
+    $router->post('/api/v1/batch-releases/{id}:approve-release', EqmsBatchReleaseController::class, 'actionApproveRelease');
+    $router->post('/api/v1/batch-releases/{id}:market-ship', EqmsBatchReleaseController::class, 'actionMarketShip');
+    $router->get('/api/v1/batch-releases/{id}', EqmsBatchReleaseController::class, 'detail');
+
+    // ECO -> /api/v1/engineering-changes
+    $router->get('/api/v1/engineering-changes', EqmsEngineeringChangeController::class, 'query');
+    $router->post('/api/v1/engineering-changes', EqmsEngineeringChangeController::class, 'create');
+    $router->get('/api/v1/engineering-changes/{id}', EqmsEngineeringChangeController::class, 'detail');
+    $router->patch('/api/v1/engineering-changes/{id}', EqmsEngineeringChangeController::class, 'update');
+    $router->get('/api/v1/engineering-changes/{id}/audit', EqmsEngineeringChangeController::class, 'audit');
+
+    // TRAIN -> /api/v1/training-records
+    $router->get('/api/v1/training-records', EqmsTrainingController::class, 'query');
+    $router->post('/api/v1/training-records', EqmsTrainingController::class, 'create');
+    $router->get('/api/v1/training-records/matrix', EqmsTrainingController::class, 'matrix');
+    $router->get('/api/v1/training-records/curricula', EqmsTrainingController::class, 'curricula');
+    $router->get('/api/v1/training-records/{id}', EqmsTrainingController::class, 'detail');
+    $router->patch('/api/v1/training-records/{id}', EqmsTrainingController::class, 'update');
+    $router->get('/api/v1/training-records/{id}/audit', EqmsTrainingController::class, 'audit');
 };

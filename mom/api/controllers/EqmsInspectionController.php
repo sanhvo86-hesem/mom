@@ -841,4 +841,26 @@ class EqmsInspectionController extends EqmsBaseController
         $this->emitQualityEvent('eqms.in_process_inspection.held', self::IP_ENTITY, $id, [], $user);
         $this->success(['inspection' => $this->loadInProcess($id)]);
     }
+
+    /**
+     * Plural-form GET-list wrapper. Delegates to existing inspection projections.
+     *
+     * Added 2026-04-25 per ADR-0008 (EQMS plural-form canonical paths).
+     * Frontend HMV4 uses /api/v1/<plural-resource> via this wrapper;
+     * legacy split inspection query paths continue to serve POST-body
+     * filtered queries.
+     */
+    public function query(string $key = '', ?string $default = null): ?string
+    {
+        if ($key !== '') {
+            return parent::query($key, $default);
+        }
+
+        $subtype = strtolower(trim((string)($_GET['subtype'] ?? $_GET['type'] ?? 'iqc')));
+        if (in_array($subtype, ['inprocess', 'in-process', 'in_process'], true)) {
+            $this->inprocessQuery();
+        }
+
+        $this->iqcQuery();
+    }
 }
