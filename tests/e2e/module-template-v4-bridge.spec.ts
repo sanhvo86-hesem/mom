@@ -28,4 +28,16 @@ test.describe('module-template-v4 bridge adapter', () => {
     expect(withContext.policy).toBe('redirect_record_context_only');
     expect(withContext.url).toContain('/ops/records/nonconformance-cases/NC-001?tab=overview');
   });
+
+  test('maps legacy training alias to canonical training-competency module', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const result = await page.evaluate(() => (window as any).Hmv4Bridge.resolveEqmsModule('training'));
+    expect(result.policy).toBe('redirect_then_deprecate');
+    expect(result.url).toContain('/ops/people-skill-ehs/training-competency');
+
+    const unmapped = await page.evaluate(() => (window as any).Hmv4Bridge.resolveEqmsModule('training-unknown'));
+    expect(unmapped.policy).toBe('unmapped_needs_decision');
+    expect(unmapped.url).toBeNull();
+    expect(unmapped.reason).toBe('no_eqms_alias');
+  });
 });

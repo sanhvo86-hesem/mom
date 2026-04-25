@@ -15,6 +15,11 @@ const fixturePages: string[] = [
   'authoritative-record-shell-nc-conflict.html',
   'authoritative-record-shell-nc-partial-access.html',
   'authoritative-record-shell-nc-degraded.html',
+  'workspace-training-matrix.html',
+  'workspace-training-matrix-empty.html',
+  'workspace-training-matrix-conflict.html',
+  'workspace-training-matrix-partial-access.html',
+  'workspace-training-matrix-degraded.html',
 ];
 
 for (const page of fixturePages) {

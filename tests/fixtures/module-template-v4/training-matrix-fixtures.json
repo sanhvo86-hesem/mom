@@ -1,0 +1,162 @@
+{
+  "version": "0.1",
+  "projectionId": "TRAIN-MATRIX-FIXTURE-001",
+  "route": "/ops/people-skill-ehs/training-competency/matrix",
+  "authorityClass": "projection",
+  "resourceFamily": "training-records",
+  "rootCode": "TRAIN",
+  "requiresReanchor": true,
+  "freshness": "fixture_current",
+  "reanchorMessage": "Open the training record before issuing or completing certification.",
+  "coverageIndex": {
+    "happyTrainingMatrix": "tests/fixtures/module-template-v4/pages/workspace-training-matrix.html",
+    "emptyMatrix": "tests/fixtures/module-template-v4/pages/workspace-training-matrix-empty.html",
+    "conflictMatrix": "tests/fixtures/module-template-v4/pages/workspace-training-matrix-conflict.html",
+    "partialAccessMatrix": "tests/fixtures/module-template-v4/pages/workspace-training-matrix-partial-access.html",
+    "degradedMatrix": "tests/fixtures/module-template-v4/pages/workspace-training-matrix-degraded.html"
+  },
+  "summary": {
+    "qualified": 4,
+    "expiring": 1,
+    "expired": 1,
+    "in_training": 1,
+    "not_required": 2
+  },
+  "qualifications": [
+    { "code": "Q-WELD-3G", "name": "Welding 3G" },
+    { "code": "Q-CMM-OP", "name": "CMM Operator" },
+    { "code": "Q-FORKLIFT", "name": "Forklift" },
+    { "code": "Q-ESD", "name": "ESD Awareness" }
+  ],
+  "operators": [
+    {
+      "id": "OP-2001",
+      "name": "Nguyen Van A",
+      "role": "Welder",
+      "team": "Assembly-1",
+      "cells": [
+        {
+          "qualification_code": "Q-WELD-3G",
+          "status": "qualified",
+          "last_certified_at": "2025-12-10",
+          "expires_at": "2026-12-10",
+          "training_record_id": "TR-1001",
+          "evidence_link": "/ops/records/training-records/TR-1001?tab=overview"
+        },
+        {
+          "qualification_code": "Q-CMM-OP",
+          "status": "not_required"
+        },
+        {
+          "qualification_code": "Q-FORKLIFT",
+          "status": "qualified",
+          "last_certified_at": "2025-08-04",
+          "expires_at": "2027-08-04",
+          "training_record_id": "TR-1002"
+        },
+        {
+          "qualification_code": "Q-ESD",
+          "status": "qualified",
+          "last_certified_at": "2026-02-01",
+          "expires_at": "2027-02-01",
+          "training_record_id": "TR-1003"
+        }
+      ]
+    },
+    {
+      "id": "OP-2002",
+      "name": "Tran Thi B",
+      "role": "Inspector",
+      "team": "Quality-Lab",
+      "cells": [
+        {
+          "qualification_code": "Q-WELD-3G",
+          "status": "not_required"
+        },
+        {
+          "qualification_code": "Q-CMM-OP",
+          "status": "expiring",
+          "last_certified_at": "2025-05-15",
+          "expires_at": "2026-05-15",
+          "training_record_id": "TR-1004",
+          "evidence_link": "/ops/records/training-records/TR-1004?tab=overview"
+        },
+        {
+          "qualification_code": "Q-FORKLIFT",
+          "status": "in_training",
+          "training_record_id": "TR-1005"
+        },
+        {
+          "qualification_code": "Q-ESD",
+          "status": "qualified",
+          "last_certified_at": "2026-01-20",
+          "expires_at": "2027-01-20",
+          "training_record_id": "TR-1006"
+        }
+      ]
+    },
+    {
+      "id": "OP-2003",
+      "name": "Le Van C",
+      "role": "Forklift Operator",
+      "team": "Logistics",
+      "cells": [
+        {
+          "qualification_code": "Q-WELD-3G",
+          "status": "not_required"
+        },
+        {
+          "qualification_code": "Q-CMM-OP",
+          "status": "not_required"
+        },
+        {
+          "qualification_code": "Q-FORKLIFT",
+          "status": "expired",
+          "last_certified_at": "2024-03-10",
+          "expires_at": "2026-03-10",
+          "training_record_id": "TR-1007",
+          "evidence_link": "/ops/records/training-records/TR-1007?tab=overview"
+        },
+        {
+          "qualification_code": "Q-ESD",
+          "status": "qualified",
+          "last_certified_at": "2025-11-22",
+          "expires_at": "2026-11-22",
+          "training_record_id": "TR-1008"
+        }
+      ]
+    }
+  ],
+  "states": {
+    "empty": {
+      "projectionId": "TRAIN-MATRIX-FIXTURE-EMPTY",
+      "freshness": "fixture_current",
+      "state": "empty",
+      "reanchorMessage": "No matrix mutation is available from an empty projection.",
+      "summary": { "qualified": 0, "expiring": 0, "expired": 0, "in_training": 0, "not_required": 0 },
+      "operators": []
+    },
+    "conflict": {
+      "projectionId": "TRAIN-MATRIX-FIXTURE-CONFLICT",
+      "freshness": "fixture_conflict",
+      "state": "conflict",
+      "reanchorMessage": "Conflict detected. Offline edits must be reconciled in the governed training record."
+    },
+    "partial_access": {
+      "projectionId": "TRAIN-MATRIX-FIXTURE-PARTIAL",
+      "freshness": "fixture_current",
+      "state": "partial_access",
+      "reanchorMessage": "Partial-access fixture. Some operators and qualifications are masked from this projection.",
+      "limitations": [
+        "Quality-Lab operators are restricted for the current role.",
+        "Q-WELD-3G column is masked in this fixture state."
+      ]
+    },
+    "degraded_offline": {
+      "projectionId": "TRAIN-MATRIX-FIXTURE-DEGRADED",
+      "freshness": "fixture_stale",
+      "state": "degraded_offline",
+      "reanchorMessage": "Projection is stale. Open training records before any governed action."
+    }
+  }
+}

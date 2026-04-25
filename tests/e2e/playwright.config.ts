@@ -5,7 +5,12 @@ export default defineConfig({
   testMatch: /module-template-v4.*\.spec\.ts/,
   timeout: 30_000,
   expect: {
-    timeout: 5_000
+    timeout: 5_000,
+    toHaveScreenshot: {
+      maxDiffPixels: 200,
+      threshold: 0.15,
+      animations: 'disabled'
+    }
   },
   fullyParallel: false,
   forbidOnly: Boolean(process.env.CI),
@@ -15,6 +20,7 @@ export default defineConfig({
     ['html', { outputFolder: '../../.codex-playwright/module-template-v4-report', open: 'never' }]
   ],
   outputDir: '../../.codex-playwright/module-template-v4-results',
+  snapshotPathTemplate: '__snapshots__/{testFilePath}/{arg}-{projectName}{ext}',
   use: {
     baseURL: 'http://127.0.0.1:8091',
     trace: 'retain-on-failure',
@@ -33,6 +39,14 @@ export default defineConfig({
     {
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] }
+    },
+    {
+      name: 'firefox',
+      use: { ...devices['Desktop Firefox'] }
+    },
+    {
+      name: 'webkit',
+      use: { ...devices['Desktop Safari'] }
     }
   ]
 });

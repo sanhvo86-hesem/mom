@@ -155,4 +155,122 @@ test.describe('module-template-v4 preview smoke', () => {
     );
     expect(enabledMutationCount).toBe(0);
   });
+
+  test('parses training matrix route as workspace with allowed view query', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const parsed = await page.evaluate(() =>
+      (window as any).Hmv4Routes.parsePath('/ops/people-skill-ehs/training-competency/matrix', '?view=default'),
+    );
+    expect(parsed.routeClass).toBe('WS');
+    expect(parsed.params.domain).toBe('people-skill-ehs');
+    expect(parsed.params.module).toBe('training-competency');
+    expect(parsed.params.workspace_family).toBe('matrix');
+    expect(parsed.query.view).toBe('default');
+    expect(parsed.rejectedQuery).toEqual([]);
+  });
+
+  test('renders training matrix as a read-only projection workspace', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/workspace-training-matrix.html');
+    const matrix = page.locator('[data-hmv4-training-matrix]');
+    await expect(matrix).toBeVisible();
+    await expect(matrix).toHaveAttribute('data-route-class', 'WS');
+    await expect(matrix).toHaveAttribute('data-authority-class', 'projection');
+    await expect(matrix).toHaveAttribute('data-resource-family', 'training-records');
+    await expect(matrix).toHaveAttribute('data-root-code', 'TRAIN');
+    await expect(matrix).toHaveAttribute('data-requires-reanchor', 'true');
+    await expect(matrix).toHaveAttribute('data-projection-state', 'current');
+    await expect(page.getByRole('heading', { name: 'Training matrix' })).toBeVisible();
+
+    const grid = page.locator('[data-hmv4-training-matrix-grid]');
+    await expect(grid).toBeVisible();
+    await expect(grid).toHaveAttribute('role', 'grid');
+    await expect(page.locator('[data-hmv4-training-operator]')).toHaveCount(3);
+    await expect(page.locator('[data-hmv4-training-qual]')).toHaveCount(4);
+
+    const statusTexts = await page.locator('[data-hmv4-training-status-text]').allTextContents();
+    expect(statusTexts).toContain('qualified');
+    expect(statusTexts).toContain('expiring');
+    expect(statusTexts).toContain('expired');
+    expect(statusTexts).toContain('in_training');
+    expect(statusTexts).toContain('not_required');
+
+    const mutationButtons = page.locator('[data-hmv4-mutation-intent]');
+    await expect(mutationButtons).toHaveCount(3);
+    const enabledMutationCount = await mutationButtons.evaluateAll((buttons) =>
+      buttons.filter((button) => !(button as HTMLButtonElement).disabled).length,
+    );
+    expect(enabledMutationCount).toBe(0);
+
+    const recordHrefs = await page.locator('[data-hmv4-record-link]').evaluateAll((nodes) =>
+      nodes.map((n) => (n as HTMLAnchorElement).getAttribute('href') || ''),
+    );
+    expect(recordHrefs.some((h) => h.startsWith('/ops/records/training-records/'))).toBeTruthy();
+    expect(recordHrefs.some((h) => h.includes('?tab=overview'))).toBeTruthy();
+  });
+
+  test('renders empty training matrix without enabling mutation', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/workspace-training-matrix-empty.html');
+    const matrix = page.locator('[data-hmv4-training-matrix]');
+    await expect(matrix).toBeVisible();
+    await expect(matrix).toHaveAttribute('data-projection-state', 'empty');
+    await expect(page.locator('[data-hmv4-training-matrix-grid]')).toHaveCount(0);
+    await expect(page.locator('[data-hmv4-training-empty]')).toContainText('No operators in scope');
+    const enabledMutationCount = await page.locator('[data-hmv4-mutation-intent]').evaluateAll((buttons) =>
+      buttons.filter((button) => !(button as HTMLButtonElement).disabled).length,
+    );
+    expect(enabledMutationCount).toBe(0);
+  });
+
+  test('renders conflict training matrix with visible conflict text', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/workspace-training-matrix-conflict.html');
+    const matrix = page.locator('[data-hmv4-training-matrix]');
+    await expect(matrix).toHaveAttribute('data-projection-state', 'conflict');
+    await expect(matrix).toHaveAttribute('data-projection-freshness', 'fixture_conflict');
+    await expect(page.locator('[data-hmv4-training-freshness]')).toContainText('conflict / fixture_conflict');
+    await expect(page.getByText('Conflict detected.')).toBeVisible();
+    const enabledMutationCount = await page.locator('[data-hmv4-mutation-intent]').evaluateAll((buttons) =>
+      buttons.filter((button) => !(button as HTMLButtonElement).disabled).length,
+    );
+    expect(enabledMutationCount).toBe(0);
+  });
+
+  test('renders partial-access training matrix with visible limitation', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/workspace-training-matrix-partial-access.html');
+    const matrix = page.locator('[data-hmv4-training-matrix]');
+    await expect(matrix).toHaveAttribute('data-projection-state', 'partial_access');
+    await expect(page.locator('[data-hmv4-training-access]')).toContainText('Quality-Lab operators are restricted');
+    await expect(page.locator('[data-hmv4-training-operator]')).toHaveCount(1);
+    await expect(page.locator('[data-hmv4-training-qual]')).toHaveCount(2);
+    await expect(page.locator('[data-hmv4-training-filters]')).toContainText('scope: logistics');
+    const enabledMutationCount = await page.locator('[data-hmv4-mutation-intent]').evaluateAll((buttons) =>
+      buttons.filter((button) => !(button as HTMLButtonElement).disabled).length,
+    );
+    expect(enabledMutationCount).toBe(0);
+  });
+
+  test('renders degraded training matrix with visible stale state', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/workspace-training-matrix-degraded.html');
+    const matrix = page.locator('[data-hmv4-training-matrix]');
+    await expect(matrix).toHaveAttribute('data-projection-state', 'degraded_offline');
+    await expect(matrix).toHaveAttribute('data-projection-freshness', 'fixture_stale');
+    await expect(page.locator('[data-hmv4-training-freshness]')).toContainText('degraded_offline / fixture_stale');
+    const recordHref = await page.locator('[data-hmv4-record-link]').first().getAttribute('href');
+    expect(recordHref).toContain('/ops/records/training-records/');
+    expect(recordHref).toContain('?tab=overview');
+    const enabledMutationCount = await page.locator('[data-hmv4-mutation-intent]').evaluateAll((buttons) =>
+      buttons.filter((button) => !(button as HTMLButtonElement).disabled).length,
+    );
+    expect(enabledMutationCount).toBe(0);
+  });
+
+  test('training matrix record-open links route to the training-records authority', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/workspace-training-matrix.html');
+    const recordHrefs = await page.locator('[data-hmv4-record-link]').evaluateAll((nodes) =>
+      nodes.map((n) => (n as HTMLAnchorElement).getAttribute('href') || ''),
+    );
+    expect(recordHrefs.length).toBeGreaterThan(0);
+    for (const href of recordHrefs) {
+      expect(href).toMatch(/^\/ops\/records\/training-records\/[A-Za-z0-9_-]+\?tab=overview$/);
+    }
+  });
 });

@@ -3,6 +3,13 @@
 **Generated**: 2026-04-25 (parallel research, no GPT Pro input)
 **Purpose**: Backend gap analysis for slice migration sequencing.
 
+> **Corrections issued (2026-04-25)** — a code-level verification pass found
+> three RED→YELLOW upgrades (QUO, PREC, MWO), two description corrections
+> (CPO, DISP), and one bridge-alias example syntax fix. Phase A sequencing
+> (Slice 3 TRAIN → 4 CAPA → 5 CDOC) is unchanged. The fact-checked version
+> is in `V20_API_READINESS_MATRIX_VERIFICATION_NOTE.md`. Treat that note as
+> the source of truth; this document remains for ADR-0007 / ADR-0008 lineage.
+
 ## Executive Summary
 
 Out of 18 Wave 1 roots:

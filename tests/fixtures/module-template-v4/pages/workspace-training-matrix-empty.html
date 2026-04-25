@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>HMV4 Fixture</title>
+<link rel="stylesheet" href="../../../../mom/styles/module-template-v4.tokens.css">
+<link rel="stylesheet" href="../../../../mom/styles/module-template-v4.css">
+</head><body>
+<div id="hmv4-fixture-root"></div>
+<script type="application/json" data-hmv4-fixture-route>
+{
+  "fixtureId": "workspace-training-matrix-empty",
+  "path": "/ops/people-skill-ehs/training-competency/matrix?view=empty",
+  "routeClass": "WS",
+  "expectedRenderer": "renderTrainingMatrixWorkspace",
+  "coverage": ["training_matrix_empty", "required_training_matrix_empty_view"]
+}
+</script>
+<script type="application/json" data-hmv4-training-matrix-fixture>
+{
+  "projectionId": "TRAIN-MATRIX-FIXTURE-EMPTY",
+  "route": "/ops/people-skill-ehs/training-competency/matrix?view=empty",
+  "authorityClass": "projection",
+  "resourceFamily": "training-records",
+  "rootCode": "TRAIN",
+  "requiresReanchor": true,
+  "freshness": "fixture_current",
+  "state": "empty",
+  "reanchorMessage": "No matrix mutation is available from an empty projection.",
+  "summary": { "qualified": 0, "expiring": 0, "expired": 0, "in_training": 0, "not_required": 0 },
+  "qualifications": [
+    { "code": "Q-WELD-3G", "name": "Welding 3G" },
+    { "code": "Q-CMM-OP", "name": "CMM Operator" }
+  ],
+  "operators": []
+}
+</script>
+<script>
+(function(){
+  var node = document.querySelector('[data-hmv4-training-matrix-fixture]');
+  if(!node) return;
+  try {
+    window.HMV4_TRAINING_MATRIX_PROJECTION = JSON.parse(node.textContent || '{}');
+  } catch(e) {
+    console.warn('[HMV4 fixture] invalid training matrix projection', e);
+  }
+})();
+</script>
+<script>window.HMV4_PREVIEW_ENABLED=true;</script>
+<script src="../../../../mom/scripts/portal/71-module-template-v4-routes.js"></script>
+<script src="../../../../mom/scripts/portal/72-module-template-v4-bridge.js"></script>
+<script src="../../../../mom/scripts/portal/73-module-template-v4-renderers.js"></script>
+<script src="../../../../mom/scripts/portal/70-module-template-v4-hydration.js"></script>
+<script>
+(function(){
+  var node = document.querySelector('[data-hmv4-fixture-route]');
+  if(!node) return;
+  try {
+    var route = JSON.parse(node.textContent || '{}');
+    window.HMV4_FIXTURE_ROUTE_CONTEXT = route;
+    if(route.path && window.history) history.replaceState(history.state || {}, '', route.path);
+  } catch(e) {
+    console.warn('[HMV4 fixture] invalid route context', e);
+  }
+})();
+</script>
+</body></html>
