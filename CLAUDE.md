@@ -162,14 +162,14 @@ render so the edit will be lost.
 ## AI Context Loading Protocol
 
 **ALWAYS read the index files FIRST before opening any source file.**
-This repository has 54 controllers, 122 services, 137 SQL migrations, and 67 contract objects.
+This repository has 89 controllers, 124 services, 158 SQL migrations, and 68 contract objects (across 839 tables and 12 domains).
 The `.ai/` directory is a pre-built knowledge index that lets you find the right file in seconds.
 
 ### Step-by-step context loading
 
 1. **`.ai/repo-map.json`** — Start here. Project topology, namespace map, infra services, file counts.
 2. **`.ai/route-map.json`** — Find which controller + method handles a given route or action key.
-3. **`.ai/db-map/index.json`** — Grep for table name to find its domain. Then read `.ai/db-map/<domain>.json` for full details. Do NOT read the full `.ai/db-map.json` (280K) unless you need cross-domain analysis.
+3. **`.ai/db-map/index.json`** — Grep for table name to find its domain. Then read `.ai/db-map/<domain>.json` for full details. Do NOT read the full `.ai/db-map.json` (~305K) unless you need cross-domain analysis.
 4. **`.ai/contracts-map.json`** — Find which domain owns a resource and which table stores it.
 5. **`.ai/symbols.json`** — Grep for a class or method name to find its file path. Do NOT read the full file.
 6. **`.ai/module-summaries/<domain>.md`** — Business rules, gotchas, entry points for that domain.
