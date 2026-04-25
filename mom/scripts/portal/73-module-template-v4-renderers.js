@@ -60,8 +60,130 @@
       '<tr><td data-label="ID">DEMO-001</td><td data-label="Title">Sample '+esc(rf)+' record</td><td data-label="Status">draft</td><td data-label="Open"><a href="/ops/records/'+esc(rf)+'/DEMO-001">Open</a></td></tr>'+
       '</tbody></table></section>';
   }
+  var nonconformanceTabs = ['overview','investigation','evidence','related','audit','signatures'];
+  function normalizeNcTab(tab){
+    return nonconformanceTabs.indexOf(tab) >= 0 ? tab : 'overview';
+  }
+  function defaultNonconformanceRecord(recordId){
+    return {
+      recordId: recordId || 'NC-001',
+      rootCode: 'NQCASE',
+      title: 'Dimensional nonconformance on operation OP-30',
+      subtype: 'Material nonconformance',
+      status: 'triaged',
+      severity: 'major',
+      state: 'current',
+      freshness: 'fixture_current',
+      owner: 'QA Engineer',
+      source: 'In-process inspection',
+      part: 'PN-2042 Rev B',
+      lot: 'LOT-2026-04',
+      workOrder: 'WO-3011',
+      stateMessage: 'Read-only prototype shell. Governed actions must remain outside this fixture.',
+      lifecycle: [
+        ['opened','complete'],
+        ['triaged','current'],
+        ['investigation','pending'],
+        ['disposition','locked'],
+        ['closure','locked']
+      ],
+      overview: [
+        'Nonconformance identified during in-process inspection.',
+        'Containment and disposition are represented as read-only placeholders in this prototype.'
+      ],
+      investigation: [
+        'Investigation placeholder: cause analysis, containment notes, and measurement review will re-anchor to governed records.',
+        'No investigation submission or workflow transition is available from this shell.'
+      ],
+      evidence: [
+        'Evidence placeholder: photos, measurements, and attachments are displayed as read-only fixture rows.',
+        'Evidence upload and versioning are out of scope for this slice.'
+      ],
+      related: [
+        ['Work order','WO-3011'],
+        ['Dispatch target','DISP-011'],
+        ['Potential CAPA','read-only placeholder']
+      ],
+      audit: [
+        'Fixture opened for preview.',
+        'No audit event is written by this prototype shell.'
+      ],
+      signatures: [
+        'Disposition signature: not executed in prototype.',
+        'Closure signature: not executed in prototype.'
+      ],
+      limitations: []
+    };
+  }
+  function mergeRecord(base, override){
+    override = override || {};
+    Object.keys(override).forEach(function(k){ base[k] = override[k]; });
+    return base;
+  }
+  function getNonconformanceRecord(route){
+    var p = route.params || {};
+    var recordId = p.record_id || 'NC-001';
+    var fixture = window.HMV4_NONCONFORMANCE_CASE_FIXTURE || readJsonFixture('[data-hmv4-nonconformance-case-fixture]') || {};
+    var record = defaultNonconformanceRecord(recordId);
+    if(fixture.records && fixture.records[recordId]) mergeRecord(record, fixture.records[recordId]);
+    if(fixture.record) mergeRecord(record, fixture.record);
+    if(fixture.state) record.state = fixture.state;
+    if(fixture.freshness) record.freshness = fixture.freshness;
+    if(fixture.stateMessage) record.stateMessage = fixture.stateMessage;
+    if(fixture.limitations) record.limitations = fixture.limitations;
+    record.recordId = recordId;
+    record.rootCode = 'NQCASE';
+    return record;
+  }
+  function renderLifecycle(record){
+    var stages = Array.isArray(record.lifecycle) ? record.lifecycle : [];
+    return '<ol class="hmv4-lifecycle-strip" data-hmv4-lifecycle-strip aria-label="Nonconformance lifecycle">' + stages.map(function(stage){
+      return '<li data-lifecycle-state="'+esc(stage[1] || 'pending')+'"><strong>'+esc(stage[0])+'</strong><span>'+esc(stage[1] || 'pending')+'</span></li>';
+    }).join('') + '</ol>';
+  }
+  function renderReadOnlyActions(){
+    return '<div class="hmv4-grid" data-hmv4-nc-readonly-actions>'+
+      '<article class="hmv4-card"><h3>Disposition</h3><p>Approval is unavailable from this read-only prototype.</p><button type="button" disabled data-hmv4-mutation-intent="nqcase-approve-disposition">Approve disposition disabled</button></article>'+
+      '<article class="hmv4-card"><h3>CAPA</h3><p>CAPA creation and closure are out of scope.</p><button type="button" disabled data-hmv4-mutation-intent="nqcase-create-capa">Create CAPA disabled</button></article>'+
+      '<article class="hmv4-card"><h3>Signature</h3><p>E-sign challenge execution is out of scope.</p><button type="button" disabled data-hmv4-mutation-intent="nqcase-esign">E-sign disabled</button></article>'+
+      '</div>';
+  }
+  function renderNcPanel(tab, record){
+    if(tab === 'overview'){
+      return '<div class="hmv4-section"><h3>Overview</h3>'+record.overview.map(function(x){return '<p>'+esc(x)+'</p>';}).join('')+
+        '<dl class="hmv4-record-facts"><dt>Subtype</dt><dd>'+esc(record.subtype)+'</dd><dt>Status</dt><dd>'+esc(record.status)+'</dd><dt>Severity</dt><dd>'+esc(record.severity)+'</dd><dt>Source</dt><dd>'+esc(record.source)+'</dd><dt>Part</dt><dd>'+esc(record.part)+'</dd><dt>Lot</dt><dd>'+esc(record.lot)+'</dd><dt>Work order</dt><dd>'+esc(record.workOrder)+'</dd></dl>'+renderReadOnlyActions()+'</div>';
+    }
+    if(tab === 'investigation'){
+      return '<div class="hmv4-section"><h3>Investigation</h3>'+record.investigation.map(function(x){return '<p>'+esc(x)+'</p>';}).join('')+'</div>';
+    }
+    if(tab === 'evidence'){
+      return '<div class="hmv4-section"><h3>Evidence</h3>'+record.evidence.map(function(x){return '<p>'+esc(x)+'</p>';}).join('')+'</div>';
+    }
+    if(tab === 'related'){
+      return '<div class="hmv4-section"><h3>Related records</h3><table class="hmv4-data-table"><thead><tr><th>Type</th><th>Reference</th></tr></thead><tbody>'+record.related.map(function(x){return '<tr><td>'+esc(x[0])+'</td><td>'+esc(x[1])+'</td></tr>';}).join('')+'</tbody></table></div>';
+    }
+    if(tab === 'audit'){
+      return '<div class="hmv4-section"><h3>Audit</h3>'+record.audit.map(function(x){return '<p>'+esc(x)+'</p>';}).join('')+'</div>';
+    }
+    return '<div class="hmv4-section"><h3>Signatures</h3>'+record.signatures.map(function(x){return '<p>'+esc(x)+'</p>';}).join('')+'</div>';
+  }
+  function renderNonconformanceRecord(route){
+    var p = route.params, tab = normalizeNcTab(route.query.tab || 'overview');
+    var record = getNonconformanceRecord(route);
+    var state = record.state || 'current';
+    var feedbackState = state === 'current' ? 'info' : 'warning';
+    return '<article class="hmv4-record-shell hmv4-record-shell--display hmv4-record-shell--nonconformance" data-hmv4-nonconformance-record data-route-class="AR" data-resource-family="nonconformance-cases" data-root-code="NQCASE" data-record-id="'+esc(p.record_id)+'" data-authority-class="authoritative" data-query-tab="'+esc(tab)+'" data-fixture-state="'+esc(state)+'" data-fixture-freshness="'+esc(record.freshness || 'fixture_current')+'">' +
+      '<section class="hmv4-record-identity"><h1 class="hmv4-record-title">'+esc(record.recordId)+'</h1><p class="hmv4-record-subtitle">'+esc(record.title)+'</p><div class="hmv4-chip-row"><span class="hmv4-chip">'+esc(record.subtype)+'</span><span class="hmv4-chip">'+esc(record.status)+'</span><span class="hmv4-chip">'+esc(record.severity)+'</span></div></section>'+
+      '<div class="hmv4-feedback" data-feedback-state="'+esc(feedbackState)+'" role="status" data-hmv4-nc-state><strong>Record posture</strong><p>'+esc(state)+' / '+esc(record.freshness || 'fixture_current')+'. '+esc(record.stateMessage || 'Read-only fixture shell.')+'</p></div>'+
+      (record.limitations && record.limitations.length ? '<div class="hmv4-feedback" data-feedback-state="warning" role="status" data-hmv4-nc-access><strong>Access limitation</strong><p>'+record.limitations.map(esc).join(' ')+'</p></div>' : '')+
+      renderLifecycle(record)+
+      '<div class="hmv4-tablist" role="tablist" aria-label="Nonconformance case details">'+nonconformanceTabs.map(function(t){return '<button class="hmv4-tab" role="tab" aria-selected="'+(t===tab)+'" data-tab="'+t+'" id="tab-'+t+'">'+esc(t)+'</button>';}).join('')+'</div>'+
+      nonconformanceTabs.map(function(t){return '<section class="hmv4-tabpanel" role="tabpanel" aria-labelledby="tab-'+t+'" '+(t===tab?'':'hidden')+' data-hmv4-nc-panel="'+esc(t)+'">'+renderNcPanel(t, record)+'</section>';}).join('')+
+      '</article>';
+  }
   function renderRecord(route){
     var p = route.params, tab = route.query.tab || 'overview';
+    if(p.resource_family === 'nonconformance-cases') return renderNonconformanceRecord(route);
     var tabs = ['overview','workflow','related','evidence','comments','audit'];
     return '<article class="hmv4-record-shell hmv4-record-shell--display" data-route-class="AR" data-resource-family="'+esc(p.resource_family)+'" data-record-id="'+esc(p.record_id)+'" data-authority-class="authoritative" data-query-tab="'+esc(tab)+'">' +
       '<section class="hmv4-record-identity"><h1 class="hmv4-record-title">'+esc(p.record_id)+'</h1><p class="hmv4-record-subtitle">'+esc(p.resource_family)+' authoritative record shell</p></section>'+
@@ -167,5 +289,5 @@
     if(!nav) return;
     nav.innerHTML = '<div class="hmv4-nav-section"><h2 class="hmv4-nav-section-title">Domains</h2>' + domains.map(function(d){ return '<a class="hmv4-nav-link" href="/ops/'+esc(d[0])+'">'+esc(d[1])+'</a>'; }).join('') + '</div>';
   }
-  window.Hmv4Renderers = { renderRoute: renderRoute, applyShell: applyShell, renderNav: renderNav, renderDispatchBoardWorkspace: renderDispatchBoardWorkspace, domains: domains, modules: modules };
+  window.Hmv4Renderers = { renderRoute: renderRoute, applyShell: applyShell, renderNav: renderNav, renderDispatchBoardWorkspace: renderDispatchBoardWorkspace, renderNonconformanceRecord: renderNonconformanceRecord, domains: domains, modules: modules };
 })();

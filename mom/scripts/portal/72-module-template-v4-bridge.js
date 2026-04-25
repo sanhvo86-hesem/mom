@@ -46,8 +46,19 @@
     var key = String(pageKey || '').trim();
     return pageKeyAliasMap[key] || { policy:'unmapped_needs_decision', url:null, reason:'no_page_key_alias' };
   }
-  function resolveEqmsModule(moduleId){
+  function getRecordContextId(context){
+    context = context || {};
+    return context.recordId || context.record_id || context.id || context.caseId || context.case_id || null;
+  }
+  function resolveEqmsModule(moduleId, context){
     var key = String(moduleId || '').trim();
+    var recordId = getRecordContextId(context);
+    if((key === 'ncr' || key === 'deviations') && recordId){
+      return {
+        policy:'redirect_record_context_only',
+        url:u('AR',{resource_family:'nonconformance-cases', record_id:recordId},{tab:(context && context.tab) || 'overview'})
+      };
+    }
     return eqmsModuleAliasMap[key] ? { policy:'redirect_then_deprecate', url:eqmsModuleAliasMap[key] } : { policy:'unmapped_needs_decision', url:null, reason:'no_eqms_alias' };
   }
   function bridgeBannerHtml(res){
