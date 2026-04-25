@@ -466,4 +466,167 @@ test.describe('CDOC record shell (Slice 5)', () => {
     const items = page.locator('[data-hmv4-cdoc-lifecycle] li');
     await expect(items).toHaveCount(7);
   });
+
+  // ── BREL (Slice 7) ────────────────────────────────────────────────────────
+
+  const brelTabFixtures: [string, string][] = [
+    ['release-package', 'authoritative-record-shell-brel-release-package.html'],
+    ['quality-evidence', 'authoritative-record-shell-brel-quality-evidence.html'],
+    ['genealogy',        'authoritative-record-shell-brel-genealogy.html'],
+    ['shipment-readiness','authoritative-record-shell-brel-shipment-readiness.html'],
+    ['related',          'authoritative-record-shell-brel-related.html'],
+    ['audit',            'authoritative-record-shell-brel-audit.html'],
+    ['signatures',       'authoritative-record-shell-brel-signatures.html'],
+  ];
+
+  test('renders BREL overview tab as authoritative release shell', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-brel-overview.html');
+    const root = page.locator('[data-hmv4-brel-record]');
+    await expect(root).toBeVisible();
+    await expect(root).toHaveAttribute('data-route-class', 'AR');
+    await expect(root).toHaveAttribute('data-resource-family', 'batch-releases');
+    await expect(root).toHaveAttribute('data-root-code', 'BREL');
+    await expect(root).toHaveAttribute('data-record-id', 'BREL-001');
+    await expect(root).toHaveAttribute('data-authority-class', 'authoritative');
+    await expect(page.locator('[data-hmv4-brel-panel="overview"]:not([hidden])')).toBeVisible();
+  });
+
+  for (const [tab, fixturePage] of brelTabFixtures) {
+    test(`renders BREL ${tab} tab as read-only authoritative shell`, async ({ page }) => {
+      await page.goto(`/tests/fixtures/module-template-v4/pages/${fixturePage}`);
+      const shell = page.locator('[data-hmv4-brel-record]');
+      await expect(shell).toBeVisible();
+      await expect(shell).toHaveAttribute('data-route-class', 'AR');
+      await expect(shell).toHaveAttribute('data-resource-family', 'batch-releases');
+      await expect(shell).toHaveAttribute('data-root-code', 'BREL');
+      await expect(shell).toHaveAttribute('data-record-id', 'BREL-001');
+      await expect(page.locator(`[data-hmv4-brel-panel="${tab}"]:not([hidden])`)).toBeVisible();
+      await expect(page.locator('[data-hmv4-mutation-intent]:not([disabled])')).toHaveCount(0);
+    });
+  }
+
+  test('BREL signatures tab shows 2-person rule status', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-brel-signatures.html');
+    const approvers = page.locator('[data-hmv4-brel-approver]');
+    await expect(approvers).toHaveCount(2);
+  });
+
+  test('BREL release-package tab links to all evidence records', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-brel-release-package.html');
+    await expect(page.locator('a[href*="records/inspections/INSP-001"]')).toBeVisible();
+    await expect(page.locator('a[href*="records/nonconformance-cases/NC-001"]')).toBeVisible();
+    await expect(page.locator('a[href*="records/capas/CAPA-001"]')).toBeVisible();
+  });
+
+  test('BREL ALL mutation intents disabled (release safety)', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-brel-overview.html');
+    await expect(page.locator('[data-hmv4-mutation-intent]:not([disabled])')).toHaveCount(0);
+    for (const intent of ['brel-approve-release','brel-market-ship','brel-recall','brel-esign-2person']) {
+      await expect(page.locator(`[data-hmv4-mutation-intent="${intent}"]`)).toHaveAttribute('disabled', '');
+    }
+  });
+
+  test('BREL conflict state sets fixture-state and stateMessage', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-brel-conflict.html');
+    const shell = page.locator('[data-hmv4-brel-record]');
+    await expect(shell).toHaveAttribute('data-fixture-state', 'conflict');
+    await expect(shell).toHaveAttribute('data-fixture-freshness', 'fixture_conflict');
+    await expect(page.locator('[data-hmv4-brel-state]')).toContainText('Conflict');
+  });
+
+  test('BREL partial-access shows limitation notice', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-brel-partial-access.html');
+    await expect(page.locator('[data-hmv4-brel-partial]')).toBeVisible();
+    await expect(page.locator('[data-hmv4-brel-partial]')).toContainText('Approver names masked');
+  });
+
+  test('BREL degraded state sets stale freshness and disables mutation', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-brel-degraded.html');
+    const shell = page.locator('[data-hmv4-brel-record]');
+    await expect(shell).toHaveAttribute('data-fixture-state', 'degraded');
+    await expect(shell).toHaveAttribute('data-fixture-freshness', 'fixture_stale');
+    await expect(page.locator('[data-hmv4-brel-state]')).toContainText('Degraded');
+    await expect(page.locator('[data-hmv4-mutation-intent]:not([disabled])')).toHaveCount(0);
+  });
+
+  test('BREL lifecycle strip renders all 7 states', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-brel-overview.html');
+    const items = page.locator('[data-hmv4-brel-lifecycle] li');
+    await expect(items).toHaveCount(7);
+  });
+});
+
+test.describe('INSP record shell (Slice 6)', () => {
+  test('renders INSP overview tab with required attributes', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-insp-overview.html');
+    const root = page.locator('[data-hmv4-insp-record]');
+    await expect(root).toBeVisible();
+    await expect(root).toHaveAttribute('data-route-class', 'AR');
+    await expect(root).toHaveAttribute('data-resource-family', 'inspections');
+    await expect(root).toHaveAttribute('data-root-code', 'INSP');
+    await expect(root).toHaveAttribute('data-authority-class', 'authoritative');
+    await expect(root).toHaveAttribute('data-record-id', 'INSP-001');
+  });
+
+  for (const tab of ['sample-results', 'nonconformance-flags', 'evidence', 'related', 'audit', 'signatures']) {
+    test(`renders INSP ${tab} tab panel`, async ({ page }) => {
+      await page.goto(`/tests/fixtures/module-template-v4/pages/authoritative-record-shell-insp-${tab}.html`);
+      await expect(page.locator(`[data-hmv4-insp-panel="${tab}"]:not([hidden])`)).toBeVisible();
+    });
+  }
+
+  test('INSP all mutation launchers are disabled', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-insp-overview.html');
+    const enabled = await page.locator('[data-hmv4-insp-launchers] [data-hmv4-mutation-intent]').evaluateAll(
+      (buttons) => buttons.filter((b) => !(b as HTMLButtonElement).disabled).length,
+    );
+    expect(enabled).toBe(0);
+  });
+
+  test('INSP overview tab renders characteristics table', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-insp-overview.html');
+    const panel = page.locator('[data-hmv4-insp-panel="overview"]:not([hidden])');
+    await expect(panel).toBeVisible();
+    await expect(panel.locator('table.hmv4-data-table')).toBeVisible();
+  });
+
+  test('INSP sample-results tab renders result cards with pass/fail judgments', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-insp-sample-results.html');
+    const panel = page.locator('[data-hmv4-insp-panel="sample-results"]:not([hidden])');
+    await expect(panel).toBeVisible();
+    await expect(panel.locator('[data-hmv4-status]')).not.toHaveCount(0);
+  });
+
+  test('INSP nonconformance-flags tab links to escalated NC', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-insp-nonconformance-flags.html');
+    const ncLink = page.locator('[data-hmv4-record-open="nonconformance-cases"][data-hmv4-record-id="NC-001"]');
+    await expect(ncLink).toBeVisible();
+    await expect(ncLink).toHaveAttribute('href', /\/ops\/records\/nonconformance-cases\/NC-001/);
+  });
+
+  test('INSP conflict state sets data-fixture-state and freshness', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-insp-conflict.html');
+    await expect(page.locator('[data-hmv4-insp-record]')).toHaveAttribute('data-fixture-state', 'conflict');
+    await expect(page.locator('[data-hmv4-insp-record]')).toHaveAttribute('data-fixture-freshness', 'fixture_conflict');
+  });
+
+  test('INSP partial-access state shows partial notice', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-insp-partial-access.html');
+    await expect(page.locator('[data-hmv4-insp-partial]')).toBeVisible();
+    await expect(page.locator('[data-hmv4-insp-partial]')).toContainText('Partial access');
+  });
+
+  test('INSP degraded state has no enabled mutation launchers', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-insp-degraded.html');
+    const enabled = await page.locator('[data-hmv4-mutation-intent]').evaluateAll(
+      (buttons) => buttons.filter((b) => !(b as HTMLButtonElement).disabled).length,
+    );
+    expect(enabled).toBe(0);
+  });
+
+  test('INSP lifecycle strip renders all 5 states', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-insp-overview.html');
+    const items = page.locator('[data-hmv4-insp-lifecycle] li');
+    await expect(items).toHaveCount(5);
+  });
 });

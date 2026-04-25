@@ -71,4 +71,30 @@ test.describe('module-template-v4 bridge adapter', () => {
     expect(withContext.policy).toBe('redirect_record_context_only');
     expect(withContext.url).toContain('/ops/records/controlled-documents/CDOC-001?tab=overview');
   });
+
+  test('maps insp to module landing without record context', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const noContext = await page.evaluate(() => (window as any).Hmv4Bridge.resolveEqmsModule('insp'));
+    expect(noContext.policy).toBe('redirect_then_deprecate');
+    expect(noContext.url).toContain('/ops/quality-operations/inspection-spc');
+    expect(noContext.url).not.toContain('/ops/records/inspections/');
+  });
+
+  test('maps insp to record shell only with explicit record context', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const withContext = await page.evaluate(() =>
+      (window as any).Hmv4Bridge.resolveEqmsModule('insp', { recordId: 'INSP-001', tab: 'overview' }),
+    );
+    expect(withContext.policy).toBe('redirect_record_context_only');
+    expect(withContext.url).toContain('/ops/records/inspections/INSP-001?tab=overview');
+  });
+
+  test('maps legacy iqc alias same as insp with record context', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const withContext = await page.evaluate(() =>
+      (window as any).Hmv4Bridge.resolveEqmsModule('iqc', { recordId: 'INSP-001', tab: 'sample-results' }),
+    );
+    expect(withContext.policy).toBe('redirect_record_context_only');
+    expect(withContext.url).toContain('/ops/records/inspections/INSP-001?tab=sample-results');
+  });
 });

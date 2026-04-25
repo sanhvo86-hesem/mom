@@ -32,6 +32,8 @@
     concessions: u('ML',{domain:'quality-operations', module:'quality-case-management'}),
     capa: u('ML',{domain:'quality-operations', module:'capa-effectiveness'}),
     cdoc: u('ML',{domain:'document-change-compliance', module:'controlled-docs-records'}),
+    insp: u('ML',{domain:'quality-operations', module:'inspection-spc'}),
+    iqc: u('ML',{domain:'quality-operations', module:'inspection-spc'}),
     'batch-release': u('ML',{domain:'quality-operations', module:'metrology-release-trace'}),
     genealogy: u('WS',{domain:'quality-operations', module:'metrology-release-trace', workspace_family:'explorer'}),
     documents: u('ML',{domain:'document-change-compliance', module:'controlled-docs-records'}),
@@ -40,6 +42,8 @@
     suppliers: u('ML',{domain:'supply-chain-intralogistics', module:'supplier-360'}),
     'supplier-audits': u('ML',{domain:'supply-chain-intralogistics', module:'supplier-360'}),
     'engineering-change': u('ML',{domain:'npi-engineering-product-definition', module:'engineering-change'}),
+    eco: u('ML',{domain:'npi-engineering-product-definition', module:'engineering-change'}),
+    'change-control': u('ML',{domain:'npi-engineering-product-definition', module:'engineering-change'}),
     'apqp-ppap': u('ML',{domain:'npi-engineering-product-definition', module:'ppap-fai-validation'}),
     fai: u('ML',{domain:'npi-engineering-product-definition', module:'ppap-fai-validation'})
   });
@@ -72,10 +76,22 @@
         url:u('AR',{resource_family:'controlled-documents', record_id:recordId},{tab:(context && context.tab) || 'overview'})
       };
     }
+    if((key === 'insp' || key === 'iqc') && recordId){
+      return {
+        policy:'redirect_record_context_only',
+        url:u('AR',{resource_family:'inspections', record_id:recordId},{tab:(context && context.tab) || 'overview'})
+      };
+    }
     if((key === 'brel' || key === 'release') && recordId){
       return {
         policy:'redirect_record_context_only',
         url:u('AR',{resource_family:'batch-releases', record_id:recordId},{tab:(context && context.tab) || 'overview'})
+      };
+    }
+    if((key === 'eco' || key === 'change-control') && recordId){
+      return {
+        policy:'redirect_record_context_only',
+        url:u('AR',{resource_family:'engineering-changes', record_id:recordId},{tab:(context && context.tab) || 'overview'})
       };
     }
     return eqmsModuleAliasMap[key] ? { policy:'redirect_then_deprecate', url:eqmsModuleAliasMap[key] } : { policy:'unmapped_needs_decision', url:null, reason:'no_eqms_alias' };

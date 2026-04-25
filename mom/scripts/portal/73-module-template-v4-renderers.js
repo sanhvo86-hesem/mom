@@ -775,12 +775,177 @@
       brelTabs.map(function(t){ return '<section class="hmv4-tabpanel" role="tabpanel" aria-labelledby="tab-brel-'+t+'" '+(t===tab?'':'hidden')+' data-hmv4-brel-panel="'+esc(t)+'">'+renderBrelPanel(t, record)+'</section>'; }).join('')+
     '</article>';
   }
+  var inspTabs = ['overview','sample-results','nonconformance-flags','evidence','related','audit','signatures'];
+  function normaliseInspTab(tab){ return inspTabs.indexOf(tab) >= 0 ? tab : 'overview'; }
+  function defaultInspRecord(recordId){
+    return {
+      recordId: recordId || 'INSP-001',
+      rootCode: 'INSP',
+      title: 'First-piece inspection on WO-3011 OP-30',
+      inspectionSubtype: 'first_piece',
+      state: 'completed',
+      severity: 'minor',
+      workOrderId: 'WO-3011',
+      lotId: 'LOT-2026-04',
+      partNumber: 'PN-2042 Rev B',
+      supplier: null,
+      freshness: 'fixture_current',
+      stateMessage: 'Read-only prototype. Mutation outside fixture.',
+      lifecycle: [
+        ['draft','complete'],['in-progress','complete'],['completed','current'],
+        ['reviewed','pending'],['closed','locked']
+      ],
+      characteristics: [],
+      sampleResults: [],
+      nonconformanceFlags: [],
+      evidence: [],
+      relatedRecords: [],
+      limitations: []
+    };
+  }
+  function getInspRecord(route){
+    var p = route.params || {};
+    var recordId = p.record_id || 'INSP-001';
+    var fixture = window.HMV4_INSP_RECORD_FIXTURE || readJsonFixture('[data-hmv4-insp-record-fixture]') || {};
+    var record = defaultInspRecord(recordId);
+    if(fixture.records && fixture.records[recordId]) mergeRecord(record, fixture.records[recordId]);
+    if(fixture.record) mergeRecord(record, fixture.record);
+    if(fixture.state) record.state = fixture.state;
+    if(fixture.freshness) record.freshness = fixture.freshness;
+    if(fixture.stateMessage) record.stateMessage = fixture.stateMessage;
+    if(fixture.limitations) record.limitations = fixture.limitations;
+    var state = (route.query && route.query.state) || fixture.state || record.state || 'completed';
+    var stateOverlay = (fixture.states || {})[state] || null;
+    if(stateOverlay){
+      record.state = state;
+      if(stateOverlay.freshness) record.freshness = stateOverlay.freshness;
+      if(stateOverlay.stateMessage) record.stateMessage = stateOverlay.stateMessage;
+      if(stateOverlay.limitations) record.limitations = stateOverlay.limitations;
+    }
+    record.recordId = recordId;
+    record.rootCode = 'INSP';
+    return record;
+  }
+  function renderInspPanel(tab, record){
+    if(tab === 'overview'){
+      return '<h2>Overview</h2>'+
+        '<dl class="hmv4-meta-grid">'+
+          '<dt>Subtype</dt><dd>'+esc(record.inspectionSubtype || '—')+'</dd>'+
+          '<dt>Work order</dt><dd>'+esc(record.workOrderId || '—')+'</dd>'+
+          '<dt>Lot</dt><dd>'+esc(record.lotId || '—')+'</dd>'+
+          '<dt>Part</dt><dd>'+esc(record.partNumber || '—')+'</dd>'+
+          '<dt>Supplier</dt><dd>'+esc(record.supplier || '—')+'</dd>'+
+        '</dl>'+
+        '<h3>Characteristics</h3>'+
+        ((record.characteristics || []).length === 0
+          ? '<p class="hmv4-text-2">No characteristics defined.</p>'
+          : '<table class="hmv4-data-table"><thead><tr><th>Name</th><th>Target</th><th>Tolerance</th><th>Sample size</th></tr></thead><tbody>'+
+            (record.characteristics || []).map(function(c){return '<tr><td>'+esc(c.name)+'</td><td>'+esc(c.target)+'</td><td>'+esc(c.tolerance)+'</td><td>'+esc(c.sampleSize)+'</td></tr>';}).join('')+
+            '</tbody></table>');
+    }
+    if(tab === 'sample-results'){
+      var results = record.sampleResults || [];
+      if(results.length === 0) return '<h2>Sample results</h2><p class="hmv4-text-2">No sample results recorded.</p>';
+      return '<h2>Sample results</h2>'+
+        results.map(function(r){
+          return '<section class="hmv4-card"><h3>'+esc(r.characteristic)+'</h3><p>Result: <strong>'+esc(r.result)+'</strong></p>'+
+            '<table class="hmv4-data-table"><thead><tr><th>Sample #</th><th>Value</th><th>Judgment</th></tr></thead><tbody>'+
+            (r.samples || []).map(function(s,i){return '<tr><td>'+(i+1)+'</td><td>'+esc(s.value)+'</td><td data-hmv4-status="'+esc(s.judgment)+'">'+esc(s.judgment)+'</td></tr>';}).join('')+
+            '</tbody></table></section>';
+        }).join('');
+    }
+    if(tab === 'nonconformance-flags'){
+      var flags = record.nonconformanceFlags || [];
+      if(flags.length === 0) return '<h2>Nonconformance flags</h2><p class="hmv4-text-2">No nonconformance flags raised.</p>';
+      return '<h2>Nonconformance flags</h2><ul class="hmv4-list">'+
+        flags.map(function(f){
+          var ncLink = f.escalatedToNcId
+            ? ' &mdash; <a href="/ops/records/nonconformance-cases/'+esc(f.escalatedToNcId)+'?tab=overview" data-hmv4-record-open="nonconformance-cases" data-hmv4-record-id="'+esc(f.escalatedToNcId)+'">'+esc(f.escalatedToNcId)+'</a>'
+            : ' (not yet escalated)';
+          return '<li><strong>'+esc(f.characteristic)+'</strong> ('+esc(f.severity)+')'+ncLink+'</li>';
+        }).join('')+
+        '</ul>';
+    }
+    if(tab === 'evidence'){
+      var ev = record.evidence || [];
+      if(ev.length === 0) return '<h2>Evidence</h2><p class="hmv4-text-2">No evidence attached.</p>';
+      return '<h2>Evidence</h2><ul class="hmv4-list">'+
+        ev.map(function(e){return '<li>'+esc(e.type)+': '+esc(e.label)+'</li>';}).join('')+
+        '</ul>';
+    }
+    if(tab === 'related'){
+      var related = record.relatedRecords || [];
+      if(related.length === 0) return '<h2>Related records</h2><p class="hmv4-text-2">No related records.</p>';
+      return '<h2>Related records</h2><ul class="hmv4-list">'+
+        related.map(function(r){return '<li><a href="/ops/records/'+esc(r.resourceFamily)+'/'+esc(r.recordId)+'?tab=overview" data-hmv4-record-open="'+esc(r.resourceFamily)+'" data-hmv4-record-id="'+esc(r.recordId)+'">'+esc(r.label)+'</a></li>';}).join('')+
+        '</ul>';
+    }
+    if(tab === 'audit') return '<h2>Audit</h2><p class="hmv4-text-2">Read-only placeholder.</p>';
+    if(tab === 'signatures') return '<h2>Signatures</h2><p class="hmv4-text-2">Read-only placeholder.</p>';
+    return '<p>Unknown tab.</p>';
+  }
+  function renderInspRecord(route){
+    var p = route.params || {};
+    var q = route.query || {};
+    var tab = normaliseInspTab(q.tab || 'overview');
+    var recordId = p.record_id || 'INSP-001';
+    var record = getInspRecord(route);
+    var state = record.state || 'completed';
+    var freshness = record.freshness || 'fixture_current';
+    var limitations = record.limitations || [];
+    var noteId = 'hmv4-insp-mutation-note';
+
+    var head =
+      '<header class="hmv4-record-identity">'+
+        '<h1 class="hmv4-record-title">'+esc(recordId)+' &mdash; '+esc(record.title)+'</h1>'+
+        '<dl class="hmv4-meta-grid">'+
+          '<dt>Subtype</dt><dd>'+esc(record.inspectionSubtype || '')+'</dd>'+
+          '<dt>State</dt><dd>'+esc(state)+'</dd>'+
+          '<dt>Severity</dt><dd>'+esc(record.severity || '')+'</dd>'+
+          '<dt>Work order</dt><dd>'+esc(record.workOrderId || '')+'</dd>'+
+        '</dl>'+
+        (record.stateMessage ? '<p class="hmv4-feedback" data-feedback-state="bridge" role="status" data-hmv4-insp-state>'+esc(record.stateMessage)+'</p>' : '')+
+      '</header>';
+
+    var lifecycleStrip = '<ol class="hmv4-lifecycle-strip" data-hmv4-insp-lifecycle aria-label="INSP lifecycle">'+
+      (record.lifecycle || []).map(function(s){return '<li data-lifecycle-state="'+esc(s[1] || 'pending')+'"><strong>'+esc(s[0])+'</strong><span>'+esc(s[1] || 'pending')+'</span></li>';}).join('')+
+      '</ol>';
+
+    var partialAccessNotice = '';
+    if(state === 'partial_access' && limitations.length){
+      partialAccessNotice =
+        '<section class="hmv4-feedback" data-feedback-state="warning" role="status" data-hmv4-insp-partial>'+
+          '<strong>Partial access</strong>'+
+          '<ul>'+limitations.map(function(l){return '<li>'+esc(l)+'</li>';}).join('')+'</ul>'+
+        '</section>';
+    }
+
+    var intents = [
+      ['insp-record-result','Record result'],
+      ['insp-flag-nonconformance','Flag nonconformance'],
+      ['insp-submit-review','Submit for review'],
+      ['insp-close','Close'],
+      ['insp-esign','e-Sign']
+    ];
+    var disabledLaunchers =
+      '<section class="hmv4-toolbar" aria-label="Disabled inspection mutation launchers" data-hmv4-insp-launchers>'+
+        intents.map(function(intent){return '<button class="hmv4-button" type="button" disabled aria-disabled="true" aria-describedby="'+esc(noteId)+'" data-hmv4-mutation-intent="'+esc(intent[0])+'">'+esc(intent[1])+' disabled</button>';}).join('')+
+        '<span class="hmv4-feedback" data-feedback-state="warning" role="note" id="'+esc(noteId)+'">Mutation actions are disabled in this read-only prototype.</span>'+
+      '</section>';
+
+    return '<article class="hmv4-record-shell hmv4-record-shell--display hmv4-record-shell--insp" data-hmv4-insp-record data-route-class="AR" data-resource-family="inspections" data-root-code="INSP" data-record-id="'+esc(recordId)+'" data-authority-class="authoritative" data-query-tab="'+esc(tab)+'" data-fixture-state="'+esc(state)+'" data-fixture-freshness="'+esc(freshness)+'">'+
+      head + lifecycleStrip + partialAccessNotice + disabledLaunchers +
+      '<div class="hmv4-tablist" role="tablist" aria-label="Inspection record details">'+inspTabs.map(function(t){return '<button class="hmv4-tab" role="tab" aria-selected="'+(t===tab)+'" data-tab="'+t+'" id="tab-insp-'+t+'">'+esc(t)+'</button>';}).join('')+'</div>'+
+      inspTabs.map(function(t){return '<section class="hmv4-tabpanel" role="tabpanel" aria-labelledby="tab-insp-'+t+'" '+(t===tab?'':'hidden')+' data-hmv4-insp-panel="'+esc(t)+'">'+renderInspPanel(t, record)+'</section>';}).join('')+
+      '</article>';
+  }
   function renderRecord(route){
     var p = route.params, tab = route.query.tab || 'overview';
     if(p.resource_family === 'nonconformance-cases') return renderNonconformanceRecord(route);
     if(p.resource_family === 'capas') return renderCapaRecord(route);
     if(p.resource_family === 'batch-releases') return renderBrelRecord(route);
     if(p.resource_family === 'controlled-documents') return renderCdocRecord(route);
+    if(p.resource_family === 'inspections') return renderInspRecord(route);
     var tabs = ['overview','workflow','related','evidence','comments','audit'];
     return '<article class="hmv4-record-shell hmv4-record-shell--display" data-route-class="AR" data-resource-family="'+esc(p.resource_family)+'" data-record-id="'+esc(p.record_id)+'" data-authority-class="authoritative" data-query-tab="'+esc(tab)+'">' +
       '<section class="hmv4-record-identity"><h1 class="hmv4-record-title">'+esc(p.record_id)+'</h1><p class="hmv4-record-subtitle">'+esc(p.resource_family)+' authoritative record shell</p></section>'+
@@ -984,6 +1149,7 @@
     renderCapaRecord: renderCapaRecord,
     renderCdocRecord: renderCdocRecord,
     renderBrelRecord: renderBrelRecord,
+    renderInspRecord: renderInspRecord,
     domains: domains,
     modules: modules
   });

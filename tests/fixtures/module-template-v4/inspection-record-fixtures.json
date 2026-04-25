@@ -1,0 +1,72 @@
+{
+  "version": "0.1",
+  "authorityClass": "authoritative",
+  "resourceFamily": "inspections",
+  "rootCode": "INSP",
+  "records": {
+    "INSP-001": {
+      "recordId": "INSP-001",
+      "rootCode": "INSP",
+      "title": "First-piece inspection on WO-3011 OP-30",
+      "inspectionSubtype": "first_piece",
+      "state": "completed",
+      "severity": "minor",
+      "workOrderId": "WO-3011",
+      "lotId": "LOT-2026-04",
+      "partNumber": "PN-2042 Rev B",
+      "supplier": null,
+      "freshness": "fixture_current",
+      "stateMessage": "Read-only prototype. Mutation outside fixture.",
+      "lifecycle": [
+        ["draft","complete"],
+        ["in-progress","complete"],
+        ["completed","current"],
+        ["reviewed","pending"],
+        ["closed","locked"]
+      ],
+      "characteristics": [
+        { "name": "Hole diameter", "target": "10.00 mm", "tolerance": "±0.02 mm", "sampleSize": 5 },
+        { "name": "Surface roughness", "target": "Ra 1.6", "tolerance": "Ra ≤ 1.6", "sampleSize": 3 }
+      ],
+      "sampleResults": [
+        {
+          "characteristic": "Hole diameter",
+          "result": "PASS",
+          "samples": [
+            { "value": "10.005 mm", "judgment": "pass" },
+            { "value": "9.995 mm",  "judgment": "pass" },
+            { "value": "10.010 mm", "judgment": "pass" },
+            { "value": "9.990 mm",  "judgment": "pass" },
+            { "value": "10.000 mm", "judgment": "pass" }
+          ]
+        },
+        {
+          "characteristic": "Surface roughness",
+          "result": "FAIL",
+          "samples": [
+            { "value": "Ra 1.4", "judgment": "pass" },
+            { "value": "Ra 1.5", "judgment": "pass" },
+            { "value": "Ra 1.9", "judgment": "fail" }
+          ]
+        }
+      ],
+      "nonconformanceFlags": [
+        { "characteristic": "Surface roughness", "severity": "minor", "escalatedToNcId": "NC-001" }
+      ],
+      "evidence": [
+        { "type": "measurement-report", "label": "CMM report INSP-001-CMM" }
+      ],
+      "relatedRecords": [
+        { "resourceFamily": "nonconformance-cases", "recordId": "NC-001", "label": "NC-001 (escalated)" },
+        { "resourceFamily": "work-orders", "recordId": "WO-3011", "label": "WO-3011" },
+        { "resourceFamily": "lots", "recordId": "LOT-2026-04", "label": "LOT-2026-04" }
+      ],
+      "limitations": []
+    }
+  },
+  "states": {
+    "conflict":       { "freshness": "fixture_conflict", "stateMessage": "Conflict: result was edited offline." },
+    "partial_access": { "stateMessage": "Partial-access fixture.", "limitations": ["Sample values masked for cross-team operators.", "Evidence links masked for current role."] },
+    "degraded":       { "freshness": "fixture_stale", "stateMessage": "Degraded fixture." }
+  }
+}

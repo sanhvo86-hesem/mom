@@ -50,6 +50,16 @@ const fixturePages: string[] = [
   'authoritative-record-shell-cdoc-conflict.html',
   'authoritative-record-shell-cdoc-partial-access.html',
   'authoritative-record-shell-cdoc-degraded.html',
+  'authoritative-record-shell-insp-overview.html',
+  'authoritative-record-shell-insp-sample-results.html',
+  'authoritative-record-shell-insp-nonconformance-flags.html',
+  'authoritative-record-shell-insp-evidence.html',
+  'authoritative-record-shell-insp-related.html',
+  'authoritative-record-shell-insp-audit.html',
+  'authoritative-record-shell-insp-signatures.html',
+  'authoritative-record-shell-insp-conflict.html',
+  'authoritative-record-shell-insp-partial-access.html',
+  'authoritative-record-shell-insp-degraded.html',
 ];
 
 for (const page of fixturePages) {
