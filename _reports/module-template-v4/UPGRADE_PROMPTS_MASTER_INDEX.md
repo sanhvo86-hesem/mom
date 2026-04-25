@@ -21,7 +21,7 @@
 |---|---|---|---|
 | **A — Slice cycle** | [Pack 1](UPGRADE_PROMPT_PACK_1_SLICE_3_CYCLE.md) | Execute one slice (plan → impl → QA) | Repeat per slice (3, 4, 5, …) |
 | **B — Pre-slice cleanup** | [Pack 2](UPGRADE_PROMPT_PACK_2_PRESLICE_CLEANUP.md) | Fix baseline tech debt before Slice 3 lands | One-time |
-| **C — Backend alignment** | [Pack 3](UPGRADE_PROMPT_PACK_3_BACKEND_ALIGNMENT.md) | Unblock fixture→live transition for EQMS roots, transactional roots, RED roots | One-time per phase |
+| **C — Backend alignment** | [Pack 3](UPGRADE_PROMPT_PACK_3_BACKEND_ALIGNMENT.md) — read [Correction Note](UPGRADE_PROMPT_PACK_3_CORRECTION_NOTE.md) before pasting C1/C3/C4 | Unblock fixture→live transition for EQMS roots, transactional roots, RED roots | One-time per phase |
 | **D — Quality infrastructure** | [Pack 4](UPGRADE_PROMPT_PACK_4_QUALITY_INFRA.md) | Add a11y, visual regression, performance, cross-browser, security | One-time setup |
 | **E — Documentation** | [Pack 5](UPGRADE_PROMPT_PACK_5_DOCUMENTATION.md) | .ai/ index regen, ADR, CLAUDE.md update | One-time + ongoing |
 

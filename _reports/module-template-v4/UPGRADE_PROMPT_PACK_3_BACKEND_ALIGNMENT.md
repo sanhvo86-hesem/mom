@@ -10,6 +10,54 @@ branch and PR.
 
 ---
 
+## Errata applied 2026-04-25
+
+The original C1, C3, C4 prompts contained method-name and path errors
+against the live codebase. They were corrected inline on this date.
+For the full audit trail and rationale, see
+[UPGRADE_PROMPT_PACK_3_CORRECTION_NOTE.md](UPGRADE_PROMPT_PACK_3_CORRECTION_NOTE.md).
+
+Summary of inline changes:
+- **C1**: `query` flagged as a new wrapper method (Q1 below); `comments_list`/
+  `comments_create` collapsed to single `comments`; `attachments_list`/
+  `attachments_create` collapsed to single `attachments`; `action_<verb>`
+  snake_case → `action<Verb>` camelCase; `PUT` update verb → `PATCH`;
+  EQMS-controllers forbidden constraint relaxed to permit additive
+  GET-list wrapper methods only.
+- **C2**: path params corrected from `{id}` to `{soNumber}`/`{joNumber}`/
+  `{woNumber}` to match live routes; `OrderController::transition` does
+  NOT auto-derive type from URL (it reads `order_type` from JSON body
+  and accepts `so`/`jo`/`wo` not `sales`/`job`/`work`), so 3 new thin
+  wrapper methods added (`transitionSalesOrder`, `transitionJobOrder`,
+  `transitionWorkOrder`) plus `listWorkOrders`, `getWorkOrderDetail`
+  which were missing; OrderController forbidden constraint relaxed
+  the same way as C1.
+- **C3**: all four method names corrected to actual controller methods
+  (`listPurchaseOrders`, `getPurchaseOrder`, `createPurchaseOrder`,
+  `transitionPurchaseOrder`); PUT update line removed because the
+  controller has no `update*` method (escalated as separate work item);
+  path param `{id}` → `{customerPoId}` to match the live route.
+- **C4**: archive paths fixed from
+  `/tmp/hesem-archive/extracted_HESEM_MOM_V18_*/all_artifacts/STEP{2,3}_*_MASTER.md`
+  to `/tmp/hesem-archive/asset {2,3}/STEP{2,3}_*_MASTER.md`; explicit
+  bail-out guard added when paths are missing.
+
+Open policy questions for the operator (do not paste blindly):
+1. **Q1 (C1)**: confirm scope expansion — adding `query()` wrappers on the
+   7 EQMS controllers is additive (no existing logic changes), but
+   contradicts the original "do not modify EQMS controllers" rule.
+   Alternative: keep controllers untouched and ship `POST /api/v1/<plural>/query`
+   → `search` instead of `GET /api/v1/<plural>` → `query`. The frozen-token
+   contract favors GET; pick option A unless you want to revisit Step 3.
+2. **Q2 (C3)**: PUT update on customer-purchase-orders is dropped from
+   the alias scope. Schedule a separate task to add `updatePurchaseOrder()`
+   if frontend needs it.
+3. **Q3 (C4)**: archive path `/tmp/hesem-archive/asset {2,3}/` is on the
+   developer's local machine. Either ensure these are present before
+   running C4, or vendor STEP2/STEP3 master excerpts into the repo.
+
+---
+
 ## C1 — EQMS Plural-Form REST Aliases 🟢 (parallel with C2, C3, C4, Streams A/B/D/E)
 
 ### When to run
@@ -38,7 +86,10 @@ You are adding plural-form REST aliases for EQMS resources, so the
 HMV4 frontend can use Step 3 frozen canonical paths.
 
 Do not change EQMS business logic.
-Do not modify EQMS controllers (they're correct as-is).
+You MAY add additive GET-list wrapper methods (named `query`) on the
+seven EQMS controllers below — these wrappers MUST delegate to the
+existing `search` projection and not introduce new query semantics.
+Do not modify any other EQMS controller method.
 Do not modify HMV4 frontend.
 Do not change forbidden files.
 
@@ -55,29 +106,41 @@ Allowed files:
   _reports/module-template-v4/S_BACKEND_EQMS_*.md
   mom/data/registry/endpoint-catalog.json (regenerate after route changes)
   mom/data/registry/endpoint-catalog-index.json
+  mom/api/controllers/EqmsNcrController.php           (additive query() only)
+  mom/api/controllers/EqmsCapaController.php          (additive query() only)
+  mom/api/controllers/EqmsDocumentsController.php     (additive query() only)
+  mom/api/controllers/EqmsInspectionController.php    (additive query() only)
+  mom/api/controllers/EqmsBatchReleaseController.php  (additive query() only)
+  mom/api/controllers/EqmsEngineeringChangeController.php (additive query() only)
+  mom/api/controllers/EqmsTrainingController.php      (additive query() only)
 
 Forbidden:
   Any HMV4 frontend file (mom/scripts/portal/7?-module-template-v4-*.js)
   Any forbidden file from CLAUDE.md
-  Existing EQMS controllers (do not modify)
+  Modifying any existing method on the EQMS controllers above (only
+    adding a new `query()` is permitted)
 
 Aliases to add (in mom/api/routes/rest-routes.php):
 
   Group: 'eqms-plural-aliases'
-  
-  GET    /api/v1/nonconformance-cases               → EqmsNcrController::query
-  POST   /api/v1/nonconformance-cases               → EqmsNcrController::create
-  GET    /api/v1/nonconformance-cases/{id}          → EqmsNcrController::detail
-  PUT    /api/v1/nonconformance-cases/{id}          → EqmsNcrController::update
-  GET    /api/v1/nonconformance-cases/{id}/audit    → EqmsNcrController::audit
-  GET    /api/v1/nonconformance-cases/{id}/comments → EqmsNcrController::comments_list
-  POST   /api/v1/nonconformance-cases/{id}/comments → EqmsNcrController::comments_create
-  GET    /api/v1/nonconformance-cases/{id}/attachments → EqmsNcrController::attachments_list
-  POST   /api/v1/nonconformance-cases/{id}/attachments → EqmsNcrController::attachments_create
-  POST   /api/v1/nonconformance-cases/{id}:contain  → EqmsNcrController::action_contain
-  POST   /api/v1/nonconformance-cases/{id}:investigate → EqmsNcrController::action_investigate
-  POST   /api/v1/nonconformance-cases/{id}:close    → EqmsNcrController::action_close
-  POST   /api/v1/nonconformance-cases/{id}:reopen   → EqmsNcrController::action_reopen
+
+  Verified actual method names — do NOT change these without re-verifying
+  against mom/api/controllers/Eqms*.php. The existing controllers expose
+  `search` (POST-body filter) but no `query` (GET list); see Step 0.
+
+  GET    /api/v1/nonconformance-cases                  → EqmsNcrController::query        (NEW wrapper)
+  POST   /api/v1/nonconformance-cases                  → EqmsNcrController::create
+  GET    /api/v1/nonconformance-cases/{id}             → EqmsNcrController::detail
+  PATCH  /api/v1/nonconformance-cases/{id}             → EqmsNcrController::update
+  GET    /api/v1/nonconformance-cases/{id}/audit       → EqmsNcrController::audit
+  GET    /api/v1/nonconformance-cases/{id}/comments    → EqmsNcrController::comments
+  POST   /api/v1/nonconformance-cases/{id}/comments    → EqmsNcrController::comments
+  GET    /api/v1/nonconformance-cases/{id}/attachments → EqmsNcrController::attachments
+  POST   /api/v1/nonconformance-cases/{id}/attachments → EqmsNcrController::attachments
+  POST   /api/v1/nonconformance-cases/{id}:contain     → EqmsNcrController::actionContain
+  POST   /api/v1/nonconformance-cases/{id}:investigate → EqmsNcrController::actionInvestigate
+  POST   /api/v1/nonconformance-cases/{id}:close       → EqmsNcrController::actionClose
+  POST   /api/v1/nonconformance-cases/{id}:reopen      → EqmsNcrController::actionReopen
 
   Same pattern for:
     /api/v1/capas              → EqmsCapaController
@@ -88,6 +151,27 @@ Aliases to add (in mom/api/routes/rest-routes.php):
     /api/v1/training-records    → EqmsTrainingController
 
 Total: 7 plural aliases × ~13 routes each = ~91 new route registrations.
+Plus 7 new `query()` wrapper methods (one per EQMS controller).
+
+Step 0: Add additive `query()` wrappers on the 7 EQMS controllers.
+
+For each of EqmsNcrController, EqmsCapaController, EqmsDocumentsController,
+EqmsInspectionController, EqmsBatchReleaseController,
+EqmsEngineeringChangeController, EqmsTrainingController, add:
+
+  /**
+   * GET list wrapper. Delegates to existing search() projection by
+   * mapping query-string filters into the search filter shape.
+   * Pure delegation — no new query semantics.
+   */
+  public function query(): never
+  {
+      return $this->search();
+  }
+
+If `search()` reads its filters from POST body only, add a small
+adapter that also accepts query-string params. Do NOT change the
+filter dictionary or response shape.
 
 Step 1: Inspect existing route file structure:
 
@@ -95,22 +179,28 @@ Step 1: Inspect existing route file structure:
   cat mom/api/routes/eqms-quality-routes.php | head -50
 
 Step 2: Add a new group block in rest-routes.php at the appropriate
-section. Use existing pattern as reference:
+section. Use existing pattern as reference. Note path-segment for
+GET routes uses positional params; colon-action for POST verbs:
 
   // ─────────────────────────────────────────────────────────────
   // EQMS plural-form REST aliases
   // Frontend Step 3 canonical paths delegate to existing EQMS
   // controllers (which use singular form internally).
   // ─────────────────────────────────────────────────────────────
-  $router->get('/api/v1/nonconformance-cases', [EqmsNcrController::class, 'query']);
-  ...
+  $router->get  ('/api/v1/nonconformance-cases',                  EqmsNcrController::class, 'query');
+  $router->post ('/api/v1/nonconformance-cases',                  EqmsNcrController::class, 'create');
+  $router->get  ('/api/v1/nonconformance-cases/{id}',             EqmsNcrController::class, 'detail');
+  $router->patch('/api/v1/nonconformance-cases/{id}',             EqmsNcrController::class, 'update');
+  $router->post ('/api/v1/nonconformance-cases/{id}:contain',     EqmsNcrController::class, 'actionContain');
+  // ... etc.
 
 Step 3: Validate aliases produce identical responses.
 
 For each alias, run:
-  curl -s 'http://127.0.0.1:8090/api/v1/eqms/ncr?limit=1' | jq -c '.[0].id'
+  curl -s 'http://127.0.0.1:8090/api/v1/eqms/ncr/query' -X POST -d '{"limit":1}' | jq -c '.[0].id'
   curl -s 'http://127.0.0.1:8090/api/v1/nonconformance-cases?limit=1' | jq -c '.[0].id'
-  # Should return same id
+  # Should return same id (the new GET wrapper must produce the same
+  # row order and shape as the legacy POST search).
 
 If responses differ, investigate (controller method may need slight
 adaptation for the alias context).
@@ -209,41 +299,72 @@ Allowed files:
   mom/data/registry/endpoint-catalog.json (regenerate)
 
 Forbidden:
-  mom/api/controllers/OrderController.php (no business logic change)
+  Modifying any existing method on OrderController.php (only adding
+    `transitionSalesOrder`, `transitionJobOrder`, `transitionWorkOrder`,
+    `listWorkOrders`, `getWorkOrderDetail` is permitted — these are
+    additive wrappers around existing logic)
   Any HMV4 frontend file
   Any forbidden file from CLAUDE.md
 
-Routes to add (canonical):
+Routes to add (canonical).
 
-  GET    /api/v1/sales-orders                  → OrderController::listSalesOrders
-  GET    /api/v1/sales-orders/{id}             → OrderController::getSalesOrderDetail
-  POST   /api/v1/sales-orders                  → OrderController::createSalesOrder
-  PUT    /api/v1/sales-orders/{id}             → OrderController::updateSalesOrder
-  POST   /api/v1/sales-orders/{id}:transition  → OrderController::transition (with type=sales)
+  Verified against mom/api/controllers/OrderController.php and
+  mom/api/routes/rest-routes.php (lines 164-173). Path params on the
+  legacy routes are `{soNumber}`, `{joNumber}`, `{woNumber}` — keep these
+  same names on the canonical routes so the controller's body/path
+  reading logic stays compatible.
 
-  GET    /api/v1/job-orders                    → OrderController::listJobOrders
-  GET    /api/v1/job-orders/{id}               → OrderController::getJobOrderDetail
-  POST   /api/v1/job-orders                    → OrderController::createJobOrder
-  PUT    /api/v1/job-orders/{id}               → OrderController::updateJobOrder
-  POST   /api/v1/job-orders/{id}:transition    → OrderController::transition (with type=job)
+  GET    /api/v1/sales-orders                          → OrderController::listSalesOrders
+  GET    /api/v1/sales-orders/{soNumber}               → OrderController::getSalesOrderDetail
+  POST   /api/v1/sales-orders                          → OrderController::createSalesOrder
+  PUT    /api/v1/sales-orders/{soNumber}               → OrderController::updateSalesOrder
+  POST   /api/v1/sales-orders/{soNumber}:transition    → OrderController::transitionSalesOrder    (NEW wrapper)
 
-  GET    /api/v1/work-orders                   → OrderController::listWorkOrders (add if missing)
-  GET    /api/v1/work-orders/{id}              → OrderController::getWorkOrderDetail (add if missing)
-  POST   /api/v1/work-orders                   → OrderController::createWorkOrder
-  PUT    /api/v1/work-orders/{id}              → OrderController::updateWorkOrder
-  POST   /api/v1/work-orders/{id}:transition   → OrderController::transition (with type=work)
+  GET    /api/v1/job-orders                            → OrderController::listJobOrders
+  GET    /api/v1/job-orders/{joNumber}                 → OrderController::getJobOrderDetail
+  POST   /api/v1/job-orders                            → OrderController::createJobOrder
+  PUT    /api/v1/job-orders/{joNumber}                 → OrderController::updateJobOrder
+  POST   /api/v1/job-orders/{joNumber}:transition      → OrderController::transitionJobOrder      (NEW wrapper)
 
-Note: WO list/detail may not exist on OrderController. If missing, add
-minimal pass-through methods that wrap existing query/projection logic.
+  GET    /api/v1/work-orders                           → OrderController::listWorkOrders          (NEW)
+  GET    /api/v1/work-orders/{woNumber}                → OrderController::getWorkOrderDetail      (NEW)
+  POST   /api/v1/work-orders                           → OrderController::createWorkOrder
+  PUT    /api/v1/work-orders/{woNumber}                → OrderController::updateWorkOrder
+  POST   /api/v1/work-orders/{woNumber}:transition     → OrderController::transitionWorkOrder     (NEW wrapper)
+
+Important: existing OrderController::transition (line 1116) reads
+`order_type`/`order_id`/`target_status` from the JSON body and only
+accepts order_type values `so`/`jo`/`wo` (NOT `sales`/`job`/`work`).
+The colon-action canonical paths cannot delegate directly. Add three
+new thin wrappers that derive `order_type` from the path and forward
+to the existing transition() implementation:
+
+  public function transitionSalesOrder(): never {
+      $body = $this->jsonBody();
+      $body['order_type'] = 'so';
+      $body['order_id']   = $this->routeParam('soNumber') ?? ($body['order_id'] ?? '');
+      $this->setJsonBody($body);
+      return $this->transition();
+  }
+  // ...likewise transitionJobOrder ('jo'/joNumber), transitionWorkOrder ('wo'/woNumber)
+
+These three new methods are additive (no logic change inside transition()).
+listWorkOrders / getWorkOrderDetail are also new (pack acknowledged
+they may be missing — verified missing as of 2026-04-25).
+
+Update the Allowed-files section accordingly:
+
+  mom/api/controllers/OrderController.php (additive — only the four NEW
+    methods above; do NOT modify any existing method)
 
 Legacy redirects to add (in core-routes.php, return 301 with Location header):
 
-  /api/orders/sales         → /api/v1/sales-orders
-  /api/orders/sales/{id}    → /api/v1/sales-orders/{id}
-  /api/orders/jobs          → /api/v1/job-orders
-  /api/orders/jobs/{id}     → /api/v1/job-orders/{id}
-  /api/orders/work          → /api/v1/work-orders
-  /api/orders/work/{id}     → /api/v1/work-orders/{id}
+  /api/orders/sales                       → /api/v1/sales-orders
+  /api/orders/sales/{soNumber}            → /api/v1/sales-orders/{soNumber}
+  /api/orders/jobs                        → /api/v1/job-orders
+  /api/orders/jobs/{joNumber}             → /api/v1/job-orders/{joNumber}
+  /api/orders/work                        → /api/v1/work-orders
+  /api/orders/work/{woNumber}             → /api/v1/work-orders/{woNumber}
 
 Step 1-7 follow the same pattern as C1.
 
@@ -312,18 +433,28 @@ Forbidden:
   CustomerPurchaseOrderController (no logic change)
   Any HMV4 frontend file
 
-Step 1: Add canonical routes in rest-routes.php:
+Step 1: Add canonical routes in rest-routes.php.
 
-  GET    /api/v1/customer-purchase-orders             → CustomerPurchaseOrderController::query
-  GET    /api/v1/customer-purchase-orders/{id}        → CustomerPurchaseOrderController::detail
-  POST   /api/v1/customer-purchase-orders             → CustomerPurchaseOrderController::create
-  PUT    /api/v1/customer-purchase-orders/{id}        → CustomerPurchaseOrderController::update
-  POST   /api/v1/customer-purchase-orders/{id}:transition → CustomerPurchaseOrderController::transition
+  Verified actual method names against
+  mom/api/controllers/CustomerPurchaseOrderController.php (lines 235,
+  264, 294, 321). Path param is `{customerPoId}` (verified at
+  rest-routes.php:108-111) — do NOT change to `{id}` because the
+  controller methods read `customerPoId` from the route context.
+
+  GET   /api/v1/customer-purchase-orders                       → CustomerPurchaseOrderController::listPurchaseOrders
+  GET   /api/v1/customer-purchase-orders/{customerPoId}        → CustomerPurchaseOrderController::getPurchaseOrder
+  POST  /api/v1/customer-purchase-orders                       → CustomerPurchaseOrderController::createPurchaseOrder
+  POST  /api/v1/customer-purchase-orders/{customerPoId}:transition → CustomerPurchaseOrderController::transitionPurchaseOrder
+
+  PUT update intentionally omitted: CustomerPurchaseOrderController has
+  no `update*` method as of 2026-04-25. Adding it would be a logic
+  change and is out of scope for this rename. Track separately if the
+  frontend requires PUT.
 
 Step 2: Add 301 redirects from legacy /commercial/ paths:
 
-  /api/v1/commercial/customer-purchase-orders        → /api/v1/customer-purchase-orders
-  /api/v1/commercial/customer-purchase-orders/{id}   → /api/v1/customer-purchase-orders/{id}
+  /api/v1/commercial/customer-purchase-orders                  → /api/v1/customer-purchase-orders
+  /api/v1/commercial/customer-purchase-orders/{customerPoId}   → /api/v1/customer-purchase-orders/{customerPoId}
 
 Step 3-5: Same as C1 (validate equivalence, update OpenAPI, regen
 catalog, run PHPUnit).
@@ -391,7 +522,14 @@ Forbidden:
   Any forbidden file from CLAUDE.md
 
 Step 1: Read Step 2 workflow schema for the root in:
-  /tmp/hesem-archive/extracted_HESEM_MOM_V18_*/all_artifacts/STEP2_WORKFLOW_MASTER.md
+  /tmp/hesem-archive/asset 2/STEP2_WORKFLOW_MASTER.md
+
+  If this path does not exist on the local machine, STOP and report
+  STEP2_ARCHIVE_MISSING. Do not proceed with assumptions about the
+  state machine — incorrect state names cascade into broken contract
+  tests and incorrect role permissions. Ask the operator to either
+  restore /tmp/hesem-archive or vendor a STEP2_<ROOT>.md excerpt into
+  _reports/module-template-v4/ before re-running.
 
 Find the section for <ROOT_CODE> and extract:
   - canonical states
@@ -404,7 +542,9 @@ Find the section for <ROOT_CODE> and extract:
   - linked artifacts
 
 Step 2: Read Step 3 API surface for the root in:
-  /tmp/hesem-archive/extracted_HESEM_MOM_V18_*/all_artifacts/STEP3_API_MASTER.md
+  /tmp/hesem-archive/asset 3/STEP3_API_MASTER.md
+
+  Same bail-out rule: if missing, STOP and report STEP3_ARCHIVE_MISSING.
 
 Find the section for <ROOT_CODE> and extract:
   - canonical resource path: /api/v1/<resource-family>
