@@ -2196,13 +2196,98 @@ function ensureIframeHeaderTitleStructure(idoc, titleWrap, code, title, desc){
   }
 }
 
-function syncIframeDocumentHeaderMetadata(idoc, doc){
+function normalizeDccHeaderRevisionValue(raw){
+  const value = String(raw || '').trim();
+  if(!value) return '';
+  return /^v/i.test(value) ? value.toUpperCase() : ('V' + value);
+}
+
+function deriveDccDocTypeForHeader(code){
+  const value = String(code || '').toUpperCase();
+  if(value.indexOf('QMS-MAN-') === 0) return 'MAN';
+  if(value.indexOf('POL-QMS-') === 0 || value.indexOf('POL-') === 0) return 'POL';
+  if(value.indexOf('SOP-') === 0) return 'SOP';
+  if(value.indexOf('WI-') === 0) return 'WI';
+  if(value.indexOf('FRM-') === 0) return 'FRM';
+  if(value.indexOf('ANNEX-') === 0) return 'ANNEX';
+  if(value.indexOf('DEPT-') === 0 || value.indexOf('RACI-') === 0) return 'ORG';
+  return value.split('-')[0] || 'DOC';
+}
+
+function getAuthoritativeDccHeaderMeta(doc){
+  const code = String((typeof getDocDisplayCode === 'function' ? getDocDisplayCode(doc) : (doc && doc.code)) || '').trim();
+  const title = String((typeof getDocDisplayTitle === 'function' ? getDocDisplayTitle(doc) : (doc && doc.title)) || code || '').trim();
+  const desc = String((typeof getDocDisplayDescription === 'function' ? getDocDisplayDescription(doc) : '') || '').trim();
+  const dccCache = (window.DccHeader && typeof window.DccHeader.getCached === 'function' && doc)
+    ? window.DccHeader.getCached(doc.code || code)
+    : null;
+  const state = (typeof getDocState === 'function' && doc) ? (getDocState(doc.code) || {}) : {};
+  const status = String((doc && doc.__dccStatus) || (typeof getDocStatus === 'function' && doc ? getDocStatus(doc) : '') || '').trim();
+  return {
+    doc_code: code,
+    title: title,
+    subtitle: desc,
+    doc_type: deriveDccDocTypeForHeader(code),
+    revision: normalizeDccHeaderRevisionValue((doc && doc.__dccRevision) || (dccCache && dccCache.revision) || (typeof getDocRevision === 'function' && doc ? getDocRevision(doc) : '')),
+    effective_date: String((doc && doc.__dccEffectiveDate) || (dccCache && dccCache.effective_date) || '').trim(),
+    owner_role_code: String((doc && doc.__dccOwner) || (dccCache && dccCache.owner_role_code) || state.owner || (doc && doc.owner) || '').trim(),
+    approver_role_code: String((doc && doc.__dccApprover) || (dccCache && dccCache.approver_role_code) || state.approver || (doc && doc.approver) || '').trim(),
+    iso_clause: String((dccCache && dccCache.iso_clause) || (doc && doc.iso_clause) || '').trim() || null,
+    status: status || String((dccCache && dccCache.status) || '').trim() || 'draft'
+  };
+}
+
+function defaultDccBootstrapLabels(){
+  return {
+    doc_id: {short:'ID', long:'Document ID', sort:10},
+    revision: {short:'Rev', long:'Revision', sort:20},
+    effective_date: {short:'Eff', long:'Effective date', sort:30},
+    owner: {short:'Owner', long:'Owner', sort:40},
+    approver: {short:'Appr', long:'Approved by', sort:50}
+  };
+}
+
+function syncIframeDccBootstrapMetadata(idoc, doc){
+  if(!idoc || !doc) return false;
+  const headerEl = idoc.querySelector('.dcc-header');
+  if(!headerEl) return false;
+  const meta = getAuthoritativeDccHeaderMeta(doc);
+  let payload = {};
+  try{
+    const raw = headerEl.getAttribute('data-dcc-bootstrap') || '';
+    payload = raw ? JSON.parse(raw) : {};
+  }catch(_e){
+    payload = {};
+  }
+  if(!payload || typeof payload !== 'object') payload = {};
+  if(!payload.header || typeof payload.header !== 'object') payload.header = {};
+  payload.header = Object.assign({}, payload.header, meta);
+  payload.labels = (payload.labels && typeof payload.labels === 'object') ? payload.labels : defaultDccBootstrapLabels();
+  try{
+    headerEl.setAttribute('data-dcc-bootstrap', JSON.stringify(payload));
+    if(meta.doc_code) headerEl.setAttribute('data-dcc-doc-code', meta.doc_code);
+    headerEl.setAttribute('data-dcc-locale', lang === 'en' ? 'en' : 'vi');
+    const iwin = idoc.defaultView || null;
+    if(iwin && iwin.DccHeader && typeof iwin.DccHeader.render === 'function'){
+      Promise.resolve(iwin.DccHeader.render(headerEl)).catch(function(){});
+    }
+  }catch(_e){}
+  return true;
+}
+
+function syncIframeDocumentHeaderMetadata(idoc, doc, options){
   if(!idoc || !doc) return;
   try{
-    const publishedMeta = extractIframePublishedDocMetadata(idoc);
-    const code = String(((typeof getDocDisplayCode === 'function' ? getDocDisplayCode(doc) : doc.code) || publishedMeta.code || '')).trim();
-    const title = String(((typeof getDocDisplayTitle === 'function' ? getDocDisplayTitle(doc) : (doc.title || '')) || publishedMeta.title || '')).trim();
-    const desc = String(((typeof getDocDisplayDescription === 'function' ? getDocDisplayDescription(doc) : '') || publishedMeta.desc || '')).trim();
+    const opts = (options && typeof options === 'object') ? options : {};
+    const activeLocale = opts.locale === 'en' ? 'en' : (lang === 'en' ? 'en' : 'vi');
+    if(activeLocale === 'en'){
+      syncIframeDccBootstrapMetadata(idoc, doc);
+    }
+    const publishedMeta = activeLocale === 'en' ? {code:'', title:'', desc:''} : extractIframePublishedDocMetadata(idoc);
+    const authoritative = getAuthoritativeDccHeaderMeta(doc);
+    const code = String(authoritative.doc_code || publishedMeta.code || '').trim();
+    const title = String(authoritative.title || publishedMeta.title || '').trim();
+    const desc = String(authoritative.subtitle || publishedMeta.desc || '').trim();
 
     const titleWrap = idoc.querySelector('.form-header .title');
     if(titleWrap){
@@ -2222,7 +2307,8 @@ function syncIframeDocumentHeaderMetadata(idoc, doc){
       }catch(_e){}
     });
 
-    if(typeof applyRuntimeDocDisplayMetadata === 'function'){
+    const allowParentSync = opts.allowParentMetadataSync !== false && activeLocale !== 'en';
+    if(allowParentSync && typeof applyRuntimeDocDisplayMetadata === 'function'){
       applyRuntimeDocDisplayMetadata(doc, {code, title, desc});
     }
   }catch(e){}
@@ -2450,7 +2536,7 @@ function loadDocContent(code){
           if(dc) dc.innerHTML = edited;
           else if(idoc.body) idoc.body.innerHTML = edited;
         }
-        try{ syncIframeDocumentHeaderMetadata(idoc, doc); }catch(_e){}
+        try{ syncIframeDocumentHeaderMetadata(idoc, doc, {locale: lang}); }catch(_e){}
         try{
           if(idoc && typeof edApplyGlobalTablePolicyToDocument==='function'){
             edApplyGlobalTablePolicyToDocument(idoc, {force:true, source:'view-load'});
