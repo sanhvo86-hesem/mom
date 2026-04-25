@@ -1,11 +1,13 @@
 # Workspace hygiene
 .DS_Store
 .claude/settings.local.json
+.claude/scheduled_tasks.lock
 __pycache__/
 *.py[cod]
 
 # Generated analysis/build/test artifacts
 _reports/*
+tests/e2e/node_modules/
 # Whitelist tracked QA evidence for the module-template-v4 slice program
 # (Slice 1 dispatch board, Slice 2 nonconformance, future Wave 1 slices).
 # Reviewed off-line by external evaluators; required to be visible on GitHub.
