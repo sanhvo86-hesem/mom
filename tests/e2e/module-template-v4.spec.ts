@@ -28,6 +28,43 @@ test.describe('module-template-v4 preview smoke', () => {
     expect(new URL(page.url()).pathname).toBe('/ops');
   });
 
+  test('renders shell home with 3 domain tiles', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/shell-home.html');
+    const root = page.locator('[data-hmv4-shell-home]');
+    await expect(root).toBeVisible();
+    await expect(root).toHaveAttribute('data-route-class', 'SH');
+    await expect(page.locator('[data-hmv4-domain-tile]')).toHaveCount(3);
+    await expect(page.locator('[data-hmv4-shell-search] input')).toBeDisabled();
+  });
+
+  test('renders domain landing with module tiles', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/domain-landing-quality-compliance.html');
+    const root = page.locator('[data-hmv4-domain-landing]');
+    await expect(root).toHaveAttribute('data-route-class', 'DL');
+    await expect(root).toHaveAttribute('data-domain-key', 'quality-compliance');
+    await expect(page.locator('[data-hmv4-module-tile]')).toHaveCount(4);
+  });
+
+  test('renders module landing with tiles', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/module-landing-quality-case-management.html');
+    const root = page.locator('[data-hmv4-module-landing]');
+    await expect(root).toHaveAttribute('data-route-class', 'ML');
+    await expect(root).toHaveAttribute('data-module-key', 'quality-case-management');
+    await expect(page.locator('a[href*="/records/nonconformance-cases"]')).toBeVisible();
+  });
+
+  test('module landing empty state', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/module-landing-empty.html');
+    await expect(page.locator('[data-hmv4-module-empty]')).toBeVisible();
+  });
+
+  test('unknown domain renders re-anchor', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/domain-landing.html?bogus=1');
+    const root = page.locator('[data-hmv4-domain-landing]');
+    await expect(root).toHaveAttribute('data-fixture-state', 'unknown');
+    await expect(root.locator('a[href="/ops"]')).toBeVisible();
+  });
+
   test('renders dispatch board as a read-only projection workspace', async ({ page }) => {
     await page.goto('/tests/fixtures/module-template-v4/pages/workspace-board.html');
     const board = page.locator('[data-hmv4-dispatch-board]');

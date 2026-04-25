@@ -37,69 +37,100 @@
     if(chips && chips.length){ html += '<div class="hmv4-chip-row">'+chips.map(function(c){return '<span class="hmv4-chip">'+esc(c)+'</span>';}).join('')+'</div>'; }
     return html + '</div>';
   }
-  function navFixture(){ return window.HMV4_NAV_SHELL_FIXTURE || null; }
-  function fixtureDomains(){
-    var f = navFixture();
-    if(f && Array.isArray(f.domains)) return f.domains.map(function(d){ return [d.key, d.name]; });
-    return domains;
-  }
-  function fixtureModulesForDomain(domainKey){
-    var f = navFixture();
-    if(f && Array.isArray(f.modules)){
-      return f.modules.filter(function(m){ return m.domainKey === domainKey; }).map(function(m){ return [m.key, m.name, m.subtitle || '']; });
-    }
-    var inline = modules[domainKey] || [];
-    return inline.map(function(m){ return [m[0], m[1], '']; });
-  }
-  function fixtureModuleTiles(moduleKey){
-    var f = navFixture();
-    if(f && f.moduleLandingTiles && f.moduleLandingTiles[moduleKey]) return f.moduleLandingTiles[moduleKey];
+  function navFixture(){ return window.HMV4_NAV_SHELL_FIXTURE || readJsonFixture('[data-hmv4-nav-shell-fixture]') || {}; }
+  function findNavDomain(domainsList, domainKey){
+    for(var i=0;i<domainsList.length;i++) if(domainsList[i].key === domainKey) return domainsList[i];
     return null;
   }
-  function renderShellHome(){
-    var list = fixtureDomains();
-    return '<section class="hmv4-shell-home" data-route-class="SH" data-domain-tile-count="'+list.length+'">' +
-      '<div class="hmv4-grid">' + list.map(function(d){ return '<article class="hmv4-card" data-hmv4-domain-tile="'+esc(d[0])+'"><h3>'+esc(d[1])+'</h3><p>Open domain landing.</p><a class="hmv4-card-link" data-hmv4-domain-link href="/ops/'+esc(d[0])+'">Open '+esc(d[1])+'</a></article>'; }).join('') + '</div></section>';
+  function findNavModule(modulesList, moduleKey){
+    for(var i=0;i<modulesList.length;i++) if(modulesList[i].key === moduleKey) return modulesList[i];
+    return null;
   }
-  function renderDomain(route){
-    var d = route.params.domain || 'operations';
-    var list = fixtureModulesForDomain(d);
-    return '<section class="hmv4-domain-landing" data-route-class="DL" data-domain="'+esc(d)+'" data-module-tile-count="'+list.length+'"><div class="hmv4-grid">' +
-      (list.length ? list.map(function(m){
-        var sub = m[2] ? '<p>'+esc(m[2])+'</p>' : '<p>Module landing and workspace entry.</p>';
-        return '<article class="hmv4-card" data-hmv4-module-tile="'+esc(m[0])+'"><h3>'+esc(m[1])+'</h3>'+sub+'<a class="hmv4-card-link" data-hmv4-module-link href="/ops/'+esc(d)+'/'+esc(m[0])+'">Open module</a></article>';
-      }).join('') : '<div class="hmv4-feedback" data-feedback-state="info" data-hmv4-empty-domain><strong>Domain ready</strong><p>No module fixture has been staged for this domain yet.</p></div>') + '</div></section>';
+  function renderShellHome(route){
+    var fixture = navFixture();
+    var domainsList = fixture.domains || [];
+    var search = '<form class="hmv4-search" role="search" aria-label="Search records or workspaces" data-hmv4-shell-search><input type="search" placeholder="Search..." disabled aria-disabled="true"></form>';
+    var tiles = domainsList.map(function(d){
+      var moduleCount = (d.modules || []).length;
+      return '<a class="hmv4-card hmv4-domain-tile" href="/ops/'+esc(d.key)+'" data-hmv4-domain-tile data-domain-key="'+esc(d.key)+'">'+
+        '<h2>'+esc(d.name)+'</h2>'+
+        '<p class="hmv4-text-2">'+moduleCount+' module'+(moduleCount===1?'':'s')+'</p>'+
+      '</a>';
+    }).join('');
+    return '<section class="hmv4-shell-home" data-hmv4-shell-home data-route-class="SH">'+
+      '<header class="hmv4-page-header-zone"><h1>Operations</h1>'+search+'</header>'+
+      '<div class="hmv4-grid">'+tiles+'</div>'+
+    '</section>';
   }
-  function renderModule(route){
-    var p = route.params;
-    var tiles = fixtureModuleTiles(p.module);
+  function renderDomainLanding(route){
+    var p = route.params || {};
+    var domainKey = p.domain || '';
+    var fixture = navFixture();
+    var domainsList = fixture.domains || [];
+    var modulesList = fixture.modules || [];
+    var domain = findNavDomain(domainsList, domainKey);
+
+    if(!domain){
+      return '<section class="hmv4-domain-landing" data-hmv4-domain-landing data-route-class="DL" data-domain-key="'+esc(domainKey)+'" data-fixture-state="unknown">'+
+        '<div class="hmv4-feedback" data-feedback-state="warning">Unknown domain "'+esc(domainKey)+'". Open <a href="/ops">shell home</a>.</div>'+
+      '</section>';
+    }
+
+    var moduleKeys = domain.modules || [];
+    var domainModules = modulesList.filter(function(m){ return moduleKeys.indexOf(m.key) >= 0; });
+    var tiles = domainModules.map(function(m){
+      return '<a class="hmv4-card hmv4-module-tile" href="/ops/'+esc(domainKey)+'/'+esc(m.key)+'" data-hmv4-module-tile data-domain-key="'+esc(domainKey)+'" data-module-key="'+esc(m.key)+'">'+
+        '<h3>'+esc(m.name)+'</h3>'+
+        (m.summary ? '<p class="hmv4-text-2">'+esc(m.summary)+'</p>' : '')+
+      '</a>';
+    }).join('');
+    var crumbs = '<nav aria-label="Breadcrumb"><ol class="hmv4-breadcrumb"><li><a href="/ops">Operations</a></li><li aria-current="page">'+esc(domain.name)+'</li></ol></nav>';
+
+    return '<section class="hmv4-domain-landing" data-hmv4-domain-landing data-route-class="DL" data-domain-key="'+esc(domainKey)+'">'+
+      '<header class="hmv4-page-header-zone">'+crumbs+'<h1>'+esc(domain.name)+'</h1>'+(domain.summary?'<p class="hmv4-page-subtitle">'+esc(domain.summary)+'</p>':'')+'</header>'+
+      '<div class="hmv4-grid">'+tiles+'</div>'+
+    '</section>';
+  }
+  function renderModuleLanding(route){
+    var p = route.params || {};
+    var domainKey = p.domain || '';
+    var moduleKey = p.module || '';
+    var fixture = navFixture();
+    var domainsList = fixture.domains || [];
+    var modulesList = fixture.modules || [];
+    var domain = findNavDomain(domainsList, domainKey);
+    var module = findNavModule(modulesList, moduleKey);
+
+    if(!domain || !module){
+      return '<section class="hmv4-module-landing" data-hmv4-module-landing data-route-class="ML" data-domain-key="'+esc(domainKey)+'" data-module-key="'+esc(moduleKey)+'" data-fixture-state="unknown">'+
+        '<div class="hmv4-feedback" data-feedback-state="warning">Unknown module "'+esc(domainKey)+'/'+esc(moduleKey)+'". Open <a href="/ops/'+esc(domainKey)+'">domain landing</a>.</div>'+
+      '</section>';
+    }
+
+    var tiles = (module.tiles || []).map(function(t){
+      var href = t.href || '';
+      return '<a class="hmv4-card hmv4-module-tile" href="'+esc(href)+'" data-hmv4-tile-kind="'+esc(t.kind || 'workspace')+'">'+
+        '<h3>'+esc(t.label)+'</h3>'+
+        (t.summary ? '<p class="hmv4-text-2">'+esc(t.summary)+'</p>' : '')+
+      '</a>';
+    }).join('');
+
     if(!tiles){
-      return '<section class="hmv4-module-landing" data-route-class="ML" data-domain="'+esc(p.domain)+'" data-module="'+esc(p.module)+'" data-module-tile-state="empty">' +
-        '<div class="hmv4-feedback" data-feedback-state="info" data-hmv4-empty-module><strong>Module ready</strong><p>No workspace or record fixture has been staged for this module yet.</p></div></section>';
+      tiles = '<div class="hmv4-feedback" data-feedback-state="bridge" data-hmv4-module-empty>'+
+        '<p>No tiles configured for this module fixture.</p>'+
+      '</div>';
     }
-    var primary = tiles.primaryWorkspace;
-    var workspaces = (tiles.additionalWorkspaces || []).slice();
-    var recordCollection = tiles.recordCollection;
-    var recent = tiles.recentRecords || [];
-    var html = '<section class="hmv4-module-landing" data-route-class="ML" data-domain="'+esc(p.domain)+'" data-module="'+esc(p.module)+'" data-module-tile-state="ready"><div class="hmv4-grid">';
-    if(primary){
-      html += '<article class="hmv4-card" data-hmv4-module-workspace="primary"><h3>'+esc(primary.label || 'Primary workspace')+'</h3><p>'+esc(primary.subtitle || 'Open the default workspace for this module.')+'</p><a class="hmv4-card-link" data-hmv4-workspace-link href="/ops/'+esc(p.domain)+'/'+esc(p.module)+'/'+esc(primary.family)+'">Open '+esc(primary.family)+'</a></article>';
-    }
-    workspaces.forEach(function(ws){
-      html += '<article class="hmv4-card" data-hmv4-module-workspace="'+esc(ws.family)+'"><h3>'+esc(ws.label || ws.family)+'</h3><p>'+esc(ws.subtitle || 'Workspace projection.')+'</p><a class="hmv4-card-link" data-hmv4-workspace-link href="/ops/'+esc(p.domain)+'/'+esc(p.module)+'/'+esc(ws.family)+'">Open '+esc(ws.family)+'</a></article>';
-    });
-    if(recordCollection){
-      html += '<article class="hmv4-card" data-hmv4-module-collection="'+esc(recordCollection.family)+'"><h3>'+esc(recordCollection.label || 'Records')+'</h3><p>'+esc(recordCollection.subtitle || 'Open authoritative collection.')+'</p><a class="hmv4-card-link" data-hmv4-collection-link href="/ops/records/'+esc(recordCollection.family)+'">Open collection</a></article>';
-    }
-    if(recent.length){
-      html += '<article class="hmv4-card" data-hmv4-module-recent><h3>Recent records</h3><ul class="hmv4-link-list">';
-      recent.forEach(function(r){
-        html += '<li><a data-hmv4-record-link href="/ops/records/'+esc(r.family)+'/'+esc(r.id)+'?tab=overview">'+esc(r.label || r.id)+'</a></li>';
-      });
-      html += '</ul></article>';
-    }
-    html += '</div></section>';
-    return html;
+
+    var crumbs = '<nav aria-label="Breadcrumb"><ol class="hmv4-breadcrumb">'+
+      '<li><a href="/ops">Operations</a></li>'+
+      '<li><a href="/ops/'+esc(domainKey)+'">'+esc(domain.name)+'</a></li>'+
+      '<li aria-current="page">'+esc(module.name)+'</li>'+
+    '</ol></nav>';
+
+    return '<section class="hmv4-module-landing" data-hmv4-module-landing data-route-class="ML" data-domain-key="'+esc(domainKey)+'" data-module-key="'+esc(moduleKey)+'">'+
+      '<header class="hmv4-page-header-zone">'+crumbs+'<h1>'+esc(module.name)+'</h1>'+(module.summary?'<p class="hmv4-page-subtitle">'+esc(module.summary)+'</p>':'')+'</header>'+
+      '<div class="hmv4-grid">'+tiles+'</div>'+
+    '</section>';
   }
   function renderCollection(route){
     var rf = route.params.resource_family || 'records';
@@ -396,8 +427,8 @@
   function renderRoute(route){
     if(!route || !route.ok) return '<div class="hmv4-feedback" data-feedback-state="error"><strong>Invalid route</strong><p>The route cannot be resolved.</p></div>';
     if(route.routeClass === 'SH') return renderShellHome(route);
-    if(route.routeClass === 'DL') return renderDomain(route);
-    if(route.routeClass === 'ML') return renderModule(route);
+    if(route.routeClass === 'DL') return renderDomainLanding(route);
+    if(route.routeClass === 'ML') return renderModuleLanding(route);
     if(route.routeClass === 'AC') return renderCollection(route);
     if(route.routeClass === 'AR' || route.routeClass === 'ERD') return renderRecord(route);
     if(route.routeClass === 'WS' || route.routeClass === 'SFW') return renderWorkspace(route);
@@ -418,7 +449,21 @@
   }
   function renderNav(nav){
     if(!nav) return;
-    nav.innerHTML = '<div class="hmv4-nav-section"><h2 class="hmv4-nav-section-title">Domains</h2>' + domains.map(function(d){ return '<a class="hmv4-nav-link" href="/ops/'+esc(d[0])+'">'+esc(d[1])+'</a>'; }).join('') + '</div>';
+    var fixture = navFixture();
+    var navDomains = fixture.domains || domains.map(function(d){ return { key: d[0], name: d[1] }; });
+    nav.innerHTML = '<div class="hmv4-nav-section"><h2 class="hmv4-nav-section-title">Domains</h2>' + navDomains.map(function(d){ return '<a class="hmv4-nav-link" href="/ops/'+esc(d.key)+'">'+esc(d.name)+'</a>'; }).join('') + '</div>';
   }
-  window.Hmv4Renderers = { renderRoute: renderRoute, applyShell: applyShell, renderNav: renderNav, renderDispatchBoardWorkspace: renderDispatchBoardWorkspace, renderTrainingMatrixWorkspace: renderTrainingMatrixWorkspace, renderNonconformanceRecord: renderNonconformanceRecord, domains: domains, modules: modules };
+  window.Hmv4Renderers = Object.assign(window.Hmv4Renderers || {}, {
+    renderRoute: renderRoute,
+    applyShell: applyShell,
+    renderNav: renderNav,
+    renderShellHome: renderShellHome,
+    renderDomainLanding: renderDomainLanding,
+    renderModuleLanding: renderModuleLanding,
+    renderDispatchBoardWorkspace: renderDispatchBoardWorkspace,
+    renderTrainingMatrixWorkspace: renderTrainingMatrixWorkspace,
+    renderNonconformanceRecord: renderNonconformanceRecord,
+    domains: domains,
+    modules: modules
+  });
 })();

@@ -2,6 +2,14 @@ import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
 const fixturePages: string[] = [
+  'shell-home.html',
+  'domain-landing.html',
+  'domain-landing-quality-compliance.html',
+  'domain-landing-shopfloor-execution.html',
+  'module-landing.html',
+  'module-landing-quality-case-management.html',
+  'module-landing-dispatch-board.html',
+  'module-landing-empty.html',
   'workspace-board.html',
   'workspace-dashboard.html',
   'workspace-board-empty.html',
