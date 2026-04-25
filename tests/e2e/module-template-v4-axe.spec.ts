@@ -39,6 +39,17 @@ const fixturePages: string[] = [
   'workspace-training-matrix-conflict.html',
   'workspace-training-matrix-partial-access.html',
   'workspace-training-matrix-degraded.html',
+  'authoritative-record-shell-cdoc-overview.html',
+  'authoritative-record-shell-cdoc-content.html',
+  'authoritative-record-shell-cdoc-revisions.html',
+  'authoritative-record-shell-cdoc-controlled-copies.html',
+  'authoritative-record-shell-cdoc-effectivity.html',
+  'authoritative-record-shell-cdoc-related.html',
+  'authoritative-record-shell-cdoc-audit.html',
+  'authoritative-record-shell-cdoc-signatures.html',
+  'authoritative-record-shell-cdoc-conflict.html',
+  'authoritative-record-shell-cdoc-partial-access.html',
+  'authoritative-record-shell-cdoc-degraded.html',
 ];
 
 for (const page of fixturePages) {

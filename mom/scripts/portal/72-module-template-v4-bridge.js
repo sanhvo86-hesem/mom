@@ -31,6 +31,7 @@
     deviations: u('ML',{domain:'quality-operations', module:'quality-case-management'}),
     concessions: u('ML',{domain:'quality-operations', module:'quality-case-management'}),
     capa: u('ML',{domain:'quality-operations', module:'capa-effectiveness'}),
+    cdoc: u('ML',{domain:'document-change-compliance', module:'controlled-docs-records'}),
     'batch-release': u('ML',{domain:'quality-operations', module:'metrology-release-trace'}),
     genealogy: u('WS',{domain:'quality-operations', module:'metrology-release-trace', workspace_family:'explorer'}),
     documents: u('ML',{domain:'document-change-compliance', module:'controlled-docs-records'}),
@@ -63,6 +64,18 @@
       return {
         policy:'redirect_record_context_only',
         url:u('AR',{resource_family:'capas', record_id:recordId},{tab:(context && context.tab) || 'overview'})
+      };
+    }
+    if(key === 'cdoc' && recordId){
+      return {
+        policy:'redirect_record_context_only',
+        url:u('AR',{resource_family:'controlled-documents', record_id:recordId},{tab:(context && context.tab) || 'overview'})
+      };
+    }
+    if((key === 'brel' || key === 'release') && recordId){
+      return {
+        policy:'redirect_record_context_only',
+        url:u('AR',{resource_family:'batch-releases', record_id:recordId},{tab:(context && context.tab) || 'overview'})
       };
     }
     return eqmsModuleAliasMap[key] ? { policy:'redirect_then_deprecate', url:eqmsModuleAliasMap[key] } : { policy:'unmapped_needs_decision', url:null, reason:'no_eqms_alias' };

@@ -392,3 +392,78 @@ test.describe('module-template-v4 preview smoke', () => {
     }
   });
 });
+
+test.describe('CDOC record shell (Slice 5)', () => {
+  test('renders CDOC overview tab with required attributes', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cdoc-overview.html');
+    const root = page.locator('[data-hmv4-cdoc-record]');
+    await expect(root).toBeVisible();
+    await expect(root).toHaveAttribute('data-route-class', 'AR');
+    await expect(root).toHaveAttribute('data-resource-family', 'controlled-documents');
+    await expect(root).toHaveAttribute('data-root-code', 'CDOC');
+    await expect(root).toHaveAttribute('data-authority-class', 'authoritative');
+    await expect(root).toHaveAttribute('data-record-id', 'CDOC-001');
+  });
+
+  for (const tab of ['content', 'revisions', 'controlled-copies', 'effectivity', 'related', 'audit', 'signatures']) {
+    test(`renders CDOC ${tab} tab panel`, async ({ page }) => {
+      await page.goto(`/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cdoc-${tab}.html`);
+      await expect(page.locator(`[data-hmv4-cdoc-panel="${tab}"]:not([hidden])`)).toBeVisible();
+    });
+  }
+
+  test('CDOC all mutation launchers are disabled', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cdoc-overview.html');
+    const enabled = await page.locator('[data-hmv4-cdoc-launchers] [data-hmv4-mutation-intent]').evaluateAll(
+      (buttons) => buttons.filter((b) => !(b as HTMLButtonElement).disabled).length,
+    );
+    expect(enabled).toBe(0);
+  });
+
+  test('CDOC revisions tab renders revision table', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cdoc-revisions.html');
+    const panel = page.locator('[data-hmv4-cdoc-panel="revisions"]:not([hidden])');
+    await expect(panel).toBeVisible();
+    await expect(panel.locator('table.hmv4-data-table')).toBeVisible();
+    await expect(panel.locator('td')).not.toHaveCount(0);
+  });
+
+  test('CDOC controlled-copies tab renders copies table', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cdoc-controlled-copies.html');
+    const panel = page.locator('[data-hmv4-cdoc-panel="controlled-copies"]:not([hidden])');
+    await expect(panel).toBeVisible();
+    await expect(panel.locator('table.hmv4-data-table')).toBeVisible();
+  });
+
+  test('CDOC related tab links use data-hmv4-record-open attributes', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cdoc-related.html');
+    const links = page.locator('[data-hmv4-cdoc-panel="related"] [data-hmv4-record-open]');
+    await expect(links.first()).toBeVisible();
+  });
+
+  test('CDOC conflict state fixture sets data-fixture-state', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cdoc-conflict.html');
+    await expect(page.locator('[data-hmv4-cdoc-record]')).toHaveAttribute('data-fixture-state', 'conflict');
+    await expect(page.locator('[data-hmv4-cdoc-record]')).toHaveAttribute('data-fixture-freshness', 'fixture_conflict');
+  });
+
+  test('CDOC partial-access state shows partial notice', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cdoc-partial-access.html');
+    await expect(page.locator('[data-hmv4-cdoc-partial]')).toBeVisible();
+    await expect(page.locator('[data-hmv4-cdoc-partial]')).toContainText('Partial access');
+  });
+
+  test('CDOC degraded state has no enabled mutation launchers', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cdoc-degraded.html');
+    const enabled = await page.locator('[data-hmv4-mutation-intent]').evaluateAll(
+      (buttons) => buttons.filter((b) => !(b as HTMLButtonElement).disabled).length,
+    );
+    expect(enabled).toBe(0);
+  });
+
+  test('CDOC lifecycle strip renders all 7 states', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cdoc-overview.html');
+    const items = page.locator('[data-hmv4-cdoc-lifecycle] li');
+    await expect(items).toHaveCount(7);
+  });
+});

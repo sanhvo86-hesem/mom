@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>HMV4 CDOC Fixture</title>
+<link rel="stylesheet" href="../../../../mom/styles/module-template-v4.tokens.css">
+<link rel="stylesheet" href="../../../../mom/styles/module-template-v4.css">
+</head><body>
+<div id="hmv4-fixture-root"></div>
+<script type="application/json" data-hmv4-fixture-route>
+{"fixtureId":"authoritative-record-shell-cdoc-revisions","path":"/ops/records/controlled-documents/CDOC-001?tab=revisions","routeClass":"AR","expectedRenderer":"renderCdocRecord","coverage":["cdoc_revisions","authoritative_record","no_mutation"]}
+</script>
+<script type="application/json" data-hmv4-cdoc-record-fixture>
+{"version":"0.1","authorityClass":"authoritative","resourceFamily":"controlled-documents","rootCode":"CDOC","records":{"CDOC-001":{"recordId":"CDOC-001","rootCode":"CDOC","docCode":"qms-sop-100","title":"Process Validation SOP","category":"SOP","classification":"internal","state":"effective","currentRevision":"B","effectiveDate":"2026-01-15","owner":"Quality Manager","approver":"VP Quality","approvedAt":"2026-01-10","releasedAt":"2026-01-12","contentSummary":"Procedure for IQ/OQ/PQ validation of new manufacturing processes. Applies to all production lines.","freshness":"fixture_current","stateMessage":"Read-only prototype. Document mutation must remain outside this fixture.","lifecycle":[["draft","complete"],["in-review","complete"],["approved","complete"],["released","complete"],["effective","current"],["superseded","locked"],["obsolete","locked"]],"revisions":[{"rev":"A","date":"2025-06-10","summary":"Initial release","approver":"VP Quality"},{"rev":"B","date":"2026-01-10","summary":"Updated PQ acceptance criteria per FDA guidance","approver":"VP Quality"}],"controlledCopies":[{"copyId":"CC-001","holder":"Production Line 1 Supervisor","location":"Line 1 control booth","acknowledgedAt":"2026-01-15"},{"copyId":"CC-002","holder":"Production Line 2 Supervisor","location":"Line 2 control booth","acknowledgedAt":"2026-01-15"},{"copyId":"CC-003","holder":"QC Lab","location":"QC Lab Wall","acknowledgedAt":null}],"effectivity":{"scope":"All production validation activities","sites":["Plant 1","Plant 2"],"processes":["Injection molding","CNC machining","Assembly"],"validFrom":"2026-01-15","validTo":null},"relatedRecords":[{"resourceFamily":"engineering-changes","recordId":"ECO-2026-014","label":"ECO-2026-014 process update driving Rev B"},{"resourceFamily":"training-records","recordId":"TR-7050","label":"TR-7050 Process Validation training"}],"limitations":[]}},"states":{"conflict":{"freshness":"fixture_conflict","stateMessage":"Conflict detected. A newer revision is in review."},"partial_access":{"stateMessage":"Partial-access fixture. Some controlled-copy holders masked.","limitations":["Holder names masked for cross-site copies.","Effectivity sites masked for current role."]},"degraded":{"freshness":"fixture_stale","stateMessage":"Degraded/offline fixture. Refresh from authority before acting."}}}
+</script>
+<script>(function(){var node=document.querySelector('[data-hmv4-cdoc-record-fixture]');if(!node)return;try{window.HMV4_CDOC_RECORD_FIXTURE=JSON.parse(node.textContent||'{}');}catch(e){console.warn('[HMV4 fixture] invalid CDOC fixture',e);}})();</script>
+<script>window.HMV4_PREVIEW_ENABLED=true;</script>
+<script src="../../../../mom/scripts/portal/71-module-template-v4-routes.js"></script>
+<script src="../../../../mom/scripts/portal/72-module-template-v4-bridge.js"></script>
+<script src="../../../../mom/scripts/portal/73-module-template-v4-renderers.js"></script>
+<script src="../../../../mom/scripts/portal/70-module-template-v4-hydration.js"></script>
+<script>(function(){var node=document.querySelector('[data-hmv4-fixture-route]');if(!node)return;try{var route=JSON.parse(node.textContent||'{}');window.HMV4_FIXTURE_ROUTE_CONTEXT=route;if(route.path&&window.history)history.replaceState(history.state||{},'',route.path);}catch(e){console.warn('[HMV4 fixture] invalid route context',e);}})();</script>
+</body></html>

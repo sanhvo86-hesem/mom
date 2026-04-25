@@ -54,4 +54,21 @@ test.describe('module-template-v4 bridge adapter', () => {
     expect(withContext.policy).toBe('redirect_record_context_only');
     expect(withContext.url).toContain('/ops/records/capas/CAPA-001?tab=overview');
   });
+
+  test('maps cdoc to module landing without record context', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const noContext = await page.evaluate(() => (window as any).Hmv4Bridge.resolveEqmsModule('cdoc'));
+    expect(noContext.policy).toBe('redirect_then_deprecate');
+    expect(noContext.url).toContain('/ops/document-change-compliance/controlled-docs-records');
+    expect(noContext.url).not.toContain('/ops/records/controlled-documents/');
+  });
+
+  test('maps cdoc to record shell only with explicit record context', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const withContext = await page.evaluate(() =>
+      (window as any).Hmv4Bridge.resolveEqmsModule('cdoc', { recordId: 'CDOC-001', tab: 'overview' }),
+    );
+    expect(withContext.policy).toBe('redirect_record_context_only');
+    expect(withContext.url).toContain('/ops/records/controlled-documents/CDOC-001?tab=overview');
+  });
 });

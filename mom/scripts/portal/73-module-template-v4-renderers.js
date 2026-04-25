@@ -442,10 +442,345 @@
       capaTabs.map(function(t){return '<section class="hmv4-tabpanel" role="tabpanel" aria-labelledby="tab-capa-'+t+'" '+(t===tab?'':'hidden')+' data-hmv4-capa-panel="'+esc(t)+'">'+renderCapaPanel(t, record)+'</section>';}).join('') +
       '</article>';
   }
+  var cdocTabs = ['overview','content','revisions','controlled-copies','effectivity','related','audit','signatures'];
+  function normaliseCdocTab(tab){ return cdocTabs.indexOf(tab) >= 0 ? tab : 'overview'; }
+  function defaultCdocRecord(recordId){
+    return {
+      recordId: recordId || 'CDOC-001',
+      rootCode: 'CDOC',
+      docCode: 'qms-sop-100',
+      title: 'Process Validation SOP',
+      category: 'SOP',
+      classification: 'internal',
+      state: 'effective',
+      currentRevision: 'B',
+      effectiveDate: '2026-01-15',
+      owner: 'Quality Manager',
+      approver: 'VP Quality',
+      approvedAt: '2026-01-10',
+      releasedAt: '2026-01-12',
+      contentSummary: 'Procedure for IQ/OQ/PQ validation of new manufacturing processes. Applies to all production lines.',
+      freshness: 'fixture_current',
+      stateMessage: 'Read-only prototype. Document mutation must remain outside this fixture.',
+      lifecycle: [
+        ['draft','complete'],['in-review','complete'],['approved','complete'],
+        ['released','complete'],['effective','current'],['superseded','locked'],['obsolete','locked']
+      ],
+      revisions: [
+        { rev: 'A', date: '2025-06-10', summary: 'Initial release', approver: 'VP Quality' },
+        { rev: 'B', date: '2026-01-10', summary: 'Updated PQ acceptance criteria per FDA guidance', approver: 'VP Quality' }
+      ],
+      controlledCopies: [
+        { copyId: 'CC-001', holder: 'Production Line 1 Supervisor', location: 'Line 1 control booth', acknowledgedAt: '2026-01-15' },
+        { copyId: 'CC-002', holder: 'Production Line 2 Supervisor', location: 'Line 2 control booth', acknowledgedAt: '2026-01-15' },
+        { copyId: 'CC-003', holder: 'QC Lab', location: 'QC Lab Wall', acknowledgedAt: null }
+      ],
+      effectivity: {
+        scope: 'All production validation activities',
+        sites: ['Plant 1', 'Plant 2'],
+        processes: ['Injection molding', 'CNC machining', 'Assembly'],
+        validFrom: '2026-01-15',
+        validTo: null
+      },
+      relatedRecords: [
+        { resourceFamily: 'engineering-changes', recordId: 'ECO-2026-014', label: 'ECO-2026-014 process update driving Rev B' },
+        { resourceFamily: 'training-records', recordId: 'TR-7050', label: 'TR-7050 Process Validation training' }
+      ],
+      limitations: []
+    };
+  }
+  function getCdocRecord(route){
+    var p = route.params || {};
+    var recordId = p.record_id || 'CDOC-001';
+    var fixture = window.HMV4_CDOC_RECORD_FIXTURE || readJsonFixture('[data-hmv4-cdoc-record-fixture]') || {};
+    var record = defaultCdocRecord(recordId);
+    if(fixture.records && fixture.records[recordId]) mergeRecord(record, fixture.records[recordId]);
+    if(fixture.record) mergeRecord(record, fixture.record);
+    if(fixture.state) record.state = fixture.state;
+    if(fixture.freshness) record.freshness = fixture.freshness;
+    if(fixture.stateMessage) record.stateMessage = fixture.stateMessage;
+    if(fixture.limitations) record.limitations = fixture.limitations;
+    var state = (route.query && route.query.state) || fixture.state || record.state || 'effective';
+    var stateOverlay = (fixture.states || {})[state] || null;
+    if(stateOverlay){
+      record.state = state;
+      if(stateOverlay.freshness) record.freshness = stateOverlay.freshness;
+      if(stateOverlay.stateMessage) record.stateMessage = stateOverlay.stateMessage;
+      if(stateOverlay.limitations) record.limitations = stateOverlay.limitations;
+    }
+    record.recordId = recordId;
+    record.rootCode = 'CDOC';
+    return record;
+  }
+  function renderCdocPanel(tab, record){
+    if(tab === 'overview'){
+      return '<h2>Overview</h2>'+
+        '<dl class="hmv4-meta-grid">'+
+          '<dt>Doc code</dt><dd>'+esc(record.docCode || '—')+'</dd>'+
+          '<dt>Category</dt><dd>'+esc(record.category || '—')+'</dd>'+
+          '<dt>Classification</dt><dd>'+esc(record.classification || '—')+'</dd>'+
+          '<dt>Current revision</dt><dd>'+esc(record.currentRevision || '—')+'</dd>'+
+          '<dt>Effective date</dt><dd>'+esc(record.effectiveDate || '—')+'</dd>'+
+          '<dt>Owner</dt><dd>'+esc(record.owner || '—')+'</dd>'+
+        '</dl>'+
+        '<p>'+esc(record.contentSummary || 'Read-only overview fixture.')+'</p>';
+    }
+    if(tab === 'content'){
+      return '<h2>Content preview</h2>'+
+        '<p class="hmv4-text-2">Document body rendering deferred to live integration. This fixture displays a placeholder.</p>'+
+        '<div class="hmv4-card hmv4-card--document-preview">'+
+          '<h3>'+esc(record.title || 'Document content')+'</h3>'+
+          '<p>'+esc(record.contentSummary || '—')+'</p>'+
+        '</div>';
+    }
+    if(tab === 'revisions'){
+      var revs = record.revisions || [];
+      if(revs.length === 0) return '<h2>Revision history</h2><p class="hmv4-text-2">No revisions recorded.</p>';
+      return '<h2>Revision history</h2>'+
+        '<table class="hmv4-data-table"><thead><tr><th>Rev</th><th>Date</th><th>Summary</th><th>Approver</th></tr></thead><tbody>'+
+        revs.map(function(r){return '<tr><td>'+esc(r.rev)+'</td><td>'+esc(r.date)+'</td><td>'+esc(r.summary)+'</td><td>'+esc(r.approver)+'</td></tr>';}).join('')+
+        '</tbody></table>';
+    }
+    if(tab === 'controlled-copies'){
+      var copies = record.controlledCopies || [];
+      if(copies.length === 0) return '<h2>Controlled copies</h2><p class="hmv4-text-2">No controlled copies issued.</p>';
+      return '<h2>Controlled copies</h2>'+
+        '<table class="hmv4-data-table"><thead><tr><th>Copy ID</th><th>Holder</th><th>Location</th><th>Acknowledged</th></tr></thead><tbody>'+
+        copies.map(function(c){return '<tr><td>'+esc(c.copyId)+'</td><td>'+esc(c.holder)+'</td><td>'+esc(c.location)+'</td><td>'+esc(c.acknowledgedAt || '—')+'</td></tr>';}).join('')+
+        '</tbody></table>';
+    }
+    if(tab === 'effectivity'){
+      var eff = record.effectivity || {};
+      return '<h2>Effectivity scope</h2>'+
+        '<dl class="hmv4-meta-grid">'+
+          '<dt>Scope</dt><dd>'+esc(eff.scope || '—')+'</dd>'+
+          '<dt>Sites</dt><dd>'+esc((eff.sites || []).join(', ') || '—')+'</dd>'+
+          '<dt>Processes</dt><dd>'+esc((eff.processes || []).join(', ') || '—')+'</dd>'+
+          '<dt>Valid from</dt><dd>'+esc(eff.validFrom || '—')+'</dd>'+
+          '<dt>Valid to</dt><dd>'+esc(eff.validTo || '—')+'</dd>'+
+        '</dl>';
+    }
+    if(tab === 'related'){
+      var related = record.relatedRecords || [];
+      if(related.length === 0) return '<h2>Related records</h2><p class="hmv4-text-2">No related records.</p>';
+      return '<h2>Related records</h2><ul class="hmv4-list">'+
+        related.map(function(r){return '<li><a href="/ops/records/'+esc(r.resourceFamily)+'/'+esc(r.recordId)+'?tab=overview" data-hmv4-record-open="'+esc(r.resourceFamily)+'" data-hmv4-record-id="'+esc(r.recordId)+'">'+esc(r.label)+'</a></li>';}).join('')+
+        '</ul>';
+    }
+    if(tab === 'audit') return '<h2>Audit trail</h2><p class="hmv4-text-2">Read-only placeholder. Live: GET /api/v1/controlled-documents/{id}/audit.</p>';
+    if(tab === 'signatures') return '<h2>Signatures</h2><p class="hmv4-text-2">Read-only placeholder. e-Signatures (21 CFR Part 11).</p>';
+    return '<p>Unknown tab.</p>';
+  }
+  function renderCdocRecord(route){
+    var p = route.params || {};
+    var q = route.query || {};
+    var tab = normaliseCdocTab(q.tab || 'overview');
+    var recordId = p.record_id || 'CDOC-001';
+    var record = getCdocRecord(route);
+    var state = record.state || 'effective';
+    var freshness = record.freshness || 'fixture_current';
+    var limitations = record.limitations || [];
+    var noteId = 'hmv4-cdoc-mutation-note';
+
+    var head =
+      '<header class="hmv4-record-identity">'+
+        '<h1 class="hmv4-record-title">'+esc(record.docCode || recordId)+' &mdash; '+esc(record.title)+'</h1>'+
+        '<dl class="hmv4-meta-grid">'+
+          '<dt>Revision</dt><dd>'+esc(record.currentRevision || '')+'</dd>'+
+          '<dt>State</dt><dd>'+esc(state)+'</dd>'+
+          '<dt>Effective</dt><dd>'+esc(record.effectiveDate || '')+'</dd>'+
+          '<dt>Owner</dt><dd>'+esc(record.owner || '')+'</dd>'+
+        '</dl>'+
+        (record.stateMessage ? '<p class="hmv4-feedback" data-feedback-state="bridge" role="status" data-hmv4-cdoc-state>'+esc(record.stateMessage)+'</p>' : '')+
+      '</header>';
+
+    var lifecycleStrip = '<ol class="hmv4-lifecycle-strip" data-hmv4-cdoc-lifecycle aria-label="CDOC lifecycle">'+
+      (record.lifecycle || []).map(function(s){return '<li data-lifecycle-state="'+esc(s[1] || 'pending')+'"><strong>'+esc(s[0])+'</strong><span>'+esc(s[1] || 'pending')+'</span></li>';}).join('')+
+      '</ol>';
+
+    var partialAccessNotice = '';
+    if(state === 'partial_access' && limitations.length){
+      partialAccessNotice =
+        '<section class="hmv4-feedback" data-feedback-state="warning" role="status" data-hmv4-cdoc-partial>'+
+          '<strong>Partial access</strong>'+
+          '<ul>'+limitations.map(function(l){return '<li>'+esc(l)+'</li>';}).join('')+'</ul>'+
+        '</section>';
+    }
+
+    var intents = [
+      ['cdoc-submit-for-review','Submit for review'],
+      ['cdoc-approve','Approve'],
+      ['cdoc-release','Release'],
+      ['cdoc-supersede','Supersede'],
+      ['cdoc-obsolete','Obsolete'],
+      ['cdoc-acknowledge-controlled-copy','Acknowledge controlled copy'],
+      ['cdoc-esign','e-Sign']
+    ];
+    var disabledLaunchers =
+      '<section class="hmv4-toolbar" aria-label="Disabled document mutation launchers" data-hmv4-cdoc-launchers>'+
+        intents.map(function(intent){return '<button class="hmv4-button" type="button" disabled aria-disabled="true" aria-describedby="'+esc(noteId)+'" data-hmv4-mutation-intent="'+esc(intent[0])+'">'+esc(intent[1])+' disabled</button>';}).join('')+
+        '<span class="hmv4-feedback" data-feedback-state="warning" role="note" id="'+esc(noteId)+'">Mutation actions are disabled in this read-only prototype.</span>'+
+      '</section>';
+
+    return '<article class="hmv4-record-shell hmv4-record-shell--display hmv4-record-shell--cdoc" data-hmv4-cdoc-record data-route-class="AR" data-resource-family="controlled-documents" data-root-code="CDOC" data-record-id="'+esc(recordId)+'" data-authority-class="authoritative" data-query-tab="'+esc(tab)+'" data-fixture-state="'+esc(state)+'" data-fixture-freshness="'+esc(freshness)+'">'+
+      head + lifecycleStrip + partialAccessNotice + disabledLaunchers +
+      '<div class="hmv4-tablist" role="tablist" aria-label="Controlled document details">'+cdocTabs.map(function(t){return '<button class="hmv4-tab" role="tab" aria-selected="'+(t===tab)+'" data-tab="'+t+'" id="tab-cdoc-'+t+'">'+esc(t)+'</button>';}).join('')+'</div>'+
+      cdocTabs.map(function(t){return '<section class="hmv4-tabpanel" role="tabpanel" aria-labelledby="tab-cdoc-'+t+'" '+(t===tab?'':'hidden')+' data-hmv4-cdoc-panel="'+esc(t)+'">'+renderCdocPanel(t, record)+'</section>';}).join('')+
+      '</article>';
+  }
+  var brelTabs = ['overview','release-package','quality-evidence','genealogy','shipment-readiness','related','audit','signatures'];
+  function normaliseBrelTab(tab){ return brelTabs.indexOf(tab) >= 0 ? tab : 'overview'; }
+  function renderBrelPanel(tab, record){
+    if(tab === 'overview'){
+      var approvers = record.approvers || [];
+      return '<h2>Overview</h2>'+
+        '<dl class="hmv4-meta-grid">'+
+          '<dt>Batch ID</dt><dd>'+esc(record.batchId || '—')+'</dd>'+
+          '<dt>Product code</dt><dd>'+esc(record.productCode || '—')+'</dd>'+
+          '<dt>Lot ID</dt><dd>'+esc(record.lotId || '—')+'</dd>'+
+          '<dt>Manufactured</dt><dd>'+esc(record.manufacturedAt || '—')+'</dd>'+
+          '<dt>Line</dt><dd>'+esc(record.manufactureLine || '—')+'</dd>'+
+          '<dt>Release decision</dt><dd>'+esc(record.releaseDecision || '—')+'</dd>'+
+        '</dl>'+
+        (approvers.length ? '<h3>Approvers (2-person rule)</h3>'+
+          '<table class="hmv4-data-table"><thead><tr><th>Role</th><th>Name</th><th>Decision</th><th>Signed at</th></tr></thead><tbody>'+
+          approvers.map(function(a){ return '<tr data-hmv4-brel-approver><td>'+esc(a.role)+'</td><td>'+esc(a.name)+'</td><td>'+esc(a.decision)+'</td><td>'+esc(a.signedAt || '—')+'</td></tr>'; }).join('')+
+          '</tbody></table>' : '');
+    }
+    if(tab === 'release-package'){
+      var pkg = record.releasePackage || {};
+      var insp = pkg.inspectionRecords || [];
+      var ncs = pkg.nonconformanceCases || [];
+      var capas = pkg.capaRecords || [];
+      var cdocs = pkg.cdocVersions || [];
+      var devs = pkg.deviations || [];
+      return '<h2>Release package</h2>'+
+        (insp.length ? '<h3>Inspection records</h3><ul class="hmv4-list">'+insp.map(function(r){ return '<li><a href="/ops/records/inspections/'+esc(r.id)+'?tab=overview" data-hmv4-record-open="inspections" data-hmv4-record-id="'+esc(r.id)+'">'+esc(r.id)+'</a> — '+esc(r.result)+'</li>'; }).join('')+'</ul>' : '')+
+        (ncs.length ? '<h3>Nonconformance cases</h3><ul class="hmv4-list">'+ncs.map(function(r){ return '<li><a href="/ops/records/nonconformance-cases/'+esc(r.id)+'?tab=overview" data-hmv4-record-open="nonconformance-cases" data-hmv4-record-id="'+esc(r.id)+'">'+esc(r.id)+'</a> — '+esc(r.disposition)+'</li>'; }).join('')+'</ul>' : '')+
+        (capas.length ? '<h3>CAPA records</h3><ul class="hmv4-list">'+capas.map(function(r){ return '<li><a href="/ops/records/capas/'+esc(r.id)+'?tab=overview" data-hmv4-record-open="capas" data-hmv4-record-id="'+esc(r.id)+'">'+esc(r.id)+'</a> — '+esc(r.status)+'</li>'; }).join('')+'</ul>' : '')+
+        (cdocs.length ? '<h3>Controlled document versions</h3><ul class="hmv4-list">'+cdocs.map(function(r){ return '<li>'+esc(r.docCode)+' Rev '+esc(r.rev)+'</li>'; }).join('')+'</ul>' : '')+
+        (devs.length ? '<h3>Deviations</h3><ul class="hmv4-list">'+devs.map(function(r){ return '<li>'+esc(r.id || JSON.stringify(r))+'</li>'; }).join('')+'</ul>' : '<p class="hmv4-text-2">No deviations on record.</p>');
+    }
+    if(tab === 'quality-evidence'){
+      var ev = record.qualityEvidence || {};
+      return '<h2>Quality evidence</h2>'+
+        '<dl class="hmv4-meta-grid">'+
+          '<dt>CoA</dt><dd>'+(ev.coa ? esc(ev.coa.id)+' (issued '+esc(ev.coa.issuedAt)+')' : '—')+'</dd>'+
+          '<dt>Batch record</dt><dd>'+(ev.batchRecord ? esc(ev.batchRecord.id)+' — '+(ev.batchRecord.complete ? 'complete' : 'incomplete') : '—')+'</dd>'+
+          '<dt>Validation certificate</dt><dd>'+(ev.validationCertificate ? esc(ev.validationCertificate.id)+' valid until '+esc(ev.validationCertificate.validUntil) : '—')+'</dd>'+
+        '</dl>';
+    }
+    if(tab === 'genealogy'){
+      return '<h2>Genealogy</h2>'+
+        '<dl class="hmv4-meta-grid">'+
+          '<dt>Genealogy root</dt><dd>'+esc(record.genealogyRoot || '—')+'</dd>'+
+        '</dl>'+
+        '<p class="hmv4-text-2">Full genealogy graph rendering deferred to live integration. Open <a href="/ops/records/lots/'+esc(record.lotId || 'LOT-UNKNOWN')+'?tab=overview">'+esc(record.lotId || 'LOT-UNKNOWN')+'</a> for the material identity anchor.</p>';
+    }
+    if(tab === 'shipment-readiness'){
+      var ship = record.shipmentReadiness || {};
+      var allocs = ship.allocatedTo || [];
+      var blocks = ship.blockedBy || [];
+      return '<h2>Shipment readiness</h2>'+
+        '<dl class="hmv4-meta-grid">'+
+          '<dt>Quantity available</dt><dd>'+esc(ship.quantityAvailable != null ? ship.quantityAvailable : '—')+'</dd>'+
+        '</dl>'+
+        (allocs.length ? '<h3>Allocations</h3><ul class="hmv4-list">'+allocs.map(function(a){ return '<li>'+esc(a.customer)+' — '+esc(a.quantity)+'</li>'; }).join('')+'</ul>' : '<p class="hmv4-text-2">No allocations.</p>')+
+        (blocks.length ? '<h3>Blocked by</h3><ul class="hmv4-list">'+blocks.map(function(b){ return '<li class="hmv4-chip" data-feedback-state="warning">'+esc(b)+'</li>'; }).join('')+'</ul>' : '<p class="hmv4-text-2">No active blockers.</p>');
+    }
+    if(tab === 'related'){
+      var related = record.relatedRecords || [];
+      if(related.length === 0) return '<h2>Related records</h2><p class="hmv4-text-2">No related records.</p>';
+      return '<h2>Related records</h2><ul class="hmv4-list">'+
+        related.map(function(r){ return '<li><a href="/ops/records/'+esc(r.resourceFamily)+'/'+esc(r.recordId)+'?tab=overview" data-hmv4-record-open="'+esc(r.resourceFamily)+'" data-hmv4-record-id="'+esc(r.recordId)+'">'+esc(r.label)+'</a></li>'; }).join('')+
+        '</ul>';
+    }
+    if(tab === 'audit') return '<h2>Audit trail</h2><p class="hmv4-text-2">Read-only placeholder. Live: GET /api/v1/batch-releases/{id}/audit.</p>';
+    if(tab === 'signatures'){
+      var sApprovers = record.approvers || [];
+      return '<h2>Signatures</h2><p class="hmv4-text-2">Read-only placeholder. 2-person e-sign required for actual release (21 CFR Part 11).</p>'+
+        (sApprovers.length ? '<table class="hmv4-data-table"><thead><tr><th>Role</th><th>Name</th><th>Decision</th><th>Signed at</th></tr></thead><tbody>'+
+          sApprovers.map(function(a){ return '<tr data-hmv4-brel-approver><td>'+esc(a.role)+'</td><td>'+esc(a.name)+'</td><td>'+esc(a.decision)+'</td><td>'+esc(a.signedAt || '—')+'</td></tr>'; }).join('')+
+          '</tbody></table>' : '');
+    }
+    return '<p>Unknown tab.</p>';
+  }
+  function renderBrelRecord(route){
+    var p = route.params || {};
+    var q = route.query || {};
+    var tab = normaliseBrelTab(q.tab || 'overview');
+    var recordId = p.record_id || 'BREL-001';
+    var fixture = window.HMV4_BREL_RECORD_FIXTURE || readJsonFixture('[data-hmv4-brel-record-fixture]') || {};
+    var records = fixture.records || {};
+    var record = records[recordId] || {
+      recordId: recordId, rootCode: 'BREL',
+      title: 'Batch BX-2026-04 release packet',
+      batchId: 'BX-2026-04', productCode: 'PN-2042', lotId: 'LOT-2026-04',
+      manufacturedAt: '2026-04-15', manufactureLine: 'Line 1',
+      state: 'review', releaseDecision: 'pending',
+      freshness: 'fixture_current',
+      stateMessage: 'Read-only release packet. 2-person e-sign required for actual release.',
+      lifecycle: [['draft','complete'],['evidence-collection','complete'],['review','current'],['release-approved','pending'],['market-ship-ready','locked'],['on-hold','locked'],['rejected','locked']],
+      approvers: [
+        {role:'QA Director', name:'Dr. Tran', decision:'pending', signedAt:null},
+        {role:'Plant Manager', name:'Mr. Le', decision:'pending', signedAt:null}
+      ],
+      releasePackage: { inspectionRecords: [], nonconformanceCases: [], capaRecords: [], cdocVersions: [], deviations: [] },
+      qualityEvidence: {}, genealogyRoot: null,
+      shipmentReadiness: { quantityAvailable: 0, allocatedTo: [], blockedBy: [] },
+      relatedRecords: []
+    };
+    record.rootCode = 'BREL'; record.recordId = recordId;
+    var state = q.state || record.state || 'review';
+    var stateOverlay = (fixture.states || {})[state] || null;
+    var freshness = (stateOverlay && stateOverlay.freshness) || record.freshness || 'fixture_current';
+    var stateMessage = (stateOverlay && stateOverlay.stateMessage) || record.stateMessage || '';
+    var partialAccessLimitations = (stateOverlay && stateOverlay.limitations) || [];
+    var head = '<header class="hmv4-record-identity">'+
+      '<h1 class="hmv4-record-title">'+esc(recordId)+' &mdash; '+esc(record.title)+'</h1>'+
+      '<dl class="hmv4-meta-grid">'+
+        '<dt>Batch</dt><dd>'+esc(record.batchId || '')+'</dd>'+
+        '<dt>State</dt><dd>'+esc(record.state || state)+'</dd>'+
+        '<dt>Decision</dt><dd>'+esc(record.releaseDecision || '')+'</dd>'+
+        '<dt>Product</dt><dd>'+esc(record.productCode || '')+'</dd>'+
+      '</dl>'+
+      (stateMessage ? '<p class="hmv4-feedback" data-feedback-state="bridge" role="status" data-hmv4-brel-state>'+esc(stateMessage)+'</p>' : '')+
+    '</header>';
+    var lifecycleStrip = '<ol class="hmv4-lifecycle-strip" data-hmv4-brel-lifecycle aria-label="BREL lifecycle">'+
+      (record.lifecycle || []).map(function(s){ return '<li data-state-class="'+esc(s[1])+'">'+esc(s[0])+'</li>'; }).join('')+
+    '</ol>';
+    var partialNotice = (state === 'partial_access' && partialAccessLimitations.length)
+      ? '<section class="hmv4-feedback" data-feedback-state="warning" data-hmv4-brel-partial><p>Partial access:</p><ul>'+partialAccessLimitations.map(function(l){ return '<li>'+esc(l)+'</li>'; }).join('')+'</ul></section>'
+      : '';
+    var noteId = 'hmv4-brel-disabled-note';
+    var brelIntents = [
+      ['brel-collect-evidence','Collect evidence'],
+      ['brel-submit-for-review','Submit for review'],
+      ['brel-approve-release','Approve release'],
+      ['brel-reject','Reject'],
+      ['brel-place-on-hold','Place on hold'],
+      ['brel-release-from-hold','Release from hold'],
+      ['brel-market-ship','Market ship'],
+      ['brel-recall','Recall'],
+      ['brel-esign-2person','e-Sign (2-person)'],
+      ['brel-esign','e-Sign']
+    ];
+    var disabledLaunchers = '<section class="hmv4-toolbar" aria-label="Disabled BREL mutation launchers" data-hmv4-brel-launchers>'+
+      brelIntents.map(function(intent){ return '<button class="hmv4-button" disabled aria-disabled="true" data-hmv4-mutation-intent="'+esc(intent[0])+'" aria-describedby="'+esc(noteId)+'">'+esc(intent[1])+'</button>'; }).join('')+
+      '<span class="hmv4-feedback" data-feedback-state="warning" role="note" id="'+esc(noteId)+'">Release actions are disabled in this read-only prototype. BREL is the highest-stakes governed-quality root — 2-person e-sign, approval, market-ship, and recall remain outside fixture scope.</span>'+
+    '</section>';
+    return '<article class="hmv4-record-shell hmv4-record-shell--display hmv4-record-shell--brel" data-hmv4-brel-record data-route-class="AR" data-resource-family="batch-releases" data-root-code="BREL" data-record-id="'+esc(recordId)+'" data-authority-class="authoritative" data-query-tab="'+esc(tab)+'" data-fixture-state="'+esc(state)+'" data-fixture-freshness="'+esc(freshness)+'">'+
+      head + lifecycleStrip + partialNotice + disabledLaunchers +
+      '<div class="hmv4-tablist" role="tablist" aria-label="Batch release details">'+brelTabs.map(function(t){ return '<button class="hmv4-tab" role="tab" aria-selected="'+(t===tab)+'" data-tab="'+t+'" id="tab-brel-'+t+'">'+esc(t)+'</button>'; }).join('')+'</div>'+
+      brelTabs.map(function(t){ return '<section class="hmv4-tabpanel" role="tabpanel" aria-labelledby="tab-brel-'+t+'" '+(t===tab?'':'hidden')+' data-hmv4-brel-panel="'+esc(t)+'">'+renderBrelPanel(t, record)+'</section>'; }).join('')+
+    '</article>';
+  }
   function renderRecord(route){
     var p = route.params, tab = route.query.tab || 'overview';
     if(p.resource_family === 'nonconformance-cases') return renderNonconformanceRecord(route);
     if(p.resource_family === 'capas') return renderCapaRecord(route);
+    if(p.resource_family === 'batch-releases') return renderBrelRecord(route);
+    if(p.resource_family === 'controlled-documents') return renderCdocRecord(route);
     var tabs = ['overview','workflow','related','evidence','comments','audit'];
     return '<article class="hmv4-record-shell hmv4-record-shell--display" data-route-class="AR" data-resource-family="'+esc(p.resource_family)+'" data-record-id="'+esc(p.record_id)+'" data-authority-class="authoritative" data-query-tab="'+esc(tab)+'">' +
       '<section class="hmv4-record-identity"><h1 class="hmv4-record-title">'+esc(p.record_id)+'</h1><p class="hmv4-record-subtitle">'+esc(p.resource_family)+' authoritative record shell</p></section>'+
@@ -647,6 +982,8 @@
     renderTrainingMatrixWorkspace: renderTrainingMatrixWorkspace,
     renderNonconformanceRecord: renderNonconformanceRecord,
     renderCapaRecord: renderCapaRecord,
+    renderCdocRecord: renderCdocRecord,
+    renderBrelRecord: renderBrelRecord,
     domains: domains,
     modules: modules
   });

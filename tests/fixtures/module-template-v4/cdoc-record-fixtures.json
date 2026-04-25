@@ -1,0 +1,61 @@
+{
+  "version": "0.1",
+  "authorityClass": "authoritative",
+  "resourceFamily": "controlled-documents",
+  "rootCode": "CDOC",
+  "records": {
+    "CDOC-001": {
+      "recordId": "CDOC-001",
+      "rootCode": "CDOC",
+      "docCode": "qms-sop-100",
+      "title": "Process Validation SOP",
+      "category": "SOP",
+      "classification": "internal",
+      "state": "effective",
+      "currentRevision": "B",
+      "effectiveDate": "2026-01-15",
+      "owner": "Quality Manager",
+      "approver": "VP Quality",
+      "approvedAt": "2026-01-10",
+      "releasedAt": "2026-01-12",
+      "contentSummary": "Procedure for IQ/OQ/PQ validation of new manufacturing processes. Applies to all production lines.",
+      "freshness": "fixture_current",
+      "stateMessage": "Read-only prototype. Document mutation must remain outside this fixture.",
+      "lifecycle": [
+        ["draft","complete"],
+        ["in-review","complete"],
+        ["approved","complete"],
+        ["released","complete"],
+        ["effective","current"],
+        ["superseded","locked"],
+        ["obsolete","locked"]
+      ],
+      "revisions": [
+        { "rev": "A", "date": "2025-06-10", "summary": "Initial release", "approver": "VP Quality" },
+        { "rev": "B", "date": "2026-01-10", "summary": "Updated PQ acceptance criteria per FDA guidance", "approver": "VP Quality" }
+      ],
+      "controlledCopies": [
+        { "copyId": "CC-001", "holder": "Production Line 1 Supervisor", "location": "Line 1 control booth", "acknowledgedAt": "2026-01-15" },
+        { "copyId": "CC-002", "holder": "Production Line 2 Supervisor", "location": "Line 2 control booth", "acknowledgedAt": "2026-01-15" },
+        { "copyId": "CC-003", "holder": "QC Lab", "location": "QC Lab Wall", "acknowledgedAt": null }
+      ],
+      "effectivity": {
+        "scope": "All production validation activities",
+        "sites": ["Plant 1", "Plant 2"],
+        "processes": ["Injection molding", "CNC machining", "Assembly"],
+        "validFrom": "2026-01-15",
+        "validTo": null
+      },
+      "relatedRecords": [
+        { "resourceFamily": "engineering-changes", "recordId": "ECO-2026-014", "label": "ECO-2026-014 process update driving Rev B" },
+        { "resourceFamily": "training-records", "recordId": "TR-7050", "label": "TR-7050 Process Validation training" }
+      ],
+      "limitations": []
+    }
+  },
+  "states": {
+    "conflict":       { "freshness": "fixture_conflict", "stateMessage": "Conflict detected. A newer revision is in review." },
+    "partial_access": { "stateMessage": "Partial-access fixture. Some controlled-copy holders masked.", "limitations": ["Holder names masked for cross-site copies.", "Effectivity sites masked for current role."] },
+    "degraded":       { "freshness": "fixture_stale", "stateMessage": "Degraded/offline fixture. Refresh from authority before acting." }
+  }
+}
