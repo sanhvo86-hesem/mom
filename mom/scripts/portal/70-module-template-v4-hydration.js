@@ -94,6 +94,74 @@
         };
       }
     },
+    'customer-purchase-orders': {
+      canonicalPath: '/api/v1/customer-purchase-orders',
+      fixtureGlobal: 'HMV4_CPO_RECORD_FIXTURE',
+      recordAttr: 'data-hmv4-cpo-record',
+      adapt: function(live){
+        if(!live) return null;
+        var recordId = live.id || live.record_id || live.cpo_id || live.code;
+        var terms = live.termsAndConditions || live.terms_and_conditions || {};
+        var ack = live.acknowledgment || {};
+        var lineItems = live.lineItems || live.line_items || [];
+        var linkedSalesOrders = live.linkedSalesOrders || live.linked_sales_orders || [];
+        return {
+          recordId: recordId,
+          rootCode: 'CPO',
+          title: live.title || live.summary || ('Customer purchase order ' + (recordId || '')),
+          customerPoNumber: live.customerPoNumber || live.customer_po_number || live.customer_order_ref,
+          customerCode: live.customerCode || live.customer_code,
+          customerName: live.customerName || live.customer_name,
+          customerOrderRef: live.customerOrderRef || live.customer_order_ref,
+          state: live.state || live.status || 'live',
+          severity: live.severity,
+          receivedDate: live.receivedDate || live.received_date,
+          requestedDeliveryDate: live.requestedDeliveryDate || live.requested_delivery_date,
+          acknowledgedDate: live.acknowledgedDate || live.acknowledged_date,
+          totalValue: live.totalValue || live.total_value,
+          currency: live.currency,
+          paymentTerms: live.paymentTerms || live.payment_terms || terms.paymentTerms || terms.payment_terms,
+          deliveryTerms: live.deliveryTerms || live.delivery_terms || terms.deliveryTerms || terms.delivery_terms,
+          owner: (live.owner && (live.owner.name || live.owner)) || null,
+          freshness: 'live_current',
+          stateMessage: 'Live API mode. Read-only display. Mutation actions remain disabled.',
+          lifecycle: normalizeLifecycle(live.lifecycle),
+          lineItems: lineItems.map(function(line){
+            return {
+              line: line.line || line.line_number,
+              productCode: line.productCode || line.product_code,
+              description: line.description,
+              quantity: line.quantity,
+              unitPrice: line.unitPrice || line.unit_price,
+              lineTotal: line.lineTotal || line.line_total,
+              requestedDate: line.requestedDate || line.requested_date
+            };
+          }),
+          termsAndConditions: {
+            paymentTerms: terms.paymentTerms || terms.payment_terms || live.paymentTerms || live.payment_terms,
+            deliveryTerms: terms.deliveryTerms || terms.delivery_terms || live.deliveryTerms || live.delivery_terms,
+            warrantyTerms: terms.warrantyTerms || terms.warranty_terms,
+            qualityRequirements: terms.qualityRequirements || terms.quality_requirements,
+            customClauses: terms.customClauses || terms.custom_clauses || []
+          },
+          linkedSalesOrders: linkedSalesOrders.map(function(order){
+            return {
+              id: order.id || order.record_id || order.sales_order_id || order.so_id,
+              productCode: order.productCode || order.product_code,
+              quantity: order.quantity,
+              state: order.state || order.status
+            };
+          }),
+          acknowledgment: {
+            acknowledgedAt: ack.acknowledgedAt || ack.acknowledged_at || live.acknowledgedDate || live.acknowledged_date,
+            acknowledgedBy: ack.acknowledgedBy || ack.acknowledged_by,
+            customerSignedAt: ack.customerSignedAt || ack.customer_signed_at,
+            deviationsFromCustomerPo: ack.deviationsFromCustomerPo || ack.deviations_from_customer_po || []
+          },
+          relatedRecords: live.relatedRecords || live.related_records || []
+        };
+      }
+    },
     'capas': {
       canonicalPath: '/api/v1/capas',
       fixtureGlobal: 'HMV4_CAPA_RECORD_FIXTURE',
@@ -343,8 +411,10 @@
     // Legacy aliases (ADR-0011 backwards compat)
     fetchNonconformance: function(recordId){ return fetchLiveResource('nonconformance-cases', recordId); },
     fetchWorkOrder: function(recordId){ return fetchLiveResource('work-orders', recordId); },
+    fetchCustomerPurchaseOrder: function(recordId){ return fetchLiveResource('customer-purchase-orders', recordId); },
     adaptNcToFixtureShape: function(live){ return HMV4_LIVE_RESOURCE_REGISTRY['nonconformance-cases'].adapt(live); },
-    adaptWoToFixtureShape: function(live){ return HMV4_LIVE_RESOURCE_REGISTRY['work-orders'].adapt(live); }
+    adaptWoToFixtureShape: function(live){ return HMV4_LIVE_RESOURCE_REGISTRY['work-orders'].adapt(live); },
+    adaptCpoToFixtureShape: function(live){ return HMV4_LIVE_RESOURCE_REGISTRY['customer-purchase-orders'].adapt(live); }
   };
   window.HMModuleTemplateV4Hydration = { hydrate: hydrate, ensureShell: ensureShell };
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hydrate); else hydrate();
