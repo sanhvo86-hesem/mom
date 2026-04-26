@@ -60,6 +60,16 @@ const fixturePages: string[] = [
   'authoritative-record-shell-insp-conflict.html',
   'authoritative-record-shell-insp-partial-access.html',
   'authoritative-record-shell-insp-degraded.html',
+  'authoritative-record-shell-jo-overview.html',
+  'authoritative-record-shell-jo-dispatch-readiness.html',
+  'authoritative-record-shell-jo-spawned-work-orders.html',
+  'authoritative-record-shell-jo-material-consumption.html',
+  'authoritative-record-shell-jo-progress.html',
+  'authoritative-record-shell-jo-related.html',
+  'authoritative-record-shell-jo-audit.html',
+  'authoritative-record-shell-jo-conflict.html',
+  'authoritative-record-shell-jo-partial-access.html',
+  'authoritative-record-shell-jo-degraded.html',
 ];
 
 for (const page of fixturePages) {

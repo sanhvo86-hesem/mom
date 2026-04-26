@@ -97,4 +97,26 @@ test.describe('module-template-v4 bridge adapter', () => {
     expect(withContext.policy).toBe('redirect_record_context_only');
     expect(withContext.url).toContain('/ops/records/inspections/INSP-001?tab=sample-results');
   });
+  test('maps jo to job-order record shell only with explicit record context', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const noContext = await page.evaluate(() => (window as any).Hmv4Bridge.resolveEqmsModule('jo'));
+    expect(noContext.policy).toBe('redirect_then_deprecate');
+    expect(noContext.url).toContain('/ops/planning-scheduling/job-orders');
+    expect(noContext.url).not.toContain('/ops/records/job-orders/');
+
+    const withContext = await page.evaluate(() =>
+      (window as any).Hmv4Bridge.resolveEqmsModule('jo', { recordId: 'JO-2026-014', tab: 'overview' }),
+    );
+    expect(withContext.policy).toBe('redirect_record_context_only');
+    expect(withContext.url).toContain('/ops/records/job-orders/JO-2026-014?tab=overview');
+  });
+
+  test('maps job-order alias to JO record shell with record_id context', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const withContext = await page.evaluate(() =>
+      (window as any).Hmv4Bridge.resolveEqmsModule('job-order', { record_id: 'JO-2026-014', tab: 'spawned-work-orders' }),
+    );
+    expect(withContext.policy).toBe('redirect_record_context_only');
+    expect(withContext.url).toContain('/ops/records/job-orders/JO-2026-014?tab=spawned-work-orders');
+  });
 });

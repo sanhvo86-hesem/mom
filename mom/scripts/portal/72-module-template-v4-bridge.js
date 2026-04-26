@@ -45,7 +45,9 @@
     eco: u('ML',{domain:'npi-engineering-product-definition', module:'engineering-change'}),
     'change-control': u('ML',{domain:'npi-engineering-product-definition', module:'engineering-change'}),
     'apqp-ppap': u('ML',{domain:'npi-engineering-product-definition', module:'ppap-fai-validation'}),
-    fai: u('ML',{domain:'npi-engineering-product-definition', module:'ppap-fai-validation'})
+    fai: u('ML',{domain:'npi-engineering-product-definition', module:'ppap-fai-validation'}),
+    'job-order': u('ML',{domain:'planning-scheduling', module:'job-orders'}),
+    jo: u('ML',{domain:'planning-scheduling', module:'job-orders'})
   });
   function resolvePageKey(pageKey){
     var key = String(pageKey || '').trim();
@@ -92,6 +94,12 @@
       return {
         policy:'redirect_record_context_only',
         url:u('AR',{resource_family:'engineering-changes', record_id:recordId},{tab:(context && context.tab) || 'overview'})
+      };
+    }
+    if((key === 'jo' || key === 'job-order') && recordId){
+      return {
+        policy:'redirect_record_context_only',
+        url:u('AR',{resource_family:'job-orders', record_id:recordId},{tab:(context && context.tab) || 'overview'})
       };
     }
     return eqmsModuleAliasMap[key] ? { policy:'redirect_then_deprecate', url:eqmsModuleAliasMap[key] } : { policy:'unmapped_needs_decision', url:null, reason:'no_eqms_alias' };

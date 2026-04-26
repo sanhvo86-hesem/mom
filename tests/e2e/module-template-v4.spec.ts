@@ -630,3 +630,59 @@ test.describe('INSP record shell (Slice 6)', () => {
     await expect(items).toHaveCount(5);
   });
 });
+
+test.describe('JO record shell (Slice 9)', () => {
+  test('renders JO overview tab', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-jo-overview.html');
+    const root = page.locator('[data-hmv4-jo-record]');
+    await expect(root).toBeVisible();
+    await expect(root).toHaveAttribute('data-route-class', 'AR');
+    await expect(root).toHaveAttribute('data-authority-class', 'authoritative');
+    await expect(root).toHaveAttribute('data-resource-family', 'job-orders');
+    await expect(root).toHaveAttribute('data-root-code', 'JO');
+    await expect(root).toHaveAttribute('data-record-id', 'JO-2026-014');
+    await expect(root).toHaveAttribute('data-query-tab', 'overview');
+  });
+
+  for (const tab of ['dispatch-readiness', 'spawned-work-orders', 'material-consumption', 'progress', 'related', 'audit']) {
+    test(`renders JO ${tab} tab`, async ({ page }) => {
+      await page.goto(`/tests/fixtures/module-template-v4/pages/authoritative-record-shell-jo-${tab}.html`);
+      await expect(page.locator(`[data-hmv4-jo-panel="${tab}"]:not([hidden])`)).toBeVisible();
+    });
+  }
+
+  test('JO spawned-work-orders tab links to WO records', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-jo-spawned-work-orders.html');
+    await expect(page.locator('a[href*="records/work-orders/WO-3011"]')).toBeVisible();
+  });
+
+  test('JO material-consumption tab links to lot records', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-jo-material-consumption.html');
+    const panel = page.locator('[data-hmv4-jo-panel="material-consumption"]:not([hidden])');
+    await expect(panel.locator('[data-hmv4-record-open="lots"][data-hmv4-record-id="LOT-2026-04"]')).toBeVisible();
+  });
+
+  test('JO conflict state', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-jo-conflict.html');
+    await expect(page.locator('[data-hmv4-jo-record]')).toHaveAttribute('data-fixture-state', 'conflict');
+    await expect(page.locator('[data-hmv4-jo-record]')).toHaveAttribute('data-fixture-freshness', 'fixture_conflict');
+  });
+
+  test('JO partial access', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-jo-partial-access.html');
+    await expect(page.locator('[data-hmv4-jo-partial]')).toBeVisible();
+    await expect(page.locator('[data-hmv4-jo-partial]')).toContainText('Partial access');
+  });
+
+  test('JO degraded no mutation', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-jo-degraded.html');
+    await expect(page.locator('[data-hmv4-mutation-intent]:not([disabled])')).toHaveCount(0);
+  });
+
+  test('JO disabled launchers expose all transactional intents', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-jo-overview.html');
+    for (const intent of ['jo-release', 'jo-spawn-work-order', 'jo-place-on-hold', 'jo-resume', 'jo-cancel', 'jo-complete']) {
+      await expect(page.locator(`[data-hmv4-mutation-intent="${intent}"][disabled]`)).toBeVisible();
+    }
+  });
+});

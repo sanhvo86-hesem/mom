@@ -939,6 +939,173 @@
       inspTabs.map(function(t){return '<section class="hmv4-tabpanel" role="tabpanel" aria-labelledby="tab-insp-'+t+'" '+(t===tab?'':'hidden')+' data-hmv4-insp-panel="'+esc(t)+'">'+renderInspPanel(t, record)+'</section>';}).join('')+
       '</article>';
   }
+  var joTabs = ['overview','dispatch-readiness','spawned-work-orders','material-consumption','progress','related','audit'];
+  function normaliseJoTab(tab){ return joTabs.indexOf(tab) >= 0 ? tab : 'overview'; }
+  function defaultJoRecord(recordId){
+    return {
+      recordId: recordId || 'JO-2026-014',
+      rootCode: 'JO',
+      title: 'Job order JO-2026-014 (PN-2042 Rev B, Qty 5000)',
+      jobNumber: 'JO-2026-014',
+      customerOrderRef: 'CPO-2026-077',
+      productCode: 'PN-2042',
+      quantityOrdered: 5000,
+      quantityCompleted: 3200,
+      state: 'executing',
+      severity: 'low',
+      scheduledStart: '2026-04-15',
+      scheduledEnd: '2026-04-30',
+      actualStart: '2026-04-15',
+      actualEnd: null,
+      owner: 'Production Planner',
+      plannerNotes: 'Customer expedite. Run on Line 1 morning shift.',
+      freshness: 'fixture_current',
+      stateMessage: 'Read-only prototype JO shell. Mutation outside fixture.',
+      lifecycle: [['draft','complete'],['released','complete'],['executing','current'],['completed','locked']],
+      dispatchReadiness: { materialReady: true, equipmentReady: true, operatorReady: true, blockedBy: [] },
+      spawnedWorkOrders: [],
+      materialConsumption: [],
+      progressMetrics: { completionPct: 64, scrapRate: 0.8, downtimePct: 3.2 },
+      relatedRecords: [],
+      limitations: []
+    };
+  }
+  function getJoRecord(route){
+    var p = route.params || {};
+    var q = route.query || {};
+    var recordId = p.record_id || 'JO-2026-014';
+    var fixture = window.HMV4_JO_RECORD_FIXTURE || readJsonFixture('[data-hmv4-jo-record-fixture]') || {};
+    var record = defaultJoRecord(recordId);
+    if(fixture.records && fixture.records[recordId]) mergeRecord(record, fixture.records[recordId]);
+    if(fixture.record) mergeRecord(record, fixture.record);
+    if(fixture.state) record.state = fixture.state;
+    if(fixture.freshness) record.freshness = fixture.freshness;
+    if(fixture.stateMessage) record.stateMessage = fixture.stateMessage;
+    if(fixture.limitations) record.limitations = fixture.limitations;
+    var state = q.state || fixture.state || record.state || 'executing';
+    var stateOverlay = (fixture.states || {})[state] || null;
+    if(stateOverlay){
+      record.state = state;
+      if(stateOverlay.freshness) record.freshness = stateOverlay.freshness;
+      if(stateOverlay.stateMessage) record.stateMessage = stateOverlay.stateMessage;
+      if(stateOverlay.limitations) record.limitations = stateOverlay.limitations;
+    }
+    record.recordId = recordId;
+    record.rootCode = 'JO';
+    return record;
+  }
+  function renderJoPanel(tab, record){
+    if(tab === 'overview'){
+      return '<h2>Overview</h2>'+
+        '<dl class="hmv4-meta-grid">'+
+          '<dt>Job number</dt><dd>'+esc(record.jobNumber || '—')+'</dd>'+
+          '<dt>Customer order</dt><dd>'+esc(record.customerOrderRef || '—')+'</dd>'+
+          '<dt>Product</dt><dd>'+esc(record.productCode || '—')+'</dd>'+
+          '<dt>Quantity</dt><dd>'+esc((record.quantityCompleted || 0)+' / '+(record.quantityOrdered || 0))+'</dd>'+
+          '<dt>Scheduled</dt><dd>'+esc(record.scheduledStart || '—')+' &rarr; '+esc(record.scheduledEnd || '—')+'</dd>'+
+          '<dt>Actual</dt><dd>'+esc(record.actualStart || '—')+' &rarr; '+esc(record.actualEnd || 'in-progress')+'</dd>'+
+          '<dt>Owner</dt><dd>'+esc(record.owner || '—')+'</dd>'+
+        '</dl>'+
+        (record.plannerNotes ? '<h3>Planner notes</h3><p>'+esc(record.plannerNotes)+'</p>' : '');
+    }
+    if(tab === 'dispatch-readiness'){
+      var d = record.dispatchReadiness || {};
+      var blockedBy = d.blockedBy || [];
+      return '<h2>Dispatch readiness</h2>'+
+        '<dl class="hmv4-meta-grid">'+
+          '<dt>Material</dt><dd data-hmv4-readiness="'+(d.materialReady ? 'ready' : 'blocked')+'">'+(d.materialReady ? 'Ready' : 'Blocked')+'</dd>'+
+          '<dt>Equipment</dt><dd data-hmv4-readiness="'+(d.equipmentReady ? 'ready' : 'blocked')+'">'+(d.equipmentReady ? 'Ready' : 'Blocked')+'</dd>'+
+          '<dt>Operator</dt><dd data-hmv4-readiness="'+(d.operatorReady ? 'ready' : 'blocked')+'">'+(d.operatorReady ? 'Ready' : 'Blocked')+'</dd>'+
+        '</dl>'+
+        (blockedBy.length === 0 ? '<p class="hmv4-text-2">No blockers.</p>' :
+          '<h3>Blocked by</h3><ul class="hmv4-list">'+blockedBy.map(function(b){return '<li>'+esc(b)+'</li>';}).join('')+'</ul>');
+    }
+    if(tab === 'spawned-work-orders'){
+      var wos = record.spawnedWorkOrders || [];
+      if(wos.length === 0) return '<h2>Spawned work orders</h2><p class="hmv4-text-2">No WOs spawned yet.</p>';
+      return '<h2>Spawned work orders</h2>'+
+        '<table class="hmv4-data-table"><thead><tr><th>WO ID</th><th>Operation</th><th>Scheduled</th><th>State</th></tr></thead><tbody>'+
+        wos.map(function(w){return '<tr><td><a href="/ops/records/work-orders/'+esc(w.id)+'?tab=overview" data-hmv4-record-open="work-orders" data-hmv4-record-id="'+esc(w.id)+'">'+esc(w.id)+'</a></td><td>'+esc(w.operation)+'</td><td>'+esc(w.scheduledStart || '')+' &rarr; '+esc(w.scheduledEnd || '')+'</td><td>'+esc(w.state)+'</td></tr>';}).join('')+
+        '</tbody></table>';
+    }
+    if(tab === 'material-consumption'){
+      var mc = record.materialConsumption || [];
+      if(mc.length === 0) return '<h2>Material consumption</h2><p class="hmv4-text-2">No materials recorded.</p>';
+      return '<h2>Material consumption</h2>'+
+        '<table class="hmv4-data-table"><thead><tr><th>Item</th><th>Planned</th><th>Actual</th><th>Lot</th></tr></thead><tbody>'+
+        mc.map(function(m){return '<tr><td>'+esc(m.itemCode)+'</td><td>'+esc(m.plannedQty)+'</td><td>'+esc(m.actualQty)+'</td><td><a href="/ops/records/lots/'+esc(m.lot || '')+'?tab=overview" data-hmv4-record-open="lots" data-hmv4-record-id="'+esc(m.lot || '')+'">'+esc(m.lot || '—')+'</a></td></tr>';}).join('')+
+        '</tbody></table>';
+    }
+    if(tab === 'progress'){
+      var metrics = record.progressMetrics || {};
+      return '<h2>Progress metrics</h2>'+
+        '<dl class="hmv4-meta-grid">'+
+          '<dt>Completion</dt><dd>'+esc((metrics.completionPct || 0)+'%')+'</dd>'+
+          '<dt>Scrap rate</dt><dd>'+esc((metrics.scrapRate || 0)+'%')+'</dd>'+
+          '<dt>Downtime</dt><dd>'+esc((metrics.downtimePct || 0)+'%')+'</dd>'+
+        '</dl>';
+    }
+    if(tab === 'related'){
+      var rel = record.relatedRecords || [];
+      if(rel.length === 0) return '<h2>Related records</h2><p class="hmv4-text-2">No related records.</p>';
+      return '<h2>Related records</h2><ul class="hmv4-list">'+
+        rel.map(function(r){return '<li><a href="/ops/records/'+esc(r.resourceFamily)+'/'+esc(r.recordId)+'?tab=overview" data-hmv4-record-open="'+esc(r.resourceFamily)+'" data-hmv4-record-id="'+esc(r.recordId)+'">'+esc(r.label)+'</a></li>';}).join('')+
+        '</ul>';
+    }
+    if(tab === 'audit') return '<h2>Audit</h2><p class="hmv4-text-2">Read-only placeholder. Live: GET /api/v1/job-orders/{id}/audit when audit endpoint is added in a Phase B follow-up.</p>';
+    return '<p>Unknown tab.</p>';
+  }
+  function renderJoRecord(route){
+    var p = route.params || {};
+    var q = route.query || {};
+    var tab = normaliseJoTab(q.tab || 'overview');
+    var recordId = p.record_id || 'JO-2026-014';
+    var record = getJoRecord(route);
+    var state = record.state || 'executing';
+    var freshness = record.freshness || 'fixture_current';
+    var partialAccessLimitations = record.limitations || [];
+    var noteId = 'hmv4-jo-disabled-note';
+
+    var head =
+      '<header class="hmv4-record-identity">'+
+        '<h1 class="hmv4-record-title">'+esc(record.jobNumber || recordId)+' &mdash; '+esc(record.title)+'</h1>'+
+        '<dl class="hmv4-meta-grid">'+
+          '<dt>State</dt><dd>'+esc(state)+'</dd>'+
+          '<dt>Product</dt><dd>'+esc(record.productCode || '—')+'</dd>'+
+          '<dt>Qty</dt><dd>'+esc((record.quantityCompleted || 0)+' / '+(record.quantityOrdered || 0))+'</dd>'+
+          '<dt>Owner</dt><dd>'+esc(record.owner || '—')+'</dd>'+
+        '</dl>'+
+        (record.stateMessage ? '<p class="hmv4-feedback" data-feedback-state="bridge" role="status" data-hmv4-jo-state>'+esc(record.stateMessage)+'</p>' : '')+
+      '</header>';
+
+    var lifecycleStrip = '<ol class="hmv4-lifecycle-strip" data-hmv4-jo-lifecycle aria-label="JO lifecycle">'+
+      (record.lifecycle || []).map(function(s){return '<li data-state-class="'+esc(s[1] || 'pending')+'" data-lifecycle-state="'+esc(s[1] || 'pending')+'"><strong>'+esc(s[0])+'</strong><span>'+esc(s[1] || 'pending')+'</span></li>';}).join('')+
+      '</ol>';
+
+    var partialNotice = (state === 'partial_access' && partialAccessLimitations.length)
+      ? '<section class="hmv4-feedback" data-feedback-state="warning" role="status" data-hmv4-jo-partial><strong>Partial access</strong><ul>'+partialAccessLimitations.map(function(l){return '<li>'+esc(l)+'</li>';}).join('')+'</ul></section>'
+      : '';
+
+    var intents = [
+      ['jo-release','Release'],
+      ['jo-spawn-work-order','Spawn WO'],
+      ['jo-place-on-hold','Place on hold'],
+      ['jo-resume','Resume'],
+      ['jo-cancel','Cancel'],
+      ['jo-complete','Complete']
+    ];
+    var disabledLaunchers =
+      '<section class="hmv4-toolbar" aria-label="Disabled JO mutation launchers" data-hmv4-jo-launchers>'+
+        intents.map(function(intent){return '<button class="hmv4-button" type="button" disabled aria-disabled="true" aria-describedby="'+esc(noteId)+'" data-hmv4-mutation-intent="'+esc(intent[0])+'">'+esc(intent[1])+' disabled</button>';}).join('')+
+        '<span class="hmv4-feedback" data-feedback-state="warning" role="note" id="'+esc(noteId)+'">Mutation actions are disabled in this read-only prototype.</span>'+
+      '</section>';
+
+    return '<article class="hmv4-record-shell hmv4-record-shell--display hmv4-record-shell--jo" data-hmv4-jo-record data-route-class="AR" data-resource-family="job-orders" data-root-code="JO" data-record-id="'+esc(recordId)+'" data-authority-class="authoritative" data-query-tab="'+esc(tab)+'" data-fixture-state="'+esc(state)+'" data-fixture-freshness="'+esc(freshness)+'">'+
+      head + lifecycleStrip + partialNotice + disabledLaunchers +
+      '<div class="hmv4-tablist" role="tablist" aria-label="Job order details">'+joTabs.map(function(t){return '<button class="hmv4-tab" role="tab" aria-selected="'+(t===tab)+'" data-tab="'+esc(t)+'" id="tab-jo-'+esc(t)+'">'+esc(t)+'</button>';}).join('')+'</div>'+
+      joTabs.map(function(t){return '<section class="hmv4-tabpanel" role="tabpanel" aria-labelledby="tab-jo-'+esc(t)+'" '+(t===tab?'':'hidden')+' data-hmv4-jo-panel="'+esc(t)+'">'+renderJoPanel(t, record)+'</section>';}).join('')+
+      '</article>';
+  }
   function renderRecord(route){
     var p = route.params, tab = route.query.tab || 'overview';
     if(p.resource_family === 'nonconformance-cases') return renderNonconformanceRecord(route);
@@ -946,6 +1113,7 @@
     if(p.resource_family === 'batch-releases') return renderBrelRecord(route);
     if(p.resource_family === 'controlled-documents') return renderCdocRecord(route);
     if(p.resource_family === 'inspections') return renderInspRecord(route);
+    if(p.resource_family === 'job-orders') return renderJoRecord(route);
     var tabs = ['overview','workflow','related','evidence','comments','audit'];
     return '<article class="hmv4-record-shell hmv4-record-shell--display" data-route-class="AR" data-resource-family="'+esc(p.resource_family)+'" data-record-id="'+esc(p.record_id)+'" data-authority-class="authoritative" data-query-tab="'+esc(tab)+'">' +
       '<section class="hmv4-record-identity"><h1 class="hmv4-record-title">'+esc(p.record_id)+'</h1><p class="hmv4-record-subtitle">'+esc(p.resource_family)+' authoritative record shell</p></section>'+
@@ -1150,6 +1318,7 @@
     renderCdocRecord: renderCdocRecord,
     renderBrelRecord: renderBrelRecord,
     renderInspRecord: renderInspRecord,
+    renderJoRecord: renderJoRecord,
     domains: domains,
     modules: modules
   });
