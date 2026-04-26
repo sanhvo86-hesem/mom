@@ -27,7 +27,9 @@
         ["draft", "complete"],
         ["released", "complete"],
         ["executing", "current"],
-        ["completed", "locked"]
+        ["on-hold", "pending"],
+        ["completed", "locked"],
+        ["cancelled", "locked"]
       ],
       "dispatchReadiness": {
         "materialReady": true,

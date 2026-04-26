@@ -48,6 +48,7 @@ test.describe('hmv4 live api toggle (NQCASE)', () => {
 // ADR-0012: resource registry live-mode tests for all governed AR roots
 const liveModePages = [
   { page: 'authoritative-record-shell-nc-live-mode.html',   recordRoot: '[data-hmv4-nonconformance-record]', family: 'nonconformance-cases' },
+  { page: 'authoritative-record-shell-jo-live-mode.html',   recordRoot: '[data-hmv4-jo-record]',             family: 'job-orders' },
   { page: 'authoritative-record-shell-wo-live-mode.html',   recordRoot: '[data-hmv4-wo-record]',             family: 'work-orders' },
   { page: 'authoritative-record-shell-capa-live-mode.html', recordRoot: '[data-hmv4-capa-record]',           family: 'capas' },
   { page: 'authoritative-record-shell-cdoc-live-mode.html', recordRoot: '[data-hmv4-cdoc-record]',           family: 'controlled-documents' },

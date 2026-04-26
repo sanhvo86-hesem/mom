@@ -102,6 +102,7 @@ const fixturePages: string[] = [
   'authoritative-record-shell-jo-conflict.html',
   'authoritative-record-shell-jo-partial-access.html',
   'authoritative-record-shell-jo-degraded.html',
+  'authoritative-record-shell-jo-live-mode.html',
   'authoritative-record-shell-so-overview.html',
   'authoritative-record-shell-so-line-items.html',
   'authoritative-record-shell-so-linked-job-orders.html',

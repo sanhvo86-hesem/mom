@@ -632,6 +632,18 @@ test.describe('INSP record shell (Slice 6)', () => {
 });
 
 test.describe('JO record shell (Slice 9)', () => {
+  test('parses JO route as authoritative record shell', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const parsed = await page.evaluate(() =>
+      (window as any).Hmv4Routes.parsePath('/ops/records/job-orders/JO-2026-014', '?tab=overview'),
+    );
+    expect(parsed.routeClass).toBe('AR');
+    expect(parsed.params.resource_family).toBe('job-orders');
+    expect(parsed.params.record_id).toBe('JO-2026-014');
+    expect(parsed.query.tab).toBe('overview');
+    expect(parsed.rejectedQuery).toEqual([]);
+  });
+
   test('renders JO overview tab', async ({ page }) => {
     await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-jo-overview.html');
     const root = page.locator('[data-hmv4-jo-record]');
@@ -684,6 +696,18 @@ test.describe('JO record shell (Slice 9)', () => {
     for (const intent of ['jo-release', 'jo-spawn-work-order', 'jo-place-on-hold', 'jo-resume', 'jo-cancel', 'jo-complete']) {
       await expect(page.locator(`[data-hmv4-mutation-intent="${intent}"][disabled]`)).toBeVisible();
     }
+  });
+
+  test('JO lifecycle strip includes transactional branch states', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-jo-overview.html');
+    await expect(page.locator('[data-hmv4-jo-lifecycle] li strong')).toHaveText([
+      'draft',
+      'released',
+      'executing',
+      'on-hold',
+      'completed',
+      'cancelled',
+    ]);
   });
 });
 

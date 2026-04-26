@@ -93,6 +93,41 @@
         };
       }
     },
+    'job-orders': {
+      canonicalPath: '/api/v1/job-orders',
+      fixtureGlobal: 'HMV4_JO_RECORD_FIXTURE',
+      recordAttr: 'data-hmv4-jo-record',
+      adapt: function(live){
+        if(!live) return null;
+        var recordId = live.id || live.record_id || live.code || live.job_number || live.jobNumber;
+        return {
+          recordId: recordId,
+          rootCode: 'JO',
+          title: live.title || live.summary || ('Job ' + (live.job_number || live.jobNumber || recordId || '')),
+          jobNumber: live.job_number || live.jobNumber || recordId,
+          customerOrderRef: live.customer_order_ref || live.customerOrderRef,
+          productCode: live.product_code || live.productCode,
+          quantityOrdered: live.quantity_ordered || live.quantityOrdered,
+          quantityCompleted: live.quantity_completed || live.quantityCompleted,
+          state: live.state || live.status || 'live',
+          severity: live.severity || 'low',
+          scheduledStart: live.scheduled_start || live.scheduledStart,
+          scheduledEnd: live.scheduled_end || live.scheduledEnd,
+          actualStart: live.actual_start || live.actualStart,
+          actualEnd: live.actual_end || live.actualEnd,
+          owner: (live.owner && (live.owner.name || live.owner)) || null,
+          plannerNotes: live.planner_notes || live.plannerNotes,
+          freshness: 'live_current',
+          stateMessage: 'Live API mode. Read-only display.',
+          lifecycle: normalizeLifecycle(live.lifecycle),
+          dispatchReadiness: live.dispatch_readiness || live.dispatchReadiness || {},
+          spawnedWorkOrders: live.spawned_work_orders || live.spawnedWorkOrders || [],
+          materialConsumption: live.material_consumption || live.materialConsumption || [],
+          progressMetrics: live.progress_metrics || live.progressMetrics || {},
+          relatedRecords: live.related_records || live.relatedRecords || []
+        };
+      }
+    },
     'capas': {
       canonicalPath: '/api/v1/capas',
       fixtureGlobal: 'HMV4_CAPA_RECORD_FIXTURE',
@@ -339,8 +374,10 @@
     // Legacy aliases (ADR-0011 backwards compat)
     fetchNonconformance: function(recordId){ return fetchLiveResource('nonconformance-cases', recordId); },
     fetchWorkOrder: function(recordId){ return fetchLiveResource('work-orders', recordId); },
+    fetchJobOrder: function(recordId){ return fetchLiveResource('job-orders', recordId); },
     adaptNcToFixtureShape: function(live){ return HMV4_LIVE_RESOURCE_REGISTRY['nonconformance-cases'].adapt(live); },
-    adaptWoToFixtureShape: function(live){ return HMV4_LIVE_RESOURCE_REGISTRY['work-orders'].adapt(live); }
+    adaptWoToFixtureShape: function(live){ return HMV4_LIVE_RESOURCE_REGISTRY['work-orders'].adapt(live); },
+    adaptJoToFixtureShape: function(live){ return HMV4_LIVE_RESOURCE_REGISTRY['job-orders'].adapt(live); }
   };
   window.HMModuleTemplateV4Hydration = { hydrate: hydrate, ensureShell: ensureShell };
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hydrate); else hydrate();
