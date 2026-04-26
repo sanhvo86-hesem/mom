@@ -871,7 +871,7 @@ test.describe('CPO record shell (Slice 12)', () => {
 
   test('CPO linked-sales-orders links to SO record', async ({ page }) => {
     await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cpo-linked-sales-orders.html');
-    await expect(page.locator('a[href*="records/sales-orders/SO-2026-088"]')).toBeVisible();
+    await expect(page.locator('[data-hmv4-cpo-panel="linked-sales-orders"]:not([hidden]) a[href*="records/sales-orders/SO-2026-088"]')).toBeVisible();
   });
 
   test('CPO acknowledgment shows deviations from customer PO', async ({ page }) => {
