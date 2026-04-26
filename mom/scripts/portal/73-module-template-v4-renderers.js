@@ -1871,7 +1871,7 @@
       var related = record.relatedRecords || [];
       if(related.length === 0) return '<h2>Related records</h2><p class="hmv4-text-2">No related records.</p>';
       return '<h2>Related records</h2><ul class="hmv4-list">'+
-        related.map(function(r){return '<li><a href="/ops/records/'+esc(r.resourceFamily)+'/'+esc(r.recordId)+'?tab=overview" data-hmv4-record-open="'+esc(r.resourceFamily)+'" data-hmv4-record-id="'+esc(r.recordId)+'">'+esc(r.label)+'</a></li>';}).join('')+
+        related.map(function(r){return '<li data-hmv4-cpo-related-record data-resource-family="'+esc(r.resourceFamily)+'" data-record-id="'+esc(r.recordId)+'">'+esc(r.label || (r.resourceFamily + ' ' + r.recordId))+'</li>';}).join('')+
         '</ul>';
     }
     if(tab === 'audit') return '<h2>Audit</h2><p class="hmv4-text-2">Read-only placeholder. Live: GET /api/v1/customer-purchase-orders/{id}/audit when audit projection is added.</p>';
