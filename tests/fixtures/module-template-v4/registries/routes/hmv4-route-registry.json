@@ -58,7 +58,8 @@
       "allowed_query_keys": ["tab", "mode", "panel", "focus", "ctx_return", "ctx_source"],
       "default_query": { "tab": "overview", "mode": "display" },
       "renderer_ref": "renderWoRecord",
-      "required_access": ["work-orders:read"]
+      "required_access": ["work-orders:read"],
+      "live_api_path": "/api/v1/work-orders/{record_id}"
     },
     {
       "route_id": "workspace.dispatch.board",

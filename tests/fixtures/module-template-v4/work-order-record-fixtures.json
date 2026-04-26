@@ -45,7 +45,8 @@
         ["ready", "complete"],
         ["executing", "current"],
         ["paused", "locked"],
-        ["completed", "locked"]
+        ["completed", "locked"],
+        ["scrapped", "locked"]
       ],
       "executionLog": [
         { "ts": "2026-04-25 14:00", "event": "released", "operatorId": "OP-1004", "note": "WO released to OP-1004" },

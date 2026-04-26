@@ -32,8 +32,8 @@
       ],
       "releasePackage": {
         "inspectionRecords": [{ "id": "INSP-001", "result": "PASS" }],
-        "nonconformanceCases": [],
-        "capaRecords": [],
+        "nonconformanceCases": [{ "id": "NC-001", "disposition": "linked_to_release_review" }],
+        "capaRecords": [{ "id": "CAPA-001", "status": "effectiveness_pending" }],
         "cdocVersions": [{ "docCode": "qms-sop-100", "rev": "B" }],
         "deviations": []
       },

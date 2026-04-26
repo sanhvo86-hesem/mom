@@ -725,7 +725,13 @@
         {role:'QA Director', name:'Dr. Tran', decision:'pending', signedAt:null},
         {role:'Plant Manager', name:'Mr. Le', decision:'pending', signedAt:null}
       ],
-      releasePackage: { inspectionRecords: [], nonconformanceCases: [], capaRecords: [], cdocVersions: [], deviations: [] },
+      releasePackage: {
+        inspectionRecords: [{id:'INSP-001', result:'PASS'}],
+        nonconformanceCases: [{id:'NC-001', disposition:'linked_to_release_review'}],
+        capaRecords: [{id:'CAPA-001', status:'effectiveness_pending'}],
+        cdocVersions: [{docCode:'qms-sop-100', rev:'B'}],
+        deviations: []
+      },
       qualityEvidence: {}, genealogyRoot: null,
       shipmentReadiness: { quantityAvailable: 0, allocatedTo: [], blockedBy: [] },
       relatedRecords: []
@@ -1345,7 +1351,7 @@
       salesNotes: 'Customer requested split shipment aligned to job-order fulfillment.',
       freshness: 'fixture_current',
       stateMessage: 'Read-only prototype SO shell. Mutation outside fixture.',
-      lifecycle: [['draft','complete'],['confirmed','complete'],['released','complete'],['fulfilling','current'],['completed','locked']],
+      lifecycle: [['draft','complete'],['confirmed','complete'],['released','complete'],['fulfilling','current'],['completed','locked'],['cancelled','locked']],
       lineItems: [
         { line: 1, productCode: 'PN-2042', description: 'Widget Assembly Rev B', quantityOrdered: 5000, quantityShipped: 0, unitPrice: 50.00, lineTotal: 250000, requestedDate: '2026-04-30' }
       ],
@@ -1376,13 +1382,21 @@
     if(fixture.freshness) record.freshness = fixture.freshness;
     if(fixture.stateMessage) record.stateMessage = fixture.stateMessage;
     if(fixture.limitations) record.limitations = fixture.limitations;
-    var state = q.state || fixture.state || record.state || 'fulfilling';
-    var stateOverlay = (fixture.states || {})[state] || null;
+    var fixtureStates = fixture.states || {};
+    var panelState = q.panel ? String(q.panel).replace(/-/g, '_') : null;
+    var state = q.state || (panelState && fixtureStates[panelState] ? panelState : null) || fixture.state || record.state || 'fulfilling';
+    var stateOverlay = fixtureStates[state] || null;
     if(stateOverlay){
       record.state = state;
       if(stateOverlay.freshness) record.freshness = stateOverlay.freshness;
       if(stateOverlay.stateMessage) record.stateMessage = stateOverlay.stateMessage;
       if(stateOverlay.limitations) record.limitations = stateOverlay.limitations;
+    }
+    if(state === 'partial_access'){
+      record.customerName = 'Masked';
+      record.totalValue = 'Masked';
+      record.invoicing = record.invoicing || {};
+      record.invoicing.paymentTerms = 'Masked';
     }
     record.recordId = recordId;
     record.rootCode = 'SO';
@@ -1395,7 +1409,9 @@
   }
   function soMoney(value, currency){
     if(value == null || value === '') return '-';
-    return esc(currency || 'USD') + ' ' + esc(soNumber(value));
+    var num = Number(value);
+    if(!isFinite(num)) return esc(String(value));
+    return esc(currency || 'USD') + ' ' + esc(num.toLocaleString('en-US'));
   }
   function renderSoPanel(tab, record){
     if(tab === 'overview'){
@@ -1556,7 +1572,7 @@
       quantityScrap: 0,
       freshness: 'fixture_current',
       stateMessage: 'Read-only prototype WO shell.',
-      lifecycle: [['planned','complete'],['released','complete'],['ready','complete'],['executing','current'],['paused','locked'],['completed','locked']],
+      lifecycle: [['planned','complete'],['released','complete'],['ready','complete'],['executing','current'],['paused','locked'],['completed','locked'],['scrapped','locked']],
       executionLog: [],
       inspections: [],
       dispatchStatus: {},
@@ -1583,6 +1599,13 @@
       if(stateOverlay.freshness) record.freshness = stateOverlay.freshness;
       if(stateOverlay.stateMessage) record.stateMessage = stateOverlay.stateMessage;
       if(stateOverlay.limitations) record.limitations = stateOverlay.limitations;
+    }
+    if(state === 'partial_access'){
+      record.resourceAllocation = Object.assign({}, record.resourceAllocation || {}, {
+        operatorName: 'Masked',
+        equipmentBookedFrom: 'Masked',
+        equipmentBookedTo: 'Masked'
+      });
     }
     record.recordId = recordId;
     record.rootCode = 'WO';
@@ -1686,7 +1709,7 @@
       '</header>';
 
     var lifecycleStrip = '<ol class="hmv4-lifecycle-strip" data-hmv4-wo-lifecycle aria-label="WO lifecycle">'+
-      (record.lifecycle || []).map(function(s){return '<li data-state-class="'+esc(s[1] || 'pending')+'" data-lifecycle-state="'+esc(s[1] || 'pending')+'"><strong>'+esc(s[0])+'</strong><span>'+esc(s[1] || 'pending')+'</span></li>';}).join('')+
+      (record.lifecycle || []).map(function(s){return '<li data-state-class="'+esc(s[1] || 'pending')+'" data-lifecycle-state="'+esc(s[0] || 'stage')+'" data-lifecycle-status="'+esc(s[1] || 'pending')+'"><strong>'+esc(s[0])+'</strong><span>'+esc(s[1] || 'pending')+'</span></li>';}).join('')+
       '</ol>';
 
     var partialNotice = (state === 'partial_access' && limitations.length)
