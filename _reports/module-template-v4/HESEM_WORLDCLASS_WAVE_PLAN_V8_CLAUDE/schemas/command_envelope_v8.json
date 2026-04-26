@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hesem.io/schemas/command_envelope_v8.json",
+  "title": "CommandEnvelopeV8",
+  "type": "object",
+  "required": [
+    "command_id","idempotency_key","tenant_id","root_code","resource_family",
+    "record_id","command_type","actor_id","actor_kind","actor_role",
+    "intended_meaning","correlation_id","client_context","sent_at"
+  ],
+  "properties": {
+    "command_id":          {"type":"string","format":"uuid","description":"UUIDv7 for ordering"},
+    "idempotency_key":     {"type":"string","minLength":32,"maxLength":256,
+                            "description":"derived: tenant_id:actor_id:root_code:record_id:command_type:sha256(payload)"},
+    "tenant_id":           {"type":"string","format":"uuid"},
+    "root_code":           {"type":"string","pattern":"^[A-Z][A-Z0-9_-]{1,15}$"},
+    "resource_family":     {"type":"string"},
+    "record_id":           {"type":"string","description":"target authoritative_root id; or 'NEW' for create commands"},
+    "command_type":        {"type":"string","pattern":"^[A-Z][A-Z0-9_]+_[A-Z][A-Z0-9_]+$"},
+    "actor_id":            {"type":"string","format":"uuid"},
+    "actor_kind":          {"enum":["user","service_principal","ai_advisory","system"]},
+    "actor_role":          {"type":"string"},
+    "intended_meaning":    {"type":"string","minLength":3,"maxLength":200},
+    "precondition_etag":   {"type":"string","pattern":"^W/\"[a-f0-9]{64}\"$"},
+    "payload":             {"type":"object"},
+    "evidence_refs":       {"type":"array","items":{"type":"string","format":"uuid"}},
+    "signature_required":  {"type":"boolean","default":false},
+    "signature_envelope":  {"$ref":"#/$defs/SignatureEnvelope"},
+    "client_context":      {
+      "type":"object",
+      "required":["surface_class","route","ip","user_agent"],
+      "properties":{
+        "surface_class":{"enum":["WS","SH","DL","ML","AC","AR","ERD","NRD","SFW"]},
+        "route":{"type":"string"},
+        "ip":{"type":"string"},
+        "user_agent":{"type":"string"}
+      }
+    },
+    "correlation_id":      {"type":"string"},
+    "trace_parent":        {"type":"string"},
+    "sent_at":             {"type":"string","format":"date-time"}
+  },
+  "$defs": {
+    "SignatureEnvelope": {
+      "type":"object",
+      "required":["signers"],
+      "properties":{
+        "signers":{
+          "type":"array","minItems":1,"maxItems":3,
+          "items":{
+            "type":"object",
+            "required":["principal_id","printed_name_snapshot","signature_meaning","factor_records","signed_at"],
+            "properties":{
+              "principal_id":{"type":"string","format":"uuid"},
+              "printed_name_snapshot":{"type":"string"},
+              "signature_meaning":{"type":"string"},
+              "factor_records":{
+                "type":"array",
+                "items":{
+                  "type":"object",
+                  "required":["factor","verified_at"],
+                  "properties":{
+                    "factor":{"enum":["password","totp","u2f","hsm_smart_card","biometric"]},
+                    "verified_at":{"type":"string","format":"date-time"}
+                  }
+                }
+              },
+              "signed_at":{"type":"string","format":"date-time"}
+            }
+          }
+        },
+        "record_canonical_state_hash":{"type":"string","pattern":"^[a-f0-9]{64}$"},
+        "session_token_id":{"type":"string"}
+      }
+    }
+  }
+}

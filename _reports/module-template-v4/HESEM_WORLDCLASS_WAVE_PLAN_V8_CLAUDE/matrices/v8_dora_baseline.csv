@@ -1,0 +1,19 @@
+wave,deployment_freq_target,lead_time_p50_target,lead_time_p95_target,change_failure_rate_target,mttr_p50_target,mttr_p95_target,tier
+W0,measurement_starts,measurement_starts,measurement_starts,measurement_starts,measurement_starts,measurement_starts,measurement
+W0.5,weekly,2 days,1 week,15%,4 hours,1 day,Medium
+W1,weekly,2 days,1 week,12%,4 hours,1 day,Medium
+W2,weekly,2 days,1 week,12%,2 hours,1 day,Medium
+W3,2x/week,1 day,3 days,10%,2 hours,8 hours,High
+W4,2x/week,1 day,2 days,10%,2 hours,8 hours,High
+W4.5,daily,1 day,2 days,8%,2 hours,8 hours,High
+W5,daily,8 hours,1 day,8%,1 hour,4 hours,High
+W6,daily,4 hours,1 day,7%,1 hour,4 hours,High
+W6.5,daily,4 hours,1 day,7%,1 hour,4 hours,High
+W7,daily+,2 hours,8 hours,6%,1 hour,4 hours,Elite-developing
+W8,daily+,1 hour,4 hours,5%,1 hour,2 hours,Elite (60% services)
+W9,daily+,1 hour,2 hours,5%,30 min,2 hours,Elite (80% services)
+W10,daily+,1 hour,2 hours,5%,30 min,2 hours,Elite (90% services)
+W11,daily+,1 hour,2 hours,4%,30 min,2 hours,Elite (95%)
+W12,daily+,1 hour,2 hours,4%,30 min,1 hour,Elite (100%)
+W13,daily+,1 hour,2 hours,4%,30 min,1 hour,Elite_sustained
+W14,daily+,1 hour,2 hours,3%,15 min,1 hour,Elite_continuous_12mo

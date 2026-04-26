@@ -1,0 +1,10 @@
+[
+  {"id":"BD-1","decision":"release_a_lot","root":"BREL","transition":"approve_release","rationale":"21 CFR 211.165 + Annex 16 + ICH Q10 — batch release is human authority"},
+  {"id":"BD-2","decision":"approve_disposition","root":"NQCASE","transition":"dispose_*","rationale":"ISO 13485 §8.3 + IATF 16949 §10.2 — disposition affects product safety"},
+  {"id":"BD-3","decision":"close_capa","root":"CAPA","transition":"action_close|effectiveness_check_pass","rationale":"ICH Q10 — CAPA effectiveness requires human judgment"},
+  {"id":"BD-4","decision":"release_controlled_document","root":"CDOC","transition":"release","rationale":"21 CFR 211.180 + Annex 11 §5 — document release is regulated"},
+  {"id":"BD-5","decision":"approve_eco","root":"ECO","transition":"approve","rationale":"Annex 11 §10 + ICH Q10 — change control requires impact assessment by humans"},
+  {"id":"BD-6","decision":"certify_training","root":"TRAIN_RECORD","transition":"certify","rationale":"21 CFR 211.25 + ISO 13485 §6.2 — training competence is human judgment"},
+  {"id":"BD-7","decision":"qualify_supplier","root":"SUP_QUAL","transition":"qualify_decide","rationale":"IATF 16949 §8.4.2 + AS9100 §8.4 — supplier qualification is regulated"},
+  {"id":"BD-8","decision":"decide_recall_or_field_action","root":"RECALL","transition":"open|escalate","rationale":"21 CFR 7 + EU MDR Article 87 — recall is reportable to regulators"}
+]

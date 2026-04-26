@@ -1,0 +1,31 @@
+id,risk,severity,occurrence,detection,RPN,action_priority,mitigation,owner,status
+R-V8-001,OTG axiom violation in production,10,2,4,80,H,file 02 INV-1..18 + nightly integrity job,Platform Lead + Data Engineering Lead,pending W0.5
+R-V8-002,Audit chain hash break,10,1,3,30,H,WORM + RFC 3161 + daily verification,Security Lead,pending W0.5+W8
+R-V8-003,RULE-2 violation (AI commits banned decision),10,2,2,40,H,file 19 §3,AI Governance Lead,pending W6.5
+R-V8-004,Tenant boundary leak,10,2,4,80,H,RLS + middleware + query plan audit,Security Lead + Platform Lead,pending W0.5
+R-V8-005,SOC 2 Type II audit failure,8,4,5,160,H,continuous evidence collection + 3rd-party gap analysis,Compliance + Security Lead,pending W8
+R-V8-006,Validation evidence stale on regulated release,9,3,2,54,H,file 22 §3 freshness alarms,Compliance Lead,pending W3+W8
+R-V8-007,Cross-region data flow violation (ITAR / Schrems II),9,2,5,90,H,per-tenant region pinning + egress monitoring,Privacy + Compliance Lead,pending W9
+R-V8-008,Edge gateway compromise (OT path),9,3,4,108,H,file 15 IEC 62443 SL-2/3,OT Security Specialist,pending W6
+R-V8-009,ML model committing banned decision via human-loop bypass,10,2,4,80,H,file 19 RULE-2 enforcement,AI Governance + ML Lead,pending W6.5
+R-V8-010,Cryptographic algorithm sunset,8,2,6,96,H,cryptographic agility + annual PQC review,Security Lead,ongoing
+R-V8-011,Solo Codex-augmented pace insufficient,7,5,3,105,M,hire 1-2 contractors + defer vertical packs,Founder,acknowledged
+R-V8-012,Cross-browser visual regression instability,5,7,4,140,M,chromium-canonical baseline; tri-browser-required from W4,Frontend Platform Lead,ongoing repair
+R-V8-013,Live-API graduation cliff,6,5,3,90,M,per-slice graduation; 60% threshold,Platform Lead,pending W4
+R-V8-014,OTG migration backfill data quality,7,4,4,112,M,phased backfill + dry-run + drift check,Data Engineering Lead,pending W4.5
+R-V8-015,Vertical pack scope creep,6,6,3,108,M,per-pack ADR with frozen scope,Vertical Pack PMs,pending W10
+R-V8-016,Customer implementation timeline blow-out,7,5,5,175,M,customer validation leverage pack + playbooks,CS Lead,pending W8
+R-V8-017,Cloud cost run-away on noisy tenant,5,6,4,120,M,per-tenant cost SLA + throttling,SRE Lead + CS,pending W4
+R-V8-018,Backup/restore failure during DR drill,8,2,4,64,M,quarterly DR drill + automated verification,SRE Lead,pending W8
+R-V8-019,Multi-tenancy migration breaks existing tenant,8,3,4,96,M,shadow-write phase + phased migration,Platform Lead,pending W9
+R-V8-020,Standards version drift,6,4,5,120,M,quarterly standards monitoring + policy directive supersession,Compliance Lead,ongoing
+R-V8-031,V7 → V8 binding map drift over time,5,5,3,75,M,per-quarter binding review + ADR,Engineering Lead,ongoing
+R-V8-032,Multi-region deployment audit chain inconsistency,8,2,5,80,M,per-region anchor with cross-anchor verification,Compliance Lead,pending W13
+R-V8-033,Per-tenant cost SLA absorbed exceeds budget,6,4,3,72,M,file 25 throttling + commercial model adjustment,FinOps Lead,pending W4
+R-V8-034,W13 multi-region cutover stalls without customer demand,4,6,2,48,L,defer W13 until first multi-region customer signed,Product Lead,watching
+R-V8-035,W14 continuous improvement loop becomes ceremonial,4,5,4,80,M,hard ROI delta tracking + quarterly review,Program Manager,pending W14
+R-V8-036,Vertical-pack regulatory landscape change post-W10,7,4,4,112,M,CS-B annual standards review + policy directive supersession,Compliance Lead,ongoing
+R-V8-037,Edge gateway scale-out lag,6,4,4,96,M,capacity planning + per-site provisioning runbook,OT Security + SRE,pending W6
+R-V8-038,Customer pilot CSAT drops despite SLA met,6,4,4,96,M,per-phase CSAT measurement + CSM intervention,CS Lead,pending W11
+R-V8-039,OSS reciprocity creates IP exposure,7,2,5,70,M,file 33 license compliance + Legal review,Legal Lead,ongoing
+R-V8-040,Approval workflow becomes bottleneck,5,5,3,75,M,file 18 SLA + automated escalation + delegation,Program Manager,pending W4

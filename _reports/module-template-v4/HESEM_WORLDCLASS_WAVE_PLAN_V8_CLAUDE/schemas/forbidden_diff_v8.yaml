@@ -1,0 +1,95 @@
+# Forbidden Diff Scanner Configuration V8
+# Per V8 file 13. Loaded by .github/workflows/v8/forbidden-diff.yml
+# Per CLAUDE.md "Forbidden files (NEVER modify in HMV4 slice work, per ADR-0004)"
+
+version: "8.0.0"
+schema_location: "https://hesem.io/schemas/forbidden_diff_v8.yaml"
+
+forbidden_paths:
+  - path: mom/portal.html
+    rule: only-feature-flag-block-allowed
+    allowed_diff_pattern: "^[+-]?\\s*<!--\\s*(BEGIN|END)\\s+HMV4_FEATURE_FLAGS"
+    severity: BLOCK
+    rationale: "ADR-0001 + ADR-0004"
+  - path: mom/styles/portal.main.css
+    rule: never
+    severity: BLOCK
+    rationale: "ADR-0004"
+  - path: mom/styles/eqms-suite.css
+    rule: never
+    severity: BLOCK
+    rationale: "ADR-0004"
+  - path: mom/styles/density-darkmode.css
+    rule: never
+    severity: BLOCK
+    rationale: "ADR-0004"
+  - path: mom/scripts/portal/01-module-router.js
+    rule: never
+    severity: BLOCK
+    rationale: "ADR-0004"
+  - path: mom/scripts/portal/02-state-auth-ui.js
+    rule: never
+    severity: BLOCK
+    rationale: "ADR-0004"
+  - path: mom/scripts/portal/40-eqms-shell.js
+    rule: never
+    severity: BLOCK
+    rationale: "ADR-0004"
+  - path: mom/qms-data/**
+    rule: never
+    severity: BLOCK
+    rationale: "no production registry promotion without explicit approval"
+  - path: mom/api/index.php
+    rule: only-bootstrap-changes-allowed
+    severity: WARN
+    rationale: "core entrypoint; require ADR + Platform Lead review"
+
+forbidden_patterns_in_text:
+  - id: HARDCODED_HEX_IN_JS
+    description: "Hex color in JS string outside graphics-authority"
+    pattern: '"#[0-9A-Fa-f]{3,8}"'
+    files:
+      - "mom/scripts/portal/**/*.js"
+    exclude:
+      - "mom/scripts/portal/00bb-graphics-authority.js"
+      - "**/*.test.js"
+    severity: WARN
+  - id: HARDCODED_PX_IN_JS
+    description: "Pixel literal in JS string"
+    pattern: "'\\d+px'"
+    files:
+      - "mom/scripts/portal/**/*.js"
+    exclude:
+      - "mom/scripts/portal/00bb-graphics-authority.js"
+    severity: WARN
+  - id: FIXTURE_LOAD_IN_PORTAL
+    description: "74-fixtures.js loaded by portal.html"
+    pattern: "74-module-template-v4-fixtures"
+    files:
+      - "mom/portal.html"
+    severity: BLOCK
+    rationale: "axiom A-INERT-1: portal must never load fixture file"
+  - id: HMV4_PREVIEW_ENABLED_TRUE
+    description: "HMV4_PREVIEW_ENABLED=true on main"
+    pattern: 'HMV4_PREVIEW_ENABLED\\s*=\\s*true'
+    files:
+      - "mom/portal.html"
+    severity: BLOCK
+    rationale: "INV-INERT: portal preview must be inert by default"
+
+forbidden_phrases_in_commits:
+  - id: PROD_WORDING
+    pattern: "(?i)production go-?live|production cutover|production release|validated production"
+    exception_marker: "release_authority:"
+    severity: BLOCK
+    rationale: "INV-11: pre-production wording until validation evidence"
+
+automation:
+  ci_workflow: ".github/workflows/v8/forbidden-diff.yml"
+  required_check: true
+  post_merge_audit_job: hourly
+  on_post_merge_violation:
+    - SEV-1 alert
+    - auto-create rollback PR (revert offending commit if BLOCK)
+    - notify CODEOWNERS
+    - emit OTG audit_event class='forbidden_diff_postmerge'

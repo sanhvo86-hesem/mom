@@ -1,0 +1,8 @@
+tier,tenant_size_users,arr_low,arr_high,implementation_rev,base_infra_per_month,per_user_per_month,storage_baseline_gb,ml_inference_per_month,total_per_month_low,total_per_month_high,gross_margin_pct
+Core_small,50,30000,80000,0,1500,30,500,30,1700,3000,33-50
+Core_medium,200,80000,200000,15000,2000,30,1000,80,2400,3600,40-60
+Pro_mid,1500,750000,2500000,200000-800000,3000,20,3000,200,4500,6500,75-87
+Enterprise_large,10000,5000000,30000000,1000000-5000000,5000,negotiated,15000,500-2000,8000,15000,80-92
+Vertical_pack_pharma_addon,*,250000,1000000,200000-800000,added,added,5000-10000,200,added,added,80-90
+Vertical_pack_auto_addon,*,150000,800000,150000-500000,added,added,3000-5000,150,added,added,80-90
+Vertical_pack_aero_addon,*,200000,1000000,300000-1000000,added,added,5000-10000,200,added,added,75-90

@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hesem.io/schemas/ai_decision_record_v8.json",
+  "title": "AIDecisionRecordV8",
+  "type": "object",
+  "required": [
+    "decision_id","feature_id","model_card_id","model_name","model_version",
+    "trained_at","tenant_id","principal_id","invoked_at","input_refs","output",
+    "confidence","abstain_flag"
+  ],
+  "properties": {
+    "decision_id":         {"type":"string","format":"uuid"},
+    "feature_id":          {"type":"string"},
+    "model_card_id":       {"type":"string","format":"uuid"},
+    "model_name":          {"type":"string"},
+    "model_version":       {"type":"string"},
+    "trained_at":          {"type":"string","format":"date-time"},
+    "tenant_id":           {"type":"string","format":"uuid"},
+    "principal_id":        {"type":"string","format":"uuid"},
+    "invoked_at":          {"type":"string","format":"date-time"},
+    "input_refs":          {"type":"array","items":{"type":"string"}},
+    "output":              {"type":"object"},
+    "confidence":          {"type":"number","minimum":0,"maximum":1},
+    "abstain_flag":        {"type":"boolean"},
+    "explanation":         {"type":"string"},
+    "human_decision_at":   {"type":"string","format":"date-time"},
+    "human_decision":      {"enum":["accepted","rejected","modified","ignored"]},
+    "override_reason":     {"type":"string","maxLength":2000},
+    "trace_parent":        {"type":"string"},
+    "rule2_check_status":  {"enum":["passed","not_applicable","violation_detected"]}
+  }
+}

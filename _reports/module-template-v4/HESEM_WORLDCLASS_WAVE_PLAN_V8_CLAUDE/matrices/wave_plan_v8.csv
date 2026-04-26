@@ -1,0 +1,21 @@
+wave,name,goal,entry,exit,decision,calendar_low,calendar_high,team_fte
+W0,Phase 2 Integration Review + Repair,Stop drift; verify main; repair Chromium baseline,Uploaded source + repo state,V21 reports done; blocker resolved or contained,PHASE2_INTEGRATION_PASS_READY_FOR_PHASE3 | BLOCKED_CROSS_BROWSER,1,2,4
+W0.5,Platform Substrate Hardening,Stabilize spines before more slices,W0 PASS,Identity/Workflow/Evidence/API/Data/Graphics baselines accepted,W0_5_PLATFORM_SUBSTRATE_ACCEPTED,4,6,6
+W1,HMV4 Foundation Productization,Slice factory ready,W0.5 accepted,Slice factory + templates + visual gates stable,W1_SLICE_FACTORY_READY,8,12,7
+W2,Governed Record Factory,AR root shell factory,W1 ready,AR template + record shell tests,W2_RECORD_FACTORY_READY,4,8,8
+W3,eQMS + Workforce + Maintenance Core,CAPA/CDOC/TRAIN/MWO/INSP graduate,W2 ready,Core eQMS workflows stable,W3_EQMS_CORE_READY,6,10,11
+W4,Live Read-Only API Graduation,Selected roots live read-only,W3 stable,NQCASE/CAPA/CDOC/TRAIN/INSP read APIs,W4_LIVE_READ_ONLY_READY,6,8,9
+W4.5,OTG Native Cutover,OTG canonical reporting,W4 ready,OTG schema + traversal + lineage,W4_5_OTG_NATIVE_READY,3,4,9
+W5,Core Transactional ERP/MOM,SO/PO/JO/WO/INVTXN flows,W4.5 ready,Transactional commands tested,W5_TRANSACTIONAL_CORE_READY,8,10,14
+W6,MES/OT Foundation,Operation execution + edge gateway,W5 ready,MES roots + OT zones modeled,W6_MES_OT_FOUNDATION_READY,8,12,14
+W6.5,AI Advisory Controlled Rollout,AI advisory only,W6 + AI risk pkg,AI retrieve/explain/summarize; no regulated decision,W6_5_AI_ADVISORY_READY,3,4,14
+W7,Digital Thread / Genealogy / Release,Release packet make-to-release proof,W6.5 ready,Genealogy + release packet works,W7_DIGITAL_THREAD_RELEASE_READY,6,8,9
+W8,Analytics + Improvement + Reliability,CDC + lakehouse + OEE/SPC + SRE,W7 ready,Analytics + DORA,W8_ANALYTICS_RELIABILITY_READY,6,12,10
+W9,Security + Validation + Compliance,VMP + ASVS + 62443,W8 ready,Validation + security packages accepted,W9_COMPLIANCE_VALIDATION_READY,6,12,11
+W10,Vertical Packs,Pharma/Auto/Aero/Med/Food packaged,W9 ready,Vertical roots + onboarding pack,W10_VERTICAL_PACKS_READY,16,26,14
+W11,Customer Pilot,Controlled pilot,W10 ready,Pilot playbook + training,W11_PRE_PRODUCTION_READINESS_READY,4,8,9
+W12,Release Candidate / Scale,Multi-site productization,W11 ready,Scale governance + commercial,W12_PRODUCTIZED_OPERATING_MODEL_READY,4,8,10
+W13,Multi-Region + Multi-Jurisdictional,Active-active + ITAR enforcement,W12 ratified,Active-active in 2+ regions + per-region compliance,W13_MULTI_REGION_MULTI_JURISDICTIONAL_READY,8,12,14
+W14,Continuous Improvement Loop,Institutionalize learning + improvement,W13 ratified,ongoing — never PASS,W14_CONTINUOUS_IMPROVEMENT_LOOP_OPERATIONAL,-1,-1,12
+CS-A,Continuous Security stream,Daily/weekly/monthly/quarterly/annual security cycles,W0.5 ratified,Per-period security review report (signed),CS_A_PERIODIC_REVIEW_<YYYYQ>,-1,-1,4
+CS-B,Continuous Validation stream,Daily/weekly/monthly/quarterly/annual validation cycles,W0.5 ratified,Per-period validation review report (signed),CS_B_PERIODIC_REVIEW_<YYYYQ>,-1,-1,3
