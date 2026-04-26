@@ -30,6 +30,27 @@
       "root_code": "JO",
       "state": "executing",
       "fixture": "tests/fixtures/module-template-v4/job-order-record-fixtures.json"
+    },
+    {
+      "resource_family": "sales-orders",
+      "record_id": "SO-2026-088",
+      "root_code": "SO",
+      "state": "fulfilling",
+      "fixture": "tests/fixtures/module-template-v4/sales-order-record-fixtures.json"
+    },
+    {
+      "resource_family": "customer-purchase-orders",
+      "record_id": "CPO-2026-077",
+      "root_code": "CPO",
+      "state": "acknowledged",
+      "fixture": "tests/fixtures/module-template-v4/customer-purchase-order-record-fixtures.json"
+    },
+    {
+      "resource_family": "work-orders",
+      "record_id": "WO-3013",
+      "root_code": "WO",
+      "state": "executing",
+      "fixture": "tests/fixtures/module-template-v4/work-order-record-fixtures.json"
     }
   ]
 }

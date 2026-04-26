@@ -97,6 +97,7 @@ test.describe('module-template-v4 bridge adapter', () => {
     expect(withContext.policy).toBe('redirect_record_context_only');
     expect(withContext.url).toContain('/ops/records/inspections/INSP-001?tab=sample-results');
   });
+
   test('maps jo to job-order record shell only with explicit record context', async ({ page }) => {
     await page.goto('/mom/portal.html?hmv4=1');
     const noContext = await page.evaluate(() => (window as any).Hmv4Bridge.resolveEqmsModule('jo'));
@@ -118,5 +119,74 @@ test.describe('module-template-v4 bridge adapter', () => {
     );
     expect(withContext.policy).toBe('redirect_record_context_only');
     expect(withContext.url).toContain('/ops/records/job-orders/JO-2026-014?tab=spawned-work-orders');
+  });
+
+  test('maps so to sales-order record shell only with explicit record context', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const noContext = await page.evaluate(() => (window as any).Hmv4Bridge.resolveEqmsModule('so'));
+    expect(noContext.policy).toBe('redirect_then_deprecate');
+    expect(noContext.url).toContain('/ops/customer-order-commit/sales-orders');
+    expect(noContext.url).not.toContain('/ops/records/sales-orders/');
+
+    const withContext = await page.evaluate(() =>
+      (window as any).Hmv4Bridge.resolveEqmsModule('so', { recordId: 'SO-2026-088', tab: 'overview' }),
+    );
+    expect(withContext.policy).toBe('redirect_record_context_only');
+    expect(withContext.url).toContain('/ops/records/sales-orders/SO-2026-088?tab=overview');
+  });
+
+  test('maps sales-order alias to SO record shell with record_id context', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const withContext = await page.evaluate(() =>
+      (window as any).Hmv4Bridge.resolveEqmsModule('sales-order', { record_id: 'SO-2026-088', tab: 'line-items' }),
+    );
+    expect(withContext.policy).toBe('redirect_record_context_only');
+    expect(withContext.url).toContain('/ops/records/sales-orders/SO-2026-088?tab=line-items');
+  });
+
+  test('maps wo to work-order record shell only with explicit record context', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const noContext = await page.evaluate(() => (window as any).Hmv4Bridge.resolveEqmsModule('wo'));
+    expect(noContext.policy).toBe('redirect_then_deprecate');
+    expect(noContext.url).toContain('/ops/shopfloor-execution/wo-console');
+    expect(noContext.url).not.toContain('/ops/records/work-orders/');
+
+    const withContext = await page.evaluate(() =>
+      (window as any).Hmv4Bridge.resolveEqmsModule('wo', { recordId: 'WO-3013', tab: 'overview' }),
+    );
+    expect(withContext.policy).toBe('redirect_record_context_only');
+    expect(withContext.url).toContain('/ops/records/work-orders/WO-3013?tab=overview');
+  });
+
+  test('maps work-order alias to WO record shell with record_id context', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const withContext = await page.evaluate(() =>
+      (window as any).Hmv4Bridge.resolveEqmsModule('work-order', { record_id: 'WO-3013', tab: 'execution-log' }),
+    );
+    expect(withContext.policy).toBe('redirect_record_context_only');
+    expect(withContext.url).toContain('/ops/records/work-orders/WO-3013?tab=execution-log');
+  });
+
+  test('maps cpo to customer-purchase-order record shell only with explicit record context', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const noContext = await page.evaluate(() => (window as any).Hmv4Bridge.resolveEqmsModule('cpo'));
+    expect(noContext.policy).toBe('redirect_then_deprecate');
+    expect(noContext.url).toContain('/ops/records/customer-purchase-orders');
+    expect(noContext.url).not.toContain('/ops/records/customer-purchase-orders/CPO-2026-077');
+
+    const withContext = await page.evaluate(() =>
+      (window as any).Hmv4Bridge.resolveEqmsModule('cpo', { recordId: 'CPO-2026-077', tab: 'acknowledgment' }),
+    );
+    expect(withContext.policy).toBe('redirect_record_context_only');
+    expect(withContext.url).toContain('/ops/records/customer-purchase-orders/CPO-2026-077?tab=acknowledgment');
+  });
+
+  test('maps customer-po alias to CPO record shell with record_id context', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const withContext = await page.evaluate(() =>
+      (window as any).Hmv4Bridge.resolveEqmsModule('customer-po', { record_id: 'CPO-2026-077', tab: 'linked-sales-orders' }),
+    );
+    expect(withContext.policy).toBe('redirect_record_context_only');
+    expect(withContext.url).toContain('/ops/records/customer-purchase-orders/CPO-2026-077?tab=linked-sales-orders');
   });
 });

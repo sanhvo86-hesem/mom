@@ -686,3 +686,220 @@ test.describe('JO record shell (Slice 9)', () => {
     }
   });
 });
+
+test.describe('WO record shell (Slice 11)', () => {
+  test('parses WO route as authoritative record shell', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const parsed = await page.evaluate(() =>
+      (window as any).Hmv4Routes.parsePath('/ops/records/work-orders/WO-3013', '?tab=overview'),
+    );
+    expect(parsed.routeClass).toBe('AR');
+    expect(parsed.params.resource_family).toBe('work-orders');
+    expect(parsed.params.record_id).toBe('WO-3013');
+    expect(parsed.query.tab).toBe('overview');
+    expect(parsed.rejectedQuery).toEqual([]);
+  });
+
+  test('renders WO overview tab', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-wo-overview.html');
+    const root = page.locator('[data-hmv4-wo-record]');
+    await expect(root).toBeVisible();
+    await expect(root).toHaveAttribute('data-route-class', 'AR');
+    await expect(root).toHaveAttribute('data-authority-class', 'authoritative');
+    await expect(root).toHaveAttribute('data-resource-family', 'work-orders');
+    await expect(root).toHaveAttribute('data-root-code', 'WO');
+    await expect(root).toHaveAttribute('data-record-id', 'WO-3013');
+    await expect(root).toHaveAttribute('data-query-tab', 'overview');
+  });
+
+  for (const tab of ['operation-detail', 'resource-allocation', 'execution-log', 'inspections', 'dispatch-status', 'related', 'audit']) {
+    test(`renders WO ${tab} tab`, async ({ page }) => {
+      await page.goto(`/tests/fixtures/module-template-v4/pages/authoritative-record-shell-wo-${tab}.html`);
+      await expect(page.locator(`[data-hmv4-wo-panel="${tab}"]:not([hidden])`)).toBeVisible();
+    });
+  }
+
+  test('WO inspections tab links to INSP record', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-wo-inspections.html');
+    await expect(page.locator('a[href*="records/inspections/INSP-001"]')).toBeVisible();
+  });
+
+  test('WO related shows parent JO + dispatch target + escalated NC', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-wo-related.html');
+    await expect(page.locator('a[href*="records/job-orders/JO-2026-014"]')).toBeVisible();
+    await expect(page.locator('a[href*="records/dispatch-targets/DISP-2026-1107"]')).toBeVisible();
+    await expect(page.locator('a[href*="records/nonconformance-cases/NC-001"]')).toBeVisible();
+  });
+
+  test('WO execution-log preserves chronological order', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-wo-execution-log.html');
+    const entries = page.locator('[data-hmv4-wo-panel="execution-log"] .hmv4-list li');
+    await expect(entries).toHaveCount(3);
+    await expect(entries.nth(0)).toContainText('2026-04-25 14:00');
+    await expect(entries.nth(1)).toContainText('2026-04-25 14:05');
+    await expect(entries.nth(2)).toContainText('2026-04-25 14:25');
+  });
+
+  test('WO conflict state', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-wo-conflict.html');
+    await expect(page.locator('[data-hmv4-wo-record]')).toHaveAttribute('data-fixture-state', 'conflict');
+    await expect(page.locator('[data-hmv4-wo-record]')).toHaveAttribute('data-fixture-freshness', 'fixture_conflict');
+  });
+
+  test('WO partial access', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-wo-partial-access.html');
+    await expect(page.locator('[data-hmv4-wo-partial]')).toBeVisible();
+    await expect(page.locator('[data-hmv4-wo-partial]')).toContainText('Partial access');
+  });
+
+  test('WO degraded no mutation', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-wo-degraded.html');
+    await expect(page.locator('[data-hmv4-mutation-intent]:not([disabled])')).toHaveCount(0);
+  });
+
+  test('WO disabled launchers expose all transactional intents', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-wo-overview.html');
+    for (const intent of ['wo-release', 'wo-mark-ready', 'wo-start-execution', 'wo-pause', 'wo-resume', 'wo-record-completion', 'wo-record-scrap', 'wo-cancel']) {
+      await expect(page.locator(`[data-hmv4-mutation-intent="${intent}"][disabled]`)).toBeVisible();
+    }
+  });
+});
+
+test.describe('SO record shell (Slice 10)', () => {
+  test('renders SO overview tab', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-so-overview.html');
+    const root = page.locator('[data-hmv4-so-record]');
+    await expect(root).toBeVisible();
+    await expect(root).toHaveAttribute('data-route-class', 'AR');
+    await expect(root).toHaveAttribute('data-authority-class', 'authoritative');
+    await expect(root).toHaveAttribute('data-resource-family', 'sales-orders');
+    await expect(root).toHaveAttribute('data-root-code', 'SO');
+    await expect(root).toHaveAttribute('data-record-id', 'SO-2026-088');
+    await expect(root).toHaveAttribute('data-query-tab', 'overview');
+  });
+
+  for (const tab of ['line-items', 'linked-job-orders', 'shipment-allocation', 'invoicing', 'related', 'audit']) {
+    test(`renders SO ${tab} tab`, async ({ page }) => {
+      await page.goto(`/tests/fixtures/module-template-v4/pages/authoritative-record-shell-so-${tab}.html`);
+      await expect(page.locator(`[data-hmv4-so-panel="${tab}"]:not([hidden])`)).toBeVisible();
+    });
+  }
+
+  test('SO linked-job-orders tab links to JO record', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-so-linked-job-orders.html');
+    await expect(page.locator('a[href*="records/job-orders/JO-2026-014"]')).toBeVisible();
+  });
+
+  test('SO line-items shows quantity progression', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-so-line-items.html');
+    await expect(page.locator('[data-hmv4-so-panel="line-items"] table tbody tr')).toHaveCount(1);
+    await expect(page.locator('[data-hmv4-so-panel="line-items"]')).toContainText('0%');
+  });
+
+  test('SO conflict state', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-so-conflict.html');
+    await expect(page.locator('[data-hmv4-so-record]')).toHaveAttribute('data-fixture-state', 'conflict');
+    await expect(page.locator('[data-hmv4-so-record]')).toHaveAttribute('data-fixture-freshness', 'fixture_conflict');
+  });
+
+  test('SO partial access', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-so-partial-access.html');
+    await expect(page.locator('[data-hmv4-so-partial]')).toBeVisible();
+    await expect(page.locator('[data-hmv4-so-partial]')).toContainText('Partial access');
+  });
+
+  test('SO degraded no mutation', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-so-degraded.html');
+    await expect(page.locator('[data-hmv4-mutation-intent]:not([disabled])')).toHaveCount(0);
+  });
+
+  test('SO disabled launchers expose all transactional intents', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-so-overview.html');
+    for (const intent of ['so-confirm', 'so-release', 'so-spawn-job-order', 'so-allocate-shipment', 'so-invoice', 'so-cancel', 'so-complete']) {
+      await expect(page.locator(`[data-hmv4-mutation-intent="${intent}"][disabled]`)).toBeVisible();
+    }
+  });
+
+  test('SO lifecycle strip renders all 5 fixture states', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-so-overview.html');
+    await expect(page.locator('[data-hmv4-so-lifecycle] li')).toHaveCount(5);
+  });
+});
+
+test.describe('CPO record shell (Slice 12)', () => {
+  test('parses CPO route as authoritative record shell', async ({ page }) => {
+    await page.goto('/mom/portal.html?hmv4=1');
+    const parsed = await page.evaluate(() =>
+      (window as any).Hmv4Routes.parsePath('/ops/records/customer-purchase-orders/CPO-2026-077', '?tab=overview'),
+    );
+    expect(parsed.routeClass).toBe('AR');
+    expect(parsed.params.resource_family).toBe('customer-purchase-orders');
+    expect(parsed.params.record_id).toBe('CPO-2026-077');
+    expect(parsed.query.tab).toBe('overview');
+    expect(parsed.rejectedQuery).toEqual([]);
+  });
+
+  test('renders CPO overview tab', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cpo-overview.html');
+    const root = page.locator('[data-hmv4-cpo-record]');
+    await expect(root).toBeVisible();
+    await expect(root).toHaveAttribute('data-route-class', 'AR');
+    await expect(root).toHaveAttribute('data-authority-class', 'authoritative');
+    await expect(root).toHaveAttribute('data-resource-family', 'customer-purchase-orders');
+    await expect(root).toHaveAttribute('data-root-code', 'CPO');
+    await expect(root).toHaveAttribute('data-record-id', 'CPO-2026-077');
+    await expect(root).toHaveAttribute('data-query-tab', 'overview');
+  });
+
+  for (const tab of ['line-items', 'terms-and-conditions', 'linked-sales-orders', 'acknowledgment', 'related', 'audit']) {
+    test(`renders CPO ${tab} tab`, async ({ page }) => {
+      await page.goto(`/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cpo-${tab}.html`);
+      await expect(page.locator(`[data-hmv4-cpo-panel="${tab}"]:not([hidden])`)).toBeVisible();
+    });
+  }
+
+  test('CPO linked-sales-orders links to SO record', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cpo-linked-sales-orders.html');
+    await expect(page.locator('a[href*="records/sales-orders/SO-2026-088"]')).toBeVisible();
+  });
+
+  test('CPO acknowledgment shows deviations from customer PO', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cpo-acknowledgment.html');
+    await expect(page.locator('text=deliveryDate')).toBeVisible();
+    await expect(page.locator('text=2026-05-02')).toBeVisible();
+  });
+
+  test('CPO terms-and-conditions shows custom clauses', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cpo-terms-and-conditions.html');
+    await expect(page.locator('text=cancel without penalty')).toBeVisible();
+  });
+
+  test('CPO conflict state', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cpo-conflict.html');
+    await expect(page.locator('[data-hmv4-cpo-record]')).toHaveAttribute('data-fixture-state', 'conflict');
+    await expect(page.locator('[data-hmv4-cpo-record]')).toHaveAttribute('data-fixture-freshness', 'fixture_conflict');
+  });
+
+  test('CPO partial-access masks total value', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cpo-partial-access.html');
+    await expect(page.locator('[data-hmv4-cpo-partial]')).toBeVisible();
+    await expect(page.locator('[data-hmv4-cpo-total-value="masked"]').first()).toBeVisible();
+  });
+
+  test('CPO degraded no mutation', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cpo-degraded.html');
+    await expect(page.locator('[data-hmv4-mutation-intent]:not([disabled])')).toHaveCount(0);
+  });
+
+  test('CPO disabled launchers expose all commercial intents', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cpo-overview.html');
+    for (const intent of ['cpo-acknowledge', 'cpo-reject', 'cpo-spawn-sales-order', 'cpo-amend']) {
+      await expect(page.locator(`[data-hmv4-mutation-intent="${intent}"][disabled]`)).toBeVisible();
+    }
+  });
+
+  test('CPO lifecycle strip renders all 5 fixture states', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-cpo-overview.html');
+    await expect(page.locator('[data-hmv4-cpo-lifecycle] li')).toHaveCount(5);
+  });
+});

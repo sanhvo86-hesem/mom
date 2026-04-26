@@ -5,6 +5,24 @@ source_step: Step 8.5 V7
 platform: HESEM Operations Platform
 
 api_contracts:
+  - operation_id: customer_purchase_orders.get
+    api_family: customer-purchase-orders
+    root_code: CPO
+    resource_family: customer-purchase-orders
+    owner_bc: BC1
+    authority_class: authoritative
+    operation_family: read
+    method: GET
+    path_template: /api/v1/customer-purchase-orders/{id}
+    idempotency_required: false
+    if_match_required: false
+    evidence_required: false
+    signature_required: false
+    audit_level: standard
+    problem_codes:
+      - hmv4.permission_denied
+      - hmv4.unknown_resource_family
+
   - operation_id: nonconformance_cases.get
     api_family: nonconformance-cases
     root_code: NQCASE

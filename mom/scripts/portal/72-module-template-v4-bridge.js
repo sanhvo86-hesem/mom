@@ -47,7 +47,13 @@
     'apqp-ppap': u('ML',{domain:'npi-engineering-product-definition', module:'ppap-fai-validation'}),
     fai: u('ML',{domain:'npi-engineering-product-definition', module:'ppap-fai-validation'}),
     'job-order': u('ML',{domain:'planning-scheduling', module:'job-orders'}),
-    jo: u('ML',{domain:'planning-scheduling', module:'job-orders'})
+    jo: u('ML',{domain:'planning-scheduling', module:'job-orders'}),
+    'work-order': u('ML',{domain:'shopfloor-execution', module:'wo-console'}),
+    wo: u('ML',{domain:'shopfloor-execution', module:'wo-console'}),
+    'sales-order': u('ML',{domain:'customer-order-commit', module:'sales-orders'}),
+    so: u('ML',{domain:'customer-order-commit', module:'sales-orders'}),
+    'customer-po': u('AC',{resource_family:'customer-purchase-orders'}),
+    cpo: u('AC',{resource_family:'customer-purchase-orders'})
   });
   function resolvePageKey(pageKey){
     var key = String(pageKey || '').trim();
@@ -100,6 +106,24 @@
       return {
         policy:'redirect_record_context_only',
         url:u('AR',{resource_family:'job-orders', record_id:recordId},{tab:(context && context.tab) || 'overview'})
+      };
+    }
+    if((key === 'wo' || key === 'work-order') && recordId){
+      return {
+        policy:'redirect_record_context_only',
+        url:u('AR',{resource_family:'work-orders', record_id:recordId},{tab:(context && context.tab) || 'overview'})
+      };
+    }
+    if((key === 'so' || key === 'sales-order') && recordId){
+      return {
+        policy:'redirect_record_context_only',
+        url:u('AR',{resource_family:'sales-orders', record_id:recordId},{tab:(context && context.tab) || 'overview'})
+      };
+    }
+    if((key === 'cpo' || key === 'customer-po') && recordId){
+      return {
+        policy:'redirect_record_context_only',
+        url:u('AR',{resource_family:'customer-purchase-orders', record_id:recordId},{tab:(context && context.tab) || 'overview'})
       };
     }
     return eqmsModuleAliasMap[key] ? { policy:'redirect_then_deprecate', url:eqmsModuleAliasMap[key] } : { policy:'unmapped_needs_decision', url:null, reason:'no_eqms_alias' };
