@@ -27,6 +27,40 @@
       "required_access": ["nonconformance-cases:read"]
     },
     {
+      "route_id": "record.sales-orders.detail",
+      "route_class": "AR",
+      "canonical_pattern": "/ops/records/sales-orders/{record_id}",
+      "authority_class": "authoritative_record",
+      "path_params": ["record_id"],
+      "allowed_query_keys": ["tab", "mode", "panel", "focus", "ctx_return", "ctx_source"],
+      "default_query": { "tab": "overview", "mode": "display" },
+      "renderer_ref": "renderSoRecord",
+      "required_access": ["sales-orders:read"]
+    },
+    {
+      "route_id": "record.customer-purchase-orders.detail",
+      "route_class": "AR",
+      "canonical_pattern": "/ops/records/customer-purchase-orders/{record_id}",
+      "authority_class": "authoritative_record",
+      "path_params": ["record_id"],
+      "allowed_query_keys": ["tab", "mode", "panel", "focus", "ctx_return", "ctx_source"],
+      "default_query": { "tab": "overview", "mode": "display" },
+      "renderer_ref": "renderCpoRecord",
+      "required_access": ["customer-purchase-orders:read"],
+      "live_api_path": "/api/v1/customer-purchase-orders/{record_id}"
+    },
+    {
+      "route_id": "record.work-orders.detail",
+      "route_class": "AR",
+      "canonical_pattern": "/ops/records/work-orders/{record_id}",
+      "authority_class": "authoritative_record",
+      "path_params": ["record_id"],
+      "allowed_query_keys": ["tab", "mode", "panel", "focus", "ctx_return", "ctx_source"],
+      "default_query": { "tab": "overview", "mode": "display" },
+      "renderer_ref": "renderWoRecord",
+      "required_access": ["work-orders:read"]
+    },
+    {
       "route_id": "workspace.dispatch.board",
       "route_class": "WS",
       "canonical_pattern": "/ops/planning-scheduling/dispatch-board/board",

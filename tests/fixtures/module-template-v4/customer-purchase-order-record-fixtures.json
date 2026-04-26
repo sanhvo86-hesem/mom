@@ -1,0 +1,94 @@
+{
+  "version": "0.1",
+  "authorityClass": "authoritative",
+  "resourceFamily": "customer-purchase-orders",
+  "rootCode": "CPO",
+  "records": {
+    "CPO-2026-077": {
+      "recordId": "CPO-2026-077",
+      "rootCode": "CPO",
+      "title": "Customer PO from Acme Industrial (PO-ACME-2026-Q2-014)",
+      "customerPoNumber": "PO-ACME-2026-Q2-014",
+      "customerCode": "CUST-100",
+      "customerName": "Acme Industrial Corp.",
+      "customerOrderRef": "PO-ACME-2026-Q2-014",
+      "state": "acknowledged",
+      "severity": "low",
+      "receivedDate": "2026-03-28",
+      "requestedDeliveryDate": "2026-04-30",
+      "acknowledgedDate": "2026-04-01",
+      "totalValue": 250000,
+      "currency": "USD",
+      "paymentTerms": "Net 30",
+      "deliveryTerms": "FOB Shipping Point",
+      "owner": "Sales Manager",
+      "freshness": "fixture_current",
+      "stateMessage": "Read-only prototype CPO shell.",
+      "lifecycle": [
+        ["received", "complete"],
+        ["reviewing", "complete"],
+        ["acknowledged", "current"],
+        ["fulfilled", "pending"],
+        ["rejected", "locked"]
+      ],
+      "lineItems": [
+        {
+          "line": 1,
+          "productCode": "PN-2042",
+          "description": "Widget Assembly Rev B",
+          "quantity": 5000,
+          "unitPrice": 50.0,
+          "lineTotal": 250000,
+          "requestedDate": "2026-04-30"
+        }
+      ],
+      "termsAndConditions": {
+        "paymentTerms": "Net 30",
+        "deliveryTerms": "FOB Shipping Point",
+        "warrantyTerms": "12 months from delivery",
+        "qualityRequirements": "ISO 9001 cert required; customer source inspection on first lot",
+        "customClauses": [
+          "Customer reserves right to cancel without penalty if delivery > 14 days late"
+        ]
+      },
+      "linkedSalesOrders": [
+        { "id": "SO-2026-088", "productCode": "PN-2042", "quantity": 5000, "state": "fulfilling" }
+      ],
+      "acknowledgment": {
+        "acknowledgedAt": "2026-04-01",
+        "acknowledgedBy": "Sales Manager",
+        "customerSignedAt": "2026-04-02",
+        "deviationsFromCustomerPo": [
+          {
+            "field": "deliveryDate",
+            "customerRequested": "2026-04-30",
+            "weAcknowledged": "2026-05-02",
+            "reason": "Production schedule capacity"
+          }
+        ]
+      },
+      "relatedRecords": [
+        { "resourceFamily": "sales-orders", "recordId": "SO-2026-088", "label": "SO-2026-088 spawned for fulfillment" }
+      ],
+      "limitations": []
+    }
+  },
+  "states": {
+    "conflict": {
+      "freshness": "fixture_conflict",
+      "stateMessage": "Conflict: customer amended PO offline."
+    },
+    "partial_access": {
+      "stateMessage": "Partial-access fixture.",
+      "limitations": [
+        "Customer name masked.",
+        "Total value masked.",
+        "Custom clauses masked."
+      ]
+    },
+    "degraded": {
+      "freshness": "fixture_stale",
+      "stateMessage": "Degraded fixture. Reload before acknowledgment."
+    }
+  }
+}
