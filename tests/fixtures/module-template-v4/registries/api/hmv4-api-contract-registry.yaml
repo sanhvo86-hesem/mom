@@ -23,6 +23,60 @@ api_contracts:
       - hmv4.permission_denied
       - hmv4.unknown_resource_family
 
+  - operation_id: sales_orders.get
+    api_family: sales-orders
+    root_code: SO
+    resource_family: sales-orders
+    owner_bc: BC1
+    authority_class: authoritative
+    operation_family: read
+    method: GET
+    path_template: /api/v1/sales-orders/{id}
+    idempotency_required: false
+    if_match_required: false
+    evidence_required: false
+    signature_required: false
+    audit_level: standard
+    problem_codes:
+      - hmv4.permission_denied
+      - hmv4.unknown_resource_family
+
+  - operation_id: job_orders.get
+    api_family: job-orders
+    root_code: JO
+    resource_family: job-orders
+    owner_bc: BC4
+    authority_class: authoritative
+    operation_family: read
+    method: GET
+    path_template: /api/v1/job-orders/{id}
+    idempotency_required: false
+    if_match_required: false
+    evidence_required: false
+    signature_required: false
+    audit_level: standard
+    problem_codes:
+      - hmv4.permission_denied
+      - hmv4.unknown_resource_family
+
+  - operation_id: work_orders.get
+    api_family: work-orders
+    root_code: WO
+    resource_family: work-orders
+    owner_bc: BC4
+    authority_class: authoritative
+    operation_family: read
+    method: GET
+    path_template: /api/v1/work-orders/{id}
+    idempotency_required: false
+    if_match_required: false
+    evidence_required: false
+    signature_required: false
+    audit_level: standard
+    problem_codes:
+      - hmv4.permission_denied
+      - hmv4.unknown_resource_family
+
   - operation_id: nonconformance_cases.get
     api_family: nonconformance-cases
     root_code: NQCASE

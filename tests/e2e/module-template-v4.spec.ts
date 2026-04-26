@@ -507,7 +507,7 @@ test.describe('CDOC record shell (Slice 5)', () => {
 
   test('BREL signatures tab shows 2-person rule status', async ({ page }) => {
     await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-brel-signatures.html');
-    const approvers = page.locator('[data-hmv4-brel-approver]');
+    const approvers = page.locator('[data-hmv4-brel-panel="signatures"]:not([hidden]) [data-hmv4-brel-approver]');
     await expect(approvers).toHaveCount(2);
   });
 
@@ -537,7 +537,7 @@ test.describe('CDOC record shell (Slice 5)', () => {
   test('BREL partial-access shows limitation notice', async ({ page }) => {
     await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-brel-partial-access.html');
     await expect(page.locator('[data-hmv4-brel-partial]')).toBeVisible();
-    await expect(page.locator('[data-hmv4-brel-partial]')).toContainText('Approver names masked');
+    await expect(page.locator('[data-hmv4-brel-partial]')).toContainText('Approver identities masked');
   });
 
   test('BREL degraded state sets stale freshness and disables mutation', async ({ page }) => {
@@ -599,7 +599,7 @@ test.describe('INSP record shell (Slice 6)', () => {
 
   test('INSP nonconformance-flags tab links to escalated NC', async ({ page }) => {
     await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-insp-nonconformance-flags.html');
-    const ncLink = page.locator('[data-hmv4-record-open="nonconformance-cases"][data-hmv4-record-id="NC-001"]');
+    const ncLink = page.locator('[data-hmv4-insp-panel="nonconformance-flags"]:not([hidden]) [data-hmv4-record-open="nonconformance-cases"][data-hmv4-record-id="NC-001"]');
     await expect(ncLink).toBeVisible();
     await expect(ncLink).toHaveAttribute('href', /\/ops\/records\/nonconformance-cases\/NC-001/);
   });
@@ -750,11 +750,19 @@ test.describe('WO record shell (Slice 11)', () => {
     await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-wo-partial-access.html');
     await expect(page.locator('[data-hmv4-wo-partial]')).toBeVisible();
     await expect(page.locator('[data-hmv4-wo-partial]')).toContainText('Partial access');
+    await expect(page.locator('[data-hmv4-wo-record]')).not.toContainText('Pham Thi D');
+    await expect(page.locator('[data-hmv4-wo-panel="resource-allocation"]')).toContainText('Masked');
   });
 
   test('WO degraded no mutation', async ({ page }) => {
     await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-wo-degraded.html');
     await expect(page.locator('[data-hmv4-mutation-intent]:not([disabled])')).toHaveCount(0);
+  });
+
+  test('WO lifecycle exposes completed and scrapped terminal branches', async ({ page }) => {
+    await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-wo-overview.html');
+    await expect(page.locator('[data-hmv4-wo-lifecycle] [data-lifecycle-state="completed"]')).toBeVisible();
+    await expect(page.locator('[data-hmv4-wo-lifecycle] [data-lifecycle-state="scrapped"]')).toBeVisible();
   });
 
   test('WO disabled launchers expose all transactional intents', async ({ page }) => {
@@ -806,6 +814,8 @@ test.describe('SO record shell (Slice 10)', () => {
     await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-so-partial-access.html');
     await expect(page.locator('[data-hmv4-so-partial]')).toBeVisible();
     await expect(page.locator('[data-hmv4-so-partial]')).toContainText('Partial access');
+    await expect(page.locator('[data-hmv4-so-panel="overview"]')).toContainText('Masked');
+    await expect(page.locator('[data-hmv4-so-panel="invoicing"]')).toContainText('Masked');
   });
 
   test('SO degraded no mutation', async ({ page }) => {
@@ -820,9 +830,10 @@ test.describe('SO record shell (Slice 10)', () => {
     }
   });
 
-  test('SO lifecycle strip renders all 5 fixture states', async ({ page }) => {
+  test('SO lifecycle strip renders all 6 fixture states', async ({ page }) => {
     await page.goto('/tests/fixtures/module-template-v4/pages/authoritative-record-shell-so-overview.html');
-    await expect(page.locator('[data-hmv4-so-lifecycle] li')).toHaveCount(5);
+    await expect(page.locator('[data-hmv4-so-lifecycle] li')).toHaveCount(6);
+    await expect(page.locator('[data-hmv4-so-lifecycle]')).toContainText('cancelled');
   });
 });
 

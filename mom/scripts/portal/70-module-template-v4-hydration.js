@@ -93,6 +93,113 @@
         };
       }
     },
+    'job-orders': {
+      canonicalPath: '/api/v1/job-orders',
+      fixtureGlobal: 'HMV4_JO_RECORD_FIXTURE',
+      recordAttr: 'data-hmv4-jo-record',
+      adapt: function(live){
+        if(!live) return null;
+        var recordId = live.id || live.record_id || live.code || live.job_number || live.jobNumber;
+        return {
+          recordId: recordId,
+          rootCode: 'JO',
+          title: live.title || live.summary || ('Job ' + (live.job_number || live.jobNumber || recordId || '')),
+          jobNumber: live.job_number || live.jobNumber || recordId,
+          customerOrderRef: live.customer_order_ref || live.customerOrderRef,
+          productCode: live.product_code || live.productCode,
+          quantityOrdered: live.quantity_ordered || live.quantityOrdered,
+          quantityCompleted: live.quantity_completed || live.quantityCompleted,
+          state: live.state || live.status || 'live',
+          severity: live.severity || 'low',
+          scheduledStart: live.scheduled_start || live.scheduledStart,
+          scheduledEnd: live.scheduled_end || live.scheduledEnd,
+          actualStart: live.actual_start || live.actualStart,
+          actualEnd: live.actual_end || live.actualEnd,
+          owner: (live.owner && (live.owner.name || live.owner)) || null,
+          plannerNotes: live.planner_notes || live.plannerNotes,
+          freshness: 'live_current',
+          stateMessage: 'Live API mode. Read-only display. Mutation actions remain disabled.',
+          lifecycle: normalizeLifecycle(live.lifecycle),
+          dispatchReadiness: live.dispatch_readiness || live.dispatchReadiness || {},
+          spawnedWorkOrders: live.spawned_work_orders || live.spawnedWorkOrders || [],
+          materialConsumption: live.material_consumption || live.materialConsumption || [],
+          progressMetrics: live.progress_metrics || live.progressMetrics || {},
+          relatedRecords: live.related_records || live.relatedRecords || []
+        };
+      }
+    },
+    'sales-orders': {
+      canonicalPath: '/api/v1/sales-orders',
+      fixtureGlobal: 'HMV4_SO_RECORD_FIXTURE',
+      recordAttr: 'data-hmv4-so-record',
+      adapt: function(live){
+        if(!live) return null;
+        var recordId = live.id || live.record_id || live.code || live.sales_order_number || live.salesOrderNumber;
+        return {
+          recordId: recordId,
+          rootCode: 'SO',
+          title: live.title || live.summary || ('Sales order ' + (recordId || '')),
+          salesOrderNumber: live.sales_order_number || live.salesOrderNumber || recordId,
+          customerCode: live.customer_code || live.customerCode,
+          customerName: live.customer_name || live.customerName,
+          customerOrderRef: live.customer_order_ref || live.customerOrderRef || live.customer_po,
+          state: live.state || live.status || 'live',
+          severity: live.severity || 'low',
+          orderDate: live.order_date || live.orderDate,
+          requestedShipDate: live.requested_ship_date || live.requestedShipDate,
+          confirmedShipDate: live.confirmed_ship_date || live.confirmedShipDate,
+          actualShipDate: live.actual_ship_date || live.actualShipDate,
+          totalValue: live.total_value || live.totalValue,
+          currency: live.currency,
+          owner: (live.owner && (live.owner.name || live.owner)) || null,
+          salesNotes: live.sales_notes || live.salesNotes,
+          freshness: 'live_current',
+          stateMessage: 'Live API mode. Read-only display. Mutation actions remain disabled.',
+          lifecycle: normalizeLifecycle(live.lifecycle),
+          lineItems: live.line_items || live.lineItems || [],
+          linkedJobOrders: live.linked_job_orders || live.linkedJobOrders || [],
+          shipmentAllocation: live.shipment_allocation || live.shipmentAllocation || [],
+          invoicing: live.invoicing || {},
+          relatedRecords: live.related_records || live.relatedRecords || []
+        };
+      }
+    },
+    'customer-purchase-orders': {
+      canonicalPath: '/api/v1/customer-purchase-orders',
+      fixtureGlobal: 'HMV4_CPO_RECORD_FIXTURE',
+      recordAttr: 'data-hmv4-cpo-record',
+      adapt: function(live){
+        if(!live) return null;
+        var recordId = live.id || live.record_id || live.code || live.customer_po_number || live.customerPoNumber;
+        return {
+          recordId: recordId,
+          rootCode: 'CPO',
+          title: live.title || live.summary || ('Customer purchase order ' + (recordId || '')),
+          customerPoNumber: live.customer_po_number || live.customerPoNumber || recordId,
+          customerCode: live.customer_code || live.customerCode,
+          customerName: live.customer_name || live.customerName,
+          customerOrderRef: live.customer_order_ref || live.customerOrderRef || recordId,
+          state: live.state || live.status || 'live',
+          severity: live.severity || 'low',
+          receivedDate: live.received_date || live.receivedDate,
+          requestedDeliveryDate: live.requested_delivery_date || live.requestedDeliveryDate,
+          acknowledgedDate: live.acknowledged_date || live.acknowledgedDate,
+          totalValue: live.total_value || live.totalValue,
+          currency: live.currency,
+          paymentTerms: live.payment_terms || live.paymentTerms,
+          deliveryTerms: live.delivery_terms || live.deliveryTerms,
+          owner: (live.owner && (live.owner.name || live.owner)) || null,
+          freshness: 'live_current',
+          stateMessage: 'Live API mode. Read-only display. Mutation actions remain disabled.',
+          lifecycle: normalizeLifecycle(live.lifecycle),
+          lineItems: live.line_items || live.lineItems || [],
+          termsAndConditions: live.terms_and_conditions || live.termsAndConditions || {},
+          linkedSalesOrders: live.linked_sales_orders || live.linkedSalesOrders || [],
+          acknowledgment: live.acknowledgment || {},
+          relatedRecords: live.related_records || live.relatedRecords || []
+        };
+      }
+    },
     'capas': {
       canonicalPath: '/api/v1/capas',
       fixtureGlobal: 'HMV4_CAPA_RECORD_FIXTURE',
@@ -339,8 +446,14 @@
     // Legacy aliases (ADR-0011 backwards compat)
     fetchNonconformance: function(recordId){ return fetchLiveResource('nonconformance-cases', recordId); },
     fetchWorkOrder: function(recordId){ return fetchLiveResource('work-orders', recordId); },
+    fetchJobOrder: function(recordId){ return fetchLiveResource('job-orders', recordId); },
+    fetchSalesOrder: function(recordId){ return fetchLiveResource('sales-orders', recordId); },
+    fetchCustomerPurchaseOrder: function(recordId){ return fetchLiveResource('customer-purchase-orders', recordId); },
     adaptNcToFixtureShape: function(live){ return HMV4_LIVE_RESOURCE_REGISTRY['nonconformance-cases'].adapt(live); },
-    adaptWoToFixtureShape: function(live){ return HMV4_LIVE_RESOURCE_REGISTRY['work-orders'].adapt(live); }
+    adaptWoToFixtureShape: function(live){ return HMV4_LIVE_RESOURCE_REGISTRY['work-orders'].adapt(live); },
+    adaptJoToFixtureShape: function(live){ return HMV4_LIVE_RESOURCE_REGISTRY['job-orders'].adapt(live); },
+    adaptSoToFixtureShape: function(live){ return HMV4_LIVE_RESOURCE_REGISTRY['sales-orders'].adapt(live); },
+    adaptCpoToFixtureShape: function(live){ return HMV4_LIVE_RESOURCE_REGISTRY['customer-purchase-orders'].adapt(live); }
   };
   window.HMModuleTemplateV4Hydration = { hydrate: hydrate, ensureShell: ensureShell };
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hydrate); else hydrate();

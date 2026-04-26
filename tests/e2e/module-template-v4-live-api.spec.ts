@@ -47,16 +47,19 @@ test.describe('hmv4 live api toggle (NQCASE)', () => {
 
 // ADR-0012: resource registry live-mode tests for all governed AR roots
 const liveModePages = [
-  { page: 'authoritative-record-shell-nc-live-mode.html',   recordRoot: '[data-hmv4-nonconformance-record]', family: 'nonconformance-cases' },
-  { page: 'authoritative-record-shell-wo-live-mode.html',   recordRoot: '[data-hmv4-wo-record]',             family: 'work-orders' },
-  { page: 'authoritative-record-shell-capa-live-mode.html', recordRoot: '[data-hmv4-capa-record]',           family: 'capas' },
-  { page: 'authoritative-record-shell-cdoc-live-mode.html', recordRoot: '[data-hmv4-cdoc-record]',           family: 'controlled-documents' },
-  { page: 'authoritative-record-shell-insp-live-mode.html', recordRoot: '[data-hmv4-insp-record]',           family: 'inspections' },
-  { page: 'authoritative-record-shell-brel-live-mode.html', recordRoot: '[data-hmv4-brel-record]',           family: 'batch-releases' },
-  { page: 'authoritative-record-shell-eco-live-mode.html',  recordRoot: '[data-hmv4-eco-record]',            family: 'engineering-changes' },
+  { page: 'authoritative-record-shell-nc-live-mode.html',   recordRoot: '[data-hmv4-nonconformance-record]', family: 'nonconformance-cases', canonicalPath: '/api/v1/nonconformance-cases' },
+  { page: 'authoritative-record-shell-jo-live-mode.html',   recordRoot: '[data-hmv4-jo-record]',             family: 'job-orders', canonicalPath: '/api/v1/job-orders' },
+  { page: 'authoritative-record-shell-wo-live-mode.html',   recordRoot: '[data-hmv4-wo-record]',             family: 'work-orders', canonicalPath: '/api/v1/work-orders' },
+  { page: 'authoritative-record-shell-capa-live-mode.html', recordRoot: '[data-hmv4-capa-record]',           family: 'capas', canonicalPath: '/api/v1/capas' },
+  { page: 'authoritative-record-shell-cdoc-live-mode.html', recordRoot: '[data-hmv4-cdoc-record]',           family: 'controlled-documents', canonicalPath: '/api/v1/controlled-documents' },
+  { page: 'authoritative-record-shell-insp-live-mode.html', recordRoot: '[data-hmv4-insp-record]',           family: 'inspections', canonicalPath: '/api/v1/inspections' },
+  { page: 'authoritative-record-shell-brel-live-mode.html', recordRoot: '[data-hmv4-brel-record]',           family: 'batch-releases', canonicalPath: '/api/v1/batch-releases' },
+  { page: 'authoritative-record-shell-eco-live-mode.html',  recordRoot: '[data-hmv4-eco-record]',            family: 'engineering-changes', canonicalPath: '/api/v1/engineering-changes' },
+  { page: 'authoritative-record-shell-cpo-live-mode.html',  recordRoot: '[data-hmv4-cpo-record]',            family: 'customer-purchase-orders', canonicalPath: '/api/v1/customer-purchase-orders' },
+  { page: 'authoritative-record-shell-so-live-mode.html',   recordRoot: '[data-hmv4-so-record]',             family: 'sales-orders', canonicalPath: '/api/v1/sales-orders' },
 ];
 
-for (const { page: fixturePage, family } of liveModePages) {
+for (const { page: fixturePage, family, canonicalPath } of liveModePages) {
   test(`live mode ${fixturePage}: error fallback when backend 401`, async ({ page: pw }) => {
     await pw.goto(`/tests/fixtures/module-template-v4/pages/${fixturePage}`);
     await pw.waitForFunction(
@@ -82,10 +85,11 @@ for (const { page: fixturePage, family } of liveModePages) {
   test(`live mode ${fixturePage}: registry exposes correct family entry`, async ({ page: pw }) => {
     await pw.goto(`/tests/fixtures/module-template-v4/pages/${fixturePage}`);
     await pw.waitForFunction(() => !!(window as any).Hmv4LiveApi, { timeout: 5_000 });
-    const hasEntry = await pw.evaluate(
-      (f) => !!(window as any).Hmv4LiveApi.registry[f],
+    const entry = await pw.evaluate(
+      (f) => (window as any).Hmv4LiveApi.registry[f],
       family,
     );
-    expect(hasEntry).toBe(true);
+    expect(entry).toBeTruthy();
+    expect(entry.canonicalPath).toBe(canonicalPath);
   });
 }

@@ -29,7 +29,8 @@
         ["confirmed", "complete"],
         ["released", "complete"],
         ["fulfilling", "current"],
-        ["completed", "locked"]
+        ["completed", "locked"],
+        ["cancelled", "locked"]
       ],
       "lineItems": [
         {
