@@ -373,6 +373,7 @@ RESIDUAL_POST_FIXES = [
 SEGMENT_BATCH_SIZE = 32
 SEGMENT_BATCH_MAX_CHARS = 3600
 CACHE_SCHEMA_VERSION = "argos_local_vi_en_v4_semantic_quality"
+QUALITY_GATE_VERSION = "quality_gate_v3"
 RESIDUAL_VIETNAMESE_TERMS = [
     "đánh giá",
     "nội bộ",
@@ -1063,7 +1064,7 @@ def main() -> int:
                 {
                     "ok": False,
                     "provider": "argos_local_vi_en",
-                    "engine_version": "quality_gate_v2",
+                    "engine_version": QUALITY_GATE_VERSION,
                     "reason": "translation_quality_gate_failed",
                     "message": "Generated English artifact failed locale quality gate.",
                     "quality_issues": quality_issues,
