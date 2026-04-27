@@ -345,8 +345,8 @@ RESIDUAL_POST_FIXES = [
     ("hóa", "standardization"),
     ("phó", "deputy"),
 ]
-SEGMENT_BATCH_SIZE = 10
-SEGMENT_BATCH_MAX_CHARS = 1200
+SEGMENT_BATCH_SIZE = 32
+SEGMENT_BATCH_MAX_CHARS = 3600
 CACHE_SCHEMA_VERSION = "argos_local_vi_en_v2_quality_gate"
 RESIDUAL_VIETNAMESE_TERMS = [
     "đánh giá",
