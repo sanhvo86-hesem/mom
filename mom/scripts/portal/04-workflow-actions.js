@@ -2264,6 +2264,42 @@ function defaultDccBootstrapLabels(){
   };
 }
 
+function markIframeDocumentNotranslate(idoc, locale){
+  if(!idoc) return;
+  const activeLocale = locale === 'en' ? 'en' : 'vi';
+  try{
+    if(idoc.documentElement){
+      idoc.documentElement.lang = activeLocale;
+      idoc.documentElement.setAttribute('translate', 'no');
+      idoc.documentElement.setAttribute('data-qms-view-lang', activeLocale);
+      if(idoc.documentElement.classList) idoc.documentElement.classList.add('notranslate');
+    }
+    const head = idoc.head || idoc.querySelector('head');
+    if(head && !head.querySelector('meta[name="google"][content="notranslate"]')){
+      const meta = idoc.createElement('meta');
+      meta.setAttribute('name', 'google');
+      meta.setAttribute('content', 'notranslate');
+      head.appendChild(meta);
+    }
+    if(idoc.body){
+      idoc.body.setAttribute('translate', 'no');
+      idoc.body.setAttribute('data-qms-view-lang', activeLocale);
+      if(idoc.body.classList) idoc.body.classList.add('notranslate');
+    }
+  }catch(_e){}
+}
+
+function rerenderIframeDccHeader(idoc, headerEl){
+  try{
+    const renderer = idoc && idoc.defaultView && idoc.defaultView.DccHeader;
+    if(renderer && typeof renderer.render === 'function' && headerEl){
+      Promise.resolve(renderer.render(headerEl)).catch(function(){});
+      return true;
+    }
+  }catch(_e){}
+  return false;
+}
+
 function syncIframeDccBootstrapMetadata(idoc, doc, locale){
   if(!idoc || !doc) return false;
   const headerEl = idoc.querySelector('.dcc-header');
@@ -2286,6 +2322,7 @@ function syncIframeDccBootstrapMetadata(idoc, doc, locale){
     headerEl.setAttribute('data-dcc-locale', locale === 'en' ? 'en' : 'vi');
     headerEl.setAttribute('data-dcc-bootstrap-source', 'portal-authoritative');
   }catch(_e){}
+  rerenderIframeDccHeader(idoc, headerEl);
   return true;
 }
 
@@ -2294,9 +2331,8 @@ function syncIframeDocumentHeaderMetadata(idoc, doc, options){
   try{
     const opts = (options && typeof options === 'object') ? options : {};
     const activeLocale = opts.locale === 'en' ? 'en' : (lang === 'en' ? 'en' : 'vi');
-    if(activeLocale === 'en'){
-      syncIframeDccBootstrapMetadata(idoc, doc, activeLocale);
-    }
+    markIframeDocumentNotranslate(idoc, activeLocale);
+    syncIframeDccBootstrapMetadata(idoc, doc, activeLocale);
     const publishedMeta = activeLocale === 'en' ? {code:'', title:'', desc:''} : extractIframePublishedDocMetadata(idoc);
     const authoritative = getAuthoritativeDccHeaderMeta(doc);
     const code = String(authoritative.doc_code || publishedMeta.code || '').trim();
@@ -2496,9 +2532,10 @@ function loadDocContent(code){
         finishDocIframeLoad(iframe, loading, loadCtx);
       };
       iframe.srcdoc = `<!DOCTYPE html>
-        <html lang="en">
+        <html lang="en" translate="no" class="notranslate">
         <head>
           <meta charset="utf-8">
+          <meta name="google" content="notranslate">
           <meta name="viewport" content="width=device-width, initial-scale=1">
           <style>
             body{margin:0;background:var(--bg-surface-alt,#f8fafc);font-family:Segoe UI,Arial,sans-serif;color:var(--text-primary,#0f172a)}
@@ -2573,9 +2610,10 @@ function loadDocContent(code){
       finishDocIframeLoad(iframe, loading, loadCtx);
     };
     iframe.srcdoc = `<!DOCTYPE html>
-      <html lang="${lang==='en'?'en':'vi'}">
+      <html lang="${lang==='en'?'en':'vi'}" translate="no" class="notranslate">
       <head>
         <meta charset="utf-8">
+        <meta name="google" content="notranslate">
         <style>
           body{margin:0;background:var(--bg-surface-alt,#f8fafc);font-family:Segoe UI,Arial,sans-serif;color:var(--text-primary,#0f172a)}
           .wrap{padding:24px}
@@ -2635,9 +2673,10 @@ function loadDocContent(code){
         finishDocIframeLoad(iframe, loading, loadCtx);
       };
       iframe.srcdoc = `<!DOCTYPE html>
-        <html lang="${lang==='en'?'en':'vi'}">
+        <html lang="${lang==='en'?'en':'vi'}" translate="no" class="notranslate">
         <head>
           <meta charset="utf-8">
+          <meta name="google" content="notranslate">
           <meta name="viewport" content="width=device-width, initial-scale=1">
           <style>
             body{margin:0;background:var(--bg-surface-alt,#f8fafc);font-family:Segoe UI,Arial,sans-serif;color:var(--text-primary,#0f172a)}
@@ -2703,11 +2742,7 @@ function loadDocContent(code){
           }
         }catch(e){}
         try{
-          if(idoc && idoc.documentElement){
-            idoc.documentElement.lang = loadCtx.lang;
-            idoc.documentElement.setAttribute('data-qms-view-lang', loadCtx.lang);
-          }
-          if(idoc && idoc.body) idoc.body.setAttribute('data-qms-view-lang', loadCtx.lang);
+          markIframeDocumentNotranslate(idoc, loadCtx.lang);
         }catch(e){}
         try{ if(typeof attachIframeLinkBridge==='function') attachIframeLinkBridge(iframe, doc, viewFile); }catch(e){}
         try{ attachIframeViewerZoom(iframe); }catch(e){}

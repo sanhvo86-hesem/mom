@@ -37,13 +37,14 @@ RESIDUAL_VIETNAMESE_TERMS = [
     "phó",
 ]
 QUALITY_REPEAT_PATTERNS = [
-    re.compile(r"\b([\wÀ-ỹ]{2,})(?:\s+\1\b){4,}", re.I),
-    re.compile(r"\bhóa(?:\s+hóa){2,}\b", re.I),
-    re.compile(r"\bphó(?:\s+phó){2,}\b", re.I),
-    re.compile(r"\bRe(?:\s+Re){4,}\b"),
-    re.compile(r"\bdiscovery(?:\s+discovery){2,}\b", re.I),
-    re.compile(r"\bdetection(?:\s+detection){2,}\b", re.I),
-    re.compile(r"\breject(?:\s+reject){3,}\b", re.I),
+    re.compile(r"\b([\wÀ-ỹ]{2,})(?:\s+\1\b){3,}", re.I),
+    re.compile(r"\bhóa(?:\s+hóa){1,}\b", re.I),
+    re.compile(r"\bphó(?:\s+phó){1,}\b", re.I),
+    re.compile(r"\bRe(?:\s+Re){1,}\b"),
+    re.compile(r"\bAc(?:\s+Ac){1,}\b"),
+    re.compile(r"\bdiscovery(?:\s+discovery){1,}\b", re.I),
+    re.compile(r"\bdetection(?:\s+detection){1,}\b", re.I),
+    re.compile(r"\breject(?:\s+reject){1,}\b", re.I),
 ]
 
 
@@ -80,7 +81,7 @@ def detect_issues(markup: str) -> List[str]:
     for term in RESIDUAL_VIETNAMESE_TERMS:
         residual_terms += len(phrase_regex(term).findall(text))
     vietnamese_chars = len(VIETNAMESE_CHAR_RE.findall(text))
-    if residual_terms > 0 and vietnamese_chars >= 2:
+    if vietnamese_chars > 0:
         issues.append("vietnamese_residue")
     if residual_terms >= 3:
         issues.append("excessive_vietnamese_residue")

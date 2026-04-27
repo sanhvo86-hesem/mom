@@ -3517,6 +3517,19 @@ async function editDocMeta(code, field){
         }
         if(!isStillActiveDocMetaView()) return;
         showToast(lang==='en' ? 'Saved' : 'Đã lưu');
+        try{
+          if(window.DccHeader && typeof window.DccHeader.clearCache === 'function'){
+            window.DccHeader.clearCache(editCode);
+          }else if(window.DccHeader && typeof window.DccHeader._clearCache === 'function'){
+            window.DccHeader._clearCache();
+          }
+        }catch(e){}
+        try{
+          if(typeof refreshDccOverlayForDocFromServer === 'function'){
+            await refreshDccOverlayForDocFromServer(editCode, {refreshUi:false});
+          }
+        }catch(e){}
+        if(!isStillActiveDocMetaView()) return;
         const headerEl = document.getElementById('doc-viewer-header');
         const dccEl = headerEl ? headerEl.querySelector('.dcc-header') : null;
         const dccCode = dccEl ? String(dccEl.getAttribute('data-dcc-doc-code') || '').trim() : '';

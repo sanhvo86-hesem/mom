@@ -70,6 +70,9 @@ final class DocumentControlService
     /** @var array<string, string> */
     private array $sourceDocumentHashCache = [];
 
+    /** @var array<string, list<string>> */
+    private array $localeArtifactQualityCache = [];
+
     public function __construct(private DataLayer $data) {}
 
     // ── Code canonicalisation ──────────────────────────────────────────────
@@ -1170,6 +1173,9 @@ final class DocumentControlService
         $revisionMatches = ($sourceRevision === '') || ($headerRevision !== '' && $sourceRevision === $headerRevision);
         $sourceHashMatches = $exists ? $this->sourceHashMatchesCurrentSource((string)($header['doc_code'] ?? ''), $variant) : true;
         $artifactPresent = $exists ? $this->localeArtifactExists($artifactPath) : false;
+        $artifactQualityIssues = ($locale !== 'vi' && $artifactPresent)
+            ? $this->localeArtifactQualityIssues($artifactPath)
+            : [];
         $draftLifecycle = in_array($headerStatus, ['draft', 'in_review', 'pending_approval'], true);
         $sourceBaselineCompatible = $revisionMatches || ($draftLifecycle && $sourceHashMatches);
         $publishedOk = $state !== 'released' || !empty($variant['published_at']);
@@ -1177,6 +1183,7 @@ final class DocumentControlService
             && $locale !== 'vi'
             && $artifactPath !== ''
             && $artifactPresent
+            && $artifactQualityIssues === []
             && in_array($state, $renderableStates, true)
             && $sourceBaselineCompatible
             && $sourceHashMatches
@@ -1190,6 +1197,7 @@ final class DocumentControlService
         $out['is_locale_fallback'] = ($locale === 'vi') ? false : !$renderable;
         $out['translation_state'] = $state;
         $out['locale_artifact_present'] = $artifactPresent;
+        $out['locale_quality_issues'] = $artifactQualityIssues;
         $out['artifact_rel_path'] = $renderable ? $artifactPath : null;
         $out['artifact_source_revision'] = $exists ? ($variant['artifact_source_revision'] ?? null) : null;
         $out['artifact_source_hash_sha256'] = $exists ? ($variant['artifact_source_hash_sha256'] ?? null) : null;
@@ -1339,6 +1347,34 @@ final class DocumentControlService
         }
 
         return is_file($rootDir . '/' . $normalized);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function localeArtifactQualityIssues(string $artifactPath): array
+    {
+        $normalized = str_replace('\\', '/', trim($artifactPath));
+        $normalized = ltrim($normalized, '/');
+        if ($normalized === '' || str_contains($normalized, '..')) {
+            return ['artifact_path_invalid'];
+        }
+        if (array_key_exists($normalized, $this->localeArtifactQualityCache)) {
+            return $this->localeArtifactQualityCache[$normalized];
+        }
+
+        $rootDir = method_exists($this->data, 'getRootDir')
+            ? (string)$this->data->getRootDir()
+            : dirname(__DIR__, 5);
+        $rootDir = rtrim(str_replace('\\', '/', $rootDir), '/');
+        $html = $rootDir !== '' ? @file_get_contents($rootDir . '/' . $normalized) : false;
+        if (!is_string($html) || trim($html) === '') {
+            $this->localeArtifactQualityCache[$normalized] = ['artifact_read_failed'];
+            return $this->localeArtifactQualityCache[$normalized];
+        }
+
+        $this->localeArtifactQualityCache[$normalized] = DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html);
+        return $this->localeArtifactQualityCache[$normalized];
     }
 
     private function sourceDocumentHashFor(string $docCode): string

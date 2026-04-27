@@ -5,18 +5,21 @@ declare(strict_types=1);
 use MOM\Database\DataLayer;
 use MOM\Services\DocumentControl\DocumentLocaleAutomationService;
 
+const DCC_LOCALE_WORKER_NO_SLOT_EXIT = 75;
+
 if (PHP_SAPI !== 'cli') {
     fwrite(STDERR, "CLI only\n");
     exit(1);
 }
 
 $rootDir = realpath(__DIR__ . '/../../..');
-if (!is_string($rootDir) || $rootDir === '') {
+if (!is_string($rootDir)) {
     fwrite(STDERR, "Unable to resolve repo root\n");
     exit(1);
 }
 
-$workerArgs = parseWorkerArgs($argv);
+$cliArgv = isset($argv) && is_array($argv) ? $argv : ($_SERVER['argv'] ?? []);
+$workerArgs = parseWorkerArgs(array_values(array_map('strval', $cliArgv)));
 $jobPath = $workerArgs['job_path'];
 if ($jobPath === '' || !is_file($jobPath)) {
     fwrite(STDERR, "Missing job file\n");
@@ -34,7 +37,7 @@ if ($fpmEnvPath !== '') {
 
 $queueLock = acquireQueueWorkerLock($rootDir);
 if ($queueLock === null) {
-    exit(0);
+    exit(DCC_LOCALE_WORKER_NO_SLOT_EXIT);
 }
 
 require_once $rootDir . '/mom/database/DataLayer.php';

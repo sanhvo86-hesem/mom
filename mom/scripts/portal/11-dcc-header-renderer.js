@@ -27,6 +27,24 @@
 var API_PREFIX = '/api/v1/dcc';
 var DEFAULT_LOCALE = 'vi';
 
+function _disableBrowserTranslation(){
+    try {
+        if (document.documentElement) {
+            document.documentElement.setAttribute('translate', 'no');
+            if (document.documentElement.classList) document.documentElement.classList.add('notranslate');
+        }
+        var head = document.head || document.querySelector('head');
+        if (head && !head.querySelector('meta[name="google"][content="notranslate"]')) {
+            var meta = document.createElement('meta');
+            meta.setAttribute('name', 'google');
+            meta.setAttribute('content', 'notranslate');
+            head.appendChild(meta);
+        }
+    } catch(e) {}
+}
+
+_disableBrowserTranslation();
+
 /* ── Canonical doc-code extractor (mirrors backend scan_extract_code) ─────
  * Derive the SHORT canonical doc code from the current document URL's
  * basename. Used as the authoritative source for which DCC row to fetch,
@@ -398,12 +416,13 @@ function render(container){
         bootstrap = null;
     }
     var cached = _cachedHeader(docCode, locale);
-    if (cached) {
-        try { _renderInto(container, cached, _labelsCache[String(locale || DEFAULT_LOCALE).toLowerCase()] || {}); } catch(e){}
-        container.setAttribute('data-dcc-state', 'cached');
-    } else {
-        container.setAttribute('data-dcc-state', 'loading');
+    // Do not first-paint cached metadata. Owner, approver, revision, title, and
+    // locale can change independently of the HTML artifact, and repainting cache
+    // before the no-store API response is the visible header flicker users saw.
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
     }
+    container.setAttribute('data-dcc-state', 'loading');
 
     return Promise.all([
         _loadHeader(docCode, locale),
@@ -477,6 +496,22 @@ window.DccHeader = {
             if (!docCode) return null;
             if (locale) return _cachedHeader(docCode, locale);
             return _cachedHeaderAnyLocale(docCode);
+        },
+        clearCache: function(docCode, locale){
+            var code = String(docCode || '').toUpperCase();
+            if (!code) {
+                _headerCache = Object.create(null);
+                _latestHeaderByDoc = Object.create(null);
+                return;
+            }
+            if (locale) {
+                delete _headerCache[_cacheKey(code, locale)];
+            } else {
+                Object.keys(_headerCache).forEach(function(key){
+                    if (key.indexOf(code + '|') === 0) delete _headerCache[key];
+                });
+            }
+            delete _latestHeaderByDoc[code];
         },
         _clearCache: function(){
             _labelsCache = {};

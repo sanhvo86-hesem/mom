@@ -347,7 +347,7 @@ RESIDUAL_POST_FIXES = [
 ]
 SEGMENT_BATCH_SIZE = 32
 SEGMENT_BATCH_MAX_CHARS = 3600
-CACHE_SCHEMA_VERSION = "argos_local_vi_en_v2_quality_gate"
+CACHE_SCHEMA_VERSION = "argos_local_vi_en_v3_quality_signature"
 RESIDUAL_VIETNAMESE_TERMS = [
     "đánh giá",
     "nội bộ",
@@ -370,13 +370,14 @@ RESIDUAL_VIETNAMESE_TERMS = [
     "phó",
 ]
 QUALITY_REPEAT_PATTERNS = [
-    re.compile(r"\b([\wÀ-ỹ]{2,})(?:\s+\1\b){4,}", re.I),
-    re.compile(r"\bhóa(?:\s+hóa){2,}\b", re.I),
-    re.compile(r"\bphó(?:\s+phó){2,}\b", re.I),
-    re.compile(r"\bRe(?:\s+Re){4,}\b"),
-    re.compile(r"\bdiscovery(?:\s+discovery){2,}\b", re.I),
-    re.compile(r"\bdetection(?:\s+detection){2,}\b", re.I),
-    re.compile(r"\breject(?:\s+reject){3,}\b", re.I),
+    re.compile(r"\b([\wÀ-ỹ]{2,})(?:\s+\1\b){3,}", re.I),
+    re.compile(r"\bhóa(?:\s+hóa){1,}\b", re.I),
+    re.compile(r"\bphó(?:\s+phó){1,}\b", re.I),
+    re.compile(r"\bRe(?:\s+Re){1,}\b"),
+    re.compile(r"\bAc(?:\s+Ac){1,}\b"),
+    re.compile(r"\bdiscovery(?:\s+discovery){1,}\b", re.I),
+    re.compile(r"\bdetection(?:\s+detection){1,}\b", re.I),
+    re.compile(r"\breject(?:\s+reject){1,}\b", re.I),
 ]
 
 _translator = None
@@ -446,9 +447,13 @@ def translation_rules_signature() -> str:
         return _translation_rules_signature
     payload = json.dumps(
         {
+            "cache_schema": CACHE_SCHEMA_VERSION,
             "glossary": load_glossary_phrases(),
             "post_fixes": POST_FIXES,
             "residual_post_fixes": RESIDUAL_POST_FIXES,
+            "protected_literal_patterns": [pattern.pattern for pattern in PROTECTED_LITERAL_PATTERNS],
+            "residual_vietnamese_terms": RESIDUAL_VIETNAMESE_TERMS,
+            "quality_repeat_patterns": [pattern.pattern for pattern in QUALITY_REPEAT_PATTERNS],
         },
         ensure_ascii=False,
         separators=(",", ":"),
@@ -559,7 +564,7 @@ def detect_quality_issues(text: str, *, html: bool = False) -> List[str]:
 
     residual_terms = residual_vietnamese_term_count(visible)
     vietnamese_chars = len(VIETNAMESE_CHAR_RE.findall(visible))
-    if residual_terms > 0 and vietnamese_chars >= 2:
+    if vietnamese_chars > 0:
         issues.append("vietnamese_residue")
     if residual_terms >= 3:
         issues.append("excessive_vietnamese_residue")
@@ -719,7 +724,9 @@ def load_cached_translations(segments: List[str]) -> Dict[str, str]:
             for key, translated in rows:
                 segment = keys.get(str(key))
                 if segment is not None and isinstance(translated, str) and translated.strip():
-                    out[segment] = translated
+                    candidate = cleanup_translation(translated)
+                    if not has_quality_issue(candidate):
+                        out[segment] = candidate
         return out
     except Exception:
         return {}
@@ -786,8 +793,11 @@ def translate_core_map(cores: Iterable[str], translator) -> Dict[str, str]:
                 translated = cleanup_translation(translator.translate(item))
                 if has_quality_issue(translated):
                     translated = glossary_only_translate(item)
+                if has_quality_issue(translated):
+                    translated = item
                 translated_map[item] = translated
-                newly_translated[item] = translated
+                if not has_quality_issue(translated):
+                    newly_translated[item] = translated
         batch = []
         batch_chars = 0
 
@@ -877,7 +887,18 @@ def translate_html(source_html: str, title: str, subtitle: str) -> Dict[str, str
 
     if soup.html is not None:
         soup.html["lang"] = "en"
+        soup.html["translate"] = "no"
         soup.html["data-qms-locale-artifact"] = "en"
+        classes = soup.html.get("class") or []
+        if isinstance(classes, str):
+            classes = classes.split()
+        if "notranslate" not in classes:
+            soup.html["class"] = list(classes) + ["notranslate"]
+    if soup.head is not None and soup.head.find("meta", attrs={"name": "google", "content": "notranslate"}) is None:
+        meta = soup.new_tag("meta")
+        meta["name"] = "google"
+        meta["content"] = "notranslate"
+        soup.head.append(meta)
     header = soup.select_one(".dcc-header")
     if header is not None:
         header["data-dcc-locale"] = "en"

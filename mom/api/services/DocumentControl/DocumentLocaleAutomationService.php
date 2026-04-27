@@ -29,7 +29,7 @@ final class DocumentLocaleAutomationService
     private const COMMAND_IO_POLL_MICROSECONDS = 200000;
     private const MAX_COMMAND_OUTPUT_BYTES = 33554432;
     private const MAX_COMMAND_MESSAGE_BYTES = 4096;
-    private const LOCALE_QUALITY_GATE_VERSION = 'locale_quality_gate_v1';
+    private const LOCALE_QUALITY_GATE_VERSION = 'locale_quality_gate_v2';
     private const RESIDUAL_VIETNAMESE_TERMS = [
         'đánh giá',
         'nội bộ',
@@ -52,13 +52,14 @@ final class DocumentLocaleAutomationService
         'phó',
     ];
     private const QUALITY_REPEAT_PATTERNS = [
-        '/\b([\p{L}]{2,})(?:\s+\1\b){4,}/iu',
-        '/\bhóa(?:\s+hóa){2,}\b/iu',
-        '/\bphó(?:\s+phó){2,}\b/iu',
-        '/\bRe(?:\s+Re){4,}\b/u',
-        '/\bdiscovery(?:\s+discovery){2,}\b/iu',
-        '/\bdetection(?:\s+detection){2,}\b/iu',
-        '/\breject(?:\s+reject){3,}\b/iu',
+        '/\b([\p{L}]{2,})(?:\s+\1\b){3,}/iu',
+        '/\bhóa(?:\s+hóa){1,}\b/iu',
+        '/\bphó(?:\s+phó){1,}\b/iu',
+        '/\bRe(?:\s+Re){1,}\b/u',
+        '/\bAc(?:\s+Ac){1,}\b/u',
+        '/\bdiscovery(?:\s+discovery){1,}\b/iu',
+        '/\bdetection(?:\s+detection){1,}\b/iu',
+        '/\breject(?:\s+reject){1,}\b/iu',
     ];
 
     public function __construct(
@@ -1300,7 +1301,7 @@ final class DocumentLocaleAutomationService
             $matches
         );
         $vietnameseChars = is_int($vietnameseChars) ? $vietnameseChars : 0;
-        if ($residualMatches > 0 && $vietnameseChars >= 2) {
+        if ($vietnameseChars > 0) {
             $issues[] = 'vietnamese_residue';
         }
         if ($residualMatches >= 3) {

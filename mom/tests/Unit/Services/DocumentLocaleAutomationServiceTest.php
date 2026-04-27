@@ -202,6 +202,26 @@ PHP);
         $this->assertContains('vietnamese_residue', DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html));
     }
 
+    public function testLocaleArtifactQualityGateDetectsShortCorruptionLoops(): void
+    {
+        $html = '<html lang="en"><body>'
+            . '<p>Accept/Reject Ac Re Re and hóa hóa must not pass.</p>'
+            . '<p>detection detection discovery discovery reject reject</p>'
+            . '</body></html>';
+
+        $issues = DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html);
+
+        $this->assertContains('repeated_token_loop', $issues);
+        $this->assertContains('vietnamese_residue', $issues);
+    }
+
+    public function testLocaleArtifactQualityGateRejectsSingleVietnameseResidue(): void
+    {
+        $html = '<html lang="en"><body><p>The fixture gá is still untranslated.</p></body></html>';
+
+        $this->assertContains('vietnamese_residue', DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html));
+    }
+
     private function newService(): DocumentLocaleAutomationService
     {
         $baseDir = realpath(__DIR__ . '/../../..');

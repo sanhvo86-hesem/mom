@@ -6,6 +6,8 @@ use MOM\Database\DataLayer;
 use MOM\Services\DocumentControl\DocumentControlService;
 use MOM\Services\DocumentControl\DocumentLocaleAutomationService;
 
+const DCC_LOCALE_WORKER_NO_SLOT_EXIT = 75;
+
 if (PHP_SAPI !== 'cli') {
     fwrite(STDERR, "CLI only\n");
     exit(1);
@@ -62,10 +64,10 @@ $segmentPrewarmLimit = isset($options['segment-prewarm-limit']) && ctype_digit((
     ? max(0, (int)$options['segment-prewarm-limit'])
     : 0;
 $startWorkers = isset($options['start-workers']) && ctype_digit((string)$options['start-workers'])
-    ? max(0, min(8, (int)$options['start-workers']))
+    ? max(0, min(4, (int)$options['start-workers']))
     : 0;
 $workerSlots = isset($options['worker-slots']) && ctype_digit((string)$options['worker-slots'])
-    ? max(1, min(8, (int)$options['worker-slots']))
+    ? max(1, min(4, (int)$options['worker-slots']))
     : max(1, $startWorkers);
 $fpmEnvPath = trim((string)($options['fpm-env'] ?? ''));
 if ($fpmEnvPath !== '') {
@@ -226,7 +228,7 @@ if (!$dryRun && $startWorkers > 0) {
     $stats['workers_started'] = $workerResult['started'];
     $stats['worker_exit_codes'] = $workerResult['exit_codes'];
     foreach ($workerResult['exit_codes'] as $exitCode) {
-        if ($exitCode !== 0) {
+        if ($exitCode !== 0 && $exitCode !== DCC_LOCALE_WORKER_NO_SLOT_EXIT) {
             $stats['errors']++;
         }
     }
@@ -486,7 +488,15 @@ function startQueuedWorkers(string $rootDir, int $count, string $fpmEnvPath = ''
     do {
         $foregroundProcesses = [];
         $waveStarted = 0;
-        foreach (listQueuedJobs($rootDir, $count) as $jobPath) {
+        $launchLimit = $count;
+        if ($waitForWorkers) {
+            $availableSlots = countAvailableWorkerSlots($rootDir);
+            if ($availableSlots <= 0) {
+                break;
+            }
+            $launchLimit = min($launchLimit, $availableSlots);
+        }
+        foreach (listQueuedJobs($rootDir, $launchLimit) as $jobPath) {
             if ($waitForWorkers) {
                 $command = [$php, $worker, $jobPath];
                 if ($fpmEnvPath !== '') {
@@ -538,16 +548,48 @@ function startQueuedWorkers(string $rootDir, int $count, string $fpmEnvPath = ''
             $waveStarted++;
         }
 
+        $waveExitCodes = [];
         foreach ($foregroundProcesses as $process) {
             $exit = @proc_close($process);
-            $exitCodes[] = is_int($exit) ? $exit : null;
+            $normalizedExit = is_int($exit) ? $exit : null;
+            $exitCodes[] = $normalizedExit;
+            $waveExitCodes[] = $normalizedExit;
         }
 
         $waves++;
-        if (!$waitForWorkers || $waveStarted === 0 || $waves >= 1000) {
+        $slotBlockedWave = $waveExitCodes !== []
+            && count(array_filter($waveExitCodes, static fn ($code): bool => $code !== DCC_LOCALE_WORKER_NO_SLOT_EXIT)) === 0;
+        if (!$waitForWorkers || $waveStarted === 0 || $slotBlockedWave || $waves >= 1000) {
             break;
         }
     } while (countQueuedJobs($rootDir) > 0);
 
     return ['started' => $started, 'exit_codes' => $exitCodes];
+}
+
+function countAvailableWorkerSlots(string $rootDir): int
+{
+    $slotCount = configuredWorkerSlotCount();
+    $available = 0;
+    for ($slot = 0; $slot < $slotCount; $slot++) {
+        $queueLockPath = rtrim($rootDir, '/') . '/mom/data/cache/dcc-locale-jobs/.worker-global.' . $slot . '.lock';
+        $queueLock = @fopen($queueLockPath, 'c');
+        if (!is_resource($queueLock)) {
+            continue;
+        }
+        if (@flock($queueLock, LOCK_EX | LOCK_NB)) {
+            $available++;
+            @flock($queueLock, LOCK_UN);
+        }
+        fclose($queueLock);
+    }
+
+    return $available;
+}
+
+function configuredWorkerSlotCount(): int
+{
+    $raw = trim((string)(getenv('DCC_TRANSLATION_WORKER_SLOTS') ?: '1'));
+    $slots = ctype_digit($raw) ? (int)$raw : 1;
+    return max(1, min(4, $slots));
 }
