@@ -1324,6 +1324,8 @@ final class DocumentLocaleAutomationService
     {
         $clean = preg_replace('/<(script|style|noscript|svg|math)\b[^>]*>.*?<\/\1>/is', ' ', $html);
         $clean = is_string($clean) ? $clean : $html;
+        $clean = preg_replace('/<[^>]+>/', ' ', $clean);
+        $clean = is_string($clean) ? $clean : $html;
         $text = html_entity_decode(strip_tags($clean), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $text = preg_replace('/\s+/u', ' ', $text);
         return trim(is_string($text) ? $text : '');

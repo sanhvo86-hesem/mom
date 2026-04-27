@@ -195,6 +195,13 @@ PHP);
         $this->assertSame([], DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html));
     }
 
+    public function testLocaleArtifactQualityGateDetectsResidualAcrossTags(): void
+    {
+        $html = '<html lang="en"><body><span>Coach</span><span>đánh giá nội bộ</span><span>Escalation</span></body></html>';
+
+        $this->assertContains('vietnamese_residue', DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html));
+    }
+
     private function newService(): DocumentLocaleAutomationService
     {
         $baseDir = realpath(__DIR__ . '/../../..');
