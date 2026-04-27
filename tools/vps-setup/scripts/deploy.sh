@@ -233,6 +233,7 @@ run_dcc_locale_prewarm_kick() {
             php8.5 "$script" \
                 --fpm-env="$fpm_conf" \
                 --prewarm-segment-cache \
+                --segment-prewarm-limit=120 \
                 --only-missing-job \
                 --no-spawn-per-job \
                 --start-workers="$workers" \

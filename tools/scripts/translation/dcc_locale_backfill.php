@@ -481,17 +481,49 @@ function startQueuedWorkers(string $rootDir, int $count, string $fpmEnvPath = ''
     $log = rtrim($rootDir, '/') . '/mom/data/php_error.log';
     $started = 0;
     $exitCodes = [];
-    $foregroundProcesses = [];
-    foreach (listQueuedJobs($rootDir, $count) as $jobPath) {
-        if ($waitForWorkers) {
-            $command = [$php, $worker, $jobPath];
-            if ($fpmEnvPath !== '') {
-                $command[] = '--fpm-env=' . $fpmEnvPath;
+    $waves = 0;
+
+    do {
+        $foregroundProcesses = [];
+        $waveStarted = 0;
+        foreach (listQueuedJobs($rootDir, $count) as $jobPath) {
+            if ($waitForWorkers) {
+                $command = [$php, $worker, $jobPath];
+                if ($fpmEnvPath !== '') {
+                    $command[] = '--fpm-env=' . $fpmEnvPath;
+                }
+                $process = @proc_open($command, [
+                    0 => ['file', '/dev/null', 'r'],
+                    1 => ['file', $log, 'a'],
+                    2 => ['file', $log, 'a'],
+                ], $pipes, $rootDir);
+                if (!is_resource($process)) {
+                    continue;
+                }
+                foreach ($pipes as $pipe) {
+                    if (is_resource($pipe)) {
+                        fclose($pipe);
+                    }
+                }
+                $foregroundProcesses[] = $process;
+                $started++;
+                $waveStarted++;
+                continue;
             }
-            $process = @proc_open($command, [
-                0 => ['file', '/dev/null', 'r'],
-                1 => ['file', $log, 'a'],
-                2 => ['file', $log, 'a'],
+
+            $command = sprintf(
+                'cd %s && nohup %s %s %s%s >> %s 2>&1 < /dev/null &',
+                escapeshellarg($rootDir),
+                escapeshellarg($php),
+                escapeshellarg($worker),
+                escapeshellarg($jobPath),
+                $fpmEnvPath !== '' ? ' --fpm-env=' . escapeshellarg($fpmEnvPath) : '',
+                escapeshellarg($log)
+            );
+            $process = @proc_open(['/bin/sh', '-lc', $command], [
+                0 => ['pipe', 'r'],
+                1 => ['pipe', 'w'],
+                2 => ['pipe', 'w'],
             ], $pipes, $rootDir);
             if (!is_resource($process)) {
                 continue;
@@ -501,41 +533,21 @@ function startQueuedWorkers(string $rootDir, int $count, string $fpmEnvPath = ''
                     fclose($pipe);
                 }
             }
-            $foregroundProcesses[] = $process;
+            @proc_close($process);
             $started++;
-            continue;
+            $waveStarted++;
         }
 
-        $command = sprintf(
-            'cd %s && nohup %s %s %s%s >> %s 2>&1 < /dev/null &',
-            escapeshellarg($rootDir),
-            escapeshellarg($php),
-            escapeshellarg($worker),
-            escapeshellarg($jobPath),
-            $fpmEnvPath !== '' ? ' --fpm-env=' . escapeshellarg($fpmEnvPath) : '',
-            escapeshellarg($log)
-        );
-        $process = @proc_open(['/bin/sh', '-lc', $command], [
-            0 => ['pipe', 'r'],
-            1 => ['pipe', 'w'],
-            2 => ['pipe', 'w'],
-        ], $pipes, $rootDir);
-        if (!is_resource($process)) {
-            continue;
+        foreach ($foregroundProcesses as $process) {
+            $exit = @proc_close($process);
+            $exitCodes[] = is_int($exit) ? $exit : null;
         }
-        foreach ($pipes as $pipe) {
-            if (is_resource($pipe)) {
-                fclose($pipe);
-            }
-        }
-        @proc_close($process);
-        $started++;
-    }
 
-    foreach ($foregroundProcesses as $process) {
-        $exit = @proc_close($process);
-        $exitCodes[] = is_int($exit) ? $exit : null;
-    }
+        $waves++;
+        if (!$waitForWorkers || $waveStarted === 0 || $waves >= 1000) {
+            break;
+        }
+    } while (countQueuedJobs($rootDir) > 0);
 
     return ['started' => $started, 'exit_codes' => $exitCodes];
 }
