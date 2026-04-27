@@ -301,6 +301,14 @@ function localeReadiness(string $rootDir, array $variant, string $sourceHash): a
     if (!is_file($rootDir . '/' . $artifactRelPath)) {
         return ['ready' => false, 'reason' => 'artifact_file_missing'];
     }
+    $artifactHtml = @file_get_contents($rootDir . '/' . $artifactRelPath);
+    if (!is_string($artifactHtml) || trim($artifactHtml) === '') {
+        return ['ready' => false, 'reason' => 'artifact_file_unreadable'];
+    }
+    $qualityIssues = DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($artifactHtml);
+    if ($qualityIssues !== []) {
+        return ['ready' => false, 'reason' => 'artifact_quality_failed:' . implode(',', $qualityIssues)];
+    }
 
     return ['ready' => true, 'reason' => 'current_artifact_ready'];
 }

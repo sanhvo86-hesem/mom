@@ -170,6 +170,31 @@ PHP);
         $this->assertGreaterThan(131072, strlen($result));
     }
 
+    public function testLocaleArtifactQualityGateDetectsCorruptMachineOutput(): void
+    {
+        $html = '<html lang="en"><body>'
+            . '<p>Accept reject Re Re Re Re Re Re Re and đánh giá nội bộ remains.</p>'
+            . '<p>according to<a href="wi.html">WI-603</a>and close.</p>'
+            . '</body></html>';
+
+        $issues = DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html);
+
+        $this->assertContains('repeated_token_loop', $issues);
+        $this->assertContains('vietnamese_residue', $issues);
+        $this->assertContains('anchor_prefix_spacing', $issues);
+        $this->assertContains('anchor_suffix_spacing', $issues);
+    }
+
+    public function testLocaleArtifactQualityGateAllowsCleanTechnicalCodes(): void
+    {
+        $html = '<html lang="en"><body>'
+            . '<p>Use AQL Ac/Re with WI-603, ANNEX-701, SSOT, SoD, QPL, ToolID and PackID.</p>'
+            . '<p>Evidence is recorded for internal audit and release handoff.</p>'
+            . '</body></html>';
+
+        $this->assertSame([], DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html));
+    }
+
     private function newService(): DocumentLocaleAutomationService
     {
         $baseDir = realpath(__DIR__ . '/../../..');

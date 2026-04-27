@@ -29,6 +29,37 @@ final class DocumentLocaleAutomationService
     private const COMMAND_IO_POLL_MICROSECONDS = 200000;
     private const MAX_COMMAND_OUTPUT_BYTES = 33554432;
     private const MAX_COMMAND_MESSAGE_BYTES = 4096;
+    private const LOCALE_QUALITY_GATE_VERSION = 'locale_quality_gate_v1';
+    private const RESIDUAL_VIETNAMESE_TERMS = [
+        'đánh giá',
+        'nội bộ',
+        'lô',
+        'mẫu',
+        'phạm vi',
+        'phải',
+        'đúng',
+        'thiếu',
+        'không',
+        'hồ sơ',
+        'bằng chứng',
+        'quyền dùng',
+        'quyền dừng',
+        'phát hành',
+        'giao hàng',
+        'một phần',
+        'gá',
+        'hóa',
+        'phó',
+    ];
+    private const QUALITY_REPEAT_PATTERNS = [
+        '/\b([\p{L}]{2,})(?:\s+\1\b){4,}/iu',
+        '/\bhóa(?:\s+hóa){2,}\b/iu',
+        '/\bphó(?:\s+phó){2,}\b/iu',
+        '/\bRe(?:\s+Re){4,}\b/u',
+        '/\bdiscovery(?:\s+discovery){2,}\b/iu',
+        '/\bdetection(?:\s+detection){2,}\b/iu',
+        '/\breject(?:\s+reject){3,}\b/iu',
+    ];
 
     public function __construct(
         private DataLayer $data,
@@ -186,6 +217,10 @@ final class DocumentLocaleAutomationService
                 'blocked_message' => (string)($attempt['message'] ?? 'No compliant internal translation provider is configured.'),
                 'last_attempt_at' => gmdate(DATE_ATOM),
             ];
+            if (isset($attempt['quality_issues']) && is_array($attempt['quality_issues'])) {
+                $metadata['quality_gate_version'] = self::LOCALE_QUALITY_GATE_VERSION;
+                $metadata['quality_issues'] = array_values(array_map('strval', $attempt['quality_issues']));
+            }
             if ($releasedSnapshot !== null) {
                 $metadata['released_snapshot'] = $releasedSnapshot;
             }
@@ -224,6 +259,52 @@ final class DocumentLocaleAutomationService
             $artifactHtml,
             $this->buildArtifactBootstrapHeader($dcc, $docCode, $artifactTitle, $artifactSubtitle)
         );
+        $qualityIssues = self::detectLocaleArtifactQualityIssues($artifactHtml);
+        if ($qualityIssues !== []) {
+            $this->deleteArtifactIfExists($artifactRelPath);
+            $metadata = [
+                'auto_sync' => true,
+                'target_locale' => self::TARGET_LOCALE,
+                'trigger' => $trigger,
+                'source_status' => $sourceStatus,
+                'source_revision' => $sourceRevision,
+                'dcc_revision' => $dccRevision,
+                'source_base_rel_path' => $baseRel,
+                'artifact_scope' => $workingPreview ? 'working_preview' : 'current_revision',
+                'blocked_reason' => 'translation_quality_gate_failed',
+                'blocked_message' => 'Generated English artifact failed locale quality checks.',
+                'quality_gate_version' => self::LOCALE_QUALITY_GATE_VERSION,
+                'quality_issues' => $qualityIssues,
+                'last_attempt_at' => gmdate(DATE_ATOM),
+            ];
+            if ($releasedSnapshot !== null) {
+                $metadata['released_snapshot'] = $releasedSnapshot;
+            }
+            $variant = $dcc->upsertLocaleVariant($docCode, self::TARGET_LOCALE, [
+                'title' => $artifactTitle,
+                'subtitle' => null,
+                'artifact_rel_path' => null,
+                'artifact_source_revision' => $dccRevision,
+                'artifact_source_hash_sha256' => $sourceHash,
+                'translation_state' => 'blocked',
+                'translation_provider' => (string)($attempt['provider'] ?? 'configured_command'),
+                'glossary_version' => (string)($attempt['glossary_version'] ?? $this->glossaryVersion()),
+                'engine_version' => (string)($attempt['engine_version'] ?? 'quality_gate_failed'),
+                'published_at' => null,
+                'metadata' => $metadata,
+            ], $actor);
+
+            return [
+                'ok' => false,
+                'doc_code' => $docCode,
+                'translation_state' => 'blocked',
+                'artifact_rel_path' => null,
+                'locale_variant' => $variant,
+                'reason' => 'translation_quality_gate_failed',
+                'message' => 'Generated English artifact failed locale quality checks.',
+                'quality_issues' => $qualityIssues,
+            ];
+        }
 
         $this->writeArtifact($artifactRelPath, $artifactHtml);
         $cacheMetadata = [];
@@ -1185,6 +1266,69 @@ final class DocumentLocaleAutomationService
         return false;
     }
 
+    /**
+     * @return list<string>
+     */
+    public static function detectLocaleArtifactQualityIssues(string $html): array
+    {
+        $visible = self::visibleLocaleText($html);
+        $issues = [];
+
+        if (preg_match('/__DCC_LITERAL_\d+__/', $visible) === 1) {
+            $issues[] = 'literal_placeholder_leak';
+        }
+
+        foreach (self::QUALITY_REPEAT_PATTERNS as $pattern) {
+            if (preg_match($pattern, $visible) === 1) {
+                $issues[] = 'repeated_token_loop';
+                break;
+            }
+        }
+
+        $residualMatches = 0;
+        foreach (self::RESIDUAL_VIETNAMESE_TERMS as $term) {
+            $pattern = '/(?<![\p{L}\p{N}_])' . preg_quote($term, '/') . '(?![\p{L}\p{N}_])/iu';
+            $count = preg_match_all($pattern, $visible, $matches);
+            if (is_int($count) && $count > 0) {
+                $residualMatches += $count;
+            }
+        }
+
+        $vietnameseChars = preg_match_all(
+            '/[àáạảãăắằẳẵặâấầẩẫậđèéẹẻẽêếềểễệìíịỉĩòóọỏõôốồổỗộơớờởỡợùúụủũưứừửữựỳýỵỷỹ]/iu',
+            $visible,
+            $matches
+        );
+        $vietnameseChars = is_int($vietnameseChars) ? $vietnameseChars : 0;
+        if ($residualMatches > 0 && $vietnameseChars >= 2) {
+            $issues[] = 'vietnamese_residue';
+        }
+        if ($residualMatches >= 3) {
+            $issues[] = 'excessive_vietnamese_residue';
+        }
+
+        if (preg_match('/\b(?:to|at|from|for|according to)<a\b/i', $html) === 1) {
+            $issues[] = 'anchor_prefix_spacing';
+        }
+        if (preg_match('/<\/a>(?:and|or|with|must|is|are|SOP|WI|ANNEX|FRM|POL|QMS-MAN)\b/i', $html) === 1) {
+            $issues[] = 'anchor_suffix_spacing';
+        }
+        if (preg_match('/\b(?:to|at|from|for|according to)(?:SOP|WI|ANNEX|FRM|POL|QMS-MAN)-\d+/i', $visible) === 1) {
+            $issues[] = 'document_code_spacing';
+        }
+
+        return array_values(array_unique($issues));
+    }
+
+    private static function visibleLocaleText(string $html): string
+    {
+        $clean = preg_replace('/<(script|style|noscript|svg|math)\b[^>]*>.*?<\/\1>/is', ' ', $html);
+        $clean = is_string($clean) ? $clean : $html;
+        $text = html_entity_decode(strip_tags($clean), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $text = preg_replace('/\s+/u', ' ', $text);
+        return trim(is_string($text) ? $text : '');
+    }
+
     private function writeArtifact(string $artifactRelPath, string $html): void
     {
         $abs = $this->rootDir . '/' . $artifactRelPath;
@@ -1477,6 +1621,12 @@ final class DocumentLocaleAutomationService
             $artifactReady = $this->restoreArtifactFromRuntimeCache($docCode, self::TARGET_LOCALE, $sourceHash, $artifactRelPath);
         }
         if (!$artifactReady) {
+            return null;
+        }
+        $artifactHtml = @file_get_contents($this->rootDir . '/' . $artifactRelPath);
+        $qualityIssues = is_string($artifactHtml) ? self::detectLocaleArtifactQualityIssues($artifactHtml) : ['artifact_read_failed'];
+        if ($qualityIssues !== []) {
+            $this->deleteArtifactIfExists($artifactRelPath);
             return null;
         }
 

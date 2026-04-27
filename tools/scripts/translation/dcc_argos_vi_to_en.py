@@ -113,12 +113,128 @@ SKIP_CLASS_TOKENS = {
 }
 VIETNAMESE_CHAR_RE = re.compile(r"[àáạảãăắằẳẵặâấầẩẫậđèéẹẻẽêếềểễệìíịỉĩòóọỏõôốồổỗộơớờởỡợùúụủũưứừửữựỳýỵỷỹ]", re.I)
 PROTECTED_LITERAL_PATTERNS = [
+    re.compile(r"%[A-Za-z]"),
+    re.compile(r"\b\d+(?:[.,]\d+)?\s*%"),
+    re.compile(r"\b(?:Ac/Re|AQL|QPL|SSOT|SoD|SoR|M365|ToolID|PackID|EvidenceUrl|FIFO|FEFO|COC|FAI|NCR|CAPA|CTQ|FOD|WCS|WIP|QMS|PDF|HTML|UAT|CNC|CAM|DFM|ERP|MRB|MSA|GRR|SPC|OJT|LPA|Qe|nST|PoU-WI|eoe/eofe|Gage|Gauge|Final|Released|Accept|Reject|HOLD|Job)\b", re.I),
+    re.compile(r"\b[A-Za-z]{1,8}/[A-Za-z]{1,8}(?:/[A-Za-z]{1,8})*\b"),
     re.compile(r"§\s*\d+(?:\.\d+)+"),
     re.compile(r"\b(?:ISO|IATF|AS)\s*\d+(?::\d+)?\b", re.I),
     re.compile(r"\b(?:SOP|WI|ANNEX|FRM|POL|TRN|JD|QMS-MAN|SYS-OPS|MRR|OJT|C\d{2}-L\d)\b(?:[-_/A-Z0-9.]*)", re.I),
     re.compile(r"\b[A-Z]{2,6}\b"),
 ]
 CORE_PHRASES: List[Tuple[str, str]] = [
+    ("Dùng khi", "Use when"),
+    ("Áp dụng khi", "Applies when"),
+    ("Mục đích, phạm vi", "Purpose and scope"),
+    ("logic lô kiểm", "inspection lot logic"),
+    ("lô kiểm", "inspection lot"),
+    ("quyết định chấp nhận/từ chối", "deciding accept/reject"),
+    ("chấp nhận/từ chối", "accept/reject"),
+    ("đầu vào / nhận hàng", "incoming / receiving"),
+    ("kế hoạch AQL hiệu lực", "effective AQL plan"),
+    ("kiểm tra by thuộc tính", "attribute inspection"),
+    ("kiểm tra theo thuộc tính", "attribute inspection"),
+    ("kiểm soát quá trình", "process control"),
+    ("hợp thức hóa", "justify"),
+    ("khuyết tật quan trọng", "critical defect"),
+    ("khuyết tật nghiêm trọng", "major defect"),
+    ("khuyết tật", "defect"),
+    ("Kế hoạch lấy mẫu", "Sampling plan"),
+    ("kế hoạch lấy mẫu", "sampling plan"),
+    ("bảng tra", "lookup table"),
+    ("Giữ nguyên", "Maintain"),
+    ("lấy mẫu nMẫu nhiên", "random sampling"),
+    ("lấy mẫu ngẫu nhiên", "random sampling"),
+    ("mẫu đại diện", "representative sample"),
+    ("đại diện", "representative"),
+    ("lấy mẫu", "sampling"),
+    ("chọn mẫu", "select samples"),
+    ("tách biệt từng lot", "segregate each lot"),
+    ("tách biệt từng lô", "segregate each lot"),
+    ("quy trình trạng thái", "process status"),
+    ("khuyết tật phân loại", "defect classification"),
+    ("phân loại khuyết tật", "defect classification"),
+    ("Chưa chốt", "not finalized"),
+    ("Mức kiểm", "inspection level"),
+    ("kiểm tra level", "inspection level"),
+    ("chuyển đổi trạng thái", "switching status"),
+    ("Không xác định được", "not defined"),
+    ("Đo lường system", "measurement system"),
+    ("hệ thống đo", "measurement system"),
+    ("đã nhanh xác minh", "verified before use"),
+    ("nghi ngờ/hết hạn/chưa xác minh", "suspect/expired/not verified"),
+    ("Tra cỡ mẫu", "Look up sample size"),
+    ("Tra theo", "Look up according to"),
+    ("lot nhỏ", "small lot"),
+    ("lô nhỏ", "small lot"),
+    ("giảm mẫu", "reduce sample size"),
+    ("rải đều", "distributed across"),
+    ("toàn kiện", "all packages"),
+    ("khay", "tray"),
+    ("random hóa", "randomize"),
+    ("tầng chứa", "storage layer"),
+    ("Kiểm và ghi defect", "Inspect and record defects"),
+    ("từng chiếc", "each piece"),
+    ("Không được cộng dồn mơ hồ", "Do not aggregate vaguely"),
+    ("cộng dồn mơ hồ", "vague aggregation"),
+    ("tách riêng", "separate"),
+    ("vượt Re", "exceeds Re"),
+    ("xuất hiện bất kỳ", "any occurrence"),
+    ("zero acceptance", "zero acceptance"),
+    ("Xử lý sau quyết định", "Disposition after decision"),
+    ("mở bao vây/NCR", "open containment/NCR"),
+    ("bao vây", "containment"),
+    ("giữ lô", "hold the lot"),
+    ("tạm giữ", "hold"),
+    ("gia công lại", "rework"),
+    ("kiểm tra lại", "reinspection"),
+    ("siết chặt / thắt chặt", "tightened"),
+    ("ổn định đủ dài", "long enough stable history"),
+    ("mở vấn đề", "open issue"),
+    ("ngăn chặn", "containment"),
+    ("ranh giới", "boundary"),
+    ("không mặc định dùng lại y nguyên", "do not automatically reuse unchanged"),
+    ("bù trừ", "offset"),
+    ("sai lệch hệ thống mẫu", "sampling system deviation"),
+    ("kết quả kiểm vô hiệu", "inspection result is invalid"),
+    ("quá trình đang trôi", "process is drifting"),
+    ("mẫu đẹp", "good samples"),
+    ("hồ sơ tối thiểu", "minimum records"),
+    ("người kiểm", "inspector"),
+    ("thời điểm", "time"),
+    ("lệnh tạm giữ", "hold order"),
+    ("liên kết", "link"),
+    ("đánh giá nội bộ", "internal audit"),
+    ("đánh giá", "audit"),
+    ("nội bộ", "internal"),
+    ("quyền dừng", "stop authority"),
+    ("quyền dùng", "use authority"),
+    ("hồ sơ công việc", "job dossier"),
+    ("gói bằng chứng", "evidence pack"),
+    ("bằng chứng", "evidence"),
+    ("truy xuất nguồn gốc", "traceability"),
+    ("truy vết", "traceability"),
+    ("nguồn chuẩn duy nhất", "single source of truth"),
+    ("người thay thế", "deputy"),
+    ("bố trí người thay thế", "deputy assignment"),
+    ("sổ tay thực hành", "controlled workbook"),
+    ("kiểm soát cuối", "final control"),
+    ("kiểm cuối", "final inspection"),
+    ("bàn giao", "handoff"),
+    ("giao hàng", "shipping"),
+    ("nhãn", "label"),
+    ("mẻ nấu", "heat lot"),
+    ("vật tư", "material"),
+    ("chứng từ", "certificate"),
+    ("quyết định xử lý", "disposition decision"),
+    ("chấp nhận", "accept"),
+    ("từ chối", "reject"),
+    ("lô", "lot"),
+    ("mẫu", "sample"),
+    ("phó", "deputy"),
+    ("gá", "fixture"),
+    ("đúng", "correct"),
+    ("thiếu", "missing"),
     ("thiết lập", "Establish"),
     ("điều hành chạy máy CNC", "operate CNC machines"),
     ("gia công CNC", "CNC machining"),
@@ -196,13 +312,76 @@ POST_FIXES = [
     ("point of usee", "point of use"),
     ("the source", "the source"),
     ("inters with", "stop deviation at"),
+    ("Russian decision", "accept/reject decision"),
+    ("obituation", "operation"),
+    ("occipital", "actual condition"),
+    ("suffier", "supplier"),
+    ("Suffier", "Supplier"),
+    ("refalested", "released"),
+    ("Guesss", "verify"),
+    ("deprent", "representative"),
+    ("atform", "at form"),
+    ("atForm", "at Form"),
 ]
-SEGMENT_BATCH_SIZE = 16
-SEGMENT_BATCH_MAX_CHARS = 2200
-CACHE_SCHEMA_VERSION = "argos_local_vi_en_v1"
+RESIDUAL_POST_FIXES = [
+    ("đánh giá nội bộ", "internal audit"),
+    ("đánh giá", "audit"),
+    ("nội bộ", "internal"),
+    ("quyền dừng", "stop authority"),
+    ("quyền dùng", "use authority"),
+    ("hồ sơ", "record"),
+    ("bằng chứng", "evidence"),
+    ("phạm vi", "scope"),
+    ("phát hành", "release"),
+    ("giao hàng", "shipping"),
+    ("một phần", "partial"),
+    ("thiếu", "missing"),
+    ("đúng", "correct"),
+    ("không", "not"),
+    ("phải", "must"),
+    ("mẫu", "sample"),
+    ("lô", "lot"),
+    ("gá", "fixture"),
+    ("hóa", "standardization"),
+    ("phó", "deputy"),
+]
+SEGMENT_BATCH_SIZE = 10
+SEGMENT_BATCH_MAX_CHARS = 1200
+CACHE_SCHEMA_VERSION = "argos_local_vi_en_v2_quality_gate"
+RESIDUAL_VIETNAMESE_TERMS = [
+    "đánh giá",
+    "nội bộ",
+    "lô",
+    "mẫu",
+    "phạm vi",
+    "phải",
+    "đúng",
+    "thiếu",
+    "không",
+    "hồ sơ",
+    "bằng chứng",
+    "quyền dùng",
+    "quyền dừng",
+    "phát hành",
+    "giao hàng",
+    "một phần",
+    "gá",
+    "hóa",
+    "phó",
+]
+QUALITY_REPEAT_PATTERNS = [
+    re.compile(r"\b([\wÀ-ỹ]{2,})(?:\s+\1\b){4,}", re.I),
+    re.compile(r"\bhóa(?:\s+hóa){2,}\b", re.I),
+    re.compile(r"\bphó(?:\s+phó){2,}\b", re.I),
+    re.compile(r"\bRe(?:\s+Re){4,}\b"),
+    re.compile(r"\bdiscovery(?:\s+discovery){2,}\b", re.I),
+    re.compile(r"\bdetection(?:\s+detection){2,}\b", re.I),
+    re.compile(r"\breject(?:\s+reject){3,}\b", re.I),
+]
 
 _translator = None
 _glossary_phrases: List[Tuple[str, str]] | None = None
+_translation_rules_signature: str | None = None
 _cache_disabled = False
 
 
@@ -261,8 +440,34 @@ def load_glossary_phrases() -> List[Tuple[str, str]]:
     return ordered
 
 
+def translation_rules_signature() -> str:
+    global _translation_rules_signature
+    if _translation_rules_signature is not None:
+        return _translation_rules_signature
+    payload = json.dumps(
+        {
+            "glossary": load_glossary_phrases(),
+            "post_fixes": POST_FIXES,
+            "residual_post_fixes": RESIDUAL_POST_FIXES,
+        },
+        ensure_ascii=False,
+        separators=(",", ":"),
+    )
+    _translation_rules_signature = hashlib.sha256(payload.encode("utf-8")).hexdigest()
+    return _translation_rules_signature
+
+
 def normalize_phrase(value: str) -> str:
     return re.sub(r"\s+", " ", unescape(value or "")).strip()
+
+
+def phrase_regex(source: str) -> re.Pattern[str]:
+    escaped = re.escape(source)
+    if re.fullmatch(r"[A-Za-zÀ-ỹ0-9_]+", source, re.I):
+        return re.compile(rf"(?<![A-Za-zÀ-ỹ0-9_]){escaped}(?![A-Za-zÀ-ỹ0-9_])", re.I)
+    prefix = r"(?<![A-Za-zÀ-ỹ0-9_])" if re.match(r"[A-Za-zÀ-ỹ0-9_]", source, re.I) else ""
+    suffix = r"(?![A-Za-zÀ-ỹ0-9_])" if re.search(r"[A-Za-zÀ-ỹ0-9_]$", source, re.I) else ""
+    return re.compile(prefix + escaped + suffix, re.I)
 
 
 def should_skip_text_node(node: NavigableString) -> bool:
@@ -295,7 +500,7 @@ def protect_glossary_phrases(text: str, literals: Dict[str, str], next_index: Li
     for source, target in load_glossary_phrases():
         if source.casefold() not in protected.casefold():
             continue
-        pattern = re.compile(re.escape(source), re.I)
+        pattern = phrase_regex(source)
         def replace(match: re.Match[str]) -> str:
             token = f"__DCC_LITERAL_{next_index[0]}__"
             next_index[0] += 1
@@ -312,7 +517,7 @@ def restore_literals(text: str, literals: Dict[str, str]) -> str:
     return restored
 
 
-def cleanup_translation(text: str) -> str:
+def cleanup_translation(text: str, *, strip: bool = True) -> str:
     cleaned = text
     cleaned = re.sub(r"\s+([,.;:!?])", r"\1", cleaned)
     cleaned = re.sub(r"([(\[])\s+", r"\1", cleaned)
@@ -320,7 +525,67 @@ def cleanup_translation(text: str) -> str:
     cleaned = re.sub(r"\s{2,}", " ", cleaned)
     for src, dst in POST_FIXES:
         cleaned = cleaned.replace(src, dst)
-    return cleaned.strip()
+    for src, dst in RESIDUAL_POST_FIXES:
+        cleaned = phrase_regex(src).sub(dst, cleaned)
+    return cleaned.strip() if strip else cleaned
+
+
+def visible_text_from_html(html: str) -> str:
+    soup = BeautifulSoup(html, "html.parser")
+    for node in soup(["script", "style", "noscript", "svg", "math"]):
+        node.decompose()
+    return normalize_phrase(soup.get_text(" "))
+
+
+def residual_vietnamese_term_count(text: str) -> int:
+    count = 0
+    for term in RESIDUAL_VIETNAMESE_TERMS:
+        count += len(phrase_regex(term).findall(text))
+    return count
+
+
+def detect_quality_issues(text: str, *, html: bool = False) -> List[str]:
+    raw = text or ""
+    visible = visible_text_from_html(raw) if html else normalize_phrase(raw)
+    issues: List[str] = []
+
+    if "__DCC_LITERAL_" in visible:
+        issues.append("literal_placeholder_leak")
+
+    for pattern in QUALITY_REPEAT_PATTERNS:
+        if pattern.search(visible):
+            issues.append("repeated_token_loop")
+            break
+
+    residual_terms = residual_vietnamese_term_count(visible)
+    vietnamese_chars = len(VIETNAMESE_CHAR_RE.findall(visible))
+    if residual_terms > 0 and vietnamese_chars >= 2:
+        issues.append("vietnamese_residue")
+    if residual_terms >= 3:
+        issues.append("excessive_vietnamese_residue")
+
+    if html:
+        if re.search(r"\b(?:to|at|from|for|according to)<a\b", raw, re.I):
+            issues.append("anchor_prefix_spacing")
+        if re.search(r"</a>(?:and|or|with|must|is|are|SOP|WI|ANNEX|FRM|POL|QMS-MAN)\b", raw, re.I):
+            issues.append("anchor_suffix_spacing")
+    if re.search(r"\b(?:to|at|from|for|according to)(?:SOP|WI|ANNEX|FRM|POL|QMS-MAN)-\d+", visible, re.I):
+        issues.append("document_code_spacing")
+
+    return sorted(set(issues))
+
+
+def has_quality_issue(text: str) -> bool:
+    return bool(detect_quality_issues(text))
+
+
+def glossary_only_translate(text: str) -> str:
+    literals: Dict[str, str] = {}
+    next_index = [0]
+    protected = protect_glossary_phrases(text, literals, next_index)
+    protected = protect_regex_literals(protected, literals, next_index)
+    restored = restore_literals(protected, literals)
+    return cleanup_translation(restored)
 
 
 def build_translation_plan(text: str):
@@ -394,11 +659,13 @@ def translate_batch(segments: List[str], translator) -> Dict[str, str]:
     parsed = parse_batched_translation_output(translated, len(segments))
     if parsed is None:
         return {}
-    return {
-        segments[index]: cleanup_translation(parsed[index])
-        for index in range(len(segments))
-        if parsed[index].strip()
-    }
+    out: Dict[str, str] = {}
+    for index in range(len(segments)):
+        candidate = cleanup_translation(parsed[index])
+        if candidate.strip() == "" or has_quality_issue(candidate):
+            continue
+        out[segments[index]] = candidate
+    return out
 
 
 def translation_cache_path() -> Path:
@@ -407,7 +674,8 @@ def translation_cache_path() -> Path:
 
 
 def cache_key(segment: str) -> str:
-    return hashlib.sha256((CACHE_SCHEMA_VERSION + "\n" + segment).encode("utf-8")).hexdigest()
+    material = CACHE_SCHEMA_VERSION + "\n" + translation_rules_signature() + "\n" + segment
+    return hashlib.sha256(material.encode("utf-8")).hexdigest()
 
 
 def open_cache():
@@ -516,6 +784,8 @@ def translate_core_map(cores: Iterable[str], translator) -> Dict[str, str]:
         for item in batch:
             if item not in batched:
                 translated = cleanup_translation(translator.translate(item))
+                if has_quality_issue(translated):
+                    translated = glossary_only_translate(item)
                 translated_map[item] = translated
                 newly_translated[item] = translated
         batch = []
@@ -535,7 +805,7 @@ def translate_core_map(cores: Iterable[str], translator) -> Dict[str, str]:
     return translated_map
 
 
-def render_translation_plan(plan, translated_cores: Dict[str, str]) -> str:
+def render_translation_plan(plan, translated_cores: Dict[str, str], *, strip: bool = True) -> str:
     out_parts: List[str] = []
     for part in plan["parts"]:
         if not isinstance(part, (list, tuple)) or not part:
@@ -553,7 +823,7 @@ def render_translation_plan(plan, translated_cores: Dict[str, str]) -> str:
         translated = translated_cores.get(second, second)
         out_parts.append(first + translated + third)
     restored = restore_literals("".join(out_parts), plan["literals"])
-    return cleanup_translation(restored)
+    return cleanup_translation(restored, strip=strip)
 
 
 def translate_text(text: str, translator) -> str:
@@ -562,6 +832,20 @@ def translate_text(text: str, translator) -> str:
         return text
     translated_cores = translate_core_map(plan["cores"], translator) if plan["cores"] else {}
     return render_translation_plan(plan, translated_cores)
+
+
+def repair_anchor_spacing(soup: BeautifulSoup) -> None:
+    for anchor in soup.find_all("a"):
+        previous = anchor.previous_sibling
+        if isinstance(previous, NavigableString):
+            previous_text = str(previous)
+            if previous_text and not previous_text[-1].isspace() and previous_text[-1] not in "([/{":
+                previous.replace_with(previous_text + " ")
+        next_node = anchor.next_sibling
+        if isinstance(next_node, NavigableString):
+            next_text = str(next_node)
+            if next_text and not next_text[0].isspace() and next_text[0] not in ".,;:)]}/":
+                next_node.replace_with(" " + next_text)
 
 
 def translate_bootstrap_seed(soup: BeautifulSoup, translator) -> None:
@@ -619,9 +903,11 @@ def translate_html(source_html: str, title: str, subtitle: str) -> Dict[str, str
     translated_cores = translate_core_map(unique_cores, translator)
     for node, plan in node_plans:
         original = str(node)
-        translated = render_translation_plan(plan, translated_cores)
+        translated = render_translation_plan(plan, translated_cores, strip=False)
         if translated != original:
             node.replace_with(translated)
+
+    repair_anchor_spacing(soup)
 
     translated_title = title if re.fullmatch(r"[\x00-\x7F\s.,:;()/_-]+", title or "") else translate_text(title, translator)
     translated_subtitle = translate_text(subtitle, translator) if subtitle else ""
@@ -670,12 +956,30 @@ def main() -> int:
         )
         return 0
 
+    quality_issues = detect_quality_issues(translated["html"], html=True)
+    if quality_issues:
+        print(
+            json.dumps(
+                {
+                    "ok": False,
+                    "provider": "argos_local_vi_en",
+                    "engine_version": "quality_gate_v2",
+                    "reason": "translation_quality_gate_failed",
+                    "message": "Generated English artifact failed locale quality gate.",
+                    "quality_issues": quality_issues,
+                    "glossary_version": str(payload.get("glossary_version", "") or "repo_glossary"),
+                },
+                ensure_ascii=False,
+            )
+        )
+        return 0
+
     print(
         json.dumps(
             {
                 "ok": True,
                 "provider": "argos_local_vi_en",
-                "engine_version": "argos_local_vi_en_v1",
+                "engine_version": CACHE_SCHEMA_VERSION,
                 "glossary_version": str(payload.get("glossary_version", "") or "repo_glossary"),
                 "translation_state": "machine_preview",
                 "title": translated["title"],
