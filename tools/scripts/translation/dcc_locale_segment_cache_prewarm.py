@@ -77,7 +77,7 @@ def main() -> int:
     collected = collect_segments(provider, paths, max(0, args.limit_docs), max(0, args.max_segments))
     segments = collected["segments"]
 
-    translator = provider.get_translator()
+    translator = provider.load_translator()
     translated = provider.translate_core_map(segments, translator)
     failed_quality = sum(1 for value in translated.values() if provider.has_quality_issue(value))
     print(
