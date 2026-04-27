@@ -12,7 +12,7 @@ if (PHP_SAPI !== 'cli') {
 }
 
 $rootDir = realpath(__DIR__ . '/../../..');
-if (!is_string($rootDir) || $rootDir === '') {
+if (!is_string($rootDir)) {
     fwrite(STDERR, "Unable to resolve repo root\n");
     exit(1);
 }
@@ -31,6 +31,8 @@ $options = getopt('', [
     'max-queue::',
     'no-spawn-per-job',
     'only-missing-job',
+    'prewarm-segment-cache',
+    'segment-prewarm-limit::',
     'start-workers::',
     'wait-for-workers',
     'worker-slots::',
@@ -47,6 +49,7 @@ $onlyCode = DocumentControlService::canonicalizeCode((string)($options['code'] ?
 $dryRun = array_key_exists('dry-run', $options);
 $force = array_key_exists('force', $options);
 $onlyMissingJob = array_key_exists('only-missing-job', $options);
+$prewarmSegmentCache = array_key_exists('prewarm-segment-cache', $options);
 $spawnPerJob = !array_key_exists('no-spawn-per-job', $options);
 $waitForWorkers = array_key_exists('wait-for-workers', $options);
 $limit = isset($options['limit']) && ctype_digit((string)$options['limit'])
@@ -54,6 +57,9 @@ $limit = isset($options['limit']) && ctype_digit((string)$options['limit'])
     : 0;
 $maxQueue = isset($options['max-queue']) && ctype_digit((string)$options['max-queue'])
     ? max(0, (int)$options['max-queue'])
+    : 0;
+$segmentPrewarmLimit = isset($options['segment-prewarm-limit']) && ctype_digit((string)$options['segment-prewarm-limit'])
+    ? max(0, (int)$options['segment-prewarm-limit'])
     : 0;
 $startWorkers = isset($options['start-workers']) && ctype_digit((string)$options['start-workers'])
     ? max(0, min(8, (int)$options['start-workers']))
@@ -92,11 +98,19 @@ $stats = [
     'errors' => 0,
     'workers_started' => 0,
     'worker_exit_codes' => [],
+    'segment_cache_prewarm' => null,
 ];
 $results = [];
 $processed = 0;
 $initialQueueCount = countQueuedJobs($rootDir);
 $currentQueueCount = $initialQueueCount;
+
+if (!$dryRun && $prewarmSegmentCache) {
+    $stats['segment_cache_prewarm'] = prewarmSegmentCache($rootDir, $segmentPrewarmLimit);
+    if (($stats['segment_cache_prewarm']['ok'] ?? false) !== true) {
+        $stats['errors']++;
+    }
+}
 
 for ($offset = 0; ; $offset += 500) {
     $rows = $dcc->listLocalizedHeaders([], 500, $offset, 'en');
@@ -227,6 +241,7 @@ echo json_encode([
     'start_workers' => $startWorkers,
     'wait_for_workers' => $waitForWorkers,
     'worker_slots' => $workerSlots,
+    'prewarm_segment_cache' => $prewarmSegmentCache,
     'queue_count_before' => $initialQueueCount,
     'queue_count_after' => countQueuedJobs($rootDir),
     'stats' => $stats,
@@ -253,6 +268,61 @@ function loadFpmEnv(string $path): void
         putenv($key . '=' . $value);
         $_ENV[$key] = $value;
     }
+}
+
+/**
+ * @return array<string, mixed>
+ */
+function prewarmSegmentCache(string $rootDir, int $limitDocs = 0): array
+{
+    $script = rtrim($rootDir, '/') . '/tools/scripts/translation/dcc_locale_segment_cache_prewarm.py';
+    if (!is_file($script)) {
+        return ['ok' => false, 'reason' => 'segment_prewarm_script_missing'];
+    }
+
+    $providerCommand = trim((string)getenv('DCC_TRANSLATION_COMMAND'));
+    if ($providerCommand === '') {
+        return ['ok' => false, 'reason' => 'translation_command_missing'];
+    }
+
+    $parts = str_getcsv($providerCommand, ' ');
+    $python = trim((string)($parts[0] ?? ''));
+    if ($python === '' || !is_file($python)) {
+        return ['ok' => false, 'reason' => 'python_runtime_missing', 'python' => $python];
+    }
+
+    $command = escapeshellarg($python)
+        . ' ' . escapeshellarg($script)
+        . ' --root=' . escapeshellarg($rootDir);
+    if ($limitDocs > 0) {
+        $command .= ' --limit-docs=' . $limitDocs;
+    }
+
+    $descriptor = [
+        1 => ['pipe', 'w'],
+        2 => ['pipe', 'w'],
+    ];
+    $process = proc_open($command, $descriptor, $pipes, $rootDir);
+    if (!is_resource($process)) {
+        return ['ok' => false, 'reason' => 'segment_prewarm_start_failed'];
+    }
+
+    $stdout = stream_get_contents($pipes[1]);
+    fclose($pipes[1]);
+    $stderr = stream_get_contents($pipes[2]);
+    fclose($pipes[2]);
+    $exitCode = proc_close($process);
+    $decoded = is_string($stdout) ? json_decode(trim($stdout), true) : null;
+    $result = is_array($decoded) ? $decoded : [];
+    $result['ok'] = $exitCode === 0 && (($result['ok'] ?? true) === true);
+    $result['exit_code'] = $exitCode;
+    if (is_string($stderr) && trim($stderr) !== '') {
+        $result['stderr'] = substr(trim($stderr), -2000);
+    }
+    if ($result === ['ok' => false, 'exit_code' => $exitCode]) {
+        $result['stdout'] = is_string($stdout) ? substr(trim($stdout), -2000) : '';
+    }
+    return $result;
 }
 
 function normalizeRepoRelativePath(string $path): string

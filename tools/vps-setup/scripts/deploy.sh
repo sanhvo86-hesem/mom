@@ -232,6 +232,7 @@ run_dcc_locale_prewarm_kick() {
             DCC_TRANSLATION_JOB_MAX_ATTEMPTS=3 \
             php8.5 "$script" \
                 --fpm-env="$fpm_conf" \
+                --prewarm-segment-cache \
                 --only-missing-job \
                 --no-spawn-per-job \
                 --start-workers="$workers" \
