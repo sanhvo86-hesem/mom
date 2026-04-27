@@ -1435,6 +1435,11 @@ final class DocumentLocaleAutomationService
 
     private function writeRuntimeArtifactCache(string $docCode, string $locale, string $sourceHash, string $html): bool
     {
+        if (self::detectLocaleArtifactQualityIssues($html) !== []) {
+            @error_log('[DCC locale automation] refused to cache non-compliant locale artifact for ' . $docCode);
+            return false;
+        }
+
         $cachePath = $this->runtimeArtifactCachePath($docCode, $locale, $sourceHash);
         $dir = dirname($cachePath);
         if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) {
@@ -1463,6 +1468,10 @@ final class DocumentLocaleAutomationService
 
         $html = @file_get_contents($cachePath);
         if (!is_string($html) || trim($html) === '') {
+            return false;
+        }
+        if (self::detectLocaleArtifactQualityIssues($html) !== []) {
+            @unlink($cachePath);
             return false;
         }
 

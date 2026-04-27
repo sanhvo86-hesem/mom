@@ -252,6 +252,47 @@ PHP);
         $this->assertSame([], DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html));
     }
 
+    public function testRuntimeArtifactCacheDoesNotRestoreNonCompliantHtml(): void
+    {
+        $service = $this->newService();
+        $docCode = 'UNIT-CACHE-QUALITY';
+        $locale = 'en';
+        $sourceHash = str_repeat('a', 64);
+        $badHtml = '<html lang="en"><body><p>Datum The ink applies/] principle Force %d</p></body></html>';
+
+        $pathMethod = new ReflectionMethod(DocumentLocaleAutomationService::class, 'runtimeArtifactCachePath');
+        $restoreMethod = new ReflectionMethod(DocumentLocaleAutomationService::class, 'restoreArtifactFromRuntimeCache');
+        set_error_handler(
+            static function (int $severity, string $message): bool {
+                return $severity === E_DEPRECATED
+                    && str_contains($message, 'ReflectionMethod::setAccessible');
+            }
+        );
+        try {
+            $pathMethod->setAccessible(true);
+            $restoreMethod->setAccessible(true);
+            $cachePath = (string)$pathMethod->invoke($service, $docCode, $locale, $sourceHash);
+            $cacheDir = dirname($cachePath);
+            if (!is_dir($cacheDir)) {
+                mkdir($cacheDir, 0775, true);
+            }
+            file_put_contents($cachePath, $badHtml);
+
+            $restored = $restoreMethod->invoke(
+                $service,
+                $docCode,
+                $locale,
+                $sourceHash,
+                'mom/data/cache/dcc-locale-artifacts-test/_unit-cache-quality.en.html'
+            );
+        } finally {
+            restore_error_handler();
+        }
+
+        $this->assertFalse($restored);
+        $this->assertFileDoesNotExist($cachePath);
+    }
+
     private function newService(): DocumentLocaleAutomationService
     {
         $baseDir = realpath(__DIR__ . '/../../..');
