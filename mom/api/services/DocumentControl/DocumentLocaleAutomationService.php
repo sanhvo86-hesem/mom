@@ -29,7 +29,7 @@ final class DocumentLocaleAutomationService
     private const COMMAND_IO_POLL_MICROSECONDS = 200000;
     private const MAX_COMMAND_OUTPUT_BYTES = 33554432;
     private const MAX_COMMAND_MESSAGE_BYTES = 4096;
-    private const LOCALE_QUALITY_GATE_VERSION = 'locale_quality_gate_v2';
+    private const LOCALE_QUALITY_GATE_VERSION = 'locale_quality_gate_v3';
     private const RESIDUAL_VIETNAMESE_TERMS = [
         'đánh giá',
         'nội bộ',
@@ -51,6 +51,27 @@ final class DocumentLocaleAutomationService
         'hóa',
         'phó',
     ];
+    private const ASCII_RESIDUAL_VIETNAMESE_TERMS = [
+        'danh gia',
+        'noi bo',
+        'phat hanh',
+        'giao hang',
+        'quyen dung',
+        'ho so',
+        'bang chung',
+        'kiem soat',
+        'ap dung khi',
+        'dung khi',
+        'muc dich',
+        'pham vi',
+        'khong',
+        'phai',
+        'thieu',
+        'dung',
+        'mau',
+        'lo',
+        'ga',
+    ];
     private const QUALITY_REPEAT_PATTERNS = [
         '/\b([\p{L}]{2,})(?:\s+\1\b){3,}/iu',
         '/\bhóa(?:\s+hóa){1,}\b/iu',
@@ -60,6 +81,18 @@ final class DocumentLocaleAutomationService
         '/\bdiscovery(?:\s+discovery){1,}\b/iu',
         '/\bdetection(?:\s+detection){1,}\b/iu',
         '/\breject(?:\s+reject){1,}\b/iu',
+    ];
+    private const MACHINE_ARTIFACT_NOISE_PATTERNS = [
+        '/\bDatum\s+The\s+ink\s+applies\b/iu',
+        '/\bAPPLEY\s+KHI\b/iu',
+        '/\bprinciple\s+Force\b/iu',
+        '/\bform\s+Force\b/iu',
+        '/\bdocument\s+Executive\b/iu',
+        '/\bRoom\s+goal\b/iu',
+        '/\bRussian\s+decision\b/iu',
+        '/\bNGUY\s+SMTP\s+CAO\b/iu',
+        '/\b(?:occipital|obituation|obituary|refalested|satamot|suffier|sufiy|strutage)\b/iu',
+        '/\bappr\s+Ovalpath\b/iu',
     ];
 
     public function __construct(
@@ -1306,6 +1339,29 @@ final class DocumentLocaleAutomationService
         }
         if ($residualMatches >= 3) {
             $issues[] = 'excessive_vietnamese_residue';
+        }
+
+        $asciiResidualMatches = 0;
+        foreach (self::ASCII_RESIDUAL_VIETNAMESE_TERMS as $term) {
+            $pattern = '/(?<![\p{L}\p{N}_])' . preg_quote($term, '/') . '(?![\p{L}\p{N}_])/iu';
+            $count = preg_match_all($pattern, $visible, $matches);
+            if (is_int($count) && $count > 0) {
+                $asciiResidualMatches += $count;
+            }
+        }
+        if ($asciiResidualMatches >= 3) {
+            $issues[] = 'ascii_vietnamese_residue';
+        }
+
+        foreach (self::MACHINE_ARTIFACT_NOISE_PATTERNS as $pattern) {
+            if (preg_match($pattern, $visible) === 1) {
+                $issues[] = 'machine_artifact_noise';
+                break;
+            }
+        }
+
+        if (preg_match('/(?<![\p{L}\p{N}])%[A-Za-z](?![\p{L}\p{N}])/u', $visible) === 1) {
+            $issues[] = 'symbol_placeholder_noise';
         }
 
         if (preg_match('/\b(?:to|at|from|for|according to)<a\b/i', $html) === 1) {

@@ -222,6 +222,36 @@ PHP);
         $this->assertContains('vietnamese_residue', DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html));
     }
 
+    public function testLocaleArtifactQualityGateRejectsSemanticMachineNoise(): void
+    {
+        $html = '<html lang="en"><body>'
+            . '<p>Datum The ink applies/] principle Force must APPLEY KHI continue.</p>'
+            . '<p>Use %d full request first time and occipital logic.</p>'
+            . '</body></html>';
+
+        $issues = DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html);
+
+        $this->assertContains('machine_artifact_noise', $issues);
+        $this->assertContains('symbol_placeholder_noise', $issues);
+    }
+
+    public function testLocaleArtifactQualityGateRejectsAsciiVietnameseResidue(): void
+    {
+        $html = '<html lang="en"><body><p>danh gia noi bo ho so phat hanh remains from source text.</p></body></html>';
+
+        $this->assertContains(
+            'ascii_vietnamese_residue',
+            DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html)
+        );
+    }
+
+    public function testLocaleArtifactQualityGateAllowsNormalPercentText(): void
+    {
+        $html = '<html lang="en"><body><p>Use 100% inspection when the AQL plan requires tightened control.</p></body></html>';
+
+        $this->assertSame([], DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html));
+    }
+
     private function newService(): DocumentLocaleAutomationService
     {
         $baseDir = realpath(__DIR__ . '/../../..');

@@ -36,6 +36,27 @@ RESIDUAL_VIETNAMESE_TERMS = [
     "hóa",
     "phó",
 ]
+ASCII_RESIDUAL_VIETNAMESE_TERMS = [
+    "danh gia",
+    "noi bo",
+    "phat hanh",
+    "giao hang",
+    "quyen dung",
+    "ho so",
+    "bang chung",
+    "kiem soat",
+    "ap dung khi",
+    "dung khi",
+    "muc dich",
+    "pham vi",
+    "khong",
+    "phai",
+    "thieu",
+    "dung",
+    "mau",
+    "lo",
+    "ga",
+]
 QUALITY_REPEAT_PATTERNS = [
     re.compile(r"\b([\wÀ-ỹ]{2,})(?:\s+\1\b){3,}", re.I),
     re.compile(r"\bhóa(?:\s+hóa){1,}\b", re.I),
@@ -45,6 +66,18 @@ QUALITY_REPEAT_PATTERNS = [
     re.compile(r"\bdiscovery(?:\s+discovery){1,}\b", re.I),
     re.compile(r"\bdetection(?:\s+detection){1,}\b", re.I),
     re.compile(r"\breject(?:\s+reject){1,}\b", re.I),
+]
+MACHINE_ARTIFACT_NOISE_PATTERNS = [
+    re.compile(r"\bDatum\s+The\s+ink\s+applies\b", re.I),
+    re.compile(r"\bAPPLEY\s+KHI\b", re.I),
+    re.compile(r"\bprinciple\s+Force\b", re.I),
+    re.compile(r"\bform\s+Force\b", re.I),
+    re.compile(r"\bdocument\s+Executive\b", re.I),
+    re.compile(r"\bRoom\s+goal\b", re.I),
+    re.compile(r"\bRussian\s+decision\b", re.I),
+    re.compile(r"\bNGUY\s+SMTP\s+CAO\b", re.I),
+    re.compile(r"\b(?:occipital|obituation|obituary|refalested|satamot|suffier|sufiy|strutage)\b", re.I),
+    re.compile(r"\bappr\s+Ovalpath\b", re.I),
 ]
 
 
@@ -85,6 +118,17 @@ def detect_issues(markup: str) -> List[str]:
         issues.append("vietnamese_residue")
     if residual_terms >= 3:
         issues.append("excessive_vietnamese_residue")
+    ascii_residual_terms = 0
+    for term in ASCII_RESIDUAL_VIETNAMESE_TERMS:
+        ascii_residual_terms += len(phrase_regex(term).findall(text))
+    if ascii_residual_terms >= 3:
+        issues.append("ascii_vietnamese_residue")
+
+    if any(pattern.search(text) for pattern in MACHINE_ARTIFACT_NOISE_PATTERNS):
+        issues.append("machine_artifact_noise")
+
+    if re.search(r"(?<![A-Za-z0-9])%[A-Za-z](?![A-Za-z0-9])", text):
+        issues.append("symbol_placeholder_noise")
 
     if re.search(r"\b(?:to|at|from|for|according to)<a\b", markup, re.I):
         issues.append("anchor_prefix_spacing")
