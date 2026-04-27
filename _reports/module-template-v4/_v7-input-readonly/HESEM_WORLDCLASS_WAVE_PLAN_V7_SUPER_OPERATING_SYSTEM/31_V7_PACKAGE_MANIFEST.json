@@ -1,0 +1,463 @@
+{
+  "package": "HESEM_WORLDCLASS_WAVE_PLAN_V7_SUPER_OPERATING_SYSTEM",
+  "generated_at": "2026-04-26T12:30:00+07:00",
+  "posture": "development/prototype/pre-production readiness planning package; not production release evidence",
+  "file_count_without_manifest": 78,
+  "markdown_total_lines": 9774,
+  "line_counts": {
+    "00_V7_SUPER_MASTER_EXECUTIVE_THESIS.md": 66,
+    "01_V7_SOURCE_GROUNDING_AND_V5_V6_GAP_SUPERSET.md": 95,
+    "02_V7_GLOBAL_BENCHMARK_PATTERN_EXTRACTION.md": 41,
+    "03_V7_STANDARDS_TO_EXECUTABLE_GATES_OS.md": 31,
+    "04_V7_PRODUCT_NORTH_STAR_AND_STRATEGY.md": 31,
+    "05_V7_CAPABILITY_MATURITY_MODEL_0_TO_7.md": 39,
+    "06_V7_TOTAL_CAPABILITY_MAP_ERP_MOM_MES_EQMS.md": 253,
+    "07_V7_AUTHORITY_LEDGER_AND_OPERATIONAL_TRUTH_GRAPH_V3.md": 49,
+    "08_V7_ROOT_BY_ROOT_BACKLOG_AND_MATURITY.md": 2459,
+    "09_V7_ENTERPRISE_SPINE_BACKLOG.md": 177,
+    "10_V7_WORKFLOW_MUTATION_COMMAND_BUS.md": 56,
+    "11_V7_API_EVENT_PROBLEM_CONTRACT_FACTORY.md": 60,
+    "12_V7_DATA_MODEL_MASTER_DATA_AND_MDM.md": 22,
+    "13_V7_MES_OT_EDGE_CONNECTED_WORKER_DEEP_MODEL.md": 28,
+    "14_V7_EQMS_REGULATORY_VALIDATION_FACTORY.md": 25,
+    "15_V7_DIGITAL_THREAD_GENEALOGY_RELEASE_PACKET.md": 21,
+    "16_V7_AI_AGENT_KNOWLEDGE_COPILOT_GOVERNANCE.md": 23,
+    "17_V7_SECURITY_PRIVACY_SAFETY_OT_THREAT_MODEL.md": 27,
+    "18_V7_DATA_PLATFORM_CDC_LAKEHOUSE_ANALYTICS_OBSERVABILITY.md": 33,
+    "19_V7_UX_ACCESSIBILITY_DESIGN_SYSTEM_GRAPHICS_AUTHORITY.md": 32,
+    "20_V7_PLATFORM_ENGINEERING_RELEASE_TRAIN_SRE.md": 26,
+    "21_V7_CUSTOMER_ONBOARDING_VERTICAL_PACKS_COMMERCIALIZATION.md": 25,
+    "22_V7_QUANTITATIVE_ROI_CAPACITY_WORKLOAD_MODEL.md": 32,
+    "23_V7_RISK_REGISTER_DECISION_LOG_STOP_RULES.md": 35,
+    "24_V7_WAVE0_TO_WAVE12_MASTER_EXECUTION_PLAN.md": 165,
+    "25_V7_WAVE_LEVEL_BACKLOG_AND_DELIVERABLES.md": 288,
+    "26_V7_SLICE_FACTORY_ARTIFACT_TAXONOMY.md": 30,
+    "27_V7_CODEX_EXECUTION_PACK_V21_AND_AFTER.md": 26,
+    "28_V7_PROMPT_LIBRARY_FOR_CODEX_CLAUDE_GPT.md": 20,
+    "29_V7_CLAUDE_MAX_ADVERSARIAL_REVIEW_PROMPT.md": 18,
+    "30_V7_APPENDIX_REFERENCES_AND_SOURCE_MAP.md": 48,
+    "32_V7_DETAILED_ROOT_EXECUTION_CATALOG.md": 3501,
+    "33_V7_STANDARDS_CHECKLIST_LIBRARY.md": 295,
+    "34_V7_VENDOR_BENCHMARK_DEEP_PLAYBOOK.md": 261,
+    "35_V7_FULL_WAVE_PROMPT_LIBRARY.md": 545,
+    "36_V7_ROOT_MATURITY_SCORECARD.md": 77,
+    "37_V7_MODULE_CAPABILITY_CROSSWALK.md": 107,
+    "38_V7_HARD_CASE_PLAYBOOK.md": 11,
+    "README_START_HERE.md": 61,
+    "checklists/UNIVERSAL_EVIDENCE_CHECKLIST.md": 18,
+    "prompts/CODEX_SLICE_FACTORY_TEMPLATE.md": 41,
+    "prompts/CODEX_V21_PHASE2_INTEGRATION_REVIEW_AND_REPAIR_COORDINATOR.md": 56,
+    "prompts/CODEX_W0_5_PROMPT.md": 28,
+    "prompts/CODEX_W0_PROMPT.md": 28,
+    "prompts/CODEX_W10_PROMPT.md": 28,
+    "prompts/CODEX_W11_PROMPT.md": 28,
+    "prompts/CODEX_W12_PROMPT.md": 28,
+    "prompts/CODEX_W1_PROMPT.md": 28,
+    "prompts/CODEX_W2_PROMPT.md": 28,
+    "prompts/CODEX_W3_PROMPT.md": 28,
+    "prompts/CODEX_W4_5_PROMPT.md": 28,
+    "prompts/CODEX_W4_PROMPT.md": 28,
+    "prompts/CODEX_W5_PROMPT.md": 28,
+    "prompts/CODEX_W6_5_PROMPT.md": 28,
+    "prompts/CODEX_W6_PROMPT.md": 28,
+    "prompts/CODEX_W7_PROMPT.md": 28,
+    "prompts/CODEX_W8_PROMPT.md": 28,
+    "prompts/CODEX_W9_PROMPT.md": 28,
+    "templates/ROOT_SCOPE_CONTRACT_TEMPLATE.md": 45,
+    "templates/WAVE_GATE_REPORT_TEMPLATE.md": 27
+  },
+  "files": [
+    {
+      "path": "00_V7_SUPER_MASTER_EXECUTIVE_THESIS.md",
+      "bytes": 3685,
+      "sha256": "a7832cdee6f5d3eaf22cdeb005663815f7438acd5838da2e010a1f0a0a491a11"
+    },
+    {
+      "path": "01_V7_SOURCE_GROUNDING_AND_V5_V6_GAP_SUPERSET.md",
+      "bytes": 4636,
+      "sha256": "28c8b47c706b98029cb54b7c73be29dc3d69778f670706cdfa7bd9a66a735974"
+    },
+    {
+      "path": "02_V7_GLOBAL_BENCHMARK_PATTERN_EXTRACTION.md",
+      "bytes": 5106,
+      "sha256": "3bd4303e2f76095887c5f753c0832bece673bcfe8df035daf2b1652ffb1f4147"
+    },
+    {
+      "path": "03_V7_STANDARDS_TO_EXECUTABLE_GATES_OS.md",
+      "bytes": 5448,
+      "sha256": "acc00260c6770dc43a53bb3c8a2cdae985559af7c87b1d694f3f0b289177ee3a"
+    },
+    {
+      "path": "04_V7_PRODUCT_NORTH_STAR_AND_STRATEGY.md",
+      "bytes": 2250,
+      "sha256": "95a1daec171a9282056caaa3124eec0fa01bf09ec11279bc86e24d52d1246e53"
+    },
+    {
+      "path": "05_V7_CAPABILITY_MATURITY_MODEL_0_TO_7.md",
+      "bytes": 2447,
+      "sha256": "0472cca20771a3c3d4c3b8a16a34c072dd055e867c6ff49892aa82312c342f95"
+    },
+    {
+      "path": "06_V7_TOTAL_CAPABILITY_MAP_ERP_MOM_MES_EQMS.md",
+      "bytes": 20995,
+      "sha256": "2270ca34a6a63e73f1445631e9bb5296fa1e1030337c0b0c3219462a3a0f1e8b"
+    },
+    {
+      "path": "07_V7_AUTHORITY_LEDGER_AND_OPERATIONAL_TRUTH_GRAPH_V3.md",
+      "bytes": 2886,
+      "sha256": "a501c323dad914ad573a4f7614ed6ae904ae9108ca6642f43594cd07e49ea5d8"
+    },
+    {
+      "path": "08_V7_ROOT_BY_ROOT_BACKLOG_AND_MATURITY.md",
+      "bytes": 89460,
+      "sha256": "b2fef19f1524708c50bf5e098c21ebfedc5b9925603c493e98c3ca7928790983"
+    },
+    {
+      "path": "09_V7_ENTERPRISE_SPINE_BACKLOG.md",
+      "bytes": 7403,
+      "sha256": "49d01f47441df59377eba96bc5cb5f066e2459f57bc94643d9205d05f1388c17"
+    },
+    {
+      "path": "10_V7_WORKFLOW_MUTATION_COMMAND_BUS.md",
+      "bytes": 2125,
+      "sha256": "c261a054b054e71afd865df6f115f6a00434220318e6730198b4595cbdc0da91"
+    },
+    {
+      "path": "11_V7_API_EVENT_PROBLEM_CONTRACT_FACTORY.md",
+      "bytes": 1983,
+      "sha256": "e2e8123849873e55e671eb53683b65017d57230258ecbac7e782e60ac4f95f1c"
+    },
+    {
+      "path": "12_V7_DATA_MODEL_MASTER_DATA_AND_MDM.md",
+      "bytes": 1060,
+      "sha256": "f681001100eb0866092e03e751a732628d9e4f7eff3b2f7a07d24c56a16e6079"
+    },
+    {
+      "path": "13_V7_MES_OT_EDGE_CONNECTED_WORKER_DEEP_MODEL.md",
+      "bytes": 1435,
+      "sha256": "b68e1c4d319ebe088f5d490f11765a8e87b87a0d34b3b59487ae059924e36cab"
+    },
+    {
+      "path": "14_V7_EQMS_REGULATORY_VALIDATION_FACTORY.md",
+      "bytes": 1592,
+      "sha256": "192c0d0cc2524acf324da1919deb8a1262341a8cb7b7f3351850df3a608c53de"
+    },
+    {
+      "path": "15_V7_DIGITAL_THREAD_GENEALOGY_RELEASE_PACKET.md",
+      "bytes": 1245,
+      "sha256": "034d7e6b4f52ab141325fb66a10bffccd69b13835a7faf3b2f41f2d2708f207b"
+    },
+    {
+      "path": "16_V7_AI_AGENT_KNOWLEDGE_COPILOT_GOVERNANCE.md",
+      "bytes": 1452,
+      "sha256": "46c4b64a549fdb160c772ef9fb4d16ec59c0e80476fe17eb6a2b6179b31b8299"
+    },
+    {
+      "path": "17_V7_SECURITY_PRIVACY_SAFETY_OT_THREAT_MODEL.md",
+      "bytes": 1440,
+      "sha256": "a6c6aae4db09512cd6f7d9b2fa839f1e507a9f759251d267a2003d0b31c0dad6"
+    },
+    {
+      "path": "18_V7_DATA_PLATFORM_CDC_LAKEHOUSE_ANALYTICS_OBSERVABILITY.md",
+      "bytes": 1540,
+      "sha256": "5600459beac2422b975c279365ffcfd5556e1f8180e09d525fab9e442276098c"
+    },
+    {
+      "path": "19_V7_UX_ACCESSIBILITY_DESIGN_SYSTEM_GRAPHICS_AUTHORITY.md",
+      "bytes": 1376,
+      "sha256": "0303846e95b383ae04f939813b63893280e56651408111b1deed1ec6d6c6f90d"
+    },
+    {
+      "path": "20_V7_PLATFORM_ENGINEERING_RELEASE_TRAIN_SRE.md",
+      "bytes": 1134,
+      "sha256": "4b68a3a3f7765f853671affca9a225ee4777b9a2e0a9fc9161ff3064bf21cc7d"
+    },
+    {
+      "path": "21_V7_CUSTOMER_ONBOARDING_VERTICAL_PACKS_COMMERCIALIZATION.md",
+      "bytes": 1144,
+      "sha256": "ce0fd90dfb54ce51996bf3589b5347bf8bebf6bba985741688b082685860f733"
+    },
+    {
+      "path": "22_V7_QUANTITATIVE_ROI_CAPACITY_WORKLOAD_MODEL.md",
+      "bytes": 1633,
+      "sha256": "18eeac1d621ddf963cd56923a22d6abb275f2be10765eeda1abfd48b777505b2"
+    },
+    {
+      "path": "23_V7_RISK_REGISTER_DECISION_LOG_STOP_RULES.md",
+      "bytes": 2812,
+      "sha256": "43a1744f9f8f1ad94ae2aa9fd4dba9fe9017ce6b4da4dce1e487a8431292ba0e"
+    },
+    {
+      "path": "24_V7_WAVE0_TO_WAVE12_MASTER_EXECUTION_PLAN.md",
+      "bytes": 12292,
+      "sha256": "f488103c25a1ebbcc008fec87f95ba98a78b41b8512618bdd86a6d3d11b6a55f"
+    },
+    {
+      "path": "25_V7_WAVE_LEVEL_BACKLOG_AND_DELIVERABLES.md",
+      "bytes": 8276,
+      "sha256": "c0967e158c27675efb9a3a259642467ed4a626c3262dd66f150750d05f8b488f"
+    },
+    {
+      "path": "26_V7_SLICE_FACTORY_ARTIFACT_TAXONOMY.md",
+      "bytes": 1239,
+      "sha256": "f50249af56315baf5d8504e58ef6f4a246ad32335fdd858dd179e10c21b93f2c"
+    },
+    {
+      "path": "27_V7_CODEX_EXECUTION_PACK_V21_AND_AFTER.md",
+      "bytes": 985,
+      "sha256": "777b735e5c3d2a045e7d3a24ceb60cb8e72a1ddd25b7f7db3627d9469cf5e891"
+    },
+    {
+      "path": "28_V7_PROMPT_LIBRARY_FOR_CODEX_CLAUDE_GPT.md",
+      "bytes": 958,
+      "sha256": "8899b7b5f9fa6b51c08ee728f7befb6b2aa3569cff90c7b3bf4ca887bc4e2e8e"
+    },
+    {
+      "path": "29_V7_CLAUDE_MAX_ADVERSARIAL_REVIEW_PROMPT.md",
+      "bytes": 995,
+      "sha256": "90e99928148d15bf035d188540d1a1d6c04ba8f7f4f97770e17c5c5822beac06"
+    },
+    {
+      "path": "30_V7_APPENDIX_REFERENCES_AND_SOURCE_MAP.md",
+      "bytes": 4936,
+      "sha256": "e0e848a68b4dc521b0038f2d4fb11a7a7dd7108fd423e8524164417608e3bfc1"
+    },
+    {
+      "path": "32_V7_DETAILED_ROOT_EXECUTION_CATALOG.md",
+      "bytes": 232892,
+      "sha256": "d2db2ab473a7b70ceae50e279c9d552d4194be42de4b325010e0c415628bbf0d"
+    },
+    {
+      "path": "33_V7_STANDARDS_CHECKLIST_LIBRARY.md",
+      "bytes": 11817,
+      "sha256": "e388c112a931d2ab52ee295fa7d2524756149168ae6bdc25d4135f5779c7ad57"
+    },
+    {
+      "path": "34_V7_VENDOR_BENCHMARK_DEEP_PLAYBOOK.md",
+      "bytes": 12611,
+      "sha256": "877942fd380b9ad638e3d3de22d152d0ff92696c0581658a1094b4b1db5d2185"
+    },
+    {
+      "path": "35_V7_FULL_WAVE_PROMPT_LIBRARY.md",
+      "bytes": 16781,
+      "sha256": "a15c56326f3a2491138c0ffe9ab1018d373abd33038f24ea6eadf2d7b702785e"
+    },
+    {
+      "path": "36_V7_ROOT_MATURITY_SCORECARD.md",
+      "bytes": 7792,
+      "sha256": "78a68d1d9e7cfbb47e772c1082a2eee4985360989fbfa29c4ab82de7fa3e23cd"
+    },
+    {
+      "path": "37_V7_MODULE_CAPABILITY_CROSSWALK.md",
+      "bytes": 12731,
+      "sha256": "8dc1af4508810bae68ca5d0e007a1520da52de04ad9be6382566d196d3920526"
+    },
+    {
+      "path": "38_V7_HARD_CASE_PLAYBOOK.md",
+      "bytes": 1375,
+      "sha256": "dad6593f21196a16028f5527ff5d7ff805fe5a81cb5f85b15a2dbbdbdf52ee4e"
+    },
+    {
+      "path": "README_START_HERE.md",
+      "bytes": 3355,
+      "sha256": "8d93a93e45a42d9f9b090b26a3e8886aa74c64b7add57b7cad032c65183050b8"
+    },
+    {
+      "path": "checklists/UNIVERSAL_EVIDENCE_CHECKLIST.md",
+      "bytes": 644,
+      "sha256": "b4de9bdf468c6936ac8e606df09a2af416e8022d7252f41b5099de8311ce4608"
+    },
+    {
+      "path": "data/benchmark_patterns.json",
+      "bytes": 4648,
+      "sha256": "e09cb4d2103b75f7ef7c01b72e00bf479f44e8ba2c398eef3f8670e47ebec9cd"
+    },
+    {
+      "path": "data/capability_map.json",
+      "bytes": 3292,
+      "sha256": "65c268a70e011630bf0e0a1f877c129c81c4c98560b288fa82f99ed5aeb23a64"
+    },
+    {
+      "path": "data/enterprise_spines.json",
+      "bytes": 3027,
+      "sha256": "f10f19c62232ceea2467fe25c25076b8175562b30995bfcca10da0bcf8d50d52"
+    },
+    {
+      "path": "data/maturity_levels.json",
+      "bytes": 1643,
+      "sha256": "10a93912a3eca97bcb4f2902942c53ba2f3b61b639d5e0c3e40ed08c6f8aa85c"
+    },
+    {
+      "path": "data/risk_register.json",
+      "bytes": 2785,
+      "sha256": "97b2cac839f8fcf3dc67769bb4c5944f833a4943f93a9a2b8ebd46c2a09e0ea9"
+    },
+    {
+      "path": "data/root_backlog.json",
+      "bytes": 21652,
+      "sha256": "bb18700c11f6e0dbc7642a1598e6ec467cd996d5f5ccdf268eadfa90d80891e3"
+    },
+    {
+      "path": "data/source_map.json",
+      "bytes": 6099,
+      "sha256": "18310517b0b7c9d8d1a3a53a69480fdfa384a759b24281a7fe2f8943b9496dbf"
+    },
+    {
+      "path": "data/standards_gates.json",
+      "bytes": 6006,
+      "sha256": "ca7a1f0cdb88955181d1ece7e79c5fe792b7a9b27be55ef16e3dafdfcfeda457"
+    },
+    {
+      "path": "data/wave_plan.json",
+      "bytes": 6297,
+      "sha256": "2e27b97a3f3850652d35f655294aea871e9fb4a28bf796449295450e224f0cb6"
+    },
+    {
+      "path": "matrices/benchmark_matrix.csv",
+      "bytes": 3229,
+      "sha256": "15e0b9d5cbb1006c6d6b7553f4207e62a858a00445ed5f101d87f2f8c3548a46"
+    },
+    {
+      "path": "matrices/capability_map_matrix.csv",
+      "bytes": 3539,
+      "sha256": "81bda4c313bebb79e119ee959dfd611a8fc04a6849c9cd38a560fea0f00f157f"
+    },
+    {
+      "path": "matrices/enterprise_spine_matrix.csv",
+      "bytes": 2055,
+      "sha256": "d8c929e94c90c00bb8b04b8727517cbee13e3a41b90266c36a1520a95c4e985a"
+    },
+    {
+      "path": "matrices/hard_case_playbook.csv",
+      "bytes": 1227,
+      "sha256": "d69fd25ae76601a316495d004717368428111e7e36430e10cfc1235b29086559"
+    },
+    {
+      "path": "matrices/risk_register_matrix.csv",
+      "bytes": 1719,
+      "sha256": "e9bd21ac99c03b587d2093cac9ba5db5df87cc00c1264d95e694acd9af0c45c2"
+    },
+    {
+      "path": "matrices/root_backlog_matrix.csv",
+      "bytes": 12672,
+      "sha256": "364cf5d6c391359cf803351497e3e15bcebf1f167a0dd2decfd69261c5da87c1"
+    },
+    {
+      "path": "matrices/root_maturity_scorecard.csv",
+      "bytes": 6104,
+      "sha256": "d1fbf06e6cfbc2ba191d6cc5c4012f73d4b8d1e07f7d6a7414b106af96bb1051"
+    },
+    {
+      "path": "matrices/standards_gates_matrix.csv",
+      "bytes": 4290,
+      "sha256": "4997f0203e8fdcb29744ff919ff1d6b1718985a2bfbb46f5bac0ad1f71279f91"
+    },
+    {
+      "path": "matrices/wave_plan_matrix.csv",
+      "bytes": 4464,
+      "sha256": "cdbefee4d01b4a76a5197219e28ad388d2eb423891d0dba538c605aad68bb5f6"
+    },
+    {
+      "path": "prompts/CODEX_SLICE_FACTORY_TEMPLATE.md",
+      "bytes": 977,
+      "sha256": "d0e25f86be0d4a1f182a34ed60169062cae737ec2655cd5a5a889193febb68d4"
+    },
+    {
+      "path": "prompts/CODEX_V21_PHASE2_INTEGRATION_REVIEW_AND_REPAIR_COORDINATOR.md",
+      "bytes": 1991,
+      "sha256": "24c7e7f65cf0a41e1287bcfec906ea628abf09fae058dd2b4fb9232983c88a9e"
+    },
+    {
+      "path": "prompts/CODEX_W0_5_PROMPT.md",
+      "bytes": 965,
+      "sha256": "12f8bc3afe44743da9d83c2e3dbe7eb535de56e4298d512e162a681abb98bd3c"
+    },
+    {
+      "path": "prompts/CODEX_W0_PROMPT.md",
+      "bytes": 1084,
+      "sha256": "2d105a74c3f32e39ecaec348789d60b27ce70463bb2b249652c6d2c9cb8ad8d7"
+    },
+    {
+      "path": "prompts/CODEX_W10_PROMPT.md",
+      "bytes": 905,
+      "sha256": "c1ca93dec771ebb176b0f7e1d9666e379bba528855c87e3be74b5804304e535f"
+    },
+    {
+      "path": "prompts/CODEX_W11_PROMPT.md",
+      "bytes": 939,
+      "sha256": "1ea3fb068203bb6a4badc23c9aad8e603546d44ee8477fd7606787947bce075f"
+    },
+    {
+      "path": "prompts/CODEX_W12_PROMPT.md",
+      "bytes": 965,
+      "sha256": "e704ce0c83d6ca10e6041051a2284632fc4f7fd51bb55facc60b5930d9e38422"
+    },
+    {
+      "path": "prompts/CODEX_W1_PROMPT.md",
+      "bytes": 933,
+      "sha256": "783d3977d6a5f0248ab0b8f37d02055292ea529f4626ddadbbbde9d3d03e9d93"
+    },
+    {
+      "path": "prompts/CODEX_W2_PROMPT.md",
+      "bytes": 915,
+      "sha256": "1d71efbae5a048c34dee7af97948f7b62003b5b8e898c2ce5a5f92fd682adf2f"
+    },
+    {
+      "path": "prompts/CODEX_W3_PROMPT.md",
+      "bytes": 905,
+      "sha256": "4de42aa21ad6b180713396005cf4dd805076f0e3ffa9d36298946b6ca2402e17"
+    },
+    {
+      "path": "prompts/CODEX_W4_5_PROMPT.md",
+      "bytes": 887,
+      "sha256": "eda9d04dc4c48407afc2224bd718ad20f519f6b9a1df299c6fb0c51750812845"
+    },
+    {
+      "path": "prompts/CODEX_W4_PROMPT.md",
+      "bytes": 922,
+      "sha256": "8f4b1af228b44b0281f0cb01bcb67d6a56160152903c3dc52a541c58dea65747"
+    },
+    {
+      "path": "prompts/CODEX_W5_PROMPT.md",
+      "bytes": 924,
+      "sha256": "7d41e3ae89dc41147dc287fd5cf45a4f6070b86367fad876e634b86bcfdec033"
+    },
+    {
+      "path": "prompts/CODEX_W6_5_PROMPT.md",
+      "bytes": 952,
+      "sha256": "249caca1ebbb96536aed0a61751cf2242080f438862f841fe301dd6a480b6a6c"
+    },
+    {
+      "path": "prompts/CODEX_W6_PROMPT.md",
+      "bytes": 930,
+      "sha256": "25981e5f6d3e53ad2618503c82afbc5c547ccf751a948909af5745ba850df200"
+    },
+    {
+      "path": "prompts/CODEX_W7_PROMPT.md",
+      "bytes": 932,
+      "sha256": "1d49c7d5aa581caf61ad86afcea1d8111f540770e44cbf196e3792bae2505e9e"
+    },
+    {
+      "path": "prompts/CODEX_W8_PROMPT.md",
+      "bytes": 908,
+      "sha256": "5fb296468b25b9bcde42fda175b6de06ba0d3f948269042b7b6d56a961b6ebbe"
+    },
+    {
+      "path": "prompts/CODEX_W9_PROMPT.md",
+      "bytes": 932,
+      "sha256": "03487eef68ff4eecab7ab6fa3794f2d4bb1c0234c1124ca8e12b0032eb15cd5a"
+    },
+    {
+      "path": "templates/ROOT_SCOPE_CONTRACT_TEMPLATE.md",
+      "bytes": 694,
+      "sha256": "052fb57a2bbe2d5341e229e9052360588d17f7d8a492346e7fd908350ea945e5"
+    },
+    {
+      "path": "templates/WAVE_GATE_REPORT_TEMPLATE.md",
+      "bytes": 458,
+      "sha256": "dd082c116662b6e9a6eee4b364950f9861337768d043ae9c7813d84193193d3e"
+    }
+  ],
+  "required_immediate_action": "Run V21 Phase 2 integration review and repair coordinator before new slices.",
+  "decision_guard": "No new module/slice while blocking integration gate remains open."
+}

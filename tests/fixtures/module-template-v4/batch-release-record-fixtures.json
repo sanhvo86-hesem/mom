@@ -1,0 +1,63 @@
+{
+  "version": "0.1",
+  "authorityClass": "authoritative",
+  "resourceFamily": "batch-releases",
+  "rootCode": "BREL",
+  "records": {
+    "BREL-001": {
+      "recordId": "BREL-001",
+      "rootCode": "BREL",
+      "title": "Batch BX-2026-04 release packet",
+      "batchId": "BX-2026-04",
+      "productCode": "PN-2042",
+      "lotId": "LOT-2026-04",
+      "manufacturedAt": "2026-04-15",
+      "manufactureLine": "Line 1",
+      "state": "review",
+      "releaseDecision": "pending",
+      "freshness": "fixture_current",
+      "stateMessage": "Read-only release packet. 2-person e-sign required for actual release.",
+      "lifecycle": [
+        ["draft","complete"],
+        ["evidence-collection","complete"],
+        ["review","current"],
+        ["release-approved","pending"],
+        ["market-ship-ready","locked"],
+        ["on-hold","locked"],
+        ["rejected","locked"]
+      ],
+      "approvers": [
+        { "role": "QA Director", "name": "Dr. Tran", "decision": "pending", "signedAt": null },
+        { "role": "Plant Manager", "name": "Mr. Le", "decision": "pending", "signedAt": null }
+      ],
+      "releasePackage": {
+        "inspectionRecords": [{ "id": "INSP-001", "result": "PASS" }],
+        "nonconformanceCases": [{ "id": "NC-001", "disposition": "linked_to_release_review" }],
+        "capaRecords": [{ "id": "CAPA-001", "status": "effectiveness_pending" }],
+        "cdocVersions": [{ "docCode": "qms-sop-100", "rev": "B" }],
+        "deviations": []
+      },
+      "qualityEvidence": {
+        "coa": { "id": "COA-2026-04", "issuedAt": "2026-04-18" },
+        "batchRecord": { "id": "BR-2026-04", "complete": true },
+        "validationCertificate": { "id": "VC-2026", "validUntil": "2027-04-15" }
+      },
+      "genealogyRoot": "LOT-2026-04",
+      "shipmentReadiness": {
+        "quantityAvailable": 500,
+        "allocatedTo": [{ "customer": "Customer A", "quantity": 200 }],
+        "blockedBy": []
+      },
+      "relatedRecords": [
+        { "resourceFamily": "inspections", "recordId": "INSP-001", "label": "INSP-001 first-piece inspection" },
+        { "resourceFamily": "lots", "recordId": "LOT-2026-04", "label": "LOT-2026-04" }
+      ],
+      "limitations": []
+    }
+  },
+  "states": {
+    "conflict":       { "freshness": "fixture_conflict", "stateMessage": "Conflict: Release batch record was amended offline." },
+    "partial_access": { "stateMessage": "Partial-access fixture. Approver identities masked.", "limitations": ["Approver identities masked for cross-team operators.", "Genealogy details masked for current role."] },
+    "degraded":       { "freshness": "fixture_stale", "stateMessage": "Degraded/offline fixture. Refresh from authority before acting." }
+  }
+}

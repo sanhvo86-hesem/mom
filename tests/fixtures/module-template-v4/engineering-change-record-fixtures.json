@@ -1,0 +1,70 @@
+{
+  "version": "0.1",
+  "authorityClass": "authoritative",
+  "resourceFamily": "engineering-changes",
+  "rootCode": "ECO",
+  "records": {
+    "ECO-2026-014": {
+      "recordId": "ECO-2026-014",
+      "rootCode": "ECO",
+      "title": "Update PQ acceptance criteria per FDA guidance 2026",
+      "changeType": "document",
+      "changeReason": "regulatory",
+      "state": "implementation",
+      "severity": "major",
+      "proposer": "Quality Manager",
+      "approver": "VP Quality + CCB",
+      "freshness": "fixture_current",
+      "stateMessage": "Read-only prototype. CCB approval cycle outside fixture.",
+      "lifecycle": [
+        ["proposed","complete"],
+        ["impact-assessment","complete"],
+        ["CCB-review","complete"],
+        ["approved","complete"],
+        ["implementation","current"],
+        ["verification","pending"],
+        ["closed","locked"]
+      ],
+      "changeScope": {
+        "affectedItems": [],
+        "affectedDocuments": [{ "docCode": "qms-sop-100", "fromRev": "A", "toRev": "B" }],
+        "affectedProcesses": ["Process Validation"]
+      },
+      "impactAssessment": {
+        "qualityImpact": "high — adds new acceptance criterion",
+        "costImpact": "low — documentation only",
+        "scheduleImpact": "30 days for retraining",
+        "regulatoryImpact": "REQUIRED — FDA guidance compliance",
+        "validationImpact": "re-validation NOT required (clarification, not new criterion)",
+        "summary": "FDA 2026 guidance clarifies PQ acceptance. Update SOP to mirror language. Retrain affected roles."
+      },
+      "implementationPlan": {
+        "targetEffectiveDate": "2026-01-15",
+        "phases": [
+          { "phase": "Document update", "owner": "QA Director", "dueDate": "2025-12-15", "status": "complete" },
+          { "phase": "Training rollout", "owner": "Training Lead", "dueDate": "2026-01-10", "status": "complete" },
+          { "phase": "Effective date go-live", "owner": "QA Director", "dueDate": "2026-01-15", "status": "in-progress" },
+          { "phase": "60-day verification", "owner": "QA Director", "dueDate": "2026-03-15", "status": "planned" }
+        ]
+      },
+      "trainingImpact": {
+        "requiredTraining": [{ "code": "QUAL_PV_2026", "name": "Process Validation per 2026 FDA guidance" }],
+        "affectedRoles": ["Process Engineer", "Validation Engineer", "QC Inspector"],
+        "trainingRecords": [
+          { "id": "TR-7050", "operatorId": "OP-1004", "status": "completed" },
+          { "id": "TR-7051", "operatorId": "OP-1007", "status": "in_progress" }
+        ]
+      },
+      "relatedRecords": [
+        { "resourceFamily": "controlled-documents", "recordId": "CDOC-001", "label": "qms-sop-100 Rev B (driven by this ECO)" },
+        { "resourceFamily": "training-records", "recordId": "TR-7050", "label": "TR-7050 PV training" }
+      ],
+      "limitations": []
+    }
+  },
+  "states": {
+    "conflict":       { "freshness": "fixture_conflict", "stateMessage": "Conflict: CCB review was reopened." },
+    "partial_access": { "stateMessage": "Partial-access fixture. Some CCB members masked.", "limitations": ["CCB member identities masked for cross-team operators.", "Cost-impact details masked for current role."] },
+    "degraded":       { "freshness": "fixture_stale", "stateMessage": "Degraded/offline fixture. Refresh from authority before acting." }
+  }
+}

@@ -1,0 +1,50 @@
+[
+  {
+    "level": 0,
+    "name": "Absent",
+    "definition": "No accepted artifact or feature surface exists",
+    "acceptance": "Backlog record only"
+  },
+  {
+    "level": 1,
+    "name": "Documented / planned",
+    "definition": "Scope, owner, root authority, risks and first contract documented",
+    "acceptance": "Planning acceptance"
+  },
+  {
+    "level": 2,
+    "name": "Fixture prototype",
+    "definition": "Fixture-backed UI/API contract exists; no backend mutation",
+    "acceptance": "Fixture parse + static guard"
+  },
+  {
+    "level": 3,
+    "name": "Current-portal-safe E2E prototype",
+    "definition": "Feature-flagged HMV4 surface passes E2E and no forbidden diff",
+    "acceptance": "E2E + forbidden guard + rollback"
+  },
+  {
+    "level": 4,
+    "name": "Opt-in live read-only API",
+    "definition": "Contracted live read API available with safe fallback",
+    "acceptance": "OpenAPI + problem details + live/fixture comparison"
+  },
+  {
+    "level": 5,
+    "name": "Controlled mutation",
+    "definition": "Command, workflow, audit, event, evidence, idempotency and rollback path implemented",
+    "acceptance": "Mutation command tests + audit/evidence tests"
+  },
+  {
+    "level": 6,
+    "name": "Pre-production validation package",
+    "definition": "Risk-based validation package complete for intended use",
+    "acceptance": "URS/RTM/IQ/OQ/PQ/VMP/restore rehearsal"
+  },
+  {
+    "level": 7,
+    "name": "Multi-site / verticalized / productized",
+    "definition": "Packaged for sites, roles, verticals, onboarding and commercial operation",
+    "acceptance": "Tenant/site rollout package + SRE + support model"
+  }
+]

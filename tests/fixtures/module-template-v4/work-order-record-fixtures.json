@@ -1,0 +1,91 @@
+{
+  "version": "0.1",
+  "authorityClass": "authoritative",
+  "resourceFamily": "work-orders",
+  "rootCode": "WO",
+  "records": {
+    "WO-3013": {
+      "recordId": "WO-3013",
+      "rootCode": "WO",
+      "title": "WO-3013 First-piece OP-30 on JO-2026-014",
+      "parentJobOrder": "JO-2026-014",
+      "state": "executing",
+      "severity": "low",
+      "operation": {
+        "code": "OP-30",
+        "name": "First-piece inspection",
+        "sequence": 30,
+        "workCenter": "WC-QC-01",
+        "equipmentCode": "CMM-Z1",
+        "equipmentName": "Zeiss Contura CMM",
+        "setupTimeMin": 15,
+        "runTimeMin": 45
+      },
+      "resourceAllocation": {
+        "operatorId": "OP-1004",
+        "operatorName": "Pham Thi D",
+        "equipmentId": "CMM-Z1",
+        "equipmentBookedFrom": "2026-04-25 14:00",
+        "equipmentBookedTo": "2026-04-25 15:30",
+        "skillRequirements": ["QUAL_FIRST_PIECE", "QUAL_QC_VISUAL"],
+        "qualifiedOperators": ["OP-1004", "OP-1007"]
+      },
+      "scheduledStart": "2026-04-25",
+      "scheduledEnd": "2026-04-26",
+      "actualStart": "2026-04-25 14:05",
+      "actualEnd": null,
+      "quantityPlanned": 5,
+      "quantityProduced": 3,
+      "quantityScrap": 0,
+      "freshness": "fixture_current",
+      "stateMessage": "Read-only prototype WO shell.",
+      "lifecycle": [
+        ["planned", "complete"],
+        ["released", "complete"],
+        ["ready", "complete"],
+        ["executing", "current"],
+        ["paused", "locked"],
+        ["completed", "locked"],
+        ["scrapped", "locked"]
+      ],
+      "executionLog": [
+        { "ts": "2026-04-25 14:00", "event": "released", "operatorId": "OP-1004", "note": "WO released to OP-1004" },
+        { "ts": "2026-04-25 14:05", "event": "started", "operatorId": "OP-1004", "note": "Setup begun" },
+        { "ts": "2026-04-25 14:25", "event": "first-sample-measured", "operatorId": "OP-1004", "note": "Sample 1 PASS" }
+      ],
+      "inspections": [
+        { "id": "INSP-001", "type": "first_piece", "result": "PASS_WITH_NOTE", "recordedAt": "2026-04-25 14:30" }
+      ],
+      "dispatchStatus": {
+        "dispatchedAt": "2026-04-25 14:00",
+        "dispatchedBy": "Production Planner",
+        "currentDispatchTarget": "DISP-2026-1107",
+        "eta": "2026-04-25 16:00"
+      },
+      "relatedRecords": [
+        { "resourceFamily": "job-orders", "recordId": "JO-2026-014", "label": "JO-2026-014 parent job" },
+        { "resourceFamily": "inspections", "recordId": "INSP-001", "label": "INSP-001 first-piece" },
+        { "resourceFamily": "nonconformance-cases", "recordId": "NC-001", "label": "NC-001 escalated from this WO" },
+        { "resourceFamily": "dispatch-targets", "recordId": "DISP-2026-1107", "label": "DISP-2026-1107 live dispatch" }
+      ],
+      "limitations": []
+    }
+  },
+  "states": {
+    "conflict": {
+      "freshness": "fixture_conflict",
+      "stateMessage": "Conflict: equipment booking changed by maintenance."
+    },
+    "partial_access": {
+      "stateMessage": "Partial-access fixture.",
+      "limitations": [
+        "Operator name masked.",
+        "Equipment booking masked."
+      ]
+    },
+    "degraded": {
+      "freshness": "fixture_stale",
+      "stateMessage": "Degraded fixture."
+    }
+  }
+}

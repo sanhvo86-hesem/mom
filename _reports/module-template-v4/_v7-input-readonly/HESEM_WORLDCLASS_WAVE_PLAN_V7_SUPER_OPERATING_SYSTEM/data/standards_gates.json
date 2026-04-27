@@ -1,0 +1,128 @@
+[
+  {
+    "standard": "ISA-95 / IEC 62264",
+    "scope": "ERP-MOM-MES boundary, activity models, information handoff",
+    "artifact": "Domain ADR; root family map; interface catalog; event map",
+    "owner": "Architecture Owner + Domain Owner",
+    "gate": "Route/API/resource family obeys authority layer; no hidden workspace authority",
+    "test": "route grammar test; contract review; command ownership review",
+    "stop_rule": "No new slice if root authority cannot be named"
+  },
+  {
+    "standard": "ISA-88",
+    "scope": "Batch process control, recipe/procedure/equipment models",
+    "artifact": "Recipe model; master/control recipe; eBR/eDHR protocol",
+    "owner": "MES Architect + Validation Owner",
+    "gate": "No batch execution without recipe/equipment/procedure mapping",
+    "test": "recipe version test; parameter bound test; step evidence test",
+    "stop_rule": "Block batch feature if recipe identity/effective date missing"
+  },
+  {
+    "standard": "21 CFR Part 11",
+    "scope": "Electronic records and signatures for FDA-regulated contexts",
+    "artifact": "Signature meaning registry; audit trail; record snapshot; identity proof",
+    "owner": "Quality/Regulatory Owner",
+    "gate": "No e-sign without signer identity, meaning, record snapshot and audit",
+    "test": "e-sign challenge test; tamper/audit test; role authorization test",
+    "stop_rule": "Disable e-sign launcher"
+  },
+  {
+    "standard": "EU GMP Annex 11",
+    "scope": "Computerized systems validation, data integrity, supplier/backup/change controls",
+    "artifact": "VMP; URS; RTM; IQ/OQ/PQ; periodic review; backup/restore test",
+    "owner": "Validation Owner",
+    "gate": "Regulated feature cannot graduate beyond maturity 5 without validation package",
+    "test": "URS-to-test traceability; data integrity review; restore rehearsal",
+    "stop_rule": "Remain pre-production readiness only"
+  },
+  {
+    "standard": "GAMP 5 2nd Edition",
+    "scope": "Risk-based validation and fit-for-intended-use computerized systems",
+    "artifact": "Intended-use statement; GAMP category; risk assessment; validation plan",
+    "owner": "Validation Owner + Product Owner",
+    "gate": "Scope and testing proportional to product quality/patient/business risk",
+    "test": "risk-class review; requirement-to-test matrix",
+    "stop_rule": "No regulated mutation without intended-use"
+  },
+  {
+    "standard": "ISA/IEC 62443",
+    "scope": "IACS/OT cybersecurity requirements, zones, conduits, lifecycle",
+    "artifact": "OT zone/conduit model; threat model; remote-access policy",
+    "owner": "Security Owner + OT Owner",
+    "gate": "No direct app-to-machine control; no unsegmented OT traffic",
+    "test": "zone boundary test; least privilege; audit; incident drill",
+    "stop_rule": "Disable OT write path"
+  },
+  {
+    "standard": "OWASP ASVS 5.0",
+    "scope": "Application security verification requirements",
+    "artifact": "ASVS control map; auth/session/access/input/crypto/error test pack",
+    "owner": "Security Owner",
+    "gate": "No public API/UI path without ASVS baseline evidence",
+    "test": "SAST/DAST; authz tests; secret scan; abuse-case tests",
+    "stop_rule": "Block merge"
+  },
+  {
+    "standard": "OWASP API Security Top 10",
+    "scope": "API abuse categories such as BOLA and broken auth",
+    "artifact": "API threat model; object-level authorization matrix",
+    "owner": "API Owner + Security Owner",
+    "gate": "Every endpoint must prove tenant/object/action authorization",
+    "test": "contract tests; negative auth tests; rate-limit tests",
+    "stop_rule": "Endpoint remains unavailable"
+  },
+  {
+    "standard": "OpenAPI 3.2.0",
+    "scope": "Standard, language-agnostic HTTP API description",
+    "artifact": "OpenAPI contract; examples; schema; status codes",
+    "owner": "API Owner",
+    "gate": "No live API without contract and backward-compatibility policy",
+    "test": "schema validation; contract diff; client mock test",
+    "stop_rule": "Fixture fallback only"
+  },
+  {
+    "standard": "RFC 9457",
+    "scope": "Problem Details machine-readable HTTP errors",
+    "artifact": "Problem registry; error envelope examples",
+    "owner": "API Owner",
+    "gate": "Every non-2xx API error uses typed problem detail",
+    "test": "negative endpoint tests; problem-code parse tests",
+    "stop_rule": "Block endpoint graduation"
+  },
+  {
+    "standard": "OpenTelemetry semantic conventions",
+    "scope": "Common semantic attributes for traces/metrics/logs",
+    "artifact": "Trace/span naming; metric catalog; dashboard; alert rule",
+    "owner": "SRE Owner",
+    "gate": "Every command/API/slice emits correlated trace/log/event evidence",
+    "test": "trace propagation test; metric presence test",
+    "stop_rule": "No release-readiness signoff"
+  },
+  {
+    "standard": "WCAG 2.2",
+    "scope": "Accessible web content recommendations",
+    "artifact": "A11y checklist; keyboard map; focus/contrast test",
+    "owner": "UX Owner",
+    "gate": "No screen passes without keyboard, focus-visible, tab semantics and contrast evidence",
+    "test": "Playwright a11y; manual keyboard path",
+    "stop_rule": "Block UI gate"
+  },
+  {
+    "standard": "NIST AI RMF",
+    "scope": "AI risk governance for trustworthy systems",
+    "artifact": "AI intended-use; hazard log; eval harness; human authority boundary",
+    "owner": "AI Governance Owner",
+    "gate": "AI cannot execute regulated decision; advisory only until explicit approval",
+    "test": "RAG eval; hallucination/error logging; refusal/uncertainty tests",
+    "stop_rule": "Disable AI action path"
+  },
+  {
+    "standard": "DORA / SRE",
+    "scope": "Engineering delivery and reliability metrics",
+    "artifact": "DORA dashboard; SLOs; error budgets; incident reviews",
+    "owner": "Platform Engineering Owner",
+    "gate": "No wave pass without delivery and reliability telemetry",
+    "test": "lead-time/change-failure/recovery metrics; rollback rehearsal",
+    "stop_rule": "Hold next wave"
+  }
+]

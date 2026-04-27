@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>HMV4 ECO Fixture</title>
+<link rel="stylesheet" href="../../../../mom/styles/module-template-v4.tokens.css">
+<link rel="stylesheet" href="../../../../mom/styles/module-template-v4.css">
+</head><body>
+<div id="hmv4-fixture-root"></div>
+<script type="application/json" data-hmv4-fixture-route>
+{"fixtureId":"authoritative-record-shell-eco-audit","path":"/ops/records/engineering-changes/ECO-2026-014?tab=audit","routeClass":"AR","expectedRenderer":"renderEcoRecord","coverage":["eco_audit","authoritative_record","no_mutation"]}
+</script>
+<script type="application/json" data-hmv4-eco-record-fixture>
+{"state":"implementation"}
+</script>
+<script>(function(){var node=document.querySelector('[data-hmv4-eco-record-fixture]');if(!node)return;try{window.HMV4_ECO_RECORD_FIXTURE=JSON.parse(node.textContent||'{}');}catch(e){console.warn('[HMV4 fixture] invalid ECO fixture',e);}})();</script>
+<script>window.HMV4_PREVIEW_ENABLED=true;</script>
+<script src="../../../../mom/scripts/portal/71-module-template-v4-routes.js"></script>
+<script src="../../../../mom/scripts/portal/72-module-template-v4-bridge.js"></script>
+<script src="../../../../mom/scripts/portal/73-module-template-v4-renderers.js"></script>
+<script src="../../../../mom/scripts/portal/70-module-template-v4-hydration.js"></script>
+<script>(function(){var node=document.querySelector('[data-hmv4-fixture-route]');if(!node)return;try{var route=JSON.parse(node.textContent||'{}');window.HMV4_FIXTURE_ROUTE_CONTEXT=route;if(route.path&&window.history)history.replaceState(history.state||{},'',route.path);}catch(e){console.warn('[HMV4 fixture] invalid route context',e);}})();</script>
+</body></html>

@@ -1,0 +1,82 @@
+[
+  {
+    "id": "R-001",
+    "risk": "Cross-browser baseline blocker ignored",
+    "impact": "New slices compound visual and E2E drift",
+    "severity": "High",
+    "mitigation": "Stop new slice; run V21 Chromium repair plan; classify pass/warn/fail",
+    "decision": "PHASE2_INTEGRATION_BLOCKED_CROSS_BROWSER"
+  },
+  {
+    "id": "R-002",
+    "risk": "Fixture file loaded by portal",
+    "impact": "Prototype data leaks into current portal runtime",
+    "severity": "Critical",
+    "mitigation": "grep guard; portal inert defaults; forbidden diff guard",
+    "decision": "FAIL_BLOCK_NEXT"
+  },
+  {
+    "id": "R-003",
+    "risk": "Workspace becomes hidden authority",
+    "impact": "Projection screen mutates records without re-anchor",
+    "severity": "Critical",
+    "mitigation": "WS data attributes; disabled mutation launchers; record-shell re-anchor",
+    "decision": "FAIL_BLOCK_NEXT"
+  },
+  {
+    "id": "R-004",
+    "risk": "API without contract",
+    "impact": "Live path diverges from UI/fixture assumptions",
+    "severity": "High",
+    "mitigation": "OpenAPI first; RFC9457 errors; contract diff tests",
+    "decision": "BLOCK_ENDPOINT_GRADUATION"
+  },
+  {
+    "id": "R-005",
+    "risk": "E-sign without meaning/audit",
+    "impact": "Regulated approval cannot be defended",
+    "severity": "Critical",
+    "mitigation": "signature meaning registry; record snapshot; audit/evidence tests",
+    "decision": "DISABLE_ESIGN"
+  },
+  {
+    "id": "R-006",
+    "risk": "AI executes regulated decision",
+    "impact": "Unsafe authority transfer to AI",
+    "severity": "Critical",
+    "mitigation": "advisory-only tool policy; human authority gate; AI eval harness",
+    "decision": "DISABLE_AI_ACTION"
+  },
+  {
+    "id": "R-007",
+    "risk": "OT path writes directly to machines",
+    "impact": "Cyber/safety risk",
+    "severity": "Critical",
+    "mitigation": "62443 zone/conduit model; no app direct control; edge gateway policy",
+    "decision": "DISABLE_OT_WRITE"
+  },
+  {
+    "id": "R-008",
+    "risk": "Validation treated as afterthought",
+    "impact": "Regulated feature cannot graduate",
+    "severity": "High",
+    "mitigation": "intended-use early; URS/RTM/IQ/OQ/PQ templates",
+    "decision": "REMAIN_PRE_PRODUCTION_READINESS"
+  },
+  {
+    "id": "R-009",
+    "risk": "Graphics hardcoding returns",
+    "impact": "UI consistency and governance fail",
+    "severity": "Medium",
+    "mitigation": "Graphics Authority no-hardcode scan; token registry simulation",
+    "decision": "BLOCK_UI_MERGE"
+  },
+  {
+    "id": "R-010",
+    "risk": "Data lake becomes untrusted dump",
+    "impact": "Analytics loses authority lineage",
+    "severity": "High",
+    "mitigation": "CDC contracts, lineage, DQ checks, source authority mapping",
+    "decision": "BLOCK_DATA_PRODUCT"
+  }
+]

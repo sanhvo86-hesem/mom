@@ -1,0 +1,188 @@
+[
+  {
+    "id": "memory",
+    "name": "HESEM_GPT_PROJECT_MEMORY.md",
+    "url": "uploaded:/mnt/data/HESEM_GPT_PROJECT_MEMORY.md",
+    "use": "persistent project context and non-negotiables"
+  },
+  {
+    "id": "v5",
+    "name": "HESEM_WORLDCLASS_WAVE_PLAN_V5_CLAUDE.zip",
+    "url": "uploaded:/mnt/data/HESEM_WORLDCLASS_WAVE_PLAN_V5_CLAUDE.zip",
+    "use": "deep domain, architecture, vertical packs, SRE, AI, security, quantitative model"
+  },
+  {
+    "id": "v6",
+    "name": "HESEM_WORLDCLASS_WAVE_PLAN_V6_GPTPRO_EXTREME.zip",
+    "url": "uploaded:/mnt/data/HESEM_WORLDCLASS_WAVE_PLAN_V6_GPTPRO_EXTREME.zip",
+    "use": "GPT Pro V6 strategic package and V21 framing"
+  },
+  {
+    "id": "repo",
+    "name": "sanhvo86-hesem/mom",
+    "url": "https://github.com/sanhvo86-hesem/mom",
+    "use": "public repo orientation"
+  },
+  {
+    "id": "claude",
+    "name": "CLAUDE.md",
+    "url": "https://github.com/sanhvo86-hesem/mom/blob/main/CLAUDE.md",
+    "use": "repo execution rules, HMV4 posture, forbidden files, quality gates"
+  },
+  {
+    "id": "repo-map",
+    "name": ".ai/repo-map.json",
+    "url": "https://github.com/sanhvo86-hesem/mom/blob/main/.ai/repo-map.json",
+    "use": "project topology, stack, counts, services"
+  },
+  {
+    "id": "exec-review",
+    "name": "EXECUTIVE_REVIEW_FOR_GPT_PRO.md",
+    "url": "https://github.com/sanhvo86-hesem/mom/blob/main/_reports/module-template-v4/EXECUTIVE_REVIEW_FOR_GPT_PRO.md",
+    "use": "HMV4 architecture and current slice state"
+  },
+  {
+    "id": "sap-dm",
+    "name": "SAP Digital Manufacturing",
+    "url": "https://www.sap.com/products/scm/digital-manufacturing.html",
+    "use": "resource orchestration and live operations pattern"
+  },
+  {
+    "id": "siemens-opcenter",
+    "name": "Siemens Opcenter",
+    "url": "https://www.siemens.com/en-us/products/opcenter/",
+    "use": "MOM orchestration, quality operations, closed-loop improvement pattern"
+  },
+  {
+    "id": "dassault-apriso",
+    "name": "DELMIA Apriso",
+    "url": "https://www.3ds.com/products/delmia/apriso",
+    "use": "multi-plant MOM/MES pattern"
+  },
+  {
+    "id": "rockwell-plex",
+    "name": "Rockwell Plex MES",
+    "url": "https://www.rockwellautomation.com/en-us/products/software/factorytalk/operationsuite/mes/plex-mes.html",
+    "use": "cloud MES, paperless shopfloor execution pattern"
+  },
+  {
+    "id": "mastercontrol",
+    "name": "MasterControl EBR / MES / QMS",
+    "url": "https://www.mastercontrol.com/manufacturing/batch-records/",
+    "use": "regulated batch record and eQMS pattern"
+  },
+  {
+    "id": "etq",
+    "name": "ETQ Reliance",
+    "url": "https://hexagon.com/products/product-groups/etq-reliance",
+    "use": "workflow eQMS pattern"
+  },
+  {
+    "id": "arena",
+    "name": "Arena PLM/QMS",
+    "url": "https://www.arenasolutions.com/",
+    "use": "product-centric quality and PLM/QMS pattern"
+  },
+  {
+    "id": "tulip",
+    "name": "Tulip Frontline Operations Platform",
+    "url": "https://tulip.co/",
+    "use": "composable connected-worker frontline operations pattern"
+  },
+  {
+    "id": "isa95",
+    "name": "ISA-95 / IEC 62264",
+    "url": "https://www.isa.org/standards-and-publications/isa-standards/isa-95-standard",
+    "use": "ERP-MOM-MES boundary and interface vocabulary"
+  },
+  {
+    "id": "isa88",
+    "name": "ISA-88",
+    "url": "https://www.isa.org/standards-and-publications/isa-standards/isa-88-standards",
+    "use": "batch recipe/procedure/eBR model"
+  },
+  {
+    "id": "62443",
+    "name": "ISA/IEC 62443",
+    "url": "https://www.isa.org/standards-and-publications/isa-standards/isa-iec-62443-series-of-standards",
+    "use": "OT cybersecurity zones/conduits and lifecycle"
+  },
+  {
+    "id": "part11",
+    "name": "21 CFR Part 11",
+    "url": "https://www.ecfr.gov/current/title-21/chapter-I/subchapter-A/part-11",
+    "use": "electronic records and signatures"
+  },
+  {
+    "id": "annex11",
+    "name": "EU GMP Annex 11",
+    "url": "https://health.ec.europa.eu/system/files/2016-11/annex11_01-2011_en_0.pdf",
+    "use": "computerised systems validation and GMP controls"
+  },
+  {
+    "id": "gamp5",
+    "name": "GAMP 5 Second Edition",
+    "url": "https://ispe.org/publications/guidance-documents/gamp-5-guide-2nd-edition",
+    "use": "risk-based computerized-system validation"
+  },
+  {
+    "id": "asvs",
+    "name": "OWASP ASVS",
+    "url": "https://owasp.org/www-project-application-security-verification-standard/",
+    "use": "application security verification controls"
+  },
+  {
+    "id": "openapi",
+    "name": "OpenAPI 3.2.0",
+    "url": "https://spec.openapis.org/oas/v3.2.0.html",
+    "use": "HTTP API contract specification"
+  },
+  {
+    "id": "rfc9457",
+    "name": "RFC 9457 Problem Details",
+    "url": "https://www.rfc-editor.org/rfc/rfc9457.html",
+    "use": "machine-readable HTTP API errors"
+  },
+  {
+    "id": "otel",
+    "name": "OpenTelemetry Semantic Conventions",
+    "url": "https://opentelemetry.io/docs/specs/semconv/",
+    "use": "observability semantic attributes"
+  },
+  {
+    "id": "wcag22",
+    "name": "WCAG 2.2",
+    "url": "https://www.w3.org/TR/WCAG22/",
+    "use": "accessibility conformance"
+  },
+  {
+    "id": "nist-ai-rmf",
+    "name": "NIST AI RMF",
+    "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+    "use": "AI risk governance"
+  },
+  {
+    "id": "palantir-ontology",
+    "name": "Palantir Foundry Ontology",
+    "url": "https://palantir.com/docs/foundry/ontology/overview/",
+    "use": "semantic and kinetic digital-twin pattern"
+  },
+  {
+    "id": "databricks-lakehouse",
+    "name": "Databricks Lakehouse",
+    "url": "https://www.databricks.com/product/data-lakehouse",
+    "use": "lakehouse data platform pattern"
+  },
+  {
+    "id": "microsoft-mfg-model",
+    "name": "Microsoft Cloud for Manufacturing data model",
+    "url": "https://learn.microsoft.com/en-us/industry/release-plan/2025wave1/cloud-manufacturing/",
+    "use": "manufacturing value-chain semantic interoperability"
+  },
+  {
+    "id": "dora",
+    "name": "DORA metrics",
+    "url": "https://dora.dev/guides/dora-metrics/",
+    "use": "engineering delivery performance metrics"
+  }
+]

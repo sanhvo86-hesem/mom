@@ -1,0 +1,86 @@
+[
+  {
+    "spine": "Identity / Access",
+    "roots": "USER, ROLE, POLICY",
+    "scope": "object/action/tenant/site authorization, SoD, MFA, session, service identity",
+    "wave": "W0.5",
+    "evidence": "deny-by-default policy tests, object authorization matrix, audit trail"
+  },
+  {
+    "spine": "Workflow",
+    "roots": "WFDEF, WFEVT",
+    "scope": "versioned state machines, guard rules, transition command lifecycle",
+    "wave": "W1",
+    "evidence": "state-transition tests, invalid-transition denial, workflow evidence"
+  },
+  {
+    "spine": "Evidence / e-Sign",
+    "roots": "EVID, ESIGN, AUDIT",
+    "scope": "hashable evidence, chain of custody, signature meaning, record snapshots",
+    "wave": "W1/W3/W9",
+    "evidence": "tamper tests, Part 11 evidence tests, retention checks"
+  },
+  {
+    "spine": "Master Data",
+    "roots": "ITEM, CUST, SUP, EQP, MDEV",
+    "scope": "identity, duplicate controls, effectivity, lifecycle",
+    "wave": "W0.5/W5",
+    "evidence": "MDM duplicate tests, lifecycle contract, change audit"
+  },
+  {
+    "spine": "Digital Thread",
+    "roots": "OTGNODE, OTGEDGE, LOT, SERIAL",
+    "scope": "genealogy graph, causality, evidence links, replay",
+    "wave": "W7",
+    "evidence": "lineage traversal tests, release packet completeness"
+  },
+  {
+    "spine": "Event / Notification",
+    "roots": "EVENT, NOTIF",
+    "scope": "domain events, notification policy, escalation, replay",
+    "wave": "W1/W4",
+    "evidence": "schema version tests, idempotency, delivery audit"
+  },
+  {
+    "spine": "Analytics",
+    "roots": "DATACON, OEEVT, SPC, COST",
+    "scope": "CDC, data products, DQ checks, KPI definitions",
+    "wave": "W8",
+    "evidence": "lineage, freshness, quality, dashboard correctness"
+  },
+  {
+    "spine": "Instruction Runtime",
+    "roots": "CDOC, TRAIN, OPER",
+    "scope": "worker guidance, instruction versions, training prerequisites",
+    "wave": "W3/W6",
+    "evidence": "instruction effective-date, qualification gate, a11y"
+  },
+  {
+    "spine": "Graphics Authority",
+    "roots": "graphics tokens/contracts",
+    "scope": "visual token governance, no-hardcode UI edits, simulation evidence",
+    "wave": "W0.5/W1",
+    "evidence": "no hex/px JS scan, token registry, preview simulation row"
+  },
+  {
+    "spine": "AI Governance",
+    "roots": "AI intended-use/eval/risk roots",
+    "scope": "advisory boundaries, RAG evaluation, prompt/tool policy",
+    "wave": "W6.5/W9",
+    "evidence": "NIST AI RMF map, eval harness, action disabled until approved"
+  },
+  {
+    "spine": "Security / Privacy / OT Safety",
+    "roots": "risk, policy, zones/conduits",
+    "scope": "ASVS/API/62443 threat model and controls",
+    "wave": "W0.5/W9",
+    "evidence": "security tests, zone model, incident drill"
+  },
+  {
+    "spine": "Platform Engineering / SRE",
+    "roots": "release train, observability, rollback",
+    "scope": "CI/CD, SLO, error budget, DORA, incident review",
+    "wave": "W0/W12",
+    "evidence": "DORA dashboard, OTel traces, rollback rehearsal"
+  }
+]

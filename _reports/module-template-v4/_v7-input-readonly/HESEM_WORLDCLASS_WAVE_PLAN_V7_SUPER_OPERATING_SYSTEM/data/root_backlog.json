@@ -1,0 +1,702 @@
+[
+  {
+    "code": "QUO",
+    "name": "Quotation",
+    "domain": "Commercial & Customer",
+    "class": "authoritative root",
+    "base": 1,
+    "wave": "W5",
+    "purpose": "convert customer demand into priced, approved commercial intent",
+    "gates": "pricing authority, customer terms, approval workflow, SO conversion evidence"
+  },
+  {
+    "code": "CPO",
+    "name": "Customer Purchase Order",
+    "domain": "Commercial & Customer",
+    "class": "authoritative root",
+    "base": 1,
+    "wave": "W5",
+    "purpose": "capture external customer commitment and reconcile to quotation/sales order",
+    "gates": "PO validation, customer reference uniqueness, exception workflow"
+  },
+  {
+    "code": "SO",
+    "name": "Sales Order",
+    "domain": "Commercial & Customer",
+    "class": "authoritative root",
+    "base": 1,
+    "wave": "W5",
+    "purpose": "authorized demand root driving planning, fulfillment and revenue evidence",
+    "gates": "order line authority, promise date, allocation, change history"
+  },
+  {
+    "code": "PO",
+    "name": "Purchase Order",
+    "domain": "Procurement & Supplier Quality",
+    "class": "authoritative root",
+    "base": 1,
+    "wave": "W5",
+    "purpose": "supplier demand commitment, receiving and supplier quality linkage",
+    "gates": "supplier authorization, item revision, receipt, change and close control"
+  },
+  {
+    "code": "IREV",
+    "name": "Item Revision",
+    "domain": "Product Engineering",
+    "class": "authoritative root",
+    "base": 1,
+    "wave": "W5",
+    "purpose": "authoritative revision/effectivity model for production and quality records",
+    "gates": "ECO linkage, effectivity, BOM/routing compatibility, release status"
+  },
+  {
+    "code": "ECO",
+    "name": "Engineering Change Order",
+    "domain": "Product Engineering",
+    "class": "authoritative root",
+    "base": 1,
+    "wave": "W5",
+    "purpose": "controlled change authority over item, BOM, routing, drawing and quality plans",
+    "gates": "impact analysis, approval, effective date, implementation verification"
+  },
+  {
+    "code": "JO",
+    "name": "Job Order",
+    "domain": "Shopfloor / MES Execution",
+    "class": "authoritative root",
+    "base": 1,
+    "wave": "W5",
+    "purpose": "production intent and WIP authorization for making product",
+    "gates": "SO/MRP linkage, item revision, routing, material availability, release approval"
+  },
+  {
+    "code": "WO",
+    "name": "Work Order",
+    "domain": "Shopfloor / MES Execution",
+    "class": "authoritative root",
+    "base": 1,
+    "wave": "W5",
+    "purpose": "operation-level work authorization and evidence capture",
+    "gates": "operator/equipment eligibility, instruction version, completion evidence"
+  },
+  {
+    "code": "DISP",
+    "name": "Dispatch Target / Dispatch Board",
+    "domain": "Planning & Scheduling",
+    "class": "workspace projection + root",
+    "base": 3,
+    "wave": "W0/W1",
+    "purpose": "supervisor projection for prioritized work; no hidden mutation authority",
+    "gates": "re-anchor links, no direct mutation, E2E, route WS attributes"
+  },
+  {
+    "code": "PREC",
+    "name": "Purchase Receipt",
+    "domain": "Inventory & Supplier Quality",
+    "class": "authoritative root",
+    "base": 1,
+    "wave": "W5",
+    "purpose": "receipt of supplier material with inspection and lot creation impact",
+    "gates": "PO match, supplier lot, incoming inspection trigger, inventory transaction"
+  },
+  {
+    "code": "LOT",
+    "name": "Lot",
+    "domain": "Traceability / Serialization",
+    "class": "authoritative root",
+    "base": 1,
+    "wave": "W7",
+    "purpose": "material/product lot genealogy, status and containment authority",
+    "gates": "lot status, genealogy edge, hold/release, split/merge audit"
+  },
+  {
+    "code": "INSP",
+    "name": "Inspection",
+    "domain": "Quality / eQMS",
+    "class": "authoritative root",
+    "base": 1,
+    "wave": "W3/W4",
+    "purpose": "inspection plan execution and measured quality evidence",
+    "gates": "sampling plan, measurement units, disposition, NC trigger"
+  },
+  {
+    "code": "NQCASE",
+    "name": "Nonconformance Case",
+    "domain": "Quality / eQMS",
+    "class": "authoritative root",
+    "base": 4,
+    "wave": "W0/W4",
+    "purpose": "contain, investigate, disposition and link quality escapes",
+    "gates": "read-only API stabilization, disposition command, CAPA link, e-sign boundary"
+  },
+  {
+    "code": "CAPA",
+    "name": "Corrective / Preventive Action",
+    "domain": "Quality / eQMS",
+    "class": "authoritative root",
+    "base": 3,
+    "wave": "W0/W3",
+    "purpose": "root-cause, action, verification and effectiveness control",
+    "gates": "cause taxonomy, action owner, verification evidence, effectiveness timer"
+  },
+  {
+    "code": "BREL",
+    "name": "Batch Release / Product Release",
+    "domain": "Traceability / Quality",
+    "class": "authoritative root",
+    "base": 1,
+    "wave": "W7",
+    "purpose": "release decision packet derived from genealogy, inspection, deviation and signoff evidence",
+    "gates": "release checklist, review by exception, e-sign, hold clearance"
+  },
+  {
+    "code": "CDOC",
+    "name": "Controlled Document",
+    "domain": "Quality / eQMS",
+    "class": "authoritative root",
+    "base": 1,
+    "wave": "W3",
+    "purpose": "controlled SOP/work instruction/document lifecycle",
+    "gates": "version/effective date, training impact, approval, archive, read acknowledgement"
+  },
+  {
+    "code": "TRAIN",
+    "name": "Training Record / Qualification",
+    "domain": "Workforce / Quality",
+    "class": "workspace + authoritative record",
+    "base": 2,
+    "wave": "W0/W3",
+    "purpose": "prove operator qualification and skill eligibility for work",
+    "gates": "training matrix, course/evidence, exam, expiration, dispatch eligibility"
+  },
+  {
+    "code": "MWO",
+    "name": "Maintenance Work Order",
+    "domain": "Maintenance / EHS",
+    "class": "authoritative root",
+    "base": 1,
+    "wave": "W3",
+    "purpose": "maintenance execution and asset readiness authority",
+    "gates": "asset, PM plan, downtime impact, completion evidence, return-to-service"
+  },
+  {
+    "code": "ITEM",
+    "name": "Item Master",
+    "domain": "Master Data",
+    "class": "dependency root",
+    "base": 1,
+    "wave": "W0.5/W5",
+    "purpose": "core material/product identity across ERP/MES/eQMS",
+    "gates": "unique identity, revision policy, UOM, classification, lifecycle"
+  },
+  {
+    "code": "CUST",
+    "name": "Customer Master",
+    "domain": "Master Data",
+    "class": "dependency root",
+    "base": 1,
+    "wave": "W0.5/W5",
+    "purpose": "customer identity, terms, site and compliance attributes",
+    "gates": "duplicate prevention, address/terms authority, sales linkage"
+  },
+  {
+    "code": "SUP",
+    "name": "Supplier Master",
+    "domain": "Master Data / Supplier Quality",
+    "class": "dependency root",
+    "base": 1,
+    "wave": "W0.5/W5",
+    "purpose": "supplier identity, qualification and risk status",
+    "gates": "qualification, approved item/scope, risk, SCAR history"
+  },
+  {
+    "code": "EQP",
+    "name": "Equipment / Asset",
+    "domain": "Maintenance / MES",
+    "class": "dependency root",
+    "base": 1,
+    "wave": "W0.5/W6",
+    "purpose": "machine/tool/asset identity for work eligibility and maintenance",
+    "gates": "status, calibration, PM, zone/conduit, eligibility"
+  },
+  {
+    "code": "MDEV",
+    "name": "Measurement Device",
+    "domain": "Quality / Metrology",
+    "class": "dependency root",
+    "base": 1,
+    "wave": "W0.5/W6",
+    "purpose": "measurement device authority for inspection evidence",
+    "gates": "calibration status, MSA, permitted measure types, traceability"
+  },
+  {
+    "code": "TENANT",
+    "name": "Tenant / Site",
+    "domain": "Core Platform",
+    "class": "platform root",
+    "base": 1,
+    "wave": "W0.5",
+    "purpose": "multi-site configuration and data boundary",
+    "gates": "tenant isolation, site hierarchy, feature flags, data partition"
+  },
+  {
+    "code": "USER",
+    "name": "User Identity",
+    "domain": "Identity / Access",
+    "class": "platform root",
+    "base": 1,
+    "wave": "W0.5",
+    "purpose": "human and service identity authority",
+    "gates": "authn, MFA policy, lifecycle, session"
+  },
+  {
+    "code": "ROLE",
+    "name": "Role / Permission",
+    "domain": "Identity / Access",
+    "class": "platform root",
+    "base": 1,
+    "wave": "W0.5",
+    "purpose": "role and action authorization authority",
+    "gates": "least privilege, segregation-of-duties, object authorization"
+  },
+  {
+    "code": "POLICY",
+    "name": "Policy Decision",
+    "domain": "Identity / Access",
+    "class": "platform root",
+    "base": 1,
+    "wave": "W0.5",
+    "purpose": "policy-as-code for route/API/command/evidence decisions",
+    "gates": "deny-by-default, explainability, audit"
+  },
+  {
+    "code": "WFDEF",
+    "name": "Workflow Definition",
+    "domain": "Workflow Spine",
+    "class": "platform root",
+    "base": 1,
+    "wave": "W1",
+    "purpose": "state machine definition for governed roots",
+    "gates": "states, transitions, guards, owners, version"
+  },
+  {
+    "code": "WFEVT",
+    "name": "Workflow Event",
+    "domain": "Workflow Spine",
+    "class": "platform root",
+    "base": 1,
+    "wave": "W1",
+    "purpose": "immutable workflow transition evidence",
+    "gates": "actor, from/to state, guard evidence, correlation id"
+  },
+  {
+    "code": "EVID",
+    "name": "Evidence Object",
+    "domain": "Evidence Spine",
+    "class": "platform root",
+    "base": 1,
+    "wave": "W1",
+    "purpose": "attached proof, observation, file, measurement or execution evidence",
+    "gates": "hash, source, retention, chain of custody"
+  },
+  {
+    "code": "ESIGN",
+    "name": "Electronic Signature",
+    "domain": "Evidence / e-Sign",
+    "class": "platform root",
+    "base": 1,
+    "wave": "W3/W9",
+    "purpose": "signature meaning and identity-bound approval evidence",
+    "gates": "meaning, signer, challenge, record snapshot, audit"
+  },
+  {
+    "code": "AUDIT",
+    "name": "Audit Trail Event",
+    "domain": "Evidence / Compliance",
+    "class": "platform root",
+    "base": 1,
+    "wave": "W1",
+    "purpose": "immutable trace of authoritative changes",
+    "gates": "before/after, actor, timestamp, reason, correlation"
+  },
+  {
+    "code": "EVENT",
+    "name": "Domain Event",
+    "domain": "Event / Notification",
+    "class": "platform root",
+    "base": 1,
+    "wave": "W1",
+    "purpose": "publishable fact derived from authority roots",
+    "gates": "schema, version, idempotency, replay"
+  },
+  {
+    "code": "NOTIF",
+    "name": "Notification",
+    "domain": "Event / Notification",
+    "class": "platform root",
+    "base": 1,
+    "wave": "W1",
+    "purpose": "human/system notification tied to domain event",
+    "gates": "recipient policy, template, escalation, audit"
+  },
+  {
+    "code": "APICON",
+    "name": "API Contract",
+    "domain": "Integration / Resilience",
+    "class": "platform root",
+    "base": 1,
+    "wave": "W1",
+    "purpose": "OpenAPI, schemas and compatibility authority",
+    "gates": "contract diff, examples, problem details"
+  },
+  {
+    "code": "DATACON",
+    "name": "Data Contract",
+    "domain": "Data Platform",
+    "class": "platform root",
+    "base": 1,
+    "wave": "W4/W8",
+    "purpose": "CDC/schema/data product contract",
+    "gates": "schema version, lineage, DQ checks, owner"
+  },
+  {
+    "code": "OTGNODE",
+    "name": "Operational Truth Graph Node",
+    "domain": "Digital Thread",
+    "class": "platform root",
+    "base": 1,
+    "wave": "W7",
+    "purpose": "semantic object in operational truth graph",
+    "gates": "node type, source authority, identity, validity"
+  },
+  {
+    "code": "OTGEDGE",
+    "name": "Operational Truth Graph Edge",
+    "domain": "Digital Thread",
+    "class": "platform root",
+    "base": 1,
+    "wave": "W7",
+    "purpose": "typed relationship/action/evidence link between roots",
+    "gates": "edge type, causality, timestamp, actor/source"
+  },
+  {
+    "code": "WCENTER",
+    "name": "Work Center",
+    "domain": "MES / Planning",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W6",
+    "purpose": "capacity and equipment grouping for scheduling/execution",
+    "gates": "calendar, eligible equipment, labor skill, constraints"
+  },
+  {
+    "code": "ROUTE",
+    "name": "Routing",
+    "domain": "Product Engineering / MES",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W6",
+    "purpose": "sequence of operations and standard times",
+    "gates": "revision/effectivity, work center, instruction linkage"
+  },
+  {
+    "code": "OPER",
+    "name": "Operation Execution",
+    "domain": "MES",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W6",
+    "purpose": "step-level execution evidence and status",
+    "gates": "start/stop, operator, equipment, parameter capture, exceptions"
+  },
+  {
+    "code": "TOOL",
+    "name": "Tooling",
+    "domain": "MES / Maintenance",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W6",
+    "purpose": "tool status, calibration, usage and eligibility",
+    "gates": "tool status, PM/calibration, assignment, lifecycle"
+  },
+  {
+    "code": "CNC",
+    "name": "Machine Program",
+    "domain": "MES / OT",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W6",
+    "purpose": "controlled machine program/version reference",
+    "gates": "revision, checksum, machine eligibility, release approval"
+  },
+  {
+    "code": "DOWNTIME",
+    "name": "Downtime Event",
+    "domain": "MES / OEE",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W6",
+    "purpose": "loss event for OEE, maintenance and continuous improvement",
+    "gates": "reason taxonomy, machine, start/end, approval"
+  },
+  {
+    "code": "OEEVT",
+    "name": "OEE Event",
+    "domain": "Analytics / MES",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W8",
+    "purpose": "availability, performance and quality event stream",
+    "gates": "calculation contract, source mapping, traceability"
+  },
+  {
+    "code": "SPC",
+    "name": "SPC Study / Control Chart",
+    "domain": "Quality Engineering",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W8",
+    "purpose": "statistical process control over measured characteristics",
+    "gates": "rational subgroup, control limits, reaction plan, alarm event"
+  },
+  {
+    "code": "CAL",
+    "name": "Calibration Event",
+    "domain": "Metrology",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W6",
+    "purpose": "calibration history and device eligibility",
+    "gates": "standard traceability, interval, result, due status"
+  },
+  {
+    "code": "MSA",
+    "name": "Measurement System Analysis",
+    "domain": "Metrology / Quality",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W8",
+    "purpose": "prove measurement system fitness",
+    "gates": "gage R&R, bias/linearity/stability, acceptance"
+  },
+  {
+    "code": "FMEA",
+    "name": "FMEA",
+    "domain": "Quality Engineering",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W10",
+    "purpose": "risk analysis linked to control plan and process change",
+    "gates": "severity/occurrence/detection, action linkage, review"
+  },
+  {
+    "code": "CTRLPLAN",
+    "name": "Control Plan",
+    "domain": "Quality Engineering",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W10",
+    "purpose": "inspection/control requirements derived from risk and design",
+    "gates": "characteristics, frequency, method, reaction plan"
+  },
+  {
+    "code": "SCAR",
+    "name": "Supplier Corrective Action",
+    "domain": "Supplier Quality",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W10",
+    "purpose": "supplier quality escape correction and effectiveness",
+    "gates": "supplier scope, containment, corrective action, verification"
+  },
+  {
+    "code": "MRB",
+    "name": "Material Review Board",
+    "domain": "Quality / Inventory",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W7",
+    "purpose": "cross-functional disposition of nonconforming material",
+    "gates": "quarantine, disposition, approvers, inventory transaction"
+  },
+  {
+    "code": "AUDPLAN",
+    "name": "Audit Plan",
+    "domain": "eQMS",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W9",
+    "purpose": "internal/supplier/customer audit schedule and scope",
+    "gates": "risk-based schedule, checklist, finding linkage"
+  },
+  {
+    "code": "FINDING",
+    "name": "Audit Finding",
+    "domain": "eQMS",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W9",
+    "purpose": "audit observation, severity and corrective path",
+    "gates": "classification, due date, CAPA/SCAR linkage"
+  },
+  {
+    "code": "RISK",
+    "name": "Operational Risk",
+    "domain": "eQMS / AI / Security",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W9",
+    "purpose": "formal risk object across product/process/system/AI/security",
+    "gates": "risk owner, score, control, residual risk, review"
+  },
+  {
+    "code": "COMPLAINT",
+    "name": "Customer Complaint",
+    "domain": "Quality / Customer",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W10",
+    "purpose": "post-market or customer quality issue root",
+    "gates": "intake, investigation, regulatory assessment, CAPA link"
+  },
+  {
+    "code": "INVTXN",
+    "name": "Inventory Transaction",
+    "domain": "Inventory / Warehouse",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W5",
+    "purpose": "stock movement ledger and quantity/status authority",
+    "gates": "lot/status, source doc, posting rules, reconciliation"
+  },
+  {
+    "code": "SHIP",
+    "name": "Shipment",
+    "domain": "Fulfillment",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W5",
+    "purpose": "shipping execution and customer delivery evidence",
+    "gates": "release status, pick/pack, carrier, export/serialization"
+  },
+  {
+    "code": "INVOICE",
+    "name": "Invoice",
+    "domain": "Finance / Commercial",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W5",
+    "purpose": "commercial billing evidence linked to shipment/order",
+    "gates": "SO/ship match, tax, approval, GL posting"
+  },
+  {
+    "code": "COST",
+    "name": "Cost / Variance",
+    "domain": "Finance / Cost",
+    "class": "authoritative root",
+    "base": 0,
+    "wave": "W8",
+    "purpose": "standard/actual/WIP cost and variance analysis",
+    "gates": "cost rollup, transaction inputs, approval, finance reconciliation"
+  },
+  {
+    "code": "MREC",
+    "name": "Master Record / Master Batch Record",
+    "domain": "Pharma Vertical",
+    "class": "vertical root",
+    "base": 0,
+    "wave": "W10",
+    "purpose": "regulated master production/batch record template",
+    "gates": "recipe, instructions, checks, approvals, effective date"
+  },
+  {
+    "code": "CREC",
+    "name": "Completed Record / eBR-eDHR",
+    "domain": "Pharma / Med Device Vertical",
+    "class": "vertical root",
+    "base": 0,
+    "wave": "W10",
+    "purpose": "executed manufacturing record for release review",
+    "gates": "step evidence, exception review, signature, release packet"
+  },
+  {
+    "code": "EBR",
+    "name": "Electronic Batch Record",
+    "domain": "Pharma Vertical",
+    "class": "vertical root",
+    "base": 0,
+    "wave": "W10",
+    "purpose": "batch execution record governed by GMP controls",
+    "gates": "recipe execution, deviations, calculations, review-by-exception"
+  },
+  {
+    "code": "EDHR",
+    "name": "Electronic Device History Record",
+    "domain": "Medical Device Vertical",
+    "class": "vertical root",
+    "base": 0,
+    "wave": "W10",
+    "purpose": "device history evidence from build to release",
+    "gates": "serial/lot genealogy, inspections, signatures, DMR linkage"
+  },
+  {
+    "code": "SERIAL",
+    "name": "Serial Number",
+    "domain": "Traceability / Aerospace / Med Device",
+    "class": "vertical root",
+    "base": 0,
+    "wave": "W10",
+    "purpose": "unit-level identity and genealogy",
+    "gates": "serialization policy, unique identity, configuration, service history"
+  },
+  {
+    "code": "APQP",
+    "name": "APQP Program",
+    "domain": "Automotive Vertical",
+    "class": "vertical root",
+    "base": 0,
+    "wave": "W10",
+    "purpose": "advanced product quality planning program evidence",
+    "gates": "phased gates, FMEA/control plan/PPAP linkage"
+  },
+  {
+    "code": "PPAP",
+    "name": "PPAP Package",
+    "domain": "Automotive Vertical",
+    "class": "vertical root",
+    "base": 0,
+    "wave": "W10",
+    "purpose": "production part approval package",
+    "gates": "submission level, dimensional, material, capability evidence"
+  },
+  {
+    "code": "FAI",
+    "name": "First Article Inspection",
+    "domain": "Aerospace Vertical",
+    "class": "vertical root",
+    "base": 0,
+    "wave": "W10",
+    "purpose": "first article verification package",
+    "gates": "ballooned drawing, characteristic results, approvals"
+  },
+  {
+    "code": "CONC",
+    "name": "Concession / Deviation Permit",
+    "domain": "Aerospace / Quality",
+    "class": "vertical root",
+    "base": 0,
+    "wave": "W10",
+    "purpose": "authorized use-as-is/deviation from requirement",
+    "gates": "customer/regulatory approval, expiration, affected lots"
+  },
+  {
+    "code": "EXPORT",
+    "name": "Export Control Record",
+    "domain": "Compliance / Aerospace",
+    "class": "vertical root",
+    "base": 0,
+    "wave": "W10",
+    "purpose": "export-controlled item/user/shipment compliance evidence",
+    "gates": "jurisdiction/classification, denied party, license, audit"
+  }
+]

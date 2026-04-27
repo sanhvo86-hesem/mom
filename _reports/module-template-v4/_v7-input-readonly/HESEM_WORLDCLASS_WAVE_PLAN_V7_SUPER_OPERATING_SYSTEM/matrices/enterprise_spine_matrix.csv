@@ -1,0 +1,13 @@
+spine,roots,scope,wave,evidence
+Identity / Access,"USER, ROLE, POLICY","object/action/tenant/site authorization, SoD, MFA, session, service identity",W0.5,"deny-by-default policy tests, object authorization matrix, audit trail"
+Workflow,"WFDEF, WFEVT","versioned state machines, guard rules, transition command lifecycle",W1,"state-transition tests, invalid-transition denial, workflow evidence"
+Evidence / e-Sign,"EVID, ESIGN, AUDIT","hashable evidence, chain of custody, signature meaning, record snapshots",W1/W3/W9,"tamper tests, Part 11 evidence tests, retention checks"
+Master Data,"ITEM, CUST, SUP, EQP, MDEV","identity, duplicate controls, effectivity, lifecycle",W0.5/W5,"MDM duplicate tests, lifecycle contract, change audit"
+Digital Thread,"OTGNODE, OTGEDGE, LOT, SERIAL","genealogy graph, causality, evidence links, replay",W7,"lineage traversal tests, release packet completeness"
+Event / Notification,"EVENT, NOTIF","domain events, notification policy, escalation, replay",W1/W4,"schema version tests, idempotency, delivery audit"
+Analytics,"DATACON, OEEVT, SPC, COST","CDC, data products, DQ checks, KPI definitions",W8,"lineage, freshness, quality, dashboard correctness"
+Instruction Runtime,"CDOC, TRAIN, OPER","worker guidance, instruction versions, training prerequisites",W3/W6,"instruction effective-date, qualification gate, a11y"
+Graphics Authority,graphics tokens/contracts,"visual token governance, no-hardcode UI edits, simulation evidence",W0.5/W1,"no hex/px JS scan, token registry, preview simulation row"
+AI Governance,AI intended-use/eval/risk roots,"advisory boundaries, RAG evaluation, prompt/tool policy",W6.5/W9,"NIST AI RMF map, eval harness, action disabled until approved"
+Security / Privacy / OT Safety,"risk, policy, zones/conduits",ASVS/API/62443 threat model and controls,W0.5/W9,"security tests, zone model, incident drill"
+Platform Engineering / SRE,"release train, observability, rollback","CI/CD, SLO, error budget, DORA, incident review",W0/W12,"DORA dashboard, OTel traces, rollback rehearsal"

@@ -11,6 +11,14 @@
     "capa",
     "inspection",
     "batch-release",
-    "genealogy"
+    "genealogy",
+    "jo",
+    "job-order",
+    "so",
+    "sales-order",
+    "wo",
+    "work-order",
+    "cpo",
+    "customer-po"
   ]
 }

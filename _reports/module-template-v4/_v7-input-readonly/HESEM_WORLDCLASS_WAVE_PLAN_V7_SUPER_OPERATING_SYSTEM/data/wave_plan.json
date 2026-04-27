@@ -1,0 +1,146 @@
+[
+  {
+    "wave": "W0",
+    "name": "Phase 2 Integration Review & Repair",
+    "goal": "Stop implementation drift; verify current main/branch; repair Chromium baseline blocker",
+    "entry": "Uploaded source + repo state; no new slice",
+    "exit": "V21 reports created; stream matrix classified; blocker resolved or formally contained",
+    "outputs": "V21 current-main report, stream status matrix, Chromium repair plan, integration review",
+    "decision": "PHASE2_INTEGRATION_PASS_READY_FOR_PHASE3_PLANNING or BLOCKED_CROSS_BROWSER"
+  },
+  {
+    "wave": "W0.5",
+    "name": "Platform Substrate Hardening",
+    "goal": "Stabilize mandatory spines before more slices",
+    "entry": "W0 pass or approved repair path",
+    "exit": "Identity/workflow/evidence/API/data contracts/Graphics Authority baseline accepted",
+    "outputs": "Spine contracts, guard scripts, token governance, API contract template",
+    "decision": "W0_5_PLATFORM_SUBSTRATE_ACCEPTED"
+  },
+  {
+    "wave": "W1",
+    "name": "HMV4 Foundation Productization",
+    "goal": "Convert slice prototype mechanics into repeatable product factory",
+    "entry": "W0.5 accepted",
+    "exit": "Slice factory, fixtures, route parser, WS/AR templates, visual gates stable",
+    "outputs": "Slice factory, templates, QA harness, rollback scripts",
+    "decision": "W1_SLICE_FACTORY_READY"
+  },
+  {
+    "wave": "W2",
+    "name": "Governed Record Factory",
+    "goal": "Build reusable AR root shell factory for quality/ERP/MES records",
+    "entry": "W1 ready",
+    "exit": "Record shell, tabs, audit/evidence/signature placeholders repeatable",
+    "outputs": "AR template, root contract template, record shell tests",
+    "decision": "W2_RECORD_FACTORY_READY"
+  },
+  {
+    "wave": "W3",
+    "name": "eQMS + Workforce + Maintenance Core",
+    "goal": "Graduate CAPA/CDOC/TRAIN/MWO/INSP workflow and evidence foundations",
+    "entry": "W2 ready",
+    "exit": "Core eQMS workflows fixture/E2E and selected live read-only APIs stable",
+    "outputs": "CAPA/CDOC/TRAIN/MWO/INSP reports",
+    "decision": "W3_EQMS_CORE_READY"
+  },
+  {
+    "wave": "W4",
+    "name": "Live Read-Only API Graduation",
+    "goal": "Turn selected roots from fixture to opt-in live read-only with fallback",
+    "entry": "W3 core stable",
+    "exit": "NQCASE/CAPA/CDOC/TRAIN/INSP read APIs contracted and observed",
+    "outputs": "OpenAPI, problem registry, live-vs-fixture reports",
+    "decision": "W4_LIVE_READ_ONLY_READY"
+  },
+  {
+    "wave": "W4.5",
+    "name": "OTG Native Cutover",
+    "goal": "Make Operational Truth Graph an explicit product primitive",
+    "entry": "W4 ready",
+    "exit": "OTG nodes/edges/contracts and lineage browser prototype",
+    "outputs": "OTG schema, graph traversal tests, evidence lineage",
+    "decision": "W4_5_OTG_NATIVE_READY"
+  },
+  {
+    "wave": "W5",
+    "name": "Core Transactional ERP/MOM",
+    "goal": "Implement SO/PO/JO/WO/INVTXN/SHIP/INVOICE/COST controlled flows",
+    "entry": "W4.5 ready",
+    "exit": "Transactional commands with workflow/audit/idempotency and rollback proof",
+    "outputs": "Command bus, API/event contracts, transaction tests",
+    "decision": "W5_TRANSACTIONAL_CORE_READY"
+  },
+  {
+    "wave": "W6",
+    "name": "MES/OT Foundation",
+    "goal": "Build operation execution, equipment, work center, routing and OT-safe edge model",
+    "entry": "W5 ready",
+    "exit": "MES execution roots and OT boundaries modeled, read/write control gated",
+    "outputs": "ISA-95/88 model, equipment/routing/operation packages",
+    "decision": "W6_MES_OT_FOUNDATION_READY"
+  },
+  {
+    "wave": "W6.5",
+    "name": "AI Advisory Controlled Rollout",
+    "goal": "Introduce AI copilot as advisory only with eval and risk controls",
+    "entry": "W6 foundation + AI risk package",
+    "exit": "AI can retrieve/explain/summarize; cannot execute regulated decisions",
+    "outputs": "AI eval harness, intended-use, tool policy, red-team report",
+    "decision": "W6_5_AI_ADVISORY_READY"
+  },
+  {
+    "wave": "W7",
+    "name": "Digital Thread / Genealogy / Release",
+    "goal": "Connect lot/serial/inspection/NC/CAPA/MRB/release into release packet",
+    "entry": "W6.5 ready",
+    "exit": "Genealogy and release packet can prove make-to-release path",
+    "outputs": "Release packet, genealogy graph, containment workflow",
+    "decision": "W7_DIGITAL_THREAD_RELEASE_READY"
+  },
+  {
+    "wave": "W8",
+    "name": "Analytics / Improvement / Reliability",
+    "goal": "CDC, lakehouse, OEE/SPC/cost and SRE telemetry mature",
+    "entry": "W7 ready",
+    "exit": "Quality/OEE/cost analytics from governed data contracts",
+    "outputs": "Data products, OTel dashboards, DORA/SLO dashboards",
+    "decision": "W8_ANALYTICS_RELIABILITY_READY"
+  },
+  {
+    "wave": "W9",
+    "name": "Security / Validation / Compliance Closure",
+    "goal": "Complete validation and security packages for regulated scope",
+    "entry": "W8 ready",
+    "exit": "VMP/URS/RTM/IQ/OQ/PQ, ASVS/API/62443 evidence accepted",
+    "outputs": "Validation package, security evidence, backup/restore rehearsal",
+    "decision": "W9_COMPLIANCE_VALIDATION_READY"
+  },
+  {
+    "wave": "W10",
+    "name": "Vertical Packs",
+    "goal": "Package pharma, med device, automotive, aerospace, industrial variants",
+    "entry": "W9 ready",
+    "exit": "Vertical roots and templates defined with onboarding packs",
+    "outputs": "Pharma/med device/auto/aero pack docs and data contracts",
+    "decision": "W10_VERTICAL_PACKS_READY"
+  },
+  {
+    "wave": "W11",
+    "name": "Customer Pilot / Pre-Production Readiness",
+    "goal": "Prepare controlled pilot without calling it production",
+    "entry": "W10 ready",
+    "exit": "Pilot playbook, training, support, SRE, rollback and validation evidence ready",
+    "outputs": "Pilot checklist, site readiness, support runbook",
+    "decision": "W11_PRE_PRODUCTION_READINESS_READY"
+  },
+  {
+    "wave": "W12",
+    "name": "Release Candidate / Scale Operating Model",
+    "goal": "Build multi-site productization and enterprise support operating model",
+    "entry": "W11 ready",
+    "exit": "Scale governance, tenant onboarding, operations, support, financial model stable",
+    "outputs": "RC evidence book, commercial model, SRE/support model",
+    "decision": "W12_PRODUCTIZED_OPERATING_MODEL_READY"
+  }
+]

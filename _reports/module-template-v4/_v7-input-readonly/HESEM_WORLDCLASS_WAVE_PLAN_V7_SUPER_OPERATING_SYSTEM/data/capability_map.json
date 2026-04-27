@@ -1,0 +1,173 @@
+[
+  {
+    "domain": "Commercial & Customer",
+    "capabilities": [
+      "Customer master",
+      "Quotation",
+      "Customer PO intake",
+      "Sales order",
+      "Pricing/contracts",
+      "Shipment/invoice",
+      "Customer complaint"
+    ]
+  },
+  {
+    "domain": "Product / Engineering",
+    "capabilities": [
+      "Item master",
+      "BOM",
+      "Routing",
+      "Item revision",
+      "ECO",
+      "CAD/document link",
+      "FMEA/control plan"
+    ]
+  },
+  {
+    "domain": "Planning & Scheduling",
+    "capabilities": [
+      "MPS/MRP",
+      "Capacity planning",
+      "Finite scheduling",
+      "Dispatch board",
+      "Constraint/TOC board",
+      "Kitting readiness"
+    ]
+  },
+  {
+    "domain": "Procurement & Supplier Quality",
+    "capabilities": [
+      "Supplier master",
+      "Purchase order",
+      "Receiving",
+      "Incoming inspection",
+      "Supplier qualification",
+      "SCAR",
+      "Supplier PPAP"
+    ]
+  },
+  {
+    "domain": "Inventory / Warehouse",
+    "capabilities": [
+      "Inventory transaction ledger",
+      "Lot/serial",
+      "WIP",
+      "Warehouse tasks",
+      "Cycle count",
+      "Material reservation",
+      "Quarantine/hold"
+    ]
+  },
+  {
+    "domain": "Shopfloor / MES Execution",
+    "capabilities": [
+      "Job order",
+      "Work order",
+      "Operation execution",
+      "Work instruction",
+      "eBR/eDHR",
+      "OEE/downtime",
+      "Andon",
+      "SPC"
+    ]
+  },
+  {
+    "domain": "Quality / eQMS",
+    "capabilities": [
+      "Inspection",
+      "Nonconformance",
+      "CAPA",
+      "Controlled document",
+      "Training",
+      "Audit",
+      "MRB",
+      "Complaint",
+      "Risk"
+    ]
+  },
+  {
+    "domain": "Traceability / Release",
+    "capabilities": [
+      "Genealogy",
+      "Batch release",
+      "Product release",
+      "Serialization",
+      "Recall/containment",
+      "Release packet",
+      "Review by exception"
+    ]
+  },
+  {
+    "domain": "Maintenance / EHS",
+    "capabilities": [
+      "Equipment",
+      "Maintenance work order",
+      "PM plan",
+      "Calibration",
+      "MSA",
+      "EHS incident",
+      "LOTO",
+      "Return-to-service"
+    ]
+  },
+  {
+    "domain": "Workforce / Skills",
+    "capabilities": [
+      "Training record",
+      "Qualification",
+      "Skill matrix",
+      "Labor reporting",
+      "Shift handover",
+      "Competency expiration"
+    ]
+  },
+  {
+    "domain": "Finance / Cost",
+    "capabilities": [
+      "Standard cost",
+      "Actual cost",
+      "WIP cost",
+      "Variance",
+      "Inventory valuation",
+      "Margin",
+      "GL integration"
+    ]
+  },
+  {
+    "domain": "Integration / Resilience",
+    "capabilities": [
+      "API gateway",
+      "OpenAPI contracts",
+      "Event bus",
+      "Idempotency",
+      "Live API toggle",
+      "CDC",
+      "Partner integration"
+    ]
+  },
+  {
+    "domain": "Analytics / AI",
+    "capabilities": [
+      "OEE analytics",
+      "Quality analytics",
+      "Throughput",
+      "Predictive maintenance",
+      "Copilot",
+      "AI evaluation",
+      "Data products"
+    ]
+  },
+  {
+    "domain": "Core Platform",
+    "capabilities": [
+      "IAM",
+      "Workflow",
+      "Evidence/eSign",
+      "Audit",
+      "Notification",
+      "Graphics Authority",
+      "Design system",
+      "SRE/observability"
+    ]
+  }
+]

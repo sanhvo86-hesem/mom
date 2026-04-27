@@ -1,0 +1,93 @@
+[
+  {
+    "vendor_class": "SAP S/4HANA + SAP Digital Manufacturing",
+    "pattern_proven": "resource orchestration from warehouse/inventory/quality/labor/maintenance",
+    "emulate": "emulate skill-aware dispatch, staging, exception orchestration",
+    "avoid": "avoid SAP-style implementation gravity and module sprawl",
+    "differentiation": "authority-led micro-slices with explicit evidence gates"
+  },
+  {
+    "vendor_class": "Siemens Opcenter",
+    "pattern_proven": "plan/orchestrate manufacturing and quality; compare as-planned vs as-is",
+    "emulate": "emulate closed-loop plan-to-execute-to-improve logic",
+    "avoid": "avoid opaque customization and weak UX modernization",
+    "differentiation": "operational truth graph with inspectable root authority"
+  },
+  {
+    "vendor_class": "Dassault DELMIA Apriso",
+    "pattern_proven": "global MOM/MES platform across execution, quality, warehouse, maintenance",
+    "emulate": "emulate multi-site standardized process models",
+    "avoid": "avoid pure configurable black box without repo-evidence",
+    "differentiation": "repo-native standards-to-gates and root-by-root graduation"
+  },
+  {
+    "vendor_class": "Rockwell Plex / FactoryTalk",
+    "pattern_proven": "cloud MES with real-time paperless production, quality and compliance",
+    "emulate": "emulate paperless shopfloor + enterprise visibility",
+    "avoid": "avoid machine-data-only thinking",
+    "differentiation": "combine MES + eQMS + ERP command bus in one authority map"
+  },
+  {
+    "vendor_class": "MasterControl",
+    "pattern_proven": "regulated eBR/eDHR and QMS patterns",
+    "emulate": "emulate record release, review by exception, GxP evidence",
+    "avoid": "avoid compliance veneer without intended-use validation",
+    "differentiation": "validation factory integrated from first mutation"
+  },
+  {
+    "vendor_class": "ETQ Reliance",
+    "pattern_proven": "workflow-based eQMS: doc, training, audit, CAPA, supplier quality, risk",
+    "emulate": "emulate configurable quality workflows and central quality hub",
+    "avoid": "avoid disconnected quality from operations",
+    "differentiation": "quality roots embedded into MOM execution and genealogy"
+  },
+  {
+    "vendor_class": "Arena / PTC",
+    "pattern_proven": "PLM/QMS link between product record and quality records",
+    "emulate": "emulate design-to-quality linkage",
+    "avoid": "avoid PLM-only scope that misses execution truth",
+    "differentiation": "ECO/ITEM/FMEA/control-plan linked to MES evidence"
+  },
+  {
+    "vendor_class": "Tulip",
+    "pattern_proven": "frontline operations platform connecting people, machines, devices, systems",
+    "emulate": "emulate composable worker apps and edge data capture",
+    "avoid": "avoid uncontrolled app sprawl",
+    "differentiation": "connected-worker runtime bound to root contracts and guard evidence"
+  },
+  {
+    "vendor_class": "Poka",
+    "pattern_proven": "connected worker knowledge, training, skill and instruction system",
+    "emulate": "emulate skill-aware work instructions and microlearning",
+    "avoid": "avoid content library detached from authority",
+    "differentiation": "training/qualification gates drive dispatch eligibility"
+  },
+  {
+    "vendor_class": "MaintainX / Limble",
+    "pattern_proven": "maintenance work orders, asset care, preventive/predictive execution",
+    "emulate": "emulate maintenance simplicity and mobile completion",
+    "avoid": "avoid maintenance island",
+    "differentiation": "maintenance evidence flows into OEE, quality holds and equipment eligibility"
+  },
+  {
+    "vendor_class": "ServiceNow",
+    "pattern_proven": "enterprise workflow platform and cross-functional case orchestration",
+    "emulate": "emulate workflow, case, service catalog, SLA design",
+    "avoid": "avoid generic workflow without manufacturing semantics",
+    "differentiation": "ISA-95-aware commands and manufacturing-specific authority ledger"
+  },
+  {
+    "vendor_class": "Palantir ontology style",
+    "pattern_proven": "digital twin with objects/properties/links and actions/security",
+    "emulate": "emulate semantic + kinetic graph",
+    "avoid": "avoid black-box ontology with weak evidence",
+    "differentiation": "Operational Truth Graph V3 with signed event/evidence edges"
+  },
+  {
+    "vendor_class": "Databricks / Snowflake / Fabric",
+    "pattern_proven": "lakehouse/semantic manufacturing data product patterns",
+    "emulate": "emulate governed CDC and analytics products",
+    "avoid": "avoid analytics divorced from authoritative source",
+    "differentiation": "CDC from authority ledger with replayable lineage and quality gates"
+  }
+]

@@ -1,0 +1,102 @@
+domain,capability
+Commercial & Customer,Customer master
+Commercial & Customer,Quotation
+Commercial & Customer,Customer PO intake
+Commercial & Customer,Sales order
+Commercial & Customer,Pricing/contracts
+Commercial & Customer,Shipment/invoice
+Commercial & Customer,Customer complaint
+Product / Engineering,Item master
+Product / Engineering,BOM
+Product / Engineering,Routing
+Product / Engineering,Item revision
+Product / Engineering,ECO
+Product / Engineering,CAD/document link
+Product / Engineering,FMEA/control plan
+Planning & Scheduling,MPS/MRP
+Planning & Scheduling,Capacity planning
+Planning & Scheduling,Finite scheduling
+Planning & Scheduling,Dispatch board
+Planning & Scheduling,Constraint/TOC board
+Planning & Scheduling,Kitting readiness
+Procurement & Supplier Quality,Supplier master
+Procurement & Supplier Quality,Purchase order
+Procurement & Supplier Quality,Receiving
+Procurement & Supplier Quality,Incoming inspection
+Procurement & Supplier Quality,Supplier qualification
+Procurement & Supplier Quality,SCAR
+Procurement & Supplier Quality,Supplier PPAP
+Inventory / Warehouse,Inventory transaction ledger
+Inventory / Warehouse,Lot/serial
+Inventory / Warehouse,WIP
+Inventory / Warehouse,Warehouse tasks
+Inventory / Warehouse,Cycle count
+Inventory / Warehouse,Material reservation
+Inventory / Warehouse,Quarantine/hold
+Shopfloor / MES Execution,Job order
+Shopfloor / MES Execution,Work order
+Shopfloor / MES Execution,Operation execution
+Shopfloor / MES Execution,Work instruction
+Shopfloor / MES Execution,eBR/eDHR
+Shopfloor / MES Execution,OEE/downtime
+Shopfloor / MES Execution,Andon
+Shopfloor / MES Execution,SPC
+Quality / eQMS,Inspection
+Quality / eQMS,Nonconformance
+Quality / eQMS,CAPA
+Quality / eQMS,Controlled document
+Quality / eQMS,Training
+Quality / eQMS,Audit
+Quality / eQMS,MRB
+Quality / eQMS,Complaint
+Quality / eQMS,Risk
+Traceability / Release,Genealogy
+Traceability / Release,Batch release
+Traceability / Release,Product release
+Traceability / Release,Serialization
+Traceability / Release,Recall/containment
+Traceability / Release,Release packet
+Traceability / Release,Review by exception
+Maintenance / EHS,Equipment
+Maintenance / EHS,Maintenance work order
+Maintenance / EHS,PM plan
+Maintenance / EHS,Calibration
+Maintenance / EHS,MSA
+Maintenance / EHS,EHS incident
+Maintenance / EHS,LOTO
+Maintenance / EHS,Return-to-service
+Workforce / Skills,Training record
+Workforce / Skills,Qualification
+Workforce / Skills,Skill matrix
+Workforce / Skills,Labor reporting
+Workforce / Skills,Shift handover
+Workforce / Skills,Competency expiration
+Finance / Cost,Standard cost
+Finance / Cost,Actual cost
+Finance / Cost,WIP cost
+Finance / Cost,Variance
+Finance / Cost,Inventory valuation
+Finance / Cost,Margin
+Finance / Cost,GL integration
+Integration / Resilience,API gateway
+Integration / Resilience,OpenAPI contracts
+Integration / Resilience,Event bus
+Integration / Resilience,Idempotency
+Integration / Resilience,Live API toggle
+Integration / Resilience,CDC
+Integration / Resilience,Partner integration
+Analytics / AI,OEE analytics
+Analytics / AI,Quality analytics
+Analytics / AI,Throughput
+Analytics / AI,Predictive maintenance
+Analytics / AI,Copilot
+Analytics / AI,AI evaluation
+Analytics / AI,Data products
+Core Platform,IAM
+Core Platform,Workflow
+Core Platform,Evidence/eSign
+Core Platform,Audit
+Core Platform,Notification
+Core Platform,Graphics Authority
+Core Platform,Design system
+Core Platform,SRE/observability
