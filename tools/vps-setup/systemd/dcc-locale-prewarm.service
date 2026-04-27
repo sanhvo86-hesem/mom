@@ -15,4 +15,4 @@ Environment=DCC_TRANSLATION_WORKER_SLOTS=4
 Environment=DCC_TRANSLATION_COMMAND_TIMEOUT_SECONDS=1800
 Environment=DCC_TRANSLATION_JOB_MAX_ATTEMPTS=3
 TimeoutStartSec=12h
-ExecStart=/usr/bin/php8.5 /var/www/eqms.hesemeng.com/tools/scripts/translation/dcc_locale_backfill.php --fpm-env=/etc/php/8.5/fpm/pool.d/mom.conf --prewarm-segment-cache --segment-prewarm-limit=120 --only-missing-job --no-spawn-per-job --start-workers=4 --wait-for-workers --worker-slots=4 --max-queue=600 --actor=system.locale-prewarm
+ExecStart=/usr/bin/php8.5 /var/www/eqms.hesemeng.com/tools/scripts/translation/dcc_locale_backfill.php --fpm-env=/etc/php/8.5/fpm/pool.d/mom.conf --only-missing-job --no-spawn-per-job --start-workers=4 --wait-for-workers --worker-slots=4 --max-queue=600 --actor=system.locale-prewarm
