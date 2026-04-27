@@ -1180,7 +1180,7 @@
       plannerNotes: 'Customer expedite. Run on Line 1 morning shift.',
       freshness: 'fixture_current',
       stateMessage: 'Read-only prototype JO shell. Mutation outside fixture.',
-      lifecycle: [['draft','complete'],['released','complete'],['executing','current'],['completed','locked']],
+      lifecycle: [['draft','complete'],['released','complete'],['executing','current'],['on-hold','pending'],['completed','locked'],['cancelled','locked']],
       dispatchReadiness: { materialReady: true, equipmentReady: true, operatorReady: true, blockedBy: [] },
       spawnedWorkOrders: [],
       materialConsumption: [],
