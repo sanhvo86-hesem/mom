@@ -341,15 +341,28 @@ for content_dir in \
     find "$content_dir" -type f -exec chmod 664 {} +
 done
 
-# Keep only the document-workflow registry files writable. The wider config
-# directory remains read-only so the deploy surface stays narrow and auditable.
+# Keep only governed runtime config files writable. The config directory itself
+# must allow PHP-FPM to create same-directory *.tmp files because the legacy
+# JSON helpers use write-then-rename for users, role permissions, module access,
+# and document visibility. Sticky + setgid keeps non-runtime deploy-owned files
+# protected while allowing the listed PHP-owned stores to be replaced atomically.
+config_dir="$SITE_DIR/mom/data/config"
+mkdir -p "$config_dir"
+chown "$DEPLOY_USER:$WEB_GROUP" "$config_dir"
+chmod 3775 "$config_dir"
+
 for config_file in \
+    "$SITE_DIR/mom/data/config/users.json" \
+    "$SITE_DIR/mom/data/config/role_permissions.json" \
+    "$SITE_DIR/mom/data/config/portal_role_docs.json" \
+    "$SITE_DIR/mom/data/config/module_access_config.json" \
+    "$SITE_DIR/mom/data/config/user_doc_overrides.json" \
     "$SITE_DIR/mom/data/config/docs_custom.json" \
     "$SITE_DIR/mom/data/config/docs_visibility.json" \
     "$SITE_DIR/mom/data/config/form_control_registry.json" \
     "$SITE_DIR/mom/data/config/portal_display_config.json"; do
     [ -e "$config_file" ] || continue
-    chown "$DEPLOY_USER:$WEB_GROUP" "$config_file"
+    chown "$WEB_USER:$WEB_GROUP" "$config_file"
     chmod 664 "$config_file"
 done
 
