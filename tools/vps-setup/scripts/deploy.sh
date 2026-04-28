@@ -31,9 +31,36 @@ SKIP_ROLLBACK="${SKIP_ROLLBACK:-0}"
 DCC_LOCALE_PREWARM_ON_DEPLOY="${DCC_LOCALE_PREWARM_ON_DEPLOY:-1}"
 DCC_LOCALE_PREWARM_WORKERS="${DCC_LOCALE_PREWARM_WORKERS:-4}"
 DCC_LOCALE_PREWARM_MAX_QUEUE="${DCC_LOCALE_PREWARM_MAX_QUEUE:-1000}"
+PRESERVE_RUNTIME_MUTATIONS="${PRESERVE_RUNTIME_MUTATIONS:-1}"
+PRESERVE_RUNTIME_DOCS="${PRESERVE_RUNTIME_DOCS:-1}"
 LOCK_FILE="${LOCK_FILE:-/var/run/qms-deploy.lock}"
 ROLLBACK_TAG_PREFIX="deploy-rollback"
 DB_SCHEMA_MAY_HAVE_CHANGED="0"
+PRESERVED_RUNTIME_DIR=""
+
+RUNTIME_CONFIG_FILES=(
+    users.json
+    role_permissions.json
+    portal_role_docs.json
+    module_access_config.json
+    user_doc_overrides.json
+    docs_custom.json
+    docs_custom.local.json
+    docs_visibility.json
+    doc_descriptions.json
+    folder_descriptions.json
+    form_control_registry.json
+    portal_display_config.json
+)
+
+RUNTIME_DOC_DIRS=(
+    mom/docs/system
+    mom/docs/operations
+    mom/docs/forms
+    mom/docs/training
+    mom/docs/glossary
+    archive
+)
 
 # ── Helpers ───────────────────────────────────────────────────────────────
 log() { echo "$(date '+%Y-%m-%d %H:%M:%S') [$1] $2" | tee -a "$LOG"; }
@@ -89,6 +116,78 @@ sanitize_php_fpm_pool_runtime_settings() {
     done
 }
 
+capture_runtime_mutations() {
+    if [ "$PRESERVE_RUNTIME_MUTATIONS" != "1" ]; then
+        log "INFO" "Runtime mutation preservation disabled (PRESERVE_RUNTIME_MUTATIONS=$PRESERVE_RUNTIME_MUTATIONS)"
+        return
+    fi
+
+    PRESERVED_RUNTIME_DIR="$(mktemp -d "${TMPDIR:-/tmp}/qms-runtime-preserve.XXXXXX")" \
+        || die "Cannot create runtime preservation directory"
+    log "INFO" "Capturing runtime-managed config/docs before git reset ($PRESERVED_RUNTIME_DIR)"
+
+    mkdir -p "$PRESERVED_RUNTIME_DIR/config"
+    mkdir -p "$PRIVATE_DATA/config" 2>/dev/null || true
+
+    local name site_file private_file
+    for name in "${RUNTIME_CONFIG_FILES[@]}"; do
+        site_file="$SITE_DIR/mom/data/config/$name"
+        private_file="$PRIVATE_DATA/config/$name"
+        if [ -f "$site_file" ]; then
+            cp -p "$site_file" "$PRESERVED_RUNTIME_DIR/config/$name" \
+                || die "Cannot preserve runtime config $site_file"
+            cp -p "$site_file" "$private_file" 2>/dev/null \
+                || log "WARN" "Could not mirror $name to $PRIVATE_DATA/config"
+        elif [ -f "$private_file" ]; then
+            cp -p "$private_file" "$PRESERVED_RUNTIME_DIR/config/$name" \
+                || die "Cannot preserve private runtime config $private_file"
+        fi
+    done
+
+    if [ "$PRESERVE_RUNTIME_DOCS" != "1" ]; then
+        log "INFO" "Runtime document preservation disabled (PRESERVE_RUNTIME_DOCS=$PRESERVE_RUNTIME_DOCS)"
+        return
+    fi
+
+    command -v rsync >/dev/null 2>&1 || die "rsync not found (required for preserving runtime document trees)"
+    local rel src dest
+    for rel in "${RUNTIME_DOC_DIRS[@]}"; do
+        src="$SITE_DIR/$rel"
+        [ -d "$src" ] || continue
+        dest="$PRESERVED_RUNTIME_DIR/$rel"
+        mkdir -p "$dest"
+        rsync -a --delete "$src/" "$dest/" \
+            || die "Cannot preserve runtime document tree $src"
+    done
+}
+
+restore_runtime_mutations() {
+    if [ "$PRESERVE_RUNTIME_MUTATIONS" != "1" ] || [ -z "$PRESERVED_RUNTIME_DIR" ] || [ ! -d "$PRESERVED_RUNTIME_DIR" ]; then
+        return
+    fi
+
+    log "INFO" "Restoring runtime-managed config/docs after git reset"
+    if [ -d "$PRESERVED_RUNTIME_DIR/config" ]; then
+        mkdir -p "$SITE_DIR/mom/data/config"
+        cp -p "$PRESERVED_RUNTIME_DIR/config/"*.json "$SITE_DIR/mom/data/config/" 2>/dev/null || true
+    fi
+
+    if [ "$PRESERVE_RUNTIME_DOCS" = "1" ]; then
+        local rel src dest
+        for rel in "${RUNTIME_DOC_DIRS[@]}"; do
+            src="$PRESERVED_RUNTIME_DIR/$rel"
+            [ -d "$src" ] || continue
+            dest="$SITE_DIR/$rel"
+            mkdir -p "$dest"
+            rsync -a --delete "$src/" "$dest/" \
+                || die "Cannot restore runtime document tree $dest"
+        done
+    fi
+
+    rm -rf "$PRESERVED_RUNTIME_DIR"
+    PRESERVED_RUNTIME_DIR=""
+}
+
 # Tag the current HEAD before we change anything so a healthcheck failure can
 # roll back to a known-good revision. Tags are local-only (not pushed).
 ROLLBACK_TAG=""
@@ -133,10 +232,12 @@ rollback_to_tag() {
         return
     fi
     log "WARN" "Rolling back to $ROLLBACK_TAG"
+    capture_runtime_mutations
     git -C "$SITE_DIR" reset --hard "$ROLLBACK_TAG" --quiet || {
         log "ERROR" "Rollback git reset failed"
         return
     }
+    restore_runtime_mutations
     systemctl reload php8.5-fpm 2>/dev/null && log "INFO" "PHP-FPM reloaded after rollback" || true
     log "WARN" "Rollback complete. Investigate the failed deploy before retrying."
 }
@@ -267,11 +368,13 @@ create_rollback_tag
 stop_dcc_locale_prewarm_for_deploy
 
 # ── Pull latest code ─────────────────────────────────────────────────────
+capture_runtime_mutations
 log "INFO" "Fetching origin/$BRANCH..."
 git fetch origin "$BRANCH" --quiet
 BEFORE=$(git rev-parse HEAD)
 git reset --hard "origin/$BRANCH" --quiet
 AFTER=$(git rev-parse HEAD)
+restore_runtime_mutations
 
 if [ "$BEFORE" = "$AFTER" ]; then
     log "INFO" "Already up-to-date at $(echo "$AFTER" | head -c 8)"
@@ -334,6 +437,7 @@ for content_dir in \
     "$SITE_DIR/mom/docs/operations" \
     "$SITE_DIR/mom/docs/forms" \
     "$SITE_DIR/mom/docs/training" \
+    "$SITE_DIR/mom/docs/glossary" \
     "$SITE_DIR/archive"; do
     [ -d "$content_dir" ] || continue
     chown -R "$DEPLOY_USER:$WEB_GROUP" "$content_dir"
