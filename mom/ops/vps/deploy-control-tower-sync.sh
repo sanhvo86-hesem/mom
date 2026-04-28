@@ -19,10 +19,27 @@ RUN_ROUTING_COMPAT_INSTALL="${RUN_ROUTING_COMPAT_INSTALL:-1}"
 RUN_DB_MIGRATIONS="${RUN_DB_MIGRATIONS:-1}"
 RUN_DB_SCHEMA_SMOKE="${RUN_DB_SCHEMA_SMOKE:-1}"
 RUN_REMOTE_SMOKE="${RUN_REMOTE_SMOKE:-1}"
+PRESERVE_RUNTIME_CONFIG="${PRESERVE_RUNTIME_CONFIG:-1}"
+SYNC_RUNTIME_DOCS="${SYNC_RUNTIME_DOCS:-0}"
 APP_OWNER_GROUP="${APP_OWNER_GROUP:-}"
 APP_DATA_OWNER_GROUP="${APP_DATA_OWNER_GROUP:-}"
 REMOTE_SUDO="${REMOTE_SUDO:-}"
 DOMAIN="${DOMAIN:-}"
+
+RUNTIME_CONFIG_EXCLUDES=(
+  mom/data/config/users.json
+  mom/data/config/role_permissions.json
+  mom/data/config/portal_role_docs.json
+  mom/data/config/module_access_config.json
+  mom/data/config/user_doc_overrides.json
+  mom/data/config/docs_custom.json
+  mom/data/config/docs_custom.local.json
+  mom/data/config/docs_visibility.json
+  mom/data/config/doc_descriptions.json
+  mom/data/config/folder_descriptions.json
+  mom/data/config/form_control_registry.json
+  mom/data/config/portal_display_config.json
+)
 
 require_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then
@@ -192,21 +209,40 @@ sync_repo() {
   echo "==> Sync local repo to ${TARGET}:${APP_DIR}"
   run_remote_cmd "mkdir -p '${APP_DIR}'"
   local rsync_path="rsync"
+  local excludes=(
+    --exclude '.git/'
+    --exclude '.DS_Store'
+    --exclude '.claude/'
+    --exclude '_reports/'
+    --exclude 'mom/data/php_error.log'
+    --exclude 'mom/data/sessions/'
+    --exclude 'mom/data/ratelimit/'
+    --exclude 'mom/data/cache/'
+    --exclude 'mom/data/scan_cache.json'
+    --exclude 'mom/data/*.sqlite'
+    --exclude 'mom/ops/local-runtime/.php-server.pid'
+    --exclude 'mom/ops/local-runtime/.php-server.log'
+  )
   if [ -n "${REMOTE_SUDO:-}" ]; then
     rsync_path="${REMOTE_SUDO} rsync"
   fi
+
+  if [ "$PRESERVE_RUNTIME_CONFIG" = "1" ]; then
+    echo "==> Preserve remote runtime config during rsync"
+    local config_file
+    for config_file in "${RUNTIME_CONFIG_EXCLUDES[@]}"; do
+      excludes+=(--exclude "$config_file")
+    done
+  fi
+
+  if [ "$SYNC_RUNTIME_DOCS" != "1" ]; then
+    echo "==> Preserve remote document corpus during rsync (set SYNC_RUNTIME_DOCS=1 to intentionally publish repo docs)"
+    excludes+=(--exclude 'mom/docs/***' --exclude 'archive/***')
+  fi
+
   RSYNC_RSH="$RSYNC_RSH" rsync -az --delete \
     --rsync-path="$rsync_path" \
-    --exclude '.git/' \
-    --exclude '.DS_Store' \
-    --exclude '.claude/' \
-    --exclude '_reports/' \
-    --exclude 'mom/data/php_error.log' \
-    --exclude 'mom/data/sessions/' \
-    --exclude 'mom/data/scan_cache.json' \
-    --exclude 'mom/data/*.sqlite' \
-    --exclude 'mom/ops/local-runtime/.php-server.pid' \
-    --exclude 'mom/ops/local-runtime/.php-server.log' \
+    "${excludes[@]}" \
     "${REPO_ROOT}/" "${TARGET}:${APP_DIR}/"
 }
 

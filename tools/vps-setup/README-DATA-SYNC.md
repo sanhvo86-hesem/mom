@@ -75,6 +75,22 @@ work.
 To recover from drift: re-pull (`data-pull.sh`), merge your local edits on
 top of the new manifest, and push again.
 
+## Deploy preservation rule
+
+Production edits made through the portal are runtime mutations. They must not
+be lost just because a code deploy refreshes the Git working tree.
+
+- `tools/vps-setup/scripts/deploy.sh` captures governed config files and
+  portal-managed document trees before `git reset --hard`, then restores them
+  after the reset.
+- `mom/ops/vps/deploy-control-tower-sync.sh` preserves remote runtime config
+  and `mom/docs/**` by default while syncing code. To intentionally publish
+  repository document changes, run it with `SYNC_RUNTIME_DOCS=1` and treat that
+  as a controlled document release action.
+- `PRESERVE_RUNTIME_MUTATIONS=0`, `PRESERVE_RUNTIME_DOCS=0`, or
+  `PRESERVE_RUNTIME_CONFIG=0` are break-glass flags only; use them with a
+  change reference and a fresh backup.
+
 ## Why we don't just rsync everything
 
 The lazy version of "pull edit push" — `rsync VPS→local`, edit, `rsync
