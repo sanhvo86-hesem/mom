@@ -68,7 +68,7 @@ try {
     $bodyProp->setValue($controller, [
         'username' => 'linked.user',
         'name' => 'Linked User',
-        'role' => 'qa_manager',
+        'role' => 'cnc_operator',
         'dept' => 'QA',
         'title' => 'QA Manager',
         'active' => true,
@@ -95,6 +95,10 @@ try {
             (string)($payload['user']['hcm_position_id'] ?? '') === $positionId,
             'user upsert response lost hcm_position_id.'
         );
+        smoke_assert(
+            (string)($payload['user']['role'] ?? '') === 'cnc_operator',
+            'user upsert response did not retain runtime role code.'
+        );
     }
 
     $persistedStore = users_load($usersFile);
@@ -107,6 +111,10 @@ try {
     smoke_assert(
         (string)($persistedUser['hcm_position_id'] ?? '') === $positionId,
         'users.json did not persist hcm_position_id.'
+    );
+    smoke_assert(
+        (string)($persistedUser['role'] ?? '') === 'cnc_operator',
+        'users.json did not persist runtime role code.'
     );
 
     $clientPayload = sanitize_user_for_client($persistedUser);

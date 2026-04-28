@@ -1549,6 +1549,57 @@ function portal_auth_normalize_user_linkage(array $user, string $rootDir): array
   }
 }
 
+function portal_auth_known_role_codes(string $rootDir, string $rolePermFile, array $store = []): array {
+  $codes = [];
+
+  $service = portal_auth_shadow_sync_service($rootDir);
+  if ($service && method_exists($service, 'knownRoleCodes')) {
+    try {
+      foreach ((array)$service->knownRoleCodes() as $code) {
+        $code = strtolower(trim((string)$code));
+        if ($code !== '') $codes[$code] = true;
+      }
+    } catch (Throwable $e) {
+      @error_log('[API] role catalog read via shadow service failed: ' . $e->getMessage());
+    }
+  }
+
+  try {
+    foreach (array_keys(load_role_permissions($rolePermFile)) as $code) {
+      $code = strtolower(trim((string)$code));
+      if ($code !== '') $codes[$code] = true;
+    }
+  } catch (Throwable $e) {
+    @error_log('[API] role permission catalog read failed: ' . $e->getMessage());
+  }
+
+  foreach ((array)($store['users'] ?? []) as $user) {
+    if (!is_array($user)) continue;
+    $code = strtolower(trim((string)($user['role'] ?? '')));
+    if ($code !== '') $codes[$code] = true;
+  }
+
+  return array_keys($codes);
+}
+
+function portal_auth_validate_runtime_role_code(string $roleCode, string $rootDir, string $rolePermFile, array $store = []): ?array {
+  $roleCode = strtolower(trim($roleCode));
+  if ($roleCode === '') {
+    return null;
+  }
+
+  if (!preg_match('/^[a-z][a-z0-9_:-]{1,79}$/', $roleCode)) {
+    return ['ok' => false, 'error' => 'invalid_role', 'message' => 'Role code format is invalid.'];
+  }
+
+  $knownRoles = portal_auth_known_role_codes($rootDir, $rolePermFile, $store);
+  if ($knownRoles !== [] && !in_array($roleCode, $knownRoles, true)) {
+    return ['ok' => false, 'error' => 'invalid_role', 'message' => 'Role must exist in the runtime role catalog.'];
+  }
+
+  return null;
+}
+
 function portal_auth_shadow_sync_user(array $user, string $rootDir): void {
   $service = portal_auth_shadow_sync_service($rootDir);
   if (!$service || !method_exists($service, 'syncUser')) {
@@ -16966,7 +17017,8 @@ case 'doc_save_draft': {
     $name = trim((string)($data['name'] ?? ''));
     $dept = trim((string)($data['dept'] ?? ''));
     $title = trim((string)($data['title'] ?? ''));
-    $role = trim((string)($data['role'] ?? 'employee'));
+    $roleProvided = array_key_exists('role', $data);
+    $role = $roleProvided ? strtolower(trim((string)$data['role'])) : 'employee';
     $active = isset($data['active']) ? (bool)$data['active'] : true;
     $cccd = trim((string)($data['cccd'] ?? ''));
     $phone = trim((string)($data['phone'] ?? ''));
@@ -16984,6 +17036,13 @@ case 'doc_save_draft': {
     if ($passwordProvided) {
       [$okPw, $whyPw] = password_policy((string)$plainPassword);
       if (!$okPw) api_json(['ok' => false, 'error' => 'bad_password', 'message' => $whyPw], 400);
+    }
+
+    if ($roleProvided) {
+      $roleProblem = portal_auth_validate_runtime_role_code($role, $ROOT_DIR, $ROLE_PERMS_FILE, $store);
+      if (is_array($roleProblem)) {
+        api_json($roleProblem, 400);
+      }
     }
 
     $users = $store['users'] ?? [];

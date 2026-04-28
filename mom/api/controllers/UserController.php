@@ -83,13 +83,9 @@ class UserController extends BaseController
                 'org_site_id',
             ];
 
-            // Validate role if provided
-            $validRoles = ['user', 'viewer', 'qa_manager', 'doc_controller', 'admin'];
+            $this->assertKnownRoleCode((string)($data['role'] ?? ''), $shadowSync, array_key_exists('role', $data));
             if (array_key_exists('role', $data)) {
-                $providedRole = (string)($data['role'] ?? '');
-                if ($providedRole !== '' && !in_array($providedRole, $validRoles, true)) {
-                    $this->error('invalid_role', 400, 'Role must be one of: ' . implode(', ', $validRoles));
-                }
+                $data['role'] = strtolower(trim((string)$data['role']));
             }
 
             foreach ($allowed as $key) {
@@ -136,12 +132,8 @@ class UserController extends BaseController
             [$pwOk, $pwErr] = password_policy($newPw);
             if (!$pwOk) $this->error($pwErr, 400);
 
-            // Validate role if provided
-            $validRoles = ['user', 'viewer', 'qa_manager', 'doc_controller', 'admin'];
-            $providedRole = (string)($data['role'] ?? 'user');
-            if ($providedRole !== '' && !in_array($providedRole, $validRoles, true)) {
-                $this->error('invalid_role', 400, 'Role must be one of: ' . implode(', ', $validRoles));
-            }
+            $providedRole = strtolower(trim((string)($data['role'] ?? 'user')));
+            $this->assertKnownRoleCode($providedRole, $shadowSync, array_key_exists('role', $data));
 
             $newUser = [
                 'username'      => $username,
@@ -200,6 +192,66 @@ class UserController extends BaseController
 
         $this->auditLog('admin_user_upsert', ['username' => $username]);
         $this->success(['user' => sanitize_user_for_client($existing)]);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function knownRoleCodes(AuthUserShadowSyncService $shadowSync): array
+    {
+        $codes = [];
+
+        if (method_exists($shadowSync, 'knownRoleCodes')) {
+            foreach ($shadowSync->knownRoleCodes() as $code) {
+                $code = strtolower(trim((string)$code));
+                if ($code !== '') {
+                    $codes[$code] = true;
+                }
+            }
+        }
+
+        $rolePermsFile = $this->confDir . '/role_permissions.json';
+        if (function_exists('load_role_permissions')) {
+            try {
+                foreach (array_keys(\load_role_permissions($rolePermsFile)) as $code) {
+                    $code = strtolower(trim((string)$code));
+                    if ($code !== '') {
+                        $codes[$code] = true;
+                    }
+                }
+            } catch (Throwable $e) {
+                @error_log('[UserController] role permission catalog unavailable: ' . $e->getMessage());
+            }
+        }
+
+        foreach ((array)($this->store['users'] ?? []) as $user) {
+            if (!is_array($user)) {
+                continue;
+            }
+            $code = strtolower(trim((string)($user['role'] ?? '')));
+            if ($code !== '') {
+                $codes[$code] = true;
+            }
+        }
+
+        return array_keys($codes);
+    }
+
+    private function assertKnownRoleCode(string $roleCode, AuthUserShadowSyncService $shadowSync, bool $roleProvided): void
+    {
+        $roleCode = strtolower(trim($roleCode));
+        if (!$roleProvided || $roleCode === '') {
+            return;
+        }
+
+        if (!preg_match('/^[a-z][a-z0-9_:-]{1,79}$/', $roleCode)) {
+            $this->error('invalid_role', 400, 'Role code format is invalid.');
+        }
+
+        $knownRoles = $this->knownRoleCodes($shadowSync);
+        if ($knownRoles !== [] && !in_array($roleCode, $knownRoles, true)) {
+            $this->error('invalid_role', 400, 'Role must exist in the runtime role catalog.');
+        }
     }
 
     /**

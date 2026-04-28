@@ -18,18 +18,6 @@ class AuthUserShadowSyncService
 {
     private Connection $db;
 
-    /**
-     * INT-006 FIX: Define hardcoded role hierarchy to prevent privilege escalation
-     */
-    private const ROLE_HIERARCHY = [
-        'viewer' => 0,
-        'operator' => 1,
-        'supervisor' => 2,
-        'manager' => 3,
-        'admin' => 4,
-        'system_admin' => 5,
-    ];
-
     public function __construct(string $portalRoot)
     {
         $base = rtrim($portalRoot, '/\\');
@@ -60,6 +48,33 @@ class AuthUserShadowSyncService
         }
 
         return 'EMP' . strtoupper(substr(sha1($seed), 0, 12));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function knownRoleCodes(): array
+    {
+        try {
+            $rows = $this->db->query(
+                'SELECT role_code
+                   FROM roles
+                  WHERE is_active IS NOT FALSE
+                  ORDER BY role_code'
+            );
+        } catch (Throwable) {
+            return [];
+        }
+
+        $codes = [];
+        foreach ($rows as $row) {
+            $code = strtolower(trim((string)($row['role_code'] ?? '')));
+            if ($code !== '') {
+                $codes[$code] = true;
+            }
+        }
+
+        return array_keys($codes);
     }
 
     /**
@@ -116,7 +131,7 @@ class AuthUserShadowSyncService
                 // Check the current DB role before accepting JSON role
                 $currentRole = $this->getCurrentUserRole($username);
                 $requestedRoleCode = trim((string)($user['role'] ?? ''));
-                $roleCode = $this->validateRoleEscalation($currentRole, $requestedRoleCode, $username);
+                $roleCode = $this->validateRuntimeRoleCode($currentRole, $requestedRoleCode, $username);
                 $roleId = $roleCode !== '' ? $this->roleIdForCode($roleCode) : null;
                 $status = !empty($user['active']) ? 'active' : 'inactive';
                 $fullName = trim((string)($user['name'] ?? $user['full_name'] ?? $username));
@@ -508,7 +523,11 @@ class AuthUserShadowSyncService
         }
 
         $row = $this->db->queryOne(
-            'SELECT role_id FROM roles WHERE role_code = :role_code LIMIT 1',
+            'SELECT role_id
+               FROM roles
+              WHERE role_code = :role_code
+                AND is_active IS NOT FALSE
+              LIMIT 1',
             [':role_code' => $roleCode]
         );
         return is_array($row) ? (string)($row['role_id'] ?? '') ?: null : null;
@@ -711,6 +730,7 @@ class AuthUserShadowSyncService
             'SELECT role_label, role_label_vi
                FROM roles
               WHERE role_code = :role_code
+                AND is_active IS NOT FALSE
               LIMIT 1',
             [':role_code' => $roleCode]
         );
@@ -815,44 +835,36 @@ class AuthUserShadowSyncService
     }
 
     /**
-     * SVC-021 (CRITICAL): Prevent role escalation from JSON source.
-     * Only allow role change if:
-     * 1. User doesn't exist yet (no current role)
-     * 2. Requested role is same as current role
-     * 3. Requested role is lower privilege
-     * Never allow promotion via JSON sync.
+     * Keep the canonical shadow tables aligned with the runtime role catalog.
      *
-     * INT-006 FIX: Use hardcoded role hierarchy to implement privilege escalation prevention.
-     *
-     * @param ?string $currentRole  The current DB role (authoritative), or null if new user
-     * @param string  $requestedRoleCode The role from JSON (untrusted)
-     * @param string  $username     For logging
-     * @return string The safe role code to use (empty string if rejected)
+     * The admin write path already gates who can change users. This layer must
+     * not maintain a second hardcoded hierarchy because production roles are
+     * governed by core_system.roles.
      */
-    private function validateRoleEscalation(?string $currentRole, string $requestedRoleCode, string $username): string
+    private function validateRuntimeRoleCode(?string $currentRole, string $requestedRoleCode, string $username): string
     {
-        $requestedRoleCode = trim($requestedRoleCode);
+        $requestedRoleCode = strtolower(trim($requestedRoleCode));
+        if ($requestedRoleCode === '') {
+            return '';
+        }
 
-        // New user: accept any role from JSON
-        if ($currentRole === null) {
+        if ($this->roleIdForCode($requestedRoleCode) !== null) {
             return $requestedRoleCode;
         }
 
-        // Existing user: only allow same role or lower privilege
-        // A user cannot grant a role higher than their own
-        $currentLevel = self::ROLE_HIERARCHY[strtolower($currentRole)] ?? 0;
-        $requestedLevel = self::ROLE_HIERARCHY[strtolower($requestedRoleCode)] ?? 0;
-
-        if ($requestedLevel > $currentLevel) {
-            // Privilege escalation attempt detected
+        $currentRole = $currentRole !== null ? strtolower(trim($currentRole)) : null;
+        if ($currentRole !== null && $currentRole !== '') {
             @error_log(
-                '[AuthUserShadowSyncService] Role escalation blocked: ' .
-                "user={$username} current_role={$currentRole} requested_role={$requestedRoleCode} " .
-                "current_level={$currentLevel} requested_level={$requestedLevel}"
+                '[AuthUserShadowSyncService] Unknown role ignored during shadow sync: ' .
+                "user={$username} current_role={$currentRole} requested_role={$requestedRoleCode}"
             );
-            return $currentRole; // Keep current role instead
+            return $currentRole;
         }
 
-        return $requestedRoleCode; // Allow downgrade or same role
+        @error_log(
+            '[AuthUserShadowSyncService] Unknown role ignored during shadow sync: ' .
+            "user={$username} requested_role={$requestedRoleCode}"
+        );
+        return '';
     }
 }

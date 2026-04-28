@@ -1582,6 +1582,74 @@ function rolesForAdminGrid(){
   });
 }
 
+function userModalRoleRows(){
+  const runtimeRows = rolesForAdminGrid().filter(row => row && row.is_active !== false);
+  return runtimeRows.length ? runtimeRows : legacyRolesForAdminGrid();
+}
+
+function normalizeRoleMatchText(value){
+  return String(value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[\/_.-]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function roleCodeExistsInUserCatalog(roleCode){
+  const target = String(roleCode || '').trim();
+  if(!target) return false;
+  return userModalRoleRows().some(row => String(row.role_code || '').trim() === target);
+}
+
+function roleCodeForUserTitle(title, deptCode='', position=null){
+  const metadata = safeJsonObject(position && position.metadata);
+  const metadataRole = String(metadata.role_code || metadata.default_role_code || metadata.role || '').trim();
+  if(metadataRole && roleCodeExistsInUserCatalog(metadataRole)) return metadataRole;
+
+  const target = normalizeRoleMatchText(title);
+  if(!target) return '';
+  const dept = String(deptCode || '').trim().toUpperCase();
+  const rows = userModalRoleRows();
+  const ranked = rows.slice().sort((a,b)=>{
+    const aDept = String(a.dept_code || roleRecordUi(a.role_code, a).dept || '').trim().toUpperCase();
+    const bDept = String(b.dept_code || roleRecordUi(b.role_code, b).dept || '').trim().toUpperCase();
+    const aScoped = dept && aDept === dept ? 0 : 1;
+    const bScoped = dept && bDept === dept ? 0 : 1;
+    if(aScoped !== bScoped) return aScoped - bScoped;
+    return String(a.role_code || '').localeCompare(String(b.role_code || ''));
+  });
+
+  for(const row of ranked){
+    const code = String(row.role_code || '').trim();
+    if(!code) continue;
+    const ui = roleRecordUi(code, row);
+    const candidates = [
+      row.role_label,
+      row.role_label_vi,
+      ui.label,
+      ui.labelEn,
+      code
+    ].map(normalizeRoleMatchText).filter(Boolean);
+    if(candidates.includes(target)) return code;
+  }
+  return '';
+}
+
+function userRoleOptionHtml(selectedRole=''){
+  const rows = userModalRoleRows();
+  return rows.map(row => {
+    const code = String(row.role_code || '').trim();
+    if(!code) return '';
+    const ui = roleRecordUi(code, row);
+    const label = lang === 'en' ? (ui.labelEn || ui.label || code) : (ui.label || ui.labelEn || code);
+    const icon = ui.icon || '';
+    return `<option value="${escapeHtml(code)}" ${String(selectedRole)===code?'selected':''}>${escapeHtml((icon ? icon + ' ' : '') + label)}</option>`;
+  }).join('');
+}
+
 async function loadAuthoritativeOrgCatalog(options={}){
   if(ADMIN_AUTH_STATE.org.loading) return;
   const force = !!options.force;
@@ -3515,24 +3583,24 @@ async function editDocMeta(code, field){
           showToast(lang==='en' ? '⚠ Save failed' : '⚠ Lưu thất bại');
           return;
         }
-        if(!isStillActiveDocMetaView()) return;
-        showToast(lang==='en' ? 'Saved' : 'Đã lưu');
-        try{
-          if(window.DccHeader && typeof window.DccHeader.clearCache === 'function'){
-            window.DccHeader.clearCache(editCode);
-          }else if(window.DccHeader && typeof window.DccHeader._clearCache === 'function'){
-            window.DccHeader._clearCache();
-          }
-        }catch(e){}
-        try{
-          if(typeof refreshDccOverlayForDocFromServer === 'function'){
-            await refreshDccOverlayForDocFromServer(editCode, {refreshUi:false});
-          }
-        }catch(e){}
-        if(!isStillActiveDocMetaView()) return;
-        const headerEl = document.getElementById('doc-viewer-header');
-        const dccEl = headerEl ? headerEl.querySelector('.dcc-header') : null;
-        const dccCode = dccEl ? String(dccEl.getAttribute('data-dcc-doc-code') || '').trim() : '';
+	        if(!isStillActiveDocMetaView()) return;
+	        showToast(lang==='en' ? 'Saved' : 'Đã lưu');
+	        try{
+	          if(window.DccHeader && typeof window.DccHeader.clearCache === 'function'){
+	            window.DccHeader.clearCache(editCode);
+	          }else if(window.DccHeader && typeof window.DccHeader._clearCache === 'function'){
+	            window.DccHeader._clearCache();
+	          }
+	        }catch(e){}
+	        try{
+	          if(typeof refreshDccOverlayForDocFromServer === 'function'){
+	            await refreshDccOverlayForDocFromServer(editCode, {refreshUi:false});
+	          }
+	        }catch(e){}
+	        if(!isStillActiveDocMetaView()) return;
+	        const headerEl = document.getElementById('doc-viewer-header');
+	        const dccEl = headerEl ? headerEl.querySelector('.dcc-header') : null;
+	        const dccCode = dccEl ? String(dccEl.getAttribute('data-dcc-doc-code') || '').trim() : '';
         const dccLocale = dccEl ? String(dccEl.getAttribute('data-dcc-locale') || '').trim() : '';
         if (dccEl && dccCode === editCode && dccLocale === editLang && window.DccHeader && typeof window.DccHeader.render === 'function') {
           try { await window.DccHeader.render(dccEl); } catch(e){}
@@ -7748,6 +7816,15 @@ async function deleteUserConfirm(userId){
   requestAnimationFrame(()=>modal.classList.add('show'));
 }
 
+async function refreshAdminUserRuntimeProjection(){
+  await loadUsersFromServerIfAdmin();
+  await Promise.all([
+    loadAuthoritativeRoleCatalog({force:true}),
+    loadAuthoritativeOrgCatalog({force:true})
+  ]);
+  renderAdmin();
+}
+
 async function doSoftDeleteUser(userId){
   const u = USERS.find(x=>String(x.id)===String(userId));
   if(!u) return;
@@ -7759,8 +7836,7 @@ async function doSoftDeleteUser(userId){
     });
     if(res && res.ok){
       showToast(lang==='en'?'✅ Deactivated':'✅ Đã vô hiệu hóa');
-      await loadUsersFromServerIfAdmin();
-      renderAdmin();
+      await refreshAdminUserRuntimeProjection();
     } else {
       showToast('\u26A0 '+((res&&res.error)?res.error:'error'));
     }
@@ -7774,8 +7850,7 @@ async function doHardDeleteUser(userId,username,name){
     const res = await apiCall('admin_user_delete', { username: username });
     if(res && res.ok){
       showToast(lang==='en'?'✅ User permanently deleted':'✅ Đã xóa hoàn toàn người dùng');
-      await loadUsersFromServerIfAdmin();
-      renderAdmin();
+      await refreshAdminUserRuntimeProjection();
     } else {
       const errMsg = res&&res.error==='cannot_delete_self' ? (lang==='en'?'Cannot delete yourself':'Không thể xóa chính mình') : ((res&&res.error)?res.error:'error');
       showToast('\u26A0 '+errMsg);
@@ -7803,8 +7878,7 @@ function showUserModal(userId){
   // Reset modal state
   window.__um_state = { tempPassword: '' };
 
-  const roleKeys = Object.keys(ROLES||{});
-  const roleOptions = roleKeys.map(k=>`<option value="${k}" ${String(u0.role)===String(k)?'selected':''}>${escapeHtml((ROLES[k]?.icon||'')+' '+(ROLES[k]?.label||k))}</option>`).join('');
+  const roleOptions = userRoleOptionHtml(u0.role || '');
   
   const deptOptions = DEPARTMENTS.map(d=>`<option value="${d.code}" ${u0.dept===d.code?'selected':''}>${d.code} — ${lang==='en'?d.labelEn:d.label}</option>`).join('');
   
@@ -7922,11 +7996,6 @@ function showUserModal(userId){
   const titleSel = modal.querySelector('#um-title');
   const roleSel = modal.querySelector('#um-role');
 
-  function roleKeyByLabel(lbl){
-    for(const [k,v] of Object.entries(ROLES)){ if(v && v.label===lbl) return k; }
-    return '';
-  }
-
   function rebuildTitleOptions(){
     const dept = (deptSel && deptSel.value) ? deptSel.value : '';
     const prev = titleSel ? titleSel.value : '';
@@ -7940,7 +8009,11 @@ function showUserModal(userId){
 
   function autoRoleFromTitle(){
     if(!roleSel || !titleSel) return;
-    const k = roleKeyByLabel(titleSel.value);
+    const resolved = resolveAuthoritativeUserAssignment({
+      dept: deptSel ? deptSel.value : '',
+      title: titleSel.value
+    });
+    const k = roleCodeForUserTitle(titleSel.value, resolved.deptCode || (deptSel ? deptSel.value : ''), resolved.position);
     if(k) roleSel.value = k;
   }
 
@@ -7978,6 +8051,16 @@ async function saveUserFromModal(userId){
     if(!name){
       showToast(lang==='en'?'⚠ Full name is required':'⚠ Họ tên là bắt buộc');
       return;
+    }
+
+    if(role && !roleCodeExistsInUserCatalog(role)){
+      await loadAuthoritativeRoleCatalog({force:!!ADMIN_AUTH_STATE.roles.error});
+      if(!roleCodeExistsInUserCatalog(role)){
+        showToast(lang==='en'
+          ?'⚠ Role must exist in core_system.roles before saving'
+          :'⚠ Vai trò phải tồn tại trong core_system.roles trước khi lưu');
+        return;
+      }
     }
 
     const deptChanged = String(existingUser && existingUser.dept || '') !== dept;
@@ -8054,8 +8137,7 @@ async function saveUserFromModal(userId){
       }
       showToast(lang==='en'?'✅ Saved':'✅ Đã lưu');
       closeModal();
-      await loadUsersFromServerIfAdmin();
-      renderAdminUsers();
+      await refreshAdminUserRuntimeProjection();
     }else{
       const msg = (res && (res.message || res.error)) ? (': ' + (res.message || res.error)) : '';
       showToast((lang==='en'?'\u26A0 Server error':'\u26A0 L\u1ed7i server') + msg);
@@ -8198,8 +8280,7 @@ async function toggleUserActive(userId){
 
     if(res && res.ok){
       showToast(lang==='en'?'✅ Updated':'✅ Đã cập nhật');
-      await loadUsersFromServerIfAdmin();
-      renderAdmin();
+      await refreshAdminUserRuntimeProjection();
     }else{
       showToast('\u26A0 '+((res&&res.error)?res.error:'server_error'));
     }
@@ -8227,8 +8308,7 @@ async function lockUser(userId){
     });
     if(res && res.ok){
       showToast(lang==='en'?'✅ Locked':'✅ Đã khóa');
-      await loadUsersFromServerIfAdmin();
-      renderAdmin();
+      await refreshAdminUserRuntimeProjection();
     }else{
       showToast('\u26A0 '+((res&&res.error)?res.error:'server_error'));
     }
