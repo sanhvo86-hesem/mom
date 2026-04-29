@@ -2,7 +2,7 @@
     "_meta": {
         "domain": "mes_execution",
         "table_count": 3,
-        "generated_at": "2026-04-28T03:16:43+00:00"
+        "generated_at": "2026-04-29T07:22:18+00:00"
     },
     "tables": {
         "downtime_event": {
