@@ -29,7 +29,12 @@ final class DocumentLocaleAutomationService
     private const COMMAND_IO_POLL_MICROSECONDS = 200000;
     private const MAX_COMMAND_OUTPUT_BYTES = 33554432;
     private const MAX_COMMAND_MESSAGE_BYTES = 4096;
-    private const LOCALE_QUALITY_GATE_VERSION = 'locale_quality_gate_v3';
+    private const LOCALE_QUALITY_GATE_VERSION = 'locale_quality_gate_v4_tiered';
+    private const LOCALE_RESIDUE_VN_CHAR_ABSOLUTE_LIMIT = 60;
+    private const LOCALE_RESIDUE_VN_CHAR_FRACTION_LIMIT = 0.005;
+    private const LOCALE_RESIDUE_TERM_CRITICAL_THRESHOLD = 3;
+    private const LOCALE_LITERAL_LEAK_TOLERANT_PATTERN
+        = '/_{1,3}\s*DCC[\W_]*LITERAL[\W_]*\d+\s*_{0,3}/iu';
     private const RESIDUAL_VIETNAMESE_TERMS = [
         'đánh giá',
         'nội bộ',
@@ -293,7 +298,13 @@ final class DocumentLocaleAutomationService
             $artifactHtml,
             $this->buildArtifactBootstrapHeader($dcc, $docCode, $artifactTitle, $artifactSubtitle)
         );
-        $qualityIssues = self::detectLocaleArtifactQualityIssues($artifactHtml);
+        $qualityClassification = self::classifyLocaleArtifactQualityIssues($artifactHtml);
+        $qualityIssues = $qualityClassification['critical'];
+        $qualityAdvisory = $qualityClassification['advisory'];
+        $providerAdvisory = isset($attempt['quality_advisory']) && is_array($attempt['quality_advisory'])
+            ? array_values(array_map('strval', $attempt['quality_advisory']))
+            : [];
+        $qualityAdvisory = array_values(array_unique(array_merge($qualityAdvisory, $providerAdvisory)));
         if ($qualityIssues !== []) {
             $this->deleteArtifactIfExists($artifactRelPath);
             $metadata = [
@@ -375,6 +386,10 @@ final class DocumentLocaleAutomationService
         $metadata = array_merge($metadata, $cacheMetadata);
         if ($releasedSnapshot !== null) {
             $metadata['released_snapshot'] = $releasedSnapshot;
+        }
+        if ($qualityAdvisory !== []) {
+            $metadata['quality_advisory'] = $qualityAdvisory;
+            $metadata['quality_gate_version'] = self::LOCALE_QUALITY_GATE_VERSION;
         }
 
         $variant = $dcc->upsertLocaleVariant($docCode, self::TARGET_LOCALE, [
@@ -1301,20 +1316,51 @@ final class DocumentLocaleAutomationService
     }
 
     /**
+     * Critical-only quality issues. An artifact with any item in this list
+     * MUST NOT be published or cached — it is structurally broken.
+     *
+     * Use {@see classifyLocaleArtifactQualityIssues()} when you need both
+     * critical (blocking) and advisory (non-blocking) classifications.
+     *
      * @return list<string>
      */
     public static function detectLocaleArtifactQualityIssues(string $html): array
     {
-        $visible = self::visibleLocaleText($html);
-        $issues = [];
+        return self::classifyLocaleArtifactQualityIssues($html)['critical'];
+    }
 
-        if (preg_match('/__DCC_LITERAL_\d+__/', $visible) === 1) {
-            $issues[] = 'literal_placeholder_leak';
+    /**
+     * Tiered quality classification.
+     *
+     * Returns ``['critical' => [...], 'advisory' => [...]]``:
+     *  - ``critical``: artifact must be rejected (block).
+     *  - ``advisory``: cosmetic / minor residue acceptable for a
+     *    ``machine_preview`` artifact, recorded as an advisory in metadata.
+     *
+     * Aligned with the Python provider's ``classify_quality_issues`` so the
+     * provider and the backend agree on what blocks publication.
+     *
+     * @return array{critical: list<string>, advisory: list<string>}
+     */
+    public static function classifyLocaleArtifactQualityIssues(string $html): array
+    {
+        $visible = self::visibleLocaleText($html);
+        $visibleLength = mb_strlen($visible, 'UTF-8');
+        $critical = [];
+        $advisory = [];
+
+        $leakCount = preg_match_all(self::LOCALE_LITERAL_LEAK_TOLERANT_PATTERN, $visible, $matches);
+        $leakCount = is_int($leakCount) ? $leakCount : 0;
+        if ($leakCount > 0) {
+            // Any leaked placeholder is a real bug — block. The Python
+            // provider's tolerant restorer should have erased these before
+            // returning, so a survivor here means structural breakage.
+            $critical[] = 'literal_placeholder_leak';
         }
 
         foreach (self::QUALITY_REPEAT_PATTERNS as $pattern) {
             if (preg_match($pattern, $visible) === 1) {
-                $issues[] = 'repeated_token_loop';
+                $critical[] = 'repeated_token_loop';
                 break;
             }
         }
@@ -1335,10 +1381,18 @@ final class DocumentLocaleAutomationService
         );
         $vietnameseChars = is_int($vietnameseChars) ? $vietnameseChars : 0;
         if ($vietnameseChars > 0) {
-            $issues[] = 'vietnamese_residue';
+            $fraction = $visibleLength > 0 ? $vietnameseChars / $visibleLength : 1.0;
+            if (
+                $vietnameseChars > self::LOCALE_RESIDUE_VN_CHAR_ABSOLUTE_LIMIT
+                || $fraction > self::LOCALE_RESIDUE_VN_CHAR_FRACTION_LIMIT
+            ) {
+                $critical[] = 'vietnamese_residue_severe';
+            } else {
+                $advisory[] = 'vietnamese_residue_minor';
+            }
         }
-        if ($residualMatches >= 3) {
-            $issues[] = 'excessive_vietnamese_residue';
+        if ($residualMatches >= self::LOCALE_RESIDUE_TERM_CRITICAL_THRESHOLD) {
+            $critical[] = 'excessive_vietnamese_residue';
         }
 
         $asciiResidualMatches = 0;
@@ -1349,32 +1403,46 @@ final class DocumentLocaleAutomationService
                 $asciiResidualMatches += $count;
             }
         }
-        if ($asciiResidualMatches >= 3) {
-            $issues[] = 'ascii_vietnamese_residue';
+        if ($asciiResidualMatches > 0) {
+            // ASCII residue is genuinely ambiguous — same string can be
+            // Vietnamese-without-diacritics OR a domain-specific token. Block
+            // only when the density is clearly an untranslated section.
+            $asciiDense = (
+                $asciiResidualMatches >= 10
+                || ($visibleLength > 0 && $asciiResidualMatches / $visibleLength > 0.001)
+            );
+            if ($asciiDense) {
+                $critical[] = 'ascii_vietnamese_residue';
+            } else {
+                $advisory[] = 'ascii_vietnamese_residue_minor';
+            }
         }
 
         foreach (self::MACHINE_ARTIFACT_NOISE_PATTERNS as $pattern) {
             if (preg_match($pattern, $visible) === 1) {
-                $issues[] = 'machine_artifact_noise';
+                $critical[] = 'machine_artifact_noise';
                 break;
             }
         }
 
         if (preg_match('/(?<![\p{L}\p{N}])%[A-Za-z](?![\p{L}\p{N}])/u', $visible) === 1) {
-            $issues[] = 'symbol_placeholder_noise';
+            $advisory[] = 'symbol_placeholder_noise';
         }
 
         if (preg_match('/\b(?:to|at|from|for|according to)<a\b/i', $html) === 1) {
-            $issues[] = 'anchor_prefix_spacing';
+            $advisory[] = 'anchor_prefix_spacing';
         }
         if (preg_match('/<\/a>(?:and|or|with|must|is|are|SOP|WI|ANNEX|FRM|POL|QMS-MAN)\b/i', $html) === 1) {
-            $issues[] = 'anchor_suffix_spacing';
+            $advisory[] = 'anchor_suffix_spacing';
         }
         if (preg_match('/\b(?:to|at|from|for|according to)(?:SOP|WI|ANNEX|FRM|POL|QMS-MAN)-\d+/i', $visible) === 1) {
-            $issues[] = 'document_code_spacing';
+            $advisory[] = 'document_code_spacing';
         }
 
-        return array_values(array_unique($issues));
+        return [
+            'critical' => array_values(array_unique($critical)),
+            'advisory' => array_values(array_unique($advisory)),
+        ];
     }
 
     private static function visibleLocaleText(string $html): string

@@ -177,12 +177,23 @@ PHP);
             . '<p>according to<a href="wi.html">WI-603</a>and close.</p>'
             . '</body></html>';
 
-        $issues = DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html);
+        $classification = DocumentLocaleAutomationService::classifyLocaleArtifactQualityIssues($html);
 
+        // Critical: structural breakage that must block publication.
+        $this->assertContains('repeated_token_loop', $classification['critical']);
+        // Two residual terms ("đánh giá", "nội bộ") in a short snippet push
+        // the residue fraction past the 0.5% gate, marking the artifact as
+        // structurally untrustworthy.
+        $this->assertContains('vietnamese_residue_severe', $classification['critical']);
+        // Cosmetic anchor-spacing problems are advisory: they do not block
+        // a machine_preview artifact, only get recorded in metadata.
+        $this->assertContains('anchor_prefix_spacing', $classification['advisory']);
+        $this->assertContains('anchor_suffix_spacing', $classification['advisory']);
+
+        // Backwards-compatible critical-only API surfaces only the blockers.
+        $issues = DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html);
         $this->assertContains('repeated_token_loop', $issues);
-        $this->assertContains('vietnamese_residue', $issues);
-        $this->assertContains('anchor_prefix_spacing', $issues);
-        $this->assertContains('anchor_suffix_spacing', $issues);
+        $this->assertNotContains('anchor_prefix_spacing', $issues);
     }
 
     public function testLocaleArtifactQualityGateAllowsCleanTechnicalCodes(): void
@@ -199,7 +210,11 @@ PHP);
     {
         $html = '<html lang="en"><body><span>Coach</span><span>đánh giá nội bộ</span><span>Escalation</span></body></html>';
 
-        $this->assertContains('vietnamese_residue', DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html));
+        // "đánh giá" + "nội bộ" → 2 residual terms; below the critical
+        // threshold (≥3) but well over 0.5% of the visible-text length, so
+        // the percentage gate flags it as severe.
+        $classification = DocumentLocaleAutomationService::classifyLocaleArtifactQualityIssues($html);
+        $this->assertContains('vietnamese_residue_severe', $classification['critical']);
     }
 
     public function testLocaleArtifactQualityGateDetectsShortCorruptionLoops(): void
@@ -211,15 +226,39 @@ PHP);
 
         $issues = DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html);
 
+        // Repeat-loop is always critical regardless of residue volume.
         $this->assertContains('repeated_token_loop', $issues);
-        $this->assertContains('vietnamese_residue', $issues);
     }
 
-    public function testLocaleArtifactQualityGateRejectsSingleVietnameseResidue(): void
+    public function testLocaleArtifactQualityGateAcceptsTinyVietnameseResidueAsAdvisory(): void
     {
+        // A long English document with one stray Vietnamese diacritic should
+        // pass the critical gate (publish as machine_preview) and only
+        // surface the residue as advisory metadata. Real-world artifacts
+        // routinely contain a single proper-name diacritic that the engine
+        // cannot translate; a binary gate makes the entire document unviewable.
+        $body = str_repeat(
+            '<p>Released data is verified before each shift and the operator '
+            . 'records evidence at the point of use, with traceability links '
+            . 'maintained through final inspection.</p>',
+            8
+        );
+        $html = '<html lang="en"><body>' . $body
+            . '<p>Approved by signatory gá Khanh.</p></body></html>';
+
+        $classification = DocumentLocaleAutomationService::classifyLocaleArtifactQualityIssues($html);
+        $this->assertSame([], $classification['critical']);
+        $this->assertContains('vietnamese_residue_minor', $classification['advisory']);
+    }
+
+    public function testLocaleArtifactQualityGateBlocksDenseVietnameseResidue(): void
+    {
+        // A short snippet that is mostly Vietnamese: the percentage gate
+        // (>0.5% of visible characters) classifies this as severe and blocks.
         $html = '<html lang="en"><body><p>The fixture gá is still untranslated.</p></body></html>';
 
-        $this->assertContains('vietnamese_residue', DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html));
+        $issues = DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html);
+        $this->assertContains('vietnamese_residue_severe', $issues);
     }
 
     public function testLocaleArtifactQualityGateRejectsSemanticMachineNoise(): void
@@ -229,10 +268,14 @@ PHP);
             . '<p>Use %d full request first time and occipital logic.</p>'
             . '</body></html>';
 
-        $issues = DocumentLocaleAutomationService::detectLocaleArtifactQualityIssues($html);
+        $classification = DocumentLocaleAutomationService::classifyLocaleArtifactQualityIssues($html);
 
-        $this->assertContains('machine_artifact_noise', $issues);
-        $this->assertContains('symbol_placeholder_noise', $issues);
+        // Machine-noise patterns are critical: they indicate the engine
+        // produced incoherent text that no reader should see.
+        $this->assertContains('machine_artifact_noise', $classification['critical']);
+        // Stray printf-style placeholders (e.g., "%d") are advisory: visible
+        // in metadata but not enough on their own to block a preview.
+        $this->assertContains('symbol_placeholder_noise', $classification['advisory']);
     }
 
     public function testLocaleArtifactQualityGateRejectsAsciiVietnameseResidue(): void
