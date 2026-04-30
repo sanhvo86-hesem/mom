@@ -62,4 +62,8 @@ return static function (Router $router, string $dataDir): void {
     // ── DCN — Document Change Notice ───────────────────────────────────────
     $router->post('/api/v1/dcc/change-notices',                                  DocumentControlController::class, 'issueDcn');
     $router->get ('/api/v1/dcc/change-notices/{dcn_id}',                         DocumentControlController::class, 'getDcn');
+
+    // ── Translation provider admin ─────────────────────────────────────────
+    $router->get ('/api/v1/dcc/admin/translation-provider',                      DocumentControlController::class, 'getTranslationProvider');
+    $router->post('/api/v1/dcc/admin/translation-provider',                      DocumentControlController::class, 'setTranslationProvider');
 };

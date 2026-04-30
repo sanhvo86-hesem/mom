@@ -6,6 +6,7 @@ namespace MOM\Api\Controllers;
 
 use MOM\Services\DocumentControl\DocumentControlService;
 use MOM\Services\DocumentControl\DocumentHeaderService;
+use MOM\Services\DocumentControl\DocumentLocaleAutomationService;
 use InvalidArgumentException;
 use RuntimeException;
 use Throwable;
@@ -483,5 +484,86 @@ final class DocumentControlController extends EqmsBaseController
             $this->error('dcc_invalid_input', 422, $e->getMessage());
         }
         $this->success(['action' => $actionName, 'header' => $result]);
+    }
+
+    // ── Translation provider admin ───────────────────────────────────────────
+
+    /**
+     * GET /api/v1/dcc/admin/translation-provider
+     *
+     * Returns the runtime translation-provider config so the admin UI can
+     * render the picker. Active provider lookup falls back through the same
+     * resolution order as the locale automation service: config file → env
+     * vars → "unconfigured".
+     */
+    public function getTranslationProvider(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+
+        $config = DocumentLocaleAutomationService::readTranslationProviderConfig($this->rootDir);
+        $envFallback = [
+            'driver' => trim((string)(getenv('DCC_TRANSLATION_DRIVER') ?: '')),
+            'command' => trim((string)(getenv('DCC_TRANSLATION_COMMAND') ?: '')),
+        ];
+
+        $this->success([
+            'config' => $config,
+            'env_fallback' => $envFallback,
+            'config_path' => 'mom/data/config/dcc-translation-config.json',
+        ]);
+    }
+
+    /**
+     * POST /api/v1/dcc/admin/translation-provider
+     * Body: { "active_provider": "argos" | "nllb" }
+     *
+     * Switches the active translation provider. Validates that the requested
+     * key exists in the config file and that the provider is marked
+     * available. Writes the file atomically.
+     */
+    public function setTranslationProvider(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+
+        $body = $this->jsonBody();
+        $requested = trim((string)($body['active_provider'] ?? ''));
+        if ($requested === '') {
+            $this->error('dcc_translation_provider_missing', 422, 'active_provider is required.');
+        }
+
+        $config = DocumentLocaleAutomationService::readTranslationProviderConfig($this->rootDir);
+        if ($config === null) {
+            $this->error('dcc_translation_config_missing', 500, 'Translation config file is missing or invalid.');
+        }
+        $providers = is_array($config['providers'] ?? null) ? $config['providers'] : [];
+        if (!isset($providers[$requested]) || !is_array($providers[$requested])) {
+            $this->error(
+                'dcc_translation_provider_unknown',
+                422,
+                'Unknown provider key: ' . $requested
+            );
+        }
+        if (($providers[$requested]['available'] ?? true) === false) {
+            $this->error(
+                'dcc_translation_provider_unavailable',
+                409,
+                'Provider is marked unavailable. Install the model first.'
+            );
+        }
+
+        $config['active_provider'] = $requested;
+        $config['updated_at'] = gmdate(DATE_ATOM);
+        $config['updated_by'] = $this->actor($user);
+
+        if (!DocumentLocaleAutomationService::writeTranslationProviderConfig($this->rootDir, $config)) {
+            $this->error('dcc_translation_config_write_failed', 500, 'Unable to persist provider selection.');
+        }
+
+        $this->success([
+            'active_provider' => $requested,
+            'config' => $config,
+        ]);
     }
 }

@@ -342,7 +342,7 @@ function normalizeRepoRelativePath(string $path): string
 function fetchLocaleVariant(DataLayer $data, string $docCode): array
 {
     $rows = $data->query(
-        "SELECT artifact_rel_path, artifact_source_hash_sha256, translation_state
+        "SELECT artifact_rel_path, artifact_source_hash_sha256, translation_state, translation_provider
          FROM dcc_document_locale_variant
          WHERE doc_code = :doc_code AND locale = 'en'
          LIMIT 1",
@@ -350,6 +350,45 @@ function fetchLocaleVariant(DataLayer $data, string $docCode): array
     ) ?? [];
     $row = $rows[0] ?? [];
     return is_array($row) ? $row : [];
+}
+
+/**
+ * Resolve the active provider's engine_label from the runtime config so we
+ * can detect provider drift on existing variants.
+ *
+ * Returns the empty string when the config is missing, malformed, has no
+ * `active_provider`, or the active provider entry is missing its
+ * `engine_label`. In all those cases the readiness check falls back to
+ * "skip the provider drift gate" — we never demote ready variants based on
+ * a config we cannot read.
+ */
+function activeTranslationProviderLabel(string $rootDir): string
+{
+    static $cached = null;
+    if ($cached !== null) {
+        return $cached;
+    }
+    $cached = '';
+    $configPath = rtrim($rootDir, '/') . '/mom/data/config/dcc-translation-config.json';
+    if (!is_file($configPath)) {
+        return $cached;
+    }
+    $raw = @file_get_contents($configPath);
+    if (!is_string($raw) || trim($raw) === '') {
+        return $cached;
+    }
+    $config = json_decode($raw, true);
+    if (!is_array($config)) {
+        return $cached;
+    }
+    $activeKey = trim((string)($config['active_provider'] ?? ''));
+    if ($activeKey === '') {
+        return $cached;
+    }
+    $providers = is_array($config['providers'] ?? null) ? $config['providers'] : [];
+    $entry = is_array($providers[$activeKey] ?? null) ? $providers[$activeKey] : [];
+    $cached = trim((string)($entry['engine_label'] ?? ''));
+    return $cached;
 }
 
 /**
@@ -365,6 +404,19 @@ function localeReadiness(string $rootDir, array $variant, string $sourceHash): a
     $variantHash = strtolower(trim((string)($variant['artifact_source_hash_sha256'] ?? '')));
     if ($variantHash === '' || !hash_equals($variantHash, $sourceHash)) {
         return ['ready' => false, 'reason' => 'source_hash_changed'];
+    }
+    // Provider drift: if the variant was authored by a different engine than
+    // the currently active provider, treat it as stale so the prewarm timer
+    // gradually re-translates the corpus under the new engine. Only enforced
+    // for `machine_preview`; reviewed / released variants are pinned (their
+    // English copy was human-approved against a specific engine version and
+    // should not be silently regenerated).
+    $activeLabel = activeTranslationProviderLabel($rootDir);
+    if ($activeLabel !== '' && $state === 'machine_preview') {
+        $variantProvider = trim((string)($variant['translation_provider'] ?? ''));
+        if ($variantProvider !== '' && !hash_equals($activeLabel, $variantProvider)) {
+            return ['ready' => false, 'reason' => 'provider_mismatch:' . $variantProvider . '->' . $activeLabel];
+        }
     }
     $artifactRelPath = normalizeRepoRelativePath((string)($variant['artifact_rel_path'] ?? ''));
     if ($artifactRelPath === '') {

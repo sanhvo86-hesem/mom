@@ -784,42 +784,147 @@ final class DocumentLocaleAutomationService
      */
     private function runConfiguredProvider(array $payload): array
     {
+        $resolution = $this->resolveActiveProviderCommand();
+        if (!$resolution['ok']) {
+            return [
+                'ok' => false,
+                'provider' => (string)($resolution['provider'] ?? 'unconfigured'),
+                'engine_version' => (string)($resolution['engine_version'] ?? 'unconfigured'),
+                'glossary_version' => $this->glossaryVersion(),
+                'reason' => (string)($resolution['reason'] ?? 'translation_provider_not_configured'),
+                'message' => (string)($resolution['message'] ?? 'No compliant internal translation provider is configured.'),
+            ];
+        }
+
+        return $this->runCommandProvider((string)$resolution['command'], $payload);
+    }
+
+    /**
+     * Resolve the currently-active translation provider command.
+     *
+     * Resolution order (first match wins):
+     *  1. Runtime config file `mom/data/config/dcc-translation-config.json`
+     *     — admin-toggleable provider selection. If `active_provider` names a
+     *     valid entry under `providers`, use that entry's `command`.
+     *  2. Legacy env-var pair `DCC_TRANSLATION_DRIVER` + `DCC_TRANSLATION_COMMAND`
+     *     — preserved for older deployments and for emergency override when
+     *     the config file is absent or malformed.
+     *
+     * @return array{ok: bool, command?: string, provider?: string, engine_version?: string, reason?: string, message?: string}
+     */
+    private function resolveActiveProviderCommand(): array
+    {
+        $config = self::readTranslationProviderConfig($this->rootDir);
+        if (is_array($config)) {
+            $activeKey = trim((string)($config['active_provider'] ?? ''));
+            $providers = is_array($config['providers'] ?? null) ? $config['providers'] : [];
+            if ($activeKey !== '' && isset($providers[$activeKey]) && is_array($providers[$activeKey])) {
+                $entry = $providers[$activeKey];
+                if (($entry['available'] ?? true) === false) {
+                    return [
+                        'ok' => false,
+                        'provider' => $activeKey,
+                        'engine_version' => 'provider_unavailable',
+                        'reason' => 'translation_provider_unavailable',
+                        'message' => sprintf(
+                            'Provider "%s" is configured but marked unavailable (model not installed?).',
+                            $activeKey
+                        ),
+                    ];
+                }
+                $command = trim((string)($entry['command'] ?? ''));
+                if ($command !== '') {
+                    return ['ok' => true, 'command' => $command, 'provider' => $activeKey];
+                }
+            }
+        }
+
         $driver = strtolower(trim((string)(getenv('DCC_TRANSLATION_DRIVER') ?: '')));
         if ($driver === '' || in_array($driver, ['disabled', 'off', 'none'], true)) {
             return [
                 'ok' => false,
                 'provider' => 'unconfigured',
                 'engine_version' => 'unconfigured',
-                'glossary_version' => $this->glossaryVersion(),
                 'reason' => 'translation_provider_not_configured',
                 'message' => 'No compliant internal translation provider is configured for DCC auto-translation.',
             ];
         }
-
         if ($driver !== self::DRIVER_COMMAND) {
             return [
                 'ok' => false,
                 'provider' => $driver,
                 'engine_version' => 'unsupported_driver',
-                'glossary_version' => $this->glossaryVersion(),
                 'reason' => 'translation_provider_driver_unsupported',
                 'message' => 'Configured DCC translation driver is unsupported.',
             ];
         }
-
         $command = trim((string)(getenv('DCC_TRANSLATION_COMMAND') ?: ''));
         if ($command === '') {
             return [
                 'ok' => false,
                 'provider' => 'command',
                 'engine_version' => 'unconfigured_command',
-                'glossary_version' => $this->glossaryVersion(),
                 'reason' => 'translation_command_missing',
                 'message' => 'DCC_TRANSLATION_COMMAND is not configured.',
             ];
         }
+        return ['ok' => true, 'command' => $command, 'provider' => 'env_command'];
+    }
 
-        return $this->runCommandProvider($command, $payload);
+    /**
+     * Read the runtime translation-provider config file.
+     *
+     * Returns null if the file is missing or malformed — callers fall back to
+     * env-var configuration in that case.
+     *
+     * @return array<string, mixed>|null
+     */
+    public static function readTranslationProviderConfig(string $rootDir): ?array
+    {
+        $path = self::translationProviderConfigPath($rootDir);
+        if (!is_file($path)) {
+            return null;
+        }
+        $raw = @file_get_contents($path);
+        if (!is_string($raw) || trim($raw) === '') {
+            return null;
+        }
+        $decoded = json_decode($raw, true);
+        return is_array($decoded) ? $decoded : null;
+    }
+
+    /**
+     * Atomically write the runtime translation-provider config file.
+     *
+     * @param array<string, mixed> $config
+     */
+    public static function writeTranslationProviderConfig(string $rootDir, array $config): bool
+    {
+        $path = self::translationProviderConfigPath($rootDir);
+        $dir = dirname($path);
+        if (!is_dir($dir) && !@mkdir($dir, 0775, true) && !is_dir($dir)) {
+            return false;
+        }
+        $encoded = json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        if (!is_string($encoded)) {
+            return false;
+        }
+        $tmp = $path . '.tmp.' . bin2hex(random_bytes(4));
+        if (@file_put_contents($tmp, $encoded . "\n", LOCK_EX) === false) {
+            return false;
+        }
+        if (!@rename($tmp, $path)) {
+            @unlink($tmp);
+            return false;
+        }
+        @chmod($path, 0664);
+        return true;
+    }
+
+    private static function translationProviderConfigPath(string $rootDir): string
+    {
+        $root = rtrim(str_replace('\\', '/', $rootDir), '/');
+        return $root . '/mom/data/config/dcc-translation-config.json';
     }
 
     /**
@@ -1713,6 +1818,31 @@ final class DocumentLocaleAutomationService
         return $variantHash !== '' && hash_equals($variantHash, $sourceHash);
     }
 
+    /**
+     * Resolve the active provider's `engine_label` from the on-disk config.
+     *
+     * Used by the artifact-reuse gate to decide whether an existing variant
+     * was authored by the same engine the system would pick today. Returns
+     * the empty string when the config is absent / malformed / has no
+     * `active_provider` — callers must treat the empty string as "skip the
+     * provider drift check," because we never want to silently regenerate
+     * artifacts based on a config we cannot read.
+     */
+    private function activeProviderEngineLabel(): string
+    {
+        $config = self::readTranslationProviderConfig($this->rootDir);
+        if (!is_array($config)) {
+            return '';
+        }
+        $activeKey = trim((string)($config['active_provider'] ?? ''));
+        if ($activeKey === '') {
+            return '';
+        }
+        $providers = is_array($config['providers'] ?? null) ? $config['providers'] : [];
+        $entry = is_array($providers[$activeKey] ?? null) ? $providers[$activeKey] : [];
+        return trim((string)($entry['engine_label'] ?? ''));
+    }
+
     private function isRenderableVariantState(string $state): bool
     {
         return in_array(
@@ -1742,6 +1872,21 @@ final class DocumentLocaleAutomationService
     ): ?array {
         if (!$this->existingVariantMatchesCurrentSource($existingVariant, $dccRevision, $sourceHash)) {
             return null;
+        }
+
+        // Provider drift: if the active translation provider has changed since
+        // the existing artifact was authored, do NOT reuse it — we want every
+        // `machine_preview` artifact in the corpus to be authored by the
+        // currently-active engine. Reviewed / released variants are pinned
+        // (their English copy was human-approved against a specific engine
+        // version) and stay reused.
+        $existingState = $this->normaliseVariantState((string)($existingVariant['translation_state'] ?? ''), 'missing');
+        if ($existingState === 'machine_preview') {
+            $activeLabel = $this->activeProviderEngineLabel();
+            $variantProvider = trim((string)($existingVariant['translation_provider'] ?? ''));
+            if ($activeLabel !== '' && $variantProvider !== '' && !hash_equals($activeLabel, $variantProvider)) {
+                return null;
+            }
         }
 
         $existingArtifactPath = $this->normalizeRepoRelativePath((string)($existingVariant['artifact_rel_path'] ?? ''));

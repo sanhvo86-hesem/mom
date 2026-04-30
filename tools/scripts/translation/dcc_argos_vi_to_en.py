@@ -99,7 +99,16 @@ SKIP_TAGS = {
     "script",
     "style",
     "noscript",
-    "code",
+    # NOTE: `<code>` was in this set historically because it usually wraps
+    # source-code or identifiers that must not be translated. In this QMS
+    # codebase, however, `<code>` is overloaded to wrap inline KPI formulas
+    # such as "(Số hành động đóng đúng hạn / Tổng hành động) * 100" — the
+    # Vietnamese inside genuinely needs translation, while the math operators
+    # (/, *, parens, integers) are passed through untouched by NLLB. Keeping
+    # `<pre>` skipped covers the genuine pre-formatted code blocks. If a real
+    # source-code identifier ever appears inside an inline `<code>`, the
+    # PROTECTED_LITERAL_PATTERNS allowlist (ISO/SOP/ANNEX/JOB ids, role codes,
+    # etc.) will preserve it.
     "pre",
     "textarea",
     "svg",
@@ -233,8 +242,189 @@ CORE_PHRASES: List[Tuple[str, str]] = [
     ("mẫu", "sample"),
     ("phó", "deputy"),
     ("gá", "fixture"),
+    ("đúng hạn", "on time"),
     ("đúng", "correct"),
     ("thiếu", "missing"),
+    # ASCII Vietnamese variants for documents authored without diacritics.
+    # NLLB does not translate diacritic-stripped Vietnamese reliably; we map
+    # the most common QMS authoring tokens directly so the glossary protector
+    # short-circuits the translation engine for these phrases.
+    ("Tai lieu tham chieu", "Reference documents"),
+    ("tai lieu tham chieu", "reference documents"),
+    ("noi dung hoan chinh", "complete content"),
+    ("Da hoan thanh", "Completed"),
+    ("da hoan thanh", "completed"),
+    ("Bieu mau Excel", "Excel form"),
+    ("bieu mau Excel", "Excel form"),
+    ("Bieu mau", "Form"),
+    ("bieu mau", "form"),
+    ("Tai lieu", "Document"),
+    ("tai lieu", "document"),
+    ("Pham vi", "Scope"),
+    ("pham vi", "scope"),
+    ("Muc dich", "Purpose"),
+    ("muc dich", "purpose"),
+    ("Ap dung cho tat ca", "Applies to all"),
+    ("ap dung cho tat ca", "applies to all"),
+    ("Ap dung khi", "Applies when"),
+    ("ap dung khi", "applies when"),
+    ("hoan chinh", "complete"),
+    ("noi dung", "content"),
+    ("San xuat", "Production"),
+    ("san xuat", "production"),
+    ("Ky thuat", "Engineering"),
+    ("ky thuat", "engineering"),
+    ("Chat luong", "Quality"),
+    ("chat luong", "quality"),
+    ("Chuoi cung ung", "Supply Chain"),
+    ("chuoi cung ung", "supply chain"),
+    ("Kinh doanh", "Sales"),
+    ("kinh doanh", "sales"),
+    ("phong ban", "department"),
+    ("Hang muc", "Item"),
+    ("hang muc", "item"),
+    ("So luong", "Quantity"),
+    ("so luong", "quantity"),
+    ("Tinh trang", "Status"),
+    ("tinh trang", "status"),
+    ("San sang trien khai", "ready for deployment"),
+    ("san sang trien khai", "ready for deployment"),
+    ("Quy trinh", "Procedure"),
+    ("quy trinh", "procedure"),
+    ("Huong dan cong viec", "Work Instruction"),
+    ("huong dan cong viec", "work instruction"),
+    # KPI formula vocabulary for `<code>`-wrapped expressions in
+    # competency-metrics.html — these used to be skipped because `<code>` was
+    # in SKIP_TAGS; they now flow through translation but glossary protection
+    # gives a deterministic English equivalent for the load-bearing phrases.
+    ("đóng đúng hạn", "closed on time"),
+    ("Lô nhận đúng", "Lot received correctly"),
+    ("lô nhận đúng", "lot received correctly"),
+    ("Lô giao hàng đúng", "Delivery lot correct"),
+    ("lô giao hàng đúng", "delivery lot correct"),
+    ("Tổng lô giao hàng", "Total delivery lots"),
+    ("tổng lô giao hàng", "total delivery lots"),
+    ("Tổng lô", "Total lots"),
+    ("tổng lô", "total lots"),
+    ("Tổng hành động", "Total actions"),
+    ("tổng hành động", "total actions"),
+    ("Tổng nhiệm vụ", "Total tasks"),
+    ("tổng nhiệm vụ", "total tasks"),
+    ("Tổng job", "Total jobs"),
+    ("tổng job", "total jobs"),
+    ("Tổng lỗi", "Total defects"),
+    ("tổng lỗi", "total defects"),
+    ("Tổng CAPA", "Total CAPAs"),
+    ("tổng CAPA", "total CAPAs"),
+    ("nhiệm vụ đúng hạn", "tasks on time"),
+    ("Nhiệm vụ đúng hạn", "Tasks on time"),
+    ("Bộ hồ sơ công việc đầy đủ", "Complete work record set"),
+    ("bộ hồ sơ công việc đầy đủ", "complete work record set"),
+    ("Lỗi phát hiện nội bộ", "Internally-detected defects"),
+    ("lỗi phát hiện nội bộ", "internally-detected defects"),
+    ("Chấm theo tiêu chí đánh giá", "Score per evaluation criteria"),
+    ("chấm theo tiêu chí đánh giá", "score per evaluation criteria"),
+    ("Đếm # lỗi hồ sơ được ghi nhận", "Count of recorded record defects"),
+    ("đếm # lỗi hồ sơ được ghi nhận", "count of recorded record defects"),
+    ("Đếm # thiếu / bỏ sót", "Count of missing / omitted"),
+    ("đếm # thiếu / bỏ sót", "count of missing / omitted"),
+    ("Số hành động", "Number of actions"),
+    ("số hành động", "number of actions"),
+    ("Hành động", "Action"),
+    ("hành động", "action"),
+    # Additional ASCII Vietnamese coverage for ANNEX-119 (change roadmap with
+    # heavy diacritic-stripped authoring). These are the densest residue
+    # contributors observed in production output. Each catches a distinct
+    # context — order is irrelevant because the loader sorts by phrase length
+    # (longest first) so multi-word phrases match before their substrings.
+    ("noi dung hoan chinh", "complete content"),
+    ("noi dung", "content"),
+    ("Noi dung", "Content"),
+    ("Ap dung", "Apply"),
+    ("ap dung", "apply"),
+    ("dung khi", "use when"),
+    ("khong day du", "incomplete"),
+    ("khong co", "no"),
+    ("khong dong bo", "not synchronized"),
+    ("khong", "not"),
+    ("Khong", "Not"),
+    ("danh gia phat hien", "evaluate detection"),
+    ("Danh gia", "Evaluation"),
+    ("danh gia", "evaluation"),
+    ("phong ngua", "prevention"),
+    ("Phong ngua", "Prevention"),
+    ("kiem soat", "control"),
+    ("Kiem soat", "Control"),
+    ("Bang chung", "Evidence"),
+    ("bang chung", "evidence"),
+    ("Lo trinh", "Roadmap"),
+    ("lo trinh", "roadmap"),
+    ("Phai", "Must"),
+    ("phai", "must"),
+    ("Thieu", "Missing"),
+    ("thieu", "missing"),
+    ("bo sot", "omitted"),
+    ("Bo sot", "Omitted"),
+    ("Mau", "Sample"),
+    ("mau", "sample"),
+    ("Lo", "Lot"),
+    ("lo", "lot"),
+    ("Ho so", "Record"),
+    ("ho so", "record"),
+    ("noi bo", "internal"),
+    ("Noi bo", "Internal"),
+    ("Quyen dung", "Stop authority"),
+    ("quyen dung", "stop authority"),
+    ("Cap nhat", "Update"),
+    ("cap nhat", "update"),
+    ("Hoan thanh", "Complete"),
+    ("hoan thanh", "complete"),
+    ("Trien khai", "Deploy"),
+    ("trien khai", "deploy"),
+    ("Chuan bi", "Prepare"),
+    ("chuan bi", "prepare"),
+    ("Dong bo", "Synchronize"),
+    ("dong bo", "synchronize"),
+    ("On dinh", "Stabilize"),
+    ("on dinh", "stabilize"),
+    ("Chung nhan", "Certification"),
+    ("chung nhan", "certification"),
+    ("Quan ly", "Manage"),
+    ("quan ly", "manage"),
+    ("rui ro", "risk"),
+    ("Rui ro", "Risk"),
+    ("van hanh", "operate"),
+    ("Van hanh", "Operate"),
+    ("Lap ke hoach", "Plan"),
+    ("lap ke hoach", "plan"),
+    ("Nguoi thuc hien", "Owner"),
+    ("nguoi thuc hien", "owner"),
+    ("Thoi gian", "Time"),
+    ("thoi gian", "time"),
+    ("giai doan", "phase"),
+    ("Giai doan", "Phase"),
+    ("Cau hinh", "Configuration"),
+    ("cau hinh", "configuration"),
+    ("Tuan", "Week"),
+    ("Cap", "Level"),
+    ("cap", "level"),
+    ("Ma", "Code"),
+    ("ma ", "code "),
+    ("Doc", "Read"),
+    ("Tat ca", "All"),
+    ("tat ca", "all"),
+    ("Nhung", "But"),
+    ("nhung", "but"),
+    ("Hieu luc", "Effective"),
+    ("hieu luc", "effective"),
+    ("dac biet", "specific"),
+    ("Dac biet", "Specific"),
+    ("Nhom", "Group"),
+    ("nhom", "group"),
+    ("Lan dau", "First time"),
+    ("lan dau", "first time"),
+    ("Cho", "For"),
+    ("cho ", "for "),
     ("thiết lập", "Establish"),
     ("điều hành chạy máy CNC", "operate CNC machines"),
     ("gia công CNC", "CNC machining"),
@@ -431,12 +621,16 @@ ASCII_RESIDUAL_VIETNAMESE_TERMS = [
     "ga",
 ]
 QUALITY_REPEAT_PATTERNS = [
-    # Generic engine-loop detector: a real word (must contain a letter or
-    # digit, not pure underscores/punctuation) repeated 4+ times in a row.
-    # The previous pattern used \w which matches "_", so form-template
-    # placeholders like "__________ __________ __________" were misclassified
-    # as engine corruption.
-    re.compile(r"\b((?=[\wÀ-ỹ]*[\dA-Za-zÀ-ỹ])[\wÀ-ỹ]{2,})(?:\s+\1\b){3,}", re.I),
+    # Generic engine-loop detector: a real word repeated 4+ times in a row.
+    # We require the token to contain at least TWO alphabetic characters
+    # (letters, optionally with diacritics), which avoids false positives
+    # from legitimate matrix-cell codes like "L1 L1 L1 L1 L1" (5 employees
+    # at level L1) or "C11 C11 ..." that compose long competency tables.
+    # Real engine loops always involve real words ("hóa hóa hóa", "Re Re Re",
+    # "discovery discovery discovery"), so the 2-letter floor is the right
+    # discriminator. Also still excludes pure underscore/digit runs because
+    # those carry no alphabetic chars.
+    re.compile(r"\b([\wÀ-ỹ]*[A-Za-zÀ-ỹ][\wÀ-ỹ]*[A-Za-zÀ-ỹ][\wÀ-ỹ]*)(?:\s+\1\b){3,}", re.I),
     re.compile(r"\bhóa(?:\s+hóa){1,}\b", re.I),
     re.compile(r"\bphó(?:\s+phó){1,}\b", re.I),
     re.compile(r"\bRe(?:\s+Re){1,}\b"),
@@ -448,10 +642,11 @@ QUALITY_REPEAT_PATTERNS = [
 # Pre-publish auto-fix for the most common Argos failure: the engine
 # emits the same word 4+ times in a row. We collapse the run to a single
 # instance so the artifact is publishable instead of failing the gate.
-# Limited to alphanumeric tokens 2+ chars to avoid touching legitimate
-# patterns like "5 5 5 5" in a numeric column or "__ __ __" form fillers.
+# Limited to tokens containing 2+ alphabetic characters so we skip both
+# numeric column fillers ("5 5 5 5"), form-blank placeholders ("__ __ __"),
+# and legitimate alphanumeric matrix codes ("L1 L1 L1 L1 L1", "P0 P0 P0 P0").
 ENGINE_REPEAT_AUTOFIX_RE = re.compile(
-    r"\b((?=[\wÀ-ỹ]*[A-Za-zÀ-ỹ])[\wÀ-ỹ]{2,})(?:\s+\1\b){3,}",
+    r"\b([\wÀ-ỹ]*[A-Za-zÀ-ỹ][\wÀ-ỹ]*[A-Za-zÀ-ỹ][\wÀ-ỹ]*)(?:\s+\1\b){3,}",
     re.I,
 )
 MACHINE_ARTIFACT_NOISE_PATTERNS = [
@@ -784,8 +979,25 @@ def glossary_only_translate(text: str) -> str:
 def build_translation_plan(text: str):
     if normalize_phrase(text) == "":
         return None
-    if not VIETNAMESE_CHAR_RE.search(text):
-        return None
+    has_diacritic_vn = bool(VIETNAMESE_CHAR_RE.search(text))
+    # ASCII Vietnamese fast-path: documents authored without diacritics
+    # (common in change-roadmap and planning notes — see ANNEX-119) used to
+    # be skipped entirely here because the cheap diacritic check returned
+    # False. We now ALSO accept segments that contain at least one entry
+    # from the ASCII residual term list, so the glossary protection layer
+    # gets a chance to substitute deterministic English equivalents that
+    # we have curated in CORE_PHRASES (Pham vi → Scope, noi dung → content,
+    # khong → not, …). NLLB's role is reduced to "translate whatever survives
+    # protection," which for ASCII Vietnamese is usually filler conjunctions
+    # we are happy to leave near-as-is in machine_preview state.
+    has_ascii_vn = False
+    if not has_diacritic_vn:
+        for term in ASCII_RESIDUAL_VIETNAMESE_TERMS:
+            if re.search(rf"(?<![A-Za-z]){re.escape(term)}(?![A-Za-z])", text, re.I):
+                has_ascii_vn = True
+                break
+        if not has_ascii_vn:
+            return None
     literals: Dict[str, str] = {}
     next_index = [0]
     protected = protect_glossary_phrases(text, literals, next_index)

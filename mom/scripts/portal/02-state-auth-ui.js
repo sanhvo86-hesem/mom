@@ -676,6 +676,7 @@ function moduleAccessAdminTabCatalog(){
     {id:'version_control', group:'operations', icon:'🔄', labelEn:'Version control', labelVi:'Điều khiển phiên bản', noteEn:'Git synchronization and release hygiene.', noteVi:'Đồng bộ Git và vệ sinh phát hành.', defaultAccess:'admin'},
     {id:'mfa', group:'security', icon:'🔑', labelEn:'MFA security', labelVi:'Bảo mật MFA', noteEn:'MFA policy and enrollment status.', noteVi:'Chính sách MFA và trạng thái kích hoạt.', defaultAccess:'admin'},
     {id:'ai_control', group:'operations', icon:'🤖', labelEn:'AI Control', labelVi:'Điều khiển AI', noteEn:'AI engine on/off, model selection, feature toggles, usage and cost tracking.', noteVi:'Bật/tắt AI engine, chọn model, tính năng, theo dõi sử dụng và chi phí.', defaultAccess:'admin'},
+    {id:'translation_provider', group:'operations', icon:'🌐', labelEn:'Translation Provider', labelVi:'Engine Dịch Thuật', noteEn:'Switch between Argos and NLLB-200 translation engines for English locale artifacts.', noteVi:'Chuyển đổi giữa Argos và NLLB-200 cho artifact tiếng Anh.', defaultAccess:'admin'},
     {id:'appearance', group:'content', icon:'🎨', labelEn:'Appearance', labelVi:'Giao diện', noteEn:'Portal design system and theme settings.', noteVi:'Thiết lập giao diện và design system.', defaultAccess:'admin'}
   ];
 }
@@ -6332,6 +6333,7 @@ function renderAdmin(){
   if(adminTab==='manual_runtime') renderAdminManualRuntime();
   if(adminTab==='data_sources') renderAdminDataSources();
   if(adminTab==='metadata_studio') renderAdminMetadataStudio();
+  if(adminTab==='translation_provider') renderAdminTranslationProviderTab();
   if(adminTab==='version_control') renderAdminVersionControl();
   if(adminTab==='portal_display'){
     renderAdminPortalDisplay();
@@ -6341,6 +6343,24 @@ function renderAdmin(){
   if(adminTab==='mfa') renderAdminMfa();
   if(adminTab==='ai_control') renderAdminAiControl();
   if(adminTab==='appearance') renderAdminAppearance();
+}
+
+/* ── Admin: Translation Provider Tab (lazy-loaded) ──────────────────────── */
+function renderAdminTranslationProviderTab(){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+  if(typeof window.renderAdminTranslationProvider === 'function'){
+    window.renderAdminTranslationProvider(el);
+    return;
+  }
+  el.innerHTML = '<div class="hm-empty">'+(lang==='en'?'Loading translation provider...':'Đang tải engine dịch thuật...')+'</div>';
+  var existing = document.getElementById('admin-translation-provider-script');
+  if(existing){ existing.remove(); }
+  var s = document.createElement('script');
+  s.id  = 'admin-translation-provider-script';
+  s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00e-admin-translation-provider.js?v=' + (window.APP_VERSION || Date.now());
+  s.onload = function(){ if(typeof window.renderAdminTranslationProvider === 'function') window.renderAdminTranslationProvider(el); };
+  document.head.appendChild(s);
 }
 
 /* ── Admin: AI Control Tab ───────────────────────────────────────────────── */
