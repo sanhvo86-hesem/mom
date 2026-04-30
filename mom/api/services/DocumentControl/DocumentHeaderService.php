@@ -194,25 +194,117 @@ final class DocumentHeaderService
         $momRoot = dirname(__DIR__, 3);
         $rows = [];
 
-        $scanCache = $this->readJsonFile($momRoot . '/data/scan_cache.json');
-        if (isset($scanCache['docs']) && is_array($scanCache['docs'])) {
-            foreach ($scanCache['docs'] as $row) {
-                if (is_array($row)) {
-                    $rows[] = $row;
-                }
-            }
+        $this->appendJsonDocumentRows($rows, $momRoot . '/data/scan_cache.json');
+        $this->appendJsonDocumentRows($rows, $momRoot . '/data/config/docs_custom.local.json');
+        $this->appendJsonDocumentRows($rows, $momRoot . '/data/config/docs_custom.json');
+
+        foreach ($this->legacyDccBootstrapRows($momRoot . '/docs') as $row) {
+            $rows[] = $row;
         }
 
-        $customDocs = $this->readJsonFile($momRoot . '/data/config/docs_custom.json');
-        if (array_is_list($customDocs)) {
-            foreach ($customDocs as $row) {
-                if (is_array($row)) {
-                    $rows[] = $row;
-                }
+        return $rows;
+    }
+
+    /**
+     * @param list<array<string, mixed>> $rows
+     */
+    private function appendJsonDocumentRows(array &$rows, string $path): void
+    {
+        $payload = $this->readJsonFile($path);
+        $docs = isset($payload['docs']) && is_array($payload['docs']) ? $payload['docs'] : $payload;
+        if (!array_is_list($docs)) {
+            return;
+        }
+
+        foreach ($docs as $row) {
+            if (is_array($row)) {
+                $rows[] = $row;
+            }
+        }
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function legacyDccBootstrapRows(string $docsRoot): array
+    {
+        if (!is_dir($docsRoot)) {
+            return [];
+        }
+
+        $rows = [];
+        $iterator = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($docsRoot, \FilesystemIterator::SKIP_DOTS)
+        );
+
+        foreach ($iterator as $fileInfo) {
+            if (!$fileInfo instanceof \SplFileInfo || !$fileInfo->isFile()) {
+                continue;
+            }
+            if (strtolower($fileInfo->getExtension()) !== 'html') {
+                continue;
+            }
+
+            $html = @file_get_contents($fileInfo->getPathname());
+            if (!is_string($html) || $html === '') {
+                continue;
+            }
+
+            $seed = $this->dccBootstrapHeader($html);
+            $code = DocumentControlService::canonicalizeCode((string)($seed['doc_code'] ?? ''));
+            if ($code === '' && preg_match('/data-dcc-doc-code=["\']([^"\']+)["\']/i', $html, $m) === 1) {
+                $code = DocumentControlService::canonicalizeCode((string)$m[1]);
+            }
+            if ($code === '') {
+                continue;
+            }
+
+            $title = trim((string)($seed['title'] ?? ''));
+            if ($title === '') {
+                $title = $this->fallbackHtmlTitle($html, $code);
+            }
+
+            $subtitle = trim((string)($seed['subtitle'] ?? ''));
+            if ($title !== '' || $subtitle !== '') {
+                $rows[] = [
+                    'code' => $code,
+                    'title' => $title,
+                    'description' => $subtitle,
+                ];
             }
         }
 
         return $rows;
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function dccBootstrapHeader(string $html): array
+    {
+        if (preg_match('/data-dcc-bootstrap=(["\'])(.*?)\1/isu', $html, $m) !== 1) {
+            return [];
+        }
+
+        $raw = html_entity_decode((string)$m[2], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $decoded = json_decode($raw, true);
+        if (!is_array($decoded) || !is_array($decoded['header'] ?? null)) {
+            return [];
+        }
+
+        return $decoded['header'];
+    }
+
+    private function fallbackHtmlTitle(string $html, string $code): string
+    {
+        if (preg_match('/<title[^>]*>(.*?)<\/title>/isu', $html, $m) !== 1) {
+            return '';
+        }
+
+        $title = trim(strip_tags(html_entity_decode((string)$m[1], ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+        $title = preg_replace('/\s*\|\s*HESEM MOM\s*$/i', '', $title) ?? $title;
+        $title = preg_replace('/^' . preg_quote($code, '/') . '\s*[-—–]\s*/i', '', $title) ?? $title;
+        return trim($title);
     }
 
     /**
