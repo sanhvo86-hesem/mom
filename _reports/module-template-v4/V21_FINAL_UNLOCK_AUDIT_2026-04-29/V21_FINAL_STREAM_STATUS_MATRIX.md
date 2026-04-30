@@ -1,0 +1,12 @@
+# V21 Final Stream Status Matrix
+
+| stream | historical_report_decision | current_local_evidence | pass_warning_blocker | repair_required | owner_path | next_action |
+| --- | --- | --- | --- | --- | --- | --- |
+| CAPA Slice 4 | `CAPA_SLICE4_PASS_WITH_WARNINGS` | Chromium full suite passed; CAPA route, tab, degraded, conflict, partial-access, and read-only shell coverage passed within the 491-test replay. | PASS | No CAPA source repair required by this audit. | HMV4 quality stream owner | Reconfirm after backend repair is integrated to current `main`. |
+| NQCASE live API toggle | `LIVE_API_TOGGLE_NQCASE_PASS_WITH_WARNINGS` | Chromium live-api tests passed; portal fixture guard passed; no production fixture 74 load. | PASS | No NQCASE repair required by this audit. | HMV4 live-api toggle owner | Reconfirm on clean current `main`. |
+| Transactional REST C2 | `TRANSACTIONAL_REST_PASS_WITH_WARNINGS` | Focused contract replay passed: 36 tests, 153 assertions. | PASS | No C2 repair required by this audit. | Backend transactional REST owner | Reconfirm on clean current `main`. |
+| Cross-browser / Chromium | Historical `CROSS_BROWSER_FAIL_BLOCK_NEXT`, later environment replay passed after browser install | Full Chromium replay passed: 491 tests, `CHROMIUM_EXIT=0`; no visual drift reproduced. | PASS | No snapshot repair required. | QA / DevEx owner | Keep Chromium installed; replay on clean current `main`. |
+| Current portal safety | V21 static safety expected | Node syntax guards, fixture production-load guard, forbidden/current portal diff guard, fixture JSON parse all passed. | PASS | None. | Portal safety owner | Preserve no-fixture-production-load rule. |
+| Backend analyse/test/check | Backend repair prompt previously reported pass | PHPStan analyse passed, PHPUnit suite passed, composer check passed. | PASS | Backend source repair exists but is not integrated into current `main`. | Backend repair integrator | Commit/integrate repair branch, then rerun final audit on main. |
+| Playwright full Chromium E2E | Environment replay target | `491 passed (2.8m)`, `CHROMIUM_EXIT=0`. | PASS | None for Chromium. | QA / DevEx owner | Reconfirm after current-main integration. |
+| Final current-main unlock | Required by Prompt 03 | Current branch is `codex/v21-backend-gate-repair-20260429`, `HEAD` differs from `origin/main`, and six backend controller files remain modified. | BLOCKER | Yes, integration/replay required before Stage F unlock. | Release gate owner | Do not unlock Stage F until a clean current-main final audit passes. |

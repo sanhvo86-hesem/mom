@@ -134,7 +134,8 @@ class EqmsFaiController extends EqmsBaseController
             $params[':part']       = '%' . $q['filters']['part_number'] . '%';
         }
         if (!empty($q['filters']['internal_part'])) {
-            $conditions[] = 'internal_part = ' . ($q['filters']['internal_part'] ? 'TRUE' : 'FALSE');
+            $internalPart = filter_var($q['filters']['internal_part'], FILTER_VALIDATE_BOOLEAN);
+            $conditions[] = 'internal_part = ' . ($internalPart ? 'TRUE' : 'FALSE');
         }
 
         $where   = implode(' AND ', $conditions);

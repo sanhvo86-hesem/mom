@@ -74,9 +74,7 @@ class EqmsEventsController extends BaseController
     public function stream(): never
     {
         // --- Auth ----------------------------------------------------------------
-        if (!$this->isLoggedIn()) {
-            $this->sendSseError(401, 'Unauthorized'); // @phpstan-ignore-line
-        }
+        $user = $this->requireAuth();
 
         // --- Accept negotiation --------------------------------------------------
         $accept = $_SERVER['HTTP_ACCEPT'] ?? '';
@@ -92,7 +90,7 @@ class EqmsEventsController extends BaseController
         $moduleFilter      = $this->parseModuleFilter($_GET['modules'] ?? '');
         $recordIdFilter    = trim($_GET['record_id'] ?? '');
         $lastEventId       = $_SERVER['HTTP_LAST_EVENT_ID'] ?? ($_GET['lastEventId'] ?? '');
-        $userId            = $this->getUserId();
+        $userId            = $this->getUserId($user);
 
         // --- SSE headers ---------------------------------------------------------
         @ob_end_clean();
@@ -179,18 +177,18 @@ class EqmsEventsController extends BaseController
                     break;
                 }
 
-                if ($message->kind !== 'message') {
+                if (($message['kind'] ?? null) !== 'message') {
                     continue;
                 }
 
-                $payload = json_decode($message->payload, true);
+                $payload = json_decode((string)($message['payload'] ?? ''), true);
                 if (!is_array($payload)) {
                     continue;
                 }
 
                 // Module filter
                 if ($moduleFilter && isset($payload['record_type'])) {
-                    $recordType = strtolower($payload['record_type']);
+                    $recordType = strtolower((string)$payload['record_type']);
                     if (!in_array($recordType, $moduleFilter, true)) {
                         continue;
                     }
@@ -204,13 +202,13 @@ class EqmsEventsController extends BaseController
                 }
 
                 // Notification channel — only send to target user/roles
-                if (str_ends_with($message->channel, 'realtime:notifications')) {
+                if (str_ends_with((string)($message['channel'] ?? ''), 'realtime:notifications')) {
                     if (!$this->isNotificationForUser($payload, $userId)) {
                         continue;
                     }
                 }
 
-                $eventType = $payload['type'] ?? 'update';
+                $eventType = (string)($payload['type'] ?? 'update');
                 $eventId   = $this->makeEventId(++$eventSeq, $now);
 
                 $this->sseEvent($eventType, $payload, $eventId);
@@ -362,25 +360,11 @@ class EqmsEventsController extends BaseController
         flush();
     }
 
-    /**
-     * Emit an error event and terminate the stream.
-     */
-    private function sendSseError(int $httpStatus, string $message): never
-    {
-        http_response_code($httpStatus);
-        header('Content-Type: text/event-stream; charset=utf-8');
-        header('Cache-Control: no-cache');
-        echo "event: error\n";
-        echo 'data: ' . json_encode(['message' => $message, 'code' => $httpStatus]) . "\n\n";
-        flush();
-        exit;
-    }
-
     // ── Session Helpers (thin wrappers around base class) ────────────────────
 
-    private function getUserId(): int|string|null
+    private function getUserId(array $user): int|string|null
     {
-        return $_SESSION['user_id'] ?? null;
+        return $_SESSION['user_id'] ?? $user['id'] ?? $user['username'] ?? $user['user'] ?? null;
     }
 
     private function getUserRoles(): array

@@ -1,0 +1,71 @@
+{
+  "schema": "v21_backend_gate_repair_summary",
+  "report_directory_date": "2026-04-29",
+  "executed_at": "2026-04-30T11:23:55+0700",
+  "branch": "codex/v21-backend-gate-repair-20260429",
+  "base_commit": "d555d0d5a7c16df083d1a7e173b9ad97a9402e45",
+  "origin_main": "d555d0d5a7c16df083d1a7e173b9ad97a9402e45",
+  "posture": "V21 gate repair only; no Stage F instantiation",
+  "source_changes": [
+    "mom/api/controllers/EqmsAmlController.php",
+    "mom/api/controllers/EqmsCsatController.php",
+    "mom/api/controllers/EqmsEventsController.php",
+    "mom/api/controllers/EqmsFaiController.php",
+    "mom/api/controllers/EqmsLessonsLearnedController.php",
+    "mom/api/controllers/EqmsSamplingPlansController.php"
+  ],
+  "forbidden_frontend_files_changed_by_this_prompt": false,
+  "snapshots_updated": false,
+  "new_api_routes": false,
+  "new_workflow_authority": false,
+  "new_esign_behavior": false,
+  "new_ai_autonomy": false,
+  "phpstan": {
+    "baseline_reproduced_errors": 20,
+    "final_status": "PASS",
+    "final_output": "[OK] No errors"
+  },
+  "phpunit": {
+    "focused_dcc_fallback": {
+      "status": "PASS",
+      "tests": 2,
+      "assertions": 5,
+      "note": "Previously reported DCC fallback failure was not reproducible on current branch state."
+    },
+    "full_suite": {
+      "status": "PASS",
+      "tests": 572,
+      "assertions": 4903,
+      "skipped": 1
+    }
+  },
+  "composer_check": {
+    "status": "PASS",
+    "note": "PHPStan and PHPUnit both passed; PHPUnit retained one skipped test."
+  },
+  "transactional_rest": {
+    "status": "PASS",
+    "tests": 36,
+    "assertions": 153
+  },
+  "v21_static_frontend_guards": {
+    "node_check_70_74": "PASS",
+    "portal_fixture_production_load_guard": "PASS"
+  },
+  "chromium_replay": {
+    "status": "PASS",
+    "tests_passed": 491,
+    "duration": "3.1m",
+    "chromium_exit": 0,
+    "sandbox_bind_failure_before_escalation": true,
+    "snapshots_updated": false
+  },
+  "reports": [
+    "_reports/module-template-v4/V21_BACKEND_GATE_REPAIR_2026-04-29/V21_BACKEND_GATE_REPAIR_REPORT.md",
+    "_reports/module-template-v4/V21_BACKEND_GATE_REPAIR_2026-04-29/V21_BACKEND_GATE_REPAIR_COMMAND_LOG.md",
+    "_reports/module-template-v4/V21_BACKEND_GATE_REPAIR_2026-04-29/V21_BACKEND_GATE_REPAIR_DIFF_SUMMARY.md",
+    "_reports/module-template-v4/V21_BACKEND_GATE_REPAIR_2026-04-29/V21_BACKEND_GATE_REPAIR_SUMMARY.json"
+  ],
+  "decision": "V21_BACKEND_GATE_REPAIR_PASS_READY_FOR_FINAL_UNLOCK_AUDIT",
+  "stage_f_unlock": false
+}

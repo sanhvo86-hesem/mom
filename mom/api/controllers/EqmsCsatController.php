@@ -141,10 +141,14 @@ class EqmsCsatController extends EqmsBaseController
         $body       = $this->jsonBody();
         $title      = trim((string)($body['title'] ?? ''));
         $surveyType = trim((string)($body['survey_type'] ?? 'periodic'));
+        $surveyMethod = trim((string)($body['survey_method'] ?? 'questionnaire'));
         $surveyDate = trim((string)($body['survey_date'] ?? date('Y-m-d')));
         if ($title === '') { $this->error('title_required', 400, "'title' is required."); }
         if (!in_array($surveyType, self::SURVEY_TYPES, true)) {
             $this->error('invalid_survey_type', 400, "'survey_type' must be one of: ".implode(', ',self::SURVEY_TYPES).'.');
+        }
+        if (!in_array($surveyMethod, self::SURVEY_METHODS, true)) {
+            $this->error('invalid_survey_method', 400, "'survey_method' must be one of: ".implode(', ',self::SURVEY_METHODS).'.');
         }
         $id     = $this->newUuid();
         $number = $this->generateNumber();
@@ -171,7 +175,7 @@ class EqmsCsatController extends EqmsBaseController
                 ':stype'=>$surveyType,':period'=>$body['survey_period']??null,
                 ':cust_id'=>$body['customer_id']??null,':cust_name'=>$body['customer_name']??null,
                 ':sdate'=>$surveyDate,':due'=>$body['response_due_date']??null,
-                ':method'=>$body['survey_method']??'questionnaire',
+                ':method'=>$surveyMethod,
                 ':qref'=>$body['questionnaire_ref']??null,':eval'=>$body['evaluator']??null,
                 ':resp_sent'=>(int)($body['responses_sent']??0),
                 ':scale'=>$body['score_scale']??'1-10',

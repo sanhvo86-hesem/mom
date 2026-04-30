@@ -110,7 +110,7 @@ class EqmsLessonsLearnedController extends EqmsBaseController
         $byStatus = $this->data->query("SELECT status, COUNT(*) AS count FROM ".self::TABLE." GROUP BY status ORDER BY status") ?? [];
         $pendingTraining = (int)($this->data->scalar("SELECT COUNT(*) FROM ".self::TABLE." WHERE training_required = TRUE AND training_completed = FALSE AND status = 'published'") ?? 0);
         $ytdPublished    = (int)($this->data->scalar("SELECT COUNT(*) FROM ".self::TABLE." WHERE status = 'published' AND created_at >= date_trunc('year', now())") ?? 0);
-        $this->success(['metrics' => compact('by_type','by_status','pending_training','ytd_published') + [
+        $this->success(['metrics' => [
             'by_type' => $byType, 'by_status' => $byStatus,
             'pending_training' => $pendingTraining, 'ytd_published' => $ytdPublished,
         ]]);
@@ -238,7 +238,7 @@ class EqmsLessonsLearnedController extends EqmsBaseController
     public function export(): never { $user=$this->requireAuth(); $this->requireAnyRole($user,$this->eqmsReadRoles()); $id=$this->requirePathId('id','lesson_id'); $this->loadLesson($id); $this->serveExport(self::MODULE,$id,$user); }
     public function exportBulk(): never { $user=$this->requireAuth(); $this->requireAnyRole($user,$this->eqmsReadRoles()); $this->serveExport(self::MODULE,'bulk',$user); }
 
-    private function doTransition(string $from, string $toStatus, string $action, array $extraSets=[], array $extraParams=[]): void
+    private function doTransition(string $from, string $toStatus, string $action, array $extraSets=[], array $extraParams=[]): never
     {
         $user = $this->requireAuth();
         $id   = $this->requirePathId('id', 'lesson_id');

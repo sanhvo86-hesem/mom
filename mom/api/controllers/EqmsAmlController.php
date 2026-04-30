@@ -224,7 +224,7 @@ class EqmsAmlController extends EqmsBaseController
         $user = $this->requireAuth();
         $this->requireAnyRole($user, $this->eqmsReadRoles());
 
-        $body       = $this->jsonBody() + ($_GET ?? []);
+        $body       = $this->jsonBody() + $_GET;
         $partNumber = trim((string)($body['part_number'] ?? ''));
         $vendorId   = trim((string)($body['vendor_id'] ?? ''));
 

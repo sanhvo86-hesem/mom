@@ -1,0 +1,53 @@
+{
+  "schema": "v21_env_replay_summary",
+  "requested_report_date": "2026-04-29",
+  "run_started_from_primary_checkout": "/Users/a10/Documents/mom",
+  "replay_worktree": "/Users/a10/Documents/mom-v21-env-replay-20260429",
+  "replay_branch": "codex/v21-env-replay-20260429",
+  "commit": "d555d0d5a7c16df083d1a7e173b9ad97a9402e45",
+  "origin_main": "d555d0d5a7c16df083d1a7e173b9ad97a9402e45",
+  "executed_at": "2026-04-30T07:10:25+0700",
+  "posture": "development/prototype pre-production readiness verification only",
+  "source_changes": false,
+  "snapshot_updates": false,
+  "stage_f_instantiated": false,
+  "primary_checkout_dirty_before_replay": true,
+  "primary_checkout_dirty_note": "Primary checkout had unrelated dirty files, including mom/scripts/portal/02-state-auth-ui.js. Replay was executed in a clean sibling worktree pinned to the same commit.",
+  "environment_repair": {
+    "npm_install_no_package_lock": "PASS",
+    "playwright_install_chromium": "PASS",
+    "playwright_version": "1.59.1",
+    "chromium_headless_shell_present": true,
+    "chromium_headless_shell_path": "/Users/a10/Library/Caches/ms-playwright/chromium_headless_shell-1217/chrome-headless-shell-mac-arm64/chrome-headless-shell"
+  },
+  "static_safety": {
+    "node_check_70_74": "PASS",
+    "portal_fixture_load_guard": "PASS",
+    "forbidden_diff_guard_clean_replay_worktree": "PASS",
+    "fixture_json_parse": "PASS"
+  },
+  "chromium_replay": {
+    "command": "PLAYWRIGHT_HTML_OPEN=never ./node_modules/.bin/playwright test --project=chromium --reporter=list",
+    "status": "PASS",
+    "tests_passed": 491,
+    "duration": "2.8m",
+    "chromium_exit": 0,
+    "focused_diagnosis_run": false,
+    "visual_diff_reproduced": false,
+    "snapshots_updated": false
+  },
+  "remaining_blockers": [
+    {
+      "gate": "Backend analyse/test/check",
+      "status": "UNRESOLVED_FROM_PREVIOUS_V21_REPLAY",
+      "note": "Backend PHPStan/PHPUnit/check failures were out of scope for this Chromium environment replay prompt."
+    }
+  ],
+  "decision": "V21_CHROMIUM_REPLAY_PASS_BACKEND_REPAIRS_STILL_REQUIRED",
+  "stage_f_unlock": false,
+  "reports": [
+    "_reports/module-template-v4/V21_ENV_REPLAY_2026-04-29/V21_ENV_REPLAY_REPORT.md",
+    "_reports/module-template-v4/V21_ENV_REPLAY_2026-04-29/V21_ENV_REPLAY_COMMAND_LOG.md",
+    "_reports/module-template-v4/V21_ENV_REPLAY_2026-04-29/V21_ENV_REPLAY_SUMMARY.json"
+  ]
+}

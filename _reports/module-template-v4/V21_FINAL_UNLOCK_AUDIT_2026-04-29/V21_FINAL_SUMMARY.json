@@ -1,0 +1,39 @@
+{
+  "decision": "PHASE2_INTEGRATION_PASS_WITH_REPAIRS_PENDING",
+  "stage_f_unlock": false,
+  "generated_at_local": "2026-04-30",
+  "repo_root": "/Users/a10/Documents/mom",
+  "branch": "codex/v21-backend-gate-repair-20260429",
+  "head": "9a1a8b9693ea4fe486849279f6afdc801eafacb7",
+  "origin_main": "d555d0d5a7c16df083d1a7e173b9ad97a9402e45",
+  "current_main_evidence_present": false,
+  "static_guards": "PASS",
+  "portal_fixture_safety": "PASS",
+  "forbidden_portal_diff_guard": "PASS",
+  "fixture_json_parse": "PASS",
+  "backend_analyse": "PASS",
+  "backend_test": "PASS",
+  "backend_check": "PASS",
+  "transactional_rest_c2": "PASS",
+  "playwright_chromium_full": "PASS",
+  "playwright_chromium_result": "491 passed (2.8m), CHROMIUM_EXIT=0",
+  "capa_slice4": "PASS",
+  "nqcase_live_api_toggle": "PASS",
+  "cross_browser_chromium": "PASS",
+  "blocker": "Final unlock requires clean current-main evidence; current checkout is backend repair branch with source edits not yet integrated into current main.",
+  "modified_source_files": [
+    "mom/api/controllers/EqmsAmlController.php",
+    "mom/api/controllers/EqmsCsatController.php",
+    "mom/api/controllers/EqmsEventsController.php",
+    "mom/api/controllers/EqmsFaiController.php",
+    "mom/api/controllers/EqmsLessonsLearnedController.php",
+    "mom/api/controllers/EqmsSamplingPlansController.php"
+  ],
+  "reports_written": [
+    "_reports/module-template-v4/V21_FINAL_UNLOCK_AUDIT_2026-04-29/V21_FINAL_UNLOCK_AUDIT_REPORT.md",
+    "_reports/module-template-v4/V21_FINAL_UNLOCK_AUDIT_2026-04-29/V21_FINAL_STREAM_STATUS_MATRIX.md",
+    "_reports/module-template-v4/V21_FINAL_UNLOCK_AUDIT_2026-04-29/V21_FINAL_COMMAND_LOG.md",
+    "_reports/module-template-v4/V21_FINAL_UNLOCK_AUDIT_2026-04-29/V21_FINAL_DECISION.md",
+    "_reports/module-template-v4/V21_FINAL_UNLOCK_AUDIT_2026-04-29/V21_FINAL_SUMMARY.json"
+  ]
+}

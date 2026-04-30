@@ -135,7 +135,7 @@ class EqmsSamplingPlansController extends EqmsBaseController
     {
         $user = $this->requireAuth();
         $this->requireAnyRole($user, $this->eqmsReadRoles());
-        $body       = $this->jsonBody() + ($_GET ?? []);
+        $body       = $this->jsonBody() + $_GET;
         $partNumber = trim((string)($body['part_number'] ?? ''));
         $vendorId   = trim((string)($body['vendor_id'] ?? ''));
         $planType   = trim((string)($body['plan_type'] ?? 'incoming'));
@@ -159,10 +159,12 @@ class EqmsSamplingPlansController extends EqmsBaseController
         $planType  = trim((string)($body['plan_type'] ?? 'incoming'));
         $standard  = trim((string)($body['standard'] ?? 'ANSI_Z1.4'));
         $inspLevel = trim((string)($body['inspection_level'] ?? 'II'));
+        $samplingType = trim((string)($body['sampling_type'] ?? 'single'));
         if ($title === '') { $this->error('title_required', 400, "'title' is required."); }
         if (!in_array($planType, self::PLAN_TYPES, true)) { $this->error('invalid_plan_type',400,"'plan_type' must be one of: ".implode(', ',self::PLAN_TYPES).'.'); }
         if (!in_array($standard, self::STANDARDS, true)) { $this->error('invalid_standard',400,"'standard' must be one of: ".implode(', ',self::STANDARDS).'.'); }
         if (!in_array($inspLevel, self::INSP_LEVELS, true)) { $this->error('invalid_inspection_level',400,"'inspection_level' must be one of: ".implode(', ',self::INSP_LEVELS).'.'); }
+        if (!in_array($samplingType, self::SAMPLING_TYPES, true)) { $this->error('invalid_sampling_type',400,"'sampling_type' must be one of: ".implode(', ',self::SAMPLING_TYPES).'.'); }
         $id     = $this->newUuid();
         $number = $this->generateNumber();
         $now    = $this->nowIso();
@@ -192,7 +194,7 @@ class EqmsSamplingPlansController extends EqmsBaseController
                 ':aql_crit'=>isset($body['aql_critical'])?(float)$body['aql_critical']:null,
                 ':aql_maj'=>isset($body['aql_major'])?(float)$body['aql_major']:null,
                 ':aql_min'=>isset($body['aql_minor'])?(float)$body['aql_minor']:null,
-                ':samp_type'=>$body['sampling_type']??'single',
+                ':samp_type'=>$samplingType,
                 ':ls_min'=>isset($body['lot_size_min'])?(int)$body['lot_size_min']:null,
                 ':ls_max'=>isset($body['lot_size_max'])?(int)$body['lot_size_max']:null,
                 ':ss'=>isset($body['sample_size'])?(int)$body['sample_size']:null,
