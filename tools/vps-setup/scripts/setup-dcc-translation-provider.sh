@@ -18,7 +18,18 @@ RUNTIME_HOME="${RUNTIME_HOME:-$PRIVATE_DATA/translation-runtime}"
 WEB_USER="${WEB_USER:-www-data}"
 WEB_GROUP="${WEB_GROUP:-www-data}"
 FPM_POOL_CONF="${FPM_POOL_CONF:-/etc/php/8.5/fpm/pool.d/mom.conf}"
-SCRIPT_PATH="$SITE_DIR/tools/scripts/translation/dcc_argos_vi_to_en.py"
+ARGOS_SCRIPT_PATH="$SITE_DIR/tools/scripts/translation/dcc_argos_vi_to_en.py"
+NLLB_SCRIPT_PATH="$SITE_DIR/tools/scripts/translation/dcc_nllb_vi_to_en.py"
+NLLB_MODEL_DIR="${NLLB_MODEL_DIR:-$MODEL_DIR/nllb-200-distilled-600M-ct2-int8}"
+NLLB_HF_NAME="${NLLB_HF_NAME:-facebook/nllb-200-distilled-600M}"
+RUNTIME_CONFIG_PATH="$SITE_DIR/mom/data/config/dcc-translation-config.json"
+# Default active provider for fresh deployments. NLLB is the canonical
+# higher-quality engine; admins can flip via the portal "Translation
+# Provider" tab without re-running this script.
+DEFAULT_ACTIVE_PROVIDER="${DEFAULT_ACTIVE_PROVIDER:-nllb}"
+# Backward-compat: legacy callers expect SCRIPT_PATH; alias to NLLB now
+# that NLLB is the default. The Argos path is still installed below.
+SCRIPT_PATH="$NLLB_SCRIPT_PATH"
 PREWARM_SERVICE_SRC="$SITE_DIR/tools/vps-setup/systemd/dcc-locale-prewarm.service"
 PREWARM_TIMER_SRC="$SITE_DIR/tools/vps-setup/systemd/dcc-locale-prewarm.timer"
 
@@ -68,6 +79,11 @@ mkdir -p "$RUNTIME_HOME/.local/share" "$RUNTIME_HOME/.cache" "$RUNTIME_HOME/.con
 python3 -m venv "$VENV_DIR"
 "$VENV_DIR/bin/pip" install --upgrade pip >/dev/null
 "$VENV_DIR/bin/pip" install argostranslate beautifulsoup4 lxml >/dev/null
+# CTranslate2 + transformers are required by the NLLB provider script
+# (`dcc_nllb_vi_to_en.py`). They're co-installed here so the venv supports
+# both engines without requiring a second setup pass.
+"$VENV_DIR/bin/pip" install \
+  ctranslate2 transformers sentencepiece huggingface_hub >/dev/null
 
 if [ ! -f "$MODEL_FILE" ]; then
   echo "[dcc-translation] downloading Argos vi→en model..."
@@ -86,6 +102,34 @@ import argostranslate.package
 argostranslate.package.install_from_path(r"$MODEL_FILE")
 print("model_installed")
 PY
+
+# Download + INT8-quantize the NLLB-200 distilled-600M model via CTranslate2.
+# Skip the heavy step if the converted model directory already looks valid.
+if [ ! -f "$NLLB_MODEL_DIR/model.bin" ]; then
+  echo "[dcc-translation] downloading + converting NLLB-200 distilled-600M to CT2 INT8..."
+  mkdir -p "$NLLB_MODEL_DIR"
+  env \
+    HOME="$RUNTIME_HOME" \
+    HF_HOME="$RUNTIME_HOME/.cache" \
+    TRANSFORMERS_CACHE="$RUNTIME_HOME/.cache" \
+    "$VENV_DIR/bin/python" - <<PY
+import os, subprocess, sys
+from huggingface_hub import snapshot_download
+
+snapshot = snapshot_download(repo_id="$NLLB_HF_NAME")
+subprocess.check_call([
+    "$VENV_DIR/bin/ct2-transformers-converter",
+    "--model", snapshot,
+    "--output_dir", "$NLLB_MODEL_DIR",
+    "--quantization", "int8",
+    "--copy_files", "tokenizer.json", "tokenizer_config.json",
+                    "special_tokens_map.json", "sentencepiece.bpe.model",
+])
+print("nllb_model_installed")
+PY
+else
+  echo "[dcc-translation] NLLB model already present at $NLLB_MODEL_DIR — skipping conversion"
+fi
 
 if id "$WEB_USER" >/dev/null 2>&1; then
   chown -R "$WEB_USER:$WEB_GROUP" "$RUNTIME_HOME"
@@ -107,9 +151,56 @@ find "$SITE_DIR/mom/data/cache/dcc-locale-jobs" "$SITE_DIR/mom/data/cache/dcc-lo
   -type f -exec chmod 0664 {} +
 chmod 0664 "$SITE_DIR/mom/data/php_error.log"
 
-if [ ! -f "$SCRIPT_PATH" ]; then
-  echo "Provider script missing: $SCRIPT_PATH" >&2
+if [ ! -f "$ARGOS_SCRIPT_PATH" ]; then
+  echo "Argos provider script missing: $ARGOS_SCRIPT_PATH" >&2
   exit 1
+fi
+if [ ! -f "$NLLB_SCRIPT_PATH" ]; then
+  echo "NLLB provider script missing: $NLLB_SCRIPT_PATH" >&2
+  exit 1
+fi
+
+# Bootstrap runtime config file. This file lives under `mom/data/` (which
+# is gitignored, so a clean deploy that scrubs runtime data will lose it).
+# Writing a default here ensures the admin UI + provider-resolver have a
+# valid config after every deployment, even if the previous one was wiped.
+# We intentionally do NOT overwrite an existing config — admin choices
+# made via the portal must survive setup re-runs.
+mkdir -p "$(dirname "$RUNTIME_CONFIG_PATH")"
+if [ ! -f "$RUNTIME_CONFIG_PATH" ]; then
+  echo "[dcc-translation] bootstrapping runtime config -> $RUNTIME_CONFIG_PATH (active=$DEFAULT_ACTIVE_PROVIDER)"
+  cat >"$RUNTIME_CONFIG_PATH" <<JSON
+{
+    "schema_version": 1,
+    "active_provider": "$DEFAULT_ACTIVE_PROVIDER",
+    "providers": {
+        "argos": {
+            "label": "Argos Translate",
+            "description": "Lightweight on-prem MT engine. Free, fast, runs on CPU. Quality is basic — proper names and uncommon phrases may be mistranslated.",
+            "command": "$VENV_DIR/bin/python $ARGOS_SCRIPT_PATH",
+            "engine_label": "argos_local_vi_en",
+            "model_size_mb": 65,
+            "expected_quality": "basic",
+            "available": true
+        },
+        "nllb": {
+            "label": "NLLB-200 (Meta)",
+            "description": "Higher-quality multilingual MT from Meta, distilled 600M model with INT8 quantization. Better proper-noun preservation and contextual translation. Slightly slower than Argos.",
+            "command": "$VENV_DIR/bin/python $NLLB_SCRIPT_PATH",
+            "engine_label": "nllb_200_distilled_600m_int8",
+            "model_size_mb": 600,
+            "expected_quality": "high",
+            "available": true
+        }
+    }
+}
+JSON
+  if id "$WEB_USER" >/dev/null 2>&1; then
+    chown "$WEB_USER:$WEB_GROUP" "$RUNTIME_CONFIG_PATH"
+  fi
+  chmod 0664 "$RUNTIME_CONFIG_PATH"
+else
+  echo "[dcc-translation] runtime config already present — preserving admin selection"
 fi
 
 if [ -f "$FPM_POOL_CONF" ]; then
