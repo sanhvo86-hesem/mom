@@ -1,0 +1,29 @@
+commit ae71ca825b8d2a09ff90040c1eb7a248e2f42dab
+Author:     sanhvo86-hesem <sanhvo86@gmail.com>
+AuthorDate: Thu Apr 30 15:18:19 2026 +0700
+Commit:     sanhvo86-hesem <sanhvo86@gmail.com>
+CommitDate: Thu Apr 30 15:18:19 2026 +0700
+
+    fix(dcc): restore legacy header title fallback
+
+ .ai/contracts-map.json                             |   2 +-
+ .ai/db-map.json                                    |   2 +-
+ .ai/db-map/analytics.json                          |   2 +-
+ .ai/db-map/commercial-customer.json                |   2 +-
+ .ai/db-map/finance.json                            |   2 +-
+ .ai/db-map/index.json                              |   2 +-
+ .ai/db-map/integration-resilience.json             |   2 +-
+ .ai/db-map/inventory-logistics.json                |   2 +-
+ .ai/db-map/maintenance-ehs.json                    |   2 +-
+ .ai/db-map/master-data.json                        |   2 +-
+ .ai/db-map/mes-execution.json                      |   2 +-
+ .ai/db-map/planning-production.json                |   2 +-
+ .ai/db-map/procurement-supplier-quality.json       |   2 +-
+ .ai/db-map/quality-improvement.json                |   2 +-
+ .ai/db-map/traceability-serialization.json         |   2 +-
+ .ai/db-map/unclassified.json                       |   2 +-
+ .ai/repo-map.json                                  |   2 +-
+ .ai/route-map.json                                 |   2 +-
+ .ai/symbols.json                                   |   2 +-
+ .../DocumentControl/DocumentHeaderService.php      | 116 ++++++++++++++++++---
+ 20 files changed, 123 insertions(+), 31 deletions(-)

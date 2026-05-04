@@ -1,0 +1,11 @@
+gate,evidence,status,stage_f_impact
+HMV4 node syntax 70-74,All five node --check commands exited 0,PASS,positive
+Portal fixture production-load guard,mom/portal.html did not load 74-module-template-v4-fixtures.js,PASS,positive
+Forbidden current portal diff guard,Forbidden portal diff guard passed,PASS,positive
+Fixture JSON parse,All HMV4 JSON fixtures parsed,PASS,positive
+Backend analyse,PHPStan no errors,PASS,positive
+Backend PHPUnit,572 tests 4903 assertions 1 skipped,PASS,positive
+Backend check,analyse plus test passed,PASS,positive
+Transactional REST C2 focused contracts,36 tests 153 assertions,PASS,positive
+Full Chromium Playwright,491 passed CHROMIUM_EXIT=0,PASS,positive
+Final current-main unlock,Audit ran on repair branch not clean current main,BLOCKER,locks_stage_f

@@ -1,0 +1,34 @@
+{
+  "decision": "PHASE2_INTEGRATION_PASS_READY_FOR_PHASE3_PLANNING",
+  "stage_f_started": false,
+  "generated_at_local": "2026-04-30",
+  "replay_worktree": "/Users/a10/Documents/mom-v21-clean-main-replay",
+  "branch": "codex/v21-clean-main-replay-20260430",
+  "base_head": "7260a7d517603031265c18227ecf5c1d26aabc6e",
+  "origin_main_at_replay": "7260a7d517603031265c18227ecf5c1d26aabc6e",
+  "branch_created_from_origin_main": true,
+  "repair_source_files": [
+    "mom/api/services/DocumentControl/DocumentHeaderService.php"
+  ],
+  "regenerated_index_files": true,
+  "static_guards": "PASS",
+  "portal_fixture_safety": "PASS",
+  "forbidden_portal_diff_guard": "PASS",
+  "fixture_json_parse": "PASS",
+  "dcc_fallback_focused_test": "PASS",
+  "backend_analyse": "PASS",
+  "backend_test": "PASS",
+  "backend_check": "PASS",
+  "transactional_rest_c2": "PASS",
+  "playwright_chromium_full": "PASS",
+  "playwright_chromium_result": "491 passed (3.1m), CHROMIUM_EXIT=0",
+  "ai_index_regeneration": "PASS_AFTER_ESCALATED_RERUN",
+  "blocker": null,
+  "reports_written": [
+    "_reports/module-template-v4/V21_CLEAN_MAIN_FINAL_REPLAY_2026-04-30/V21_CLEAN_MAIN_FINAL_REPLAY_REPORT.md",
+    "_reports/module-template-v4/V21_CLEAN_MAIN_FINAL_REPLAY_2026-04-30/V21_CLEAN_MAIN_COMMAND_LOG.md",
+    "_reports/module-template-v4/V21_CLEAN_MAIN_FINAL_REPLAY_2026-04-30/V21_CLEAN_MAIN_STREAM_STATUS_MATRIX.md",
+    "_reports/module-template-v4/V21_CLEAN_MAIN_FINAL_REPLAY_2026-04-30/V21_CLEAN_MAIN_DECISION.md",
+    "_reports/module-template-v4/V21_CLEAN_MAIN_FINAL_REPLAY_2026-04-30/V21_CLEAN_MAIN_SUMMARY.json"
+  ]
+}
