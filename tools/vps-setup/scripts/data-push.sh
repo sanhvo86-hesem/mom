@@ -126,7 +126,7 @@ echo ""
 # (or push + db-push) from interleaving across the whole drift→snapshot→
 # upload→verify→audit lifecycle. Skipped under --dry-run because dry-run
 # performs no writes.
-LOCK_DIR_REMOTE="/var/run/qms-data-push.lock.d"
+LOCK_DIR_REMOTE="${QMS_PUSH_LOCK_DIR:-/var/run/qms-data-push.lock.d}"
 LOCK_HOLDER_ID="$ACTOR pid=$$ change_ref=${CHANGE_REF:-dry-run} ts=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 LOCK_ACQUIRED=0
 
@@ -152,7 +152,10 @@ if mk; then
 fi
 # Existing lock — check staleness
 if [ -f "$LOCK_DIR/holder" ]; then
-  holder_ts=$(stat -c '%Y' "$LOCK_DIR/holder" 2>/dev/null || echo 0)
+  # Portable mtime (GNU stat -c %Y; BSD stat -f %m).
+  holder_ts=$(stat -c '%Y' "$LOCK_DIR/holder" 2>/dev/null \
+              || stat -f '%m' "$LOCK_DIR/holder" 2>/dev/null \
+              || echo 0)
   now=$(date +%s)
   age=$((now - holder_ts))
   if [ "$age" -lt "$STALE_CUTOFF_SECONDS" ]; then
@@ -345,7 +348,9 @@ jq -n \
    }' > "$SNAPSHOT_DIR/SNAPSHOT.json"
 
 # Prune snapshots — keep 30 most recent.
-ls -1d "$PRIVATE_DATA/.snapshots/"* 2>/dev/null | sort | head -n -30 | \
+# Keep 30 most recent snapshots. Portable across GNU/BSD (BSD head has no -n -N).
+ls -1d "$PRIVATE_DATA/.snapshots/"* 2>/dev/null | sort | \
+  awk 'BEGIN{keep=30}{a[NR]=$0}END{for(i=1;i<=NR-keep;i++)print a[i]}' | \
   while IFS= read -r old; do rm -rf "$old"; done
 
 echo "$SNAPSHOT_DIR"

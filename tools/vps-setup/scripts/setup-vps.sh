@@ -156,6 +156,18 @@ log "PostgreSQL configured: database=$DB_NAME, user=$DB_USER"
 # ══════════════════════════════════════════════════════════════════════════
 if [ -d "$SITE_DIR/.git" ]; then
     log "Repository already exists at $SITE_DIR"
+    # Refuse to git reset --hard against an existing checkout from setup-vps.
+    # This script is one-shot bootstrap; for ongoing updates use deploy.sh
+    # which has capture/restore around the reset. If we silently reset here
+    # we can clobber every runtime-mutated config file in one go.
+    if [ "${SETUP_VPS_FORCE_RESET:-0}" != "1" ]; then
+        log "ERROR: setup-vps.sh refuses to git reset --hard an existing repo."
+        log "       Use deploy.sh for updates (it preserves runtime state)."
+        log "       To intentionally re-bootstrap (DESTRUCTIVE), set SETUP_VPS_FORCE_RESET=1"
+        log "       and back up /var/www/data-private/ first."
+        exit 1
+    fi
+    log "WARN: SETUP_VPS_FORCE_RESET=1 — running destructive reset."
     cd "$SITE_DIR"
     git fetch origin "$GIT_BRANCH" --quiet
     git reset --hard "origin/$GIT_BRANCH" --quiet

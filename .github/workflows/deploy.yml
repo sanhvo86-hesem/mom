@@ -17,9 +17,45 @@ jobs:
     environment: production
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Need 2 commits so the runtime-files diff can compare against the
+          # previous SHA. fetch-depth: 0 would also work but is heavier.
+          fetch-depth: 2
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
+
+      - name: Refuse runtime config / docs in commit
+        # Hard gate: even if the deploy.sh capture/restore would catch this
+        # at runtime, we don't want runtime data flowing through git history
+        # at all. ISO ALCOA+ "Original" requires changes to live data go
+        # through data-push.sh with a change-ref, not a code commit.
+        run: |
+          set -euo pipefail
+          # shellcheck source=tools/vps-setup/scripts/_runtime-files.sh
+          . tools/vps-setup/scripts/_runtime-files.sh
+          BASE="${{ github.event.before }}"
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+            BASE="HEAD~1"
+          fi
+          DIFF="$(git diff --name-only "$BASE" HEAD || true)"
+          OFFENDERS="$(printf '%s\n' "$DIFF" | grep -E "$RUNTIME_CONFIG_REGEX" || true)"
+          if [ -n "$OFFENDERS" ]; then
+            echo "::error::This push modifies runtime-mutated config files:" >&2
+            echo "$OFFENDERS" | sed 's/^/  - /' >&2
+            echo "" >&2
+            echo "Runtime config must NOT travel through git." >&2
+            echo "Use: bash tools/vps-setup/scripts/data-sync.sh" >&2
+            echo "  or: bash tools/vps-setup/scripts/data-push.sh --change-ref CR-XXX" >&2
+            exit 1
+          fi
+
+      - name: Verify runtime-files preserve list covers all PHP writers
+        # If a developer added a new save_*() / saveConfig() / write_json_file()
+        # call whose path resolves under mom/data/config/ but didn't add the
+        # basename to RUNTIME_CONFIG_FILES in _runtime-files.sh, the next
+        # deploy will silently clobber that file. Catch it here, before SSH.
+        run: php tools/vps-setup/scripts/audit-runtime-files.php
 
       - name: Block generated/runtime artifacts in controlled source
         run: php mom/tools/release/check_repo_boundary.php

@@ -1,11 +1,42 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
+# Hard refusal: block any commit that touches a runtime-mutated config file.
+# The list lives in tools/vps-setup/scripts/_runtime-files.sh — this hook
+# sources the regex from there so we cannot drift.
+#
+# Bypass (only after reading: tools/vps-setup/README-DATA-SYNC.md):
+#   git commit --no-verify
 
-python 01-QMS-Portal/tools/check_portal_encoding.py --scope shell
-status=$?
-if [ $status -ne 0 ]; then
-  echo ""
-  echo "pre-commit: portal encoding audit failed."
-  exit $status
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo .)"
+RUNTIME_LIST="$REPO_ROOT/tools/vps-setup/scripts/_runtime-files.sh"
+if [ -f "$RUNTIME_LIST" ]; then
+    # shellcheck source=tools/vps-setup/scripts/_runtime-files.sh
+    . "$RUNTIME_LIST"
+    OFFENDERS=$(git diff --cached --name-only | grep -E "$RUNTIME_CONFIG_REGEX" || true)
+    if [ -n "$OFFENDERS" ]; then
+        echo "" >&2
+        echo "pre-commit: refusing to commit runtime-mutated config files." >&2
+        echo "" >&2
+        printf '%s\n' "$OFFENDERS" | sed 's/^/  - /' >&2
+        echo "" >&2
+        echo "Runtime config belongs on the VPS only. To push edits, use:" >&2
+        echo "  bash tools/vps-setup/scripts/data-sync.sh" >&2
+        echo "  or  bash tools/vps-setup/scripts/data-push.sh --change-ref CR-XXX" >&2
+        echo "" >&2
+        echo "Bypass (rare, requires reading README-DATA-SYNC.md first):" >&2
+        echo "  git commit --no-verify" >&2
+        exit 1
+    fi
+fi
+
+# Legacy portal encoding check — preserved from prior version of this hook.
+if [ -f "$REPO_ROOT/01-QMS-Portal/tools/check_portal_encoding.py" ]; then
+    python "$REPO_ROOT/01-QMS-Portal/tools/check_portal_encoding.py" --scope shell
+    status=$?
+    if [ $status -ne 0 ]; then
+        echo ""
+        echo "pre-commit: portal encoding audit failed."
+        exit $status
+    fi
 fi
 
 exit 0

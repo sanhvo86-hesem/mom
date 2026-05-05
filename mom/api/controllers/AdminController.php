@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
+use MOM\Api\Services\DataSyncStatusService;
 use MOM\Api\Services\GraphicsGovernanceException;
 use MOM\Api\Services\GraphicsGovernanceService;
 use Throwable;
@@ -95,6 +96,40 @@ class AdminController extends BaseController
                 default                                        => 'git_status_failed',
             };
             $this->error($error, 500, $message);
+        }
+    }
+
+    /**
+     * GET dataSyncStatus — Read-only status of the local↔VPS runtime-config bridge.
+     *
+     * Action: `admin_data_sync_status`
+     *
+     * Surfaces what data-sync.sh, data-pull.sh, and data-push.sh manage:
+     * which runtime config files exist, whether they match the
+     * /var/www/data-private mirror, how many push snapshots are kept, and
+     * the most recent audit-log lines and audit_events rows.
+     *
+     * The portal NEVER drives data-sync from PHP — that script must run on
+     * the developer workstation (where it has SSH credentials and a working
+     * pool to reconcile against). This endpoint only observes state.
+     *
+     * @return never
+     */
+    public function dataSyncStatus(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAdmin($me);
+
+        try {
+            $svc = new DataSyncStatusService(
+                $this->rootDir,
+                $this->dataDir,
+                $this->data
+            );
+            $this->success($svc->status());
+        } catch (Throwable $e) {
+            $this->auditLog('admin_data_sync_status_failed', ['error' => $e->getMessage()]);
+            $this->error('data_sync_status_failed', 500, $e->getMessage());
         }
     }
 

@@ -38,20 +38,28 @@ ROLLBACK_TAG_PREFIX="deploy-rollback"
 DB_SCHEMA_MAY_HAVE_CHANGED="0"
 PRESERVED_RUNTIME_DIR=""
 
-RUNTIME_CONFIG_FILES=(
-    users.json
-    role_permissions.json
-    portal_role_docs.json
-    module_access_config.json
-    user_doc_overrides.json
-    docs_custom.json
-    docs_custom.local.json
-    docs_visibility.json
-    doc_descriptions.json
-    folder_descriptions.json
-    form_control_registry.json
-    portal_display_config.json
-)
+# Single source of truth for runtime-mutated config file basenames.
+# Sourced from the same file data-sync.sh + audit-runtime-files.php read, so
+# the three callers can never drift. If the file is missing, REFUSE to deploy
+# rather than silently fall back to a stale list (that's the failure mode
+# this whole subsystem exists to prevent).
+RUNTIME_FILES_LIST="${SITE_DIR}/tools/vps-setup/scripts/_runtime-files.sh"
+if [ ! -f "$RUNTIME_FILES_LIST" ]; then
+    # Pre-rollback safety: SITE_DIR may not yet contain the new tree if the
+    # very first deploy hasn't completed. Fall back to the script-relative
+    # path so the bootstrap deploy can still run.
+    RUNTIME_FILES_LIST="$(cd "$(dirname "$0")" && pwd)/_runtime-files.sh"
+fi
+if [ ! -f "$RUNTIME_FILES_LIST" ]; then
+    echo "FATAL: cannot find _runtime-files.sh — refusing to deploy without preserve list" >&2
+    exit 1
+fi
+# shellcheck source=_runtime-files.sh
+. "$RUNTIME_FILES_LIST"
+if [ "${#RUNTIME_CONFIG_FILES[@]}" -eq 0 ]; then
+    echo "FATAL: RUNTIME_CONFIG_FILES is empty after sourcing $RUNTIME_FILES_LIST" >&2
+    exit 1
+fi
 
 RUNTIME_DOC_DIRS=(
     mom/docs/system
@@ -167,9 +175,27 @@ restore_runtime_mutations() {
     fi
 
     log "INFO" "Restoring runtime-managed config/docs after git reset"
+    local restored_count=0
     if [ -d "$PRESERVED_RUNTIME_DIR/config" ]; then
         mkdir -p "$SITE_DIR/mom/data/config"
-        cp -p "$PRESERVED_RUNTIME_DIR/config/"*.json "$SITE_DIR/mom/data/config/" 2>/dev/null || true
+        local name preserved live preserved_hash live_hash
+        for name in "${RUNTIME_CONFIG_FILES[@]}"; do
+            preserved="$PRESERVED_RUNTIME_DIR/config/$name"
+            live="$SITE_DIR/mom/data/config/$name"
+            [ -f "$preserved" ] || continue
+            cp -p "$preserved" "$live" \
+                || die "FATAL: cannot restore $name to $live — runtime data may be lost. Snapshot at $PRESERVED_RUNTIME_DIR is preserved (do NOT clean it up)."
+            # Verify byte-for-byte that the restore took. A silent cp success
+            # with a wrong destination (e.g. selinux relabel) would otherwise
+            # leave VPS state corrupted with no signal.
+            preserved_hash="$(sha256sum "$preserved" | awk '{print $1}')"
+            live_hash="$(sha256sum "$live" | awk '{print $1}')"
+            if [ "$preserved_hash" != "$live_hash" ]; then
+                die "FATAL: post-restore checksum mismatch for $name (preserved=$preserved_hash live=$live_hash). $PRESERVED_RUNTIME_DIR is preserved for forensic recovery."
+            fi
+            restored_count=$((restored_count + 1))
+        done
+        log "INFO" "Restored $restored_count runtime config file(s) with sha256 verification"
     fi
 
     if [ "$PRESERVE_RUNTIME_DOCS" = "1" ]; then
@@ -182,6 +208,23 @@ restore_runtime_mutations() {
             rsync -a --delete "$src/" "$dest/" \
                 || die "Cannot restore runtime document tree $dest"
         done
+    fi
+
+    # Snapshot evidence to /var/www/data-private/.deploy-snapshots/ BEFORE
+    # cleaning the temp dir. 30-deep retention. If a future user complains
+    # "I lost X after deploy", an operator can grep these for the missing
+    # bytes even after the temp dir is gone.
+    local evidence_root="$PRIVATE_DATA/.deploy-snapshots"
+    if mkdir -p "$evidence_root" 2>/dev/null; then
+        local snap_id
+        snap_id="$(date -u +%Y%m%dT%H%M%SZ)"
+        if cp -a "$PRESERVED_RUNTIME_DIR" "$evidence_root/$snap_id" 2>/dev/null; then
+            log "INFO" "Deploy preservation snapshot kept at $evidence_root/$snap_id"
+            # Keep last 30 (portable: BSD head doesn't accept -n -N).
+            ls -1d "$evidence_root"/* 2>/dev/null | sort | \
+                awk 'BEGIN{keep=30}{a[NR]=$0}END{for(i=1;i<=NR-keep;i++)print a[i]}' \
+                | while IFS= read -r old; do rm -rf "$old"; done
+        fi
     fi
 
     rm -rf "$PRESERVED_RUNTIME_DIR"
@@ -208,7 +251,7 @@ create_rollback_tag() {
 prune_rollback_tags() {
     git -C "$SITE_DIR" tag --list "${ROLLBACK_TAG_PREFIX}-*" \
         | sort \
-        | head -n -10 \
+        | awk 'BEGIN{keep=10}{a[NR]=$0}END{for(i=1;i<=NR-keep;i++)print a[i]}' \
         | while IFS= read -r old_tag; do
             [ -n "$old_tag" ] || continue
             git -C "$SITE_DIR" tag -d "$old_tag" >/dev/null 2>&1 \
@@ -389,6 +432,35 @@ if [ -d "$PRIVATE_DATA/config" ]; then
     log "INFO" "Copying private config..."
     cp -n "$PRIVATE_DATA/config/"*.json \
         "$SITE_DIR/mom/data/config/" 2>/dev/null || true
+fi
+
+# ── Bootstrap missing runtime files from .bootstrap.json seeds ───────────
+# After untrack-runtime-files.sh runs, the runtime files (users.json etc.)
+# are no longer tracked. Fresh installs need a starting point — that comes
+# from the .bootstrap.json sibling seeds shipped in the repo. Existing
+# installs already have the live files (preserved by capture/restore above)
+# so the `cp -n` is a no-op for them.
+log "INFO" "Bootstrapping missing runtime files from .bootstrap.json seeds..."
+seeded_count=0
+for name in "${RUNTIME_CONFIG_FILES[@]}"; do
+    live="$SITE_DIR/mom/data/config/$name"
+    seed="$SITE_DIR/mom/data/config/${name%.json}.bootstrap.json"
+    if [ ! -f "$live" ] && [ -f "$seed" ]; then
+        cp -p "$seed" "$live" || die "Cannot bootstrap $name from $seed"
+        seeded_count=$((seeded_count + 1))
+        log "INFO" "  bootstrapped $name from .bootstrap.json"
+    fi
+done
+[ "$seeded_count" -gt 0 ] && log "INFO" "Bootstrapped $seeded_count runtime file(s) from seeds"
+
+# ── Verify preserve list still covers every PHP writer ────────────────────
+# Belt-and-suspenders: the canonical list lives in _runtime-files.sh, but
+# someone may have added a new save_*() callsite without updating it. Run
+# the audit script and abort if a new writer is unprotected.
+if [ -f "$SITE_DIR/tools/vps-setup/scripts/audit-runtime-files.php" ]; then
+    if ! php8.5 "$SITE_DIR/tools/vps-setup/scripts/audit-runtime-files.php" >>"$LOG" 2>&1; then
+        die "Runtime-files audit FAILED — see $LOG. A new PHP writer touches mom/data/config/ without being in the preserve list. Fix _runtime-files.sh and re-deploy."
+    fi
 fi
 
 # ── Fix permissions ──────────────────────────────────────────────────────

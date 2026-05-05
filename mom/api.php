@@ -14295,6 +14295,27 @@ function shell_run(string $command, ?int &$exitCode = null): string {
   return trim(implode("\n", $output));
 }
 
+function git_resolve_binary(): string {
+  // Cache: PHP-FPM may have a stripped PATH (no /usr/local/bin), so a bare
+  // `git` in shell_exec returns 127. Try the standard install locations and
+  // memoise the first one that exists; fall back to bare `git` so any
+  // environment that DOES have it on PATH still works.
+  static $resolved = null;
+  if ($resolved !== null) return $resolved;
+  $candidates = [
+    '/usr/bin/git',
+    '/usr/local/bin/git',
+    '/opt/homebrew/bin/git',
+    '/opt/local/bin/git',
+  ];
+  foreach ($candidates as $path) {
+    if (is_file($path) && is_executable($path)) {
+      return $resolved = $path;
+    }
+  }
+  return $resolved = 'git';
+}
+
 function git_shell_command(string $repoDir, array $args): string {
   $safeDirectories = array_values(array_unique(array_filter([
     str_replace('\\', '/', trim($repoDir)),
@@ -14303,7 +14324,7 @@ function git_shell_command(string $repoDir, array $args): string {
   $parts = [
     'GIT_TERMINAL_PROMPT=0',
     'GIT_SSH_COMMAND=' . escapeshellarg('ssh -oBatchMode=yes'),
-    'git',
+    escapeshellarg(git_resolve_binary()),
   ];
   foreach ($safeDirectories as $safeDirectory) {
     $parts[] = '-c';

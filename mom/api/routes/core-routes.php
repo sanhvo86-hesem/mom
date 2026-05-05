@@ -83,6 +83,7 @@ return static function (Router $router, string $dataDir): void {
     // Admin
     $router->actions([
         'admin_git_status'                 => [AdminController::class, 'gitStatus'],
+        'admin_data_sync_status'           => [AdminController::class, 'dataSyncStatus'],
         'admin_clear_site_cache'           => [AdminController::class, 'clearCache'],
         'get_data_settings'                => [AdminController::class, 'getSettings'],
         'save_data_settings'               => [AdminController::class, 'saveSettings'],

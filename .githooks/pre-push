@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+# ============================================================================
+# pre-push: warn if local runtime-data is out of sync with the VPS before a
+# git push triggers a deploy.
+#
+# Why: pushing while local↔VPS are diverged risks either (a) committing
+# runtime data that should never be in git, or (b) running a deploy whose
+# preserve/restore step has to fight with stale local copies. This hook
+# runs `data-sync.sh --check-only` and asks for confirmation if anything is
+# pending.
+#
+# Soft-fail: if SSH to the VPS is unavailable (no network, no key loaded,
+# wrong host), the hook exits 0 silently — it must never block a developer
+# who is offline or working from a clean checkout.
+#
+# Activate once per clone (one-time setup):
+#   git config core.hooksPath .githooks
+#
+# Bypass for an individual push:
+#   git push --no-verify
+# ============================================================================
+set -u
+
+# Skip entirely if the user has not opted into hookspath. This avoids
+# running the check from random clones / CI.
+HOOKS_PATH="$(git config --get core.hooksPath 2>/dev/null || true)"
+if [[ "$HOOKS_PATH" != ".githooks" ]]; then
+    exit 0
+fi
+
+# Skip in non-interactive contexts (CI, scripts) — nothing to confirm to.
+if [[ ! -t 0 || ! -t 1 ]]; then
+    exit 0
+fi
+
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo .)"
+SYNC_SCRIPT="$REPO_ROOT/tools/vps-setup/scripts/data-sync.sh"
+[[ -x "$SYNC_SCRIPT" ]] || exit 0
+
+# Quick reachability probe (3s) so the hook can't hang on a flaky network.
+VPS="${TARGET:-${VPS:-deploy@vps.hesemeng.com}}"
+if ! ssh -o ConnectTimeout=3 -o BatchMode=yes -o StrictHostKeyChecking=accept-new \
+        "$VPS" 'true' >/dev/null 2>&1; then
+    # Cannot reach VPS — silent skip. We're not the right place to alert.
+    exit 0
+fi
+
+echo "pre-push: checking local↔VPS data sync state..."
+set +e
+"$SYNC_SCRIPT" --check-only --vps "$VPS" >/tmp/mom-sync-check.$$ 2>&1
+rc=$?
+set -e
+
+case "$rc" in
+    0)
+        echo "pre-push: local and VPS are in sync. Proceeding."
+        rm -f /tmp/mom-sync-check.$$
+        exit 0
+        ;;
+    10)
+        echo ""
+        echo "pre-push: WARNING — local runtime data differs from VPS:"
+        sed -n '/Plan:/,/^Proceed?/{/^Proceed?/d; p;}' /tmp/mom-sync-check.$$ \
+            | sed 's/^/  /' || true
+        echo ""
+        echo "  The deploy that runs after this push will preserve VPS state,"
+        echo "  but you may also want to:"
+        echo "    bash $SYNC_SCRIPT                 # reconcile interactively"
+        echo "    git push --no-verify              # bypass this check"
+        echo ""
+        printf 'Continue with push anyway? [y/N] '
+        read -r ans </dev/tty || ans=""
+        rm -f /tmp/mom-sync-check.$$
+        case "$ans" in
+            y|Y|yes|YES) exit 0 ;;
+            *) echo "pre-push: aborted by user."; exit 1 ;;
+        esac
+        ;;
+    *)
+        # Sync script error (not a clean diff) — show output, don't block push.
+        echo "pre-push: data-sync --check-only exited $rc (non-fatal). Output:"
+        sed 's/^/  /' /tmp/mom-sync-check.$$ >&2
+        rm -f /tmp/mom-sync-check.$$
+        exit 0
+        ;;
+esac

@@ -17,7 +17,14 @@ What are you trying to do?
 │    → use git. Push to main, deploy.sh applies.
 │      DO NOT use these data-sync scripts for code.
 │
-├─ Edit a runtime config file under /var/www/data-private/config/
+├─ Keep local and VPS runtime config continuously aligned
+│  (the "communicating vessels" model — recommended default)
+│    → data-sync.sh
+│      Runs a 3-way diff (baseline ↔ local ↔ VPS) and applies the right
+│      direction per file. Conflicts go through a deterministic resolver.
+│      See "Bidirectional sync" below.
+│
+├─ One-shot manual edit of a runtime config file
 │    → data-pull.sh  (download with manifest)
 │      edit locally
 │      data-push.sh --change-ref CR-XXX  (upload with drift check + audit)
@@ -30,6 +37,119 @@ What are you trying to do?
      → tools/vps-setup/scripts/db-push.sh
        (last resort; usually the right answer is a migration script)
 ```
+
+## Bidirectional sync (`data-sync.sh`) — the recommended default
+
+`data-sync.sh` treats the local working copy and the VPS as two
+communicating vessels. On each run it compares THREE states and decides
+per file which way to flow:
+
+```
+   baseline   ← state of VPS at last successful sync (working/manifest.json)
+   local      ← current working/files/config/*.json
+   vps        ← live /var/www/data-private/config/*.json
+```
+
+Decision table (`B = baseline`, `L = local`, `V = vps`):
+
+| L vs B | V vs B | L vs V | Action      |
+|--------|--------|--------|-------------|
+| same   | same   | —      | NOOP        |
+| diff   | same   | —      | PUSH local→vps |
+| same   | diff   | —      | PULL  vps→local |
+| diff   | diff   | same   | CONVERGED (refresh baseline only) |
+| diff   | diff   | diff   | CONFLICT (resolved per `--conflict-mode`) |
+
+Conflict modes:
+
+- `prefer-vps` *(default — production is authoritative)*: VPS bytes win on
+  disk; the prior local copy is preserved as `<file>.LOCAL.<timestamp>` so
+  no work is silently destroyed.
+- `prefer-local`: local bytes win; the prior VPS bytes survive in the
+  snapshot directory automatically taken by `data-push.sh`.
+- `keep-both`: same effect as `prefer-vps` plus an explicit name; useful
+  when scripting a follow-up human review of the `.LOCAL.*` files.
+- `abort`: stop with exit code 2 and let a human resolve manually.
+
+### Common operations
+
+```bash
+# Continuous reconciliation (interactive confirmation):
+bash tools/vps-setup/scripts/data-sync.sh
+
+# Dry-run — exits 0 if in sync, 10 if changes pending. Good for CI/cron:
+bash tools/vps-setup/scripts/data-sync.sh --check-only
+
+# Non-interactive auto-pull (e.g. from a 5-min launchd/cron):
+bash tools/vps-setup/scripts/data-sync.sh --pull-only --yes
+
+# Push-only after intentional local edits, with a real change reference:
+bash tools/vps-setup/scripts/data-sync.sh --push-only --yes --change-ref CR-2026-099
+
+# When you're sure local is right and want it to win on conflict:
+bash tools/vps-setup/scripts/data-sync.sh --conflict-mode prefer-local --yes
+```
+
+### Working-dir layout
+
+```
+~/mom-vps-data/<host_slug>/working/
+├── files/config/*.json     ← editable local copy (the "local pool")
+├── manifest.json           ← baseline = VPS state at last successful sync
+├── .history/<ts>/          ← per-sync VPS pull (manifest + files)
+├── .sync-state.jsonl       ← append-only log of every sync decision
+└── .sync.lock              ← flock — only one sync at a time per host
+```
+
+`.history/` is auto-pruned to the last 30 entries. `.sync-state.jsonl`
+keeps full plan + outcome of every run for ALCOA+ Contemporaneous /
+Reproducible — grep it for the audit trail of who synced what when.
+
+### Optional pre-push hook
+
+`.githooks/pre-push` runs `data-sync.sh --check-only` before each
+`git push` and prompts for confirmation if local data has drifted from
+the VPS. It is silent when offline / when VPS is unreachable so it never
+blocks travel. Activate per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Bypass any single push with `git push --no-verify`.
+
+### Automation: run sync on a 5-minute schedule
+
+macOS (launchd):
+
+```xml
+<!-- ~/Library/LaunchAgents/com.hesem.mom.data-sync.plist -->
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+  <key>Label</key>            <string>com.hesem.mom.data-sync</string>
+  <key>ProgramArguments</key> <array>
+    <string>/bin/bash</string>
+    <string>/Users/YOU/Documents/mom/tools/vps-setup/scripts/data-sync.sh</string>
+    <string>--pull-only</string><string>--yes</string>
+  </array>
+  <key>StartInterval</key>    <integer>300</integer>
+  <key>StandardOutPath</key>  <string>/tmp/mom-data-sync.out</string>
+  <key>StandardErrorPath</key><string>/tmp/mom-data-sync.err</string>
+</dict></plist>
+```
+
+Then: `launchctl load ~/Library/LaunchAgents/com.hesem.mom.data-sync.plist`.
+
+Linux (cron):
+
+```cron
+*/5 * * * * /bin/bash $HOME/Documents/mom/tools/vps-setup/scripts/data-sync.sh --pull-only --yes >>/tmp/mom-data-sync.log 2>&1
+```
+
+Default to `--pull-only` for the timer: scheduled runs should never push
+without an explicit human change reference.
 
 ## File-system layout
 

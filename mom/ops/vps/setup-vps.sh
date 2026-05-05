@@ -225,6 +225,14 @@ systemctl enable nginx
 echo "[7/10] Cloning repository..."
 mkdir -p /var/www
 if [ -d "$APP_DIR" ]; then
+    if [ "${SETUP_VPS_FORCE_RESET:-0}" != "1" ]; then
+        echo "ERROR: $APP_DIR already exists. setup-vps.sh refuses to git reset --hard"
+        echo "       an existing checkout because it would clobber runtime config."
+        echo "       Use tools/vps-setup/scripts/deploy.sh for updates."
+        echo "       To intentionally re-bootstrap (DESTRUCTIVE), set SETUP_VPS_FORCE_RESET=1"
+        echo "       and back up /var/www/data-private/ first."
+        exit 1
+    fi
     cd "$APP_DIR" && git fetch origin && git reset --hard origin/main
 else
     git clone "$REPO_URL" "$APP_DIR"
@@ -250,18 +258,14 @@ certbot --nginx -d "$DOMAIN" --non-interactive --agree-tos --email admin@hesem.c
 echo "[10/10] Creating deploy script..."
 cat > /usr/local/bin/hesem-deploy <<'DEPLOY'
 #!/usr/bin/env bash
+# DEPRECATED — this shim is kept only so existing operator muscle memory
+# resolves to the correct script. The real deploy logic lives in
+# tools/vps-setup/scripts/deploy.sh which preserves runtime config across
+# git reset --hard. The previous inline `git reset --hard` here was
+# DELETED because it bypassed preservation and could clobber runtime data.
 set -euo pipefail
-cd /var/www/hesem-mom
-echo "Pulling latest code..."
-git fetch origin
-git reset --hard origin/main
-chown -R www-data:www-data .
-chmod -R 755 .
-chmod -R 775 mom/data
-
-echo "Clearing PHP OPcache..."
-php8.5 -r "opcache_reset();" 2>/dev/null || true
-systemctl reload php8.5-fpm
+APP_DIR=/var/www/hesem-mom
+exec bash "$APP_DIR/tools/vps-setup/scripts/deploy.sh"
 
 echo "Deploy complete! $(date)"
 DEPLOY
