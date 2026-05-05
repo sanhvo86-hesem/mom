@@ -52,7 +52,6 @@ final class DataSyncStatusService
         'ai_config.json',
     ];
 
-    private string $rootDir;
     private string $dataDir;
     private string $privateDataDir;
     private string $syncLogPath;
@@ -65,7 +64,10 @@ final class DataSyncStatusService
         ?string $privateDataDir = null,
         ?string $syncLogPath = null
     ) {
-        $this->rootDir = rtrim(str_replace('\\', '/', $rootDir), '/');
+        // $rootDir is part of the controller wiring contract (BaseController
+        // hands it to every service) but this read-only introspection service
+        // does not need it. Discard explicitly so phpstan stops flagging it.
+        unset($rootDir);
         $this->dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->privateDataDir = rtrim(str_replace('\\', '/', $privateDataDir
             ?? ((string)(getenv('PRIVATE_DATA') ?: '/var/www/data-private'))), '/');
