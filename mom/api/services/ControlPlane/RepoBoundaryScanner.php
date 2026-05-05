@@ -67,6 +67,12 @@ final class RepoBoundaryScanner
         '#^mom/data/schema-studio/(?:designs/workspace\.json|snapshots/workspace\.baseline\.json|policies/control-plane-defaults\.json)$#i',
         '#^mom/docs/system/agent-reports/tranche[0-9]+/(?:pass2-)?agent[0-9]-[^/]+\.md$#i',
         '#^mom/docs/system/(?:branch-strategy|unresolved-backlog-ledger|world-benchmark-dossier|world-class-swarm-closure|world-class-swarm-reaudit-closure)-tranche[0-9]+\.md$#i',
+        // HMV4 Wave 1 slice program — .gitignore explicitly whitelists this
+        // path because external evaluators review the artifacts on GitHub
+        // (CLAUDE.md "!_reports/module-template-v4/"). Mirror that exception
+        // here so the deploy boundary check stops blocking commits that
+        // touch the slice program inputs/outputs.
+        '#^_reports/module-template-v4/.*$#',
     ];
 
     /**
