@@ -64,16 +64,29 @@ jobs:
         working-directory: mom
         run: composer install --no-interaction --prefer-dist
 
-      - name: Validate controlled source before deploy
+      # Split into 4 steps so the GitHub Actions UI shows EXACTLY which gate
+      # fails. Previously bundled into one step where a phpunit failure
+      # looked identical to a phpstan failure looked identical to a
+      # workflow-status-authority failure.
+      - name: Validate — phpstan analyse
         working-directory: mom
-        env:
-          APP_ENV: test
-          DB_PASSWORD: test_password
-        run: |
-          ./composer analyse -- --memory-limit=1G
-          ./composer test
-          ./composer check
-          php tools/release/check_workflow_status_authority.php
+        env: { APP_ENV: test, DB_PASSWORD: test_password }
+        run: ./composer analyse -- --memory-limit=1G
+
+      - name: Validate — phpunit tests
+        working-directory: mom
+        env: { APP_ENV: test, DB_PASSWORD: test_password }
+        run: ./composer test
+
+      - name: Validate — composer check (analyse + test)
+        working-directory: mom
+        env: { APP_ENV: test, DB_PASSWORD: test_password }
+        run: ./composer check
+
+      - name: Validate — workflow status authority
+        working-directory: mom
+        env: { APP_ENV: test, DB_PASSWORD: test_password }
+        run: php tools/release/check_workflow_status_authority.php
 
       - name: Require governed promotion inputs
         env:
