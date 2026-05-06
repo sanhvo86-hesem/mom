@@ -155,8 +155,13 @@ foreach ($rows as $row) {
         continue;
     }
 
-    // Resolve the source HTML file from the header.filesystem_path column.
+    // Resolve the source HTML file. dcc_document_header.filesystem_path is
+    // not always populated, so fall back to scan_cache.json (the scanned
+    // doc registry that the portal also uses) keyed by doc_code.
     $relPath = (string)($row['filesystem_path'] ?? '');
+    if ($relPath === '') {
+        $relPath = scan_cache_path_for($docCode, $root);
+    }
     if ($relPath === '') {
         log_line("   ERROR {$docCode}: header.path is empty.");
         continue;
@@ -211,4 +216,32 @@ exit(0);
 function log_line(string $msg): void
 {
     fwrite(STDOUT, '[' . date('Y-m-d H:i:s') . '] ' . $msg . "\n");
+}
+
+/**
+ * Resolve doc path from mom/data/scan_cache.json. Cached after first call
+ * so the cron only reads the file once per invocation.
+ */
+function scan_cache_path_for(string $docCode, string $root): string
+{
+    static $map = null;
+    if ($map === null) {
+        $map = [];
+        $cachePath = $root . '/mom/data/scan_cache.json';
+        if (is_file($cachePath)) {
+            $raw = @file_get_contents($cachePath);
+            if (is_string($raw)) {
+                $decoded = @json_decode($raw, true);
+                $docs = is_array($decoded['docs'] ?? null) ? $decoded['docs'] : [];
+                foreach ($docs as $doc) {
+                    $code = strtoupper(trim((string)($doc['code'] ?? '')));
+                    $path = (string)($doc['path'] ?? '');
+                    if ($code !== '' && $path !== '') {
+                        $map[$code] = $path;
+                    }
+                }
+            }
+        }
+    }
+    return $map[strtoupper(trim($docCode))] ?? '';
 }
