@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
+use MOM\Api\Services\DataSyncMutationService;
 use MOM\Api\Services\DataSyncStatusService;
 use MOM\Api\Services\GraphicsGovernanceException;
 use MOM\Api\Services\GraphicsGovernanceService;
@@ -131,6 +132,195 @@ class AdminController extends BaseController
             $this->auditLog('admin_data_sync_status_failed', ['error' => $e->getMessage()]);
             $this->error('data_sync_status_failed', 500, $e->getMessage());
         }
+    }
+
+    /**
+     * GET admin_data_sync_download_file ?file=<basename>
+     * Returns the raw content of one whitelisted runtime file as an attachment.
+     */
+    public function dataSyncDownloadFile(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAdmin($me);
+
+        $file = (string)($this->query('file') ?? '');
+        try {
+            $svc = $this->dataSyncMutator();
+            $row = $svc->readSiteFile($file);
+            $safeName = preg_replace('/[^A-Za-z0-9._-]/', '_', $file) ?: 'download.json';
+            // Send as application/json download
+            while (ob_get_level() > 0) { @ob_end_clean(); }
+            header('Content-Type: application/json; charset=utf-8');
+            header('Content-Disposition: attachment; filename="' . $safeName . '"');
+            header('X-File-SHA256: ' . $row['sha256']);
+            header('Cache-Control: no-store, must-revalidate');
+            header('X-Content-Type-Options: nosniff');
+            echo $row['bytes'];
+            $this->auditLog('admin_data_sync_download_file', ['file' => $file, 'sha256' => $row['sha256']]);
+            exit;
+        } catch (Throwable $e) {
+            $this->mapMutationException($e);
+        }
+    }
+
+    /**
+     * POST admin_data_sync_upload_file
+     * Body: { file, content, expected_sha256?, change_ref?, force? }
+     */
+    public function dataSyncUploadFile(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $body = $this->jsonBody(8 * 1024 * 1024);
+        $file = (string)($body['file'] ?? '');
+        $content = (string)($body['content'] ?? '');
+        $expected = isset($body['expected_sha256']) && $body['expected_sha256'] !== ''
+            ? (string)$body['expected_sha256'] : null;
+        $force = !empty($body['force']);
+        if ($force) {
+            // Bypass drift detection by passing null baseline.
+            $expected = null;
+        }
+        $changeRef = trim((string)($body['change_ref'] ?? ''));
+        if ($changeRef === '') {
+            $changeRef = 'admin-ui-' . substr(bin2hex(random_bytes(3)), 0, 6);
+        }
+        $actor = (string)($me['username'] ?? 'unknown');
+
+        try {
+            $svc = $this->dataSyncMutator();
+            $result = $svc->uploadFile($file, $content, $expected, $actor, $changeRef);
+            $this->success(array_merge(['file' => $file, 'change_ref' => $changeRef], $result));
+        } catch (Throwable $e) {
+            $this->mapMutationException($e);
+        }
+    }
+
+    /**
+     * POST admin_data_sync_resolve_drift
+     * Body: { file, direction: site_to_mirror|mirror_to_site, change_ref? }
+     */
+    public function dataSyncResolveDrift(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $body = $this->jsonBody();
+        $file = (string)($body['file'] ?? '');
+        $direction = (string)($body['direction'] ?? '');
+        $changeRef = trim((string)($body['change_ref'] ?? ''));
+        if ($changeRef === '') {
+            $changeRef = 'admin-ui-drift-' . substr(bin2hex(random_bytes(3)), 0, 6);
+        }
+        $actor = (string)($me['username'] ?? 'unknown');
+
+        try {
+            $svc = $this->dataSyncMutator();
+            $result = $svc->resolveMirrorDrift($file, $direction, $actor, $changeRef);
+            $this->success(array_merge(['file' => $file], $result));
+        } catch (Throwable $e) {
+            $this->mapMutationException($e);
+        }
+    }
+
+    /**
+     * GET admin_data_sync_snapshots
+     */
+    public function dataSyncListSnapshots(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAdmin($me);
+
+        try {
+            $svc = $this->dataSyncMutator();
+            $rows = $svc->listSnapshots(60);
+            $this->success(['snapshots' => $rows]);
+        } catch (Throwable $e) {
+            $this->mapMutationException($e);
+        }
+    }
+
+    /**
+     * POST admin_data_sync_restore_snapshot
+     * Body: { snapshot_id, file? (optional, restores single file), change_ref? }
+     */
+    public function dataSyncRestoreSnapshot(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $body = $this->jsonBody();
+        $snapshotId = (string)($body['snapshot_id'] ?? '');
+        $file = isset($body['file']) && $body['file'] !== '' ? (string)$body['file'] : null;
+        $changeRef = trim((string)($body['change_ref'] ?? ''));
+        if ($changeRef === '') {
+            $changeRef = 'admin-ui-restore-' . substr(bin2hex(random_bytes(3)), 0, 6);
+        }
+        $actor = (string)($me['username'] ?? 'unknown');
+
+        try {
+            $svc = $this->dataSyncMutator();
+            $result = $svc->restoreFromSnapshot($snapshotId, $file, $actor, $changeRef);
+            $this->success($result);
+        } catch (Throwable $e) {
+            $this->mapMutationException($e);
+        }
+    }
+
+    /**
+     * POST admin_data_sync_take_snapshot
+     * Body: { files?: list<basename>, reason?: string }
+     */
+    public function dataSyncTakeSnapshot(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $body = $this->jsonBody();
+        $files = isset($body['files']) && is_array($body['files']) ? array_values(array_map('strval', $body['files'])) : null;
+        $reason = trim((string)($body['reason'] ?? 'manual'));
+        if (strlen($reason) > 80) { $reason = substr($reason, 0, 80); }
+        $actor = (string)($me['username'] ?? 'unknown');
+
+        try {
+            $svc = $this->dataSyncMutator();
+            $result = $svc->takeManualSnapshot($files, $actor, $reason);
+            $this->success($result);
+        } catch (Throwable $e) {
+            $this->mapMutationException($e);
+        }
+    }
+
+    private function dataSyncMutator(): DataSyncMutationService
+    {
+        return new DataSyncMutationService($this->dataDir, $this->data);
+    }
+
+    /**
+     * Map RuntimeException codes thrown by DataSyncMutationService into
+     * stable HTTP errors the frontend can react to.
+     */
+    private function mapMutationException(Throwable $e): never
+    {
+        $msg = $e->getMessage();
+        $code = strtok($msg, ':') ?: 'unknown_error';
+        $detail = (string)substr($msg, strlen($code) + 1);
+        $http = match ($code) {
+            'invalid_file', 'invalid_direction', 'invalid_snapshot_id', 'invalid_json', 'empty_content' => 400,
+            'file_not_found', 'snapshot_not_found', 'snapshot_has_no_config', 'snapshot_empty', 'source_missing' => 404,
+            'file_too_large' => 413,
+            'drift_detected', 'file_locked' => 409,
+            'mirror_unavailable' => 503,
+            'forbidden' => 403,
+            default => 500,
+        };
+        $this->auditLog('admin_data_sync_action_failed', ['code' => $code, 'detail' => $detail]);
+        $this->error($code, $http, $detail);
     }
 
     /**

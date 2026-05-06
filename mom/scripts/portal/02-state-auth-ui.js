@@ -6091,6 +6091,252 @@ function adminRefreshDataSyncStatus(){
   loadDataSyncStatus({force:true});
 }
 
+// ── Data-sync action handlers ──────────────────────────────────────────────
+let dataSyncSnapshotsState = {loading:false, loaded:false, error:'', data:null};
+
+async function loadDataSyncSnapshots(options={}){
+  const force = !!options.force;
+  if(dataSyncSnapshotsState.loading && !force) return;
+  if(dataSyncSnapshotsState.loaded && !force) return;
+  dataSyncSnapshotsState.loading = true;
+  if(currentPage === 'admin') renderAdmin();
+  try{
+    const res = await apiCall('admin_data_sync_snapshots', null, 'GET');
+    if(res && res.ok){
+      dataSyncSnapshotsState = {loading:false, loaded:true, error:'', data:res};
+    }else{
+      dataSyncSnapshotsState = {loading:false, loaded:false,
+        error:(res && (res.detail || res.error)) ? String(res.detail||res.error) : 'snapshots_failed', data:null};
+    }
+  }catch(e){
+    dataSyncSnapshotsState = {loading:false, loaded:false, error:e.message||'snapshots_failed', data:null};
+  }finally{
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+function adminDataSyncDownload(name){
+  // Browser-native download: hit the GET endpoint, browser saves to Downloads.
+  if(!name || typeof name !== 'string') return;
+  const url = 'api.php?action=admin_data_sync_download_file&file=' + encodeURIComponent(name);
+  // Use a hidden link click so cookies + credentials flow naturally.
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => document.body.removeChild(a), 100);
+  showToast(lang==='en' ? `Downloading ${name}…` : `Đang tải ${name}…`);
+}
+
+function adminDataSyncUploadPrompt(name){
+  if(!name) return;
+  // Find current sha so we can pass expected_sha256 (drift detection).
+  const data = dataSyncStatusState.data;
+  let currentSha = '';
+  if(data && Array.isArray(data.config_files)){
+    const f = data.config_files.find(x => x && x.name === name);
+    if(f && f.site_sha256_short) currentSha = f.site_sha256_short;
+  }
+
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.json,application/json';
+  input.style.display = 'none';
+  input.onchange = async () => {
+    const file = input.files && input.files[0];
+    document.body.removeChild(input);
+    if(!file) return;
+    if(file.size > 5*1024*1024){
+      showToast(lang==='en' ? 'File > 5MB — refused' : 'File > 5MB — bị từ chối');
+      return;
+    }
+    let text;
+    try{ text = await file.text(); }
+    catch(e){ showToast('Read failed: ' + e.message); return; }
+    try{ JSON.parse(text); }
+    catch(e){ showToast(lang==='en' ? `Not valid JSON: ${e.message}` : `JSON không hợp lệ: ${e.message}`); return; }
+
+    const cr = prompt(lang==='en'
+      ? `Change reference for upload of ${name} (e.g. CR-2026-099):`
+      : `Mã thay đổi (CR) cho lần đẩy ${name} (vd CR-2026-099):`,
+      '');
+    if(cr === null) return;
+    const changeRef = (cr || '').trim() || 'admin-ui';
+    await adminDataSyncUploadDo(name, text, currentSha ? null : null, changeRef, false);
+  };
+  document.body.appendChild(input);
+  input.click();
+}
+
+async function adminDataSyncUploadDo(name, content, expectedSha, changeRef, force){
+  try{
+    const body = {file: name, content, change_ref: changeRef};
+    if(expectedSha) body.expected_sha256 = expectedSha;
+    if(force) body.force = true;
+    const res = await apiCall('admin_data_sync_upload_file', body, 'POST');
+    if(res && res.ok){
+      if(res.unchanged){
+        showToast(lang==='en' ? `${name}: no change` : `${name}: không có thay đổi`);
+      }else{
+        showToast(lang==='en'
+          ? `${name} uploaded · snapshot ${(res.snapshot||'').slice(0,15)}`
+          : `Đã đẩy ${name} · snapshot ${(res.snapshot||'').slice(0,15)}`);
+      }
+      adminRefreshDataSyncStatus();
+      dataSyncSnapshotsState = {loading:false, loaded:false, error:'', data:null};
+      return;
+    }
+    if(res && res.error === 'drift_detected'){
+      const ok = confirm(lang==='en'
+        ? `${name} on the VPS changed since you opened this page (sha=${res.detail||'?'}). Force overwrite?`
+        : `${name} trên VPS đã thay đổi từ lúc bạn mở trang (sha=${res.detail||'?'}). Vẫn ép ghi đè?`);
+      if(ok) return adminDataSyncUploadDo(name, content, null, changeRef, true);
+      return;
+    }
+    showToast((lang==='en' ? 'Upload failed: ' : 'Đẩy thất bại: ') + (res && (res.detail||res.error) || 'unknown'));
+  }catch(e){
+    showToast('Upload error: ' + e.message);
+  }
+}
+
+async function adminDataSyncResolveDrift(name, direction){
+  const dirLabel = direction === 'site_to_mirror' ? 'site → mirror' : 'mirror → site';
+  if(!confirm(lang==='en'
+      ? `Resolve drift for ${name} by copying ${dirLabel}? A snapshot is taken first.`
+      : `Giải quyết lệch ${name} bằng cách copy ${dirLabel}? Snapshot sẽ được tạo trước.`)){
+    return;
+  }
+  const cr = prompt(lang==='en' ? 'Change reference:' : 'Mã thay đổi (CR):', 'admin-ui-drift');
+  if(cr === null) return;
+  try{
+    const res = await apiCall('admin_data_sync_resolve_drift',
+      {file: name, direction, change_ref: cr.trim() || 'admin-ui-drift'}, 'POST');
+    if(res && res.ok){
+      if(res.unchanged){
+        showToast(lang==='en' ? 'Already in sync' : 'Đã khớp sẵn');
+      }else{
+        showToast(lang==='en'
+          ? `Resolved ${name} (${dirLabel}) · snapshot ${(res.snapshot||'').slice(0,15)}`
+          : `Đã giải quyết ${name} (${dirLabel}) · snapshot ${(res.snapshot||'').slice(0,15)}`);
+      }
+      adminRefreshDataSyncStatus();
+      dataSyncSnapshotsState = {loading:false, loaded:false, error:'', data:null};
+    }else{
+      showToast((lang==='en' ? 'Failed: ' : 'Lỗi: ') + (res && (res.detail||res.error) || 'unknown'));
+    }
+  }catch(e){
+    showToast('Error: ' + e.message);
+  }
+}
+
+async function adminDataSyncTakeSnapshot(){
+  const reason = prompt(lang==='en' ? 'Snapshot reason / label:' : 'Lý do/nhãn snapshot:', 'manual checkpoint');
+  if(reason === null) return;
+  try{
+    const res = await apiCall('admin_data_sync_take_snapshot', {reason: reason || 'manual'}, 'POST');
+    if(res && res.ok){
+      showToast(lang==='en'
+        ? `Snapshot ${(res.snapshot||'').slice(0,15)} taken`
+        : `Đã tạo snapshot ${(res.snapshot||'').slice(0,15)}`);
+      dataSyncSnapshotsState = {loading:false, loaded:false, error:'', data:null};
+      loadDataSyncSnapshots({force:true});
+    }else{
+      showToast((lang==='en'?'Failed: ':'Lỗi: ') + (res && (res.detail||res.error) || 'unknown'));
+    }
+  }catch(e){
+    showToast('Error: ' + e.message);
+  }
+}
+
+async function adminDataSyncRestoreSnapshot(snapshotId, fileName){
+  const target = fileName ? `${fileName} from ${snapshotId}` : `ALL files from ${snapshotId}`;
+  if(!confirm(lang==='en'
+      ? `Restore ${target}? Current bytes will be snapshotted before overwrite.`
+      : `Khôi phục ${target}? Bản hiện tại sẽ được snapshot trước khi ghi đè.`)){
+    return;
+  }
+  const cr = prompt(lang==='en' ? 'Change reference:' : 'Mã thay đổi (CR):', 'admin-ui-restore');
+  if(cr === null) return;
+  try{
+    const body = {snapshot_id: snapshotId, change_ref: cr.trim() || 'admin-ui-restore'};
+    if(fileName) body.file = fileName;
+    const res = await apiCall('admin_data_sync_restore_snapshot', body, 'POST');
+    if(res && res.ok){
+      const n = (res.restored||[]).length;
+      showToast(lang==='en' ? `Restored ${n} file(s)` : `Đã khôi phục ${n} file`);
+      adminRefreshDataSyncStatus();
+      dataSyncSnapshotsState = {loading:false, loaded:false, error:'', data:null};
+    }else{
+      showToast((lang==='en'?'Failed: ':'Lỗi: ') + (res && (res.detail||res.error) || 'unknown'));
+    }
+  }catch(e){
+    showToast('Error: ' + e.message);
+  }
+}
+
+function renderAdminDataSyncSnapshotsCard(){
+  const state = dataSyncSnapshotsState;
+  const titleEn = 'Snapshots & restore';
+  const titleVi = 'Snapshot & khôi phục';
+
+  const headerHtml = `<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap">
+    <div class="admin-sync-panel-title">${escapeHtml(lang==='en'?titleEn:titleVi)}</div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <button class="admin-sync-mini" onclick="adminDataSyncTakeSnapshot()">+ ${escapeHtml(lang==='en'?'Take snapshot':'Tạo snapshot')}</button>
+      <button class="admin-sync-mini" onclick="loadDataSyncSnapshots({force:true})">${escapeHtml(lang==='en'?'Refresh':'Làm mới')}</button>
+    </div>
+  </div>`;
+
+  if(state.loading && !state.data){
+    return `<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">
+      ${headerHtml}
+      <div class="admin-sync-callout-bar is-info">${escapeHtml(lang==='en'?'Loading snapshots…':'Đang tải snapshot…')}</div>
+    </article>`;
+  }
+  if(state.error && !state.data){
+    return `<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">
+      ${headerHtml}
+      <div class="admin-sync-callout-bar is-error">${escapeHtml((lang==='en'?'Could not list snapshots. ':'Không liệt kê snapshot được. ')+state.error)}</div>
+    </article>`;
+  }
+  const snaps = (state.data && Array.isArray(state.data.snapshots)) ? state.data.snapshots : [];
+  if(!snaps.length){
+    return `<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">
+      ${headerHtml}
+      <div style="color:var(--text-3);font-size:12px">${escapeHtml(lang==='en'?'No snapshots yet. Take one before risky changes.':'Chưa có snapshot. Tạo trước khi thao tác rủi ro.')}</div>
+    </article>`;
+  }
+  const fmtTime = iso => iso ? gitRepoFormatTime(iso) || iso : '--';
+  const rows = snaps.map(s => `<tr>
+    <td><code>${escapeHtml(s.id||'')}</code></td>
+    <td>${escapeHtml(fmtTime(s.captured_at))}</td>
+    <td><code>${escapeHtml(s.change_ref||'--')}</code></td>
+    <td><code>${escapeHtml(s.actor||'--')}</code></td>
+    <td>${escapeHtml(String(s.file_count||0))}</td>
+    <td>${escapeHtml(s.reason||'--')}</td>
+    <td><button class="dsync-act dsync-restore" onclick='adminDataSyncRestoreSnapshot(${JSON.stringify(s.id||"")}, null)'>${escapeHtml(lang==='en'?'Restore all':'Khôi phục tất cả')}</button></td>
+  </tr>`).join('');
+  return `<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">
+    ${headerHtml}
+    <div style="margin-top:6px;color:var(--text-3);font-size:12px">${escapeHtml(lang==='en'
+      ? 'Each upload/restore/drift-resolve action takes a snapshot first. Restore brings the captured bytes back over the live site (with a fresh pre-restore snapshot for safety).'
+      : 'Mỗi lần upload/khôi phục/giải quyết lệch đều tạo snapshot trước. Khôi phục đưa bytes đã giữ về site hiện tại (kèm snapshot pre-restore để rollback).')}</div>
+    <table class="admin-sync-simple-table" style="width:100%;border-collapse:collapse;font-size:11px;margin-top:8px">
+      <thead><tr>
+        <th style="text-align:left">${escapeHtml(lang==='en'?'Snapshot id':'Mã snapshot')}</th>
+        <th style="text-align:left">${escapeHtml(lang==='en'?'Captured at':'Tạo lúc')}</th>
+        <th style="text-align:left">CR</th>
+        <th style="text-align:left">${escapeHtml(lang==='en'?'Actor':'Người làm')}</th>
+        <th style="text-align:left">${escapeHtml(lang==='en'?'Files':'File')}</th>
+        <th style="text-align:left">${escapeHtml(lang==='en'?'Reason':'Lý do')}</th>
+        <th style="text-align:left">${escapeHtml(lang==='en'?'Action':'Hành động')}</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </article>`;
+}
+
 function renderAdminDataSyncCard(){
   const state = dataSyncStatusState;
   const data = state.data && typeof state.data === 'object' ? state.data : null;
@@ -6163,6 +6409,19 @@ function renderAdminDataSyncCard(){
           : (!f.private_present
               ? `<span class="admin-sync-status-pill is-warn">${escapeHtml(lang==='en' ? 'no mirror' : 'chưa mirror')}</span>`
               : `<span class="admin-sync-status-pill is-warn">${escapeHtml(lang==='en' ? 'drift' : 'lệch')}</span>`));
+    const fName = JSON.stringify(f.name);
+    const dl = f.site_present
+      ? `<button class="dsync-act dsync-dl" onclick='adminDataSyncDownload(${fName})' title="${escapeHtml(lang==='en'?'Download site copy':'Tải file site')}">⬇ ${escapeHtml(lang==='en'?'Tải':'Tải')}</button>`
+      : '';
+    const up = `<button class="dsync-act dsync-up" onclick='adminDataSyncUploadPrompt(${fName})' title="${escapeHtml(lang==='en'?'Upload from laptop':'Đẩy file từ máy lên')}">⬆ ${escapeHtml(lang==='en'?'Đẩy':'Đẩy')}</button>`;
+    const drift = (f.site_present && f.private_present && !f.in_sync_with_mirror)
+      ? `<button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"site_to_mirror")' title="${escapeHtml(lang==='en'?'Push site over mirror':'Đẩy site đè mirror')}">→ ${escapeHtml(lang==='en'?'site→mirror':'site→mirror')}</button>
+         <button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"mirror_to_site")' title="${escapeHtml(lang==='en'?'Pull mirror over site':'Kéo mirror đè site')}">← ${escapeHtml(lang==='en'?'mirror→site':'mirror→site')}</button>`
+      : '';
+    const noMirror = (f.site_present && !f.private_present)
+      ? `<button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"site_to_mirror")' title="${escapeHtml(lang==='en'?'Seed mirror':'Tạo mirror')}">+ ${escapeHtml(lang==='en'?'seed mirror':'tạo mirror')}</button>`
+      : '';
+    const actions = `<div class="dsync-actions">${dl}${up}${drift}${noMirror}</div>`;
     return `<tr>
       <td><code>${escapeHtml(f.name)}</code></td>
       <td>${escapeHtml(f.site_present ? fmtBytes(f.site_size) : '--')}</td>
@@ -6170,6 +6429,7 @@ function renderAdminDataSyncCard(){
       <td><code>${escapeHtml(f.site_sha256_short || '--')}</code></td>
       <td><code>${escapeHtml(f.private_sha256_short || '--')}</code></td>
       <td>${okBadge}</td>
+      <td>${actions}</td>
     </tr>`;
   }).join('');
 
@@ -6181,6 +6441,7 @@ function renderAdminDataSyncCard(){
         <th style="text-align:left">${escapeHtml(lang==='en' ? 'Site sha' : 'Sha site')}</th>
         <th style="text-align:left">${escapeHtml(lang==='en' ? 'Mirror sha' : 'Sha mirror')}</th>
         <th style="text-align:left">${escapeHtml(lang==='en' ? 'State' : 'Trạng thái')}</th>
+        <th style="text-align:left">${escapeHtml(lang==='en' ? 'Actions' : 'Hành động')}</th>
       </tr></thead>
       <tbody>${rows || `<tr><td colspan="6" style="color:var(--text-3);padding:8px">${escapeHtml(lang==='en' ? 'No runtime files registered.' : 'Chưa có file runtime nào.')}</td></tr>`}</tbody>
     </table>`;
@@ -6253,7 +6514,16 @@ ${docs.push_only || 'bash tools/vps-setup/scripts/data-sync.sh --push-only --yes
 ${docs.readme || 'tools/vps-setup/README-DATA-SYNC.md'}`)}</pre>
   </details>`;
 
-  return `<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">
+  return `<style>
+    .dsync-actions { display:flex; gap:4px; flex-wrap:wrap; }
+    .dsync-act { font-size:10px; padding:2px 6px; border-radius:4px; border:1px solid #cbd5e1; background:#f8fafc; cursor:pointer; line-height:1.2; }
+    .dsync-act:hover { background:#e2e8f0; }
+    .dsync-dl { color:#1e40af; }
+    .dsync-up { color:#0f766e; }
+    .dsync-resolve { color:#92400e; }
+    .dsync-restore { color:#7e22ce; font-weight:600; }
+  </style>
+  <article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
       <div>
         <div class="admin-sync-panel-title">${escapeHtml(lang==='en' ? titleEn : titleVi)}</div>
@@ -6416,6 +6686,7 @@ function renderAdminSyncPanelV2(){
         </div>
       ` : ''}
       ${renderAdminDataSyncCard()}
+      ${renderAdminDataSyncSnapshotsCard()}
       <article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">
         <div class="admin-sync-panel-title">${escapeHtml(deployTitle)}</div>
         <ol class="admin-sync-deploy-steps">
@@ -6438,6 +6709,9 @@ function renderAdminVersionControl(){
   }
   if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading && !dataSyncStatusState.error){
     loadDataSyncStatus({silent:true});
+  }
+  if(!dataSyncSnapshotsState.loaded && !dataSyncSnapshotsState.loading && !dataSyncSnapshotsState.error){
+    loadDataSyncSnapshots({silent:true});
   }
   el.innerHTML = renderAdminSyncPanelV2();
 }

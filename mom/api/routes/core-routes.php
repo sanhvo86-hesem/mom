@@ -84,6 +84,12 @@ return static function (Router $router, string $dataDir): void {
     $router->actions([
         'admin_git_status'                 => [AdminController::class, 'gitStatus'],
         'admin_data_sync_status'           => [AdminController::class, 'dataSyncStatus'],
+        'admin_data_sync_download_file'    => [AdminController::class, 'dataSyncDownloadFile'],
+        'admin_data_sync_upload_file'      => [AdminController::class, 'dataSyncUploadFile'],
+        'admin_data_sync_resolve_drift'    => [AdminController::class, 'dataSyncResolveDrift'],
+        'admin_data_sync_snapshots'        => [AdminController::class, 'dataSyncListSnapshots'],
+        'admin_data_sync_restore_snapshot' => [AdminController::class, 'dataSyncRestoreSnapshot'],
+        'admin_data_sync_take_snapshot'    => [AdminController::class, 'dataSyncTakeSnapshot'],
         'admin_clear_site_cache'           => [AdminController::class, 'clearCache'],
         'get_data_settings'                => [AdminController::class, 'getSettings'],
         'save_data_settings'               => [AdminController::class, 'saveSettings'],
