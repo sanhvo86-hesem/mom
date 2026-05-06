@@ -35,12 +35,15 @@ mom/sw-build-tag.js
 mom/docs/tmp/
 mom/docs/forms/**/.backups/
 mom/docs/forms/**/*.bak
-# DocumentLocaleAutomationService writes auto-translated cache siblings next
-# to source docs (`_<stem>.preview_r<rev>.<locale>.<ext>`) — runtime artifacts,
-# not source-of-truth. Was producing 380+ untracked entries on the VPS after
-# the NLLB provider warmed up.
-mom/docs/**/_*.preview_r*.html
-mom/docs/**/_*.preview_r*.htm
+# DocumentLocaleAutomationService writes auto-translated siblings next to
+# source docs in two shapes (depending on whether revision is set):
+#   _<stem>.preview_r<rev>.<locale>.html  (revision-pinned preview)
+#   _<stem>.<locale>.html                  (current published translation)
+# Both are runtime cache, regenerated on demand. Match by trailing locale
+# code instead of the optional `.preview_rN` middle so both shapes are
+# caught. Add a new locale here when the portal grows beyond vi/en.
+mom/docs/**/_*.en.html
+mom/docs/**/_*.en.htm
 # Ad-hoc debug scratch file from tee/sed sessions on the VPS.
 mom/dbg.txt
 mom/docs/system/agent-reports/
