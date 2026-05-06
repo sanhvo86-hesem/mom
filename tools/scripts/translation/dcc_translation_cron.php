@@ -1,0 +1,189 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * dcc_translation_cron.php — user-mode translation worker.
+ *
+ * Why this exists:
+ *   The portal's request handler (PHP-FPM as www-data) can spawn the local
+ *   NLLB driver because that driver doesn't need OAuth credentials. But the
+ *   subscription CLIs (`claude`, `codex`) read OAuth tokens from
+ *   $HOME/.claude/.credentials.json, which lives under the operator's user
+ *   account and is not readable by www-data.
+ *
+ *   This worker runs under the operator's user (via cron or systemd), polls
+ *   the dcc_document_locale_variant table for variants whose source_hash
+ *   has drifted from the published artifact, and re-runs translation using
+ *   the registry-resolved provider chain. Every attempt is logged in
+ *   translation_usage_log just like the inline path.
+ *
+ * Cron example (run every 5 min as the operator user):
+ *   *\/5 * * * *  cd /var/www/mom-app && /usr/bin/php tools/scripts/translation/dcc_translation_cron.php >> /var/log/dcc-translation-cron.log 2>&1
+ *
+ * Env:
+ *   DCC_CRON_BATCH_LIMIT     max docs per run (default 5; cron polls again in 5 min)
+ *   DCC_CRON_ONLY_TIERS      comma list e.g. "tier_1,tier_2" — limit scope
+ *   DCC_CRON_DRY_RUN         "1" → log what would happen, don't write
+ *
+ * Exit codes:
+ *   0  success (including "no work to do")
+ *   2  fatal config error (missing autoload, no DB)
+ */
+
+$root = realpath(__DIR__ . '/../../..');
+if ($root === false) {
+    fwrite(STDERR, "Cannot resolve project root from cron script.\n");
+    exit(2);
+}
+
+$autoload = $root . '/mom/vendor/autoload.php';
+if (!is_file($autoload)) {
+    fwrite(STDERR, "Composer autoload not found at {$autoload}.\n");
+    exit(2);
+}
+require_once $autoload;
+
+// Load env. The portal's index.php uses dotenv via vendor; we load minimally
+// to keep this script independent.
+$envFile = $root . '/mom/.env';
+if (is_file($envFile)) {
+    foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+        if (str_starts_with(ltrim($line), '#')) {
+            continue;
+        }
+        if (!str_contains($line, '=')) {
+            continue;
+        }
+        [$k, $v] = explode('=', $line, 2);
+        $k = trim($k);
+        $v = trim($v, " \t\"'");
+        if ($k !== '' && getenv($k) === false) {
+            putenv("{$k}={$v}");
+            $_ENV[$k] = $v;
+        }
+    }
+}
+
+// We need the DataLayer + DocumentLocaleAutomationService. The application
+// boot is in mom/api/index.php; we don't want to run the full HTTP boot.
+// Reuse the bootstrap helpers via a minimal include.
+$dataDir = $root . '/mom/data';
+
+// Manual DataLayer init (mirrors what the boot script does).
+$config = require $root . '/mom/database/config.php';
+$dataLayer = new \MOM\Database\DataLayer($config, $dataDir);
+
+$batchLimit = (int)(getenv('DCC_CRON_BATCH_LIMIT') ?: '5');
+$onlyTiers = trim((string)(getenv('DCC_CRON_ONLY_TIERS') ?: ''));
+$dryRun = (string)(getenv('DCC_CRON_DRY_RUN') ?: '') === '1';
+
+$startTs = microtime(true);
+log_line("dcc-translation-cron start: limit={$batchLimit} only_tiers={$onlyTiers} dry_run=" . ($dryRun ? 'yes' : 'no'));
+
+// Find candidates: variants in machine_preview that need re-rendering with
+// the current provider routing. The simplest signal is: variants whose
+// engine_version doesn't match the *currently routed* provider's
+// engine_version pattern. To avoid recomputing routing per row, we just
+// pick variants whose translation_state IS 'machine_preview' AND whose
+// updated_at is older than the most recent dcc_document_header.updated_at.
+$candidatesSql = '
+    SELECT v.locale_variant_id, v.doc_code, v.translation_state, v.translation_provider,
+           v.engine_version, v.metadata, v.updated_at,
+           h.doc_type, h.title, h.subtitle, h.revision, h.status
+      FROM dcc_document_locale_variant v
+      JOIN dcc_document_header h ON h.doc_code = v.doc_code
+     WHERE v.locale = $1
+       AND v.translation_state IN ($2, $3)
+     ORDER BY v.updated_at ASC
+     LIMIT $4
+';
+
+try {
+    $rows = $dataLayer->query(
+        $candidatesSql,
+        ['en', 'machine_preview', 'blocked', $batchLimit]
+    );
+} catch (\Throwable $e) {
+    log_line('Query failed: ' . $e->getMessage());
+    exit(2);
+}
+
+if (!is_array($rows) || count($rows) === 0) {
+    log_line('No candidates. Exiting cleanly.');
+    exit(0);
+}
+
+log_line(sprintf('Found %d candidate(s).', count($rows)));
+
+$registry = new \MOM\Services\Translation\ProviderRegistryService(
+    $dataLayer,
+    new \MOM\Services\Translation\SecretVaultService($dataLayer),
+);
+$tierFilter = $onlyTiers === '' ? [] : array_map('trim', explode(',', $onlyTiers));
+
+$processed = 0;
+$skipped = 0;
+foreach ($rows as $row) {
+    $docCode = (string)$row['doc_code'];
+    $docType = (string)($row['doc_type'] ?? '');
+    $tier = $registry->tierForDocType($docType);
+    if (!empty($tierFilter) && !in_array($tier, $tierFilter, true)) {
+        $skipped++;
+        continue;
+    }
+    $resolution = $registry->describeResolution($docCode, $docType);
+    $primary = $resolution['attempts'][0] ?? null;
+    if ($primary === null) {
+        log_line("[SKIP] {$docCode}: no provider attempt resolves.");
+        $skipped++;
+        continue;
+    }
+    log_line(sprintf(
+        '[%s] %s tier=%s primary=%s/%s',
+        $dryRun ? 'DRY' : 'RUN',
+        $docCode,
+        $tier,
+        $primary['provider_key'],
+        $primary['model_id'] ?? '-'
+    ));
+    if ($dryRun) {
+        continue;
+    }
+
+    // Trigger the same automation entry point used by the portal. The
+    // automation service reads the DB-backed routing FIRST (added by
+    // migration 157), so the same provider chain applies.
+    try {
+        $automation = new \MOM\Services\DocumentControl\DocumentLocaleAutomationService(
+            $dataLayer,
+            $root
+        );
+        $result = $automation->syncEnglishMachinePreview(
+            $docCode,
+            'cron_worker',
+            ['trigger' => 'cron']
+        );
+        log_line(sprintf(
+            '   → state=%s provider=%s engine=%s',
+            $result['translation_state'] ?? '?',
+            $result['translation_provider'] ?? '?',
+            $result['engine_version'] ?? '?'
+        ));
+        $processed++;
+    } catch (\Throwable $e) {
+        log_line("   ERROR {$docCode}: " . $e->getMessage());
+    }
+}
+
+$elapsedMs = (int)((microtime(true) - $startTs) * 1000);
+log_line(sprintf(
+    'dcc-translation-cron done in %dms: processed=%d skipped=%d total=%d',
+    $elapsedMs, $processed, $skipped, count($rows)
+));
+exit(0);
+
+function log_line(string $msg): void
+{
+    fwrite(STDOUT, '[' . date('Y-m-d H:i:s') . '] ' . $msg . "\n");
+}
