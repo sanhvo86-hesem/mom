@@ -677,6 +677,7 @@ function moduleAccessAdminTabCatalog(){
     {id:'mfa', group:'security', icon:'🔑', labelEn:'MFA security', labelVi:'Bảo mật MFA', noteEn:'MFA policy and enrollment status.', noteVi:'Chính sách MFA và trạng thái kích hoạt.', defaultAccess:'admin'},
     {id:'ai_control', group:'operations', icon:'🤖', labelEn:'AI Control', labelVi:'Điều khiển AI', noteEn:'AI engine on/off, model selection, feature toggles, usage and cost tracking.', noteVi:'Bật/tắt AI engine, chọn model, tính năng, theo dõi sử dụng và chi phí.', defaultAccess:'admin'},
     {id:'translation_provider', group:'operations', icon:'🌐', labelEn:'Translation Provider', labelVi:'Engine Dịch Thuật', noteEn:'Switch between Argos and NLLB-200 translation engines for English locale artifacts.', noteVi:'Chuyển đổi giữa Argos và NLLB-200 cho artifact tiếng Anh.', defaultAccess:'admin'},
+    {id:'translation_module', group:'operations', icon:'🌍', labelEn:'Translation Module', labelVi:'Module Dịch Thuật', noteEn:'Multi-provider routing (NLLB / Claude CLI / Codex CLI / API), credentials vault, model discovery, cost log, side-by-side test bench. Backed by migration 157.', noteVi:'Định tuyến đa engine (NLLB / Claude CLI / Codex CLI / API), kho API key mã hóa, chọn model, log chi phí, test song song. Migration 157.', defaultAccess:'admin'},
     {id:'appearance', group:'content', icon:'🎨', labelEn:'Appearance', labelVi:'Giao diện', noteEn:'Portal design system and theme settings.', noteVi:'Thiết lập giao diện và design system.', defaultAccess:'admin'}
   ];
 }
@@ -6839,6 +6840,7 @@ function renderAdmin(){
   if(adminTab==='data_sources') renderAdminDataSources();
   if(adminTab==='metadata_studio') renderAdminMetadataStudio();
   if(adminTab==='translation_provider') renderAdminTranslationProviderTab();
+  if(adminTab==='translation_module') renderAdminTranslationModuleTab();
   if(adminTab==='version_control') renderAdminVersionControl();
   if(adminTab==='portal_display'){
     renderAdminPortalDisplay();
@@ -6865,6 +6867,24 @@ function renderAdminTranslationProviderTab(){
   s.id  = 'admin-translation-provider-script';
   s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00e-admin-translation-provider.js?v=' + (window.APP_VERSION || Date.now());
   s.onload = function(){ if(typeof window.renderAdminTranslationProvider === 'function') window.renderAdminTranslationProvider(el); };
+  document.head.appendChild(s);
+}
+
+/* ── Admin: Translation Module Tab (multi-provider, lazy-loaded) ─────────── */
+function renderAdminTranslationModuleTab(){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+  if(typeof window.renderAdminTranslationModule === 'function'){
+    window.renderAdminTranslationModule(el);
+    return;
+  }
+  el.innerHTML = '<div class="hm-empty">'+(lang==='en'?'Loading translation module...':'Đang tải module dịch thuật...')+'</div>';
+  var existing = document.getElementById('admin-translation-module-script');
+  if(existing){ existing.remove(); }
+  var s = document.createElement('script');
+  s.id  = 'admin-translation-module-script';
+  s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00f-admin-translation-module.js?v=' + (window.APP_VERSION || Date.now());
+  s.onload = function(){ if(typeof window.renderAdminTranslationModule === 'function') window.renderAdminTranslationModule(el); };
   document.head.appendChild(s);
 }
 

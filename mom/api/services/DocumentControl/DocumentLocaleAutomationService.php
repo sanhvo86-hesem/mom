@@ -784,6 +784,59 @@ final class DocumentLocaleAutomationService
      */
     private function runConfiguredProvider(array $payload): array
     {
+        // Migration 157+: consult the database-backed routing registry FIRST.
+        // If it returns a chain of attempts, iterate in order — the first
+        // successful translation wins; failures fall through to the next
+        // attempt and are logged via TranslationUsageRecorder.
+        $attempts = $this->resolveProviderAttemptsFromRegistry($payload);
+        if ($attempts !== null && $attempts !== []) {
+            $lastResult = null;
+            $previousProviderKey = null;
+            $recorder = $this->translationUsageRecorder();
+            foreach ($attempts as $attempt) {
+                $startMs = (int)(microtime(true) * 1000);
+                $envOverlay = $attempt->buildEnvOverlay();
+                $result = $this->runCommandProvider($attempt->driverCommand, $payload, $envOverlay);
+                $durationMs = (int)(microtime(true) * 1000) - $startMs;
+                $usage = is_array($result['usage'] ?? null) ? $result['usage'] : [];
+                $outcome = ($result['ok'] ?? false) === true ? 'ok' : 'driver_crash';
+                if ($outcome !== 'ok' && isset($result['reason'])) {
+                    $reason = (string)$result['reason'];
+                    if (str_contains($reason, 'quality_gate')) { $outcome = 'quality_fail'; }
+                    elseif (str_contains($reason, 'timeout')) { $outcome = 'timeout'; }
+                    elseif (str_contains($reason, 'auth')) { $outcome = 'auth_failed'; }
+                    elseif (str_contains($reason, 'rate')) { $outcome = 'rate_limited'; }
+                    else { $outcome = 'api_error'; }
+                }
+                if ($recorder !== null) {
+                    $recorder->record(
+                        (string)($payload['doc_code'] ?? ''),
+                        $attempt->providerKey,
+                        $attempt->modelId,
+                        (string)($payload['trigger'] ?? 'edit'),
+                        isset($usage['input_tokens']) ? (int)$usage['input_tokens'] : null,
+                        isset($usage['cached_input_tokens']) ? (int)$usage['cached_input_tokens'] : null,
+                        isset($usage['output_tokens']) ? (int)$usage['output_tokens'] : null,
+                        $durationMs,
+                        $outcome,
+                        $outcome === 'ok' ? null : (string)($result['reason'] ?? 'driver_crash'),
+                        $previousProviderKey,
+                    );
+                }
+                $lastResult = $result;
+                if ($outcome === 'ok') {
+                    return $result;
+                }
+                $previousProviderKey = $attempt->providerKey;
+            }
+            // All attempts in the chain failed; surface the last failure.
+            if ($lastResult !== null) {
+                return $lastResult;
+            }
+        }
+
+        // Legacy path: file-config or env-var fallback (preserves v4.1 behavior
+        // for environments where migration 157 has not been applied yet).
         $resolution = $this->resolveActiveProviderCommand();
         if (!$resolution['ok']) {
             return [
@@ -797,6 +850,56 @@ final class DocumentLocaleAutomationService
         }
 
         return $this->runCommandProvider((string)$resolution['command'], $payload);
+    }
+
+    /**
+     * Consult migration 157's translation_routing table. Returns null when
+     * the registry is unavailable (table missing, DataLayer error) so the
+     * legacy code path remains the default.
+     *
+     * @param array<string, mixed> $payload
+     * @return list<\MOM\Services\Translation\ProviderAttempt>|null
+     */
+    private function resolveProviderAttemptsFromRegistry(array $payload): ?array
+    {
+        try {
+            $vault = new \MOM\Services\Translation\SecretVaultService($this->data);
+            $registry = new \MOM\Services\Translation\ProviderRegistryService($this->data, $vault);
+            $docCode = (string)($payload['doc_code'] ?? '');
+            if ($docCode === '') {
+                return null;
+            }
+            $docType = $this->lookupDocTypeForCode($docCode);
+            return $registry->resolveAttempts($docCode, $docType);
+        } catch (\Throwable $e) {
+            error_log('Translation registry lookup failed, falling back to legacy resolver: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    private function lookupDocTypeForCode(string $docCode): ?string
+    {
+        try {
+            $rows = $this->data->query(
+                'SELECT doc_type FROM dcc_document_header WHERE doc_code = :p1 LIMIT 1',
+                [':p1' => $docCode]
+            );
+            if (is_array($rows) && isset($rows[0]['doc_type'])) {
+                return (string)$rows[0]['doc_type'];
+            }
+        } catch (\Throwable $e) {
+            // Header lookup is advisory; tier defaults to tier_3 if unknown.
+        }
+        return DocumentControlService::deriveDocType($docCode);
+    }
+
+    private function translationUsageRecorder(): ?\MOM\Services\Translation\TranslationUsageRecorder
+    {
+        try {
+            return new \MOM\Services\Translation\TranslationUsageRecorder($this->data, $this->rootDir);
+        } catch (\Throwable $e) {
+            return null;
+        }
     }
 
     /**
@@ -929,9 +1032,13 @@ final class DocumentLocaleAutomationService
 
     /**
      * @param array<string, mixed> $payload
+     * @param array<string, string> $envOverlay Optional env vars merged on top of inherited env.
+     *                                          Used by the registry-driven path to inject
+     *                                          DCC_PROVIDER_KEY / DCC_PROVIDER_MODEL / DCC_PROVIDER_API_KEY
+     *                                          / HOME (for cli_subscription auth).
      * @return array<string, mixed>
      */
-    private function runCommandProvider(string $command, array $payload): array
+    private function runCommandProvider(string $command, array $payload, array $envOverlay = []): array
     {
         $spec = [
             // proc_open pipe modes are defined from the child-process side:
@@ -941,7 +1048,15 @@ final class DocumentLocaleAutomationService
             2 => ['pipe', 'w'],
         ];
 
-        $process = @proc_open(['/bin/sh', '-lc', 'exec ' . $command], $spec, $pipes, $this->rootDir);
+        $envForProc = null;
+        if ($envOverlay !== []) {
+            $base = $_ENV;
+            if ($base === null || $base === []) {
+                $base = getenv();
+            }
+            $envForProc = array_merge(is_array($base) ? $base : [], $envOverlay);
+        }
+        $process = @proc_open(['/bin/sh', '-lc', 'exec ' . $command], $spec, $pipes, $this->rootDir, $envForProc);
         if (!is_resource($process)) {
             return [
                 'ok' => false,

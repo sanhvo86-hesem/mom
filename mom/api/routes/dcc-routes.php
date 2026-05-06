@@ -63,7 +63,33 @@ return static function (Router $router, string $dataDir): void {
     $router->post('/api/v1/dcc/change-notices',                                  DocumentControlController::class, 'issueDcn');
     $router->get ('/api/v1/dcc/change-notices/{dcn_id}',                         DocumentControlController::class, 'getDcn');
 
-    // ── Translation provider admin ─────────────────────────────────────────
+    // ── Translation provider admin (legacy single-toggle, kept for compat) ─
     $router->get ('/api/v1/dcc/admin/translation-provider',                      DocumentControlController::class, 'getTranslationProvider');
     $router->post('/api/v1/dcc/admin/translation-provider',                      DocumentControlController::class, 'setTranslationProvider');
+
+    // ── Translation Admin Module (migration 157) ───────────────────────────
+    // Multi-provider routing, encrypted credentials, model discovery, cost log,
+    // and side-by-side test bench. See TranslationAdminController.
+    $router->get   ('/api/v1/dcc/admin/translation/providers',                                TranslationAdminController::class, 'listProviders');
+    $router->put   ('/api/v1/dcc/admin/translation/providers/{provider_key}',                 TranslationAdminController::class, 'toggleProvider');
+
+    $router->get   ('/api/v1/dcc/admin/translation/credentials/{provider_key}',               TranslationAdminController::class, 'getCredential');
+    $router->put   ('/api/v1/dcc/admin/translation/credentials/{provider_key}',               TranslationAdminController::class, 'setCredential');
+    $router->delete('/api/v1/dcc/admin/translation/credentials/{provider_key}',               TranslationAdminController::class, 'deleteCredential');
+    $router->post  ('/api/v1/dcc/admin/translation/credentials/{provider_key}/probe',         TranslationAdminController::class, 'probeCredential');
+    $router->post  ('/api/v1/dcc/admin/translation/credentials/{provider_key}/login/start',   TranslationAdminController::class, 'loginStart');
+    $router->post  ('/api/v1/dcc/admin/translation/credentials/{provider_key}/login/complete',TranslationAdminController::class, 'loginComplete');
+    $router->post  ('/api/v1/dcc/admin/translation/credentials/{provider_key}/logout',        TranslationAdminController::class, 'loginLogout');
+
+    $router->get   ('/api/v1/dcc/admin/translation/models/{provider_key}',                    TranslationAdminController::class, 'listModels');
+    $router->post  ('/api/v1/dcc/admin/translation/models/{provider_key}/refresh',            TranslationAdminController::class, 'refreshModels');
+
+    $router->get   ('/api/v1/dcc/admin/translation/routing',                                  TranslationAdminController::class, 'listRouting');
+    $router->post  ('/api/v1/dcc/admin/translation/routing',                                  TranslationAdminController::class, 'upsertRouting');
+    $router->put   ('/api/v1/dcc/admin/translation/routing/{routing_id}',                     TranslationAdminController::class, 'upsertRouting');
+    $router->delete('/api/v1/dcc/admin/translation/routing/{routing_id}',                     TranslationAdminController::class, 'deleteRouting');
+    $router->get   ('/api/v1/dcc/admin/translation/resolve',                                  TranslationAdminController::class, 'resolveDocument');
+
+    $router->get   ('/api/v1/dcc/admin/translation/usage',                                    TranslationAdminController::class, 'usageSummary');
+    $router->post  ('/api/v1/dcc/admin/translation/test',                                     TranslationAdminController::class, 'testBench');
 };
