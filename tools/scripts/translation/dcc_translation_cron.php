@@ -93,7 +93,7 @@ log_line("dcc-translation-cron start: limit={$batchLimit} only_tiers={$onlyTiers
 $candidatesSql = "
     SELECT v.locale_variant_id, v.doc_code, v.translation_state, v.translation_provider,
            v.engine_version, v.metadata, v.updated_at,
-           h.doc_type, h.title, h.subtitle, h.revision, h.status, h.path
+           h.doc_type, h.title, h.subtitle, h.revision, h.status, h.filesystem_path
       FROM dcc_document_locale_variant v
       JOIN dcc_document_header h ON h.doc_code = v.doc_code
      WHERE v.locale = :p1
@@ -155,8 +155,8 @@ foreach ($rows as $row) {
         continue;
     }
 
-    // Resolve the source HTML file from the header.path column.
-    $relPath = (string)($row['path'] ?? '');
+    // Resolve the source HTML file from the header.filesystem_path column.
+    $relPath = (string)($row['filesystem_path'] ?? '');
     if ($relPath === '') {
         log_line("   ERROR {$docCode}: header.path is empty.");
         continue;
