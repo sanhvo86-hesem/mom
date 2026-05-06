@@ -156,8 +156,10 @@ final class DataSyncStatusService
             if ($e === '.' || $e === '..') {
                 continue;
             }
-            // Snapshot timestamps are always 20YYMMDDTHHMMSSZ.
-            if (!preg_match('/^\d{8}T\d{6}Z$/', $e)) {
+            // Snapshot timestamps: 20YYMMDDTHHMMSSZ optionally followed by
+            // a -<source>-<rand> suffix (e.g. -admin-ui-1f2a) when taken
+            // from the in-portal admin actions.
+            if (!preg_match('/^\d{8}T\d{6}Z(-[a-zA-Z0-9_-]+)?$/', $e)) {
                 continue;
             }
             $valid[] = $e;
