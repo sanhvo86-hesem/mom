@@ -1213,8 +1213,11 @@ function stripTransientRuntimeArtifacts(docOrRoot){
       'link[href*="kaspersky-labs.com"]',
       'script[src*="kaspersky-labs.com"]',
       'style.abn_style',
+      'style[class*="abn_"]',
       'style#portal-doc-viewer-zoom-style',
       'link[data-dcc-header-stylesheet]',
+      'link[href*="dcc-header.css"]',
+      'script[src*="11-dcc-header-renderer"]',
       'style[data-qms-runtime-transient="1"]',
       'link[data-qms-runtime-transient="1"]',
       'script[data-qms-runtime-transient="1"]'
