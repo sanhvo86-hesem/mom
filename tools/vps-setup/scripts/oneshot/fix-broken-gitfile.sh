@@ -17,6 +17,12 @@ echo "=== VPS git repair $(date) ==="
 # 0. Ensure private dir exists
 mkdir -p "$PRIV/config"
 
+# 0a. Ensure git tolerates the repo path no matter who owns it (we're root
+# but the working tree may be deploy:www-data, which trips git's
+# "dubious ownership" guard introduced in CVE-2022-24765).
+git config --global --add safe.directory "$SITE" 2>/dev/null || true
+git config --global --add safe.directory '*' 2>/dev/null || true
+
 # 1. Identify and backup current .git (whatever it is)
 echo "Step 1: backup current .git ..."
 if [ -e "$SITE/.git" ]; then
