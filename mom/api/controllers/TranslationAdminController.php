@@ -57,7 +57,7 @@ final class TranslationAdminController extends EqmsBaseController
     {
         static $svc = null;
         if ($svc === null) {
-            $svc = new ModelDiscoveryService($this->data, $this->vault(), $this->cli());
+            $svc = new ModelDiscoveryService($this->data, $this->vault());
         }
         return $svc;
     }
@@ -75,7 +75,7 @@ final class TranslationAdminController extends EqmsBaseController
     {
         static $svc = null;
         if ($svc === null) {
-            $svc = new CliLoginService($this->data, $this->cli());
+            $svc = new CliLoginService($this->data);
         }
         return $svc;
     }

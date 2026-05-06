@@ -28,7 +28,6 @@ final class ModelDiscoveryService
     public function __construct(
         private readonly DataLayer $data,
         private readonly SecretVaultService $vault,
-        private readonly CliRuntimeService $cli,
     ) {}
 
     /**

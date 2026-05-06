@@ -43,11 +43,9 @@ use Throwable;
 final class CliLoginService
 {
     private const SESSION_ROOT = '/tmp/dcc-cli-login';
-    private const PROCESS_TIMEOUT_SECONDS = 600; // 10 min for user to act
 
     public function __construct(
         private readonly DataLayer $data,
-        private readonly CliRuntimeService $cli,
     ) {}
 
     /**

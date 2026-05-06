@@ -877,7 +877,7 @@ final class DocumentLocaleAutomationService
         }
     }
 
-    private function lookupDocTypeForCode(string $docCode): ?string
+    private function lookupDocTypeForCode(string $docCode): string
     {
         try {
             $rows = $this->data->query(
@@ -1051,7 +1051,7 @@ final class DocumentLocaleAutomationService
         $envForProc = null;
         if ($envOverlay !== []) {
             $base = $_ENV;
-            if ($base === null || $base === []) {
+            if ($base === []) {
                 $base = getenv();
             }
             $envForProc = array_merge(is_array($base) ? $base : [], $envOverlay);
