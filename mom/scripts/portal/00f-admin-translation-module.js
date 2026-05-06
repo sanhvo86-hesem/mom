@@ -281,12 +281,14 @@ function renderRuleEditor(rule, scopeType, scopeValue, enabledProviders) {
 
   return `
     <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center;">
-      <select class="tx-primary-provider" style="padding:6px 8px;">
+      <select class="tx-primary-provider" data-current-model="${escapeHtml(primaryModel)}" style="padding:6px 8px;">
         ${enabledProviders.map(p => `
           <option value="${p.provider_key}" ${p.provider_key === primary ? 'selected' : ''}>${escapeHtml(p.display_name)}</option>
         `).join('')}
       </select>
-      <input class="tx-primary-model" type="text" placeholder="${_t('Model (vd: claude-sonnet-4-6)','Model (e.g. claude-sonnet-4-6)')}" value="${escapeHtml(primaryModel)}" style="padding:6px 8px;border:1px solid var(--ln,#ddd);border-radius:4px;">
+      <select class="tx-primary-model" data-selected-model="${escapeHtml(primaryModel)}" style="padding:6px 8px;border:1px solid var(--ln,#ddd);border-radius:4px;">
+        ${renderModelOptions(primary, primaryModel)}
+      </select>
       <button class="tx-save-rule" style="padding:6px 14px;background:var(--brand-primary,#0c63e7);color:#fff;border:0;border-radius:4px;cursor:pointer;font-size:13px;">${_t('Lưu','Save')}</button>
     </div>
     <details style="margin-top:8px;">
@@ -301,7 +303,37 @@ function renderRuleEditor(rule, scopeType, scopeValue, enabledProviders) {
   `;
 }
 
+function modelsForProvider(providerKey) {
+  const p = STATE.providers.find(pr => pr.provider_key === providerKey);
+  if (!p) return [];
+  // Prefer probed available_models; fall back to capability candidates.
+  const cred = p.credential || {};
+  if (Array.isArray(cred.available_models) && cred.available_models.length) return cred.available_models;
+  const caps = p.capabilities || {};
+  return Array.isArray(caps.candidate_models) ? caps.candidate_models : [];
+}
+
+function renderModelOptions(providerKey, currentModel) {
+  const list = modelsForProvider(providerKey);
+  if (list.length === 0) {
+    return `<option value="">${_t('(không có model)','(no models)')}</option>`;
+  }
+  // Always include current value so we don't silently lose a previously-set model
+  const has = list.some(m => m.id === currentModel);
+  const opts = list.map(m => `<option value="${escapeHtml(m.id)}" ${m.id === currentModel ? 'selected' : ''}>${escapeHtml(m.label || m.id)}${m.state && m.state !== 'available' && m.state !== 'candidate' ? ' (' + m.state + ')' : ''}</option>`).join('');
+  return (currentModel && !has ? `<option value="${escapeHtml(currentModel)}" selected>${escapeHtml(currentModel)} (legacy)</option>` : '') + opts;
+}
+
 function wireRouting() {
+  // Re-populate model dropdown when provider changes.
+  document.querySelectorAll('.tx-primary-provider').forEach(sel => {
+    sel.addEventListener('change', () => {
+      const card = sel.closest('.tx-rule-card');
+      const modelSel = card.querySelector('.tx-primary-model');
+      if (modelSel) modelSel.innerHTML = renderModelOptions(sel.value, '');
+    });
+  });
+
   document.querySelectorAll('.tx-save-rule').forEach(btn => {
     btn.addEventListener('click', () => {
       const card = btn.closest('.tx-rule-card');
@@ -398,6 +430,13 @@ function renderProviderCard(p) {
                   : _t('Local model','Local model');
   const isCli = p.provider_kind === 'cli_subscription';
   const isApi = p.provider_kind === 'http_api';
+  const isConnected = isCli && !!cred.cli_auth_subject;
+
+  // Available models dropdown — populated from credential.available_models if
+  // present, otherwise fall back to capabilities.candidate_models.
+  const candidates = (cred.available_models && cred.available_models.length)
+    ? cred.available_models
+    : ((p.capabilities && p.capabilities.candidate_models) || []);
 
   return `<section class="tx-provider-card" data-provider-key="${p.provider_key}"
     style="padding:16px;border:1px solid var(--ln,#ddd);border-radius:8px;margin-bottom:12px;background:var(--bg,#fff);">
@@ -411,34 +450,71 @@ function renderProviderCard(p) {
         ${_t('Bật','Enabled')}
       </label>
     </header>
-    <div style="display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;">
-      <div style="font-size:13px;color:var(--text-2);">
-        <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${statusColor};margin-right:6px;"></span>
-        ${cred.last_test_status ? escapeHtml(cred.last_test_status) : _t('Chưa test','Never tested')}
-        ${cred.last_test_message ? ' — ' + escapeHtml(cred.last_test_message.substr(0, 200)) : ''}
-      </div>
-      <div>
-        ${isCli ? `<button class="tx-probe-cli" style="padding:5px 12px;border:1px solid var(--ln,#ddd);background:var(--bg-2,#f5f5f5);border-radius:4px;cursor:pointer;font-size:12px;">${_t('Probe','Probe')}</button>` : ''}
-      </div>
-    </div>
+
     ${isCli ? `
-      <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:center;font-size:12px;">
-        <input type="text" class="tx-cli-binary" placeholder="${escapeHtml(p.capabilities && p.capabilities.cli_binary_default || '/opt/homebrew/bin/...')}"
-               value="${escapeHtml(cred.cli_binary_path || '')}" style="padding:5px;border:1px solid var(--ln,#ddd);border-radius:4px;">
-        <input type="text" class="tx-cli-home" placeholder="${escapeHtml(p.capabilities && p.capabilities.cli_auth_home_default || '/var/www/.claude')}"
-               value="${escapeHtml(cred.cli_auth_home_path || '')}" style="padding:5px;border:1px solid var(--ln,#ddd);border-radius:4px;">
-        <button class="tx-save-cli" style="padding:5px 12px;background:var(--brand-primary,#0c63e7);color:#fff;border:0;border-radius:4px;cursor:pointer;">${_t('Lưu','Save')}</button>
+      <!-- Account section -->
+      <div style="padding:10px;background:var(--bg-2,#f5f7fb);border-radius:6px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;">
+          <div style="font-size:13px;">
+            ${isConnected ? `
+              <span style="color:var(--success,#0a7e3a);">●</span>
+              <strong>${_t('Đã đăng nhập','Connected')}:</strong> ${escapeHtml(cred.cli_auth_subject || '?')}
+            ` : `
+              <span style="color:var(--text-3);">○</span>
+              <em style="color:var(--text-3);">${_t('Chưa đăng nhập tài khoản','No account connected')}</em>
+            `}
+          </div>
+          <div style="display:flex;gap:6px;">
+            <button class="tx-cli-login" style="padding:6px 14px;background:var(--brand-primary,#0c63e7);color:#fff;border:0;border-radius:4px;cursor:pointer;font-size:12px;">
+              ${isConnected ? _t('🔄 Đổi tài khoản','🔄 Switch account') : _t('🔑 Đăng nhập','🔑 Connect')}
+            </button>
+            ${isConnected ? `<button class="tx-cli-logout" style="padding:6px 14px;background:none;border:1px solid var(--danger,#c00);color:var(--danger,#c00);border-radius:4px;cursor:pointer;font-size:12px;">${_t('Đăng xuất','Logout')}</button>` : ''}
+            <button class="tx-probe-cli" style="padding:6px 14px;border:1px solid var(--ln,#ddd);background:var(--bg,#fff);border-radius:4px;cursor:pointer;font-size:12px;">${_t('Probe','Probe')}</button>
+          </div>
+        </div>
+        <div style="font-size:12px;color:var(--text-2);margin-top:6px;">
+          <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${statusColor};margin-right:5px;"></span>
+          ${cred.last_test_status ? escapeHtml(cred.last_test_status) : _t('Chưa test','Never tested')}
+          ${cred.last_test_message ? ' — ' + escapeHtml(String(cred.last_test_message).substr(0, 180)) : ''}
+        </div>
       </div>
-      <small style="color:var(--text-3);">${_t('Binary path / Auth HOME (chứa .claude/.credentials.json hoặc .codex/auth.json)','Binary path / Auth HOME (containing .claude/.credentials.json or .codex/auth.json)')}</small>
+
+      <!-- Runtime config (binary path, auth home) -->
+      <details style="margin-bottom:8px;">
+        <summary style="cursor:pointer;color:var(--text-3);font-size:12px;">${_t('Cấu hình runtime (binary, auth home)','Runtime config (binary, auth home)')}</summary>
+        <div style="margin-top:6px;display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:center;font-size:12px;">
+          <input type="text" class="tx-cli-binary" placeholder="${escapeHtml(p.capabilities && p.capabilities.cli_binary_default || '/usr/local/bin/...')}"
+                 value="${escapeHtml(cred.cli_binary_path || '')}" style="padding:5px;border:1px solid var(--ln,#ddd);border-radius:4px;">
+          <input type="text" class="tx-cli-home" placeholder="${escapeHtml(p.capabilities && p.capabilities.cli_auth_home_default || '/var/lib/dcc-cli-runtime')}"
+                 value="${escapeHtml(cred.cli_auth_home_path || '')}" style="padding:5px;border:1px solid var(--ln,#ddd);border-radius:4px;">
+          <button class="tx-save-cli" style="padding:5px 12px;background:var(--brand-primary,#0c63e7);color:#fff;border:0;border-radius:4px;cursor:pointer;">${_t('Lưu','Save')}</button>
+        </div>
+        <small style="color:var(--text-3);">${_t('Path tới binary CLI / thư mục HOME chứa credentials','Binary path / HOME directory containing credentials')}</small>
+      </details>
+
+      <!-- Available models -->
+      ${candidates.length > 0 ? `
+        <div style="font-size:12px;color:var(--text-3);">
+          <strong>${_t('Models có thể dùng','Available models')}:</strong>
+          ${candidates.map(m => `<code style="background:var(--bg-2,#f5f5f5);padding:1px 5px;border-radius:3px;margin:0 2px;">${escapeHtml(m.id)}</code>`).join(' ')}
+        </div>
+      ` : `<small style="color:var(--text-3);">${_t('Refresh ở tab Model để probe danh sách model','Refresh on Model tab to probe model list')}</small>`}
     ` : ''}
+
     ${isApi ? `
       <div style="margin-top:10px;display:grid;grid-template-columns:1fr auto auto;gap:6px;align-items:center;font-size:12px;">
-        <input type="password" class="tx-api-key" placeholder="${cred.key_fingerprint ? '••••••••' + escapeHtml(cred.key_fingerprint.substr(-6)) : 'sk-...'}"
+        <input type="password" class="tx-api-key" placeholder="${cred.key_fingerprint ? '••••••••' + escapeHtml(String(cred.key_fingerprint).substr(-6)) : 'sk-...'}"
                style="padding:5px;border:1px solid var(--ln,#ddd);border-radius:4px;">
         <button class="tx-save-key" style="padding:5px 12px;background:var(--brand-primary,#0c63e7);color:#fff;border:0;border-radius:4px;cursor:pointer;" ${STATE.vaultReady ? '' : 'disabled'}>${_t('Lưu','Save')}</button>
         <button class="tx-delete-key" style="padding:5px 12px;background:none;color:var(--danger,#c00);border:1px solid var(--danger,#c00);border-radius:4px;cursor:pointer;">${_t('Xóa','Delete')}</button>
       </div>
       ${cred.key_fingerprint ? `<small style="color:var(--text-3);">FP: ${escapeHtml(cred.key_fingerprint)}</small>` : ''}
+    ` : ''}
+
+    ${!isCli && !isApi ? `
+      <div style="font-size:12px;color:var(--text-3);">
+        ${_t('Engine local (không cần đăng nhập)','Local engine (no login required)')}
+      </div>
     ` : ''}
   </section>`;
 }
@@ -489,7 +565,181 @@ function wireProviders() {
         .then(() => { toast(_t('Đã xóa','Deleted')); loadAll(); })
         .catch(err => alert(err.message));
     });
+
+    const loginBtn = card.querySelector('.tx-cli-login');
+    if (loginBtn) loginBtn.addEventListener('click', () => openCliLoginModal(key));
+
+    const logoutBtn = card.querySelector('.tx-cli-logout');
+    if (logoutBtn) logoutBtn.addEventListener('click', () => {
+      if (!confirm(_t('Đăng xuất CLI cho provider này? Sẽ phải đăng nhập lại để dùng.','Logout this CLI provider? You will need to connect again to use it.'))) return;
+      api('POST', `/api/v1/dcc/admin/translation/credentials/${encodeURIComponent(key)}/logout`)
+        .then(() => { toast(_t('Đã đăng xuất','Logged out')); loadAll(); })
+        .catch(err => alert(err.message));
+    });
   });
+}
+
+// ── CLI login modal ──────────────────────────────────────────────────────────
+
+function openCliLoginModal(providerKey) {
+  // Build / replace modal scaffolding
+  let modal = document.getElementById('tx-cli-login-modal');
+  if (modal) modal.remove();
+  modal = document.createElement('div');
+  modal.id = 'tx-cli-login-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:99999;display:flex;align-items:center;justify-content:center;';
+  modal.innerHTML = `<div style="background:var(--bg,#fff);border-radius:10px;padding:24px;max-width:600px;width:90%;max-height:90vh;overflow:auto;">
+    <header style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
+      <h3 style="margin:0;">${_t('Đăng nhập CLI','CLI Login')}: <code>${escapeHtml(providerKey)}</code></h3>
+      <button id="tx-cli-modal-close" style="background:none;border:0;font-size:24px;cursor:pointer;color:var(--text-3);">×</button>
+    </header>
+    <div id="tx-cli-modal-body">
+      <div style="text-align:center;padding:30px;color:var(--text-3);">
+        ⟳ ${_t('Đang khởi tạo session đăng nhập...','Starting login session...')}
+      </div>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+  document.getElementById('tx-cli-modal-close').addEventListener('click', () => modal.remove());
+  modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+
+  // Kick off the login session
+  api('POST', `/api/v1/dcc/admin/translation/credentials/${encodeURIComponent(providerKey)}/login/start`)
+    .then(d => renderCliLoginModalBody(providerKey, d.session))
+    .catch(err => {
+      const body = document.getElementById('tx-cli-modal-body');
+      if (body) body.innerHTML = `<div style="color:var(--danger,#c00);padding:14px;">${escapeHtml(err.message)}</div>`;
+    });
+}
+
+function renderCliLoginModalBody(providerKey, session) {
+  const body = document.getElementById('tx-cli-modal-body');
+  if (!body) return;
+  const url = session.auth_url;
+  const code = session.pairing_code || '';
+  const isPaste = !!session.expects_paste;
+  const instructions = (lang === 'en' ? session.instructions_en : session.instructions_vi) || '';
+
+  body.innerHTML = `
+    <ol style="font-size:14px;line-height:1.6;padding-left:20px;">
+      <li>${_t('Mở URL bên dưới trong tab mới của browser','Open the URL below in a new browser tab')}:
+        <div style="margin:6px 0;display:flex;gap:6px;align-items:center;">
+          <a href="${escapeHtml(url)}" target="_blank" rel="noopener" style="word-break:break-all;color:var(--brand-primary,#0c63e7);text-decoration:underline;">${escapeHtml(url)}</a>
+          <button id="tx-copy-url" style="padding:3px 8px;border:1px solid var(--ln,#ddd);background:var(--bg-2,#f5f5f5);border-radius:3px;cursor:pointer;font-size:11px;">📋</button>
+        </div>
+      </li>
+      ${code ? `
+        <li>${_t('Nhập mã sau khi browser hỏi','Enter this code when the browser asks')}:
+          <div style="font-family:monospace;font-size:18px;background:var(--bg-2,#f5f5f5);padding:8px 12px;border-radius:4px;display:inline-block;margin:6px 0;letter-spacing:2px;font-weight:600;">${escapeHtml(code)}</div>
+          <button id="tx-copy-code" style="padding:3px 8px;border:1px solid var(--ln,#ddd);background:var(--bg-2,#f5f5f5);border-radius:3px;cursor:pointer;font-size:11px;">📋</button>
+        </li>` : ''}
+      <li>${_t('Đăng nhập tài khoản subscription của bạn rồi nhấn Approve','Sign in to your subscription account, then click Approve')}</li>
+    </ol>
+
+    ${isPaste ? `
+      <div style="margin-top:14px;padding:14px;background:var(--bg-2,#f5f7fb);border-radius:6px;">
+        <label style="display:block;font-size:13px;margin-bottom:6px;font-weight:600;">${_t('Paste token từ Claude vào đây','Paste the token from Claude here')}:</label>
+        <textarea id="tx-paste-code" rows="3" placeholder="sk-ant-oat01-..." style="width:100%;padding:8px;font-family:monospace;font-size:12px;border:1px solid var(--ln,#ddd);border-radius:4px;"></textarea>
+        <div style="margin-top:8px;text-align:right;">
+          <button id="tx-cli-submit-code" style="padding:8px 18px;background:var(--brand-primary,#0c63e7);color:#fff;border:0;border-radius:4px;cursor:pointer;">${_t('Hoàn tất đăng nhập','Complete login')}</button>
+        </div>
+      </div>
+    ` : `
+      <div style="margin-top:14px;padding:14px;background:var(--bg-2,#f5f7fb);border-radius:6px;text-align:center;">
+        <button id="tx-cli-poll" style="padding:10px 22px;background:var(--brand-primary,#0c63e7);color:#fff;border:0;border-radius:4px;cursor:pointer;font-size:14px;">${_t('Đợi xác nhận từ browser','Wait for browser approval')}</button>
+        <div id="tx-cli-poll-status" style="margin-top:8px;font-size:12px;color:var(--text-3);"></div>
+      </div>
+    `}
+  `;
+
+  const copyUrl = document.getElementById('tx-copy-url');
+  if (copyUrl) copyUrl.addEventListener('click', () => navigator.clipboard.writeText(url).then(() => toast(_t('Đã copy URL','URL copied'))));
+  const copyCode = document.getElementById('tx-copy-code');
+  if (copyCode) copyCode.addEventListener('click', () => navigator.clipboard.writeText(code).then(() => toast(_t('Đã copy mã','Code copied'))));
+
+  if (isPaste) {
+    document.getElementById('tx-cli-submit-code').addEventListener('click', () => {
+      const tokenInput = document.getElementById('tx-paste-code');
+      const token = (tokenInput.value || '').trim();
+      if (!token) return alert(_t('Paste token trước','Paste the token first'));
+      const btn = document.getElementById('tx-cli-submit-code');
+      btn.disabled = true; btn.textContent = '⟳ ' + _t('Đang xử lý...','Processing...');
+      api('POST', `/api/v1/dcc/admin/translation/credentials/${encodeURIComponent(providerKey)}/login/complete`, {
+        session_id: session.session_id, code: token,
+      }).then(d => handleLoginResult(d.result, providerKey))
+        .catch(err => {
+          alert(err.message);
+          btn.disabled = false; btn.textContent = _t('Hoàn tất đăng nhập','Complete login');
+        });
+    });
+  } else {
+    document.getElementById('tx-cli-poll').addEventListener('click', () => {
+      pollDeviceAuth(providerKey, session.session_id);
+    });
+  }
+}
+
+function pollDeviceAuth(providerKey, sessionId) {
+  const status = document.getElementById('tx-cli-poll-status');
+  const btn = document.getElementById('tx-cli-poll');
+  if (btn) { btn.disabled = true; btn.textContent = '⟳ ' + _t('Đang đợi...','Waiting...'); }
+  if (status) status.textContent = _t('Đang poll mỗi 25s...','Polling every 25s...');
+
+  let attempts = 0;
+  const maxAttempts = 12; // ~5 min total (25s × 12)
+  const poll = () => {
+    attempts++;
+    api('POST', `/api/v1/dcc/admin/translation/credentials/${encodeURIComponent(providerKey)}/login/complete`, {
+      session_id: sessionId, code: '',
+    }).then(d => {
+      if (d.result.state === 'completed') {
+        handleLoginResult(d.result, providerKey);
+      } else if (d.result.state === 'pending' && attempts < maxAttempts) {
+        if (status) status.textContent = `${_t('Đang đợi','Waiting')}... (${attempts}/${maxAttempts})`;
+        setTimeout(poll, 1000);
+      } else {
+        handleLoginResult(d.result, providerKey);
+      }
+    }).catch(err => {
+      if (status) status.textContent = String(err.message || err);
+      if (btn) { btn.disabled = false; btn.textContent = _t('Thử lại','Retry'); }
+    });
+  };
+  poll();
+}
+
+function handleLoginResult(result, providerKey) {
+  const body = document.getElementById('tx-cli-modal-body');
+  if (!body) return;
+  if (result.state === 'completed') {
+    body.innerHTML = `<div style="text-align:center;padding:30px;">
+      <div style="font-size:48px;margin-bottom:10px;">✅</div>
+      <h3 style="margin:6px 0;color:var(--success,#0a7e3a);">${_t('Đăng nhập thành công','Login successful')}</h3>
+      <p style="font-size:13px;color:var(--text-2);">
+        ${_t('Tài khoản','Account')}: <strong>${escapeHtml(result.account.subject || '?')}</strong><br>
+        ${_t('Subscription','Subscription')}: <strong>${escapeHtml(result.account.subscription || '?')}</strong>
+      </p>
+      <button id="tx-cli-modal-close-2" style="margin-top:16px;padding:8px 22px;background:var(--brand-primary,#0c63e7);color:#fff;border:0;border-radius:4px;cursor:pointer;">${_t('Đóng','Close')}</button>
+    </div>`;
+    document.getElementById('tx-cli-modal-close-2').addEventListener('click', () => {
+      document.getElementById('tx-cli-login-modal').remove();
+      loadAll();
+    });
+    toast(`${providerKey}: ${_t('connected','connected')} ✓`);
+  } else if (result.state === 'failed') {
+    body.innerHTML = `<div style="padding:18px;color:var(--danger,#c00);">
+      <strong>${_t('Đăng nhập thất bại','Login failed')}</strong>
+      <p>${escapeHtml(result.message || '')}</p>
+      <details style="margin-top:8px;"><summary style="cursor:pointer;">CLI output</summary>
+        <pre style="font-size:11px;background:var(--bg-2,#f5f5f5);padding:8px;border-radius:4px;white-space:pre-wrap;">${escapeHtml(result.tail || '')}</pre>
+      </details>
+    </div>`;
+  } else {
+    // pending / unknown
+    body.innerHTML += `<div style="margin-top:10px;padding:10px;background:var(--warn-bg,#fff8e1);border-radius:6px;font-size:12px;">
+      ${_t('Vẫn đang đợi xác nhận. Đảm bảo bạn đã hoàn tất bước Approve trên browser.','Still waiting for approval. Make sure you have completed the Approve step in the browser.')}
+    </div>`;
+  }
 }
 
 // ── Tab 3: Models ────────────────────────────────────────────────────────────

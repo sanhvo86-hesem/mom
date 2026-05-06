@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
+use MOM\Services\Translation\CliLoginService;
 use MOM\Services\Translation\CliRuntimeService;
 use MOM\Services\Translation\ModelDiscoveryService;
 use MOM\Services\Translation\ProviderRegistryService;
@@ -66,6 +67,15 @@ final class TranslationAdminController extends EqmsBaseController
         static $svc = null;
         if ($svc === null) {
             $svc = new TranslationUsageRecorder($this->data, $this->rootDir);
+        }
+        return $svc;
+    }
+
+    private function cliLogin(): CliLoginService
+    {
+        static $svc = null;
+        if ($svc === null) {
+            $svc = new CliLoginService($this->data, $this->cli());
         }
         return $svc;
     }
@@ -201,6 +211,77 @@ final class TranslationAdminController extends EqmsBaseController
         $providerKey = $this->pathProviderKey();
         $result = $this->cli()->probe($providerKey);
         $this->success(['probe' => $result]);
+    }
+
+    /**
+     * POST /api/v1/dcc/admin/translation/credentials/{provider_key}/login/start
+     *
+     * Spawns the CLI's interactive login flow (claude setup-token /
+     * codex login --device-auth), captures the auth URL + (codex) device code,
+     * returns them so the admin UI can show a modal with a clickable link.
+     */
+    public function loginStart(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $providerKey = $this->pathProviderKey();
+        try {
+            $info = $this->cliLogin()->start($providerKey);
+        } catch (Throwable $e) {
+            $this->error('translation_cli_login_start_failed', 500, $e->getMessage());
+        }
+        $this->success(['session' => $info]);
+    }
+
+    /**
+     * POST /api/v1/dcc/admin/translation/credentials/{provider_key}/login/complete
+     * Body: { "session_id": "...", "code": "<token-from-browser>" }
+     *
+     * For Claude: writes the pasted token to the running setup-token process'
+     * stdin, waits for credentials.json, returns account info.
+     * For Codex device-auth: just polls until process exits (UI may call this
+     * repeatedly; returns state="pending" if not yet approved).
+     */
+    public function loginComplete(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $providerKey = $this->pathProviderKey();
+        $body = $this->jsonBody();
+        $sessionId = (string)($body['session_id'] ?? '');
+        $code = (string)($body['code'] ?? '');
+        if ($sessionId === '') {
+            $this->error('translation_cli_login_session_missing', 422, 'session_id is required.');
+        }
+        try {
+            if ($code !== '') {
+                $result = $this->cliLogin()->completeWithCode($providerKey, $sessionId, $code);
+            } else {
+                $result = $this->cliLogin()->pollDeviceAuth($providerKey, $sessionId);
+            }
+        } catch (Throwable $e) {
+            $this->error('translation_cli_login_complete_failed', 500, $e->getMessage());
+        }
+        $this->success(['result' => $result]);
+    }
+
+    /**
+     * POST /api/v1/dcc/admin/translation/credentials/{provider_key}/logout
+     *
+     * Wipes credentials, resets last-test state. After this, admin must
+     * Connect again to re-authenticate.
+     */
+    public function loginLogout(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $providerKey = $this->pathProviderKey();
+        try {
+            $result = $this->cliLogin()->logout($providerKey);
+        } catch (Throwable $e) {
+            $this->error('translation_cli_logout_failed', 500, $e->getMessage());
+        }
+        $this->success($result);
     }
 
     // ── Models (per-provider model list) ─────────────────────────────────────

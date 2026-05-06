@@ -77,6 +77,9 @@ return static function (Router $router, string $dataDir): void {
     $router->put   ('/api/v1/dcc/admin/translation/credentials/{provider_key}',               TranslationAdminController::class, 'setCredential');
     $router->delete('/api/v1/dcc/admin/translation/credentials/{provider_key}',               TranslationAdminController::class, 'deleteCredential');
     $router->post  ('/api/v1/dcc/admin/translation/credentials/{provider_key}/probe',         TranslationAdminController::class, 'probeCredential');
+    $router->post  ('/api/v1/dcc/admin/translation/credentials/{provider_key}/login/start',   TranslationAdminController::class, 'loginStart');
+    $router->post  ('/api/v1/dcc/admin/translation/credentials/{provider_key}/login/complete',TranslationAdminController::class, 'loginComplete');
+    $router->post  ('/api/v1/dcc/admin/translation/credentials/{provider_key}/logout',        TranslationAdminController::class, 'loginLogout');
 
     $router->get   ('/api/v1/dcc/admin/translation/models/{provider_key}',                    TranslationAdminController::class, 'listModels');
     $router->post  ('/api/v1/dcc/admin/translation/models/{provider_key}/refresh',            TranslationAdminController::class, 'refreshModels');
