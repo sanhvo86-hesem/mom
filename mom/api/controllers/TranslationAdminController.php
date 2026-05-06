@@ -104,13 +104,26 @@ final class TranslationAdminController extends EqmsBaseController
     }
 
     /**
-     * PUT /api/v1/dcc/admin/translation/providers/{key}
+     * Resolve the {provider_key} URL parameter from the router-injected $_GET.
+     */
+    private function pathProviderKey(): string
+    {
+        $key = $this->requirePathId('provider_key', 'provider_key');
+        if ($key === '') {
+            $this->error('translation_provider_key_missing', 422, 'provider_key is required.');
+        }
+        return $key;
+    }
+
+    /**
+     * PUT /api/v1/dcc/admin/translation/providers/{provider_key}
      * Body: { "is_enabled": bool }
      */
-    public function toggleProvider(string $providerKey): never
+    public function toggleProvider(): never
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
+        $providerKey = $this->pathProviderKey();
         $body = $this->jsonBody();
         $isEnabled = (bool)($body['is_enabled'] ?? true);
 
@@ -124,27 +137,25 @@ final class TranslationAdminController extends EqmsBaseController
     // ── Credentials (API key + CLI runtime) ──────────────────────────────────
 
     /**
-     * GET /api/v1/dcc/admin/translation/credentials/{key}
-     *
-     * Returns the safe-to-display credential row (no ciphertext, no key).
+     * GET /api/v1/dcc/admin/translation/credentials/{provider_key}
      */
-    public function getCredential(string $providerKey): never
+    public function getCredential(): never
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
+        $providerKey = $this->pathProviderKey();
         $row = $this->vault()->describe($providerKey);
         $this->success(['credential' => $row, 'vault_ready' => $this->vault()->isReady()]);
     }
 
     /**
-     * PUT /api/v1/dcc/admin/translation/credentials/{key}
-     * Body for API key:    { "api_key": "sk-..." }
-     * Body for CLI runtime: { "cli_binary_path": "...", "cli_auth_home_path": "..." }
+     * PUT /api/v1/dcc/admin/translation/credentials/{provider_key}
      */
-    public function setCredential(string $providerKey): never
+    public function setCredential(): never
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
+        $providerKey = $this->pathProviderKey();
         $body = $this->jsonBody();
         $actor = $this->adminActor($user);
 
@@ -169,50 +180,45 @@ final class TranslationAdminController extends EqmsBaseController
     }
 
     /**
-     * DELETE /api/v1/dcc/admin/translation/credentials/{key}
+     * DELETE /api/v1/dcc/admin/translation/credentials/{provider_key}
      */
-    public function deleteCredential(string $providerKey): never
+    public function deleteCredential(): never
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
+        $providerKey = $this->pathProviderKey();
         $ok = $this->vault()->delete($providerKey);
         $this->success(['deleted' => $ok]);
     }
 
     /**
-     * POST /api/v1/dcc/admin/translation/credentials/{key}/probe
-     *
-     * Runs the CLI probe (binary --version + ping prompt). Updates
-     * last_test_* columns. Returns the result.
+     * POST /api/v1/dcc/admin/translation/credentials/{provider_key}/probe
      */
-    public function probeCredential(string $providerKey): never
+    public function probeCredential(): never
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
+        $providerKey = $this->pathProviderKey();
         $result = $this->cli()->probe($providerKey);
         $this->success(['probe' => $result]);
     }
 
     // ── Models (per-provider model list) ─────────────────────────────────────
 
-    /**
-     * GET /api/v1/dcc/admin/translation/models/{key}
-     */
-    public function listModels(string $providerKey): never
+    public function listModels(): never
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
+        $providerKey = $this->pathProviderKey();
         $models = $this->discovery()->listAvailable($providerKey, false);
         $this->success(['provider_key' => $providerKey, 'models' => $models]);
     }
 
-    /**
-     * POST /api/v1/dcc/admin/translation/models/{key}/refresh
-     */
-    public function refreshModels(string $providerKey): never
+    public function refreshModels(): never
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
+        $providerKey = $this->pathProviderKey();
         $models = $this->discovery()->refresh($providerKey);
         $this->success(['provider_key' => $providerKey, 'models' => $models]);
     }
@@ -234,10 +240,11 @@ final class TranslationAdminController extends EqmsBaseController
      * POST /api/v1/dcc/admin/translation/routing
      * PUT  /api/v1/dcc/admin/translation/routing/{routing_id}
      */
-    public function upsertRouting(int $routingId = 0): never
+    public function upsertRouting(): never
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
+        $routingId = (int)($this->input('routing_id') ?? '0');
         $body = $this->jsonBody();
         try {
             $row = $this->registry()->upsertRoutingRule($routingId, $body, $this->adminActor($user));
@@ -250,10 +257,14 @@ final class TranslationAdminController extends EqmsBaseController
     /**
      * DELETE /api/v1/dcc/admin/translation/routing/{routing_id}
      */
-    public function deleteRouting(int $routingId): never
+    public function deleteRouting(): never
     {
         $user = $this->requireAuth();
         $this->requireAdmin($user);
+        $routingId = (int)($this->input('routing_id') ?? '0');
+        if ($routingId <= 0) {
+            $this->error('translation_routing_id_missing', 422, 'routing_id required');
+        }
         $ok = $this->registry()->deleteRoutingRule($routingId);
         if (!$ok) {
             $this->error('translation_routing_delete_blocked', 409, 'Cannot delete the global_default rule or rule does not exist.');
