@@ -70,9 +70,10 @@ if (is_file($envFile)) {
 // Reuse the bootstrap helpers via a minimal include.
 $dataDir = $root . '/mom/data';
 
-// Manual DataLayer init (mirrors what the boot script does).
-$config = require $root . '/mom/database/config.php';
-$dataLayer = new \MOM\Database\DataLayer($config, $dataDir);
+// Manual DataLayer init — signature is ($dataDir, $rootDir, ?$configOverride).
+require_once $root . '/mom/database/Connection.php';
+require_once $root . '/mom/database/DataLayer.php';
+$dataLayer = new \MOM\Database\DataLayer($dataDir, $root);
 
 $batchLimit = (int)(getenv('DCC_CRON_BATCH_LIMIT') ?: '5');
 $onlyTiers = trim((string)(getenv('DCC_CRON_ONLY_TIERS') ?: ''));
@@ -81,28 +82,26 @@ $dryRun = (string)(getenv('DCC_CRON_DRY_RUN') ?: '') === '1';
 $startTs = microtime(true);
 log_line("dcc-translation-cron start: limit={$batchLimit} only_tiers={$onlyTiers} dry_run=" . ($dryRun ? 'yes' : 'no'));
 
-// Find candidates: variants in machine_preview that need re-rendering with
-// the current provider routing. The simplest signal is: variants whose
-// engine_version doesn't match the *currently routed* provider's
-// engine_version pattern. To avoid recomputing routing per row, we just
-// pick variants whose translation_state IS 'machine_preview' AND whose
-// updated_at is older than the most recent dcc_document_header.updated_at.
-$candidatesSql = '
+// Find candidates: variants in machine_preview/blocked whose engine_version
+// doesn't match the currently-routed provider. We re-translate when the
+// engine has changed (e.g. switched from NLLB to Codex/Claude routing).
+$candidatesSql = "
     SELECT v.locale_variant_id, v.doc_code, v.translation_state, v.translation_provider,
            v.engine_version, v.metadata, v.updated_at,
-           h.doc_type, h.title, h.subtitle, h.revision, h.status
+           h.doc_type, h.title, h.subtitle, h.revision, h.status, h.path
       FROM dcc_document_locale_variant v
       JOIN dcc_document_header h ON h.doc_code = v.doc_code
-     WHERE v.locale = $1
-       AND v.translation_state IN ($2, $3)
+     WHERE v.locale = :p1
+       AND v.translation_state IN (:p2, :p3)
+       AND COALESCE(v.translation_provider, '') NOT IN ('claude_cli:claude-opus-4-7', 'claude_cli:haiku', 'codex_cli:gpt-5')
      ORDER BY v.updated_at ASC
-     LIMIT $4
-';
+     LIMIT :p4
+";
 
 try {
     $rows = $dataLayer->query(
         $candidatesSql,
-        ['en', 'machine_preview', 'blocked', $batchLimit]
+        [':p1' => 'en', ':p2' => 'machine_preview', ':p3' => 'blocked', ':p4' => $batchLimit]
     );
 } catch (\Throwable $e) {
     log_line('Query failed: ' . $e->getMessage());
@@ -151,19 +150,40 @@ foreach ($rows as $row) {
         continue;
     }
 
-    // Trigger the same automation entry point used by the portal. The
-    // automation service reads the DB-backed routing FIRST (added by
-    // migration 157), so the same provider chain applies.
+    // Resolve the source HTML file from the header.path column.
+    $relPath = (string)($row['path'] ?? '');
+    if ($relPath === '') {
+        log_line("   ERROR {$docCode}: header.path is empty.");
+        continue;
+    }
+    $absPath = $root . '/' . ltrim($relPath, '/');
+    if (!is_file($absPath)) {
+        log_line("   ERROR {$docCode}: source file not found at {$absPath}");
+        continue;
+    }
+    $sourceHtml = @file_get_contents($absPath);
+    if ($sourceHtml === false || trim($sourceHtml) === '') {
+        log_line("   ERROR {$docCode}: source HTML empty/unreadable");
+        continue;
+    }
+
     try {
         $automation = new \MOM\Services\DocumentControl\DocumentLocaleAutomationService(
             $dataLayer,
             $root
         );
-        $result = $automation->syncEnglishMachinePreview(
-            $docCode,
-            'cron_worker',
-            ['trigger' => 'cron']
-        );
+        $result = $automation->syncEnglishMachinePreview([
+            'doc_code' => $docCode,
+            'base_rel_path' => $relPath,
+            'source_html' => $sourceHtml,
+            'source_status' => $row['status'] ?? 'released',
+            'revision' => (string)($row['revision'] ?? '0.0'),
+            'trigger' => 'cron_bulk',
+            'actor' => 'cron_worker',
+            'title' => (string)($row['title'] ?? ''),
+            'subtitle' => (string)($row['subtitle'] ?? ''),
+            'effective_date' => date('Y-m-d'),
+        ]);
         log_line(sprintf(
             '   → state=%s provider=%s engine=%s',
             $result['translation_state'] ?? '?',
