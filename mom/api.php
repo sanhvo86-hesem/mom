@@ -3515,17 +3515,78 @@ function inject_base_href_archive(string $html): string {
 }
 
 function repair_broken_doc_style_html(string $html): string {
+  // 1. Repair the legacy ".small{ thead{...}tfoot{...} p{...}" authoring bug
+  //    where the .small{ block was opened but never closed before the next
+  //    30+ rules (.toc, .grid-3, .check-grid, …). Pre-Chrome-112 browsers
+  //    silently dropped the malformed declarations and parsed the rest as
+  //    top-level rules; modern browsers (CSS Nesting Level 1) correctly
+  //    scope every following rule under ".small descendant", so the page
+  //    body — which has no .small ancestor — loses all those styles.
+  //
+  //    The fix: rewrite the opener as three flat "scoped" rules and drop
+  //    the orphaned closing brace that previously matched it (always sits
+  //    on its own line right before </style>).
+  $brokenSmallPattern = '/\.small\{\s*thead\{display:table-header-group\}tfoot\{display:table-footer-group\}\s*p\{orphans:3;widows:3\}/';
+  if (preg_match($brokenSmallPattern, $html)) {
+    $html = preg_replace(
+      $brokenSmallPattern,
+      ".small thead{display:table-header-group}\n.small tfoot{display:table-footer-group}\n.small p{orphans:3;widows:3}",
+      $html,
+      1
+    );
+    $html = preg_replace('/\n\}\n(<\/style>)/', "\n$1", $html, 1);
+  }
+
+  // 2. Strip browser-side runtime artifacts that should never live in
+  //    persisted source: Kaspersky AV link injections, AdBlock-style
+  //    "abn_style" blocks, and the dynamically-appended DCC header
+  //    stylesheet/renderer pair.
+  $html = preg_replace(
+    '/<link\b[^>]*href=["\'][^"\']*kaspersky-labs\.com[^"\']*["\'][^>]*>\s*/i',
+    '', $html
+  ) ?? $html;
+  $html = preg_replace(
+    '/<style\b[^>]*class=["\'][^"\']*\babn_[^"\']*["\'][^>]*>[\s\S]*?<\/style>\s*/i',
+    '', $html
+  ) ?? $html;
+  $html = preg_replace(
+    '/<link\b[^>]*data-dcc-header-stylesheet[^>]*>\s*/i',
+    '', $html
+  ) ?? $html;
+  $html = preg_replace(
+    '/<script\b[^>]*src=["\'][^"\']*11-dcc-header-renderer\.js[^"\']*["\'][^>]*>\s*<\/script>\s*/i',
+    '', $html
+  ) ?? $html;
+
+  // 3. Drop the runtime-only "js-ready" class and "data-qms-view-lang"
+  //    attribute that the portal app bridge sets after hydration.
+  $html = preg_replace_callback(
+    '/(<html\b[^>]*class=")([^"]*)(")/i',
+    static function (array $m): string {
+      if (strpos($m[2], 'js-ready') === false) return $m[0];
+      $classes = preg_replace('/\bjs-ready\b/', '', $m[2]) ?? $m[2];
+      $classes = trim(preg_replace('/\s+/', ' ', $classes) ?? $classes);
+      if ($classes === '') {
+        return rtrim($m[1], 'class="') . $m[3];
+      }
+      return $m[1] . $classes . $m[3];
+    },
+    $html
+  ) ?? $html;
+  $html = preg_replace('/\s+data-qms-view-lang="[^"]*"/i', '', $html) ?? $html;
+
+  // 4. Legacy: the "PAGE BREAK & OVERFLOW FIX" stray-CSS recovery (kept).
   $markerPos = stripos($html, 'PAGE BREAK & OVERFLOW FIX');
-  if ($markerPos === false) return $html;
-
-  $bodyPos = stripos($html, '<body');
-  if ($bodyPos !== false && $markerPos > $bodyPos) return $html;
-
-  $headChunk = substr($html, 0, $markerPos);
-  $hasOpenStyleBeforeMarker = preg_match('/<style\b[^>]*>/i', $headChunk) === 1;
-  $closeStylePos = stripos($html, '</style>', $markerPos);
-  if (!$hasOpenStyleBeforeMarker && $closeStylePos !== false) {
-    $html = substr($html, 0, $markerPos) . "<style>\n" . substr($html, $markerPos);
+  if ($markerPos !== false) {
+    $bodyPos = stripos($html, '<body');
+    if ($bodyPos === false || $markerPos < $bodyPos) {
+      $headChunk = substr($html, 0, $markerPos);
+      $hasOpenStyleBeforeMarker = preg_match('/<style\b[^>]*>/i', $headChunk) === 1;
+      $closeStylePos = stripos($html, '</style>', $markerPos);
+      if (!$hasOpenStyleBeforeMarker && $closeStylePos !== false) {
+        $html = substr($html, 0, $markerPos) . "<style>\n" . substr($html, $markerPos);
+      }
+    }
   }
 
   if (stripos($html, '<head') !== false && stripos($html, '</head>') === false && preg_match('/<body\b/i', $html, $m, PREG_OFFSET_CAPTURE)) {
