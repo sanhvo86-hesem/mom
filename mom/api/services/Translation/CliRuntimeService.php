@@ -153,15 +153,23 @@ final class CliRuntimeService
 
     private function capturePing(string $binary, string $authHome, string $providerKey): ?string
     {
-        $env = $authHome !== '' ? ['HOME' => $authHome] : null;
-        // For both Claude and Codex we just send a 2-word prompt and check
-        // we get *some* non-empty text response. We don't validate semantics.
+        $env = $authHome !== '' ? ['HOME' => $authHome] : [];
+        // Linux Claude Code (>=2.x) does not always pick up the OAuth token
+        // from $HOME/.claude/.credentials.json. Inject ANTHROPIC_AUTH_TOKEN
+        // explicitly so the OAuth-Max subscription is recognised.
+        if (str_starts_with($providerKey, 'claude') && $authHome !== '') {
+            $token = self::readClaudeOAuthToken($authHome);
+            if ($token !== null) {
+                $env['ANTHROPIC_AUTH_TOKEN'] = $token;
+            }
+        }
         if (str_starts_with($providerKey, 'claude')) {
             $cmd = [
                 $binary, '-p', '--bare',
                 '--max-turns', '1',
                 '--no-session-persistence',
                 '--output-format', 'text',
+                '--model', 'haiku',
                 'Reply OK',
             ];
         } elseif (str_starts_with($providerKey, 'codex')) {
@@ -173,11 +181,51 @@ final class CliRuntimeService
         } else {
             return null;
         }
-        $result = $this->run($cmd, '', $env, 30);
+        $result = $this->run($cmd, '', $env, 60);
         if ($result === null) {
             return null;
         }
         return trim($result['stdout']) === '' ? null : $result['stdout'];
+    }
+
+    /**
+     * Read $HOME/.claude/.credentials.json and return the live access token,
+     * or null if the file is missing / token is expired / format unexpected.
+     *
+     * Public helper so the registry-driven spawn path can also inject the
+     * token when launching the Claude CLI driver.
+     */
+    public static function readClaudeOAuthToken(string $authHome): ?string
+    {
+        if ($authHome === '') {
+            return null;
+        }
+        $path = rtrim($authHome, '/') . '/.claude/.credentials.json';
+        if (!is_file($path) || !is_readable($path)) {
+            return null;
+        }
+        $raw = @file_get_contents($path);
+        if (!is_string($raw)) {
+            return null;
+        }
+        $decoded = json_decode($raw, true);
+        if (!is_array($decoded)) {
+            return null;
+        }
+        $oauth = $decoded['claudeAiOauth'] ?? null;
+        if (!is_array($oauth)) {
+            return null;
+        }
+        $token = (string)($oauth['accessToken'] ?? '');
+        if ($token === '') {
+            return null;
+        }
+        // expiresAt is millisecond epoch; treat tokens within next 60s as expired
+        $expiresMs = (int)($oauth['expiresAt'] ?? 0);
+        if ($expiresMs > 0 && $expiresMs < ((int)(microtime(true) * 1000) + 60_000)) {
+            return null;
+        }
+        return $token;
     }
 
     /**

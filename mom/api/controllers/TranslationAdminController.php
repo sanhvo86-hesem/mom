@@ -382,7 +382,16 @@ final class TranslationAdminController extends EqmsBaseController
                 $bin = (string)($credRow[0]['cli_binary_path'] ?? '');
                 $home = (string)($credRow[0]['cli_auth_home_path'] ?? '');
                 if ($bin !== '') { $env['DCC_CLI_BINARY'] = $bin; }
-                if ($home !== '') { $env['DCC_CLI_AUTH_HOME'] = $home; $env['HOME'] = $home; }
+                if ($home !== '') {
+                    $env['DCC_CLI_AUTH_HOME'] = $home;
+                    $env['HOME'] = $home;
+                    if (str_starts_with($providerKey, 'claude')) {
+                        $token = \MOM\Services\Translation\CliRuntimeService::readClaudeOAuthToken($home);
+                        if ($token !== null) {
+                            $env['ANTHROPIC_AUTH_TOKEN'] = $token;
+                        }
+                    }
+                }
             }
         }
 

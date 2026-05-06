@@ -62,6 +62,15 @@ final class ProviderAttempt
             if ($this->cliAuthHomePath !== '') {
                 $env['DCC_CLI_AUTH_HOME'] = $this->cliAuthHomePath;
                 $env['HOME'] = $this->cliAuthHomePath;
+                // Linux Claude Code does not consistently pick up
+                // .credentials.json on its own; inject the OAuth token via
+                // ANTHROPIC_AUTH_TOKEN so the Max subscription is honored.
+                if (str_starts_with($this->providerKey, 'claude')) {
+                    $token = CliRuntimeService::readClaudeOAuthToken($this->cliAuthHomePath);
+                    if ($token !== null) {
+                        $env['ANTHROPIC_AUTH_TOKEN'] = $token;
+                    }
+                }
             }
         }
         if (!empty($this->options)) {
