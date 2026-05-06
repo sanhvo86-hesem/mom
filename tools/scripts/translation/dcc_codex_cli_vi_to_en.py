@@ -109,10 +109,17 @@ def _call_codex_cli(user_prompt: str) -> Dict[str, object]:
             full_prompt,
         ]
         try:
+            # IMPORTANT: codex `exec` reads from stdin by default (it prints
+            # "Reading additional input from stdin..." and appends whatever is
+            # there to the prompt). When we are spawned by PHP→python the
+            # parent's stdin pipe is open until EOF; codex stalls or appends
+            # garbage. Force-close stdin so codex uses ONLY the positional
+            # prompt argument.
             proc = subprocess.run(
                 cmd,
                 capture_output=True,
                 text=True,
+                stdin=subprocess.DEVNULL,
                 timeout=CLI_TIMEOUT_SECONDS,
             )
         except subprocess.TimeoutExpired as exc:

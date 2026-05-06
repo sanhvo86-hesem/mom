@@ -34,7 +34,7 @@ const STATE = {
   rules: [],
   modelsByProvider: {},
   usage: null,
-  testInput: { source_html: '', title: '', subtitle: '', selectedProviders: [] },
+  testInput: { source_html: '', title: '', subtitle: '', selectedProviders: [], modelByProvider: {} },
   testResults: [],
   loading: false,
   error: '',
@@ -301,6 +301,18 @@ function renderRuleEditor(rule, scopeType, scopeValue, enabledProviders) {
       </div>
     </details>
   `;
+}
+
+// Resolve the "best default" model id for a provider, in this order of trust:
+//   1. The active routing rule (global_default / tier / per-doc) — what the
+//      portal would actually invoke, so the test bench mirrors production.
+//   2. credential.available_models[0]      — what the operator probed/loaded.
+//   3. capabilities.candidate_models[0]    — the seed catalogue (last resort).
+function defaultModelForProvider(providerKey) {
+  const matchingRules = (STATE.rules || []).filter(r => r.primary_provider === providerKey && r.primary_model);
+  if (matchingRules.length) return matchingRules[0].primary_model;
+  const list = modelsForProvider(providerKey);
+  return list && list[0] && list[0].id || null;
 }
 
 function modelsForProvider(providerKey) {
@@ -811,12 +823,26 @@ function renderTestBench() {
       <input id="tx-test-title" type="text" placeholder="${_t('Title (vd: QMS Manual)','Title (e.g. QMS Manual)')}" value="${escapeHtml(STATE.testInput.title)}" style="padding:6px;border:1px solid var(--ln,#ddd);border-radius:4px;">
       <input id="tx-test-subtitle" type="text" placeholder="${_t('Subtitle','Subtitle')}" value="${escapeHtml(STATE.testInput.subtitle)}" style="padding:6px;border:1px solid var(--ln,#ddd);border-radius:4px;">
     </div>
-    <div style="margin:10px 0;display:flex;flex-wrap:wrap;gap:8px;">
-      ${enabled.map(p => `
-        <label style="display:flex;align-items:center;gap:5px;padding:5px 10px;border:1px solid var(--ln,#ddd);border-radius:4px;cursor:pointer;font-size:13px;">
-          <input type="checkbox" class="tx-test-provider-pick" data-key="${p.provider_key}" ${STATE.testInput.selectedProviders.includes(p.provider_key) ? 'checked' : ''}>
-          ${escapeHtml(p.display_name)}
-        </label>`).join('')}
+    <div style="margin:10px 0;display:flex;flex-direction:column;gap:6px;">
+      ${enabled.map(p => {
+        const checked = STATE.testInput.selectedProviders.includes(p.provider_key);
+        const currentModel = STATE.testInput.modelByProvider[p.provider_key]
+          || defaultModelForProvider(p.provider_key) || '';
+        const hasModels = (modelsForProvider(p.provider_key) || []).length > 0;
+        return `
+        <div style="display:flex;align-items:center;gap:10px;padding:6px 10px;border:1px solid var(--ln,#ddd);border-radius:4px;font-size:13px;">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;flex:0 0 auto;">
+            <input type="checkbox" class="tx-test-provider-pick" data-key="${p.provider_key}" ${checked ? 'checked' : ''}>
+            <strong>${escapeHtml(p.display_name)}</strong>
+          </label>
+          ${hasModels ? `
+            <span style="color:var(--text-3);font-size:12px;">model:</span>
+            <select class="tx-test-model-pick" data-key="${p.provider_key}" style="padding:3px 6px;border:1px solid var(--ln,#ddd);border-radius:3px;font-size:12px;">
+              ${renderModelOptions(p.provider_key, currentModel)}
+            </select>
+          ` : `<span style="color:var(--text-3);font-size:12px;">${_t('không có model','no model')}</span>`}
+        </div>`;
+      }).join('')}
     </div>
     <button id="tx-test-run" style="padding:10px 20px;background:var(--brand-primary,#0c63e7);color:#fff;border:0;border-radius:6px;cursor:pointer;font-size:14px;">▶ ${_t('Chạy test','Run test')}</button>
 
@@ -856,6 +882,11 @@ function wireTestBench() {
       STATE.testInput.selectedProviders = [...set];
     });
   });
+  document.querySelectorAll('.tx-test-model-pick').forEach(sel => {
+    sel.addEventListener('change', () => {
+      STATE.testInput.modelByProvider[sel.dataset.key] = sel.value;
+    });
+  });
 
   const runBtn = document.getElementById('tx-test-run');
   if (runBtn) runBtn.addEventListener('click', () => {
@@ -863,10 +894,10 @@ function wireTestBench() {
     if (STATE.testInput.selectedProviders.length === 0) return alert(_t('Chọn ít nhất 1 provider','Select at least 1 provider'));
     runBtn.disabled = true; runBtn.textContent = '⟳ ' + _t('Đang dịch...','Translating...');
     const providers = STATE.testInput.selectedProviders.map(pk => {
-      const provider = STATE.providers.find(p => p.provider_key === pk);
-      const candidates = provider && provider.capabilities && provider.capabilities.candidate_models;
-      const defaultModel = (candidates && candidates[0] && candidates[0].id) || null;
-      return { provider_key: pk, model: defaultModel };
+      // Trust the per-test dropdown first; fall back to the routing rule's
+      // primary_model so the test mirrors what production would send.
+      const model = STATE.testInput.modelByProvider[pk] || defaultModelForProvider(pk) || null;
+      return { provider_key: pk, model };
     });
     api('POST', '/api/v1/dcc/admin/translation/test', {
       providers,

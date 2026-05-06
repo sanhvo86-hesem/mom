@@ -135,10 +135,14 @@ def _call_claude_cli(user_prompt: str) -> Dict[str, object]:
         user_prompt,
     ]
     try:
+        # Force stdin closed — `claude -p` does not read stdin in --bare mode,
+        # but we are spawned via PHP→python and the inherited fd may still be
+        # open and confuse some CLI versions. Defensive close.
         proc = subprocess.run(
             cmd,
             capture_output=True,
             text=True,
+            stdin=subprocess.DEVNULL,
             timeout=CLI_TIMEOUT_SECONDS,
         )
     except subprocess.TimeoutExpired as exc:

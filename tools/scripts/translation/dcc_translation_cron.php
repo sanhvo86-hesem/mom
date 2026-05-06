@@ -98,7 +98,14 @@ $candidatesSql = "
       JOIN dcc_document_header h ON h.doc_code = v.doc_code
      WHERE v.locale = :p1
        AND v.translation_state IN (:p2, :p3)
-       AND COALESCE(v.translation_provider, '') NOT IN ('claude_cli:claude-opus-4-7', 'claude_cli:haiku', 'codex_cli:gpt-5')
+       -- Skip variants already produced by the current canonical providers.
+       -- The provider label is 'driver:model' as built in dcc_*_cli_vi_to_en.py.
+       AND COALESCE(v.translation_provider, '') NOT IN (
+            'claude_cli:opus', 'claude_cli:sonnet', 'claude_cli:haiku',
+            'claude_cli:claude-opus-4-5', 'claude_cli:claude-sonnet-4-5', 'claude_cli:claude-haiku-4-5',
+            'codex_cli:gpt-5.5', 'codex_cli:gpt-5.4', 'codex_cli:gpt-5.4-mini',
+            'codex_cli:gpt-5.3-codex', 'codex_cli:gpt-5.2'
+       )
      ORDER BY v.updated_at ASC
      LIMIT :p4
 ";
