@@ -218,6 +218,12 @@ def install_engine_overrides() -> None:
 
     common.load_translator = _codex_load_translator
 
+    # Disable glossary regex protection — LLM gets clean source + system
+    # prompt vocabulary contract. See dcc_claude_cli_vi_to_en for rationale.
+    def _no_glossary_protect(text, literals, next_index):
+        return text
+    common.protect_glossary_phrases = _no_glossary_protect
+
     vn_re = common.VIETNAMESE_CHAR_RE
 
     def _codex_translate_batch(segments: List[str], _translator) -> Dict[str, str]:

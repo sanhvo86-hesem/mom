@@ -228,7 +228,16 @@ _adapter: Optional[_ClaudeCliAdapter] = None
 
 
 def install_engine_overrides() -> None:
-    """Replace Argos translator + batch helpers with Claude CLI versions."""
+    """Replace Argos translator + batch helpers with Claude CLI versions.
+
+    Also disables the glossary regex protection layer. That layer was built
+    for NLLB/Argos which need single-word "anchor" substitutions (Chuẩn →
+    Datum, rủi ro → Risk, …) to keep terminology stable. For an LLM-class
+    translator those substitutions backfire — they corrupt the source
+    sentence ("Chuẩn mực" becomes "Datum mực", "RACI" gets glued to the
+    next word, etc.). The system prompt at translator-system-prompt.md
+    already gives the LLM a full vocabulary contract.
+    """
     global _adapter
     _adapter = _ClaudeCliAdapter()
     common._translator = _adapter
@@ -237,6 +246,11 @@ def install_engine_overrides() -> None:
         return _adapter
 
     common.load_translator = _claude_load_translator
+
+    # No-op glossary protector: pass text through untouched.
+    def _no_glossary_protect(text, literals, next_index):
+        return text
+    common.protect_glossary_phrases = _no_glossary_protect
 
     vn_re = common.VIETNAMESE_CHAR_RE
 
