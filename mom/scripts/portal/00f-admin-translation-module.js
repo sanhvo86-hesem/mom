@@ -306,11 +306,31 @@ function renderRuleEditor(rule, scopeType, scopeValue, enabledProviders) {
 function modelsForProvider(providerKey) {
   const p = STATE.providers.find(pr => pr.provider_key === providerKey);
   if (!p) return [];
-  // Prefer probed available_models; fall back to capability candidates.
   const cred = p.credential || {};
-  if (Array.isArray(cred.available_models) && cred.available_models.length) return cred.available_models;
-  const caps = p.capabilities || {};
-  return Array.isArray(caps.candidate_models) ? caps.candidate_models : [];
+  return normaliseModelList(cred.available_models)
+    || normaliseModelList(p.capabilities && p.capabilities.candidate_models)
+    || [];
+}
+
+/**
+ * Normalise a JSONB column value (which may arrive as a JSON string from
+ * Postgres or as an already-parsed array) into a list of model entries
+ * `[{id, label, state?}]`. Returns null if the value is empty so callers
+ * can chain through fallbacks with `||`.
+ */
+function normaliseModelList(value) {
+  if (value == null) return null;
+  if (typeof value === 'string') {
+    if (value.trim() === '' || value === '[]') return null;
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) && parsed.length ? parsed : null;
+    } catch (e) {
+      return null;
+    }
+  }
+  if (Array.isArray(value)) return value.length ? value : null;
+  return null;
 }
 
 function renderModelOptions(providerKey, currentModel) {
@@ -434,9 +454,11 @@ function renderProviderCard(p) {
 
   // Available models dropdown — populated from credential.available_models if
   // present, otherwise fall back to capabilities.candidate_models.
-  const candidates = (cred.available_models && cred.available_models.length)
-    ? cred.available_models
-    : ((p.capabilities && p.capabilities.candidate_models) || []);
+  // Postgres JSONB columns may come back as a string or an array depending on
+  // the driver, so normalise here.
+  const candidates = normaliseModelList(cred.available_models)
+    || normaliseModelList(p.capabilities && p.capabilities.candidate_models)
+    || [];
 
   return `<section class="tx-provider-card" data-provider-key="${p.provider_key}"
     style="padding:16px;border:1px solid var(--ln,#ddd);border-radius:8px;margin-bottom:12px;background:var(--bg,#fff);">
