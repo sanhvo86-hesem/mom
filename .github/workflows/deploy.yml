@@ -68,20 +68,23 @@ jobs:
       # fails. Previously bundled into one step where a phpunit failure
       # looked identical to a phpstan failure looked identical to a
       # workflow-status-authority failure.
+      #
+      # Use system `composer` (provided by setup-php), NOT `./composer` —
+      # the local wrapper at mom/composer is gitignored and absent in CI.
       - name: Validate — phpstan analyse
         working-directory: mom
         env: { APP_ENV: test, DB_PASSWORD: test_password }
-        run: ./composer analyse -- --memory-limit=1G
+        run: composer analyse -- --memory-limit=1G
 
       - name: Validate — phpunit tests
         working-directory: mom
         env: { APP_ENV: test, DB_PASSWORD: test_password }
-        run: ./composer test
+        run: composer test
 
       - name: Validate — composer check (analyse + test)
         working-directory: mom
         env: { APP_ENV: test, DB_PASSWORD: test_password }
-        run: ./composer check
+        run: composer check
 
       - name: Validate — workflow status authority
         working-directory: mom
