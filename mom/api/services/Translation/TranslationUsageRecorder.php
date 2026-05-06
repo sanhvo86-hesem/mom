@@ -47,12 +47,12 @@ final class TranslationUsageRecorder
                     (doc_code, provider_key, model_id, trigger_kind,
                      input_tokens, cached_input_tokens, output_tokens,
                      cost_usd_microcents, duration_ms, outcome, error_code, fallback_from, metadata)
-                 VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13::jsonb)',
+                 VALUES (:p1,:p2,:p3,:p4,:p5,:p6,:p7,:p8,:p9,:p10,:p11,:p12,:p13::jsonb)',
                 [
-                    $docCode, $providerKey, $modelId, $triggerKind,
-                    $inputTokens, $cachedInputTokens, $outputTokens,
-                    $cost, $durationMs, $outcome, $errorCode, $fallbackFrom,
-                    json_encode($extra, JSON_UNESCAPED_SLASHES) ?: '{}',
+                    ':p1' => $docCode, ':p2' => $providerKey, ':p3' => $modelId, ':p4' => $triggerKind,
+                    ':p5' => $inputTokens, ':p6' => $cachedInputTokens, ':p7' => $outputTokens,
+                    ':p8' => $cost, ':p9' => $durationMs, ':p10' => $outcome, ':p11' => $errorCode, ':p12' => $fallbackFrom,
+                    ':p13' => json_encode($extra, JSON_UNESCAPED_SLASHES) ?: '{}',
                 ]
             );
         } catch (Throwable $e) {
@@ -78,10 +78,10 @@ final class TranslationUsageRecorder
                     SUM(COALESCE(cost_usd_microcents,0))  AS cost_microcents,
                     AVG(duration_ms)                      AS avg_ms
                FROM translation_usage_log
-              WHERE created_at >= now() - ((\$1)::int * INTERVAL '1 day')
+              WHERE created_at >= now() - ((:p1)::int * INTERVAL '1 day')
               GROUP BY provider_key
               ORDER BY cost_microcents DESC, attempts DESC",
-            [$sinceDays]
+            [':p1' => $sinceDays]
         );
         if (!is_array($rows)) {
             return ['since_days' => $sinceDays, 'providers' => [], 'total_cost_usd' => 0.0];
@@ -120,8 +120,8 @@ final class TranslationUsageRecorder
                     duration_ms, outcome, error_code, fallback_from, created_at
                FROM translation_usage_log
               ORDER BY created_at DESC
-              LIMIT $1',
-            [$limit]
+              LIMIT :p1',
+            [':p1' => $limit]
         );
         if (!is_array($rows)) {
             return [];

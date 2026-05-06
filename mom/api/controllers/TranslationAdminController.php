@@ -115,8 +115,8 @@ final class TranslationAdminController extends EqmsBaseController
         $isEnabled = (bool)($body['is_enabled'] ?? true);
 
         $this->data->execute(
-            'UPDATE translation_provider_config SET is_enabled = $1, updated_at = now() WHERE provider_key = $2',
-            [$isEnabled ? 't' : 'f', $providerKey]
+            'UPDATE translation_provider_config SET is_enabled = :p1, updated_at = now() WHERE provider_key = :p2',
+            [':p1' => $isEnabled ? 't' : 'f', ':p2' => $providerKey]
         );
         $this->success(['provider_key' => $providerKey, 'is_enabled' => $isEnabled]);
     }
@@ -344,8 +344,8 @@ final class TranslationAdminController extends EqmsBaseController
         }
         $providerRow = $this->data->query(
             'SELECT driver_command, default_options, capabilities, provider_kind
-               FROM translation_provider_config WHERE provider_key = $1',
-            [$providerKey]
+               FROM translation_provider_config WHERE provider_key = :p1',
+            [':p1' => $providerKey]
         );
         if (!is_array($providerRow) || count($providerRow) === 0) {
             return ['provider_key' => $providerKey, 'ok' => false, 'message' => 'unknown provider'];
@@ -364,8 +364,8 @@ final class TranslationAdminController extends EqmsBaseController
         }
         if ($kind === 'cli_subscription') {
             $credRow = $this->data->query(
-                'SELECT cli_binary_path, cli_auth_home_path FROM translation_credentials WHERE provider_key = $1',
-                [$providerKey]
+                'SELECT cli_binary_path, cli_auth_home_path FROM translation_credentials WHERE provider_key = :p1',
+                [':p1' => $providerKey]
             );
             if (is_array($credRow) && isset($credRow[0])) {
                 $bin = (string)($credRow[0]['cli_binary_path'] ?? '');

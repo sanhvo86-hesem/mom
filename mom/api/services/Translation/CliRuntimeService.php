@@ -38,25 +38,25 @@ final class CliRuntimeService
         $authHome = isset($patch['cli_auth_home_path']) ? trim((string)$patch['cli_auth_home_path']) : null;
 
         $rows = $this->data->query(
-            'SELECT 1 FROM translation_credentials WHERE provider_key = $1',
-            [$providerKey]
+            'SELECT 1 FROM translation_credentials WHERE provider_key = :p1',
+            [':p1' => $providerKey]
         );
         if (is_array($rows) && count($rows) > 0) {
             $this->data->execute(
                 'UPDATE translation_credentials
-                    SET credential_kind = $1,
-                        cli_binary_path = COALESCE($2, cli_binary_path),
-                        cli_auth_home_path = COALESCE($3, cli_auth_home_path),
+                    SET credential_kind = :p1,
+                        cli_binary_path = COALESCE(:p2, cli_binary_path),
+                        cli_auth_home_path = COALESCE(:p3, cli_auth_home_path),
                         updated_at = now()
-                  WHERE provider_key = $4',
-                ['cli_auth', $binary, $authHome, $providerKey]
+                  WHERE provider_key = :p4',
+                [':p1' => 'cli_auth', ':p2' => $binary, ':p3' => $authHome, ':p4' => $providerKey]
             );
         } else {
             $this->data->execute(
                 'INSERT INTO translation_credentials
                     (provider_key, credential_kind, cli_binary_path, cli_auth_home_path, created_by)
-                 VALUES ($1, $2, $3, $4, $5)',
-                [$providerKey, 'cli_auth', $binary, $authHome, $actor]
+                 VALUES (:p1, :p2, :p3, :p4, :p5)',
+                [':p1' => $providerKey, ':p2' => 'cli_auth', ':p3' => $binary, ':p4' => $authHome, ':p5' => $actor]
             );
         }
     }
@@ -74,8 +74,8 @@ final class CliRuntimeService
         $row = $this->data->query(
             'SELECT cli_binary_path, cli_auth_home_path
                FROM translation_credentials
-              WHERE provider_key = $1',
-            [$providerKey]
+              WHERE provider_key = :p1',
+            [':p1' => $providerKey]
         );
         if (!is_array($row) || count($row) === 0) {
             return ['status' => 'config_error', 'message' => 'No CLI runtime configured for this provider.'];
@@ -131,12 +131,12 @@ final class CliRuntimeService
         $this->data->execute(
             'UPDATE translation_credentials
                 SET last_test_at = now(),
-                    last_test_status = $1,
-                    last_test_message = $2,
-                    cli_auth_subject = COALESCE($3, cli_auth_subject),
+                    last_test_status = :p1,
+                    last_test_message = :p2,
+                    cli_auth_subject = COALESCE(:p3, cli_auth_subject),
                     updated_at = now()
-              WHERE provider_key = $4',
-            [$status, $trimmedMessage, $subject, $providerKey]
+              WHERE provider_key = :p4',
+            [':p1' => $status, ':p2' => $trimmedMessage, ':p3' => $subject, ':p4' => $providerKey]
         );
     }
 

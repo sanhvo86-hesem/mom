@@ -53,8 +53,8 @@ final class ModelDiscoveryService
     public function refresh(string $providerKey): array
     {
         $providerRow = $this->data->query(
-            'SELECT provider_kind, capabilities FROM translation_provider_config WHERE provider_key = $1',
-            [$providerKey]
+            'SELECT provider_kind, capabilities FROM translation_provider_config WHERE provider_key = :p1',
+            [':p1' => $providerKey]
         );
         if (!is_array($providerRow) || count($providerRow) === 0) {
             return [];
@@ -82,8 +82,8 @@ final class ModelDiscoveryService
         $rows = $this->data->query(
             'SELECT available_models, models_fetched_at
                FROM translation_credentials
-              WHERE provider_key = $1',
-            [$providerKey]
+              WHERE provider_key = :p1',
+            [':p1' => $providerKey]
         );
         if (!is_array($rows) || count($rows) === 0) {
             return null;
@@ -105,23 +105,23 @@ final class ModelDiscoveryService
     {
         $payload = json_encode(array_values($models), JSON_UNESCAPED_SLASHES) ?: '[]';
         $exists = $this->data->query(
-            'SELECT 1 FROM translation_credentials WHERE provider_key = $1',
-            [$providerKey]
+            'SELECT 1 FROM translation_credentials WHERE provider_key = :p1',
+            [':p1' => $providerKey]
         );
         if (is_array($exists) && count($exists) > 0) {
             $this->data->execute(
                 'UPDATE translation_credentials
-                    SET available_models = $1::jsonb,
+                    SET available_models = :p1::jsonb,
                         models_fetched_at = now(),
                         updated_at = now()
-                  WHERE provider_key = $2',
-                [$payload, $providerKey]
+                  WHERE provider_key = :p2',
+                [':p1' => $payload, ':p2' => $providerKey]
             );
         } else {
             $this->data->execute(
                 'INSERT INTO translation_credentials (provider_key, credential_kind, available_models, models_fetched_at)
-                 VALUES ($1, $2, $3::jsonb, now())',
-                [$providerKey, 'none', $payload]
+                 VALUES (:p1, :p2, :p3::jsonb, now())',
+                [':p1' => $providerKey, ':p2' => 'none', ':p3' => $payload]
             );
         }
     }

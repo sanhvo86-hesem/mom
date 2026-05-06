@@ -881,8 +881,8 @@ final class DocumentLocaleAutomationService
     {
         try {
             $rows = $this->data->query(
-                'SELECT doc_type FROM dcc_document_header WHERE doc_code = $1 LIMIT 1',
-                [$docCode]
+                'SELECT doc_type FROM dcc_document_header WHERE doc_code = :p1 LIMIT 1',
+                [':p1' => $docCode]
             );
             if (is_array($rows) && isset($rows[0]['doc_type'])) {
                 return (string)$rows[0]['doc_type'];

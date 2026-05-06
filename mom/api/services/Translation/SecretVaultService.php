@@ -76,28 +76,28 @@ final class SecretVaultService
         $fingerprint = substr(hash('sha256', $apiKey), 0, 32);
 
         $existing = $this->data->query(
-            'SELECT 1 FROM translation_credentials WHERE provider_key = $1',
-            [$providerKey]
+            'SELECT 1 FROM translation_credentials WHERE provider_key = :p1',
+            [':p1' => $providerKey]
         );
         if (is_array($existing) && count($existing) > 0) {
             $this->data->execute(
                 'UPDATE translation_credentials
-                    SET credential_kind = $1,
-                        ciphertext = $2,
-                        nonce = $3,
-                        key_fingerprint = $4,
+                    SET credential_kind = :p1,
+                        ciphertext = :p2,
+                        nonce = :p3,
+                        key_fingerprint = :p4,
                         rotated_at = now(),
-                        created_by = COALESCE(created_by, $5),
+                        created_by = COALESCE(created_by, :p5),
                         updated_at = now()
-                  WHERE provider_key = $6',
-                ['api_key', $ciphertext, $nonce, $fingerprint, $actor, $providerKey]
+                  WHERE provider_key = :p6',
+                [':p1' => 'api_key', ':p2' => $ciphertext, ':p3' => $nonce, ':p4' => $fingerprint, ':p5' => $actor, ':p6' => $providerKey]
             );
         } else {
             $this->data->execute(
                 'INSERT INTO translation_credentials
                     (provider_key, credential_kind, ciphertext, nonce, key_fingerprint, created_by)
-                 VALUES ($1, $2, $3, $4, $5, $6)',
-                [$providerKey, 'api_key', $ciphertext, $nonce, $fingerprint, $actor]
+                 VALUES (:p1, :p2, :p3, :p4, :p5, :p6)',
+                [':p1' => $providerKey, ':p2' => 'api_key', ':p3' => $ciphertext, ':p4' => $nonce, ':p5' => $fingerprint, ':p6' => $actor]
             );
         }
 
@@ -122,9 +122,9 @@ final class SecretVaultService
         $rows = $this->data->query(
             'SELECT ciphertext, nonce
                FROM translation_credentials
-              WHERE provider_key = $1
-                AND credential_kind = $2',
-            [$providerKey, 'api_key']
+              WHERE provider_key = :p1
+                AND credential_kind = :p2',
+            [':p1' => $providerKey, ':p2' => 'api_key']
         );
         if (!is_array($rows) || count($rows) === 0) {
             return null;
@@ -152,8 +152,8 @@ final class SecretVaultService
                     last_test_at, last_test_status, last_test_message,
                     rate_limit_window, rotated_at, updated_at
                FROM translation_credentials
-              WHERE provider_key = $1',
-            [$providerKey]
+              WHERE provider_key = :p1',
+            [':p1' => $providerKey]
         );
         if (!is_array($rows) || count($rows) === 0) {
             return null;
@@ -166,8 +166,8 @@ final class SecretVaultService
     public function delete(string $providerKey): bool
     {
         $affected = $this->data->execute(
-            'DELETE FROM translation_credentials WHERE provider_key = $1',
-            [$providerKey]
+            'DELETE FROM translation_credentials WHERE provider_key = :p1',
+            [':p1' => $providerKey]
         );
         return $affected > 0;
     }

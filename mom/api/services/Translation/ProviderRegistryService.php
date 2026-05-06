@@ -188,17 +188,17 @@ final class ProviderRegistryService
             $params = [];
             $idx = 1;
             foreach ($clean as $col => $val) {
-                $sets[] = "{$col} = \${$idx}";
-                $params[] = $val;
+                $sets[] = "{$col} = :p{$idx}";
+                $params[":p{$idx}"] = $val;
                 $idx++;
             }
-            $sets[] = "updated_by = \${$idx}"; $params[] = $actor; $idx++;
+            $sets[] = "updated_by = :p{$idx}"; $params[":p{$idx}"] = $actor; $idx++;
             $sets[] = "updated_at = now()";
-            $params[] = $routingId;
+            $params[":p{$idx}"] = $routingId;
             $sql = 'UPDATE translation_routing SET ' . implode(', ', $sets) .
-                   " WHERE routing_id = \${$idx}";
+                   " WHERE routing_id = :p{$idx}";
             $this->data->execute($sql, $params);
-            $row = $this->data->query('SELECT * FROM translation_routing WHERE routing_id = $1', [$routingId]);
+            $row = $this->data->query('SELECT * FROM translation_routing WHERE routing_id = :p1', [':p1' => $routingId]);
             return is_array($row) && isset($row[0]) ? $row[0] : [];
         }
         // Insert
@@ -208,10 +208,16 @@ final class ProviderRegistryService
         $vals = array_values($clean);
         $vals[] = $actor;
         $vals[] = $actor;
-        $placeholders = array_map(fn ($i) => '$' . $i, range(1, count($vals)));
+        $placeholders = [];
+        $params = [];
+        foreach ($vals as $i => $v) {
+            $name = ':p' . ($i + 1);
+            $placeholders[] = $name;
+            $params[$name] = $v;
+        }
         $sql = 'INSERT INTO translation_routing (' . implode(', ', $cols) . ') VALUES (' .
                implode(', ', $placeholders) . ') RETURNING *';
-        $rows = $this->data->query($sql, $vals);
+        $rows = $this->data->query($sql, $params);
         return is_array($rows) && isset($rows[0]) ? $rows[0] : [];
     }
 
@@ -219,8 +225,8 @@ final class ProviderRegistryService
     {
         // Never delete the global_default — it's the safety net.
         $check = $this->data->query(
-            'SELECT scope_type FROM translation_routing WHERE routing_id = $1',
-            [$routingId]
+            'SELECT scope_type FROM translation_routing WHERE routing_id = :p1',
+            [':p1' => $routingId]
         );
         if (!is_array($check) || count($check) === 0) {
             return false;
@@ -229,8 +235,8 @@ final class ProviderRegistryService
             return false;
         }
         $affected = $this->data->execute(
-            'DELETE FROM translation_routing WHERE routing_id = $1',
-            [$routingId]
+            'DELETE FROM translation_routing WHERE routing_id = :p1',
+            [':p1' => $routingId]
         );
         return $affected > 0;
     }
@@ -255,14 +261,14 @@ final class ProviderRegistryService
                   FROM translation_routing
                  WHERE is_enabled = TRUE
                    AND (
-                        (scope_type = \'doc_code\' AND upper(scope_value) = upper($1))
-                     OR (scope_type = \'doc_pattern\' AND $1 ILIKE replace(scope_value, \'*\', \'%\'))
-                     OR (scope_type = \'tier\' AND scope_value = $2)
+                        (scope_type = \'doc_code\' AND upper(scope_value) = upper(:p1))
+                     OR (scope_type = \'doc_pattern\' AND :p1 ILIKE replace(scope_value, \'*\', \'%\'))
+                     OR (scope_type = \'tier\' AND scope_value = :p2)
                      OR (scope_type = \'global_default\' AND scope_value = \'*\')
                        )
               ORDER BY scope_rank DESC, priority DESC
                  LIMIT 1';
-        $rows = $this->data->query($sql, [$docCode, $tier]);
+        $rows = $this->data->query($sql, [':p1' => $docCode, ':p2' => $tier]);
         if (!is_array($rows) || count($rows) === 0) {
             return null;
         }
@@ -312,8 +318,8 @@ final class ProviderRegistryService
         if ($att->providerKind === 'cli_subscription') {
             $row = $this->data->query(
                 'SELECT cli_binary_path, cli_auth_home_path
-                   FROM translation_credentials WHERE provider_key = $1',
-                [$providerKey]
+                   FROM translation_credentials WHERE provider_key = :p1',
+                [':p1' => $providerKey]
             );
             if (is_array($row) && isset($row[0])) {
                 $att->cliBinaryPath = (string)($row[0]['cli_binary_path'] ?? '');
