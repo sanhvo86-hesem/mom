@@ -68,10 +68,13 @@ function api(method, path, body) {
   }
   return fetch(path, opts).then(r => r.json()).then(d => {
     if (!d || !d.ok) {
-      const msg = (d && d.error && d.error.message) || _t('Lỗi không xác định', 'Unknown error');
+      const msg = (d && (typeof d.error === 'string' ? d.error : (d.error && d.error.message))) || _t('Lỗi không xác định', 'Unknown error');
       throw new Error(msg);
     }
-    return d.data || {};
+    // BaseController.success() merges payload into the top-level envelope.
+    // Strip the envelope keys (ok, server_time) and return the rest verbatim.
+    const { ok, server_time, ...rest } = d;
+    return rest;
   });
 }
 
