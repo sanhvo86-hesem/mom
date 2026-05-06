@@ -44,23 +44,28 @@ if (!is_file($autoload)) {
 }
 require_once $autoload;
 
-// Load env. The portal's index.php uses dotenv via vendor; we load minimally
-// to keep this script independent.
-$envFile = $root . '/mom/.env';
-if (is_file($envFile)) {
-    foreach (file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
-        if (str_starts_with(ltrim($line), '#')) {
+// Load env from .env file AND from PHP-FPM pool config (env[FOO] = bar lines).
+// Cron runs outside FPM so pool env isn't auto-injected; we mirror what
+// mom/database/migrate.php does to make DB creds + provider config available.
+$envSources = array_filter([
+    $root . '/mom/.env',
+    '/etc/php/8.5/fpm/pool.d/mom.conf',
+], 'is_file');
+foreach ($envSources as $src) {
+    foreach (file($src, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) as $line) {
+        $line = trim($line);
+        if ($line === '' || str_starts_with($line, '#') || str_starts_with($line, ';')) {
             continue;
         }
-        if (!str_contains($line, '=')) {
-            continue;
-        }
-        [$k, $v] = explode('=', $line, 2);
-        $k = trim($k);
-        $v = trim($v, " \t\"'");
-        if ($k !== '' && getenv($k) === false) {
-            putenv("{$k}={$v}");
-            $_ENV[$k] = $v;
+        // Match either `KEY=VALUE` (.env) or `env[KEY] = VALUE` (php-fpm pool)
+        if (preg_match('/^env\[([^\]]+)\]\s*=\s*(.*)$/', $line, $m)
+            || preg_match('/^([A-Z_][A-Z0-9_]*)\s*=\s*(.*)$/i', $line, $m)) {
+            $k = trim($m[1]);
+            $v = trim($m[2], " \t\"'");
+            if ($k !== '' && getenv($k) === false) {
+                putenv("{$k}={$v}");
+                $_ENV[$k] = $v;
+            }
         }
     }
 }
