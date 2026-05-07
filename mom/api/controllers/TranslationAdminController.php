@@ -555,4 +555,248 @@ final class TranslationAdminController extends EqmsBaseController
         $exit = proc_close($proc);
         return ['stdout'=>$stdout,'stderr'=>$stderr,'exit'=>$exit];
     }
+
+    // ── Documents tab ─────────────────────────────────────────────────────────
+
+    private function pathDocCode(): string
+    {
+        $raw = $this->requirePathId('doc_code', 'doc_code');
+        if ($raw === '') {
+            $this->error('translation_doc_code_missing', 422, 'doc_code is required.');
+        }
+        return strtoupper(trim($raw));
+    }
+
+    /**
+     * GET /api/v1/dcc/admin/translation/documents
+     *
+     * Paginated list of all documents that have an English locale variant,
+     * joined with header data and any per-doc routing override.
+     *
+     * Query params: page, per_page, search, state
+     */
+    public function listTranslatedDocuments(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+
+        $page        = max(1, (int)($this->query('page') ?? '1'));
+        $perPage     = min(100, max(10, (int)($this->query('per_page') ?? '50')));
+        $search      = trim((string)($this->query('search') ?? ''));
+        $stateFilter = trim((string)($this->query('state') ?? ''));
+
+        $where  = ["v.locale = 'en'"];
+        $params = [];
+
+        if ($search !== '') {
+            $where[]            = '(h.doc_code ILIKE :p_srch1 OR h.title ILIKE :p_srch2)';
+            $params[':p_srch1'] = '%' . $search . '%';
+            $params[':p_srch2'] = '%' . $search . '%';
+        }
+        if ($stateFilter !== '') {
+            $where[]          = 'v.translation_state = :p_state';
+            $params[':p_state'] = $stateFilter;
+        }
+
+        $whereClause = implode(' AND ', $where);
+        $offset      = ($page - 1) * $perPage;
+
+        $rows = $this->data->query(
+            "SELECT
+                 h.doc_code, h.title, h.doc_type,
+                 h.revision AS source_revision, h.status AS source_status,
+                 v.translation_state, v.translation_provider, v.engine_version,
+                 v.artifact_source_revision AS translated_revision,
+                 v.updated_at AS translated_at,
+                 r.routing_id AS override_routing_id,
+                 r.primary_provider AS override_provider,
+                 r.primary_model AS override_model
+             FROM dcc_document_header h
+             JOIN dcc_document_locale_variant v
+                  ON v.doc_code = h.doc_code AND v.locale = 'en'
+             LEFT JOIN translation_routing r
+                  ON r.scope_type = 'doc_code'
+                  AND r.scope_value = h.doc_code
+                  AND r.is_enabled = true
+             WHERE $whereClause
+             ORDER BY v.updated_at DESC NULLS LAST
+             LIMIT $perPage OFFSET $offset",
+            $params
+        );
+
+        $countRow = $this->data->query(
+            "SELECT COUNT(*) AS total
+             FROM dcc_document_header h
+             JOIN dcc_document_locale_variant v
+                  ON v.doc_code = h.doc_code AND v.locale = 'en'
+             WHERE $whereClause",
+            $params
+        );
+
+        $this->success([
+            'documents' => is_array($rows) ? $rows : [],
+            'total'     => (int)(is_array($countRow) && isset($countRow[0]) ? ($countRow[0]['total'] ?? 0) : 0),
+            'page'      => $page,
+            'per_page'  => $perPage,
+        ]);
+    }
+
+    /**
+     * PUT /api/v1/dcc/admin/translation/documents/{doc_code}/override
+     * Body: { "primary_provider": "claude_cli", "primary_model": "sonnet" }
+     *
+     * Saves a per-document routing override used for all future auto-translations.
+     * This is stored as a translation_routing row with scope_type='doc_code'.
+     */
+    public function setDocumentOverride(): never
+    {
+        $user    = $this->requireAuth();
+        $this->requireAdmin($user);
+        $docCode = $this->pathDocCode();
+        $body    = $this->jsonBody();
+        $actor   = $this->adminActor($user);
+
+        $provider = trim((string)($body['primary_provider'] ?? ''));
+        $model    = isset($body['primary_model']) && (string)$body['primary_model'] !== ''
+            ? (string)$body['primary_model'] : null;
+
+        if ($provider === '') {
+            $this->error('translation_override_missing_provider', 422, 'primary_provider is required.');
+        }
+
+        $existing  = $this->data->query(
+            "SELECT routing_id FROM translation_routing
+              WHERE scope_type = 'doc_code' AND scope_value = :p1",
+            [':p1' => $docCode]
+        );
+        $routingId = is_array($existing) && count($existing) > 0 ? (int)$existing[0]['routing_id'] : 0;
+
+        try {
+            $row = $this->registry()->upsertRoutingRule($routingId, [
+                'scope_type'       => 'doc_code',
+                'scope_value'      => $docCode,
+                'primary_provider' => $provider,
+                'primary_model'    => $model,
+                'fallback_chain'   => [],
+                'is_enabled'       => true,
+            ], $actor);
+        } catch (Throwable $e) {
+            $this->error('translation_override_upsert_failed', 500, $e->getMessage());
+        }
+
+        $this->success(['rule' => $row]);
+    }
+
+    /**
+     * DELETE /api/v1/dcc/admin/translation/documents/{doc_code}/override
+     *
+     * Removes the per-document routing override, reverting to the inherited
+     * tier or global-default routing rule.
+     */
+    public function removeDocumentOverride(): never
+    {
+        $user    = $this->requireAuth();
+        $this->requireAdmin($user);
+        $docCode = $this->pathDocCode();
+
+        $this->data->execute(
+            "DELETE FROM translation_routing
+              WHERE scope_type = 'doc_code' AND scope_value = :p1",
+            [':p1' => $docCode]
+        );
+        $this->success(['deleted' => true, 'doc_code' => $docCode]);
+    }
+
+    /**
+     * POST /api/v1/dcc/admin/translation/documents/{doc_code}/retranslate
+     *
+     * Forces a fresh translation of the document, bypassing the content-hash
+     * cache. Uses whatever routing rule is currently active for this doc
+     * (per-doc override if set, otherwise inherited tier/global rule).
+     *
+     * The source HTML is read from the path stored in the locale variant's
+     * metadata (source_base_rel_path), so the document must have been
+     * translated at least once before this endpoint can be called.
+     */
+    public function retranslateDocument(): never
+    {
+        $user    = $this->requireAuth();
+        $this->requireAdmin($user);
+        $docCode = $this->pathDocCode();
+        $actor   = $this->adminActor($user);
+
+        $headers = $this->data->query(
+            "SELECT doc_code, title, doc_type, revision, status
+               FROM dcc_document_header WHERE doc_code = :p1 LIMIT 1",
+            [':p1' => $docCode]
+        );
+        if (!is_array($headers) || count($headers) === 0) {
+            $this->error('translation_doc_not_found', 404, "Document $docCode not found.");
+        }
+        $header = $headers[0];
+
+        $variants = $this->data->query(
+            "SELECT metadata FROM dcc_document_locale_variant
+              WHERE doc_code = :p1 AND locale = 'en' LIMIT 1",
+            [':p1' => $docCode]
+        );
+        $baseRelPath = '';
+        if (is_array($variants) && count($variants) > 0) {
+            $meta = $variants[0]['metadata'];
+            if (is_string($meta)) {
+                $meta = json_decode($meta, true) ?? [];
+            }
+            if (is_array($meta)) {
+                $baseRelPath = (string)($meta['source_base_rel_path'] ?? '');
+            }
+        }
+
+        if ($baseRelPath === '') {
+            $this->error(
+                'translation_retranslate_no_source_path', 422,
+                "Cannot determine source file path for $docCode. " .
+                'The document must have been translated at least once before force-retranslation is available.'
+            );
+        }
+
+        $absPath = rtrim($this->rootDir, '/') . '/' . ltrim($baseRelPath, '/');
+        if (!is_file($absPath)) {
+            $this->error('translation_retranslate_file_missing', 422, "Source file not found: $baseRelPath");
+        }
+        $sourceHtml = (string)@file_get_contents($absPath);
+        if (trim($sourceHtml) === '') {
+            $this->error('translation_retranslate_empty_file', 422, "Source file is empty: $baseRelPath");
+        }
+
+        // Clear the stored source hash so the automation service re-runs the
+        // provider instead of serving the cached artifact.
+        $this->data->execute(
+            "UPDATE dcc_document_locale_variant
+                SET artifact_source_hash_sha256 = NULL
+              WHERE doc_code = :p1 AND locale = 'en'",
+            [':p1' => $docCode]
+        );
+
+        $automation = new \MOM\Services\DocumentControl\DocumentLocaleAutomationService(
+            $this->data,
+            $this->rootDir
+        );
+
+        try {
+            $result = $automation->syncEnglishMachinePreview([
+                'doc_code'      => $docCode,
+                'base_rel_path' => $baseRelPath,
+                'source_html'   => $sourceHtml,
+                'title'         => (string)($header['title'] ?? ''),
+                'revision'      => (string)($header['revision'] ?? '0.0'),
+                'source_status' => (string)($header['status'] ?? 'draft'),
+                'trigger'       => 'admin_force',
+                'actor'         => $actor,
+            ]);
+        } catch (Throwable $e) {
+            $this->error('translation_retranslate_failed', 500, $e->getMessage());
+        }
+
+        $this->success(['doc_code' => $docCode, 'result' => $result]);
+    }
 }

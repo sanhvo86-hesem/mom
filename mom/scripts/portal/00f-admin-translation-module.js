@@ -39,14 +39,22 @@ const STATE = {
   loading: false,
   error: '',
   toast: '',
+  // ── Documents tab
+  documents: null,
+  docPage: 1,
+  docSearch: '',
+  docStateFilter: '',
+  docExpandedOverride: null,
+  docRetranslating: {},
 };
 
 const TABS = [
-  { id: 'routing',   vi: 'Routing',     en: 'Routing' },
-  { id: 'providers', vi: 'Provider',    en: 'Providers' },
-  { id: 'models',    vi: 'Model',       en: 'Models' },
-  { id: 'test',      vi: 'Test bench',  en: 'Test bench' },
-  { id: 'usage',     vi: 'Chi phí',     en: 'Cost & Usage' },
+  { id: 'routing',   vi: 'Routing',          en: 'Routing' },
+  { id: 'providers', vi: 'Provider',         en: 'Providers' },
+  { id: 'models',    vi: 'Model',            en: 'Models' },
+  { id: 'documents', vi: 'Tài liệu đã dịch', en: 'Translated Docs' },
+  { id: 'test',      vi: 'Test bench',       en: 'Test bench' },
+  { id: 'usage',     vi: 'Chi phí',          en: 'Cost & Usage' },
 ];
 
 const TIERS = ['tier_1', 'tier_2', 'tier_3'];
@@ -152,6 +160,7 @@ function render() {
     case 'routing':   bodyEl.innerHTML = renderRouting(); wireRouting(); break;
     case 'providers': bodyEl.innerHTML = renderProviders(); wireProviders(); break;
     case 'models':    bodyEl.innerHTML = renderModels(); wireModels(); break;
+    case 'documents': bodyEl.innerHTML = renderDocuments(); wireDocuments(); break;
     case 'test':      bodyEl.innerHTML = renderTestBench(); wireTestBench(); break;
     case 'usage':     bodyEl.innerHTML = renderUsage(); break;
   }
@@ -161,6 +170,7 @@ function switchTab(id) {
   STATE.activeTab = id;
   if (id === 'usage' && !STATE.usage) loadUsage();
   if (id === 'models') loadAllModels();
+  if (id === 'documents' && !STATE.documents) loadDocuments();
   render();
 }
 
@@ -966,6 +976,329 @@ function renderUsage() {
       </table>
     </section>
   `;
+}
+
+// ── Tab 4: Translated Documents ───────────────────────────────────────────────
+
+function loadDocuments() {
+  const params = new URLSearchParams({ page: STATE.docPage, per_page: 50 });
+  if (STATE.docSearch) params.set('search', STATE.docSearch);
+  if (STATE.docStateFilter) params.set('state', STATE.docStateFilter);
+  api('GET', '/api/v1/dcc/admin/translation/documents?' + params.toString())
+    .then(d => { STATE.documents = d; render(); })
+    .catch(err => { STATE.error = String(err.message || err); render(); });
+}
+
+function docStateBadgeStyle(state) {
+  const map = {
+    machine_preview: 'background:var(--info-bg,#e3f0ff);color:var(--info,#0c63e7)',
+    blocked: 'background:var(--danger-bg,#fff0f0);color:var(--danger,#c00)',
+    review_pending: 'background:var(--warn-bg,#fff8e1);color:var(--warn,#e0a000)',
+    published: 'background:var(--success-bg,#e6f9ee);color:var(--success,#0a7e3a)',
+  };
+  return map[state] || 'background:var(--bg-2,#f5f7fb);color:var(--text-3)';
+}
+
+function renderDocuments() {
+  const docs = STATE.documents;
+  if (!docs) {
+    return `<div style="padding:40px;text-align:center;color:var(--text-3);">⟳ ${_t('Đang tải tài liệu...', 'Loading documents...')}</div>`;
+  }
+
+  const stateOpts = [
+    { v: '', l: _t('Tất cả trạng thái', 'All states') },
+    { v: 'machine_preview', l: 'machine_preview' },
+    { v: 'blocked', l: 'blocked' },
+    { v: 'review_pending', l: 'review_pending' },
+    { v: 'published', l: 'published' },
+  ];
+
+  const enabledProviders = STATE.providers.filter(p => p.is_enabled);
+  const list       = docs.documents || [];
+  const total      = docs.total || 0;
+  const page       = docs.page || 1;
+  const perPage    = docs.per_page || 50;
+  const totalPages = Math.ceil(total / perPage) || 1;
+
+  return `
+    <div style="margin-bottom:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <input id="tx-doc-search" type="text" value="${escapeHtml(STATE.docSearch)}"
+        placeholder="${_t('Tìm theo mã/tên tài liệu', 'Search by code or title')}"
+        style="padding:7px 10px;border:1px solid var(--ln,#ddd);border-radius:6px;font-size:13px;min-width:220px;">
+      <select id="tx-doc-state-filter" style="padding:7px 8px;border:1px solid var(--ln,#ddd);border-radius:6px;font-size:13px;">
+        ${stateOpts.map(o => `<option value="${escapeHtml(o.v)}" ${STATE.docStateFilter === o.v ? 'selected' : ''}>${escapeHtml(o.l)}</option>`).join('')}
+      </select>
+      <button id="tx-doc-refresh" style="padding:7px 14px;border:1px solid var(--ln,#ddd);border-radius:6px;background:var(--bg,#fff);cursor:pointer;font-size:13px;">${_t('Làm mới', 'Refresh')}</button>
+      <span style="margin-left:auto;font-size:12px;color:var(--text-3);">
+        ${_t('Tổng', 'Total')}: <strong>${total}</strong> &nbsp;·&nbsp; ${_t('Trang', 'Page')} ${page} / ${totalPages}
+      </span>
+    </div>
+
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead>
+          <tr style="text-align:left;border-bottom:2px solid var(--ln,#ddd);background:var(--bg-2,#f5f7fb);">
+            <th style="padding:9px 8px;">${_t('Tài liệu', 'Document')}</th>
+            <th style="padding:9px 8px;">${_t('Loại', 'Type')}</th>
+            <th style="padding:9px 8px;">${_t('Phiên bản', 'Revision')}</th>
+            <th style="padding:9px 8px;">${_t('Engine dịch', 'Translation engine')}</th>
+            <th style="padding:9px 8px;">${_t('Ngày dịch', 'Translated')}</th>
+            <th style="padding:9px 8px;">${_t('Trạng thái', 'State')}</th>
+            <th style="padding:9px 8px;min-width:200px;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${list.length === 0
+            ? `<tr><td colspan="7" style="padding:28px;text-align:center;color:var(--text-3);">${_t('Chưa có tài liệu nào được dịch.', 'No translated documents found.')}</td></tr>`
+            : list.map(doc => renderDocRow(doc, enabledProviders)).join('')}
+        </tbody>
+      </table>
+    </div>
+
+    ${totalPages > 1 ? `
+      <div style="margin-top:12px;display:flex;gap:6px;justify-content:flex-end;">
+        <button class="tx-doc-page" data-page="${page - 1}" ${page <= 1 ? 'disabled' : ''}
+          style="padding:6px 12px;border:1px solid var(--ln,#ddd);border-radius:4px;cursor:${page <= 1 ? 'default' : 'pointer'};font-size:13px;opacity:${page <= 1 ? '.4' : '1'};">
+          ‹ ${_t('Trước', 'Prev')}
+        </button>
+        <button class="tx-doc-page" data-page="${page + 1}" ${page >= totalPages ? 'disabled' : ''}
+          style="padding:6px 12px;border:1px solid var(--ln,#ddd);border-radius:4px;cursor:${page >= totalPages ? 'default' : 'pointer'};font-size:13px;opacity:${page >= totalPages ? '.4' : '1'};">
+          ${_t('Sau', 'Next')} ›
+        </button>
+      </div>
+    ` : ''}
+  `;
+}
+
+function renderDocRow(doc, enabledProviders) {
+  const code         = doc.doc_code;
+  const srcRev       = doc.source_revision || '—';
+  const trlRev       = doc.translated_revision || '—';
+  const stale        = srcRev !== '—' && trlRev !== '—' && srcRev !== trlRev;
+  const retranslating = !!STATE.docRetranslating[code];
+  const expanded     = STATE.docExpandedOverride === code;
+
+  const engineLabel = doc.override_provider
+    ? `<div style="font-size:10px;color:var(--text-3);margin-bottom:1px;">${_t('override', 'override')}:</div>
+       <span style="color:var(--brand-primary,#0c63e7);font-weight:600;">${escapeHtml(doc.override_provider)}${doc.override_model ? ' / ' + escapeHtml(doc.override_model) : ''}</span>`
+    : `<span style="color:var(--text-2);">${escapeHtml(doc.translation_provider || '—')}${doc.engine_version ? '<br><span style="font-size:11px;color:var(--text-3);">' + escapeHtml(doc.engine_version.replace(/_v\d+$/, '')) + '</span>' : ''}</span>`;
+
+  return `
+    <tr class="tx-doc-row" data-doc-code="${escapeHtml(code)}"
+        style="border-bottom:1px solid var(--ln-2,#eee);${expanded ? 'background:var(--bg-2,#f5f7fb);' : ''}vertical-align:top;">
+      <td style="padding:9px 8px;">
+        <div style="font-weight:600;font-family:monospace;font-size:12px;">${escapeHtml(code)}</div>
+        <div style="color:var(--text-2);font-size:12px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(doc.title || '')}">${escapeHtml(doc.title || '')}</div>
+      </td>
+      <td style="padding:9px 8px;">
+        <span style="padding:2px 6px;background:var(--bg-2,#f5f7fb);border-radius:4px;font-size:11px;font-family:monospace;">${escapeHtml(doc.doc_type || '?')}</span>
+      </td>
+      <td style="padding:9px 8px;font-family:monospace;font-size:12px;">
+        <div>${escapeHtml(srcRev)}</div>
+        ${stale
+          ? `<div style="font-size:11px;color:var(--warn,#e0a000);">⚠ ${_t('dịch', 'translated')} ${escapeHtml(trlRev)}</div>`
+          : `<div style="font-size:11px;color:var(--text-3);">${_t('dịch', 'translated')} ${escapeHtml(trlRev)}</div>`}
+      </td>
+      <td style="padding:9px 8px;font-size:12px;">${engineLabel}</td>
+      <td style="padding:9px 8px;font-size:12px;color:var(--text-3);white-space:nowrap;">
+        ${doc.translated_at ? escapeHtml(doc.translated_at.substr(0, 16).replace('T', ' ')) : '—'}
+      </td>
+      <td style="padding:9px 8px;">
+        <span style="padding:3px 8px;border-radius:4px;font-size:11px;white-space:nowrap;${docStateBadgeStyle(doc.translation_state)}">
+          ${escapeHtml(doc.translation_state || 'unknown')}
+        </span>
+      </td>
+      <td style="padding:9px 8px;text-align:right;white-space:nowrap;">
+        <button class="tx-doc-override-toggle" data-doc-code="${escapeHtml(code)}"
+          style="padding:5px 10px;border:1px solid var(--ln,#ddd);border-radius:4px;background:${expanded ? 'var(--bg-2,#f5f7fb)' : 'var(--bg,#fff)'};cursor:pointer;font-size:12px;margin-right:4px;">
+          ${_t('Đổi engine', 'Change engine')} ${expanded ? '▲' : '▼'}
+        </button>
+        <button class="tx-doc-retranslate" data-doc-code="${escapeHtml(code)}"
+          ${retranslating ? 'disabled' : ''}
+          style="padding:5px 10px;border:0;border-radius:4px;background:var(--brand-primary,#0c63e7);color:#fff;cursor:${retranslating ? 'default' : 'pointer'};font-size:12px;opacity:${retranslating ? '.6' : '1'};">
+          ${retranslating ? '⟳ ' + _t('Đang dịch...', 'Translating...') : _t('Dịch lại', 'Retranslate')}
+        </button>
+      </td>
+    </tr>
+    ${expanded ? `<tr data-override-for="${escapeHtml(code)}" style="background:var(--bg-2,#f5f7fb);">
+      <td colspan="7" style="padding:0;">${renderDocOverridePanel(doc, enabledProviders)}</td>
+    </tr>` : ''}
+  `;
+}
+
+function renderDocOverridePanel(doc, enabledProviders) {
+  const code        = doc.doc_code;
+  const curProvider = doc.override_provider || (enabledProviders[0] && enabledProviders[0].provider_key) || '';
+  const curModel    = doc.override_model || '';
+
+  return `
+    <div style="padding:14px 16px;border-top:1px solid var(--ln,#ddd);">
+      <div style="font-size:12px;font-weight:600;margin-bottom:10px;color:var(--text-2);">
+        ${_t('Override engine dịch cho', 'Per-document translation override for')}
+        <code style="background:var(--bg,#fff);padding:1px 5px;border-radius:3px;">${escapeHtml(code)}</code>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+        <select class="tx-doc-override-provider" data-doc-code="${escapeHtml(code)}"
+          style="padding:6px 8px;border:1px solid var(--ln,#ddd);border-radius:4px;font-size:13px;">
+          ${enabledProviders.map(p => `
+            <option value="${escapeHtml(p.provider_key)}" ${p.provider_key === curProvider ? 'selected' : ''}>${escapeHtml(p.display_name)}</option>
+          `).join('')}
+        </select>
+        <select class="tx-doc-override-model" data-doc-code="${escapeHtml(code)}"
+          style="padding:6px 8px;border:1px solid var(--ln,#ddd);border-radius:4px;font-size:13px;">
+          ${renderModelOptions(curProvider, curModel)}
+        </select>
+        <button class="tx-doc-save-override" data-doc-code="${escapeHtml(code)}"
+          style="padding:6px 14px;background:var(--brand-primary,#0c63e7);color:#fff;border:0;border-radius:4px;cursor:pointer;font-size:13px;">
+          ${_t('Lưu override', 'Save override')}
+        </button>
+        ${doc.override_provider ? `
+          <button class="tx-doc-remove-override" data-doc-code="${escapeHtml(code)}"
+            style="padding:6px 10px;background:none;border:1px solid var(--danger,#c00);color:var(--danger,#c00);border-radius:4px;cursor:pointer;font-size:13px;">
+            ${_t('Xóa override', 'Remove override')}
+          </button>
+        ` : ''}
+      </div>
+      <p style="margin:8px 0 0;font-size:11px;color:var(--text-3);">
+        ${_t(
+          'Override này được lưu và áp dụng cho tất cả các lần dịch tự động tiếp theo của tài liệu này.',
+          'This override is saved and applied to all future automatic translations of this document.'
+        )}
+      </p>
+    </div>
+  `;
+}
+
+function wireDocuments() {
+  const searchEl  = document.getElementById('tx-doc-search');
+  const stateEl   = document.getElementById('tx-doc-state-filter');
+  const refreshEl = document.getElementById('tx-doc-refresh');
+
+  let searchTimer = null;
+  if (searchEl) {
+    searchEl.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        STATE.docSearch = searchEl.value.trim();
+        STATE.docPage = 1;
+        STATE.documents = null;
+        loadDocuments();
+      }, 400);
+    });
+  }
+  if (stateEl) {
+    stateEl.addEventListener('change', () => {
+      STATE.docStateFilter = stateEl.value;
+      STATE.docPage = 1;
+      STATE.documents = null;
+      loadDocuments();
+    });
+  }
+  if (refreshEl) {
+    refreshEl.addEventListener('click', () => {
+      STATE.documents = null;
+      loadDocuments();
+    });
+  }
+
+  document.querySelectorAll('.tx-doc-page').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.disabled) return;
+      STATE.docPage = parseInt(btn.dataset.page, 10) || 1;
+      STATE.documents = null;
+      loadDocuments();
+    });
+  });
+
+  document.querySelectorAll('.tx-doc-override-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const code = btn.dataset.docCode;
+      STATE.docExpandedOverride = STATE.docExpandedOverride === code ? null : code;
+      render();
+    });
+  });
+
+  // Override panel: refresh model dropdown when provider changes
+  document.querySelectorAll('.tx-doc-override-provider').forEach(sel => {
+    sel.addEventListener('change', () => {
+      const td = sel.closest('td');
+      const modelSel = td && td.querySelector('.tx-doc-override-model');
+      if (modelSel) modelSel.innerHTML = renderModelOptions(sel.value, '');
+    });
+  });
+
+  // Save override
+  document.querySelectorAll('.tx-doc-save-override').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const code = btn.dataset.docCode;
+      const td = btn.closest('td');
+      const providerSel = td && td.querySelector('.tx-doc-override-provider');
+      const modelSel    = td && td.querySelector('.tx-doc-override-model');
+      const provider    = providerSel ? providerSel.value : '';
+      const model       = (modelSel && modelSel.value.trim()) || null;
+      if (!provider) return;
+      btn.disabled = true;
+      api('PUT', `/api/v1/dcc/admin/translation/documents/${encodeURIComponent(code)}/override`, {
+        primary_provider: provider,
+        primary_model: model,
+      }).then(() => {
+        toast(_t('Đã lưu override', 'Override saved'));
+        STATE.docExpandedOverride = null;
+        STATE.documents = null;
+        loadDocuments();
+      }).catch(err => { alert(err.message); btn.disabled = false; });
+    });
+  });
+
+  // Remove override
+  document.querySelectorAll('.tx-doc-remove-override').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const code = btn.dataset.docCode;
+      if (!confirm(_t(
+        'Xóa override này? Tài liệu sẽ dùng routing rule mặc định.',
+        'Remove this override? The document will revert to default routing.'
+      ))) return;
+      api('DELETE', `/api/v1/dcc/admin/translation/documents/${encodeURIComponent(code)}/override`)
+        .then(() => {
+          toast(_t('Đã xóa override', 'Override removed'));
+          STATE.docExpandedOverride = null;
+          STATE.documents = null;
+          loadDocuments();
+        }).catch(err => alert(err.message));
+    });
+  });
+
+  // Force retranslate
+  document.querySelectorAll('.tx-doc-retranslate').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.disabled) return;
+      const code = btn.dataset.docCode;
+      if (!confirm(_t(
+        `Dịch lại "${code}"?\nThao tác này sẽ ghi đè bản dịch hiện tại bằng bản dịch mới.`,
+        `Retranslate "${code}"?\nThis will overwrite the current translation with a fresh one.`
+      ))) return;
+      STATE.docRetranslating[code] = true;
+      render();
+      api('POST', `/api/v1/dcc/admin/translation/documents/${encodeURIComponent(code)}/retranslate`, {})
+        .then(d => {
+          delete STATE.docRetranslating[code];
+          const ok = !d.result || d.result.ok !== false;
+          if (ok) {
+            toast(_t('Dịch thành công: ' + code, 'Translation complete: ' + code));
+          } else {
+            const reason = (d.result && (d.result.reason || d.result.message)) || 'unknown';
+            toast(_t('Dịch thất bại: ' + reason, 'Translation failed: ' + reason));
+          }
+          STATE.documents = null;
+          loadDocuments();
+        }).catch(err => {
+          delete STATE.docRetranslating[code];
+          STATE.documents = null;
+          loadDocuments();
+          alert(err.message);
+        });
+    });
+  });
 }
 
 })();

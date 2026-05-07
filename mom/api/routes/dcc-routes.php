@@ -92,4 +92,10 @@ return static function (Router $router, string $dataDir): void {
 
     $router->get   ('/api/v1/dcc/admin/translation/usage',                                    TranslationAdminController::class, 'usageSummary');
     $router->post  ('/api/v1/dcc/admin/translation/test',                                     TranslationAdminController::class, 'testBench');
+
+    // ── Documents tab (per-doc override + force retranslate) ──────────────
+    $router->get   ('/api/v1/dcc/admin/translation/documents',                                          TranslationAdminController::class, 'listTranslatedDocuments');
+    $router->put   ('/api/v1/dcc/admin/translation/documents/{doc_code}/override',                      TranslationAdminController::class, 'setDocumentOverride');
+    $router->delete('/api/v1/dcc/admin/translation/documents/{doc_code}/override',                      TranslationAdminController::class, 'removeDocumentOverride');
+    $router->post  ('/api/v1/dcc/admin/translation/documents/{doc_code}/retranslate',                   TranslationAdminController::class, 'retranslateDocument');
 };
