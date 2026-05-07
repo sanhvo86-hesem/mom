@@ -9,8 +9,8 @@ use RuntimeException;
 use Throwable;
 
 /**
- * Drives the interactive `claude setup-token` and `codex login --device-auth`
- * OAuth flows from the admin UI.
+ * Drives the interactive `claude setup-token` (OAuth PKCE) and
+ * `codex login --with-api-key` (synchronous API-key) flows from the admin UI.
  *
  * Flow (admin clicks "Connect" in the Provider tab):
  *
@@ -88,7 +88,7 @@ final class CliLoginService
     }
 
     /**
-     * Admin pasted the token (Claude) — feed it to the waiting process.
+     * Admin pasted the token (Claude) or API key (Codex) — feed it to the CLI.
      *
      * @return array<string, mixed>
      */
@@ -99,6 +99,13 @@ final class CliLoginService
             throw new RuntimeException('Code/token is empty.');
         }
         $sessionDir = $this->sessionDir($sessionId);
+
+        // API-key flow (codex): run CLI synchronously, no background process.
+        $meta = $this->readMeta($sessionId);
+        if ($meta !== null && ($meta['kind'] ?? '') === 'api_key') {
+            return $this->completeApiKeyLogin($providerKey, $sessionId, $code, $meta);
+        }
+
         $stdin = $sessionDir . '/stdin';
         if (!is_file($stdin)) {
             throw new RuntimeException('Login session not found or already finished. Click Connect again.');
@@ -108,6 +115,59 @@ final class CliLoginService
             throw new RuntimeException('Could not write code to session stdin.');
         }
         return $this->waitForCompletion($providerKey, $sessionId);
+    }
+
+    /**
+     * Codex API-key flow: run `codex login --with-api-key` synchronously.
+     *
+     * @param array<string,mixed> $meta
+     * @return array<string,mixed>
+     */
+    private function completeApiKeyLogin(string $providerKey, string $sessionId, string $apiKey, array $meta): array
+    {
+        $binary   = (string)$meta['binary'];
+        $authHome = (string)$meta['authHome'];
+
+        @mkdir(rtrim($authHome, '/') . '/.codex', 0700, true);
+
+        $result = $this->runCommand(
+            [$binary, 'login', '--with-api-key'],
+            $apiKey . "\n",
+            ['HOME' => $authHome],
+            30
+        );
+        $this->cleanupSession($sessionId);
+
+        if ($result === null || $result['exit'] !== 0) {
+            $stderr = $result['stderr'] ?? '';
+            $stdout = $result['stdout'] ?? '';
+            throw new RuntimeException(
+                'codex login --with-api-key failed: ' . mb_substr($stderr ?: $stdout, 0, 400)
+            );
+        }
+
+        $info = $this->readCredentialMeta($providerKey, $authHome);
+        if ($info === null) {
+            throw new RuntimeException('codex login ran but no auth.json was written.');
+        }
+
+        $this->data->execute(
+            'UPDATE translation_credentials
+                SET cli_auth_subject = :p1,
+                    last_test_at = NULL,
+                    last_test_status = NULL,
+                    last_test_message = NULL,
+                    updated_at = now()
+              WHERE provider_key = :p2',
+            [':p1' => $info['subject'] ?? null, ':p2' => $providerKey]
+        );
+
+        return [
+            'ok' => true,
+            'state' => 'completed',
+            'session_id' => $sessionId,
+            'account' => $info,
+        ];
     }
 
     /**
@@ -239,69 +299,31 @@ final class CliLoginService
      */
     private function startCodex(string $providerKey, string $binary, string $authHome): array
     {
+        // codex login --with-api-key reads the key from stdin synchronously.
+        // No background process needed — just record session so completeWithCode()
+        // knows which binary/home to use.
         $sessionId = $this->newSessionId();
         $sessionDir = $this->sessionDir($sessionId);
         if (!@mkdir($sessionDir, 0700, true) && !is_dir($sessionDir)) {
             throw new RuntimeException("Could not create session dir {$sessionDir}");
         }
-        $stdout = $sessionDir . '/stdout';
-        // codex device-auth doesn't need stdin, but we still touch one so
-        // cleanupSession is symmetric with claude.
         touch($sessionDir . '/stdin');
-
-        $cmd = sprintf(
-            'cd %s && HOME=%s nohup bash -c %s > /dev/null 2>&1 & echo $!',
-            escapeshellarg($authHome),
-            escapeshellarg($authHome),
-            escapeshellarg(sprintf(
-                '%s login --device-auth > %s 2>&1',
-                escapeshellarg($binary),
-                escapeshellarg($stdout)
-            ))
-        );
-        $pid = trim((string)shell_exec($cmd));
-        if (!ctype_digit($pid)) {
-            $this->cleanupSession($sessionId);
-            throw new RuntimeException('Could not spawn codex login --device-auth.');
-        }
-        file_put_contents($sessionDir . '/pid', $pid);
+        touch($sessionDir . '/stdout');
         $this->writeMeta($sessionId, [
             'provider_key' => $providerKey,
-            'kind' => 'device',
+            'kind' => 'api_key',
             'started_at' => time(),
+            'binary' => $binary,
             'authHome' => $authHome,
-            'pid' => (int)$pid,
         ]);
-
-        // Wait up to 15s for "Visit URL X with code Y" line.
-        $url = '';
-        $code = '';
-        $deadline = microtime(true) + 15;
-        while (microtime(true) < $deadline) {
-            $out = (string)@file_get_contents($stdout);
-            if ($url === '' && preg_match('~https?://[^\s\x1b]+~', $out, $m)) {
-                $url = trim($m[0], "\"'.,;:");
-            }
-            if ($code === '' && preg_match('~code:?\s*([A-Z0-9-]{4,})~i', $out, $m)) {
-                $code = trim($m[1]);
-            }
-            if ($url !== '' && $code !== '') break;
-            usleep(300_000);
-        }
-        if ($url === '') {
-            $this->cleanupSession($sessionId);
-            throw new RuntimeException('Did not receive auth URL from codex login.');
-        }
 
         return [
             'session_id' => $sessionId,
             'provider_key' => $providerKey,
-            'flow' => 'device',
-            'auth_url' => $url,
-            'pairing_code' => $code,
-            'expects_paste' => false,
-            'instructions_vi' => "1. Mở URL ở trên\n2. Nhập mã: " . $code . "\n3. Đăng nhập tài khoản ChatGPT Pro\n4. Nhấn Approve\n5. Bấm \"Đợi xác nhận\" ở dưới (process tự kết thúc khi xác nhận thành công)",
-            'instructions_en' => "1. Open the URL above\n2. Enter the code: " . $code . "\n3. Sign in to your ChatGPT account (Pro subscription)\n4. Click Approve\n5. Click \"Wait for completion\" below (process auto-finishes once approved)",
+            'flow' => 'api_key',
+            'expects_paste' => true,
+            'instructions_vi' => "Lấy OpenAI API key tại platform.openai.com/api-keys rồi dán vào ô bên dưới.",
+            'instructions_en' => "Get your OpenAI API key at platform.openai.com/api-keys and paste it below.",
         ];
     }
 
@@ -406,8 +428,15 @@ final class CliLoginService
             if (!is_file($path)) return null;
             $j = json_decode((string)@file_get_contents($path), true);
             if (!is_array($j)) return null;
+            $subject = $j['email'] ?? $j['account_id'] ?? $j['user_id'] ?? null;
+            if ($subject === null && isset($j['auth_mode'])) {
+                $subject = (string)$j['auth_mode'];
+            }
+            if ($subject === null && (isset($j['OPENAI_API_KEY']) || isset($j['openai_api_key']))) {
+                $subject = 'apikey';
+            }
             return [
-                'subject' => $j['email'] ?? $j['account_id'] ?? $j['user_id'] ?? null,
+                'subject' => $subject,
                 'subscription' => $j['plan_type'] ?? $j['plan'] ?? 'unknown',
                 'mode' => $j['auth_mode'] ?? null,
             ];

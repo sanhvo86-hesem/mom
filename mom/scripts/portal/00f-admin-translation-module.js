@@ -769,10 +769,41 @@ function openCliLoginModal(providerKey) {
 function renderCliLoginModalBody(providerKey, session) {
   const body = document.getElementById('tx-cli-modal-body');
   if (!body) return;
-  const url = session.auth_url;
+  const flow = session.flow || 'paste';
+  const instructions = (lang === 'en' ? session.instructions_en : session.instructions_vi) || '';
+
+  // ── API-key flow (Codex): no auth URL, just paste the key ───────────────────
+  if (flow === 'api_key') {
+    body.innerHTML = `
+      ${instructions ? `<p style="font-size:13px;color:var(--text-2);white-space:pre-line;margin:0 0 14px;">${escapeHtml(instructions)}</p>` : ''}
+      <div style="padding:14px;background:var(--bg-2,#f5f7fb);border-radius:6px;">
+        <label style="display:block;font-size:13px;margin-bottom:6px;font-weight:600;">${_t('OpenAI API key','OpenAI API key')}:</label>
+        <textarea id="tx-paste-code" rows="2" placeholder="sk-..." style="width:100%;padding:8px;font-family:monospace;font-size:12px;border:1px solid var(--ln,#ddd);border-radius:4px;box-sizing:border-box;"></textarea>
+        <div style="margin-top:10px;text-align:right;">
+          <button id="tx-cli-submit-code" style="padding:8px 20px;background:var(--brand-primary,#0c63e7);color:#fff;border:0;border-radius:4px;cursor:pointer;font-size:14px;">${_t('Đăng nhập','Login')}</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('tx-cli-submit-code').addEventListener('click', () => {
+      const token = (document.getElementById('tx-paste-code').value || '').trim();
+      if (!token) return alert(_t('Nhập API key trước','Enter the API key first'));
+      const btn = document.getElementById('tx-cli-submit-code');
+      btn.disabled = true; btn.textContent = '⟳ ' + _t('Đang xử lý...','Processing...');
+      api('POST', `/api/v1/dcc/admin/translation/credentials/${encodeURIComponent(providerKey)}/login/complete`, {
+        session_id: session.session_id, code: token,
+      }).then(d => handleLoginResult(d.result, providerKey))
+        .catch(err => {
+          alert(err.message);
+          btn.disabled = false; btn.textContent = _t('Đăng nhập','Login');
+        });
+    });
+    return;
+  }
+
+  // ── OAuth / paste flows (Claude and device-auth) ─────────────────────────────
+  const url = session.auth_url || '';
   const code = session.pairing_code || '';
   const isPaste = !!session.expects_paste;
-  const instructions = (lang === 'en' ? session.instructions_en : session.instructions_vi) || '';
 
   body.innerHTML = `
     <ol style="font-size:14px;line-height:1.6;padding-left:20px;">
