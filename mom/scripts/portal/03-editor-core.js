@@ -6251,9 +6251,33 @@ function _edSanitizeHtmlFragment(rawHtml,opts){
   var tpl=document.createElement('template');
   tpl.innerHTML=html.replace(/<!--[\s\S]*?-->/g,'');
 
-  var forbidden='script,style,meta,link,iframe,frame,frameset,object,embed,applet,base,noscript';
+  // Always strip: script (XSS), iframe/frame/frameset (clickjacking),
+  // object/embed/applet (plugin abuse), meta/link/base (head-only —
+  // illegal in body and used for bypasses), noscript (delivery vector).
+  var forbidden='script,meta,link,iframe,frame,frameset,object,embed,applet,base,noscript';
   if(cfg.forPaste) forbidden+=',form,button,select,textarea,input';
   tpl.content.querySelectorAll(forbidden).forEach(function(el){el.remove();});
+
+  // <style> handling:
+  //   - In paste mode (untrusted external HTML): strip entirely.
+  //   - In non-paste mode (toggle source↔WYSIWYG of own authored doc):
+  //     preserve the block but neutralize CSS attack vectors:
+  //       expression(), behavior:url(), @import url(javascript:), etc.
+  // Stripping <style> on every toggle was the root cause of "graphics
+  // disappear after editing" for docs that legitimately carry inline
+  // <style> blocks (annex process maps, certificate templates, design
+  // system index, etc.) — about 4 docs in this repo today.
+  tpl.content.querySelectorAll('style').forEach(function(el){
+    if(cfg.forPaste){ el.remove(); return; }
+    var css=String(el.textContent||'');
+    // Defensive sanitization: drop dangerous CSS constructs but keep
+    // the rest of the rules intact.
+    css=css.replace(/expression\s*\(/gi,'/*expr*/(');
+    css=css.replace(/behavior\s*:\s*[^;]*url\s*\([^)]*\)/gi,'/*behavior-url-stripped*/');
+    css=css.replace(/(@import[^;]*url\s*\(\s*["']?)\s*javascript:/gi,'$1about:blank#');
+    css=css.replace(/url\s*\(\s*["']?\s*javascript:/gi,'url(about:blank#');
+    el.textContent=css;
+  });
 
   tpl.content.querySelectorAll('*').forEach(function(el){
     var tag=(el.tagName||'').toLowerCase();
