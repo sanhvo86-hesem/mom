@@ -510,34 +510,94 @@ class DocumentController extends BaseController
         $manifest = load_doc_manifest($this->rootDir, $baseRel, $archiveDir, $code);
         $versions = $manifest['versions'] ?? [];
 
-        // Find the in_review version file
+        // Find the source file to publish. We must:
+        //  (a) match the version exactly to the active $revision (not pick
+        //      any random older draft that might still be in the manifest),
+        //  (b) prefer status='draft' over 'in_review' for the same revision
+        //      because the editor saves the latest edits to the DRAFT file
+        //      after a re-open, and INREVIEW only reflects the snapshot at
+        //      the moment submitReview was called. If users continue editing
+        //      after submit (a supported flow), DRAFT holds the freshest body.
         $reviewFile = null;
-        foreach ($versions as $v) {
-            if (is_array($v) && in_array(($v['status'] ?? ''), ['in_review', 'draft'], true)) {
+        $reviewSrcRel = '';
+        $tryStatus = static function (string $statusWanted) use ($versions, $revision): array {
+            foreach ($versions as $v) {
+                if (!is_array($v)) continue;
+                if (($v['status'] ?? '') !== $statusWanted) continue;
+                if (($v['version'] ?? '') !== ('v' . $revision)) continue;
                 $file = (string)($v['file'] ?? '');
-                if ($file !== '') {
-                    try {
-                        $absFile = join_in_root($this->rootDir, $file);
-                        if (is_file($absFile)) {
-                            $reviewFile = $absFile;
-                            break;
-                        }
-                    } catch (Throwable $e) {
-                        $this->rethrowResponse($e);
-                        // skip
-                    }
+                if ($file === '') continue;
+                return [$file, true];
+            }
+            return ['', false];
+        };
+        foreach (['draft', 'in_review'] as $statusWanted) {
+            [$relFound, $ok] = $tryStatus($statusWanted);
+            if (!$ok) continue;
+            try {
+                $absFile = join_in_root($this->rootDir, $relFound);
+                if (is_file($absFile)) {
+                    $reviewFile  = $absFile;
+                    $reviewSrcRel = $relFound;
+                    break;
                 }
+            } catch (Throwable $e) {
+                $this->rethrowResponse($e);
             }
         }
 
-        // Publish the approved version to the live file
+        if ($reviewFile === null) {
+            // Hard error instead of silently leaving live file stale and
+            // marking state='approved'. Without this guard, an editor that
+            // saved a draft but lost the manifest entry would yield a doc
+            // showing "approved v3.0" while the body is still v2.0 content.
+            $this->error(
+                'approve_no_pending_revision',
+                409,
+                'No draft or in_review version found for revision ' . $revision,
+                [
+                    'revision' => $revision,
+                    'manifest_versions' => array_map(static fn($v) => is_array($v) ? [
+                        'status'  => $v['status']  ?? '',
+                        'version' => $v['version'] ?? '',
+                        'file'    => $v['file']    ?? '',
+                    ] : null, $versions),
+                ]
+            );
+        }
+
+        // Publish the approved version to the live file. We HARD-VERIFY the
+        // write because @file_put_contents was previously suppressed and
+        // could silently fail (eg. ownership/permission drift from a manual
+        // git pull that ran as a different user). Silent failure left the
+        // state machine "approved" while the live file was stale — the exact
+        // class of bug this guard fixes.
         $liveFile = join_in_root($this->rootDir, $baseRel);
-        if ($reviewFile !== null && is_file($reviewFile)) {
-            $html = (string)@file_get_contents($reviewFile);
-            $html = strip_base_href_archive($html);
-            $html = sync_doc_header_html($html, $revision, $effectiveDate !== '' ? $effectiveDate : null);
-            $html = portal_sync_doc_title_blocks($html, $code, trim((string)($data['title'] ?? '')));
-            @file_put_contents($liveFile, $html, LOCK_EX);
+        $html = (string)@file_get_contents($reviewFile);
+        $html = strip_base_href_archive($html);
+        $html = sync_doc_header_html($html, $revision, $effectiveDate !== '' ? $effectiveDate : null);
+        $html = portal_sync_doc_title_blocks($html, $code, trim((string)($data['title'] ?? '')));
+        $expectedLen = strlen($html);
+        $writeBytes  = @file_put_contents($liveFile, $html, LOCK_EX);
+        if ($writeBytes === false || $writeBytes !== $expectedLen) {
+            $writableLive = is_writable($liveFile) || (is_writable(dirname($liveFile)) && !is_file($liveFile));
+            $this->error(
+                'approve_live_write_failed',
+                500,
+                'file_put_contents to live path returned ' . var_export($writeBytes, true),
+                [
+                    'expected_bytes' => $expectedLen,
+                    'wrote_bytes'    => $writeBytes,
+                    'live_path'      => $baseRel,
+                    'live_writable'  => $writableLive,
+                    'source_rel'     => $reviewSrcRel,
+                    'php_user'       => function_exists('posix_geteuid')
+                        ? (posix_geteuid() . ':' . (function_exists('posix_getegid') ? posix_getegid() : '?'))
+                        : (string)getmyuid(),
+                    'live_owner'     => is_file($liveFile) ? (string)fileowner($liveFile) : null,
+                    'live_perms'     => is_file($liveFile) ? substr(sprintf('%o', fileperms($liveFile)), -4) : null,
+                ]
+            );
         }
 
         // Store approved version in archive
