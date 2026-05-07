@@ -8,6 +8,7 @@ use MOM\Api\Services\DataSyncMutationService;
 use MOM\Api\Services\DataSyncStatusService;
 use MOM\Api\Services\GraphicsGovernanceException;
 use MOM\Api\Services\GraphicsGovernanceService;
+use MOM\Api\Services\VersionControlService;
 use Throwable;
 
 /**
@@ -299,6 +300,118 @@ class AdminController extends BaseController
     private function dataSyncMutator(): DataSyncMutationService
     {
         return new DataSyncMutationService($this->dataDir, $this->data);
+    }
+
+    private function versionControlService(): VersionControlService
+    {
+        return new VersionControlService($this->dataDir, $this->data);
+    }
+
+    /**
+     * GET admin_version_control_overview
+     *
+     * Read-only dashboard payload for the Admin → Version Control → Overview
+     * sub-tab. Combines drift status, snapshot inventory, and DCC document
+     * activity into a single round-trip so the panel renders without N
+     * sequential calls. Each section is independently fault-tolerant: a
+     * Postgres outage degrades the doc_activity tile but does not break
+     * the drift / snapshot tiles.
+     *
+     * @return never
+     */
+    public function versionControlOverview(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAdmin($me);
+
+        $syncStatus = [];
+        try {
+            $syncStatus = (new DataSyncStatusService($this->rootDir, $this->dataDir, $this->data))->status();
+        } catch (Throwable $e) {
+            $this->auditLog('admin_version_control_overview_sync_failed', ['error' => $e->getMessage()]);
+        }
+
+        $snapshots = [];
+        try {
+            $snapshots = $this->dataSyncMutator()->listSnapshots(60);
+        } catch (Throwable $e) {
+            $this->auditLog('admin_version_control_overview_snapshots_failed', ['error' => $e->getMessage()]);
+        }
+
+        try {
+            $payload = $this->versionControlService()->buildOverview(
+                is_array($syncStatus) ? $syncStatus : [],
+                is_array($snapshots) ? $snapshots : []
+            );
+            $this->success($payload);
+        } catch (Throwable $e) {
+            $this->auditLog('admin_version_control_overview_failed', ['error' => $e->getMessage()]);
+            $this->error('version_control_overview_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * GET admin_version_control_doc_history_list ?limit=N&search=STR
+     *
+     * Returns the docs that have any rows in `dcc_document_revision_history`,
+     * ordered by most-recent change first. Drives the "Lịch sử tài liệu"
+     * sub-tab listing.
+     *
+     * @return never
+     */
+    public function versionControlDocHistoryList(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAdmin($me);
+
+        $limit = max(1, min(500, (int)($this->query('limit', '100') ?? '100')));
+        $search = trim((string)($this->query('search', '') ?? ''));
+        if (strlen($search) > 80) {
+            $search = substr($search, 0, 80);
+        }
+
+        try {
+            $payload = $this->versionControlService()->listDocsWithHistory($limit, $search);
+            $this->success($payload);
+        } catch (Throwable $e) {
+            $this->auditLog('admin_version_control_doc_history_list_failed', ['error' => $e->getMessage()]);
+            $this->error('doc_history_list_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * GET admin_version_control_doc_revisions ?doc_code=qms-man-001
+     *
+     * Returns the full revision history for a single document — the header
+     * snapshot, every approved body row from `dcc_document_revision`, and
+     * every status transition from `dcc_document_revision_history`. Drives
+     * the per-doc drawer in the "Lịch sử tài liệu" sub-tab.
+     *
+     * @return never
+     */
+    public function versionControlDocRevisions(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAdmin($me);
+
+        $docCode = trim((string)($this->query('doc_code', '') ?? ''));
+        if ($docCode === '') {
+            $this->error('invalid_doc_code', 400, 'doc_code query parameter is required');
+        }
+        if (strlen($docCode) > 80 || !preg_match('/^[A-Za-z0-9._-]+$/', $docCode)) {
+            $this->error('invalid_doc_code', 400, 'doc_code must be alphanumeric (with . _ -) and ≤ 80 chars');
+        }
+
+        try {
+            $payload = $this->versionControlService()->getDocRevisions($docCode);
+            $this->success(array_merge(['doc_code' => strtolower($docCode)], $payload));
+        } catch (Throwable $e) {
+            $this->auditLog('admin_version_control_doc_revisions_failed', [
+                'error' => $e->getMessage(),
+                'doc_code' => $docCode,
+            ]);
+            $this->error('doc_revisions_failed', 500, $e->getMessage());
+        }
     }
 
     /**

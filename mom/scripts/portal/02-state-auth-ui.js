@@ -6703,18 +6703,654 @@ function markUnsaved(){
   if(bar) bar.style.display = 'flex';
 }
 
+// ── Version Control sub-tab system ────────────────────────────────────────
+// The "Điều khiển phiên bản" admin tab is split into six sub-tabs so the
+// distinct concerns (drift, snapshots, doc history, audit log, SOP) live in
+// separate panes instead of one ever-scrolling wall. Sub-tab state is held
+// in a single global so re-renders triggered by other panels don't reset it.
+
+let versionControlSubTab = 'overview';
+let versionControlOverviewState = {loading:false, loaded:false, error:'', data:null};
+let versionControlDocsState     = {loading:false, loaded:false, error:'', data:null, search:''};
+let versionControlDocDetailState= {loading:false, loaded:false, error:'', data:null, docCode:''};
+let versionControlAuditState    = {loading:false, loaded:false, error:'', data:null, limit:100};
+
+function setVersionControlSubTab(id){
+  if(typeof id !== 'string' || !id) return;
+  if(versionControlSubTab === id) return;
+  versionControlSubTab = id;
+  // Lazy-load the data needed by the chosen sub-tab.
+  if(id === 'overview' && !versionControlOverviewState.loaded && !versionControlOverviewState.loading){
+    loadVersionControlOverview({silent:true});
+  } else if(id === 'doc_history' && !versionControlDocsState.loaded && !versionControlDocsState.loading){
+    loadVersionControlDocs({silent:true});
+  } else if(id === 'audit' && !versionControlAuditState.loaded && !versionControlAuditState.loading){
+    loadVersionControlAudit({silent:true});
+  } else if(id === 'snapshots' && !dataSyncSnapshotsState.loaded && !dataSyncSnapshotsState.loading){
+    loadDataSyncSnapshots({silent:true});
+  } else if(id === 'sync'){
+    if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading) loadGitRepoStatus({silent:true});
+    if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading) loadDataSyncStatus({silent:true});
+  }
+  renderAdmin();
+}
+
+async function loadVersionControlOverview(options){
+  options = options || {};
+  const force = !!options.force;
+  if(versionControlOverviewState.loading && !force) return;
+  if(versionControlOverviewState.loaded && !force) return;
+  versionControlOverviewState.loading = true;
+  if(!options.silent && currentPage === 'admin') renderAdmin();
+  try{
+    const res = await apiCall('admin_version_control_overview', null, 'GET');
+    if(res && res.ok){
+      versionControlOverviewState = {loading:false, loaded:true, error:'', data:res};
+    } else {
+      versionControlOverviewState = {loading:false, loaded:false,
+        error:(res && (res.detail||res.error)) ? String(res.detail||res.error) : 'overview_failed',
+        data:null};
+    }
+  } catch(e){
+    versionControlOverviewState = {loading:false, loaded:false, error:e.message||'overview_failed', data:null};
+  } finally {
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+async function loadVersionControlDocs(options){
+  options = options || {};
+  const force = !!options.force;
+  const search = typeof options.search === 'string' ? options.search : versionControlDocsState.search;
+  if(versionControlDocsState.loading && !force) return;
+  if(versionControlDocsState.loaded && !force && search === versionControlDocsState.search) return;
+  versionControlDocsState.loading = true;
+  versionControlDocsState.search = search;
+  if(!options.silent && currentPage === 'admin') renderAdmin();
+  try{
+    const params = {limit:200};
+    if(search) params.search = search;
+    const res = await apiCall('admin_version_control_doc_history_list', params, 'GET');
+    if(res && res.ok){
+      versionControlDocsState = {loading:false, loaded:true, error:'', data:res, search:search};
+    } else {
+      versionControlDocsState = {loading:false, loaded:false,
+        error:(res && (res.detail||res.error)) ? String(res.detail||res.error) : 'doc_list_failed',
+        data:null, search:search};
+    }
+  } catch(e){
+    versionControlDocsState = {loading:false, loaded:false, error:e.message||'doc_list_failed', data:null, search:search};
+  } finally {
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+async function loadVersionControlDocDetail(docCode, options){
+  options = options || {};
+  if(!docCode) return;
+  versionControlDocDetailState = {loading:true, loaded:false, error:'', data:null, docCode:docCode};
+  if(!options.silent && currentPage === 'admin') renderAdmin();
+  try{
+    const res = await apiCall('admin_version_control_doc_revisions', {doc_code:docCode}, 'GET');
+    if(res && res.ok){
+      versionControlDocDetailState = {loading:false, loaded:true, error:'', data:res, docCode:docCode};
+    } else {
+      versionControlDocDetailState = {loading:false, loaded:false,
+        error:(res && (res.detail||res.error)) ? String(res.detail||res.error) : 'doc_detail_failed',
+        data:null, docCode:docCode};
+    }
+  } catch(e){
+    versionControlDocDetailState = {loading:false, loaded:false, error:e.message||'doc_detail_failed', data:null, docCode:docCode};
+  } finally {
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+async function loadVersionControlAudit(options){
+  options = options || {};
+  const force = !!options.force;
+  if(versionControlAuditState.loading && !force) return;
+  if(versionControlAuditState.loaded && !force) return;
+  versionControlAuditState.loading = true;
+  if(!options.silent && currentPage === 'admin') renderAdmin();
+  try{
+    const res = await apiCall('admin_audit_trail_list', {limit:Number(versionControlAuditState.limit||100)}, 'GET');
+    if(res && res.ok){
+      versionControlAuditState = {loading:false, loaded:true, error:'', data:res, limit:versionControlAuditState.limit};
+    } else {
+      versionControlAuditState = {loading:false, loaded:false,
+        error:(res && (res.detail||res.error)) ? String(res.detail||res.error) : 'audit_failed',
+        data:null, limit:versionControlAuditState.limit};
+    }
+  } catch(e){
+    versionControlAuditState = {loading:false, loaded:false, error:e.message||'audit_failed', data:null, limit:versionControlAuditState.limit};
+  } finally {
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+function vcFmtTime(iso){
+  if(!iso) return '--';
+  return gitRepoFormatTime(iso) || iso;
+}
+
+function vcStatusPill(label, tone){
+  // tone: good | warn | error | info | neutral. Reuses admin-sync-callout-bar
+  // tone classes so colors come from the Graphics Authority tokens already
+  // bound in portal.main.css (no hardcoded colors here).
+  const cls = (tone === 'good') ? 'is-good'
+            : (tone === 'warn') ? 'is-warn'
+            : (tone === 'error') ? 'is-error'
+            : 'is-info';
+  return '<span class="admin-sync-status-pill ' + cls + '">' + escapeHtml(String(label||'')) + '</span>';
+}
+
+function renderVCSubTabNav(){
+  const tabs = [
+    {id:'overview',    en:'Overview',     vi:'Tổng quan'},
+    {id:'sync',        en:'Sync',         vi:'Đồng bộ Git/Config'},
+    {id:'snapshots',   en:'Snapshots',    vi:'Snapshot & rollback'},
+    {id:'doc_history', en:'Doc history',  vi:'Lịch sử tài liệu'},
+    {id:'audit',       en:'Audit log',    vi:'Nhật ký kiểm toán'},
+    {id:'process',     en:'Process / SOP',vi:'Quy trình SOP'}
+  ];
+  const buttons = tabs.map(t => {
+    const isActive = (versionControlSubTab === t.id);
+    const label = (lang==='en' ? t.en : t.vi);
+    // Active pill: forced background via brand token, NOT a hardcoded color.
+    const activeStyle = isActive
+      ? ' style="background:color-mix(in srgb,var(--brand-2,#1565c0) 14%,var(--bg-surface,#fff));border-color:color-mix(in srgb,var(--brand-2,#1565c0) 40%,var(--border,#bfd0e5));color:var(--brand-2,#1565c0)"'
+      : '';
+    return '<button class="admin-sync-mini" data-vc-tab="'+t.id+'"'+activeStyle+
+           ' onclick="setVersionControlSubTab(\''+t.id+'\')">'+escapeHtml(label)+'</button>';
+  }).join('');
+  return '<nav role="tablist" aria-label="Version control sub-tabs" '+
+         'style="display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px 0">'+buttons+'</nav>';
+}
+
+// ── Sub-tab: Overview ─────────────────────────────────────────────────────
+function renderAdminVCOverview(){
+  const state = versionControlOverviewState;
+  if(state.loading && !state.data){
+    return '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">'+
+      '<div class="admin-sync-callout-bar is-info">'+
+      escapeHtml(lang==='en'?'Loading version-control dashboard…':'Đang tải tổng quan kiểm soát phiên bản…')+
+      '</div></article>';
+  }
+  if(state.error && !state.data){
+    return '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">'+
+      '<div class="admin-sync-callout-bar is-error">'+
+      escapeHtml((lang==='en'?'Could not load overview. ':'Không tải được tổng quan. ')+state.error)+
+      '</div><div style="margin-top:8px">'+
+      '<button class="admin-sync-mini" onclick="loadVersionControlOverview({force:true})">'+
+      escapeHtml(lang==='en'?'Retry':'Thử lại')+'</button></div></article>';
+  }
+  const data = state.data || {};
+  const drift = data.config_drift || {};
+  const snap = data.snapshots || {};
+  const act = data.doc_activity || {};
+  const recent = Array.isArray(data.recent_doc_changes) ? data.recent_doc_changes : [];
+
+  const driftTone = (Number(drift.drift_count||0) > 0) ? 'warn' : 'good';
+  const driftMsg = (Number(drift.drift_count||0) > 0)
+    ? (lang==='en'
+        ? Number(drift.drift_count)+' file(s) differ between site and mirror.'
+        : Number(drift.drift_count)+' file đang lệch giữa site và mirror.')
+    : (lang==='en'
+        ? 'All '+Number(drift.total_files||0)+' runtime files match the mirror.'
+        : 'Tất cả '+Number(drift.total_files||0)+' file runtime khớp mirror.');
+
+  const recentRows = recent.length ? recent.map(r => {
+    const tone = (r.to_status === 'released' || r.to_status === 'approved') ? 'good'
+              : (r.to_status === 'obsolete' || r.to_status === 'superseded') ? 'warn'
+              : 'info';
+    return '<tr>'+
+      '<td><code>'+escapeHtml(r.doc_code||'')+'</code></td>'+
+      '<td><code>'+escapeHtml(r.revision||'')+'</code></td>'+
+      '<td>'+vcStatusPill((r.from_status||'?')+' → '+(r.to_status||'?'), tone)+'</td>'+
+      '<td><code>'+escapeHtml(r.actor_party_id||'--')+'</code></td>'+
+      '<td>'+escapeHtml(vcFmtTime(r.recorded_at))+'</td>'+
+      '<td><button class="admin-sync-mini" onclick="setVersionControlSubTab(\'doc_history\');loadVersionControlDocDetail(\''+escapeHtml(r.doc_code||'')+'\')">'+
+        escapeHtml(lang==='en'?'Open':'Mở')+'</button></td>'+
+    '</tr>';
+  }).join('') : '<tr><td colspan="6" style="color:var(--text-3);padding:8px">'+
+    escapeHtml(lang==='en'?'No recent document revisions recorded.':'Chưa có thay đổi tài liệu gần đây.')+
+    '</td></tr>';
+
+  const tile = (titleVi, titleEn, value, sub, tone) => {
+    const cls = (tone==='warn'?'is-warn':tone==='error'?'is-error':tone==='good'?'is-good':'is-info');
+    return '<article class="admin-sync-cpanel-card">'+
+      '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?titleEn:titleVi)+'</div>'+
+      '<div style="font-size:28px;font-weight:700;line-height:1.1;margin-top:6px">'+escapeHtml(String(value))+'</div>'+
+      (sub ? '<div class="admin-sync-callout-bar '+cls+'" style="margin-top:8px">'+escapeHtml(sub)+'</div>' : '')+
+    '</article>';
+  };
+
+  return '<section>'+
+    '<div class="admin-sync-cpanel-grid">'+
+      tile('Lệch cấu hình runtime','Runtime config drift', Number(drift.drift_count||0), driftMsg, driftTone)+
+      tile('Snapshot đang giữ','Snapshots kept', Number(snap.total||0),
+        (lang==='en'?'Latest: ':'Mới nhất: ')+(snap.latest_at?vcFmtTime(snap.latest_at):'--'), 'info')+
+      tile('Tài liệu có lịch sử','Docs with history', Number(act.distinct_docs||0),
+        (lang==='en'?'Total revisions: ':'Tổng số phiên bản: ')+Number(act.total_revisions||0), 'info')+
+      tile('Thay đổi 7 ngày','Changes (7d)', Number(act.last_7d||0),
+        (lang==='en'?'Last 30d: ':'30 ngày qua: ')+Number(act.last_30d||0), 'info')+
+    '</div>'+
+    '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:14px">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'+
+        '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'Recent document revisions':'Thay đổi tài liệu gần đây')+'</div>'+
+        '<button class="admin-sync-mini" onclick="loadVersionControlOverview({force:true})">'+
+          escapeHtml(lang==='en'?'Refresh':'Làm mới')+'</button>'+
+      '</div>'+
+      '<table class="admin-sync-simple-table" style="width:100%;border-collapse:collapse;font-size:12px;margin-top:8px">'+
+        '<thead><tr>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Doc code':'Mã tài liệu')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Revision':'Phiên bản')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Transition':'Chuyển trạng thái')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Actor':'Người làm')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'When (UTC)':'Lúc (UTC)')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Open':'Mở')+'</th>'+
+        '</tr></thead>'+
+        '<tbody>'+recentRows+'</tbody>'+
+      '</table>'+
+    '</article>'+
+  '</section>';
+}
+
+// ── Sub-tab: Snapshots (with intro context) ──────────────────────────────
+function renderAdminVCSnapshots(){
+  const intro = '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">'+
+    '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'Snapshot system':'Hệ thống snapshot')+'</div>'+
+    '<div class="admin-sync-callout-bar is-info">'+
+    escapeHtml(lang==='en'
+      ? 'Every upload, drift-resolve, and restore action takes a snapshot before writing. Up to 60 snapshots are retained on the VPS at /var/www/data-private/.snapshots/. Use Take snapshot before risky changes.'
+      : 'Mỗi lần upload, giải quyết lệch hay khôi phục đều tạo snapshot trước khi ghi. VPS giữ tối đa 60 snapshot ở /var/www/data-private/.snapshots/. Hãy bấm Tạo snapshot trước các thao tác rủi ro.')+
+    '</div></article>';
+  return '<section>'+intro+renderAdminDataSyncSnapshotsCard()+'</section>';
+}
+
+// ── Sub-tab: Doc history ─────────────────────────────────────────────────
+function renderAdminVCDocHistory(){
+  const list = versionControlDocsState;
+  const detail = versionControlDocDetailState;
+
+  const search = list.search || '';
+  const searchBox = '<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px">'+
+    '<input type="search" id="vcDocSearchInput" value="'+escapeHtml(search)+'" '+
+      'placeholder="'+escapeHtml(lang==='en'?'Filter by doc code':'Lọc theo mã tài liệu')+
+      '" style="flex:1;min-width:220px;padding:8px 12px;border:1px solid var(--border,#d7e3ef);'+
+      'border-radius:8px;font-size:13px;background:var(--bg-surface,#fff);color:var(--text-primary,#1e293b)" '+
+      'onkeydown="if(event.key===\'Enter\'){loadVersionControlDocs({force:true,search:this.value.trim()})}">'+
+    '<button class="admin-sync-mini" onclick="loadVersionControlDocs({force:true,search:document.getElementById(\'vcDocSearchInput\').value.trim()})">'+
+      escapeHtml(lang==='en'?'Search':'Tìm')+'</button>'+
+    (search ? '<button class="admin-sync-mini" onclick="loadVersionControlDocs({force:true,search:\'\'})">'+
+      escapeHtml(lang==='en'?'Clear':'Xóa')+'</button>' : '')+
+  '</div>';
+
+  let listHtml;
+  if(list.loading && !list.data){
+    listHtml = '<div class="admin-sync-callout-bar is-info">'+
+      escapeHtml(lang==='en'?'Loading documents with history…':'Đang tải danh sách tài liệu có lịch sử…')+
+      '</div>';
+  } else if(list.error && !list.data){
+    listHtml = '<div class="admin-sync-callout-bar is-error">'+
+      escapeHtml((lang==='en'?'Failed: ':'Lỗi: ')+list.error)+'</div>';
+  } else {
+    const docs = (list.data && Array.isArray(list.data.docs)) ? list.data.docs : [];
+    if(!docs.length){
+      listHtml = '<div style="color:var(--text-3);font-size:12px;padding:8px">'+
+        escapeHtml(lang==='en'
+          ? 'No document revision history recorded yet. Approve a draft from the document module to start the trail.'
+          : 'Chưa có lịch sử phiên bản tài liệu nào. Phê duyệt một bản nháp ở module tài liệu để bắt đầu ghi nhận.')+
+      '</div>';
+    } else {
+      const rows = docs.map(d => {
+        const isOpen = (detail.docCode === d.doc_code);
+        return '<tr'+(isOpen?' style="background:color-mix(in srgb,var(--brand-2,#1565c0) 6%,transparent)"':'')+'>'+
+          '<td><code>'+escapeHtml(d.doc_code||'')+'</code></td>'+
+          '<td><code>'+escapeHtml(d.doc_type||'--')+'</code></td>'+
+          '<td><code>'+escapeHtml(d.header_revision||d.latest_revision||'--')+'</code></td>'+
+          '<td>'+vcStatusPill(d.header_status||'--',
+            (d.header_status==='released'||d.header_status==='approved')?'good':
+            (d.header_status==='obsolete'||d.header_status==='superseded')?'warn':'info')+'</td>'+
+          '<td>'+escapeHtml(String(d.history_rows||0))+'</td>'+
+          '<td>'+escapeHtml(vcFmtTime(d.last_recorded_at))+'</td>'+
+          '<td><button class="admin-sync-mini" onclick="loadVersionControlDocDetail(\''+escapeHtml(d.doc_code||'')+'\')">'+
+            escapeHtml(lang==='en'?'View revisions':'Xem phiên bản')+'</button></td>'+
+        '</tr>';
+      }).join('');
+      listHtml = '<div style="overflow-x:auto"><table class="admin-sync-simple-table" style="width:100%;border-collapse:collapse;font-size:12px">'+
+        '<thead><tr>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Doc code':'Mã tài liệu')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Type':'Loại')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Current rev':'Phiên bản')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Status':'Trạng thái')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'History rows':'Số phiên bản')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Last change':'Thay đổi cuối')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Action':'Hành động')+'</th>'+
+        '</tr></thead>'+
+        '<tbody>'+rows+'</tbody>'+
+      '</table></div>';
+    }
+  }
+
+  let detailHtml = '';
+  if(detail.docCode){
+    if(detail.loading){
+      detailHtml = '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:14px">'+
+        '<div class="admin-sync-panel-title">'+escapeHtml(detail.docCode)+'</div>'+
+        '<div class="admin-sync-callout-bar is-info">'+escapeHtml(lang==='en'?'Loading revisions…':'Đang tải phiên bản…')+'</div>'+
+      '</article>';
+    } else if(detail.error){
+      detailHtml = '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:14px">'+
+        '<div class="admin-sync-panel-title">'+escapeHtml(detail.docCode)+'</div>'+
+        '<div class="admin-sync-callout-bar is-error">'+escapeHtml((lang==='en'?'Failed: ':'Lỗi: ')+detail.error)+'</div>'+
+      '</article>';
+    } else if(detail.data){
+      const hdr = detail.data.header || {};
+      const bodies = Array.isArray(detail.data.bodies) ? detail.data.bodies : [];
+      const transitions = Array.isArray(detail.data.transitions) ? detail.data.transitions : [];
+
+      const headerHtml = '<div class="admin-sync-meta-list">'+
+        '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'Title':'Tiêu đề')+'</div><div class="admin-sync-meta-value">'+escapeHtml(hdr.title||'--')+'</div></div>'+
+        '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'Doc type':'Loại')+'</div><div class="admin-sync-meta-value"><code>'+escapeHtml(hdr.doc_type||'--')+'</code></div></div>'+
+        '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'Current revision':'Phiên bản hiện tại')+'</div><div class="admin-sync-meta-value"><code>'+escapeHtml(hdr.revision||'--')+'</code></div></div>'+
+        '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'Status':'Trạng thái')+'</div><div class="admin-sync-meta-value">'+vcStatusPill(hdr.status||'--',
+          (hdr.status==='released'||hdr.status==='approved')?'good':
+          (hdr.status==='obsolete'||hdr.status==='superseded')?'warn':'info')+'</div></div>'+
+        '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'Effective date':'Ngày hiệu lực')+'</div><div class="admin-sync-meta-value">'+escapeHtml(hdr.effective_date||'--')+'</div></div>'+
+        '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'Owner role':'Vai trò sở hữu')+'</div><div class="admin-sync-meta-value"><code>'+escapeHtml(hdr.owner_role_code||'--')+'</code></div></div>'+
+        '<div class="admin-sync-meta-row"><div class="admin-sync-meta-label">'+escapeHtml(lang==='en'?'Approver role':'Vai trò phê duyệt')+'</div><div class="admin-sync-meta-value"><code>'+escapeHtml(hdr.approver_role_code||'--')+'</code></div></div>'+
+      '</div>';
+
+      const bodyRows = bodies.length ? bodies.map(b => {
+        const isCur = !!b.is_current;
+        return '<tr'+(isCur?' style="background:color-mix(in srgb,var(--green,#16a34a) 8%,transparent)"':'')+'>'+
+          '<td><code>'+escapeHtml(b.revision||'')+'</code>'+(isCur?' '+vcStatusPill(lang==='en'?'current':'hiện hành','good'):'')+'</td>'+
+          '<td><code>'+escapeHtml(b.update_type||'--')+'</code></td>'+
+          '<td>'+escapeHtml(b.effective_date||'--')+'</td>'+
+          '<td><code title="'+escapeHtml(b.content_sha256||'')+'">'+escapeHtml((b.content_sha256||'').substring(0,12)||'--')+'</code></td>'+
+          '<td><code>'+escapeHtml(b.approved_by||'--')+'</code></td>'+
+          '<td>'+escapeHtml(vcFmtTime(b.approved_at))+'</td>'+
+          '<td><code>'+escapeHtml(b.dcr_id?b.dcr_id.substring(0,8):'--')+'</code></td>'+
+          '<td>'+escapeHtml(b.note||'--')+'</td>'+
+        '</tr>';
+      }).join('') : '<tr><td colspan="8" style="color:var(--text-3);padding:8px">'+
+        escapeHtml(lang==='en'?'No approved revision bodies recorded.':'Chưa có bản phê duyệt nào.')+'</td></tr>';
+
+      const transitionRows = transitions.length ? transitions.map(t => {
+        const tone = (t.to_status === 'released' || t.to_status === 'approved') ? 'good'
+                  : (t.to_status === 'obsolete' || t.to_status === 'superseded') ? 'warn'
+                  : 'info';
+        return '<tr>'+
+          '<td><code>'+escapeHtml(t.previous_revision||'--')+' → '+escapeHtml(t.revision||'--')+'</code></td>'+
+          '<td>'+vcStatusPill((t.from_status||'?')+' → '+(t.to_status||'?'), tone)+'</td>'+
+          '<td><code>'+escapeHtml(t.actor_party_id||'--')+'</code></td>'+
+          '<td><code>'+escapeHtml(t.actor_role_code||'--')+'</code></td>'+
+          '<td>'+escapeHtml(vcFmtTime(t.recorded_at))+'</td>'+
+          '<td>'+escapeHtml(t.note||'--')+'</td>'+
+        '</tr>';
+      }).join('') : '<tr><td colspan="6" style="color:var(--text-3);padding:8px">'+
+        escapeHtml(lang==='en'?'No status transitions recorded.':'Chưa có chuyển trạng thái nào.')+'</td></tr>';
+
+      detailHtml = '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:14px">'+
+        '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px">'+
+          '<div>'+
+            '<div class="admin-sync-kicker">'+escapeHtml(lang==='en'?'Document':'Tài liệu')+'</div>'+
+            '<h3 style="margin:4px 0 0 0"><code>'+escapeHtml(detail.docCode)+'</code></h3>'+
+          '</div>'+
+          '<button class="admin-sync-mini" onclick="loadVersionControlDocDetail(\''+escapeHtml(detail.docCode)+'\',{force:true})">'+
+            escapeHtml(lang==='en'?'Refresh':'Làm mới')+'</button>'+
+        '</div>'+
+        '<div style="margin-top:10px">'+headerHtml+'</div>'+
+        '<div class="admin-sync-panel-title" style="margin-top:14px">'+escapeHtml(lang==='en'?'Approved revision bodies':'Các bản đã phê duyệt')+'</div>'+
+        '<div style="overflow-x:auto"><table class="admin-sync-simple-table" style="width:100%;border-collapse:collapse;font-size:12px;margin-top:6px">'+
+          '<thead><tr>'+
+            '<th style="text-align:left">'+escapeHtml(lang==='en'?'Revision':'Phiên bản')+'</th>'+
+            '<th style="text-align:left">'+escapeHtml(lang==='en'?'Type':'Loại')+'</th>'+
+            '<th style="text-align:left">'+escapeHtml(lang==='en'?'Effective':'Hiệu lực')+'</th>'+
+            '<th style="text-align:left">'+escapeHtml(lang==='en'?'Content sha':'Sha nội dung')+'</th>'+
+            '<th style="text-align:left">'+escapeHtml(lang==='en'?'Approved by':'Phê duyệt')+'</th>'+
+            '<th style="text-align:left">'+escapeHtml(lang==='en'?'Approved at':'Lúc phê duyệt')+'</th>'+
+            '<th style="text-align:left">DCR</th>'+
+            '<th style="text-align:left">'+escapeHtml(lang==='en'?'Note':'Ghi chú')+'</th>'+
+          '</tr></thead><tbody>'+bodyRows+'</tbody></table></div>'+
+        '<div class="admin-sync-panel-title" style="margin-top:14px">'+escapeHtml(lang==='en'?'Status transitions (append-only)':'Chuyển trạng thái (append-only)')+'</div>'+
+        '<div style="overflow-x:auto"><table class="admin-sync-simple-table" style="width:100%;border-collapse:collapse;font-size:12px;margin-top:6px">'+
+          '<thead><tr>'+
+            '<th style="text-align:left">'+escapeHtml(lang==='en'?'Revision':'Phiên bản')+'</th>'+
+            '<th style="text-align:left">'+escapeHtml(lang==='en'?'Status transition':'Chuyển trạng thái')+'</th>'+
+            '<th style="text-align:left">'+escapeHtml(lang==='en'?'Actor':'Người làm')+'</th>'+
+            '<th style="text-align:left">'+escapeHtml(lang==='en'?'Role':'Vai trò')+'</th>'+
+            '<th style="text-align:left">'+escapeHtml(lang==='en'?'When (UTC)':'Lúc (UTC)')+'</th>'+
+            '<th style="text-align:left">'+escapeHtml(lang==='en'?'Note':'Ghi chú')+'</th>'+
+          '</tr></thead><tbody>'+transitionRows+'</tbody></table></div>'+
+        '<div class="admin-sync-callout-bar is-info" style="margin-top:14px">'+
+          escapeHtml(lang==='en'
+            ? 'These tables are append-only by design (DCC standard for ISO 9001 / 21 CFR Part 11). Restore an earlier revision by approving a new revision via the document module — never by editing the history rows.'
+            : 'Hai bảng này append-only theo thiết kế (chuẩn DCC cho ISO 9001 / 21 CFR Part 11). Muốn khôi phục bản cũ thì phê duyệt một phiên bản mới qua module tài liệu — KHÔNG sửa trực tiếp dòng lịch sử.')+
+        '</div>'+
+      '</article>';
+    }
+  }
+
+  return '<section>'+
+    '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'+
+        '<div>'+
+          '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'Document revision history':'Lịch sử phiên bản tài liệu')+'</div>'+
+          '<div style="color:var(--text-3);font-size:12px;max-width:780px">'+escapeHtml(lang==='en'
+            ? 'Reads the dcc_document_revision_history + dcc_document_revision tables. Click View revisions to inspect a single document.'
+            : 'Đọc trực tiếp từ bảng dcc_document_revision_history + dcc_document_revision. Bấm Xem phiên bản để xem chi tiết một tài liệu.')+'</div>'+
+        '</div>'+
+        '<button class="admin-sync-mini" onclick="loadVersionControlDocs({force:true,search:document.getElementById(\'vcDocSearchInput\')?document.getElementById(\'vcDocSearchInput\').value.trim():\'\'})">'+
+          escapeHtml(lang==='en'?'Refresh':'Làm mới')+'</button>'+
+      '</div>'+
+      '<div style="margin-top:10px">'+searchBox+listHtml+'</div>'+
+    '</article>'+
+    detailHtml+
+  '</section>';
+}
+
+// ── Sub-tab: Audit log ───────────────────────────────────────────────────
+function renderAdminVCAuditLog(){
+  const state = versionControlAuditState;
+  let body;
+  if(state.loading && !state.data){
+    body = '<div class="admin-sync-callout-bar is-info">'+escapeHtml(lang==='en'?'Loading audit events…':'Đang tải nhật ký kiểm toán…')+'</div>';
+  } else if(state.error && !state.data){
+    body = '<div class="admin-sync-callout-bar is-error">'+escapeHtml((lang==='en'?'Failed: ':'Lỗi: ')+state.error)+'</div>';
+  } else {
+    const events = (state.data && Array.isArray(state.data.events)) ? state.data.events : [];
+    if(!events.length){
+      body = '<div style="color:var(--text-3);font-size:12px;padding:8px">'+escapeHtml(lang==='en'?'No audit events.':'Chưa có sự kiện kiểm toán.')+'</div>';
+    } else {
+      const rows = events.map(e => {
+        const tone = (String(e.event_type||'').indexOf('_failed')>=0 || String(e.event_type||'').indexOf('error')>=0) ? 'error'
+                  : (String(e.event_type||'').indexOf('restore')>=0 || String(e.event_type||'').indexOf('snapshot')>=0) ? 'warn'
+                  : 'info';
+        const payload = (e.payload && typeof e.payload === 'object') ? JSON.stringify(e.payload) : '';
+        return '<tr>'+
+          '<td>'+escapeHtml(vcFmtTime(e.recorded_at))+'</td>'+
+          '<td>'+vcStatusPill(e.event_type||'--', tone)+'</td>'+
+          '<td><code>'+escapeHtml(e.actor_name||'--')+'</code></td>'+
+          '<td><code>'+escapeHtml(e.aggregate_type||'--')+'</code></td>'+
+          '<td><code>'+escapeHtml((e.aggregate_id||'').substring(0,40))+'</code></td>'+
+          '<td><code style="font-size:10px;word-break:break-all">'+escapeHtml(payload.substring(0,180))+(payload.length>180?'…':'')+'</code></td>'+
+        '</tr>';
+      }).join('');
+      body = '<div style="overflow-x:auto"><table class="admin-sync-simple-table" style="width:100%;border-collapse:collapse;font-size:11px">'+
+        '<thead><tr>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'When (UTC)':'Lúc (UTC)')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Event':'Sự kiện')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Actor':'Người làm')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Aggregate type':'Loại aggregate')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Aggregate id':'ID aggregate')+'</th>'+
+          '<th style="text-align:left">'+escapeHtml(lang==='en'?'Payload':'Payload')+'</th>'+
+        '</tr></thead><tbody>'+rows+'</tbody></table></div>';
+    }
+  }
+  return '<section>'+
+    '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">'+
+      '<div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">'+
+        '<div>'+
+          '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'Audit log (latest events)':'Nhật ký kiểm toán (sự kiện mới nhất)')+'</div>'+
+          '<div style="color:var(--text-3);font-size:12px;max-width:780px">'+escapeHtml(lang==='en'
+            ? 'Read-only view of the audit_events table. Every snapshot, restore, drift-resolve, doc upload, and admin action is recorded with actor, IP, payload, and timestamp.'
+            : 'Hiển thị chỉ-đọc bảng audit_events. Mỗi snapshot, khôi phục, giải quyết lệch, upload tài liệu và thao tác admin đều được ghi với người làm, IP, payload, thời gian.')+'</div>'+
+        '</div>'+
+        '<button class="admin-sync-mini" onclick="loadVersionControlAudit({force:true})">'+escapeHtml(lang==='en'?'Refresh':'Làm mới')+'</button>'+
+      '</div>'+
+      '<div style="margin-top:10px">'+body+'</div>'+
+    '</article>'+
+  '</section>';
+}
+
+// ── Sub-tab: Process / SOP ───────────────────────────────────────────────
+function renderAdminVCProcess(){
+  const en = '<h3 style="margin:0 0 6px 0">Local ↔ VPS workflow (SOP)</h3>'+
+    '<p>Two write surfaces exist in this portal: <strong>code</strong> (Git deploy from a developer laptop) and <strong>content</strong> (HTML docs, users, options edited live in the portal). They write to the same filesystem on the VPS, so a deploy can clobber a fresh content edit if either side ignores the rules below.</p>'+
+    '<h4>Golden rule</h4>'+
+    '<p>Code flows <em>Local → Git → VPS</em>. Content flows <em>VPS → Git</em> (via data-sync, never via direct commits). Two directions, never mixed.</p>'+
+    '<h4>A — Code change (PHP / JS / CSS / migration)</h4>'+
+    '<ol>'+
+      '<li>Edit on local laptop, commit, push to <code>main</code>.</li>'+
+      '<li>GitHub Actions runs <code>deploy.yml</code> → SSH to VPS → <code>deploy.sh</code>.</li>'+
+      '<li><code>deploy.sh</code> captures runtime mutations (rsync) → <code>git reset --hard</code> → restores captured mutations → runs migrations → healthcheck.</li>'+
+      '<li>Pre-commit hook automatically blocks staged HTML docs and runtime config JSON. To deliberately bundle a doc with a code PR set <code>ALLOW_DOC_COMMIT=1</code> and document the reason in the commit message.</li>'+
+    '</ol>'+
+    '<h4>B — Content change (HTML doc, user, option, theme)</h4>'+
+    '<ol>'+
+      '<li>Edit through the portal admin UI — never SSH and edit files directly.</li>'+
+      '<li>Mutation is written via the controller, which: takes a snapshot first, writes atomically (tmp + rename), records an <code>audit_events</code> row, and (for runtime config) mirrors to <code>/var/www/data-private/config/</code>.</li>'+
+      '<li>Periodically (e.g. once a week) pull the live state back to a developer laptop with <code>bash tools/vps-setup/scripts/data-sync.sh pull</code> — review with <code>--check-only</code> first.</li>'+
+    '</ol>'+
+    '<h4>C — Mixed change (code + content together)</h4>'+
+    '<ol>'+
+      '<li>Pull content first: <code>bash tools/vps-setup/scripts/data-sync.sh pull</code>.</li>'+
+      '<li>Make code edits locally, commit, push (deploy preserves content via capture-restore).</li>'+
+      '<li>If you must include a doc in the PR, follow the <code>ALLOW_DOC_COMMIT=1</code> exception with a DCR reference.</li>'+
+    '</ol>'+
+    '<h4>D — DB schema change</h4>'+
+    '<ol>'+
+      '<li>Write a new migration file in <code>mom/database/migrations/NNN_*.sql</code>.</li>'+
+      '<li>Test against a fresh DB locally.</li>'+
+      '<li>Deploy with <code>RUN_DB_MIGRATIONS=1</code>; never edit VPS schema directly.</li>'+
+      '<li>Use <code>db-push.sh</code> only for disaster recovery — it creates a pre-restore pg_dump first.</li>'+
+    '</ol>'+
+    '<h4>If something is wrong</h4>'+
+    '<ul>'+
+      '<li><strong>Drift on the Overview tile?</strong> Open the Sync sub-tab, find the file with sha mismatch, choose <em>site→mirror</em> if portal edits are correct, <em>mirror→site</em> if you trust the deploy.</li>'+
+      '<li><strong>Lost a doc revision?</strong> Open Doc history → find the doc → look for the last good row → restore it via the <em>document module</em> (approve a new revision pointing at the archived body). Never edit history rows directly.</li>'+
+      '<li><strong>Lost a runtime config file?</strong> Open Snapshots → restore a single file from the most recent snapshot.</li>'+
+      '<li><strong>Need forensics?</strong> Open Audit log and filter by event type / actor.</li>'+
+    '</ul>'+
+    '<h4>Forbidden operations</h4>'+
+    '<ul>'+
+      '<li>Running <code>git reset --hard</code> manually as root on the VPS — this clobbers all unsaved content edits.</li>'+
+      '<li>Editing files under <code>mom/docs/**</code> via SSH instead of the portal.</li>'+
+      '<li>Bypassing the pre-commit hook with <code>--no-verify</code> without a documented reason.</li>'+
+      '<li>Editing rows in <code>dcc_document_revision_history</code> or <code>audit_events</code> directly in the database.</li>'+
+    '</ul>';
+
+  const vi = '<h3 style="margin:0 0 6px 0">Quy trình Local ↔ VPS (SOP)</h3>'+
+    '<p>Portal có hai luồng ghi vào cùng filesystem trên VPS: <strong>code</strong> (deploy Git từ laptop developer) và <strong>nội dung</strong> (tài liệu HTML, người dùng, option chỉnh trực tiếp trong portal). Nếu một bên không tuân thủ luật bên dưới, lần deploy có thể xóa mất chỉnh sửa nội dung vừa lưu.</p>'+
+    '<h4>Nguyên tắc vàng</h4>'+
+    '<p>Code đi theo chiều <em>Local → Git → VPS</em>. Nội dung đi theo chiều <em>VPS → Git</em> (qua data-sync, KHÔNG bao giờ commit trực tiếp). Hai chiều không bao giờ trộn lẫn.</p>'+
+    '<h4>A — Thay đổi CODE (PHP / JS / CSS / migration)</h4>'+
+    '<ol>'+
+      '<li>Sửa trên laptop local, commit, push lên nhánh <code>main</code>.</li>'+
+      '<li>GitHub Actions chạy <code>deploy.yml</code> → SSH vào VPS → gọi <code>deploy.sh</code>.</li>'+
+      '<li><code>deploy.sh</code> capture runtime mutations (rsync) → <code>git reset --hard</code> → restore lại runtime mutations → chạy migration → healthcheck.</li>'+
+      '<li>Pre-commit hook tự chặn nếu lỡ stage tài liệu HTML hoặc file runtime JSON. Muốn kèm tài liệu trong PR code thì set <code>ALLOW_DOC_COMMIT=1</code> và ghi rõ lý do trong commit message.</li>'+
+    '</ol>'+
+    '<h4>B — Thay đổi NỘI DUNG (tài liệu HTML, user, option, theme)</h4>'+
+    '<ol>'+
+      '<li>Sửa qua giao diện admin trong portal — KHÔNG SSH lên VPS sửa file trực tiếp.</li>'+
+      '<li>Controller xử lý: tạo snapshot trước, ghi atomic (tmp + rename), ghi audit_events, và (với runtime config) mirror sang <code>/var/www/data-private/config/</code>.</li>'+
+      '<li>Định kỳ (ví dụ mỗi tuần) kéo state live về laptop bằng <code>bash tools/vps-setup/scripts/data-sync.sh pull</code> — xem trước bằng <code>--check-only</code>.</li>'+
+    '</ol>'+
+    '<h4>C — Thay đổi HỖN HỢP (code + nội dung cùng lúc)</h4>'+
+    '<ol>'+
+      '<li>Kéo nội dung về trước: <code>bash tools/vps-setup/scripts/data-sync.sh pull</code>.</li>'+
+      '<li>Sửa code ở local, commit, push (deploy sẽ bảo toàn nội dung qua capture-restore).</li>'+
+      '<li>Nếu bắt buộc đưa tài liệu vào PR, dùng exception <code>ALLOW_DOC_COMMIT=1</code> kèm số DCR.</li>'+
+    '</ol>'+
+    '<h4>D — Thay đổi schema DB</h4>'+
+    '<ol>'+
+      '<li>Viết migration mới ở <code>mom/database/migrations/NNN_*.sql</code>.</li>'+
+      '<li>Test trên fresh DB local trước.</li>'+
+      '<li>Deploy với <code>RUN_DB_MIGRATIONS=1</code>; không sửa schema VPS trực tiếp.</li>'+
+      '<li>Chỉ dùng <code>db-push.sh</code> khi disaster recovery — script này tự pg_dump trước.</li>'+
+    '</ol>'+
+    '<h4>Khi gặp sự cố</h4>'+
+    '<ul>'+
+      '<li><strong>Có lệch ở Overview?</strong> Mở sub-tab Đồng bộ, tìm file có sha lệch, chọn <em>site→mirror</em> nếu chỉnh sửa trong portal là đúng, hoặc <em>mirror→site</em> nếu tin bản deploy.</li>'+
+      '<li><strong>Mất một bản tài liệu?</strong> Mở Lịch sử tài liệu → tìm doc → tìm dòng phiên bản tốt cuối cùng → khôi phục bằng cách phê duyệt phiên bản mới qua module tài liệu (trỏ tới body đã lưu trong archive). KHÔNG sửa trực tiếp dòng lịch sử.</li>'+
+      '<li><strong>Mất file runtime config?</strong> Mở Snapshot → khôi phục một file từ snapshot mới nhất.</li>'+
+      '<li><strong>Cần điều tra forensic?</strong> Mở Nhật ký kiểm toán và lọc theo loại sự kiện / người làm.</li>'+
+    '</ul>'+
+    '<h4>Cấm tuyệt đối</h4>'+
+    '<ul>'+
+      '<li>Chạy <code>git reset --hard</code> thủ công bằng quyền root trên VPS — sẽ xóa hết thay đổi nội dung chưa kéo về Git.</li>'+
+      '<li>Sửa file trong <code>mom/docs/**</code> bằng SSH thay vì qua portal.</li>'+
+      '<li>Bypass pre-commit hook bằng <code>--no-verify</code> mà không ghi rõ lý do.</li>'+
+      '<li>Sửa trực tiếp dòng trong <code>dcc_document_revision_history</code> hoặc <code>audit_events</code> bằng câu lệnh SQL.</li>'+
+    '</ul>';
+
+  return '<section>'+
+    '<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">'+
+      '<div class="admin-sync-panel-title">'+escapeHtml(lang==='en'?'Standard Operating Procedure':'Quy trình chuẩn (SOP)')+'</div>'+
+      '<div style="font-size:13px;line-height:1.7;color:var(--text-primary,#1e293b);max-width:980px">'+
+        (lang==='en'?en:vi)+
+      '</div>'+
+    '</article>'+
+  '</section>';
+}
+
+// ── Dispatcher ────────────────────────────────────────────────────────────
 function renderAdminVersionControl(){
   const el = document.getElementById('admin-content');
-  if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error){
-    loadGitRepoStatus({silent:true});
+  if(!el) return;
+
+  // Bootstrap state for the currently active sub-tab.
+  if(versionControlSubTab === 'overview' && !versionControlOverviewState.loaded && !versionControlOverviewState.loading && !versionControlOverviewState.error){
+    loadVersionControlOverview({silent:true});
   }
-  if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading && !dataSyncStatusState.error){
-    loadDataSyncStatus({silent:true});
+  if(versionControlSubTab === 'sync'){
+    if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error) loadGitRepoStatus({silent:true});
+    if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading && !dataSyncStatusState.error) loadDataSyncStatus({silent:true});
   }
-  if(!dataSyncSnapshotsState.loaded && !dataSyncSnapshotsState.loading && !dataSyncSnapshotsState.error){
+  if(versionControlSubTab === 'snapshots' && !dataSyncSnapshotsState.loaded && !dataSyncSnapshotsState.loading && !dataSyncSnapshotsState.error){
     loadDataSyncSnapshots({silent:true});
   }
-  el.innerHTML = renderAdminSyncPanelV2();
+  if(versionControlSubTab === 'doc_history' && !versionControlDocsState.loaded && !versionControlDocsState.loading && !versionControlDocsState.error){
+    loadVersionControlDocs({silent:true});
+  }
+  if(versionControlSubTab === 'audit' && !versionControlAuditState.loaded && !versionControlAuditState.loading && !versionControlAuditState.error){
+    loadVersionControlAudit({silent:true});
+  }
+
+  let body;
+  switch(versionControlSubTab){
+    case 'sync':        body = renderAdminSyncPanelV2();        break;
+    case 'snapshots':   body = renderAdminVCSnapshots();        break;
+    case 'doc_history': body = renderAdminVCDocHistory();       break;
+    case 'audit':       body = renderAdminVCAuditLog();         break;
+    case 'process':     body = renderAdminVCProcess();          break;
+    case 'overview':
+    default:            body = renderAdminVCOverview();         break;
+  }
+
+  el.innerHTML =
+    '<header style="margin-bottom:8px">'+
+      '<div class="admin-sync-kicker">'+escapeHtml(lang==='en'?'Version control':'Điều khiển phiên bản')+'</div>'+
+      '<h2 style="margin:4px 0 0 0">'+escapeHtml(lang==='en'
+        ? 'Local ↔ VPS sync, snapshots, doc history, audit, SOP'
+        : 'Đồng bộ Local ↔ VPS, snapshot, lịch sử tài liệu, audit, quy trình')+'</h2>'+
+    '</header>'+
+    renderVCSubTabNav()+
+    body;
 }
 
 function renderAdminInfrastructure(){
