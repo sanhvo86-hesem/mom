@@ -14857,12 +14857,30 @@ function users_save(string $usersFile, array $store): void {
   $dir = dirname($usersFile);
   ensure_dir($dir);
 
+  // Self-heal: if the file exists but is not writable by the current process,
+  // attempt to restore group-writable permissions (works when process owns the file
+  // or has CAP_DAC_OVERRIDE; silently ignored otherwise).
+  if (is_file($usersFile) && !is_writable($usersFile)) {
+    @chmod($usersFile, 0664);
+  }
+
   $json = json_encode($store, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
-  if ($json === false) { throw new RuntimeException('Cannot encode users'); }
+  if ($json === false) {
+    throw new RuntimeException(
+      'Cannot JSON-encode user store (json_last_error=' . json_last_error() . ' ' . json_last_error_msg() . ')'
+    );
+  }
 
   // Prefer atomic write (tmp + rename). Some hosts may block rename() across
   // file systems; fall back to direct write in that case.
   $tmp = $usersFile . '.tmp';
+
+  // Clean up any orphaned .tmp left by a previous failed write.
+  if (is_file($tmp) && !@unlink($tmp)) {
+    @chmod($tmp, 0664);
+    @unlink($tmp);
+  }
+
   $wroteTmp = false;
   try {
     $wroteTmp = @file_put_contents($tmp, $json, LOCK_EX);
@@ -14871,13 +14889,21 @@ function users_save(string $usersFile, array $store): void {
   }
 
   if ($wroteTmp === false) {
+    $dirInfo = sprintf('dir_writable=%s file_writable=%s owner=%s euid=%s',
+      is_writable($dir) ? 'yes' : 'no',
+      is_file($usersFile) ? (is_writable($usersFile) ? 'yes' : 'no') : 'new',
+      (string)(@fileowner($usersFile) ?: @fileowner($dir) ?: '?'),
+      function_exists('posix_geteuid') ? (string)@posix_geteuid() : '?'
+    );
     try {
       $wrote = @file_put_contents($usersFile, $json, LOCK_EX);
     } catch (Throwable $e) {
       $wrote = false;
     }
     if ($wrote === false) {
-      throw new RuntimeException('Cannot write users file. Please ensure the web server can write to: ' . $usersFile);
+      throw new RuntimeException(
+        'Cannot write users file (' . $dirInfo . '). Path: ' . $usersFile
+      );
     }
     @chmod($usersFile, 0664);
     return;
@@ -14906,7 +14932,9 @@ function users_save(string $usersFile, array $store): void {
       }
       if (!$copied) {
         @unlink($tmp);
-        throw new RuntimeException('Cannot replace users file. Please ensure write permissions for: ' . $usersFile);
+        throw new RuntimeException(
+          'Cannot replace users file (rename+copy both failed). Path: ' . $usersFile
+        );
       }
     }
     @unlink($tmp);
@@ -17263,6 +17291,59 @@ case 'doc_save_draft': {
     api_json(['ok' => true, 'users' => $out, 'server_time' => now_iso()]);
   }
 
+  case 'admin_users_file_check': {
+    $me = require_logged_in($store);
+    $adminRoles = admin_roles();
+    $meRole = migrate_role((string)($me['role'] ?? ''));
+    if (!in_array($meRole, $adminRoles, true) && !in_array((string)($me['role'] ?? ''), $adminRoles, true)) {
+      api_json(['ok' => false, 'error' => 'forbidden'], 403);
+    }
+
+    $fileInfo = static function(string $path): array {
+      $exists = file_exists($path);
+      $isFile = is_file($path);
+      $isDir = is_dir($path);
+      $writable = is_writable($path);
+      $readable = is_readable($path);
+      $perms = $exists ? decoct(@fileperms($path) & 0777) : null;
+      $owner = $exists ? @fileowner($path) : null;
+      $group = $exists ? @filegroup($path) : null;
+      $ownerName = ($owner !== false && $owner !== null && function_exists('posix_getpwuid'))
+        ? (@posix_getpwuid((int)$owner)['name'] ?? (string)$owner) : (string)$owner;
+      $groupName = ($group !== false && $group !== null && function_exists('posix_getgrgid'))
+        ? (@posix_getgrgid((int)$group)['name'] ?? (string)$group) : (string)$group;
+      $euid = function_exists('posix_geteuid') ? @posix_geteuid() : null;
+      $euname = ($euid !== null && function_exists('posix_getpwuid'))
+        ? (@posix_getpwuid((int)$euid)['name'] ?? (string)$euid) : (string)$euid;
+      return [
+        'path' => $path,
+        'exists' => $exists,
+        'is_file' => $isFile,
+        'is_dir' => $isDir,
+        'readable' => $readable,
+        'writable' => $writable,
+        'permissions' => $perms,
+        'owner' => $ownerName,
+        'group' => $groupName,
+        'process_user' => $euname,
+        'size' => ($isFile ? @filesize($path) : null),
+      ];
+    };
+
+    $confDir = dirname($USERS_FILE);
+    $tmpFile = $USERS_FILE . '.tmp';
+
+    api_json([
+      'ok' => true,
+      'users_file' => $fileInfo($USERS_FILE),
+      'config_dir' => $fileInfo($confDir),
+      'tmp_file' => $fileInfo($tmpFile),
+      'data_dir' => $fileInfo(dirname($confDir)),
+      'php_version' => PHP_VERSION,
+      'server_time' => now_iso(),
+    ]);
+  }
+
   case 'admin_users_list': {
     if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
     $me = require_logged_in($store);
@@ -17439,7 +17520,12 @@ case 'doc_save_draft': {
     try{
       users_save($USERS_FILE, $store);
     }catch(Throwable $e){
-      api_json(['ok'=>false,'error'=>'users_save_failed'], 500);
+      $errMsg = $e->getMessage();
+      @error_log('[API] admin_user_upsert: users_save failed for "' . $username . '": ' . $errMsg
+        . ' | file=' . $USERS_FILE
+        . ' | writable=' . (is_writable($USERS_FILE) ? 'yes' : 'no')
+        . ' | dir_writable=' . (is_writable(dirname($USERS_FILE)) ? 'yes' : 'no'));
+      api_json(['ok'=>false,'error'=>'users_save_failed','detail'=>$errMsg], 500);
     }
 
     $updated = find_user_by_username($store, $username);
@@ -17533,7 +17619,9 @@ case 'doc_save_draft': {
     try{
       users_save($USERS_FILE, $store);
     }catch(Throwable $e){
-      api_json(['ok'=>false,'error'=>'users_save_failed'], 500);
+      $errMsg = $e->getMessage();
+      @error_log('[API] admin_user_reset_password: users_save failed for "' . $username . '": ' . $errMsg);
+      api_json(['ok'=>false,'error'=>'users_save_failed','detail'=>$errMsg], 500);
     }
 
     $updated = find_user_by_username($store, $username);
@@ -17608,7 +17696,8 @@ case 'auth_login': {
     try{
       users_save($USERS_FILE, $store);
     }catch(Throwable $e){
-      api_json(['ok'=>false,'error'=>'users_save_failed'], 500);
+      // Non-blocking: auth succeeded; last_login write is best-effort.
+      @error_log('[API] auth_login(inline-otp): last_login write failed for "' . $username . '": ' . $e->getMessage());
     }
 
     portal_audit_session_event('user_login', $username, ['mfa' => true, 'inline_otp' => true]);
@@ -17665,7 +17754,8 @@ case 'auth_login': {
     try{
       users_save($USERS_FILE, $store);
     }catch(Throwable $e){
-      api_json(['ok'=>false,'error'=>'users_save_failed'], 500);
+      // Non-blocking: last_login update is best-effort; auth already succeeded.
+      @error_log('[API] auth_login(no-mfa): last_login write failed for "' . $username . '": ' . $e->getMessage());
     }
 
     portal_audit_session_event('user_login', $username, ['mfa' => false]);
@@ -17728,7 +17818,8 @@ if ($username === '') {
     try{
       users_save($USERS_FILE, $store);
     }catch(Throwable $e){
-      api_json(['ok'=>false,'error'=>'users_save_failed'], 500);
+      // Non-blocking: auth succeeded; last_login write is best-effort.
+      @error_log('[API] auth_mfa_verify: last_login write failed for "' . $username . '": ' . $e->getMessage());
     }
 
     api_json([
@@ -17773,7 +17864,9 @@ if ($username === '') {
     try{
       users_save($USERS_FILE, $store);
     }catch(Throwable $e){
-      api_json(['ok'=>false,'error'=>'users_save_failed'], 500);
+      $errMsg = $e->getMessage();
+      @error_log('[API] auth_enroll_verify: MFA save failed for "' . $username . '": ' . $errMsg);
+      api_json(['ok'=>false,'error'=>'users_save_failed','detail'=>$errMsg], 500);
     }
 
     set_authenticated_session($username, $user);

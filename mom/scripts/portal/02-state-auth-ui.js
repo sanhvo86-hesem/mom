@@ -10546,7 +10546,9 @@ async function saveUserFromModal(userId){
       closeModal();
       await refreshAdminUserRuntimeProjection();
     }else{
-      const msg = (res && (res.message || res.error)) ? (': ' + (res.message || res.error)) : '';
+      const errCode = res && (res.message || res.error) ? (res.message || res.error) : '';
+      const detail = res && res.detail ? ' — ' + res.detail : '';
+      const msg = errCode ? (': ' + errCode + detail) : '';
       showToast((lang==='en'?'\u26A0 Server error':'\u26A0 L\u1ed7i server') + msg);
     }
   }catch(e){
