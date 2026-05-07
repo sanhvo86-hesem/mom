@@ -3558,6 +3558,19 @@ function repair_broken_doc_style_html(string $html): string {
     '', $html
   ) ?? $html;
 
+  // 2b. Rewrite broken Vietnamese-folder absolute asset paths emitted by
+  //     some editor / translation paste flows: e.g.
+  //     <link href="/02-Tai-Lieu-He-Thong/assets/style.css">. The
+  //     filesystem on VPS only serves /mom/assets/ — there is no
+  //     Vietnamese-folder alias for assets, so those links 404 and the
+  //     doc renders unstyled when viewed outside the portal iframe.
+  //     Map any "/<NN-vi-folder>/assets/<file>" back to "/mom/assets/<file>".
+  $html = preg_replace(
+    '#(["\'(])/(?:\d{2}-[A-Za-z][A-Za-z0-9-]+)/assets/#i',
+    '$1/mom/assets/',
+    $html
+  ) ?? $html;
+
   // 3. Drop the runtime-only "js-ready" class and "data-qms-view-lang"
   //    attribute that the portal app bridge sets after hydration.
   $html = preg_replace_callback(
