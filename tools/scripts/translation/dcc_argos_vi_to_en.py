@@ -78,20 +78,25 @@ except Exception as exc:  # pragma: no cover - runtime guard
 
 try:
     import argostranslate.translate
+    _ARGOS_AVAILABLE = True
 except Exception as exc:  # pragma: no cover - runtime guard
-    print(
-        json.dumps(
-            {
-                "ok": False,
-                "provider": "argos_local_vi_en",
-                "engine_version": "argos_missing",
-                "reason": "translation_runtime_missing",
-                "message": f"Argos Translate runtime is missing: {exc}",
-            },
-            ensure_ascii=False,
+    _ARGOS_AVAILABLE = False
+    _ARGOS_MISSING_EXC = exc
+    argostranslate = None  # type: ignore[assignment]
+    if __name__ == "__main__":
+        print(
+            json.dumps(
+                {
+                    "ok": False,
+                    "provider": "argos_local_vi_en",
+                    "engine_version": "argos_missing",
+                    "reason": "translation_runtime_missing",
+                    "message": f"Argos Translate runtime is missing: {exc}",
+                },
+                ensure_ascii=False,
+            )
         )
-    )
-    raise SystemExit(0)
+        raise SystemExit(0)
 
 
 GLOSSARY_PATH = ROOT / "mom" / "data" / "glossary" / "dict-data.json"
@@ -679,6 +684,8 @@ def load_translator():
     global _translator
     if _translator is not None:
         return _translator
+    if not _ARGOS_AVAILABLE:
+        raise RuntimeError(f"Argos Translate runtime is missing: {_ARGOS_MISSING_EXC}")
     languages = argostranslate.translate.get_installed_languages()
     from_lang = next((lang for lang in languages if getattr(lang, "code", "") == "vi"), None)
     to_lang = next((lang for lang in languages if getattr(lang, "code", "") == "en"), None)

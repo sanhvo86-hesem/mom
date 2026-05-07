@@ -64,11 +64,14 @@ final class CliLoginService
         }
         $binary = (string)($row[0]['cli_binary_path'] ?? '');
         $authHome = (string)($row[0]['cli_auth_home_path'] ?? '');
-        if ($binary === '' || !is_file($binary)) {
-            throw new RuntimeException("CLI binary not found at {$binary}");
+        if ($binary === '') {
+            throw new RuntimeException('cli_binary_path chưa được cấu hình. Vào tab Provider → mở rộng "Cấu hình runtime" → nhập đường dẫn binary rồi lưu.');
+        }
+        if (!is_file($binary)) {
+            throw new RuntimeException("CLI binary không tìm thấy tại: {$binary}. Kiểm tra lại đường dẫn trong tab Provider → Cấu hình runtime.");
         }
         if ($authHome === '') {
-            throw new RuntimeException('cli_auth_home_path is empty.');
+            throw new RuntimeException('cli_auth_home_path chưa được cấu hình. Vào tab Provider → mở rộng "Cấu hình runtime" → nhập auth home rồi lưu.');
         }
         if (!is_dir($authHome)) {
             @mkdir($authHome, 0700, true);
@@ -164,31 +167,30 @@ final class CliLoginService
         if (!@mkdir($sessionDir, 0700, true) && !is_dir($sessionDir)) {
             throw new RuntimeException("Could not create session dir {$sessionDir}");
         }
-        $stdin = $sessionDir . '/stdin';
+        $stdin  = $sessionDir . '/stdin';
         $stdout = $sessionDir . '/stdout';
         touch($stdin);
+        touch($stdout);
 
-        // Spawn: tail -F stdin | claude setup-token > stdout 2>&1 &
-        // tail -F keeps the input open even when the file is empty, so the CLI
-        // doesn't see EOF prematurely.
+        // Use a Python PTY wrapper so claude setup-token sees a real terminal
+        // and outputs its auth URL. Plain shell_exec() has no tty and causes
+        // claude to suppress all interactive output.
+        $ptyScript = dirname(__DIR__, 4) . '/tools/scripts/translation/dcc_cli_login_pty.py';
+        if (!is_file($ptyScript)) {
+            throw new RuntimeException("PTY login script not found at: {$ptyScript}");
+        }
         $cmd = sprintf(
-            'cd %s && HOME=%s nohup bash -c %s > /dev/null 2>&1 & echo $!',
-            escapeshellarg($authHome),
-            escapeshellarg($authHome),
-            escapeshellarg(sprintf(
-                'tail -n +1 -F %s | %s setup-token > %s 2>&1',
-                escapeshellarg($stdin),
-                escapeshellarg($binary),
-                escapeshellarg($stdout)
-            ))
+            'nohup /usr/bin/python3 %s %s %s %s > /dev/null 2>&1 & echo $!',
+            escapeshellarg($ptyScript),
+            escapeshellarg($sessionDir),
+            escapeshellarg($binary),
+            escapeshellarg($authHome)
         );
         $pid = trim((string)shell_exec($cmd));
         if (!ctype_digit($pid)) {
             $this->cleanupSession($sessionId);
-            throw new RuntimeException('Could not spawn claude setup-token.');
+            throw new RuntimeException('Could not spawn claude setup-token PTY wrapper.');
         }
-        // The pipeline pid we capture is bash's; the actual claude process is
-        // its child. For wait/cleanup purposes we track the pipeline group.
         file_put_contents($sessionDir . '/pid', $pid);
         $this->writeMeta($sessionId, [
             'provider_key' => $providerKey,
@@ -198,12 +200,19 @@ final class CliLoginService
             'pid' => (int)$pid,
         ]);
 
-        // Wait up to 12s for the URL to appear in stdout.
+        // Wait up to 35s for the URL to appear in stdout.
+        // The Python wrapper writes a [PTY_URL] marker once it extracts the URL.
         $url = '';
-        $deadline = microtime(true) + 12;
+        $deadline = microtime(true) + 35;
         while (microtime(true) < $deadline) {
             $out = (string)@file_get_contents($stdout);
-            if (preg_match('~https?://[^\s\x1b]+~', $out, $m)) {
+            // Prefer the explicit PTY_URL marker the wrapper writes
+            if (preg_match('~\[PTY_URL\]\s*(https?://\S+)~', $out, $m)) {
+                $url = trim($m[1], "\"'.,;:");
+                break;
+            }
+            // Fallback: any URL in the raw output
+            if (preg_match('~https?://[^\s\x1b\]]+~', $out, $m)) {
                 $url = trim($m[0], "\"'.,;:");
                 break;
             }
@@ -211,7 +220,7 @@ final class CliLoginService
         }
         if ($url === '') {
             $this->cleanupSession($sessionId);
-            throw new RuntimeException('Did not receive auth URL from claude setup-token within 12s.');
+            throw new RuntimeException('Did not receive auth URL from claude setup-token within 35s.');
         }
 
         return [
@@ -376,8 +385,17 @@ final class CliLoginService
             $j = json_decode((string)@file_get_contents($path), true);
             if (!is_array($j)) return null;
             $oauth = $j['claudeAiOauth'] ?? [];
+            $subject = $oauth['subject'] ?? $oauth['accountEmail'] ?? $oauth['email'] ?? null;
+            // Fall back to subscription type so the portal shows "logged in" even
+            // when the OAuth token doesn't carry identity claims.
+            if ($subject === null && isset($oauth['subscriptionType'])) {
+                $subject = (string)$oauth['subscriptionType'];
+            }
+            if ($subject === null && isset($oauth['accessToken'])) {
+                $subject = 'authenticated';
+            }
             return [
-                'subject' => $oauth['subject'] ?? $oauth['accountEmail'] ?? null,
+                'subject' => $subject,
                 'subscription' => $oauth['subscriptionType'] ?? null,
                 'expires_at' => isset($oauth['expiresAt']) ? (int)($oauth['expiresAt'] / 1000) : null,
                 'scopes' => $oauth['scopes'] ?? [],
