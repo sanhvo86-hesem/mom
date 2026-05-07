@@ -1,5 +1,26 @@
 // RENDER WORKFLOW UI
 // ═══════════════════════════════════════════════════
+
+function showRevisionTypeDialog(code, majorNext, minorNext){
+  return new Promise(function(resolve){
+    var existing=document.getElementById('mm-rev-dialog-overlay');
+    if(existing) existing.remove();
+    var overlay=document.createElement('div');
+    overlay.id='mm-rev-dialog-overlay';
+    overlay.className='mm-rev-overlay';
+    var title=lang==='en'?('New revision for '+code):('Phiên bản chỉnh sửa mới cho '+code);
+    var descMajor=lang==='en'?'Restructured / breaking change':'Thay đổi lớn / cấu trúc lại';
+    var descMinor=lang==='en'?'Small edits / corrections':'Sửa nhỏ / bổ sung';
+    var cancelLbl=lang==='en'?'Cancel':'Hủy';
+    overlay.innerHTML='<div class="mm-rev-dialog"><div class="mm-rev-dialog-header"><h4>'+title+'</h4></div><div class="mm-rev-dialog-body"><button class="mm-rev-btn mm-btn-major" id="mm-rev-major"><span class="mm-rev-btn-label">Major</span><span class="mm-rev-btn-ver">v'+majorNext+'</span><span class="mm-rev-btn-desc">'+descMajor+'</span></button><button class="mm-rev-btn mm-btn-minor" id="mm-rev-minor"><span class="mm-rev-btn-label">Minor</span><span class="mm-rev-btn-ver">v'+minorNext+'</span><span class="mm-rev-btn-desc">'+descMinor+'</span></button></div><div class="mm-rev-dialog-footer"><button id="mm-rev-cancel">'+cancelLbl+'</button></div></div>';
+    document.body.appendChild(overlay);
+    overlay.querySelector('#mm-rev-major').onclick=function(){overlay.remove();resolve('major');};
+    overlay.querySelector('#mm-rev-minor').onclick=function(){overlay.remove();resolve('minor');};
+    overlay.querySelector('#mm-rev-cancel').onclick=function(){overlay.remove();resolve(null);};
+    overlay.addEventListener('click',function(e){if(e.target===overlay){overlay.remove();resolve(null);}});
+  });
+}
+
 function renderWorkflowPanel(doc){
   if(!doc) return;
 
@@ -47,11 +68,9 @@ async function startNewRevision(code){
     const minorNext = `${maj}.${min+1}`;
     const majorNext = `${maj+1}.0`;
 
-    const msg = (lang==='en'
-      ? `Start a new revision for ${doc.code}\n\nOK = MAJOR (v${majorNext})\nCancel = MINOR (v${minorNext})`
-      : `Bắt đầu phiên bản chỉnh sửa mới cho ${doc.code}\n\nOK = MAJOR (v${majorNext})\nCancel = MINOR (v${minorNext})`);
-    const isMajor = confirm(msg);
-    updateType = isMajor ? 'major' : 'minor';
+    const choice = await showRevisionTypeDialog(doc.code, majorNext, minorNext);
+    if(choice === null) return;
+    updateType = choice;
   }
 
   try{
@@ -186,7 +205,7 @@ function showFilteredDocs(filter){
         if(v.status==='approved' && v.date){
           var vDate=new Date(v.date.replace(' ','T'));
           if(vDate>=thirtyDaysAgo){
-            recentEntries.push({doc:d, version:v.version, date:v.date, user:v.user, updateType:v.updateType||'', submittedBy:v.submittedBy||'', dateObj:vDate});
+            recentEntries.push({doc:d, version:v.version, date:v.date, user:v.by||v.user||'', updateType:v.updateType||'', submittedBy:v.submittedBy||'', dateObj:vDate});
           }
         }
       });
@@ -668,7 +687,7 @@ function renderVersionHistory(doc){
                 ${isCurrentVersionEntry(doc,v)?'<span class="vh-current-pill">'+T('wf_current')+'</span>':''}
                 ${versionHasAccess(doc,v)?'<span class="vh-access-hint" title="'+(lang==='en'?(isWorkbook?'Click to download':'Click to view'):(isWorkbook?'Nhấn để tải':'Nhấn để xem'))+'">'+(isWorkbook?'⬇':'👁')+' '+(lang==='en'?(isWorkbook?'Download':'View'):(isWorkbook?'Tải':'Xem'))+'</span>':''}
                 <div class="date">${v.date}</div>
-                <div class="who">${v.user} — ${v.role}</div>
+                <div class="who">${v.by||v.user||''}${(v.by||v.user)&&v.role?' — '+v.role:''}</div>
                 ${v.submittedBy?'<div class="vh-meta-line link">📤 '+(lang==='en'?'Submitted by':'Gửi bởi')+': '+v.submittedBy+(v.submittedDate?' · '+v.submittedDate:'')+'</div>':''}
                 ${v.lastEditBy?'<div class="vh-meta-line">✏️ '+(lang==='en'?'Last editor':'Người chỉnh sửa cuối')+': '+v.lastEditBy+(v.lastEditRole?' — '+v.lastEditRole:'')+(v.lastEditDate?' · '+v.lastEditDate:'')+'</div>':''}
                 ${v.approvedBy?'<div class="vh-meta-line success">✅ '+(lang==='en'?'Approved by':'Duyệt bởi')+': '+v.approvedBy+(v.approvedDate?' · '+v.approvedDate:'')+'</div>':''}
@@ -732,7 +751,7 @@ function openVersionPreview(code, idx){
       <div class="vp-header">
         <div>
           <h4>${doc?doc.code:code} — ${v.version} <span style="color:${statusColor(v.status)};font-size:11px">${statusLabel(v.status)}</span></h4>
-          <div class="vp-meta">${v.date} · ${v.user} · ${v.role}${v.note?' · "'+v.note+'"':''}</div>
+          <div class="vp-meta">${v.date}${(v.by||v.user)?' · '+(v.by||v.user):''}${v.role?' · '+v.role:''}${v.note?' · "'+v.note+'"':''}</div>
         </div>
         <div class="vp-actions">
           <button class="vp-open" onclick='event.stopPropagation();triggerDownloadUrl(${JSON.stringify(accessUrl)})'>⬇ ${lang==='en'?'Download version':'Tải phiên bản'}</button>
@@ -750,7 +769,7 @@ function openVersionPreview(code, idx){
           </div>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-top:18px">
             <div style="border:1px solid var(--border);border-radius:12px;padding:12px;background:var(--bg-surface,#fff)"><b style="display:block;font-size:11px;color:var(--text-tertiary);text-transform:uppercase;margin-bottom:4px">${lang==='en'?'Status':'Trạng thái'}</b><span>${statusLabel(v.status)}</span></div>
-            <div style="border:1px solid var(--border);border-radius:12px;padding:12px;background:var(--bg-surface,#fff)"><b style="display:block;font-size:11px;color:var(--text-tertiary);text-transform:uppercase;margin-bottom:4px">${lang==='en'?'Updated by':'Cập nhật bởi'}</b><span>${v.user||'—'}</span></div>
+            <div style="border:1px solid var(--border);border-radius:12px;padding:12px;background:var(--bg-surface,#fff)"><b style="display:block;font-size:11px;color:var(--text-tertiary);text-transform:uppercase;margin-bottom:4px">${lang==='en'?'Updated by':'Cập nhật bởi'}</b><span>${v.by||v.user||'—'}</span></div>
             <div style="border:1px solid var(--border);border-radius:12px;padding:12px;background:var(--bg-surface,#fff)"><b style="display:block;font-size:11px;color:var(--text-tertiary);text-transform:uppercase;margin-bottom:4px">${lang==='en'?'When':'Thời điểm'}</b><span>${v.date||'—'}</span></div>
           </div>
         </div>
@@ -761,7 +780,7 @@ function openVersionPreview(code, idx){
       <div class="vp-header">
         <div>
           <h4>${doc?doc.code:code} — ${v.version} <span style="color:${statusColor(v.status)};font-size:11px">${statusLabel(v.status)}</span></h4>
-          <div class="vp-meta">${v.date} · ${v.user} · ${v.role}${v.note?' · "'+v.note+'"':''}</div>
+          <div class="vp-meta">${v.date}${(v.by||v.user)?' · '+(v.by||v.user):''}${v.role?' · '+v.role:''}${v.note?' · "'+v.note+'"':''}</div>
         </div>
         <div class="vp-actions">
           <button class="vp-open" onclick="event.stopPropagation();window.open('${accessUrl}${accessUrl.indexOf('?')>=0?'&':'?'}t=${Date.now()}','_blank')">↗ ${lang==='en'?'Open in new tab':'Mở tab mới'}</button>
