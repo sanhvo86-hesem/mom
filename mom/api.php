@@ -3558,15 +3558,32 @@ function repair_broken_doc_style_html(string $html): string {
     '', $html
   ) ?? $html;
 
-  // 2b. Rewrite broken Vietnamese-folder absolute asset paths emitted by
-  //     some editor / translation paste flows: e.g.
-  //     <link href="/02-Tai-Lieu-He-Thong/assets/style.css">. The
-  //     filesystem on VPS only serves /mom/assets/ — there is no
-  //     Vietnamese-folder alias for assets, so those links 404 and the
-  //     doc renders unstyled when viewed outside the portal iframe.
-  //     Map any "/<NN-vi-folder>/assets/<file>" back to "/mom/assets/<file>".
+  // 2b. Normalize all asset references to the canonical absolute path
+  //     /mom/assets/<file>. Two failure modes existed in the wild:
+  //
+  //     (i)  Relative parents — <link href="../../assets/style.css">,
+  //          <img src="../../assets/hesem-logo.svg">, etc. These resolve
+  //          correctly only from a specific depth in mom/docs/, but
+  //          break entirely when the file is served from /_Archive/
+  //          (one level deeper) or accessed via the version-history
+  //          modal (which loads the file directly without the portal
+  //          iframe runtime path-fixup).
+  //
+  //     (ii) Vietnamese-folder absolute paths — emitted by some editor
+  //          and translation paste flows: <link href="/02-Tai-Lieu-He-
+  //          Thong/assets/style.css">. The webserver only serves
+  //          /mom/assets/, so those links 404 and the doc renders
+  //          unstyled when viewed outside the portal iframe.
+  //
+  //     Both forms are rewritten here on every persisted save so older
+  //     archive versions and direct-URL views stay graphics-correct.
   $html = preg_replace(
-    '#(["\'(])/(?:\d{2}-[A-Za-z][A-Za-z0-9-]+)/assets/#i',
+    '#((?:href|src)=["\'])(?:\.\./){1,8}assets/#i',
+    '$1/mom/assets/',
+    $html
+  ) ?? $html;
+  $html = preg_replace(
+    '#((?:href|src)=["\'])/(?:\d{2}-[A-Za-z][A-Za-z0-9-]+)/assets/#i',
     '$1/mom/assets/',
     $html
   ) ?? $html;
