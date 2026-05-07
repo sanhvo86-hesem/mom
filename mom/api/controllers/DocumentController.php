@@ -578,7 +578,28 @@ class DocumentController extends BaseController
         $html = sync_doc_header_html($html, $revision, $effectiveDate !== '' ? $effectiveDate : null);
         $html = portal_sync_doc_title_blocks($html, $code, trim((string)($data['title'] ?? '')));
         $expectedLen = strlen($html);
-        $writeBytes  = @file_put_contents($liveFile, $html, LOCK_EX);
+        // Strategy: file_put_contents fails when the existing file is owned
+        // by another user (eg. root, leftover from a sudo `git pull`). The
+        // PHP-FPM user typically still has WRITE on the parent directory, so
+        // we can publish via tmp+rename: write a sibling tempfile (creating
+        // it under the PHP-FPM user), atomically rename onto $liveFile. The
+        // rename succeeds whenever the directory is writable, regardless of
+        // the existing file's owner — and on POSIX it's atomic to readers.
+        $writeBytes = @file_put_contents($liveFile, $html, LOCK_EX);
+        if ($writeBytes === false || $writeBytes !== $expectedLen) {
+            $tmp = $liveFile . '.tmp.' . bin2hex(random_bytes(4));
+            $tmpBytes = @file_put_contents($tmp, $html, LOCK_EX);
+            if ($tmpBytes === $expectedLen) {
+                @chmod($tmp, 0664);
+                if (@rename($tmp, $liveFile)) {
+                    $writeBytes = $expectedLen;
+                } else {
+                    @unlink($tmp);
+                }
+            } elseif ($tmpBytes !== false) {
+                @unlink($tmp);
+            }
+        }
         if ($writeBytes === false || $writeBytes !== $expectedLen) {
             $writableLive = is_writable($liveFile) || (is_writable(dirname($liveFile)) && !is_file($liveFile));
             $this->error(
