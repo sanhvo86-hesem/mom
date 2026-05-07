@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
-# Hard refusal: block any commit that touches a runtime-mutated config file.
-# The list lives in tools/vps-setup/scripts/_runtime-files.sh — this hook
-# sources the regex from there so we cannot drift.
+# Hard refusal: block any commit that touches runtime-mutated files.
+# Two categories are protected:
+#   1. Runtime config JSON files (mom/data/config/*.json)
+#   2. Portal-managed HTML document files (mom/docs/**/*.html)
 #
-# Bypass (only after reading: tools/vps-setup/README-DATA-SYNC.md):
+# Both are written at runtime by PHP-FPM / portal editor. Committing a local
+# copy of either can silently overwrite live data on the next deploy.
+#
+# Bypass (only for genuine structural fixes — read the warning carefully):
 #   git commit --no-verify
 
 REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo .)"
@@ -11,6 +15,8 @@ RUNTIME_LIST="$REPO_ROOT/tools/vps-setup/scripts/_runtime-files.sh"
 if [ -f "$RUNTIME_LIST" ]; then
     # shellcheck source=tools/vps-setup/scripts/_runtime-files.sh
     . "$RUNTIME_LIST"
+
+    # ── Check 1: runtime config JSON files ───────────────────────────────
     OFFENDERS=$(git diff --cached --name-only | grep -E "$RUNTIME_CONFIG_REGEX" || true)
     if [ -n "$OFFENDERS" ]; then
         echo "" >&2
@@ -25,6 +31,31 @@ if [ -f "$RUNTIME_LIST" ]; then
         echo "Bypass (rare, requires reading README-DATA-SYNC.md first):" >&2
         echo "  git commit --no-verify" >&2
         exit 1
+    fi
+
+    # ── Check 2: portal-managed HTML document files ───────────────────────
+    # These files are also written at runtime by DocumentController (saveDraft
+    # / approve). A local commit overwrites portal-authored content on the VPS
+    # because deploy.sh's rsync restore only captures *VPS* pre-deploy state —
+    # it cannot recover edits made on your local machine that were never pushed.
+    if [ "${ALLOW_DOC_COMMIT:-0}" != "1" ]; then
+        DOC_OFFENDERS=$(git diff --cached --name-only | grep -E "$RUNTIME_DOC_REGEX" || true)
+        if [ -n "$DOC_OFFENDERS" ]; then
+            echo "" >&2
+            echo "pre-commit: refusing to commit portal-managed HTML document files." >&2
+            echo "" >&2
+            printf '%s\n' "$DOC_OFFENDERS" | sed 's/^/  - /' >&2
+            echo "" >&2
+            echo "These files are written at runtime by the portal document editor." >&2
+            echo "Committing a local copy risks overwriting portal-authored edits on" >&2
+            echo "the VPS. If you edited this doc in Chrome (localhost), pull the" >&2
+            echo "VPS state first:" >&2
+            echo "  bash tools/dev-setup/sync-docs-from-vps.sh" >&2
+            echo "" >&2
+            echo "For a genuine structural/CSS fix (template change, not content):" >&2
+            echo "  ALLOW_DOC_COMMIT=1 git commit --no-verify" >&2
+            exit 1
+        fi
     fi
 fi
 

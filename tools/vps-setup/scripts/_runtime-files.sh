@@ -63,3 +63,17 @@ RUNTIME_CONFIG_FILES=(
 # Regex (extended) for matching the same set inside git diff paths. Kept in
 # sync with the array above by hand; audit-runtime-files.php verifies parity.
 RUNTIME_CONFIG_REGEX='^mom/data/config/(users|role_permissions|portal_role_docs|module_access_config|user_doc_overrides|docs_custom(\.local)?|docs_visibility|doc_descriptions|folder_descriptions|doc_owner_overrides|doc_review_policy|record_type_expanded|form_control_registry|form_builder_formulas|so_jo_wo_config|portal_display_config|data_collection_settings|epicor_integration_policy|evidence_retention_policy|evidence_review_sla_policy|ai_config)\.json$'
+
+# ── Portal-managed HTML document files ─────────────────────────────────────
+# These files live under mom/docs/ AND are written at runtime by the portal
+# document editor (DocumentController::saveDraft / approve). They must never
+# be committed from a local dev machine — doing so silently overwrites
+# portal-authored content on the VPS when deployed.
+#
+# deploy.sh already preserves them via capture_runtime_mutations (rsync).
+# The pre-commit hook below prevents the complementary failure: accidentally
+# committing a local copy that has diverged from the portal-edited VPS state.
+#
+# Bypass (structural CSS/template change only):
+#   ALLOW_DOC_COMMIT=1 git commit --no-verify
+RUNTIME_DOC_REGEX='^mom/docs/(system|operations|forms|training|glossary)/.+\.html$'
