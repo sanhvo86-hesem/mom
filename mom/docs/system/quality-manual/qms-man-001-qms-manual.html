@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html lang="vi"><head><meta charset="utf-8">
+<html lang="vi" class="notranslate" translate="no"><head><meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>QMS-MAN-001 - QMS Manual | HESEM MOM</title>
-<link href="../../assets/style.css" rel="stylesheet">
+<link href="/mom/assets/style.css" rel="stylesheet">
 <script>
 /* DCC Header bootstrap — computes absolute URLs from location.pathname so the
  * stylesheet + renderer load correctly regardless of how the document is
- * served (direct, portal iframe + <base href="../"> injection, doc_stream, …).
+ * served (direct, portal iframe + <base href="/mom/docs/system/quality-manual"> injection, doc_stream, …).
  * The explicit `?v=…` query string busts browser + service-worker caches
  * whenever the DCC header CSS or renderer ships a new revision. */
 (function () {
@@ -22,8 +22,7 @@
   js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
   document.head.appendChild(js);
 })();
-</script>
-<style> .chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
+</script><style> .chip{display:inline-block;padding:2px 10px;border-radius:999px;border:1px solid #d7dee7;background:#f8fafc;font-size:11px;margin-right:6px;margin-bottom:6px;font-weight:600;}
 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;font-size:12px;}
 .tight li{margin:4px 0;}
 .grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;}
@@ -89,75 +88,1116 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 .section-jump{margin-top:10px}
 </style>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
-</head>
-<body>
+<meta name="google" content="notranslate"></head>
+<body translate="no" class="notranslate">
 <div class="container">
 <div class="page">
 <div class="page-body">
 <!-- DCC Document Change Control header (values served by /api/v1/dcc; bootstrap seed is preview-only) -->
-<div class="dcc-header"
-     data-dcc-doc-code="QMS-MAN-001"
-     data-dcc-locale="vi"
-     data-dcc-logo="../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap='{"header":{"doc_code":"QMS-MAN-001","title":"QMS Manual","subtitle":"S\u1ed5 tay QMS t\u00edch h\u1ee3p \u2014 t\u1ed5ng quan h\u1ec7 th\u1ed1ng qu\u1ea3n l\u00fd ch\u1ea5t l\u01b0\u1ee3ng","doc_type":"MAN","revision":"V0","effective_date":"2026-04-13","owner_role_code":"QMR","approver_role_code":"CEO","iso_clause":"ISO 9001:2026 §4","status":"released"},"labels":{"doc_id":{"short":"ID","long":"Document ID","sort":10},"revision":{"short":"Rev","long":"Revision","sort":20},"effective_date":{"short":"Eff","long":"Effective date","sort":30},"owner":{"short":"Owner","long":"Owner","sort":40},"approver":{"short":"Appr","long":"Approved by","sort":50}}}'></div>
+<div class="dcc-header" data-dcc-doc-code="QMS-MAN-001" data-dcc-locale="vi" data-dcc-logo="../../../assets/hesem-logo.svg" data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;QMS-MAN-001&quot;,&quot;title&quot;:&quot;QMS Manual&quot;,&quot;subtitle&quot;:&quot;Sổ tay QMS tích hợp — tổng quan hệ thống quản lý chất lượng&quot;,&quot;doc_type&quot;:&quot;MAN&quot;,&quot;revision&quot;:&quot;V4.0&quot;,&quot;effective_date&quot;:&quot;2026-05-07&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;approved&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}" data-dcc-state="ready" data-dcc-bootstrap-source="portal-authoritative" data-dcc-status="approved"><div class="dcc-header__title-block"><div class="dcc-header__logo"><img src="/mom/assets/hesem-logo.svg" alt="HESEM" width="100" height="32"></div><div class="dcc-header__titles"><h2 class="dcc-header__title">QMS Manual</h2><p class="dcc-header__subtitle">Sổ tay QMS tích hợp — tổng quan hệ thống quản lý chất lượng</p></div></div><div class="dcc-header__ribbon"><div class="dcc-header__cell" data-dcc-cell="doc_id"><span class="dcc-header__label" title="Mã tài liệu">ID</span><span class="dcc-header__value"><span class="dcc-header__code" title="QMS-MAN-001">QMS-MAN-001</span></span></div><div class="dcc-header__cell" data-dcc-cell="revision"><span class="dcc-header__label" title="Phiên bản">Rev</span><span class="dcc-header__value">V4.0</span></div><div class="dcc-header__cell" data-dcc-cell="effective_date"><span class="dcc-header__label" title="Ngày hiệu lực">Eff</span><span class="dcc-header__value">2026-05-07</span></div><div class="dcc-header__cell" data-dcc-cell="owner"><span class="dcc-header__label" title="Chủ sở hữu">Owner</span><span class="dcc-header__value"><span class="dcc-header__role">QA</span></span></div><div class="dcc-header__cell" data-dcc-cell="approver"><span class="dcc-header__label" title="Phê duyệt">Appr</span><span class="dcc-header__value"><span class="dcc-header__role">CEO</span></span></div></div></div>
 <div class="doc-content" id="docContent"><div class="form-sheet">
-<div class="iso-map"><div class="iso-title">Chuẩn mực áp dụng / nguyên tắc bắt buộc</div><div class="req"><span class="req-tag shall">PHẢI</span><div>QMS được thiết kế theo tư duy quá trình, kiểm soát rủi ro, bằng chứng phù hợp và trách nhiệm cuối cùng của HESEM đối với đầu ra đã giao cho khách hàng. <span class="iso-clause">§4</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Các quá trình chính phải được vận hành theo ranh giới trách nhiệm, thẩm quyền, RACI, cổng kiểm soát chất lượng (gate), nguồn chuẩn duy nhất và dữ liệu tối thiểu đã được chuẩn hóa; không thay bằng thói quen cá nhân hoặc chỉ đạo miệng. <span class="iso-clause">§4</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Hệ thống phải ngăn lỗi từ đầu vào, chuẩn bị đủ điều kiện trước khi chạy và giữ kiểm soát xuyên suốt quá trình; không dồn trách nhiệm cho kiểm tra cuối. <span class="iso-clause">§4</span></div></div></div>
-<div class="preface-block"><div class="grid-2"><div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="card"><div class="card-title">Định vị của sổ tay</div><p>Sổ tay này là tài liệu cấp 1 của hệ thống, dùng để quy định khung quản trị cho doanh nghiệp gia công CNC chính xác theo mô hình <b>lệnh sản xuất / chủng loại cao (cao-mix)</b>. Tài liệu giải thích logic điều hành, ranh giới trách nhiệm, kiến trúc dữ liệu và mối liên kết giữa chính sách – SOP – WI – biểu mẫu – hồ sơ.</p></div></div></div><div class="ed-qms-block" data-qms-kind="callout" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="callout"><div class="card-title">Trục điều hành bắt buộc</div><p>Tài liệu này quy định rõ <b>ranh giới trách nhiệm</b>, <b>nguồn chuẩn duy nhất</b>, <b>thẩm quyền cổng kiểm soát</b>, <b>phê duyệt theo bằng chứng</b>, <b>kiểm soát dữ liệu</b>, <b>ứng phó gián đoạn</b> và <b>bố trí Người thay thế</b>.</p></div></div></div></div></div>
-<div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#m1" rel="noopener noreferrer">1. Mục đích và định vị</a><a href="#m2" rel="noopener noreferrer">2. Phạm vi và tính áp dụng</a><a href="#m3" rel="noopener noreferrer">3. Bối cảnh, bên quan tâm và định hướng chiến lược</a><a href="#m4" rel="noopener noreferrer">4. Kiến trúc QMS và bản đồ quá trình</a><a href="#m5" rel="noopener noreferrer">5. Mô hình vận hành từ RFQ đến giao hàng</a><a href="#m6" rel="noopener noreferrer">6. Cơ chế kiểm soát trọng yếu</a><a href="#m7" rel="noopener noreferrer">7. Đo lường, truy xuất nguồn gốc và bằng chứng phù hợp</a><a href="#m8" rel="noopener noreferrer">8. Governance nhà cung cấp và công đoạn ngoài</a><a href="#m9" rel="noopener noreferrer">9. Năng lực, lãnh đạo và cải tiến</a><a href="#m10" rel="noopener noreferrer">10. Ma trận tài liệu cấp dưới</a><a href="#m11" rel="noopener noreferrer">11. Governance dữ liệu số, nguồn chuẩn duy nhất và kiểm soát hồ sơ</a><a href="#m12" rel="noopener noreferrer">12. Thẩm quyền, ranh giới trách nhiệm và cơ chế điều hành liên phòng ban</a><a href="#m13" rel="noopener noreferrer">13. Khả năng chống gián đoạn và phục hồi</a></div></div>
+<div class="iso-map">
+<div class="iso-title">Chuẩn mực áp dụng / nguyên tắc bắt buộc</div>
+<div class="req">
+<span class="req-tag shall">PHẢI</span>
+<div>QMS được thiết kế theo tư duy quá trình, kiểm soát rủi ro, bằng chứng phù hợp và trách nhiệm cuối cùng của HESEM đối với đầu ra đã giao cho khách hàng. <span class="iso-clause">§4</span>
+</div>
+</div>
+<div class="req">
+<span class="req-tag shall">PHẢI</span>
+<div>Các quá trình chính phải được vận hành theo ranh giới trách nhiệm, thẩm quyền, RACI, cổng kiểm soát chất lượng, nguồn chuẩn duy nhất và dữ liệu tối thiểu đã được chuẩn hóa; không thay bằng thói quen cá nhân hoặc chỉ đạo miệng. <span class="iso-clause">§4</span>
+</div>
+</div>
+<div class="req">
+<span class="req-tag shall">PHẢI</span>
+<div>Hệ thống phải ngăn lỗi từ đầu vào, chuẩn bị đủ điều kiện trước khi chạy và giữ kiểm soát xuyên suốt quá trình; không dồn trách nhiệm cho kiểm tra cuối. <span class="iso-clause">§4</span>
+</div>
+</div>
+</div>
+<div class="preface-block">
+<div class="grid-2">
+<div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="card">
+<div class="card-title">Định vị của sổ tay</div>
+<p>Sổ tay này là tài liệu cấp 1 của hệ thống, dùng để quy định khung quản trị cho doanh nghiệp gia công CNC chính xác theo mô hình <b>lệnh sản xuất /&nbsp;Sản xuất đa chủng loại với sản lượng thấp đến trung bình</b>. Tài liệu giải thích logic điều hành, ranh giới trách nhiệm, kiến trúc dữ liệu và mối liên kết giữa chính sách – SOP – WI – biểu mẫu – hồ sơ.</p>
+</div>
+</div>
+</div>
+<div class="ed-qms-block" data-qms-kind="callout" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="callout">
+<div class="card-title">Trục điều hành bắt buộc</div>
+<p>Tài liệu này quy định rõ <b>ranh giới trách nhiệm</b>, <b>nguồn chuẩn duy nhất</b>, <b>thẩm quyền, cổng kiểm soát</b>, <b>phê duyệt theo bằng chứng</b>, <b>kiểm soát dữ liệu</b>, <b>ứng phó gián đoạn</b> và <b>bố trí Người thay thế</b>.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="toc">
+<div class="toc-title">Mục lục nhanh</div>
+<div class="toc-grid">
+<a href="#m1" rel="noopener noreferrer">1. Mục đích và định vị</a>
+<a href="#m2" rel="noopener noreferrer">2. Phạm vi và tính áp dụng</a>
+<a href="#m3" rel="noopener noreferrer">3. Bối cảnh, bên quan tâm và định hướng chiến lược</a>
+<a href="#m4" rel="noopener noreferrer">4. Kiến trúc QMS và bản đồ quá trình</a>
+<a href="#m5" rel="noopener noreferrer">5. Mô hình vận hành từ RFQ đến giao hàng</a>
+<a href="#m6" rel="noopener noreferrer">6. Cơ chế kiểm soát trọng yếu</a>
+<a href="#m7" rel="noopener noreferrer">7. Đo lường, truy xuất nguồn gốc và bằng chứng phù hợp</a>
+<a href="#m8" rel="noopener noreferrer">8. Governance nhà cung cấp và công đoạn ngoài</a>
+<a href="#m9" rel="noopener noreferrer">9. Năng lực, lãnh đạo và cải tiến</a>
+<a href="#m10" rel="noopener noreferrer">10. Ma trận tài liệu cấp dưới</a>
+<a href="#m11" rel="noopener noreferrer">11. Quản trị dữ liệu số, nguồn chuẩn duy nhất và kiểm soát hồ sơ</a>
+<a href="#m12" rel="noopener noreferrer">12. Thẩm quyền, ranh giới trách nhiệm và cơ chế điều hành liên phòng ban</a>
+<a href="#m13" rel="noopener noreferrer">13. Khả năng chống gián đoạn và phục hồi</a>
+</div>
+</div>
 <h2 class="h2" id="m1">1. Mục đích và định vị</h2>
-<p>Tài liệu này mô tả cách HESEM thiết kế, triển khai và duy trì hệ thống quản lý chất lượng để bảo đảm mọi đơn hàng gia công CNC, tích hợp cơ khí chính xác và các dịch vụ bổ trợ liên quan được thực hiện nhất quán, đúng yêu cầu khách hàng, đúng yêu cầu pháp lý/chuẩn áp dụng, đúng năng lực quá trình và đúng logic truy xuất nguồn gốc bằng chứng.</p>
+<p>Tài liệu này mô tả cách HESEM thiết kế, triển khai và duy trì hệ thống quản lý chất lượng để bảo đảm mọi đơn hàng gia công CNC và các dịch vụ bổ trợ liên quan được thực hiện nhất quán, đúng yêu cầu khách hàng, đúng yêu cầu pháp lý/chuẩn áp dụng, đúng năng lực quá trình và đúng logic truy xuất nguồn gốc bằng chứng.</p>
 <p>Sổ tay đồng thời là "bản đồ đọc hệ thống" cho lãnh đạo, quản lý tuyến đầu, kỹ sư, QA/QC, chuỗi cung ứng, IT/Epicor và các bên đánh giá bên ngoài. Mục đích của tài liệu không phải lặp lại toàn bộ SOP/WI, mà làm rõ: (i) hệ thống được tổ chức theo kiến trúc nào, (ii) đâu là các quyết định không được mơ hồ, và (iii) bằng chứng nào tạo nên một quyết định hợp lệ trong QMS.</p>
-<div class="pillar-grid"><div class="pillar-card"><div class="pillar-eyebrow">Chuỗi giá trị cốt lõi</div><div class="pillar-title">RFQ → Ship</div></div><div class="pillar-card"><div class="pillar-eyebrow">Bối cảnh áp dụng</div><div class="pillar-title">Toàn cầu / toàn bộ CNC</div></div><div class="pillar-card"><div class="pillar-eyebrow">Môi trường sản xuất</div><div class="pillar-title">Chủng loại cao, sản lượng thấp đến trung bình</div></div><div class="pillar-card"><div class="pillar-eyebrow">Nguyên tắc điều hành</div><div class="pillar-title">Dựa trên bằng chứng</div></div></div>
+<div class="pillar-grid">
+<div class="pillar-card">
+<div class="pillar-eyebrow">Chuỗi giá trị cốt lõi</div>
+<div class="pillar-title">RFQ → Ship</div>
+</div>
+<div class="pillar-card">
+<div class="pillar-eyebrow">Bối cảnh áp dụng</div>
+<div class="pillar-title">Toàn cầu / toàn bộ CNC</div>
+</div>
+<div class="pillar-card">
+<div class="pillar-eyebrow">Môi trường sản xuất</div>
+<div class="pillar-title">Sản xuất đa chủng loại với sản lượng thấp đến trung bình</div>
+</div>
+<div class="pillar-card">
+<div class="pillar-eyebrow">Nguyên tắc điều hành</div>
+<div class="pillar-title">Dựa trên bằng chứng</div>
+</div>
+</div>
 <h2 class="h2" id="m2">2. Phạm vi và tính áp dụng</h2>
 <p>Phạm vi QMS bao phủ toàn bộ chuỗi từ tiếp nhận RFQ, rà soát hợp đồng, đánh giá khả thi, chuẩn bị gói kỹ thuật, quản trị nguồn cung và công đoạn ngoài, lập lịch – điều độ – gia công – hoàn thiện – đo lường – đóng gói – giao hàng, khiếu nại/RMA, đánh giá, xem xét của lãnh đạo và cải tiến liên tục.</p>
-<div class="ed-qms-block" data-qms-kind="revisionTable" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="table-card"><table class="table" data-ed-autofit="balanced" data-ed-autofit-lock="0" data-qms-autofit="balanced"><colgroup><col style="width:27.77%"><col style="width:72.23%"></colgroup><thead><tr><th style="overflow-wrap:anywhere;word-break:break-word">Nội dung</th><th style="overflow-wrap:anywhere;word-break:break-word">Cách áp dụng</th></tr></thead><tbody><tr><td style="overflow-wrap:anywhere;word-break:break-word">Thiết kế sản phẩm cuối</td><td style="overflow-wrap:anywhere;word-break:break-word">Thông thường do khách hàng sở hữu; HESEM không tự phê duyệt thay đổi thiết kế sản phẩm của khách nếu không có ủy quyền.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Thiết kế / phát triển quá trình</td><td style="overflow-wrap:anywhere;word-break:break-word">Áp dụng đầy đủ: <a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html" title="DFM Engineer (Kỹ sư DFM)"><span class="entity-code role-code">DFM</span></a>, lộ trình gia công, fixture/tool khái niệm, CAM/CNC, kế hoạch kiểm soát, đo lường chiến lược, vệ sinh / sạch sẽ/đóng gói chiến lược, chạy kiểm chứng và xác nhận thay đổi.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Công đoạn thuê ngoài</td><td style="overflow-wrap:anywhere;word-break:break-word">Nằm trong phạm vi kiểm soát QMS của HESEM: luồng-xuống / Từng yêu cầu, lựa chọn nguồn, xác nhận đầu ra, giữ hồ sơ và trách nhiệm cuối cùng với khách hàng.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Dữ liệu số và luồng công việc</td><td style="overflow-wrap:anywhere;word-break:break-word">Thuộc phạm vi QMS khi chúng tác động đến phát hành, bằng chứng, truy xuất nguồn gốc, quyền truy cập hoặc tính toàn vẹn hồ sơ.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">đa-site / hậu cần / kho thuê ngoài</td><td style="overflow-wrap:anywhere;word-break:break-word">Khi phát sinh phải mô tả ranh giới trách nhiệm, người chịu trách nhiệm giao diện và logic truy xuất nguồn gốc trong hồ sơ đơn hàng và ma trận bàn giao.</td></tr></tbody></table></div></div></div>
+<div class="ed-qms-block" data-qms-kind="revisionTable" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="table-card">
+<table class="table" data-ed-autofit="balanced" data-ed-autofit-lock="0" data-qms-autofit="balanced" style="width:100%;max-width:100%;min-width:0px;table-layout:fixed">
+<colgroup>
+<col style="width:26.95%">
+<col style="width:73.05%">
+</colgroup>
+<thead>
+<tr>
+<th style="overflow-wrap:anywhere;word-break:break-word">Nội dung</th>
+<th style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Cách áp dụng</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Thiết kế sản phẩm cuối</td>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Thông thường do khách hàng sở hữu; HESEM không tự phê duyệt thay đổi thiết kế sản phẩm của khách nếu không có ủy quyền.</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">lập kế hoạch sản xuất</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Đánh giá tính khả thi gia công, phương án gia công, thiết kế đồ gá và dụng cụ, CAM/CNC, kế hoạch kiểm soát, chiến lược đo lường, vệ sinh – đóng gói và các hoạt động kiểm chứng/xác nhận thay đổi.</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">Công đoạn thuê ngoài</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Thuộc phạm vi kiểm soát của QMS HESEM: quản lý toàn bộ quá trình theo từng giai đoạn, bao gồm lựa chọn nguồn cung, xác nhận đầu ra, lưu giữ hồ sơ và chịu trách nhiệm với khách hàng.</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">Dữ liệu số và luồng công việc</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Thuộc phạm vi kiểm soát của QMS khi ảnh hưởng đến phê duyệt, bằng chứng chất lượng, truy xuất nguồn gốc, quyền truy cập hoặc tính toàn vẹn của hồ sơ.</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">Đa địa điểm / hậu cần / kho thuê ngoài</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Khi phát sinh hoạt động liên quan, cần xác định rõ phạm vi trách nhiệm, đầu mối phụ trách và cơ chế truy xuất nguồn gốc trong hồ sơ đơn hàng và ma trận bàn giao.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
 <h2 class="h2" id="m3">3. Bối cảnh, bên quan tâm và định hướng chiến lược</h2>
-<p>HESEM vận hành trong bối cảnh cạnh tranh toàn cầu, chu kỳ giao hàng ngắn, dung sai chặt, yêu cầu minh bạch truy xuất nguồn gốc cao và áp lực đồng thời về chất lượng – chi phí – tốc độ. Bối cảnh đó làm cho hệ thống phải đủ mạnh ở 5 điểm: sàng lọc hợp đồng, phát hành kỹ thuật, kiểm soát nguồn, mức sẵn sàng trước khi chạy và bộ hồ sơ phê duyệt giao hàng (gói phê duyệt giao hàng).</p>
-<div class="grid-3"><div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="card"><div class="card-title">Bên quan tâm chính</div><ul class="tight"><li>Customer OEM/hợp đồng sản xuất và các bên đánh giá của khách hàng</li><li>Supplier vật tư, Người xử lý/công đoạn đặc biệt, hậu cần và lab hiệu chuẩn</li><li>Nhân sự vận hành, quản lý tuyến đầu, kỹ sư, QA/QC/Đo lường, khối hỗ trợ</li><li>Cơ quan pháp lý, an toàn lao động, hải quan, yêu cầu xuất xứ / chứng từ / bảo mật dữ liệu</li></ul></div></div></div><div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="card"><div class="card-title">Kỳ vọng trọng yếu</div><ul class="tight"><li>Đúng bản vẽ, đúng phiên bản, đúng vật liệu, đúng chứng từ</li><li>thời gian dẫn (thời gian giao) ngắn nhưng không bỏ qua cổng kiểm soát và dữ liệu</li><li>Ngăn chặn nhanh, phả hệ truy xuất rõ, điều tra nguyên nhân có hiệu lực</li><li>Bảo vệ IP, dữ liệu kỹ thuật và tính toàn vẹn của hồ sơ</li></ul></div></div></div><div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="card"><div class="card-title">Định hướng quản trị</div><ul class="tight"><li>Ngăn lỗi từ đầu vào và quy trình design, không dồn trách nhiệm cho kiểm tra cuối</li><li>Điều hành theo rủi ro, CTQ/đặc biệt đặc tính, sản phẩm an toàn và con Người yếu tố</li><li>Dùng dữ liệu thời gian thực cho điều phối xuất hàng, cổng kiểm soát, escalation và xem xét của lãnh đạo</li><li>Chuẩn hóa – số hóa – backup/phó để hệ thống không phụ thuộc cá nhân</li></ul></div></div></div></div>
+<p>HESEM vận hành trong bối cảnh cạnh tranh toàn cầu, chu kỳ giao hàng ngắn, dung sai chặt, yêu cầu minh bạch truy xuất nguồn gốc cao và áp lực đồng thời về chất lượng – chi phí – tốc độ. Bối cảnh đó làm cho hệ thống phải đủ mạnh ở 5 điểm: sàng lọc hợp đồng, phát hành kỹ thuật, kiểm soát nguồn, mức sẵn sàng trước khi chạy và bộ hồ sơ phê duyệt giao hàng.</p>
+<div class="grid-3">
+<div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="card">
+<div class="card-title">Bên quan tâm chính</div>
+<ul class="tight">
+<li>Khách hàng và các tổ chức đánh giá/kiểm toán của khách hàng</li>
+<li>Nhà cung cấp vật tư, đơn vị xử lý công đoạn đặc biệt, logistics và phòng lab hiệu chuẩn</li>
+<li>Nhân sự vận hành, kỹ sư, QA/QC, đo lường và các bộ phận hỗ trợ</li>
+<li>Cơ quan quản lý, an toàn lao động, hải quan và các yêu cầu tuân thủ liên quan</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="card">
+<div class="card-title">Kỳ vọng trọng yếu</div>
+<ul class="tight">
+<li>Đúng bản vẽ, đúng phiên bản tài liệu, đúng vật liệu và đầy đủ chứng từ</li>
+<li>Đảm bảo thời gian giao hàng ngắn nhưng vẫn duy trì đầy đủ kiểm soát và hồ sơ chất lượng</li>
+<li>Khả năng ngăn chặn nhanh, truy xuất nguồn gốc rõ ràng và điều tra nguyên nhân hiệu quả</li>
+<li>Bảo vệ tài sản trí tuệ (IP), dữ liệu kỹ thuật</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="card">
+<div class="card-title">Định hướng quản trị</div>
+<ul class="tight">
+<li>Ngăn ngừa lỗi từ đầu vào và trong quá trình gia công, không phụ thuộc hoàn toàn vào khâu kiểm tra cuối</li>
+<li>Điều hành dựa trên rủi ro, chất lượng sản phẩm và yếu tố con người</li>
+<li>Điều hành bằng dữ liệu thời gian thực</li>
+<li>Chuẩn hóa và số hóa để giảm phụ thuộc cá nhân</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
 <h2 class="h2" id="m4">4. Kiến trúc QMS và bản đồ quá trình</h2>
-<p>Kiến trúc hệ thống được tổ chức theo 4 lớp: (1) sổ tay / thủ công/policy, (2) SOP, (3) WI/ANNEX/tham chiếu, (4) biểu mẫu/hồ sơ. Mỗi lớp có vai trò riêng: định hướng, chuẩn hóa quá trình, hướng dẫn thực thi/tra cứu chuẩn, và tạo bằng chứng.</p>
-<div class="process-strip"><span class="pill">Lớp / Tầng 1: Sổ tay/Policy</span><span class="pill">Lớp / Tầng 2: SOP</span><span class="pill">Lớp / Tầng 3: WI / ANNEX</span><span class="pill">Lớp / Tầng 4: Biểu mẫu / Hồ sơ</span></div>
-<p>Bản đồ quá trình chi tiết và ma trận ISO phải được đọc tại <a href="../../operations/references/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-105-process-map-detailed.html" rel="noopener noreferrer">ANNEX-105</a> và <a href="../../operations/references/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-106-iso9001-matrix-full.html" rel="noopener noreferrer">ANNEX-106</a>. Hai annex này thay thế cho các tham chiếu REF cũ và là nguồn chuẩn hiện hành.</p>
-<div class="ed-qms-block" data-qms-kind="actionTable" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="table-card"><table class="table" data-ed-autofit="balanced" data-ed-autofit-lock="0" data-qms-autofit="balanced"><colgroup><col style="width:21.27%"><col style="width:47.79%"><col style="width:30.94%"></colgroup><thead><tr><th style="overflow-wrap:anywhere;word-break:break-word">Nhóm quá trình</th><th style="overflow-wrap:anywhere;word-break:break-word">Mục tiêu điều hành</th><th style="overflow-wrap:anywhere;word-break:break-word">Tài liệu dẫn chính</th></tr></thead><tbody><tr><td style="overflow-wrap:anywhere;word-break:break-word">Leader &amp; System</td><td style="overflow-wrap:anywhere;word-break:break-word">Đặt bối cảnh, mục tiêu, rủi ro, thay đổi hệ thống, đánh giá, xem xét của lãnh đạo, cải tiến.</td><td style="overflow-wrap:anywhere;word-break:break-word"><a href="../../operations/sops/01-SOP-100/sop-101-document-and-data-control.html" rel="noopener noreferrer">SOP-101</a>, <a href="../../operations/sops/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html" rel="noopener noreferrer">SOP-102</a>, <a href="../../operations/sops/01-SOP-100/sop-103-risk-opportunity-fmea-and-control-plan.html" rel="noopener noreferrer">SOP-103</a>, <a href="../../operations/sops/09-SOP-900/sop-901-internal-audit-and-lpa.html" rel="noopener noreferrer">SOP-901</a>, <a href="../../operations/sops/09-SOP-900/sop-902-management-review.html" rel="noopener noreferrer">SOP-902</a>, <a href="../../operations/sops/09-SOP-900/sop-903-continual-improvement-and-kaizen.html" rel="noopener noreferrer">SOP-903</a></td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Customer &amp; Engineer</td><td style="overflow-wrap:anywhere;word-break:break-word">Làm rõ yêu cầu, tính khả thi, báo giá, phát hành kỹ thuật, FAI, khiếu nại/thay đổi giao diện.</td><td style="overflow-wrap:anywhere;word-break:break-word"><a href="../../operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html" rel="noopener noreferrer">SOP-201</a>, <a href="../../operations/sops/02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html" rel="noopener noreferrer">SOP-202</a>, <a href="../../operations/sops/02-SOP-200/sop-203-customer-property-control.html" rel="noopener noreferrer">SOP-203</a>, <a href="../../operations/sops/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html" rel="noopener noreferrer">SOP-301</a>, <a href="../../operations/sops/03-SOP-300/sop-302-first-article-inspection-fai.html" rel="noopener noreferrer">SOP-302</a>, <a href="../../operations/sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html" rel="noopener noreferrer">SOP-303</a></td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Nguồn cung &amp; sản xuất</td><td style="overflow-wrap:anywhere;word-break:break-word">Nguồn vật tư/Người xử lý, nhận hàng/kho, lập kế hoạch, CNC thực thi, hoàn thiện bề mặt, bảo trì, ship chuẩn bị.</td><td style="overflow-wrap:anywhere;word-break:break-word"><a href="../../operations/sops/04-SOP-400/sop-401-supplier-control-and-special-process.html" rel="noopener noreferrer">SOP-401</a>, <a href="../../operations/sops/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html" rel="noopener noreferrer">SOP-402</a>, <a href="../../operations/sops/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html" rel="noopener noreferrer">SOP-501</a>–<a href="../../operations/sops/05-SOP-500/sop-505-finishing-deburr-and-secondary-operations-control.html" rel="noopener noreferrer">SOP-505</a>, <a href="../../operations/sops/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html" rel="noopener noreferrer">SOP-701</a></td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Quality &amp; đo lường</td><td style="overflow-wrap:anywhere;word-break:break-word">Quality lập kế hoạch, đo lường, MSA, SPC, cổng kiểm soát thực thi, NCR/CAPA, final phát hành.</td><td style="overflow-wrap:anywhere;word-break:break-word"><a href="../../operations/sops/06-SOP-600/sop-601-calibration-and-gage-control.html" rel="noopener noreferrer">SOP-601</a>–<a href="../../operations/sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html" rel="noopener noreferrer">SOP-606</a>, <a href="../../operations/sops/07-SOP-700/sop-703-product-safety-conformity-and-fod-prevention.html" rel="noopener noreferrer">SOP-703</a>, <a href="../../operations/sops/08-SOP-800/sop-804-human-factors-and-error-proofing.html" rel="noopener noreferrer">SOP-804</a></td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Năng lực &amp; nền tảng số</td><td style="overflow-wrap:anywhere;word-break:break-word">Năng lực, truyền đạt / giao tiếp, kiểm soát dữ liệu và quyền truy cập, quản trị truy cập, quản trị dữ liệu và ứng phó gián đoạn.</td><td style="overflow-wrap:anywhere;word-break:break-word"><a href="../../operations/sops/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html" rel="noopener noreferrer">SOP-104</a>, <a href="../../operations/sops/01-SOP-100/sop-105-organizational-knowledge-management.html" rel="noopener noreferrer">SOP-105</a>, <a href="../../operations/sops/01-SOP-100/sop-106-change-and-configuration-management.html" rel="noopener noreferrer">SOP-106</a>, <a href="../../operations/sops/01-SOP-100/sop-107-communication-management.html" rel="noopener noreferrer">SOP-107</a>, <a href="../../operations/sops/01-SOP-100/sop-108-operational-contingency-plan.html" rel="noopener noreferrer">SOP-108</a>, <a href="../../operations/sops/08-SOP-800/sop-801-competence-training-and-certification.html" rel="noopener noreferrer">SOP-801</a></td></tr></tbody></table></div></div></div>
-<h2 class="h2" id="m5">5. Mô hình vận hành từ RFQ đến giao hàng</h2>
-<p>Mô hình vận hành cốt lõi của HESEM là theo từng cổng kiểm soát (stage-gate) từ RFQ đến Ship, với người chịu trách nhiệm rõ ở từng điểm quyết định và không được chuyển rủi ro giữa các phòng ban bằng giả định ngầm.</p>
-<div class="process-strip"><span class="pill">G0 Contract</span><span class="pill">G1 Engineering</span><span class="pill">G2 IQC</span><span class="pill">G3 Setup</span><span class="pill">G4 FAI</span><span class="pill">G5 IPQC</span><span class="pill">G6 Final <a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a></span><span class="pill">G7 Ship</span></div>
-<div class="ed-qms-block" data-qms-kind="actionTable" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="table-card"><table class="table" data-ed-autofit="balanced" data-ed-autofit-lock="0" data-qms-autofit="balanced"><colgroup><col style="width:13.71%"><col style="width:21.04%"><col style="width:22.28%"><col style="width:42.97%"></colgroup><thead><tr><th style="overflow-wrap:anywhere;word-break:break-word">Cổng kiểm soát</th><th style="overflow-wrap:anywhere;word-break:break-word">Mục tiêu</th><th style="overflow-wrap:anywhere;word-break:break-word">người chịu trách nhiệm chính</th><th style="overflow-wrap:anywhere;word-break:break-word">Điều kiện "đủ"</th></tr></thead><tbody><tr><td style="overflow-wrap:anywhere;word-break:break-word">G0</td><td style="overflow-wrap:anywhere;word-break:break-word">Nhận yêu cầu sạch, chấp nhận đơn hàng có cơ sở</td><td style="overflow-wrap:anywhere;word-break:break-word"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhân viên dịch vụ khách hàng)"><span class="entity-code role-code">CS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhân viên báo giá)"><span class="entity-code role-code">EST</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhân viên dịch vụ khách hàng)"><span class="entity-code role-code">CS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhân viên báo giá)"><span class="entity-code role-code">EST</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA[QMR]</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quản lý tài chính)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quản lý nhân sự)"><span class="entity-code role-code">HR</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)"><span class="entity-code role-code">EHS</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td><td style="overflow-wrap:anywhere;word-break:break-word">Có bản vẽ/spec/phiên bản tối thiểu, tính khả thi, Ngày đến hạn, source rủi ro, cert/gói hàng level đã rà soát.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">G1</td><td style="overflow-wrap:anywhere;word-break:break-word">Phát hành gói kỹ thuật sạch (<a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html" title="DFM Engineer (Kỹ sư DFM)"><span class="entity-code role-code">DFM</span></a>, CAM/NC, baseline)</td><td style="overflow-wrap:anywhere;word-break:break-word"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td style="overflow-wrap:anywhere;word-break:break-word">Bộ hồ sơ chuẩn (mốc chuẩn gói hàng), lộ trình gia công, NC/setup, kế hoạch kiểm soát, đo lường chiến lược, hiệu lực áp dụng rõ.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">G2</td><td style="overflow-wrap:anywhere;word-break:break-word">Kiểm tra đầu vào (IQC)</td><td style="overflow-wrap:anywhere;word-break:break-word"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phòng Chất lượng)"><span class="entity-code dept-code">D-QUAL</span></a></span></td><td style="overflow-wrap:anywhere;word-break:break-word">Nguyên vật liệu/cert đã xác minh, truy xuất nguồn gốc đủ, nhà cung cấp đạt.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">G3</td><td style="overflow-wrap:anywhere;word-break:break-word">Chuẩn bị máy, phát hành chương trình (Setup)</td><td style="overflow-wrap:anywhere;word-break:break-word"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)"><span class="entity-code dept-code">D-PROD</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td style="overflow-wrap:anywhere;word-break:break-word">Machine/tool/nguyên vật liệu/gage/con Người ready; phiếu setup, danh sách dao cụ đầy đủ.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">G4</td><td style="overflow-wrap:anywhere;word-break:break-word">Kiểm tra bài đầu tiên (FAI)</td><td style="overflow-wrap:anywhere;word-break:break-word"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phòng Chất lượng)"><span class="entity-code dept-code">D-QUAL</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)"><span class="entity-code dept-code">D-PROD</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td style="overflow-wrap:anywhere;word-break:break-word">Mẫu đầu (tiên chi tiết / sản phẩm) bằng chứng đủ, phát hành quyết định rõ.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">G5</td><td style="overflow-wrap:anywhere;word-break:break-word">Kiểm soát trong quá trình (IPQC)</td><td style="overflow-wrap:anywhere;word-break:break-word"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)"><span class="entity-code dept-code">D-PROD</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phòng Chất lượng)"><span class="entity-code dept-code">D-QUAL</span></a></span></td><td style="overflow-wrap:anywhere;word-break:break-word">Phiếu công nghệ, IPQC hồ sơ, SPC/năng lực khi áp dụng, bất thường/hold log đầy đủ.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">G6</td><td style="overflow-wrap:anywhere;word-break:break-word">Kiểm tra cuối, đóng gói (Final <a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a>)</td><td style="overflow-wrap:anywhere;word-break:break-word">Quality final + <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bộ phận Kho)"><span class="entity-code dept-code">D-WHS</span></a></span>/Hậu cần</td><td style="overflow-wrap:anywhere;word-break:break-word">Kiểm tra đầy đủ, bộ chứng từ chứng nhận đủ, số lượng/label/đối chiếu đóng gói đúng.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">G7</td><td style="overflow-wrap:anywhere;word-break:break-word">Phê duyệt giao hàng, đóng vòng dữ liệu &amp; bài học (Ship)</td><td style="overflow-wrap:anywhere;word-break:break-word">Quality + <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bộ phận Kho)"><span class="entity-code dept-code">D-WHS</span></a></span>/Hậu cần + Chủ quá trình + QMS</td><td style="overflow-wrap:anywhere;word-break:break-word">CoC/CoA đủ, phê duyệt giao hàng bàn giao, Hồ sơ công việc đóng, bài học kinh nghiệm/CAPA nếu cần.</td></tr></tbody></table></div></div></div>
-<p>Chi tiết ranh giới trách nhiệm ở các giao điểm khó phải đọc tại <a href="../../operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html" rel="noopener noreferrer">ANNEX-503</a> và gói đồng bộ cổng kiểm soát / MRR / thực thi tại <a href="../../operations/references/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html" rel="noopener noreferrer">ANNEX-502</a>.</p>
+<p>Kiến trúc hệ thống được tổ chức theo 4 lớp: (1) sổ tay / chính sách, (2) quy trình, (3) hướng dẫn thao tác, phụ lục(4) biểu mẫu. Mỗi lớp có vai trò riêng: định hướng, chuẩn hóa quá trình, hướng dẫn thực thi/tra cứu chuẩn, và tạo bằng chứng.</p>
+<div class="process-strip">
+<span class="pill">Tầng 1: Sổ tay/CHÍNH SÁCH</span>
+<span class="pill">Tầng 2: QUY TRÌNH</span>
+<span class="pill">Tầng 3: HƯỚNG DẪN THAO TÁC/ PHỤ LỤC</span>
+<span class="pill">Tầng 4: Biểu mẫu</span>
+</div>
+<p>Bản đồ quá trình chi tiết và ma trận ISO phải được đọc tại <a href="/operations/references/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-105-process-map-detailed.html" rel="noopener noreferrer">ANNEX-105</a> và <a href="/operations/references/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-106-iso9001-matrix-full.html" rel="noopener noreferrer">ANNEX-106</a>.</p>
+<div class="ed-qms-block" data-qms-kind="actionTable" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="table-card">
+<table class="table" data-ed-autofit="balanced" data-ed-autofit-lock="0" data-qms-autofit="balanced" style="width:100%;max-width:100%;min-width:0px;table-layout:fixed">
+<colgroup>
+<col style="width:19.65%">
+<col style="width:52.09%">
+<col style="width:28.26%">
+</colgroup>
+<thead>
+<tr>
+<th style="overflow-wrap:anywhere;word-break:break-word">Nhóm quá trình</th>
+<th style="overflow-wrap:anywhere;word-break:break-word">Mục tiêu điều hành</th>
+<th style="overflow-wrap:anywhere;word-break:break-word">Tài liệu dẫn chính</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Lãnh đạo và Hệ thống</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Thiết lập bối cảnh tổ chức, mục tiêu và quản trị rủi ro; kiểm soát thay đổi hệ thống; thực hiện đánh giá, xem xét lãnh đạo và cải tiến liên tục.</td>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">
+<a href="/operations/sops/01-SOP-100/sop-101-document-and-data-control.html" rel="noopener noreferrer">SOP-101</a>, <a href="/operations/sops/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html" rel="noopener noreferrer">SOP-102</a>, <a href="/operations/sops/01-SOP-100/sop-103-risk-opportunity-fmea-and-control-plan.html" rel="noopener noreferrer">SOP-103</a>, <a href="/operations/sops/09-SOP-900/sop-901-internal-audit-and-lpa.html" rel="noopener noreferrer">SOP-901</a>, <a href="/operations/sops/09-SOP-900/sop-902-management-review.html" rel="noopener noreferrer">SOP-902</a>, <a href="/operations/sops/09-SOP-900/sop-903-continual-improvement-and-kaizen.html" rel="noopener noreferrer">SOP-903</a>
+</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Khách hàng và Kỹ sư</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Làm rõ yêu cầu khách hàng, đánh giá tính khả thi, báo giá, phát hành kỹ thuật, FAI và quản lý thay đổi/khiếu nại khách hàng.</td>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">
+<a href="/operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html" rel="noopener noreferrer">SOP-201</a>, <a href="/operations/sops/02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html" rel="noopener noreferrer">SOP-202</a>, <a href="/operations/sops/02-SOP-200/sop-203-customer-property-control.html" rel="noopener noreferrer">SOP-203</a>, <a href="/operations/sops/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html" rel="noopener noreferrer">SOP-301</a>, <a href="/operations/sops/03-SOP-300/sop-302-first-article-inspection-fai.html" rel="noopener noreferrer">SOP-302</a>, <a href="/operations/sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html" rel="noopener noreferrer">SOP-303</a>
+</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Nguồn cung &amp; Sản xuất</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Quản lý nguồn cung, kho và lập kế hoạch sản xuất; triển khai gia công CNC, xử lý công đoạn đặc biệt, hoàn thiện bề mặt, bảo trì và chuẩn bị giao hàng.</td>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:col-resize">
+<a href="/operations/sops/04-SOP-400/sop-401-supplier-control-and-special-process.html" rel="noopener noreferrer">SOP-401</a>, <a href="/operations/sops/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html" rel="noopener noreferrer">SOP-402</a>, <a href="/operations/sops/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html" rel="noopener noreferrer">SOP-501</a>–<a href="/operations/sops/05-SOP-500/sop-505-finishing-deburr-and-secondary-operations-control.html" rel="noopener noreferrer">SOP-505</a>, <a href="/operations/sops/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html" rel="noopener noreferrer">SOP-701</a>
+</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:col-resize">Chất lượng &amp; Đo lường</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Lập kế hoạch chất lượng, đo lường và kiểm soát quá trình; triển khai MSA, SPC, NCR/CAPA và phê duyệt xuất hàng cuối cùng.</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<a href="/operations/sops/06-SOP-600/sop-601-calibration-and-gage-control.html" rel="noopener noreferrer">SOP-601</a>–<a href="/operations/sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html" rel="noopener noreferrer">SOP-606</a>, <a href="/operations/sops/07-SOP-700/sop-703-product-safety-conformity-and-fod-prevention.html" rel="noopener noreferrer">SOP-703</a>, <a href="/operations/sops/08-SOP-800/sop-804-human-factors-and-error-proofing.html" rel="noopener noreferrer">SOP-804</a>
+</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:col-resize">Năng lực &amp; Nền tảng số</td>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Phát triển năng lực nhân sự, truyền đạt nội bộ, quản trị dữ liệu và quyền truy cập; đảm bảo tính liên tục và an toàn của nền tảng số.</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<a href="/operations/sops/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html" rel="noopener noreferrer">SOP-104</a>, <a href="/operations/sops/01-SOP-100/sop-105-organizational-knowledge-management.html" rel="noopener noreferrer">SOP-105</a>, <a href="/operations/sops/01-SOP-100/sop-106-change-and-configuration-management.html" rel="noopener noreferrer">SOP-106</a>, <a href="/operations/sops/01-SOP-100/sop-107-communication-management.html" rel="noopener noreferrer">SOP-107</a>, <a href="/operations/sops/01-SOP-100/sop-108-operational-contingency-plan.html" rel="noopener noreferrer">SOP-108</a>, <a href="/operations/sops/08-SOP-800/sop-801-competence-training-and-certification.html" rel="noopener noreferrer">SOP-801</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<h2 class="h2" id="m5">5. Mô hình vận hành từ báo giá đến giao hàng</h2>
+<p>Mô hình vận hành cốt lõi của HESEM là theo từng cổng kiểm soát từ báo giá đến giao hàng, với người chịu trách nhiệm rõ ở từng điểm quyết định và không được chuyển rủi ro giữa các phòng ban bằng giả định ngầm.</p>
+<div class="process-strip">
+<span class="pill">G0 Contract</span>
+<span class="pill">G1 Engineering</span>
+<span class="pill">G2 IQC</span>
+<span class="pill">G3 Setup</span>
+<span class="pill">G4 FAI</span>
+<span class="pill">G5 IPQC</span>
+<span class="pill">G6 OQC</span>
+<span class="pill">G7 Ship</span>
+</div>
+<div class="ed-qms-block" data-qms-kind="actionTable" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="table-card">
+<table class="table" data-ed-autofit="fixed" data-ed-autofit-lock="1" data-qms-autofit="balanced" style="width:100%;max-width:100%;min-width:0px;table-layout:fixed">
+<colgroup>
+<col style="width:9.18%">
+<col style="width:21.54%">
+<col style="width:30.05%">
+<col style="width:39.23%">
+</colgroup>
+<thead>
+<tr>
+<th style="overflow-wrap:anywhere;word-break:break-word">Cổng kiểm soát</th>
+<th style="overflow-wrap:anywhere;word-break:break-word">Mục tiêu</th>
+<th style="overflow-wrap:anywhere;word-break:break-word;cursor:col-resize">người chịu trách nhiệm chính</th>
+<th style="overflow-wrap:anywhere;word-break:break-word">Điều kiện "đủ"</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">G0</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Nhận yêu cầu sạch, chấp nhận đơn hàng có cơ sở</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<span class="entity-cluster role-cluster">
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhân viên dịch vụ khách hàng)" rel="noopener noreferrer">
+<span class="entity-code role-code">CS</span>
+</a>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhân viên báo giá)" rel="noopener noreferrer">
+<span class="entity-code role-code">EST</span>
+</a>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)" rel="noopener noreferrer">
+<span class="entity-code role-code">PD</span>
+</a>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)" rel="noopener noreferrer">
+<span class="entity-code role-code">ENGM</span>
+</a>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Trưởng bộ phận đảm bảo chất lượng)" rel="noopener noreferrer">
+<span class="entity-code role-code">QA[QMR]</span>
+</a>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)" rel="noopener noreferrer">
+<span class="entity-code role-code">SCM</span>
+</a>
+<span class="entity-sep role-sep">
+<br>
+</span>
+</span>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Có bản vẽ đúng phiên bản, yêu cầu kỹ thuật rõ ràng, vật liệu xác định đầy đủ, thời gian giao hàng khả thi và năng lực sản xuất đáp ứng yêu cầu.</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">G1</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Phát hành đầy đủ hồ sơ phục vụ sản xuất đúng phiên bản.</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<span class="entity-cluster role-cluster">
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-ENG</span>
+</a>
+</span>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Chương trình NC và sách hướng dẫn đúng phiên bản và lưu đúng vị trí, danh sách dao cụ, kế hoạch kiểm soát và tiêu chuẩn đo lường.</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">G2</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Kiểm tra đầu vào (IQC)</td>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:col-resize">
+<span class="entity-cluster role-cluster">
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="SC Function (Bộ phận Cung Ứng)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-SCM</span>
+</a>
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phòng Chất lượng)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-QUAL</span>
+</a>
+</span>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Nguyên vật liệu đúng yêu cầu kỹ thuật, chứng từ đầy đủ, truy xuất nguồn gốc rõ ràng và đạt kiểm tra đầu vào.</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">G3</td>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Đảm bảo máy móc, dao cụ và điều kiện sản xuất sẵn sàng</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<span class="entity-cluster role-cluster">
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-PROD</span>
+</a>
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-ENG</span>
+</a>
+</span>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Máy móc sẵn sàng, dao cụ đúng yêu cầu, sách hướng dẫn và chương trình NC đúng phiên bản, dụng cụ đo đầy đủ.</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">G4</td>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:col-resize">Xác nhận sản phẩm đầu tiên đạt yêu cầu trước khi sản xuất hàng loạt (FAI)</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<span class="entity-cluster role-cluster">
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phòng Chất lượng)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-QUAL</span>
+</a>
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-PROD</span>
+</a>
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-ENG</span>
+</a>
+</span>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Kích thước và ngoại quan đạt yêu cầu, dữ liệu đo đầy đủ và kết quả kiểm tra sản phẩm đầu tiên được phê duyệt.</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">G5</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Duy trì sự ổn định của quá trình gia công(IPQC)</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<span class="entity-cluster role-cluster">
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-PROD</span>
+</a>
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phòng Chất lượng)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-QUAL</span>
+</a>
+</span>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Có ghi nhận kiểm tra theo quy định, dữ liệu kiểm soát quá trình đầy đủ và các bất thường đã được xử lý, lưu hồ sơ.</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">G6</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Đảm bảo thành phẩm đạt yêu cầu trước khi giao hàng (FQC)</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<span class="entity-cluster role-cluster">
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phòng Chất lượng)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-QUAL</span>
+</a>
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="SC Function (Bộ phận Cung Ứng)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-SCM</span>
+</a>
+</span>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Thành phẩm đạt kiểm tra cuối, số lượng đúng, nhãn nhận diện chính xác, đóng gói đúng yêu cầu và chứng từ đầy đủ.</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">G7</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Hoàn tất giao hàng và lưu trữ hồ sơ truy xuất</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<span class="entity-cluster role-cluster">
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phòng Chất lượng)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-QUAL</span>
+</a>
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="SC Function (Bộ phận Cung Ứng)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-SCM</span>
+</a>
+</span>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Hồ sơ chứng nhận đầy đủ, dữ liệu truy xuất được lưu trữ hoàn chỉnh và các hành động khắc phục/phòng ngừa được cập nhật khi cần.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Chi tiết ranh giới trách nhiệm ở các giao điểm khó phải đọc tại <a href="/operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html" rel="noopener noreferrer">ANNEX-503</a> và gói đồng bộ cổng kiểm soát / MRR / thực thi tại <a href="/operations/references/05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html" rel="noopener noreferrer">ANNEX-502</a>.</p>
 <h2 class="h2" id="m6">6. Cơ chế kiểm soát trọng yếu</h2>
-<div class="grid-3"><div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="card"><div class="card-title">1. Hợp đồng &amp; giả định control</div><ul class="tight"><li>Không phát hành nội bộ khi hợp đồng, phiên bản, cert/pack yêu cầu hoặc due-date còn mơ hồ</li><li>giả định phải được ghi nhận, có người chịu trách nhiệm và Ngày đóng</li><li>Customer thay đổi sau cam kết phải qua tác động rà soát</li></ul></div></div></div><div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="card"><div class="card-title">2. Bộ hồ sơ chuẩn &amp; cấu hình control</div><ul class="tight"><li>Một job/phiên bản chỉ có một bộ hồ sơ chuẩn dùng tại điểm thực thi</li><li>thay thế / bãi bỏ/rút / thu hồi phải có hiệu lực áp dụng và Point-of-use bị ảnh hưởng</li><li>Không cho phép sản xuất dùng song song file cũ-mới ngoài kiểm soát</li></ul></div></div></div><div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="card"><div class="card-title">3. Mức sẵn sàng trước khi chạy</div><ul class="tight"><li>Không chạy khi thiếu machine/tool/fixture/nguyên vật liệu/gage/năng lực/trạng thái cổng kiểm soát</li><li>Mẫu đầu và chuyển giao xác nhận phải để lại bằng chứng</li><li><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Điều độ sản xuất)"><span class="entity-code role-code">PPL</span></a></span> không được dùng điều phối xuất hàng để che năng lực / khả năng gap</li></ul></div></div></div></div>
-<div class="grid-3"><div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="card"><div class="card-title">4. Cổng kiểm soát tính toàn vẹn &amp; đo lường tin cậy</div><ul class="tight"><li>Hold/phát hành là quyết định có bằng chứng và thẩm quyền</li><li>Tài sản đo không hợp lệ phải bị hold cùng với tác động đánh giá</li><li>SPC/phản ứng plan phải được dùng, không chỉ lưu cho đẹp</li></ul></div></div></div><div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="card"><div class="card-title">5. Truy xuất nguồn gốc &amp; tài liệu</div><ul class="tight"><li>Part/lot/số sê-ri/nguyên vật liệu/quy trình cert/kiểm tra/bộ hồ sơ giao hàng (ship gói hồ sơ) phải truy ngược được</li><li>PHẢI ghi nhận ngay tại thời điểm thực hiện; trạng thái "đã làm nhưng quên ghi" không được xem là bình thường</li><li>Hồ sơ công việc phải đủ để tái dựng quyết định chính</li></ul></div></div></div><div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="card"><div class="card-title">6. Sản phẩm an toàn, FOD, con Người yếu tố</div><ul class="tight"><li>An toàn/sự phù hợp/FOD là kiểm soát hệ thống, không phải khẩu hiệu</li><li>con Người yếu tố phải được dùng để thiết kế lỗi-kiểm chứng / soát lỗi, mỏi (mỏi (fatigue) nhận thức và stop-công việc quyết định</li><li>mãn tính / kéo dài vấn đề phải đi vào CAPA / bài học kinh nghiệm</li></ul></div></div></div></div>
+<div class="grid-3">
+<div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="card">
+<div class="card-title">1. Kiểm soát yêu cầu khách hàng</div>
+<ul class="tight">
+<li>Không phát hành khi yêu cầu/bản vẽ/phiên bản chưa rõ
+</li>
+<li>
+Mọi giả định phải được ghi nhận và phê duyệt
+</li>
+<li>
+Thay đổi khách hàng phải đánh giá tác động</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="card">
+<div class="card-title">2. Kiểm soát hồ sơ sản xuất</div>
+<ul class="tight">
+<li>Mỗi mã hàng chỉ dùng một bộ hồ sơ chuẩn
+</li>
+<li>
+Tài liệu thay đổi phải cập nhật đầy đủ
+</li>
+<li>
+Không dùng song song file cũ – mới ngoài kiểm soát</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="card">
+<div class="card-title">3. Xác nhận sẵn sàng sản xuất</div>
+<ul class="tight">
+<li>Không chạy khi thiếu máy, dao, đồ gá, vật tư, dụng cụ đo hoặc nhân lực
+</li>
+<li>
+Mẫu đầu và chuyển giao phải có xác nhận
+</li>
+<li>
+Không dùng kế hoạch giao hàng để che thiếu năng lực&nbsp;</li>
+<h3>
+</h3>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="grid-3">
+<div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="card">
+<div class="card-title">4. Kiểm soát chất lượng &amp; dữ liệu</div>
+<ul class="tight">
+<li>Hold/release phải có bằng chứng và đúng thẩm quyền
+</li>
+<li>
+Hàng lỗi phải được cách ly và xử lý rõ ràng
+</li>
+<li>
+SPC và kế hoạch phản ứng phải được áp dụng thực tế</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="card">
+<div class="card-title">5. Truy xuất nguồn gốc &amp; hồ sơ</div>
+<ul class="tight">
+<li>Truy xuất được vật liệu, công đoạn, kiểm tra và giao hàng
+</li>
+<li>
+Ghi nhận dữ liệu tại thời điểm thực hiện
+</li>
+<li>
+Hồ sơ phải đủ cho điều tra và truy xuất lại</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="card">
+<div class="card-title">6. An toàn sản phẩm &amp; yếu tố con người</div>
+<ul class="tight">
+<li>An toàn sản phẩm và FOD phải được kiểm soát hệ thống
+</li>
+<li>
+Xem xét yếu tố con người và mệt mỏi khi vận hành
+</li>
+<li>
+Vấn đề lặp lại phải đưa vào CAPA và bài học kinh nghiệm</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
 <h2 class="h2" id="m7">7. Đo lường, truy xuất nguồn gốc và bằng chứng phù hợp</h2>
-<p>HESEM xem hồ sơ không chỉ là yêu cầu lưu hồ sơ mà là cấu phần của quyết định. Một quyết định phát hành, quyết định xử lý, ship, thay đổi hay đóng job chỉ hợp lệ khi có bộ bằng chứng tối thiểu được xác định rõ.</p>
-<div class="ed-qms-block" data-qms-kind="actionTable" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="table-card"><table class="table" data-ed-autofit="balanced" data-ed-autofit-lock="0" data-qms-autofit="balanced"><colgroup><col style="width:25.85%"><col style="width:52.13%"><col style="width:22.02%"></colgroup><thead><tr><th style="overflow-wrap:anywhere;word-break:break-word">Loại quyết định</th><th style="overflow-wrap:anywhere;word-break:break-word">Evidence tối thiểu</th><th style="overflow-wrap:anywhere;word-break:break-word">Nguồn chuẩn</th></tr></thead><tbody><tr><td style="overflow-wrap:anywhere;word-break:break-word">Đơn hàng acceptance / rà soát hợp đồng</td><td style="overflow-wrap:anywhere;word-break:break-word">RFQ/PO, yêu cầu đã được rà soát, giả định, nội bộ xác nhận phê duyệt, khách hàng xác nhận</td><td style="overflow-wrap:anywhere;word-break:break-word"><a download="" href="../../forms/frm-200-purchase/FRM-201_RFQ_Register.xlsx" rel="noopener noreferrer">FRM-201</a> / <a download="" href="../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx" rel="noopener noreferrer">FRM-202</a></td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Phát hành kỹ thuật</td><td style="overflow-wrap:anywhere;word-break:break-word">Phiên bản nguồn, lộ trình gia công, NC/setup, hiệu lực áp dụng, control/kiểm tra logic, lịch sử thay đổi</td><td style="overflow-wrap:anywhere;word-break:break-word"><a href="../../operations/sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html" rel="noopener noreferrer">SOP-303</a> / <a download="" href="../../forms/frm-100-sales/FRM-161_ECR_ECO.xlsx" rel="noopener noreferrer">FRM-161</a></td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Mức sẵn sàng sản xuất / mẫu đầu</td><td style="overflow-wrap:anywhere;word-break:break-word">Điều phối, nguyên vật liệu trạng thái, machine/tool/fixture trạng thái, hồ sơ thiết lập, mẫu đầu bằng chứng, trạng thái cổng kiểm soát</td><td style="overflow-wrap:anywhere;word-break:break-word"><a download="" href="../../forms/frm-500-production/FRM-501_Planning_Release_Checklist.xlsx" rel="noopener noreferrer">FRM-501</a> / <a download="" href="../../forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx" rel="noopener noreferrer">FRM-511</a></td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">NCR / CAPA / khiếu nại quyết định xử lý</td><td style="overflow-wrap:anywhere;word-break:break-word">Ngăn chặn, phả hệ truy xuất, nguyên nhân gốc, hành động, xác minh, khách hàng truyền đạt / giao tiếp ở đâu / nơi nào cần thiết</td><td style="overflow-wrap:anywhere;word-break:break-word"><a download="" href="../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx" rel="noopener noreferrer">FRM-651</a> / <a download="" href="../../forms/frm-600-inspection/FRM-652_CAPA_8D_Report.xlsx" rel="noopener noreferrer">FRM-652</a> / <a download="" href="../../forms/frm-200-purchase/FRM-211_Complaint_Log.xlsx" rel="noopener noreferrer">FRM-211</a></td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Phê duyệt giao hàng cuối cùng</td><td style="overflow-wrap:anywhere;word-break:break-word">Kiểm tra cuối, bộ chứng từ chứng nhận, CoC/CoA, đối chiếu đóng gói, label/số lượng xác nhận</td><td style="overflow-wrap:anywhere;word-break:break-word"><a download="" href="../../forms/frm-600-inspection/FRM-642_Final_Inspection_and_CoC_Register.xlsx" rel="noopener noreferrer">FRM-642</a> / <a href="../../operations/work-instructions/02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html" rel="noopener noreferrer">WI-206</a></td></tr></tbody></table></div></div></div>
-<p>Cấu trúc hồ sơ công việc và bằng chứng đánh giá chủ / gốc được chuẩn hóa tại <a href="../../operations/work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html" rel="noopener noreferrer">WI-203</a> và <a href="../../operations/references/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-107-audit-evidence-pack-master.html" rel="noopener noreferrer">ANNEX-107</a>.</p>
-<h2 class="h2" id="m8">8. Governance nhà cung cấp và công đoạn ngoài</h2>
-<p>HESEM giữ trách nhiệm cuối cùng với khách hàng kể cả khi một phần hoạt động được thực hiện bởi nhà cung cấp hoặc Người xử lý bên ngoài. Vì vậy QMS yêu cầu không chỉ đánh giá nguồn mà còn phải luồng-xuống / Từng đúng, nhận hàng đúng, kiểm tra đúng và giữ hồ sơ đúng.</p>
-<div class="ed-qms-block" data-qms-kind="actionTable" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="table-card"><table class="table" data-ed-autofit="balanced" data-ed-autofit-lock="0" data-qms-autofit="balanced"><colgroup><col style="width:31.62%"><col style="width:68.38%"></colgroup><thead><tr><th style="overflow-wrap:anywhere;word-break:break-word">Khối kiểm soát</th><th style="overflow-wrap:anywhere;word-break:break-word">Điểm bắt buộc</th></tr></thead><tbody><tr><td style="overflow-wrap:anywhere;word-break:break-word">Đã phê duyệt source &amp; nhà cung cấp rủi ro</td><td style="overflow-wrap:anywhere;word-break:break-word">Nguồn phải được đánh giá và phân tầng theo <a href="../../operations/references/04-ANNEX-400/annex-401-supplier-risk-model-and-scorecard-method.html" rel="noopener noreferrer">ANNEX-401</a>; source mới hoặc source tạm phải có rủi ro quyết định.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Outsource / công đoạn đặc biệt pack</td><td style="overflow-wrap:anywhere;word-break:break-word">PO và gói gửi ngoài phải mang đủ bản vẽ/rev/spec/cert/đóng gói/trả lại điều kiện theo <a href="../../operations/references/04-ANNEX-400/annex-402-outsource-special-process-pack.html" rel="noopener noreferrer">ANNEX-402</a>.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Nhận hàng &amp; truy xuất nguồn gốc</td><td style="overflow-wrap:anywhere;word-break:break-word">Lot/mẻ nấu (mẻ nấu (heat)/cert/số lượng/gói hàng điều kiện phải được kiểm tra, trạng thái rõ, và put-cách xa / rời theo <a href="../../operations/work-instructions/07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html" rel="noopener noreferrer">WI-701</a> / <a href="../../operations/work-instructions/07-WI-700/wi-702-storage-environment-location-and-fifo-control.html" rel="noopener noreferrer">WI-702</a>.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Supplier phản hồi &amp; khắc phục vòng lặp</td><td style="overflow-wrap:anywhere;word-break:break-word">Vấn đề chất lượng, chậm giao, sai chứng từ, đóng gói hư hỏng phải đi vào thẻ điểm (bảng điểm) và hành động theo dõi tiếp chứ không xử lý rời rạc.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Lô giao hàng đối soát</td><td style="overflow-wrap:anywhere;word-break:break-word">Giao hàng là một đối soát cuối: part, qty, label, cert, pack, lộ trình gia công hướng dẫn và ship phương pháp phải khớp theo <a href="../../operations/references/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html" rel="noopener noreferrer">ANNEX-701</a>.</td></tr></tbody></table></div></div></div>
+<p>HESEM xem hồ sơ không chỉ để lưu trữ mà là cơ sở cho mọi quyết định vận hành.<br>
+Mọi quyết định phát hành, xử lý, giao hàng hoặc thay đổi công việc đều phải có bằng chứng phù hợp và truy xuất được.</p>
+<div class="ed-qms-block" data-qms-kind="actionTable" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="table-card">
+<table class="table" data-ed-autofit="balanced" data-ed-autofit-lock="0" data-qms-autofit="balanced" style="width:100%;max-width:100%;min-width:0px;table-layout:fixed">
+<colgroup>
+<col style="width:25.16%">
+<col style="width:50.88%">
+<col style="width:23.96%">
+</colgroup>
+<thead>
+<tr>
+<th style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Loại quyết định</th>
+<th style="overflow-wrap:anywhere;word-break:break-word">Evidence tối thiểu</th>
+<th style="overflow-wrap:anywhere;word-break:break-word">Nguồn chuẩn</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Xem xét đơn hàng</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">RFQ/PO, bản vẽ và yêu cầu kỹ thuật đã rà soát, xác nhận nội bộ và xác nhận khách hàng khi cần</td>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">
+<a download="" href="/forms/frm-200-purchase/FRM-201_RFQ_Register.xlsx" rel="noopener noreferrer">FRM-201</a> / <a download="" href="/forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx" rel="noopener noreferrer">FRM-202</a>
+</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Phát hành hồ sơ kỹ thuật</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Phiên bản tài liệu đúng, quy trình gia công, chương trình NC/setup, kế hoạch kiểm soát và lịch sử thay đổi</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<a href="/operations/sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html" rel="noopener noreferrer">SOP-303</a> / <a download="" href="/forms/frm-100-sales/FRM-161_ECR_ECO.xlsx" rel="noopener noreferrer">FRM-161</a>
+</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Xác nhận sẵn sàng sản xuất</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Tình trạng vật liệu, máy móc, dao cụ, đồ gá, dụng cụ đo, hồ sơ setup và kết quả mẫu đầu</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<a download="" href="/forms/frm-500-production/FRM-501_Planning_Release_Checklist.xlsx" rel="noopener noreferrer">FRM-501</a> / <a download="" href="/forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx" rel="noopener noreferrer">FRM-511</a>
+</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">Xử lý NCR/CAPA/khiếu nại</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Thông tin ngăn chặn, truy xuất nguồn gốc, nguyên nhân gốc, hành động khắc phục và xác nhận hiệu lực</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<a download="" href="/forms/frm-600-inspection/FRM-651_NCR_Report.xlsx" rel="noopener noreferrer">FRM-651</a> / <a download="" href="/forms/frm-600-inspection/FRM-652_CAPA_8D_Report.xlsx" rel="noopener noreferrer">FRM-652</a> / <a download="" href="/forms/frm-200-purchase/FRM-211_Complaint_Log.xlsx" rel="noopener noreferrer">FRM-211</a>
+</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">Phê duyệt giao hàng</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Kết quả kiểm tra cuối, chứng từ chất lượng, CoC/CoA, xác nhận đóng gói, nhãn và số lượng</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<a download="" href="/forms/frm-600-inspection/FRM-642_Final_Inspection_and_CoC_Register.xlsx" rel="noopener noreferrer">FRM-642</a> / <a href="/operations/work-instructions/02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html" rel="noopener noreferrer">WI-206</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Cấu trúc hồ sơ công việc và bằng chứng đánh giá chủ / gốc được chuẩn hóa tại <a href="/operations/work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html" rel="noopener noreferrer">WI-203</a> và <a href="/operations/references/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-107-audit-evidence-pack-master.html" rel="noopener noreferrer">ANNEX-107</a>.</p>
+<h2 class="h2" id="m8">8. Quản trị nhà cung cấp và công đoạn thuê ngoài</h2>
+<p>HESEM chịu trách nhiệm với khách hàng đối với toàn bộ sản phẩm, kể cả khi một phần công việc được thực hiện bởi nhà cung cấp hoặc đơn vị gia công bên ngoài.<br>
+Mọi hoạt động thuê ngoài phải được đánh giá, kiểm soát, truy xuất và lưu hồ sơ đầy đủ.</p>
+<div class="ed-qms-block" data-qms-kind="actionTable" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="table-card">
+<table class="table" data-ed-autofit="balanced" data-ed-autofit-lock="0" data-qms-autofit="balanced" style="width:100%;max-width:100%;min-width:0px;table-layout:fixed">
+<colgroup>
+<col style="width:28.76%">
+<col style="width:71.24%">
+</colgroup>
+<thead>
+<tr>
+<th style="overflow-wrap:anywhere;word-break:break-word">Khối kiểm soát</th>
+<th style="overflow-wrap:anywhere;word-break:break-word">Điểm bắt buộc</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Phê duyệt nhà cung cấp</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Nhà cung cấp phải được đánh giá, phân loại và phê duyệt theo quy định; nguồn mới hoặc nguồn tạm thời phải được kiểm soát rủi ro trước khi sử dụng theo <a href="/operations/references/04-ANNEX-400/annex-401-supplier-risk-model-and-scorecard-method.html" rel="noopener noreferrer">ANNEX-401</a></td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">Kiểm soát công đoạn thuê ngoài</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Hồ sơ gửi gia công phải đầy đủ bản vẽ, phiên bản, yêu cầu kỹ thuật, chứng từ, yêu cầu đóng gói và điều kiện giao nhận theo <a href="/operations/references/04-ANNEX-400/annex-402-outsource-special-process-pack.html" rel="noopener noreferrer">ANNEX-402</a>.</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Nhận hàng và truy xuất nguồn gốc</td><td style="overflow-wrap:anywhere;word-break:break-word">Kiểm tra đầy đủ lot, chứng từ, số lượng, tình trạng hàng hóa và khả năng truy xuất trước khi nhập kho hoặc đưa vào sản xuất theo <a href="/operations/work-instructions/07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html" rel="noopener noreferrer">WI-701</a> / <a href="/operations/work-instructions/07-WI-700/wi-702-storage-environment-location-and-fifo-control.html" rel="noopener noreferrer">WI-702</a>.</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">Theo dõi chất lượng nhà cung cấp</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Các vấn đề về chất lượng, giao hàng hoặc chứng từ phải được ghi nhận, theo dõi và thực hiện hành động khắc phục phù hợp.</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">Kiểm soát giao hàng</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Thành phẩm giao hàng phải đúng mã hàng, số lượng, nhãn nhận diện, chứng từ, yêu cầu đóng gói và điều kiện giao hàng theo <a href="/operations/references/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html" rel="noopener noreferrer">ANNEX-701</a>.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
 <h2 class="h2" id="m9">9. Năng lực, lãnh đạo và cải tiến</h2>
-<p>Lãnh đạo chịu trách nhiệm duy trì tính toàn vẹn của QMS, cung cấp nguồn lực và giải quyết các nghề / thương mại-off giữa chất lượng, giao hàng, chi phí và tốc độ trên cơ sở dữ liệu, không trên cảm tính. Các quản lý tuyến đầu chịu trách nhiệm duy trì standard công việc, mức sẵn sàng, stop-công việc kỷ luật / chuyên ngành và kèm cặp phát triển (huấn luyện) tại điểm thực thi.</p>
-<div class="ed-qms-block" data-qms-kind="riskTable" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="table-card"><table class="table" data-ed-autofit="balanced" data-ed-autofit-lock="0" data-qms-autofit="balanced"><colgroup><col style="width:30.42%"><col style="width:69.58%"></colgroup><thead><tr><th style="overflow-wrap:anywhere;word-break:break-word">Khối vai trò</th><th style="overflow-wrap:anywhere;word-break:break-word">Trách nhiệm trọng yếu</th></tr></thead><tbody><tr><td style="overflow-wrap:anywhere;word-break:break-word"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tổng Giám đốc)"><span class="entity-code role-code">CEO</span></a></span></td><td style="overflow-wrap:anywhere;word-break:break-word">Thiết lập định hướng, ưu tiên rủi ro, phê duyệt thay đổi lớn, rà hiệu lực hệ thống qua MR và bảo đảm nguồn lực.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA[QMR]</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quản lý tài chính)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quản lý nhân sự)"><span class="entity-code role-code">HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)"><span class="entity-code role-code">EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td><td style="overflow-wrap:anywhere;word-break:break-word">Giữ ranh giới quyết định, KPI, bố trí Người thay thế, năng lực đội ngũ và chất lượng bàn giao liên phòng ban.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhân viên dịch vụ khách hàng)"><span class="entity-code role-code">CS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhân viên báo giá)"><span class="entity-code role-code">EST</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="entity-code role-code">ENGM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA[QMR]</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)"><span class="entity-code role-code">SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quản lý tài chính)"><span class="entity-code role-code">FIN</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quản lý nhân sự)"><span class="entity-code role-code">HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)"><span class="entity-code role-code">EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td><td style="overflow-wrap:anywhere;word-break:break-word">Định nghĩa quy trình, đầu vào/đầu ra, cổng kiểm soát, bằng chứng và dữ liệu, đồng thời điều chỉnh quy trình khi có bài học/cải tiến.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bộ phận quản trị ERP)"><span class="entity-code dept-code">D-ERP</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phòng Nhân sự)"><span class="entity-code dept-code">D-HR</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phòng EHS)"><span class="entity-code dept-code">D-EHS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-finance-handbook.html" title="Finance Department (Phòng Tài chính)"><span class="entity-code dept-code">D-FIN</span></a></span></td><td style="overflow-wrap:anywhere;word-break:break-word">Giữ điều kiện nền để hệ thống vận hành an toàn, đúng dữ liệu, đúng Người và đúng phân quyền.</td></tr></tbody></table></div></div></div>
-<p>Năng lực được quản lý theo <a href="../../operations/sops/08-SOP-800/sop-801-competence-training-and-certification.html" rel="noopener noreferrer">SOP-801</a>, <a href="../../operations/references/08-ANNEX-800/annex-801-competency-levels-and-certification-rules.html" rel="noopener noreferrer">ANNEX-801</a> và bố trí Người thay thế tại <a href="../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html" rel="noopener noreferrer">ANNEX-123</a>. Improvement liên tục được kích hoạt qua dữ liệu KPI, NCR/CAPA, đánh giá, xem xét của lãnh đạo và kaizen theo <a href="../../operations/sops/09-SOP-900/sop-903-continual-improvement-and-kaizen.html" rel="noopener noreferrer">SOP-903</a>.</p>
+<p>Lãnh đạo chịu trách nhiệm duy trì hiệu lực QMS, cung cấp nguồn lực và ra quyết định dựa trên dữ liệu nhằm cân bằng chất lượng, giao hàng, chi phí và năng lực sản xuất.<br>
+Quản lý các cấp chịu trách nhiệm duy trì tiêu chuẩn công việc, đào tạo, giám sát thực hiện và thúc đẩy cải tiến liên tục tại hiện trường.</p>
+<div class="ed-qms-block" data-qms-kind="riskTable" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="table-card">
+<table class="table" data-ed-autofit="balanced" data-ed-autofit-lock="0" data-qms-autofit="balanced" style="width:100%;max-width:100%;min-width:0px;table-layout:fixed">
+<colgroup>
+<col style="width:34.91%">
+<col style="width:65.09%">
+</colgroup>
+<thead>
+<tr>
+<th style="overflow-wrap:anywhere;word-break:break-word">Khối vai trò</th>
+<th style="overflow-wrap:anywhere;word-break:break-word">Trách nhiệm trọng yếu</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<span class="entity-cluster role-cluster">
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tổng Giám đốc)" rel="noopener noreferrer">
+<span class="entity-code role-code">CEO</span>
+</a>
+</span>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:col-resize">Định hướng hệ thống, phê duyệt thay đổi trọng yếu, ưu tiên rủi ro và bảo đảm nguồn lực vận hành.</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:col-resize">
+<span class="entity-cluster role-cluster">
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)" rel="noopener noreferrer">
+<span class="entity-code role-code">PD</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)" rel="noopener noreferrer">
+<span class="entity-code role-code">ENGM</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Trưởng bộ phận đảm bảo chất lượng)" rel="noopener noreferrer">
+<span class="entity-code role-code">QA[QMR]</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)" rel="noopener noreferrer">
+<span class="entity-code role-code">SCM</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quản lý tài chính)" rel="noopener noreferrer">
+<span class="entity-code role-code">FIN</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quản lý nhân sự)" rel="noopener noreferrer">
+<span class="entity-code role-code">HR</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)" rel="noopener noreferrer">
+<span class="entity-code role-code">EHS</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)" rel="noopener noreferrer">
+<span class="entity-code role-code">ITA</span>
+</a>
+</span>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Ban lãnh đạo: Quản lý KPI, năng lực đội ngũ, phối hợp liên phòng ban và bảo đảm chất lượng bàn giao công việc.</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">
+<span class="entity-cluster role-cluster">
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhân viên dịch vụ khách hàng)" rel="noopener noreferrer">
+<span class="entity-code role-code">CS</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhân viên báo giá)" rel="noopener noreferrer">
+<span class="entity-code role-code">EST</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)" rel="noopener noreferrer">
+<span class="entity-code role-code">PD</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)" rel="noopener noreferrer">
+<span class="entity-code role-code">ENGM</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager [Quality Management Representative] (Trưởng bộ phận đảm bảo chất lượng)" rel="noopener noreferrer">
+<span class="entity-code role-code">QA[QMR]</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html" title="Supply Chain Manager (Quản lý chuỗi cung ứng)" rel="noopener noreferrer">
+<span class="entity-code role-code">SCM</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html" title="Finance Manager (Quản lý tài chính)" rel="noopener noreferrer">
+<span class="entity-code role-code">FIN</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html" title="HR Manager (Quản lý nhân sự)" rel="noopener noreferrer">
+<span class="entity-code role-code">HR</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/09-JD-EHS/jd-ehs-specialist.html" title="EHS Specialist (Chuyên viên EHS)" rel="noopener noreferrer">
+<span class="entity-code role-code">EHS</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)" rel="noopener noreferrer">
+<span class="entity-code role-code">ITA</span>
+</a>
+</span>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Chủ quá trình:&nbsp;Xây dựng và duy trì quy trình, tiêu chuẩn, dữ liệu kiểm soát và cải tiến sau các bài học thực tế.</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<span class="entity-cluster role-cluster">
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-IT</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bộ phận quản trị ERP)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-ERP</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-hr-handbook.html" title="Human Resources Department (Phòng Nhân sự)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-HR</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-ehs-handbook.html" title="EHS Department (Phòng EHS)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-EHS</span>
+</a>
+<span class="entity-sep role-sep">/</span>
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-finance-handbook.html" title="Finance Department (Phòng Tài chính)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-FIN</span>
+</a>
+</span>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Khối hỗ trợ hệ thống:&nbsp;Bảo đảm hệ thống CNTT, ERP, nhân sự, tài chính và EHS vận hành ổn định, đúng dữ liệu và đúng phân quyền.</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Năng lực được quản lý theo <a href="/operations/sops/08-SOP-800/sop-801-competence-training-and-certification.html" rel="noopener noreferrer">SOP-801</a>, <a href="/operations/references/08-ANNEX-800/annex-801-competency-levels-and-certification-rules.html" rel="noopener noreferrer">ANNEX-801</a> và bố trí Người thay thế tại <a href="/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html" rel="noopener noreferrer">ANNEX-123</a>. Improvement liên tục được kích hoạt qua dữ liệu KPI, NCR/CAPA, đánh giá, xem xét của lãnh đạo và kaizen theo <a href="/operations/sops/09-SOP-900/sop-903-continual-improvement-and-kaizen.html" rel="noopener noreferrer">SOP-903</a>.</p>
 <h2 class="h2" id="m10">10. Ma trận tài liệu cấp dưới</h2>
-<div class="ed-qms-block" data-qms-kind="revisionTable" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="table-card"><table class="table" data-ed-autofit="balanced" data-ed-autofit-lock="0" data-qms-autofit="balanced"><colgroup><col style="width:23.04%"><col style="width:42.99%"><col style="width:33.97%"></colgroup><thead><tr><th style="overflow-wrap:anywhere;word-break:break-word">Nhóm tài liệu</th><th style="overflow-wrap:anywhere;word-break:break-word">Mục đích</th><th style="overflow-wrap:anywhere;word-break:break-word">Ví dụ liên kết</th></tr></thead><tbody><tr><td style="overflow-wrap:anywhere;word-break:break-word">Policy &amp; mục tiêu</td><td style="overflow-wrap:anywhere;word-break:break-word">Thể hiện cam kết và mục tiêu điều hành cấp cao</td><td style="overflow-wrap:anywhere;word-break:break-word"><a href="../02-Policies-Objectives/pol-qms-001-quality-policy.html" rel="noopener noreferrer">POL-QMS-001</a>, <a href="../02-Policies-Objectives/pol-qms-002-quality-objectives.html" rel="noopener noreferrer">POL-QMS-002</a></td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Cốt lõi các SOP</td><td style="overflow-wrap:anywhere;word-break:break-word">Chuẩn hóa vận hành liên phòng ban theo quá trình</td><td style="overflow-wrap:anywhere;word-break:break-word"><a href="../../operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html" rel="noopener noreferrer">SOP-201</a>, <a href="../../operations/sops/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html" rel="noopener noreferrer">SOP-301</a>, <a href="../../operations/sops/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html" rel="noopener noreferrer">SOP-501</a>, <a href="../../operations/sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html" rel="noopener noreferrer">SOP-605</a>, <a href="../../operations/sops/09-SOP-900/sop-902-management-review.html" rel="noopener noreferrer">SOP-902</a></td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">WI / ANNEX</td><td style="overflow-wrap:anywhere;word-break:break-word">Làm rõ cách thực hiện, ma trận chuẩn, bản đồ vai trò, nguồn chuẩn duy nhất, cổng kiểm soát, bảng điều khiển và ứng phó gián đoạn</td><td style="overflow-wrap:anywhere;word-break:break-word"><a href="../../operations/references/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-105-process-map-detailed.html" rel="noopener noreferrer">ANNEX-105</a>, <a href="../../operations/references/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-106-iso9001-matrix-full.html" rel="noopener noreferrer">ANNEX-106</a>, <a href="../../operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html" rel="noopener noreferrer">ANNEX-503</a>, <a href="../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html" rel="noopener noreferrer">ANNEX-119</a></td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Biểu mẫu / hồ sơ</td><td style="overflow-wrap:anywhere;word-break:break-word">Tạo bằng chứng kiểm soát và dữ liệu phân tích</td><td style="overflow-wrap:anywhere;word-break:break-word"><a download="" href="../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx" rel="noopener noreferrer">FRM-202</a>, <a download="" href="../../forms/frm-200-purchase/FRM-205_Job_Dossier_Evidence_Index.xlsx" rel="noopener noreferrer">FRM-205</a>, <a download="" href="../../forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx" rel="noopener noreferrer">FRM-511</a>, <a download="" href="../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx" rel="noopener noreferrer">FRM-651</a>, <a download="" href="../../forms/frm-900-admin/FRM-911_Management_Review_Minutes.xlsx" rel="noopener noreferrer">FRM-911</a></td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Tổ chức quản trị</td><td style="overflow-wrap:anywhere;word-break:break-word">Khóa thẩm quyền, RACI, KPI lan truyền / phân tầng, bố trí Người thay thế, sổ tay và JD</td><td style="overflow-wrap:anywhere;word-break:break-word"><a href="../../operations/references/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-104-org-chart-fullpage.html" rel="noopener noreferrer">ANNEX-104</a>, <a href="../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html" rel="noopener noreferrer">ANNEX-120</a>, <a href="../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html" rel="noopener noreferrer">ANNEX-121</a>, <a href="../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html" rel="noopener noreferrer">ANNEX-122</a>, <a href="../03-Organization/03-Job-Descriptions/index.html" rel="noopener noreferrer">JD Thư viện</a></td></tr></tbody></table></div></div></div>
-<h2 class="h2" id="m11">11. Governance dữ liệu số, nguồn chuẩn duy nhất và kiểm soát hồ sơ</h2>
-<p>Trong QMS mới, kiểm soát dữ liệu và quyền truy cập không còn là phần phụ mà là cấu phần của hệ thống. Điều này có nghĩa: nơi lưu chuẩn, quyền truy cập, luồng công việc, bảng điều khiển, backup và lưu giữ hồ sơ phải được xem như control đo lường của quá trình, không phải tiện ích CNTT thuần túy.</p>
-<div class="grid-2"><div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="card"><div class="card-title">Nguyên tắc nguồn chuẩn / SoR</div><ul class="tight"><li>Epicor là SoR cho giao dịch ERP đã chốt theo <a href="../../operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html" rel="noopener noreferrer">ANNEX-115</a></li><li>M365/SharePoint/Danh sách/Luồng là SoR cho luồng công việc, phê duyệt, hồ sơ/bằng chứng ở nơi đã được định nghĩa</li><li>máy tính bàn/email/chat chỉ là không gian làm việc tạm; không phải nơi lưu hồ sơ chính thức</li></ul></div></div></div><div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="card"><div class="card-title">Nguyên tắc tính toàn vẹn hồ sơ</div><ul class="tight"><li>Hồ sơ phải có người chịu trách nhiệm, dấu thời gian, version/hiệu lực áp dụng khi áp dụng</li><li>Quyền truy cập phải theo vai trò và rà soát định kỳ</li><li>Backup phải có bằng chứng thử khôi phục; chế độ ngoại tuyến phải có kịch bản nhập bù</li></ul></div></div></div></div>
-<p>Các tài liệu chuẩn cho lớp kiểm soát số gồm <a href="../../operations/sops/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html" rel="noopener noreferrer">SOP-104</a>, bộ <a href="../../operations/references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html" rel="noopener noreferrer">ANNEX-131</a> đến <a href="../../operations/references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html" rel="noopener noreferrer">ANNEX-136</a>, <a href="../../operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html" rel="noopener noreferrer">ANNEX-113</a>, <a href="../../operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html" rel="noopener noreferrer">ANNEX-115</a>, <a href="../../operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html" rel="noopener noreferrer">ANNEX-118</a>, <a href="../../operations/work-instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html" rel="noopener noreferrer">WI-102</a>, <a href="../../operations/work-instructions/01-WI-100/wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html" rel="noopener noreferrer">WI-103</a>, <a href="../../operations/work-instructions/01-WI-100/wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html" rel="noopener noreferrer">WI-104</a>, <a href="../../operations/work-instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html" rel="noopener noreferrer">WI-105</a>, <a href="../../operations/work-instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html" rel="noopener noreferrer">WI-107</a>, <a href="../03-Organization/02-Department-Handbooks/index.html" rel="noopener noreferrer">Department Handbooks Index</a> và sổ tay của <a href="../03-Organization/02-Department-Handbooks/dept-it-handbook.html" rel="noopener noreferrer">D-IT</a> / <a href="../03-Organization/02-Department-Handbooks/dept-epicor-handbook.html" rel="noopener noreferrer">D-ERP</a>. Bộ này quy định cả nơi lưu hồ sơ, mô hình phân quyền, đường đọc tài liệu theo vai trò, vị trí đặt source trên SharePoint, đường đi SharePoint local sync → Git → server deployment và cách đào tạo Người dùng dùng đúng hệ thống.</p>
+<div class="ed-qms-block" data-qms-kind="revisionTable" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="table-card">
+<table class="table" data-ed-autofit="balanced" data-ed-autofit-lock="0" data-qms-autofit="balanced" style="width:100%;max-width:100%;min-width:0px;table-layout:fixed">
+<colgroup>
+<col style="width:23.65%">
+<col style="width:42.28%">
+<col style="width:34.07%">
+</colgroup>
+<thead>
+<tr>
+<th style="overflow-wrap:anywhere;word-break:break-word">Nhóm tài liệu</th>
+<th style="overflow-wrap:anywhere;word-break:break-word">Mục đích</th>
+<th style="overflow-wrap:anywhere;word-break:break-word">Ví dụ liên kết</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Chính sách và mục tiêu</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Thể hiện định hướng, cam kết và mục tiêu điều hành của hệ thống</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<a href="/mom/docs/system/policies/pol-qms-001-quality-policy.html" rel="noopener noreferrer">POL-QMS-001</a>, <a href="/mom/docs/system/policies/pol-qms-002-quality-objectives.html" rel="noopener noreferrer">POL-QMS-002</a>
+</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Quy trình cốt lõi</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Chuẩn hóa hoạt động liên phòng ban theo chuỗi quá trình</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<a href="/operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html" rel="noopener noreferrer">SOP-201</a>, <a href="/operations/sops/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html" rel="noopener noreferrer">SOP-301</a>, <a href="/operations/sops/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html" rel="noopener noreferrer">SOP-501</a>, <a href="/operations/sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html" rel="noopener noreferrer">SOP-605</a>, <a href="/operations/sops/09-SOP-900/sop-902-management-review.html" rel="noopener noreferrer">SOP-902</a>
+</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:col-resize">WI / ANNEX</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Hướng dẫn thực hiện, tiêu chuẩn áp dụng, ma trận kiểm soát và quy định vận hành chi tiết</td>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:col-resize">
+<a href="/operations/references/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-105-process-map-detailed.html" rel="noopener noreferrer">ANNEX-105</a>, <a href="/operations/references/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-106-iso9001-matrix-full.html" rel="noopener noreferrer">ANNEX-106</a>, <a href="/operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html" rel="noopener noreferrer">ANNEX-503</a>, <a href="/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html" rel="noopener noreferrer">ANNEX-119</a>
+</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">Biểu mẫu / hồ sơ</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Ghi nhận bằng chứng kiểm soát và dữ liệu vận hành</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<a download="" href="/forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx" rel="noopener noreferrer">FRM-202</a>, <a download="" href="/forms/frm-200-purchase/FRM-205_Job_Dossier_Evidence_Index.xlsx" rel="noopener noreferrer">FRM-205</a>, <a download="" href="/forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx" rel="noopener noreferrer">FRM-511</a>, <a download="" href="/forms/frm-600-inspection/FRM-651_NCR_Report.xlsx" rel="noopener noreferrer">FRM-651</a>, <a download="" href="/forms/frm-900-admin/FRM-911_Management_Review_Minutes.xlsx" rel="noopener noreferrer">FRM-911</a>
+</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Tổ chức quản trị</td>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Quy định vai trò, thẩm quyền, KPI, cơ cấu tổ chức, nhân sự thay thế và mô tả công việc</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<a href="/operations/references/01-ANNEX-100/10-ANNEX-100-Foundation-Maps-and-Control/annex-104-org-chart-fullpage.html" rel="noopener noreferrer">ANNEX-104</a>, <a href="/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html" rel="noopener noreferrer">ANNEX-120</a>, <a href="/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html" rel="noopener noreferrer">ANNEX-121</a>, <a href="/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html" rel="noopener noreferrer">ANNEX-122</a>, <a href="/mom/docs/system/organization/03-Job-Descriptions/index.html" rel="noopener noreferrer">JD Thư viện</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<h2 class="h2" id="m11">11. Quản trị dữ liệu số, nguồn chuẩn duy nhất và kiểm soát hồ sơ</h2>
+<p>Trong QMS, dữ liệu và quyền truy cập là một phần của kiểm soát vận hành.<br>
+Hệ thống lưu trữ, phân quyền, luồng phê duyệt, backup và quản lý hồ sơ phải được kiểm soát như một phần của quá trình chất lượng, không chỉ là chức năng công nghệ thông tin.</p>
+<div class="grid-2">
+<div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="card">
+<div class="card-title">Nguyên tắc nguồn chuẩn / SoR</div>
+<ul class="tight">
+<li>Epicor là SoR cho giao dịch ERP đã chốt theo <a href="/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html" rel="noopener noreferrer">ANNEX-115</a>
+</li>
+<li>M365/SharePoint/Danh sách/Luồng là SoR cho luồng công việc, phê duyệt, hồ sơ/bằng chứng ở nơi đã được định nghĩa</li>
+<li>máy tính bàn/email/chat chỉ là không gian làm việc tạm; không phải nơi lưu hồ sơ chính thức</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="ed-qms-block" data-qms-kind="docControl" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="card">
+<div class="card-title">Nguyên tắc tính toàn vẹn hồ sơ</div>
+<ul class="tight">
+<li>Hồ sơ phải có người chịu trách nhiệm, dấu thời gian, version/hiệu lực áp dụng khi áp dụng</li>
+<li>Quyền truy cập phải theo vai trò và rà soát định kỳ</li>
+<li>Backup phải có bằng chứng thử khôi phục; chế độ ngoại tuyến phải có kịch bản nhập bù</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<p>Các tài liệu chuẩn cho lớp kiểm soát số gồm <a href="/operations/sops/01-SOP-100/sop-104-data-governance-records-security-and-ip-protection.html" rel="noopener noreferrer">SOP-104</a>, bộ <a href="/operations/references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html" rel="noopener noreferrer">ANNEX-131</a> đến <a href="/operations/references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html" rel="noopener noreferrer">ANNEX-136</a>, <a href="/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html" rel="noopener noreferrer">ANNEX-113</a>, <a href="/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html" rel="noopener noreferrer">ANNEX-115</a>, <a href="/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html" rel="noopener noreferrer">ANNEX-118</a>, <a href="/operations/work-instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html" rel="noopener noreferrer">WI-102</a>, <a href="/operations/work-instructions/01-WI-100/wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html" rel="noopener noreferrer">WI-103</a>, <a href="/operations/work-instructions/01-WI-100/wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html" rel="noopener noreferrer">WI-104</a>, <a href="/operations/work-instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html" rel="noopener noreferrer">WI-105</a>, <a href="/operations/work-instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html" rel="noopener noreferrer">WI-107</a>, <a href="/mom/docs/system/organization/02-Department-Handbooks/index.html" rel="noopener noreferrer">Department Handbooks Index</a> và sổ tay của <a href="/mom/docs/system/organization/02-Department-Handbooks/dept-it-handbook.html" rel="noopener noreferrer">D-IT</a> / <a href="/mom/docs/system/organization/02-Department-Handbooks/dept-epicor-handbook.html" rel="noopener noreferrer">D-ERP</a>. Bộ này quy định cả nơi lưu hồ sơ, mô hình phân quyền, đường đọc tài liệu theo vai trò, vị trí đặt source trên SharePoint, đường đi SharePoint local sync → Git → server deployment và cách đào tạo Người dùng dùng đúng hệ thống.</p>
 <h2 class="h2" id="m12">12. Thẩm quyền, ranh giới trách nhiệm và cơ chế điều hành liên phòng ban</h2>
 <p>QMS hiện hành yêu cầu chuyển từ mô tả vai trò chung chung sang ranh giới quyết định rõ. Mỗi giao điểm khó phải có người chịu trách nhiệm quyết định, Người phải tham vấn, dữ liệu tối thiểu và giới hạn "không được vượt".</p>
-<div class="ed-qms-block" data-qms-kind="revisionTable" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="table-card"><table class="table" data-ed-autofit="balanced" data-ed-autofit-lock="0" data-qms-autofit="balanced"><colgroup><col style="width:49.04%"><col style="width:50.96%"></colgroup><thead><tr><th style="overflow-wrap:anywhere;word-break:break-word">Giao điểm liên phòng ban</th><th style="overflow-wrap:anywhere;word-break:break-word">Nguồn chuẩn để giải quyết</th></tr></thead><tbody><tr><td style="overflow-wrap:anywhere;word-break:break-word"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhân viên dịch vụ khách hàng)"><span class="entity-code role-code">CS</span></a><span class="entity-sep role-sep">vs</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhân viên báo giá)"><span class="entity-code role-code">EST</span></a></span></td><td style="overflow-wrap:anywhere;word-break:break-word"><a href="../../operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html" rel="noopener noreferrer">ANNEX-503</a> + sổ tay Kinh doanh-CS + Ma trận thẩm quyền</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html" title="DFM Engineer (Kỹ sư DFM)"><span class="entity-code role-code">DFM</span></a><span class="entity-sep role-sep">vs</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html" title="Process Engineer (Kỹ sư quy trình)"><span class="entity-code role-code">PE</span></a><span class="entity-sep role-sep">vs</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lập trình viên CAM / NC)"><span class="entity-code role-code">CAM</span></a></span></td><td style="overflow-wrap:anywhere;word-break:break-word"><a href="../../operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html" rel="noopener noreferrer">ANNEX-503</a> + sổ tay Kỹ thuật</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Điều độ sản xuất)"><span class="entity-code role-code">PPL</span></a><span class="entity-sep role-sep">vs</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/02-JD-Production/jd-production-engineer-industrial-engineer.html" title="Production Engineer / Industrial Engineer (Kỹ sư sản xuất / kỹ sư công nghiệp)"><span class="entity-code role-code">PIE</span></a><span class="entity-sep role-sep">vs</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)"><span class="entity-code role-code">WKM</span></a></span></td><td style="overflow-wrap:anywhere;word-break:break-word"><a href="../../operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html" rel="noopener noreferrer">ANNEX-503</a> + sổ tay Sản xuất</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word"><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Trưởng ca)"><span class="entity-code role-code">SL</span></a><span class="entity-sep role-sep">vs</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Kỹ thuật viên setup)"><span class="entity-code role-code">SET</span></a><span class="entity-sep role-sep">vs</span><a class="entity-link role-link" href="../03-Organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html" title="CNC Operator (Nhân viên vận hành CNC)"><span class="entity-code role-code">OPR</span></a></span></td><td style="overflow-wrap:anywhere;word-break:break-word"><a href="../../operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html" rel="noopener noreferrer">ANNEX-503</a> + <a href="../../operations/sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html" rel="noopener noreferrer">SOP-504</a></td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phòng Chất lượng)"><span class="entity-code dept-code">D-QUAL</span></a><span class="entity-sep role-sep">vs</span><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)"><span class="entity-code dept-code">D-PROD</span></a></span></td><td style="overflow-wrap:anywhere;word-break:break-word"><a href="../../operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html" rel="noopener noreferrer">ANNEX-503</a> + <a href="../../operations/work-instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html" rel="noopener noreferrer">WI-201</a> + sổ tay Quality</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Supply Chain Department (Phòng Chuỗi cung ứng)"><span class="entity-code dept-code">D-SCM</span></a><span class="entity-sep role-sep">vs</span><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bộ phận Kho)"><span class="entity-code dept-code">D-WHS</span></a><span class="entity-sep role-sep">vs</span><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Logistics and Shipping Function (Bộ phận Logistics và Giao vận)"><span class="entity-code dept-code">D-LOG</span></a></span></td><td style="overflow-wrap:anywhere;word-break:break-word">Sổ tay Chuỗi cung ứng + <a href="../../operations/references/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html" rel="noopener noreferrer">ANNEX-701</a></td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word"><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">vs</span><a class="entity-link dept-link" href="../03-Organization/02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bộ phận quản trị ERP)"><span class="entity-code dept-code">D-ERP</span></a><span class="entity-sep role-sep">vs</span><span class="chip"><a class="entity-link bundle-link bundle-chip" data-bundle="FUNC_OWNERS" href="../03-Organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-owners" title="Functional Content Owners (Nhóm sở hữu nội dung nghiệp vụ theo chức năng) — CS / EST / PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA"><span class="entity-code bundle-code">FUNC_OWNERS</span></a></span></span></td><td style="overflow-wrap:anywhere;word-break:break-word">Sổ tay IT + sổ tay Epicor + <a href="../../operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html" rel="noopener noreferrer">ANNEX-115</a></td></tr></tbody></table></div></div></div>
-<p>Thẩm quyền và trách nhiệm được khóa chính thức tại <a href="../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html" rel="noopener noreferrer">ANNEX-120</a>, <a href="../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html" rel="noopener noreferrer">ANNEX-121</a>, <a href="../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html" rel="noopener noreferrer">ANNEX-122</a> và <a href="../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html" rel="noopener noreferrer">ANNEX-123</a>. Khi có xung đột giữa mô tả không chính thức và các ma trận này, ma trận được phê duyệt là nguồn chuẩn để ra quyết định.</p>
+<div class="ed-qms-block" data-qms-kind="revisionTable" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="table-card">
+<table class="table" data-ed-autofit="balanced" data-ed-autofit-lock="0" data-qms-autofit="balanced" style="width:100%;max-width:100%;min-width:0px;table-layout:fixed">
+<colgroup>
+<col style="width:51.28%">
+<col style="width:48.72%">
+</colgroup>
+<thead>
+<tr>
+<th style="overflow-wrap:anywhere;word-break:break-word">Giao điểm liên phòng ban</th>
+<th style="overflow-wrap:anywhere;word-break:break-word">Nguồn chuẩn để giải quyết</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<span class="entity-cluster role-cluster">
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-customer-service.html" title="Customer Service (Nhân viên dịch vụ khách hàng)" rel="noopener noreferrer">
+<span class="entity-code role-code">CS</span>
+</a>
+<span class="entity-sep role-sep">vs</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/06-JD-Sales/jd-estimator.html" title="Estimator (Nhân viên báo giá)" rel="noopener noreferrer">
+<span class="entity-code role-code">EST</span>
+</a>
+</span>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<a href="/operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html" rel="noopener noreferrer">ANNEX-503</a>&nbsp;</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<span class="entity-cluster role-cluster">
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-dfm-engineer.html" title="DFM Engineer (Kỹ sư DFM)" rel="noopener noreferrer">
+<span class="entity-code role-code">DFM</span>
+</a>
+<span class="entity-sep role-sep">vs</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html" title="Process Engineer (Kỹ sư quy trình)" rel="noopener noreferrer">
+<span class="entity-code role-code">PE</span>
+</a>
+<span class="entity-sep role-sep">vs</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lập trình viên CAM / NC)" rel="noopener noreferrer">
+<span class="entity-code role-code">CAM</span>
+</a>
+</span>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<a href="/operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html" rel="noopener noreferrer">ANNEX-503</a>&nbsp;</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<span class="entity-cluster role-cluster">
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-planner.html" title="Production Planner (Điều độ sản xuất)" rel="noopener noreferrer">
+<span class="entity-code role-code">PPL</span>
+</a>
+<span class="entity-sep role-sep">vs</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-production-engineer-industrial-engineer.html" title="Production Engineer / Industrial Engineer (Kỹ sư sản xuất / kỹ sư công nghiệp)" rel="noopener noreferrer">
+<span class="entity-code role-code">PIE</span>
+</a>
+<span class="entity-sep role-sep">vs</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)" rel="noopener noreferrer">
+<span class="entity-code role-code">WKM</span>
+</a>
+</span>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<a href="/operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html" rel="noopener noreferrer">ANNEX-503</a>&nbsp;</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<span class="entity-cluster role-cluster">
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Trưởng ca)" rel="noopener noreferrer">
+<span class="entity-code role-code">SL</span>
+</a>
+<span class="entity-sep role-sep">vs</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Kỹ thuật viên setup)" rel="noopener noreferrer">
+<span class="entity-code role-code">SET</span>
+</a>
+<span class="entity-sep role-sep">vs</span>
+<a class="entity-link role-link" href="/mom/docs/system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html" title="CNC Operator (Nhân viên vận hành CNC)" rel="noopener noreferrer">
+<span class="entity-code role-code">OPR</span>
+</a>
+</span>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<a href="/operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html" rel="noopener noreferrer">ANNEX-503</a> , <a href="/operations/sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html" rel="noopener noreferrer">SOP-504</a>
+</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<span class="entity-cluster role-cluster">
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phòng Chất lượng)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-QUAL</span>
+</a>
+<span class="entity-sep role-sep">vs</span>
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-PROD</span>
+</a>
+</span>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<a href="/operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html" rel="noopener noreferrer">ANNEX-503</a> , <a href="/operations/work-instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html" rel="noopener noreferrer">WI-201</a>&nbsp;</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<span class="entity-cluster role-cluster">
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Supply Chain Department (Phòng Chuỗi cung ứng)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-SCM</span>
+</a>
+<span class="entity-sep role-sep">vs</span>
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bộ phận Kho)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-WHS</span>
+</a>
+<span class="entity-sep role-sep">vs</span>
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Logistics and Shipping Function (Bộ phận Logistics và Giao vận)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-LOG</span>
+</a>
+</span>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word"><a href="/operations/references/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html" rel="noopener noreferrer">ANNEX-701</a>
+</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<span class="entity-cluster role-cluster">
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-IT</span>
+</a>
+<span class="entity-sep role-sep">vs</span>
+<a class="entity-link dept-link" href="/mom/docs/system/organization/02-Department-Handbooks/dept-epicor-handbook.html" title="ERP Administration Function (Bộ phận quản trị ERP)" rel="noopener noreferrer">
+<span class="entity-code dept-code">D-ERP</span>
+</a>
+<span class="entity-sep role-sep">vs</span>
+<span class="chip">
+<a class="entity-link bundle-link bundle-chip" data-bundle="FUNC_OWNERS" href="/mom/docs/system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-owners" title="Functional Content Owners (Nhóm sở hữu nội dung nghiệp vụ theo chức năng) — CS / EST / PD / ENGM / QA[QMR] / SCM / FIN / HR / EHS / ITA" rel="noopener noreferrer">
+<span class="entity-code bundle-code">FUNC_OWNERS</span>
+</a>
+</span>
+</span>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word"><a href="/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html" rel="noopener noreferrer">ANNEX-115</a>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<p>Thẩm quyền và trách nhiệm được khóa chính thức tại <a href="/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html" rel="noopener noreferrer">ANNEX-120</a>, <a href="/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html" rel="noopener noreferrer">ANNEX-121</a>, <a href="/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html" rel="noopener noreferrer">ANNEX-122</a> và <a href="/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html" rel="noopener noreferrer">ANNEX-123</a>. Khi có xung đột giữa mô tả không chính thức và các ma trận này, ma trận được phê duyệt là nguồn chuẩn để ra quyết định.</p>
 <h2 class="h2" id="m13">13. Khả năng chống gián đoạn và phục hồi</h2>
-<p>QMS phải duy trì khả năng hoạt động có kiểm soát khi xuất hiện sự kiện gián đoạn như mất điện, mất mạng, hỏng máy trọng yếu, lỗi hệ thống số, đứt nguồn cung, thiếu Người ở vai trò quan trọng / nghiêm trọng, sự cố an ninh thông tin hoặc sự kiện an toàn/EHS.</p>
-<div class="ed-qms-block" data-qms-kind="riskTable" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="table-card"><table class="table" data-ed-autofit="balanced" data-ed-autofit-lock="0" data-qms-autofit="balanced"><colgroup><col style="width:33.51%"><col style="width:66.49%"></colgroup><thead><tr><th style="overflow-wrap:anywhere;word-break:break-word">Loại sự kiện</th><th style="overflow-wrap:anywhere;word-break:break-word">Yêu cầu phản ứng hệ thống</th></tr></thead><tbody><tr><td style="overflow-wrap:anywhere;word-break:break-word">Mất hệ thống số / mất mạng</td><td style="overflow-wrap:anywhere;word-break:break-word">Kích hoạt dự phòng và offline kit theo <a href="../../operations/sops/01-SOP-100/sop-108-operational-contingency-plan.html" rel="noopener noreferrer">SOP-108</a> / <a href="../../operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html" rel="noopener noreferrer">ANNEX-118</a>; giữ truy xuất nguồn gốc giấy và nhập bù sau khôi phục.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Hỏng máy / mất năng lực quy trình</td><td style="overflow-wrap:anywhere;word-break:break-word">Đánh giá sắp xếp lại, chéo-load, outsource, rủi ro giao hàng; cập nhật trung tâm điều hành (control tháp / cột) theo <a href="../../operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html" rel="noopener noreferrer">ANNEX-117</a> và sổ tay Sản xuất.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Supplier / Người xử lý gián đoạn</td><td style="overflow-wrap:anywhere;word-break:break-word">Đánh giá nguồn thay thế, tác động đến WIP/ship, khách hàng truyền đạt / giao tiếp và rủi ro quyết định xử lý.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Rò rỉ dữ liệu / sự cố truy cập</td><td style="overflow-wrap:anywhere;word-break:break-word">Ngăn chặn truy cập, bảo quản bằng chứng, đánh giá tác động to hồ sơ/IP, rà soát SoD and khôi phục / thu hồi.</td></tr><tr><td style="overflow-wrap:anywhere;word-break:break-word">Thiếu Người ở vai trò quan trọng / nghiêm trọng</td><td style="overflow-wrap:anywhere;word-break:break-word">Kích hoạt bố trí Người thay thế theo <a href="../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html" rel="noopener noreferrer">ANNEX-123</a> và kỹ năng/chứng nhận quy tắc.</td></tr></tbody></table></div></div></div>
-<h2 class="h2 phase3a-workbook-alignment" id="m14">14. Cơ chế kiểm soát biểu mẫu Excel</h2><div class="ed-qms-block" data-qms-kind="note" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="note phase3a-workbook-alignment"><b>Nguyên tắc hệ thống</b><br>Biểu mẫu FRM được kiểm soát theo mô hình <b>một sổ tay thực hành Excel hiện hành / tải trực tiếp</b>. File sổ tay thực hành trong thư mục chuỗi / loạt là nơi ghi nhận, ký xác nhận, theo dõi hành động và bảo toàn kiểm soát dữ liệu; các HTML biểu mẫu cũ không thuộc danh mục hiện hành. Việc chuẩn hóa mã và phạm vi bao phủ được tra tại <a href="../../forms/design-system/form-control-register.html" rel="noopener noreferrer">Biểu mẫu Control Sổ đăng ký</a>. Quy tắc điều khiển được khóa tại <a href="../../forms/design-system/form-versioning-model.html" rel="noopener noreferrer">Biểu mẫu Quản lý phiên bản Mô hình</a>, quy tắc phát hành tại <a href="../../forms/design-system/form-release-checklist.html" rel="noopener noreferrer">Biểu mẫu Phát hành Bảng kiểm</a> và trung tâm kiểm soát tại <a href="../../forms/design-system/form-control-register.html" rel="noopener noreferrer">Biểu mẫu Control Sổ đăng ký</a>.<div class="note-soft"><b>Tài liệu kiểm soát bắt buộc đọc:</b> <a href="../../forms/design-system/form-release-checklist.html" rel="noopener noreferrer">Biểu mẫu Phát hành Bảng kiểm</a>, <a href="../../forms/design-system/desktop-excel-endpoint-baseline.html" rel="noopener noreferrer">máy tính bàn Excel điểm cuối Mốc chuẩn</a>, <a href="../../forms/design-system/server-delivery-rollout-checklist.html" rel="noopener noreferrer">Server Giao hàng triển khai Bảng kiểm</a>, <a href="../../forms/design-system/production-acceptance-uat-pack.html" rel="noopener noreferrer">Sản xuất Acceptance UAT Pack</a>, <a href="../../forms/design-system/periodic-control-cadence.html" rel="noopener noreferrer">Định kỳ Control Nhịp độ</a>, <a href="../../forms/design-system/server-stack-profile-library.html" rel="noopener noreferrer">Server chồng / xếp hồ sơ / biên dạng Thư viện</a>, <a href="../../forms/design-system/pilot-endpoint-rollout-pack.html" rel="noopener noreferrer">Thí điểm điểm cuối triển khai Pack</a> và <a href="../../forms/design-system/editorial-consistency-audit.html" rel="noopener noreferrer">Biên tập Tính nhất quán Đánh giá</a> là bộ tài liệu phải đọc khi kiểm soát phát hành, máy trạm, máy chủ, UAT, kiểm tra định kỳ và phạm vi sử dụng. Mở trực tiếp trên trình duyệt không thuộc mô hình vận hành được phép.</div></div></div></div><div class="ed-qms-block" data-qms-kind="actionTable" contenteditable="false"><div class="ed-qms-body" contenteditable="true"><div class="table-card phase3a-workbook-alignment"><table class="table" data-ed-autofit="balanced" data-ed-autofit-lock="0" data-qms-autofit="balanced"><colgroup><col style="width:18.32%"><col style="width:24.7%"><col style="width:56.98%"></colgroup><thead><tr><th style="overflow-wrap:anywhere;word-break:break-word">Chặng quá trình</th><th style="overflow-wrap:anywhere;word-break:break-word">Sổ tay thực hành / hồ sơ trọng yếu</th><th style="overflow-wrap:anywhere;word-break:break-word">Ý nghĩa hệ thống</th></tr></thead><tbody>
-<tr><td style="overflow-wrap:anywhere;word-break:break-word">RFQ / hợp đồng / điều phối</td><td style="overflow-wrap:anywhere;word-break:break-word"><a download="" href="../../forms/frm-200-purchase/FRM-201_RFQ_Register.xlsx" rel="noopener noreferrer">FRM-201</a>, <a download="" href="../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx" rel="noopener noreferrer">FRM-202</a>, <a download="" href="../../forms/frm-200-purchase/FRM-205_Job_Dossier_Evidence_Index.xlsx" rel="noopener noreferrer">FRM-205</a>, <a download="" href="../../forms/frm-200-purchase/FRM-208_Daily_Tier_Meeting_and_Escalation_Log.xlsx" rel="noopener noreferrer">FRM-208</a>, <a download="" href="../../forms/frm-200-purchase/FRM-209_High_Risk_Job_Readiness_Review.xlsx" rel="noopener noreferrer">FRM-209</a></td><td style="overflow-wrap:anywhere;word-break:break-word">Chuỗi hồ sơ đơn hàng chuyển sang sổ tay thực hành để khóa giả định, escalation hằng ngày, mức sẵn sàng của job rủi ro cao và hồ sơ bằng chứng thay vì dùng HTML biểu mẫu tĩnh.</td></tr>
-<tr><td style="overflow-wrap:anywhere;word-break:break-word">Phát hành kỹ thuật</td><td style="overflow-wrap:anywhere;word-break:break-word"><a download="" href="../../forms/frm-300-technical/FRM-305_Inspection_Program_Release_Checklist.xlsx" rel="noopener noreferrer">FRM-305</a>, <a download="" href="../../forms/frm-300-technical/FRM-306_Engineering_Release_and_Baseline_Package_Approval.xlsx" rel="noopener noreferrer">FRM-306</a></td><td style="overflow-wrap:anywhere;word-break:break-word">Bộ hồ sơ phát hành, phê duyệt phát hành và phát hành chương trình kiểm tra (phát hành chương trình (program phát hành) phải bám sổ tay thực hành để kiểm soát phiên bản, hiệu lực áp dụng, xác nhận phê duyệt và bộ bằng chứng.</td></tr>
-<tr><td style="overflow-wrap:anywhere;word-break:break-word">Mức sẵn sàng sản xuất &amp; thực thi</td><td style="overflow-wrap:anywhere;word-break:break-word"><a download="" href="../../forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx" rel="noopener noreferrer">FRM-511</a>, <a download="" href="../../forms/frm-500-production/FRM-518_Work_Transfer_Validation_Record.xlsx" rel="noopener noreferrer">FRM-518</a>, <a download="" href="../../forms/frm-500-production/FRM-519_Job_Packet_Quick_Check_and_Pre_Run_Verification.xlsx" rel="noopener noreferrer">FRM-519</a></td><td style="overflow-wrap:anywhere;word-break:break-word">Setup, chuyển giao công việc và xác minh trước khi chạy được chuyển sang sổ tay thực hành để giữ bảng kiểm điều kiện chạy, bàn giao giữa công đoạn và đóng hành động trên cùng cấu trúc dữ liệu.</td></tr>
-<tr><td style="overflow-wrap:anywhere;word-break:break-word">Nhận hàng / kho / vệ sinh và đóng gói</td><td style="overflow-wrap:anywhere;word-break:break-word"><a download="" href="../../forms/frm-700-maintenance/FRM-701_Receiving_and_IQC_Log.xlsx" rel="noopener noreferrer">FRM-701</a>, <a download="" href="../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx" rel="noopener noreferrer">FRM-413</a>, <a download="" href="../../forms/frm-700-maintenance/FRM-713_Cleanroom_Entry_and_Gowning_Log.xlsx" rel="noopener noreferrer">FRM-713</a>, <a download="" href="../../forms/frm-700-maintenance/FRM-714_Ultrasonic_Cleaning_Batch_Record.xlsx" rel="noopener noreferrer">FRM-714</a>, <a download="" href="../../forms/frm-700-maintenance/FRM-715_Vacuum_Compatible_Clean_Build_and_Bagging_Record.xlsx" rel="noopener noreferrer">FRM-715</a>, <a download="" href="../../forms/frm-700-maintenance/FRM-721_FOD_Line_Clearance_and_Tool_Accountability_Log.xlsx" rel="noopener noreferrer">FRM-721</a></td><td style="overflow-wrap:anywhere;word-break:break-word"><a download="" href="../../forms/frm-700-maintenance/FRM-701_Receiving_and_IQC_Log.xlsx" rel="noopener noreferrer">FRM-701</a> sổ tay thực hành là hồ sơ hợp nhất cho nhận hàng/IQC cổng kiểm soát, put-cách xa / rời và lưu kho / lưu trữ bàn giao; chỉ còn trong ghi chú phạm vi mã để giải thích phạm vi lịch sử sau khi logic được hợp nhất vào <a download="" href="../../forms/frm-700-maintenance/FRM-701_Receiving_and_IQC_Log.xlsx" rel="noopener noreferrer">FRM-701</a>. Cụm clean/phòng sạch/chân không/FOD dùng sổ tay thực hành riêng để bảo toàn truy xuất nguồn gốc và ranh giới phát hành.</td></tr>
-<tr><td style="overflow-wrap:anywhere;word-break:break-word">Mã không phát hành trong danh mục hiện hành</td><td style="overflow-wrap:anywhere;word-break:break-word"><a href="../../forms/design-system/form-control-register.html#FRM-103" rel="noopener noreferrer">FRM-103</a>, <a href="../../forms/design-system/form-control-register.html#FRM-108" rel="noopener noreferrer">FRM-108</a>, <a href="../../forms/design-system/form-control-register.html#FRM-109" rel="noopener noreferrer">FRM-109</a>, <a href="../../forms/design-system/form-control-register.html#FRM-407" rel="noopener noreferrer">FRM-407</a>, <a href="../../forms/design-system/form-control-register.html#FRM-412" rel="noopener noreferrer">FRM-412</a> và các mã không phát hành khác được kiểm soát tại <a href="../../forms/design-system/form-control-register.html" rel="noopener noreferrer">Biểu mẫu Control Sổ đăng ký</a></td><td style="overflow-wrap:anywhere;word-break:break-word">Các mã này chỉ dùng để tra phạm vi mã / phạm vi quy trình; không được xem là sổ tay thực hành hiện hành và không được dùng để tạo hồ sơ mới.</td></tr>
-</tbody></table></div></div></div><div class="footer-note">Sổ tay này phải được đọc cùng bộ SOP/WI/ANNEX/sổ tay/JD hiện hành. Khi có thay đổi làm ảnh hưởng ranh giới trách nhiệm, nguồn chuẩn duy nhất, thẩm quyền, thẩm quyền cổng kiểm soát hoặc kiến trúc ứng phó gián đoạn, QMS sổ tay / thủ công phải được rà lại cùng danh mục ưu tiên tại <a href="../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html" rel="noopener noreferrer">ANNEX-119</a>.</div>
+<p>QMS phải duy trì khả năng vận hành có kiểm soát khi xảy ra gián đoạn như mất điện, mất mạng, hỏng máy trọng yếu, gián đoạn nguồn cung, thiếu nhân sự chủ chốt hoặc sự cố an toàn/EHS.</p>
+<div class="ed-qms-block" data-qms-kind="riskTable" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="table-card">
+<table class="table" data-ed-autofit="balanced" data-ed-autofit-lock="0" data-qms-autofit="balanced" style="width:100%;max-width:100%;min-width:0px;table-layout:fixed">
+<colgroup>
+<col style="width:34.01%">
+<col style="width:65.99%">
+</colgroup>
+<thead>
+<tr>
+<th style="overflow-wrap:anywhere;word-break:break-word">Loại sự kiện</th>
+<th style="overflow-wrap:anywhere;word-break:break-word">Yêu cầu phản ứng hệ thống</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Mất hệ thống số / mất mạng</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Kích hoạt chế độ vận hành dự phòng, sử dụng hồ sơ offline và cập nhật dữ liệu sau khi hệ thống phục hồi. theo <a href="/operations/sops/01-SOP-100/sop-108-operational-contingency-plan.html" rel="noopener noreferrer">SOP-108</a> / <a href="/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html" rel="noopener noreferrer">ANNEX-118</a></td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Hỏng máy / mất năng lực sản xuất</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Đánh giá điều chuyển sản xuất, ưu tiên đơn hàng, nguồn thay thế và rủi ro giao hàng theo <a href="/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html" rel="noopener noreferrer">ANNEX-117</a></td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">Gián đoạn nhà cung cấp / gia công ngoài</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Đánh giá nguồn thay thế, ảnh hưởng đến WIP/giao hàng và cập nhật thông tin cho khách hàng khi cần.</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Rò rỉ dữ liệu / sự cố truy cập</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Khóa truy cập liên quan, bảo vệ dữ liệu và đánh giá ảnh hưởng đến hồ sơ, IP và hệ thống.</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">Thiếu nhân sự chủ chốt</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Kích hoạt nhân sự thay thế đã được đào tạo và phân quyền phù hợp.theo <a href="/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html" rel="noopener noreferrer">ANNEX-123</a>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<h2 class="h2 phase3a-workbook-alignment" id="m14">14. Cơ chế kiểm soát biểu mẫu Excel</h2>
+<div class="ed-qms-block" data-qms-kind="note" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="note phase3a-workbook-alignment">
+<b>Nguyên tắc hệ thống</b>
+<br><p>Biểu mẫu Excel được sử dụng như hồ sơ vận hành trực tiếp tại hiện trường và phải được kiểm soát như một phần của QMS. Mọi biểu mẫu phát hành phải có mã tài liệu, phiên bản, phạm vi áp dụng và trạng thái hiệu lực rõ ràng.</p>
+<span style="font-family:-apple-system, &quot;Segoe UI&quot;, &quot;Noto Sans&quot;, Arial, Helvetica, sans-serif;background-color:rgb(255, 247, 237)">Các file làm việc tạm thời, file cá nhân hoặc bản sao ngoài hệ thống không được xem là hồ sơ chính thức.</span>. Việc chuẩn hóa mã và phạm vi bao phủ được tra tại <a href="/forms/design-system/form-control-register.html" rel="noopener noreferrer">Biểu mẫu Control Sổ đăng ký</a>. Quy tắc điều khiển được khóa tại <a href="/forms/design-system/form-versioning-model.html" rel="noopener noreferrer">Biểu mẫu Quản lý phiên bản Mô hình</a>, quy tắc phát hành tại <a href="/forms/design-system/form-release-checklist.html" rel="noopener noreferrer">Biểu mẫu Phát hành Bảng kiểm</a> và trung tâm kiểm soát tại <a href="/forms/design-system/form-control-register.html" rel="noopener noreferrer">Biểu mẫu Control Sổ đăng ký</a>.<div class="note-soft">
+<b>Tài liệu kiểm soát bắt buộc đọc:</b>
+<a href="/forms/design-system/form-release-checklist.html" rel="noopener noreferrer">Biểu mẫu Phát hành Bảng kiểm</a>, <a href="/forms/design-system/desktop-excel-endpoint-baseline.html" rel="noopener noreferrer">máy tính bàn Excel điểm cuối Mốc chuẩn</a>, <a href="/forms/design-system/server-delivery-rollout-checklist.html" rel="noopener noreferrer">Server Giao hàng triển khai Bảng kiểm</a>, <a href="/forms/design-system/production-acceptance-uat-pack.html" rel="noopener noreferrer">Sản xuất Acceptance UAT Pack</a>, <a href="/forms/design-system/periodic-control-cadence.html" rel="noopener noreferrer">Định kỳ Control Nhịp độ</a>, <a href="/forms/design-system/server-stack-profile-library.html" rel="noopener noreferrer">Server chồng / xếp hồ sơ / biên dạng Thư viện</a>, <a href="/forms/design-system/pilot-endpoint-rollout-pack.html" rel="noopener noreferrer">Thí điểm điểm cuối triển khai Pack</a> và <a href="/forms/design-system/editorial-consistency-audit.html" rel="noopener noreferrer">Biên tập Tính nhất quán Đánh giá</a> là bộ tài liệu phải đọc khi kiểm soát phát hành, máy trạm, máy chủ, UAT, kiểm tra định kỳ và phạm vi sử dụng. Mở trực tiếp trên trình duyệt không thuộc mô hình vận hành được phép.</div>
+</div>
+</div>
+</div>
+<div class="ed-qms-block" data-qms-kind="actionTable" contenteditable="false">
+<div class="ed-qms-body" contenteditable="true">
+<div class="table-card phase3a-workbook-alignment">
+<table class="table" data-ed-autofit="balanced" data-ed-autofit-lock="0" data-qms-autofit="balanced" style="width:100%;max-width:100%;min-width:0px;table-layout:fixed">
+<colgroup>
+<col style="width:24.93%">
+<col style="width:34.71%">
+<col style="width:40.36%">
+</colgroup>
+<thead>
+<tr>
+<th style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Chặng quá trình</th>
+<th style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Sổ tay thực hành / hồ sơ trọng yếu</th>
+<th style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Ý nghĩa hệ thống</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">báo giá / hợp đồng / điều phối</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<a download="" href="/forms/frm-200-purchase/FRM-201_RFQ_Register.xlsx" rel="noopener noreferrer">FRM-201</a>, <a download="" href="/forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx" rel="noopener noreferrer">FRM-202</a>, <a download="" href="/forms/frm-200-purchase/FRM-205_Job_Dossier_Evidence_Index.xlsx" rel="noopener noreferrer">FRM-205</a>, <a download="" href="/forms/frm-200-purchase/FRM-208_Daily_Tier_Meeting_and_Escalation_Log.xlsx" rel="noopener noreferrer">FRM-208</a>, <a download="" href="/forms/frm-200-purchase/FRM-209_High_Risk_Job_Readiness_Review.xlsx" rel="noopener noreferrer">FRM-209</a>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Kiểm soát rà soát yêu cầu, xác nhận điều kiện thực hiện và lưu bằng chứng phê duyệt</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">Phát hành kỹ thuật</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<a download="" href="/forms/frm-300-technical/FRM-305_Inspection_Program_Release_Checklist.xlsx" rel="noopener noreferrer">FRM-305</a>, <a download="" href="/forms/frm-300-technical/FRM-306_Engineering_Release_and_Baseline_Package_Approval.xlsx" rel="noopener noreferrer">FRM-306</a>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Kiểm soát phát hành hồ sơ kỹ thuật, chương trình NC và xác nhận phiên bản áp dụng</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">Chuẩn bị sản xuất</td>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:col-resize">
+<a download="" href="/forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx" rel="noopener noreferrer">FRM-511</a>, <a download="" href="/forms/frm-500-production/FRM-518_Work_Transfer_Validation_Record.xlsx" rel="noopener noreferrer">FRM-518</a>, <a download="" href="/forms/frm-500-production/FRM-519_Job_Packet_Quick_Check_and_Pre_Run_Verification.xlsx" rel="noopener noreferrer">FRM-519</a>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Kiểm soát setup, bàn giao công việc và xác nhận điều kiện chạy sản xuất</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word">Nhận hàng / kho / đóng gói</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<a download="" href="/forms/frm-700-maintenance/FRM-701_Receiving_and_IQC_Log.xlsx" rel="noopener noreferrer">FRM-701</a>, <a download="" href="/forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx" rel="noopener noreferrer">FRM-413</a>, <a download="" href="/forms/frm-700-maintenance/FRM-713_Cleanroom_Entry_and_Gowning_Log.xlsx" rel="noopener noreferrer">FRM-713</a>, <a download="" href="/forms/frm-700-maintenance/FRM-714_Ultrasonic_Cleaning_Batch_Record.xlsx" rel="noopener noreferrer">FRM-714</a>, <a download="" href="/forms/frm-700-maintenance/FRM-715_Vacuum_Compatible_Clean_Build_and_Bagging_Record.xlsx" rel="noopener noreferrer">FRM-715</a>, <a download="" href="/forms/frm-700-maintenance/FRM-721_FOD_Line_Clearance_and_Tool_Accountability_Log.xlsx" rel="noopener noreferrer">FRM-721</a>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:row-resize">Nhận hàng / kho / đóng góiNhận hàng / kho / đóng gói</td>
+</tr>
+<tr>
+<td style="overflow-wrap:anywhere;word-break:break-word;cursor:col-resize">Biểu mẫu tra cứu / không phát hành hiện trường</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">
+<a href="/forms/design-system/form-control-register.html#FRM-103" rel="noopener noreferrer">FRM-103</a>, <a href="/forms/design-system/form-control-register.html#FRM-108" rel="noopener noreferrer">FRM-108</a>, <a href="/forms/design-system/form-control-register.html#FRM-109" rel="noopener noreferrer">FRM-109</a>, <a href="/forms/design-system/form-control-register.html#FRM-407" rel="noopener noreferrer">FRM-407</a>, <a href="/forms/design-system/form-control-register.html#FRM-412" rel="noopener noreferrer">FRM-412</a> và các mã không phát hành khác được kiểm soát tại <a href="/forms/design-system/form-control-register.html" rel="noopener noreferrer">Biểu mẫu Control Sổ đăng ký</a>
+</td>
+<td style="overflow-wrap:anywhere;word-break:break-word">Chỉ dùng cho tra cứu hoặc quản trị hệ thống; không dùng làm hồ sơ vận hành trực tiếp</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="footer-note">Sổ tay này phải được đọc cùng bộ SOP/WI/ANNEX/sổ tay/JD hiện hành. Khi có thay đổi làm ảnh hưởng ranh giới trách nhiệm, nguồn chuẩn duy nhất, thẩm quyền, thẩm quyền cổng kiểm soát hoặc kiến trúc ứng phó gián đoạn, QMS sổ tay / thủ công phải được rà lại cùng danh mục ưu tiên tại <a href="/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html" rel="noopener noreferrer">ANNEX-119</a>.</div>
 </div></div>
 </div>
 </div>
@@ -168,4 +1208,5 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 
 
 
-<script src="../../../assets/app.js" async="" defer data-qms-portal-bridge="1"></script></body></html>
+<script src="/mom/assets/app.js" async="" defer="" data-qms-portal-bridge="1"></script>
+</body></html>
