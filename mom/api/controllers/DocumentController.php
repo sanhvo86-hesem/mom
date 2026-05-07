@@ -646,16 +646,22 @@ class DocumentController extends BaseController
         // - drop any prior 'approved' entry for the SAME revision (we replace,
         //   not stack — re-approves of v3.0 must not produce three "approved
         //   v3.0" entries),
+        // - mark all OTHER 'approved' entries as 'obsolete' (only one revision
+        //   can be the released-current at a time; older approves are
+        //   historical),
         // - prepend exactly one canonical 'approved' entry at the top.
-        // Older approved entries for OTHER revisions stay intact (they are
-        // marked obsolete by the next major/minor cycle, which is the proper
-        // historical trail).
         $versions = array_values(array_filter($versions, static function ($v) use ($revision): bool {
             if (!is_array($v)) return false;
             $sameRev = (($v['version'] ?? '') === ('v' . $revision));
             $isTransient = in_array(($v['status'] ?? ''), ['draft', 'in_review', 'rejected', 'approved'], true);
             return !($sameRev && $isTransient);
         }));
+        foreach ($versions as &$v) {
+            if (is_array($v) && (($v['status'] ?? '') === 'approved')) {
+                $v['status'] = 'obsolete';
+            }
+        }
+        unset($v);
         array_unshift($versions, [
             'status'  => 'approved',
             'version' => 'v' . $revision,
