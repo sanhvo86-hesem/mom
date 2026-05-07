@@ -1250,53 +1250,79 @@ function wireDocuments() {
     });
   });
 
-  // Remove override
+  // Remove override — 2-click confirmation (avoids native confirm() which blocks the event loop)
   document.querySelectorAll('.tx-doc-remove-override').forEach(btn => {
     btn.addEventListener('click', () => {
-      const code = btn.dataset.docCode;
-      if (!confirm(_t(
-        'Xóa override này? Tài liệu sẽ dùng routing rule mặc định.',
-        'Remove this override? The document will revert to default routing.'
-      ))) return;
-      api('DELETE', `/api/v1/dcc/admin/translation/documents/${encodeURIComponent(code)}/override`)
-        .then(() => {
-          toast(_t('Đã xóa override', 'Override removed'));
-          STATE.docExpandedOverride = null;
-          STATE.documents = null;
-          loadDocuments();
-        }).catch(err => alert(err.message));
+      if (btn.dataset.pending === '1') {
+        // Second click: execute
+        const code = btn.dataset.docCode;
+        api('DELETE', `/api/v1/dcc/admin/translation/documents/${encodeURIComponent(code)}/override`)
+          .then(() => {
+            toast(_t('Đã xóa override', 'Override removed'));
+            STATE.docExpandedOverride = null;
+            STATE.documents = null;
+            loadDocuments();
+          }).catch(err => toast('Error: ' + err.message));
+        return;
+      }
+      // First click: arm
+      btn.dataset.pending = '1';
+      const origText = btn.textContent;
+      btn.textContent = _t('Xác nhận xóa?', 'Confirm remove?');
+      btn.style.background = 'var(--danger,#c00)';
+      btn.style.color = '#fff';
+      setTimeout(() => {
+        if (btn.dataset.pending === '1') {
+          delete btn.dataset.pending;
+          btn.textContent = origText;
+          btn.style.background = '';
+          btn.style.color = 'var(--danger,#c00)';
+        }
+      }, 3000);
     });
   });
 
-  // Force retranslate
+  // Force retranslate — 2-click confirmation
   document.querySelectorAll('.tx-doc-retranslate').forEach(btn => {
     btn.addEventListener('click', () => {
       if (btn.disabled) return;
       const code = btn.dataset.docCode;
-      if (!confirm(_t(
-        `Dịch lại "${code}"?\nThao tác này sẽ ghi đè bản dịch hiện tại bằng bản dịch mới.`,
-        `Retranslate "${code}"?\nThis will overwrite the current translation with a fresh one.`
-      ))) return;
-      STATE.docRetranslating[code] = true;
-      render();
-      api('POST', `/api/v1/dcc/admin/translation/documents/${encodeURIComponent(code)}/retranslate`, {})
-        .then(d => {
-          delete STATE.docRetranslating[code];
-          const ok = !d.result || d.result.ok !== false;
-          if (ok) {
-            toast(_t('Dịch thành công: ' + code, 'Translation complete: ' + code));
-          } else {
-            const reason = (d.result && (d.result.reason || d.result.message)) || 'unknown';
-            toast(_t('Dịch thất bại: ' + reason, 'Translation failed: ' + reason));
-          }
-          STATE.documents = null;
-          loadDocuments();
-        }).catch(err => {
-          delete STATE.docRetranslating[code];
-          STATE.documents = null;
-          loadDocuments();
-          alert(err.message);
-        });
+      if (btn.dataset.pending === '1') {
+        // Second click: execute
+        STATE.docRetranslating[code] = true;
+        render();
+        api('POST', `/api/v1/dcc/admin/translation/documents/${encodeURIComponent(code)}/retranslate`, {})
+          .then(d => {
+            delete STATE.docRetranslating[code];
+            const ok = !d.result || d.result.ok !== false;
+            if (ok) {
+              toast(_t('Dịch thành công: ' + code, 'Translation complete: ' + code));
+            } else {
+              const reason = (d.result && (d.result.reason || d.result.message)) || 'unknown';
+              toast(_t('Dịch thất bại: ' + reason, 'Translation failed: ' + reason));
+            }
+            STATE.documents = null;
+            loadDocuments();
+          }).catch(err => {
+            delete STATE.docRetranslating[code];
+            STATE.documents = null;
+            loadDocuments();
+            toast('Error: ' + err.message);
+          });
+        return;
+      }
+      // First click: arm
+      btn.dataset.pending = '1';
+      const origText = btn.textContent.trim();
+      btn.textContent = _t('Xác nhận dịch?', 'Confirm retranslate?');
+      btn.style.background = 'var(--warn,#e0a000)';
+      setTimeout(() => {
+        if (btn.dataset.pending === '1') {
+          delete btn.dataset.pending;
+          btn.textContent = origText;
+          btn.style.background = 'var(--brand-primary,#0c63e7)';
+        }
+      }, 3000);
     });
   });
 }
