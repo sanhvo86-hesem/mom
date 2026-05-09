@@ -7997,7 +7997,7 @@ function renderAdmin(){
     renderAdminModuleAccess();
     loadModuleAccessConfigFromServer({silent:true});
   }
-  if(adminTab==='docs') renderAdminEffectiveDocs();
+  if(adminTab==='docs') renderAdminContentTab('effective_docs');
   if(adminTab==='infrastructure') renderAdminInfrastructure();
   if(adminTab==='manual_runtime') renderAdminManualRuntime();
   if(adminTab==='data_sources') renderAdminDataSources();
@@ -8008,8 +8008,8 @@ function renderAdmin(){
     renderAdminPortalDisplay();
     loadPortalDisplayConfigFromServer({silent:true});
   }
-  if(adminTab==='retention') renderAdminRetention();
-  if(adminTab==='mfa') renderAdminMfa();
+  if(adminTab==='retention') renderAdminContentTab('retention');
+  if(adminTab==='mfa') renderAdminContentTab('mfa');
   if(adminTab==='ai_control') renderAdminAiControl();
   if(adminTab==='appearance') renderAdminAppearance();
   if(adminTab==='permission_catalog') renderAdminGovernanceTab('permission_catalog');
@@ -8033,6 +8033,26 @@ function renderAdminGovernanceTab(slug){
   s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00g-admin-governance-tabs.js?v=' + (window.APP_VERSION || Date.now());
   s.onload = function(){
     if(typeof window._renderAdminGovernanceTab === 'function') window._renderAdminGovernanceTab(el, slug);
+  };
+  document.head.appendChild(s);
+}
+
+/* ── Admin: Content & security tabs (Effective Docs / Retention / MFA) ──── */
+function renderAdminContentTab(slug){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+  if(typeof window._renderAdminContentTab === 'function'){
+    window._renderAdminContentTab(el, slug);
+    return;
+  }
+  el.innerHTML = '<div class="hm-empty">'+(lang==='en'?'Loading admin tab...':'Đang tải tab quản trị...')+'</div>';
+  var existing = document.getElementById('admin-content-tabs-script');
+  if(existing){ existing.remove(); }
+  var s = document.createElement('script');
+  s.id  = 'admin-content-tabs-script';
+  s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00h-admin-content-tabs.js?v=' + (window.APP_VERSION || Date.now());
+  s.onload = function(){
+    if(typeof window._renderAdminContentTab === 'function') window._renderAdminContentTab(el, slug);
   };
   document.head.appendChild(s);
 }
