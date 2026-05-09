@@ -24,7 +24,7 @@
   document.head.appendChild(js);
 })();
 </script>
-<link rel="stylesheet" href="../../../assets/style.css">
+<link rel="stylesheet" href="../../../../assets/style.css">
 <style>
 
 .page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
@@ -71,7 +71,7 @@ ul.tight li {margin:4px 0;}
  
  
 <div class="section"><h2>1. Mục đích và khi nào phải mở WI-801</h2>
-<p>WI-801 dùng để triển khai poka-yoke tại công đoạn một cách có kiểm soát. Tài liệu này không phải thư viện ví dụ; thư viện ví dụ nằm ở <a href="../../03-Reference/05-ANNEX-500/annex-507-poka-yoke-cnc-examples.html">ANNEX-507</a>. WI này chỉ trả lời 5 câu hỏi: lỗi nào cần chặn, chọn cơ chế nào, thử thế nào, xác nhận hiệu lực ra sao và khi nào được đưa vào vận hành chính thức.</p>
+<p>WI-801 dùng để triển khai poka-yoke tại công đoạn một cách có kiểm soát. Tài liệu này không phải thư viện ví dụ; thư viện ví dụ nằm ở <a href="../../references/05-ANNEX-500/annex-507-poka-yoke-cnc-examples.html">ANNEX-507</a>. WI này chỉ trả lời 5 câu hỏi: lỗi nào cần chặn, chọn cơ chế nào, thử thế nào, xác nhận hiệu lực ra sao và khi nào được đưa vào vận hành chính thức.</p>
 <div class="callout-danger"><strong>PHẢI</strong> triển khai giải pháp error-proofing thực chất cho lỗi lặp, lỗi có hậu quả lớn, sự cố suýt xảy ra nghiêm trọng hoặc lỗi dễ lọt qua cổng kiểm soát; không chỉ dừng ở "đào tạo lại", "nhắc nhở cẩn thận hơn" hoặc "treo thêm bảng nhắc".</div></div>
 
 <div class="section"><h2>2. Kích hoạt bắt buộc phải triển khai poka (chống sai) (chống sai)-giá đỡ (yoke)</h2>
@@ -94,7 +94,7 @@ ul.tight li {margin:4px 0;}
 <div class="step-list">
 <div class="step-item"><strong>Bước 1 — Chốt lỗi mục tiêu.</strong> Mô tả lỗi bằng hành vi cụ thể: nhầm phiên bản, nhầm program, lắp ngược, sai bù trừ (offset), bỏ sót cap, sai count, dùng sai gage, sai tool, hỗn hợp / lẫn lộn part… Không dùng mô tả mơ hồ kiểu "Operator bất cẩn".</div>
 <div class="step-item"><strong>Bước 2 — Chốt Point-of-use và điểm chặn.</strong> Xác định đúng trạm / vị trí làm việc, đúng bước, đúng Người, đúng điểm mà lỗi có thể bị chặn sớm nhất. poka (chống sai) (chống sai)-giá đỡ (yoke) đặt càng xa nguồn sai thì càng yếu.</div>
-<div class="step-item"><strong>Bước 3 — Chọn giải pháp.</strong> Dùng <a href="../../03-Reference/05-ANNEX-500/annex-507-poka-yoke-cnc-examples.html">ANNEX-507</a> để chọn cơ chế; ưu tiên cơ khí / key / khóa / liên động an toàn trước trực quan hoặc nhắc nhớ.</div>
+<div class="step-item"><strong>Bước 3 — Chọn giải pháp.</strong> Dùng <a href="../../references/05-ANNEX-500/annex-507-poka-yoke-cnc-examples.html">ANNEX-507</a> để chọn cơ chế; ưu tiên cơ khí / key / khóa / liên động an toàn trước trực quan hoặc nhắc nhớ.</div>
 <div class="step-item"><strong>Bước 4 — Kiểm tra khả năng vượt qua.</strong> Trước khi thí điểm, phải trả lời: có thể tắt, lách, đổi đường, bỏ qua hay dùng đồ khác thay thế cơ chế này không. Nếu có, chưa được phát hành.</div>
 <div class="step-item"><strong>Bước 5 — Thí điểm có kiểm soát.</strong> Thử trên 1 máy / 1 trạm / vị trí làm việc / 1 nhóm Job. Thực hiện dry-run, mẫu đầu (tiên chi tiết / sản phẩm), giao ca và ít nhất một tình huống bất thường mô phỏng để xem cơ chế phản ứng thế nào.</div>
 <div class="step-item"><strong>Bước 6 — Đo hiệu lực.</strong> Kiểm tra lại đúng lỗi mục tiêu, thời gian chu kỳ, mức hiểu của Người dùng, số lần false cảnh báo, số lần vượt qua và mức sạch/ an toàn/ bảo trì bị ảnh hưởng. Chỉ giữ giải pháp nếu hiệu lực tăng mà không sinh lỗi mới.</div>
@@ -135,9 +135,9 @@ ul.tight li {margin:4px 0;}
 </ul></div>
 </div>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Liên kết</th><th>Vai trò</th></tr></thead><tbody>
-<tr><td><a href="../../01-SOPs/08-SOP-800/sop-804-human-factors-and-error-proofing.html">SOP-804</a></td><td>Khung quản trị yếu tố con Người và chống sai.</td></tr>
-<tr><td><a href="../../01-SOPs/09-SOP-900/sop-903-continual-improvement-and-kaizen.html">SOP-903</a></td><td>Đưa control có hiệu lực vào cải tiến chuẩn hóa.</td></tr>
-<tr><td><a href="../../03-Reference/05-ANNEX-500/annex-507-poka-yoke-cnc-examples.html">ANNEX-507</a></td><td>Thư viện giải pháp mẫu để chọn nhanh cơ chế phù hợp.</td></tr>
+<tr><td><a href="../../sops/08-SOP-800/sop-804-human-factors-and-error-proofing.html">SOP-804</a></td><td>Khung quản trị yếu tố con Người và chống sai.</td></tr>
+<tr><td><a href="../../sops/09-SOP-900/sop-903-continual-improvement-and-kaizen.html">SOP-903</a></td><td>Đưa control có hiệu lực vào cải tiến chuẩn hóa.</td></tr>
+<tr><td><a href="../../references/05-ANNEX-500/annex-507-poka-yoke-cnc-examples.html">ANNEX-507</a></td><td>Thư viện giải pháp mẫu để chọn nhanh cơ chế phù hợp.</td></tr>
 <tr><td><a href="../05-WI-500/wi-512-3-axis-vertical-milling-guide.html">WI-512</a> / <a href="../05-WI-500/wi-513-5-axis-milling-guide.html">WI-513</a> / <a href="../05-WI-500/wi-514-cnc-turning-guide.html">WI-514</a> / <a href="../05-WI-500/wi-515-mill-turn-guide.html">WI-515</a> / <a href="../05-WI-500/wi-516-machine-operation-quick-card.html">WI-516</a></td><td>Các Point-of-use chính để nhúng control.</td></tr>
 <tr><td><a download="" href="../../../forms/frm-800-hr/FRM-811_Incident_Report.xlsx">FRM-811</a></td><td>Sự cố suýt xảy ra / sự cố / kích hoạt cho chống sai.</td></tr>
 </tbody></table></div></div>
@@ -148,6 +148,6 @@ ul.tight li {margin:4px 0;}
  </div>
 
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
-<script src="../../../assets/app.js"></script>
+<script src="../../../../assets/app.js"></script>
 </body>
 </html>

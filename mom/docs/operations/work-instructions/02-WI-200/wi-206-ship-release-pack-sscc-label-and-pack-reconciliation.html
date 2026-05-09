@@ -24,7 +24,7 @@
   document.head.appendChild(js);
 })();
 </script>
-<link rel="stylesheet" href="../../../assets/style.css">
+<link rel="stylesheet" href="../../../../assets/style.css">
 <style>
 
 
@@ -97,7 +97,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>QPL / customer package</td><td>Xác định rõ mức QPL, overlay khách hàng, yêu cầu cert, label, pack spec và release thẩm quyền</td><td>Chưa xác định QPL hoặc chưa rõ tài liệu khách hàng nào đang hiệu lực</td></tr>
 <tr><td>Pack structure</td><td>Đã xác định số inner pack, outer pack, pallet/crate, qty theo từng logistic unit và rule giao hàng một phầnment</td><td>Chưa rõ cấu trúc kiện hoặc còn thay đổi chưa khóa</td></tr>
 <tr><td>Source data</td><td>Part, Rev, Qty, Lot/Serial, SO/PO, Ship-to, carrier/service, customer PN nếu áp dụng, dữ liệu label đều lấy từ SoR/SSOT hiệu lực</td><td>Dữ liệu lấy từ email/chat/Excel rời hoặc có nhiều nguồn mâu thuẫn</td></tr>
-<tr><td>Packaging condition</td><td>Bao gói đáp ứng <a href="../../03-Reference/07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a> và yêu cầu khách hàng; kiện sạch, không FOD, không hỏng</td><td>Bao gói chưa đạt, thiếu vật tư, thiếu ảnh/bằng chứng hoặc còn nguy cơ nhiễm bẩn</td></tr>
+<tr><td>Packaging condition</td><td>Bao gói đáp ứng <a href="../../references/07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a> và yêu cầu khách hàng; kiện sạch, không FOD, không hỏng</td><td>Bao gói chưa đạt, thiếu vật tư, thiếu ảnh/bằng chứng hoặc còn nguy cơ nhiễm bẩn</td></tr>
 </tbody></table></div>
 <div class="callout-info"><strong>SoR / SSOT</strong><br>Trạng thái lô giao hàng, PackID, số lượng, phân bổ và xác nhận giao hàng phải lấy từ SoR giao dịch. Evidence, ảnh, bảng kiểm, lịch sử phê duyệt và liên kết chứng từ phải nằm trong SSOT hồ sơ. Không được duy trì "bộ hồ sơ giao hàng riêng" ngoài hệ thống.</div></div>
 
@@ -122,7 +122,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Nhóm chứng từ</th><th>Bắt buộc khi</th><th>Ví dụ hồ sơ phải có</th></tr></thead><tbody>
 <tr><td>Hồ sơ cốt lõi của lô giao hàng</td><td>Mọi lô giao hàng</td><td>phiếu đóng gói, lô giao hàng/hồ sơ đóng gói, ảnh nhãn, ảnh kiện, bảng kiểm giao hàng</td></tr>
 <tr><td>Phê duyệt chất lượng</td><td>Mọi lô giao hàng có cổng kiểm soát phê duyệt</td><td>Kiểm tra cuối phê duyệt, CoC, kiểm tra log, lịch sử phê duyệt</td></tr>
-<tr><td>bằng chứng theo QPL</td><td>Theo <a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a></td><td>FAI, kế hoạch kiểm soát, CTQ bằng chứng, chấp thuận đặc biệt nếu có</td></tr>
+<tr><td>bằng chứng theo QPL</td><td>Theo <a href="../../references/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a></td><td>FAI, kế hoạch kiểm soát, CTQ bằng chứng, chấp thuận đặc biệt nếu có</td></tr>
 <tr><td>Vật liệu / thuê ngoài</td><td>Khi khách hàng hoặc yêu cầu kỹ thuật yêu cầu</td><td>MTR/CoC vật liệu, chứng từ chứng nhận công đoạn đặc biệt, bộ hồ sơ thuê ngoài, chuỗi mẻ nhiệt/lô</td></tr>
 <tr><td>Vận chuyển / xuất khẩu / chứng từ khách hàng</td><td>Khi áp dụng</td><td>AWB/BOL/theo dõi, nhãn theo yêu cầu khách hàng, chứng từ thương mại, xuất xứ hàng hóa</td></tr>
 </tbody></table></div>
@@ -158,7 +158,7 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 <tr><td>Thiếu CoC/MTR/chứng từ chứng nhận/công đoạn đặc biệt trong hồ sơ</td><td>Không giao; giữ TẠM GIỮ cho đến khi hồ sơ đủ và thẩm quyền phê duyệt lại.</td></tr>
 <tr><td>Không khớp giữa bộ bằng chứng và lô giao hàng thực tế</td><td>Review lại toàn bộ lô giao hàng; không sửa lẻ từng file để "cho khớp".</td></tr>
 </tbody></table></div>
-<div class="kpi-grid"><div class="kpi-box"><strong>Gate/control metrics</strong><div class="tiny" style="margin-top:6px;">Phê duyệt giao hàng đúng hạn; số lô giao hàng TẠM GIỮ do đóng gói/chứng từ không khớp; số dán nhãn lại/đóng gói lại; số lọt lỗi giao hàng do nhãn/chứng từ; thời gian từ phê duyệt cuối cùng đến xác nhận giao hàng. LOG/QA review theo ngày/tuần; chặn lỗi trước ship được ghi nhận; lệch lặp lại mở hành động khắc phục, kỷ luật chỉ áp dụng khi cố ý bypass gate hoặc làm sai evidence.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;"><a href="../../01-SOPs/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a>; <a href="wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a>; <a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>; <a href="../../03-Reference/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a>; <a href="../../03-Reference/07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a>; <a href="../../03-Reference/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a>; <a href="../../../forms/frm-700-maintenance/FRM-702_Shipping_Checklist.xlsx" download="">FRM-702</a>; <a href="../../../forms/frm-700-maintenance/FRM-706_Shipping_Label.xlsx" download="">FRM-706</a>.</div></div></div></div>
+<div class="kpi-grid"><div class="kpi-box"><strong>Gate/control metrics</strong><div class="tiny" style="margin-top:6px;">Phê duyệt giao hàng đúng hạn; số lô giao hàng TẠM GIỮ do đóng gói/chứng từ không khớp; số dán nhãn lại/đóng gói lại; số lọt lỗi giao hàng do nhãn/chứng từ; thời gian từ phê duyệt cuối cùng đến xác nhận giao hàng. LOG/QA review theo ngày/tuần; chặn lỗi trước ship được ghi nhận; lệch lặp lại mở hành động khắc phục, kỷ luật chỉ áp dụng khi cố ý bypass gate hoặc làm sai evidence.</div></div><div class="kpi-box"><strong>Tài liệu liên kết</strong><div class="tiny" style="margin-top:6px;"><a href="../../sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a>; <a href="wi-205-barcode-labeling-and-scan-to-action.html">WI-205</a>; <a href="wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>; <a href="../../references/07-ANNEX-700/annex-701-gs1-sscc-data-dictionary-and-pack-reconciliation.html">ANNEX-701</a>; <a href="../../references/07-ANNEX-700/annex-702-packaging-labeling-spec.html">ANNEX-702</a>; <a href="../../references/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a>; <a href="../../../forms/frm-700-maintenance/FRM-702_Shipping_Checklist.xlsx" download="">FRM-702</a>; <a href="../../../forms/frm-700-maintenance/FRM-706_Shipping_Label.xlsx" download="">FRM-706</a>.</div></div></div></div>
 
  </div>
  </div>

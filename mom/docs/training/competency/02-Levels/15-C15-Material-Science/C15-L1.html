@@ -56,18 +56,18 @@
  Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
  </p>
 <ul class="tight">
-<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-material-cert-specialprocess.html">DRL-03 — TRN-Bài diễn tập ACA-DRL-03 — Nguyên vật liệu Cert &amp;amp; Công đoạn đặc biệt Outsource | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-joborder-e2e.html">DRL-01 — TRN-Bài diễn tập ACA-DRL-01 — Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship gói hồ sơ) | HESEM Academy</a></li>
+<li><a href="../../../content/03-Practice-Drills/drill-material-cert-specialprocess.html">DRL-03 — TRN-Bài diễn tập ACA-DRL-03 — Nguyên vật liệu Cert &amp;amp; Công đoạn đặc biệt Outsource | HESEM Academy</a></li><li><a href="../../../content/03-Practice-Drills/drill-joborder-e2e.html">DRL-01 — TRN-Bài diễn tập ACA-DRL-01 — Lệnh sản xuất E2E (RFQ → Bộ hồ sơ giao hàng (ship gói hồ sơ) | HESEM Academy</a></li>
 </ul>
 <p class="small muted" style="margin-top:8px;">
- Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
+ Lưu bằng chứng theo <a href="../../../templates/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
  </p>
 </div>
 <h2>2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <div class="card"><ul><li>Phân xưởng CNC gia công theo đơn (job xưởng) có nhiều loại vật liệu, nhiều trạng thái (T6/T651/đã ủ (annealed) và nhiều công đoạn outsource (xi mạ anốt (anodize)/mạ/mẻ nấu (heat) xử lý).</li><li>Sai vật liệu hoặc thiếu chứng từ tạo ra 3 hậu quả: (1) phế phẩm/làm lại, (2) khiếu nại / yêu cầu bồi thường khách hàng, (3) đánh giá phát hiện nặng do mất truy xuất nguồn gốc.</li><li>Mô-đun tập trung chặn lỗi ngay tại hiện trường: nhận đúng – ghi đúng – lưu đúng – bàn giao đủ chứng cứ.</li></ul></div>
 <h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
 <p>Mô-đun này bám theo các quy trình nội bộ liên quan và yêu cầu "không có bằng chứng = không qua cổng kiểm soát". Link tham chiếu: 
-<a href="../../../../operations/02-Work-Instructions/02-WI-200">WI-OPS-001 Quality cổng</a> •
-<a href="../../../../operations/02-Work-Instructions/05-WI-500">WI-OPS-008 Hồ sơ công việc (hồ sơ công việc) &amp; Bộ bằng chứng</a>.
+<a href="../../../../operations/work-instructions/02-WI-200">WI-OPS-001 Quality cổng</a> •
+<a href="../../../../operations/work-instructions/05-WI-500">WI-OPS-008 Hồ sơ công việc (hồ sơ công việc) &amp; Bộ bằng chứng</a>.
 </p>
 <div class="vflow"><div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Nhận hàng &amp; IQC</strong><p>Nhận vật tư + kiểm chứng từ (MTR/CoC) + dán nhãn vị trí kho.</p></div></div><div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Lưu kho &amp; bảo quản</strong><p>Lưu kho đúng khu vực, chống trầy/xước/oxy hóa, phân lô rõ ràng.</p></div></div><div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Vấn đề to Job</strong><p>Xuất vật tư cho Job đúng Part/REV/spec; ghi nhận mẻ nấu (heat)/lot vào hồ sơ Job.</p></div></div><div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>gia công cơ khí</strong><p>Gia công đúng vật liệu/ram (temper); bảo vệ bề mặt; không trộn phôi khác lô.</p></div></div><div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Outsource Công đoạn đặc biệt</strong><p>Lập yêu cầu outsource theo spec; gửi kèm mẫu/tiêu chí; kiểm soát đóng gói.</p></div></div><div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>đầu vào / nhận hàng sau nhà thầu phụ (Subcon)</strong><p>Kiểm tra chứng từ + kiểm tra bề mặt/độ dày/độ cứng theo yêu cầu; cập nhật Job Pack.</p></div></div><div class="vstep"><div class="vnum">7</div><div class="vtext"><strong>Final <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a> &amp; Ship</strong><p>Bảo đảm bộ hồ sơ giao hàng có đủ chứng chỉ vật liệu và chứng chỉ công đoạn đặc biệt.</p></div></div></div>
 <div class="table-card">
@@ -135,7 +135,7 @@
 <ul><li>Không truy xuất nguồn gốc được mẻ nấu (heat)/lot cho part đã ship.</li><li>MTR/CoC không nằm trong SSOT hoặc không liên kết đúng Job.</li><li>WIP tag thiếu thông tin hoặc viết tay khó đọc, gây nhầm lẫn.</li><li>Trộn lô vật liệu trong kho hoặc tại máy, không có cách ly.</li><li>Outsource yêu cầu thiếu spec/CTQ, NCC làm sai xử lý.</li><li>Kiểm tra đầu vào sau outsource không có hồ sơ hoặc ký nháy không đủ bằng chứng.</li><li><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a> Hold không được mở dù có không khớp.</li><li>Chứng chỉ công đoạn đặc biệt không khớp spec nhưng vẫn phát hành.</li><li><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Warehouse Function (Bộ phận Kho)"><span class="entity-code dept-code">D-WHS</span></a></span> bảo quản không có log môi trường cho vật tư nhạy cảm.</li></ul>
 </div></div></div>
 </div>
-<script src="../../../../assets/app.js"></script>
+<script src="../../../../../assets/app.js"></script>
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>

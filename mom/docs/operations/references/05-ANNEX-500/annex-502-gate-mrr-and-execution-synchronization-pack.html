@@ -24,7 +24,7 @@
   document.head.appendChild(js);
 })();
 </script>
-<link rel="stylesheet" href="../../../assets/style.css">
+<link rel="stylesheet" href="../../../../assets/style.css">
 
 <style>
 
@@ -149,7 +149,7 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>8. Exception path: chuyển giao công việc, rebaseline, split lot, giao hàng một phần</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Có được đi tiếp không</th><th>Điều kiện bắt buộc trước khi mở lại</th></tr></thead><tbody>
-<tr><td>Chuyển giao công việc sang máy / ca / Người khác</td><td>Chỉ được đi tiếp sau G2 mini-check hoặc theo <a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a></td><td>Bàn giao nhật ký, current offset/tool state, part sample retained, first 1–3 pcs xác minh lại</td></tr>
+<tr><td>Chuyển giao công việc sang máy / ca / Người khác</td><td>Chỉ được đi tiếp sau G2 mini-check hoặc theo <a href="../../work-instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a></td><td>Bàn giao nhật ký, current offset/tool state, part sample retained, first 1–3 pcs xác minh lại</td></tr>
 <tr><td>Rebaseline do đổi rev / ECO</td><td>Không được dùng dữ liệu G2/G4 cũ nguyên xi</td><td>Thu hồi revision set cũ, baseline mới, đánh dấu cut-over time, re-sign engineering + <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a></td></tr>
 <tr><td>Split lot / giao hàng một phần</td><td>Được nếu trace và label tách hoàn toàn</td><td>Mỗi lot con có đối chiếu đóng gói riêng, label riêng, qty balance rõ</td></tr>
 <tr><td>Repack / relabel sau G5</td><td>Được trong giới hạn thẩm quyền</td><td>Giữ chain of custody, ảnh trước/sau, reprint / relabel nhật ký, QA/WHS approval</td></tr>
@@ -174,12 +174,12 @@ hr.sep {border:none;border-top:1px solid var(--ln2);margin:18px 0;}
 
 <div class="section"><h2>10. Tài liệu liên kết</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
-<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html">WI-201</a></td><td>Thực hiện cổng kiểm soát, hold, phát hành tại hiện trường.</td></tr>
-<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Kiểm tính đầy đủ hồ sơ theo cổng kiểm soát.</td></tr>
-<tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a></td><td>Điều độ, WIP và cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch).</td></tr>
-<tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a></td><td>Chuyển giao công việc xác nhận.</td></tr>
-<tr><td><a href="../../02-Work-Instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a></td><td>Xác minh trước khi chạy tại máy.</td></tr>
-<tr><td><a href="../../02-Work-Instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>siêu dữ liệu và cấu trúc của hồ sơ.</td></tr>
+<tr><td><a href="../../work-instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html">WI-201</a></td><td>Thực hiện cổng kiểm soát, hold, phát hành tại hiện trường.</td></tr>
+<tr><td><a href="../../work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Kiểm tính đầy đủ hồ sơ theo cổng kiểm soát.</td></tr>
+<tr><td><a href="../../work-instructions/05-WI-500/wi-501-dispatch-capacity-and-wip-control.html">WI-501</a></td><td>Điều độ, WIP và cửa sổ khóa kế hoạch (đóng băng cửa sổ / khung thời gian / cửa sổ khóa kế hoạch).</td></tr>
+<tr><td><a href="../../work-instructions/05-WI-500/wi-518-work-transfer-validation.html">WI-518</a></td><td>Chuyển giao công việc xác nhận.</td></tr>
+<tr><td><a href="../../work-instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a></td><td>Xác minh trước khi chạy tại máy.</td></tr>
+<tr><td><a href="../../work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>siêu dữ liệu và cấu trúc của hồ sơ.</td></tr>
 <tr><td><a href="../01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a></td><td>Escalation và SLA.</td></tr>
 <tr><td><a href="../01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a></td><td>Ma trận thẩm quyền.</td></tr>
 <tr><td><a href="../01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html">ANNEX-121</a></td><td>RACI chủ / gốc matrix.</td></tr>

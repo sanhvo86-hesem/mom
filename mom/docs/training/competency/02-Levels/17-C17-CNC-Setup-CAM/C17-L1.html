@@ -56,18 +56,18 @@
  Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
  </p>
 <ul class="tight">
-<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-setup-firstarticle-ir.html">DRL-04 — TRN-Bài diễn tập ACA-DRL-04 — Setup + Kiểm tra sản phẩm đầu tiên (sản phẩm / bài viết) + IR/FAI | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-cam-release-changecontrol.html">DRL-05 — TRN-Bài diễn tập ACA-DRL-05 — CAM Gói phát hành + Kiểm soát thay đổi | HESEM Academy</a></li>
+<li><a href="../../../content/03-Practice-Drills/drill-setup-firstarticle-ir.html">DRL-04 — TRN-Bài diễn tập ACA-DRL-04 — Setup + Kiểm tra sản phẩm đầu tiên (sản phẩm / bài viết) + IR/FAI | HESEM Academy</a></li><li><a href="../../../content/03-Practice-Drills/drill-cam-release-changecontrol.html">DRL-05 — TRN-Bài diễn tập ACA-DRL-05 — CAM Gói phát hành + Kiểm soát thay đổi | HESEM Academy</a></li>
 </ul>
 <p class="small muted" style="margin-top:8px;">
- Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
+ Lưu bằng chứng theo <a href="../../../templates/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
  </p>
 </div>
 <h2>2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <div class="card"><ul><li>Trong phân xưởng CNC, lỗi tốn kém nhất xuất phát từ: chạy sai phiên bản, sai chương trình, sai bù trừ (offset)/không / bằng không, vượt qua mẫu đầu.</li><li>Operator không bị đánh giá theo "chạy nhanh", mà theo "chạy đúng và có bằng chứng".</li><li>Bám quy trình: <a href="../../../../operations/sops/05-SOP-500/sop-502-cnc-machining-operations.html">PROC-CNC-001 CNC gia công cơ khí thực thi</a> • <a href="../../../../operations/sops/05-SOP-500/sop-502-cnc-machining-operations.html">PROC-CNC-002 Program/Setup Phát hành Control</a>.</li></ul></div>
 <h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
 <p>Mô-đun này bám theo các quy trình nội bộ liên quan và yêu cầu "không có bằng chứng = không qua cổng kiểm soát". Link tham chiếu: 
-<a href="../../../../operations/02-Work-Instructions/02-WI-200">WI-OPS-001 Quality cổng</a> •
-<a href="../../../../operations/02-Work-Instructions/05-WI-500">WI-OPS-008 Hồ sơ công việc (hồ sơ công việc) &amp; Bộ bằng chứng</a>.
+<a href="../../../../operations/work-instructions/02-WI-200">WI-OPS-001 Quality cổng</a> •
+<a href="../../../../operations/work-instructions/05-WI-500">WI-OPS-008 Hồ sơ công việc (hồ sơ công việc) &amp; Bộ bằng chứng</a>.
 </p>
 <div class="vflow"><div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Nhận Job Pack</strong><p>Mở Hồ sơ công việc và xác nhận PartNo/REV, CTQ, lộ trình gia công.</p></div></div><div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Lấy Phiếu setup</strong><p>Dùng phiếu cài đặt đúng phiên bản và đúng máy/đồ gá/dao.</p></div></div><div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Nạp chương trình Released</strong><p>Chỉ dùng chương trình trong SSOT; kiểm tên file/version.</p></div></div><div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Set không / bằng không &amp; tool bù trừ (bù trừ (offset)</strong><p>Set mốc chuẩn (datum), tool chiều dài/đường kính; ghi nhận bù trừ (offset) theo chuẩn.</p></div></div><div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Mẫu đầu / FAI cổng kiểm soát</strong><p>Chạy 1 chi tiết đầu, đo theo plan; QC/Trưởng nhóm ký phát hành.</p></div></div><div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>Trong quá trình kiểm tra</strong><p>Đo theo tần suất; phản ứng theo phản ứng plan; ghi hồ sơ.</p></div></div><div class="vstep"><div class="vnum">7</div><div class="vtext"><strong>Kết thúc job</strong><p>Vệ sinh, bảo quản part, cập nhật phiếu công nghệ/tuổi dao (tool tuổi thọ / vòng đời)/Thời gian dừng máy Log.</p></div></div></div>
 <div class="table-card">
@@ -135,7 +135,7 @@
 <ul><li>Không chứng minh chương trình CNC đang chạy là bản phát hành.</li><li>Phiếu setup thiếu hoặc không đúng phiên bản.</li><li>Mẫu đầu hồ sơ thiếu chữ ký/thiếu kết quả.</li><li>tuổi dao (tool tuổi thọ / vòng đời) log không được ghi, trôi / sai lệch không truy xuất nguồn gốc.</li><li>bù trừ (offset) chỉnh nhưng không có hồ sơ.</li><li>Part/WIP trộn giữa job, mất truy xuất nguồn gốc.</li><li>Thời gian dừng máy không ghi, dữ liệu OEE sai.</li><li><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a> Hold không mở khi có sai lệch.</li><li>Bề mặt part trầy do bảo quản sai sau gia công.</li></ul>
 </div></div></div>
 </div>
-<script src="../../../../assets/app.js"></script>
+<script src="../../../../../assets/app.js"></script>
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>

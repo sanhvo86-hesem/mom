@@ -56,18 +56,18 @@
  Mở danh mục diễn tập tại <a href="../../02-Training-Content/03-Practice-Drills/index.html"><b>TRN-ACA-DRL-INDEX</b></a>.
  </p>
 <ul class="tight">
-<li><a href="../../../02-Training-Content/03-Practice-Drills/drill-setup-firstarticle-ir.html">DRL-04 — TRN-Bài diễn tập ACA-DRL-04 — Setup + Kiểm tra sản phẩm đầu tiên (sản phẩm / bài viết) + IR/FAI | HESEM Academy</a></li><li><a href="../../../02-Training-Content/03-Practice-Drills/drill-cam-release-changecontrol.html">DRL-05 — TRN-Bài diễn tập ACA-DRL-05 — CAM Gói phát hành + Kiểm soát thay đổi | HESEM Academy</a></li>
+<li><a href="../../../content/03-Practice-Drills/drill-setup-firstarticle-ir.html">DRL-04 — TRN-Bài diễn tập ACA-DRL-04 — Setup + Kiểm tra sản phẩm đầu tiên (sản phẩm / bài viết) + IR/FAI | HESEM Academy</a></li><li><a href="../../../content/03-Practice-Drills/drill-cam-release-changecontrol.html">DRL-05 — TRN-Bài diễn tập ACA-DRL-05 — CAM Gói phát hành + Kiểm soát thay đổi | HESEM Academy</a></li>
 </ul>
 <p class="small muted" style="margin-top:8px;">
- Lưu bằng chứng theo <a href="../../../04-Templates-Tools/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
+ Lưu bằng chứng theo <a href="../../../templates/evidence-naming-rule.html"><b>TRN-ACA-EVID-01</b></a>.
  </p>
 </div>
 <h2>2) Mục đích mô-đun &amp; bối cảnh vận hành</h2>
 <div class="card"><ul><li>Setup sai tạo ra sự cố nghiêm trọng hoặc trôi / sai lệch hàng loạt. Level 2 là "điểm chặn kỹ thuật" ngay trước khi chạy lô.</li><li>Đầu ra của setup không phải là "máy chạy", mà là "máy chạy ổn định + có hồ sơ + có kế hoạch phản ứng".</li><li>Bám quy trình: <a href="../../../../operations/sops/05-SOP-500/sop-502-cnc-machining-operations.html">PROC-CNC-002</a> • <a href="../../../../operations/sops/05-SOP-500/sop-503-tooling-maintenance-pm-and-breakdown-response.html">PROC-MNT-001 Tooling &amp; Fixture Control</a>.</li></ul></div>
 <h2>3) Vị trí trong chuỗi E2E + luồng bàn giao (đầu vào/đầu ra) + điểm chặn</h2>
 <p>Mô-đun này bám theo các quy trình nội bộ liên quan và yêu cầu "không có bằng chứng = không qua cổng kiểm soát". Link tham chiếu: 
-<a href="../../../../operations/02-Work-Instructions/02-WI-200">WI-OPS-001 Quality cổng</a> •
-<a href="../../../../operations/02-Work-Instructions/05-WI-500">WI-OPS-008 Hồ sơ công việc (hồ sơ công việc) &amp; Bộ bằng chứng</a>.
+<a href="../../../../operations/work-instructions/02-WI-200">WI-OPS-001 Quality cổng</a> •
+<a href="../../../../operations/work-instructions/05-WI-500">WI-OPS-008 Hồ sơ công việc (hồ sơ công việc) &amp; Bộ bằng chứng</a>.
 </p>
 <div class="vflow"><div class="vstep"><div class="vnum">1</div><div class="vtext"><strong>Chuẩn bị</strong><p>Xác nhận job pack, CTQ, phiếu cài đặt; chuẩn bị dao/đồ gá/đồng hồ so/đồ đo.</p></div></div><div class="vstep"><div class="vnum">2</div><div class="vtext"><strong>Lắp đồ gá</strong><p>Lắp fixture, siết lực đúng, kiểm kẹp phôi và thông quan / giải phóng.</p></div></div><div class="vstep"><div class="vnum">3</div><div class="vtext"><strong>Set mốc chuẩn (datum) &amp; đo bằng đầu dò</strong><p>Thiết lập mốc chuẩn (datum); chạy đầu dò (probe); xác nhận công việc bù trừ (offset).</p></div></div><div class="vstep"><div class="vnum">4</div><div class="vtext"><strong>Set tool bù trừ (bù trừ (offset)</strong><p>Cập nhật tool chiều dài/đường kính; ghi hồ sơ.</p></div></div><div class="vstep"><div class="vnum">5</div><div class="vtext"><strong>Chạy thử khô (dry run) / đơn lẻ chặn / khóa</strong><p>Chạy chạy kiểm chứng theo mức an toàn (đơn lẻ chặn / khóa, bước tiến (feed) ghi đè / bỏ qua) khi áp dụng.</p></div></div><div class="vstep"><div class="vnum">6</div><div class="vtext"><strong>Mẫu đầu / FAI</strong><p>Chạy 1 chi tiết, đo theo plan; cập nhật điều chỉnh hợp lệ.</p></div></div><div class="vstep"><div class="vnum">7</div><div class="vtext"><strong>Bàn giao</strong><p>Bàn giao cho Operator: bù trừ (offset), dao, điểm rủi ro, tần suất đo, phản ứng plan.</p></div></div></div>
 <div class="table-card">
@@ -135,7 +135,7 @@
 <ul><li>Chạy kiểm chứng không có bằng chứng; không chứng minh chế độ an toàn.</li><li>FAI thiếu CTQ hoặc thiếu chữ ký phát hành.</li><li>Phiếu setup không cập nhật bù trừ (offset) final.</li><li>Thay đổi vượt phạm vi không có yêu cầu thay đổi.</li><li>tuổi dao (tool tuổi thọ / vòng đời) log không cập nhật; trôi / sai lệch không truy xuất nguồn gốc.</li><li>Fixture/dao không theo quy định tooling control.</li><li>Part fail không được cô lập, lẫn vào part đạt.</li><li>Bàn giao ca thiếu thông tin, lỗi lặp theo ca.</li></ul>
 </div></div></div>
 </div>
-<script src="../../../../assets/app.js"></script>
+<script src="../../../../../assets/app.js"></script>
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>

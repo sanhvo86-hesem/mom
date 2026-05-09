@@ -1,15 +1,15 @@
 <!DOCTYPE html>
+
 <html lang="vi">
 <head>
-<meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>JD-OPR - CNC Operator | HESEM MOM</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JD-OPR - Nhân viên vận hành máy điều khiển số bằng máy tính (CNC) | HESEM MOM</title>
 <script>
-/* DCC Header bootstrap — computes absolute URLs from location.pathname so the
- * stylesheet + renderer load correctly regardless of how the document is
- * served (direct, portal iframe + <base href="../"> injection, doc_stream, …).
- * The explicit `?v=…` query string busts browser + service-worker caches
- * whenever the DCC header CSS or renderer ships a new revision. */
+/* DCC Header bootstrap (vi) — Khởi tạo đầu trang kiểm soát tài liệu: tự tính đường dẫn tuyệt đối từ location.pathname
+ * để tải đúng biểu định dạng và bộ dựng đầu trang khi mở trực tiếp, trong cổng nội bộ
+ * hoặc qua luồng xem tài liệu. Tham số phiên bản giúp trình duyệt nhận bản mới khi
+ * thành phần đầu trang được cập nhật. */
 (function () {
   var DCC_VERSION = '2026-04-24-1';
   var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
@@ -25,153 +25,220 @@
 })();
 </script>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
-<link rel="stylesheet" href="../../../../assets/style.css">
+<link href="../../../../../assets/style.css" rel="stylesheet"/>
 </head>
 <body>
 <div class="container">
 <div class="page">
 <div class="page-body">
-<!-- DCC Document Change Control header (values served by /api/v1/dcc; bootstrap seed is preview-only) -->
-<div class="dcc-header"
-     data-dcc-doc-code="JD-CNC-OPERATOR"
-     data-dcc-locale="vi"
-     data-dcc-logo="../../../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;JD-CNC-OPERATOR&quot;,&quot;title&quot;:&quot;CNC Operator&quot;,&quot;subtitle&quot;:&quot;Nhân viên vận hành CNC&quot;,&quot;doc_type&quot;:&quot;JD&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
+<!-- Đầu trang kiểm soát thay đổi tài liệu: giữ nguyên cơ chế hiển thị của hệ thống. -->
+<div class="dcc-header" data-dcc-bootstrap='{"header":{"doc_code":"JD-CNC-OPERATOR","title":"Nhân viên vận hành máy điều khiển số bằng máy tính (CNC)","subtitle":"Nhân viên vận hành CNC","doc_type":"JD","revision":"V0","effective_date":"2026-04-23","owner_role_code":"QA","approver_role_code":"CEO","iso_clause":null,"status":"draft"},"labels":{"doc_id":{"short":"Mã","long":"Mã tài liệu","sort":10},"revision":{"short":"Lần sửa","long":"Lần sửa đổi","sort":20},"effective_date":{"short":"Hiệu lực","long":"Ngày hiệu lực","sort":30},"owner":{"short":"Sở hữu","long":"Bộ phận sở hữu","sort":40},"approver":{"short":"Duyệt","long":"Người phê duyệt","sort":50}}}' data-dcc-doc-code="JD-CNC-OPERATOR" data-dcc-locale="vi" data-dcc-logo="../../../../../assets/hesem-logo.svg"></div>
 <div class="doc-content" id="docContent">
 <div class="form-sheet">
-<div class="preface-block">
-<p><b>Bộ phận</b> <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)"><span class="entity-code dept-code">D-PROD</span></a></span>    <b>Vai trò trong chuỗi giá trị</b> Sau setup phát hành → vận hành máy theo job đang chạy → tự kiểm trong giới hạn → ghi dữ liệu → bàn giao công đoạn tiếp theo.    <b>Tài liệu liên đới</b> <a class="entity-link dept-link" href="../../02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)"><span class="entity-code dept-code">D-PROD</span></a> <a href="../../../../operations/sops/05-SOP-500/sop-502-cnc-machining-operations.html">SOP-502</a> <a href="../../../../operations/sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a> <a href="../../../../operations/work-instructions/05-WI-500/wi-511-machine-type-quick-reference.html">WI-511</a> <a href="../../../../operations/work-instructions/05-WI-500/wi-512-3-axis-vertical-milling-guide.html">WI-512</a> <a href="../../../../operations/work-instructions/05-WI-500/wi-513-5-axis-milling-guide.html">WI-513</a> <a href="../../../../operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a></p>
+<div class="note-blue terminology-note" style="margin:12px 0"><p><b>Quy ước thuật ngữ viết tắt trong tài liệu:</b> Tài liệu mô tả công việc (<b>JD</b>); Tổ chức Tiêu chuẩn hóa Quốc tế (<b>ISO</b>); Máy điều khiển số bằng máy tính (<b>CNC</b>); Ma trận phân định trách nhiệm theo bốn trạng thái: thực hiện, chịu trách nhiệm phê duyệt, tham vấn và nhận thông tin (<b>RACI</b>); Chỉ số đánh giá hiệu quả công việc (<b>KPI</b>); Quy trình thao tác chuẩn (<b>SOP</b>); Hướng dẫn công việc (<b>WI</b>); Phụ lục kiểm soát (<b>ANNEX</b>); Biểu mẫu/hồ sơ kiểm soát (<b>FRM</b>); Đào tạo tại nơi làm việc (<b>OJT</b>); Bán thành phẩm đang trong quá trình sản xuất (<b>WIP</b>); Kiểm tra sản phẩm đầu tiên (<b>FAI</b>); Kiểm tra chất lượng trong quá trình sản xuất (<b>IPQC</b>); Dị vật ngoại lai (<b>FOD</b>); Phương tiện bảo vệ cá nhân (<b>PPE</b>); Kiểm tra chất lượng (<b>QC</b>).</p><p><b>Mã vai trò và bộ phận xuất hiện trong tài liệu:</b> Phòng Sản xuất (<b>D-PROD</b>); Nhân viên vận hành máy điều khiển số (<b>OPR</b>); Trưởng ca (<b>SL</b>); Kỹ thuật viên thiết lập máy (<b>SET</b>); Tổ trưởng kiểm tra chất lượng (<b>QCL</b>); Quản lý phân xưởng điều khiển số (<b>WKM</b>); Kỹ sư quy trình gia công (<b>PE</b>); Nhân viên kiểm tra chất lượng kiêm lập trình và vận hành máy đo tọa độ (<b>QC</b>).</p></div><div class="preface-block">
+<p><b>Bộ phận</b> <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../02-Department-Handbooks/dept-production-handbook.html" title="Phòng Sản xuất (D-PROD)"><span class="entity-code dept-code">D-PROD</span></a></span>
+<b>Vai trò trong chuỗi giá trị</b> Sau khi máy và lệnh sản xuất được phép chạy → vận hành máy CNC theo tài liệu đã ban hành → tự kiểm trong phạm vi được giao → ghi nhận dữ liệu trung thực → bàn giao sản phẩm cho công đoạn tiếp theo.
+ <b>Tài liệu liên đới</b> <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../02-Department-Handbooks/dept-production-handbook.html" title="Phòng Sản xuất (D-PROD)"><span class="entity-code dept-code">D-PROD</span></a></span>
+<a href="../../../../operations/sops/05-SOP-500/sop-502-cnc-machining-operations.html">Quy trình thao tác chuẩn (SOP)-502</a>
+<a href="../../../../operations/sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a>
+<a href="../../../../operations/work-instructions/05-WI-500/wi-511-machine-type-quick-reference.html">Hướng dẫn công việc (WI)-511</a>
+<a href="../../../../operations/work-instructions/05-WI-500/wi-512-3-axis-vertical-milling-guide.html">WI-512</a>
+<a href="../../../../operations/work-instructions/05-WI-500/wi-513-5-axis-milling-guide.html">WI-513</a>
+<a href="../../../../operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">Phụ lục kiểm soát (ANNEX)-503</a></p>
 </div>
-<div class="jd-purpose"><p>Vai trò của tài liệu: JD này khóa rõ phạm vi công việc, điểm kết thúc trách nhiệm và cơ chế bàn giao của CNC Operator (<a class="entity-link role-link" href="jd-cnc-operator.html" title="CNC Operator (Nhân viên vận hành CNC)"><span class="entity-code role-code">OPR</span></a>); dùng làm đầu vào chuẩn cho tuyển dụng, OJT/đào tạo, đánh giá năng lực, KPI, lương thưởng và phối hợp liên phòng ban trong chuỗi RFQ → ship. JD này phải được đọc cùng <a href="../../../../operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a>, <a href="../../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a>, <a href="../../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html">ANNEX-121</a>, <a href="../../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html">ANNEX-122</a>, <a href="../../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a> và SOP/WI/ANNEX đang hiệu lực.</p></div>
-<h2 class="h2">1. Thông tin vị trí (Vị trí / Chức vụ ID &amp; tiêu đề)</h2>
+<div class="jd-purpose"><p>Vai trò của tài liệu: Bản mô tả công việc (JD) này xác định phạm vi công việc, điểm kết thúc trách nhiệm và cơ chế bàn giao của Nhân viên vận hành máy CNC (<span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-cnc-operator.html" title="Nhân viên vận hành máy điều khiển số (OPR)"><span class="entity-code role-code">OPR</span></a></span>). Tài liệu được dùng làm đầu vào chuẩn cho tuyển dụng, đào tạo tại nơi làm việc (OJT), đánh giá năng lực, chỉ số đánh giá hiệu quả công việc (KPI), lương thưởng và phối hợp liên phòng ban trong chuỗi yêu cầu báo giá → sản xuất → giao hàng. JD này phải được đọc cùng ANNEX-503, ma trận thẩm quyền, ma trận phân vai trách nhiệm (RACI), từ điển KPI phân tầng, ma trận người thay thế và các SOP/WI/ANNEX đang hiệu lực.</p></div>
+<div class="note-blue" style="margin:12px 0">
+<b>🗺️ Hệ thống 8 cổng (G0→G7):</b> vai trò OPR tập trung tại G4–G5, nghĩa là chạy sản xuất, tự kiểm, ghi dữ liệu trong quá trình và phản ứng khi có bất thường.
+ <br/>→ Xem <a href="../../../../operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a> để đối chiếu ranh giới vai trò theo từng cổng.
+</div>
+<h2 class="h2">1. Thông tin vị trí</h2>
 <div class="table-card">
 <table class="table require-table"><tbody>
-<tr><th>Mã vị trí (Vị trí / Chức vụ ID)</th><td>JD-OPR</td></tr>
-<tr><th>Mã vai trò dùng trong SOP/RACI</th><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-cnc-operator.html" title="CNC Operator (Nhân viên vận hành CNC)"><span class="entity-code role-code">OPR</span></a></span></td></tr><tr><th>Chức danh theo tài liệu</th><td>CNC Operator</td></tr>
-<tr><th>Bộ phận</th><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)"><span class="entity-code dept-code">D-PROD</span></a></span></td></tr>
-<tr><th>Cấp vai trò</th><td>Technician / Operator</td></tr>
-<tr><th>Nhóm vai trò</th><td>Sản xuất / điều hành mặt bằng xưởng / kiểm soát thực thi</td></tr>
-<tr><th>Báo cáo trực tiếp cho</th><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-shift-leader.html" title="Shift Leader (Trưởng ca)"><span class="entity-code role-code">SL</span></a></span></td></tr>
-<tr><th>Quản lý trực tiếp</th><td>Khong co nhan su bao cao truc tiep.</td></tr>
-<tr><th>Phối hợp chức năng chính</th><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-shift-leader.html" title="Shift Leader (Trưởng ca)"><span class="entity-code role-code">SL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="jd-setup-technician.html" title="Setup Technician (Kỹ thuật viên setup)"><span class="entity-code role-code">SET</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (Tổ trưởng QC)"><span class="entity-code role-code">QCL</span></a></span></td></tr>
-<tr><th>Hệ thống / công cụ vận hành chính</th><td>Epicor quản lý Job / nhập nhân công / điều độ Job; phiếu công nghệ, phiếu cài đặt, WI; bảng quản trị theo ca và dữ liệu sản xuất hiện trường.</td></tr>
-<tr><th>Vai trò trong chuỗi giá trị</th><td>Sau setup phát hành → vận hành máy theo job đang chạy → tự kiểm trong giới hạn → ghi dữ liệu → bàn giao công đoạn tiếp theo.</td></tr></tbody></table>
-</div>
-<h2 class="h2">2. Sứ mệnh vị trí (Sứ mệnh vị trí)</h2>
-<div class="jd-mission"><p>CNC Operator là Operator máy theo đúng gói kỹ thuật đã được phát hành, giữ cho quá trình chạy ổn định, đúng CTQ, đúng phiên bản và đúng bằng chứng. Đây là vị trí tuyến đầu bảo vệ chất lượng tại nguồn.</p><p>Một Operator giỏi không chỉ đạt đầu ra mà còn phát hiện sớm dấu hiệu bất thường, tự kiểm đúng tần suất, ghi nhận dữ liệu trung thực và dừng đúng lúc để ngăn khách hàng thoát / bỏ qua.</p><div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul><li>Máy chạy ổn định theo plan với tự-kiểm tra và kỷ luật / chuyên ngành tại máy đầy đủ.</li><li>Mọi dấu hiệu trôi / sai lệch, tool mài mòn, bất thường âm thanh/rung động, sai truy xuất nguồn gốc hoặc nghi NG được phát hiện sớm và đã báo cáo vượt cấp đúng tuyến.</li><li>Dữ liệu sản lượng, thời gian dừng máy, phế phẩm và hồ sơ trong quá trình / hold được ghi nhận đúng thời điểm, không hồi tố tùy tiện.</li></ul></div><p class="inline-note"><b>Ranh giới vị trí:</b> CNC Operator chịu trách nhiệm chạy ổn định theo tài liệu Released và phản ứng đúng khi có bất thường; không có quyền tự sửa phương pháp, thay đổi chương trình, chạy hàng hold hoặc tự quyết định xử lý NG.</p></div><div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight"><li>Vận hành trong cửa sổ chuẩn đã được thả, giữ đúng phiên bản, đúng mẫu tần suất, đúng tuổi dao (tool tuổi thọ / vòng đời) và đúng phản ứng khi có bất thường.</li><li>Khi job ra ngoài chuẩn, nhiệm vụ đầu tiên là dừng - giữ - Mọi hỗ trợ; không tự sáng tác sai lệch, không bỏ kiểm để chạy kịp.</li><li>Mỗi lần ghi nhân công/hoàn thành/kiểm tra hoặc thay tool phải tạo dữ liệu có thể truy xuất nguồn gốc được, vì đó là nền cho chất lượng, tính giá thành và học tập hệ thống.</li></ul></div>
-<h2 class="h2">3. Tuyến báo cáo &amp; phạm vi quản lý</h2>
-<div class="table-card">
-<table class="table require-table"><tbody>
-<tr><th>Báo cáo trực tiếp</th><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-shift-leader.html" title="Shift Leader (Trưởng ca)"><span class="entity-code role-code">SL</span></a></span></td></tr>
-<tr><th>Nhân sự báo cáo trực tiếp</th><td>Khong co nhan su bao cao truc tiep.</td></tr>
-<tr><th>Tuyến phối hợp chức năng</th><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-shift-leader.html" title="Shift Leader (Trưởng ca)"><span class="entity-code role-code">SL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="jd-setup-technician.html" title="Setup Technician (Kỹ thuật viên setup)"><span class="entity-code role-code">SET</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (Tổ trưởng QC)"><span class="entity-code role-code">QCL</span></a></span></td></tr>
-<tr><th>Interfaces nội bộ chính</th><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-shift-leader.html" title="Shift Leader (Trưởng ca)"><span class="entity-code role-code">SL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="jd-setup-technician.html" title="Setup Technician (Kỹ thuật viên setup)"><span class="entity-code role-code">SET</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (Tổ trưởng QC)"><span class="entity-code role-code">QCL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)"><span class="entity-code role-code">WKM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="jd-maintenance-technician.html" title="Maintenance Technician (Kỹ thuật viên bảo trì)"><span class="entity-code role-code">MNT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../05-JD-Supply-Chain/jd-tool-crib-tool-storekeeper.html" title="Tool Crib / Tool Storekeeper (Thủ kho dao cụ)"><span class="entity-code role-code">TOOL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../05-JD-Supply-Chain/jd-warehouse-clerk.html" title="Warehouse Clerk (Nhân viên kho)"><span class="entity-code role-code">WAR</span></a></span></td></tr>
-<tr><th>Interfaces bên ngoài</th><td>No direct external interface.</td></tr>
-<tr><th>Phạm vi vị trí</th><td>Vai trò thực thi chuẩn tại bộ phận Sản xuất; làm việc theo SOP/WI, ghi nhận dữ liệu đầy đủ và báo cáo vượt cấp bất thường kịp thời.</td></tr>
+<tr><th>Mã vị trí</th><td>JD-OPR</td></tr>
+<tr><th>Mã vai trò dùng trong SOP/RACI</th><td>Nhân viên vận hành máy CNC <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-cnc-operator.html" title="Nhân viên vận hành máy điều khiển số (OPR)"><span class="entity-code role-code">OPR</span></a></span></td></tr>
+<tr><th>Chức danh theo tài liệu</th><td>Nhân viên vận hành máy điều khiển số bằng máy tính (CNC)</td></tr>
+<tr><th>Bộ phận</th><td>Phòng Sản xuất <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../02-Department-Handbooks/dept-production-handbook.html" title="Phòng Sản xuất (D-PROD)"><span class="entity-code dept-code">D-PROD</span></a></span></td></tr>
+<tr><th>Cấp vai trò</th><td>Nhân viên kỹ thuật / vận hành viên</td></tr>
+<tr><th>Nhóm vai trò</th><td>Sản xuất trực tiếp / vận hành hiện trường / kiểm soát thực thi tại máy</td></tr>
+<tr><th>Báo cáo trực tiếp cho</th><td>Trưởng ca <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-shift-leader.html" title="Trưởng ca (SL)"><span class="entity-code role-code">SL</span></a></span></td></tr>
+<tr><th>Quản lý trực tiếp</th><td>Không có nhân sự báo cáo trực tiếp.</td></tr>
+<tr><th>Phối hợp chức năng chính</th><td>Trưởng ca <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-shift-leader.html" title="Trưởng ca (SL)"><span class="entity-code role-code">SL</span></a></span> / Kỹ thuật viên thiết lập máy CNC <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-setup-technician.html" title="Kỹ thuật viên thiết lập máy (SET)"><span class="entity-code role-code">SET</span></a></span> / Tổ trưởng kiểm soát chất lượng <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../04-JD-Quality/jd-qc-inspector-lead.html" title="Tổ trưởng kiểm tra chất lượng (QCL)"><span class="entity-code role-code">QCL</span></a></span></td></tr>
+<tr><th>Hệ thống / công cụ vận hành chính</th><td>Epicor để ghi nhận lệnh sản xuất, thời gian lao động và sản lượng; phiếu công nghệ, phiếu thiết lập máy, hướng dẫn công việc, bảng quản trị theo ca và dữ liệu sản xuất tại hiện trường.</td></tr>
+<tr><th>Vai trò trong chuỗi giá trị</th><td>Sau khi máy và lệnh sản xuất được phép chạy → vận hành máy theo tài liệu đã ban hành → tự kiểm trong phạm vi được giao → ghi nhận dữ liệu → bàn giao sản phẩm cho công đoạn tiếp theo.</td></tr>
 </tbody></table>
 </div>
-<h2 class="h2">4. Trách nhiệm chính (Key Trách nhiệm)</h2>
+<h2 class="h2">2. Sứ mệnh vị trí</h2>
+<div class="jd-mission">
+<p>Nhân viên vận hành máy CNC chịu trách nhiệm chạy máy theo đúng tài liệu đã ban hành, giữ quá trình ổn định, bảo vệ chất lượng tại nguồn và ghi nhận dữ liệu trung thực. Đây là vị trí tuyến đầu vì mọi sai lệch tại máy có thể ảnh hưởng trực tiếp đến kích thước, ngoại quan, truy xuất nguồn gốc, chi phí và tiến độ giao hàng.</p>
+<p>Người giữ vị trí này không chỉ “bấm máy”; họ phải hiểu trạng thái lệnh sản xuất, nhận biết dấu hiệu bất thường, tự kiểm đúng tần suất, dừng đúng lúc và báo đúng tuyến khi điều kiện sản xuất không còn nằm trong giới hạn cho phép.</p>
+<div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul>
+<li>Máy được vận hành ổn định theo tài liệu phát hành, đúng chương trình đã cho phép, đúng vật liệu, đúng phiên bản và đúng yêu cầu kiểm tra.</li>
+<li>Dấu hiệu mòn dao, rung, lệch kích thước, âm thanh bất thường, sai truy xuất hoặc nghi ngờ không phù hợp được phát hiện sớm và báo ngay.</li>
+<li>Dữ liệu sản lượng, thời gian dừng máy, phế phẩm, điều chỉnh trong phạm vi cho phép và tình trạng sản phẩm được ghi đúng thời điểm, không ghi hồi tố tùy tiện.</li>
+</ul></div>
+<p class="inline-note"><b>Ranh giới vị trí:</b> OPR vận hành trong giới hạn đã được SET và QCL xác nhận; không tự sửa chương trình, không tự đổi thông số ngoài phạm vi cho phép, không chạy hàng đang bị giữ và không tự quyết định xử lý sản phẩm không phù hợp.</p>
+</div>
+<div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight">
+<li>Chỉ chạy khi đủ điều kiện: đúng lệnh sản xuất, đúng vật liệu, đúng chương trình, đúng đồ gá, đúng dụng cụ cắt, đúng trạng thái kiểm tra đầu tiên và đúng hướng dẫn công việc.</li>
+<li>Khi phát hiện bất thường phải dừng, giữ nguyên hiện trạng liên quan, bảo vệ sản phẩm và gọi đúng người hỗ trợ; không tự “chữa cháy” để kịp sản lượng.</li>
+<li>Mọi thao tác ghi nhận vào Epicor và hồ sơ hiện trường phải có khả năng truy xuất vì đây là đầu vào cho chất lượng, tính giá thành, giao hàng và cải tiến.</li>
+</ul></div>
+<h2 class="h2">3. Tuyến báo cáo và phạm vi quản lý</h2>
+<div class="table-card">
+<table class="table require-table"><tbody>
+<tr><th>Báo cáo trực tiếp</th><td>Trưởng ca <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-shift-leader.html" title="Trưởng ca (SL)"><span class="entity-code role-code">SL</span></a></span></td></tr>
+<tr><th>Nhân sự báo cáo trực tiếp</th><td>Không có nhân sự báo cáo trực tiếp.</td></tr>
+<tr><th>Tuyến phối hợp chức năng</th><td>SL / SET / QCL / Quản lý phân xưởng CNC <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-cnc-workshop-manager.html" title="Quản lý phân xưởng điều khiển số (WKM)"><span class="entity-code role-code">WKM</span></a></span></td></tr>
+<tr><th>Kết nối nội bộ chính</th><td>SL, SET, QCL, Kỹ sư quy trình <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../03-JD-Engineering/jd-process-engineer.html" title="Kỹ sư quy trình gia công (PE)"><span class="entity-code role-code">PE</span></a></span>, Nhân viên kiểm soát chất lượng <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="Nhân viên kiểm tra chất lượng kiêm lập trình và vận hành máy đo tọa độ (QC)"><span class="entity-code role-code">QC</span></a></span></td></tr>
+<tr><th>Kết nối bên ngoài</th><td>Không làm việc trực tiếp với khách hàng hoặc nhà cung cấp; mọi thông tin bên ngoài đi qua quản lý, kỹ thuật, chất lượng hoặc chuỗi cung ứng theo thẩm quyền.</td></tr>
+<tr><th>Phạm vi vị trí</th><td>Thực hiện vận hành máy tại khu vực được phân công; ghi nhận dữ liệu; tự kiểm trong phạm vi cho phép; báo cáo vượt cấp khi có bất thường về an toàn, chất lượng, thiết bị, vật liệu hoặc hồ sơ.</td></tr>
+</tbody></table>
+</div>
+<h2 class="h2">4. Trách nhiệm chính</h2>
 <div class="table-card">
 <table class="table"><thead><tr><th style="width:26%">Nhóm trách nhiệm</th><th>Nội dung trách nhiệm</th></tr></thead><tbody>
-<tr><th style="width:26%">Vận hành theo standard công việc</th><td><ul><li>Xác minh đúng job, đúng phiên bản, đúng setup, đúng raw nguyên vật liệu / WIP nhận dạng trước khi chạy.</li><li>Vận hành máy theo WI / nhanh card / setup note; không tự ý thay đổi điều kiện chạy vượt phạm vi được cho phép.</li><li>Theo dõi tool mài mòn, bề mặt, phoi, nhiệt, tiếng ồn / rung và các tín hiệu bất thường trong suốt quá trình chạy.</li></ul></td></tr><tr><th style="width:26%">Tự kiểm và bảo vệ chất lượng tại nguồn</th><td><ul><li>Thực hiện tự-kiểm tra đúng đặc tính, đúng tần suất và đúng phương pháp đã quy định trên phiếu công nghệ / kế hoạch kiểm soát / setup note.</li><li>Dừng máy ngay khi nghi ngờ trôi / sai lệch CTQ, sai lot, sai định hướng / đào tạo hội nhập, sai chương trình hoặc hỏng tool có khả năng gây lỗi hàng loạt.</li><li>Cô lập sản phẩm nghi ngờ, dán nhận diện hold theo quy định và thông báo cho Tổ trưởng ca / <a class="entity-link role-link" href="../04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a> mà không chờ "chạy thêm cho đủ số".</li></ul></td></tr><tr><th style="width:26%">Ghi nhận dữ liệu và giữ hiện trường</th><td><ul><li>Ghi sản lượng, thời gian dừng, phế phẩm, thay dao, bất thường và các mốc kiểm soát theo đúng thời điểm.</li><li>Giữ khu vực máy sạch, ngăn nắp, chống FOD, không để lẫn part OK / NG / setup mẫu / đo lường aid.</li><li>Bảo vệ truy xuất nguồn gốc giữa part – phiếu công nghệ – lot / số sê-ri – hồ sơ trong suốt ca sản xuất.</li></ul></td></tr><tr><th style="width:26%">Phối hợp và học hỏi</th><td><ul><li>Nhận bàn giao đầy đủ từ setup / Tổ trưởng ca và xác nhận đã hiểu các điểm rủi ro của job.</li><li>Phản hồi cho Tổ trưởng ca / Setup / Kỹ thuật khi thấy quy trình khó vận hành, điểm kiểm chưa thực tế hoặc lỗi có xu hướng lặp.</li><li>Tham gia OJT, 5S, diễn tập phản ứng lỗi và các chương trình nâng bậc tay nghề theo lộ trình công ty.</li></ul></td></tr>
-<tr><th style="width:26%">Trong quá trình control &amp; stop-cuộc gọi-chờ</th><td><ul><li>Thực hiện vận hành theo phiếu công nghệ/WI/phiếu cài đặt/program đúng phiên bản; xác nhận tool trạng thái, dòng / chuyền thông quan / giải phóng, phoi (phoi (chip)/FOD control và điều kiện máy trước khi chạy.</li><li>Tuân thủ mẫu kiểm tra, bù trừ (bù trừ (offset)/tool-cửa sổ / khung thời gian, trong quá trình phản ứng plan, bất thường log và quy tắc cách ly nghi ngờ sản phẩm khi kết quả/âm thanh/rung/hiện tượng không còn trong chuẩn.</li><li>Ghi nhận nhân công, hoàn thành, phế phẩm, tool thay đổi, thời gian dừng máy hoặc sự kiện bất thường đủ chi tiết để ca sau, Phân xưởng, <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-production-planner.html" title="Production Planner (Điều độ sản xuất)"><span class="entity-code role-code">PPL</span></a></span> và Quality dùng được.</li></ul></td></tr></tbody></table>
-</div>
-<div class="table-card ranh giới trách nhiệm-box">
-<table class="table">
-<tbody>
-<tr>
-<th style="width:26%">Điểm kết thúc trách nhiệm</th>
-<td>CNC Operator chịu trách nhiệm chạy ổn định theo tài liệu Released và phản ứng đúng khi có bất thường; không có quyền tự sửa phương pháp, thay đổi chương trình, chạy hàng hold hoặc tự quyết định xử lý NG.</td>
-</tr>
-<tr>
-<th style="width:26%">Không thuộc trách nhiệm chính / phải đã báo cáo vượt cấp</th>
-<td><ul><li>Không chỉnh sửa Chương trình NC, chiến lược cắt, trình tự công đoạn hoặc bù trừ (bù trừ (offset) ngoài cửa sổ cho phép trong phiếu cài đặt/WI; mọi thay đổi vượt giới hạn phải Mọi Setup/Tổ trưởng ca/Kỹ thuật.</li><li>Không chạy vật tư không rõ lot/phiên bản, không chạy job thiếu phiếu công nghệ/phiếu cài đặt/Current bản vẽ, không chạy hàng đang hold hoặc chưa qua đầu tiên-off/FAI khi quy định yêu cầu.</li><li>Không tự quyết định use-as-is, làm lại, sort hay tiếp tục chạy khi có dấu hiệu trôi / sai lệch/OOC, mòn dao bất thường, tiếng kêu lạ, không khớp giữa bản vẽ và thực tế.</li><li>Chịu trách nhiệm về kỷ luật dữ liệu tại điểm chạy: nhân công mục nhập, số lượng, phế phẩm, thời gian dừng máy, tool thay đổi, mẫu đầu (tiên chi tiết / sản phẩm) kiểm tra trong phạm vi được giao và bảo quản tình trạng máy/khu vực làm việc.</li><li>Kết thúc trách nhiệm tại mỗi lot/job khi chi tiết được gia công theo tài liệu hiện hành, dữ liệu được ghi đủ và trạng thái WIP được bàn giao rõ cho Tổ trưởng ca/QC/công đoạn sau.</li></ul></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="callout"><p><b>Trách nhiệm theo mô hình 8 cổng (G0 – G7)</b></p>
-<p style="font-size:12px;margin:4px 0;">G0 Contract → G1 Engineering ‖ G2 IQC → G3 Setup → G4 FAI → G5 IPQC → G6 Final <a class="entity-link role-link" href="../04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a> → G7 Ship</p>
-<ul class="tight">
-<li><b>G5 IPQC</b> — Chủ trì (★): vận hành máy ổn định theo tài liệu, tự kiểm trong quá trình đúng tần suất, phát hiện bất thường và escalation kịp thời.</li>
-</ul></div>
-<p class="inline-note boundary-inline-note">Nguyên tắc phân vai: khi công việc chạm tới quyết định vượt thẩm quyền của chức danh, Người giữ vị trí phải chuyển đúng người chịu trách nhiệm thay vì xử lý ngoài tuyến kiểm soát.</p>
-<p class="inline-note">Mọi thay đổi ảnh hưởng chất lượng, giao hàng, chi phí, phiên bản, phát hành hoặc truy vết phải tuân theo quy trình/hồ sơ liên kết tại Mục 12.</p>
-<h2 class="h2">5. Quyền hạn (Thẩm quyền &amp; quyền ra quyết định (quyền)</h2>
-<div class="auth-grid">
-<div class="auth-item">Dừng máy khi thấy dấu hiệu trôi / sai lệch CTQ, tool ngắt / nghỉ, bất thường an toàn, sai phiên bản hoặc mất truy xuất nguồn gốc.</div><div class="auth-item">Từ chối chạy job khi chưa có setup bàn giao rõ ràng, gói hồ sơ thiếu hoặc trạng thái hold chưa được giải quyết.</div><div class="auth-item">Yêu cầu Tổ trưởng ca / <a class="entity-link role-link" href="../04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a> / Setup hỗ trợ ngay khi phát sinh bất thường vượt khả năng xử lý tại máy.</div><div class="auth-item">Không ký hoặc ghi hồ sơ thay cho Người kiểm / Người có thẩm quyền khác.</div>
-<div class="auth-item">Có quyền kích hoạt TẠM GIỮ/STOP ở điểm vận hành khi phát hiện sai phiên bản, dấu hiệu trôi / sai lệch, FOD, tool/fixture không an toàn, thiếu gage hợp lệ hoặc chưa dòng / chuyền-clear xong.</div></div>
-<h2 class="h2">6. Interfaces liên phòng ban — RACI / Bàn giao</h2>
-<div class="table-card">
-<table class="table">
-<thead>
-<tr>
-<th style="width:24%">Đối tác / tuyến phối hợp</th>
-<th>Nội dung bàn giao / phối hợp</th>
-<th style="width:10%">RACI</th>
-<th>Kết quả mong đợi</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<th style="width:20%"><span class="role-cluster"><a class="role-link" href="jd-setup-technician.html" title="Setup Technician (Kỹ thuật viên setup)"><span class="role-code">SET</span></a></span></th>
-<td><p>Nhận máy đã setup, thông số mốc chuẩn, danh sách dao cụ, đầu tiên-off trạng thái, lưu ý CTQ và các giới hạn điều chỉnh được phép.</p></td>
-<td style="width:10%; text-align:center"><span class="raci-badge raci-c">C</span></td>
-<td>Operator hiểu rõ điều kiện chạy và giới hạn can thiệp của mình.</td>
-</tr>
-<tr>
-<th style="width:20%"><span class="role-cluster"><a class="role-link" href="jd-shift-leader.html" title="Shift Leader (Trưởng ca)"><span class="role-code">SL</span></a></span></th>
-<td><p>Báo tiến độ, thời gian dừng máy, thiếu vật tư/tool, tín hiệu bất thường, phế phẩm/làm lại và đề nghị ưu tiên xử lý trong ca.</p></td>
-<td style="width:10%; text-align:center"><span class="raci-badge raci-r">R</span></td>
-<td>Ca sản xuất được điều hành theo dữ liệu hiện trường thật.</td>
-</tr>
-<tr>
-<th style="width:20%"><span class="role-cluster"><a class="role-link" href="../04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="role-code">QC</span></a><span class="role-sep">/</span><a class="role-link" href="../04-JD-Quality/jd-qc-inspector-lead.html" title="QC Inspector Lead (Tổ trưởng QC)"><span class="role-code">QCL</span></a></span></th>
-<td><p>Phối hợp kiểm đầu tiên-off, trong quá trình kiểm tra, phản ứng OOC/trôi / sai lệch và xác minh khi có nghi ngờ chất lượng.</p></td>
-<td style="width:10%; text-align:center"><span class="raci-badge raci-c">C</span></td>
-<td>Máy chỉ tiếp tục chạy khi tình trạng chất lượng đã được xác minh đúng tuyến.</td>
-</tr>
-<tr>
-<th style="width:20%"><span class="role-cluster"><a class="role-link" href="jd-maintenance-technician.html" title="Maintenance Technician (Kỹ thuật viên bảo trì)"><span class="role-code">MNT</span></a></span></th>
-<td><p>Báo cáo vượt cấp lỗi máy, cảnh báo trục chính (trục chính (spindle)/air/dung dịch làm mát (dung dịch làm nguội)/trục, sự cố làm ảnh hưởng an toàn hoặc chất lượng.</p></td>
-<td style="width:10%; text-align:center"><span class="raci-badge raci-i">I</span></td>
-<td>Sự cố thiết bị được phản ứng nhanh trước khi gây lây lan lỗi.</td>
-</tr>
-<tr>
-<th style="width:20%">Mài bavia / công đoạn sau</th>
-<td><p>Bàn giao bán thành phẩm đúng số lượng, đúng nhận diện job/lot, có tình trạng và lưu ý bảo vệ bề mặt.</p></td>
-<td style="width:10%; text-align:center"><span class="raci-badge raci-r">R</span></td>
-<td>Công đoạn sau nhận hàng rõ trạng thái, không mất truy vết.</td>
-</tr>
-</tbody>
-</table>
-</div><p class="inline-note">Quy ước: R = đầu mối trực tiếp thực hiện/phản hồi; A = đầu mối chịu trách nhiệm cuối cùng trong tuyến phối hợp; C = cần tham vấn/bắt buộc đồng bộ trước khi tiếp tục; I = cần được thông tin để đồng bộ trạng thái.</p>
-<h2 class="h2">7. Đầu ra bắt buộc / hồ sơ quản trị</h2>
-<div class="table-card"><table class="table"><thead><tr><th>Đầu ra / hồ sơ</th><th>Nội dung bắt buộc</th><th>Chu kỳ</th><th>Nơi lưu / nguồn</th></tr></thead><tbody><tr><td>Operator log / machine hồ sơ</td><td>Sản lượng, thời gian dừng, thay dao, phế phẩm và tình trạng máy theo ca.</td><td>Ca / job</td><td>Log ca, bảng điều khiển máy, phiếu công nghệ / SSOT.</td></tr><tr><td>tự-kiểm tra / trong quá trình hồ sơ</td><td>Evidence tự kiểm hoặc hồ sơ tại công đoạn theo yêu cầu của job.</td><td>Theo tần suất quy định</td><td>Phiếu công nghệ, kiểm tra hồ sơ, SSOT.</td></tr><tr><td>Hold / bất thường thông báo</td><td>Thông tin part nghi ngờ NG, thời điểm phát hiện và tuyến đã báo.</td><td>Khi phát sinh</td><td><a download="" href="../../../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx">FRM-651</a> hoặc log bất thường, SSOT sản xuất.</td></tr><tr><td>5S / FOD tuân thủ tại máy</td><td>Tình trạng khu vực máy, dụng cụ, part, phoi và kiểm soát lẫn lộn.</td><td>Ca / đánh giá</td><td>Bảng kiểm 5S / LPA / đánh giá hồ sơ.</td></tr><tr><td>Trong quá trình thực thi bằng chứng</td><td>Dữ liệu nhân công/hoàn thành, mẫu kiểm tra, bất thường log, tool thay đổi, thời gian dừng máy và nghi ngờ-sản phẩm cách ly trong suốt quá trình chạy.</td><td>Mỗi job / mỗi ca</td><td>Phiếu công nghệ; Epicor nhân công/hoàn thành; WI hồ sơ; <a download="" href="../../../../forms/frm-500-production/FRM-512_Downtime_Log.xlsx">FRM-512</a> khi có thời gian Từng máy.</td></tr></tbody></table></div>
-<h2 class="h2">8. KPI cá nhân</h2>
-<div class="table-card"><table class="table"><thead><tr><th>KPI trọng yếu</th><th>Cách đo / nguồn dữ liệu</th><th>Chu kỳ theo dõi</th></tr></thead><tbody><tr><td>Đầu ra theo kế hoạch ca / job</td><td>Sản lượng thực hiện so với kế hoạch được giao.</td><td>Ca / tuần</td></tr><tr><td>Operator phế phẩm / khuyết tật có thể quy cho</td><td>Phế phẩm, làm lại hoặc lỗi do vận hành / giám sát tại máy.</td><td>Tuần / tháng</td></tr><tr><td>tự-kiểm tra tuân thủ</td><td>Tỷ lệ tự kiểm đúng tần suất, đúng hồ sơ, đúng thời điểm.</td><td>Ngày / tuần</td></tr><tr><td>Thời gian dừng máy escalation time</td><td>Tốc độ báo bất thường sau khi phát hiện.</td><td>Ca / tuần</td></tr><tr><td>Phiên bản / truy xuất nguồn gốc không / bằng không-vi phạm</td><td>Số lần chạy sai phiên bản, mất truy vết hoặc lẫn WIP.</td><td>Tháng</td></tr><tr><td>5S / an toàn / FOD score</td><td>Kết quả kiểm tra hiện trường tại máy.</td><td>Tuần / tháng</td></tr><tr><td>Trong quá trình kiểm tra tuân thủ</td><td>Tỷ lệ job/vận hành có bằng chứng kiểm tại Point-of-use đúng tần suất, đúng phản ứng và không phát sinh lỗi do bỏ kiểm hoặc bỏ escalation.</td><td>Tuần / tháng</td></tr></tbody></table></div>
-<h2 class="h2">9. Yêu cầu năng lực (Năng lực Yêu cầu)</h2>
-<div class="comp-grid">
-<div class="comp-card"><p><b>Kiến thức chuyên môn &amp; hệ thống</b></p><ul><li>Hiểu vận hành máy, thay dao cơ bản, tự-kiểm tra, nhận diện bất thường và phản ứng stop–cuộc gọi–cách ly.</li><li>Biết đọc phiếu công nghệ / setup note / nhanh card; ưu tiên đọc được bản vẽ cơ bản và dùng dụng cụ đo đơn giản.</li></ul></div>
-<div class="comp-card"><p><b>Năng lực hành vi / tác phong</b></p><ul><li>Kỷ luật, trung thực dữ liệu, tập trung, làm việc tốt theo ca và tuân thủ chặt chẽ hướng dẫn.</li><li>Không chủ quan, không "lách" quy trình, có tinh thần học nghề và nâng level.</li></ul></div>
-</div>
-<div class="callout"><p><b>Mô-đun năng lực / đào tạo cốt lõi</b></p><ul><li><a href="../../../../training/content/01-Modules/C01.html">C01 — Mô-đun C01 — Nơi làm việc An toàn &amp; 5S | HESEM OS</a></li><li><a href="../../../../training/content/01-Modules/C02.html">C02 — Mô-đun C02 — Quy trình Kỷ luật &amp; Standard Công việc Tuân thủ | HESEM OS</a></li><li><a href="../../../../training/content/01-Modules/C03.html">C03 — Mô-đun C03 — Quality Tư duy (Đúng ngay từ lần đầu (Quyền / Đúng Đầu tiên Time) | HESEM OS</a></li><li><a href="../../../../training/content/01-Modules/C08.html">C08 — Mô-đun C08 — Tư duy dựa trên dữ liệu &amp; sử dụng hệ thống (ERP/Excel) | HESEM OS</a></li><li><a href="../../../../training/content/01-Modules/C09.html">C09 — Mô-đun C09 — Quản lý thời gian &amp; ưu tiên hóa | HESEM OS</a></li><li><a href="../../../../training/content/01-Modules/C10.html">C10 — Mô-đun C10 — Quy trình lệnh sản xuất CNC (RFQ → thu tiền) | HESEM OS</a></li><li><a href="../../../../training/content/01-Modules/C16.html">C16 — Mô-đun C16 — Nâng cao Đo lường — FAI / CMM / MSA | HESEM OS</a></li><li><a href="../../../../training/content/01-Modules/C17.html">C17 — Mô-đun C17 — Năng lực kỹ thuật theo vai trò (CNC/Setup/CAM) | HESEM OS</a></li></ul></div>
-<p class="inline-note">Mức đánh giá chi tiết, kiểm soát cổng OJT và lộ trình phát triển áp dụng theo ma trận đào tạo (matrix) / năng lực đánh giá hướng dẫn hiện hành của bộ phận.</p>
-<h2 class="h2">10. Học vấn, kinh nghiệm &amp; yêu cầu tuyển dụng</h2>
-<div class="table-card">
-<table class="table require-table"><tbody>
-<tr><th>Trình độ / chứng chỉ</th><td><ul><li>Tốt nghiệp THPT hoặc trung cấp nghề; ưu tiên ngành cơ khí, cơ điện, cắt gọt kim loại.</li><li>Ưu tiên có kinh nghiệm vận hành một hoặc nhiều nhóm máy CNC tương ứng với nhu cầu tuyển dụng của nhà máy.</li></ul></td></tr><tr><th>Kinh nghiệm</th><td><ul><li>Ưu tiên có kinh nghiệm vận hành CNC trong môi trường chính xác / độ chính xác gia công cơ khí / cao-spec khách hàng.</li><li>Chấp nhận đào tạo ứng viên có nền tảng cơ khí tốt và thái độ phù hợp nếu đáp ứng được lộ trình chứng nhận nội bộ.</li></ul></td></tr><tr><th>Hệ thống / công cụ cần dùng</th><td><p>Epicor quản lý Job / nhập nhân công / điều độ Job; phiếu công nghệ, phiếu cài đặt, WI; bảng quản trị theo ca và dữ liệu sản xuất hiện trường.</p></td></tr><tr><th>Điều kiện / đặc thù công việc</th><td><p>Working chủ yếu tại phân xưởng/kho; có thể theo ca hoặc tăng ca theo kế hoạch; phải tuân thủ PPE, 5S và kỷ luật ghi nhận dữ liệu hiện trường.</p></td></tr><tr><th>Lưu ý tuyển dụng ưu tiên</th><td><p>Ưu tiên ứng viên đã làm việc trong môi trường gia công chính xác/chủng loại cao (cao-mix)–low-khối lượng, quen ERP và kỷ luật tài liệu kiểm soát.</p></td></tr>
+<tr><th>Chuẩn bị trước khi chạy</th><td><ul>
+<li>Kiểm tra tình trạng máy, vật liệu, lệnh sản xuất, phiên bản bản vẽ, phiếu công nghệ, dụng cụ cắt, đồ gá, dung dịch làm mát, phương tiện bảo vệ cá nhân (PPE) và khu vực làm việc trước khi nhận ca.</li>
+<li>Xác nhận trạng thái đã được SET bàn giao và điều kiện kiểm tra sản phẩm đầu tiên (FAI) hoặc kiểm soát chất lượng trong quá trình (IPQC) đã rõ trước khi chạy hàng.</li>
+<li>Không bắt đầu sản xuất khi thiếu tài liệu, thiếu nhận diện sản phẩm, thiếu vật liệu đúng mã, thiếu chương trình đã được cho phép hoặc thiếu chỉ dẫn kiểm soát.</li>
+</ul></td></tr>
+<tr><th>Vận hành máy và tự kiểm</th><td><ul>
+<li>Vận hành máy theo đúng hướng dẫn công việc, đúng giới hạn được giao và đúng yêu cầu về tần suất kiểm tra trong quá trình.</li>
+<li>Theo dõi kích thước trọng yếu, tình trạng bề mặt, tiếng máy, rung, nhiệt, phoi, tuổi dao, dung dịch làm mát và các dấu hiệu cho thấy quá trình có thể trôi khỏi kiểm soát.</li>
+<li>Thực hiện tự kiểm bằng dụng cụ được phép dùng; không sử dụng dụng cụ hết hạn hiệu chuẩn hoặc không phù hợp với yêu cầu đo.</li>
+</ul></td></tr>
+<tr><th>Ghi nhận dữ liệu và truy xuất nguồn gốc</th><td><ul>
+<li>Ghi thời gian bắt đầu, kết thúc, dừng máy, số lượng đạt, số lượng không đạt và nguyên nhân bất thường theo đúng thời điểm phát sinh.</li>
+<li>Bảo toàn nhận diện sản phẩm đang gia công (WIP), khay, tem, thẻ trạng thái và phân tách rõ hàng đạt, hàng chờ kiểm, hàng nghi ngờ và hàng không phù hợp.</li>
+<li>Không sửa hồ sơ, không điền thay người khác và không ghi nhận sản lượng khi chưa có sản phẩm tương ứng.</li>
+</ul></td></tr>
+<tr><th>Phản ứng bất thường</th><td><ul>
+<li>Dừng máy hoặc dừng chuyển tiếp khi phát hiện sai chương trình, sai vật liệu, sai phiên bản, sai đồ gá, kích thước lệch, bề mặt hỏng, nghi ngờ dị vật ngoại lai (FOD) hoặc nghi ngờ sản phẩm không phù hợp.</li>
+<li>Báo ngay cho SL, SET, QCL hoặc WKM theo mức độ ảnh hưởng; giữ nguyên bằng chứng cần thiết để điều tra nguyên nhân.</li>
+<li>Tham gia xử lý, làm lại, phân loại hoặc thử lại chỉ khi có hướng dẫn rõ từ người có thẩm quyền.</li>
+</ul></td></tr>
+<tr><th>An toàn, 5S và bàn giao ca</th><td><ul>
+<li>Tuân thủ an toàn máy, khóa liên động, bảo vệ phoi, vệ sinh khu vực, quản lý dụng cụ và phòng ngừa FOD.</li>
+<li>Bàn giao ca bằng thông tin rõ ràng: tình trạng máy, tình trạng lệnh sản xuất, sản lượng, sản phẩm đang chờ, dụng cụ cắt, bất thường và việc chưa hoàn tất.</li>
+<li>Giữ khu vực làm việc sạch, gọn, có phân tách dòng sản phẩm rõ để tránh lẫn mã, lẫn lô hoặc mất dấu trạng thái.</li>
+</ul></td></tr>
 </tbody></table>
 </div>
+<div class="table-card ranh giới trách nhiệm-box">
+<table class="table"><tbody>
+<tr><th style="width:26%">Điểm kết thúc trách nhiệm</th><td>OPR hoàn thành trách nhiệm khi sản phẩm đã được chạy theo đúng tài liệu, dữ liệu được ghi đầy đủ, trạng thái sản phẩm rõ ràng và đã bàn giao đúng người / đúng công đoạn.</td></tr>
+<tr><th>Không thuộc trách nhiệm chính / phải báo cáo vượt cấp</th><td><ul>
+<li>Không tự thay đổi chương trình, chế độ cắt, đồ gá, dụng cụ, vật liệu, trình tự công nghệ hoặc tiêu chí chấp nhận.</li>
+<li>Không chạy tiếp khi chưa rõ trạng thái giữ, sản phẩm không phù hợp, thiếu kiểm tra đầu tiên hoặc thiếu xác nhận của chất lượng.</li>
+<li>Không tự quyết định dùng lại sản phẩm không phù hợp, sửa lỗi ngoài hướng dẫn hoặc bỏ qua tần suất tự kiểm để đạt sản lượng.</li>
+<li>Phải báo cáo vượt cấp khi có nguy cơ an toàn, hỏng máy, sai vật liệu, sai phiên bản, lỗi lặp lại, nghi ngờ FOD hoặc dữ liệu không khớp với thực tế.</li>
+</ul></td></tr>
+</tbody></table>
+</div>
+<p class="inline-note boundary-inline-note">Nguyên tắc phân vai: khi công việc chạm tới quyết định vượt thẩm quyền, người giữ vị trí phải chuyển đúng người chịu trách nhiệm thay vì tự xử lý ngoài tuyến kiểm soát.</p>
+<h2 class="h2">5. Quyền hạn</h2>
+<div class="auth-grid">
+<div class="auth-item">Có quyền dừng máy khi phát hiện nguy cơ an toàn, sai điều kiện sản xuất, nghi ngờ không phù hợp hoặc dấu hiệu máy chạy bất thường.</div>
+<div class="auth-item">Có quyền từ chối chạy lệnh sản xuất khi thiếu tài liệu, thiếu chương trình đã được cho phép, thiếu vật liệu đúng mã hoặc thiếu trạng thái chất lượng rõ ràng.</div>
+<div class="auth-item">Có quyền yêu cầu SET / SL / QCL xác nhận lại khi hướng dẫn vận hành, giới hạn điều chỉnh hoặc tần suất kiểm tra chưa rõ.</div>
+<div class="auth-item">Có quyền tách riêng và đánh dấu sản phẩm nghi ngờ để ngăn chuyển tiếp sai trạng thái.</div>
+<div class="auth-item">Không có quyền tự phê duyệt sản phẩm không phù hợp, tự đổi chương trình hoặc tự thay đổi yêu cầu kỹ thuật.</div>
+</div>
+<h2 class="h2">6. Kết nối liên phòng ban — RACI / Bàn giao</h2>
+<div class="table-card">
+<table class="table"><thead><tr><th style="width:24%">Đối tác / tuyến phối hợp</th><th>Nội dung bàn giao / phối hợp</th><th style="width:10%">RACI</th><th>Kết quả mong đợi</th></tr></thead><tbody>
+<tr><th>Trưởng ca (SL)</th><td>Nhận phân công máy, thứ tự ưu tiên, mục tiêu ca, trạng thái lệnh sản xuất và yêu cầu bàn giao cuối ca.</td><td style="text-align:center"><span class="raci-badge raci-r">R</span></td><td>Ca vận hành đúng ưu tiên và có thông tin phản hồi kịp thời.</td></tr>
+<tr><th>Kỹ thuật viên thiết lập máy (SET)</th><td>Nhận bàn giao máy sau thiết lập, giới hạn điều chỉnh, điểm cần theo dõi, tình trạng dụng cụ cắt và lưu ý đặc biệt của lệnh sản xuất.</td><td style="text-align:center"><span class="raci-badge raci-c">C</span></td><td>Máy được vận hành trong giới hạn đã xác nhận, không tự ý sửa điều kiện thiết lập.</td></tr>
+<tr><th>Tổ trưởng kiểm soát chất lượng (QCL) / Nhân viên kiểm soát chất lượng (QC)</th><td>Phối hợp xác nhận sản phẩm đầu tiên, kiểm tra trong quá trình, tình trạng nghi ngờ và xử lý sản phẩm không phù hợp.</td><td style="text-align:center"><span class="raci-badge raci-c">C</span></td><td>Không để hàng nghi ngờ chuyển tiếp hoặc bị trộn lẫn với hàng đạt.</td></tr>
+<tr><th>Quản lý phân xưởng CNC (WKM)</th><td>Báo cáo vấn đề lặp lại, thời gian dừng máy lớn, thiếu nguồn lực hoặc rủi ro ảnh hưởng tiến độ / chất lượng.</td><td style="text-align:center"><span class="raci-badge raci-i">I</span></td><td>Quản lý có dữ liệu để điều phối nguồn lực và xử lý nút thắt.</td></tr>
+<tr><th>Ca sau</th><td>Bàn giao trạng thái máy, WIP, dụng cụ cắt, sản lượng, hồ sơ, bất thường và việc còn mở.</td><td style="text-align:center"><span class="raci-badge raci-r">R</span></td><td>Ca sau tiếp quản ngay, không mất dấu trạng thái sản phẩm hoặc máy.</td></tr>
+</tbody></table>
+</div>
+<p class="inline-note">Quy ước: R = trực tiếp thực hiện/phản hồi; A = chịu trách nhiệm cuối cùng; C = cần tham vấn trước khi tiếp tục; I = cần được thông tin để đồng bộ trạng thái.</p>
+<h2 class="h2">7. Đầu ra bắt buộc / hồ sơ quản trị</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Đầu ra / hồ sơ</th><th>Nội dung bắt buộc</th><th>Chu kỳ</th><th>Nơi lưu / nguồn</th></tr></thead><tbody>
+<tr><td>Ghi nhận lao động và sản lượng</td><td>Thời gian chạy, thời gian dừng, số lượng đạt, số lượng không đạt, lý do dừng và người thực hiện.</td><td>Mỗi lệnh / mỗi ca</td><td>Epicor, bảng theo dõi ca, hồ sơ sản xuất.</td></tr>
+<tr><td>Hồ sơ tự kiểm trong quá trình</td><td>Kết quả tự kiểm, thời điểm kiểm, dụng cụ đo, người kiểm và hành động khi lệch chuẩn.</td><td>Theo tần suất quy định</td><td>Phiếu kiểm trong quá trình, biểu mẫu chất lượng liên quan.</td></tr>
+<tr><td>Thông báo bất thường</td><td>Dấu hiệu máy, dụng cụ, vật liệu, kích thước, bề mặt, FOD hoặc nhận diện sản phẩm bất thường.</td><td>Khi phát sinh</td><td><a download="" href="../../../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx">FRM-651</a> hoặc hồ sơ bất thường theo tuyến.</td></tr>
+<tr><td>Bàn giao ca</td><td>Trạng thái máy, WIP, dụng cụ cắt, sản lượng, hồ sơ còn mở và điểm cần chú ý cho ca sau.</td><td>Mỗi ca</td><td>Bảng bàn giao ca, bảng quản trị xưởng.</td></tr>
+<tr><td>Bằng chứng 5S / an toàn tại máy</td><td>Tình trạng vệ sinh, bảo vệ máy, dụng cụ, vật liệu, lối đi và phòng ngừa FOD.</td><td>Ngày / tuần</td><td>Bảng kiểm 5S, kiểm tra hiện trường.</td></tr>
+</tbody></table></div>
+<h2 class="h2">8. KPI cá nhân</h2>
+<div class="table-card"><table class="table"><thead><tr><th>KPI trọng yếu</th><th>Cách đo / nguồn dữ liệu</th><th>Chu kỳ theo dõi</th></tr></thead><tbody>
+<tr><td>Tỷ lệ sản phẩm đạt ngay tại nguồn</td><td>Số lượng đạt so với tổng sản lượng của lệnh / ca, loại trừ lỗi không thuộc phạm vi vận hành khi có bằng chứng.</td><td>Tuần / tháng</td></tr>
+<tr><td>Tuân thủ tự kiểm</td><td>Tỷ lệ tự kiểm đúng tần suất, đúng thời điểm và có ghi nhận hợp lệ.</td><td>Tuần / tháng</td></tr>
+<tr><td>Ghi nhận dữ liệu đúng hạn</td><td>Mức độ đầy đủ và đúng thời điểm của ghi nhận sản lượng, thời gian dừng và lý do bất thường.</td><td>Ngày / tuần</td></tr>
+<tr><td>Lỗi do vận hành có thể quy trách nhiệm</td><td>Số lỗi do chạy sai điều kiện, bỏ kiểm, ghi sai dữ liệu, chuyển tiếp sai trạng thái hoặc không báo cáo bất thường.</td><td>Tháng</td></tr>
+<tr><td>Tuân thủ an toàn, 5S và FOD</td><td>Kết quả kiểm tra hiện trường, vệ sinh khu vực, phân tách sản phẩm và quản lý vật dụng tại máy.</td><td>Tuần / tháng</td></tr>
+</tbody></table></div>
+<h2 class="h2">9. Yêu cầu năng lực</h2>
+<div class="comp-grid">
+<div class="comp-card"><p><b>Kiến thức chuyên môn và hệ thống</b></p><ul>
+<li>Hiểu nguyên tắc vận hành máy CNC, đọc được thông tin cơ bản trên lệnh sản xuất, phiếu công nghệ, bản vẽ, hướng dẫn công việc và tem nhận diện.</li>
+<li>Biết tự kiểm trong phạm vi được giao, nhận biết dấu hiệu mòn dao, trôi kích thước, sai bề mặt, sai nhận diện và rủi ro FOD.</li>
+<li>Biết ghi nhận dữ liệu vào Epicor hoặc biểu mẫu hiện trường theo hướng dẫn.</li>
+</ul></div>
+<div class="comp-card"><p><b>Năng lực hành vi / tác phong</b></p><ul>
+<li>Kỷ luật, trung thực với dữ liệu, không che giấu lỗi và không tự ý xử lý ngoài phạm vi.</li>
+<li>Cẩn thận, tập trung, tuân thủ an toàn máy và sẵn sàng báo cáo khi có nghi ngờ.</li>
+<li>Có khả năng phối hợp với SET, SL và QC trong điều kiện áp lực sản lượng.</li>
+</ul></div>
+</div>
+<div class="callout"><p><b>Mô-đun năng lực / đào tạo cốt lõi</b></p><ul>
+<li><a href="../../../../training/content/01-Modules/C01.html">C01 — An toàn nơi làm việc và 5S</a></li>
+<li><a href="../../../../training/content/01-Modules/C02.html">C02 — Kỷ luật quy trình và tuân thủ công việc chuẩn</a></li>
+<li><a href="../../../../training/content/01-Modules/C03.html">C03 — Tư duy chất lượng: làm đúng ngay từ lần đầu</a></li>
+<li><a href="../../../../training/content/01-Modules/C10.html">C10 — Quy trình lệnh sản xuất CNC</a></li>
+<li><a href="../../../../training/content/01-Modules/C14.html">C14 — Đọc bản vẽ và dung sai hình học</a></li>
+<li><a href="../../../../training/content/01-Modules/C17.html">C17 — Vận hành máy CNC và thiết lập cơ bản</a></li>
+</ul></div>
+<p class="inline-note">Mức đánh giá chi tiết và lộ trình OJT áp dụng theo ma trận đào tạo / hướng dẫn đánh giá năng lực hiện hành của bộ phận.</p>
+<h2 class="h2">10. Học vấn, kinh nghiệm và yêu cầu tuyển dụng</h2>
+<div class="table-card"><table class="table require-table"><tbody>
+<tr><th>Trình độ / chứng chỉ</th><td><ul><li>Tốt nghiệp trung học phổ thông trở lên; ưu tiên trung cấp / cao đẳng nghề cơ khí, cắt gọt kim loại, cơ điện tử hoặc lĩnh vực liên quan.</li><li>Ưu tiên đã qua đào tạo vận hành máy CNC, đọc bản vẽ cơ bản, đo kiểm cơ bản và an toàn máy.</li></ul></td></tr>
+<tr><th>Kinh nghiệm</th><td><ul><li>Có kinh nghiệm vận hành máy phay, tiện hoặc trung tâm gia công CNC; có thể tiếp nhận đào tạo nội bộ nếu thái độ và kỷ luật phù hợp.</li><li>Ưu tiên từng làm trong môi trường gia công chính xác, nhiều mã hàng, sản lượng vừa và yêu cầu truy xuất cao.</li></ul></td></tr>
+<tr><th>Hệ thống / công cụ cần dùng</th><td>Epicor, phiếu công nghệ, hướng dẫn công việc, dụng cụ đo cơ bản, bảng quản trị ca, bảng bàn giao và hồ sơ chất lượng liên quan.</td></tr>
+<tr><th>Điều kiện / đặc thù công việc</th><td>Làm việc tại phân xưởng, có thể theo ca hoặc tăng ca theo kế hoạch; phải tuân thủ PPE, an toàn máy, 5S, kiểm soát FOD và kỷ luật ghi dữ liệu.</td></tr>
+<tr><th>Lưu ý tuyển dụng ưu tiên</th><td>Ưu tiên ứng viên cẩn thận, trung thực, có thói quen dừng khi nghi ngờ và không ngại hỏi khi điều kiện vận hành chưa rõ.</td></tr>
+</tbody></table></div>
 <h2 class="h2">11. Người thay thế / kế nhiệm tạm thời</h2>
 <div class="backup-card">
-<p><b>Chính / Sơ cấp Backup:</b> <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-shift-leader.html" title="Shift Leader (Trưởng ca)"><span class="entity-code role-code">SL</span></a></span> chỉ định backup theo ANNEX-123; người thay thế phải được OJT, có bàn giao và được phép nhận việc trong phạm vi được giao.</p>
-<p><b>Thứ cấp / Phụ Backup:</b> <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-shift-leader.html" title="Shift Leader (Trưởng ca)"><span class="entity-code role-code">SL</span></a></span> phối hợp <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)"><span class="entity-code dept-code">D-PROD</span></a></span> bố trí nguồn lực dự phòng theo ca/kế hoạch để duy trì công việc và truy vết hồ sơ.</p>
-<p><b>Giới hạn quyền khi thay thế:</b> Chỉ thực hiện trong phạm vi công việc thường lệ; không tự phê duyệt thay đổi, phát hành, cam kết khách hàng, ngoại lệ chất lượng hay chi phí vượt thẩm quyền chức danh gốc.</p>
-<p><b>Nguyên tắc kích hoạt:</b> Kích hoạt khi nghỉ phép, công tác, đào tạo, vắng mặt ngắn hạn hoặc khối lượng tăng đột biến; phải có phân công rõ bằng email, ca lệnh hoặc bảng phân nhiệm.</p>
+<p><b>Người thay thế chính:</b> Trưởng ca <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-shift-leader.html" title="Trưởng ca (SL)"><span class="entity-code role-code">SL</span></a></span> chỉ định OPR đã được OJT và đủ năng lực theo loại máy / loại công việc tương ứng.</p>
+<p><b>Người thay thế phụ:</b> WKM phối hợp SL bố trí nhân sự dự phòng theo ca, bảo đảm người thay thế hiểu trạng thái lệnh sản xuất, điểm kiểm và giới hạn vận hành.</p>
+<p><b>Giới hạn quyền khi thay thế:</b> Chỉ vận hành trong phạm vi đã được đào tạo và cho phép; không tự đổi chương trình, thông số, tiêu chí chấp nhận hoặc xử lý hàng không phù hợp.</p>
+<p><b>Nguyên tắc kích hoạt:</b> Kích hoạt khi nghỉ phép, vắng mặt, đào tạo, đổi ca hoặc khối lượng tăng đột biến; phải có bàn giao rõ bằng bảng ca, lệnh sản xuất hoặc phân công của SL.</p>
 </div>
-<h2 class="h2">12. SOP / WI / Biểu mẫu / Academy liên quan</h2>
-<div class="table-card"><table class="table"><tbody><tr><th style="width:28%">SOP cốt lõi</th><td><ul class="doc-link-list"><li><a href="../../../../operations/sops/05-SOP-500/sop-502-cnc-machining-operations.html">SOP-502 — Thực thi gia công CNC</a></li><li><a href="../../../../operations/sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504 — Phát hành chương trình, setup, chi tiết đầu tiên, chuyển đổi (chuyển đổi (chuyển công đoạn) và kiểm soát bàn giao công việc</a></li><li><a href="../../../../operations/sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606 — NCR, CAPA và phản ứng IPQC</a></li><li><a href="../../../../operations/sops/07-SOP-700/sop-703-product-safety-conformity-and-fod-prevention.html">SOP-703 — An toàn sản phẩm, kiểm soát tính phù hợp và phòng ngừa FOD</a></li><li><a href="../../../../operations/sops/08-SOP-800/sop-804-human-factors-and-error-proofing.html">SOP-804 — Yếu tố con Người, phòng ngừa sai lỗi và poka (chống sai) (chống sai) (chống sai)-giá đỡ (giá đỡ (yoke)</a></li><li><a href="../../../../operations/sops/06-SOP-600/sop-604-spc-and-capability-control.html">SOP-604 — SPC và kiểm soát năng lực quá trình</a></li></ul></td></tr><tr><th style="width:28%">WI / Reference / System</th><td><ul class="doc-link-list"><li><a href="../../../../operations/work-instructions/05-WI-500/wi-511-machine-type-quick-reference.html">WI-511 — Thẻ nhanh theo loại máy, điểm rủi ro sự cố nghiêm trọng, an toàn start và an toàn khôi phục / thu hồi</a></li><li><a href="../../../../operations/work-instructions/05-WI-500/wi-512-3-axis-vertical-milling-guide.html">WI-512 — Hướng dẫn vận hành máy phay đứng 3 trục</a></li><li><a href="../../../../operations/work-instructions/05-WI-500/wi-513-5-axis-milling-guide.html">WI-513 — Hướng dẫn vận hành máy phay 5 trục</a></li><li><a href="../../../../operations/work-instructions/05-WI-500/wi-514-cnc-turning-guide.html">WI-514 — Hướng dẫn vận hành tiện CNC</a></li><li><a href="../../../../operations/work-instructions/05-WI-500/wi-515-mill-turn-guide.html">WI-515 — Hướng dẫn vận hành phay-lượt / quay / đa nhiệm</a></li><li><a href="../../../../operations/work-instructions/05-WI-500/wi-516-machine-operation-quick-card.html">WI-516 — Thẻ vận hành chuẩn vận hành máy CNC</a></li><li><a href="../../../../operations/work-instructions/07-WI-700/wi-721-fod-prevention-line-clearance-and-tool-accountability.html">WI-721 — Chống FOD, dòng / chuyền thông quan / giải phóng, kiểm tool/vật lạ và xác nhận khu vực sạch</a></li><li><a href="../../../../operations/work-instructions/08-WI-800/wi-801-cnc-poka-yoke-examples.html">WI-801 — Triển khai poka (chống sai) (chống sai) (chống sai)-giá đỡ (giá đỡ (yoke) tại công đoạn và xác nhận hiệu lực</a></li><li><a href="../../../../operations/references/05-ANNEX-500/annex-506-fod-prevention-program.html">ANNEX-506 — Chương trình phòng ngừa FOD</a></li><li><a href="../../../../operations/references/05-ANNEX-500/annex-507-poka-yoke-cnc-examples.html">ANNEX-507 — Thư viện ví dụ poka (chống sai) (chống sai) (chống sai)-giá đỡ (giá đỡ (yoke) CNC, chống-mix, chống-rev, chống-tooling lỗi</a></li><li><a href="../../../../operations/work-instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202 — Điều hành hằng ngày, họp tầng, KPI, log hành động và xử lý vượt cấp | HESEM MOM</a></li><li><a href="../../../../operations/work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203 — Lập Hồ sơ công việc (hồ sơ công việc), nạp bằng chứng, kiểm tính đầy đủ hồ sơ và khóa hồ sơ</a></li></ul></td></tr><tr><th style="width:28%">Biểu mẫu / hồ sơ</th><td><ul class="doc-link-list"><li><a download="" href="../../../../forms/frm-200-purchase/FRM-203_Job_Tracking_Sheet.xlsx"><b>FRM-203</b> — Job Theo dõi Sheet</a></li><li><a download="" href="../../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx"><b>FRM-504</b> — Shift Bàn giao Log</a></li><li><a download="" href="../../../../forms/frm-500-production/FRM-512_Downtime_Log.xlsx"><b>FRM-512</b> — Thời gian Từng máy Log</a></li><li><a download="" href="../../../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx"><b>FRM-651</b> — NCR Báo cáo</a></li><li><a download="" href="../../../../forms/frm-600-inspection/FRM-631_SPC_and_Process_Capability_Log.xlsx">FRM-631 — SPC and Quy trình Khả năng Log</a></li></ul></td></tr><tr><th style="width:28%">Academy / năng lực</th><td><ul class="doc-link-list"><li><a href="../../../../training/content/02-OJT-Guides/ojt-role-operator.html"><b>TRN-ACA-OJT-OP-01</b> — OJT 1 trang — CNC Operator | HESEM OS</a></li><li><a href="../../../../training/content/01-Modules/C01.html"><b>Mô-đun C01</b> — Nơi làm việc An toàn &amp; 5S | HESEM OS</a></li><li><a href="../../../../training/content/01-Modules/C02.html"><b>Mô-đun C02</b> — Quy trình Kỷ luật &amp; Standard Công việc Tuân thủ | HESEM OS</a></li><li><a href="../../../../training/content/01-Modules/C03.html">Mô-đun C03 — Quality Tư duy (Đúng ngay từ lần đầu (Quyền / Đúng Đầu tiên Time) | HESEM OS</a></li><li><a href="../../../../training/content/01-Modules/C08.html"><b>Mô-đun C08</b> — Data-Định hướng bởi Tư duy &amp; System Sử dụng (ERP/Excel) | HESEM OS</a></li><li><a href="../../../../training/content/01-Modules/C10.html"><b>Mô-đun C10</b> — Quy trình Lệnh sản xuất CNC (RFQ → Tiền mặt) | HESEM OS</a></li><li><a href="../../../../training/content/01-Modules/C17.html"><b>Mô-đun C17</b> — Kỹ thuật Năng lực by Vai trò (CNC/Setup/CAM) | HESEM OS</a></li></ul></td></tr><tr><th style="width:28%">Reference điều hành</th><td><ul class="doc-link-list"><li><a href="../../../../operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503 — Mô hình vận hành CNC và ranh giới vai trò</a></li><li><a href="../../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html"><b>ANNEX-120</b> — Ma trận thẩm quyền quyết định và nhả giữ</a></li><li><a href="../../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html"><b>ANNEX-121</b> — RACI chủ / gốc ở mức hoạt động và tài liệu</a></li><li><a href="../../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html"><b>ANNEX-122</b> — Từ điển KPI lan truyền / phân tầng</a></li><li><a href="../../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html"><b>ANNEX-123</b> — Ma trận phó / backup</a></li></ul></td></tr></tbody></table></div>
+<h2 class="h2">12. Tài liệu liên quan: SOP / WI / Biểu mẫu / Đào tạo</h2>
+<div class="table-card"><table class="table"><tbody>
+<tr><th style="width:28%">SOP cốt lõi</th><td><ul class="doc-link-list">
+<li><a href="../../../../operations/sops/05-SOP-500/sop-502-cnc-machining-operations.html">SOP-502 — Vận hành gia công CNC</a></li>
+<li><a href="../../../../operations/sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504 — Phát hành chương trình, thiết lập máy, kiểm tra sản phẩm đầu tiên, đổi mã và chuyển giao công việc</a></li>
+<li><a href="../../../../operations/sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606 — Phản ứng với sản phẩm không phù hợp, hành động khắc phục và kiểm soát trong quá trình</a></li>
+</ul></td></tr>
+<tr><th>WI / Phụ lục kiểm soát</th><td><ul class="doc-link-list">
+<li><a href="../../../../operations/work-instructions/05-WI-500/wi-511-machine-type-quick-reference.html">WI-511 — Tra cứu nhanh theo loại máy</a></li>
+<li><a href="../../../../operations/work-instructions/05-WI-500/wi-512-3-axis-vertical-milling-guide.html">WI-512 — Hướng dẫn phay đứng 3 trục</a></li>
+<li><a href="../../../../operations/work-instructions/05-WI-500/wi-513-5-axis-milling-guide.html">WI-513 — Hướng dẫn phay 5 trục</a></li>
+<li><a href="../../../../operations/work-instructions/05-WI-500/wi-516-machine-operation-quick-card.html">WI-516 — Thẻ hướng dẫn nhanh vận hành máy</a></li>
+<li><a href="../../../../operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503 — Mô hình vận hành CNC và ranh giới vai trò</a></li>
+</ul></td></tr>
+<tr><th>Biểu mẫu / hồ sơ</th><td><ul class="doc-link-list">
+<li><a download="" href="../../../../forms/frm-500-production/FRM-501_Job_Traveler.xlsx">FRM-501 — Phiếu theo dõi lệnh sản xuất</a></li>
+<li><a download="" href="../../../../forms/frm-500-production/FRM-505_Daily_Production_Log.xlsx">FRM-505 — Nhật ký sản xuất hằng ngày</a></li>
+<li><a download="" href="../../../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx">FRM-651 — Báo cáo sản phẩm không phù hợp</a></li>
+</ul></td></tr>
+<tr><th>Đào tạo / năng lực</th><td><ul class="doc-link-list">
+<li><a href="../../../../training/templates/role-roadmaps.html">Lộ trình vai trò 30/60/90 ngày</a></li>
+<li><a href="../../../../training/content/01-Modules/C10.html">C10 — Quy trình lệnh sản xuất CNC</a></li>
+<li><a href="../../../../training/content/01-Modules/C17.html">C17 — Vận hành máy CNC và thiết lập cơ bản</a></li>
+</ul></td></tr>
+<tr><th>Tham chiếu điều hành</th><td><ul class="doc-link-list">
+<li><a href="../../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120 — Ma trận thẩm quyền</a></li>
+<li><a href="../../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html">ANNEX-121 — Ma trận RACI</a></li>
+<li><a href="../../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html">ANNEX-122 — Từ điển KPI phân tầng</a></li>
+<li><a href="../../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123 — Ma trận người thay thế</a></li>
+</ul></td></tr>
+</tbody></table></div>
 </div>
 </div>
 </div>

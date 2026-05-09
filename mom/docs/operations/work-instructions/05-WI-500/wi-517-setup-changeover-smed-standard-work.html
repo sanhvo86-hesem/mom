@@ -24,7 +24,7 @@
   document.head.appendChild(js);
 })();
 </script>
-<link rel="stylesheet" href="../../../assets/style.css">
+<link rel="stylesheet" href="../../../../assets/style.css">
 <style>
 .page-body h1 { font-size: 24px; line-height: 1.35; margin: 0 0 10px; }
 .page-body h2 { font-size: 18px; line-height: 1.4; margin: 18px 0 10px; color: var(--navy); }
@@ -55,7 +55,7 @@ ul.tight li { margin: 4px 0; }
      data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;WI-517&quot;,&quot;title&quot;:&quot;Setup Chuyển công đoạn Smed Công việc tiêu chuẩn hoá&quot;,&quot;subtitle&quot;:&quot;Setup, changeover, SMED standard work theo họ máy, checkpoint ready-to-run và handoff sau setup.&quot;,&quot;doc_type&quot;:&quot;WI&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
       
 
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi setup job mới, đổi Part/Rev, đổi fixture, đổi machine, đổi logic setup hoặc restart sau bất thường làm thay điều kiện chạy. Đây là POU-WI tại máy và bench setup; matrix family máy và role boundary tra tại <a href="../../03-Reference/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a>.</div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi setup job mới, đổi Part/Rev, đổi fixture, đổi machine, đổi logic setup hoặc restart sau bất thường làm thay điều kiện chạy. Đây là POU-WI tại máy và bench setup; matrix family máy và role boundary tra tại <a href="../../references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a>.</div>
       
 
       <section id="wi-s1" class="wi-section">
@@ -105,7 +105,7 @@ ul.tight li { margin: 4px 0; }
               <tr>
                 <td>Released set</td>
                 <td>Phiếu công nghệ, phiếu setup, danh mục dao cụ, program released và plan đo đang hiệu lực.</td>
-                <td>Tra nguồn và boundary tại <a href="../../03-Reference/03-ANNEX-300/annex-301-setup-sheet-and-tool-list-standard.html">ANNEX-301</a> và <a href="../../03-Reference/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a>.</td>
+                <td>Tra nguồn và boundary tại <a href="../../references/03-ANNEX-300/annex-301-setup-sheet-and-tool-list-standard.html">ANNEX-301</a> và <a href="../../references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a>.</td>
               </tr>
               <tr>
                 <td>Fixture và phần cứng gá</td>
@@ -134,7 +134,7 @@ ul.tight li { margin: 4px 0; }
           <li>Program và phiếu setup chứng minh được đúng Job, đúng Part/Rev và đúng nguồn phát hành.</li>
           <li>Fixture, ToolID, probe, WCS và vật liệu đã sẵn ở point-of-use trước khi đưa máy vào setup chính.</li>
           <li>Gage hoặc phương pháp đo cho part đầu đã sẵn sàng nếu setup này dẫn tới mẫu đầu tiên ngay sau đó.</li>
-          <li>Nếu family máy có add-on kiểm soát riêng thì phải tra trước ở <a href="../../03-Reference/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a>.</li>
+          <li>Nếu family máy có add-on kiểm soát riêng thì phải tra trước ở <a href="../../references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a>.</li>
         </ul>
         <div class="callout-warning"><strong>HOLD</strong><br>Nếu một điều kiện tiên quyết chưa đạt, không được “setup tạm trước rồi sửa hồ sơ sau”. Phải dừng tại chỗ và sửa điều kiện gốc trước khi tiếp tục.</div>
       </section>
@@ -254,9 +254,9 @@ ul.tight li { margin: 4px 0; }
       <section id="wi-s7" class="wi-section">
         <h2>7. Tài liệu liên quan</h2>
         <div class="doc-link-row">
-          <a class="doc-link" href="../../01-SOPs/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a>
-          <a class="doc-link" href="../../03-Reference/03-ANNEX-300/annex-301-setup-sheet-and-tool-list-standard.html">ANNEX-301</a>
-          <a class="doc-link" href="../../03-Reference/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a>
+          <a class="doc-link" href="../../sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a>
+          <a class="doc-link" href="../../references/03-ANNEX-300/annex-301-setup-sheet-and-tool-list-standard.html">ANNEX-301</a>
+          <a class="doc-link" href="../../references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a>
           <a class="doc-link" href="wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a>
           <a class="doc-link" href="../03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html">WI-302</a>
         </div>
