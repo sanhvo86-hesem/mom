@@ -7989,13 +7989,12 @@ function renderAdmin(){
   }
   if(adminTab==='users') renderAdminUsers();
   if(adminTab==='dept_title') renderAdminDeptTitle();
-  if(adminTab==='perms') renderAdminPerms();
+  if(adminTab==='perms') renderAdminPermTab('doc_perms');
   if(adminTab==='roles') renderAdminRoles();
   if(adminTab==='orgchart') renderAdminOrgChart();
   if(adminTab==='activity') renderAdminActivity();
   if(adminTab==='module_access'){
-    renderAdminModuleAccess();
-    loadModuleAccessConfigFromServer({silent:true});
+    renderAdminPermTab('module_perms');
   }
   if(adminTab==='docs') renderAdminContentTab('effective_docs');
   if(adminTab==='infrastructure') renderAdminInfrastructure();
@@ -8005,8 +8004,7 @@ function renderAdmin(){
   if(adminTab==='translation_module') renderAdminTranslationModuleTab();
   if(adminTab==='version_control') renderAdminVersionControl();
   if(adminTab==='portal_display'){
-    renderAdminPortalDisplay();
-    loadPortalDisplayConfigFromServer({silent:true});
+    renderAdminPermTab('portal_display');
   }
   if(adminTab==='retention') renderAdminContentTab('retention');
   if(adminTab==='mfa') renderAdminContentTab('mfa');
@@ -8033,6 +8031,26 @@ function renderAdminGovernanceTab(slug){
   s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00g-admin-governance-tabs.js?v=' + (window.APP_VERSION || Date.now());
   s.onload = function(){
     if(typeof window._renderAdminGovernanceTab === 'function') window._renderAdminGovernanceTab(el, slug);
+  };
+  document.head.appendChild(s);
+}
+
+/* ── Admin: Permissions tabs (Module / Document / Portal Display) ──────── */
+function renderAdminPermTab(slug){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+  if(typeof window._renderAdminPermTab === 'function'){
+    window._renderAdminPermTab(el, slug);
+    return;
+  }
+  el.innerHTML = '<div class="hm-empty">'+(lang==='en'?'Loading admin tab...':'Đang tải tab quản trị...')+'</div>';
+  var existing = document.getElementById('admin-permissions-tabs-script');
+  if(existing){ existing.remove(); }
+  var s = document.createElement('script');
+  s.id  = 'admin-permissions-tabs-script';
+  s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00i-admin-permissions-tabs.js?v=' + (window.APP_VERSION || Date.now());
+  s.onload = function(){
+    if(typeof window._renderAdminPermTab === 'function') window._renderAdminPermTab(el, slug);
   };
   document.head.appendChild(s);
 }
