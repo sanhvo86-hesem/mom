@@ -675,6 +675,9 @@ function moduleAccessAdminTabCatalog(){
     {id:'manual_runtime', group:'operations', icon:'🧾', labelEn:'Manual runtime', labelVi:'Nhập tay vận hành', noteEn:'Manual runtime fallback workspace.', noteVi:'Không gian fallback nhập tay vận hành.', defaultAccess:'admin'},
     {id:'version_control', group:'operations', icon:'🔄', labelEn:'Version control', labelVi:'Điều khiển phiên bản', noteEn:'Git synchronization and release hygiene.', noteVi:'Đồng bộ Git và vệ sinh phát hành.', defaultAccess:'admin'},
     {id:'mfa', group:'security', icon:'🔑', labelEn:'MFA security', labelVi:'Bảo mật MFA', noteEn:'MFA policy and enrollment status.', noteVi:'Chính sách MFA và trạng thái kích hoạt.', defaultAccess:'admin'},
+    {id:'permission_catalog', group:'governance', icon:'🗂', labelEn:'Permission Catalog', labelVi:'Catalog Quyền', noteEn:'Atomic permission codes (NIST 800-162 / SAP authorization-object).', noteVi:'Mã quyền nguyên tử (NIST 800-162 / SAP authorization-object).', defaultAccess:'admin'},
+    {id:'sod_matrix', group:'governance', icon:'⚖️', labelEn:'SoD Matrix', labelVi:'Tách trách nhiệm', noteEn:'Separation-of-Duties conflict matrix (COBIT 5 / SOX 404 / ISO 27001).', noteVi:'Ma trận xung đột tách trách nhiệm (COBIT / SOX / ISO 27001).', defaultAccess:'admin'},
+    {id:'access_review', group:'governance', icon:'🧐', labelEn:'Access Reviews', labelVi:'Đánh giá phân quyền', noteEn:'Periodic access-review campaigns (ISO 27001 A.9.2.5 / SOX 404).', noteVi:'Chu kỳ đánh giá phân quyền định kỳ (ISO 27001 A.9.2.5 / SOX 404).', defaultAccess:'admin'},
     {id:'ai_control', group:'operations', icon:'🤖', labelEn:'AI Control', labelVi:'Điều khiển AI', noteEn:'AI engine on/off, model selection, feature toggles, usage and cost tracking.', noteVi:'Bật/tắt AI engine, chọn model, tính năng, theo dõi sử dụng và chi phí.', defaultAccess:'admin'},
     {id:'translation_module', group:'operations', icon:'🌍', labelEn:'Translation Module', labelVi:'Module Dịch Thuật', noteEn:'Multi-provider routing (NLLB / Claude CLI / Codex CLI / API), credentials vault, model discovery, cost log, side-by-side test bench. Backed by migration 157.', noteVi:'Định tuyến đa engine (NLLB / Claude CLI / Codex CLI / API), kho API key mã hóa, chọn model, log chi phí, test song song. Migration 157.', defaultAccess:'admin'},
     {id:'appearance', group:'content', icon:'🎨', labelEn:'Appearance', labelVi:'Giao diện', noteEn:'Portal design system and theme settings.', noteVi:'Thiết lập giao diện và design system.', defaultAccess:'admin'}
@@ -8009,6 +8012,29 @@ function renderAdmin(){
   if(adminTab==='mfa') renderAdminMfa();
   if(adminTab==='ai_control') renderAdminAiControl();
   if(adminTab==='appearance') renderAdminAppearance();
+  if(adminTab==='permission_catalog') renderAdminGovernanceTab('permission_catalog');
+  if(adminTab==='sod_matrix') renderAdminGovernanceTab('sod_matrix');
+  if(adminTab==='access_review') renderAdminGovernanceTab('access_review');
+}
+
+/* ── Admin: Governance tabs (Permission Catalog / SoD Matrix / Access Reviews) ─ */
+function renderAdminGovernanceTab(slug){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+  if(typeof window._renderAdminGovernanceTab === 'function'){
+    window._renderAdminGovernanceTab(el, slug);
+    return;
+  }
+  el.innerHTML = '<div class="hm-empty">'+(lang==='en'?'Loading governance tab...':'Đang tải tab quản trị...')+'</div>';
+  var existing = document.getElementById('admin-governance-tabs-script');
+  if(existing){ existing.remove(); }
+  var s = document.createElement('script');
+  s.id  = 'admin-governance-tabs-script';
+  s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00g-admin-governance-tabs.js?v=' + (window.APP_VERSION || Date.now());
+  s.onload = function(){
+    if(typeof window._renderAdminGovernanceTab === 'function') window._renderAdminGovernanceTab(el, slug);
+  };
+  document.head.appendChild(s);
 }
 
 /* ── Admin: Translation Module Tab (multi-provider, lazy-loaded) ─────────── */
