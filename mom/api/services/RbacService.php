@@ -422,6 +422,199 @@ class RbacService
         );
     }
 
+    /**
+     * Insert a HMAC-signed acknowledgement row.
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>
+     */
+    public function insertAcknowledgement(array $payload): array
+    {
+        $row = $this->db->execute(
+            "INSERT INTO document_acknowledgement
+                (ack_id, doc_id, doc_revision, user_id, signature_method, signature_hash,
+                 affirmation_text, acknowledged_at)
+             VALUES
+                (uuid_generate_v4(), :doc_id, :revision, NULLIF(:user_id,'')::uuid,
+                 :sig_method, :sig_hash, :notes, NOW())
+             RETURNING ack_id, doc_id, doc_revision, user_id, signature_method, signature_hash, acknowledged_at",
+            [
+                ':doc_id'     => $payload['doc_id'],
+                ':revision'   => $payload['revision'] ?: '1.0',
+                ':user_id'    => $payload['user_id'] ?? '',
+                ':sig_method' => $payload['signature_method'],
+                ':sig_hash'   => $payload['signature_hmac'],
+                ':notes'      => $payload['notes'] ?? '',
+            ]
+        );
+        $this->writeAudit('document.acknowledge', 'document', (string)$payload['doc_id'], (string)$payload['user_id'], $payload);
+        return is_array($row) ? $row : ['ok' => true];
+    }
+
+    /**
+     * Dispose a record with witness signature + chain-of-custody.
+     * Refuses if the record is currently under a legal hold.
+     * @return array<string, mixed>
+     */
+    public function disposeRecord(
+        string $recordId,
+        string $actorUserId,
+        string $witnessUserId,
+        string $methodUsed,
+        string $location,
+        string $notes,
+        string $actorReason
+    ): array {
+        $hold = $this->db->query(
+            'SELECT id, case_ref FROM legal_hold
+              WHERE released_at IS NULL
+                AND (record_class_filter IS NULL OR record_class_filter = ANY(string_to_array(
+                    (SELECT record_class FROM v_retention_due_for_disposal
+                     WHERE record_id = :rid LIMIT 1), \',\'))) LIMIT 1',
+            [':rid' => $recordId]
+        );
+        if (!empty($hold)) {
+            throw new \RuntimeException('record_under_legal_hold:' . ($hold[0]['case_ref'] ?? ''));
+        }
+        $event = $this->db->execute(
+            "INSERT INTO disposal_event
+                (id, record_id, actor_user_id, witness_user_id, method_used, location, notes, actor_reason, disposed_at, row_version)
+             VALUES
+                (uuid_generate_v4(), :rid, NULLIF(:actor,'')::uuid, NULLIF(:witness,'')::uuid,
+                 :method, :location, :notes, :reason, NOW(), 1)
+             RETURNING id, record_id, witness_user_id, method_used, disposed_at",
+            [
+                ':rid'      => $recordId,
+                ':actor'    => $actorUserId,
+                ':witness'  => $witnessUserId,
+                ':method'   => $methodUsed,
+                ':location' => $location,
+                ':notes'    => $notes,
+                ':reason'   => $actorReason,
+            ]
+        );
+        $this->writeAudit('retention.dispose', 'record', $recordId, $actorUserId, [
+            'record_id' => $recordId,
+            'witness_user_id' => $witnessUserId,
+            'method_used' => $methodUsed,
+            'location' => $location,
+            'notes' => $notes,
+            'actor_reason' => $actorReason,
+        ]);
+        return is_array($event) ? $event : ['ok' => true];
+    }
+
+    /**
+     * Close an access review campaign. Counts pending items, writes audit.
+     * @return array<string, mixed>
+     */
+    public function closeCampaign(string $campaignId, string $actorUserId, string $reason): array
+    {
+        $pending = $this->db->query(
+            'SELECT COUNT(*)::int AS n FROM access_review_item
+              WHERE campaign_id = :cid AND (decision IS NULL OR decision = \'pending\')',
+            [':cid' => $campaignId]
+        );
+        $pendingCount = (int)($pending[0]['n'] ?? 0);
+        $closed = $this->db->execute(
+            "UPDATE access_review_campaign
+                SET status = 'closed', completed_at = NOW(), closed_at = NOW(),
+                    close_reason = :reason, pending_at_close = :pending,
+                    row_version = COALESCE(row_version,1) + 1
+              WHERE campaign_id = :cid
+             RETURNING campaign_id, name, status, completed_at, pending_at_close",
+            [':cid' => $campaignId, ':reason' => $reason, ':pending' => $pendingCount]
+        );
+        $this->writeAudit('access_review.close', 'access_review_campaign', $campaignId, $actorUserId, [
+            'reason' => $reason,
+            'pending_at_close' => $pendingCount,
+        ]);
+        return is_array($closed) ? $closed : ['ok' => true, 'pending_at_close' => $pendingCount];
+    }
+
+    /**
+     * List active sessions derived from the audit_events stream.
+     *
+     * Authoritative source = audit_events because every authenticated request
+     * writes one (with session_id, actor, IP, user_agent in metadata). The
+     * PHP file sessions on disk are owned by www-data with restrictive perms
+     * which can prevent direct reads under some FPM pool configs, so we go
+     * via the database — same data, more reliable, no file-IO surface.
+     *
+     * Returned shape per row: session_id, actor_id, actor_name, ip_address,
+     * user_agent, first_event_at, last_event_at, event_count, last_event_type,
+     * idle_seconds, is_current, status.
+     *
+     * @return array<int, array<string, mixed>>
+     */
+    public function listActiveSessions(string $currentSessionId = ''): array
+    {
+        $sql = "
+            SELECT
+              ae.session_id::text                              AS session_id,
+              MAX(COALESCE(NULLIF(ae.actor_name,''), '<unknown>')) AS actor_name,
+              MAX(ae.actor_id::text)                           AS actor_id,
+              MAX(ae.ip_address::text)                         AS ip_address,
+              MIN(ae.recorded_at)                              AS first_event_at,
+              MAX(ae.recorded_at)                              AS last_event_at,
+              COUNT(*)::int                                    AS event_count,
+              (array_agg(ae.event_type ORDER BY ae.recorded_at DESC))[1] AS last_event_type,
+              (array_agg(ae.metadata->>'user_agent' ORDER BY ae.recorded_at DESC)
+                 FILTER (WHERE jsonb_exists(ae.metadata, 'user_agent')))[1] AS user_agent,
+              EXTRACT(EPOCH FROM (now() - MAX(ae.recorded_at)))::int AS idle_seconds
+            FROM audit_events ae
+            WHERE ae.session_id IS NOT NULL
+              AND ae.recorded_at > now() - interval '8 hours'
+            GROUP BY ae.session_id
+            ORDER BY MAX(ae.recorded_at) DESC
+            LIMIT 200
+        ";
+        $rows = $this->db->query($sql);
+        // Normalise current session id (with or without dashes) for matching
+        $currentDashed = $this->dashifyToken($currentSessionId);
+        foreach ($rows as &$r) {
+            $r['idle_seconds'] = (int)($r['idle_seconds'] ?? 0);
+            $r['event_count'] = (int)($r['event_count'] ?? 0);
+            $r['is_current']  = ($r['session_id'] === $currentSessionId)
+                              || ($r['session_id'] === $currentDashed);
+            // status: active = idle < 5 min; idle = 5..30 min; stale = > 30 min
+            if ($r['idle_seconds'] < 300) $r['status'] = 'active';
+            elseif ($r['idle_seconds'] < 1800) $r['status'] = 'idle';
+            else $r['status'] = 'stale';
+        }
+        unset($r);
+        return $rows;
+    }
+
+    /**
+     * Force-logout a session by deleting its file. Writes audit event.
+     * Returns true if deleted, false if file did not exist.
+     */
+    public function revokeSession(string $sessionId, string $actorUserId, string $reason): bool
+    {
+        // Accept either the PHP token (no dashes) or the UUID (with dashes).
+        $token = str_replace('-', '', $sessionId);
+        $dir = dirname(__DIR__, 2) . '/data/sessions';
+        $path = $dir . '/sess_' . $token;
+        $deleted = false;
+        if (is_file($path)) {
+            $deleted = @unlink($path);
+        }
+        $this->writeAudit('session.revoke', 'portal_session', $sessionId, $actorUserId, [
+            'reason'        => $reason,
+            'session_token' => $token,
+            'file_path'     => $path,
+            'deleted'       => $deleted,
+        ]);
+        return $deleted;
+    }
+
+    private function dashifyToken(string $token): string
+    {
+        $token = strtolower(preg_replace('/[^a-f0-9]/', '', $token) ?: '');
+        if (strlen($token) !== 32) return '';
+        return substr($token, 0, 8) . '-' . substr($token, 8, 4) . '-' . substr($token, 12, 4) . '-' . substr($token, 16, 4) . '-' . substr($token, 20, 12);
+    }
+
     // ── Audit helper ────────────────────────────────────────────────────────
 
     /**
@@ -446,5 +639,58 @@ class RbacService
         } catch (\Throwable $e) {
             @error_log('[RbacService] audit write failed: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Re-apply the canonical least-privilege seed (migration 173) idempotently.
+     *
+     * The seed file at mom/database/migrations/173_rbac_role_permissions_canonical_seed.sql
+     * is the single source of canonical permissions. This method reads it and
+     * executes it inside a transaction so an admin can reset all 38 catalog
+     * roles to the canonical baseline at any time, without re-running the
+     * migration runner.
+     *
+     * @return array{applied: int, roles: array<int, string>, ran_at: string}
+     */
+    public function applyCanonicalSeed(string $actorUserId, string $reason): array
+    {
+        $portalRoot = dirname(__DIR__, 2);
+        $sqlFile = $portalRoot . '/database/migrations/173_rbac_role_permissions_canonical_seed.sql';
+        if (!is_file($sqlFile) || !is_readable($sqlFile)) {
+            throw new RuntimeException('canonical_seed_sql_missing');
+        }
+        $sql = (string)file_get_contents($sqlFile);
+        if ($sql === '') {
+            throw new RuntimeException('canonical_seed_sql_empty');
+        }
+
+        // Run the migration script (idempotent — uses pg_temp helper + UPDATE).
+        $this->db->executeScript($sql);
+
+        // Count seeded roles for the response.
+        $row = $this->db->queryOne(
+            "SELECT COUNT(*) AS c FROM roles WHERE permissions->>'seeded_by' = 'migration_173'",
+            []
+        );
+        $applied = (int)($row['c'] ?? 0);
+
+        $rolesRows = $this->db->query(
+            "SELECT role_code FROM roles WHERE permissions->>'seeded_by' = 'migration_173' ORDER BY role_code",
+            []
+        );
+        $roleCodes = array_map(static fn($r) => (string)$r['role_code'], $rolesRows);
+
+        $this->writeAudit('rbac.canonical_seed.apply', 'roles', 'all', $actorUserId, [
+            'applied' => $applied,
+            'roles' => $roleCodes,
+            'reason' => $reason,
+            'standard' => 'NIST 800-53 AC-6 + SOX 404 SoD + ISO 27001 A.9.4',
+        ]);
+
+        return [
+            'applied' => $applied,
+            'roles' => $roleCodes,
+            'ran_at' => date('c'),
+        ];
     }
 }

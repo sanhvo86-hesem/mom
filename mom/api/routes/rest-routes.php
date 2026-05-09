@@ -65,6 +65,7 @@ return static function (Router $router, string $dataDir): void {
     $router->get ('/api/v1/rbac/sod-violations',                 RbacController::class, 'sodViolations');
     $router->post('/api/v1/rbac/role-assignments',               RbacController::class, 'assignRole');
     $router->delete('/api/v1/rbac/role-assignments',             RbacController::class, 'revokeRole');
+    $router->post('/api/v1/rbac/canonical-seed:apply',           RbacController::class, 'applyCanonicalSeed');
 
     $router->get ('/api/v1/mfa/factors',                         RbacController::class, 'listFactors');
     $router->post('/api/v1/mfa/factors/{factorId}:revoke',       RbacController::class, 'revokeFactor');
@@ -72,11 +73,18 @@ return static function (Router $router, string $dataDir): void {
 
     $router->get ('/api/v1/documents/in-force',                  RbacController::class, 'documentsInForce');
     $router->get ('/api/v1/documents/pending-acknowledgement',   RbacController::class, 'pendingAcknowledgement');
+    $router->post('/api/v1/documents/{docId}:acknowledge',       RbacController::class, 'acknowledgeDocument');
 
     $router->get ('/api/v1/portal-display/effective-layout',     RbacController::class, 'effectiveLayout');
 
+    // Active portal sessions (file-based PHP sessions, enriched from audit_events)
+    $router->get ('/api/v1/sessions/active',                      RbacController::class, 'listActiveSessions');
+    $router->post('/api/v1/sessions/{sessionId}:revoke',          RbacController::class, 'revokeSession');
+
     $router->get ('/api/v1/retention/due-for-disposal',          RbacController::class, 'retentionDueForDisposal');
+    $router->post('/api/v1/retention/{recordId}:dispose',        RbacController::class, 'disposeRecord');
     $router->get ('/api/v1/access-review/progress',              RbacController::class, 'accessReviewProgress');
+    $router->post('/api/v1/access-review/campaigns/{campaignId}:close', RbacController::class, 'closeCampaign');
 
     // Generic runtime entity access — registered under /api/v1/runtime so the nginx
     // ^/api/v1/ location block routes the request to mom/api/index.php. Plain

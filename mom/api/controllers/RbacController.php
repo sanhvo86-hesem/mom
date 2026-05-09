@@ -284,4 +284,181 @@ class RbacController extends BaseController
             $this->error('access_review_progress_failed', 500, $e->getMessage());
         }
     }
+
+    /**
+     * POST /api/v1/documents/{docId}:acknowledge
+     * Body: { revision?: string, notes?: string }
+     * Writes a HMAC-signed acknowledgement row (21 CFR Part 11 §11.10(c)).
+     */
+    public function acknowledgeDocument(string $docId): void
+    {
+        $user = $this->requireAuthOrFail();
+        $body = $this->jsonBody();
+        try {
+            $payload = [
+                'doc_id'           => $docId,
+                'doc_code'         => (string)($body['doc_code'] ?? $docId),
+                'revision'         => (string)($body['revision'] ?? ''),
+                'user_id'          => $this->actorId($user),
+                'signature_method' => 'hmac-sha256',
+                'notes'            => (string)($body['notes'] ?? ''),
+                'created_at'       => date('c'),
+            ];
+            $secret = (string)(getenv('HMAC_SECRET') ?: 'mom-dev-hmac-secret');
+            $payloadStr = $payload['doc_id'].'|'.$payload['revision'].'|'.$payload['user_id'].'|'.$payload['created_at'];
+            $payload['signature_hmac'] = hash_hmac('sha256', $payloadStr, $secret);
+            $row = $this->rbac()->insertAcknowledgement($payload);
+            $this->success(['acknowledgement' => $row], 201);
+        } catch (Throwable $e) {
+            $this->error('acknowledge_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST /api/v1/retention/{recordId}:dispose
+     * Body: { method_used, witness_user_id, location?, notes, actor_reason }
+     * Writes a disposal_event row + chain-of-custody entry; refuses if a
+     * legal hold is active for the record.
+     */
+    public function disposeRecord(string $recordId): void
+    {
+        $user = $this->requireAuthOrFail();
+        $this->requireAdmin($user);
+        $body = $this->jsonBody();
+        $required = ['method_used','witness_user_id','notes'];
+        foreach ($required as $f) {
+            if (empty($body[$f])) { $this->error('missing_field:'.$f, 400); }
+        }
+        try {
+            $event = $this->rbac()->disposeRecord(
+                $recordId,
+                $this->actorId($user),
+                (string)$body['witness_user_id'],
+                (string)$body['method_used'],
+                (string)($body['location'] ?? ''),
+                (string)$body['notes'],
+                (string)($body['actor_reason'] ?? '')
+            );
+            $this->success(['disposal_event' => $event], 201);
+        } catch (Throwable $e) {
+            $this->error('dispose_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST /api/v1/access-review/campaigns/{campaignId}:close
+     * Body: { reason }
+     * Marks campaign closed, snapshots remaining-pending count, writes audit.
+     */
+    public function closeCampaign(string $campaignId): void
+    {
+        $user = $this->requireAuthOrFail();
+        $this->requireAdmin($user);
+        $body = $this->jsonBody();
+        if (empty($body['reason'])) { $this->error('reason_required', 400); }
+        try {
+            $summary = $this->rbac()->closeCampaign($campaignId, $this->actorId($user), (string)$body['reason']);
+            $this->success(['campaign' => $summary]);
+        } catch (Throwable $e) {
+            $this->error('close_campaign_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * GET /api/v1/sessions/active
+     *
+     * Lists every active PHP session under mom/data/sessions/ enriched with
+     * the username, role, last-activity time, IP and User-Agent from audit
+     * events. This is the world-class sessions surface — file-based PHP
+     * sessions stay invisible to the GenericCrudController, so we hand-build
+     * the dataset here.
+     *
+     * Output sorted by last-activity desc; the caller's own session is flagged
+     * with `is_current`.
+     */
+    public function listActiveSessions(): void
+    {
+        $user = $this->requireAuthOrFail();
+        $this->requireAdmin($user);
+        try {
+            $rows = $this->rbac()->listActiveSessions($this->getCurrentSessionId());
+            $this->success(['data' => $rows, 'count' => count($rows), 'current_session_id' => $this->getCurrentSessionId()]);
+        } catch (Throwable $e) {
+            $this->error('sessions_list_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST /api/v1/sessions/{sessionId}:revoke
+     *
+     * Force-logs-out a portal session by deleting its session file. The
+     * actor must be admin and cannot revoke their own current session via
+     * this endpoint (use the standard logout flow instead).
+     */
+    public function revokeSession(string $sessionId): void
+    {
+        $user = $this->requireAuthOrFail();
+        $this->requireAdmin($user);
+        $body = $this->jsonBody();
+        if (empty($body['reason'])) { $this->error('reason_required', 400); }
+        if ($sessionId === $this->getCurrentSessionId()) {
+            $this->error('cannot_revoke_own_session', 400);
+        }
+        try {
+            $deleted = $this->rbac()->revokeSession($sessionId, $this->actorId($user), (string)$body['reason']);
+            $this->success(['session_id' => $sessionId, 'deleted' => $deleted]);
+        } catch (Throwable $e) {
+            $this->error('revoke_session_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST /api/v1/rbac/canonical-seed:apply
+     *
+     * Idempotent re-application of the canonical least-privilege seed
+     * (migration 173). Overwrites the {permissions, denies, level, admin, …}
+     * shape on every catalog role. Custom roles outside the catalog are
+     * untouched. Audited via audit_events as `rbac.canonical_seed.apply`.
+     *
+     * Body: { reason: string (>= 5 chars) }
+     */
+    public function applyCanonicalSeed(): void
+    {
+        $user = $this->requireAuthOrFail();
+        $this->requireAdmin($user);
+        $body = $this->jsonBody();
+        $reason = trim((string)($body['reason'] ?? ''));
+        if (strlen($reason) < 5) {
+            $this->error('reason_required', 400, 'reason must be >= 5 chars');
+        }
+        try {
+            $result = $this->rbac()->applyCanonicalSeed($this->actorId($user), $reason);
+            $this->success(['data' => $result, 'applied' => $result['applied'] ?? 0]);
+        } catch (Throwable $e) {
+            $this->error('canonical_seed_failed', 500, $e->getMessage());
+        }
+    }
+
+    private function getCurrentSessionId(): string
+    {
+        // 1. Active PHP session
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            $sid = (string)session_id();
+            if ($sid !== '') return $sid;
+        }
+        // 2. Try to start a session quietly to recover the id from the cookie
+        if (session_status() === PHP_SESSION_NONE) {
+            @session_start(['read_and_close' => true]);
+            $sid = (string)session_id();
+            if ($sid !== '') return $sid;
+        }
+        // 3. Fallback: scan all cookies for one whose value resembles a 32-hex
+        //    PHP session token (matches what we see on disk: sess_<hex32>).
+        foreach (($_COOKIE ?? []) as $name => $value) {
+            if (is_string($value) && preg_match('/^[a-f0-9]{32}$/i', $value)) {
+                return $value;
+            }
+        }
+        return '';
+    }
 }

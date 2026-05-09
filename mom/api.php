@@ -1651,10 +1651,66 @@ function portal_auth_shadow_deactivate_user(string $username, ?string $employeeI
   }
 }
 
+/**
+ * Load role permission grants from the canonical authority (roles.permissions
+ * JSONB column, since 2026-05-09 per architecture_rbac_authority decision).
+ *
+ * Returns null on DB unavailability so the caller can fall back to the legacy
+ * JSON file. Result is memoised per request.
+ *
+ * @return array<string, array<string, mixed>>|null
+ */
+function load_role_permissions_from_db(): ?array {
+  static $cache = null;
+  static $resolved = false;
+  if ($resolved) return $cache;
+  $connection = portal_system_db_connection();
+  if (!$connection) {
+    $resolved = true;
+    return null;
+  }
+  try {
+    $rows = $connection->query(
+      "SELECT role_code, permissions
+         FROM roles
+        WHERE is_active = TRUE
+          AND permissions IS NOT NULL
+          AND permissions::text <> '{}'",
+      []
+    );
+  } catch (Throwable $e) {
+    @error_log('[API] load_role_permissions_from_db failed: ' . $e->getMessage());
+    $resolved = true;
+    return null;
+  }
+  $out = [];
+  foreach ($rows as $r) {
+    $code = strtolower(trim((string)($r['role_code'] ?? '')));
+    if ($code === '') continue;
+    $perm = $r['permissions'] ?? null;
+    if (is_string($perm)) {
+      $decoded = json_decode($perm, true);
+      if (is_array($decoded)) $perm = $decoded;
+    }
+    if (is_array($perm) && !empty($perm)) {
+      $out[$code] = $perm;
+    }
+  }
+  $cache = $out;
+  $resolved = true;
+  return $cache;
+}
+
 function load_role_permissions(string $file): array {
   $defaults = default_role_permissions();
-  $j = portal_system_config_shadow_read('role_permissions');
-  if (!is_array($j)) {
+  // 1) Canonical: roles.permissions JSONB (single source of truth).
+  $j = load_role_permissions_from_db();
+  // 2) Variable registry shadow store.
+  if (!is_array($j) || empty($j)) {
+    $j = portal_system_config_shadow_read('role_permissions');
+  }
+  // 3) Legacy file fallback (deprecated, kept for offline/JSON_ONLY mode).
+  if (!is_array($j) || empty($j)) {
     $j = read_json_file($file);
   }
   if (!is_array($j)) return $defaults;
