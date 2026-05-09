@@ -7572,6 +7572,339 @@
         "ceo",
         "qa_manager"
       ]
+    },
+    "document_acknowledgement": {
+      "list": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "detail": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "delete": [
+        "it_admin",
+        "ceo",
+        "qa_manager"
+      ]
+    },
+    "portal_widget_catalog": {
+      "list": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "detail": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "delete": [
+        "it_admin",
+        "ceo",
+        "qa_manager"
+      ]
+    },
+    "portal_layout_template": {
+      "list": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "detail": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "delete": [
+        "it_admin",
+        "ceo",
+        "qa_manager"
+      ]
+    },
+    "portal_layout_widget": {
+      "list": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "detail": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "delete": [
+        "it_admin",
+        "ceo",
+        "qa_manager"
+      ]
+    },
+    "portal_display_preference": {
+      "list": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "detail": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "delete": [
+        "it_admin",
+        "ceo",
+        "qa_manager"
+      ]
+    },
+    "retention_policy": {
+      "list": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "detail": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "delete": [
+        "it_admin",
+        "ceo",
+        "qa_manager"
+      ]
+    },
+    "retention_class_assignment": {
+      "list": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "detail": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "delete": [
+        "it_admin",
+        "ceo",
+        "qa_manager"
+      ]
+    },
+    "retention_disposal_event": {
+      "list": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "detail": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "delete": [
+        "it_admin",
+        "ceo",
+        "qa_manager"
+      ]
+    },
+    "retention_legal_hold": {
+      "list": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "detail": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "create": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "update": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "transition": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "qms_engineer"
+      ],
+      "delete": [
+        "it_admin",
+        "ceo",
+        "qa_manager"
+      ]
     }
   }
 }
