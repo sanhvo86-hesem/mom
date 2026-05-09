@@ -34,11 +34,28 @@ C_LEVEL_RX = re.compile(r'(?:01-Competency-System|competency)/02-Levels/(C\d+)-(
 
 
 def atomic_write(path, content):
+    """Write `content` to `path` atomically, preserving the original file's
+    permissions and ownership. tempfile.mkstemp creates files with mode 0600
+    by default — directly os.replace'ing such a tmpfile would silently strip
+    group-read from portal-managed docs and break web serving (the portal
+    runs as www-data, not as the script's user). We snapshot st_mode + uid +
+    gid before write and re-apply after replace.
+    """
     d = os.path.dirname(path)
+    # Snapshot original perms (or sane defaults if file is new).
+    try:
+        st = os.stat(path)
+        mode, uid, gid = st.st_mode & 0o777, st.st_uid, st.st_gid
+    except FileNotFoundError:
+        mode, uid, gid = 0o644, -1, -1
     fd, tmp = tempfile.mkstemp(prefix=".cano-", dir=d, text=True)
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as fh:
             fh.write(content)
+        os.chmod(tmp, mode)
+        if uid != -1 and gid != -1 and hasattr(os, "chown"):
+            try: os.chown(tmp, uid, gid)
+            except (PermissionError, OSError): pass  # not running as root or unsupported
         os.replace(tmp, path)
     except Exception:
         try: os.unlink(tmp)

@@ -77,11 +77,27 @@ RENAME_MAP = {
 
 
 def atomic_write(path, content):
+    """Atomic write that PRESERVES original file mode + ownership.
+
+    tempfile.mkstemp creates files with mode 0600. Without re-applying the
+    original mode, portal-managed docs would silently lose group-read and
+    nginx (running as www-data) would 403 them. Verified regression on
+    2026-05-09 — restored after stripping 970 files to 0600.
+    """
     d = os.path.dirname(path)
+    try:
+        st = os.stat(path)
+        mode, uid, gid = st.st_mode & 0o777, st.st_uid, st.st_gid
+    except FileNotFoundError:
+        mode, uid, gid = 0o644, -1, -1
     fd, tmp = tempfile.mkstemp(prefix=".rename-", dir=d, text=True)
     try:
         with os.fdopen(fd, "w", encoding="utf-8") as fh:
             fh.write(content)
+        os.chmod(tmp, mode)
+        if uid != -1 and gid != -1 and hasattr(os, "chown"):
+            try: os.chown(tmp, uid, gid)
+            except (PermissionError, OSError): pass
         os.replace(tmp, path)
     except Exception:
         try: os.unlink(tmp)
