@@ -1,442 +1,813 @@
 /* ============================================================================
- * Admin Content & Security Tabs — Effective Docs / Retention / MFA Security
+ * Admin Content Tabs — MFA / Effective Documents / Retention (v2 — full CRUD)
  * ----------------------------------------------------------------------------
- * Lazy-loaded by 02-state-auth-ui.js. Reads from the new schema introduced
- * by migrations 165-168 via:
- *   * GET /api/v1/documents/in-force                        (v_documents_in_force)
- *   * GET /api/v1/retention/due-for-disposal                (v_retention_due_for_disposal)
- *   * GET /api/v1/runtime/core_system/retention_policy
- *   * GET /api/v1/mfa/factors                               (admin or self)
- *   * GET /api/v1/runtime/core_system/mfa_policy
- *   * GET /api/v1/runtime/core_system/users                 (for MFA compliance roster)
- * No hardcoded colors — every visual token comes from existing CSS vars.
+ *  ▸ mfa             — 2-pane: role policies (NIST 800-63B AAL) + user
+ *                      compliance with revoke/reset factor actions
+ *  ▸ effective_docs  — list draft/effective documents, promote draft→effective,
+ *                      acknowledgement flow with HMAC sign (21 CFR Part 11)
+ *  ▸ retention       — 3-pane: policies / disposal queue / legal holds, with
+ *                      witness signature + chain-of-custody on disposal
  * ========================================================================== */
 
 (function(){
   'use strict';
+  if (!window.AdminUI) { console.error('[admin-content] AdminUI not loaded'); return; }
+  var UI = window.AdminUI;
+  var t = UI.t, esc = UI.escapeHtml, badge = UI.badge;
 
-  var t = (typeof window.lang === 'string' && window.lang === 'en')
-    ? function(en, vi){ return en; }
-    : function(en, vi){ return vi || en; };
-
-  function escapeHtml(s){
-    s = String(s == null ? '' : s);
-    return s.replace(/[&<>"']/g, function(c){
-      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c];
-    });
-  }
-
-  function badge(label, tone){
-    var bg = ({
-      block:'var(--red-light,#fee2e2)', warn:'var(--yellow-light,#fef3c7)',
-      info:'var(--blue-light,#dbeafe)', ok:'var(--green-light,#dcfce7)',
-      muted:'var(--gray-100,#f3f4f6)'
-    })[tone || 'muted'] || 'var(--gray-100,#f3f4f6)';
-    var fg = ({
-      block:'var(--red-dark,#991b1b)', warn:'var(--yellow-dark,#92400e)',
-      info:'var(--blue-dark,#1e40af)', ok:'var(--green-dark,#166534)',
-      muted:'var(--text-2,#4b5563)'
-    })[tone || 'muted'] || 'var(--text-2,#4b5563)';
-    return '<span style="display:inline-block;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:600;background:'+bg+';color:'+fg+';white-space:nowrap">'+escapeHtml(label)+'</span>';
-  }
-
-  function loadingHtml(){
-    return '<div class="hm-empty" style="padding:40px;text-align:center;color:var(--text-3)">'
-      + '<div style="font-size:24px;margin-bottom:8px">⏳</div>'
-      + escapeHtml(t('Loading…','Đang tải…'))
-      + '</div>';
-  }
-
-  function emptyHtml(message){
-    return '<div class="hm-empty" style="padding:40px;text-align:center;color:var(--text-3)">'
-      + '<div style="font-size:32px;margin-bottom:8px">∅</div>'
-      + escapeHtml(message)
-      + '</div>';
-  }
-
-  function errorHtml(detail, retry){
-    return '<div class="hm-empty" style="padding:40px;text-align:center">'
-      + '<div style="font-size:32px;margin-bottom:8px;color:var(--red-dark,#991b1b)">⚠</div>'
-      + '<div style="color:var(--text-1);margin-bottom:8px">'+escapeHtml(t('Failed to load','Không tải được'))+'</div>'
-      + '<div style="font-size:12px;color:var(--text-3);margin-bottom:16px">'+escapeHtml(String(detail || ''))+'</div>'
-      + (retry ? '<button class="btn-admin secondary" onclick="('+retry.toString()+')()">🔄 '+escapeHtml(t('Retry','Thử lại'))+'</button>' : '')
-      + '</div>';
-  }
-
-  function panelHeader(title, subtitle, actionsHtml){
-    return '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;flex-wrap:wrap">'
-      + '<div>'
-      +   '<div style="font-size:18px;font-weight:600;color:var(--text-1)">'+escapeHtml(title)+'</div>'
-      +   (subtitle ? '<div style="font-size:13px;color:var(--text-3);margin-top:2px">'+escapeHtml(subtitle)+'</div>' : '')
-      + '</div>'
-      + '<div style="display:flex;gap:8px;flex-wrap:wrap">'+(actionsHtml || '')+'</div>'
-      + '</div>';
-  }
-
-  function kpiCard(label, value, tone){
-    var border = tone === 'block' ? 'var(--red-light,#fecaca)'
-                : tone === 'warn'  ? 'var(--yellow-light,#fde68a)'
-                : tone === 'ok'    ? 'var(--green-light,#bbf7d0)'
-                : 'var(--border)';
-    var labelColor = tone === 'block' ? 'var(--red-dark,#991b1b)'
-                   : tone === 'warn'  ? 'var(--yellow-dark,#92400e)'
-                   : tone === 'ok'    ? 'var(--green-dark,#166534)'
-                   : 'var(--text-3)';
-    return '<div style="background:var(--surface-2);padding:10px 14px;border-radius:8px;border:1px solid '+border+'">'
-      + '<div style="font-size:11px;color:'+labelColor+';text-transform:uppercase;letter-spacing:.5px">'+escapeHtml(label)+'</div>'
-      + '<div style="font-size:20px;font-weight:600">'+escapeHtml(String(value))+'</div>'
-      + '</div>';
-  }
-
-  function fmtDate(iso){
-    if(!iso) return '—';
-    try{ return new Date(iso).toLocaleDateString(lang === 'en' ? 'en-US' : 'vi-VN', {year:'numeric',month:'short',day:'numeric'}); }
-    catch(e){ return String(iso).slice(0,10); }
-  }
-
-  // ── 1. Tài liệu hiệu lực (Effective Documents) ───────────────────────────
-
-  function renderEffectiveDocs(el){
-    el.innerHTML = loadingHtml();
-    Promise.all([
-      fetch('/api/v1/documents/in-force?limit=500', {credentials:'include'}).then(function(r){ return r.json(); }),
-      fetch('/api/v1/documents/pending-acknowledgement?limit=200', {credentials:'include'}).then(function(r){ return r.json(); })
-    ]).then(function(out){
-      var inForceRes = out[0]; var pendingRes = out[1];
-      if(!(inForceRes && inForceRes.ok)){
-        el.innerHTML = errorHtml(inForceRes && inForceRes.error || 'effective_docs_load_failed', function(){ window._renderAdminContentTab(document.getElementById('admin-content'), 'effective_docs'); });
-        return;
-      }
-      var docs = inForceRes.data || [];
-      var pending = (pendingRes && pendingRes.ok && pendingRes.data) || [];
-
-      var ackRequiredCount = docs.filter(function(d){ return d.acknowledgement_required; }).length;
-      var legalHoldCount   = docs.filter(function(d){ return d.legal_hold_active; }).length;
-      var byType = {};
-      docs.forEach(function(d){
-        var k = String(d.doc_type || 'other');
-        byType[k] = (byType[k] || 0) + 1;
-      });
-
-      var html = panelHeader(
-        t('Effective Documents','Tài liệu hiệu lực'),
-        t(
-          'Documents currently in force (status=approved + within effective window + not superseded). 21 CFR Part 11 §11.10(d) acknowledgement tracking enabled.',
-          'Tài liệu đang hiệu lực (status=approved + trong khoảng effective + chưa bị thay thế). Theo dõi xác nhận đã đọc theo 21 CFR Part 11 §11.10(d).'
-        ),
-        ''
-      );
-
-      html += '<div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">';
-      html += kpiCard(t('In force','Đang hiệu lực'), docs.length, 'ok');
-      html += kpiCard(t('Acknowledgement required','Cần xác nhận đọc'), ackRequiredCount, ackRequiredCount > 0 ? 'warn' : 'muted');
-      html += kpiCard(t('My pending acknowledgements','Tôi cần xác nhận'), pending.length, pending.length > 0 ? 'warn' : 'ok');
-      html += kpiCard(t('On legal hold','Đang giữ pháp lý'), legalHoldCount, legalHoldCount > 0 ? 'block' : 'muted');
-      html += kpiCard(t('Doc types','Loại tài liệu'), Object.keys(byType).length);
-      html += '</div>';
-
-      if(pending.length > 0){
-        html += '<div style="background:var(--yellow-light,#fef3c7);border:1px solid var(--yellow-light,#fde68a);border-radius:12px;padding:16px;margin-bottom:20px">';
-        html += '<div style="font-weight:600;color:var(--yellow-dark,#92400e);margin-bottom:8px">⏰ '+escapeHtml(t('Documents awaiting your acknowledgement','Tài liệu chờ bạn xác nhận đã đọc'))+'</div>';
-        html += '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13px">';
-        html += '<thead><tr><th style="text-align:left;padding:6px 8px">'+escapeHtml(t('Doc','Tài liệu'))+'</th>'
-              + '<th style="text-align:left;padding:6px 8px">'+escapeHtml(t('Rev','Phiên bản'))+'</th>'
-              + '<th style="text-align:left;padding:6px 8px">'+escapeHtml(t('Effective','Hiệu lực từ'))+'</th>'
-              + '<th style="text-align:left;padding:6px 8px">'+escapeHtml(t('Due','Hạn'))+'</th>'
-              + '<th style="text-align:left;padding:6px 8px">'+escapeHtml(t('State','Trạng thái'))+'</th>'
-              + '</tr></thead><tbody>';
-        pending.slice(0, 20).forEach(function(p){
-          var titleLocal = lang === 'en' ? (p.title || p.title_vi) : (p.title_vi || p.title);
-          var stateTone = p.due_state === 'overdue' ? 'block' : (p.due_state === 'due_soon' ? 'warn' : 'ok');
-          html += '<tr style="border-top:1px solid var(--border-faint,rgba(0,0,0,.06))">'
-            + '<td style="padding:6px 8px"><code style="font-family:monospace;font-size:11px">'+escapeHtml(p.doc_id)+'</code> ' + escapeHtml(titleLocal || '') + '</td>'
-            + '<td style="padding:6px 8px">'+escapeHtml(p.current_rev || '')+'</td>'
-            + '<td style="padding:6px 8px">'+escapeHtml(fmtDate(p.effective_from))+'</td>'
-            + '<td style="padding:6px 8px">'+escapeHtml(fmtDate(p.due_at))+'</td>'
-            + '<td style="padding:6px 8px">'+badge(p.due_state || '—', stateTone)+'</td>'
-            + '</tr>';
-        });
-        html += '</tbody></table></div>';
-        if(pending.length > 20){
-          html += '<div style="font-size:11px;color:var(--text-3);margin-top:8px">'+escapeHtml(t('Showing 20 of ','Hiện 20 trên ')) + pending.length + ' '+escapeHtml(t('pending acknowledgements','xác nhận chờ'))+'</div>';
-        }
-        html += '</div>';
-      }
-
-      html += '<div>';
-      html += '<div style="font-size:13px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">'+escapeHtml(t('All effective documents','Tất cả tài liệu hiệu lực'))+'</div>';
-      if(docs.length === 0){
-        html += emptyHtml(t('No documents currently in force.','Chưa có tài liệu nào đang hiệu lực.'));
-      } else {
-        html += '<div style="overflow-x:auto"><table class="admin-table" style="width:100%;border-collapse:collapse;font-size:13px">';
-        html += '<thead><tr style="background:var(--surface-2)">'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Code','Mã'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Title','Tiêu đề'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Type','Loại'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Rev','Phiên bản'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Effective','Hiệu lực'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Ack required','Cần xác nhận'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Retention','Lưu giữ'))+'</th>'
-          + '</tr></thead><tbody>';
-        docs.slice(0, 100).forEach(function(d){
-          var titleLocal = lang === 'en' ? (d.title || d.title_vi) : (d.title_vi || d.title);
-          html += '<tr style="border-bottom:1px solid var(--border-faint,rgba(0,0,0,.06))">'
-            + '<td style="padding:8px 12px"><code style="font-family:monospace;font-size:12px;color:var(--brand-primary,#1565c0)">'+escapeHtml(d.doc_id)+'</code></td>'
-            + '<td style="padding:8px 12px">'+escapeHtml(titleLocal || '')+'</td>'
-            + '<td style="padding:8px 12px;color:var(--text-3)">'+escapeHtml(d.doc_type || '')+'</td>'
-            + '<td style="padding:8px 12px">'+escapeHtml(d.current_rev || '')+'</td>'
-            + '<td style="padding:8px 12px;font-size:12px">'+escapeHtml(fmtDate(d.effective_from))+(d.effective_until ? ' → '+escapeHtml(fmtDate(d.effective_until)) : '')+'</td>'
-            + '<td style="padding:8px 12px">'+(d.acknowledgement_required ? badge(t('Yes','Có'),'warn') : badge('—','muted'))+'</td>'
-            + '<td style="padding:8px 12px">'+(d.retention_policy_code ? '<code style="font-size:11px;color:var(--text-3)">'+escapeHtml(d.retention_policy_code)+'</code>' : '<span style="color:var(--text-3)">—</span>')+(d.legal_hold_active ? ' '+badge(t('Hold','Giữ'),'block') : '')+'</td>'
-            + '</tr>';
-        });
-        html += '</tbody></table></div>';
-        if(docs.length > 100){
-          html += '<div style="font-size:11px;color:var(--text-3);margin-top:8px">'+escapeHtml(t('Showing 100 of ','Hiện 100 trên ')) + docs.length + '</div>';
-        }
-      }
-      html += '</div>';
-
-      el.innerHTML = html;
-    }).catch(function(e){
-      el.innerHTML = errorHtml(e && e.message || e, function(){ window._renderAdminContentTab(document.getElementById('admin-content'), 'effective_docs'); });
-    });
-  }
-
-  // ── 2. Lưu giữ (Retention) ────────────────────────────────────────────────
-
-  function renderRetention(el){
-    el.innerHTML = loadingHtml();
-    Promise.all([
-      fetch('/api/v1/runtime/core_system/retention_policy?limit=200&direction=asc&sort=policy_code', {credentials:'include'}).then(function(r){ return r.json(); }),
-      fetch('/api/v1/retention/due-for-disposal?limit=200', {credentials:'include'}).then(function(r){ return r.json(); }),
-      fetch('/api/v1/runtime/core_system/retention_legal_hold?limit=50', {credentials:'include'}).then(function(r){ return r.json(); })
-    ]).then(function(out){
-      var policiesRes = out[0]; var dueRes = out[1]; var holdsRes = out[2];
-      if(!(policiesRes && policiesRes.ok)){
-        el.innerHTML = errorHtml(policiesRes && policiesRes.error || 'retention_policies_load_failed', function(){ window._renderAdminContentTab(document.getElementById('admin-content'), 'retention'); });
-        return;
-      }
-      var policies = policiesRes.records || [];
-      var dueDocs  = (dueRes && dueRes.ok && dueRes.data) || [];
-      var holds    = (holdsRes && holdsRes.ok && holdsRes.records) || [];
-      var blockedCount = dueDocs.filter(function(d){ return d.hold_blocks_disposal; }).length;
-      var freeToDispose = dueDocs.length - blockedCount;
-
-      var html = panelHeader(
-        t('Records Retention','Lưu giữ hồ sơ'),
-        t(
-          'Document/record retention lifecycle — ISO 9001 §7.5.3.2 / AS9100D §7.5.3 / 21 CFR Part 11 §11.10(c) / GDPR Art. 5(1)(e) / Vietnam Archives Law 2011.',
-          'Vòng đời lưu giữ tài liệu/hồ sơ — ISO 9001 §7.5.3.2 / AS9100D §7.5.3 / 21 CFR Part 11 §11.10(c) / GDPR Điều 5(1)(e) / Luật Lưu trữ Việt Nam 2011.'
-        ),
-        ''
-      );
-
-      html += '<div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">';
-      html += kpiCard(t('Policies','Chính sách'), policies.length);
-      html += kpiCard(t('Due ≤ 60d','Đến hạn ≤ 60 ngày'), dueDocs.length, dueDocs.length > 0 ? 'warn' : 'ok');
-      html += kpiCard(t('Ready to dispose','Sẵn sàng huỷ'), freeToDispose, freeToDispose > 0 ? 'warn' : 'muted');
-      html += kpiCard(t('Blocked by legal hold','Bị giữ pháp lý'), blockedCount, blockedCount > 0 ? 'block' : 'muted');
-      html += kpiCard(t('Active legal holds','Lệnh giữ pháp lý'), holds.filter(function(h){return h.is_active;}).length, holds.length > 0 ? 'block' : 'muted');
-      html += '</div>';
-
-      html += '<div style="margin-bottom:24px">';
-      html += '<div style="font-size:13px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">'+escapeHtml(t('Retention policies','Chính sách lưu giữ'))+'</div>';
-      if(policies.length === 0){
-        html += emptyHtml(t('No retention policies defined yet.','Chưa có chính sách lưu giữ nào.'));
-      } else {
-        html += '<div style="overflow-x:auto"><table class="admin-table" style="width:100%;border-collapse:collapse;font-size:13px">';
-        html += '<thead><tr style="background:var(--surface-2)">'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Code','Mã'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Label','Tên'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Pattern','Mẫu tài liệu'))+'</th>'
-          + '<th style="text-align:right;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Years','Số năm'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Trigger','Bắt đầu tính'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Disposition','Cách xử lý'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Compliance','Tuân thủ'))+'</th>'
-          + '</tr></thead><tbody>';
-        policies.forEach(function(p){
-          var labelLocal = lang === 'en' ? (p.label || p.label_vi) : (p.label_vi || p.label);
-          var compRefs = Array.isArray(p.compliance_refs) ? p.compliance_refs : [];
-          html += '<tr style="border-bottom:1px solid var(--border-faint,rgba(0,0,0,.06))">'
-            + '<td style="padding:8px 12px"><code style="font-family:monospace;font-size:12px;color:var(--brand-primary,#1565c0)">'+escapeHtml(p.policy_code)+'</code></td>'
-            + '<td style="padding:8px 12px">'+escapeHtml(labelLocal || '')+'</td>'
-            + '<td style="padding:8px 12px"><code style="font-size:11px;color:var(--text-3)">'+escapeHtml(p.doc_pattern || '')+'</code></td>'
-            + '<td style="padding:8px 12px;text-align:right;font-weight:500">'+escapeHtml(String(p.retention_period_years || ''))+'</td>'
-            + '<td style="padding:8px 12px;color:var(--text-3);font-size:11px">'+escapeHtml(p.retention_trigger || '')+'</td>'
-            + '<td style="padding:8px 12px">'+badge(p.disposition_method || '—', p.disposition_method === 'destroy' ? 'block' : (p.disposition_method === 'archive' ? 'info' : 'muted'))+'</td>'
-            + '<td style="padding:8px 12px;color:var(--text-3);font-size:11px">'+escapeHtml(compRefs.join(' · '))+'</td>'
-            + '</tr>';
-        });
-        html += '</tbody></table></div>';
-      }
-      html += '</div>';
-
-      html += '<div>';
-      html += '<div style="font-size:13px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">'+escapeHtml(t('Documents due for disposal (next 60 days)','Tài liệu đến hạn huỷ (60 ngày tới)'))+'</div>';
-      if(dueDocs.length === 0){
-        html += '<div style="padding:24px;text-align:center;color:var(--green-dark,#166534);background:var(--green-light,#dcfce7);border-radius:8px;border:1px solid var(--green-light,#bbf7d0)">✓ '+escapeHtml(t('No documents due for retention disposal in the next 60 days.','Không có tài liệu nào đến hạn huỷ trong 60 ngày tới.'))+'</div>';
-      } else {
-        html += '<div style="overflow-x:auto"><table class="admin-table" style="width:100%;border-collapse:collapse;font-size:13px">';
-        html += '<thead><tr style="background:var(--surface-2)">'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Doc','Tài liệu'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Policy','Chính sách'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Due at','Đến hạn'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Disposition','Cách xử lý'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Status','Trạng thái'))+'</th>'
-          + '</tr></thead><tbody>';
-        dueDocs.slice(0,50).forEach(function(d){
-          var titleLocal = lang === 'en' ? (d.title || d.title_vi) : (d.title_vi || d.title);
-          html += '<tr style="border-bottom:1px solid var(--border-faint,rgba(0,0,0,.06))">'
-            + '<td style="padding:8px 12px"><code style="font-family:monospace;font-size:11px">'+escapeHtml(d.doc_id)+'</code> '+escapeHtml(titleLocal || '')+'</td>'
-            + '<td style="padding:8px 12px"><code style="font-size:11px;color:var(--text-3)">'+escapeHtml(d.retention_policy_code || '—')+'</code></td>'
-            + '<td style="padding:8px 12px">'+escapeHtml(fmtDate(d.due_at))+'</td>'
-            + '<td style="padding:8px 12px">'+badge(d.disposition_method || '—', d.disposition_method === 'destroy' ? 'block' : 'info')+'</td>'
-            + '<td style="padding:8px 12px">'+(d.hold_blocks_disposal ? badge(t('Held','Đang giữ'),'block') : badge(t('Ready','Sẵn sàng'),'warn'))+'</td>'
-            + '</tr>';
-        });
-        html += '</tbody></table></div>';
-      }
-      html += '</div>';
-
-      el.innerHTML = html;
-    }).catch(function(e){
-      el.innerHTML = errorHtml(e && e.message || e, function(){ window._renderAdminContentTab(document.getElementById('admin-content'), 'retention'); });
-    });
-  }
-
-  // ── 3. Bảo mật MFA ────────────────────────────────────────────────────────
-
-  function renderMfa(el){
-    el.innerHTML = loadingHtml();
-    Promise.all([
-      fetch('/api/v1/runtime/core_system/mfa_policy?limit=200&direction=asc&sort=role_id', {credentials:'include'}).then(function(r){ return r.json(); }),
-      fetch('/api/v1/runtime/core_system/roles?limit=200&direction=asc&sort=role_code', {credentials:'include'}).then(function(r){ return r.json(); }),
-      fetch('/api/v1/runtime/core_system/mfa_factor?limit=500&direction=desc&sort=enrolled_at', {credentials:'include'}).then(function(r){ return r.json(); })
-    ]).then(function(out){
-      var policiesRes = out[0]; var rolesRes = out[1]; var factorsRes = out[2];
-      if(!(policiesRes && policiesRes.ok)){
-        el.innerHTML = errorHtml(policiesRes && policiesRes.error || 'mfa_policy_load_failed', function(){ window._renderAdminContentTab(document.getElementById('admin-content'), 'mfa'); });
-        return;
-      }
-      var policies = policiesRes.records || [];
-      var roles    = (rolesRes && rolesRes.ok && rolesRes.records) || [];
-      var factors  = (factorsRes && factorsRes.ok && factorsRes.records) || [];
-
-      var rolesById = {};
-      roles.forEach(function(r){ rolesById[String(r.role_id)] = r; });
-
-      var stats = {
-        total_policies:    policies.length,
-        required:          policies.filter(function(p){ return p.required; }).length,
-        aal3:              policies.filter(function(p){ return Number(p.required_aal_level) === 3; }).length,
-        active_factors:    factors.filter(function(f){ return f.status === 'active'; }).length,
-        pending_factors:   factors.filter(function(f){ return f.status === 'pending_verify'; }).length,
-        revoked_factors:   factors.filter(function(f){ return f.status === 'revoked'; }).length
-      };
-
-      var html = panelHeader(
-        t('MFA Security','Bảo mật MFA'),
-        t(
-          'Multi-factor authentication policy and enrollment — NIST 800-63B (AAL 1/2/3) / FIDO2 / ISO 27001 A.9.4.2 / 21 CFR Part 11 §11.10(d).',
-          'Chính sách MFA và trạng thái ghi danh — NIST 800-63B (AAL 1/2/3) / FIDO2 / ISO 27001 A.9.4.2 / 21 CFR Part 11 §11.10(d).'
-        ),
-        ''
-      );
-
-      html += '<div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">';
-      html += kpiCard(t('Policies','Chính sách'), stats.total_policies);
-      html += kpiCard(t('Required','Bắt buộc'), stats.required, stats.required > 0 ? 'info' : 'muted');
-      html += kpiCard(t('AAL 3 (hardware)','AAL 3 (khoá phần cứng)'), stats.aal3, stats.aal3 > 0 ? 'block' : 'muted');
-      html += kpiCard(t('Active factors','Yếu tố đang hoạt động'), stats.active_factors, stats.active_factors > 0 ? 'ok' : 'muted');
-      html += kpiCard(t('Pending verify','Chờ xác minh'), stats.pending_factors, stats.pending_factors > 0 ? 'warn' : 'muted');
-      html += kpiCard(t('Revoked','Đã thu hồi'), stats.revoked_factors);
-      html += '</div>';
-
-      html += '<div style="margin-bottom:24px">';
-      html += '<div style="font-size:13px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">'+escapeHtml(t('Per-role MFA policy','Chính sách MFA theo vai trò'))+'</div>';
-      if(policies.length === 0){
-        html += emptyHtml(t('No MFA policies defined yet.','Chưa có chính sách MFA nào.'));
-      } else {
-        html += '<div style="overflow-x:auto"><table class="admin-table" style="width:100%;border-collapse:collapse;font-size:13px">';
-        html += '<thead><tr style="background:var(--surface-2)">'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Role','Vai trò'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Required','Bắt buộc'))+'</th>'
-          + '<th style="text-align:right;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Min factors','Số yếu tố tối thiểu'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Required AAL','AAL yêu cầu'))+'</th>'
-          + '<th style="text-align:right;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Grace days','Ngày ân hạn'))+'</th>'
-          + '<th style="text-align:right;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Re-auth (min)','Tái xác thực (phút)'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Allowed types','Loại cho phép'))+'</th>'
-          + '</tr></thead><tbody>';
-        policies.forEach(function(p){
-          var role = rolesById[String(p.role_id)] || {};
-          var roleLabelLocal = lang === 'en' ? (role.role_label || role.role_label_vi) : (role.role_label_vi || role.role_label);
-          var allowedTypes = Array.isArray(p.allowed_factor_types) ? p.allowed_factor_types : [];
-          var aal = Number(p.required_aal_level || 1);
-          html += '<tr style="border-bottom:1px solid var(--border-faint,rgba(0,0,0,.06))">'
-            + '<td style="padding:8px 12px">'
-            +   (role.icon_emoji ? '<span style="margin-right:6px">'+escapeHtml(role.icon_emoji)+'</span>' : '')
-            +   '<div style="display:inline-block"><div style="font-weight:500">'+escapeHtml(roleLabelLocal || role.role_code || '—')+'</div>'
-            +   '<div style="font-size:11px;color:var(--text-3)"><code>'+escapeHtml(role.role_code || '')+'</code>'+(role.is_admin_tier ? ' '+badge(t('Admin tier','Tầng admin'),'block') : '')+'</div></div>'
-            + '</td>'
-            + '<td style="padding:8px 12px">'+(p.required ? badge(t('Yes','Có'),'info') : badge(t('Optional','Tuỳ chọn'),'muted'))+'</td>'
-            + '<td style="padding:8px 12px;text-align:right;font-weight:500">'+escapeHtml(String(p.min_factors || 1))+'</td>'
-            + '<td style="padding:8px 12px">'+badge('AAL '+aal, aal === 3 ? 'block' : (aal === 2 ? 'warn' : 'muted'))+'</td>'
-            + '<td style="padding:8px 12px;text-align:right">'+escapeHtml(String(p.grace_period_days || 0))+'</td>'
-            + '<td style="padding:8px 12px;text-align:right">'+escapeHtml(String(p.reauth_after_minutes || 0))+'</td>'
-            + '<td style="padding:8px 12px;font-size:11px;color:var(--text-3)">'+escapeHtml(allowedTypes.join(' · '))+'</td>'
-            + '</tr>';
-        });
-        html += '</tbody></table></div>';
-      }
-      html += '</div>';
-
-      html += '<div>';
-      html += '<div style="font-size:13px;font-weight:600;color:var(--text-2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">'+escapeHtml(t('Enrolled MFA factors','Yếu tố MFA đã ghi danh'))+'</div>';
-      if(factors.length === 0){
-        html += '<div style="padding:24px;text-align:center;color:var(--text-3);background:var(--surface-2);border:1px dashed var(--border);border-radius:8px">'
-          + escapeHtml(t('No MFA factors enrolled yet. Users will be prompted on next login.','Chưa có yếu tố MFA nào được ghi danh. Người dùng sẽ được yêu cầu khi đăng nhập tiếp theo.'))
-          + '</div>';
-      } else {
-        html += '<div style="overflow-x:auto"><table class="admin-table" style="width:100%;border-collapse:collapse;font-size:13px">';
-        html += '<thead><tr style="background:var(--surface-2)">'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('User','Người dùng'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Factor','Yếu tố'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('AAL','AAL'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Status','Trạng thái'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Enrolled','Ghi danh'))+'</th>'
-          + '<th style="text-align:left;padding:8px 12px;border-bottom:1px solid var(--border)">'+escapeHtml(t('Last used','Lần dùng cuối'))+'</th>'
-          + '</tr></thead><tbody>';
-        factors.slice(0, 100).forEach(function(f){
-          var aal = Number(f.aal_level || 1);
-          var stTone = f.status === 'active' ? 'ok' : (f.status === 'pending_verify' ? 'warn' : (f.status === 'revoked' ? 'block' : 'muted'));
-          html += '<tr style="border-bottom:1px solid var(--border-faint,rgba(0,0,0,.06))">'
-            + '<td style="padding:8px 12px"><code style="font-family:monospace;font-size:11px">'+escapeHtml(String(f.user_id || '').slice(0,8))+'…</code></td>'
-            + '<td style="padding:8px 12px"><code style="font-family:monospace;font-size:12px">'+escapeHtml(f.factor_type || '')+'</code> '+escapeHtml(f.factor_label || '')+'</td>'
-            + '<td style="padding:8px 12px">'+badge('AAL '+aal, aal === 3 ? 'block' : (aal === 2 ? 'warn' : 'muted'))+'</td>'
-            + '<td style="padding:8px 12px">'+badge(f.status || '—', stTone)+'</td>'
-            + '<td style="padding:8px 12px;font-size:11px;color:var(--text-3)">'+escapeHtml(fmtDate(f.enrolled_at))+'</td>'
-            + '<td style="padding:8px 12px;font-size:11px;color:var(--text-3)">'+escapeHtml(fmtDate(f.last_used_at))+'</td>'
-            + '</tr>';
-        });
-        html += '</tbody></table></div>';
-      }
-      html += '</div>';
-
-      el.innerHTML = html;
-    }).catch(function(e){
-      el.innerHTML = errorHtml(e && e.message || e, function(){ window._renderAdminContentTab(document.getElementById('admin-content'), 'mfa'); });
-    });
-  }
-
-  // ── Public dispatcher ────────────────────────────────────────────────────
-
-  window._renderAdminContentTab = function(el, slug){
-    if(!el) return;
-    if(slug === 'effective_docs') return renderEffectiveDocs(el);
-    if(slug === 'retention')      return renderRetention(el);
-    if(slug === 'mfa')            return renderMfa(el);
-    el.innerHTML = '<div class="hm-empty">'+escapeHtml(t('Unknown content tab','Tab không xác định'))+': '+escapeHtml(String(slug))+'</div>';
+  var state = {
+    roles: [],
+    users: [],
+    rolePolicies: [],
+    userFactors: [],
+    docs: [],
+    acknowledgements: [],
+    retentionPolicies: [],
+    legalHolds: [],
+    disposalQueue: []
   };
 
+  function fetchRoles(){ return UI.runtime.list('core_system','roles',{ limit:500 }).then(function(r){ state.roles = (r&&r.data)||r||[]; }); }
+  function fetchUsers(){ return UI.runtime.list('core_system','users',{ limit:1000 }).then(function(r){ state.users = (r&&r.data)||r||[]; }).catch(function(){
+    state.users = (window.USERS||[]).map(function(u){ return { id:u.id, username:u.username, full_name:u.name, role_code:u.role, dept_code:u.dept, is_active:u.active!==false }; });
+  }); }
+  function fetchRolePolicies(){ return UI.runtime.list('core_system','role_mfa_policy',{ limit:500 }).then(function(r){ state.rolePolicies = (r&&r.data)||r||[]; }).catch(function(){ state.rolePolicies = []; }); }
+  function fetchUserFactors(){ return UI.fetchJson('/api/v1/mfa/factors').then(function(r){ state.userFactors = (r&&r.data)||r||[]; }).catch(function(){ state.userFactors = []; }); }
+  function fetchDocs(){
+    // DCC document control system holds the authoritative document register
+    // (387 rows on prod). status='approved' = effective; 'draft' = unreleased.
+    return UI.runtime.list('document_control','dcc_document_header',{ limit:500, sort:'-effective_date' })
+      .then(function(r){
+        var rows = (r && r.data) || r || [];
+        state.docs = rows.map(function(d){
+          return {
+            id: d.header_id || d.id,
+            doc_code: d.doc_code,
+            title: d.title,
+            title_vi: d.title || d.subtitle,
+            revision: d.revision,
+            effective_date: d.effective_date,
+            owner_role: d.owner_role_code,
+            approver_role: d.approver_role_code,
+            // map DCC status → admin tab status
+            status: d.status === 'approved' ? 'effective' : (d.status === 'retired' ? 'retired' : 'draft'),
+            row_version: d.row_version,
+            __raw: d
+          };
+        });
+      }).catch(function(e){ console.warn('[admin-content] fetchDocs failed', e); state.docs = []; });
+  }
+  function fetchAcknowledgements(){ return UI.runtime.list('core_system','document_acknowledgement',{ limit:1000 }).then(function(r){ state.acknowledgements = (r&&r.data)||r||[]; }).catch(function(){ state.acknowledgements = []; }); }
+  function fetchRetentionPolicies(){ return UI.runtime.list('core_system','retention_policy',{ limit:200 }).then(function(r){ state.retentionPolicies = (r&&r.data)||r||[]; }).catch(function(){ state.retentionPolicies = []; }); }
+  function fetchLegalHolds(){ return UI.runtime.list('core_system','legal_hold',{ limit:500 }).then(function(r){ state.legalHolds = (r&&r.data)||r||[]; }).catch(function(){ state.legalHolds = []; }); }
+  function fetchDisposalQueue(){ return UI.fetchJson('/api/v1/retention/due-for-disposal').then(function(r){ state.disposalQueue = (r&&r.data)||r||[]; }).catch(function(){ state.disposalQueue = []; }); }
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // Tab — MFA
+  // ════════════════════════════════════════════════════════════════════════════
+  function renderMfa(rootEl){
+    rootEl.innerHTML = UI.loadingHtml();
+    Promise.all([fetchRoles(), fetchUsers(), fetchRolePolicies(), fetchUserFactors()]).then(function(){
+      UI.renderSubTabs(rootEl, [
+        { key:'policy', label:t('Role policies','Chính sách theo vai trò'), render:renderMfaPolicies },
+        { key:'compliance', label:t('User compliance','Tình trạng tuân thủ'), render:renderMfaCompliance }
+      ], {});
+    }).catch(function(err){ rootEl.innerHTML = UI.errorHtml(err && err.message, function(){ renderMfa(rootEl); }); });
+  }
+
+  function renderMfaPolicies(el){
+    var head = UI.panelHeader(
+      t('MFA policies per role','Chính sách MFA theo vai trò'),
+      t('NIST 800-63B AAL levels. Higher AAL forces stronger factors and shorter session lifetimes.',
+        'Mức AAL theo NIST 800-63B. AAL cao buộc dùng yếu tố mạnh hơn và phiên ngắn hơn.'),
+      UI.btn(t('Refresh','Làm mới'),{ icon:'🔄', kind:'secondary', id:'mfa-pol-refresh' })
+      + UI.btn(t('New policy','Chính sách mới'),{ icon:'＋', id:'mfa-pol-new' })
+    );
+    var rolesByCode = {}; state.roles.forEach(function(r){ rolesByCode[r.role_code] = r; });
+    var rows = state.rolePolicies.slice();
+    var columns = [
+      { key:'role_code', label:t('Role','Vai trò'), render:function(p){
+          var r = rolesByCode[p.role_code];
+          return '<div style="font-weight:500">'+esc((r&&r.role_label_vi)||p.role_code)+'</div>'
+            + '<div style="font-family:ui-monospace,monospace;font-size:11px;color:var(--text-3)">'+esc(p.role_code)+'</div>';
+        } },
+      { key:'required_aal', label:'AAL', width:'80px', render:function(p){
+          var aal = p.required_aal || 1;
+          var tone = aal >= 3 ? 'block' : (aal === 2 ? 'warn' : 'info');
+          return badge('AAL'+aal, tone);
+        } },
+      { key:'webauthn_required', label:t('WebAuthn','WebAuthn'), width:'100px', render:function(p){ return p.webauthn_required ? badge(t('Required','Bắt buộc'),'block') : badge(t('Optional','Tuỳ chọn'),'muted'); } },
+      { key:'reauth_minutes', label:t('Re-auth','Tái xác thực'), width:'120px', render:function(p){
+          if (!p.reauth_minutes) return badge(t('Never','Không yêu cầu'),'muted');
+          return '<span style="font-family:ui-monospace,monospace;font-size:12px">'+esc(p.reauth_minutes)+t(' min',' phút')+'</span>';
+        } },
+      { key:'allow_remembered_device', label:t('Remembered device','Thiết bị nhớ'), width:'140px', render:function(p){ return p.allow_remembered_device !== false ? badge(t('Allowed','Cho phép'),'ok') : badge(t('Blocked','Chặn'),'block'); } },
+      { key:'actions', label:'', width:'150px', render:function(p){
+          return '<div style="display:flex;gap:4px">'
+            + '<button class="btn-admin secondary sm" data-edit-pol="'+UI.escapeAttr(p.id)+'">'+esc(t('Edit','Sửa'))+'</button>'
+            + '<button class="btn-admin secondary sm" data-del-pol="'+UI.escapeAttr(p.id)+'" style="color:var(--red-dark,#991b1b)">'+esc(t('Remove','Xoá'))+'</button>'
+            + '</div>';
+        } }
+    ];
+    el.innerHTML = head;
+    el.appendChild(UI.buildTable(columns, rows, { rowKey:'id', emptyMessage:t('No MFA policies defined — defaults will apply','Chưa có chính sách MFA — dùng mặc định') }));
+    el.querySelector('#mfa-pol-refresh').addEventListener('click', function(){ fetchRolePolicies().then(function(){ renderMfaPolicies(el); }); });
+    el.querySelector('#mfa-pol-new').addEventListener('click', function(){ openMfaPolicyEditor(null, el); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-edit-pol]'), function(b){
+      b.addEventListener('click', function(){ var p = state.rolePolicies.find(function(x){ return String(x.id)===b.getAttribute('data-edit-pol'); }); openMfaPolicyEditor(p, el); });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-del-pol]'), function(b){
+      b.addEventListener('click', function(){
+        var id = b.getAttribute('data-del-pol');
+        var p = state.rolePolicies.find(function(x){ return String(x.id)===id; });
+        UI.confirmDestructive({ title:t('Remove MFA policy','Xoá chính sách MFA'), requireReason:true }).then(function(r){
+          if (!r||!r.confirmed) return;
+          UI.runtime.delete('core_system','role_mfa_policy', id, p && p.row_version).then(function(){
+            UI.audit('mfa.policy.delete', { id:id, reason:r.reason });
+            UI.toast(t('Removed','Đã xoá'),'ok');
+            fetchRolePolicies().then(function(){ renderMfaPolicies(el); });
+          }).catch(function(err){ UI.toast((err && err.message) || t('Failed','Thất bại'),'block'); });
+        });
+      });
+    });
+  }
+
+  function openMfaPolicyEditor(existing, hostEl){
+    var rolesUsed = state.rolePolicies.map(function(p){ return p.role_code; });
+    var availableRoles = state.roles.filter(function(r){ return existing ? true : rolesUsed.indexOf(r.role_code) < 0; });
+    var fields = [
+      { key:'role_code', label:t('Role','Vai trò'), type:'select', required:true,
+        value: existing ? existing.role_code : '',
+        disabled: !!existing,
+        options: availableRoles.map(function(r){ return { value:r.role_code, label:(r.role_label_vi||r.role_code)+' ('+r.role_code+')' }; }) },
+      { key:'required_aal', label:t('Required AAL','AAL bắt buộc'), type:'select', required:true,
+        value: existing ? (existing.required_aal||1) : 1,
+        options:[
+          { value:1, label:'AAL1 — '+t('single-factor','một yếu tố') },
+          { value:2, label:'AAL2 — '+t('two-factor (TOTP/SMS/Push)','hai yếu tố') },
+          { value:3, label:'AAL3 — '+t('hardware-bound (FIDO2/WebAuthn)','phần cứng FIDO2/WebAuthn') }
+        ] },
+      { key:'reauth_minutes', label:t('Re-auth interval (min, 0=never)','Khoảng tái xác thực (phút, 0=không)'), type:'number', min:0, max:1440,
+        value: existing ? (existing.reauth_minutes != null ? existing.reauth_minutes : 60) : 60 },
+      { key:'allow_remembered_device', label:t('Allow remembered device','Thiết bị đã nhớ'), type:'checkbox',
+        value: existing ? (existing.allow_remembered_device !== false) : true,
+        checkboxLabel: t('Skip second factor on previously enrolled device','Bỏ qua yếu tố thứ 2 trên thiết bị đã đăng ký') },
+      { key:'webauthn_required', label:t('Require WebAuthn','Bắt buộc WebAuthn'), type:'checkbox',
+        value: existing ? !!existing.webauthn_required : false,
+        checkboxLabel: t('User must enroll a hardware key (FIDO2)','Phải đăng ký khoá phần cứng (FIDO2)') }
+    ];
+    var form = UI.buildForm(fields);
+    var modal = UI.openModal({
+      title: existing ? t('Edit MFA policy','Sửa chính sách MFA') : t('New MFA policy','Tạo chính sách MFA'),
+      bodyEl: form.el, width:'560px',
+      footerHtml:'<button class="btn-admin secondary" id="mfa-pol-cancel">'+esc(t('Cancel','Huỷ'))+'</button>'
+        + '<button class="btn-admin" id="mfa-pol-save">'+esc(t('Save','Lưu'))+'</button>'
+    });
+    modal.card.querySelector('#mfa-pol-cancel').addEventListener('click', modal.close);
+    modal.card.querySelector('#mfa-pol-save').addEventListener('click', function(){
+      var v = form.getValues();
+      if (!v.role_code) { form.setError('role_code', t('Required','Bắt buộc')); return; }
+      var p = existing
+        ? UI.runtime.update('core_system','role_mfa_policy', existing.id, v, existing.row_version)
+        : UI.runtime.create('core_system','role_mfa_policy', v);
+      p.then(function(){
+        UI.audit(existing ? 'mfa.policy.update':'mfa.policy.create', v);
+        UI.toast(t('Saved','Đã lưu'),'ok');
+        modal.close();
+        fetchRolePolicies().then(function(){ renderMfaPolicies(hostEl); });
+      }).catch(function(err){ UI.toast((err && err.message) || t('Save failed','Lưu thất bại'),'block'); });
+    });
+  }
+
+  function renderMfaCompliance(el){
+    var search = '';
+    var statusFilter = 'all';
+    function rerender(){
+      var byUser = {};
+      state.userFactors.forEach(function(f){ (byUser[f.user_id] = byUser[f.user_id] || []).push(f); });
+      var policiesByRole = {}; state.rolePolicies.forEach(function(p){ policiesByRole[p.role_code] = p; });
+      var rows = state.users.map(function(u){
+        var policy = policiesByRole[u.role_code] || policiesByRole[u.role];
+        var requiredAal = policy ? (policy.required_aal||1) : 1;
+        var factors = byUser[u.id] || byUser[u.username] || [];
+        var maxAal = factors.reduce(function(m,f){ return Math.max(m, f.aal||1); }, factors.length ? 1 : 0);
+        var compliant = maxAal >= requiredAal;
+        return { user:u, factors:factors, requiredAal:requiredAal, maxAal:maxAal, compliant:compliant };
+      });
+      rows = rows.filter(function(r){
+        if (statusFilter === 'compliant' && !r.compliant) return false;
+        if (statusFilter === 'noncompliant' && r.compliant) return false;
+        if (!search) return true;
+        var hay = ((r.user.full_name||'')+' '+(r.user.username||'')+' '+(r.user.email||'')+' '+(r.user.role_code||'')).toLowerCase();
+        return hay.indexOf(search.toLowerCase()) >= 0;
+      });
+      var head = UI.panelHeader(
+        t('User MFA compliance','Tình trạng tuân thủ MFA'),
+        t('Each user is checked against their role policy.','Đối chiếu mỗi user với chính sách của vai trò.'),
+        UI.btn(t('Refresh','Làm mới'),{ icon:'🔄', kind:'secondary', id:'mfa-comp-refresh' })
+      );
+      var kpi = UI.kpiRow([
+        UI.kpiCard(t('Users','User'), rows.length, '', 'info'),
+        UI.kpiCard(t('Compliant','Đạt'), rows.filter(function(r){ return r.compliant; }).length, '', 'ok'),
+        UI.kpiCard(t('Non-compliant','Chưa đạt'), rows.filter(function(r){ return !r.compliant; }).length, '', rows.filter(function(r){ return !r.compliant; }).length ? 'warn' : 'muted'),
+        UI.kpiCard(t('Total factors','Tổng yếu tố'), state.userFactors.length, '', 'muted')
+      ]);
+      var toolbar = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">'
+        + '<input type="search" id="mfa-c-search" placeholder="'+esc(t('Search user / role…','Tìm user / vai trò…'))+'" value="'+UI.escapeAttr(search)+'" style="padding:8px 10px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:13px;min-width:240px">'
+        + '<select id="mfa-c-status" style="padding:8px 10px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:13px">'
+        +   '<option value="all">'+esc(t('All status','Tất cả'))+'</option>'
+        +   '<option value="compliant"'+(statusFilter==='compliant'?' selected':'')+'>'+esc(t('Compliant','Đạt'))+'</option>'
+        +   '<option value="noncompliant"'+(statusFilter==='noncompliant'?' selected':'')+'>'+esc(t('Non-compliant','Chưa đạt'))+'</option>'
+        + '</select>'
+        + '</div>';
+      var columns = [
+        { key:'user', label:t('User','Người dùng'), render:function(r){
+            return '<div style="font-weight:500">'+esc(r.user.full_name||r.user.username||'')+'</div>'
+              + '<div style="font-size:11px;color:var(--text-3)">'+esc(r.user.username||'')+(r.user.email?' · '+esc(r.user.email):'')+'</div>';
+          } },
+        { key:'role', label:t('Role','Vai trò'), width:'140px', render:function(r){ return esc(r.user.role_code||r.user.role||'—'); } },
+        { key:'factors', label:t('Factors enrolled','Yếu tố đã đăng ký'), render:function(r){
+            if (!r.factors.length) return '<span style="color:var(--text-3)">—</span>';
+            return r.factors.map(function(f){
+              var tone = f.is_active === false ? 'muted' : (f.aal>=3?'block':(f.aal===2?'warn':'info'));
+              return badge((f.factor_type||'totp').toUpperCase()+' AAL'+(f.aal||1), tone);
+            }).join(' ');
+          } },
+        { key:'compliance', label:t('Compliance','Tuân thủ'), width:'140px', render:function(r){
+            return r.compliant ? badge(t('Compliant','Đạt'),'ok')
+              : badge(t('Below AAL'+r.requiredAal,'Dưới AAL'+r.requiredAal),'block');
+          } },
+        { key:'actions', label:'', width:'170px', render:function(r){
+            return '<div style="display:flex;gap:4px;flex-wrap:wrap">'
+              + (r.factors.length ? '<button class="btn-admin secondary sm" data-revoke-factor="'+UI.escapeAttr(r.user.id||r.user.username)+'">'+esc(t('Revoke factor','Thu hồi'))+'</button>' : '')
+              + (r.factors.length ? '<button class="btn-admin secondary sm" data-reset-factors="'+UI.escapeAttr(r.user.id||r.user.username)+'" style="color:var(--red-dark,#991b1b)">'+esc(t('Reset all','Reset tất cả'))+'</button>' : '')
+              + '</div>';
+          } }
+      ];
+      el.innerHTML = head + kpi + toolbar;
+      el.appendChild(UI.buildTable(columns, rows, { rowKey:function(r){ return r.user.id||r.user.username; }, emptyMessage:t('No users match','Không có user khớp') }));
+      el.querySelector('#mfa-comp-refresh').addEventListener('click', function(){ Promise.all([fetchUsers(),fetchUserFactors(),fetchRolePolicies()]).then(rerender); });
+      el.querySelector('#mfa-c-search').addEventListener('input', UI.debounce(function(e){ search = e.target.value; rerender(); }, 220));
+      el.querySelector('#mfa-c-status').addEventListener('change', function(e){ statusFilter = e.target.value; rerender(); });
+      Array.prototype.forEach.call(el.querySelectorAll('[data-revoke-factor]'), function(b){
+        b.addEventListener('click', function(){
+          var uid = b.getAttribute('data-revoke-factor');
+          var userFactors = state.userFactors.filter(function(f){ return String(f.user_id) === uid; });
+          if (!userFactors.length){ UI.toast(t('No factor to revoke','Không có yếu tố nào'),'info'); return; }
+          openRevokeFactorDialog(uid, userFactors, rerender);
+        });
+      });
+      Array.prototype.forEach.call(el.querySelectorAll('[data-reset-factors]'), function(b){
+        b.addEventListener('click', function(){
+          var uid = b.getAttribute('data-reset-factors');
+          UI.confirmDestructive({
+            title: t('Reset all MFA factors','Reset toàn bộ yếu tố MFA'),
+            message: t('User will be forced to re-enroll. Use this for lost-device recovery.',
+                       'User sẽ phải đăng ký lại. Dùng khi mất thiết bị.'),
+            requireReason: true,
+            confirmLabel: t('Reset all','Reset tất cả'),
+            requireText: 'RESET'
+          }).then(function(r){
+            if (!r||!r.confirmed) return;
+            UI.fetchJson('/api/v1/mfa/factors:reset', { method:'POST', body:{ user_id: uid, reason: r.reason } })
+              .then(function(){
+                UI.audit('mfa.factor.reset_all', { user_id: uid, reason: r.reason });
+                UI.toast(t('All factors reset','Đã reset tất cả'),'warn');
+                fetchUserFactors().then(rerender);
+              }).catch(function(err){ UI.toast((err && err.message) || t('Failed','Thất bại'),'block'); });
+          });
+        });
+      });
+    }
+    rerender();
+  }
+
+  function openRevokeFactorDialog(userId, factors, refresh){
+    var fields = [
+      { key:'factor_id', label:t('Factor to revoke','Yếu tố cần thu hồi'), type:'select', required:true,
+        options: factors.map(function(f){ return { value:f.id, label:(f.factor_type||'').toUpperCase()+' · AAL'+(f.aal||1)+' · '+(f.label||f.id) }; }) },
+      { key:'reason', label:t('Reason (audit)','Lý do (nhật ký)'), type:'textarea', rows:3, required:true }
+    ];
+    var form = UI.buildForm(fields);
+    var modal = UI.openModal({
+      title:t('Revoke MFA factor','Thu hồi yếu tố MFA'), bodyEl:form.el, width:'520px',
+      footerHtml:'<button class="btn-admin secondary" id="rf-cancel">'+esc(t('Cancel','Huỷ'))+'</button>'
+        + '<button class="btn-admin" id="rf-go" style="background:var(--red-dark,#991b1b);color:#fff">'+esc(t('Revoke','Thu hồi'))+'</button>'
+    });
+    modal.card.querySelector('#rf-cancel').addEventListener('click', modal.close);
+    modal.card.querySelector('#rf-go').addEventListener('click', function(){
+      var v = form.getValues();
+      if (!v.factor_id || !v.reason) return;
+      UI.fetchJson('/api/v1/mfa/factors/'+encodeURIComponent(v.factor_id)+':revoke', {
+        method:'POST', body:{ user_id:userId, reason:v.reason }
+      }).then(function(){
+        UI.audit('mfa.factor.revoke', { user_id:userId, factor_id:v.factor_id, reason:v.reason });
+        UI.toast(t('Factor revoked','Đã thu hồi yếu tố'),'ok');
+        modal.close();
+        fetchUserFactors().then(refresh);
+      }).catch(function(err){ UI.toast((err && err.message) || t('Failed','Thất bại'),'block'); });
+    });
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // Tab — Effective documents
+  // ════════════════════════════════════════════════════════════════════════════
+  function renderEffectiveDocs(rootEl){
+    rootEl.innerHTML = UI.loadingHtml();
+    Promise.all([fetchDocs(), fetchAcknowledgements(), fetchUsers()]).then(function(){
+      UI.renderSubTabs(rootEl, [
+        { key:'list', label:t('Document list','Danh sách tài liệu'), render:renderEffectiveDocList },
+        { key:'ack', label:t('Acknowledgements','Xác nhận đọc'), render:renderAcknowledgements }
+      ], {});
+    }).catch(function(err){ rootEl.innerHTML = UI.errorHtml(err && err.message, function(){ renderEffectiveDocs(rootEl); }); });
+  }
+
+  function renderEffectiveDocList(el){
+    var statusFilter = 'all';
+    var search = '';
+    function rerender(){
+      var rows = state.docs.filter(function(d){
+        if (statusFilter !== 'all' && (d.status||d.lifecycle_state) !== statusFilter) return false;
+        if (!search) return true;
+        var hay = ((d.doc_code||'')+' '+(d.title_vi||'')+' '+(d.title||'')+' '+(d.owner_role||'')).toLowerCase();
+        return hay.indexOf(search.toLowerCase()) >= 0;
+      });
+      var head = UI.panelHeader(
+        t('Effective documents','Tài liệu hiệu lực'),
+        t('Promote draft → effective and trigger acknowledgement campaigns (21 CFR Part 11 §11.10).',
+          'Phát hành tài liệu draft → effective và mở chiến dịch xác nhận đọc (21 CFR Part 11).'),
+        UI.btn(t('Refresh','Làm mới'),{ icon:'🔄', kind:'secondary', id:'ed-refresh' })
+      );
+      var kpi = UI.kpiRow([
+        UI.kpiCard(t('Total','Tổng'), state.docs.length, '', 'info'),
+        UI.kpiCard(t('Effective','Hiệu lực'), state.docs.filter(function(d){ return (d.status||d.lifecycle_state)==='effective'; }).length, '', 'ok'),
+        UI.kpiCard(t('Draft','Bản nháp'), state.docs.filter(function(d){ return (d.status||d.lifecycle_state)==='draft'; }).length, '', 'warn'),
+        UI.kpiCard(t('Retired','Thu hồi'), state.docs.filter(function(d){ return (d.status||d.lifecycle_state)==='retired'; }).length, '', 'muted')
+      ]);
+      var toolbar = '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">'
+        + '<input type="search" id="ed-search" placeholder="'+esc(t('Search code / title / owner…','Tìm mã / tiêu đề / chủ sở hữu…'))+'" value="'+UI.escapeAttr(search)+'" style="padding:8px 10px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:13px;min-width:280px">'
+        + '<select id="ed-status" style="padding:8px 10px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:13px">'
+        +   '<option value="all">'+esc(t('All status','Tất cả trạng thái'))+'</option>'
+        +   '<option value="draft"'+(statusFilter==='draft'?' selected':'')+'>'+esc(t('Draft','Nháp'))+'</option>'
+        +   '<option value="effective"'+(statusFilter==='effective'?' selected':'')+'>'+esc(t('Effective','Hiệu lực'))+'</option>'
+        +   '<option value="retired"'+(statusFilter==='retired'?' selected':'')+'>'+esc(t('Retired','Thu hồi'))+'</option>'
+        + '</select>'
+        + '</div>';
+      var columns = [
+        { key:'doc_code', label:t('Code','Mã'), width:'180px', render:function(d){ return '<code style="font-size:12px">'+esc(d.doc_code||'')+'</code>'+(d.revision?' <span style="color:var(--text-3);font-size:11px">v'+esc(d.revision)+'</span>':''); } },
+        { key:'title', label:t('Title','Tiêu đề'), render:function(d){
+            return '<div style="font-weight:500">'+esc(d.title_vi||d.title||'')+'</div>'
+              + '<div style="font-size:11px;color:var(--text-3)">'+esc(d.title||'')+'</div>';
+          } },
+        { key:'owner_role', label:t('Owner','Chủ sở hữu'), width:'140px', render:function(d){ return esc(d.owner_role||'—'); } },
+        { key:'effective_date', label:t('Effective','Có hiệu lực'), width:'120px', render:function(d){ return d.effective_date ? '<span style="font-family:ui-monospace,monospace;font-size:11px">'+esc(d.effective_date.slice(0,10))+'</span>' : '<span style="color:var(--text-3)">—</span>'; } },
+        { key:'status', label:t('Status','Trạng thái'), width:'120px', render:function(d){
+            var s = d.status||d.lifecycle_state||'draft';
+            return badge(s, s==='effective'?'ok':(s==='draft'?'warn':(s==='retired'?'muted':'info')));
+          } },
+        { key:'actions', label:'', width:'200px', render:function(d){
+            var s = d.status||d.lifecycle_state;
+            var actions = [];
+            if (s === 'draft') actions.push('<button class="btn-admin sm" data-promote="'+UI.escapeAttr(d.id)+'">'+esc(t('Promote','Phát hành'))+'</button>');
+            if (s === 'effective') actions.push('<button class="btn-admin secondary sm" data-ack-campaign="'+UI.escapeAttr(d.id)+'">'+esc(t('Open ack campaign','Mở xác nhận'))+'</button>');
+            if (s === 'effective') actions.push('<button class="btn-admin secondary sm" data-retire="'+UI.escapeAttr(d.id)+'" style="color:var(--red-dark,#991b1b)">'+esc(t('Retire','Thu hồi'))+'</button>');
+            return '<div style="display:flex;gap:4px;flex-wrap:wrap">'+actions.join('')+'</div>';
+          } }
+      ];
+      el.innerHTML = head + kpi + toolbar;
+      el.appendChild(UI.buildTable(columns, rows, { rowKey:'id', emptyMessage:t('No documents match','Không có tài liệu khớp') }));
+      el.querySelector('#ed-refresh').addEventListener('click', function(){ fetchDocs().then(rerender); });
+      el.querySelector('#ed-search').addEventListener('input', UI.debounce(function(e){ search = e.target.value; rerender(); }, 220));
+      el.querySelector('#ed-status').addEventListener('change', function(e){ statusFilter = e.target.value; rerender(); });
+      Array.prototype.forEach.call(el.querySelectorAll('[data-promote]'), function(b){
+        b.addEventListener('click', function(){ openPromoteDialog(state.docs.find(function(d){ return String(d.id)===b.getAttribute('data-promote'); }), rerender); });
+      });
+      Array.prototype.forEach.call(el.querySelectorAll('[data-retire]'), function(b){
+        b.addEventListener('click', function(){
+          var d = state.docs.find(function(x){ return String(x.id)===b.getAttribute('data-retire'); });
+          UI.confirmDestructive({
+            title:t('Retire document','Thu hồi tài liệu'),
+            message:t('This document will become inactive. New users will not see it.',
+                      'Tài liệu sẽ ngừng hiệu lực. User mới sẽ không thấy.'),
+            requireText: d.doc_code, requireReason:true
+          }).then(function(r){
+            if (!r||!r.confirmed) return;
+            UI.runtime.update('document_control','dcc_document_header', d.id, { status:'retired' }, d.row_version)
+              .then(function(){
+                UI.audit('document.retire', { id:d.id, doc_code:d.doc_code, reason:r.reason });
+                UI.toast(t('Retired','Đã thu hồi'),'ok');
+                fetchDocs().then(rerender);
+              }).catch(function(err){ UI.toast((err && err.message) || t('Failed','Thất bại'),'block'); });
+          });
+        });
+      });
+      Array.prototype.forEach.call(el.querySelectorAll('[data-ack-campaign]'), function(b){
+        b.addEventListener('click', function(){ openAckCampaignDialog(state.docs.find(function(d){ return String(d.id)===b.getAttribute('data-ack-campaign'); })); });
+      });
+    }
+    rerender();
+  }
+
+  function openPromoteDialog(doc, refresh){
+    var fields = [
+      { key:'effective_date', label:t('Effective date','Ngày có hiệu lực'), required:true, placeholder:'2026-05-15',
+        value: new Date().toISOString().slice(0,10) },
+      { key:'revision', label:t('Revision (e.g. 1.0, 2.1)','Phiên bản (vd 1.0, 2.1)'), required:true, value:doc.revision || '1.0' },
+      { key:'training_required', label:t('Require acknowledgement','Bắt buộc xác nhận'), type:'checkbox', value:true,
+        checkboxLabel:t('Open acknowledgement campaign immediately','Mở chiến dịch xác nhận ngay sau khi phát hành') },
+      { key:'reason', label:t('Promotion reason / change summary','Căn cứ phát hành / tóm tắt thay đổi'), type:'textarea', rows:3, required:true }
+    ];
+    var form = UI.buildForm(fields);
+    var modal = UI.openModal({
+      title: t('Promote draft → effective','Phát hành: nháp → hiệu lực') + ' · ' + (doc.doc_code||''),
+      bodyEl: form.el, width:'560px',
+      footerHtml:'<button class="btn-admin secondary" id="pr-cancel">'+esc(t('Cancel','Huỷ'))+'</button>'
+        + '<button class="btn-admin" id="pr-go">'+esc(t('Promote','Phát hành'))+'</button>'
+    });
+    modal.card.querySelector('#pr-cancel').addEventListener('click', modal.close);
+    modal.card.querySelector('#pr-go').addEventListener('click', function(){
+      var v = form.getValues();
+      if (!v.effective_date || !v.revision || !v.reason) return;
+      // Map back to DCC schema: status='approved' (= effective in DCC vocab)
+      var payload = { status:'approved', effective_date: v.effective_date, revision: v.revision };
+      UI.runtime.update('document_control','dcc_document_header', doc.id, payload, doc.row_version).then(function(){
+        UI.audit('document.promote', { id:doc.id, doc_code:doc.doc_code, payload:payload });
+        UI.toast(t('Promoted','Đã phát hành'),'ok');
+        modal.close();
+        fetchDocs().then(refresh);
+        if (v.training_required) openAckCampaignDialog(doc);
+      }).catch(function(err){ UI.toast((err && err.message) || t('Failed','Thất bại'),'block'); });
+    });
+  }
+
+  function openAckCampaignDialog(doc){
+    var fields = [
+      { key:'audience_kind', label:t('Audience','Đối tượng'), type:'select', required:true, value:'role',
+        options:[
+          { value:'role', label:t('Role(s)','Vai trò') },
+          { value:'dept', label:t('Department(s)','Phòng ban') },
+          { value:'all', label:t('All active users','Tất cả user đang hoạt động') }
+        ] },
+      { key:'audience_value', label:t('Audience value (comma-separated codes)','Mã đối tượng (cách nhau dấu phẩy)'),
+        placeholder:'qa_manager, qa_engineer', hint:t('Leave blank if "all"','Để trống nếu chọn "tất cả"') },
+      { key:'deadline', label:t('Deadline (ISO date)','Hạn chót (ISO date)'), required:true,
+        placeholder:'2026-06-30', value:new Date(Date.now()+30*86400000).toISOString().slice(0,10) },
+      { key:'message', label:t('Message to recipients (VN)','Thông điệp tới user (Tiếng Việt có dấu)'), type:'textarea', rows:3, required:true }
+    ];
+    var form = UI.buildForm(fields);
+    var modal = UI.openModal({
+      title:t('Open acknowledgement campaign','Mở chiến dịch xác nhận đọc')+' · '+(doc.doc_code||''),
+      bodyEl: form.el, width:'600px',
+      footerHtml:'<button class="btn-admin secondary" id="ac-cancel">'+esc(t('Cancel','Huỷ'))+'</button>'
+        + '<button class="btn-admin" id="ac-go">'+esc(t('Open campaign','Mở chiến dịch'))+'</button>'
+    });
+    modal.card.querySelector('#ac-cancel').addEventListener('click', modal.close);
+    modal.card.querySelector('#ac-go').addEventListener('click', function(){
+      var v = form.getValues();
+      var payload = {
+        doc_id: doc.id, doc_code: doc.doc_code,
+        audience_kind: v.audience_kind,
+        audience_value: v.audience_value || '*',
+        deadline: v.deadline,
+        message: v.message,
+        opened_at: new Date().toISOString()
+      };
+      UI.runtime.create('core_system','document_ack_campaign', payload).then(function(){
+        UI.audit('document.ack_campaign.open', payload);
+        UI.toast(t('Campaign opened','Đã mở chiến dịch'),'ok');
+        modal.close();
+      }).catch(function(err){ UI.toast((err && err.message) || t('Failed','Thất bại'),'block'); });
+    });
+  }
+
+  function renderAcknowledgements(el){
+    var search = '';
+    function rerender(){
+      var rows = state.acknowledgements.filter(function(a){
+        if (!search) return true;
+        var hay = ((a.doc_code||'')+' '+(a.user_id||'')+' '+(a.signature_method||'')).toLowerCase();
+        return hay.indexOf(search.toLowerCase()) >= 0;
+      });
+      var head = UI.panelHeader(
+        t('Document acknowledgements','Xác nhận đọc tài liệu'),
+        t('Records of users acknowledging effective documents (HMAC-signed, 21 CFR Part 11 §11.10(c)).',
+          'Lưu vết user xác nhận đã đọc tài liệu hiệu lực (ký HMAC, 21 CFR Part 11).'),
+        UI.btn(t('Refresh','Làm mới'),{ icon:'🔄', kind:'secondary', id:'ack-refresh' })
+        + UI.btn(t('Export CSV','Xuất CSV'),{ icon:'📤', kind:'secondary', id:'ack-export' })
+      );
+      var columns = [
+        { key:'created_at', label:t('Signed at','Thời điểm ký'), width:'160px', render:function(a){ return '<span style="font-family:ui-monospace,monospace;font-size:11px">'+esc((a.created_at||'').slice(0,19).replace('T',' '))+'</span>'; } },
+        { key:'doc_code', label:t('Document','Tài liệu'), width:'200px', render:function(a){ return '<code style="font-size:11px">'+esc(a.doc_code||'')+'</code>'+(a.revision?' v'+esc(a.revision):''); } },
+        { key:'user', label:t('User','User'), render:function(a){
+            var u = state.users.find(function(x){ return String(x.id)===String(a.user_id) || x.username===a.user_id; });
+            return esc((u && (u.full_name||u.username)) || a.user_id || '—');
+          } },
+        { key:'signature_method', label:t('Method','Phương thức'), width:'120px', render:function(a){ return badge(a.signature_method || 'hmac', 'info'); } },
+        { key:'hmac', label:t('Signature (truncated)','Chữ ký (rút gọn)'), render:function(a){
+            var sig = a.signature_hmac || a.hmac || '';
+            return '<span style="font-family:ui-monospace,monospace;font-size:11px;color:var(--text-3)">'+esc(sig.slice(0,32))+(sig.length > 32 ? '…' : '')+'</span>';
+          } }
+      ];
+      el.innerHTML = head + '<div style="margin-bottom:12px"><input type="search" id="ack-search" placeholder="'+esc(t('Search…','Tìm…'))+'" value="'+UI.escapeAttr(search)+'" style="padding:8px 10px;border:1px solid var(--border-1,#e5e7eb);border-radius:6px;font-size:13px;min-width:280px"></div>';
+      el.appendChild(UI.buildTable(columns, rows, { rowKey:'id', emptyMessage:t('No acknowledgements','Chưa có xác nhận nào') }));
+      el.querySelector('#ack-refresh').addEventListener('click', function(){ fetchAcknowledgements().then(rerender); });
+      el.querySelector('#ack-export').addEventListener('click', function(){
+        var csv = 'created_at,doc_code,revision,user_id,signature_method,signature_hmac\n' + rows.map(function(a){
+          return [a.created_at,a.doc_code,a.revision,a.user_id,a.signature_method,a.signature_hmac].map(function(x){ return '"'+String(x||'').replace(/"/g,'""')+'"'; }).join(',');
+        }).join('\n');
+        var blob = new Blob([csv],{type:'text/csv'});
+        var a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='document-acknowledgements-'+new Date().toISOString().slice(0,10)+'.csv'; a.click();
+        UI.audit('document.ack.export', { count: rows.length });
+      });
+      el.querySelector('#ack-search').addEventListener('input', UI.debounce(function(e){ search = e.target.value; rerender(); }, 220));
+    }
+    rerender();
+  }
+
+  // ════════════════════════════════════════════════════════════════════════════
+  // Tab — Retention
+  // ════════════════════════════════════════════════════════════════════════════
+  function renderRetention(rootEl){
+    rootEl.innerHTML = UI.loadingHtml();
+    Promise.all([fetchRetentionPolicies(), fetchLegalHolds(), fetchDisposalQueue(), fetchUsers()]).then(function(){
+      UI.renderSubTabs(rootEl, [
+        { key:'policies', label:t('Policies','Chính sách lưu trữ'), render:renderRetentionPolicies },
+        { key:'queue', label:t('Disposal queue','Hàng đợi tiêu huỷ'), render:renderDisposalQueue },
+        { key:'holds', label:t('Legal holds','Lệnh giữ pháp lý'), render:renderLegalHolds }
+      ], {});
+    }).catch(function(err){ rootEl.innerHTML = UI.errorHtml(err && err.message, function(){ renderRetention(rootEl); }); });
+  }
+
+  function renderRetentionPolicies(el){
+    var head = UI.panelHeader(
+      t('Retention policies','Chính sách lưu trữ'),
+      t('Per-record-class retention requirements (Vietnam Archives Law 2011, GDPR Art. 5(1)(e)).',
+        'Yêu cầu lưu trữ theo từng loại hồ sơ (Luật Lưu trữ 2011, GDPR Điều 5).'),
+      UI.btn(t('Refresh','Làm mới'),{ icon:'🔄', kind:'secondary', id:'rp-refresh' })
+      + UI.btn(t('New policy','Chính sách mới'),{ icon:'＋', id:'rp-new' })
+    );
+    var columns = [
+      { key:'policy_code', label:t('Record class','Loại hồ sơ'), render:function(p){
+          return '<div style="font-weight:500">'+esc(p.label_vi||p.label||p.policy_code||'')+'</div>'
+            + '<div style="font-family:ui-monospace,monospace;font-size:11px;color:var(--text-3)">'+esc(p.policy_code||p.record_class||'')+'</div>';
+        } },
+      { key:'retention_period_years', label:t('Retain for','Thời gian lưu'), width:'140px', render:function(p){
+          var yrs = p.retention_period_years || p.retention_years;
+          return '<span style="font-family:ui-monospace,monospace;font-size:13px;font-weight:600">'+esc(String(yrs||'—'))+t(' years',' năm')+'</span>';
+        } },
+      { key:'disposition_method', label:t('Disposal method','Phương pháp tiêu huỷ'), width:'160px', render:function(p){
+          var m = p.disposition_method || p.disposal_method;
+          return badge(m||'—', m==='shred'?'block':(m==='archive'?'info':'muted'));
+        } },
+      { key:'disposition_witness_required', label:t('Witness','Chứng kiến'), width:'110px', render:function(p){
+          var w = p.disposition_witness_required != null ? p.disposition_witness_required : p.witness_required;
+          return w ? badge(t('Required','Bắt buộc'),'warn') : badge(t('Optional','Không'),'muted');
+        } },
+      { key:'retention_basis', label:t('Basis','Căn cứ'), render:function(p){ return esc(p.retention_basis||p.legal_basis||'—'); } },
+      { key:'actions', label:'', width:'150px', render:function(p){
+          var pk = p.policy_code || p.id;
+          return '<div style="display:flex;gap:4px"><button class="btn-admin secondary sm" data-edit-rp="'+UI.escapeAttr(pk)+'">'+esc(t('Edit','Sửa'))+'</button>'
+            + '<button class="btn-admin secondary sm" data-del-rp="'+UI.escapeAttr(pk)+'" style="color:var(--red-dark,#991b1b)">'+esc(t('Remove','Xoá'))+'</button></div>';
+        } }
+    ];
+    el.innerHTML = head;
+    el.appendChild(UI.buildTable(columns, state.retentionPolicies, { rowKey:'policy_code', emptyMessage:t('No retention policies defined','Chưa có chính sách lưu trữ') }));
+    el.querySelector('#rp-refresh').addEventListener('click', function(){ fetchRetentionPolicies().then(function(){ renderRetentionPolicies(el); }); });
+    el.querySelector('#rp-new').addEventListener('click', function(){ openRetentionPolicyEditor(null, el); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-edit-rp]'), function(b){
+      b.addEventListener('click', function(){ openRetentionPolicyEditor(state.retentionPolicies.find(function(p){ return String(p.policy_code||p.id)===b.getAttribute('data-edit-rp'); }), el); });
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-del-rp]'), function(b){
+      b.addEventListener('click', function(){
+        var pk = b.getAttribute('data-del-rp');
+        var p = state.retentionPolicies.find(function(x){ return String(x.policy_code||x.id)===pk; });
+        UI.confirmDestructive({ title:t('Remove retention policy','Xoá chính sách lưu trữ'), requireReason:true }).then(function(r){
+          if (!r||!r.confirmed) return;
+          UI.runtime.delete('core_system','retention_policy', pk, p && p.row_version).then(function(){
+            UI.audit('retention.policy.delete', { id:id, reason:r.reason });
+            UI.toast(t('Removed','Đã xoá'),'ok');
+            fetchRetentionPolicies().then(function(){ renderRetentionPolicies(el); });
+          }).catch(function(err){ UI.toast((err && err.message) || t('Failed','Thất bại'),'block'); });
+        });
+      });
+    });
+  }
+
+  function openRetentionPolicyEditor(existing, hostEl){
+    var fields = [
+      { key:'record_class', label:t('Record class code','Mã loại hồ sơ'), required:true, disabled:!!existing,
+        value: existing ? existing.record_class : '', placeholder:'qms.records.production' },
+      { key:'label_vi', label:t('Label (VI with diacritics)','Tên hiển thị (Tiếng Việt có dấu)'), required:true,
+        value: existing ? (existing.label_vi||'') : '' },
+      { key:'retention_years', label:t('Retention years','Số năm lưu'), type:'number', min:1, max:50, required:true,
+        value: existing ? (existing.retention_years||5) : 5 },
+      { key:'disposal_method', label:t('Disposal method','Phương pháp tiêu huỷ'), type:'select', required:true,
+        value: existing ? (existing.disposal_method||'shred') : 'shred',
+        options:[
+          { value:'shred', label:t('Shred — destroy beyond reconstruction','Cắt huỷ — không thể phục dựng') },
+          { value:'archive', label:t('Archive — move to long-term storage','Lưu trữ — chuyển sang kho dài hạn') },
+          { value:'anonymize', label:t('Anonymize — strip PII, keep aggregate','Ẩn danh — bỏ PII, giữ tổng hợp') }
+        ] },
+      { key:'witness_required', label:t('Witness signature required','Cần chữ ký chứng kiến'), type:'checkbox',
+        value: existing ? !!existing.witness_required : true,
+        checkboxLabel: t('Disposal must be witnessed by a second authorized actor','Tiêu huỷ phải có người thứ hai chứng kiến') },
+      { key:'legal_basis', label:t('Legal basis (citation)','Căn cứ pháp lý (trích dẫn)'),
+        value: existing ? (existing.legal_basis||'') : '', placeholder:'Vietnam Archives Law 2011 Art. 14, GDPR Art. 5(1)(e)' },
+      { key:'description', label:t('Description','Mô tả'), type:'textarea', rows:2,
+        value: existing ? (existing.description||'') : '' }
+    ];
+    var form = UI.buildForm(fields);
+    var modal = UI.openModal({
+      title: existing ? t('Edit retention policy','Sửa chính sách lưu trữ') : t('New retention policy','Tạo chính sách lưu trữ'),
+      bodyEl: form.el, width:'620px',
+      footerHtml:'<button class="btn-admin secondary" id="rp-cancel">'+esc(t('Cancel','Huỷ'))+'</button>'
+        + '<button class="btn-admin" id="rp-save">'+esc(t('Save','Lưu'))+'</button>'
+    });
+    modal.card.querySelector('#rp-cancel').addEventListener('click', modal.close);
+    modal.card.querySelector('#rp-save').addEventListener('click', function(){
+      var v = form.getValues();
+      if (!v.record_class || !v.label_vi || !v.retention_years) return;
+      var p = existing
+        ? UI.runtime.update('core_system','retention_policy', existing.id, v, existing.row_version)
+        : UI.runtime.create('core_system','retention_policy', v);
+      p.then(function(){
+        UI.audit(existing?'retention.policy.update':'retention.policy.create', v);
+        UI.toast(t('Saved','Đã lưu'),'ok');
+        modal.close();
+        fetchRetentionPolicies().then(function(){ renderRetentionPolicies(hostEl); });
+      }).catch(function(err){ UI.toast((err && err.message) || t('Save failed','Lưu thất bại'),'block'); });
+    });
+  }
+
+  function renderDisposalQueue(el){
+    var head = UI.panelHeader(
+      t('Disposal queue','Hàng đợi tiêu huỷ'),
+      t('Records past their retention deadline. Disposal requires a witness signature and writes a chain-of-custody entry.',
+        'Hồ sơ đã quá hạn lưu trữ. Tiêu huỷ phải có chứng kiến và ghi chuỗi giám hộ (chain-of-custody).'),
+      UI.btn(t('Refresh','Làm mới'),{ icon:'🔄', kind:'secondary', id:'dq-refresh' })
+    );
+    var columns = [
+      { key:'record_id', label:t('Record','Hồ sơ'), render:function(r){
+          return '<div style="font-family:ui-monospace,monospace;font-size:11px">'+esc(r.record_id||r.id||'—')+'</div>'
+            + '<div style="font-size:11px;color:var(--text-3)">'+esc(r.title_vi||r.title||r.label||'')+'</div>';
+        } },
+      { key:'record_class', label:t('Class','Loại'), width:'160px', render:function(r){ return esc(r.record_class||'—'); } },
+      { key:'retention_until', label:t('Retain until','Đến hạn'), width:'140px', render:function(r){
+          return '<span style="font-family:ui-monospace,monospace;font-size:11px;color:var(--red-dark,#991b1b)">'+esc((r.retention_until||'').slice(0,10))+'</span>';
+        } },
+      { key:'on_hold', label:t('Status','Trạng thái'), width:'140px', render:function(r){
+          return r.on_hold ? badge(t('Legal hold','Bị giữ pháp lý'),'block') : badge(t('Eligible','Đủ điều kiện huỷ'),'warn');
+        } },
+      { key:'actions', label:'', width:'170px', render:function(r){
+          if (r.on_hold) return '<span style="color:var(--text-3);font-size:11px">'+esc(t('Cannot dispose while on hold','Không thể huỷ khi đang giữ'))+'</span>';
+          return '<button class="btn-admin sm" data-dispose="'+UI.escapeAttr(r.record_id||r.id)+'" style="background:var(--red-dark,#991b1b);color:#fff">'+esc(t('Dispose','Tiêu huỷ'))+'</button>';
+        } }
+    ];
+    el.innerHTML = head;
+    el.appendChild(UI.buildTable(columns, state.disposalQueue, { rowKey:'record_id', emptyMessage:t('Queue is empty','Không có hồ sơ nào đến hạn') }));
+    el.querySelector('#dq-refresh').addEventListener('click', function(){ fetchDisposalQueue().then(function(){ renderDisposalQueue(el); }); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-dispose]'), function(b){
+      b.addEventListener('click', function(){
+        var rid = b.getAttribute('data-dispose');
+        var rec = state.disposalQueue.find(function(x){ return String(x.record_id||x.id)===rid; });
+        openDisposalDialog(rec);
+      });
+    });
+  }
+
+  function openDisposalDialog(rec){
+    var fields = [
+      { key:'method_used', label:t('Method used','Phương pháp dùng'), type:'select', required:true, value:'shred',
+        options:[
+          { value:'shred', label:t('Shred','Cắt huỷ') },
+          { value:'archive', label:t('Archive','Lưu trữ dài hạn') },
+          { value:'anonymize', label:t('Anonymize','Ẩn danh') }
+        ] },
+      { key:'witness_user', label:t('Witness user','User chứng kiến'), type:'select', required:true,
+        options: state.users.filter(function(u){ return u.is_active !== false; }).map(function(u){ return { value:u.id||u.username, label:(u.full_name||u.username) }; }) },
+      { key:'location', label:t('Location of disposal','Địa điểm tiêu huỷ'), placeholder:t('Office shredder, Hanoi','Máy huỷ giấy, văn phòng Hà Nội') },
+      { key:'notes', label:t('Notes (chain-of-custody)','Ghi chú (chuỗi giám hộ)'), type:'textarea', rows:3, required:true }
+    ];
+    var form = UI.buildForm(fields);
+    var modal = UI.openModal({
+      title: t('Dispose record','Tiêu huỷ hồ sơ') + ' · ' + (rec.record_id||rec.id||''),
+      bodyEl: form.el, width:'600px',
+      footerHtml:'<button class="btn-admin secondary" id="dz-cancel">'+esc(t('Cancel','Huỷ'))+'</button>'
+        + '<button class="btn-admin" id="dz-go" style="background:var(--red-dark,#991b1b);color:#fff">'+esc(t('Confirm disposal','Xác nhận tiêu huỷ'))+'</button>'
+    });
+    modal.card.querySelector('#dz-cancel').addEventListener('click', modal.close);
+    modal.card.querySelector('#dz-go').addEventListener('click', function(){
+      var v = form.getValues();
+      if (!v.witness_user || !v.notes) return;
+      UI.confirmDestructive({
+        title:t('Final confirmation','Xác nhận lần cuối'),
+        message:t('This action permanently disposes the record. A chain-of-custody entry will be created with the witness signature.',
+                  'Hồ sơ sẽ bị tiêu huỷ vĩnh viễn. Chuỗi giám hộ sẽ được ghi kèm chữ ký chứng kiến.'),
+        requireText:'DISPOSE', requireReason:true
+      }).then(function(r){
+        if (!r||!r.confirmed) return;
+        var payload = {
+          record_id: rec.record_id||rec.id,
+          method_used: v.method_used,
+          witness_user_id: v.witness_user,
+          location: v.location,
+          notes: v.notes,
+          actor_reason: r.reason,
+          disposed_at: new Date().toISOString()
+        };
+        UI.fetchJson('/api/v1/retention/'+encodeURIComponent(payload.record_id)+':dispose', {
+          method:'POST', body: payload
+        }).then(function(){
+          UI.audit('retention.dispose', payload);
+          UI.toast(t('Disposed — chain-of-custody recorded','Đã tiêu huỷ — đã ghi chuỗi giám hộ'),'ok');
+          modal.close();
+          fetchDisposalQueue();
+        }).catch(function(err){ UI.toast((err && err.message) || t('Failed','Thất bại'),'block'); });
+      });
+    });
+  }
+
+  function renderLegalHolds(el){
+    var head = UI.panelHeader(
+      t('Legal holds','Lệnh giữ pháp lý'),
+      t('Active holds suspend retention disposal until released by counsel.',
+        'Lệnh giữ làm tạm dừng tiêu huỷ cho đến khi luật sư giải toả.'),
+      UI.btn(t('Refresh','Làm mới'),{ icon:'🔄', kind:'secondary', id:'lh-refresh' })
+      + UI.btn(t('Place hold','Đặt lệnh giữ'),{ icon:'＋', id:'lh-new' })
+    );
+    var columns = [
+      { key:'case_ref', label:t('Case reference','Mã vụ việc'), render:function(h){ return '<code>'+esc(h.case_ref||'—')+'</code>'; } },
+      { key:'description', label:t('Description','Mô tả'), render:function(h){ return esc(h.description||''); } },
+      { key:'placed_at', label:t('Placed','Đặt lúc'), width:'140px', render:function(h){ return '<span style="font-family:ui-monospace,monospace;font-size:11px">'+esc((h.placed_at||'').slice(0,10))+'</span>'; } },
+      { key:'released_at', label:t('Released','Giải toả'), width:'140px', render:function(h){
+          return h.released_at ? '<span style="font-family:ui-monospace,monospace;font-size:11px">'+esc(h.released_at.slice(0,10))+'</span>' : badge(t('active','đang giữ'),'block');
+        } },
+      { key:'actions', label:'', width:'150px', render:function(h){
+          if (h.released_at) return '<span style="color:var(--text-3);font-size:11px">'+esc(t('Released','Đã giải toả'))+'</span>';
+          return '<button class="btn-admin secondary sm" data-release="'+UI.escapeAttr(h.id)+'">'+esc(t('Release hold','Giải toả'))+'</button>';
+        } }
+    ];
+    el.innerHTML = head;
+    el.appendChild(UI.buildTable(columns, state.legalHolds, { rowKey:'id', emptyMessage:t('No legal holds active','Không có lệnh giữ nào đang hoạt động') }));
+    el.querySelector('#lh-refresh').addEventListener('click', function(){ fetchLegalHolds().then(function(){ renderLegalHolds(el); }); });
+    el.querySelector('#lh-new').addEventListener('click', function(){ openLegalHoldEditor(null, el); });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-release]'), function(b){
+      b.addEventListener('click', function(){
+        var id = b.getAttribute('data-release');
+        var h = state.legalHolds.find(function(x){ return String(x.id)===id; });
+        UI.confirmDestructive({ title:t('Release legal hold','Giải toả lệnh giữ'), requireReason:true }).then(function(r){
+          if (!r||!r.confirmed) return;
+          UI.runtime.update('core_system','legal_hold', id, { released_at: new Date().toISOString(), release_reason: r.reason }, h && h.row_version)
+            .then(function(){
+              UI.audit('legal_hold.release', { id:id, reason:r.reason });
+              UI.toast(t('Released','Đã giải toả'),'ok');
+              fetchLegalHolds().then(function(){ renderLegalHolds(el); });
+            }).catch(function(err){ UI.toast((err && err.message) || t('Failed','Thất bại'),'block'); });
+        });
+      });
+    });
+  }
+
+  function openLegalHoldEditor(existing, hostEl){
+    var fields = [
+      { key:'case_ref', label:t('Case reference','Mã vụ việc'), required:true, value: existing ? existing.case_ref : '' },
+      { key:'description', label:t('Description / scope','Mô tả / phạm vi'), type:'textarea', rows:3, required:true,
+        value: existing ? (existing.description||'') : '' },
+      { key:'record_class_filter', label:t('Record class filter (comma-separated)','Lọc loại hồ sơ (cách nhau dấu phẩy)'),
+        value: existing ? (existing.record_class_filter||'') : '',
+        hint: t('Leave blank to hold all records','Để trống = giữ tất cả loại hồ sơ') },
+      { key:'placed_by', label:t('Placed by (legal counsel)','Người đặt (luật sư)'), required:true,
+        value: existing ? (existing.placed_by||'') : '' }
+    ];
+    var form = UI.buildForm(fields);
+    var modal = UI.openModal({
+      title: existing ? t('Edit legal hold','Sửa lệnh giữ') : t('Place legal hold','Đặt lệnh giữ'),
+      bodyEl: form.el, width:'600px',
+      footerHtml:'<button class="btn-admin secondary" id="lh-cancel">'+esc(t('Cancel','Huỷ'))+'</button>'
+        + '<button class="btn-admin" id="lh-save">'+esc(t('Save','Lưu'))+'</button>'
+    });
+    modal.card.querySelector('#lh-cancel').addEventListener('click', modal.close);
+    modal.card.querySelector('#lh-save').addEventListener('click', function(){
+      var v = form.getValues();
+      if (!v.case_ref || !v.description || !v.placed_by) return;
+      v.placed_at = existing ? existing.placed_at : new Date().toISOString();
+      var p = existing
+        ? UI.runtime.update('core_system','legal_hold', existing.id, v, existing.row_version)
+        : UI.runtime.create('core_system','legal_hold', v);
+      p.then(function(){
+        UI.audit(existing?'legal_hold.update':'legal_hold.place', v);
+        UI.toast(t('Saved','Đã lưu'),'ok');
+        modal.close();
+        fetchLegalHolds().then(function(){ renderLegalHolds(hostEl); });
+      }).catch(function(err){ UI.toast((err && err.message) || t('Save failed','Lưu thất bại'),'block'); });
+    });
+  }
+
+  // ── Public dispatcher ───────────────────────────────────────────────────────
+  window._renderAdminContentTab = function(rootEl, slug){
+    if (slug === 'mfa') return renderMfa(rootEl);
+    if (slug === 'effective_docs') return renderEffectiveDocs(rootEl);
+    if (slug === 'retention') return renderRetention(rootEl);
+    rootEl.innerHTML = UI.errorHtml(t('Unknown tab: '+slug,'Tab không xác định: '+slug));
+  };
 })();

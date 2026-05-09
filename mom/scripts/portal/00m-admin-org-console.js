@@ -1,0 +1,1675 @@
+/* ============================================================================
+ * Admin: Organization Console — Phòng ban & Chức danh + Sơ đồ tổ chức
+ * ----------------------------------------------------------------------------
+ * Replaces fragmented prompt()-driven dept/title rendering with two
+ * world-class consoles wired to the authoritative HCM runtime tables:
+ *
+ *   Phòng ban & Chức danh (renderOrgUnits):
+ *     • Three-pane workbench: outline tree | unit detail | position panel
+ *     • Inline rename, retype, recolor, reparent
+ *     • Position cards with role-icon auto-derived from title
+ *     • Headcount + filled/open KPI per unit
+ *     • Filter chips by type & status, search across units + positions
+ *
+ *   Sơ đồ tổ chức (renderOrgChart):
+ *     • Full SVG canvas (vector → perfect for SVG/PDF export)
+ *     • Reingold-Tilford-style layered tree, supports TB / LR / Radial
+ *     • Pan with mouse drag, zoom with wheel (cursor-centred)
+ *     • Drag node → drop on another node = reparent (PUT runtime)
+ *     • Export: SVG, PNG, Print (browser → PDF), JSON snapshot
+ *
+ * Backend (no new endpoints needed — uses GenericCrudController):
+ *   GET    /api/v1/runtime/hcm_workforce/hcm_org_units
+ *   POST   /api/v1/runtime/hcm_workforce/hcm_org_units
+ *   PUT    /api/v1/runtime/hcm_workforce/hcm_org_units/{id}
+ *   DELETE /api/v1/runtime/hcm_workforce/hcm_org_units/{id}
+ *   (same shape for hcm_positions, hcm_employees)
+ *
+ * Optimistic concurrency via row_version (If-Match header) — handled by
+ * AdminUI.runtime.update.
+ * ========================================================================== */
+
+(function(){
+  'use strict';
+  if (!window.AdminUI) { console.error('[admin-org] AdminUI not loaded'); return; }
+  var UI = window.AdminUI;
+  var t = UI.t, esc = UI.escapeHtml, badge = UI.badge;
+
+  /* ──────────────────────────────────────────────────────────────────────── *
+   * Type metadata — single source of truth for icons + colors per org level
+   * ──────────────────────────────────────────────────────────────────────── */
+  var TYPE_META = {
+    company:    { icon:'🏢', label:'Công ty',  labelEn:'Company',    color:'#0ea5e9', order:0 },
+    division:   { icon:'🏛️', label:'Khối',     labelEn:'Division',   color:'#8b5cf6', order:1 },
+    department: { icon:'🏬', label:'Phòng',    labelEn:'Department', color:'#f59e0b', order:2 },
+    section:    { icon:'🧩', label:'Bộ phận',  labelEn:'Section',    color:'#10b981', order:3 },
+    team:       { icon:'🤝', label:'Nhóm',     labelEn:'Team',       color:'#ef4444', order:4 }
+  };
+  function typeMeta(type){ return TYPE_META[String(type||'department')] || TYPE_META.department; }
+  function typeOrder(type){ return typeMeta(type).order; }
+
+  // Department palette (10 distinct hues) — used when metadata.color absent
+  var DEPT_PALETTE = ['#2563eb','#16a34a','#dc2626','#7c3aed','#0f766e','#d97706','#0891b2','#a21caf','#65a30d','#475569'];
+  function defaultDeptColor(code){
+    var s = String(code||'GEN');
+    var seed = 0;
+    for (var i = 0; i < s.length; i++) seed += s.charCodeAt(i);
+    return DEPT_PALETTE[seed % DEPT_PALETTE.length];
+  }
+  function unitColor(unit){
+    var meta = safeJson(unit && unit.metadata);
+    return String(meta.color || defaultDeptColor(unit && unit.org_unit_code));
+  }
+
+  /* Position icon — derived from title keyword. Maps Vietnamese + English. */
+  function positionIcon(title){
+    var s = String(title || '').toLowerCase();
+    if (/giám đốc điều hành|chief executive|^ceo\b/.test(s)) return '🏆';
+    if (/giám đốc|director|cto|cfo|coo|cio/.test(s))         return '👑';
+    if (/phó giám đốc|deputy director|deputy gm|vice president/.test(s)) return '🎖️';
+    if (/trưởng phòng|head of|chief of|leader|lead\b/.test(s))           return '🎯';
+    if (/phó phòng|deputy head|assistant head/.test(s))                  return '🥈';
+    if (/quản đốc|production manager|plant manager/.test(s))             return '🏭';
+    if (/quản lý|manager|supervisor/.test(s))                            return '📋';
+    if (/kỹ sư|engineer/.test(s))                                        return '🔧';
+    if (/lập trình|developer|programmer/.test(s))                        return '💻';
+    if (/chuyên viên|specialist|analyst|consultant/.test(s))             return '📊';
+    if (/kỹ thuật viên|technician|maintenance/.test(s))                  return '🛠️';
+    if (/kế toán|accountant|finance/.test(s))                            return '💰';
+    if (/nhân sự|hr|human resources|recruiter/.test(s))                  return '👥';
+    if (/mua hàng|purchasing|procurement|buyer/.test(s))                 return '🛒';
+    if (/bán hàng|sales|marketing|account exec/.test(s))                 return '📈';
+    if (/kho|warehouse|logistics|shipping/.test(s))                      return '📦';
+    if (/kiểm tra|inspector|qc|quality|qa\b/.test(s))                    return '🔍';
+    if (/an toàn|safety|hse|ehs/.test(s))                                return '🦺';
+    if (/đào tạo|training|trainer/.test(s))                              return '🎓';
+    if (/it\b|system admin|sysadmin|devops/.test(s))                     return '🖥️';
+    if (/thiết kế|designer|cad/.test(s))                                 return '🎨';
+    if (/lái xe|driver/.test(s))                                         return '🚗';
+    if (/bảo vệ|security guard/.test(s))                                 return '🛡️';
+    if (/lễ tân|receptionist|admin assist/.test(s))                      return '☎️';
+    if (/công nhân|operator|worker|technician/.test(s))                  return '⚙️';
+    if (/thực tập|intern|apprentice/.test(s))                            return '🌱';
+    if (/nhân viên|staff|officer|associate|clerk/.test(s))               return '👤';
+    return '💼';
+  }
+
+  function safeJson(v){
+    if (!v) return {};
+    if (typeof v === 'object') return v || {};
+    try { return JSON.parse(String(v)) || {}; } catch(e){ return {}; }
+  }
+  function lang(){ return UI.isEn() ? 'en' : 'vi'; }
+
+  /* ──────────────────────────────────────────────────────────────────────── *
+   * Shared state
+   * ──────────────────────────────────────────────────────────────────────── */
+  var S = {
+    units: [], positions: [], employees: [],
+    loaded: false, loading: false, error: '',
+    selectedUnitId: null, selectedPositionId: null,
+    filter: { search:'', type:'all', status:'active' },
+    chart: {
+      mode:'units',          // 'units' | 'positions'
+      layout:'TB',           // 'TB' | 'LR' | 'RADIAL'
+      zoom:1, panX:0, panY:0,
+      locked:false,
+      showLegend:true
+    }
+  };
+
+  function indexData(){
+    S.byUnitId = {};
+    S.byPositionId = {};
+    S.byEmployeeId = {};
+    S.childrenOfUnit = {};
+    S.positionsByUnit = {};
+    S.employeesByPosition = {};
+    S.employeesByUnit = {};
+    S.units.forEach(function(u){
+      S.byUnitId[u.hcm_org_unit_id] = u;
+      var p = String(u.parent_org_unit_id || '');
+      (S.childrenOfUnit[p] = S.childrenOfUnit[p] || []).push(u);
+    });
+    S.positions.forEach(function(p){
+      S.byPositionId[p.hcm_position_id] = p;
+      var k = String(p.hcm_org_unit_id || '');
+      (S.positionsByUnit[k] = S.positionsByUnit[k] || []).push(p);
+    });
+    S.employees.forEach(function(e){
+      S.byEmployeeId[e.employee_id] = e;
+      var pk = String(e.hcm_position_id || '');
+      var uk = String(e.hcm_org_unit_id || '');
+      (S.employeesByPosition[pk] = S.employeesByPosition[pk] || []).push(e);
+      (S.employeesByUnit[uk] = S.employeesByUnit[uk] || []).push(e);
+    });
+    // sort children by org_unit_type weight then code
+    Object.keys(S.childrenOfUnit).forEach(function(k){
+      S.childrenOfUnit[k].sort(function(a,b){
+        var w = typeOrder(a.org_unit_type) - typeOrder(b.org_unit_type);
+        if (w) return w;
+        return String(a.org_unit_code||'').localeCompare(String(b.org_unit_code||''));
+      });
+    });
+    Object.keys(S.positionsByUnit).forEach(function(k){
+      S.positionsByUnit[k].sort(function(a,b){
+        return String(a.position_code||'').localeCompare(String(b.position_code||''));
+      });
+    });
+  }
+
+  function loadAll(force){
+    if (S.loading) return S._loadingPromise || Promise.resolve();
+    if (S.loaded && !force) return Promise.resolve();
+    S.loading = true; S.error = '';
+    var p = Promise.all([
+      UI.runtime.list('hcm_workforce','hcm_org_units', {limit:500, sort:'org_unit_code', direction:'asc'}),
+      UI.runtime.list('hcm_workforce','hcm_positions', {limit:500, sort:'position_code', direction:'asc'}),
+      UI.runtime.list('hcm_workforce','hcm_employees', {limit:500, sort:'employee_id',   direction:'asc'})
+    ]).then(function(results){
+      S.units     = (results[0] && results[0].data) || [];
+      S.positions = (results[1] && results[1].data) || [];
+      S.employees = (results[2] && results[2].data) || [];
+      S.loaded = true;
+      indexData();
+    }).catch(function(err){
+      S.error = (err && err.message) || 'org_load_failed';
+    }).then(function(){
+      S.loading = false;
+      S._loadingPromise = null;
+    });
+    S._loadingPromise = p;
+    return p;
+  }
+
+  /* ──────────────────────────────────────────────────────────────────────── *
+   * One-time CSS injection
+   * ──────────────────────────────────────────────────────────────────────── */
+  function injectCss(){
+    if (document.getElementById('admin-org-console-css')) return;
+    var css = ''
+      + '.org-console{display:flex;flex-direction:column;gap:14px;font-family:inherit;color:var(--text-1)}'
+      + '.org-kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}'
+      + '.org-kpi{position:relative;padding:12px 14px 12px 18px;border:1px solid var(--border-1,#e5e7eb);border-radius:12px;background:var(--surface-1,#fff);overflow:hidden}'
+      + '.org-kpi-band{position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:12px 0 0 12px}'
+      + '.org-kpi-label{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-3,#9ca3af)}'
+      + '.org-kpi-value{font-size:22px;font-weight:800;line-height:1.15;margin-top:4px;color:var(--text-1)}'
+      + '.org-kpi-hint{font-size:11px;color:var(--text-3);margin-top:4px}'
+      + '.org-toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--border-1,#e5e7eb);border-radius:12px;background:var(--surface-1,#fff)}'
+      + '.org-toolbar input[type="search"]{flex:1;min-width:220px;padding:8px 12px;border:1px solid var(--border-1,#e5e7eb);border-radius:8px;font-size:13px;background:var(--surface-1,#fff);color:var(--text-1)}'
+      + '.org-toolbar select{padding:8px 10px;border:1px solid var(--border-1,#e5e7eb);border-radius:8px;font-size:13px;background:var(--surface-1,#fff);color:var(--text-1)}'
+      + '.org-chip{padding:6px 12px;border:1px solid var(--border-1,#e5e7eb);border-radius:9999px;background:var(--surface-1,#fff);color:var(--text-1);cursor:pointer;font-size:12px;font-weight:600;display:inline-flex;align-items:center;gap:6px;transition:all .15s}'
+      + '.org-chip:hover{border-color:var(--brand-primary,#4f46e5)}'
+      + '.org-chip.is-active{background:var(--brand-primary,#4f46e5);color:#fff;border-color:var(--brand-primary,#4f46e5)}'
+      + '.org-chip.is-active:hover{filter:brightness(.96)}'
+      + '.org-grid{display:grid;grid-template-columns:280px minmax(0,1fr) 340px;gap:14px;min-height:560px}'
+      + '@media(max-width:1180px){.org-grid{grid-template-columns:240px minmax(0,1fr)}.org-pane-right{grid-column:1/-1}}'
+      + '.org-pane{border:1px solid var(--border-1,#e5e7eb);border-radius:14px;background:var(--surface-1,#fff);display:flex;flex-direction:column;min-height:0;overflow:hidden}'
+      + '.org-pane-head{padding:10px 14px;border-bottom:1px solid var(--border-1,#e5e7eb);font-size:12px;font-weight:700;color:var(--text-2);text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;justify-content:space-between;gap:8px;background:var(--surface-2,#f9fafb)}'
+      + '.org-pane-body{flex:1;overflow:auto;padding:8px}'
+      + '.org-tree{padding:4px 6px;font-size:13px}'
+      + '.org-tree-node{margin:1px 0}'
+      + '.org-tree-row{display:flex;align-items:center;gap:6px;padding:6px 8px;border-radius:8px;cursor:pointer;border:1px solid transparent;line-height:1.25}'
+      + '.org-tree-row:hover{background:var(--surface-2,#f9fafb)}'
+      + '.org-tree-row.is-selected{background:color-mix(in srgb,var(--brand-primary,#4f46e5) 14%,transparent);border-color:var(--brand-primary,#4f46e5)}'
+      + '.org-tree-row.is-inactive{opacity:.55}'
+      + '.org-tree-toggle{width:18px;text-align:center;color:var(--text-3);user-select:none;cursor:pointer}'
+      + '.org-tree-name{flex:1;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}'
+      + '.org-tree-code{font-size:10px;color:var(--text-3);font-family:ui-monospace,monospace}'
+      + '.org-tree-count{font-size:10px;background:var(--surface-2,#f9fafb);border:1px solid var(--border-1,#e5e7eb);border-radius:9999px;padding:1px 7px;color:var(--text-2);font-weight:700}'
+      + '.org-tree-children{margin-left:14px;border-left:1px dashed var(--border-1,#e5e7eb);padding-left:6px}'
+      + '.org-unit-card{margin:8px;border-radius:14px;border:1px solid var(--border-1,#e5e7eb);background:var(--surface-1,#fff);overflow:hidden;box-shadow:0 1px 2px rgba(0,0,0,0.02)}'
+      + '.org-unit-head{padding:14px 16px;display:flex;flex-direction:column;gap:4px;border-bottom:1px solid var(--border-1,#e5e7eb);position:relative}'
+      + '.org-unit-head::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px}'
+      + '.org-unit-meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;color:var(--text-3);font-size:12px}'
+      + '.org-unit-title{font-size:18px;font-weight:800;color:var(--text-1);display:flex;align-items:center;gap:8px}'
+      + '.org-unit-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;padding:10px 16px;background:var(--surface-2,#f9fafb);border-bottom:1px solid var(--border-1,#e5e7eb)}'
+      + '.org-unit-stat-l{font-size:10px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--text-3)}'
+      + '.org-unit-stat-v{font-size:18px;font-weight:800;color:var(--text-1);line-height:1.2;margin-top:2px}'
+      + '.org-position-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;padding:12px}'
+      + '.org-position-card{position:relative;border:1px solid var(--border-1,#e5e7eb);border-radius:12px;background:var(--surface-1,#fff);padding:12px;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;gap:8px}'
+      + '.org-position-card:hover{border-color:var(--brand-primary,#4f46e5);transform:translateY(-1px);box-shadow:0 4px 14px rgba(15,23,42,.06)}'
+      + '.org-position-card.is-selected{border-color:var(--brand-primary,#4f46e5);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand-primary,#4f46e5) 18%,transparent)}'
+      + '.org-position-card.is-inactive{opacity:.55}'
+      + '.org-position-head{display:flex;align-items:center;gap:10px}'
+      + '.org-position-icon{flex-shrink:0;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}'
+      + '.org-position-title{font-weight:700;font-size:13.5px;line-height:1.25;color:var(--text-1)}'
+      + '.org-position-code{font-size:10px;color:var(--text-3);font-family:ui-monospace,monospace}'
+      + '.org-position-foot{display:flex;flex-wrap:wrap;gap:6px;font-size:11px;color:var(--text-2)}'
+      + '.org-pos-pill{padding:2px 8px;border-radius:9999px;background:var(--surface-2,#f9fafb);border:1px solid var(--border-1,#e5e7eb);font-weight:600}'
+      + '.org-pos-pill.is-warn{background:color-mix(in srgb,#f59e0b 14%,#fff);border-color:#f59e0b;color:#92400e}'
+      + '.org-pos-pill.is-ok{background:color-mix(in srgb,#10b981 14%,#fff);border-color:#10b981;color:#065f46}'
+      + '.org-pos-pill.is-bad{background:color-mix(in srgb,#ef4444 14%,#fff);border-color:#ef4444;color:#991b1b}'
+      + '.org-detail-section{padding:10px 14px;border-bottom:1px solid var(--border-1,#e5e7eb)}'
+      + '.org-detail-section:last-child{border-bottom:0}'
+      + '.org-detail-l{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text-3);margin-bottom:6px}'
+      + '.org-detail-v{font-size:13.5px;color:var(--text-1);font-weight:600;line-height:1.4;word-break:break-word}'
+      + '.org-empty{padding:24px;text-align:center;color:var(--text-3);font-size:13px}'
+      + '.org-actions{display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px}'
+      + '.org-btn{padding:6px 12px;border:1px solid var(--border-1,#e5e7eb);border-radius:8px;background:var(--surface-1,#fff);color:var(--text-1);font-size:12px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:5px;transition:all .12s}'
+      + '.org-btn:hover{border-color:var(--brand-primary,#4f46e5);color:var(--brand-primary,#4f46e5)}'
+      + '.org-btn.is-primary{background:var(--brand-primary,#4f46e5);color:#fff;border-color:var(--brand-primary,#4f46e5)}'
+      + '.org-btn.is-primary:hover{filter:brightness(.95);color:#fff}'
+      + '.org-btn.is-danger{color:#dc2626}'
+      + '.org-btn.is-danger:hover{background:#fef2f2;border-color:#dc2626;color:#dc2626}'
+      /* Sơ đồ tổ chức (canvas) */
+      + '.org-canvas-wrap{position:relative;border:1px solid var(--border-1,#e5e7eb);border-radius:14px;background:var(--surface-1,#fff);overflow:hidden;height:calc(100vh - 250px);min-height:520px}'
+      + '.org-canvas-toolbar{position:absolute;top:10px;left:10px;right:10px;z-index:5;display:flex;flex-wrap:wrap;gap:8px;align-items:center;pointer-events:none}'
+      + '.org-canvas-toolbar > *{pointer-events:auto}'
+      + '.org-canvas-tools{display:flex;gap:6px;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:10px;background:var(--surface-1,#fff);box-shadow:0 2px 8px rgba(15,23,42,.06)}'
+      + '.org-canvas-svg{width:100%;height:100%;display:block;cursor:grab;background:var(--surface-1,#fff)}'
+      + '.org-canvas-svg.is-panning{cursor:grabbing}'
+      + '.org-canvas-svg.is-dragging-node{cursor:move}'
+      + '.org-grid-bg{fill:var(--surface-2,#f9fafb);stroke:var(--border-1,#e5e7eb);stroke-width:.5}'
+      + '.org-node-rect{fill:var(--surface-1,#fff);stroke:var(--border-1,#e5e7eb);stroke-width:1.2;rx:14;ry:14;transition:filter .15s}'
+      + '.org-node-rect.is-hover{filter:drop-shadow(0 2px 8px rgba(15,23,42,.18))}'
+      + '.org-node-rect.is-selected{stroke:var(--brand-primary,#4f46e5);stroke-width:2.4}'
+      + '.org-node-rect.is-drop-target{stroke:#10b981;stroke-width:3;stroke-dasharray:6 3}'
+      + '.org-node-band{rx:0;ry:0}'
+      + '.org-node-title{font-family:inherit;font-weight:800;fill:var(--text-1)}'
+      + '.org-node-sub{font-family:inherit;fill:var(--text-3);font-size:10.5px}'
+      + '.org-node-code{font-family:ui-monospace,monospace;fill:var(--text-3);font-size:9.5px}'
+      + '.org-node-icon{font-size:18px}'
+      + '.org-edge{fill:none;stroke:var(--text-3);stroke-width:1.4;opacity:.65}'
+      + '.org-edge.is-highlight{stroke:var(--brand-primary,#4f46e5);stroke-width:2;opacity:1}'
+      + '.org-legend{position:absolute;bottom:10px;left:10px;padding:10px 12px;border:1px solid var(--border-1,#e5e7eb);border-radius:10px;background:var(--surface-1,#fff);font-size:11px;display:flex;flex-direction:column;gap:5px;z-index:5;box-shadow:0 2px 8px rgba(15,23,42,.06);max-width:200px}'
+      + '.org-legend-row{display:flex;align-items:center;gap:8px}'
+      + '.org-legend-swatch{width:14px;height:14px;border-radius:3px}'
+      + '.org-mini{position:absolute;bottom:10px;right:10px;width:200px;height:140px;border:1px solid var(--border-1,#e5e7eb);border-radius:10px;background:var(--surface-1,#fff);overflow:hidden;z-index:5;box-shadow:0 2px 8px rgba(15,23,42,.06)}'
+      + '.org-mini svg{width:100%;height:100%;display:block;background:var(--surface-2,#f9fafb)}'
+      + '.org-mini-vp{fill:none;stroke:var(--brand-primary,#4f46e5);stroke-width:2}'
+      + '.org-zoom-pill{padding:6px 10px;border:1px solid var(--border-1,#e5e7eb);border-radius:9999px;background:var(--surface-1,#fff);font-size:11px;font-weight:700;color:var(--text-2);font-family:ui-monospace,monospace}'
+      /* Modals/forms */
+      + '.org-form-row{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}'
+      + '.org-form-row label{font-size:12px;font-weight:600;color:var(--text-2)}'
+      + '.org-form-row input,.org-form-row select,.org-form-row textarea{padding:8px 10px;border:1px solid var(--border-1,#e5e7eb);border-radius:8px;font-size:13px;background:var(--surface-1,#fff);color:var(--text-1);font-family:inherit}'
+      + '.org-form-row input:focus,.org-form-row select:focus,.org-form-row textarea:focus{outline:0;border-color:var(--brand-primary,#4f46e5);box-shadow:0 0 0 3px color-mix(in srgb,var(--brand-primary,#4f46e5) 18%,transparent)}'
+      + '.org-color-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(36px,1fr));gap:6px}'
+      + '.org-color-swatch{width:32px;height:32px;border-radius:8px;cursor:pointer;border:2px solid transparent;transition:transform .12s}'
+      + '.org-color-swatch:hover{transform:scale(1.08)}'
+      + '.org-color-swatch.is-selected{border-color:var(--text-1);transform:scale(1.08)}'
+      ;
+    var s = document.createElement('style');
+    s.id = 'admin-org-console-css';
+    s.textContent = css;
+    document.head.appendChild(s);
+  }
+
+  /* ──────────────────────────────────────────────────────────────────────── *
+   * Common toolbar
+   * ──────────────────────────────────────────────────────────────────────── */
+  function renderTypeChips(){
+    var current = S.filter.type;
+    var html = '<button type="button" class="org-chip '+(current==='all'?'is-active':'')+'" data-act="set-type" data-val="all">'+
+               (lang()==='en'?'All types':'Tất cả')+'</button>';
+    Object.keys(TYPE_META).forEach(function(k){
+      var m = TYPE_META[k];
+      var on = current === k;
+      html += '<button type="button" class="org-chip '+(on?'is-active':'')+'" data-act="set-type" data-val="'+k+'">'
+            + '<span>'+m.icon+'</span>' + (lang()==='en'?m.labelEn:m.label) + '</button>';
+    });
+    return html;
+  }
+
+  /* ──────────────────────────────────────────────────────────────────────── *
+   * Phòng ban & Chức danh — three-pane workbench
+   * ──────────────────────────────────────────────────────────────────────── */
+  function renderOrgUnits(host){
+    injectCss();
+    if (!host) return;
+    if (S.loading || !S.loaded){
+      host.innerHTML = UI.loadingHtml(t('Loading workforce catalog…','Đang tải danh mục tổ chức…'));
+      loadAll().then(function(){ renderOrgUnits(host); });
+      return;
+    }
+    if (S.error){
+      host.innerHTML = UI.errorHtml(S.error, function(){ S.loaded=false; renderOrgUnits(host); });
+      return;
+    }
+    if (!S.units.length){
+      host.innerHTML = ''
+        + '<div class="org-console">'
+        +   '<div class="org-empty">'+esc(t('No org units yet. Start by creating the root company node.','Chưa có đơn vị nào. Tạo công ty gốc để bắt đầu.'))+'<br>'
+        +     '<button class="org-btn is-primary" style="margin-top:12px" data-act="create-unit-root">'+esc(t('+ Create root unit','+ Tạo đơn vị gốc'))+'</button>'
+        +   '</div>'
+        + '</div>';
+      bindOrgUnitsEvents(host);
+      return;
+    }
+
+    // Auto-select root if nothing selected
+    if (!S.selectedUnitId || !S.byUnitId[S.selectedUnitId]){
+      var roots = S.childrenOfUnit[''] || [];
+      if (roots.length) S.selectedUnitId = roots[0].hcm_org_unit_id;
+    }
+
+    var totalUnits = S.units.length;
+    var activeUnits = S.units.filter(function(u){ return String(u.status||'active')!=='inactive'; }).length;
+    var totalPositions = S.positions.length;
+    var activePositions = S.positions.filter(function(p){ return String(p.status||'active')!=='inactive'; }).length;
+    var totalHc = S.positions.reduce(function(s,p){ return s + (parseInt(p.required_headcount,10)||0); }, 0);
+    var filledHc = S.employees.filter(function(e){ return String(e.employment_status||'active')==='active'; }).length;
+    var openHc = Math.max(0, totalHc - filledHc);
+    var fillPct = totalHc ? Math.round(filledHc * 100 / totalHc) : 0;
+
+    var kpiHtml = ''
+      + '<div class="org-kpi-row">'
+      +   kpiCard('🏢', t('Org units','Đơn vị'),     activeUnits+' / '+totalUnits, '#0ea5e9', t('active / total','đang dùng / tổng'))
+      +   kpiCard('💼', t('Positions','Vị trí'),     activePositions+' / '+totalPositions, '#8b5cf6', t('active / total','đang dùng / tổng'))
+      +   kpiCard('🪑', t('Headcount','Định biên'),  filledHc+' / '+totalHc, '#10b981', fillPct+'% '+t('filled','đã điền'))
+      +   kpiCard('📭', t('Open seats','Chỗ trống'), openHc+'',              '#f59e0b', openHc>0 ? t('positions to recruit','vị trí đang trống') : t('fully staffed','đã đầy đủ'))
+      + '</div>';
+
+    var toolbarHtml = ''
+      + '<div class="org-toolbar">'
+      +   '<input type="search" data-act="search" value="'+esc(S.filter.search||'')+'" placeholder="'+esc(t('Search unit, position, code…','Tìm đơn vị, vị trí, mã…'))+'">'
+      +   '<select data-act="set-status">'
+      +     '<option value="active"'  + (S.filter.status==='active'?' selected':'')   + '>'+esc(t('Active only','Đang hoạt động'))+'</option>'
+      +     '<option value="inactive"'+ (S.filter.status==='inactive'?' selected':'') + '>'+esc(t('Inactive only','Ngừng dùng'))+'</option>'
+      +     '<option value="all"'     + (S.filter.status==='all'?' selected':'')      + '>'+esc(t('All','Tất cả'))+'</option>'
+      +   '</select>'
+      +   renderTypeChips()
+      +   '<span style="flex:1"></span>'
+      +   '<button class="org-btn" data-act="reload">🔄 '+esc(t('Reload','Tải lại'))+'</button>'
+      +   '<button class="org-btn is-primary" data-act="create-unit-root">'+esc(t('+ Unit','+ Đơn vị'))+'</button>'
+      + '</div>';
+
+    var treeHtml = renderTree();
+    var detailHtml = renderUnitDetail(S.selectedUnitId);
+    var positionPaneHtml = renderPositionPane(S.selectedPositionId);
+
+    host.innerHTML = ''
+      + '<div class="org-console">'
+      +   kpiHtml
+      +   toolbarHtml
+      +   '<div class="org-grid">'
+      +     '<div class="org-pane">'
+      +       '<div class="org-pane-head">'
+      +         '<span>'+esc(t('Org outline','Cây tổ chức'))+'</span>'
+      +         '<button class="org-btn" data-act="expand-all" title="'+esc(t('Expand all','Mở rộng tất cả'))+'">⇲</button>'
+      +       '</div>'
+      +       '<div class="org-pane-body">'+treeHtml+'</div>'
+      +     '</div>'
+      +     '<div class="org-pane">'
+      +       '<div class="org-pane-head">'
+      +         '<span>'+esc(t('Unit detail','Chi tiết đơn vị'))+'</span>'
+      +         '<span class="org-tree-code" id="orgu-bc"></span>'
+      +       '</div>'
+      +       '<div class="org-pane-body">'+detailHtml+'</div>'
+      +     '</div>'
+      +     '<div class="org-pane org-pane-right">'
+      +       '<div class="org-pane-head">'
+      +         '<span>'+esc(t('Position','Vị trí'))+'</span>'
+      +       '</div>'
+      +       '<div class="org-pane-body" id="orgu-pos-pane">'+positionPaneHtml+'</div>'
+      +     '</div>'
+      +   '</div>'
+      + '</div>';
+
+    bindOrgUnitsEvents(host);
+    updateBreadcrumb();
+  }
+
+  function kpiCard(icon, label, value, color, hint){
+    return ''
+      + '<div class="org-kpi">'
+      +   '<div class="org-kpi-band" style="background:'+color+'"></div>'
+      +   '<div class="org-kpi-label">'+icon+' '+esc(label)+'</div>'
+      +   '<div class="org-kpi-value">'+esc(String(value))+'</div>'
+      +   (hint ? '<div class="org-kpi-hint">'+esc(hint)+'</div>' : '')
+      + '</div>';
+  }
+
+  function unitMatchesFilter(u){
+    if (S.filter.type !== 'all' && String(u.org_unit_type||'') !== S.filter.type) return false;
+    var active = String(u.status||'active') !== 'inactive';
+    if (S.filter.status === 'active'   && !active) return false;
+    if (S.filter.status === 'inactive' &&  active) return false;
+    if (S.filter.search){
+      var needle = S.filter.search.toLowerCase();
+      var fields = [u.org_unit_code, u.org_unit_name, u.org_unit_type];
+      var positionsHere = S.positionsByUnit[u.hcm_org_unit_id] || [];
+      positionsHere.forEach(function(p){ fields.push(p.position_code); fields.push(p.position_title); });
+      var hay = fields.filter(Boolean).join(' ').toLowerCase();
+      if (hay.indexOf(needle) < 0) return false;
+    }
+    return true;
+  }
+  function unitOrAncestorMatches(u){
+    if (unitMatchesFilter(u)) return true;
+    var children = S.childrenOfUnit[u.hcm_org_unit_id] || [];
+    return children.some(unitOrAncestorMatches);
+  }
+
+  function renderTree(){
+    var roots = S.childrenOfUnit[''] || [];
+    if (!roots.length){
+      return '<div class="org-empty">'+esc(t('No root unit','Chưa có đơn vị gốc'))+'</div>';
+    }
+    return '<div class="org-tree">' + roots.map(function(r){ return renderTreeNode(r, 0); }).join('') + '</div>';
+  }
+  function renderTreeNode(unit, depth){
+    if (!unitOrAncestorMatches(unit)) return '';
+    var meta = typeMeta(unit.org_unit_type);
+    var color = unitColor(unit);
+    var children = S.childrenOfUnit[unit.hcm_org_unit_id] || [];
+    var positions = S.positionsByUnit[unit.hcm_org_unit_id] || [];
+    var selected = S.selectedUnitId === unit.hcm_org_unit_id;
+    var inactive = String(unit.status||'active') === 'inactive';
+    var hasKids = children.length > 0;
+    var nodeKey = String(unit.hcm_org_unit_id);
+    var collapsed = S._collapsed && S._collapsed[nodeKey];
+    var rowHtml = ''
+      + '<div class="org-tree-row '+(selected?'is-selected':'')+' '+(inactive?'is-inactive':'')+'" data-act="select-unit" data-unit-id="'+esc(nodeKey)+'" title="'+esc(unit.org_unit_name||'')+'">'
+      +   (hasKids
+            ? '<span class="org-tree-toggle" data-act="toggle-tree" data-unit-id="'+esc(nodeKey)+'">'+(collapsed?'▶':'▼')+'</span>'
+            : '<span class="org-tree-toggle">·</span>')
+      +   '<span style="font-size:14px">'+meta.icon+'</span>'
+      +   '<span class="org-tree-name" style="color:'+color+'">'+esc(unit.org_unit_name || unit.org_unit_code || '?')+'</span>'
+      +   '<span class="org-tree-code">'+esc(unit.org_unit_code||'')+'</span>'
+      +   (positions.length ? '<span class="org-tree-count">'+positions.length+'</span>' : '')
+      + '</div>';
+    var childHtml = '';
+    if (hasKids && !collapsed){
+      childHtml = '<div class="org-tree-children">'
+                + children.map(function(c){ return renderTreeNode(c, depth+1); }).join('')
+                + '</div>';
+    }
+    return '<div class="org-tree-node">'+rowHtml+childHtml+'</div>';
+  }
+
+  function renderUnitDetail(unitId){
+    var u = S.byUnitId[unitId];
+    if (!u){
+      return '<div class="org-empty">'+esc(t('Select a unit from the tree on the left.','Chọn một đơn vị từ cây bên trái.'))+'</div>';
+    }
+    var meta = typeMeta(u.org_unit_type);
+    var color = unitColor(u);
+    var positions = (S.positionsByUnit[u.hcm_org_unit_id] || []).slice();
+    var employeesHere = S.employeesByUnit[u.hcm_org_unit_id] || [];
+    var totalHc = positions.reduce(function(s,p){ return s + (parseInt(p.required_headcount,10)||0); }, 0);
+    var filledHc = employeesHere.filter(function(e){ return String(e.employment_status||'active')==='active'; }).length;
+    var openHc = Math.max(0, totalHc - filledHc);
+    var managerEmployeeId = String(u.manager_employee_id || '');
+    var manager = S.byEmployeeId[managerEmployeeId];
+    var unitMeta = safeJson(u.metadata);
+    var inactive = String(u.status||'active') === 'inactive';
+    var parent = u.parent_org_unit_id ? S.byUnitId[u.parent_org_unit_id] : null;
+
+    var posHtml = positions.length
+      ? positions.map(function(p){ return renderPositionCard(p, u); }).join('')
+      : '<div class="org-empty" style="grid-column:1/-1">'+esc(t('No positions yet. Click + Position to add one.','Chưa có vị trí nào. Bấm + Vị trí để thêm.'))+'</div>';
+
+    return ''
+      + '<article class="org-unit-card">'
+      +   '<div class="org-unit-head">'
+      +     '<style>.org-unit-head::before{background:'+color+'}</style>'
+      +     '<div class="org-unit-meta">'
+      +       '<span style="display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:9999px;background:color-mix(in srgb,'+color+' 14%,transparent);color:'+color+';font-weight:700">'+meta.icon+' '+(lang()==='en'?meta.labelEn:meta.label)+'</span>'
+      +       (parent ? '<span>↑ '+esc(parent.org_unit_name||parent.org_unit_code||'?')+'</span>' : '<span>'+esc(t('(root)','(gốc)'))+'</span>')
+      +       (inactive ? UI.badge(t('Inactive','Ngừng dùng'),'danger') : UI.badge(t('Active','Đang hoạt động'),'success'))
+      +       (unitMeta.cost_center ? '<span>💳 '+esc(String(unitMeta.cost_center))+'</span>' : '')
+      +     '</div>'
+      +     '<div class="org-unit-title"><span style="font-size:24px">'+meta.icon+'</span><span style="color:'+color+'">'+esc(u.org_unit_name||'?')+'</span><span class="org-tree-code">'+esc(u.org_unit_code||'')+'</span></div>'
+      +     (manager ? '<div style="font-size:12px;color:var(--text-3);margin-top:2px">👑 '+esc(t('Manager','Trưởng đơn vị'))+': <b style="color:var(--text-1)">'+esc(manager.employee_id || managerEmployeeId)+'</b></div>' : '')
+      +   '</div>'
+      +   '<div class="org-unit-stats">'
+      +     '<div><div class="org-unit-stat-l">'+esc(t('Positions','Vị trí'))+'</div><div class="org-unit-stat-v">'+positions.length+'</div></div>'
+      +     '<div><div class="org-unit-stat-l">'+esc(t('Headcount','Định biên'))+'</div><div class="org-unit-stat-v">'+totalHc+'</div></div>'
+      +     '<div><div class="org-unit-stat-l">'+esc(t('Filled','Đã điền'))+'</div><div class="org-unit-stat-v" style="color:#10b981">'+filledHc+'</div></div>'
+      +     '<div><div class="org-unit-stat-l">'+esc(t('Open','Còn trống'))+'</div><div class="org-unit-stat-v" style="color:'+(openHc>0?'#f59e0b':'#10b981')+'">'+openHc+'</div></div>'
+      +     '<div><div class="org-unit-stat-l">'+esc(t('Children','Đơn vị con'))+'</div><div class="org-unit-stat-v">'+(S.childrenOfUnit[u.hcm_org_unit_id]||[]).length+'</div></div>'
+      +   '</div>'
+      +   '<div class="org-actions">'
+      +     '<button class="org-btn is-primary" data-act="add-position" data-unit-id="'+esc(u.hcm_org_unit_id)+'">'+esc(t('+ Position','+ Vị trí'))+'</button>'
+      +     '<button class="org-btn" data-act="add-child-unit" data-unit-id="'+esc(u.hcm_org_unit_id)+'">'+esc(t('+ Child unit','+ Đơn vị con'))+'</button>'
+      +     '<button class="org-btn" data-act="edit-unit" data-unit-id="'+esc(u.hcm_org_unit_id)+'">✏️ '+esc(t('Edit','Sửa'))+'</button>'
+      +     '<button class="org-btn" data-act="recolor-unit" data-unit-id="'+esc(u.hcm_org_unit_id)+'">🎨 '+esc(t('Color','Màu'))+'</button>'
+      +     '<button class="org-btn" data-act="reparent-unit" data-unit-id="'+esc(u.hcm_org_unit_id)+'">🔗 '+esc(t('Reparent','Chuyển cha'))+'</button>'
+      +     '<button class="org-btn '+(inactive?'is-primary':'is-danger')+'" data-act="toggle-unit" data-unit-id="'+esc(u.hcm_org_unit_id)+'">'+esc(inactive?t('Activate','Kích hoạt'):t('Archive','Ngừng dùng'))+'</button>'
+      +     '<button class="org-btn" data-act="open-chart" data-unit-id="'+esc(u.hcm_org_unit_id)+'">'+esc(t('View on chart','Xem trên sơ đồ'))+' ↗</button>'
+      +   '</div>'
+      +   '<div class="org-position-grid">'+posHtml+'</div>'
+      + '</article>';
+  }
+
+  function renderPositionCard(p, unit){
+    var color = unitColor(unit);
+    var icon  = positionIcon(p.position_title);
+    var employees = S.employeesByPosition[p.hcm_position_id] || [];
+    var filled = employees.filter(function(e){ return String(e.employment_status||'active')==='active'; }).length;
+    var hc = parseInt(p.required_headcount,10) || 1;
+    var open = Math.max(0, hc - filled);
+    var inactive = String(p.status||'active') === 'inactive';
+    var fillCls = open>0 ? 'is-warn' : 'is-ok';
+    var selected = S.selectedPositionId === p.hcm_position_id;
+    var typeBadge = p.employment_type ? '<span class="org-pos-pill">'+esc(p.employment_type)+'</span>' : '';
+    var gradeBadge = p.grade_code ? '<span class="org-pos-pill">'+esc(p.grade_code)+'</span>' : '';
+    return ''
+      + '<div class="org-position-card '+(selected?'is-selected':'')+' '+(inactive?'is-inactive':'')+'" data-act="select-position" data-pos-id="'+esc(p.hcm_position_id)+'">'
+      +   '<div class="org-position-head">'
+      +     '<div class="org-position-icon" style="background:color-mix(in srgb,'+color+' 18%,transparent);color:'+color+'">'+icon+'</div>'
+      +     '<div style="flex:1;min-width:0">'
+      +       '<div class="org-position-title">'+esc(p.position_title||'?')+'</div>'
+      +       '<div class="org-position-code">'+esc(p.position_code||'')+'</div>'
+      +     '</div>'
+      +   '</div>'
+      +   '<div class="org-position-foot">'
+      +     '<span class="org-pos-pill '+fillCls+'">'+filled+'/'+hc+' '+esc(t('filled','đã điền'))+'</span>'
+      +     (open>0 ? '<span class="org-pos-pill is-warn">+'+open+' '+esc(t('open','trống'))+'</span>' : '')
+      +     gradeBadge
+      +     typeBadge
+      +     (inactive ? '<span class="org-pos-pill is-bad">'+esc(t('inactive','ngừng dùng'))+'</span>' : '')
+      +   '</div>'
+      + '</div>';
+  }
+
+  function renderPositionPane(positionId){
+    var p = positionId ? S.byPositionId[positionId] : null;
+    if (!p){
+      return '<div class="org-empty">'+esc(t('Select a position card to see its detail and assigned people.','Chọn một thẻ vị trí để xem chi tiết và nhân sự được giao.'))+'</div>';
+    }
+    var u = S.byUnitId[p.hcm_org_unit_id];
+    var employees = (S.employeesByPosition[p.hcm_position_id] || []).slice();
+    var reportsTo = p.reports_to_position_id ? S.byPositionId[p.reports_to_position_id] : null;
+    var hc = parseInt(p.required_headcount,10) || 1;
+    var filled = employees.filter(function(e){ return String(e.employment_status||'active')==='active'; }).length;
+    var open = Math.max(0, hc - filled);
+    var icon = positionIcon(p.position_title);
+    var inactive = String(p.status||'active') === 'inactive';
+
+    var employeeRows = employees.length ? employees.map(function(e){
+      var status = String(e.employment_status||'active');
+      var statusColor = status==='active'?'#10b981':(status==='leave'?'#f59e0b':(status==='terminated'?'#ef4444':'#9ca3af'));
+      return '<div style="display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px dashed var(--border-1,#e5e7eb)">'
+           +   '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+statusColor+'"></span>'
+           +   '<span style="font-family:ui-monospace,monospace;font-size:11px;color:var(--text-3)">'+esc(e.employee_id||'')+'</span>'
+           +   '<span style="flex:1;font-weight:600">'+esc(e.employee_id||'?')+'</span>'
+           +   '<span style="font-size:11px;color:'+statusColor+';font-weight:600">'+esc(status)+'</span>'
+           + '</div>';
+    }).join('') : '<div class="org-empty" style="padding:14px">'+esc(t('No employees assigned to this position yet.','Chưa có nhân sự nào được giao vào vị trí này.'))+'</div>';
+
+    return ''
+      + '<div class="org-detail-section">'
+      +   '<div style="display:flex;align-items:center;gap:10px">'
+      +     '<div class="org-position-icon" style="background:color-mix(in srgb,'+(u?unitColor(u):'#4f46e5')+' 18%,transparent);color:'+(u?unitColor(u):'#4f46e5')+'">'+icon+'</div>'
+      +     '<div style="flex:1;min-width:0">'
+      +       '<div style="font-weight:800;font-size:15px;color:var(--text-1)">'+esc(p.position_title||'?')+'</div>'
+      +       '<div class="org-position-code">'+esc(p.position_code||'')+'</div>'
+      +     '</div>'
+      +     (inactive ? UI.badge(t('Inactive','Ngừng dùng'),'danger') : UI.badge(t('Active','Đang hoạt động'),'success'))
+      +   '</div>'
+      + '</div>'
+      + '<div class="org-detail-section">'
+      +   '<div class="org-detail-l">'+esc(t('Org unit','Đơn vị'))+'</div>'
+      +   '<div class="org-detail-v">'+(u ? esc((u.org_unit_name||'')+' ('+(u.org_unit_code||'')+')') : '—')+'</div>'
+      + '</div>'
+      + '<div class="org-detail-section">'
+      +   '<div class="org-detail-l">'+esc(t('Reports to','Báo cáo cho'))+'</div>'
+      +   '<div class="org-detail-v">'+(reportsTo ? esc((reportsTo.position_title||'')+' ('+(reportsTo.position_code||'')+')') : '—')+'</div>'
+      + '</div>'
+      + '<div class="org-detail-section" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+      +   '<div><div class="org-detail-l">'+esc(t('Type','Loại'))+'</div><div class="org-detail-v">'+esc(p.employment_type||'—')+'</div></div>'
+      +   '<div><div class="org-detail-l">'+esc(t('Grade','Bậc'))+'</div><div class="org-detail-v">'+esc(p.grade_code||'—')+'</div></div>'
+      +   '<div><div class="org-detail-l">'+esc(t('Headcount','Định biên'))+'</div><div class="org-detail-v">'+hc+'</div></div>'
+      +   '<div><div class="org-detail-l">'+esc(t('Filled','Đã điền'))+'</div><div class="org-detail-v" style="color:#10b981">'+filled+'</div></div>'
+      +   '<div><div class="org-detail-l">'+esc(t('Open','Còn trống'))+'</div><div class="org-detail-v" style="color:'+(open>0?'#f59e0b':'#10b981')+'">'+open+'</div></div>'
+      + '</div>'
+      + '<div class="org-detail-section">'
+      +   '<div class="org-detail-l">'+esc(t('Assigned employees','Nhân sự được giao'))+' ('+employees.length+')</div>'
+      +   employeeRows
+      + '</div>'
+      + '<div class="org-actions" style="border-top:1px solid var(--border-1,#e5e7eb)">'
+      +   '<button class="org-btn" data-act="edit-position" data-pos-id="'+esc(p.hcm_position_id)+'">✏️ '+esc(t('Edit','Sửa'))+'</button>'
+      +   '<button class="org-btn" data-act="reparent-position" data-pos-id="'+esc(p.hcm_position_id)+'">🔗 '+esc(t('Move to dept','Chuyển phòng'))+'</button>'
+      +   '<button class="org-btn '+(inactive?'is-primary':'is-danger')+'" data-act="toggle-position" data-pos-id="'+esc(p.hcm_position_id)+'">'+esc(inactive?t('Activate','Kích hoạt'):t('Archive','Ngừng dùng'))+'</button>'
+      + '</div>';
+  }
+
+  function updateBreadcrumb(){
+    var bc = document.getElementById('orgu-bc');
+    if (!bc) return;
+    var u = S.selectedUnitId ? S.byUnitId[S.selectedUnitId] : null;
+    if (!u){ bc.textContent = ''; return; }
+    var trail = [];
+    var cur = u;
+    var safety = 0;
+    while (cur && safety++ < 50){
+      trail.unshift(cur.org_unit_code || cur.org_unit_name || '?');
+      cur = cur.parent_org_unit_id ? S.byUnitId[cur.parent_org_unit_id] : null;
+    }
+    bc.textContent = trail.join(' / ');
+  }
+
+  /* ── Phòng ban events ─────────────────────────────────────────────────── */
+  function bindOrgUnitsEvents(host){
+    if (host._bound) return;
+    host._bound = true;
+    host.addEventListener('click', function(ev){
+      var el = ev.target.closest('[data-act]'); if (!el) return;
+      var act = el.getAttribute('data-act');
+      var unitId = el.getAttribute('data-unit-id');
+      var posId = el.getAttribute('data-pos-id');
+
+      if (act === 'select-unit'){
+        S.selectedUnitId = unitId;
+        S.selectedPositionId = null;
+        renderOrgUnits(host);
+      } else if (act === 'toggle-tree'){
+        ev.stopPropagation();
+        S._collapsed = S._collapsed || {};
+        S._collapsed[unitId] = !S._collapsed[unitId];
+        renderOrgUnits(host);
+      } else if (act === 'select-position'){
+        S.selectedPositionId = posId;
+        // Only re-render the right pane + re-mark selected card
+        var pane = document.getElementById('orgu-pos-pane');
+        if (pane) pane.innerHTML = renderPositionPane(posId);
+        host.querySelectorAll('.org-position-card.is-selected').forEach(function(c){ c.classList.remove('is-selected'); });
+        host.querySelectorAll('.org-position-card[data-pos-id="'+posId+'"]').forEach(function(c){ c.classList.add('is-selected'); });
+      } else if (act === 'set-type'){
+        S.filter.type = el.getAttribute('data-val') || 'all';
+        renderOrgUnits(host);
+      } else if (act === 'reload'){
+        loadAll(true).then(function(){ renderOrgUnits(host); });
+      } else if (act === 'create-unit-root'){
+        openUnitModal(null, null, host);
+      } else if (act === 'add-child-unit'){
+        openUnitModal(null, unitId, host);
+      } else if (act === 'add-position'){
+        openPositionModal(null, unitId, host);
+      } else if (act === 'edit-unit'){
+        openUnitModal(unitId, null, host);
+      } else if (act === 'edit-position'){
+        openPositionModal(posId, null, host);
+      } else if (act === 'recolor-unit'){
+        openColorModal(unitId, host);
+      } else if (act === 'reparent-unit'){
+        openReparentUnitModal(unitId, host);
+      } else if (act === 'reparent-position'){
+        openReparentPositionModal(posId, host);
+      } else if (act === 'toggle-unit'){
+        toggleUnit(unitId, host);
+      } else if (act === 'toggle-position'){
+        togglePosition(posId, host);
+      } else if (act === 'open-chart'){
+        // Trigger sibling Sơ đồ tổ chức tab via the legacy global pattern.
+        if (typeof window.switchAdminTab === 'function'){
+          window.switchAdminTab('orgchart');
+        } else {
+          try { window.adminTab = 'orgchart'; if (typeof window.renderAdmin === 'function') window.renderAdmin(); }
+          catch(_){ if (typeof window.showToast === 'function') window.showToast(t('Switch to Sơ đồ tổ chức tab','Chuyển sang tab Sơ đồ tổ chức')); }
+        }
+      } else if (act === 'expand-all'){
+        S._collapsed = {};
+        renderOrgUnits(host);
+      }
+    });
+    host.addEventListener('input', function(ev){
+      var el = ev.target.closest('[data-act]'); if (!el) return;
+      var act = el.getAttribute('data-act');
+      if (act === 'search'){
+        S.filter.search = String(el.value || '').trim();
+        clearTimeout(host._searchT);
+        host._searchT = setTimeout(function(){ renderOrgUnits(host); }, 180);
+      } else if (act === 'set-status'){
+        S.filter.status = String(el.value || 'active');
+        renderOrgUnits(host);
+      }
+    });
+    host.addEventListener('change', function(ev){
+      var el = ev.target.closest('[data-act]'); if (!el) return;
+      if (el.getAttribute('data-act') === 'set-status'){
+        S.filter.status = String(el.value || 'active');
+        renderOrgUnits(host);
+      }
+    });
+  }
+
+  /* ── Org-unit CRUD modals ─────────────────────────────────────────────── */
+  function openUnitModal(unitId, parentUnitId, host){
+    var existing = unitId ? S.byUnitId[unitId] : null;
+    var meta = existing ? safeJson(existing.metadata) : {};
+    var body = document.createElement('div');
+    body.innerHTML = ''
+      + '<div class="org-form-row"><label>'+esc(t('Code','Mã'))+'</label><input data-f="org_unit_code" value="'+esc(existing ? (existing.org_unit_code||'') : '')+'" '+(existing?'readonly':'')+' placeholder="ENG, QA, PROD…"></div>'
+      + '<div class="org-form-row"><label>'+esc(t('Name','Tên'))+'</label><input data-f="org_unit_name" value="'+esc(existing ? (existing.org_unit_name||'') : '')+'" placeholder="'+esc(t('Engineering','Kỹ thuật'))+'"></div>'
+      + '<div class="org-form-row"><label>'+esc(t('Type','Loại'))+'</label><select data-f="org_unit_type">'
+      +   Object.keys(TYPE_META).map(function(k){
+            var sel = (existing ? existing.org_unit_type : 'department') === k;
+            return '<option value="'+k+'"'+(sel?' selected':'')+'>'+TYPE_META[k].icon+' '+(lang()==='en'?TYPE_META[k].labelEn:TYPE_META[k].label)+'</option>';
+          }).join('')
+      + '</select></div>'
+      + '<div class="org-form-row"><label>'+esc(t('Parent unit','Đơn vị cha'))+'</label><select data-f="parent_org_unit_id">'
+      +   '<option value="">— '+esc(t('(root level)','(cấp gốc)'))+' —</option>'
+      +   S.units.filter(function(u){ return !existing || u.hcm_org_unit_id !== existing.hcm_org_unit_id; }).map(function(u){
+            var sel = (parentUnitId && u.hcm_org_unit_id === parentUnitId) || (existing && u.hcm_org_unit_id === existing.parent_org_unit_id);
+            return '<option value="'+esc(u.hcm_org_unit_id)+'"'+(sel?' selected':'')+'>'+typeMeta(u.org_unit_type).icon+' '+esc(u.org_unit_name||u.org_unit_code||'?')+' ('+esc(u.org_unit_code||'')+')</option>';
+          }).join('')
+      + '</select></div>'
+      + '<div class="org-form-row"><label>'+esc(t('Cost center','Mã chi phí'))+'</label><input data-f="cost_center" value="'+esc(existing ? (existing.cost_center||'') : '')+'" placeholder="CC-001"></div>'
+      + '<div class="org-form-row"><label>'+esc(t('Manager (employee_id)','Trưởng đơn vị (employee_id)'))+'</label><input data-f="manager_employee_id" value="'+esc(existing ? (existing.manager_employee_id||'') : '')+'" placeholder="EMP-0001"></div>'
+      ;
+    UI.openModal({
+      title: existing ? t('Edit unit','Sửa đơn vị') : t('Create unit','Tạo đơn vị'),
+      body: body,
+      width: '480px',
+      buttons: [
+        { label: t('Cancel','Hủy'), variant:'secondary', onClick:function(close){ close(); } },
+        { label: existing ? t('Save','Lưu') : t('Create','Tạo'), variant:'primary', onClick: function(close){
+            var get = function(f){ var n = body.querySelector('[data-f="'+f+'"]'); return n ? String(n.value||'').trim() : ''; };
+            var payload = {
+              org_unit_code: get('org_unit_code').toUpperCase(),
+              org_unit_name: get('org_unit_name'),
+              org_unit_type: get('org_unit_type'),
+              parent_org_unit_id: get('parent_org_unit_id') || null,
+              cost_center: get('cost_center') || null,
+              manager_employee_id: get('manager_employee_id') || null
+            };
+            if (!payload.org_unit_code || !payload.org_unit_name){
+              UI.toast(t('Code and name are required','Mã và tên không được để trống'),'error');
+              return;
+            }
+            var op = existing
+              ? UI.runtime.update('hcm_workforce','hcm_org_units', existing.hcm_org_unit_id, payload, existing.row_version)
+              : UI.runtime.create('hcm_workforce','hcm_org_units', payload);
+            op.then(function(res){
+              UI.toast(existing?t('Unit saved','Đã lưu đơn vị'):t('Unit created','Đã tạo đơn vị'),'success');
+              close();
+              loadAll(true).then(function(){
+                if (!existing && res && res.record) S.selectedUnitId = res.record.hcm_org_unit_id;
+                renderOrgUnits(host);
+              });
+            }).catch(function(err){
+              UI.toast((err && err.message) || 'save_failed','error');
+            });
+          } }
+      ]
+    });
+  }
+
+  function openPositionModal(positionId, defaultUnitId, host){
+    var existing = positionId ? S.byPositionId[positionId] : null;
+    var unitId = existing ? existing.hcm_org_unit_id : defaultUnitId;
+    var body = document.createElement('div');
+    body.innerHTML = ''
+      + '<div class="org-form-row"><label>'+esc(t('Position code','Mã vị trí'))+'</label><input data-f="position_code" value="'+esc(existing ? (existing.position_code||'') : '')+'" '+(existing?'readonly':'')+' placeholder="ENG-MGR-001"></div>'
+      + '<div class="org-form-row"><label>'+esc(t('Title','Chức danh'))+'</label><input data-f="position_title" value="'+esc(existing ? (existing.position_title||'') : '')+'" placeholder="'+esc(t('Engineering Manager','Trưởng phòng kỹ thuật'))+'"></div>'
+      + '<div class="org-form-row"><label>'+esc(t('Org unit','Đơn vị'))+'</label><select data-f="hcm_org_unit_id">'
+      +   S.units.map(function(u){
+            var sel = u.hcm_org_unit_id === unitId;
+            return '<option value="'+esc(u.hcm_org_unit_id)+'"'+(sel?' selected':'')+'>'+typeMeta(u.org_unit_type).icon+' '+esc(u.org_unit_name||u.org_unit_code||'?')+' ('+esc(u.org_unit_code||'')+')</option>';
+          }).join('')
+      + '</select></div>'
+      + '<div class="org-form-row"><label>'+esc(t('Reports to (position)','Báo cáo cho (vị trí)'))+'</label><select data-f="reports_to_position_id">'
+      +   '<option value="">— '+esc(t('none','không'))+' —</option>'
+      +   S.positions.filter(function(p){ return !existing || p.hcm_position_id !== existing.hcm_position_id; }).map(function(p){
+            var sel = existing && p.hcm_position_id === existing.reports_to_position_id;
+            return '<option value="'+esc(p.hcm_position_id)+'"'+(sel?' selected':'')+'>'+esc((p.position_title||'?')+' ('+(p.position_code||'')+')')+'</option>';
+          }).join('')
+      + '</select></div>'
+      + '<div class="org-form-row" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+      +   '<div><label>'+esc(t('Employment type','Loại'))+'</label><select data-f="employment_type">'
+      +     ['full_time','part_time','contractor','intern'].map(function(v){
+              var sel = (existing ? existing.employment_type : 'full_time') === v;
+              return '<option value="'+v+'"'+(sel?' selected':'')+'>'+v+'</option>';
+            }).join('')
+      +   '</select></div>'
+      +   '<div><label>'+esc(t('Headcount','Định biên'))+'</label><input type="number" min="1" data-f="required_headcount" value="'+esc(existing ? (existing.required_headcount||1) : 1)+'"></div>'
+      + '</div>'
+      + '<div class="org-form-row"><label>'+esc(t('Grade code','Bậc'))+'</label><input data-f="grade_code" value="'+esc(existing ? (existing.grade_code||'') : '')+'" placeholder="GR-05"></div>'
+      ;
+    UI.openModal({
+      title: existing ? t('Edit position','Sửa vị trí') : t('Create position','Tạo vị trí'),
+      body: body,
+      width: '500px',
+      buttons: [
+        { label: t('Cancel','Hủy'), variant:'secondary', onClick:function(close){ close(); } },
+        { label: existing ? t('Save','Lưu') : t('Create','Tạo'), variant:'primary', onClick: function(close){
+            var get = function(f){ var n = body.querySelector('[data-f="'+f+'"]'); return n ? String(n.value||'').trim() : ''; };
+            var payload = {
+              position_code: get('position_code').toUpperCase(),
+              position_title: get('position_title'),
+              hcm_org_unit_id: get('hcm_org_unit_id'),
+              reports_to_position_id: get('reports_to_position_id') || null,
+              employment_type: get('employment_type') || 'full_time',
+              required_headcount: parseInt(get('required_headcount'),10) || 1,
+              grade_code: get('grade_code') || null
+            };
+            if (!payload.position_code || !payload.position_title || !payload.hcm_org_unit_id){
+              UI.toast(t('Code, title, and unit are required','Mã, chức danh, đơn vị bắt buộc'),'error');
+              return;
+            }
+            var op = existing
+              ? UI.runtime.update('hcm_workforce','hcm_positions', existing.hcm_position_id, payload, existing.row_version)
+              : UI.runtime.create('hcm_workforce','hcm_positions', payload);
+            op.then(function(res){
+              UI.toast(existing?t('Position saved','Đã lưu vị trí'):t('Position created','Đã tạo vị trí'),'success');
+              close();
+              loadAll(true).then(function(){
+                if (!existing && res && res.record) S.selectedPositionId = res.record.hcm_position_id;
+                renderOrgUnits(host);
+              });
+            }).catch(function(err){
+              UI.toast((err && err.message) || 'save_failed','error');
+            });
+          } }
+      ]
+    });
+  }
+
+  function openColorModal(unitId, host){
+    var u = S.byUnitId[unitId]; if (!u) return;
+    var current = unitColor(u);
+    var body = document.createElement('div');
+    body.innerHTML = ''
+      + '<div style="margin-bottom:10px;font-size:13px;color:var(--text-2)">'+esc(t('Pick a color band for this org unit. Used in tree, cards, and the org chart.','Chọn dải màu cho đơn vị. Dùng trong cây, thẻ và sơ đồ tổ chức.'))+'</div>'
+      + '<div class="org-color-grid">'
+      +   DEPT_PALETTE.concat(['#ec4899','#14b8a6','#f97316','#6366f1','#84cc16','#06b6d4']).map(function(c){
+            return '<div class="org-color-swatch '+(c===current?'is-selected':'')+'" data-color="'+c+'" style="background:'+c+'"></div>';
+          }).join('')
+      + '</div>'
+      ;
+    UI.openModal({
+      title: t('Unit color','Màu đơn vị'),
+      body: body,
+      width: '380px',
+      buttons: [
+        { label: t('Cancel','Hủy'), variant:'secondary', onClick:function(close){ close(); } },
+        { label: t('Save','Lưu'), variant:'primary', onClick: function(close){
+            var sel = body.querySelector('.org-color-swatch.is-selected');
+            var color = sel ? sel.getAttribute('data-color') : current;
+            var nextMeta = Object.assign({}, safeJson(u.metadata), { color: color });
+            UI.runtime.update('hcm_workforce','hcm_org_units', u.hcm_org_unit_id, { metadata: nextMeta }, u.row_version)
+              .then(function(){
+                UI.toast(t('Color saved','Đã lưu màu'),'success');
+                close();
+                loadAll(true).then(function(){ renderOrgUnits(host); });
+              }).catch(function(err){ UI.toast(err && err.message || 'save_failed','error'); });
+          } }
+      ]
+    });
+    body.addEventListener('click', function(ev){
+      var sw = ev.target.closest('.org-color-swatch'); if (!sw) return;
+      body.querySelectorAll('.org-color-swatch.is-selected').forEach(function(s){ s.classList.remove('is-selected'); });
+      sw.classList.add('is-selected');
+    });
+  }
+
+  function openReparentUnitModal(unitId, host){
+    var u = S.byUnitId[unitId]; if (!u) return;
+    // Build descendant id set so user can't pick a descendant as parent
+    var descendants = new Set();
+    (function walk(id){
+      (S.childrenOfUnit[id]||[]).forEach(function(c){
+        descendants.add(c.hcm_org_unit_id);
+        walk(c.hcm_org_unit_id);
+      });
+    })(u.hcm_org_unit_id);
+    var body = document.createElement('div');
+    body.innerHTML = ''
+      + '<div style="margin-bottom:10px;font-size:13px;color:var(--text-2)">'+esc(t('Choose a new parent unit. Cannot be a descendant of the moving unit.','Chọn đơn vị cha mới. Không được là con cháu của đơn vị đang chuyển.'))+'</div>'
+      + '<div class="org-form-row"><label>'+esc(t('New parent','Cha mới'))+'</label><select data-f="parent">'
+      +   '<option value="">— '+esc(t('(root level)','(cấp gốc)'))+' —</option>'
+      +   S.units.filter(function(x){ return x.hcm_org_unit_id !== u.hcm_org_unit_id && !descendants.has(x.hcm_org_unit_id); }).map(function(x){
+            var sel = x.hcm_org_unit_id === u.parent_org_unit_id;
+            return '<option value="'+esc(x.hcm_org_unit_id)+'"'+(sel?' selected':'')+'>'+typeMeta(x.org_unit_type).icon+' '+esc(x.org_unit_name||x.org_unit_code||'?')+' ('+esc(x.org_unit_code||'')+')</option>';
+          }).join('')
+      + '</select></div>';
+    UI.openModal({
+      title: t('Reparent unit','Chuyển đơn vị cha'),
+      body: body,
+      width: '420px',
+      buttons: [
+        { label: t('Cancel','Hủy'), variant:'secondary', onClick:function(close){ close(); } },
+        { label: t('Move','Chuyển'), variant:'primary', onClick:function(close){
+            var sel = body.querySelector('[data-f="parent"]');
+            var newParent = sel ? sel.value : null;
+            UI.runtime.update('hcm_workforce','hcm_org_units', u.hcm_org_unit_id, { parent_org_unit_id: newParent || null }, u.row_version)
+              .then(function(){
+                UI.toast(t('Unit moved','Đã chuyển đơn vị'),'success');
+                close();
+                loadAll(true).then(function(){ renderOrgUnits(host); });
+              }).catch(function(err){ UI.toast(err && err.message || 'move_failed','error'); });
+          } }
+      ]
+    });
+  }
+
+  function openReparentPositionModal(posId, host){
+    var p = S.byPositionId[posId]; if (!p) return;
+    var body = document.createElement('div');
+    body.innerHTML = ''
+      + '<div class="org-form-row"><label>'+esc(t('Move to org unit','Chuyển sang đơn vị'))+'</label><select data-f="unit">'
+      +   S.units.map(function(x){
+            var sel = x.hcm_org_unit_id === p.hcm_org_unit_id;
+            return '<option value="'+esc(x.hcm_org_unit_id)+'"'+(sel?' selected':'')+'>'+typeMeta(x.org_unit_type).icon+' '+esc(x.org_unit_name||x.org_unit_code||'?')+' ('+esc(x.org_unit_code||'')+')</option>';
+          }).join('')
+      + '</select></div>';
+    UI.openModal({
+      title: t('Move position','Chuyển vị trí'),
+      body: body,
+      width: '420px',
+      buttons: [
+        { label: t('Cancel','Hủy'), variant:'secondary', onClick:function(close){ close(); } },
+        { label: t('Move','Chuyển'), variant:'primary', onClick:function(close){
+            var sel = body.querySelector('[data-f="unit"]');
+            var newUnit = sel ? sel.value : null;
+            if (!newUnit) return;
+            UI.runtime.update('hcm_workforce','hcm_positions', p.hcm_position_id, { hcm_org_unit_id: newUnit }, p.row_version)
+              .then(function(){
+                UI.toast(t('Position moved','Đã chuyển vị trí'),'success');
+                close();
+                loadAll(true).then(function(){ renderOrgUnits(host); });
+              }).catch(function(err){ UI.toast(err && err.message || 'move_failed','error'); });
+          } }
+      ]
+    });
+  }
+
+  function toggleUnit(unitId, host){
+    var u = S.byUnitId[unitId]; if (!u) return;
+    var willInactivate = String(u.status||'active') !== 'inactive';
+    UI.confirmDestructive({
+      title: willInactivate ? t('Archive unit?','Ngừng dùng đơn vị?') : t('Activate unit?','Kích hoạt đơn vị?'),
+      message: willInactivate
+        ? t('Existing positions and employees keep their links. Archived units are hidden from the active filter but can be restored.','Vị trí và nhân sự liên quan vẫn giữ liên kết. Đơn vị ngừng dùng sẽ bị ẩn khỏi bộ lọc Đang hoạt động nhưng có thể khôi phục.')
+        : t('Make this unit visible in the active list again.','Đưa đơn vị này trở lại danh sách hoạt động.'),
+      confirmLabel: willInactivate ? t('Archive','Ngừng dùng') : t('Activate','Kích hoạt'),
+      onConfirm: function(){
+        UI.runtime.update('hcm_workforce','hcm_org_units', u.hcm_org_unit_id, { status: willInactivate ? 'inactive' : 'active' }, u.row_version)
+          .then(function(){
+            UI.toast(t('Saved','Đã lưu'),'success');
+            loadAll(true).then(function(){ renderOrgUnits(host); });
+          }).catch(function(err){ UI.toast(err && err.message || 'save_failed','error'); });
+      }
+    });
+  }
+
+  function togglePosition(posId, host){
+    var p = S.byPositionId[posId]; if (!p) return;
+    var willInactivate = String(p.status||'active') !== 'inactive';
+    UI.confirmDestructive({
+      title: willInactivate ? t('Archive position?','Ngừng dùng vị trí?') : t('Activate position?','Kích hoạt vị trí?'),
+      message: t('Status changes are audited.','Thay đổi trạng thái được ghi audit.'),
+      confirmLabel: willInactivate ? t('Archive','Ngừng dùng') : t('Activate','Kích hoạt'),
+      onConfirm: function(){
+        UI.runtime.update('hcm_workforce','hcm_positions', p.hcm_position_id, { status: willInactivate ? 'inactive' : 'active' }, p.row_version)
+          .then(function(){
+            UI.toast(t('Saved','Đã lưu'),'success');
+            loadAll(true).then(function(){ renderOrgUnits(host); });
+          }).catch(function(err){ UI.toast(err && err.message || 'save_failed','error'); });
+      }
+    });
+  }
+
+  /* ──────────────────────────────────────────────────────────────────────── *
+   * Sơ đồ tổ chức — SVG canvas
+   * ──────────────────────────────────────────────────────────────────────── */
+  // Reingold-Tilford-style layered tree layout. Returns a map nodeId → {x,y,w,h}.
+  // Layout direction: 'TB' (top-bottom) or 'LR' (left-right).
+  function layoutTree(rootIds, getChildren, getDimensions, dir){
+    dir = dir || 'TB';
+    var H_GAP = 28, V_GAP = 60;
+    var positions = {};
+    var idx = {};
+
+    function compute(id, depth){
+      var dims = getDimensions(id);
+      var children = getChildren(id);
+      var node = { id:id, depth:depth, w:dims.w, h:dims.h, children:children.map(function(c){ return compute(c, depth+1); }) };
+      idx[id] = node;
+      if (!node.children.length){
+        node.x = 0;
+        node.subWidth = node.w;
+      } else {
+        var cursor = 0;
+        node.children.forEach(function(c){
+          c.x += cursor;
+          shift(c, c.x);
+          cursor += c.subWidth + H_GAP;
+        });
+        var first = node.children[0], last = node.children[node.children.length-1];
+        var center = ((first.x) + (last.x + last.w)) / 2;
+        node.x = center - node.w/2;
+        node.subWidth = Math.max(node.w, cursor - H_GAP);
+      }
+      return node;
+    }
+    function shift(n, dx){
+      n.children.forEach(function(c){ c.x += 0; }); // child already absolute via cursor
+    }
+    function assignY(n){
+      n.y = n.depth * (160 + V_GAP);
+      n.children.forEach(assignY);
+    }
+    function flatten(n){
+      positions[n.id] = { x:n.x, y:n.y, w:n.w, h:n.h, depth:n.depth };
+      n.children.forEach(flatten);
+    }
+
+    // Forest: lay out each root, then offset roots horizontally
+    var trees = rootIds.map(function(r){ return compute(r, 0); });
+    trees.forEach(assignY);
+    var cursor = 0;
+    trees.forEach(function(tree){
+      shiftSubtree(tree, cursor);
+      cursor += tree.subWidth + H_GAP * 2;
+    });
+    trees.forEach(flatten);
+
+    // If LR, swap x/y (and flip width/height as visual delta)
+    if (dir === 'LR'){
+      var swapped = {};
+      Object.keys(positions).forEach(function(k){
+        var p = positions[k];
+        swapped[k] = { x: p.y, y: p.x, w: p.w, h: p.h, depth: p.depth };
+      });
+      positions = swapped;
+    }
+    return positions;
+
+    function shiftSubtree(n, dx){
+      n.x += dx;
+      n.children.forEach(function(c){ shiftSubtree(c, dx); });
+    }
+  }
+
+  function renderOrgChart(host){
+    injectCss();
+    if (!host) return;
+    if (S.loading || !S.loaded){
+      host.innerHTML = UI.loadingHtml(t('Loading workforce catalog…','Đang tải danh mục tổ chức…'));
+      loadAll().then(function(){ renderOrgChart(host); });
+      return;
+    }
+    if (S.error){
+      host.innerHTML = UI.errorHtml(S.error, function(){ S.loaded=false; renderOrgChart(host); });
+      return;
+    }
+
+    host.innerHTML = ''
+      + '<div class="org-console">'
+      +   '<div class="org-toolbar">'
+      +     '<span style="font-weight:700">'+esc(t('Display','Hiển thị'))+':</span>'
+      +     '<button class="org-chip '+(S.chart.mode==='units'?'is-active':'')+'"     data-act="chart-mode" data-val="units">🏢 '+esc(t('Units','Đơn vị'))+'</button>'
+      +     '<button class="org-chip '+(S.chart.mode==='positions'?'is-active':'')+'" data-act="chart-mode" data-val="positions">💼 '+esc(t('Positions','Vị trí'))+'</button>'
+      +     '<span style="width:1px;height:24px;background:var(--border-1,#e5e7eb)"></span>'
+      +     '<span style="font-weight:700">'+esc(t('Layout','Bố cục'))+':</span>'
+      +     '<button class="org-chip '+(S.chart.layout==='TB'?'is-active':'')+'" data-act="chart-layout" data-val="TB">↓ '+esc(t('Top-down','Dọc'))+'</button>'
+      +     '<button class="org-chip '+(S.chart.layout==='LR'?'is-active':'')+'" data-act="chart-layout" data-val="LR">→ '+esc(t('Left-right','Ngang'))+'</button>'
+      +     '<span style="flex:1"></span>'
+      +     '<button class="org-btn" data-act="chart-fit" title="'+esc(t('Fit to screen','Vừa khung'))+'">⛶ '+esc(t('Fit','Vừa khung'))+'</button>'
+      +     '<button class="org-btn" data-act="chart-reload">🔄 '+esc(t('Reload','Tải lại'))+'</button>'
+      +     '<div style="position:relative" data-export-menu>'
+      +       '<button class="org-btn" data-act="chart-export-menu">⤓ '+esc(t('Export','Xuất'))+' ▾</button>'
+      +       '<div data-export-dropdown style="display:none;position:absolute;top:calc(100% + 4px);right:0;min-width:180px;background:var(--surface-1,#fff);border:1px solid var(--border-1,#e5e7eb);border-radius:10px;box-shadow:0 8px 24px rgba(15,23,42,.12);z-index:30;padding:4px">'
+      +         '<button class="org-btn" style="width:100%;justify-content:flex-start;border:0;background:transparent" data-act="chart-export" data-format="svg">📐 '+esc(t('SVG vector','SVG vector'))+'</button>'
+      +         '<button class="org-btn" style="width:100%;justify-content:flex-start;border:0;background:transparent" data-act="chart-export" data-format="png">🖼️ '+esc(t('PNG image','Ảnh PNG'))+'</button>'
+      +         '<button class="org-btn" style="width:100%;justify-content:flex-start;border:0;background:transparent" data-act="chart-export" data-format="print">🖨️ '+esc(t('Print / Save as PDF','In / Lưu PDF'))+'</button>'
+      +         '<button class="org-btn" style="width:100%;justify-content:flex-start;border:0;background:transparent" data-act="chart-export" data-format="json">{ } '+esc(t('JSON snapshot','JSON snapshot'))+'</button>'
+      +       '</div>'
+      +     '</div>'
+      +   '</div>'
+      +   '<div class="org-canvas-wrap" data-canvas-wrap>'
+      +     '<div class="org-canvas-toolbar">'
+      +       '<div class="org-canvas-tools">'
+      +         '<button class="org-btn" data-act="chart-zoom" data-val="-1" title="'+esc(t('Zoom out','Thu nhỏ'))+'">−</button>'
+      +         '<span class="org-zoom-pill" data-zoom-display>100%</span>'
+      +         '<button class="org-btn" data-act="chart-zoom" data-val="1" title="'+esc(t('Zoom in','Phóng to'))+'">+</button>'
+      +         '<button class="org-btn" data-act="chart-zoom" data-val="0" title="'+esc(t('Reset zoom','Khôi phục'))+'">100%</button>'
+      +       '</div>'
+      +     '</div>'
+      +     '<svg class="org-canvas-svg" data-canvas-svg xmlns="http://www.w3.org/2000/svg"></svg>'
+      +     '<div class="org-legend">'
+      +       '<div style="font-weight:700;color:var(--text-2);margin-bottom:2px">'+esc(t('Legend','Chú thích'))+'</div>'
+      +       Object.keys(TYPE_META).map(function(k){
+                var m = TYPE_META[k];
+                return '<div class="org-legend-row"><span class="org-legend-swatch" style="background:'+m.color+'"></span><span>'+m.icon+' '+(lang()==='en'?m.labelEn:m.label)+'</span></div>';
+              }).join('')
+      +       '<div style="margin-top:6px;color:var(--text-3)">'+esc(t('Drag a node to reparent. Wheel to zoom.','Kéo node để đổi cha. Lăn chuột để zoom.'))+'</div>'
+      +     '</div>'
+      +   '</div>'
+      + '</div>';
+
+    bindOrgChartEvents(host);
+    drawOrgChart(host);
+  }
+
+  function bindOrgChartEvents(host){
+    if (host._chartBound) return;
+    host._chartBound = true;
+    var canvasWrap = host.querySelector('[data-canvas-wrap]');
+    var svg = host.querySelector('[data-canvas-svg]');
+    var zoomDisplay = host.querySelector('[data-zoom-display]');
+
+    host.addEventListener('click', function(ev){
+      var dropdown = host.querySelector('[data-export-dropdown]');
+      var menu = host.querySelector('[data-export-menu]');
+      if (menu && !menu.contains(ev.target) && dropdown){ dropdown.style.display = 'none'; }
+
+      var el = ev.target.closest('[data-act]'); if (!el) return;
+      var act = el.getAttribute('data-act');
+      if (act === 'chart-mode'){
+        S.chart.mode = el.getAttribute('data-val');
+        renderOrgChart(host);
+      } else if (act === 'chart-layout'){
+        S.chart.layout = el.getAttribute('data-val');
+        renderOrgChart(host);
+      } else if (act === 'chart-zoom'){
+        var v = parseInt(el.getAttribute('data-val'),10);
+        if (v === 0) S.chart.zoom = 1;
+        else S.chart.zoom = Math.max(0.2, Math.min(3, S.chart.zoom * (v>0?1.2:1/1.2)));
+        applyTransform(svg, zoomDisplay);
+      } else if (act === 'chart-fit'){
+        fitToScreen(svg, canvasWrap, zoomDisplay);
+      } else if (act === 'chart-reload'){
+        loadAll(true).then(function(){ renderOrgChart(host); });
+      } else if (act === 'chart-export-menu'){
+        ev.stopPropagation();
+        if (dropdown) dropdown.style.display = (dropdown.style.display === 'none' || !dropdown.style.display) ? 'block' : 'none';
+      } else if (act === 'chart-export'){
+        var fmt = el.getAttribute('data-format');
+        if (dropdown) dropdown.style.display = 'none';
+        exportChart(svg, fmt);
+      }
+    });
+
+    // Pan + zoom on the SVG itself
+    var panning = false, panStart = null;
+    svg.addEventListener('mousedown', function(ev){
+      // ignore drag-on-node (handled in node mousedown)
+      if (ev.target.closest('[data-node-id]')) return;
+      panning = true;
+      panStart = { x: ev.clientX, y: ev.clientY, panX: S.chart.panX, panY: S.chart.panY };
+      svg.classList.add('is-panning');
+      ev.preventDefault();
+    });
+    window.addEventListener('mousemove', function(ev){
+      if (!panning) return;
+      S.chart.panX = panStart.panX + (ev.clientX - panStart.x);
+      S.chart.panY = panStart.panY + (ev.clientY - panStart.y);
+      applyTransform(svg, zoomDisplay);
+    });
+    window.addEventListener('mouseup', function(){
+      if (panning){ panning = false; svg.classList.remove('is-panning'); }
+    });
+    svg.addEventListener('wheel', function(ev){
+      ev.preventDefault();
+      var rect = svg.getBoundingClientRect();
+      var cx = ev.clientX - rect.left, cy = ev.clientY - rect.top;
+      var delta = ev.deltaY < 0 ? 1.12 : 1/1.12;
+      var nextZoom = Math.max(0.2, Math.min(3, S.chart.zoom * delta));
+      // Zoom toward cursor
+      var ratio = nextZoom / S.chart.zoom;
+      S.chart.panX = cx - (cx - S.chart.panX) * ratio;
+      S.chart.panY = cy - (cy - S.chart.panY) * ratio;
+      S.chart.zoom = nextZoom;
+      applyTransform(svg, zoomDisplay);
+    }, { passive:false });
+  }
+
+  function applyTransform(svg, zoomDisplay){
+    if (!svg) return;
+    var g = svg.querySelector('[data-svg-root]');
+    if (g) g.setAttribute('transform', 'translate('+S.chart.panX+','+S.chart.panY+') scale('+S.chart.zoom+')');
+    if (zoomDisplay) zoomDisplay.textContent = Math.round(S.chart.zoom * 100) + '%';
+  }
+
+  function fitToScreen(svg, wrap, zoomDisplay){
+    var g = svg.querySelector('[data-svg-root]'); if (!g) return;
+    var bbox = g.getBBox();
+    if (!bbox.width || !bbox.height) return;
+    var rect = wrap.getBoundingClientRect();
+    var pad = 60;
+    var sx = (rect.width - pad) / bbox.width;
+    var sy = (rect.height - pad) / bbox.height;
+    var z = Math.min(sx, sy, 1.5);
+    S.chart.zoom = Math.max(0.2, z);
+    S.chart.panX = (rect.width - bbox.width * z) / 2 - bbox.x * z;
+    S.chart.panY = (rect.height - bbox.height * z) / 2 - bbox.y * z;
+    applyTransform(svg, zoomDisplay);
+  }
+
+  function drawOrgChart(host){
+    var svg = host.querySelector('[data-canvas-svg]');
+    if (!svg) return;
+    while (svg.firstChild) svg.removeChild(svg.firstChild);
+    var SVG_NS = 'http://www.w3.org/2000/svg';
+    var defs = document.createElementNS(SVG_NS, 'defs');
+    defs.innerHTML = '<pattern id="org-grid" width="24" height="24" patternUnits="userSpaceOnUse">'
+      + '<path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(120,120,120,.06)" stroke-width="1"/>'
+      + '</pattern>';
+    svg.appendChild(defs);
+    var bg = document.createElementNS(SVG_NS,'rect');
+    bg.setAttribute('width','100%'); bg.setAttribute('height','100%');
+    bg.setAttribute('fill','url(#org-grid)');
+    svg.appendChild(bg);
+
+    var rootG = document.createElementNS(SVG_NS,'g');
+    rootG.setAttribute('data-svg-root','');
+    svg.appendChild(rootG);
+
+    if (S.chart.mode === 'positions'){
+      drawPositionsTree(rootG, host);
+    } else {
+      drawUnitsTree(rootG, host);
+    }
+
+    // Apply current transform; if first time, fit
+    if (S.chart.zoom === 1 && S.chart.panX === 0 && S.chart.panY === 0){
+      var wrap = host.querySelector('[data-canvas-wrap]');
+      var zoomDisplay = host.querySelector('[data-zoom-display]');
+      // Slight delay so getBBox sees the rendered nodes
+      requestAnimationFrame(function(){ fitToScreen(svg, wrap, zoomDisplay); });
+    } else {
+      applyTransform(svg, host.querySelector('[data-zoom-display]'));
+    }
+  }
+
+  function drawUnitsTree(rootG, host){
+    var SVG_NS = 'http://www.w3.org/2000/svg';
+    var W = 230, H = 130;
+    var rootIds = (S.childrenOfUnit['']||[]).map(function(u){ return u.hcm_org_unit_id; });
+    var positions = layoutTree(
+      rootIds,
+      function(id){ return (S.childrenOfUnit[id]||[]).map(function(c){ return c.hcm_org_unit_id; }); },
+      function(){ return { w:W, h:H }; },
+      S.chart.layout
+    );
+
+    // Edges first
+    Object.keys(positions).forEach(function(id){
+      var u = S.byUnitId[id]; if (!u) return;
+      var children = (S.childrenOfUnit[id]||[]);
+      children.forEach(function(c){
+        var p1 = positions[id], p2 = positions[c.hcm_org_unit_id];
+        if (!p2) return;
+        var path = document.createElementNS(SVG_NS,'path');
+        path.setAttribute('class','org-edge');
+        path.setAttribute('d', edgePath(p1, p2, W, H, S.chart.layout));
+        rootG.appendChild(path);
+      });
+    });
+
+    // Nodes
+    Object.keys(positions).forEach(function(id){
+      var u = S.byUnitId[id]; if (!u) return;
+      var p = positions[id];
+      drawUnitNode(rootG, u, p.x, p.y, W, H, host);
+    });
+  }
+
+  function drawPositionsTree(rootG, host){
+    // Build virtual tree from reports_to_position_id
+    var SVG_NS = 'http://www.w3.org/2000/svg';
+    var W = 240, H = 110;
+    var childrenMap = {};
+    S.positions.forEach(function(p){
+      var pid = String(p.reports_to_position_id || '');
+      (childrenMap[pid] = childrenMap[pid] || []).push(p.hcm_position_id);
+    });
+    var rootIds = (childrenMap['']||[]);
+    if (!rootIds.length){
+      var msg = document.createElementNS(SVG_NS,'text');
+      msg.setAttribute('x',60); msg.setAttribute('y',60);
+      msg.setAttribute('fill','currentColor');
+      msg.textContent = t('No reporting lines configured. Set "Reports to" on positions to see this view.','Chưa có line báo cáo. Thiết lập "Báo cáo cho" trên vị trí để xem chế độ này.');
+      rootG.appendChild(msg);
+      return;
+    }
+    var positions = layoutTree(
+      rootIds,
+      function(id){ return childrenMap[id] || []; },
+      function(){ return { w:W, h:H }; },
+      S.chart.layout
+    );
+    Object.keys(positions).forEach(function(id){
+      (childrenMap[id]||[]).forEach(function(cid){
+        var p1 = positions[id], p2 = positions[cid];
+        if (!p2) return;
+        var path = document.createElementNS(SVG_NS,'path');
+        path.setAttribute('class','org-edge');
+        path.setAttribute('d', edgePath(p1, p2, W, H, S.chart.layout));
+        rootG.appendChild(path);
+      });
+    });
+    Object.keys(positions).forEach(function(id){
+      var p = S.byPositionId[id]; if (!p) return;
+      var pos = positions[id];
+      drawPositionNode(rootG, p, pos.x, pos.y, W, H, host);
+    });
+  }
+
+  function edgePath(p1, p2, W, H, dir){
+    if (dir === 'LR'){
+      var x1 = p1.x + W, y1 = p1.y + H/2;
+      var x2 = p2.x,     y2 = p2.y + H/2;
+      var mx = (x1 + x2) / 2;
+      return 'M'+x1+','+y1+' C'+mx+','+y1+' '+mx+','+y2+' '+x2+','+y2;
+    }
+    var x1t = p1.x + W/2, y1t = p1.y + H;
+    var x2t = p2.x + W/2, y2t = p2.y;
+    var my = (y1t + y2t) / 2;
+    return 'M'+x1t+','+y1t+' C'+x1t+','+my+' '+x2t+','+my+' '+x2t+','+y2t;
+  }
+
+  function svgEl(name, attrs){
+    var el = document.createElementNS('http://www.w3.org/2000/svg', name);
+    Object.keys(attrs||{}).forEach(function(k){ el.setAttribute(k, attrs[k]); });
+    return el;
+  }
+
+  function drawUnitNode(rootG, u, x, y, W, H, host){
+    var meta = typeMeta(u.org_unit_type);
+    var color = unitColor(u);
+    var positions = S.positionsByUnit[u.hcm_org_unit_id] || [];
+    var totalHc = positions.reduce(function(s,p){ return s + (parseInt(p.required_headcount,10)||0); }, 0);
+    var employeesHere = S.employeesByUnit[u.hcm_org_unit_id] || [];
+    var filledHc = employeesHere.filter(function(e){ return String(e.employment_status||'active')==='active'; }).length;
+    var inactive = String(u.status||'active') === 'inactive';
+    var g = svgEl('g', { transform:'translate('+x+','+y+')', 'data-node-id': u.hcm_org_unit_id, 'data-node-kind':'unit', style:'cursor:move' });
+    if (inactive) g.setAttribute('opacity','.55');
+    var rect = svgEl('rect', { x:0, y:0, width:W, height:H, 'class':'org-node-rect', rx:14, ry:14, fill:'var(--surface-1,#fff)', stroke:'#e5e7eb' });
+    g.appendChild(rect);
+    var band = svgEl('rect', { x:0, y:0, width:8, height:H, fill:color, rx:14, ry:14 });
+    g.appendChild(band);
+    var iconBg = svgEl('rect', { x:18, y:14, width:36, height:36, rx:10, ry:10, fill:'color-mix(in srgb,'+color+' 14%,#fff)' });
+    g.appendChild(iconBg);
+    var iconText = svgEl('text', { x:36, y:38, 'text-anchor':'middle', class:'org-node-icon' });
+    iconText.textContent = meta.icon;
+    g.appendChild(iconText);
+    var title = svgEl('text', { x:64, y:30, class:'org-node-title', 'font-size':14, fill:color });
+    title.textContent = ellipsize(u.org_unit_name||u.org_unit_code||'?', 22);
+    g.appendChild(title);
+    var sub = svgEl('text', { x:64, y:46, class:'org-node-sub', 'font-size':10.5 });
+    sub.textContent = (lang()==='en'?meta.labelEn:meta.label) + ' · ' + (u.org_unit_code||'');
+    g.appendChild(sub);
+    // KPI strip
+    var kpiBg = svgEl('rect', { x:18, y:62, width:W-36, height:50, rx:10, ry:10, fill:'#f9fafb', stroke:'#e5e7eb' });
+    g.appendChild(kpiBg);
+    var kpis = [
+      { l: lang()==='en'?'Pos.':'Vị trí',  v: positions.length, c: '#6366f1' },
+      { l: lang()==='en'?'HC':'Định biên', v: totalHc, c: '#0ea5e9' },
+      { l: lang()==='en'?'Filled':'Có',    v: filledHc, c: '#10b981' }
+    ];
+    var kw = (W-36) / kpis.length;
+    kpis.forEach(function(k, i){
+      var cx = 18 + i*kw + kw/2;
+      var v = svgEl('text', { x:cx, y:88, 'text-anchor':'middle', 'font-size':18, 'font-weight':800, fill:k.c });
+      v.textContent = String(k.v);
+      g.appendChild(v);
+      var l = svgEl('text', { x:cx, y:104, 'text-anchor':'middle', 'font-size':9.5, fill:'#6b7280' });
+      l.textContent = k.l;
+      g.appendChild(l);
+    });
+    // Click → select
+    g.addEventListener('click', function(ev){ ev.stopPropagation(); selectChartNode(host, 'unit', u.hcm_org_unit_id); });
+    // Drag-reparent
+    enableNodeDrag(g, host, 'unit', u.hcm_org_unit_id, x, y, W, H);
+    rootG.appendChild(g);
+  }
+
+  function drawPositionNode(rootG, p, x, y, W, H, host){
+    var u = S.byUnitId[p.hcm_org_unit_id];
+    var color = u ? unitColor(u) : '#4f46e5';
+    var employees = S.employeesByPosition[p.hcm_position_id] || [];
+    var filled = employees.filter(function(e){ return String(e.employment_status||'active')==='active'; }).length;
+    var hc = parseInt(p.required_headcount,10) || 1;
+    var open = Math.max(0, hc - filled);
+    var icon = positionIcon(p.position_title);
+    var inactive = String(p.status||'active') === 'inactive';
+    var g = svgEl('g', { transform:'translate('+x+','+y+')', 'data-node-id': p.hcm_position_id, 'data-node-kind':'position', style:'cursor:pointer' });
+    if (inactive) g.setAttribute('opacity','.55');
+    var rect = svgEl('rect', { x:0, y:0, width:W, height:H, 'class':'org-node-rect', rx:12, ry:12, fill:'var(--surface-1,#fff)', stroke:'#e5e7eb' });
+    g.appendChild(rect);
+    var band = svgEl('rect', { x:0, y:0, width:6, height:H, fill:color, rx:12, ry:12 });
+    g.appendChild(band);
+    var iconBg = svgEl('rect', { x:14, y:14, width:30, height:30, rx:8, ry:8, fill:'color-mix(in srgb,'+color+' 14%,#fff)' });
+    g.appendChild(iconBg);
+    var iconText = svgEl('text', { x:29, y:34, 'text-anchor':'middle', class:'org-node-icon', 'font-size':16 });
+    iconText.textContent = icon;
+    g.appendChild(iconText);
+    var title = svgEl('text', { x:54, y:28, class:'org-node-title', 'font-size':13 });
+    title.textContent = ellipsize(p.position_title||'?', 24);
+    g.appendChild(title);
+    var sub = svgEl('text', { x:54, y:44, class:'org-node-code', 'font-size':10 });
+    sub.textContent = p.position_code||'';
+    g.appendChild(sub);
+    var unitText = svgEl('text', { x:14, y:64, class:'org-node-sub', 'font-size':10 });
+    unitText.textContent = (u ? '🏬 '+ ellipsize(u.org_unit_name||u.org_unit_code||'',24) : '');
+    g.appendChild(unitText);
+    // Filled / open pill
+    var pillFg = open>0 ? '#92400e' : '#065f46';
+    var pillBg = open>0 ? '#fef3c7' : '#d1fae5';
+    var pill = svgEl('rect', { x:14, y:78, width:80, height:20, rx:10, ry:10, fill:pillBg, stroke:open>0?'#f59e0b':'#10b981' });
+    g.appendChild(pill);
+    var pillText = svgEl('text', { x:54, y:92, 'text-anchor':'middle', 'font-size':11, 'font-weight':700, fill:pillFg });
+    pillText.textContent = filled+'/'+hc + (open>0?' (+'+open+')':'');
+    g.appendChild(pillText);
+    g.addEventListener('click', function(ev){ ev.stopPropagation(); selectChartNode(host, 'position', p.hcm_position_id); });
+    rootG.appendChild(g);
+  }
+
+  function ellipsize(s, n){
+    s = String(s||'');
+    return s.length > n ? s.substring(0, n-1) + '…' : s;
+  }
+
+  function selectChartNode(host, kind, id){
+    if (kind === 'unit'){
+      S.selectedUnitId = id;
+      // Visual feedback
+      host.querySelectorAll('.org-node-rect.is-selected').forEach(function(r){ r.classList.remove('is-selected'); });
+      var node = host.querySelector('[data-node-id="'+id+'"] .org-node-rect');
+      if (node) node.classList.add('is-selected');
+    } else if (kind === 'position'){
+      S.selectedPositionId = id;
+      host.querySelectorAll('.org-node-rect.is-selected').forEach(function(r){ r.classList.remove('is-selected'); });
+      var n2 = host.querySelector('[data-node-id="'+id+'"] .org-node-rect');
+      if (n2) n2.classList.add('is-selected');
+    }
+  }
+
+  function enableNodeDrag(g, host, kind, id, origX, origY, W, H){
+    if (kind !== 'unit') return; // only units support drag-reparent for now
+    var dragState = null;
+    g.addEventListener('mousedown', function(ev){
+      if (ev.button !== 0) return;
+      ev.stopPropagation();
+      var svg = host.querySelector('[data-canvas-svg]');
+      svg.classList.add('is-dragging-node');
+      dragState = { startX: ev.clientX, startY: ev.clientY, currentX: origX, currentY: origY, dropTargetId: null };
+    });
+    function onMove(ev){
+      if (!dragState) return;
+      var dx = (ev.clientX - dragState.startX) / S.chart.zoom;
+      var dy = (ev.clientY - dragState.startY) / S.chart.zoom;
+      var nx = origX + dx, ny = origY + dy;
+      g.setAttribute('transform', 'translate('+nx+','+ny+')');
+      g.setAttribute('opacity','.85');
+      dragState.currentX = nx; dragState.currentY = ny;
+      // Find drop target: hover testing other unit nodes
+      var dropTarget = null;
+      host.querySelectorAll('[data-node-id][data-node-kind="unit"]').forEach(function(other){
+        if (other === g) return;
+        var oid = other.getAttribute('data-node-id');
+        var ot = other.getAttribute('transform') || 'translate(0,0)';
+        var m = /translate\(([^,]+),([^)]+)\)/.exec(ot);
+        if (!m) return;
+        var ox = parseFloat(m[1]), oy = parseFloat(m[2]);
+        // Check if center of dragged node is inside the other rectangle
+        var cx = nx + W/2, cy = ny + H/2;
+        if (cx >= ox && cx <= ox + W && cy >= oy && cy <= oy + H){
+          dropTarget = oid;
+        }
+      });
+      // Highlight drop target
+      host.querySelectorAll('.org-node-rect.is-drop-target').forEach(function(r){ r.classList.remove('is-drop-target'); });
+      if (dropTarget){
+        var rectEl = host.querySelector('[data-node-id="'+dropTarget+'"] .org-node-rect');
+        if (rectEl) rectEl.classList.add('is-drop-target');
+      }
+      dragState.dropTargetId = dropTarget;
+    }
+    function onUp(){
+      if (!dragState) return;
+      var svg = host.querySelector('[data-canvas-svg]');
+      svg.classList.remove('is-dragging-node');
+      g.setAttribute('opacity','1');
+      host.querySelectorAll('.org-node-rect.is-drop-target').forEach(function(r){ r.classList.remove('is-drop-target'); });
+      var newParentId = dragState.dropTargetId;
+      var u = S.byUnitId[id];
+      // Reset position (will re-render after save)
+      g.setAttribute('transform', 'translate('+origX+','+origY+')');
+      if (newParentId && u && newParentId !== u.parent_org_unit_id){
+        // Disallow self or descendant
+        var descendants = new Set(); (function walk(uid){ (S.childrenOfUnit[uid]||[]).forEach(function(c){ descendants.add(c.hcm_org_unit_id); walk(c.hcm_org_unit_id); }); })(id);
+        if (newParentId === id || descendants.has(newParentId)){
+          UI.toast(t('Cannot move under self or descendant','Không thể chuyển vào chính mình hoặc đơn vị con'),'error');
+          dragState = null; return;
+        }
+        var parent = S.byUnitId[newParentId];
+        UI.confirmDestructive({
+          title: t('Reparent unit?','Chuyển đơn vị cha?'),
+          message: t('Move "'+u.org_unit_name+'" under "'+parent.org_unit_name+'"?', 'Chuyển "'+u.org_unit_name+'" vào dưới "'+parent.org_unit_name+'"?'),
+          confirmLabel: t('Move','Chuyển'),
+          onConfirm: function(){
+            UI.runtime.update('hcm_workforce','hcm_org_units', id, { parent_org_unit_id: newParentId }, u.row_version)
+              .then(function(){
+                UI.toast(t('Unit moved','Đã chuyển đơn vị'),'success');
+                loadAll(true).then(function(){ renderOrgChart(host); });
+              }).catch(function(err){ UI.toast(err && err.message || 'move_failed','error'); });
+          }
+        });
+      }
+      dragState = null;
+    }
+    host._dragMove = host._dragMove || onMove;
+    host._dragUp = host._dragUp || onUp;
+    if (!host._dragWired){
+      host._dragWired = true;
+      window.addEventListener('mousemove', function(ev){
+        // Only one drag is active at a time globally; we delegate to currently-attached handler
+        host.querySelectorAll('[data-node-id]').forEach(function(){});
+      });
+    }
+    g.addEventListener('mousedown', function(){
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', function once(){
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', once);
+        onUp();
+      });
+    });
+  }
+
+  /* ── Export ──────────────────────────────────────────────────────────── */
+  function exportChart(svg, format){
+    if (!svg) return;
+    if (format === 'json'){
+      var snapshot = {
+        generated_at: new Date().toISOString(),
+        mode: S.chart.mode,
+        layout: S.chart.layout,
+        units: S.units, positions: S.positions
+      };
+      downloadBlob(new Blob([JSON.stringify(snapshot, null, 2)], { type:'application/json' }), 'org-chart-snapshot.json');
+      return;
+    }
+    var serialized = serializeSvgForExport(svg);
+    if (format === 'svg'){
+      downloadBlob(new Blob([serialized], { type:'image/svg+xml' }), 'org-chart.svg');
+      return;
+    }
+    if (format === 'png'){
+      svgToPng(serialized, function(blob){
+        downloadBlob(blob, 'org-chart.png');
+      });
+      return;
+    }
+    if (format === 'print'){
+      printSvg(serialized);
+      return;
+    }
+  }
+
+  function serializeSvgForExport(svg){
+    var clone = svg.cloneNode(true);
+    // Compute true bounding box of content
+    var rootG = svg.querySelector('[data-svg-root]');
+    var bbox = rootG ? rootG.getBBox() : { x:0, y:0, width:1200, height:800 };
+    var pad = 40;
+    var width  = Math.ceil(bbox.width  + pad*2);
+    var height = Math.ceil(bbox.height + pad*2);
+    // Reset transforms in clone so the raw vector is exported (not the panned/zoomed view)
+    var cloneRoot = clone.querySelector('[data-svg-root]');
+    if (cloneRoot){
+      cloneRoot.setAttribute('transform', 'translate('+(pad - bbox.x)+','+(pad - bbox.y)+')');
+    }
+    clone.setAttribute('xmlns','http://www.w3.org/2000/svg');
+    clone.setAttribute('width', width);
+    clone.setAttribute('height', height);
+    clone.setAttribute('viewBox', '0 0 '+width+' '+height);
+    // Remove the SVG-class (cursor styles not relevant in a static export)
+    clone.removeAttribute('class');
+    // Inline minimal styles so the file renders standalone
+    var style = document.createElementNS('http://www.w3.org/2000/svg','style');
+    style.textContent = ''
+      + '.org-node-rect{fill:#fff;stroke:#e5e7eb;stroke-width:1.2}'
+      + '.org-node-title{font-family:-apple-system,Segoe UI,Roboto,sans-serif;font-weight:800}'
+      + '.org-node-sub{font-family:-apple-system,Segoe UI,Roboto,sans-serif;fill:#6b7280}'
+      + '.org-node-code{font-family:ui-monospace,monospace;fill:#6b7280}'
+      + '.org-edge{fill:none;stroke:#9ca3af;stroke-width:1.4;opacity:.7}';
+    clone.insertBefore(style, clone.firstChild);
+    return new XMLSerializer().serializeToString(clone);
+  }
+
+  function svgToPng(svgString, cb){
+    var img = new Image();
+    var blobUrl = URL.createObjectURL(new Blob([svgString], { type:'image/svg+xml' }));
+    img.onload = function(){
+      var canvas = document.createElement('canvas');
+      canvas.width = img.width * 2;
+      canvas.height = img.height * 2;
+      var ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff';
+      ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob(function(b){ URL.revokeObjectURL(blobUrl); cb(b); }, 'image/png');
+    };
+    img.onerror = function(){ UI.toast(t('PNG export failed','Xuất PNG thất bại'),'error'); };
+    img.src = blobUrl;
+  }
+
+  function printSvg(svgString){
+    var w = window.open('', '_blank');
+    if (!w){ UI.toast(t('Popup blocked','Popup bị chặn'),'error'); return; }
+    w.document.write('<!DOCTYPE html><html><head><title>'+esc(t('Organization Chart','Sơ đồ tổ chức'))+'</title>'
+      + '<style>@page{size:A3 landscape;margin:8mm}body{margin:0;padding:0;font-family:-apple-system,Segoe UI,Roboto,sans-serif}'
+      + 'header{padding:12px 18px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between}'
+      + 'h1{font-size:16px;margin:0}.meta{font-size:11px;color:#6b7280}'
+      + 'svg{width:100%;height:auto;display:block;margin:0 auto}</style></head>'
+      + '<body><header><h1>'+esc(t('HESEM — Organization Chart','HESEM — Sơ đồ tổ chức'))+'</h1>'
+      + '<div class="meta">'+esc(new Date().toISOString())+' · '+S.units.length+' '+esc(t('units','đơn vị'))+' · '+S.positions.length+' '+esc(t('positions','vị trí'))+'</div></header>'
+      + svgString
+      + '<script>window.onload=function(){setTimeout(function(){window.print();},200);};<\/script>'
+      + '</body></html>');
+    w.document.close();
+  }
+
+  function downloadBlob(blob, filename){
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ a.remove(); URL.revokeObjectURL(url); }, 100);
+  }
+
+  /* ──────────────────────────────────────────────────────────────────────── *
+   * Public exports
+   * ──────────────────────────────────────────────────────────────────────── */
+  window._renderAdminOrgUnits = renderOrgUnits;
+  window._renderAdminOrgChart = renderOrgChart;
+  window._adminOrgConsole = { state: S, reload: function(){ return loadAll(true); } };
+})();

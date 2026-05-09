@@ -665,19 +665,13 @@ function moduleAccessAdminTabCatalog(){
     {id:'orgchart', group:'identity', icon:'🏗', labelEn:'Org chart', labelVi:'Sơ đồ tổ chức', noteEn:'Organisation structure view.', noteVi:'Sơ đồ cấu trúc tổ chức.', defaultAccess:'admin'},
     {id:'perms', group:'governance', icon:'🔐', labelEn:'Permissions', labelVi:'Phân quyền tài liệu', noteEn:'Document and workflow permissions.', noteVi:'Phân quyền tài liệu và workflow.', defaultAccess:'admin'},
     {id:'module_access', group:'governance', icon:'🧭', labelEn:'Module access', labelVi:'Phân quyền module', noteEn:'Central visibility and access control for portal modules.', noteVi:'Điều khiển tập trung việc hiển thị và truy cập module.', defaultAccess:'admin', locked:true},
-    {id:'activity', group:'governance', icon:'📊', labelEn:'Activity log', labelVi:'Kiểm soát hành vi', noteEn:'Audit and activity review.', noteVi:'Rà soát audit và hành vi.', defaultAccess:'admin'},
-    {id:'docs', group:'content', icon:'📄', labelEn:'Effective docs', labelVi:'Tài liệu hiệu lực', noteEn:'Effective document administration.', noteVi:'Quản trị tài liệu hiệu lực.', defaultAccess:'admin'},
+    {id:'iam_console', group:'governance', icon:'🛡️', labelEn:'IAM Control Console', labelVi:'Kiểm Soát Vận Hành', noteEn:'Unified IAM hub: activity, sessions, permissions, SoD, retention, audit (NIST 800-53 / ISO 27001 / SOX / 21 CFR Part 11).', noteVi:'Trung tâm IAM: hành vi, phiên đăng nhập, quyền, tách trách nhiệm, lưu trữ, audit (NIST 800-53 / ISO 27001 / SOX / 21 CFR Part 11).', defaultAccess:'admin'},
     {id:'portal_display', group:'content', icon:'🧭', labelEn:'Portal display', labelVi:'Hiển thị portal', noteEn:'Portal file and sidebar display control.', noteVi:'Điều khiển hiển thị file và sidebar portal.', defaultAccess:'admin'},
-    {id:'retention', group:'content', icon:'📋', labelEn:'Retention', labelVi:'Lưu giữ', noteEn:'Retention policies and controlled evidence lifecycle.', noteVi:'Chính sách lưu giữ và vòng đời chứng cứ.', defaultAccess:'admin'},
     {id:'data_sources', group:'data', icon:'🗄', labelEn:'Data sources', labelVi:'Nguồn dữ liệu', noteEn:'Runtime data sources and integration status.', noteVi:'Nguồn dữ liệu runtime và trạng thái tích hợp.', defaultAccess:'admin'},
     {id:'metadata_studio', group:'data', icon:'🧬', labelEn:'Data Schema', labelVi:'Data Schema', noteEn:'Schema, metadata and data contract tooling.', noteVi:'Công cụ schema, metadata và data contract.', defaultAccess:'admin'},
     {id:'infrastructure', group:'data', icon:'🖥', labelEn:'VPS infrastructure', labelVi:'Hạ tầng VPS', noteEn:'Terminal, observability and host control plane.', noteVi:'Control plane cho host, terminal và observability.', defaultAccess:'admin'},
     {id:'manual_runtime', group:'operations', icon:'🧾', labelEn:'Manual runtime', labelVi:'Nhập tay vận hành', noteEn:'Manual runtime fallback workspace.', noteVi:'Không gian fallback nhập tay vận hành.', defaultAccess:'admin'},
     {id:'version_control', group:'operations', icon:'🔄', labelEn:'Version control', labelVi:'Điều khiển phiên bản', noteEn:'Git synchronization and release hygiene.', noteVi:'Đồng bộ Git và vệ sinh phát hành.', defaultAccess:'admin'},
-    {id:'mfa', group:'security', icon:'🔑', labelEn:'MFA security', labelVi:'Bảo mật MFA', noteEn:'MFA policy and enrollment status.', noteVi:'Chính sách MFA và trạng thái kích hoạt.', defaultAccess:'admin'},
-    {id:'permission_catalog', group:'governance', icon:'🗂', labelEn:'Permission Catalog', labelVi:'Catalog Quyền', noteEn:'Atomic permission codes (NIST 800-162 / SAP authorization-object).', noteVi:'Mã quyền nguyên tử (NIST 800-162 / SAP authorization-object).', defaultAccess:'admin'},
-    {id:'sod_matrix', group:'governance', icon:'⚖️', labelEn:'SoD Matrix', labelVi:'Tách trách nhiệm', noteEn:'Separation-of-Duties conflict matrix (COBIT 5 / SOX 404 / ISO 27001).', noteVi:'Ma trận xung đột tách trách nhiệm (COBIT / SOX / ISO 27001).', defaultAccess:'admin'},
-    {id:'access_review', group:'governance', icon:'🧐', labelEn:'Access Reviews', labelVi:'Đánh giá phân quyền', noteEn:'Periodic access-review campaigns (ISO 27001 A.9.2.5 / SOX 404).', noteVi:'Chu kỳ đánh giá phân quyền định kỳ (ISO 27001 A.9.2.5 / SOX 404).', defaultAccess:'admin'},
     {id:'ai_control', group:'operations', icon:'🤖', labelEn:'AI Control', labelVi:'Điều khiển AI', noteEn:'AI engine on/off, model selection, feature toggles, usage and cost tracking.', noteVi:'Bật/tắt AI engine, chọn model, tính năng, theo dõi sử dụng và chi phí.', defaultAccess:'admin'},
     {id:'translation_module', group:'operations', icon:'🌍', labelEn:'Translation Module', labelVi:'Module Dịch Thuật', noteEn:'Multi-provider routing (NLLB / Claude CLI / Codex CLI / API), credentials vault, model discovery, cost log, side-by-side test bench. Backed by migration 157.', noteVi:'Định tuyến đa engine (NLLB / Claude CLI / Codex CLI / API), kho API key mã hóa, chọn model, log chi phí, test song song. Migration 157.', defaultAccess:'admin'},
     {id:'appearance', group:'content', icon:'🎨', labelEn:'Appearance', labelVi:'Giao diện', noteEn:'Portal design system and theme settings.', noteVi:'Thiết lập giao diện và design system.', defaultAccess:'admin'}
@@ -7989,30 +7983,22 @@ function renderAdmin(){
   }
   if(adminTab==='users') renderAdminUsers();
   if(adminTab==='dept_title') renderAdminDeptTitle();
-  if(adminTab==='perms') renderAdminPermTab('doc_perms');
+  if(adminTab==='perms') renderAdminPerms();          // legacy 2-pane folder tree
   if(adminTab==='roles') renderAdminRoles();
   if(adminTab==='orgchart') renderAdminOrgChart();
   if(adminTab==='activity') renderAdminActivity();
-  if(adminTab==='module_access'){
-    renderAdminPermTab('module_perms');
-  }
-  if(adminTab==='docs') renderAdminContentTab('effective_docs');
+  if(adminTab==='module_access') renderAdminModuleAccess();   // legacy hero + 2 cards
   if(adminTab==='infrastructure') renderAdminInfrastructure();
   if(adminTab==='manual_runtime') renderAdminManualRuntime();
   if(adminTab==='data_sources') renderAdminDataSources();
   if(adminTab==='metadata_studio') renderAdminMetadataStudio();
   if(adminTab==='translation_module') renderAdminTranslationModuleTab();
   if(adminTab==='version_control') renderAdminVersionControl();
-  if(adminTab==='portal_display'){
-    renderAdminPermTab('portal_display');
-  }
-  if(adminTab==='retention') renderAdminContentTab('retention');
-  if(adminTab==='mfa') renderAdminContentTab('mfa');
+  if(adminTab==='portal_display') renderAdminPortalDisplay();  // legacy widget editor
+  if(adminTab==='mfa') renderAdminMfa();              // legacy MFA settings (apiCall-backed)
+  if(adminTab==='iam_console') renderAdminIamConsole();
   if(adminTab==='ai_control') renderAdminAiControl();
   if(adminTab==='appearance') renderAdminAppearance();
-  if(adminTab==='permission_catalog') renderAdminGovernanceTab('permission_catalog');
-  if(adminTab==='sod_matrix') renderAdminGovernanceTab('sod_matrix');
-  if(adminTab==='access_review') renderAdminGovernanceTab('access_review');
 }
 
 /* ── Admin: Governance tabs (Permission Catalog / SoD Matrix / Access Reviews) ─ */
@@ -8024,14 +8010,54 @@ function renderAdminGovernanceTab(slug){
     return;
   }
   el.innerHTML = '<div class="hm-empty">'+(lang==='en'?'Loading governance tab...':'Đang tải tab quản trị...')+'</div>';
-  var existing = document.getElementById('admin-governance-tabs-script');
-  if(existing){ existing.remove(); }
+  ensureAdminShared(function(){
+    var existing = document.getElementById('admin-governance-tabs-script');
+    if(existing){ existing.remove(); }
+    var s = document.createElement('script');
+    s.id  = 'admin-governance-tabs-script';
+    s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00g-admin-governance-tabs.js?v=' + (window.APP_VERSION || Date.now());
+    s.onload = function(){
+      if(typeof window._renderAdminGovernanceTab === 'function') window._renderAdminGovernanceTab(el, slug);
+    };
+    document.head.appendChild(s);
+  });
+}
+
+/* ── Admin: IAM Control Console (lazy-loaded unified hub) ──────────────── */
+function renderAdminIamConsole(){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+  if(typeof window._renderAdminIamConsole === 'function'){
+    window._renderAdminIamConsole(el);
+    return;
+  }
+  el.innerHTML = '<div class="hm-empty">'+(lang==='en'?'Loading IAM Console...':'Đang tải IAM Console...')+'</div>';
+  ensureAdminShared(function(){
+    var existing = document.getElementById('admin-iam-console-script');
+    if(existing){ existing.remove(); }
+    var s = document.createElement('script');
+    s.id  = 'admin-iam-console-script';
+    s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00l-admin-iam-console.js?v=' + (window.APP_VERSION || Date.now());
+    s.onload = function(){
+      if(typeof window._renderAdminIamConsole === 'function') window._renderAdminIamConsole(el);
+    };
+    document.head.appendChild(s);
+  });
+}
+
+/* ── Admin: ensure shared library is loaded before admin tab files ──────── */
+function ensureAdminShared(cb){
+  if(window.AdminUI && window.AdminUI.__loaded){ cb(); return; }
+  var existing = document.getElementById('admin-shared-script');
+  if(existing){
+    if(window.AdminUI && window.AdminUI.__loaded) return cb();
+    existing.addEventListener('load', cb);
+    return;
+  }
   var s = document.createElement('script');
-  s.id  = 'admin-governance-tabs-script';
-  s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00g-admin-governance-tabs.js?v=' + (window.APP_VERSION || Date.now());
-  s.onload = function(){
-    if(typeof window._renderAdminGovernanceTab === 'function') window._renderAdminGovernanceTab(el, slug);
-  };
+  s.id  = 'admin-shared-script';
+  s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00j-admin-shared.js?v=' + (window.APP_VERSION || Date.now());
+  s.onload = cb;
   document.head.appendChild(s);
 }
 
@@ -8044,15 +8070,17 @@ function renderAdminPermTab(slug){
     return;
   }
   el.innerHTML = '<div class="hm-empty">'+(lang==='en'?'Loading admin tab...':'Đang tải tab quản trị...')+'</div>';
-  var existing = document.getElementById('admin-permissions-tabs-script');
-  if(existing){ existing.remove(); }
-  var s = document.createElement('script');
-  s.id  = 'admin-permissions-tabs-script';
-  s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00i-admin-permissions-tabs.js?v=' + (window.APP_VERSION || Date.now());
-  s.onload = function(){
-    if(typeof window._renderAdminPermTab === 'function') window._renderAdminPermTab(el, slug);
-  };
-  document.head.appendChild(s);
+  ensureAdminShared(function(){
+    var existing = document.getElementById('admin-permissions-tabs-script');
+    if(existing){ existing.remove(); }
+    var s = document.createElement('script');
+    s.id  = 'admin-permissions-tabs-script';
+    s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00i-admin-permissions-tabs.js?v=' + (window.APP_VERSION || Date.now());
+    s.onload = function(){
+      if(typeof window._renderAdminPermTab === 'function') window._renderAdminPermTab(el, slug);
+    };
+    document.head.appendChild(s);
+  });
 }
 
 /* ── Admin: Content & security tabs (Effective Docs / Retention / MFA) ──── */
@@ -8064,15 +8092,17 @@ function renderAdminContentTab(slug){
     return;
   }
   el.innerHTML = '<div class="hm-empty">'+(lang==='en'?'Loading admin tab...':'Đang tải tab quản trị...')+'</div>';
-  var existing = document.getElementById('admin-content-tabs-script');
-  if(existing){ existing.remove(); }
-  var s = document.createElement('script');
-  s.id  = 'admin-content-tabs-script';
-  s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00h-admin-content-tabs.js?v=' + (window.APP_VERSION || Date.now());
-  s.onload = function(){
-    if(typeof window._renderAdminContentTab === 'function') window._renderAdminContentTab(el, slug);
-  };
-  document.head.appendChild(s);
+  ensureAdminShared(function(){
+    var existing = document.getElementById('admin-content-tabs-script');
+    if(existing){ existing.remove(); }
+    var s = document.createElement('script');
+    s.id  = 'admin-content-tabs-script';
+    s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00h-admin-content-tabs.js?v=' + (window.APP_VERSION || Date.now());
+    s.onload = function(){
+      if(typeof window._renderAdminContentTab === 'function') window._renderAdminContentTab(el, slug);
+    };
+    document.head.appendChild(s);
+  });
 }
 
 /* ── Admin: Translation Module Tab (multi-provider, lazy-loaded) ─────────── */
@@ -10572,7 +10602,65 @@ function renderAdminActivityFallback(){
 // ═══════════════════════════════════════════════════
 // ADMIN TAB: DEPARTMENTS & TITLES
 // ═══════════════════════════════════════════════════
+// Lazy-loader for the new world-class org console (00m-admin-org-console.js).
+// Falls through to the legacy table-card renderer if the new module is unavailable.
+// Expose a small helper so external admin console modules (00m-admin-org-console
+// and friends) can switch admin tabs without touching legacy globals directly.
+if (typeof window !== 'undefined' && typeof window.switchAdminTab !== 'function'){
+  window.switchAdminTab = function(tabId){
+    try {
+      adminTab = String(tabId || '');
+      if (typeof renderAdmin === 'function') renderAdmin();
+    } catch(_){
+      if (typeof showToast === 'function') showToast('⚠ '+(lang==='en'?'Tab switch failed':'Không chuyển tab được'));
+    }
+  };
+}
+
+function ensureAdminOrgConsole(cb){
+  if(typeof window._renderAdminOrgUnits === 'function' && typeof window._renderAdminOrgChart === 'function'){
+    cb(); return;
+  }
+  ensureAdminShared(function(){
+    var existing = document.getElementById('admin-org-console-script');
+    if(existing){
+      if(typeof window._renderAdminOrgUnits === 'function') return cb();
+      existing.addEventListener('load', cb);
+      return;
+    }
+    var s = document.createElement('script');
+    s.id  = 'admin-org-console-script';
+    s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00m-admin-org-console.js?v=' + (window.APP_VERSION || Date.now());
+    s.onload = cb;
+    s.onerror = function(){
+      console.error('[admin-org] Failed to load 00m-admin-org-console.js — falling back to legacy renderer');
+      cb();
+    };
+    document.head.appendChild(s);
+  });
+}
+
 function renderAdminDeptTitle(){
+  const panel = document.getElementById('admin-content');
+  if(!panel) return;
+  // Try the world-class console first; fall back if unavailable.
+  if(typeof window._renderAdminOrgUnits === 'function'){
+    panel.innerHTML = '';
+    window._renderAdminOrgUnits(panel);
+    return;
+  }
+  panel.innerHTML = '<div class="hm-empty">'+(lang==='en'?'Loading workforce console…':'Đang tải bảng điều khiển nhân sự…')+'</div>';
+  ensureAdminOrgConsole(function(){
+    if(typeof window._renderAdminOrgUnits === 'function'){
+      panel.innerHTML = '';
+      window._renderAdminOrgUnits(panel);
+    } else {
+      renderAdminDeptTitleLegacy();
+    }
+  });
+}
+
+function renderAdminDeptTitleLegacy(){
   const panel = document.getElementById('admin-content');
   if(!panel) return;
   panel.innerHTML='';
@@ -10918,6 +11006,26 @@ function deleteTitle(idx){
 // ADMIN TAB: ORG CHART
 // ═══════════════════════════════════════════════════
 function renderAdminOrgChart(){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+  // Try the world-class SVG canvas console first; fall back if unavailable.
+  if(typeof window._renderAdminOrgChart === 'function'){
+    el.innerHTML = '';
+    window._renderAdminOrgChart(el);
+    return;
+  }
+  el.innerHTML = '<div class="hm-empty">'+(lang==='en'?'Loading org chart canvas…':'Đang tải sơ đồ tổ chức…')+'</div>';
+  ensureAdminOrgConsole(function(){
+    if(typeof window._renderAdminOrgChart === 'function'){
+      el.innerHTML = '';
+      window._renderAdminOrgChart(el);
+    } else {
+      renderAdminOrgChartLegacy();
+    }
+  });
+}
+
+function renderAdminOrgChartLegacy(){
   const el = document.getElementById('admin-content');
   if(!ADMIN_AUTH_STATE.org.loaded){
     if(!ADMIN_AUTH_STATE.org.loading && !ADMIN_AUTH_STATE.org.error){
@@ -11476,6 +11584,30 @@ function exportActivityCSV(){
 // ═══════════════════════════════════════════════════
 function renderAdminRoles(){
   const el=document.getElementById('admin-content');
+  if(!el) return;
+  if(typeof window._renderAdminRolesV2 === 'function'){
+    window._renderAdminRolesV2(el);
+    return;
+  }
+  el.innerHTML = '<div class="hm-empty">'+(lang==='en'?'Loading roles...':'Đang tải vai trò...')+'</div>';
+  ensureAdminShared(function(){
+    var existing = document.getElementById('admin-roles-script');
+    if(existing){ existing.remove(); }
+    var s = document.createElement('script');
+    s.id  = 'admin-roles-script';
+    s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00k-admin-roles.js?v=' + (window.APP_VERSION || Date.now());
+    s.onload = function(){
+      if(typeof window._renderAdminRolesV2 === 'function') window._renderAdminRolesV2(el);
+      else renderAdminRolesLegacy();
+    };
+    s.onerror = function(){ renderAdminRolesLegacy(); };
+    document.head.appendChild(s);
+  });
+}
+
+function renderAdminRolesLegacy(){
+  const el=document.getElementById('admin-content');
+  if(!el) return;
   if(!ADMIN_AUTH_STATE.roles.loaded){
     if(!ADMIN_AUTH_STATE.roles.loading && !ADMIN_AUTH_STATE.roles.error){
       loadAuthoritativeRoleCatalog({silent:true});
