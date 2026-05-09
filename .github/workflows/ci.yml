@@ -119,13 +119,13 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
-      - name: Broken-refs regression gate (baseline 120)
-        # Baseline 120 leaves a +2 buffer over the current 118 known content
+      - name: Broken-refs regression gate (baseline 95)
+        # Baseline 95 leaves a +2 buffer over the current 93 known content
         # gaps tracked in _reports/doc-link-orphans-2026-05-09.md. Any commit
         # that introduces a NEW broken internal link will trip this gate.
         # When intentionally lowering the gap (e.g. authoring a missing page),
         # update the threshold here in the same PR.
-        run: python3 scripts/doc-broken-refs-scan.py mom/docs --max-broken 120
+        run: python3 scripts/doc-broken-refs-scan.py mom/docs --max-broken 95
       - name: DCC header audit (compliant-count regression gate)
         # Asserts ≥389 of 390 HTML docs satisfy the DCC pattern. Baseline 389
         # accommodates the one pre-existing fragment template
