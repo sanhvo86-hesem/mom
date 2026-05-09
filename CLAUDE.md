@@ -12,6 +12,51 @@ Quick mandatory sequence every session:
 
 **NEVER create files at repo root. NEVER place reports inside `mom/docs/`.**
 
+## MANDATORY: VPS deployment policy (NEVER `git reset --hard` on VPS)
+
+Live VPS state at `/var/www/eqms.hesemeng.com/` includes runtime data that
+PHP-FPM mutates (users, role permissions, doc overrides, …). Any
+destructive git operation that runs as root on the VPS will silently
+overwrite this state with stale committed bytes. **A previous incident
+lost user `ianr` from `users.json` because an SSH-driven `git reset
+--hard origin/main` reverted the tracked file to a pre-mutation snapshot
+in commit `4a8ffebd`.** Untracking (commit `41436ee2`) closes the
+physical gap, but the policy below is non-negotiable to prevent
+recurrence with any file added later.
+
+### Forbidden on VPS
+- **NEVER** run `git reset --hard`, `git restore`, `git clean -fd`, or
+  any destructive git op on `/var/www/eqms.hesemeng.com` via SSH.
+- **NEVER** craft composite SSH commands like
+  `ssh root@eqms 'cd /var/www/... && git fetch && git reset --hard origin/main && systemctl reload php-fpm'`
+  for "manual-fix" or "quick deploy". This bypasses
+  `tools/vps-setup/scripts/deploy.sh` capture/restore.
+
+### Required deploy paths
+- **Default**: push to `main` → GitHub Actions
+  (`.github/workflows/deploy.yml`) runs the deploy. Has CI guard +
+  capture/restore + sha256 verification.
+- **Manual fallback** (only when CI is unavailable):
+  `ssh eqms 'sudo -n bash /var/www/eqms.hesemeng.com/tools/vps-setup/scripts/deploy.sh'`
+  — this script captures runtime config to
+  `/var/www/data-private/.deploy-snapshots/<TS>/`, runs the reset,
+  restores by sha256 verification, fails loudly on mismatch.
+- **Hot-fix on VPS only** (rare): edit via portal admin UI which writes
+  through `DataSyncMutationService` (snapshots + audit_events row).
+  Never edit `mom/data/config/*.json` with `vi`/`sed`/`cat >` directly.
+
+### Backups before any risky op
+```
+ssh eqms 'sudo cp -a /var/www/data-private /var/backups/data-private-$(date +%F-%H%M) \
+       && sudo cp -a /var/www/eqms.hesemeng.com/mom/data/config /var/backups/site-config-$(date +%F-%H%M)'
+```
+
+### When this policy applies
+- Any AI assistant session that has SSH access to `eqms` host.
+- Any human deploying outside the GitHub Actions workflow.
+- Any "fix the broken VPS" ad-hoc instruction — pause, verify the
+  failure mode, prefer `deploy.sh` over raw git ops.
+
 ## MANDATORY: Graphics Authority Link (no-hardcode rule)
 
 **Every UI module resolves visual parameters through the Graphics Authority.
