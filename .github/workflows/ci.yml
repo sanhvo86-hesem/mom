@@ -109,3 +109,40 @@ jobs:
         run: npm install -g @stoplight/spectral-cli
       - name: Validate OpenAPI spec
         run: spectral lint mom/api/openapi.yaml --fail-severity warn
+
+  doc-health:
+    name: Doc Health (broken-refs + DCC audit)
+    runs-on: ubuntu-latest
+    needs: repo-boundary
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+      - name: Broken-refs regression gate (baseline 120)
+        # Baseline 120 leaves a +2 buffer over the current 118 known content
+        # gaps tracked in _reports/doc-link-orphans-2026-05-09.md. Any commit
+        # that introduces a NEW broken internal link will trip this gate.
+        # When intentionally lowering the gap (e.g. authoring a missing page),
+        # update the threshold here in the same PR.
+        run: python3 scripts/doc-broken-refs-scan.py mom/docs --max-broken 120
+      - name: DCC header audit (compliant-count regression gate)
+        # Asserts ≥389 of 390 HTML docs satisfy the DCC pattern. Baseline 389
+        # accommodates the one pre-existing fragment template
+        # (mom/docs/training/templates/certificate-template.html — no <head>).
+        # If a new doc fails to add a DCC header, this drops compliance and
+        # the gate fails. Bump the baseline only when intentionally retiring
+        # the certificate-template fix-up.
+        run: |
+          OUT="$(php mom/tools/dcc-batch/audit.php 2>&1 || true)"
+          echo "$OUT"
+          COMPLIANT=$(echo "$OUT" | awk -F: '/Fully compliant/{gsub(/ /,"",$2); print $2; exit}')
+          if [ -z "$COMPLIANT" ]; then
+            echo "FAIL: could not parse 'Fully compliant' from audit output." >&2
+            exit 1
+          fi
+          if [ "$COMPLIANT" -lt 389 ]; then
+            echo "FAIL: DCC compliance ($COMPLIANT) dropped below baseline (389)." >&2
+            exit 1
+          fi
+          echo "PASS: DCC compliance $COMPLIANT ≥ 389."
