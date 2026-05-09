@@ -56,6 +56,28 @@ return static function (Router $router, string $dataDir): void {
     $router->get('/api/registry/global-capability-audit', RegistryController::class, 'getGlobalCapabilityAudit');
     $router->get('/api/registry/manifest', RegistryController::class, 'getRegistryManifest');
     
+    // ─────────────────────────────────────────────────────────────────────
+    // RBAC + Governance custom endpoints (cross-table joins, SoD pre-check,
+    // view-backed read ports). Live alongside generic CRUD so the admin
+    // governance UI can avoid stitching multiple table-runtime calls.
+    // ─────────────────────────────────────────────────────────────────────
+    $router->get ('/api/v1/rbac/effective-permissions/{userId}', RbacController::class, 'effectivePermissions');
+    $router->get ('/api/v1/rbac/sod-violations',                 RbacController::class, 'sodViolations');
+    $router->post('/api/v1/rbac/role-assignments',               RbacController::class, 'assignRole');
+    $router->delete('/api/v1/rbac/role-assignments',             RbacController::class, 'revokeRole');
+
+    $router->get ('/api/v1/mfa/factors',                         RbacController::class, 'listFactors');
+    $router->post('/api/v1/mfa/factors/{factorId}:revoke',       RbacController::class, 'revokeFactor');
+    $router->post('/api/v1/mfa/factors:reset',                   RbacController::class, 'resetFactors');
+
+    $router->get ('/api/v1/documents/in-force',                  RbacController::class, 'documentsInForce');
+    $router->get ('/api/v1/documents/pending-acknowledgement',   RbacController::class, 'pendingAcknowledgement');
+
+    $router->get ('/api/v1/portal-display/effective-layout',     RbacController::class, 'effectiveLayout');
+
+    $router->get ('/api/v1/retention/due-for-disposal',          RbacController::class, 'retentionDueForDisposal');
+    $router->get ('/api/v1/access-review/progress',              RbacController::class, 'accessReviewProgress');
+
     // Generic runtime entity access — registered under /api/v1/runtime so the nginx
     // ^/api/v1/ location block routes the request to mom/api/index.php. Plain
     // /api/runtime/* never reached PHP and would 404 at the edge.
