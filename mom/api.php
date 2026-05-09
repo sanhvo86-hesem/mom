@@ -18665,7 +18665,7 @@ if ($username === '') {
     if ($_SERVER['REQUEST_METHOD'] !== 'GET') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
     if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
     if (empty($_SESSION['user'])) {
-      header('Location: portal.html');
+      header('Location: ' . rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '/mom/api.php'), '/\\') . '/portal.html');
       http_response_code(302);
       exit;
     }
@@ -18713,7 +18713,7 @@ if ($username === '') {
     if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
 
     if (empty($_SESSION['user'])) {
-      header('Location: portal.html');
+      header('Location: ' . rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? '/mom/api.php'), '/\\') . '/portal.html');
       http_response_code(302);
       exit;
     }

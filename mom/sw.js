@@ -36,7 +36,7 @@ try {
   self.__SW_BUILD_TAG = 'dev';
 }
 
-const CACHE_VERSION = 'v1.3.58';
+const CACHE_VERSION = 'v1.3.59';
 const CACHE_BUILD   = self.__SW_BUILD_TAG || 'dev';
 const CACHE_PREFIX  = 'hesem-mom';
 
@@ -204,6 +204,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Auth-gated document files (nginx routes these through doc_stream).
+  // They require a valid session, are version-controlled, and must never be
+  // cached by the SW — always pass through to the browser natively.
+  if (isDocStreamUrl(url)) return;
+
   // Route to appropriate caching strategy based on request type.
   if (isApiRequest(url)) {
     event.respondWith(networkFirst(request, CACHES.api));
@@ -279,6 +284,20 @@ function isAppShellRequest(url) {
 function isDeployMetadataRequest(url) {
   return url.pathname === '/mom/build-info.json' ||
          url.pathname === '/mom/sw-build-tag.js';
+}
+
+/**
+ * Identify auth-gated document files that nginx routes through doc_stream.
+ * Matches the nginx rewrite rule pattern:
+ *   ^/(archive|mom/docs/...)/.+\.(html|xlsx|xlsm|xls|csv)$
+ * These must bypass the SW entirely — they need a valid session and are
+ * version-controlled, so caching them would serve stale or wrong content.
+ * @param {URL} url
+ * @returns {boolean}
+ */
+function isDocStreamUrl(url) {
+  const p = url.pathname;
+  return p.startsWith('/mom/docs/') || p.startsWith('/archive/');
 }
 
 
