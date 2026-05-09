@@ -161,3 +161,26 @@ rate-limit/
 01-QMS-Portal/qms-data/runtime-shadow/**
 01-QMS-Portal/qms-data/sessions/**
 !01-QMS-Portal/qms-data/sessions/README.md
+
+# Runtime-mutated config files (untracked by untrack-runtime-files.sh)
+!mom/data/config/
+mom/data/config/*
+!mom/data/config/*.bootstrap.json
+mom/data/config/users.json
+mom/data/config/role_permissions.json
+mom/data/config/portal_role_docs.json
+mom/data/config/module_access_config.json
+mom/data/config/docs_custom.json
+mom/data/config/docs_custom.local.json
+mom/data/config/docs_visibility.json
+mom/data/config/doc_descriptions.json
+mom/data/config/folder_descriptions.json
+mom/data/config/doc_owner_overrides.json
+mom/data/config/record_type_expanded.json
+mom/data/config/form_control_registry.json
+mom/data/config/form_builder_formulas.json
+mom/data/config/so_jo_wo_config.json
+mom/data/config/portal_display_config.json
+mom/data/config/epicor_integration_policy.json
+mom/data/config/evidence_retention_policy.json
+mom/data/config/evidence_review_sla_policy.json
