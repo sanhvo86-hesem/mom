@@ -4476,7 +4476,7 @@ paths:
         policy, authored business-contract indexes and global ERP+MOM capability audit.
 
         Storage authority remains `database/migrations/*.sql -> database/schema.sql`.
-        Runtime generic access is documented separately at `/api/runtime/{domain}/{table}`.
+        Runtime generic access is documented separately at `/api/v1/runtime/{domain}/{table}`.
 
         **Legacy action:** `registry_system_contract`
       responses:
@@ -5568,7 +5568,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/GraphicsActiveWaiversResponse'
 
-  /api/runtime/{domain}/{table}:
+  /api/v1/runtime/{domain}/{table}:
     get:
       operationId: runtimeEntityList
       tags: [System Contract]
@@ -5642,7 +5642,7 @@ paths:
         '403':
           $ref: '#/components/responses/Forbidden'
 
-  /api/runtime/{domain}/{table}/{id}:
+  /api/v1/runtime/{domain}/{table}/{id}:
     get:
       operationId: runtimeEntityDetail
       tags: [System Contract]
@@ -5749,7 +5749,7 @@ paths:
         '409':
           $ref: '#/components/responses/Conflict'
 
-  /api/runtime/{domain}/{table}/{id}/transition:
+  /api/v1/runtime/{domain}/{table}/{id}/transition:
     post:
       operationId: runtimeEntityTransition
       tags: [System Contract]

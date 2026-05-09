@@ -137,6 +137,30 @@ class AuditMiddleware
      */
     public function writeEntry(array $entry): void
     {
+        // DB sink — write to audit_events for every authenticated REST API request.
+        // Covers /api/v1/ routes (including /api/v1/runtime/*) that bypass the legacy api.php global hook.
+        // portal_system_audit_shadow_write is defined in api.php and available here because
+        // api/index.php loads api.php with API_HELPERS_ONLY before dispatching.
+        if (\function_exists('portal_system_audit_shadow_write')) {
+            $actorName = strtolower(trim((string)($entry['user'] ?? '')));
+            if ($actorName !== '' && $actorName !== 'anonymous') {
+                \portal_system_audit_shadow_write([
+                    'event_type'     => (string)($entry['action'] ?? ''),
+                    'aggregate_type' => 'api_action',
+                    'aggregate_id'   => (string)($entry['action'] ?? ''),
+                    'actor_name'     => $actorName,
+                    'ip_address'     => (string)($entry['ip'] ?? ''),
+                    'session_id'     => \session_status() === PHP_SESSION_ACTIVE ? \session_id() : null,
+                    'metadata'       => [
+                        'source'        => 'rest_middleware',
+                        'method'        => $entry['method'] ?? '',
+                        'response_code' => $entry['response_code'] ?? null,
+                        'duration_ms'   => $entry['duration_ms'] ?? null,
+                    ],
+                ]);
+            }
+        }
+
         if (!$this->enabled) {
             return;
         }

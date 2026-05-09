@@ -56,13 +56,15 @@ return static function (Router $router, string $dataDir): void {
     $router->get('/api/registry/global-capability-audit', RegistryController::class, 'getGlobalCapabilityAudit');
     $router->get('/api/registry/manifest', RegistryController::class, 'getRegistryManifest');
     
-    // Generic runtime entity access
-    $router->get('/api/runtime/{domain}/{table}', GenericCrudController::class, 'listRecords');
-    $router->get('/api/runtime/{domain}/{table}/{id}', GenericCrudController::class, 'getDetail');
-    $router->post('/api/runtime/{domain}/{table}', GenericCrudController::class, 'createRecord');
-    $router->put('/api/runtime/{domain}/{table}/{id}', GenericCrudController::class, 'updateRecord');
-    $router->delete('/api/runtime/{domain}/{table}/{id}', GenericCrudController::class, 'deleteRecord');
-    $router->post('/api/runtime/{domain}/{table}/{id}/transition', GenericCrudController::class, 'transitionRecord');
+    // Generic runtime entity access — registered under /api/v1/runtime so the nginx
+    // ^/api/v1/ location block routes the request to mom/api/index.php. Plain
+    // /api/runtime/* never reached PHP and would 404 at the edge.
+    $router->get('/api/v1/runtime/{domain}/{table}', GenericCrudController::class, 'listRecords');
+    $router->get('/api/v1/runtime/{domain}/{table}/{id}', GenericCrudController::class, 'getDetail');
+    $router->post('/api/v1/runtime/{domain}/{table}', GenericCrudController::class, 'createRecord');
+    $router->put('/api/v1/runtime/{domain}/{table}/{id}', GenericCrudController::class, 'updateRecord');
+    $router->delete('/api/v1/runtime/{domain}/{table}/{id}', GenericCrudController::class, 'deleteRecord');
+    $router->post('/api/v1/runtime/{domain}/{table}/{id}/transition', GenericCrudController::class, 'transitionRecord');
     
     // ── Foundation Governance Contract Slice: Public REST Routes ────────────────
     

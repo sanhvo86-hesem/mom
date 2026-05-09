@@ -1407,6 +1407,20 @@ function portal_legacy_admin_audit_log(string $action, array $context = [], ?arr
   ]);
 }
 
+function portal_audit_session_event(string $eventType, string $username, array $meta = []): void {
+  if ($username === '') return;
+  try {
+    runtime_data_layer()->logEvent($eventType, 'user_session', $username, [], [
+      'actor_name' => $username,
+      'ip_address'  => (string)($_SERVER['REMOTE_ADDR'] ?? ''),
+      'session_id'  => session_status() === PHP_SESSION_ACTIVE ? session_id() : null,
+      'metadata'    => array_merge(['source' => 'auth'], $meta),
+    ]);
+  } catch (Throwable $e) {
+    @error_log('[api] session_audit failed: ' . $e->getMessage());
+  }
+}
+
 function portal_system_audit_shadow_read(array $filters = []): ?array {
   $connection = portal_system_db_connection();
   if (!$connection) {
@@ -1448,6 +1462,19 @@ function portal_system_audit_shadow_read(array $filters = []): ?array {
   if ($search !== '') {
     $where[] = "(coalesce(actor_name,'') ILIKE :search OR coalesce(event_type,'') ILIKE :search OR coalesce(aggregate_type,'') ILIKE :search OR coalesce(aggregate_id,'') ILIKE :search OR CAST(payload AS text) ILIKE :search)";
     $params[':search'] = '%' . $search . '%';
+  }
+
+  if (!empty($filters['exclude_aggregate_types'])) {
+    $excludeTypes = array_values(array_filter(array_map('strval', (array)$filters['exclude_aggregate_types'])));
+    if ($excludeTypes !== []) {
+      $excPlaceholders = [];
+      foreach ($excludeTypes as $i => $et) {
+        $ph = ':exc_agg_' . $i;
+        $excPlaceholders[] = $ph;
+        $params[$ph] = $et;
+      }
+      $where[] = "coalesce(aggregate_type,'') NOT IN (" . implode(',', $excPlaceholders) . ')';
+    }
   }
 
   $sql = 'SELECT event_type, aggregate_type, aggregate_id, actor_id, actor_name, payload, metadata, ip_address::text AS ip_address, session_id::text AS session_id, recorded_at
@@ -14978,6 +15005,40 @@ $action = match ($action) {
   default => $action
 };
 
+// ── Global user-activity audit hook ────────────────────────────────────────
+// Records ALL authenticated API actions so every user's activity appears in
+// the admin "Kiểm soát hành vi" tab — not just the 4 admin-specific actions
+// that previously called portal_legacy_admin_audit_log explicitly.
+// Actions that have dedicated detailed audit handlers are excluded to avoid
+// duplicate entries with empty payload (they log richer context themselves).
+(static function () use ($action, $method): void {
+    static $skip = [
+        '', 'status',
+        'auth_login', 'auth_logout', 'auth_mfa_verify', 'auth_enroll_verify',
+        'admin_docs_visibility_save', 'admin_portal_display_config_save',
+        'admin_module_access_save', 'save_data_settings',
+    ];
+    if (empty($_SESSION['user']) || in_array($action, $skip, true)) {
+        return;
+    }
+    try {
+        runtime_data_layer()->logEvent(
+            $action,
+            'api_action',
+            $action,
+            [],
+            [
+                'actor_name' => strtolower((string)$_SESSION['user']),
+                'ip_address'  => (string)($_SERVER['REMOTE_ADDR'] ?? ''),
+                'session_id'  => session_status() === PHP_SESSION_ACTIVE ? session_id() : null,
+                'metadata'    => ['source' => 'global_api_hook', 'method' => strtoupper($method)],
+            ]
+        );
+    } catch (Throwable $e) {
+        @error_log('[api] global_audit_hook failed: ' . $e->getMessage());
+    }
+})();
+
 switch ($action) {
   case 'status': {
     $logged = false;
@@ -17395,6 +17456,7 @@ case 'auth_login': {
       $user['updated_at'] = now_iso();
       update_user($store, $user);
       try { users_save($USERS_FILE, $store); } catch (Throwable $e) {}
+      portal_audit_session_event('user_login', $username, ['mfa' => false]);
       api_json([
         'ok' => true,
         'logged_in' => true,
@@ -17423,6 +17485,7 @@ case 'auth_login': {
       api_json(['ok'=>false,'error'=>'users_save_failed'], 500);
     }
 
+    portal_audit_session_event('user_login', $username, ['mfa' => true, 'inline_otp' => true]);
     api_json([
       'ok' => true,
       'logged_in' => true,
@@ -17479,6 +17542,7 @@ case 'auth_login': {
       api_json(['ok'=>false,'error'=>'users_save_failed'], 500);
     }
 
+    portal_audit_session_event('user_login', $username, ['mfa' => false]);
     api_json([
       'ok' => true,
       'logged_in' => true,
@@ -17601,6 +17665,8 @@ if ($username === '') {
     if ($method !== 'POST') api_json(['ok' => false, 'error' => 'method_not_allowed'], 405);
     require_allowed_origin();
     require_csrf();
+    $logoutUser = (string)($_SESSION['user'] ?? '');
+    portal_audit_session_event('user_logout', $logoutUser);
     destroy_auth_session();
     api_json(['ok' => true, 'logged_in' => false]);
   }

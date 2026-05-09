@@ -1617,6 +1617,12 @@ class DataLayer
                     $to = (string)$filters['to'];
                     $entries = array_values(array_filter($entries, static fn(array $row): bool => (string)($row['recorded_at'] ?? $row['timestamp'] ?? '') <= $to));
                 }
+                if (!empty($filters['exclude_aggregate_types'])) {
+                    $excludeTypes = array_map('strval', (array)$filters['exclude_aggregate_types']);
+                    $entries = array_values(array_filter($entries, static fn(array $row): bool =>
+                        !in_array((string)($row['aggregate_type'] ?? ''), $excludeTypes, true)
+                    ));
+                }
                 if (!empty($filters['search'])) {
                     $needle = mb_strtolower((string)$filters['search']);
                     $entries = array_values(array_filter($entries, static function (array $row) use ($needle): bool {
@@ -1660,16 +1666,25 @@ class DataLayer
                 if (!empty($filters['to'])) {
                     $qb->where('recorded_at', '<=', $filters['to']);
                 }
+                if (!empty($filters['exclude_aggregate_types'])) {
+                    $excludeTypes = array_values(array_filter(array_map('strval', (array)$filters['exclude_aggregate_types'])));
+                    if ($excludeTypes !== []) {
+                        $namedPhs = [];
+                        $namedParams = [];
+                        foreach ($excludeTypes as $i => $et) {
+                            $ph = ':_excagg' . $i;
+                            $namedPhs[] = $ph;
+                            $namedParams[$ph] = $et;
+                        }
+                        $qb->whereRaw("coalesce(aggregate_type,'') NOT IN (" . implode(',', $namedPhs) . ')', $namedParams);
+                    }
+                }
                 if (!empty($filters['search'])) {
                     // DB-008: Escape LIKE wildcard characters to prevent injection
                     $search = str_replace(['\\', '%', '_'], ['\\\\', '\%', '\_'], (string)$filters['search']);
                     $needle = '%' . $search . '%';
-                    $qb->whereRaw('(coalesce(actor_name, \'\') ILIKE ? OR coalesce(event_type, \'\') ILIKE ? OR coalesce(aggregate_type, \'\') ILIKE ? OR coalesce(aggregate_id, \'\') ILIKE ? OR CAST(payload AS text) ILIKE ?)', [
-                        $needle,
-                        $needle,
-                        $needle,
-                        $needle,
-                        $needle,
+                    $qb->whereRaw('(coalesce(actor_name, \'\') ILIKE :_srch OR coalesce(event_type, \'\') ILIKE :_srch OR coalesce(aggregate_type, \'\') ILIKE :_srch OR coalesce(aggregate_id, \'\') ILIKE :_srch OR CAST(payload AS text) ILIKE :_srch)', [
+                        ':_srch' => $needle,
                     ]);
                 }
                 $qb->limit((int)($filters['limit'] ?? 100));

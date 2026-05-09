@@ -676,7 +676,6 @@ function moduleAccessAdminTabCatalog(){
     {id:'version_control', group:'operations', icon:'🔄', labelEn:'Version control', labelVi:'Điều khiển phiên bản', noteEn:'Git synchronization and release hygiene.', noteVi:'Đồng bộ Git và vệ sinh phát hành.', defaultAccess:'admin'},
     {id:'mfa', group:'security', icon:'🔑', labelEn:'MFA security', labelVi:'Bảo mật MFA', noteEn:'MFA policy and enrollment status.', noteVi:'Chính sách MFA và trạng thái kích hoạt.', defaultAccess:'admin'},
     {id:'ai_control', group:'operations', icon:'🤖', labelEn:'AI Control', labelVi:'Điều khiển AI', noteEn:'AI engine on/off, model selection, feature toggles, usage and cost tracking.', noteVi:'Bật/tắt AI engine, chọn model, tính năng, theo dõi sử dụng và chi phí.', defaultAccess:'admin'},
-    {id:'translation_provider', group:'operations', icon:'🌐', labelEn:'Translation Provider', labelVi:'Engine Dịch Thuật', noteEn:'Switch between Argos and NLLB-200 translation engines for English locale artifacts.', noteVi:'Chuyển đổi giữa Argos và NLLB-200 cho artifact tiếng Anh.', defaultAccess:'admin'},
     {id:'translation_module', group:'operations', icon:'🌍', labelEn:'Translation Module', labelVi:'Module Dịch Thuật', noteEn:'Multi-provider routing (NLLB / Claude CLI / Codex CLI / API), credentials vault, model discovery, cost log, side-by-side test bench. Backed by migration 157.', noteVi:'Định tuyến đa engine (NLLB / Claude CLI / Codex CLI / API), kho API key mã hóa, chọn model, log chi phí, test song song. Migration 157.', defaultAccess:'admin'},
     {id:'appearance', group:'content', icon:'🎨', labelEn:'Appearance', labelVi:'Giao diện', noteEn:'Portal design system and theme settings.', noteVi:'Thiết lập giao diện và design system.', defaultAccess:'admin'}
   ];
@@ -1351,7 +1350,7 @@ async function controlPlaneDocumentAuthoringRequest(action, payload=null, method
 }
 
 function runtimeApiPath(domain, table, recordId=''){
-  const base = `/api/runtime/${encodeURIComponent(domain)}/${encodeURIComponent(table)}`;
+  const base = `/api/v1/runtime/${encodeURIComponent(domain)}/${encodeURIComponent(table)}`;
   return recordId ? `${base}/${encodeURIComponent(recordId)}` : base;
 }
 
@@ -1709,7 +1708,12 @@ async function loadAuthoritativeAuditTrail(options={}){
   ADMIN_AUTH_STATE.audit.loading = true;
   ADMIN_AUTH_STATE.audit.error = '';
   try{
-    const res = await apiCall('admin_audit_trail_list', {limit:500}, 'GET', 9000);
+    const filters = adminFilterState('activity');
+    const params = {limit: 1000};
+    if(filters.dateFrom) params.from = filters.dateFrom + 'T00:00:00Z';
+    if(filters.dateTo)   params.to   = filters.dateTo   + 'T23:59:59Z';
+    if(filters.includeSystem) params.include_system = '1';
+    const res = await apiCall('admin_audit_trail_list', params, 'GET', 12000);
     if(!(res && res.ok && Array.isArray(res.events))) throw new Error(runtimeErrorMessage(res, 'audit_trail_load_failed'));
     ADMIN_AUTH_STATE.audit.events = res.events;
     ADMIN_AUTH_STATE.audit.loaded = true;
@@ -5805,7 +5809,7 @@ const ADMIN_TAB_FILTER_DEFAULTS = {
   dept_title:{search:'',status:'all'},
   orgchart:{search:'',status:'all'},
   roles:{search:'',dept:'',status:'all'},
-  activity:{search:'',actor:'',eventType:'',aggregateType:''}
+  activity:{search:'',actor:'',eventType:'',aggregateType:'',dateFrom:'',dateTo:'',includeSystem:false}
 };
 let ADMIN_TAB_FILTERS = JSON.parse(JSON.stringify(ADMIN_TAB_FILTER_DEFAULTS));
 const ADMIN_RUNTIME_ASSET_VERSION = '20260413c';
@@ -6202,7 +6206,7 @@ async function adminDataSyncUploadDo(name, content, expectedSha, changeRef, forc
 }
 
 async function adminDataSyncResolveDrift(name, direction){
-  const dirLabel = direction === 'site_to_mirror' ? 'site → mirror' : 'mirror → site';
+  const dirLabel = direction === 'site_to_mirror' ? 'VPS → Local' : 'Local → VPS';
   if(!confirm(lang==='en'
       ? `Resolve drift for ${name} by copying ${dirLabel}? A snapshot is taken first.`
       : `Giải quyết lệch ${name} bằng cách copy ${dirLabel}? Snapshot sẽ được tạo trước.`)){
@@ -6416,13 +6420,16 @@ function renderAdminDataSyncCard(){
       : '';
     const up = `<button class="dsync-act dsync-up" onclick='adminDataSyncUploadPrompt(${fName})' title="${escapeHtml(lang==='en'?'Upload from laptop':'Đẩy file từ máy lên')}">⬆ ${escapeHtml(lang==='en'?'Đẩy':'Đẩy')}</button>`;
     const drift = (f.site_present && f.private_present && !f.in_sync_with_mirror)
-      ? `<button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"site_to_mirror")' title="${escapeHtml(lang==='en'?'Push site over mirror':'Đẩy site đè mirror')}">→ ${escapeHtml(lang==='en'?'site→mirror':'site→mirror')}</button>
-         <button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"mirror_to_site")' title="${escapeHtml(lang==='en'?'Pull mirror over site':'Kéo mirror đè site')}">← ${escapeHtml(lang==='en'?'mirror→site':'mirror→site')}</button>`
+      ? `<button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"site_to_mirror")' title="${escapeHtml(lang==='en'?'Copy VPS file to local mirror':'Ghi bản VPS vào mirror local')}">→ ${escapeHtml(lang==='en'?'VPS→Local':'VPS→Local')}</button>
+         <button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"mirror_to_site")' title="${escapeHtml(lang==='en'?'Copy local mirror to VPS':'Ghi bản mirror local lên VPS')}">← ${escapeHtml(lang==='en'?'Local→VPS':'Local→VPS')}</button>`
       : '';
     const noMirror = (f.site_present && !f.private_present)
-      ? `<button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"site_to_mirror")' title="${escapeHtml(lang==='en'?'Seed mirror':'Tạo mirror')}">+ ${escapeHtml(lang==='en'?'seed mirror':'tạo mirror')}</button>`
+      ? `<button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"site_to_mirror")' title="${escapeHtml(lang==='en'?'Seed local mirror from VPS':'Tạo mirror local từ VPS')}">+ ${escapeHtml(lang==='en'?'seed local':'tạo mirror')}</button>`
       : '';
-    const actions = `<div class="dsync-actions">${dl}${up}${drift}${noMirror}</div>`;
+    const absentMirror = (!f.site_present && f.private_present)
+      ? `<button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"mirror_to_site")' title="${escapeHtml(lang==='en'?'Restore file on VPS from local mirror':'Khôi phục file lên VPS từ mirror local')}">← ${escapeHtml(lang==='en'?'Local→VPS':'Local→VPS')}</button>`
+      : '';
+    const actions = `<div class="dsync-actions">${dl}${up}${drift}${noMirror}${absentMirror}</div>`;
     return `<tr>
       <td><code>${escapeHtml(f.name)}</code></td>
       <td>${escapeHtml(f.site_present ? fmtBytes(f.site_size) : '--')}</td>
@@ -6571,6 +6578,512 @@ function adminGitSyncIcon(kind){
 
 
 
+// ── Config Sync sub-tab: action functions ─────────────────────────────────
+
+async function adminDataSyncBatchResolve(direction, scope){
+  const scopeLabel = scope === 'no_mirror'
+    ? (lang==='en' ? 'files missing a mirror copy' : 'file chưa có bản mirror')
+    : scope === 'absent'
+    ? (lang==='en' ? 'files absent on VPS but in mirror' : 'file thiếu trên VPS nhưng có trong mirror')
+    : (lang==='en' ? 'all drifted files' : 'tất cả file lệch');
+  const dirLabel = direction === 'site_to_mirror'
+    ? (lang==='en' ? 'VPS → Mirror' : 'VPS → Mirror')
+    : (lang==='en' ? 'Mirror → VPS' : 'Mirror → VPS');
+  if(!confirm(lang==='en'
+    ? `Batch resolve ${scopeLabel} (direction: ${dirLabel})?\nA snapshot will be taken before any write.`
+    : `Giải quyết hàng loạt ${scopeLabel} (chiều: ${dirLabel})?\nSnapshot sẽ được tạo trước khi ghi.`)){
+    return;
+  }
+  const cr = prompt(lang==='en' ? 'Change reference (CR):' : 'Mã thay đổi (CR):', 'admin-ui-batch');
+  if(cr === null) return;
+  try{
+    showToast(lang==='en' ? 'Running batch resolve…' : 'Đang giải quyết hàng loạt…');
+    const res = await apiCall('admin_data_sync_batch_resolve',
+      {direction, scope, change_ref: (cr||'').trim() || 'admin-ui-batch'}, 'POST');
+    if(res && res.ok){
+      const ok = Number(res.ok_count || 0);
+      const total = Number(res.total_candidates || 0);
+      showToast(lang==='en'
+        ? `Batch done: ${ok}/${total} files resolved · snapshot ${(res.snapshot||'').slice(0,15)}`
+        : `Hoàn tất: ${ok}/${total} file đã giải quyết · snapshot ${(res.snapshot||'').slice(0,15)}`);
+      adminRefreshDataSyncStatus();
+      dataSyncSnapshotsState = {loading:false, loaded:false, error:'', data:null};
+    }else{
+      showToast((lang==='en'?'Batch failed: ':'Hàng loạt thất bại: ')+(res&&(res.detail||res.error)||'unknown'));
+    }
+  }catch(e){
+    showToast('Batch resolve error: '+e.message);
+  }
+}
+
+async function adminDataSyncViewDiff(name){
+  if(!name) return;
+  vcConfigSyncDiffState = {open:true, name, loading:true, site:null, mirror:null, error:''};
+  renderAdmin();
+  try{
+    const res = await apiCall('admin_data_sync_read_file', {file:name}, 'GET');
+    if(res && res.ok){
+      vcConfigSyncDiffState = {open:true, name, loading:false, site:res.site||null, mirror:res.mirror||null, error:''};
+    }else{
+      vcConfigSyncDiffState = {open:true, name, loading:false, site:null, mirror:null,
+        error:(res&&(res.detail||res.error))||'read_failed'};
+    }
+  }catch(e){
+    vcConfigSyncDiffState = {open:true, name, loading:false, site:null, mirror:null, error:e.message};
+  }
+  renderAdmin();
+}
+
+function adminDataSyncCloseDiff(){
+  vcConfigSyncDiffState = {open:false, name:'', loading:false, site:null, mirror:null, error:''};
+  renderAdmin();
+}
+
+async function adminDataSyncOpenEditor(name){
+  if(!name) return;
+  vcConfigSyncEditorState = {open:true, name, loading:true, content:'', error:'', saving:false};
+  renderAdmin();
+  try{
+    // Fetch current site content via download endpoint (returns raw JSON text)
+    const url = 'api.php?action=admin_data_sync_read_file&file='+encodeURIComponent(name);
+    const r = await fetch(url, {credentials:'same-origin'});
+    const json = await r.json();
+    if(json && json.ok && json.site && json.site.bytes != null){
+      let pretty = json.site.bytes;
+      try{ pretty = JSON.stringify(JSON.parse(json.site.bytes), null, 2); }catch(_){}
+      vcConfigSyncEditorState = {open:true, name, loading:false, content:pretty, error:'', saving:false};
+    }else if(json && json.site === null){
+      vcConfigSyncEditorState = {open:true, name, loading:false, content:'{}', error:'', saving:false};
+    }else{
+      vcConfigSyncEditorState = {open:true, name, loading:false, content:'',
+        error:(json&&(json.detail||json.error))||'read_failed', saving:false};
+    }
+  }catch(e){
+    vcConfigSyncEditorState = {open:true, name, loading:false, content:'', error:e.message, saving:false};
+  }
+  renderAdmin();
+}
+
+function adminDataSyncCloseEditor(){
+  vcConfigSyncEditorState = {open:false, name:'', loading:false, content:'', error:'', saving:false};
+  renderAdmin();
+}
+
+async function adminDataSyncSaveEditor(){
+  const st = vcConfigSyncEditorState;
+  if(!st.open || st.saving) return;
+  const ta = document.getElementById('vc-config-editor-textarea');
+  const content = ta ? ta.value : st.content;
+  try{ JSON.parse(content); }
+  catch(e){
+    showToast(lang==='en'?'Invalid JSON: '+e.message:'JSON không hợp lệ: '+e.message);
+    return;
+  }
+  const cr = prompt(lang==='en'?'Change reference (CR):':'Mã thay đổi (CR):', 'admin-ui-edit');
+  if(cr === null) return;
+  vcConfigSyncEditorState = Object.assign({}, st, {saving:true});
+  renderAdmin();
+  try{
+    const res = await apiCall('admin_data_sync_upload_file',
+      {file:st.name, content, change_ref:(cr||'').trim()||'admin-ui-edit'}, 'POST');
+    if(res && res.ok){
+      showToast(res.unchanged
+        ? (lang==='en'?'No change detected':'Không có thay đổi')
+        : (lang==='en'?`Saved ${st.name} · snapshot ${(res.snapshot||'').slice(0,15)}`
+                      :`Đã lưu ${st.name} · snapshot ${(res.snapshot||'').slice(0,15)}`));
+      adminDataSyncCloseEditor();
+      adminRefreshDataSyncStatus();
+      dataSyncSnapshotsState = {loading:false, loaded:false, error:'', data:null};
+    }else{
+      vcConfigSyncEditorState = Object.assign({}, vcConfigSyncEditorState, {saving:false,
+        error:(res&&(res.detail||res.error))||'save_failed'});
+      renderAdmin();
+    }
+  }catch(e){
+    vcConfigSyncEditorState = Object.assign({}, vcConfigSyncEditorState, {saving:false, error:e.message});
+    renderAdmin();
+  }
+}
+
+// Simple line-level diff: returns array of {type:'same'|'add'|'del', line:string}
+function vcConfigSimpleDiff(aText, bText){
+  const aLines = (aText||'').split('\n');
+  const bLines = (bText||'').split('\n');
+  // Myers-style LCS is overkill; use a pragmatic patience-diff approximation
+  // for JSON files (usually only a few hundred lines).
+  const result = [];
+  let ai=0, bi=0;
+  while(ai < aLines.length || bi < bLines.length){
+    if(ai >= aLines.length){ result.push({type:'add', line:bLines[bi++]}); continue; }
+    if(bi >= bLines.length){ result.push({type:'del', line:aLines[ai++]}); continue; }
+    if(aLines[ai] === bLines[bi]){ result.push({type:'same', line:aLines[ai]}); ai++; bi++; }
+    else{
+      // Look ahead up to 8 lines to find a match
+      let foundA=-1, foundB=-1;
+      for(let la=1;la<=8;la++){ if(ai+la<aLines.length && aLines[ai+la]===bLines[bi]){foundA=la;break;} }
+      for(let lb=1;lb<=8;lb++){ if(bi+lb<bLines.length && bLines[bi+lb]===aLines[ai]){foundB=lb;break;} }
+      if(foundA>=0 && (foundB<0||foundA<=foundB)){
+        for(let x=0;x<foundA;x++) result.push({type:'del', line:aLines[ai++]});
+      }else if(foundB>=0){
+        for(let x=0;x<foundB;x++) result.push({type:'add', line:bLines[bi++]});
+      }else{
+        result.push({type:'del', line:aLines[ai++]});
+        result.push({type:'add', line:bLines[bi++]});
+      }
+    }
+  }
+  return result;
+}
+
+function renderVCConfigDiffModal(){
+  const st = vcConfigSyncDiffState;
+  if(!st.open) return '';
+  const title = escapeHtml(lang==='en'?`Diff: ${st.name}`:`So sánh nội dung: ${st.name}`);
+  let body;
+  if(st.loading){
+    body = `<div class="admin-sync-callout-bar is-info">${escapeHtml(lang==='en'?'Loading content…':'Đang tải nội dung…')}</div>`;
+  }else if(st.error){
+    body = `<div class="admin-sync-callout-bar is-error">${escapeHtml(st.error)}</div>`;
+  }else{
+    const siteBytes  = (st.site  && !st.site.error)  ? (st.site.bytes  || '') : null;
+    const mirrorBytes= (st.mirror && !st.mirror.error)? (st.mirror.bytes|| '') : null;
+    if(siteBytes === null && mirrorBytes === null){
+      body = `<div class="admin-sync-callout-bar is-warn">${escapeHtml(lang==='en'?'Both sides are absent.':'Cả hai bên đều không có file.')}</div>`;
+    }else if(siteBytes === null){
+      body = `<div class="admin-sync-callout-bar is-warn">${escapeHtml(lang==='en'?'File absent on VPS site. Mirror content shown below.':'File không có trên VPS. Nội dung mirror bên dưới.')}</div>`+
+        `<pre class="vc-diff-pre vc-diff-pre--single">${escapeHtml(mirrorBytes||'')}</pre>`;
+    }else if(mirrorBytes === null){
+      body = `<div class="admin-sync-callout-bar is-warn">${escapeHtml(lang==='en'?'Mirror absent. Site content shown below.':'Mirror không có. Nội dung site bên dưới.')}</div>`+
+        `<pre class="vc-diff-pre vc-diff-pre--single">${escapeHtml(siteBytes||'')}</pre>`;
+    }else if(siteBytes === mirrorBytes){
+      body = `<div class="admin-sync-callout-bar is-good">${escapeHtml(lang==='en'?'Files are identical (no diff).':'Hai file giống hệt nhau.')}</div>`;
+    }else{
+      const diff = vcConfigSimpleDiff(siteBytes, mirrorBytes);
+      const rows = diff.filter(d=>d.type!=='same').length;
+      const diffHtml = diff.map(d=>{
+        const cls = d.type==='add'?'vc-diff-add':d.type==='del'?'vc-diff-del':'vc-diff-same';
+        const pfx = d.type==='add'?'+ ':d.type==='del'?'- ':'  ';
+        return `<span class="${cls}">${escapeHtml(pfx+d.line)}\n</span>`;
+      }).join('');
+      body = `<div style="font-size:11px;color:var(--text-3);margin-bottom:6px">`+
+        escapeHtml(lang==='en'?`${rows} changed line(s)`:`${rows} dòng khác`)+
+        ` &nbsp;·&nbsp; <span style="color:var(--vc-diff-del,#c0392b)">- VPS site</span>`+
+        ` &nbsp;·&nbsp; <span style="color:var(--vc-diff-add,#27ae60)">+ mirror</span></div>`+
+        `<pre class="vc-diff-pre">${diffHtml}</pre>`;
+    }
+  }
+  return `<div class="vc-diff-overlay" onclick="if(event.target===this)adminDataSyncCloseDiff()">
+    <div class="vc-diff-modal">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <strong style="font-size:14px">${title}</strong>
+        <button class="admin-sync-mini" onclick="adminDataSyncCloseDiff()">✕ ${escapeHtml(lang==='en'?'Close':'Đóng')}</button>
+      </div>
+      ${body}
+    </div>
+  </div>`;
+}
+
+function renderVCConfigEditorModal(){
+  const st = vcConfigSyncEditorState;
+  if(!st.open) return '';
+  const title = escapeHtml(lang==='en'?`Edit: ${st.name}`:`Chỉnh sửa: ${st.name}`);
+  let body;
+  if(st.loading){
+    body = `<div class="admin-sync-callout-bar is-info">${escapeHtml(lang==='en'?'Loading file content…':'Đang tải nội dung file…')}</div>`;
+  }else if(st.error && !st.content){
+    body = `<div class="admin-sync-callout-bar is-error">${escapeHtml(st.error)}</div>`;
+  }else{
+    body = (st.error ? `<div class="admin-sync-callout-bar is-error" style="margin-bottom:8px">${escapeHtml(st.error)}</div>` : '')+
+      `<textarea id="vc-config-editor-textarea" class="vc-editor-textarea" spellcheck="false">${escapeHtml(st.content)}</textarea>`+
+      `<div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="admin-sync-mini" onclick="adminDataSyncSaveEditor()" ${st.saving?'disabled':''}>
+          ${st.saving
+            ? escapeHtml(lang==='en'?'Saving…':'Đang lưu…')
+            : escapeHtml(lang==='en'?'Save + sync mirror':'Lưu + cập nhật mirror')}
+        </button>
+        <button class="admin-sync-mini" onclick="adminDataSyncCloseEditor()">
+          ${escapeHtml(lang==='en'?'Cancel':'Hủy')}
+        </button>
+        <span style="font-size:11px;color:var(--text-3);align-self:center">
+          ${escapeHtml(lang==='en'?'Saves to VPS site copy and syncs mirror atomically.':'Lưu vào bản site VPS và đồng bộ mirror ngay lập tức.')}
+        </span>
+      </div>`;
+  }
+  return `<div class="vc-diff-overlay" onclick="if(event.target===this)adminDataSyncCloseEditor()">
+    <div class="vc-diff-modal vc-editor-modal">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <strong style="font-size:14px">${title}</strong>
+        <button class="admin-sync-mini" onclick="adminDataSyncCloseEditor()">✕ ${escapeHtml(lang==='en'?'Close':'Đóng')}</button>
+      </div>
+      ${body}
+    </div>
+  </div>`;
+}
+
+// ── Config Sync sub-tab renderer ──────────────────────────────────────────
+function renderAdminVCConfigSync(){
+  const state = dataSyncStatusState;
+  const data  = state.data && typeof state.data === 'object' ? state.data : null;
+  const err   = String(state.error || '').trim();
+
+  const refreshBtn = `<button class="admin-sync-mini" onclick="adminRefreshDataSyncStatus()">
+    <span class="admin-sync-mini-ico">${adminGitSyncIcon('sync')}</span>
+    <span>${lang==='en'?'Refresh':'Làm mới'}</span>
+  </button>`;
+
+  if(state.loading && !data){
+    return `<section><article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">
+      <div class="admin-sync-callout-bar is-info">${escapeHtml(lang==='en'?'Loading runtime config sync status…':'Đang tải trạng thái đồng bộ config runtime…')}</div>
+    </article></section>`;
+  }
+  if(err && !data){
+    return `<section><article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">
+      <div class="admin-sync-callout-bar is-error">${escapeHtml((lang==='en'?'Could not load status. ':'Không tải được trạng thái. ')+err)}</div>
+      <div style="margin-top:8px">${refreshBtn}</div>
+    </article></section>`;
+  }
+
+  const files      = Array.isArray(data && data.config_files) ? data.config_files : [];
+  const mirrorOk   = !!(data && data.private_data_present);
+  const driftFiles = files.filter(f=>f&&f.site_present&&f.private_present&&!f.in_sync_with_mirror);
+  const noMirrorFiles = files.filter(f=>f&&f.site_present&&!f.private_present);
+  const absentFiles= files.filter(f=>f&&!f.site_present&&f.private_present);
+  const goneFiles  = files.filter(f=>f&&!f.site_present&&!f.private_present);
+  const syncedFiles= files.filter(f=>f&&f.in_sync_with_mirror);
+
+  const fmtBytes = n=>{ n=Number(n||0); if(n<1024)return n+' B'; if(n<1048576)return (n/1024).toFixed(1)+' KB'; return (n/1048576).toFixed(2)+' MB'; };
+  const fmtTime  = iso=>iso?gitRepoFormatTime(iso)||iso:'--';
+
+  // ── Status banner ──────────────────────────────────────────────────────
+  const banner = (() => {
+    if(!mirrorOk) return `<div class="admin-sync-callout-bar is-error">${escapeHtml(lang==='en'
+      ?`Mirror directory ${data&&data.private_data_dir||'/var/www/data-private'} is missing — deploys cannot preserve runtime mutations.`
+      :`Thư mục mirror ${data&&data.private_data_dir||'/var/www/data-private'} không tồn tại — deploy không thể bảo toàn dữ liệu runtime.`)}</div>`;
+    const problems = driftFiles.length + noMirrorFiles.length + absentFiles.length + goneFiles.length;
+    if(problems === 0) return `<div class="admin-sync-callout-bar is-good">${escapeHtml(lang==='en'
+      ?`All ${syncedFiles.length} registered files are in sync with the mirror.`
+      :`Tất cả ${syncedFiles.length} file đã đăng ký đều khớp với mirror.`)}</div>`;
+    const parts = [];
+    if(driftFiles.length)   parts.push(lang==='en'?`${driftFiles.length} drifted`:`${driftFiles.length} lệch`);
+    if(noMirrorFiles.length)parts.push(lang==='en'?`${noMirrorFiles.length} no mirror`:`${noMirrorFiles.length} chưa mirror`);
+    if(absentFiles.length)  parts.push(lang==='en'?`${absentFiles.length} absent on VPS`:`${absentFiles.length} thiếu trên VPS`);
+    if(goneFiles.length)    parts.push(lang==='en'?`${goneFiles.length} missing from both pools`:`${goneFiles.length} mất cả hai bên`);
+    return `<div class="admin-sync-callout-bar is-warn">${escapeHtml(parts.join(' · ')+
+      (lang==='en'?' — use the batch actions or per-file actions below to resolve.'
+                  :' — dùng nút xử lý hàng loạt hoặc xử lý từng file bên dưới.'))}</div>`;
+  })();
+
+  // ── Batch action bar ───────────────────────────────────────────────────
+  const batchBar = (driftFiles.length || noMirrorFiles.length || absentFiles.length) ? `
+    <div class="vc-cs-batch-bar">
+      <span style="font-size:12px;font-weight:600;color:var(--text-primary,#1e293b)">${escapeHtml(lang==='en'?'Batch actions:':'Hành động hàng loạt:')}</span>
+      ${driftFiles.length ? `
+        <button class="dsync-act dsync-resolve" onclick="adminDataSyncBatchResolve('site_to_mirror','drift')"
+          title="${escapeHtml(lang==='en'?'Sync all drifted files: copy VPS site → mirror (trust VPS)':'Đồng bộ tất cả file lệch: VPS site → mirror (tin VPS)')}">
+          → ${escapeHtml(lang==='en'?`Sync ${driftFiles.length} drifted → Mirror`:`Đồng bộ ${driftFiles.length} file lệch → Mirror`)}
+        </button>
+        <button class="dsync-act dsync-resolve" onclick="adminDataSyncBatchResolve('mirror_to_site','drift')"
+          title="${escapeHtml(lang==='en'?'Sync all drifted files: copy mirror → VPS site (trust mirror)':'Đồng bộ tất cả file lệch: mirror → VPS site (tin mirror)')}">
+          ← ${escapeHtml(lang==='en'?`Sync ${driftFiles.length} drifted ← Mirror`:`Đồng bộ ${driftFiles.length} file lệch ← Mirror`)}
+        </button>` : ''}
+      ${noMirrorFiles.length ? `
+        <button class="dsync-act dsync-resolve" onclick="adminDataSyncBatchResolve('site_to_mirror','no_mirror')"
+          title="${escapeHtml(lang==='en'?'Create mirror copies for all files that have none':'Tạo bản mirror cho tất cả file chưa có')}">
+          + ${escapeHtml(lang==='en'?`Seed ${noMirrorFiles.length} mirrors`:`Tạo ${noMirrorFiles.length} bản mirror`)}
+        </button>` : ''}
+      ${absentFiles.length ? `
+        <button class="dsync-act dsync-resolve" onclick="adminDataSyncBatchResolve('mirror_to_site','absent')"
+          title="${escapeHtml(lang==='en'?'Restore all VPS-absent files from their mirror copies':'Khôi phục tất cả file thiếu trên VPS từ bản mirror')}">
+          ↺ ${escapeHtml(lang==='en'?`Restore ${absentFiles.length} absent`:`Khôi phục ${absentFiles.length} file thiếu`)}
+        </button>` : ''}
+    </div>` : '';
+
+  // ── Per-file table rows ────────────────────────────────────────────────
+  const rows = files.map(f=>{
+    if(!f) return '';
+    const bothAbsent = !f.site_present && !f.private_present;
+    const noMirror   = f.site_present  && !f.private_present;
+    const absentVPS  = !f.site_present && f.private_present;
+    const drifted    = f.site_present  && f.private_present && !f.in_sync_with_mirror;
+    const synced     = f.in_sync_with_mirror;
+
+    const badge = synced
+      ? `<span class="admin-sync-status-pill is-good">${escapeHtml(lang==='en'?'synced':'khớp')}</span>`
+      : drifted
+      ? `<span class="admin-sync-status-pill is-warn">${escapeHtml(lang==='en'?'drifted':'lệch')}</span>`
+      : noMirror
+      ? `<span class="admin-sync-status-pill is-warn">${escapeHtml(lang==='en'?'no mirror':'chưa mirror')}</span>`
+      : absentVPS
+      ? `<span class="admin-sync-status-pill is-warn">${escapeHtml(lang==='en'?'absent on VPS':'thiếu trên VPS')}</span>`
+      : `<span class="admin-sync-status-pill is-error">${escapeHtml(lang==='en'?'missing both':'mất cả hai')}</span>`;
+
+    const fName = JSON.stringify(f.name);
+    const acts = [];
+    if(f.site_present){
+      acts.push(`<button class="dsync-act dsync-dl" onclick='adminDataSyncDownload(${fName})' title="${escapeHtml(lang==='en'?'Download VPS site copy':'Tải bản site VPS')}">⬇ ${escapeHtml(lang==='en'?'Tải':'Tải')}</button>`);
+      acts.push(`<button class="dsync-act" style="color:var(--brand-2,#1565c0)" onclick='adminDataSyncOpenEditor(${fName})' title="${escapeHtml(lang==='en'?'Edit file content in portal':'Sửa nội dung file ngay trong portal')}">✎ ${escapeHtml(lang==='en'?'Edit':'Sửa')}</button>`);
+    }
+    acts.push(`<button class="dsync-act dsync-up" onclick='adminDataSyncUploadPrompt(${fName})' title="${escapeHtml(lang==='en'?'Upload new version from laptop':'Đẩy phiên bản mới từ laptop')}">⬆ ${escapeHtml(lang==='en'?'Đẩy':'Đẩy')}</button>`);
+    if(drifted){
+      acts.push(`<button class="dsync-act" style="color:#6366f1" onclick='adminDataSyncViewDiff(${fName})' title="${escapeHtml(lang==='en'?'View diff between site and mirror':'Xem khác biệt site và mirror')}">⊞ ${escapeHtml(lang==='en'?'Diff':'Diff')}</button>`);
+      acts.push(`<button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"site_to_mirror")' title="${escapeHtml(lang==='en'?'Copy VPS → mirror (trust VPS)':'Ghi bản VPS vào mirror (tin VPS)')}">→ VPS→M</button>`);
+      acts.push(`<button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"mirror_to_site")' title="${escapeHtml(lang==='en'?'Copy mirror → VPS (trust mirror)':'Ghi mirror lên VPS (tin mirror)')}">← M→VPS</button>`);
+    }
+    if(noMirror){
+      acts.push(`<button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"site_to_mirror")' title="${escapeHtml(lang==='en'?'Create mirror copy from VPS site file':'Tạo bản mirror từ file site VPS')}">+ ${escapeHtml(lang==='en'?'Seed mirror':'Tạo mirror')}</button>`);
+    }
+    if(absentVPS){
+      acts.push(`<button class="dsync-act" style="color:#6366f1" onclick='adminDataSyncViewDiff(${fName})' title="${escapeHtml(lang==='en'?'Preview mirror content before restoring':'Xem nội dung mirror trước khi khôi phục')}">⊞ ${escapeHtml(lang==='en'?'Preview':'Xem')}</button>`);
+      acts.push(`<button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"mirror_to_site")' title="${escapeHtml(lang==='en'?'Restore file on VPS from mirror':'Khôi phục file lên VPS từ mirror')}">↺ ${escapeHtml(lang==='en'?'Restore to VPS':'Khôi phục VPS')}</button>`);
+    }
+    if(bothAbsent){
+      acts.push(`<span style="font-size:10px;color:var(--text-3)">${escapeHtml(lang==='en'?'Missing from both pools — restore from a snapshot below':'Mất cả hai bên — khôi phục từ snapshot bên dưới')}</span>`);
+    }
+
+    return `<tr class="${bothAbsent?'vc-cs-row-critical':drifted||noMirror||absentVPS?'vc-cs-row-warn':''}">
+      <td><code>${escapeHtml(f.name)}</code></td>
+      <td>${escapeHtml(f.site_present?(fmtBytes(f.site_size)+' · '+fmtTime(f.site_mtime)):'—')}</td>
+      <td><code class="${!f.site_present?'vc-cs-sha-absent':''}">${escapeHtml(f.site_sha256_short||'—')}</code></td>
+      <td><code class="${!f.private_present?'vc-cs-sha-absent':''}">${escapeHtml(f.private_sha256_short||'—')}</code></td>
+      <td>${badge}</td>
+      <td><div class="dsync-actions">${acts.join('')}</div></td>
+    </tr>`;
+  }).join('');
+
+  // ── Sync log tail ──────────────────────────────────────────────────────
+  const syncLog  = (data && data.sync_log) || {readable:false, tail:[], path:''};
+  const logBlock = (() => {
+    if(!syncLog.readable) return `<div style="color:var(--text-3);font-size:12px">${escapeHtml(lang==='en'
+      ?`Sync log ${syncLog.path||''} not readable from PHP-FPM (root-only — normal).`
+      :`Log ${syncLog.path||''} không đọc được từ PHP-FPM (mặc định root-only — bình thường).`)}</div>`;
+    const tail = Array.isArray(syncLog.tail)?syncLog.tail:[];
+    if(!tail.length) return `<div style="color:var(--text-3);font-size:12px">${escapeHtml(lang==='en'?'Sync log is empty.':'Log sync rỗng.')}</div>`;
+    return `<pre style="font-size:11px;line-height:1.4;background:var(--bg-2,#f6f7fb);padding:8px;border-radius:6px;overflow:auto;max-height:160px;margin:0">${escapeHtml(tail.join('\n'))}</pre>`;
+  })();
+
+  const modals = renderVCConfigDiffModal() + renderVCConfigEditorModal();
+
+  return `<style>
+    .vc-cs-batch-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 12px;
+      background:var(--bg-2,#f6f7fb);border-radius:8px;margin:0 0 12px 0;border:1px solid var(--border,#e2e8f0)}
+    .vc-cs-row-warn td{background:color-mix(in srgb,#f59e0b 6%,transparent)}
+    .vc-cs-row-critical td{background:color-mix(in srgb,#ef4444 8%,transparent)}
+    .vc-cs-sha-absent{color:var(--text-3,#94a3b8);font-style:italic}
+    .vc-diff-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
+    .vc-diff-modal{background:var(--bg-surface,#fff);border-radius:12px;padding:20px;width:100%;max-width:860px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+    .vc-editor-modal{max-width:940px}
+    .vc-diff-pre{font-size:11px;line-height:1.4;background:var(--bg-2,#f6f7fb);padding:10px;border-radius:6px;overflow:auto;max-height:480px;margin:0;white-space:pre-wrap;word-break:break-all}
+    .vc-diff-pre--single{max-height:420px}
+    .vc-diff-add{color:var(--vc-diff-add,#166534);background:color-mix(in srgb,#22c55e 12%,transparent);display:block}
+    .vc-diff-del{color:var(--vc-diff-del,#991b1b);background:color-mix(in srgb,#ef4444 10%,transparent);display:block}
+    .vc-diff-same{color:var(--text-3,#64748b);display:block}
+    .vc-editor-textarea{width:100%;height:380px;font-family:monospace;font-size:12px;line-height:1.5;border:1px solid var(--border,#e2e8f0);border-radius:6px;padding:10px;resize:vertical;background:var(--bg-2,#f6f7fb);box-sizing:border-box}
+  </style>
+  ${modals}
+  <section>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px">
+      <div>
+        <div class="admin-sync-kicker">${lang==='en'?'Config Sync':'Đồng bộ Config File'}</div>
+        <h3 style="margin:4px 0 2px 0">${lang==='en'?'Runtime config bridge (local ↔ VPS)':'Ống thông cấu hình runtime (local ↔ VPS)'}</h3>
+        <p style="margin:0;font-size:12px;color:var(--text-3)">${lang==='en'
+          ?'These JSON files are written at runtime by the portal. The data-private mirror keeps them alive across deploys. Use batch or per-file actions to close any gaps.'
+          :'Các file JSON này được portal ghi runtime. Bản mirror data-private giữ chúng sống sót qua mỗi lần deploy. Dùng hành động hàng loạt hoặc từng file để đóng mọi khoảng cách.'}</p>
+      </div>
+      ${refreshBtn}
+    </div>
+    ${banner}
+    ${batchBar}
+    <article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">
+      <div class="admin-sync-panel-title" style="margin-bottom:8px">${lang==='en'?'File inventory':'Danh sách file'}
+        <span style="font-weight:400;color:var(--text-3);font-size:11px;margin-left:8px">
+          ${escapeHtml(lang==='en'
+            ?`${syncedFiles.length} synced · ${driftFiles.length} drifted · ${noMirrorFiles.length} no mirror · ${absentFiles.length} absent VPS · ${goneFiles.length} missing both`
+            :`${syncedFiles.length} khớp · ${driftFiles.length} lệch · ${noMirrorFiles.length} chưa mirror · ${absentFiles.length} thiếu VPS · ${goneFiles.length} mất cả hai`)}
+        </span>
+      </div>
+      <table class="admin-sync-simple-table" style="width:100%;border-collapse:collapse;font-size:12px">
+        <thead><tr>
+          <th style="text-align:left">${escapeHtml(lang==='en'?'File':'File')}</th>
+          <th style="text-align:left">${escapeHtml(lang==='en'?'Site (size · modified)':'Site (kích thước · sửa)')}</th>
+          <th style="text-align:left">${escapeHtml(lang==='en'?'SHA site':'SHA site')}</th>
+          <th style="text-align:left">${escapeHtml(lang==='en'?'SHA mirror':'SHA mirror')}</th>
+          <th style="text-align:left">${escapeHtml(lang==='en'?'Status':'Trạng thái')}</th>
+          <th style="text-align:left">${escapeHtml(lang==='en'?'Actions':'Hành động')}</th>
+        </tr></thead>
+        <tbody>${rows||`<tr><td colspan="6" style="color:var(--text-3);padding:8px">${escapeHtml(lang==='en'?'No files registered.':'Chưa đăng ký file nào.')}</td></tr>`}</tbody>
+      </table>
+    </article>
+    <article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+        <div class="admin-sync-panel-title">${lang==='en'?'Take manual snapshot':'Tạo snapshot thủ công'}</div>
+        <button class="admin-sync-mini" onclick="adminDataSyncTakeSnapshot()">
+          <span class="admin-sync-mini-ico">+</span>
+          <span>${lang==='en'?'Snapshot now':'Tạo snapshot ngay'}</span>
+        </button>
+      </div>
+      <div style="font-size:12px;color:var(--text-3)">${lang==='en'
+        ?'Creates a point-in-time copy of all site files into the data-private/.snapshots directory. Use the Snapshots sub-tab to restore from any previous snapshot.'
+        :'Tạo bản sao tại thời điểm hiện tại của tất cả file site vào thư mục data-private/.snapshots. Mở sub-tab Snapshot để khôi phục từ bất kỳ snapshot nào.'}</div>
+      ${goneFiles.length ? `
+        <div class="admin-sync-callout-bar is-error" style="margin-top:10px">
+          ${escapeHtml(lang==='en'
+            ?`${goneFiles.length} file(s) are missing from BOTH site and mirror: ${goneFiles.map(f=>f.name).join(', ')}. Restore them from the Snapshots sub-tab if a snapshot exists, or upload a clean copy via the ⬆ Đẩy button above.`
+            :`${goneFiles.length} file mất cả hai bên: ${goneFiles.map(f=>f.name).join(', ')}. Khôi phục từ sub-tab Snapshot nếu có snapshot, hoặc đẩy bản sạch bằng nút ⬆ Đẩy ở trên.`)}
+        </div>` : ''}
+    </article>
+    <article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:14px">
+      <div class="admin-sync-panel-title">${lang==='en'?'Sync log tail':'Đuôi log sync'} <code style="font-weight:400;color:var(--text-3);font-size:11px">${escapeHtml(syncLog.path||'')}</code></div>
+      <div style="margin-top:8px">${logBlock}</div>
+      <details style="margin-top:10px"><summary style="cursor:pointer;font-size:12px;font-weight:600">${escapeHtml(lang==='en'?'How to sync from your laptop (CLI)':'Cách đồng bộ từ laptop (CLI)')}</summary>
+        <pre style="font-size:11px;line-height:1.5;background:var(--bg-2,#f6f7fb);padding:8px;border-radius:6px;overflow:auto;margin:8px 0 0">
+${escapeHtml(`# 3-way reconcile (resolves drift, prefers VPS on conflict)
+bash tools/vps-setup/scripts/data-sync.sh
+
+# Dry-run first (exit 0=in-sync, 10=pending, 2=conflict)
+bash tools/vps-setup/scripts/data-sync.sh --check-only
+
+# Pull only (safe to cron every 5 min on laptop)
+bash tools/vps-setup/scripts/data-sync.sh --pull-only --yes
+
+# Push only (with a real Change Reference)
+bash tools/vps-setup/scripts/data-sync.sh --push-only --yes --change-ref <CR>`)}</pre>
+      </details>
+    </article>
+  </section>`;
+}
+
+// Compact runtime-config drift badge shown inside the Sync (Git) sub-tab.
+// Full details are in the dedicated Config Sync sub-tab.
+function renderAdminSyncConfigBadge(){
+  const state = dataSyncStatusState;
+  const data  = state.data && typeof state.data === 'object' ? state.data : null;
+  const files = Array.isArray(data && data.config_files) ? data.config_files : [];
+  const driftN   = files.filter(f=>f&&f.site_present&&f.private_present&&!f.in_sync_with_mirror).length;
+  const absentN  = files.filter(f=>f&&(!f.site_present||!f.private_present)).length;
+  const problems = driftN + absentN;
+
+  const tone  = !data ? 'is-info' : (problems > 0 ? 'is-warn' : 'is-good');
+  const msg   = !data
+    ? (lang==='en'?'Config sync status not yet loaded.':'Chưa tải trạng thái config sync.')
+    : problems === 0
+    ? (lang==='en'?`Runtime config: all ${files.length} files in sync with mirror.`:`Runtime config: tất cả ${files.length} file khớp với mirror.`)
+    : (lang==='en'
+        ?(driftN?`${driftN} drifted`:'')+( driftN&&absentN?' · ':'' )+(absentN?`${absentN} absent/no-mirror`:'')
+            +' — open Config Sync tab to resolve.'
+        :(driftN?`${driftN} file lệch`:'')+( driftN&&absentN?' · ':'' )+(absentN?`${absentN} file thiếu/chưa mirror`:'')
+            +' — mở tab Đồng bộ Config File để xử lý.');
+
+  return `<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+      <div class="admin-sync-panel-title">${lang==='en'?'Runtime config bridge':'Ống thông cấu hình runtime'}</div>
+      <button class="admin-sync-mini" onclick="setVersionControlSubTab('config_sync')">
+        ${escapeHtml(lang==='en'?'Open Config Sync →':'Mở Đồng bộ Config →')}
+      </button>
+    </div>
+    <div class="admin-sync-callout-bar ${tone}" style="margin-top:8px">${escapeHtml(msg)}</div>
+  </article>`;
+}
+
 function renderAdminSyncPanelV2(){
   const status = gitRepoStatusState.data && typeof gitRepoStatusState.data === 'object' ? gitRepoStatusState.data : null;
   const statusError = String(gitRepoStatusState.error || '').trim();
@@ -6686,7 +7199,7 @@ function renderAdminSyncPanelV2(){
           ${gitSyncRenderSimpleFileTable(dirtyEntries, lang==='en' ? 'The checked-out branch is clean.' : 'Nhánh đang checkout đang sạch.')}
         </div>
       ` : ''}
-      ${renderAdminDataSyncCard()}
+      ${renderAdminSyncConfigBadge()}
       ${renderAdminDataSyncSnapshotsCard()}
       <article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">
         <div class="admin-sync-panel-title">${escapeHtml(deployTitle)}</div>
@@ -6710,10 +7223,14 @@ function markUnsaved(){
 // in a single global so re-renders triggered by other panels don't reset it.
 
 let versionControlSubTab = 'overview';
-let versionControlOverviewState = {loading:false, loaded:false, error:'', data:null};
-let versionControlDocsState     = {loading:false, loaded:false, error:'', data:null, search:''};
-let versionControlDocDetailState= {loading:false, loaded:false, error:'', data:null, docCode:''};
-let versionControlAuditState    = {loading:false, loaded:false, error:'', data:null, limit:100};
+let versionControlOverviewState  = {loading:false, loaded:false, error:'', data:null};
+let versionControlDocsState      = {loading:false, loaded:false, error:'', data:null, search:''};
+let versionControlDocDetailState = {loading:false, loaded:false, error:'', data:null, docCode:''};
+let versionControlAuditState     = {loading:false, loaded:false, error:'', data:null, limit:100};
+// config_sync sub-tab: re-uses dataSyncStatusState (same data as Sync tab)
+// but has its own diff-viewer and editor modals stored in these locals:
+let vcConfigSyncDiffState  = {open:false, name:'', loading:false, site:null, mirror:null, error:''};
+let vcConfigSyncEditorState= {open:false, name:'', loading:false, content:'', error:'', saving:false};
 
 function setVersionControlSubTab(id){
   if(typeof id !== 'string' || !id) return;
@@ -6730,6 +7247,8 @@ function setVersionControlSubTab(id){
     loadDataSyncSnapshots({silent:true});
   } else if(id === 'sync'){
     if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading) loadGitRepoStatus({silent:true});
+    if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading) loadDataSyncStatus({silent:true});
+  } else if(id === 'config_sync'){
     if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading) loadDataSyncStatus({silent:true});
   }
   renderAdmin();
@@ -6847,12 +7366,13 @@ function vcStatusPill(label, tone){
 
 function renderVCSubTabNav(){
   const tabs = [
-    {id:'overview',    en:'Overview',     vi:'Tổng quan'},
-    {id:'sync',        en:'Sync',         vi:'Đồng bộ Git/Config'},
-    {id:'snapshots',   en:'Snapshots',    vi:'Snapshot & rollback'},
-    {id:'doc_history', en:'Doc history',  vi:'Lịch sử tài liệu'},
-    {id:'audit',       en:'Audit log',    vi:'Nhật ký kiểm toán'},
-    {id:'process',     en:'Process / SOP',vi:'Quy trình SOP'}
+    {id:'overview',    en:'Overview',          vi:'Tổng quan'},
+    {id:'sync',        en:'Sync (Git)',         vi:'Đồng bộ Git'},
+    {id:'config_sync', en:'Config Sync',        vi:'Đồng bộ Config File'},
+    {id:'snapshots',   en:'Snapshots',          vi:'Snapshot & rollback'},
+    {id:'doc_history', en:'Doc history',        vi:'Lịch sử tài liệu'},
+    {id:'audit',       en:'Audit log',          vi:'Nhật ký kiểm toán'},
+    {id:'process',     en:'Process / SOP',      vi:'Quy trình SOP'}
   ];
   const buttons = tabs.map(t => {
     const isActive = (versionControlSubTab === t.id);
@@ -7321,6 +7841,9 @@ function renderAdminVersionControl(){
     if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading && !gitRepoStatusState.error) loadGitRepoStatus({silent:true});
     if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading && !dataSyncStatusState.error) loadDataSyncStatus({silent:true});
   }
+  if(versionControlSubTab === 'config_sync' && !dataSyncStatusState.loaded && !dataSyncStatusState.loading && !dataSyncStatusState.error){
+    loadDataSyncStatus({silent:true});
+  }
   if(versionControlSubTab === 'snapshots' && !dataSyncSnapshotsState.loaded && !dataSyncSnapshotsState.loading && !dataSyncSnapshotsState.error){
     loadDataSyncSnapshots({silent:true});
   }
@@ -7334,6 +7857,7 @@ function renderAdminVersionControl(){
   let body;
   switch(versionControlSubTab){
     case 'sync':        body = renderAdminSyncPanelV2();        break;
+    case 'config_sync': body = renderAdminVCConfigSync();       break;
     case 'snapshots':   body = renderAdminVCSnapshots();        break;
     case 'doc_history': body = renderAdminVCDocHistory();       break;
     case 'audit':       body = renderAdminVCAuditLog();         break;
@@ -7475,7 +7999,6 @@ function renderAdmin(){
   if(adminTab==='manual_runtime') renderAdminManualRuntime();
   if(adminTab==='data_sources') renderAdminDataSources();
   if(adminTab==='metadata_studio') renderAdminMetadataStudio();
-  if(adminTab==='translation_provider') renderAdminTranslationProviderTab();
   if(adminTab==='translation_module') renderAdminTranslationModuleTab();
   if(adminTab==='version_control') renderAdminVersionControl();
   if(adminTab==='portal_display'){
@@ -7486,24 +8009,6 @@ function renderAdmin(){
   if(adminTab==='mfa') renderAdminMfa();
   if(adminTab==='ai_control') renderAdminAiControl();
   if(adminTab==='appearance') renderAdminAppearance();
-}
-
-/* ── Admin: Translation Provider Tab (lazy-loaded) ──────────────────────── */
-function renderAdminTranslationProviderTab(){
-  const el = document.getElementById('admin-content');
-  if(!el) return;
-  if(typeof window.renderAdminTranslationProvider === 'function'){
-    window.renderAdminTranslationProvider(el);
-    return;
-  }
-  el.innerHTML = '<div class="hm-empty">'+(lang==='en'?'Loading translation provider...':'Đang tải engine dịch thuật...')+'</div>';
-  var existing = document.getElementById('admin-translation-provider-script');
-  if(existing){ existing.remove(); }
-  var s = document.createElement('script');
-  s.id  = 'admin-translation-provider-script';
-  s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00e-admin-translation-provider.js?v=' + (window.APP_VERSION || Date.now());
-  s.onload = function(){ if(typeof window.renderAdminTranslationProvider === 'function') window.renderAdminTranslationProvider(el); };
-  document.head.appendChild(s);
 }
 
 /* ── Admin: Translation Module Tab (multi-provider, lazy-loaded) ─────────── */
@@ -10668,53 +11173,81 @@ function renderAdminActivity(){
     return;
   }
 
-  const auditEvents = (ADMIN_AUTH_STATE.audit.events || []).slice().sort((a,b)=>String(b.recorded_at||'').localeCompare(String(a.recorded_at||'')));
+  const allEvents = (ADMIN_AUTH_STATE.audit.events || []).slice().sort((a,b)=>String(b.recorded_at||'').localeCompare(String(a.recorded_at||'')));
   const filters = adminFilterState('activity');
-  const uniqueUsers = [...new Set(auditEvents.map(item => item.actor_name).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)));
-  const uniqueEventTypes = [...new Set(auditEvents.map(item => item.event_type).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)));
-  const uniqueAggregates = [...new Set(auditEvents.map(item => item.aggregate_type).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)));
-  const filteredEvents = auditEvents.filter(event=>{
+  const uniqueUsers = [...new Set(allEvents.map(item => item.actor_name).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)));
+  const uniqueEventTypes = [...new Set(allEvents.map(item => item.event_type).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)));
+  const uniqueAggregates = [...new Set(allEvents.map(item => item.aggregate_type).filter(Boolean))].sort((a,b)=>String(a).localeCompare(String(b)));
+
+  const filteredEvents = allEvents.filter(event=>{
     if(filters.actor && String(event.actor_name || '') !== String(filters.actor)) return false;
     if(filters.eventType && String(event.event_type || '') !== String(filters.eventType)) return false;
     if(filters.aggregateType && String(event.aggregate_type || '') !== String(filters.aggregateType)) return false;
     return adminContainsNeedle(filters.search, [
-      event.actor_name,
-      event.event_type,
-      event.aggregate_type,
-      event.aggregate_id,
-      event.ip_address,
-      JSON.stringify(event.payload || {}),
-      JSON.stringify(event.metadata || {})
+      event.actor_name, event.event_type, event.aggregate_type,
+      event.aggregate_id, event.ip_address,
+      JSON.stringify(event.payload || {}), JSON.stringify(event.metadata || {})
     ]);
   });
+
+  // Stats: events per user
+  const userEventCounts = {};
+  allEvents.forEach(e=>{
+    const u = e.actor_name || 'system';
+    userEventCounts[u] = (userEventCounts[u] || 0) + 1;
+  });
+  const topUsers = Object.entries(userEventCounts).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const statsHtml = topUsers.map(([u,n])=>`
+    <span style="display:inline-flex;align-items:center;gap:4px;background:color-mix(in srgb,var(--brand-primary,#2563eb) 10%,var(--bg-surface,#fff));border:1px solid color-mix(in srgb,var(--brand-primary,#2563eb) 25%,var(--border));border-radius:20px;padding:2px 10px;font-size:11px;cursor:pointer" onclick="setAdminFilter('activity','actor','${escapeHtml(u)}')">
+      <b>${escapeHtml(u)}</b><span style="color:var(--text-3)">${n}</span>
+    </span>`).join('');
+
+  const loadedAt = ADMIN_AUTH_STATE.audit.lastLoadedAt
+    ? new Date(ADMIN_AUTH_STATE.audit.lastLoadedAt).toLocaleTimeString('vi-VN') : '';
 
   const headHtml = `
     <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
       <div>
-        <h3 style="font-size:14px;font-weight:700;margin:0">📊 ${lang==='en'?'Administrative audit trail':'Kiểm soát hành vi & audit trail'}</h3>
-        <div style="font-size:11px;color:var(--text-3);margin-top:4px">${filteredEvents.length} / ${auditEvents.length} event hiển thị</div>
+        <h3 style="font-size:14px;font-weight:700;margin:0">📊 ${lang==='en'?'User Behavior Monitor — All Users':'Giám sát hành vi — Tất cả người dùng'}</h3>
+        <div style="font-size:11px;color:var(--text-3);margin-top:2px">
+          ${filteredEvents.length}/${allEvents.length} event · ${uniqueUsers.length} actor
+          ${loadedAt ? ' · cập nhật ' + loadedAt : ''}
+        </div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         <button class="btn-admin secondary" onclick="document.getElementById('ds-panel').style.display=document.getElementById('ds-panel').style.display==='none'?'':'none'">⚙️ ${lang==='en'?'Settings':'Cài đặt'}</button>
-        <button class="btn-admin secondary" onclick="loadAuthoritativeAuditTrail({force:true})">🔄 ${lang==='en'?'Refresh':'Làm mới'}</button>
-        <button class="btn-admin secondary" onclick="resetAdminFilters('activity')">↺ Reset filter</button>
+        <button class="btn-admin secondary" onclick="activityReloadWithCurrentFilters()">🔄 ${lang==='en'?'Refresh':'Làm mới'}</button>
+        <button class="btn-admin secondary" onclick="resetActivityFilters()">↺ Reset</button>
         <button class="btn-admin secondary" onclick="exportActivityCSV()">📥 CSV</button>
       </div>
     </div>
-    <div class="admin-toolbar">
-      <input type="search" placeholder="Tìm actor, event, aggregate, payload..." value="${escapeHtml(filters.search || '')}" oninput="setAdminFilter('activity','search',this.value)">
+    ${topUsers.length > 0 ? `<div style="display:flex;flex-wrap:wrap;gap:6px;padding:6px 0">${statsHtml}</div>` : ''}
+    <div class="admin-toolbar" style="flex-wrap:wrap;gap:6px">
+      <input type="search" placeholder="${lang==='en'?'Search actor, event, payload...':'Tìm actor, event, payload...'}" value="${escapeHtml(filters.search || '')}" oninput="setAdminFilter('activity','search',this.value)" style="min-width:180px">
       <select onchange="setAdminFilter('activity','actor',this.value)">
-        <option value="">${lang==='en'?'All actors':'Tất cả actor'}</option>
-        ${uniqueUsers.map(u=>`<option value="${escapeHtml(u)}"${filters.actor === u ? ' selected' : ''}>${escapeHtml(u)}</option>`).join('')}
+        <option value="">${lang==='en'?'All users':'Tất cả user'} (${uniqueUsers.length})</option>
+        ${uniqueUsers.map(u=>`<option value="${escapeHtml(u)}"${filters.actor === u ? ' selected' : ''}>${escapeHtml(u)} (${userEventCounts[u]||0})</option>`).join('')}
       </select>
       <select onchange="setAdminFilter('activity','eventType',this.value)">
-        <option value="">Tất cả event</option>
-        ${uniqueEventTypes.map(eventType=>`<option value="${escapeHtml(eventType)}"${filters.eventType === eventType ? ' selected' : ''}>${escapeHtml(eventType)}</option>`).join('')}
+        <option value="">${lang==='en'?'All events':'Tất cả event'}</option>
+        ${uniqueEventTypes.map(t=>`<option value="${escapeHtml(t)}"${filters.eventType === t ? ' selected' : ''}>${escapeHtml(t)}</option>`).join('')}
       </select>
       <select onchange="setAdminFilter('activity','aggregateType',this.value)">
-        <option value="">Tất cả aggregate</option>
-        ${uniqueAggregates.map(aggregateType=>`<option value="${escapeHtml(aggregateType)}"${filters.aggregateType === aggregateType ? ' selected' : ''}>${escapeHtml(aggregateType)}</option>`).join('')}
+        <option value="">${lang==='en'?'All types':'Tất cả type'}</option>
+        ${uniqueAggregates.map(t=>`<option value="${escapeHtml(t)}"${filters.aggregateType === t ? ' selected' : ''}>${escapeHtml(t)}</option>`).join('')}
       </select>
+      <label style="display:flex;align-items:center;gap:4px;font-size:12px;white-space:nowrap">
+        <span>${lang==='en'?'From:':'Từ:'}</span>
+        <input type="date" value="${escapeHtml(filters.dateFrom||'')}" style="font-size:12px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg-surface,#fff)" onchange="setActivityDateFilter('dateFrom',this.value)">
+      </label>
+      <label style="display:flex;align-items:center;gap:4px;font-size:12px;white-space:nowrap">
+        <span>${lang==='en'?'To:':'Đến:'}</span>
+        <input type="date" value="${escapeHtml(filters.dateTo||'')}" style="font-size:12px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg-surface,#fff)" onchange="setActivityDateFilter('dateTo',this.value)">
+      </label>
+      <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer;white-space:nowrap">
+        <input type="checkbox" ${filters.includeSystem ? 'checked' : ''} onchange="setActivitySystemFilter(this.checked)">
+        ${lang==='en'?'Show system':'Hiện system'}
+      </label>
     </div>
     <div id="ds-panel" style="display:none;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--bg-surface,#fff)">
       <div style="padding:12px 16px;font-weight:700;font-size:13px;background:var(--bg-surface-alt,#f8fafc);border-bottom:1px solid var(--border)">⚙️ ${lang==='en'?'Data Collection Settings':'Cài đặt Thu thập Dữ liệu'}</div>
@@ -10748,65 +11281,94 @@ function renderAdminActivity(){
       </div>
       <div style="padding:10px 14px;background:color-mix(in srgb, var(--brand-2) 10%, var(--bg-surface,#fff));font-size:11px;color:var(--brand-2)">💡 ${lang==='en'?'Toggle options then click Save. Changes take effect on next login.':'Bật/tắt tùy chọn rồi nhấn Lưu. Thay đổi có hiệu lực từ lần đăng nhập kế.'}</div>
     </div>
-    <div style="font-size:11px;color:var(--text-3);padding:10px;background:color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--green) 28%, var(--border));border-radius:8px">
-      🛡 <b>${lang==='en'?'Authoritative audit trail':'Audit trail authoritative'}:</b> 
+    <div style="font-size:11px;color:var(--text-3);padding:8px 10px;background:color-mix(in srgb,var(--green) 8%,var(--bg-surface,#fff));border:1px solid color-mix(in srgb,var(--green) 25%,var(--border));border-radius:8px">
+      🛡 <b>${lang==='en'?'All-user audit trail active':'Audit trail tất cả người dùng đang hoạt động'}:</b>
       ${lang==='en'
-        ?'Server-side administrative actions are sourced from the system audit layer. This tab no longer relies on browser-local telemetry for governance decisions.'
-        :'Các hành động quản trị phía server được lấy từ lớp audit hệ thống. Tab này không còn dựa vào telemetry cục bộ của trình duyệt cho quyết định quản trị.'}
+        ?'Every authenticated API action from every user is now captured. System events (runtime observability) are hidden by default.'
+        :'Mọi hành động API của mọi người dùng đều được ghi lại. Sự kiện hệ thống (runtime observability) bị ẩn mặc định.'}
     </div>`;
+
   const bodyHtml = `<div class="activity-log-scroller">
       ${filteredEvents.length === 0
-        ? '<div style="text-align:center;padding:40px;color:var(--text-3)">'+( lang==='en'?'No authoritative audit event recorded yet':'Chưa có audit event authoritative nào')+'</div>'
+        ? `<div style="text-align:center;padding:40px;color:var(--text-3)">${lang==='en'?'No events match the current filter':'Không có event nào khớp filter hiện tại'}</div>`
         : `<table class="activity-log-table">
             <thead>
               <tr>
-                <th style="min-width:140px">Thời điểm</th>
-                <th style="min-width:140px">Actor</th>
+                <th style="min-width:140px">${lang==='en'?'Time':'Thời điểm'}</th>
+                <th style="min-width:130px">${lang==='en'?'User (Actor)':'Người dùng'}</th>
                 <th style="min-width:150px">Event</th>
-                <th style="min-width:150px">Aggregate</th>
-                <th style="min-width:120px">ID</th>
-                <th style="min-width:130px">IP</th>
-                <th>Ngữ cảnh</th>
+                <th style="min-width:140px">Type</th>
+                <th style="min-width:110px">ID</th>
+                <th style="min-width:115px">IP</th>
+                <th>${lang==='en'?'Context':'Ngữ cảnh'}</th>
               </tr>
             </thead>
             <tbody>
               ${filteredEvents.map((event,idx)=>{
-          const recorded = event.recorded_at ? new Date(event.recorded_at) : null;
-          const dateStr = recorded && !Number.isNaN(recorded.getTime())
-            ? recorded.toLocaleDateString('vi-VN') + ' ' + recorded.toLocaleTimeString('vi-VN')
-            : '—';
-          const detailRecord = {
-            recorded_at: event.recorded_at || '',
-            actor_name: event.actor_name || '',
-            event_type: event.event_type || '',
-            aggregate_type: event.aggregate_type || '',
-            aggregate_id: event.aggregate_id || '',
-            ip_address: event.ip_address || '',
-            payload: (event.payload && typeof event.payload === 'object') ? event.payload : {},
-            metadata: (event.metadata && typeof event.metadata === 'object') ? event.metadata : {}
-          };
-          const contextText = escapeHtml(JSON.stringify(detailRecord, null, 2));
-          return `<tr data-user="${escapeHtml(event.actor_name || '')}" data-idx="${idx}">
-                <td>${escapeHtml(dateStr)}</td>
-                <td><b>${escapeHtml(event.actor_name || 'system')}</b></td>
-                <td><span class="admin-inline-badge">${escapeHtml(event.event_type || 'event')}</span></td>
-                <td>${escapeHtml(event.aggregate_type || 'api_action')}</td>
-                <td style="font-family:var(--mono);font-size:10px">${escapeHtml(event.aggregate_id || '—')}</td>
-                <td>${escapeHtml(event.ip_address || '—')}</td>
-                <td>
-                  <details class="activity-detail-panel">
-                    <summary>Xem payload</summary>
-                    <pre>${contextText}</pre>
-                  </details>
-                </td>
-              </tr>`;
-        }).join('')}
+                const recorded = event.recorded_at ? new Date(event.recorded_at) : null;
+                const dateStr = recorded && !Number.isNaN(recorded.getTime())
+                  ? recorded.toLocaleDateString('vi-VN') + ' ' + recorded.toLocaleTimeString('vi-VN')
+                  : '—';
+                const actorName = event.actor_name || 'system';
+                const isSystemActor = actorName === 'system' || !event.actor_name;
+                const isLoginEvent = (event.event_type||'').startsWith('user_login') || (event.event_type||'').startsWith('user_logout');
+                const detailRecord = {
+                  recorded_at: event.recorded_at || '',
+                  actor_name: actorName,
+                  event_type: event.event_type || '',
+                  aggregate_type: event.aggregate_type || '',
+                  aggregate_id: event.aggregate_id || '',
+                  ip_address: event.ip_address || '',
+                  payload: (event.payload && typeof event.payload === 'object') ? event.payload : {},
+                  metadata: (event.metadata && typeof event.metadata === 'object') ? event.metadata : {}
+                };
+                const contextText = escapeHtml(JSON.stringify(detailRecord, null, 2));
+                const rowStyle = isLoginEvent ? 'background:color-mix(in srgb,var(--green) 6%,transparent)' : '';
+                return `<tr data-user="${escapeHtml(actorName)}" data-idx="${idx}" style="${rowStyle}">
+                  <td style="font-size:11px;white-space:nowrap">${escapeHtml(dateStr)}</td>
+                  <td><b style="color:${isSystemActor?'var(--text-3)':'var(--brand-primary,#2563eb)'}">${escapeHtml(actorName)}</b></td>
+                  <td><span class="admin-inline-badge" style="${isLoginEvent?'background:color-mix(in srgb,var(--green) 20%,var(--bg-surface,#fff));border-color:color-mix(in srgb,var(--green) 40%,var(--border))':''}">${escapeHtml(event.event_type || 'event')}</span></td>
+                  <td style="font-size:11px;color:var(--text-3)">${escapeHtml(event.aggregate_type || 'api_action')}</td>
+                  <td style="font-family:var(--mono);font-size:10px">${escapeHtml(event.aggregate_id || '—')}</td>
+                  <td style="font-size:11px">${escapeHtml(event.ip_address || '—')}</td>
+                  <td>
+                    <details class="activity-detail-panel">
+                      <summary style="font-size:11px;cursor:pointer">${lang==='en'?'payload':'payload'}</summary>
+                      <pre style="font-size:10px;max-height:200px;overflow:auto">${contextText}</pre>
+                    </details>
+                  </td>
+                </tr>`;
+              }).join('')}
             </tbody>
           </table>`
       }
     </div>`;
   el.innerHTML = adminScopedLayout(headHtml, bodyHtml, 'has-x-scroll');
+}
 
+function activityReloadWithCurrentFilters(){
+  ADMIN_AUTH_STATE.audit.loaded = false;
+  ADMIN_AUTH_STATE.audit.events = [];
+  loadAuthoritativeAuditTrail({force:true});
+}
+
+function resetActivityFilters(){
+  if(ADMIN_TAB_FILTER_DEFAULTS['activity']){
+    ADMIN_TAB_FILTERS['activity'] = JSON.parse(JSON.stringify(ADMIN_TAB_FILTER_DEFAULTS['activity']));
+  }
+  activityReloadWithCurrentFilters();
+}
+
+function setActivityDateFilter(key, value){
+  const state = adminFilterState('activity');
+  state[key] = value || '';
+  activityReloadWithCurrentFilters();
+}
+
+function setActivitySystemFilter(checked){
+  const state = adminFilterState('activity');
+  state.includeSystem = !!checked;
+  activityReloadWithCurrentFilters();
 }
 
 function filterActivityLog(){

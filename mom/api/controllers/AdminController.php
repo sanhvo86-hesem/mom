@@ -297,6 +297,55 @@ class AdminController extends BaseController
         }
     }
 
+    /**
+     * GET admin_data_sync_read_file ?file=<basename>
+     * Returns content from BOTH site and mirror pools so the admin diff-viewer
+     * can render an inline comparison before resolving drift.
+     */
+    public function dataSyncReadFile(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAdmin($me);
+
+        $file = (string)($this->query('file') ?? '');
+        try {
+            $svc = $this->dataSyncMutator();
+            $result = $svc->readBothFiles($file);
+            $this->success($result);
+        } catch (Throwable $e) {
+            $this->mapMutationException($e);
+        }
+    }
+
+    /**
+     * POST admin_data_sync_batch_resolve
+     * Body: { direction: site_to_mirror|mirror_to_site, scope: drift|no_mirror|absent|all, change_ref? }
+     * Resolves all qualifying files in one shot with a pre-flight snapshot.
+     */
+    public function dataSyncBatchResolve(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $body      = $this->jsonBody();
+        $direction = (string)($body['direction'] ?? '');
+        $scope     = (string)($body['scope'] ?? 'drift');
+        $changeRef = trim((string)($body['change_ref'] ?? ''));
+        if ($changeRef === '') {
+            $changeRef = 'admin-ui-batch-' . substr(bin2hex(random_bytes(3)), 0, 6);
+        }
+        $actor = (string)($me['username'] ?? 'unknown');
+
+        try {
+            $svc    = $this->dataSyncMutator();
+            $result = $svc->batchResolveDrift($direction, $scope, $actor, $changeRef);
+            $this->success(array_merge(['direction' => $direction, 'scope' => $scope, 'change_ref' => $changeRef], $result));
+        } catch (Throwable $e) {
+            $this->mapMutationException($e);
+        }
+    }
+
     private function dataSyncMutator(): DataSyncMutationService
     {
         return new DataSyncMutationService($this->dataDir, $this->data);
@@ -640,13 +689,19 @@ class AdminController extends BaseController
         $user = $this->requireAuth();
         $this->requireAdmin($user);
 
-        $limit = max(1, min(500, (int)($this->query('limit', '200') ?? '200')));
+        $limit = max(1, min(1000, (int)($this->query('limit', '500') ?? '500')));
         $filters = ['limit' => $limit];
         foreach (['event_type', 'aggregate_type', 'aggregate_id', 'actor_name', 'search', 'from', 'to'] as $key) {
             $value = trim((string)($this->query($key, '') ?? ''));
             if ($value !== '') {
                 $filters[$key] = $value;
             }
+        }
+        // Exclude system observability events by default (runtime_read_model, connector_feed, runtime_shadow).
+        // Admin can opt-in to see these with include_system=1.
+        $includeSystem = filter_var($this->query('include_system', '0'), FILTER_VALIDATE_BOOLEAN);
+        if (!$includeSystem) {
+            $filters['exclude_aggregate_types'] = ['runtime_read_model', 'connector_feed', 'runtime_shadow'];
         }
 
         try {

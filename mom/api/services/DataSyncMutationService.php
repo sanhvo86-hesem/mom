@@ -337,6 +337,172 @@ final class DataSyncMutationService
     }
 
     /**
+     * Read content from BOTH site and mirror pools for a single file.
+     * Used by the admin diff-viewer: shows what differs before resolving.
+     *
+     * @return array{name:string, site:array<string,mixed>|null, mirror:array<string,mixed>|null}
+     */
+    public function readBothFiles(string $name): array
+    {
+        $this->assertWhitelisted($name);
+        $sitePath   = $this->sitePath($name);
+        $mirrorPath = $this->mirrorPath($name);
+
+        $read = function (string $path): ?array {
+            if (!is_file($path) || !is_readable($path)) {
+                return null;
+            }
+            $size = (int)@filesize($path);
+            if ($size > self::MAX_FILE_BYTES) {
+                return ['error' => 'file_too_large', 'size' => $size];
+            }
+            $bytes = @file_get_contents($path);
+            if ($bytes === false) {
+                return ['error' => 'file_unreadable'];
+            }
+            return [
+                'bytes'  => $bytes,
+                'size'   => strlen($bytes),
+                'sha256' => hash('sha256', $bytes),
+                'mtime'  => gmdate('c', (int)@filemtime($path)),
+            ];
+        };
+
+        return [
+            'name'   => $name,
+            'site'   => $read($sitePath),
+            'mirror' => $read($mirrorPath),
+        ];
+    }
+
+    /**
+     * Batch-resolve drift/missing for multiple files in one direction.
+     *
+     * scope:
+     *   'drift'     – files where both pools exist but sha differs
+     *   'no_mirror' – files present on site but mirror absent (seed mirror)
+     *   'absent'    – files absent on site but mirror present (restore VPS)
+     *   'all'       – all of the above that make sense for the given direction
+     *
+     * Returns per-file results (ok/skipped/error) plus a snapshot id that
+     * covers every file touched.
+     *
+     * @return array<string,mixed>
+     */
+    public function batchResolveDrift(
+        string $direction,
+        string $scope,
+        string $actor,
+        string $changeRef
+    ): array {
+        if (!in_array($direction, ['site_to_mirror', 'mirror_to_site'], true)) {
+            throw new RuntimeException('invalid_direction:' . $direction);
+        }
+        if (!in_array($scope, ['drift', 'no_mirror', 'absent', 'all'], true)) {
+            throw new RuntimeException('invalid_scope:' . $scope);
+        }
+        if (!is_dir($this->privateDataDir)) {
+            throw new RuntimeException('mirror_unavailable:' . $this->privateDataDir);
+        }
+
+        // Collect candidate files
+        $candidates = [];
+        foreach (self::RUNTIME_CONFIG_FILES as $name) {
+            $sitePath   = $this->sitePath($name);
+            $mirrorPath = $this->mirrorPath($name);
+            $siteExists   = is_file($sitePath);
+            $mirrorExists = is_file($mirrorPath);
+
+            if ($scope === 'drift' || $scope === 'all') {
+                // Both present but sha differs → resolve
+                if ($siteExists && $mirrorExists) {
+                    $ss = @hash_file('sha256', $sitePath);
+                    $ms = @hash_file('sha256', $mirrorPath);
+                    if ($ss !== false && $ms !== false && $ss !== $ms) {
+                        $candidates[] = ['name' => $name, 'reason' => 'drift'];
+                        continue;
+                    }
+                }
+            }
+            if ($scope === 'no_mirror' || $scope === 'all') {
+                // Site present, mirror absent → seed mirror (only makes sense site_to_mirror)
+                if ($siteExists && !$mirrorExists && $direction === 'site_to_mirror') {
+                    $candidates[] = ['name' => $name, 'reason' => 'no_mirror'];
+                    continue;
+                }
+            }
+            if ($scope === 'absent' || $scope === 'all') {
+                // Site absent, mirror present → restore VPS (only makes sense mirror_to_site)
+                if (!$siteExists && $mirrorExists && $direction === 'mirror_to_site') {
+                    $candidates[] = ['name' => $name, 'reason' => 'absent'];
+                    continue;
+                }
+            }
+        }
+
+        if (empty($candidates)) {
+            return ['resolved' => [], 'skipped' => 0, 'snapshot' => null, 'total_candidates' => 0];
+        }
+
+        // Pre-flight snapshot covering all candidate files
+        $names = array_column($candidates, 'name');
+        $snapshotId = $this->snapshotSet($names, 'batch_' . $direction . '_' . $scope, $actor, $changeRef);
+
+        $results = [];
+        $this->ensureMirrorDir();
+
+        foreach ($candidates as $c) {
+            $name = $c['name'];
+            try {
+                $result = $this->withFileLock($name, function () use ($name, $direction) {
+                    $sitePath   = $this->sitePath($name);
+                    $mirrorPath = $this->mirrorPath($name);
+                    $src = $direction === 'site_to_mirror' ? $sitePath : $mirrorPath;
+                    $dst = $direction === 'site_to_mirror' ? $mirrorPath : $sitePath;
+                    if (!is_file($src)) {
+                        return ['status' => 'skipped', 'reason' => 'source_missing'];
+                    }
+                    $bytes = @file_get_contents($src);
+                    if ($bytes === false) {
+                        return ['status' => 'error', 'reason' => 'source_unreadable'];
+                    }
+                    $srcSha = hash('sha256', $bytes);
+                    $dstSha = is_file($dst) ? @hash_file('sha256', $dst) : null;
+                    if ($srcSha === $dstSha) {
+                        return ['status' => 'skipped', 'reason' => 'already_in_sync'];
+                    }
+                    $this->atomicWrite($dst, $bytes);
+                    $verify = @hash_file('sha256', $dst);
+                    if ($verify !== $srcSha) {
+                        return ['status' => 'error', 'reason' => 'post_write_sha_mismatch'];
+                    }
+                    return ['status' => 'ok', 'sha256' => $srcSha];
+                });
+                $results[] = array_merge(['name' => $name, 'scope_reason' => $c['reason']], $result);
+            } catch (\Throwable $e) {
+                $results[] = ['name' => $name, 'scope_reason' => $c['reason'], 'status' => 'error', 'reason' => $e->getMessage()];
+            }
+        }
+
+        $ok = array_filter($results, fn($r) => $r['status'] === 'ok');
+        $this->writeAudit('admin_ui_batch_' . $direction, $scope, [
+            'actor'       => $actor,
+            'change_ref'  => $changeRef,
+            'scope'       => $scope,
+            'snapshot_id' => $snapshotId,
+            'resolved'    => count($ok),
+            'total'       => count($candidates),
+        ]);
+
+        return [
+            'resolved'         => $results,
+            'snapshot'         => $snapshotId,
+            'total_candidates' => count($candidates),
+            'ok_count'         => count($ok),
+        ];
+    }
+
+    /**
      * Take a manual snapshot of the current site state for the given files.
      */
     public function takeManualSnapshot(?array $names, string $actor, string $reason): array
