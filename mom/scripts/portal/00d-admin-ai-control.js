@@ -416,7 +416,7 @@ function _cbStatus(cb){
   var fails  = cb.failure_count || 0;
   var thresh = cb.failure_threshold || 5;
   var recov  = cb.recovery_timeout || 120;
-  var stateColor = state === 'open' ? '#ef4444' : state === 'half_open' ? '#f59e0b' : '#10b981';
+  var stateColor = state === 'open' ? 'var(--red,#ef4444)' : state === 'half_open' ? 'var(--amber,#f59e0b)' : 'var(--green,#10b981)';
   var stateLabel = {open: _t('MỞ (AI bị tắt tạm thời)','OPEN (AI temporarily disabled)'), half_open: _t('NỬA MỞ (đang phục hồi)','HALF-OPEN (recovering)'), closed: _t('ĐÓNG (hoạt động bình thường)','CLOSED (operating normally)')}[state] || state;
   return `
     <div class="ai-cb-item">
