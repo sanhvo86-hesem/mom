@@ -93,6 +93,8 @@ return static function (Router $router, string $dataDir): void {
         'admin_data_sync_read_file'        => [AdminController::class, 'dataSyncReadFile'],
         'admin_data_sync_batch_resolve'    => [AdminController::class, 'dataSyncBatchResolve'],
         'admin_local_sync_report'          => [AdminController::class, 'localSyncReport'],
+        'admin_sync_schedule_get'          => [AdminController::class, 'syncScheduleGet'],
+        'admin_sync_schedule_set'          => [AdminController::class, 'syncScheduleSet'],
         'admin_version_control_overview'         => [AdminController::class, 'versionControlOverview'],
         'admin_version_control_doc_history_list' => [AdminController::class, 'versionControlDocHistoryList'],
         'admin_version_control_doc_revisions'    => [AdminController::class, 'versionControlDocRevisions'],

@@ -7326,6 +7326,8 @@ launchctl load ~/Library/LaunchAgents/com.hesem.mom-sync.plist`)}</pre>`;
 
     </div>
 
+    ${renderAdminVCSyncScheduleCard()}
+
     <article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:14px">
       <div class="admin-sync-panel-title">${lang==='en'?'How the 3-tier sync works':'Cách "ống thông" 3 tầng hoạt động'}</div>
       <div style="font-family:monospace;font-size:12px;line-height:2;padding:10px;background:var(--bg-2,#f6f7fb);border-radius:8px;margin:8px 0">
@@ -7562,6 +7564,13 @@ let vcConfigSyncEditorState= {open:false, name:'', loading:false, content:'', er
 // local_sync sub-tab: last report written by data-sync.sh to VPS
 let localSyncReportState = {loading:false, loaded:false, error:'', data:null};
 
+// Auto-sync schedule: stored on VPS, read/written via admin_sync_schedule_* endpoints
+let syncScheduleState = {loading:false, loaded:false, error:'', data:null};
+let _autoSyncTimerId   = null;   // setInterval handle for the sync action
+let _autoSyncTickId    = null;   // setInterval handle for the countdown display (1s tick)
+let _autoSyncNextAt    = null;   // Date when next sync fires
+let _autoSyncRunning   = false;  // guard: prevent concurrent auto-sync calls
+
 function setVersionControlSubTab(id){
   if(typeof id !== 'string' || !id) return;
   if(versionControlSubTab === id) return;
@@ -7583,6 +7592,7 @@ function setVersionControlSubTab(id){
   } else if(id === 'local_sync'){
     if(!localSyncReportState.loaded && !localSyncReportState.loading) loadLocalSyncReport({silent:true});
     if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading) loadDataSyncStatus({silent:true});
+    if(!syncScheduleState.loaded && !syncScheduleState.loading) loadSyncSchedule({silent:true});
   }
   renderAdmin();
 }
@@ -7679,6 +7689,190 @@ async function loadVersionControlAudit(options){
   } finally {
     if(currentPage === 'admin') renderAdmin();
   }
+}
+
+// ── Auto-sync schedule helpers ────────────────────────────────────────────
+
+async function loadSyncSchedule(options){
+  options = options || {};
+  if(syncScheduleState.loading && !options.force) return;
+  if(syncScheduleState.loaded && !options.force) return;
+  syncScheduleState = {loading:true, loaded:false, error:'', data:null};
+  try{
+    const res = await apiCall('admin_sync_schedule_get', null, 'GET');
+    if(res && res.ok){
+      syncScheduleState = {loading:false, loaded:true, error:'', data:res};
+      if(res.enabled) _startAutoSyncTimer(Number(res.interval_minutes||5));
+      else _stopAutoSyncTimer();
+    } else {
+      syncScheduleState = {loading:false, loaded:false, error:String(res&&(res.detail||res.error)||'schedule_load_failed'), data:null};
+    }
+  } catch(e){
+    syncScheduleState = {loading:false, loaded:false, error:e.message||'schedule_load_failed', data:null};
+  } finally {
+    if(currentPage==='admin') renderAdmin();
+  }
+}
+
+async function saveSyncSchedule(minutes, enabled){
+  minutes = Math.max(1, Math.min(1440, Number(minutes)||5));
+  try{
+    const res = await apiCall('admin_sync_schedule_set', {interval_minutes:minutes, enabled:!!enabled}, 'POST');
+    if(res && res.ok){
+      syncScheduleState = {loading:false, loaded:true, error:'',
+        data:Object.assign({}, syncScheduleState.data||{}, {interval_minutes:minutes, enabled:!!enabled})};
+      if(enabled) _startAutoSyncTimer(minutes);
+      else _stopAutoSyncTimer();
+      showToast(lang==='en'
+        ? `Auto-sync ${enabled?'enabled':'disabled'}: every ${minutes} min`
+        : `Auto-sync ${enabled?'bật':'tắt'}: mỗi ${minutes} phút`);
+    } else {
+      showToast((lang==='en'?'Failed to save schedule: ':'Lỗi lưu lịch: ')+(res&&(res.detail||res.error)||'?'), 'error');
+    }
+  } catch(e){
+    showToast((lang==='en'?'Failed: ':'Lỗi: ')+e.message, 'error');
+  }
+  if(currentPage==='admin') renderAdmin();
+}
+
+function _startAutoSyncTimer(minutes){
+  _stopAutoSyncTimer();
+  const ms = minutes * 60 * 1000;
+  _autoSyncNextAt = new Date(Date.now() + ms);
+  _autoSyncTimerId = setInterval(async()=>{
+    if(_autoSyncRunning) return;
+    _autoSyncRunning = true;
+    const ts = new Date().toISOString();
+    try{
+      // Sync VPS site → mirror for all drifted files
+      await apiCall('admin_data_sync_batch_resolve',
+        {direction:'site_to_mirror', scope:'all', change_ref:'auto-sync-'+ts.slice(0,16)}, 'POST');
+      // Also read the updated drift status
+      await loadDataSyncStatus({force:true, silent:true});
+      // Persist last_auto_sync timestamp on VPS
+      const sched = syncScheduleState.data || {};
+      await apiCall('admin_sync_schedule_set',
+        {interval_minutes:sched.interval_minutes||minutes, enabled:true, last_auto_sync:ts}, 'POST');
+      if(syncScheduleState.data) syncScheduleState.data.last_auto_sync = ts;
+      showToast(lang==='en'?'Auto-sync: VPS site → mirror done':'Auto-sync: đã đồng bộ VPS site → mirror', 'success');
+    } catch(e){
+      showToast((lang==='en'?'Auto-sync error: ':'Lỗi auto-sync: ')+e.message, 'error');
+    } finally {
+      _autoSyncRunning = false;
+      _autoSyncNextAt = new Date(Date.now() + ms);
+      if(currentPage==='admin' && versionControlSubTab==='local_sync') renderAdmin();
+    }
+  }, ms);
+  // 1-second countdown tick for UI display
+  if(_autoSyncTickId) clearInterval(_autoSyncTickId);
+  _autoSyncTickId = setInterval(()=>{
+    const el = document.getElementById('vc-autosync-countdown');
+    if(el && _autoSyncNextAt){
+      const secs = Math.max(0, Math.round((_autoSyncNextAt - Date.now())/1000));
+      const m = Math.floor(secs/60), s = secs%60;
+      el.textContent = (lang==='en'?'Next in: ':'Còn: ')+m+'m '+String(s).padStart(2,'0')+'s';
+    }
+  }, 1000);
+}
+
+function _stopAutoSyncTimer(){
+  if(_autoSyncTimerId){ clearInterval(_autoSyncTimerId); _autoSyncTimerId = null; }
+  if(_autoSyncTickId){  clearInterval(_autoSyncTickId);  _autoSyncTickId  = null; }
+  _autoSyncNextAt = null;
+}
+
+async function runAutoSyncNow(){
+  if(_autoSyncRunning){ showToast(lang==='en'?'Sync already running…':'Đang sync…'); return; }
+  _autoSyncRunning = true;
+  const ts = new Date().toISOString();
+  try{
+    const res = await apiCall('admin_data_sync_batch_resolve',
+      {direction:'site_to_mirror', scope:'all', change_ref:'manual-sync-'+ts.slice(0,16)}, 'POST');
+    if(res && res.ok){
+      await loadDataSyncStatus({force:true, silent:true});
+      const sched = syncScheduleState.data || {};
+      if(sched.enabled){
+        await apiCall('admin_sync_schedule_set',
+          {interval_minutes:sched.interval_minutes||5, enabled:true, last_auto_sync:ts}, 'POST');
+        if(syncScheduleState.data) syncScheduleState.data.last_auto_sync = ts;
+      }
+      showToast(lang==='en'?'Sync done: VPS site → mirror':'Đã sync: VPS site → mirror', 'success');
+    } else {
+      showToast((lang==='en'?'Sync failed: ':'Sync thất bại: ')+(res&&(res.detail||res.error)||'?'), 'error');
+    }
+  } catch(e){
+    showToast((lang==='en'?'Sync error: ':'Lỗi: ')+e.message, 'error');
+  } finally {
+    _autoSyncRunning = false;
+    if(currentPage==='admin') renderAdmin();
+  }
+}
+
+function renderAdminVCSyncScheduleCard(){
+  const sched   = syncScheduleState.data || {};
+  const enabled  = !!(sched.enabled);
+  const interval = Number(sched.interval_minutes || 5);
+  const lastSync = sched.last_auto_sync || null;
+
+  const statusPart = enabled
+    ? `<span style="color:var(--green,#16a34a);font-weight:600">● ${lang==='en'?'Active':'Đang chạy'}</span>
+       &nbsp;·&nbsp;<span style="color:var(--text-3);font-size:12px">${lang==='en'?'Last sync:':'Lần cuối:'} ${lastSync?vcFmtTime(lastSync):(lang==='en'?'not yet':'chưa có')}</span>
+       &nbsp;·&nbsp;<span id="vc-autosync-countdown" style="color:var(--text-3);font-size:12px"></span>`
+    : `<span style="color:var(--text-3)">○ ${lang==='en'?'Disabled':'Đã tắt'}</span>`;
+
+  const presetBtns = [1,3,5,10,15,30,60].map(m=>{
+    const active = interval===m && enabled;
+    return `<button class="admin-sync-mini${active?' vc-sched-active':''}"
+      style="${active?'background:color-mix(in srgb,var(--brand-2,#1565c0) 14%,var(--bg-surface,#fff));border-color:color-mix(in srgb,var(--brand-2,#1565c0) 40%,var(--border,#bfd0e5));color:var(--brand-2,#1565c0)':''}"
+      onclick="saveSyncSchedule(${m}, true)">${m} ${lang==='en'?'min':'phút'}</button>`;
+  }).join('');
+
+  return `<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:14px">
+    <style>
+      .vc-sched-input{width:70px;padding:4px 8px;border:1px solid var(--border,#e2e8f0);border-radius:6px;
+        font-size:13px;background:var(--bg-2,#f6f7fb);color:var(--text-primary,#1e293b);text-align:center}
+    </style>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+      <div>
+        <div class="admin-sync-panel-title">${lang==='en'?'Auto-sync schedule':'Lịch tự động đồng bộ'}
+          &nbsp;<span style="font-size:11px;font-weight:400;color:var(--text-3)">${lang==='en'?'(VPS site → mirror)':'(VPS site → mirror)'}</span>
+        </div>
+        <div style="margin-top:4px">${statusPart}</div>
+      </div>
+      <button class="admin-sync-mini" onclick="runAutoSyncNow()" ${_autoSyncRunning?'disabled':''}>
+        <span class="admin-sync-mini-ico">⚡</span>
+        <span>${lang==='en'?'Sync now':'Đồng bộ ngay'}</span>
+      </button>
+    </div>
+
+    <div class="admin-sync-callout-bar is-info" style="margin-bottom:12px;font-size:12px">
+      ${lang==='en'
+        ?'Each auto-sync copies VPS site files → data-private mirror. When <code>deploy.sh</code> runs, it captures from the mirror — so the most you can lose on a reset is one interval worth of portal edits.'
+        :'Mỗi lần auto-sync sao chép file VPS site → mirror data-private. Khi <code>deploy.sh</code> chạy, nó capture từ mirror — vậy nếu có reset, tối đa mất đúng một khoảng thời gian một chu kỳ sync portal edits.'}
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px">
+      <span style="font-size:13px;font-weight:600">${lang==='en'?'Interval:':'Chu kỳ:'}</span>
+      ${presetBtns}
+      <span style="font-size:12px;color:var(--text-3);margin:0 4px">${lang==='en'?'or custom:':'hoặc tùy chỉnh:'}</span>
+      <input type="number" min="1" max="1440" value="${escapeHtml(String(interval))}"
+        class="vc-sched-input" id="vc-sched-custom-input"
+        onkeydown="if(event.key==='Enter'){const v=parseInt(this.value,10);if(v>=1)saveSyncSchedule(v,true);}">
+      <button class="admin-sync-mini" onclick="const v=parseInt(document.getElementById('vc-sched-custom-input').value,10);if(v>=1)saveSyncSchedule(v,true);">
+        ${lang==='en'?'Set':'Đặt'}
+      </button>
+      ${enabled
+        ? `<button class="admin-sync-mini" style="color:var(--red,#ef4444);border-color:var(--red,#ef4444)"
+             onclick="saveSyncSchedule(${interval}, false)">${lang==='en'?'Disable':'Tắt'}</button>`
+        : `<button class="admin-sync-mini" onclick="saveSyncSchedule(${interval}, true)">${lang==='en'?'Enable':'Bật'}</button>`}
+    </div>
+
+    <div style="margin-top:10px;font-size:11px;color:var(--text-3)">
+      ${lang==='en'
+        ?'Note: auto-sync runs only while this admin page is open. For 24/7 background sync, set up a macOS LaunchAgent (see CLI section below) or a VPS cron job with the same interval.'
+        :'Lưu ý: auto-sync chỉ chạy khi trang admin này đang mở. Để sync 24/7 ngầm, cài LaunchAgent macOS (xem CLI bên dưới) hoặc cron job VPS với cùng chu kỳ.'}
+    </div>
+  </article>`;
 }
 
 async function loadLocalSyncReport(options){
@@ -8213,6 +8407,7 @@ function renderAdminVersionControl(){
   if(versionControlSubTab === 'local_sync'){
     if(!localSyncReportState.loaded && !localSyncReportState.loading && !localSyncReportState.error) loadLocalSyncReport({silent:true});
     if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading && !dataSyncStatusState.error) loadDataSyncStatus({silent:true});
+    if(!syncScheduleState.loaded && !syncScheduleState.loading && !syncScheduleState.error) loadSyncSchedule({silent:true});
   }
 
   let body;

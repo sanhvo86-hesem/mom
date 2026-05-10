@@ -395,6 +395,77 @@ class AdminController extends BaseController
         ]);
     }
 
+    /**
+     * GET  admin_sync_schedule_get  — Read auto-sync schedule config.
+     * POST admin_sync_schedule_set  — Write schedule (interval_minutes, enabled, last_auto_sync?).
+     *
+     * Config stored at $PRIVATE_DATA/.sync-schedule.json so it survives deploys.
+     * The JS timer in the admin UI reads this and starts/stops setInterval accordingly.
+     *
+     * @return never
+     */
+    public function syncScheduleGet(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAdmin($me);
+
+        $path = $this->syncSchedulePath();
+        if (!is_file($path)) {
+            $this->success(['ok' => true, 'interval_minutes' => 5, 'enabled' => false, 'last_auto_sync' => null]);
+        }
+        $raw    = (string)(@file_get_contents($path) ?: '{}');
+        $config = json_decode($raw, true);
+        if (!is_array($config)) {
+            $this->success(['ok' => true, 'interval_minutes' => 5, 'enabled' => false, 'last_auto_sync' => null]);
+        }
+        $this->success([
+            'ok'               => true,
+            'interval_minutes' => (int)($config['interval_minutes'] ?? 5),
+            'enabled'          => (bool)($config['enabled'] ?? false),
+            'last_auto_sync'   => isset($config['last_auto_sync']) ? (string)$config['last_auto_sync'] : null,
+        ]);
+    }
+
+    public function syncScheduleSet(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $body            = $this->jsonBody();
+        $intervalMinutes = max(1, min(1440, (int)($body['interval_minutes'] ?? 5)));
+        $enabled         = (bool)($body['enabled'] ?? false);
+        $lastAutoSync    = isset($body['last_auto_sync']) ? (string)$body['last_auto_sync'] : null;
+
+        $config = [
+            'interval_minutes' => $intervalMinutes,
+            'enabled'          => $enabled,
+            'last_auto_sync'   => $lastAutoSync,
+            'updated_at'       => (new \DateTime())->format('c'),
+            'updated_by'       => (string)($me['username'] ?? 'unknown'),
+        ];
+
+        $path = $this->syncSchedulePath();
+        $tmp  = $path . '.tmp.' . substr(bin2hex(random_bytes(3)), 0, 6);
+        if (file_put_contents($tmp, json_encode($config, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE)) === false
+            || !rename($tmp, $path)) {
+            @unlink($tmp);
+            $this->error('sync_schedule_write_failed', 500);
+        }
+
+        $this->auditLog('admin_sync_schedule_set', [
+            'interval_minutes' => $intervalMinutes,
+            'enabled'          => $enabled,
+        ]);
+        $this->success(['ok' => true, 'interval_minutes' => $intervalMinutes, 'enabled' => $enabled]);
+    }
+
+    private function syncSchedulePath(): string
+    {
+        $dir = rtrim((string)(getenv('PRIVATE_DATA') ?: '/var/www/data-private'), '/');
+        return $dir . '/.sync-schedule.json';
+    }
+
     private function dataSyncMutator(): DataSyncMutationService
     {
         return new DataSyncMutationService($this->dataDir, $this->data);
