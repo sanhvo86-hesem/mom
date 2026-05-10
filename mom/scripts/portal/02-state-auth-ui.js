@@ -7882,6 +7882,35 @@ function renderAdminInfrastructure(){
     return;
   }
   el.innerHTML = '<div class="hm-empty">' + (lang==='en' ? 'Loading VPS infrastructure module...' : 'Đang tải module hạ tầng VPS...') + '</div>';
+  var existing = document.getElementById('admin-vps-control-tower-script');
+  if(existing){
+    var tries = 0;
+    (function waitForTower(){
+      if(typeof window._renderVpsControlTower === 'function'){
+        window._renderVpsControlTower(el);
+        return;
+      }
+      if(tries < 40){
+        tries += 1;
+        setTimeout(waitForTower, 150);
+        return;
+      }
+      el.innerHTML = '<div class="hm-empty">Failed to initialize VPS infrastructure module.</div>';
+    })();
+    return;
+  }
+  var script = document.createElement('script');
+  script.id = 'admin-vps-control-tower-script';
+  script.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '33-vps-control-tower.js?v=' + (window.APP_VERSION || Date.now());
+  script.onload = function(){
+    if(typeof window._renderVpsControlTower === 'function'){
+      window._renderVpsControlTower(el);
+    }
+  };
+  script.onerror = function(){
+    el.innerHTML = '<div class="hm-empty">Failed to load VPS infrastructure. Check 33-vps-control-tower.js</div>';
+  };
+  document.head.appendChild(script);
 }
 
 function adminTabLabel(meta){
@@ -7983,7 +8012,7 @@ function renderAdmin(){
   }
   if(adminTab==='users') renderAdminUsers();
   if(adminTab==='dept_title') renderAdminDeptTitle();
-  if(adminTab==='perms') renderAdminPerms();          // legacy 2-pane folder tree
+  if(adminTab==='perms') renderAdminPermTab('doc_perms');   // new doc_perms grid (grant editor + override + expiry)
   if(adminTab==='roles') renderAdminRoles();
   if(adminTab==='orgchart') renderAdminOrgChart();
   if(adminTab==='activity') renderAdminActivity();
@@ -8151,7 +8180,7 @@ function renderAdminMetadataStudio(){
     window._renderAdminMetadataStudio(el);
     return;
   }
-  el.innerHTML='<div class="hm-empty">'+(lang==='en'?'Loading Data Schema...':'Dang tai Data Schema...')+'</div>';
+  el.innerHTML='<div class="hm-empty">'+(lang==='en'?'Loading Data Schema...':'Đang tải Data Schema...')+'</div>';
   var existing=document.getElementById('admin-metadata-studio-script');
   if(existing){
     var tries=0;
@@ -9392,15 +9421,15 @@ function exportUsersExcel(){
     showToast('🔒 '+(lang==='en'?'No permission to export user data':'Không có quyền xuất dữ liệu người dùng'));
     return;
   }
-  // Build CSV with BOM for Excel compatibility (Vietnamese)
-  const headers = ['ID','Username','Password','Họ tên / Name','CCCD / Citizen ID','Số ĐT / Phone','Email cá nhân / Personal Email','Phòng ban / Dept','Chức danh / Title','Vai trò / Role','Role Key','Trạng thái / Status','MFA'];
+  // Build CSV with BOM for Excel compatibility (Vietnamese).
+  // Password column intentionally OMITTED — credentials must never round-trip through CSV.
+  const headers = ['ID','Username','Họ tên / Name','CCCD / Citizen ID','Số ĐT / Phone','Email cá nhân / Personal Email','Phòng ban / Dept','Chức danh / Title','Vai trò / Role','Role Key','Trạng thái / Status','MFA'];
   let csv = headers.join(',') + '\n';
   USERS.forEach(u=>{
     const roleDef = ROLES[u.role] || {};
     csv += [
       '"'+(u.id||'')+'"',
       '"'+(u.username||'')+'"',
-      '"'+(u.password||'')+'"',
       '"'+(u.name||'').replace(/"/g,'""')+'"',
       '"'+(u.cccd||'')+'"',
       '"'+(u.phone||'')+'"',
@@ -9472,16 +9501,18 @@ function importUsersExcel(input){
         return;
       }
       
-      // Parse data rows
-      let imported = 0, skipped = 0, errors = [];
+      // Parse data rows and POST each to backend (admin_user_upsert)
+      let imported = 0, skipped = 0, failed = 0;
+      const failures = [];
+      showToast('⏳ '+(lang==='en'?'Importing users…':'Đang nhập người dùng…'));
       for(let i=1; i<lines.length; i++){
         const cols = parseCSVRow(lines[i]);
         if(cols.length < 2) continue;
-        
+
         const username = (cols[colMap.username]||'').trim();
         const name = (cols[colMap.name]||'').trim();
         if(!username && !name){ skipped++; continue; }
-        
+
         // Resolve role from key or label
         let role = (cols[colMap.role]||'').trim();
         if(!role && colMap.roleLabel !== undefined){
@@ -9490,7 +9521,7 @@ function importUsersExcel(input){
           role = found ? found[0] : '';
         }
         if(!role || !ROLES[role]) role = 'trainee';
-        
+
         const dept = (cols[colMap.dept]||'').trim();
         const title = (cols[colMap.title]||'').trim();
         const cccd = colMap.cccd !== undefined ? (cols[colMap.cccd]||'').trim() : '';
@@ -9500,41 +9531,47 @@ function importUsersExcel(input){
         const email = colMap.email !== undefined ? (cols[colMap.email]||'').trim() : '';
         const status = colMap.status !== undefined ? (cols[colMap.status]||'').trim() : 'Active';
         const active = !status.toLowerCase().includes('inactive');
-        
-        // Check if user exists
-        const existing = USERS.find(u=> u.username === username);
-        if(existing){
-          // Update
-          existing.name = name || existing.name;
-          existing.dept = dept || existing.dept;
-          existing.title = title || existing.title;
-          existing.role = role;
-          existing.cccd = cccd || existing.cccd || '';
-          existing.phone = phone || existing.phone || '';
-          existing.personal_email = personal_email || existing.personal_email || '';
-          if(password) existing.password = password;
-          existing.email = email || existing.email;
-          existing.active = active;
-        } else {
-          // Add new
-          const newId = USERS.length > 0 ? Math.max(...USERS.map(u=>parseInt(u.id)||0))+1 : 1;
-          USERS.push({
-            id: String(newId),
-            username: username || name.toLowerCase().replace(/\s+/g,'.'),
-            password: password || '',
-            name: name, dept: dept, title: title, role: role,
-            cccd: cccd, phone: phone, personal_email: personal_email,
-            email: email, active: active, mfa_enabled: false
-          });
+
+        const payload = {
+          username: username || (name ? name.toLowerCase().replace(/\s+/g,'.') : ''),
+          name: name,
+          dept: dept,
+          title: title,
+          role: role,
+          active: active,
+          cccd: cccd,
+          phone: phone,
+          personal_email: personal_email,
+          email: email
+        };
+        if(password) payload.password = password;
+
+        try{
+          const res = await apiCall('admin_user_upsert', payload);
+          if(res && res.ok){
+            imported++;
+          } else {
+            failed++;
+            const msg = (res && (res.message || res.error)) || 'unknown';
+            failures.push((payload.username||name)+': '+msg);
+          }
+        } catch(err){
+          failed++;
+          failures.push((payload.username||name)+': '+(err && err.message || 'network'));
         }
-        imported++;
       }
-      
-      showToast('✅ '+(lang==='en'
-        ?`Imported ${imported} users${skipped?' ('+skipped+' skipped)':''}`
-        :`Đã nhập ${imported} người dùng${skipped?' ('+skipped+' bỏ qua)':''}`));
-      
-      markUnsaved();
+
+      // Refresh authoritative user list from server
+      try { await loadUsersFromServerIfAdmin(); } catch(_e){}
+
+      const summary = lang==='en'
+        ? `Imported ${imported}${skipped?', '+skipped+' skipped':''}${failed?', '+failed+' failed':''}`
+        : `Đã nhập ${imported}${skipped?', '+skipped+' bỏ qua':''}${failed?', '+failed+' lỗi':''}`;
+      showToast((failed?'⚠ ':'✅ ')+summary);
+      if(failed && failures.length){
+        console.warn('Import failures:', failures);
+      }
+
       renderAdmin();
     }catch(err){
       console.error('Import error:', err);
@@ -9723,6 +9760,18 @@ function showUserModal(userId){
           </div>
         </div>
 
+        <div class="modal-grid-2">
+          <div class="modal-field">
+            <label>${lang==='en'?'2FA / MFA':'2FA / MFA'}</label>
+            <select id="um-mfa">
+              <option value="1" ${u0.mfa_enabled?'selected':''}>${lang==='en'?'Enabled':'Đã bật'}</option>
+              <option value="0" ${!u0.mfa_enabled?'selected':''}>${lang==='en'?'Disabled':'Chưa bật'}</option>
+            </select>
+            <div class="help-text" style="font-size:10px">${lang==='en'?'Disabling clears existing factor enrolment.':'Tắt sẽ xoá yếu tố đã đăng ký.'}</div>
+          </div>
+          <div class="modal-field"></div>
+        </div>
+
         <div style="border-top:1px solid var(--border-light,#e2e8f0);margin:14px 0;padding-top:14px">
           <div style="font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:10px">📋 ${lang==='en'?'Personal Information':'Thông tin cá nhân'}</div>
           <div class="modal-grid-2">
@@ -9819,6 +9868,7 @@ async function saveUserFromModal(userId){
     const title = String(document.getElementById('um-title')?.value||'').trim();
     const role = String(document.getElementById('um-role')?.value||'employee').trim();
     const active = String(document.getElementById('um-active')?.value||'1') === '1';
+    const mfaEnabled = String(document.getElementById('um-mfa')?.value||'0') === '1';
     const password = String(document.getElementById('um-password')?.value||'').trim();
     const cccd = String(document.getElementById('um-cccd')?.value||'').trim();
     const phone = String(document.getElementById('um-phone')?.value||'').trim();
@@ -9895,6 +9945,7 @@ async function saveUserFromModal(userId){
       title: assignment.positionTitle || title,
       role,
       active,
+      mfa_enabled: mfaEnabled,
       cccd,
       phone,
       personal_email,
@@ -10022,26 +10073,6 @@ function closeModal(){
   });
 }
 
-function saveUser(existingId){
-  const name=document.getElementById('mu-name').value.trim();
-  const username=document.getElementById('mu-username').value.trim();
-  const pin=document.getElementById('mu-pin').value;
-  const title=document.getElementById('mu-title').value.trim();
-  const role=document.getElementById('mu-role').value;
-  const dept=document.getElementById('mu-dept').value;
-  if(!name||!username){alert(lang==='en'?'Name and username required':'Cần nhập tên và username');return;}
-  if(existingId){
-    const u=USERS.find(x=>String(x.id)===String(existingId));
-    if(u){Object.assign(u,{name,username,pin,title,role,dept});}
-  } else {
-    const newId='U'+String(USERS.length+1).padStart(3,'0');
-    USERS.push({id:newId,name,username,pin,role,dept,title,avatar:'🧑',active:true});
-  }
-  saveUsersToStorage();
-  closeModal();
-  renderAdmin();
-}
-
 async function toggleUserActive(userId){
   const u = USERS.find(x=>String(x.id)===String(userId));
   if(!u) return;
@@ -10069,40 +10100,6 @@ async function toggleUserActive(userId){
     showToast(lang==='en'?'\u26A0 Server error':'\u26A0 L\u1ed7i server');
   }
 }
-
-async function lockUser(userId){
-  const u = USERS.find(x=>String(x.id)===String(userId));
-  if(!u) return;
-  if(u.active===false){
-    showToast(lang==='en'?'ℹ️ Already inactive':'ℹ️ Đã bị khóa');
-    return;
-  }
-  try{
-    const res = await apiCall('admin_user_upsert', {
-      username: u.username,
-      name: u.name||u.username,
-      dept: u.dept||'',
-      title: u.title||'',
-      role: u.role||'employee',
-      active: false
-    });
-    if(res && res.ok){
-      showToast(lang==='en'?'✅ Locked':'✅ Đã khóa');
-      await refreshAdminUserRuntimeProjection();
-    }else{
-      showToast('\u26A0 '+((res&&res.error)?res.error:'server_error'));
-    }
-  }catch(e){
-    console.error(e);
-    showToast(lang==='en'?'\u26A0 Server error':'\u26A0 L\u1ed7i server');
-  }
-}
-
-async function pauseUser(userId){
-  return toggleUserActive(userId);
-}
-
-
 
 function editUserPerms(userId){
   const u=USERS.find(x=>String(x.id)===String(userId));
