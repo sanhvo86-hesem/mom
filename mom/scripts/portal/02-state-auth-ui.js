@@ -2043,7 +2043,7 @@ async function onLoggedIn(res){
         timeout: lang==='en'?'Location request timed out.':'Yêu cầu vị trí quá thời gian.',
         not_supported: lang==='en'?'Browser does not support geolocation.':'Trình duyệt không hỗ trợ định vị.'
       };
-      alert('⚠ ' + (reasons[geo.reason] || reasons.denied) + '\n\n' + (lang==='en'?'Session will be terminated.':'Phiên sẽ kết thúc.'));
+      showToast('⚠ ' + (reasons[geo.reason] || reasons.denied) + ' — ' + (lang==='en'?'Session will be terminated.':'Phiên sẽ kết thúc.'), 'error');
       syncCurrentUserRef(null); _syncCsrf(null);
       try{ await apiCall('auth_logout', {}, 'POST'); }catch(e){}
       setLoginStage('password');
@@ -5659,7 +5659,7 @@ async function saveDictTerm(originalTerm){
 
   const validationError = getDictionaryValidationError(term, meaning, def, originalTerm);
   if(validationError){
-    alert(getDictionarySaveErrorMessage(validationError));
+    showToast('⚠ ' + getDictionarySaveErrorMessage(validationError));
     return;
   }
 
@@ -5680,21 +5680,25 @@ async function saveDictTerm(originalTerm){
 
 async function deleteDictTerm(term){
   if(!isAdmin()) return;
-  if(!confirm((lang==='en'?'Delete term':'Xóa thuật ngữ')+': '+term+' ?')) return;
-  try{
-    const res = await apiCall('dict_delete',{term});
-    if(!(res && res.ok)){
-      showToast((res && res.error)?('⚠ '+res.error):(lang==='en'?'⚠ Delete failed':'⚠ Xóa thất bại'));
-      return;
+  showAdminConfirmModal(
+    'Xóa thuật ngữ: ' + term + '?',
+    'Delete term: ' + term + '?',
+    async function(){
+      try{
+        const res = await apiCall('dict_delete',{term});
+        if(!(res && res.ok)){
+          showToast((res && res.error)?('⚠ '+res.error):(lang==='en'?'⚠ Delete failed':'⚠ Xóa thất bại'));
+          return;
+        }
+        dictData = res.items || dictData;
+        renderDictBody();
+        showToast(lang==='en'?'✓ Deleted':'✓ Đã xóa');
+      }catch(e){
+        showToast(lang==='en'?'⚠ Delete failed':'⚠ Xóa thất bại');
+      }
     }
-    dictData = res.items || dictData;
-    renderDictBody();
-    showToast(lang==='en'?'✓ Deleted':'✓ Đã xóa');
-  }catch(e){
-    showToast(lang==='en'?'⚠ Delete failed':'⚠ Xóa thất bại');
-  }
+  );
 }
-
 function escapeHtml(s){
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
@@ -6181,13 +6185,12 @@ function adminDataSyncUploadPrompt(name){
     try{ JSON.parse(text); }
     catch(e){ showToast(lang==='en' ? `Not valid JSON: ${e.message}` : `JSON không hợp lệ: ${e.message}`); return; }
 
-    const cr = prompt(lang==='en'
-      ? `Change reference for upload of ${name} (e.g. CR-2026-099):`
-      : `Mã thay đổi (CR) cho lần đẩy ${name} (vd CR-2026-099):`,
-      '');
-    if(cr === null) return;
-    const changeRef = (cr || '').trim() || 'admin-ui';
-    await adminDataSyncUploadDo(name, text, currentSha ? null : null, changeRef, false);
+    showAdminCrModal(
+      'admin-ui-upload',
+      `Mã thay đổi (CR) cho lần đẩy ${name} (vd CR-2026-099):`,
+      `Change reference for upload of ${name} (e.g. CR-2026-099):`,
+      (cr) => { adminDataSyncUploadDo(name, text, null, cr || 'admin-ui-upload', false); }
+    );
   };
   document.body.appendChild(input);
   input.click();
@@ -6212,10 +6215,11 @@ async function adminDataSyncUploadDo(name, content, expectedSha, changeRef, forc
       return;
     }
     if(res && res.error === 'drift_detected'){
-      const ok = confirm(lang==='en'
-        ? `${name} on the VPS changed since you opened this page (sha=${res.detail||'?'}). Force overwrite?`
-        : `${name} trên VPS đã thay đổi từ lúc bạn mở trang (sha=${res.detail||'?'}). Vẫn ép ghi đè?`);
-      if(ok) return adminDataSyncUploadDo(name, content, null, changeRef, true);
+      showAdminConfirmModal(
+        `${name} trên VPS đã thay đổi từ lúc bạn mở trang (sha=${res.detail||'?'}). Vẫn ép ghi đè?`,
+        `${name} on the VPS changed since you opened this page (sha=${res.detail||'?'}). Force overwrite?`,
+        () => adminDataSyncUploadDo(name, content, null, changeRef, true)
+      );
       return;
     }
     showToast((lang==='en' ? 'Upload failed: ' : 'Đẩy thất bại: ') + (res && (res.detail||res.error) || 'unknown'));
@@ -6224,79 +6228,174 @@ async function adminDataSyncUploadDo(name, content, expectedSha, changeRef, forc
   }
 }
 
-async function adminDataSyncResolveDrift(name, direction){
+// ── Admin modal helpers — no native alert/confirm/prompt ──────────────────
+function showAdminConfirmModal(msgVi, msgEn, onConfirm) {
+  const el = document.getElementById('admin-shared-confirm-modal');
+  if (el) el.remove();
+  const d = document.createElement('div');
+  d.id = 'admin-shared-confirm-modal';
+  d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center';
+  d.innerHTML = '<div style="background:#fff;border-radius:8px;padding:22px 26px;max-width:440px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.22)">'
+    + '<p style="margin:0 0 18px;font-size:14px;line-height:1.5;white-space:pre-wrap">' + escapeHtml(lang==='en'?msgEn:msgVi) + '</p>'
+    + '<div style="display:flex;gap:10px;justify-content:flex-end">'
+    + '<button id="ascm-cancel" style="padding:7px 16px;background:#f0f0f0;border:0;border-radius:5px;cursor:pointer">' + (lang==='en'?'Cancel':'Hủy') + '</button>'
+    + '<button id="ascm-ok" style="padding:7px 16px;background:var(--danger,#c00);color:#fff;border:0;border-radius:5px;cursor:pointer;font-weight:600">' + (lang==='en'?'Confirm':'Xác nhận') + '</button>'
+    + '</div></div>';
+  document.body.appendChild(d);
+  document.getElementById('ascm-cancel').onclick = () => d.remove();
+  document.getElementById('ascm-ok').onclick = () => { d.remove(); onConfirm(); };
+  d.onclick = e => { if(e.target === d) d.remove(); };
+}
+function showAdminCrModal(defaultVal, labelVi, labelEn, onConfirm) {
+  const el = document.getElementById('admin-shared-cr-modal');
+  if (el) el.remove();
+  const d = document.createElement('div');
+  d.id = 'admin-shared-cr-modal';
+  d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center';
+  d.innerHTML = '<div style="background:#fff;border-radius:8px;padding:22px 26px;max-width:400px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.22)">'
+    + '<label style="display:block;font-size:13px;font-weight:600;margin-bottom:8px">' + escapeHtml(lang==='en'?labelEn:labelVi) + '</label>'
+    + '<input id="ascm-cr-inp" type="text" value="' + escapeHtml(defaultVal) + '" style="width:100%;padding:7px 10px;border:1px solid var(--ln,#ddd);border-radius:5px;font-size:13px;box-sizing:border-box">'
+    + '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">'
+    + '<button id="ascm-cr-cancel" style="padding:7px 16px;background:#f0f0f0;border:0;border-radius:5px;cursor:pointer">' + (lang==='en'?'Cancel':'Hủy') + '</button>'
+    + '<button id="ascm-cr-ok" style="padding:7px 16px;background:var(--brand-primary,#0c63e7);color:#fff;border:0;border-radius:5px;cursor:pointer;font-weight:600">OK</button>'
+    + '</div></div>';
+  document.body.appendChild(d);
+  const inp = document.getElementById('ascm-cr-inp');
+  inp.focus(); inp.select();
+  const submit = () => { const v = inp.value.trim() || defaultVal; d.remove(); onConfirm(v); };
+  document.getElementById('ascm-cr-cancel').onclick = () => d.remove();
+  document.getElementById('ascm-cr-ok').onclick = submit;
+  d.onclick = e => { if(e.target === d) d.remove(); };
+  inp.addEventListener('keydown', e => { if(e.key==='Enter') submit(); if(e.key==='Escape') d.remove(); });
+}
+
+function showAdminFormModal(titleVi, titleEn, fields, onSubmit) {
+  const el = document.getElementById('admin-shared-form-modal');
+  if (el) el.remove();
+  const title = lang === 'en' ? titleEn : titleVi;
+  let fieldsHtml = '';
+  fields.forEach(function(f) {
+    const lbl = lang === 'en' ? f.labelEn : f.labelVi;
+    if (f.type === 'select') {
+      let optHtml = '';
+      (f.options || []).forEach(function(o) {
+        const sel = String(f.defaultVal || '') === String(o.value) ? ' selected' : '';
+        optHtml += '<option value="' + escapeHtml(o.value) + '"' + sel + '>' + escapeHtml(o.label) + '</option>';
+      });
+      fieldsHtml += '<div style="margin-bottom:12px"><label style="display:block;font-size:12px;color:#666;margin-bottom:4px">' + escapeHtml(lbl) + (f.required ? ' *' : '') + '</label>'
+        + '<select data-key="' + escapeHtml(f.key) + '" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:4px;font-size:13px">' + optHtml + '</select></div>';
+    } else {
+      const defVal = (f.defaultVal !== undefined && f.defaultVal !== null) ? String(f.defaultVal) : '';
+      fieldsHtml += '<div style="margin-bottom:12px"><label style="display:block;font-size:12px;color:#666;margin-bottom:4px">' + escapeHtml(lbl) + (f.required ? ' *' : '') + '</label>'
+        + '<input data-key="' + escapeHtml(f.key) + '" type="' + (f.type || 'text') + '" value="' + escapeHtml(defVal) + '" placeholder="' + escapeHtml(f.placeholder || '') + '" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:4px;font-size:13px;box-sizing:border-box"></div>';
+    }
+  });
+  const d = document.createElement('div');
+  d.id = 'admin-shared-form-modal';
+  d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding-top:60px;overflow-y:auto';
+  d.innerHTML = '<div style="background:#fff;border-radius:8px;padding:22px 26px;max-width:480px;width:92%;box-shadow:0 8px 32px rgba(0,0,0,.22)">'
+    + '<h3 style="margin:0 0 16px;font-size:15px;font-weight:600">' + escapeHtml(title) + '</h3>'
+    + fieldsHtml
+    + '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px">'
+    + '<button id="asfm-cancel" style="padding:7px 16px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-size:13px">' + (lang === 'en' ? 'Cancel' : 'Hủy') + '</button>'
+    + '<button id="asfm-ok" style="padding:7px 16px;border:none;border-radius:5px;background:var(--brand-primary,#1565c0);color:#fff;cursor:pointer;font-size:13px;font-weight:500">' + (lang === 'en' ? 'Save' : 'Lưu') + '</button>'
+    + '</div></div>';
+  document.body.appendChild(d);
+  const firstInput = d.querySelector('input,select');
+  if (firstInput) { firstInput.focus(); if (firstInput.select) firstInput.select(); }
+  document.getElementById('asfm-cancel').onclick = function() { d.remove(); };
+  document.getElementById('asfm-ok').onclick = function() {
+    const values = {};
+    d.querySelectorAll('[data-key]').forEach(function(inp) { values[inp.getAttribute('data-key')] = inp.value; });
+    const missing = fields.filter(function(f) { return f.required && !String(values[f.key] || '').trim(); });
+    if (missing.length) {
+      const lbl = lang === 'en' ? missing[0].labelEn : missing[0].labelVi;
+      showToast('⚠ ' + (lang === 'en' ? 'Required: ' : 'Bắt buộc: ') + lbl);
+      return;
+    }
+    d.remove();
+    onSubmit(values);
+  };
+  d.addEventListener('keydown', function(e) { if (e.key === 'Escape') d.remove(); });
+  d.onclick = function(e) { if (e.target === d) d.remove(); };
+}
+
+function adminDataSyncResolveDrift(name, direction){
   const dirLabel = direction === 'site_to_mirror' ? 'VPS → Local' : 'Local → VPS';
-  if(!confirm(lang==='en'
-      ? `Resolve drift for ${name} by copying ${dirLabel}? A snapshot is taken first.`
-      : `Giải quyết lệch ${name} bằng cách copy ${dirLabel}? Snapshot sẽ được tạo trước.`)){
-    return;
-  }
-  const cr = prompt(lang==='en' ? 'Change reference:' : 'Mã thay đổi (CR):', 'admin-ui-drift');
-  if(cr === null) return;
-  try{
-    const res = await apiCall('admin_data_sync_resolve_drift',
-      {file: name, direction, change_ref: cr.trim() || 'admin-ui-drift'}, 'POST');
-    if(res && res.ok){
-      if(res.unchanged){
-        showToast(lang==='en' ? 'Already in sync' : 'Đã khớp sẵn');
-      }else{
-        showToast(lang==='en'
-          ? `Resolved ${name} (${dirLabel}) · snapshot ${(res.snapshot||'').slice(0,15)}`
-          : `Đã giải quyết ${name} (${dirLabel}) · snapshot ${(res.snapshot||'').slice(0,15)}`);
+  showAdminConfirmModal(
+    `Giải quyết lệch ${name} bằng cách copy ${dirLabel}? Snapshot sẽ được tạo trước.`,
+    `Resolve drift for ${name} by copying ${dirLabel}? A snapshot is taken first.`,
+    async () => {
+      try{
+        const res = await apiCall('admin_data_sync_resolve_drift',
+          {file: name, direction, change_ref: 'admin-ui-drift'}, 'POST');
+        if(res && res.ok){
+          if(res.unchanged){
+            showToast(lang==='en' ? 'Already in sync' : 'Đã khớp sẵn');
+          }else{
+            showToast(lang==='en'
+              ? `Resolved ${name} (${dirLabel}) · snapshot ${(res.snapshot||'').slice(0,15)}`
+              : `Đã giải quyết ${name} (${dirLabel}) · snapshot ${(res.snapshot||'').slice(0,15)}`);
+          }
+          adminRefreshDataSyncStatus();
+          dataSyncSnapshotsState = {loading:false, loaded:false, error:'', data:null};
+        }else{
+          showToast((lang==='en' ? 'Failed: ' : 'Lỗi: ') + (res && (res.detail||res.error) || 'unknown'));
+        }
+      }catch(e){
+        showToast('Error: ' + e.message);
       }
-      adminRefreshDataSyncStatus();
-      dataSyncSnapshotsState = {loading:false, loaded:false, error:'', data:null};
-    }else{
-      showToast((lang==='en' ? 'Failed: ' : 'Lỗi: ') + (res && (res.detail||res.error) || 'unknown'));
     }
-  }catch(e){
-    showToast('Error: ' + e.message);
-  }
+  );
 }
 
-async function adminDataSyncTakeSnapshot(){
-  const reason = prompt(lang==='en' ? 'Snapshot reason / label:' : 'Lý do/nhãn snapshot:', 'manual checkpoint');
-  if(reason === null) return;
-  try{
-    const res = await apiCall('admin_data_sync_take_snapshot', {reason: reason || 'manual'}, 'POST');
-    if(res && res.ok){
-      showToast(lang==='en'
-        ? `Snapshot ${(res.snapshot||'').slice(0,15)} taken`
-        : `Đã tạo snapshot ${(res.snapshot||'').slice(0,15)}`);
-      dataSyncSnapshotsState = {loading:false, loaded:false, error:'', data:null};
-      loadDataSyncSnapshots({force:true});
-    }else{
-      showToast((lang==='en'?'Failed: ':'Lỗi: ') + (res && (res.detail||res.error) || 'unknown'));
+function adminDataSyncTakeSnapshot(){
+  showAdminCrModal(
+    'manual checkpoint',
+    'Lý do / nhãn snapshot:',
+    'Snapshot reason / label:',
+    async (reason) => {
+      try{
+        const res = await apiCall('admin_data_sync_take_snapshot', {reason: reason || 'manual'}, 'POST');
+        if(res && res.ok){
+          showToast(lang==='en'
+            ? `Snapshot ${(res.snapshot||'').slice(0,15)} taken`
+            : `Đã tạo snapshot ${(res.snapshot||'').slice(0,15)}`);
+          dataSyncSnapshotsState = {loading:false, loaded:false, error:'', data:null};
+          loadDataSyncSnapshots({force:true});
+        }else{
+          showToast((lang==='en'?'Failed: ':'Lỗi: ') + (res && (res.detail||res.error) || 'unknown'));
+        }
+      }catch(e){
+        showToast('Error: ' + e.message);
+      }
     }
-  }catch(e){
-    showToast('Error: ' + e.message);
-  }
+  );
 }
 
-async function adminDataSyncRestoreSnapshot(snapshotId, fileName){
+function adminDataSyncRestoreSnapshot(snapshotId, fileName){
   const target = fileName ? `${fileName} from ${snapshotId}` : `ALL files from ${snapshotId}`;
-  if(!confirm(lang==='en'
-      ? `Restore ${target}? Current bytes will be snapshotted before overwrite.`
-      : `Khôi phục ${target}? Bản hiện tại sẽ được snapshot trước khi ghi đè.`)){
-    return;
-  }
-  const cr = prompt(lang==='en' ? 'Change reference:' : 'Mã thay đổi (CR):', 'admin-ui-restore');
-  if(cr === null) return;
-  try{
-    const body = {snapshot_id: snapshotId, change_ref: cr.trim() || 'admin-ui-restore'};
-    if(fileName) body.file = fileName;
-    const res = await apiCall('admin_data_sync_restore_snapshot', body, 'POST');
-    if(res && res.ok){
-      const n = (res.restored||[]).length;
-      showToast(lang==='en' ? `Restored ${n} file(s)` : `Đã khôi phục ${n} file`);
-      adminRefreshDataSyncStatus();
-      dataSyncSnapshotsState = {loading:false, loaded:false, error:'', data:null};
-    }else{
-      showToast((lang==='en'?'Failed: ':'Lỗi: ') + (res && (res.detail||res.error) || 'unknown'));
+  showAdminConfirmModal(
+    `Khôi phục ${target}? Bản hiện tại sẽ được snapshot trước khi ghi đè.`,
+    `Restore ${target}? Current bytes will be snapshotted before overwrite.`,
+    async () => {
+      try{
+        const body = {snapshot_id: snapshotId, change_ref: 'admin-ui-restore'};
+        if(fileName) body.file = fileName;
+        const res = await apiCall('admin_data_sync_restore_snapshot', body, 'POST');
+        if(res && res.ok){
+          const n = (res.restored||[]).length;
+          showToast(lang==='en' ? `Restored ${n} file(s)` : `Đã khôi phục ${n} file`);
+          adminRefreshDataSyncStatus();
+          dataSyncSnapshotsState = {loading:false, loaded:false, error:'', data:null};
+        }else{
+          showToast((lang==='en'?'Failed: ':'Lỗi: ') + (res && (res.detail||res.error) || 'unknown'));
+        }
+      }catch(e){
+        showToast('Error: ' + e.message);
+      }
     }
-  }catch(e){
-    showToast('Error: ' + e.message);
-  }
+  );
 }
 
 function renderAdminDataSyncSnapshotsCard(){
@@ -6608,31 +6707,30 @@ async function adminDataSyncBatchResolve(direction, scope){
   const dirLabel = direction === 'site_to_mirror'
     ? (lang==='en' ? 'VPS → Mirror' : 'VPS → Mirror')
     : (lang==='en' ? 'Mirror → VPS' : 'Mirror → VPS');
-  if(!confirm(lang==='en'
-    ? `Batch resolve ${scopeLabel} (direction: ${dirLabel})?\nA snapshot will be taken before any write.`
-    : `Giải quyết hàng loạt ${scopeLabel} (chiều: ${dirLabel})?\nSnapshot sẽ được tạo trước khi ghi.`)){
-    return;
-  }
-  const cr = prompt(lang==='en' ? 'Change reference (CR):' : 'Mã thay đổi (CR):', 'admin-ui-batch');
-  if(cr === null) return;
-  try{
-    showToast(lang==='en' ? 'Running batch resolve…' : 'Đang giải quyết hàng loạt…');
-    const res = await apiCall('admin_data_sync_batch_resolve',
-      {direction, scope, change_ref: (cr||'').trim() || 'admin-ui-batch'}, 'POST');
-    if(res && res.ok){
-      const ok = Number(res.ok_count || 0);
-      const total = Number(res.total_candidates || 0);
-      showToast(lang==='en'
-        ? `Batch done: ${ok}/${total} files resolved · snapshot ${(res.snapshot||'').slice(0,15)}`
-        : `Hoàn tất: ${ok}/${total} file đã giải quyết · snapshot ${(res.snapshot||'').slice(0,15)}`);
-      adminRefreshDataSyncStatus();
-      dataSyncSnapshotsState = {loading:false, loaded:false, error:'', data:null};
-    }else{
-      showToast((lang==='en'?'Batch failed: ':'Hàng loạt thất bại: ')+(res&&(res.detail||res.error)||'unknown'));
+  showAdminConfirmModal(
+    `Giải quyết hàng loạt ${scopeLabel} (chiều: ${dirLabel})? Snapshot sẽ được tạo trước khi ghi.`,
+    `Batch resolve ${scopeLabel} (direction: ${dirLabel})? A snapshot will be taken before any write.`,
+    async () => {
+      try{
+        showToast(lang==='en' ? 'Running batch resolve…' : 'Đang giải quyết hàng loạt…');
+        const res = await apiCall('admin_data_sync_batch_resolve',
+          {direction, scope, change_ref: 'admin-ui-batch'}, 'POST');
+        if(res && res.ok){
+          const ok = Number(res.ok_count || 0);
+          const total = Number(res.total_candidates || 0);
+          showToast(lang==='en'
+            ? `Batch done: ${ok}/${total} files resolved · snapshot ${(res.snapshot||'').slice(0,15)}`
+            : `Hoàn tất: ${ok}/${total} file đã giải quyết · snapshot ${(res.snapshot||'').slice(0,15)}`);
+          adminRefreshDataSyncStatus();
+          dataSyncSnapshotsState = {loading:false, loaded:false, error:'', data:null};
+        }else{
+          showToast((lang==='en'?'Batch failed: ':'Hàng loạt thất bại: ')+(res&&(res.detail||res.error)||'unknown'));
+        }
+      }catch(e){
+        showToast('Batch resolve error: '+e.message);
+      }
     }
-  }catch(e){
-    showToast('Batch resolve error: '+e.message);
-  }
+  );
 }
 
 async function adminDataSyncViewDiff(name){
@@ -6698,30 +6796,35 @@ async function adminDataSyncSaveEditor(){
     showToast(lang==='en'?'Invalid JSON: '+e.message:'JSON không hợp lệ: '+e.message);
     return;
   }
-  const cr = prompt(lang==='en'?'Change reference (CR):':'Mã thay đổi (CR):', 'admin-ui-edit');
-  if(cr === null) return;
-  vcConfigSyncEditorState = Object.assign({}, st, {saving:true});
-  renderAdmin();
-  try{
-    const res = await apiCall('admin_data_sync_upload_file',
-      {file:st.name, content, change_ref:(cr||'').trim()||'admin-ui-edit'}, 'POST');
-    if(res && res.ok){
-      showToast(res.unchanged
-        ? (lang==='en'?'No change detected':'Không có thay đổi')
-        : (lang==='en'?`Saved ${st.name} · snapshot ${(res.snapshot||'').slice(0,15)}`
-                      :`Đã lưu ${st.name} · snapshot ${(res.snapshot||'').slice(0,15)}`));
-      adminDataSyncCloseEditor();
-      adminRefreshDataSyncStatus();
-      dataSyncSnapshotsState = {loading:false, loaded:false, error:'', data:null};
-    }else{
-      vcConfigSyncEditorState = Object.assign({}, vcConfigSyncEditorState, {saving:false,
-        error:(res&&(res.detail||res.error))||'save_failed'});
+  showAdminCrModal(
+    'admin-ui-edit',
+    'Mã thay đổi (CR):',
+    'Change reference (CR):',
+    async (cr) => {
+      vcConfigSyncEditorState = Object.assign({}, st, {saving:true});
       renderAdmin();
+      try{
+        const res = await apiCall('admin_data_sync_upload_file',
+          {file:st.name, content, change_ref: cr || 'admin-ui-edit'}, 'POST');
+        if(res && res.ok){
+          showToast(res.unchanged
+            ? (lang==='en'?'No change detected':'Không có thay đổi')
+            : (lang==='en'?`Saved ${st.name} · snapshot ${(res.snapshot||'').slice(0,15)}`
+                          :`Đã lưu ${st.name} · snapshot ${(res.snapshot||'').slice(0,15)}`));
+          adminDataSyncCloseEditor();
+          adminRefreshDataSyncStatus();
+          dataSyncSnapshotsState = {loading:false, loaded:false, error:'', data:null};
+        }else{
+          vcConfigSyncEditorState = Object.assign({}, vcConfigSyncEditorState, {saving:false,
+            error:(res&&(res.detail||res.error))||'save_failed'});
+          renderAdmin();
+        }
+      }catch(e){
+        vcConfigSyncEditorState = Object.assign({}, vcConfigSyncEditorState, {saving:false, error:e.message});
+        renderAdmin();
+      }
     }
-  }catch(e){
-    vcConfigSyncEditorState = Object.assign({}, vcConfigSyncEditorState, {saving:false, error:e.message});
-    renderAdmin();
-  }
+  );
 }
 
 // Simple line-level diff: returns array of {type:'same'|'add'|'del', line:string}
@@ -8357,27 +8460,39 @@ function renderAdminMfa(){
       var newVal=!requireMfa;
       apiCall('admin_mfa_settings_save',{require_mfa:newVal}).then(function(r){
         if(r&&r.ok){ renderAdminMfa(); }
-        else { alert('Lỗi: '+(r?r.error:'unknown')); }
+        else { showToast('⚠ Lỗi: '+(r?r.error:'unknown')); }
       });
     });
 
     el.querySelectorAll('[data-mfa-reset]').forEach(function(btn){
       btn.addEventListener('click',function(){
         var username=this.getAttribute('data-mfa-reset');
-        if(!confirm((lang==='en'?'Reset MFA for ':'Đặt lại MFA cho ')+username+'?')) return;
-        apiCall('admin_mfa_settings_save',{reset_user:username}).then(function(r){
-          if(r&&r.ok) renderAdminMfa();
-        });
+        showAdminConfirmModal(
+          'Đặt lại MFA cho ' + username + '?',
+          'Reset MFA for ' + username + '?',
+          function(){
+            apiCall('admin_mfa_settings_save',{reset_user:username}).then(function(r){
+              if(r&&r.ok) renderAdminMfa();
+              else showToast('⚠ '+(r&&r.error?r.error:'error'));
+            });
+          }
+        );
       });
     });
 
     el.querySelectorAll('[data-mfa-disable]').forEach(function(btn){
       btn.addEventListener('click',function(){
         var username=this.getAttribute('data-mfa-disable');
-        if(!confirm((lang==='en'?'Disable MFA for ':'Tắt MFA cho ')+username+'?')) return;
-        apiCall('admin_mfa_settings_save',{disable_user:username}).then(function(r){
-          if(r&&r.ok) renderAdminMfa();
-        });
+        showAdminConfirmModal(
+          'Tắt MFA cho ' + username + '?',
+          'Disable MFA for ' + username + '?',
+          function(){
+            apiCall('admin_mfa_settings_save',{disable_user:username}).then(function(r){
+              if(r&&r.ok) renderAdminMfa();
+              else showToast('⚠ '+(r&&r.error?r.error:'error'));
+            });
+          }
+        );
       });
     });
   });
@@ -9683,20 +9798,24 @@ async function doSoftDeleteUser(userId){
 }
 
 async function doHardDeleteUser(userId,username,name){
-  if(!confirm((lang==='en'?'⚠ PERMANENTLY DELETE ':'⚠ XÓA VĨNH VIỄN ')+name+'?\n\n'+(lang==='en'?'This will completely remove the user from the database. This action CANNOT be undone!':'Điều này sẽ xóa hoàn toàn người dùng khỏi cơ sở dữ liệu. Hành động này KHÔNG THỂ hoàn tác!'))) return;
-  closeModal();
-  try{
-    const res = await apiCall('admin_user_delete', { username: username });
-    if(res && res.ok){
-      showToast(lang==='en'?'✅ User permanently deleted':'✅ Đã xóa hoàn toàn người dùng');
-      await refreshAdminUserRuntimeProjection();
-    } else {
-      const errMsg = res&&res.error==='cannot_delete_self' ? (lang==='en'?'Cannot delete yourself':'Không thể xóa chính mình') : ((res&&res.error)?res.error:'error');
-      showToast('\u26A0 '+errMsg);
+  showAdminConfirmModal(
+    '⚠ XÓA VĨNH VIỄN ' + name + '?\n\nĐiều này sẽ xóa hoàn toàn người dùng khỏi cơ sở dữ liệu. Hành động này KHÔNG THỂ hoàn tác!',
+    '⚠ PERMANENTLY DELETE ' + name + '?\n\nThis will completely remove the user from the database. This action CANNOT be undone!',
+    async function(){
+      closeModal();
+      try{
+        const res = await apiCall('admin_user_delete', { username: username });
+        if(res && res.ok){
+          showToast(lang==='en'?'✅ User permanently deleted':'✅ Đã xóa hoàn toàn người dùng');
+          await refreshAdminUserRuntimeProjection();
+        } else {
+          const errMsg = res&&res.error==='cannot_delete_self' ? (lang==='en'?'Cannot delete yourself':'Không thể xóa chính mình') : ((res&&res.error)?res.error:'error');
+          showToast('⚠ '+errMsg);
+        }
+      }catch(e){ showToast('⚠ Server error'); }
     }
-  }catch(e){ showToast('\u26A0 Server error'); }
+  );
 }
-
 function showUserModal(userId){
   const isEdit = !!userId;
   const seedUser = isEdit ? USERS.find(x=>String(x.id)===String(userId)) : {id:'',name:'',username:'',dept:'',title:'',role:'employee',active:true,mfa_enabled:false,cccd:'',phone:'',personal_email:'',hcm_org_unit_id:'',hcm_position_id:''};
@@ -10794,7 +10913,7 @@ function renderAdminDeptTitleLegacy(){
         <button class="btn-admin secondary" onclick="resetAdminFilters('dept_title')">↺ Reset filter</button>
         <button class="btn-admin secondary" onclick="loadAuthoritativeOrgCatalog({force:true})">🔄 Làm mới</button>
         <button class="btn-admin primary" onclick="promptCreateAuthoritativeOrgUnit()">＋ Thêm đơn vị</button>
-        <button class="btn-admin secondary" onclick="(function(){const code=(prompt('Nhập mã đơn vị để thêm vị trí:','')||'').trim().toUpperCase();if(!code)return;const unit=(ADMIN_AUTH_STATE.org.orgUnits||[]).find(x=>String(x.org_unit_code||'').toUpperCase()===code);if(!unit){showToast('⚠ Không tìm thấy đơn vị','error');return;}promptCreateAuthoritativePosition(unit.hcm_org_unit_id);})();">＋ Thêm vị trí</button>
+        <button class="btn-admin secondary" onclick="pickOrgUnitThenCreatePosition()">＋ Thêm vị trí</button>
       </div>
     </section>`;
   const bodyHtml = `<div class="admin-authority-grid">
@@ -10803,155 +10922,192 @@ function renderAdminDeptTitleLegacy(){
   panel.innerHTML = adminScopedLayout(headHtml, bodyHtml);
 }
 
-async function promptCreateAuthoritativeOrgUnit(){
-  const code = (prompt('Mã đơn vị tổ chức (ví dụ QA, PRO, ENG):','') || '').trim().toUpperCase();
-  if(!code) return;
-  const name = (prompt('Tên đơn vị:','') || '').trim();
-  if(!name) return;
-  const typeRaw = (prompt('Loại đơn vị: company / division / department / section / team','department') || '').trim().toLowerCase();
-  const orgUnitType = ['company','division','department','section','team'].includes(typeRaw) ? typeRaw : 'department';
-  const parentCode = (prompt('Mã đơn vị cha (để trống nếu là cấp gốc):','') || '').trim().toUpperCase();
-  const parentUnit = parentCode
-    ? (ADMIN_AUTH_STATE.org.orgUnits || []).find(unit => String(unit.org_unit_code||'').toUpperCase() === parentCode)
-    : null;
-  const res = await runtimeCreate('hcm_workforce', 'hcm_org_units', {
-    org_unit_code: code,
-    org_unit_name: name,
-    org_unit_type: orgUnitType,
-    parent_org_unit_id: parentUnit ? parentUnit.hcm_org_unit_id : null,
-    status: 'active',
-    metadata: {color: defaultDepartmentColor(code)}
+function pickOrgUnitThenCreatePosition(){
+  showAdminCrModal('', 'Nhập mã đơn vị để thêm vị trí:', 'Enter org unit code to add position:', function(code){
+    code = (code || '').trim().toUpperCase();
+    if(!code) return;
+    const unit = (ADMIN_AUTH_STATE.org.orgUnits || []).find(function(x){ return String(x.org_unit_code||'').toUpperCase() === code; });
+    if(!unit){ showToast('⚠ Không tìm thấy đơn vị'); return; }
+    promptCreateAuthoritativePosition(unit.hcm_org_unit_id);
   });
-  if(!(res && res.ok && res.record)){
-    showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Create org unit failed':'Tạo đơn vị thất bại'), 'error');
-    return;
-  }
-  showToast('✅ Đã tạo đơn vị tổ chức');
-  await loadAuthoritativeOrgCatalog({force:true});
 }
 
-async function promptEditAuthoritativeOrgUnit(orgUnitId){
-  const unit = (ADMIN_AUTH_STATE.org.orgUnits || []).find(item => String(item.hcm_org_unit_id||'') === String(orgUnitId||''));
-  if(!unit) return;
-  const nextName = (prompt(`Tên mới cho ${unit.org_unit_code}:`, unit.org_unit_name || '') || '').trim();
-  if(!nextName) return;
-  const nextTypeRaw = (prompt('Loại đơn vị: company / division / department / section / team', unit.org_unit_type || 'department') || '').trim().toLowerCase();
-  const nextType = ['company','division','department','section','team'].includes(nextTypeRaw) ? nextTypeRaw : (unit.org_unit_type || 'department');
-  const nextParentCode = (prompt('Mã đơn vị cha mới (để trống nếu giữ/cấp gốc):', (() => {
-    const parent = (ADMIN_AUTH_STATE.org.orgUnits || []).find(item => String(item.hcm_org_unit_id||'') === String(unit.parent_org_unit_id||''));
-    return parent ? parent.org_unit_code : '';
-  })()) || '').trim().toUpperCase();
-  const nextParent = nextParentCode
-    ? (ADMIN_AUTH_STATE.org.orgUnits || []).find(item => String(item.org_unit_code||'').toUpperCase() === nextParentCode)
-    : null;
-  const metadata = Object.assign({}, safeJsonObject(unit.metadata), {color: defaultDepartmentColor(unit.org_unit_code)});
-  const res = await runtimeUpdate('hcm_workforce', 'hcm_org_units', unit.hcm_org_unit_id, {
-    org_unit_name: nextName,
-    org_unit_type: nextType,
-    parent_org_unit_id: nextParent ? nextParent.hcm_org_unit_id : null,
-    metadata
-  }, unit.row_version || null);
-  if(!(res && res.ok && res.record)){
-    showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Update org unit failed':'Cập nhật đơn vị thất bại'), 'error');
-    return;
-  }
-  showToast('✅ Đã cập nhật đơn vị tổ chức');
-  await loadAuthoritativeOrgCatalog({force:true});
-}
-
-async function setAuthoritativeOrgUnitActive(orgUnitId, active){
-  const unit = (ADMIN_AUTH_STATE.org.orgUnits || []).find(item => String(item.hcm_org_unit_id||'') === String(orgUnitId||''));
-  if(!unit) return;
-  const confirmed = confirm(active ? `Kích hoạt lại đơn vị ${unit.org_unit_code}?` : `Ngừng sử dụng đơn vị ${unit.org_unit_code}?`);
-  if(!confirmed) return;
-  const res = await runtimeUpdate('hcm_workforce', 'hcm_org_units', unit.hcm_org_unit_id, {
-    status: active ? 'active' : 'inactive',
-    metadata: Object.assign({}, safeJsonObject(unit.metadata), {color: defaultDepartmentColor(unit.org_unit_code)})
-  }, unit.row_version || null);
-  if(!(res && res.ok && res.record)){
-    showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Org unit status update failed':'Cập nhật trạng thái đơn vị thất bại'), 'error');
-    return;
-  }
-  showToast(active ? '✅ Đã kích hoạt lại đơn vị' : '✅ Đã ngừng dùng đơn vị');
-  await loadAuthoritativeOrgCatalog({force:true});
-}
-
-async function promptCreateAuthoritativePosition(orgUnitId){
-  const unit = (ADMIN_AUTH_STATE.org.orgUnits || []).find(item => String(item.hcm_org_unit_id||'') === String(orgUnitId||''));
-  if(!unit) return;
-  const code = (prompt(`Mã vị trí cho ${unit.org_unit_code}:`,'') || '').trim().toUpperCase();
-  if(!code) return;
-  const title = (prompt('Tên vị trí:','') || '').trim();
-  if(!title) return;
-  const headcountRaw = (prompt('Headcount yêu cầu:', '1') || '').trim();
-  const headcount = Math.max(1, Number(headcountRaw) || 1);
-  const employmentTypeRaw = (prompt('Loại việc làm: full_time / part_time / contractor / intern','full_time') || '').trim().toLowerCase();
-  const employmentType = ['full_time','part_time','contractor','intern'].includes(employmentTypeRaw) ? employmentTypeRaw : 'full_time';
-  const reportsToCode = (prompt('Mã vị trí báo cáo lên (để trống nếu không có):','') || '').trim().toUpperCase();
-  const reportsTo = reportsToCode
-    ? (ADMIN_AUTH_STATE.org.positions || []).find(position => String(position.position_code||'').toUpperCase() === reportsToCode)
-    : null;
-  const res = await runtimeCreate('hcm_workforce', 'hcm_positions', {
-    position_code: code,
-    position_title: title,
-    hcm_org_unit_id: unit.hcm_org_unit_id,
-    required_headcount: headcount,
-    employment_type: employmentType,
-    reports_to_position_id: reportsTo ? reportsTo.hcm_position_id : null,
-    status: 'active'
+function promptCreateAuthoritativeOrgUnit(){
+  const orgUnitTypeOptions = [
+    {value:'company',label:'company'},{value:'division',label:'division'},
+    {value:'department',label:'department'},{value:'section',label:'section'},{value:'team',label:'team'}
+  ];
+  showAdminFormModal('Thêm đơn vị tổ chức', 'Add Org Unit', [
+    {key:'code', labelVi:'Mã đơn vị (ví dụ QA, PRO)', labelEn:'Unit code (e.g. QA, PRO)', required:true, placeholder:'QA'},
+    {key:'name', labelVi:'Tên đơn vị', labelEn:'Unit name', required:true},
+    {key:'type', labelVi:'Loại đơn vị', labelEn:'Unit type', type:'select', defaultVal:'department', options:orgUnitTypeOptions},
+    {key:'parentCode', labelVi:'Mã đơn vị cha (để trống nếu cấp gốc)', labelEn:'Parent code (blank if root)', placeholder:''}
+  ], async function(v){
+    const code = v.code.trim().toUpperCase();
+    const name = v.name.trim();
+    const orgUnitType = v.type || 'department';
+    const parentCode = (v.parentCode || '').trim().toUpperCase();
+    const parentUnit = parentCode
+      ? (ADMIN_AUTH_STATE.org.orgUnits || []).find(function(u){ return String(u.org_unit_code||'').toUpperCase() === parentCode; })
+      : null;
+    const res = await runtimeCreate('hcm_workforce', 'hcm_org_units', {
+      org_unit_code: code, org_unit_name: name, org_unit_type: orgUnitType,
+      parent_org_unit_id: parentUnit ? parentUnit.hcm_org_unit_id : null,
+      status: 'active', metadata: {color: defaultDepartmentColor(code)}
+    });
+    if(!(res && res.ok && res.record)){
+      showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Create org unit failed':'Tạo đơn vị thất bại'), 'error');
+      return;
+    }
+    showToast('✅ Đã tạo đơn vị tổ chức');
+    await loadAuthoritativeOrgCatalog({force:true});
   });
-  if(!(res && res.ok && res.record)){
-    showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Create position failed':'Tạo vị trí thất bại'), 'error');
-    return;
-  }
-  showToast('✅ Đã tạo vị trí');
-  await loadAuthoritativeOrgCatalog({force:true});
 }
 
-async function promptEditAuthoritativePosition(positionId){
-  const position = (ADMIN_AUTH_STATE.org.positions || []).find(item => String(item.hcm_position_id||'') === String(positionId||''));
-  if(!position) return;
-  const nextTitle = (prompt('Tên vị trí:', position.position_title || '') || '').trim();
-  if(!nextTitle) return;
-  const headcountRaw = (prompt('Headcount yêu cầu:', String(position.required_headcount || 1)) || '').trim();
-  const nextHeadcount = Math.max(1, Number(headcountRaw) || Number(position.required_headcount || 1) || 1);
-  const nextEmploymentTypeRaw = (prompt('Loại việc làm: full_time / part_time / contractor / intern', position.employment_type || 'full_time') || '').trim().toLowerCase();
-  const nextEmploymentType = ['full_time','part_time','contractor','intern'].includes(nextEmploymentTypeRaw) ? nextEmploymentTypeRaw : (position.employment_type || 'full_time');
-  const nextReportsToCode = (prompt('Mã vị trí báo cáo lên:', (() => {
-    const parent = (ADMIN_AUTH_STATE.org.positions || []).find(item => String(item.hcm_position_id||'') === String(position.reports_to_position_id||''));
-    return parent ? parent.position_code : '';
-  })()) || '').trim().toUpperCase();
-  const nextReportsTo = nextReportsToCode
-    ? (ADMIN_AUTH_STATE.org.positions || []).find(item => String(item.position_code||'').toUpperCase() === nextReportsToCode)
-    : null;
-  const res = await runtimeUpdate('hcm_workforce', 'hcm_positions', position.hcm_position_id, {
-    position_title: nextTitle,
-    required_headcount: nextHeadcount,
-    employment_type: nextEmploymentType,
-    reports_to_position_id: nextReportsTo ? nextReportsTo.hcm_position_id : null
-  }, position.row_version || null);
-  if(!(res && res.ok && res.record)){
-    showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Update position failed':'Cập nhật vị trí thất bại'), 'error');
-    return;
-  }
-  showToast('✅ Đã cập nhật vị trí');
-  await loadAuthoritativeOrgCatalog({force:true});
+function promptEditAuthoritativeOrgUnit(orgUnitId){
+  const unit = (ADMIN_AUTH_STATE.org.orgUnits || []).find(function(item){ return String(item.hcm_org_unit_id||'') === String(orgUnitId||''); });
+  if(!unit) return;
+  const currentParent = (ADMIN_AUTH_STATE.org.orgUnits || []).find(function(item){ return String(item.hcm_org_unit_id||'') === String(unit.parent_org_unit_id||''); });
+  const orgUnitTypeOptions = [
+    {value:'company',label:'company'},{value:'division',label:'division'},
+    {value:'department',label:'department'},{value:'section',label:'section'},{value:'team',label:'team'}
+  ];
+  showAdminFormModal('Sửa đơn vị: ' + unit.org_unit_code, 'Edit unit: ' + unit.org_unit_code, [
+    {key:'name', labelVi:'Tên đơn vị', labelEn:'Unit name', required:true, defaultVal:unit.org_unit_name || ''},
+    {key:'type', labelVi:'Loại đơn vị', labelEn:'Unit type', type:'select', defaultVal:unit.org_unit_type || 'department', options:orgUnitTypeOptions},
+    {key:'parentCode', labelVi:'Mã đơn vị cha (để trống nếu cấp gốc)', labelEn:'Parent code (blank if root)', defaultVal:currentParent ? currentParent.org_unit_code : '', placeholder:''}
+  ], async function(v){
+    const nextName = v.name.trim();
+    if(!nextName) return;
+    const nextType = ['company','division','department','section','team'].includes(v.type) ? v.type : (unit.org_unit_type || 'department');
+    const nextParentCode = (v.parentCode || '').trim().toUpperCase();
+    const nextParent = nextParentCode
+      ? (ADMIN_AUTH_STATE.org.orgUnits || []).find(function(item){ return String(item.org_unit_code||'').toUpperCase() === nextParentCode; })
+      : null;
+    const metadata = Object.assign({}, safeJsonObject(unit.metadata), {color: defaultDepartmentColor(unit.org_unit_code)});
+    const res = await runtimeUpdate('hcm_workforce', 'hcm_org_units', unit.hcm_org_unit_id, {
+      org_unit_name: nextName, org_unit_type: nextType,
+      parent_org_unit_id: nextParent ? nextParent.hcm_org_unit_id : null, metadata
+    }, unit.row_version || null);
+    if(!(res && res.ok && res.record)){
+      showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Update org unit failed':'Cập nhật đơn vị thất bại'), 'error');
+      return;
+    }
+    showToast('✅ Đã cập nhật đơn vị tổ chức');
+    await loadAuthoritativeOrgCatalog({force:true});
+  });
 }
 
-async function setAuthoritativePositionActive(positionId, active){
-  const position = (ADMIN_AUTH_STATE.org.positions || []).find(item => String(item.hcm_position_id||'') === String(positionId||''));
+function setAuthoritativeOrgUnitActive(orgUnitId, active){
+  const unit = (ADMIN_AUTH_STATE.org.orgUnits || []).find(function(item){ return String(item.hcm_org_unit_id||'') === String(orgUnitId||''); });
+  if(!unit) return;
+  showAdminConfirmModal(
+    (active ? 'Kích hoạt lại đơn vị ' : 'Ngừng sử dụng đơn vị ') + unit.org_unit_code + '?',
+    (active ? 'Reactivate unit ' : 'Deactivate unit ') + unit.org_unit_code + '?',
+    async function(){
+      const res = await runtimeUpdate('hcm_workforce', 'hcm_org_units', unit.hcm_org_unit_id, {
+        status: active ? 'active' : 'inactive',
+        metadata: Object.assign({}, safeJsonObject(unit.metadata), {color: defaultDepartmentColor(unit.org_unit_code)})
+      }, unit.row_version || null);
+      if(!(res && res.ok && res.record)){
+        showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Org unit status update failed':'Cập nhật trạng thái đơn vị thất bại'), 'error');
+        return;
+      }
+      showToast(active ? '✅ Đã kích hoạt lại đơn vị' : '✅ Đã ngừng dùng đơn vị');
+      await loadAuthoritativeOrgCatalog({force:true});
+    }
+  );
+}
+
+function promptCreateAuthoritativePosition(orgUnitId){
+  const unit = (ADMIN_AUTH_STATE.org.orgUnits || []).find(function(item){ return String(item.hcm_org_unit_id||'') === String(orgUnitId||''); });
+  if(!unit) return;
+  const employmentTypeOptions = [
+    {value:'full_time',label:'full_time'},{value:'part_time',label:'part_time'},
+    {value:'contractor',label:'contractor'},{value:'intern',label:'intern'}
+  ];
+  showAdminFormModal('Thêm vị trí cho ' + unit.org_unit_code, 'Add position for ' + unit.org_unit_code, [
+    {key:'code', labelVi:'Mã vị trí', labelEn:'Position code', required:true, placeholder:'MGR_QA'},
+    {key:'title', labelVi:'Tên vị trí', labelEn:'Position title', required:true},
+    {key:'headcount', labelVi:'Headcount yêu cầu', labelEn:'Required headcount', type:'number', defaultVal:'1'},
+    {key:'employment_type', labelVi:'Loại việc làm', labelEn:'Employment type', type:'select', defaultVal:'full_time', options:employmentTypeOptions},
+    {key:'reportsToCode', labelVi:'Mã vị trí báo cáo lên (để trống nếu không có)', labelEn:'Reports-to code (blank if none)', placeholder:''}
+  ], async function(v){
+    const code = v.code.trim().toUpperCase();
+    const title = v.title.trim();
+    const headcount = Math.max(1, Number(v.headcount) || 1);
+    const employmentType = ['full_time','part_time','contractor','intern'].includes(v.employment_type) ? v.employment_type : 'full_time';
+    const reportsToCode = (v.reportsToCode || '').trim().toUpperCase();
+    const reportsTo = reportsToCode
+      ? (ADMIN_AUTH_STATE.org.positions || []).find(function(p){ return String(p.position_code||'').toUpperCase() === reportsToCode; })
+      : null;
+    const res = await runtimeCreate('hcm_workforce', 'hcm_positions', {
+      position_code: code, position_title: title, hcm_org_unit_id: unit.hcm_org_unit_id,
+      required_headcount: headcount, employment_type: employmentType,
+      reports_to_position_id: reportsTo ? reportsTo.hcm_position_id : null, status: 'active'
+    });
+    if(!(res && res.ok && res.record)){
+      showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Create position failed':'Tạo vị trí thất bại'), 'error');
+      return;
+    }
+    showToast('✅ Đã tạo vị trí');
+    await loadAuthoritativeOrgCatalog({force:true});
+  });
+}
+
+function promptEditAuthoritativePosition(positionId){
+  const position = (ADMIN_AUTH_STATE.org.positions || []).find(function(item){ return String(item.hcm_position_id||'') === String(positionId||''); });
   if(!position) return;
-  const confirmed = confirm(active ? `Kích hoạt lại vị trí ${position.position_code}?` : `Ngừng sử dụng vị trí ${position.position_code}?`);
-  if(!confirmed) return;
-  const res = await runtimeUpdate('hcm_workforce', 'hcm_positions', position.hcm_position_id, {
-    status: active ? 'active' : 'inactive'
-  }, position.row_version || null);
-  if(!(res && res.ok && res.record)){
-    showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Position status update failed':'Cập nhật trạng thái vị trí thất bại'), 'error');
-    return;
-  }
-  showToast(active ? '✅ Đã kích hoạt lại vị trí' : '✅ Đã ngừng dùng vị trí');
-  await loadAuthoritativeOrgCatalog({force:true});
+  const currentParent = (ADMIN_AUTH_STATE.org.positions || []).find(function(item){ return String(item.hcm_position_id||'') === String(position.reports_to_position_id||''); });
+  const employmentTypeOptions = [
+    {value:'full_time',label:'full_time'},{value:'part_time',label:'part_time'},
+    {value:'contractor',label:'contractor'},{value:'intern',label:'intern'}
+  ];
+  showAdminFormModal('Sửa vị trí: ' + position.position_code, 'Edit position: ' + position.position_code, [
+    {key:'title', labelVi:'Tên vị trí', labelEn:'Position title', required:true, defaultVal:position.position_title || ''},
+    {key:'headcount', labelVi:'Headcount yêu cầu', labelEn:'Required headcount', type:'number', defaultVal:String(position.required_headcount || 1)},
+    {key:'employment_type', labelVi:'Loại việc làm', labelEn:'Employment type', type:'select', defaultVal:position.employment_type || 'full_time', options:employmentTypeOptions},
+    {key:'reportsToCode', labelVi:'Mã vị trí báo cáo lên', labelEn:'Reports-to code', defaultVal:currentParent ? currentParent.position_code : '', placeholder:''}
+  ], async function(v){
+    const nextTitle = v.title.trim();
+    if(!nextTitle) return;
+    const nextHeadcount = Math.max(1, Number(v.headcount) || Number(position.required_headcount || 1) || 1);
+    const nextEmploymentType = ['full_time','part_time','contractor','intern'].includes(v.employment_type) ? v.employment_type : (position.employment_type || 'full_time');
+    const nextReportsToCode = (v.reportsToCode || '').trim().toUpperCase();
+    const nextReportsTo = nextReportsToCode
+      ? (ADMIN_AUTH_STATE.org.positions || []).find(function(item){ return String(item.position_code||'').toUpperCase() === nextReportsToCode; })
+      : null;
+    const res = await runtimeUpdate('hcm_workforce', 'hcm_positions', position.hcm_position_id, {
+      position_title: nextTitle, required_headcount: nextHeadcount,
+      employment_type: nextEmploymentType, reports_to_position_id: nextReportsTo ? nextReportsTo.hcm_position_id : null
+    }, position.row_version || null);
+    if(!(res && res.ok && res.record)){
+      showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Update position failed':'Cập nhật vị trí thất bại'), 'error');
+      return;
+    }
+    showToast('✅ Đã cập nhật vị trí');
+    await loadAuthoritativeOrgCatalog({force:true});
+  });
+}
+
+function setAuthoritativePositionActive(positionId, active){
+  const position = (ADMIN_AUTH_STATE.org.positions || []).find(function(item){ return String(item.hcm_position_id||'') === String(positionId||''); });
+  if(!position) return;
+  showAdminConfirmModal(
+    (active ? 'Kích hoạt lại vị trí ' : 'Ngừng sử dụng vị trí ') + position.position_code + '?',
+    (active ? 'Reactivate position ' : 'Deactivate position ') + position.position_code + '?',
+    async function(){
+      const res = await runtimeUpdate('hcm_workforce', 'hcm_positions', position.hcm_position_id, {
+        status: active ? 'active' : 'inactive'
+      }, position.row_version || null);
+      if(!(res && res.ok && res.record)){
+        showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Position status update failed':'Cập nhật trạng thái vị trí thất bại'), 'error');
+        return;
+      }
+      showToast(active ? '✅ Đã kích hoạt lại vị trí' : '✅ Đã ngừng dùng vị trí');
+      await loadAuthoritativeOrgCatalog({force:true});
+    }
+  );
 }
 
 function addDept(){
@@ -10969,28 +11125,30 @@ function addDept(){
 function editDept(idx){
   const d = DEPARTMENTS[idx];
   if(!d) return;
-  const newLabel = prompt((lang==='en'?'Edit name for ':'Sửa tên cho ')+d.code+':', lang==='en'?d.labelEn:d.label);
-  if(newLabel !== null && newLabel.trim()){
-    d.label = newLabel.trim();
-    d.labelEn = newLabel.trim();
-    saveDepartments();
-    renderAdminDeptTitle();
-  }
+  showAdminCrModal(lang==='en'?d.labelEn:d.label, 'Sửa tên cho '+d.code+':', 'Edit name for '+d.code+':', function(newLabel){
+    if(newLabel && newLabel.trim()){
+      d.label = newLabel.trim();
+      d.labelEn = newLabel.trim();
+      saveDepartments();
+      renderAdminDeptTitle();
+    }
+  });
 }
 
 function deleteDept(idx){
   const d = DEPARTMENTS[idx];
   if(!d) return;
-  const usersInDept = USERS.filter(u=>u.dept===d.code).length;
+  const usersInDept = USERS.filter(function(u){ return u.dept===d.code; }).length;
   if(usersInDept > 0){
     showToast('⚠ '+d.code+' '+(lang==='en'?'has':'có')+' '+usersInDept+' '+(lang==='en'?'users — reassign first':'người dùng — hãy chuyển trước'));
     return;
   }
-  if(!confirm((lang==='en'?'Delete department ':'Xóa phòng ban ')+d.code+'?')) return;
-  DEPARTMENTS.splice(idx,1);
-  saveDepartments();
-  showToast('✅ Đã xóa');
-  renderAdminDeptTitle();
+  showAdminConfirmModal('Xóa phòng ban '+d.code+'?', 'Delete department '+d.code+'?', function(){
+    DEPARTMENTS.splice(idx,1);
+    saveDepartments();
+    showToast('✅ Đã xóa');
+    renderAdminDeptTitle();
+  });
 }
 
 function addTitle(){
@@ -11005,20 +11163,22 @@ function addTitle(){
 
 function editTitle(idx){
   const old = TITLES[idx];
-  const newName = prompt((lang==='en'?'Edit title':'Sửa chức danh')+':', old);
-  if(newName !== null && newName.trim() && newName.trim() !== old){
-    TITLES[idx] = newName.trim();
-    saveTitles();
-    renderAdminDeptTitle();
-  }
+  showAdminCrModal(old, 'Sửa chức danh:', 'Edit title:', function(newName){
+    if(newName && newName.trim() && newName.trim() !== old){
+      TITLES[idx] = newName.trim();
+      saveTitles();
+      renderAdminDeptTitle();
+    }
+  });
 }
 
 function deleteTitle(idx){
   const t = TITLES[idx];
-  if(!confirm((lang==='en'?'Delete title: ':'Xóa chức danh: ')+t+'?')) return;
-  TITLES.splice(idx,1);
-  saveTitles();
-  renderAdminDeptTitle();
+  showAdminConfirmModal('Xóa chức danh: '+t+'?', 'Delete title: '+t+'?', function(){
+    TITLES.splice(idx,1);
+    saveTitles();
+    renderAdminDeptTitle();
+  });
 }
 
 // ═══════════════════════════════════════════════════
@@ -11766,78 +11926,86 @@ async function toggleSystemRoleFlag(roleCode, key, value){
   }
 }
 
-async function promptCreateSystemRole(){
-  const code = (prompt('Mã vai trò (ví dụ qa_manager, process_engineer):','') || '').trim();
-  if(!code) return;
-  const labelVi = (prompt('Tên vai trò (VI):','') || '').trim();
-  if(!labelVi) return;
-  const labelEn = (prompt('Tên vai trò (EN):', labelVi) || '').trim() || labelVi;
-  const deptCode = (prompt('Dept code (để trống nếu không gắn):','') || '').trim().toUpperCase();
-  const description = (prompt('Mô tả vai trò:','') || '').trim();
-  const level = Math.max(0, Number((prompt('Level vai trò:', '4') || '').trim()) || 4);
-  const res = await runtimeCreate('core_system', 'roles', {
-    role_code: code,
-    role_label: labelEn,
-    role_label_vi: labelVi,
-    dept_code: deptCode || null,
-    description,
-    is_active: true,
-    permissions: {
-      level,
-      approve: false,
-      canEditDocs: false,
-      canCreateDocs: false,
-      canViewActivity: false,
-      canExportUsers: false,
-      icon: '👤',
-      color: defaultDepartmentColor(deptCode || code)
+function promptCreateSystemRole(){
+  showAdminFormModal('Tạo vai trò mới', 'Create new role', [
+    {key:'code', labelVi:'Mã vai trò (ví dụ qa_manager)', labelEn:'Role code (e.g. qa_manager)', required:true, placeholder:'qa_manager'},
+    {key:'labelVi', labelVi:'Tên vai trò (VI)', labelEn:'Role name (VI)', required:true},
+    {key:'labelEn', labelVi:'Tên vai trò (EN)', labelEn:'Role name (EN)', placeholder:''},
+    {key:'deptCode', labelVi:'Dept code (để trống nếu không gắn)', labelEn:'Dept code (blank if none)', placeholder:''},
+    {key:'description', labelVi:'Mô tả vai trò', labelEn:'Role description', placeholder:''},
+    {key:'level', labelVi:'Level (0-5)', labelEn:'Level (0-5)', type:'number', defaultVal:'4'}
+  ], async function(v){
+    const code = v.code.trim();
+    const labelVi = v.labelVi.trim();
+    if(!code || !labelVi) return;
+    const labelEn = (v.labelEn || '').trim() || labelVi;
+    const deptCode = (v.deptCode || '').trim().toUpperCase();
+    const description = (v.description || '').trim();
+    const level = Math.max(0, Number(v.level) || 4);
+    const res = await runtimeCreate('core_system', 'roles', {
+      role_code: code, role_label: labelEn, role_label_vi: labelVi,
+      dept_code: deptCode || null, description, is_active: true,
+      permissions: {
+        level, approve: false, canEditDocs: false, canCreateDocs: false,
+        canViewActivity: false, canExportUsers: false,
+        icon: '👤', color: defaultDepartmentColor(deptCode || code)
+      }
+    });
+    if(!(res && res.ok && res.record)){
+      showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Create role failed':'Tạo vai trò thất bại'), 'error');
+      return;
     }
+    await loadAuthoritativeRoleCatalog({force:true});
+    showToast('✅ ' + (lang==='en' ? 'Role created' : 'Đã tạo vai trò'));
   });
-  if(!(res && res.ok && res.record)){
-    showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Create role failed':'Tạo vai trò thất bại'), 'error');
-    return;
-  }
-  await loadAuthoritativeRoleCatalog({force:true});
-  showToast('✅ ' + (lang==='en' ? 'Role created' : 'Đã tạo vai trò'));
 }
 
-async function promptEditSystemRole(roleCode){
+function promptEditSystemRole(roleCode){
   const row = ADMIN_AUTH_STATE.roles.byCode[roleCode];
   if(!row) return;
   const ui = roleRecordUi(roleCode, row);
-  const labelVi = (prompt('Tên vai trò (VI):', row.role_label_vi || ui.label || '') || '').trim();
-  if(!labelVi) return;
-  const labelEn = (prompt('Tên vai trò (EN):', row.role_label || ui.labelEn || '') || '').trim() || labelVi;
-  const deptCode = (prompt('Dept code:', row.dept_code || ui.dept || '') || '').trim().toUpperCase();
-  const description = (prompt('Mô tả vai trò:', row.description || '') || '').trim();
-  const level = Math.max(0, Number((prompt('Level vai trò:', String(ui.level || 4)) || '').trim()) || ui.level || 4);
-  const icon = (prompt('Biểu tượng role:', ui.icon || '👤') || '').trim() || (ui.icon || '👤');
-  const color = (prompt('Màu role (hex hoặc token CSS):', ui.color || defaultDepartmentColor(deptCode || roleCode)) || '').trim() || (ui.color || defaultDepartmentColor(deptCode || roleCode));
-  const saved = await upsertAuthoritativeRole(roleCode, {
-    role_label_vi: labelVi,
-    role_label: labelEn,
-    dept_code: deptCode || null,
-    description,
-    level,
-    icon,
-    color
+  showAdminFormModal('Sửa vai trò: ' + roleCode, 'Edit role: ' + roleCode, [
+    {key:'labelVi', labelVi:'Tên vai trò (VI)', labelEn:'Role name (VI)', required:true, defaultVal:row.role_label_vi || ui.label || ''},
+    {key:'labelEn', labelVi:'Tên vai trò (EN)', labelEn:'Role name (EN)', defaultVal:row.role_label || ui.labelEn || ''},
+    {key:'deptCode', labelVi:'Dept code', labelEn:'Dept code', defaultVal:row.dept_code || ui.dept || '', placeholder:''},
+    {key:'description', labelVi:'Mô tả', labelEn:'Description', defaultVal:row.description || '', placeholder:''},
+    {key:'level', labelVi:'Level (0-5)', labelEn:'Level (0-5)', type:'number', defaultVal:String(ui.level || 4)},
+    {key:'icon', labelVi:'Biểu tượng', labelEn:'Icon', defaultVal:ui.icon || '👤'},
+    {key:'color', labelVi:'Màu (token CSS)', labelEn:'Color (CSS token)', defaultVal:ui.color || defaultDepartmentColor(row.dept_code || roleCode)}
+  ], async function(v){
+    const labelVi = v.labelVi.trim();
+    if(!labelVi) return;
+    const labelEn = (v.labelEn || '').trim() || labelVi;
+    const deptCode = (v.deptCode || '').trim().toUpperCase();
+    const description = (v.description || '').trim();
+    const level = Math.max(0, Number(v.level) || ui.level || 4);
+    const icon = (v.icon || '').trim() || (ui.icon || '👤');
+    const color = (v.color || '').trim() || (ui.color || defaultDepartmentColor(deptCode || roleCode));
+    const saved = await upsertAuthoritativeRole(roleCode, {
+      role_label_vi: labelVi, role_label: labelEn, dept_code: deptCode || null,
+      description, level, icon, color
+    });
+    if(saved){
+      showToast('✅ ' + (lang==='en' ? 'Role updated' : 'Đã cập nhật vai trò'));
+      renderAdminRoles();
+    }
   });
-  if(saved){
-    showToast('✅ ' + (lang==='en' ? 'Role updated' : 'Đã cập nhật vai trò'));
-    renderAdminRoles();
-  }
 }
 
-async function setSystemRoleActive(roleCode, active){
+function setSystemRoleActive(roleCode, active){
   const row = ADMIN_AUTH_STATE.roles.byCode[roleCode];
   if(!row) return;
-  const confirmed = confirm(active ? `Kích hoạt lại vai trò ${roleCode}?` : `Ngừng sử dụng vai trò ${roleCode}?`);
-  if(!confirmed) return;
-  const saved = await upsertAuthoritativeRole(roleCode, {is_active: active});
-  if(saved){
-    showToast(active ? '✅ Đã kích hoạt vai trò' : '✅ Đã ngừng dùng vai trò');
-    renderAdminRoles();
-  }
+  showAdminConfirmModal(
+    (active ? 'Kích hoạt lại vai trò ' : 'Ngừng sử dụng vai trò ') + roleCode + '?',
+    (active ? 'Reactivate role ' : 'Deactivate role ') + roleCode + '?',
+    async function(){
+      const saved = await upsertAuthoritativeRole(roleCode, {is_active: active});
+      if(saved){
+        showToast(active ? '✅ Đã kích hoạt vai trò' : '✅ Đã ngừng dùng vai trò');
+        renderAdminRoles();
+      }
+    }
+  );
 }
 
 function reassignUserRole(){
