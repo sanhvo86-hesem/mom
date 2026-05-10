@@ -542,6 +542,17 @@ for config_file in \
     chmod 664 "$config_file"
 done
 
+# data-private root: www-data must be able to create dot-files
+# (.sync-schedule.json, .local-sync-report.json) via atomic tmp+rename.
+chgrp "$WEB_GROUP" "$PRIVATE_DATA" 2>/dev/null || true
+chmod g+w  "$PRIVATE_DATA" 2>/dev/null || true
+for _dpfile in .sync-schedule.json .local-sync-report.json; do
+    _fp="$PRIVATE_DATA/$_dpfile"
+    [ -e "$_fp" ] || touch "$_fp"
+    chown "$WEB_USER:$WEB_GROUP" "$_fp"
+    chmod 664 "$_fp"
+done
+
 # Ensure log files are writable
 for logfile in php_error.log audit.log db_queries.log; do
     target="$SITE_DIR/mom/data/$logfile"
