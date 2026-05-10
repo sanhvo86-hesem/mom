@@ -271,14 +271,14 @@ function statusColor(status){
     if(info && info.color && info.color !== '#6b7280') return info.color;
   }
   var map={
-    draft:'#f59e0b',
-    in_review:'#3b82f6',
-    pending_approval:'#8b5cf6',
-    approved:'#16a34a',
-    initial_release:'#16a34a',
-    obsolete:'#94a3b8'
+    draft:'var(--amber-dark,#f59e0b)',
+    in_review:'var(--blue,#3b82f6)',
+    pending_approval:'var(--purple,#8b5cf6)',
+    approved:'var(--green-light,#16a34a)',
+    initial_release:'var(--green-light,#16a34a)',
+    obsolete:'var(--gray-400,#94a3b8)'
   };
-  return map[status]||'#94a3b8';
+  return map[status]||'var(--gray-400,#94a3b8)';
 }
 
 // ═══════════════════════════════════════════════════
@@ -6824,9 +6824,9 @@ function _edActivateFindMatch(index,scrollIntoView){
     mark.classList.toggle('ed-hl-active',i===next);
     if(i===next){
       mark.style.background='var(--amber-light,#f59e0b)';
-      mark.style.color='#111827';
+      mark.style.color='var(--text-primary,#111827)';
     }else{
-      mark.style.background='#fde047';
+      mark.style.background='var(--yellow,#fde047)';
       mark.style.color='';
     }
   });
@@ -6929,7 +6929,7 @@ function edFindInDoc(step,preserveIndex){
       if(mt.start>lastIdx)frag.appendChild(document.createTextNode(text.slice(lastIdx,mt.start)));
       var mark=document.createElement('mark');
       mark.className='ed-hl';
-      mark.style.cssText='background:#fde047;padding:0 1px;border-radius:2px';
+      mark.style.cssText='background:var(--yellow,#fde047);padding:0 1px;border-radius:2px';
       mark.textContent=text.slice(mt.start,mt.end);
       frag.appendChild(mark);
       lastIdx=mt.end;

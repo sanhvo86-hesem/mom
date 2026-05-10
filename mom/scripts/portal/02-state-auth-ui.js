@@ -1405,7 +1405,7 @@ function safeJsonObject(value){
 function defaultDepartmentColor(code){
   const fallback = (DEFAULT_DEPARTMENTS || []).find(d => String(d.code||'') === String(code||''));
   if(fallback && fallback.color) return fallback.color;
-  const palette = ['#2563eb','#16a34a','#dc2626','#7c3aed','#0f766e','#d97706','#0891b2','#a21caf','#65a30d','#475569'];
+  const palette = ['var(--blue-light,#2563eb)','var(--green-light,#16a34a)','var(--red,#dc2626)','var(--purple-light,#7c3aed)','var(--teal,#0f766e)','var(--amber-light,#d97706)','var(--cyan-light,#0891b2)','var(--purple,#a21caf)','var(--green,#65a30d)','var(--text-secondary,#475569)'];
   const seed = String(code||'GEN').split('').reduce((sum, ch) => sum + ch.charCodeAt(0), 0);
   return palette[seed % palette.length];
 }
@@ -1982,7 +1982,7 @@ function initLogin(){
 function fillLogin(username){
   document.getElementById('inp-user').value = username;
   document.getElementById('inp-pin').value = '';
-  document.getElementById('inp-user').style.borderColor = '#1565c0';
+  document.getElementById('inp-user').style.borderColor = 'var(--brand-2,#1565c0)';
   document.getElementById('inp-pin').focus();
 }
 
@@ -2539,11 +2539,11 @@ function renderSidebar(){
     html += portalNavSectionHtml(lang==='en'?'TOOLS':'CÔNG CỤ', toolButtons);
 
     if(canUserAccessModule('module-builder')){
-      html += `<div class="nav-section" style="padding:0 8px"><button class="nav-item" onclick="navigateTo('module-builder')" style="border:1px dashed rgba(255,255,255,0.3);justify-content:center;opacity:0.7"><span class="icon">➕</span><span>${lang==='en'?'Create Module':'Tạo Module mới'}</span></button></div>`;
+      html += `<div class="nav-section" style="padding:0 8px"><button class="nav-item" onclick="navigateTo('module-builder')" style="border:1px dashed var(--nav-item-dashed-border,rgba(255,255,255,0.3));justify-content:center;opacity:0.7"><span class="icon">➕</span><span>${lang==='en'?'Create Module':'Tạo Module mới'}</span></button></div>`;
     }
   }
   if(isPortalSidebarCoreVisible('admin') && canUserAccessModule('admin')){
-    html += `<div class="nav-section"><div class="nav-section-title">ADMIN</div><button class="nav-item ${currentPage==='admin'?'active':''}" onclick="navigateTo('admin')"><span class="icon">⚙</span><span>${T('admin_panel')}</span></button></div>`;
+    html += `<div class="nav-section"><div class="nav-section-title">${lang==='en'?'ADMIN':'QUẢN TRỊ'}</div><button class="nav-item ${currentPage==='admin'?'active':''}" onclick="navigateTo('admin')"><span class="icon">⚙</span><span>${T('admin_panel')}</span></button></div>`;
   }
 
   if(canUserAccessModule('template-demo')){
@@ -2602,12 +2602,12 @@ function renderModuleBuilderStatus(container, mode, detail){
         : 'Không thể nạp Module Builder tự động. Vui lòng tải lại một lần.');
   var extra = '';
   if(detail){
-    extra = '<div style="margin-top:12px;padding:10px 12px;border-radius:12px;border:1px solid rgba(220,38,38,0.18);background:rgba(220,38,38,0.06);color:#991b1b;font-size:12px;word-break:break-word">' + String(detail).replace(/[&<>]/g, function(ch){
+    extra = '<div style="margin-top:12px;padding:10px 12px;border-radius:12px;border:1px solid rgba(220,38,38,0.18);background:rgba(220,38,38,0.06);color:var(--red-dark,#991b1b);font-size:12px;word-break:break-word">' + String(detail).replace(/[&<>]/g, function(ch){
       return ch === '&' ? '&amp;' : (ch === '<' ? '&lt;' : '&gt;');
     }) + '</div>';
   }
   container.innerHTML =
-    '<div style="max-width:760px;margin:32px auto;padding:24px;border-radius:20px;border:1px solid var(--border);background:#fff;box-shadow:var(--shadow-sm)">' +
+    '<div style="max-width:760px;margin:32px auto;padding:24px;border-radius:20px;border:1px solid var(--border);background:var(--bg-surface,#fff);box-shadow:var(--shadow-sm)">' +
       '<div style="font-size:22px;font-weight:700;margin-bottom:8px">' + title + '</div>' +
       '<div style="color:var(--text-secondary);line-height:1.6">' + body + '</div>' +
       extra +
@@ -3380,7 +3380,7 @@ function updateDocViewerHeader(doc){
   let submittedMeta='';
   if(state && state.submittedBy && state.submittedBy.name){
     const sb=state.submittedBy;
-    const utBadge=sb.updateType?(' <span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;'+(sb.updateType==='major'?'background:#fee2e2;color:#dc2626':'background:#dcfce7;color:#16a34a')+'">'+(sb.updateType==='major'?'MAJOR':'MINOR')+'</span>'):'';    
+    const utBadge=sb.updateType?(' <span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;'+(sb.updateType==='major'?'background:var(--red-bg,#fee2e2);color:var(--red,#dc2626)':'background:var(--green-bg,#dcfce7);color:var(--green,#16a34a)')+'">'+(sb.updateType==='major'?'MAJOR':'MINOR')+'</span>'):'';
     submittedMeta=`<div class="dv-meta-note submit"><span class="dv-meta-note-label">${T('sm_submitter_label')}</span><b>${sb.name}</b><span>${sb.date||''}</span>${utBadge}</div>`;
   }
 
@@ -3739,8 +3739,8 @@ function renderDashboard(){
   let pendingHtml = '';
   if(r.approve && pendingDocs.length > 0){
     pendingHtml = `
-      <div class="card" style="border-left:3px solid #f59e0b;grid-column:1/-1">
-        <h3 style="color:#d97706">📬 ${T('pending_approval')} <span style="background:#fef3c7;color:#d97706;padding:2px 10px;border-radius:10px;font-size:12px;margin-left:6px">${pendingDocs.length}</span></h3>
+      <div class="card" style="border-left:3px solid var(--amber,#f59e0b);grid-column:1/-1">
+        <h3 style="color:var(--amber-light,#d97706)">📬 ${T('pending_approval')} <span style="background:var(--amber-bg,#fef3c7);color:var(--amber-light,#d97706);padding:2px 10px;border-radius:10px;font-size:12px;margin-left:6px">${pendingDocs.length}</span></h3>
         <div style="max-height:300px;overflow-y:auto">
           ${pendingDocs.map(d=>{
             const cat=getCatForDoc(d);
@@ -3748,15 +3748,15 @@ function renderDashboard(){
             const submitter=state&&state.submittedBy?state.submittedBy.name:'—';
             const subDate=state&&state.submittedBy?state.submittedBy.date:'';
             const subType=state&&state.submittedBy&&state.submittedBy.updateType?state.submittedBy.updateType:'';
-            const subTypeBadge=subType?('<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;margin-left:4px;'+(subType==='major'?'background:#fee2e2;color:#dc2626':'background:#dcfce7;color:#16a34a')+'">'+(subType==='major'?'MAJOR':'MINOR')+'</span>'):'';
+            const subTypeBadge=subType?('<span style="display:inline-block;padding:1px 6px;border-radius:4px;font-size:9px;font-weight:700;margin-left:4px;'+(subType==='major'?'background:var(--red-bg,#fee2e2);color:var(--red,#dc2626)':'background:var(--green-bg,#dcfce7);color:var(--green,#16a34a)')+'">'+(subType==='major'?'MAJOR':'MINOR')+'</span>'):'';
             return `<div class="pa-card" onclick="openDoc('${d.code}')">
-              <div class="pa-badge" style="background:#3b82f615;color:#3b82f6">📤 IN REVIEW</div>
+              <div class="pa-badge" style="background:var(--blue-bg,#eff6ff);color:var(--blue,#3b82f6)">📤 IN REVIEW</div>
               <div class="pa-info">
                 <div class="pa-code">${d.code}${subTypeBadge}</div>
                 <div class="pa-title">${d.title}</div>
                 <div class="pa-sub">${T('submitted_by')}: ${submitter} · ${subDate} · v${getDocRevision(d)}</div>
               </div>
-              <span style="color:#1565c0;font-size:18px">→</span>
+              <span style="color:var(--brand-2,#1565c0);font-size:18px">→</span>
             </div>`;
           }).join('')}
         </div>
@@ -3767,19 +3767,19 @@ function renderDashboard(){
   let draftsHtml = '';
   if(r.canEditDocs && myEditing.length > 0){
     draftsHtml = `
-      <div class="card" style="border-left:3px solid #6366f1;grid-column:1/-1">
-        <h3 style="color:#6366f1">📝 ${T('my_drafts')} <span style="background:#eef2ff;color:#6366f1;padding:2px 10px;border-radius:10px;font-size:12px;margin-left:6px">${myEditing.length}</span></h3>
+      <div class="card" style="border-left:3px solid var(--purple-light,#6366f1);grid-column:1/-1">
+        <h3 style="color:var(--purple-light,#6366f1)">📝 ${T('my_drafts')} <span style="background:var(--purple-bg,#eef2ff);color:var(--purple-light,#6366f1);padding:2px 10px;border-radius:10px;font-size:12px;margin-left:6px">${myEditing.length}</span></h3>
         <div style="max-height:200px;overflow-y:auto">
           ${myEditing.map(d=>{
             const state=getDocState(d.code);
             return `<div class="pa-card" onclick="openDoc('${d.code}')">
-              <div class="pa-badge" style="background:#f59e0b15;color:#f59e0b">📋 DRAFT</div>
+              <div class="pa-badge" style="background:var(--amber-bg,#fffbeb);color:var(--amber,#f59e0b)">📋 DRAFT</div>
               <div class="pa-info">
                 <div class="pa-code">${d.code}</div>
                 <div class="pa-title">${d.title}</div>
                 <div class="pa-sub">v${getDocRevision(d)} · ${state&&state.lastEdit?state.lastEdit.date:''}</div>
               </div>
-              <span style="color:#1565c0;font-size:18px">→</span>
+              <span style="color:var(--brand-2,#1565c0);font-size:18px">→</span>
             </div>`;
           }).join('')}
         </div>
@@ -3804,63 +3804,63 @@ function renderDashboard(){
 
   el.innerHTML = `
     <div class="stats-row">
-      <div class="stat-card" style="cursor:pointer;border-left:3px solid #059669" onclick="showFilteredDocs('recent')"><div class="value" style="color:#059669">${ruCount}</div><div class="label">${lang==='en'?'Updated (30d)':'Cập nhật (30d)'}</div><div class="sub">${lang==='en'?'Last 30 days':'30 ngày qua'}</div></div>
-      <div class="stat-card" style="cursor:pointer" onclick="showFilteredDocs('approved')"><div class="value" style="color:#2e7d32">${approvedCount}</div><div class="label">${T('approved')}</div><div class="sub">${T('effective')}</div></div>
-      <div class="stat-card" style="cursor:pointer" onclick="showFilteredDocs('draft')"><div class="value" style="color:#f57f17">${draftCount}</div><div class="label">${T('draft')}</div><div class="sub">${T('editing')}</div></div>
-      <div class="stat-card" style="cursor:pointer;${r.approve&&reviewCount>0?'border:2px solid #f59e0b':''}" onclick="showFilteredDocs('review')"><div class="value" style="color:#d97706">${reviewCount}</div><div class="label">${T('in_review_label')}</div><div class="sub">${r.approve&&reviewCount>0?T('click_review'):T('pending_waiting')}</div></div>
-      <div class="stat-card" style="cursor:pointer" onclick="showFilteredDocs('accessible')"><div class="value" style="color:#6366f1">${accessibleDocs.length}</div><div class="label">${T('accessible')}</div><div class="sub">${T('by_role')} ${lang==='en'?(r.labelEn||r.label):r.label}</div></div>
+      <div class="stat-card" style="cursor:pointer;border-left:3px solid var(--green,#059669)" onclick="showFilteredDocs('recent')"><div class="value" style="color:var(--green,#059669)">${ruCount}</div><div class="label">${lang==='en'?'Updated (30d)':'Cập nhật (30d)'}</div><div class="sub">${lang==='en'?'Last 30 days':'30 ngày qua'}</div></div>
+      <div class="stat-card" style="cursor:pointer" onclick="showFilteredDocs('approved')"><div class="value" style="color:var(--green,#2e7d32)">${approvedCount}</div><div class="label">${T('approved')}</div><div class="sub">${T('effective')}</div></div>
+      <div class="stat-card" style="cursor:pointer" onclick="showFilteredDocs('draft')"><div class="value" style="color:var(--amber,#f57f17)">${draftCount}</div><div class="label">${T('draft')}</div><div class="sub">${T('editing')}</div></div>
+      <div class="stat-card" style="cursor:pointer;${r.approve&&reviewCount>0?'border:2px solid var(--amber,#f59e0b)':''}" onclick="showFilteredDocs('review')"><div class="value" style="color:var(--amber-light,#d97706)">${reviewCount}</div><div class="label">${T('in_review_label')}</div><div class="sub">${r.approve&&reviewCount>0?T('click_review'):T('pending_waiting')}</div></div>
+      <div class="stat-card" style="cursor:pointer" onclick="showFilteredDocs('accessible')"><div class="value" style="color:var(--purple-light,#6366f1)">${accessibleDocs.length}</div><div class="label">${T('accessible')}</div><div class="sub">${T('by_role')} ${lang==='en'?(r.labelEn||r.label):r.label}</div></div>
     </div>
     <div id="dash-pending">${pendingHtml}${draftsHtml}</div>
     <div class="card" style="margin-top:12px">
       <h3 style="margin-bottom:8px">🏭 ${lang==='en'?'Job Order Lifecycle — G0 → G7 (8 Gates)':'Vòng đời đơn hàng — G0 → G7 (8 cổng)'}</h3>
       <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:6px;overflow-x:auto;padding:4px 0 8px">
-        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #4CAF50;background:#f8fdf8;min-width:0"><div style="font-weight:700;font-size:11px;color:#2e7d32;margin-bottom:3px">G0</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">Contract</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'RFQ, order entry':'Xem xét RFQ, nhập đơn'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-201');return false" style="color:#0369a1">SOP-201</a></div></div>
-        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #1565C0;background:#f0f4ff;min-width:0"><div style="font-weight:700;font-size:11px;color:#0d47a1;margin-bottom:3px">G1</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">Engineering</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'DFM, CAM/NC, baseline':'DFM, CAM/NC, baseline'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-303');return false" style="color:#0369a1">SOP-303</a></div></div>
-        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #795548;background:#faf6f3;min-width:0"><div style="font-weight:700;font-size:11px;color:#4e342e;margin-bottom:3px">G2</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">IQC</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'Receiving, incoming QC':'Nhận hàng, KT đầu vào'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('WI-701');return false" style="color:#0369a1">WI-701</a></div></div>
-        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #2196F3;background:#f5f9ff;min-width:0"><div style="font-weight:700;font-size:11px;color:#1565c0;margin-bottom:3px">G3</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">Setup</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'Program, machine setup':'CT, setup máy'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-504');return false" style="color:#0369a1">SOP-504</a></div></div>
-        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #FF9800;background:#fffbf0;min-width:0"><div style="font-weight:700;font-size:11px;color:#e65100;margin-bottom:3px">G4</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">FAI</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'First article inspection':'Kiểm tra bài đầu tiên'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-302');return false" style="color:#0369a1">SOP-302</a></div></div>
-        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #9C27B0;background:#fdf5ff;min-width:0"><div style="font-weight:700;font-size:11px;color:#7b1fa2;margin-bottom:3px">G5</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">IPQC</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'In-process QC, SPC':'KS trong quá trình'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-502');return false" style="color:#0369a1">SOP-502</a></div></div>
-        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #00BCD4;background:#f0fdff;min-width:0"><div style="font-weight:700;font-size:11px;color:#00838f;margin-bottom:3px">G6</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">Final QC</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'Final inspection, pack':'KT cuối, đóng gói'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-605');return false" style="color:#0369a1">SOP-605</a></div></div>
-        <div style="border:1px solid #e5e7eb;border-radius:8px;padding:8px;border-top:3px solid #F44336;background:#fff5f5;min-width:0"><div style="font-weight:700;font-size:11px;color:#c62828;margin-bottom:3px">G7</div><div style="font-size:9px;color:#333;font-weight:600;margin-bottom:4px">Ship</div><div style="font-size:9px;color:#666;margin-bottom:5px">${lang==='en'?'Shipment, CoC':'Giao hàng, CoC'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-605');return false" style="color:#0369a1">SOP-605</a></div></div>
+        <div style="border:1px solid var(--border,#e5e7eb);border-radius:8px;padding:8px;border-top:3px solid var(--green,#4CAF50);background:var(--green-bg,#f8fdf8);min-width:0"><div style="font-weight:700;font-size:11px;color:var(--green,#2e7d32);margin-bottom:3px">G0</div><div style="font-size:9px;color:var(--text,#333);font-weight:600;margin-bottom:4px">Contract</div><div style="font-size:9px;color:var(--text-3,#666);margin-bottom:5px">${lang==='en'?'RFQ, order entry':'Xem xét RFQ, nhập đơn'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-201');return false" style="color:var(--cyan,#0369a1)">SOP-201</a></div></div>
+        <div style="border:1px solid var(--border,#e5e7eb);border-radius:8px;padding:8px;border-top:3px solid var(--brand-2,#1565C0);background:var(--blue-bg,#f0f4ff);min-width:0"><div style="font-weight:700;font-size:11px;color:var(--blue,#0d47a1);margin-bottom:3px">G1</div><div style="font-size:9px;color:var(--text,#333);font-weight:600;margin-bottom:4px">Engineering</div><div style="font-size:9px;color:var(--text-3,#666);margin-bottom:5px">${lang==='en'?'DFM, CAM/NC, baseline':'DFM, CAM/NC, baseline'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-303');return false" style="color:var(--cyan,#0369a1)">SOP-303</a></div></div>
+        <div style="border:1px solid var(--border,#e5e7eb);border-radius:8px;padding:8px;border-top:3px solid var(--amber-dark,#795548);background:var(--amber-bg,#faf6f3);min-width:0"><div style="font-weight:700;font-size:11px;color:var(--text-secondary,#4e342e);margin-bottom:3px">G2</div><div style="font-size:9px;color:var(--text,#333);font-weight:600;margin-bottom:4px">IQC</div><div style="font-size:9px;color:var(--text-3,#666);margin-bottom:5px">${lang==='en'?'Receiving, incoming QC':'Nhận hàng, KT đầu vào'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('WI-701');return false" style="color:var(--cyan,#0369a1)">WI-701</a></div></div>
+        <div style="border:1px solid var(--border,#e5e7eb);border-radius:8px;padding:8px;border-top:3px solid var(--blue,#2196F3);background:var(--blue-bg,#f5f9ff);min-width:0"><div style="font-weight:700;font-size:11px;color:var(--brand-2,#1565c0);margin-bottom:3px">G3</div><div style="font-size:9px;color:var(--text,#333);font-weight:600;margin-bottom:4px">Setup</div><div style="font-size:9px;color:var(--text-3,#666);margin-bottom:5px">${lang==='en'?'Program, machine setup':'CT, setup máy'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-504');return false" style="color:var(--cyan,#0369a1)">SOP-504</a></div></div>
+        <div style="border:1px solid var(--border,#e5e7eb);border-radius:8px;padding:8px;border-top:3px solid var(--amber,#FF9800);background:var(--amber-bg,#fffbf0);min-width:0"><div style="font-weight:700;font-size:11px;color:var(--orange,#e65100);margin-bottom:3px">G4</div><div style="font-size:9px;color:var(--text,#333);font-weight:600;margin-bottom:4px">FAI</div><div style="font-size:9px;color:var(--text-3,#666);margin-bottom:5px">${lang==='en'?'First article inspection':'Kiểm tra bài đầu tiên'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-302');return false" style="color:var(--cyan,#0369a1)">SOP-302</a></div></div>
+        <div style="border:1px solid var(--border,#e5e7eb);border-radius:8px;padding:8px;border-top:3px solid var(--purple,#9C27B0);background:var(--purple-bg,#fdf5ff);min-width:0"><div style="font-weight:700;font-size:11px;color:var(--purple,#7b1fa2);margin-bottom:3px">G5</div><div style="font-size:9px;color:var(--text,#333);font-weight:600;margin-bottom:4px">IPQC</div><div style="font-size:9px;color:var(--text-3,#666);margin-bottom:5px">${lang==='en'?'In-process QC, SPC':'KS trong quá trình'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-502');return false" style="color:var(--cyan,#0369a1)">SOP-502</a></div></div>
+        <div style="border:1px solid var(--border,#e5e7eb);border-radius:8px;padding:8px;border-top:3px solid var(--cyan,#00BCD4);background:var(--cyan-bg,#f0fdff);min-width:0"><div style="font-weight:700;font-size:11px;color:var(--cyan,#00838f);margin-bottom:3px">G6</div><div style="font-size:9px;color:var(--text,#333);font-weight:600;margin-bottom:4px">Final QC</div><div style="font-size:9px;color:var(--text-3,#666);margin-bottom:5px">${lang==='en'?'Final inspection, pack':'KT cuối, đóng gói'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-605');return false" style="color:var(--cyan,#0369a1)">SOP-605</a></div></div>
+        <div style="border:1px solid var(--border,#e5e7eb);border-radius:8px;padding:8px;border-top:3px solid var(--red,#F44336);background:var(--red-bg,#fff5f5);min-width:0"><div style="font-weight:700;font-size:11px;color:var(--red,#c62828);margin-bottom:3px">G7</div><div style="font-size:9px;color:var(--text,#333);font-weight:600;margin-bottom:4px">Ship</div><div style="font-size:9px;color:var(--text-3,#666);margin-bottom:5px">${lang==='en'?'Shipment, CoC':'Giao hàng, CoC'}</div><div style="font-size:9px"><a href="#" onclick="openDoc('SOP-605');return false" style="color:var(--cyan,#0369a1)">SOP-605</a></div></div>
       </div>
     </div>
     <div class="grid-2" style="margin-top:12px">
       <div class="card">
         <h3>👤 ${lang==='en'?'Quick Access by Role':'Truy cập nhanh theo vai trò'}</h3>
         <div style="display:grid;grid-template-columns:1fr;gap:6px;font-size:12px">
-          <div style="padding:8px 10px;border-left:3px solid #2196F3;border-radius:4px;background:#f5f9ff"><b>CNC Operator</b> — <a href="#" onclick="openDoc('SOP-502');return false" style="color:#0369a1">SOP-502</a> · <a href="#" onclick="openDoc('SOP-504');return false" style="color:#0369a1">SOP-504</a> · <a href="#" onclick="openDoc('WI-519');return false" style="color:#0369a1">WI-519</a></div>
-          <div style="padding:8px 10px;border-left:3px solid #4CAF50;border-radius:4px;background:#f8fdf8"><b>QC Inspector</b> — <a href="#" onclick="openDoc('SOP-302');return false" style="color:#0369a1">SOP-302</a> · <a href="#" onclick="openDoc('SOP-604');return false" style="color:#0369a1">SOP-604</a> · <a href="#" onclick="openDoc('SOP-601');return false" style="color:#0369a1">SOP-601</a></div>
-          <div style="padding:8px 10px;border-left:3px solid #FF9800;border-radius:4px;background:#fffbf0"><b>Team Leader / Foreman</b> — <a href="#" onclick="openDoc('WI-202');return false" style="color:#0369a1">WI-202</a> · <a href="#" onclick="openDoc('SOP-501');return false" style="color:#0369a1">SOP-501</a> · <a href="#" onclick="openDoc('SOP-606');return false" style="color:#0369a1">SOP-606</a></div>
-          <div style="padding:8px 10px;border-left:3px solid #9C27B0;border-radius:4px;background:#fdf5ff"><b>Planner / Engineer</b> — <a href="#" onclick="openDoc('SOP-501');return false" style="color:#0369a1">SOP-501</a> · <a href="#" onclick="openDoc('SOP-303');return false" style="color:#0369a1">SOP-303</a> · <a href="#" onclick="openDoc('SOP-103');return false" style="color:#0369a1">SOP-103</a></div>
-          <div style="padding:8px 10px;border-left:3px solid #0C2D48;border-radius:4px;background:#f0f4f8"><b>Manager / Director</b> — <a href="#" onclick="openDoc('SOP-902');return false" style="color:#0369a1">SOP-902</a> · <a href="#" onclick="openDoc('WI-901');return false" style="color:#0369a1">WI-901</a> · <a href="#" onclick="openDoc('ANNEX-122');return false" style="color:#0369a1">ANNEX-122</a></div>
-          <div style="padding:8px 10px;border-left:3px solid #00BCD4;border-radius:4px;background:#f0fdff"><b>IT / QMS Admin</b> — <a href="#" onclick="openDoc('SOP-101');return false" style="color:#0369a1">SOP-101</a> · <a href="#" onclick="openDoc('SOP-104');return false" style="color:#0369a1">SOP-104</a> · <a href="#" onclick="openDoc('ANNEX-101');return false" style="color:#0369a1">ANNEX-101</a></div>
+          <div style="padding:8px 10px;border-left:3px solid var(--blue,#2196F3);border-radius:4px;background:var(--blue-bg,#f5f9ff)"><b>CNC Operator</b> — <a href="#" onclick="openDoc('SOP-502');return false" style="color:var(--cyan,#0369a1)">SOP-502</a> · <a href="#" onclick="openDoc('SOP-504');return false" style="color:var(--cyan,#0369a1)">SOP-504</a> · <a href="#" onclick="openDoc('WI-519');return false" style="color:var(--cyan,#0369a1)">WI-519</a></div>
+          <div style="padding:8px 10px;border-left:3px solid var(--green,#4CAF50);border-radius:4px;background:var(--green-bg,#f8fdf8)"><b>QC Inspector</b> — <a href="#" onclick="openDoc('SOP-302');return false" style="color:var(--cyan,#0369a1)">SOP-302</a> · <a href="#" onclick="openDoc('SOP-604');return false" style="color:var(--cyan,#0369a1)">SOP-604</a> · <a href="#" onclick="openDoc('SOP-601');return false" style="color:var(--cyan,#0369a1)">SOP-601</a></div>
+          <div style="padding:8px 10px;border-left:3px solid var(--amber,#FF9800);border-radius:4px;background:var(--amber-bg,#fffbf0)"><b>Team Leader / Foreman</b> — <a href="#" onclick="openDoc('WI-202');return false" style="color:var(--cyan,#0369a1)">WI-202</a> · <a href="#" onclick="openDoc('SOP-501');return false" style="color:var(--cyan,#0369a1)">SOP-501</a> · <a href="#" onclick="openDoc('SOP-606');return false" style="color:var(--cyan,#0369a1)">SOP-606</a></div>
+          <div style="padding:8px 10px;border-left:3px solid var(--purple,#9C27B0);border-radius:4px;background:var(--purple-bg,#fdf5ff)"><b>Planner / Engineer</b> — <a href="#" onclick="openDoc('SOP-501');return false" style="color:var(--cyan,#0369a1)">SOP-501</a> · <a href="#" onclick="openDoc('SOP-303');return false" style="color:var(--cyan,#0369a1)">SOP-303</a> · <a href="#" onclick="openDoc('SOP-103');return false" style="color:var(--cyan,#0369a1)">SOP-103</a></div>
+          <div style="padding:8px 10px;border-left:3px solid var(--brand,#0C2D48);border-radius:4px;background:var(--bg-surface-alt,#f0f4f8)"><b>Manager / Director</b> — <a href="#" onclick="openDoc('SOP-902');return false" style="color:var(--cyan,#0369a1)">SOP-902</a> · <a href="#" onclick="openDoc('WI-901');return false" style="color:var(--cyan,#0369a1)">WI-901</a> · <a href="#" onclick="openDoc('ANNEX-122');return false" style="color:var(--cyan,#0369a1)">ANNEX-122</a></div>
+          <div style="padding:8px 10px;border-left:3px solid var(--cyan,#00BCD4);border-radius:4px;background:var(--cyan-bg,#f0fdff)"><b>IT / QMS Admin</b> — <a href="#" onclick="openDoc('SOP-101');return false" style="color:var(--cyan,#0369a1)">SOP-101</a> · <a href="#" onclick="openDoc('SOP-104');return false" style="color:var(--cyan,#0369a1)">SOP-104</a> · <a href="#" onclick="openDoc('ANNEX-101');return false" style="color:var(--cyan,#0369a1)">ANNEX-101</a></div>
         </div>
       </div>
       <div class="card">
         <h3>📋 ${lang==='en'?'Key Documents & Matrices':'Tài liệu trọng yếu'}</h3>
         <div style="display:grid;gap:6px;font-size:12px">
-          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-120')"><b>Authority Matrix</b><span style="color:#0369a1;font-size:11px">ANNEX-120 →</span></div>
-          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-121')"><b>RACI Master</b><span style="color:#0369a1;font-size:11px">ANNEX-121 →</span></div>
-          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-122')"><b>KPI Cascade Dictionary</b><span style="color:#0369a1;font-size:11px">ANNEX-122 →</span></div>
-          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-123')"><b>Deputy / Backup Matrix</b><span style="color:#0369a1;font-size:11px">ANNEX-123 →</span></div>
-          <div style="padding:8px 10px;border:1px solid #e5e7eb;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('WI-201')"><b>Quality Gates & Hold Points</b><span style="color:#0369a1;font-size:11px">WI-201 →</span></div>
-          <div style="padding:8px 10px;border:1px solid #fee2e2;border-left:3px solid #ef4444;border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-118')"><b>⚠ Offline Fallback Kit</b><span style="color:#ef4444;font-size:11px">ANNEX-118 →</span></div>
+          <div style="padding:8px 10px;border:1px solid var(--border,#e5e7eb);border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-120')"><b>Authority Matrix</b><span style="color:var(--cyan,#0369a1);font-size:11px">ANNEX-120 →</span></div>
+          <div style="padding:8px 10px;border:1px solid var(--border,#e5e7eb);border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-121')"><b>RACI Master</b><span style="color:var(--cyan,#0369a1);font-size:11px">ANNEX-121 →</span></div>
+          <div style="padding:8px 10px;border:1px solid var(--border,#e5e7eb);border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-122')"><b>KPI Cascade Dictionary</b><span style="color:var(--cyan,#0369a1);font-size:11px">ANNEX-122 →</span></div>
+          <div style="padding:8px 10px;border:1px solid var(--border,#e5e7eb);border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-123')"><b>Deputy / Backup Matrix</b><span style="color:var(--cyan,#0369a1);font-size:11px">ANNEX-123 →</span></div>
+          <div style="padding:8px 10px;border:1px solid var(--border,#e5e7eb);border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('WI-201')"><b>Quality Gates & Hold Points</b><span style="color:var(--cyan,#0369a1);font-size:11px">WI-201 →</span></div>
+          <div style="padding:8px 10px;border:1px solid var(--red-bg,#fee2e2);border-left:3px solid var(--red,#ef4444);border-radius:6px;cursor:pointer;display:flex;justify-content:space-between" onclick="openDoc('ANNEX-118')"><b>⚠ Offline Fallback Kit</b><span style="color:var(--red,#ef4444);font-size:11px">ANNEX-118 →</span></div>
         </div>
       </div>
     </div>
     <div class="card" style="margin-top:12px">
       <h3>📊 ${lang==='en'?'Operational KPIs — ISO 9001:2026 §9.1':'KPI vận hành — ISO 9001:2026 §9.1'}</h3>
       <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:6px;font-size:12px">
-        <div style="padding:10px;border:1px solid #dcfce7;border-radius:8px;background:#f0fdf4;text-align:center;min-width:0"><div style="font-size:10px;color:#166534;font-weight:600;text-transform:uppercase">OTD</div><div style="font-size:18px;font-weight:700;color:#16a34a;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'On-Time Delivery':'Giao hàng đúng hạn'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 95%</div></div>
-        <div style="padding:10px;border:1px solid #dbeafe;border-radius:8px;background:#eff6ff;text-align:center;min-width:0"><div style="font-size:10px;color:#1e40af;font-weight:600;text-transform:uppercase">FPY</div><div style="font-size:18px;font-weight:700;color:#2563eb;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'First Pass Yield':'Tỷ lệ đạt lần đầu'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 98%</div></div>
-        <div style="padding:10px;border:1px solid #fef3c7;border-radius:8px;background:#fffbeb;text-align:center;min-width:0"><div style="font-size:10px;color:var(--amber);font-weight:600;text-transform:uppercase">COPQ</div><div style="font-size:18px;font-weight:700;color:#d97706;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Cost of Poor Quality':'Chi phí CL kém'}</div><div style="font-size:9px;color:#999;margin-top:2px">≤ 2%</div></div>
-        <div style="padding:10px;border:1px solid #fee2e2;border-radius:8px;background:#fef2f2;text-align:center;min-width:0"><div style="font-size:10px;color:var(--red);font-weight:600;text-transform:uppercase">NCR</div><div style="font-size:18px;font-weight:700;color:#dc2626;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Open NCRs':'NCR đang mở'}</div><div style="font-size:9px;color:#999;margin-top:2px">= 0</div></div>
-        <div style="padding:10px;border:1px solid #f3e8ff;border-radius:8px;background:#faf5ff;text-align:center;min-width:0"><div style="font-size:10px;color:#6b21a8;font-weight:600;text-transform:uppercase">IQC Pass</div><div style="font-size:18px;font-weight:700;color:#7c3aed;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'IQC Pass Rate':'Tỷ lệ đạt IQC'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 99%</div></div>
-        <div style="padding:10px;border:1px solid #e0f2fe;border-radius:8px;background:#f0f9ff;text-align:center;min-width:0"><div style="font-size:10px;color:#075985;font-weight:600;text-transform:uppercase">OEE</div><div style="font-size:18px;font-weight:700;color:#0284c7;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Equipment Effectiveness':'Hiệu suất thiết bị'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 85%</div></div>
-        <div style="padding:10px;border:1px solid #dbeafe;border-radius:8px;background:#eff6ff;text-align:center;min-width:0"><div style="font-size:10px;color:#1e3a5f;font-weight:600;text-transform:uppercase">ENG FTR</div><div style="font-size:18px;font-weight:700;color:#1565c0;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Eng First-Time-Right':'KT đúng lần đầu'}</div><div style="font-size:9px;color:#999;margin-top:2px">≥ 95%</div></div>
-        <div style="padding:10px;border:1px solid #fce7f3;border-radius:8px;background:#fdf2f8;text-align:center;min-width:0"><div style="font-size:10px;color:#831843;font-weight:600;text-transform:uppercase">ECN Lead</div><div style="font-size:18px;font-weight:700;color:#be185d;margin:4px 0">—</div><div style="font-size:9px;color:#666">${lang==='en'?'Eng Change Lead':'TG thay đổi KT'}</div><div style="font-size:9px;color:#999;margin-top:2px">≤ 48h</div></div>
+        <div style="padding:10px;border:1px solid var(--green-bg,#dcfce7);border-radius:8px;background:var(--green-bg,#f0fdf4);text-align:center;min-width:0"><div style="font-size:10px;color:var(--green,#166534);font-weight:600;text-transform:uppercase">OTD</div><div style="font-size:18px;font-weight:700;color:var(--green-light,#16a34a);margin:4px 0">—</div><div style="font-size:9px;color:var(--text-3,#666)">${lang==='en'?'On-Time Delivery':'Giao hàng đúng hạn'}</div><div style="font-size:9px;color:var(--text-3,#999);margin-top:2px">≥ 95%</div></div>
+        <div style="padding:10px;border:1px solid var(--blue-bg,#dbeafe);border-radius:8px;background:var(--blue-bg,#eff6ff);text-align:center;min-width:0"><div style="font-size:10px;color:var(--blue,#1e40af);font-weight:600;text-transform:uppercase">FPY</div><div style="font-size:18px;font-weight:700;color:var(--blue-light,#2563eb);margin:4px 0">—</div><div style="font-size:9px;color:var(--text-3,#666)">${lang==='en'?'First Pass Yield':'Tỷ lệ đạt lần đầu'}</div><div style="font-size:9px;color:var(--text-3,#999);margin-top:2px">≥ 98%</div></div>
+        <div style="padding:10px;border:1px solid var(--amber-bg,#fef3c7);border-radius:8px;background:var(--amber-bg,#fffbeb);text-align:center;min-width:0"><div style="font-size:10px;color:var(--amber);font-weight:600;text-transform:uppercase">COPQ</div><div style="font-size:18px;font-weight:700;color:var(--amber-light,#d97706);margin:4px 0">—</div><div style="font-size:9px;color:var(--text-3,#666)">${lang==='en'?'Cost of Poor Quality':'Chi phí CL kém'}</div><div style="font-size:9px;color:var(--text-3,#999);margin-top:2px">≤ 2%</div></div>
+        <div style="padding:10px;border:1px solid var(--red-bg,#fee2e2);border-radius:8px;background:var(--red-bg,#fef2f2);text-align:center;min-width:0"><div style="font-size:10px;color:var(--red);font-weight:600;text-transform:uppercase">NCR</div><div style="font-size:18px;font-weight:700;color:var(--red,#dc2626);margin:4px 0">—</div><div style="font-size:9px;color:var(--text-3,#666)">${lang==='en'?'Open NCRs':'NCR đang mở'}</div><div style="font-size:9px;color:var(--text-3,#999);margin-top:2px">= 0</div></div>
+        <div style="padding:10px;border:1px solid var(--purple-bg,#f3e8ff);border-radius:8px;background:var(--purple-bg,#faf5ff);text-align:center;min-width:0"><div style="font-size:10px;color:var(--purple,#6b21a8);font-weight:600;text-transform:uppercase">IQC Pass</div><div style="font-size:18px;font-weight:700;color:var(--purple-light,#7c3aed);margin:4px 0">—</div><div style="font-size:9px;color:var(--text-3,#666)">${lang==='en'?'IQC Pass Rate':'Tỷ lệ đạt IQC'}</div><div style="font-size:9px;color:var(--text-3,#999);margin-top:2px">≥ 99%</div></div>
+        <div style="padding:10px;border:1px solid var(--cyan-bg,#e0f2fe);border-radius:8px;background:var(--cyan-bg,#f0f9ff);text-align:center;min-width:0"><div style="font-size:10px;color:var(--cyan,#075985);font-weight:600;text-transform:uppercase">OEE</div><div style="font-size:18px;font-weight:700;color:var(--cyan,#0284c7);margin:4px 0">—</div><div style="font-size:9px;color:var(--text-3,#666)">${lang==='en'?'Equipment Effectiveness':'Hiệu suất thiết bị'}</div><div style="font-size:9px;color:var(--text-3,#999);margin-top:2px">≥ 85%</div></div>
+        <div style="padding:10px;border:1px solid var(--blue-bg,#dbeafe);border-radius:8px;background:var(--blue-bg,#eff6ff);text-align:center;min-width:0"><div style="font-size:10px;color:var(--brand,#1e3a5f);font-weight:600;text-transform:uppercase">ENG FTR</div><div style="font-size:18px;font-weight:700;color:var(--brand-2,#1565c0);margin:4px 0">—</div><div style="font-size:9px;color:var(--text-3,#666)">${lang==='en'?'Eng First-Time-Right':'KT đúng lần đầu'}</div><div style="font-size:9px;color:var(--text-3,#999);margin-top:2px">≥ 95%</div></div>
+        <div style="padding:10px;border:1px solid var(--red-bg,#fce7f3);border-radius:8px;background:var(--red-bg,#fdf2f8);text-align:center;min-width:0"><div style="font-size:10px;color:var(--red,#831843);font-weight:600;text-transform:uppercase">ECN Lead</div><div style="font-size:18px;font-weight:700;color:var(--red,#be185d);margin:4px 0">—</div><div style="font-size:9px;color:var(--text-3,#666)">${lang==='en'?'Eng Change Lead':'TG thay đổi KT'}</div><div style="font-size:9px;color:var(--text-3,#999);margin-top:2px">≤ 48h</div></div>
       </div>
-      <div style="margin-top:8px;font-size:10px;color:var(--text-3);text-align:right"><a href="#" onclick="openDoc('ANNEX-122');return false" style="color:#0369a1">${lang==='en'?'Full KPI Dictionary':'Từ điển KPI đầy đủ'} → ANNEX-122</a> · <a href="#" onclick="openDoc('WI-901');return false" style="color:#0369a1">${lang==='en'?'Dashboard Guide':'Hướng dẫn Dashboard'} → WI-901</a></div>
+      <div style="margin-top:8px;font-size:10px;color:var(--text-3);text-align:right"><a href="#" onclick="openDoc('ANNEX-122');return false" style="color:var(--cyan,#0369a1)">${lang==='en'?'Full KPI Dictionary':'Từ điển KPI đầy đủ'} → ANNEX-122</a> · <a href="#" onclick="openDoc('WI-901');return false" style="color:var(--cyan,#0369a1)">${lang==='en'?'Dashboard Guide':'Hướng dẫn Dashboard'} → WI-901</a></div>
     </div>
     `;
 /* OLD DASHBOARD CODE REMOVED — see git history for reference */
@@ -4023,7 +4023,7 @@ function renderDocCategoryGrid(VDOCS){
     const cnt = VDOCS.filter(d=>d.cat===cat.id).length;
     html += `
       <div class="fm-folder" onclick="currentFilter='${cat.id}';currentFolderPath=[];renderDocuments();renderSidebar()" style="padding:20px 14px">
-        <div style="width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:${cat.color};color:#fff;font-size:24px;box-shadow:0 4px 12px ${cat.color}33">${cat.icon}</div>
+        <div style="width:52px;height:52px;border-radius:16px;display:flex;align-items:center;justify-content:center;background:${cat.color};color:var(--text-inverse,#fff);font-size:24px;box-shadow:0 4px 12px ${cat.color}33">${cat.icon}</div>
         <div class="fm-label" style="font-size:14px;margin-top:4px">${catLabel(cat).split('(')[0].trim()}</div>
         <div class="fm-count">${cnt} ${lang==='en'?'docs':'tài liệu'}</div>
       </div>`;
@@ -4047,9 +4047,9 @@ function renderDocFileList(docs){
     const displayDesc = getDocDisplayDescription(doc);
     html += `
       <div class="fm-file-row ${locked?'locked':''}" ${locked?'':`onclick="openDoc('${doc.code}')"`} ${dragAttr} oncontextmenu="event.preventDefault();event.stopPropagation();openDocEditMenu(event,'${escapeHtml(doc.code)}')" data-doc-code="${doc.code}">
-        <div class="fm-file-icon" style="border-color:${cat?cat.color:'#a5b4fc'}">${getDocIcon(doc.code)}</div>
+        <div class="fm-file-icon" style="border-color:${cat?cat.color:'var(--purple-light,#a5b4fc)'}">${getDocIcon(doc.code)}</div>
         <div class="fm-file-name">
-          <span style="color:${cat?cat.color:'#64748b'}">${doc.code}</span>
+          <span style="color:${cat?cat.color:'var(--gray-500,#64748b)'}">${doc.code}</span>
           <small>${displayTitle}</small>
           ${displayDesc?`<small class="fm-doc-desc">${displayDesc}</small>`:''}
         </div>
@@ -4244,8 +4244,8 @@ function openFolderEditMenu(event, folderPath, folderKey){
   document.body.appendChild(menu);
   menu.querySelectorAll('.ctx-item').forEach(item=>{
     const isDanger=item.classList.contains('ctx-danger');
-    item.style.cssText = 'padding:8px 16px;cursor:pointer;font-size:13px;transition:background .1s'+(isDanger?';color:#dc2626':'');
-    item.onmouseenter = ()=>item.style.background=isDanger?'#fef2f2':'var(--bg-2)';
+    item.style.cssText = 'padding:8px 16px;cursor:pointer;font-size:13px;transition:background .1s'+(isDanger?';color:var(--red,#dc2626)':'');
+    item.onmouseenter = ()=>item.style.background=isDanger?'var(--red-bg,#fef2f2)':'var(--bg-2)';
     item.onmouseleave = ()=>item.style.background='transparent';
   });
   const close = (e)=>{ if(!menu.contains(e.target)){menu.remove();document.removeEventListener('click',close);} };
@@ -4264,13 +4264,13 @@ function openDocEditMenu(event, code){
   menu.innerHTML = `
     <div class="ctx-item" onclick="openDoc('${escapeHtml(code)}')">📄 ${vi?'Mở tài liệu':'Open document'}</div>
     <div class="ctx-item" onclick="openDocEditDialog('${escapeHtml(code)}')">✏️ ${vi?'Chỉnh sửa thông tin':'Edit info'}</div>
-    ${canCreateNewDoc()?`<div style="border-top:1px solid #f1f3f5;margin:4px 0"></div><div class="ctx-item ctx-danger" onclick="confirmDeleteDoc('${escapeHtml(code)}','${escapeHtml(standardTitle)}')">🗑️ ${vi?'Xóa tài liệu':'Delete document'}</div>`:''}
+    ${canCreateNewDoc()?`<div style="border-top:1px solid var(--border-light,#f1f3f5);margin:4px 0"></div><div class="ctx-item ctx-danger" onclick="confirmDeleteDoc('${escapeHtml(code)}','${escapeHtml(standardTitle)}')">🗑️ ${vi?'Xóa tài liệu':'Delete document'}</div>`:''}
   `;
   document.body.appendChild(menu);
   menu.querySelectorAll('.ctx-item').forEach(item=>{
     const isDanger=item.classList.contains('ctx-danger');
-    item.style.cssText = 'padding:8px 16px;cursor:pointer;font-size:13px;transition:background .1s'+(isDanger?';color:#dc2626':'');
-    item.onmouseenter = ()=>item.style.background=isDanger?'#fef2f2':'var(--bg-2)';
+    item.style.cssText = 'padding:8px 16px;cursor:pointer;font-size:13px;transition:background .1s'+(isDanger?';color:var(--red,#dc2626)':'');
+    item.onmouseenter = ()=>item.style.background=isDanger?'var(--red-bg,#fef2f2)':'var(--bg-2)';
     item.onmouseleave = ()=>item.style.background='transparent';
   });
   const close = (e)=>{ if(!menu.contains(e.target)){menu.remove();document.removeEventListener('click',close);} };
@@ -4591,23 +4591,23 @@ function showIconPickerInline(targetType, targetId, btnId){
   let gridHtml='';
   Object.entries(ICON_LIBRARY).forEach(([catKey,icons])=>{
     gridHtml+=`<div style="margin-bottom:8px">
-      <div style="font-size:10px;font-weight:700;color:#6b7280;margin-bottom:4px">${catLabels[catKey]||catKey}</div>
+      <div style="font-size:10px;font-weight:700;color:var(--gray-500,#6b7280);margin-bottom:4px">${catLabels[catKey]||catKey}</div>
       <div style="display:flex;flex-wrap:wrap;gap:2px">
         ${icons.map(ic=>`<button onclick="applyIconInline('${targetType}','${escapeHtml(targetId)}','${ic.icon}','${btnId}')" title="${ic.label}"
-          style="width:32px;height:32px;border-radius:6px;border:1px solid #e5e7eb;background:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0"
-          onmouseenter="this.style.background='#eff6ff';this.style.borderColor='#60a5fa'" onmouseleave="this.style.background='#fff';this.style.borderColor='#e5e7eb'"
+          style="width:32px;height:32px;border-radius:6px;border:1px solid var(--border,#e5e7eb);background:var(--bg-surface,#fff);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0"
+          onmouseenter="this.style.background='var(--blue-bg,#eff6ff)';this.style.borderColor='var(--blue-dark,#60a5fa)'" onmouseleave="this.style.background='var(--bg-surface,#fff)';this.style.borderColor='var(--border,#e5e7eb)'"
         >${ic.icon}</button>`).join('')}
       </div>
     </div>`;
   });
   // Add reset option
   gridHtml += `<div style="text-align:center;margin-top:4px">
-    <a href="#" onclick="event.preventDefault();applyIconInline('${targetType}','${escapeHtml(targetId)}','','${btnId}')" style="font-size:11px;color:#dc2626">${lang==='en'?'Reset to default':'Đặt lại mặc định'}</a>
+    <a href="#" onclick="event.preventDefault();applyIconInline('${targetType}','${escapeHtml(targetId)}','','${btnId}')" style="font-size:11px;color:var(--red,#dc2626)">${lang==='en'?'Reset to default':'Đặt lại mặc định'}</a>
   </div>`;
   
   const picker = document.createElement('div');
   picker.className = 'icon-picker-inline';
-  picker.style.cssText = `position:fixed;top:${Math.min(rect.bottom+4, window.innerHeight-420)}px;left:${Math.min(rect.left, window.innerWidth-380)}px;z-index:10000;background:#fff;border:1px solid #d1d5db;border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.18);padding:12px;width:360px;max-height:400px;overflow-y:auto`;
+  picker.style.cssText = `position:fixed;top:${Math.min(rect.bottom+4, window.innerHeight-420)}px;left:${Math.min(rect.left, window.innerWidth-380)}px;z-index:10000;background:var(--bg-surface,#fff);border:1px solid var(--border,#d1d5db);border-radius:12px;box-shadow:0 12px 40px rgba(0,0,0,.18);padding:12px;width:360px;max-height:400px;overflow-y:auto`;
   picker.innerHTML = gridHtml;
   document.body.appendChild(picker);
   
@@ -5293,9 +5293,16 @@ let dictCatFilter = 'ALL';
 let dictShowCount = 30;
 
 const DICT_CAT_COLORS = {
-  'ISO/QMS':'#7c3aed','Quality':'#2e7d32','CNC/Engineering':'#0369a1',
-  'Operations/Planning':'#059669','HR/Training':'#c026d3','Finance':'#d97706',
-  'IT/Systems':'#6366f1','Logistics':'#0891b2','HSE':'#dc2626','General':'#64748b'
+  'ISO/QMS':       'var(--purple-light,#7c3aed)',
+  'Quality':       'var(--green,#2e7d32)',
+  'CNC/Engineering':'var(--cyan,#0369a1)',
+  'Operations/Planning':'var(--green-dark,#059669)',
+  'HR/Training':   'var(--purple,#c026d3)',
+  'Finance':       'var(--amber-light,#d97706)',
+  'IT/Systems':    'var(--purple-light,#6366f1)',
+  'Logistics':     'var(--cyan-light,#0891b2)',
+  'HSE':           'var(--red-light,#dc2626)',
+  'General':       'var(--gray-500,#64748b)'
 };
 
 async function loadDictData(){
@@ -5554,7 +5561,7 @@ function renderDictBody(){
       <button class="dict-cat-chip ${dictCatFilter==='ALL'?'active':''}" onclick="dictCatFilter='ALL';dictShowCount=30;renderDictBody()">${T('dict_all')}</button>
       ${Object.entries(catCounts).sort((a,b)=>b[1]-a[1]).map(([cat,cnt]) => 
         `<button class="dict-cat-chip ${dictCatFilter===cat?'active':''}" onclick="dictCatFilter='${cat.replace(/'/g,"\\'")}';dictShowCount=30;renderDictBody()">
-          <span class="chip-dot" style="background:${DICT_CAT_COLORS[cat]||'#94a3b8'}"></span>${cat} (${cnt})
+          <span class="chip-dot" style="background:${DICT_CAT_COLORS[cat]||'var(--gray-400,#94a3b8)'}"></span>${cat} (${cnt})
         </button>`
       ).join('')}
     </div>
@@ -5576,7 +5583,7 @@ function renderDictBody(){
               ${d.vi && d.vi !== d.term && d.vi !== d.meaning ? `<div class="dict-vi">${highlightMatch(d.vi, dictQuery)}</div>` : ''}
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-              <div class="dict-cat-badge"><span class="dot" style="background:${DICT_CAT_COLORS[d.cat]||'#94a3b8'}"></span>${d.cat}</div>
+              <div class="dict-cat-badge"><span class="dot" style="background:${DICT_CAT_COLORS[d.cat]||'var(--gray-400,#94a3b8)'}"></span>${d.cat}</div>
               ${isAdmin()?`
                 <button class="btn-admin secondary sm" title="${lang==='en'?'Edit term':'Sửa thuật ngữ'}" onclick="openDictTermModal('${safeTerm}')">✎</button>
                 <button class="btn-admin danger sm" title="${lang==='en'?'Delete term':'Xóa thuật ngữ'}" onclick="deleteDictTerm('${safeTerm}')">🗑</button>
@@ -5599,7 +5606,7 @@ function highlightMatch(text, query){
   if(!query || !text) return text;
   const escaped = query.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
   const darkUi = document.documentElement.getAttribute('data-color-mode') === 'dark';
-  const markBg = darkUi ? 'rgba(251,191,36,.28)' : '#fff9c4';
+  const markBg = darkUi ? 'rgba(251,191,36,.28)' : 'var(--yellow-bg,#fff9c4)';
   return text.replace(new RegExp('('+escaped+')','gi'),'<mark style="background:'+markBg+';color:inherit;padding:0 2px;border-radius:2px">$1</mark>');
 }
 
@@ -5889,15 +5896,15 @@ function adminContainsNeedle(needle, values){
 function showToast(msg, type, duration){
   duration = duration || 3000;
   var colorMap = {
-    success: {bg:'#16a34a', icon:'✅'},
-    error: {bg:'#dc2626', icon:'❌'},
-    warning: {bg:'#d97706', icon:'⚠️'},
-    info: {bg:'#2563eb', icon:'ℹ️'}
+    success: {bg:'var(--green-light,#16a34a)', icon:'✅'},
+    error:   {bg:'var(--red-light,#dc2626)',   icon:'❌'},
+    warning: {bg:'var(--amber-light,#d97706)', icon:'⚠️'},
+    info:    {bg:'var(--blue-light,#2563eb)',  icon:'ℹ️'}
   };
   var style = colorMap[type] || colorMap.info;
   var t=document.createElement('div');
   t.className='toast';
-  t.style.cssText='position:fixed;bottom:24px;right:24px;z-index:1500;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;color:#fff;background:'+style.bg+';box-shadow:0 8px 24px rgba(0,0,0,0.2);opacity:0;transform:translateY(12px);transition:all .3s ease;max-width:420px;display:flex;align-items:center;gap:8px';
+  t.style.cssText='position:fixed;bottom:24px;right:24px;z-index:1500;padding:12px 20px;border-radius:10px;font-size:13px;font-weight:600;color:var(--text-inverse,#fff);background:'+style.bg+';box-shadow:0 8px 24px rgba(0,0,0,0.2);opacity:0;transform:translateY(12px);transition:all .3s ease;max-width:420px;display:flex;align-items:center;gap:8px';
   t.innerHTML=style.icon+' '+String(msg||'');
   document.body.appendChild(t);
   requestAnimationFrame(function(){requestAnimationFrame(function(){t.style.opacity='1';t.style.transform='translateY(0)';});});
@@ -6235,10 +6242,10 @@ function showAdminConfirmModal(msgVi, msgEn, onConfirm) {
   const d = document.createElement('div');
   d.id = 'admin-shared-confirm-modal';
   d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center';
-  d.innerHTML = '<div style="background:#fff;border-radius:8px;padding:22px 26px;max-width:440px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.22)">'
+  d.innerHTML = '<div style="background:var(--bg-surface,#fff);border-radius:8px;padding:22px 26px;max-width:440px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.22)">'
     + '<p style="margin:0 0 18px;font-size:14px;line-height:1.5;white-space:pre-wrap">' + escapeHtml(lang==='en'?msgEn:msgVi) + '</p>'
     + '<div style="display:flex;gap:10px;justify-content:flex-end">'
-    + '<button id="ascm-cancel" style="padding:7px 16px;background:#f0f0f0;border:0;border-radius:5px;cursor:pointer">' + (lang==='en'?'Cancel':'Hủy') + '</button>'
+    + '<button id="ascm-cancel" style="padding:7px 16px;background:var(--bg-surface-alt,#f0f0f0);border:0;border-radius:5px;cursor:pointer">' + (lang==='en'?'Cancel':'Hủy') + '</button>'
     + '<button id="ascm-ok" style="padding:7px 16px;background:var(--danger,#c00);color:#fff;border:0;border-radius:5px;cursor:pointer;font-weight:600">' + (lang==='en'?'Confirm':'Xác nhận') + '</button>'
     + '</div></div>';
   document.body.appendChild(d);
@@ -6252,11 +6259,11 @@ function showAdminCrModal(defaultVal, labelVi, labelEn, onConfirm) {
   const d = document.createElement('div');
   d.id = 'admin-shared-cr-modal';
   d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center';
-  d.innerHTML = '<div style="background:#fff;border-radius:8px;padding:22px 26px;max-width:400px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.22)">'
+  d.innerHTML = '<div style="background:var(--bg-surface,#fff);border-radius:8px;padding:22px 26px;max-width:400px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.22)">'
     + '<label style="display:block;font-size:13px;font-weight:600;margin-bottom:8px">' + escapeHtml(lang==='en'?labelEn:labelVi) + '</label>'
     + '<input id="ascm-cr-inp" type="text" value="' + escapeHtml(defaultVal) + '" style="width:100%;padding:7px 10px;border:1px solid var(--ln,#ddd);border-radius:5px;font-size:13px;box-sizing:border-box">'
     + '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">'
-    + '<button id="ascm-cr-cancel" style="padding:7px 16px;background:#f0f0f0;border:0;border-radius:5px;cursor:pointer">' + (lang==='en'?'Cancel':'Hủy') + '</button>'
+    + '<button id="ascm-cr-cancel" style="padding:7px 16px;background:var(--bg-surface-alt,#f0f0f0);border:0;border-radius:5px;cursor:pointer">' + (lang==='en'?'Cancel':'Hủy') + '</button>'
     + '<button id="ascm-cr-ok" style="padding:7px 16px;background:var(--brand-primary,#0c63e7);color:#fff;border:0;border-radius:5px;cursor:pointer;font-weight:600">OK</button>'
     + '</div></div>';
   document.body.appendChild(d);
@@ -6282,22 +6289,22 @@ function showAdminFormModal(titleVi, titleEn, fields, onSubmit) {
         const sel = String(f.defaultVal || '') === String(o.value) ? ' selected' : '';
         optHtml += '<option value="' + escapeHtml(o.value) + '"' + sel + '>' + escapeHtml(o.label) + '</option>';
       });
-      fieldsHtml += '<div style="margin-bottom:12px"><label style="display:block;font-size:12px;color:#666;margin-bottom:4px">' + escapeHtml(lbl) + (f.required ? ' *' : '') + '</label>'
-        + '<select data-key="' + escapeHtml(f.key) + '" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:4px;font-size:13px">' + optHtml + '</select></div>';
+      fieldsHtml += '<div style="margin-bottom:12px"><label style="display:block;font-size:12px;color:var(--text-secondary,#666);margin-bottom:4px">' + escapeHtml(lbl) + (f.required ? ' *' : '') + '</label>'
+        + '<select data-key="' + escapeHtml(f.key) + '" style="width:100%;padding:6px 8px;border:1px solid var(--ln,#ddd);border-radius:4px;font-size:13px">' + optHtml + '</select></div>';
     } else {
       const defVal = (f.defaultVal !== undefined && f.defaultVal !== null) ? String(f.defaultVal) : '';
-      fieldsHtml += '<div style="margin-bottom:12px"><label style="display:block;font-size:12px;color:#666;margin-bottom:4px">' + escapeHtml(lbl) + (f.required ? ' *' : '') + '</label>'
-        + '<input data-key="' + escapeHtml(f.key) + '" type="' + (f.type || 'text') + '" value="' + escapeHtml(defVal) + '" placeholder="' + escapeHtml(f.placeholder || '') + '" style="width:100%;padding:6px 8px;border:1px solid #ddd;border-radius:4px;font-size:13px;box-sizing:border-box"></div>';
+      fieldsHtml += '<div style="margin-bottom:12px"><label style="display:block;font-size:12px;color:var(--text-secondary,#666);margin-bottom:4px">' + escapeHtml(lbl) + (f.required ? ' *' : '') + '</label>'
+        + '<input data-key="' + escapeHtml(f.key) + '" type="' + (f.type || 'text') + '" value="' + escapeHtml(defVal) + '" placeholder="' + escapeHtml(f.placeholder || '') + '" style="width:100%;padding:6px 8px;border:1px solid var(--ln,#ddd);border-radius:4px;font-size:13px;box-sizing:border-box"></div>';
     }
   });
   const d = document.createElement('div');
   d.id = 'admin-shared-form-modal';
   d.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding-top:60px;overflow-y:auto';
-  d.innerHTML = '<div style="background:#fff;border-radius:8px;padding:22px 26px;max-width:480px;width:92%;box-shadow:0 8px 32px rgba(0,0,0,.22)">'
+  d.innerHTML = '<div style="background:var(--bg-surface,#fff);border-radius:8px;padding:22px 26px;max-width:480px;width:92%;box-shadow:0 8px 32px rgba(0,0,0,.22)">'
     + '<h3 style="margin:0 0 16px;font-size:15px;font-weight:600">' + escapeHtml(title) + '</h3>'
     + fieldsHtml
     + '<div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px">'
-    + '<button id="asfm-cancel" style="padding:7px 16px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer;font-size:13px">' + (lang === 'en' ? 'Cancel' : 'Hủy') + '</button>'
+    + '<button id="asfm-cancel" style="padding:7px 16px;border:1px solid var(--ln,#ccc);border-radius:5px;background:var(--bg-surface,#fff);cursor:pointer;font-size:13px">' + (lang === 'en' ? 'Cancel' : 'Hủy') + '</button>'
     + '<button id="asfm-ok" style="padding:7px 16px;border:none;border-radius:5px;background:var(--brand-primary,#1565c0);color:#fff;cursor:pointer;font-size:13px;font-weight:500">' + (lang === 'en' ? 'Save' : 'Lưu') + '</button>'
     + '</div></div>';
   document.body.appendChild(d);
@@ -6642,12 +6649,12 @@ ${docs.readme || 'tools/vps-setup/README-DATA-SYNC.md'}`)}</pre>
 
   return `<style>
     .dsync-actions { display:flex; gap:4px; flex-wrap:wrap; }
-    .dsync-act { font-size:10px; padding:2px 6px; border-radius:4px; border:1px solid #cbd5e1; background:#f8fafc; cursor:pointer; line-height:1.2; }
-    .dsync-act:hover { background:#e2e8f0; }
-    .dsync-dl { color:#1e40af; }
-    .dsync-up { color:#0f766e; }
-    .dsync-resolve { color:#92400e; }
-    .dsync-restore { color:#7e22ce; font-weight:600; }
+    .dsync-act { font-size:10px; padding:2px 6px; border-radius:4px; border:1px solid var(--border-light,#cbd5e1); background:var(--bg-surface-alt,#f8fafc); cursor:pointer; line-height:1.2; }
+    .dsync-act:hover { background:var(--bg-hover,#e2e8f0); }
+    .dsync-dl { color:var(--blue,#1e40af); }
+    .dsync-up { color:var(--teal,#0f766e); }
+    .dsync-resolve { color:var(--amber-dark,#92400e); }
+    .dsync-restore { color:var(--purple,#7e22ce); font-weight:600; }
   </style>
   <article class="admin-sync-cpanel-card admin-sync-cpanel-card--full">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
@@ -7047,7 +7054,7 @@ function renderAdminVCConfigSync(){
     }
     acts.push(`<button class="dsync-act dsync-up" onclick='adminDataSyncUploadPrompt(${fName})' title="${escapeHtml(lang==='en'?'Upload new version from laptop':'Đẩy phiên bản mới từ laptop')}">⬆ ${escapeHtml(lang==='en'?'Đẩy':'Đẩy')}</button>`);
     if(drifted){
-      acts.push(`<button class="dsync-act" style="color:#6366f1" onclick='adminDataSyncViewDiff(${fName})' title="${escapeHtml(lang==='en'?'View diff between site and mirror':'Xem khác biệt site và mirror')}">⊞ ${escapeHtml(lang==='en'?'Diff':'Diff')}</button>`);
+      acts.push(`<button class="dsync-act" style="color:var(--purple-light,#6366f1)" onclick='adminDataSyncViewDiff(${fName})' title="${escapeHtml(lang==='en'?'View diff between site and mirror':'Xem khác biệt site và mirror')}">⊞ ${escapeHtml(lang==='en'?'Diff':'Diff')}</button>`);
       acts.push(`<button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"site_to_mirror")' title="${escapeHtml(lang==='en'?'Copy VPS → mirror (trust VPS)':'Ghi bản VPS vào mirror (tin VPS)')}">→ VPS→M</button>`);
       acts.push(`<button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"mirror_to_site")' title="${escapeHtml(lang==='en'?'Copy mirror → VPS (trust mirror)':'Ghi mirror lên VPS (tin mirror)')}">← M→VPS</button>`);
     }
@@ -7055,7 +7062,7 @@ function renderAdminVCConfigSync(){
       acts.push(`<button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"site_to_mirror")' title="${escapeHtml(lang==='en'?'Create mirror copy from VPS site file':'Tạo bản mirror từ file site VPS')}">+ ${escapeHtml(lang==='en'?'Seed mirror':'Tạo mirror')}</button>`);
     }
     if(absentVPS){
-      acts.push(`<button class="dsync-act" style="color:#6366f1" onclick='adminDataSyncViewDiff(${fName})' title="${escapeHtml(lang==='en'?'Preview mirror content before restoring':'Xem nội dung mirror trước khi khôi phục')}">⊞ ${escapeHtml(lang==='en'?'Preview':'Xem')}</button>`);
+      acts.push(`<button class="dsync-act" style="color:var(--purple-light,#6366f1)" onclick='adminDataSyncViewDiff(${fName})' title="${escapeHtml(lang==='en'?'Preview mirror content before restoring':'Xem nội dung mirror trước khi khôi phục')}">⊞ ${escapeHtml(lang==='en'?'Preview':'Xem')}</button>`);
       acts.push(`<button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"mirror_to_site")' title="${escapeHtml(lang==='en'?'Restore file on VPS from mirror':'Khôi phục file lên VPS từ mirror')}">↺ ${escapeHtml(lang==='en'?'Restore to VPS':'Khôi phục VPS')}</button>`);
     }
     if(bothAbsent){
@@ -7088,8 +7095,8 @@ function renderAdminVCConfigSync(){
   return `<style>
     .vc-cs-batch-bar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;padding:10px 12px;
       background:var(--bg-2,#f6f7fb);border-radius:8px;margin:0 0 12px 0;border:1px solid var(--border,#e2e8f0)}
-    .vc-cs-row-warn td{background:color-mix(in srgb,#f59e0b 6%,transparent)}
-    .vc-cs-row-critical td{background:color-mix(in srgb,#ef4444 8%,transparent)}
+    .vc-cs-row-warn td{background:color-mix(in srgb,var(--amber-light,#f59e0b) 6%,transparent)}
+    .vc-cs-row-critical td{background:color-mix(in srgb,var(--red,#ef4444) 8%,transparent)}
     .vc-cs-sha-absent{color:var(--text-3,#94a3b8);font-style:italic}
     .vc-diff-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:flex-start;justify-content:center;padding:40px 16px;overflow-y:auto}
     .vc-diff-modal{background:var(--bg-surface,#fff);border-radius:12px;padding:20px;width:100%;max-width:860px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
@@ -8637,7 +8644,7 @@ function renderModuleAccessScope(scope, roleOptions){
         </label>`;
       }).join('');
       const deprecatedBadge = meta.deprecated
-        ? ` <span style="display:inline-block;font-size:0.7em;padding:1px 5px;border-radius:3px;background:rgba(255,160,0,0.15);color:#f59e0b;vertical-align:middle;font-weight:600">${lang==='en'?'Deprecated':'Đã hợp nhất'}</span>`
+        ? ` <span style="display:inline-block;font-size:0.7em;padding:1px 5px;border-radius:3px;background:rgba(255,160,0,0.15);color:var(--amber-light,#f59e0b);vertical-align:middle;font-weight:600">${lang==='en'?'Deprecated':'Đã hợp nhất'}</span>`
         : '';
       return `<article class="module-access-row ${policy.enabled ? '' : 'is-disabled'}${meta.deprecated ? ' is-deprecated' : ''}" style="${meta.deprecated ? 'opacity:0.65' : ''}">
         <div class="module-access-row-main">
@@ -9018,18 +9025,18 @@ function renderAdminManualRuntime(){
       <section style="border:1px solid var(--border);border-radius:22px;background:linear-gradient(135deg,color-mix(in srgb, var(--brand-2) 6%, var(--bg-surface,#fff)) 0%,color-mix(in srgb, var(--blue) 8%, var(--bg-surface,#fff)) 48%,color-mix(in srgb, var(--amber) 8%, var(--bg-surface,#fff)) 100%);padding:22px 24px">
         <div style="display:flex;justify-content:space-between;gap:16px;align-items:flex-start;flex-wrap:wrap">
           <div style="max-width:760px">
-            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#0f4c81">${lang==='en'?'Manual machine runtime':'Nhập tay vận hành máy'}</div>
-            <h3 style="margin:8px 0 10px;font-size:24px;line-height:1.2;color:#102a43">${lang==='en'?'Machine/MES input only, process data through endpoints':'Chỉ nhập dữ liệu máy/MES, dữ liệu quy trình đi qua endpoint'}</h3>
-            <p style="margin:0;color:#334e68;line-height:1.65">${lang==='en'
+            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--blue,#0f4c81)">${lang==='en'?'Manual machine runtime':'Nhập tay vận hành máy'}</div>
+            <h3 style="margin:8px 0 10px;font-size:24px;line-height:1.2;color:var(--text-primary,#102a43)">${lang==='en'?'Machine/MES input only, process data through endpoints':'Chỉ nhập dữ liệu máy/MES, dữ liệu quy trình đi qua endpoint'}</h3>
+            <p style="margin:0;color:var(--text-secondary,#334e68);line-height:1.65">${lang==='en'
               ? 'This workspace is limited to machine-origin and machine-support data: work centers, machines, adapters, alarms, downtime codes and tooling. Customer, supplier, part, PO/SO/JO/WO, CAPA and quality process data are intentionally kept out of this editor.'
               : 'Workspace này chỉ giới hạn cho dữ liệu có nguồn hoặc vai trò trực tiếp với máy: work center, máy, adapter, alarm, mã downtime và tooling. Khách hàng, nhà cung cấp, part, PO/SO/JO/WO, CAPA và dữ liệu chất lượng được loại khỏi editor này có chủ đích.'}</p>
-            <div style="margin-top:12px;font-size:13px;color:#486581">${lang==='en'
+            <div style="margin-top:12px;font-size:13px;color:var(--text-2,#486581)">${lang==='en'
               ? 'Frontend process screens must call their own process endpoint contracts. This panel only exposes machine/MES endpoint contracts and operator authority references.'
               : 'Frontend các màn hình quy trình phải gọi endpoint contract riêng. Panel này chỉ hiển thị contract máy/MES và tham chiếu authority operator.'}</div>
             <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
-              <span style="display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.78);border:1px solid color-mix(in srgb, var(--blue) 22%, var(--border));font-size:12px;color:#0f4c81">${lang==='en'?'Runtime':'Runtime'}: ${escapeHtml(runtimeMode)}</span>
-              <span style="display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.78);border:1px solid color-mix(in srgb, var(--blue) 22%, var(--border));font-size:12px;color:#0f4c81">${lang==='en'?'Master source':'Nguồn master'}: ${escapeHtml(String((readSources.master_data || {}).source || '-'))}</span>
-              <span style="display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.78);border:1px solid color-mix(in srgb, var(--blue) 22%, var(--border));font-size:12px;color:#0f4c81">${lang==='en'?'Orders source':'Nguồn orders'}: ${escapeHtml(String((readSources.orders || {}).source || '-'))}</span>
+              <span style="display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.78);border:1px solid color-mix(in srgb, var(--blue) 22%, var(--border));font-size:12px;color:var(--blue,#0f4c81)">${lang==='en'?'Runtime':'Runtime'}: ${escapeHtml(runtimeMode)}</span>
+              <span style="display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.78);border:1px solid color-mix(in srgb, var(--blue) 22%, var(--border));font-size:12px;color:var(--blue,#0f4c81)">${lang==='en'?'Master source':'Nguồn master'}: ${escapeHtml(String((readSources.master_data || {}).source || '-'))}</span>
+              <span style="display:inline-flex;align-items:center;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.78);border:1px solid color-mix(in srgb, var(--blue) 22%, var(--border));font-size:12px;color:var(--blue,#0f4c81)">${lang==='en'?'Orders source':'Nguồn orders'}: ${escapeHtml(String((readSources.orders || {}).source || '-'))}</span>
             </div>
           </div>
           <button class="btn-admin secondary" onclick="loadAdminManualRuntimeState({force:true})">⟳ ${lang==='en'?'Refresh':'Làm mới'}</button>
@@ -9041,34 +9048,34 @@ function renderAdminManualRuntime(){
       <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px">
         ${stats.map(card => `
           <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
-            <div style="font-size:12px;color:#486581">${escapeHtml(card.label)}</div>
-            <div style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(String(card.value))}</div>
+            <div style="font-size:12px;color:var(--text-2,#486581)">${escapeHtml(card.label)}</div>
+            <div style="margin-top:6px;font-size:28px;font-weight:700;color:var(--text-primary,#102a43)">${escapeHtml(String(card.value))}</div>
           </div>
         `).join('')}
       </section>
 
       <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px">
         <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
-          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Machine/MES runtime tables':'Bảng vận hành máy/MES'}</div>
-          <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${lang==='en'
+          <div style="font-size:18px;font-weight:700;color:var(--text-primary,#102a43)">${lang==='en'?'Machine/MES runtime tables':'Bảng vận hành máy/MES'}</div>
+          <p style="margin:8px 0 14px;color:var(--text-secondary,#52667a);line-height:1.6">${lang==='en'
             ? 'Only these tables open in this manual runtime editor. They feed machine dispatch, connector health, alarm handling, downtime and tooling readiness.'
             : 'Chỉ các bảng này được mở trong editor nhập tay vận hành. Chúng phục vụ dispatch máy, trạng thái connector, xử lý alarm, downtime và tooling readiness.'}</p>
           <div style="display:grid;gap:10px">
             ${checklist.map(item => `
               <button type="button" onclick="adminOpenMasterEntity('${item.entity}','machine_runtime')" style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:14px;background:${item.count > 0 ? 'color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff))' : 'color-mix(in srgb, var(--amber) 10%, var(--bg-surface,#fff))'};border:1px solid ${item.count > 0 ? 'color-mix(in srgb, var(--green) 28%, var(--border))' : 'color-mix(in srgb, var(--amber) 28%, var(--border))'};cursor:pointer;text-align:left">
                 <span>
-                  <strong style="display:block;color:#102a43">${escapeHtml(item.label)}</strong>
-                  <small style="color:#52667a">${escapeHtml(item.count > 0 ? (lang==='en'?'Runtime table linked':'Đã link runtime') : (lang==='en'?'Missing machine baseline':'Thiếu baseline máy/MES'))}</small>
+                  <strong style="display:block;color:var(--text-primary,#102a43)">${escapeHtml(item.label)}</strong>
+                  <small style="color:var(--text-secondary,#52667a)">${escapeHtml(item.count > 0 ? (lang==='en'?'Runtime table linked':'Đã link runtime') : (lang==='en'?'Missing machine baseline':'Thiếu baseline máy/MES'))}</small>
                 </span>
-                <strong style="font-size:20px;color:#102a43">${escapeHtml(String(item.count))}</strong>
+                <strong style="font-size:20px;color:var(--text-primary,#102a43)">${escapeHtml(String(item.count))}</strong>
               </button>
             `).join('')}
           </div>
         </article>
 
         <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
-          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Machine/MES endpoint contracts':'Endpoint máy/MES'}</div>
-          <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${lang==='en'
+          <div style="font-size:18px;font-weight:700;color:var(--text-primary,#102a43)">${lang==='en'?'Machine/MES endpoint contracts':'Endpoint máy/MES'}</div>
+          <p style="margin:8px 0 14px;color:var(--text-secondary,#52667a);line-height:1.6">${lang==='en'
             ? 'SO / JO / WO are process objects. Create them through their governed forms and API endpoints, not as machine runtime tables.'
             : 'SO / JO / WO là object quy trình. Tạo chúng qua form và API có kiểm soát, không đưa vào bảng nhập tay máy/MES.'}</p>
           <div style="display:grid;gap:10px">
@@ -9090,8 +9097,8 @@ function renderAdminManualRuntime(){
         </article>
 
         <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
-          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Frontend endpoint contracts':'Contract endpoint cho frontend'}</div>
-          <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${missing.length
+          <div style="font-size:18px;font-weight:700;color:var(--text-primary,#102a43)">${lang==='en'?'Frontend endpoint contracts':'Contract endpoint cho frontend'}</div>
+          <p style="margin:8px 0 14px;color:var(--text-secondary,#52667a);line-height:1.6">${missing.length
             ? (lang==='en'
               ? ('Machine baseline still missing for: ' + missing.map(item => item.label).join(', ') + '.')
               : ('Baseline máy/MES còn thiếu cho: ' + missing.map(item => item.label).join(', ') + '.'))
@@ -9103,9 +9110,9 @@ function renderAdminManualRuntime(){
             ${endpointContracts.length ? endpointContracts.map(contract => `
               <div style="padding:12px 14px;border-radius:14px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border);color:var(--text-secondary,#334e68);line-height:1.55">
                 <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px">
-                  <strong style="color:#102a43">${escapeHtml(contract.action || '-')}</strong>
-                  <span style="padding:2px 8px;border-radius:999px;background:color-mix(in srgb, var(--blue) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--blue) 24%, var(--border));font-size:11px;color:#0f4c81">${escapeHtml(contract.method || '-')}</span>
-                  <span style="padding:2px 8px;border-radius:999px;background:color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--green) 24%, var(--border));font-size:11px;color:#0f7a50">${escapeHtml(contract.authority || '-')}</span>
+                  <strong style="color:var(--text-primary,#102a43)">${escapeHtml(contract.action || '-')}</strong>
+                  <span style="padding:2px 8px;border-radius:999px;background:color-mix(in srgb, var(--blue) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--blue) 24%, var(--border));font-size:11px;color:var(--blue,#0f4c81)">${escapeHtml(contract.method || '-')}</span>
+                  <span style="padding:2px 8px;border-radius:999px;background:color-mix(in srgb, var(--green) 10%, var(--bg-surface,#fff));border:1px solid color-mix(in srgb, var(--green) 24%, var(--border));font-size:11px;color:var(--teal,#0f7a50)">${escapeHtml(contract.authority || '-')}</span>
                 </div>
                 <div>${escapeHtml(contract.frontend_use || contract.purpose || '-')}</div>
               </div>
@@ -9117,12 +9124,12 @@ function renderAdminManualRuntime(){
       <section style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
         <div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap">
           <div>
-            <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Recent records':'Bản ghi gần nhất'}</div>
-            <div style="margin-top:6px;color:#52667a">${lang==='en'
+            <div style="font-size:18px;font-weight:700;color:var(--text-primary,#102a43)">${lang==='en'?'Recent records':'Bản ghi gần nhất'}</div>
+            <div style="margin-top:6px;color:var(--text-secondary,#52667a)">${lang==='en'
               ? 'Quickly verify that manual data is being created in the expected order.'
               : 'Kiểm tra nhanh xem dữ liệu nhập tay đã được tạo đúng trình tự mong muốn hay chưa.'}</div>
           </div>
-          <div style="font-size:12px;color:#486581">${lang==='en'?'Last event':'Lần cập nhật gần nhất'}: ${escapeHtml(adminFormatRuntimeStamp(adminManualRuntimeState.lastCreated && adminManualRuntimeState.lastCreated.updated_at))}</div>
+          <div style="font-size:12px;color:var(--text-2,#486581)">${lang==='en'?'Last event':'Lần cập nhật gần nhất'}: ${escapeHtml(adminFormatRuntimeStamp(adminManualRuntimeState.lastCreated && adminManualRuntimeState.lastCreated.updated_at))}</div>
         </div>
         <div style="margin-top:14px;overflow:auto">
           <table class="admin-table" style="width:100%;font-size:12px">
@@ -9137,12 +9144,12 @@ function renderAdminManualRuntime(){
             </thead>
             <tbody>
               ${recentRows.length ? recentRows.map(row => `
-                <tr style="border-bottom:1px solid #eef2f7">
+                <tr style="border-bottom:1px solid var(--border-light,#eef2f7)">
                   <td style="padding:10px;font-weight:700">${escapeHtml(row.type)}</td>
                   <td style="padding:10px"><code>${escapeHtml(row.id || '-')}</code></td>
-                  <td style="padding:10px;color:#334e68">${escapeHtml(row.title || '-')}</td>
+                  <td style="padding:10px;color:var(--text-secondary,#334e68)">${escapeHtml(row.title || '-')}</td>
                   <td style="padding:10px">${escapeHtml(row.status || '-')}</td>
-                  <td style="padding:10px;color:#52667a">${escapeHtml(adminFormatRuntimeStamp(row.updated_at))}</td>
+                  <td style="padding:10px;color:var(--text-secondary,#52667a)">${escapeHtml(adminFormatRuntimeStamp(row.updated_at))}</td>
                 </tr>
               `).join('') : `<tr><td colspan="5" style="padding:14px;color:var(--text-secondary)">${lang==='en'?'No SO / JO / WO records yet.':'Chưa có SO / JO / WO nào được tạo.'}</td></tr>`}
             </tbody>
@@ -9272,9 +9279,9 @@ function renderAdminDataSources(){
       <section style="border:1px solid var(--border);border-radius:22px;background:linear-gradient(135deg,color-mix(in srgb, var(--amber) 7%, var(--bg-surface,#fff)) 0%,color-mix(in srgb, var(--blue) 8%, var(--bg-surface,#fff)) 55%,color-mix(in srgb, var(--purple) 8%, var(--bg-surface,#fff)) 100%);padding:22px 24px">
         <div style="display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:flex-start">
           <div style="max-width:760px">
-            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#7c2d12">${lang==='en'?'Data source and database control':'Nguồn dữ liệu và Database'}</div>
-            <h3 style="margin:8px 0 10px;font-size:24px;line-height:1.2;color:#102a43">${lang==='en'?'Inspect and tune the runtime data layer from frontend':'Kiểm tra và chỉnh lớp dữ liệu runtime ngay trên frontend'}</h3>
-            <p style="margin:0;color:#334e68;line-height:1.65">${lang==='en'
+            <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red-dark,#7c2d12)">${lang==='en'?'Data source and database control':'Nguồn dữ liệu và Database'}</div>
+            <h3 style="margin:8px 0 10px;font-size:24px;line-height:1.2;color:var(--text-primary,#102a43)">${lang==='en'?'Inspect and tune the runtime data layer from frontend':'Kiểm tra và chỉnh lớp dữ liệu runtime ngay trên frontend'}</h3>
+            <p style="margin:0;color:var(--text-secondary,#334e68);line-height:1.65">${lang==='en'
               ? 'This panel exposes the active JSON / PostgreSQL runtime mode, shadow-sync health, and the connection profile you can safely adjust without touching server code.'
               : 'Panel này hiển thị chế độ runtime JSON / PostgreSQL đang hoạt động, sức khỏe shadow-sync, và bộ cấu hình kết nối mà bạn có thể chỉnh an toàn mà không cần sửa code server.'}</p>
           </div>
@@ -9286,74 +9293,74 @@ function renderAdminDataSources(){
 
       <section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
         <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
-          <div style="font-size:12px;color:#486581">${lang==='en'?'Runtime mode':'Chế độ runtime'}</div>
-          <div id="admin-data-source-mode-preview" style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(adminDataSourceModePreview(draft))}</div>
-          <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'Applied to new requests immediately':'Áp dụng ngay cho các request mới'}</div>
+          <div style="font-size:12px;color:var(--text-2,#486581)">${lang==='en'?'Runtime mode':'Chế độ runtime'}</div>
+          <div id="admin-data-source-mode-preview" style="margin-top:6px;font-size:28px;font-weight:700;color:var(--text-primary,#102a43)">${escapeHtml(adminDataSourceModePreview(draft))}</div>
+          <div style="margin-top:6px;font-size:12px;color:var(--text-secondary,#52667a)">${lang==='en'?'Applied to new requests immediately':'Áp dụng ngay cho các request mới'}</div>
         </div>
         <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
-          <div style="font-size:12px;color:#486581">PostgreSQL</div>
-          <div style="margin-top:6px;font-size:28px;font-weight:700;color:${dbProbeReachable ? '#0f766e' : '#b45309'}">${dbProbeReachable ? (lang==='en'?'Reachable':'Kết nối được') : (dbProbeConfigured ? (lang==='en'?'Unavailable':'Chưa kết nối') : (lang==='en'?'Not configured':'Chưa cấu hình'))}</div>
-          <div style="margin-top:6px;font-size:12px;color:#52667a">${escapeHtml(runtimeMode.database_probe_error || runtimeMode.postgres_error || (dbProbeConfigured ? (lang==='en'?'Runtime path may still be JSON-only even though a DB profile exists.':'Runtime có thể vẫn đang JSON-only dù đã có hồ sơ DB.') : (lang==='en'?'No live DB profile configured yet':'Chưa cấu hình hồ sơ DB thật')))}</div>
+          <div style="font-size:12px;color:var(--text-2,#486581)">PostgreSQL</div>
+          <div style="margin-top:6px;font-size:28px;font-weight:700;color:${dbProbeReachable ? 'var(--teal,#0f766e)' : 'var(--amber-dark,#b45309)'}">${dbProbeReachable ? (lang==='en'?'Reachable':'Kết nối được') : (dbProbeConfigured ? (lang==='en'?'Unavailable':'Chưa kết nối') : (lang==='en'?'Not configured':'Chưa cấu hình'))}</div>
+          <div style="margin-top:6px;font-size:12px;color:var(--text-secondary,#52667a)">${escapeHtml(runtimeMode.database_probe_error || runtimeMode.postgres_error || (dbProbeConfigured ? (lang==='en'?'Runtime path may still be JSON-only even though a DB profile exists.':'Runtime có thể vẫn đang JSON-only dù đã có hồ sơ DB.') : (lang==='en'?'No live DB profile configured yet':'Chưa cấu hình hồ sơ DB thật')))}</div>
         </div>
         <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
-          <div style="font-size:12px;color:#486581">${lang==='en'?'Shadow-sync failures':'Lỗi shadow-sync'}</div>
-          <div style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(String(shadowFailures))}</div>
-          <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'JSON fallback reads':'Lượt fallback về JSON'}: ${escapeHtml(String(fallbackReads))}</div>
+          <div style="font-size:12px;color:var(--text-2,#486581)">${lang==='en'?'Shadow-sync failures':'Lỗi shadow-sync'}</div>
+          <div style="margin-top:6px;font-size:28px;font-weight:700;color:var(--text-primary,#102a43)">${escapeHtml(String(shadowFailures))}</div>
+          <div style="margin-top:6px;font-size:12px;color:var(--text-secondary,#52667a)">${lang==='en'?'JSON fallback reads':'Lượt fallback về JSON'}: ${escapeHtml(String(fallbackReads))}</div>
         </div>
         <div style="padding:16px;border:1px solid var(--border);border-radius:18px;background:var(--bg-surface,#fff)">
-          <div style="font-size:12px;color:#486581">${lang==='en'?'Connector alerts':'Cảnh báo connector'}</div>
-          <div style="margin-top:6px;font-size:28px;font-weight:700;color:#102a43">${escapeHtml(String(connectorFailures))}</div>
-          <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'WO launch blockers':'WO bị chặn'}: ${escapeHtml(String(launchBlockers))}</div>
+          <div style="font-size:12px;color:var(--text-2,#486581)">${lang==='en'?'Connector alerts':'Cảnh báo connector'}</div>
+          <div style="margin-top:6px;font-size:28px;font-weight:700;color:var(--text-primary,#102a43)">${escapeHtml(String(connectorFailures))}</div>
+          <div style="margin-top:6px;font-size:12px;color:var(--text-secondary,#52667a)">${lang==='en'?'WO launch blockers':'WO bị chặn'}: ${escapeHtml(String(launchBlockers))}</div>
         </div>
       </section>
 
       <section style="display:grid;grid-template-columns:minmax(340px,1.25fr) minmax(280px,.95fr);gap:16px">
         <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px">
-          <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'PostgreSQL runtime profile':'Hồ sơ runtime PostgreSQL'}</div>
-          <p style="margin:8px 0 14px;color:#52667a;line-height:1.6">${lang==='en'
+          <div style="font-size:18px;font-weight:700;color:var(--text-primary,#102a43)">${lang==='en'?'PostgreSQL runtime profile':'Hồ sơ runtime PostgreSQL'}</div>
+          <p style="margin:8px 0 14px;color:var(--text-secondary,#52667a);line-height:1.6">${lang==='en'
             ? 'Switch between JSON-only, shadow-write, PostgreSQL-primary, and PostgreSQL-only here. Passwords remain on the server and are not exposed in frontend.'
             : 'Chuyển giữa JSON-only, shadow-write, PostgreSQL-primary và PostgreSQL-only ngay tại đây. Mật khẩu vẫn được giữ ở server và không lộ ra frontend.'}</p>
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px">
             <label style="display:grid;gap:6px">
-              <span style="font-size:12px;color:#486581">Host</span>
+              <span style="font-size:12px;color:var(--text-2,#486581)">Host</span>
               <input class="sj-input" value="${escapeHtml(String(draft.host || ''))}" oninput="adminDataSourceSetField('host', this.value)">
             </label>
             <label style="display:grid;gap:6px">
-              <span style="font-size:12px;color:#486581">Port</span>
+              <span style="font-size:12px;color:var(--text-2,#486581)">Port</span>
               <input class="sj-input" type="number" value="${escapeHtml(String(draft.port || 5432))}" oninput="adminDataSourceSetField('port', Number(this.value || 0))">
             </label>
             <label style="display:grid;gap:6px">
-              <span style="font-size:12px;color:#486581">Database</span>
+              <span style="font-size:12px;color:var(--text-2,#486581)">Database</span>
               <input class="sj-input" value="${escapeHtml(String(draft.database || ''))}" oninput="adminDataSourceSetField('database', this.value)">
             </label>
             <label style="display:grid;gap:6px">
-              <span style="font-size:12px;color:#486581">${lang==='en'?'Username':'Tài khoản'}</span>
+              <span style="font-size:12px;color:var(--text-2,#486581)">${lang==='en'?'Username':'Tài khoản'}</span>
               <input class="sj-input" value="${escapeHtml(String(draft.username || ''))}" oninput="adminDataSourceSetField('username', this.value)">
             </label>
             <label style="display:grid;gap:6px">
-              <span style="font-size:12px;color:#486581">Schema</span>
+              <span style="font-size:12px;color:var(--text-2,#486581)">Schema</span>
               <input class="sj-input" value="${escapeHtml(String(draft.schema || 'public'))}" oninput="adminDataSourceSetField('schema', this.value)">
             </label>
             <label style="display:grid;gap:6px">
-              <span style="font-size:12px;color:#486581">SSL Mode</span>
+              <span style="font-size:12px;color:var(--text-2,#486581)">SSL Mode</span>
               <select class="sj-input" onchange="adminDataSourceSetField('sslmode', this.value)">
                 ${['disable','allow','prefer','require','verify-ca','verify-full'].map(item => `<option value="${item}" ${String(draft.sslmode || 'prefer')===item ? 'selected' : ''}>${item}</option>`).join('')}
               </select>
             </label>
             <label style="display:grid;gap:6px">
-              <span style="font-size:12px;color:#486581">${lang==='en'?'Connect timeout (s)':'Timeout kết nối (giây)'}</span>
+              <span style="font-size:12px;color:var(--text-2,#486581)">${lang==='en'?'Connect timeout (s)':'Timeout kết nối (giây)'}</span>
               <input class="sj-input" type="number" value="${escapeHtml(String(draft.connect_timeout || 5))}" oninput="adminDataSourceSetField('connect_timeout', Number(this.value || 0))">
             </label>
             <label style="display:grid;gap:6px">
-              <span style="font-size:12px;color:#486581">${lang==='en'?'Statement timeout (ms)':'Statement timeout (ms)'}</span>
+              <span style="font-size:12px;color:var(--text-2,#486581)">${lang==='en'?'Statement timeout (ms)':'Statement timeout (ms)'}</span>
               <input class="sj-input" type="number" value="${escapeHtml(String(draft.statement_timeout || 30000))}" oninput="adminDataSourceSetField('statement_timeout', Number(this.value || 0))">
             </label>
             <label style="display:grid;gap:6px">
-              <span style="font-size:12px;color:#486581">${lang==='en'?'Read retry count':'Số lần retry khi đọc'}</span>
+              <span style="font-size:12px;color:var(--text-2,#486581)">${lang==='en'?'Read retry count':'Số lần retry khi đọc'}</span>
               <input class="sj-input" type="number" value="${escapeHtml(String(draft.read_retry_count || 3))}" oninput="adminDataSourceSetField('read_retry_count', Number(this.value || 0))">
             </label>
             <label style="display:grid;gap:6px">
-              <span style="font-size:12px;color:#486581">${lang==='en'?'Read retry delay (ms)':'Độ trễ retry khi đọc (ms)'}</span>
+              <span style="font-size:12px;color:var(--text-2,#486581)">${lang==='en'?'Read retry delay (ms)':'Độ trễ retry khi đọc (ms)'}</span>
               <input class="sj-input" type="number" value="${escapeHtml(String(draft.read_retry_delay_ms || 150))}" oninput="adminDataSourceSetField('read_retry_delay_ms', Number(this.value || 0))">
             </label>
           </div>
@@ -9380,30 +9387,30 @@ function renderAdminDataSources(){
 
         <article style="border:1px solid var(--border);border-radius:20px;background:var(--bg-surface,#fff);padding:18px;display:grid;gap:12px">
           <div>
-            <div style="font-size:18px;font-weight:700;color:#102a43">${lang==='en'?'Integration diagnostics':'Chẩn đoán tích hợp'}</div>
-            <p style="margin:8px 0 0;color:#52667a;line-height:1.6">${lang==='en'
+            <div style="font-size:18px;font-weight:700;color:var(--text-primary,#102a43)">${lang==='en'?'Integration diagnostics':'Chẩn đoán tích hợp'}</div>
+            <p style="margin:8px 0 0;color:var(--text-secondary,#52667a);line-height:1.6">${lang==='en'
               ? 'Use these cards to judge whether manual mode is still necessary or whether Epicor / CNC links are healthy enough to rely on.'
               : 'Dùng các thẻ này để đánh giá xem có còn cần chế độ nhập tay hay không, hoặc Epicor / CNC đã đủ khỏe để dựa vào kết nối hay chưa.'}</p>
           </div>
 
           <div style="padding:14px;border-radius:16px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
-            <div style="font-size:12px;color:#486581">Epicor</div>
-            <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${epicorHealth.configured ? (lang==='en'?'Configured':'Đã cấu hình') : (lang==='en'?'Not configured':'Chưa cấu hình')}</div>
-            <div style="margin-top:6px;font-size:13px;color:#52667a">${epicorHealth.dry_run ? (lang==='en'?'Dry-run is active while transport is incomplete.':'Đang ở chế độ dry-run khi transport chưa cấu hình đủ.') : (lang==='en'?'Live transport is active.':'Transport thực đang hoạt động.')}</div>
-            <div style="margin-top:8px;font-size:12px;color:#52667a">${lang==='en'?'Company':'Company'}: ${escapeHtml(String(epicorHealth.company || '-'))} · Plant: ${escapeHtml(String(epicorHealth.plant || '-'))}</div>
+            <div style="font-size:12px;color:var(--text-2,#486581)">Epicor</div>
+            <div style="margin-top:6px;font-size:22px;font-weight:700;color:var(--text-primary,#102a43)">${epicorHealth.configured ? (lang==='en'?'Configured':'Đã cấu hình') : (lang==='en'?'Not configured':'Chưa cấu hình')}</div>
+            <div style="margin-top:6px;font-size:13px;color:var(--text-secondary,#52667a)">${epicorHealth.dry_run ? (lang==='en'?'Dry-run is active while transport is incomplete.':'Đang ở chế độ dry-run khi transport chưa cấu hình đủ.') : (lang==='en'?'Live transport is active.':'Transport thực đang hoạt động.')}</div>
+            <div style="margin-top:8px;font-size:12px;color:var(--text-secondary,#52667a)">${lang==='en'?'Company':'Company'}: ${escapeHtml(String(epicorHealth.company || '-'))} · Plant: ${escapeHtml(String(epicorHealth.plant || '-'))}</div>
           </div>
 
           <div style="padding:14px;border-radius:16px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
-            <div style="font-size:12px;color:#486581">${lang==='en'?'CNC connectors':'Kết nối CNC'}</div>
-            <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${escapeHtml(String(connectorKpis.connectors_healthy || 0))}/${escapeHtml(String(connectorKpis.connectors_total || 0))} ${lang==='en'?'healthy':'ổn định'}</div>
-            <div style="margin-top:6px;font-size:13px;color:#52667a">${lang==='en'?'Manual bridges':'Manual bridge'}: ${escapeHtml(String(connectorKpis.manual_bridges || 0))} · ${lang==='en'?'Stale links':'Link stale'}: ${escapeHtml(String(connectorKpis.connectors_stale || 0))}</div>
+            <div style="font-size:12px;color:var(--text-2,#486581)">${lang==='en'?'CNC connectors':'Kết nối CNC'}</div>
+            <div style="margin-top:6px;font-size:22px;font-weight:700;color:var(--text-primary,#102a43)">${escapeHtml(String(connectorKpis.connectors_healthy || 0))}/${escapeHtml(String(connectorKpis.connectors_total || 0))} ${lang==='en'?'healthy':'ổn định'}</div>
+            <div style="margin-top:6px;font-size:13px;color:var(--text-secondary,#52667a)">${lang==='en'?'Manual bridges':'Manual bridge'}: ${escapeHtml(String(connectorKpis.manual_bridges || 0))} · ${lang==='en'?'Stale links':'Link stale'}: ${escapeHtml(String(connectorKpis.connectors_stale || 0))}</div>
           </div>
 
           <div style="padding:14px;border-radius:16px;background:var(--bg-surface-alt,#f8fafc);border:1px solid var(--border)">
-            <div style="font-size:12px;color:#486581">${lang==='en'?'Shadow observability':'Quan sát shadow'}</div>
-            <div style="margin-top:6px;font-size:22px;font-weight:700;color:#102a43">${escapeHtml(String(shadowFailures))} ${lang==='en'?'failures':'lỗi'}</div>
-            <div style="margin-top:6px;font-size:13px;color:#52667a">${lang==='en'?'JSON fallback reads':'Lượt fallback về JSON'}: ${escapeHtml(String(fallbackReads))}</div>
-            <div style="margin-top:6px;font-size:12px;color:#52667a">${lang==='en'?'Last config update':'Lần lưu cấu hình gần nhất'}: ${escapeHtml(adminFormatRuntimeStamp((cfgRes.override_meta || {}).updated || ''))}</div>
+            <div style="font-size:12px;color:var(--text-2,#486581)">${lang==='en'?'Shadow observability':'Quan sát shadow'}</div>
+            <div style="margin-top:6px;font-size:22px;font-weight:700;color:var(--text-primary,#102a43)">${escapeHtml(String(shadowFailures))} ${lang==='en'?'failures':'lỗi'}</div>
+            <div style="margin-top:6px;font-size:13px;color:var(--text-secondary,#52667a)">${lang==='en'?'JSON fallback reads':'Lượt fallback về JSON'}: ${escapeHtml(String(fallbackReads))}</div>
+            <div style="margin-top:6px;font-size:12px;color:var(--text-secondary,#52667a)">${lang==='en'?'Last config update':'Lần lưu cấu hình gần nhất'}: ${escapeHtml(adminFormatRuntimeStamp((cfgRes.override_meta || {}).updated || ''))}</div>
           </div>
         </article>
       </section>
@@ -9466,7 +9473,7 @@ function renderAdminUsers(){
       ${USERS.map(u => {
         const r = ROLES[u.role];
         const dept = deptMap[u.dept];
-        const colorBg = r ? r.color : '#94a3b8';
+        const colorBg = r ? r.color : 'var(--gray-400,#94a3b8)';
         const initials = (u.name||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
         return `<div class="user-card ${u.active===false?'inactive':''}" data-name="${escapeHtml((u.name||'').toLowerCase())}" data-dept="${escapeHtml(u.dept||'')}">
           <div class="uc-top">
@@ -9863,7 +9870,7 @@ function showUserModal(userId){
           <div class="modal-field">
             <label>${lang==='en'?'Username':'Tên đăng nhập'}</label>
             <input id="um-username" type="text" value="${escapeHtml(u0.username||'')}" ${isEdit?'':''}  placeholder="ten.ho">
-            ${isEdit?'<div class="help-text" style="color:#d97706;font-size:10px">'+( lang==='en'?'⚠ Changing username will create a new account':'⚠ Đổi username sẽ tạo tài khoản mới')+'</div>':''}
+            ${isEdit?'<div class="help-text" style="color:var(--amber-light,#d97706);font-size:10px">'+( lang==='en'?'⚠ Changing username will create a new account':'⚠ Đổi username sẽ tạo tài khoản mới')+'</div>':''}
           </div>
         </div>
 
@@ -9882,7 +9889,7 @@ function showUserModal(userId){
               <option value="">— ${lang==='en'?'Select title':'Chọn chức danh'} —</option>
               ${titleOptions}
             </select>
-            ${!TITLES.includes(u0.title||'') && u0.title ? '<div class="help-text" style="font-size:10px;color:#d97706">⚠ "'+escapeHtml(u0.title)+'" '+( lang==='en'?'not in standard list — will be kept':'không có trong danh sách — sẽ được giữ lại')+'</div>':''}
+            ${!TITLES.includes(u0.title||'') && u0.title ? '<div class="help-text" style="font-size:10px;color:var(--amber-light,#d97706)">⚠ "'+escapeHtml(u0.title)+'" '+( lang==='en'?'not in standard list — will be kept':'không có trong danh sách — sẽ được giữ lại')+'</div>':''}
           </div>
         </div>
 
@@ -10271,7 +10278,7 @@ function editUserPerms(userId){
           <span class="doc-code">${d.code}</span>
           ${d.title.substring(0,50)}${d.title.length>50?'...':''}
         </label>
-        ${isOverride?'<span style="font-size:9px;color:#d97706;font-weight:700">OVERRIDE</span>':''}
+        ${isOverride?'<span style="font-size:9px;color:var(--amber-light,#d97706);font-weight:700">OVERRIDE</span>':''}
       </div>`;
     });
   });
@@ -10340,7 +10347,7 @@ async function handlePermChange(cb, userId, overrideKey){
   const existing=row.querySelector('span[style*="OVERRIDE"]');
   const isOverride=(cb.checked&&!baseAccess)||(!cb.checked&&baseAccess);
   if(isOverride&&!existing){
-    row.insertAdjacentHTML('beforeend','<span style="font-size:9px;color:#d97706;font-weight:700">OVERRIDE</span>');
+    row.insertAdjacentHTML('beforeend','<span style="font-size:9px;color:var(--amber-light,#d97706);font-weight:700">OVERRIDE</span>');
     cb.closest('label').style.fontWeight='600';
   } else if(!isOverride&&existing){
     existing.remove();
@@ -10403,7 +10410,7 @@ function renderAdminPerms(){
           catHtml+=`<div class="perm-doc-row">
             <label>
               ${isFullAccess
-                ? '<span style="color:#16a34a;font-weight:700;width:16px;display:inline-block">✓</span>'
+                ? '<span style="color:var(--green-light,#16a34a);font-weight:700;width:16px;display:inline-block">✓</span>'
                 : '<input type="checkbox" data-doc="'+d.code+'" '+(has?'checked':'')+' onchange="toggleRoleDoc(this,\''+adminEditRole+'\')">'}
               <span class="doc-code">${d.code}</span>
               ${d.title.substring(0,55)}${d.title.length>55?'...':''}
@@ -10417,7 +10424,7 @@ function renderAdminPerms(){
         catHtml+=`<div class="perm-doc-row">
           <label>
             ${isFullAccess
-              ? '<span style="color:#16a34a;font-weight:700;width:16px;display:inline-block">✓</span>'
+              ? '<span style="color:var(--green-light,#16a34a);font-weight:700;width:16px;display:inline-block">✓</span>'
               : '<input type="checkbox" data-doc="'+d.code+'" '+(has?'checked':'')+' onchange="toggleRoleDoc(this,\''+adminEditRole+'\')">'}
             <span class="doc-code">${d.code}</span>
             ${d.title.substring(0,55)}${d.title.length>55?'...':''}
@@ -10440,10 +10447,10 @@ function renderAdminPerms(){
         }).join('')}
       </div>
       <div class="pg-content">
-        <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:${r?r.color:'#333'}">${r?r.icon:''} ${r?r.label:adminEditRole}</div>
+        <div style="font-size:13px;font-weight:700;margin-bottom:8px;color:${r?r.color:'var(--text-primary,#333)'}">${r?r.icon:''} ${r?r.label:adminEditRole}</div>
         <div style="font-size:11px;color:var(--text-3);margin-bottom:12px">
           ${isFullAccess
-            ?'<span style="color:#16a34a;font-weight:700">✅ FULL ACCESS — '+(lang==='en'?'All':'Tất cả')+' '+DOCS.length+' '+(lang==='en'?'documents':'tài liệu')+'</span>'
+            ?'<span style="color:var(--green-light,#16a34a);font-weight:700">✅ FULL ACCESS — '+(lang==='en'?'All':'Tất cả')+' '+DOCS.length+' '+(lang==='en'?'documents':'tài liệu')+'</span>'
             :'<span>'+(lang==='en'?'Access':'Quyền')+': <b>'+DOCS.filter(d=>docMatchesRole(d.code,adminEditRole)).length+'</b>/'+DOCS.length+' '+(lang==='en'?'documents — check/uncheck to modify':'tài liệu — đánh dấu để thay đổi')+'</span>'}
         </div>
         ${catHtml}

@@ -188,7 +188,7 @@ if(window.HmRegistry && typeof HmRegistry.init === 'function'){
 function hmBadge(setKey, value){
   if(window.HmRegistry) return HmRegistry.badge(setKey, value);
   // Fallback nếu HmRegistry chưa load
-  var color = '#6b7280';
+  var color = 'var(--gray-500,#6b7280)';
   var label = value || '';
   return '<span style="display:inline-block;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600;color:var(--text-inverse,#fff);background:' + color + '">' + label + '</span>';
 }
@@ -199,11 +199,11 @@ function hmBadge(setKey, value){
 const DEFAULT_DEPARTMENTS = [
   {code:'EXE',label:'Ban Giám Đốc',labelEn:'Executive',color:'var(--purple-light,#7c3aed)'},
   {code:'PRO',label:'Phòng Sản Xuất',labelEn:'Production',color:'var(--green-dark,#059669)'},
-  {code:'ENG',label:'Phòng Kỹ Thuật',labelEn:'Engineering',color:'#0369a1'},
+  {code:'ENG',label:'Phòng Kỹ Thuật',labelEn:'Engineering',color:'var(--cyan,#0369a1)'},
   {code:'QA',label:'Phòng Chất Lượng',labelEn:'Quality',color:'var(--red-light,#dc2626)'},
-  {code:'SCM',label:'Phòng Cung Ứng',labelEn:'Supply Chain',color:'#84cc16'},
+  {code:'SCM',label:'Phòng Cung Ứng',labelEn:'Supply Chain',color:'var(--green,#84cc16)'},
   {code:'SAL',label:'Phòng Kinh Doanh',labelEn:'Sales',color:'var(--amber-light,#f59e0b)'},
-  {code:'FIN',label:'Phòng Tài Chính',labelEn:'Finance',color:'#a21caf'},
+  {code:'FIN',label:'Phòng Tài Chính',labelEn:'Finance',color:'var(--purple,#a21caf)'},
   {code:'HR',label:'Phòng Nhân Sự',labelEn:'Human Resources',color:'var(--purple-light,#8b5cf6)'},
   {code:'EHS',label:'Phòng An Toàn',labelEn:'EHS',color:'var(--green-dark,#16a34a)'},
   {code:'IT',label:'Phòng CNTT',labelEn:'IT',color:'var(--text-primary,#0f172a)'},
@@ -995,18 +995,18 @@ loadRoleDocsFromStorage();
 
 const CATEGORIES = [
   // ── Tài liệu hệ thống ── (mom/docs/system)
-  {id:"MAN",icon:"📘",label:"Sổ tay QMS (Manual)",color:"#1e40af",dept:"QMS",section:"system"},
+  {id:"MAN",icon:"📘",label:"Sổ tay QMS (Manual)",color:"var(--blue,#1e40af)",dept:"QMS",section:"system"},
   {id:"POL",icon:"📜",label:"Chính sách (Policy)",color:"var(--purple-light,#7c3aed)",dept:"QMS",section:"system"},
-  {id:"ORG",icon:"🏢",label:"Tổ chức & Nhân sự",color:"var(--text-secondary,#475569)",dept:"ORG",section:"system"},
+  {id:"ORG",icon:"🏢",label:"Tổ chức & RACI",color:"var(--text-secondary,#475569)",dept:"ORG",section:"system"},
   // ── Tài liệu vận hành ── (mom/docs/operations + mom/docs/forms)
-  {id:"SOP",icon:"📋",label:"Quy trình (SOP)",color:"#0369a1",dept:"QMS",section:"ops"},
-  {id:"WI",icon:"📖",label:"Hướng dẫn công việc (WI)",color:"var(--green-dark,#059669)",dept:"OPS",section:"ops"},
+  {id:"SOP",icon:"📋",label:"Quy trình (SOP)",color:"var(--cyan,#0369a1)",dept:"QMS",section:"ops"},
+  {id:"WI",icon:"📖",label:"Hướng dẫn (WI/OPS)",color:"var(--green-dark,#059669)",dept:"OPS",section:"ops"},
   {id:"ANNEX",icon:"📚",label:"Phụ lục (ANNEX)",color:"var(--purple-light,#6366f1)",dept:"QMS",section:"ops"},
-  {id:"FRM",icon:"📝",label:"Biểu mẫu & Hồ sơ (Forms)",color:"var(--amber-light,#d97706)",dept:"FRM",section:"ops"},
-  // ── Đào tạo & Năng lực ── (10)
-  {id:"TRN",icon:"🎓",label:"Đào tạo & Năng lực (Training)",color:"#9333ea",dept:"TRN",section:"train"},
+  {id:"FRM",icon:"📝",label:"Biểu mẫu (Forms)",color:"var(--amber-light,#d97706)",dept:"FRM",section:"ops"},
+  // ── Đào tạo & Năng lực ──
+  {id:"TRN",icon:"🎓",label:"Đào tạo (Training)",color:"var(--purple,#9333ea)",dept:"TRN",section:"train"},
   // ── Ẩn ──
-  {id:"DICT",icon:"📖",label:"Từ điển thuật ngữ",color:"#0ea5e9",dept:"DICT",hidden:true},
+  {id:"DICT",icon:"📖",label:"Từ điển thuật ngữ",color:"var(--cyan-light,#0ea5e9)",dept:"DICT",hidden:true},
 ];
 
 // ═══════════════════════════════════════════════════
