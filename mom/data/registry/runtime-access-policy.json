@@ -1192,7 +1192,8 @@
         "ceo",
         "qa_manager",
         "quality_manager"
-      ]
+      ],
+      "genericMutation": "allow"
     },
     "inventory": {
       "list": [

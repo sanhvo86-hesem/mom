@@ -195,7 +195,9 @@ final class LogTransport
         $response = curl_exec($ch);
         $httpCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $error = curl_error($ch);
-        curl_close($ch);
+        // curl_close() is deprecated and a no-op since PHP 8.0; under PHP 8.5
+        // the strict engine raises it as Uncaught Deprecation. Skip the call.
+        unset($ch);
 
         if ($httpCode < 200 || $httpCode >= 300) {
             $this->lokiAvailable = false;

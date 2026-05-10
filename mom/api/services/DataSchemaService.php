@@ -3887,6 +3887,17 @@ final class DataSchemaService
         $normalized = str_replace('INTEGER[]', 'INT[]', $normalized);
         $normalized = preg_replace('/\bINTEGER\b/', 'INT', $normalized) ?? $normalized;
         $normalized = preg_replace('/\bDOUBLE PRECISION\b/', 'FLOAT8', $normalized) ?? $normalized;
+        // PostgreSQL internal array notation: _TEXT ≡ TEXT[], _INT4 ≡ INT4[], etc.
+        if (preg_match('/^_([A-Z0-9]+)$/', $normalized, $m)) {
+            $normalized = $m[1] . '[]';
+        }
+        // Strip numeric/decimal precision for comparison: NUMERIC(6,2) ≡ NUMERIC
+        $normalized = preg_replace('/^(NUMERIC|DECIMAL)\(\d+(?:,\d+)?\)$/', '$1', $normalized) ?? $normalized;
+        // Serial pseudo-types: PostgreSQL reports underlying integer type after DDL
+        $normalized = str_replace('BIGSERIAL', 'BIGINT', $normalized);
+        $normalized = str_replace('SMALLSERIAL', 'SMALLINT', $normalized);
+        // SERIAL must come last (substring of BIGSERIAL/SMALLSERIAL already replaced)
+        $normalized = preg_replace('/\bSERIAL\b/', 'INT', $normalized) ?? $normalized;
         return $normalized;
     }
 

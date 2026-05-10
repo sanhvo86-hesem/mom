@@ -122,8 +122,14 @@ class AuditMiddleware
             }
         }
 
+        // Coerce each query value to a string. Arrays (e.g. filter[role_code])
+        // become a JSON-encoded summary so strval() never raises a notice.
+        $queryFlat = [];
+        foreach ($query as $k => $v) {
+            $queryFlat[(string)$k] = is_scalar($v) ? (string)$v : (json_encode($v) ?: '');
+        }
         return [
-            'query'     => array_map('strval', $query),
+            'query'     => $queryFlat,
             'body_keys' => $bodyKeys,
         ];
     }

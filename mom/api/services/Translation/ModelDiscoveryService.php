@@ -212,7 +212,7 @@ final class ModelDiscoveryService
         ]);
         $body = curl_exec($ch);
         $code = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        curl_close($ch);
+        unset($ch); /* PHP 8.5: curl_close deprecated */
         if ($code !== 200 || !is_string($body)) {
             return $this->candidatesAsList($fallbackCandidates);
         }

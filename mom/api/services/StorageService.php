@@ -435,7 +435,7 @@ final class S3StorageDriver implements StorageDriver
         $response = curl_exec($ch);
         $httpCode = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $error = curl_error($ch);
-        curl_close($ch);
+        unset($ch); /* PHP 8.5: curl_close deprecated */
 
         return ['code' => $httpCode, 'body' => $response, 'error' => $error];
     }

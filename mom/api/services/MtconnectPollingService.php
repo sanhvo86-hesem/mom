@@ -545,7 +545,7 @@ final class MtconnectPollingService
             $body = curl_exec($ch);
             $status = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
             $error = curl_error($ch);
-            curl_close($ch);
+            unset($ch); /* PHP 8.5: curl_close deprecated */
             if ($body === false) {
                 throw new RuntimeException('connector_http_failed: ' . ($error !== '' ? $error : 'unknown_error'));
             }

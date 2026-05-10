@@ -555,7 +555,7 @@ PROMPT;
             return $parsed;
 
         } finally {
-            curl_close($ch);
+            unset($ch); /* PHP 8.5: curl_close deprecated */
         }
     }
 
@@ -647,7 +647,7 @@ PROMPT;
             return $accumulated;
 
         } finally {
-            curl_close($ch);
+            unset($ch); /* PHP 8.5: curl_close deprecated */
         }
     }
 

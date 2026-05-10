@@ -326,14 +326,14 @@ final class EpicorTransportAdapter
             $raw = curl_exec($ch);
             if ($raw === false) {
                 $error = curl_error($ch);
-                curl_close($ch);
+                unset($ch); /* PHP 8.5: curl_close deprecated */
                 throw new RuntimeException($error !== '' ? $error : 'epicor_transport_curl_failed');
             }
             $statusCode = (int)curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
             $headerSize = (int)curl_getinfo($ch, CURLINFO_HEADER_SIZE);
             $rawHeaders = substr($raw, 0, $headerSize);
             $rawBody = substr($raw, $headerSize);
-            curl_close($ch);
+            unset($ch); /* PHP 8.5: curl_close deprecated */
             return [
                 'status_code' => $statusCode,
                 'headers' => preg_split("/\r\n|\n|\r/", trim($rawHeaders)) ?: [],
