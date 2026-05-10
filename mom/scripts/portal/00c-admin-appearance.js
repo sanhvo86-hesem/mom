@@ -1901,21 +1901,21 @@ function joinList(items, emptyText){
 
 function _contractStatusChip(state){
   if(!state || state === 'not checked'){
-    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0">⬜ not checked</span>';
+    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:var(--bg-surface-alt,#f1f5f9);color:var(--text-secondary,#64748b);border:1px solid var(--border,#e2e8f0)">⬜ not checked</span>';
   }
   if(state === 'online'){
-    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#dcfce7;color:#166534;border:1px solid #86efac">✅ online</span>';
+    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:color-mix(in srgb,var(--green,#16a34a) 12%,var(--bg-surface,#fff));color:var(--green,#166534);border:1px solid color-mix(in srgb,var(--green,#16a34a) 30%,transparent)">✅ online</span>';
   }
   if(state === 'auth-blocked'){
-    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#fef9c3;color:#854d0e;border:1px solid #fde047">🔐 auth-blocked</span>';
+    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:color-mix(in srgb,var(--amber,#f57f17) 10%,var(--bg-surface,#fff));color:color-mix(in srgb,var(--amber,#f57f17) 60%,#000 40%);border:1px solid color-mix(in srgb,var(--amber,#f57f17) 30%,transparent)">🔐 auth-blocked</span>';
   }
   if(state === 'not-found'){
-    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#fecaca;color:#991b1b;border:1px solid #fca5a5">❌ not-found</span>';
+    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:color-mix(in srgb,var(--red,#c62828) 10%,var(--bg-surface,#fff));color:var(--red,#991b1b);border:1px solid color-mix(in srgb,var(--red,#c62828) 25%,transparent)">❌ not-found</span>';
   }
   if(/^offline/.test(state)){
-    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#fee2e2;color:#991b1b;border:1px solid #fca5a5">🔴 '+esc(state)+'</span>';
+    return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:color-mix(in srgb,var(--red,#c62828) 10%,var(--bg-surface,#fff));color:var(--red,#991b1b);border:1px solid color-mix(in srgb,var(--red,#c62828) 25%,transparent)">🔴 '+esc(state)+'</span>';
   }
-  return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#fef3c7;color:#92400e;border:1px solid #fcd34d">⚠️ '+esc(state)+'</span>';
+  return '<span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:color-mix(in srgb,var(--amber,#f57f17) 10%,var(--bg-surface,#fff));color:color-mix(in srgb,var(--amber,#f57f17) 60%,#000 40%);border:1px solid color-mix(in srgb,var(--amber,#f57f17) 28%,transparent)">⚠️ '+esc(state)+'</span>';
 }
 
 /* ─────────────────────────────────────────────────────────────────────────
@@ -1976,7 +1976,7 @@ function _renderModuleOverrideEditor(moduleId, complianceRow){
     return '<tr>'
       + '<td style="padding:4px 6px"><input type="text" value="'+esc(prop)+'" oninput="_admModuleOverrideTokenKey(\''+esc(moduleId)+'\','+i+',this.value)" style="width:100%;padding:3px 6px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:var(--font-mono);background:var(--bg-surface)"></td>'
       + '<td style="padding:4px 6px"><input type="text" value="'+esc(draft.tokens[prop])+'" oninput="_admModuleOverrideTokenVal(\''+esc(moduleId)+'\','+i+',this.value)" style="width:100%;padding:3px 6px;border:1px solid var(--border);border-radius:4px;font-size:11px;font-family:var(--font-mono);background:var(--bg-surface)"></td>'
-      + '<td style="padding:4px 6px;text-align:center"><button onclick="_admModuleOverrideTokenDel(\''+esc(moduleId)+'\','+i+')" style="padding:2px 8px;border:1px solid #fca5a5;border-radius:4px;background:#fff;color:#dc2626;font-size:11px;cursor:pointer">✕</button></td>'
+      + '<td style="padding:4px 6px;text-align:center"><button onclick="_admModuleOverrideTokenDel(\''+esc(moduleId)+'\','+i+')" style="padding:2px 8px;border:1px solid color-mix(in srgb,var(--red,#c62828) 30%,transparent);border-radius:4px;background:var(--bg-surface,#fff);color:var(--red,#dc2626);font-size:11px;cursor:pointer">✕</button></td>'
       + '</tr>';
   }).join('');
 
@@ -1984,9 +1984,9 @@ function _renderModuleOverrideEditor(moduleId, complianceRow){
     + '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;flex-wrap:wrap">'
     + '<div style="font-size:12px;font-weight:700;color:var(--text-primary)">🎨 Module CSS Override</div>'
     + '<div style="display:flex;gap:6px;align-items:center">'
-    + (hasOverride ? '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:'+(isEnabled?'#dcfce7':'#f1f5f9')+';color:'+(isEnabled?'#166534':'#64748b')+';border:1px solid '+(isEnabled?'#86efac':'#e2e8f0')+';">'+(isEnabled?'● Enabled':'○ Disabled')+'</span>' : '')
+    + (hasOverride ? '<span style="font-size:11px;padding:2px 8px;border-radius:4px;background:'+(isEnabled?'color-mix(in srgb,var(--green,#16a34a) 12%,var(--bg-surface,#fff))':'var(--bg-surface-alt,#f1f5f9)')+';color:'+(isEnabled?'var(--green,#166534)':'var(--text-secondary,#64748b)')+';border:1px solid '+(isEnabled?'color-mix(in srgb,var(--green,#16a34a) 28%,transparent)':'var(--border,#e2e8f0)')+';">'+(isEnabled?'● Enabled':'○ Disabled')+'</span>' : '')
     + (hasOverride ? '<button onclick="_admModuleOverrideToggle(\''+esc(moduleId)+'\')" style="padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg-surface);color:var(--text-primary)">'+(isEnabled?L('Tắt','Disable'):L('Bật','Enable'))+'</button>' : '')
-    + (hasOverride ? '<button onclick="_admModuleOverrideDelete(\''+esc(moduleId)+'\')" style="padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid #fca5a5;background:#fff;color:#dc2626">'+L('Xóa','Delete')+'</button>' : '')
+    + (hasOverride ? '<button onclick="_admModuleOverrideDelete(\''+esc(moduleId)+'\')" style="padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600;cursor:pointer;border:1px solid color-mix(in srgb,var(--red,#c62828) 30%,transparent);background:var(--bg-surface,#fff);color:var(--red,#dc2626)">'+L('Xóa','Delete')+'</button>' : '')
     + '</div>'
     + '</div>'
     + '<div style="margin-bottom:10px">'
@@ -2068,8 +2068,8 @@ function renderModuleComplianceEditorPanel(){
       + '</div>'
       + (violations.length ? '<div style="margin-bottom:10px"><div style="font-size:10px;font-weight:700;color:var(--text-secondary);margin-bottom:6px">'+L('Vi phạm','Violations')+'</div>'
         + '<ul style="margin:0;padding-left:16px">'
-        + violations.map(function(v){ return '<li style="font-size:11px;color:#dc2626;margin-bottom:2px">'+esc(String(v))+'</li>'; }).join('')
-        + '</ul></div>' : '<div style="font-size:11px;color:#22c55e;margin-bottom:10px">✓ '+L('Không có vi phạm được phát hiện','No violations detected')+'</div>')
+        + violations.map(function(v){ return '<li style="font-size:11px;color:var(--red,#dc2626);margin-bottom:2px">'+esc(String(v))+'</li>'; }).join('')
+        + '</ul></div>' : '<div style="font-size:11px;color:var(--green,#22c55e);margin-bottom:10px">✓ '+L('Không có vi phạm được phát hiện','No violations detected')+'</div>')
       + _renderModuleOverrideEditor(moduleId, row)
       + '</div>'
       + '</div>';
@@ -3286,10 +3286,10 @@ function _computeContrast(hex1, hex2){
 
 function _wcagChip(ratio){
   var r=ratio?ratio.toFixed(2):'?';
-  if(ratio>=7) return '<span style="padding:2px 7px;border-radius:4px;font-size:10px;font-weight:800;background:#dcfce7;color:#166534;border:1px solid #86efac">AAA '+r+':1</span>';
-  if(ratio>=4.5) return '<span style="padding:2px 7px;border-radius:4px;font-size:10px;font-weight:800;background:#dbeafe;color:#1e40af;border:1px solid #93c5fd">AA '+r+':1</span>';
-  if(ratio>=3) return '<span style="padding:2px 7px;border-radius:4px;font-size:10px;font-weight:800;background:#fef9c3;color:#854d0e;border:1px solid #fde047">AA-Large '+r+':1</span>';
-  return '<span style="padding:2px 7px;border-radius:4px;font-size:10px;font-weight:800;background:#fecaca;color:#991b1b;border:1px solid #fca5a5">FAIL '+r+':1</span>';
+  if(ratio>=7) return '<span style="padding:2px 7px;border-radius:4px;font-size:10px;font-weight:800;background:color-mix(in srgb,var(--green,#16a34a) 12%,var(--bg-surface,#fff));color:var(--green,#166534);border:1px solid color-mix(in srgb,var(--green,#16a34a) 28%,transparent)">AAA '+r+':1</span>';
+  if(ratio>=4.5) return '<span style="padding:2px 7px;border-radius:4px;font-size:10px;font-weight:800;background:color-mix(in srgb,var(--brand-2,#1565c0) 10%,var(--bg-surface,#fff));color:var(--brand-2,#1565c0);border:1px solid color-mix(in srgb,var(--brand-2,#1565c0) 25%,transparent)">AA '+r+':1</span>';
+  if(ratio>=3) return '<span style="padding:2px 7px;border-radius:4px;font-size:10px;font-weight:800;background:color-mix(in srgb,var(--amber,#f57f17) 10%,var(--bg-surface,#fff));color:color-mix(in srgb,var(--amber,#f57f17) 60%,#000 40%);border:1px solid color-mix(in srgb,var(--amber,#f57f17) 28%,transparent)">AA-Large '+r+':1</span>';
+  return '<span style="padding:2px 7px;border-radius:4px;font-size:10px;font-weight:800;background:color-mix(in srgb,var(--red,#c62828) 10%,var(--bg-surface,#fff));color:var(--red,#991b1b);border:1px solid color-mix(in srgb,var(--red,#c62828) 25%,transparent)">FAIL '+r+':1</span>';
 }
 
 function renderWcagContrastPanel(){
@@ -3358,15 +3358,27 @@ function renderColorBlindnessPanel(){
     {id:'tritan', label:'Tritanopia (blue-yellow)',          matrix:'0.95 0.05 0 0 0  0 0.433 0.567 0 0  0 0.475 0.525 0 0  0 0 0 1 0'},
     {id:'achroma',label:'Achromatopsia (no color)',          matrix:'0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0.299 0.587 0.114 0 0  0 0 0 1 0'},
   ];
-  var preview = '<div style="padding:16px;background:#f8fafc;border-radius:8px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start">'
-    +'<div style="padding:8px 16px;background:#1565c0;color:#fff;border-radius:6px;font-size:13px;font-weight:700">Primary</div>'
-    +'<div style="padding:8px 16px;background:#22c55e;color:#fff;border-radius:6px;font-size:13px;font-weight:700">Success</div>'
-    +'<div style="padding:8px 16px;background:#ef4444;color:#fff;border-radius:6px;font-size:13px;font-weight:700">Error</div>'
-    +'<div style="padding:8px 16px;background:#f59e0b;color:#fff;border-radius:6px;font-size:13px;font-weight:700">Warning</div>'
-    +'<div style="padding:8px 16px;background:#8b5cf6;color:#fff;border-radius:6px;font-size:13px;font-weight:700">Purple</div>'
-    +'<div style="padding:10px;border:1px solid #e2e8f0;border-radius:6px;background:#fff"><div style="font-size:13px;font-weight:600;color:#1e293b">Card text</div><div style="font-size:11px;color:#64748b">Secondary text</div></div>'
+  var _cbAll = HmTheme.getAll ? HmTheme.getAll() : {};
+  var _cbSc  = _cbAll.statusColors || {};
+  var _cbCc  = _cbAll.colors || {};
+  var _cbCl  = _cbAll.colorsLight || {};
+  var _cbBrand   = _cbCc.brand2 || '#1565c0';
+  var _cbSuccess = _cbSc.success || '#22c55e';
+  var _cbError   = _cbSc.error   || '#ef4444';
+  var _cbWarning = _cbSc.warning || '#f59e0b';
+  var _cbSurf    = _cbCl.bgSurface    || '#ffffff';
+  var _cbBdr     = _cbCl.border       || '#e2e8f0';
+  var _cbTxt     = _cbCl.textPrimary  || '#1e293b';
+  var _cbTxt2    = _cbCl.textSecondary|| '#64748b';
+  var preview = '<div style="padding:16px;background:var(--bg-page,#f8fafc);border-radius:8px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start">'
+    +'<div style="padding:8px 16px;background:'+_cbBrand+';color:'+_cbSurf+';border-radius:6px;font-size:13px;font-weight:700">Primary</div>'
+    +'<div style="padding:8px 16px;background:'+_cbSuccess+';color:'+_cbSurf+';border-radius:6px;font-size:13px;font-weight:700">Success</div>'
+    +'<div style="padding:8px 16px;background:'+_cbError+';color:'+_cbSurf+';border-radius:6px;font-size:13px;font-weight:700">Error</div>'
+    +'<div style="padding:8px 16px;background:'+_cbWarning+';color:'+_cbSurf+';border-radius:6px;font-size:13px;font-weight:700">Warning</div>'
+    +'<div style="padding:8px 16px;background:#8b5cf6;color:'+_cbSurf+';border-radius:6px;font-size:13px;font-weight:700">Purple</div>'
+    +'<div style="padding:10px;border:1px solid '+_cbBdr+';border-radius:6px;background:'+_cbSurf+'"><div style="font-size:13px;font-weight:600;color:'+_cbTxt+'">Card text</div><div style="font-size:11px;color:'+_cbTxt2+'">Secondary text</div></div>'
     +'<div style="display:flex;gap:6px">'
-    +['#ef4444','#f97316','#eab308','#22c55e','#3b82f6','#8b5cf6','#ec4899'].map(function(c){ return '<div style="width:28px;height:28px;border-radius:4px;background:'+c+'"></div>'; }).join('')
+    +[_cbError,'#f97316','#eab308',_cbSuccess,'#3b82f6','#8b5cf6','#ec4899'].map(function(c){ return '<div style="width:28px;height:28px;border-radius:4px;background:'+c+'"></div>'; }).join('')
     +'</div>'
     +'</div>';
   var svgDefs = '<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0">'
@@ -3619,7 +3631,7 @@ function renderSpacingScalePanel(){
     var pct = Math.min(100, s/96*100);
     return '<div style="display:flex;align-items:center;gap:10px;padding:4px 0">'
       +'<div style="width:50px;font-size:11px;font-family:var(--font-mono);color:var(--text-secondary)">'+s+'px</div>'
-      +'<div style="height:20px;width:'+(pct)+'%;background:#1565c0;border-radius:3px;min-width:2px"></div>'
+      +'<div style="height:20px;width:'+(pct)+'%;background:var(--brand-2,#1565c0);border-radius:3px;min-width:2px"></div>'
       +'</div>';
   }).join('');
   return sect(L('Spacing & Type Scale','Spacing & Type Scale'),
@@ -3675,7 +3687,7 @@ function renderMotionCatalogPanel(){
       +'<div style="font-size:10px;color:var(--text-secondary);margin-bottom:8px;font-family:var(--font-mono)">'+esc(c.val)+'</div>'
       +'<div style="font-size:10px;color:var(--text-tertiary);margin-bottom:10px">'+esc(c.label)+'</div>'
       +'<div style="height:32px;background:var(--bg-surface-alt,var(--bg-hover));border-radius:6px;overflow:hidden;position:relative">'
-      +'<div style="position:absolute;top:8px;left:0;width:16px;height:16px;border-radius:50%;background:#1565c0;animation:admSlide 1.6s '+esc(c.val)+' infinite"></div>'
+      +'<div style="position:absolute;top:8px;left:0;width:16px;height:16px;border-radius:50%;background:var(--brand-2,#1565c0);animation:admSlide 1.6s '+esc(c.val)+' infinite"></div>'
       +'</div>'
       +'</div>';
   }).join('');
@@ -3683,7 +3695,7 @@ function renderMotionCatalogPanel(){
     return '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid var(--border)">'
       +'<div style="width:70px;font-size:12px;font-weight:600;color:var(--text-primary)">'+esc(d.name)+'</div>'
       +'<div style="width:55px;font-size:11px;font-family:var(--font-mono);color:var(--text-secondary)">'+d.val+'ms</div>'
-      +'<div style="flex:1;height:6px;border-radius:3px;background:#e2e8f0;overflow:hidden"><div style="height:100%;width:'+(Math.min(100,d.val/3))+'%;background:#8b5cf6;border-radius:3px"></div></div>'
+      +'<div style="flex:1;height:6px;border-radius:3px;background:var(--border,#e2e8f0);overflow:hidden"><div style="height:100%;width:'+(Math.min(100,d.val/3))+'%;background:var(--brand-2,#1565c0);border-radius:3px"></div></div>'
       +'<div style="font-size:10px;color:var(--text-tertiary)">'+esc(d.label)+'</div>'
       +'</div>';
   }).join('');
@@ -3788,9 +3800,28 @@ function renderTokenSemanticMapPanel(){
 }
 
 function renderSideBySidePanel(){
+  /* Read configured token values so the demo reflects the org's actual palette */
+  var all  = HmTheme.getAll ? HmTheme.getAll() : {};
+  var cl   = all.colorsLight      || {};
+  var cd   = all.colorsDark       || {};
+  var sc   = all.statusColors     || {};
+  var scd  = all.statusColorsDark || {};
+  var cc   = all.colors           || {};
+  var btnBg = cc.brand2 || '#1565c0';
+
   var sampleHtml = function(mode){
     var isDark = mode==='dark';
-    var bg=isDark?'#1e293b':'#ffffff',pg=isDark?'#0f172a':'#f8fafc',txt=isDark?'#f1f5f9':'#1e293b',txt2=isDark?'#94a3b8':'#64748b',bdr=isDark?'#334155':'#e2e8f0',btnBg='#1565c0';
+    var bg   = isDark ? (cd.bgSurface    || '#1e293b') : (cl.bgSurface    || '#ffffff');
+    var pg   = isDark ? (cd.bgPage       || '#0f172a') : (cl.bgPage       || '#f8fafc');
+    var txt  = isDark ? (cd.textPrimary  || '#f1f5f9') : (cl.textPrimary  || '#1e293b');
+    var txt2 = isDark ? (cd.textSecondary|| '#94a3b8') : (cl.textSecondary|| '#64748b');
+    var bdr  = isDark ? (cd.border       || '#334155') : (cl.border       || '#e2e8f0');
+    var okColor = isDark ? (scd.success || '#22c55e')  : (sc.success      || '#16a34a');
+    var doneBg  = isDark ? 'rgba(34,197,94,.15)' : 'rgba(22,163,74,.12)';
+    var pendBg  = isDark ? 'rgba(234,179,8,.12)' : 'rgba(217,119,6,.10)';
+    var pendTxt = isDark ? (scd.warning||'#fbbf24') : (sc.warning||'#854d0e');
+    var ovdBg   = isDark ? 'rgba(248,113,113,.12)' : 'rgba(220,38,38,.10)';
+    var ovdTxt  = isDark ? (scd.error||'#f87171')   : (sc.error  ||'#991b1b');
     return '<div style="background:'+pg+';padding:12px;border-radius:8px;font-family:-apple-system,sans-serif">'
       +'<div style="background:'+bg+';border:1px solid '+bdr+';border-radius:8px;padding:14px;margin-bottom:10px">'
       +'<div style="font-size:13px;font-weight:700;color:'+txt+';margin-bottom:4px">'+L('Bảng điều khiển','Dashboard')+'</div>'
@@ -3801,16 +3832,17 @@ function renderSideBySidePanel(){
       +'<div style="flex:1;min-width:80px;border:1px solid '+bdr+';border-radius:6px;padding:8px;background:'+bg+'">'
       +'<div style="font-size:10px;color:'+txt2+'">CAPA</div><div style="font-size:18px;font-weight:800;color:'+txt+'">8</div></div>'
       +'<div style="flex:1;min-width:80px;border:1px solid '+bdr+';border-radius:6px;padding:8px;background:'+bg+'">'
-      +'<div style="font-size:10px;color:'+txt2+'">Audit</div><div style="font-size:18px;font-weight:800;color:#22c55e">OK</div></div>'
+      +'<div style="font-size:10px;color:'+txt2+'">Audit</div><div style="font-size:18px;font-weight:800;color:'+okColor+'">OK</div></div>'
       +'</div>'
       +'<div style="margin-top:10px;display:flex;gap:6px">'
-      +'<button style="padding:5px 12px;border-radius:5px;font-size:11px;font-weight:700;background:'+btnBg+';color:#fff;border:none">'+L('Tạo NCR','Create NCR')+'</button>'
+      +'<button style="padding:5px 12px;border-radius:5px;font-size:11px;font-weight:700;background:'+btnBg+';color:'+bg+';border:none">'+L('Tạo NCR','Create NCR')+'</button>'
       +'<button style="padding:5px 12px;border-radius:5px;font-size:11px;font-weight:600;background:transparent;color:'+txt+';border:1px solid '+bdr+'">'+L('Xuất','Export')+'</button>'
       +'</div>'
       +'</div>'
-      +'<div style="display:flex;gap:6px"><span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#dcfce7;color:#166534">Done</span>'
-      +'<span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#fef9c3;color:#854d0e">Pending</span>'
-      +'<span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:#fecaca;color:#991b1b">Overdue</span></div>'
+      +'<div style="display:flex;gap:6px">'
+      +'<span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:'+doneBg+';color:'+okColor+'">Done</span>'
+      +'<span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:'+pendBg+';color:'+pendTxt+'">Pending</span>'
+      +'<span style="padding:2px 8px;border-radius:4px;font-size:10px;font-weight:700;background:'+ovdBg+';color:'+ovdTxt+'">Overdue</span></div>'
       +'</div>';
   };
   return sect(L('Light / Dark Comparison','Light / Dark Comparison'),
