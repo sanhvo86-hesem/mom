@@ -728,6 +728,58 @@ class AdminController extends BaseController
     }
 
     /**
+     * POST /api/v1/admin/audit/log — Append a front-end-originated administrative
+     * audit event to audit_events. Used by the admin console (UI.audit) to record
+     * supplementary actions that do not have their own server endpoint, e.g.
+     * "audit.export", "module_permission.toggle.preview", "role.permissions.cell.click".
+     *
+     * Body: { event_type: string, detail?: object }
+     *
+     * @return never
+     */
+    public function logFrontendAuditEvent(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($user);
+
+        $data = $this->jsonBody();
+        $eventType = trim((string)($data['event_type'] ?? ''));
+        if ($eventType === '') {
+            $this->error('missing_event_type', 400);
+        }
+        // Cap event_type length defensively.
+        if (strlen($eventType) > 80) {
+            $eventType = substr($eventType, 0, 80);
+        }
+
+        // Flatten detail into scalar context for auditLog (it strips non-scalars).
+        $detailRaw = $data['detail'] ?? [];
+        $context   = ['source' => 'frontend'];
+        if (is_array($detailRaw)) {
+            foreach ($detailRaw as $k => $v) {
+                $key = (string)$k;
+                if ($key === '' || strlen($key) > 60) {
+                    continue;
+                }
+                if (is_scalar($v) || $v === null) {
+                    $context[$key] = $v === null ? null : (string)$v;
+                } elseif (is_array($v)) {
+                    $context[$key] = json_encode($v, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                }
+            }
+        }
+
+        try {
+            $this->auditLog('fe.' . $eventType, $context);
+            $this->success(['ok' => true]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('audit_log_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
      * GET getUserDocumentOverrides — Read per-user document access overrides.
      *
      * Action: `user_doc_overrides_get`
@@ -1044,7 +1096,7 @@ class AdminController extends BaseController
         $envEnabled = filter_var(getenv('AI_ENABLED') ?: 'false', FILTER_VALIDATE_BOOLEAN);
         $defaults = [
             'enabled'       => $envEnabled,
-            'model'         => getenv('ANTHROPIC_MODEL') ?: 'claude-sonnet-4-20250514',
+            'model'         => getenv('ANTHROPIC_MODEL') ?: 'claude-sonnet-4-6',
             'max_tokens'    => (int)(getenv('ANTHROPIC_MAX_TOKENS') ?: 4096),
             'timeout'       => (int)(getenv('ANTHROPIC_TIMEOUT') ?: 30),
             'cache_ttl'     => (int)(getenv('AI_CACHE_TTL') ?: 300),
@@ -1086,11 +1138,12 @@ class AdminController extends BaseController
 
         // Validate
         $allowed_models = [
+            'claude-opus-4-7', 'claude-sonnet-4-6', 'claude-haiku-4-5-20251001',
             'claude-opus-4-5', 'claude-sonnet-4-5', 'claude-haiku-3-5',
             'claude-opus-4-20250514', 'claude-sonnet-4-20250514', 'claude-haiku-3-20240307',
         ];
 
-        $model = (string)($body['model'] ?? 'claude-sonnet-4-20250514');
+        $model = (string)($body['model'] ?? 'claude-sonnet-4-6');
         if (!in_array($model, $allowed_models, true)) {
             $this->error('invalid_model', 400, 'Unknown model: ' . $model);
         }
@@ -1260,7 +1313,7 @@ class AdminController extends BaseController
         $raw  = curl_exec($ch);
         $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
         $err  = curl_error($ch);
-        curl_close($ch);
+        unset($ch); /* PHP 8.5: curl_close deprecated */
 
         if ($err) {
             $this->error('curl_error', 502, $err);

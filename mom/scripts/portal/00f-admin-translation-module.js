@@ -414,33 +414,107 @@ function wireRouting() {
 
   document.querySelectorAll('.tx-rule-delete').forEach(btn => {
     btn.addEventListener('click', () => {
-      if (!confirm(_t('Xóa rule này?', 'Delete this rule?'))) return;
-      const id = parseInt(btn.dataset.ruleId, 10);
-      api('DELETE', `/api/v1/dcc/admin/translation/routing/${id}`)
-        .then(() => { toast(_t('Đã xóa', 'Deleted')); loadAll(); })
-        .catch(err => alert(err.message));
+      if (btn.dataset.pending === '1') {
+        const id = parseInt(btn.dataset.ruleId, 10);
+        api('DELETE', `/api/v1/dcc/admin/translation/routing/${id}`)
+          .then(() => { toast(_t('Đã xóa', 'Deleted')); loadAll(); })
+          .catch(err => { toast('Error: ' + err.message); btn.disabled = false; });
+        return;
+      }
+      btn.dataset.pending = '1';
+      const orig = btn.textContent;
+      btn.textContent = _t('Xác nhận xóa?', 'Confirm delete?');
+      btn.style.cssText += ';color:var(--danger,#c00);font-weight:600;';
+      setTimeout(() => {
+        if (btn.dataset.pending === '1') {
+          delete btn.dataset.pending;
+          btn.textContent = orig;
+          btn.style.color = '';
+          btn.style.fontWeight = '';
+        }
+      }, 3000);
     });
   });
 
   const addBtn = document.getElementById('tx-rule-add');
   if (addBtn) {
-    addBtn.addEventListener('click', () => {
-      const scopeValue = prompt(_t('Nhập doc_code chính xác hoặc pattern (vd: qms-man-* hoặc QMS-MAN-001):', 'Enter exact doc_code or pattern (e.g. qms-man-* or QMS-MAN-001):'));
-      if (!scopeValue) return;
-      const scopeType = scopeValue.includes('*') ? 'doc_pattern' : 'doc_code';
-      const enabled = STATE.providers.filter(p => p.is_enabled);
-      const provider = prompt(_t('Provider key (vd nllb, claude_cli, codex_cli):', 'Provider key (e.g. nllb, claude_cli, codex_cli):'),
-        enabled[0] ? enabled[0].provider_key : '');
-      if (!provider) return;
-      const model = prompt(_t('Model (để trống nếu provider không có model):', 'Model (blank for providers without models):'), '') || null;
-      api('POST', '/api/v1/dcc/admin/translation/routing', {
-        scope_type: scopeType, scope_value: scopeValue,
-        primary_provider: provider, primary_model: model,
-        fallback_chain: [], is_enabled: true,
-      }).then(() => { toast(_t('Đã thêm', 'Added')); loadAll(); })
-        .catch(err => alert(err.message));
+    addBtn.addEventListener('click', () => openAddOverrideModal());
+  }
+}
+
+function openAddOverrideModal() {
+  const enabled = STATE.providers.filter(p => p.is_enabled);
+  let existing = document.getElementById('tx-add-override-modal');
+  if (existing) existing.remove();
+  const modal = document.createElement('div');
+  modal.id = 'tx-add-override-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:99999;display:flex;align-items:center;justify-content:center;';
+  modal.innerHTML = `<div style="background:var(--bg,#fff);border-radius:10px;padding:24px;max-width:500px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,.18);">
+    <header style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <h3 style="margin:0;font-size:15px;">${_t('Thêm override theo tài liệu / pattern', 'Add per-document / pattern override')}</h3>
+      <button id="tx-aom-close" style="background:none;border:0;font-size:22px;cursor:pointer;color:var(--text-3);">×</button>
+    </header>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div>
+        <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;">${_t('Doc code hoặc pattern', 'Doc code or pattern')} <span style="color:var(--text-3);font-weight:400;">(vd: QMS-MAN-001 hoặc qms-man-*)</span></label>
+        <input id="tx-aom-scope" type="text" placeholder="QMS-MAN-001"
+          style="width:100%;padding:8px 10px;border:1px solid var(--ln,#ddd);border-radius:5px;font-size:13px;box-sizing:border-box;">
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;">${_t('Provider', 'Provider')}</label>
+        <select id="tx-aom-provider" style="width:100%;padding:7px 8px;border:1px solid var(--ln,#ddd);border-radius:5px;font-size:13px;">
+          ${enabled.map(p => `<option value="${escapeHtml(p.provider_key)}">${escapeHtml(p.display_name)}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;">${_t('Model', 'Model')} <span style="color:var(--text-3);font-weight:400;">(${_t('để trống nếu không cần', 'blank if not needed')})</span></label>
+        <select id="tx-aom-model" style="width:100%;padding:7px 8px;border:1px solid var(--ln,#ddd);border-radius:5px;font-size:13px;">
+          ${enabled.length ? renderModelOptions(enabled[0].provider_key, '') : '<option value="">(no models)</option>'}
+        </select>
+      </div>
+      <div id="tx-aom-error" style="color:var(--danger,#c00);font-size:12px;min-height:16px;"></div>
+    </div>
+    <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:16px;">
+      <button id="tx-aom-cancel" style="padding:8px 16px;border:1px solid var(--ln,#ddd);background:var(--bg,#fff);border-radius:5px;cursor:pointer;font-size:13px;">${_t('Hủy', 'Cancel')}</button>
+      <button id="tx-aom-save" style="padding:8px 18px;background:var(--brand-primary,#0c63e7);color:#fff;border:0;border-radius:5px;cursor:pointer;font-size:13px;font-weight:600;">${_t('Thêm override', 'Add override')}</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+
+  const close = () => modal.remove();
+  document.getElementById('tx-aom-close').addEventListener('click', close);
+  document.getElementById('tx-aom-cancel').addEventListener('click', close);
+  modal.addEventListener('click', e => { if (e.target === modal) close(); });
+
+  const provSel = document.getElementById('tx-aom-provider');
+  const modelSel = document.getElementById('tx-aom-model');
+  if (provSel) {
+    provSel.addEventListener('change', () => {
+      if (modelSel) modelSel.innerHTML = renderModelOptions(provSel.value, '');
     });
   }
+
+  document.getElementById('tx-aom-save').addEventListener('click', () => {
+    const scopeValue = (document.getElementById('tx-aom-scope').value || '').trim();
+    const provider = provSel ? provSel.value : '';
+    const model = (modelSel && modelSel.value.trim()) || null;
+    const errEl = document.getElementById('tx-aom-error');
+    if (!scopeValue) { if (errEl) errEl.textContent = _t('Nhập doc_code hoặc pattern', 'Enter doc_code or pattern'); return; }
+    if (!provider) { if (errEl) errEl.textContent = _t('Chọn provider', 'Select provider'); return; }
+    if (errEl) errEl.textContent = '';
+    const saveBtn = document.getElementById('tx-aom-save');
+    saveBtn.disabled = true; saveBtn.textContent = '⟳ ' + _t('Đang lưu...', 'Saving...');
+    const scopeType = scopeValue.includes('*') ? 'doc_pattern' : 'doc_code';
+    api('POST', '/api/v1/dcc/admin/translation/routing', {
+      scope_type: scopeType, scope_value: scopeValue,
+      primary_provider: provider, primary_model: model,
+      fallback_chain: [], is_enabled: true,
+    }).then(() => { toast(_t('Đã thêm override', 'Override added')); close(); loadAll(); })
+      .catch(err => {
+        if (errEl) errEl.textContent = err.message;
+        saveBtn.disabled = false; saveBtn.textContent = _t('Thêm override', 'Add override');
+      });
+  });
 }
 
 // ── Tab 2: Providers ─────────────────────────────────────────────────────────
@@ -571,7 +645,7 @@ function wireProviders() {
     if (toggle) toggle.addEventListener('change', () => {
       api('PUT', `/api/v1/dcc/admin/translation/providers/${encodeURIComponent(key)}`, { is_enabled: toggle.checked })
         .then(() => { toast(_t('Đã cập nhật','Updated')); loadAll(); })
-        .catch(err => alert(err.message));
+        .catch(err => { toggle.checked = !toggle.checked; toast('Error: ' + err.message); });
     });
 
     const probe = card.querySelector('.tx-probe-cli');
@@ -579,7 +653,7 @@ function wireProviders() {
       probe.disabled = true; probe.textContent = '...';
       api('POST', `/api/v1/dcc/admin/translation/credentials/${encodeURIComponent(key)}/probe`)
         .then(d => { toast(`${key}: ${d.probe.status} — ${d.probe.message}`); loadAll(); })
-        .catch(err => alert(err.message))
+        .catch(err => toast('Error: ' + err.message))
         .finally(() => { probe.disabled = false; probe.textContent = _t('Probe','Probe'); });
     });
 
@@ -587,27 +661,46 @@ function wireProviders() {
     if (saveCli) saveCli.addEventListener('click', () => {
       const binary = card.querySelector('.tx-cli-binary').value.trim();
       const home = card.querySelector('.tx-cli-home').value.trim();
+      saveCli.disabled = true;
       api('PUT', `/api/v1/dcc/admin/translation/credentials/${encodeURIComponent(key)}`, {
         cli_binary_path: binary, cli_auth_home_path: home,
       }).then(() => { toast(_t('Đã lưu','Saved')); loadAll(); })
-        .catch(err => alert(err.message));
+        .catch(err => toast('Error: ' + err.message))
+        .finally(() => { saveCli.disabled = false; });
     });
 
     const saveKey = card.querySelector('.tx-save-key');
     if (saveKey) saveKey.addEventListener('click', () => {
       const apiKey = card.querySelector('.tx-api-key').value;
-      if (!apiKey) return alert(_t('Nhập API key','Enter API key'));
+      if (!apiKey) { toast(_t('Nhập API key','Enter API key')); return; }
+      saveKey.disabled = true;
       api('PUT', `/api/v1/dcc/admin/translation/credentials/${encodeURIComponent(key)}`, { api_key: apiKey })
         .then(d => { toast(`${_t('Đã lưu — fingerprint','Saved — fingerprint')}: ${d.fingerprint}`); loadAll(); })
-        .catch(err => alert(err.message));
+        .catch(err => toast('Error: ' + err.message))
+        .finally(() => { saveKey.disabled = false; });
     });
 
     const delKey = card.querySelector('.tx-delete-key');
     if (delKey) delKey.addEventListener('click', () => {
-      if (!confirm(_t('Xóa credential cho provider này?','Delete credential for this provider?'))) return;
-      api('DELETE', `/api/v1/dcc/admin/translation/credentials/${encodeURIComponent(key)}`)
-        .then(() => { toast(_t('Đã xóa','Deleted')); loadAll(); })
-        .catch(err => alert(err.message));
+      if (delKey.dataset.pending === '1') {
+        api('DELETE', `/api/v1/dcc/admin/translation/credentials/${encodeURIComponent(key)}`)
+          .then(() => { toast(_t('Đã xóa','Deleted')); loadAll(); })
+          .catch(err => toast('Error: ' + err.message));
+        return;
+      }
+      delKey.dataset.pending = '1';
+      const orig = delKey.textContent;
+      delKey.textContent = _t('Xác nhận xóa?','Confirm delete?');
+      delKey.style.background = 'var(--danger,#c00)';
+      delKey.style.color = '#fff';
+      setTimeout(() => {
+        if (delKey.dataset.pending === '1') {
+          delete delKey.dataset.pending;
+          delKey.textContent = orig;
+          delKey.style.background = '';
+          delKey.style.color = 'var(--danger,#c00)';
+        }
+      }, 3000);
     });
 
     const loginBtn = card.querySelector('.tx-cli-login');
@@ -615,10 +708,26 @@ function wireProviders() {
 
     const logoutBtn = card.querySelector('.tx-cli-logout');
     if (logoutBtn) logoutBtn.addEventListener('click', () => {
-      if (!confirm(_t('Đăng xuất CLI cho provider này? Sẽ phải đăng nhập lại để dùng.','Logout this CLI provider? You will need to connect again to use it.'))) return;
-      api('POST', `/api/v1/dcc/admin/translation/credentials/${encodeURIComponent(key)}/logout`)
-        .then(() => { toast(_t('Đã đăng xuất','Logged out')); loadAll(); })
-        .catch(err => alert(err.message));
+      if (logoutBtn.dataset.pending === '1') {
+        api('POST', `/api/v1/dcc/admin/translation/credentials/${encodeURIComponent(key)}/logout`)
+          .then(() => { toast(_t('Đã đăng xuất','Logged out')); loadAll(); })
+          .catch(err => toast('Error: ' + err.message));
+        return;
+      }
+      logoutBtn.dataset.pending = '1';
+      const orig = logoutBtn.textContent;
+      logoutBtn.textContent = _t('Xác nhận đăng xuất?','Confirm logout?');
+      logoutBtn.style.background = 'var(--danger,#c00)';
+      logoutBtn.style.color = '#fff';
+      logoutBtn.style.borderColor = 'var(--danger,#c00)';
+      setTimeout(() => {
+        if (logoutBtn.dataset.pending === '1') {
+          delete logoutBtn.dataset.pending;
+          logoutBtn.textContent = orig;
+          logoutBtn.style.background = '';
+          logoutBtn.style.color = 'var(--danger,#c00)';
+        }
+      }, 3000);
     });
   });
 }
@@ -705,14 +814,14 @@ function renderCliLoginModalBody(providerKey, session) {
     document.getElementById('tx-cli-submit-code').addEventListener('click', () => {
       const tokenInput = document.getElementById('tx-paste-code');
       const token = (tokenInput.value || '').trim();
-      if (!token) return alert(_t('Paste token trước','Paste the token first'));
+      if (!token) { toast(_t('Paste token trước','Paste the token first')); return; }
       const btn = document.getElementById('tx-cli-submit-code');
       btn.disabled = true; btn.textContent = '⟳ ' + _t('Đang xử lý...','Processing...');
       api('POST', `/api/v1/dcc/admin/translation/credentials/${encodeURIComponent(providerKey)}/login/complete`, {
         session_id: session.session_id, code: token,
       }).then(d => handleLoginResult(d.result, providerKey))
         .catch(err => {
-          alert(err.message);
+          toast('Error: ' + err.message);
           btn.disabled = false; btn.textContent = _t('Hoàn tất đăng nhập','Complete login');
         });
     });
@@ -812,7 +921,7 @@ function wireModels() {
       btn.disabled = true; btn.textContent = '...';
       api('POST', `/api/v1/dcc/admin/translation/models/${encodeURIComponent(key)}/refresh`)
         .then(d => { STATE.modelsByProvider[key] = d.models || []; render(); toast(_t('Đã refresh','Refreshed')); })
-        .catch(err => alert(err.message))
+        .catch(err => toast('Error: ' + err.message))
         .finally(() => { btn.disabled = false; btn.textContent = '↻ ' + _t('Refresh','Refresh'); });
     });
   });
@@ -900,12 +1009,10 @@ function wireTestBench() {
 
   const runBtn = document.getElementById('tx-test-run');
   if (runBtn) runBtn.addEventListener('click', () => {
-    if (!STATE.testInput.source_html.trim()) return alert(_t('Cần source','Source required'));
-    if (STATE.testInput.selectedProviders.length === 0) return alert(_t('Chọn ít nhất 1 provider','Select at least 1 provider'));
+    if (!STATE.testInput.source_html.trim()) { toast(_t('Cần paste nội dung nguồn','Source content required')); return; }
+    if (STATE.testInput.selectedProviders.length === 0) { toast(_t('Chọn ít nhất 1 provider','Select at least 1 provider')); return; }
     runBtn.disabled = true; runBtn.textContent = '⟳ ' + _t('Đang dịch...','Translating...');
     const providers = STATE.testInput.selectedProviders.map(pk => {
-      // Trust the per-test dropdown first; fall back to the routing rule's
-      // primary_model so the test mirrors what production would send.
       const model = STATE.testInput.modelByProvider[pk] || defaultModelForProvider(pk) || null;
       return { provider_key: pk, model };
     });
@@ -917,7 +1024,7 @@ function wireTestBench() {
     }).then(d => {
       STATE.testResults = d.results || [];
       render();
-    }).catch(err => alert(err.message))
+    }).catch(err => { toast('Error: ' + err.message); })
       .finally(() => { runBtn.disabled = false; runBtn.textContent = '▶ ' + _t('Chạy test','Run test'); });
   });
 }
@@ -1246,7 +1353,7 @@ function wireDocuments() {
         STATE.docExpandedOverride = null;
         STATE.documents = null;
         loadDocuments();
-      }).catch(err => { alert(err.message); btn.disabled = false; });
+      }).catch(err => { toast('Error: ' + err.message); btn.disabled = false; });
     });
   });
 

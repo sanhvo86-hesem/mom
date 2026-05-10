@@ -20,11 +20,13 @@ var _testing = false;
 
 /* ── Supported models ─────────────────────────────────────────── */
 var AI_MODELS = [
-  { id:'claude-opus-4-5',             label:'Claude Opus 4.5',             provider:'anthropic', tier:'premium',  ctx:200000 },
-  { id:'claude-sonnet-4-5',           label:'Claude Sonnet 4.5',           provider:'anthropic', tier:'balanced', ctx:200000 },
-  { id:'claude-haiku-3-5',            label:'Claude Haiku 3.5',            provider:'anthropic', tier:'fast',     ctx:200000 },
-  { id:'claude-opus-4-20250514',      label:'Claude Opus 4 (20250514)',     provider:'anthropic', tier:'premium',  ctx:200000 },
-  { id:'claude-sonnet-4-20250514',    label:'Claude Sonnet 4 (20250514)',   provider:'anthropic', tier:'balanced', ctx:200000 },
+  { id:'claude-opus-4-7',             label:'Claude Opus 4.7',             provider:'anthropic', tier:'premium',  ctx:200000 },
+  { id:'claude-sonnet-4-6',           label:'Claude Sonnet 4.6',           provider:'anthropic', tier:'balanced', ctx:200000 },
+  { id:'claude-haiku-4-5-20251001',   label:'Claude Haiku 4.5',            provider:'anthropic', tier:'fast',     ctx:200000 },
+  { id:'claude-opus-4-5',             label:'Claude Opus 4.5 (legacy)',     provider:'anthropic', tier:'premium',  ctx:200000 },
+  { id:'claude-sonnet-4-5',           label:'Claude Sonnet 4.5 (legacy)',   provider:'anthropic', tier:'balanced', ctx:200000 },
+  { id:'claude-sonnet-4-20250514',    label:'Claude Sonnet 4 (20250514, legacy)', provider:'anthropic', tier:'balanced', ctx:200000 },
+  { id:'claude-haiku-3-5',            label:'Claude Haiku 3.5 (legacy)',    provider:'anthropic', tier:'fast',     ctx:200000 },
   { id:'claude-haiku-3-20240307',     label:'Claude Haiku 3 (legacy)',      provider:'anthropic', tier:'fast',     ctx:200000 },
 ];
 
