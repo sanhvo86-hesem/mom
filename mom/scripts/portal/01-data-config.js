@@ -106,6 +106,8 @@ async function loadUsersFromServerIfAdmin(){
         org_site_id: String(u.org_site_id || ''),
         avatar: u.avatar || '👤',
         active: (u.active !== false),
+        // Flatten nested mfa.enabled into the flat boolean used by FE table/modal.
+        mfa_enabled: !!(u.mfa && u.mfa.enabled),
         // Keep pin empty: passwords are server-side only
         pin: ''
       }));

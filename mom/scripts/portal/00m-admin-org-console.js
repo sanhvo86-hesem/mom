@@ -13,7 +13,7 @@
  *
  *   Sơ đồ tổ chức (renderOrgChart):
  *     • Full SVG canvas (vector → perfect for SVG/PDF export)
- *     • Reingold-Tilford-style layered tree, supports TB / LR / Radial
+ *     • Reingold-Tilford-style layered tree, supports TB / LR
  *     • Pan with mouse drag, zoom with wheel (cursor-centred)
  *     • Drag node → drop on another node = reparent (PUT runtime)
  *     • Export: SVG, PNG, Print (browser → PDF), JSON snapshot
@@ -101,6 +101,206 @@
   }
   function lang(){ return UI.isEn() ? 'en' : 'vi'; }
 
+  /* Thin modal wrapper. AdminUI.openModal expects {bodyEl|bodyHtml, footerHtml}
+   * — we accept {body: domNode|string, buttons:[{label,variant,onClick}]} and
+   * wire up the footer buttons after the modal mounts.
+   *
+   * onClick contract: receives a `close` function. If onClick returns a Promise,
+   * the modal stays open until the promise resolves to a truthy value
+   * (auto-close). If onClick returns nothing/sync, behaviour is unchanged —
+   * caller must call close() themselves. */
+  function modal(opts){
+    var bodyEl = null, bodyHtml = '';
+    if (opts.body instanceof Element) bodyEl = opts.body;
+    else if (typeof opts.body === 'string') bodyHtml = opts.body;
+    var btns = opts.buttons || [];
+    var footerHtml = btns.map(function(b, i){
+      var cls = 'btn-admin' + (b.variant === 'primary' ? '' : ' secondary');
+      var style = '';
+      if (b.variant === 'primary') style = 'background:var(--brand-primary,#4f46e5);color:#fff;border-color:var(--brand-primary,#4f46e5)';
+      if (b.variant === 'danger')  style = 'background:var(--red-dark,#991b1b);color:#fff;border-color:var(--red-dark,#991b1b)';
+      return '<button class="'+cls+'" data-mb="'+i+'" type="button"'+(style?' style="'+style+'"':'')+'>'+esc(b.label||'')+'</button>';
+    }).join('');
+    var m = UI.openModal({
+      title: opts.title || '',
+      width: opts.width || '480px',
+      bodyEl: bodyEl,
+      bodyHtml: bodyHtml,
+      footerHtml: footerHtml
+    });
+    // Capture overlay+close locally so the close action does not depend on
+    // `m.close` lookup at click time (defensive against any prototype/this
+    // weirdness — directly close via DOM removal as a fallback).
+    var overlay = m.overlay;
+    var hardClose = function(){
+      try { m.close && m.close(); } catch(e){}
+      if (overlay && overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    };
+    btns.forEach(function(b, i){
+      var btn = m.card.querySelector('[data-mb="'+i+'"]');
+      if (!btn || typeof b.onClick !== 'function') return;
+      btn.addEventListener('click', function(ev){
+        ev.preventDefault();
+        try {
+          var ret = b.onClick(hardClose);
+          if (ret && typeof ret.then === 'function'){
+            ret.then(function(keep){ if (keep !== false) hardClose(); }, function(){ /* keep open on error */ });
+          }
+        } catch(e){
+          console.error('[admin-org] modal button error', e);
+          UI.toast(String(e && e.message || e), 'error');
+        }
+      });
+    });
+    return m;
+  }
+  /* Inline confirm (cannot use AdminUI.confirmDestructive — it has a race where
+   * modal.close() fires onClose → resolve(null) BEFORE resolve(result), so the
+   * promise always resolves to null even on confirm). Returns Promise<boolean>. */
+  function confirm(opts){
+    opts = opts || {};
+    return new Promise(function(resolve){
+      var body = document.createElement('div');
+      body.style.cssText = 'font-size:13px;color:var(--text-2);line-height:1.6';
+      body.textContent = opts.message || t('Are you sure?','Bạn có chắc chắn?');
+      var settled = false;
+      var settle = function(v){ if (settled) return; settled = true; resolve(v); };
+      var m = modal({
+        title: opts.title || t('Confirm action','Xác nhận thao tác'),
+        body: body,
+        width: '460px',
+        buttons: [
+          { label: t('Cancel','Hủy'),     variant:'secondary', onClick: function(close){ settle(false); close(); } },
+          { label: opts.confirmLabel || t('Confirm','Xác nhận'), variant: opts.danger === false ? 'primary' : 'danger', onClick: function(close){ settle(true);  close(); } }
+        ]
+      });
+      // If user dismisses via × or backdrop, treat as cancel.
+      m.overlay.addEventListener('click', function(ev){ if (ev.target === m.overlay) settle(false); });
+      m.card.querySelector('.adminui-modal-close').addEventListener('click', function(){ settle(false); });
+    });
+  }
+
+  /* Tolerant JSON parser. GenericCrudController sometimes appends a spurious
+   * {"ok":false,"error":"server_error"} body after a SUCCESSFUL create/update
+   * (a post-response shutdown handler in mom/api/index.php fires even though
+   * the real response was already echoed). Without tolerance, the second
+   * object makes JSON.parse choke and the success is lost. We accept the
+   * first complete top-level object/array and ignore the rest. */
+  function tolerantParseJson(text){
+    if (!text) return null;
+    text = String(text).replace(/^﻿/, '').replace(/^\s+/, '');
+    if (text[0] !== '{' && text[0] !== '[') return JSON.parse(text);
+    var depth = 0, inStr = false, esc = false;
+    for (var i = 0; i < text.length; i++){
+      var c = text[i];
+      if (esc) { esc = false; continue; }
+      if (c === '\\' && inStr) { esc = true; continue; }
+      if (c === '"') { inStr = !inStr; continue; }
+      if (inStr) continue;
+      if (c === '{' || c === '[') depth++;
+      else if (c === '}' || c === ']') {
+        depth--;
+        if (depth === 0) return JSON.parse(text.substring(0, i+1));
+      }
+    }
+    return JSON.parse(text);
+  }
+
+  /* Resilient mutation wrapper (POST/PUT/DELETE). Hand-rolled fetch so we can:
+   *   - tolerate the server's double-body bug via tolerantParseJson
+   *   - send X-CSRF-Token + If-Match (for optimistic concurrency)
+   *   - retry once on 409 conflict by re-fetching detail for fresh row_version
+   * Returns the parsed body (e.g. {ok:true, record:{…}}). */
+  function mutate(method, domain, table, id, payload, rowVersion){
+    var url = '/api/v1/runtime/'+encodeURIComponent(domain)+'/'+encodeURIComponent(table)
+      + (id ? ('/'+encodeURIComponent(id)) : '');
+    var headers = { 'Accept':'application/json', 'Content-Type':'application/json' };
+    var tok = window.csrfToken || (window.AppState && window.AppState.csrfToken);
+    if (tok) headers['X-CSRF-Token'] = tok;
+    if (rowVersion != null){
+      headers['If-Match'] = String(rowVersion);
+      if (payload && typeof payload === 'object' && payload.row_version == null) payload.row_version = rowVersion;
+    }
+    return fetch(url, {
+      method: method, credentials:'same-origin', cache:'no-store',
+      headers: headers, body: JSON.stringify(payload || {})
+    }).then(function(r){
+      return r.text().then(function(txt){
+        var body;
+        try { body = tolerantParseJson(txt); }
+        catch(e){ var pe = new Error('parse_failed'); pe.status = r.status; pe.raw = txt; throw pe; }
+        // Trust body.ok over HTTP status: the server's shutdown handler can
+        // emit a stray 500/server_error AFTER a successful 2xx body. The first
+        // (parsed) object is the truth.
+        var bodyOk = body && body.ok === true;
+        if (!bodyOk && (!r.ok || (body && body.ok === false))){
+          var msg = (body && body.error && (body.error.message || body.error)) || (body && body.message) || ('HTTP '+r.status);
+          var err = new Error(typeof msg === 'string' ? msg : JSON.stringify(msg));
+          err.status = r.status;
+          err.body = body;
+          throw err;
+        }
+        return body;
+      });
+    });
+  }
+  // Notify other admin tabs (Users tab in particular) that the org/HCM
+  // catalog changed so their cached dropdowns refresh on next render.
+  function notifyOrgChanged(){
+    try { window.dispatchEvent(new CustomEvent('admin:org:invalidated')); } catch(_){}
+  }
+
+  function safeCreate(domain, table, payload){
+    return mutate('POST', domain, table, null, payload, null).then(function(r){ notifyOrgChanged(); return r; });
+  }
+  function safeUpdate(domain, table, id, payload, currentRv){
+    return mutate('PUT', domain, table, id, payload, currentRv).catch(function(err){
+      if (err && err.status === 409 && err.body && (err.body.error === 'conflict' || err.body.error === 'stale_row_version')){
+        return UI.runtime.get(domain, table, id).then(function(detail){
+          var freshRv = detail && detail.record && detail.record.row_version;
+          if (freshRv == null) throw err;
+          return mutate('PUT', domain, table, id, payload, freshRv);
+        });
+      }
+      throw err;
+    }).then(function(r){ notifyOrgChanged(); return r; });
+  }
+  /* Status transitions go through a dedicated endpoint, not generic update —
+   * `status` is a controlled column. POST /…/{id}/transition with body {to}. */
+  function safeTransition(domain, table, id, toStatus, currentRv){
+    var url = '/api/v1/runtime/'+encodeURIComponent(domain)+'/'+encodeURIComponent(table)+'/'+encodeURIComponent(id)+'/transition';
+    var headers = { 'Accept':'application/json', 'Content-Type':'application/json' };
+    var tok = window.csrfToken || (window.AppState && window.AppState.csrfToken);
+    if (tok) headers['X-CSRF-Token'] = tok;
+    if (currentRv != null) headers['If-Match'] = String(currentRv);
+    return fetch(url, {
+      method:'POST', credentials:'same-origin', cache:'no-store',
+      headers: headers, body: JSON.stringify({ to: toStatus, row_version: currentRv })
+    }).then(function(r){
+      return r.text().then(function(txt){
+        var body;
+        try { body = tolerantParseJson(txt); }
+        catch(e){ var pe = new Error('parse_failed'); pe.status = r.status; pe.raw = txt; throw pe; }
+        var bodyOk = body && body.ok === true;
+        if (!bodyOk && (!r.ok || (body && body.ok === false))){
+          var msg = (body && body.error && (body.error.message || body.error)) || ('HTTP '+r.status);
+          var err = new Error(typeof msg === 'string' ? msg : JSON.stringify(msg));
+          err.status = r.status; err.body = body; throw err;
+        }
+        return body;
+      });
+    }).catch(function(err){
+      if (err && err.status === 409 && err.body && (err.body.error === 'conflict' || err.body.error === 'stale_row_version')){
+        return UI.runtime.get(domain, table, id).then(function(detail){
+          var freshRv = detail && detail.record && detail.record.row_version;
+          if (freshRv == null) throw err;
+          return safeTransition(domain, table, id, toStatus, freshRv);
+        });
+      }
+      throw err;
+    }).then(function(r){ notifyOrgChanged(); return r; });
+  }
+
   /* ──────────────────────────────────────────────────────────────────────── *
    * Shared state
    * ──────────────────────────────────────────────────────────────────────── */
@@ -111,10 +311,8 @@
     filter: { search:'', type:'all', status:'active' },
     chart: {
       mode:'units',          // 'units' | 'positions'
-      layout:'TB',           // 'TB' | 'LR' | 'RADIAL'
-      zoom:1, panX:0, panY:0,
-      locked:false,
-      showLegend:true
+      layout:'TB',           // 'TB' | 'LR'
+      zoom:1, panX:0, panY:0
     }
   };
 
@@ -162,10 +360,26 @@
     if (S.loading) return S._loadingPromise || Promise.resolve();
     if (S.loaded && !force) return Promise.resolve();
     S.loading = true; S.error = '';
+    // Cache-bust with _t param + no-store fetch — runtime list responses are
+    // cached by upstream layers (browser HTTP cache + possible CDN) and serve
+    // stale row_version, which causes 409 conflict on save.
+    var _t = Date.now();
+    var noCache = { cache:'no-store', headers:{'Cache-Control':'no-cache, no-store, max-age=0','Pragma':'no-cache'} };
+    function freshList(table, params){
+      var url = '/api/v1/runtime/hcm_workforce/'+encodeURIComponent(table)+
+        '?'+Object.keys(params).filter(function(k){return params[k]!=null && params[k]!=='';})
+            .map(function(k){return encodeURIComponent(k)+'='+encodeURIComponent(params[k]);}).join('&');
+      return UI.fetchJson(url, noCache).then(function(r){
+        return Array.isArray(r) ? {data:r,total:r.length,raw:r}
+             : (r && Array.isArray(r.records)) ? {data:r.records,total:r.total!=null?r.total:r.records.length,raw:r}
+             : (r && Array.isArray(r.data))    ? {data:r.data,total:r.total!=null?r.total:r.data.length,raw:r}
+             : {data:[],total:0,raw:r};
+      });
+    }
     var p = Promise.all([
-      UI.runtime.list('hcm_workforce','hcm_org_units', {limit:500, sort:'org_unit_code', direction:'asc'}),
-      UI.runtime.list('hcm_workforce','hcm_positions', {limit:500, sort:'position_code', direction:'asc'}),
-      UI.runtime.list('hcm_workforce','hcm_employees', {limit:500, sort:'employee_id',   direction:'asc'})
+      freshList('hcm_org_units', {limit:500, sort:'org_unit_code', direction:'asc', _t:_t}),
+      freshList('hcm_positions', {limit:500, sort:'position_code', direction:'asc', _t:_t}),
+      freshList('hcm_employees', {limit:500, sort:'employee_id',   direction:'asc', _t:_t})
     ]).then(function(results){
       S.units     = (results[0] && results[0].data) || [];
       S.positions = (results[1] && results[1].data) || [];
@@ -257,21 +471,23 @@
       + '.org-canvas-toolbar{position:absolute;top:10px;left:10px;right:10px;z-index:5;display:flex;flex-wrap:wrap;gap:8px;align-items:center;pointer-events:none}'
       + '.org-canvas-toolbar > *{pointer-events:auto}'
       + '.org-canvas-tools{display:flex;gap:6px;padding:6px 8px;border:1px solid var(--border-1,#e5e7eb);border-radius:10px;background:var(--surface-1,#fff);box-shadow:0 2px 8px rgba(15,23,42,.06)}'
-      + '.org-canvas-svg{width:100%;height:100%;display:block;cursor:grab;background:var(--surface-1,#fff)}'
+      + '.org-canvas-svg{width:100%;height:100%;display:block;cursor:grab;background:var(--surface-1,#fff);user-select:none;-webkit-user-select:none}'
       + '.org-canvas-svg.is-panning{cursor:grabbing}'
       + '.org-canvas-svg.is-dragging-node{cursor:move}'
+      + '.org-canvas-svg [data-node-id]{user-select:none;-webkit-user-select:none}'
       + '.org-grid-bg{fill:var(--surface-2,#f9fafb);stroke:var(--border-1,#e5e7eb);stroke-width:.5}'
       + '.org-node-rect{fill:var(--surface-1,#fff);stroke:var(--border-1,#e5e7eb);stroke-width:1.2;rx:14;ry:14;transition:filter .15s}'
       + '.org-node-rect.is-hover{filter:drop-shadow(0 2px 8px rgba(15,23,42,.18))}'
       + '.org-node-rect.is-selected{stroke:var(--brand-primary,#4f46e5);stroke-width:2.4}'
       + '.org-node-rect.is-drop-target{stroke:#10b981;stroke-width:3;stroke-dasharray:6 3}'
+      + '.org-node-rect.is-drop-illegal{stroke:#ef4444;stroke-width:3;stroke-dasharray:6 3}'
       + '.org-node-band{rx:0;ry:0}'
       + '.org-node-title{font-family:inherit;font-weight:800;fill:var(--text-1)}'
       + '.org-node-sub{font-family:inherit;fill:var(--text-3);font-size:10.5px}'
       + '.org-node-code{font-family:ui-monospace,monospace;fill:var(--text-3);font-size:9.5px}'
       + '.org-node-icon{font-size:18px}'
-      + '.org-edge{fill:none;stroke:var(--text-3);stroke-width:1.4;opacity:.65}'
-      + '.org-edge.is-highlight{stroke:var(--brand-primary,#4f46e5);stroke-width:2;opacity:1}'
+      + '.org-edge{fill:none;stroke:#64748b;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.85}'
+      + '.org-edge.is-highlight{stroke:var(--brand-primary,#4f46e5);stroke-width:2.4;opacity:1}'
       + '.org-legend{position:absolute;bottom:10px;left:10px;padding:10px 12px;border:1px solid var(--border-1,#e5e7eb);border-radius:10px;background:var(--surface-1,#fff);font-size:11px;display:flex;flex-direction:column;gap:5px;z-index:5;box-shadow:0 2px 8px rgba(15,23,42,.06);max-width:200px}'
       + '.org-legend-row{display:flex;align-items:center;gap:8px}'
       + '.org-legend-swatch{width:14px;height:14px;border-radius:3px}'
@@ -748,9 +964,27 @@
           }).join('')
       + '</select></div>'
       + '<div class="org-form-row"><label>'+esc(t('Cost center','Mã chi phí'))+'</label><input data-f="cost_center" value="'+esc(existing ? (existing.cost_center||'') : '')+'" placeholder="CC-001"></div>'
-      + '<div class="org-form-row"><label>'+esc(t('Manager (employee_id)','Trưởng đơn vị (employee_id)'))+'</label><input data-f="manager_employee_id" value="'+esc(existing ? (existing.manager_employee_id||'') : '')+'" placeholder="EMP-0001"></div>'
+      + (function(){
+          var currentMgr = existing ? (existing.manager_employee_id||'') : '';
+          // Build a real dropdown sourced from hcm_employees so the admin picks an
+          // existing employee instead of typing an ID by hand.
+          var opts = '<option value="">— '+esc(t('(none)','(không có)'))+' —</option>'
+            + (S.employees||[]).map(function(emp){
+                var name = emp.full_name || emp.preferred_name || emp.given_name || emp.hcm_employee_id || '';
+                var sel = currentMgr && (emp.hcm_employee_id === currentMgr || emp.employee_id === currentMgr);
+                var val = emp.hcm_employee_id || emp.employee_id || '';
+                if (!val) return '';
+                return '<option value="'+esc(val)+'"'+(sel?' selected':'')+'>'+esc(name)+' ('+esc(val)+')</option>';
+              }).filter(Boolean).join('');
+          // If the saved manager is not in the employees list (legacy/imported data),
+          // append it so we don't lose the existing reference on save.
+          if (currentMgr && (S.employees||[]).every(function(e){ return e.hcm_employee_id !== currentMgr && e.employee_id !== currentMgr; })){
+            opts += '<option value="'+esc(currentMgr)+'" selected>'+esc(currentMgr)+' ('+esc(t('legacy','di sản'))+')</option>';
+          }
+          return '<div class="org-form-row"><label>'+esc(t('Manager','Trưởng đơn vị'))+'</label><select data-f="manager_employee_id">'+opts+'</select></div>';
+        })()
       ;
-    UI.openModal({
+    modal({
       title: existing ? t('Edit unit','Sửa đơn vị') : t('Create unit','Tạo đơn vị'),
       body: body,
       width: '480px',
@@ -770,9 +1004,12 @@
               UI.toast(t('Code and name are required','Mã và tên không được để trống'),'error');
               return;
             }
+            // Always use the freshest row_version from state in case the
+            // background cache invalidated between modal-open and click.
+            var current = existing ? (S.byUnitId[existing.hcm_org_unit_id] || existing) : null;
             var op = existing
-              ? UI.runtime.update('hcm_workforce','hcm_org_units', existing.hcm_org_unit_id, payload, existing.row_version)
-              : UI.runtime.create('hcm_workforce','hcm_org_units', payload);
+              ? safeUpdate('hcm_workforce','hcm_org_units', existing.hcm_org_unit_id, payload, current.row_version)
+              : safeCreate('hcm_workforce','hcm_org_units', payload);
             op.then(function(res){
               UI.toast(existing?t('Unit saved','Đã lưu đơn vị'):t('Unit created','Đã tạo đơn vị'),'success');
               close();
@@ -819,7 +1056,7 @@
       + '</div>'
       + '<div class="org-form-row"><label>'+esc(t('Grade code','Bậc'))+'</label><input data-f="grade_code" value="'+esc(existing ? (existing.grade_code||'') : '')+'" placeholder="GR-05"></div>'
       ;
-    UI.openModal({
+    modal({
       title: existing ? t('Edit position','Sửa vị trí') : t('Create position','Tạo vị trí'),
       body: body,
       width: '500px',
@@ -841,8 +1078,8 @@
               return;
             }
             var op = existing
-              ? UI.runtime.update('hcm_workforce','hcm_positions', existing.hcm_position_id, payload, existing.row_version)
-              : UI.runtime.create('hcm_workforce','hcm_positions', payload);
+              ? safeUpdate('hcm_workforce','hcm_positions', existing.hcm_position_id, payload, existing.row_version)
+              : safeCreate('hcm_workforce','hcm_positions', payload);
             op.then(function(res){
               UI.toast(existing?t('Position saved','Đã lưu vị trí'):t('Position created','Đã tạo vị trí'),'success');
               close();
@@ -870,7 +1107,7 @@
           }).join('')
       + '</div>'
       ;
-    UI.openModal({
+    modal({
       title: t('Unit color','Màu đơn vị'),
       body: body,
       width: '380px',
@@ -880,7 +1117,7 @@
             var sel = body.querySelector('.org-color-swatch.is-selected');
             var color = sel ? sel.getAttribute('data-color') : current;
             var nextMeta = Object.assign({}, safeJson(u.metadata), { color: color });
-            UI.runtime.update('hcm_workforce','hcm_org_units', u.hcm_org_unit_id, { metadata: nextMeta }, u.row_version)
+            safeUpdate('hcm_workforce','hcm_org_units', u.hcm_org_unit_id, { metadata: nextMeta }, u.row_version)
               .then(function(){
                 UI.toast(t('Color saved','Đã lưu màu'),'success');
                 close();
@@ -916,7 +1153,7 @@
             return '<option value="'+esc(x.hcm_org_unit_id)+'"'+(sel?' selected':'')+'>'+typeMeta(x.org_unit_type).icon+' '+esc(x.org_unit_name||x.org_unit_code||'?')+' ('+esc(x.org_unit_code||'')+')</option>';
           }).join('')
       + '</select></div>';
-    UI.openModal({
+    modal({
       title: t('Reparent unit','Chuyển đơn vị cha'),
       body: body,
       width: '420px',
@@ -925,7 +1162,7 @@
         { label: t('Move','Chuyển'), variant:'primary', onClick:function(close){
             var sel = body.querySelector('[data-f="parent"]');
             var newParent = sel ? sel.value : null;
-            UI.runtime.update('hcm_workforce','hcm_org_units', u.hcm_org_unit_id, { parent_org_unit_id: newParent || null }, u.row_version)
+            safeUpdate('hcm_workforce','hcm_org_units', u.hcm_org_unit_id, { parent_org_unit_id: newParent || null }, u.row_version)
               .then(function(){
                 UI.toast(t('Unit moved','Đã chuyển đơn vị'),'success');
                 close();
@@ -946,7 +1183,7 @@
             return '<option value="'+esc(x.hcm_org_unit_id)+'"'+(sel?' selected':'')+'>'+typeMeta(x.org_unit_type).icon+' '+esc(x.org_unit_name||x.org_unit_code||'?')+' ('+esc(x.org_unit_code||'')+')</option>';
           }).join('')
       + '</select></div>';
-    UI.openModal({
+    modal({
       title: t('Move position','Chuyển vị trí'),
       body: body,
       width: '420px',
@@ -956,7 +1193,7 @@
             var sel = body.querySelector('[data-f="unit"]');
             var newUnit = sel ? sel.value : null;
             if (!newUnit) return;
-            UI.runtime.update('hcm_workforce','hcm_positions', p.hcm_position_id, { hcm_org_unit_id: newUnit }, p.row_version)
+            safeUpdate('hcm_workforce','hcm_positions', p.hcm_position_id, { hcm_org_unit_id: newUnit }, p.row_version)
               .then(function(){
                 UI.toast(t('Position moved','Đã chuyển vị trí'),'success');
                 close();
@@ -970,109 +1207,123 @@
   function toggleUnit(unitId, host){
     var u = S.byUnitId[unitId]; if (!u) return;
     var willInactivate = String(u.status||'active') !== 'inactive';
-    UI.confirmDestructive({
+    confirm({
       title: willInactivate ? t('Archive unit?','Ngừng dùng đơn vị?') : t('Activate unit?','Kích hoạt đơn vị?'),
       message: willInactivate
         ? t('Existing positions and employees keep their links. Archived units are hidden from the active filter but can be restored.','Vị trí và nhân sự liên quan vẫn giữ liên kết. Đơn vị ngừng dùng sẽ bị ẩn khỏi bộ lọc Đang hoạt động nhưng có thể khôi phục.')
         : t('Make this unit visible in the active list again.','Đưa đơn vị này trở lại danh sách hoạt động.'),
-      confirmLabel: willInactivate ? t('Archive','Ngừng dùng') : t('Activate','Kích hoạt'),
-      onConfirm: function(){
-        UI.runtime.update('hcm_workforce','hcm_org_units', u.hcm_org_unit_id, { status: willInactivate ? 'inactive' : 'active' }, u.row_version)
-          .then(function(){
-            UI.toast(t('Saved','Đã lưu'),'success');
-            loadAll(true).then(function(){ renderOrgUnits(host); });
-          }).catch(function(err){ UI.toast(err && err.message || 'save_failed','error'); });
-      }
+      confirmLabel: willInactivate ? t('Archive','Ngừng dùng') : t('Activate','Kích hoạt')
+    }).then(function(ok){
+      if (!ok) return;
+      safeTransition('hcm_workforce','hcm_org_units', u.hcm_org_unit_id, willInactivate ? 'inactive' : 'active', u.row_version)
+        .then(function(){
+          UI.toast(t('Saved','Đã lưu'),'success');
+          loadAll(true).then(function(){ renderOrgUnits(host); });
+        }).catch(function(err){ UI.toast(err && err.message || 'save_failed','error'); });
     });
   }
 
   function togglePosition(posId, host){
     var p = S.byPositionId[posId]; if (!p) return;
     var willInactivate = String(p.status||'active') !== 'inactive';
-    UI.confirmDestructive({
+    confirm({
       title: willInactivate ? t('Archive position?','Ngừng dùng vị trí?') : t('Activate position?','Kích hoạt vị trí?'),
       message: t('Status changes are audited.','Thay đổi trạng thái được ghi audit.'),
-      confirmLabel: willInactivate ? t('Archive','Ngừng dùng') : t('Activate','Kích hoạt'),
-      onConfirm: function(){
-        UI.runtime.update('hcm_workforce','hcm_positions', p.hcm_position_id, { status: willInactivate ? 'inactive' : 'active' }, p.row_version)
-          .then(function(){
-            UI.toast(t('Saved','Đã lưu'),'success');
-            loadAll(true).then(function(){ renderOrgUnits(host); });
-          }).catch(function(err){ UI.toast(err && err.message || 'save_failed','error'); });
-      }
+      confirmLabel: willInactivate ? t('Archive','Ngừng dùng') : t('Activate','Kích hoạt')
+    }).then(function(ok){
+      if (!ok) return;
+      safeTransition('hcm_workforce','hcm_positions', p.hcm_position_id, willInactivate ? 'inactive' : 'active', p.row_version)
+        .then(function(){
+          UI.toast(t('Saved','Đã lưu'),'success');
+          loadAll(true).then(function(){ renderOrgUnits(host); });
+        }).catch(function(err){ UI.toast(err && err.message || 'save_failed','error'); });
     });
   }
 
   /* ──────────────────────────────────────────────────────────────────────── *
    * Sơ đồ tổ chức — SVG canvas
    * ──────────────────────────────────────────────────────────────────────── */
-  // Reingold-Tilford-style layered tree layout. Returns a map nodeId → {x,y,w,h}.
+  // Layered tree layout (Walker-style: bottom-up subtree-width, top-down
+  // absolute placement). Returns map nodeId → {x,y,w,h,depth}.
   // Layout direction: 'TB' (top-bottom) or 'LR' (left-right).
   function layoutTree(rootIds, getChildren, getDimensions, dir){
     dir = dir || 'TB';
-    var H_GAP = 28, V_GAP = 60;
-    var positions = {};
-    var idx = {};
+    var H_GAP = 32;            // sibling gap (horizontal in TB)
+    var ROW_GAP = 70;          // vertical gap between depth levels in TB
+    // We use the FIRST root's dims as a row-height baseline; each layer is
+    // dim.h + ROW_GAP. Mixing wildly-different sizes is uncommon for orgs.
+    var firstDims = rootIds.length ? getDimensions(rootIds[0]) : {w:200, h:130};
+    var ROW_HEIGHT = firstDims.h + ROW_GAP;
+    var COL_WIDTH  = firstDims.w + 90; // for LR: each depth is one "column"
 
-    function compute(id, depth){
-      var dims = getDimensions(id);
-      var children = getChildren(id);
-      var node = { id:id, depth:depth, w:dims.w, h:dims.h, children:children.map(function(c){ return compute(c, depth+1); }) };
-      idx[id] = node;
-      if (!node.children.length){
-        node.x = 0;
-        node.subWidth = node.w;
-      } else {
-        var cursor = 0;
-        node.children.forEach(function(c){
-          c.x += cursor;
-          shift(c, c.x);
-          cursor += c.subWidth + H_GAP;
-        });
-        var first = node.children[0], last = node.children[node.children.length-1];
-        var center = ((first.x) + (last.x + last.w)) / 2;
-        node.x = center - node.w/2;
-        node.subWidth = Math.max(node.w, cursor - H_GAP);
+    // Step 1 — build nodes & compute each subtree's required width (bottom-up).
+    // Defensive: track visited ids to break any accidental cycle in the
+    // parent/reports-to graph. A cycle would otherwise blow the stack and
+    // freeze the page (this manifested as "treo" when switching to Vị trí
+    // mode if a position pointed reports_to_position_id back to an ancestor).
+    var visited = new Set();
+    function build(id, depth){
+      if (visited.has(id) || depth > 32){
+        // skip — already placed in another branch, or guard against pathological depth
+        return null;
       }
-      return node;
-    }
-    function shift(n, dx){
-      n.children.forEach(function(c){ c.x += 0; }); // child already absolute via cursor
-    }
-    function assignY(n){
-      n.y = n.depth * (160 + V_GAP);
-      n.children.forEach(assignY);
-    }
-    function flatten(n){
-      positions[n.id] = { x:n.x, y:n.y, w:n.w, h:n.h, depth:n.depth };
-      n.children.forEach(flatten);
+      visited.add(id);
+      var d = getDimensions(id);
+      var n = { id:id, depth:depth, w:d.w, h:d.h, children:[], subW:d.w };
+      n.children = (getChildren(id) || [])
+        .map(function(cid){ return build(cid, depth+1); })
+        .filter(function(c){ return c !== null; });
+      if (n.children.length){
+        var total = 0;
+        n.children.forEach(function(c, i){ if (i>0) total += H_GAP; total += c.subW; });
+        n.subW = Math.max(n.w, total);
+      }
+      return n;
     }
 
-    // Forest: lay out each root, then offset roots horizontally
-    var trees = rootIds.map(function(r){ return compute(r, 0); });
-    trees.forEach(assignY);
+    // Step 2 — assign absolute x by walking left→right; parent centered on its
+    // children's bounding span. Cursor parameter is the leftmost x for this
+    // subtree.
+    var positions = {};
+    function place(n, cursorX){
+      if (!n.children.length){
+        n.x = cursorX + (n.subW - n.w) / 2;
+      } else {
+        var x = cursorX;
+        var firstCx, lastCx;
+        n.children.forEach(function(c, i){
+          if (i > 0) x += H_GAP;
+          place(c, x);
+          var cCx = c.x + c.w / 2;
+          if (i === 0) firstCx = cCx;
+          lastCx = cCx;
+          x += c.subW;
+        });
+        var centerX = (firstCx + lastCx) / 2;
+        n.x = centerX - n.w / 2;
+      }
+      n.y = n.depth * ROW_HEIGHT;
+      positions[n.id] = { x:n.x, y:n.y, w:n.w, h:n.h, depth:n.depth };
+    }
+
+    // Step 3 — lay out the forest. Roots placed side-by-side with double gap.
+    var trees = rootIds.map(function(r){ return build(r, 0); }).filter(function(t){ return t !== null; });
     var cursor = 0;
     trees.forEach(function(tree){
-      shiftSubtree(tree, cursor);
-      cursor += tree.subWidth + H_GAP * 2;
+      place(tree, cursor);
+      cursor += tree.subW + H_GAP * 2;
     });
-    trees.forEach(flatten);
 
-    // If LR, swap x/y (and flip width/height as visual delta)
+    // Step 4 — for LR, project onto columns (depth → x) and rows (original x → y)
     if (dir === 'LR'){
       var swapped = {};
       Object.keys(positions).forEach(function(k){
         var p = positions[k];
-        swapped[k] = { x: p.y, y: p.x, w: p.w, h: p.h, depth: p.depth };
+        swapped[k] = { x: p.depth * COL_WIDTH, y: p.x * 0.55, w: p.w, h: p.h, depth: p.depth };
       });
       positions = swapped;
     }
     return positions;
-
-    function shiftSubtree(n, dx){
-      n.x += dx;
-      n.children.forEach(function(c){ shiftSubtree(c, dx); });
-    }
   }
 
   function renderOrgChart(host){
@@ -1087,6 +1338,10 @@
       host.innerHTML = UI.errorHtml(S.error, function(){ S.loaded=false; renderOrgChart(host); });
       return;
     }
+    // Detach window pan listeners from the previous SVG before innerHTML wipes
+    // it (otherwise stale closures accumulate and slow the page over time).
+    var prevSvg = host.querySelector('[data-canvas-svg]');
+    if (prevSvg && typeof prevSvg._panCleanup === 'function') prevSvg._panCleanup();
 
     host.innerHTML = ''
       + '<div class="org-console">'
@@ -1132,29 +1387,37 @@
       +   '</div>'
       + '</div>';
 
-    bindOrgChartEvents(host);
+    bindOrgChartHostEvents(host);
+    bindOrgChartSvgEvents(host);
     drawOrgChart(host);
   }
 
-  function bindOrgChartEvents(host){
-    if (host._chartBound) return;
-    host._chartBound = true;
-    var canvasWrap = host.querySelector('[data-canvas-wrap]');
-    var svg = host.querySelector('[data-canvas-svg]');
-    var zoomDisplay = host.querySelector('[data-zoom-display]');
-
+  /* Toolbar/button click delegation on the panel — bound ONCE. Looks up the
+   * current SVG via querySelector at click time so the handlers always operate
+   * on the live DOM (the SVG element gets recreated on every renderOrgChart). */
+  function bindOrgChartHostEvents(host){
+    if (host._chartHostBound) return;
+    host._chartHostBound = true;
     host.addEventListener('click', function(ev){
       var dropdown = host.querySelector('[data-export-dropdown]');
       var menu = host.querySelector('[data-export-menu]');
       if (menu && !menu.contains(ev.target) && dropdown){ dropdown.style.display = 'none'; }
 
       var el = ev.target.closest('[data-act]'); if (!el) return;
+      var svg = host.querySelector('[data-canvas-svg]');
+      var canvasWrap = host.querySelector('[data-canvas-wrap]');
+      var zoomDisplay = host.querySelector('[data-zoom-display]');
       var act = el.getAttribute('data-act');
       if (act === 'chart-mode'){
         S.chart.mode = el.getAttribute('data-val');
+        // Reset transform so the new mode auto-fits — the previous mode's
+        // pan/zoom is sized for a different node count and hierarchy depth,
+        // leaving the new chart partly off-screen (looks like the page froze).
+        S.chart.zoom = 1; S.chart.panX = 0; S.chart.panY = 0;
         renderOrgChart(host);
       } else if (act === 'chart-layout'){
         S.chart.layout = el.getAttribute('data-val');
+        S.chart.zoom = 1; S.chart.panX = 0; S.chart.panY = 0;
         renderOrgChart(host);
       } else if (act === 'chart-zoom'){
         var v = parseInt(el.getAttribute('data-val'),10);
@@ -1174,33 +1437,55 @@
         exportChart(svg, fmt);
       }
     });
+  }
 
-    // Pan + zoom on the SVG itself
+  /* Pan + wheel-zoom on the SVG itself — bound EVERY render because the SVG
+   * element is recreated by renderOrgChart's innerHTML rewrite. Without this
+   * re-bind, switching modes/layouts left pan/zoom dead and the chart felt
+   * frozen ("bị treo") on interaction. */
+  function bindOrgChartSvgEvents(host){
+    var svg = host.querySelector('[data-canvas-svg]');
+    if (!svg || svg._svgBound) return;
+    svg._svgBound = true;
+    var zoomDisplay = host.querySelector('[data-zoom-display]');
     var panning = false, panStart = null;
+
     svg.addEventListener('mousedown', function(ev){
-      // ignore drag-on-node (handled in node mousedown)
-      if (ev.target.closest('[data-node-id]')) return;
+      if (ev.target.closest('[data-node-id]')) return; // node has its own drag handler
       panning = true;
       panStart = { x: ev.clientX, y: ev.clientY, panX: S.chart.panX, panY: S.chart.panY };
       svg.classList.add('is-panning');
       ev.preventDefault();
     });
-    window.addEventListener('mousemove', function(ev){
+
+    function onPanMove(ev){
       if (!panning) return;
       S.chart.panX = panStart.panX + (ev.clientX - panStart.x);
       S.chart.panY = panStart.panY + (ev.clientY - panStart.y);
       applyTransform(svg, zoomDisplay);
-    });
-    window.addEventListener('mouseup', function(){
-      if (panning){ panning = false; svg.classList.remove('is-panning'); }
-    });
+    }
+    function onPanUp(){
+      if (panning){
+        panning = false;
+        svg.classList.remove('is-panning');
+      }
+    }
+    // Window listeners survive SVG replacement; tracked on the SVG so that if
+    // a stale SVG is gc'd its closures are also cleared by removeEventListener
+    // on the next render's cleanup hook below.
+    window.addEventListener('mousemove', onPanMove);
+    window.addEventListener('mouseup', onPanUp);
+    svg._panCleanup = function(){
+      window.removeEventListener('mousemove', onPanMove);
+      window.removeEventListener('mouseup', onPanUp);
+    };
+
     svg.addEventListener('wheel', function(ev){
       ev.preventDefault();
       var rect = svg.getBoundingClientRect();
       var cx = ev.clientX - rect.left, cy = ev.clientY - rect.top;
       var delta = ev.deltaY < 0 ? 1.12 : 1/1.12;
       var nextZoom = Math.max(0.2, Math.min(3, S.chart.zoom * delta));
-      // Zoom toward cursor
       var ratio = nextZoom / S.chart.zoom;
       S.chart.panX = cx - (cx - S.chart.panX) * ratio;
       S.chart.panY = cy - (cy - S.chart.panY) * ratio;
@@ -1237,9 +1522,19 @@
     while (svg.firstChild) svg.removeChild(svg.firstChild);
     var SVG_NS = 'http://www.w3.org/2000/svg';
     var defs = document.createElementNS(SVG_NS, 'defs');
-    defs.innerHTML = '<pattern id="org-grid" width="24" height="24" patternUnits="userSpaceOnUse">'
-      + '<path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(120,120,120,.06)" stroke-width="1"/>'
-      + '</pattern>';
+    // Grid pattern + arrow markers (open & filled). Markers are referenced by
+    // edge paths via marker-end="url(#org-arrow)" to draw professional
+    // parent → child arrowheads typical of corporate org charts.
+    defs.innerHTML = ''
+      + '<pattern id="org-grid" width="24" height="24" patternUnits="userSpaceOnUse">'
+      +   '<path d="M 24 0 L 0 0 0 24" fill="none" stroke="rgba(120,120,120,.06)" stroke-width="1"/>'
+      + '</pattern>'
+      + '<marker id="org-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse">'
+      +   '<path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>'
+      + '</marker>'
+      + '<marker id="org-arrow-hi" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse">'
+      +   '<path d="M 0 0 L 10 5 L 0 10 z" fill="var(--brand-primary,#4f46e5)"/>'
+      + '</marker>';
     svg.appendChild(defs);
     var bg = document.createElementNS(SVG_NS,'rect');
     bg.setAttribute('width','100%'); bg.setAttribute('height','100%');
@@ -1278,7 +1573,9 @@
       S.chart.layout
     );
 
-    // Edges first
+    // Edges first (orthogonal connectors with arrow markers, like corporate
+    // org charts). Each edge consists of: bus stub down from parent, horizontal
+    // shoulder, vertical drop into child top — classic three-segment join.
     Object.keys(positions).forEach(function(id){
       var u = S.byUnitId[id]; if (!u) return;
       var children = (S.childrenOfUnit[id]||[]);
@@ -1287,7 +1584,8 @@
         if (!p2) return;
         var path = document.createElementNS(SVG_NS,'path');
         path.setAttribute('class','org-edge');
-        path.setAttribute('d', edgePath(p1, p2, W, H, S.chart.layout));
+        path.setAttribute('d', orthoEdgePath(p1, p2, W, H, S.chart.layout));
+        path.setAttribute('marker-end','url(#org-arrow)');
         rootG.appendChild(path);
       });
     });
@@ -1330,7 +1628,8 @@
         if (!p2) return;
         var path = document.createElementNS(SVG_NS,'path');
         path.setAttribute('class','org-edge');
-        path.setAttribute('d', edgePath(p1, p2, W, H, S.chart.layout));
+        path.setAttribute('d', orthoEdgePath(p1, p2, W, H, S.chart.layout));
+        path.setAttribute('marker-end','url(#org-arrow)');
         rootG.appendChild(path);
       });
     });
@@ -1341,17 +1640,43 @@
     });
   }
 
-  function edgePath(p1, p2, W, H, dir){
+  /* Orthogonal three-segment connector with rounded corners and an arrowhead
+   * at the child end. Looks like classic corporate org charts:
+   *   ┃ stub down from parent
+   *   ┗━━━━━┓ horizontal shoulder
+   *         ┃ vertical drop into child (with arrow)
+   * Uses rounded quadratic-bezier corners (R) for a polished look. */
+  function orthoEdgePath(p1, p2, W, H, dir){
+    var R = 8; // corner radius
     if (dir === 'LR'){
-      var x1 = p1.x + W, y1 = p1.y + H/2;
-      var x2 = p2.x,     y2 = p2.y + H/2;
+      // parent right-edge → horizontal stub → vertical shoulder → arrow into child left-edge
+      var x1 = p1.x + W,        y1 = p1.y + H/2;
+      var x2 = p2.x - 4,        y2 = p2.y + H/2; // -4 so arrow tip lands on edge
       var mx = (x1 + x2) / 2;
-      return 'M'+x1+','+y1+' C'+mx+','+y1+' '+mx+','+y2+' '+x2+','+y2;
+      var dy = y2 > y1 ? 1 : -1;
+      // Rounded right-angle bends at (mx, y1) and (mx, y2)
+      return 'M'+x1+' '+y1
+           +' L'+(mx-R)+' '+y1
+           +' Q'+mx+' '+y1+' '+mx+' '+(y1 + dy*R)
+           +' L'+mx+' '+(y2 - dy*R)
+           +' Q'+mx+' '+y2+' '+(mx+R)+' '+y2
+           +' L'+x2+' '+y2;
     }
+    // TB: parent bottom-center → vertical stub → horizontal shoulder → vertical drop → arrow into child top
     var x1t = p1.x + W/2, y1t = p1.y + H;
-    var x2t = p2.x + W/2, y2t = p2.y;
-    var my = (y1t + y2t) / 2;
-    return 'M'+x1t+','+y1t+' C'+x1t+','+my+' '+x2t+','+my+' '+x2t+','+y2t;
+    var x2t = p2.x + W/2, y2t = p2.y - 4; // -4 so arrow tip lands on top edge
+    var my  = (y1t + y2t) / 2;
+    var dx  = x2t > x1t ? 1 : (x2t < x1t ? -1 : 0);
+    if (dx === 0){
+      // straight vertical (child directly under parent)
+      return 'M'+x1t+' '+y1t+' L'+x2t+' '+y2t;
+    }
+    return 'M'+x1t+' '+y1t
+         +' L'+x1t+' '+(my - R)
+         +' Q'+x1t+' '+my+' '+(x1t + dx*R)+' '+my
+         +' L'+(x2t - dx*R)+' '+my
+         +' Q'+x2t+' '+my+' '+x2t+' '+(my + R)
+         +' L'+x2t+' '+y2t;
   }
 
   function svgEl(name, attrs){
@@ -1403,8 +1728,9 @@
       l.textContent = k.l;
       g.appendChild(l);
     });
-    // Click → select
+    // Click → select. Double-click → open edit modal.
     g.addEventListener('click', function(ev){ ev.stopPropagation(); selectChartNode(host, 'unit', u.hcm_org_unit_id); });
+    g.addEventListener('dblclick', function(ev){ ev.stopPropagation(); openUnitModal(u.hcm_org_unit_id, null, host); });
     // Drag-reparent
     enableNodeDrag(g, host, 'unit', u.hcm_org_unit_id, x, y, W, H);
     rootG.appendChild(g);
@@ -1448,7 +1774,108 @@
     pillText.textContent = filled+'/'+hc + (open>0?' (+'+open+')':'');
     g.appendChild(pillText);
     g.addEventListener('click', function(ev){ ev.stopPropagation(); selectChartNode(host, 'position', p.hcm_position_id); });
+    g.addEventListener('dblclick', function(ev){ ev.stopPropagation(); openPositionModal(p.hcm_position_id, null, host); });
+    enablePositionDrag(g, host, p.hcm_position_id, x, y, W, H);
     rootG.appendChild(g);
+  }
+
+  /* Drag a position card onto another position to set reports_to_position_id. */
+  function enablePositionDrag(g, host, id, origX, origY, W, H){
+    g.addEventListener('mousedown', function(downEv){
+      if (downEv.button !== 0) return;
+      var startX = downEv.clientX, startY = downEv.clientY;
+      var dragging = false, dropTargetId = null, dropLegal = false;
+      var svg = host.querySelector('[data-canvas-svg]');
+      // Compute descendants in the position-reporting tree
+      var descendants = new Set();
+      (function walk(pid){
+        S.positions.forEach(function(p){
+          if (String(p.reports_to_position_id||'') === String(pid)){
+            descendants.add(p.hcm_position_id);
+            walk(p.hcm_position_id);
+          }
+        });
+      })(id);
+      function onMove(ev){
+        var ddx = ev.clientX - startX, ddy = ev.clientY - startY;
+        if (!dragging){
+          if (ddx*ddx + ddy*ddy < 16) return;
+          dragging = true;
+          downEv.stopPropagation();
+          if (svg) svg.classList.add('is-dragging-node');
+          g.setAttribute('opacity','.85');
+        }
+        var nx = origX + ddx / S.chart.zoom;
+        var ny = origY + ddy / S.chart.zoom;
+        g.setAttribute('transform', 'translate('+nx+','+ny+')');
+        dropTargetId = null;
+        var cx = nx + W/2, cy = ny + H/2;
+        host.querySelectorAll('[data-node-id][data-node-kind="position"]').forEach(function(other){
+          if (other === g) return;
+          var ot = other.getAttribute('transform') || '';
+          var m = /translate\(([^,\s]+)[ ,]\s*([^)\s]+)\)/.exec(ot);
+          if (!m) return;
+          var ox = parseFloat(m[1]), oy = parseFloat(m[2]);
+          if (cx >= ox && cx <= ox + W && cy >= oy && cy <= oy + H){
+            dropTargetId = other.getAttribute('data-node-id');
+          }
+        });
+        host.querySelectorAll('.org-node-rect.is-drop-target,.org-node-rect.is-drop-illegal').forEach(function(r){
+          r.classList.remove('is-drop-target'); r.classList.remove('is-drop-illegal');
+        });
+        if (dropTargetId){
+          dropLegal = dropTargetId !== id && !descendants.has(dropTargetId);
+          var rectEl = host.querySelector('[data-node-id="'+dropTargetId+'"] .org-node-rect');
+          if (rectEl) rectEl.classList.add(dropLegal ? 'is-drop-target' : 'is-drop-illegal');
+        }
+      }
+      function onUp(){
+        window.removeEventListener('mousemove', onMove);
+        window.removeEventListener('mouseup', onUp);
+        if (svg) svg.classList.remove('is-dragging-node');
+        host.querySelectorAll('.org-node-rect.is-drop-target,.org-node-rect.is-drop-illegal').forEach(function(r){
+          r.classList.remove('is-drop-target'); r.classList.remove('is-drop-illegal');
+        });
+        if (!dragging) return;
+        g.setAttribute('opacity','1');
+        g.setAttribute('transform', 'translate('+origX+','+origY+')');
+        var newParentId = dropTargetId;
+        var p = S.byPositionId[id];
+        if (!newParentId){
+          if (p && p.reports_to_position_id){
+            confirm({
+              title: t('Clear reports-to?','Bỏ báo cáo cho?'),
+              message: t('Make "'+p.position_title+'" no longer report to a position?','Đặt "'+p.position_title+'" không còn báo cáo cho vị trí nào?'),
+              confirmLabel: t('Clear','Bỏ')
+            }).then(function(ok){
+              if (!ok) return;
+              safeUpdate('hcm_workforce','hcm_positions', id, { reports_to_position_id: null }, p.row_version)
+                .then(function(){ UI.toast(t('Position moved','Đã cập nhật'),'success'); loadAll(true).then(function(){ renderOrgChart(host); }); })
+                .catch(function(err){ UI.toast(err && err.message || 'move_failed','error'); });
+            });
+          }
+          return;
+        }
+        if (newParentId === id || descendants.has(newParentId)){
+          UI.toast(t('Cannot report to self or own subordinate','Không thể báo cáo cho chính mình hoặc cấp dưới'),'error');
+          return;
+        }
+        if (newParentId === p.reports_to_position_id) return;
+        var parent = S.byPositionId[newParentId];
+        confirm({
+          title: t('Set reports-to?','Đặt báo cáo cho?'),
+          message: t('Make "'+p.position_title+'" report to "'+parent.position_title+'"?','Đặt "'+p.position_title+'" báo cáo cho "'+parent.position_title+'"?'),
+          confirmLabel: t('Set','Đặt')
+        }).then(function(ok){
+          if (!ok) return;
+          safeUpdate('hcm_workforce','hcm_positions', id, { reports_to_position_id: newParentId }, p.row_version)
+            .then(function(){ UI.toast(t('Position moved','Đã cập nhật'),'success'); loadAll(true).then(function(){ renderOrgChart(host); }); })
+            .catch(function(err){ UI.toast(err && err.message || 'move_failed','error'); });
+        });
+      }
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+    });
   }
 
   function ellipsize(s, n){
@@ -1471,96 +1898,112 @@
     }
   }
 
+  /* Drag-reparent on a unit node. Click-and-hold over a node, drag to another
+   * unit node, drop. The drop target is highlighted green if the move is
+   * legal, red if it would create a cycle (self/descendant). Click without
+   * movement just selects (no drag). */
   function enableNodeDrag(g, host, kind, id, origX, origY, W, H){
-    if (kind !== 'unit') return; // only units support drag-reparent for now
-    var dragState = null;
-    g.addEventListener('mousedown', function(ev){
-      if (ev.button !== 0) return;
-      ev.stopPropagation();
+    if (kind !== 'unit') return;
+    g.addEventListener('mousedown', function(downEv){
+      if (downEv.button !== 0) return;
+      // Allow native click for selection if user just clicks; only start drag
+      // after a small movement threshold (4px).
+      var startX = downEv.clientX, startY = downEv.clientY;
+      var dragging = false, dropTargetId = null, dropLegal = false;
       var svg = host.querySelector('[data-canvas-svg]');
-      svg.classList.add('is-dragging-node');
-      dragState = { startX: ev.clientX, startY: ev.clientY, currentX: origX, currentY: origY, dropTargetId: null };
-    });
-    function onMove(ev){
-      if (!dragState) return;
-      var dx = (ev.clientX - dragState.startX) / S.chart.zoom;
-      var dy = (ev.clientY - dragState.startY) / S.chart.zoom;
-      var nx = origX + dx, ny = origY + dy;
-      g.setAttribute('transform', 'translate('+nx+','+ny+')');
-      g.setAttribute('opacity','.85');
-      dragState.currentX = nx; dragState.currentY = ny;
-      // Find drop target: hover testing other unit nodes
-      var dropTarget = null;
-      host.querySelectorAll('[data-node-id][data-node-kind="unit"]').forEach(function(other){
-        if (other === g) return;
-        var oid = other.getAttribute('data-node-id');
-        var ot = other.getAttribute('transform') || 'translate(0,0)';
-        var m = /translate\(([^,]+),([^)]+)\)/.exec(ot);
-        if (!m) return;
-        var ox = parseFloat(m[1]), oy = parseFloat(m[2]);
-        // Check if center of dragged node is inside the other rectangle
+      // Pre-compute descendants so we can mark illegal drops red.
+      var descendants = new Set();
+      (function walk(uid){
+        (S.childrenOfUnit[uid] || []).forEach(function(c){
+          descendants.add(c.hcm_org_unit_id);
+          walk(c.hcm_org_unit_id);
+        });
+      })(id);
+
+      function onMove(ev){
+        var ddx = ev.clientX - startX, ddy = ev.clientY - startY;
+        if (!dragging){
+          if (ddx*ddx + ddy*ddy < 16) return; // 4px threshold
+          dragging = true;
+          downEv.stopPropagation();
+          if (svg) svg.classList.add('is-dragging-node');
+          g.setAttribute('opacity','.85');
+        }
+        var nx = origX + ddx / S.chart.zoom;
+        var ny = origY + ddy / S.chart.zoom;
+        g.setAttribute('transform', 'translate('+nx+','+ny+')');
+        // Hit-test other unit nodes for drop target
+        dropTargetId = null;
         var cx = nx + W/2, cy = ny + H/2;
-        if (cx >= ox && cx <= ox + W && cy >= oy && cy <= oy + H){
-          dropTarget = oid;
-        }
-      });
-      // Highlight drop target
-      host.querySelectorAll('.org-node-rect.is-drop-target').forEach(function(r){ r.classList.remove('is-drop-target'); });
-      if (dropTarget){
-        var rectEl = host.querySelector('[data-node-id="'+dropTarget+'"] .org-node-rect');
-        if (rectEl) rectEl.classList.add('is-drop-target');
-      }
-      dragState.dropTargetId = dropTarget;
-    }
-    function onUp(){
-      if (!dragState) return;
-      var svg = host.querySelector('[data-canvas-svg]');
-      svg.classList.remove('is-dragging-node');
-      g.setAttribute('opacity','1');
-      host.querySelectorAll('.org-node-rect.is-drop-target').forEach(function(r){ r.classList.remove('is-drop-target'); });
-      var newParentId = dragState.dropTargetId;
-      var u = S.byUnitId[id];
-      // Reset position (will re-render after save)
-      g.setAttribute('transform', 'translate('+origX+','+origY+')');
-      if (newParentId && u && newParentId !== u.parent_org_unit_id){
-        // Disallow self or descendant
-        var descendants = new Set(); (function walk(uid){ (S.childrenOfUnit[uid]||[]).forEach(function(c){ descendants.add(c.hcm_org_unit_id); walk(c.hcm_org_unit_id); }); })(id);
-        if (newParentId === id || descendants.has(newParentId)){
-          UI.toast(t('Cannot move under self or descendant','Không thể chuyển vào chính mình hoặc đơn vị con'),'error');
-          dragState = null; return;
-        }
-        var parent = S.byUnitId[newParentId];
-        UI.confirmDestructive({
-          title: t('Reparent unit?','Chuyển đơn vị cha?'),
-          message: t('Move "'+u.org_unit_name+'" under "'+parent.org_unit_name+'"?', 'Chuyển "'+u.org_unit_name+'" vào dưới "'+parent.org_unit_name+'"?'),
-          confirmLabel: t('Move','Chuyển'),
-          onConfirm: function(){
-            UI.runtime.update('hcm_workforce','hcm_org_units', id, { parent_org_unit_id: newParentId }, u.row_version)
-              .then(function(){
-                UI.toast(t('Unit moved','Đã chuyển đơn vị'),'success');
-                loadAll(true).then(function(){ renderOrgChart(host); });
-              }).catch(function(err){ UI.toast(err && err.message || 'move_failed','error'); });
+        host.querySelectorAll('[data-node-id][data-node-kind="unit"]').forEach(function(other){
+          if (other === g) return;
+          var ot = other.getAttribute('transform') || '';
+          var m = /translate\(([^,\s]+)[ ,]\s*([^)\s]+)\)/.exec(ot);
+          if (!m) return;
+          var ox = parseFloat(m[1]), oy = parseFloat(m[2]);
+          if (cx >= ox && cx <= ox + W && cy >= oy && cy <= oy + H){
+            dropTargetId = other.getAttribute('data-node-id');
           }
         });
+        // Update highlight (green=legal, red=illegal)
+        host.querySelectorAll('.org-node-rect.is-drop-target,.org-node-rect.is-drop-illegal').forEach(function(r){
+          r.classList.remove('is-drop-target'); r.classList.remove('is-drop-illegal');
+        });
+        if (dropTargetId){
+          dropLegal = dropTargetId !== id && !descendants.has(dropTargetId);
+          var rectEl = host.querySelector('[data-node-id="'+dropTargetId+'"] .org-node-rect');
+          if (rectEl) rectEl.classList.add(dropLegal ? 'is-drop-target' : 'is-drop-illegal');
+        }
       }
-      dragState = null;
-    }
-    host._dragMove = host._dragMove || onMove;
-    host._dragUp = host._dragUp || onUp;
-    if (!host._dragWired){
-      host._dragWired = true;
-      window.addEventListener('mousemove', function(ev){
-        // Only one drag is active at a time globally; we delegate to currently-attached handler
-        host.querySelectorAll('[data-node-id]').forEach(function(){});
-      });
-    }
-    g.addEventListener('mousedown', function(){
-      window.addEventListener('mousemove', onMove);
-      window.addEventListener('mouseup', function once(){
+      function onUp(){
         window.removeEventListener('mousemove', onMove);
-        window.removeEventListener('mouseup', once);
-        onUp();
-      });
+        window.removeEventListener('mouseup', onUp);
+        if (svg) svg.classList.remove('is-dragging-node');
+        host.querySelectorAll('.org-node-rect.is-drop-target,.org-node-rect.is-drop-illegal').forEach(function(r){
+          r.classList.remove('is-drop-target'); r.classList.remove('is-drop-illegal');
+        });
+        if (!dragging) return; // pure click — let the click handler run
+        g.setAttribute('opacity','1');
+        g.setAttribute('transform', 'translate('+origX+','+origY+')');
+        var newParentId = dropTargetId;
+        // Drop on empty canvas → make root (clear parent)
+        if (!newParentId){
+          var u0 = S.byUnitId[id];
+          if (u0 && u0.parent_org_unit_id){
+            confirm({
+              title: t('Make root unit?','Đặt làm đơn vị gốc?'),
+              message: t('Move "'+u0.org_unit_name+'" out of its parent and make it a top-level unit?','Bỏ liên kết "'+u0.org_unit_name+'" khỏi đơn vị cha và đặt thành cấp gốc?'),
+              confirmLabel: t('Make root','Đặt làm gốc')
+            }).then(function(ok){
+              if (!ok) return;
+              safeUpdate('hcm_workforce','hcm_org_units', id, { parent_org_unit_id: null }, u0.row_version)
+                .then(function(){ UI.toast(t('Unit moved','Đã chuyển đơn vị'),'success'); loadAll(true).then(function(){ renderOrgChart(host); }); })
+                .catch(function(err){ UI.toast(err && err.message || 'move_failed','error'); });
+            });
+          }
+          return;
+        }
+        var u = S.byUnitId[id];
+        if (newParentId === id || descendants.has(newParentId)){
+          UI.toast(t('Cannot move under self or descendant','Không thể chuyển vào chính mình hoặc đơn vị con'),'error');
+          return;
+        }
+        if (newParentId === u.parent_org_unit_id) return; // no change
+        var parent = S.byUnitId[newParentId];
+        confirm({
+          title: t('Reparent unit?','Chuyển đơn vị cha?'),
+          message: t('Move "'+u.org_unit_name+'" under "'+parent.org_unit_name+'"?','Chuyển "'+u.org_unit_name+'" vào dưới "'+parent.org_unit_name+'"?'),
+          confirmLabel: t('Move','Chuyển')
+        }).then(function(ok){
+          if (!ok) return;
+          safeUpdate('hcm_workforce','hcm_org_units', id, { parent_org_unit_id: newParentId }, u.row_version)
+            .then(function(){ UI.toast(t('Unit moved','Đã chuyển đơn vị'),'success'); loadAll(true).then(function(){ renderOrgChart(host); }); })
+            .catch(function(err){ UI.toast(err && err.message || 'move_failed','error'); });
+        });
+      }
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onUp);
+      // Don't preventDefault — we want native click to still fire if no drag
     });
   }
 
@@ -1671,5 +2114,9 @@
    * ──────────────────────────────────────────────────────────────────────── */
   window._renderAdminOrgUnits = renderOrgUnits;
   window._renderAdminOrgChart = renderOrgChart;
-  window._adminOrgConsole = { state: S, reload: function(){ return loadAll(true); } };
+  window._adminOrgConsole = {
+    state: S,
+    reload: function(){ return loadAll(true); },
+    _internals: { safeCreate: safeCreate, safeUpdate: safeUpdate, mutate: mutate, tolerantParseJson: tolerantParseJson }
+  };
 })();

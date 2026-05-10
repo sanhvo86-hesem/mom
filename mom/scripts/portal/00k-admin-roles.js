@@ -13,7 +13,7 @@
  *   - Bulk actions: clone role, copy permissions from another role
  *
  * Backend tables: core_system.roles, role_permission, role_sod_conflict,
- * role_mfa_policy, audit_log. RBAC service endpoints used for assignments
+ * mfa_policy, audit_log. RBAC service endpoints used for assignments
  * and SoD checks.
  * ========================================================================== */
 
@@ -34,6 +34,12 @@
     users: [],
     filters: { search:'', dept:'', status:'all' }
   };
+
+  // Notify other admin tabs (e.g. Users tab) that the role catalog changed
+  // so their cached dropdowns/lists refresh on next render.
+  function notifyRolesChanged(){
+    try { window.dispatchEvent(new CustomEvent('admin:roles:invalidated')); } catch(_){}
+  }
 
   // Unpack permissions JSONB on each role row into convenient view fields.
   // The legacy schema stores icon/color/level/admin inside permissions JSONB,
@@ -62,7 +68,7 @@
     if (force || !state.sodConflicts.length) p.push(UI.runtime.list('core_system','role_sod_conflict',{ limit:500 }).then(function(r){
       state.sodConflicts = (r && r.data) || r || [];
     }).catch(function(){ state.sodConflicts = []; }));
-    if (force || !state.mfaPolicy.length) p.push(UI.runtime.list('core_system','role_mfa_policy',{ limit:500 }).then(function(r){
+    if (force || !state.mfaPolicy.length) p.push(UI.runtime.list('core_system','mfa_policy',{ limit:500 }).then(function(r){
       state.mfaPolicy = (r && r.data) || r || [];
     }).catch(function(){ state.mfaPolicy = []; }));
     // users — try runtime then fallback to existing global USERS
@@ -338,6 +344,7 @@
       p.then(function(saved){
         UI.toast(isCreate ? t('Role created','Đã tạo vai trò') : t('Role updated','Đã cập nhật vai trò'), 'ok');
         UI.audit(isCreate ? 'role.create' : 'role.update', { role_code: v.role_code, before: existing || null, after: v });
+        notifyRolesChanged();
         modal.close();
         fetchAll(true).then(function(){ render(hostEl); });
       }).catch(function(err){
@@ -394,6 +401,7 @@
       UI.runtime.create('core_system','roles', payload).then(function(){
         UI.audit('role.clone', { source: v.source_role, target: v.new_code, copy_permissions: !!v.copy_permissions });
         UI.toast(t('Role cloned','Đã sao chép vai trò'), 'ok');
+        notifyRolesChanged();
         modal.close();
         fetchAll(true).then(function(){ render(hostEl); });
       }).catch(function(err){
@@ -445,6 +453,7 @@
           .then(function(){
             UI.audit(now ? 'role.reactivate':'role.deactivate', { role_code: role.role_code, reason: res.reason || null });
             UI.toast(now ? t('Reactivated','Đã kích hoạt') : t('Deactivated','Đã ngừng dùng'), 'ok');
+            notifyRolesChanged();
             drawer.close();
             fetchAll(true).then(function(){ render(document.getElementById('admin-content')); });
           })
@@ -471,6 +480,7 @@
           .then(function(){
             UI.audit('role.delete', { role_code: role.role_code, reason: res.reason });
             UI.toast(t('Role deleted','Đã xoá vai trò'),'ok');
+            notifyRolesChanged();
             drawer.close();
             fetchAll(true).then(function(){ render(document.getElementById('admin-content')); });
           })
@@ -528,9 +538,9 @@
           if (!res || !res.confirmed) return;
           UI.fetchJson('/api/v1/rbac/role-assignments', {
             method:'DELETE',
-            body:{ user_id: uid, role_code: role.role_code, reason: res.reason }
+            body:{ user_id: uid, role_id: role.role_id, role_code: role.role_code, reason: res.reason }
           }).then(function(){
-            UI.audit('role.revoke', { user_id: uid, role_code: role.role_code, reason: res.reason });
+            UI.audit('role.revoke', { user_id: uid, role_id: role.role_id, role_code: role.role_code, reason: res.reason });
             UI.toast(t('Revoked','Đã thu hồi'),'ok');
             fetchAll(true).then(function(){ renderMembersTab(el, role); });
           }).catch(function(err){ UI.toast((err && err.message) || t('Failed','Thất bại'),'block'); });
@@ -562,7 +572,7 @@
       btn.disabled = true; btn.textContent = t('Checking SoD…','Đang kiểm tra SoD…');
       UI.fetchJson('/api/v1/rbac/role-assignments', {
         method:'POST',
-        body:{ user_id: v.user_id, role_code: role.role_code, reason: v.reason || null }
+        body:{ user_id: v.user_id, role_id: role.role_id, role_code: role.role_code, reason: v.reason || null }
       }).then(function(res){
         if (res && res.sod_violation && !res.waived){
           // SoD blocked — show waiver flow
@@ -577,9 +587,9 @@
             if (!w || !w.confirmed) return;
             UI.fetchJson('/api/v1/rbac/role-assignments', {
               method:'POST',
-              body:{ user_id: v.user_id, role_code: role.role_code, reason: w.reason, waiveSod: true }
+              body:{ user_id: v.user_id, role_id: role.role_id, role_code: role.role_code, reason: w.reason, waive_sod: true }
             }).then(function(){
-              UI.audit('role.assign.waived', { user_id: v.user_id, role_code: role.role_code, reason: w.reason });
+              UI.audit('role.assign.waived', { user_id: v.user_id, role_id: role.role_id, role_code: role.role_code, reason: w.reason });
               UI.toast(t('Assigned with SoD waiver','Đã gán kèm waiver SoD'),'warn');
               modal.close(); fetchAll(true).then(function(){ renderMembersTab(hostEl, role); });
             }).catch(function(err){ UI.toast((err && err.message) || t('Failed','Thất bại'),'block'); });
@@ -654,12 +664,52 @@
       Array.prototype.forEach.call(el.querySelectorAll('[data-perm-clear]'), function(b){
         b.addEventListener('click', function(){ applyEffect(b.getAttribute('data-perm-clear'), null); });
       });
+      // Bulk grant/revoke must be ONE write — N parallel read-modify-write
+      // operations will lose updates. Build the final permissions object once
+      // and PUT it.
+      function bulkApply(newPerms){
+        var pk = role.role_id || role.role_code;
+        return UI.runtime.update('core_system','roles', pk,
+          { permissions: newPerms }, role.row_version)
+          .then(function(resp){
+            var rec = (resp && resp.record) || resp || {};
+            var saved = rec.permissions;
+            if (typeof saved === 'string'){ try { saved = JSON.parse(saved); } catch(e){ saved = newPerms; } }
+            role.permissions = saved || newPerms;
+            if (rec.row_version != null){
+              role.row_version = rec.row_version;
+              return loadRolePermissions(role.role_code).then(function(){ renderPermissionsTab(el, role); });
+            }
+            // Server response was bare {ok:true}: re-fetch so row_version + permissions
+            // are authoritative, otherwise the next bulk PUT will 409.
+            return UI.runtime.get('core_system','roles', pk).then(function(detail){
+              var fresh = detail && detail.record;
+              if (fresh){
+                role.row_version = fresh.row_version != null ? fresh.row_version : role.row_version;
+                role.permissions = fresh.permissions || role.permissions;
+              }
+              return loadRolePermissions(role.role_code).then(function(){ renderPermissionsTab(el, role); });
+            }).catch(function(){
+              if (role.row_version != null) role.row_version += 1;
+              return loadRolePermissions(role.role_code).then(function(){ renderPermissionsTab(el, role); });
+            });
+          });
+      }
       el.querySelector('#perm-grant-all').addEventListener('click', function(){
         UI.confirmDestructive({ title:t('Grant all permissions','Cấp tất cả quyền'),
           message:t('This will grant every permission in the catalog to this role. Use with caution.','Sẽ cấp toàn bộ quyền trong catalog cho vai trò này. Thận trọng.'),
           requireReason:true
         }).then(function(r){ if (!r||!r.confirmed) return;
-          Promise.all(state.permissionCatalog.map(function(p){ return applyEffect(p.permission_code,'grant').catch(function(){}); }));
+          var existing = role.permissions || {};
+          if (typeof existing === 'string'){ try { existing = JSON.parse(existing); } catch(_){ existing = {}; } }
+          var newPerms = Object.assign({}, existing, {
+            permissions: state.permissionCatalog.map(function(p){ return p.permission_code; }),
+            denies: []
+          });
+          bulkApply(newPerms).then(function(){
+            UI.audit('role.permissions.grant_all', { role_code: role.role_code, count: state.permissionCatalog.length, reason: r.reason });
+            UI.toast(t('Granted all','Đã cấp tất cả'),'ok');
+          }).catch(function(err){ UI.toast((err && err.message) || t('Failed','Thất bại'),'block'); });
         });
       });
       el.querySelector('#perm-revoke-all').addEventListener('click', function(){
@@ -667,7 +717,13 @@
           message:t('Remove all permission grants from this role?','Gỡ tất cả quyền của vai trò này?'),
           requireReason:true
         }).then(function(r){ if (!r||!r.confirmed) return;
-          Promise.all(perms.map(function(p){ return applyEffect(p.permission_code, null).catch(function(){}); }));
+          var existing = role.permissions || {};
+          if (typeof existing === 'string'){ try { existing = JSON.parse(existing); } catch(_){ existing = {}; } }
+          var newPerms = Object.assign({}, existing, { permissions: [], denies: [] });
+          bulkApply(newPerms).then(function(){
+            UI.audit('role.permissions.revoke_all', { role_code: role.role_code, reason: r.reason });
+            UI.toast(t('Revoked all','Đã thu hồi tất cả'),'ok');
+          }).catch(function(err){ UI.toast((err && err.message) || t('Failed','Thất bại'),'block'); });
         });
       });
     }).catch(function(err){
@@ -771,31 +827,51 @@
   }
 
   // ── Sub-tab: MFA ────────────────────────────────────────────────────────────
+  // Backed by real `mfa_policy` table (migration 165). PK = role_id (UUID FK to roles).
   function renderMfaTab(el, role){
-    var policy = state.mfaPolicy.find(function(p){ return p.role_code === role.role_code; }) || null;
+    if (!role.role_id){
+      el.innerHTML = UI.emptyHtml(t('Role has no role_id — cannot configure MFA policy','Vai trò chưa có role_id — không thể cấu hình MFA'));
+      return;
+    }
+    var policy = state.mfaPolicy.find(function(p){ return p.role_id === role.role_id; }) || null;
+    // Distinguish "no policy → defaults" from "policy with explicit empty array → respect".
+    var allowed = (policy && Array.isArray(policy.allowed_factor_types))
+      ? policy.allowed_factor_types
+      : (policy ? [] : ['totp','webauthn','backup_code']);
+    var meta = (policy && policy.metadata && typeof policy.metadata === 'object') ? policy.metadata : {};
     var fields = [
-      { key:'required_aal', label:t('Required AAL (NIST 800-63B)','AAL bắt buộc (NIST 800-63B)'), type:'select', required:true,
-        value: policy ? (policy.required_aal||1) : 1,
+      { key:'required', label:t('MFA required for this role','Bắt buộc MFA cho vai trò này'), type:'checkbox',
+        value: policy ? policy.required !== false : true,
+        checkboxLabel: t('Block sign-in until enrolled (subject to grace period)','Chặn đăng nhập tới khi đăng ký xong (theo grace period)') },
+      { key:'required_aal_level', label:t('Required AAL (NIST 800-63B)','AAL bắt buộc (NIST 800-63B)'), type:'select', required:true,
+        value: policy ? (policy.required_aal_level||2) : 2,
         options:[
           { value:1, label:t('AAL1 — single-factor','AAL1 — một yếu tố') },
           { value:2, label:t('AAL2 — two-factor (TOTP/SMS/Push)','AAL2 — hai yếu tố') },
           { value:3, label:t('AAL3 — hardware-bound (FIDO2/WebAuthn)','AAL3 — phần cứng (FIDO2/WebAuthn)') }
         ] },
-      { key:'reauth_minutes', label:t('Re-auth interval (minutes, 0=never)','Khoảng tái xác thực (phút, 0=không yêu cầu)'), type:'number', min:0, max:1440,
-        value: policy ? (policy.reauth_minutes != null ? policy.reauth_minutes : 60) : 60 },
-      { key:'allow_remembered_device', label:t('Allow remembered device','Cho phép thiết bị đã ghi nhớ'), type:'checkbox',
-        value: policy ? (policy.allow_remembered_device !== false) : true,
-        checkboxLabel: t('Skip second factor on previously enrolled device','Bỏ qua yếu tố thứ 2 trên thiết bị đã đăng ký') },
+      { key:'min_factors', label:t('Minimum enrolled factors','Số yếu tố tối thiểu phải đăng ký'), type:'number', min:1, max:4,
+        value: policy ? (policy.min_factors||1) : 1 },
+      { key:'reauth_after_minutes', label:t('Re-auth interval (minutes, 0=never)','Khoảng tái xác thực (phút, 0=không yêu cầu)'), type:'number', min:0, max:10080,
+        value: policy ? (policy.reauth_after_minutes != null ? policy.reauth_after_minutes : 480) : 480 },
+      { key:'grace_period_days', label:t('Grace period (days)','Thời gian ân hạn (ngày)'), type:'number', min:0, max:90,
+        value: policy ? (policy.grace_period_days != null ? policy.grace_period_days : 7) : 7 },
+      { key:'apply_to_admin_only', label:t('Apply to admin actions only','Chỉ áp dụng cho hành động admin'), type:'checkbox',
+        value: policy ? !!policy.apply_to_admin_only : false,
+        checkboxLabel: t('Step-up MFA only when performing privileged operations','Chỉ yêu cầu MFA khi thực hiện thao tác đặc quyền') },
       { key:'webauthn_required', label:t('Require WebAuthn factor','Bắt buộc yếu tố WebAuthn'), type:'checkbox',
-        value: policy ? !!policy.webauthn_required : false,
-        checkboxLabel: t('User must enroll a hardware key (FIDO2)','User phải đăng ký khoá phần cứng (FIDO2)') }
+        value: allowed.indexOf('webauthn') >= 0 && (meta.webauthn_required === true || (allowed.length === 1 && allowed[0] === 'webauthn')),
+        checkboxLabel: t('User must enroll a hardware key (FIDO2)','User phải đăng ký khoá phần cứng (FIDO2)') },
+      { key:'allow_remembered_device', label:t('Allow remembered device','Cho phép thiết bị đã ghi nhớ'), type:'checkbox',
+        value: meta.allow_remembered_device !== false,
+        checkboxLabel: t('Skip second factor on previously enrolled device','Bỏ qua yếu tố thứ 2 trên thiết bị đã đăng ký') }
     ];
     var form = UI.buildForm(fields);
     el.innerHTML = '';
     var hdr = document.createElement('div');
     hdr.style.cssText = 'margin-bottom:10px;font-size:13px;color:var(--text-2)';
     hdr.innerHTML = policy
-      ? esc(t('Policy in effect since ','Chính sách áp dụng từ '))+esc(policy.effective_from || policy.created_at || '—')
+      ? esc(t('Policy in effect since ','Chính sách áp dụng từ '))+esc(policy.created_at || policy.last_modified_at || '—')
       : esc(t('No MFA policy defined yet — defaults will apply','Chưa định nghĩa MFA — dùng mặc định'));
     el.appendChild(hdr);
     el.appendChild(form.el);
@@ -806,12 +882,32 @@
     el.appendChild(actions);
     actions.querySelector('#mfa-save').addEventListener('click', function(){
       var v = form.getValues();
-      v.role_code = role.role_code;
+      // Build mfa_policy payload from form values, derive allowed_factor_types from
+      // current set + webauthn_required toggle. UI fields not on the table are tucked
+      // into metadata so nothing is silently lost.
+      var newAllowed = allowed.slice();
+      if (v.webauthn_required && newAllowed.indexOf('webauthn') < 0) newAllowed.push('webauthn');
+      if (!newAllowed.length) newAllowed = ['totp','webauthn','backup_code'];
+      var newMeta = Object.assign({}, meta, {
+        webauthn_required: !!v.webauthn_required,
+        allow_remembered_device: !!v.allow_remembered_device
+      });
+      var payload = {
+        role_id: role.role_id,
+        required: !!v.required,
+        required_aal_level: parseInt(v.required_aal_level,10) || 2,
+        min_factors: parseInt(v.min_factors,10) || 1,
+        reauth_after_minutes: parseInt(v.reauth_after_minutes,10) || 0,
+        grace_period_days: parseInt(v.grace_period_days,10) || 0,
+        apply_to_admin_only: !!v.apply_to_admin_only,
+        allowed_factor_types: newAllowed,
+        metadata: newMeta
+      };
       var p = policy
-        ? UI.runtime.update('core_system','role_mfa_policy', policy.id, v, policy.row_version)
-        : UI.runtime.create('core_system','role_mfa_policy', v);
+        ? UI.runtime.update('core_system','mfa_policy', policy.role_id, payload, policy.row_version)
+        : UI.runtime.create('core_system','mfa_policy', payload);
       p.then(function(){
-        UI.audit('mfa.policy.save', { role_code: role.role_code, payload: v });
+        UI.audit('mfa.policy.save', { role_code: role.role_code, role_id: role.role_id, payload: payload });
         UI.toast(t('Policy saved','Đã lưu chính sách'),'ok');
         fetchAll(true).then(function(){ renderMfaTab(el, role); });
       }).catch(function(err){ UI.toast((err && err.message) || t('Failed','Thất bại'),'block'); });
@@ -820,8 +916,8 @@
     if (clrBtn) clrBtn.addEventListener('click', function(){
       UI.confirmDestructive({ title: t('Clear MFA policy','Xoá chính sách MFA'), requireReason:true }).then(function(r){
         if (!r || !r.confirmed) return;
-        UI.runtime.delete('core_system','role_mfa_policy', policy.id, policy.row_version).then(function(){
-          UI.audit('mfa.policy.clear', { role_code: role.role_code, reason: r.reason });
+        UI.runtime.delete('core_system','mfa_policy', policy.role_id, policy.row_version).then(function(){
+          UI.audit('mfa.policy.clear', { role_code: role.role_code, role_id: role.role_id, reason: r.reason });
           UI.toast(t('Cleared','Đã xoá'),'ok');
           fetchAll(true).then(function(){ renderMfaTab(el, role); });
         }).catch(function(err){ UI.toast((err && err.message) || t('Failed','Thất bại'),'block'); });

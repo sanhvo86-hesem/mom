@@ -1285,6 +1285,28 @@ const ADMIN_AUTH_STATE = {
   audit: {loaded:false, loading:false, error:'', events:[], lastLoadedAt:0}
 };
 
+/* Cross-tab freshness: when the Vai trò or Phòng ban tabs mutate the
+ * authoritative roles/org catalogs, they emit an `admin:<scope>:invalidated`
+ * CustomEvent on `window` so the Users tab (and any other consumer of
+ * ADMIN_AUTH_STATE) refetches on the next render. */
+if (typeof window !== 'undefined' && !window.__admin_state_bus_wired){
+  window.__admin_state_bus_wired = true;
+  window.addEventListener('admin:roles:invalidated', function(){
+    ADMIN_AUTH_STATE.roles.loaded = false;
+    ADMIN_AUTH_STATE.roles.error = '';
+    if (typeof loadAuthoritativeRoleCatalog === 'function'){
+      loadAuthoritativeRoleCatalog({force:true}).catch(function(){});
+    }
+  });
+  window.addEventListener('admin:org:invalidated', function(){
+    ADMIN_AUTH_STATE.org.loaded = false;
+    ADMIN_AUTH_STATE.org.error = '';
+    if (typeof loadAuthoritativeOrgCatalog === 'function'){
+      loadAuthoritativeOrgCatalog({force:true}).catch(function(){});
+    }
+  });
+}
+
 function apiRequest(path, options={}){
   const method = (options.method || 'GET').toUpperCase();
   const payload = Object.prototype.hasOwnProperty.call(options, 'payload') ? options.payload : null;

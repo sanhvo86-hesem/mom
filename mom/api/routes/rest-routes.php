@@ -160,6 +160,8 @@ return static function (Router $router, string $dataDir): void {
     $router->post('/api/admin/git/sync', AdminController::class, 'gitSync');
     $router->post('/api/admin/git/pull', AdminController::class, 'gitPull');
     $router->post('/api/admin/cache/clear', AdminController::class, 'clearCache');
+    // Front-end audit-event sink (used by UI.audit in 00j-admin-shared.js)
+    $router->post('/api/v1/admin/audit/log', AdminController::class, 'logFrontendAuditEvent');
     
     // Documents â€” snapshot
     $router->post('/api/documents/snapshot', DocumentController::class, 'docsSnapshot');

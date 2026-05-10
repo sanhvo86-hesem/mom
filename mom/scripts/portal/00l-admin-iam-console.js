@@ -123,8 +123,10 @@
       UI.runtime.list('core_system','roles', { limit: 500 }).catch(function(){ return { data: [] }; }),
       UI.runtime.list('core_system','permission_catalog', { limit: 500 }).catch(function(){ return { data: [] }; }),
       UI.runtime.list('core_system','role_sod_conflict', { limit: 100 }).catch(function(){ return { data: [] }; }),
-      UI.runtime.list('customer_portal','portal_sessions', { limit: 500 }).catch(function(){ return { data: [] }; }),
-      UI.runtime.list('core_system','audit_events', { sort:'-recorded_at', limit: 1 }).catch(function(){ return { raw: { total: 0 } }; }),
+      // Use /api/v1/sessions/active (audit_events-derived, internal portal) instead of
+      // customer_portal.portal_sessions (which is for external customer portal users).
+      UI.fetchJson('/api/v1/sessions/active').catch(function(){ return { data: [] }; }),
+      UI.runtime.list('core_system','audit_events', { sort:'-recorded_at', limit: 1, include_total: 1 }).catch(function(){ return { raw: { total: 0 } }; }),
       UI.runtime.list('core_system','retention_policy', { limit: 100 }).catch(function(){ return { data: [] }; }),
       UI.runtime.list('core_system','users', { limit: 1000 }).catch(function(){ return { data: [] }; })
     ]).then(function(results){
@@ -132,10 +134,12 @@
       var perms = results[1].data || [];
       var sods = results[2].data || [];
       var sessions = results[3].data || [];
-      var auditTotal = (results[4].raw && results[4].raw.total) || 'n/a';
+      var auditTotal = (results[4].raw && (results[4].raw.total != null) ? results[4].raw.total : (results[4].total != null ? results[4].total : 'n/a'));
       var retentions = results[5].data || [];
       var users = results[6].data || [];
-      var activeSessions = sessions.filter(function(s){ return !s.expires_at || new Date(s.expires_at) > new Date(); }).length;
+      // /api/v1/sessions/active rows carry status: 'active' | 'idle' | 'stale' (last 8h).
+      // Count only 'active' for the KPI; idle/stale are background.
+      var activeSessions = sessions.filter(function(s){ return s && (s.status === 'active' || s.status === undefined); }).length;
       var dangerous = perms.filter(function(p){ return p.is_dangerous; }).length;
       var aalRequired = perms.filter(function(p){ return (p.required_aal_level||1) >= 2; }).length;
       el.innerHTML = ''

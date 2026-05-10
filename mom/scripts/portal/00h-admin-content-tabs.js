@@ -31,7 +31,7 @@
   function fetchUsers(){ return UI.runtime.list('core_system','users',{ limit:1000 }).then(function(r){ state.users = (r&&r.data)||r||[]; }).catch(function(){
     state.users = (window.USERS||[]).map(function(u){ return { id:u.id, username:u.username, full_name:u.name, role_code:u.role, dept_code:u.dept, is_active:u.active!==false }; });
   }); }
-  function fetchRolePolicies(){ return UI.runtime.list('core_system','role_mfa_policy',{ limit:500 }).then(function(r){ state.rolePolicies = (r&&r.data)||r||[]; }).catch(function(){ state.rolePolicies = []; }); }
+  function fetchRolePolicies(){ return UI.runtime.list('core_system','mfa_policy',{ limit:500 }).then(function(r){ state.rolePolicies = (r&&r.data)||r||[]; }).catch(function(){ state.rolePolicies = []; }); }
   function fetchUserFactors(){ return UI.fetchJson('/api/v1/mfa/factors').then(function(r){ state.userFactors = (r&&r.data)||r||[]; }).catch(function(){ state.userFactors = []; }); }
   function fetchDocs(){
     // DCC document control system holds the authoritative document register
@@ -83,47 +83,58 @@
       UI.btn(t('Refresh','Làm mới'),{ icon:'🔄', kind:'secondary', id:'mfa-pol-refresh' })
       + UI.btn(t('New policy','Chính sách mới'),{ icon:'＋', id:'mfa-pol-new' })
     );
-    var rolesByCode = {}; state.roles.forEach(function(r){ rolesByCode[r.role_code] = r; });
+    // Index roles by both role_id and role_code so policy rows from the real
+    // mfa_policy table (PK=role_id) can resolve their human label.
+    var rolesById = {}, rolesByCode = {};
+    state.roles.forEach(function(r){
+      if (r.role_id) rolesById[r.role_id] = r;
+      if (r.role_code) rolesByCode[r.role_code] = r;
+    });
     var rows = state.rolePolicies.slice();
     var columns = [
-      { key:'role_code', label:t('Role','Vai trò'), render:function(p){
-          var r = rolesByCode[p.role_code];
-          return '<div style="font-weight:500">'+esc((r&&r.role_label_vi)||p.role_code)+'</div>'
-            + '<div style="font-family:ui-monospace,monospace;font-size:11px;color:var(--text-3)">'+esc(p.role_code)+'</div>';
+      { key:'role_id', label:t('Role','Vai trò'), render:function(p){
+          var r = rolesById[p.role_id] || rolesByCode[p.role_code];
+          return '<div style="font-weight:500">'+esc((r&&r.role_label_vi)||(r&&r.role_code)||p.role_id||'?')+'</div>'
+            + '<div style="font-family:ui-monospace,monospace;font-size:11px;color:var(--text-3)">'+esc((r&&r.role_code)||p.role_id||'')+'</div>';
         } },
-      { key:'required_aal', label:'AAL', width:'80px', render:function(p){
-          var aal = p.required_aal || 1;
+      { key:'required_aal_level', label:'AAL', width:'80px', render:function(p){
+          var aal = p.required_aal_level || 1;
           var tone = aal >= 3 ? 'block' : (aal === 2 ? 'warn' : 'info');
           return badge('AAL'+aal, tone);
         } },
-      { key:'webauthn_required', label:t('WebAuthn','WebAuthn'), width:'100px', render:function(p){ return p.webauthn_required ? badge(t('Required','Bắt buộc'),'block') : badge(t('Optional','Tuỳ chọn'),'muted'); } },
-      { key:'reauth_minutes', label:t('Re-auth','Tái xác thực'), width:'120px', render:function(p){
-          if (!p.reauth_minutes) return badge(t('Never','Không yêu cầu'),'muted');
-          return '<span style="font-family:ui-monospace,monospace;font-size:12px">'+esc(p.reauth_minutes)+t(' min',' phút')+'</span>';
+      { key:'webauthn_required', label:t('WebAuthn','WebAuthn'), width:'100px', render:function(p){
+          var allowed = Array.isArray(p.allowed_factor_types) ? p.allowed_factor_types : [];
+          var meta = (p.metadata && typeof p.metadata === 'object') ? p.metadata : {};
+          var req = meta.webauthn_required === true || (allowed.length === 1 && allowed[0] === 'webauthn');
+          return req ? badge(t('Required','Bắt buộc'),'block') : badge(t('Optional','Tuỳ chọn'),'muted');
         } },
-      { key:'allow_remembered_device', label:t('Remembered device','Thiết bị nhớ'), width:'140px', render:function(p){ return p.allow_remembered_device !== false ? badge(t('Allowed','Cho phép'),'ok') : badge(t('Blocked','Chặn'),'block'); } },
+      { key:'reauth_after_minutes', label:t('Re-auth','Tái xác thực'), width:'120px', render:function(p){
+          if (!p.reauth_after_minutes) return badge(t('Never','Không yêu cầu'),'muted');
+          return '<span style="font-family:ui-monospace,monospace;font-size:12px">'+esc(p.reauth_after_minutes)+t(' min',' phút')+'</span>';
+        } },
+      { key:'apply_to_admin_only', label:t('Scope','Phạm vi'), width:'140px', render:function(p){ return p.apply_to_admin_only ? badge(t('Admin actions only','Chỉ thao tác admin'),'warn') : badge(t('All actions','Mọi thao tác'),'ok'); } },
       { key:'actions', label:'', width:'150px', render:function(p){
           return '<div style="display:flex;gap:4px">'
-            + '<button class="btn-admin secondary sm" data-edit-pol="'+UI.escapeAttr(p.id)+'">'+esc(t('Edit','Sửa'))+'</button>'
-            + '<button class="btn-admin secondary sm" data-del-pol="'+UI.escapeAttr(p.id)+'" style="color:var(--red-dark,#991b1b)">'+esc(t('Remove','Xoá'))+'</button>'
+            + '<button class="btn-admin secondary sm" data-edit-pol="'+UI.escapeAttr(p.role_id)+'">'+esc(t('Edit','Sửa'))+'</button>'
+            + '<button class="btn-admin secondary sm" data-del-pol="'+UI.escapeAttr(p.role_id)+'" style="color:var(--red-dark,#991b1b)">'+esc(t('Remove','Xoá'))+'</button>'
             + '</div>';
         } }
     ];
     el.innerHTML = head;
-    el.appendChild(UI.buildTable(columns, rows, { rowKey:'id', emptyMessage:t('No MFA policies defined — defaults will apply','Chưa có chính sách MFA — dùng mặc định') }));
+    el.appendChild(UI.buildTable(columns, rows, { rowKey:'role_id', emptyMessage:t('No MFA policies defined — defaults will apply','Chưa có chính sách MFA — dùng mặc định') }));
     el.querySelector('#mfa-pol-refresh').addEventListener('click', function(){ fetchRolePolicies().then(function(){ renderMfaPolicies(el); }); });
     el.querySelector('#mfa-pol-new').addEventListener('click', function(){ openMfaPolicyEditor(null, el); });
     Array.prototype.forEach.call(el.querySelectorAll('[data-edit-pol]'), function(b){
-      b.addEventListener('click', function(){ var p = state.rolePolicies.find(function(x){ return String(x.id)===b.getAttribute('data-edit-pol'); }); openMfaPolicyEditor(p, el); });
+      b.addEventListener('click', function(){ var p = state.rolePolicies.find(function(x){ return String(x.role_id)===b.getAttribute('data-edit-pol'); }); openMfaPolicyEditor(p, el); });
     });
     Array.prototype.forEach.call(el.querySelectorAll('[data-del-pol]'), function(b){
       b.addEventListener('click', function(){
-        var id = b.getAttribute('data-del-pol');
-        var p = state.rolePolicies.find(function(x){ return String(x.id)===id; });
+        var rid = b.getAttribute('data-del-pol');
+        var p = state.rolePolicies.find(function(x){ return String(x.role_id)===rid; });
         UI.confirmDestructive({ title:t('Remove MFA policy','Xoá chính sách MFA'), requireReason:true }).then(function(r){
           if (!r||!r.confirmed) return;
-          UI.runtime.delete('core_system','role_mfa_policy', id, p && p.row_version).then(function(){
-            UI.audit('mfa.policy.delete', { id:id, reason:r.reason });
+          UI.runtime.delete('core_system','mfa_policy', rid, p && p.row_version).then(function(){
+            UI.audit('mfa.policy.delete', { role_id:rid, reason:r.reason });
             UI.toast(t('Removed','Đã xoá'),'ok');
             fetchRolePolicies().then(function(){ renderMfaPolicies(el); });
           }).catch(function(err){ UI.toast((err && err.message) || t('Failed','Thất bại'),'block'); });
@@ -133,27 +144,45 @@
   }
 
   function openMfaPolicyEditor(existing, hostEl){
-    var rolesUsed = state.rolePolicies.map(function(p){ return p.role_code; });
-    var availableRoles = state.roles.filter(function(r){ return existing ? true : rolesUsed.indexOf(r.role_code) < 0; });
+    var usedRoleIds = state.rolePolicies.map(function(p){ return p.role_id; });
+    var availableRoles = state.roles.filter(function(r){
+      if (!r.role_id) return false;
+      return existing ? true : usedRoleIds.indexOf(r.role_id) < 0;
+    });
+    var existingMeta = (existing && existing.metadata && typeof existing.metadata === 'object') ? existing.metadata : {};
+    // Distinguish "field absent → use safe defaults" from "explicit empty array → respect it".
+    var existingAllowed = (existing && Array.isArray(existing.allowed_factor_types))
+      ? existing.allowed_factor_types
+      : (existing ? [] : ['totp','webauthn','backup_code']);
     var fields = [
-      { key:'role_code', label:t('Role','Vai trò'), type:'select', required:true,
-        value: existing ? existing.role_code : '',
+      { key:'role_id', label:t('Role','Vai trò'), type:'select', required:true,
+        value: existing ? existing.role_id : '',
         disabled: !!existing,
-        options: availableRoles.map(function(r){ return { value:r.role_code, label:(r.role_label_vi||r.role_code)+' ('+r.role_code+')' }; }) },
-      { key:'required_aal', label:t('Required AAL','AAL bắt buộc'), type:'select', required:true,
-        value: existing ? (existing.required_aal||1) : 1,
+        options: availableRoles.map(function(r){ return { value:r.role_id, label:(r.role_label_vi||r.role_code)+' ('+r.role_code+')' }; }) },
+      { key:'required', label:t('MFA required','Bắt buộc MFA'), type:'checkbox',
+        value: existing ? existing.required !== false : true,
+        checkboxLabel: t('Block sign-in until enrolled (subject to grace period)','Chặn đăng nhập tới khi đăng ký xong (theo grace period)') },
+      { key:'required_aal_level', label:t('Required AAL','AAL bắt buộc'), type:'select', required:true,
+        value: existing ? (existing.required_aal_level||2) : 2,
         options:[
           { value:1, label:'AAL1 — '+t('single-factor','một yếu tố') },
           { value:2, label:'AAL2 — '+t('two-factor (TOTP/SMS/Push)','hai yếu tố') },
           { value:3, label:'AAL3 — '+t('hardware-bound (FIDO2/WebAuthn)','phần cứng FIDO2/WebAuthn') }
         ] },
-      { key:'reauth_minutes', label:t('Re-auth interval (min, 0=never)','Khoảng tái xác thực (phút, 0=không)'), type:'number', min:0, max:1440,
-        value: existing ? (existing.reauth_minutes != null ? existing.reauth_minutes : 60) : 60 },
+      { key:'min_factors', label:t('Minimum factors','Số yếu tố tối thiểu'), type:'number', min:1, max:4,
+        value: existing ? (existing.min_factors||1) : 1 },
+      { key:'reauth_after_minutes', label:t('Re-auth interval (min, 0=never)','Khoảng tái xác thực (phút, 0=không)'), type:'number', min:0, max:10080,
+        value: existing ? (existing.reauth_after_minutes != null ? existing.reauth_after_minutes : 480) : 480 },
+      { key:'grace_period_days', label:t('Grace period (days)','Ân hạn (ngày)'), type:'number', min:0, max:90,
+        value: existing ? (existing.grace_period_days != null ? existing.grace_period_days : 7) : 7 },
+      { key:'apply_to_admin_only', label:t('Admin actions only','Chỉ thao tác admin'), type:'checkbox',
+        value: existing ? !!existing.apply_to_admin_only : false,
+        checkboxLabel: t('Step-up only when performing privileged operations','Chỉ yêu cầu khi thực hiện thao tác đặc quyền') },
       { key:'allow_remembered_device', label:t('Allow remembered device','Thiết bị đã nhớ'), type:'checkbox',
-        value: existing ? (existing.allow_remembered_device !== false) : true,
+        value: existingMeta.allow_remembered_device !== false,
         checkboxLabel: t('Skip second factor on previously enrolled device','Bỏ qua yếu tố thứ 2 trên thiết bị đã đăng ký') },
       { key:'webauthn_required', label:t('Require WebAuthn','Bắt buộc WebAuthn'), type:'checkbox',
-        value: existing ? !!existing.webauthn_required : false,
+        value: existingAllowed.indexOf('webauthn') >= 0 && (existingMeta.webauthn_required === true || (existingAllowed.length === 1 && existingAllowed[0] === 'webauthn')),
         checkboxLabel: t('User must enroll a hardware key (FIDO2)','Phải đăng ký khoá phần cứng (FIDO2)') }
     ];
     var form = UI.buildForm(fields);
@@ -166,12 +195,32 @@
     modal.card.querySelector('#mfa-pol-cancel').addEventListener('click', modal.close);
     modal.card.querySelector('#mfa-pol-save').addEventListener('click', function(){
       var v = form.getValues();
-      if (!v.role_code) { form.setError('role_code', t('Required','Bắt buộc')); return; }
+      if (!v.role_id) { form.setError('role_id', t('Required','Bắt buộc')); return; }
+      // Build payload matching real mfa_policy columns; non-column UI flags
+      // (webauthn_required + allow_remembered_device) are tucked into metadata.
+      var newAllowed = existingAllowed.slice();
+      if (v.webauthn_required && newAllowed.indexOf('webauthn') < 0) newAllowed.push('webauthn');
+      if (!newAllowed.length) newAllowed = ['totp','webauthn','backup_code'];
+      var newMeta = Object.assign({}, existingMeta, {
+        webauthn_required: !!v.webauthn_required,
+        allow_remembered_device: !!v.allow_remembered_device
+      });
+      var payload = {
+        role_id: existing ? existing.role_id : v.role_id,
+        required: !!v.required,
+        required_aal_level: parseInt(v.required_aal_level,10) || 2,
+        min_factors: parseInt(v.min_factors,10) || 1,
+        reauth_after_minutes: parseInt(v.reauth_after_minutes,10) || 0,
+        grace_period_days: parseInt(v.grace_period_days,10) || 0,
+        apply_to_admin_only: !!v.apply_to_admin_only,
+        allowed_factor_types: newAllowed,
+        metadata: newMeta
+      };
       var p = existing
-        ? UI.runtime.update('core_system','role_mfa_policy', existing.id, v, existing.row_version)
-        : UI.runtime.create('core_system','role_mfa_policy', v);
+        ? UI.runtime.update('core_system','mfa_policy', existing.role_id, payload, existing.row_version)
+        : UI.runtime.create('core_system','mfa_policy', payload);
       p.then(function(){
-        UI.audit(existing ? 'mfa.policy.update':'mfa.policy.create', v);
+        UI.audit(existing ? 'mfa.policy.update':'mfa.policy.create', { role_id: payload.role_id, required_aal_level: payload.required_aal_level });
         UI.toast(t('Saved','Đã lưu'),'ok');
         modal.close();
         fetchRolePolicies().then(function(){ renderMfaPolicies(hostEl); });
@@ -185,10 +234,19 @@
     function rerender(){
       var byUser = {};
       state.userFactors.forEach(function(f){ (byUser[f.user_id] = byUser[f.user_id] || []).push(f); });
-      var policiesByRole = {}; state.rolePolicies.forEach(function(p){ policiesByRole[p.role_code] = p; });
+      // mfa_policy is keyed by role_id; we still join via role_code for users so
+      // build a role_code → policy map by joining through state.roles.
+      var rolesByIdLocal = {};
+      state.roles.forEach(function(r){ if (r.role_id) rolesByIdLocal[r.role_id] = r; });
+      var policiesByRole = {};
+      state.rolePolicies.forEach(function(p){
+        var r = rolesByIdLocal[p.role_id];
+        var code = r ? r.role_code : (p.role_code || p.role_id);
+        if (code) policiesByRole[code] = p;
+      });
       var rows = state.users.map(function(u){
         var policy = policiesByRole[u.role_code] || policiesByRole[u.role];
-        var requiredAal = policy ? (policy.required_aal||1) : 1;
+        var requiredAal = policy ? (policy.required_aal_level||1) : 1;
         var factors = byUser[u.id] || byUser[u.username] || [];
         var maxAal = factors.reduce(function(m,f){ return Math.max(m, f.aal||1); }, factors.length ? 1 : 0);
         var compliant = maxAal >= requiredAal;

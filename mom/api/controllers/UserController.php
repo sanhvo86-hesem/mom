@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MOM\Api\Controllers;
 
 use MOM\Api\Services\AuthUserShadowSyncService;
+use MOM\Api\Services\RbacService;
 use Throwable;
 
 /**
@@ -93,6 +94,44 @@ class UserController extends BaseController
                     $existing[$key] = $data[$key];
                 }
             }
+
+            // Flat mfa_enabled toggle from the admin UI maps to nested mfa.enabled.
+            // Disabling clears any factor metadata so re-enabling forces re-enrolment.
+            // When the DB is reachable, also revoke active mfa_factor rows via
+            // RbacService::resetAllFactors so the user really cannot bypass.
+            if (array_key_exists('mfa_enabled', $data)) {
+                $mfaOn = (bool)$data['mfa_enabled'];
+                $previouslyOn = !empty($existing['mfa']['enabled']);
+                $mfa   = isset($existing['mfa']) && is_array($existing['mfa']) ? $existing['mfa'] : [];
+                $mfa['enabled'] = $mfaOn;
+                if (!$mfaOn) {
+                    unset($mfa['secret'], $mfa['factor_id'], $mfa['enrolled_at']);
+                }
+                $existing['mfa'] = $mfa;
+
+                if ($previouslyOn && !$mfaOn) {
+                    try {
+                        $rbac = new RbacService($this->data);
+                        $userIdForFactors = (string)($existing['user_id'] ?? '');
+                        if ($userIdForFactors === '' || !preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $userIdForFactors)) {
+                            $userIdForFactors = $rbac->resolveUserIdByUsername($username);
+                        }
+                        $actorUsername = (string)($me['username'] ?? $me['user'] ?? $me['name'] ?? '');
+                        $actorId = $actorUsername === '' ? '' : $rbac->resolveUserIdByUsername($actorUsername);
+                        if ($userIdForFactors !== '' && $actorId !== '') {
+                            $rbac->resetAllFactors(
+                                $userIdForFactors,
+                                $actorId,
+                                'admin disabled MFA via user edit modal'
+                            );
+                        }
+                    } catch (Throwable $factorErr) {
+                        // Non-fatal: JSON_ONLY mode or DB hiccup. mfa.enabled flag still flipped.
+                        @error_log('[UserController] mfa factor reset failed: ' . $factorErr->getMessage());
+                    }
+                }
+            }
+
             $existing['updated_at'] = $this->nowIso();
 
             // Handle password change
@@ -153,7 +192,7 @@ class UserController extends BaseController
                 'org_site_id'   => (string)($data['org_site_id'] ?? ''),
                 'employee_id'   => AuthUserShadowSyncService::canonicalEmployeeIdForUser(['username' => $username]),
                 'password_hash' => password_hash($newPw, PASSWORD_BCRYPT, ['cost' => 12]),
-                'mfa'           => ['enabled' => false],
+                'mfa'           => ['enabled' => (bool)($data['mfa_enabled'] ?? false)],
                 'created_at'    => $this->nowIso(),
                 'updated_at'    => $this->nowIso(),
             ];
