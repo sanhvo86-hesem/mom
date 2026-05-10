@@ -8137,7 +8137,7 @@ function renderAdmin(){
   }
   if(adminTab==='users') renderAdminUsers();
   if(adminTab==='dept_title') renderAdminDeptTitle();
-  if(adminTab==='perms') renderAdminPermTab('doc_perms');   // new doc_perms grid (grant editor + override + expiry)
+  if(adminTab==='perms') renderAdminPerms();          // role × document permission matrix (data-rich folder tree)
   if(adminTab==='roles') renderAdminRoles();
   if(adminTab==='orgchart') renderAdminOrgChart();
   if(adminTab==='activity') renderAdminActivity();
