@@ -32,7 +32,7 @@ var TABS = [
 
 var PRIORITY = {
   urgent: { vi:'Khan cap', en:'Urgent', color:'#ef4444', bg:'rgba(239,68,68,.1)' },
-  high:   { vi:'Cao',      en:'High',   color:'#f59e0b', bg:'rgba(245,158,11,.1)' },
+  high:   { vi:'Cao',      en:'High',   color:'var(--amber-light,#f59e0b)', bg:'rgba(245,158,11,.1)' },
   normal: { vi:'Binh thuong', en:'Normal', color:'#3b82f6', bg:'rgba(59,130,246,.1)' },
   low:    { vi:'Thap',     en:'Low',    color:'#94a3b8', bg:'rgba(148,163,184,.1)' }
 };
@@ -142,7 +142,7 @@ function _ensureStyles(){
     '.ms-sync-dot{width:12px;height:12px;border-radius:50%;display:inline-block}',
     '.ms-sync-online{background:#22c55e}',
     '.ms-sync-offline{background:#ef4444}',
-    '.ms-sync-pending{background:#f59e0b}',
+    '.ms-sync-pending{background:var(--amber-light,#f59e0b)}',
     /* card */
     '.ms-card{background:var(--surface,#fff);border:2px solid var(--border,#e2e8f0);border-radius:12px;padding:16px;margin-bottom:12px}',
     /* status indicator */

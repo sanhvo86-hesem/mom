@@ -71,7 +71,7 @@
   var CAPABILITY_LEVELS = {
     excellent: { min: 1.67, color: '#059669', vi: 'Xuất sắc', en: 'Excellent' },
     capable:   { min: 1.33, color: '#10b981', vi: 'Đủ năng lực', en: 'Capable' },
-    marginal:  { min: 1.0,  color: '#f59e0b', vi: 'Biên', en: 'Marginal' },
+    marginal:  { min: 1.0,  color: 'var(--amber-light,#f59e0b)', vi: 'Biên', en: 'Marginal' },
     incapable: { min: 0,    color: '#ef4444', vi: 'Không đủ năng lực', en: 'Incapable' }
   };
 
@@ -616,7 +616,7 @@
     html += '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">';
     html += '<div><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#059669;margin-right:6px"></span>' + T({ vi: 'Xuất sắc (>1.67)', en: 'Excellent (>1.67)' }) + '</div>';
     html += '<div><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#10b981;margin-right:6px"></span>' + T({ vi: 'Đủ năng lực (>1.33)', en: 'Capable (>1.33)' }) + '</div>';
-    html += '<div><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#f59e0b;margin-right:6px"></span>' + T({ vi: 'Biên (1.0-1.33)', en: 'Marginal (1.0-1.33)' }) + '</div>';
+    html += '<div><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:var(--amber-light,#f59e0b);margin-right:6px"></span>' + T({ vi: 'Biên (1.0-1.33)', en: 'Marginal (1.0-1.33)' }) + '</div>';
     html += '<div><span style="display:inline-block;width:12px;height:12px;border-radius:2px;background:#ef4444;margin-right:6px"></span>' + T({ vi: 'Không đủ năng lực (<1.0)', en: 'Incapable (<1.0)' }) + '</div>';
     html += '</div></div>';
 
