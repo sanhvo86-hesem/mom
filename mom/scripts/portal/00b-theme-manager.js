@@ -1587,6 +1587,7 @@ window.HmTheme = {
   saveTemplate: saveTemplate,
   deleteTemplate: deleteTemplate,
   getTemplateAuthorityStatus: getTemplateAuthorityStatus,
+  hasPreviewOverrides: _hasPreviewOverrides,
 	  graphicsAuthorityClient: graphicsAuthorityClient,
 	  resolveWithTemplate: resolveWithTemplate,
 	  getVisualThemePresets: getVisualThemePresets,

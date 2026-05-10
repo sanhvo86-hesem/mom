@@ -79,7 +79,7 @@ function T(k){
     light:'Sáng',dark:'Tối',auto:'Tự động (OS)',schedule:'Hẹn giờ',
     sharp:'Sắc nét',rounded:'Bo tròn',pill:'Viên thuốc',
     normal:'Bình thường',reduced:'Giảm',off:'Tắt',
-    saveOrg:'Lưu cho tổ chức',reset:'Đặt lại tất cả',saved:'Đã lưu cài đặt',resetDone:'Đã đặt lại mặc định',
+    saveOrg:'Lưu cho tổ chức',reset:'Hủy thay đổi xem trước',saved:'Đã lưu cài đặt',resetDone:'Đã hủy thay đổi xem trước',
     fontFamily:'Phông chữ',fontWeight:'Độ đậm',fontSize:'Cỡ chữ',lineHeight:'Chiều cao dòng',
     display:'Hiển thị / Hero',heading:'Tiêu đề',body:'Văn bản',label:'Nhãn / Caption',mono:'Mã nguồn',
     brand:'Màu thương hiệu',status:'Màu trạng thái',gray:'Thang xám',surfacesLight:'Bề mặt (Sáng)',surfacesDark:'Bề mặt (Tối)',
@@ -163,6 +163,9 @@ window._hmSet = function(cssVar, path, value){
     try { GraphicsAuthority.tokens.stage(path, value, { skipPreview: true }); }
     catch(_e){ /* swallow, legacy path must not throw */ }
   }
+  /* Show dirty notice whenever a preview change is staged */
+  var _dn = document.getElementById('adm-appearance-dirty-notice');
+  if(_dn) _dn.style.display = '';
 };
 window._hmSetWithUnit = function(cssVar, path, value, unit){
   var raw = value == null ? '' : String(value);
@@ -2011,7 +2014,7 @@ function _renderModuleOverrideEditor(moduleId, complianceRow){
     + '</div>'
     + '<div style="display:flex;gap:8px;justify-content:flex-end">'
     + '<button onclick="_admModuleOverridePreview(\''+esc(moduleId)+'\')" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg-surface);color:var(--text-primary)">👁 '+L('Preview','Preview')+'</button>'
-    + '<button onclick="_admModuleOverrideSave(\''+esc(moduleId)+'\')" style="padding:6px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#1565c0;color:#fff">💾 '+L('Lưu override','Save override')+'</button>'
+    + '<button onclick="_admModuleOverrideSave(\''+esc(moduleId)+'\')" style="padding:6px 16px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:var(--brand-2);color:var(--text-inverse,#fff)">💾 '+L('Lưu override','Save override')+'</button>'
     + '</div>'
     + '</div>';
 }
@@ -2193,8 +2196,8 @@ function renderAuthorityStatusPanel(){
     else totalUnchecked++;
   });
 
-  var probeBtn = '<button onclick="_admGraphicsProbeContracts()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid #e2e8f0;background:#ffffff;color:#1e293b">🔍 Probe all endpoints</button>';
-  var refreshBtn = '<button onclick="_admGraphicsForceRefresh()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid #e2e8f0;background:#ffffff;color:#1e293b">↻ Refresh live data</button>';
+  var probeBtn = '<button onclick="_admGraphicsProbeContracts()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--bg-surface);color:var(--text-primary)">🔍 Probe all endpoints</button>';
+  var refreshBtn = '<button onclick="_admGraphicsForceRefresh()" style="display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border);background:var(--bg-surface);color:var(--text-primary)">↻ Refresh live data</button>';
   var lastRefresh = snap.lastLoadedAt ? '<span style="font-size:11px;color:var(--text-secondary)">Last refresh: '+esc(snap.lastLoadedAt.replace('T',' ').replace(/\.\d+Z$/,' UTC'))+'</span>' : '';
   var lastProbe = (snap.lastProbeAt) ? '<span style="font-size:11px;color:var(--text-secondary)">Last probe: '+esc(snap.lastProbeAt.replace('T',' ').replace(/\.\d+Z$/,' UTC'))+'</span>' : '<span style="font-size:11px;color:var(--text-secondary)">Not probed yet — POST endpoints require manual probe</span>';
 
@@ -3521,8 +3524,8 @@ function renderTokenExportPanel(){
   var btnBar = formats.map(function(f){
     return '<button onclick="_admTokenExportFormat(\''+f.key+'\')" id="export-btn-'+f.key+'" style="padding:5px 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border);background:var(--bg-surface);color:var(--text-primary)">'+f.btn+'</button>';
   }).join('');
-  var copyBtn = '<button onclick="_admTokenExportCopy()" style="padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#1565c0;color:#fff;margin-left:auto">📋 Copy</button>';
-  var downloadBtn = '<button onclick="_admTokenExportDownload()" style="padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:#059669;color:#fff">⬇ Download</button>';
+  var copyBtn = '<button onclick="_admTokenExportCopy()" style="padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:var(--brand-2);color:var(--text-inverse,#fff);margin-left:auto">📋 Copy</button>';
+  var downloadBtn = '<button onclick="_admTokenExportDownload()" style="padding:5px 12px;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer;border:none;background:var(--green);color:var(--text-inverse,#fff)">⬇ Download</button>';
   var preview = genCSS().slice(0,1800);
   return sect(L('Token Export Pipeline','Token Export Pipeline'),
     '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px">'+L('Xuất tất cả '+keys.length+' design tokens ra nhiều định dạng: CSS, SCSS, JS/TS, W3C DTCG, iOS Swift.','Export all '+keys.length+' design tokens in multiple formats: CSS, SCSS, JS/TS, W3C DTCG, iOS Swift.')+'</div>'
@@ -3947,14 +3950,22 @@ function render(el, subTab, currentLang){
   });
 
   /* Global actions */
-  h += '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">';
+  var _hasDirty = typeof HmTheme !== 'undefined' && HmTheme.hasPreviewOverrides && HmTheme.hasPreviewOverrides();
+  h += '<div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)">';
   h += '<button class="hm-btn hm-btn-primary" onclick="_saveAllAppearance()">'+T('saveOrg')+'</button>';
-  h += '<button class="hm-btn hm-btn-secondary" onclick="HmTheme.reset();renderAdminAppearance()">'+T('reset')+'</button>';
+  h += '<button class="hm-btn hm-btn-secondary" onclick="_admAppearanceClearDirty();HmTheme.reset();renderAdminAppearance()">'+T('reset')+'</button>';
+  h += '<div id="adm-appearance-dirty-notice" style="display:'+(_hasDirty?'':'none')+';font-size:12px;font-weight:600;color:var(--brand-2);padding:5px 10px;border-radius:6px;background:color-mix(in srgb,var(--brand-2) 8%,var(--bg-surface));border:1px solid color-mix(in srgb,var(--brand-2) 20%,transparent)">⚠ '+L('Có thay đổi xem trước chưa lưu','Unsaved preview changes')+'</div>';
   h += '</div>';
 
   h += '</div>';
   el.innerHTML = h;
 }
+
+/* ── Dirty-state helpers ─────────────────────────────────────────────────── */
+window._admAppearanceClearDirty = function(){
+  var el = document.getElementById('adm-appearance-dirty-notice');
+  if(el) el.style.display = 'none';
+};
 
 /* ── Save all ────────────────────────────────────────────────────────────── */
 window._saveAllAppearance = function(){
@@ -3963,6 +3974,7 @@ window._saveAllAppearance = function(){
   HmTheme.saveAdminConfig(cfg, function(ok){
     announceGraphics(ok ? L('Admin draft đã lưu qua backend authority.', 'Admin draft saved through backend authority.') : L('Lưu admin draft thất bại; authority không đổi.', 'Admin draft save failed; authority unchanged.'));
     if(typeof showToast==='function') showToast(T(ok?'saved':'error'), ok?'success':'error');
+    if(ok) window._admAppearanceClearDirty();
   });
 };
 
