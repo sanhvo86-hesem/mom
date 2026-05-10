@@ -346,6 +346,55 @@ class AdminController extends BaseController
         }
     }
 
+    /**
+     * GET admin_local_sync_report
+     *
+     * Returns the last sync report written by data-sync.sh after completing a
+     * pull/push cycle. The report is stored at
+     * $PRIVATE_DATA/.local-sync-report.json on the VPS and contains:
+     *   ts, actor, conflict_mode, pull_count, push_applied, conflict_count
+     *
+     * If the file doesn't exist yet (no sync has run since bootstrap), the
+     * response contains a "never_synced" flag so the UI can show a hint.
+     *
+     * @return never
+     */
+    public function localSyncReport(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAdmin($me);
+
+        $privateDataDir = rtrim((string)(getenv('PRIVATE_DATA') ?: '/var/www/data-private'), '/');
+        $reportPath     = $privateDataDir . '/.local-sync-report.json';
+
+        if (!is_file($reportPath)) {
+            $this->success(['ok' => true, 'never_synced' => true, 'report' => null]);
+        }
+
+        $raw = @file_get_contents($reportPath);
+        if ($raw === false) {
+            $this->success(['ok' => true, 'never_synced' => true, 'report' => null]);
+        }
+
+        $report = json_decode((string)$raw, true);
+        if (!is_array($report)) {
+            $this->success(['ok' => true, 'never_synced' => true, 'report' => null]);
+        }
+
+        $this->success([
+            'ok'           => true,
+            'never_synced' => false,
+            'report'       => [
+                'ts'             => (string)($report['ts'] ?? ''),
+                'actor'          => (string)($report['actor'] ?? ''),
+                'conflict_mode'  => (string)($report['conflict_mode'] ?? ''),
+                'pull_count'     => (int)($report['pull_count'] ?? 0),
+                'push_applied'   => (bool)($report['push_applied'] ?? false),
+                'conflict_count' => (int)($report['conflict_count'] ?? 0),
+            ],
+        ]);
+    }
+
     private function dataSyncMutator(): DataSyncMutationService
     {
         return new DataSyncMutationService($this->dataDir, $this->data);

@@ -7181,6 +7181,205 @@ bash tools/vps-setup/scripts/data-sync.sh --push-only --yes --change-ref <CR>`)}
   </section>`;
 }
 
+// ── Sub-tab: Local sync ───────────────────────────────────────────────────
+// Shows the 3-tier sync architecture (local machine ↔ VPS mirror ↔ VPS site)
+// and the last sync report written by data-sync.sh.
+function renderAdminVCLocalSync(){
+  const repState  = localSyncReportState;
+  const syncState = dataSyncStatusState;
+  const report    = repState.data && repState.data.report ? repState.data.report : null;
+  const neverSynced = !!(repState.data && repState.data.never_synced);
+  const syncData  = syncState.data && typeof syncState.data === 'object' ? syncState.data : null;
+  const files     = Array.isArray(syncData && syncData.config_files) ? syncData.config_files : [];
+  const driftCount = files.filter(f=>f&&f.site_present&&f.private_present&&!f.in_sync_with_mirror).length;
+  const mirrorOk   = !!(syncData && syncData.private_data_present);
+
+  const refreshBtn = `<button class="admin-sync-mini" onclick="loadLocalSyncReport({force:true});loadDataSyncStatus({force:true})">
+    <span class="admin-sync-mini-ico">${adminGitSyncIcon('sync')}</span>
+    <span>${lang==='en'?'Refresh':'Làm mới'}</span>
+  </button>`;
+
+  // ── Last sync report card ──────────────────────────────────────────────
+  const reportCard = (() => {
+    if(repState.loading && !report){
+      return `<div class="admin-sync-callout-bar is-info">${escapeHtml(lang==='en'?'Loading last sync report…':'Đang tải báo cáo sync cuối…')}</div>`;
+    }
+    if(repState.error && !report){
+      return `<div class="admin-sync-callout-bar is-error">${escapeHtml((lang==='en'?'Could not load sync report. ':'Không tải được báo cáo. ')+repState.error)}</div>`;
+    }
+    if(neverSynced || !report){
+      return `<div class="admin-sync-callout-bar is-warn">${escapeHtml(lang==='en'
+        ?'No sync report found on VPS. The SessionStart hook will write one after the next Claude session begins (it now runs --pull-only --yes).'
+        :'Chưa tìm thấy báo cáo sync trên VPS. Hook SessionStart sẽ ghi báo cáo sau khi phiên Claude tiếp theo bắt đầu (đã đổi sang --pull-only --yes).')}</div>`;
+    }
+    const tone = report.conflict_count > 0 ? 'error' : report.pull_count > 0 || report.push_applied ? 'good' : 'info';
+    const summary = report.push_applied
+      ? (lang==='en' ? `Pushed local→VPS and pulled ${report.pull_count} file(s).` : `Đã đẩy local→VPS và kéo ${report.pull_count} file.`)
+      : report.pull_count > 0
+      ? (lang==='en' ? `Pulled ${report.pull_count} file(s) from VPS to local.` : `Đã kéo ${report.pull_count} file từ VPS về local.`)
+      : (lang==='en' ? 'In sync — no files transferred.' : 'Đồng bộ — không có file nào được chuyển.');
+    const conflictNote = report.conflict_count > 0
+      ? (lang==='en' ? ` ${report.conflict_count} conflict(s) resolved by conflict mode.` : ` ${report.conflict_count} xung đột đã xử lý theo conflict mode.`)
+      : '';
+    return `<div class="admin-sync-callout-bar is-${tone === 'error' ? 'error' : tone === 'good' ? 'good' : 'info'}">${escapeHtml(summary+conflictNote)}</div>
+    <div class="admin-sync-meta-list" style="margin-top:8px">
+      <div class="admin-sync-meta-row"><div class="admin-sync-meta-label">${lang==='en'?'Last sync time':'Thời gian sync cuối'}</div>
+        <div class="admin-sync-meta-value">${escapeHtml(vcFmtTime(report.ts))}</div></div>
+      <div class="admin-sync-meta-row"><div class="admin-sync-meta-label">${lang==='en'?'Actor':'Actor'}</div>
+        <div class="admin-sync-meta-value"><code>${escapeHtml(report.actor||'--')}</code></div></div>
+      <div class="admin-sync-meta-row"><div class="admin-sync-meta-label">${lang==='en'?'Conflict mode':'Conflict mode'}</div>
+        <div class="admin-sync-meta-value"><code>${escapeHtml(report.conflict_mode||'prefer-vps')}</code></div></div>
+      <div class="admin-sync-meta-row"><div class="admin-sync-meta-label">${lang==='en'?'Files pulled (VPS→local)':'File kéo (VPS→local)'}</div>
+        <div class="admin-sync-meta-value">${escapeHtml(String(report.pull_count||0))}</div></div>
+      <div class="admin-sync-meta-row"><div class="admin-sync-meta-label">${lang==='en'?'Push applied (local→VPS)':'Đẩy (local→VPS)'}</div>
+        <div class="admin-sync-meta-value">${escapeHtml(report.push_applied?(lang==='en'?'Yes':'Có'):(lang==='en'?'No':'Không'))}</div></div>
+      <div class="admin-sync-meta-row"><div class="admin-sync-meta-label">${lang==='en'?'Conflicts':'Xung đột'}</div>
+        <div class="admin-sync-meta-value">${escapeHtml(String(report.conflict_count||0))}</div></div>
+    </div>`;
+  })();
+
+  // ── VPS mirror health summary ──────────────────────────────────────────
+  const mirrorCard = (() => {
+    if(!syncData && syncState.loading) return `<div class="admin-sync-callout-bar is-info">${escapeHtml(lang==='en'?'Checking VPS mirror health…':'Đang kiểm tra VPS mirror…')}</div>`;
+    if(!mirrorOk) return `<div class="admin-sync-callout-bar is-error">${escapeHtml(lang==='en'
+      ?'VPS mirror directory (data-private) is missing — deploys cannot protect runtime config.'
+      :'Thư mục VPS mirror (data-private) đang thiếu — deploy không thể bảo vệ config runtime.')}</div>`;
+    return `<div class="admin-sync-callout-bar is-${driftCount>0?'warn':'good'}">${escapeHtml(driftCount>0
+      ?(lang==='en'?`${driftCount} file(s) drifted between VPS site and VPS mirror. Open Config Sync sub-tab to resolve.`:`${driftCount} file lệch giữa VPS site và VPS mirror. Mở sub-tab Config Sync để xử lý.`)
+      :(lang==='en'?`VPS mirror is healthy — ${files.length} runtime config files are in sync.`:`VPS mirror khỏe mạnh — ${files.length} file config runtime đang khớp.`))}</div>`;
+  })();
+
+  // ── CLI quickstart ─────────────────────────────────────────────────────
+  const cliBlock = `<pre style="font-size:11px;line-height:1.6;background:var(--bg-2,#f6f7fb);padding:10px;border-radius:6px;overflow:auto;margin:0">${escapeHtml(
+`# Check what would be synced (dry-run, no writes)
+cd /path/to/mom && TARGET=eqms bash tools/vps-setup/scripts/data-sync.sh --check-only
+
+# Pull VPS changes to local (safe, runs at every Claude session start)
+TARGET=eqms bash tools/vps-setup/scripts/data-sync.sh --pull-only --yes
+
+# Full 3-way reconcile (prefer-vps on conflict)
+TARGET=eqms bash tools/vps-setup/scripts/data-sync.sh --yes
+
+# Push local edits to VPS with a Change Reference
+TARGET=eqms bash tools/vps-setup/scripts/data-sync.sh --push-only --yes --change-ref CR-2026-XXX`)}</pre>`;
+
+  // ── macOS LaunchAgent for 5-min auto-pull ──────────────────────────────
+  const launchAgentBlock = `<pre style="font-size:10px;line-height:1.5;background:var(--bg-2,#f6f7fb);padding:10px;border-radius:6px;overflow:auto;margin:0">${escapeHtml(
+`# Save to ~/Library/LaunchAgents/com.hesem.mom-sync.plist
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>           <string>com.hesem.mom-sync</string>
+  <key>StartInterval</key>   <integer>300</integer>
+  <key>WorkingDirectory</key><string>/Users/a10/Documents/mom</string>
+  <key>EnvironmentVariables</key>
+  <dict><key>TARGET</key><string>eqms</string></dict>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>tools/vps-setup/scripts/data-sync.sh</string>
+    <string>--pull-only</string>
+    <string>--yes</string>
+  </array>
+  <key>StandardOutPath</key> <string>/tmp/mom-sync.log</string>
+  <key>StandardErrorPath</key><string>/tmp/mom-sync-err.log</string>
+</dict>
+</plist>
+
+# Load once:
+launchctl load ~/Library/LaunchAgents/com.hesem.mom-sync.plist`)}</pre>`;
+
+  return `<section class="admin-sync-strip admin-sync-strip--cpanel">
+    <div class="admin-sync-head admin-sync-head--cpanel">
+      <div class="admin-sync-title-wrap">
+        <div class="admin-sync-kicker">${lang==='en'?'Local sync':'Đồng bộ local'}</div>
+        <h3>${lang==='en'?'Local machine ↔ VPS bidirectional sync':'Đồng bộ hai chiều Local ↔ VPS'}</h3>
+        <p>${lang==='en'
+          ?'data-sync.sh manages a 3-tier communication vessel: VPS site → VPS mirror (data-private) → local working copy. The Claude SessionStart hook now runs --pull-only --yes on every session.'
+          :'data-sync.sh quản lý "ống thông" 3 tầng: VPS site → VPS mirror (data-private) → bản local. Hook SessionStart của Claude hiện chạy --pull-only --yes mỗi khi mở phiên mới.'}</p>
+      </div>
+      <div class="admin-sync-head-actions">${refreshBtn}</div>
+    </div>
+
+    <div class="admin-sync-cpanel-grid">
+
+      <article class="admin-sync-cpanel-card">
+        <div class="admin-sync-panel-title">${lang==='en'?'Last session sync result':'Kết quả sync phiên cuối'}</div>
+        ${reportCard}
+      </article>
+
+      <article class="admin-sync-cpanel-card">
+        <div class="admin-sync-panel-title">${lang==='en'?'VPS mirror health':'Tình trạng VPS mirror'}</div>
+        ${mirrorCard}
+        <div style="margin-top:8px;font-size:11px;color:var(--text-3)">
+          ${lang==='en'
+            ?'The VPS mirror (data-private/config/) is the sync authority between the VPS and your local machine. Full details are in the Config Sync sub-tab.'
+            :'VPS mirror (data-private/config/) là nguồn đồng bộ giữa VPS và máy local. Chi tiết đầy đủ trong sub-tab Config Sync.'}
+        </div>
+        ${driftCount > 0 ? `<div style="margin-top:8px">
+          <button class="admin-sync-mini" onclick="setVersionControlSubTab('config_sync')">
+            ${lang==='en'?'Go to Config Sync →':'Mở Config Sync →'}
+          </button></div>` : ''}
+      </article>
+
+    </div>
+
+    <article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:14px">
+      <div class="admin-sync-panel-title">${lang==='en'?'How the 3-tier sync works':'Cách "ống thông" 3 tầng hoạt động'}</div>
+      <div style="font-family:monospace;font-size:12px;line-height:2;padding:10px;background:var(--bg-2,#f6f7fb);border-radius:8px;margin:8px 0">
+        ${lang==='en'
+          ?'Local machine  ←──────────────────────────────────→  VPS mirror (data-private/config/)  ←──────────────────→  VPS site (mom/data/config/)'
+          :'Máy local  ←─────────────────────────────────────→  VPS mirror (data-private/config/)  ←──────────────────→  VPS site (mom/data/config/)'}
+        <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        ${lang==='en'?'data-sync.sh (CLI + SessionStart hook)':'data-sync.sh (CLI + hook SessionStart)'}
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        ${lang==='en'?'admin UI + deploy.sh':'admin UI + deploy.sh'}
+      </div>
+      <ul style="font-size:12px;margin:8px 0 0 16px;line-height:1.9;color:var(--text-2)">
+        <li><strong>${lang==='en'?'VPS site':'VPS site'}</strong> — ${lang==='en'?'live runtime config, written by the portal UI (DataSyncMutationService).':'config runtime đang chạy, được portal UI ghi (DataSyncMutationService).'}</li>
+        <li><strong>${lang==='en'?'VPS mirror':'VPS mirror'}</strong> — ${lang==='en'?'data-private/config/ survives git reset --hard via deploy.sh capture/restore.':'data-private/config/ sống sót qua git reset --hard nhờ deploy.sh capture/restore.'}</li>
+        <li><strong>${lang==='en'?'Local copy':'Bản local'}</strong> — ${lang==='en'?'~/mom-vps-data/eqms/working/files/config/ — baseline manifest tracks last sync state.':'~/mom-vps-data/eqms/working/files/config/ — manifest baseline theo dõi trạng thái sync cuối.'}</li>
+        <li><strong>${lang==='en'?'Why git reset --hard lost data (historical)':'Tại sao git reset --hard làm mất dữ liệu (lịch sử)'}</strong> — ${lang==='en'
+          ?'Before commit 41436ee2, runtime config files were tracked. git reset --hard reverted them to committed bytes, wiping portal edits (e.g. user ianr lost in commit 4a8ffebd). Now files are gitignored + deploy.sh has capture/restore.'
+          :'Trước commit 41436ee2, các file config runtime được track bởi git. git reset --hard ghi đè chúng về bytes đã commit, xóa các thay đổi của portal (ví dụ: mất user ianr ở commit 4a8ffebd). Nay files đã gitignore + deploy.sh có capture/restore.'}</li>
+      </ul>
+    </article>
+
+    <article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:14px">
+      <div class="admin-sync-panel-title">${lang==='en'?'SessionStart hook (Claude Code)':'Hook SessionStart (Claude Code)'}</div>
+      <div style="font-size:12px;color:var(--text-2);margin-bottom:8px">${lang==='en'
+        ?'Configured in .claude/settings.local.json. Runs automatically when a Claude Code session starts. Now uses --pull-only --yes instead of --check-only, so local files are always fresh at session start.'
+        :'Cấu hình trong .claude/settings.local.json. Chạy tự động khi phiên Claude Code bắt đầu. Hiện dùng --pull-only --yes thay vì --check-only, đảm bảo file local luôn mới nhất khi mở phiên.'}</div>
+      <pre style="font-size:11px;line-height:1.5;background:var(--bg-2,#f6f7fb);padding:10px;border-radius:6px;overflow:auto;margin:0">${escapeHtml(
+`"SessionStart": [{
+  "type": "command",
+  "command": "cd \\"$CLAUDE_PROJECT_DIR\\" && TARGET=eqms perl -e 'alarm 60; exec @ARGV' bash tools/vps-setup/scripts/data-sync.sh --pull-only --yes 2>&1 | tail -30"
+}]`)}</pre>
+    </article>
+
+    <article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:14px">
+      <details>
+        <summary style="cursor:pointer;font-size:13px;font-weight:600;padding:4px 0">${escapeHtml(lang==='en'?'CLI quick-reference':'Tham chiếu nhanh CLI')}</summary>
+        <div style="margin-top:10px">${cliBlock}</div>
+      </details>
+    </article>
+
+    <article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:14px">
+      <details>
+        <summary style="cursor:pointer;font-size:13px;font-weight:600;padding:4px 0">${escapeHtml(lang==='en'?'Setup 5-minute auto-sync (macOS LaunchAgent)':'Cài đồng bộ tự động mỗi 5 phút (macOS LaunchAgent)')}</summary>
+        <div style="font-size:12px;color:var(--text-3);margin:8px 0">${lang==='en'
+          ?'This LaunchAgent pulls VPS changes to your local machine every 5 minutes. Only use --pull-only so it never overwrites VPS data without an explicit Change Reference.'
+          :'LaunchAgent này kéo thay đổi từ VPS về máy local mỗi 5 phút. Chỉ dùng --pull-only để không ghi đè dữ liệu VPS mà không có Change Reference.'}</div>
+        <div style="margin-top:8px">${launchAgentBlock}</div>
+      </details>
+    </article>
+
+  </section>`;
+}
+
 // Compact runtime-config drift badge shown inside the Sync (Git) sub-tab.
 // Full details are in the dedicated Config Sync sub-tab.
 function renderAdminSyncConfigBadge(){
@@ -7360,6 +7559,8 @@ let versionControlAuditState     = {loading:false, loaded:false, error:'', data:
 // but has its own diff-viewer and editor modals stored in these locals:
 let vcConfigSyncDiffState  = {open:false, name:'', loading:false, site:null, mirror:null, error:''};
 let vcConfigSyncEditorState= {open:false, name:'', loading:false, content:'', error:'', saving:false};
+// local_sync sub-tab: last report written by data-sync.sh to VPS
+let localSyncReportState = {loading:false, loaded:false, error:'', data:null};
 
 function setVersionControlSubTab(id){
   if(typeof id !== 'string' || !id) return;
@@ -7378,6 +7579,9 @@ function setVersionControlSubTab(id){
     if(!gitRepoStatusState.loaded && !gitRepoStatusState.loading) loadGitRepoStatus({silent:true});
     if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading) loadDataSyncStatus({silent:true});
   } else if(id === 'config_sync'){
+    if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading) loadDataSyncStatus({silent:true});
+  } else if(id === 'local_sync'){
+    if(!localSyncReportState.loaded && !localSyncReportState.loading) loadLocalSyncReport({silent:true});
     if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading) loadDataSyncStatus({silent:true});
   }
   renderAdmin();
@@ -7477,6 +7681,29 @@ async function loadVersionControlAudit(options){
   }
 }
 
+async function loadLocalSyncReport(options){
+  options = options || {};
+  const force = !!options.force;
+  if(localSyncReportState.loading && !force) return;
+  if(localSyncReportState.loaded && !force) return;
+  localSyncReportState = {loading:true, loaded:false, error:'', data:null};
+  if(!options.silent && currentPage === 'admin') renderAdmin();
+  try{
+    const res = await apiCall('admin_local_sync_report', null, 'GET');
+    if(res && res.ok){
+      localSyncReportState = {loading:false, loaded:true, error:'', data:res};
+    } else {
+      localSyncReportState = {loading:false, loaded:false,
+        error:(res && (res.detail||res.error)) ? String(res.detail||res.error) : 'local_sync_report_failed',
+        data:null};
+    }
+  } catch(e){
+    localSyncReportState = {loading:false, loaded:false, error:e.message||'local_sync_report_failed', data:null};
+  } finally {
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
 function vcFmtTime(iso){
   if(!iso) return '--';
   return gitRepoFormatTime(iso) || iso;
@@ -7498,6 +7725,7 @@ function renderVCSubTabNav(){
     {id:'overview',    en:'Overview',          vi:'Tổng quan'},
     {id:'sync',        en:'Sync (Git)',         vi:'Đồng bộ Git'},
     {id:'config_sync', en:'Config Sync',        vi:'Đồng bộ Config File'},
+    {id:'local_sync',  en:'Local sync',         vi:'Đồng bộ local↔VPS'},
     {id:'snapshots',   en:'Snapshots',          vi:'Snapshot & rollback'},
     {id:'doc_history', en:'Doc history',        vi:'Lịch sử tài liệu'},
     {id:'audit',       en:'Audit log',          vi:'Nhật ký kiểm toán'},
@@ -7982,11 +8210,16 @@ function renderAdminVersionControl(){
   if(versionControlSubTab === 'audit' && !versionControlAuditState.loaded && !versionControlAuditState.loading && !versionControlAuditState.error){
     loadVersionControlAudit({silent:true});
   }
+  if(versionControlSubTab === 'local_sync'){
+    if(!localSyncReportState.loaded && !localSyncReportState.loading && !localSyncReportState.error) loadLocalSyncReport({silent:true});
+    if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading && !dataSyncStatusState.error) loadDataSyncStatus({silent:true});
+  }
 
   let body;
   switch(versionControlSubTab){
     case 'sync':        body = renderAdminSyncPanelV2();        break;
     case 'config_sync': body = renderAdminVCConfigSync();       break;
+    case 'local_sync':  body = renderAdminVCLocalSync();        break;
     case 'snapshots':   body = renderAdminVCSnapshots();        break;
     case 'doc_history': body = renderAdminVCDocHistory();       break;
     case 'audit':       body = renderAdminVCAuditLog();         break;

@@ -472,3 +472,18 @@ log "  PULL applied: ${#PULL_FILES[@]}   PUSH applied: ${#PUSH_FILES[@]}   CONFL
 log "  Working files: $WORKING_DIR/files/$SUBSET/"
 log "  History:       $WORKING_DIR/.history/$TS/"
 log "  State log:     $WORKING_DIR/.sync-state.jsonl"
+
+# ── Step 10: Write sync report to VPS for portal admin UI ──────────────────
+# Non-critical: write a small JSON summary to the VPS mirror so the portal
+# admin VC "Local sync" sub-tab can display last-sync metadata.
+_SYNC_REPORT="$(jq -nc \
+    --arg ts "$NOW_ISO" \
+    --arg actor "$ACTOR" \
+    --arg mode "$CONFLICT_MODE" \
+    --argjson pull "${#PULL_FILES[@]}" \
+    --argjson push "$PUSHED" \
+    --argjson conflict "$CONFLICT_N" \
+    '{ts:$ts, actor:$actor, conflict_mode:$mode,
+      pull_count:$pull, push_applied:($push==1), conflict_count:$conflict}')"
+ssh "$VPS" "cat > \"${PRIVATE_DATA}/.local-sync-report.json\"" <<< "$_SYNC_REPORT" 2>/dev/null \
+  || warn "Could not write sync report to VPS (non-fatal)."
