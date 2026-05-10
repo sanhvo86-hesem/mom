@@ -17299,6 +17299,18 @@ case 'doc_save_draft': {
         $users[$i]['org_site_id'] = $orgSiteId;
         $users[$i]['updated_at'] = now_iso();
 
+        // Flat mfa_enabled toggle from the admin UI maps to nested mfa.enabled.
+        // Disabling clears any factor metadata so re-enabling forces re-enrolment.
+        if (array_key_exists('mfa_enabled', $data)) {
+          $mfaOn = (bool)$data['mfa_enabled'];
+          $mfa = isset($users[$i]['mfa']) && is_array($users[$i]['mfa']) ? $users[$i]['mfa'] : [];
+          $mfa['enabled'] = $mfaOn;
+          if (!$mfaOn) {
+            unset($mfa['secret'], $mfa['factor_id'], $mfa['enrolled_at']);
+          }
+          $users[$i]['mfa'] = $mfa;
+        }
+
         if ($passwordProvided) {
           $users[$i]['password_hash'] = password_hash((string)$plainPassword, PASSWORD_DEFAULT);
           // Reset MFA on password set/reset (user must enroll again)
@@ -17347,7 +17359,7 @@ case 'doc_save_draft': {
         'org_legal_entity_code' => $orgLegalEntityCode,
         'org_plant_id' => $orgPlantId,
         'org_site_id' => $orgSiteId,
-        'mfa' => ['enabled' => false],
+        'mfa' => ['enabled' => (bool)($data['mfa_enabled'] ?? false)],
         'created_at' => now_iso(),
         'updated_at' => now_iso(),
       ];
