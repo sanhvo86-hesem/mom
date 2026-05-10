@@ -1477,6 +1477,33 @@ class GenericCrudService
                 }
                 return $json;
             }
+            // PostgreSQL native array columns: type starts with `_` (e.g. `_TEXT`,
+            // `_INT4`). Encode JS arrays as a PG array literal `{a,b,c}` with
+            // double-quote escaping for text-like elements so values containing
+            // commas / braces / quotes survive the round-trip.
+            if (is_array($value) && str_starts_with($type, '_')) {
+                if ($value === [] || array_is_list($value)) {
+                    $parts = [];
+                    foreach ($value as $item) {
+                        if ($item === null) {
+                            $parts[] = 'NULL';
+                            continue;
+                        }
+                        if (is_bool($item)) {
+                            $parts[] = $item ? 't' : 'f';
+                            continue;
+                        }
+                        if (is_int($item) || is_float($item)) {
+                            $parts[] = (string)$item;
+                            continue;
+                        }
+                        $s = (string)$item;
+                        $escaped = str_replace(['\\', '"'], ['\\\\', '\\"'], $s);
+                        $parts[] = '"' . $escaped . '"';
+                    }
+                    return '{' . implode(',', $parts) . '}';
+                }
+            }
             throw new RuntimeException('Complex values are only allowed for JSON columns');
         }
 
