@@ -871,7 +871,14 @@ pre, code { overflow-wrap: anywhere; word-break: break-word; }
   td, th { overflow-wrap: anywhere; word-break: break-word; }
   pre { white-space: pre-wrap; }
 
-  .page-body { padding: 20px 16px 32px; }
+  /* Edge-to-edge document surface on mobile — eliminate the gray frame
+     produced by .container side gutters + .page border-radius/shadow so
+     controlled documents use the full viewport width inside the portal
+     iframe (and standalone). Print + desktop layouts are untouched. */
+  body { background: var(--bg); }
+  .container { max-width: 100%; padding: 0; }
+  .page, .page.landscape { border-radius: 0; box-shadow: none; max-width: 100%; }
+  .page-body { padding: 14px 12px 24px; }
   .form-header .meta { flex-direction: column; }
   .grid-2, .form-grid, .ship-grid, .toc-grid { grid-template-columns: 1fr; }
   .sig-row, .sign-row { flex-direction: column; }
