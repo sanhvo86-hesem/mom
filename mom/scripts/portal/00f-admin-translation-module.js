@@ -100,9 +100,9 @@ function escapeHtml(s) {
 
 // ── Entry & shell ────────────────────────────────────────────────────────────
 
-window.renderAdminTranslationModule = function () {
-  const el = document.getElementById('admin-content');
-  if (!el) return;
+window.renderAdminTranslationModule = function (container) {
+  const el = container || document.getElementById('admin-content');
+  if (!el || !document.contains(el)) return;
   el.innerHTML = renderShell();
   loadAll();
 };

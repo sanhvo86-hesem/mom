@@ -13,10 +13,11 @@
 function _t(vi, en){ return (typeof lang !== 'undefined' && lang === 'en') ? en : vi; }
 
 /* ── State ────────────────────────────────────────────────────── */
-var _cfg = null;   // loaded config object
-var _usage = null; // usage stats from server
+var _cfg = null;       // loaded config object
+var _usage = null;     // usage stats from server
 var _saving = false;
 var _testing = false;
+var _container = null; // element passed by caller; prevents stale getElementById stomping later tabs
 
 /* ── Supported models ─────────────────────────────────────────── */
 var AI_MODELS = [
@@ -32,6 +33,7 @@ var AI_MODELS = [
 
 /* ── Main render entry point ──────────────────────────────────── */
 window._renderAdminAiControl = function(el){
+  _container = el;
   el.innerHTML = _skeleton();
   _load();
 };
@@ -85,8 +87,8 @@ function _fetchUsage(cb){
 
 /* ── Main render ──────────────────────────────────────────────── */
 function _render(){
-  var el = document.getElementById('admin-content');
-  if(!el) return;
+  var el = _container || document.getElementById('admin-content');
+  if(!el || !document.contains(el)) return;
 
   var cfg = _cfg || {};
   var enabled  = cfg.enabled === true || cfg.enabled === 'true';
