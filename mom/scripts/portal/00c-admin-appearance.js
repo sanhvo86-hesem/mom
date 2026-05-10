@@ -320,24 +320,24 @@ function radioRow(name, options, current, onChange){
 function statusChip(kind, label){
   var map = {
     full: {
-      bg: 'rgba(22,163,74,0.12)',
-      border: 'rgba(22,163,74,0.28)',
+      bg: 'color-mix(in srgb,var(--green,#16a34a) 12%,transparent)',
+      border: 'color-mix(in srgb,var(--green,#16a34a) 28%,transparent)',
       color: 'var(--green,#15803d)'
     },
     partial: {
-      bg: 'rgba(245,158,11,0.12)',
-      border: 'rgba(245,158,11,0.28)',
+      bg: 'color-mix(in srgb,var(--amber,#f57f17) 12%,transparent)',
+      border: 'color-mix(in srgb,var(--amber,#f57f17) 28%,transparent)',
       color: 'var(--amber,#d97706)'
     },
     preview: {
-      bg: 'rgba(37,99,235,0.12)',
-      border: 'rgba(37,99,235,0.24)',
-      color: 'var(--blue,#2563eb)'
+      bg: 'color-mix(in srgb,var(--brand-2,#1565c0) 12%,transparent)',
+      border: 'color-mix(in srgb,var(--brand-2,#1565c0) 24%,transparent)',
+      color: 'var(--brand-2,#1565c0)'
     },
     admin: {
-      bg: 'rgba(124,58,237,0.12)',
-      border: 'rgba(124,58,237,0.24)',
-      color: 'var(--purple,#7c3aed)'
+      bg: 'color-mix(in srgb,var(--brand,#0c2d48) 12%,transparent)',
+      border: 'color-mix(in srgb,var(--brand,#0c2d48) 24%,transparent)',
+      color: 'var(--brand,#0c2d48)'
     }
   };
   var tone = map[kind] || map.preview;
@@ -347,24 +347,24 @@ function statusChip(kind, label){
 function infoCard(title, body, kind){
   var tone = {
     full: {
-      bg: 'rgba(22,163,74,0.08)',
-      border: 'rgba(22,163,74,0.24)',
+      bg: 'color-mix(in srgb,var(--green,#16a34a) 8%,transparent)',
+      border: 'color-mix(in srgb,var(--green,#16a34a) 24%,transparent)',
       title: 'var(--green,#15803d)'
     },
     partial: {
-      bg: 'rgba(245,158,11,0.08)',
-      border: 'rgba(245,158,11,0.24)',
+      bg: 'color-mix(in srgb,var(--amber,#f57f17) 8%,transparent)',
+      border: 'color-mix(in srgb,var(--amber,#f57f17) 24%,transparent)',
       title: 'var(--amber,#d97706)'
     },
     preview: {
-      bg: 'rgba(37,99,235,0.08)',
-      border: 'rgba(37,99,235,0.22)',
-      title: 'var(--blue,#2563eb)'
+      bg: 'color-mix(in srgb,var(--brand-2,#1565c0) 8%,transparent)',
+      border: 'color-mix(in srgb,var(--brand-2,#1565c0) 22%,transparent)',
+      title: 'var(--brand-2,#1565c0)'
     },
     admin: {
-      bg: 'rgba(79,70,229,0.08)',
-      border: 'rgba(79,70,229,0.22)',
-      title: 'var(--indigo,#4f46e5)'
+      bg: 'color-mix(in srgb,var(--brand,#0c2d48) 8%,transparent)',
+      border: 'color-mix(in srgb,var(--brand,#0c2d48) 22%,transparent)',
+      title: 'var(--brand,#0c2d48)'
     },
     neutral: {
       bg: 'var(--bg-surface-alt,var(--bg-hover))',
@@ -609,7 +609,7 @@ function previewDensityControls(){
     + '<button class="hm-btn hm-btn-primary">Default</button>'
     + '<button class="hm-btn hm-btn-lg hm-btn-secondary">Large</button>'
     + '<input class="hm-input" value="Input sizing" style="max-width:180px">'
-    + '<span class="hm-badge hm-badge-review"><i style="display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:currentColor;color:#fff">i</i>Badge</span>'
+    + '<span class="hm-badge hm-badge-review"><i style="display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:currentColor;color:var(--text-inverse,#fff)">i</i>Badge</span>'
     + '</div>'
     + '<div style="display:flex;gap:10px;flex-wrap:wrap">'
     + '<div style="display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:var(--radius-md);background:var(--bg-surface)">'
@@ -1947,9 +1947,9 @@ function _moduleComplianceBadge(row){
 
 function _moduleDebtBar(score){
   var pct = Math.min(100, Math.round(score));
-  var color = pct < 20 ? '#22c55e' : pct < 50 ? '#f59e0b' : '#ef4444';
+  var color = pct < 20 ? 'var(--green,#22c55e)' : pct < 50 ? 'var(--amber,#f59e0b)' : 'var(--red,#ef4444)';
   return '<div style="display:flex;align-items:center;gap:6px">'
-    + '<div style="flex:1;height:6px;border-radius:3px;background:#e2e8f0;overflow:hidden">'
+    + '<div style="flex:1;height:6px;border-radius:3px;background:var(--border,#e2e8f0);overflow:hidden">'
     + '<div style="height:100%;width:'+pct+'%;background:'+color+';border-radius:3px;transition:width .3s"></div>'
     + '</div>'
     + '<span style="font-size:10px;color:var(--text-secondary);min-width:28px;text-align:right">'+pct+'</span>'
@@ -2040,7 +2040,7 @@ function renderModuleComplianceEditorPanel(){
     var score = _moduleDebtScore(row);
     var hasOverride = !!(savedOverrides[moduleId] && savedOverrides[moduleId].scope);
     var isNonCompliant = row.linkageStatus !== 'full-admin-controlled' && row.linkageStatus !== 'full';
-    var borderColor = isNonCompliant ? '#fca5a5' : '#bbf7d0';
+    var borderColor = isNonCompliant ? 'color-mix(in srgb,var(--red,#ef4444) 35%,transparent)' : 'color-mix(in srgb,var(--green,#16a34a) 30%,transparent)';
     var violations = [];
     if(row.usesPrivateCssShell) violations.push(L('Shell CSS riêng (không dùng hm-*)','Private CSS shell (not using hm-*)'));
     if(row.hardcodedStyleDebt > 0) violations.push(L('Hardcoded styles: ','Hardcoded styles: ') + row.hardcodedStyleDebt);
@@ -2218,11 +2218,11 @@ function renderAuthorityStatusPanel(){
     var state = statuses[key] || 'not checked';
     var isPost = ep.method === 'POST';
     var methodCell = isPost
-      ? '<span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:800;background:#fef3c7;color:#92400e;font-family:var(--font-mono)">POST</span>'
-      : '<span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:800;background:#e0f2fe;color:#075985;font-family:var(--font-mono)">GET</span>';
+      ? '<span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:800;background:color-mix(in srgb,var(--amber,#f59e0b) 14%,var(--bg-surface,#fff));color:var(--amber-dark,#92400e);font-family:var(--font-mono)">POST</span>'
+      : '<span style="display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:800;background:color-mix(in srgb,var(--brand-2,#1565c0) 10%,var(--bg-surface,#fff));color:var(--brand-2,#075985);font-family:var(--font-mono)">GET</span>';
     var noteCell = isPost && state === 'not checked'
-      ? '<span style="font-size:10px;color:#94a3b8;font-style:italic">mutation — probe to verify</span>'
-      : (isPost ? '<span style="font-size:10px;color:#94a3b8;font-style:italic">mutation</span>' : '');
+      ? '<span style="font-size:10px;color:var(--text-tertiary,#94a3b8);font-style:italic">mutation — probe to verify</span>'
+      : (isPost ? '<span style="font-size:10px;color:var(--text-tertiary,#94a3b8);font-style:italic">mutation</span>' : '');
     return '<tr>'
       + '<td style="padding:7px 8px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:11px;white-space:nowrap">'+esc(key)+'</td>'
       + '<td style="padding:7px 8px;border-bottom:1px solid var(--border)">'+methodCell+'</td>'
@@ -2788,9 +2788,9 @@ function renderApiContractPanel(){
 }
 
 function densityChipStyle(density){
-  if(density === 'dense') return 'background:rgba(217,119,6,.12);color:#b45309;border:1px solid rgba(217,119,6,.18)';
-  if(density === 'comfortable') return 'background:rgba(22,163,74,.12);color:#15803d;border:1px solid rgba(22,163,74,.18)';
-  return 'background:rgba(79,70,229,.10);color:#4338ca;border:1px solid rgba(79,70,229,.18)';
+  if(density === 'dense') return 'background:color-mix(in srgb,var(--amber,#f57f17) 12%,transparent);color:color-mix(in srgb,var(--amber,#f57f17) 70%,#000 30%);border:1px solid color-mix(in srgb,var(--amber,#f57f17) 18%,transparent)';
+  if(density === 'comfortable') return 'background:color-mix(in srgb,var(--green,#16a34a) 12%,transparent);color:var(--green,#15803d);border:1px solid color-mix(in srgb,var(--green,#16a34a) 18%,transparent)';
+  return 'background:color-mix(in srgb,var(--brand-2,#1565c0) 10%,transparent);color:var(--brand-2,#1565c0);border:1px solid color-mix(in srgb,var(--brand-2,#1565c0) 18%,transparent)';
 }
 
 function renderTemplateSvg(tpl){
@@ -3049,7 +3049,7 @@ function renderTemplateCard(tpl){
 	      +     templateStatusChip(tpl)
 	      +     templateControlBadge(tpl)
 	      +     statusChip(templatePublishEligibility(tpl) === 'eligible' ? 'full' : (templatePublishEligibility(tpl) === 'blocked' ? 'partial' : 'preview'), templatePublishEligibility(tpl))
-	      +     '<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;background:rgba(37,99,235,.10);color:#1d4ed8;border:1px solid rgba(37,99,235,.18);font-size:10px;font-weight:700">'+esc(String(tpl.zoneCount))+' zones</span>'
+	      +     '<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;background:color-mix(in srgb,var(--brand-2,#1565c0) 10%,transparent);color:var(--brand-2,#1565c0);border:1px solid color-mix(in srgb,var(--brand-2,#1565c0) 18%,transparent);font-size:10px;font-weight:700">'+esc(String(tpl.zoneCount))+' zones</span>'
 	      +     '<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:700;'+densityChipStyle(tpl.density)+'">'+esc(tpl.density)+'</span>'
 	      +   '</div>'
     +   '<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:8px">'
@@ -3144,7 +3144,7 @@ function renderTemplateDetail(id){
   h += '</div>';
   h += '<div class="tpl-detail-header" style="display:grid;grid-template-columns:minmax(280px,360px) 1fr;align-items:stretch">';
   h += '<div class="tpl-detail-preview" style="width:auto"><div style="aspect-ratio:16/10;display:flex;align-items:center;justify-content:center">'+renderTemplateSvg(tpl)+'</div></div>';
-  h += '<div class="tpl-detail-meta"><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="hm-badge">'+esc(cat ? cat.label[lang === 'en' ? 'en' : 'vi'] : tpl.category)+'</span>'+templateStatusChip(tpl)+templateControlBadge(tpl)+'<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;background:rgba(37,99,235,.10);color:#1d4ed8;border:1px solid rgba(37,99,235,.18);font-size:10px;font-weight:700">'+esc(String(tpl.zoneCount))+' zones</span><span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:700;'+densityChipStyle(tpl.density)+'">'+esc(tpl.density)+'</span></div>'
+  h += '<div class="tpl-detail-meta"><div style="display:flex;gap:6px;flex-wrap:wrap"><span class="hm-badge">'+esc(cat ? cat.label[lang === 'en' ? 'en' : 'vi'] : tpl.category)+'</span>'+templateStatusChip(tpl)+templateControlBadge(tpl)+'<span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;background:color-mix(in srgb,var(--brand-2,#1565c0) 10%,transparent);color:var(--brand-2,#1565c0);border:1px solid color-mix(in srgb,var(--brand-2,#1565c0) 18%,transparent);font-size:10px;font-weight:700">'+esc(String(tpl.zoneCount))+' zones</span><span style="display:inline-flex;align-items:center;padding:2px 6px;border-radius:999px;font-size:10px;font-weight:700;'+densityChipStyle(tpl.density)+'">'+esc(tpl.density)+'</span></div>'
     + '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;margin-top:10px">'
     + smallMeta('templateId', tpl.templateId || tpl.id)
     + smallMeta('version', tpl.version || '1.0.0')
@@ -3457,7 +3457,7 @@ function renderA11yChecklistPanel(){
   ];
   var rows = checks.map(function(c){
     var icon = c.done===true ? '✅' : c.done===false ? '❌' : '⚠️';
-    var bg = c.done===true ? '' : c.done===false ? 'background:#fff5f5' : 'background:#fffbeb';
+    var bg = c.done===true ? '' : c.done===false ? 'background:color-mix(in srgb,var(--red,#ef4444) 6%,var(--bg-surface,#fff))' : 'background:color-mix(in srgb,var(--amber,#f59e0b) 8%,var(--bg-surface,#fff))';
     return '<tr style="'+bg+'">'
       +'<td style="padding:6px 10px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--text-secondary);white-space:nowrap">'+esc(c.cat)+'</td>'
       +'<td style="padding:6px 10px;border-bottom:1px solid var(--border);font-size:16px;text-align:center">'+icon+'</td>'
@@ -3590,12 +3590,12 @@ function renderHealthScorePanel(){
   var debtPct = Math.max(0, 100-debtScore);
   var blockersScore = blockers.length === 0 ? 100 : Math.max(0, 100-blockers.length*15);
   var overall = Math.round((adoptionPct*0.4)+(debtPct*0.35)+(blockersScore*0.25));
-  function scoreColor(pct){ return pct>=80?'#22c55e':pct>=50?'#f59e0b':'#ef4444'; }
+  function scoreColor(pct){ return pct>=80?'var(--green,#22c55e)':pct>=50?'var(--amber,#f59e0b)':'var(--red,#ef4444)'; }
   function bar(pct,label,detail){
     var c=scoreColor(pct);
     return '<div style="margin-bottom:12px">'
       +'<div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;font-weight:600;color:var(--text-primary)">'+esc(label)+'</span><span style="font-size:12px;font-weight:700;color:'+c+'">'+pct+'%</span></div>'
-      +'<div style="height:8px;border-radius:4px;background:#e2e8f0;overflow:hidden;margin-bottom:3px"><div style="height:100%;width:'+pct+'%;background:'+c+';border-radius:4px;transition:width .4s"></div></div>'
+      +'<div style="height:8px;border-radius:4px;background:var(--border,#e2e8f0);overflow:hidden;margin-bottom:3px"><div style="height:100%;width:'+pct+'%;background:'+c+';border-radius:4px;transition:width .4s"></div></div>'
       +'<div style="font-size:11px;color:var(--text-secondary)">'+esc(detail)+'</div>'
       +'</div>';
   }
@@ -3787,12 +3787,12 @@ function renderTokenSemanticMapPanel(){
     {name:L('Component Tokens','Component Tokens'), color:'#fef9c3', examples:['--hds-btn-py','--hds-table-cell-py','--hds-badge-fw','--hds-modal-radius','--hds-nav-height'], desc:L('Override per-component nếu cần tách biệt khỏi semantic. Dùng ít nhất có thể.','Per-component overrides when separation from semantic is needed. Use sparingly.')},
   ];
   var blocks = layers.map(function(l,i){
-    return '<div style="flex:1;border-radius:10px;padding:16px;background:'+esc(l.color)+';border:2px solid rgba(0,0,0,.07)">'
-      +'<div style="font-size:12px;font-weight:800;color:#1e293b;margin-bottom:6px">'+(i+1)+'. '+esc(l.name)+'</div>'
-      +'<div style="font-size:11px;color:#374151;margin-bottom:10px;line-height:1.6">'+esc(l.desc)+'</div>'
-      +'<div style="display:flex;flex-direction:column;gap:4px">'+l.examples.map(function(e){return '<code style="font-size:10px;background:rgba(255,255,255,.7);border-radius:4px;padding:2px 6px;color:#1e293b;display:inline-block">'+esc(e)+'</code>';}).join('')+'</div>'
+    return '<div style="flex:1;border-radius:10px;padding:16px;background:'+esc(l.color)+';border:2px solid color-mix(in srgb,var(--text-primary,#1e293b) 7%,transparent)">'
+      +'<div style="font-size:12px;font-weight:800;color:var(--text-primary,#1e293b);margin-bottom:6px">'+(i+1)+'. '+esc(l.name)+'</div>'
+      +'<div style="font-size:11px;color:var(--text-secondary,#374151);margin-bottom:10px;line-height:1.6">'+esc(l.desc)+'</div>'
+      +'<div style="display:flex;flex-direction:column;gap:4px">'+l.examples.map(function(e){return '<code style="font-size:10px;background:color-mix(in srgb,var(--bg-surface,#fff) 70%,transparent);border-radius:4px;padding:2px 6px;color:var(--text-primary,#1e293b);display:inline-block">'+esc(e)+'</code>';}).join('')+'</div>'
       +'</div>';
-  }).join('<div style="display:flex;align-items:center;padding:0 6px;font-size:20px;color:#94a3b8">→</div>');
+  }).join('<div style="display:flex;align-items:center;padding:0 6px;font-size:20px;color:var(--text-tertiary,#94a3b8)">→</div>');
   return sect(L('Token Semantic Architecture','Token Semantic Architecture'),
     '<div style="font-size:12px;color:var(--text-secondary);margin-bottom:14px">'+L('Ba lớp token: Primitive (giá trị thô) → Semantic (vai trò ngữ nghĩa) → Component (override cục bộ). Chỉ semantic và component được phép dùng trong stylesheet module.','Three-layer token architecture: Primitive (raw values) → Semantic (role-assigned) → Component (local overrides). Only semantic and component layers should appear in module stylesheets.')+'</div>'
     +'<div style="display:flex;gap:8px;align-items:stretch;flex-wrap:wrap">'+blocks+'</div>',
@@ -3817,10 +3817,10 @@ function renderSideBySidePanel(){
     var txt2 = isDark ? (cd.textSecondary|| '#94a3b8') : (cl.textSecondary|| '#64748b');
     var bdr  = isDark ? (cd.border       || '#334155') : (cl.border       || '#e2e8f0');
     var okColor = isDark ? (scd.success || '#22c55e')  : (sc.success      || '#16a34a');
-    var doneBg  = isDark ? 'rgba(34,197,94,.15)' : 'rgba(22,163,74,.12)';
-    var pendBg  = isDark ? 'rgba(234,179,8,.12)' : 'rgba(217,119,6,.10)';
+    var doneBg  = 'color-mix(in srgb,'+(isDark?(scd.success||'#22c55e'):(sc.success||'#16a34a'))+' 13%,'+(isDark?(cd.bgSurface||'#1e293b'):(cl.bgSurface||'#ffffff'))+')';
+    var pendBg  = 'color-mix(in srgb,'+(isDark?(scd.warning||'#fbbf24'):(sc.warning||'#d97706'))+' 11%,'+(isDark?(cd.bgSurface||'#1e293b'):(cl.bgSurface||'#ffffff'))+')';
     var pendTxt = isDark ? (scd.warning||'#fbbf24') : (sc.warning||'#854d0e');
-    var ovdBg   = isDark ? 'rgba(248,113,113,.12)' : 'rgba(220,38,38,.10)';
+    var ovdBg   = 'color-mix(in srgb,'+(isDark?(scd.error||'#f87171'):(sc.error||'#dc2626'))+' 11%,'+(isDark?(cd.bgSurface||'#1e293b'):(cl.bgSurface||'#ffffff'))+')';
     var ovdTxt  = isDark ? (scd.error||'#f87171')   : (sc.error  ||'#991b1b');
     return '<div style="background:'+pg+';padding:12px;border-radius:8px;font-family:-apple-system,sans-serif">'
       +'<div style="background:'+bg+';border:1px solid '+bdr+';border-radius:8px;padding:14px;margin-bottom:10px">'
