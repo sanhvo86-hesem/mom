@@ -603,6 +603,15 @@ function portal_normalize_streamed_doc_url(string $docRelPath, string $url): str
 
   $canonical = portal_map_legacy_doc_path_to_canonical($resolved);
   if ($canonical === '') return $url;
+  // If legacy→canonical mapping made no change (path not in any known legacy prefix),
+  // only rewrite if the path starts with mom/ or assets/ (already canonical).
+  // Relative paths that resolved outside the legacy hierarchy (e.g. ../../../operations/...)
+  // must NOT be rewritten to /operations/... — they should stay as-is so the browser
+  // resolves them correctly against the document's actual serving URL.
+  $normalizedResolved = ltrim(str_replace('\\', '/', trim($resolved)), '/');
+  if ($canonical === $normalizedResolved && !preg_match('#^(mom/|assets/)#', $normalizedResolved)) {
+    return $url;
+  }
   return '/' . ltrim($canonical, '/') . $suffix;
 }
 
@@ -1637,6 +1646,51 @@ function portal_auth_shadow_sync_user(array $user, string $rootDir): void {
   } catch (Throwable $e) {
     @error_log('[API] auth user shadow sync failed: ' . $e->getMessage());
   }
+  // ADR-0013: also write a row to the hash-chained audit log so the
+  // legacy api.php upsert/reset_password/delete paths are auditable
+  // alongside the new UserController path. Failure is non-fatal.
+  portal_identity_audit_chain_record($user, 'identity_user_saved');
+}
+
+/**
+ * Record an identity mutation in audit_event_chain (migration 174).
+ * Best-effort — silently no-ops when PortalServices / DB is unavailable.
+ */
+function portal_identity_audit_chain_record(array $user, string $eventType): void {
+  try {
+    $servicesFile = __DIR__ . '/api/services/PortalServices.php';
+    if (!is_file($servicesFile)) {
+      return;
+    }
+    require_once $servicesFile;
+    if (!class_exists('\MOM\Api\Services\PortalServices')) {
+      return;
+    }
+    $audit = \MOM\Api\Services\PortalServices::auditChain();
+    if ($audit === null) {
+      return;
+    }
+    $username = strtolower(trim((string)($user['username'] ?? '')));
+    if ($username === '') {
+      return;
+    }
+    $audit->record(
+      eventType: $eventType,
+      aggregateType: 'identity.users',
+      aggregateId: $username,
+      actorId: null,
+      actorName: 'legacy_api_php',
+      payload: [
+        'username'   => $username,
+        'role'       => (string)($user['role'] ?? ''),
+        'dept'       => (string)($user['dept'] ?? ''),
+        'active'     => (bool)($user['active'] ?? true),
+        'source'     => 'legacy_api_php',
+      ],
+    );
+  } catch (Throwable $e) {
+    @error_log('[API] audit_event_chain record failed: ' . $e->getMessage());
+  }
 }
 
 function portal_auth_shadow_deactivate_user(string $username, ?string $employeeId, string $rootDir): void {
@@ -1649,6 +1703,10 @@ function portal_auth_shadow_deactivate_user(string $username, ?string $employeeI
   } catch (Throwable $e) {
     @error_log('[API] auth user shadow deactivate failed: ' . $e->getMessage());
   }
+  portal_identity_audit_chain_record(
+    ['username' => $username, 'employee_id' => $employeeId, 'active' => false],
+    'identity_user_deactivated',
+  );
 }
 
 /**
