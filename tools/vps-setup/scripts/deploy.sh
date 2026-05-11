@@ -563,6 +563,20 @@ if [ -d "$design_dir" ]; then
     [ -f "$design_dir/template-registry.json" ] && chmod 664 "$design_dir/template-registry.json"
 fi
 
+# Stale *.lock and *.tmp files left by admin CLI tests or crashed PHP workers
+# can be owned by root (when run via sudo) and block fopen('c') from PHP-FPM.
+# Reset ownership on all such files in every PHP-writable area so the next
+# legitimate write always succeeds regardless of what created the lock file.
+for _lock_dir in \
+    "$SITE_DIR/mom/data/config" \
+    "$SITE_DIR/mom/data/registry" \
+    "$SITE_DIR/mom/data/graphics-governance" \
+    "$SITE_DIR/mom/design"; do
+    [ -d "$_lock_dir" ] || continue
+    find "$_lock_dir" -name "*.lock" -exec chown "$WEB_USER:$WEB_GROUP" {} + -exec chmod 664 {} + 2>/dev/null || true
+    find "$_lock_dir" -name "*.tmp"  -delete 2>/dev/null || true
+done
+
 # data-private root: www-data must be able to create dot-files
 # (.sync-schedule.json, .local-sync-report.json) via atomic tmp+rename.
 chgrp "$WEB_GROUP" "$PRIVATE_DATA" 2>/dev/null || true
