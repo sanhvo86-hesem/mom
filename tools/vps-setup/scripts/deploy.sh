@@ -555,6 +555,14 @@ for gfx_dir in \
     find "$gfx_dir" -type f -exec chmod 664 {} +
 done
 
+# mom/design is the canonical template registry source; publishTemplate() writes
+# template-registry.json there via atomic tmp→rename (no sticky bit on this dir).
+design_dir="$SITE_DIR/mom/design"
+if [ -d "$design_dir" ]; then
+    chmod 775 "$design_dir"
+    [ -f "$design_dir/template-registry.json" ] && chmod 664 "$design_dir/template-registry.json"
+fi
+
 # data-private root: www-data must be able to create dot-files
 # (.sync-schedule.json, .local-sync-report.json) via atomic tmp+rename.
 chgrp "$WEB_GROUP" "$PRIVATE_DATA" 2>/dev/null || true
