@@ -536,10 +536,23 @@ for config_file in \
     "$SITE_DIR/mom/data/config/docs_custom.json" \
     "$SITE_DIR/mom/data/config/docs_visibility.json" \
     "$SITE_DIR/mom/data/config/form_control_registry.json" \
-    "$SITE_DIR/mom/data/config/portal_display_config.json"; do
+    "$SITE_DIR/mom/data/config/portal_display_config.json" \
+    "$SITE_DIR/mom/data/config/design-system-config.json"; do
     [ -e "$config_file" ] || continue
     chown "$WEB_USER:$WEB_GROUP" "$config_file"
     chmod 664 "$config_file"
+done
+
+# Graphics governance runtime directories: PHP-FPM writes registry snapshots and
+# governance state here. No sticky bit on these dirs so atomic tmp→rename works
+# as long as www-data has directory write permission.
+for gfx_dir in \
+    "$SITE_DIR/mom/data/registry" \
+    "$SITE_DIR/mom/data/graphics-governance"; do
+    [ -d "$gfx_dir" ] || continue
+    chown "$DEPLOY_USER:$WEB_GROUP" "$gfx_dir"
+    find "$gfx_dir" -type d -exec chmod 775 {} +
+    find "$gfx_dir" -type f -exec chmod 664 {} +
 done
 
 # data-private root: www-data must be able to create dot-files
