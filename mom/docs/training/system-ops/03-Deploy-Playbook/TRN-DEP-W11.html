@@ -3,11 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>TRN-DEP-W11 — Playbook tuần 11 (2026-07-25) | HESEM MOM</title>
+<title>TRN-DEP-W11 — Sổ tay triển khai tuần 11 (2026-07-25) | HESEM MOM</title>
 <script>
-/* DCC Header bootstrap — copy verbatim from TRN-OPS-09 pattern.
- * Computes absolute URLs so the stylesheet + renderer load correctly
- * regardless of how the document is served (direct, portal iframe, …). */
+	/* Nap bo hien thi DCC dung chung theo mau TRN-OPS-09.
+	 * Tinh URL tuyet doi de tep dinh dang va bo hien thi tai dung khi mo truc tiep hoac trong khung nhung cong thong tin. */
 (function () {
   var DCC_VERSION = '2026-04-24-1';
   var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
@@ -34,154 +33,154 @@
 <body>
 <div class="container"><div class="page"><div class="page-body">
 
-<!-- DCC Document Change Control header (preview seed; live values served by /api/v1/dcc) -->
+	<!-- Tieu de kiem soat thay doi DCC (du lieu mau xem truoc; gia tri thuc te do /api/v1/dcc cung cap) -->
 <div class="dcc-header"
      data-dcc-doc-code="TRN-DEP-W11"
      data-dcc-locale="vi"
      data-dcc-logo="../../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap='{"header":{"doc_code":"TRN-DEP-W11","title":"Playbook tuần 11 — Lessons learned + tài liệu hậu triển khai","subtitle":"Triển khai vận hành QMS · Phase P4 · 2026-07-25 (Saturday)","doc_type":"TRN","revision":"V0","effective_date":"2026-07-25","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":null,"status":"draft"}}'></div>
+     data-dcc-bootstrap='{"header":{"doc_code":"TRN-DEP-W11","title":"Sổ tay triển khai tuần 11 — Bài học kinh nghiệm và tài liệu sau triển khai","subtitle":"Triển khai vận hành QMS · Giai đoạn P4 · 2026-07-25 (Thứ Bảy)","doc_type":"TRN","revision":"V0","effective_date":"2026-07-25","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":null,"status":"draft"}}'></div>
 
 <div class="doc-content" id="docContent">
 <section class="card" id="sec-cover">
-  <h1 class="h2" style="margin-top:0;">W11 · 2026-07-25 — Lessons learned + tài liệu hậu triển khai</h1>
-  <p class="lead">Tuần 11 là buổi thu hoạch giá trị từ 10 tuần triển khai trước đó: không chỉ chúc mừng, mà biến lỗi, workaround, dữ liệu dashboard và phản hồi ẩn danh thành revision tài liệu, training playlist v2 và 5 cải tiến hệ thống. Đây là Kotter bước 8 ở dạng thực thi, Prosci Reinforcement, Lean Change final retrospective và ISO 9001:2015 §10.1/§10.3 continual improvement. CEO mở đầu bằng khung blameless, nhưng senior role nói sau cùng để tránh neo ý kiến theo Hofstede Vietnam high power-distance.</p>
+  <h1 class="h2" style="margin-top:0;">W11 · 2026-07-25 — Bài học kinh nghiệm và tài liệu sau triển khai</h1>
+	  <p class="lead">Tuần 11 là buổi thu hoạch giá trị từ 10 tuần triển khai trước đó: không chỉ chúc mừng, mà biến lỗi, phương án tạm thời, dữ liệu bảng điều hành và phản hồi ẩn danh thành lần sửa đổi tài liệu, danh sách video đào tạo v2 và 5 cải tiến hệ thống. Đây là Kotter bước 8 ở dạng thực thi, củng cố hành vi theo Prosci, cuộc họp hồi cứu cuối theo Lean Change và ISO 9001:2015 §10.1/§10.3 cải tiến liên tục. CEO mở đầu bằng khung không quy lỗi cá nhân, nhưng vai trò lãnh đạo nói sau cùng để tránh neo ý kiến trong bối cảnh Việt Nam có khoảng cách quyền lực cao theo Hofstede.</p>
   <div class="grid-3">
     <div class="metric-card"><strong>Ngày</strong><br>2026-07-25</div>
     <div class="metric-card"><strong>Thứ</strong><br>Thứ Bảy</div>
-    <div class="metric-card"><strong>Phase</strong><br>P4 · Reinforcement</div>
-    <div class="metric-card"><strong>Pillar</strong><br>doc · lessons learned</div>
-    <div class="metric-card"><strong>Attendees</strong><br>All departments, Steering, 22 champions, document owners · khoảng 80 người</div>
-    <div class="metric-card"><strong>Owner</strong><br>CEO opening · QMS_MGR facilitation · QMS_ENG evidence pack</div>
+    <div class="metric-card"><strong>Giai đoạn</strong><br>P4 · củng cố đào tạo</div>
+    <div class="metric-card"><strong>Trụ cột</strong><br>tài liệu · bài học kinh nghiệm</div>
+    <div class="metric-card"><strong>Thành phần tham dự</strong><br>Đại diện được ủy quyền của các phòng ban · Ban Chỉ đạo · đại diện hạt nhân · chủ trì tài liệu liên quan</div>
+    <div class="metric-card"><strong>Chủ trì</strong><br>CEO mở đầu · QMS_MGR điều phối · QMS_ENG chuẩn bị gói bằng chứng</div>
   </div>
-  <p>Cuộc họp này chỉ đạt giá trị nếu các bài học đi vào controlled documents. Mỗi theme phải có số submission, root cause, tài liệu bị ảnh hưởng, owner role, ETA và bằng chứng `audit_events`. Mọi phát biểu cá nhân được chuyển thành process language: "quy trình thiếu checkpoint", "template không hiển thị revision", "role chưa rõ R/A", thay vì gọi lỗi theo người.</p>
+  <p>Cuộc họp này chỉ đạt giá trị nếu các bài học đi vào tài liệu được kiểm soát. Thành phần họp là đại diện phòng ban được ủy quyền, không triệu tập toàn bộ người dùng; phản hồi và thông báo sau họp mới được phổ biến lại cho đội nhóm. Mỗi chủ đề phải có số phản hồi, nguyên nhân gốc, tài liệu bị ảnh hưởng, vai trò chịu trách nhiệm, hạn hoàn thành dự kiến và bằng chứng `audit_events`. Mọi phát biểu cá nhân được chuyển thành ngôn ngữ quy trình: "quy trình thiếu điểm kiểm soát", "mẫu không hiển thị lần sửa đổi", "vai trò chưa rõ R/A", thay vì gọi lỗi theo người.</p>
 </section>
 <section class="card" id="sec-objective">
   <h2 class="h2">Mục tiêu tuần 11</h2>
   <ol class="tight">
-    <li>Đến 2026-07-25 09:20, lessons learned report v1.0 phải có top 5 systemic themes từ ít nhất 33 submissions, gồm 11 phòng heads và 22 champions, với frequency count và bằng chứng process miss.</li>
-    <li>Đến 2026-07-25 09:50, ít nhất 10 controlled docs phải được đưa vào revision +1 plan, mỗi doc có owner role, ETA ≤30 ngày và lý do revision liên kết với theme cụ thể.</li>
-    <li>QR code refresh batch phải có tối thiểu 21 sticker, tương ứng 7 zone × 3 sticker, và có lịch posting ngày 2026-07-28 do IT_MGR phối hợp champion Production.</li>
-    <li>Training playlist v2 phải được approve với ít nhất 3 video mới, script owner, record date và evidence location, dùng bài học W08 hypercare và W10 dashboard governance.</li>
-    <li>Top 5 systemic improvements phải được Steering Committee ký owner path và đưa vào KPI-DEP-03 tracker trước 2026-07-25 17:00.</li>
+    <li>Đến 2026-07-25 09:20, bài học kinh nghiệm báo cáo v1.0 phải có 5 chủ đề chính mang tính hệ thống chủ đề từ ít nhất 33 phản hồi, gồm 11 trưởng bộ phận và 22 hạt nhân, với tần suất xuất hiện và bằng chứng lỗ hổng quy trình.</li>
+    <li>Đến 2026-07-25 09:50, ít nhất 10 tài liệu được kiểm soát phải được đưa vào kế hoạch sửa đổi +1, mỗi tài liệu có vai trò chịu trách nhiệm, hạn hoàn thành dự kiến ≤30 ngày và lý do lần sửa đổi liên kết với chủ đề cụ thể.</li>
+    <li>lô cập nhật mã QR phải có tối thiểu 21 nhãn, tương ứng 7 khu vực × 3 nhãn, và có lịch dán nhãn ngày 2026-07-28 do IT_MGR phối hợp hạt nhân Sản xuất.</li>
+    <li>Danh sách video đào tạo v2 phải được phê duyệt với ít nhất 3 video mới, kịch bản chủ trì, hồ sơ ngày và bằng chứng địa điểm, dùng bài học W08 hỗ trợ tăng cường và W10 quản trị bảng điều hành.</li>
+    <li>5 chủ đề chính mang tính hệ thống cải tiến phải được Ban chỉ đạo ký chủ trì đường dẫn và đưa vào KPI-DEP-03 bảng theo dõi trước 2026-07-25 17:00.</li>
   </ol>
-  <div class="table-card"><table class="table"><thead><tr><th>Baseline</th><th>Giá trị trước W11</th><th>Target W11</th><th>Evidence</th><th>Owner</th></tr></thead><tbody>
-    <tr><td>Feedback submissions</td><td>Form đã gửi 11 phòng heads + 22 champions</td><td>≥33 submissions hoặc có absence rationale cho từng role thiếu</td><td>Microsoft Forms export, ANNEX-119</td><td>HR_MGR</td></tr>
-    <tr><td>Doc revision candidates</td><td>Danh sách nháp từ W10, chưa ưu tiên</td><td>≥10 docs có revision +1 owner và ETA ≤30 ngày</td><td>dcc_document_header, revision plan</td><td>QMS_MGR</td></tr>
-    <tr><td>CAPA overdue</td><td>0 overdue là điều kiện từ W10</td><td>0 CAPA quá 30 ngày tại 2026-07-25 17:00</td><td>CAPA table, ANNEX-117</td><td>QA_MGR</td></tr>
-    <tr><td>Training playlist</td><td>Playlist v1 có W01-W09 materials</td><td>Playlist v2 có ≥3 video script approved</td><td>SOP-801 record, WI-105 training evidence</td><td>HR_MGR</td></tr>
-    <tr><td>QR code refresh</td><td>Old stickers from pilot + production waves</td><td>≥21 stickers printed, posting plan dated 2026-07-28</td><td>IT_MGR print log, zone posting checklist</td><td>IT_MGR</td></tr>
+  <div class="table-card"><table class="table"><thead><tr><th>Mốc đầu kỳ</th><th>Giá trị trước W11</th><th>Mục tiêu W11</th><th>Bằng chứng</th><th>Chủ trì</th></tr></thead><tbody>
+    <tr><td>Phản hồi</td><td>Biểu mẫu đã gửi 11 trưởng bộ phận + 22 hạt nhân</td><td>≥33 phản hồi hoặc có lý do vắng mặt cho từng vai trò thiếu</td><td>Microsoft Forms tệp xuất, ANNEX-119</td><td>HR_MGR</td></tr>
+    <tr><td>Tài liệu ứng viên sửa đổi</td><td>Danh sách nháp từ W10, chưa ưu tiên</td><td>≥10 tài liệu có lần sửa đổi +1 chủ trì và hạn hoàn thành dự kiến ≤30 ngày</td><td>dcc_document_header, lần sửa đổi kế hoạch</td><td>QMS_MGR</td></tr>
+    <tr><td>CAPA quá hạn</td><td>0 quá hạn là điều kiện từ W10</td><td>0 CAPA quá 30 ngày tại 2026-07-25 17:00</td><td>bảng CAPA, ANNEX-117</td><td>QA_MGR</td></tr>
+    <tr><td>Danh sách video đào tạo</td><td>Danh sách video v1 có W01-W09 tài liệu học</td><td>Danh sách video v2 có ≥3 video kịch bản đã duyệt</td><td>SOP-801 hồ sơ, WI-105 đào tạo bằng chứng</td><td>HR_MGR</td></tr>
+    <tr><td>mã QR cập nhật</td><td>Nhãn cũ từ thí điểm + sản xuất các đợt triển khai</td><td>≥21 nhãn đã in, dán nhãn kế hoạch có ngày 2026-07-28</td><td>IT_MGR bản in nhật ký, khu vực dán nhãn danh sách kiểm tra</td><td>IT_MGR</td></tr>
   </tbody></table></div>
-  <p>SMART ở W11 nghĩa là mỗi bài học phải tạo được hành động kiểm chứng. Một bài học không có tài liệu hoặc owner không được tính là systemic improvement. Một tài liệu revision +1 không có evidence từ issue, CAPA, drill, dashboard hoặc training record cũng không được tính vào target 10 docs.</p>
+  <p>SMART ở W11 nghĩa là mỗi bài học phải tạo được hành động kiểm chứng. Một bài học không có tài liệu hoặc chủ trì không được tính là mang tính hệ thống cải tiến. Một tài liệu lần sửa đổi +1 không có bằng chứng từ vấn đề, CAPA, diễn tập, bảng điều hành hoặc đào tạo hồ sơ cũng không được tính vào mục tiêu 10 tài liệu.</p>
 </section>
 <section class="card" id="sec-prep">
-  <h2 class="h2">Prep checklist — T-7 / T-3 / T-1 / T-0</h2>
-  <div class="table-card"><table class="table"><thead><tr><th>Window</th><th>WHO</th><th>WHAT</th><th>EVIDENCE</th><th>DEADLINE</th></tr></thead><tbody>
-    <tr><td>T-7 · 2026-07-18</td><td>HR_MGR</td><td>Phát form "3 điều cần thay đổi" cho 11 phòng heads và 22 champions, không thu tên cá nhân, chỉ thu role group.</td><td>Microsoft Forms link, access list</td><td>2026-07-18 17:30</td></tr>
-    <tr><td>T-7 · 2026-07-18</td><td>QMS_MGR</td><td>Định nghĩa rule phân loại feedback: process miss, document gap, training gap, system access, dashboard/data gap.</td><td>taxonomy note in ANNEX-119</td><td>2026-07-18 18:00</td></tr>
-    <tr><td>T-7 · 2026-07-18</td><td>QA_MGR</td><td>Extract CAPA, issue và PIR themes từ W03-W10 để so sánh với feedback ẩn danh.</td><td>CAPA export, issue trend table</td><td>2026-07-18 18:00</td></tr>
-    <tr><td>T-7 · 2026-07-18</td><td>CEO</td><td>Approve blameless framing: "we measure system design, not individual blame" để dùng ở slide mở đầu.</td><td>CEO framing note</td><td>2026-07-18 18:30</td></tr>
-    <tr><td>T-3 · 2026-07-22</td><td>QMS_ENG</td><td>Aggregate ≥33 submissions, group top 5 themes by frequency, attach 2 evidence examples per theme.</td><td>feedback analysis workbook</td><td>2026-07-22 12:00</td></tr>
-    <tr><td>T-3 · 2026-07-22</td><td>QMS_MGR</td><td>Map top themes to at least 10 docs requiring revision +1, including WI-105, WI-202, ANNEX-114, ANNEX-117 and ANNEX-119.</td><td>doc revision matrix v0.8</td><td>2026-07-22 15:00</td></tr>
-    <tr><td>T-3 · 2026-07-22</td><td>IT_MGR</td><td>Prepare QR code refresh print specification: 7 zones, 3 sticker positions per zone, owner for posting.</td><td>QR print spec, zone map</td><td>2026-07-22 16:00</td></tr>
-    <tr><td>T-3 · 2026-07-22</td><td>HR_MGR</td><td>Draft training playlist v2: 3 video titles, script owner, record date, target audience and training record mapping.</td><td>playlist v2 plan</td><td>2026-07-22 17:00</td></tr>
-    <tr><td>T-1 · 2026-07-24</td><td>QMS_MGR</td><td>Circulate lessons-learned report v0.9 with top 5 themes, doc plan, QR plan, playlist v2 plan and decision table.</td><td>review packet PDF</td><td>2026-07-24 10:00</td></tr>
-    <tr><td>T-1 · 2026-07-24</td><td>CEO</td><td>Read top 5 themes and prepare to speak last in round-robin; CEO opening limited to blameless frame.</td><td>CEO pre-read acknowledgement</td><td>2026-07-24 12:00</td></tr>
-    <tr><td>T-1 · 2026-07-24</td><td>QA_MGR</td><td>Re-run CAPA overdue check; if any CAPA overdue exists, prepare blocker note for P4-03.</td><td>CAPA query output</td><td>2026-07-24 15:00</td></tr>
-    <tr><td>T-1 · 2026-07-24</td><td>Document owners</td><td>Confirm capacity for revision +1 within 30 days; owner who cannot commit must name backup role.</td><td>owner capacity confirmations</td><td>2026-07-24 16:00</td></tr>
-    <tr><td>T-0 · 2026-07-25</td><td>QMS_ENG</td><td>Verify slide 2 has frequency counts and no direct quotes that identify individuals.</td><td>final deck checklist</td><td>2026-07-25 08:30</td></tr>
-    <tr><td>T-0 · 2026-07-25</td><td>HR_MGR</td><td>Confirm round-robin order: operational roles first, Steering last, CEO final comment after all departments.</td><td>facilitation run sheet</td><td>2026-07-25 08:35</td></tr>
-    <tr><td>T-0 · 2026-07-25</td><td>IT_MGR</td><td>Show QR sticker proof, not just design file; each sticker must resolve to current document route.</td><td>QR scan test log</td><td>2026-07-25 08:40</td></tr>
-    <tr><td>T-0 · 2026-07-25</td><td>QMS_MGR</td><td>Confirm P4-03 decision form includes necessary/sufficient tables and signature rows.</td><td>gate decision form</td><td>2026-07-25 08:45</td></tr>
+  <h2 class="h2">Danh sách chuẩn bị — T-7 / T-3 / T-1 / T-0</h2>
+  <div class="table-card"><table class="table"><thead><tr><th>Mốc</th><th>Chủ trì</th><th>Việc phải làm</th><th>Bằng chứng</th><th>Hạn chót</th></tr></thead><tbody>
+    <tr><td>T-7 · 2026-07-18</td><td>HR_MGR</td><td>Phát biểu mẫu "3 điều cần thay đổi" cho 11 trưởng bộ phận và 22 hạt nhân, không thu tên cá nhân, chỉ thu vai trò nhóm.</td><td>Microsoft Forms liên kết, danh sách quyền truy cập</td><td>2026-07-18 17:30</td></tr>
+    <tr><td>T-7 · 2026-07-18</td><td>QMS_MGR</td><td>Định nghĩa quy tắc phân loại phản hồi: lỗ hổng quy trình, tài liệu khoảng trống, đào tạo khoảng trống, quyền truy cập hệ thống, bảng điều hành/dữ liệu khoảng trống.</td><td>ghi chú phân loại trong ANNEX-119</td><td>2026-07-18 18:00</td></tr>
+    <tr><td>T-7 · 2026-07-18</td><td>QA_MGR</td><td>Trích xuất CAPA, vấn đề và PIR chủ đề từ W03-W10 để so sánh với phản hồi ẩn danh.</td><td>CAPA tệp xuất, bảng xu hướng vấn đề</td><td>2026-07-18 18:00</td></tr>
+    <tr><td>T-7 · 2026-07-18</td><td>CEO</td><td>Phê duyệt không quy lỗi cá nhân khung thông điệp: "chúng ta đo chất lượng thiết kế hệ thống, không quy lỗi cá nhân" để dùng ở trang trình chiếu mở đầu.</td><td>CEO khung thông điệp ghi chú</td><td>2026-07-18 18:30</td></tr>
+    <tr><td>T-3 · 2026-07-22</td><td>QMS_ENG</td><td>tổng hợp ≥33 phản hồi, nhóm 5 chủ đề chính bởi tần suất, đính kèm 2 bằng chứng ví dụ trên mỗi chủ đề.</td><td>phản hồi bảng tính phân tích</td><td>2026-07-22 12:00</td></tr>
+    <tr><td>T-3 · 2026-07-22</td><td>QMS_MGR</td><td>Ánh xạ các chủ đề chính sang ít nhất 10 tài liệu cần lần sửa đổi +1, gồm WI-105, WI-202, ANNEX-114, ANNEX-117 và ANNEX-119.</td><td>tài liệu lần sửa đổi ma trận v0.8</td><td>2026-07-22 15:00</td></tr>
+    <tr><td>T-3 · 2026-07-22</td><td>IT_MGR</td><td>Chuẩn bị mã QR cập nhật quy cách in: 7 khu vực, 3 nhãn vị trí trên mỗi khu vực, chủ trì cho dán nhãn.</td><td>quy cách in mã QR, khu vực ánh xạ</td><td>2026-07-22 16:00</td></tr>
+    <tr><td>T-3 · 2026-07-22</td><td>HR_MGR</td><td>Soạn nháp danh sách video đào tạo v2: 3 video tựa đề, kịch bản chủ trì, hồ sơ ngày, mục tiêu người học mục tiêu và đào tạo hồ sơ ánh xạ.</td><td>danh sách video v2 kế hoạch</td><td>2026-07-22 17:00</td></tr>
+    <tr><td>T-1 · 2026-07-24</td><td>QMS_MGR</td><td>Gửi trước báo cáo bài học kinh nghiệm v0.9 với 5 chủ đề chính, tài liệu kế hoạch, QR kế hoạch, danh sách video v2 kế hoạch và bảng quyết định.</td><td>rà soát gói hồ sơ PDF</td><td>2026-07-24 10:00</td></tr>
+    <tr><td>T-1 · 2026-07-24</td><td>CEO</td><td>Đọc 5 chủ đề chính và chuẩn bị phát biểu sau cùng trong lần lượt phát biểu; CEO mở đầu chỉ giới hạn ở khung không quy lỗi cá nhân.</td><td>CEO xác nhận đã đọc trước</td><td>2026-07-24 12:00</td></tr>
+    <tr><td>T-1 · 2026-07-24</td><td>QA_MGR</td><td>Chạy lại CAPA quá hạn kiểm tra; nếu bất kỳ CAPA quá hạn tồn tại, chuẩn bị điểm chặn ghi chú cho P4-03.</td><td>CAPA truy vấn đầu ra</td><td>2026-07-24 15:00</td></tr>
+    <tr><td>T-1 · 2026-07-24</td><td>Chủ trì tài liệu</td><td>Xác nhận năng lực xử lý cho lần sửa đổi +1 trong vòng 30 ngày; chủ trì không thể cam kết thì phải nêu dự phòng vai trò.</td><td>chủ trì năng lực xử lý xác nhận</td><td>2026-07-24 16:00</td></tr>
+    <tr><td>T-0 · 2026-07-25</td><td>QMS_ENG</td><td>Xác nhận trang trình chiếu 2 có số tần suất xuất hiện và không trực tiếp trích dẫn có thể nhận diện cá nhân.</td><td>cuối cùng bộ trình chiếu danh sách kiểm tra</td><td>2026-07-25 08:30</td></tr>
+    <tr><td>T-0 · 2026-07-25</td><td>HR_MGR</td><td>Xác nhận lần lượt phát biểu thứ tự: vận hành vai trò đầu tiên, Ban chỉ đạo sau cùng, CEO cuối cùng nhận xét sau khi mọi phòng ban đã phát biểu.</td><td>kịch bản điều phối</td><td>2026-07-25 08:35</td></tr>
+    <tr><td>T-0 · 2026-07-25</td><td>IT_MGR</td><td>Trình bày nhãn QR bằng chứng kiểm tra, không chỉ là bản thiết kế; mỗi nhãn phải mở đúng sang đường dẫn tài liệu hiện hành.</td><td>QR kiểm tra quét nhật ký</td><td>2026-07-25 08:40</td></tr>
+    <tr><td>T-0 · 2026-07-25</td><td>QMS_MGR</td><td>Xác nhận P4-03 quyết định biểu mẫu gồm điều kiện cần/điều kiện đủ bảng và chữ ký dòng.</td><td>cổng quyết định quyết định biểu mẫu</td><td>2026-07-25 08:45</td></tr>
   </tbody></table></div>
 </section>
 <section class="card" id="sec-agenda">
-  <h2 class="h2">Agenda · 09:00–10:00 (60 phút)</h2>
-  <div class="table-card"><table class="table"><thead><tr><th>Thời gian</th><th>Phút</th><th>Đề mục</th><th>Owner</th><th>Output kỳ vọng</th></tr></thead><tbody>
-    <tr><td>09:00-09:10</td><td>10</td><td>CEO opening: blameless lessons learned, system over person</td><td>CEO</td><td>Không khí học tập; mọi phát biểu chuyển thành process issue.</td></tr>
-    <tr><td>09:10-09:20</td><td>10</td><td>Top 5 systemic improvements từ 33 submissions</td><td>QMS_MGR</td><td>5 themes có frequency count, root cause và evidence sample.</td></tr>
-    <tr><td>09:20-09:36</td><td>16</td><td>Round-robin: mỗi phòng head 90 giây nêu 1 improvement</td><td>HR_MGR</td><td>11 role groups lên tiếng; senior roles nói sau để tránh anchoring.</td></tr>
-    <tr><td>09:36-09:46</td><td>10</td><td>Doc revision +1 plan cho ≥10 docs</td><td>QMS_MGR</td><td>Document owner, ETA ≤30 ngày, revision reason và evidence link được khóa.</td></tr>
-    <tr><td>09:46-09:51</td><td>5</td><td>QR code refresh batch</td><td>IT_MGR</td><td>21 sticker plan approved, posting schedule 2026-07-28.</td></tr>
-    <tr><td>09:51-09:55</td><td>4</td><td>Training playlist v2 preview</td><td>HR_MGR</td><td>3 video script approved, record schedule W11 weekend.</td></tr>
-    <tr><td>09:55-09:58</td><td>3</td><td>Gate P4-03 decision</td><td>CEO, QMS_MGR, QA_MGR</td><td>Go / Conditional Go / No-Go signed and audit_events path assigned.</td></tr>
-    <tr><td>09:58-10:00</td><td>2</td><td>Preview W12 handoff</td><td>QMS_MGR</td><td>Handoff package owners understand deadlines 2026-07-27 to 2026-07-31.</td></tr>
+  <h2 class="h2">Chương trình họp · 09:00–10:00 (60 phút)</h2>
+  <div class="table-card"><table class="table"><thead><tr><th>Thời gian</th><th>Phút</th><th>Đề mục</th><th>Chủ trì</th><th>Kết quả kỳ vọng</th></tr></thead><tbody>
+    <tr><td>09:00-09:10</td><td>10</td><td>CEO mở đầu: học bài học kinh nghiệm mà không quy lỗi cá nhân, nhìn vào hệ thống, không quy lỗi cá nhân</td><td>CEO</td><td>Không khí học tập; mọi phát biểu chuyển thành vấn đề quy trình.</td></tr>
+    <tr><td>09:10-09:20</td><td>10</td><td>5 chủ đề chính mang tính hệ thống cải tiến từ 33 phản hồi</td><td>QMS_MGR</td><td>5 chủ đề có tần suất xuất hiện, nguyên nhân gốc và bằng chứng mẫu.</td></tr>
+    <tr><td>09:20-09:36</td><td>16</td><td>Lần lượt phát biểu: mỗi trưởng bộ phận 90 giây nêu 1 cải tiến</td><td>HR_MGR</td><td>11 vai trò nhóm lên tiếng; vai trò lãnh đạo nói sau để tránh anchoring.</td></tr>
+    <tr><td>09:36-09:46</td><td>10</td><td>Tài liệu kế hoạch sửa đổi +1 cho ≥10 tài liệu</td><td>QMS_MGR</td><td>Chủ trì tài liệu, hạn hoàn thành dự kiến ≤30 ngày, lý do lần sửa đổi và liên kết bằng chứng được khóa.</td></tr>
+    <tr><td>09:46-09:51</td><td>5</td><td>lô cập nhật mã QR</td><td>IT_MGR</td><td>21 nhãn kế hoạch đã duyệt, dán nhãn lịch 2026-07-28.</td></tr>
+    <tr><td>09:51-09:55</td><td>4</td><td>Danh sách video đào tạo v2 xem trước</td><td>HR_MGR</td><td>3 video kịch bản đã duyệt, hồ sơ lịch W11 cuối tuần.</td></tr>
+    <tr><td>09:55-09:58</td><td>3</td><td>Cổng P4-03 quyết định</td><td>CEO, QMS_MGR, QA_MGR</td><td>Đi tiếp / Đi tiếp có điều kiện / Dừng lại đã ký và audit_events đường dẫn được giao.</td></tr>
+    <tr><td>09:58-10:00</td><td>2</td><td>Xem trước W12 bàn giao</td><td>QMS_MGR</td><td>Bàn giao gói hồ sơ chủ trì hiểu rõ hạn chót 2026-07-27 sang 2026-07-31.</td></tr>
   </tbody></table></div>
 </section>
 <section class="card" id="sec-slides">
-  <h2 class="h2">Nội dung họp tuần 11 — slide-by-slide</h2>
-  <div class="card"><h3>Slide 1 — Lessons learned methodology</h3><p>QMS_MGR giải thích phương pháp: feedback ẩn danh, phân loại theo process miss, đối chiếu với CAPA/issue/PIR và chuyển thành revision action. Lean Change Management của Jason Little được dùng làm khung Insights, Options, Experiments; Prosci Reinforcement nhấn mạnh cần biến hành vi mới thành bằng chứng lặp lại. CEO chỉ mở khung blameless và không phán xét theme trước khi các phòng trình bày.</p><ul class="tight"><li>Input tối thiểu: 33 submissions.</li><li>Evidence: Microsoft Forms export, ANNEX-119, CAPA table.</li><li>Rule: không dùng tên người; chỉ role code hoặc role group.</li></ul></div>
-  <div class="card"><h3>Slide 2 — Top 5 themes từ 33 submissions</h3><p>Slide này là bảng chính của W11. Mỗi theme phải có frequency count, ví dụ process miss đã ẩn danh, evidence nguồn và impact. Nếu theme chỉ xuất hiện 1 lần nhưng có Sev-1/CAPA evidence, vẫn được giữ nhưng phải ghi lý do ưu tiên. Nếu theme xuất hiện nhiều nhưng chỉ là cosmetic, có thể chuyển sang year-2 backlog.</p><ul class="tight"><li>Theme 1: revision visibility tại zone, 11/33 submissions.</li><li>Theme 2: RACI escalation chưa rõ khi dashboard đỏ, 9/33.</li><li>Theme 3: training video thiếu ví dụ shop-floor thật, 8/33.</li><li>Theme 4: QR sticker cũ gây nhầm revision, 7/33.</li><li>Theme 5: CAPA effectiveness check chưa nhìn thấy trên weekly tier, 6/33.</li></ul></div>
-  <div class="card"><h3>Slide 3 — Theme 1: Revision visibility tại điểm sử dụng</h3><p>Theme này liên kết trực tiếp với ISO 9001:2015 §7.5.3 documented information. Người dùng không chỉ cần mở đúng file; họ cần thấy revision, effective date và owner ngay tại điểm dùng. Root cause là QR code và link cũ không làm nổi bật revision delta sau các wave, làm tăng nguy cơ dùng tài liệu cũ trong production và quality checks.</p><ul class="tight"><li>Docs affected: WI-202, WI-519, SOP-501, ANNEX-114.</li><li>Action: QR code refresh 21 sticker và doc header check.</li><li>KPI impact: KPI-FLD-01, KPI-FLD-02.</li></ul></div>
-  <div class="card"><h3>Slide 4 — Theme 2: RACI escalation khi dashboard đỏ</h3><p>Dashboard đỏ không có nghĩa nếu không biết role nào phải làm gì trong 24 giờ đầu. Theme này nối W10 dashboard governance với WI-202 weekly tier meeting. Root cause là một số widget hiển thị metric nhưng thiếu "next action owner"; người xem biết có vấn đề nhưng không biết R/A/C/I cụ thể.</p><ul class="tight"><li>Docs affected: ANNEX-113, ANNEX-119, WI-202.</li><li>Action: mỗi widget thêm escalation owner và response SLA.</li><li>KPI impact: KPI-DEP-02, KPI-DEP-05, KPI-DEP-07.</li></ul></div>
-  <div class="card"><h3>Slide 5 — Theme 3: Training playlist thiếu ví dụ thật</h3><p>HR_MGR trình bày phản hồi rằng video v1 giải thích quy trình nhưng chưa đủ tình huống thật từ W08 hypercare và W10 RBAC probe. Prosci ADKAR Ability/Reinforcement yêu cầu người dùng thấy hành vi mong muốn trong bối cảnh công việc của họ. Playlist v2 vì vậy phải có video "cách đọc dashboard đỏ", "cách kiểm revision tại zone" và "cách mở CAPA evidence".</p><ul class="tight"><li>Minimum: 3 new videos.</li><li>Evidence: script approved, record date, training_records mapping.</li><li>Docs affected: WI-105, SOP-801, WI-202.</li></ul></div>
-  <div class="card"><h3>Slide 6 — Theme 4: QR sticker cũ gây nhầm revision</h3><p>IT_MGR trình bày scan test trước W11. QR sticker là điểm chạm vật lý của QMS, nên sticker cũ hoặc không rõ revision có thể phá vỡ mọi nỗ lực DCC. Cách xử lý là batch refresh có zone map, scan log và posting photo; không giao miệng cho từng zone tự dán.</p><ul class="tight"><li>Minimum batch: 7 zone × 3 sticker = 21 sticker.</li><li>Posting date: 2026-07-28.</li><li>Evidence: scan test log, zone posting checklist, photo archive.</li></ul></div>
-  <div class="card"><h3>Slide 7 — Theme 5: CAPA effectiveness chưa hiện trong weekly tier</h3><p>QA_MGR trình bày CAPA không được xem là đóng chỉ vì action completed. ISO §10.2 yêu cầu đánh giá hiệu lực; nếu weekly tier không nhìn thấy effectiveness check, tổ chức dễ lặp lại lỗi. Theme này đưa CAPA effectiveness vào WI-202 như một row bắt buộc trong weekly tier meeting.</p><ul class="tight"><li>Docs affected: WI-202, ANNEX-117, ANNEX-119.</li><li>Threshold: 0 CAPA overdue &gt;30 ngày.</li><li>Evidence: CAPA table, effectiveness check record.</li></ul></div>
-  <div class="card"><h3>Slide 8 — Doc revision +1 plan</h3><p>Slide này là bảng 10+ docs, không phải danh sách mong muốn. Mỗi doc có current revision, proposed revision, owner role, due date, theme link và evidence source. QMS_MGR phải nêu rõ revision +1 không tự động nghĩa là release ngay; doc owner chịu trách nhiệm draft, review, approval và DCC header update.</p><ul class="tight"><li>Required: WI-105, WI-202, ANNEX-114, ANNEX-117, ANNEX-119.</li><li>Additional: SOP-501, WI-519, SOP-303, WI-302, ANNEX-113, SOP-801.</li><li>ETA: ≤30 ngày, không sau 2026-08-24.</li></ul></div>
-  <div class="card"><h3>Slide 9 — QR code refresh batch</h3><p>IT_MGR trình bày kế hoạch in, scan, dán và kiểm sau dán. Mỗi sticker phải mở đúng route, hiển thị đúng doc code và revision. Nếu zone không cho dán trong ngày 2026-07-28, issue phải được mở với owner zone và không ghi hoàn thành giả.</p><ul class="tight"><li>7 zones: CNC machining, Setup/programming, IPQC, FAI, Final QC, Shipping/CoC, Tooling/maintenance.</li><li>3 positions per zone: entrance board, workstation binder, escalation board.</li><li>Evidence: QR scan log + posting photo.</li></ul></div>
-  <div class="card"><h3>Slide 10 — Training playlist v2</h3><p>HR_MGR trình bày 3 video mới. Video không được là lecture dài; mỗi video phải là tình huống 5-7 phút, có role code, job context, lỗi thường gặp và câu hỏi kiểm tra. NIST AT-4 yêu cầu training record retainable, vì vậy playlist v2 phải map từng video sang `training_records` và SOP-801.</p><ul class="tight"><li>Video 1: Kiểm revision bằng QR tại zone.</li><li>Video 2: Đọc dashboard đỏ và mở escalation theo WI-202.</li><li>Video 3: CAPA effectiveness check trong weekly tier.</li></ul></div>
-  <div class="card"><h3>Slide 11 — KPI sparkline final: 11-week journey</h3><p>QMS_ENG trình bày KPI-FLD-01, KPI-FLD-02 và KPI-DEP-03 từ W01 đến W11. Slide phải cho thấy vùng đỏ thật và action đã đóng, không làm mượt để đẹp. DORA 2024 được dùng cho KPI-DEP-03; nếu change failure giảm nhờ ít change hơn, phải ghi điều đó, vì mục tiêu là hệ thống khỏe chứ không phải số liệu đẹp.</p><ul class="tight"><li>Show baseline W01, pilot W03-W04, production W07-W08, governance W10-W11.</li><li>Evidence: ANNEX-110, readiness snapshots, audit_events.</li><li>Decision: KPI owner transfer prep cho W12.</li></ul></div>
-  <div class="card"><h3>Slide 12 — Preview W12 handoff</h3><p>Slide cuối nêu rõ W12 không phải lễ kết thúc hình thức. W12 cần handoff memo, KPI ownership transfer, internal audit calendar, BAU cadence và champion roster ongoing. Nếu W11 không khóa doc revision plan, W12 không có nền để bàn giao, vì BAU sẽ nhận một hệ thống còn nợ bài học.</p><ul class="tight"><li>W12 date: 2026-08-01.</li><li>Handoff package finalized: 2026-07-31.</li><li>Required signers: CEO, QMS_MGR, QA_MGR, PROD_DIR, ENG_MGR.</li></ul></div>
+  <h2 class="h2">Nội dung họp tuần 11 — theo từng trang</h2>
+  <div class="card"><h3>Trang 1 — Phương pháp rút bài học kinh nghiệm</h3><p>QMS_MGR giải thích phương pháp: phản hồi ẩn danh, phân loại theo lỗ hổng quy trình, đối chiếu với CAPA/vấn đề/PIR và chuyển thành hành động sửa đổi tài liệu. Lean Change Management của Jason Little được dùng làm khung Nhận định, Lựa chọn, Thử nghiệm; Prosci nhấn mạnh việc củng cố hành vi mới bằng bằng chứng lặp lại. CEO chỉ mở khung không quy lỗi cá nhân và không phán xét chủ đề trước khi các phòng trình bày.</p><ul class="tight"><li>Đầu vào tối thiểu: 33 phản hồi.</li><li>Bằng chứng: Microsoft Forms tệp xuất, ANNEX-119, bảng CAPA.</li><li>Quy tắc: không dùng tên người; chỉ mã vai trò hoặc vai trò nhóm.</li></ul></div>
+  <div class="card"><h3>Trang 2 — 5 chủ đề chính từ 33 phản hồi</h3><p>Trang này là bảng chính của W11. Mỗi chủ đề phải có tần suất xuất hiện, ví dụ lỗ hổng quy trình đã ẩn danh, bằng chứng nguồn và ảnh hưởng. Nếu chủ đề chỉ xuất hiện 1 lần nhưng có Sev-1/CAPA bằng chứng, vẫn được giữ nhưng phải ghi lý do ưu tiên. Nếu chủ đề xuất hiện nhiều nhưng chỉ là hình thức, có thể chuyển sang tồn đọng năm 2.</p><ul class="tight"><li>Chủ đề 1: lần sửa đổi khả năng nhìn thấy tại khu vực, 11/33 phản hồi.</li><li>Chủ đề 2: RACI leo thang xử lý chưa rõ khi bảng điều hành đỏ, 9/33.</li><li>Chủ đề 3: đào tạo video thiếu ví dụ tại xưởng thật, 8/33.</li><li>Chủ đề 4: nhãn QR cũ gây nhầm lần sửa đổi, 7/33.</li><li>Chủ đề 5: CAPA kiểm tra hiệu lực chưa nhìn thấy trên họp điều hành hằng tuần, 6/33.</li></ul></div>
+  <div class="card"><h3>Trang 3 — Chủ đề 1: Khả năng nhìn thấy lần sửa đổi tại điểm sử dụng</h3><p>Chủ đề này liên kết trực tiếp với ISO 9001:2015 §7.5.3 được ghi hồ sơ thông tin. Người dùng không chỉ cần mở đúng file; họ cần thấy lần sửa đổi, có hiệu lực ngày và chủ trì ngay tại điểm dùng. Nguyên nhân gốc là mã QR và liên kết cũ không làm nổi bật lần sửa đổi phần thay đổi sau các đợt triển khai, làm tăng nguy cơ dùng tài liệu cũ trong sản xuất và chất lượng kiểm tra.</p><ul class="tight"><li>Tài liệu bị ảnh hưởng: WI-202, WI-519, SOP-501, ANNEX-114.</li><li>Hành động: mã QR cập nhật 21 nhãn và tài liệu phần đầu kiểm tra.</li><li>KPI bị ảnh hưởng: KPI-FLD-01, KPI-FLD-02.</li></ul></div>
+  <div class="card"><h3>Trang 4 — Chủ đề 2: RACI leo thang xử lý khi bảng điều hành đỏ</h3><p>Bảng điều hành đỏ không có nghĩa nếu không biết vai trò nào phải làm gì trong 24 giờ đầu. Chủ đề này nối W10 quản trị bảng điều hành với WI-202 cuộc họp điều hành hằng tuần. Nguyên nhân gốc là một số ô chỉ báo hiển thị chỉ số nhưng thiếu "chủ trì hành động tiếp theo"; người xem biết có vấn đề nhưng không biết R/A/C/I cụ thể.</p><ul class="tight"><li>Tài liệu bị ảnh hưởng: ANNEX-113, ANNEX-119, WI-202.</li><li>Hành động: mỗi ô chỉ báo thêm leo thang xử lý chủ trì và mức cam kết phản hồi.</li><li>KPI bị ảnh hưởng: KPI-DEP-02, KPI-DEP-05, KPI-DEP-07.</li></ul></div>
+  <div class="card"><h3>Trang 5 — Chủ đề 3: Danh sách video đào tạo thiếu ví dụ thật</h3><p>HR_MGR trình bày phản hồi rằng video v1 giải thích quy trình nhưng chưa đủ tình huống thật từ W08 hỗ trợ tăng cường và W10 RBAC kiểm tra thử. Prosci ADKAR về năng lực thực hiện và củng cố yêu cầu người dùng thấy hành vi mong muốn trong bối cảnh công việc của họ. Danh sách video v2 vì vậy phải có video "cách đọc bảng điều hành đỏ", "cách kiểm lần sửa đổi tại khu vực" và "cách mở CAPA bằng chứng".</p><ul class="tight"><li>Tối thiểu: 3 video mới.</li><li>Bằng chứng: kịch bản đã duyệt, hồ sơ ngày, ánh xạ với training_records.</li><li>Tài liệu bị ảnh hưởng: WI-105, SOP-801, WI-202.</li></ul></div>
+  <div class="card"><h3>Trang 6 — Chủ đề 4: nhãn QR cũ gây nhầm lần sửa đổi</h3><p>IT_MGR trình bày kiểm tra quét trước W11. nhãn QR là điểm chạm vật lý của QMS, nên nhãn cũ hoặc không rõ lần sửa đổi có thể phá vỡ mọi nỗ lực DCC. Cách xử lý là lô cập nhật có khu vực ánh xạ, quét nhật ký và ảnh sau khi dán nhãn; không giao miệng cho từng khu vực tự dán.</p><ul class="tight"><li>Lô tối thiểu: 7 khu vực × 3 nhãn = 21 nhãn.</li><li>Ngày dán ngày: 2026-07-28.</li><li>Bằng chứng: kiểm tra quét nhật ký, khu vực dán nhãn danh sách kiểm tra, kho ảnh bằng chứng.</li></ul></div>
+  <div class="card"><h3>Trang 7 — Chủ đề 5: CAPA hiệu lực chưa hiện trong họp điều hành hằng tuần</h3><p>QA_MGR trình bày CAPA không được xem là đóng chỉ vì hành động đã hoàn tất. ISO §10.2 yêu cầu đánh giá hiệu lực; nếu họp điều hành hằng tuần không nhìn thấy kiểm tra hiệu lực, tổ chức dễ lặp lại lỗi. Chủ đề này đưa CAPA hiệu lực vào WI-202 như một dòng bắt buộc trong cuộc họp điều hành hằng tuần.</p><ul class="tight"><li>Tài liệu bị ảnh hưởng: WI-202, ANNEX-117, ANNEX-119.</li><li>Ngưỡng: 0 CAPA quá hạn &gt;30 ngày.</li><li>Bằng chứng: bảng CAPA, kiểm tra hiệu lực hồ sơ.</li></ul></div>
+  <div class="card"><h3>Trang 8 — Tài liệu kế hoạch sửa đổi +1</h3><p>Trang này là bảng 10+ tài liệu, không phải danh sách mong muốn. Mỗi tài liệu có lần sửa đổi hiện tại, lần sửa đổi đề xuất, vai trò chịu trách nhiệm, ngày đến hạn, chủ đề liên kết và bằng chứng nguồn. QMS_MGR phải nêu rõ lần sửa đổi +1 không tự động nghĩa là phát hành ngay; tài liệu chủ trì chịu trách nhiệm bản nháp, rà soát, phê duyệt và cập nhật phần đầu DCC.</p><ul class="tight"><li>Bắt buộc: WI-105, WI-202, ANNEX-114, ANNEX-117, ANNEX-119.</li><li>Bổ sung: SOP-501, WI-519, SOP-303, WI-302, ANNEX-113, SOP-801.</li><li>Hạn hoàn thành dự kiến: ≤30 ngày, không sau 2026-08-24.</li></ul></div>
+  <div class="card"><h3>Trang 9 — lô cập nhật mã QR</h3><p>IT_MGR trình bày kế hoạch in, quét, dán và kiểm sau dán. Mỗi nhãn phải mở đúng đường dẫn, hiển thị đúng tài liệu mã và lần sửa đổi. Nếu khu vực không cho dán trong ngày 2026-07-28, vấn đề phải được mở với chủ trì khu vực và không ghi hoàn thành giả.</p><ul class="tight"><li>7 khu vực: Gia công CNC, Gá đặt/lập trình, IPQC, FAI, QC cuối, Giao hàng/CoC, Dụng cụ/bảo trì.</li><li>3 vị trí trên mỗi khu vực: bảng tại lối vào, tập hồ sơ tại vị trí làm việc, bảng leo thang xử lý.</li><li>Bằng chứng: QR quét nhật ký + ảnh sau khi dán nhãn.</li></ul></div>
+  <div class="card"><h3>Trang 10 — Danh sách video đào tạo v2</h3><p>HR_MGR trình bày 3 video mới. Video không được là bài giảng dài; mỗi video phải là tình huống 5-7 phút, có mã vai trò, bối cảnh công việc, lỗi thường gặp và câu hỏi kiểm tra. NIST AT-4 yêu cầu đào tạo hồ sơ có thể lưu hồ sơ, vì vậy danh sách video v2 phải ánh xạ từng video sang `training_records` và SOP-801.</p><ul class="tight"><li>Video 1: Kiểm lần sửa đổi bằng QR tại khu vực.</li><li>Video 2: Đọc bảng điều hành đỏ và mở leo thang xử lý theo WI-202.</li><li>Video 3: CAPA kiểm tra hiệu lực trong họp điều hành hằng tuần.</li></ul></div>
+  <div class="card"><h3>Trang 11 — đường xu hướng KPI cuối cùng: 11-tuần hành trình</h3><p>QMS_ENG trình bày KPI-FLD-01, KPI-FLD-02 và KPI-DEP-03 từ W01 đến W11. Trang phải cho thấy vùng đỏ thật và hành động đã đóng, không làm mượt để đẹp. DORA 2024 được dùng cho KPI-DEP-03; nếu thay đổi lỗi giảm nhờ ít thay đổi hơn, phải ghi điều đó, vì mục tiêu là hệ thống khỏe chứ không phải số liệu đẹp.</p><ul class="tight"><li>Trình bày mốc đầu kỳ W01, thí điểm W03-W04, sản xuất W07-W08, quản trị W10-W11.</li><li>Bằng chứng: ANNEX-110, mức sẵn sàng ảnh chụp dữ liệu, audit_events.</li><li>Quyết định: chuẩn bị bàn giao chủ trì KPI cho W12.</li></ul></div>
+  <div class="card"><h3>Trang 12 — Xem trước W12 bàn giao</h3><p>Trang cuối nêu rõ W12 không phải lễ kết thúc hình thức. W12 cần bản ghi nhớ bàn giao, KPI trách nhiệm chủ trì bàn giao, đánh giá nội bộ lịch, nhịp vận hành thường xuyên điều hành và danh sách hạt nhân duy trì thường xuyên. Nếu W11 không khóa tài liệu lần sửa đổi kế hoạch, W12 không có nền để bàn giao, vì vận hành thường xuyên sẽ nhận một hệ thống còn nợ bài học.</p><ul class="tight"><li>W12 ngày: 2026-08-01.</li><li>Bàn giao gói hồ sơ hoàn tất: 2026-07-31.</li><li>Người ký bắt buộc: CEO, QMS_MGR, QA_MGR, PROD_DIR, ENG_MGR.</li></ul></div>
 </section>
 <section class="card" id="sec-decisions">
   <h2 class="h2">Quyết định cần lấy trong cuộc họp này</h2>
-  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Quyết định</th><th>Người ký</th><th>Cơ sở doc/data</th><th>Fallback nếu deferred</th></tr></thead><tbody>
-    <tr><td>1</td><td>Approve lessons-learned report v1.0 với top 5 systemic improvements.</td><td>CEO, QMS_MGR, QA_MGR</td><td>ANNEX-119, feedback export, issue/CAPA evidence</td><td>Conditional: 48h để bổ sung missing evidence; nếu thiếu frequency count thì không phát hành v1.0.</td></tr>
-    <tr><td>2</td><td>Approve doc revision +1 plan cho ≥10 controlled docs.</td><td>QMS_MGR, document owners</td><td>dcc_document_header, doc revision matrix</td><td>Defer doc không có owner; không được tính vào target 10 docs.</td></tr>
-    <tr><td>3</td><td>Approve QR code refresh batch 21 sticker và posting schedule 2026-07-28.</td><td>IT_MGR, PROD_DIR</td><td>QR scan test, zone posting checklist</td><td>Nếu print chưa sẵn, posting dời tối đa đến 2026-07-30 và mở Sev-3 logistics issue.</td></tr>
-    <tr><td>4</td><td>Approve training playlist v2 release schedule với ≥3 video.</td><td>HR_MGR, QMS_MGR</td><td>SOP-801, WI-105, training playlist plan</td><td>Nếu script chưa đạt, record vẫn book nhưng video đó không release cho đến khi QMS_MGR approve.</td></tr>
-    <tr><td>5</td><td>Approve top 5 systemic improvements vào KPI-DEP-03 tracker.</td><td>CEO, QMS_MGR</td><td>ANNEX-110, KPI-DEP-03 tracker, lessons report</td><td>Nếu còn tranh luận, ghi dissent và giao owner path trước 2026-07-28.</td></tr>
+  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Quyết định</th><th>Người ký</th><th>Cơ sở tài liệu / dữ liệu</th><th>Cách xử lý nếu hoãn quyết định</th></tr></thead><tbody>
+    <tr><td>1</td><td>Phê duyệt báo cáo bài học kinh nghiệm v1.0 với 5 chủ đề chính mang tính hệ thống cải tiến.</td><td>CEO, QMS_MGR, QA_MGR</td><td>ANNEX-119, phản hồi tệp xuất, vấn đề/CAPA bằng chứng</td><td>Có điều kiện: 48h để bổ sung thiếu bằng chứng; nếu thiếu tần suất xuất hiện thì không phát hành v1.0.</td></tr>
+    <tr><td>2</td><td>Phê duyệt tài liệu kế hoạch sửa đổi +1 cho ≥10 tài liệu được kiểm soát.</td><td>QMS_MGR, tài liệu chủ trì</td><td>dcc_document_header, tài liệu lần sửa đổi ma trận</td><td>Hoãn tài liệu không có chủ trì; không được tính vào mục tiêu 10 tài liệu.</td></tr>
+    <tr><td>3</td><td>Phê duyệt lô cập nhật mã QR 21 nhãn và dán nhãn lịch 2026-07-28.</td><td>IT_MGR, PROD_DIR</td><td>QR kiểm tra quét, khu vực dán nhãn danh sách kiểm tra</td><td>Nếu bản in chưa sẵn, dán nhãn dời tối đa đến 2026-07-30 và mở Sev-3 hậu cần vấn đề.</td></tr>
+    <tr><td>4</td><td>Phê duyệt danh sách video đào tạo v2 lịch phát hành với ≥3 video.</td><td>HR_MGR, QMS_MGR</td><td>SOP-801, WI-105, danh sách video đào tạo kế hoạch</td><td>Nếu kịch bản chưa đạt, hồ sơ vẫn đặt lịch nhưng video đó không phát hành cho đến khi QMS_MGR phê duyệt.</td></tr>
+    <tr><td>5</td><td>Phê duyệt 5 chủ đề chính mang tính hệ thống cải tiến vào KPI-DEP-03 bảng theo dõi.</td><td>CEO, QMS_MGR</td><td>ANNEX-110, KPI-DEP-03 bảng theo dõi, bài học báo cáo</td><td>Nếu còn tranh luận, ghi ý kiến không đồng thuận và giao chủ trì đường dẫn trước 2026-07-28.</td></tr>
   </tbody></table></div>
 </section>
 <section class="card" id="sec-gate">
-  <h2 class="h2">Gate Go/No-Go — Điều kiện CẦN và ĐỦ</h2>
-  <h3>Gate P4-03 · Điều kiện CẦN</h3>
-  <div class="table-card"><table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Threshold</th><th>Bằng chứng</th></tr></thead><tbody>
-    <tr><td>Lessons learned report v1.0 đã ký.</td><td>Kiểm tra signature và top 5 themes có evidence.</td><td>CEO + QMS_MGR + QA_MGR ký trước 2026-07-25 17:00.</td><td>ANNEX-119, signed PDF, audit_events.</td></tr>
-    <tr><td>≥10 docs identified for revision +1.</td><td>Đếm doc rows có owner, ETA, reason, evidence.</td><td>Ít nhất 10 docs; ETA ≤30 ngày; không row nào thiếu owner.</td><td>doc revision matrix, dcc_document_header.</td></tr>
-    <tr><td>QR code refresh batch printed.</td><td>Kiểm tra print log và scan test.</td><td>≥21 sticker = 7 zone × 3, 100% scan mở đúng doc route.</td><td>QR print log, zone map, scan results.</td></tr>
-    <tr><td>Training playlist v2 script approved.</td><td>Kiểm tra 3 video scripts có owner và record date.</td><td>≥3 scripts approved; mapping to SOP-801 training_records.</td><td>playlist v2 plan, SOP-801 record map.</td></tr>
+  <h2 class="h2">Cổng quyết định Đi tiếp/Dừng lại — Điều kiện CẦN và ĐỦ</h2>
+  <h3>Cổng P4-03 · Điều kiện CẦN</h3>
+  <div class="table-card"><table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Ngưỡng</th><th>Bằng chứng</th></tr></thead><tbody>
+    <tr><td>Bài học kinh nghiệm báo cáo v1.0 đã ký.</td><td>Kiểm tra chữ ký và 5 chủ đề chính có bằng chứng.</td><td>CEO + QMS_MGR + QA_MGR ký trước 2026-07-25 17:00.</td><td>ANNEX-119, đã ký PDF, audit_events.</td></tr>
+    <tr><td>≥10 tài liệu được xác định cho lần sửa đổi +1.</td><td>Đếm dòng tài liệu có chủ trì, hạn hoàn thành dự kiến, lý do và bằng chứng.</td><td>Ít nhất 10 tài liệu; hạn hoàn thành dự kiến ≤30 ngày; không dòng nào thiếu chủ trì.</td><td>ma trận lần sửa đổi tài liệu, dcc_document_header.</td></tr>
+    <tr><td>lô cập nhật mã QR đã in.</td><td>Kiểm tra bản in nhật ký và kiểm tra quét.</td><td>≥21 nhãn = 7 khu vực × 3, 100% quét mở đúng tài liệu đường dẫn.</td><td>QR bản in nhật ký, khu vực ánh xạ, quét kết quả.</td></tr>
+    <tr><td>Danh sách video đào tạo v2 kịch bản đã duyệt.</td><td>Kiểm tra 3 video kịch bản có chủ trì và hồ sơ ngày.</td><td>≥3 kịch bản đã duyệt; ánh xạ sang SOP-801 training_records.</td><td>danh sách video v2 kế hoạch, SOP-801 hồ sơ ánh xạ.</td></tr>
   </tbody></table></div>
-  <h3>Gate P4-03 · Điều kiện ĐỦ</h3>
-  <div class="table-card"><table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Threshold</th><th>Bằng chứng</th></tr></thead><tbody>
-    <tr><td>0 phòng head opposed report.</td><td>Written confirmation sau round-robin.</td><td>0 formal objection; dissent nếu có phải ghi rationale và owner path.</td><td>meeting minutes, confirmation log.</td></tr>
-    <tr><td>0 CAPA overdue &gt;30 ngày.</td><td>CAPA query lúc cuối ngày.</td><td>0 overdue tại 2026-07-25 17:00.</td><td>CAPA table, ANNEX-117.</td></tr>
-    <tr><td>Internal audit cycle năm 1 confirmed.</td><td>Calendar đã book 4 quý.</td><td>4 calendar events có scope và owner.</td><td>calendar export, ANNEX-119.</td></tr>
-    <tr><td>Management approval logged.</td><td>Audit event tạo đúng code.</td><td>Audit_events row `lessons_learned_v1_signed` tồn tại.</td><td>`audit_events`, `mgmt-reviews.json`.</td></tr>
+  <h3>Cổng P4-03 · Điều kiện ĐỦ</h3>
+  <div class="table-card"><table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Ngưỡng</th><th>Bằng chứng</th></tr></thead><tbody>
+    <tr><td>0 trưởng bộ phận phản đối báo cáo.</td><td>Xác nhận bằng văn bản sau lần lượt phát biểu.</td><td>0 ý kiến phản đối chính thức; ý kiến không đồng thuận nếu có phải ghi lý do và chủ trì đường dẫn.</td><td>cuộc họp biên bản, xác nhận nhật ký.</td></tr>
+    <tr><td>0 CAPA quá hạn &gt;30 ngày.</td><td>CAPA truy vấn lúc cuối ngày.</td><td>0 quá hạn tại 2026-07-25 17:00.</td><td>bảng CAPA, ANNEX-117.</td></tr>
+    <tr><td>Chu kỳ đánh giá nội bộ năm 1 đã xác nhận.</td><td>Lịch đã đặt lịch 4 quý.</td><td>4 lịch sự kiện có phạm vi và chủ trì.</td><td>lịch tệp xuất, ANNEX-119.</td></tr>
+    <tr><td>Phê duyệt của lãnh đạo đã được ghi nhận.</td><td>Sự kiện đánh giá tạo đúng mã.</td><td>Bản ghi audit_events `lessons_learned_v1_signed` tồn tại.</td><td>`audit_events`, `mgmt-reviews.json`.</td></tr>
   </tbody></table></div>
 </section>
 <section class="card" id="sec-tasks">
-  <h2 class="h2">Phân công nhiệm vụ sau họp · RACI · deadline</h2>
-  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Task</th><th>R</th><th>A</th><th>C</th><th>I</th><th>Deadline</th><th>Evidence</th><th>KPI</th></tr></thead><tbody>
-    <tr><td>1</td><td>Archive lessons-learned report v1.0 into ANNEX-119.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>CEO</td><td>All_depts</td><td>2026-07-25 17:00</td><td>ANNEX-119</td><td>KPI-DEP-02</td></tr>
-    <tr><td>2</td><td>Create audit_events row `lessons_learned_v1_signed`.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>CEO</td><td>2026-07-25 17:30</td><td>`audit_events`</td><td>KPI-DEP-02</td></tr>
-    <tr><td>3</td><td>Assign 10+ doc revision +1 actions to document owners.</td><td>QMS_MGR</td><td>CEO</td><td>Document owners</td><td>QA_MGR</td><td>2026-07-26</td><td>doc revision matrix</td><td>KPI-FLD-01</td></tr>
-    <tr><td>4</td><td>Update WI-202 draft to include CAPA effectiveness row in weekly tier meeting.</td><td>QMS_MGR</td><td>QA_MGR</td><td>HR_MGR</td><td>All_depts</td><td>2026-07-29</td><td>WI-202 draft revision</td><td>KPI-DEP-02</td></tr>
-    <tr><td>5</td><td>Prepare QR code posting crew and route for 2026-07-28.</td><td>IT_MGR</td><td>PROD_DIR</td><td>QMS_ENG</td><td>Zone champions</td><td>2026-07-27</td><td>zone posting checklist</td><td>KPI-FLD-02</td></tr>
-    <tr><td>6</td><td>Post 21 QR stickers and capture photo evidence.</td><td>IT_MGR</td><td>PROD_DIR</td><td>QA_MGR</td><td>QMS_MGR</td><td>2026-07-28</td><td>photo archive, scan log</td><td>KPI-FLD-01</td></tr>
-    <tr><td>7</td><td>Record training playlist v2 video 1 and video 2.</td><td>HR_MGR</td><td>QMS_MGR</td><td>PROD_DIR, IT_MGR</td><td>All_depts</td><td>2026-07-29</td><td>SOP-801 training media log</td><td>KPI-TRN-01</td></tr>
-    <tr><td>8</td><td>Record training playlist v2 video 3 and prepare quiz questions.</td><td>HR_MGR</td><td>QMS_MGR</td><td>QA_MGR</td><td>All_depts</td><td>2026-07-30</td><td>playlist v2 quiz pack</td><td>KPI-TRN-01</td></tr>
-    <tr><td>9</td><td>Update dashboard with KPI final sparkline W01-W11.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>CEO</td><td>2026-07-30</td><td>dashboard snapshot</td><td>KPI-DEP-05</td></tr>
-    <tr><td>10</td><td>Send lessons-learned summary memo to all 80 employees.</td><td>QMS_MGR</td><td>CEO</td><td>HR_MGR</td><td>All_depts</td><td>2026-07-27</td><td>memo archive</td><td>KPI-FLD-01</td></tr>
-    <tr><td>11</td><td>Draft W12 handoff memo v0.9.</td><td>QMS_MGR</td><td>CEO</td><td>QA_MGR, PROD_DIR, ENG_MGR</td><td>All_depts</td><td>2026-07-27</td><td>handoff memo draft</td><td>KPI-DEP-02</td></tr>
-    <tr><td>12</td><td>Draft KPI ownership transfer matrix for 10 KPI.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>Widget owners</td><td>CEO</td><td>2026-07-29</td><td>ANNEX-110 owner matrix</td><td>KPI-DEP-05</td></tr>
-    <tr><td>13</td><td>Prepare W12 signature package and order.</td><td>QMS_MGR</td><td>CEO</td><td>QA_MGR, PROD_DIR, ENG_MGR</td><td>Steering</td><td>2026-07-31</td><td>W12 handoff packet</td><td>KPI-DEP-02</td></tr>
-    <tr><td>14</td><td>Book first BAU weekly tier meeting and monthly management review draft slots.</td><td>QMS_MGR</td><td>CEO</td><td>HR_MGR, FIN_MGR</td><td>All_depts</td><td>2026-07-31</td><td>calendar export</td><td>KPI-DEP-02</td></tr>
-    <tr><td>15</td><td>Update KPI-DEP-03 tracker with top 5 systemic improvements.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>QA_MGR</td><td>CEO</td><td>2026-07-28</td><td>ANNEX-110, tracker row</td><td>KPI-DEP-03</td></tr>
+  <h2 class="h2">Phân công nhiệm vụ sau họp · RACI · hạn chót</h2>
+  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Nhiệm vụ</th><th>R</th><th>A</th><th>C</th><th>I</th><th>Hạn chót</th><th>Bằng chứng</th><th>KPI</th></tr></thead><tbody>
+    <tr><td>1</td><td>Lưu hồ sơ báo cáo bài học kinh nghiệm v1.0 vào ANNEX-119.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>CEO</td><td>Đại diện các phòng ban</td><td>2026-07-25 17:00</td><td>ANNEX-119</td><td>KPI-DEP-02</td></tr>
+    <tr><td>2</td><td>Tạo bản ghi audit_events `lessons_learned_v1_signed`.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>CEO</td><td>2026-07-25 17:30</td><td>`audit_events`</td><td>KPI-DEP-02</td></tr>
+    <tr><td>3</td><td>Giao 10+ tài liệu lần sửa đổi +1 hành động sang tài liệu chủ trì.</td><td>QMS_MGR</td><td>CEO</td><td>Chủ trì tài liệu</td><td>QA_MGR</td><td>2026-07-26</td><td>tài liệu lần sửa đổi ma trận</td><td>KPI-FLD-01</td></tr>
+    <tr><td>4</td><td>Cập nhật WI-202 bản nháp sang bổ sung dòng CAPA hiệu lực trong cuộc họp điều hành hằng tuần.</td><td>QMS_MGR</td><td>QA_MGR</td><td>HR_MGR</td><td>Đại diện các phòng ban</td><td>2026-07-29</td><td>WI-202 bản nháp lần sửa đổi</td><td>KPI-DEP-02</td></tr>
+    <tr><td>5</td><td>Chuẩn bị mã QR dán nhãn nhóm thực hiện và đường dẫn cho 2026-07-28.</td><td>IT_MGR</td><td>PROD_DIR</td><td>QMS_ENG</td><td>Hạt nhân khu vực</td><td>2026-07-27</td><td>khu vực dán nhãn danh sách kiểm tra</td><td>KPI-FLD-02</td></tr>
+    <tr><td>6</td><td>Dán 21 nhãn QR và chụp ảnh bằng chứng.</td><td>IT_MGR</td><td>PROD_DIR</td><td>QA_MGR</td><td>QMS_MGR</td><td>2026-07-28</td><td>kho ảnh bằng chứng, quét nhật ký</td><td>KPI-FLD-01</td></tr>
+    <tr><td>7</td><td>Ghi hình danh sách video đào tạo v2 video 1 và video 2.</td><td>HR_MGR</td><td>QMS_MGR</td><td>PROD_DIR, IT_MGR</td><td>Đại diện các phòng ban</td><td>2026-07-29</td><td>SOP-801 đào tạo nhật ký truyền thông đào tạo</td><td>KPI-TRN-01</td></tr>
+    <tr><td>8</td><td>Ghi hình danh sách video đào tạo v2 video 3 và chuẩn bị câu hỏi kiểm tra.</td><td>HR_MGR</td><td>QMS_MGR</td><td>QA_MGR</td><td>Đại diện các phòng ban</td><td>2026-07-30</td><td>danh sách video v2 gói câu hỏi kiểm tra</td><td>KPI-TRN-01</td></tr>
+    <tr><td>9</td><td>Cập nhật bảng điều hành với KPI cuối cùng đường xu hướng nhỏ W01-W11.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>CEO</td><td>2026-07-30</td><td>bảng điều hành ảnh chụp dữ liệu</td><td>KPI-DEP-05</td></tr>
+    <tr><td>10</td><td>Gửi bản ghi nhớ tóm tắt bài học kinh nghiệm cho đại diện các phòng ban để phổ biến lại trong đội nhóm.</td><td>QMS_MGR</td><td>CEO</td><td>HR_MGR</td><td>Đại diện các phòng ban</td><td>2026-07-27</td><td>bản ghi nhớ lưu trữ</td><td>KPI-FLD-01</td></tr>
+    <tr><td>11</td><td>Soạn nháp W12 bản ghi nhớ bàn giao v0.9.</td><td>QMS_MGR</td><td>CEO</td><td>QA_MGR, PROD_DIR, ENG_MGR</td><td>Đại diện các phòng ban</td><td>2026-07-27</td><td>bản nháp bản ghi nhớ bàn giao</td><td>KPI-DEP-02</td></tr>
+    <tr><td>12</td><td>Soạn nháp Ma trận bàn giao chủ trì KPI cho 10 KPI.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>Ô chỉ báo chủ trì</td><td>CEO</td><td>2026-07-29</td><td>ANNEX-110 chủ trì ma trận</td><td>KPI-DEP-05</td></tr>
+    <tr><td>13</td><td>Chuẩn bị W12 chữ ký gói hồ sơ và thứ tự.</td><td>QMS_MGR</td><td>CEO</td><td>QA_MGR, PROD_DIR, ENG_MGR</td><td>Ban chỉ đạo</td><td>2026-07-31</td><td>W12 gói hồ sơ bàn giao</td><td>KPI-DEP-02</td></tr>
+    <tr><td>14</td><td>Đặt lịch cuộc họp điều hành hằng tuần đầu tiên trong vận hành thường xuyên và xem xét của lãnh đạo hằng tháng bản nháp khung lịch.</td><td>QMS_MGR</td><td>CEO</td><td>HR_MGR, FIN_MGR</td><td>Đại diện các phòng ban</td><td>2026-07-31</td><td>lịch tệp xuất</td><td>KPI-DEP-02</td></tr>
+    <tr><td>15</td><td>Cập nhật KPI-DEP-03 bảng theo dõi với 5 chủ đề chính mang tính hệ thống cải tiến.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>QA_MGR</td><td>CEO</td><td>2026-07-28</td><td>ANNEX-110, bảng theo dõi dòng</td><td>KPI-DEP-03</td></tr>
   </tbody></table></div>
 </section>
 <section class="card" id="sec-next-week">
-  <h2 class="h2">Preview tuần 12 · nhiệm vụ chuẩn bị</h2>
-  <p>Tuần 12 ngày 2026-08-01 là bàn giao chính thức sang BAU. Để bàn giao thật, W11 phải tạo đủ package: handoff memo, KPI ownership matrix, calendar audit năm 1, cadence weekly/monthly/quarterly và champion roster ongoing. Nếu bất kỳ package nào chưa có owner, W12 chỉ là lễ hình thức và không được phép ghi `deploy_program_handoff_complete`.</p>
-  <div class="table-card"><table class="table"><thead><tr><th>Role</th><th>Task chuẩn bị cho W12</th><th>Deadline</th></tr></thead><tbody>
-    <tr><td>QMS_MGR</td><td>Handoff memo draft v0.9, bao gồm scope, outcome, open CAPA, doc revision plan và BAU cadence.</td><td>2026-07-27</td></tr>
-    <tr><td>QMS_ENG</td><td>KPI ownership transfer matrix 10 KPI × BAU owner role, source system và review cadence.</td><td>2026-07-29</td></tr>
-    <tr><td>IT_MGR</td><td>QR code posted evidence và dashboard BAU mode toggle proposal.</td><td>2026-07-30</td></tr>
-    <tr><td>HR_MGR</td><td>Training playlist v2 recording log và champion roster ongoing status draft.</td><td>2026-07-31</td></tr>
-    <tr><td>CEO</td><td>Review signature order and closing speech for Kotter step 8 anchor.</td><td>2026-07-31</td></tr>
+  <h2 class="h2">Xem trước tuần 12 · nhiệm vụ chuẩn bị</h2>
+  <p>Tuần 12 ngày 2026-08-01 là bàn giao chính thức sang vận hành thường xuyên. Để bàn giao thật, W11 phải tạo đủ gói hồ sơ: bản ghi nhớ bàn giao, ma trận chủ trì KPI, lịch đánh giá năm 1, nhịp điều hành hằng tuần/hằng tháng/hằng quý và danh sách hạt nhân duy trì thường xuyên. Nếu bất kỳ gói hồ sơ nào chưa có chủ trì, W12 chỉ là lễ hình thức và không được phép ghi `deploy_program_handoff_complete`.</p>
+  <div class="table-card"><table class="table"><thead><tr><th>Vai trò</th><th>Nhiệm vụ chuẩn bị cho W12</th><th>Hạn chót</th></tr></thead><tbody>
+    <tr><td>QMS_MGR</td><td>Bản ghi nhớ bàn giao bản nháp v0.9, bao gồm phạm vi, kết quả, mở CAPA, tài liệu lần sửa đổi kế hoạch và nhịp vận hành thường xuyên điều hành.</td><td>2026-07-27</td></tr>
+    <tr><td>QMS_ENG</td><td>Ma trận bàn giao chủ trì KPI 10 KPI × vai trò vận hành thường xuyên chịu trách nhiệm, hệ thống nguồn và rà soát nhịp điều hành.</td><td>2026-07-29</td></tr>
+    <tr><td>IT_MGR</td><td>mã QR đã dán bằng chứng và công tắc chuyển bảng điều hành sang chế độ vận hành thường xuyên.</td><td>2026-07-30</td></tr>
+    <tr><td>HR_MGR</td><td>Danh sách video đào tạo v2 nhật ký ghi hình và danh sách hạt nhân duy trì thường xuyên trạng thái bản nháp.</td><td>2026-07-31</td></tr>
+    <tr><td>CEO</td><td>Rà soát chữ ký thứ tự và bài phát biểu kết thúc cho điểm neo Kotter bước 8.</td><td>2026-07-31</td></tr>
   </tbody></table></div>
 </section>
-<section class="card" id="sec-docs">
-  <h2 class="h2">Tài liệu liên quan · click để mở</h2>
+<section class="card" id="sec-tài liệu">
+  <h2 class="h2">Tài liệu liên quan · bấm để mở</h2>
   <p>
     <a href="#" onclick="if(window.openDoc)openDoc('WI-105');return false;" class="role-chip">WI-105</a>
     <a href="#" onclick="if(window.openDoc)openDoc('WI-202');return false;" class="role-chip">WI-202</a>
@@ -214,25 +213,25 @@
     <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W10');return false;" class="role-chip">TRN-DEP-W10</a>
     <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W12');return false;" class="role-chip">TRN-DEP-W12</a>
   </p>
-  <p>Danh sách này cố ý rộng vì W11 là tuần revision planning. Người điều phối phải xem các controlled docs như một hệ thống liên kết: policy, work instruction, SOP, annex, RACI, authority và playbook history. Chip nào không mở được là blocker cho DCC evidence, không phải lỗi trình bày.</p>
+  <p>Danh sách này cố ý rộng vì W11 là tuần lập kế hoạch sửa đổi. Người điều phối phải xem các tài liệu được kiểm soát như một hệ thống liên kết: quy định, hướng dẫn công việc, SOP, phụ lục, RACI, ma trận thẩm quyền và lịch sử sổ tay triển khai. Thẻ nào không mở được là điểm chặn cho bằng chứng DCC, không phải lỗi trình bày.</p>
 </section>
 <section class="card" id="sec-risks">
-  <h2 class="h2">Rủi ro tuần 11 + escalation</h2>
-  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Mô tả rủi ro</th><th>L</th><th>I</th><th>Mitigation</th><th>Trigger escalation</th><th>Owner</th></tr></thead><tbody>
-    <tr><td>1</td><td>Hofstede risk: phòng heads im lặng trong all-hands để giữ thể diện, làm lessons learned thành diễn văn.</td><td>H</td><td>H</td><td>Thu feedback ẩn danh trước, senior speaks last, form written confirmation sau họp.</td><td>&lt;33 submissions hoặc 0 dissent trong khi issue/CAPA có blocker.</td><td>CEO</td></tr>
-    <tr><td>2</td><td>Face-saving risk: role group không muốn nhận wave của mình từng struggle, dẫn đến theme bị làm mềm.</td><td>H</td><td>M</td><td>Frame "system miss, not person miss"; QMS_MGR thay tên phòng bằng process category khi trình bày.</td><td>Round-robin chuyển sang tự khen hoặc tránh theme có evidence.</td><td>QMS_MGR</td></tr>
-    <tr><td>3</td><td>Doc revision overload: ≥10 docs revision +1 trong 30 ngày vượt capacity của document owners.</td><td>M</td><td>H</td><td>Prioritize theo ISO clause impact và Sev-1/Sev-2 evidence; cosmetic defer year 2.</td><td>Any owner không commit ETA ≤30 ngày.</td><td>QMS_MGR</td></tr>
-    <tr><td>4</td><td>QR code logistics: 21 sticker in, scan, dán và kiểm có thể fail vì vật tư hoặc zone downtime.</td><td>M</td><td>M</td><td>IT_MGR chuẩn bị 10% spare stickers, posting crew 2 champion, scan test trước khi dán.</td><td>&lt;21 sticker printed hoặc scan fail &gt;0.</td><td>IT_MGR</td></tr>
-    <tr><td>5</td><td>Training playlist budget/time: video mới bị trì hoãn vì cần editor hoặc thiết bị.</td><td>M</td><td>M</td><td>Dùng phone + free editor; giới hạn video 5-7 phút, một tình huống thực tế mỗi video.</td><td>Script chưa approve trước 2026-07-25 17:00.</td><td>HR_MGR</td></tr>
-    <tr><td>6</td><td>CAPA overdue xuất hiện sau khi W10 đã green, chặn P4-03.</td><td>L</td><td>H</td><td>QA_MGR re-run query T-1 và T-0; nếu overdue, chuyển Gate thành Conditional Go hoặc No-Go.</td><td>Any CAPA &gt;30 ngày tại 2026-07-25 17:00.</td><td>QA_MGR</td></tr>
+  <h2 class="h2">Rủi ro tuần 11 + leo thang xử lý</h2>
+  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Mô tả rủi ro</th><th>L</th><th>I</th><th>Biện pháp giảm thiểu</th><th>Điều kiện leo thang xử lý</th><th>Chủ trì</th></tr></thead><tbody>
+    <tr><td>1</td><td>Rủi ro văn hóa: trưởng phòng hoặc đại diện phòng ban im lặng trong cuộc họp cấp đại diện để giữ thể diện, làm phần bài học kinh nghiệm thành diễn văn.</td><td>H</td><td>H</td><td>Thu phản hồi ẩn danh trước, lãnh đạo phát biểu sau cùng, dùng biểu mẫu xác nhận bằng văn bản sau họp.</td><td>&lt;33 phản hồi hoặc 0 ý kiến khác biệt trong khi vấn đề/CAPA có điểm chặn.</td><td>CEO</td></tr>
+	    <tr><td>2</td><td>Rủi ro giữ thể diện: vai trò nhóm không muốn thừa nhận đợt triển khai của mình từng gặp khó, dẫn đến chủ đề bị làm mềm.</td><td>H</td><td>M</td><td>Dùng khung "lỗi hệ thống, không quy lỗi cá nhân"; QMS_MGR thay tên phòng bằng nhóm quy trình khi trình bày.</td><td>Lần lượt phát biểu chuyển sang tự khen hoặc tránh chủ đề có bằng chứng.</td><td>QMS_MGR</td></tr>
+	    <tr><td>3</td><td>Quá tải sửa đổi tài liệu: ≥10 tài liệu tăng lần sửa đổi trong 30 ngày vượt năng lực xử lý của chủ trì tài liệu.</td><td>M</td><td>H</td><td>Ưu tiên theo điều khoản ISO bị ảnh hưởng và bằng chứng Sev-1/Sev-2; thay đổi chỉ mang tính hình thức thì hoãn sang năm 2.</td><td>Bất kỳ chủ trì không cam kết hạn hoàn thành dự kiến ≤30 ngày.</td><td>QMS_MGR</td></tr>
+    <tr><td>4</td><td>mã QR hậu cần: 21 nhãn in, quét, dán và kiểm có thể lỗi vì vật tư hoặc khu vực thời gian dừng.</td><td>M</td><td>M</td><td>IT_MGR chuẩn bị 10% nhãn dự phòng, dán nhãn nhóm thực hiện 2 hạt nhân, kiểm tra quét trước khi dán.</td><td>&lt;21 nhãn đã in hoặc quét lỗi &gt;0.</td><td>IT_MGR</td></tr>
+    <tr><td>5</td><td>Danh sách video đào tạo budget/time: video mới bị trì hoãn vì cần editor hoặc thiết bị.</td><td>M</td><td>M</td><td>Dùng phone + công cụ dựng miễn phí; giới hạn video 5-7 phút, một tình huống thực tế mỗi video.</td><td>Kịch bản chưa được phê duyệt trước 2026-07-25 17:00.</td><td>HR_MGR</td></tr>
+    <tr><td>6</td><td>CAPA quá hạn xuất hiện sau khi W10 đã green, chặn P4-03.</td><td>L</td><td>H</td><td>QA_MGR chạy lại truy vấn T-1 và T-0; nếu quá hạn, chuyển Cổng thành Đi tiếp có điều kiện hoặc Dừng lại.</td><td>Bất kỳ CAPA &gt;30 ngày tại 2026-07-25 17:00.</td><td>QA_MGR</td></tr>
   </tbody></table></div>
 </section>
-<section class="card" id="sec-lessons">
-  <h2 class="h2">Lessons learned · điền sau họp (Lean Change cycle)</h2>
+<section class="card" id="sec-bài học">
+  <h2 class="h2">Bài học kinh nghiệm · điền sau họp (chu trình Lean Change)</h2>
   <div class="grid-3">
-    <div class="note-blue"><h3>Insights</h3><p>Điền ngay sau họp 2026-07-25 bởi QMS_ENG: 5 systemic patterns đã được Steering xác nhận, frequency count, evidence source và doc impact. Không ghi cảm nhận chung; mỗi insight cần link về form export, issue/CAPA hoặc dashboard snapshot.</p></div>
-    <div class="note"><h3>Options</h3><p>Điền bởi QMS_MGR: các lựa chọn xử lý từng theme, gồm revision +1 ngay, đưa vào year-2 backlog, hoặc chuyển thành BAU monitoring row. Ghi rõ option bị loại và lý do, ví dụ capacity, low severity hoặc không có evidence.</p></div>
-    <div class="note-green"><h3>Experiments</h3><p>Điền bởi QMS_MGR + HR_MGR: thí nghiệm BAU đầu tiên từ lessons learned, ví dụ playlist v2 đo lại retrieval drill sau 2 tuần hoặc QR code scan audit bất ngờ tại 7 zone. Mỗi experiment có ngày, owner, metric và stop condition.</p></div>
+    <div class="note-blue"><h3>Nhận định</h3><p>Điền ngay sau họp 2026-07-25 bởi QMS_ENG: 5 mẫu lỗi mang tính hệ thống đã được Ban chỉ đạo xác nhận, gồm tần suất xuất hiện, bằng chứng nguồn và tài liệu ảnh hưởng. Không ghi cảm nhận chung; mỗi nhận định cần liên kết về biểu mẫu tệp xuất, vấn đề/CAPA hoặc bảng điều hành ảnh chụp dữ liệu.</p></div>
+    <div class="note"><h3>Lựa chọn</h3><p>Điền bởi QMS_MGR: các lựa chọn xử lý từng chủ đề, gồm lần sửa đổi +1 ngay, đưa vào tồn đọng năm 2, hoặc chuyển thành dòng theo dõi trong vận hành thường xuyên. Ghi rõ phương án bị loại và lý do, ví dụ năng lực xử lý, mức độ nghiêm trọng thấp hoặc không có bằng chứng.</p></div>
+    <div class="note-green"><h3>Thử nghiệm</h3><p>Điền bởi QMS_MGR + HR_MGR: thử nghiệm vận hành thường xuyên đầu tiên từ bài học kinh nghiệm, ví dụ danh sách video v2 đo lại diễn tập tra cứu sau 2 tuần hoặc mã QR quét đánh giá bất ngờ tại 7 khu vực. Mỗi thử nghiệm có ngày, chủ trì, chỉ số và điều kiện dừng.</p></div>
   </div>
 </section>
 

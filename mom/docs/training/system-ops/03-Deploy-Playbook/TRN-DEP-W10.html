@@ -3,11 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>TRN-DEP-W10 — Playbook tuần 10 (2026-07-18) | HESEM MOM</title>
+<title>TRN-DEP-W10 — Sổ tay triển khai tuần 10 (2026-07-18) | HESEM MOM</title>
 <script>
-/* DCC Header bootstrap — copy verbatim from TRN-OPS-09 pattern.
- * Computes absolute URLs so the stylesheet + renderer load correctly
- * regardless of how the document is served (direct, portal iframe, …). */
+	/* Nap bo hien thi DCC dung chung theo mau TRN-OPS-09.
+	 * Tinh URL tuyet doi de tep dinh dang va bo hien thi tai dung khi mo truc tiep hoac trong khung nhung cong thong tin. */
 (function () {
   var DCC_VERSION = '2026-04-24-1';
   var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
@@ -34,171 +33,171 @@
 <body>
 <div class="container"><div class="page"><div class="page-body">
 
-<!-- DCC Document Change Control header (preview seed; live values served by /api/v1/dcc) -->
+	<!-- Tieu de kiem soat thay doi DCC (du lieu mau xem truoc; gia tri thuc te do /api/v1/dcc cung cap) -->
 <div class="dcc-header"
      data-dcc-doc-code="TRN-DEP-W10"
      data-dcc-locale="vi"
      data-dcc-logo="../../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap='{"header":{"doc_code":"TRN-DEP-W10","title":"Playbook tuần 10 — Wave 3 stabilize + dashboard governance review","subtitle":"Triển khai vận hành QMS · Phase P4 · 2026-07-18 (Saturday)","doc_type":"TRN","revision":"V0","effective_date":"2026-07-18","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":null,"status":"draft"}}'></div>
+     data-dcc-bootstrap='{"header":{"doc_code":"TRN-DEP-W10","title":"Sổ tay triển khai tuần 10 — Ổn định đợt 3 và rà soát quản trị bảng điều hành","subtitle":"Triển khai vận hành QMS · Giai đoạn P4 · 2026-07-18 (Thứ Bảy)","doc_type":"TRN","revision":"V0","effective_date":"2026-07-18","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":null,"status":"draft"}}'></div>
 
 <div class="doc-content" id="docContent">
 <section class="card" id="sec-cover">
-  <h1 class="h2" style="margin-top:0;">W10 · 2026-07-18 — Wave 3 stabilize + dashboard governance review</h1>
-  <p class="lead">Tuần 10 là điểm chuyển từ nhịp triển khai theo sóng sang cơ chế vận hành có chủ sở hữu dashboard, chủ sở hữu KPI và lịch audit rõ ràng. Wave 3 đã đi qua tuần khởi động, vì vậy cuộc họp ngày 2026-07-18 không còn chỉ hỏi hệ thống có chạy được hay không; cuộc họp phải chứng minh rằng dữ liệu điều hành, phân quyền truy cập và CAPA tồn đọng đã đủ ổn định để thay hypercare bằng governance thường xuyên. Trọng tâm là Kotter bước 7, ISO 9001:2015 §9.1 và §9.2, NIST SP 800-53 AU/AT, cùng kiểm tra trưởng thành dashboard governance theo Gartner D&amp;A 2023.</p>
+  <h1 class="h2" style="margin-top:0;">W10 · 2026-07-18 — Ổn định đợt 3 và rà soát quản trị bảng điều hành</h1>
+  <p class="lead">Tuần 10 là điểm chuyển từ nhịp triển khai theo sóng sang cơ chế vận hành có chủ sở hữu bảng điều hành, chủ sở hữu KPI và lịch đánh giá rõ ràng. Đợt 3 đã đi qua tuần khởi động, vì vậy cuộc họp ngày 2026-07-18 không còn chỉ hỏi hệ thống có chạy được hay không; cuộc họp phải chứng minh rằng dữ liệu điều hành, phân quyền truy cập và CAPA tồn đọng đã đủ ổn định để thay hỗ trợ tăng cường bằng quản trị thường xuyên. Trọng tâm là Kotter bước 7, ISO 9001:2015 §9.1 và §9.2, NIST SP 800-53 AU/AT, cùng kiểm tra trưởng thành quản trị bảng điều hành theo Gartner D&amp;A 2023.</p>
   <div class="grid-3">
     <div class="metric-card"><strong>Ngày</strong><br>2026-07-18</div>
     <div class="metric-card"><strong>Thứ</strong><br>Thứ Bảy</div>
-    <div class="metric-card"><strong>Phase</strong><br>P4 · Institutionalize</div>
-    <div class="metric-card"><strong>Pillar</strong><br>dash · governance evidence</div>
-    <div class="metric-card"><strong>Attendees</strong><br>HR_MGR, FIN_MGR, IT_MGR, EHS_MGR, EPICOR_ADMIN, QMS_MGR, widget owners, champion Wave 3 · khoảng 30 người</div>
-    <div class="metric-card"><strong>Owner</strong><br>QMS_MGR · CEO sign-off cho gate P4-01/P4-02</div>
+    <div class="metric-card"><strong>Giai đoạn</strong><br>P4 · Thể chế hóa</div>
+    <div class="metric-card"><strong>Trụ cột</strong><br>bảng điều hành · quản trị bằng chứng</div>
+    <div class="metric-card"><strong>Thành phần tham dự</strong><br>Đại diện được ủy quyền của HR, FIN, IT, EHS, EPICOR_ADMIN; QMS_MGR; chủ trì ô chỉ báo; đại diện hạt nhân Đợt 3</div>
+    <div class="metric-card"><strong>Chủ trì</strong><br>QMS_MGR · CEO ký xác nhận cho cổng quyết định P4-01/P4-02</div>
   </div>
-  <p>Thông điệp vận hành của tuần này là: nếu dashboard không có owner role, nếu refresh SLA chưa đạt, hoặc nếu CAPA vẫn quá hạn, chương trình chưa được phép tự nhận là đã ổn định. Tất cả bằng chứng phải đi qua mã tài liệu, bảng dữ liệu, audit log và người chịu trách nhiệm theo role code; không dùng cam kết miệng hoặc mô tả chung chung.</p>
+  <p>Thông điệp vận hành của tuần này là: nếu bảng điều hành không có vai trò chịu trách nhiệm, nếu tỷ lệ cập nhật đúng hạn chưa đạt, hoặc nếu CAPA vẫn quá hạn, chương trình chưa được phép tự nhận là đã ổn định. Tất cả bằng chứng phải đi qua mã tài liệu, bảng dữ liệu, đánh giá nhật ký và người chịu trách nhiệm theo mã vai trò; không dùng cam kết miệng hoặc mô tả chung chung.</p>
 </section>
 <section class="card" id="sec-objective">
   <h2 class="h2">Mục tiêu tuần 10</h2>
   <ol class="tight">
-    <li>Đến 2026-07-18 09:45, Wave 3 cohort phải có Sev-1 count = 0 trong 5 ngày làm việc liên tiếp, đo từ `issues.json` và đối chiếu với severity board do HR_MGR điều phối.</li>
-    <li>Đến cuối cuộc họp, 10 dashboard widget phải có owner role, `role_required`, cadence refresh, backup reviewer và evidence link; thiếu bất kỳ trường nào thì gate P4-01 không được ký.</li>
-    <li>KPI-DEP-05 phải đạt refresh SLA ≥95% trong 4 tuần liên tiếp, nguồn đo là `readiness.json` snapshot và dashboard audit log; mục tiêu này thay thế cảm tính "dashboard xanh".</li>
-    <li>CAPA backlog phải ≤5 open, 0 CAPA quá 30 ngày, và mọi CAPA còn mở phải có owner role + ETA ≤30 ngày theo ANNEX-117 hoặc CAPA table.</li>
-    <li>Lịch internal audit năm 1 phải được QMS_MGR và CEO chốt ở mức quý: Q1 tháng 09/2026, Q2 tháng 12/2026, Q3 tháng 03/2027, Q4 tháng 06/2027, phù hợp ISO 9001:2015 §9.2.2(a-f).</li>
+    <li>Đến 2026-07-18 09:45, nhóm triển khai Đợt 3 phải có Sev-1 số lượng = 0 trong 5 ngày làm việc liên tiếp, đo từ `issues.json` và đối chiếu với bảng mức độ nghiêm trọng do HR_MGR điều phối.</li>
+    <li>Đến cuối cuộc họp, 10 ô chỉ báo bảng điều hành phải có vai trò chịu trách nhiệm, `role_required`, nhịp cập nhật, người rà soát dự phòng và liên kết bằng chứng; thiếu bất kỳ trường nào thì cổng quyết định P4-01 không được ký.</li>
+    <li>KPI-DEP-05 phải đạt tỷ lệ cập nhật đúng hạn ≥95% trong 4 tuần liên tiếp, nguồn đo là `readiness.json` ảnh chụp dữ liệu và nhật ký đánh giá bảng điều hành; mục tiêu này thay thế cảm tính "bảng điều hành xanh".</li>
+    <li>tồn đọng CAPA phải ≤5 mở, 0 CAPA quá 30 ngày, và mọi CAPA còn mở phải có vai trò chịu trách nhiệm + hạn hoàn thành dự kiến ≤30 ngày theo ANNEX-117 hoặc bảng CAPA.</li>
+    <li>Lịch đánh giá nội bộ năm 1 phải được QMS_MGR và CEO chốt ở mức quý: Q1 tháng 09/2026, Q2 tháng 12/2026, Q3 tháng 03/2027, Q4 tháng 06/2027, phù hợp ISO 9001:2015 §9.2.2(a-f).</li>
   </ol>
   <div class="table-card">
     <table class="table">
-      <thead><tr><th>KPI / evidence</th><th>Baseline trước W10</th><th>Mục tiêu W10</th><th>Owner</th><th>Nguồn kiểm chứng</th></tr></thead>
+      <thead><tr><th>KPI / bằng chứng</th><th>Mốc đầu kỳ trước W10</th><th>Mục tiêu W10</th><th>Chủ trì</th><th>Nguồn kiểm chứng</th></tr></thead>
       <tbody>
-        <tr><td>KPI-FLD-01</td><td>Wave 3 routing đúng thư mục 92% sau W09</td><td>≥95% toàn bộ 80 users trước 2026-07-18 17:00</td><td>QMS_MGR</td><td>ANNEX-110, retrieval drill log, `training_records`</td></tr>
-        <tr><td>KPI-FLD-02</td><td>Median retrieval 188s cho Wave 3</td><td>≤180s với ít nhất 15 lượt drill có timestamp</td><td>IT_MGR</td><td>`readiness.json`, drill raw data, WI-202 meeting record</td></tr>
-        <tr><td>KPI-DEP-05</td><td>3 tuần đạt ≥95%, cần tuần thứ 4</td><td>Refresh SLA ≥95% trong 4 tuần liên tiếp</td><td>QMS_ENG</td><td>dashboard scheduler log, ANNEX-110</td></tr>
-        <tr><td>CAPA backlog</td><td>5 open, 0 overdue nếu W09 đóng đúng hạn</td><td>≤5 open và 0 quá 30 ngày</td><td>QA_MGR</td><td>CAPA table, ANNEX-117</td></tr>
-        <tr><td>Dashboard widget governance</td><td>10 widget có owner nháp, access chưa ký</td><td>10/10 widget có owner role + RBAC verified</td><td>QMS_MGR</td><td>ANNEX-113, dashboard widget config</td></tr>
+        <tr><td>KPI-FLD-01</td><td>Đợt 3 định tuyến đúng thư mục 92% sau W09</td><td>≥95% toàn bộ 80 người dùng trước 2026-07-18 17:00</td><td>QMS_MGR</td><td>ANNEX-110, nhật ký diễn tập tra cứu, `training_records`</td></tr>
+        <tr><td>KPI-FLD-02</td><td>Thời gian tra cứu trung vị 188s cho Đợt 3</td><td>≤180s với ít nhất 15 lượt diễn tập có dấu thời gian</td><td>IT_MGR</td><td>`readiness.json`, dữ liệu gốc của diễn tập, WI-202 hồ sơ cuộc họp</td></tr>
+        <tr><td>KPI-DEP-05</td><td>3 tuần đạt ≥95%, cần tuần thứ 4</td><td>cam kết cập nhật đúng hạn ≥95% trong 4 tuần liên tiếp</td><td>QMS_ENG</td><td>bảng điều hành nhật ký bộ lập lịch, ANNEX-110</td></tr>
+        <tr><td>tồn đọng CAPA</td><td>5 mở, 0 quá hạn nếu W09 đóng đúng hạn</td><td>≤5 mở và 0 quá 30 ngày</td><td>QA_MGR</td><td>bảng CAPA, ANNEX-117</td></tr>
+        <tr><td>Bảng điều hành ô chỉ báo quản trị</td><td>10 ô chỉ báo có chủ trì nháp, quyền truy cập chưa được ký xác nhận</td><td>10/10 ô chỉ báo có vai trò chịu trách nhiệm + RBAC đã kiểm chứng</td><td>QMS_MGR</td><td>ANNEX-113, ô chỉ báo bảng điều hành cấu hình</td></tr>
       </tbody>
     </table>
   </div>
-  <p>Đây là tuần đầu tiên dashboard governance được xem như cơ chế điều hành dài hạn, không phải màn hình minh họa. NIST AU-11 yêu cầu retention đủ dài cho audit trail, ISO §9.1 yêu cầu dữ liệu monitoring dùng được cho quyết định, và Gartner D&amp;A 2023 nhấn mạnh mỗi dashboard phải có owner, người dùng mục tiêu, cadence và ngữ cảnh hành động. Vì vậy mọi KPI trong bảng trên phải có bằng chứng nguồn, không được kết luận từ màu widget.</p>
+  <p>Đây là tuần đầu tiên quản trị bảng điều hành được xem như cơ chế điều hành dài hạn, không phải màn hình minh họa. Người tham dự cuộc họp là đại diện phòng ban được ủy quyền; 80 người dùng chỉ là phạm vi đo KPI và truyền thông sau họp, không phải danh sách người tham dự. NIST AU-11 yêu cầu lưu giữ đủ dài cho dấu vết đánh giá, ISO §9.1 yêu cầu dữ liệu theo dõi dùng được cho quyết định, và Gartner D&amp;A 2023 nhấn mạnh mỗi bảng điều hành phải có chủ trì, người dùng mục tiêu, nhịp điều hành và ngữ cảnh hành động. Vì vậy mọi KPI trong bảng trên phải có bằng chứng nguồn, không được kết luận từ màu ô chỉ báo.</p>
 </section>
 <section class="card" id="sec-prep">
-  <h2 class="h2">Prep checklist — T-7 / T-3 / T-1 / T-0</h2>
+  <h2 class="h2">Danh sách chuẩn bị — T-7 / T-3 / T-1 / T-0</h2>
   <div class="table-card">
     <table class="table">
-      <thead><tr><th>Window</th><th>WHO</th><th>WHAT</th><th>EVIDENCE</th><th>DEADLINE</th></tr></thead>
+      <thead><tr><th>Mốc</th><th>Chủ trì</th><th>Việc phải làm</th><th>Bằng chứng</th><th>Hạn chót</th></tr></thead>
       <tbody>
-        <tr><td>T-7 · 2026-07-11</td><td>QMS_MGR</td><td>Đóng danh sách 10 dashboard widget cần review, gồm tên widget, mục đích điều hành, owner role, backup reviewer và nhóm người được xem.</td><td>ANNEX-113 widget inventory v0.9</td><td>2026-07-11 17:00</td></tr>
-        <tr><td>T-7 · 2026-07-11</td><td>HR_MGR</td><td>Xác nhận Wave 3 cohort đã có training record sau W09, thiếu record nào phải ghi blocker riêng thay vì cộng gộp.</td><td>`training_records` export</td><td>2026-07-11 18:00</td></tr>
-        <tr><td>T-7 · 2026-07-11</td><td>IT_MGR</td><td>Seed access-review form cho HR, FIN, IT, EHS, EPICOR_ADMIN; mỗi form có câu hỏi role_required và user exception.</td><td>Microsoft Forms export, ANNEX-113 link</td><td>2026-07-11 18:00</td></tr>
-        <tr><td>T-7 · 2026-07-11</td><td>QA_MGR</td><td>Chụp CAPA backlog ngay sau W09 để có baseline cho triage 4 tuần.</td><td>CAPA table snapshot, ANNEX-117</td><td>2026-07-11 18:30</td></tr>
-        <tr><td>T-3 · 2026-07-15</td><td>Widget owners</td><td>Điền access review cho 10 widget, nêu rõ role nào được xem, role nào được export, role nào chỉ xem aggregate.</td><td>10 submitted access-review forms</td><td>2026-07-15 12:00</td></tr>
-        <tr><td>T-3 · 2026-07-15</td><td>QMS_ENG</td><td>Đối chiếu KPI-DEP-05 4 tuần với scheduler log; đánh dấu đỏ nếu bất kỳ tuần nào dưới 95%.</td><td>`readiness.json` snapshots, scheduler log</td><td>2026-07-15 15:00</td></tr>
-        <tr><td>T-3 · 2026-07-15</td><td>IT_MGR</td><td>Kiểm tra RBAC bằng 5 tài khoản mẫu: HR_MGR, FIN_MGR, IT_MGR, EHS_MGR, EPICOR_ADMIN.</td><td>access test screenshots, audit_events `dashboard_access_probe`</td><td>2026-07-15 16:00</td></tr>
-        <tr><td>T-3 · 2026-07-15</td><td>QMS_MGR</td><td>Draft internal audit cycle năm 1 với 4 quý, tránh tuần month-end close và tránh tuần production freeze.</td><td>calendar draft, ANNEX-119 reference</td><td>2026-07-15 17:00</td></tr>
-        <tr><td>T-1 · 2026-07-17</td><td>QMS_MGR</td><td>Gộp evidence packet W10: Wave 3 severity, widget governance, refresh SLA, CAPA backlog, audit cycle draft.</td><td>W10 review packet PDF</td><td>2026-07-17 14:00</td></tr>
-        <tr><td>T-1 · 2026-07-17</td><td>QA_MGR</td><td>Chuẩn bị CAPA closure plan 4 tuần, mỗi CAPA có owner, due date, effectiveness check và link evidence.</td><td>CAPA closure plan v0.9</td><td>2026-07-17 15:00</td></tr>
-        <tr><td>T-1 · 2026-07-17</td><td>IT_MGR</td><td>Xác nhận không có user ngoài role permission trong 10 widget; nếu có exception phải có rationale và expiry date.</td><td>RBAC exception register</td><td>2026-07-17 15:30</td></tr>
-        <tr><td>T-1 · 2026-07-17</td><td>CEO</td><td>Đọc trước decision memo, chuẩn bị khung quyết định: approve, conditional approve hoặc defer 1 tuần.</td><td>CEO pre-read acknowledgement</td><td>2026-07-17 17:00</td></tr>
-        <tr><td>T-0 · 2026-07-18</td><td>QMS_MGR</td><td>30 phút trước họp, xác nhận slide 3-11 có số liệu timestamp, không dùng ảnh dashboard đã cắt mất timestamp.</td><td>final deck checksum</td><td>2026-07-18 08:30</td></tr>
-        <tr><td>T-0 · 2026-07-18</td><td>IT_MGR</td><td>Login test live trên màn hình họp bằng tài khoản role test, bảo đảm access matrix không chỉ là giấy.</td><td>live RBAC probe log</td><td>2026-07-18 08:35</td></tr>
-        <tr><td>T-0 · 2026-07-18</td><td>QA_MGR</td><td>Kiểm tra lại CAPA overdue bằng query cuối cùng; nếu có CAPA quá 30 ngày thì chuẩn bị No-Go rationale.</td><td>CAPA query output</td><td>2026-07-18 08:40</td></tr>
-        <tr><td>T-0 · 2026-07-18</td><td>CEO</td><td>Thống nhất với QMS_MGR: senior speaks last trong phần rủi ro để tránh Hofstede anchoring.</td><td>meeting facilitation note</td><td>2026-07-18 08:45</td></tr>
+        <tr><td>T-7 · 2026-07-11</td><td>QMS_MGR</td><td>Đóng danh sách 10 ô chỉ báo bảng điều hành cần rà soát, gồm tên ô chỉ báo, mục đích điều hành, vai trò chịu trách nhiệm, người rà soát dự phòng và nhóm người được xem.</td><td>ANNEX-113 danh mục ô chỉ báo v0.9</td><td>2026-07-11 17:00</td></tr>
+        <tr><td>T-7 · 2026-07-11</td><td>HR_MGR</td><td>Xác nhận nhóm triển khai Đợt 3 đã có đào tạo hồ sơ sau W09, thiếu hồ sơ nào phải ghi điểm chặn riêng thay vì cộng gộp.</td><td>`training_records` tệp xuất</td><td>2026-07-11 18:00</td></tr>
+	        <tr><td>T-7 · 2026-07-11</td><td>IT_MGR</td><td>Tạo sẵn biểu mẫu rà soát quyền truy cập cho HR, FIN, IT, EHS, EPICOR_ADMIN; mỗi biểu mẫu có câu hỏi `role_required` và ngoại lệ người dùng.</td><td>Microsoft Forms tệp xuất, ANNEX-113 liên kết</td><td>2026-07-11 18:00</td></tr>
+        <tr><td>T-7 · 2026-07-11</td><td>QA_MGR</td><td>Chụp tồn đọng CAPA ngay sau W09 để có mốc đầu kỳ cho phân loại xử lý 4 tuần.</td><td>bảng CAPA ảnh chụp dữ liệu, ANNEX-117</td><td>2026-07-11 18:30</td></tr>
+        <tr><td>T-3 · 2026-07-15</td><td>Ô chỉ báo chủ trì</td><td>Điền rà soát quyền truy cập cho 10 ô chỉ báo, nêu rõ vai trò nào được xem, vai trò nào được tệp xuất, vai trò nào chỉ xem dữ liệu tổng hợp.</td><td>10 biểu mẫu rà soát quyền truy cập đã nộp</td><td>2026-07-15 12:00</td></tr>
+        <tr><td>T-3 · 2026-07-15</td><td>QMS_ENG</td><td>Đối chiếu KPI-DEP-05 4 tuần với nhật ký bộ lập lịch; đánh dấu đỏ nếu bất kỳ tuần nào dưới 95%.</td><td>`readiness.json` ảnh chụp dữ liệu, nhật ký bộ lập lịch</td><td>2026-07-15 15:00</td></tr>
+        <tr><td>T-3 · 2026-07-15</td><td>IT_MGR</td><td>Kiểm tra RBAC bằng 5 tài khoản mẫu: HR_MGR, FIN_MGR, IT_MGR, EHS_MGR, EPICOR_ADMIN.</td><td>ảnh chụp màn hình kiểm tra quyền truy cập, audit_events `dashboard_access_probe`</td><td>2026-07-15 16:00</td></tr>
+        <tr><td>T-3 · 2026-07-15</td><td>QMS_MGR</td><td>Soạn nháp đánh giá nội bộ chu kỳ năm 1 với 4 quý, tránh tuần khóa sổ cuối tháng và tránh tuần sản xuất khóa dữ liệu.</td><td>lịch bản nháp, ANNEX-119 tham chiếu</td><td>2026-07-15 17:00</td></tr>
+        <tr><td>T-1 · 2026-07-17</td><td>QMS_MGR</td><td>Gộp bằng chứng gói hồ sơ W10: Đợt 3 mức độ nghiêm trọng, ô chỉ báo quản trị, tỷ lệ cập nhật đúng hạn, tồn đọng CAPA, chu kỳ đánh giá bản nháp.</td><td>W10 rà soát gói hồ sơ PDF</td><td>2026-07-17 14:00</td></tr>
+        <tr><td>T-1 · 2026-07-17</td><td>QA_MGR</td><td>Chuẩn bị CAPA đóng vấn đề kế hoạch 4 tuần, mỗi CAPA có chủ trì, ngày đến hạn, kiểm tra hiệu lực và liên kết bằng chứng.</td><td>CAPA đóng vấn đề kế hoạch v0.9</td><td>2026-07-17 15:00</td></tr>
+        <tr><td>T-1 · 2026-07-17</td><td>IT_MGR</td><td>Xác nhận không có người dùng ngoài vai trò quyền truy cập trong 10 ô chỉ báo; nếu có ngoại lệ phải có lý do và ngày hết hiệu lực.</td><td>RBAC ngoại lệ sổ đăng ký</td><td>2026-07-17 15:30</td></tr>
+        <tr><td>T-1 · 2026-07-17</td><td>CEO</td><td>Đọc trước bản ghi nhớ quyết định, chuẩn bị khung quyết định: phê duyệt, phê duyệt có điều kiện hoặc hoãn 1 tuần.</td><td>CEO xác nhận đã đọc trước</td><td>2026-07-17 17:00</td></tr>
+        <tr><td>T-0 · 2026-07-18</td><td>QMS_MGR</td><td>30 phút trước họp, xác nhận trang trình chiếu 3-11 có số liệu dấu thời gian, không dùng ảnh bảng điều hành đã cắt mất dấu thời gian.</td><td>mã kiểm tra bộ trình chiếu cuối cùng</td><td>2026-07-18 08:30</td></tr>
+        <tr><td>T-0 · 2026-07-18</td><td>IT_MGR</td><td>Kiểm tra đăng nhập trực tiếp trên màn hình họp bằng tài khoản vai trò test, bảo đảm ma trận quyền truy cập không chỉ là giấy.</td><td>nhật ký kiểm tra thử RBAC trực tiếp</td><td>2026-07-18 08:35</td></tr>
+        <tr><td>T-0 · 2026-07-18</td><td>QA_MGR</td><td>Kiểm tra lại CAPA quá hạn bằng truy vấn cuối cùng; nếu có CAPA quá 30 ngày thì chuẩn bị Dừng lại lý do.</td><td>CAPA truy vấn đầu ra</td><td>2026-07-18 08:40</td></tr>
+        <tr><td>T-0 · 2026-07-18</td><td>CEO</td><td>Thống nhất với QMS_MGR: lãnh đạo phát biểu sau cùng trong phần rủi ro để tránh Hofstede anchoring.</td><td>ghi chú điều phối cuộc họp</td><td>2026-07-18 08:45</td></tr>
       </tbody>
     </table>
   </div>
 </section>
 <section class="card" id="sec-agenda">
-  <h2 class="h2">Agenda · 09:00–10:00 (60 phút)</h2>
+  <h2 class="h2">Chương trình họp · 09:00–10:00 (60 phút)</h2>
   <div class="table-card">
     <table class="table">
-      <thead><tr><th>Thời gian</th><th>Phút</th><th>Đề mục</th><th>Owner</th><th>Output kỳ vọng</th></tr></thead>
+      <thead><tr><th>Thời gian</th><th>Phút</th><th>Đề mục</th><th>Chủ trì</th><th>Kết quả kỳ vọng</th></tr></thead>
       <tbody>
-        <tr><td>09:00-09:05</td><td>5</td><td>CEO mở đầu: từ sprint triển khai sang marathon governance</td><td>CEO</td><td>Khung quyết định P4-01/P4-02 rõ ràng; mọi phòng hiểu dashboard là bằng chứng điều hành.</td></tr>
-        <tr><td>09:05-09:10</td><td>5</td><td>Wave 3 stabilize status</td><td>HR_MGR</td><td>Sev-1 streak, issue count, training completion và blocker được trình bày bằng số.</td></tr>
-        <tr><td>09:10-09:25</td><td>15</td><td>Dashboard widget governance review: 10 widget × owner × access</td><td>QMS_MGR</td><td>10/10 row có owner role, role_required, backup reviewer, refresh cadence và exception register.</td></tr>
-        <tr><td>09:25-09:35</td><td>10</td><td>KPI-DEP-05 refresh SLA 4 tuần</td><td>QMS_ENG</td><td>Refresh SLA ≥95% được chứng minh bằng scheduler log và `readiness.json`.</td></tr>
-        <tr><td>09:35-09:45</td><td>10</td><td>CAPA backlog triage + closure plan</td><td>QA_MGR</td><td>≤5 CAPA open, 0 overdue, mỗi dòng có owner role và ETA ≤30 ngày.</td></tr>
-        <tr><td>09:45-09:53</td><td>8</td><td>Internal audit cycle năm 1</td><td>QMS_MGR</td><td>Lịch Q1-Q4 được chốt theo ISO §9.2.2, không đụng month-end close.</td></tr>
-        <tr><td>09:53-09:58</td><td>5</td><td>Gate decision P4-01/P4-02</td><td>CEO</td><td>Go, Conditional Go hoặc No-Go được ký; dissent được ghi trong minutes.</td></tr>
-        <tr><td>09:58-10:00</td><td>2</td><td>Preview W11 lessons learned</td><td>QMS_MGR</td><td>11 phòng biết deadline gửi form "3 điều cần thay đổi" trước 2026-07-21.</td></tr>
+        <tr><td>09:00-09:05</td><td>5</td><td>CEO mở đầu: từ chặng chạy nước rút triển khai sang đường dài quản trị</td><td>CEO</td><td>Khung quyết định P4-01/P4-02 rõ ràng; mọi phòng hiểu bảng điều hành là bằng chứng điều hành.</td></tr>
+        <tr><td>09:05-09:10</td><td>5</td><td>Trạng thái ổn định Đợt 3</td><td>HR_MGR</td><td>chuỗi ngày không có Sev-1, vấn đề số lượng, đào tạo hoàn thành và điểm chặn được trình bày bằng số.</td></tr>
+        <tr><td>09:10-09:25</td><td>15</td><td>Bảng điều hành ô chỉ báo quản trị rà soát: 10 ô chỉ báo × chủ trì × quyền truy cập</td><td>QMS_MGR</td><td>10/10 dòng có vai trò chịu trách nhiệm, role_required, người rà soát dự phòng, cập nhật nhịp điều hành và ngoại lệ sổ đăng ký.</td></tr>
+        <tr><td>09:25-09:35</td><td>10</td><td>KPI-DEP-05 tỷ lệ cập nhật đúng hạn 4 tuần</td><td>QMS_ENG</td><td>cam kết cập nhật đúng hạn ≥95% được chứng minh bằng nhật ký bộ lập lịch và `readiness.json`.</td></tr>
+        <tr><td>09:35-09:45</td><td>10</td><td>tồn đọng CAPA phân loại xử lý + đóng vấn đề kế hoạch</td><td>QA_MGR</td><td>≤5 CAPA mở, 0 quá hạn, mỗi dòng có vai trò chịu trách nhiệm và hạn hoàn thành dự kiến ≤30 ngày.</td></tr>
+        <tr><td>09:45-09:53</td><td>8</td><td>Chu kỳ đánh giá nội bộ năm 1</td><td>QMS_MGR</td><td>Lịch Q1-Q4 được chốt theo ISO §9.2.2, không đụng khóa sổ cuối tháng.</td></tr>
+        <tr><td>09:53-09:58</td><td>5</td><td>Cổng quyết định P4-01/P4-02</td><td>CEO</td><td>Đi tiếp, Đi tiếp có điều kiện hoặc Dừng lại được ký; ý kiến không đồng thuận được ghi trong biên bản.</td></tr>
+        <tr><td>09:58-10:00</td><td>2</td><td>Xem trước W11 bài học kinh nghiệm</td><td>QMS_MGR</td><td>11 phòng biết hạn chót gửi biểu mẫu "3 điều cần thay đổi" trước 2026-07-21.</td></tr>
       </tbody>
     </table>
   </div>
 </section>
 <section class="card" id="sec-slides">
-  <h2 class="h2">Nội dung họp tuần 10 — slide-by-slide</h2>
-  <div class="card"><h3>Slide 1 — Wave 3 stabilize: Sev-1 streak 5-day counter</h3><p>Slide mở bằng câu hỏi thực tế: HR, FIN, IT, EHS và EPICOR_ADMIN đã vận hành đủ ổn định để không cần daily hypercare chưa. HR_MGR trình bày 5 ngày làm việc gần nhất, mỗi ngày có số Sev-1 mở, số Sev-2, số issue mới và số issue đóng. Nếu bất kỳ dòng nào thiếu timestamp thì không được dùng làm evidence cho gate P4-01.</p><ul class="tight"><li>Threshold: Sev-1 count = 0 từ 2026-07-13 đến 2026-07-17.</li><li>Evidence: `issues.json`, severity board, audit_events `wave3_daily_review`.</li><li>Citation: ISO 9001:2015 §9.1 monitoring and measurement.</li></ul></div>
-  <div class="card"><h3>Slide 2 — Wave 3 KPI snapshot cho 15 users</h3><p>Slide này không gom Wave 3 vào con số toàn công ty để tránh che lỗi của nhóm nhỏ. KPI-FLD-01, KPI-FLD-02 và KPI-TRN-01 phải hiện riêng cho 15 users Wave 3, rồi mới hiện tổng 80 users. Nếu FIN_MGR đạt 100% nhưng EHS_MGR còn thiếu training record, bảng phải tách rõ thay vì ghi "đã ổn".</p><ul class="tight"><li>KPI-FLD-01 target ≥95%; KPI-FLD-02 median ≤180s; KPI-TRN-01 ≥90%.</li><li>Evidence: ANNEX-110 KPI dictionary, `training_records`, retrieval drill raw log.</li><li>Owner phát biểu: HR_MGR trước, QMS_MGR kết luận sau.</li></ul></div>
-  <div class="card"><h3>Slide 3 — Dashboard widget inventory: 10 widget</h3><p>QMS_MGR trình bày bảng 10 widget: tên, mục đích, owner role, backup reviewer, refresh cadence và dữ liệu nguồn. Một widget không có owner không phải "vấn đề nhỏ"; nó là orphan dashboard và sẽ mất giá trị khi tổ chức thay đổi. Gartner D&amp;A 2023 được dùng để nhấn mạnh owner, cadence và decision context.</p><ul class="tight"><li>10 widget: KPI field, training, issue closure, CAPA, change failure, lead time, MTTR, refresh SLA, audit calendar, champion coverage.</li><li>Required docs: ANNEX-113, ANNEX-110.</li><li>Go condition: 10/10 owner role populated.</li></ul></div>
-  <div class="card"><h3>Slide 4 — Widget access review: RBAC matrix</h3><p>IT_MGR trình bày ma trận người xem theo role, không trình bày theo tên nhân viên. Mỗi widget phải có `role_required`, export permission, exception expiry và audit log. NIST SP 800-53 AU và AT được viện dẫn vì dashboard không chỉ là giao diện; nó là nguồn bằng chứng kiểm toán và đào tạo.</p><ul class="tight"><li>Probe role: HR_MGR, FIN_MGR, IT_MGR, EHS_MGR, EPICOR_ADMIN.</li><li>Threshold: 0 user ngoài role permission; exception phải có expiry date ≤30 ngày.</li><li>Evidence: access test screenshots, `dashboard_access_probe` audit_events.</li></ul></div>
-  <div class="card"><h3>Slide 5 — KPI-DEP-05 refresh SLA: 4 tuần liên tiếp</h3><p>QMS_ENG trình bày 4 tuần W07-W10, mỗi tuần có số lần refresh expected, số lần refresh thành công, số lần trễ và nguyên nhân. Nếu W10 đạt nhưng W08 từng fail, slide phải hiển thị fail và remediation thay vì chỉ hiển thị tuần hiện tại. Mục tiêu là xây cơ chế vận hành, không phải tạo ảnh đẹp cho cuộc họp.</p><ul class="tight"><li>Threshold: refresh SLA ≥95% trong 4 tuần liên tiếp.</li><li>Evidence: `readiness.json`, scheduler log, ANNEX-110 KPI-DEP-05 definition.</li><li>Escalation: nếu SLA &lt;95%, IT_MGR mở Sev-2 governance issue trước 2026-07-18 17:00.</li></ul></div>
-  <div class="card"><h3>Slide 6 — KPI-DEP-06 deployment frequency W07-W10</h3><p>Slide này cho thấy thay đổi có đang được phát hành với nhịp đủ nhỏ và đủ an toàn hay không. DORA State of DevOps 2024 và Accelerate 2018 được dùng để giải thích tại sao deployment frequency phải đi cùng change failure rate, không được chạy số lượng change bằng mọi giá. Nếu tần suất ≥3 change/tuần nhưng KPI-DEP-03 vượt 10%, gate không được coi là khỏe.</p><ul class="tight"><li>KPI-DEP-06 target ≥3 change/tuần.</li><li>KPI-DEP-03 target ≤10% change failure.</li><li>Evidence: deploy log, CAB minutes, `audit_events` change rows.</li></ul></div>
-  <div class="card"><h3>Slide 7 — KPI-DEP-07 MTTR rolling median</h3><p>QA_MGR trình bày MTTR cho Sev-1 và Sev-2 trong 4 tuần, nhưng phải tách "không có Sev-1" khỏi "MTTR tốt". Nếu không có Sev-1, MTTR Sev-1 ghi `n/a` và slide chuyển sang Sev-2 workaround stability. ITIL 4 Change Enablement §5.1.7 được dùng cho cách đóng PIR và cách giữ rollback evidence.</p><ul class="tight"><li>Target: KPI-DEP-07 MTTR Sev-1 ≤24h nếu Sev-1 phát sinh.</li><li>W10 yêu cầu: Sev-2 mở có workaround + ETA ≤7 ngày.</li><li>Evidence: incident log, PIR form, ANNEX-117.</li></ul></div>
-  <div class="card"><h3>Slide 8 — CAPA backlog current state</h3><p>CAPA table phải được đưa lên slide dưới dạng danh sách có owner role, tuổi CAPA theo ngày, due date, effectiveness check và blocker. Không dùng câu "đang xử lý" nếu không có ETA. ISO 9001:2015 §10.2 và §10.3 làm nền: corrective action phải có nguyên nhân, hành động, đánh giá hiệu lực và học lại quy trình.</p><ul class="tight"><li>Threshold: CAPA backlog ≤5 open.</li><li>Threshold: 0 CAPA quá 30 ngày.</li><li>Evidence: CAPA table, ANNEX-117, owner role acknowledgement.</li></ul></div>
-  <div class="card"><h3>Slide 9 — CAPA closure plan 4 tuần</h3><p>QA_MGR trình bày kế hoạch đóng CAPA theo 4 tuần, sắp xếp Sev-1/Sev-2 trước, Sev-3 sau, và ghi rõ điều gì không làm trong P4. Việc nói rõ không làm cũng quan trọng vì tránh biến W10 thành backlog dump. Plan phải có ngày tuyệt đối, role chịu trách nhiệm, tài liệu liên quan và KPI bị ảnh hưởng.</p><ul class="tight"><li>Week 1: close overdue-risk CAPA trước 2026-07-24.</li><li>Week 2: effectiveness check cho CAPA Wave Production.</li><li>Week 3-4: chuyển Sev-3 còn lại sang BAU weekly tier meeting theo WI-202.</li></ul></div>
-  <div class="card"><h3>Slide 10 — Internal audit cycle năm 1</h3><p>QMS_MGR trình bày lịch audit theo quý: tháng 09/2026, 12/2026, 03/2027 và 06/2027. ISO §9.2.2 yêu cầu xác định tiêu chí, phạm vi, tần suất, phương pháp, trách nhiệm, báo cáo và lưu bằng chứng. Slide cần ghi rõ Q1 không đặt vào week 4 của tháng để tránh xung đột month-end close của FIN_MGR.</p><ul class="tight"><li>Q1: Document control + training record.</li><li>Q2: Production traceability + CAPA effectiveness.</li><li>Q3: Dashboard governance + RBAC.</li><li>Q4: Management review input pack theo ISO §9.3.</li></ul></div>
-  <div class="card"><h3>Slide 11 — Audit log retention policy</h3><p>IT_MGR và QMS_MGR thống nhất retention policy cho audit_events, dashboard access log, training record và gate decision minutes. NIST AU-11 được dùng để đặt nguyên tắc retention; thời hạn áp dụng trong playbook là 5 năm cho audit trail liên quan QMS triển khai. Nếu hệ thống lưu ngắn hơn, phải mở issue governance thay vì ghi "sẽ xem xét".</p><ul class="tight"><li>Audit_events: retain 5 năm.</li><li>Training_records: retain theo SOP-801 và NIST AT-4 evidence.</li><li>Dashboard access probe: retain 12 tháng active + archive theo ANNEX-119.</li></ul></div>
-  <div class="card"><h3>Slide 12 — Preview W11 lessons learned</h3><p>Slide cuối chuyển tâm thế sang học có cấu trúc. Hofstede Vietnam PDI cao và IDV thấp có nghĩa là phòng ban có thể tránh nói thẳng trong cuộc họp chung, nên W11 phải dùng form ẩn danh trước, round-robin có senior speaking last, và written confirmation sau họp. CEO chốt rằng lessons learned đo process miss, không đo lỗi cá nhân.</p><ul class="tight"><li>Deadline form "3 điều cần thay đổi": 2026-07-21.</li><li>QMS_ENG consolidate: 2026-07-22.</li><li>Draft lessons-learned report v0.9: 2026-07-23.</li></ul></div>
+  <h2 class="h2">Nội dung họp tuần 10 — theo từng trang</h2>
+  <div class="card"><h3>Trang 1 — Đợt 3 ổn định: 5 ngày không có Sev-1</h3><p>Trang mở bằng câu hỏi thực tế: HR, FIN, IT, EHS và EPICOR_ADMIN đã vận hành đủ ổn định để không cần hỗ trợ tăng cường hằng ngày chưa. HR_MGR trình bày 5 ngày làm việc gần nhất, mỗi ngày có số Sev-1 mở, số Sev-2, số vấn đề mới và số vấn đề đóng. Nếu bất kỳ dòng nào thiếu dấu thời gian thì không được dùng làm bằng chứng cho cổng quyết định P4-01.</p><ul class="tight"><li>Ngưỡng: Sev-1 số lượng = 0 từ 2026-07-13 đến 2026-07-17.</li><li>Bằng chứng: `issues.json`, bảng mức độ nghiêm trọng, audit_events `wave3_daily_review`.</li><li>Nguồn viện dẫn: ISO 9001:2015 §9.1 theo dõi và đo lường.</li></ul></div>
+  <div class="card"><h3>Trang 2 — Đợt 3 KPI ảnh chụp dữ liệu cho 15 người dùng</h3><p>Trang này không gom Đợt 3 vào con số toàn công ty để tránh che lỗi của nhóm nhỏ. KPI-FLD-01, KPI-FLD-02 và KPI-TRN-01 phải hiện riêng cho 15 người dùng Đợt 3, rồi mới hiện tổng 80 người dùng. Nếu FIN_MGR đạt 100% nhưng EHS_MGR còn thiếu đào tạo hồ sơ, bảng phải tách rõ thay vì ghi "đã ổn".</p><ul class="tight"><li>KPI-FLD-01 mục tiêu ≥95%; KPI-FLD-02 trung vị ≤180s; KPI-TRN-01 ≥90%.</li><li>Bằng chứng: ANNEX-110 từ điển KPI, `training_records`, nhật ký gốc của diễn tập tra cứu.</li><li>Chủ trì phát biểu: HR_MGR trước, QMS_MGR kết luận sau.</li></ul></div>
+  <div class="card"><h3>Trang 3 — Bảng điều hành danh mục ô chỉ báo: 10 ô chỉ báo</h3><p>QMS_MGR trình bày bảng 10 ô chỉ báo: tên, mục đích, vai trò chịu trách nhiệm, người rà soát dự phòng, cập nhật nhịp điều hành và dữ liệu nguồn. Một ô chỉ báo không có chủ trì không phải "vấn đề nhỏ"; nó là ô chỉ báo không có chủ trì trên bảng điều hành và sẽ mất giá trị khi tổ chức thay đổi. Gartner D&amp;A 2023 được dùng để nhấn mạnh chủ trì, nhịp điều hành và quyết định ngữ cảnh.</p><ul class="tight"><li>10 ô chỉ báo: KPI tại điểm dùng, đào tạo, đóng vấn đề, CAPA, thay đổi lỗi, thời gian xử lý, MTTR, tỷ lệ cập nhật đúng hạn, lịch đánh giá, hạt nhân mức bao phủ.</li><li>Tài liệu bắt buộc: ANNEX-113, ANNEX-110.</li><li>Điều kiện đi tiếp: 10/10 vai trò chịu trách nhiệm đã được điền đầy đủ.</li></ul></div>
+  <div class="card"><h3>Trang 4 — Ô chỉ báo rà soát quyền truy cập: RBAC ma trận</h3><p>IT_MGR trình bày ma trận người xem theo vai trò, không trình bày theo tên nhân viên. Mỗi ô chỉ báo phải có `role_required`, tệp xuất quyền truy cập, ngoại lệ ngày hết hiệu lực và đánh giá nhật ký. NIST SP 800-53 AU và AT được viện dẫn vì bảng điều hành không chỉ là giao diện; nó là nguồn bằng chứng kiểm toán và đào tạo.</p><ul class="tight"><li>Vai trò kiểm tra thử: HR_MGR, FIN_MGR, IT_MGR, EHS_MGR, EPICOR_ADMIN.</li><li>Ngưỡng: 0 người dùng ngoài vai trò quyền truy cập; ngoại lệ phải có ngày hết hiệu lực ≤30 ngày.</li><li>Bằng chứng: ảnh chụp màn hình kiểm tra quyền truy cập, `dashboard_access_probe` audit_events.</li></ul></div>
+  <div class="card"><h3>Trang 5 — KPI-DEP-05 tỷ lệ cập nhật đúng hạn: 4 tuần liên tiếp</h3><p>QMS_ENG trình bày 4 tuần W07-W10, mỗi tuần có số lần cập nhật dự kiến, số lần cập nhật thành công, số lần trễ và nguyên nhân. Nếu W10 đạt nhưng W08 từng lỗi, trang trình chiếu phải hiển thị lỗi và hành động khắc phục thay vì chỉ hiển thị tuần hiện tại. Mục tiêu là xây cơ chế vận hành, không phải tạo ảnh đẹp cho cuộc họp.</p><ul class="tight"><li>Ngưỡng: tỷ lệ cập nhật đúng hạn ≥95% trong 4 tuần liên tiếp.</li><li>Bằng chứng: `readiness.json`, nhật ký bộ lập lịch, ANNEX-110 KPI-DEP-05 định nghĩa.</li><li>Leo thang xử lý: nếu SLA &lt;95%, IT_MGR mở Sev-2 quản trị vấn đề trước 2026-07-18 17:00.</li></ul></div>
+	  <div class="card"><h3>Trang 6 — KPI-DEP-06 tần suất triển khai W07-W10</h3><p>Trang này cho thấy thay đổi có đang được phát hành với nhịp đủ nhỏ và đủ an toàn hay không. Báo cáo DORA 2024 và nghiên cứu Accelerate 2018 được dùng để giải thích tại sao tần suất triển khai phải đi cùng tỷ lệ thay đổi lỗi, không được chạy số lượng thay đổi bằng mọi giá. Nếu tần suất ≥3 thay đổi/tuần nhưng KPI-DEP-03 vượt 10%, cổng quyết định không được coi là khỏe.</p><ul class="tight"><li>KPI-DEP-06 mục tiêu ≥3 thay đổi/tuần.</li><li>KPI-DEP-03 mục tiêu ≤10% thay đổi lỗi.</li><li>Bằng chứng: nhật ký triển khai, biên bản CAB, dòng thay đổi trong `audit_events`.</li></ul></div>
+  <div class="card"><h3>Trang 7 — KPI-DEP-07 MTTR lũy kế động trung vị</h3><p>QA_MGR trình bày MTTR cho Sev-1 và Sev-2 trong 4 tuần, nhưng phải tách "không có Sev-1" khỏi "MTTR tốt". Nếu không có Sev-1, MTTR Sev-1 ghi `n/a` và trang trình chiếu chuyển sang Sev-2 độ ổn định của phương án tạm thời. ITIL 4 Change Enablement §5.1.7 được dùng cho cách đóng PIR và cách giữ khôi phục bằng chứng.</p><ul class="tight"><li>Mục tiêu: KPI-DEP-07 MTTR Sev-1 ≤24h nếu Sev-1 phát sinh.</li><li>W10 yêu cầu: Sev-2 mở có phương án tạm thời + hạn hoàn thành dự kiến ≤7 ngày.</li><li>Bằng chứng: sự cố nhật ký, PIR biểu mẫu, ANNEX-117.</li></ul></div>
+  <div class="card"><h3>Trang 8 — tồn đọng CAPA hiện trạng</h3><p>bảng CAPA phải được đưa lên trang trình chiếu dưới dạng danh sách có vai trò chịu trách nhiệm, tuổi CAPA theo ngày, ngày đến hạn, kiểm tra hiệu lực và điểm chặn. Không dùng câu "đang xử lý" nếu không có hạn hoàn thành dự kiến. ISO 9001:2015 §10.2 và §10.3 làm nền: hành động khắc phục phải có nguyên nhân, hành động, đánh giá hiệu lực và học lại quy trình.</p><ul class="tight"><li>Ngưỡng: tồn đọng CAPA ≤5 mở.</li><li>Ngưỡng: 0 CAPA quá 30 ngày.</li><li>Bằng chứng: bảng CAPA, ANNEX-117, vai trò chịu trách nhiệm xác nhận.</li></ul></div>
+  <div class="card"><h3>Trang 9 — CAPA đóng vấn đề kế hoạch 4 tuần</h3><p>QA_MGR trình bày kế hoạch đóng CAPA theo 4 tuần, sắp xếp Sev-1/Sev-2 trước, Sev-3 sau, và ghi rõ điều gì không làm trong P4. Việc nói rõ không làm cũng quan trọng vì tránh biến W10 thành đổ tồn đọng vào cuộc họp. Kế hoạch phải có ngày tuyệt đối, vai trò chịu trách nhiệm, tài liệu liên quan và KPI bị ảnh hưởng.</p><ul class="tight"><li>Tuần 1: đóng CAPA có nguy cơ quá hạn trước 2026-07-24.</li><li>Tuần 2: kiểm tra hiệu lực cho CAPA Đợt Sản xuất.</li><li>Tuần 3-4: chuyển Sev-3 còn lại sang cuộc họp điều hành hằng tuần trong vận hành thường xuyên theo WI-202.</li></ul></div>
+  <div class="card"><h3>Trang 10 — Chu kỳ đánh giá nội bộ năm 1</h3><p>QMS_MGR trình bày lịch đánh giá theo quý: tháng 09/2026, 12/2026, 03/2027 và 06/2027. ISO §9.2.2 yêu cầu xác định tiêu chí, phạm vi, tần suất, phương pháp, trách nhiệm, báo cáo và lưu bằng chứng. Trang cần ghi rõ Q1 không đặt vào tuần thứ 4 của tháng để tránh xung đột khóa sổ cuối tháng của FIN_MGR.</p><ul class="tight"><li>Q1: Kiểm soát tài liệu + đào tạo hồ sơ.</li><li>Q2: Truy xuất nguồn gốc trong sản xuất + CAPA hiệu lực.</li><li>Q3: Bảng điều hành quản trị + RBAC.</li><li>Q4: Gói đầu vào xem xét của lãnh đạo theo ISO §9.3.</li></ul></div>
+  <div class="card"><h3>Trang 11 — Quy định lưu giữ nhật ký đánh giá</h3><p>IT_MGR và QMS_MGR thống nhất quy định lưu giữ cho audit_events, nhật ký quyền truy cập bảng điều hành, đào tạo hồ sơ và cổng quyết định quyết định biên bản. NIST AU-11 được dùng để đặt nguyên tắc lưu giữ; thời hạn áp dụng trong sổ tay triển khai là 5 năm cho dấu vết đánh giá liên quan QMS triển khai. Nếu hệ thống lưu ngắn hơn, phải mở vấn đề quản trị thay vì ghi "sẽ xem xét".</p><ul class="tight"><li>Audit_events: lưu giữ 5 năm.</li><li>Training_records: lưu giữ theo SOP-801 và NIST AT-4 bằng chứng.</li><li>Kiểm tra thử quyền truy cập bảng điều hành: lưu giữ 12 tháng đang hoạt động + lưu trữ theo ANNEX-119.</li></ul></div>
+  <div class="card"><h3>Trang 12 — Xem trước W11 bài học kinh nghiệm</h3><p>Trang cuối chuyển tâm thế sang học có cấu trúc. Hofstede Vietnam PDI cao và IDV thấp có nghĩa là phòng ban có thể tránh nói thẳng trong cuộc họp chung, nên W11 phải dùng biểu mẫu ẩn danh trước, lần lượt phát biểu có lãnh đạo phát biểu sau cùng, và xác nhận bằng văn bản sau họp. CEO chốt rằng bài học kinh nghiệm đo lỗ hổng quy trình, không đo lỗi cá nhân.</p><ul class="tight"><li>Hạn chót biểu mẫu "3 điều cần thay đổi": 2026-07-21.</li><li>QMS_ENG tổng hợp: 2026-07-22.</li><li>Soạn nháp báo cáo bài học kinh nghiệm v0.9: 2026-07-23.</li></ul></div>
 </section>
 <section class="card" id="sec-decisions">
   <h2 class="h2">Quyết định cần lấy trong cuộc họp này</h2>
   <div class="table-card">
     <table class="table">
-      <thead><tr><th>#</th><th>Quyết định</th><th>Người ký</th><th>Cơ sở doc/data</th><th>Fallback nếu deferred</th></tr></thead>
+      <thead><tr><th>#</th><th>Quyết định</th><th>Người ký</th><th>Cơ sở tài liệu / dữ liệu</th><th>Cách xử lý nếu hoãn quyết định</th></tr></thead>
       <tbody>
-        <tr><td>1</td><td>Approve dashboard widget governance v1.0 cho 10 widget, gồm owner role, backup reviewer, RBAC, refresh cadence và exception expiry.</td><td>CEO, QMS_MGR, IT_MGR</td><td>ANNEX-113, access-review forms, dashboard widget config</td><td>Conditional Go: 48h để đóng thiếu sót; nếu vẫn thiếu owner thì widget bị ẩn khỏi BAU dashboard.</td></tr>
-        <tr><td>2</td><td>Approve internal audit cycle năm 1 với 4 quý calendar.</td><td>CEO, QMS_MGR</td><td>ANNEX-119, ISO 9001:2015 §9.2.2 planning note</td><td>Defer tối đa đến 2026-07-22; nếu quá hạn, QMS_MGR mở Sev-2 governance issue.</td></tr>
-        <tr><td>3</td><td>Approve CAPA closure plan 4 tuần với backlog ≤5 và 0 overdue.</td><td>QA_MGR, QMS_MGR</td><td>CAPA table, ANNEX-117, effectiveness check log</td><td>No-Go nếu có CAPA quá 30 ngày; họp lại ngày 2026-07-20 sau triage bắt buộc.</td></tr>
-        <tr><td>4</td><td>Approve Wave 3 hypercare exit, chuyển cadence sang weekly tier meeting theo WI-202.</td><td>CEO, HR_MGR, QMS_MGR</td><td>Wave 3 issue log, `training_records`, KPI snapshot W10</td><td>Extend hypercare thêm 5 ngày làm việc đến 2026-07-24, giữ daily standup 08:30.</td></tr>
+        <tr><td>1</td><td>Phê duyệt ô chỉ báo bảng điều hành quản trị v1.0 cho 10 ô chỉ báo, gồm vai trò chịu trách nhiệm, người rà soát dự phòng, RBAC, cập nhật nhịp điều hành và ngoại lệ ngày hết hiệu lực.</td><td>CEO, QMS_MGR, IT_MGR</td><td>ANNEX-113, biểu mẫu rà soát quyền truy cập, ô chỉ báo bảng điều hành cấu hình</td><td>Đi tiếp có điều kiện: 48 giờ để đóng thiếu sót; nếu vẫn thiếu chủ trì thì ô chỉ báo bị ẩn khỏi vận hành thường xuyên bảng điều hành.</td></tr>
+        <tr><td>2</td><td>Phê duyệt đánh giá nội bộ chu kỳ năm 1 với 4 quý lịch.</td><td>CEO, QMS_MGR</td><td>ANNEX-119, ISO 9001:2015 §9.2.2 ghi chú lập kế hoạch</td><td>Hoãn tối đa đến 2026-07-22; nếu quá hạn, QMS_MGR mở Sev-2 quản trị vấn đề.</td></tr>
+        <tr><td>3</td><td>Phê duyệt CAPA đóng vấn đề kế hoạch 4 tuần với tồn đọng ≤5 và 0 quá hạn.</td><td>QA_MGR, QMS_MGR</td><td>bảng CAPA, ANNEX-117, kiểm tra hiệu lực nhật ký</td><td>Dừng lại nếu có CAPA quá 30 ngày; họp lại ngày 2026-07-20 sau phân loại xử lý bắt buộc.</td></tr>
+	        <tr><td>4</td><td>Phê duyệt kết thúc hỗ trợ tăng cường cho Đợt 3, chuyển nhịp điều hành sang cuộc họp điều hành hằng tuần theo WI-202.</td><td>CEO, HR_MGR, QMS_MGR</td><td>Nhật ký vấn đề Đợt 3, `training_records`, ảnh chụp dữ liệu KPI W10</td><td>Gia hạn hỗ trợ tăng cường thêm 5 ngày làm việc đến 2026-07-24, giữ họp ngắn hằng ngày 08:30.</td></tr>
       </tbody>
     </table>
   </div>
 </section>
 <section class="card" id="sec-gate">
-  <h2 class="h2">Gate Go/No-Go — Điều kiện CẦN và ĐỦ</h2>
-  <h3>Gate P4-01/P4-02 · Điều kiện CẦN</h3>
-  <div class="table-card"><table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Threshold</th><th>Bằng chứng</th></tr></thead><tbody>
-    <tr><td>Wave 3 Sev-1 = 0 trong 5 ngày làm việc.</td><td>Filter issue log theo cohort Wave 3 và severity.</td><td>0 Sev-1 open từ 2026-07-13 đến 2026-07-17.</td><td>`issues.json`, severity board, audit_events.</td></tr>
-    <tr><td>10 dashboard widget có owner + access control verified.</td><td>Review widget inventory và live RBAC probe.</td><td>10/10 widget có owner role, backup reviewer, `role_required`, 0 unauthorized user.</td><td>ANNEX-113, screenshots, dashboard config.</td></tr>
-    <tr><td>CAPA backlog không vượt giới hạn.</td><td>Query CAPA table theo status open và tuổi CAPA.</td><td>≤5 open; 0 CAPA quá 30 ngày.</td><td>CAPA table, ANNEX-117.</td></tr>
-    <tr><td>KPI-DEP-05 refresh SLA đạt 4 tuần.</td><td>Tính số refresh đúng hạn / tổng refresh expected.</td><td>≥95% trong 4 tuần liên tiếp W07-W10.</td><td>`readiness.json`, scheduler log, ANNEX-110.</td></tr>
+  <h2 class="h2">Cổng quyết định Đi tiếp/Dừng lại — Điều kiện CẦN và ĐỦ</h2>
+  <h3>Cổng P4-01/P4-02 · Điều kiện CẦN</h3>
+  <div class="table-card"><table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Ngưỡng</th><th>Bằng chứng</th></tr></thead><tbody>
+    <tr><td>Đợt 3 Sev-1 = 0 trong 5 ngày làm việc.</td><td>Lọc vấn đề nhật ký theo nhóm người dùng Đợt 3 và mức độ nghiêm trọng.</td><td>0 Sev-1 mở từ 2026-07-13 đến 2026-07-17.</td><td>`issues.json`, bảng mức độ nghiêm trọng, audit_events.</td></tr>
+    <tr><td>10 ô chỉ báo bảng điều hành có chủ trì + kiểm soát quyền truy cập đã kiểm chứng.</td><td>Rà soát danh mục ô chỉ báo và trực tiếp RBAC kiểm tra thử.</td><td>10/10 ô chỉ báo có vai trò chịu trách nhiệm, người rà soát dự phòng, `role_required`, 0 người dùng chưa được phân quyền.</td><td>ANNEX-113, ảnh chụp màn hình, bảng điều hành cấu hình.</td></tr>
+    <tr><td>tồn đọng CAPA không vượt giới hạn.</td><td>Truy vấn bảng CAPA theo trạng thái mở và tuổi CAPA.</td><td>≤5 mở; 0 CAPA quá 30 ngày.</td><td>bảng CAPA, ANNEX-117.</td></tr>
+    <tr><td>KPI-DEP-05 tỷ lệ cập nhật đúng hạn đạt 4 tuần.</td><td>Tính số cập nhật đúng hạn / tổng cập nhật dự kiến.</td><td>≥95% trong 4 tuần liên tiếp W07-W10.</td><td>`readiness.json`, nhật ký bộ lập lịch, ANNEX-110.</td></tr>
   </tbody></table></div>
-  <h3>Gate P4-01/P4-02 · Điều kiện ĐỦ</h3>
-  <div class="table-card"><table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Threshold</th><th>Bằng chứng</th></tr></thead><tbody>
-    <tr><td>Internal audit cycle năm 1 đã được ký.</td><td>Kiểm tra calendar draft và sign-off.</td><td>Q1-Q4 có tháng, phạm vi, owner; CEO + QMS_MGR ký.</td><td>ANNEX-119, calendar export.</td></tr>
-    <tr><td>KPI-FLD-01 đạt mức toàn công ty.</td><td>Tổng hợp retrieval routing drill cho 80 users.</td><td>≥95% đúng thư mục, sample audit 10% match 100%.</td><td>ANNEX-110, drill log, training_records.</td></tr>
-    <tr><td>Không CAPA quá 30 ngày sau triage.</td><td>Re-run query sau cuộc họp.</td><td>0 overdue CAPA lúc 2026-07-18 17:00.</td><td>CAPA table, QA_MGR acknowledgement.</td></tr>
-    <tr><td>Management approval logged.</td><td>Kiểm tra minutes và audit event.</td><td>Audit_events row `wave3_stabilize_complete` tồn tại; minutes circulated trong 48h.</td><td>`audit_events`, `mgmt-reviews.json`.</td></tr>
+  <h3>Cổng P4-01/P4-02 · Điều kiện ĐỦ</h3>
+  <div class="table-card"><table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Ngưỡng</th><th>Bằng chứng</th></tr></thead><tbody>
+    <tr><td>Chu kỳ đánh giá nội bộ năm 1 đã được ký.</td><td>Kiểm tra lịch bản nháp và ký xác nhận.</td><td>Q1-Q4 có tháng, phạm vi, chủ trì; CEO + QMS_MGR ký.</td><td>ANNEX-119, lịch tệp xuất.</td></tr>
+	    <tr><td>KPI-FLD-01 đạt mức toàn công ty.</td><td>Tổng hợp kết quả diễn tập tra cứu đúng thư mục cho 80 người dùng.</td><td>≥95% đúng thư mục, mẫu đánh giá 10% khớp 100%.</td><td>ANNEX-110, nhật ký diễn tập, training_records.</td></tr>
+    <tr><td>Không CAPA quá 30 ngày sau phân loại xử lý.</td><td>Chạy lại truy vấn sau cuộc họp.</td><td>0 quá hạn CAPA lúc 2026-07-18 17:00.</td><td>bảng CAPA, QA_MGR xác nhận.</td></tr>
+    <tr><td>Phê duyệt của lãnh đạo đã được ghi nhận.</td><td>Kiểm tra biên bản và đánh giá sự kiện.</td><td>Bản ghi audit_events `wave3_stabilize_complete` tồn tại; biên bản đã được gửi trong 48h.</td><td>`audit_events`, `mgmt-reviews.json`.</td></tr>
   </tbody></table></div>
-  <p>Nếu thiếu bất kỳ điều kiện cần nào, quyết định mặc định là No-Go hoặc Conditional Go với điều kiện đóng trong 48 giờ. Nếu đủ điều kiện cần nhưng thiếu điều kiện đủ, không tuyên bố BAU readiness; chỉ cho phép tiếp tục weekly cadence với blocker công khai.</p>
+  <p>Nếu thiếu bất kỳ điều kiện cần nào, quyết định mặc định là Dừng lại hoặc Đi tiếp có điều kiện với điều kiện đóng trong 48 giờ. Nếu đủ điều kiện cần nhưng thiếu điều kiện đủ, không tuyên bố mức sẵn sàng vận hành thường xuyên; chỉ cho phép tiếp tục hằng tuần nhịp điều hành với điểm chặn công khai.</p>
 </section>
 <section class="card" id="sec-tasks">
-  <h2 class="h2">Phân công nhiệm vụ sau họp · RACI · deadline</h2>
-  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Task</th><th>R</th><th>A</th><th>C</th><th>I</th><th>Deadline</th><th>Evidence</th><th>KPI</th></tr></thead><tbody>
-    <tr><td>1</td><td>Update dashboard widget config với `role_required` và backup reviewer cho 10 widget.</td><td>IT_MGR</td><td>QMS_MGR</td><td>QMS_ENG</td><td>CEO</td><td>2026-07-18 17:00</td><td>ANNEX-113, dashboard config</td><td>KPI-DEP-05</td></tr>
-    <tr><td>2</td><td>Log audit_events row `wave3_stabilize_complete` nếu gate Go.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>CEO</td><td>2026-07-18 17:30</td><td>`audit_events`</td><td>KPI-DEP-02</td></tr>
-    <tr><td>3</td><td>Schedule Q1 internal audit target tháng 09/2026, tránh week 4.</td><td>QMS_MGR</td><td>CEO</td><td>QA_MGR, FIN_MGR</td><td>All_depts</td><td>2026-07-20</td><td>ANNEX-119 calendar</td><td>KPI-DEP-02</td></tr>
-    <tr><td>4</td><td>Update CAPA tracker với 4-week closure plan, owner role và due date.</td><td>QA_MGR</td><td>QMS_MGR</td><td>PROD_DIR, ENG_MGR</td><td>CEO</td><td>2026-07-20</td><td>CAPA table, ANNEX-117</td><td>KPI-DEP-02</td></tr>
-    <tr><td>5</td><td>Archive Wave 3 hypercare evidence into ANNEX-117.</td><td>HR_MGR</td><td>QMS_MGR</td><td>IT_MGR</td><td>Wave3_depts</td><td>2026-07-21</td><td>ANNEX-117</td><td>KPI-TRN-01</td></tr>
-    <tr><td>6</td><td>Continue refresh SLA monitoring weekly and publish W10 result.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>Widget owners</td><td>2026-07-21</td><td>`readiness.json`</td><td>KPI-DEP-05</td></tr>
-    <tr><td>7</td><td>Draft W11 lessons learned agenda and invite list.</td><td>QMS_MGR</td><td>CEO</td><td>HR_MGR</td><td>All_depts</td><td>2026-07-20</td><td>TRN-DEP-W11 prep packet</td><td>KPI-DEP-02</td></tr>
-    <tr><td>8</td><td>Distribute anonymous "3 điều cần thay đổi" form to 11 phòng heads + 22 champions.</td><td>HR_MGR</td><td>QMS_MGR</td><td>CEO</td><td>All_depts</td><td>2026-07-21</td><td>Microsoft Forms export</td><td>KPI-FLD-01</td></tr>
-    <tr><td>9</td><td>Prepare audit log retention note theo NIST AU-11.</td><td>IT_MGR</td><td>QMS_MGR</td><td>QA_MGR</td><td>CEO</td><td>2026-07-22</td><td>ANNEX-119 appendix</td><td>KPI-DEP-05</td></tr>
-    <tr><td>10</td><td>Verify all Wave 3 training records are retained per SOP-801 / NIST AT-4.</td><td>HR_MGR</td><td>QMS_MGR</td><td>IT_MGR</td><td>QA_MGR</td><td>2026-07-22</td><td>`training_records`</td><td>KPI-TRN-01</td></tr>
-    <tr><td>11</td><td>Publish W10 decision minutes within 48h, including dissent rationale if any.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>CEO</td><td>All_depts</td><td>2026-07-20 10:00</td><td>`mgmt-reviews.json`</td><td>KPI-DEP-02</td></tr>
-    <tr><td>12</td><td>Open blocker issue nếu any widget owner remains missing after Conditional Go.</td><td>QMS_MGR</td><td>CEO</td><td>IT_MGR</td><td>Widget owners</td><td>2026-07-20 17:00</td><td>`issues.json` Sev-2 governance issue</td><td>KPI-DEP-03</td></tr>
+  <h2 class="h2">Phân công nhiệm vụ sau họp · RACI · hạn chót</h2>
+  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Nhiệm vụ</th><th>R</th><th>A</th><th>C</th><th>I</th><th>Hạn chót</th><th>Bằng chứng</th><th>KPI</th></tr></thead><tbody>
+    <tr><td>1</td><td>Cập nhật ô chỉ báo bảng điều hành cấu hình với `role_required` và người rà soát dự phòng cho 10 ô chỉ báo.</td><td>IT_MGR</td><td>QMS_MGR</td><td>QMS_ENG</td><td>CEO</td><td>2026-07-18 17:00</td><td>ANNEX-113, bảng điều hành cấu hình</td><td>KPI-DEP-05</td></tr>
+    <tr><td>2</td><td>Ghi bản ghi audit_events `wave3_stabilize_complete` nếu cổng quyết định Đi tiếp.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>CEO</td><td>2026-07-18 17:30</td><td>`audit_events`</td><td>KPI-DEP-02</td></tr>
+    <tr><td>3</td><td>Đặt lịch Q1 đánh giá nội bộ mục tiêu tháng 09/2026, tránh tuần thứ 4.</td><td>QMS_MGR</td><td>CEO</td><td>QA_MGR, FIN_MGR</td><td>Đại diện các phòng ban</td><td>2026-07-20</td><td>ANNEX-119 lịch</td><td>KPI-DEP-02</td></tr>
+    <tr><td>4</td><td>Cập nhật CAPA bảng theo dõi với 4-tuần đóng vấn đề kế hoạch, vai trò chịu trách nhiệm và ngày đến hạn.</td><td>QA_MGR</td><td>QMS_MGR</td><td>PROD_DIR, ENG_MGR</td><td>CEO</td><td>2026-07-20</td><td>bảng CAPA, ANNEX-117</td><td>KPI-DEP-02</td></tr>
+    <tr><td>5</td><td>Lưu hồ sơ Đợt 3 hỗ trợ tăng cường bằng chứng vào ANNEX-117.</td><td>HR_MGR</td><td>QMS_MGR</td><td>IT_MGR</td><td>Các phòng ban Đợt 3</td><td>2026-07-21</td><td>ANNEX-117</td><td>KPI-TRN-01</td></tr>
+    <tr><td>6</td><td>Tiếp tục tỷ lệ cập nhật đúng hạn theo dõi hằng tuần và công bố W10 kết quả.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>Ô chỉ báo chủ trì</td><td>2026-07-21</td><td>`readiness.json`</td><td>KPI-DEP-05</td></tr>
+    <tr><td>7</td><td>Soạn nháp W11 bài học kinh nghiệm, chương trình họp và danh sách mời cấp đại diện phòng ban.</td><td>QMS_MGR</td><td>CEO</td><td>HR_MGR</td><td>Đại diện các phòng ban</td><td>2026-07-20</td><td>TRN-DEP-W11 gói chuẩn bị</td><td>KPI-DEP-02</td></tr>
+    <tr><td>8</td><td>Gửi biểu mẫu ẩn danh "3 điều cần thay đổi" cho 11 trưởng bộ phận và 22 hạt nhân.</td><td>HR_MGR</td><td>QMS_MGR</td><td>CEO</td><td>Đại diện các phòng ban</td><td>2026-07-21</td><td>Microsoft Forms tệp xuất</td><td>KPI-FLD-01</td></tr>
+    <tr><td>9</td><td>Chuẩn bị đánh giá nhật ký lưu giữ ghi chú theo NIST AU-11.</td><td>IT_MGR</td><td>QMS_MGR</td><td>QA_MGR</td><td>CEO</td><td>2026-07-22</td><td>ANNEX-119 phụ lục</td><td>KPI-DEP-05</td></tr>
+    <tr><td>10</td><td>Xác nhận toàn bộ hồ sơ đào tạo Đợt 3 được lưu giữ theo SOP-801 / NIST AT-4.</td><td>HR_MGR</td><td>QMS_MGR</td><td>IT_MGR</td><td>QA_MGR</td><td>2026-07-22</td><td>`training_records`</td><td>KPI-TRN-01</td></tr>
+    <tr><td>11</td><td>Phát hành biên bản quyết định W10 trong vòng 48 giờ cho đại diện các phòng ban, gồm lý do của ý kiến không đồng thuận nếu có.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>CEO</td><td>Đại diện các phòng ban</td><td>2026-07-20 10:00</td><td>`mgmt-reviews.json`</td><td>KPI-DEP-02</td></tr>
+    <tr><td>12</td><td>Mở điểm chặn vấn đề nếu bất kỳ ô chỉ báo chủ trì vẫn còn thiếu sau Đi tiếp có điều kiện.</td><td>QMS_MGR</td><td>CEO</td><td>IT_MGR</td><td>Ô chỉ báo chủ trì</td><td>2026-07-20 17:00</td><td>`issues.json` Sev-2 quản trị vấn đề</td><td>KPI-DEP-03</td></tr>
   </tbody></table></div>
 </section>
 <section class="card" id="sec-next-week">
-  <h2 class="h2">Preview tuần 11 · nhiệm vụ chuẩn bị</h2>
-  <p>Tuần 11 ngày 2026-07-25 là buổi lessons learned toàn công ty. Mục tiêu không phải kể chuyện thành công; mục tiêu là trích xuất 5 cải tiến hệ thống, xác định ít nhất 10 tài liệu cần revision +1, khóa kế hoạch QR code refresh và phát hành training playlist v2. Vì văn hóa Việt Nam thường giữ thể diện trong họp đông người, phần chuẩn bị phải lấy feedback ẩn danh trước cuộc họp, tổng hợp theo tần suất, rồi chỉ đưa chủ đề hệ thống lên slide.</p>
-  <div class="table-card"><table class="table"><thead><tr><th>Role</th><th>Task chuẩn bị cho W11</th><th>Deadline</th></tr></thead><tbody>
-    <tr><td>HR_MGR</td><td>Thu 33 submissions từ 11 phòng heads + 22 champions, không yêu cầu tên cá nhân trong form.</td><td>2026-07-21 17:00</td></tr>
-    <tr><td>QMS_ENG</td><td>Nhóm feedback thành top 5 themes, mỗi theme có frequency count và ví dụ process miss.</td><td>2026-07-22 17:00</td></tr>
-    <tr><td>QMS_MGR</td><td>Draft lessons-learned report v0.9 và doc revision +1 plan cho ≥10 controlled docs.</td><td>2026-07-23 17:00</td></tr>
-    <tr><td>IT_MGR</td><td>Chuẩn bị QR code refresh batch plan: 7 zone × 3 sticker = 21 sticker, posting date 2026-07-28.</td><td>2026-07-23 17:00</td></tr>
-    <tr><td>CEO</td><td>Đọc trước framing blameless, xác nhận senior speaks last trong round-robin.</td><td>2026-07-24 12:00</td></tr>
+  <h2 class="h2">Xem trước tuần 11 · nhiệm vụ chuẩn bị</h2>
+  <p>Tuần 11 ngày 2026-07-25 là buổi bài học kinh nghiệm cấp đại diện phòng ban. Mục tiêu không phải kể chuyện thành công; mục tiêu là trích xuất 5 cải tiến hệ thống, xác định ít nhất 10 tài liệu cần lần sửa đổi +1, khóa kế hoạch mã QR cập nhật và phát hành danh sách video đào tạo v2. Vì văn hóa Việt Nam thường giữ thể diện trong họp đông người, phần chuẩn bị phải lấy phản hồi ẩn danh trước cuộc họp, tổng hợp theo tần suất, rồi chỉ đưa chủ đề hệ thống lên trang trình chiếu.</p>
+  <div class="table-card"><table class="table"><thead><tr><th>Vai trò</th><th>Nhiệm vụ chuẩn bị cho W11</th><th>Hạn chót</th></tr></thead><tbody>
+    <tr><td>HR_MGR</td><td>Thu 33 phản hồi từ 11 trưởng bộ phận + 22 hạt nhân, không yêu cầu tên cá nhân trong biểu mẫu.</td><td>2026-07-21 17:00</td></tr>
+    <tr><td>QMS_ENG</td><td>Nhóm phản hồi thành 5 chủ đề chính, mỗi chủ đề có tần suất xuất hiện và ví dụ lỗ hổng quy trình.</td><td>2026-07-22 17:00</td></tr>
+    <tr><td>QMS_MGR</td><td>Soạn nháp báo cáo bài học kinh nghiệm v0.9 và tài liệu kế hoạch sửa đổi +1 cho ≥10 tài liệu được kiểm soát.</td><td>2026-07-23 17:00</td></tr>
+    <tr><td>IT_MGR</td><td>Chuẩn bị lô cập nhật mã QR kế hoạch: 7 khu vực × 3 nhãn = 21 nhãn, dán nhãn ngày 2026-07-28.</td><td>2026-07-23 17:00</td></tr>
+    <tr><td>CEO</td><td>Đọc trước khung thông điệp không quy lỗi cá nhân, xác nhận lãnh đạo phát biểu sau cùng trong lần lượt phát biểu.</td><td>2026-07-24 12:00</td></tr>
   </tbody></table></div>
 </section>
-<section class="card" id="sec-docs">
-  <h2 class="h2">Tài liệu liên quan · click để mở</h2>
+<section class="card" id="sec-tài liệu">
+  <h2 class="h2">Tài liệu liên quan · bấm để mở</h2>
   <p>
     <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-110');return false;" class="role-chip">ANNEX-110</a>
     <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-113');return false;" class="role-chip">ANNEX-113</a>
@@ -209,25 +208,25 @@
     <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W09');return false;" class="role-chip">TRN-DEP-W09</a>
     <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W11');return false;" class="role-chip">TRN-DEP-W11</a>
   </p>
-  <p>Các chip trên là đường dẫn làm việc trong portal, không phải danh sách tham khảo trang trí. Người trình bày phải mở được ANNEX-110 để giải thích KPI, ANNEX-113 để chứng minh dashboard governance, ANNEX-117 để kiểm tra hypercare/CAPA evidence, và WI-202 để chuyển cadence sang weekly tier meeting.</p>
+  <p>Các thẻ trên là đường dẫn làm việc trong cổng thông tin, không phải danh sách tham khảo trang trí. Người trình bày phải mở được ANNEX-110 để giải thích KPI, ANNEX-113 để chứng minh quản trị bảng điều hành, ANNEX-117 để kiểm tra hỗ trợ tăng cường/CAPA bằng chứng, và WI-202 để chuyển nhịp điều hành sang cuộc họp điều hành hằng tuần.</p>
 </section>
 <section class="card" id="sec-risks">
-  <h2 class="h2">Rủi ro tuần 10 + escalation</h2>
-  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Mô tả rủi ro</th><th>L</th><th>I</th><th>Mitigation</th><th>Trigger escalation</th><th>Owner</th></tr></thead><tbody>
-    <tr><td>1</td><td>Wave 3 Sev-1 spike trong nhóm nhỏ nhưng blast radius lớn: payroll, invoice, access hoặc EHS compliance có thể dừng sản xuất gián tiếp.</td><td>M</td><td>H</td><td>Giữ dedicated hypercare thêm 5 ngày nếu có Sev-1; mọi Sev-1 cần PIR trong 24h.</td><td>Any Sev-1 open hoặc Sev-2 không có workaround.</td><td>HR_MGR</td></tr>
-    <tr><td>2</td><td>Dashboard widget orphan khi owner role bị reorg hoặc backup reviewer không biết nguồn dữ liệu.</td><td>M</td><td>H</td><td>2 widget per owner cap; mỗi widget phải có backup reviewer và data-source note.</td><td>Widget owner blank hoặc owner giữ &gt;2 widget.</td><td>QMS_MGR</td></tr>
-    <tr><td>3</td><td>CAPA backlog overflow do Wave Production để lại nhiều corrective action chưa kiểm tra hiệu lực.</td><td>M</td><td>H</td><td>Đóng Sev-1/Sev-2 trước; Sev-3 chuyển BAU nhưng vẫn có due date và effectiveness check.</td><td>CAPA open &gt;5 hoặc bất kỳ CAPA quá 30 ngày.</td><td>QA_MGR</td></tr>
-    <tr><td>4</td><td>Audit schedule conflict với month-end close của FIN_MGR, dẫn đến audit calendar bị trượt ngay từ Q1.</td><td>M</td><td>M</td><td>Đặt audit week 2 của tháng, không đặt week 4; CEO ký calendar ngay trong W10.</td><td>FIN_MGR reject Q1 slot hoặc calendar chưa book trước 2026-07-22.</td><td>QMS_MGR</td></tr>
-    <tr><td>5</td><td>Hofstede risk: các role heads không muốn nêu lỗi dashboard trong họp vì sợ làm mất mặt owner role.</td><td>H</td><td>M</td><td>Dùng anonymous pre-meeting form, senior speaks last, ghi vấn đề dưới dạng process miss.</td><td>0 issue được nêu nhưng RBAC probe có exception.</td><td>CEO</td></tr>
-    <tr><td>6</td><td>Refresh SLA đạt trên slide nhưng log thiếu timestamp hoặc bị manual refresh che lỗi scheduler.</td><td>M</td><td>H</td><td>Chỉ dùng scheduler log có timestamp; manual refresh phải ghi exception.</td><td>Bất kỳ tuần nào SLA &lt;95% hoặc manual refresh không có rationale.</td><td>IT_MGR</td></tr>
+  <h2 class="h2">Rủi ro tuần 10 + leo thang xử lý</h2>
+  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Mô tả rủi ro</th><th>L</th><th>I</th><th>Biện pháp giảm thiểu</th><th>Điều kiện leo thang xử lý</th><th>Chủ trì</th></tr></thead><tbody>
+	    <tr><td>1</td><td>Đợt 3 có Sev-1 tăng vọt trong nhóm nhỏ nhưng phạm vi ảnh hưởng lớn: lương, hóa đơn, quyền truy cập hoặc tuân thủ EHS có thể dừng sản xuất gián tiếp.</td><td>M</td><td>H</td><td>Giữ đội hỗ trợ tăng cường chuyên trách thêm 5 ngày nếu có Sev-1; mọi Sev-1 cần PIR trong 24h.</td><td>Bất kỳ Sev-1 mở hoặc Sev-2 không có phương án tạm thời.</td><td>HR_MGR</td></tr>
+	    <tr><td>2</td><td>Ô chỉ báo trên bảng điều hành không có chủ trì khi vai trò chịu trách nhiệm bị tái cơ cấu hoặc người rà soát dự phòng không biết nguồn dữ liệu.</td><td>M</td><td>H</td><td>Tối đa 2 ô chỉ báo trên mỗi chủ trì; mỗi ô chỉ báo phải có người rà soát dự phòng và ghi chú nguồn dữ liệu.</td><td>Ô chỉ báo chủ trì bị trống hoặc một chủ trì giữ &gt;2 ô chỉ báo.</td><td>QMS_MGR</td></tr>
+	    <tr><td>3</td><td>Tồn đọng CAPA tăng vượt ngưỡng do Đợt Sản xuất để lại nhiều hành động khắc phục chưa kiểm tra hiệu lực.</td><td>M</td><td>H</td><td>Đóng Sev-1/Sev-2 trước; Sev-3 chuyển vận hành thường xuyên nhưng vẫn có ngày đến hạn và kiểm tra hiệu lực.</td><td>CAPA mở &gt;5 hoặc bất kỳ CAPA quá 30 ngày.</td><td>QA_MGR</td></tr>
+	    <tr><td>4</td><td>Lịch đánh giá trùng với khóa sổ cuối tháng của FIN_MGR, dẫn đến lịch đánh giá bị trượt ngay từ Q1.</td><td>M</td><td>M</td><td>Đặt đánh giá tuần 2 của tháng, không đặt tuần thứ 4; CEO ký lịch ngay trong W10.</td><td>FIN_MGR không chấp nhận khung lịch Q1 hoặc lịch chưa được đặt trước 2026-07-22.</td><td>QMS_MGR</td></tr>
+	    <tr><td>5</td><td>Rủi ro theo Hofstede: các vai trò trưởng bộ phận không muốn nêu lỗi bảng điều hành trong họp vì sợ làm mất mặt vai trò chịu trách nhiệm.</td><td>H</td><td>M</td><td>Dùng biểu mẫu ẩn danh trước cuộc họp, lãnh đạo phát biểu sau cùng, ghi vấn đề dưới dạng lỗ hổng quy trình.</td><td>0 vấn đề được nêu nhưng RBAC kiểm tra thử có ngoại lệ.</td><td>CEO</td></tr>
+	    <tr><td>6</td><td>Cam kết cập nhật đúng hạn đạt trên trang trình chiếu nhưng nhật ký thiếu dấu thời gian hoặc bị cập nhật thủ công che lỗi bộ lập lịch.</td><td>M</td><td>H</td><td>Chỉ dùng nhật ký bộ lập lịch có dấu thời gian; cập nhật thủ công phải ghi ngoại lệ.</td><td>Bất kỳ tuần nào SLA &lt;95% hoặc cập nhật thủ công không có lý do.</td><td>IT_MGR</td></tr>
   </tbody></table></div>
 </section>
-<section class="card" id="sec-lessons">
-  <h2 class="h2">Lessons learned · điền sau họp (Lean Change cycle)</h2>
+<section class="card" id="sec-bài học">
+  <h2 class="h2">Bài học kinh nghiệm · điền sau họp (chu trình Lean Change)</h2>
   <div class="grid-3">
-    <div class="note-blue"><h3>Insights</h3><p>Điền sau cuộc họp 2026-07-18 bởi QMS_ENG + QMS_MGR: ghi 3 điều dashboard governance tiết lộ về owner, access control và refresh SLA. Mỗi insight phải có evidence link, không ghi cảm nhận chung.</p></div>
-    <div class="note"><h3>Options</h3><p>Điền sau cuộc họp 2026-07-18 bởi QMS_MGR: liệt kê các lựa chọn cadence sau hypercare như weekly tier, bi-daily dashboard review hoặc extend hypercare. Mỗi option có trade-off, owner và ngày quyết định.</p></div>
-    <div class="note-green"><h3>Experiments</h3><p>Điền sau cuộc họp 2026-07-18 bởi QMS_ENG: mô tả thí nghiệm BAU đầu tiên, ví dụ 4 tuần đo refresh SLA tự động và một lần RBAC probe bất ngờ trước W12.</p></div>
+    <div class="note-blue"><h3>Nhận định</h3><p>Điền sau cuộc họp 2026-07-18 bởi QMS_ENG + QMS_MGR: ghi 3 điều quản trị bảng điều hành tiết lộ về chủ trì, kiểm soát quyền truy cập và tỷ lệ cập nhật đúng hạn. Mỗi nhận định phải có liên kết bằng chứng, không ghi cảm nhận chung.</p></div>
+    <div class="note"><h3>Lựa chọn</h3><p>Điền sau cuộc họp 2026-07-18 bởi QMS_MGR: liệt kê các lựa chọn nhịp điều hành sau hỗ trợ tăng cường như họp điều hành hằng tuần, rà soát bảng điều hành cách hai ngày hoặc gia hạn hỗ trợ tăng cường. Mỗi lựa chọn có đánh đổi, chủ trì và ngày quyết định.</p></div>
+    <div class="note-green"><h3>Thử nghiệm</h3><p>Điền sau cuộc họp 2026-07-18 bởi QMS_ENG: mô tả thử nghiệm vận hành thường xuyên đầu tiên, ví dụ 4 tuần đo tỷ lệ cập nhật đúng hạn tự động và một lần RBAC kiểm tra thử bất ngờ trước W12.</p></div>
   </div>
 </section>
 
