@@ -1250,6 +1250,13 @@ function renderFormField(f){
         <input type="date" data-form-key="${deployEscape(f.key)}" value="${deployEscape(f.value||'')}" ${f.required?'required':''}>
         ${hint}
       </label>`;
+    case 'password':
+      return `
+      <label class="dfd-field">
+        <span class="dfd-label">${deployEscape(f.label)}${req}</span>
+        <input type="password" inputmode="numeric" autocomplete="off" data-form-key="${deployEscape(f.key)}" value="" placeholder="${deployEscape(f.placeholder||'')}" ${f.required?'required':''} ${f.maxLength?`maxlength="${f.maxLength}"`:''}>
+        ${hint}
+      </label>`;
     case 'text':
     default:
       return `
@@ -1415,8 +1422,7 @@ function renderPickerModal(){
       </div>
 
       <footer class="dp-foot">
-        <span class="dp-foot-hint">💡 Người không thuộc users.json? Đóng modal, gõ tay vào ô tên ẩn bên dưới slot.</span>
-        <button class="deploy-btn deploy-btn-sm" type="button" onclick="deployPickerAssignManual()">+ Nhập tay</button>
+        <span class="dp-foot-hint">Danh sách này dùng chung nguồn Người dùng trong Admin.</span>
       </footer>
     </div>
   </div>`;
@@ -1493,18 +1499,7 @@ function deployPickerSelect(username){
 }
 
 function deployPickerAssignManual(){
-  const p = DeployState.picker;
-  if (!p) return;
-  const name = prompt('Tên người (nhập tay — không có trong users.json):');
-  if (!name) return;
-  const phone = prompt('SĐT:') || '';
-  const champs = DeployState.champions || {champions:{}};
-  if (!champs.champions[p.deptId]) champs.champions[p.deptId] = {primary:{}, backup:{}, shift:'A'};
-  champs.champions[p.deptId][p.slot] = {name, phone, m365:'', ojtPass:false};
-  DeployState.champions = champs;
-  DeployState.picker = null;
-  renderDeployDashboard();
-  deploySaveChampion(p.deptId);
+  alert('Vui lòng thêm người dùng trong Admin > Người dùng trước khi bổ nhiệm.');
 }
 
 function deployClearChampion(deptId, slot){
@@ -1897,10 +1892,47 @@ async function deployBridgeCapa(issueId){
   }catch(e){ console.error('[deploy] capa bridge failed', e); alert('Lỗi mở CAPA: ' + e.message); }
 }
 
-async function deployResetState(){
-  if (!confirm('Reset toàn bộ readiness, issue, drill, biên bản? Hành động này KHÔNG xóa program.json.')) return;
-  const confirm2 = prompt('Gõ RESET_DEPLOY_STATE để xác nhận:');
-  if (confirm2 !== 'RESET_DEPLOY_STATE') return;
+// Password gate cho Reset state. Mật khẩu chốt ở client để tránh người dùng
+// nhấn nhầm khi đang demo — không phải bí mật bảo mật cao. Backend vẫn
+// kiểm tra confirm token "RESET_DEPLOY_STATE" như cũ, nên giả mạo client
+// vẫn không qua được API.
+const DEPLOY_RESET_PASSWORD = '122112';
+
+function deployResetState(){
+  deployOpenFormDialog({
+    title: 'Reset state triển khai',
+    kicker: '⚠ Hành động không thể hoàn tác',
+    accentColor: '#dc2626',
+    submitLabel: '🗑 Xác nhận reset',
+    hint: 'Xóa: readiness, champion roster, issue, drill, audit, biên bản review. Không xóa: program.json (12 tuần), iso-clauses.json, meetings template.',
+    fields: [
+      {
+        type: 'static',
+        label: 'Ảnh hưởng',
+        value: 'Toàn bộ tiến độ phòng ban, danh sách champion, sổ vấn đề, biên bản họp tuần, đánh giá nội bộ, xem xét lãnh đạo sẽ bị xóa.',
+      },
+      {
+        type: 'password',
+        key: 'password',
+        label: 'Mật khẩu xác nhận',
+        required: true,
+        maxLength: 12,
+        placeholder: '••••••',
+        hint: 'Hỏi QMS Manager nếu chưa biết mật khẩu reset. Hành động được audit log.',
+      },
+    ],
+    onSubmit: async (values) => {
+      const pwd = (values.password || '').trim();
+      if (pwd !== DEPLOY_RESET_PASSWORD) {
+        alert('Mật khẩu sai. Hủy reset.');
+        return;
+      }
+      await deployResetStateConfirmed();
+    },
+  });
+}
+
+async function deployResetStateConfirmed(){
   try{
     await deployApi('deploy_state_reset', {confirm: 'RESET_DEPLOY_STATE'});
     await loadDeployState();

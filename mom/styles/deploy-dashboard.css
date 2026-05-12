@@ -905,3 +905,369 @@ body.dark-theme .deploy-dash,
 }
 body.dark-theme .deploy-dash .deploy-heatmap th,
 [data-theme="dark"] .deploy-dash .deploy-heatmap th { background: #0f172a; }
+
+/* ═════════════════════════════════════════════════════════════════════════
+   DESIGN UPGRADE v3 — bright, colorful, "command center" look
+   Override pack appended for "chỉnh giao diện sáng sủa, màu sắc và đẹp".
+   Toàn bộ light theme + multi-color accent per section.
+   ═════════════════════════════════════════════════════════════════════════ */
+
+.deploy-dash {
+  --c-bg: #f5f7ff;
+  --indigo: #6366f1;
+  --indigo-soft: #eef2ff;
+  --violet: #8b5cf6;
+  --pink: #ec4899;
+  --pink-soft: #fdf2f8;
+  --rose: #f43f5e;
+  --orange: #f97316;
+  --orange-soft: #fff7ed;
+  --amber: #f59e0b;
+  --amber-soft: #fef3c7;
+  --emerald: #10b981;
+  --emerald-soft: #ecfdf5;
+  --teal: #14b8a6;
+  --sky: #0ea5e9;
+  --sky-soft: #f0f9ff;
+  --cyan: #06b6d4;
+  --slate-soft: #f1f5f9;
+}
+
+/* ── Hero — bright multi-color gradient với pattern overlay ─────────────── */
+.deploy-dash .deploy-hero {
+  background:
+    radial-gradient(at 12% 18%, rgba(255,255,255,.28) 0, transparent 38%),
+    radial-gradient(at 88% 78%, rgba(255,255,255,.18) 0, transparent 42%),
+    linear-gradient(125deg, #4f46e5 0%, #7c3aed 32%, #db2777 64%, #f59e0b 100%);
+  box-shadow:
+    0 18px 40px -18px rgba(79, 70, 229, .55),
+    0 4px 16px rgba(15, 23, 42, .08);
+  position: relative;
+  overflow: hidden;
+}
+.deploy-dash .deploy-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 18px 18px, rgba(255,255,255,.10) 1.5px, transparent 1.5px);
+  background-size: 28px 28px;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+.deploy-dash .deploy-hero > * { position: relative; z-index: 1; }
+.deploy-dash .deploy-kicker {
+  background: rgba(255,255,255,.22);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,.32);
+  letter-spacing: .08em;
+  font-weight: 700;
+}
+.deploy-dash .deploy-action-link {
+  background: rgba(255,255,255,.18);
+  border-color: rgba(255,255,255,.32);
+  backdrop-filter: blur(6px);
+  font-weight: 700;
+}
+.deploy-dash .deploy-action-link:hover {
+  background: rgba(255,255,255,.32);
+  transform: translateY(-1px);
+}
+.deploy-dash .hero-side-card {
+  background: rgba(255,255,255,.18);
+  border-color: rgba(255,255,255,.30);
+  backdrop-filter: blur(8px);
+  border-radius: 14px;
+}
+.deploy-dash .hero-side-card.hero-phase { border-left: 4px solid #fde68a; }
+
+/* ── Summary KPI cards — pastel tint + colorful top accent ─────────────── */
+.deploy-dash .deploy-summary-card {
+  border: none;
+  background: var(--c-card);
+  position: relative;
+  overflow: hidden;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,.6) inset,
+    0 4px 14px -6px rgba(15, 23, 42, .10);
+  transition: transform .15s ease, box-shadow .15s ease;
+}
+.deploy-dash .deploy-summary-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--indigo), var(--violet));
+}
+.deploy-dash .deploy-summary-grid > .deploy-summary-card:nth-child(1)::before { background: linear-gradient(90deg, var(--emerald), var(--teal)); }
+.deploy-dash .deploy-summary-grid > .deploy-summary-card:nth-child(2)::before { background: linear-gradient(90deg, var(--indigo), var(--violet)); }
+.deploy-dash .deploy-summary-grid > .deploy-summary-card:nth-child(3)::before { background: linear-gradient(90deg, var(--amber), var(--orange)); }
+.deploy-dash .deploy-summary-grid > .deploy-summary-card:nth-child(4)::before { background: linear-gradient(90deg, var(--rose), var(--pink)); }
+.deploy-dash .deploy-summary-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -10px rgba(15, 23, 42, .18); }
+.deploy-dash .deploy-summary-card strong { background: linear-gradient(135deg, var(--c-ink) 0%, var(--indigo) 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
+.deploy-dash .deploy-summary-card.summary-alert { background: linear-gradient(180deg, #fef2f2 0%, #fff 60%); }
+.deploy-dash .deploy-summary-card.summary-alert strong { -webkit-text-fill-color: var(--c-red); background: none; }
+
+/* ── Phase timeline — distinct color per phase ─────────────────────────── */
+.deploy-dash .phase-node {
+  background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+  box-shadow: 0 1px 0 rgba(255,255,255,.6) inset, 0 2px 6px rgba(15,23,42,.05);
+  border-radius: 14px;
+}
+.deploy-dash .deploy-phase-timeline > .phase-node:nth-child(1) { --phase-tint: #64748b; }
+.deploy-dash .deploy-phase-timeline > .phase-node:nth-child(3) { --phase-tint: var(--indigo); }
+.deploy-dash .deploy-phase-timeline > .phase-node:nth-child(5) { --phase-tint: var(--amber); }
+.deploy-dash .deploy-phase-timeline > .phase-node:nth-child(7) { --phase-tint: var(--emerald); }
+.deploy-dash .deploy-phase-timeline > .phase-node:nth-child(9) { --phase-tint: var(--violet); }
+.deploy-dash .phase-node .phase-status-dot {
+  background: var(--phase-tint, var(--c-muted));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--phase-tint, var(--c-muted)) 22%, transparent);
+}
+.deploy-dash .phase-node.phase-active {
+  background: linear-gradient(180deg, #fff 0%, color-mix(in srgb, var(--phase-tint, var(--indigo)) 10%, #fff) 100%);
+  border-color: var(--phase-tint, var(--indigo));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--phase-tint, var(--indigo)) 18%, transparent);
+}
+
+/* ── Pillar cards — rainbow border-top + warm shadow ─────────────────── */
+.deploy-dash .deploy-pillar-card {
+  background: linear-gradient(180deg, #fff 0%, #fafbff 100%);
+  border-radius: 14px;
+  box-shadow: 0 6px 18px -10px rgba(15,23,42,.12);
+  position: relative;
+  overflow: hidden;
+}
+.deploy-dash .deploy-pillar-card::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--indigo) 0%, var(--violet) 100%);
+}
+.deploy-dash .deploy-pillar-grid > .deploy-pillar-card:nth-child(1)::before { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
+.deploy-dash .deploy-pillar-grid > .deploy-pillar-card:nth-child(2)::before { background: linear-gradient(90deg, #06b6d4, #0ea5e9); }
+.deploy-dash .deploy-pillar-grid > .deploy-pillar-card:nth-child(3)::before { background: linear-gradient(90deg, #10b981, #14b8a6); }
+.deploy-dash .deploy-pillar-grid > .deploy-pillar-card:nth-child(4)::before { background: linear-gradient(90deg, #f59e0b, #f97316); }
+.deploy-dash .deploy-pillar-grid > .deploy-pillar-card:nth-child(5)::before { background: linear-gradient(90deg, #ec4899, #f43f5e); }
+.deploy-dash .deploy-pillar-grid > .deploy-pillar-card:nth-child(6)::before { background: linear-gradient(90deg, #8b5cf6, #ec4899); }
+.deploy-dash .deploy-pillar-grid > .deploy-pillar-card:nth-child(7)::before { background: linear-gradient(90deg, #f97316, #ef4444); }
+.deploy-dash .deploy-pillar-grid > .deploy-pillar-card:nth-child(8)::before { background: linear-gradient(90deg, #14b8a6, #06b6d4); }
+.deploy-dash .deploy-pillar-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -10px rgba(15,23,42,.20); }
+.deploy-dash .pillar-pass { background: var(--emerald-soft); border-left-color: var(--emerald); }
+
+/* ── KPI mini-card — left rainbow indicator ────────────────────────────── */
+.deploy-dash .kpi-mini-card {
+  background: linear-gradient(180deg, #fff 0%, #fafbff 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px -8px rgba(15,23,42,.10);
+}
+.deploy-dash .kpi-mini-icon {
+  background: linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%);
+  color: #fff;
+  font-weight: 800;
+  letter-spacing: .04em;
+  font-size: 11px;
+  border-radius: 8px;
+  padding: 6px 8px;
+  min-width: 38px;
+  text-align: center;
+}
+.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(8n+1) .kpi-mini-icon { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(8n+2) .kpi-mini-icon { background: linear-gradient(135deg, #06b6d4, #0ea5e9); }
+.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(8n+3) .kpi-mini-icon { background: linear-gradient(135deg, #10b981, #14b8a6); }
+.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(8n+4) .kpi-mini-icon { background: linear-gradient(135deg, #f59e0b, #f97316); }
+.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(8n+5) .kpi-mini-icon { background: linear-gradient(135deg, #ec4899, #f43f5e); }
+.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(8n+6) .kpi-mini-icon { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
+.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(8n+7) .kpi-mini-icon { background: linear-gradient(135deg, #f97316, #ef4444); }
+.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(8n+8) .kpi-mini-icon { background: linear-gradient(135deg, #14b8a6, #06b6d4); }
+
+/* ── Cadence — softer cards ───────────────────────────────────────────── */
+.deploy-dash .cadence-item {
+  background: linear-gradient(180deg, #fff 0%, var(--indigo-soft) 100%);
+  border: 1px solid color-mix(in srgb, var(--indigo) 16%, transparent);
+  border-radius: 12px;
+  box-shadow: 0 4px 10px -6px rgba(99, 102, 241, .25);
+}
+.deploy-dash .cadence-period { color: var(--indigo); }
+
+/* ── Tabs — gradient underline on active ──────────────────────────────── */
+.deploy-dash .deploy-tabs {
+  background: linear-gradient(180deg, #fff 0%, var(--slate-soft) 100%);
+  border-radius: 14px 14px 0 0;
+  padding: 0 8px;
+}
+.deploy-dash .deploy-tab {
+  font-weight: 600;
+  color: #475569;
+  position: relative;
+}
+.deploy-dash .deploy-tab:hover {
+  background: var(--indigo-soft);
+  color: var(--indigo);
+}
+.deploy-dash .deploy-tab.active {
+  color: var(--indigo);
+  background: transparent;
+  border-bottom-color: transparent;
+  font-weight: 700;
+}
+.deploy-dash .deploy-tab.active::after {
+  content: '';
+  position: absolute;
+  left: 12px; right: 12px; bottom: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(90deg, var(--indigo), var(--pink));
+}
+
+/* ── Timeline cards (Lộ trình) — colorful phase tint ──────────────────── */
+.deploy-dash .tl-week {
+  background: linear-gradient(180deg, #fff 0%, #fafbff 100%);
+  border-radius: 14px;
+  box-shadow: 0 6px 16px -10px rgba(15,23,42,.12);
+}
+.deploy-dash .tl-week.tlw-current {
+  background: linear-gradient(180deg, #fffbeb 0%, #fef3c7 100%);
+  border-color: var(--amber);
+  box-shadow:
+    0 0 0 2px var(--amber-soft) inset,
+    0 10px 24px -10px color-mix(in srgb, var(--amber) 50%, transparent);
+}
+.deploy-dash .tl-week.tlw-done {
+  background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%);
+  border-color: var(--emerald);
+}
+.deploy-dash .tl-week.tlw-blocked {
+  background: linear-gradient(180deg, #fef2f2 0%, #fee2e2 100%);
+  border-color: var(--rose);
+}
+.deploy-dash .tl-week.tlw-cond {
+  background: linear-gradient(180deg, #fff7ed 0%, #ffedd5 100%);
+  border-color: var(--orange);
+}
+
+/* ── Wave cards (Phòng ban → Wave rollout) — distinct color ───────────── */
+.deploy-dash .deploy-wave-card { border-radius: 14px; box-shadow: 0 6px 16px -10px rgba(15,23,42,.12); overflow: hidden; }
+.deploy-dash .deploy-wave-grid > .deploy-wave-card:nth-child(1) { border-top: 4px solid var(--indigo); }
+.deploy-dash .deploy-wave-grid > .deploy-wave-card:nth-child(2) { border-top: 4px solid var(--amber); }
+.deploy-dash .deploy-wave-grid > .deploy-wave-card:nth-child(3) { border-top: 4px solid var(--rose); }
+
+/* ── Buttons — bright primary gradient ────────────────────────────────── */
+.deploy-dash .deploy-btn,
+.deploy-dash .deploy-btn-primary,
+.deploy-dash .dfd-foot-buttons button[type="submit"] {
+  background: linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%);
+  border: none;
+  color: #fff !important;
+  font-weight: 700;
+  letter-spacing: .01em;
+  box-shadow: 0 4px 10px -3px color-mix(in srgb, var(--indigo) 50%, transparent);
+  transition: transform .12s ease, box-shadow .12s ease;
+}
+.deploy-dash .deploy-btn:hover,
+.deploy-dash .dfd-foot-buttons button[type="submit"]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px -3px color-mix(in srgb, var(--indigo) 60%, transparent);
+}
+.deploy-dash .deploy-btn-reset {
+  background: linear-gradient(135deg, #ef4444 0%, #ec4899 100%);
+  color: #fff !important;
+  border: none;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 6px 14px;
+  box-shadow: 0 4px 10px -3px rgba(239, 68, 68, .50);
+}
+.deploy-dash .deploy-btn-reset:hover { transform: translateY(-1px); }
+
+/* ── Form dialog modal — header tint matching accent ──────────────────── */
+.deploy-form-overlay {
+  background: rgba(15, 23, 42, .55) !important;
+  backdrop-filter: blur(4px);
+}
+.deploy-form-dialog {
+  border-radius: 18px;
+  box-shadow:
+    0 24px 60px -20px rgba(79, 70, 229, .45),
+    0 4px 14px rgba(15, 23, 42, .10);
+  overflow: hidden;
+  border-top: 0 !important;
+}
+.deploy-form-dialog .dfd-head {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+  color: #fff;
+  padding: 18px 22px;
+  border-bottom: 0;
+}
+.deploy-form-dialog .dfd-head .dp-kicker {
+  color: rgba(255,255,255,.92) !important;
+  letter-spacing: .10em;
+  font-weight: 800;
+}
+.deploy-form-dialog .dfd-head h2 { color: #fff; }
+.deploy-form-dialog .dfd-head .dfd-desc { color: rgba(255,255,255,.86); }
+.deploy-form-dialog .dfd-head .dwp-close {
+  background: rgba(255,255,255,.18);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,.32);
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  font-size: 18px;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.deploy-form-dialog .dfd-head .dwp-close:hover {
+  background: rgba(255,255,255,.32);
+  transform: scale(1.06);
+  color: #fff;
+}
+/* Reset modal uses red accent (via inline style --phase-color:#dc2626) */
+.deploy-form-dialog[style*="#dc2626"] .dfd-head {
+  background: linear-gradient(135deg, #dc2626 0%, #f97316 100%);
+}
+.deploy-form-dialog .dfd-foot {
+  background: linear-gradient(180deg, #fff 0%, #f1f5f9 100%);
+  border-top: 1px solid var(--c-border);
+}
+.deploy-form-dialog .dfd-foot-hint { color: var(--c-muted); font-size: 12px; }
+.deploy-form-dialog input[type="password"] {
+  letter-spacing: 0.35em;
+  font-size: 18px;
+  text-align: center;
+  font-weight: 700;
+}
+
+/* ── Champion / readiness cards softer ─────────────────────────────────── */
+.deploy-dash .deploy-readiness-table {
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 6px 16px -10px rgba(15,23,42,.10);
+}
+.deploy-dash .deploy-readiness-table th {
+  background: linear-gradient(180deg, var(--indigo-soft) 0%, #fff 100%);
+  color: var(--c-ink);
+  font-weight: 700;
+}
+.deploy-dash .deploy-champion-card {
+  background: linear-gradient(180deg, #fff 0%, #fafbff 100%);
+  border-radius: 14px;
+  box-shadow: 0 6px 16px -10px rgba(15,23,42,.10);
+}
+
+/* ── Heatmap (ISO map) — softer borders ───────────────────────────────── */
+.deploy-dash .deploy-iso-card {
+  background: linear-gradient(180deg, #fff 0%, #fafbff 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px -8px rgba(15,23,42,.10);
+}
+
+/* ── Body background — subtle gradient instead of flat gray ───────────── */
+#page-deploy { background: linear-gradient(180deg, #f8fafc 0%, #eef2ff 100%); border-radius: 0; }
+
+/* ── Reset state footer link — make distinct ──────────────────────────── */
+.deploy-dash .deploy-meta-bar {
+  background: linear-gradient(180deg, #fff 0%, #f8fafc 100%);
+  border-radius: 12px;
+  border: 1px solid var(--c-border);
+  padding: 14px 16px;
+}
