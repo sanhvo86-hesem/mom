@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>TRN-DEP-W12 — Playbook tuần 12 (2026-08-01) | HESEM MOM</title>
+<script>
+/* DCC Header bootstrap — copy verbatim from TRN-OPS-09 pattern.
+ * Computes absolute URLs so the stylesheet + renderer load correctly
+ * regardless of how the document is served (direct, portal iframe, …). */
+(function () {
+  var DCC_VERSION = '2026-04-24-1';
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css?v=' + DCC_VERSION;
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(js);
+})();
+</script>
+<link href="../../../../assets/style.css" rel="stylesheet">
+<style>
+ .role-chip{display:inline-block;padding:2px 8px;border-radius:999px;background:#f3f4f6;margin:2px 6px 2px 0;font-size:12px}
+ .tight li{margin:2px 0}
+ .pending-fill{background:#fef3c7;border-left:4px solid #f59e0b;padding:12px 16px;border-radius:8px;color:#78350f;margin:12px 0;font-size:13px}
+ .pending-fill strong{color:#92400e;font-weight:700}
+ .pending-fill code{background:rgba(146,64,14,.10);padding:1px 5px;border-radius:4px;font-size:12px}
+ table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; }
+ td,th { word-wrap:break-word; overflow-wrap:break-word; padding:8px 10px; border:1px solid #e2e8f0; vertical-align:top; }
+ th { background:#f1f5f9; text-align:left; font-weight:700; }
+</style>
+</head>
+<body>
+<div class="container"><div class="page"><div class="page-body">
+
+<!-- DCC Document Change Control header (preview seed; live values served by /api/v1/dcc) -->
+<div class="dcc-header"
+     data-dcc-doc-code="TRN-DEP-W12"
+     data-dcc-locale="vi"
+     data-dcc-logo="../../../../assets/hesem-logo.svg"
+     data-dcc-bootstrap='{"header":{"doc_code":"TRN-DEP-W12","title":"Playbook tuần 12 — Bàn giao chính thức · vận hành thường xuyên","subtitle":"Triển khai vận hành QMS · Phase P4 · 2026-08-01 (Saturday)","doc_type":"TRN","revision":"V0","effective_date":"2026-08-01","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":null,"status":"draft"}}'></div>
+
+<div class="doc-content" id="docContent">
+
+<div class="pending-fill" id="codex-marker">
+  <strong>⚠ Tài liệu khung — Codex chưa viết nội dung chi tiết.</strong>
+  Đây là scaffold do <code>generate-deploy-playbooks.sh</code> sinh ra với 12 section placeholder.
+  Phần nội dung do AI author điền theo prompt pack tương ứng (tham chiếu <code>_reports/deploy-playbook/PROMPT_PACK_12.md</code>).
+  Sau khi Codex viết xong sẽ xoá khung cảnh báo này.
+</div>
+
+<!-- ─────────────────────────────────────────────────────────────────────
+     SECTION 1 — COVER
+     Codex fill: kicker (Phase P4), large title, một câu mô tả intent,
+     khối "QUICK FACTS" 6 ô (Ngày · Thứ · Phase · Pillar · Attendees · Owner)
+     ───────────────────────────────────────────────────────────────────── -->
+<section class="card" id="sec-cover">
+  <h1 class="h2" style="margin-top:0;">W12 · 2026-08-01 — Bàn giao chính thức · vận hành thường xuyên</h1>
+  <p class="lead"><!-- TODO Codex W12/SEC-COVER: 2–3 câu mô tả mục đích chiến lược của tuần 12 trong tổng thể 12 tuần. --></p>
+  <!-- TODO Codex W12/SEC-COVER: bảng QUICK FACTS với 6 ô (grid-3, 2 hàng): Ngày · Thứ · Phase · Pillar · Attendees · Owner -->
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────────────
+     SECTION 2 — MỤC TIÊU TUẦN + KPI BASELINE
+     ───────────────────────────────────────────────────────────────────── -->
+<section class="card" id="sec-objective">
+  <h2 class="h2">Mục tiêu tuần 12</h2>
+  <!-- TODO Codex W12/SEC-OBJECTIVE: viết 3–5 mục tiêu SMART (Specific, Measurable, Achievable, Relevant, Time-bound).
+       Sau đó liệt kê KPI baseline cần đo TRƯỚC khi tuần bắt đầu (con số khởi điểm).
+       Tham chiếu ANNEX-110 (KPI dictionary) cho mọi KPI ID. -->
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────────────
+     SECTION 3 — PREP CHECKLIST T-7 / T-3 / T-1 / T-0
+     ───────────────────────────────────────────────────────────────────── -->
+<section class="card" id="sec-prep">
+  <h2 class="h2">Prep checklist — T-7 / T-3 / T-1 / T-0</h2>
+  <!-- TODO Codex W12/SEC-PREP: 4 bảng prep (T-7, T-3, T-1 ngày trước, T-0 sáng họp).
+       Mỗi item: WHO (role code) · WHAT · EVIDENCE · DEADLINE.
+       Mỗi T-window tối thiểu 4 item; T-0 là pre-meeting sanity check 30' trước họp. -->
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────────────
+     SECTION 4 — AGENDA TIMED (60 phút)
+     ───────────────────────────────────────────────────────────────────── -->
+<section class="card" id="sec-agenda">
+  <h2 class="h2">Agenda · 09:00–10:00 (60 phút)</h2>
+  <!-- TODO Codex W12/SEC-AGENDA: bảng 8–10 dòng. Cột: Thời gian · Phút · Đề mục · Owner · Output kỳ vọng.
+       Đảm bảo có: opening (5'), KPI review (10'), main content (~30'), gate decision (10'), closing + next week preview (5'). -->
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────────────
+     SECTION 5 — NỘI DUNG HỌP TUẦN NÀY (slide-by-slide)
+     ───────────────────────────────────────────────────────────────────── -->
+<section class="card" id="sec-slides">
+  <h2 class="h2">Nội dung họp tuần 12 — slide-by-slide</h2>
+  <!-- TODO Codex W12/SEC-SLIDES: 8–12 slide block, mỗi block:
+         <div class="card"> hoặc <div class="note-blue">
+           <h3>Slide N — Tiêu đề</h3>
+           <p>Talking points 3–5 câu (Vietnamese with diacritics).</p>
+           <ul class="tight">các bullet cụ thể, có CON SỐ và DOC CODE.</ul>
+         </div>
+       Cấm dùng "đảm bảo chất lượng" generic. Phải có con số, doc code, role code cụ thể.
+       Vận dụng Hofstede (Vietnam high power-distance): CEO speaks first, seniority order, bilingual VN/EN slides. -->
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────────────
+     SECTION 6 — QUYẾT ĐỊNH CẦN LẤY TẠI HỌP
+     ───────────────────────────────────────────────────────────────────── -->
+<section class="card" id="sec-decisions">
+  <h2 class="h2">Quyết định cần lấy trong cuộc họp này</h2>
+  <!-- TODO Codex W12/SEC-DECISIONS: bảng 3–6 quyết định. Cột: # · Quyết định · Người ký · Cơ sở (doc/data) · Fallback nếu deferred.
+       Mỗi quyết định phải có Plan-B nếu không lấy được trong cuộc họp. -->
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────────────
+     SECTION 7 — GO/NO-GO GATE — ĐIỀU KIỆN CẦN VÀ ĐỦ
+     ───────────────────────────────────────────────────────────────────── -->
+<section class="card" id="sec-gate">
+  <h2 class="h2">Gate Go/No-Go — Điều kiện CẦN và ĐỦ</h2>
+  <!-- TODO Codex W12/SEC-GATE: 2 bảng tách biệt:
+       (A) ĐIỀU KIỆN CẦN (necessary): nếu thiếu BẤT KỲ → No-Go. Tối thiểu 4 item.
+       (B) ĐIỀU KIỆN ĐỦ (sufficient): nếu (A) đủ VÀ tất cả (B) đạt → Go. Tối thiểu 4 item.
+       Mỗi điều kiện: Câu mô tả · Cách đo · Threshold · Bằng chứng (table/file/system).
+       Vận dụng "Go/No-Go gate condition library" của research pack — boilerplate 10 item, chọn lọc cho tuần 12. -->
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────────────
+     SECTION 8 — PHÂN CÔNG NHIỆM VỤ SAU HỌP (RACI)
+     ───────────────────────────────────────────────────────────────────── -->
+<section class="card" id="sec-tasks">
+  <h2 class="h2">Phân công nhiệm vụ sau họp · RACI · deadline</h2>
+  <!-- TODO Codex W12/SEC-TASKS: bảng 8–15 task. Cột: # · Task · R · A · C · I · Deadline · Evidence · KPI ảnh hưởng.
+       R/A/C/I dùng role code (CEO, QMS_MGR, QA_MGR, PROD_DIR, …) — không tên người.
+       Deadline phải absolute date (không "tuần sau"); evidence phải point đến doc_code hoặc table_name. -->
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────────────
+     SECTION 9 — NỘI DUNG HỌP TUẦN SAU (PREVIEW)
+     ───────────────────────────────────────────────────────────────────── -->
+<section class="card" id="sec-next-week">
+  <h2 class="h2">Preview tuần 13 · nhiệm vụ chuẩn bị</h2>
+  <!-- TODO Codex W12/SEC-NEXT-WEEK: tóm tắt 1 đoạn về tuần kế tiếp, sau đó bảng "chuẩn bị" — mỗi item: Role · Task · Deadline (trong tuần 12).
+       Mục đích: cuối họp W12 mỗi người biết rõ tuần sau họ cần đến với gì. -->
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────────────
+     SECTION 10 — TÀI LIỆU LIÊN QUAN
+     ───────────────────────────────────────────────────────────────────── -->
+<section class="card" id="sec-docs">
+  <h2 class="h2">Tài liệu liên quan · click để mở</h2>
+  <!-- TODO Codex W12/SEC-DOCS: liệt kê 6–12 doc code dạng:
+         <a href="#" onclick="if(window.openDoc)openDoc('CODE');return false;" class="role-chip">CODE</a>
+       Bắt buộc bao gồm doc trong requiredDocs của tuần 12 (xem program.bootstrap.json). -->
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────────────
+     SECTION 11 — RỦI RO + ESCALATION
+     ───────────────────────────────────────────────────────────────────── -->
+<section class="card" id="sec-risks">
+  <h2 class="h2">Rủi ro tuần 12 + escalation</h2>
+  <!-- TODO Codex W12/SEC-RISKS: bảng 5–8 rủi ro. Cột: # · Mô tả rủi ro · Likelihood (L/M/H) · Impact (L/M/H) · Mitigation · Trigger escalation · Escalation owner.
+       Bao gồm ít nhất 1 rủi ro Hofstede (VN cultural): vd "trưởng phòng không feedback openly tại all-hands" → mitigation: anonymous feedback box. -->
+</section>
+
+<!-- ─────────────────────────────────────────────────────────────────────
+     SECTION 12 — LESSONS LEARNED (FILL POST-MEETING)
+     ───────────────────────────────────────────────────────────────────── -->
+<section class="card" id="sec-lessons">
+  <h2 class="h2">Lessons learned · điền sau họp (Lean Change cycle)</h2>
+  <!-- TODO Codex W12/SEC-LESSONS: chừa 3 khối Insights / Options / Experiments (Jason Little Lean Change Canvas) với placeholder text.
+       Sau cuộc họp thật, owner sẽ điền vào 3 ô này. -->
+</section>
+
+</div><!-- /doc-content -->
+</div></div></div>
+</body>
+</html>

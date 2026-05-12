@@ -1145,6 +1145,15 @@ function renderWeekPanel(){
         <div>
           <span class="dwp-kicker">${deployEscape(phase.label)} · ${deployEscape(phase.title)}</span>
           <h2>W${wn} · ${w.dayOverride ? deployEscape(w.dayOverride) + ' ' : ''}${deployFmtDate(w.date)} · ${deployEscape(w.label)}</h2>
+          ${w.playbookCode ? `
+            <div class="dwp-playbook-link">
+              <button type="button" class="dwp-playbook-btn"
+                onclick="if(window.openDoc) openDoc('${deployEscape(w.playbookCode)}'); else alert('Trang tài liệu chưa sẵn sàng');"
+                title="Mở tài liệu Playbook chi tiết cho W${wn}">
+                📖 Mở Playbook W${wn} · ${deployEscape(w.playbookCode)}
+              </button>
+              <small>Tài liệu chi tiết: nội dung họp · phân công · gate Go/No-Go · preview tuần kế tiếp</small>
+            </div>` : ''}
         </div>
         <button class="dwp-close" onclick="deployCloseWeek()" aria-label="Đóng">×</button>
       </header>
