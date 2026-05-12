@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-<meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>14 | HESEM MOM</title>
 <script>
 /* DCC Header bootstrap — computes absolute URLs from location.pathname so the
@@ -24,14 +25,429 @@
 })();
 </script>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
-<link rel="stylesheet" href="../../../../assets/style.css"></head>
+<link rel="stylesheet" href="../../../../assets/style.css">
+</head>
 <body>
-<div class="container"><div class="page"><div class="page-body">
+<div class="container">
+<div class="page">
+<div class="page-body">
 <!-- DCC Document Change Control header (values served by /api/v1/dcc; bootstrap seed is preview-only) -->
 <div class="dcc-header"
      data-dcc-doc-code="SYS-OPS-14"
      data-dcc-locale="vi"
      data-dcc-logo="../../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;SYS-OPS-14&quot;,&quot;title&quot;:&quot;14&quot;,&quot;subtitle&quot;:&quot;Tài liệu đào tạo &amp; năng lực&quot;,&quot;doc_type&quot;:&quot;REF&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
+     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;SYS-OPS-14&quot;,&quot;title&quot;:&quot;SYS-OPS-14 — IPQC, SPC và kiểm soát quá trình tại trạm&quot;,&quot;subtitle&quot;:&quot;Hướng dẫn vận hành mô-đun &amp; tài liệu đào tạo OJT&quot;,&quot;doc_type&quot;:&quot;REF&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}">
+</div>
+<div class="doc-content" id="docContent">
+<div class="note-blue" style="margin:12px 0">
+<b>Hệ thống 8 cổng G0-G7:</b> SYS-OPS-14 vận hành trọng tâm tại <b>G3-G4</b> nhưng phải giữ truy xuất từ RFQ, SO, JO, WO, kiểm tra, giao hàng, đóng hồ sơ và cải tiến.</div>
+<p class="lead">SYS-OPS-14 — IPQC, SPC và kiểm soát quá trình tại trạm là tài liệu OJT cho QA, QC, PROD, PE, tổ trưởng ca, người vận hành CNC. Mục tiêu là làm đúng IPQC, SPC và kiểm soát quá trình tại trạm, giữ nguồn thực thi trong đường nghiệp vụ, giữ bằng chứng MRR, không vượt cổng khi thiếu điều kiện và không để bảng điều khiển hoặc AI thay quyết định được ủy quyền.</p>
+<div class="grid">
+<div class="card"><div class="card-title">Vì sao mô-đun tồn tại</div><p>Mô-đun này bảo vệ chuỗi ERP/MOM/MES/EQMS khỏi lỗi lan truyền khi IPQC, SPC và kiểm soát quá trình tại trạm bị thao tác theo thói quen hoặc theo dữ liệu đọc chưa xác minh.</p></div>
+<div class="card"><div class="card-title">Nguồn đúng vận hành</div><p>Nguồn thực thi gồm EqmsInspectionController, EqmsSpcLớp điều khiển và SpcEngine; dữ liệu phân tích chỉ là mô hình đọc trừ khi được đường nghiệp vụ chấp nhận.</p></div>
+<div class="card"><div class="card-title">Điều kiện học đạt</div><p>Người học phải giải thích được cổng, RACI, endpoint, bảng dữ liệu, MRR và tình huống dừng của SYS-OPS-14.</p></div>
+</div>
+
+<h2>1. Bối cảnh và vị trí mô-đun</h2>
+<h3>1.1 Vấn đề vận hành cần kiểm soát</h3>
+<p>SYS-OPS-14 nằm trong hệ đào tạo vận hành để người dùng hiểu đúng IPQC, SPC và kiểm soát quá trình tại trạm trước khi thao tác trên dữ liệu thật. Tài liệu này không thay SOP/WI sản xuất, nhưng là lớp năng lực bắt buộc để người học biết khi nào được đi tiếp, khi nào phải dừng, và khi nào phải chuyển cấp.</p>
+<h3>1.2 Vị trí trong G0-G7</h3>
+<div class="vflow">
+<div class="vstep"><div class="vnum">G0</div><div class="vtext"><b>Tiếp nhận yêu cầu</b><br><span>SYS-OPS-14 giữ vai trò kiểm tra liên quan tại cổng này.</span></div></div><div class="vstep"><div class="vnum">G1</div><div class="vtext"><b>Rà soát hợp đồng</b><br><span>SYS-OPS-14 giữ vai trò kiểm tra liên quan tại cổng này.</span></div></div><div class="vstep"><div class="vnum">G2</div><div class="vtext"><b>Phát hành kỹ thuật</b><br><span>SYS-OPS-14 giữ vai trò kiểm tra liên quan tại cổng này.</span></div></div><div class="vstep"><div class="vnum">G3</div><div class="vtext"><b>Release sản xuất</b><br><span>SYS-OPS-14 giữ vai trò trực tiếp tại cổng này.</span></div></div><div class="vstep"><div class="vnum">G4</div><div class="vtext"><b>Giao hàng</b><br><span>SYS-OPS-14 giữ vai trò trực tiếp tại cổng này.</span></div></div><div class="vstep"><div class="vnum">G5</div><div class="vtext"><b>Đóng hồ sơ</b><br><span>SYS-OPS-14 giữ vai trò kiểm tra liên quan tại cổng này.</span></div></div><div class="vstep"><div class="vnum">G6</div><div class="vtext"><b>Cải tiến</b><br><span>SYS-OPS-14 giữ vai trò kiểm tra liên quan tại cổng này.</span></div></div><div class="vstep"><div class="vnum">G7</div><div class="vtext"><b>Chuẩn hóa tri thức</b><br><span>SYS-OPS-14 giữ vai trò kiểm tra liên quan tại cổng này.</span></div></div>
+</div>
+<h3>1.3 Bản đồ đối tượng cần hiểu</h3>
+<table>
+<thead><tr><th>STT</th><th>Đối tượng</th><th>Điều kiện kiểm soát</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>phiếu IPQC</td><td>Phải có mã định danh, trạng thái, người phụ trách và bằng chứng liên quan tới IPQC, SPC và kiểm soát quá trình tại trạm.</td></tr>
+<tr><td>2</td><td>đặc tính CTQ</td><td>Phải có mã định danh, trạng thái, người phụ trách và bằng chứng liên quan tới IPQC, SPC và kiểm soát quá trình tại trạm.</td></tr>
+<tr><td>3</td><td>giới hạn LSL/USL</td><td>Phải có mã định danh, trạng thái, người phụ trách và bằng chứng liên quan tới IPQC, SPC và kiểm soát quá trình tại trạm.</td></tr>
+<tr><td>4</td><td>biểu đồ SPC</td><td>Phải có mã định danh, trạng thái, người phụ trách và bằng chứng liên quan tới IPQC, SPC và kiểm soát quá trình tại trạm.</td></tr>
+<tr><td>5</td><td>vi phạm kiểm soát</td><td>Phải có mã định danh, trạng thái, người phụ trách và bằng chứng liên quan tới IPQC, SPC và kiểm soát quá trình tại trạm.</td></tr>
+<tr><td>6</td><td>NCR</td><td>Phải có mã định danh, trạng thái, người phụ trách và bằng chứng liên quan tới IPQC, SPC và kiểm soát quá trình tại trạm.</td></tr>
+<tr><td>7</td><td>FAI</td><td>Phải có mã định danh, trạng thái, người phụ trách và bằng chứng liên quan tới IPQC, SPC và kiểm soát quá trình tại trạm.</td></tr>
+</tbody>
+</table>
+
+<h2>2. Mục tiêu và vì sao phải làm đúng</h2>
+<h3>2.1 Mục tiêu năng lực</h3>
+<p>Người học phải dùng được SYS-OPS-14 để đọc một hồ sơ thật hoặc mô phỏng, xác định trạng thái, nguồn dữ liệu, rủi ro còn mở, người quyết định và bằng chứng tối thiểu. Mục tiêu không phải thuộc lòng màn hình, mà là quyết định đúng trong tình huống có áp lực tiến độ.</p>
+<h3>2.2 Hậu quả khi làm sai</h3>
+<table>
+<thead><tr><th>Mục tiêu</th><th>Sai lệch nếu bỏ qua</th><th>Kết quả mong muốn</th></tr></thead>
+<tbody>
+<tr><td>Chất lượng</td><td>Sản phẩm hoặc hồ sơ NG đi tiếp qua cổng.</td><td>Rủi ro được giữ lại trước khi ảnh hưởng khách hàng.</td></tr>
+<tr><td>Tiến độ</td><td>Chạy nhanh nhưng phải rework hoặc trả lời khách muộn.</td><td>Lịch được cập nhật dựa trên dữ liệu đã xác minh.</td></tr>
+<tr><td>Tài chính</td><td>Giá, tồn, scrap hoặc COPQ bị đọc sai.</td><td>KPI có nguồn, phạm vi và người chịu trách nhiệm.</td></tr>
+<tr><td>Tuân thủ</td><td>Nhật ký kiểm tra thiếu, chữ ký hoặc MRR không đủ.</td><td>Bằng chứng ALCOA+ đủ để truy xuất và bảo vệ quyết định.</td></tr>
+<tr><td>Con người</td><td>Người chưa đủ năng lực thao tác dữ liệu thật.</td><td>Cổng đào tạo và quyền thao tác khớp vai trò thực tế.</td></tr>
+</tbody>
+</table>
+
+<h2>3. Vị trí trong chuỗi E2E</h2>
+<h3>3.1 Tài liệu liền kề</h3>
+<p>Tài liệu trước: <a href="SYS-OPS-13.html">SYS-OPS-13 — Policy và KPI cascade</a>.Tài liệu sau: <a href="SYS-OPS-15.html">SYS-OPS-15 — đánh giá nội bộ</a>. Khi học phải đọc tài liệu liền kề để hiểu dữ liệu đầu vào và đầu ra, không xem SYS-OPS-14 như một màn hình đơn lẻ.</p>
+<h3>3.2 Nguồn kỹ thuật cần đối chiếu</h3>
+<table>
+<thead><tr><th>Lớp</th><th>Tên thật trong repo</th><th>Cách dùng trong đào tạo</th></tr></thead>
+<tbody>
+<tr><td>Lớp điều khiển</td><td><code>EqmsInspectionController, EqmsSpcController, DashboardController</code></td><td>Chỉ để người học biết đường nào nhận thao tác; không sửa mã nguồn trong bài học.</td></tr>
+<tr><td>Lớp dịch vụ</td><td><code>EqmsInspectionController, EqmsSpcLớp điều khiển và SpcEngine</code></td><td>Là nguồn thực thi hoặc nguồn xác minh chính.</td></tr>
+<tr><td>Hàm xử lý</td><td><code>inprocessQuery, inprocessActionRecordValue, inprocessActionFlagNc, actionRecalculateLimits, actionAcknowledgeViolation, spcCapability</code></td><td>Dùng khi đối chiếu hành vi hoặc viết kiểm thử quy trình.</td></tr>
+<tr><td>Đường API</td><td><code>/api/v1/inspections; /api/v1/inspections/{id}:flag-nonconformance; /api/v1/mes/quality/spc/query; /api/spc/capability</code></td><td>Dùng để truy vết luồng UI/API và quyền thao tác.</td></tr>
+<tr><td>Bảng dữ liệu</td><td><code>ipqc_inspections, ipqc_inspection_results, spc_data, mes_spc_control_limits, mes_spc_violations, inspection_results, ncr_records</code></td><td>Dùng để phân biệt nguồn ghi, read model và snapshot.</td></tr>
+<tr><td>Miền dữ liệu</td><td>planning-production cho IPQC theo WO; quality-improvement cho SPC và NCR</td><td>Dùng để tránh nhập nhằng giữa planning, execution, quality, analytics.</td></tr>
+</tbody>
+</table>
+
+<h3>3.4 Field mapping bắt buộc</h3>
+<p>Bảng này giúp người học đọc đúng trường dữ liệu, không suy luận từ màu sắc màn hình. Khi một trường không tồn tại trên hồ sơ thật, phải ghi rõ là dữ liệu chưa đủ thay vì tự điền theo kinh nghiệm.</p>
+<table>
+<thead><tr><th>STT</th><th>Trường dữ liệu</th><th>Cách kiểm soát</th><th>Điều kiện không được bỏ qua</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><code>inspection_id</code></td><td>Trường này phải được đối chiếu khi kiểm soát IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không được để trống nếu quyết định qua cổng phụ thuộc vào trường này.</td></tr>
+<tr><td>2</td><td><code>characteristic_id</code></td><td>Trường này phải được đối chiếu khi kiểm soát IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không được để trống nếu quyết định qua cổng phụ thuộc vào trường này.</td></tr>
+<tr><td>3</td><td><code>nominal_value</code></td><td>Trường này phải được đối chiếu khi kiểm soát IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không được để trống nếu quyết định qua cổng phụ thuộc vào trường này.</td></tr>
+<tr><td>4</td><td><code>lsl</code></td><td>Trường này phải được đối chiếu khi kiểm soát IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không được để trống nếu quyết định qua cổng phụ thuộc vào trường này.</td></tr>
+<tr><td>5</td><td><code>usl</code></td><td>Trường này phải được đối chiếu khi kiểm soát IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không được để trống nếu quyết định qua cổng phụ thuộc vào trường này.</td></tr>
+<tr><td>6</td><td><code>measured_value</code></td><td>Trường này phải được đối chiếu khi kiểm soát IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không được để trống nếu quyết định qua cổng phụ thuộc vào trường này.</td></tr>
+<tr><td>7</td><td><code>gage_id</code></td><td>Trường này phải được đối chiếu khi kiểm soát IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không được để trống nếu quyết định qua cổng phụ thuộc vào trường này.</td></tr>
+<tr><td>8</td><td><code>sample_time</code></td><td>Trường này phải được đối chiếu khi kiểm soát IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không được để trống nếu quyết định qua cổng phụ thuộc vào trường này.</td></tr>
+<tr><td>9</td><td><code>spc_rule</code></td><td>Trường này phải được đối chiếu khi kiểm soát IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không được để trống nếu quyết định qua cổng phụ thuộc vào trường này.</td></tr>
+<tr><td>10</td><td><code>violation_id</code></td><td>Trường này phải được đối chiếu khi kiểm soát IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không được để trống nếu quyết định qua cổng phụ thuộc vào trường này.</td></tr>
+<tr><td>11</td><td><code>ncr_id</code></td><td>Trường này phải được đối chiếu khi kiểm soát IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không được để trống nếu quyết định qua cổng phụ thuộc vào trường này.</td></tr>
+<tr><td>12</td><td><code>containment_status</code></td><td>Trường này phải được đối chiếu khi kiểm soát IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không được để trống nếu quyết định qua cổng phụ thuộc vào trường này.</td></tr>
+</tbody>
+</table>
+<h3>3.3 Nguyên tắc nguồn dữ liệu</h3>
+<p>Nếu bảng điều khiển, file xuất, email và đường nghiệp vụ khác nhau, người học phải dừng ở nguồn có quyền thực thi và ghi rõ nguyên nhân lệch. File xuất chỉ là bằng chứng phụ, không tự trở thành lệnh vận hành.</p>
+
+<h2>4. Điểm đứt gãy hay gặp</h2>
+<h3>4.1 Dấu hiệu cần nhận biết</h3>
+<table>
+<thead><tr><th>STT</th><th>Dấu hiệu</th><th>Phản ứng bắt buộc</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Đo IPQC ghi pass/fail nhưng thiếu giá trị đo thực tế.</td><td>Tạm dừng cổng liên quan, xác minh nguồn gốc, gắn người xử lý và chỉ mở lại khi bằng chứng đủ.</td></tr>
+<tr><td>2</td><td>Giới hạn SPC dùng sai REV hoặc sai máy so với công đoạn.</td><td>Tạm dừng cổng liên quan, xác minh nguồn gốc, gắn người xử lý và chỉ mở lại khi bằng chứng đủ.</td></tr>
+<tr><td>3</td><td>Điểm đo vượt xu hướng nhưng chưa vượt LSL/USL nên bị bỏ qua.</td><td>Tạm dừng cổng liên quan, xác minh nguồn gốc, gắn người xử lý và chỉ mở lại khi bằng chứng đủ.</td></tr>
+<tr><td>4</td><td>Người vận hành sửa kích thước mà không ghi offset hoặc lý do.</td><td>Tạm dừng cổng liên quan, xác minh nguồn gốc, gắn người xử lý và chỉ mở lại khi bằng chứng đủ.</td></tr>
+<tr><td>5</td><td>Dữ liệu CMM được đính kèm nhưng không liên kết đặc tính CTQ.</td><td>Tạm dừng cổng liên quan, xác minh nguồn gốc, gắn người xử lý và chỉ mở lại khi bằng chứng đủ.</td></tr>
+<tr><td>6</td><td>FAI chưa duyệt nhưng sản xuất hàng loạt đã tiếp tục.</td><td>Tạm dừng cổng liên quan, xác minh nguồn gốc, gắn người xử lý và chỉ mở lại khi bằng chứng đủ.</td></tr>
+<tr><td>7</td><td>Vi phạm SPC không tạo containment hoặc NCR khi có sản phẩm nghi ngờ.</td><td>Tạm dừng cổng liên quan, xác minh nguồn gốc, gắn người xử lý và chỉ mở lại khi bằng chứng đủ.</td></tr>
+<tr><td>8</td><td>Mẫu đo lấy sau khi đã chọn lọc, làm sai đại diện quá trình.</td><td>Tạm dừng cổng liên quan, xác minh nguồn gốc, gắn người xử lý và chỉ mở lại khi bằng chứng đủ.</td></tr>
+<tr><td>9</td><td>Dụng cụ đo quá hạn hiệu chuẩn nhưng vẫn dùng cho CTQ.</td><td>Tạm dừng cổng liên quan, xác minh nguồn gốc, gắn người xử lý và chỉ mở lại khi bằng chứng đủ.</td></tr>
+<tr><td>10</td><td>Bảng KPI FPY đẹp nhưng thiếu mẫu bị giữ lại tại trạm.</td><td>Tạm dừng cổng liên quan, xác minh nguồn gốc, gắn người xử lý và chỉ mở lại khi bằng chứng đủ.</td></tr>
+<tr><td>11</td><td>Kết quả đo nhập trễ sau ca, mất khả năng phản ứng 60 giây.</td><td>Tạm dừng cổng liên quan, xác minh nguồn gốc, gắn người xử lý và chỉ mở lại khi bằng chứng đủ.</td></tr>
+<tr><td>12</td><td>Không phân biệt điều chỉnh quá trình với nhượng bộ chất lượng.</td><td>Tạm dừng cổng liên quan, xác minh nguồn gốc, gắn người xử lý và chỉ mở lại khi bằng chứng đủ.</td></tr>
+</tbody>
+</table>
+<h3>4.2 Dấu hiệu trọng yếu cần diễn giải</h3>
+<div class="grid">
+<div class="card"><div class="card-title">Dấu hiệu trọng yếu 1</div><p>Đo IPQC ghi pass/fail nhưng thiếu giá trị đo thực tế. Khi gặp dấu hiệu này, người học phải nói rõ điều kiện dừng, người chịu trách nhiệm và MRR cần tạo.</p></div>
+<div class="card"><div class="card-title">Dấu hiệu trọng yếu 2</div><p>Giới hạn SPC dùng sai REV hoặc sai máy so với công đoạn. Khi gặp dấu hiệu này, người học phải nói rõ điều kiện dừng, người chịu trách nhiệm và MRR cần tạo.</p></div>
+<div class="card"><div class="card-title">Dấu hiệu trọng yếu 3</div><p>Điểm đo vượt xu hướng nhưng chưa vượt LSL/USL nên bị bỏ qua. Khi gặp dấu hiệu này, người học phải nói rõ điều kiện dừng, người chịu trách nhiệm và MRR cần tạo.</p></div>
+<div class="card"><div class="card-title">Dấu hiệu trọng yếu 4</div><p>Người vận hành sửa kích thước mà không ghi offset hoặc lý do. Khi gặp dấu hiệu này, người học phải nói rõ điều kiện dừng, người chịu trách nhiệm và MRR cần tạo.</p></div>
+<div class="card"><div class="card-title">Dấu hiệu trọng yếu 5</div><p>Dữ liệu CMM được đính kèm nhưng không liên kết đặc tính CTQ. Khi gặp dấu hiệu này, người học phải nói rõ điều kiện dừng, người chịu trách nhiệm và MRR cần tạo.</p></div>
+<div class="card"><div class="card-title">Dấu hiệu trọng yếu 6</div><p>FAI chưa duyệt nhưng sản xuất hàng loạt đã tiếp tục. Khi gặp dấu hiệu này, người học phải nói rõ điều kiện dừng, người chịu trách nhiệm và MRR cần tạo.</p></div>
+</div>
+<h3>4.3 Khi nào nối sang NCR/CAPA</h3>
+<p>Khi dấu hiệu tạo sản phẩm nghi ngờ, dữ liệu nguồn sai, lỗi lặp lại, hoặc quyết định override có ảnh hưởng chất lượng, phải nối sang <a href="SYS-OPS-17.html">SYS-OPS-17 — NCR/CAPA</a>. Không dùng ghi chú cá nhân, tin nhắn hoặc file tạm để thay NCR, MRB hoặc CAPA.</p>
+
+<h2>5. Biện pháp kiểm soát rủi ro</h2>
+<h3>5.1 RACI tối thiểu</h3>
+<table>
+<thead><tr><th>Kiểm soát</th><th>R</th><th>A</th><th>Yêu cầu</th><th>C/I</th></tr></thead>
+<tbody>
+<tr><td>Giá trị đo bắt buộc</td><td>QC</td><td>QA</td><td>CTQ phải có giá trị đo, đơn vị, thiết bị, người đo và thời điểm.</td><td>C</td></tr>
+<tr><td>Giới hạn đúng REV</td><td>QA</td><td>PE</td><td>LSL/USL và control limit phải khớp bản vẽ, máy và công đoạn.</td><td>I</td></tr>
+<tr><td>Phản ứng SPC</td><td>QC</td><td>PROD</td><td>Rule vi phạm phải được ack, containment và quyết định chạy tiếp.</td><td>C</td></tr>
+<tr><td>Liên kết FAI</td><td>QA</td><td>PE</td><td>Sản xuất hàng loạt không đi tiếp nếu FAI chưa đạt.</td><td>I</td></tr>
+<tr><td>Hiệu chuẩn thiết bị đo</td><td>QA</td><td>QC</td><td>Thiết bị quá hạn không được dùng để phán quyết CTQ.</td><td>C</td></tr>
+<tr><td>NCR khi nghi ngờ</td><td>QA</td><td>PROD</td><td>Sản phẩm nghi ngờ phải giữ, đánh dấu và mở NCR khi cần.</td><td>I</td></tr>
+<tr><td>Lấy mẫu đại diện</td><td>QC</td><td>PROD</td><td>Không chọn mẫu đẹp; mẫu phải theo plan kiểm soát.</td><td>C</td></tr>
+<tr><td>Tách điều chỉnh và nhượng bộ</td><td>PE</td><td>QA</td><td>Chỉnh offset không được coi là chấp nhận sản phẩm NG.</td><td>I</td></tr>
+</tbody>
+</table>
+<h3>5.2 Yêu cầu bắt buộc</h3>
+<div class="grid">
+<div class="card req"><div class="card-title"><span class="tag shall">PHẢI</span> Không vượt nguồn thực thi</div><p>SYS-OPS-14 không cho phép bảng điều khiển, email, ảnh chụp hoặc AI thay thế quyết định nghiệp vụ của nguồn nghiệp vụ gốc.</p></div>
+<div class="card req"><div class="card-title"><span class="tag shall">PHẢI</span> Không thiếu MRR</div><p>Mọi ngoại lệ của IPQC, SPC và kiểm soát quá trình tại trạm phải có MRR tối thiểu và người phụ trách được chỉ rõ.</p></div>
+<div class="card req"><div class="card-title"><span class="tag shall">PHẢI</span> Không bỏ qua RACI</div><p>Người thao tác, người rà soát, người duyệt và người được thông báo phải tách rõ khi rủi ro chất lượng hoặc giao hàng cao.</p></div>
+<div class="card req"><div class="card-title"><span class="tag shall">PHẢI</span> Không chấp nhận dữ liệu mơ hồ</div><p>Hồ sơ IPQC, SPC và kiểm soát quá trình tại trạm thiếu mã record, trạng thái hoặc thời điểm tạo thì chưa đủ để qua cổng.</p></div>
+<div class="card req"><div class="card-title"><span class="tag shall">PHẢI</span> Không để AI tự ghi</div><p>AI chỉ được dùng để gợi ý, tóm tắt hoặc cảnh báo; quyết định ghi phải qua vai trò được ủy quyền.</p></div>
+<div class="card req"><div class="card-title"><span class="tag shall">PHẢI</span> Không đóng vòng bằng lời nói</div><p>Hành động sửa lỗi, nhượng bộ, containment, CAPA hoặc đào tạo lại phải có bằng chứng đóng vòng.</p></div>
+</div>
+<h3>5.3 Cách kiểm chứng trong buổi học</h3>
+<p>Người hướng dẫn không chấm đạt bằng câu trả lời miệng. Mỗi kiểm soát phải được kiểm chứng bằng một hồ sơ mô phỏng có mã record, trạng thái, người thao tác, người duyệt, ngày hiệu lực và MRR đi kèm.</p>
+
+<h2>6. Dừng sớm khi rủi ro vượt ngưỡng</h2>
+<h3>6.1 Quy tắc dừng</h3>
+<table>
+<thead><tr><th>STT</th><th>Điều kiện dừng</th><th>Việc phải làm ngay</th><th>Người quyết định mở lại</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Thiết bị đo quá hạn</td><td>Dừng phát hành hoặc thao tác ghi liên quan.</td><td>QA cùng chủ sở hữu quy trình quyết định bước tiếp theo.</td></tr>
+<tr><td>2</td><td>FAI chưa đạt</td><td>Dừng phát hành hoặc thao tác ghi liên quan.</td><td>QA cùng chủ sở hữu quy trình quyết định bước tiếp theo.</td></tr>
+<tr><td>3</td><td>SPC out of control chưa xử lý</td><td>Dừng phát hành hoặc thao tác ghi liên quan.</td><td>QA cùng chủ sở hữu quy trình quyết định bước tiếp theo.</td></tr>
+<tr><td>4</td><td>CTQ thiếu giá trị đo</td><td>Dừng phát hành hoặc thao tác ghi liên quan.</td><td>QA cùng chủ sở hữu quy trình quyết định bước tiếp theo.</td></tr>
+<tr><td>5</td><td>Sản phẩm nghi ngờ chưa containment</td><td>Dừng phát hành hoặc thao tác ghi liên quan.</td><td>QA cùng chủ sở hữu quy trình quyết định bước tiếp theo.</td></tr>
+</tbody>
+</table>
+<h3>6.2 Tình huống dừng mẫu</h3>
+<div class="card req"><div class="card-title"><span class="tag shall">PHẢI</span> Tình huống thực hành</div><p>Trong bài thực hành, người học nhận tình huống: một đặc tính CTQ trên lô đầu ca có xu hướng lệch nhưng chưa vượt USL. Người học phải dừng đúng cổng, nêu người quyết định, nêu MRR thiếu và viết một hành động có thời hạn.</p></div>
+
+<h2>7. 60 giây phản ứng</h2>
+<h3>7.1 Luồng phản ứng</h3>
+<div class="vflow">
+<div class="vstep"><div class="vnum">0-10 giây</div><div class="vtext"><b>Nhận biết</b><br><span>Gọi đúng tên rủi ro của IPQC, SPC và kiểm soát quá trình tại trạm, không tiếp tục thao tác theo thói quen.</span></div></div><div class="vstep"><div class="vnum">10-20 giây</div><div class="vtext"><b>Giữ an toàn</b><br><span>Giữ hồ sơ, lot, WO, quyền hoặc dữ liệu liên quan ở trạng thái không làm tăng rủi ro.</span></div></div><div class="vstep"><div class="vnum">20-30 giây</div><div class="vtext"><b>Xác minh nguồn</b><br><span>Mở nguồn kỹ thuật: <code>/api/v1/inspections; /api/v1/inspections/{id}:flag-nonconformance; /api/v1/mes/quality/spc/query; /api/spc/capability</code>.</span></div></div><div class="vstep"><div class="vnum">30-40 giây</div><div class="vtext"><b>Báo đúng người</b><br><span>Báo vai trò RACI liên quan: QA, QC, PROD, PE, tổ trưởng ca, người vận hành CNC.</span></div></div><div class="vstep"><div class="vnum">40-50 giây</div><div class="vtext"><b>Tạo bằng chứng</b><br><span>Ghi mã record, ảnh chụp có thời điểm nếu cần, và liên kết MRR.</span></div></div><div class="vstep"><div class="vnum">50-60 giây</div><div class="vtext"><b>Quyết định</b><br><span>Chọn tiếp tục có điều kiện, giữ lại, mở NCR/CAPA hoặc chuyển cấp thẩm quyền.</span></div></div>
+</div>
+<h3>7.2 Bảng kiểm phản ứng nhanh</h3>
+<table>
+<thead><tr><th>Mốc</th><th>Mục tiêu</th><th>Câu nói mẫu</th></tr></thead>
+<tbody>
+<tr><td>0-10 giây</td><td>Nhận biết</td><td>Gọi đúng tên rủi ro của IPQC, SPC và kiểm soát quá trình tại trạm, không tiếp tục thao tác theo thói quen.</td></tr>
+<tr><td>10-20 giây</td><td>Giữ an toàn</td><td>Giữ hồ sơ, lot, WO, quyền hoặc dữ liệu liên quan ở trạng thái không làm tăng rủi ro.</td></tr>
+<tr><td>20-30 giây</td><td>Xác minh nguồn</td><td>Mở nguồn kỹ thuật: <code>/api/v1/inspections; /api/v1/inspections/{id}:flag-nonconformance; /api/v1/mes/quality/spc/query; /api/spc/capability</code>.</td></tr>
+<tr><td>30-40 giây</td><td>Báo đúng người</td><td>Báo vai trò RACI liên quan: QA, QC, PROD, PE, tổ trưởng ca, người vận hành CNC.</td></tr>
+<tr><td>40-50 giây</td><td>Tạo bằng chứng</td><td>Ghi mã record, ảnh chụp có thời điểm nếu cần, và liên kết MRR.</td></tr>
+<tr><td>50-60 giây</td><td>Quyết định</td><td>Chọn tiếp tục có điều kiện, giữ lại, mở NCR/CAPA hoặc chuyển cấp thẩm quyền.</td></tr>
+</tbody>
+</table>
+
+<h2>8. Bảng kiểm triển khai</h2>
+<h3>8.1 Checklist <= 15 bước</h3>
+<table>
+<thead><tr><th>Bước</th><th>Việc cần làm</th><th>Bằng chứng</th><th>Điều kiện đạt</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Mở đúng tài liệu hiện hành trên cổng HESEM, không dùng bản tải xuống cũ.</td><td>Có bằng chứng/ghi chú kiểm tra</td><td>Đạt khi người học giải thích được, không đọc chép.</td></tr>
+<tr><td>2</td><td>Nêu được mục đích của SYS-OPS-14: IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Có bằng chứng/ghi chú kiểm tra</td><td>Đạt khi người học giải thích được, không đọc chép.</td></tr>
+<tr><td>3</td><td>Chỉ ra cổng E2E chính: G3-G4.</td><td>Có bằng chứng/ghi chú kiểm tra</td><td>Đạt khi người học giải thích được, không đọc chép.</td></tr>
+<tr><td>4</td><td>Xác định nguồn thực thi: EqmsInspectionController, EqmsSpcLớp điều khiển và SpcEngine.</td><td>Có bằng chứng/ghi chú kiểm tra</td><td>Đạt khi người học giải thích được, không đọc chép.</td></tr>
+<tr><td>5</td><td>Đọc đúng lớp xử lý trong phần kỹ thuật: <code>EqmsInspectionController, EqmsSpcController, DashboardController</code>.</td><td>Có bằng chứng/ghi chú kiểm tra</td><td>Đạt khi người học giải thích được, không đọc chép.</td></tr>
+<tr><td>6</td><td>Đọc đúng đường API: <code>/api/v1/inspections; /api/v1/inspections/{id}:flag-nonconformance; /api/v1/mes/quality/spc/query; /api/spc/capability</code>.</td><td>Có bằng chứng/ghi chú kiểm tra</td><td>Đạt khi người học giải thích được, không đọc chép.</td></tr>
+<tr><td>7</td><td>Nêu được bảng dữ liệu liên quan: <code>ipqc_inspections, ipqc_inspection_results, spc_data, mes_spc_control_limits, mes_spc_violations, inspection_results, ncr_records</code>.</td><td>Có bằng chứng/ghi chú kiểm tra</td><td>Đạt khi người học giải thích được, không đọc chép.</td></tr>
+<tr><td>8</td><td>Kiểm tra ít nhất một hồ sơ mô phỏng có đủ mã record và trạng thái.</td><td>Có bằng chứng/ghi chú kiểm tra</td><td>Đạt khi người học giải thích được, không đọc chép.</td></tr>
+<tr><td>9</td><td>Chỉ ra tối thiểu ba dấu hiệu đứt gãy cần dừng.</td><td>Có bằng chứng/ghi chú kiểm tra</td><td>Đạt khi người học giải thích được, không đọc chép.</td></tr>
+<tr><td>10</td><td>Thực hiện phản ứng 60 giây trên tình huống mô phỏng.</td><td>Có bằng chứng/ghi chú kiểm tra</td><td>Đạt khi người học giải thích được, không đọc chép.</td></tr>
+<tr><td>11</td><td>Điền RACI cho một ngoại lệ và nêu người quyết định cuối.</td><td>Có bằng chứng/ghi chú kiểm tra</td><td>Đạt khi người học giải thích được, không đọc chép.</td></tr>
+<tr><td>12</td><td>Liên kết được MRR tối thiểu và bằng chứng cần lưu.</td><td>Có bằng chứng/ghi chú kiểm tra</td><td>Đạt khi người học giải thích được, không đọc chép.</td></tr>
+<tr><td>13</td><td>Làm bài kiểm tra kiến thức đạt ngưỡng.</td><td>Có bằng chứng/ghi chú kiểm tra</td><td>Đạt khi người học giải thích được, không đọc chép.</td></tr>
+<tr><td>14</td><td>Thực hành OJT dưới quan sát của người hướng dẫn.</td><td>Có bằng chứng/ghi chú kiểm tra</td><td>Đạt khi người học giải thích được, không đọc chép.</td></tr>
+<tr><td>15</td><td>Ghi hành động cải tiến hoặc bài học nếu phát hiện lỗ hổng.</td><td>Có bằng chứng/ghi chú kiểm tra</td><td>Đạt khi người học giải thích được, không đọc chép.</td></tr>
+</tbody>
+</table>
+<h3>8.2 Sai lệch trong khi triển khai</h3>
+<p>Nếu bất kỳ bước nào không thể chứng minh, người hướng dẫn ghi “không đạt tạm thời”, chỉ rõ lỗ hổng, giao hành động bù và không mở quyền thao tác thật cho đến khi bằng chứng được bổ sung.</p>
+
+<h2>9. OJT TWI và L1-L4 theo vai trò</h2>
+<h3>9.1 Mức năng lực L1-L4</h3>
+<table>
+<thead><tr><th>Mức</th><th>Tên mức</th><th>Bằng chứng đạt</th></tr></thead>
+<tbody>
+<tr><td>L1</td><td>Nhận biết</td><td>Đọc được mục tiêu IPQC, SPC và kiểm soát quá trình tại trạm, nêu đúng nguồn thực thi và một điểm dừng.</td></tr>
+<tr><td>L2</td><td>Thao tác có hướng dẫn</td><td>Mở hồ sơ mô phỏng, xác minh phiếu IPQC, đặc tính CTQ, giới hạn LSL/USL, biểu đồ SPC, vi phạm kiểm soát, NCR, FAI, ghi kết quả theo checklist.</td></tr>
+<tr><td>L3</td><td>Tự xử lý</td><td>Tự xử lý tình huống CMM báo một kích thước gần USL, tổ trưởng muốn chạy tiếp để giữ OEE, tạo bằng chứng và chọn đường chuyển cấp.</td></tr>
+<tr><td>L4</td><td>Huấn luyện và cải tiến</td><td>Dạy lại cho người khác, phát hiện lỗ hổng hệ thống và đề xuất CAPA/A3 nếu cần.</td></tr>
+</tbody>
+</table>
+<h3>9.2 Liên kết JD</h3>
+<table>
+<thead><tr><th>Vai trò</th><th>JD tham chiếu</th><th>Lý do liên kết</th></tr></thead>
+<tbody>
+<tr><td>QA</td><td><a href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a></td><td>Vai trò này phải hiểu trách nhiệm trong SYS-OPS-14 và ký nhận khi được phân công.</td></tr>
+<tr><td>QC</td><td><a href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html">QC</a></td><td>Vai trò này phải hiểu trách nhiệm trong SYS-OPS-14 và ký nhận khi được phân công.</td></tr>
+<tr><td>người vận hành CNC</td><td><a href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-operator.html">người vận hành CNC</a></td><td>Vai trò này phải hiểu trách nhiệm trong SYS-OPS-14 và ký nhận khi được phân công.</td></tr>
+</tbody>
+</table>
+<h3>9.3 Thẻ huấn luyện TWI</h3>
+<div class="grid">
+<div class="card"><div class="card-title">L1</div><p>Đọc được mục tiêu IPQC, SPC và kiểm soát quá trình tại trạm, nêu đúng nguồn thực thi và một điểm dừng.</p></div>
+<div class="card"><div class="card-title">L2</div><p>Mở hồ sơ mô phỏng, xác minh phiếu IPQC, đặc tính CTQ, giới hạn LSL/USL, biểu đồ SPC, vi phạm kiểm soát, NCR, FAI, ghi kết quả theo checklist.</p></div>
+<div class="card"><div class="card-title">L3</div><p>Tự xử lý tình huống CMM báo một kích thước gần USL, tổ trưởng muốn chạy tiếp để giữ OEE, tạo bằng chứng và chọn đường chuyển cấp.</p></div>
+<div class="card"><div class="card-title">L4</div><p>Dạy lại cho người khác, phát hiện lỗ hổng hệ thống và đề xuất CAPA/A3 nếu cần.</p></div>
+</div>
+
+<h2>10. Đánh giá pack</h2>
+<h3>10.1 Trắc nghiệm tối thiểu 20 câu</h3>
+<table>
+<thead><tr><th>Câu</th><th>Câu hỏi</th><th>Đáp án mong muốn</th><th>Cách chấm</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Nguồn nào phải được ưu tiên khi màn hình tổng hợp và hồ sơ nghiệp vụ khác nhau?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+<tr><td>2</td><td>Khi phát hiện thiếu bằng chứng MRR trước cổng, hành động đúng là gì?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+<tr><td>3</td><td>Dấu hiệu nào cho thấy cần nối sang NCR/CAPA?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+<tr><td>4</td><td>Ai phải xác nhận điều kiện vận hành trước khi cho đi tiếp?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+<tr><td>5</td><td>Điều gì chứng minh một thao tác có thể truy xuất?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+<tr><td>6</td><td>Khi dữ liệu snapshot bị trễ, người học phải làm gì?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+<tr><td>7</td><td>Vì sao không được dùng ghi chú cá nhân để thay hồ sơ hệ thống?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+<tr><td>8</td><td>Khi có xung đột SoD, quyết định đúng là gì?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+<tr><td>9</td><td>Một yêu cầu khách hàng thay đổi CTQ phải được xử lý thế nào?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+<tr><td>10</td><td>KPI đẹp nhưng hồ sơ gốc có cảnh báo thì phải ưu tiên gì?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+<tr><td>11</td><td>Thời điểm phản ứng 60 giây bắt đầu từ đâu?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+<tr><td>12</td><td>Điều kiện nào làm bài OJT không đạt?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+<tr><td>13</td><td>Khi người hướng dẫn và người duyệt là một người, rủi ro chính là gì?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+<tr><td>14</td><td>Một file xuất PDF có được coi là nguồn thực thi không?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+<tr><td>15</td><td>Cách xử lý đúng khi phát hiện dữ liệu nhập sai là gì?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+<tr><td>16</td><td>Tại sao cần mã record duy nhất trong bằng chứng?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+<tr><td>17</td><td>Điều gì làm cho quyết định override có thể chấp nhận?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+<tr><td>18</td><td>Khi hệ thống cảnh báo nhưng sản xuất muốn chạy tiếp, ai cần tham gia?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+<tr><td>19</td><td>Một thay đổi sau phê duyệt cần có gì?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+<tr><td>20</td><td>Điều kiện đạt cuối cùng của học viên là gì?</td><td>Đáp án đúng ưu tiên nguồn thực thi, MRR đủ, RACI rõ và không vượt quyền.</td><td>Giải thích phải gắn với IPQC, SPC và kiểm soát quá trình tại trạm, không trả lời chung chung.</td></tr>
+</tbody>
+</table>
+<h3>10.2 Tình huống thực hành</h3>
+<div class="grid">
+<div class="card"><div class="card-title">Tình huống 1 — dữ liệu lệch trong IPQC, SPC và kiểm soát quá trình tại trạm</div><p>một đặc tính CTQ trên lô đầu ca có xu hướng lệch nhưng chưa vượt USL Người học phải xác định nguồn đúng, người quyết định và MRR còn thiếu.</p></div>
+<div class="card"><div class="card-title">Tình huống 2 — áp lực tiến độ</div><p>CMM báo một kích thước gần USL, tổ trưởng muốn chạy tiếp để giữ OEE Người học phải dừng đúng điểm, không dùng KPI tiến độ để bỏ qua rủi ro.</p></div>
+<div class="card"><div class="card-title">Tình huống 3 — phát hiện sau ca</div><p>Sau khi ca kết thúc, bằng chứng của IPQC, SPC và kiểm soát quá trình tại trạm thiếu một trường bắt buộc. Người học phải ghi containment, tìm phạm vi ảnh hưởng và mở hành động phòng ngừa.</p></div>
+<div class="card"><div class="card-title">Tình huống 4 — thay đổi có tác động</div><p>Có thay đổi người, máy, REV hoặc dữ liệu nguồn làm ảnh hưởng IPQC, SPC và kiểm soát quá trình tại trạm. Người học phải mô tả quy trình đánh giá tác động và quyết định release lại.</p></div>
+</div>
+<h3>10.3 Drill bắt buộc</h3>
+<table>
+<thead><tr><th>Drill</th><th>File</th><th>Cách dùng</th></tr></thead>
+<tbody>
+<tr><td>Drill phản ứng thay đổi REV</td><td><a href="../../content/03-Practice-Drills/drill-revision-ssot-60s.html">Drill phản ứng thay đổi REV</a></td><td>Dùng để kiểm tra phản ứng nhanh và diễn giải đúng IPQC, SPC và kiểm soát quá trình tại trạm.</td></tr>
+<tr><td>Drill dịch CTQ khách hàng</td><td><a href="../../content/03-Practice-Drills/drill-customer-ctq-translation.html">Drill dịch CTQ khách hàng</a></td><td>Dùng để kiểm tra phản ứng nhanh và diễn giải đúng IPQC, SPC và kiểm soát quá trình tại trạm.</td></tr>
+<tr><td>Drill lệnh order E2E</td><td><a href="../../content/03-Practice-Drills/drill-joborder-e2e.html">Drill lệnh order E2E</a></td><td>Dùng để kiểm tra phản ứng nhanh và diễn giải đúng IPQC, SPC và kiểm soát quá trình tại trạm.</td></tr>
+<tr><td>Drill NCR CAPA phản ứng</td><td><a href="../../content/03-Practice-Drills/drill-ncr-capa-response.html">Drill NCR CAPA phản ứng</a></td><td>Dùng để kiểm tra phản ứng nhanh và diễn giải đúng IPQC, SPC và kiểm soát quá trình tại trạm.</td></tr>
+</tbody>
+</table>
+<h3>10.4 Bài thực hành cuối</h3>
+<table>
+<thead><tr><th>Phần</th><th>Yêu cầu</th><th>Điều kiện đạt</th></tr></thead>
+<tbody>
+<tr><td>Đọc hồ sơ</td><td>Mở một hồ sơ mô phỏng liên quan IPQC, SPC và kiểm soát quá trình tại trạm và nêu trạng thái.</td><td>Đúng mã record, đúng nguồn, đúng cổng.</td></tr>
+<tr><td>Phân tích rủi ro</td><td>Chỉ ra ít nhất ba rủi ro và một điểm dừng.</td><td>Có RACI và MRR tương ứng.</td></tr>
+<tr><td>Phản ứng 60 giây</td><td>Thực hiện verbal walkthrough không quá 60 giây.</td><td>Không bỏ qua nguồn thực thi.</td></tr>
+<tr><td>Đóng vòng</td><td>Viết hành động, người chịu trách nhiệm, ngày hẹn và bằng chứng.</td><td>Hành động đủ rõ để theo dõi sau buổi học.</td></tr>
+</tbody>
+</table>
+
+<h3>10.5 Ngân hàng tình huống vận hành</h3>
+<p>Người hướng dẫn chọn tối thiểu ba tình huống dưới đây cho mỗi buổi học. Mỗi tình huống phải được giải bằng dữ liệu mô phỏng có kiểm soát, không chỉ thảo luận miệng.</p>
+<table>
+<thead><tr><th>STT</th><th>Tình huống</th><th>Yêu cầu xử lý</th><th>Điều kiện đạt</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>CTQ thiếu giá trị đo</td><td>Người học nói rõ nguồn dữ liệu, người quyết định, điểm dừng và MRR cần tạo cho SYS-OPS-14.</td><td>Đạt khi có hành động có chủ sở hữu và ngày hẹn.</td></tr>
+<tr><td>2</td><td>thiết bị đo quá hạn</td><td>Người học nói rõ nguồn dữ liệu, người quyết định, điểm dừng và MRR cần tạo cho SYS-OPS-14.</td><td>Đạt khi có hành động có chủ sở hữu và ngày hẹn.</td></tr>
+<tr><td>3</td><td>FAI chưa duyệt</td><td>Người học nói rõ nguồn dữ liệu, người quyết định, điểm dừng và MRR cần tạo cho SYS-OPS-14.</td><td>Đạt khi có hành động có chủ sở hữu và ngày hẹn.</td></tr>
+<tr><td>4</td><td>SPC trend lệch</td><td>Người học nói rõ nguồn dữ liệu, người quyết định, điểm dừng và MRR cần tạo cho SYS-OPS-14.</td><td>Đạt khi có hành động có chủ sở hữu và ngày hẹn.</td></tr>
+<tr><td>5</td><td>CMM file không link characteristic</td><td>Người học nói rõ nguồn dữ liệu, người quyết định, điểm dừng và MRR cần tạo cho SYS-OPS-14.</td><td>Đạt khi có hành động có chủ sở hữu và ngày hẹn.</td></tr>
+<tr><td>6</td><td>offset chỉnh không ghi lý do</td><td>Người học nói rõ nguồn dữ liệu, người quyết định, điểm dừng và MRR cần tạo cho SYS-OPS-14.</td><td>Đạt khi có hành động có chủ sở hữu và ngày hẹn.</td></tr>
+<tr><td>7</td><td>mẫu đo bị chọn lọc</td><td>Người học nói rõ nguồn dữ liệu, người quyết định, điểm dừng và MRR cần tạo cho SYS-OPS-14.</td><td>Đạt khi có hành động có chủ sở hữu và ngày hẹn.</td></tr>
+<tr><td>8</td><td>SPC violation chưa ack</td><td>Người học nói rõ nguồn dữ liệu, người quyết định, điểm dừng và MRR cần tạo cho SYS-OPS-14.</td><td>Đạt khi có hành động có chủ sở hữu và ngày hẹn.</td></tr>
+<tr><td>9</td><td>NCR không mở khi nghi ngờ</td><td>Người học nói rõ nguồn dữ liệu, người quyết định, điểm dừng và MRR cần tạo cho SYS-OPS-14.</td><td>Đạt khi có hành động có chủ sở hữu và ngày hẹn.</td></tr>
+<tr><td>10</td><td>giới hạn dùng sai REV</td><td>Người học nói rõ nguồn dữ liệu, người quyết định, điểm dừng và MRR cần tạo cho SYS-OPS-14.</td><td>Đạt khi có hành động có chủ sở hữu và ngày hẹn.</td></tr>
+<tr><td>11</td><td>dữ liệu nhập sau ca</td><td>Người học nói rõ nguồn dữ liệu, người quyết định, điểm dừng và MRR cần tạo cho SYS-OPS-14.</td><td>Đạt khi có hành động có chủ sở hữu và ngày hẹn.</td></tr>
+<tr><td>12</td><td>OEE che chất lượng xấu</td><td>Người học nói rõ nguồn dữ liệu, người quyết định, điểm dừng và MRR cần tạo cho SYS-OPS-14.</td><td>Đạt khi có hành động có chủ sở hữu và ngày hẹn.</td></tr>
+</tbody>
+</table>
+<h3>10.6 Phiếu quan sát OJT tại trạm</h3>
+<p>Phiếu quan sát dùng để chứng minh người học thật sự thao tác và giải thích được rủi ro. Nếu chỉ có điểm quiz mà không có quan sát, kết quả không đủ để mở quyền ghi.</p>
+<table>
+<thead><tr><th>STT</th><th>Hành vi cần quan sát</th><th>Cách quan sát</th><th>Kết quả ghi nhận</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>mở hồ sơ nguồn</td><td>Người hướng dẫn quan sát trực tiếp trong bài SYS-OPS-14.</td><td>Có/Không đạt + ghi chú ngắn.</td></tr>
+<tr><td>2</td><td>đọc trạng thái</td><td>Người hướng dẫn quan sát trực tiếp trong bài SYS-OPS-14.</td><td>Có/Không đạt + ghi chú ngắn.</td></tr>
+<tr><td>3</td><td>kiểm tra vai trò</td><td>Người hướng dẫn quan sát trực tiếp trong bài SYS-OPS-14.</td><td>Có/Không đạt + ghi chú ngắn.</td></tr>
+<tr><td>4</td><td>so sánh REV</td><td>Người hướng dẫn quan sát trực tiếp trong bài SYS-OPS-14.</td><td>Có/Không đạt + ghi chú ngắn.</td></tr>
+<tr><td>5</td><td>xác minh MRR</td><td>Người hướng dẫn quan sát trực tiếp trong bài SYS-OPS-14.</td><td>Có/Không đạt + ghi chú ngắn.</td></tr>
+<tr><td>6</td><td>nhận diện điểm dừng</td><td>Người hướng dẫn quan sát trực tiếp trong bài SYS-OPS-14.</td><td>Có/Không đạt + ghi chú ngắn.</td></tr>
+<tr><td>7</td><td>báo đúng người</td><td>Người hướng dẫn quan sát trực tiếp trong bài SYS-OPS-14.</td><td>Có/Không đạt + ghi chú ngắn.</td></tr>
+<tr><td>8</td><td>ghi hành động</td><td>Người hướng dẫn quan sát trực tiếp trong bài SYS-OPS-14.</td><td>Có/Không đạt + ghi chú ngắn.</td></tr>
+<tr><td>9</td><td>đóng vòng bằng chứng</td><td>Người hướng dẫn quan sát trực tiếp trong bài SYS-OPS-14.</td><td>Có/Không đạt + ghi chú ngắn.</td></tr>
+<tr><td>10</td><td>giải thích lại cho người khác</td><td>Người hướng dẫn quan sát trực tiếp trong bài SYS-OPS-14.</td><td>Có/Không đạt + ghi chú ngắn.</td></tr>
+</tbody>
+</table>
+<h2>11. Tiêu chí ĐẠT/KHÔNG ĐẠT</h2>
+<h3>11.1 Ngưỡng chấm</h3>
+<table>
+<thead><tr><th>Hạng mục</th><th>ĐẠT</th><th>KHÔNG ĐẠT</th></tr></thead>
+<tbody>
+<tr><td>Kiến thức</td><td>&gt;= 80% câu trắc nghiệm đúng và giải thích được lý do.</td><td>Thuộc đáp án nhưng không nói được nguồn hoặc RACI.</td></tr>
+<tr><td>Thực hành</td><td>Hoàn tất hồ sơ mô phỏng, phản ứng 60 giây và MRR.</td><td>Thiếu bằng chứng, nhầm nguồn hoặc bỏ qua điểm dừng.</td></tr>
+<tr><td>Thái độ vận hành</td><td>Dám dừng khi thiếu điều kiện và báo đúng vai trò.</td><td>Chạy tiếp vì tiến độ, cảm tính hoặc áp lực cấp trên.</td></tr>
+<tr><td>Tính truy xuất</td><td>Mọi kết luận có mã record, ngày, người và nguồn.</td><td>Dựa vào ảnh chụp, email hoặc lời nói không kiểm chứng.</td></tr>
+</tbody>
+</table>
+<h3>11.2 Ghi nhận kết quả</h3>
+<p>Kết quả học phải ghi vào ma trận đào tạo hoặc record OJT tương ứng. Nếu không đạt, người học nhận kế hoạch bù và không được dùng SYS-OPS-14 như điều kiện cấp quyền ghi cho tới khi đạt lại.</p>
+
+<h2>12. MRR tối thiểu</h2>
+<h3>12.1 Danh sách MRR</h3>
+<table>
+<thead><tr><th>MRR</th><th>File</th><th>Khi nào bắt buộc</th></tr></thead>
+<tbody>
+<tr><td>MRR-02 — gá đặt và FAI</td><td><a href="../03-MRR-Pack/mrr-02-setup-fai.html">MRR-02 — gá đặt và FAI</a></td><td>Bắt buộc khi SYS-OPS-14 tạo, sửa, hold, release hoặc đóng hồ sơ liên quan tới IPQC, SPC và kiểm soát quá trình tại trạm.</td></tr>
+<tr><td>MRR-03 — inspection và đo lường</td><td><a href="../03-MRR-Pack/mrr-03-inspection-measurement.html">MRR-03 — inspection và đo lường</a></td><td>Bắt buộc khi SYS-OPS-14 tạo, sửa, hold, release hoặc đóng hồ sơ liên quan tới IPQC, SPC và kiểm soát quá trình tại trạm.</td></tr>
+<tr><td>MRR-04 — NCR CAPA</td><td><a href="../03-MRR-Pack/mrr-04-ncr-capa.html">MRR-04 — NCR CAPA</a></td><td>Bắt buộc khi SYS-OPS-14 tạo, sửa, hold, release hoặc đóng hồ sơ liên quan tới IPQC, SPC và kiểm soát quá trình tại trạm.</td></tr>
+</tbody>
+</table>
+<h3>12.2 Quy tắc đặt tên bằng chứng</h3>
+<p>Bằng chứng phải theo <a href="../../templates/evidence-naming-rule.html">quy tắc đặt tên evidence</a>, có mã SYS-OPS-14, mã hồ sơ nguồn, ngày, người tạo và loại bằng chứng. Không dùng tên file chung như final, latest hoặc scan mới.</p>
+
+<h3>12.3 Gói bằng chứng tối thiểu theo hồ sơ</h3>
+<p>Gói bằng chứng tối thiểu phải có nguồn, thời điểm, người tạo, người duyệt và mối liên hệ với quyết định vận hành. Nếu thiếu một mảnh bằng chứng quan trọng, phải giữ trạng thái chưa đủ.</p>
+<table>
+<thead><tr><th>STT</th><th>Bằng chứng</th><th>Quy tắc lưu</th><th>Cách kiểm tra lại</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>phiếu IPQC</td><td>Bằng chứng này phải gắn mã SYS-OPS-14, mã hồ sơ nguồn và ngày hiệu lực.</td><td>Lưu theo evidence naming rule, không dùng tên file chung chung.</td></tr>
+<tr><td>2</td><td>báo cáo CMM</td><td>Bằng chứng này phải gắn mã SYS-OPS-14, mã hồ sơ nguồn và ngày hiệu lực.</td><td>Lưu theo evidence naming rule, không dùng tên file chung chung.</td></tr>
+<tr><td>3</td><td>trạng thái hiệu chuẩn gage</td><td>Bằng chứng này phải gắn mã SYS-OPS-14, mã hồ sơ nguồn và ngày hiệu lực.</td><td>Lưu theo evidence naming rule, không dùng tên file chung chung.</td></tr>
+<tr><td>4</td><td>biểu đồ SPC</td><td>Bằng chứng này phải gắn mã SYS-OPS-14, mã hồ sơ nguồn và ngày hiệu lực.</td><td>Lưu theo evidence naming rule, không dùng tên file chung chung.</td></tr>
+<tr><td>5</td><td>xác nhận vi phạm</td><td>Bằng chứng này phải gắn mã SYS-OPS-14, mã hồ sơ nguồn và ngày hiệu lực.</td><td>Lưu theo evidence naming rule, không dùng tên file chung chung.</td></tr>
+<tr><td>6</td><td>hồ sơ containment</td><td>Bằng chứng này phải gắn mã SYS-OPS-14, mã hồ sơ nguồn và ngày hiệu lực.</td><td>Lưu theo evidence naming rule, không dùng tên file chung chung.</td></tr>
+<tr><td>7</td><td>liên kết NCR</td><td>Bằng chứng này phải gắn mã SYS-OPS-14, mã hồ sơ nguồn và ngày hiệu lực.</td><td>Lưu theo evidence naming rule, không dùng tên file chung chung.</td></tr>
+<tr><td>8</td><td>phê duyệt FAI</td><td>Bằng chứng này phải gắn mã SYS-OPS-14, mã hồ sơ nguồn và ngày hiệu lực.</td><td>Lưu theo evidence naming rule, không dùng tên file chung chung.</td></tr>
+<tr><td>9</td><td>kế hoạch lấy mẫu</td><td>Bằng chứng này phải gắn mã SYS-OPS-14, mã hồ sơ nguồn và ngày hiệu lực.</td><td>Lưu theo evidence naming rule, không dùng tên file chung chung.</td></tr>
+<tr><td>10</td><td>nhật ký offset</td><td>Bằng chứng này phải gắn mã SYS-OPS-14, mã hồ sơ nguồn và ngày hiệu lực.</td><td>Lưu theo evidence naming rule, không dùng tên file chung chung.</td></tr>
+<tr><td>11</td><td>MRR-03 pack</td><td>Bằng chứng này phải gắn mã SYS-OPS-14, mã hồ sơ nguồn và ngày hiệu lực.</td><td>Lưu theo evidence naming rule, không dùng tên file chung chung.</td></tr>
+<tr><td>12</td><td>ghi chú vận hành đã duyệt</td><td>Bằng chứng này phải gắn mã SYS-OPS-14, mã hồ sơ nguồn và ngày hiệu lực.</td><td>Lưu theo evidence naming rule, không dùng tên file chung chung.</td></tr>
+</tbody>
+</table>
+<h2>13. Phát hiện đánh giá hay gặp và phòng ngừa</h2>
+<h3>13.1 Danh sách phát hiện</h3>
+<table>
+<thead><tr><th>STT</th><th>Phát hiện</th><th>Phòng ngừa</th><th>Cách kiểm tra lại</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Bằng chứng thiếu mã hồ sơ hoặc thiếu thời điểm tạo.</td><td>Phòng ngừa bằng checklist, RACI và MRR của SYS-OPS-14.</td><td>Kiểm tra lại trong OJT hoặc đánh giá định kỳ.</td></tr>
+<tr><td>2</td><td>Người dùng hiểu sai bảng điều khiển là nguồn có quyền ghi.</td><td>Phòng ngừa bằng checklist, RACI và MRR của SYS-OPS-14.</td><td>Kiểm tra lại trong OJT hoặc đánh giá định kỳ.</td></tr>
+<tr><td>3</td><td>Quy trình có đủ bước nhưng thiếu người chịu trách nhiệm khi lệch chuẩn.</td><td>Phòng ngừa bằng checklist, RACI và MRR của SYS-OPS-14.</td><td>Kiểm tra lại trong OJT hoặc đánh giá định kỳ.</td></tr>
+<tr><td>4</td><td>Dữ liệu dùng trong bài tập không khớp REV hoặc scope.</td><td>Phòng ngừa bằng checklist, RACI và MRR của SYS-OPS-14.</td><td>Kiểm tra lại trong OJT hoặc đánh giá định kỳ.</td></tr>
+<tr><td>5</td><td>Mẫu checklist ghi đạt nhưng không chỉ cách kiểm chứng.</td><td>Phòng ngừa bằng checklist, RACI và MRR của SYS-OPS-14.</td><td>Kiểm tra lại trong OJT hoặc đánh giá định kỳ.</td></tr>
+<tr><td>6</td><td>Hồ sơ học không liên kết JD hoặc vai trò cần năng lực.</td><td>Phòng ngừa bằng checklist, RACI và MRR của SYS-OPS-14.</td><td>Kiểm tra lại trong OJT hoặc đánh giá định kỳ.</td></tr>
+<tr><td>7</td><td>Điểm dừng được nêu nhưng không có thời hạn phản ứng.</td><td>Phòng ngừa bằng checklist, RACI và MRR của SYS-OPS-14.</td><td>Kiểm tra lại trong OJT hoặc đánh giá định kỳ.</td></tr>
+<tr><td>8</td><td>KPI được đo nhưng không nối hành động cải tiến.</td><td>Phòng ngừa bằng checklist, RACI và MRR của SYS-OPS-14.</td><td>Kiểm tra lại trong OJT hoặc đánh giá định kỳ.</td></tr>
+<tr><td>9</td><td>MRR lưu rời rạc, không có quy tắc đặt tên bằng chứng.</td><td>Phòng ngừa bằng checklist, RACI và MRR của SYS-OPS-14.</td><td>Kiểm tra lại trong OJT hoặc đánh giá định kỳ.</td></tr>
+<tr><td>10</td><td>Tình huống mô phỏng không bao gồm ngoại lệ hoặc xung đột.</td><td>Phòng ngừa bằng checklist, RACI và MRR của SYS-OPS-14.</td><td>Kiểm tra lại trong OJT hoặc đánh giá định kỳ.</td></tr>
+<tr><td>11</td><td>RACI ghi chung chung, người duyệt thật không rõ.</td><td>Phòng ngừa bằng checklist, RACI và MRR của SYS-OPS-14.</td><td>Kiểm tra lại trong OJT hoặc đánh giá định kỳ.</td></tr>
+<tr><td>12</td><td>Không có kiểm tra sau khi CAPA hoặc thay đổi tài liệu được phát hành.</td><td>Phòng ngừa bằng checklist, RACI và MRR của SYS-OPS-14.</td><td>Kiểm tra lại trong OJT hoặc đánh giá định kỳ.</td></tr>
+</tbody>
+</table>
+<h3>13.2 Liên kết cải tiến liên tục</h3>
+<p>Nếu phát hiện lặp lại trong hai kỳ học hoặc hai ca vận hành liên tiếp, người phụ trách phải mở A3/8D hoặc CAPA tùy mức rủi ro. SYS-OPS-14 chỉ được xem là hoàn tất khi bài học được đưa lại vào tài liệu, ma trận đào tạo và checklist triển khai.</p>
+<h3>13.3 Chỉ số theo dõi</h3>
+<p>KPI gợi ý cho SYS-OPS-14 gồm: FPY, Cpk/Ppk, số vi phạm SPC chưa ack, thời gian containment, tỷ lệ thiết bị đo còn hiệu lực. Chỉ số này phải được đọc cùng hồ sơ gốc, không dùng riêng để kết luận khi nguồn dữ liệu đang có cảnh báo.</p>
+</div>
+
+<h3>13.4 Bài tự kiểm cuối ca</h3>
+<p>Người học dùng phần này trước khi kết thúc ca thực hành. Nếu một câu trả lời còn mơ hồ, người hướng dẫn phải giữ trạng thái chưa đủ và giao bài bù cụ thể.</p>
+<table>
+<thead><tr><th>STT</th><th>Câu tự kiểm</th><th>Bằng chứng cần chỉ ra</th><th>Dấu hiệu không đạt</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Tôi đã đọc đúng nguồn thực thi chưa?</td><td>Chỉ ra bằng chứng liên quan tới SYS-OPS-14 và IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không nói được nguồn, người quyết định hoặc MRR.</td></tr>
+<tr><td>2</td><td>Tôi có thể chỉ mã hồ sơ và trạng thái hiện tại không?</td><td>Chỉ ra bằng chứng liên quan tới SYS-OPS-14 và IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không nói được nguồn, người quyết định hoặc MRR.</td></tr>
+<tr><td>3</td><td>Tôi đã xác định người chịu trách nhiệm và người duyệt chưa?</td><td>Chỉ ra bằng chứng liên quan tới SYS-OPS-14 và IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không nói được nguồn, người quyết định hoặc MRR.</td></tr>
+<tr><td>4</td><td>Tôi đã biết điểm dừng nếu dữ liệu thiếu chưa?</td><td>Chỉ ra bằng chứng liên quan tới SYS-OPS-14 và IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không nói được nguồn, người quyết định hoặc MRR.</td></tr>
+<tr><td>5</td><td>Tôi đã liên kết MRR và quy tắc đặt tên bằng chứng chưa?</td><td>Chỉ ra bằng chứng liên quan tới SYS-OPS-14 và IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không nói được nguồn, người quyết định hoặc MRR.</td></tr>
+<tr><td>6</td><td>Tôi có thể giải thích lại cho người khác trong 60 giây không?</td><td>Chỉ ra bằng chứng liên quan tới SYS-OPS-14 và IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không nói được nguồn, người quyết định hoặc MRR.</td></tr>
+<tr><td>7</td><td>Tôi có đang dùng snapshot hoặc file xuất như nguồn ghi không?</td><td>Chỉ ra bằng chứng liên quan tới SYS-OPS-14 và IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không nói được nguồn, người quyết định hoặc MRR.</td></tr>
+<tr><td>8</td><td>Tôi đã ghi hành động phòng ngừa nếu thấy lỗi lặp chưa?</td><td>Chỉ ra bằng chứng liên quan tới SYS-OPS-14 và IPQC, SPC và kiểm soát quá trình tại trạm.</td><td>Không nói được nguồn, người quyết định hoặc MRR.</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<script src="../../../../assets/app.js">
+</script>
+<div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
 </html>

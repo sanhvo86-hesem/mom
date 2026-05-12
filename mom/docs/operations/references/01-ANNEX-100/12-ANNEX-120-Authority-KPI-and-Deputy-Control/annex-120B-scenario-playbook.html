@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANNEX-120B - Scenario Playbook | HESEM MOM</title>
+<script>
+/* DCC Header bootstrap — computes absolute URLs from location.pathname so the
+ * stylesheet + renderer load correctly regardless of how the document is
+ * served (direct, portal iframe + <base href="../"> injection, doc_stream, …).
+ * The explicit `?v=…` query string busts browser + service-worker caches
+ * whenever the DCC header CSS or renderer ships a new revision. */
+(function () {
+  var DCC_VERSION = '2026-04-24-1';
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css?v=' + DCC_VERSION;
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(js);
+})();
+</script>
+<link rel="stylesheet" href="../../../../../assets/style.css">
+<style>
+thead { display: table-header-group; }
+ tfoot { display: table-footer-group; }
+ p { orphans: 3; widows: 3; }
+ 
+}
+.page-body { overflow-x: hidden; }
+.table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
+table { max-width: 100%; table-layout: auto; }
+td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
+.role-code {font-family: var(--mono); font-size: 11px; background: var(--bg3); padding: 2px 6px; border-radius: 5px;}
+.raci-cell {text-align:center; font-weight:700; width:34px; min-width:34px; padding:6px 4px !important;}
+.raci-A {background:#fff5f5; color:#c92a2a;}
+.raci-R {background:#e7f5ff; color:#1864ab;}
+.raci-C {background:#fff9db; color:#e67700;}
+.raci-I {background:#ebfbee; color:#2b8a3e;}
+.portal-grid {display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
+.portal-card {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:18px;}
+.portal-card h3 {font-size:14px; color:var(--navy); margin:0 0 8px;}
+.doc-link-list {list-style:none; margin:0; padding:0;}
+.doc-link-list li {padding:6px 0 6px 16px; position:relative;}
+.doc-link-list li:before {content:"•"; position:absolute; left:0; color:var(--blue);}
+.inline-tag {display:inline-block;padding:3px 8px;border:1px solid var(--ln);border-radius:999px;font-size:10px;font-weight:700;background:var(--bg2);margin-right:6px;margin-bottom:6px;}
+.svg-wrap,.org-wrap {background:var(--bg); border:1px solid var(--ln); border-radius:var(--r); padding:16px; overflow:auto;}
+.nav-toc a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;margin:6px 0;background:var(--bg);}
+kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2px 5px;border-radius:4px;background:#fff;}
+.org-tree{display:flex;flex-direction:column;gap:16px;margin:8px 0;}
+.org-level{display:grid;gap:14px;}
+.org-level.cols-1{grid-template-columns:1fr;}
+.org-level.cols-2{grid-template-columns:repeat(2,minmax(0,1fr));}
+.org-level.cols-3{grid-template-columns:repeat(3,minmax(0,1fr));}
+.org-level.cols-4{grid-template-columns:repeat(4,minmax(0,1fr));}
+.org-level.cols-5{grid-template-columns:repeat(5,minmax(0,1fr));}
+.org-card{border:1px solid var(--ln);border-top:4px solid var(--blue);border-radius:var(--r);padding:14px;background:var(--bg);}
+.org-card h3{font-size:14px;color:var(--navy);margin:0 0 4px;}
+.org-card p{margin:4px 0;font-size:12px;}
+.org-row{border:1px solid var(--ln);border-radius:var(--r);padding:14px;background:var(--bg);margin:12px 0;}
+.org-row h3{margin:0 0 8px;font-size:13px;color:var(--navy);}
+.badge-soft{display:inline-block;padding:2px 8px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:10px;font-weight:700;margin-right:6px;margin-bottom:6px;}
+.kpi-box{border:1px solid var(--ln);border-radius:var(--r);padding:12px;background:var(--bg);margin:8px 0;}
+.kpi-box b{display:block;font-size:11px;color:var(--navy);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px;}
+.auth-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:10px 0 16px;}
+.auth-item{padding:12px 14px; border:1px solid var(--ln,#d7deea); border-radius:8px; background:var(--bg2,#f8fafc);}
+.backup-card{padding:14px 16px; border:1px solid var(--ln,#d7deea); border-left: 3px solid #0f766e; border-radius:8px; background:var(--bg2,#f8fafc); margin:10px 0 0;}
+.role-boundary{border:1px solid #cfe0ff;border-left: 3px solid #2563eb;border-radius:8px;background:#eef6ff;padding:14px 16px;margin:14px 0;}
+.milestone-card{border:1px solid var(--ln);border-left: 3px solid var(--gold);border-radius:var(--r);padding:14px;background:#fffdf5;margin:12px 0;}
+.milestone-card h3{margin:0 0 6px;font-size:14px;color:var(--navy);}
+.milestone-card p:last-child,.role-boundary p:last-child,.auth-item p:last-child,.backup-card p:last-child{margin-bottom:0;}
+.small-note{font-size:12px;color:var(--ink2);}
+
+.toc{border:1px solid var(--ln);border-radius:var(--r);padding:16px;background:var(--bg);margin:0 0 18px}
+.toc-title{font-weight:700;color:var(--navy);margin-bottom:10px}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.toc-grid a{display:block;padding:10px 12px;border:1px solid var(--ln);border-radius:8px;background:var(--bg2)}
+
+.check-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px;margin:14px 0}
+.check-item{border:1px solid var(--ln);border-left: 3px solid var(--blue);border-radius:var(--r);padding:14px;background:#eef6ff}
+.process-strip{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
+.pill{display:inline-block;padding:4px 10px;border-radius:999px;background:var(--blue-l);color:var(--navy);font-size:11px;font-weight:700}
+.card-title{font-size:13px;font-weight:700;color:var(--navy);margin-bottom:8px}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.tight{margin:0;padding-left:18px}
+.tight li{margin:4px 0}
+.mini-note{font-size:12px;color:var(--ink2)}
+.footer-note{margin-top:18px;padding:12px 14px;border-top:1px solid var(--ln);font-size:12px;color:var(--ink2)}
+.decision-table th,.decision-table td{vertical-align:top}
+@media (max-width: 960px){.grid-2,.grid-3{grid-template-columns:1fr}.auth-grid{grid-template-columns:1fr}}
+
+.doc-grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;}
+.doc-grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+.card h3{margin-top:0}
+.small{font-size:12px;color:var(--ink3);}
+.tight p{margin:8px 0;}
+.legend-row{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0 18px;}
+.legend-item{display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--ln);border-radius:12px;padding:8px 10px;font-size:12px;}
+.legend-swatch{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;border:1px solid var(--ln2);}
+.kpi-good{background:#ebfbee;color:#2b8a3e}
+.kpi-warn{background:#fff9db;color:#e67700}
+.kpi-bad{background:#fff5f5;color:#c92a2a}
+.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;white-space:nowrap}
+.matrix-table{width:100%;border-collapse:collapse;font-size:12px;}
+.matrix-table th{padding:8px 10px;text-align:left;font-size:11px;font-weight:800;color:var(--navy);background:var(--th-bg);border:1px solid var(--th-bdr);text-transform:uppercase;letter-spacing:.3px;vertical-align:bottom}
+.matrix-table td{padding:8px 10px;border:1px solid var(--ln2);vertical-align:top;line-height:1.45}
+.matrix-table tbody tr:nth-child(even){background:#fafcfe}
+.matrix-table .section-row td{background:var(--navy)!important;color:#fff;font-weight:700;letter-spacing:.4px}
+.center{text-align:center}
+.nowrap{white-space:nowrap}
+.cell-a{background:#e3f2fd;color:#1565c0;font-weight:800;text-align:center}
+.cell-p{background:#fff3e0;color:#e65100;font-weight:700;text-align:center}
+.cell-v{background:#f3e5f5;color:#7b1fa2;font-weight:700;text-align:center}
+.cell-c{background:#fff9db;color:#e67700;font-weight:700;text-align:center}
+.cell-i{background:#e8f5e9;color:#2e7d32;font-weight:600;text-align:center}
+.cell-x{background:#f8f9fa;color:#868e96;text-align:center}
+.badge-strip{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0 14px}
+.badge-chip{display:inline-flex;align-items:center;gap:6px;background:var(--bg);border:1px solid var(--ln);padding:6px 10px;border-radius:999px;font-size:12px}
+.footer-note{margin-top:18px;padding:14px 16px;border:1px dashed var(--ln2);border-radius:12px;background:var(--bg2);color:var(--ink2)}
+</style>
+</head>
+<body>
+<div class="container"><div class="page"><div class="page-body">
+<div class="dcc-header" data-dcc-bootstrap='{"header":{"doc_code":"ANNEX-120B","title":"Scenario Playbook — Tra cứu thẩm quyền theo tình huống thực chiến","subtitle":"Bộ tình huống vận hành thực tế tại xưởng gia công CNC — mỗi tình huống dẫn về CDR + FRM + ngưỡng số","doc_type":"REF","revision":"V0","effective_date":"2026-05-12","owner_role_code":"QA","approver_role_code":"CEO","iso_clause":"ISO 9001:2015 §5.3 §8.1 §8.7 §9.1","status":"draft"},"labels":{"doc_id":{"short":"Mã","long":"Mã tài liệu","sort":10},"revision":{"short":"Lần sửa","long":"Lần sửa đổi","sort":20},"effective_date":{"short":"Hiệu lực","long":"Ngày hiệu lực","sort":30},"owner":{"short":"Sở hữu","long":"Bộ phận sở hữu","sort":40},"approver":{"short":"Duyệt","long":"Người phê duyệt","sort":50}}}' data-dcc-doc-code="ANNEX-120B" data-dcc-locale="vi" data-dcc-logo="../../../../../assets/hesem-logo.svg"></div>
+
+<div class="doc-content" id="docContent"><div class="form-sheet">
+
+<div class="iso-map">
+<div class="iso-title">Mục đích — tra cứu 1 phút khi có sự cố</div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Trang này là chỉ mục ngược theo tình huống thực tế tại xưởng. Khi gặp sự cố, mở trang này trước để biết: trigger, người quyết định, FRM/SOP, ngưỡng leo thang. Mọi quyết định cuối vẫn phải đối chiếu <a href="annex-120-authority-matrix.html">ANNEX-120</a> (CDR) và <a href="annex-121-raci-master-matrix.html">ANNEX-121</a> (RACI). <span class="iso-clause">§5.3 / §8.7</span></div></div>
+</div>
+
+<h2 class="h2" id="p1">1. Bảng tra tình huống (20 ca thực chiến)</h2>
+<div class="table-card"><table class="table">
+<colgroup>
+<col style="width:5%"><col style="width:20%"><col style="width:18%">
+<col style="width:8%"><col style="width:12%"><col style="width:10%">
+<col style="width:15%"><col style="width:12%">
+</colgroup>
+<thead><tr>
+<th>#</th><th>Tình huống</th><th>Trigger định lượng</th>
+<th>Cổng G</th><th>Quyết định cần (CDR)</th><th>Người ký A</th>
+<th>FRM / SOP</th><th>Leo thang nếu</th>
+</tr></thead>
+<tbody>
+<tr><td>1</td><td>Khách hủy đơn sau khi đã ra lệnh sản xuất</td><td>Job đã release ≥G2, khách thông báo hủy</td><td>G0/G3</td><td><a href="annex-120-authority-matrix.html#cdr-A6">A6</a> + <a href="annex-120-authority-matrix.html#cdr-C7">C7</a></td><td><span class="role-code">CEO</span></td><td><a download="" href="../../../../forms/frm-200-purchase/FRM-212_Customer_Change_Request.xlsx">FRM-212</a> · <a download="" href="../../../../forms/frm-500-production/FRM-503_WIP_Aging_Report.xlsx">FRM-503</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td><td>Khách yêu cầu hủy sau khi đã mua vật tư hoặc WIP có chi phí không thu hồi.</td></tr>
+<tr><td>2</td><td>Máy CNC hỏng giữa ca, lô WIP đang gia công</td><td>Downtime ≥ <<TH:NEED-REVIEW: 30 phút>></td><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-C7">C7</a></td><td><span class="role-code">PD</span></td><td><a download="" href="../../../../forms/frm-500-production/FRM-512_Downtime_Log.xlsx">FRM-512</a> · <a download="" href="../../../../forms/frm-500-production/FRM-522_Crash_Report.xlsx">FRM-522</a> · <a download="" href="../../../../forms/frm-500-production/FRM-503_WIP_Aging_Report.xlsx">FRM-503</a></td><td>Lô có khách ưu tiên, máy thay thế không đủ năng lực hoặc trễ giao vượt placeholder của C7.</td></tr>
+<tr><td>3</td><td>Lô fail FAI, khách yêu cầu giao gấp</td><td>FAI fail + delivery ≤ <<TH:NEED-REVIEW: 3 ngày>></td><td>G4</td><td><a href="annex-120-authority-matrix.html#cdr-D2">D2</a></td><td><span class="role-code">QA</span>+<span class="role-code">CEO</span></td><td><a download="" href="../../../../forms/frm-300-technical/FRM-311_FAI_Report.xlsx">FRM-311</a> · <a download="" href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302</a></td><td>Khách yêu cầu ship trước khi QA xác nhận bằng chứng kiểm lại.</td></tr>
+<tr><td>4</td><td>Đứt vật tư đột xuất giữa job</td><td>Stock &lt; ROP, trễ vendor ≥ <<TH:NEED-REVIEW: 5 ngày>></td><td>G2</td><td><a href="annex-120-authority-matrix.html#cdr-E5">E5</a></td><td><span class="role-code">SCM</span></td><td><a download="" href="../../../../forms/frm-400-quality/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-401</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td><td>Emergency PO vượt L2 cap, vật tư thay thế ảnh hưởng kỹ thuật hoặc khách hàng phải duyệt.</td></tr>
+<tr><td>5</td><td>QA Manager vắng, có lô chờ release</td><td>QA vắng ≥1 giờ + lô hold ≥10 chi tiết</td><td>—</td><td><a href="annex-120-authority-matrix.html#cdr-F3">F3</a></td><td><span class="role-code">DIRECT_LINE_MGRS</span> → <span class="role-code">CEO</span></td><td><a href="annex-123-deputy-backup-matrix.html#d4">ANNEX-123 d4</a> · <a download="" href="../../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a></td><td>Phó không có chứng nhận hoặc giới hạn d4 chặn quyền release.</td></tr>
+<tr><td>6</td><td>Khách đòi miễn FAI (waiver)</td><td>CCR có cụm "skip FAI"</td><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-B7">B7</a></td><td><span class="role-code">QA</span>+<span class="role-code">ENGM</span></td><td><a download="" href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302</a></td><td>Waiver ảnh hưởng đặc tính trọng yếu, khách không ghi rõ chấp thuận hoặc ENGM không xác nhận rủi ro.</td></tr>
+<tr><td>7</td><td>OT phòng sản xuất vượt ngưỡng tuần</td><td>OT &gt; <<TH:NEED-REVIEW: 8 giờ/người/tuần>></td><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-C6">C6</a></td><td><span class="role-code">HR</span>+<span class="role-code">PD</span></td><td><a download="" href="../../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td><td>OT kéo dài qua tuần kế tiếp hoặc tạo rủi ro an toàn / chất lượng.</td></tr>
+<tr><td>8</td><td>Scrap value bất thường</td><td>Scrap &gt; <<TH:NEED-REVIEW: 20 triệu VND/lô>></td><td>G5</td><td><a href="annex-120-authority-matrix.html#cdr-D9">D9</a></td><td><span class="role-code">CEO</span></td><td><a download="" href="../../../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx">FRM-651</a> · <a download="" href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a></td><td>Scrap lặp lại cùng nguyên nhân, vượt L2 cap hoặc có dấu hiệu ảnh hưởng khách hàng.</td></tr>
+<tr><td>9</td><td>NCR major escalation đầu vào</td><td>NCR major ≥ <<TH:NEED-REVIEW: 5/tháng/job>></td><td>G5</td><td><a href="annex-120-authority-matrix.html#cdr-D3">D3</a> + <a href="annex-120-authority-matrix.html#cdr-D4">D4</a></td><td><span class="role-code">QA</span>+<span class="role-code">CEO</span></td><td><a download="" href="../../../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx">FRM-651</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td><td>Supplier liên quan nhiều job, có nguy cơ stop-ship hoặc cần SCAR.</td></tr>
+<tr><td>10</td><td>Break-glass ERP cấp giờ</td><td>ERP outage &gt; <<TH:NEED-REVIEW: 2 giờ>>, cần truy cập gấp</td><td>—</td><td><a href="annex-120-authority-matrix.html#cdr-F2">F2</a></td><td><span class="role-code">ESA</span>+<span class="role-code">CEO</span></td><td><a download="" href="../../../../forms/frm-100-sales/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a></td><td>Truy cập có quyền tài chính, chất lượng, master data hoặc không có log hậu kiểm.</td></tr>
+<tr><td>11</td><td>Customer complaint nặng (RMA)</td><td>Khách gửi complaint chính thức + tổn thất ≥ <<TH:NEED-REVIEW: 10 triệu>></td><td>G7</td><td><a href="annex-120-authority-matrix.html#cdr-F5">F5</a></td><td><span class="role-code">QA</span>+<span class="role-code">CS</span>+<span class="role-code">CEO</span></td><td><a download="" href="../../../../forms/frm-200-purchase/FRM-211_Complaint_Log.xlsx">FRM-211</a> · <a download="" href="../../../../forms/frm-200-purchase/FRM-213_RMA_Tracking_Log.xlsx">FRM-213</a> · <a href="../../../sops/02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html">SOP-202</a></td><td>Complaint liên quan an toàn, khách trọng yếu hoặc yêu cầu bồi hoàn vượt cap.</td></tr>
+<tr><td>12</td><td>Supplier audit fail</td><td>Supplier critical NC ≥ <<TH:NEED-REVIEW: 2>></td><td>G5</td><td><a href="annex-120-authority-matrix.html#cdr-E6">E6</a></td><td><span class="role-code">SCM</span>+<span class="role-code">QA</span></td><td><a download="" href="../../../../forms/frm-400-quality/FRM-409_Supplier_Audit_Checklist.xlsx">FRM-409</a> · <a download="" href="../../../../forms/frm-400-quality/FRM-406_SCAR.xlsx">FRM-406</a></td><td>Critical NC chưa có containment hoặc supplier đang cấp vật tư cho job mở.</td></tr>
+<tr><td>13</td><td>EHS incident — Stop-Work</td><td>Incident severity ≥ <<TH:NEED-REVIEW: cấp 2>></td><td>—</td><td><a href="annex-120-authority-matrix.html#cdr-F4">F4</a></td><td><span class="role-code">EHS</span>+<span class="role-code">CEO</span></td><td><a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a> · <a download="" href="../../../../forms/frm-800-hr/FRM-811_Incident_Report.xlsx">FRM-811</a></td><td>Cần dừng nhiều khu vực, báo cơ quan ngoài hoặc có nguy cơ tái khởi động không an toàn.</td></tr>
+<tr><td>14</td><td>IT outage ảnh hưởng ≥1 dây chuyền</td><td>Outage ≥ <<TH:NEED-REVIEW: 1 giờ>> trong ca</td><td>—</td><td><a href="annex-120-authority-matrix.html#cdr-F1">F1</a></td><td><span class="role-code">ITA</span>+<span class="role-code">ESA</span>+<span class="role-code">PD</span></td><td><a download="" href="../../../../forms/frm-100-sales/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a></td><td>Outage chặn truy xuất, release chất lượng, dispatch hoặc đóng giao dịch ERP.</td></tr>
+<tr><td>15</td><td>Climate disruption — vận chuyển/năng lượng</td><td>Bão/lũ ảnh hưởng giao hàng ≥ <<TH:NEED-REVIEW: 2 ngày>></td><td>—</td><td><a href="annex-120-authority-matrix.html#cdr-F6">F6</a></td><td><span class="role-code">CEO</span>+<span class="role-code">SCM</span></td><td><a download="" href="../../../../forms/frm-100-sales/FRM-124_Climate_Change_Assessment_Record.xlsx">FRM-124</a></td><td>Ảnh hưởng khách hàng chiến lược, mất điện dài hoặc cần đổi tuyến giao hàng.</td></tr>
+<tr><td>16</td><td>Audit nonconformity tại Internal Audit</td><td>Major NC ≥ <<TH:NEED-REVIEW: 1>></td><td>—</td><td><a href="annex-120-authority-matrix.html#cdr-F4">F4</a></td><td><span class="role-code">QA</span>+<span class="role-code">CEO</span></td><td><a download="" href="../../../../forms/frm-900-admin/FRM-901_Internal_Audit_Checklist.xlsx">FRM-901</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td><td>NC chạm hệ thống phát hành, traceability, khách hàng hoặc rủi ro chứng nhận.</td></tr>
+<tr><td>17</td><td>Customer property bị hỏng/mất</td><td>Khách property loss &gt; <<TH:NEED-REVIEW: 5 triệu>></td><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-E7">E7</a></td><td><span class="role-code">CS</span>+<span class="role-code">QA</span>+<span class="role-code">CEO</span></td><td><a download="" href="../../../../forms/frm-200-purchase/FRM-221_Customer_Property_Register.xlsx">FRM-221</a> · <a href="../../../sops/02-SOP-200/sop-203-customer-property-control.html">SOP-203</a></td><td>Tài sản là vật tư độc quyền, tooling khách hàng hoặc có ràng buộc bồi hoàn.</td></tr>
+<tr><td>18</td><td>CoC dispute — khách reject CoC sau giao</td><td>Khách phản đối CoC ≤ <<TH:NEED-REVIEW: 30 ngày>></td><td>G7</td><td><a href="annex-120-authority-matrix.html#cdr-D8">D8</a></td><td><span class="role-code">QA</span>+<span class="role-code">CEO</span></td><td><a download="" href="../../../../forms/frm-600-inspection/FRM-641_Final_Inspection_Report.xlsx">FRM-641</a> · <a download="" href="../../../../forms/frm-600-inspection/FRM-642_Final_Inspection_and_CoC_Register.xlsx">FRM-642</a></td><td>CoC sai revision, thiếu traceability hoặc khách dừng nhận hàng kế tiếp.</td></tr>
+<tr><td>19</td><td>Engineering Change Order khẩn (job đang chạy)</td><td>ECO trong khi job ≥G3, ảnh hưởng setup</td><td>G1+G3</td><td><a href="annex-120-authority-matrix.html#cdr-B3">B3</a> + <a href="annex-120-authority-matrix.html#cdr-C4">C4</a></td><td><span class="role-code">ENGM</span>+<span class="role-code">QA</span></td><td><a download="" href="../../../../forms/frm-100-sales/FRM-102_Document_Change_Request.xlsx">FRM-102</a> · <a download="" href="../../../../forms/frm-100-sales/FRM-162_Change_Impact_Matrix.xlsx">FRM-162</a> · <a href="../../../sops/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td><td>Đổi setup làm ảnh hưởng FAI, tooling, chương trình NC hoặc cam kết giao hàng.</td></tr>
+<tr><td>20</td><td>Phá băng lịch — re-priority khách VIP</td><td>Khách VIP yêu cầu rút ngắn lead-time ≥ <<TH:NEED-REVIEW: 3 ngày>></td><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-C3">C3</a> + <a href="annex-120-authority-matrix.html#cdr-A6">A6</a></td><td><span class="role-code">PD</span>+<span class="role-code">CEO</span></td><td><a download="" href="../../../../forms/frm-500-production/FRM-502_Daily_Dispatch_List.xlsx">FRM-502</a> · <a download="" href="../../../../forms/frm-200-purchase/FRM-212_Customer_Change_Request.xlsx">FRM-212</a></td><td>Re-priority làm trễ job khác, cần OT vượt cap hoặc phát sinh CCR thương mại.</td></tr>
+</tbody>
+</table></div>
+
+<h2 class="h2" id="p2">2. Quy tắc dùng playbook</h2>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Playbook là điểm vào tra cứu nhanh; quyết định cuối vẫn lấy theo CDR trong ANNEX-120 và trách nhiệm RACI trong ANNEX-121.</div></div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Nếu tình huống không khớp mã CDR, người nhận sự cố phải leo thang TOP_MGMT để bổ sung CDR; không tự tạo thẩm quyền mới trong ca.</div></div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi áp dụng playbook phải để lại log tại FRM tương ứng trong hàng tình huống; nếu dùng phó/dự phòng, ghi thêm FRM-504 hoặc kênh bàn giao tương đương.</div></div>
+
+</div></div></div></div></div>
+</body></html>
