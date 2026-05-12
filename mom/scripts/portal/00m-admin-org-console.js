@@ -631,9 +631,11 @@
     var active = activeEmployees(employees || []);
     var groupImage = firstText(meta.org_chart_image, meta.image_url, meta.image_data_url, meta.photo_url);
     var groupIcon = firstText(meta.org_chart_icon, meta.icon, positionIcon(p && p.position_title));
-    var personImage = active.length === 1 ? employeeAvatarUrl(active[0]) : '';
+    var single = active.length === 1 ? active[0] : null;
+    var personImage = single ? employeeAvatarUrl(single) : '';
+    var personIcon = single ? employeeAvatarLabel(single, employeeDisplayName(single)) : '';
     return {
-      icon: groupIcon,
+      icon: single ? firstText(personIcon, groupIcon) : groupIcon,
       image: active.length === 1 ? personImage : groupImage
     };
   }
@@ -3275,4 +3277,9 @@
     reload: function(){ return loadAll(true); },
     _internals: { safeCreate: safeCreate, safeUpdate: safeUpdate, safeDelete: safeDelete, mutate: mutate, tolerantParseJson: tolerantParseJson }
   };
+  window.addEventListener('admin:users:updated', function(ev){
+    S.users = ev && ev.detail && Array.isArray(ev.detail.users) ? ev.detail.users : (Array.isArray(window.USERS) ? window.USERS : []);
+    S.employeeProfiles = mergeEmployeeProfiles(S.users, Array.isArray(window.USERS) ? window.USERS : []);
+    if (S.loaded) indexData();
+  });
 })();
