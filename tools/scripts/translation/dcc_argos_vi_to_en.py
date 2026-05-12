@@ -129,6 +129,30 @@ VIETNAMESE_CHAR_RE = re.compile(r"[àáạảãăắằẳẵặâấầẩẫ�
 PROTECTED_LITERAL_PATTERNS = [
     re.compile(r"%[A-Za-z]"),
     re.compile(r"\b\d+(?:[.,]\d+)?\s*%"),
+    # Capture parenthesised abbreviations AS A SINGLE UNIT before the bare
+    # abbreviation patterns below get to them.
+    #
+    # Why this rule exists: NLLB-200 (and Argos to a lesser extent) is
+    # non-deterministically prone to hallucinating a sentence boundary
+    # between Vietnamese text and a protected placeholder when the
+    # placeholder is wrapped in parens but only its inner symbol is
+    # protected. Example:
+    #
+    #   src:  "tỷ lệ đạt ngay từ lần đầu (FPY)"
+    #   bare protect: "tỷ lệ đạt ngay từ lần đầu (__DCC_LITERAL_47__)"
+    #   NLLB out:    "Yield From the very beginning.__DCC_LITERAL_47__)"
+    #   restored:    "Yield From the very beginning.FPY)"   ← opening "(" lost
+    #
+    # The model effectively decides the space + "(" before a placeholder is
+    # a sentence end and substitutes "." for the "(". By protecting the
+    # whole "(ABBR)" group as one literal we remove the seam NLLB drops
+    # tokens through. The closing ")" is preserved as part of the same
+    # protected span, so the restored text is always "<phrase> (ABBR)".
+    #
+    # Allow optional inner whitespace and standalone abbreviations of 2..8
+    # uppercase chars so terms like "(FPY)", "(WIP)", "(CAPA)", "(KPI)",
+    # "(OTD)", "(MRR)" are all covered.
+    re.compile(r"\(\s*[A-Z]{2,8}\s*\)"),
     re.compile(r"\b(?:Ac/Re|AQL|QPL|SSOT|SoD|SoR|M365|ToolID|PackID|EvidenceUrl|FIFO|FEFO|COC|FAI|NCR|CAPA|CTQ|FOD|WCS|WIP|QMS|PDF|HTML|UAT|CNC|CAM|DFM|ERP|MRB|MSA|GRR|SPC|OJT|LPA|Qe|nST|PoU-WI|eoe/eofe|Gage|Gauge|Final|Released|Accept|Reject|HOLD|Job)\b", re.I),
     re.compile(r"\b[A-Za-z]{1,8}/[A-Za-z]{1,8}(?:/[A-Za-z]{1,8})*\b"),
     re.compile(r"§\s*\d+(?:\.\d+)+"),
@@ -136,6 +160,30 @@ PROTECTED_LITERAL_PATTERNS = [
     re.compile(r"\b(?:SOP|WI|ANNEX|FRM|POL|TRN|JD|QMS-MAN|SYS-OPS|MRR|OJT|C\d{2}-L\d)\b(?:[-_/A-Z0-9.]*)", re.I),
     re.compile(r"\b[A-Z]{2,6}\b"),
 ]
+
+# Safety-net repair patterns applied AFTER translation + literal restore.
+# Catch the residual NLLB failure mode where the parenthesised-abbreviation
+# protection above does not fire (e.g. lowercase or mixed-case acronyms that
+# fall through PROTECTED_LITERAL_PATTERNS) and the model still drops the
+# opening "(" while substituting "." for the leading space. The match
+# requires a closing ")" so we never rewrite legitimate sentence endings.
+POSTPROCESS_PAREN_REPAIR_PATTERNS = [
+    # "beginning.FPY)" → "beginning (FPY)"  — also handles "beginning .FPY)"
+    re.compile(r"(?<=\w)\s*\.\s*([A-Z]{2,8})\)"),
+]
+
+
+def repair_lost_open_paren(text: str) -> str:
+    """Restore "(ABBR)" pairs the MT engine corrupted into ".ABBR)".
+
+    Idempotent — running twice produces the same result. Only fires when the
+    closing ")" is already present, so it cannot fabricate parens around
+    text that was never wrapped in them.
+    """
+    repaired = text
+    for pattern in POSTPROCESS_PAREN_REPAIR_PATTERNS:
+        repaired = pattern.sub(lambda m: " (" + m.group(1) + ")", repaired)
+    return repaired
 CORE_PHRASES: List[Tuple[str, str]] = [
     ("Dùng khi", "Use when"),
     ("Áp dụng khi", "Applies when"),
@@ -839,6 +887,11 @@ def restore_literals(text: str, literals: Dict[str, str]) -> str:
 
 def cleanup_translation(text: str, *, strip: bool = True) -> str:
     cleaned = text
+    # Repair "(ABBR)" pairs the MT engine corrupted into ".ABBR)" before
+    # whitespace normalisation collapses the inserted period further. Runs
+    # first because the regex anchors on the trailing ")" which subsequent
+    # rules must leave intact.
+    cleaned = repair_lost_open_paren(cleaned)
     cleaned = re.sub(r"\s+([,.;:!?])", r"\1", cleaned)
     cleaned = re.sub(r"([(\[])\s+", r"\1", cleaned)
     cleaned = re.sub(r"\s+([)\]])", r"\1", cleaned)
