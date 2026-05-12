@@ -101,11 +101,15 @@ install_ttyd() {
 write_wrapper_scripts() {
   cat > /usr/local/bin/hesem-terminal-primary <<PRIMARY
 #!/usr/bin/env bash
-set -euo pipefail
 export TERM="xterm-256color"
+export COLORTERM="truecolor"
+export LANG="${LANG:-en_US.UTF-8}"
 cd "${APP_DIR}" 2>/dev/null || cd /root
 if command -v tmux >/dev/null 2>&1; then
-  exec tmux new-session -A -s hesem-ops
+  # -D detaches all other clients so this connection owns the terminal size.
+  # Without -D, tmux constrains the session to the smallest attached client
+  # (e.g. a noVNC console at 80x24), making output invisible in a wider browser.
+  exec tmux new-session -A -D -s hesem-ops
 fi
 exec bash -l
 PRIMARY
@@ -150,7 +154,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=${APP_DIR}
-ExecStart=/usr/local/bin/ttyd -i 127.0.0.1 -p ${PRIMARY_PORT} -H X-Remote-User -W -O -b /ops/terminal/primary/ -t rendererType=webgl -t disableLeaveAlert=true /usr/local/bin/hesem-terminal-primary
+ExecStart=/usr/local/bin/ttyd -i 127.0.0.1 -p ${PRIMARY_PORT} -H X-Remote-User -W -O -b /ops/terminal/primary/ -t rendererType=canvas -t disableLeaveAlert=true /usr/local/bin/hesem-terminal-primary
 Restart=always
 RestartSec=2
 
@@ -166,7 +170,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory=${APP_DIR}
-ExecStart=/usr/local/bin/ttyd -i 127.0.0.1 -p ${READONLY_PORT} -H X-Remote-User -O -b /ops/terminal/readonly/ -t rendererType=webgl -t disableLeaveAlert=true /usr/local/bin/hesem-terminal-readonly
+ExecStart=/usr/local/bin/ttyd -i 127.0.0.1 -p ${READONLY_PORT} -H X-Remote-User -O -b /ops/terminal/readonly/ -t rendererType=canvas -t disableLeaveAlert=true /usr/local/bin/hesem-terminal-readonly
 Restart=always
 RestartSec=2
 
@@ -221,6 +225,7 @@ location ^~ /ops/terminal/primary/ {
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
     proxy_read_timeout 86400;
+    proxy_send_timeout 86400;
     proxy_buffering off;
     proxy_pass http://127.0.0.1:__PRIMARY_PORT__;
 }
@@ -237,6 +242,7 @@ location ^~ /ops/terminal/readonly/ {
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
     proxy_read_timeout 86400;
+    proxy_send_timeout 86400;
     proxy_buffering off;
     proxy_pass http://127.0.0.1:__READONLY_PORT__;
 }
