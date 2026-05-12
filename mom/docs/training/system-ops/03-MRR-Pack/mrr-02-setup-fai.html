@@ -56,8 +56,65 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
      data-dcc-doc-code="MRR-02"
      data-dcc-locale="vi"
      data-dcc-logo="../../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;MRR-02&quot;,&quot;title&quot;:&quot;Phát hiện lỗi sớm (STOP/TẠM GIỮ/CHẶN)&quot;,&quot;subtitle&quot;:null,&quot;doc_type&quot;:&quot;REF&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
-
+     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;MRR-02&quot;,&quot;title&quot;:&quot;Setup &amp; FAI (Kiểm tra mẫu đầu tiên)&quot;,&quot;subtitle&quot;:&quot;MRR — Hồ sơ setup máy CNC và phê duyệt chạy lô&quot;,&quot;doc_type&quot;:&quot;REF&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;PROD&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
+<div class="doc-content" id="docContent">
+<div class="note-blue"><p><b>Vị trí trong chuỗi G0-G7:</b> MRR-02 đứng ngay sau bộ hồ sơ lệnh sản xuất và trước MRR-03 đo kiểm. Cổng này chỉ cho chạy lô khi setup đã được xác nhận và mẫu đầu tiên đạt yêu cầu.</p><p class="small">Link nhanh: <a href="mrr-01-job-dossier.html">MRR-01 Job Dossier</a> | <a href="mrr-03-inspection-measurement.html">MRR-03 Inspection Measurement</a> | <a href="../01-System-Guides/SYS-OPS-12.html">SYS-OPS-12 kiểm soát REV và tài liệu hiện trường</a> | <a href="../../templates/evidence-naming-rule.html">TRN-ACA-EVID-01</a>.</p></div>
+<p class="lead">MRR-02 dùng tại máy CNC khi Setup, Operator và QC cùng xác nhận chương trình, dao, đồ gá, gốc tọa độ, dụng cụ đo và phiếu FAI. Nếu mẫu đầu chưa đạt hoặc chưa có bằng chứng, lệnh phải giữ tại trạm, không chuyển sang chạy lô.</p>
+<div class="card">
+<h2>Bảng kiểm MRR (Tối thiểu Bắt buộc Hồ sơ)</h2>
+<table class="table"><thead><tr><th>STT</th><th>Hồ sơ</th><th>Mã biểu mẫu / mẫu</th><th>Người chịu trách nhiệm</th><th>Nơi lưu / chu kỳ</th></tr></thead><tbody>
+<tr><td>1</td><td>Setup sheet ký bởi Operator và Tổ trưởng, có dao, offset, gốc tọa độ, lực kẹp, dung dịch cắt và cảnh báo an toàn.</td><td>FRM-MRR-02-01 / Setup sheet</td><td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Kỹ thuật viên setup)"><span class="entity-code role-code">SET</span></a> + <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Trưởng ca)"><span class="entity-code role-code">SL</span></a></td><td>03_PRODUCTION/SETUP/; mỗi lần setup hoặc đổi dao trọng yếu.</td></tr>
+<tr><td>2</td><td>Phiếu kiểm dao trước setup: tình trạng lưỡi, đường kính bù trừ, chiều dài dao, holder và số vị trí ổ dao.</td><td>FRM-MRR-02-02 / Tool pre-check</td><td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-tool-crib-tool-storekeeper.html" title="Tool Crib / Tool Storekeeper (Thủ kho dao cụ)"><span class="entity-code role-code">TOOL</span></a> + SET</td><td>03_PRODUCTION/TOOLING/; trước khi cắt phôi đầu.</td></tr>
+<tr><td>3</td><td>Chứng nhận hiệu chuẩn của panme, thước cặp, đồng hồ so, dưỡng kiểm hoặc CMM dùng cho FAI.</td><td>FRM-MRR-02-03 / Gage calibration pack</td><td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html" title="Metrology and Calibration Specialist (Chuyên viên đo lường và hiệu chuẩn)"><span class="entity-code role-code">MCS</span></a></td><td>04_QUALITY/GAGE/; kiểm hạn trước khi đo.</td></tr>
+<tr><td>4</td><td>Phiếu FAI theo form HESEM hoặc AS9102 tương đương, gồm đặc tính, phương pháp đo, kết quả và phán định.</td><td>FRM-MRR-02-04 / FAI form</td><td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qc-inspector-cmm-programmer-operator.html" title="QC Inspector / CMM Programmer-Operator (Nhân viên QC / lập trình viên - vận hành CMM)"><span class="entity-code role-code">QC</span></a></td><td>04_QUALITY/FAI/; bắt buộc trước khi cho chạy lô.</td></tr>
+<tr><td>5</td><td>Ảnh setup hiện trường tối thiểu 3 ảnh: gốc tọa độ, gá phôi, dao trong ổ dao và tem nhận diện job.</td><td>FRM-MRR-02-05 / Setup photo log</td><td>SET + Operator</td><td>03_PRODUCTION/SETUP-PHOTO/; chụp trước chạy mẫu đầu.</td></tr>
+<tr><td>6</td><td>Phiếu chứng nhận chương trình NC: REV, checksum, máy áp dụng, người lập, người review và trạng thái phát hành.</td><td>FRM-MRR-02-06 / NC program release</td><td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lập trình viên CAM / NC)"><span class="entity-code role-code">CAM</span></a></td><td>03_PRODUCTION/NC-PROGRAM/; khóa theo REV.</td></tr>
+<tr><td>7</td><td>Bảng kiểm setup không quá 15 mục, ký bởi Setup, Operator, Tổ trưởng và QC khi có CTQ.</td><td>FRM-MRR-02-07 / Setup checklist</td><td>SET + SL + QC</td><td>03_PRODUCTION/SETUP/; lưu cùng setup sheet.</td></tr>
+<tr><td>8</td><td>Mẫu vật FAI vật lý được đánh số thứ tự đầu lô, gắn job, REV, ngày giờ và người đo.</td><td>FRM-MRR-02-08 / FAI sample tag</td><td>Operator + QC</td><td>Khay FAI hoặc tủ mẫu; giữ theo thời hạn khách/hệ thống.</td></tr>
+<tr><td>9</td><td>Báo cáo đo CMM hoặc đo tay cho mọi CTQ, ghi rõ thiết bị, chương trình đo, điều kiện môi trường nếu áp dụng.</td><td>FRM-MRR-02-09 / CMM manual report</td><td>QC</td><td>04_QUALITY/FAI/; lưu cùng phiếu FAI.</td></tr>
+<tr><td>10</td><td>Phiếu duyệt chuyển sang chạy lô, có chữ ký Tổ trưởng và QC sau khi FAI đạt.</td><td>FRM-MRR-02-10 / Lot run release</td><td>SL + QC</td><td>03_PRODUCTION/RELEASE/; trước khi chạy sản lượng.</td></tr>
+<tr><td>11</td><td>NCR tại trạm nếu FAI fail, kèm ảnh, kích thước đo, số lượng mẫu ảnh hưởng và quyết định xử lý.</td><td>FRM-MRR-02-11 / Station NCR</td><td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> + QC</td><td>04_QUALITY/NCR/; mở ngay theo <a href="mrr-04-ncr-capa.html">MRR-04</a>.</td></tr>
+<tr><td>12</td><td>Biên bản thay đổi setup nếu đổi dao, offset, tốc độ, bước tiến hoặc đồ gá sau FAI.</td><td>FRM-MRR-02-12 / Setup change log</td><td>SET + PE + QC</td><td>03_PRODUCTION/CHANGE-LOG/; ký trước khi chạy lại FAI.</td></tr>
+</tbody></table>
+<p class="small">Chuẩn liên quan: AS9102 cho FAI, IATF 16949 điều 8.3.4.4 và 8.5.1, ISO/IEC 17025 cho truy xuất hiệu chuẩn. Không được dùng kết quả FAI nếu thiết bị đo hết hạn hoặc chương trình NC chưa khóa REV.</p>
+</div>
+<div class="card">
+<h2>Phát hiện lỗi sớm (STOP / TẠM GIỮ / CHẶN)</h2>
+<table class="table"><thead><tr><th>Dấu hiệu</th><th>Hậu quả nếu để lọt</th><th>Hành động dừng/báo</th></tr></thead><tbody>
+<tr><td>Chương trình NC trên máy khác REV hoặc checksum với phiếu phát hành.</td><td>Cắt sai biên dạng, sai lỗ hoặc sai thứ tự nguyên công.</td><td>STOP máy, xóa chương trình sai, CAM và PE xác nhận lại trước khi tải.</td></tr>
+<tr><td>Dao mòn, sai bán kính bù trừ hoặc holder không đúng vị trí.</td><td>Kích thước lệch dần, mặt xấu, gãy dao khi chạy lô.</td><td>TẠM GIỮ setup, thay dao, cập nhật tool pre-check và chạy lại mẫu đầu.</td></tr>
+<tr><td>Dung dịch cắt quá loãng, áp lực/lưu lượng không đủ hoặc phoi bám tại vùng cắt.</td><td>Cháy dao, biến cứng bề mặt, độ nhám không đạt.</td><td>STOP cắt, chỉnh nồng độ/lưu lượng, ghi điều kiện vào setup sheet.</td></tr>
+<tr><td>Offset gốc Z hoặc gốc XY chưa được người thứ hai xác nhận.</td><td>Va dao, cắt hụt/hớ, phế mẫu đầu và mất an toàn.</td><td>Áp dụng kiểm tra hai người; Tổ trưởng ký trước khi chạy thử.</td></tr>
+<tr><td>Mẫu FAI lệch nhưng vẫn cho chạy lô vì gần đạt.</td><td>Lỗi hàng loạt, mất FPY và phải phân loại toàn bộ WIP.</td><td>CHẶN chạy lô, mở NCR, PE/QC quyết định chỉnh setup hay xin chấp thuận.</td></tr>
+<tr><td>Thiết bị đo dùng cho FAI không có chứng nhận hiệu chuẩn còn hiệu lực.</td><td>Kết quả FAI không được chấp nhận khi audit hoặc khi khách khiếu nại.</td><td>STOP đo, thay thiết bị hợp lệ, đo lại toàn bộ CTQ.</td></tr>
+<tr><td>Ảnh setup không thể hiện gốc tọa độ, gá phôi hoặc tem job.</td><td>Không tái lập được setup khi ca sau hoặc job lặp lại.</td><td>Bổ sung ảnh trước khi tháo gá; nếu đã tháo, setup lại và ghi ngoại lệ.</td></tr>
+</tbody></table>
+</div>
+<div class="card">
+<h2>Đánh giá 60 giây</h2>
+<table class="table"><thead><tr><th>Câu hỏi kiểm nhanh</th><th>Có</th><th>Không</th><th>Bằng chứng đâu?</th></tr></thead><tbody>
+<tr><td>Setup sheet đã có đủ dao, offset, gốc tọa độ, lực kẹp và dung dịch cắt?</td><td></td><td></td><td>Setup sheet ký Operator + Tổ trưởng.</td></tr>
+<tr><td>NC program đang tải lên máy có REV/checksum đúng?</td><td></td><td></td><td>NC release record + ảnh màn hình máy.</td></tr>
+<tr><td>Gage dùng cho FAI còn hạn và phù hợp dải đo?</td><td></td><td></td><td>Gage list + chứng nhận hiệu chuẩn.</td></tr>
+<tr><td>Ảnh setup đã đủ tối thiểu 3 góc bắt buộc?</td><td></td><td></td><td>Thư mục SETUP-PHOTO.</td></tr>
+<tr><td>Phiếu FAI có đủ mọi CTQ trên bản vẽ?</td><td></td><td></td><td>FAI form và báo cáo đo.</td></tr>
+<tr><td>Nếu FAI fail, NCR tại trạm đã được mở ngay?</td><td></td><td></td><td>Số NCR, ảnh lỗi, quyết định xử lý.</td></tr>
+<tr><td>Phiếu duyệt chạy lô đã ký sau FAI đạt?</td><td></td><td></td><td>Lot run release.</td></tr>
+<tr><td>Link bằng chứng đặt tên theo TRN-ACA-EVID-01?</td><td></td><td></td><td>Đường dẫn SSOT có JO, REV, ngày, số thứ tự.</td></tr>
+</tbody></table>
+</div>
+<div class="card">
+<h2>Ký xác nhận</h2>
+<table class="table"><thead><tr><th>Vai trò</th><th>Họ tên</th><th>Chữ ký / Ngày</th><th>Ghi chú</th></tr></thead><tbody>
+<tr><td>Operator</td><td></td><td></td><td>Xác nhận setup theo sheet và chạy mẫu đầu.</td></tr>
+<tr><td>Setup Technician</td><td></td><td></td><td>Dao, offset, đồ gá, gốc tọa độ.</td></tr>
+<tr><td>Tổ trưởng sản xuất</td><td></td><td></td><td>Cho phép chạy thử và chuyển chạy lô.</td></tr>
+<tr><td>QC/QA</td><td></td><td></td><td>FAI, gage, CTQ, NCR nếu fail.</td></tr>
+<tr><td>PE/CAM</td><td></td><td></td><td>NC program, routing, thay đổi setup.</td></tr>
+</tbody></table>
+</div>
+</div>
+</div></div></div>
 
 <script src="../../../../assets/app.js"></script>
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>

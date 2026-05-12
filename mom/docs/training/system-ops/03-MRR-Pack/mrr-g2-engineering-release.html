@@ -56,8 +56,68 @@ td, th { max-width: 400px; overflow-wrap: break-word; word-wrap: break-word; }
      data-dcc-doc-code="MRR-G2"
      data-dcc-locale="vi"
      data-dcc-logo="../../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;MRR-G2&quot;,&quot;title&quot;:&quot;Phát hiện lỗi sớm (STOP/TẠM GIỮ/CHẶN)&quot;,&quot;subtitle&quot;:null,&quot;doc_type&quot;:&quot;REF&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
-
+     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;MRR-G2&quot;,&quot;title&quot;:&quot;Engineering Release (Bàn giao thiết kế vào sản xuất)&quot;,&quot;subtitle&quot;:&quot;MRR — Cổng G2 khóa REV trước khi mua vật tư và chạy job&quot;,&quot;doc_type&quot;:&quot;REF&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;ENG&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
+<div class="doc-content" id="docContent">
+<div class="note-blue"><p><b>Vị trí trong chuỗi G0-G7:</b> MRR-G2 khóa gói kỹ thuật trước khi mua vật tư, mở JO/WO hoặc phát hành chương trình. Sau G2, mọi thay đổi phải đi qua ECO/ECN hoặc phê duyệt ngoại lệ.</p><p class="small">Link nhanh: <a href="mrr-g1-contract-kickoff.html">MRR-G1 Contract Kickoff</a> | <a href="mrr-g3-production-fai-release.html">MRR-G3 Production FAI Release</a> | <a href="../01-System-Guides/SYS-OPS-12.html">SYS-OPS-12 kiểm soát tài liệu và REV</a> | <a href="../../templates/evidence-naming-rule.html">TRN-ACA-EVID-01</a>.</p></div>
+<p class="lead">MRR-G2 dùng khi PE/R&amp;D bàn giao bản vẽ, BOM, routing, PFMEA, control plan, danh sách dao/đồ gá và yêu cầu kiểm thử cho Sản xuất, Kế hoạch, Mua hàng và QC. Cổng này ngăn việc mua sai vật tư, chạy sai REV hoặc bỏ sót yêu cầu khách hàng.</p>
+<div class="card">
+<h2>Bảng kiểm MRR (Tối thiểu Bắt buộc Hồ sơ)</h2>
+<table class="table"><thead><tr><th>STT</th><th>Hồ sơ</th><th>Mã biểu mẫu / mẫu</th><th>Người chịu trách nhiệm</th><th>Nơi lưu / chu kỳ</th></tr></thead><tbody>
+<tr><td>1</td><td>Bản vẽ kỹ thuật REV chính thức, đã được PE release, QA review và Engineering Manager phê duyệt.</td><td>FRM-MRR-G2-01 / Drawing release record</td><td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html" title="Process Engineer (Kỹ sư quy trình)"><span class="entity-code role-code">PE</span></a> + <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html" title="Engineering Lead / Manager (Trưởng nhóm / quản lý kỹ thuật)"><span class="entity-code role-code">ENGM</span></a></td><td>02_ENGINEERING/DRAWING/; khóa theo REV.</td></tr>
+<tr><td>2</td><td>BOM hiện hành đã release, có checksum/version ERP và quy tắc thay thế vật liệu nếu được phép.</td><td>FRM-MRR-G2-02 / BOM release pack</td><td>PE + Kế hoạch</td><td>02_ENGINEERING/BOM/; đồng bộ trước PR/PO.</td></tr>
+<tr><td>3</td><td>Routing và PFMEA, nêu công đoạn, máy, rủi ro chính, RPN sau hành động và điểm kiểm soát.</td><td>FRM-MRR-G2-03 / Routing PFMEA</td><td>PE + QA</td><td>02_ENGINEERING/PFMEA/; cập nhật khi đổi quy trình.</td></tr>
+<tr><td>4</td><td>Control Plan đã phê duyệt, gắn CTQ, phương pháp đo, tần suất và phản ứng khi ngoài giới hạn.</td><td>FRM-MRR-G2-04 / Control Plan</td><td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html" title="Quality Engineer (Kỹ sư chất lượng)"><span class="entity-code role-code">QE</span></a></td><td>04_QUALITY/CONTROL-PLAN/; cùng REV với bản vẽ.</td></tr>
+<tr><td>5</td><td>DFMEA cho thiết kế custom hoặc phần khách yêu cầu đánh giá rủi ro thiết kế.</td><td>FRM-MRR-G2-05 / DFMEA</td><td>R&amp;D / PE</td><td>02_ENGINEERING/DFMEA/; bắt buộc khi có thiết kế mới.</td></tr>
+<tr><td>6</td><td>Tooling list và bản vẽ đồ gá, gồm dao, holder, fixture, soft jaw, chương trình đo và vật tư phụ.</td><td>FRM-MRR-G2-06 / Tooling fixture list</td><td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-cam-nc-programmer.html" title="CAM / NC Programmer (Lập trình viên CAM / NC)"><span class="entity-code role-code">CAM</span></a> + PE</td><td>02_ENGINEERING/TOOLING/; trước khi mua dao/đồ gá.</td></tr>
+<tr><td>7</td><td>Test plan và tiêu chí chấp nhận, gồm CTQ list, dung sai, mẫu đo và điều kiện môi trường nếu cần.</td><td>FRM-MRR-G2-07 / Test acceptance plan</td><td>QE + QC</td><td>04_QUALITY/TEST-PLAN/; dùng cho FAI/IPQC/FQC.</td></tr>
+<tr><td>8</td><td>Yêu cầu vật liệu đặc biệt: nhiệt luyện, bề mặt, chứng chỉ, truy xuất lot, điều kiện bảo quản.</td><td>FRM-MRR-G2-08 / Special material requirement</td><td>PE + Mua hàng</td><td>05_MATERIAL/REQUIREMENT/; trước PR/PO.</td></tr>
+<tr><td>9</td><td>Phê duyệt khách hàng đối với thay đổi trọng yếu, PPAP nếu automotive hoặc FAI nếu aerospace.</td><td>FRM-MRR-G2-09 / Customer approval evidence</td><td>CS + PE + QA</td><td>00_CUSTOMER/APPROVAL/; trước release nếu hợp đồng yêu cầu.</td></tr>
+<tr><td>10</td><td>ECO/ECN ký đầy đủ, nêu phạm vi ảnh hưởng, ngày hiệu lực, tồn kho/WIP bị ảnh hưởng và kế hoạch triển khai.</td><td>FRM-MRR-G2-10 / ECO ECN pack</td><td>ENGM + QA</td><td>02_ENGINEERING/ECO-ECN/; bắt buộc khi thay đổi REV.</td></tr>
+<tr><td>11</td><td>Document Master List snapshot tại ngày release, xác định tài liệu nào là hiện hành.</td><td>FRM-MRR-G2-11 / DML snapshot</td><td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></td><td>02_ENGINEERING/DML/; gắn với revision release.</td></tr>
+<tr><td>12</td><td>Risk register cho job mới: an toàn, chất lượng, OTD, vật tư, năng lực máy và công đoạn đặc biệt.</td><td>FRM-MRR-G2-12 / Job risk register</td><td>PE + PM + QA</td><td>02_ENGINEERING/RISK/; rà soát trước G3.</td></tr>
+<tr><td>13</td><td>Training requirements cho thao tác mới, công đoạn mới, thiết bị mới hoặc tiêu chuẩn khách mới.</td><td>FRM-MRR-G2-13 / Training requirement log</td><td>PE + HR + WKM</td><td>08_TRAINING/REQUIREMENT/; trước phân ca.</td></tr>
+<tr><td>14</td><td>Equipment qualification nếu cần máy mới, fixture mới, phần mềm đo mới hoặc công đoạn chưa từng chạy.</td><td>FRM-MRR-G2-14 / Equipment qualification</td><td>PE + Maintenance + QA</td><td>02_ENGINEERING/EQUIPMENT-QUAL/; trước chạy thử.</td></tr>
+<tr><td>15</td><td>Bản tóm tắt tác động thay đổi cho Sản xuất, QC, Mua hàng, Kho và Kế hoạch.</td><td>FRM-MRR-G2-15 / Change impact brief</td><td>ENGM + PM</td><td>02_ENGINEERING/CHANGE-IMPACT/; phát hành trong cuộc họp G2.</td></tr>
+</tbody></table>
+<p class="small">Chuẩn liên quan: ISO 9001:2015 điều 8.3, AS9100D điều 8.3.4, IATF 16949 điều 8.3 và APQP. Nếu thiếu bằng chứng phê duyệt, job không được chuyển sang mua vật tư, setup hoặc FAI.</p>
+</div>
+<div class="card">
+<h2>Phát hiện lỗi sớm (STOP / TẠM GIỮ / CHẶN)</h2>
+<table class="table"><thead><tr><th>Dấu hiệu</th><th>Hậu quả nếu để lọt</th><th>Hành động dừng/báo</th></tr></thead><tbody>
+<tr><td>BOM ERP lệch BOM bản vẽ hoặc thiếu mã thay thế được phê duyệt.</td><td>Mua sai vật tư, thiếu chi tiết lắp, sai giá thành và trễ job.</td><td>CHẶN PR/PO, PE và Kế hoạch đồng bộ BOM trước release.</td></tr>
+<tr><td>REV bản vẽ chưa khóa nhưng đã gửi cho Mua hàng hoặc CAM.</td><td>Nhà cung cấp báo giá sai, chương trình NC làm theo cấu hình chưa duyệt.</td><td>STOP phát hành, thu hồi file, phát hành lại bằng ECO/ECN.</td></tr>
+<tr><td>PFMEA có RPN cao nhưng chưa có hành động giảm rủi ro.</td><td>Lỗi thiết kế quy trình lọt xuống xưởng và lặp ở nhiều job.</td><td>TẠM GIỮ cổng G2, PE/QA chốt hành động và owner.</td></tr>
+<tr><td>Customer approval bắt buộc nhưng chưa có bằng chứng.</td><td>Chạy job không được khách chấp nhận; rủi ro chargeback.</td><td>CHẶN release; CS/PE xin phê duyệt hoặc ghi waiver chính thức.</td></tr>
+<tr><td>Control Plan không nêu CTQ hoặc không khớp bản vẽ.</td><td>QC đo thiếu đặc tính trọng yếu, FAI không có giá trị.</td><td>QA yêu cầu sửa control plan trước MRR-02/MRR-03.</td></tr>
+<tr><td>Tooling list thiếu fixture hoặc dao đặc biệt có lead time dài.</td><td>Setup trễ, phải đổi quy trình gấp hoặc gia công không ổn định.</td><td>Kế hoạch chặn lịch chạy, Mua hàng mở PR sau khi PE phê duyệt.</td></tr>
+<tr><td>Training requirement cho thao tác mới không được đưa vào kế hoạch ca.</td><td>Operator chưa đủ năng lực chạy job mới; lỗi thao tác và mất an toàn.</td><td>WKM và HR mở OJT trước khi phân người.</td></tr>
+</tbody></table>
+</div>
+<div class="card">
+<h2>Đánh giá 60 giây</h2>
+<table class="table"><thead><tr><th>Câu hỏi kiểm nhanh</th><th>Có</th><th>Không</th><th>Bằng chứng đâu?</th></tr></thead><tbody>
+<tr><td>Bản vẽ, BOM, routing, PFMEA và control plan cùng REV?</td><td></td><td></td><td>Release pack + Document Master List snapshot.</td></tr>
+<tr><td>BOM ERP có checksum/version và khớp vật liệu trên bản vẽ?</td><td></td><td></td><td>BOM release pack.</td></tr>
+<tr><td>PFMEA còn RPN cao nào chưa có hành động?</td><td></td><td></td><td>PFMEA action log.</td></tr>
+<tr><td>Control Plan có mọi CTQ, tần suất đo và reaction plan?</td><td></td><td></td><td>Control Plan đã ký.</td></tr>
+<tr><td>Tooling/fixture list đã đủ để mua và chuẩn bị máy?</td><td></td><td></td><td>Tooling fixture list + PR nếu cần.</td></tr>
+<tr><td>Khách hàng đã phê duyệt thay đổi nếu hợp đồng yêu cầu?</td><td></td><td></td><td>Email/portal approval hoặc waiver.</td></tr>
+<tr><td>Training và equipment qualification đã được xác định?</td><td></td><td></td><td>Training requirement log + equipment qualification.</td></tr>
+<tr><td>Link bằng chứng đặt tên theo TRN-ACA-EVID-01?</td><td></td><td></td><td>Đường dẫn SSOT có job, REV, ngày, số thứ tự.</td></tr>
+</tbody></table>
+</div>
+<div class="card">
+<h2>Ký xác nhận</h2>
+<table class="table"><thead><tr><th>Vai trò</th><th>Họ tên</th><th>Chữ ký / Ngày</th><th>Ghi chú</th></tr></thead><tbody>
+<tr><td>PE/R&amp;D</td><td></td><td></td><td>Bản vẽ, BOM, routing, DFMEA/PFMEA.</td></tr>
+<tr><td>Engineering Manager</td><td></td><td></td><td>Phê duyệt release và tác động thay đổi.</td></tr>
+<tr><td>QA/QC</td><td></td><td></td><td>Control Plan, CTQ, FAI/IPQC/FQC.</td></tr>
+<tr><td>Kế hoạch / Sản xuất</td><td></td><td></td><td>Khả năng chạy, máy, người, lịch.</td></tr>
+<tr><td>Mua hàng / Kho</td><td></td><td></td><td>Vật tư, công đoạn thuê ngoài, truy xuất.</td></tr>
+</tbody></table>
+</div>
+</div>
+</div></div></div>
 
 <script src="../../../../assets/app.js"></script>
 <div class="no-screen print-disclaimer" style="display:none;text-align:center;font-size:9px;color:#999;padding:8px 0;border-top:1px solid #ddd;margin-top:20px">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
