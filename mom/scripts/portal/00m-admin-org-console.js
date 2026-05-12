@@ -947,6 +947,8 @@
       + '.org-node-sub{font-family:inherit;fill:var(--text-3);font-size:10.5px}'
       + '.org-node-code{font-family:ui-monospace,monospace;fill:var(--text-3);font-size:9.5px}'
       + '.org-node-icon{font-size:18px}'
+      + '.org-position-fold{opacity:0;pointer-events:none;transition:opacity .14s ease}'
+      + '.org-position-node:hover .org-position-fold,.org-position-node:focus-within .org-position-fold{opacity:1;pointer-events:auto}'
       + '.org-chart-editing{background:color-mix(in srgb,var(--brand-primary,#4f46e5) 12%,#fff);border-color:var(--brand-primary,#4f46e5);color:var(--brand-primary,#4f46e5)}'
       + '.org-edge{fill:none;stroke:#64748b;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;opacity:.85}'
       + '.org-edge.is-highlight{stroke:var(--brand-primary,#4f46e5);stroke-width:2.4;opacity:1}'
@@ -978,6 +980,9 @@
       + '.org-assignee-status.is-active{border-color:var(--hm-success,#10b981);background:color-mix(in srgb,var(--hm-success,#10b981) 14%,transparent);color:var(--hm-success-text,#065f46)}'
       + '.org-assignee-status.is-warn{border-color:var(--hm-warning,#f59e0b);background:color-mix(in srgb,var(--hm-warning,#f59e0b) 14%,transparent);color:var(--hm-warning-text,#92400e)}'
       + '.org-assignee-status.is-bad{border-color:var(--hm-danger,#ef4444);background:color-mix(in srgb,var(--hm-danger,#ef4444) 12%,transparent);color:var(--hm-danger-text,#991b1b)}'
+      + '.org-assignment-picker{display:grid;grid-template-columns:1fr 180px;gap:8px;margin-bottom:8px}'
+      + '.org-assignment-picker input,.org-assignment-picker select{height:36px;padding:0 10px;border:1px solid var(--border-1,#e5e7eb);border-radius:8px;font-size:13px;background:var(--surface-1,#fff);color:var(--text-1)}'
+      + '.org-assignment-count{font-size:11px;color:var(--text-3);margin:-2px 0 8px}'
       + '.org-visual-form{display:grid;grid-template-columns:96px minmax(0,1fr);gap:14px;align-items:start}'
       + '.org-visual-preview{width:96px;height:96px;border:1px solid var(--border-1,#e5e7eb);border-radius:14px;display:flex;align-items:center;justify-content:center;overflow:hidden;background:var(--surface-2,#f9fafb);font-size:38px}'
       + '.org-visual-preview img{width:100%;height:100%;object-fit:cover;display:block}'
@@ -1334,7 +1339,7 @@
       + '</div>';
   }
 
-  function openPositionAssignmentsModal(positionId){
+  function openPositionAssignmentsModal(positionId, host){
     var p = positionId ? S.byPositionId[positionId] : null;
     if (!p) return;
     var u = S.byUnitId[p.hcm_org_unit_id] || null;
@@ -1383,17 +1388,17 @@
       body: body,
       width: '620px',
       buttons: [
-        { label: t('+ Add person','+ Thêm nhân sự'), variant:'primary', onClick:function(close){ close(); openAssignmentModal(positionId, null); return false; } },
-        { label: t('Icon / image','Icon / hình'), variant:'secondary', onClick:function(close){ close(); openPositionVisualModal(positionId, null); return false; } },
+        { label: t('+ Add person','+ Thêm nhân sự'), variant:'primary', onClick:function(close){ close(); openAssignmentModal(positionId, host); return false; } },
+        { label: t('Icon / image','Icon / hình'), variant:'secondary', onClick:function(close){ close(); openPositionVisualModal(positionId, host); return false; } },
         { label: t('Close','Đóng'), variant:'secondary', onClick:function(close){ close(); } }
       ]
     });
     body.addEventListener('click', function(ev){
       var btn = ev.target.closest('[data-act="remove-assignee"]');
       if (!btn) return;
-      removeAssigneeFromAttrs(btn, null, function(){
+      removeAssigneeFromAttrs(btn, host, function(){
         try { modalRef && modalRef.close && modalRef.close(); } catch(_){}
-        openPositionAssignmentsModal(positionId);
+        openPositionAssignmentsModal(positionId, host);
       });
     });
   }
@@ -1407,8 +1412,29 @@
     }
     (S.employeeProfiles || []).forEach(add);
     (S.users || []).forEach(add);
+    (S.hcmEmployees || []).forEach(add);
     if (Array.isArray(window.USERS)) window.USERS.forEach(add);
     return Object.keys(byId).map(function(id){ return byId[id]; }).sort(compareEmployeesByDisplayName);
+  }
+
+  function assignmentPersonSearchText(person){
+    var profile = employeeProfile(person) || {};
+    var meta = safeJson(person && person.metadata);
+    return [
+      employeeIdentity(person),
+      employeeDisplayName(person),
+      employeeSecondaryLabel(person),
+      person && person.username,
+      person && person.user_id_code,
+      person && person.dept,
+      person && person.title,
+      profile.username,
+      profile.dept,
+      profile.title,
+      profile.role_label,
+      meta.dept,
+      meta.title
+    ].map(function(v){ return String(v || '').toLowerCase(); }).join(' ');
   }
 
   function openAssignmentModal(positionId, host){
@@ -1422,14 +1448,17 @@
     var body = document.createElement('div');
     var today = new Date().toISOString().slice(0, 10);
     body.innerHTML = ''
-      + '<div class="org-form-row"><label>'+esc(t('Person','Nhân sự'))+'</label><select data-f="employee_id">'
-      +   people.map(function(person){
-            var id = employeeIdentity(person);
-            var name = employeeDisplayName(person);
-            var subtitle = employeeSecondaryLabel(person);
-            return '<option value="'+esc(id)+'">'+esc(name)+(subtitle ? ' · '+esc(subtitle) : '')+'</option>';
-          }).join('')
-      + '</select></div>'
+      + '<div class="org-form-row"><label>'+esc(t('Person','Nhân sự'))+'</label>'
+      +   '<div class="org-assignment-picker">'
+      +     '<input type="search" data-f="employee_search" placeholder="'+esc(t('Search name, username, employee ID, role...','Tìm tên, username, mã nhân viên, vai trò...'))+'">'
+      +     '<select data-f="employee_scope">'
+      +       '<option value="all">'+esc(t('All people','Tất cả nhân sự'))+'</option>'
+      +       '<option value="unassigned">'+esc(t('Not assigned here','Chưa gán vị trí này'))+'</option>'
+      +     '</select>'
+      +   '</div>'
+      +   '<select data-f="employee_id"></select>'
+      +   '<div class="org-assignment-count" data-role="people-count"></div>'
+      + '</div>'
       + '<div class="org-form-row"><label>'+esc(t('Assignment type','Loại bổ nhiệm'))+'</label><select data-f="assignment_type">'
       +   ['concurrent','role','primary','acting','backup','temporary'].map(function(v){
             return '<option value="'+v+'">'+esc(assignmentTypeLabel(v) || v)+'</option>';
@@ -1440,6 +1469,47 @@
       +   '<div><label>'+esc(t('Effective from','Hiệu lực từ'))+'</label><input type="date" data-f="effective_from" value="'+today+'"></div>'
       + '</div>'
       + '<div class="org-form-row"><label>'+esc(t('Note','Ghi chú'))+'</label><textarea data-f="note" rows="3" placeholder="'+esc(t('Reason or scope of the appointment','Lý do hoặc phạm vi bổ nhiệm'))+'"></textarea></div>';
+    var assignedHere = {};
+    (S.employeesByPosition[p.hcm_position_id] || []).forEach(function(row){
+      var id = employeeIdentity(row);
+      if (id && assignmentStatus(row) === 'active') assignedHere[id] = true;
+    });
+    function refreshPeopleOptions(){
+      var search = String((body.querySelector('[data-f="employee_search"]') || {}).value || '').toLowerCase().trim();
+      var scope = String((body.querySelector('[data-f="employee_scope"]') || {}).value || 'all');
+      var select = body.querySelector('[data-f="employee_id"]');
+      var count = body.querySelector('[data-role="people-count"]');
+      var previous = select ? select.value : '';
+      var filtered = people.filter(function(person){
+        var id = employeeIdentity(person);
+        if (!id) return false;
+        if (scope === 'unassigned' && assignedHere[id]) return false;
+        if (!search) return true;
+        return assignmentPersonSearchText(person).indexOf(search) >= 0;
+      });
+      if (select) {
+        select.innerHTML = filtered.slice(0, 80).map(function(person){
+          var id = employeeIdentity(person);
+          var name = employeeDisplayName(person);
+          var subtitle = employeeSecondaryLabel(person);
+          var assigned = assignedHere[id] ? ' · ' + t('already assigned here','đã gán tại đây') : '';
+          return '<option value="'+esc(id)+'">'+esc(name)+(subtitle ? ' · '+esc(subtitle) : '')+esc(assigned)+'</option>';
+        }).join('');
+        if (previous && filtered.some(function(person){ return employeeIdentity(person) === previous; })) select.value = previous;
+      }
+      if (count) {
+        count.textContent = filtered.length
+          ? t('Showing','Đang hiển thị') + ' ' + Math.min(filtered.length, 80) + ' / ' + filtered.length
+          : t('No matching person','Không có nhân sự khớp bộ lọc');
+      }
+    }
+    body.addEventListener('input', function(ev){
+      if (ev.target && ev.target.getAttribute('data-f') === 'employee_search') refreshPeopleOptions();
+    });
+    body.addEventListener('change', function(ev){
+      if (ev.target && ev.target.getAttribute('data-f') === 'employee_scope') refreshPeopleOptions();
+    });
+    refreshPeopleOptions();
 
     modal({
       title: t('Add assigned person','Thêm nhân sự được giao'),
@@ -1454,6 +1524,10 @@
             var fte = parseFloat(get('fte_fraction'));
             if (!employeeId){
               UI.toast(t('Person is required','Bắt buộc chọn nhân sự'), 'error');
+              return false;
+            }
+            if (assignedHere[employeeId]){
+              UI.toast(t('This person is already assigned to this position','Nhân sự này đã được gán vào vị trí này'), 'error');
               return false;
             }
             if (!isFinite(fte) || fte <= 0 || fte > 1.5){
@@ -2840,7 +2914,7 @@
     var detailNames = employees.length
       ? employees.map(function(e){ return employeeDisplayName(e); }).join('\n')
       : (lang() === 'en' ? 'No assigned employee' : 'Chưa có nhân sự được bổ nhiệm');
-    var g = svgEl('g', { transform:'translate('+x+','+y+')', 'data-node-id': p.hcm_position_id, 'data-node-kind':'position', style:S.chart.editing?'cursor:move':'cursor:pointer' });
+    var g = svgEl('g', { transform:'translate('+x+','+y+')', 'class':'org-position-node', 'data-node-id': p.hcm_position_id, 'data-node-kind':'position', style:S.chart.editing?'cursor:move':'cursor:pointer' });
     if (inactive) g.setAttribute('opacity','.55');
     var tooltip = svgEl('title', {});
     tooltip.textContent = [
@@ -2860,7 +2934,7 @@
     title.textContent = ellipsize(p.position_title||'?', 27);
     g.appendChild(title);
     if (childCount > 0){
-      var fold = svgEl('g', { 'data-role':'position-fold', style:'cursor:pointer' });
+      var fold = svgEl('g', { 'class':'org-position-fold', 'data-role':'position-fold', style:'cursor:pointer' });
       var foldTitle = svgEl('title', {});
       foldTitle.textContent = isCollapsed
         ? t('Expand direct reports','Mở cấp dưới trực tiếp')
@@ -2894,7 +2968,7 @@
     pillText.textContent = filled+'/'+hc + (over>0?' (+'+over+')':(open>0?' (+'+open+')':''));
     g.appendChild(pillText);
     g.addEventListener('click', function(ev){ ev.stopPropagation(); selectChartNode(host, 'position', p.hcm_position_id); });
-    g.addEventListener('dblclick', function(ev){ ev.stopPropagation(); openPositionAssignmentsModal(p.hcm_position_id); });
+    g.addEventListener('dblclick', function(ev){ ev.stopPropagation(); openPositionAssignmentsModal(p.hcm_position_id, host); });
     enablePositionDrag(g, host, p.hcm_position_id, x, y, W, H);
     rootG.appendChild(g);
   }

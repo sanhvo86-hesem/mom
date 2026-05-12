@@ -1280,7 +1280,7 @@ async function apiCallFormData(action, formData, timeoutMs=120000){
 }
 
 const ADMIN_AUTH_STATE = {
-  org: {loaded:false, loading:false, error:'', orgUnits:[], positions:[], employees:[], lastLoadedAt:0},
+  org: {loaded:false, loading:false, error:'', orgUnits:[], positions:[], employees:[], assignments:[], lastLoadedAt:0},
   roles: {loaded:false, loading:false, error:'', items:[], byCode:{}, lastLoadedAt:0},
   audit: {loaded:false, loading:false, error:'', events:[], lastLoadedAt:0}
 };
@@ -1396,6 +1396,16 @@ async function runtimeUpdate(domain, table, recordId, data, rowVersion=null){
     payload.expected_row_version = rowVersion;
   }
   return await apiRequest(runtimeApiPath(domain, table, recordId), {method:'PUT', payload});
+}
+
+async function runtimeDelete(domain, table, recordId, rowVersion=null){
+  const payload = {};
+  const headers = {};
+  if(rowVersion !== null && rowVersion !== undefined && rowVersion !== ''){
+    payload.expected_row_version = rowVersion;
+    headers['If-Match'] = String(rowVersion);
+  }
+  return await apiRequest(runtimeApiPath(domain, table, recordId), {method:'DELETE', payload, headers});
 }
 
 function safeJsonObject(value){
@@ -1587,6 +1597,166 @@ function syncUsersWithAuthoritativeOrg(){
   try { window.dispatchEvent(new CustomEvent('admin:users:updated', { detail:{ users:USERS } })); } catch(_){}
 }
 
+function adminUserEmployeeId(user){
+  return String((user && (user.employee_id || user.id || user.user_id_code || user.username)) || '').trim();
+}
+
+function orgUnitById(orgUnitId){
+  return (ADMIN_AUTH_STATE.org.orgUnits || []).find(unit=>String(unit.hcm_org_unit_id || '') === String(orgUnitId || '')) || null;
+}
+
+function orgPositionById(positionId){
+  return (ADMIN_AUTH_STATE.org.positions || []).find(position=>String(position.hcm_position_id || '') === String(positionId || '')) || null;
+}
+
+function orgUnitDisplayLabel(unit){
+  if(!unit) return '—';
+  return `${String(unit.org_unit_code || '').trim()} — ${String(unit.org_unit_name || unit.org_unit_code || '').trim()}`.replace(/^ — /, '');
+}
+
+function orgPositionDisplayLabel(position){
+  if(!position) return '—';
+  const unit = orgUnitById(position.hcm_org_unit_id);
+  const code = String(position.position_code || '').trim();
+  const title = String(position.position_title || code || '').trim();
+  const unitCode = String(unit && unit.org_unit_code || '').trim();
+  return `${unitCode ? unitCode + ' — ' : ''}${title}${code && code !== title ? ' (' + code + ')' : ''}`;
+}
+
+function userPositionAssignmentRows(user){
+  const employeeId = adminUserEmployeeId(user);
+  if(!employeeId) return [];
+  const rows = (ADMIN_AUTH_STATE.org.assignments || [])
+    .filter(row=>String(row.employee_id || '').trim() === employeeId)
+    .filter(row=>String(row.assignment_status || 'active') === 'active')
+    .map(row=>Object.assign({_synthetic:false}, row));
+  const primaryPositionId = String(user && user.hcm_position_id || '').trim();
+  if(primaryPositionId && !rows.some(row=>String(row.hcm_position_id || '') === primaryPositionId && String(row.assignment_type || '') === 'primary')){
+    const position = orgPositionById(primaryPositionId);
+    rows.unshift({
+      _synthetic:true,
+      employee_id: employeeId,
+      hcm_position_id: primaryPositionId,
+      hcm_org_unit_id: String((position && position.hcm_org_unit_id) || (user && user.hcm_org_unit_id) || ''),
+      assignment_type: 'primary',
+      assignment_status: 'active',
+      is_primary: true,
+      source_system: 'admin_user_upsert'
+    });
+  }
+  return rows.sort((a,b)=>{
+    const ap = (String(a.assignment_type || '') === 'primary' || a.is_primary === true) ? 0 : 1;
+    const bp = (String(b.assignment_type || '') === 'primary' || b.is_primary === true) ? 0 : 1;
+    if(ap !== bp) return ap - bp;
+    return orgPositionDisplayLabel(orgPositionById(a.hcm_position_id)).localeCompare(orgPositionDisplayLabel(orgPositionById(b.hcm_position_id)));
+  });
+}
+
+function assignmentTypeText(type){
+  const labels = {
+    primary: lang==='en' ? 'Primary' : 'Chính',
+    role: lang==='en' ? 'Role' : 'Vai trò',
+    concurrent: lang==='en' ? 'Concurrent' : 'Kiêm nhiệm',
+    acting: lang==='en' ? 'Acting' : 'Phụ trách',
+    backup: lang==='en' ? 'Backup' : 'Dự phòng',
+    temporary: lang==='en' ? 'Temporary' : 'Tạm thời'
+  };
+  return labels[String(type || '')] || String(type || '');
+}
+
+function userAssignmentSectionHtml(user, isEdit){
+  const employeeId = adminUserEmployeeId(user);
+  const rows = userPositionAssignmentRows(user);
+  const rowHtml = rows.length ? rows.map(row=>{
+    const position = orgPositionById(row.hcm_position_id);
+    const unit = orgUnitById(row.hcm_org_unit_id || (position && position.hcm_org_unit_id));
+    const type = String(row.assignment_type || 'concurrent');
+    const isPrimary = type === 'primary' || row.is_primary === true;
+    const source = String(row.source_system || '').trim();
+    const locked = row._synthetic || (source === 'AUTH_JSON' && isPrimary);
+    const canRemove = !locked && String(row.hcm_assignment_id || '').trim();
+    return `<div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px dashed var(--border-light,#e2e8f0)">
+      <div style="width:34px;height:34px;border-radius:10px;background:color-mix(in srgb,var(--primary,#2563eb) 12%,transparent);display:flex;align-items:center;justify-content:center;flex:0 0 auto">${isPrimary?'🎯':'➕'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-weight:800;color:var(--text-primary,#111827)">${escapeHtml(orgPositionDisplayLabel(position))}</div>
+        <div class="muted" style="font-size:11px;margin-top:2px">${escapeHtml(orgUnitDisplayLabel(unit))}</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
+          <span class="admin-inline-badge ${isPrimary?'is-active':''}">${escapeHtml(assignmentTypeText(type))}</span>
+          ${source ? `<span class="admin-inline-badge">${escapeHtml(source)}</span>` : ''}
+          ${row._synthetic ? `<span class="admin-inline-badge">${lang==='en'?'from user primary fields':'từ vị trí chính'}</span>` : ''}
+        </div>
+      </div>
+      ${canRemove ? `<button class="btn-admin secondary sm" onclick="removeUserPositionAssignmentFromModal('${escapeHtml(String(user.id || employeeId))}','${escapeHtml(String(row.hcm_assignment_id || ''))}','${escapeHtml(String(row.row_version || ''))}')">${lang==='en'?'Remove':'Xóa'}</button>` : ''}
+    </div>`;
+  }).join('') : `<div class="muted" style="font-size:12px;padding:10px 0">${lang==='en'?'No active position assignment yet. Save a primary position or add a concurrent assignment.':'Chưa có bổ nhiệm vị trí đang hoạt động. Lưu vị trí chính hoặc thêm kiêm nhiệm.'}</div>`;
+
+  const addHtml = isEdit && employeeId ? `
+    <div style="margin-top:12px;padding:12px;border:1px solid var(--border-light,#e2e8f0);border-radius:12px;background:var(--bg-subtle,#f8fafc)">
+      <div class="modal-grid-2">
+        <div class="modal-field">
+          <label>${lang==='en'?'Search position':'Tìm vị trí'}</label>
+          <input id="um-assignment-search" type="search" placeholder="${lang==='en'?'Search department, title, code':'Tìm phòng ban, chức danh, mã'}">
+        </div>
+        <div class="modal-field">
+          <label>${lang==='en'?'Assignment type':'Loại bổ nhiệm'}</label>
+          <select id="um-assignment-type">
+            <option value="concurrent">${lang==='en'?'Concurrent':'Kiêm nhiệm'}</option>
+            <option value="acting">${lang==='en'?'Acting':'Phụ trách'}</option>
+            <option value="backup">${lang==='en'?'Backup':'Dự phòng'}</option>
+            <option value="temporary">${lang==='en'?'Temporary':'Tạm thời'}</option>
+            <option value="role">${lang==='en'?'Role':'Vai trò'}</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-field" style="margin-top:8px">
+        <label>${lang==='en'?'Position':'Vị trí'}</label>
+        <select id="um-add-position"></select>
+      </div>
+      <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;margin-top:10px">
+        <div id="um-assignment-count" class="muted" style="font-size:11px"></div>
+        <button class="btn-admin primary" onclick="addUserPositionAssignmentFromModal('${escapeHtml(String(user.id || employeeId))}')">+ ${lang==='en'?'Add assignment':'Thêm bổ nhiệm'}</button>
+      </div>
+    </div>` : `<div class="muted" style="font-size:12px;margin-top:8px">${lang==='en'?'Save this user first, then add concurrent positions.':'Lưu người dùng trước, sau đó thêm vị trí kiêm nhiệm.'}</div>`;
+
+  return `<div style="border-top:1px solid var(--border-light,#e2e8f0);margin:14px 0;padding-top:14px">
+    <div style="font-size:12px;font-weight:800;color:var(--text-2);margin-bottom:10px">🧭 ${lang==='en'?'Position assignments':'Bổ nhiệm vị trí'}</div>
+    <div class="muted" style="font-size:11px;margin-bottom:8px">${lang==='en'
+      ?'Primary department/title stays above. Concurrent assignments are written to hcm_employee_position_assignments.'
+      :'Phòng ban/chức danh chính nằm phía trên. Kiêm nhiệm được ghi vào hcm_employee_position_assignments.'}</div>
+    ${rowHtml}
+    ${addHtml}
+  </div>`;
+}
+
+function refreshUserAssignmentPositionOptions(userId){
+  const user = USERS.find(x=>String(x.id)===String(userId)) || USERS.find(x=>adminUserEmployeeId(x)===String(userId)) || null;
+  const select = document.getElementById('um-add-position');
+  if(!select || !user) return;
+  const search = String(document.getElementById('um-assignment-search')?.value || '').toLowerCase().trim();
+  const assigned = new Set(userPositionAssignmentRows(user).map(row=>String(row.hcm_position_id || '')).filter(Boolean));
+  const rows = (ADMIN_AUTH_STATE.org.positions || [])
+    .filter(position=>String(position.status || 'active') !== 'inactive')
+    .filter(position=>!assigned.has(String(position.hcm_position_id || '')))
+    .filter(position=>{
+      if(!search) return true;
+      const unit = orgUnitById(position.hcm_org_unit_id);
+      return [
+        position.position_title,
+        position.position_code,
+        unit && unit.org_unit_code,
+        unit && unit.org_unit_name
+      ].map(v=>String(v || '').toLowerCase()).join(' ').includes(search);
+    })
+    .sort((a,b)=>orgPositionDisplayLabel(a).localeCompare(orgPositionDisplayLabel(b)));
+  select.innerHTML = rows.slice(0, 80).map(position=>`<option value="${escapeHtml(String(position.hcm_position_id || ''))}">${escapeHtml(orgPositionDisplayLabel(position))}</option>`).join('');
+  const count = document.getElementById('um-assignment-count');
+  if(count){
+    count.textContent = rows.length
+      ? `${lang==='en'?'Showing':'Đang hiển thị'} ${Math.min(rows.length, 80)} / ${rows.length}`
+      : (lang==='en'?'No matching unassigned position':'Không có vị trí chưa gán phù hợp');
+  }
+}
+
 function rolesForAdminGrid(){
   const seen = new Set();
   const list = [];
@@ -1679,10 +1849,12 @@ async function loadAuthoritativeOrgCatalog(options={}){
   ADMIN_AUTH_STATE.org.loading = true;
   ADMIN_AUTH_STATE.org.error = '';
   try{
-    const [orgUnitsRes, positionsRes, employeesRes] = await Promise.all([
+    const [orgUnitsRes, positionsRes, employeesRes, assignmentsRes] = await Promise.all([
       runtimeList('hcm_workforce', 'hcm_org_units', {limit:500, direction:'asc', sort:'org_unit_code'}, {timeoutMs:9000}),
       runtimeList('hcm_workforce', 'hcm_positions', {limit:500, direction:'asc', sort:'position_code'}, {timeoutMs:9000}),
-      runtimeList('hcm_workforce', 'hcm_employees', {limit:500, direction:'asc', sort:'employee_id'}, {timeoutMs:9000})
+      runtimeList('hcm_workforce', 'hcm_employees', {limit:500, direction:'asc', sort:'employee_id'}, {timeoutMs:9000}),
+      runtimeList('hcm_workforce', 'hcm_employee_position_assignments', {limit:1000, direction:'asc', sort:'employee_id'}, {timeoutMs:9000})
+        .catch(()=>({ok:false, records:[]}))
     ]);
     if(!(orgUnitsRes && orgUnitsRes.ok && Array.isArray(orgUnitsRes.records))) throw new Error(runtimeErrorMessage(orgUnitsRes, 'org_units_load_failed'));
     if(!(positionsRes && positionsRes.ok && Array.isArray(positionsRes.records))) throw new Error(runtimeErrorMessage(positionsRes, 'positions_load_failed'));
@@ -1690,6 +1862,7 @@ async function loadAuthoritativeOrgCatalog(options={}){
     ADMIN_AUTH_STATE.org.orgUnits = orgUnitsRes.records;
     ADMIN_AUTH_STATE.org.positions = positionsRes.records;
     ADMIN_AUTH_STATE.org.employees = employeesRes.records;
+    ADMIN_AUTH_STATE.org.assignments = assignmentsRes && Array.isArray(assignmentsRes.records) ? assignmentsRes.records : [];
     ADMIN_AUTH_STATE.org.loaded = true;
     ADMIN_AUTH_STATE.org.lastLoadedAt = Date.now();
     hydrateAuthoritativeOrgProjection();
@@ -10362,6 +10535,8 @@ async function showUserModal(userId){
           <div class="modal-field"></div>
         </div>
 
+        ${userAssignmentSectionHtml(u0, isEdit)}
+
         <div style="border-top:1px solid var(--border-light,#e2e8f0);margin:14px 0;padding-top:14px">
           <div style="font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:10px">📋 ${lang==='en'?'Personal Information':'Thông tin cá nhân'}</div>
           <div class="modal-grid-2">
@@ -10444,8 +10619,89 @@ async function showUserModal(userId){
     if(u0.title) titleSel.value = u0.title;
     autoRoleFromTitle();
   }
+  const assignmentSearch = modal.querySelector('#um-assignment-search');
+  if(assignmentSearch){
+    assignmentSearch.addEventListener('input', ()=>refreshUserAssignmentPositionOptions(String(u0.id || adminUserEmployeeId(u0))));
+    refreshUserAssignmentPositionOptions(String(u0.id || adminUserEmployeeId(u0)));
+  }
 
   modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});
+}
+
+async function addUserPositionAssignmentFromModal(userId){
+  try{
+    const user = USERS.find(x=>String(x.id)===String(userId)) || USERS.find(x=>adminUserEmployeeId(x)===String(userId)) || null;
+    if(!user){
+      showToast(lang==='en'?'⚠ User not found':'⚠ Không tìm thấy người dùng');
+      return;
+    }
+    const employeeId = adminUserEmployeeId(user);
+    const positionId = String(document.getElementById('um-add-position')?.value || '').trim();
+    const assignmentType = String(document.getElementById('um-assignment-type')?.value || 'concurrent').trim();
+    const position = orgPositionById(positionId);
+    if(!employeeId || !position){
+      showToast(lang==='en'?'⚠ Select a valid position':'⚠ Chọn vị trí hợp lệ');
+      return;
+    }
+    const duplicate = userPositionAssignmentRows(user).some(row=>String(row.hcm_position_id || '') === positionId && String(row.assignment_status || 'active') === 'active');
+    if(duplicate){
+      showToast(lang==='en'?'⚠ This user is already assigned to that position':'⚠ Người dùng đã được bổ nhiệm vị trí này');
+      return;
+    }
+    const res = await runtimeCreate('hcm_workforce', 'hcm_employee_position_assignments', {
+      employee_id: employeeId,
+      hcm_position_id: positionId,
+      hcm_org_unit_id: String(position.hcm_org_unit_id || ''),
+      assignment_type: ['concurrent','acting','backup','temporary','role'].includes(assignmentType) ? assignmentType : 'concurrent',
+      assignment_status: 'active',
+      is_primary: false,
+      fte_fraction: 1,
+      effective_from: new Date().toISOString().slice(0, 10),
+      source_system: 'ADMIN_USER_MODAL',
+      source_record_id: `user-modal:${String(user.username || employeeId).slice(0, 40)}:${positionId.slice(0, 36)}`,
+      payload_schema_version: '1.0',
+      metadata: {
+        username: String(user.username || ''),
+        name: String(user.name || ''),
+        position_title: String(position.position_title || ''),
+        created_from: 'admin_user_modal'
+      }
+    });
+    if(!(res && res.ok && res.record)){
+      showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Add assignment failed':'Thêm bổ nhiệm thất bại'));
+      return;
+    }
+    showToast(lang==='en'?'✅ Assignment added':'✅ Đã thêm bổ nhiệm');
+    await loadAuthoritativeOrgCatalog({force:true});
+    showUserModal(String(user.id || employeeId));
+  }catch(e){
+    console.error(e);
+    showToast(lang==='en'?'⚠ Add assignment failed':'⚠ Thêm bổ nhiệm thất bại');
+  }
+}
+
+function removeUserPositionAssignmentFromModal(userId, assignmentId, rowVersion=''){
+  const user = USERS.find(x=>String(x.id)===String(userId)) || USERS.find(x=>adminUserEmployeeId(x)===String(userId)) || null;
+  if(!user || !assignmentId) return;
+  showAdminConfirmModal(
+    lang==='en'?'Remove this position assignment?':'Xóa bổ nhiệm vị trí này?',
+    lang==='en'?'Remove this assignment from the user.':'Xóa bổ nhiệm này khỏi người dùng.',
+    async function(){
+      try{
+        const res = await runtimeDelete('hcm_workforce', 'hcm_employee_position_assignments', assignmentId, rowVersion || null);
+        if(!(res && res.ok)){
+          showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Remove assignment failed':'Xóa bổ nhiệm thất bại'));
+          return;
+        }
+        showToast(lang==='en'?'✅ Assignment removed':'✅ Đã xóa bổ nhiệm');
+        await loadAuthoritativeOrgCatalog({force:true});
+        showUserModal(String(user.id || adminUserEmployeeId(user)));
+      }catch(e){
+        console.error(e);
+        showToast(lang==='en'?'⚠ Remove assignment failed':'⚠ Xóa bổ nhiệm thất bại');
+      }
+    }
+  );
 }
 
 async function saveUserFromModal(userId){
@@ -10558,6 +10814,7 @@ async function saveUserFromModal(userId){
       }
       showToast(lang==='en'?'✅ Saved':'✅ Đã lưu');
       closeModal();
+      await loadAuthoritativeOrgCatalog({force:true});
       await refreshAdminUserRuntimeProjection();
     }else{
       const errCode = res && (res.message || res.error) ? (res.message || res.error) : '';
@@ -11703,6 +11960,20 @@ function renderAdminOrgChartLegacy(){
     const positionId = String(employee.hcm_position_id || '');
     if(!employeesByPosition[positionId]) employeesByPosition[positionId] = [];
     employeesByPosition[positionId].push(employee);
+  });
+  (ADMIN_AUTH_STATE.org.assignments || []).forEach(assignment=>{
+    if(String(assignment.assignment_status || 'active') !== 'active') return;
+    const employeeId = String(assignment.employee_id || '').trim();
+    const positionId = String(assignment.hcm_position_id || '').trim();
+    if(!employeeId || !positionId) return;
+    const employee = Object.assign({}, employeesByEmployeeId[employeeId] || {employee_id: employeeId}, assignment, {
+      employee_id: employeeId,
+      hcm_position_id: positionId,
+      hcm_org_unit_id: String(assignment.hcm_org_unit_id || '')
+    });
+    if(!employeesByPosition[positionId]) employeesByPosition[positionId] = [];
+    const keyExists = employeesByPosition[positionId].some(row=>String(row.employee_id || '').trim() === employeeId);
+    if(!keyExists) employeesByPosition[positionId].push(employee);
   });
   USERS.filter(u=>u.active!==false).forEach(user=>{
     const resolved = resolveAuthoritativeUserAssignment({
