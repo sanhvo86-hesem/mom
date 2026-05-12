@@ -33,9 +33,15 @@ class UserController extends BaseController
         $this->requireAdmin($me);
 
         $users = $this->store['users'] ?? [];
+        $shadowSync = new AuthUserShadowSyncService($this->rootDir);
         $sanitized = [];
         foreach ($users as $user) {
             if (!is_array($user)) continue;
+            try {
+                $shadowSync->syncUser($user);
+            } catch (Throwable $e) {
+                @error_log('[UserController] shadow list sync failed: ' . $e->getMessage());
+            }
             $sanitized[] = sanitize_user_for_client($user);
         }
 

@@ -436,84 +436,11 @@
       }), 40);
     });
 
-    (S.hcmEmployees || []).forEach(function(e){
-      if (!String(e.hcm_position_id || '').trim()) return;
-      put(Object.assign({}, e, {
-        assignment_status: String(e.employment_status || 'active') === 'active' ? 'active' : String(e.employment_status || 'inactive'),
-        assignment_type: 'primary',
-        is_primary: true
-      }), 20);
-    });
-
-    (S.employeeProfiles || []).forEach(function(profile){
-      profilePositions(profile).forEach(function(item){
-        var position = item.position;
-        put({
-          employee_id: employeeIdentity(profile),
-          username: profile.username,
-          name: profile.name || profile.full_name || profile.display_name || '',
-          hcm_position_id: position.hcm_position_id,
-          hcm_org_unit_id: position.hcm_org_unit_id,
-          employment_status: profile.active === false ? 'inactive' : 'active',
-          assignment_status: profile.active === false ? 'inactive' : 'active',
-          assignment_type: item.assignmentType || 'role',
-          metadata: {
-            title: profile.title || profile.jd_title || '',
-            role: profile.role || '',
-            source: 'admin_users_list'
-          }
-        }, 10);
-      });
-    });
-
     return Object.keys(byKey).map(function(k){
       var row = byKey[k];
       delete row._priority;
       return row;
     });
-  }
-
-  function profilePositions(profile){
-    var found = {};
-    function add(position, assignmentType){
-      if (!position || !position.hcm_position_id || found[position.hcm_position_id]) return;
-      found[position.hcm_position_id] = { position: position, assignmentType: assignmentType };
-    }
-
-    var explicitId = String(profile && profile.hcm_position_id || '').trim();
-    if (explicitId && S.byPositionId[explicitId]) add(S.byPositionId[explicitId], 'primary');
-    var orgUnitId = String(profile && profile.hcm_org_unit_id || '').trim();
-
-    positionTextCandidates(profile).forEach(function(text){
-      var position = positionForText(text, orgUnitId);
-      if (position) add(position, explicitId && position.hcm_position_id === explicitId ? 'primary' : 'role');
-    });
-
-    return Object.keys(found).map(function(k){ return found[k]; });
-  }
-
-  function positionTextCandidates(profile){
-    var roleSource = (profile && profile.role_source && typeof profile.role_source === 'object') ? profile.role_source : {};
-    var values = [
-      profile && profile.title,
-      profile && profile.jd_title,
-      profile && profile.position_title,
-      profile && profile.role,
-      roleSource.excel_role,
-      roleSource.excel_title,
-      roleSource.excel_role_key,
-      roleSource.role_label,
-      roleSource.role_label_vi,
-      roleSource.jd_title
-    ];
-    var out = [];
-    values.forEach(function(v){
-      v = String(v || '').trim();
-      if (!v) return;
-      out.push(v);
-      titleAliases(v).forEach(function(alias){ out.push(alias); });
-    });
-    return uniqueStrings(out);
   }
 
   function uniqueStrings(values){
@@ -523,44 +450,6 @@
       if (v && out.indexOf(v) < 0) out.push(v);
     });
     return out;
-  }
-
-  function normalizeTitleText(text){
-    text = String(text || '').toLowerCase();
-    if (text.normalize) text = text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    return text.replace(/[&/_-]+/g, ' ').replace(/[^\p{L}\p{N}\s]+/gu, ' ').replace(/\s+/g, ' ').trim();
-  }
-
-  function titleAliases(text){
-    var normalized = normalizeTitleText(text);
-    var aliases = [String(text || '').trim()];
-    var isQualityManager = normalized.indexOf('qa manager') >= 0
-      || normalized.indexOf('quality manager') >= 0
-      || normalized.indexOf('qc manager') >= 0
-      || normalized.indexOf('truong phong chat luong') >= 0
-      || normalized.indexOf('qa phong chat luong') >= 0
-      || (normalized.indexOf('chat luong') >= 0 && normalized.indexOf('truong phong') >= 0);
-    if (isQualityManager) {
-      aliases.push('QA Manager', 'Quality Manager', 'Trưởng Phòng Chất Lượng');
-    }
-    return uniqueStrings(aliases);
-  }
-
-  function positionForText(text, orgUnitId){
-    var candidates = titleAliases(text);
-    var normalized = candidates.map(normalizeTitleText).filter(Boolean);
-    if (!normalized.length) return null;
-    function matches(p){
-      var title = normalizeTitleText(p.position_title || '');
-      var code = normalizeTitleText(p.position_code || '');
-      return normalized.indexOf(title) >= 0 || normalized.indexOf(code) >= 0;
-    }
-    if (orgUnitId) {
-      var scoped = (S.positionsByUnit[orgUnitId] || []).filter(matches);
-      if (scoped.length) return scoped[0];
-    }
-    var global = (S.positions || []).filter(matches);
-    return global.length ? global[0] : null;
   }
 
   function employeeIdentity(e){
@@ -791,17 +680,17 @@
       });
     }
     function optionalUsers(){
-      if (Array.isArray(window.USERS) && window.USERS.length) {
-        return Promise.resolve({ data: window.USERS, total: window.USERS.length, raw:{ source:'window.USERS' } });
-      }
       if (typeof window.loadSharedAdminUsers === 'function') {
-        return window.loadSharedAdminUsers(false).then(function(users){
+        return window.loadSharedAdminUsers(true).then(function(users){
           users = Array.isArray(users) ? users : [];
           return { data: users, total: users.length, raw:{ source:'loadSharedAdminUsers' } };
         }).catch(function(err){
           console.warn('[admin-org] shared admin user load failed', err);
           return optionalUsersFromApi();
         });
+      }
+      if (Array.isArray(window.USERS) && window.USERS.length) {
+        return Promise.resolve({ data: window.USERS, total: window.USERS.length, raw:{ source:'window.USERS' } });
       }
       return optionalUsersFromApi();
     }
@@ -821,18 +710,21 @@
           return { data:[], total:0, raw:{ ok:false, error:(err && err.message) || 'optional_user_load_failed' } };
         });
     }
-    var p = Promise.all([
-      freshList('hcm_org_units', {limit:500, sort:'org_unit_code', direction:'asc', _t:_t}),
-      freshList('hcm_positions', {limit:500, sort:'position_code', direction:'asc', _t:_t}),
-      freshList('hcm_employees', {limit:500, sort:'employee_id',   direction:'asc', _t:_t}),
-      optionalList('hcm_workforce', 'hcm_employee_position_assignments', {limit:1000, sort:'employee_id', direction:'asc', _t:_t}),
-      optionalUsers()
-    ]).then(function(results){
+    var p = optionalUsers().then(function(userResult){
+      return Promise.all([
+        freshList('hcm_org_units', {limit:500, sort:'org_unit_code', direction:'asc', _t:_t}),
+        freshList('hcm_positions', {limit:500, sort:'position_code', direction:'asc', _t:_t}),
+        freshList('hcm_employees', {limit:500, sort:'employee_id',   direction:'asc', _t:_t}),
+        optionalList('hcm_workforce', 'hcm_employee_position_assignments', {limit:1000, sort:'employee_id', direction:'asc', _t:_t})
+      ]).then(function(results){ return { results:results, userResult:userResult }; });
+    }).then(function(bundle){
+      var results = bundle.results || [];
+      var userResult = bundle.userResult || {};
       S.units        = (results[0] && results[0].data) || [];
       S.positions    = (results[1] && results[1].data) || [];
       S.hcmEmployees = (results[2] && results[2].data) || [];
       S.assignments  = (results[3] && results[3].data) || [];
-      S.users        = (results[4] && results[4].data) || [];
+      S.users        = userResult.data || [];
       S.employeeProfiles = mergeEmployeeProfiles(
         S.users,
         Array.isArray(window.USERS) ? window.USERS : []
@@ -1611,7 +1503,7 @@
         ops.push(safeUpdate('hcm_workforce','hcm_employees', raw.employee_id, { hcm_position_id:null, hcm_org_unit_id:null }, raw.row_version));
       }
       if (!ops.length){
-        UI.toast(t('This row comes from the user profile directory and cannot be removed from the chart here.','Dòng này lấy từ hồ sơ người dùng nên không thể xóa trực tiếp trong sơ đồ.'), 'error');
+        UI.toast(t('This assignment is not persisted in the HCM assignment table. Refresh the org catalog and try again.','Bổ nhiệm này không nằm trong bảng bổ nhiệm HCM. Hãy làm mới danh mục tổ chức rồi thử lại.'), 'error');
         return;
       }
       Promise.all(ops).then(function(){

@@ -1571,28 +1571,6 @@ function resolveAuthoritativeUserAssignment(selection={}){
 
 function syncUsersWithAuthoritativeOrg(){
   if(!Array.isArray(USERS) || !USERS.length) return;
-  const employeesByEmployeeId = {};
-  (ADMIN_AUTH_STATE.org.employees || []).forEach(employee=>{
-    const employeeId = String(employee.employee_id || '');
-    if(employeeId) employeesByEmployeeId[employeeId] = employee;
-  });
-  USERS = USERS.map(user=>{
-    const employee = employeesByEmployeeId[String(user.employee_id || '')] || null;
-    const resolved = resolveAuthoritativeUserAssignment({
-      dept: user.dept,
-      title: user.title,
-      hcm_org_unit_id: String(user.hcm_org_unit_id || (employee && employee.hcm_org_unit_id) || ''),
-      hcm_position_id: String(user.hcm_position_id || (employee && employee.hcm_position_id) || '')
-    });
-    if(!resolved.orgUnitId && !resolved.positionId) return user;
-    const next = Object.assign({}, user, {
-      hcm_org_unit_id: resolved.orgUnitId,
-      hcm_position_id: resolved.positionId
-    });
-    if(resolved.deptCode) next.dept = resolved.deptCode;
-    if(resolved.positionTitle) next.title = resolved.positionTitle;
-    return next;
-  });
   window.USERS = USERS;
   try { window.dispatchEvent(new CustomEvent('admin:users:updated', { detail:{ users:USERS } })); } catch(_){}
 }
@@ -1626,25 +1604,11 @@ function orgPositionDisplayLabel(position){
 function userPositionAssignmentRows(user){
   const employeeId = adminUserEmployeeId(user);
   if(!employeeId) return [];
-  const rows = (ADMIN_AUTH_STATE.org.assignments || [])
+  return (ADMIN_AUTH_STATE.org.assignments || [])
     .filter(row=>String(row.employee_id || '').trim() === employeeId)
     .filter(row=>String(row.assignment_status || 'active') === 'active')
-    .map(row=>Object.assign({_synthetic:false}, row));
-  const primaryPositionId = String(user && user.hcm_position_id || '').trim();
-  if(primaryPositionId && !rows.some(row=>String(row.hcm_position_id || '') === primaryPositionId && String(row.assignment_type || '') === 'primary')){
-    const position = orgPositionById(primaryPositionId);
-    rows.unshift({
-      _synthetic:true,
-      employee_id: employeeId,
-      hcm_position_id: primaryPositionId,
-      hcm_org_unit_id: String((position && position.hcm_org_unit_id) || (user && user.hcm_org_unit_id) || ''),
-      assignment_type: 'primary',
-      assignment_status: 'active',
-      is_primary: true,
-      source_system: 'admin_user_upsert'
-    });
-  }
-  return rows.sort((a,b)=>{
+    .map(row=>Object.assign({_synthetic:false}, row))
+    .sort((a,b)=>{
     const ap = (String(a.assignment_type || '') === 'primary' || a.is_primary === true) ? 0 : 1;
     const bp = (String(b.assignment_type || '') === 'primary' || b.is_primary === true) ? 0 : 1;
     if(ap !== bp) return ap - bp;
@@ -1673,8 +1637,7 @@ function userAssignmentSectionHtml(user, isEdit){
     const type = String(row.assignment_type || 'concurrent');
     const isPrimary = type === 'primary' || row.is_primary === true;
     const source = String(row.source_system || '').trim();
-    const locked = row._synthetic || (source === 'AUTH_JSON' && isPrimary);
-    const canRemove = !locked && String(row.hcm_assignment_id || '').trim();
+    const canRemove = String(row.hcm_assignment_id || '').trim();
     return `<div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px dashed var(--border-light,#e2e8f0)">
       <div style="width:34px;height:34px;border-radius:10px;background:color-mix(in srgb,var(--primary,#2563eb) 12%,transparent);display:flex;align-items:center;justify-content:center;flex:0 0 auto">${isPrimary?'🎯':'➕'}</div>
       <div style="flex:1;min-width:0">
@@ -1683,12 +1646,11 @@ function userAssignmentSectionHtml(user, isEdit){
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">
           <span class="admin-inline-badge ${isPrimary?'is-active':''}">${escapeHtml(assignmentTypeText(type))}</span>
           ${source ? `<span class="admin-inline-badge">${escapeHtml(source)}</span>` : ''}
-          ${row._synthetic ? `<span class="admin-inline-badge">${lang==='en'?'from user primary fields':'từ vị trí chính'}</span>` : ''}
         </div>
       </div>
       ${canRemove ? `<button class="btn-admin secondary sm" onclick="removeUserPositionAssignmentFromModal('${escapeHtml(String(user.id || employeeId))}','${escapeHtml(String(row.hcm_assignment_id || ''))}','${escapeHtml(String(row.row_version || ''))}')">${lang==='en'?'Remove':'Xóa'}</button>` : ''}
     </div>`;
-  }).join('') : `<div class="muted" style="font-size:12px;padding:10px 0">${lang==='en'?'No active position assignment yet. Save a primary position or add a concurrent assignment.':'Chưa có bổ nhiệm vị trí đang hoạt động. Lưu vị trí chính hoặc thêm kiêm nhiệm.'}</div>`;
+  }).join('') : `<div class="muted" style="font-size:12px;padding:10px 0">${lang==='en'?'No active position assignment in HCM yet.':'Chưa có bổ nhiệm vị trí đang hoạt động trong HCM.'}</div>`;
 
   const addHtml = isEdit && employeeId ? `
     <div style="margin-top:12px;padding:12px;border:1px solid var(--border-light,#e2e8f0);border-radius:12px;background:var(--bg-subtle,#f8fafc)">
@@ -1721,8 +1683,8 @@ function userAssignmentSectionHtml(user, isEdit){
   return `<div style="border-top:1px solid var(--border-light,#e2e8f0);margin:14px 0;padding-top:14px">
     <div style="font-size:12px;font-weight:800;color:var(--text-2);margin-bottom:10px">🧭 ${lang==='en'?'Position assignments':'Bổ nhiệm vị trí'}</div>
     <div class="muted" style="font-size:11px;margin-bottom:8px">${lang==='en'
-      ?'Primary department/title stays above. Concurrent assignments are written to hcm_employee_position_assignments.'
-      :'Phòng ban/chức danh chính nằm phía trên. Kiêm nhiệm được ghi vào hcm_employee_position_assignments.'}</div>
+      ?'Active assignments are read from hcm_employee_position_assignments. Department/title above only selects the primary HCM assignment written by the backend.'
+      :'Bổ nhiệm đang hoạt động được đọc từ hcm_employee_position_assignments. Phòng ban/chức danh phía trên chỉ chọn bổ nhiệm chính để backend ghi vào HCM.'}</div>
     ${rowHtml}
     ${addHtml}
   </div>`;
@@ -10381,11 +10343,11 @@ async function deleteUserConfirm(userId){
 }
 
 async function refreshAdminUserRuntimeProjection(){
+  await loadUsersFromServerIfAdmin();
   await Promise.all([
     loadAuthoritativeRoleCatalog({force:true}),
     loadAuthoritativeOrgCatalog({force:true})
   ]);
-  await loadUsersFromServerIfAdmin();
   renderAdmin();
 }
 
@@ -11938,8 +11900,6 @@ function renderAdminOrgChartLegacy(){
   const positionsByUnit = {};
   const employeesByPosition = {};
   const employeesByEmployeeId = {};
-  const portalUsersByPosition = {};
-  const portalUsersByUnit = {};
   const portalUsersByEmployeeId = {};
   const unitById = {};
 
@@ -11957,9 +11917,6 @@ function renderAdminOrgChartLegacy(){
   hcmEmployees.forEach(employee=>{
     const employeeId = String(employee.employee_id || '').trim();
     if(employeeId) employeesByEmployeeId[employeeId] = employee;
-    const positionId = String(employee.hcm_position_id || '');
-    if(!employeesByPosition[positionId]) employeesByPosition[positionId] = [];
-    employeesByPosition[positionId].push(employee);
   });
   (ADMIN_AUTH_STATE.org.assignments || []).forEach(assignment=>{
     if(String(assignment.assignment_status || 'active') !== 'active') return;
@@ -11976,26 +11933,10 @@ function renderAdminOrgChartLegacy(){
     if(!keyExists) employeesByPosition[positionId].push(employee);
   });
   USERS.filter(u=>u.active!==false).forEach(user=>{
-    const resolved = resolveAuthoritativeUserAssignment({
-      dept: user.dept,
-      title: user.title,
-      hcm_org_unit_id: user.hcm_org_unit_id,
-      hcm_position_id: user.hcm_position_id
-    });
-    const unitId = String(resolved.orgUnitId || user.hcm_org_unit_id || '');
-    const positionId = String(resolved.positionId || user.hcm_position_id || '');
     const employeeId = String(user.employee_id || '').trim();
     if(employeeId){
       if(!portalUsersByEmployeeId[employeeId]) portalUsersByEmployeeId[employeeId] = [];
       portalUsersByEmployeeId[employeeId].push(user);
-    }
-    if(unitId){
-      if(!portalUsersByUnit[unitId]) portalUsersByUnit[unitId] = [];
-      portalUsersByUnit[unitId].push(user);
-    }
-    if(positionId){
-      if(!portalUsersByPosition[positionId]) portalUsersByPosition[positionId] = [];
-      portalUsersByPosition[positionId].push(user);
     }
   });
 
@@ -12020,14 +11961,6 @@ function renderAdminOrgChartLegacy(){
     if(baseLabel) return baseLabel;
     return username ? `@${username}` : 'employee';
   }
-  function portalUserDisplayLabel(user){
-    const name = String(user.name || '').trim();
-    const username = String(user.username || '').trim();
-    if(name && username && name.toLowerCase() !== username.toLowerCase()){
-      return `${name} @${username}`;
-    }
-    return name || (username ? `@${username}` : 'portal user');
-  }
   function managerDisplayLabel(employeeId){
     const normalizedEmployeeId = String(employeeId || '').trim();
     if(!normalizedEmployeeId) return '—';
@@ -12039,44 +11972,16 @@ function renderAdminOrgChartLegacy(){
   }
   function positionPeople(positionId){
     const assignedEmployees = employeesByPosition[positionId] || [];
-    const portalUsers = portalUsersByPosition[positionId] || [];
-    const linkedPortalUsernames = new Set();
-    const assignedEmployeeIds = new Set(
-      assignedEmployees
-        .map(employee => String(employee.employee_id || '').trim())
-        .filter(Boolean)
-    );
     const people = [];
 
     assignedEmployees.forEach((employee, index)=>{
       const employeeId = String(employee.employee_id || '').trim();
-      const linkedUsers = employeeId
-        ? portalUsers.filter(user => String(user.employee_id || '').trim() === employeeId)
-        : [];
-      linkedUsers.forEach(user=>{
-        const usernameKey = String(user.username || '').trim().toLowerCase();
-        if(usernameKey) linkedPortalUsernames.add(usernameKey);
-      });
       const fallbackUsers = employeeId ? (portalUsersByEmployeeId[employeeId] || []) : [];
       people.push({
         key: `employee:${employeeId || index}`,
-        label: employeeDisplayLabel(employee, linkedUsers.length ? linkedUsers : fallbackUsers),
+        label: employeeDisplayLabel(employee, fallbackUsers),
         tone: 'is-active',
-        title: [employeeId, ...linkedUsers.map(user=>`@${String(user.username || '').trim()}`).filter(Boolean)].join(' · ')
-      });
-    });
-
-    portalUsers.forEach((user, index)=>{
-      const username = String(user.username || '').trim();
-      const usernameKey = username.toLowerCase();
-      const employeeId = String(user.employee_id || '').trim();
-      if(usernameKey && linkedPortalUsernames.has(usernameKey)) return;
-      if(employeeId && assignedEmployeeIds.has(employeeId)) return;
-      people.push({
-        key: `portal:${usernameKey || employeeId || index}`,
-        label: portalUserDisplayLabel(user),
-        tone: '',
-        title: [username ? `@${username}` : '', employeeId].filter(Boolean).join(' · ')
+        title: [employeeId, ...fallbackUsers.map(user=>`@${String(user.username || '').trim()}`).filter(Boolean)].join(' · ')
       });
     });
 
@@ -12085,7 +11990,6 @@ function renderAdminOrgChartLegacy(){
   function matchesUnitSearch(unit){
     const unitId = String(unit.hcm_org_unit_id || '');
     const unitPositions = positionsByUnit[unitId] || [];
-    const deptUsers = portalUsersByUnit[unitId] || [];
     return adminContainsNeedle(filters.search, [
       unit.org_unit_code,
       unit.org_unit_name,
@@ -12100,9 +12004,7 @@ function renderAdminOrgChartLegacy(){
           const employeeId = String(employee.employee_id || '').trim();
           return employeeDisplayLabel(employee, employeeId ? (portalUsersByEmployeeId[employeeId] || []) : []);
         });
-      }),
-      ...deptUsers.map(user=>user.name),
-      ...deptUsers.map(user=>user.username)
+      })
     ]);
   }
   function isUnitVisible(unitId){
@@ -12128,14 +12030,11 @@ function renderAdminOrgChartLegacy(){
     const positionId = String(position.hcm_position_id || '');
     const activePosition = String(position.status || 'active') !== 'inactive';
     const assignedEmployees = employeesByPosition[positionId] || [];
-    const portalUsers = portalUsersByPosition[positionId] || [];
     const people = positionPeople(positionId);
     const badges = [
       `<span class="admin-inline-badge ${activePosition ? 'is-active' : 'is-inactive'}">${activePosition ? 'active' : 'inactive'}</span>`,
       `<span class="admin-inline-badge">HC ${escapeHtml(String(position.required_headcount || 1))}</span>`,
-      `<span class="admin-inline-badge">HCM ${assignedEmployees.length}</span>`,
-      `<span class="admin-inline-badge">Portal ${portalUsers.length}</span>`,
-      people.length !== (assignedEmployees.length + portalUsers.length) ? `<span class="admin-inline-badge">People ${people.length}</span>` : ''
+      `<span class="admin-inline-badge">Assignments ${assignedEmployees.length}</span>`
     ].filter(Boolean).join('');
     const personCloud = people.map(person=>`<span class="admin-inline-badge ${person.tone}"${person.title ? ` title="${escapeHtml(person.title)}"` : ''}>${escapeHtml(person.label)}</span>`).join('');
 
@@ -12162,7 +12061,6 @@ function renderAdminOrgChartLegacy(){
       .slice()
       .sort((a,b)=>String(a.org_unit_code||'').localeCompare(String(b.org_unit_code||'')));
     const active = String(unit.status || 'active') !== 'inactive';
-    const unitUsers = portalUsersByUnit[unitId] || [];
     const positionHtml = unitPositions.map(position => renderPositionCard(position)).join('');
     const childHtml = childUnits.map(child => renderOrgUnitNode(child, depth + 1)).join('');
     return `
@@ -12175,7 +12073,7 @@ function renderAdminOrgChartLegacy(){
                 <span class="admin-org-node-name">${escapeHtml(String(unit.org_unit_name||''))}</span>
                 <span class="admin-org-node-kind">${escapeHtml(String(unit.org_unit_type||'department'))}</span>
               </div>
-              <div class="admin-org-node-summary">${unitPositions.length} vị trí • ${unitUsers.length} user portal • ${childUnits.length} đơn vị con</div>
+              <div class="admin-org-node-summary">${unitPositions.length} vị trí • ${childUnits.length} đơn vị con</div>
             </div>
             <div class="admin-org-node-manager">Manager employee: <b>${escapeHtml(managerDisplayLabel(unit.manager_employee_id))}</b></div>
           </div>
@@ -12197,8 +12095,8 @@ function renderAdminOrgChartLegacy(){
       <div>
         <h3 style="font-size:14px;font-weight:700;margin:0">🏗 ${lang==='en'?'Organization chart':'Sơ đồ tổ chức authoritative'}</h3>
         <div style="font-size:11px;color:var(--text-3);margin-top:4px">${lang==='en'
-          ?'Authoritative projection from HCM org units, positions and mapped portal users.'
-          :'Projection authoritative từ HCM org units, positions và user portal đã map.'}</div>
+          ?'Authoritative projection from HCM org units, positions and hcm_employee_position_assignments.'
+          :'Projection authoritative từ HCM org_units, positions và hcm_employee_position_assignments.'}</div>
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn-admin secondary" onclick="loadAuthoritativeOrgCatalog({force:true})">🔄 ${lang==='en'?'Refresh':'Làm mới'}</button>
@@ -12206,7 +12104,7 @@ function renderAdminOrgChartLegacy(){
       </div>
     </div>
     <div class="admin-toolbar">
-      <input type="search" placeholder="Tìm đơn vị, vị trí, nhân sự portal..." value="${escapeHtml(filters.search || '')}" oninput="setAdminFilter('orgchart','search',this.value)">
+      <input type="search" placeholder="Tìm đơn vị, vị trí, nhân sự được bổ nhiệm..." value="${escapeHtml(filters.search || '')}" oninput="setAdminFilter('orgchart','search',this.value)">
       <select onchange="setAdminFilter('orgchart','status',this.value)">
         <option value="all"${filters.status === 'all' ? ' selected' : ''}>Tất cả trạng thái</option>
         <option value="active"${filters.status === 'active' ? ' selected' : ''}>Đang hoạt động</option>

@@ -710,11 +710,11 @@
             "username": "hue.bui",
             "name": "Bùi Thị Huệ",
             "password_hash": "$2y$12$jVcChcokVPBFKQW1dm9AQeXofricexclJ5/JHo.wzECyFlZ3AEWHO",
-            "role": "supply_chain_manager",
+            "role": "tool_storekeeper",
             "active": true,
             "created_at": "2026-04-09T09:58:43+00:00",
             "updated_at": "2026-04-09T09:58:43+00:00",
-            "title": "Supply Chain Manager",
+            "title": "Tool Crib / Tool Storekeeper",
             "dept": "SCM",
             "cccd": "038188010624",
             "phone": "0346021882",
@@ -722,14 +722,14 @@
             "mfa": {
                 "enabled": false
             },
-            "jd_code": "JD-SCM",
-            "jd_title": "Supply Chain Manager",
+            "jd_code": "JD-TOOL",
+            "jd_title": "Tool Crib / Tool Storekeeper",
             "role_source": {
                 "excel_dept": "WH",
-                "excel_title": "warehouse_manager",
-                "excel_role": "Warehouse Manager",
-                "excel_role_key": "warehouse_manager",
-                "mapping_reason": "Warehouse Manager mapped to the warehouse leadership JD available in the portal role model."
+                "excel_title": "tool_storekeeper",
+                "excel_role": "Tool Crib / Tool Storekeeper",
+                "excel_role_key": "tool_storekeeper",
+                "mapping_reason": "Tool crib responsibility maps to the SCM tool storekeeper position in the HCM catalog."
             },
             "employee_id": "EMPE1C115215937"
         },
