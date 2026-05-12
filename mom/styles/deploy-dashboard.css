@@ -613,7 +613,9 @@
 .dwp-stamp { grid-column: 1 / -1; font-size: 10px; color: var(--c-muted); padding-left: 30px; }
 
 .dwp-required-docs { display: flex; flex-wrap: wrap; gap: 6px; }
-.dwp-doc-chip { font-size: 11px; padding: 4px 10px; background: var(--c-brand-soft); color: var(--c-brand); border-radius: var(--r-pill); font-weight: 600; font-family: ui-monospace, SFMono-Regular, monospace; }
+.dwp-doc-chip { font-size: 11px; padding: 4px 10px; background: var(--c-brand-soft); color: var(--c-brand); border-radius: var(--r-pill); font-weight: 600; font-family: ui-monospace, SFMono-Regular, monospace; display: inline-block; margin: 2px 4px 2px 0; }
+.dwp-doc-chip-link { cursor: pointer; text-decoration: none; transition: background .15s ease, transform .12s ease, box-shadow .12s ease; }
+.dwp-doc-chip-link:hover { background: #1565c0; color: #fff; transform: translateY(-1px); box-shadow: 0 4px 10px -3px rgba(21,101,192,.45); }
 
 .dwp-issue-list { display: flex; flex-direction: column; gap: 6px; }
 .dwp-issue-row { padding: 8px 12px; background: var(--c-card); border-radius: 6px; font-size: 13px; display: flex; align-items: center; gap: 10px; }
@@ -933,15 +935,15 @@ body.dark-theme .deploy-dash .deploy-heatmap th,
   --slate-soft: #f1f5f9;
 }
 
-/* ── Hero — bright multi-color gradient với pattern overlay ─────────────── */
+/* ── Hero — EQMS navy gradient (matches portal left sidebar) ────────────── */
 .deploy-dash .deploy-hero {
   background:
-    radial-gradient(at 12% 18%, rgba(255,255,255,.28) 0, transparent 38%),
-    radial-gradient(at 88% 78%, rgba(255,255,255,.18) 0, transparent 42%),
-    linear-gradient(125deg, #4f46e5 0%, #7c3aed 32%, #db2777 64%, #f59e0b 100%);
+    radial-gradient(at 12% 18%, rgba(255,255,255,.12) 0, transparent 42%),
+    radial-gradient(at 88% 78%, rgba(255,255,255,.08) 0, transparent 46%),
+    linear-gradient(135deg, #0c2d48 0%, #134172 45%, #1565c0 100%);
   box-shadow:
-    0 18px 40px -18px rgba(79, 70, 229, .55),
-    0 4px 16px rgba(15, 23, 42, .08);
+    0 14px 32px -18px rgba(12, 45, 72, .50),
+    0 2px 10px rgba(15, 23, 42, .08);
   position: relative;
   overflow: hidden;
 }
@@ -950,8 +952,8 @@ body.dark-theme .deploy-dash .deploy-heatmap th,
   position: absolute;
   inset: 0;
   background-image:
-    radial-gradient(circle at 18px 18px, rgba(255,255,255,.10) 1.5px, transparent 1.5px);
-  background-size: 28px 28px;
+    radial-gradient(circle at 18px 18px, rgba(255,255,255,.06) 1.2px, transparent 1.2px);
+  background-size: 32px 32px;
   pointer-events: none;
   mix-blend-mode: overlay;
 }
@@ -1117,7 +1119,7 @@ body.dark-theme .deploy-dash .deploy-heatmap th,
   left: 12px; right: 12px; bottom: 0;
   height: 3px;
   border-radius: 3px 3px 0 0;
-  background: linear-gradient(90deg, var(--indigo), var(--pink));
+  background: linear-gradient(90deg, #1565c0, #0c2d48);
 }
 
 /* ── Timeline cards (Lộ trình) — colorful phase tint ──────────────────── */
@@ -1156,18 +1158,18 @@ body.dark-theme .deploy-dash .deploy-heatmap th,
 .deploy-dash .deploy-btn,
 .deploy-dash .deploy-btn-primary,
 .deploy-dash .dfd-foot-buttons button[type="submit"] {
-  background: linear-gradient(135deg, var(--indigo) 0%, var(--violet) 100%);
+  background: linear-gradient(135deg, #1565c0 0%, #0c2d48 100%);
   border: none;
   color: #fff !important;
   font-weight: 700;
   letter-spacing: .01em;
-  box-shadow: 0 4px 10px -3px color-mix(in srgb, var(--indigo) 50%, transparent);
+  box-shadow: 0 4px 10px -3px rgba(21, 101, 192, .45);
   transition: transform .12s ease, box-shadow .12s ease;
 }
 .deploy-dash .deploy-btn:hover,
 .deploy-dash .dfd-foot-buttons button[type="submit"]:hover {
   transform: translateY(-1px);
-  box-shadow: 0 6px 14px -3px color-mix(in srgb, var(--indigo) 60%, transparent);
+  box-shadow: 0 6px 14px -3px rgba(21, 101, 192, .55);
 }
 .deploy-dash .deploy-btn-reset {
   background: linear-gradient(135deg, #ef4444 0%, #ec4899 100%);
@@ -1194,7 +1196,7 @@ body.dark-theme .deploy-dash .deploy-heatmap th,
   border-top: 0 !important;
 }
 .deploy-form-dialog .dfd-head {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+  background: linear-gradient(135deg, #0c2d48 0%, #1565c0 100%);
   color: #fff;
   padding: 18px 22px;
   border-bottom: 0;

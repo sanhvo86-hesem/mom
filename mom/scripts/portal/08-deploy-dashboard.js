@@ -199,6 +199,16 @@ function deployEscape(s){
 }
 function deployNum(v){ const n = parseFloat(v); return Number.isFinite(n) ? n : 0; }
 function deployIsoToVi(iso){ if(!iso) return '—'; try{ return new Date(iso).toLocaleString('vi-VN'); }catch(_){ return iso; } }
+function deployRenderDocChip(code){
+  const safe = deployEscape(code);
+  // Reuse the portal-wide openDoc() resolver (defined in 02-state-auth-ui.js).
+  // It maps a doc-code to its file path via the DCC registry and opens the
+  // correct viewer. When unavailable (e.g. anonymous test), fall back to chip.
+  if (typeof window !== 'undefined' && typeof window.openDoc === 'function') {
+    return `<a class="dwp-doc-chip dwp-doc-chip-link" href="javascript:void(0)" onclick="openDoc('${safe}');return false;" title="Mở tài liệu ${safe}">${safe}</a>`;
+  }
+  return `<span class="dwp-doc-chip">${safe}</span>`;
+}
 function deployFmtDate(iso){ if(!iso) return '—'; try{ return new Date(iso).toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}); }catch(_){ return iso; } }
 function deployTodayIso(){ return new Date().toISOString().slice(0,10); }
 function deployGetPhaseDef(id){ return DEPLOY_CONFIG.phases.find(p=>p.id===id) || DEPLOY_CONFIG.phases[0]; }
@@ -863,7 +873,7 @@ function renderClauseCard(c){
         }).join('')}
       </div>
       <div class="iso-clause-docs">
-        ${(c.docs || []).map(d => `<span class="dwp-doc-chip">${deployEscape(d)}</span>`).join('')}
+        ${(c.docs || []).map(d => deployRenderDocChip(d)).join('')}
       </div>
     </div>
     ${hasFinding ? `<div class="iso-clause-findings">⚠ ${findings.length} phát hiện · ${findings.map(x => x.f.severity).join(', ')}</div>` : ''}
@@ -1083,7 +1093,7 @@ function renderWeekPanel(){
       <section class="dwp-section">
         <h3>Tài liệu liên quan</h3>
         <div class="dwp-required-docs">
-          ${(w.requiredDocs || []).map(code => `<span class="dwp-doc-chip">${deployEscape(code)}</span>`).join('') || '<span class="deploy-empty-inline">— (không neo tài liệu)</span>'}
+          ${(w.requiredDocs || []).map(code => deployRenderDocChip(code)).join('') || '<span class="deploy-empty-inline">— (không neo tài liệu)</span>'}
         </div>
       </section>
 

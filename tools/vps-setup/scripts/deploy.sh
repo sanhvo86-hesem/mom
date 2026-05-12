@@ -517,6 +517,21 @@ for dir in uploads online-forms allocations form-workflow/state; do
     fi
 done
 
+# Runtime config files (PHP-FPM mutates these — users.json, deploy/*.json, …).
+# The global `find -type f -exec chmod 644` above resets every file under
+# $SITE_DIR back to read-only-for-group, including the live runtime JSON we
+# just restored or bootstrapped. Without this loop, every PHP write returns
+# `api_error:server_error` on the next request. Walk RUNTIME_CONFIG_FILES (the
+# single-source-of-truth array sourced earlier) and widen each back to 664,
+# plus make sure their parent dirs are 775 (setgid by mom-vps-data/ ACL) so
+# the app can also CREATE new sidecar files (locks, .tmp, …) at write time.
+for name in "${RUNTIME_CONFIG_FILES[@]}"; do
+    live="$SITE_DIR/mom/data/config/$name"
+    live_dir="$(dirname "$live")"
+    [ -d "$live_dir" ] && chmod 775 "$live_dir" 2>/dev/null || true
+    [ -f "$live"     ] && chmod 664 "$live"     2>/dev/null || true
+done
+
 # PHP-owned runtime state must stay owned by the PHP-FPM pool user. Session
 # files fail hard when created by another UID, and login rate-limit counters
 # are written during authentication.
