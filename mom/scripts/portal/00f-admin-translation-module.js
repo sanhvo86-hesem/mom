@@ -169,9 +169,15 @@ function render() {
 
 function switchTab(id) {
   STATE.activeTab = id;
+  // Cancel any pending doc-queue poll if we're leaving the Documents tab.
+  if (id !== 'documents' && _docsPollHandle) {
+    clearTimeout(_docsPollHandle);
+    _docsPollHandle = null;
+  }
   if (id === 'usage' && !STATE.usage) loadUsage();
   if (id === 'models') loadAllModels();
   if (id === 'documents' && !STATE.documents) loadDocuments();
+  if (id === 'documents' && STATE.documents) scheduleDocsPoll();
   render();
 }
 
@@ -1124,8 +1130,57 @@ function loadDocuments() {
   if (STATE.docSearch) params.set('search', STATE.docSearch);
   if (STATE.docStateFilter) params.set('state', STATE.docStateFilter);
   api('GET', '/api/v1/dcc/admin/translation/documents?' + params.toString())
-    .then(d => { STATE.documents = d; render(); })
+    .then(d => {
+      // Detect completions vs the previous snapshot so we can toast.
+      const prevList = (STATE.documents && Array.isArray(STATE.documents.documents)) ? STATE.documents.documents : [];
+      const nextList = (d && Array.isArray(d.documents)) ? d.documents : [];
+      if (prevList.length > 0 && nextList.length > 0) {
+        const prevQueued = new Set(prevList.filter(isDocQueued).map(x => x.doc_code));
+        nextList.forEach(doc => {
+          if (prevQueued.has(doc.doc_code) && !isDocQueued(doc)) {
+            const eng = (doc.engine_version || '').replace(/_v\d+$/, '');
+            const stateLabel = doc.translation_state === 'blocked'
+              ? _t('thất bại: ' + (doc.engine_version || ''), 'failed: ' + (doc.engine_version || ''))
+              : _t('xong với ' + eng, 'completed with ' + eng);
+            toast(_t('✓ ' + doc.doc_code + ' — ' + stateLabel, '✓ ' + doc.doc_code + ' — ' + stateLabel));
+          }
+        });
+      }
+      STATE.documents = d;
+      render();
+      scheduleDocsPoll();
+    })
     .catch(err => { STATE.error = String(err.message || err); render(); });
+}
+
+// ── Async queue polling ──────────────────────────────────────────────────────
+// A retranslate now enqueues a job and returns immediately; the backend
+// worker may take several minutes. Poll the list every 20s while at least
+// one row is still in `queued_background_worker` so the admin can see
+// progress + completion without manual refresh. Polling stops automatically
+// when nothing is in flight.
+let _docsPollHandle = null;
+function isDocQueued(doc) {
+  return (doc && doc.engine_version === 'queued_background_worker');
+}
+function queuedElapsedMinutes(doc) {
+  if (!doc || !doc.translated_at) return null;
+  // PG returns "YYYY-MM-DD HH:MM:SS.fff+TZ"; Date.parse handles it.
+  const ts = Date.parse(doc.translated_at);
+  if (isNaN(ts)) return null;
+  return Math.max(0, Math.round((Date.now() - ts) / 60000));
+}
+function scheduleDocsPoll() {
+  if (_docsPollHandle) { clearTimeout(_docsPollHandle); _docsPollHandle = null; }
+  const docs = STATE.documents;
+  if (!docs || !Array.isArray(docs.documents)) return;
+  // Only poll while user is still on the Documents tab.
+  if (STATE.activeTab !== 'documents') return;
+  if (!docs.documents.some(isDocQueued)) return;
+  _docsPollHandle = setTimeout(() => {
+    _docsPollHandle = null;
+    if (STATE.activeTab === 'documents') loadDocuments();
+  }, 20_000);
 }
 
 function docStateBadgeStyle(state) {
@@ -1136,6 +1191,17 @@ function docStateBadgeStyle(state) {
     published: 'background:var(--success-bg,#e6f9ee);color:var(--success,#0a7e3a)',
   };
   return map[state] || 'background:var(--bg-2,#f5f7fb);color:var(--text-3)';
+}
+
+// Inline keyframes so the "translating" pulse works without a CSS edit.
+function ensureTxQueuedStyles() {
+  if (document.getElementById('tx-queued-styles')) return;
+  const s = document.createElement('style');
+  s.id = 'tx-queued-styles';
+  s.textContent = '@keyframes tx-queued-pulse{0%,100%{opacity:1}50%{opacity:.45}}'
+    + '.tx-queued-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--warn,#e0a000);margin-right:6px;animation:tx-queued-pulse 1.2s ease-in-out infinite;vertical-align:middle}'
+    + '.tx-queued-stuck{background:var(--danger,#c00)!important}';
+  document.head.appendChild(s);
 }
 
 function renderDocuments() {
@@ -1210,17 +1276,37 @@ function renderDocuments() {
 }
 
 function renderDocRow(doc, enabledProviders) {
+  ensureTxQueuedStyles();
   const code         = doc.doc_code;
   const srcRev       = doc.source_revision || '—';
   const trlRev       = doc.translated_revision || '—';
   const stale        = srcRev !== '—' && trlRev !== '—' && srcRev !== trlRev;
-  const retranslating = !!STATE.docRetranslating[code];
+  const queued       = isDocQueued(doc);
+  const elapsedMin   = queued ? queuedElapsedMinutes(doc) : null;
+  // After 30 min in queue the worker is almost certainly dead (codex crash,
+  // PHP-FPM kill, autoload failure). Surface a clear "stuck" warning so the
+  // admin knows to re-queue rather than wait indefinitely.
+  const stuck        = queued && elapsedMin !== null && elapsedMin >= 30;
+  const retranslating = !!STATE.docRetranslating[code] || (queued && !stuck);
   const expanded     = STATE.docExpandedOverride === code;
 
-  const engineLabel = doc.override_provider
-    ? `<div style="font-size:10px;color:var(--text-3);margin-bottom:1px;">${_t('override', 'override')}:</div>
-       <span style="color:var(--brand-primary,#0c63e7);font-weight:600;">${escapeHtml(doc.override_provider)}${doc.override_model ? ' / ' + escapeHtml(doc.override_model) : ''}</span>`
-    : `<span style="color:var(--text-2);">${escapeHtml(doc.translation_provider || '—')}${doc.engine_version ? '<br><span style="font-size:11px;color:var(--text-3);">' + escapeHtml(doc.engine_version.replace(/_v\d+$/, '')) + '</span>' : ''}</span>`;
+  let engineLabel;
+  if (queued) {
+    const elapsedTxt = elapsedMin === null
+      ? _t('vừa xếp hàng', 'just queued')
+      : (elapsedMin === 0 ? _t('< 1 phút', '< 1 min') : _t(elapsedMin + ' phút trước', elapsedMin + 'm ago'));
+    const stuckBadge = stuck
+      ? `<br><span style="font-size:11px;color:var(--danger,#c00);font-weight:600;">⚠ ${_t('Worker có thể đã chết — bấm Dịch lại để re-queue', 'Worker may have died — click Retranslate to re-queue')}</span>`
+      : '';
+    engineLabel = `<span class="tx-queued-dot${stuck ? ' tx-queued-stuck' : ''}"></span>
+       <span style="color:var(--warn,#e0a000);font-weight:600;">${_t('Đang dịch...', 'Translating...')}</span>
+       <br><span style="font-size:11px;color:var(--text-3);">${_t('bắt đầu', 'started')} ${escapeHtml(elapsedTxt)}</span>${stuckBadge}`;
+  } else {
+    engineLabel = doc.override_provider
+      ? `<div style="font-size:10px;color:var(--text-3);margin-bottom:1px;">${_t('override', 'override')}:</div>
+         <span style="color:var(--brand-primary,#0c63e7);font-weight:600;">${escapeHtml(doc.override_provider)}${doc.override_model ? ' / ' + escapeHtml(doc.override_model) : ''}</span>`
+      : `<span style="color:var(--text-2);">${escapeHtml(doc.translation_provider || '—')}${doc.engine_version ? '<br><span style="font-size:11px;color:var(--text-3);">' + escapeHtml(doc.engine_version.replace(/_v\d+$/, '')) + '</span>' : ''}</span>`;
+  }
 
   return `
     <tr class="tx-doc-row" data-doc-code="${escapeHtml(code)}"
@@ -1243,9 +1329,9 @@ function renderDocRow(doc, enabledProviders) {
         ${doc.translated_at ? escapeHtml(doc.translated_at.substr(0, 16).replace('T', ' ')) : '—'}
       </td>
       <td style="padding:9px 8px;">
-        <span style="padding:3px 8px;border-radius:4px;font-size:11px;white-space:nowrap;${docStateBadgeStyle(doc.translation_state)}">
-          ${escapeHtml(doc.translation_state || 'unknown')}
-        </span>
+        ${queued && !stuck
+          ? `<span style="padding:3px 8px;border-radius:4px;font-size:11px;white-space:nowrap;background:var(--warn-bg,#fff8e1);color:var(--warn,#e0a000);font-weight:600;">⟳ ${_t('đang dịch', 'translating')}</span>`
+          : `<span style="padding:3px 8px;border-radius:4px;font-size:11px;white-space:nowrap;${docStateBadgeStyle(doc.translation_state)}">${escapeHtml(doc.translation_state || 'unknown')}</span>`}
       </td>
       <td style="padding:9px 8px;text-align:right;white-space:nowrap;">
         <button class="tx-doc-override-toggle" data-doc-code="${escapeHtml(code)}"
@@ -1253,9 +1339,10 @@ function renderDocRow(doc, enabledProviders) {
           ${_t('Đổi engine', 'Change engine')} ${expanded ? '▲' : '▼'}
         </button>
         <button class="tx-doc-retranslate" data-doc-code="${escapeHtml(code)}"
-          ${retranslating ? 'disabled' : ''}
-          style="padding:5px 10px;border:0;border-radius:4px;background:var(--brand-primary,#0c63e7);color:#fff;cursor:${retranslating ? 'default' : 'pointer'};font-size:12px;opacity:${retranslating ? '.6' : '1'};">
-          ${retranslating ? '⟳ ' + _t('Đang dịch...', 'Translating...') : _t('Dịch lại', 'Retranslate')}
+          ${retranslating && !stuck ? 'disabled' : ''}
+          title="${stuck ? _t('Worker quá hạn — bấm để re-queue', 'Worker timeout — click to re-queue') : ''}"
+          style="padding:5px 10px;border:0;border-radius:4px;background:${stuck ? 'var(--danger,#c00)' : 'var(--brand-primary,#0c63e7)'};color:#fff;cursor:${retranslating && !stuck ? 'default' : 'pointer'};font-size:12px;opacity:${retranslating && !stuck ? '.6' : '1'};">
+          ${stuck ? '↻ ' + _t('Re-queue', 'Re-queue') : (retranslating ? '⟳ ' + _t('Đang dịch...', 'Translating...') : _t('Dịch lại', 'Retranslate'))}
         </button>
       </td>
     </tr>
