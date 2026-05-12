@@ -428,6 +428,19 @@ class AuthUserShadowSyncService
                         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                     ]
                 );
+
+                $this->syncUserPositionAssignments(
+                    $user,
+                    $employeeId,
+                    $linkage,
+                    $employmentStatus,
+                    [
+                        'org_company_code' => $orgCompanyCode,
+                        'org_legal_entity_code' => $orgLegalEntityCode,
+                        'org_plant_id' => $orgPlantId,
+                        'org_site_id' => $orgSiteId,
+                    ]
+                );
             });
         } catch (Throwable $e) {
             @error_log('[AuthUserShadowSyncService] syncUser failed: ' . $e->getMessage());
