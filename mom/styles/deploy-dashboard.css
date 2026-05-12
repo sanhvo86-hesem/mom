@@ -795,6 +795,103 @@
 .review-row-value { font-size: 13px; color: var(--c-ink); padding-left: 30px; white-space: pre-wrap; }
 .review-buttons { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
 
+/* ── Generic form dialog ──────────────────────────────────────────────── */
+.deploy-form-overlay {
+  position: fixed; inset: 0;
+  background: rgba(15, 23, 42, .56);
+  z-index: 1200;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 32px 20px;
+  overflow-y: auto;
+  animation: dwpFadeIn .15s ease;
+}
+.deploy-form-dialog {
+  width: min(720px, 100%);
+  background: var(--c-card);
+  border-radius: 14px;
+  border-top: 5px solid var(--phase-color, var(--c-brand));
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  animation: dwpSlideIn .2s cubic-bezier(.32,.72,.32,1);
+  margin: auto;
+}
+.dfd-head {
+  padding: 18px 24px 14px;
+  border-bottom: 1px solid var(--c-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  background: var(--c-card);
+}
+.dfd-head h2 { margin: 4px 0 0; font-size: 20px; font-weight: 700; }
+.dfd-desc { margin: 6px 0 0; font-size: 12px; color: var(--c-muted); }
+.dfd-form { display: flex; flex-direction: column; max-height: calc(86vh - 80px); }
+.dfd-body { padding: 16px 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; flex: 1; }
+.dfd-foot { padding: 12px 24px; border-top: 1px solid var(--c-border); background: #f8fafc; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.dfd-foot-hint { font-size: 11px; color: var(--c-muted); }
+.dfd-foot-buttons { display: flex; gap: 8px; align-items: center; }
+.dfd-field { display: flex; flex-direction: column; gap: 4px; }
+.dfd-label { font-size: 12px; color: var(--c-ink); font-weight: 600; }
+.dfd-required { color: var(--c-red); margin-left: 3px; }
+.dfd-hint { font-size: 11px; color: var(--c-muted); }
+.dfd-field input,
+.dfd-field select,
+.dfd-field textarea {
+  padding: 8px 12px;
+  font-size: 13px;
+  border: 1px solid var(--c-border);
+  border-radius: 6px;
+  font-family: inherit;
+  background: var(--c-card);
+  color: var(--c-ink);
+}
+.dfd-field input:focus,
+.dfd-field select:focus,
+.dfd-field textarea:focus { outline: none; border-color: var(--c-brand); box-shadow: 0 0 0 3px var(--c-brand-soft); }
+.dfd-field textarea { resize: vertical; min-height: 48px; }
+.dfd-static { display: flex; flex-direction: column; gap: 4px; padding: 8px 12px; background: #f8fafc; border-radius: 6px; }
+.dfd-static-label { font-size: 11px; color: var(--c-muted); text-transform: uppercase; letter-spacing: .04em; }
+.dfd-static-value { font-size: 13px; color: var(--c-ink); }
+.dfd-separator {
+  margin: 12px 0 0;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: var(--c-brand);
+  background: var(--c-brand-soft);
+  border-radius: 6px;
+}
+.dfd-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.dfd-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  background: var(--c-card);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-pill);
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+  transition: all .12s ease;
+}
+.dfd-chip input { display: none; }
+.dfd-chip:hover { border-color: var(--c-brand); }
+.dfd-chip.dfd-chip-on { background: var(--c-brand); color: #fff; border-color: var(--c-brand); font-weight: 600; }
+.dfd-checkbox { display: flex; align-items: center; gap: 8px; font-size: 13px; padding: 6px 0; cursor: pointer; }
+.dfd-checkbox input { margin: 0; }
+
+/* Ghost button variant */
+.deploy-btn-ghost { background: transparent; color: var(--c-brand); border: 1px solid var(--c-border); }
+.deploy-btn-ghost:hover:not([disabled]) { background: var(--c-brand-soft); border-color: var(--c-brand); }
+
 /* ── Dark mode shim ───────────────────────────────────────────────────── */
 body.dark-theme .deploy-dash,
 [data-theme="dark"] .deploy-dash {

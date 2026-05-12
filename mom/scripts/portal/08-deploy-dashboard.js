@@ -49,46 +49,46 @@ const DEPLOY_CONFIG = {
     {id:'ERP',  label:'Epicor / ERP',     wave:3, color:'#0f766e', owner:'ERP Owner',            handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-epicor-handbook.html',                docs:[{code:'ANNEX-115',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html'},{code:'ANNEX-118',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html'}], record:'Epicor SoR + interface logs'},
   ],
   docsByGroup: [
-    {title:'Điều phối tổng', subtitle:'Sponsor · steering · cutover lead', items:[
-      {code:'WI-106',  title:'Master plan',         path:'../mom/docs/operations/work-instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html'},
-      {code:'ANNEX-114', title:'Runbook go-live',   path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html'},
-      {code:'ANNEX-119', title:'Roadmap register',  path:'../mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html'},
-      {code:'ANNEX-117', title:'Escalation & SLA',  path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html'},
+    {title:'Điều phối tổng', subtitle:'Cho sponsor · ban điều phối · trưởng nhóm cutover', items:[
+      {code:'WI-106',  title:'Kế hoạch triển khai tổng',  path:'../mom/docs/operations/work-instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html'},
+      {code:'ANNEX-114', title:'Sổ tay vận hành Go-live', path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html'},
+      {code:'ANNEX-119', title:'Sổ đăng ký lộ trình thay đổi', path:'../mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html'},
+      {code:'ANNEX-117', title:'Ma trận leo thang & SLA', path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html'},
     ]},
-    {title:'Tiếp cận & đào tạo', subtitle:'Manager · champion · end-user', items:[
-      {code:'WI-105', title:'Document navigation',  path:'../mom/docs/operations/work-instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html'},
-      {code:'WI-103', title:'Folder routing',       path:'../mom/docs/operations/work-instructions/01-WI-100/wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html'},
-      {code:'WI-104', title:'Quick cards by role',  path:'../mom/docs/operations/work-instructions/01-WI-100/wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html'},
-      {code:'DRL-E2E', title:'Job Order drill',     path:'../mom/docs/training/content/03-Practice-Drills/drill-joborder-e2e.html'},
+    {title:'Tiếp cận & đào tạo', subtitle:'Cho trưởng phòng · champion · người dùng cuối', items:[
+      {code:'WI-105', title:'Hướng dẫn tra cứu tài liệu',   path:'../mom/docs/operations/work-instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html'},
+      {code:'WI-103', title:'Định tuyến thư mục M365',     path:'../mom/docs/operations/work-instructions/01-WI-100/wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html'},
+      {code:'WI-104', title:'Thẻ tham chiếu nhanh theo vai trò', path:'../mom/docs/operations/work-instructions/01-WI-100/wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html'},
+      {code:'DRL-E2E', title:'Bài diễn tập đơn hàng đầu-cuối', path:'../mom/docs/training/content/03-Practice-Drills/drill-joborder-e2e.html'},
     ]},
-    {title:'Tài liệu nền QMS', subtitle:'Manual · Policy · Handbook', items:[
-      {code:'MAN-001',     title:'QMS Manual',     path:'../mom/docs/system/quality-manual/qms-man-001-qms-manual.html'},
-      {code:'POL-QMS-001', title:'Quality Policy', path:'../mom/docs/system/policies/pol-qms-001-quality-policy.html'},
-      {code:'POL-QMS-002', title:'Quality Objectives', path:'../mom/docs/system/policies/pol-qms-002-quality-objectives.html'},
-      {code:'RACI',        title:'RACI master',    path:'../mom/docs/system/organization/04-RACI-Authority/raci-master-matrix.html'},
+    {title:'Tài liệu nền QMS', subtitle:'Sổ tay · Chính sách · Sổ tay phòng ban', items:[
+      {code:'MAN-001',     title:'Sổ tay QMS',          path:'../mom/docs/system/quality-manual/qms-man-001-qms-manual.html'},
+      {code:'POL-QMS-001', title:'Chính sách chất lượng', path:'../mom/docs/system/policies/pol-qms-001-quality-policy.html'},
+      {code:'POL-QMS-002', title:'Mục tiêu chất lượng', path:'../mom/docs/system/policies/pol-qms-002-quality-objectives.html'},
+      {code:'RACI',        title:'Ma trận RACI chính',  path:'../mom/docs/system/organization/04-RACI-Authority/raci-master-matrix.html'},
     ]},
-    {title:'Dashboard & bằng chứng', subtitle:'Owner · IT · governance', items:[
-      {code:'ANNEX-113', title:'Dashboard governance', path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html'},
-      {code:'ANNEX-110', title:'KPI dictionary',       path:'../mom/docs/operations/references/01-ANNEX-100/annex-110-dashboard-kpi-dictionary-and-data-model.html'},
-      {code:'WI-202',    title:'Tier meetings',        path:'../mom/docs/operations/work-instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html'},
-      {code:'WI-901',    title:'Performance dashboard',path:'../mom/docs/operations/work-instructions/09-WI-900/wi-901-performance-dashboard.html'},
+    {title:'Dashboard & bằng chứng', subtitle:'Cho data owner · IT · governance', items:[
+      {code:'ANNEX-113', title:'Quản trị dashboard',     path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html'},
+      {code:'ANNEX-110', title:'Từ điển KPI',            path:'../mom/docs/operations/references/01-ANNEX-100/annex-110-dashboard-kpi-dictionary-and-data-model.html'},
+      {code:'WI-202',    title:'Họp điều hành theo tầng', path:'../mom/docs/operations/work-instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html'},
+      {code:'WI-901',    title:'Dashboard hiệu suất',    path:'../mom/docs/operations/work-instructions/09-WI-900/wi-901-performance-dashboard.html'},
     ]},
-    {title:'Fallback & bằng chứng', subtitle:'Hypercare · audit · handoff', items:[
-      {code:'ANNEX-118', title:'Offline fallback kit', path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html'},
-      {code:'WI-203',    title:'Evidence pack',        path:'../mom/docs/operations/work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html'},
-      {code:'WI-201',    title:'Quality gates',        path:'../mom/docs/operations/work-instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html'},
-      {code:'ANNEX-135', title:'Records file plan',    path:'../mom/docs/operations/references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html'},
+    {title:'Dự phòng & bằng chứng', subtitle:'Cho hypercare · audit · bàn giao', items:[
+      {code:'ANNEX-118', title:'Bộ dự phòng offline',   path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html'},
+      {code:'WI-203',    title:'Bộ bằng chứng hồ sơ',   path:'../mom/docs/operations/work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html'},
+      {code:'WI-201',    title:'Cổng chất lượng',       path:'../mom/docs/operations/work-instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html'},
+      {code:'ANNEX-135', title:'Kế hoạch lưu hồ sơ',    path:'../mom/docs/operations/references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html'},
     ]},
   ],
   kpis: [
-    {id:'KPI-FLD-01', label:'Routing accuracy',       target:'>=95', unit:'%', short:'RA'},
-    {id:'KPI-FLD-02', label:'Doc retrieval (giây)',   target:'<=180', unit:'s', short:'RT'},
-    {id:'KPI-TRN-01', label:'Training completion',    target:'>=90', unit:'%', short:'TR'},
-    {id:'KPI-DEP-01', label:'Champion coverage',      target:'>=100',unit:'%', short:'CH'},
-    {id:'KPI-DEP-02', label:'Issue closure on time',  target:'>=95', unit:'%', short:'IC'},
-    {id:'KPI-DEP-03', label:'Change failure rate',    target:'<=10', unit:'%', short:'CF'},
-    {id:'KPI-DEP-04', label:'Change lead time',       target:'<=10', unit:'d', short:'LT'},
-    {id:'KPI-DEP-05', label:'Dashboard refresh',      target:'>=95', unit:'%', short:'RF'},
+    {id:'KPI-FLD-01', label:'Định tuyến đúng thư mục',   target:'>=95', unit:'%', short:'TM'},
+    {id:'KPI-FLD-02', label:'Thời gian tra cứu',          target:'<=180', unit:'s', short:'TC'},
+    {id:'KPI-TRN-01', label:'Hoàn thành đào tạo',         target:'>=90', unit:'%', short:'ĐT'},
+    {id:'KPI-DEP-01', label:'Phủ champion (primary+backup)', target:'>=100',unit:'%', short:'CH'},
+    {id:'KPI-DEP-02', label:'Đóng issue đúng hạn',        target:'>=95', unit:'%', short:'ĐI'},
+    {id:'KPI-DEP-03', label:'Tỉ lệ thay đổi thất bại',    target:'<=10', unit:'%', short:'TB'},
+    {id:'KPI-DEP-04', label:'Lead time thay đổi (ngày)',  target:'<=10', unit:'d', short:'LT'},
+    {id:'KPI-DEP-05', label:'Refresh dashboard đúng hạn', target:'>=95', unit:'%', short:'RF'},
   ],
   phaseChecklists: {
     P0:[
@@ -149,6 +149,7 @@ const DeployState = {
   activeTab: 'overview',
   activeWeek: null, // when not null, week side panel is open
   picker: null,     // {deptId, slot, query, roleFilter} when modal open
+  formDialog: null, // {title, kicker, fields, submitLabel, accentColor, onSubmit} when dialog open
 };
 
 // ── API ───────────────────────────────────────────────────────────────────
@@ -304,9 +305,9 @@ function renderDeployHero(){
       <h1>Command Center triển khai vận hành</h1>
       <p>12 tuần · 10 phòng ban · 7 trụ · cadence Thứ Bảy 9:00. State chia sẻ qua backend.</p>
       <div class="deploy-hero-actions">
-        <a class="deploy-action-link" href="../mom/docs/operations/work-instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html" target="_blank">WI-106 Master plan</a>
-        <a class="deploy-action-link" href="../mom/docs/operations/work-instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html" target="_blank">WI-105 Navigation</a>
-        <a class="deploy-action-link" href="../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html" target="_blank">ANNEX-114 Runbook</a>
+        <a class="deploy-action-link" href="../mom/docs/operations/work-instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html" target="_blank">WI-106 Kế hoạch tổng</a>
+        <a class="deploy-action-link" href="../mom/docs/operations/work-instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html" target="_blank">WI-105 Hướng dẫn tra cứu</a>
+        <a class="deploy-action-link" href="../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html" target="_blank">ANNEX-114 Sổ tay Go-live</a>
       </div>
     </div>
     <div class="deploy-hero-side">
@@ -340,22 +341,22 @@ function renderDeploySummary(){
     <div class="deploy-summary-card">
       <span class="summary-label">Phòng ban sẵn sàng</span>
       <strong>${ready}/${total}</strong>
-      <div>${inProg} đang đi qua wave</div>
+      <div>${inProg} đang trong wave</div>
     </div>
     <div class="deploy-summary-card">
-      <span class="summary-label">Champion pass OJT</span>
+      <span class="summary-label">Champion đạt OJT</span>
       <strong>${chPct}%</strong>
-      <div>${chPass}/${DEPLOY_CONFIG.championTarget} đã pass</div>
+      <div>${chPass}/${DEPLOY_CONFIG.championTarget} đã đạt</div>
     </div>
     <div class="deploy-summary-card">
-      <span class="summary-label">Issue đang mở</span>
+      <span class="summary-label">Vấn đề đang mở</span>
       <strong>${issuesOpen}</strong>
-      <div>Severity board live</div>
+      <div>Bảng nghiêm trọng đang theo dõi</div>
     </div>
     <div class="deploy-summary-card ${red > 0 ? 'summary-alert' : ''}">
       <span class="summary-label">Tín hiệu đỏ</span>
       <strong>${red}</strong>
-      <div>${blocked} dept chặn · ${red - blocked} KPI/sev đỏ</div>
+      <div>${blocked} phòng chặn · ${red - blocked} KPI/sev đỏ</div>
     </div>
   </section>`;
 }
@@ -705,7 +706,7 @@ function renderTabDocs(){
   return `
   <div class="deploy-tab-panel active" id="dtab-docs">
     <section class="deploy-section">
-      <div class="deploy-section-head"><h2>Document hub</h2><span>Quick links theo nhóm vai trò</span></div>
+      <div class="deploy-section-head"><h2>Trung tâm tài liệu</h2><span>Đường tắt theo nhóm vai trò</span></div>
       <div class="doc-group-grid">
         ${DEPLOY_CONFIG.docsByGroup.map(g => `
           <div class="doc-group-card">
@@ -722,7 +723,7 @@ function renderTabDocs(){
       </div>
     </section>
     <section class="deploy-section">
-      <div class="deploy-section-head"><h2>Retrieval drill recorder · KPI ≤3 phút</h2><span>${drillStats.total} drill · pass ${drillStats.passPct}%</span></div>
+      <div class="deploy-section-head"><h2>Diễn tập tra cứu tài liệu · KPI ≤3 phút</h2><span>${drillStats.total} lượt · đạt ${drillStats.passPct}%</span></div>
       <div class="drill-recorder">
         <form onsubmit="event.preventDefault(); deployRecordDrill();" class="drill-form" id="deployDrillForm">
           <input type="date" id="drillDate" value="${deployTodayIso()}" ${DeployState.me.canEdit?'':'disabled'}>
@@ -733,7 +734,7 @@ function renderTabDocs(){
           </select>
           <input type="text" id="drillDoc" placeholder="Mã tài liệu (vd SOP-501)" ${DeployState.me.canEdit?'':'disabled'}>
           <input type="number" id="drillSeconds" placeholder="Số giây" min="1" max="900" ${DeployState.me.canEdit?'':'disabled'}>
-          <button type="submit" class="deploy-btn" ${DeployState.me.canEdit?'':'disabled'}>Ghi drill</button>
+          <button type="submit" class="deploy-btn" ${DeployState.me.canEdit?'':'disabled'}>Ghi lượt diễn tập</button>
         </form>
         <div class="drill-log">
           ${drills.slice(0, 10).map(d => `
@@ -743,7 +744,7 @@ function renderTabDocs(){
               <span class="drill-seconds">${d.seconds}s</span>
               <small>${deployFmtDate(d.date)}</small>
             </div>`).join('')}
-          ${drills.length === 0 ? '<div class="deploy-empty">Chưa có drill nào. Mục tiêu KPI: ≤180 giây (3 phút).</div>' : ''}
+          ${drills.length === 0 ? '<div class="deploy-empty">Chưa có lượt diễn tập nào. Mục tiêu KPI: ≤180 giây (3 phút).</div>' : ''}
         </div>
       </div>
     </section>
@@ -765,14 +766,14 @@ function renderTabIssues(){
   <div class="deploy-tab-panel active" id="dtab-issues">
     <section class="deploy-section">
       <div class="deploy-section-head">
-        <h2>Issue register · ${open} mở · ${closed} đóng</h2>
-        <span>Severity board live</span>
+        <h2>Sổ vấn đề · ${open} mở · ${closed} đã đóng</h2>
+        <span>Bảng nghiêm trọng đang theo dõi</span>
       </div>
       <div class="issue-toolbar">
-        ${DeployState.me.canEdit ? `<button class="deploy-btn" onclick="deployOpenIssueForm()">+ Tạo issue</button>` : ''}
+        ${DeployState.me.canEdit ? `<button class="deploy-btn" onclick="deployOpenIssueForm()">+ Ghi vấn đề mới</button>` : ''}
       </div>
       <div class="issue-list">
-        ${issues.length === 0 ? '<div class="deploy-empty">Chưa có issue nào. Mở severity board khi pilot bắt đầu (W4).</div>' : ''}
+        ${issues.length === 0 ? '<div class="deploy-empty">Chưa có vấn đề nào. Bảng nghiêm trọng sẽ kích hoạt khi pilot bắt đầu (W4).</div>' : ''}
         ${issues.map(i => renderIssueRow(i)).join('')}
       </div>
     </section>
@@ -792,11 +793,12 @@ function renderIssueRow(i){
       </div>
     </div>
     <div class="issue-actions">
+      ${DeployState.me.canEdit ? `<button class="deploy-btn-link" type="button" title="Sửa issue" onclick="deployEditIssue('${deployEscape(i.id)}')">✎</button>` : ''}
       ${(i.sev|0) <= 2 && !i.capaLink && DeployState.me.canEdit ? `<button class="deploy-btn deploy-btn-sm" onclick="deployBridgeCapa('${deployEscape(i.id)}')" title="Mở CAPA case từ issue này">→ CAPA</button>` : ''}
       <select class="issue-status-select" ${DeployState.me.canEdit?'':'disabled'} onchange="deployUpdateIssueStatus('${deployEscape(i.id)}', this.value)">
-        <option value="open" ${i.status==='open'?'selected':''}>Mở</option>
-        <option value="workaround" ${i.status==='workaround'?'selected':''}>Có workaround</option>
-        <option value="closed" ${i.status==='closed'?'selected':''}>Đóng</option>
+        <option value="open" ${i.status==='open'?'selected':''}>Đang mở</option>
+        <option value="workaround" ${i.status==='workaround'?'selected':''}>Có giải pháp tạm</option>
+        <option value="closed" ${i.status==='closed'?'selected':''}>Đã đóng</option>
       </select>
     </div>
   </div>`;
@@ -813,7 +815,7 @@ function renderTabIso(){
     <section class="deploy-section">
       <div class="deploy-section-head">
         <h2>ISO 9001:2015 — Bản đồ điều khoản</h2>
-        <span>${coverage.covered}/${coverage.total} điều khoản đã map · ${coverage.pct}% coverage</span>
+        <span>${coverage.covered}/${coverage.total} điều khoản đã ánh xạ · độ phủ ${coverage.pct}%</span>
       </div>
       <div class="iso-coverage-bar"><span style="width:${coverage.pct}%"></span></div>
     </section>
@@ -864,7 +866,7 @@ function renderClauseCard(c){
         ${(c.docs || []).map(d => `<span class="dwp-doc-chip">${deployEscape(d)}</span>`).join('')}
       </div>
     </div>
-    ${hasFinding ? `<div class="iso-clause-findings">⚠ ${findings.length} finding · ${findings.map(x => x.f.severity).join(', ')}</div>` : ''}
+    ${hasFinding ? `<div class="iso-clause-findings">⚠ ${findings.length} phát hiện · ${findings.map(x => x.f.severity).join(', ')}</div>` : ''}
   </div>`;
 }
 
@@ -873,16 +875,17 @@ function renderTabAudit(){
   const audits = ((DeployState.audits && DeployState.audits.audits) || []).slice().sort((a,b) => (a.plannedDate||'').localeCompare(b.plannedDate||''));
   const totalFindings = audits.reduce((sum, a) => sum + ((a.findings||[]).length), 0);
   const openFindings  = audits.reduce((sum, a) => sum + ((a.findings||[]).filter(f => f.status !== 'closed').length), 0);
+  const auditStatusLabels = {scheduled:'Đã lên lịch', in_progress:'Đang thực hiện', completed:'Hoàn tất', closed:'Đã đóng'};
   return `
   <div class="deploy-tab-panel active" id="dtab-audit">
     <section class="deploy-section">
       <div class="deploy-section-head">
-        <h2>Đánh giá nội bộ (ISO 9.2) — ${audits.length} audit · ${openFindings}/${totalFindings} finding mở</h2>
-        <span>Chu kỳ tối thiểu 1 năm — chia 3-4 quý</span>
+        <h2>Đánh giá nội bộ (ISO 9.2) — ${audits.length} cuộc · ${openFindings}/${totalFindings} phát hiện đang mở</h2>
+        <span>Chu kỳ tối thiểu 1 năm — chia 3–4 quý</span>
       </div>
-      ${DeployState.me.canEdit ? `<div class="audit-toolbar"><button class="deploy-btn" onclick="deployOpenAuditForm()">+ Lên lịch audit</button></div>` : ''}
+      ${DeployState.me.canEdit ? `<div class="audit-toolbar"><button class="deploy-btn" onclick="deployOpenAuditForm()">+ Lên lịch cuộc đánh giá</button></div>` : ''}
       <div class="audit-list">
-        ${audits.length === 0 ? '<div class="deploy-empty">Chưa có audit nào trong chu kỳ.</div>' : ''}
+        ${audits.length === 0 ? '<div class="deploy-empty">Chưa có cuộc đánh giá nội bộ nào.</div>' : ''}
         ${audits.map(a => renderAuditCard(a)).join('')}
       </div>
     </section>
@@ -904,15 +907,15 @@ function renderAuditCard(a){
         <div class="audit-meta">
           ${a.plannedDate ? 'Dự kiến ' + deployFmtDate(a.plannedDate) : ''}
           ${a.executedDate ? ' · Thực hiện ' + deployFmtDate(a.executedDate) : ''}
-          · <span class="audit-status-badge">${deployEscape(a.status||'scheduled')}</span>
+          · <span class="audit-status-badge">${deployEscape(({scheduled:'Đã lên lịch', in_progress:'Đang thực hiện', completed:'Hoàn tất', closed:'Đã đóng'})[a.status]||a.status||'scheduled')}</span>
         </div>
       </div>
       <div class="audit-finding-counts">
         ${major  ? `<span class="audit-fc fc-major">${major} major</span>` : ''}
         ${minor  ? `<span class="audit-fc fc-minor">${minor} minor</span>` : ''}
-        ${obs    ? `<span class="audit-fc fc-obs">${obs} obs</span>` : ''}
-        ${opp    ? `<span class="audit-fc fc-opp">${opp} opp</span>` : ''}
-        ${!findings.length ? `<span class="audit-fc fc-empty">— chưa có finding —</span>` : ''}
+        ${obs    ? `<span class="audit-fc fc-obs">${obs} quan sát</span>` : ''}
+        ${opp    ? `<span class="audit-fc fc-opp">${opp} cơ hội</span>` : ''}
+        ${!findings.length ? `<span class="audit-fc fc-empty">— chưa có phát hiện —</span>` : ''}
       </div>
     </div>
     <div class="audit-card-body">
@@ -923,7 +926,7 @@ function renderAuditCard(a){
         <small>Phòng ban:</small> ${(a.scopeDepts || []).map(s => `<span class="audit-dept-chip">${deployEscape(s)}</span>`).join(' ')}
       </div>
       <div class="audit-scope">
-        <small>Lead auditor:</small> ${deployEscape(a.leadAuditor || '—')}
+        <small>Đánh giá viên dẫn:</small> ${deployEscape(a.leadAuditor || '—')}
       </div>
     </div>
     ${findings.length ? `
@@ -933,13 +936,22 @@ function renderAuditCard(a){
             <span class="finding-sev-badge">${deployEscape((f.severity||'minor').toUpperCase())}</span>
             <span class="finding-clause">Cl ${deployEscape(f.clauseRef||'—')}</span>
             <span class="finding-desc">${deployEscape(f.description||'')}</span>
-            <span class="finding-status">${deployEscape(f.status||'open')}</span>
+            <span class="finding-status">${deployFmtFindingStatus(f.status)}</span>
             ${f.capaLink ? `<a href="${deployEscape(f.capaLink)}" target="_blank">CAPA</a>` : ''}
+            ${DeployState.me.canEdit ? `<button class="deploy-btn-link" type="button" title="Sửa phát hiện" onclick="deployEditFinding('${deployEscape(a.id)}','${deployEscape(f.id)}')">✎</button>` : ''}
           </div>
         `).join('')}
       </div>` : ''}
-    ${DeployState.me.canEdit ? `<div class="audit-actions"><button class="deploy-btn deploy-btn-sm" onclick="deployOpenFindingForm('${deployEscape(a.id)}')">+ Ghi finding</button></div>` : ''}
+    ${DeployState.me.canEdit ? `<div class="audit-actions">
+      <button class="deploy-btn deploy-btn-sm" onclick="deployOpenFindingForm('${deployEscape(a.id)}')">+ Ghi phát hiện</button>
+      <button class="deploy-btn deploy-btn-sm deploy-btn-ghost" onclick="deployEditAudit('${deployEscape(a.id)}')">✎ Sửa audit</button>
+    </div>` : ''}
   </div>`;
+}
+
+function deployFmtFindingStatus(s){
+  const map = {open:'Mở', capa:'Đã chuyển CAPA', closed:'Đã đóng'};
+  return deployEscape(map[s] || s || '—');
 }
 
 // ── Tab 9: Management Review (ISO 9.3) ────────────────────────────────────
@@ -951,16 +963,16 @@ function renderTabReview(){
   <div class="deploy-tab-panel active" id="dtab-review">
     <section class="deploy-section">
       <div class="deploy-section-head">
-        <h2>Xem xét của lãnh đạo (ISO 9.3) — ${reviews.length} packet</h2>
-        <span>Hằng quý — 12 input + 3 output theo điều khoản 9.3.2 / 9.3.3</span>
+        <h2>Xem xét của lãnh đạo (ISO 9.3) — ${reviews.length} biên bản</h2>
+        <span>Hằng quý — 12 đầu vào + 3 đầu ra theo điều khoản 9.3.2 / 9.3.3</span>
       </div>
-      ${DeployState.me.canEdit ? `<div class="review-toolbar"><button class="deploy-btn" onclick="deployOpenReviewForm()">+ Tạo packet quý mới</button></div>` : ''}
+      ${DeployState.me.canEdit ? `<div class="review-toolbar"><button class="deploy-btn" onclick="deployOpenReviewForm()">+ Tạo biên bản quý mới</button></div>` : ''}
     </section>
     ${reviews.length === 0 ? `
       <section class="deploy-section">
         <div class="deploy-empty">
-          Chưa có Management Review packet. Mỗi quý CEO + ban điều hành cần họp xem xét.<br>
-          <small>Input template: ${inputs.length} mục — Output template: ${outputs.length} mục.</small>
+          Chưa có biên bản Xem xét lãnh đạo. Mỗi quý CEO + ban điều hành cần họp xem xét.<br>
+          <small>Mẫu đầu vào: ${inputs.length} mục — Mẫu đầu ra: ${outputs.length} mục.</small>
         </div>
       </section>
     ` : reviews.map(r => renderReviewCard(r, inputs, outputs)).join('')}
@@ -981,7 +993,7 @@ function renderReviewCard(r, inputs, outputs){
       ${so ? `<span class="meeting-signoff-badge">🔒 Ký ${deployEscape(so.name||so.by)} · ${deployIsoToVi(so.at)}</span>` : ''}
     </div>
     <details class="review-details">
-      <summary>📋 Đầu vào (9.3.2) — ${inputs.length} mục</summary>
+      <summary>📋 Đầu vào — Điều khoản 9.3.2 — ${inputs.length} mục</summary>
       <div class="review-grid">
         ${inputs.map(it => `
           <div class="review-row">
@@ -994,7 +1006,7 @@ function renderReviewCard(r, inputs, outputs){
       </div>
     </details>
     <details class="review-details">
-      <summary>🎯 Đầu ra (9.3.3) — ${outputs.length} mục</summary>
+      <summary>🎯 Đầu ra — Điều khoản 9.3.3 — ${outputs.length} mục</summary>
       <div class="review-grid">
         ${outputs.map(it => `
           <div class="review-row">
@@ -1008,7 +1020,7 @@ function renderReviewCard(r, inputs, outputs){
     </details>
     ${!so && DeployState.me.canEdit ? `
       <div class="review-buttons">
-        <button class="deploy-btn deploy-btn-sm" onclick="deployEditReview('${deployEscape(r.id)}')">Sửa packet</button>
+        <button class="deploy-btn deploy-btn-sm" onclick="deployEditReview('${deployEscape(r.id)}')">✎ Sửa biên bản</button>
         ${DeployState.me.canSignOff ? `<button class="deploy-btn deploy-btn-go deploy-btn-sm" onclick="deploySignOffReview('${deployEscape(r.id)}')">🔒 Ký khóa</button>` : ''}
       </div>` : ''}
   </section>`;
@@ -1142,6 +1154,161 @@ function renderWeekMeetingForm(meeting, week, kv){
       `}
     </div>
   </div>`;
+}
+
+// ── Generic form dialog ───────────────────────────────────────────────────
+// Single modal that takes a field schema and a submit callback. Replaces
+// chained prompt() flows with a sane one-screen UX. Field types:
+//   text · number · date · textarea · select · multiselect · checkbox · static
+function renderFormDialog(){
+  const f = DeployState.formDialog;
+  if (!f) return '';
+  const accent = f.accentColor || '#1e3a8a';
+  return `
+  <div class="deploy-form-overlay" onclick="deployCloseFormDialog(event)">
+    <div class="deploy-form-dialog" onclick="event.stopPropagation()" style="--phase-color:${accent}">
+      <header class="dfd-head">
+        <div>
+          ${f.kicker ? `<span class="dp-kicker">${deployEscape(f.kicker)}</span>` : ''}
+          <h2>${deployEscape(f.title || 'Nhập thông tin')}</h2>
+          ${f.description ? `<p class="dfd-desc">${deployEscape(f.description)}</p>` : ''}
+        </div>
+        <button class="dwp-close" type="button" onclick="deployCloseFormDialog()" aria-label="Đóng">×</button>
+      </header>
+      <form id="deployFormDialogForm" class="dfd-form" onsubmit="event.preventDefault(); deployFormDialogSubmit();">
+        <div class="dfd-body">
+          ${(f.fields || []).map(fld => renderFormField(fld)).join('')}
+        </div>
+        <footer class="dfd-foot">
+          ${f.hint ? `<span class="dfd-foot-hint">${deployEscape(f.hint)}</span>` : '<span></span>'}
+          <div class="dfd-foot-buttons">
+            <button type="button" class="deploy-btn-link" onclick="deployCloseFormDialog()">Hủy</button>
+            <button type="submit" class="deploy-btn">${deployEscape(f.submitLabel || 'Lưu')}</button>
+          </div>
+        </footer>
+      </form>
+    </div>
+  </div>`;
+}
+
+function renderFormField(f){
+  if (f.type === 'static') {
+    return `<div class="dfd-static"><span class="dfd-static-label">${deployEscape(f.label||'')}</span><div class="dfd-static-value">${deployEscape(f.value||'')}</div></div>`;
+  }
+  if (f.type === 'separator') {
+    return `<div class="dfd-separator">${deployEscape(f.label||'')}</div>`;
+  }
+  const req = f.required ? '<span class="dfd-required">*</span>' : '';
+  const hint = f.hint ? `<small class="dfd-hint">${deployEscape(f.hint)}</small>` : '';
+  switch (f.type) {
+    case 'textarea':
+      return `
+      <label class="dfd-field">
+        <span class="dfd-label">${deployEscape(f.label)}${req}</span>
+        <textarea data-form-key="${deployEscape(f.key)}" rows="${f.rows||3}" placeholder="${deployEscape(f.placeholder||'')}" ${f.required?'required':''}>${deployEscape(f.value||'')}</textarea>
+        ${hint}
+      </label>`;
+    case 'select':
+      return `
+      <label class="dfd-field">
+        <span class="dfd-label">${deployEscape(f.label)}${req}</span>
+        <select data-form-key="${deployEscape(f.key)}" ${f.required?'required':''}>
+          ${(f.options||[]).map(o => `<option value="${deployEscape(o.value)}" ${String(o.value)===String(f.value||'')?'selected':''}>${deployEscape(o.label)}</option>`).join('')}
+        </select>
+        ${hint}
+      </label>`;
+    case 'multiselect':
+      return `
+      <div class="dfd-field">
+        <span class="dfd-label">${deployEscape(f.label)}${req}</span>
+        <div class="dfd-chips" data-form-key="${deployEscape(f.key)}">
+          ${(f.options||[]).map(o => {
+            const checked = (Array.isArray(f.value) ? f.value : []).map(String).includes(String(o.value));
+            return `<label class="dfd-chip ${checked?'dfd-chip-on':''}"><input type="checkbox" value="${deployEscape(o.value)}" ${checked?'checked':''} onchange="this.parentElement.classList.toggle('dfd-chip-on', this.checked)"><span>${deployEscape(o.label)}</span></label>`;
+          }).join('')}
+        </div>
+        ${hint}
+      </div>`;
+    case 'checkbox':
+      return `
+      <label class="dfd-checkbox">
+        <input type="checkbox" data-form-key="${deployEscape(f.key)}" ${f.value?'checked':''}>
+        <span>${deployEscape(f.label)}${req}</span>
+        ${hint}
+      </label>`;
+    case 'number':
+      return `
+      <label class="dfd-field">
+        <span class="dfd-label">${deployEscape(f.label)}${req}</span>
+        <input type="number" data-form-key="${deployEscape(f.key)}" value="${deployEscape(f.value||'')}" ${f.min!=null?`min="${f.min}"`:''} ${f.max!=null?`max="${f.max}"`:''} ${f.step!=null?`step="${f.step}"`:''} ${f.required?'required':''}>
+        ${hint}
+      </label>`;
+    case 'date':
+      return `
+      <label class="dfd-field">
+        <span class="dfd-label">${deployEscape(f.label)}${req}</span>
+        <input type="date" data-form-key="${deployEscape(f.key)}" value="${deployEscape(f.value||'')}" ${f.required?'required':''}>
+        ${hint}
+      </label>`;
+    case 'text':
+    default:
+      return `
+      <label class="dfd-field">
+        <span class="dfd-label">${deployEscape(f.label)}${req}</span>
+        <input type="text" data-form-key="${deployEscape(f.key)}" value="${deployEscape(f.value||'')}" placeholder="${deployEscape(f.placeholder||'')}" ${f.required?'required':''}>
+        ${hint}
+      </label>`;
+  }
+}
+
+function deployOpenFormDialog(config){
+  DeployState.formDialog = config;
+  renderDeployDashboard();
+  setTimeout(() => {
+    const first = document.querySelector('#deployFormDialogForm [data-form-key]');
+    if (first && typeof first.focus === 'function') first.focus();
+  }, 50);
+}
+function deployCloseFormDialog(ev){
+  if (ev && ev.target && !ev.target.classList.contains('deploy-form-overlay')) return;
+  DeployState.formDialog = null;
+  renderDeployDashboard();
+}
+function deployFormDialogSubmit(){
+  const f = DeployState.formDialog;
+  if (!f) return;
+  const values = {};
+  (f.fields || []).forEach(fld => {
+    if (fld.type === 'static' || fld.type === 'separator') return;
+    if (fld.type === 'multiselect') {
+      const boxes = document.querySelectorAll(`[data-form-key="${fld.key}"] input[type="checkbox"]`);
+      values[fld.key] = Array.from(boxes).filter(c => c.checked).map(c => c.value);
+    } else if (fld.type === 'checkbox') {
+      const el = document.querySelector(`[data-form-key="${fld.key}"]`);
+      values[fld.key] = el ? !!el.checked : false;
+    } else if (fld.type === 'number') {
+      const el = document.querySelector(`[data-form-key="${fld.key}"]`);
+      values[fld.key] = el && el.value !== '' ? Number(el.value) : null;
+    } else {
+      const el = document.querySelector(`[data-form-key="${fld.key}"]`);
+      values[fld.key] = el ? el.value : '';
+    }
+  });
+  // Validate required
+  const missing = (f.fields || []).filter(fld => fld.required && (values[fld.key] == null || values[fld.key] === '' || (Array.isArray(values[fld.key]) && values[fld.key].length === 0)));
+  if (missing.length) {
+    alert('Vui lòng nhập đủ: ' + missing.map(m => m.label).join(', '));
+    return;
+  }
+  const onSubmit = f.onSubmit;
+  DeployState.formDialog = null;
+  renderDeployDashboard();
+  if (typeof onSubmit === 'function') {
+    Promise.resolve(onSubmit(values)).catch(e => {
+      console.error('[deploy] form submit failed', e);
+      alert('Lỗi lưu: ' + (e && e.message || e));
+    });
+  }
 }
 
 // ── User picker modal ─────────────────────────────────────────────────────
@@ -1460,14 +1627,56 @@ async function deploySaveChampion(deptId){
   }catch(e){ console.error('[deploy] champion failed', e); alert('Lỗi lưu champion: ' + e.message); }
 }
 
-function deployOpenIssueForm(){
-  const title = prompt('Tiêu đề issue:');
-  if (!title) return;
-  const sev = parseInt(prompt('Severity (1=critical, 2=high, 3=low):', '3'), 10) || 3;
-  const deptId = prompt('Mã phòng ban (PROD, ENG, QA, SCM, SALES, FIN, HR, IT, EHS, ERP):', 'QA') || 'QA';
-  const owner = prompt('Owner xử lý:', DeployState.me.username) || '';
-  const weekN = parseInt(prompt('Tuần phát sinh (số):', deployCurrentWeek()), 10) || 0;
-  deploySaveIssue({title, sev, deptId, owner, weekN, status:'open'});
+function deployOpenIssueForm(existing){
+  const isEdit = !!(existing && existing.id);
+  deployOpenFormDialog({
+    kicker: isEdit ? `Sửa issue ${existing.id}` : 'Ghi issue mới',
+    title: isEdit ? 'Cập nhật vấn đề' : 'Ghi vấn đề / sự cố trong triển khai',
+    accentColor: '#dc2626',
+    submitLabel: isEdit ? 'Cập nhật' : 'Ghi vấn đề',
+    fields: [
+      {key:'title', label:'Tiêu đề', type:'text', required:true, value: existing?.title || '',
+        placeholder:'Mô tả ngắn (≤80 ký tự)'},
+      {key:'sev', label:'Mức nghiêm trọng', type:'select', required:true, value: String(existing?.sev || 3),
+        options: [
+          {value:'1', label:'Sev-1 — Dừng vận hành / Critical'},
+          {value:'2', label:'Sev-2 — Ảnh hưởng lớn / High'},
+          {value:'3', label:'Sev-3 — Bất tiện / Low'},
+        ]},
+      {key:'deptId', label:'Phòng ban', type:'select', required:true, value: existing?.deptId || 'QA',
+        options: DEPLOY_CONFIG.departments.map(d => ({value:d.id, label: d.label}))},
+      {key:'owner', label:'Owner xử lý', type:'text', required:true,
+        value: existing?.owner || (DeployState.me.name || DeployState.me.username || ''),
+        placeholder:'Họ tên người nhận xử lý'},
+      {key:'weekN', label:'Tuần phát sinh', type:'number', required:true,
+        value: existing?.weekN != null ? existing.weekN : deployCurrentWeek(),
+        min: 0, max: 12, hint:'Tuần W0..W12 trong chương trình.'},
+      {key:'status', label:'Trạng thái', type:'select', value: existing?.status || 'open',
+        options: [
+          {value:'open', label:'Đang mở'},
+          {value:'workaround', label:'Có workaround'},
+          {value:'closed', label:'Đã đóng'},
+        ]},
+      {key:'capaLink', label:'Link CAPA (nếu có)', type:'text', value: existing?.capaLink || '',
+        placeholder:'/portal.html#eqms?capa=CAPA-...', hint:'Nếu Sev-1/2, dùng nút "→ CAPA" để tự sinh stub.'},
+    ],
+    onSubmit: (v) => deploySaveIssue({
+      ...(existing || {}),
+      title: v.title,
+      sev: parseInt(v.sev, 10) || 3,
+      deptId: v.deptId,
+      owner: v.owner,
+      weekN: parseInt(v.weekN, 10) || 0,
+      status: v.status,
+      capaLink: v.capaLink || '',
+    }),
+  });
+}
+
+function deployEditIssue(id){
+  const list = (DeployState.issues && DeployState.issues.issues) || [];
+  const it = list.find(x => x.id === id);
+  if (it) deployOpenIssueForm(it);
 }
 
 async function deploySaveIssue(payload){
@@ -1500,15 +1709,40 @@ async function deployRecordDrill(){
   }catch(e){ console.error('[deploy] drill failed', e); alert('Lỗi ghi drill: ' + e.message); }
 }
 
-function deployOpenAuditForm(){
-  const cycle = prompt('Chu kỳ audit (vd Q3-2026):', 'Q' + (Math.floor(new Date().getMonth()/3)+1) + '-' + new Date().getFullYear());
-  if (!cycle) return;
-  const plannedDate = prompt('Ngày dự kiến (YYYY-MM-DD):', deployTodayIso());
-  if (!plannedDate) return;
-  const scope = (prompt('Phạm vi điều khoản (vd 4,5,6):', '4,5,6') || '').split(',').map(s => s.trim()).filter(Boolean);
-  const scopeDepts = (prompt('Phòng ban (vd QA,PROD,ENG):', 'QA') || '').split(',').map(s => s.trim()).filter(Boolean);
-  const leadAuditor = prompt('Lead auditor:', DeployState.me.name || DeployState.me.username) || '';
-  deploySaveAudit({cycle, plannedDate, scope, scopeDepts, leadAuditor, status: 'scheduled'});
+function deployOpenAuditForm(existing){
+  const isEdit = !!(existing && existing.id);
+  const todayQuarter = 'Q' + (Math.floor(new Date().getMonth()/3)+1) + '-' + new Date().getFullYear();
+  const clauseSections = ['4', '5', '6', '7', '8', '9', '10'];
+  const sectionLabels = {
+    '4':'4 — Bối cảnh', '5':'5 — Lãnh đạo', '6':'6 — Hoạch định',
+    '7':'7 — Hỗ trợ', '8':'8 — Vận hành', '9':'9 — Đánh giá hiệu lực', '10':'10 — Cải tiến'
+  };
+  deployOpenFormDialog({
+    kicker: isEdit ? 'Cập nhật audit nội bộ' : 'Lên lịch audit nội bộ',
+    title: isEdit ? `Cập nhật ${existing.id}` : 'Lên lịch đánh giá nội bộ ISO 9.2',
+    accentColor: '#d97706',
+    submitLabel: isEdit ? 'Cập nhật' : 'Lên lịch',
+    fields: [
+      {key:'cycle', label:'Chu kỳ', type:'text', required:true, value: existing?.cycle || todayQuarter, placeholder:'vd Q3-2026', hint:'Định danh chu kỳ (quý-năm) để xếp lịch năm.'},
+      {key:'plannedDate', label:'Ngày dự kiến', type:'date', required:true, value: existing?.plannedDate || deployTodayIso()},
+      {key:'executedDate', label:'Ngày thực hiện thực tế', type:'date', value: existing?.executedDate || '', hint:'Bỏ trống nếu chưa thực hiện.'},
+      {key:'leadAuditor', label:'Đánh giá viên dẫn', type:'text', required:true, value: existing?.leadAuditor || (DeployState.me.name || DeployState.me.username || ''), placeholder:'Họ tên'},
+      {key:'scope', label:'Phạm vi điều khoản ISO 9001', type:'multiselect', required:true,
+        value: existing?.scope || ['4','5','6'],
+        options: clauseSections.map(s => ({value: s, label: sectionLabels[s]}))},
+      {key:'scopeDepts', label:'Phòng ban trong phạm vi', type:'multiselect', required:true,
+        value: existing?.scopeDepts || ['QA'],
+        options: DEPLOY_CONFIG.departments.map(d => ({value: d.id, label: d.label}))},
+      {key:'status', label:'Trạng thái', type:'select', value: existing?.status || 'scheduled',
+        options: [
+          {value:'scheduled', label:'Đã lên lịch'},
+          {value:'in_progress', label:'Đang thực hiện'},
+          {value:'completed', label:'Hoàn tất'},
+          {value:'closed', label:'Đã đóng'},
+        ]},
+    ],
+    onSubmit: (v) => deploySaveAudit({...(existing||{}), ...v}),
+  });
 }
 async function deploySaveAudit(payload){
   try{
@@ -1518,15 +1752,45 @@ async function deploySaveAudit(payload){
   }catch(e){ console.error('[deploy] audit failed', e); alert('Lỗi lưu audit: ' + e.message); }
 }
 
-function deployOpenFindingForm(auditId){
-  const clauseRef = prompt('Điều khoản (vd 8.5, 7.2):');
-  if (!clauseRef) return;
-  const severity = prompt('Severity (major / minor / observation / opportunity):', 'minor') || 'minor';
-  const deptId = prompt('Phòng ban liên quan (PROD/QA/ENG/...):', 'QA') || 'QA';
-  const description = prompt('Mô tả phát hiện:');
-  if (!description) return;
-  const evidence = prompt('Bằng chứng (tài liệu, hồ sơ, quan sát):') || '';
-  deploySaveFinding({auditId, clauseRef, severity, deptId, description, evidence, status:'open'});
+function deployOpenFindingForm(auditId, existing){
+  const isEdit = !!(existing && existing.id);
+  const clauseOptions = ((DeployState.clauses && DeployState.clauses.clauses) || []).map(c => ({
+    value: c.code, label: `${c.code} — ${c.title}`
+  }));
+  deployOpenFormDialog({
+    kicker: isEdit ? `Sửa phát hiện ${existing.id}` : `Ghi phát hiện mới · ${auditId}`,
+    title: isEdit ? 'Cập nhật phát hiện đánh giá' : 'Ghi phát hiện đánh giá nội bộ',
+    accentColor: '#dc2626',
+    submitLabel: isEdit ? 'Cập nhật' : 'Ghi phát hiện',
+    fields: [
+      {key:'clauseRef', label:'Điều khoản ISO 9001 vi phạm', type:'select', required:true,
+        value: existing?.clauseRef || '',
+        options: [{value:'', label:'— Chọn điều khoản —'}, ...clauseOptions]},
+      {key:'severity', label:'Mức độ', type:'select', required:true, value: existing?.severity || 'minor',
+        options: [
+          {value:'major', label:'Major — Sự không phù hợp nặng'},
+          {value:'minor', label:'Minor — Sự không phù hợp nhẹ'},
+          {value:'observation', label:'Observation — Quan sát'},
+          {value:'opportunity', label:'Opportunity — Cơ hội cải tiến'},
+        ]},
+      {key:'deptId', label:'Phòng ban liên quan', type:'select', required:true,
+        value: existing?.deptId || 'QA',
+        options: DEPLOY_CONFIG.departments.map(d => ({value:d.id, label: d.label}))},
+      {key:'description', label:'Mô tả phát hiện', type:'textarea', required:true, rows:3, value: existing?.description || '',
+        placeholder:'Ghi rõ điểm không phù hợp + tham chiếu hoạt động/quá trình'},
+      {key:'evidence', label:'Bằng chứng', type:'textarea', rows:2, value: existing?.evidence || '',
+        placeholder:'Tài liệu, hồ sơ, quan sát, phỏng vấn — kèm mã/đường dẫn nếu có', hint:'Bằng chứng cụ thể giúp khi tái kiểm tra.'},
+      {key:'status', label:'Trạng thái', type:'select', value: existing?.status || 'open',
+        options: [
+          {value:'open', label:'Mở'},
+          {value:'capa', label:'Đã chuyển CAPA'},
+          {value:'closed', label:'Đã đóng'},
+        ]},
+      {key:'capaLink', label:'Link CAPA (nếu có)', type:'text', value: existing?.capaLink || '',
+        placeholder:'/portal.html#eqms?capa=CAPA-...', hint:'Để trống nếu chưa mở CAPA.'},
+    ],
+    onSubmit: (v) => deploySaveFinding({auditId, findingId: existing?.id || '', ...v}),
+  });
 }
 async function deploySaveFinding(payload){
   try{
@@ -1536,40 +1800,73 @@ async function deploySaveFinding(payload){
   }catch(e){ console.error('[deploy] finding failed', e); alert('Lỗi lưu finding: ' + e.message); }
 }
 
-function deployOpenReviewForm(){
-  const cycle = prompt('Chu kỳ review (vd Q3-2026):', 'Q' + (Math.floor(new Date().getMonth()/3)+1) + '-' + new Date().getFullYear());
-  if (!cycle) return;
-  const date = prompt('Ngày họp review (YYYY-MM-DD):', deployTodayIso());
-  if (!date) return;
-  const attendees = (prompt('Người tham dự (phân cách dấu phẩy):', DeployState.me.name) || '').split(',').map(s => s.trim()).filter(Boolean);
-  const inputs = {};
-  ((DeployState.reviews && DeployState.reviews.inputTemplate) || []).forEach(it => {
-    const v = prompt(`${it.clause} · ${it.label}:`, '');
-    if (v != null) inputs[it.key] = v;
+function deployOpenReviewForm(existing){
+  const isEdit = !!(existing && existing.id);
+  const inputTpl = (DeployState.reviews && DeployState.reviews.inputTemplate) || [];
+  const outputTpl = (DeployState.reviews && DeployState.reviews.outputTemplate) || [];
+  const todayQuarter = 'Q' + (Math.floor(new Date().getMonth()/3)+1) + '-' + new Date().getFullYear();
+  const existingInputs  = (existing && existing.inputs)  || {};
+  const existingOutputs = (existing && existing.outputs) || {};
+
+  const fields = [
+    {key:'cycle', label:'Chu kỳ Review', type:'text', required:true,
+      value: existing?.cycle || todayQuarter, placeholder:'vd Q3-2026',
+      hint:'Theo điều khoản 9.3.1 — định kỳ tối thiểu 1 năm; khuyến nghị quý.'},
+    {key:'date', label:'Ngày họp Review', type:'date', required:true,
+      value: existing?.date || deployTodayIso()},
+    {key:'attendees_raw', label:'Người tham dự', type:'text',
+      value: (existing?.attendees || [DeployState.me.name || '']).filter(Boolean).join(', '),
+      placeholder:'Họ tên, phân cách dấu phẩy',
+      hint:'CEO + ban điều hành tối thiểu — clause 9.3.1.'},
+
+    {type:'separator', label:'📋 Đầu vào (Clause 9.3.2) — 12 mục bắt buộc'},
+    ...inputTpl.map(it => ({
+      key: 'input_' + it.key,
+      label: `${it.clause} · ${it.label}`,
+      type: 'textarea', rows: 2,
+      value: existingInputs[it.key] || '',
+      placeholder:'Ghi tình trạng + nguồn dữ liệu',
+    })),
+
+    {type:'separator', label:'🎯 Đầu ra (Clause 9.3.3) — 3 nhóm quyết định'},
+    ...outputTpl.map(it => ({
+      key: 'output_' + it.key,
+      label: `${it.clause} · ${it.label}`,
+      type: 'textarea', rows: 2,
+      value: existingOutputs[it.key] || '',
+      placeholder:'Quyết định + người chịu trách nhiệm + hạn',
+    })),
+  ];
+
+  deployOpenFormDialog({
+    kicker: isEdit ? 'Cập nhật Management Review' : 'Tạo Management Review mới',
+    title: isEdit ? `Cập nhật packet ${existing.cycle}` : 'Xem xét lãnh đạo — packet quý mới',
+    description: 'Theo điều khoản ISO 9001 §9.3 — Xem xét của lãnh đạo. Điền đầu vào + đầu ra, lưu rồi ký khóa.',
+    accentColor: '#7c3aed',
+    submitLabel: isEdit ? 'Cập nhật' : 'Tạo packet',
+    fields,
+    hint: 'Ô để trống = chưa có dữ liệu. Có thể quay lại sửa.',
+    onSubmit: (v) => {
+      const attendees = (v.attendees_raw || '').split(',').map(s => s.trim()).filter(Boolean);
+      const inputs = {};
+      inputTpl.forEach(it => { inputs[it.key] = v['input_'+it.key] || ''; });
+      const outputs = {};
+      outputTpl.forEach(it => { outputs[it.key] = v['output_'+it.key] || ''; });
+      return deploySaveReview({
+        ...(existing||{}),
+        cycle: v.cycle,
+        date: v.date,
+        attendees, inputs, outputs,
+      });
+    },
   });
-  const outputs = {};
-  ((DeployState.reviews && DeployState.reviews.outputTemplate) || []).forEach(it => {
-    const v = prompt(`${it.clause} · ${it.label}:`, '');
-    if (v != null) outputs[it.key] = v;
-  });
-  deploySaveReview({cycle, date, attendees, inputs, outputs});
 }
 
 function deployEditReview(id){
   const list = (DeployState.reviews && DeployState.reviews.reviews) || [];
   const r = list.find(x => x.id === id);
   if (!r) return;
-  const inputs = {...(r.inputs || {})};
-  const outputs = {...(r.outputs || {})};
-  ((DeployState.reviews && DeployState.reviews.inputTemplate) || []).forEach(it => {
-    const v = prompt(`${it.clause} · ${it.label}:`, inputs[it.key] || '');
-    if (v != null) inputs[it.key] = v;
-  });
-  ((DeployState.reviews && DeployState.reviews.outputTemplate) || []).forEach(it => {
-    const v = prompt(`${it.clause} · ${it.label}:`, outputs[it.key] || '');
-    if (v != null) outputs[it.key] = v;
-  });
-  deploySaveReview({...r, inputs, outputs});
+  deployOpenReviewForm(r);
 }
 
 async function deploySaveReview(payload){
@@ -1644,10 +1941,10 @@ function renderDeployDashboard(){
         <button class="deploy-tab ${at==='meetings'?'active':''}"    onclick="switchDeployTab('meetings')">Họp &amp; Gate</button>
         <button class="deploy-tab ${at==='departments'?'active':''}" onclick="switchDeployTab('departments')">Phòng ban</button>
         <button class="deploy-tab ${at==='docs'?'active':''}"        onclick="switchDeployTab('docs')">Tài liệu</button>
-        <button class="deploy-tab ${at==='issues'?'active':''}"      onclick="switchDeployTab('issues')">Issues</button>
-        <button class="deploy-tab ${at==='iso'?'active':''}"         onclick="switchDeployTab('iso')">ISO 9001</button>
-        <button class="deploy-tab ${at==='audit'?'active':''}"       onclick="switchDeployTab('audit')">Audit 9.2</button>
-        <button class="deploy-tab ${at==='review'?'active':''}"      onclick="switchDeployTab('review')">Mgmt Review 9.3</button>
+        <button class="deploy-tab ${at==='issues'?'active':''}"      onclick="switchDeployTab('issues')">Vấn đề &amp; sự cố</button>
+        <button class="deploy-tab ${at==='iso'?'active':''}"         onclick="switchDeployTab('iso')">Bản đồ ISO 9001</button>
+        <button class="deploy-tab ${at==='audit'?'active':''}"       onclick="switchDeployTab('audit')">Đánh giá nội bộ (9.2)</button>
+        <button class="deploy-tab ${at==='review'?'active':''}"      onclick="switchDeployTab('review')">Xem xét lãnh đạo (9.3)</button>
       </nav>
       ${tabHtml}
       <div class="deploy-footer">
@@ -1656,6 +1953,7 @@ function renderDeployDashboard(){
       </div>
       ${renderWeekPanel()}
       ${renderPickerModal()}
+      ${renderFormDialog()}
     </div>`;
 }
 
@@ -1688,4 +1986,17 @@ window.deployPickerSetFilter = deployPickerSetFilter;
 window.deployPickerSelect = deployPickerSelect;
 window.deployPickerAssignManual = deployPickerAssignManual;
 window.deployClearChampion = deployClearChampion;
+window.deployCloseFormDialog = deployCloseFormDialog;
+window.deployFormDialogSubmit = deployFormDialogSubmit;
+window.deployEditIssue = deployEditIssue;
+window.deployEditAudit = (id) => {
+  const a = ((DeployState.audits && DeployState.audits.audits) || []).find(x => x.id === id);
+  if (a) deployOpenAuditForm(a);
+};
+window.deployEditFinding = (auditId, findingId) => {
+  const a = ((DeployState.audits && DeployState.audits.audits) || []).find(x => x.id === auditId);
+  if (!a) return;
+  const f = (a.findings || []).find(x => x.id === findingId);
+  if (f) deployOpenFindingForm(auditId, f);
+};
 window.deployResetState = deployResetState;
