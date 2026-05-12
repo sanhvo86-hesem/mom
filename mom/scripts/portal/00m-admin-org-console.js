@@ -436,6 +436,39 @@
       }), 40);
     });
 
+    (S.hcmEmployees || []).forEach(function(e){
+      var eid = employeeIdentity(e);
+      var posId = String(e && e.hcm_position_id || '').trim();
+      if (!eid || !posId) return;
+      var position = S.byPositionId[posId] || {};
+      put(Object.assign({}, e, {
+        employee_id: eid,
+        hcm_position_id: posId,
+        hcm_org_unit_id: String(e.hcm_org_unit_id || position.hcm_org_unit_id || ''),
+        assignment_status: String(e.employment_status || 'active') === 'terminated' ? 'ended' : 'active',
+        assignment_type: 'primary',
+        is_primary: true,
+        source_system: firstText(e.source_system, 'HCM_EMPLOYEE_PRIMARY')
+      }), 30);
+    });
+
+    (S.users || []).forEach(function(user){
+      var eid = employeeIdentity(user);
+      var posId = String(user && user.hcm_position_id || '').trim();
+      if (!eid || !posId) return;
+      var position = S.byPositionId[posId] || {};
+      put(Object.assign({}, user, {
+        employee_id: eid,
+        hcm_position_id: posId,
+        hcm_org_unit_id: String(user.hcm_org_unit_id || position.hcm_org_unit_id || ''),
+        assignment_status: user.active === false ? 'inactive' : 'active',
+        employment_status: user.active === false ? 'inactive' : 'active',
+        assignment_type: 'primary',
+        is_primary: true,
+        source_system: firstText(user.source_system, 'ADMIN_USER_PRIMARY')
+      }), 20);
+    });
+
     return Object.keys(byKey).map(function(k){
       var row = byKey[k];
       delete row._priority;

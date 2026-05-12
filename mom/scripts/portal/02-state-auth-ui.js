@@ -12103,6 +12103,39 @@ function renderAdminOrgChartLegacy(){
     const keyExists = employeesByPosition[positionId].some(row=>String(row.employee_id || '').trim() === employeeId);
     if(!keyExists) employeesByPosition[positionId].push(employee);
   });
+  hcmEmployees.forEach(employee=>{
+    const employeeId = String(employee.employee_id || '').trim();
+    const positionId = String(employee.hcm_position_id || '').trim();
+    if(!employeeId || !positionId) return;
+    if(!employeesByPosition[positionId]) employeesByPosition[positionId] = [];
+    const keyExists = employeesByPosition[positionId].some(row=>String(row.employee_id || '').trim() === employeeId);
+    if(keyExists) return;
+    employeesByPosition[positionId].push(Object.assign({}, employee, {
+      employee_id: employeeId,
+      hcm_position_id: positionId,
+      assignment_status: String(employee.employment_status || 'active') === 'terminated' ? 'ended' : 'active',
+      assignment_type: 'primary',
+      is_primary: true,
+      source_system: String(employee.source_system || 'HCM_EMPLOYEE_PRIMARY')
+    }));
+  });
+  USERS.filter(user=>user.active!==false).forEach(user=>{
+    const employeeId = adminUserEmployeeId(user);
+    const positionId = String(user.hcm_position_id || '').trim();
+    if(!employeeId || !positionId) return;
+    if(!employeesByPosition[positionId]) employeesByPosition[positionId] = [];
+    const keyExists = employeesByPosition[positionId].some(row=>String(row.employee_id || '').trim() === employeeId);
+    if(keyExists) return;
+    employeesByPosition[positionId].push(Object.assign({}, user, {
+      employee_id: employeeId,
+      hcm_position_id: positionId,
+      hcm_org_unit_id: String(user.hcm_org_unit_id || ''),
+      assignment_status: 'active',
+      assignment_type: 'primary',
+      is_primary: true,
+      source_system: String(user.source_system || 'ADMIN_USER_PRIMARY')
+    }));
+  });
   USERS.filter(u=>u.active!==false).forEach(user=>{
     const employeeId = String(user.employee_id || '').trim();
     if(employeeId){
