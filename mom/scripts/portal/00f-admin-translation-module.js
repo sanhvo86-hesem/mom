@@ -169,10 +169,10 @@ function render() {
 
 function switchTab(id) {
   STATE.activeTab = id;
-  // Cancel any pending doc-queue poll if we're leaving the Documents tab.
-  if (id !== 'documents' && _docsPollHandle) {
-    clearTimeout(_docsPollHandle);
-    _docsPollHandle = null;
+  // Cancel any pending doc-queue poll and live timers if leaving Documents tab.
+  if (id !== 'documents') {
+    if (_docsPollHandle) { clearTimeout(_docsPollHandle); _docsPollHandle = null; }
+    clearLiveTimers();
   }
   if (id === 'usage' && !STATE.usage) loadUsage();
   if (id === 'models') loadAllModels();
@@ -1149,6 +1149,7 @@ function loadDocuments() {
       STATE.documents = d;
       render();
       scheduleDocsPoll();
+      startLiveTimers();
     })
     .catch(err => { STATE.error = String(err.message || err); render(); });
 }
@@ -1160,6 +1161,9 @@ function loadDocuments() {
 // progress + completion without manual refresh. Polling stops automatically
 // when nothing is in flight.
 let _docsPollHandle = null;
+// Live elapsed timers: doc_code → intervalId
+let _liveTimers = {};
+
 function isDocQueued(doc) {
   return (doc && doc.engine_version === 'queued_background_worker');
 }
@@ -1169,6 +1173,44 @@ function queuedElapsedMinutes(doc) {
   const ts = Date.parse(doc.translated_at);
   if (isNaN(ts)) return null;
   return Math.max(0, Math.round((Date.now() - ts) / 60000));
+}
+// Format elapsed seconds (integer) into "5s", "2m 07s", "1h 03m".
+function formatElapsedSec(sec) {
+  if (sec < 60) return sec + 's';
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  if (m < 60) return m + 'm ' + String(s).padStart(2, '0') + 's';
+  const h = Math.floor(m / 60);
+  return h + 'h ' + String(m % 60).padStart(2, '0') + 'm';
+}
+// Wire up a 1-second setInterval for each queued doc. The interval writes to
+// the cell identified by id="tx-dur-CODE", which survives DOM rebuilds because
+// each tick re-queries by id. Non-queued docs get their timer cleared.
+function startLiveTimers() {
+  const docs = STATE.documents;
+  if (!docs || !Array.isArray(docs.documents)) return;
+  docs.documents.forEach(doc => {
+    const code = doc.doc_code;
+    if (isDocQueued(doc)) {
+      if (_liveTimers[code]) return; // already running
+      const startTs = doc.translated_at ? Date.parse(doc.translated_at) : Date.now();
+      _liveTimers[code] = setInterval(() => {
+        const el = document.getElementById('tx-dur-' + code);
+        if (el) {
+          el.textContent = formatElapsedSec(Math.floor((Date.now() - startTs) / 1000));
+        }
+      }, 1000);
+    } else {
+      if (_liveTimers[code]) {
+        clearInterval(_liveTimers[code]);
+        delete _liveTimers[code];
+      }
+    }
+  });
+}
+function clearLiveTimers() {
+  Object.values(_liveTimers).forEach(id => clearInterval(id));
+  _liveTimers = {};
 }
 function scheduleDocsPoll() {
   if (_docsPollHandle) { clearTimeout(_docsPollHandle); _docsPollHandle = null; }
@@ -1308,22 +1350,22 @@ function renderDocRow(doc, enabledProviders) {
   const retranslating = !!STATE.docRetranslating[code] || (queued && !stuck);
   const expanded     = STATE.docExpandedOverride === code;
 
+  // Build the engine label. When queued, keep showing the actual engine/provider
+  // and prepend a pulsing dot so the admin can see which engine is running.
+  const stuckBadge = stuck
+    ? `<br><span style="font-size:11px;color:var(--danger,#c00);font-weight:600;">⚠ ${_t('Worker có thể đã chết — bấm Dịch lại để re-queue', 'Worker may have died — click Retranslate to re-queue')}</span>`
+    : '';
   let engineLabel;
-  if (queued) {
-    const elapsedTxt = elapsedMin === null
-      ? _t('vừa xếp hàng', 'just queued')
-      : (elapsedMin === 0 ? _t('< 1 phút', '< 1 min') : _t(elapsedMin + ' phút trước', elapsedMin + 'm ago'));
-    const stuckBadge = stuck
-      ? `<br><span style="font-size:11px;color:var(--danger,#c00);font-weight:600;">⚠ ${_t('Worker có thể đã chết — bấm Dịch lại để re-queue', 'Worker may have died — click Retranslate to re-queue')}</span>`
-      : '';
-    engineLabel = `<span class="tx-queued-dot${stuck ? ' tx-queued-stuck' : ''}"></span>
-       <span style="color:var(--warn,#e0a000);font-weight:600;">${_t('Đang dịch...', 'Translating...')}</span>
-       <br><span style="font-size:11px;color:var(--text-3);">${_t('bắt đầu', 'started')} ${escapeHtml(elapsedTxt)}</span>${stuckBadge}`;
+  if (doc.override_provider) {
+    engineLabel = `<div style="font-size:10px;color:var(--text-3);margin-bottom:1px;">${_t('override', 'override')}:</div>`
+      + `<span style="color:var(--brand-primary,#0c63e7);font-weight:600;">${escapeHtml(doc.override_provider)}${doc.override_model ? ' / ' + escapeHtml(doc.override_model) : ''}</span>`;
   } else {
-    engineLabel = doc.override_provider
-      ? `<div style="font-size:10px;color:var(--text-3);margin-bottom:1px;">${_t('override', 'override')}:</div>
-         <span style="color:var(--brand-primary,#0c63e7);font-weight:600;">${escapeHtml(doc.override_provider)}${doc.override_model ? ' / ' + escapeHtml(doc.override_model) : ''}</span>`
-      : `<span style="color:var(--text-2);">${escapeHtml(doc.translation_provider || '—')}${doc.engine_version ? '<br><span style="font-size:11px;color:var(--text-3);">' + escapeHtml(doc.engine_version.replace(/_v\d+$/, '')) + '</span>' : ''}</span>`;
+    const evClean = (doc.engine_version || '').replace(/_v\d+$/, '');
+    const evDisplay = evClean === 'queued_background_worker' || evClean === '' ? '' : evClean;
+    engineLabel = `<span style="color:var(--text-2);">${escapeHtml(doc.translation_provider || '—')}${evDisplay ? '<br><span style="font-size:11px;color:var(--text-3);">' + escapeHtml(evDisplay) + '</span>' : ''}</span>`;
+  }
+  if (queued) {
+    engineLabel = `<span class="tx-queued-dot${stuck ? ' tx-queued-stuck' : ''}"></span>${engineLabel}${stuckBadge}`;
   }
 
   return `
@@ -1346,10 +1388,14 @@ function renderDocRow(doc, enabledProviders) {
       <td style="padding:9px 8px;font-size:12px;color:var(--text-3);white-space:nowrap;">
         ${doc.translated_at ? escapeHtml(doc.translated_at.substr(0, 16).replace('T', ' ')) : '—'}
       </td>
-      <td style="padding:9px 8px;font-size:12px;color:var(--text-3);white-space:nowrap;text-align:right;font-family:monospace;"
-          title="${doc.last_provider_key ? escapeHtml(doc.last_provider_key + (doc.last_model_id ? ' / ' + doc.last_model_id : '')) : ''}">
-        ${escapeHtml(formatDuration(doc.last_duration_ms))}
-      </td>
+      ${queued
+        ? `<td id="tx-dur-${escapeHtml(code)}" style="padding:9px 8px;font-size:12px;color:var(--warn,#e0a000);white-space:nowrap;text-align:right;font-family:monospace;">
+            ${formatElapsedSec(Math.max(0, Math.floor((Date.now() - (doc.translated_at ? Date.parse(doc.translated_at) : Date.now())) / 1000)))}
+          </td>`
+        : `<td style="padding:9px 8px;font-size:12px;color:var(--text-3);white-space:nowrap;text-align:right;font-family:monospace;"
+              title="${doc.last_provider_key ? escapeHtml(doc.last_provider_key + (doc.last_model_id ? ' / ' + doc.last_model_id : '')) : ''}">
+            ${escapeHtml(formatDuration(doc.last_duration_ms))}
+          </td>`}
       <td style="padding:9px 8px;">
         ${queued && !stuck
           ? `<span style="padding:3px 8px;border-radius:4px;font-size:11px;white-space:nowrap;background:var(--warn-bg,#fff8e1);color:var(--warn,#e0a000);font-weight:600;">⟳ ${_t('đang dịch', 'translating')}</span>`
