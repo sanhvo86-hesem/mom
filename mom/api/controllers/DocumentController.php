@@ -222,7 +222,7 @@ class DocumentController extends BaseController
                 'draft_rel' => $draftRel,
                 'doc'       => $docRecord,
                 'state'     => $state,
-                'versions'  => $manifest['versions'],
+                'versions'  => $this->enrichVersionHistory($manifest['versions'] ?? []),
                 'locale_translation' => $localeTranslation,
             ]);
         } catch (Throwable $e) {
@@ -361,7 +361,7 @@ class DocumentController extends BaseController
             'draft_rel' => $draftRel,
             'revision' => $revision,
             'state' => $state,
-            'versions' => $versions,
+            'versions' => $this->enrichVersionHistory($versions),
             'locale_translation' => $localeTranslation,
         ]);
     }
@@ -517,7 +517,7 @@ class DocumentController extends BaseController
             'status' => 'in_review',
             'revision' => $revision,
             'state' => $state,
-            'versions' => $versions,
+            'versions' => $this->enrichVersionHistory($versions),
             'locale_translation' => $localeTranslation,
         ]);
     }
@@ -685,6 +685,12 @@ class DocumentController extends BaseController
         $state['approved_by']      = (string)($me['name'] ?? $me['username'] ?? '');
         $state['approved_date']    = $this->nowIso();
         if ($effectiveDate !== '') $state['effective_date'] = $effectiveDate;
+        // Capture submitter info before transient fields are cleared
+        $submittedBy       = (string)($state['submittedBy']  ?? '');
+        $submittedDateRaw  = (string)($state['submittedDate'] ?? '');
+        $submittedDateHuman = $submittedDateRaw !== ''
+            ? gmdate('Y-m-d H:i', (int)strtotime($submittedDateRaw))
+            : '';
         // Remove transient fields
         foreach (['lastEdit', 'submittedBy', 'submittedDate', 'submittedUpdateType', 'rejectedBy', 'rejectedDate', 'checked_out_by'] as $k) {
             unset($state[$k]);
@@ -713,13 +719,19 @@ class DocumentController extends BaseController
             }
         }
         unset($v);
+        $approverName = (string)($me['name'] ?? $me['username'] ?? '');
+        $approvedDateHuman = $this->humanDt();
         array_unshift($versions, [
-            'status'  => 'approved',
-            'version' => 'v' . $revision,
-            'date'    => $this->humanDt(),
-            'by'      => (string)($me['name'] ?? $me['username'] ?? ''),
-            'file'    => $baseRel,
-            'note'    => $note ?: 'Approved',
+            'status'        => 'approved',
+            'version'       => 'v' . $revision,
+            'date'          => $approvedDateHuman,
+            'by'            => $approverName,
+            'approvedBy'    => $approverName,
+            'approvedDate'  => $approvedDateHuman,
+            'submittedBy'   => $submittedBy,
+            'submittedDate' => $submittedDateHuman,
+            'file'          => $baseRel,
+            'note'          => $note ?: 'Approved',
         ]);
         $manifest['versions'] = $versions;
         save_doc_manifest($this->rootDir, $baseRel, $manifest);
@@ -777,7 +789,7 @@ class DocumentController extends BaseController
             'status' => 'approved',
             'revision' => $revision,
             'state' => $state,
-            'versions' => $versions,
+            'versions' => $this->enrichVersionHistory($versions),
             'locale_translation' => $localeTranslation,
         ]);
     }
@@ -861,7 +873,7 @@ class DocumentController extends BaseController
             'status' => 'draft',
             'revision' => $revision,
             'state' => $state,
-            'versions' => $versions,
+            'versions' => $this->enrichVersionHistory($versions),
         ]);
     }
 
@@ -1086,7 +1098,7 @@ class DocumentController extends BaseController
         }
 
         $this->auditLog('doc_delete_drafts', ['code' => $code, 'removed' => $removed]);
-        $this->success(['removed' => $removed, 'state' => $state, 'versions' => $kept]);
+        $this->success(['removed' => $removed, 'state' => $state, 'versions' => $this->enrichVersionHistory($kept)]);
     }
 
     /**
@@ -1152,7 +1164,7 @@ class DocumentController extends BaseController
         }
 
         $this->auditLog('doc_delete_version', ['code' => $code, 'version' => $version]);
-        $this->success(['deleted' => $deleted, 'state' => $state, 'versions' => $kept]);
+        $this->success(['deleted' => $deleted, 'state' => $state, 'versions' => $this->enrichVersionHistory($kept)]);
     }
 
     /**
@@ -1180,7 +1192,7 @@ class DocumentController extends BaseController
 
         $this->success([
             'code'     => $code,
-            'versions' => $manifest['versions'] ?? [],
+            'versions' => $this->enrichVersionHistory($manifest['versions'] ?? []),
             'state'    => $state,
         ]);
     }
@@ -1271,7 +1283,7 @@ class DocumentController extends BaseController
         // projection; no further DCC write is needed.
 
         $this->auditLog('doc_start_new_revision', ['code' => $code, 'revision' => $newRevision]);
-        $this->success(['revision' => $newRevision, 'state' => $state, 'versions' => $versions]);
+        $this->success(['revision' => $newRevision, 'state' => $state, 'versions' => $this->enrichVersionHistory($versions)]);
     }
 
     /**
@@ -2296,6 +2308,35 @@ class DocumentController extends BaseController
         }
 
         return '<span class="entity-cluster role-cluster">' . implode('<span class="entity-sep role-sep">/</span>', $chips) . '</span>';
+    }
+
+    /**
+     * Enrich version history entries for backwards-compatible display.
+     *
+     * Old manifest entries written before the actor-tracking fields were added
+     * have only `by` + `date`. This backfills `approvedBy` and `approvedDate`
+     * from those existing fields so the frontend renders labelled rows for ALL
+     * documents — not just ones approved after the fix was deployed.
+     * Called on every API response that includes a versions array.
+     *
+     * @param  array<mixed> $versions
+     * @return array<mixed>
+     */
+    private function enrichVersionHistory(array $versions): array
+    {
+        return array_map(static function (mixed $v): mixed {
+            if (!is_array($v)) return $v;
+            $status = (string)($v['status'] ?? '');
+            if (
+                in_array($status, ['approved', 'obsolete'], true)
+                && ($v['by'] ?? '') !== ''
+                && ($v['approvedBy'] ?? '') === ''
+            ) {
+                $v['approvedBy']   = (string)$v['by'];
+                $v['approvedDate'] = (string)($v['date'] ?? '');
+            }
+            return $v;
+        }, $versions);
     }
 
     /**

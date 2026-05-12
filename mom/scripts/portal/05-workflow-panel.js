@@ -686,11 +686,12 @@ function renderVersionHistory(doc){
                 ${workflowUpdateTypeBadge(v.updateType,false)}
                 ${isCurrentVersionEntry(doc,v)?'<span class="vh-current-pill">'+T('wf_current')+'</span>':''}
                 ${versionHasAccess(doc,v)?'<span class="vh-access-hint" title="'+(lang==='en'?(isWorkbook?'Click to download':'Click to view'):(isWorkbook?'Nhấn để tải':'Nhấn để xem'))+'">'+(isWorkbook?'⬇':'👁')+' '+(lang==='en'?(isWorkbook?'Download':'View'):(isWorkbook?'Tải':'Xem'))+'</span>':''}
-                <div class="date">${v.date}</div>
-                <div class="who">${v.by||v.user||''}${(v.by||v.user)&&v.role?' — '+v.role:''}</div>
-                ${v.submittedBy?'<div class="vh-meta-line link">📤 '+(lang==='en'?'Submitted by':'Gửi bởi')+': '+v.submittedBy+(v.submittedDate?' · '+v.submittedDate:'')+'</div>':''}
+                ${v.approvedBy
+                  ? ''
+                  : '<div class="date">'+v.date+'</div><div class="who">'+(v.by||v.user||'')+((v.by||v.user)&&v.role?' — '+v.role:'')+'</div>'}
+                ${v.submittedBy?'<div class="vh-meta-line link">📤 '+(lang==='en'?'Submitted by':'Người gởi')+': '+v.submittedBy+(v.submittedDate?' · '+v.submittedDate:'')+'</div>':''}
                 ${v.lastEditBy?'<div class="vh-meta-line">✏️ '+(lang==='en'?'Last editor':'Người chỉnh sửa cuối')+': '+v.lastEditBy+(v.lastEditRole?' — '+v.lastEditRole:'')+(v.lastEditDate?' · '+v.lastEditDate:'')+'</div>':''}
-                ${v.approvedBy?'<div class="vh-meta-line success">✅ '+(lang==='en'?'Approved by':'Duyệt bởi')+': '+v.approvedBy+(v.approvedDate?' · '+v.approvedDate:'')+'</div>':''}
+                ${v.approvedBy?'<div class="vh-meta-line success">✅ '+(lang==='en'?'Approved by':'Người duyệt')+': '+v.approvedBy+(v.approvedDate?' · '+v.approvedDate:'')+'</div>':''}
                 ${v.note?'<div class="note">"'+v.note+'"</div>':''}
               </div>
               ${!isWorkbook && i>0 && versionHasAccess(doc,v) && canEdit({code:doc.code})?'<button class="vh-restore" onclick="event.stopPropagation();restoreVersion(\''+doc.code+'\','+i+')">'+T('wf_restore')+'</button>':''}
