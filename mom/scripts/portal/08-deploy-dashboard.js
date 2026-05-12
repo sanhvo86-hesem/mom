@@ -505,11 +505,17 @@ function renderKpiCard(kpi, value){
 function renderTabTimeline(){
   const weeks = (DeployState.program && DeployState.program.weeks) || [];
   const cw = deployCurrentWeek();
+  // Detect any week that overrides the default Saturday cadence (e.g. the
+  // exec-only W0 on a Thursday) so the header is honest about exceptions.
+  const overrides = weeks.filter(w => w.dayOverride);
+  const overrideNote = overrides.length
+    ? overrides.map(w => `W${w.n|0} ${deployEscape(w.dayOverride)} ${deployFmtDate(w.date)}`).join(', ')
+    : '';
   return `
   <div class="deploy-tab-panel active" id="dtab-timeline">
     <section class="deploy-section">
       <div class="deploy-section-head">
-        <h2>Lộ trình 12 tuần · Thứ Bảy 9:00</h2>
+        <h2>Lộ trình 12 tuần · cadence Thứ Bảy 9:00${overrideNote ? ` · ngoại lệ ${overrideNote}` : ''}</h2>
         <span>Click một tuần để mở panel chi tiết</span>
       </div>
       <div class="deploy-timeline">
@@ -531,17 +537,26 @@ function renderTimelineWeek(w, currentWeek){
   const so = w.signOff;
   let statusClass = w.status === 'completed' ? 'tlw-done' : w.status === 'blocked' ? 'tlw-blocked' : w.status === 'conditional' ? 'tlw-cond' : isCurrent ? 'tlw-current' : 'tlw-pending';
   const decisionBadge = so ? `<span class="tlw-decision tlw-decision-${so.decision}">${so.decision === 'go' ? '✓ GO' : so.decision === 'no_go' ? '✗ NO-GO' : '◐ COND'}</span>` : '';
+  // Show day-of-week if the week overrides the default Saturday cadence
+  // (e.g. W0 Thursday). The chip makes the exception visible without
+  // having to open the side panel.
+  const dayBadge = w.dayOverride
+    ? `<span class="tlw-day-override" title="Ngoại lệ cadence: tuần này họp ${deployEscape(w.dayOverride)}">${deployEscape(w.dayOverride)}</span>`
+    : '';
+  const attendeesBadge = w.attendees && w.attendees.length
+    ? `<span class="tlw-attendees" title="${deployEscape((w.attendeesNote || ''))}">${w.attendees[0] === 'all_departments' ? '👥 ALL DEPT' : '🔒 ' + w.attendees.length + ' người'}</span>`
+    : '';
   return `
   <button class="tl-week ${statusClass}" onclick="deployOpenWeek(${w.n|0})" style="--phase-color:${phase.color}">
     <div class="tlw-head">
       <span class="tlw-num">W${w.n|0}</span>
-      <span class="tlw-date">${deployFmtDate(w.date)}</span>
+      <span class="tlw-date">${deployFmtDate(w.date)}${dayBadge}</span>
     </div>
     <div class="tlw-phase">${deployEscape(phase.label)}</div>
     <div class="tlw-label">${deployEscape(w.label || '')}</div>
     <div class="tlw-foot">
       <span class="tlw-gate">${(w.gateCodes||[]).join(' · ') || '—'}</span>
-      ${decisionBadge}
+      ${decisionBadge || attendeesBadge}
     </div>
   </button>`;
 }
@@ -1117,10 +1132,21 @@ function renderWeekPanel(){
       <header class="dwp-header">
         <div>
           <span class="dwp-kicker">${deployEscape(phase.label)} · ${deployEscape(phase.title)}</span>
-          <h2>W${wn} · ${deployFmtDate(w.date)} · ${deployEscape(w.label)}</h2>
+          <h2>W${wn} · ${w.dayOverride ? deployEscape(w.dayOverride) + ' ' : ''}${deployFmtDate(w.date)} · ${deployEscape(w.label)}</h2>
         </div>
         <button class="dwp-close" onclick="deployCloseWeek()" aria-label="Đóng">×</button>
       </header>
+
+      ${(w.attendees && w.attendees.length) ? `
+        <section class="dwp-section dwp-attendees-section">
+          <h3>Người tham dự</h3>
+          <div class="dwp-attendees-chips">
+            ${w.attendees[0] === 'all_departments'
+              ? '<span class="dwp-attendee-chip chip-all">👥 Tất cả 10 phòng ban + Steering</span>'
+              : w.attendees.map(a => `<span class="dwp-attendee-chip chip-restricted">🔒 ${deployEscape(a)}</span>`).join('')}
+          </div>
+          ${w.attendeesNote ? `<p class="dwp-attendees-note">${deployEscape(w.attendeesNote)}</p>` : ''}
+        </section>` : ''}
 
       <section class="dwp-section">
         <h3>Mục tiêu tuần</h3>

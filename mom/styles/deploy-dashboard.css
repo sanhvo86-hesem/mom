@@ -260,6 +260,46 @@
 .kpi-tip-head span { font-weight: 400; color: rgba(241,245,249,.7); font-size: 11px; }
 .kpi-tip-row { margin: 6px 0; color: #cbd5e1; }
 .kpi-tip-row strong { color: #fbbf24; font-weight: 700; display: inline-block; margin-right: 4px; }
+
+/* Timeline card — day-override chip + attendees chip */
+.tlw-day-override {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  background: #fef3c7;
+  color: #92400e;
+  border-radius: var(--r-pill);
+  font-size: 9.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  vertical-align: middle;
+}
+.tlw-attendees {
+  display: inline-block;
+  padding: 2px 8px;
+  background: rgba(21, 101, 192, .10);
+  color: #1565c0;
+  border-radius: var(--r-pill);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* Week side-panel attendees section */
+.dwp-attendees-section { background: #f1f5f9; border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; }
+.dwp-attendees-section h3 { margin: 0 0 6px; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--c-muted); }
+.dwp-attendees-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+.dwp-attendee-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+.dwp-attendee-chip.chip-all { background: #dcfce7; color: #166534; }
+.dwp-attendee-chip.chip-restricted { background: #fef3c7; color: #92400e; }
+.dwp-attendees-note { margin: 0; font-size: 11.5px; color: var(--c-muted); line-height: 1.45; }
 .kpi-mini-input {
   width: 70px;
   padding: 4px 6px;
