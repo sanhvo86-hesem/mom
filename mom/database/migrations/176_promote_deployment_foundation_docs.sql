@@ -62,7 +62,7 @@ DO $$
 BEGIN
     IF EXISTS (SELECT 1 FROM information_schema.tables
                WHERE table_name = 'dcc_document_revision') THEN
-        INSERT INTO dcc_document_revision (doc_code, revision, update_type, effective_date, recorded_at, recorded_by, notes)
+        INSERT INTO dcc_document_revision (doc_code, revision, update_type, effective_date, approved_at, approved_by, note)
         SELECT  d,
                 'V1.0',
                 'major',
@@ -80,7 +80,7 @@ BEGIN
             SELECT 1 FROM dcc_document_revision r
             WHERE  r.doc_code = s.d
               AND  r.revision = 'V1.0'
-              AND  r.recorded_by = 'deploy_program_migration_176'
+              AND  r.approved_by = 'deploy_program_migration_176'
         );
     END IF;
 END$$;
