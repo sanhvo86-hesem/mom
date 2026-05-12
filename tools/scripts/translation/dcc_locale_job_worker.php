@@ -40,6 +40,18 @@ if ($queueLock === null) {
     exit(DCC_LOCALE_WORKER_NO_SLOT_EXIT);
 }
 
+// Composer autoload first so the MOM\Services\Translation\* namespace
+// (SecretVaultService, ProviderRegistryService, ...) resolves when the
+// automation service consults the routing registry. Without this, the
+// registry lookup catches a class-not-found error and falls back to the
+// legacy DCC_TRANSLATION_COMMAND env (which is NLLB on this VPS), so every
+// queued retranslate silently produces NLLB output regardless of the
+// routing rule the admin configured.
+$composerAutoload = $rootDir . '/mom/vendor/autoload.php';
+if (is_file($composerAutoload)) {
+    require_once $composerAutoload;
+}
+
 require_once $rootDir . '/mom/database/DataLayer.php';
 require_once $rootDir . '/mom/api/services/DocumentControl/DocumentControlService.php';
 require_once $rootDir . '/mom/api/services/DocumentControl/DocumentLocaleAutomationService.php';
