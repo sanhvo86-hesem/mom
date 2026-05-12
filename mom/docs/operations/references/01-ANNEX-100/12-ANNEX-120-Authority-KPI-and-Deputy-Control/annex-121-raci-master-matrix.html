@@ -153,7 +153,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
  </div>
  </div>
  </div>
- <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#r1">1. Mục đích</a><a href="#r2">2. Chú giải và quy tắc dùng RACI</a><a href="#r3">3. Vai trò / vai trò nhóm / cụm</a><a href="#r4">4. RACI ngang không gắn cổng</a><a href="#r5gate">5. RACI theo cổng G0→G7</a><a href="#r6">6. RACI mức tài liệu</a><a href="#r7">7. Bàn giao và leo thang</a><a href="#r8">8. Đồng bộ tài liệu / quyền</a><a href="#r9">9. Rà soát cập nhật</a></div></div>
+ <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid"><a href="#r1">1. Mục đích</a><a href="#r2">2. Chú giải và quy tắc dùng RACI</a><a href="#r3">3. Vai trò / vai trò nhóm / cụm</a><a href="#r4">4. RACI mức hoạt động theo value-luồng</a><a href="#r5gate">5. RACI theo cổng G0→G7</a><a href="#r6">6. RACI mức tài liệu</a><a href="#r7">7. Bàn giao và leo thang</a><a href="#r8">8. Đồng bộ SOP — WI — ANNEX — JD — quyền hệ thống</a><a href="#r9">9. Kích hoạt rà soát</a></div></div>
  <h2 class="h2" id="r1">1. Mục đích</h2>
 <p>ANNEX-121 mô tả <b>ai chịu trách nhiệm làm, ai chịu trách nhiệm cuối cùng, ai phải được tham vấn và ai cần được biết</b> ở hai cấp: (1) hoạt động/value-luồng và (2) quản lý tài sản của tài liệu/hồ sơ hệ thống. Mục tiêu là khóa đường bàn giao, ngăn khoảng trống người chịu trách nhiệm, và giúp SOP/WI/ANNEX/JD chạy cùng một logic thực thi.</p>
 <h2 class="h2" id="r2">2. Chú giải và quy tắc dùng RACI</h2>
@@ -167,118 +167,690 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
  <ul class="doc-link-list">
  <li>RACI trả lời câu hỏi <b>ai sở hữu hoạt động</b>; ma trận thẩm quyền trả lời câu hỏi <b>ai có quyền phê duyệt/nhả giữ</b>.</li>
  <li>Hoạt động có thể có nhiều R nhưng chỉ một A; tài liệu có thể có người chịu trách nhiệm, Reviewer, Approver khác nhau.</li>
- <li>Khi hoạt động thay đổi do tự động hóa, phần mềm mới, thay đổi ranh giới vai trò hoặc kết quả đánh giá, RACI phải được cập nhật đồng thời với phân quyền hệ thống và <a class="entity-link bundle-link bundle-chip" data-bundle="FUNC_OWNERS" href="../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-owners" title="Functional Content Owners (Nhóm sở hữu nội dung nghiệp vụ theo chức năng)"><span class="entity-code bundle-code">FUNC_OWNERS</span></a>.</li>
+ <li>Khi hoạt động thay đổi do tự động hóa, phần mềm mới, thay đổi ranh giới vai trò hoặc phát hiện từ đánh giá, RACI phải được cập nhật đồng thời với quyền hệ thống và bundle <a class="entity-link bundle-link bundle-chip" data-bundle="FUNC_OWNERS" href="../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-func-owners" title="Functional Owners"><span class="entity-code bundle-code">FUNC_OWNERS</span></a>.</li>
  </ul>
 </div>
-<h2 class="h2" id="r3">3. Vai trò / vai trò nhóm / cụm</h2><div class="table-card"><table class="table"><colgroup><col style="width:18%"><col style="width:28%"><col style="width:54%"></colgroup><thead><tr><th>Vai trò nhóm / cụm</th><th>Vai trò</th><th>Trọng tâm</th></tr></thead><tbody><tr><td><span class="role-cluster"><a class="role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tổng Giám đốc)"><span class="role-code">CEO</span></a></span></td><td>Chiến lược / leo thang cuối cùng</td><td>Ngoại lệ thương mại, chính sách, kích hoạt tính liên tục kinh doanh, quyết định khách hàng lớn/nghiêm trọng hoặc dòng tiền.</td></tr>
+<h2 class="h2" id="r3">3. Vai trò / vai trò nhóm / cụm</h2>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:18%"><col style="width:28%"><col style="width:54%"></colgroup>
+<thead><tr><th>Vai trò nhóm / cụm</th><th>Vai trò</th><th>Trọng tâm</th></tr></thead>
+<tbody>
+<tr><td><span class="role-code">CEO</span></td><td>Chiến lược / leo thang cuối cùng</td><td>Ngoại lệ thương mại, chính sách, tính liên tục kinh doanh, quyết định khách hàng lớn và kiểm soát dòng tiền.</td></tr>
 <tr><td><span class="role-code">CS</span> <span class="role-code">EST</span></td><td>Thương mại tuyến đầu</td><td>RFQ, dữ liệu đơn hàng, liên lạc khách hàng, báo giá và kích hoạt lập hóa đơn.</td></tr>
-<tr><td><span class="role-code">ENGM</span> <span class="role-code">PE</span> <span class="role-code">CAM</span></td><td>Nhóm kỹ thuật</td><td>Phương pháp, chương trình NC, kiểm soát thay đổi, mức độ sẵn sàng kỹ thuật.</td></tr>
-<tr><td><span class="role-code">PPL</span> <span class="role-code">PD</span> <span class="role-code">WKM</span></td><td>Nhóm kế hoạch &amp; kiểm soát sản xuất</td><td>Công suất, điều phối giao hàng, lịch trình phục hồi, điều hành sản xuất.</td></tr>
-<tr><td><span class="role-code">QA</span> <span class="role-code">QE</span> <span class="role-code">QCL</span> <span class="role-code">QC</span> <span class="role-code">QMS</span></td><td>Nhóm chất lượng</td><td>Kiểm soát, xác minh, phát hành cuối, CAPA, đánh giá và tài liệu chuyên ngành.</td></tr>
-<tr><td><span class="role-code">SCM</span> <span class="role-code">BUY</span> <span class="role-code">LOG</span> <span class="role-code">WAR</span> <span class="role-code">TOOL</span></td><td>Nhóm chuỗi cung ứng</td><td>Nhà cung cấp, vật tư, tồn kho, xuất hàng và hỗ trợ dụng cụ.</td></tr>
-<tr><td><span class="role-code">FIN</span> <span class="role-code">APAR</span> <span class="role-code">GLP</span></td><td>Nhóm tài chính</td><td>Hóa đơn, AR/AP, kế toán lương, đóng sổ và kiểm soát tài chính.</td></tr>
-<tr><td><span class="role-code">HR</span> <span class="role-code">EHS</span></td><td>Nhóm Nhân sự &amp; An toàn</td><td>Năng lực nhân sự, tiếp nhận nhân viên mới, ứng phó sự cố, ủy quyền làm việc.</td></tr>
-<tr><td><span class="role-code">ITA</span> <span class="role-code">ESA</span></td><td>Kỹ thuật số</td><td>Hạ tầng kỹ thuật số, vòng đời quyền truy cập, quy trình ERP/Admin, sao lưu và phục hồi.</td></tr></tbody></table></div><h2 class="h2" id="r4">4. RACI ngang không gắn cổng</h2>
-<div class="req"><span class="req-tag shall">PHẢI</span><div>Những hoạt động đã nằm trong r5gate không lặp lại tại mục này. Mục này chỉ giữ các nhịp quản trị ngang để tránh trùng CDR.</div></div>
-<div class="table-card"><table class="table"><colgroup><col style="width:28%"><col style="width:18%"><col style="width:18%"><col style="width:18%"><col style="width:18%"></colgroup><thead><tr><th>Hoạt động ngang</th><th>A</th><th>R</th><th>C</th><th>Bằng chứng</th></tr></thead><tbody>
-<tr><td>Rà soát định kỳ RACI / Authority / Deputy</td><td>QMS</td><td>FUNC_OWNERS</td><td>TOP_MGMT</td><td>Biên bản rà soát + ANNEX-120/121/123</td></tr>
-<tr><td>Đồng bộ quyền hệ thống sau khi đổi vai trò</td><td>ITA/ESA</td><td>FUNC_OWNERS</td><td>QA + HR</td><td>FRM-141 + nhật ký phân quyền</td></tr>
-<tr><td>Rà soát dữ liệu xem xét lãnh đạo</td><td>TOP_MGMT</td><td>FUNC_OWNERS</td><td>QMS + FIN</td><td>Gói Management Review</td></tr>
+<tr><td><span class="role-code">ENG</span> <span class="role-code">PE</span> <span class="role-code">CAM</span></td><td>Nhóm kỹ thuật</td><td>DFM, phương án gia công, chương trình CAM/NC, baseline kỹ thuật và kiểm soát thay đổi.</td></tr>
+<tr><td><span class="role-code">PPL</span> <span class="role-code">PD</span> <span class="role-code">WKM</span></td><td>Kế hoạch và sản xuất</td><td>Công suất, điều độ giao hàng, phục hồi tiến độ, bố trí ca và thực thi tại xưởng.</td></tr>
+<tr><td><span class="role-code">QA</span> <span class="role-code">QE</span> <span class="role-code">QCL</span> <span class="role-code">QC</span> <span class="role-code">QMS</span></td><td>Nhóm chất lượng</td><td>FAI, HOLD, NCR, CAPA, release cuối, audit và kiểm soát tài liệu chất lượng.</td></tr>
+<tr><td><span class="role-code">SCM</span> <span class="role-code">BUY</span> <span class="role-code">LOG</span> <span class="role-code">WAR</span> <span class="role-code">TOOL</span></td><td>Chuỗi cung ứng</td><td>Nhà cung cấp, vật tư, tồn kho, outsource, logistics, shipping và dụng cụ sản xuất.</td></tr>
+<tr><td><span class="role-code">FIN</span> <span class="role-code">APAR</span> <span class="role-code">GLP</span></td><td>Tài chính</td><td>Báo giá tài chính, PO, AR/AP, lương, đóng sổ và kiểm soát chi phí.</td></tr>
+<tr><td><span class="role-code">HR</span> <span class="role-code">EHS</span></td><td>Nhân sự và an toàn</td><td>Năng lực nhân sự, đào tạo, phân quyền nhân sự, ứng phó sự cố và Stop-Work.</td></tr>
+<tr><td><span class="role-code">ITA</span> <span class="role-code">ESA</span></td><td>Kỹ thuật số</td><td>Hạ tầng CNTT, vòng đời quyền truy cập, ERP admin, break-glass, sao lưu và phục hồi.</td></tr>
+</tbody></table></div>
+<h2 class="h2" id="r4">4. RACI mức hoạt động theo value-luồng</h2>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Section này chỉ giữ hoạt động ngang không gắn một cổng G cụ thể. Mọi hoạt động đã có trong bảng G0→G7 ở mục 5 không được lặp lại tại đây. <span class="iso-clause">§5.3 / §7.5</span></div></div>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:26%"><col style="width:14%"><col style="width:14%"><col style="width:20%"><col style="width:26%"></colgroup>
+<thead><tr><th>Hoạt động ngang</th><th>A</th><th>R</th><th>C/I</th><th>Bằng chứng</th></tr></thead>
+<tbody>
+<tr><td>Rà soát chu kỳ RACI và thẩm quyền</td><td><span class="role-code">QA</span></td><td><span class="role-code">QMS</span></td><td><span class="role-code">CEO</span> / <span class="role-code">FUNC_HEADS</span></td><td><a href="annex-120-authority-matrix.html">ANNEX-120</a> · <a href="annex-123-deputy-backup-matrix.html">ANNEX-123</a></td></tr>
+<tr><td>Đồng bộ quyền hệ thống với RACI</td><td><span class="role-code">ITA</span></td><td><span class="role-code">ESA</span></td><td><span class="role-code">QMS</span> / <span class="role-code">FUNC_OWNERS</span></td><td><a href="../../../sops/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a> · <a href="../../../../forms/frm-100-sales/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a></td></tr>
+<tr><td>Rà soát KPI cycle và input Management Review</td><td><span class="role-code">QMS</span></td><td><span class="role-code">FUNC_OWNERS</span></td><td><span class="role-code">CEO</span> / <span class="role-code">FIN</span></td><td><a href="annex-122-kpi-cascade-dictionary.html">ANNEX-122</a> · <a href="../../../sops/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html">SOP-102</a></td></tr>
+<tr><td>Kiểm tra năng lực sau khi đổi vai trò RACI</td><td><span class="role-code">HR</span></td><td><span class="role-code">FUNC_HEADS</span></td><td><span class="role-code">QA</span> / <span class="role-code">QMS</span></td><td><a href="annex-123-deputy-backup-matrix.html#d4">ANNEX-123 d4</a> · <a href="../../../sops/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td></tr>
+<tr><td>Rà soát phó vai trò trọng yếu</td><td><span class="role-code">DIRECT_LINE_MGRS</span></td><td><span class="role-code">HR</span></td><td><span class="role-code">CEO</span> / <span class="role-code">QA</span></td><td><a href="annex-123-deputy-backup-matrix.html">ANNEX-123</a> · <a href="../../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a></td></tr>
 </tbody></table></div>
 <h2 class="h2" id="r5gate">5. RACI theo cổng kiểm soát G0→G7</h2>
-<div class="req"><span class="req-tag shall">PHẢI</span><div>Mỗi cổng kiểm soát có ít nhất 3 hoạt động; mỗi hoạt động khớp mã CDR trong ANNEX-120 và có FRM/SOP trỏ về repo. Không dùng cụm mơ hồ thay cho vai trò chịu trách nhiệm. <span class="iso-clause">§5.3 / §7.5 / §8.1</span></div></div>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Mỗi cổng kiểm soát có tối thiểu 3 hoạt động; mỗi hoạt động khớp mã CDR (A1–F6) và có ít nhất một FRM hoặc SOP trỏ về repo. Không dùng cụm mơ hồ trong cột R/C/I. <span class="iso-clause">§5.3 / §7.5 / §8.1</span></div></div>
 <div class="table-card"><table class="table">
-<colgroup><col style="width:4%"><col style="width:5%"><col style="width:20%"><col span="10" style="width:5%"><col style="width:21%"></colgroup>
-<thead><tr><th>G</th><th>CDR</th><th>Hoạt động</th><th>CEO</th><th>CS</th><th>EST</th><th>ENG</th><th>PPL</th><th>WKM</th><th>QA</th><th>SCM</th><th>FIN</th><th>HR/IT</th><th>FRM / SOP</th></tr></thead>
+<colgroup>
+<col style="width:5%"><col style="width:5%"><col style="width:22%">
+<col style="width:5%"><col style="width:5%"><col style="width:5%"><col style="width:5%"><col style="width:5%"><col style="width:5%"><col style="width:5%"><col style="width:5%"><col style="width:5%">
+<col style="width:18%">
+</colgroup>
+<thead><tr>
+<th>G</th><th>CDR</th><th>Hoạt động</th>
+<th>CS</th><th>EST</th><th>ENG</th><th>PPL</th><th>WKM</th><th>QA</th><th>SCM</th><th>FIN</th><th>HR/IT</th>
+<th>FRM / SOP</th>
+</tr></thead>
 <tbody>
-<tr><td>G0</td><td><a href="annex-120-authority-matrix.html#cdr-A1">A1</a></td><td>Tiếp nhận RFQ và làm rõ yêu cầu khách hàng</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-I">I</td><td></td><td class="raci-cell raci-C">C</td><td></td><td></td><td></td><td><a download="" href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G0</td><td><a href="annex-120-authority-matrix.html#cdr-A2">A2</a></td><td>Phê duyệt báo giá theo bậc giá trị</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-R">R</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td></td><td></td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td><a download="" href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G0</td><td><a href="annex-120-authority-matrix.html#cdr-A3">A3</a></td><td>Phê duyệt chiết khấu / điều kiện thương mại ngoại lệ</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-R">R</td><td></td><td class="raci-cell raci-I">I</td><td></td><td></td><td></td><td class="raci-cell raci-C">C</td><td></td><td><a download="" href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G0</td><td><a href="annex-120-authority-matrix.html#cdr-A4">A4</a></td><td>Phê duyệt điều kiện thanh toán ngoại lệ</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td><td></td><td></td><td></td><td></td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-A">A</td><td></td><td><a download="" href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G0</td><td><a href="annex-120-authority-matrix.html#cdr-A5">A5</a></td><td>Chấp thuận đơn hàng và xem xét hợp đồng</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td><a download="" href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G0</td><td><a href="annex-120-authority-matrix.html#cdr-A6">A6</a></td><td>Phê duyệt Customer Change Request (CCR) ảnh hưởng giá / lịch / phạm vi</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td><a download="" href="../../../../forms/frm-200-purchase/FRM-212_Customer_Change_Request.xlsx">FRM-212</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G1</td><td><a href="annex-120-authority-matrix.html#cdr-B1">B1</a></td><td>DFM review và phân loại rủi ro kỹ thuật</td><td class="raci-cell raci-I">I</td><td></td><td class="raci-cell raci-R">R</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td></td><td><a download="" href="../../../../forms/frm-200-purchase/FRM-209_High_Risk_Job_Readiness_Review.xlsx">FRM-209</a> · <a href="../../../sops/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a></td></tr>
-<tr><td>G1</td><td><a href="annex-120-authority-matrix.html#cdr-B2">B2</a></td><td>Phê duyệt Engineering Release / Baseline Package</td><td class="raci-cell raci-I">I</td><td></td><td></td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-I">I</td><td></td><td></td><td><a download="" href="../../../../forms/frm-300-technical/FRM-306_Engineering_Release_and_Baseline_Package_Approval.xlsx">FRM-306</a> · <a href="../../../sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td></tr>
-<tr><td>G1</td><td><a href="annex-120-authority-matrix.html#cdr-B3">B3</a></td><td>Phê duyệt Engineering Change Order (ECO)</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td></td><td><a download="" href="../../../../forms/frm-100-sales/FRM-102_Document_Change_Request.xlsx">FRM-102</a> · <a download="" href="../../../../forms/frm-100-sales/FRM-162_Change_Impact_Matrix.xlsx">FRM-162</a> · <a href="../../../sops/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td></tr>
-<tr><td>G1</td><td><a href="annex-120-authority-matrix.html#cdr-B4">B4</a></td><td>Phê duyệt Package Supersedure và Withdrawal</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-I">I</td><td></td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td></td><td><a download="" href="../../../../forms/frm-300-technical/FRM-307_Package_Supersedure_and_Withdrawal_Notice.xlsx">FRM-307</a> · <a href="../../../sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td></tr>
-<tr><td>G2</td><td><a href="annex-120-authority-matrix.html#cdr-C1">C1</a></td><td>Phát hành Planning Release (job → shop)</td><td class="raci-cell raci-I">I</td><td></td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td></td><td><a download="" href="../../../../forms/frm-500-production/FRM-501_Planning_Release_Checklist.xlsx">FRM-501</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G2</td><td><a href="annex-120-authority-matrix.html#cdr-E1">E1</a></td><td>Phê duyệt PO theo bậc giá trị</td><td class="raci-cell raci-I">I</td><td></td><td></td><td class="raci-cell raci-C">C</td><td></td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td></td><td><a download="" href="../../../../forms/frm-400-quality/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-401</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G2</td><td><a href="annex-120-authority-matrix.html#cdr-E2">E2</a></td><td>Phê duyệt nhà cung cấp mới (qualify)</td><td class="raci-cell raci-I">I</td><td></td><td></td><td class="raci-cell raci-C">C</td><td></td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td></td><td><a download="" href="../../../../forms/frm-400-quality/FRM-402_Supplier_Evaluation_Form.xlsx">FRM-402</a> · <a download="" href="../../../../forms/frm-400-quality/FRM-409_Supplier_Audit_Checklist.xlsx">FRM-409</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G2</td><td><a href="annex-120-authority-matrix.html#cdr-E5">E5</a></td><td>Phê duyệt Emergency PO / vật tư khẩn</td><td class="raci-cell raci-I">I</td><td></td><td></td><td></td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td></td><td><a download="" href="../../../../forms/frm-400-quality/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-401</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-C2">C2</a></td><td>Phê duyệt Daily Dispatch</td><td class="raci-cell raci-I">I</td><td></td><td></td><td></td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td></td><td><a download="" href="../../../../forms/frm-500-production/FRM-502_Daily_Dispatch_List.xlsx">FRM-502</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-C3">C3</a></td><td>Phê duyệt phá băng lịch / re-priority khẩn cấp</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td></td><td></td><td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td><a download="" href="../../../../forms/frm-500-production/FRM-502_Daily_Dispatch_List.xlsx">FRM-502</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-C4">C4</a></td><td>Phê duyệt thay đổi Setup ngoài kế hoạch</td><td class="raci-cell raci-I">I</td><td></td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td></td><td></td><td></td><td><a download="" href="../../../../forms/frm-300-technical/FRM-302_Setup_Sheet.xlsx">FRM-302</a> · <a download="" href="../../../../forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> · <a href="../../../sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td></tr>
-<tr><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-C5">C5</a></td><td>Phê duyệt Work Transfer giữa máy/ca</td><td></td><td></td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-I">I</td><td></td><td></td><td><a download="" href="../../../../forms/frm-500-production/FRM-518_Work_Transfer_Validation_Record.xlsx">FRM-518</a> · <a href="../../../sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td></tr>
-<tr><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-C6">C6</a></td><td>Phê duyệt OT theo bậc giờ</td><td class="raci-cell raci-C">C</td><td></td><td></td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-R">R</td><td class="raci-cell raci-I">I</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td><a download="" href="../../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-C7">C7</a></td><td>Phê duyệt phục hồi tiến độ sau breakdown / Crash</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-I">I</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td></td><td><a download="" href="../../../../forms/frm-500-production/FRM-512_Downtime_Log.xlsx">FRM-512</a> · <a download="" href="../../../../forms/frm-500-production/FRM-522_Crash_Report.xlsx">FRM-522</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-B5">B5</a></td><td>Phát hành chương trình CAM/NC (mới + sửa đổi)</td><td></td><td></td><td></td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td></td><td></td><td><a download="" href="../../../../forms/frm-300-technical/FRM-305_Inspection_Program_Release_Checklist.xlsx">FRM-305</a> · <a href="../../../sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td></tr>
-<tr><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-B6">B6</a></td><td>Phê duyệt Pilot/Dry-run trước loạt</td><td class="raci-cell raci-I">I</td><td></td><td></td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td><td></td><td></td><td></td><td><a download="" href="../../../../forms/frm-100-sales/FRM-106_Pilot_Dry_Run_Log.xlsx">FRM-106</a> · <a href="../../../sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td></tr>
-<tr><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-B7">B7</a></td><td>Phê duyệt deviation/waiver kỹ thuật (concession)</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td></td><td></td><td></td><td><a download="" href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td></tr>
-<tr><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-E3">E3</a></td><td>Phê duyệt Outsourced Process Request</td><td class="raci-cell raci-I">I</td><td></td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td></td><td></td><td><a download="" href="../../../../forms/frm-400-quality/FRM-403_Outsourced_Process_Request.xlsx">FRM-403</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-E4">E4</a></td><td>Phê duyệt Outsource Dispatch + Incoming Verification</td><td class="raci-cell raci-I">I</td><td></td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td></td><td></td><td><a download="" href="../../../../forms/frm-400-quality/FRM-404_Outsource_Dispatch_Checklist.xlsx">FRM-404</a> · <a download="" href="../../../../forms/frm-400-quality/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-411</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-E5">E5</a></td><td>Phê duyệt Emergency PO / vật tư khẩn</td><td class="raci-cell raci-I">I</td><td></td><td></td><td></td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td></td><td><a download="" href="../../../../forms/frm-400-quality/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-401</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-E7">E7</a></td><td>Customer Property handling exception</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-R">R</td><td></td><td></td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td></td><td><a download="" href="../../../../forms/frm-200-purchase/FRM-221_Customer_Property_Register.xlsx">FRM-221</a> · <a href="../../../sops/02-SOP-200/sop-203-customer-property-control.html">SOP-203</a></td></tr>
-<tr><td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-A6">A6</a></td><td>Phê duyệt Customer Change Request (CCR) ảnh hưởng giá / lịch / phạm vi</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-R">R</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td><a download="" href="../../../../forms/frm-200-purchase/FRM-212_Customer_Change_Request.xlsx">FRM-212</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G4</td><td><a href="annex-120-authority-matrix.html#cdr-D1">D1</a></td><td>Phê duyệt FAI release</td><td class="raci-cell raci-I">I</td><td></td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td></td><td></td><td></td><td><a download="" href="../../../../forms/frm-300-technical/FRM-311_FAI_Report.xlsx">FRM-311</a> · <a download="" href="../../../../forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> · <a href="../../../sops/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302</a></td></tr>
-<tr><td>G4</td><td><a href="annex-120-authority-matrix.html#cdr-D2">D2</a></td><td>Xử lý FAI fail (rework / scrap / customer-waiver)</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td></td><td></td><td></td><td><a download="" href="../../../../forms/frm-300-technical/FRM-311_FAI_Report.xlsx">FRM-311</a> · <a download="" href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302</a></td></tr>
-<tr><td>G4</td><td><a href="annex-120-authority-matrix.html#cdr-B7">B7</a></td><td>Phê duyệt deviation/waiver kỹ thuật (concession)</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td></td><td></td><td></td><td><a download="" href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td></tr>
-<tr><td>G5</td><td><a href="annex-120-authority-matrix.html#cdr-D3">D3</a></td><td>Mở NCR và phân loại minor/major/critical</td><td class="raci-cell raci-I">I</td><td></td><td></td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td></td><td></td><td><a download="" href="../../../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx">FRM-651</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td></tr>
-<tr><td>G5</td><td><a href="annex-120-authority-matrix.html#cdr-D4">D4</a></td><td>Phê duyệt NCR disposition (use-as-is/rework/scrap/RTV)</td><td class="raci-cell raci-I">I</td><td></td><td></td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td><a download="" href="../../../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx">FRM-651</a> · <a download="" href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td></tr>
-<tr><td>G5</td><td><a href="annex-120-authority-matrix.html#cdr-D5">D5</a></td><td>Phê duyệt CAPA closure / verification</td><td class="raci-cell raci-I">I</td><td></td><td></td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td></td><td></td><td><a download="" href="../../../../forms/frm-600-inspection/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td></tr>
-<tr><td>G5</td><td><a href="annex-120-authority-matrix.html#cdr-D6">D6</a></td><td>Phê duyệt HOLD release</td><td class="raci-cell raci-I">I</td><td></td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td></td><td></td><td></td><td><a download="" href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td></tr>
-<tr><td>G5</td><td><a href="annex-120-authority-matrix.html#cdr-D9">D9</a></td><td>Phê duyệt Scrap disposition theo bậc giá trị</td><td class="raci-cell raci-I">I</td><td></td><td></td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td></td><td class="raci-cell raci-C">C</td><td></td><td><a download="" href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a download="" href="../../../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx">FRM-651</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td></tr>
-<tr><td>G5</td><td><a href="annex-120-authority-matrix.html#cdr-E6">E6</a></td><td>Phê duyệt SCAR leo thang</td><td class="raci-cell raci-I">I</td><td></td><td></td><td class="raci-cell raci-C">C</td><td></td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td></td><td></td><td><a download="" href="../../../../forms/frm-400-quality/FRM-406_SCAR.xlsx">FRM-406</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td></tr>
-<tr><td>G5</td><td><a href="annex-120-authority-matrix.html#cdr-B7">B7</a></td><td>Phê duyệt deviation/waiver kỹ thuật (concession)</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td></td><td></td><td></td><td><a download="" href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td></tr>
-<tr><td>G6</td><td><a href="annex-120-authority-matrix.html#cdr-D8">D8</a></td><td>Phê duyệt CoC release / final inspection sign-off</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-C">C</td><td></td><td></td><td></td><td></td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td></td><td></td><td><a download="" href="../../../../forms/frm-600-inspection/FRM-641_Final_Inspection_Report.xlsx">FRM-641</a> · <a download="" href="../../../../forms/frm-600-inspection/FRM-642_Final_Inspection_and_CoC_Register.xlsx">FRM-642</a> · <a href="../../../sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td></tr>
-<tr><td>G6</td><td><a href="annex-120-authority-matrix.html#cdr-B7">B7</a></td><td>Phê duyệt deviation/waiver kỹ thuật (concession)</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td></td><td></td><td></td><td><a download="" href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td></tr>
-<tr><td>G6</td><td><a href="annex-120-authority-matrix.html#cdr-A6">A6</a></td><td>Phê duyệt Customer Change Request (CCR) ảnh hưởng giá / lịch / phạm vi</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-R">R</td><td></td><td></td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td><a download="" href="../../../../forms/frm-200-purchase/FRM-212_Customer_Change_Request.xlsx">FRM-212</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G7</td><td><a href="annex-120-authority-matrix.html#cdr-D7">D7</a></td><td>Phê duyệt Stop-Ship và Unfreeze ship</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td></td><td></td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td><td></td><td></td><td><a download="" href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a download="" href="../../../../forms/frm-600-inspection/FRM-642_Final_Inspection_and_CoC_Register.xlsx">FRM-642</a> · <a href="../../../sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td></tr>
-<tr><td>G7</td><td><a href="annex-120-authority-matrix.html#cdr-D8">D8</a></td><td>Phê duyệt CoC release / final inspection sign-off</td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-C">C</td><td></td><td></td><td></td><td></td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-C">C</td><td></td><td></td><td><a download="" href="../../../../forms/frm-600-inspection/FRM-641_Final_Inspection_Report.xlsx">FRM-641</a> · <a download="" href="../../../../forms/frm-600-inspection/FRM-642_Final_Inspection_and_CoC_Register.xlsx">FRM-642</a> · <a href="../../../sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td></tr>
-<tr><td>G7</td><td><a href="annex-120-authority-matrix.html#cdr-F5">F5</a></td><td>Tiếp nhận Customer Complaint / RMA acceptance</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-R">R</td><td></td><td></td><td></td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td><a download="" href="../../../../forms/frm-200-purchase/FRM-211_Complaint_Log.xlsx">FRM-211</a> · <a download="" href="../../../../forms/frm-200-purchase/FRM-213_RMA_Tracking_Log.xlsx">FRM-213</a> · <a download="" href="../../../../forms/frm-200-purchase/FRM-654_Customer_Satisfaction_Survey.xlsx">FRM-654</a> · <a href="../../../sops/02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html">SOP-202</a></td></tr>
-<tr><td>G7</td><td><a href="annex-120-authority-matrix.html#cdr-A6">A6</a></td><td>Phê duyệt Customer Change Request (CCR) ảnh hưởng giá / lịch / phạm vi</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-R">R</td><td></td><td></td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td><a download="" href="../../../../forms/frm-200-purchase/FRM-212_Customer_Change_Request.xlsx">FRM-212</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>G7</td><td><a href="annex-120-authority-matrix.html#cdr-E7">E7</a></td><td>Customer Property handling exception</td><td class="raci-cell raci-A">A</td><td class="raci-cell raci-R">R</td><td></td><td></td><td class="raci-cell raci-I">I</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td></td><td><a download="" href="../../../../forms/frm-200-purchase/FRM-221_Customer_Property_Register.xlsx">FRM-221</a> · <a href="../../../sops/02-SOP-200/sop-203-customer-property-control.html">SOP-203</a></td></tr>
-<tr><td>—</td><td><a href="annex-120-authority-matrix.html#cdr-F1">F1</a></td><td>Phê duyệt IT Access Request / Change / Removal</td><td class="raci-cell raci-I">I</td><td></td><td></td><td></td><td></td><td></td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-A">A</td><td><a download="" href="../../../../forms/frm-100-sales/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a> · <a href="../../../sops/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td></tr>
-<tr><td>—</td><td><a href="annex-120-authority-matrix.html#cdr-F2">F2</a></td><td>Phê duyệt Break-glass access ERP</td><td class="raci-cell raci-A">A</td><td></td><td></td><td></td><td></td><td></td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-R">R</td><td><a download="" href="../../../../forms/frm-100-sales/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a> · <a href="../../../sops/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td></tr>
-<tr><td>—</td><td><a href="annex-120-authority-matrix.html#cdr-F3">F3</a></td><td>Kích hoạt phó/đại diện vai trò trọng yếu</td><td class="raci-cell raci-A">A</td><td></td><td></td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-R">R</td><td><a href="annex-123-deputy-backup-matrix.html#d4">ANNEX-123 d4</a> · <a download="" href="../../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a></td></tr>
-<tr><td>—</td><td><a href="annex-120-authority-matrix.html#cdr-F4">F4</a></td><td>Phê duyệt EHS incident response và Stop-Work</td><td class="raci-cell raci-A">A</td><td></td><td></td><td></td><td class="raci-cell raci-I">I</td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-C">C</td><td></td><td></td><td class="raci-cell raci-R">R</td><td><a download="" href="../../../../forms/frm-800-hr/FRM-811_Incident_Report.xlsx">FRM-811</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td></tr>
-<tr><td>—</td><td><a href="annex-120-authority-matrix.html#cdr-F6">F6</a></td><td>Phê duyệt Climate Change risk action</td><td class="raci-cell raci-A">A</td><td></td><td></td><td></td><td class="raci-cell raci-C">C</td><td></td><td class="raci-cell raci-C">C</td><td class="raci-cell raci-R">R</td><td class="raci-cell raci-C">C</td><td></td><td><a download="" href="../../../../forms/frm-100-sales/FRM-124_Climate_Change_Assessment_Record.xlsx">FRM-124</a> · <a download="" href="../../../../forms/frm-100-sales/FRM-121_Context_Analysis_SWOT_PESTLE.xlsx">FRM-121</a> · <a href="../../../sops/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html">SOP-102</a></td></tr>
-</tbody></table></div>
+<tr>
+  <td>G0</td><td><a href="annex-120-authority-matrix.html#cdr-A1">A1</a></td><td>Tiếp nhận RFQ và làm rõ yêu cầu khách hàng</td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+</tr>
+<tr>
+  <td>G0</td><td><a href="annex-120-authority-matrix.html#cdr-A2">A2</a></td><td>Phê duyệt báo giá theo bậc giá trị</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td><a href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+</tr>
+<tr>
+  <td>G0</td><td><a href="annex-120-authority-matrix.html#cdr-A3">A3</a></td><td>Phê duyệt chiết khấu / điều kiện thương mại ngoại lệ</td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-R">R</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-A">A</td>
+  <td></td>
+  <td><a href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+</tr>
+<tr>
+  <td>G0</td><td><a href="annex-120-authority-matrix.html#cdr-A4">A4</a></td><td>Phê duyệt điều kiện thanh toán ngoại lệ</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-A">A</td>
+  <td></td>
+  <td><a href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+</tr>
+<tr>
+  <td>G0</td><td><a href="annex-120-authority-matrix.html#cdr-A5">A5</a></td><td>Chấp thuận đơn hàng và xem xét hợp đồng</td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td><a href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+</tr>
+<tr>
+  <td>G0</td><td><a href="annex-120-authority-matrix.html#cdr-A6">A6</a></td><td>Phê duyệt Customer Change Request (CCR) ảnh hưởng giá / lịch / phạm vi</td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td><a href="../../../../forms/frm-200-purchase/FRM-212_Customer_Change_Request.xlsx">FRM-212</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+</tr>
+<tr>
+  <td>G1</td><td><a href="annex-120-authority-matrix.html#cdr-B1">B1</a></td><td>DFM review và phân loại rủi ro kỹ thuật</td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td class="raci-cell raci-R">R</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-200-purchase/FRM-209_High_Risk_Job_Readiness_Review.xlsx">FRM-209</a> · <a href="../../../sops/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301</a></td>
+</tr>
+<tr>
+  <td>G1</td><td><a href="annex-120-authority-matrix.html#cdr-B2">B2</a></td><td>Phê duyệt Engineering Release / Baseline Package</td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td class="raci-cell raci-R">R</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-300-technical/FRM-306_Engineering_Release_and_Baseline_Package_Approval.xlsx">FRM-306</a> · <a href="../../../sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td>
+</tr>
+<tr>
+  <td>G1</td><td><a href="annex-120-authority-matrix.html#cdr-B3">B3</a></td><td>Phê duyệt Engineering Change Order (ECO)</td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-R">R</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-100-sales/FRM-102_Document_Change_Request.xlsx">FRM-102</a> · <a href="../../../../forms/frm-100-sales/FRM-162_Change_Impact_Matrix.xlsx">FRM-162</a> · <a href="../../../sops/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td>
+</tr>
+<tr>
+  <td>G1</td><td><a href="annex-120-authority-matrix.html#cdr-B4">B4</a></td><td>Phê duyệt Package Supersedure và Withdrawal</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td class="raci-cell raci-R">R</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-300-technical/FRM-307_Package_Supersedure_and_Withdrawal_Notice.xlsx">FRM-307</a> · <a href="../../../sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303</a></td>
+</tr>
+<tr>
+  <td>G2</td><td><a href="annex-120-authority-matrix.html#cdr-C1">C1</a></td><td>Phát hành Planning Release (job → shop)</td>
+  <td class="raci-cell raci-I">I</td>
+  <td class="raci-cell raci-I">I</td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-500-production/FRM-501_Planning_Release_Checklist.xlsx">FRM-501</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+</tr>
+<tr>
+  <td>G2</td><td><a href="annex-120-authority-matrix.html#cdr-E1">E1</a></td><td>Phê duyệt PO theo bậc giá trị</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-R">R</td>
+  <td></td>
+  <td><a href="../../../../forms/frm-400-quality/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-401</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+</tr>
+<tr>
+  <td>G2</td><td><a href="annex-120-authority-matrix.html#cdr-E2">E2</a></td><td>Phê duyệt nhà cung cấp mới (qualify)</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td><a href="../../../../forms/frm-400-quality/FRM-402_Supplier_Evaluation_Form.xlsx">FRM-402</a> · <a href="../../../../forms/frm-400-quality/FRM-409_Supplier_Audit_Checklist.xlsx">FRM-409</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+</tr>
+<tr>
+  <td>G2</td><td><a href="annex-120-authority-matrix.html#cdr-E5">E5</a></td><td>Phê duyệt Emergency PO / vật tư khẩn</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td class="raci-cell raci-I">I</td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-R">R</td>
+  <td></td>
+  <td><a href="../../../../forms/frm-400-quality/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-401</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+</tr>
+<tr>
+  <td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-C2">C2</a></td><td>Phê duyệt Daily Dispatch</td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-500-production/FRM-502_Daily_Dispatch_List.xlsx">FRM-502</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+</tr>
+<tr>
+  <td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-C3">C3</a></td><td>Phê duyệt phá băng lịch / re-priority khẩn cấp</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td><a href="../../../../forms/frm-500-production/FRM-502_Daily_Dispatch_List.xlsx">FRM-502</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+</tr>
+<tr>
+  <td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-C4">C4</a></td><td>Phê duyệt thay đổi Setup ngoài kế hoạch</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-300-technical/FRM-302_Setup_Sheet.xlsx">FRM-302</a> · <a href="../../../../forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> · <a href="../../../sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td>
+</tr>
+<tr>
+  <td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-C5">C5</a></td><td>Phê duyệt Work Transfer giữa máy/ca</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-500-production/FRM-518_Work_Transfer_Validation_Record.xlsx">FRM-518</a> · <a href="../../../sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td>
+</tr>
+<tr>
+  <td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-C6">C6</a></td><td>Phê duyệt OT theo bậc giờ</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-R">R</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-I">I</td>
+  <td class="raci-cell raci-A">A</td>
+  <td><a href="../../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+</tr>
+<tr>
+  <td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-C7">C7</a></td><td>Phê duyệt phục hồi tiến độ sau breakdown / Crash</td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td><a href="../../../../forms/frm-500-production/FRM-512_Downtime_Log.xlsx">FRM-512</a> · <a href="../../../../forms/frm-500-production/FRM-522_Crash_Report.xlsx">FRM-522</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+</tr>
+<tr>
+  <td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-B5">B5</a></td><td>Phát hành chương trình CAM/NC (mới + sửa đổi)</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-I">I</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-300-technical/FRM-305_Inspection_Program_Release_Checklist.xlsx">FRM-305</a> · <a href="../../../sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td>
+</tr>
+<tr>
+  <td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-B6">B6</a></td><td>Phê duyệt Pilot/Dry-run trước loạt</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-100-sales/FRM-106_Pilot_Dry_Run_Log.xlsx">FRM-106</a> · <a href="../../../sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td>
+</tr>
+<tr>
+  <td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-E3">E3</a></td><td>Phê duyệt Outsourced Process Request</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-A">A</td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-400-quality/FRM-403_Outsourced_Process_Request.xlsx">FRM-403</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+</tr>
+<tr>
+  <td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-E4">E4</a></td><td>Phê duyệt Outsource Dispatch + Incoming Verification</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-I">I</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-A">A</td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-400-quality/FRM-404_Outsource_Dispatch_Checklist.xlsx">FRM-404</a> · <a href="../../../../forms/frm-400-quality/FRM-411_Outsourced_Process_Incoming_Verification.xlsx">FRM-411</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+</tr>
+<tr>
+  <td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-E5">E5</a></td><td>Phê duyệt Emergency PO / vật tư khẩn</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-R">R</td>
+  <td></td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td><a href="../../../../forms/frm-400-quality/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-401</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+</tr>
+<tr>
+  <td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-E7">E7</a></td><td>Customer Property handling exception</td>
+  <td class="raci-cell raci-A">A</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-R">R</td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-200-purchase/FRM-221_Customer_Property_Register.xlsx">FRM-221</a> · <a href="../../../sops/02-SOP-200/sop-203-customer-property-control.html">SOP-203</a></td>
+</tr>
+<tr>
+  <td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-F1">F1</a></td><td>Phê duyệt IT Access Request / Change / Removal</td>
+  <td class="raci-cell raci-R">R</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-A">A</td>
+  <td><a href="../../../../forms/frm-100-sales/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a> · <a href="../../../sops/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td>
+</tr>
+<tr>
+  <td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-F2">F2</a></td><td>Phê duyệt Break-glass access ERP</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-R">R</td>
+  <td></td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-A">A</td>
+  <td><a href="../../../../forms/frm-100-sales/FRM-141_IT_Access_Request_Change_Removal.xlsx">FRM-141</a> · <a href="../../../sops/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106</a></td>
+</tr>
+<tr>
+  <td>G3</td><td><a href="annex-120-authority-matrix.html#cdr-F4">F4</a></td><td>Phê duyệt EHS incident response và Stop-Work</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-I">I</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-A">A</td>
+  <td><a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
+</tr>
+<tr>
+  <td>G4</td><td><a href="annex-120-authority-matrix.html#cdr-D1">D1</a></td><td>Phê duyệt FAI release</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-I">I</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-A">A</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-300-technical/FRM-311_FAI_Report.xlsx">FRM-311</a> · <a href="../../../../forms/frm-500-production/FRM-511_Setup_and_First_Piece_Record.xlsx">FRM-511</a> · <a href="../../../sops/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302</a></td>
+</tr>
+<tr>
+  <td>G4</td><td><a href="annex-120-authority-matrix.html#cdr-D2">D2</a></td><td>Xử lý FAI fail (rework / scrap / customer-waiver)</td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-I">I</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-A">A</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-300-technical/FRM-311_FAI_Report.xlsx">FRM-311</a> · <a href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302</a></td>
+</tr>
+<tr>
+  <td>G4</td><td><a href="annex-120-authority-matrix.html#cdr-B7">B7</a></td><td>Phê duyệt deviation/waiver kỹ thuật (concession)</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td class="raci-cell raci-A">A</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
+</tr>
+<tr>
+  <td>G5</td><td><a href="annex-120-authority-matrix.html#cdr-D3">D3</a></td><td>Mở NCR và phân loại minor/major/critical</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-I">I</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-A">A</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx">FRM-651</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
+</tr>
+<tr>
+  <td>G5</td><td><a href="annex-120-authority-matrix.html#cdr-D4">D4</a></td><td>Phê duyệt NCR disposition (use-as-is/rework/scrap/RTV)</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td><a href="../../../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx">FRM-651</a> · <a href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
+</tr>
+<tr>
+  <td>G5</td><td><a href="annex-120-authority-matrix.html#cdr-D5">D5</a></td><td>Phê duyệt CAPA closure / verification</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-I">I</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-A">A</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-I">I</td>
+  <td><a href="../../../../forms/frm-600-inspection/FRM-652_CAPA_8D_Report.xlsx">FRM-652</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
+</tr>
+<tr>
+  <td>G5</td><td><a href="annex-120-authority-matrix.html#cdr-D6">D6</a></td><td>Phê duyệt HOLD release</td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-A">A</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
+</tr>
+<tr>
+  <td>G5</td><td><a href="annex-120-authority-matrix.html#cdr-D9">D9</a></td><td>Phê duyệt Scrap disposition theo bậc giá trị</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-I">I</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td><a href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx">FRM-651</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
+</tr>
+<tr>
+  <td>G5</td><td><a href="annex-120-authority-matrix.html#cdr-E6">E6</a></td><td>Phê duyệt SCAR leo thang</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td><a href="../../../../forms/frm-400-quality/FRM-406_SCAR.xlsx">FRM-406</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
+</tr>
+<tr>
+  <td>G5</td><td><a href="annex-120-authority-matrix.html#cdr-B7">B7</a></td><td>Phê duyệt deviation/waiver kỹ thuật (concession)</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td class="raci-cell raci-A">A</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
+</tr>
+<tr>
+  <td>G6</td><td><a href="annex-120-authority-matrix.html#cdr-D8">D8</a></td><td>Phê duyệt CoC release / final inspection sign-off</td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-I">I</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-600-inspection/FRM-641_Final_Inspection_Report.xlsx">FRM-641</a> · <a href="../../../../forms/frm-600-inspection/FRM-642_Final_Inspection_and_CoC_Register.xlsx">FRM-642</a> · <a href="../../../sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td>
+</tr>
+<tr>
+  <td>G6</td><td><a href="annex-120-authority-matrix.html#cdr-B7">B7</a></td><td>Phê duyệt deviation/waiver kỹ thuật (concession)</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td class="raci-cell raci-A">A</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td>
+</tr>
+<tr>
+  <td>G6</td><td><a href="annex-120-authority-matrix.html#cdr-E7">E7</a></td><td>Customer Property handling exception</td>
+  <td class="raci-cell raci-A">A</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-R">R</td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-200-purchase/FRM-221_Customer_Property_Register.xlsx">FRM-221</a> · <a href="../../../sops/02-SOP-200/sop-203-customer-property-control.html">SOP-203</a></td>
+</tr>
+<tr>
+  <td>G7</td><td><a href="annex-120-authority-matrix.html#cdr-D7">D7</a></td><td>Phê duyệt Stop-Ship và Unfreeze ship</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td><a href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../../forms/frm-600-inspection/FRM-642_Final_Inspection_and_CoC_Register.xlsx">FRM-642</a> · <a href="../../../sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td>
+</tr>
+<tr>
+  <td>G7</td><td><a href="annex-120-authority-matrix.html#cdr-D8">D8</a></td><td>Phê duyệt CoC release / final inspection sign-off</td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-I">I</td>
+  <td></td>
+  <td class="raci-cell raci-A">A</td>
+  <td class="raci-cell raci-R">R</td>
+  <td></td>
+  <td></td>
+  <td><a href="../../../../forms/frm-600-inspection/FRM-641_Final_Inspection_Report.xlsx">FRM-641</a> · <a href="../../../../forms/frm-600-inspection/FRM-642_Final_Inspection_and_CoC_Register.xlsx">FRM-642</a> · <a href="../../../sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a></td>
+</tr>
+<tr>
+  <td>G7</td><td><a href="annex-120-authority-matrix.html#cdr-F5">F5</a></td><td>Tiếp nhận Customer Complaint / RMA acceptance</td>
+  <td class="raci-cell raci-A">A</td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-R">R</td>
+  <td class="raci-cell raci-I">I</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td><a href="../../../../forms/frm-200-purchase/FRM-211_Complaint_Log.xlsx">FRM-211</a> · <a href="../../../../forms/frm-200-purchase/FRM-213_RMA_Tracking_Log.xlsx">FRM-213</a> · <a href="../../../../forms/frm-200-purchase/FRM-654_Customer_Satisfaction_Survey.xlsx">FRM-654</a> · <a href="../../../sops/02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html">SOP-202</a></td>
+</tr>
+<tr>
+  <td>G7</td><td><a href="annex-120-authority-matrix.html#cdr-A6">A6</a></td><td>Phê duyệt Customer Change Request (CCR) ảnh hưởng giá / lịch / phạm vi</td>
+  <td class="raci-cell raci-A">A</td>
+  <td></td>
+  <td></td>
+  <td class="raci-cell raci-R">R</td>
+  <td></td>
+  <td class="raci-cell raci-C">C</td>
+  <td class="raci-cell raci-I">I</td>
+  <td class="raci-cell raci-C">C</td>
+  <td></td>
+  <td><a href="../../../../forms/frm-200-purchase/FRM-212_Customer_Change_Request.xlsx">FRM-212</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td>
+</tr>
+</tbody>
+</table></div>
 <h2 class="h2" id="r6">6. RACI mức tài liệu / tài liệu quản lý tài sản</h2>
-<div class="table-card"><table class="table"><colgroup><col style="width:18%"><col style="width:30%"><col style="width:16%"><col style="width:16%"><col style="width:20%"></colgroup><thead><tr><th>Tài liệu</th><th>Mục đích kiểm soát</th><th>R</th><th>A</th><th>Liên kết</th></tr></thead><tbody>
-<tr><td>ANNEX-120</td><td>Sổ đăng ký quyết định và ngưỡng phê duyệt</td><td>QMS</td><td>QA</td><td><a href="annex-120-authority-matrix.html">Authority Matrix</a></td></tr>
-<tr><td>ANNEX-121</td><td>RACI theo hoạt động và cổng kiểm soát</td><td>QMS</td><td>QA</td><td><a href="#r5gate">r5gate</a></td></tr>
-<tr><td>ANNEX-123</td><td>Phó / dự phòng và giới hạn ủy quyền</td><td>HR</td><td>CEO</td><td><a href="annex-123-deputy-backup-matrix.html#d4">Deputy Matrix</a></td></tr>
-<tr><td>FRM-202</td><td>Contract review và RFQ evidence</td><td>CS</td><td>CEO</td><td><a download="" href="../../../../forms/frm-200-purchase/FRM-202_Contract_Review_Checklist.xlsx">FRM-202</a></td></tr>
-<tr><td>FRM-401</td><td>PO tracking và phê duyệt mua hàng</td><td>SCM</td><td>FIN</td><td><a download="" href="../../../../forms/frm-400-quality/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-401</a></td></tr>
-<tr><td>FRM-413</td><td>HOLD, disposition, concession</td><td>QA</td><td>CEO</td><td><a download="" href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a></td></tr>
-<tr><td>FRM-504</td><td>Shift handover và log kích hoạt phó</td><td>WKM</td><td>PD</td><td><a download="" href="../../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a></td></tr>
-<tr><td>FRM-651</td><td>NCR và phân loại nonconformity</td><td>QA</td><td>QA</td><td><a download="" href="../../../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx">FRM-651</a></td></tr>
-<tr><td>SOP-201</td><td>RFQ-to-cash và điều phối đơn hàng</td><td>CS</td><td>CEO</td><td><a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td></tr>
-<tr><td>SOP-504</td><td>Setup, first piece, program release</td><td>WKM</td><td>PD</td><td><a href="../../../sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504</a></td></tr>
-<tr><td>SOP-606</td><td>NCR, CAPA, IPQC reaction</td><td>QA</td><td>QA</td><td><a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a></td></tr>
+<div class="req"><span class="req-tag shall">PHẢI</span><div>Danh sách dưới đây giữ 11 tài liệu QMS trọng yếu để đồng bộ với RACI hoạt động. Tên tài liệu phải giữ đúng tiền tố repo như ANNEX-, SOP- và FRM-. <span class="iso-clause">§7.5</span></div></div>
+<div class="table-card"><table class="table">
+<colgroup><col style="width:24%"><col style="width:13%"><col style="width:13%"><col style="width:20%"><col style="width:13%"><col style="width:17%"></colgroup>
+<thead><tr><th>Tài liệu</th><th>A</th><th>R</th><th>C</th><th>Duyệt</th><th>Người dùng chính</th></tr></thead>
+<tbody>
+<tr><td><a href="annex-120-authority-matrix.html">ANNEX-120 Authority Matrix</a></td><td><span class="role-code">CEO</span></td><td><span class="role-code">QMS</span></td><td><span class="role-code">FUNC_HEADS</span></td><td><span class="role-code">CEO</span></td><td>Người ký quyết định CDR</td></tr>
+<tr><td><a href="annex-121-raci-master-matrix.html">ANNEX-121 RACI Master Matrix</a></td><td><span class="role-code">QA</span></td><td><span class="role-code">QMS</span></td><td><span class="role-code">FUNC_OWNERS</span></td><td><span class="role-code">CEO</span></td><td>CS / EST / ENG / PPL / WKM / QA / SCM / FIN / HR / IT</td></tr>
+<tr><td><a href="annex-123-deputy-backup-matrix.html">ANNEX-123 Deputy Backup Matrix</a></td><td><span class="role-code">HR</span></td><td><span class="role-code">DIRECT_LINE_MGRS</span></td><td><span class="role-code">QA</span> / <span class="role-code">QMS</span></td><td><span class="role-code">CEO</span></td><td>Vai trò trọng yếu và phó được kích hoạt</td></tr>
+<tr><td><a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201 Order Fulfillment RFQ to Cash</a></td><td><span class="role-code">CS</span></td><td><span class="role-code">EST</span></td><td><span class="role-code">PPL</span> / <span class="role-code">FIN</span> / <span class="role-code">QA</span></td><td><span class="role-code">CEO</span></td><td>G0 / G2 / G3</td></tr>
+<tr><td><a href="../../../sops/03-SOP-300/sop-301-engineering-dfm-quoting-and-machining-planning.html">SOP-301 Engineering DFM Quoting and Machining Planning</a></td><td><span class="role-code">ENG</span></td><td><span class="role-code">EST</span></td><td><span class="role-code">QA</span> / <span class="role-code">PPL</span></td><td><span class="role-code">CEO</span></td><td>G1</td></tr>
+<tr><td><a href="../../../sops/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302 First Article Inspection FAI</a></td><td><span class="role-code">QA</span></td><td><span class="role-code">QCL</span></td><td><span class="role-code">ENG</span> / <span class="role-code">WKM</span></td><td><span class="role-code">CEO</span></td><td>G4</td></tr>
+<tr><td><a href="../../../sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html">SOP-303 Engineering Release Baseline Package and Job Snapshot Control</a></td><td><span class="role-code">ENG</span></td><td><span class="role-code">PE</span></td><td><span class="role-code">QA</span> / <span class="role-code">PPL</span></td><td><span class="role-code">CEO</span></td><td>G1 / G3</td></tr>
+<tr><td><a href="../../../sops/05-SOP-500/sop-504-program-release-setup-first-piece-changeover-and-work-transfer-control.html">SOP-504 Program Release Setup First Piece Changeover and Work Transfer Control</a></td><td><span class="role-code">WKM</span></td><td><span class="role-code">PPL</span></td><td><span class="role-code">ENG</span> / <span class="role-code">QA</span></td><td><span class="role-code">PD</span></td><td>G3</td></tr>
+<tr><td><a href="../../../sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605 Final Inspection CoC and Shipment Release</a></td><td><span class="role-code">QA</span></td><td><span class="role-code">QCL</span></td><td><span class="role-code">SCM</span> / <span class="role-code">CS</span></td><td><span class="role-code">CEO</span></td><td>G6 / G7</td></tr>
+<tr><td><a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606 NCR CAPA and IPQC Reaction</a></td><td><span class="role-code">QA</span></td><td><span class="role-code">QE</span></td><td><span class="role-code">WKM</span> / <span class="role-code">ENG</span> / <span class="role-code">SCM</span></td><td><span class="role-code">CEO</span></td><td>G5 / support controls</td></tr>
+<tr><td><a href="../../../sops/01-SOP-100/sop-106-change-and-configuration-management.html">SOP-106 Change and Configuration Management</a></td><td><span class="role-code">QMS</span></td><td><span class="role-code">ITA</span> / <span class="role-code">ESA</span></td><td><span class="role-code">FUNC_HEADS</span></td><td><span class="role-code">CEO</span></td><td>F1 / F2 / B3</td></tr>
 </tbody></table></div>
 <h2 class="h2" id="r7">7. Quy tắc bàn giao và leo thang</h2>
-<div class="table-card"><table class="table"><colgroup><col style="width:22%"><col style="width:54%"><col style="width:24%"></colgroup><thead><tr><th>Nguyên tắc</th><th>Mô tả thực thi</th><th>Bằng chứng</th></tr></thead><tbody>
-<tr><td>Bàn giao phải có đầu ra rõ</td><td>Mỗi lần bàn giao phải nêu đầu vào đã kiểm tra, đầu ra cần đạt, thời hạn hoàn thành và người nhận.</td><td>FRM / checklist / ERP trạng thái</td></tr>
-<tr><td>Không bàn giao trạng thái mơ hồ</td><td>Không dùng câu chung chung để chuyển trách nhiệm; phải gắn với cổng kiểm soát hoặc sản phẩm bàn giao.</td><td>WI-203 / hồ sơ job</td></tr>
-<tr><td>Leo thang khi bàn giao bị chặn</td><td>Nếu bên nhận thiếu dữ liệu hoặc thiếu quyền, leo thang theo ANNEX-117 và ANNEX-120.</td><td>Nhật ký hành động / ANNEX-117</td></tr>
-<tr><td>Bàn giao liên chức năng phải truy xuất được</td><td>Hồ sơ phải truy ngược từ hóa đơn, lô hàng, NCR hoặc sự kiện chất lượng về nguồn vận hành.</td><td>ERP log / FRM liên quan</td></tr>
+<div class="table-card"><table class="table"><colgroup><col style="width:20%"><col style="width:50%"><col style="width:30%"></colgroup><thead><tr><th>Nguyên tắc bàn giao</th><th>Mô tả thực thi</th><th>Công cụ / bằng chứng</th></tr></thead><tbody>
+<tr><td>Bàn giao phải có đầu ra rõ</td><td>Mỗi lần bàn giao phải nêu đầu vào đã kiểm tra, đầu ra cần đạt, thời hạn và người nhận.</td><td>FRM/SOP gắn tại mục 5, trạng thái ERP, log hành động.</td></tr>
+<tr><td>Không bàn giao trạng thái mơ hồ</td><td>Các câu như "đã xong" hoặc "kiểm tra giúp" không đủ. Người giao phải nêu cổng G, mã CDR và bằng chứng cần kiểm.</td><td><a href="../../../work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>, gói hồ sơ job, bảng trạng thái.</td></tr>
+<tr><td>Leo thang khi bị chặn</td><td>Nếu thiếu dữ liệu, thiếu quyền hoặc quá hạn, người A trong dòng RACI phải kích hoạt leo thang theo ANNEX-117 và ANNEX-120.</td><td><a href="../11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> · <a href="annex-120-authority-matrix.html">ANNEX-120</a></td></tr>
+<tr><td>Bàn giao liên chức năng phải truy xuất được</td><td>Hồ sơ phải truy ngược từ lô hàng, NCR, CAPA, CoC hoặc hóa đơn về quyết định CDR và người A.</td><td>ERP audit trail, FRM liên quan, gói bằng chứng job.</td></tr>
 </tbody></table></div>
 <h2 class="h2" id="r8">8. Quy tắc đồng bộ SOP — WI — ANNEX — JD — quyền hệ thống</h2>
-<div class="table-card"><table class="table"><colgroup><col style="width:24%"><col style="width:40%"><col style="width:36%"></colgroup><thead><tr><th>Khi thay đổi</th><th>Tài liệu phải đổi theo</th><th>Ví dụ</th></tr></thead><tbody>
-<tr><td>JD hoặc ranh giới vai trò đổi</td><td>ANNEX-120, ANNEX-121, ANNEX-123, bản đồ phân quyền.</td><td>Tách thêm vai trò PPL/WKM hoặc đổi quyền release.</td></tr>
-<tr><td>SOP/WI/cổng kiểm soát đổi</td><td>RACI, thẩm quyền, nguồn dữ liệu KPI, workflow điện tử.</td><td>Bổ sung hold point hoặc thay đổi điều kiện FAI.</td></tr>
-<tr><td>Thay đổi quyền hệ thống</td><td>RACI hoạt động, ma trận thẩm quyền, FRM-141, ghi chú dự phòng.</td><td>Tạo vai trò ERP mới hoặc đổi quyền phê duyệt.</td></tr>
-<tr><td>Nguồn dữ liệu quản trị đổi</td><td>FUNC_OWNERS, QMS và TOP_MGMT phải rà soát lại bằng chứng.</td><td>Chuyển dữ liệu từ Excel sang ERP hoặc dashboard.</td></tr>
+<div class="table-card"><table class="table"><colgroup><col style="width:22%"><col style="width:42%"><col style="width:36%"></colgroup><thead><tr><th>Khi thay đổi ở đâu</th><th>Tài liệu / quyền phải đổi theo</th><th>Ví dụ kiểm soát</th></tr></thead><tbody>
+<tr><td>JD hoặc ranh giới vai trò đổi</td><td>ANNEX-120, ANNEX-121, ANNEX-123, bản đồ phân quyền và SOP sở hữu hoạt động.</td><td>Tách thêm vai trò lập kế hoạch, đổi người A cho C2 hoặc C7.</td></tr>
+<tr><td>SOP/WI/cổng kiểm soát đổi</td><td>RACI hoạt động, ma trận thẩm quyền, nguồn dữ liệu KPI và checklist FRM.</td><td>Thêm hold point FAI hoặc đổi điều kiện release CoC.</td></tr>
+<tr><td>Quyền hệ thống hoặc workflow đổi</td><td>RACI, thẩm quyền, FRM-141 và log cấu hình theo SOP-106.</td><td>Thêm quyền approve ECO, break-glass ERP hoặc quyền HOLD release.</td></tr>
+<tr><td>Bundle vai trò đổi</td><td>Chỉ dùng 7 bundle chuẩn: TOP_MGMT, FUNC_HEADS, FUNC_OWNERS, DIRECT_LINE_MGRS, COMMERCIAL_FRONT, QUALITY_CORE, SUPPORT_ENABLEMENT.</td><td>Đổi bundle phải kiểm lại mọi link bundle trong ANNEX-120/121/123 và trang tóm tắt.</td></tr>
 </tbody></table></div>
 <h2 class="h2" id="r9">9. Kích hoạt rà soát và cập nhật</h2>
-<div class="table-card"><table class="table"><colgroup><col style="width:25%"><col style="width:35%"><col style="width:40%"></colgroup><thead><tr><th>Kích hoạt rà soát</th><th>Chu kỳ / thời điểm</th><th>Người điều phối</th></tr></thead><tbody>
-<tr><td>Rà soát định kỳ</td><td>Ít nhất 01 lần/năm hoặc khi xem xét của lãnh đạo yêu cầu.</td><td>QMS + QA</td></tr>
-<tr><td>Sau thay đổi tổ chức / hệ thống</td><td>Ngay sau khi ban hành vai trò mới, module mới hoặc outsource mới.</td><td>FUNC_OWNERS + HR + ITA/ESA</td></tr>
-<tr><td>Sau sự cố lớn / phát hiện audit</td><td>Khi phát hiện lỗ hổng người chịu trách nhiệm, tự phê duyệt hoặc bàn giao thất bại.</td><td>QA + TOP_MGMT</td></tr>
-<tr><td>Sau khi cập nhật SOP/WI/ANNEX trọng yếu</td><td>Trước khi phát hành phiên bản tài liệu mới nếu đổi người chịu trách nhiệm.</td><td>QMS[DC]</td></tr>
+<div class="table-card"><table class="table"><colgroup><col style="width:26%"><col style="width:36%"><col style="width:38%"></colgroup><thead><tr><th>Kích hoạt rà soát</th><th>Chu kỳ / thời điểm</th><th>Người chịu trách nhiệm điều phối</th></tr></thead><tbody>
+<tr><td>Rà soát định kỳ</td><td>Ít nhất 01 lần/năm hoặc khi xem xét của lãnh đạo yêu cầu.</td><td><span class="role-code">QMS</span> / <span class="role-code">QA</span></td></tr>
+<tr><td>Sau thay đổi tổ chức / hệ thống</td><td>Ngay sau khi ban hành vai trò mới, mô-đun mới hoặc outsource mới.</td><td><span class="role-code">QMS</span> + <span class="role-code">FUNC_HEADS</span></td></tr>
+<tr><td>Sau sự cố lớn hoặc phát hiện qua đánh giá</td><td>Khi có tự phê duyệt, bàn giao thất bại, thiếu người A hoặc thiếu đường leo thang.</td><td><span class="role-code">QA</span> + <span class="role-code">CEO</span></td></tr>
+<tr><td>Sau khi cập nhật SOP/WI/ANNEX quan trọng</td><td>Trước khi phát hành phiên bản tài liệu mới nếu có thay đổi trách nhiệm hoạt động.</td><td><span class="role-code">QMS[DC]</span></td></tr>
 </tbody></table></div>
-<div class="footer-note">ANNEX này liên kết trực tiếp với <a href="annex-120-authority-matrix.html">ANNEX-120</a> để khóa quyền quyết định, với <a href="#r5gate">r5gate</a> để khóa trách nhiệm theo cổng, và với <a href="annex-123-deputy-backup-matrix.html">ANNEX-123</a> để khóa tính liên tục khi người chịu trách nhiệm vắng mặt.</div>
+<div class="footer-note">ANNEX này liên kết trực tiếp với <a href="annex-120-authority-matrix.html">ANNEX-120</a> để khóa quyền quyết định, với <a href="annex-122-kpi-cascade-dictionary.html">ANNEX-122</a> để khóa KPI, và với <a href="annex-123-deputy-backup-matrix.html">ANNEX-123</a> để khóa tính liên tục khi người chịu trách nhiệm vắng mặt.</div>
  </div>
  </div>
  </div>
