@@ -624,17 +624,22 @@
   function employeeSecondaryLabel(e){
     var profile = employeeProfile(e) || {};
     var meta = safeJson(e && e.metadata);
+    function humanDetail(v){
+      v = String(v || '').trim();
+      if (!v) return '';
+      if (/^EMP[A-Z0-9]{8,}$/i.test(v)) return '';
+      if (/^[A-Z0-9]{2,8}$/.test(v)) return '';
+      if (/^[a-z0-9]+(?:_[a-z0-9]+)+$/i.test(v)) return '';
+      return v;
+    }
     var details = [
       assignmentTypeLabel(e && e.assignment_type),
       profile.title,
       profile.jd_title,
       meta.title,
       profile.role_label,
-      profile.role,
-      e && e.labor_grade,
-      e && e.payroll_group,
       meta.dept
-    ].map(function(v){ return String(v || '').trim(); }).filter(Boolean);
+    ].map(humanDetail).filter(Boolean);
     return uniqueStrings(details).slice(0, 3).join(' · ');
   }
 
