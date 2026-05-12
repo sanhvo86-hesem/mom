@@ -9,6 +9,44 @@ const root = path.resolve(__dirname, '../../..');
 
 const errors = [];
 const warnings = [];
+const DEPLOY_BADGE_PRIMITIVE_CLASSES = [
+  'tlw-day-override',
+  'tlw-attendees',
+  'tlw-decision',
+  'dwp-attendee-chip',
+  'meeting-decision-chip',
+  'meeting-signoff-badge',
+  'deploy-wave-badge',
+  'champion-shift',
+  'dp-chip',
+  'dp-badge',
+  'deploy-doc-code',
+  'dwp-check-code',
+  'deploy-doc-chip',
+  'dwp-doc-chip',
+  'iso-clause-code',
+  'iso-pillar-chip',
+  'audit-status-badge',
+  'audit-fc',
+  'audit-dept-chip',
+  'finding-sev-badge',
+  'finding-clause',
+  'finding-status',
+  'issue-sev-badge',
+  'dfd-chip',
+];
+const DEPLOY_BADGE_REQUIRED_GEOMETRY = [
+  'display',
+  'align-items',
+  'justify-content',
+  'box-sizing',
+  'inline-size',
+  'block-size',
+  'min-inline-size',
+  'min-block-size',
+  'line-height',
+  'white-space',
+];
 
 function rel(...parts) {
   return path.join(root, ...parts);
@@ -151,6 +189,7 @@ function main() {
 
   validateGraphicsGovernance(graphicsGovernance, packets);
   validateWorldclassPackArtifacts(graphicsGovernance);
+  validateDeployDashboardBadgePrimitives();
 
   reportAndExit();
 }
@@ -380,6 +419,63 @@ function validateWorldclassPackArtifacts(graphicsGovernance) {
   const authorityRefs = Array.isArray(releaseLink.graphicsAuthorityRefs) ? releaseLink.graphicsAuthorityRefs : [];
   if (!authorityRefs.some((ref) => String(ref).includes('mom/design/graphics'))) {
     warnings.push('graphics-governance: graphicsReleaseLink does not yet reference mom/design/graphics pack artifacts; current release remains compatibility projection');
+  }
+}
+
+function validateDeployDashboardBadgePrimitives() {
+  const cssPath = 'mom/styles/deploy-dashboard.css';
+  const jsPath = 'mom/scripts/portal/08-deploy-dashboard.js';
+  const css = fs.readFileSync(rel(cssPath), 'utf8');
+  const js = fs.readFileSync(rel(jsPath), 'utf8');
+  const primitiveSet = new Set(DEPLOY_BADGE_PRIMITIVE_CLASSES);
+
+  const resetMatch = css.match(/\/\* Deploy badge primitive contract:[\s\S]*?\.deploy-dash :is\(([\s\S]*?)\)\s*\{([\s\S]*?)\}/);
+  if (!resetMatch) {
+    errors.push(`${cssPath}: missing Deploy badge primitive contract reset`);
+  } else {
+    const resetSelector = resetMatch[1];
+    const resetBody = resetMatch[2];
+    for (const className of DEPLOY_BADGE_PRIMITIVE_CLASSES) {
+      if (!resetSelector.includes(`.${className}`)) {
+        errors.push(`${cssPath}: Deploy badge primitive contract does not cover .${className}`);
+      }
+    }
+    for (const property of DEPLOY_BADGE_REQUIRED_GEOMETRY) {
+      if (!new RegExp(`(^|[;\\n])\\s*${property}\\s*:`, 'm').test(resetBody)) {
+        errors.push(`${cssPath}: Deploy badge primitive contract missing ${property}`);
+      }
+    }
+  }
+
+  const cssWithoutReset = resetMatch ? css.replace(resetMatch[0], '') : css;
+  const rulePattern = /([^{}]+)\{[^{}]*\}/g;
+  let ruleMatch;
+  while ((ruleMatch = rulePattern.exec(cssWithoutReset))) {
+    const selector = ruleMatch[1].replace(/\/\*[\s\S]*?\*\//g, '').trim();
+    if (!selector) continue;
+    for (const selectorPart of selector.split(',')) {
+      const part = selectorPart.trim();
+      if (!part) continue;
+      for (const className of DEPLOY_BADGE_PRIMITIVE_CLASSES) {
+        if (part.includes(`.${className}`) && !part.includes('.deploy-dash')) {
+          errors.push(`${cssPath}: deploy primitive selector must be scoped under .deploy-dash: ${part}`);
+        }
+      }
+    }
+  }
+
+  const renderedPrimitivePattern = /(?:-chip|-badge|-pill|-code)$|(?:^|-)decision$/;
+  const deployNamespacePattern = /^(deploy|tlw|dwp|meeting|issue|iso|audit|finding|dp|dfd|champion)-/;
+  const classPattern = /class="([^"]+)"/g;
+  let classMatch;
+  while ((classMatch = classPattern.exec(js))) {
+    for (const token of classMatch[1].split(/\s+/)) {
+      if (!token || token.includes('${')) continue;
+      if (!deployNamespacePattern.test(token) || !renderedPrimitivePattern.test(token)) continue;
+      if (!primitiveSet.has(token)) {
+        errors.push(`${jsPath}: rendered deploy primitive .${token} must be added to DEPLOY_BADGE_PRIMITIVE_CLASSES and the CSS reset`);
+      }
+    }
   }
 }
 
