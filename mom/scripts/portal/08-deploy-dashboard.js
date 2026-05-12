@@ -81,14 +81,53 @@ const DEPLOY_CONFIG = {
     ]},
   ],
   kpis: [
-    {id:'KPI-FLD-01', label:'Định tuyến đúng thư mục',   target:'>=95', unit:'%', short:'TM'},
-    {id:'KPI-FLD-02', label:'Thời gian tra cứu',          target:'<=180', unit:'s', short:'TC'},
-    {id:'KPI-TRN-01', label:'Hoàn thành đào tạo',         target:'>=90', unit:'%', short:'ĐT'},
-    {id:'KPI-DEP-01', label:'Phủ champion (primary+backup)', target:'>=100',unit:'%', short:'CH'},
-    {id:'KPI-DEP-02', label:'Đóng issue đúng hạn',        target:'>=95', unit:'%', short:'ĐI'},
-    {id:'KPI-DEP-03', label:'Tỉ lệ thay đổi thất bại',    target:'<=10', unit:'%', short:'TB'},
-    {id:'KPI-DEP-04', label:'Lead time thay đổi (ngày)',  target:'<=10', unit:'d', short:'LT'},
-    {id:'KPI-DEP-05', label:'Refresh dashboard đúng hạn', target:'>=95', unit:'%', short:'RF'},
+    {id:'KPI-FLD-01', label:'Định tuyến đúng thư mục',   target:'>=95', unit:'%', short:'TM',
+      basis:'ISO 9001:2015 §7.5.3 · AIIM Industry Watch 2023',
+      rationale:'Mục tiêu ≥95% cho phép tối đa 1/20 tài liệu sai folder routing — đủ thấp để search index của M365 vẫn tin cậy. Benchmark AIIM 2023: tổ chức mature đạt 90–97% folder compliance.',
+      method:'Audit 50 doc ngẫu nhiên/tuần do champion thực hiện, so sánh với ANNEX-135 file-plan. Tử số = số doc đúng folder, mẫu số = 50.',
+      escalation:'<90% → escalate gate P1-02 (champion bootcamp re-run). 90–94% → warning, training booster cho champion phòng có sai cao nhất.'},
+
+    {id:'KPI-FLD-02', label:'Thời gian tra cứu',          target:'<=180', unit:'s', short:'TC',
+      basis:'ISO 9001:2015 §7.5.3 · McKinsey "Social Economy" 2012',
+      rationale:'Mục tiêu ≤180 giây (3 phút) bảo đảm "tài liệu available where & when needed". McKinsey: nhân viên tri thức dành 1.8h/ngày tra cứu — duy trì ≤3min/doc giữ tổng retrieval dưới 30 phút/ngày khi 10 lượt.',
+      method:'Drill ANNEX-114 weekly: champion bốc 5 doc ngẫu nhiên, đo thời gian từ "user nhận yêu cầu" → "mở đúng tài liệu". Lấy median 5 lượt.',
+      escalation:'>240s → escalate (M365 search index hỏng hoặc folder routing sai). 180–240s → drill bổ sung tuần kế.'},
+
+    {id:'KPI-TRN-01', label:'Hoàn thành đào tạo',         target:'>=90', unit:'%', short:'ĐT',
+      basis:'ISO 9001:2015 §7.2 · Prosci ADKAR ROI 2023',
+      rationale:'Mục tiêu ≥90% (không phải 100%) cho phép short-tail absence (nghỉ phép, ốm, mới vào). Prosci ROI 2023: change initiative với training completion <80% bị giảm 50% adoption rate.',
+      method:'SOP-801 training matrix sign-off: ký xác nhận "đã hoàn tất OJT" / tổng số người trong wave hiện tại. Tính theo wave, không theo headcount tổng.',
+      escalation:'<80% → chặn gate go-live wave kế. 80–89% → champion phải report kế hoạch catch-up trong 7 ngày.'},
+
+    {id:'KPI-DEP-01', label:'Phủ champion (primary+backup)', target:'>=100',unit:'%', short:'CH',
+      basis:'Prosci CMROI 2023 · WI-105 §4.2',
+      rationale:'Mục tiêu 100% (primary + backup mỗi phòng) đảm bảo business continuity khi primary nghỉ. Prosci CMROI 2023: dự án có change agent named có adoption rate cao hơn 6×. Backup không bắt buộc OJT nhưng phải biết escalation path.',
+      method:'Tử số = số phòng có CẢ primary + backup nominated và đã sign-off. Mẫu số = 11 phòng. 100% nghĩa là 22/22 slot (11×2).',
+      escalation:'<100% → gate P0-02 chặn. Phòng nào thiếu backup phải nominate trong 3 ngày làm việc.'},
+
+    {id:'KPI-DEP-02', label:'Đóng issue đúng hạn',        target:'>=95', unit:'%', short:'ĐI',
+      basis:'ITIL 4 Incident Management · Gartner ITSM 2023',
+      rationale:'Mục tiêu ≥95% issue closed trong SLA. ITIL benchmark top-quartile ≥95%. Dưới mức này, backlog dồn lại và confidence của user erode (Gartner ITSM 2023).',
+      method:'SLA matrix theo ANNEX-117: Sev-1 24h, Sev-2 3 ngày, Sev-3 1 tuần. Tử số = issue đóng trong SLA tuần này, mẫu số = tổng issue đóng tuần này.',
+      escalation:'<85% → escalate Steering Committee. 85–94% → tăng tần suất daily standup từ tuần này.'},
+
+    {id:'KPI-DEP-03', label:'Tỉ lệ thay đổi thất bại',    target:'<=10', unit:'%', short:'TB',
+      basis:'DORA "State of DevOps" 2024 · ITIL 4 Change',
+      rationale:'Mục tiêu ≤10% theo DORA 2024: Elite 0–15%, High 16–30%. 10% phù hợp mid-maturity — cho phép thí nghiệm mà không erode trust. Đo cả change tài liệu (SOP/WI) chứ không chỉ software.',
+      method:'Tử số = số change cần rollback hoặc patch khẩn cấp trong 7 ngày kể từ effective. Mẫu số = tổng change đã release tuần đó. Source: dcc_document_revision.',
+      escalation:'>15% → freeze tất cả change non-critical, root-cause review trong 5 ngày.'},
+
+    {id:'KPI-DEP-04', label:'Lead time thay đổi (ngày)',  target:'<=10', unit:'d', short:'LT',
+      basis:'DORA "State of DevOps" 2024',
+      rationale:'Mục tiêu ≤10 ngày từ request → effective. DORA 2024: Elite <1 ngày, High 1d–1w, Medium 1w–1m. 10 ngày = top-of-Medium, đạt được cho SOP/WI revision (không phải software).',
+      method:'Tử số = SUM(approved_at - submitted_at) của change đã release trong tuần. Mẫu số = số change. Lấy median (không trung bình) để tránh outlier.',
+      escalation:'>15d → review approval bottleneck (thường là ký phê duyệt). Cân nhắc delegation rule theo ANNEX-120.'},
+
+    {id:'KPI-DEP-05', label:'Refresh dashboard đúng hạn', target:'>=95', unit:'%', short:'RF',
+      basis:'Gartner Data & Analytics 2023 · ANNEX-110',
+      rationale:'Mục tiêu ≥95% widget refresh trên schedule. Gartner: dashboard refresh trễ <95% mất trust của decision maker trong 4 tuần. Tier meeting cadence không vận hành được nếu KPI nguồn không up-to-date.',
+      method:'Tử số = widget có data_collected_at trong deadline (theo cadence của widget: daily/weekly/monthly). Mẫu số = tổng widget active. Weekly snapshot.',
+      escalation:'<90% → owner widget có 3 ngày fix nguồn dữ liệu. <80% → dashboard tạm gỡ widget đỏ để tránh decision sai.'},
   ],
   phaseChecklists: {
     P0:[
@@ -433,14 +472,32 @@ function renderKpiCard(kpi, value){
   const v = value == null ? '' : String(value);
   const rag = deployKpiRag(kpi, v);
   const ro = !DeployState.me.canEdit;
+  const hasTip = !!(kpi.rationale || kpi.basis || kpi.method);
+  // Build rationale tooltip body. Uses an <aside> floating beside the card on
+  // hover (CSS-only). Native `title=` on the input is also set so screen-
+  // readers and keyboard-focus users get the same content.
+  const tipHtml = hasTip ? `
+    <aside class="kpi-tip" role="tooltip">
+      <div class="kpi-tip-head">${deployEscape(kpi.label)} <span>· Target ${deployEscape(kpi.target)}${deployEscape(kpi.unit)}</span></div>
+      ${kpi.basis     ? `<div class="kpi-tip-row"><strong>Cơ sở:</strong> ${deployEscape(kpi.basis)}</div>` : ''}
+      ${kpi.rationale ? `<div class="kpi-tip-row"><strong>Vì sao:</strong> ${deployEscape(kpi.rationale)}</div>` : ''}
+      ${kpi.method    ? `<div class="kpi-tip-row"><strong>Đo thế nào:</strong> ${deployEscape(kpi.method)}</div>` : ''}
+      ${kpi.escalation? `<div class="kpi-tip-row"><strong>Khi lệch:</strong> ${deployEscape(kpi.escalation)}</div>` : ''}
+    </aside>` : '';
+  // Native title attribute mirrors the tooltip in a single \n-joined string
+  // so input focus / hover on the cell also reveals the rationale.
+  const titleAttr = hasTip
+    ? `${kpi.basis ? 'Cơ sở: ' + kpi.basis + '\n' : ''}${kpi.rationale ? 'Vì sao: ' + kpi.rationale + '\n' : ''}${kpi.method ? 'Đo: ' + kpi.method + '\n' : ''}${kpi.escalation ? 'Khi lệch: ' + kpi.escalation : ''}`
+    : '';
   return `
-  <div class="kpi-mini-card kpi-rag-${rag}">
+  <div class="kpi-mini-card kpi-rag-${rag}${hasTip ? ' has-kpi-tip' : ''}">
     <div class="kpi-mini-icon">${deployEscape(kpi.short)}</div>
     <div class="kpi-mini-body">
-      <div class="kpi-mini-label">${deployEscape(kpi.label)}</div>
+      <div class="kpi-mini-label">${deployEscape(kpi.label)} ${hasTip ? `<button type="button" class="kpi-info-btn" aria-label="Cơ sở KPI" tabindex="0">ⓘ</button>` : ''}</div>
       <div class="kpi-mini-target">Target ${deployEscape(kpi.target)}${deployEscape(kpi.unit)}</div>
     </div>
-    <input type="text" class="kpi-mini-input" value="${deployEscape(v)}" placeholder="—" ${ro ? 'disabled' : ''} onchange="deployUpdateMetric('${deployEscape(kpi.id)}', this.value)">
+    <input type="text" class="kpi-mini-input" value="${deployEscape(v)}" placeholder="—" ${ro ? 'disabled' : ''} title="${deployEscape(titleAttr)}" onchange="deployUpdateMetric('${deployEscape(kpi.id)}', this.value)">
+    ${tipHtml}
   </div>`;
 }
 
