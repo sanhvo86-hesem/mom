@@ -454,7 +454,7 @@ class RbacController extends BaseController
         }
         // 3. Fallback: scan all cookies for one whose value resembles a 32-hex
         //    PHP session token (matches what we see on disk: sess_<hex32>).
-        foreach (($_COOKIE ?? []) as $name => $value) {
+        foreach ($_COOKIE as $name => $value) {
             if (is_string($value) && preg_match('/^[a-f0-9]{32}$/i', $value)) {
                 return $value;
             }

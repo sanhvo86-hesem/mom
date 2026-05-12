@@ -880,4 +880,33 @@ class AuthUserShadowSyncService
         );
         return '';
     }
+
+    /**
+     * TODO(org-chart-codex-agent): Sync user → position assignment rows
+     * (employee_position_assignment) for the org-chart subtree work in
+     * progress on branch `codex/org-chart-subtree-enhancements`. Stubbed
+     * here as a no-op so syncUser() can call it safely without crashing.
+     *
+     * @param array<string, mixed> $user
+     * @param array<string, mixed> $linkage
+     * @param array<string, mixed> $orgContext
+     */
+    private function syncUserPositionAssignments(
+        array $user,
+        ?string $employeeId,
+        array $linkage,
+        string $employmentStatus,
+        array $orgContext
+    ): void {
+        // Intentional no-op until the parallel org-chart branch lands the
+        // canonical implementation. Logged so we can see when callers reach
+        // this path on the VPS.
+        @error_log(
+            '[AuthUserShadowSyncService] syncUserPositionAssignments stub invoked: ' .
+            'user=' . (string)($user['username'] ?? '') .
+            ' employee_id=' . (string)($employeeId ?? '') .
+            ' status=' . $employmentStatus
+        );
+        unset($linkage, $orgContext);
+    }
 }

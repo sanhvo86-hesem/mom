@@ -222,7 +222,7 @@ class DocumentController extends BaseController
                 'draft_rel' => $draftRel,
                 'doc'       => $docRecord,
                 'state'     => $state,
-                'versions'  => $this->enrichVersionHistory($manifest['versions'] ?? []),
+                'versions'  => $this->enrichVersionHistory($manifest['versions']),
                 'locale_translation' => $localeTranslation,
             ]);
         } catch (Throwable $e) {

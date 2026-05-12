@@ -26,6 +26,7 @@ use Throwable;
  */
 final class VersionControlService
 {
+    /** @phpstan-ignore-next-line property.onlyWritten — retained for future filesystem-scoped lookups */
     private string $dataDir;
     private DataLayer $data;
 

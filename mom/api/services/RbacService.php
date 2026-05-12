@@ -28,6 +28,7 @@ use RuntimeException;
  */
 class RbacService
 {
+    /** @phpstan-ignore-next-line property.onlyWritten — held for future DataLayer-routed reads */
     private DataLayer $data;
     private Connection $db;
 
@@ -401,7 +402,7 @@ class RbacService
     }
 
     /**
-     * @return array<int, array<string, mixed>>
+     * @return array<string, mixed>|null
      */
     public function effectiveLayoutForUser(string $userId): ?array
     {
@@ -429,7 +430,7 @@ class RbacService
      */
     public function insertAcknowledgement(array $payload): array
     {
-        $row = $this->db->execute(
+        $row = $this->db->queryOne(
             "INSERT INTO document_acknowledgement
                 (ack_id, doc_id, doc_revision, user_id, signature_method, signature_hash,
                  affirmation_text, acknowledged_at)
@@ -475,7 +476,7 @@ class RbacService
         if (!empty($hold)) {
             throw new \RuntimeException('record_under_legal_hold:' . ($hold[0]['case_ref'] ?? ''));
         }
-        $event = $this->db->execute(
+        $event = $this->db->queryOne(
             "INSERT INTO disposal_event
                 (id, record_id, actor_user_id, witness_user_id, method_used, location, notes, actor_reason, disposed_at, row_version)
              VALUES
@@ -515,7 +516,7 @@ class RbacService
             [':cid' => $campaignId]
         );
         $pendingCount = (int)($pending[0]['n'] ?? 0);
-        $closed = $this->db->execute(
+        $closed = $this->db->queryOne(
             "UPDATE access_review_campaign
                 SET status = 'closed', completed_at = NOW(), closed_at = NOW(),
                     close_reason = :reason, pending_at_close = :pending,
