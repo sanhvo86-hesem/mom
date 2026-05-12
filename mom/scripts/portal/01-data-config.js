@@ -9,6 +9,7 @@ window.qmsEditorConfig = Object.assign({
 }, window.qmsEditorConfig||{});
 
 let USERS = []; // Server-side auth: do NOT embed credentials in client-side code.
+window.USERS = USERS;
 // Fallback demo users for offline/dev mode (only used if API returns empty)
 const DEMO_USERS = [
   // ═══ EXECUTIVE (EXE) ═══
@@ -95,6 +96,9 @@ async function loadUsersFromServerIfAdmin(){
         role: _ROLE_MIGRATE[u.role] || u.role || 'cnc_operator',
         dept: (u.dept==='BOD'?'EXE':(u.dept==='WH'?'WHS':(u.dept||''))),
         title: (u.title||''),
+        jd_code: String(u.jd_code || ''),
+        jd_title: String(u.jd_title || ''),
+        role_source: (u.role_source && typeof u.role_source === 'object') ? u.role_source : {},
         hcm_org_unit_id: String(u.hcm_org_unit_id || ''),
         hcm_position_id: String(u.hcm_position_id || ''),
         cccd: (u.cccd || ''),
@@ -111,6 +115,8 @@ async function loadUsersFromServerIfAdmin(){
         // Keep pin empty: passwords are server-side only
         pin: ''
       }));
+      window.USERS = USERS;
+      try { window.dispatchEvent(new CustomEvent('admin:users:updated', { detail:{ users:USERS } })); } catch(_){}
       if(typeof syncUsersWithAuthoritativeOrg === 'function') syncUsersWithAuthoritativeOrg();
       if(currentPage==='admin'){ renderAdmin(); }
     }
@@ -118,6 +124,12 @@ async function loadUsersFromServerIfAdmin(){
     // silent: admin listing is best-effort
   }
 }
+
+window.loadSharedAdminUsers = async function(force){
+  if(!force && Array.isArray(window.USERS) && window.USERS.length) return window.USERS;
+  await loadUsersFromServerIfAdmin();
+  return Array.isArray(window.USERS) ? window.USERS : [];
+};
 
 
 

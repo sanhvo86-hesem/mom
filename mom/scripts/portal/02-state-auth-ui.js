@@ -1583,6 +1583,8 @@ function syncUsersWithAuthoritativeOrg(){
     if(resolved.positionTitle) next.title = resolved.positionTitle;
     return next;
   });
+  window.USERS = USERS;
+  try { window.dispatchEvent(new CustomEvent('admin:users:updated', { detail:{ users:USERS } })); } catch(_){}
 }
 
 function rolesForAdminGrid(){
@@ -10206,11 +10208,11 @@ async function deleteUserConfirm(userId){
 }
 
 async function refreshAdminUserRuntimeProjection(){
-  await loadUsersFromServerIfAdmin();
   await Promise.all([
     loadAuthoritativeRoleCatalog({force:true}),
     loadAuthoritativeOrgCatalog({force:true})
   ]);
+  await loadUsersFromServerIfAdmin();
   renderAdmin();
 }
 
@@ -10251,7 +10253,19 @@ async function doHardDeleteUser(userId,username,name){
     }
   );
 }
-function showUserModal(userId){
+async function showUserModal(userId){
+  if(!ADMIN_AUTH_STATE.org.loaded){
+    await loadAuthoritativeOrgCatalog({force:!!ADMIN_AUTH_STATE.org.error});
+  }
+  if(!ADMIN_AUTH_STATE.roles.loaded){
+    await loadAuthoritativeRoleCatalog({force:!!ADMIN_AUTH_STATE.roles.error});
+  }
+  if(!ADMIN_AUTH_STATE.org.loaded){
+    showToast(lang==='en'
+      ?'⚠ Cannot edit department/title until the backend HCM organization catalog is available'
+      :'⚠ Không thể sửa phòng ban/chức danh khi catalog tổ chức HCM backend chưa sẵn sàng');
+    return;
+  }
   const isEdit = !!userId;
   const seedUser = isEdit ? USERS.find(x=>String(x.id)===String(userId)) : {id:'',name:'',username:'',dept:'',title:'',role:'employee',active:true,mfa_enabled:false,cccd:'',phone:'',personal_email:'',hcm_org_unit_id:'',hcm_position_id:''};
   if(isEdit && !seedUser){
@@ -10488,8 +10502,8 @@ async function saveUserFromModal(userId){
       const resolvedAssignment = resolveAuthoritativeUserAssignment({
         dept,
         title,
-        hcm_org_unit_id: preserveExistingAssignment.orgUnitId,
-        hcm_position_id: preserveExistingAssignment.positionId
+        hcm_org_unit_id: deptChanged ? '' : preserveExistingAssignment.orgUnitId,
+        hcm_position_id: (deptChanged || titleChanged) ? '' : preserveExistingAssignment.positionId
       });
       const mustEnforceOrg = !isEdit || deptChanged || !preserveExistingAssignment.orgUnitId;
       const mustEnforcePosition = !isEdit || titleChanged || !preserveExistingAssignment.positionId;

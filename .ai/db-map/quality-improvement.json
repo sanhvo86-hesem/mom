@@ -2,7 +2,7 @@
     "_meta": {
         "domain": "quality_improvement",
         "table_count": 20,
-        "generated_at": "2026-05-10T03:11:29+00:00"
+        "generated_at": "2026-05-12T11:59:30+00:00"
     },
     "tables": {
         "apqp_gate_reviews": {
@@ -193,7 +193,8 @@
                 "155_dcc_consolidation.sql",
                 "155_dcc_consolidation.sql",
                 "155_dcc_consolidation.sql",
-                "156_live_schema_drift_governance_reconcile.sql"
+                "156_live_schema_drift_governance_reconcile.sql",
+                "175_dcc_document_body_storage.sql"
             ],
             "primary_key": "",
             "foreign_keys": [],

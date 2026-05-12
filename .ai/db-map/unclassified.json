@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 774,
-        "generated_at": "2026-05-10T03:11:29+00:00"
+        "table_count": 778,
+        "generated_at": "2026-05-12T11:59:30+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -457,6 +457,13 @@
                     "ref": "users(user_id)"
                 }
             ],
+            "contract": null
+        },
+        "audit_event_chain": {
+            "defined_in": "174_data_isolation_foundation.sql",
+            "extended_in": [],
+            "primary_key": "chain_id",
+            "foreign_keys": [],
             "contract": null
         },
         "audit_events": {
@@ -1410,6 +1417,25 @@
                     "ref": "retention_policies(policy_id)"
                 }
             ],
+            "contract": null
+        },
+        "data_collection_drift": {
+            "defined_in": "174_data_isolation_foundation.sql",
+            "extended_in": [],
+            "primary_key": "drift_id",
+            "foreign_keys": [
+                {
+                    "col": "collection_key",
+                    "ref": "data_collection_state(collection_key)"
+                }
+            ],
+            "contract": null
+        },
+        "data_collection_state": {
+            "defined_in": "174_data_isolation_foundation.sql",
+            "extended_in": [],
+            "primary_key": "collection_key",
+            "foreign_keys": [],
             "contract": null
         },
         "dcc_doc_type_catalog": {
@@ -4612,6 +4638,42 @@
                 {
                     "col": "scanned_cert_doc_id",
                     "ref": "documents(doc_id)"
+                }
+            ],
+            "contract": null
+        },
+        "hcm_employee_position_assignments": {
+            "defined_in": "177_hcm_employee_position_assignments.sql",
+            "extended_in": [],
+            "primary_key": "hcm_assignment_id",
+            "foreign_keys": [
+                {
+                    "col": "employee_id",
+                    "ref": "hcm_employees(employee_id)"
+                },
+                {
+                    "col": "hcm_position_id",
+                    "ref": "hcm_positions(hcm_position_id)"
+                },
+                {
+                    "col": "hcm_org_unit_id",
+                    "ref": "hcm_org_units(hcm_org_unit_id)"
+                },
+                {
+                    "col": "org_company_code",
+                    "ref": "org_companies(company_code)"
+                },
+                {
+                    "col": "org_legal_entity_code",
+                    "ref": "org_legal_entities(legal_entity_code)"
+                },
+                {
+                    "col": "org_plant_id",
+                    "ref": "org_plants(plant_id)"
+                },
+                {
+                    "col": "org_site_id",
+                    "ref": "mes_sites(site_id)"
                 }
             ],
             "contract": null

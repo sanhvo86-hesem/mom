@@ -37,6 +37,24 @@
     return r;
   }
 
+  function sharedAdminUsers(){
+    var loader = typeof window.loadSharedAdminUsers === 'function'
+      ? window.loadSharedAdminUsers
+      : function(){ return Promise.resolve(window.USERS || []); };
+    return loader().then(function(users){
+      return (users || []).map(function(u){
+        return {
+          id: u.id || u.employee_id || u.username,
+          username: u.username,
+          full_name: u.name || u.full_name,
+          role_code: u.role,
+          dept_code: u.dept,
+          is_active: u.active !== false
+        };
+      });
+    });
+  }
+
   function render(rootEl){
     rootEl.innerHTML = ''
       + '<div style="margin-bottom:14px">'
@@ -128,7 +146,7 @@
       UI.fetchJson('/api/v1/sessions/active').catch(function(){ return { data: [] }; }),
       UI.runtime.list('core_system','audit_events', { sort:'-recorded_at', limit: 1, include_total: 1 }).catch(function(){ return { raw: { total: 0 } }; }),
       UI.runtime.list('core_system','retention_policy', { limit: 100 }).catch(function(){ return { data: [] }; }),
-      UI.runtime.list('core_system','users', { limit: 1000 }).catch(function(){ return { data: [] }; })
+      sharedAdminUsers().then(function(users){ return { data: users }; }).catch(function(){ return { data: [] }; })
     ]).then(function(results){
       var roles = results[0].data || [];
       var perms = results[1].data || [];

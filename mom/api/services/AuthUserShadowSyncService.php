@@ -504,6 +504,24 @@ class AuthUserShadowSyncService
                         ':employee_id' => $employeeId,
                     ]
                 );
+
+                if ($this->tableExists('hcm_employee_position_assignments')) {
+                    $this->db->execute(
+                        'UPDATE hcm_employee_position_assignments
+                            SET assignment_status = :status,
+                                effective_to = COALESCE(effective_to, CURRENT_DATE),
+                                updated_at = now()
+                          WHERE employee_id = :employee_id
+                            AND source_system = :source_system
+                            AND assignment_status = :active_status',
+                        [
+                            ':status' => 'ended',
+                            ':employee_id' => $employeeId,
+                            ':source_system' => 'AUTH_JSON',
+                            ':active_status' => 'active',
+                        ]
+                    );
+                }
             });
         } catch (Throwable $e) {
             @error_log('[AuthUserShadowSyncService] deactivateUser failed: ' . $e->getMessage());
@@ -560,9 +578,32 @@ class AuthUserShadowSyncService
         $roleCode = trim((string)($user['role'] ?? ''));
         $requestedOrgUnitId = $this->validOrgUnitId((string)($user['hcm_org_unit_id'] ?? ''));
         $requestedPosition = $this->positionRecordForId((string)($user['hcm_position_id'] ?? ''));
+        $submittedTitle = trim((string)($user['title'] ?? ''));
+
+        if ($requestedOrgUnitId !== null && $deptCode !== null) {
+            $requestedDeptCode = $this->orgUnitCodeForId($requestedOrgUnitId);
+            if ($requestedDeptCode !== null && strtoupper($requestedDeptCode) !== strtoupper($deptCode)) {
+                $requestedOrgUnitId = null;
+            }
+        }
+
+        if (is_array($requestedPosition)) {
+            $positionOrgUnitId = (string)($requestedPosition['hcm_org_unit_id'] ?? '') ?: null;
+            $positionDeptCode = $positionOrgUnitId !== null ? $this->orgUnitCodeForId($positionOrgUnitId) : null;
+            $positionTitle = trim((string)($requestedPosition['position_title'] ?? ''));
+            $titleMismatch = $submittedTitle !== ''
+                && $this->normalizeComparableTitle($positionTitle) !== $this->normalizeComparableTitle($submittedTitle);
+            $deptMismatch = $deptCode !== null
+                && $positionDeptCode !== null
+                && strtoupper($positionDeptCode) !== strtoupper($deptCode);
+            if ($titleMismatch || $deptMismatch) {
+                $requestedPosition = null;
+            }
+        }
+
         $orgUnitId = $requestedOrgUnitId;
         $positionId = is_array($requestedPosition) ? (string)($requestedPosition['hcm_position_id'] ?? '') ?: null : null;
-        $positionTitle = trim((string)($user['title'] ?? ''));
+        $positionTitle = $submittedTitle;
 
         if ($orgUnitId === null && $deptCode !== null) {
             $orgUnitId = $this->orgUnitIdForCode($deptCode);
@@ -820,6 +861,137 @@ class AuthUserShadowSyncService
         return preg_match('/^[0-9a-fA-F-]{36}$/', $value) === 1 ? strtolower($value) : null;
     }
 
+    private function tableExists(string $table): bool
+    {
+        try {
+            $row = $this->db->queryOne(
+                'SELECT to_regclass(:table_name) AS table_name',
+                [':table_name' => 'public.' . $table]
+            );
+            return is_array($row) && trim((string)($row['table_name'] ?? '')) !== '';
+        } catch (Throwable) {
+            return false;
+        }
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function userRoleCodes(array $user): array
+    {
+        $roles = [];
+        $add = static function (mixed $role) use (&$roles): void {
+            if (!is_scalar($role)) {
+                return;
+            }
+            $roleCode = strtolower(trim((string)$role));
+            if ($roleCode !== '') {
+                $roles[$roleCode] = true;
+            }
+        };
+
+        if (is_array($user['roles'] ?? null)) {
+            foreach ((array)$user['roles'] as $role) {
+                $add($role);
+            }
+        }
+        $add($user['role'] ?? '');
+
+        return array_keys($roles);
+    }
+
+    /**
+     * @return list<array{position:array<string,mixed>, assignment_type:string, source_key:string, role_code:?string}>
+     */
+    private function desiredUserPositionAssignments(array $user, array $linkage): array
+    {
+        $desired = [];
+        $seen = [];
+        $orgUnitId = $this->nullableUuid((string)($linkage['hcm_org_unit_id'] ?? ''));
+        $primaryPositionId = $this->nullableUuid((string)($linkage['hcm_position_id'] ?? ''));
+        $primaryPosition = $primaryPositionId !== null ? $this->positionRecordForId($primaryPositionId) : null;
+
+        if (!is_array($primaryPosition) && $primaryPositionId !== null && $orgUnitId !== null) {
+            $primaryPosition = [
+                'hcm_position_id' => $primaryPositionId,
+                'hcm_org_unit_id' => $orgUnitId,
+                'position_title' => trim((string)($linkage['position_title'] ?? $user['title'] ?? '')),
+            ];
+        }
+
+        $add = static function (array $position, string $assignmentType, string $sourceKey, ?string $roleCode) use (&$desired, &$seen): void {
+            $positionId = trim((string)($position['hcm_position_id'] ?? ''));
+            $unitId = trim((string)($position['hcm_org_unit_id'] ?? ''));
+            if ($positionId === '' || $unitId === '') {
+                return;
+            }
+            $assignmentType = in_array($assignmentType, ['primary', 'role', 'concurrent', 'acting', 'backup', 'temporary'], true)
+                ? $assignmentType
+                : 'role';
+            $key = $positionId . '|' . $assignmentType;
+            if (isset($seen[$key])) {
+                return;
+            }
+            $seen[$key] = true;
+            $desired[] = [
+                'position' => $position,
+                'assignment_type' => $assignmentType,
+                'source_key' => substr($sourceKey, 0, 120),
+                'role_code' => $roleCode,
+            ];
+        };
+
+        if (is_array($primaryPosition)) {
+            $add($primaryPosition, 'primary', 'primary', null);
+        }
+
+        foreach ($this->userRoleCodes($user) as $roleCode) {
+            $rolePosition = $this->positionRecordForRoleCode($orgUnitId, $roleCode);
+            if (!is_array($rolePosition)) {
+                continue;
+            }
+            $rolePositionId = trim((string)($rolePosition['hcm_position_id'] ?? ''));
+            if ($primaryPositionId !== null && $rolePositionId === $primaryPositionId) {
+                continue;
+            }
+            $add($rolePosition, 'role', 'role:' . $roleCode, $roleCode);
+        }
+
+        return $desired;
+    }
+
+    /**
+     * @param list<string> $keepSourceIds
+     */
+    private function endStaleAuthJsonAssignments(string $employeeId, string $username, array $keepSourceIds = []): void
+    {
+        $params = [
+            ':employee_id' => $employeeId,
+            ':source_system' => 'AUTH_JSON',
+            ':source_prefix' => strtr($username, ['\\' => '\\\\', '%' => '\\%', '_' => '\\_']) . ':%',
+            ':active_status' => 'active',
+            ':ended_status' => 'ended',
+        ];
+        $sql = 'UPDATE hcm_employee_position_assignments
+                   SET assignment_status = :ended_status,
+                       effective_to = COALESCE(effective_to, CURRENT_DATE),
+                       updated_at = now()
+                 WHERE employee_id = :employee_id
+                   AND source_system = :source_system
+                   AND source_record_id LIKE :source_prefix ESCAPE \'\\\'
+                   AND assignment_status = :active_status';
+        if ($keepSourceIds !== []) {
+            $placeholders = [];
+            foreach (array_values($keepSourceIds) as $idx => $sourceId) {
+                $ph = ':keep_' . $idx;
+                $placeholders[] = $ph;
+                $params[$ph] = $sourceId;
+            }
+            $sql .= ' AND source_record_id NOT IN (' . implode(',', $placeholders) . ')';
+        }
+        $this->db->execute($sql, $params);
+    }
+
     /**
      * SVC-021 (CRITICAL): Get the current role from the authoritative DB source.
      * Only the DB is the source of truth for user roles during sync.
@@ -882,10 +1054,7 @@ class AuthUserShadowSyncService
     }
 
     /**
-     * TODO(org-chart-codex-agent): Sync user → position assignment rows
-     * (employee_position_assignment) for the org-chart subtree work in
-     * progress on branch `codex/org-chart-subtree-enhancements`. Stubbed
-     * here as a no-op so syncUser() can call it safely without crashing.
+     * Mirror the admin user list into the canonical multi-position bridge.
      *
      * @param array<string, mixed> $user
      * @param array<string, mixed> $linkage
@@ -898,15 +1067,112 @@ class AuthUserShadowSyncService
         string $employmentStatus,
         array $orgContext
     ): void {
-        // Intentional no-op until the parallel org-chart branch lands the
-        // canonical implementation. Logged so we can see when callers reach
-        // this path on the VPS.
-        @error_log(
-            '[AuthUserShadowSyncService] syncUserPositionAssignments stub invoked: ' .
-            'user=' . (string)($user['username'] ?? '') .
-            ' employee_id=' . (string)($employeeId ?? '') .
-            ' status=' . $employmentStatus
-        );
-        unset($linkage, $orgContext);
+        $employeeId = trim((string)($employeeId ?? ''));
+        $username = strtolower(trim((string)($user['username'] ?? '')));
+        if ($employeeId === '' || $username === '') {
+            return;
+        }
+        if (!$this->tableExists('hcm_employee_position_assignments')) {
+            return;
+        }
+
+        if ($employmentStatus !== 'active') {
+            $this->endStaleAuthJsonAssignments($employeeId, $username);
+            return;
+        }
+
+        $desired = $this->desiredUserPositionAssignments($user, $linkage);
+        if ($desired === []) {
+            $this->endStaleAuthJsonAssignments($employeeId, $username);
+            return;
+        }
+
+        $keepSourceIds = [];
+        foreach ($desired as $assignment) {
+            $position = $assignment['position'];
+            $positionId = (string)($position['hcm_position_id'] ?? '');
+            $orgUnitId = (string)($position['hcm_org_unit_id'] ?? '');
+            $assignmentType = $assignment['assignment_type'];
+            $sourceRecordId = substr($username . ':' . $assignment['source_key'], 0, 120);
+            $keepSourceIds[] = $sourceRecordId;
+            $metadata = [
+                'source' => 'users.json',
+                'username' => $username,
+                'name' => (string)($user['name'] ?? ''),
+                'title' => (string)($position['position_title'] ?? $linkage['position_title'] ?? $user['title'] ?? ''),
+                'role_code' => (string)($assignment['role_code'] ?? $user['role'] ?? ''),
+                'assignment_linkage_source' => (($user['hcm_position_id'] ?? '') !== '' || ($user['hcm_org_unit_id'] ?? '') !== '') ? 'explicit_hcm_reference' : 'admin_user_list',
+            ];
+
+            $this->db->execute(
+                'INSERT INTO hcm_employee_position_assignments (
+                    employee_id,
+                    hcm_position_id,
+                    hcm_org_unit_id,
+                    assignment_type,
+                    assignment_status,
+                    is_primary,
+                    org_company_code,
+                    org_legal_entity_code,
+                    org_plant_id,
+                    org_site_id,
+                    source_system,
+                    source_record_id,
+                    payload_schema_version,
+                    metadata,
+                    created_at,
+                    updated_at
+                 ) VALUES (
+                    :employee_id,
+                    :position_id,
+                    :org_unit_id,
+                    :assignment_type,
+                    :assignment_status,
+                    :is_primary,
+                    :org_company_code,
+                    :org_legal_entity_code,
+                    :org_plant_id,
+                    :org_site_id,
+                    :source_system,
+                    :source_record_id,
+                    :payload_schema_version,
+                    :metadata::jsonb,
+                    now(),
+                    now()
+                 )
+                 ON CONFLICT (employee_id, hcm_position_id, assignment_type, source_system, source_record_id)
+                 WHERE assignment_status = \'active\'
+                 DO UPDATE SET
+                    hcm_org_unit_id = EXCLUDED.hcm_org_unit_id,
+                    assignment_status = EXCLUDED.assignment_status,
+                    is_primary = EXCLUDED.is_primary,
+                    effective_to = NULL,
+                    org_company_code = EXCLUDED.org_company_code,
+                    org_legal_entity_code = EXCLUDED.org_legal_entity_code,
+                    org_plant_id = EXCLUDED.org_plant_id,
+                    org_site_id = EXCLUDED.org_site_id,
+                    payload_schema_version = EXCLUDED.payload_schema_version,
+                    metadata = COALESCE(hcm_employee_position_assignments.metadata, \'{}\'::jsonb) || EXCLUDED.metadata,
+                    updated_at = now()',
+                [
+                    ':employee_id' => $employeeId,
+                    ':position_id' => $positionId,
+                    ':org_unit_id' => $orgUnitId,
+                    ':assignment_type' => $assignmentType,
+                    ':assignment_status' => 'active',
+                    ':is_primary' => $assignmentType === 'primary',
+                    ':org_company_code' => $orgContext['org_company_code'] ?? null,
+                    ':org_legal_entity_code' => $orgContext['org_legal_entity_code'] ?? null,
+                    ':org_plant_id' => $orgContext['org_plant_id'] ?? null,
+                    ':org_site_id' => $orgContext['org_site_id'] ?? null,
+                    ':source_system' => 'AUTH_JSON',
+                    ':source_record_id' => $sourceRecordId,
+                    ':payload_schema_version' => '1.0',
+                    ':metadata' => json_encode($metadata, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
+                ]
+            );
+        }
+
+        $this->endStaleAuthJsonAssignments($employeeId, $username, array_values(array_unique($keepSourceIds)));
     }
 }

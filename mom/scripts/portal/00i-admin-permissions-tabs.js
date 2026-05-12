@@ -72,11 +72,12 @@
     }).catch(function(){ state.portalLayouts = []; });
   }
   function fetchUsers(){
-    return UI.runtime.list('core_system','users',{ limit:1000 }).then(function(r){
-      state.users = (r && r.data) || r || [];
-    }).catch(function(){
-      state.users = (window.USERS || []).map(function(u){
-        return { id:u.id, username:u.username, full_name:u.name, role_code:u.role, dept_code:u.dept, is_active:u.active!==false };
+    var loader = typeof window.loadSharedAdminUsers === 'function'
+      ? window.loadSharedAdminUsers
+      : function(){ return Promise.resolve(window.USERS || []); };
+    return loader().then(function(users){
+      state.users = (users || []).map(function(u){
+        return { id:u.id || u.employee_id || u.username, username:u.username, full_name:u.name || u.full_name, role_code:u.role, dept_code:u.dept, is_active:u.active!==false };
       });
     });
   }

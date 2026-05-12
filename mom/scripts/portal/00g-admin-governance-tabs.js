@@ -34,9 +34,14 @@
   function fetchSodWaivers(){ return UI.runtime.list('core_system','role_sod_waiver',{ limit:500 }).then(function(r){ state.sodWaivers = (r&&r.data)||r||[]; }).catch(function(){ state.sodWaivers = []; }); }
   function fetchCampaigns(){ return UI.runtime.list('core_system','access_review_campaign',{ limit:200 }).then(function(r){ state.campaigns = (r&&r.data)||r||[]; }).catch(function(){ state.campaigns = []; }); }
   function fetchReviewItems(campaignId){ return UI.runtime.list('core_system','access_review_item',{ 'filter[campaign_id]': campaignId, limit:5000 }).then(function(r){ state.reviewItems = (r&&r.data)||r||[]; }).catch(function(){ state.reviewItems = []; }); }
-  function fetchUsers(){ return UI.runtime.list('core_system','users',{ limit:1000 }).then(function(r){ state.users = (r&&r.data)||r||[]; }).catch(function(){
-    state.users = (window.USERS||[]).map(function(u){ return { id:u.id, username:u.username, full_name:u.name, role_code:u.role, dept_code:u.dept, is_active:u.active!==false }; });
-  }); }
+  function fetchUsers(){
+    var loader = typeof window.loadSharedAdminUsers === 'function'
+      ? window.loadSharedAdminUsers
+      : function(){ return Promise.resolve(window.USERS || []); };
+    return loader().then(function(users){
+      state.users = (users || []).map(function(u){ return { id:u.id || u.employee_id || u.username, username:u.username, full_name:u.name || u.full_name, role_code:u.role, dept_code:u.dept, is_active:u.active!==false }; });
+    });
+  }
 
   // ════════════════════════════════════════════════════════════════════════════
   // Tab — Permission catalog

@@ -41,6 +41,17 @@
     try { window.dispatchEvent(new CustomEvent('admin:roles:invalidated')); } catch(_){}
   }
 
+  function sharedAdminUsers(){
+    var loader = typeof window.loadSharedAdminUsers === 'function'
+      ? window.loadSharedAdminUsers
+      : function(){ return Promise.resolve(window.USERS || []); };
+    return loader().then(function(users){
+      state.users = (users || []).map(function(u){
+        return { id:u.id || u.employee_id || u.username, username:u.username, full_name:u.name || u.full_name, role_code:u.role, dept_code:u.dept, is_active:u.active!==false };
+      });
+    });
+  }
+
   // Unpack permissions JSONB on each role row into convenient view fields.
   // The legacy schema stores icon/color/level/admin inside permissions JSONB,
   // not as separate columns. Newer roles also have icon_emoji/badge_color_token
@@ -71,15 +82,9 @@
     if (force || !state.mfaPolicy.length) p.push(UI.runtime.list('core_system','mfa_policy',{ limit:500 }).then(function(r){
       state.mfaPolicy = (r && r.data) || r || [];
     }).catch(function(){ state.mfaPolicy = []; }));
-    // users — try runtime then fallback to existing global USERS
+    // users — shared admin user list, same source as the Users tab
     if (force || !state.users.length){
-      p.push(UI.runtime.list('core_system','users',{ limit:1000 }).then(function(r){
-        state.users = (r && r.data) || r || [];
-      }).catch(function(){
-        state.users = (window.USERS || []).map(function(u){
-          return { id:u.id, username:u.username, full_name:u.name, role_code:u.role, is_active:u.active!==false };
-        });
-      }));
+      p.push(sharedAdminUsers());
     }
     return Promise.all(p);
   }

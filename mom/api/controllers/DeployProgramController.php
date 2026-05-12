@@ -594,17 +594,25 @@ class DeployProgramController extends BaseController
         foreach ($store['users'] as $u) {
             if (!is_array($u)) continue;
             if (!($u['active'] ?? false)) continue;
+            $employeeId = (string)($u['employee_id'] ?? '');
+            $username = (string)($u['username'] ?? '');
             $out[] = [
-                'username'  => (string)($u['username'] ?? ''),
-                'name'      => (string)($u['name'] ?? ''),
-                'role'      => (string)($u['role'] ?? ''),
-                'title'     => (string)($u['title'] ?? ''),
-                'dept'      => (string)($u['dept'] ?? ''),
-                'phone'     => (string)($u['phone'] ?? ''),
-                'email'     => (string)($u['personal_email'] ?? ''),
-                'jd_code'   => (string)($u['jd_code'] ?? ''),
-                'jd_title'  => (string)($u['jd_title'] ?? ''),
-                'employee_id' => (string)($u['employee_id'] ?? ''),
+                'id'                  => $employeeId !== '' ? $employeeId : $username,
+                'employee_id'         => $employeeId,
+                'username'            => $username,
+                'name'                => (string)($u['name'] ?? ''),
+                'role'                => (string)($u['role'] ?? ''),
+                'title'               => (string)($u['title'] ?? ''),
+                'dept'                => (string)($u['dept'] ?? ''),
+                'active'              => (bool)($u['active'] ?? true),
+                'phone'               => (string)($u['phone'] ?? ''),
+                'email'               => (string)($u['personal_email'] ?? ''),
+                'personal_email'      => (string)($u['personal_email'] ?? ''),
+                'jd_code'             => (string)($u['jd_code'] ?? ''),
+                'jd_title'            => (string)($u['jd_title'] ?? ''),
+                'role_source'         => is_array($u['role_source'] ?? null) ? (array)$u['role_source'] : new \stdClass(),
+                'hcm_org_unit_id'     => (string)($u['hcm_org_unit_id'] ?? ''),
+                'hcm_position_id'     => (string)($u['hcm_position_id'] ?? ''),
             ];
         }
         usort($out, static fn($a, $b) => strcasecmp($a['name'], $b['name']));
