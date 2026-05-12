@@ -137,10 +137,19 @@ capture_runtime_mutations() {
     mkdir -p "$PRESERVED_RUNTIME_DIR/config"
     mkdir -p "$PRIVATE_DATA/config" 2>/dev/null || true
 
-    local name site_file private_file
+    local name site_file private_file rel_dir
     for name in "${RUNTIME_CONFIG_FILES[@]}"; do
         site_file="$SITE_DIR/mom/data/config/$name"
         private_file="$PRIVATE_DATA/config/$name"
+        # Ensure target subdirectories exist for names that contain a slash
+        # (e.g. "deploy/program.json"). Without this, cp fails because the
+        # intermediate dirs under both the preservation tmp dir and the
+        # private mirror were never created.
+        rel_dir="$(dirname "$name")"
+        if [ "$rel_dir" != "." ]; then
+            mkdir -p "$PRESERVED_RUNTIME_DIR/config/$rel_dir"
+            mkdir -p "$PRIVATE_DATA/config/$rel_dir" 2>/dev/null || true
+        fi
         if [ -f "$site_file" ]; then
             cp -p "$site_file" "$PRESERVED_RUNTIME_DIR/config/$name" \
                 || die "Cannot preserve runtime config $site_file"
@@ -178,11 +187,16 @@ restore_runtime_mutations() {
     local restored_count=0
     if [ -d "$PRESERVED_RUNTIME_DIR/config" ]; then
         mkdir -p "$SITE_DIR/mom/data/config"
-        local name preserved live preserved_hash live_hash
+        local name preserved live preserved_hash live_hash live_dir
         for name in "${RUNTIME_CONFIG_FILES[@]}"; do
             preserved="$PRESERVED_RUNTIME_DIR/config/$name"
             live="$SITE_DIR/mom/data/config/$name"
             [ -f "$preserved" ] || continue
+            # Ensure live destination subdir exists for nested names
+            # (e.g. "deploy/program.json"). Without this, cp fails on a
+            # fresh checkout where the subdir was never created.
+            live_dir="$(dirname "$live")"
+            mkdir -p "$live_dir"
             cp -p "$preserved" "$live" \
                 || die "FATAL: cannot restore $name to $live — runtime data may be lost. Snapshot at $PRESERVED_RUNTIME_DIR is preserved (do NOT clean it up)."
             # Verify byte-for-byte that the restore took. A silent cp success
@@ -446,6 +460,8 @@ for name in "${RUNTIME_CONFIG_FILES[@]}"; do
     live="$SITE_DIR/mom/data/config/$name"
     seed="$SITE_DIR/mom/data/config/${name%.json}.bootstrap.json"
     if [ ! -f "$live" ] && [ -f "$seed" ]; then
+        # Ensure subdir exists for nested names like "deploy/program.json"
+        mkdir -p "$(dirname "$live")"
         cp -p "$seed" "$live" || die "Cannot bootstrap $name from $seed"
         seeded_count=$((seeded_count + 1))
         log "INFO" "  bootstrapped $name from .bootstrap.json"
