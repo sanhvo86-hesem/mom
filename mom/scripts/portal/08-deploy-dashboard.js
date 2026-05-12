@@ -201,13 +201,14 @@ function deployNum(v){ const n = parseFloat(v); return Number.isFinite(n) ? n : 
 function deployIsoToVi(iso){ if(!iso) return '—'; try{ return new Date(iso).toLocaleString('vi-VN'); }catch(_){ return iso; } }
 function deployRenderDocChip(code){
   const safe = deployEscape(code);
+  const baseClass = 'deploy-doc-chip dwp-doc-chip';
   // Reuse the portal-wide openDoc() resolver (defined in 02-state-auth-ui.js).
   // It maps a doc-code to its file path via the DCC registry and opens the
   // correct viewer. When unavailable (e.g. anonymous test), fall back to chip.
   if (typeof window !== 'undefined' && typeof window.openDoc === 'function') {
-    return `<a class="dwp-doc-chip dwp-doc-chip-link" href="javascript:void(0)" onclick="openDoc('${safe}');return false;" title="Mở tài liệu ${safe}">${safe}</a>`;
+    return `<a class="${baseClass} deploy-doc-chip-link dwp-doc-chip-link" href="javascript:void(0)" onclick="openDoc('${safe}');return false;" title="Mở tài liệu ${safe}">${safe}</a>`;
   }
-  return `<span class="dwp-doc-chip">${safe}</span>`;
+  return `<span class="${baseClass}">${safe}</span>`;
 }
 function deployFmtDate(iso){ if(!iso) return '—'; try{ return new Date(iso).toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}); }catch(_){ return iso; } }
 function deployTodayIso(){ return new Date().toISOString().slice(0,10); }
