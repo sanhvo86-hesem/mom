@@ -588,6 +588,23 @@
     return picked.map(function(w){ return w.charAt(0); }).join('').toUpperCase();
   }
 
+  function employeeSingleAssigneePositionVisual(e, kind){
+    var id = employeeIdentity(e);
+    if (!id || !S || !S.employeesByPosition) return '';
+    var values = [];
+    Object.keys(S.employeesByPosition).forEach(function(positionId){
+      var rows = S.employeesByPosition[positionId] || [];
+      var active = activeEmployees(rows);
+      if (active.length !== 1 || employeeIdentity(active[0]) !== id) return;
+      var p = S.byPositionId[positionId] || {};
+      var meta = safeJson(p.metadata);
+      values.push(kind === 'icon'
+        ? firstText(meta.org_chart_icon, meta.icon)
+        : firstText(meta.org_chart_image, meta.image_url, meta.image_data_url, meta.photo_url));
+    });
+    return firstText.apply(null, values);
+  }
+
   function employeeAvatarUrl(e){
     var profile = employeeProfile(e) || {};
     var meta = safeJson(e && e.metadata);
@@ -607,7 +624,8 @@
       meta.photo_url,
       meta.image_url,
       meta.image_data_url,
-      meta.avatar_image
+      meta.avatar_image,
+      employeeSingleAssigneePositionVisual(e, 'image')
     );
   }
 
@@ -622,6 +640,7 @@
       profileMeta.avatar,
       meta.avatar_icon,
       meta.avatar,
+      employeeSingleAssigneePositionVisual(e, 'icon'),
       employeeInitials(name)
     );
   }
@@ -1281,12 +1300,16 @@
            +   '<button class="org-btn is-danger" data-act="remove-assignee" data-pos-id="'+esc(p.hcm_position_id)+'" data-assignment-id="'+esc(e.hcm_assignment_id||'')+'" data-employee-id="'+esc(employeeIdentity(e))+'">'+esc(t('Remove','Xóa'))+'</button>'
            + '</div>';
     }).join('') : '<div class="org-empty" style="padding:18px">'+esc(t('No employees assigned to this position yet.','Chưa có nhân sự nào được bổ nhiệm vào vị trí này.'))+'</div>';
-    var groupVisualAction = active.length !== 1
+    var singleAssigneeId = active.length === 1 ? employeeIdentity(active[0]) : '';
+    var groupVisualAction = active.length === 1
       ? '<div class="org-detail-section" style="padding:10px 0;border-bottom:0">'
+        + '<button class="org-btn" data-act="edit-user-visual" data-employee-id="'+esc(singleAssigneeId)+'">🖼️ '+esc(t('Edit user image','Sửa hình nhân sự'))+'</button>'
+        + '<span class="org-assignment-count" style="margin-left:8px">'+esc(t('Single-person positions use the assigned user profile image.','Vị trí 1 người dùng hình hồ sơ user được bổ nhiệm.'))+'</span>'
+        + '</div>'
+      : '<div class="org-detail-section" style="padding:10px 0;border-bottom:0">'
         + '<button class="org-btn" data-act="edit-group-visual" data-pos-id="'+esc(p.hcm_position_id)+'">🖼️ '+esc(t('Position icon / image','Icon / hình chức danh'))+'</button>'
         + '<span class="org-assignment-count" style="margin-left:8px">'+esc(t('Used when the position has no assignee or multiple assignees.','Dùng khi vị trí chưa có nhân sự hoặc có nhiều nhân sự.'))+'</span>'
-        + '</div>'
-      : '';
+        + '</div>';
     var body = document.createElement('div');
 
     body.innerHTML = ''
@@ -1322,6 +1345,12 @@
       if (groupBtn){
         try { modalRef && modalRef.close && modalRef.close(); } catch(_){}
         openPositionVisualModal(positionId, host);
+        return;
+      }
+      var userVisualBtn = ev.target.closest('[data-act="edit-user-visual"]');
+      if (userVisualBtn){
+        try { modalRef && modalRef.close && modalRef.close(); } catch(_){}
+        openAssignedUserModal(userVisualBtn.getAttribute('data-employee-id') || '');
         return;
       }
       var btn = ev.target.closest('[data-act="remove-assignee"]');
@@ -1569,12 +1598,35 @@
     else if (host) renderOrgUnits(host);
   }
 
+  function openAssignedUserModal(employeeId){
+    var id = String(employeeId || '').trim();
+    if (!id){
+      UI.toast(t('Cannot find assigned user','Không tìm thấy user được bổ nhiệm'), 'error');
+      return;
+    }
+    if (typeof window.showUserModal === 'function'){
+      var matched = null;
+      (S.users || []).concat(Array.isArray(window.USERS) ? window.USERS : []).some(function(user){
+        var keys = profileIdentityKeys(user);
+        if (keys.indexOf(id) >= 0){
+          matched = user;
+          return true;
+        }
+        return false;
+      });
+      window.showUserModal(String((matched && (matched.id || matched.employee_id || matched.username)) || id));
+      return;
+    }
+    UI.toast(t('User editor is not available','Chưa tải được hộp thoại sửa user'), 'error');
+  }
+
   function openPositionVisualModal(positionId, host){
     var p = positionId ? S.byPositionId[positionId] : null;
     if (!p) return;
     var employees = S.employeesByPosition[p.hcm_position_id] || [];
-    if (activeEmployees(employees).length === 1){
-      UI.toast(t('Single-person images are edited on the user profile','Hình cá nhân sửa ở hồ sơ user'), 'error');
+    var active = activeEmployees(employees);
+    if (active.length === 1){
+      openAssignedUserModal(employeeIdentity(active[0]));
       return;
     }
     var meta = safeJson(p.metadata);

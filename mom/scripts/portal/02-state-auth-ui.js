@@ -1409,7 +1409,14 @@ async function runtimeDelete(domain, table, recordId, rowVersion=null){
 }
 
 function safeJsonObject(value){
-  return (value && typeof value === 'object' && !Array.isArray(value)) ? value : {};
+  if(value && typeof value === 'object' && !Array.isArray(value)) return value;
+  if(typeof value === 'string' && value.trim()){
+    try{
+      const parsed = JSON.parse(value);
+      return (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) ? parsed : {};
+    }catch(_){}
+  }
+  return {};
 }
 
 function defaultDepartmentColor(code){
@@ -1579,12 +1586,44 @@ function adminUserEmployeeId(user){
   return String((user && (user.employee_id || user.id || user.user_id_code || user.username)) || '').trim();
 }
 
+function adminFirstText(...values){
+  for(const value of values){
+    const text = String(value == null ? '' : value).trim();
+    if(text) return text;
+  }
+  return '';
+}
+
+function adminUserLegacySingleAssigneeVisual(user, kind){
+  const employeeId = adminUserEmployeeId(user);
+  if(!employeeId || !ADMIN_AUTH_STATE.org.loaded) return '';
+  const activeByPosition = {};
+  (ADMIN_AUTH_STATE.org.assignments || []).forEach(row=>{
+    if(String(row.assignment_status || 'active') !== 'active') return;
+    const positionId = String(row.hcm_position_id || '').trim();
+    if(!positionId) return;
+    if(!activeByPosition[positionId]) activeByPosition[positionId] = [];
+    activeByPosition[positionId].push(String(row.employee_id || '').trim());
+  });
+  for(const position of (ADMIN_AUTH_STATE.org.positions || [])){
+    const positionId = String(position.hcm_position_id || '').trim();
+    const active = (activeByPosition[positionId] || []).filter(Boolean);
+    if(active.length !== 1 || active[0] !== employeeId) continue;
+    const meta = safeJsonObject(position.metadata);
+    const value = kind === 'icon'
+      ? adminFirstText(meta.org_chart_icon, meta.icon)
+      : adminFirstText(meta.org_chart_image, meta.image_url, meta.image_data_url, meta.photo_url);
+    if(value) return value;
+  }
+  return '';
+}
+
 function adminUserAvatarImage(user){
-  return String((user && (user.avatar_image || user.avatar_url)) || '').trim();
+  return adminFirstText(user && user.avatar_image, user && user.avatar_url, adminUserLegacySingleAssigneeVisual(user, 'image'));
 }
 
 function adminUserAvatarIcon(user){
-  return String((user && (user.avatar_icon || user.avatar)) || '').trim() || '👤';
+  return adminFirstText(user && user.avatar_icon, user && user.avatar, adminUserLegacySingleAssigneeVisual(user, 'icon'), '👤');
 }
 
 function adminUserAvatarHtml(user, colorBg){
@@ -10503,7 +10542,13 @@ async function showUserModal(userId){
     return;
   }
   const isEdit = !!userId;
-  const seedUser = isEdit ? USERS.find(x=>String(x.id)===String(userId)) : {id:'',name:'',username:'',dept:'',title:'',role:'employee',active:true,mfa_enabled:false,cccd:'',phone:'',personal_email:'',avatar:'👤',avatar_icon:'👤',avatar_image:'',avatar_url:'',hcm_org_unit_id:'',hcm_position_id:''};
+  const seedUser = isEdit
+    ? USERS.find(x=>
+        String(x.id)===String(userId) ||
+        adminUserEmployeeId(x)===String(userId) ||
+        String(x.username || '')===String(userId)
+      )
+    : {id:'',name:'',username:'',dept:'',title:'',role:'employee',active:true,mfa_enabled:false,cccd:'',phone:'',personal_email:'',avatar:'👤',avatar_icon:'👤',avatar_image:'',avatar_url:'',hcm_org_unit_id:'',hcm_position_id:''};
   if(isEdit && !seedUser){
     showToast(lang==='en'?'⚠ User not found':'⚠ Không tìm thấy người dùng');
     return;
@@ -10707,6 +10752,8 @@ async function showUserModal(userId){
 
   modal.addEventListener('click',e=>{if(e.target===modal)closeModal();});
 }
+
+window.showUserModal = showUserModal;
 
 async function addUserPositionAssignmentFromModal(userId){
   try{
