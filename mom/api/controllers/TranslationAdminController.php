@@ -782,8 +782,14 @@ final class TranslationAdminController extends EqmsBaseController
             $this->rootDir
         );
 
+        // Always queue: a single LLM call can run minutes (codex_cli/gpt-5
+        // routinely takes ~30s per 8-segment batch). PHP-FPM's per-request
+        // timeout terminates synchronous calls and returns the FPM HTML 504
+        // error page, which trips the admin UI's JSON parser ("Unexpected
+        // token '<'"). The queued path writes a job file, spawns a worker via
+        // nohup, and returns immediately.
         try {
-            $result = $automation->syncEnglishMachinePreview([
+            $result = $automation->scheduleEnglishMachinePreview([
                 'doc_code'      => $docCode,
                 'base_rel_path' => $baseRelPath,
                 'source_html'   => $sourceHtml,
@@ -792,11 +798,12 @@ final class TranslationAdminController extends EqmsBaseController
                 'source_status' => (string)($header['status'] ?? 'draft'),
                 'trigger'       => 'admin_force',
                 'actor'         => $actor,
+                'spawn_worker'  => true,
             ]);
         } catch (Throwable $e) {
             $this->error('translation_retranslate_failed', 500, $e->getMessage());
         }
 
-        $this->success(['doc_code' => $docCode, 'result' => $result]);
+        $this->success(['doc_code' => $docCode, 'result' => $result, 'queued' => true]);
     }
 }

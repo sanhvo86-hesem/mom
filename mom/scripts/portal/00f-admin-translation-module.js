@@ -1433,12 +1433,18 @@ function wireDocuments() {
         api('POST', `/api/v1/dcc/admin/translation/documents/${encodeURIComponent(code)}/retranslate`, {})
           .then(d => {
             delete STATE.docRetranslating[code];
-            const ok = !d.result || d.result.ok !== false;
-            if (ok) {
-              toast(_t('Dịch thành công: ' + code, 'Translation complete: ' + code));
+            // Endpoint now enqueues the job and returns immediately. The
+            // worker runs in background via nohup; UI just confirms queued.
+            if (d.queued === true || (d.result && d.result.queued)) {
+              toast(_t('Đã đưa vào hàng đợi: ' + code + ' — refresh danh sách sau vài phút', 'Queued: ' + code + ' — refresh in a few minutes'));
             } else {
-              const reason = (d.result && (d.result.reason || d.result.message)) || 'unknown';
-              toast(_t('Dịch thất bại: ' + reason, 'Translation failed: ' + reason));
+              const ok = !d.result || d.result.ok !== false;
+              if (ok) {
+                toast(_t('Dịch thành công: ' + code, 'Translation complete: ' + code));
+              } else {
+                const reason = (d.result && (d.result.reason || d.result.message)) || 'unknown';
+                toast(_t('Dịch thất bại: ' + reason, 'Translation failed: ' + reason));
+              }
             }
             STATE.documents = null;
             loadDocuments();
