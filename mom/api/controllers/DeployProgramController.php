@@ -1,0 +1,620 @@
+<?php
+
+declare(strict_types=1);
+
+namespace MOM\Api\Controllers;
+
+/**
+ * Deploy Program Controller
+ *
+ * Backs the "Triển khai vận hành" portal module. Persists program timeline,
+ * weekly meetings, gate sign-offs, department readiness, champion roster,
+ * issue register and retrieval drill log to JSON files under
+ * mom/data/config/deploy/. Shared across all browsers — replaces the old
+ * localStorage-only single-user state.
+ *
+ * Sign-off endpoints require ceo + qms_manager (or admin override).
+ */
+class DeployProgramController extends BaseController
+{
+    private const FILE_PROGRAM    = 'deploy/program.json';
+    private const FILE_MEETINGS   = 'deploy/meetings.json';
+    private const FILE_CHAMPIONS  = 'deploy/champions.json';
+    private const FILE_READINESS  = 'deploy/readiness.json';
+    private const FILE_ISSUES     = 'deploy/issues.json';
+    private const FILE_DRILLS     = 'deploy/drills.json';
+    private const FILE_CLAUSES    = 'deploy/iso-clauses.json';
+    private const FILE_AUDITS     = 'deploy/audits.json';
+    private const FILE_REVIEWS    = 'deploy/mgmt-reviews.json';
+
+    private const SIGNOFF_ROLES = ['admin', 'it_admin', 'ceo', 'qms_manager', 'qa_manager', 'general_director'];
+    private const EDIT_ROLES    = ['admin', 'it_admin', 'ceo', 'qms_manager', 'qa_manager', 'general_director', 'production_director', 'supply_chain_manager', 'hr_manager', 'finance_manager', 'engineering_lead'];
+
+    public function loadState(): never
+    {
+        $me = $this->requireAuth();
+        $this->success([
+            'data' => [
+                'program'   => $this->loadFile(self::FILE_PROGRAM),
+                'meetings'  => $this->loadFile(self::FILE_MEETINGS),
+                'champions' => $this->loadFile(self::FILE_CHAMPIONS),
+                'readiness' => $this->loadFile(self::FILE_READINESS),
+                'issues'    => $this->loadFile(self::FILE_ISSUES),
+                'drills'    => $this->loadFile(self::FILE_DRILLS),
+                'clauses'   => $this->loadFile(self::FILE_CLAUSES),
+                'audits'    => $this->loadFile(self::FILE_AUDITS),
+                'reviews'   => $this->loadFile(self::FILE_REVIEWS),
+                'me'        => [
+                    'username' => (string)($me['username'] ?? ''),
+                    'name'     => (string)($me['name'] ?? ''),
+                    'role'     => (string)($me['role'] ?? ''),
+                    'canSignOff' => $this->hasAnyRole($me, self::SIGNOFF_ROLES),
+                    'canEdit'    => $this->hasAnyRole($me, self::EDIT_ROLES),
+                ],
+            ],
+        ]);
+    }
+
+    public function cycleReadiness(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::EDIT_ROLES);
+        $body = $this->jsonBody();
+        $dept = (string)($body['deptId'] ?? '');
+        $dim  = (string)($body['dimId'] ?? '');
+        $value = (string)($body['value'] ?? '');
+        if ($dept === '' || $dim === '') $this->error('missing_dept_or_dim', 400);
+        $allowed = ['pending', 'in_progress', 'completed', 'blocked'];
+        if (!in_array($value, $allowed, true)) $this->error('invalid_value', 400);
+
+        $state = $this->loadFile(self::FILE_READINESS);
+        if (!isset($state['deptReadiness'][$dept])) $state['deptReadiness'][$dept] = [];
+        $state['deptReadiness'][$dept][$dim] = $value;
+        $state['lastUpdated'] = gmdate('c');
+        $this->saveFile(self::FILE_READINESS, $state);
+        $this->audit('deploy.readiness.cycle', $me, ['dept' => $dept, 'dim' => $dim, 'value' => $value]);
+        $this->success(['data' => $state]);
+    }
+
+    public function updateMetric(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::EDIT_ROLES);
+        $body = $this->jsonBody();
+        $key = (string)($body['key'] ?? '');
+        $value = $body['value'] ?? '';
+        if ($key === '') $this->error('missing_key', 400);
+
+        $state = $this->loadFile(self::FILE_READINESS);
+        if (!isset($state['kpiValues']) || !is_array($state['kpiValues'])) $state['kpiValues'] = [];
+        $state['kpiValues'][$key] = is_scalar($value) ? (string)$value : '';
+        $state['lastUpdated'] = gmdate('c');
+        $this->saveFile(self::FILE_READINESS, $state);
+        $this->audit('deploy.metric.update', $me, ['key' => $key, 'value' => (string)$value]);
+        $this->success(['data' => $state]);
+    }
+
+    public function toggleChecklist(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::EDIT_ROLES);
+        $body = $this->jsonBody();
+        $key = (string)($body['key'] ?? '');
+        $checked = !empty($body['checked']);
+        if ($key === '') $this->error('missing_key', 400);
+
+        $state = $this->loadFile(self::FILE_READINESS);
+        if (!isset($state['checklistItems']) || !is_array($state['checklistItems'])) $state['checklistItems'] = [];
+        if ($checked) {
+            $state['checklistItems'][$key] = ['by' => (string)($me['username'] ?? ''), 'at' => gmdate('c')];
+        } else {
+            unset($state['checklistItems'][$key]);
+        }
+        $state['lastUpdated'] = gmdate('c');
+        $this->saveFile(self::FILE_READINESS, $state);
+        $this->audit('deploy.checklist.toggle', $me, ['key' => $key, 'checked' => $checked ? 1 : 0]);
+        $this->success(['data' => $state]);
+    }
+
+    public function setPhase(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::SIGNOFF_ROLES);
+        $body = $this->jsonBody();
+        $phaseId = (string)($body['phaseId'] ?? '');
+        $allowed = ['P0', 'P1', 'P2', 'P3', 'P4'];
+        if (!in_array($phaseId, $allowed, true)) $this->error('invalid_phase', 400);
+
+        $program = $this->loadFile(self::FILE_PROGRAM);
+        $idx = array_search($phaseId, $allowed, true);
+        foreach ($allowed as $i => $id) {
+            if ($i < $idx)      $program['phaseStatus'][$id] = 'completed';
+            elseif ($i === $idx) $program['phaseStatus'][$id] = 'in_progress';
+            else                 $program['phaseStatus'][$id] = 'pending';
+        }
+        $program['currentPhase'] = $phaseId;
+        $program['lastUpdated'] = gmdate('c');
+        $this->saveFile(self::FILE_PROGRAM, $program);
+        $this->audit('deploy.phase.set', $me, ['phase' => $phaseId]);
+        $this->success(['data' => $program]);
+    }
+
+    public function setCurrentWeek(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::EDIT_ROLES);
+        $body = $this->jsonBody();
+        $weekN = (int)($body['weekN'] ?? -1);
+        if ($weekN < 0) $this->error('invalid_week', 400);
+        $program = $this->loadFile(self::FILE_PROGRAM);
+        $program['currentWeek'] = $weekN;
+        $program['lastUpdated'] = gmdate('c');
+        $this->saveFile(self::FILE_PROGRAM, $program);
+        $this->success(['data' => $program]);
+    }
+
+    public function signOffWeek(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::SIGNOFF_ROLES);
+        $body = $this->jsonBody();
+        $weekN = (int)($body['weekN'] ?? -1);
+        $decision = (string)($body['decision'] ?? '');
+        $notes = (string)($body['notes'] ?? '');
+        if ($weekN < 0) $this->error('invalid_week', 400);
+        if (!in_array($decision, ['go', 'no_go', 'conditional'], true)) $this->error('invalid_decision', 400);
+
+        $program = $this->loadFile(self::FILE_PROGRAM);
+        $found = false;
+        foreach ($program['weeks'] as &$w) {
+            if ((int)($w['n'] ?? -1) === $weekN) {
+                $w['status'] = $decision === 'go' ? 'completed' : ($decision === 'no_go' ? 'blocked' : 'conditional');
+                $w['signOff'] = [
+                    'by'       => (string)($me['username'] ?? ''),
+                    'name'     => (string)($me['name'] ?? ''),
+                    'role'     => (string)($me['role'] ?? ''),
+                    'decision' => $decision,
+                    'notes'    => $notes,
+                    'at'       => gmdate('c'),
+                ];
+                $found = true;
+                break;
+            }
+        }
+        unset($w);
+        if (!$found) $this->error('week_not_found', 404);
+        $program['lastUpdated'] = gmdate('c');
+        $this->saveFile(self::FILE_PROGRAM, $program);
+        $this->audit('deploy.week.signoff', $me, ['week' => $weekN, 'decision' => $decision]);
+        $this->success(['data' => $program]);
+    }
+
+    public function saveMeeting(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::EDIT_ROLES);
+        $body = $this->jsonBody();
+        $weekN = (int)($body['weekN'] ?? -1);
+        if ($weekN < 0) $this->error('invalid_week', 400);
+
+        $meetings = $this->loadFile(self::FILE_MEETINGS);
+        if (!isset($meetings['meetings']) || !is_array($meetings['meetings'])) $meetings['meetings'] = [];
+
+        $id = (string)($body['id'] ?? '');
+        $now = gmdate('c');
+        $payload = [
+            'id'           => $id !== '' ? $id : ('MTG-W' . $weekN . '-' . substr(md5($now . random_int(0, 999999)), 0, 6)),
+            'weekN'        => $weekN,
+            'date'         => (string)($body['date'] ?? ''),
+            'title'        => (string)($body['title'] ?? ''),
+            'attendees'    => is_array($body['attendees'] ?? null) ? $body['attendees'] : [],
+            'agenda'       => is_array($body['agenda'] ?? null) ? $body['agenda'] : [],
+            'minutes'      => (string)($body['minutes'] ?? ''),
+            'decisions'    => is_array($body['decisions'] ?? null) ? $body['decisions'] : [],
+            'kpiSnapshot'  => is_array($body['kpiSnapshot'] ?? null) ? $body['kpiSnapshot'] : [],
+            'updatedAt'    => $now,
+            'updatedBy'    => (string)($me['username'] ?? ''),
+        ];
+
+        $replaced = false;
+        foreach ($meetings['meetings'] as &$m) {
+            if ((string)($m['id'] ?? '') === $payload['id']) {
+                $payload['signOff'] = $m['signOff'] ?? null;
+                $m = $payload;
+                $replaced = true;
+                break;
+            }
+        }
+        unset($m);
+        if (!$replaced) {
+            $payload['signOff'] = null;
+            $meetings['meetings'][] = $payload;
+        }
+        $this->saveFile(self::FILE_MEETINGS, $meetings);
+        $this->audit('deploy.meeting.save', $me, ['week' => $weekN, 'id' => $payload['id']]);
+        $this->success(['data' => $meetings, 'meeting' => $payload]);
+    }
+
+    public function signOffMeeting(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::SIGNOFF_ROLES);
+        $body = $this->jsonBody();
+        $id = (string)($body['id'] ?? '');
+        if ($id === '') $this->error('missing_id', 400);
+
+        $meetings = $this->loadFile(self::FILE_MEETINGS);
+        $found = false;
+        foreach ($meetings['meetings'] as &$m) {
+            if ((string)($m['id'] ?? '') === $id) {
+                $m['signOff'] = [
+                    'by'   => (string)($me['username'] ?? ''),
+                    'name' => (string)($me['name'] ?? ''),
+                    'role' => (string)($me['role'] ?? ''),
+                    'at'   => gmdate('c'),
+                ];
+                $found = true;
+                break;
+            }
+        }
+        unset($m);
+        if (!$found) $this->error('meeting_not_found', 404);
+        $this->saveFile(self::FILE_MEETINGS, $meetings);
+        $this->audit('deploy.meeting.signoff', $me, ['id' => $id]);
+        $this->success(['data' => $meetings]);
+    }
+
+    public function saveChampion(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::EDIT_ROLES);
+        $body = $this->jsonBody();
+        $dept = (string)($body['deptId'] ?? '');
+        if ($dept === '') $this->error('missing_dept', 400);
+
+        $champions = $this->loadFile(self::FILE_CHAMPIONS);
+        if (!isset($champions['champions']) || !is_array($champions['champions'])) $champions['champions'] = [];
+        $clean = static function ($p): array {
+            $p = is_array($p) ? $p : [];
+            return [
+                'name'    => (string)($p['name'] ?? ''),
+                'phone'   => (string)($p['phone'] ?? ''),
+                'm365'    => (string)($p['m365'] ?? ''),
+                'ojtPass' => !empty($p['ojtPass']),
+            ];
+        };
+        $champions['champions'][$dept] = [
+            'primary' => $clean($body['primary'] ?? []),
+            'backup'  => $clean($body['backup'] ?? []),
+            'shift'   => (string)($body['shift'] ?? 'A'),
+        ];
+        $this->saveFile(self::FILE_CHAMPIONS, $champions);
+        $this->audit('deploy.champion.save', $me, ['dept' => $dept]);
+        $this->success(['data' => $champions]);
+    }
+
+    public function saveIssue(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::EDIT_ROLES);
+        $body = $this->jsonBody();
+        $issues = $this->loadFile(self::FILE_ISSUES);
+        if (!isset($issues['issues']) || !is_array($issues['issues'])) $issues['issues'] = [];
+
+        $id = (string)($body['id'] ?? '');
+        $now = gmdate('c');
+        $payload = [
+            'id'        => $id !== '' ? $id : ('ISS-' . substr(md5($now . random_int(0, 999999)), 0, 8)),
+            'weekN'     => (int)($body['weekN'] ?? 0),
+            'sev'       => max(1, min(3, (int)($body['sev'] ?? 3))),
+            'deptId'    => (string)($body['deptId'] ?? ''),
+            'title'     => (string)($body['title'] ?? ''),
+            'owner'     => (string)($body['owner'] ?? ''),
+            'status'    => in_array($body['status'] ?? '', ['open', 'workaround', 'closed'], true) ? (string)$body['status'] : 'open',
+            'capaLink'  => (string)($body['capaLink'] ?? ''),
+            'openedAt'  => (string)($body['openedAt'] ?? $now),
+            'closedAt'  => (string)($body['status'] ?? '') === 'closed' ? $now : null,
+            'updatedAt' => $now,
+            'updatedBy' => (string)($me['username'] ?? ''),
+        ];
+
+        $replaced = false;
+        foreach ($issues['issues'] as &$is) {
+            if ((string)($is['id'] ?? '') === $payload['id']) {
+                $payload['openedAt'] = (string)($is['openedAt'] ?? $payload['openedAt']);
+                $is = $payload;
+                $replaced = true;
+                break;
+            }
+        }
+        unset($is);
+        if (!$replaced) $issues['issues'][] = $payload;
+        $this->saveFile(self::FILE_ISSUES, $issues);
+        $this->audit('deploy.issue.save', $me, ['id' => $payload['id'], 'sev' => $payload['sev'], 'status' => $payload['status']]);
+        $this->success(['data' => $issues, 'issue' => $payload]);
+    }
+
+    public function recordDrill(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::EDIT_ROLES);
+        $body = $this->jsonBody();
+        $drills = $this->loadFile(self::FILE_DRILLS);
+        if (!isset($drills['drills']) || !is_array($drills['drills'])) $drills['drills'] = [];
+
+        $seconds = (int)($body['seconds'] ?? 0);
+        $payload = [
+            'id'       => 'DRL-' . substr(md5(gmdate('c') . random_int(0, 999999)), 0, 8),
+            'date'     => (string)($body['date'] ?? gmdate('Y-m-d')),
+            'person'   => (string)($body['person'] ?? ''),
+            'deptId'   => (string)($body['deptId'] ?? ''),
+            'docCode'  => (string)($body['docCode'] ?? ''),
+            'seconds'  => $seconds,
+            'pass'     => $seconds > 0 && $seconds <= 180,
+            'note'     => (string)($body['note'] ?? ''),
+            'recordedBy' => (string)($me['username'] ?? ''),
+            'recordedAt' => gmdate('c'),
+        ];
+        $drills['drills'][] = $payload;
+        $this->saveFile(self::FILE_DRILLS, $drills);
+        $this->audit('deploy.drill.record', $me, ['dept' => $payload['deptId'], 'seconds' => $seconds]);
+        $this->success(['data' => $drills, 'drill' => $payload]);
+    }
+
+    public function saveAudit(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::EDIT_ROLES);
+        $body = $this->jsonBody();
+        $audits = $this->loadFile(self::FILE_AUDITS);
+        if (!isset($audits['audits']) || !is_array($audits['audits'])) $audits['audits'] = [];
+
+        $id = (string)($body['id'] ?? '');
+        $now = gmdate('c');
+        $payload = [
+            'id'           => $id !== '' ? $id : ('IA-' . substr(md5($now . random_int(0, 999999)), 0, 8)),
+            'type'         => (string)($body['type'] ?? 'internal'),
+            'cycle'        => (string)($body['cycle'] ?? ''),
+            'plannedDate'  => (string)($body['plannedDate'] ?? ''),
+            'executedDate' => $body['executedDate'] ?? null,
+            'scope'        => is_array($body['scope'] ?? null) ? array_values($body['scope']) : [],
+            'scopeDepts'   => is_array($body['scopeDepts'] ?? null) ? array_values($body['scopeDepts']) : [],
+            'leadAuditor'  => (string)($body['leadAuditor'] ?? ''),
+            'auditTeam'    => is_array($body['auditTeam'] ?? null) ? array_values($body['auditTeam']) : [],
+            'status'       => in_array($body['status'] ?? '', ['scheduled', 'in_progress', 'completed', 'closed'], true) ? (string)$body['status'] : 'scheduled',
+            'findings'     => [],
+            'updatedAt'    => $now,
+            'updatedBy'    => (string)($me['username'] ?? ''),
+        ];
+
+        $replaced = false;
+        foreach ($audits['audits'] as &$a) {
+            if ((string)($a['id'] ?? '') === $payload['id']) {
+                $payload['findings'] = $a['findings'] ?? [];
+                $payload['createdAt'] = (string)($a['createdAt'] ?? $now);
+                $a = $payload;
+                $replaced = true;
+                break;
+            }
+        }
+        unset($a);
+        if (!$replaced) {
+            $payload['createdAt'] = $now;
+            $audits['audits'][] = $payload;
+        }
+        $this->saveFile(self::FILE_AUDITS, $audits);
+        $this->audit('deploy.audit.save', $me, ['id' => $payload['id'], 'status' => $payload['status']]);
+        $this->success(['data' => $audits, 'audit' => $payload]);
+    }
+
+    public function saveFinding(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::EDIT_ROLES);
+        $body = $this->jsonBody();
+        $auditId = (string)($body['auditId'] ?? '');
+        if ($auditId === '') $this->error('missing_audit_id', 400);
+
+        $audits = $this->loadFile(self::FILE_AUDITS);
+        $found = null;
+        foreach ($audits['audits'] as &$a) {
+            if ((string)($a['id'] ?? '') === $auditId) { $found = &$a; break; }
+        }
+        if (!$found) $this->error('audit_not_found', 404);
+
+        $now = gmdate('c');
+        $findingId = (string)($body['findingId'] ?? '');
+        $payload = [
+            'id'         => $findingId !== '' ? $findingId : ('FND-' . substr(md5($now . random_int(0, 999999)), 0, 8)),
+            'clauseRef'  => (string)($body['clauseRef'] ?? ''),
+            'severity'   => in_array($body['severity'] ?? '', ['major', 'minor', 'observation', 'opportunity'], true) ? (string)$body['severity'] : 'minor',
+            'deptId'     => (string)($body['deptId'] ?? ''),
+            'description'=> (string)($body['description'] ?? ''),
+            'evidence'   => (string)($body['evidence'] ?? ''),
+            'status'     => in_array($body['status'] ?? '', ['open', 'capa', 'closed'], true) ? (string)$body['status'] : 'open',
+            'capaLink'   => (string)($body['capaLink'] ?? ''),
+            'recordedBy' => (string)($me['username'] ?? ''),
+            'recordedAt' => $now,
+        ];
+
+        if (!isset($found['findings']) || !is_array($found['findings'])) $found['findings'] = [];
+        $replaced = false;
+        foreach ($found['findings'] as &$f) {
+            if ((string)($f['id'] ?? '') === $payload['id']) {
+                $payload['recordedAt'] = (string)($f['recordedAt'] ?? $now);
+                $f = $payload;
+                $replaced = true;
+                break;
+            }
+        }
+        unset($f);
+        if (!$replaced) $found['findings'][] = $payload;
+        unset($found);
+
+        $this->saveFile(self::FILE_AUDITS, $audits);
+        $this->audit('deploy.audit.finding.save', $me, ['audit' => $auditId, 'finding' => $payload['id'], 'severity' => $payload['severity']]);
+        $this->success(['data' => $audits, 'finding' => $payload]);
+    }
+
+    public function saveReview(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::EDIT_ROLES);
+        $body = $this->jsonBody();
+        $reviews = $this->loadFile(self::FILE_REVIEWS);
+        if (!isset($reviews['reviews']) || !is_array($reviews['reviews'])) $reviews['reviews'] = [];
+
+        $id = (string)($body['id'] ?? '');
+        $now = gmdate('c');
+        $payload = [
+            'id'        => $id !== '' ? $id : ('MR-' . substr(md5($now . random_int(0, 999999)), 0, 8)),
+            'cycle'     => (string)($body['cycle'] ?? ''),
+            'date'      => (string)($body['date'] ?? ''),
+            'attendees' => is_array($body['attendees'] ?? null) ? array_values($body['attendees']) : [],
+            'inputs'    => is_array($body['inputs'] ?? null) ? $body['inputs'] : [],
+            'outputs'   => is_array($body['outputs'] ?? null) ? $body['outputs'] : [],
+            'updatedAt' => $now,
+            'updatedBy' => (string)($me['username'] ?? ''),
+        ];
+
+        $replaced = false;
+        foreach ($reviews['reviews'] as &$r) {
+            if ((string)($r['id'] ?? '') === $payload['id']) {
+                $payload['signOff'] = $r['signOff'] ?? null;
+                $payload['createdAt'] = (string)($r['createdAt'] ?? $now);
+                $r = $payload;
+                $replaced = true;
+                break;
+            }
+        }
+        unset($r);
+        if (!$replaced) {
+            $payload['signOff'] = null;
+            $payload['createdAt'] = $now;
+            $reviews['reviews'][] = $payload;
+        }
+        $this->saveFile(self::FILE_REVIEWS, $reviews);
+        $this->audit('deploy.review.save', $me, ['id' => $payload['id'], 'cycle' => $payload['cycle']]);
+        $this->success(['data' => $reviews, 'review' => $payload]);
+    }
+
+    public function signOffReview(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::SIGNOFF_ROLES);
+        $body = $this->jsonBody();
+        $id = (string)($body['id'] ?? '');
+        if ($id === '') $this->error('missing_id', 400);
+
+        $reviews = $this->loadFile(self::FILE_REVIEWS);
+        $found = false;
+        foreach ($reviews['reviews'] as &$r) {
+            if ((string)($r['id'] ?? '') === $id) {
+                $r['signOff'] = [
+                    'by'   => (string)($me['username'] ?? ''),
+                    'name' => (string)($me['name'] ?? ''),
+                    'role' => (string)($me['role'] ?? ''),
+                    'at'   => gmdate('c'),
+                ];
+                $found = true;
+                break;
+            }
+        }
+        unset($r);
+        if (!$found) $this->error('review_not_found', 404);
+        $this->saveFile(self::FILE_REVIEWS, $reviews);
+        $this->audit('deploy.review.signoff', $me, ['id' => $id]);
+        $this->success(['data' => $reviews]);
+    }
+
+    public function bridgeCapa(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::EDIT_ROLES);
+        $body = $this->jsonBody();
+        $issueId = (string)($body['issueId'] ?? '');
+        if ($issueId === '') $this->error('missing_issue', 400);
+
+        $issues = $this->loadFile(self::FILE_ISSUES);
+        $found = null;
+        foreach ($issues['issues'] as &$is) {
+            if ((string)($is['id'] ?? '') === $issueId) { $found = &$is; break; }
+        }
+        if (!$found) $this->error('issue_not_found', 404);
+
+        $stubCode = 'CAPA-' . strtoupper(substr(md5($issueId . gmdate('Ymd')), 0, 6));
+        $found['capaLink'] = '/portal.html#eqms?capa=' . $stubCode;
+        $found['capaCode'] = $stubCode;
+        $found['status'] = 'workaround';
+        $found['updatedAt'] = gmdate('c');
+        $found['updatedBy'] = (string)($me['username'] ?? '');
+        unset($found);
+
+        $this->saveFile(self::FILE_ISSUES, $issues);
+        $this->audit('deploy.issue.capa_bridge', $me, ['issue' => $issueId, 'capa_stub' => $stubCode]);
+        $this->success(['data' => $issues, 'capaCode' => $stubCode, 'capaLink' => '/portal.html#eqms?capa=' . $stubCode]);
+    }
+
+    public function resetState(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, ['admin', 'it_admin']);
+        $body = $this->jsonBody();
+        $confirm = (string)($body['confirm'] ?? '');
+        if ($confirm !== 'RESET_DEPLOY_STATE') $this->error('confirm_required', 400);
+
+        $this->saveFile(self::FILE_READINESS, [
+            'version'        => 1,
+            'deptReadiness'  => [],
+            'kpiValues'      => [],
+            'checklistItems' => [],
+            'lastUpdated'    => gmdate('c'),
+        ]);
+        $this->saveFile(self::FILE_MEETINGS, ['version' => 1, 'meetings' => [], 'agendaTemplate' => []]);
+        $this->saveFile(self::FILE_ISSUES, ['version' => 1, 'issues' => []]);
+        $this->saveFile(self::FILE_DRILLS, ['version' => 1, 'drills' => []]);
+        $this->audit('deploy.state.reset', $me, []);
+        $this->success(['data' => ['reset' => true]]);
+    }
+
+    // ── Helpers ─────────────────────────────────────────────────────────────
+
+    private function loadFile(string $rel): array
+    {
+        $path = $this->dataDir . '/config/' . $rel;
+        $data = $this->readJsonFile($path);
+        return is_array($data) ? $data : [];
+    }
+
+    private function saveFile(string $rel, array $data): void
+    {
+        $path = $this->dataDir . '/config/' . $rel;
+        $dir = dirname($path);
+        if (!is_dir($dir)) @mkdir($dir, 0775, true);
+        $this->writeJsonFile($path, $data);
+    }
+
+    private function hasAnyRole(array $user, array $roles): bool
+    {
+        $userRoles = is_array($user['roles'] ?? null) ? $user['roles'] : [(string)($user['role'] ?? '')];
+        $normalized = array_map(static fn($r) => strtolower(trim((string)$r)), $roles);
+        foreach ($userRoles as $r) {
+            if (in_array(strtolower(trim((string)$r)), $normalized, true)) return true;
+        }
+        return false;
+    }
+
+    private function audit(string $event, array $user, array $extra): void
+    {
+        $line = json_encode([
+            'ts'    => gmdate('c'),
+            'event' => $event,
+            'by'    => (string)($user['username'] ?? ''),
+            'role'  => (string)($user['role'] ?? ''),
+            'extra' => $extra,
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        if ($line === false) return;
+        $logFile = $this->dataDir . '/audit.log';
+        @file_put_contents($logFile, $line . "\n", FILE_APPEND | LOCK_EX);
+    }
+}

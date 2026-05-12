@@ -1,292 +1,1440 @@
-const DEPLOY_STORAGE_KEY='hesem_deploy_state';
+/**
+ * Triển khai vận hành — Command Center (rebuild v2)
+ *
+ * Replaces the legacy single-user localStorage dashboard with a shared,
+ * backend-persisted ISO 9001 deployment program runner. State lives in
+ * mom/data/config/deploy/*.json via DeployProgramController.
+ *
+ * Tabs:  Tổng quan · Lộ trình · Họp & Gate · Phòng ban · Tài liệu · Issues
+ * Sign-off (week gate, meeting close): CEO + QMS Manager only.
+ */
 
-const DEPLOY_CONFIG={
-  championTarget:20,
-  phases:[
-    {id:'P0',label:'Phase 0',title:'Chuẩn bị và đồng bộ',weeks:'T1-T4',color:'#64748b'},
-    {id:'P1',label:'Phase 1',title:'Đào tạo và readiness',weeks:'T5-T6',color:'#2563eb'},
-    {id:'P2',label:'Phase 2',title:'Pilot và xác nhận',weeks:'T7-T10',color:'#d97706'},
-    {id:'P3',label:'Phase 3',title:'Go-live theo wave',weeks:'T11-T14',color:'#16a34a'},
-    {id:'P4',label:'Phase 4',title:'Ổn định và bàn giao',weeks:'T15-T20',color:'#7c3aed'}
+// ── Static config (catalog, not state) ────────────────────────────────────
+const DEPLOY_CONFIG = {
+  championTarget: 22, // 11 dept × 2 (primary + backup)
+  phases: [
+    {id:'P0', label:'Phase 0', title:'Chuẩn bị và đồng bộ',  weeks:'W0–W1', color:'#64748b'},
+    {id:'P1', label:'Phase 1', title:'Đào tạo và readiness', weeks:'W2–W3', color:'#2563eb'},
+    {id:'P2', label:'Phase 2', title:'Pilot và xác nhận',     weeks:'W4–W5', color:'#d97706'},
+    {id:'P3', label:'Phase 3', title:'Go-live theo wave',     weeks:'W6–W9', color:'#16a34a'},
+    {id:'P4', label:'Phase 4', title:'Ổn định và bàn giao',   weeks:'W10–W12', color:'#7c3aed'},
   ],
-  readinessDimensions:[
-    {id:'docReview',label:'Rà soát tài liệu',help:'Playlist, handbook, QR, SOP/WI link'},
-    {id:'training',label:'Training',help:'Manager briefing, role training, OJT'},
-    {id:'m365',label:'Digital',help:'M365, metadata, access, routing'},
-    {id:'champion',label:'Champion',help:'Champion và backup theo ca'},
-    {id:'pilot',label:'Pilot',help:'Dual-run, retrieval, drill, validation'},
-    {id:'golive',label:'Go-Live',help:'Go/No-Go, hypercare, handoff'}
+  readinessDimensions: [
+    {id:'docReview', label:'Tài liệu',  help:'Playlist, handbook, QR, SOP/WI link'},
+    {id:'training',  label:'Đào tạo',   help:'Manager briefing, role training, OJT'},
+    {id:'m365',      label:'M365',      help:'Metadata, access, folder routing'},
+    {id:'champion',  label:'Champion',  help:'Champion và backup theo ca'},
+    {id:'pilot',     label:'Pilot',     help:'Dual-run, retrieval, drill, validation'},
+    {id:'golive',    label:'Go-Live',   help:'Go/No-Go, hypercare, handoff'},
   ],
-  pillars:[
-    {title:'Governance và gate',owner:'CEO / Steering Committee',deliverable:'Gate review, escalation, rollback authority',pass:'Quyết định Go/No-Go đã khóa'},
-    {title:'Tài liệu và playlist',owner:'QMS Manager',deliverable:'WI-105, WI-106, handbooks, SOP/WI, QR',pass:'Người dùng biết mở tài liệu nào trước'},
-    {title:'M365 và truy cập',owner:'IT Manager',deliverable:'Metadata, permissions, folder routing, fallback',pass:'Truy xuất đúng, đúng quyền'},
-    {title:'Đào tạo và Champion',owner:'HR / Dept Managers',deliverable:'Briefing, bootcamp, OJT, skills matrix',pass:'Người dùng tự thao tác được'},
-    {title:'Pilot và xác nhận',owner:'Production / QA',deliverable:'Dual-run, retrieval, drill, issue closure',pass:'Pilot không còn KPI đỏ'},
-    {title:'Go-live và hypercare',owner:'Cutover Lead',deliverable:'Runbook, support rota, severity board',pass:'Wave go-live ổn định'},
-    {title:'Dashboard và bằng chứng',owner:'QMS / Data Owner',deliverable:'Owner, source, refresh, exception, document hub',pass:'Số dashboard đáng tin'}
+  pillars: [
+    {key:'gov',   title:'Governance & gate',    owner:'CEO / Steering',    pass:'Quyết định Go/No-Go đã khóa'},
+    {key:'doc',   title:'Tài liệu & playlist',  owner:'QMS Manager',       pass:'Người dùng biết mở tài liệu nào trước'},
+    {key:'m365',  title:'M365 & truy cập',      owner:'IT Manager',        pass:'Truy xuất đúng người, đúng quyền'},
+    {key:'train', title:'Đào tạo & Champion',   owner:'HR / Dept Manager', pass:'Người dùng tự thao tác được'},
+    {key:'pilot', title:'Pilot & xác nhận',     owner:'Production / QA',   pass:'Pilot không còn KPI đỏ'},
+    {key:'golive',title:'Go-live & hypercare',  owner:'Cutover Lead',      pass:'Wave go-live ổn định'},
+    {key:'dash',  title:'Dashboard & bằng chứng',owner:'QMS / Data Owner', pass:'Số dashboard đáng tin'},
   ],
-  departments:[
-    {id:'PROD',label:'Sản xuất',wave:1,color:'#1e40af',owner:'Production Director',handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html',docs:[{code:'SOP-501',path:'../mom/docs/operations/sops/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html'},{code:'WI-519',path:'../mom/docs/operations/work-instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html'}],record:'DEP-PRO + Job Dossier'},
-    {id:'ENG',label:'Kỹ thuật',wave:1,color:'#9d174d',owner:'Engineering Manager',handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html',docs:[{code:'SOP-303',path:'../mom/docs/operations/sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html'},{code:'WI-302',path:'../mom/docs/operations/work-instructions/03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html'}],record:'Part master + Job Dossier + DEP-ENG'},
-    {id:'QA',label:'Quality',wave:1,color:'#166534',owner:'QA Manager',handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-quality-handbook.html',docs:[{code:'SOP-605',path:'../mom/docs/operations/sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html'},{code:'WI-201',path:'../mom/docs/operations/work-instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html'}],record:'Quality records + Job Dossier + DEP-QA'},
-    {id:'SCM',label:'Chuỗi cung ứng',wave:2,color:'#92400e',owner:'SCM Manager',handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html',docs:[{code:'SOP-401',path:'../mom/docs/operations/sops/04-SOP-400/sop-401-supplier-control-and-special-process.html'},{code:'WI-701',path:'../mom/docs/operations/work-instructions/07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html'}],record:'DEP-SCM + receiving/shipping pack'},
-    {id:'SALES',label:'Kinh doanh / CS',wave:2,color:'#3730a3',owner:'Sales Manager',handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html',docs:[{code:'SOP-201',path:'../mom/docs/operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html'},{code:'WI-203',path:'../mom/docs/operations/work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html'}],record:'DEP-SAL + customer records'},
-    {id:'FIN',label:'Tài chính',wave:3,color:'#6b21a8',owner:'Finance Manager',handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-finance-handbook.html',docs:[{code:'SOP-803',path:'../mom/docs/operations/sops/08-SOP-800/sop-803-invoicing-job-costing-and-arap.html'},{code:'WI-203',path:'../mom/docs/operations/work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html'}],record:'DEP-FIN + ERP SoR'},
-    {id:'HR',label:'Nhân sự',wave:3,color:'#9f1239',owner:'HR Manager',handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-hr-handbook.html',docs:[{code:'SOP-801',path:'../mom/docs/operations/sops/08-SOP-800/sop-801-competence-training-and-certification.html'},{code:'WI-103',path:'../mom/docs/operations/work-instructions/01-WI-100/wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html'}],record:'Training records + restricted people site'},
-    {id:'IT',label:'IT',wave:3,color:'#155e75',owner:'IT Manager',handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-it-handbook.html',docs:[{code:'ANNEX-113',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html'},{code:'WI-102',path:'../mom/docs/operations/work-instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html'}],record:'Digital control site + access logs'},
-    {id:'EHS',label:'EHS',wave:3,color:'#b45309',owner:'EHS Manager',handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-ehs-handbook.html',docs:[{code:'SOP-802',path:'../mom/docs/operations/sops/08-SOP-800/sop-802-incident-near-miss-and-ehs.html'},{code:'ANNEX-703',path:'../mom/docs/operations/references/07-ANNEX-700/annex-703-warehouse-location-fifo-rules.html'}],record:'DEP-EHS + incident records'},
-    {id:'ERP',label:'Epicor / ERP',wave:3,color:'#0f766e',owner:'ERP Owner',handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-epicor-handbook.html',docs:[{code:'ANNEX-115',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html'},{code:'ANNEX-118',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html'}],record:'Epicor SoR + interface logs'}
+  departments: [
+    {id:'PROD', label:'Sản xuất',         wave:1, color:'#1e40af', owner:'Production Director',  handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html',           docs:[{code:'SOP-501',path:'../mom/docs/operations/sops/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html'},{code:'WI-519',path:'../mom/docs/operations/work-instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html'}], record:'DEP-PRO + Job Dossier'},
+    {id:'ENG',  label:'Kỹ thuật',         wave:1, color:'#9d174d', owner:'Engineering Manager',  handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html',           docs:[{code:'SOP-303',path:'../mom/docs/operations/sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html'},{code:'WI-302',path:'../mom/docs/operations/work-instructions/03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html'}], record:'Part master + Job Dossier'},
+    {id:'QA',   label:'Chất lượng',       wave:1, color:'#166534', owner:'QA Manager',           handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-quality-handbook.html',              docs:[{code:'SOP-605',path:'../mom/docs/operations/sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html'},{code:'WI-201',path:'../mom/docs/operations/work-instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html'}], record:'Quality records + DEP-QA'},
+    {id:'SCM',  label:'Chuỗi cung ứng',   wave:2, color:'#92400e', owner:'SCM Manager',          handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html',         docs:[{code:'SOP-401',path:'../mom/docs/operations/sops/04-SOP-400/sop-401-supplier-control-and-special-process.html'},{code:'WI-701',path:'../mom/docs/operations/work-instructions/07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html'}], record:'DEP-SCM + receiving/shipping'},
+    {id:'SALES',label:'Kinh doanh / CS',  wave:2, color:'#3730a3', owner:'Sales Manager',        handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html', docs:[{code:'SOP-201',path:'../mom/docs/operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html'},{code:'WI-203',path:'../mom/docs/operations/work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html'}], record:'DEP-SAL + customer records'},
+    {id:'FIN',  label:'Tài chính',        wave:3, color:'#6b21a8', owner:'Finance Manager',      handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-finance-handbook.html',              docs:[{code:'SOP-803',path:'../mom/docs/operations/sops/08-SOP-800/sop-803-invoicing-job-costing-and-arap.html'}], record:'DEP-FIN + ERP SoR'},
+    {id:'HR',   label:'Nhân sự',          wave:3, color:'#9f1239', owner:'HR Manager',           handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-hr-handbook.html',                   docs:[{code:'SOP-801',path:'../mom/docs/operations/sops/08-SOP-800/sop-801-competence-training-and-certification.html'}], record:'Training records'},
+    {id:'IT',   label:'IT',               wave:3, color:'#155e75', owner:'IT Manager',           handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-it-handbook.html',                   docs:[{code:'ANNEX-113',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html'},{code:'WI-102',path:'../mom/docs/operations/work-instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html'}], record:'Digital control + access logs'},
+    {id:'EHS',  label:'EHS',              wave:3, color:'#b45309', owner:'EHS Manager',          handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-ehs-handbook.html',                  docs:[{code:'SOP-802',path:'../mom/docs/operations/sops/08-SOP-800/sop-802-incident-near-miss-and-ehs.html'}], record:'DEP-EHS + incident records'},
+    {id:'ERP',  label:'Epicor / ERP',     wave:3, color:'#0f766e', owner:'ERP Owner',            handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-epicor-handbook.html',                docs:[{code:'ANNEX-115',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html'},{code:'ANNEX-118',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html'}], record:'Epicor SoR + interface logs'},
   ],
-  docsByGroup:[
-    {title:'Điều phối tổng',subtitle:'Cho sponsor, steering và cutover lead',items:[{code:'WI-106',title:'Master plan',path:'../mom/docs/operations/work-instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html'},{code:'ANNEX-114',title:'Runbook go-live',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html'},{code:'ANNEX-119',title:'Roadmap register',path:'../mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html'},{code:'ANNEX-117',title:'Escalation matrix',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html'}]},
-    {title:'Tiếp cận và đào tạo',subtitle:'Cho manager, champion và người dùng cuối',items:[{code:'WI-105',title:'Document navigation',path:'../mom/docs/operations/work-instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html'},{code:'WI-103',title:'Folder routing training',path:'../mom/docs/operations/work-instructions/01-WI-100/wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html'},{code:'WI-104',title:'Quick cards',path:'../mom/docs/operations/work-instructions/01-WI-100/wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html'},{code:'DRL-E2E',title:'Job Order drill',path:'../mom/docs/training/content/03-Practice-Drills/drill-joborder-e2e.html'}]},
-    {title:'Dashboard và dữ liệu',subtitle:'Cho owner, IT và data governance',items:[{code:'ANNEX-113',title:'Dashboard governance',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html'},{code:'ANNEX-110',title:'KPI dictionary',path:'../mom/docs/operations/references/01-ANNEX-100/annex-110-dashboard-kpi-dictionary-and-data-model.html'},{code:'WI-202',title:'Tier meetings',path:'../mom/docs/operations/work-instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html'},{code:'WI-901',title:'Performance dashboard',path:'../mom/docs/operations/work-instructions/09-WI-900/wi-901-performance-dashboard.html'}]},
-    {title:'Fallback và bằng chứng',subtitle:'Cho hypercare, audit và handoff',items:[{code:'ANNEX-118',title:'Offline fallback kit',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html'},{code:'WI-203',title:'Evidence pack',path:'../mom/docs/operations/work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html'},{code:'WI-201',title:'Quality gates',path:'../mom/docs/operations/work-instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html'},{code:'ANNEX-135',title:'Records file plan',path:'../mom/docs/operations/references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html'}]}
+  docsByGroup: [
+    {title:'Điều phối tổng', subtitle:'Sponsor · steering · cutover lead', items:[
+      {code:'WI-106',  title:'Master plan',         path:'../mom/docs/operations/work-instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html'},
+      {code:'ANNEX-114', title:'Runbook go-live',   path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html'},
+      {code:'ANNEX-119', title:'Roadmap register',  path:'../mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html'},
+      {code:'ANNEX-117', title:'Escalation & SLA',  path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html'},
+    ]},
+    {title:'Tiếp cận & đào tạo', subtitle:'Manager · champion · end-user', items:[
+      {code:'WI-105', title:'Document navigation',  path:'../mom/docs/operations/work-instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html'},
+      {code:'WI-103', title:'Folder routing',       path:'../mom/docs/operations/work-instructions/01-WI-100/wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html'},
+      {code:'WI-104', title:'Quick cards by role',  path:'../mom/docs/operations/work-instructions/01-WI-100/wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html'},
+      {code:'DRL-E2E', title:'Job Order drill',     path:'../mom/docs/training/content/03-Practice-Drills/drill-joborder-e2e.html'},
+    ]},
+    {title:'Tài liệu nền QMS', subtitle:'Manual · Policy · Handbook', items:[
+      {code:'MAN-001',     title:'QMS Manual',     path:'../mom/docs/system/quality-manual/qms-man-001-qms-manual.html'},
+      {code:'POL-QMS-001', title:'Quality Policy', path:'../mom/docs/system/policies/pol-qms-001-quality-policy.html'},
+      {code:'POL-QMS-002', title:'Quality Objectives', path:'../mom/docs/system/policies/pol-qms-002-quality-objectives.html'},
+      {code:'RACI',        title:'RACI master',    path:'../mom/docs/system/organization/04-RACI-Authority/raci-master-matrix.html'},
+    ]},
+    {title:'Dashboard & bằng chứng', subtitle:'Owner · IT · governance', items:[
+      {code:'ANNEX-113', title:'Dashboard governance', path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html'},
+      {code:'ANNEX-110', title:'KPI dictionary',       path:'../mom/docs/operations/references/01-ANNEX-100/annex-110-dashboard-kpi-dictionary-and-data-model.html'},
+      {code:'WI-202',    title:'Tier meetings',        path:'../mom/docs/operations/work-instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html'},
+      {code:'WI-901',    title:'Performance dashboard',path:'../mom/docs/operations/work-instructions/09-WI-900/wi-901-performance-dashboard.html'},
+    ]},
+    {title:'Fallback & bằng chứng', subtitle:'Hypercare · audit · handoff', items:[
+      {code:'ANNEX-118', title:'Offline fallback kit', path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html'},
+      {code:'WI-203',    title:'Evidence pack',        path:'../mom/docs/operations/work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html'},
+      {code:'WI-201',    title:'Quality gates',        path:'../mom/docs/operations/work-instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html'},
+      {code:'ANNEX-135', title:'Records file plan',    path:'../mom/docs/operations/references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html'},
+    ]},
   ],
-  commandCadence:[
-    {title:'Daily command center',owner:'Cutover Lead',cadence:'Hằng ngày trong pilot / hypercare',purpose:'Rà blocker, severity, tuổi issue'},
-    {title:'Wave readiness review',owner:'Steering Committee',cadence:'Hằng tuần',purpose:'Quyết pha, quyết wave, xử lý no-go'},
-    {title:'Document and data review',owner:'QMS / IT',cadence:'Hằng tuần',purpose:'Link, QR, refresh, owner, source'}
+  kpis: [
+    {id:'KPI-FLD-01', label:'Routing accuracy',       target:'>=95', unit:'%', short:'RA'},
+    {id:'KPI-FLD-02', label:'Doc retrieval (giây)',   target:'<=180', unit:'s', short:'RT'},
+    {id:'KPI-TRN-01', label:'Training completion',    target:'>=90', unit:'%', short:'TR'},
+    {id:'KPI-DEP-01', label:'Champion coverage',      target:'>=100',unit:'%', short:'CH'},
+    {id:'KPI-DEP-02', label:'Issue closure on time',  target:'>=95', unit:'%', short:'IC'},
+    {id:'KPI-DEP-03', label:'Change failure rate',    target:'<=10', unit:'%', short:'CF'},
+    {id:'KPI-DEP-04', label:'Change lead time',       target:'<=10', unit:'d', short:'LT'},
+    {id:'KPI-DEP-05', label:'Dashboard refresh',      target:'>=95', unit:'%', short:'RF'},
   ],
-  kpis:[
-    {id:'KPI-FLD-01',label:'Routing accuracy',target:'>=95%',icon:'RA'},
-    {id:'KPI-FLD-02',label:'Document retrieval',target:'<=3',icon:'RT'},
-    {id:'KPI-TRN-01',label:'Training completion',target:'>=90%',icon:'TR'},
-    {id:'KPI-DEP-01',label:'Champion coverage',target:'>=100%',icon:'CH'},
-    {id:'KPI-DEP-02',label:'Issue closure on time',target:'>=95%',icon:'IC'},
-    {id:'KPI-DEP-03',label:'Change failure rate',target:'<=10%',icon:'CF'},
-    {id:'KPI-DEP-04',label:'Change lead time',target:'<=10',icon:'LT'},
-    {id:'KPI-DEP-05',label:'Dashboard refresh on time',target:'>=95%',icon:'RF'}
+  phaseChecklists: {
+    P0:[
+      {code:'P0-01', text:'Handbook, SOP, WI, FRM, ANNEX và QR đã đồng bộ'},
+      {code:'P0-02', text:'Champion và backup theo ca đã được chỉ định'},
+      {code:'P0-03', text:'M365 metadata, permission, folder routing đã test'},
+      {code:'P0-04', text:'Dashboard shell đã có owner, source, quick links'},
+      {code:'P0-05', text:'Issue register và cadence điều hành đã sẵn sàng'},
+    ],
+    P1:[
+      {code:'P1-01', text:'Manager briefing đã hoàn thành'},
+      {code:'P1-02', text:'Champion bootcamp đã pass'},
+      {code:'P1-03', text:'Người dùng trong wave đã pass OJT'},
+      {code:'P1-04', text:'Baseline KPI và dashboard readiness đã được nạp'},
+    ],
+    P2:[
+      {code:'P2-01', text:'Dual-run và single-run đã xác nhận trên pilot'},
+      {code:'P2-02', text:'Retrieval, traceback và wrong-revision drill đã pass'},
+      {code:'P2-03', text:'Issue pilot đã đóng hoặc có action plan'},
+      {code:'P2-04', text:'Phòng ban core vận hành độc lập được'},
+    ],
+    P3:[
+      {code:'P3-01', text:'Wave hiện tại có command center và support rota'},
+      {code:'P3-02', text:'Go-live sign-off, fallback và rollback trigger đã khóa'},
+      {code:'P3-03', text:'KPI đỏ = 0 hoặc có exception note'},
+      {code:'P3-04', text:'Người dùng mở đúng tài liệu và lưu đúng hồ sơ'},
+    ],
+    P4:[
+      {code:'P4-01', text:'Hypercare Sev-1 = 0 và Sev-2 có workaround ổn định'},
+      {code:'P4-02', text:'Dashboard governance, access review và refresh SLA đã khóa'},
+      {code:'P4-03', text:'Tài liệu, QR và playlist đã cập nhật theo bài học thật'},
+      {code:'P4-04', text:'Owner vận hành thường xuyên đã nhận handoff'},
+    ],
+  },
+  commandCadence: [
+    {title:'Họp Thứ Bảy 9:00',     owner:'CEO + QMS Manager',   cadence:'Tuần',    purpose:'Gate review, KPI, decision log'},
+    {title:'Daily command center',  owner:'Cutover Lead',        cadence:'Ngày (pilot/hypercare)', purpose:'Severity board, issue age'},
+    {title:'Document & data review',owner:'QMS / IT',            cadence:'Tuần',    purpose:'Link, QR, refresh, owner'},
+    {title:'Management Review (ISO 9.3)', owner:'CEO + dept heads', cadence:'Quý', purpose:'Mgmt review packet, action items'},
   ],
-  phaseChecklists:{
-    P0:[{code:'P0-01',text:'Handbook, SOP, WI, FRM, ANNEX và QR đã đồng bộ'},{code:'P0-02',text:'Champion và backup theo ca đã được chỉ định'},{code:'P0-03',text:'M365 metadata, permission, folder routing đã test'},{code:'P0-04',text:'Dashboard shell đã có owner, source, quick links'},{code:'P0-05',text:'Issue register và cadence điều hành đã sẵn sàng'}],
-    P1:[{code:'P1-01',text:'Manager briefing đã hoàn thành'},{code:'P1-02',text:'Champion bootcamp đã pass'},{code:'P1-03',text:'Người dùng trong wave đã pass OJT'},{code:'P1-04',text:'Baseline KPI và dashboard readiness đã được nạp'}],
-    P2:[{code:'P2-01',text:'Dual-run và single-run đã xác nhận trên pilot'},{code:'P2-02',text:'Retrieval, traceback và wrong-revision drill đã pass'},{code:'P2-03',text:'Issue pilot đã đóng hoặc có action plan'},{code:'P2-04',text:'Phòng ban core vận hành độc lập được'}],
-    P3:[{code:'P3-01',text:'Wave hiện tại có command center và support rota'},{code:'P3-02',text:'Go-live sign-off, fallback và rollback trigger đã khóa'},{code:'P3-03',text:'KPI đỏ không có hoặc đã có exception note'},{code:'P3-04',text:'Người dùng mở đúng tài liệu và lưu đúng hồ sơ'}],
-    P4:[{code:'P4-01',text:'Hypercare Sev-1 = 0 và Sev-2 có workaround ổn định'},{code:'P4-02',text:'Dashboard governance, access review và refresh SLA đã khóa'},{code:'P4-03',text:'Tài liệu, QR và playlist đã cập nhật theo bài học thật'},{code:'P4-04',text:'Owner vận hành thường xuyên đã nhận handoff'}]
-  }
 };
 
-function loadDeployState(){try{const raw=localStorage.getItem(DEPLOY_STORAGE_KEY);if(raw)return JSON.parse(raw);}catch(e){}return getDefaultDeployState();}
-function saveDeployState(state){try{localStorage.setItem(DEPLOY_STORAGE_KEY,JSON.stringify(state));}catch(e){}}
-function getDefaultDeployState(){
-  const state={currentPhase:'P0',phaseStatus:{P0:'in_progress',P1:'pending',P2:'pending',P3:'pending',P4:'pending'},deptReadiness:{},kpiValues:{sev1Open:0,sev2Open:0,sev3Open:0,championPass:0},checklistItems:{},lastUpdated:new Date().toISOString()};
-  DEPLOY_CONFIG.departments.forEach((dept)=>{state.deptReadiness[dept.id]={};DEPLOY_CONFIG.readinessDimensions.forEach((dim)=>{state.deptReadiness[dept.id][dim.id]='pending';});});
-  return state;
+// ── Runtime state (filled by load) ────────────────────────────────────────
+const DeployState = {
+  loaded: false,
+  loading: false,
+  program: null,
+  meetings: null,
+  champions: null,
+  readiness: null,
+  issues: null,
+  drills: null,
+  clauses: null,
+  audits: null,
+  reviews: null,
+  me: {username:'', name:'', role:'', canSignOff:false, canEdit:false},
+  activeTab: 'overview',
+  activeWeek: null, // when not null, week side panel is open
+};
+
+// ── API ───────────────────────────────────────────────────────────────────
+async function deployApi(action, payload){
+  if (typeof apiCall !== 'function') {
+    throw new Error('apiCall_unavailable');
+  }
+  const res = await apiCall(action, payload || {}, 'POST', 45000);
+  if (!res || res.ok === false) {
+    const msg = res && res.error ? res.error : 'unknown';
+    throw new Error('api_error:' + msg);
+  }
+  return res;
 }
 
-function getNumberValue(value){const parsed=parseFloat(value);return Number.isFinite(parsed)?parsed:0;}
-function getDeptProgress(state,deptId){const readiness=(state.deptReadiness||{})[deptId]||{};const total=DEPLOY_CONFIG.readinessDimensions.reduce((sum,dim)=>{const value=readiness[dim.id]||'pending';if(value==='completed')return sum+1;if(value==='in_progress')return sum+0.5;return sum;},0);return total/DEPLOY_CONFIG.readinessDimensions.length;}
-function hasDeptBlocked(state,deptId){const readiness=(state.deptReadiness||{})[deptId]||{};return DEPLOY_CONFIG.readinessDimensions.some((dim)=>readiness[dim.id]==='blocked');}
-function getPhaseChecklist(phaseId){return DEPLOY_CONFIG.phaseChecklists[phaseId]||DEPLOY_CONFIG.phaseChecklists.P0;}
-function getChampionPercent(state){const passed=getNumberValue(state.kpiValues.championPass);return Math.min(100,Math.round((passed/DEPLOY_CONFIG.championTarget)*100));}
-function getNextChecklistItem(state){const checklist=getPhaseChecklist(state.currentPhase);for(let i=0;i<checklist.length;i+=1){if(!state.checklistItems[state.currentPhase+'-'+i])return checklist[i].code;}return '';}
-function getDeptNextAction(state,deptId){
-  const readiness=(state.deptReadiness||{})[deptId]||{};
-  if(hasDeptBlocked(state,deptId))return 'Cần gỡ blocker trước khi qua gate';
-  const labels={docReview:'Chốt playlist, QR và tài liệu hiệu lực',training:'Hoàn thành manager briefing, role training và OJT',m365:'Khóa metadata, permission và route hồ sơ',champion:'Chỉ định Champion và backup theo ca',pilot:'Hoàn tất pilot, retrieval và drill',golive:'Xác nhận Go/No-Go, hypercare và handoff'};
-  for(let i=0;i<DEPLOY_CONFIG.readinessDimensions.length;i+=1){const id=DEPLOY_CONFIG.readinessDimensions[i].id;if(readiness[id]!=='completed')return labels[id];}
-  return 'Duy trì readiness và chuẩn bị audit / handoff';
+async function loadDeployState(){
+  if (DeployState.loading) return;
+  DeployState.loading = true;
+  try{
+    const res = await deployApi('deploy_state_load', {});
+    const d = res.data || {};
+    DeployState.program   = d.program   || {weeks:[]};
+    DeployState.meetings  = d.meetings  || {meetings:[], agendaTemplate:[]};
+    DeployState.champions = d.champions || {champions:{}};
+    DeployState.readiness = d.readiness || {deptReadiness:{}, kpiValues:{}, checklistItems:{}};
+    DeployState.issues    = d.issues    || {issues:[]};
+    DeployState.drills    = d.drills    || {drills:[]};
+    DeployState.clauses   = d.clauses   || {clauses:[]};
+    DeployState.audits    = d.audits    || {audits:[]};
+    DeployState.reviews   = d.reviews   || {reviews:[], inputTemplate:[], outputTemplate:[]};
+    DeployState.me        = d.me        || DeployState.me;
+    DeployState.loaded    = true;
+  }catch(e){
+    console.error('[deploy] load failed', e);
+    DeployState.loaded = false;
+  }finally{
+    DeployState.loading = false;
+  }
 }
-function getStatusIcon(status){if(status==='completed')return 'OK';if(status==='in_progress')return 'IP';if(status==='blocked')return 'BL';return 'NS';}
-function getKpiRag(kpi,value){
-  if(value===''||value===null||typeof value==='undefined')return 'none';
-  const numeric=parseFloat(String(value).replace('%',''));
-  if(!Number.isFinite(numeric))return 'none';
-  if(kpi.target.startsWith('>=')){const target=parseFloat(kpi.target.replace('>=','').replace('%',''));if(numeric>=target)return 'green';if(numeric>=target*0.85)return 'amber';return 'red';}
-  if(kpi.target.startsWith('<=')){const target=parseFloat(kpi.target.replace('<=','').replace('%',''));if(numeric<=target)return 'green';if(numeric<=target*1.25)return 'amber';return 'red';}
+
+// ── Helpers ───────────────────────────────────────────────────────────────
+function deployEscape(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function deployNum(v){ const n = parseFloat(v); return Number.isFinite(n) ? n : 0; }
+function deployIsoToVi(iso){ if(!iso) return '—'; try{ return new Date(iso).toLocaleString('vi-VN'); }catch(_){ return iso; } }
+function deployFmtDate(iso){ if(!iso) return '—'; try{ return new Date(iso).toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}); }catch(_){ return iso; } }
+function deployTodayIso(){ return new Date().toISOString().slice(0,10); }
+function deployGetPhaseDef(id){ return DEPLOY_CONFIG.phases.find(p=>p.id===id) || DEPLOY_CONFIG.phases[0]; }
+function deployGetDept(id){ return DEPLOY_CONFIG.departments.find(d=>d.id===id); }
+function deployGetWeek(n){ return (DeployState.program && DeployState.program.weeks || []).find(w => (w.n|0) === (n|0)); }
+
+function deployDeptProgress(deptId){
+  const r = (DeployState.readiness && DeployState.readiness.deptReadiness && DeployState.readiness.deptReadiness[deptId]) || {};
+  const dims = DEPLOY_CONFIG.readinessDimensions;
+  let score = 0;
+  dims.forEach(d => {
+    const v = r[d.id] || 'pending';
+    if (v === 'completed') score += 1;
+    else if (v === 'in_progress') score += 0.5;
+  });
+  return score / dims.length;
+}
+function deployDeptHasBlocker(deptId){
+  const r = (DeployState.readiness && DeployState.readiness.deptReadiness && DeployState.readiness.deptReadiness[deptId]) || {};
+  return DEPLOY_CONFIG.readinessDimensions.some(d => r[d.id] === 'blocked');
+}
+function deployKpiRag(kpi, value){
+  if (value === '' || value == null) return 'none';
+  const num = parseFloat(String(value).replace('%','').replace('s','').replace('d',''));
+  if (!Number.isFinite(num)) return 'none';
+  const t = kpi.target;
+  if (t.startsWith('>=')) {
+    const tgt = parseFloat(t.replace('>=',''));
+    if (num >= tgt) return 'green';
+    if (num >= tgt * 0.85) return 'amber';
+    return 'red';
+  }
+  if (t.startsWith('<=')) {
+    const tgt = parseFloat(t.replace('<=',''));
+    if (num <= tgt) return 'green';
+    if (num <= tgt * 1.25) return 'amber';
+    return 'red';
+  }
   return 'none';
 }
-
-function renderPhaseNode(state,phase){
-  const status=state.phaseStatus[phase.id]||'pending';
-  const cls=status==='completed'?'phase-done':status==='in_progress'?'phase-active':'phase-pending';
-  return `<button class="phase-node ${cls}" onclick="setDeployPhase('${phase.id}')" title="${phase.title}"><div class="phase-info"><strong>${phase.label}</strong><span>${phase.title}</span><span class="phase-weeks">${phase.weeks}</span></div><div class="phase-status-dot"></div></button>`;
+function deployChampionCount(){
+  let pass = 0;
+  const ch = (DeployState.champions && DeployState.champions.champions) || {};
+  Object.values(ch).forEach(d => {
+    if (d && d.primary && d.primary.ojtPass) pass++;
+    if (d && d.backup  && d.backup.ojtPass)  pass++;
+  });
+  return pass;
 }
-function renderWaveColumn(state,wave){
-  const departments=DEPLOY_CONFIG.departments.filter((dept)=>dept.wave===wave);
-  return `<div class="wave-card"><div class="wave-card-head"><strong>Wave ${wave}</strong><span>${departments.length} dept</span></div><div class="wave-card-body">${departments.map((dept)=>`<div class="wave-dept-row"><div class="wave-dept-main"><span class="wave-color" style="background:${dept.color}"></span><span>${dept.label}</span></div><span class="wave-score">${Math.round(getDeptProgress(state,dept.id)*100)}%</span></div>`).join('')}</div></div>`;
+function deployStatusIcon(status){
+  if (status === 'completed') return '✓';
+  if (status === 'in_progress') return '◐';
+  if (status === 'blocked') return '⚠';
+  return '○';
 }
-function renderDepartmentCard(state,dept){
-  const progress=Math.round(getDeptProgress(state,dept.id)*100);
-  const blocked=hasDeptBlocked(state,dept.id);
-  return `<div class="dept-card ${blocked?'dept-card-blocked':''}"><div class="dept-card-head"><div><span class="dept-wave-badge wave-${dept.wave}">Wave ${dept.wave}</span><h3>${dept.label}</h3><div class="dept-owner">${dept.owner}</div></div><div class="dept-progress-ring"><strong>${progress}%</strong></div></div><div class="dept-progress-bar"><span style="width:${progress}%"></span></div><div class="dept-next-action">${getDeptNextAction(state,dept.id)}</div><div class="dept-link-group"><a href="${dept.handbook}" target="_blank">Handbook</a>${dept.docs.map((doc)=>`<a href="${doc.path}" target="_blank">${doc.code}</a>`).join('')}</div><div class="dept-records">${dept.record}</div></div>`;
+function deployPhaseStatus(phaseId){
+  const ps = (DeployState.program && DeployState.program.phaseStatus) || {};
+  return ps[phaseId] || 'pending';
 }
-function renderReadinessRow(state,dept){
-  const readiness=state.deptReadiness[dept.id]||{};
-  const progress=Math.round(getDeptProgress(state,dept.id)*100);
-  return `<tr><td><div class="readiness-dept-name"><span class="wave-color" style="background:${dept.color}"></span><span>${dept.label}</span></div></td><td><span class="deploy-wave-badge wave-${dept.wave}">Wave ${dept.wave}</span></td>${DEPLOY_CONFIG.readinessDimensions.map((dim)=>{const value=readiness[dim.id]||'pending';return `<td class="heatmap-cell hm-${value}" onclick="cycleReadiness('${dept.id}','${dim.id}')" title="${dept.label} • ${dim.label} • ${value}">${getStatusIcon(value)}</td>`;}).join('')}<td><strong>${progress}%</strong></td></tr>`;
+function deployCurrentPhase(){
+  const cur = (DeployState.program && DeployState.program.currentPhase) || 'P0';
+  return cur;
 }
-function renderKpiCard(state,kpi){
-  const value=state.kpiValues[kpi.id]||'';
-  const rag=getKpiRag(kpi,value);
-  return `<div class="kpi-mini-card kpi-rag-${rag}"><div class="kpi-mini-icon">${kpi.icon}</div><div class="kpi-mini-body"><div class="kpi-mini-label">${kpi.label}</div><div class="kpi-mini-target">Target: ${kpi.target}</div></div><input type="text" class="kpi-mini-input" value="${value}" placeholder="-" onchange="updateMetric('${kpi.id}', this.value)"></div>`;
+function deployCurrentWeek(){
+  const w = (DeployState.program && DeployState.program.currentWeek);
+  return Number.isFinite(w) ? (w|0) : 0;
+}
+function deployChecklistDoneCount(phaseId){
+  const items = DEPLOY_CONFIG.phaseChecklists[phaseId] || [];
+  const cl = (DeployState.readiness && DeployState.readiness.checklistItems) || {};
+  let done = 0;
+  items.forEach((it) => { if (cl[it.code]) done++; });
+  return {done, total: items.length};
+}
+function deployIssuesOpen(){
+  const list = (DeployState.issues && DeployState.issues.issues) || [];
+  return list.filter(i => (i.status || 'open') !== 'closed');
+}
+function deployRedSignals(){
+  let red = 0;
+  DEPLOY_CONFIG.departments.forEach(d => { if (deployDeptHasBlocker(d.id)) red++; });
+  const kv = (DeployState.readiness && DeployState.readiness.kpiValues) || {};
+  DEPLOY_CONFIG.kpis.forEach(k => { if (deployKpiRag(k, kv[k.id]) === 'red') red++; });
+  red += deployNum(kv.sev1Open);
+  return red;
 }
 
-let _deployActiveTab='overview';
-function switchDeployTab(tabId){
-  _deployActiveTab=tabId;
-  document.querySelectorAll('.deploy-tab').forEach(t=>{t.classList.toggle('active',t.dataset.tab===tabId);});
-  document.querySelectorAll('.deploy-tab-panel').forEach(p=>{p.classList.toggle('active',p.id==='dtab-'+tabId);});
+// ── Tab switching ─────────────────────────────────────────────────────────
+function switchDeployTab(tab){
+  DeployState.activeTab = tab;
+  renderDeployDashboard();
 }
 
-function renderDeployDashboard(){
-  const container=document.getElementById('page-deploy');
-  if(!container)return;
-  const state=loadDeployState();
-  const isVi=typeof lang==='undefined'?true:lang==='vi';
-  const activePhase=DEPLOY_CONFIG.phases.find((phase)=>phase.id===state.currentPhase)||DEPLOY_CONFIG.phases[0];
-  const readyDepartments=DEPLOY_CONFIG.departments.filter((dept)=>getDeptProgress(state,dept.id)>=1).length;
-  const departmentsInProgress=DEPLOY_CONFIG.departments.filter((dept)=>{const progress=getDeptProgress(state,dept.id);return progress>0&&progress<1;}).length;
-  const blockedDepartments=DEPLOY_CONFIG.departments.filter((dept)=>hasDeptBlocked(state,dept.id)).length;
-  const redKpis=DEPLOY_CONFIG.kpis.filter((kpi)=>getKpiRag(kpi,state.kpiValues[kpi.id])==='red').length;
-  const redSignals=blockedDepartments+redKpis+getNumberValue(state.kpiValues.sev1Open);
-  const checklist=getPhaseChecklist(state.currentPhase);
-  const checklistDone=checklist.filter((item,index)=>state.checklistItems[state.currentPhase+'-'+index]).length;
-  const at=_deployActiveTab;
-
-  container.innerHTML=`
-    <div class="deploy-dash">
-
-      <!-- ═══ Hero — compact strip ═══ -->
-      <section class="deploy-hero">
-        <div class="deploy-hero-main">
-          <span class="deploy-kicker">${isVi?'Triển khai vận hành':'Operations deployment'}</span>
-          <h1>${isVi?'Command Center triển khai vận hành':'Operations deployment command center'}</h1>
-          <p>${isVi?'Bảng điều phối, readiness, command center và document hub cho từng phòng ban.':'Steering control, readiness tracking, and document hub for every department.'}</p>
-          <div class="deploy-hero-actions">
-            <a class="deploy-action-link" href="../mom/docs/operations/work-instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html" target="_blank">WI-106</a>
-            <a class="deploy-action-link" href="../mom/docs/operations/work-instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html" target="_blank">WI-105</a>
-            <a class="deploy-action-link" href="../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html" target="_blank">ANNEX-114</a>
-          </div>
-        </div>
-        <div class="deploy-hero-side">
-          <div class="hero-side-card">
-            <span class="hero-side-label">${isVi?'Pha hiện tại':'Current phase'}</span>
-            <strong>${activePhase.label}</strong>
-            <div>${activePhase.title}</div>
-            <div class="hero-side-meta">${activePhase.weeks}</div>
-          </div>
-          <div class="hero-side-card">
-            <span class="hero-side-label">${isVi?'Checklist pha':'Phase checklist'}</span>
-            <strong>${checklistDone}/${checklist.length}</strong>
-            <div>${isVi?'Mục đã xác nhận':'Items confirmed'}</div>
-            <div class="hero-side-meta">${getNextChecklistItem(state)||(isVi?'Không còn mục mở':'No open items')}</div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ═══ Summary strip ═══ -->
-      <section class="deploy-summary-grid">
-        <div class="deploy-summary-card"><span class="summary-label">${isVi?'Phòng ban sẵn sàng':'Departments ready'}</span><strong>${readyDepartments}/${DEPLOY_CONFIG.departments.length}</strong><div>${isVi?'Đạt 100% trên 6 tiêu chí':'100% across 6 criteria'}</div></div>
-        <div class="deploy-summary-card"><span class="summary-label">${isVi?'Đang triển khai':'In progress'}</span><strong>${departmentsInProgress}</strong><div>${isVi?'Phòng ban đang đi qua wave':'Moving through active wave'}</div></div>
-        <div class="deploy-summary-card"><span class="summary-label">Champion</span><strong>${getChampionPercent(state)}%</strong><div>${getNumberValue(state.kpiValues.championPass)}/${DEPLOY_CONFIG.championTarget} ${isVi?'đã pass':'passed'}</div></div>
-        <div class="deploy-summary-card summary-alert"><span class="summary-label">${isVi?'Tín hiệu đỏ':'Red signals'}</span><strong>${redSignals}</strong><div>${blockedDepartments} ${isVi?'chặn':'blocked'} · ${redKpis} KPI ${isVi?'đỏ':'red'}</div></div>
-      </section>
-
-      <!-- ═══ Tab bar ═══ -->
-      <nav class="deploy-tabs">
-        <button class="deploy-tab ${at==='overview'?'active':''}" data-tab="overview" onclick="switchDeployTab('overview')">${isVi?'Tổng quan':'Overview'}</button>
-        <button class="deploy-tab ${at==='departments'?'active':''}" data-tab="departments" onclick="switchDeployTab('departments')">${isVi?'Phòng ban':'Departments'}</button>
-        <button class="deploy-tab ${at==='readiness'?'active':''}" data-tab="readiness" onclick="switchDeployTab('readiness')">${isVi?'Readiness & Gate':'Readiness & Gate'}</button>
-        <button class="deploy-tab ${at==='command'?'active':''}" data-tab="command" onclick="switchDeployTab('command')">Command Center</button>
-        <button class="deploy-tab ${at==='docs'?'active':''}" data-tab="docs" onclick="switchDeployTab('docs')">${isVi?'Tài liệu':'Documents'}</button>
-      </nav>
-
-      <!-- ═══ TAB 1: Tổng quan ═══ -->
-      <div class="deploy-tab-panel ${at==='overview'?'active':''}" id="dtab-overview">
-        <section class="deploy-section">
-          <div class="deploy-section-head"><h2>${isVi?'Lộ trình 5 pha':'Five-phase roadmap'}</h2><span>${isVi?'Nhấn để chuyển pha đang theo dõi':'Click to set active phase'}</span></div>
-          <div class="deploy-phase-timeline">${DEPLOY_CONFIG.phases.map((phase)=>renderPhaseNode(state,phase)).join('<div class="phase-connector"></div>')}</div>
-        </section>
-        <section class="deploy-section">
-          <div class="deploy-section-head"><h2>${isVi?'7 trụ triển khai':'Seven deployment pillars'}</h2><span>${isVi?'Thiếu bất kỳ trụ nào = chưa go-live':'Missing any pillar = no go-live'}</span></div>
-          <div class="deploy-pillar-grid">${DEPLOY_CONFIG.pillars.map((pillar)=>`<div class="deploy-pillar-card"><h3>${pillar.title}</h3><div class="pillar-owner">${pillar.owner}</div><p>${pillar.deliverable}</p><div class="pillar-pass">${pillar.pass}</div></div>`).join('')}</div>
-        </section>
-        <section class="deploy-section">
-          <div class="deploy-section-head"><h2>${isVi?'KPI triển khai':'Deployment KPIs'}</h2><span>${isVi?'Nhập giá trị thực tế':'Enter current values'}</span></div>
-          <div class="kpi-mini-grid">${DEPLOY_CONFIG.kpis.map((kpi)=>renderKpiCard(state,kpi)).join('')}</div>
-        </section>
+// ── Render: hero + summary ────────────────────────────────────────────────
+function renderDeployHero(){
+  const phase = deployGetPhaseDef(deployCurrentPhase());
+  const cw = deployCurrentWeek();
+  const wk = deployGetWeek(cw) || {label:'—', date:'—'};
+  const cl = deployChecklistDoneCount(phase.id);
+  return `
+  <section class="deploy-hero">
+    <div class="deploy-hero-main">
+      <span class="deploy-kicker">Triển khai vận hành · ISO 9001:2015</span>
+      <h1>Command Center triển khai vận hành</h1>
+      <p>12 tuần · 10 phòng ban · 7 trụ · cadence Thứ Bảy 9:00. State chia sẻ qua backend.</p>
+      <div class="deploy-hero-actions">
+        <a class="deploy-action-link" href="../mom/docs/operations/work-instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html" target="_blank">WI-106 Master plan</a>
+        <a class="deploy-action-link" href="../mom/docs/operations/work-instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html" target="_blank">WI-105 Navigation</a>
+        <a class="deploy-action-link" href="../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html" target="_blank">ANNEX-114 Runbook</a>
       </div>
-
-      <!-- ═══ TAB 2: Phòng ban ═══ -->
-      <div class="deploy-tab-panel ${at==='departments'?'active':''}" id="dtab-departments">
-        <section class="deploy-section">
-          <div class="deploy-section-head"><h2>${isVi?'Wave rollout':'Wave rollout'}</h2><span>${isVi?'Mỗi wave có readiness và support riêng':'Each wave has its own readiness and support'}</span></div>
-          <div class="deploy-wave-grid">${[1,2,3].map((wave)=>renderWaveColumn(state,wave)).join('')}</div>
-        </section>
-        <section class="deploy-section">
-          <div class="deploy-section-head"><h2>${isVi?'Navigator theo phòng ban':'Department navigator'}</h2><span>${isVi?'Cửa vào tài liệu và readiness cho từng phòng':'Document entry point per department'}</span></div>
-          <div class="deploy-dept-grid">${DEPLOY_CONFIG.departments.map((dept)=>renderDepartmentCard(state,dept)).join('')}</div>
-        </section>
-      </div>
-
-      <!-- ═══ TAB 3: Readiness & Gate ═══ -->
-      <div class="deploy-tab-panel ${at==='readiness'?'active':''}" id="dtab-readiness">
-        <section class="deploy-section">
-          <div class="deploy-section-head"><h2>${isVi?'Bảng readiness':'Readiness board'}</h2><span>${isVi?'Nhấn ô để chuyển trạng thái':'Click a cell to cycle status'}</span></div>
-          <div class="deploy-table-wrap">
-            <table class="deploy-heatmap">
-              <thead>
-                <tr>
-                  <th>${isVi?'Phòng ban':'Department'}</th>
-                  <th>Wave</th>
-                  ${DEPLOY_CONFIG.readinessDimensions.map((dim)=>`<th title="${dim.help}">${dim.label}</th>`).join('')}
-                  <th>${isVi?'Tiến độ':'Progress'}</th>
-                </tr>
-              </thead>
-              <tbody>${DEPLOY_CONFIG.departments.map((dept)=>renderReadinessRow(state,dept)).join('')}</tbody>
-            </table>
-          </div>
-          <div class="heatmap-legend">
-            <span class="hm-legend-item"><span class="hm-dot hm-pending"></span>${isVi?'Chưa bắt đầu':'Not started'}</span>
-            <span class="hm-legend-item"><span class="hm-dot hm-in_progress"></span>${isVi?'Đang thực hiện':'In progress'}</span>
-            <span class="hm-legend-item"><span class="hm-dot hm-completed"></span>${isVi?'Hoàn thành':'Completed'}</span>
-            <span class="hm-legend-item"><span class="hm-dot hm-blocked"></span>${isVi?'Bị chặn':'Blocked'}</span>
-          </div>
-        </section>
-        <section class="deploy-section">
-          <div class="deploy-section-head"><h2>${isVi?'Checklist pha hiện tại':'Current phase checklist'}</h2><span>${activePhase.label} · ${activePhase.title}</span></div>
-          <div class="checklist-grid">${checklist.map((item,index)=>{const key=state.currentPhase+'-'+index;const checked=!!state.checklistItems[key];return `<label class="checklist-item ${checked?'checked':''}"><input type="checkbox" ${checked?'checked':''} onchange="toggleChecklist('${key}', this.checked)"><span class="checklist-code">${item.code}</span><span class="checklist-text">${item.text}</span></label>`;}).join('')}</div>
-          <div class="deploy-links-compact"><a href="../mom/docs/operations/work-instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html" target="_blank">WI-106</a><a href="../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html" target="_blank">ANNEX-114</a><a href="../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html" target="_blank">ANNEX-117</a></div>
-        </section>
-      </div>
-
-      <!-- ═══ TAB 4: Command Center ═══ -->
-      <div class="deploy-tab-panel ${at==='command'?'active':''}" id="dtab-command">
-        <section class="deploy-row-2col">
-          <div class="deploy-section">
-            <div class="deploy-section-head"><h2>${isVi?'Issue severity':'Issue severity'}</h2><span>${isVi?'Cập nhật signal':'Update signals'}</span></div>
-            <div class="command-card-grid">
-              <div class="command-card"><span class="command-label">Sev-1</span><input type="number" min="0" value="${getNumberValue(state.kpiValues.sev1Open)}" onchange="updateMetric('sev1Open', this.value)"><small>${isVi?'Dừng sản xuất / rollback signal':'Stop / rollback signal'}</small></div>
-              <div class="command-card"><span class="command-label">Sev-2</span><input type="number" min="0" value="${getNumberValue(state.kpiValues.sev2Open)}" onchange="updateMetric('sev2Open', this.value)"><small>${isVi?'Cần workaround và review nhanh':'Needs workaround and fast review'}</small></div>
-              <div class="command-card"><span class="command-label">Sev-3</span><input type="number" min="0" value="${getNumberValue(state.kpiValues.sev3Open)}" onchange="updateMetric('sev3Open', this.value)"><small>${isVi?'Đóng trong ngày / backlog':'Same-day close or backlog'}</small></div>
-              <div class="command-card"><span class="command-label">${isVi?'Champion pass':'Champion passed'}</span><input type="number" min="0" value="${getNumberValue(state.kpiValues.championPass)}" onchange="updateMetric('championPass', this.value)"><small>${DEPLOY_CONFIG.championTarget} ${isVi?'mục tiêu':'target'}</small></div>
-            </div>
-          </div>
-          <div class="deploy-section">
-            <div class="deploy-section-head"><h2>${isVi?'Lịch điều hành':'Meeting cadence'}</h2></div>
-            <div class="cadence-list">${DEPLOY_CONFIG.commandCadence.map((item)=>`<div class="cadence-item"><strong>${item.title}</strong><span>${item.cadence}</span><p>${item.owner} · ${item.purpose}</p></div>`).join('')}</div>
-          </div>
-        </section>
-      </div>
-
-      <!-- ═══ TAB 5: Tài liệu ═══ -->
-      <div class="deploy-tab-panel ${at==='docs'?'active':''}" id="dtab-docs">
-        <section class="deploy-section">
-          <div class="deploy-section-head"><h2>${isVi?'Document hub':'Document hub'}</h2><span>${isVi?'Tài liệu dùng nhiều nhất trong triển khai':'Most-used during rollout'}</span></div>
-          <div class="doc-group-grid">${DEPLOY_CONFIG.docsByGroup.map((group)=>`<div class="doc-group-card"><h3>${group.title}</h3><p>${group.subtitle}</p><div class="doc-group-links">${group.items.map((item)=>`<a class="deploy-doc-card" href="${item.path}" target="_blank"><span class="deploy-doc-code">${item.code}</span><span class="deploy-doc-title">${item.title}</span></a>`).join('')}</div></div>`).join('')}</div>
-        </section>
-      </div>
-
-      <div class="deploy-footer"><span>${isVi?'Cập nhật lần cuối':'Last updated'}: ${state.lastUpdated?new Date(state.lastUpdated).toLocaleString('vi-VN'):'-'}</span><button class="deploy-btn-reset" onclick="resetDeployState()">${isVi?'Reset dữ liệu':'Reset data'}</button></div>
     </div>
-  `;
+    <div class="deploy-hero-side">
+      <div class="hero-side-card hero-phase" style="border-color:${phase.color}">
+        <span class="hero-side-label">Pha hiện tại</span>
+        <strong>${deployEscape(phase.label)}</strong>
+        <div>${deployEscape(phase.title)}</div>
+        <div class="hero-side-meta">${deployEscape(phase.weeks)}</div>
+      </div>
+      <div class="hero-side-card">
+        <span class="hero-side-label">Tuần đang theo dõi</span>
+        <strong>W${cw} · ${deployFmtDate(wk.date)}</strong>
+        <div>${deployEscape(wk.label || '—')}</div>
+        <div class="hero-side-meta">Checklist ${cl.done}/${cl.total}</div>
+      </div>
+    </div>
+  </section>`;
 }
 
-function cycleReadiness(deptId,dimId){const state=loadDeployState();const current=(((state.deptReadiness||{})[deptId]||{})[dimId])||'pending';const cycle=['pending','in_progress','completed','blocked'];state.deptReadiness[deptId][dimId]=cycle[(cycle.indexOf(current)+1)%cycle.length];state.lastUpdated=new Date().toISOString();saveDeployState(state);renderDeployDashboard();}
-function setDeployPhase(phaseId){const state=loadDeployState();const ids=DEPLOY_CONFIG.phases.map((phase)=>phase.id);const index=ids.indexOf(phaseId);ids.forEach((id,i)=>{if(i<index)state.phaseStatus[id]='completed';else if(i===index)state.phaseStatus[id]='in_progress';else state.phaseStatus[id]='pending';});state.currentPhase=phaseId;state.lastUpdated=new Date().toISOString();saveDeployState(state);renderDeployDashboard();}
-function updateMetric(key,value){const state=loadDeployState();state.kpiValues[key]=value;state.lastUpdated=new Date().toISOString();saveDeployState(state);renderDeployDashboard();}
-function toggleChecklist(key,checked){const state=loadDeployState();state.checklistItems[key]=checked;state.lastUpdated=new Date().toISOString();saveDeployState(state);}
-function resetDeployState(){if(!confirm('Reset toàn bộ dữ liệu triển khai?'))return;localStorage.removeItem(DEPLOY_STORAGE_KEY);renderDeployDashboard();}
+function renderDeploySummary(){
+  const ready = DEPLOY_CONFIG.departments.filter(d => deployDeptProgress(d.id) >= 1).length;
+  const total = DEPLOY_CONFIG.departments.length;
+  const inProg = DEPLOY_CONFIG.departments.filter(d => { const p = deployDeptProgress(d.id); return p > 0 && p < 1; }).length;
+  const chPass = deployChampionCount();
+  const chPct = Math.min(100, Math.round((chPass / DEPLOY_CONFIG.championTarget) * 100));
+  const blocked = DEPLOY_CONFIG.departments.filter(d => deployDeptHasBlocker(d.id)).length;
+  const red = deployRedSignals();
+  const issuesOpen = deployIssuesOpen().length;
+  return `
+  <section class="deploy-summary-grid">
+    <div class="deploy-summary-card">
+      <span class="summary-label">Phòng ban sẵn sàng</span>
+      <strong>${ready}/${total}</strong>
+      <div>${inProg} đang đi qua wave</div>
+    </div>
+    <div class="deploy-summary-card">
+      <span class="summary-label">Champion pass OJT</span>
+      <strong>${chPct}%</strong>
+      <div>${chPass}/${DEPLOY_CONFIG.championTarget} đã pass</div>
+    </div>
+    <div class="deploy-summary-card">
+      <span class="summary-label">Issue đang mở</span>
+      <strong>${issuesOpen}</strong>
+      <div>Severity board live</div>
+    </div>
+    <div class="deploy-summary-card ${red > 0 ? 'summary-alert' : ''}">
+      <span class="summary-label">Tín hiệu đỏ</span>
+      <strong>${red}</strong>
+      <div>${blocked} dept chặn · ${red - blocked} KPI/sev đỏ</div>
+    </div>
+  </section>`;
+}
+
+// ── Tab 1: Overview ───────────────────────────────────────────────────────
+function renderTabOverview(){
+  const kv = (DeployState.readiness && DeployState.readiness.kpiValues) || {};
+  return `
+  <div class="deploy-tab-panel active" id="dtab-overview">
+    <section class="deploy-section">
+      <div class="deploy-section-head"><h2>Lộ trình 5 pha</h2><span>Nhấn pha để chuyển — chỉ CEO/QMS</span></div>
+      <div class="deploy-phase-timeline">
+        ${DEPLOY_CONFIG.phases.map(p => renderPhaseNode(p)).join('<div class="phase-connector"></div>')}
+      </div>
+    </section>
+    <section class="deploy-section">
+      <div class="deploy-section-head"><h2>7 trụ triển khai</h2><span>Thiếu trụ nào = chưa go-live</span></div>
+      <div class="deploy-pillar-grid">
+        ${DEPLOY_CONFIG.pillars.map(pl => `
+          <div class="deploy-pillar-card">
+            <h3>${deployEscape(pl.title)}</h3>
+            <div class="pillar-owner">${deployEscape(pl.owner)}</div>
+            <div class="pillar-pass">${deployEscape(pl.pass)}</div>
+          </div>`).join('')}
+      </div>
+    </section>
+    <section class="deploy-section">
+      <div class="deploy-section-head"><h2>KPI triển khai</h2><span>${DeployState.me.canEdit ? 'Nhập giá trị thực tế' : 'Chỉ đọc — không có quyền edit'}</span></div>
+      <div class="kpi-mini-grid">
+        ${DEPLOY_CONFIG.kpis.map(k => renderKpiCard(k, kv[k.id])).join('')}
+      </div>
+    </section>
+    <section class="deploy-section">
+      <div class="deploy-section-head"><h2>Cadence điều hành</h2><span>Nhịp họp cố định</span></div>
+      <div class="cadence-list">
+        ${DEPLOY_CONFIG.commandCadence.map(c => `
+          <div class="cadence-item">
+            <strong>${deployEscape(c.title)}</strong>
+            <span class="cadence-period">${deployEscape(c.cadence)}</span>
+            <p>${deployEscape(c.owner)} · ${deployEscape(c.purpose)}</p>
+          </div>`).join('')}
+      </div>
+    </section>
+  </div>`;
+}
+
+function renderPhaseNode(phase){
+  const st = deployPhaseStatus(phase.id);
+  const cls = st === 'completed' ? 'phase-done' : st === 'in_progress' ? 'phase-active' : 'phase-pending';
+  const disabled = !DeployState.me.canSignOff;
+  return `
+  <button class="phase-node ${cls}" ${disabled ? 'disabled aria-disabled="true"' : ''} onclick="deploySetPhase('${phase.id}')" title="${deployEscape(phase.title)}">
+    <div class="phase-info">
+      <strong>${deployEscape(phase.label)}</strong>
+      <span>${deployEscape(phase.title)}</span>
+      <span class="phase-weeks">${deployEscape(phase.weeks)}</span>
+    </div>
+    <div class="phase-status-dot" style="background:${phase.color}"></div>
+  </button>`;
+}
+
+function renderKpiCard(kpi, value){
+  const v = value == null ? '' : String(value);
+  const rag = deployKpiRag(kpi, v);
+  const ro = !DeployState.me.canEdit;
+  return `
+  <div class="kpi-mini-card kpi-rag-${rag}">
+    <div class="kpi-mini-icon">${deployEscape(kpi.short)}</div>
+    <div class="kpi-mini-body">
+      <div class="kpi-mini-label">${deployEscape(kpi.label)}</div>
+      <div class="kpi-mini-target">Target ${deployEscape(kpi.target)}${deployEscape(kpi.unit)}</div>
+    </div>
+    <input type="text" class="kpi-mini-input" value="${deployEscape(v)}" placeholder="—" ${ro ? 'disabled' : ''} onchange="deployUpdateMetric('${deployEscape(kpi.id)}', this.value)">
+  </div>`;
+}
+
+// ── Tab 2: Lộ trình (Timeline) ────────────────────────────────────────────
+function renderTabTimeline(){
+  const weeks = (DeployState.program && DeployState.program.weeks) || [];
+  const cw = deployCurrentWeek();
+  return `
+  <div class="deploy-tab-panel active" id="dtab-timeline">
+    <section class="deploy-section">
+      <div class="deploy-section-head">
+        <h2>Lộ trình 12 tuần · Thứ Bảy 9:00</h2>
+        <span>Click một tuần để mở panel chi tiết</span>
+      </div>
+      <div class="deploy-timeline">
+        ${weeks.map(w => renderTimelineWeek(w, cw)).join('')}
+      </div>
+    </section>
+    <section class="deploy-section">
+      <div class="deploy-section-head"><h2>Gate decision log</h2><span>Tuần đã ký Go/No-Go</span></div>
+      <div class="deploy-decision-log">
+        ${renderDecisionLog(weeks)}
+      </div>
+    </section>
+  </div>`;
+}
+
+function renderTimelineWeek(w, currentWeek){
+  const phase = deployGetPhaseDef(w.phase);
+  const isCurrent = (w.n|0) === (currentWeek|0);
+  const so = w.signOff;
+  let statusClass = w.status === 'completed' ? 'tlw-done' : w.status === 'blocked' ? 'tlw-blocked' : w.status === 'conditional' ? 'tlw-cond' : isCurrent ? 'tlw-current' : 'tlw-pending';
+  const decisionBadge = so ? `<span class="tlw-decision tlw-decision-${so.decision}">${so.decision === 'go' ? '✓ GO' : so.decision === 'no_go' ? '✗ NO-GO' : '◐ COND'}</span>` : '';
+  return `
+  <button class="tl-week ${statusClass}" onclick="deployOpenWeek(${w.n|0})" style="--phase-color:${phase.color}">
+    <div class="tlw-head">
+      <span class="tlw-num">W${w.n|0}</span>
+      <span class="tlw-date">${deployFmtDate(w.date)}</span>
+    </div>
+    <div class="tlw-phase">${deployEscape(phase.label)}</div>
+    <div class="tlw-label">${deployEscape(w.label || '')}</div>
+    <div class="tlw-foot">
+      <span class="tlw-gate">${(w.gateCodes||[]).join(' · ') || '—'}</span>
+      ${decisionBadge}
+    </div>
+  </button>`;
+}
+
+function renderDecisionLog(weeks){
+  const signed = weeks.filter(w => w.signOff).sort((a,b) => (b.n|0) - (a.n|0));
+  if (!signed.length) return '<div class="deploy-empty">Chưa có quyết định gate nào được ký.</div>';
+  return `<table class="deploy-decision-table">
+    <thead><tr><th>Tuần</th><th>Ngày họp</th><th>Quyết định</th><th>Ký bởi</th><th>Ghi chú</th></tr></thead>
+    <tbody>${signed.map(w => `
+      <tr>
+        <td><strong>W${w.n|0}</strong> ${deployEscape(w.label||'')}</td>
+        <td>${deployFmtDate(w.date)}</td>
+        <td><span class="tlw-decision tlw-decision-${w.signOff.decision}">${w.signOff.decision === 'go' ? '✓ GO' : w.signOff.decision === 'no_go' ? '✗ NO-GO' : '◐ COND'}</span></td>
+        <td>${deployEscape(w.signOff.name || w.signOff.by || '')}<br><small>${deployIsoToVi(w.signOff.at)}</small></td>
+        <td>${deployEscape(w.signOff.notes || '')}</td>
+      </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+// ── Tab 3: Họp & Gate ─────────────────────────────────────────────────────
+function renderTabMeetings(){
+  const meetings = ((DeployState.meetings && DeployState.meetings.meetings) || []).slice().sort((a,b) => (b.weekN|0) - (a.weekN|0));
+  const tpl = (DeployState.meetings && DeployState.meetings.agendaTemplate) || [];
+  return `
+  <div class="deploy-tab-panel active" id="dtab-meetings">
+    <section class="deploy-section">
+      <div class="deploy-section-head">
+        <h2>Khuôn họp Thứ Bảy 9:00 — 60 phút</h2>
+        <span>Mẫu agenda cố định, lặp đúng mỗi tuần</span>
+      </div>
+      <div class="agenda-template-grid">
+        ${tpl.map(t => `
+          <div class="agenda-slot">
+            <span class="agenda-slot-time">${deployEscape(t.slot)}'</span>
+            <strong>${deployEscape(t.label)}</strong>
+            <div class="agenda-owner">${deployEscape(t.owner)}</div>
+            <p>${deployEscape(t.note)}</p>
+          </div>`).join('')}
+      </div>
+    </section>
+    <section class="deploy-section">
+      <div class="deploy-section-head">
+        <h2>Lịch họp & biên bản</h2>
+        <span>${meetings.length} biên bản · click một tuần ở tab Lộ trình để tạo mới</span>
+      </div>
+      ${meetings.length === 0 ? '<div class="deploy-empty">Chưa có biên bản. Mở tab <strong>Lộ trình</strong>, click tuần và bấm <strong>Tạo biên bản</strong>.</div>' : `
+      <div class="deploy-meeting-list">
+        ${meetings.map(m => renderMeetingCard(m)).join('')}
+      </div>`}
+    </section>
+  </div>`;
+}
+
+function renderMeetingCard(m){
+  const week = deployGetWeek(m.weekN);
+  const phase = week ? deployGetPhaseDef(week.phase) : null;
+  const so = m.signOff;
+  return `
+  <div class="meeting-card ${so ? 'meeting-locked' : ''}">
+    <div class="meeting-card-head">
+      <div>
+        <strong>W${m.weekN|0} · ${deployEscape(m.title || (week ? week.label : ''))}</strong>
+        <div class="meeting-meta">${deployFmtDate(m.date || (week && week.date))} · ${phase ? deployEscape(phase.label) : ''}</div>
+      </div>
+      ${so
+        ? `<span class="meeting-signoff-badge">🔒 Ký bởi ${deployEscape(so.name || so.by)}<br><small>${deployIsoToVi(so.at)}</small></span>`
+        : `<button class="deploy-btn" onclick="deployOpenWeek(${m.weekN|0})">Mở chi tiết →</button>`
+      }
+    </div>
+    ${m.minutes ? `<div class="meeting-minutes-preview">${deployEscape(m.minutes.substring(0,200))}${m.minutes.length > 200 ? '…' : ''}</div>` : ''}
+    ${(m.decisions && m.decisions.length) ? `
+      <div class="meeting-decisions">
+        ${m.decisions.map(d => `<span class="meeting-decision-chip">• ${deployEscape(d)}</span>`).join('')}
+      </div>` : ''}
+  </div>`;
+}
+
+// ── Tab 4: Phòng ban + champion ───────────────────────────────────────────
+function renderTabDepartments(){
+  return `
+  <div class="deploy-tab-panel active" id="dtab-departments">
+    <section class="deploy-section">
+      <div class="deploy-section-head"><h2>Wave rollout</h2><span>3 wave · go-live theo thứ tự rủi ro</span></div>
+      <div class="deploy-wave-grid">
+        ${[1,2,3].map(w => renderWaveColumn(w)).join('')}
+      </div>
+    </section>
+    <section class="deploy-section">
+      <div class="deploy-section-head"><h2>Bảng readiness 6 chiều</h2><span>Click ô để cycle pending → in_progress → completed → blocked</span></div>
+      <div class="deploy-table-wrap">
+        <table class="deploy-heatmap">
+          <thead>
+            <tr>
+              <th>Phòng ban</th>
+              <th>Wave</th>
+              ${DEPLOY_CONFIG.readinessDimensions.map(dim => `<th title="${deployEscape(dim.help)}">${deployEscape(dim.label)}</th>`).join('')}
+              <th>Tiến độ</th>
+            </tr>
+          </thead>
+          <tbody>${DEPLOY_CONFIG.departments.map(d => renderReadinessRow(d)).join('')}</tbody>
+        </table>
+      </div>
+      <div class="heatmap-legend">
+        <span class="hm-legend-item"><span class="hm-dot hm-pending">○</span>Chưa bắt đầu</span>
+        <span class="hm-legend-item"><span class="hm-dot hm-in_progress">◐</span>Đang thực hiện</span>
+        <span class="hm-legend-item"><span class="hm-dot hm-completed">✓</span>Hoàn thành</span>
+        <span class="hm-legend-item"><span class="hm-dot hm-blocked">⚠</span>Bị chặn</span>
+      </div>
+    </section>
+    <section class="deploy-section">
+      <div class="deploy-section-head"><h2>Champion roster</h2><span>Primary + Backup mỗi phòng — ${deployChampionCount()}/${DEPLOY_CONFIG.championTarget} đã pass OJT</span></div>
+      <div class="champion-grid">
+        ${DEPLOY_CONFIG.departments.map(d => renderChampionCard(d)).join('')}
+      </div>
+    </section>
+  </div>`;
+}
+
+function renderWaveColumn(wave){
+  const depts = DEPLOY_CONFIG.departments.filter(d => d.wave === wave);
+  return `
+  <div class="wave-card">
+    <div class="wave-card-head"><strong>Wave ${wave}</strong><span>${depts.length} phòng</span></div>
+    <div class="wave-card-body">
+      ${depts.map(d => {
+        const pct = Math.round(deployDeptProgress(d.id) * 100);
+        return `
+        <div class="wave-dept-row">
+          <div class="wave-dept-main">
+            <span class="wave-color" style="background:${d.color}"></span>
+            <span>${deployEscape(d.label)}</span>
+          </div>
+          <span class="wave-score">${pct}%</span>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+function renderReadinessRow(dept){
+  const r = (DeployState.readiness && DeployState.readiness.deptReadiness && DeployState.readiness.deptReadiness[dept.id]) || {};
+  const pct = Math.round(deployDeptProgress(dept.id) * 100);
+  const ro = !DeployState.me.canEdit;
+  return `
+  <tr>
+    <td>
+      <div class="readiness-dept-name">
+        <span class="wave-color" style="background:${dept.color}"></span>
+        <span>${deployEscape(dept.label)}</span>
+        <small>${deployEscape(dept.owner)}</small>
+      </div>
+    </td>
+    <td><span class="deploy-wave-badge wave-${dept.wave}">Wave ${dept.wave}</span></td>
+    ${DEPLOY_CONFIG.readinessDimensions.map(dim => {
+      const v = r[dim.id] || 'pending';
+      const onClick = ro ? '' : `onclick="deployCycleReadiness('${dept.id}','${dim.id}')"`;
+      return `<td class="heatmap-cell hm-${v} ${ro ? 'hm-readonly' : ''}" ${onClick} title="${deployEscape(dept.label)} · ${deployEscape(dim.label)} · ${v}">${deployStatusIcon(v)}</td>`;
+    }).join('')}
+    <td><strong>${pct}%</strong><div class="dept-mini-bar"><span style="width:${pct}%;background:${dept.color}"></span></div></td>
+  </tr>`;
+}
+
+function renderChampionCard(dept){
+  const ch = (DeployState.champions && DeployState.champions.champions && DeployState.champions.champions[dept.id]) || {primary:{}, backup:{}, shift:'A'};
+  const ro = !DeployState.me.canEdit;
+  return `
+  <div class="champion-card">
+    <div class="champion-card-head">
+      <span class="wave-color" style="background:${dept.color}"></span>
+      <strong>${deployEscape(dept.label)}</strong>
+      <span class="champion-shift">Ca ${deployEscape(ch.shift || 'A')}</span>
+    </div>
+    <div class="champion-form">
+      <div class="champion-slot">
+        <span class="champion-slot-label">Champion</span>
+        <input type="text" placeholder="Tên" value="${deployEscape(ch.primary?.name)}" ${ro?'disabled':''} data-deploy-champion="${dept.id}|primary|name">
+        <input type="text" placeholder="SĐT" value="${deployEscape(ch.primary?.phone)}" ${ro?'disabled':''} data-deploy-champion="${dept.id}|primary|phone">
+        <label class="champion-ojt"><input type="checkbox" ${ch.primary?.ojtPass?'checked':''} ${ro?'disabled':''} data-deploy-champion="${dept.id}|primary|ojtPass">OJT pass</label>
+      </div>
+      <div class="champion-slot">
+        <span class="champion-slot-label">Backup</span>
+        <input type="text" placeholder="Tên" value="${deployEscape(ch.backup?.name)}" ${ro?'disabled':''} data-deploy-champion="${dept.id}|backup|name">
+        <input type="text" placeholder="SĐT" value="${deployEscape(ch.backup?.phone)}" ${ro?'disabled':''} data-deploy-champion="${dept.id}|backup|phone">
+        <label class="champion-ojt"><input type="checkbox" ${ch.backup?.ojtPass?'checked':''} ${ro?'disabled':''} data-deploy-champion="${dept.id}|backup|ojtPass">OJT pass</label>
+      </div>
+      <button class="deploy-btn deploy-btn-sm" ${ro?'disabled':''} onclick="deploySaveChampion('${dept.id}')">Lưu</button>
+    </div>
+  </div>`;
+}
+
+// ── Tab 5: Tài liệu ───────────────────────────────────────────────────────
+function renderTabDocs(){
+  const drills = ((DeployState.drills && DeployState.drills.drills) || []).slice().sort((a,b) => (b.recordedAt || '').localeCompare(a.recordedAt || ''));
+  const drillStats = computeDrillStats(drills);
+  return `
+  <div class="deploy-tab-panel active" id="dtab-docs">
+    <section class="deploy-section">
+      <div class="deploy-section-head"><h2>Document hub</h2><span>Quick links theo nhóm vai trò</span></div>
+      <div class="doc-group-grid">
+        ${DEPLOY_CONFIG.docsByGroup.map(g => `
+          <div class="doc-group-card">
+            <h3>${deployEscape(g.title)}</h3>
+            <p>${deployEscape(g.subtitle)}</p>
+            <div class="doc-group-links">
+              ${g.items.map(it => `
+                <a class="deploy-doc-card" href="${deployEscape(it.path)}" target="_blank">
+                  <span class="deploy-doc-code">${deployEscape(it.code)}</span>
+                  <span class="deploy-doc-title">${deployEscape(it.title)}</span>
+                </a>`).join('')}
+            </div>
+          </div>`).join('')}
+      </div>
+    </section>
+    <section class="deploy-section">
+      <div class="deploy-section-head"><h2>Retrieval drill recorder · KPI ≤3 phút</h2><span>${drillStats.total} drill · pass ${drillStats.passPct}%</span></div>
+      <div class="drill-recorder">
+        <form onsubmit="event.preventDefault(); deployRecordDrill();" class="drill-form" id="deployDrillForm">
+          <input type="date" id="drillDate" value="${deployTodayIso()}" ${DeployState.me.canEdit?'':'disabled'}>
+          <input type="text" id="drillPerson" placeholder="Người thực hiện" ${DeployState.me.canEdit?'':'disabled'}>
+          <select id="drillDept" ${DeployState.me.canEdit?'':'disabled'}>
+            <option value="">— Phòng —</option>
+            ${DEPLOY_CONFIG.departments.map(d => `<option value="${d.id}">${deployEscape(d.label)}</option>`).join('')}
+          </select>
+          <input type="text" id="drillDoc" placeholder="Mã tài liệu (vd SOP-501)" ${DeployState.me.canEdit?'':'disabled'}>
+          <input type="number" id="drillSeconds" placeholder="Số giây" min="1" max="900" ${DeployState.me.canEdit?'':'disabled'}>
+          <button type="submit" class="deploy-btn" ${DeployState.me.canEdit?'':'disabled'}>Ghi drill</button>
+        </form>
+        <div class="drill-log">
+          ${drills.slice(0, 10).map(d => `
+            <div class="drill-row drill-${d.pass ? 'pass' : 'fail'}">
+              <span class="drill-pass-icon">${d.pass ? '✓' : '✗'}</span>
+              <span class="drill-meta"><strong>${deployEscape(d.person)}</strong> · ${deployEscape(d.deptId)} · ${deployEscape(d.docCode)}</span>
+              <span class="drill-seconds">${d.seconds}s</span>
+              <small>${deployFmtDate(d.date)}</small>
+            </div>`).join('')}
+          ${drills.length === 0 ? '<div class="deploy-empty">Chưa có drill nào. Mục tiêu KPI: ≤180 giây (3 phút).</div>' : ''}
+        </div>
+      </div>
+    </section>
+  </div>`;
+}
+
+function computeDrillStats(drills){
+  const total = drills.length;
+  const pass = drills.filter(d => d.pass).length;
+  return {total, pass, passPct: total ? Math.round(pass*100/total) : 0};
+}
+
+// ── Tab 6: Issues ─────────────────────────────────────────────────────────
+function renderTabIssues(){
+  const issues = ((DeployState.issues && DeployState.issues.issues) || []).slice().sort((a,b) => (a.sev|0) - (b.sev|0) || (b.updatedAt||'').localeCompare(a.updatedAt||''));
+  const open = issues.filter(i => i.status !== 'closed').length;
+  const closed = issues.length - open;
+  return `
+  <div class="deploy-tab-panel active" id="dtab-issues">
+    <section class="deploy-section">
+      <div class="deploy-section-head">
+        <h2>Issue register · ${open} mở · ${closed} đóng</h2>
+        <span>Severity board live</span>
+      </div>
+      <div class="issue-toolbar">
+        ${DeployState.me.canEdit ? `<button class="deploy-btn" onclick="deployOpenIssueForm()">+ Tạo issue</button>` : ''}
+      </div>
+      <div class="issue-list">
+        ${issues.length === 0 ? '<div class="deploy-empty">Chưa có issue nào. Mở severity board khi pilot bắt đầu (W4).</div>' : ''}
+        ${issues.map(i => renderIssueRow(i)).join('')}
+      </div>
+    </section>
+  </div>`;
+}
+
+function renderIssueRow(i){
+  const dept = deployGetDept(i.deptId);
+  return `
+  <div class="issue-row issue-sev-${i.sev|0} issue-status-${deployEscape(i.status||'open')}">
+    <span class="issue-sev-badge">SEV-${i.sev|0}</span>
+    <div class="issue-main">
+      <strong>${deployEscape(i.title)}</strong>
+      <div class="issue-meta">
+        W${i.weekN|0} · ${dept ? deployEscape(dept.label) : deployEscape(i.deptId)} · Owner ${deployEscape(i.owner || '—')}
+        ${i.capaLink ? ` · <a href="${deployEscape(i.capaLink)}" target="_blank">${deployEscape(i.capaCode || 'CAPA')}</a>` : ''}
+      </div>
+    </div>
+    <div class="issue-actions">
+      ${(i.sev|0) <= 2 && !i.capaLink && DeployState.me.canEdit ? `<button class="deploy-btn deploy-btn-sm" onclick="deployBridgeCapa('${deployEscape(i.id)}')" title="Mở CAPA case từ issue này">→ CAPA</button>` : ''}
+      <select class="issue-status-select" ${DeployState.me.canEdit?'':'disabled'} onchange="deployUpdateIssueStatus('${deployEscape(i.id)}', this.value)">
+        <option value="open" ${i.status==='open'?'selected':''}>Mở</option>
+        <option value="workaround" ${i.status==='workaround'?'selected':''}>Có workaround</option>
+        <option value="closed" ${i.status==='closed'?'selected':''}>Đóng</option>
+      </select>
+    </div>
+  </div>`;
+}
+
+// ── Tab 7: ISO 9001 clause map ────────────────────────────────────────────
+function renderTabIso(){
+  const list = (DeployState.clauses && DeployState.clauses.clauses) || [];
+  const sections = {};
+  list.forEach(c => { (sections[c.section] = sections[c.section] || []).push(c); });
+  const coverage = isoComputeCoverage(list);
+  return `
+  <div class="deploy-tab-panel active" id="dtab-iso">
+    <section class="deploy-section">
+      <div class="deploy-section-head">
+        <h2>ISO 9001:2015 — Bản đồ điều khoản</h2>
+        <span>${coverage.covered}/${coverage.total} điều khoản đã map · ${coverage.pct}% coverage</span>
+      </div>
+      <div class="iso-coverage-bar"><span style="width:${coverage.pct}%"></span></div>
+    </section>
+    ${Object.keys(sections).map(sec => `
+      <section class="deploy-section">
+        <div class="deploy-section-head"><h2>${deployEscape(sec)}</h2><span>${sections[sec].length} điều khoản</span></div>
+        <div class="iso-clause-grid">
+          ${sections[sec].map(c => renderClauseCard(c)).join('')}
+        </div>
+      </section>
+    `).join('')}
+  </div>`;
+}
+
+function isoComputeCoverage(list){
+  const total = list.length;
+  let covered = 0;
+  list.forEach(c => {
+    const hasPillar = Array.isArray(c.pillars) && c.pillars.length > 0;
+    const hasDoc    = Array.isArray(c.docs) && c.docs.length > 0;
+    if (hasPillar && hasDoc) covered++;
+  });
+  return {total, covered, pct: total ? Math.round(covered * 100 / total) : 0};
+}
+
+function renderClauseCard(c){
+  const auditList = (DeployState.audits && DeployState.audits.audits) || [];
+  const findings = [];
+  auditList.forEach(a => (a.findings || []).forEach(f => {
+    if (f.clauseRef === c.code) findings.push({audit: a.id, f});
+  }));
+  const hasFinding = findings.length > 0;
+  const sev = findings.find(x => x.f.severity === 'major') ? 'major' : findings.find(x => x.f.severity === 'minor') ? 'minor' : 'clean';
+  return `
+  <div class="iso-clause-card iso-sev-${sev}">
+    <div class="iso-clause-head">
+      <span class="iso-clause-code">${deployEscape(c.code)}</span>
+      <strong>${deployEscape(c.title)}</strong>
+    </div>
+    <div class="iso-clause-meta">
+      <div class="iso-clause-pillars">
+        ${(c.pillars || []).map(p => {
+          const pl = DEPLOY_CONFIG.pillars.find(x => x.key === p);
+          return `<span class="iso-pillar-chip">${deployEscape(pl ? pl.title : p)}</span>`;
+        }).join('')}
+      </div>
+      <div class="iso-clause-docs">
+        ${(c.docs || []).map(d => `<span class="dwp-doc-chip">${deployEscape(d)}</span>`).join('')}
+      </div>
+    </div>
+    ${hasFinding ? `<div class="iso-clause-findings">⚠ ${findings.length} finding · ${findings.map(x => x.f.severity).join(', ')}</div>` : ''}
+  </div>`;
+}
+
+// ── Tab 8: Audit (internal cycle ISO 9.2) ─────────────────────────────────
+function renderTabAudit(){
+  const audits = ((DeployState.audits && DeployState.audits.audits) || []).slice().sort((a,b) => (a.plannedDate||'').localeCompare(b.plannedDate||''));
+  const totalFindings = audits.reduce((sum, a) => sum + ((a.findings||[]).length), 0);
+  const openFindings  = audits.reduce((sum, a) => sum + ((a.findings||[]).filter(f => f.status !== 'closed').length), 0);
+  return `
+  <div class="deploy-tab-panel active" id="dtab-audit">
+    <section class="deploy-section">
+      <div class="deploy-section-head">
+        <h2>Đánh giá nội bộ (ISO 9.2) — ${audits.length} audit · ${openFindings}/${totalFindings} finding mở</h2>
+        <span>Chu kỳ tối thiểu 1 năm — chia 3-4 quý</span>
+      </div>
+      ${DeployState.me.canEdit ? `<div class="audit-toolbar"><button class="deploy-btn" onclick="deployOpenAuditForm()">+ Lên lịch audit</button></div>` : ''}
+      <div class="audit-list">
+        ${audits.length === 0 ? '<div class="deploy-empty">Chưa có audit nào trong chu kỳ.</div>' : ''}
+        ${audits.map(a => renderAuditCard(a)).join('')}
+      </div>
+    </section>
+  </div>`;
+}
+
+function renderAuditCard(a){
+  const findings = a.findings || [];
+  const major  = findings.filter(f => f.severity === 'major').length;
+  const minor  = findings.filter(f => f.severity === 'minor').length;
+  const obs    = findings.filter(f => f.severity === 'observation').length;
+  const opp    = findings.filter(f => f.severity === 'opportunity').length;
+  const open   = findings.filter(f => f.status !== 'closed').length;
+  return `
+  <div class="audit-card audit-status-${deployEscape(a.status||'scheduled')}">
+    <div class="audit-card-head">
+      <div>
+        <strong>${deployEscape(a.id)} · ${deployEscape(a.cycle)}</strong>
+        <div class="audit-meta">
+          ${a.plannedDate ? 'Dự kiến ' + deployFmtDate(a.plannedDate) : ''}
+          ${a.executedDate ? ' · Thực hiện ' + deployFmtDate(a.executedDate) : ''}
+          · <span class="audit-status-badge">${deployEscape(a.status||'scheduled')}</span>
+        </div>
+      </div>
+      <div class="audit-finding-counts">
+        ${major  ? `<span class="audit-fc fc-major">${major} major</span>` : ''}
+        ${minor  ? `<span class="audit-fc fc-minor">${minor} minor</span>` : ''}
+        ${obs    ? `<span class="audit-fc fc-obs">${obs} obs</span>` : ''}
+        ${opp    ? `<span class="audit-fc fc-opp">${opp} opp</span>` : ''}
+        ${!findings.length ? `<span class="audit-fc fc-empty">— chưa có finding —</span>` : ''}
+      </div>
+    </div>
+    <div class="audit-card-body">
+      <div class="audit-scope">
+        <small>Phạm vi điều khoản:</small> ${(a.scope || []).map(s => `<span class="dwp-doc-chip">Cl ${deployEscape(s)}</span>`).join(' ')}
+      </div>
+      <div class="audit-scope">
+        <small>Phòng ban:</small> ${(a.scopeDepts || []).map(s => `<span class="audit-dept-chip">${deployEscape(s)}</span>`).join(' ')}
+      </div>
+      <div class="audit-scope">
+        <small>Lead auditor:</small> ${deployEscape(a.leadAuditor || '—')}
+      </div>
+    </div>
+    ${findings.length ? `
+      <div class="audit-findings">
+        ${findings.map(f => `
+          <div class="audit-finding audit-finding-${deployEscape(f.severity||'minor')}">
+            <span class="finding-sev-badge">${deployEscape((f.severity||'minor').toUpperCase())}</span>
+            <span class="finding-clause">Cl ${deployEscape(f.clauseRef||'—')}</span>
+            <span class="finding-desc">${deployEscape(f.description||'')}</span>
+            <span class="finding-status">${deployEscape(f.status||'open')}</span>
+            ${f.capaLink ? `<a href="${deployEscape(f.capaLink)}" target="_blank">CAPA</a>` : ''}
+          </div>
+        `).join('')}
+      </div>` : ''}
+    ${DeployState.me.canEdit ? `<div class="audit-actions"><button class="deploy-btn deploy-btn-sm" onclick="deployOpenFindingForm('${deployEscape(a.id)}')">+ Ghi finding</button></div>` : ''}
+  </div>`;
+}
+
+// ── Tab 9: Management Review (ISO 9.3) ────────────────────────────────────
+function renderTabReview(){
+  const reviews = ((DeployState.reviews && DeployState.reviews.reviews) || []).slice().sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  const inputs = (DeployState.reviews && DeployState.reviews.inputTemplate) || [];
+  const outputs = (DeployState.reviews && DeployState.reviews.outputTemplate) || [];
+  return `
+  <div class="deploy-tab-panel active" id="dtab-review">
+    <section class="deploy-section">
+      <div class="deploy-section-head">
+        <h2>Xem xét của lãnh đạo (ISO 9.3) — ${reviews.length} packet</h2>
+        <span>Hằng quý — 12 input + 3 output theo điều khoản 9.3.2 / 9.3.3</span>
+      </div>
+      ${DeployState.me.canEdit ? `<div class="review-toolbar"><button class="deploy-btn" onclick="deployOpenReviewForm()">+ Tạo packet quý mới</button></div>` : ''}
+    </section>
+    ${reviews.length === 0 ? `
+      <section class="deploy-section">
+        <div class="deploy-empty">
+          Chưa có Management Review packet. Mỗi quý CEO + ban điều hành cần họp xem xét.<br>
+          <small>Input template: ${inputs.length} mục — Output template: ${outputs.length} mục.</small>
+        </div>
+      </section>
+    ` : reviews.map(r => renderReviewCard(r, inputs, outputs)).join('')}
+  </div>`;
+}
+
+function renderReviewCard(r, inputs, outputs){
+  const so = r.signOff;
+  const inputsData = r.inputs || {};
+  const outputsData = r.outputs || {};
+  return `
+  <section class="deploy-section review-card ${so?'review-signed':''}">
+    <div class="review-head">
+      <div>
+        <strong>${deployEscape(r.cycle || r.id)}</strong>
+        <div class="review-meta">${deployFmtDate(r.date)} · ${(r.attendees||[]).length} người tham dự</div>
+      </div>
+      ${so ? `<span class="meeting-signoff-badge">🔒 Ký ${deployEscape(so.name||so.by)} · ${deployIsoToVi(so.at)}</span>` : ''}
+    </div>
+    <details class="review-details">
+      <summary>📋 Đầu vào (9.3.2) — ${inputs.length} mục</summary>
+      <div class="review-grid">
+        ${inputs.map(it => `
+          <div class="review-row">
+            <div class="review-row-head">
+              <span class="review-clause">${deployEscape(it.clause)}</span>
+              <strong>${deployEscape(it.label)}</strong>
+            </div>
+            <div class="review-row-value">${deployEscape(inputsData[it.key] || '—')}</div>
+          </div>`).join('')}
+      </div>
+    </details>
+    <details class="review-details">
+      <summary>🎯 Đầu ra (9.3.3) — ${outputs.length} mục</summary>
+      <div class="review-grid">
+        ${outputs.map(it => `
+          <div class="review-row">
+            <div class="review-row-head">
+              <span class="review-clause">${deployEscape(it.clause)}</span>
+              <strong>${deployEscape(it.label)}</strong>
+            </div>
+            <div class="review-row-value">${deployEscape(outputsData[it.key] || '—')}</div>
+          </div>`).join('')}
+      </div>
+    </details>
+    ${!so && DeployState.me.canEdit ? `
+      <div class="review-buttons">
+        <button class="deploy-btn deploy-btn-sm" onclick="deployEditReview('${deployEscape(r.id)}')">Sửa packet</button>
+        ${DeployState.me.canSignOff ? `<button class="deploy-btn deploy-btn-go deploy-btn-sm" onclick="deploySignOffReview('${deployEscape(r.id)}')">🔒 Ký khóa</button>` : ''}
+      </div>` : ''}
+  </section>`;
+}
+
+// ── Week side panel ───────────────────────────────────────────────────────
+function renderWeekPanel(){
+  if (DeployState.activeWeek == null) return '';
+  const wn = DeployState.activeWeek | 0;
+  const w = deployGetWeek(wn);
+  if (!w) return '';
+  const phase = deployGetPhaseDef(w.phase);
+  const cl = (DeployState.readiness && DeployState.readiness.checklistItems) || {};
+  const items = DEPLOY_CONFIG.phaseChecklists[phase.id] || [];
+  const gateItems = items.filter(it => (w.gateCodes || []).includes(it.code));
+  const so = w.signOff;
+  const me = DeployState.me;
+  const meetings = (DeployState.meetings && DeployState.meetings.meetings) || [];
+  const existingMeeting = meetings.find(m => (m.weekN|0) === wn);
+  const issues = ((DeployState.issues && DeployState.issues.issues) || []).filter(i => (i.weekN|0) === wn);
+  const kv = (DeployState.readiness && DeployState.readiness.kpiValues) || {};
+
+  return `
+  <div class="deploy-week-overlay" onclick="deployCloseWeek(event)">
+    <aside class="deploy-week-panel" onclick="event.stopPropagation()" style="--phase-color:${phase.color}">
+      <header class="dwp-header">
+        <div>
+          <span class="dwp-kicker">${deployEscape(phase.label)} · ${deployEscape(phase.title)}</span>
+          <h2>W${wn} · ${deployFmtDate(w.date)} · ${deployEscape(w.label)}</h2>
+        </div>
+        <button class="dwp-close" onclick="deployCloseWeek()" aria-label="Đóng">×</button>
+      </header>
+
+      <section class="dwp-section">
+        <h3>Mục tiêu tuần</h3>
+        <p>${deployEscape(w.objective || '')}</p>
+        ${(w.deliverables && w.deliverables.length) ? `
+          <ul class="dwp-deliverables">
+            ${w.deliverables.map(d => `<li>${deployEscape(d)}</li>`).join('')}
+          </ul>` : ''}
+      </section>
+
+      <section class="dwp-section">
+        <h3>Gate checklist · ${gateItems.length} mục</h3>
+        <div class="dwp-checklist">
+          ${gateItems.map(it => {
+            const checked = !!cl[it.code];
+            const stamp = checked && typeof cl[it.code] === 'object' ? cl[it.code] : null;
+            return `
+            <label class="dwp-check-item ${checked?'checked':''}">
+              <input type="checkbox" ${checked?'checked':''} ${me.canEdit?'':'disabled'} onchange="deployToggleChecklist('${it.code}', this.checked)">
+              <span class="dwp-check-code">${deployEscape(it.code)}</span>
+              <span class="dwp-check-text">${deployEscape(it.text)}</span>
+              ${stamp ? `<small class="dwp-stamp">${deployEscape(stamp.by||'')} · ${deployIsoToVi(stamp.at||'')}</small>` : ''}
+            </label>`;
+          }).join('')}
+        </div>
+      </section>
+
+      <section class="dwp-section">
+        <h3>Tài liệu liên quan</h3>
+        <div class="dwp-required-docs">
+          ${(w.requiredDocs || []).map(code => `<span class="dwp-doc-chip">${deployEscape(code)}</span>`).join('') || '<span class="deploy-empty-inline">— (không neo tài liệu)</span>'}
+        </div>
+      </section>
+
+      <section class="dwp-section">
+        <h3>Issues phát sinh tuần W${wn}</h3>
+        <div class="dwp-issue-list">
+          ${issues.length === 0 ? '<span class="deploy-empty-inline">Chưa có issue.</span>' :
+            issues.map(i => `<div class="dwp-issue-row issue-sev-${i.sev|0}"><span class="issue-sev-badge">SEV-${i.sev|0}</span> ${deployEscape(i.title)} <small>· ${deployEscape(i.status||'open')}</small></div>`).join('')
+          }
+        </div>
+      </section>
+
+      <section class="dwp-section">
+        <h3>Biên bản họp</h3>
+        ${renderWeekMeetingForm(existingMeeting, w, kv)}
+      </section>
+
+      <section class="dwp-section dwp-signoff">
+        <h3>Quyết định Gate</h3>
+        ${so ? `
+          <div class="dwp-signoff-locked">
+            <strong>${so.decision === 'go' ? '✓ GO' : so.decision === 'no_go' ? '✗ NO-GO' : '◐ CONDITIONAL'}</strong>
+            <div>Ký bởi <strong>${deployEscape(so.name||so.by)}</strong> (${deployEscape(so.role)}) · ${deployIsoToVi(so.at)}</div>
+            ${so.notes ? `<p>${deployEscape(so.notes)}</p>` : ''}
+          </div>
+        ` : me.canSignOff ? `
+          <div class="dwp-signoff-form">
+            <textarea id="dwpSignOffNotes" placeholder="Ghi chú quyết định (tùy chọn)" rows="2"></textarea>
+            <div class="dwp-signoff-buttons">
+              <button class="deploy-btn deploy-btn-go" onclick="deploySignOffWeek(${wn}, 'go')">✓ GO</button>
+              <button class="deploy-btn deploy-btn-cond" onclick="deploySignOffWeek(${wn}, 'conditional')">◐ CONDITIONAL</button>
+              <button class="deploy-btn deploy-btn-nogo" onclick="deploySignOffWeek(${wn}, 'no_go')">✗ NO-GO</button>
+            </div>
+            <small class="dwp-signoff-hint">Chỉ CEO + QMS Manager có quyền ký gate.</small>
+          </div>
+        ` : `
+          <div class="dwp-empty">Bạn không có quyền ký gate. Cần vai trò <strong>CEO</strong> hoặc <strong>QMS Manager</strong>.</div>
+        `}
+      </section>
+    </aside>
+  </div>`;
+}
+
+function renderWeekMeetingForm(meeting, week, kv){
+  const m = meeting || {minutes:'', decisions:[], attendees:[], kpiSnapshot:{}};
+  const ro = !DeployState.me.canEdit || !!(meeting && meeting.signOff);
+  const signed = !!(meeting && meeting.signOff);
+  return `
+  <div class="dwp-meeting-form">
+    <label class="dwp-field">
+      <span>Người tham dự (phân cách dấu phẩy)</span>
+      <input type="text" id="dwpAttendees" value="${deployEscape((m.attendees||[]).join(', '))}" ${ro?'disabled':''}>
+    </label>
+    <label class="dwp-field">
+      <span>Biên bản · ghi chú họp</span>
+      <textarea id="dwpMinutes" rows="4" ${ro?'disabled':''}>${deployEscape(m.minutes||'')}</textarea>
+    </label>
+    <label class="dwp-field">
+      <span>Quyết định (mỗi dòng 1 quyết định)</span>
+      <textarea id="dwpDecisions" rows="3" ${ro?'disabled':''}>${deployEscape((m.decisions||[]).join('\n'))}</textarea>
+    </label>
+    <div class="dwp-meeting-buttons">
+      ${signed ? `
+        <span class="meeting-signoff-badge">🔒 Đã khóa · ${deployIsoToVi(meeting.signOff.at)}</span>
+      ` : `
+        ${!ro ? `<button class="deploy-btn" onclick="deploySaveMeeting(${week.n|0})">Lưu biên bản</button>` : ''}
+        ${meeting && DeployState.me.canSignOff ? `<button class="deploy-btn deploy-btn-go" onclick="deploySignOffMeeting('${deployEscape(meeting.id)}')">🔒 Ký khóa biên bản</button>` : ''}
+      `}
+    </div>
+  </div>`;
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────
+async function deployCycleReadiness(deptId, dimId){
+  const cur = (DeployState.readiness?.deptReadiness?.[deptId]?.[dimId]) || 'pending';
+  const cycle = ['pending', 'in_progress', 'completed', 'blocked'];
+  const next = cycle[(cycle.indexOf(cur)+1) % cycle.length];
+  try{
+    const res = await deployApi('deploy_readiness_cycle', {deptId, dimId, value: next});
+    DeployState.readiness = res.data;
+    renderDeployDashboard();
+  }catch(e){ console.error('[deploy] cycle failed', e); alert('Lỗi cập nhật readiness: ' + e.message); }
+}
+
+async function deployUpdateMetric(key, value){
+  try{
+    const res = await deployApi('deploy_metric_update', {key, value});
+    DeployState.readiness = res.data;
+    renderDeployDashboard();
+  }catch(e){ console.error('[deploy] metric failed', e); alert('Lỗi cập nhật KPI: ' + e.message); }
+}
+
+async function deployToggleChecklist(code, checked){
+  try{
+    const res = await deployApi('deploy_checklist_toggle', {key: code, checked});
+    DeployState.readiness = res.data;
+    renderDeployDashboard();
+  }catch(e){ console.error('[deploy] checklist failed', e); alert('Lỗi: ' + e.message); }
+}
+
+async function deploySetPhase(phaseId){
+  if (!DeployState.me.canSignOff) { alert('Cần quyền CEO/QMS Manager để chuyển pha.'); return; }
+  if (!confirm('Chuyển pha hoạt động sang ' + phaseId + '? Hành động này được audit.')) return;
+  try{
+    const res = await deployApi('deploy_phase_set', {phaseId});
+    DeployState.program = res.data;
+    renderDeployDashboard();
+  }catch(e){ console.error('[deploy] phase failed', e); alert('Lỗi chuyển pha: ' + e.message); }
+}
+
+function deployOpenWeek(n){
+  DeployState.activeWeek = n;
+  renderDeployDashboard();
+}
+function deployCloseWeek(ev){
+  if (ev && ev.target && !ev.target.classList.contains('deploy-week-overlay')) return;
+  DeployState.activeWeek = null;
+  renderDeployDashboard();
+}
+
+async function deploySaveMeeting(weekN){
+  const wk = deployGetWeek(weekN);
+  if (!wk) return;
+  const attendees = (document.getElementById('dwpAttendees')?.value || '').split(',').map(s => s.trim()).filter(Boolean);
+  const minutes = document.getElementById('dwpMinutes')?.value || '';
+  const decisions = (document.getElementById('dwpDecisions')?.value || '').split('\n').map(s => s.trim()).filter(Boolean);
+  const kv = (DeployState.readiness && DeployState.readiness.kpiValues) || {};
+  const existing = ((DeployState.meetings?.meetings) || []).find(m => (m.weekN|0) === (weekN|0));
+  try{
+    const res = await deployApi('deploy_meeting_save', {
+      id: existing ? existing.id : '',
+      weekN, date: wk.date, title: wk.label,
+      attendees, minutes, decisions,
+      agenda: (DeployState.meetings && DeployState.meetings.agendaTemplate) || [],
+      kpiSnapshot: {...kv},
+    });
+    DeployState.meetings = res.data;
+    renderDeployDashboard();
+  }catch(e){ console.error('[deploy] save meeting failed', e); alert('Lỗi lưu biên bản: ' + e.message); }
+}
+
+async function deploySignOffMeeting(id){
+  if (!DeployState.me.canSignOff) { alert('Cần quyền CEO/QMS Manager để ký.'); return; }
+  if (!confirm('Khóa biên bản này? Sau khi khóa không sửa được.')) return;
+  try{
+    const res = await deployApi('deploy_meeting_signoff', {id});
+    DeployState.meetings = res.data;
+    renderDeployDashboard();
+  }catch(e){ console.error('[deploy] meeting signoff failed', e); alert('Lỗi: ' + e.message); }
+}
+
+async function deploySignOffWeek(weekN, decision){
+  if (!DeployState.me.canSignOff) { alert('Cần quyền CEO/QMS Manager để ký gate.'); return; }
+  const notes = document.getElementById('dwpSignOffNotes')?.value || '';
+  if (!confirm('Ký gate W' + weekN + ' với quyết định ' + decision.toUpperCase() + '?')) return;
+  try{
+    const res = await deployApi('deploy_week_signoff', {weekN, decision, notes});
+    DeployState.program = res.data;
+    renderDeployDashboard();
+  }catch(e){ console.error('[deploy] week signoff failed', e); alert('Lỗi ký gate: ' + e.message); }
+}
+
+async function deploySaveChampion(deptId){
+  const get = (slot, field) => {
+    const sel = `[data-deploy-champion="${deptId}|${slot}|${field}"]`;
+    const el = document.querySelector(sel);
+    if (!el) return field === 'ojtPass' ? false : '';
+    return field === 'ojtPass' ? !!el.checked : el.value;
+  };
+  const payload = {
+    deptId,
+    primary: { name: get('primary','name'), phone: get('primary','phone'), m365: '', ojtPass: get('primary','ojtPass') },
+    backup:  { name: get('backup','name'),  phone: get('backup','phone'),  m365: '', ojtPass: get('backup','ojtPass') },
+    shift: 'A',
+  };
+  try{
+    const res = await deployApi('deploy_champion_save', payload);
+    DeployState.champions = res.data;
+    renderDeployDashboard();
+  }catch(e){ console.error('[deploy] champion failed', e); alert('Lỗi lưu champion: ' + e.message); }
+}
+
+function deployOpenIssueForm(){
+  const title = prompt('Tiêu đề issue:');
+  if (!title) return;
+  const sev = parseInt(prompt('Severity (1=critical, 2=high, 3=low):', '3'), 10) || 3;
+  const deptId = prompt('Mã phòng ban (PROD, ENG, QA, SCM, SALES, FIN, HR, IT, EHS, ERP):', 'QA') || 'QA';
+  const owner = prompt('Owner xử lý:', DeployState.me.username) || '';
+  const weekN = parseInt(prompt('Tuần phát sinh (số):', deployCurrentWeek()), 10) || 0;
+  deploySaveIssue({title, sev, deptId, owner, weekN, status:'open'});
+}
+
+async function deploySaveIssue(payload){
+  try{
+    const res = await deployApi('deploy_issue_save', payload);
+    DeployState.issues = res.data;
+    renderDeployDashboard();
+  }catch(e){ console.error('[deploy] issue failed', e); alert('Lỗi lưu issue: ' + e.message); }
+}
+
+async function deployUpdateIssueStatus(id, status){
+  const list = (DeployState.issues && DeployState.issues.issues) || [];
+  const cur = list.find(i => i.id === id);
+  if (!cur) return;
+  await deploySaveIssue({...cur, status});
+}
+
+async function deployRecordDrill(){
+  const f = id => document.getElementById(id);
+  const date = f('drillDate').value;
+  const person = f('drillPerson').value.trim();
+  const deptId = f('drillDept').value;
+  const docCode = f('drillDoc').value.trim();
+  const seconds = parseInt(f('drillSeconds').value, 10) || 0;
+  if (!person || !deptId || !docCode || !seconds) { alert('Điền đủ các ô.'); return; }
+  try{
+    const res = await deployApi('deploy_drill_record', {date, person, deptId, docCode, seconds});
+    DeployState.drills = res.data;
+    renderDeployDashboard();
+  }catch(e){ console.error('[deploy] drill failed', e); alert('Lỗi ghi drill: ' + e.message); }
+}
+
+function deployOpenAuditForm(){
+  const cycle = prompt('Chu kỳ audit (vd Q3-2026):', 'Q' + (Math.floor(new Date().getMonth()/3)+1) + '-' + new Date().getFullYear());
+  if (!cycle) return;
+  const plannedDate = prompt('Ngày dự kiến (YYYY-MM-DD):', deployTodayIso());
+  if (!plannedDate) return;
+  const scope = (prompt('Phạm vi điều khoản (vd 4,5,6):', '4,5,6') || '').split(',').map(s => s.trim()).filter(Boolean);
+  const scopeDepts = (prompt('Phòng ban (vd QA,PROD,ENG):', 'QA') || '').split(',').map(s => s.trim()).filter(Boolean);
+  const leadAuditor = prompt('Lead auditor:', DeployState.me.name || DeployState.me.username) || '';
+  deploySaveAudit({cycle, plannedDate, scope, scopeDepts, leadAuditor, status: 'scheduled'});
+}
+async function deploySaveAudit(payload){
+  try{
+    const res = await deployApi('deploy_audit_save', payload);
+    DeployState.audits = res.data;
+    renderDeployDashboard();
+  }catch(e){ console.error('[deploy] audit failed', e); alert('Lỗi lưu audit: ' + e.message); }
+}
+
+function deployOpenFindingForm(auditId){
+  const clauseRef = prompt('Điều khoản (vd 8.5, 7.2):');
+  if (!clauseRef) return;
+  const severity = prompt('Severity (major / minor / observation / opportunity):', 'minor') || 'minor';
+  const deptId = prompt('Phòng ban liên quan (PROD/QA/ENG/...):', 'QA') || 'QA';
+  const description = prompt('Mô tả phát hiện:');
+  if (!description) return;
+  const evidence = prompt('Bằng chứng (tài liệu, hồ sơ, quan sát):') || '';
+  deploySaveFinding({auditId, clauseRef, severity, deptId, description, evidence, status:'open'});
+}
+async function deploySaveFinding(payload){
+  try{
+    const res = await deployApi('deploy_audit_finding_save', payload);
+    DeployState.audits = res.data;
+    renderDeployDashboard();
+  }catch(e){ console.error('[deploy] finding failed', e); alert('Lỗi lưu finding: ' + e.message); }
+}
+
+function deployOpenReviewForm(){
+  const cycle = prompt('Chu kỳ review (vd Q3-2026):', 'Q' + (Math.floor(new Date().getMonth()/3)+1) + '-' + new Date().getFullYear());
+  if (!cycle) return;
+  const date = prompt('Ngày họp review (YYYY-MM-DD):', deployTodayIso());
+  if (!date) return;
+  const attendees = (prompt('Người tham dự (phân cách dấu phẩy):', DeployState.me.name) || '').split(',').map(s => s.trim()).filter(Boolean);
+  const inputs = {};
+  ((DeployState.reviews && DeployState.reviews.inputTemplate) || []).forEach(it => {
+    const v = prompt(`${it.clause} · ${it.label}:`, '');
+    if (v != null) inputs[it.key] = v;
+  });
+  const outputs = {};
+  ((DeployState.reviews && DeployState.reviews.outputTemplate) || []).forEach(it => {
+    const v = prompt(`${it.clause} · ${it.label}:`, '');
+    if (v != null) outputs[it.key] = v;
+  });
+  deploySaveReview({cycle, date, attendees, inputs, outputs});
+}
+
+function deployEditReview(id){
+  const list = (DeployState.reviews && DeployState.reviews.reviews) || [];
+  const r = list.find(x => x.id === id);
+  if (!r) return;
+  const inputs = {...(r.inputs || {})};
+  const outputs = {...(r.outputs || {})};
+  ((DeployState.reviews && DeployState.reviews.inputTemplate) || []).forEach(it => {
+    const v = prompt(`${it.clause} · ${it.label}:`, inputs[it.key] || '');
+    if (v != null) inputs[it.key] = v;
+  });
+  ((DeployState.reviews && DeployState.reviews.outputTemplate) || []).forEach(it => {
+    const v = prompt(`${it.clause} · ${it.label}:`, outputs[it.key] || '');
+    if (v != null) outputs[it.key] = v;
+  });
+  deploySaveReview({...r, inputs, outputs});
+}
+
+async function deploySaveReview(payload){
+  try{
+    const res = await deployApi('deploy_review_save', payload);
+    DeployState.reviews = res.data;
+    renderDeployDashboard();
+  }catch(e){ console.error('[deploy] review failed', e); alert('Lỗi lưu review: ' + e.message); }
+}
+
+async function deploySignOffReview(id){
+  if (!DeployState.me.canSignOff) { alert('Cần quyền CEO/QMS Manager.'); return; }
+  if (!confirm('Khóa Management Review packet này?')) return;
+  try{
+    const res = await deployApi('deploy_review_signoff', {id});
+    DeployState.reviews = res.data;
+    renderDeployDashboard();
+  }catch(e){ console.error('[deploy] review signoff failed', e); alert('Lỗi: ' + e.message); }
+}
+
+async function deployBridgeCapa(issueId){
+  if (!confirm('Mở CAPA case từ issue này? Issue sẽ chuyển trạng thái workaround.')) return;
+  try{
+    const res = await deployApi('deploy_capa_bridge', {issueId});
+    DeployState.issues = res.data;
+    renderDeployDashboard();
+    if (res.capaLink) window.open(res.capaLink, '_blank');
+  }catch(e){ console.error('[deploy] capa bridge failed', e); alert('Lỗi mở CAPA: ' + e.message); }
+}
+
+async function deployResetState(){
+  if (!confirm('Reset toàn bộ readiness, issue, drill, biên bản? Hành động này KHÔNG xóa program.json.')) return;
+  const confirm2 = prompt('Gõ RESET_DEPLOY_STATE để xác nhận:');
+  if (confirm2 !== 'RESET_DEPLOY_STATE') return;
+  try{
+    await deployApi('deploy_state_reset', {confirm: 'RESET_DEPLOY_STATE'});
+    await loadDeployState();
+    renderDeployDashboard();
+  }catch(e){ console.error('[deploy] reset failed', e); alert('Lỗi reset: ' + e.message); }
+}
+
+// ── Main render ───────────────────────────────────────────────────────────
+function renderDeployDashboard(){
+  const container = document.getElementById('page-deploy');
+  if (!container) return;
+  if (!DeployState.loaded) {
+    container.innerHTML = `<div class="deploy-loading"><div class="deploy-spinner"></div><p>Đang nạp Command Center...</p></div>`;
+    loadDeployState().then(() => renderDeployDashboard());
+    return;
+  }
+  const at = DeployState.activeTab;
+  const me = DeployState.me;
+  let tabHtml = '';
+  switch(at){
+    case 'timeline':    tabHtml = renderTabTimeline(); break;
+    case 'meetings':    tabHtml = renderTabMeetings(); break;
+    case 'departments': tabHtml = renderTabDepartments(); break;
+    case 'docs':        tabHtml = renderTabDocs(); break;
+    case 'issues':      tabHtml = renderTabIssues(); break;
+    case 'iso':         tabHtml = renderTabIso(); break;
+    case 'audit':       tabHtml = renderTabAudit(); break;
+    case 'review':      tabHtml = renderTabReview(); break;
+    default:            tabHtml = renderTabOverview();
+  }
+  container.innerHTML = `
+    <div class="deploy-dash">
+      ${renderDeployHero()}
+      ${renderDeploySummary()}
+      <nav class="deploy-tabs" role="tablist">
+        <button class="deploy-tab ${at==='overview'?'active':''}"    onclick="switchDeployTab('overview')">Tổng quan</button>
+        <button class="deploy-tab ${at==='timeline'?'active':''}"    onclick="switchDeployTab('timeline')">Lộ trình</button>
+        <button class="deploy-tab ${at==='meetings'?'active':''}"    onclick="switchDeployTab('meetings')">Họp &amp; Gate</button>
+        <button class="deploy-tab ${at==='departments'?'active':''}" onclick="switchDeployTab('departments')">Phòng ban</button>
+        <button class="deploy-tab ${at==='docs'?'active':''}"        onclick="switchDeployTab('docs')">Tài liệu</button>
+        <button class="deploy-tab ${at==='issues'?'active':''}"      onclick="switchDeployTab('issues')">Issues</button>
+        <button class="deploy-tab ${at==='iso'?'active':''}"         onclick="switchDeployTab('iso')">ISO 9001</button>
+        <button class="deploy-tab ${at==='audit'?'active':''}"       onclick="switchDeployTab('audit')">Audit 9.2</button>
+        <button class="deploy-tab ${at==='review'?'active':''}"      onclick="switchDeployTab('review')">Mgmt Review 9.3</button>
+      </nav>
+      ${tabHtml}
+      <div class="deploy-footer">
+        <span>${me.canEdit ? `Đăng nhập <strong>${deployEscape(me.name||me.username)}</strong> · ${deployEscape(me.role)}` : 'Chế độ chỉ đọc'} · cập nhật ${deployIsoToVi(DeployState.program?.lastUpdated)}</span>
+        ${me.canSignOff ? `<button class="deploy-btn-reset" onclick="deployResetState()">Reset state</button>` : ''}
+      </div>
+      ${renderWeekPanel()}
+    </div>`;
+}
+
+// Legacy global aliases (kept so the portal router and any cached HTML keep working)
+window.renderDeployDashboard = renderDeployDashboard;
+window.switchDeployTab = switchDeployTab;
+window.deployCycleReadiness = deployCycleReadiness;
+window.deployUpdateMetric = deployUpdateMetric;
+window.deployToggleChecklist = deployToggleChecklist;
+window.deploySetPhase = deploySetPhase;
+window.deployOpenWeek = deployOpenWeek;
+window.deployCloseWeek = deployCloseWeek;
+window.deploySaveMeeting = deploySaveMeeting;
+window.deploySignOffMeeting = deploySignOffMeeting;
+window.deploySignOffWeek = deploySignOffWeek;
+window.deploySaveChampion = deploySaveChampion;
+window.deployOpenIssueForm = deployOpenIssueForm;
+window.deployUpdateIssueStatus = deployUpdateIssueStatus;
+window.deployRecordDrill = deployRecordDrill;
+window.deployOpenAuditForm = deployOpenAuditForm;
+window.deployOpenFindingForm = deployOpenFindingForm;
+window.deployOpenReviewForm = deployOpenReviewForm;
+window.deployEditReview = deployEditReview;
+window.deploySignOffReview = deploySignOffReview;
+window.deployBridgeCapa = deployBridgeCapa;
+window.deployResetState = deployResetState;
