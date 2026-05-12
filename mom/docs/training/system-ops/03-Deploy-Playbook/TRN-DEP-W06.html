@@ -45,137 +45,160 @@
      data-dcc-bootstrap='{"header":{"doc_code":"TRN-DEP-W06","title":"Playbook tuần 06 — Wave 2 mid-review + Wave Production prep","subtitle":"Triển khai vận hành QMS · Phase P3 · 2026-06-20 (Saturday)","doc_type":"TRN","revision":"V0","effective_date":"2026-06-20","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":null,"status":"draft"}}'></div>
 
 <div class="doc-content" id="docContent">
-
-<div class="pending-fill" id="codex-marker">
-  <strong>⚠ Tài liệu khung — Codex chưa viết nội dung chi tiết.</strong>
-  Đây là scaffold do <code>generate-deploy-playbooks.sh</code> sinh ra với 12 section placeholder.
-  Phần nội dung do AI author điền theo prompt pack tương ứng (tham chiếu <code>_reports/deploy-playbook/PROMPT_PACK_06.md</code>).
-  Sau khi Codex viết xong sẽ xoá khung cảnh báo này.
-</div>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 1 — COVER
-     Codex fill: kicker (Phase P3), large title, một câu mô tả intent,
-     khối "QUICK FACTS" 6 ô (Ngày · Thứ · Phase · Pillar · Attendees · Owner)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-cover">
-  <h1 class="h2" style="margin-top:0;">W06 · 2026-06-20 — Wave 2 mid-review + Wave Production prep</h1>
-  <p class="lead"><!-- TODO Codex W06/SEC-COVER: 2–3 câu mô tả mục đích chiến lược của tuần 06 trong tổng thể 12 tuần. --></p>
-  <!-- TODO Codex W06/SEC-COVER: bảng QUICK FACTS với 6 ô (grid-3, 2 hàng): Ngày · Thứ · Phase · Pillar · Attendees · Owner -->
+<h1 class="h2" style="margin-top:0;">W06 · 2026-06-20 — Wave 2 mid-review + Wave Production prep</h1>
+<p class="lead">Tuần 06 là tuần khóa điều kiện trước khi chương trình đi vào wave rủi ro cao nhất: Production và Engineering go-live đồng thời. Một mặt, Steering phải chứng minh Wave 2 đã đủ ổn định; mặt khác, CAB phải khóa runbook, rollback trigger và evidence test cho Wave Production.</p>
+<p>Cuộc họp phải trả lời bằng dữ liệu: Wave 2 có Sev-1 = 0 trong 5 ngày làm việc từ 2026-06-15 đến 2026-06-19 hay không; Sev-2 nào còn mở có workaround ổn định hay không; rollback test ngày 2026-06-18 có recovery state thật hay chỉ là diễn tập giấy.</p>
+<p>W06 phải tách rõ Wave 2 stable và Wave Production ready; Wave 2 xanh không tự động cho phép Production go-live nếu CAB, rollback, champion roster hoặc runbook chưa đạt.</p>
+<div class="grid-3">
+<div class="note"><b>Ngày</b><br>2026-06-20</div>
+<div class="note"><b>Thứ</b><br>Thứ Bảy · 09:00-10:00</div>
+<div class="note"><b>Phase</b><br>P3 · Mid-review + major change prep</div>
+<div class="note"><b>Pillar</b><br>golive</div>
+<div class="note"><b>Attendees</b><br>Steering + Wave 2 + PROD + ENG + champions</div>
+<div class="note"><b>Owner</b><br>CEO + QMS_MGR + QA_MGR + PROD_DIR + ENG_MGR</div>
+</div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 2 — MỤC TIÊU TUẦN + KPI BASELINE
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-objective">
-  <h2 class="h2">Mục tiêu tuần 06</h2>
-  <!-- TODO Codex W06/SEC-OBJECTIVE: viết 3–5 mục tiêu SMART (Specific, Measurable, Achievable, Relevant, Time-bound).
-       Sau đó liệt kê KPI baseline cần đo TRƯỚC khi tuần bắt đầu (con số khởi điểm).
-       Tham chiếu ANNEX-110 (KPI dictionary) cho mọi KPI ID. -->
+<section class="card" id="sec-objective"><h2 class="h2">Mục tiêu tuần 06</h2>
+<p>W06 có hai bộ mục tiêu độc lập nhưng liên kết. Wave 2 phải chứng minh đủ ổn định để thoát hypercare nặng; Wave Production phải chứng minh đủ kiểm soát để mở cutover lớn.</p>
+<p>Khi runbook Production được ký, hệ thống chạm vào ca sản xuất, setup, chương trình CNC, kiểm tra trong công đoạn, giao ca và hồ sơ Job Order; vì vậy mọi điều kiện phải có evidence vận hành.</p>
+<ol class="tight"><li>Wave 2 Sev-1 = 0 trong 5 ngày làm việc liên tiếp 2026-06-15 đến 2026-06-19; mọi Sev-2 có workaround ≥2 ngày và ETA ≤7 ngày.</li><li>Wave Production runbook v1.0 khóa qua CAB lúc 2026-06-17 16:00, status released trong dcc_document_header cho ANNEX-114 và ANNEX-118.</li><li>Rollback trigger live test chạy ngày 2026-06-18, có audit_events row, measured duration, recovery state và signer QMS_ENG + IT_MGR.</li><li>Approve go-live 2026-06-22 05:00 hoặc defer 2026-06-29 nếu điều kiện cần fail; decision ký bởi CEO, QMS_MGR, QA_MGR, PROD_DIR, ENG_MGR.</li><li>Champion Production 22 record và Engineering 8 record nominated, bootcamp pass ≥90%, không zone thiếu backup.</li></ol>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>KPI / evidence</th><th>Baseline</th><th>Threshold</th><th>Nguồn đo</th></tr></thead>
+<tbody>
+<tr><td>KPI-DEP-03</td><td>Wave 2 issue và rollback rehearsal</td><td>≤10%, Sev-1 = 0 trong 5 ngày</td><td>issues.json + readiness.json</td></tr>
+<tr><td>KPI-DEP-04</td><td>Runbook v0.9 từ W05</td><td>≤10 ngày từ W04 gate đến W06 lock</td><td>ANNEX-114 history</td></tr>
+<tr><td>KPI-DEP-05</td><td>Daily dashboard snapshot</td><td>≥95% refresh đúng hạn</td><td>readiness.json</td></tr>
+<tr><td>KPI-DEP-07</td><td>Không Sev-1 nếu pass sạch</td><td>≤24h nếu có Sev-1, open Sev-1 = 0</td><td>issues.json</td></tr>
+<tr><td>Rollback evidence</td><td>W05 rehearsal</td><td>Live test có audit_events row và recovery state</td><td>rollback_test_result</td></tr>
+</tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 3 — PREP CHECKLIST T-7 / T-3 / T-1 / T-0
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-prep">
-  <h2 class="h2">Prep checklist — T-7 / T-3 / T-1 / T-0</h2>
-  <!-- TODO Codex W06/SEC-PREP: 4 bảng prep (T-7, T-3, T-1 ngày trước, T-0 sáng họp).
-       Mỗi item: WHO (role code) · WHAT · EVIDENCE · DEADLINE.
-       Mỗi T-window tối thiểu 4 item; T-0 là pre-meeting sanity check 30' trước họp. -->
+<section class="card" id="sec-prep"><h2 class="h2">Prep checklist — T-7 / T-3 / T-1 / T-0</h2><p>W06 prep chạy như major change control, không phải training meeting. CAB, rollback live test và champion evidence phải có trước khi CEO thấy slide.</p>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>Window</th><th>WHO</th><th>WHAT</th><th>EVIDENCE</th><th>DEADLINE</th></tr></thead>
+<tbody>
+<tr><td>T-7 · 2026-06-13</td><td>CUTOVER_LEAD</td><td>Khóa scope Wave Production major change và gửi pre-read bằng role code; mọi tài liệu dùng doc_code, revision và owner rõ.</td><td>W06 prep memo</td><td>2026-06-13 17:00</td></tr>
+<tr><td>T-7 · 2026-06-13</td><td>QMS_ENG</td><td>Seed evidence packet, dashboard snapshot và issue categories để không sửa số liệu trong cuộc họp.</td><td>readiness.json</td><td>2026-06-13 18:00</td></tr>
+<tr><td>T-7 · 2026-06-13</td><td>IT_MGR</td><td>Kiểm M365 access cho cohort và champion backup; không dùng tài khoản chia sẻ.</td><td>access_review_item</td><td>2026-06-13 18:00</td></tr>
+<tr><td>T-7 · 2026-06-13</td><td>HR_MGR</td><td>Xác nhận training/OJT checklist và pass criterion theo SOP-801.</td><td>training_records draft</td><td>2026-06-13 18:00</td></tr>
+<tr><td>T-3 · 2026-06-17</td><td>CUTOVER_LEAD</td><td>Rà evidence chính, đối chiếu threshold với ANNEX-110 và gate code tuần.</td><td>W06 evidence review</td><td>2026-06-17 12:00</td></tr>
+<tr><td>T-3 · 2026-06-17</td><td>QA_MGR</td><td>Cập nhật issue log, severity, owner, ETA và CAPA link nếu issue lặp lại.</td><td>issues.json</td><td>2026-06-17 16:00</td></tr>
+<tr><td>T-3 · 2026-06-17</td><td>QMS_MGR</td><td>Rà decision form, dissent field và fallback path; senior roles phát biểu cuối để giảm anchoring.</td><td>gate form</td><td>2026-06-17 17:00</td></tr>
+<tr><td>T-3 · 2026-06-17</td><td>QMS_ENG</td><td>Kiểm audit_events payload mẫu, chưa ghi cho đến khi decision được ký.</td><td>audit_events draft</td><td>2026-06-17 17:30</td></tr>
+<tr><td>T-1 · 2026-06-19</td><td>CUTOVER_LEAD</td><td>Pre-circulate evidence packet cho Steering và các manager liên quan.</td><td>evidence packet PDF</td><td>2026-06-19 16:00</td></tr>
+<tr><td>T-1 · 2026-06-19</td><td>QMS_ENG</td><td>Đóng dashboard snapshot cuối ngày với timestamp và KPI values.</td><td>readiness.json</td><td>2026-06-19 16:30</td></tr>
+<tr><td>T-1 · 2026-06-19</td><td>QA_MGR</td><td>Kiểm điều kiện Sev-1, Sev-2, CAPA backlog và PIR draft.</td><td>PIR draft</td><td>2026-06-19 17:00</td></tr>
+<tr><td>T-1 · 2026-06-19</td><td>CEO</td><td>Đọc trước decision packet, ghi câu hỏi vào form để tránh tranh luận ngoài dữ liệu.</td><td>CEO pre-read</td><td>2026-06-19 18:00</td></tr>
+<tr><td>T-0 · 2026-06-20</td><td>QMS_MGR</td><td>Dry-run 30 phút trước họp: thứ tự nói, decision options, evidence screen.</td><td>dry-run note</td><td>2026-06-20 08:30</td></tr>
+<tr><td>T-0 · 2026-06-20</td><td>IT_MGR</td><td>Mở dashboard, exported logs và offline backup trước khi họp.</td><td>AV checklist</td><td>2026-06-20 08:40</td></tr>
+<tr><td>T-0 · 2026-06-20</td><td>CUTOVER_LEAD</td><td>Kiểm 3 số phải nói trong slide khớp evidence packet.</td><td>speaker card</td><td>2026-06-20 08:45</td></tr>
+<tr><td>T-0 · 2026-06-20</td><td>QMS_ENG</td><td>Chuẩn bị final minutes shell, action log và audit event payload.</td><td>minutes shell</td><td>2026-06-20 08:50</td></tr>
+</tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 4 — AGENDA TIMED (60 phút)
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-agenda">
-  <h2 class="h2">Agenda · 09:00–10:00 (60 phút)</h2>
-  <!-- TODO Codex W06/SEC-AGENDA: bảng 8–10 dòng. Cột: Thời gian · Phút · Đề mục · Owner · Output kỳ vọng.
-       Đảm bảo có: opening (5'), KPI review (10'), main content (~30'), gate decision (10'), closing + next week preview (5'). -->
+<section class="card" id="sec-agenda"><h2 class="h2">Agenda · 09:00–10:00 (60 phút)</h2><div class="table-card">
+<table class="table">
+<thead><tr><th>Thời gian</th><th>Phút</th><th>Đề mục</th><th>Owner</th><th>Output kỳ vọng</th></tr></thead>
+<tbody>
+<tr><td>09:00-09:05</td><td>5</td><td>CEO mở đầu: thiếu rollback evidence thì không Go.</td><td>CEO</td><td>Tiêu chuẩn ký rõ.</td></tr>
+<tr><td>09:05-09:15</td><td>10</td><td>Wave 2 mid-review 5 ngày hypercare.</td><td>SCM_MGR + SALES_MGR</td><td>Sev-1 streak, Sev-2 workaround.</td></tr>
+<tr><td>09:15-09:25</td><td>10</td><td>Wave 2 KPI snapshot + CAPA backlog.</td><td>QA_MGR</td><td>KPI-DEP-03/04/05 status.</td></tr>
+<tr><td>09:25-09:35</td><td>10</td><td>Runbook v1.0 walkthrough.</td><td>PROD_DIR + ENG_MGR</td><td>7-zone map và owner.</td></tr>
+<tr><td>09:35-09:45</td><td>10</td><td>Rollback test result 2026-06-18.</td><td>IT_MGR + QMS_ENG</td><td>Duration, recovery, audit row.</td></tr>
+<tr><td>09:45-09:55</td><td>10</td><td>Gate P3-02: Go, Conditional hoặc defer.</td><td>CEO + QMS_MGR + QA_MGR</td><td>Gate form signed.</td></tr>
+<tr><td>09:55-10:00</td><td>5</td><td>Preview W07 cutover 2026-06-22 05:00.</td><td>CUTOVER_LEAD</td><td>W07 memo trước 2026-06-21.</td></tr>
+</tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 5 — NỘI DUNG HỌP TUẦN NÀY (slide-by-slide)
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-slides">
-  <h2 class="h2">Nội dung họp tuần 06 — slide-by-slide</h2>
-  <!-- TODO Codex W06/SEC-SLIDES: 8–12 slide block, mỗi block:
-         <div class="card"> hoặc <div class="note-blue">
-           <h3>Slide N — Tiêu đề</h3>
-           <p>Talking points 3–5 câu (Vietnamese with diacritics).</p>
-           <ul class="tight">các bullet cụ thể, có CON SỐ và DOC CODE.</ul>
-         </div>
-       Cấm dùng "đảm bảo chất lượng" generic. Phải có con số, doc code, role code cụ thể.
-       Vận dụng Hofstede (Vietnam high power-distance): CEO speaks first, seniority order, bilingual VN/EN slides. -->
+<section class="card" id="sec-slides"><h2 class="h2">Nội dung họp tuần 06 — slide-by-slide</h2>
+<div class="note-blue"><h3>Slide 1 — Wave 2 hypercare exit criteria</h3><p>W06 là major change gate: presenter phải đưa dữ liệu từ Wave 2, CAB, rollback test, champion roster và runbook, rồi liên kết từng evidence với P3-02. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: ITIL 4 Change Enablement, ISO 9001:2015 §7.5.3/§9.1, Toyota shusa và andon-cord protocol; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 2 — Wave 2 Sev-2 closure timeline</h3><p>W06 là major change gate: presenter phải đưa dữ liệu từ Wave 2, CAB, rollback test, champion roster và runbook, rồi liên kết từng evidence với P3-02. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: ITIL 4 Change Enablement, ISO 9001:2015 §7.5.3/§9.1, Toyota shusa và andon-cord protocol; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 3 — Wave 2 KPI final</h3><p>W06 là major change gate: presenter phải đưa dữ liệu từ Wave 2, CAB, rollback test, champion roster và runbook, rồi liên kết từng evidence với P3-02. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: ITIL 4 Change Enablement, ISO 9001:2015 §7.5.3/§9.1, Toyota shusa và andon-cord protocol; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 4 — Runbook v1.0 7-zone map</h3><p>W06 là major change gate: presenter phải đưa dữ liệu từ Wave 2, CAB, rollback test, champion roster và runbook, rồi liên kết từng evidence với P3-02. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: ITIL 4 Change Enablement, ISO 9001:2015 §7.5.3/§9.1, Toyota shusa và andon-cord protocol; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 5 — Timeline 2026-06-22/23</h3><p>W06 là major change gate: presenter phải đưa dữ liệu từ Wave 2, CAB, rollback test, champion roster và runbook, rồi liên kết từng evidence với P3-02. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: ITIL 4 Change Enablement, ISO 9001:2015 §7.5.3/§9.1, Toyota shusa và andon-cord protocol; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 6 — Rollback trigger conditions</h3><p>W06 là major change gate: presenter phải đưa dữ liệu từ Wave 2, CAB, rollback test, champion roster và runbook, rồi liên kết từng evidence với P3-02. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: ITIL 4 Change Enablement, ISO 9001:2015 §7.5.3/§9.1, Toyota shusa và andon-cord protocol; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 7 — Rollback live test 2026-06-18</h3><p>W06 là major change gate: presenter phải đưa dữ liệu từ Wave 2, CAB, rollback test, champion roster và runbook, rồi liên kết từng evidence với P3-02. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: ITIL 4 Change Enablement, ISO 9001:2015 §7.5.3/§9.1, Toyota shusa và andon-cord protocol; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 8 — Champion Production roster</h3><p>W06 là major change gate: presenter phải đưa dữ liệu từ Wave 2, CAB, rollback test, champion roster và runbook, rồi liên kết từng evidence với P3-02. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: ITIL 4 Change Enablement, ISO 9001:2015 §7.5.3/§9.1, Toyota shusa và andon-cord protocol; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 9 — Champion Engineering roster</h3><p>W06 là major change gate: presenter phải đưa dữ liệu từ Wave 2, CAB, rollback test, champion roster và runbook, rồi liên kết từng evidence với P3-02. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: ITIL 4 Change Enablement, ISO 9001:2015 §7.5.3/§9.1, Toyota shusa và andon-cord protocol; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 10 — Andon-cord escalation tree</h3><p>W06 là major change gate: presenter phải đưa dữ liệu từ Wave 2, CAB, rollback test, champion roster và runbook, rồi liên kết từng evidence với P3-02. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: ITIL 4 Change Enablement, ISO 9001:2015 §7.5.3/§9.1, Toyota shusa và andon-cord protocol; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 11 — Daily gemba walk schedule</h3><p>W06 là major change gate: presenter phải đưa dữ liệu từ Wave 2, CAB, rollback test, champion roster và runbook, rồi liên kết từng evidence với P3-02. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: ITIL 4 Change Enablement, ISO 9001:2015 §7.5.3/§9.1, Toyota shusa và andon-cord protocol; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 12 — W07 gate criteria preview</h3><p>W06 là major change gate: presenter phải đưa dữ liệu từ Wave 2, CAB, rollback test, champion roster và runbook, rồi liên kết từng evidence với P3-02. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: ITIL 4 Change Enablement, ISO 9001:2015 §7.5.3/§9.1, Toyota shusa và andon-cord protocol; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 6 — QUYẾT ĐỊNH CẦN LẤY TẠI HỌP
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-decisions">
-  <h2 class="h2">Quyết định cần lấy trong cuộc họp này</h2>
-  <!-- TODO Codex W06/SEC-DECISIONS: bảng 3–6 quyết định. Cột: # · Quyết định · Người ký · Cơ sở (doc/data) · Fallback nếu deferred.
-       Mỗi quyết định phải có Plan-B nếu không lấy được trong cuộc họp. -->
+<section class="card" id="sec-decisions"><h2 class="h2">Quyết định cần lấy trong cuộc họp này</h2><div class="table-card">
+<table class="table">
+<thead><tr><th>#</th><th>Quyết định</th><th>Người ký</th><th>Cơ sở doc/data</th><th>Fallback nếu deferred</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Approve Wave Production runbook v1.0 lock.</td><td>CEO + PROD_DIR + ENG_MGR</td><td>ANNEX-114 + CAB minutes</td><td>Chưa released thì defer W07 sang 2026-06-29.</td></tr>
+<tr><td>2</td><td>Approve rollback trigger v1.0.</td><td>CUTOVER_LEAD + QMS_MGR</td><td>ANNEX-118 + rollback_test_result</td><td>Test fail thì ECAB trước 2026-06-21 12:00.</td></tr>
+<tr><td>3</td><td>Approve go-live 2026-06-22 05:00 hoặc defer.</td><td>CEO + QMS_MGR + QA_MGR</td><td>P3-02 gate form</td><td>Fail điều kiện cần thì defer tự động.</td></tr>
+<tr><td>4</td><td>Approve champion roster 30 record.</td><td>HR_MGR + PROD_DIR + ENG_MGR</td><td>champions.json + training_records</td><td>Zone thiếu backup thì Conditional.</td></tr>
+</tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 7 — GO/NO-GO GATE — ĐIỀU KIỆN CẦN VÀ ĐỦ
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-gate">
-  <h2 class="h2">Gate Go/No-Go — Điều kiện CẦN và ĐỦ</h2>
-  <!-- TODO Codex W06/SEC-GATE: 2 bảng tách biệt:
-       (A) ĐIỀU KIỆN CẦN (necessary): nếu thiếu BẤT KỲ → No-Go. Tối thiểu 4 item.
-       (B) ĐIỀU KIỆN ĐỦ (sufficient): nếu (A) đủ VÀ tất cả (B) đạt → Go. Tối thiểu 4 item.
-       Mỗi điều kiện: Câu mô tả · Cách đo · Threshold · Bằng chứng (table/file/system).
-       Vận dụng "Go/No-Go gate condition library" của research pack — boilerplate 10 item, chọn lọc cho tuần 06. -->
+<section class="card" id="sec-gate"><h2 class="h2">Gate Go/No-Go — Điều kiện CẦN và ĐỦ</h2><h3>Điều kiện CẦN</h3><div class="table-card">
+<table class="table">
+<thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Threshold</th><th>Bằng chứng</th></tr></thead>
+<tbody>
+<tr><td>Wave 2 Sev-1 streak đạt.</td><td>Filter issues 2026-06-15 đến 2026-06-19.</td><td>Sev-1 = 0 × 5 ngày.</td><td>issues.json</td></tr>
+<tr><td>Sev-2 có workaround.</td><td>Kiểm từng Sev-2 mở.</td><td>100% có workaround ≥2 ngày và ETA ≤7 ngày.</td><td>PIR form</td></tr>
+<tr><td>Runbook released.</td><td>Đọc DCC header.</td><td>ANNEX-114 và ANNEX-118 released.</td><td>dcc_document_header</td></tr>
+<tr><td>Rollback live test executed.</td><td>Kiểm test 2026-06-18.</td><td>audit_events row + duration + recovery.</td><td>rollback_test_result</td></tr>
+<tr><td>Champion coverage đủ.</td><td>Đếm records và pass bootcamp.</td><td>30 records, pass ≥90%, không zone thiếu backup.</td><td>champions.json</td></tr>
+</tbody></table></div>
+<h3>Điều kiện ĐỦ</h3><div class="table-card">
+<table class="table">
+<thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Threshold</th><th>Bằng chứng</th></tr></thead>
+<tbody>
+<tr><td>CAB approval logged.</td><td>Kiểm CAB minutes.</td><td>Decision, dissent, signer đủ.</td><td>CAB minutes</td></tr>
+<tr><td>CAPA backlog trong ngưỡng.</td><td>Đếm CAPA mở và overdue.</td><td>≤5 mở; 0 overdue.</td><td>capa_records</td></tr>
+<tr><td>KPI dashboard xanh 5 ngày.</td><td>Đọc snapshots.</td><td>DEP-03 ≤10%, DEP-04 ≤10d, DEP-05 ≥95%.</td><td>readiness.json</td></tr>
+<tr><td>PIR W05-W06 signed.</td><td>Kiểm chữ ký QA_MGR và champion.</td><td>Signed trước 2026-06-20 09:45.</td><td>PIR form</td></tr>
+<tr><td>Gate decision form đủ 5 role.</td><td>Kiểm timestamp.</td><td>CEO + QMS_MGR + QA_MGR + PROD_DIR + ENG_MGR.</td><td>P3-02 gate form</td></tr>
+</tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 8 — PHÂN CÔNG NHIỆM VỤ SAU HỌP (RACI)
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-tasks">
-  <h2 class="h2">Phân công nhiệm vụ sau họp · RACI · deadline</h2>
-  <!-- TODO Codex W06/SEC-TASKS: bảng 8–15 task. Cột: # · Task · R · A · C · I · Deadline · Evidence · KPI ảnh hưởng.
-       R/A/C/I dùng role code (CEO, QMS_MGR, QA_MGR, PROD_DIR, …) — không tên người.
-       Deadline phải absolute date (không "tuần sau"); evidence phải point đến doc_code hoặc table_name. -->
+<section class="card" id="sec-tasks"><h2 class="h2">Phân công nhiệm vụ sau họp · RACI · deadline</h2><div class="table-card">
+<table class="table">
+<thead><tr><th>#</th><th>Task</th><th>R</th><th>A</th><th>C</th><th>I</th><th>Deadline</th><th>Evidence</th><th>KPI</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Trigger cutover 2026-06-22 05:00 nếu Go.</td><td>CUTOVER_LEAD</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-21 17:00</td><td>readiness.json</td><td>KPI-FLD-01</td></tr>
+<tr><td>2</td><td>Publish gemba schedule 7 zone.</td><td>PROD_DIR</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-21 17:00</td><td>issues.json</td><td>KPI-FLD-02</td></tr>
+<tr><td>3</td><td>Print andon-cord posters.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-21 17:00</td><td>champions.json</td><td>KPI-TRN-01</td></tr>
+<tr><td>4</td><td>Seed problem-of-the-day board.</td><td>QA_MGR</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-21 17:00</td><td>ANNEX-117</td><td>KPI-DEP-02</td></tr>
+<tr><td>5</td><td>Archive runbook v1.0.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-21 17:00</td><td>ANNEX-118</td><td>KPI-DEP-05</td></tr>
+<tr><td>6</td><td>Close Wave 2 hypercare.</td><td>SCM_MGR</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-21 17:00</td><td>audit_events</td><td>KPI-DEP-07</td></tr>
+<tr><td>7</td><td>Send go-live memo.</td><td>CUTOVER_LEAD</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-21 17:00</td><td>readiness.json</td><td>KPI-FLD-01</td></tr>
+<tr><td>8</td><td>Verify champion presence plan.</td><td>PROD_DIR</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-21 17:00</td><td>issues.json</td><td>KPI-FLD-02</td></tr>
+<tr><td>9</td><td>Prepare JO dossier audit checklist.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-21 17:00</td><td>champions.json</td><td>KPI-TRN-01</td></tr>
+<tr><td>10</td><td>Publish CAD/CAM fallback.</td><td>QA_MGR</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-21 17:00</td><td>ANNEX-117</td><td>KPI-DEP-02</td></tr>
+<tr><td>11</td><td>Log P3-02 audit event.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-21 17:00</td><td>ANNEX-118</td><td>KPI-DEP-05</td></tr>
+<tr><td>12</td><td>If defer, publish 2026-06-29 plan.</td><td>SCM_MGR</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-21 17:00</td><td>audit_events</td><td>KPI-DEP-07</td></tr>
+</tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 9 — NỘI DUNG HỌP TUẦN SAU (PREVIEW)
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-next-week">
-  <h2 class="h2">Preview tuần 7 · nhiệm vụ chuẩn bị</h2>
-  <!-- TODO Codex W06/SEC-NEXT-WEEK: tóm tắt 1 đoạn về tuần kế tiếp, sau đó bảng "chuẩn bị" — mỗi item: Role · Task · Deadline (trong tuần 06).
-       Mục đích: cuối họp W06 mỗi người biết rõ tuần sau họ cần đến với gì. -->
+<section class="card" id="sec-next-week"><h2 class="h2">Preview tuần 7 · nhiệm vụ chuẩn bị</h2><p>W07 bắt đầu bằng cutover 2026-06-22 05:00 và được review ngày 2026-06-27. Giai đoạn này kiểm soát tại hiện trường: champion có mặt tại zone, gemba walk 7 zone, JO dossier đầu tiên, shift handover và andon-cord live test.</p>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>Role</th><th>Task chuẩn bị</th><th>Deadline</th><th>Evidence</th></tr></thead>
+<tbody>
+<tr><td>PROD_DIR</td><td>Xác nhận champion Production có mặt tại zone lúc 2026-06-22 07:00.</td><td>2026-06-21 16:00</td><td>champion rota</td></tr>
+<tr><td>ENG_MGR</td><td>Xác nhận dual-CAD fallback và export script.</td><td>2026-06-21 12:00</td><td>ANNEX-118</td></tr>
+<tr><td>QA_MGR</td><td>Chuẩn bị JO dossier audit checklist và andon event log.</td><td>2026-06-21 15:00</td><td>QA checklist</td></tr>
+<tr><td>QMS_ENG</td><td>Seed W07 dashboard, gemba log và problem board.</td><td>2026-06-21 17:00</td><td>readiness.json</td></tr>
+<tr><td>CEO</td><td>Chuẩn bị message: kéo andon là hành vi tốt.</td><td>2026-06-21 18:00</td><td>CEO speaker card</td></tr>
+</tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 10 — TÀI LIỆU LIÊN QUAN
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-docs">
-  <h2 class="h2">Tài liệu liên quan · click để mở</h2>
-  <!-- TODO Codex W06/SEC-DOCS: liệt kê 6–12 doc code dạng:
-         <a href="#" onclick="if(window.openDoc)openDoc('CODE');return false;" class="role-chip">CODE</a>
-       Bắt buộc bao gồm doc trong requiredDocs của tuần 06 (xem program.bootstrap.json). -->
+<section class="card" id="sec-docs"><h2 class="h2">Tài liệu liên quan · click để mở</h2><p>Các tài liệu này là nguồn kiểm soát cho P3-02, runbook lock, rollback, production cutover và hypercare W07.</p><p><a href="#" onclick="if(window.openDoc)openDoc('ANNEX-114');return false;" class="role-chip">ANNEX-114</a> <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-117');return false;" class="role-chip">ANNEX-117</a> <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-118');return false;" class="role-chip">ANNEX-118</a> <a href="#" onclick="if(window.openDoc)openDoc('SOP-501');return false;" class="role-chip">SOP-501</a> <a href="#" onclick="if(window.openDoc)openDoc('WI-519');return false;" class="role-chip">WI-519</a> <a href="#" onclick="if(window.openDoc)openDoc('SOP-303');return false;" class="role-chip">SOP-303</a> <a href="#" onclick="if(window.openDoc)openDoc('WI-302');return false;" class="role-chip">WI-302</a> <a href="#" onclick="if(window.openDoc)openDoc('WI-202');return false;" class="role-chip">WI-202</a> <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W05');return false;" class="role-chip">TRN-DEP-W05</a> <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W07');return false;" class="role-chip">TRN-DEP-W07</a> <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W08');return false;" class="role-chip">TRN-DEP-W08</a> </p></section>
+<section class="card" id="sec-risks"><h2 class="h2">Rủi ro tuần 06 + escalation</h2><div class="table-card">
+<table class="table">
+<thead><tr><th>#</th><th>Mô tả rủi ro</th><th>L</th><th>I</th><th>Mitigation</th><th>Trigger escalation</th><th>Owner</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Wave 2 Sev-1 spike cuối tuần.</td><td>M</td><td>H</td><td>Không ký Go nếu Sev-1 mở trong 2026-06-15 đến 2026-06-19.</td><td>Open Sev-1 &gt;0.</td><td>CEO</td></tr>
+<tr><td>2</td><td>Rollback live test fail hoặc chỉ là dry-run.</td><td>M</td><td>H</td><td>ECAB chạy lại test có recovery state.</td><td>Thiếu audit_events row.</td><td>IT_MGR</td></tr>
+<tr><td>3</td><td>Champion Production thiếu backup.</td><td>M</td><td>H</td><td>22 record Production bắt buộc.</td><td>champions.json thiếu zone.</td><td>PROD_DIR</td></tr>
+<tr><td>4</td><td>Operator ngại kéo andon vì high power-distance.</td><td>H</td><td>H</td><td>CEO message 2026-06-22 05:30, mentor pair.</td><td>0 andon trong khi issue delay.</td><td>QA_MGR</td></tr>
+<tr><td>5</td><td>CAD/CAM disruption làm job đầu tiên không chạy.</td><td>M</td><td>H</td><td>Dual-CAD fallback 5 ngày, ENG_MGR on-call.</td><td>CAD export fail.</td><td>ENG_MGR</td></tr>
+<tr><td>6</td><td>Runbook bị chỉnh sau CAB.</td><td>L</td><td>H</td><td>Mọi chỉnh sửa sau CAB qua emergency change hoặc CAB mới.</td><td>Timestamp thay đổi không audit event.</td><td>CUTOVER_LEAD</td></tr>
+</tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 11 — RỦI RO + ESCALATION
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-risks">
-  <h2 class="h2">Rủi ro tuần 06 + escalation</h2>
-  <!-- TODO Codex W06/SEC-RISKS: bảng 5–8 rủi ro. Cột: # · Mô tả rủi ro · Likelihood (L/M/H) · Impact (L/M/H) · Mitigation · Trigger escalation · Escalation owner.
-       Bao gồm ít nhất 1 rủi ro Hofstede (VN cultural): vd "trưởng phòng không feedback openly tại all-hands" → mitigation: anonymous feedback box. -->
-</section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 12 — LESSONS LEARNED (FILL POST-MEETING)
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-lessons">
-  <h2 class="h2">Lessons learned · điền sau họp (Lean Change cycle)</h2>
-  <!-- TODO Codex W06/SEC-LESSONS: chừa 3 khối Insights / Options / Experiments (Jason Little Lean Change Canvas) với placeholder text.
-       Sau cuộc họp thật, owner sẽ điền vào 3 ô này. -->
-</section>
-
+<section class="card" id="sec-lessons"><h2 class="h2">Lessons learned · điền sau họp (Lean Change cycle)</h2><p>QMS_ENG chỉ điền Lean Change canvas sau khi gate P3-02 đã ký và audit_events đã ghi decision; ghi chú phải phân biệt Wave 2, CAB/rollback và readiness tại hiện trường.</p><div class="grid-3"><div class="note"><h3>Insights</h3><p>Điền 3 phát hiện thật từ gate, kèm evidence source và ảnh hưởng tới W05.</p></div><div class="note"><h3>Options</h3><p>Điền các lựa chọn đã cân nhắc, gồm lựa chọn không chọn và lý do không chọn.</p></div><div class="note"><h3>Experiments</h3><p>Điền experiment W05, hypothesis, threshold pass/fail và owner role code.</p></div></div></section>
 </div><!-- /doc-content -->
 </div></div></div>
 </body>

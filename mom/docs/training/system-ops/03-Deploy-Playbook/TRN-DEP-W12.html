@@ -26,9 +26,6 @@
 <style>
  .role-chip{display:inline-block;padding:2px 8px;border-radius:999px;background:#f3f4f6;margin:2px 6px 2px 0;font-size:12px}
  .tight li{margin:2px 0}
- .pending-fill{background:#fef3c7;border-left:4px solid #f59e0b;padding:12px 16px;border-radius:8px;color:#78350f;margin:12px 0;font-size:13px}
- .pending-fill strong{color:#92400e;font-weight:700}
- .pending-fill code{background:rgba(146,64,14,.10);padding:1px 5px;border-radius:4px;font-size:12px}
  table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; }
  td,th { word-wrap:break-word; overflow-wrap:break-word; padding:8px 10px; border:1px solid #e2e8f0; vertical-align:top; }
  th { background:#f1f5f9; text-align:left; font-weight:700; }
@@ -45,135 +42,184 @@
      data-dcc-bootstrap='{"header":{"doc_code":"TRN-DEP-W12","title":"Playbook tuần 12 — Bàn giao chính thức · vận hành thường xuyên","subtitle":"Triển khai vận hành QMS · Phase P4 · 2026-08-01 (Saturday)","doc_type":"TRN","revision":"V0","effective_date":"2026-08-01","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":null,"status":"draft"}}'></div>
 
 <div class="doc-content" id="docContent">
-
-<div class="pending-fill" id="codex-marker">
-  <strong>⚠ Tài liệu khung — Codex chưa viết nội dung chi tiết.</strong>
-  Đây là scaffold do <code>generate-deploy-playbooks.sh</code> sinh ra với 12 section placeholder.
-  Phần nội dung do AI author điền theo prompt pack tương ứng (tham chiếu <code>_reports/deploy-playbook/PROMPT_PACK_12.md</code>).
-  Sau khi Codex viết xong sẽ xoá khung cảnh báo này.
-</div>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 1 — COVER
-     Codex fill: kicker (Phase P4), large title, một câu mô tả intent,
-     khối "QUICK FACTS" 6 ô (Ngày · Thứ · Phase · Pillar · Attendees · Owner)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-cover">
   <h1 class="h2" style="margin-top:0;">W12 · 2026-08-01 — Bàn giao chính thức · vận hành thường xuyên</h1>
-  <p class="lead"><!-- TODO Codex W12/SEC-COVER: 2–3 câu mô tả mục đích chiến lược của tuần 12 trong tổng thể 12 tuần. --></p>
-  <!-- TODO Codex W12/SEC-COVER: bảng QUICK FACTS với 6 ô (grid-3, 2 hàng): Ngày · Thứ · Phase · Pillar · Attendees · Owner -->
+  <p class="lead">Tuần 12 đóng chương trình triển khai 12 tuần và bàn giao hệ thống sang BAU, nhưng chỉ đóng khi owner vận hành nhận KPI, cadence, audit calendar, champion roster và open actions bằng chữ ký rõ ràng. Đây là điểm Kotter bước 8 được chứng minh: QMS không còn là dự án đặc biệt mà trở thành cách công ty điều hành hằng tuần, hằng tháng và hằng quý. ISO 9001:2015 §9.3 management review input, ITIL 4 transition to operations, NIST baseline freeze và Toyota institutionalization đều được chuyển thành bằng chứng cụ thể trong handoff package.</p>
+  <div class="grid-3">
+    <div class="metric-card"><strong>Ngày</strong><br>2026-08-01</div>
+    <div class="metric-card"><strong>Thứ</strong><br>Thứ Bảy</div>
+    <div class="metric-card"><strong>Phase</strong><br>P4 · Handoff to BAU</div>
+    <div class="metric-card"><strong>Pillar</strong><br>gov · BAU operating cadence</div>
+    <div class="metric-card"><strong>Attendees</strong><br>Steering + all 80 employees · CEO, QMS_MGR, QA_MGR, PROD_DIR, ENG_MGR sign live</div>
+    <div class="metric-card"><strong>Owner</strong><br>CEO + QMS_MGR · BAU owners accept KPI responsibility</div>
+  </div>
+  <p>Thông điệp cuối cùng: chương trình đóng, nhưng control loop không đóng. Từ 2026-08-08 trở đi, cuộc họp thứ Bảy 09:00 là weekly tier meeting theo WI-202; từ 2026-08-27, management review tháng đầu tiên chạy theo WI-901; và từ tháng 09/2026, internal audit cycle năm 1 bắt đầu theo ANNEX-119.</p>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 2 — MỤC TIÊU TUẦN + KPI BASELINE
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-objective">
   <h2 class="h2">Mục tiêu tuần 12</h2>
-  <!-- TODO Codex W12/SEC-OBJECTIVE: viết 3–5 mục tiêu SMART (Specific, Measurable, Achievable, Relevant, Time-bound).
-       Sau đó liệt kê KPI baseline cần đo TRƯỚC khi tuần bắt đầu (con số khởi điểm).
-       Tham chiếu ANNEX-110 (KPI dictionary) cho mọi KPI ID. -->
+  <ol class="tight">
+    <li>Handoff memo v1.0 phải được ký live bởi 5 Steering roles: CEO, QMS_MGR, QA_MGR, PROD_DIR, ENG_MGR trước 2026-08-01 09:25.</li>
+    <li>KPI ownership transfer matrix phải gán đủ 10 KPI IDs từ KPI-FLD-01 đến KPI-DEP-07 cho BAU owner role, source system, review cadence và escalation path trước 2026-08-01 09:35.</li>
+    <li>Cadence vận hành sau chương trình phải được publish: weekly tier meeting thứ Bảy 09:00, monthly management review thứ Năm cuối tháng, quarterly internal audit theo lịch 09/2026, 12/2026, 03/2027, 06/2027.</li>
+    <li>Champion roster chuyển trạng thái từ `deploy` sang `ongoing`; mỗi champion có backup, JD link và training responsibility để không biến mất sau lễ đóng chương trình.</li>
+    <li>Audit_events row `deploy_program_handoff_complete` phải được tạo trước 2026-08-01 17:00, kèm handoff package, KPI matrix, calendar evidence và decision minutes.</li>
+  </ol>
+  <div class="table-card"><table class="table"><thead><tr><th>Baseline trước W12</th><th>Giá trị cuối W11</th><th>Target W12</th><th>Evidence</th><th>Owner tiếp nhận</th></tr></thead><tbody>
+    <tr><td>Handoff memo</td><td>v0.9 đã draft, cần chữ ký live</td><td>v1.0 signed by 5 Steering roles</td><td>handoff memo PDF, signature page</td><td>CEO</td></tr>
+    <tr><td>KPI ownership</td><td>Matrix draft 10 KPI, cần BAU acceptance</td><td>10/10 KPI có owner role và cadence</td><td>ANNEX-110 owner transfer matrix</td><td>QMS_MGR</td></tr>
+    <tr><td>Audit calendar</td><td>Q1-Q4 booked draft</td><td>4 calendar events confirmed</td><td>ANNEX-119, calendar export</td><td>QMS_MGR</td></tr>
+    <tr><td>CAPA status</td><td>0 overdue required by W11</td><td>0 CAPA overdue at handoff</td><td>CAPA query, ANNEX-117</td><td>QA_MGR</td></tr>
+    <tr><td>Champion roster</td><td>22 deploy champions + backups</td><td>Status `ongoing`, owner role, backup and JD link present</td><td>`champions.json`, training_records</td><td>HR_MGR</td></tr>
+  </tbody></table></div>
+  <p>W12 không được đóng nếu còn câu trả lời mơ hồ, không có ngày, không có owner hoặc không có evidence. Mỗi mục tiêu phải kết thúc bằng artifact: memo, matrix, calendar, roster, audit event. Nếu một artifact thiếu, chương trình chuyển sang Conditional Handoff và CEO phải ký rationale thay vì ghi hoàn tất.</p>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 3 — PREP CHECKLIST T-7 / T-3 / T-1 / T-0
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-prep">
   <h2 class="h2">Prep checklist — T-7 / T-3 / T-1 / T-0</h2>
-  <!-- TODO Codex W12/SEC-PREP: 4 bảng prep (T-7, T-3, T-1 ngày trước, T-0 sáng họp).
-       Mỗi item: WHO (role code) · WHAT · EVIDENCE · DEADLINE.
-       Mỗi T-window tối thiểu 4 item; T-0 là pre-meeting sanity check 30' trước họp. -->
+  <div class="table-card"><table class="table"><thead><tr><th>Window</th><th>WHO</th><th>WHAT</th><th>EVIDENCE</th><th>DEADLINE</th></tr></thead><tbody>
+    <tr><td>T-7 · 2026-07-25</td><td>QMS_MGR</td><td>Assemble handoff memo draft from W01-W11 evidence, including gates, KPIs, CAPA, doc revisions and open actions.</td><td>handoff memo v0.7</td><td>2026-07-25 18:00</td></tr>
+    <tr><td>T-7 · 2026-07-25</td><td>QMS_ENG</td><td>Freeze 12-week KPI raw data and build sparkline packet for KPI-FLD-01..KPI-DEP-07.</td><td>ANNEX-110 data pack</td><td>2026-07-25 18:00</td></tr>
+    <tr><td>T-7 · 2026-07-25</td><td>HR_MGR</td><td>Draft champion roster transition from deploy role to ongoing role, including backup and JD link.</td><td>`champions.json` draft</td><td>2026-07-25 18:30</td></tr>
+    <tr><td>T-7 · 2026-07-25</td><td>IT_MGR</td><td>Confirm QR code posting evidence and dashboard BAU mode toggle proposal.</td><td>QR photo archive, dashboard config note</td><td>2026-07-25 18:30</td></tr>
+    <tr><td>T-3 · 2026-07-29</td><td>QMS_ENG</td><td>Finalize KPI ownership transfer matrix with source system, review cadence, escalation owner and BAU owner acceptance cell.</td><td>ANNEX-110 matrix v0.9</td><td>2026-07-29 12:00</td></tr>
+    <tr><td>T-3 · 2026-07-29</td><td>QMS_MGR</td><td>Confirm internal audit calendar Q1-Q4 and monthly management review first slot 2026-08-27.</td><td>calendar export, ANNEX-119</td><td>2026-07-29 15:00</td></tr>
+    <tr><td>T-3 · 2026-07-29</td><td>QA_MGR</td><td>Run CAPA final status query and list every open CAPA with owner, due date and effectiveness check status.</td><td>CAPA query output, ANNEX-117</td><td>2026-07-29 16:00</td></tr>
+    <tr><td>T-3 · 2026-07-29</td><td>HR_MGR</td><td>Verify training playlist v2 recording status and map all released videos to `training_records`.</td><td>SOP-801, playlist v2 log</td><td>2026-07-29 17:00</td></tr>
+    <tr><td>T-1 · 2026-07-31</td><td>QMS_MGR</td><td>Finalize handoff package: memo, KPI matrix, audit calendar, champion roster, CAPA status, W11 revision plan.</td><td>handoff package v1.0 candidate</td><td>2026-07-31 12:00</td></tr>
+    <tr><td>T-1 · 2026-07-31</td><td>CEO</td><td>Review closing speech and signature order; confirm no unresolved gate disagreement.</td><td>CEO review acknowledgement</td><td>2026-07-31 14:00</td></tr>
+    <tr><td>T-1 · 2026-07-31</td><td>IT_MGR</td><td>Prepare live dashboard view with BAU mode and ensure no draft-only data is displayed in final all-hands.</td><td>dashboard screenshot with timestamp</td><td>2026-07-31 15:00</td></tr>
+    <tr><td>T-1 · 2026-07-31</td><td>QMS_ENG</td><td>Prepare audit_events insertion packet for `deploy_program_handoff_complete`.</td><td>audit event payload draft</td><td>2026-07-31 16:00</td></tr>
+    <tr><td>T-0 · 2026-08-01</td><td>QMS_MGR</td><td>30 phút trước họp, verify signature pages printed, digital signature fallback ready and calendar export attached.</td><td>signature readiness checklist</td><td>2026-08-01 08:30</td></tr>
+    <tr><td>T-0 · 2026-08-01</td><td>QMS_ENG</td><td>Verify all 12 TRN-DEP-Wnn links open from portal and render DCC header.</td><td>playbook link smoke log</td><td>2026-08-01 08:35</td></tr>
+    <tr><td>T-0 · 2026-08-01</td><td>QA_MGR</td><td>Re-run CAPA overdue check; any overdue CAPA blocks full handoff.</td><td>CAPA final query</td><td>2026-08-01 08:40</td></tr>
+    <tr><td>T-0 · 2026-08-01</td><td>CEO</td><td>Confirm closing line: program closes, BAU cadence begins, first weekly tier meeting 2026-08-08 09:00.</td><td>CEO run sheet</td><td>2026-08-01 08:45</td></tr>
+  </tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 4 — AGENDA TIMED (60 phút)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-agenda">
   <h2 class="h2">Agenda · 09:00–10:00 (60 phút)</h2>
-  <!-- TODO Codex W12/SEC-AGENDA: bảng 8–10 dòng. Cột: Thời gian · Phút · Đề mục · Owner · Output kỳ vọng.
-       Đảm bảo có: opening (5'), KPI review (10'), main content (~30'), gate decision (10'), closing + next week preview (5'). -->
+  <div class="table-card"><table class="table"><thead><tr><th>Thời gian</th><th>Phút</th><th>Đề mục</th><th>Owner</th><th>Output kỳ vọng</th></tr></thead><tbody>
+    <tr><td>09:00-09:05</td><td>5</td><td>CEO closing speech: anchor QMS as daily operating system</td><td>CEO</td><td>All-hands hiểu chương trình đóng nhưng cadence BAU bắt đầu.</td></tr>
+    <tr><td>09:05-09:15</td><td>10</td><td>12-week journey recap with KPI sparkline</td><td>QMS_MGR</td><td>W01-W12 timeline, waves, issues, CAPA and KPI trend shown with evidence.</td></tr>
+    <tr><td>09:15-09:25</td><td>10</td><td>Handoff memo walkthrough + live signature</td><td>CEO, QMS_MGR</td><td>5 Steering roles sign memo v1.0.</td></tr>
+    <tr><td>09:25-09:35</td><td>10</td><td>KPI ownership transfer matrix</td><td>QMS_ENG</td><td>10 KPI assigned to BAU owner role, cadence and escalation path.</td></tr>
+    <tr><td>09:35-09:43</td><td>8</td><td>Internal audit cycle năm 1</td><td>QMS_MGR</td><td>4 quarterly audit slots confirmed and visible in calendar.</td></tr>
+    <tr><td>09:43-09:50</td><td>7</td><td>Cadence vận hành post-program</td><td>QMS_MGR</td><td>Weekly tier, monthly management review, quarterly audit and issue escalation accepted.</td></tr>
+    <tr><td>09:50-09:56</td><td>6</td><td>Champion recognition and transition to ongoing role</td><td>HR_MGR</td><td>22 champions recognized by role group and ongoing status confirmed.</td></tr>
+    <tr><td>09:56-09:59</td><td>3</td><td>Gate P4-04 decision</td><td>CEO</td><td>Go / Conditional Handoff / No-Go documented.</td></tr>
+    <tr><td>09:59-10:00</td><td>1</td><td>Week 13 first BAU week preview</td><td>QMS_MGR</td><td>First BAU weekly tier meeting confirmed for 2026-08-08 09:00.</td></tr>
+  </tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 5 — NỘI DUNG HỌP TUẦN NÀY (slide-by-slide)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-slides">
   <h2 class="h2">Nội dung họp tuần 12 — slide-by-slide</h2>
-  <!-- TODO Codex W12/SEC-SLIDES: 8–12 slide block, mỗi block:
-         <div class="card"> hoặc <div class="note-blue">
-           <h3>Slide N — Tiêu đề</h3>
-           <p>Talking points 3–5 câu (Vietnamese with diacritics).</p>
-           <ul class="tight">các bullet cụ thể, có CON SỐ và DOC CODE.</ul>
-         </div>
-       Cấm dùng "đảm bảo chất lượng" generic. Phải có con số, doc code, role code cụ thể.
-       Vận dụng Hofstede (Vietnam high power-distance): CEO speaks first, seniority order, bilingual VN/EN slides. -->
+  <div class="card"><h3>Slide 1 — 12-week journey timeline</h3><p>QMS_MGR trình bày hành trình từ W01 công bố chính thức, W03-W04 pilot QA, W05-W06 Wave 2, W07-W08 Wave Production, W09-W10 Wave 3, W11 lessons learned đến W12 handoff. Timeline không chỉ kể tuần; mỗi mốc phải kèm gate code, deliverable và evidence. Kotter bước 8 được diễn giải bằng câu: "this is now how we operate".</p><ul class="tight"><li>W01-W03: P0/P1/P2 foundation and pilot start.</li><li>W04-W09: wave gates P2/P3 and hypercare.</li><li>W10-W12: dashboard governance, lessons, handoff.</li></ul></div>
+  <div class="card"><h3>Slide 2 — KPI sparkline: KPI-FLD-01, KPI-FLD-02, KPI-TRN-01</h3><p>Slide này hiển thị ba KPI người dùng: routing đúng thư mục, thời gian tra cứu và hoàn thành đào tạo. Nếu W01 baseline thấp, phải giữ nguyên để thấy learning curve. Không được chỉ hiển thị điểm cuối; điểm cuối không giải thích được năng lực vận hành nếu không thấy trend theo wave.</p><ul class="tight"><li>KPI-FLD-01 target ≥95%.</li><li>KPI-FLD-02 target ≤180s.</li><li>KPI-TRN-01 target ≥90%.</li><li>Evidence: ANNEX-110, training_records, retrieval drill log.</li></ul></div>
+  <div class="card"><h3>Slide 3 — KPI sparkline: KPI-DEP-01..KPI-DEP-05</h3><p>QMS_ENG trình bày champion coverage, issue closure on time, change failure rate, change lead time và refresh SLA. Đây là nhóm KPI chứng minh chương trình có operating discipline. Nếu KPI-DEP-05 chỉ đạt sau khi manual refresh, slide phải ghi exception vì BAU không thể phụ thuộc vào thao tác thủ công mỗi tuần.</p><ul class="tight"><li>KPI-DEP-01 champion coverage = 100% primary + backup.</li><li>KPI-DEP-02 issue closure ≥95% on time.</li><li>KPI-DEP-05 refresh SLA ≥95%.</li></ul></div>
+  <div class="card"><h3>Slide 4 — KPI sparkline: KPI-DEP-06 and KPI-DEP-07</h3><p>DORA 2024 và ITIL 4 được dùng để giải thích hai KPI cuối: deployment/change frequency và MTTR Sev-1. Mục tiêu không phải tăng change vô hạn, mà duy trì nhịp thay đổi đủ nhỏ để học nhanh và MTTR đủ thấp nếu sự cố xảy ra. Nếu không có Sev-1 trong giai đoạn cuối, MTTR Sev-1 ghi `n/a` và dùng Sev-2 workaround stability làm context.</p><ul class="tight"><li>KPI-DEP-06 target ≥3 change/tuần.</li><li>KPI-DEP-07 target ≤24h cho Sev-1.</li><li>Evidence: deploy log, PIR, incident log.</li></ul></div>
+  <div class="card"><h3>Slide 5 — Wave breakdown</h3><p>Slide này giúp 80 employees thấy chương trình bao phủ toàn công ty: QA pilot, SCM + Sales, Production + Engineering, rồi HR/FIN/IT/EHS/Epicor. Mỗi wave có cohort, risk profile, gate result và hypercare note. Không dùng "thành công" nếu chưa nêu số issue, Sev-1, CAPA và closure evidence.</p><ul class="tight"><li>QA pilot: wrong-revision drill and retrieval discipline.</li><li>Wave 2: money-touching SCM/Sales operations.</li><li>Wave Production: shop-floor high-risk go-live.</li><li>Wave 3: support functions and dashboard governance.</li></ul></div>
+  <div class="card"><h3>Slide 6 — Issue closure stats</h3><p>QA_MGR trình bày total issues opened, closed, by severity and wave. Số issue cao trong pilot không phải xấu nếu closure on time đạt target; issue thấp bất thường có thể nghĩa là người dùng không report. Bảng cần phân biệt Sev-1, Sev-2, Sev-3 và dummy entries used to test workflow.</p><ul class="tight"><li>Target: KPI-DEP-02 ≥95% closure on time.</li><li>Evidence: `issues.json`, severity board, audit_events.</li><li>Open issue at handoff: must have owner and due date.</li></ul></div>
+  <div class="card"><h3>Slide 7 — CAPA stats</h3><p>CAPA không được dùng như thùng chứa nợ. Slide này hiện total opened, total closed, rolling backlog, overdue count and effectiveness check completion. ISO §10.2/§10.3 yêu cầu corrective action và continual improvement; vì vậy CAPA còn mở tại handoff vẫn được phép nếu có owner, due date, risk level và check hiệu lực.</p><ul class="tight"><li>Handoff threshold: 0 CAPA overdue.</li><li>CAPA backlog target: ≤5 open.</li><li>Evidence: CAPA table, ANNEX-117, effectiveness records.</li></ul></div>
+  <div class="card"><h3>Slide 8 — Doc revision activity</h3><p>QMS_MGR trình bày 27 controlled docs effective, 10+ docs revision +1 from W11 and DCC header conformance. Slide phải nêu rõ doc nào đã release, doc nào đang revision plan và doc nào là BAU follow-up. DCC header conformance = 100% là điều kiện chất lượng tài liệu, không phải việc trang trí.</p><ul class="tight"><li>Evidence: `dcc_document_header`, DCC audit output, ANNEX-119.</li><li>Revision plan ETA: no later than 2026-08-24.</li><li>Required docs: MAN-001, POL-QMS-001, POL-QMS-002, WI/SOP/ANNEX set.</li></ul></div>
+  <div class="card"><h3>Slide 9 — Champion roster ongoing</h3><p>HR_MGR trình bày champion roster theo role code và zone, không dùng tên cá nhân. Mỗi champion phải có backup, scope, JD link và ongoing responsibility. Champion không còn là người cứu dự án; họ là một phần của cơ chế quản trị thường xuyên và training reinforcement.</p><ul class="tight"><li>Target: 22 champion + 22 backup have ongoing status.</li><li>Evidence: `champions.json`, training_records, JD links.</li><li>Risk: attrition; mitigation: role becomes part of JD and annual KPI.</li></ul></div>
+  <div class="card"><h3>Slide 10 — KPI ownership transfer matrix</h3><p>QMS_ENG trình bày 10 KPI × BAU owner. Matrix phải có source system, review cadence, escalation owner and target. Nếu owner role chưa nhận trách nhiệm live, KPI đó không được coi là bàn giao. Đây là điểm chuyển từ project governance sang line management governance.</p><ul class="tight"><li>KPI-FLD-01/02: QMS_MGR + IT_MGR.</li><li>KPI-TRN-01: HR_MGR.</li><li>KPI-DEP-01/02/03/04/05/06/07: QMS_MGR with role-specific data owners.</li></ul></div>
+  <div class="card"><h3>Slide 11 — Internal audit cycle năm 1</h3><p>Slide này biến ISO 9001 §9.2 từ yêu cầu trừu tượng thành lịch thật. Q1 09/2026 kiểm document control + training, Q2 12/2026 kiểm production traceability + CAPA, Q3 03/2027 kiểm dashboard governance + RBAC, Q4 06/2027 kiểm management review input pack. Calendar events phải có scope, owner and report due date.</p><ul class="tight"><li>First audit: week 2 of 09/2026.</li><li>Monthly review first slot: 2026-08-27.</li><li>Evidence: ANNEX-119, calendar export.</li></ul></div>
+  <div class="card"><h3>Slide 12 — Cadence vận hành post-program</h3><p>CEO chốt slide cuối: weekly tier meeting thứ Bảy 09:00 theo WI-202, monthly management review thứ Năm cuối tháng theo WI-901, quarterly audit theo ANNEX-119. Chương trình triển khai không còn là lý do để làm khác hệ thống; BAU mode là hệ thống. Nếu cadence rơi trong 4 tuần đầu, CEO cam kết tham dự để giữ nhịp.</p><ul class="tight"><li>First BAU weekly tier: 2026-08-08 09:00.</li><li>First monthly management review: 2026-08-27.</li><li>First internal audit: 09/2026.</li></ul></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 6 — QUYẾT ĐỊNH CẦN LẤY TẠI HỌP
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-decisions">
   <h2 class="h2">Quyết định cần lấy trong cuộc họp này</h2>
-  <!-- TODO Codex W12/SEC-DECISIONS: bảng 3–6 quyết định. Cột: # · Quyết định · Người ký · Cơ sở (doc/data) · Fallback nếu deferred.
-       Mỗi quyết định phải có Plan-B nếu không lấy được trong cuộc họp. -->
+  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Quyết định</th><th>Người ký</th><th>Cơ sở doc/data</th><th>Fallback nếu deferred</th></tr></thead><tbody>
+    <tr><td>1</td><td>Approve handoff memo v1.0.</td><td>CEO, QMS_MGR, QA_MGR, PROD_DIR, ENG_MGR</td><td>handoff package, W01-W12 evidence, ANNEX-119</td><td>Conditional Handoff nếu chỉ thiếu non-critical appendix; No-Go nếu thiếu chữ ký Steering.</td></tr>
+    <tr><td>2</td><td>Approve KPI ownership transfer matrix 10 KPI to BAU.</td><td>CEO, QMS_MGR, BAU owners</td><td>ANNEX-110, dashboard owner matrix</td><td>Không chuyển KPI thiếu owner; QMS_MGR giữ interim owner tối đa 14 ngày với issue mở.</td></tr>
+    <tr><td>3</td><td>Approve internal audit cycle năm 1 calendar.</td><td>CEO, QMS_MGR</td><td>ANNEX-119, calendar export</td><td>Defer tối đa 2026-08-03; nếu chưa book, không ghi full handoff complete.</td></tr>
+    <tr><td>4</td><td>Approve cadence vận hành post-program.</td><td>CEO, QMS_MGR</td><td>WI-202, WI-901, mgmt review calendar</td><td>Giữ deploy cadence thêm 2 tuần nếu BAU owner chưa nhận nhịp.</td></tr>
+    <tr><td>5</td><td>Approve champion roster transition to ongoing role.</td><td>HR_MGR, QMS_MGR</td><td>`champions.json`, training_records, JD links</td><td>Champion thiếu backup thì giữ status `deploy-extended` đến khi backup trained.</td></tr>
+  </tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 7 — GO/NO-GO GATE — ĐIỀU KIỆN CẦN VÀ ĐỦ
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-gate">
   <h2 class="h2">Gate Go/No-Go — Điều kiện CẦN và ĐỦ</h2>
-  <!-- TODO Codex W12/SEC-GATE: 2 bảng tách biệt:
-       (A) ĐIỀU KIỆN CẦN (necessary): nếu thiếu BẤT KỲ → No-Go. Tối thiểu 4 item.
-       (B) ĐIỀU KIỆN ĐỦ (sufficient): nếu (A) đủ VÀ tất cả (B) đạt → Go. Tối thiểu 4 item.
-       Mỗi điều kiện: Câu mô tả · Cách đo · Threshold · Bằng chứng (table/file/system).
-       Vận dụng "Go/No-Go gate condition library" của research pack — boilerplate 10 item, chọn lọc cho tuần 12. -->
+  <h3>Gate P4-04 · Điều kiện CẦN</h3>
+  <div class="table-card"><table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Threshold</th><th>Bằng chứng</th></tr></thead><tbody>
+    <tr><td>Handoff memo signed.</td><td>Kiểm tra signature page.</td><td>5 Steering roles ký: CEO, QMS_MGR, QA_MGR, PROD_DIR, ENG_MGR.</td><td>handoff memo v1.0, signature archive.</td></tr>
+    <tr><td>KPI ownership transfer complete.</td><td>Đếm 10 KPI rows có BAU owner.</td><td>10/10 KPI có owner role, source system, cadence and escalation owner.</td><td>ANNEX-110 owner matrix.</td></tr>
+    <tr><td>Internal audit cycle booked.</td><td>Kiểm calendar export.</td><td>4 quarterly audit events exist with scope and owner.</td><td>ANNEX-119, calendar export.</td></tr>
+    <tr><td>Cadence vận hành published.</td><td>Check memo to all 80 employees.</td><td>Weekly tier, monthly management review, quarterly audit in memo.</td><td>handoff announcement, WI-202, WI-901.</td></tr>
+  </tbody></table></div>
+  <h3>Gate P4-04 · Điều kiện ĐỦ</h3>
+  <div class="table-card"><table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Threshold</th><th>Bằng chứng</th></tr></thead><tbody>
+    <tr><td>0 unresolved gate disagreement.</td><td>Check meeting minutes and dissent log.</td><td>0 unresolved dissent; if dissent exists, rationale + owner path recorded.</td><td>`mgmt-reviews.json`, minutes.</td></tr>
+    <tr><td>0 CAPA overdue.</td><td>CAPA final query.</td><td>0 CAPA quá 30 ngày tại 2026-08-01 17:00.</td><td>CAPA table, ANNEX-117.</td></tr>
+    <tr><td>Management approval logged.</td><td>Audit event created.</td><td>Audit_events row `deploy_program_handoff_complete` exists.</td><td>`audit_events`.</td></tr>
+    <tr><td>All 12 playbooks archived as reference set.</td><td>OpenDoc smoke and archive manifest.</td><td>TRN-DEP-W01..W12 render with DCC header and are linked from ANNEX-119.</td><td>ANNEX-119, playbook smoke log.</td></tr>
+  </tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 8 — PHÂN CÔNG NHIỆM VỤ SAU HỌP (RACI)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-tasks">
   <h2 class="h2">Phân công nhiệm vụ sau họp · RACI · deadline</h2>
-  <!-- TODO Codex W12/SEC-TASKS: bảng 8–15 task. Cột: # · Task · R · A · C · I · Deadline · Evidence · KPI ảnh hưởng.
-       R/A/C/I dùng role code (CEO, QMS_MGR, QA_MGR, PROD_DIR, …) — không tên người.
-       Deadline phải absolute date (không "tuần sau"); evidence phải point đến doc_code hoặc table_name. -->
+  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Task</th><th>R</th><th>A</th><th>C</th><th>I</th><th>Deadline</th><th>Evidence</th><th>KPI</th></tr></thead><tbody>
+    <tr><td>1</td><td>Archive 12 playbook docs into ANNEX-119 reference set.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>All_depts</td><td>2026-08-01 17:00</td><td>ANNEX-119, TRN-DEP-W01..W12</td><td>KPI-FLD-01</td></tr>
+    <tr><td>2</td><td>Create audit_events row `deploy_program_handoff_complete`.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>CEO</td><td>2026-08-01 17:30</td><td>`audit_events`</td><td>KPI-DEP-02</td></tr>
+    <tr><td>3</td><td>Update dashboard with BAU mode toggle and hide deploy-only widgets.</td><td>IT_MGR</td><td>QMS_MGR</td><td>Widget owners</td><td>CEO</td><td>2026-08-03</td><td>dashboard config, ANNEX-113</td><td>KPI-DEP-05</td></tr>
+    <tr><td>4</td><td>Send handoff announcement to all 80 employees.</td><td>QMS_MGR</td><td>CEO</td><td>HR_MGR</td><td>All_depts</td><td>2026-08-03 10:00</td><td>handoff announcement archive</td><td>KPI-FLD-01</td></tr>
+    <tr><td>5</td><td>Update champion roster with `ongoing` status.</td><td>HR_MGR</td><td>QMS_MGR</td><td>Dept managers</td><td>CEO</td><td>2026-08-03</td><td>`champions.json`</td><td>KPI-DEP-01</td></tr>
+    <tr><td>6</td><td>Schedule first BAU weekly tier meeting.</td><td>QMS_MGR</td><td>CEO</td><td>All_depts</td><td>All employees</td><td>2026-08-03</td><td>calendar event 2026-08-08 09:00</td><td>KPI-DEP-02</td></tr>
+    <tr><td>7</td><td>Schedule first monthly management review.</td><td>QMS_MGR</td><td>CEO</td><td>FIN_MGR, QA_MGR</td><td>Steering</td><td>2026-08-03</td><td>calendar event 2026-08-27</td><td>KPI-DEP-02</td></tr>
+    <tr><td>8</td><td>Archive program audit_events log and lock handoff evidence packet.</td><td>IT_MGR</td><td>QMS_MGR</td><td>QMS_ENG</td><td>QA_MGR</td><td>2026-08-04</td><td>audit archive manifest</td><td>KPI-DEP-05</td></tr>
+    <tr><td>9</td><td>Update `currentPhase` in program.json to `BAU` after gate Go.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>CEO</td><td>2026-08-04</td><td>program.json, audit_events</td><td>KPI-DEP-02</td></tr>
+    <tr><td>10</td><td>Publish W11 doc revision +1 tracking view for BAU follow-up.</td><td>QMS_MGR</td><td>QA_MGR</td><td>Document owners</td><td>CEO</td><td>2026-08-05</td><td>doc revision tracker</td><td>KPI-FLD-01</td></tr>
+    <tr><td>11</td><td>Run first BAU readiness pulse before weekly tier meeting.</td><td>HR_MGR</td><td>QMS_MGR</td><td>IT_MGR</td><td>All_depts</td><td>2026-08-07</td><td>pulse survey export</td><td>KPI-TRN-01</td></tr>
+    <tr><td>12</td><td>Prepare first weekly tier agenda using WI-202 template.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>QA_MGR</td><td>All_depts</td><td>2026-08-07</td><td>WI-202 agenda packet</td><td>KPI-DEP-02</td></tr>
+  </tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 9 — NỘI DUNG HỌP TUẦN SAU (PREVIEW)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-next-week">
   <h2 class="h2">Preview tuần 13 · nhiệm vụ chuẩn bị</h2>
-  <!-- TODO Codex W12/SEC-NEXT-WEEK: tóm tắt 1 đoạn về tuần kế tiếp, sau đó bảng "chuẩn bị" — mỗi item: Role · Task · Deadline (trong tuần 12).
-       Mục đích: cuối họp W12 mỗi người biết rõ tuần sau họ cần đến với gì. -->
+  <p>Tuần 13 không còn là tuần deploy. Đó là tuần BAU đầu tiên, cùng slot thứ Bảy 09:00 nhưng agenda chuyển sang weekly tier meeting theo WI-202: KPI review, issue escalation, CAPA effectiveness, dashboard exceptions, decision log và action owners. Mọi role phải ngừng hỏi "đội triển khai xử lý chưa" và bắt đầu hỏi "BAU owner đã xử lý theo cadence chưa".</p>
+  <div class="table-card"><table class="table"><thead><tr><th>Role</th><th>Task chuẩn bị cho Week 13</th><th>Deadline</th></tr></thead><tbody>
+    <tr><td>QMS_MGR</td><td>Gửi agenda BAU weekly tier meeting đầu tiên, kèm KPI snapshot và open CAPA list.</td><td>2026-08-07 12:00</td></tr>
+    <tr><td>QA_MGR</td><td>Chuẩn bị CAPA effectiveness update và overdue risk list, dù overdue count = 0.</td><td>2026-08-07 15:00</td></tr>
+    <tr><td>IT_MGR</td><td>Xác nhận dashboard BAU mode chạy và refresh SLA monitor vẫn ≥95%.</td><td>2026-08-07 15:00</td></tr>
+    <tr><td>HR_MGR</td><td>Chuẩn bị champion ongoing attendance và playlist v2 completion status.</td><td>2026-08-07 16:00</td></tr>
+    <tr><td>CEO</td><td>Attend first 4 weekly tier meetings để anchor BAU mode trong tháng 08/2026.</td><td>2026-08-08 09:00</td></tr>
+  </tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 10 — TÀI LIỆU LIÊN QUAN
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-docs">
   <h2 class="h2">Tài liệu liên quan · click để mở</h2>
-  <!-- TODO Codex W12/SEC-DOCS: liệt kê 6–12 doc code dạng:
-         <a href="#" onclick="if(window.openDoc)openDoc('CODE');return false;" class="role-chip">CODE</a>
-       Bắt buộc bao gồm doc trong requiredDocs của tuần 12 (xem program.bootstrap.json). -->
+  <p>
+    <a href="#" onclick="if(window.openDoc)openDoc('WI-202');return false;" class="role-chip">WI-202</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('WI-901');return false;" class="role-chip">WI-901</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-119');return false;" class="role-chip">ANNEX-119</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('MAN-001');return false;" class="role-chip">MAN-001</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('POL-QMS-001');return false;" class="role-chip">POL-QMS-001</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('POL-QMS-002');return false;" class="role-chip">POL-QMS-002</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W01');return false;" class="role-chip">TRN-DEP-W01</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W02');return false;" class="role-chip">TRN-DEP-W02</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W03');return false;" class="role-chip">TRN-DEP-W03</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W04');return false;" class="role-chip">TRN-DEP-W04</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W05');return false;" class="role-chip">TRN-DEP-W05</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W06');return false;" class="role-chip">TRN-DEP-W06</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W07');return false;" class="role-chip">TRN-DEP-W07</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W08');return false;" class="role-chip">TRN-DEP-W08</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W09');return false;" class="role-chip">TRN-DEP-W09</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W10');return false;" class="role-chip">TRN-DEP-W10</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W11');return false;" class="role-chip">TRN-DEP-W11</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W12');return false;" class="role-chip">TRN-DEP-W12</a>
+  </p>
+  <p>W12 phải mở được toàn bộ reference set vì handoff chỉ đáng tin khi người dùng có thể truy xuất lịch sử 12 tuần. WI-202 là agenda vận hành thường xuyên, WI-901 là management review, ANNEX-119 là nơi lưu decision trail, còn MAN-001 và hai policy QMS giữ vai trò khung quản trị.</p>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 11 — RỦI RO + ESCALATION
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-risks">
   <h2 class="h2">Rủi ro tuần 12 + escalation</h2>
-  <!-- TODO Codex W12/SEC-RISKS: bảng 5–8 rủi ro. Cột: # · Mô tả rủi ro · Likelihood (L/M/H) · Impact (L/M/H) · Mitigation · Trigger escalation · Escalation owner.
-       Bao gồm ít nhất 1 rủi ro Hofstede (VN cultural): vd "trưởng phòng không feedback openly tại all-hands" → mitigation: anonymous feedback box. -->
+  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Mô tả rủi ro</th><th>L</th><th>I</th><th>Mitigation</th><th>Trigger escalation</th><th>Owner</th></tr></thead><tbody>
+    <tr><td>1</td><td>BAU rebound: cadence rơi trong 4 tuần đầu vì mọi người nghĩ chương trình đã xong.</td><td>M</td><td>H</td><td>CEO tham dự 4 weekly tier meetings đầu tiên; missed meeting phải có written rationale.</td><td>Any weekly tier meeting bị hủy trong 08/2026.</td><td>CEO</td></tr>
+    <tr><td>2</td><td>KPI ownership ambiguity, đặc biệt KPI-DEP-06 và KPI-DEP-07 không rõ owner giữa QMS_MGR và IT_MGR.</td><td>M</td><td>H</td><td>Matrix slide 10 ghi owner role, source system, cadence and escalation path.</td><td>Any KPI row thiếu owner hoặc owner từ chối live.</td><td>QMS_MGR</td></tr>
+    <tr><td>3</td><td>Audit cycle slippage vì Q1 audit đụng month-end close hoặc production freeze.</td><td>M</td><td>M</td><td>Book week 2 của tháng; FIN_MGR confirm no conflict trước 2026-08-03.</td><td>Q1 event chưa có calendar invite trước 2026-08-03.</td><td>QMS_MGR</td></tr>
+    <tr><td>4</td><td>Champion attrition: 22 champion nhiều, một số đổi ca hoặc chuyển vai trò.</td><td>M</td><td>M</td><td>Champion role becomes part of JD and annual KPI; backup training required.</td><td>Any champion lacks backup or JD link.</td><td>HR_MGR</td></tr>
+    <tr><td>5</td><td>Hofstede risk: BAU mode mất CEO active presence, role heads quay lại chờ chỉ đạo trên.</td><td>M</td><td>H</td><td>CEO attends first 4 weekly meetings, then monthly review; QMS_MGR publishes decision log.</td><td>Decision log has 0 owner actions for 2 consecutive weeks.</td><td>CEO</td></tr>
+    <tr><td>6</td><td>Open doc revisions from W11 bị quên sau handoff.</td><td>M</td><td>H</td><td>Doc revision tracker becomes weekly tier standing item until all ≥10 docs close.</td><td>Any revision +1 action misses ETA.</td><td>QMS_MGR</td></tr>
+  </tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 12 — LESSONS LEARNED (FILL POST-MEETING)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-lessons">
   <h2 class="h2">Lessons learned · điền sau họp (Lean Change cycle)</h2>
-  <!-- TODO Codex W12/SEC-LESSONS: chừa 3 khối Insights / Options / Experiments (Jason Little Lean Change Canvas) với placeholder text.
-       Sau cuộc họp thật, owner sẽ điền vào 3 ô này. -->
+  <div class="grid-3">
+    <div class="note-blue"><h3>Insights</h3><p>1) Người dùng học nhanh nhất khi tài liệu, QR code và dashboard cùng chỉ về một revision rõ ràng tại điểm dùng. 2) Wave Production tạo nhiều dữ liệu nhất nhưng Wave 3 tạo rủi ro blast radius âm thầm vì payroll, invoice, access và EHS ít thấy trên shop floor. 3) Champion network hoạt động tốt khi có backup và zone responsibility, nhưng sẽ suy yếu nếu không đưa vào JD. 4) Dashboard governance chỉ có giá trị khi widget có owner, access rule và escalation path. 5) CAPA không đóng bằng action completed; CAPA đóng khi effectiveness check được weekly tier nhìn thấy.</p></div>
+    <div class="note"><h3>Options</h3><p>Những việc đã chọn không làm trong handoff: không giữ daily hypercare cho toàn công ty vì sẽ làm BAU phụ thuộc vào đội triển khai; không publish mọi feedback thô vì có nguy cơ nhận diện cá nhân; không sửa toàn bộ 27 docs cùng lúc vì quá tải document owners; không cho dashboard orphan tiếp tục hiển thị vì tạo cảm giác kiểm soát giả; không gọi W12 là success nếu CAPA overdue hoặc KPI owner còn trống.</p></div>
+    <div class="note-green"><h3>Experiments</h3><p>BAU year-2 experiments: 1) 4 tuần đầu đo attendance và action closure của weekly tier meeting để kiểm cadence có sống thật không. 2) Thực hiện QR scan audit bất ngờ tại 7 zones trong tháng 08/2026. 3) Chạy RBAC probe dashboard mỗi tháng trong Q3. 4) Đo training playlist v2 bằng retrieval drill trước và sau khi xem video. 5) Dùng CAPA effectiveness row trong WI-202 để giảm repeat issue rate trong Q4.</p></div>
+  </div>
 </section>
 
 </div><!-- /doc-content -->

@@ -45,137 +45,159 @@
      data-dcc-bootstrap='{"header":{"doc_code":"TRN-DEP-W04","title":"Playbook tuần 04 — Pilot QA gate Go/No-Go cho Wave 2","subtitle":"Triển khai vận hành QMS · Phase P2 · 2026-06-06 (Saturday)","doc_type":"TRN","revision":"V0","effective_date":"2026-06-06","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":null,"status":"draft"}}'></div>
 
 <div class="doc-content" id="docContent">
-
-<div class="pending-fill" id="codex-marker">
-  <strong>⚠ Tài liệu khung — Codex chưa viết nội dung chi tiết.</strong>
-  Đây là scaffold do <code>generate-deploy-playbooks.sh</code> sinh ra với 12 section placeholder.
-  Phần nội dung do AI author điền theo prompt pack tương ứng (tham chiếu <code>_reports/deploy-playbook/PROMPT_PACK_04.md</code>).
-  Sau khi Codex viết xong sẽ xoá khung cảnh báo này.
-</div>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 1 — COVER
-     Codex fill: kicker (Phase P2), large title, một câu mô tả intent,
-     khối "QUICK FACTS" 6 ô (Ngày · Thứ · Phase · Pillar · Attendees · Owner)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-cover">
-  <h1 class="h2" style="margin-top:0;">W04 · 2026-06-06 — Pilot QA gate Go/No-Go cho Wave 2</h1>
-  <p class="lead"><!-- TODO Codex W04/SEC-COVER: 2–3 câu mô tả mục đích chiến lược của tuần 04 trong tổng thể 12 tuần. --></p>
-  <!-- TODO Codex W04/SEC-COVER: bảng QUICK FACTS với 6 ô (grid-3, 2 hàng): Ngày · Thứ · Phase · Pillar · Attendees · Owner -->
+<h1 class="h2" style="margin-top:0;">W04 · 2026-06-06 — Pilot QA gate Go/No-Go cho Wave 2</h1>
+<p class="lead">Tuần 04 là quyết định quản trị đầu tiên dựa trên dữ liệu thật của chương trình triển khai. Steering phải chọn rõ một trong ba trạng thái: Go cho Wave 2, Conditional Go với điều kiện đóng trước 2026-06-08, hoặc No-Go và kéo dài pilot thêm 5 ngày làm việc.</p>
+<p>Trọng tâm là kiểm chứng năng lực vận hành của QA sau hai tuần chạy SOP-605, WI-201 và WI-202: dữ liệu drill, issue log, PIR, CAPA và dashboard phải khớp nhau. Cách làm bám Lean Change validated learning, ITIL 4 Change Enablement PIR, Kotter step 6, ISO 9001:2015 §9.1.2 và §10.2.</p>
+<p>CEO mở đầu để giảm ambiguity về quyền quyết định; QA_MGR trình bày dữ liệu, QMS_MGR điều phối retrospective, senior roles phát biểu cuối để tránh anchoring trong bối cảnh high power-distance.</p>
+<div class="grid-3">
+<div class="note"><b>Ngày</b><br>2026-06-06</div>
+<div class="note"><b>Thứ</b><br>Thứ Bảy · 09:00-10:00</div>
+<div class="note"><b>Phase</b><br>P2 · Pilot gate</div>
+<div class="note"><b>Pillar</b><br>pilot</div>
+<div class="note"><b>Attendees</b><br>Steering + 11 champion · khoảng 16 người</div>
+<div class="note"><b>Owner</b><br>CEO + QMS_MGR</div>
+</div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 2 — MỤC TIÊU TUẦN + KPI BASELINE
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-objective">
-  <h2 class="h2">Mục tiêu tuần 04</h2>
-  <!-- TODO Codex W04/SEC-OBJECTIVE: viết 3–5 mục tiêu SMART (Specific, Measurable, Achievable, Relevant, Time-bound).
-       Sau đó liệt kê KPI baseline cần đo TRƯỚC khi tuần bắt đầu (con số khởi điểm).
-       Tham chiếu ANNEX-110 (KPI dictionary) cho mọi KPI ID. -->
+<section class="card" id="sec-objective"><h2 class="h2">Mục tiêu tuần 04</h2>
+<p>W04 không cho phép quyết định theo cảm nhận. Mỗi mục tiêu có mốc thời gian, người ký, bảng dữ liệu và ngưỡng đo đủ cụ thể để CEO có thể ký biên bản ngay trong khung 09:45-09:55.</p>
+<p>Pilot QA là phép thử nhỏ nhưng có giá trị hệ thống. Nếu QA không tự vận hành được một ngày độc lập, Wave 2 không được mở rộng sang SCM và Sales vì rủi ro sẽ chạm khách hàng, supplier và tồn kho.</p>
+<ol class="tight"><li>Đóng pilot QA Tuần 2 từ 2026-06-01 đến 2026-06-05 với tối thiểu 3 ngày dual-run và 1 ngày QA vận hành độc lập vào 2026-06-04; ngưỡng pass là Sev-1 = 0 và Sev-2 = 0.</li><li>Thực hiện wrong-revision drill vào 2026-06-02 lúc 09:00 với 5 tài liệu, trong đó ít nhất 3 tài liệu cố tình sai revision; champion QA phải phát hiện catch rate ≥95%.</li><li>Hoàn tất evidence packet 8-10 trang trước 2026-06-05 16:00, gồm KPI snapshot, issue log ≥10 entries, PIR draft, CAPA backlog, Lean Change canvas và gate decision form.</li><li>Ký quyết định P2-02, P2-03, P2-04 trong cuộc họp 2026-06-06; nếu Conditional Go thì mọi điều kiện có owner role code và deadline không muộn hơn 2026-06-08 17:00.</li><li>Gửi gate decision memo cho toàn bộ 80 nhân sự trước 2026-06-07 18:00; memo nêu decision, lý do dữ liệu, ảnh hưởng tới W05 và đường escalation WI-106.</li></ol>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>KPI / evidence</th><th>Baseline</th><th>Threshold</th><th>Nguồn đo</th></tr></thead>
+<tbody>
+<tr><td>KPI-FLD-02 · thời gian tra cứu</td><td>W03 median từ 10 lượt drill</td><td>≤180 giây trên 25+ lượt cộng dồn</td><td>ANNEX-117 + readiness.json</td></tr>
+<tr><td>KPI-TRN-01 · hoàn thành đào tạo QA</td><td>5/5 QA team qua bootcamp W03</td><td>100% QA team ký SOP-801 record</td><td>training_records</td></tr>
+<tr><td>Issue severity</td><td>≥5 issue từ W03</td><td>≥10 issue pilot, Sev-1 mở = 0</td><td>issues.json</td></tr>
+<tr><td>CAPA backlog</td><td>Backlog pilot sau W03</td><td>≤5 CAPA mở, mỗi CAPA ETA ≤30 ngày</td><td>capa_records</td></tr>
+<tr><td>Audit event</td><td>pilot_qa_week1_complete đã ghi</td><td>pilot_qa_gate_go/cond/nogo ghi trước 2026-06-06 17:00</td><td>audit_events</td></tr>
+</tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 3 — PREP CHECKLIST T-7 / T-3 / T-1 / T-0
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-prep">
-  <h2 class="h2">Prep checklist — T-7 / T-3 / T-1 / T-0</h2>
-  <!-- TODO Codex W04/SEC-PREP: 4 bảng prep (T-7, T-3, T-1 ngày trước, T-0 sáng họp).
-       Mỗi item: WHO (role code) · WHAT · EVIDENCE · DEADLINE.
-       Mỗi T-window tối thiểu 4 item; T-0 là pre-meeting sanity check 30' trước họp. -->
+<section class="card" id="sec-prep"><h2 class="h2">Prep checklist — T-7 / T-3 / T-1 / T-0</h2><p>Chuẩn bị W04 bắt đầu ngay sau retrospective W03. Mục tiêu là khóa evidence trước khi Steering vào phòng họp để cuộc họp không biến thành tranh luận cảm tính.</p>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>Window</th><th>WHO</th><th>WHAT</th><th>EVIDENCE</th><th>DEADLINE</th></tr></thead>
+<tbody>
+<tr><td>T-7 · 2026-05-30</td><td>QA_MGR</td><td>Khóa scope Pilot QA gate và gửi pre-read bằng role code; mọi tài liệu dùng doc_code, revision và owner rõ.</td><td>W04 prep memo</td><td>2026-05-30 17:00</td></tr>
+<tr><td>T-7 · 2026-05-30</td><td>QMS_ENG</td><td>Seed evidence packet, dashboard snapshot và issue categories để không sửa số liệu trong cuộc họp.</td><td>readiness.json</td><td>2026-05-30 18:00</td></tr>
+<tr><td>T-7 · 2026-05-30</td><td>IT_MGR</td><td>Kiểm M365 access cho cohort và champion backup; không dùng tài khoản chia sẻ.</td><td>access_review_item</td><td>2026-05-30 18:00</td></tr>
+<tr><td>T-7 · 2026-05-30</td><td>HR_MGR</td><td>Xác nhận training/OJT checklist và pass criterion theo SOP-801.</td><td>training_records draft</td><td>2026-05-30 18:00</td></tr>
+<tr><td>T-3 · 2026-06-02</td><td>QA_MGR</td><td>Rà evidence chính, đối chiếu threshold với ANNEX-110 và gate code tuần.</td><td>W04 evidence review</td><td>2026-06-02 12:00</td></tr>
+<tr><td>T-3 · 2026-06-02</td><td>QA_MGR</td><td>Cập nhật issue log, severity, owner, ETA và CAPA link nếu issue lặp lại.</td><td>issues.json</td><td>2026-06-02 16:00</td></tr>
+<tr><td>T-3 · 2026-06-02</td><td>QMS_MGR</td><td>Rà decision form, dissent field và fallback path; senior roles phát biểu cuối để giảm anchoring.</td><td>gate form</td><td>2026-06-02 17:00</td></tr>
+<tr><td>T-3 · 2026-06-02</td><td>QMS_ENG</td><td>Kiểm audit_events payload mẫu, chưa ghi cho đến khi decision được ký.</td><td>audit_events draft</td><td>2026-06-02 17:30</td></tr>
+<tr><td>T-1 · 2026-06-05</td><td>QA_MGR</td><td>Pre-circulate evidence packet cho Steering và các manager liên quan.</td><td>evidence packet PDF</td><td>2026-06-05 16:00</td></tr>
+<tr><td>T-1 · 2026-06-05</td><td>QMS_ENG</td><td>Đóng dashboard snapshot cuối ngày với timestamp và KPI values.</td><td>readiness.json</td><td>2026-06-05 16:30</td></tr>
+<tr><td>T-1 · 2026-06-05</td><td>QA_MGR</td><td>Kiểm điều kiện Sev-1, Sev-2, CAPA backlog và PIR draft.</td><td>PIR draft</td><td>2026-06-05 17:00</td></tr>
+<tr><td>T-1 · 2026-06-05</td><td>CEO</td><td>Đọc trước decision packet, ghi câu hỏi vào form để tránh tranh luận ngoài dữ liệu.</td><td>CEO pre-read</td><td>2026-06-05 18:00</td></tr>
+<tr><td>T-0 · 2026-06-06</td><td>QMS_MGR</td><td>Dry-run 30 phút trước họp: thứ tự nói, decision options, evidence screen.</td><td>dry-run note</td><td>2026-06-06 08:30</td></tr>
+<tr><td>T-0 · 2026-06-06</td><td>IT_MGR</td><td>Mở dashboard, exported logs và offline backup trước khi họp.</td><td>AV checklist</td><td>2026-06-06 08:40</td></tr>
+<tr><td>T-0 · 2026-06-06</td><td>QA_MGR</td><td>Kiểm 3 số phải nói trong slide khớp evidence packet.</td><td>speaker card</td><td>2026-06-06 08:45</td></tr>
+<tr><td>T-0 · 2026-06-06</td><td>QMS_ENG</td><td>Chuẩn bị final minutes shell, action log và audit event payload.</td><td>minutes shell</td><td>2026-06-06 08:50</td></tr>
+</tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 4 — AGENDA TIMED (60 phút)
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-agenda">
-  <h2 class="h2">Agenda · 09:00–10:00 (60 phút)</h2>
-  <!-- TODO Codex W04/SEC-AGENDA: bảng 8–10 dòng. Cột: Thời gian · Phút · Đề mục · Owner · Output kỳ vọng.
-       Đảm bảo có: opening (5'), KPI review (10'), main content (~30'), gate decision (10'), closing + next week preview (5'). -->
+<section class="card" id="sec-agenda"><h2 class="h2">Agenda · 09:00–10:00 (60 phút)</h2><div class="table-card">
+<table class="table">
+<thead><tr><th>Thời gian</th><th>Phút</th><th>Đề mục</th><th>Owner</th><th>Output kỳ vọng</th></tr></thead>
+<tbody>
+<tr><td>09:00-09:05</td><td>5</td><td>CEO mở đầu: Go / Conditional Go / No-Go.</td><td>CEO</td><td>Decision space rõ.</td></tr>
+<tr><td>09:05-09:20</td><td>15</td><td>QA_MGR trình bày 2-week pilot data dump.</td><td>QA_MGR</td><td>KPI, issue, drill, QA independent day.</td></tr>
+<tr><td>09:20-09:30</td><td>10</td><td>Lean Change retrospective.</td><td>QMS_MGR</td><td>3 insight, 3 option, 1 experiment.</td></tr>
+<tr><td>09:30-09:40</td><td>10</td><td>PIR review theo ITIL 4 §5.1.7.</td><td>QMS_ENG</td><td>PIR pass/conditional/fail.</td></tr>
+<tr><td>09:40-09:45</td><td>5</td><td>Champion QA xác nhận drill integrity.</td><td>QA_MGR</td><td>Confirmation in minutes.</td></tr>
+<tr><td>09:45-09:55</td><td>10</td><td>Gate deliberation và ký P2-02/P2-03/P2-04.</td><td>CEO + QMS_MGR</td><td>Decision form signed.</td></tr>
+<tr><td>09:55-10:00</td><td>5</td><td>Preview W05 SCM + Sales.</td><td>QMS_MGR</td><td>Managers nhận task.</td></tr>
+</tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 5 — NỘI DUNG HỌP TUẦN NÀY (slide-by-slide)
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-slides">
-  <h2 class="h2">Nội dung họp tuần 04 — slide-by-slide</h2>
-  <!-- TODO Codex W04/SEC-SLIDES: 8–12 slide block, mỗi block:
-         <div class="card"> hoặc <div class="note-blue">
-           <h3>Slide N — Tiêu đề</h3>
-           <p>Talking points 3–5 câu (Vietnamese with diacritics).</p>
-           <ul class="tight">các bullet cụ thể, có CON SỐ và DOC CODE.</ul>
-         </div>
-       Cấm dùng "đảm bảo chất lượng" generic. Phải có con số, doc code, role code cụ thể.
-       Vận dụng Hofstede (Vietnam high power-distance): CEO speaks first, seniority order, bilingual VN/EN slides. -->
+<section class="card" id="sec-slides"><h2 class="h2">Nội dung họp tuần 04 — slide-by-slide</h2>
+<div class="note-blue"><h3>Slide 1 — Recap 2 tuần pilot QA</h3><p>W04 là gate dữ liệu thật đầu tiên của chương trình pilot QA. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: Lean Change, ITIL 4 PIR, ISO 9001:2015 §9.1.2/§10.2; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 2 — KPI-FLD-01 baseline đến W04</h3><p>W04 là gate dữ liệu thật đầu tiên của chương trình pilot QA. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: Lean Change, ITIL 4 PIR, ISO 9001:2015 §9.1.2/§10.2; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 3 — KPI-FLD-02 retrieval drill 25+ lượt</h3><p>W04 là gate dữ liệu thật đầu tiên của chương trình pilot QA. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: Lean Change, ITIL 4 PIR, ISO 9001:2015 §9.1.2/§10.2; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 4 — KPI-TRN-01 QA training completion</h3><p>W04 là gate dữ liệu thật đầu tiên của chương trình pilot QA. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: Lean Change, ITIL 4 PIR, ISO 9001:2015 §9.1.2/§10.2; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 5 — Issue log full table 12+ entries</h3><p>W04 là gate dữ liệu thật đầu tiên của chương trình pilot QA. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: Lean Change, ITIL 4 PIR, ISO 9001:2015 §9.1.2/§10.2; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 6 — Severity breakdown và closure rate</h3><p>W04 là gate dữ liệu thật đầu tiên của chương trình pilot QA. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: Lean Change, ITIL 4 PIR, ISO 9001:2015 §9.1.2/§10.2; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 7 — Wrong-revision drill 5 tài liệu</h3><p>W04 là gate dữ liệu thật đầu tiên của chương trình pilot QA. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: Lean Change, ITIL 4 PIR, ISO 9001:2015 §9.1.2/§10.2; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 8 — QA độc lập 1 ngày 2026-06-04</h3><p>W04 là gate dữ liệu thật đầu tiên của chương trình pilot QA. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: Lean Change, ITIL 4 PIR, ISO 9001:2015 §9.1.2/§10.2; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 9 — Lean Change Insights</h3><p>W04 là gate dữ liệu thật đầu tiên của chương trình pilot QA. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: Lean Change, ITIL 4 PIR, ISO 9001:2015 §9.1.2/§10.2; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 10 — Lean Change Options cho Wave 2</h3><p>W04 là gate dữ liệu thật đầu tiên của chương trình pilot QA. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: Lean Change, ITIL 4 PIR, ISO 9001:2015 §9.1.2/§10.2; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 11 — PIR root cause cho Sev-2</h3><p>W04 là gate dữ liệu thật đầu tiên của chương trình pilot QA. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: Lean Change, ITIL 4 PIR, ISO 9001:2015 §9.1.2/§10.2; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
+<div class="note-blue"><h3>Slide 12 — Gate decision matrix</h3><p>W04 là gate dữ liệu thật đầu tiên của chương trình pilot QA. Presenter phải dùng role code, doc_code, threshold và evidence source; không dùng trạng thái xanh nếu chưa có dữ liệu. Mỗi slide phải giúp người nghe ra quyết định vận hành, không chỉ nghe báo cáo.</p><ul class="tight"><li>Threshold được nêu bằng số, ví dụ Sev-1 = 0, median ≤180 giây, pass rate ≥90% hoặc CAPA backlog ≤5.</li><li>Evidence phải chỉ rõ file, table hoặc annex: readiness.json, issues.json, champions.json, audit_events, training_records.</li><li>Framework: Lean Change, ITIL 4 PIR, ISO 9001:2015 §9.1.2/§10.2; mọi áp dụng phải gắn với quyết định tuần này.</li></ul></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 6 — QUYẾT ĐỊNH CẦN LẤY TẠI HỌP
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-decisions">
-  <h2 class="h2">Quyết định cần lấy trong cuộc họp này</h2>
-  <!-- TODO Codex W04/SEC-DECISIONS: bảng 3–6 quyết định. Cột: # · Quyết định · Người ký · Cơ sở (doc/data) · Fallback nếu deferred.
-       Mỗi quyết định phải có Plan-B nếu không lấy được trong cuộc họp. -->
+<section class="card" id="sec-decisions"><h2 class="h2">Quyết định cần lấy trong cuộc họp này</h2><div class="table-card">
+<table class="table">
+<thead><tr><th>#</th><th>Quyết định</th><th>Người ký</th><th>Cơ sở doc/data</th><th>Fallback nếu deferred</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Gate Pilot QA sang Wave 2: Go / Conditional Go / No-Go.</td><td>CEO + QMS_MGR</td><td>P2-02, P2-03, P2-04; readiness.json; issues.json; PIR form</td><td>Nếu chưa đủ evidence, mặc định No-Go và kéo pilot đến 2026-06-12.</td></tr>
+<tr><td>2</td><td>Issue closure plan cho mọi issue pilot còn mở.</td><td>QA_MGR</td><td>issues.json + WI-106</td><td>Issue không có owner trước 2026-06-06 17:00 được escalate lên QMS_MGR.</td></tr>
+<tr><td>3</td><td>Lean Change experiment cho W05.</td><td>QMS_MGR</td><td>Lean Change canvas + ANNEX-117</td><td>Nếu Conditional, experiment thu hẹp còn SCM trước.</td></tr>
+<tr><td>4</td><td>Wave 2 attendee list và champion roster.</td><td>SCM_MGR + SALES_MGR + HR_MGR</td><td>champions.json + access_review_item</td><td>Thiếu backup thì HR_MGR đóng trước 2026-06-08 12:00.</td></tr>
+</tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 7 — GO/NO-GO GATE — ĐIỀU KIỆN CẦN VÀ ĐỦ
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-gate">
-  <h2 class="h2">Gate Go/No-Go — Điều kiện CẦN và ĐỦ</h2>
-  <!-- TODO Codex W04/SEC-GATE: 2 bảng tách biệt:
-       (A) ĐIỀU KIỆN CẦN (necessary): nếu thiếu BẤT KỲ → No-Go. Tối thiểu 4 item.
-       (B) ĐIỀU KIỆN ĐỦ (sufficient): nếu (A) đủ VÀ tất cả (B) đạt → Go. Tối thiểu 4 item.
-       Mỗi điều kiện: Câu mô tả · Cách đo · Threshold · Bằng chứng (table/file/system).
-       Vận dụng "Go/No-Go gate condition library" của research pack — boilerplate 10 item, chọn lọc cho tuần 04. -->
+<section class="card" id="sec-gate"><h2 class="h2">Gate Go/No-Go — Điều kiện CẦN và ĐỦ</h2><h3>Điều kiện CẦN</h3><div class="table-card">
+<table class="table">
+<thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Threshold</th><th>Bằng chứng</th></tr></thead>
+<tbody>
+<tr><td>Pilot dual-run đủ Tuần 1 và Tuần 2.</td><td>Đếm ngày có log hợp lệ.</td><td>≥6 ngày tổng.</td><td>pilot_run_log.csv</td></tr>
+<tr><td>Issue log đủ và không còn Sev-1 mở.</td><td>Filter issues.json.</td><td>≥10 entries; open Sev-1 = 0.</td><td>issues.json</td></tr>
+<tr><td>Wrong-revision drill đã chạy.</td><td>So sánh expected_rev và observed_rev.</td><td>5 doc; catch rate ≥95%.</td><td>ANNEX-117</td></tr>
+<tr><td>QA độc lập 1 ngày hoàn tất.</td><td>Log 2026-06-04.</td><td>Sev-1 = 0; Sev-2 = 0.</td><td>daily timeline</td></tr>
+<tr><td>PIR form hoàn tất và được ký.</td><td>Kiểm role signature.</td><td>QA_MGR + champion QA.</td><td>PIR form</td></tr>
+</tbody></table></div>
+<h3>Điều kiện ĐỦ</h3><div class="table-card">
+<table class="table">
+<thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Threshold</th><th>Bằng chứng</th></tr></thead>
+<tbody>
+<tr><td>KPI-FLD-02 đạt trên tập drill đủ lớn.</td><td>Tính median 25+ lượt.</td><td>≤180 giây.</td><td>drill_log.csv</td></tr>
+<tr><td>KPI-TRN-01 QA team đạt.</td><td>SOP-801 + observed task.</td><td>5/5 pass.</td><td>training_records</td></tr>
+<tr><td>CAPA backlog pilot trong ngưỡng.</td><td>Đếm CAPA mở.</td><td>≤5; ETA ≤30 ngày.</td><td>capa_records</td></tr>
+<tr><td>Management approval logged.</td><td>CEO + QMS_MGR ký.</td><td>Timestamp trước 2026-06-06 17:00.</td><td>gate form</td></tr>
+<tr><td>Audit event đúng decision.</td><td>Đọc audit_events.</td><td>Đúng một row gate_go/cond/nogo.</td><td>audit_events</td></tr>
+</tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 8 — PHÂN CÔNG NHIỆM VỤ SAU HỌP (RACI)
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-tasks">
-  <h2 class="h2">Phân công nhiệm vụ sau họp · RACI · deadline</h2>
-  <!-- TODO Codex W04/SEC-TASKS: bảng 8–15 task. Cột: # · Task · R · A · C · I · Deadline · Evidence · KPI ảnh hưởng.
-       R/A/C/I dùng role code (CEO, QMS_MGR, QA_MGR, PROD_DIR, …) — không tên người.
-       Deadline phải absolute date (không "tuần sau"); evidence phải point đến doc_code hoặc table_name. -->
+<section class="card" id="sec-tasks"><h2 class="h2">Phân công nhiệm vụ sau họp · RACI · deadline</h2><div class="table-card">
+<table class="table">
+<thead><tr><th>#</th><th>Task</th><th>R</th><th>A</th><th>C</th><th>I</th><th>Deadline</th><th>Evidence</th><th>KPI</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Kích hoạt W05 prep nếu Go.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-08 17:00</td><td>readiness.json</td><td>KPI-FLD-01</td></tr>
+<tr><td>2</td><td>Lập điều kiện nếu Conditional.</td><td>QMS_MGR</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-08 17:00</td><td>issues.json</td><td>KPI-FLD-02</td></tr>
+<tr><td>3</td><td>Kéo pilot nếu No-Go.</td><td>QA_MGR</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-08 17:00</td><td>champions.json</td><td>KPI-TRN-01</td></tr>
+<tr><td>4</td><td>Cập nhật KPI dashboard.</td><td>IT_MGR</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-08 17:00</td><td>ANNEX-117</td><td>KPI-DEP-02</td></tr>
+<tr><td>5</td><td>Gửi gate decision memo.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-08 17:00</td><td>ANNEX-118</td><td>KPI-DEP-05</td></tr>
+<tr><td>6</td><td>Archive PIR + Lean Change.</td><td>QMS_MGR</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-08 17:00</td><td>audit_events</td><td>KPI-DEP-07</td></tr>
+<tr><td>7</td><td>Đóng issue pilot.</td><td>QA_MGR</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-08 17:00</td><td>readiness.json</td><td>KPI-FLD-01</td></tr>
+<tr><td>8</td><td>Cập nhật champions.json Wave 2.</td><td>IT_MGR</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-08 17:00</td><td>issues.json</td><td>KPI-FLD-02</td></tr>
+<tr><td>9</td><td>Verify M365 access.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-08 17:00</td><td>champions.json</td><td>KPI-TRN-01</td></tr>
+<tr><td>10</td><td>Seed severity board.</td><td>QMS_MGR</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-08 17:00</td><td>ANNEX-117</td><td>KPI-DEP-02</td></tr>
+<tr><td>11</td><td>Chuẩn bị OJT checklist.</td><td>QA_MGR</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-08 17:00</td><td>ANNEX-118</td><td>KPI-DEP-05</td></tr>
+<tr><td>12</td><td>Thông báo fallback dual-system.</td><td>IT_MGR</td><td>QMS_MGR</td><td>QA_MGR, IT_MGR</td><td>CEO, Steering</td><td>2026-06-08 17:00</td><td>audit_events</td><td>KPI-DEP-07</td></tr>
+</tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 9 — NỘI DUNG HỌP TUẦN SAU (PREVIEW)
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-next-week">
-  <h2 class="h2">Preview tuần 5 · nhiệm vụ chuẩn bị</h2>
-  <!-- TODO Codex W04/SEC-NEXT-WEEK: tóm tắt 1 đoạn về tuần kế tiếp, sau đó bảng "chuẩn bị" — mỗi item: Role · Task · Deadline (trong tuần 04).
-       Mục đích: cuối họp W04 mỗi người biết rõ tuần sau họ cần đến với gì. -->
+<section class="card" id="sec-next-week"><h2 class="h2">Preview tuần 5 · nhiệm vụ chuẩn bị</h2><p>W05 chỉ mở nếu decision W04 là Go hoặc Conditional Go đã đóng đủ điều kiện trước 2026-06-08 17:00. Wave 2 gồm SCM và Sales, khoảng 25 người, có rủi ro trực tiếp tới inbound material, tồn kho, báo giá và phản hồi khách hàng.</p>
+<div class="table-card">
+<table class="table">
+<thead><tr><th>Role</th><th>Task chuẩn bị</th><th>Deadline</th><th>Evidence</th></tr></thead>
+<tbody>
+<tr><td>SCM_MGR</td><td>Chốt Mua hàng, Kho, XNK và 3 champion primary + 3 backup.</td><td>2026-06-08 12:00</td><td>champions.json</td></tr>
+<tr><td>SALES_MGR</td><td>Chốt CS + Estimator và 2 champion primary + 2 backup.</td><td>2026-06-08 12:00</td><td>Wave 2 roster</td></tr>
+<tr><td>IT_MGR</td><td>Spot-check M365 access cho 5 user và 5 champion.</td><td>2026-06-10 17:00</td><td>access_review_item</td></tr>
+<tr><td>HR_MGR</td><td>Chuẩn bị SOP-801 OJT checklist.</td><td>2026-06-11 17:00</td><td>training_records</td></tr>
+<tr><td>QMS_ENG</td><td>Seed severity board và KPI dashboard Wave 2.</td><td>2026-06-12 12:00</td><td>severity_board.json</td></tr>
+</tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 10 — TÀI LIỆU LIÊN QUAN
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-docs">
-  <h2 class="h2">Tài liệu liên quan · click để mở</h2>
-  <!-- TODO Codex W04/SEC-DOCS: liệt kê 6–12 doc code dạng:
-         <a href="#" onclick="if(window.openDoc)openDoc('CODE');return false;" class="role-chip">CODE</a>
-       Bắt buộc bao gồm doc trong requiredDocs của tuần 04 (xem program.bootstrap.json). -->
+<section class="card" id="sec-docs"><h2 class="h2">Tài liệu liên quan · click để mở</h2><p>Các chip dưới đây là tài liệu bắt buộc để Steering kiểm tra gate W04 và chuẩn bị W05.</p><p><a href="#" onclick="if(window.openDoc)openDoc('ANNEX-114');return false;" class="role-chip">ANNEX-114</a> <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-117');return false;" class="role-chip">ANNEX-117</a> <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-118');return false;" class="role-chip">ANNEX-118</a> <a href="#" onclick="if(window.openDoc)openDoc('SOP-605');return false;" class="role-chip">SOP-605</a> <a href="#" onclick="if(window.openDoc)openDoc('WI-201');return false;" class="role-chip">WI-201</a> <a href="#" onclick="if(window.openDoc)openDoc('WI-202');return false;" class="role-chip">WI-202</a> <a href="#" onclick="if(window.openDoc)openDoc('SOP-401');return false;" class="role-chip">SOP-401</a> <a href="#" onclick="if(window.openDoc)openDoc('SOP-201');return false;" class="role-chip">SOP-201</a> <a href="#" onclick="if(window.openDoc)openDoc('WI-701');return false;" class="role-chip">WI-701</a> <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W03');return false;" class="role-chip">TRN-DEP-W03</a> <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W05');return false;" class="role-chip">TRN-DEP-W05</a> </p></section>
+<section class="card" id="sec-risks"><h2 class="h2">Rủi ro tuần 04 + escalation</h2><div class="table-card">
+<table class="table">
+<thead><tr><th>#</th><th>Mô tả rủi ro</th><th>L</th><th>I</th><th>Mitigation</th><th>Trigger escalation</th><th>Owner</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Gate gridlock giữa Go và No-Go.</td><td>M</td><td>H</td><td>CEO + 2/3 Steering rule; dissent ghi bằng role code.</td><td>Không chốt decision 09:55.</td><td>CEO</td></tr>
+<tr><td>2</td><td>Face-saving khiến manager ngại nói No-Go.</td><td>M</td><td>H</td><td>CEO nói No-Go có dữ liệu là hành vi quản trị tốt.</td><td>Evidence fail nhưng vẫn đề xuất Go.</td><td>CEO</td></tr>
+<tr><td>3</td><td>Wave 2 thiếu champion backup.</td><td>M</td><td>M</td><td>HR_MGR kích hoạt backup trước 2026-06-08.</td><td>champions.json thiếu backup.</td><td>HR_MGR</td></tr>
+<tr><td>4</td><td>Drill data bị làm đẹp.</td><td>L</td><td>H</td><td>Backup re-run độc lập và IT_MGR kiểm timestamp.</td><td>Pattern thời gian bất thường.</td><td>QMS_MGR</td></tr>
+<tr><td>5</td><td>CAPA backlog không owner.</td><td>M</td><td>H</td><td>Mọi CAPA có owner và ETA ≤30 ngày.</td><td>CAPA mở &gt;5.</td><td>QA_MGR</td></tr>
+</tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 11 — RỦI RO + ESCALATION
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-risks">
-  <h2 class="h2">Rủi ro tuần 04 + escalation</h2>
-  <!-- TODO Codex W04/SEC-RISKS: bảng 5–8 rủi ro. Cột: # · Mô tả rủi ro · Likelihood (L/M/H) · Impact (L/M/H) · Mitigation · Trigger escalation · Escalation owner.
-       Bao gồm ít nhất 1 rủi ro Hofstede (VN cultural): vd "trưởng phòng không feedback openly tại all-hands" → mitigation: anonymous feedback box. -->
-</section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 12 — LESSONS LEARNED (FILL POST-MEETING)
-     ───────────────────────────────────────────────────────────────────── -->
-<section class="card" id="sec-lessons">
-  <h2 class="h2">Lessons learned · điền sau họp (Lean Change cycle)</h2>
-  <!-- TODO Codex W04/SEC-LESSONS: chừa 3 khối Insights / Options / Experiments (Jason Little Lean Change Canvas) với placeholder text.
-       Sau cuộc họp thật, owner sẽ điền vào 3 ô này. -->
-</section>
-
+<section class="card" id="sec-lessons"><h2 class="h2">Lessons learned · điền sau họp (Lean Change cycle)</h2><p>Phần này để trống có kiểm soát cho dữ liệu thật sau 2026-06-06; mỗi ghi chú phải có evidence, tác động và điều chỉnh.</p><div class="grid-3"><div class="note"><h3>Insights</h3><p>Điền 3 phát hiện thật từ gate, kèm evidence source và ảnh hưởng tới W05.</p></div><div class="note"><h3>Options</h3><p>Điền các lựa chọn đã cân nhắc, gồm lựa chọn không chọn và lý do không chọn.</p></div><div class="note"><h3>Experiments</h3><p>Điền experiment W05, hypothesis, threshold pass/fail và owner role code.</p></div></div></section>
 </div><!-- /doc-content -->
 </div></div></div>
 </body>

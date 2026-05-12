@@ -368,6 +368,126 @@
 }
 .deploy-dash .dwp-playbook-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 16px -3px rgba(21, 101, 192, .55); }
 .deploy-dash .dwp-playbook-link small { color: var(--c-muted); font-size: 11px; }
+.deploy-dash .dwp-playbook-link { flex-direction: row !important; flex-wrap: wrap; align-items: center; gap: 8px; }
+.deploy-dash .dwp-fullscreen-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 14px;
+  background: #fff;
+  color: #1565c0;
+  border: 1.5px solid #1565c0;
+  border-radius: 10px;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .12s ease, color .12s ease;
+}
+.deploy-dash .dwp-fullscreen-btn:hover { background: #1565c0; color: #fff; }
+
+/* ── Meeting brief section · inline playbook excerpt ──────────────────── */
+.deploy-dash .dwp-meeting-brief-section {
+  background: #f8fafc;
+  border: 1px solid var(--c-border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin: 12px 0;
+}
+.deploy-dash .dwp-meeting-brief-section > h3 {
+  margin: 0 0 10px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: #0c2d48;
+  font-weight: 800;
+}
+.deploy-dash .dwp-brief-loading, .deploy-dash .dwp-brief-empty {
+  padding: 12px;
+  background: #fff;
+  border-radius: 8px;
+  color: var(--c-muted);
+  font-size: 13px;
+}
+.deploy-dash .dwp-brief-empty a { color: var(--c-brand); font-weight: 700; }
+.deploy-dash .dwp-brief-head {
+  display: flex; flex-direction: column; gap: 4px;
+  padding: 10px 12px;
+  background: linear-gradient(135deg, #e0f2fe 0%, #ddd6fe 100%);
+  border-left: 4px solid #1565c0;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  font-size: 12px;
+}
+.deploy-dash .dwp-brief-head strong { color: #0c2d48; font-size: 13px; }
+.deploy-dash .dwp-brief-head a { color: var(--c-brand); font-weight: 700; }
+.deploy-dash .dwp-brief-block {
+  margin: 6px 0;
+  background: #fff;
+  border: 1px solid var(--c-border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.deploy-dash .dwp-brief-block summary {
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--c-ink);
+  background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+  list-style: none;
+  display: flex; align-items: center; gap: 8px;
+}
+.deploy-dash .dwp-brief-block summary::before { content: '▶'; font-size: 10px; color: var(--c-muted); transition: transform .12s ease; }
+.deploy-dash .dwp-brief-block[open] summary::before { transform: rotate(90deg); }
+.deploy-dash .dwp-brief-block summary::-webkit-details-marker { display: none; }
+.deploy-dash .dwp-brief-block summary:hover { background: var(--c-brand-soft); color: var(--c-brand); }
+.deploy-dash .dwp-brief-body { padding: 12px 16px; font-size: 13px; line-height: 1.55; }
+.deploy-dash .dwp-brief-body .card { padding: 0; border: none; background: transparent; box-shadow: none; margin: 0 0 8px; }
+.deploy-dash .dwp-brief-body .h2 { font-size: 14px !important; margin: 4px 0 8px !important; }
+.deploy-dash .dwp-brief-body .h3 { font-size: 13px !important; margin: 8px 0 4px !important; color: #1565c0; }
+.deploy-dash .dwp-brief-body table { width: 100%; border-collapse: collapse; font-size: 12px; margin: 6px 0; }
+.deploy-dash .dwp-brief-body th, .deploy-dash .dwp-brief-body td { padding: 6px 8px; border: 1px solid var(--c-border); vertical-align: top; }
+.deploy-dash .dwp-brief-body th { background: #f1f5f9; font-weight: 700; text-align: left; }
+.deploy-dash .dwp-brief-body .table-card { overflow-x: auto; }
+.deploy-dash .dwp-brief-body .note, .deploy-dash .dwp-brief-body .note-blue, .deploy-dash .dwp-brief-body .note-green {
+  padding: 8px 10px; border-radius: 6px; margin: 6px 0; font-size: 12.5px;
+}
+.deploy-dash .dwp-brief-body .note { background: #f8fafc; border-left: 3px solid var(--c-muted); }
+.deploy-dash .dwp-brief-body .note-blue { background: #eff6ff; border-left: 3px solid #1565c0; }
+.deploy-dash .dwp-brief-body .note-green { background: #ecfdf5; border-left: 3px solid #10b981; }
+.deploy-dash .dwp-brief-body .grid-2, .deploy-dash .dwp-brief-body .grid-3 { display: grid; gap: 8px; }
+.deploy-dash .dwp-brief-body .grid-2 { grid-template-columns: 1fr 1fr; }
+.deploy-dash .dwp-brief-body .grid-3 { grid-template-columns: repeat(3, 1fr); }
+.deploy-dash .dwp-brief-body ul.tight, .deploy-dash .dwp-brief-body ol.tight { padding-left: 18px; margin: 4px 0; }
+.deploy-dash .dwp-brief-body ul.tight li, .deploy-dash .dwp-brief-body ol.tight li { margin: 2px 0; font-size: 12px; }
+.deploy-dash .dwp-brief-body .role-chip { display: inline-block; padding: 2px 8px; border-radius: 999px; background: #f3f4f6; margin: 1px 4px 1px 0; font-size: 11px; }
+.deploy-dash .dwp-brief-body code { background: #f1f5f9; padding: 1px 5px; border-radius: 4px; font-size: 11.5px; }
+.deploy-dash .dwp-brief-body a { color: var(--c-brand); text-decoration: none; font-weight: 600; }
+.deploy-dash .dwp-brief-body a:hover { text-decoration: underline; }
+
+/* ── Fullscreen mode — week panel expands to ~96% viewport ────────────── */
+.deploy-week-overlay.dwp-fullscreen { padding: 12px; }
+.deploy-week-overlay.dwp-fullscreen .deploy-week-panel {
+  width: 96vw;
+  max-width: none;
+  height: calc(100vh - 24px);
+  max-height: none;
+  border-radius: 16px;
+}
+.deploy-week-overlay.dwp-fullscreen .dwp-meeting-brief-section {
+  background: #f8fafc;
+  margin: 12px;
+  border-radius: 10px;
+  padding: 16px 24px 20px;
+}
+.deploy-week-overlay.dwp-fullscreen .dwp-brief-body { font-size: 14px; line-height: 1.6; }
+.deploy-week-overlay.dwp-fullscreen .dwp-brief-body th,
+.deploy-week-overlay.dwp-fullscreen .dwp-brief-body td { padding: 8px 10px; font-size: 13px; }
+.deploy-week-overlay.dwp-fullscreen .dwp-brief-block summary { font-size: 14px; padding: 12px 16px; }
+.deploy-week-overlay.dwp-fullscreen .dwp-brief-body .grid-2 { grid-template-columns: 1fr 1fr 1fr; }
+
+@media (max-width: 900px){
+  .deploy-week-overlay.dwp-fullscreen .deploy-week-panel { width: 100vw; height: 100vh; border-radius: 0; }
+  .deploy-dash .dwp-brief-body .grid-2, .deploy-dash .dwp-brief-body .grid-3 { grid-template-columns: 1fr; }
+}
 .kpi-mini-input {
   width: 70px;
   padding: 4px 6px;

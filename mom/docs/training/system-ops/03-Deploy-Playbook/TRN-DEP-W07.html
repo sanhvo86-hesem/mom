@@ -46,134 +46,201 @@
 
 <div class="doc-content" id="docContent">
 
-<div class="pending-fill" id="codex-marker">
-  <strong>⚠ Tài liệu khung — Codex chưa viết nội dung chi tiết.</strong>
-  Đây là scaffold do <code>generate-deploy-playbooks.sh</code> sinh ra với 12 section placeholder.
-  Phần nội dung do AI author điền theo prompt pack tương ứng (tham chiếu <code>_reports/deploy-playbook/PROMPT_PACK_07.md</code>).
-  Sau khi Codex viết xong sẽ xoá khung cảnh báo này.
-</div>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 1 — COVER
-     Codex fill: kicker (Phase P3), large title, một câu mô tả intent,
-     khối "QUICK FACTS" 6 ô (Ngày · Thứ · Phase · Pillar · Attendees · Owner)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-cover">
   <h1 class="h2" style="margin-top:0;">W07 · 2026-06-27 — Wave Production go-live — Tuần 1 (PROD + ENG)</h1>
-  <p class="lead"><!-- TODO Codex W07/SEC-COVER: 2–3 câu mô tả mục đích chiến lược của tuần 07 trong tổng thể 12 tuần. --></p>
-  <!-- TODO Codex W07/SEC-COVER: bảng QUICK FACTS với 6 ô (grid-3, 2 hàng): Ngày · Thứ · Phase · Pillar · Attendees · Owner -->
+  <p class="lead">W07 là tuần rủi ro cao nhất của chương trình vì Sản xuất và Kỹ thuật đi live đồng thời sau cutover 2026-06-22 05:00. Nếu 7 zone vận hành được, Job Order dossier đầu tiên truy xuất đủ G0-G7, shift handover chạy đúng 3 ca và Andon-cord leo thang trong ngưỡng, phần còn lại của chương trình chuyển từ trạng thái cứu hỏa sang hypercare có dữ liệu. Cách điều hành tuần này bám Toyota hypercare và shusa/chief-engineer model trong Liker 2021, ISO 9001:2015 §8.5/§8.6 về kiểm soát sản xuất và release, NIST SP 800-53 Rev.5 CM-3 về change control.</p>
+  <div class="grid-3">
+    <div class="note"><b>Ngày</b><br>2026-06-27</div>
+    <div class="note"><b>Thứ</b><br>Thứ Bảy · 09:00-10:00</div>
+    <div class="note"><b>Phase</b><br>P3 · Wave Production go-live</div>
+    <div class="note"><b>Pillar</b><br>golive · hypercare · traceability</div>
+    <div class="note"><b>Attendees</b><br>production_dept + engineering_dept + champions + cutover_lead + hypercare_team · khoảng 50 người</div>
+    <div class="note"><b>Owner</b><br>PROD_DIR + ENG_MGR; CEO quan sát và chỉ ký exception khi evidence đầy đủ</div>
+  </div>
+  <p>Quy tắc văn hóa của cuộc họp: PROD_DIR nói trạng thái thật trước, QA_MGR xác nhận bằng chứng trước khi ai kết luận, CEO phát biểu sau cùng trong phần gate để không neo ý kiến theo quyền lực. Mọi nội dung chính là tiếng Việt có dấu; doc code, table name và role code giữ nguyên tiếng Anh để khớp hệ thống.</p>
 </section>
 
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 2 — MỤC TIÊU TUẦN + KPI BASELINE
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-objective">
   <h2 class="h2">Mục tiêu tuần 07</h2>
-  <!-- TODO Codex W07/SEC-OBJECTIVE: viết 3–5 mục tiêu SMART (Specific, Measurable, Achievable, Relevant, Time-bound).
-       Sau đó liệt kê KPI baseline cần đo TRƯỚC khi tuần bắt đầu (con số khởi điểm).
-       Tham chiếu ANNEX-110 (KPI dictionary) cho mọi KPI ID. -->
+  <ol class="tight">
+    <li><b>Cutover hoàn tất trước ca A:</b> chuyển đổi Wave Production bắt đầu 2026-06-22 05:00 và trạng thái <span class="mono">cutover_complete=true</span> phải được ghi trước 2026-06-22 07:00 trong <span class="mono">audit_events</span>.</li>
+    <li><b>Gemba walk đủ:</b> 7 zone × 2 lượt/ngày × 5 ngày = 70 lượt log; mỗi log có zone, issue, severity, owner, containment, ETA.</li>
+    <li><b>Job Order dossier đầu tiên pass:</b> G0 customer/order, G1 item revision, G2 routing, G3 setup sheet, G4 CNC program, G5 IPQC/FAI, G6 final QC/packing, G7 CoC/release đủ evidence và QA_MGR ký.</li>
+    <li><b>Shift handover ổn định:</b> 3 ca × 5 ngày = 15 bản giao ca; completion ≥90%, critical field "next-shift risk" ≥95%.</li>
+    <li><b>Andon-cord được chứng minh:</b> ít nhất 1 lần kéo Andon thật trong 2026-06-22..2026-06-26, QA_MGR acknowledge ≤5 phút, containment ≤30 phút.</li>
+    <li><b>KPI đỏ có xử lý đúng:</b> mục tiêu KPI đỏ = 0; nếu KPI đỏ xuất hiện thì exception note phải có CEO signature, owner, containment, ETA và CAPA link trước 2026-06-27 10:00.</li>
+    <li><b>Champion hiện diện:</b> 11 champion Production có mặt tại zone lúc 07:00 mỗi ngày; yêu cầu ≥90% của 55 instance, backup activation ghi trong <span class="mono">champions.json</span>.</li>
+  </ol>
+  <div class="table-card"><table class="table"><thead><tr><th>KPI</th><th>Baseline</th><th>Threshold W07</th><th>Evidence</th></tr></thead><tbody>
+    <tr><td>KPI-FLD-01</td><td>Wave 2 ≥90%, Production chưa đo đủ</td><td>≥90% cohort 60+ người mở đúng tài liệu</td><td>ANNEX-110 + retrieval drill log</td></tr>
+    <tr><td>KPI-FLD-02</td><td>W06 median ≤180 giây</td><td>≤180 giây với 20 lượt Production/Engineering</td><td><span class="mono">readiness.json</span></td></tr>
+    <tr><td>KPI-TRN-01</td><td>Bootcamp Production/Engineering ≥90%</td><td>Critical-task sign-off = 100% cho 11 zone chính</td><td><span class="mono">training_records</span> + SOP-801</td></tr>
+    <tr><td>KPI-DEP-02</td><td>Issue closure W06 ≥95%</td><td>≥95% issue có owner + deadline trong 24h</td><td><span class="mono">issues.json</span></td></tr>
+    <tr><td>KPI-DEP-05</td><td>Dashboard refresh daily W06</td><td>Snapshot daily trước 17:00</td><td><span class="mono">readiness.json</span> timestamps</td></tr>
+    <tr><td>KPI-DEP-07</td><td>MTTR Sev-1 ≤24h</td><td>≤24h; containment đầu tiên ≤2h</td><td>incident timeline + CAPA table</td></tr>
+  </tbody></table></div>
+  <div class="note-blue">
+    <p><b>Operating note cho W07:</b> Tuần này không được điều hành như một buổi báo cáo tiến độ thông thường. PROD_DIR cần coi mỗi chỉ số như một câu hỏi vận hành: nếu gemba đủ 70 lượt nhưng issue count thấp bất thường, có thể operator đang không ghi nhận vấn đề; nếu Andon không có lượt kéo nào nhưng problem board có Sev-2, có thể người vận hành chưa tin rằng kéo Andon là hành vi được bảo vệ; nếu JO dossier đầu tiên pass nhưng G4 program revision không có timestamp, traceability chưa đủ để bảo vệ release decision. Do đó, mọi owner phải trình bày cả numerator, denominator và sampling rule. Ví dụ: “KPI-FLD-01 = 56/60 người mở đúng tài liệu trong drill 2026-06-24, median 142 giây, p90 231 giây, 4 fail nằm ở Zone 2 và Zone 7” là dữ liệu dùng được; “đa số mở được” không dùng được.</p>
+    <p>Về mặt văn hóa, W07 là lúc dễ xuất hiện im lặng tập thể vì Sản xuất đang chịu áp lực cao nhất. Nếu CEO hoặc PROD_DIR phát biểu kết luận quá sớm, các champion có thể ngừng báo lỗi để tránh làm mất mặt tổ. Vì vậy phần gate phải giữ thứ tự: QMS_ENG đọc dữ liệu, QA_MGR xác nhận bằng chứng, ENG_MGR nói riêng về CAD/CAM, PROD_DIR nói về khả năng chạy ca tiếp theo, sau đó CEO mới kết luận. Mọi exception ký bởi CEO phải có expiry date; exception không có ngày hết hiệu lực sẽ biến thành quy trình ngầm và làm hỏng runbook W08.</p>
+  </div>
 </section>
 
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 3 — PREP CHECKLIST T-7 / T-3 / T-1 / T-0
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-prep">
   <h2 class="h2">Prep checklist — T-7 / T-3 / T-1 / T-0</h2>
-  <!-- TODO Codex W07/SEC-PREP: 4 bảng prep (T-7, T-3, T-1 ngày trước, T-0 sáng họp).
-       Mỗi item: WHO (role code) · WHAT · EVIDENCE · DEADLINE.
-       Mỗi T-window tối thiểu 4 item; T-0 là pre-meeting sanity check 30' trước họp. -->
+  <div class="table-card"><table class="table"><thead><tr><th>Window</th><th>WHO</th><th>WHAT</th><th>EVIDENCE</th><th>DEADLINE</th></tr></thead><tbody>
+    <tr><td>T-7 · 2026-06-20</td><td>PROD_DIR</td><td>Khóa Wave Production runbook v1.0, 7-zone cutover map, champion roster và rule không đổi route ngoài CAB/ECAB.</td><td>ANNEX-114 amendment</td><td>2026-06-20 17:00</td></tr>
+    <tr><td>T-7 · 2026-06-20</td><td>ENG_MGR</td><td>Khóa CAD/CAM dual-system, program revision và CNC transfer rule cho job dự kiến chạy 2026-06-22..2026-06-26.</td><td>SOP-303 + WI-302 checklist</td><td>2026-06-20 17:30</td></tr>
+    <tr><td>T-7 · 2026-06-20</td><td>IT_MGR</td><td>Test M365, QR link, dashboard và offline PDF backup tại 7 zone; mỗi zone mở SOP-501/WI-519/SOP-303/WI-302 trong ≤180 giây.</td><td>retrieval drill log</td><td>2026-06-20 18:00</td></tr>
+    <tr><td>T-7 · 2026-06-20</td><td>QA_MGR</td><td>Chuẩn bị checklist JO dossier G0-G7, sampling 10% JO, release criterion theo ISO 9001:2015 §8.6.</td><td>ANNEX-117 template</td><td>2026-06-20 18:30</td></tr>
+    <tr><td>T-3 · 2026-06-23</td><td>CUTOVER_LEAD</td><td>Reverse-PIR sau ngày cutover đầu tiên: sai gì, chậm gì, điều gì cần đổi theo ITIL emergency change.</td><td>PIR draft</td><td>2026-06-23 11:00</td></tr>
+    <tr><td>T-3 · 2026-06-23</td><td>QMS_ENG</td><td>Kiểm dữ liệu gemba ngày 2026-06-22: đủ 14 lượt, issue có severity, owner, ETA, containment.</td><td>gemba log + issues.json</td><td>2026-06-23 12:00</td></tr>
+    <tr><td>T-3 · 2026-06-23</td><td>PROD_CHAMPION</td><td>Xác nhận 11 zone đã treo Andon poster và problem-of-the-day board.</td><td>7 zone photo log</td><td>2026-06-23 14:00</td></tr>
+    <tr><td>T-3 · 2026-06-23</td><td>ENG_MGR</td><td>Đánh giá dual-CAD/Dual-CAM sau 1 ngày: format, revision, access, operator instruction, hotfix v1.1 nếu cần.</td><td>SOP-303 exception register</td><td>2026-06-23 16:00</td></tr>
+    <tr><td>T-1 · 2026-06-26</td><td>QMS_ENG</td><td>Assemble data pack: cutover timeline, 70 gemba walks, JO dossier, handover, issue closure, Andon timing, KPI snapshots.</td><td>W07 evidence packet</td><td>2026-06-26 16:00</td></tr>
+    <tr><td>T-1 · 2026-06-26</td><td>QA_MGR</td><td>Sample 10% JO Mon-Fri, kiểm G0-G7, ghi exception nếu thiếu cổng.</td><td>ANNEX-117 sample audit</td><td>2026-06-26 16:30</td></tr>
+    <tr><td>T-1 · 2026-06-26</td><td>PROD_DIR</td><td>Đọc trước exception note cho KPI đỏ; không đưa "đang xử lý" vào họp nếu thiếu owner/ETA.</td><td>exception note draft</td><td>2026-06-26 17:00</td></tr>
+    <tr><td>T-1 · 2026-06-26</td><td>ENG_MGR</td><td>Chốt đề xuất switch-off hay giữ dual-system đến W08 dựa trên số lỗi revision/CAD-CAM lockout.</td><td>Engineering memo</td><td>2026-06-26 17:30</td></tr>
+    <tr><td>T-0 · 2026-06-27</td><td>PROD_DIR</td><td>Pre-meeting sanity: slide 1 phải có Go/Conditional/No-Go indicator.</td><td>slide checksum</td><td>2026-06-27 08:30</td></tr>
+    <tr><td>T-0 · 2026-06-27</td><td>QMS_MGR</td><td>Kiểm gate P3-03 có threshold và evidence; dòng thiếu evidence đánh đỏ.</td><td>gate worksheet</td><td>2026-06-27 08:40</td></tr>
+    <tr><td>T-0 · 2026-06-27</td><td>CEO</td><td>Nhận brief 5 phút về KPI đỏ; chỉ ký exception nếu đủ owner, containment, ETA, CAPA link.</td><td>CEO briefing note</td><td>2026-06-27 08:50</td></tr>
+    <tr><td>T-0 · 2026-06-27</td><td>IT_MGR</td><td>Mở thử SOP-501, WI-519, SOP-303, WI-302 trên portal; time-to-open mỗi doc ≤30 giây.</td><td>portal access check</td><td>2026-06-27 08:55</td></tr>
+  </tbody></table></div>
 </section>
 
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 4 — AGENDA TIMED (60 phút)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-agenda">
-  <h2 class="h2">Agenda · 09:00–10:00 (60 phút)</h2>
-  <!-- TODO Codex W07/SEC-AGENDA: bảng 8–10 dòng. Cột: Thời gian · Phút · Đề mục · Owner · Output kỳ vọng.
-       Đảm bảo có: opening (5'), KPI review (10'), main content (~30'), gate decision (10'), closing + next week preview (5'). -->
+  <h2 class="h2">Agenda · 09:00-10:00 (60 phút)</h2>
+  <div class="table-card"><table class="table"><thead><tr><th>Thời gian</th><th>Phút</th><th>Đề mục</th><th>Owner</th><th>Output kỳ vọng</th></tr></thead><tbody>
+    <tr><td>09:00-09:05</td><td>5</td><td>Opening: trạng thái Wave Production, rule dữ liệu trước ý kiến</td><td>PROD_DIR</td><td>Go/Conditional/No-Go indicator</td></tr>
+    <tr><td>09:05-09:15</td><td>10</td><td>Cutover timeline 2026-06-22 05:00-07:00</td><td>CUTOVER_LEAD</td><td>Complete hoặc exception rõ owner</td></tr>
+    <tr><td>09:15-09:25</td><td>10</td><td>7 zone gemba recap</td><td>PROD_CHAMPION</td><td>70 walk target đối chiếu log thật</td></tr>
+    <tr><td>09:25-09:35</td><td>10</td><td>JO dossier đầu tiên G0-G7</td><td>QA_MGR</td><td>QA_MGR ký pass hoặc list gap</td></tr>
+    <tr><td>09:35-09:43</td><td>8</td><td>Andon-cord live test</td><td>QMS_ENG</td><td>Escalation ≤5 phút hoặc CAPA</td></tr>
+    <tr><td>09:43-09:50</td><td>7</td><td>KPI Wave Production snapshot</td><td>QMS_MGR</td><td>KPI đỏ = 0 hoặc exception note</td></tr>
+    <tr><td>09:50-09:56</td><td>6</td><td>Gate P3-03 deliberation</td><td>CEO + QMS_MGR</td><td>Gate decision signed</td></tr>
+    <tr><td>09:56-10:00</td><td>4</td><td>Preview W08 cadence</td><td>PROD_DIR</td><td>Deadline 2026-06-30/2026-07-03 rõ</td></tr>
+  </tbody></table></div>
 </section>
 
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 5 — NỘI DUNG HỌP TUẦN NÀY (slide-by-slide)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-slides">
   <h2 class="h2">Nội dung họp tuần 07 — slide-by-slide</h2>
-  <!-- TODO Codex W07/SEC-SLIDES: 8–12 slide block, mỗi block:
-         <div class="card"> hoặc <div class="note-blue">
-           <h3>Slide N — Tiêu đề</h3>
-           <p>Talking points 3–5 câu (Vietnamese with diacritics).</p>
-           <ul class="tight">các bullet cụ thể, có CON SỐ và DOC CODE.</ul>
-         </div>
-       Cấm dùng "đảm bảo chất lượng" generic. Phải có con số, doc code, role code cụ thể.
-       Vận dụng Hofstede (Vietnam high power-distance): CEO speaks first, seniority order, bilingual VN/EN slides. -->
+  <div class="card"><h3>Slide 1 — Cutover 2026-06-22 05:00-07:00</h3><p>Timeline Gantt 120 phút đầu: command center 05:00, M365 05:15, SOP-501/WI-519 05:30, zone readiness 06:15, CAD/CAM check 06:30, release ca A 07:00. Mọi deviation ghi phút trễ, owner, containment. NIST CM-3 yêu cầu trace và approval nên không có dòng "ổn rồi" nếu không có timestamp.</p></div>
+  <div class="card"><h3>Slide 2 — 7 zone status grid</h3><p>Grid gồm Zone 1 CNC machining, Zone 2 setup/programming, Zone 3 IPQC, Zone 4 FAI, Zone 5 Final QC + packing, Zone 6 Shipping + CoC, Zone 7 Tooling + maintenance. Mỗi ô có status, issue count, champion present, backup used, open CAPA. Mục đích là thấy rủi ro hệ thống, không tạo áp lực cá nhân.</p></div>
+  <div class="card"><h3>Slide 3 — Zone 1 CNC machining</h3><p>PROD_CHAMPION trình bày lỗi mở nhầm setup sheet, tool-life thiếu ToolID, offset chưa ký, hoặc operator dùng bản in cũ. Mỗi lỗi liên kết SOP-501 hoặc WI-519, có containment trong ca hiện tại và ETA để ngăn lặp lại.</p></div>
+  <div class="card"><h3>Slide 4 — Zone 2 setup/programming</h3><p>ENG_MGR trình bày program revision, CAD/CAM export, NC file approval và rollback path. Nếu Engineering giữ dual-system thêm 1 tuần, lý do phải là lỗi format hoặc revision có số, không phải cảm giác chưa sẵn sàng. ITIL 4 Change Enablement phân biệt normal change và emergency change.</p></div>
+  <div class="card"><h3>Slide 5 — Zone 3 IPQC</h3><p>QA_MGR cho thấy IPQC bắt deviation trước FAI hay không. Bảng cần JO, CTQ, measurement result, disposition, linked evidence. ISO 9001:2015 §8.5 yêu cầu evidence; measurement đúng nhưng thiếu evidence vẫn là gap.</p></div>
+  <div class="card"><h3>Slide 6 — Zone 4 FAI</h3><p>FAI là cổng quyết định có cho chạy tiếp. Slide hiển thị FAI result, disposition, QA_MGR sign-off và exception. Nếu first article pass bằng lời nhưng thiếu chữ ký trong hệ thống, gate W07 chưa đủ.</p></div>
+  <div class="card"><h3>Slide 7 — Zone 5 Final QC + packing</h3><p>Final QC và packing ảnh hưởng khách hàng trực tiếp. QA_MGR nêu số lỗi label, packing instruction, CoC và release note. Mỗi lỗi tách rõ containment trước giao hàng và corrective action sau giao hàng.</p></div>
+  <div class="card"><h3>Slide 8 — Zone 6 Shipping + CoC</h3><p>Zone 6 kiểm tra chuỗi từ final release đến chứng nhận giao hàng. SALES_MGR consult nếu customer communication bị ảnh hưởng, nhưng owner vẫn là PROD_DIR/QA_MGR. Target: CoC đúng revision = 100% sample W07.</p></div>
+  <div class="card"><h3>Slide 9 — Zone 7 Tooling + maintenance</h3><p>Maintenance và tooling làm Production chậm mà không luôn hiện thành lỗi chất lượng. Slide ghi tool availability, tool-life log, downtime, stop condition. Nếu tool-life log thiếu mốc, PROD_DIR chọn containment trước khi kết thúc họp.</p></div>
+  <div class="card"><h3>Slide 10 — JO dossier đầu tiên · G0-G7</h3><p>QA_MGR trình bày hồ sơ đầu tiên như thread truy xuất: G0 order, G1 item revision, G2 routing, G3 setup sheet, G4 CNC program, G5 IPQC/FAI, G6 final QC/packing, G7 CoC/release. Từng link phải là doc code hoặc table/file.</p></div>
+  <div class="card"><h3>Slide 11 — Andon-cord live test</h3><p>Andon-cord là quyền dừng/leo thang khi process có nguy cơ tạo lỗi. Slide ghi thời điểm kéo, lý do, người nhận, QA_MGR phản hồi sau bao nhiêu phút, containment và closure. CEO nhắc rằng kéo Andon đúng quy tắc là hành vi tốt, không làm xấu mặt tổ. Toyota Way Ch.13 nhấn mạnh problem visibility và shusa ownership.</p></div>
+  <div class="card"><h3>Slide 12 — KPI snapshot + W08 cadence</h3><p>Slide cuối khóa trạng thái định lượng: KPI-FLD-01, KPI-FLD-02, KPI-DEP-02, KPI-DEP-05, KPI-DEP-07, Sev-1 count, CAPA backlog, shift handover. PROD_DIR công bố W08: gemba 2 lượt/ngày, problem-of-the-day reset hằng ngày, exit criterion Sev-1 = 0 trong 5 ngày liên tiếp.</p></div>
 </section>
 
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 6 — QUYẾT ĐỊNH CẦN LẤY TẠI HỌP
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-decisions">
   <h2 class="h2">Quyết định cần lấy trong cuộc họp này</h2>
-  <!-- TODO Codex W07/SEC-DECISIONS: bảng 3–6 quyết định. Cột: # · Quyết định · Người ký · Cơ sở (doc/data) · Fallback nếu deferred.
-       Mỗi quyết định phải có Plan-B nếu không lấy được trong cuộc họp. -->
+  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Quyết định</th><th>Người ký</th><th>Cơ sở</th><th>Fallback nếu deferred</th></tr></thead><tbody>
+    <tr><td>1</td><td>Approve Wave Production tiếp tục sang W08 hypercare hoặc chuyển Conditional-Go.</td><td>CEO + PROD_DIR + QMS_MGR</td><td>Gate P3-03, 70 gemba logs, Sev-1 count, JO dossier</td><td>Giữ command center 24/5 đến 2026-07-01 và họp ECAB 2026-06-28 09:00.</td></tr>
+    <tr><td>2</td><td>Approve runbook v1.1 amendment nếu W07 phát hiện gap cần sửa trước W08.</td><td>PROD_DIR + ENG_MGR + QMS_MGR</td><td>ANNEX-114, ITIL change classification</td><td>Temporary work instruction expiry 2026-07-04.</td></tr>
+    <tr><td>3</td><td>Approve daily gemba cadence tiếp tục 2 lượt/ngày đến 2026-07-07.</td><td>PROD_DIR</td><td>Gemba coverage, issue trend, problem board</td><td>Kích hoạt backup champion, không giảm zone critical.</td></tr>
+    <tr><td>4</td><td>Approve exception note cho mọi KPI đỏ.</td><td>CEO</td><td>KPI snapshot, CAPA owner, ETA, containment</td><td>KPI đỏ thiếu owner/ETA thành No-Go blocker.</td></tr>
+    <tr><td>5</td><td>Approve Engineering dual-system tiếp tục hoặc switch-off bản cũ cuối W08.</td><td>ENG_MGR + PROD_DIR</td><td>SOP-303, WI-302, CAD/CAM incident count</td><td>Nếu >2 lỗi revision, dual-system đến 2026-07-10.</td></tr>
+  </tbody></table></div>
 </section>
 
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 7 — GO/NO-GO GATE — ĐIỀU KIỆN CẦN VÀ ĐỦ
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-gate">
   <h2 class="h2">Gate Go/No-Go — Điều kiện CẦN và ĐỦ</h2>
-  <!-- TODO Codex W07/SEC-GATE: 2 bảng tách biệt:
-       (A) ĐIỀU KIỆN CẦN (necessary): nếu thiếu BẤT KỲ → No-Go. Tối thiểu 4 item.
-       (B) ĐIỀU KIỆN ĐỦ (sufficient): nếu (A) đủ VÀ tất cả (B) đạt → Go. Tối thiểu 4 item.
-       Mỗi điều kiện: Câu mô tả · Cách đo · Threshold · Bằng chứng (table/file/system).
-       Vận dụng "Go/No-Go gate condition library" của research pack — boilerplate 10 item, chọn lọc cho tuần 07. -->
+  <h3>Điều kiện CẦN</h3>
+  <div class="table-card"><table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Threshold</th><th>Bằng chứng</th></tr></thead><tbody>
+    <tr><td>Cutover hoàn tất</td><td>Timestamp start/finish trong audit_events</td><td>Complete trước 2026-06-22 07:00</td><td>audit_events + ANNEX-114</td></tr>
+    <tr><td>Gemba walk đủ</td><td>Đếm log zone/date/round</td><td>70 target; ≥63 tối thiểu</td><td>gemba log + issues.json</td></tr>
+    <tr><td>JO dossier signed</td><td>QA_MGR kiểm G0-G7</td><td>8/8 cổng có evidence</td><td>JO bundle + ANNEX-117</td></tr>
+    <tr><td>Shift handover</td><td>Đếm handover đủ critical fields</td><td>≥90% của 15 bản</td><td>handover register</td></tr>
+    <tr><td>Champion hiện diện</td><td>11 zone × 5 ngày</td><td>≥90% của 55 instance</td><td>champions.json</td></tr>
+    <tr><td>Sev-1 không mở</td><td>Filter sev=1 status!='closed'</td><td>0 Sev-1 mở hoặc CEO exception + MTTR ≤24h</td><td>issues.json + incident timeline</td></tr>
+  </tbody></table></div>
+  <h3>Điều kiện ĐỦ</h3>
+  <div class="table-card"><table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Threshold</th><th>Bằng chứng</th></tr></thead><tbody>
+    <tr><td>Andon live test</td><td>Pull → QA_MGR acknowledge → containment</td><td>≤5 phút acknowledge; ≤30 phút containment</td><td>Andon event log</td></tr>
+    <tr><td>KPI-FLD-01 Production</td><td>Random retrieval cohort 60+ người</td><td>≥90%</td><td>retrieval drill log</td></tr>
+    <tr><td>KPI-DEP-07 MTTR</td><td>Rolling median Sev-1 nếu có</td><td>≤24h</td><td>incident timeline</td></tr>
+    <tr><td>CAPA backlog</td><td>Đếm open/overdue</td><td>≤5 open; owner + ETA đầy đủ</td><td>CAPA table</td></tr>
+    <tr><td>Gate audit event</td><td>Check event name</td><td>wave_production_week1_go hoặc wave_production_week1_cond</td><td>audit_events</td></tr>
+  </tbody></table></div>
 </section>
 
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 8 — PHÂN CÔNG NHIỆM VỤ SAU HỌP (RACI)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-tasks">
   <h2 class="h2">Phân công nhiệm vụ sau họp · RACI · deadline</h2>
-  <!-- TODO Codex W07/SEC-TASKS: bảng 8–15 task. Cột: # · Task · R · A · C · I · Deadline · Evidence · KPI ảnh hưởng.
-       R/A/C/I dùng role code (CEO, QMS_MGR, QA_MGR, PROD_DIR, …) — không tên người.
-       Deadline phải absolute date (không "tuần sau"); evidence phải point đến doc_code hoặc table_name. -->
+  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Task</th><th>R</th><th>A</th><th>C</th><th>I</th><th>Deadline</th><th>Evidence</th><th>KPI</th></tr></thead><tbody>
+    <tr><td>1</td><td>Publish W08 hypercare cadence: 7 zone, 2 gemba lượt/ngày, command center hours, escalation tree.</td><td>PROD_DIR</td><td>QMS_MGR</td><td>QA_MGR</td><td>CEO</td><td>2026-06-27 17:00</td><td>ANNEX-118</td><td>KPI-DEP-02</td></tr>
+    <tr><td>2</td><td>Reset problem-of-the-day board với 5 category chuẩn.</td><td>QMS_ENG</td><td>QA_MGR</td><td>PROD_CHAMPION</td><td>PROD_DIR</td><td>2026-06-29 08:00</td><td>board snapshot</td><td>KPI-DEP-02</td></tr>
+    <tr><td>3</td><td>Refresh Andon posters tại 7 zone.</td><td>PROD_CHAMPION</td><td>PROD_DIR</td><td>QMS_ENG</td><td>ENG_MGR</td><td>2026-06-29 07:00</td><td>photo log</td><td>KPI-DEP-07</td></tr>
+    <tr><td>4</td><td>Review shift handover template nếu completion <95%.</td><td>QA_MGR</td><td>QMS_MGR</td><td>PROD_DIR</td><td>CEO</td><td>2026-06-30 12:00</td><td>handover v1.1</td><td>KPI-FLD-01</td></tr>
+    <tr><td>5</td><td>Audit 10% JO Mon-Fri W07, ghi gap G0-G7.</td><td>QA_MGR</td><td>QMS_MGR</td><td>ENG_MGR</td><td>PROD_DIR</td><td>2026-07-01 17:00</td><td>ANNEX-117</td><td>KPI-DEP-03</td></tr>
+    <tr><td>6</td><td>Đánh giá Engineering dual-system.</td><td>ENG_MGR</td><td>PROD_DIR</td><td>IT_MGR</td><td>QMS_MGR</td><td>2026-07-03 15:00</td><td>SOP-303 memo</td><td>KPI-DEP-03</td></tr>
+    <tr><td>7</td><td>Update KPI dashboard daily trong hypercare.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>CEO</td><td>2026-07-03 17:00</td><td>readiness.json</td><td>KPI-DEP-05</td></tr>
+    <tr><td>8</td><td>Schedule Wave 3 champion bootcamp.</td><td>HR_MGR</td><td>QMS_MGR</td><td>IT_MGR</td><td>CEO</td><td>2026-06-30 14:00</td><td>training_records</td><td>KPI-TRN-01</td></tr>
+    <tr><td>9</td><td>Close/contain mọi Sev-2 W07 với workaround và ETA ≤7 ngày.</td><td>PROD_DIR</td><td>CEO</td><td>QA_MGR</td><td>QMS_MGR</td><td>2026-07-01 18:00</td><td>issues.json</td><td>KPI-DEP-02</td></tr>
+    <tr><td>10</td><td>Write audit event cho gate decision W07.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>CEO</td><td>2026-06-27 12:00</td><td>audit_events</td><td>KPI-DEP-05</td></tr>
+    <tr><td>11</td><td>Update WI-519 nếu tool-life gap lặp lại ≥2 lần.</td><td>ENG_MGR</td><td>QMS_MGR</td><td>PROD_DIR</td><td>QA_MGR</td><td>2026-07-03 16:00</td><td>WI-519 draft</td><td>KPI-FLD-01</td></tr>
+    <tr><td>12</td><td>Prepare W08 hypercare exit packet skeleton.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>PROD_DIR</td><td>CEO</td><td>2026-06-30 10:00</td><td>W08 packet</td><td>KPI-DEP-05</td></tr>
+    <tr><td>13</td><td>Pair senior technician với từng champion cho Toyota Kata coaching.</td><td>PROD_DIR</td><td>CEO</td><td>HR_MGR</td><td>QMS_MGR</td><td>2026-06-30 08:00</td><td>coaching roster</td><td>KPI-TRN-01</td></tr>
+    <tr><td>14</td><td>Send W07 status memo cho all_departments.</td><td>QMS_MGR</td><td>CEO</td><td>PROD_DIR</td><td>all_departments</td><td>2026-06-29 09:00</td><td>mgmt-reviews.json</td><td>KPI-DEP-02</td></tr>
+    <tr><td>15</td><td>Confirm CAPA owner/ETA cho từng JO dossier gap.</td><td>QA_MGR</td><td>QMS_MGR</td><td>PROD_DIR</td><td>CEO</td><td>2026-06-30 17:00</td><td>CAPA table</td><td>KPI-DEP-07</td></tr>
+  </tbody></table></div>
 </section>
 
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 9 — NỘI DUNG HỌP TUẦN SAU (PREVIEW)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-next-week">
   <h2 class="h2">Preview tuần 8 · nhiệm vụ chuẩn bị</h2>
-  <!-- TODO Codex W07/SEC-NEXT-WEEK: tóm tắt 1 đoạn về tuần kế tiếp, sau đó bảng "chuẩn bị" — mỗi item: Role · Task · Deadline (trong tuần 07).
-       Mục đích: cuối họp W07 mỗi người biết rõ tuần sau họ cần đến với gì. -->
+  <p>W08 ngày 2026-07-04 là Production hypercare tuần 2. Từ 2026-06-30 đến 2026-07-03, 7 zone vẫn chạy gemba 2 lượt/ngày, problem-of-the-day board đóng ≥95% trong 24 giờ, Andon-cord có ít nhất 1 pull/ngày với escalation đúng, và Sev-1 giữ streak 0 trong 5 ngày làm việc. Nếu streak reset vào ngày 4, W08 không được đóng hypercare dù các chỉ số còn lại đẹp.</p>
+  <div class="table-card"><table class="table"><thead><tr><th>Role</th><th>Task chuẩn bị</th><th>Deadline</th></tr></thead><tbody>
+    <tr><td>PROD_DIR</td><td>Công bố cadence gemba W08 và danh sách zone owner.</td><td>2026-06-27 17:00</td></tr>
+    <tr><td>QA_MGR</td><td>Chuẩn bị PIR form cho hypercare exit.</td><td>2026-07-03 15:00</td></tr>
+    <tr><td>QMS_ENG</td><td>Build W08 evidence packet.</td><td>2026-07-03 16:00</td></tr>
+    <tr><td>ENG_MGR</td><td>Nộp dual-system decision memo.</td><td>2026-07-03 15:00</td></tr>
+    <tr><td>HR_MGR</td><td>Chốt Wave 3 bootcamp roster.</td><td>2026-06-30 12:00</td></tr>
+  </tbody></table></div>
 </section>
 
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 10 — TÀI LIỆU LIÊN QUAN
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-docs">
   <h2 class="h2">Tài liệu liên quan · click để mở</h2>
-  <!-- TODO Codex W07/SEC-DOCS: liệt kê 6–12 doc code dạng:
-         <a href="#" onclick="if(window.openDoc)openDoc('CODE');return false;" class="role-chip">CODE</a>
-       Bắt buộc bao gồm doc trong requiredDocs của tuần 07 (xem program.bootstrap.json). -->
+  <p>
+    <a href="#" onclick="if(window.openDoc)openDoc('SOP-501');return false;" class="role-chip">SOP-501</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('WI-519');return false;" class="role-chip">WI-519</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('SOP-303');return false;" class="role-chip">SOP-303</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('WI-302');return false;" class="role-chip">WI-302</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-114');return false;" class="role-chip">ANNEX-114</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-117');return false;" class="role-chip">ANNEX-117</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-118');return false;" class="role-chip">ANNEX-118</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('WI-201');return false;" class="role-chip">WI-201</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('WI-202');return false;" class="role-chip">WI-202</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W06');return false;" class="role-chip">TRN-DEP-W06</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W08');return false;" class="role-chip">TRN-DEP-W08</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W09');return false;" class="role-chip">TRN-DEP-W09</a>
+  </p>
 </section>
 
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 11 — RỦI RO + ESCALATION
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-risks">
   <h2 class="h2">Rủi ro tuần 07 + escalation</h2>
-  <!-- TODO Codex W07/SEC-RISKS: bảng 5–8 rủi ro. Cột: # · Mô tả rủi ro · Likelihood (L/M/H) · Impact (L/M/H) · Mitigation · Trigger escalation · Escalation owner.
-       Bao gồm ít nhất 1 rủi ro Hofstede (VN cultural): vd "trưởng phòng không feedback openly tại all-hands" → mitigation: anonymous feedback box. -->
+  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Rủi ro</th><th>L</th><th>I</th><th>Mitigation</th><th>Trigger</th><th>Owner</th></tr></thead><tbody>
+    <tr><td>1</td><td>Sev-1 ngày đầu gây production halt.</td><td>M</td><td>H</td><td>Dual-system fallback ≤2h, ECAB trong 24h.</td><td>Sev-1 mở >30 phút</td><td>CEO</td></tr>
+    <tr><td>2</td><td>Operator im lặng dùng cách cũ do high power-distance.</td><td>H</td><td>H</td><td>Champion hiện diện, anonymous note, senior speaks last.</td><td>Gemba phát hiện ngoài system sau 2 ngày</td><td>PROD_DIR</td></tr>
+    <tr><td>3</td><td>Andon không được kéo vì sợ mất mặt.</td><td>M</td><td>H</td><td>CEO endorsement 2026-06-22 05:30, ghi nhận pull đúng đầu tiên.</td><td>0 pull dù có ≥3 Sev-2</td><td>QMS_MGR</td></tr>
+    <tr><td>4</td><td>CAD/CAM lockout hoặc NC program sai revision.</td><td>M</td><td>H</td><td>Dual-CAD/CAM 1 tuần, emergency export script.</td><td>>2 lỗi revision</td><td>ENG_MGR</td></tr>
+    <tr><td>5</td><td>KPI đỏ bị che bằng câu "mới go-live".</td><td>M</td><td>M</td><td>Exception note bắt buộc owner, ETA, containment, CEO signature.</td><td>KPI đỏ thiếu note trước 10:00</td><td>CEO</td></tr>
+    <tr><td>6</td><td>Shift handover thiếu next-shift risk.</td><td>M</td><td>H</td><td>Template v1.1 nếu completion <95%.</td><td>2 ca liên tiếp thiếu risk field</td><td>QA_MGR</td></tr>
+    <tr><td>7</td><td>Tool-life log thiếu ToolID dẫn đến CTQ drift.</td><td>M</td><td>H</td><td>WI-519 quick revision, tăng sampling CTQ 20%.</td><td>≥2 gap ToolID</td><td>ENG_MGR</td></tr>
+  </tbody></table></div>
 </section>
 
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 12 — LESSONS LEARNED (FILL POST-MEETING)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-lessons">
   <h2 class="h2">Lessons learned · điền sau họp (Lean Change cycle)</h2>
-  <!-- TODO Codex W07/SEC-LESSONS: chừa 3 khối Insights / Options / Experiments (Jason Little Lean Change Canvas) với placeholder text.
-       Sau cuộc họp thật, owner sẽ điền vào 3 ô này. -->
+  <div class="grid-3">
+    <div class="note"><b>Insights</b><br>Điền sáng 2026-06-29 bởi QMS_ENG + PROD_DIR. Ghi 3 pattern có bằng chứng: zone lặp issue, cổng G0-G7 yếu, handover field bị bỏ sót.</div>
+    <div class="note"><b>Options</b><br>Điền sáng 2026-06-29 bởi QMS_ENG + PROD_DIR. Mỗi option có owner, expected KPI impact và rủi ro nếu không làm.</div>
+    <div class="note"><b>Experiments</b><br>Điền sáng 2026-06-29 bởi QMS_ENG + PROD_DIR. Mỗi experiment chạy tối đa 5 ngày, có threshold trước khi đưa vào runbook v1.1.</div>
+  </div>
+  <p class="note-blue">Khi điền lessons learned, không viết dạng hồi tưởng chung. Mỗi insight phải có một evidence anchor như gemba log, issue id, CAPA id, JO dossier field hoặc timestamp trong audit_events. Mỗi option phải ghi điều gì không làm và vì sao không làm, ví dụ không tắt dual-system nếu CAD/CAM revision error còn >2. Mỗi experiment phải đủ nhỏ để kiểm trong W08, có expected movement lên KPI-FLD-01, KPI-DEP-02 hoặc KPI-DEP-07, và có stop rule nếu gây rủi ro mới.</p>
 </section>
 
 </div><!-- /doc-content -->

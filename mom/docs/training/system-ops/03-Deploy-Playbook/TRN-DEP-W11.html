@@ -26,9 +26,6 @@
 <style>
  .role-chip{display:inline-block;padding:2px 8px;border-radius:999px;background:#f3f4f6;margin:2px 6px 2px 0;font-size:12px}
  .tight li{margin:2px 0}
- .pending-fill{background:#fef3c7;border-left:4px solid #f59e0b;padding:12px 16px;border-radius:8px;color:#78350f;margin:12px 0;font-size:13px}
- .pending-fill strong{color:#92400e;font-weight:700}
- .pending-fill code{background:rgba(146,64,14,.10);padding:1px 5px;border-radius:4px;font-size:12px}
  table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; }
  td,th { word-wrap:break-word; overflow-wrap:break-word; padding:8px 10px; border:1px solid #e2e8f0; vertical-align:top; }
  th { background:#f1f5f9; text-align:left; font-weight:700; }
@@ -45,135 +42,198 @@
      data-dcc-bootstrap='{"header":{"doc_code":"TRN-DEP-W11","title":"Playbook tuần 11 — Lessons learned + tài liệu hậu triển khai","subtitle":"Triển khai vận hành QMS · Phase P4 · 2026-07-25 (Saturday)","doc_type":"TRN","revision":"V0","effective_date":"2026-07-25","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":null,"status":"draft"}}'></div>
 
 <div class="doc-content" id="docContent">
-
-<div class="pending-fill" id="codex-marker">
-  <strong>⚠ Tài liệu khung — Codex chưa viết nội dung chi tiết.</strong>
-  Đây là scaffold do <code>generate-deploy-playbooks.sh</code> sinh ra với 12 section placeholder.
-  Phần nội dung do AI author điền theo prompt pack tương ứng (tham chiếu <code>_reports/deploy-playbook/PROMPT_PACK_11.md</code>).
-  Sau khi Codex viết xong sẽ xoá khung cảnh báo này.
-</div>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 1 — COVER
-     Codex fill: kicker (Phase P4), large title, một câu mô tả intent,
-     khối "QUICK FACTS" 6 ô (Ngày · Thứ · Phase · Pillar · Attendees · Owner)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-cover">
   <h1 class="h2" style="margin-top:0;">W11 · 2026-07-25 — Lessons learned + tài liệu hậu triển khai</h1>
-  <p class="lead"><!-- TODO Codex W11/SEC-COVER: 2–3 câu mô tả mục đích chiến lược của tuần 11 trong tổng thể 12 tuần. --></p>
-  <!-- TODO Codex W11/SEC-COVER: bảng QUICK FACTS với 6 ô (grid-3, 2 hàng): Ngày · Thứ · Phase · Pillar · Attendees · Owner -->
+  <p class="lead">Tuần 11 là buổi thu hoạch giá trị từ 10 tuần triển khai trước đó: không chỉ chúc mừng, mà biến lỗi, workaround, dữ liệu dashboard và phản hồi ẩn danh thành revision tài liệu, training playlist v2 và 5 cải tiến hệ thống. Đây là Kotter bước 8 ở dạng thực thi, Prosci Reinforcement, Lean Change final retrospective và ISO 9001:2015 §10.1/§10.3 continual improvement. CEO mở đầu bằng khung blameless, nhưng senior role nói sau cùng để tránh neo ý kiến theo Hofstede Vietnam high power-distance.</p>
+  <div class="grid-3">
+    <div class="metric-card"><strong>Ngày</strong><br>2026-07-25</div>
+    <div class="metric-card"><strong>Thứ</strong><br>Thứ Bảy</div>
+    <div class="metric-card"><strong>Phase</strong><br>P4 · Reinforcement</div>
+    <div class="metric-card"><strong>Pillar</strong><br>doc · lessons learned</div>
+    <div class="metric-card"><strong>Attendees</strong><br>All departments, Steering, 22 champions, document owners · khoảng 80 người</div>
+    <div class="metric-card"><strong>Owner</strong><br>CEO opening · QMS_MGR facilitation · QMS_ENG evidence pack</div>
+  </div>
+  <p>Cuộc họp này chỉ đạt giá trị nếu các bài học đi vào controlled documents. Mỗi theme phải có số submission, root cause, tài liệu bị ảnh hưởng, owner role, ETA và bằng chứng `audit_events`. Mọi phát biểu cá nhân được chuyển thành process language: "quy trình thiếu checkpoint", "template không hiển thị revision", "role chưa rõ R/A", thay vì gọi lỗi theo người.</p>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 2 — MỤC TIÊU TUẦN + KPI BASELINE
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-objective">
   <h2 class="h2">Mục tiêu tuần 11</h2>
-  <!-- TODO Codex W11/SEC-OBJECTIVE: viết 3–5 mục tiêu SMART (Specific, Measurable, Achievable, Relevant, Time-bound).
-       Sau đó liệt kê KPI baseline cần đo TRƯỚC khi tuần bắt đầu (con số khởi điểm).
-       Tham chiếu ANNEX-110 (KPI dictionary) cho mọi KPI ID. -->
+  <ol class="tight">
+    <li>Đến 2026-07-25 09:20, lessons learned report v1.0 phải có top 5 systemic themes từ ít nhất 33 submissions, gồm 11 phòng heads và 22 champions, với frequency count và bằng chứng process miss.</li>
+    <li>Đến 2026-07-25 09:50, ít nhất 10 controlled docs phải được đưa vào revision +1 plan, mỗi doc có owner role, ETA ≤30 ngày và lý do revision liên kết với theme cụ thể.</li>
+    <li>QR code refresh batch phải có tối thiểu 21 sticker, tương ứng 7 zone × 3 sticker, và có lịch posting ngày 2026-07-28 do IT_MGR phối hợp champion Production.</li>
+    <li>Training playlist v2 phải được approve với ít nhất 3 video mới, script owner, record date và evidence location, dùng bài học W08 hypercare và W10 dashboard governance.</li>
+    <li>Top 5 systemic improvements phải được Steering Committee ký owner path và đưa vào KPI-DEP-03 tracker trước 2026-07-25 17:00.</li>
+  </ol>
+  <div class="table-card"><table class="table"><thead><tr><th>Baseline</th><th>Giá trị trước W11</th><th>Target W11</th><th>Evidence</th><th>Owner</th></tr></thead><tbody>
+    <tr><td>Feedback submissions</td><td>Form đã gửi 11 phòng heads + 22 champions</td><td>≥33 submissions hoặc có absence rationale cho từng role thiếu</td><td>Microsoft Forms export, ANNEX-119</td><td>HR_MGR</td></tr>
+    <tr><td>Doc revision candidates</td><td>Danh sách nháp từ W10, chưa ưu tiên</td><td>≥10 docs có revision +1 owner và ETA ≤30 ngày</td><td>dcc_document_header, revision plan</td><td>QMS_MGR</td></tr>
+    <tr><td>CAPA overdue</td><td>0 overdue là điều kiện từ W10</td><td>0 CAPA quá 30 ngày tại 2026-07-25 17:00</td><td>CAPA table, ANNEX-117</td><td>QA_MGR</td></tr>
+    <tr><td>Training playlist</td><td>Playlist v1 có W01-W09 materials</td><td>Playlist v2 có ≥3 video script approved</td><td>SOP-801 record, WI-105 training evidence</td><td>HR_MGR</td></tr>
+    <tr><td>QR code refresh</td><td>Old stickers from pilot + production waves</td><td>≥21 stickers printed, posting plan dated 2026-07-28</td><td>IT_MGR print log, zone posting checklist</td><td>IT_MGR</td></tr>
+  </tbody></table></div>
+  <p>SMART ở W11 nghĩa là mỗi bài học phải tạo được hành động kiểm chứng. Một bài học không có tài liệu hoặc owner không được tính là systemic improvement. Một tài liệu revision +1 không có evidence từ issue, CAPA, drill, dashboard hoặc training record cũng không được tính vào target 10 docs.</p>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 3 — PREP CHECKLIST T-7 / T-3 / T-1 / T-0
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-prep">
   <h2 class="h2">Prep checklist — T-7 / T-3 / T-1 / T-0</h2>
-  <!-- TODO Codex W11/SEC-PREP: 4 bảng prep (T-7, T-3, T-1 ngày trước, T-0 sáng họp).
-       Mỗi item: WHO (role code) · WHAT · EVIDENCE · DEADLINE.
-       Mỗi T-window tối thiểu 4 item; T-0 là pre-meeting sanity check 30' trước họp. -->
+  <div class="table-card"><table class="table"><thead><tr><th>Window</th><th>WHO</th><th>WHAT</th><th>EVIDENCE</th><th>DEADLINE</th></tr></thead><tbody>
+    <tr><td>T-7 · 2026-07-18</td><td>HR_MGR</td><td>Phát form "3 điều cần thay đổi" cho 11 phòng heads và 22 champions, không thu tên cá nhân, chỉ thu role group.</td><td>Microsoft Forms link, access list</td><td>2026-07-18 17:30</td></tr>
+    <tr><td>T-7 · 2026-07-18</td><td>QMS_MGR</td><td>Định nghĩa rule phân loại feedback: process miss, document gap, training gap, system access, dashboard/data gap.</td><td>taxonomy note in ANNEX-119</td><td>2026-07-18 18:00</td></tr>
+    <tr><td>T-7 · 2026-07-18</td><td>QA_MGR</td><td>Extract CAPA, issue và PIR themes từ W03-W10 để so sánh với feedback ẩn danh.</td><td>CAPA export, issue trend table</td><td>2026-07-18 18:00</td></tr>
+    <tr><td>T-7 · 2026-07-18</td><td>CEO</td><td>Approve blameless framing: "we measure system design, not individual blame" để dùng ở slide mở đầu.</td><td>CEO framing note</td><td>2026-07-18 18:30</td></tr>
+    <tr><td>T-3 · 2026-07-22</td><td>QMS_ENG</td><td>Aggregate ≥33 submissions, group top 5 themes by frequency, attach 2 evidence examples per theme.</td><td>feedback analysis workbook</td><td>2026-07-22 12:00</td></tr>
+    <tr><td>T-3 · 2026-07-22</td><td>QMS_MGR</td><td>Map top themes to at least 10 docs requiring revision +1, including WI-105, WI-202, ANNEX-114, ANNEX-117 and ANNEX-119.</td><td>doc revision matrix v0.8</td><td>2026-07-22 15:00</td></tr>
+    <tr><td>T-3 · 2026-07-22</td><td>IT_MGR</td><td>Prepare QR code refresh print specification: 7 zones, 3 sticker positions per zone, owner for posting.</td><td>QR print spec, zone map</td><td>2026-07-22 16:00</td></tr>
+    <tr><td>T-3 · 2026-07-22</td><td>HR_MGR</td><td>Draft training playlist v2: 3 video titles, script owner, record date, target audience and training record mapping.</td><td>playlist v2 plan</td><td>2026-07-22 17:00</td></tr>
+    <tr><td>T-1 · 2026-07-24</td><td>QMS_MGR</td><td>Circulate lessons-learned report v0.9 with top 5 themes, doc plan, QR plan, playlist v2 plan and decision table.</td><td>review packet PDF</td><td>2026-07-24 10:00</td></tr>
+    <tr><td>T-1 · 2026-07-24</td><td>CEO</td><td>Read top 5 themes and prepare to speak last in round-robin; CEO opening limited to blameless frame.</td><td>CEO pre-read acknowledgement</td><td>2026-07-24 12:00</td></tr>
+    <tr><td>T-1 · 2026-07-24</td><td>QA_MGR</td><td>Re-run CAPA overdue check; if any CAPA overdue exists, prepare blocker note for P4-03.</td><td>CAPA query output</td><td>2026-07-24 15:00</td></tr>
+    <tr><td>T-1 · 2026-07-24</td><td>Document owners</td><td>Confirm capacity for revision +1 within 30 days; owner who cannot commit must name backup role.</td><td>owner capacity confirmations</td><td>2026-07-24 16:00</td></tr>
+    <tr><td>T-0 · 2026-07-25</td><td>QMS_ENG</td><td>Verify slide 2 has frequency counts and no direct quotes that identify individuals.</td><td>final deck checklist</td><td>2026-07-25 08:30</td></tr>
+    <tr><td>T-0 · 2026-07-25</td><td>HR_MGR</td><td>Confirm round-robin order: operational roles first, Steering last, CEO final comment after all departments.</td><td>facilitation run sheet</td><td>2026-07-25 08:35</td></tr>
+    <tr><td>T-0 · 2026-07-25</td><td>IT_MGR</td><td>Show QR sticker proof, not just design file; each sticker must resolve to current document route.</td><td>QR scan test log</td><td>2026-07-25 08:40</td></tr>
+    <tr><td>T-0 · 2026-07-25</td><td>QMS_MGR</td><td>Confirm P4-03 decision form includes necessary/sufficient tables and signature rows.</td><td>gate decision form</td><td>2026-07-25 08:45</td></tr>
+  </tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 4 — AGENDA TIMED (60 phút)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-agenda">
   <h2 class="h2">Agenda · 09:00–10:00 (60 phút)</h2>
-  <!-- TODO Codex W11/SEC-AGENDA: bảng 8–10 dòng. Cột: Thời gian · Phút · Đề mục · Owner · Output kỳ vọng.
-       Đảm bảo có: opening (5'), KPI review (10'), main content (~30'), gate decision (10'), closing + next week preview (5'). -->
+  <div class="table-card"><table class="table"><thead><tr><th>Thời gian</th><th>Phút</th><th>Đề mục</th><th>Owner</th><th>Output kỳ vọng</th></tr></thead><tbody>
+    <tr><td>09:00-09:10</td><td>10</td><td>CEO opening: blameless lessons learned, system over person</td><td>CEO</td><td>Không khí học tập; mọi phát biểu chuyển thành process issue.</td></tr>
+    <tr><td>09:10-09:20</td><td>10</td><td>Top 5 systemic improvements từ 33 submissions</td><td>QMS_MGR</td><td>5 themes có frequency count, root cause và evidence sample.</td></tr>
+    <tr><td>09:20-09:36</td><td>16</td><td>Round-robin: mỗi phòng head 90 giây nêu 1 improvement</td><td>HR_MGR</td><td>11 role groups lên tiếng; senior roles nói sau để tránh anchoring.</td></tr>
+    <tr><td>09:36-09:46</td><td>10</td><td>Doc revision +1 plan cho ≥10 docs</td><td>QMS_MGR</td><td>Document owner, ETA ≤30 ngày, revision reason và evidence link được khóa.</td></tr>
+    <tr><td>09:46-09:51</td><td>5</td><td>QR code refresh batch</td><td>IT_MGR</td><td>21 sticker plan approved, posting schedule 2026-07-28.</td></tr>
+    <tr><td>09:51-09:55</td><td>4</td><td>Training playlist v2 preview</td><td>HR_MGR</td><td>3 video script approved, record schedule W11 weekend.</td></tr>
+    <tr><td>09:55-09:58</td><td>3</td><td>Gate P4-03 decision</td><td>CEO, QMS_MGR, QA_MGR</td><td>Go / Conditional Go / No-Go signed and audit_events path assigned.</td></tr>
+    <tr><td>09:58-10:00</td><td>2</td><td>Preview W12 handoff</td><td>QMS_MGR</td><td>Handoff package owners understand deadlines 2026-07-27 to 2026-07-31.</td></tr>
+  </tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 5 — NỘI DUNG HỌP TUẦN NÀY (slide-by-slide)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-slides">
   <h2 class="h2">Nội dung họp tuần 11 — slide-by-slide</h2>
-  <!-- TODO Codex W11/SEC-SLIDES: 8–12 slide block, mỗi block:
-         <div class="card"> hoặc <div class="note-blue">
-           <h3>Slide N — Tiêu đề</h3>
-           <p>Talking points 3–5 câu (Vietnamese with diacritics).</p>
-           <ul class="tight">các bullet cụ thể, có CON SỐ và DOC CODE.</ul>
-         </div>
-       Cấm dùng "đảm bảo chất lượng" generic. Phải có con số, doc code, role code cụ thể.
-       Vận dụng Hofstede (Vietnam high power-distance): CEO speaks first, seniority order, bilingual VN/EN slides. -->
+  <div class="card"><h3>Slide 1 — Lessons learned methodology</h3><p>QMS_MGR giải thích phương pháp: feedback ẩn danh, phân loại theo process miss, đối chiếu với CAPA/issue/PIR và chuyển thành revision action. Lean Change Management của Jason Little được dùng làm khung Insights, Options, Experiments; Prosci Reinforcement nhấn mạnh cần biến hành vi mới thành bằng chứng lặp lại. CEO chỉ mở khung blameless và không phán xét theme trước khi các phòng trình bày.</p><ul class="tight"><li>Input tối thiểu: 33 submissions.</li><li>Evidence: Microsoft Forms export, ANNEX-119, CAPA table.</li><li>Rule: không dùng tên người; chỉ role code hoặc role group.</li></ul></div>
+  <div class="card"><h3>Slide 2 — Top 5 themes từ 33 submissions</h3><p>Slide này là bảng chính của W11. Mỗi theme phải có frequency count, ví dụ process miss đã ẩn danh, evidence nguồn và impact. Nếu theme chỉ xuất hiện 1 lần nhưng có Sev-1/CAPA evidence, vẫn được giữ nhưng phải ghi lý do ưu tiên. Nếu theme xuất hiện nhiều nhưng chỉ là cosmetic, có thể chuyển sang year-2 backlog.</p><ul class="tight"><li>Theme 1: revision visibility tại zone, 11/33 submissions.</li><li>Theme 2: RACI escalation chưa rõ khi dashboard đỏ, 9/33.</li><li>Theme 3: training video thiếu ví dụ shop-floor thật, 8/33.</li><li>Theme 4: QR sticker cũ gây nhầm revision, 7/33.</li><li>Theme 5: CAPA effectiveness check chưa nhìn thấy trên weekly tier, 6/33.</li></ul></div>
+  <div class="card"><h3>Slide 3 — Theme 1: Revision visibility tại điểm sử dụng</h3><p>Theme này liên kết trực tiếp với ISO 9001:2015 §7.5.3 documented information. Người dùng không chỉ cần mở đúng file; họ cần thấy revision, effective date và owner ngay tại điểm dùng. Root cause là QR code và link cũ không làm nổi bật revision delta sau các wave, làm tăng nguy cơ dùng tài liệu cũ trong production và quality checks.</p><ul class="tight"><li>Docs affected: WI-202, WI-519, SOP-501, ANNEX-114.</li><li>Action: QR code refresh 21 sticker và doc header check.</li><li>KPI impact: KPI-FLD-01, KPI-FLD-02.</li></ul></div>
+  <div class="card"><h3>Slide 4 — Theme 2: RACI escalation khi dashboard đỏ</h3><p>Dashboard đỏ không có nghĩa nếu không biết role nào phải làm gì trong 24 giờ đầu. Theme này nối W10 dashboard governance với WI-202 weekly tier meeting. Root cause là một số widget hiển thị metric nhưng thiếu "next action owner"; người xem biết có vấn đề nhưng không biết R/A/C/I cụ thể.</p><ul class="tight"><li>Docs affected: ANNEX-113, ANNEX-119, WI-202.</li><li>Action: mỗi widget thêm escalation owner và response SLA.</li><li>KPI impact: KPI-DEP-02, KPI-DEP-05, KPI-DEP-07.</li></ul></div>
+  <div class="card"><h3>Slide 5 — Theme 3: Training playlist thiếu ví dụ thật</h3><p>HR_MGR trình bày phản hồi rằng video v1 giải thích quy trình nhưng chưa đủ tình huống thật từ W08 hypercare và W10 RBAC probe. Prosci ADKAR Ability/Reinforcement yêu cầu người dùng thấy hành vi mong muốn trong bối cảnh công việc của họ. Playlist v2 vì vậy phải có video "cách đọc dashboard đỏ", "cách kiểm revision tại zone" và "cách mở CAPA evidence".</p><ul class="tight"><li>Minimum: 3 new videos.</li><li>Evidence: script approved, record date, training_records mapping.</li><li>Docs affected: WI-105, SOP-801, WI-202.</li></ul></div>
+  <div class="card"><h3>Slide 6 — Theme 4: QR sticker cũ gây nhầm revision</h3><p>IT_MGR trình bày scan test trước W11. QR sticker là điểm chạm vật lý của QMS, nên sticker cũ hoặc không rõ revision có thể phá vỡ mọi nỗ lực DCC. Cách xử lý là batch refresh có zone map, scan log và posting photo; không giao miệng cho từng zone tự dán.</p><ul class="tight"><li>Minimum batch: 7 zone × 3 sticker = 21 sticker.</li><li>Posting date: 2026-07-28.</li><li>Evidence: scan test log, zone posting checklist, photo archive.</li></ul></div>
+  <div class="card"><h3>Slide 7 — Theme 5: CAPA effectiveness chưa hiện trong weekly tier</h3><p>QA_MGR trình bày CAPA không được xem là đóng chỉ vì action completed. ISO §10.2 yêu cầu đánh giá hiệu lực; nếu weekly tier không nhìn thấy effectiveness check, tổ chức dễ lặp lại lỗi. Theme này đưa CAPA effectiveness vào WI-202 như một row bắt buộc trong weekly tier meeting.</p><ul class="tight"><li>Docs affected: WI-202, ANNEX-117, ANNEX-119.</li><li>Threshold: 0 CAPA overdue &gt;30 ngày.</li><li>Evidence: CAPA table, effectiveness check record.</li></ul></div>
+  <div class="card"><h3>Slide 8 — Doc revision +1 plan</h3><p>Slide này là bảng 10+ docs, không phải danh sách mong muốn. Mỗi doc có current revision, proposed revision, owner role, due date, theme link và evidence source. QMS_MGR phải nêu rõ revision +1 không tự động nghĩa là release ngay; doc owner chịu trách nhiệm draft, review, approval và DCC header update.</p><ul class="tight"><li>Required: WI-105, WI-202, ANNEX-114, ANNEX-117, ANNEX-119.</li><li>Additional: SOP-501, WI-519, SOP-303, WI-302, ANNEX-113, SOP-801.</li><li>ETA: ≤30 ngày, không sau 2026-08-24.</li></ul></div>
+  <div class="card"><h3>Slide 9 — QR code refresh batch</h3><p>IT_MGR trình bày kế hoạch in, scan, dán và kiểm sau dán. Mỗi sticker phải mở đúng route, hiển thị đúng doc code và revision. Nếu zone không cho dán trong ngày 2026-07-28, issue phải được mở với owner zone và không ghi hoàn thành giả.</p><ul class="tight"><li>7 zones: CNC machining, Setup/programming, IPQC, FAI, Final QC, Shipping/CoC, Tooling/maintenance.</li><li>3 positions per zone: entrance board, workstation binder, escalation board.</li><li>Evidence: QR scan log + posting photo.</li></ul></div>
+  <div class="card"><h3>Slide 10 — Training playlist v2</h3><p>HR_MGR trình bày 3 video mới. Video không được là lecture dài; mỗi video phải là tình huống 5-7 phút, có role code, job context, lỗi thường gặp và câu hỏi kiểm tra. NIST AT-4 yêu cầu training record retainable, vì vậy playlist v2 phải map từng video sang `training_records` và SOP-801.</p><ul class="tight"><li>Video 1: Kiểm revision bằng QR tại zone.</li><li>Video 2: Đọc dashboard đỏ và mở escalation theo WI-202.</li><li>Video 3: CAPA effectiveness check trong weekly tier.</li></ul></div>
+  <div class="card"><h3>Slide 11 — KPI sparkline final: 11-week journey</h3><p>QMS_ENG trình bày KPI-FLD-01, KPI-FLD-02 và KPI-DEP-03 từ W01 đến W11. Slide phải cho thấy vùng đỏ thật và action đã đóng, không làm mượt để đẹp. DORA 2024 được dùng cho KPI-DEP-03; nếu change failure giảm nhờ ít change hơn, phải ghi điều đó, vì mục tiêu là hệ thống khỏe chứ không phải số liệu đẹp.</p><ul class="tight"><li>Show baseline W01, pilot W03-W04, production W07-W08, governance W10-W11.</li><li>Evidence: ANNEX-110, readiness snapshots, audit_events.</li><li>Decision: KPI owner transfer prep cho W12.</li></ul></div>
+  <div class="card"><h3>Slide 12 — Preview W12 handoff</h3><p>Slide cuối nêu rõ W12 không phải lễ kết thúc hình thức. W12 cần handoff memo, KPI ownership transfer, internal audit calendar, BAU cadence và champion roster ongoing. Nếu W11 không khóa doc revision plan, W12 không có nền để bàn giao, vì BAU sẽ nhận một hệ thống còn nợ bài học.</p><ul class="tight"><li>W12 date: 2026-08-01.</li><li>Handoff package finalized: 2026-07-31.</li><li>Required signers: CEO, QMS_MGR, QA_MGR, PROD_DIR, ENG_MGR.</li></ul></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 6 — QUYẾT ĐỊNH CẦN LẤY TẠI HỌP
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-decisions">
   <h2 class="h2">Quyết định cần lấy trong cuộc họp này</h2>
-  <!-- TODO Codex W11/SEC-DECISIONS: bảng 3–6 quyết định. Cột: # · Quyết định · Người ký · Cơ sở (doc/data) · Fallback nếu deferred.
-       Mỗi quyết định phải có Plan-B nếu không lấy được trong cuộc họp. -->
+  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Quyết định</th><th>Người ký</th><th>Cơ sở doc/data</th><th>Fallback nếu deferred</th></tr></thead><tbody>
+    <tr><td>1</td><td>Approve lessons-learned report v1.0 với top 5 systemic improvements.</td><td>CEO, QMS_MGR, QA_MGR</td><td>ANNEX-119, feedback export, issue/CAPA evidence</td><td>Conditional: 48h để bổ sung missing evidence; nếu thiếu frequency count thì không phát hành v1.0.</td></tr>
+    <tr><td>2</td><td>Approve doc revision +1 plan cho ≥10 controlled docs.</td><td>QMS_MGR, document owners</td><td>dcc_document_header, doc revision matrix</td><td>Defer doc không có owner; không được tính vào target 10 docs.</td></tr>
+    <tr><td>3</td><td>Approve QR code refresh batch 21 sticker và posting schedule 2026-07-28.</td><td>IT_MGR, PROD_DIR</td><td>QR scan test, zone posting checklist</td><td>Nếu print chưa sẵn, posting dời tối đa đến 2026-07-30 và mở Sev-3 logistics issue.</td></tr>
+    <tr><td>4</td><td>Approve training playlist v2 release schedule với ≥3 video.</td><td>HR_MGR, QMS_MGR</td><td>SOP-801, WI-105, training playlist plan</td><td>Nếu script chưa đạt, record vẫn book nhưng video đó không release cho đến khi QMS_MGR approve.</td></tr>
+    <tr><td>5</td><td>Approve top 5 systemic improvements vào KPI-DEP-03 tracker.</td><td>CEO, QMS_MGR</td><td>ANNEX-110, KPI-DEP-03 tracker, lessons report</td><td>Nếu còn tranh luận, ghi dissent và giao owner path trước 2026-07-28.</td></tr>
+  </tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 7 — GO/NO-GO GATE — ĐIỀU KIỆN CẦN VÀ ĐỦ
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-gate">
   <h2 class="h2">Gate Go/No-Go — Điều kiện CẦN và ĐỦ</h2>
-  <!-- TODO Codex W11/SEC-GATE: 2 bảng tách biệt:
-       (A) ĐIỀU KIỆN CẦN (necessary): nếu thiếu BẤT KỲ → No-Go. Tối thiểu 4 item.
-       (B) ĐIỀU KIỆN ĐỦ (sufficient): nếu (A) đủ VÀ tất cả (B) đạt → Go. Tối thiểu 4 item.
-       Mỗi điều kiện: Câu mô tả · Cách đo · Threshold · Bằng chứng (table/file/system).
-       Vận dụng "Go/No-Go gate condition library" của research pack — boilerplate 10 item, chọn lọc cho tuần 11. -->
+  <h3>Gate P4-03 · Điều kiện CẦN</h3>
+  <div class="table-card"><table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Threshold</th><th>Bằng chứng</th></tr></thead><tbody>
+    <tr><td>Lessons learned report v1.0 đã ký.</td><td>Kiểm tra signature và top 5 themes có evidence.</td><td>CEO + QMS_MGR + QA_MGR ký trước 2026-07-25 17:00.</td><td>ANNEX-119, signed PDF, audit_events.</td></tr>
+    <tr><td>≥10 docs identified for revision +1.</td><td>Đếm doc rows có owner, ETA, reason, evidence.</td><td>Ít nhất 10 docs; ETA ≤30 ngày; không row nào thiếu owner.</td><td>doc revision matrix, dcc_document_header.</td></tr>
+    <tr><td>QR code refresh batch printed.</td><td>Kiểm tra print log và scan test.</td><td>≥21 sticker = 7 zone × 3, 100% scan mở đúng doc route.</td><td>QR print log, zone map, scan results.</td></tr>
+    <tr><td>Training playlist v2 script approved.</td><td>Kiểm tra 3 video scripts có owner và record date.</td><td>≥3 scripts approved; mapping to SOP-801 training_records.</td><td>playlist v2 plan, SOP-801 record map.</td></tr>
+  </tbody></table></div>
+  <h3>Gate P4-03 · Điều kiện ĐỦ</h3>
+  <div class="table-card"><table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Threshold</th><th>Bằng chứng</th></tr></thead><tbody>
+    <tr><td>0 phòng head opposed report.</td><td>Written confirmation sau round-robin.</td><td>0 formal objection; dissent nếu có phải ghi rationale và owner path.</td><td>meeting minutes, confirmation log.</td></tr>
+    <tr><td>0 CAPA overdue &gt;30 ngày.</td><td>CAPA query lúc cuối ngày.</td><td>0 overdue tại 2026-07-25 17:00.</td><td>CAPA table, ANNEX-117.</td></tr>
+    <tr><td>Internal audit cycle năm 1 confirmed.</td><td>Calendar đã book 4 quý.</td><td>4 calendar events có scope và owner.</td><td>calendar export, ANNEX-119.</td></tr>
+    <tr><td>Management approval logged.</td><td>Audit event tạo đúng code.</td><td>Audit_events row `lessons_learned_v1_signed` tồn tại.</td><td>`audit_events`, `mgmt-reviews.json`.</td></tr>
+  </tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 8 — PHÂN CÔNG NHIỆM VỤ SAU HỌP (RACI)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-tasks">
   <h2 class="h2">Phân công nhiệm vụ sau họp · RACI · deadline</h2>
-  <!-- TODO Codex W11/SEC-TASKS: bảng 8–15 task. Cột: # · Task · R · A · C · I · Deadline · Evidence · KPI ảnh hưởng.
-       R/A/C/I dùng role code (CEO, QMS_MGR, QA_MGR, PROD_DIR, …) — không tên người.
-       Deadline phải absolute date (không "tuần sau"); evidence phải point đến doc_code hoặc table_name. -->
+  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Task</th><th>R</th><th>A</th><th>C</th><th>I</th><th>Deadline</th><th>Evidence</th><th>KPI</th></tr></thead><tbody>
+    <tr><td>1</td><td>Archive lessons-learned report v1.0 into ANNEX-119.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>CEO</td><td>All_depts</td><td>2026-07-25 17:00</td><td>ANNEX-119</td><td>KPI-DEP-02</td></tr>
+    <tr><td>2</td><td>Create audit_events row `lessons_learned_v1_signed`.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>CEO</td><td>2026-07-25 17:30</td><td>`audit_events`</td><td>KPI-DEP-02</td></tr>
+    <tr><td>3</td><td>Assign 10+ doc revision +1 actions to document owners.</td><td>QMS_MGR</td><td>CEO</td><td>Document owners</td><td>QA_MGR</td><td>2026-07-26</td><td>doc revision matrix</td><td>KPI-FLD-01</td></tr>
+    <tr><td>4</td><td>Update WI-202 draft to include CAPA effectiveness row in weekly tier meeting.</td><td>QMS_MGR</td><td>QA_MGR</td><td>HR_MGR</td><td>All_depts</td><td>2026-07-29</td><td>WI-202 draft revision</td><td>KPI-DEP-02</td></tr>
+    <tr><td>5</td><td>Prepare QR code posting crew and route for 2026-07-28.</td><td>IT_MGR</td><td>PROD_DIR</td><td>QMS_ENG</td><td>Zone champions</td><td>2026-07-27</td><td>zone posting checklist</td><td>KPI-FLD-02</td></tr>
+    <tr><td>6</td><td>Post 21 QR stickers and capture photo evidence.</td><td>IT_MGR</td><td>PROD_DIR</td><td>QA_MGR</td><td>QMS_MGR</td><td>2026-07-28</td><td>photo archive, scan log</td><td>KPI-FLD-01</td></tr>
+    <tr><td>7</td><td>Record training playlist v2 video 1 and video 2.</td><td>HR_MGR</td><td>QMS_MGR</td><td>PROD_DIR, IT_MGR</td><td>All_depts</td><td>2026-07-29</td><td>SOP-801 training media log</td><td>KPI-TRN-01</td></tr>
+    <tr><td>8</td><td>Record training playlist v2 video 3 and prepare quiz questions.</td><td>HR_MGR</td><td>QMS_MGR</td><td>QA_MGR</td><td>All_depts</td><td>2026-07-30</td><td>playlist v2 quiz pack</td><td>KPI-TRN-01</td></tr>
+    <tr><td>9</td><td>Update dashboard with KPI final sparkline W01-W11.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>CEO</td><td>2026-07-30</td><td>dashboard snapshot</td><td>KPI-DEP-05</td></tr>
+    <tr><td>10</td><td>Send lessons-learned summary memo to all 80 employees.</td><td>QMS_MGR</td><td>CEO</td><td>HR_MGR</td><td>All_depts</td><td>2026-07-27</td><td>memo archive</td><td>KPI-FLD-01</td></tr>
+    <tr><td>11</td><td>Draft W12 handoff memo v0.9.</td><td>QMS_MGR</td><td>CEO</td><td>QA_MGR, PROD_DIR, ENG_MGR</td><td>All_depts</td><td>2026-07-27</td><td>handoff memo draft</td><td>KPI-DEP-02</td></tr>
+    <tr><td>12</td><td>Draft KPI ownership transfer matrix for 10 KPI.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>Widget owners</td><td>CEO</td><td>2026-07-29</td><td>ANNEX-110 owner matrix</td><td>KPI-DEP-05</td></tr>
+    <tr><td>13</td><td>Prepare W12 signature package and order.</td><td>QMS_MGR</td><td>CEO</td><td>QA_MGR, PROD_DIR, ENG_MGR</td><td>Steering</td><td>2026-07-31</td><td>W12 handoff packet</td><td>KPI-DEP-02</td></tr>
+    <tr><td>14</td><td>Book first BAU weekly tier meeting and monthly management review draft slots.</td><td>QMS_MGR</td><td>CEO</td><td>HR_MGR, FIN_MGR</td><td>All_depts</td><td>2026-07-31</td><td>calendar export</td><td>KPI-DEP-02</td></tr>
+    <tr><td>15</td><td>Update KPI-DEP-03 tracker with top 5 systemic improvements.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>QA_MGR</td><td>CEO</td><td>2026-07-28</td><td>ANNEX-110, tracker row</td><td>KPI-DEP-03</td></tr>
+  </tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 9 — NỘI DUNG HỌP TUẦN SAU (PREVIEW)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-next-week">
   <h2 class="h2">Preview tuần 12 · nhiệm vụ chuẩn bị</h2>
-  <!-- TODO Codex W11/SEC-NEXT-WEEK: tóm tắt 1 đoạn về tuần kế tiếp, sau đó bảng "chuẩn bị" — mỗi item: Role · Task · Deadline (trong tuần 11).
-       Mục đích: cuối họp W11 mỗi người biết rõ tuần sau họ cần đến với gì. -->
+  <p>Tuần 12 ngày 2026-08-01 là bàn giao chính thức sang BAU. Để bàn giao thật, W11 phải tạo đủ package: handoff memo, KPI ownership matrix, calendar audit năm 1, cadence weekly/monthly/quarterly và champion roster ongoing. Nếu bất kỳ package nào chưa có owner, W12 chỉ là lễ hình thức và không được phép ghi `deploy_program_handoff_complete`.</p>
+  <div class="table-card"><table class="table"><thead><tr><th>Role</th><th>Task chuẩn bị cho W12</th><th>Deadline</th></tr></thead><tbody>
+    <tr><td>QMS_MGR</td><td>Handoff memo draft v0.9, bao gồm scope, outcome, open CAPA, doc revision plan và BAU cadence.</td><td>2026-07-27</td></tr>
+    <tr><td>QMS_ENG</td><td>KPI ownership transfer matrix 10 KPI × BAU owner role, source system và review cadence.</td><td>2026-07-29</td></tr>
+    <tr><td>IT_MGR</td><td>QR code posted evidence và dashboard BAU mode toggle proposal.</td><td>2026-07-30</td></tr>
+    <tr><td>HR_MGR</td><td>Training playlist v2 recording log và champion roster ongoing status draft.</td><td>2026-07-31</td></tr>
+    <tr><td>CEO</td><td>Review signature order and closing speech for Kotter step 8 anchor.</td><td>2026-07-31</td></tr>
+  </tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 10 — TÀI LIỆU LIÊN QUAN
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-docs">
   <h2 class="h2">Tài liệu liên quan · click để mở</h2>
-  <!-- TODO Codex W11/SEC-DOCS: liệt kê 6–12 doc code dạng:
-         <a href="#" onclick="if(window.openDoc)openDoc('CODE');return false;" class="role-chip">CODE</a>
-       Bắt buộc bao gồm doc trong requiredDocs của tuần 11 (xem program.bootstrap.json). -->
+  <p>
+    <a href="#" onclick="if(window.openDoc)openDoc('WI-105');return false;" class="role-chip">WI-105</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('WI-202');return false;" class="role-chip">WI-202</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-114');return false;" class="role-chip">ANNEX-114</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-117');return false;" class="role-chip">ANNEX-117</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-119');return false;" class="role-chip">ANNEX-119</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('MAN-001');return false;" class="role-chip">MAN-001</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('POL-QMS-001');return false;" class="role-chip">POL-QMS-001</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('POL-QMS-002');return false;" class="role-chip">POL-QMS-002</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('WI-103');return false;" class="role-chip">WI-103</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('WI-104');return false;" class="role-chip">WI-104</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('WI-106');return false;" class="role-chip">WI-106</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('WI-201');return false;" class="role-chip">WI-201</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('WI-302');return false;" class="role-chip">WI-302</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('WI-519');return false;" class="role-chip">WI-519</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('WI-701');return false;" class="role-chip">WI-701</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('WI-901');return false;" class="role-chip">WI-901</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('SOP-201');return false;" class="role-chip">SOP-201</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('SOP-303');return false;" class="role-chip">SOP-303</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('SOP-401');return false;" class="role-chip">SOP-401</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('SOP-501');return false;" class="role-chip">SOP-501</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('SOP-605');return false;" class="role-chip">SOP-605</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('SOP-801');return false;" class="role-chip">SOP-801</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-110');return false;" class="role-chip">ANNEX-110</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-113');return false;" class="role-chip">ANNEX-113</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-118');return false;" class="role-chip">ANNEX-118</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('RACI-master-matrix');return false;" class="role-chip">RACI-master-matrix</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('Authority-matrix');return false;" class="role-chip">Authority-matrix</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('DRL-E2E');return false;" class="role-chip">DRL-E2E</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W10');return false;" class="role-chip">TRN-DEP-W10</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W12');return false;" class="role-chip">TRN-DEP-W12</a>
+  </p>
+  <p>Danh sách này cố ý rộng vì W11 là tuần revision planning. Người điều phối phải xem các controlled docs như một hệ thống liên kết: policy, work instruction, SOP, annex, RACI, authority và playbook history. Chip nào không mở được là blocker cho DCC evidence, không phải lỗi trình bày.</p>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 11 — RỦI RO + ESCALATION
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-risks">
   <h2 class="h2">Rủi ro tuần 11 + escalation</h2>
-  <!-- TODO Codex W11/SEC-RISKS: bảng 5–8 rủi ro. Cột: # · Mô tả rủi ro · Likelihood (L/M/H) · Impact (L/M/H) · Mitigation · Trigger escalation · Escalation owner.
-       Bao gồm ít nhất 1 rủi ro Hofstede (VN cultural): vd "trưởng phòng không feedback openly tại all-hands" → mitigation: anonymous feedback box. -->
+  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Mô tả rủi ro</th><th>L</th><th>I</th><th>Mitigation</th><th>Trigger escalation</th><th>Owner</th></tr></thead><tbody>
+    <tr><td>1</td><td>Hofstede risk: phòng heads im lặng trong all-hands để giữ thể diện, làm lessons learned thành diễn văn.</td><td>H</td><td>H</td><td>Thu feedback ẩn danh trước, senior speaks last, form written confirmation sau họp.</td><td>&lt;33 submissions hoặc 0 dissent trong khi issue/CAPA có blocker.</td><td>CEO</td></tr>
+    <tr><td>2</td><td>Face-saving risk: role group không muốn nhận wave của mình từng struggle, dẫn đến theme bị làm mềm.</td><td>H</td><td>M</td><td>Frame "system miss, not person miss"; QMS_MGR thay tên phòng bằng process category khi trình bày.</td><td>Round-robin chuyển sang tự khen hoặc tránh theme có evidence.</td><td>QMS_MGR</td></tr>
+    <tr><td>3</td><td>Doc revision overload: ≥10 docs revision +1 trong 30 ngày vượt capacity của document owners.</td><td>M</td><td>H</td><td>Prioritize theo ISO clause impact và Sev-1/Sev-2 evidence; cosmetic defer year 2.</td><td>Any owner không commit ETA ≤30 ngày.</td><td>QMS_MGR</td></tr>
+    <tr><td>4</td><td>QR code logistics: 21 sticker in, scan, dán và kiểm có thể fail vì vật tư hoặc zone downtime.</td><td>M</td><td>M</td><td>IT_MGR chuẩn bị 10% spare stickers, posting crew 2 champion, scan test trước khi dán.</td><td>&lt;21 sticker printed hoặc scan fail &gt;0.</td><td>IT_MGR</td></tr>
+    <tr><td>5</td><td>Training playlist budget/time: video mới bị trì hoãn vì cần editor hoặc thiết bị.</td><td>M</td><td>M</td><td>Dùng phone + free editor; giới hạn video 5-7 phút, một tình huống thực tế mỗi video.</td><td>Script chưa approve trước 2026-07-25 17:00.</td><td>HR_MGR</td></tr>
+    <tr><td>6</td><td>CAPA overdue xuất hiện sau khi W10 đã green, chặn P4-03.</td><td>L</td><td>H</td><td>QA_MGR re-run query T-1 và T-0; nếu overdue, chuyển Gate thành Conditional Go hoặc No-Go.</td><td>Any CAPA &gt;30 ngày tại 2026-07-25 17:00.</td><td>QA_MGR</td></tr>
+  </tbody></table></div>
 </section>
-
-<!-- ─────────────────────────────────────────────────────────────────────
-     SECTION 12 — LESSONS LEARNED (FILL POST-MEETING)
-     ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-lessons">
   <h2 class="h2">Lessons learned · điền sau họp (Lean Change cycle)</h2>
-  <!-- TODO Codex W11/SEC-LESSONS: chừa 3 khối Insights / Options / Experiments (Jason Little Lean Change Canvas) với placeholder text.
-       Sau cuộc họp thật, owner sẽ điền vào 3 ô này. -->
+  <div class="grid-3">
+    <div class="note-blue"><h3>Insights</h3><p>Điền ngay sau họp 2026-07-25 bởi QMS_ENG: 5 systemic patterns đã được Steering xác nhận, frequency count, evidence source và doc impact. Không ghi cảm nhận chung; mỗi insight cần link về form export, issue/CAPA hoặc dashboard snapshot.</p></div>
+    <div class="note"><h3>Options</h3><p>Điền bởi QMS_MGR: các lựa chọn xử lý từng theme, gồm revision +1 ngay, đưa vào year-2 backlog, hoặc chuyển thành BAU monitoring row. Ghi rõ option bị loại và lý do, ví dụ capacity, low severity hoặc không có evidence.</p></div>
+    <div class="note-green"><h3>Experiments</h3><p>Điền bởi QMS_MGR + HR_MGR: thí nghiệm BAU đầu tiên từ lessons learned, ví dụ playlist v2 đo lại retrieval drill sau 2 tuần hoặc QR code scan audit bất ngờ tại 7 zone. Mỗi experiment có ngày, owner, metric và stop condition.</p></div>
+  </div>
 </section>
 
 </div><!-- /doc-content -->

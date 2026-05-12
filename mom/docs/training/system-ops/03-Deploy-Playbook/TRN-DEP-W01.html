@@ -26,9 +26,6 @@
 <style>
  .role-chip{display:inline-block;padding:2px 8px;border-radius:999px;background:#f3f4f6;margin:2px 6px 2px 0;font-size:12px}
  .tight li{margin:2px 0}
- .pending-fill{background:#fef3c7;border-left:4px solid #f59e0b;padding:12px 16px;border-radius:8px;color:#78350f;margin:12px 0;font-size:13px}
- .pending-fill strong{color:#92400e;font-weight:700}
- .pending-fill code{background:rgba(146,64,14,.10);padding:1px 5px;border-radius:4px;font-size:12px}
  table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; }
  td,th { word-wrap:break-word; overflow-wrap:break-word; padding:8px 10px; border:1px solid #e2e8f0; vertical-align:top; }
  th { background:#f1f5f9; text-align:left; font-weight:700; }
@@ -46,13 +43,6 @@
 
 <div class="doc-content" id="docContent">
 
-<div class="pending-fill" id="codex-marker">
-  <strong>⚠ Tài liệu khung — Codex chưa viết nội dung chi tiết.</strong>
-  Đây là scaffold do <code>generate-deploy-playbooks.sh</code> sinh ra với 12 section placeholder.
-  Phần nội dung do AI author điền theo prompt pack tương ứng (tham chiếu <code>_reports/deploy-playbook/PROMPT_PACK_01.md</code>).
-  Sau khi Codex viết xong sẽ xoá khung cảnh báo này.
-</div>
-
 <!-- ─────────────────────────────────────────────────────────────────────
      SECTION 1 — COVER
      Codex fill: kicker (Phase P0), large title, một câu mô tả intent,
@@ -60,8 +50,15 @@
      ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-cover">
   <h1 class="h2" style="margin-top:0;">W01 · 2026-05-16 — Công bố chính thức · MAN-001 + POL-QMS-001/002 hiệu lực</h1>
-  <p class="lead"><!-- TODO Codex W01/SEC-COVER: 2–3 câu mô tả mục đích chiến lược của tuần 01 trong tổng thể 12 tuần. --></p>
-  <!-- TODO Codex W01/SEC-COVER: bảng QUICK FACTS với 6 ô (grid-3, 2 hàng): Ngày · Thứ · Phase · Pillar · Attendees · Owner -->
+  <p class="lead">W01 là mốc công bố chính thức của chương trình triển khai QMS 12 tuần: Steering Committee chuyển thông điệp từ chuẩn bị nội bộ sang cam kết công khai trước toàn bộ 80 nhân sự. Trọng tâm của ngày 2026-05-16 là làm rõ vì sao MAN-001, POL-QMS-001 và POL-QMS-002 có hiệu lực ngay, từng phòng ban nhận sổ tay/JD như bằng chứng khởi động, và mọi phản hồi phải đi qua issue register thay vì trao đổi miệng. Thiết kế buổi họp dùng Kotter 2012 bước 3-4, Prosci ADKAR 2023 giai đoạn Awareness/Desire và ISO 9001:2015 §5.1.1(a-b) để biến cam kết lãnh đạo thành bằng chứng kiểm soát được.</p>
+  <div class="grid-3">
+    <div class="note"><b>Ngày</b><br>2026-05-16</div>
+    <div class="note"><b>Thứ</b><br>Thứ Bảy · 09:00-10:00</div>
+    <div class="note"><b>Phase</b><br>P0 · Pre-flight finish</div>
+    <div class="note"><b>Pillar</b><br>gov + doc</div>
+    <div class="note"><b>Attendees</b><br>80 nhân sự · all_departments</div>
+    <div class="note"><b>Owner</b><br>CEO · QMS_MGR accountable</div>
+  </div>
 </section>
 
 <!-- ─────────────────────────────────────────────────────────────────────
@@ -69,9 +66,24 @@
      ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-objective">
   <h2 class="h2">Mục tiêu tuần 01</h2>
-  <!-- TODO Codex W01/SEC-OBJECTIVE: viết 3–5 mục tiêu SMART (Specific, Measurable, Achievable, Relevant, Time-bound).
-       Sau đó liệt kê KPI baseline cần đo TRƯỚC khi tuần bắt đầu (con số khởi điểm).
-       Tham chiếu ANNEX-110 (KPI dictionary) cho mọi KPI ID. -->
+  <ol class="tight">
+    <li>Đến 2026-05-16 17:00, MAN-001, POL-QMS-001 và POL-QMS-002 có `status='released'` và `effective_date=2026-05-16` trong `dcc_document_header`; evidence là export header và biên bản ký của CEO.</li>
+    <li>Đến cuối buổi họp 2026-05-16, 11 sổ tay phòng ban và 39 JD được bàn giao vật lý hoặc số hóa; mỗi packet có acknowledgement ký bởi DEPT_HEAD, scan vào ANNEX-119 trước 2026-05-17 12:00.</li>
+    <li>Issue register mở trước 2026-05-16 10:00 với ít nhất 1 dummy Sev-3 entry để chứng minh workflow tạo, phân loại, assign owner và đóng issue; evidence là `issues.json` hoặc bảng tương đương trong registry.</li>
+    <li>Awareness pulse đạt ≥80% người tham dự trả lời đúng 1 câu hỏi: “3 tài liệu nền của QMS là gì?”; QMS_ENG lưu raw response, score và danh sách role code vào `training_records` trước 2026-05-16 18:00.</li>
+  </ol>
+  <div class="table-card">
+    <table class="table">
+      <thead><tr><th>KPI baseline</th><th>Cách đo tại W01</th><th>Target khởi động</th><th>Evidence</th></tr></thead>
+      <tbody>
+        <tr><td>KPI-FLD-01</td><td>Spot-check 20 người mở đúng thư mục chứa MAN-001/POL-QMS-001/POL-QMS-002.</td><td>Ghi current state trước rollout; chưa ép đạt 95%.</td><td>ANNEX-110 KPI dictionary + drill log.</td></tr>
+        <tr><td>KPI-FLD-02</td><td>5 lượt retrieval drill do QA_MGR chuẩn bị; đo giây từ yêu cầu đến khi mở đúng tài liệu.</td><td>Baseline median được chốt để so với W02/W03; target dài hạn ≤180s.</td><td>`readiness.json` kpiValues snapshot.</td></tr>
+        <tr><td>KPI-DEP-01</td><td>Champion coverage xuất phát từ 0 primary/backup.</td><td>0% tại W01, yêu cầu đạt 100% ở W02.</td><td>`champions.json` draft.</td></tr>
+        <tr><td>KPI-DEP-05</td><td>Dashboard refresh baseline: widget cadence có timestamp hay chưa.</td><td>Ghi refresh SLA đầu tiên; target dài hạn ≥95%.</td><td>Dashboard widget status + audit_events.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note-blue">Tất cả mục tiêu trên đo được bằng số, role code và nguồn evidence cụ thể; không dùng mô tả chung chung nếu không có checklist và threshold. Cách viết này bám ISO 9001:2015 §7.5.3 về kiểm soát thông tin dạng văn bản và ANNEX-110 về KPI dictionary.</p>
 </section>
 
 <!-- ─────────────────────────────────────────────────────────────────────
@@ -79,9 +91,29 @@
      ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-prep">
   <h2 class="h2">Prep checklist — T-7 / T-3 / T-1 / T-0</h2>
-  <!-- TODO Codex W01/SEC-PREP: 4 bảng prep (T-7, T-3, T-1 ngày trước, T-0 sáng họp).
-       Mỗi item: WHO (role code) · WHAT · EVIDENCE · DEADLINE.
-       Mỗi T-window tối thiểu 4 item; T-0 là pre-meeting sanity check 30' trước họp. -->
+  <div class="table-card">
+    <table class="table">
+      <thead><tr><th>Window</th><th>WHO</th><th>WHAT</th><th>EVIDENCE</th><th>DEADLINE</th></tr></thead>
+      <tbody>
+        <tr><td>T-7 · 2026-05-09</td><td>CEO</td><td>Review bài phát biểu 5 phút, mở bằng lý do kinh doanh và khẳng định QMS là cách vận hành chính thức, không phải dự án phụ.</td><td>CEO speech v1.0 trong ANNEX-119.</td><td>2026-05-09 17:00</td></tr>
+        <tr><td>T-7 · 2026-05-09</td><td>QMS_MGR</td><td>In và bind 11 sổ tay phòng ban; mỗi packet có mã phòng, doc list, trang ký và QR mở bản số.</td><td>Hand-off packet index.</td><td>2026-05-09 17:00</td></tr>
+        <tr><td>T-7 · 2026-05-09</td><td>HR_MGR</td><td>Assemble 39 JD packets theo role code; không ghi tên người cụ thể; gắn form acknowledgement.</td><td>JD packet manifest.</td><td>2026-05-09 17:00</td></tr>
+        <tr><td>T-7 · 2026-05-09</td><td>IT_MGR</td><td>Book phòng họp, kiểm tra AV, camera ghi âm, mạng dự phòng và tài khoản M365 cho 10 phòng.</td><td>IT readiness checklist.</td><td>2026-05-09 18:00</td></tr>
+        <tr><td>T-3 · 2026-05-13</td><td>CEO + QMS_MGR</td><td>Rehearsal CEO opening và phần walkthrough MAN-001 10 phút; cắt mọi slide không có quyết định hoặc evidence.</td><td>Rehearsal sign-off note.</td><td>2026-05-13 16:00</td></tr>
+        <tr><td>T-3 · 2026-05-13</td><td>QA_MGR</td><td>Lock nội dung POL-QMS-001 và POL-QMS-002, mỗi chính sách có 5 cam kết hoặc target đo được.</td><td>Slide deck VN/EN v1.0.</td><td>2026-05-13 16:00</td></tr>
+        <tr><td>T-3 · 2026-05-13</td><td>HR_MGR</td><td>Confirm attendee list = 80 role assignments, seat by rank để tránh hiểu nhầm high power-distance.</td><td>Attendance roster role-coded.</td><td>2026-05-13 18:00</td></tr>
+        <tr><td>T-3 · 2026-05-13</td><td>QMS_ENG</td><td>Seed issue register với dummy Sev-3, owner QMS_ENG, due date 2026-05-19, status open.</td><td>`issues.json` row + audit_events draft.</td><td>2026-05-13 18:00</td></tr>
+        <tr><td>T-1 · 2026-05-15</td><td>QMS_ENG</td><td>Print final agenda, gate checklist P0-04/P0-05 và one-question awareness quiz.</td><td>Meeting pack PDF.</td><td>2026-05-15 15:00</td></tr>
+        <tr><td>T-1 · 2026-05-15</td><td>HR_MGR</td><td>Prepare champion candidate shortlist: 1 primary + 1 backup per phòng để DEPT_HEAD chốt ở W02.</td><td>`champions.json` draft v0.1.</td><td>2026-05-15 15:00</td></tr>
+        <tr><td>T-1 · 2026-05-15</td><td>QMS_MGR</td><td>Circulate RACI master pre-read, ANNEX-119 v0.9, Authority-matrix và rule phản hồi 14 ngày.</td><td>Email/M365 circulation log.</td><td>2026-05-15 16:00</td></tr>
+        <tr><td>T-1 · 2026-05-15</td><td>IT_MGR</td><td>Prepare offline PDF backup cho MAN-001/POL-QMS-001/POL-QMS-002 và QR fallback nếu M365 chậm.</td><td>Offline backup folder hash.</td><td>2026-05-15 16:30</td></tr>
+        <tr><td>T-0 · 2026-05-16 08:30</td><td>IT_MGR</td><td>Verify M365 access cho đại diện 10 phòng, test projector, mic, recording và backup network.</td><td>30-minute sanity checklist.</td><td>2026-05-16 08:30</td></tr>
+        <tr><td>T-0 · 2026-05-16 08:30</td><td>QA_MGR</td><td>Pre-load 5 retrieval drill docs để không lãng phí thời gian trong 60 phút họp.</td><td>Retrieval drill packet.</td><td>2026-05-16 08:35</td></tr>
+        <tr><td>T-0 · 2026-05-16 08:30</td><td>CEO</td><td>Mic check, xác nhận thứ tự phát biểu: CEO nói đầu tiên để endorsement rõ ràng.</td><td>AV log + agenda mark.</td><td>2026-05-16 08:40</td></tr>
+        <tr><td>T-0 · 2026-05-16 08:30</td><td>QMS_ENG</td><td>Prepare QR feedback anonymous và 1:1 supervisor card để giảm rủi ro im lặng do collectivism.</td><td>Feedback form URL + card stack.</td><td>2026-05-16 08:45</td></tr>
+      </tbody>
+    </table>
+  </div>
 </section>
 
 <!-- ─────────────────────────────────────────────────────────────────────
@@ -89,8 +121,21 @@
      ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-agenda">
   <h2 class="h2">Agenda · 09:00–10:00 (60 phút)</h2>
-  <!-- TODO Codex W01/SEC-AGENDA: bảng 8–10 dòng. Cột: Thời gian · Phút · Đề mục · Owner · Output kỳ vọng.
-       Đảm bảo có: opening (5'), KPI review (10'), main content (~30'), gate decision (10'), closing + next week preview (5'). -->
+  <div class="table-card">
+    <table class="table">
+      <thead><tr><th>Thời gian</th><th>Phút</th><th>Đề mục</th><th>Owner</th><th>Output kỳ vọng</th></tr></thead>
+      <tbody>
+        <tr><td>09:00-09:05</td><td>5</td><td>CEO opening theo Kotter step 1 urgency: vì sao triển khai QMS ngay 2026-05-16.</td><td>CEO</td><td>80 người nghe cùng một thông điệp, ghi âm archived.</td></tr>
+        <tr><td>09:05-09:15</td><td>10</td><td>MAN-001 walkthrough: phạm vi, 7 trụ, cách đọc doc khi có mâu thuẫn.</td><td>QMS_MGR</td><td>MAN-001 được hiểu là manual vận hành chính, không phải tài liệu tham khảo.</td></tr>
+        <tr><td>09:15-09:25</td><td>10</td><td>POL-QMS-001 và POL-QMS-002: 5 cam kết, mục tiêu chất lượng, target đo được.</td><td>QA_MGR</td><td>Người tham dự biết mở policy nào khi cần quyết định chất lượng.</td></tr>
+        <tr><td>09:25-09:35</td><td>10</td><td>Hand-off ceremony: CEO trao 11 sổ tay cho DEPT_HEAD và HR_MGR xác nhận 39 JD packets.</td><td>CEO + HR_MGR</td><td>Acknowledgement thu tại chỗ; thiếu packet nào ghi issue ngay.</td></tr>
+        <tr><td>09:35-09:42</td><td>7</td><td>Awareness quiz 1 câu mỗi người: 3 tài liệu nền là gì?</td><td>QMS_ENG</td><td>Raw score để tính ≥80% correct.</td></tr>
+        <tr><td>09:42-09:45</td><td>3</td><td>Q&A theo 1:1 supervisor cards thay vì ép phát biểu công khai.</td><td>HR_MGR</td><td>Giảm bias Hofstede high power-distance và collectivism.</td></tr>
+        <tr><td>09:45-09:55</td><td>10</td><td>Gate P0-04/P0-05 decision: effective docs, hand-off evidence, issue register.</td><td>CEO + QMS_MGR</td><td>Go/No-Go ký ngay hoặc fallback có owner/deadline.</td></tr>
+        <tr><td>09:55-10:00</td><td>5</td><td>Preview W02 · 2026-05-23: sổ tay/JD/RACI freeze, champion nomination.</td><td>QMS_MGR</td><td>DEPT_HEAD biết 3 việc phải chuẩn bị trước 2026-05-21.</td></tr>
+      </tbody>
+    </table>
+  </div>
 </section>
 
 <!-- ─────────────────────────────────────────────────────────────────────
@@ -98,14 +143,20 @@
      ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-slides">
   <h2 class="h2">Nội dung họp tuần 01 — slide-by-slide</h2>
-  <!-- TODO Codex W01/SEC-SLIDES: 8–12 slide block, mỗi block:
-         <div class="card"> hoặc <div class="note-blue">
-           <h3>Slide N — Tiêu đề</h3>
-           <p>Talking points 3–5 câu (Vietnamese with diacritics).</p>
-           <ul class="tight">các bullet cụ thể, có CON SỐ và DOC CODE.</ul>
-         </div>
-       Cấm dùng "đảm bảo chất lượng" generic. Phải có con số, doc code, role code cụ thể.
-       Vận dụng Hofstede (Vietnam high power-distance): CEO speaks first, seniority order, bilingual VN/EN slides. -->
+  <div class="grid-2">
+    <div class="note-blue"><h3>Slide 1 — Vì sao triển khai QMS lúc này</h3><p>CEO mở bằng business case: lỗi tài liệu, sai revision và phản hồi miệng làm tăng rủi ro giao hàng. Thông điệp bắt buộc là QMS không thêm giấy tờ, mà tạo đường quyết định rõ khi có mâu thuẫn giữa sản xuất, chất lượng và giao hàng. Cách framing bám Kotter 2012 về urgency và ISO 9001:2015 §5.1.1(a-b) về leadership commitment.</p><ul class="tight"><li>80 attendees nghe cùng một message.</li><li>Output: recording archived trong ANNEX-119.</li><li>Không dùng tên cá nhân; chỉ role code.</li></ul></div>
+    <div class="note-blue"><h3>Slide 2 — MAN-001 scope + 7 pillars overview</h3><p>QMS_MGR giới thiệu MAN-001 như bản đồ điều hành cho 12 tuần, có liên kết tới `gov`, `doc`, `m365`, `train`, `pilot`, `golive`, `dash`. Slide giải thích owner và pass criterion từng trụ để người dùng biết khi nào một trụ được xem là đạt. Đây là điểm neo cho mọi gate sau W01.</p><ul class="tight"><li>Doc code: MAN-001.</li><li>7 trụ có owner: CEO, QMS_MGR, IT_MGR, HR_MGR, QA_MGR.</li><li>Evidence: MAN-001 released row.</li></ul></div>
+    <div class="note-blue"><h3>Slide 3 — POL-QMS-001 · Chính sách chất lượng</h3><p>QA_MGR trình bày 5 cam kết chất lượng bằng ngôn ngữ vận hành: đúng revision, đúng người duyệt, đúng bằng chứng, đúng phản hồi issue và đúng cadence review. Mỗi cam kết phải nối với hành vi cụ thể trong tuần đầu, ví dụ mở đúng tài liệu và ghi issue thay vì nhắn riêng. Slide này dùng Prosci ADKAR Awareness để chuyển policy thành kỳ vọng cá nhân.</p><ul class="tight"><li>Doc code: POL-QMS-001.</li><li>Target awareness pulse ≥80% correct.</li><li>Evidence: training_records quiz.</li></ul></div>
+    <div class="note-blue"><h3>Slide 4 — POL-QMS-002 · Mục tiêu chất lượng</h3><p>Slide quy đổi mục tiêu chất lượng thành KPI-FLD-01, KPI-FLD-02, KPI-DEP-01 và KPI-DEP-05. Người dự họp phải thấy baseline W01 là điểm bắt đầu, không phải bài thi đổ lỗi. QMS_ENG ghi rõ target dài hạn và evidence source ngay trên slide.</p><ul class="tight"><li>KPI-FLD-02 target dài hạn ≤180s.</li><li>KPI-DEP-01 target W02 = 100% champion coverage.</li><li>Dashboard refresh target ≥95%.</li></ul></div>
+    <div class="note-blue"><h3>Slide 5 — 7 trụ triển khai · owner + pass criterion</h3><p>Bảng 7 trụ hiển thị owner và pass criterion. Ví dụ `gov` pass khi Go/No-Go đã khóa, `doc` pass khi người dùng biết mở tài liệu nào trước, `dash` pass khi dashboard có bằng chứng refresh. Slide này giúp DEPT_HEAD không diễn giải khác nhau về “đã triển khai”.</p><ul class="tight"><li>Owner không được là tên người; dùng role code.</li><li>Pass criterion dùng threshold hoặc evidence.</li><li>Không ghi câu chung thiếu metric.</li></ul></div>
+    <div class="note-blue"><h3>Slide 6 — Lộ trình 12 tuần</h3><p>Timeline bắt đầu từ W01 2026-05-16 và kết thúc W12 2026-08-01. W01 là công bố, W02 freeze handbook/JD/RACI, W03 pilot QA, W04 gate pilot, W05-W08 go-live/hypercare, W09-W12 institutionalize. Timeline phải làm rõ những tuần có gate thật để tránh kỳ vọng sai.</p><ul class="tight"><li>W02 date: 2026-05-23.</li><li>W03 pilot date: 2026-05-30.</li><li>W12 handoff date: 2026-08-01.</li></ul></div>
+    <div class="note-blue"><h3>Slide 7 — Vai trò mỗi phòng ban</h3><p>Bảng 10 phòng ban × 4 cột mô tả DEPT_HEAD, champion primary, champion backup và evidence owner. Với văn hóa high power-distance, slide nói rõ CEO ủy quyền cho DEPT_HEAD quyết định trong phạm vi sổ tay và issue register, nhưng mọi exception phải có bằng chứng. HR_MGR nhắc lại không dùng tên cá nhân trong playbook.</p><ul class="tight"><li>10 phòng ban có M365 access check.</li><li>11 sổ tay được hand-off.</li><li>39 JD có acknowledgement.</li></ul></div>
+    <div class="note-blue"><h3>Slide 8 — Champion là ai</h3><p>Champion không phải người “làm thay QMS”; champion là tuyến hỗ trợ đầu tiên của phòng ban, có backup để tránh single point of failure. W01 chỉ mở nomination, W02 mới khóa danh sách 11 primary + 11 backup. Trách nhiệm gồm retrieval drill, hướng dẫn mở doc, ghi issue và phản hồi anonymous cards.</p><ul class="tight"><li>W01 baseline KPI-DEP-01 = 0%.</li><li>W02 target KPI-DEP-01 = 100%.</li><li>Evidence: champions.json draft.</li></ul></div>
+    <div class="note-blue"><h3>Slide 9 — Cadence điều hành</h3><p>Cadence chính thức: họp Thứ Bảy 09:00 hàng tuần, daily standup 15 phút khi pilot/hypercare mở, và issue triage theo severity. QMS_MGR giải thích rằng cadence không thay thế authority matrix; nó chỉ là nơi review evidence và ra quyết định. Every decision must leave minutes within 48 hours.</p><ul class="tight"><li>Saturday weekly tier starts 2026-05-16.</li><li>Daily standup begins in W03 pilot.</li><li>Evidence: mgmt-reviews.json + audit_events.</li></ul></div>
+    <div class="note-blue"><h3>Slide 10 — Cách phản hồi trong 14 ngày</h3><p>Feedback window mở từ 2026-05-16 đến 2026-05-30, nhưng W02 cần nhận bản đầu trước 2026-05-21 để freeze. Vì rủi ro collectivism, phản hồi có 3 kênh: anonymous form, 1:1 supervisor card và issue register. Mỗi phản hồi phải có category: doc correction, RACI dispute, training need hoặc access issue.</p><ul class="tight"><li>Window: 2026-05-16 đến 2026-05-30.</li><li>Early cut: 2026-05-21 cho W02 freeze.</li><li>Owner: QMS_ENG tổng hợp.</li></ul></div>
+    <div class="note-blue"><h3>Slide 11 — Issue register · 4 mức severity</h3><p>QMS_ENG trình bày cách mở issue Sev-1 đến Sev-4. W01 yêu cầu ít nhất một dummy Sev-3 entry để chứng minh flow trước khi người dùng thật cần nó. Severity phải dựa trên production stop, customer impact, regulatory exposure và deadline risk, không dựa trên cảm giác.</p><ul class="tight"><li>Dummy Sev-3 owner: QMS_ENG.</li><li>Due date: 2026-05-19.</li><li>Evidence: issues.json + audit_events.</li></ul></div>
+    <div class="note-blue"><h3>Slide 12 — Cam kết Steering Committee</h3><p>CEO, QMS_MGR và QA_MGR phát biểu cuối theo thứ tự đã định: CEO mở đường, QMS_MGR nêu discipline, QA_MGR nêu chất lượng bằng số. Phát biểu kết thúc bằng quyết định P0-04/P0-05 và xác nhận người dùng được quyền hỏi qua kênh không công khai nếu ngại phát biểu. Đây là cách xử lý Hofstede high power-distance mà vẫn giữ evidence.</p><ul class="tight"><li>Gate codes: P0-04, P0-05.</li><li>Minutes circulated by 2026-05-18.</li><li>Dissent recorded with rationale.</li></ul></div>
+  </div>
 </section>
 
 <!-- ─────────────────────────────────────────────────────────────────────
@@ -113,8 +164,18 @@
      ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-decisions">
   <h2 class="h2">Quyết định cần lấy trong cuộc họp này</h2>
-  <!-- TODO Codex W01/SEC-DECISIONS: bảng 3–6 quyết định. Cột: # · Quyết định · Người ký · Cơ sở (doc/data) · Fallback nếu deferred.
-       Mỗi quyết định phải có Plan-B nếu không lấy được trong cuộc họp. -->
+  <div class="table-card">
+    <table class="table">
+      <thead><tr><th>#</th><th>Quyết định</th><th>Người ký</th><th>Cơ sở doc/data</th><th>Fallback nếu deferred</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>MAN-001 có hiệu lực từ 2026-05-16, status chuyển `released`.</td><td>CEO</td><td>`dcc_document_header` row MAN-001; recording CEO opening; ISO 9001:2015 §5.1.1.</td><td>Nếu thiếu chữ ký, QMS_MGR khóa họp bổ sung 2026-05-16 15:00; No-Go P0-04 cho đến khi ký.</td></tr>
+        <tr><td>2</td><td>POL-QMS-001 có hiệu lực từ 2026-05-16 với 5 cam kết chất lượng.</td><td>CEO</td><td>`dcc_document_header` row POL-QMS-001; QA_MGR slide 3.</td><td>Nếu deferred, issue Sev-2 “quality policy not released” owner QA_MGR due 2026-05-17.</td></tr>
+        <tr><td>3</td><td>POL-QMS-002 có hiệu lực từ 2026-05-16 với target đo được.</td><td>CEO</td><td>`dcc_document_header` row POL-QMS-002; ANNEX-110 KPI mapping.</td><td>Nếu deferred, không mở KPI baseline chính thức; QMS_ENG phải gửi corrected target matrix trước 2026-05-17 12:00.</td></tr>
+        <tr><td>4</td><td>Approve 14-day feedback window từ 2026-05-16 đến 2026-05-30, early cut 2026-05-21 cho W02.</td><td>QMS_MGR</td><td>Feedback form, issue register, ANNEX-119 minutes.</td><td>Nếu không approve, W02 freeze không hợp lệ; HR_MGR kích hoạt anonymous card-only fallback trong ngày 2026-05-16.</td></tr>
+        <tr><td>5</td><td>Approve escalation matrix cho issue severity và cadence weekly tier.</td><td>CEO + QMS_MGR</td><td>WI-106, issue register dummy row, mgmt-reviews.json template.</td><td>Nếu chưa chốt severity, mọi Sev-1/Sev-2 tạm escalate trực tiếp CEO trong 24h đầu.</td></tr>
+      </tbody>
+    </table>
+  </div>
 </section>
 
 <!-- ─────────────────────────────────────────────────────────────────────
@@ -122,11 +183,25 @@
      ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-gate">
   <h2 class="h2">Gate Go/No-Go — Điều kiện CẦN và ĐỦ</h2>
-  <!-- TODO Codex W01/SEC-GATE: 2 bảng tách biệt:
-       (A) ĐIỀU KIỆN CẦN (necessary): nếu thiếu BẤT KỲ → No-Go. Tối thiểu 4 item.
-       (B) ĐIỀU KIỆN ĐỦ (sufficient): nếu (A) đủ VÀ tất cả (B) đạt → Go. Tối thiểu 4 item.
-       Mỗi điều kiện: Câu mô tả · Cách đo · Threshold · Bằng chứng (table/file/system).
-       Vận dụng "Go/No-Go gate condition library" của research pack — boilerplate 10 item, chọn lọc cho tuần 01. -->
+  <h3 class="h3">Gate P0-04/P0-05 · Điều kiện CẦN</h3>
+  <div class="table-card">
+    <table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Threshold</th><th>Bằng chứng</th></tr></thead><tbody>
+      <tr><td>MAN-001 có `effective_date=2026-05-16` và `status='released'`.</td><td>Query hoặc export `dcc_document_header` theo doc_code.</td><td>1/1 row đạt; thiếu là No-Go.</td><td>`dcc_document_header`; DCC audit batch.</td></tr>
+      <tr><td>11 sổ tay phòng ban đã hand-off.</td><td>Đếm acknowledgement packet ký bởi DEPT_HEAD.</td><td>11/11 packet hoặc exception note CEO ký.</td><td>ANNEX-119 hand-off index.</td></tr>
+      <tr><td>39 JD đã hand-off.</td><td>Đếm manifest JD packet và signature received.</td><td>39/39 packet; thiếu role nào ghi issue Sev-3.</td><td>JD packet manifest + scan folder.</td></tr>
+      <tr><td>Issue register tồn tại và tạo được entry.</td><td>Open dummy Sev-3 và assign owner/deadline.</td><td>≥1 row status open trước 2026-05-16 10:00.</td><td>`issues.json` hoặc issue table + audit_events.</td></tr>
+    </tbody></table>
+  </div>
+  <h3 class="h3">Gate P0-04/P0-05 · Điều kiện ĐỦ</h3>
+  <div class="table-card">
+    <table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Threshold</th><th>Bằng chứng</th></tr></thead><tbody>
+      <tr><td>Awareness quiz xác nhận người dùng nhớ 3 tài liệu nền.</td><td>1 câu hỏi cuối họp, chấm theo role-coded response.</td><td>≥80% attendees correct; nếu dưới ngưỡng, thêm micro-training 2026-05-17.</td><td>`training_records` raw response.</td></tr>
+      <tr><td>CEO speech delivered và recording archived.</td><td>Kiểm tra file ghi âm, timestamp và minutes.</td><td>1 recording + 1 minutes row trước 2026-05-16 18:00.</td><td>ANNEX-119 media index.</td></tr>
+      <tr><td>Audit event `deploy_program_start` được ghi.</td><td>Filter `audit_events` theo event type.</td><td>1 row có actor role QMS_ENG, timestamp trong ngày 2026-05-16.</td><td>`audit_events` table/export.</td></tr>
+      <tr><td>Cadence dashboard widget hiển thị W01 green.</td><td>Kiểm tra dashboard widget deploy cadence.</td><td>W01 status = green, refresh timestamp không cũ hơn 24h.</td><td>`readiness.json` kpiValues + dashboard screenshot.</td></tr>
+    </tbody></table>
+  </div>
+  <p class="note">Nếu bất kỳ điều kiện CẦN nào fail, decision mặc định là No-Go cho handoff chính thức và CEO phải ký exception. Nếu điều kiện CẦN đạt nhưng một điều kiện ĐỦ fail, quyết định là Conditional Go với owner, deadline absolute và issue severity tương ứng.</p>
 </section>
 
 <!-- ─────────────────────────────────────────────────────────────────────
@@ -134,18 +209,37 @@
      ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-tasks">
   <h2 class="h2">Phân công nhiệm vụ sau họp · RACI · deadline</h2>
-  <!-- TODO Codex W01/SEC-TASKS: bảng 8–15 task. Cột: # · Task · R · A · C · I · Deadline · Evidence · KPI ảnh hưởng.
-       R/A/C/I dùng role code (CEO, QMS_MGR, QA_MGR, PROD_DIR, …) — không tên người.
-       Deadline phải absolute date (không "tuần sau"); evidence phải point đến doc_code hoặc table_name. -->
+  <div class="table-card">
+    <table class="table"><thead><tr><th>#</th><th>Task</th><th>R</th><th>A</th><th>C</th><th>I</th><th>Deadline</th><th>Evidence</th><th>KPI</th></tr></thead><tbody>
+      <tr><td>1</td><td>Insert `deploy_program_start` row vào `audit_events`.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>CEO</td><td>2026-05-16 17:00</td><td>`audit_events`</td><td>KPI-DEP-05</td></tr>
+      <tr><td>2</td><td>Send champion nomination form cho 11 DEPT_HEAD.</td><td>HR_MGR</td><td>QMS_MGR</td><td>CEO</td><td>All DEPT_HEAD</td><td>2026-05-18 12:00</td><td>`champions.json` draft</td><td>KPI-DEP-01</td></tr>
+      <tr><td>3</td><td>Distribute RACI master pre-read and collect acknowledgement.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>HR_MGR</td><td>DEPT_HEAD</td><td>2026-05-19 17:00</td><td>ANNEX-119 v0.9</td><td>KPI-FLD-01</td></tr>
+      <tr><td>4</td><td>Scan 11 handbook hand-off pages.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>CEO</td><td>2026-05-17 12:00</td><td>ANNEX-119 hand-off folder</td><td>KPI-FLD-01</td></tr>
+      <tr><td>5</td><td>Scan 39 JD acknowledgement pages and reconcile missing role codes.</td><td>HR_MGR</td><td>QMS_MGR</td><td>DEPT_HEAD</td><td>CEO</td><td>2026-05-17 15:00</td><td>JD manifest</td><td>KPI-TRN-01</td></tr>
+      <tr><td>6</td><td>Publish feedback window instruction with anonymous form and issue severity guide.</td><td>QMS_MGR</td><td>CEO</td><td>HR_MGR</td><td>All roles</td><td>2026-05-16 18:00</td><td>ANNEX-119 minutes</td><td>KPI-DEP-02</td></tr>
+      <tr><td>7</td><td>Score awareness quiz and identify roles needing micro-training.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>HR_MGR</td><td>DEPT_HEAD</td><td>2026-05-16 18:00</td><td>`training_records`</td><td>KPI-TRN-01</td></tr>
+      <tr><td>8</td><td>Update dashboard cadence widget W01 status.</td><td>IT_MGR</td><td>QMS_MGR</td><td>QMS_ENG</td><td>CEO</td><td>2026-05-16 18:00</td><td>`readiness.json`</td><td>KPI-DEP-05</td></tr>
+      <tr><td>9</td><td>Open issue for any missing handbook/JD acknowledgement.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>HR_MGR</td><td>CEO</td><td>2026-05-17 16:00</td><td>`issues.json`</td><td>KPI-DEP-02</td></tr>
+      <tr><td>10</td><td>Prepare W02 signature room layout and two-table signing flow.</td><td>HR_MGR</td><td>QMS_MGR</td><td>IT_MGR</td><td>DEPT_HEAD</td><td>2026-05-21 17:00</td><td>W02 logistics checklist</td><td>KPI-TRN-01</td></tr>
+      <tr><td>11</td><td>Prepare bootcamp Session 1 material for WI-105/WI-106 retrieval drill.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>QA_MGR</td><td>Champion candidates</td><td>2026-05-21 17:00</td><td>TRN-DEP-W02 pack</td><td>KPI-FLD-02</td></tr>
+      <tr><td>12</td><td>Circulate W02 pre-read: handbook proposed edits, 3 JD review points, champion primary/backup.</td><td>QMS_MGR</td><td>CEO</td><td>HR_MGR</td><td>All DEPT_HEAD</td><td>2026-05-20 12:00</td><td>Email/M365 log</td><td>KPI-DEP-01</td></tr>
+    </tbody></table>
+  </div>
 </section>
 
 <!-- ─────────────────────────────────────────────────────────────────────
      SECTION 9 — NỘI DUNG HỌP TUẦN SAU (PREVIEW)
      ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-next-week">
-  <h2 class="h2">Preview tuần 2 · nhiệm vụ chuẩn bị</h2>
-  <!-- TODO Codex W01/SEC-NEXT-WEEK: tóm tắt 1 đoạn về tuần kế tiếp, sau đó bảng "chuẩn bị" — mỗi item: Role · Task · Deadline (trong tuần 01).
-       Mục đích: cuối họp W01 mỗi người biết rõ tuần sau họ cần đến với gì. -->
+  <h2 class="h2">Preview W02 · 2026-05-23 · nhiệm vụ chuẩn bị</h2>
+  <p>W02 là tuần “knowledge freeze”: 11 sổ tay phòng ban, 39 JD và RACI master phải chuyển từ bản đã công bố sang bản ký V1.0. Mỗi DEPT_HEAD cần đến cuộc họp 2026-05-23 với hai chỉnh sửa đề xuất cho sổ tay, ba JD đã đọc kỹ và một champion primary + một backup được đề cử. Nếu feedback không gửi trước 2026-05-21, QMS_MGR vẫn ghi nhận nhưng sẽ phân loại deferred để không làm trễ freeze.</p>
+  <div class="table-card"><table class="table"><thead><tr><th>Role</th><th>Task chuẩn bị</th><th>Deadline</th><th>Evidence</th></tr></thead><tbody>
+    <tr><td>DEPT_HEAD</td><td>Review sổ tay phòng ban và gửi 2 chỉnh sửa có lý do, không viết chung chung.</td><td>2026-05-21 17:00</td><td>Feedback form category doc correction.</td></tr>
+    <tr><td>DEPT_HEAD</td><td>Đọc kỹ 3 JD trọng yếu trong phòng và đánh dấu owner/approver sai nếu có.</td><td>2026-05-21 17:00</td><td>JD review checklist.</td></tr>
+    <tr><td>DEPT_HEAD</td><td>Nominated champion primary + backup, kèm lý do năng lực vận hành.</td><td>2026-05-21 17:00</td><td>`champions.json` draft.</td></tr>
+    <tr><td>QMS_ENG</td><td>Tổng hợp RACI dispute, phân loại conflict R/A/C/I, chuẩn bị escalation path CEO trong 5 ngày làm việc.</td><td>2026-05-22 12:00</td><td>ANNEX-119 RACI dispute log.</td></tr>
+    <tr><td>HR_MGR</td><td>Chuẩn bị bootcamp Session 1 attendance và quiz pass criterion ≥90%.</td><td>2026-05-22 15:00</td><td>Training roster.</td></tr>
+  </tbody></table></div>
 </section>
 
 <!-- ─────────────────────────────────────────────────────────────────────
@@ -153,9 +247,19 @@
      ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-docs">
   <h2 class="h2">Tài liệu liên quan · click để mở</h2>
-  <!-- TODO Codex W01/SEC-DOCS: liệt kê 6–12 doc code dạng:
-         <a href="#" onclick="if(window.openDoc)openDoc('CODE');return false;" class="role-chip">CODE</a>
-       Bắt buộc bao gồm doc trong requiredDocs của tuần 01 (xem program.bootstrap.json). -->
+  <p>
+    <a href="#" onclick="if(window.openDoc)openDoc('MAN-001');return false;" class="role-chip">MAN-001</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('POL-QMS-001');return false;" class="role-chip">POL-QMS-001</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('POL-QMS-002');return false;" class="role-chip">POL-QMS-002</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('WI-105');return false;" class="role-chip">WI-105</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('WI-106');return false;" class="role-chip">WI-106</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-114');return false;" class="role-chip">ANNEX-114</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-119');return false;" class="role-chip">ANNEX-119</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('RACI-master-matrix');return false;" class="role-chip">RACI-master-matrix</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('Authority-matrix');return false;" class="role-chip">Authority-matrix</a>
+    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W02');return false;" class="role-chip">TRN-DEP-W02</a>
+  </p>
+  <p class="note">Ba chip đầu là requiredDocs của W01 trong `program.bootstrap.json`. Các chip còn lại là tài liệu chuẩn bị trực tiếp cho W02 và kênh evidence của gate P0-04/P0-05.</p>
 </section>
 
 <!-- ─────────────────────────────────────────────────────────────────────
@@ -163,8 +267,14 @@
      ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-risks">
   <h2 class="h2">Rủi ro tuần 01 + escalation</h2>
-  <!-- TODO Codex W01/SEC-RISKS: bảng 5–8 rủi ro. Cột: # · Mô tả rủi ro · Likelihood (L/M/H) · Impact (L/M/H) · Mitigation · Trigger escalation · Escalation owner.
-       Bao gồm ít nhất 1 rủi ro Hofstede (VN cultural): vd "trưởng phòng không feedback openly tại all-hands" → mitigation: anonymous feedback box. -->
+  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Mô tả rủi ro</th><th>Likelihood</th><th>Impact</th><th>Mitigation</th><th>Trigger escalation</th><th>Escalation owner</th></tr></thead><tbody>
+    <tr><td>1</td><td>Hofstede collectivism: DEPT_HEAD không speak up trong all-hands vì sợ làm mất mặt phòng khác.</td><td>H</td><td>M</td><td>Anonymous feedback box + 1:1 supervisor card ngay sau họp; senior speaks last trong phần Q&A.</td><td>< 10 phản hồi nhận được trước 2026-05-18.</td><td>HR_MGR</td></tr>
+    <tr><td>2</td><td>Power-distance risk: nếu CEO phát biểu sau, người tham dự đọc là endorsement yếu.</td><td>M</td><td>H</td><td>CEO phát biểu đầu tiên 09:00 và nói rõ QMS là operating model chính thức.</td><td>CEO opening không có recording archived.</td><td>CEO</td></tr>
+    <tr><td>3</td><td>AV/M365 down trong họp làm mất retrieval drill và làm người dùng nghĩ hệ thống chưa sẵn sàng.</td><td>M</td><td>H</td><td>Offline PDF backup, QR fallback, IT_MGR trực phòng họp từ 08:30.</td><td>M365 fail >5 phút hoặc projector fail >3 phút.</td><td>IT_MGR</td></tr>
+    <tr><td>4</td><td>Hand-off packet thiếu sổ tay hoặc JD, làm P0-04 fail.</td><td>M</td><td>H</td><td>Manifest T-7, scan T-1, thiếu packet mở Sev-3 tại chỗ.</td><td>Hand-off count <11 handbook hoặc <39 JD.</td><td>QMS_MGR</td></tr>
+    <tr><td>5</td><td>Awareness quiz dưới 80% vì nội dung quá nhiều trong 60 phút.</td><td>M</td><td>M</td><td>Quiz chỉ hỏi 1 câu, slide lặp lại 3 doc nền, micro-training cho role fail.</td><td>Score <80% correct.</td><td>QMS_ENG</td></tr>
+    <tr><td>6</td><td>Issue register dummy flow không chạy, người dùng tiếp tục dùng chat không kiểm soát.</td><td>M</td><td>H</td><td>Seed dummy Sev-3 trước T-3, demo ngay slide 11, bắt mọi missing evidence thành issue.</td><td>Không tạo được issue trước 2026-05-16 10:00.</td><td>QMS_MGR</td></tr>
+  </tbody></table></div>
 </section>
 
 <!-- ─────────────────────────────────────────────────────────────────────
@@ -172,8 +282,12 @@
      ───────────────────────────────────────────────────────────────────── -->
 <section class="card" id="sec-lessons">
   <h2 class="h2">Lessons learned · điền sau họp (Lean Change cycle)</h2>
-  <!-- TODO Codex W01/SEC-LESSONS: chừa 3 khối Insights / Options / Experiments (Jason Little Lean Change Canvas) với placeholder text.
-       Sau cuộc họp thật, owner sẽ điền vào 3 ô này. -->
+  <div class="grid-3">
+    <div class="note"><h3>Insights</h3><p>Điền sau cuộc họp 2026-05-16 bởi QMS_ENG. Ghi tối thiểu 3 quan sát có bằng chứng: awareness score, số phản hồi anonymous, số issue mở trong 24h đầu.</p></div>
+    <div class="note"><h3>Options</h3><p>Điền sau cuộc họp 2026-05-16 bởi QMS_ENG. Liệt kê 2-3 lựa chọn điều chỉnh cho W02, ví dụ tăng micro-training, sửa slide RACI, hoặc thay cách lấy feedback.</p></div>
+    <div class="note"><h3>Experiments</h3><p>Điền sau cuộc họp 2026-05-16 bởi QMS_ENG. Mỗi experiment cần giả thuyết, owner role, metric và deadline trước 2026-05-23.</p></div>
+  </div>
+  <p class="note-blue">Lean Change Management của Jason Little 2014 được dùng như khung học nhanh, nhưng không thay thế gate. Nếu experiment đụng execution truth, QMS_MGR phải mở issue hoặc DCR theo WI-105/WI-106 trước khi đổi quy trình.</p>
 </section>
 
 </div><!-- /doc-content -->

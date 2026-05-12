@@ -250,6 +250,129 @@ function deployEscape(s){
 }
 function deployNum(v){ const n = parseFloat(v); return Number.isFinite(n) ? n : 0; }
 function deployIsoToVi(iso){ if(!iso) return '—'; try{ return new Date(iso).toLocaleString('vi-VN'); }catch(_){ return iso; } }
+// ── Playbook fetch + cache ────────────────────────────────────────────────
+// Pulls the 12-section playbook HTML for a given doc code (TRN-DEP-W01..W12)
+// via the existing doc_stream API and parses out individual sections so the
+// week side panel can render meeting brief inline (and fullscreen mode can
+// render the full playbook). Results are cached in DeployState.playbookCache
+// to avoid re-fetching on tab switches.
+async function deployFetchPlaybook(code){
+  if (!code) return null;
+  DeployState.playbookCache = DeployState.playbookCache || {};
+  if (DeployState.playbookCache[code]) return DeployState.playbookCache[code];
+  if (DeployState.playbookInflight && DeployState.playbookInflight[code]) return DeployState.playbookInflight[code];
+  DeployState.playbookInflight = DeployState.playbookInflight || {};
+
+  const promise = (async () => {
+    try{
+      const path = `mom/docs/training/system-ops/03-Deploy-Playbook/${code}.html`;
+      // Try doc_stream first (respects auth + DCC pipeline); fall back to direct
+      // path so a missing doc_stream registration doesn't kill the brief.
+      const tryUrls = [
+        `api.php?action=doc_stream&path=${encodeURIComponent(path)}&code=${encodeURIComponent(code)}`,
+        '/' + path,
+      ];
+      let html = '';
+      for (const url of tryUrls){
+        try{
+          const res = await fetch(url, {credentials: 'same-origin', headers: {Accept: 'text/html'}});
+          if (res.ok){
+            html = await res.text();
+            if (html && html.length > 1000) break;
+          }
+        }catch(_){}
+      }
+      if (!html) throw new Error('empty playbook');
+      const dom = new DOMParser().parseFromString(html, 'text/html');
+      const pick = (id) => {
+        const el = dom.querySelector('#' + id);
+        return el ? el.outerHTML : '';
+      };
+      const parsed = {
+        cover:     pick('sec-cover'),
+        objective: pick('sec-objective'),
+        prep:      pick('sec-prep'),
+        agenda:    pick('sec-agenda'),
+        slides:    pick('sec-slides'),
+        decisions: pick('sec-decisions'),
+        gate:      pick('sec-gate'),
+        tasks:     pick('sec-tasks'),
+        nextWeek:  pick('sec-next-week'),
+        docs:      pick('sec-docs'),
+        risks:     pick('sec-risks'),
+        lessons:   pick('sec-lessons'),
+        rawTitle:  (dom.querySelector('title')?.textContent || '').trim(),
+      };
+      DeployState.playbookCache[code] = parsed;
+      return parsed;
+    }catch(e){
+      console.warn('[deploy] playbook fetch failed', code, e && e.message);
+      return null;
+    }finally{
+      delete DeployState.playbookInflight[code];
+    }
+  })();
+  DeployState.playbookInflight[code] = promise;
+  return promise;
+}
+
+async function deployHydratePlaybook(code, target){
+  // Async hydration: target is a CSS selector or element where the meeting
+  // brief should be injected. While loading, show a skeleton.
+  if (!code) return;
+  const host = typeof target === 'string' ? document.querySelector(target) : target;
+  if (!host) return;
+  host.innerHTML = `<div class="dwp-brief-loading">⏳ Đang tải nội dung họp chi tiết từ ${deployEscape(code)}…</div>`;
+  const data = await deployFetchPlaybook(code);
+  if (!data){
+    host.innerHTML = `<div class="dwp-brief-empty">⚠ Không tải được playbook ${deployEscape(code)}. <a href="javascript:void(0)" onclick="if(window.openDoc)openDoc('${deployEscape(code)}');return false;">Mở trực tiếp</a></div>`;
+    return;
+  }
+  host.innerHTML = deployRenderBrief(code, data, false);
+}
+
+function deployRenderBrief(code, data, fullscreen){
+  const sections = fullscreen
+    ? [
+        ['cover','📌 Tổng quan'],
+        ['objective','🎯 Mục tiêu tuần'],
+        ['prep','📋 Prep checklist (T-7 → T-0)'],
+        ['agenda','📅 Agenda 60 phút'],
+        ['slides','🎞 Nội dung họp · slide-by-slide'],
+        ['decisions','✍️ Quyết định cần lấy'],
+        ['gate','🚦 Gate Go/No-Go · CẦN + ĐỦ'],
+        ['tasks','📤 Nhiệm vụ sau họp (RACI)'],
+        ['nextWeek','▶ Preview tuần sau'],
+        ['docs','📎 Tài liệu liên quan'],
+        ['risks','⚠ Rủi ro + escalation'],
+        ['lessons','💡 Lessons learned'],
+      ]
+    : [
+        ['agenda','📅 Agenda 60 phút'],
+        ['decisions','✍️ Quyết định cần lấy'],
+        ['gate','🚦 Gate Go/No-Go · CẦN + ĐỦ'],
+        ['tasks','📤 Nhiệm vụ sau họp (RACI)'],
+        ['risks','⚠ Rủi ro + escalation'],
+      ];
+  const blocks = sections.map(([key, title]) => {
+    const html = data[key];
+    if (!html) return '';
+    return `
+      <details class="dwp-brief-block" ${fullscreen ? 'open' : (key==='agenda' ? 'open' : '')}>
+        <summary><span>${title}</span></summary>
+        <div class="dwp-brief-body">${html}</div>
+      </details>`;
+  }).join('');
+  const head = `
+    <div class="dwp-brief-head">
+      <strong>📖 Playbook ${deployEscape(code)}</strong>
+      <span>Trích từ tài liệu chính thức · ${fullscreen ? 'toàn bộ 12 section' : '5 section trọng yếu'} ·
+        <a href="javascript:void(0)" onclick="if(window.openDoc)openDoc('${deployEscape(code)}');return false;">Mở doc đầy đủ ↗</a>
+      </span>
+    </div>`;
+  return head + blocks;
+}
+
 function deployRenderDocChip(code){
   const safe = deployEscape(code);
   const baseClass = 'deploy-doc-chip dwp-doc-chip';
@@ -1152,11 +1275,24 @@ function renderWeekPanel(){
                 title="Mở tài liệu Playbook chi tiết cho W${wn}">
                 📖 Mở Playbook W${wn} · ${deployEscape(w.playbookCode)}
               </button>
+              <button type="button" class="dwp-fullscreen-btn"
+                onclick="deployToggleWeekFullscreen()"
+                title="Hiển thị biên bản họp toàn màn hình">
+                ⛶ Toàn màn hình
+              </button>
               <small>Tài liệu chi tiết: nội dung họp · phân công · gate Go/No-Go · preview tuần kế tiếp</small>
             </div>` : ''}
         </div>
         <button class="dwp-close" onclick="deployCloseWeek()" aria-label="Đóng">×</button>
       </header>
+
+      ${w.playbookCode ? `
+        <section class="dwp-section dwp-meeting-brief-section">
+          <h3>📋 Nội dung họp chi tiết · trích từ playbook</h3>
+          <div id="dwp-meeting-brief" data-playbook-code="${deployEscape(w.playbookCode)}">
+            <div class="dwp-brief-loading">⏳ Đang tải nội dung họp chi tiết từ ${deployEscape(w.playbookCode)}…</div>
+          </div>
+        </section>` : ''}
 
       ${(w.attendees && w.attendees.length) ? `
         <section class="dwp-section dwp-attendees-section">
@@ -1667,13 +1803,45 @@ async function deploySetPhase(phaseId){
 
 function deployOpenWeek(n){
   DeployState.activeWeek = n;
+  DeployState.weekFullscreen = false;
   renderDeployDashboard();
+  // After the panel renders, fire off the playbook fetch + hydration.
+  setTimeout(() => {
+    const host = document.getElementById('dwp-meeting-brief');
+    if (host && host.dataset.playbookCode){
+      deployHydratePlaybook(host.dataset.playbookCode, host);
+    }
+  }, 30);
 }
 function deployCloseWeek(ev){
   if (ev && ev.target && !ev.target.classList.contains('deploy-week-overlay')) return;
   DeployState.activeWeek = null;
+  DeployState.weekFullscreen = false;
   renderDeployDashboard();
 }
+function deployToggleWeekFullscreen(){
+  DeployState.weekFullscreen = !DeployState.weekFullscreen;
+  const overlay = document.querySelector('.deploy-week-overlay');
+  if (!overlay) return;
+  overlay.classList.toggle('dwp-fullscreen', !!DeployState.weekFullscreen);
+  // When entering fullscreen, swap the brief from 5-section short view to
+  // the full 12-section view (re-render using cached parsed data).
+  const host = document.getElementById('dwp-meeting-brief');
+  if (host && host.dataset.playbookCode){
+    const code = host.dataset.playbookCode;
+    const data = DeployState.playbookCache && DeployState.playbookCache[code];
+    if (data) host.innerHTML = deployRenderBrief(code, data, !!DeployState.weekFullscreen);
+    else deployHydratePlaybook(code, host).then(() => {
+      // After fetch, if we're now in fullscreen, re-render with full sections.
+      const fresh = DeployState.playbookCache && DeployState.playbookCache[code];
+      if (fresh && DeployState.weekFullscreen) host.innerHTML = deployRenderBrief(code, fresh, true);
+    });
+  }
+  // Toggle button label
+  const btn = overlay.querySelector('.dwp-fullscreen-btn');
+  if (btn) btn.textContent = DeployState.weekFullscreen ? '⊟ Thoát toàn màn hình' : '⛶ Toàn màn hình';
+}
+window.deployToggleWeekFullscreen = deployToggleWeekFullscreen;
 
 async function deploySaveMeeting(weekN){
   const wk = deployGetWeek(weekN);
