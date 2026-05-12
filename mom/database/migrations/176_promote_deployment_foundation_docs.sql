@@ -77,10 +77,13 @@ BEGIN
             ('POL-QMS-002',DATE '2026-05-23')
         ) AS s(d, eff)
         WHERE NOT EXISTS (
+            -- Idempotency: skip if ANY V1.0 row exists for the doc, regardless
+            -- of which actor created it. The table enforces a UNIQUE constraint
+            -- on (doc_code, revision); a narrower predicate would re-attempt
+            -- the insert and fail when a different actor already filled it in.
             SELECT 1 FROM dcc_document_revision r
             WHERE  r.doc_code = s.d
               AND  r.revision = 'V1.0'
-              AND  r.approved_by = 'deploy_program_migration_176'
         );
     END IF;
 END$$;
