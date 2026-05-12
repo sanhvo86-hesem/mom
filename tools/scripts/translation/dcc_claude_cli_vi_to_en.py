@@ -285,6 +285,93 @@ def install_engine_overrides() -> None:
 
     common.translate_batch = _claude_translate_batch
 
+    # Engine-scoped segment cache.
+    #
+    # `common.translate_html` (Argos pipeline) consults a shared SQLite cache
+    # before invoking the translator. The cache key is hash(segment); the row
+    # carries an `engine_version` column but it is NOT part of the key. Without
+    # this override, the Claude CLI script reads back Argos/NLLB rows for any
+    # segment that an earlier engine already processed — Claude is never
+    # actually asked. Result: clicking "Retranslate" with Claude returns the
+    # cached Argos output unchanged.
+    #
+    # Override the load/store helpers so they only see rows authored by an
+    # engine in the `claude_cli_%` family. Writes stamp the row with the
+    # current `ENGINE_VERSION` (e.g. `claude_cli_opus_v1`), overwriting any
+    # stale Argos entry for the same segment via `ON CONFLICT`.
+    _engine_tag = ENGINE_VERSION
+
+    def _claude_load_cached_translations(segments: List[str]) -> Dict[str, str]:
+        if not segments:
+            return {}
+        conn = common.open_cache()
+        if conn is None:
+            return {}
+        try:
+            keys = {common.cache_key(seg): seg for seg in segments}
+            out: Dict[str, str] = {}
+            key_items = list(keys.items())
+            for start in range(0, len(key_items), 400):
+                chunk = key_items[start : start + 400]
+                placeholders = ",".join("?" for _ in chunk)
+                rows = conn.execute(
+                    "SELECT cache_key, translated_text "
+                    "FROM segment_translation_cache "
+                    "WHERE engine_version LIKE 'claude_cli_%' "
+                    f"AND cache_key IN ({placeholders})",
+                    [key for key, _seg in chunk],
+                ).fetchall()
+                for key, translated in rows:
+                    seg = keys.get(str(key))
+                    if seg is not None and isinstance(translated, str) and translated.strip():
+                        candidate = common.cleanup_translation(translated)
+                        if not common.has_quality_issue(candidate):
+                            out[seg] = candidate
+            return out
+        except Exception:
+            return {}
+        finally:
+            try:
+                conn.close()
+            except Exception:
+                pass
+
+    def _claude_store_cached_translations(translated_map: Dict[str, str]) -> None:
+        if not translated_map:
+            return
+        conn = common.open_cache()
+        if conn is None:
+            return
+        try:
+            rows = [
+                (common.cache_key(source), source, translated, _engine_tag)
+                for source, translated in translated_map.items()
+                if source and translated
+            ]
+            if not rows:
+                return
+            conn.executemany(
+                "INSERT INTO segment_translation_cache "
+                "(cache_key, source_text, translated_text, engine_version, updated_at) "
+                "VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP) "
+                "ON CONFLICT(cache_key) DO UPDATE SET "
+                "translated_text=excluded.translated_text, "
+                "engine_version=excluded.engine_version, "
+                "updated_at=CURRENT_TIMESTAMP",
+                rows,
+            )
+            conn.commit()
+        except Exception:
+            pass
+        finally:
+            try:
+                conn.close()
+            except Exception:
+                pass
+
+    common.load_cached_translations = _claude_load_cached_translations
+    common.store_cached_translations = _claude_store_cached_translations
+
 
 def _claude_batch_impl(self: _ClaudeCliAdapter, segments: List[str]) -> List[str]:
     """Batched implementation; wired into _ClaudeCliAdapter via monkey-patch."""

@@ -257,6 +257,82 @@ def install_engine_overrides() -> None:
 
     common.translate_batch = _codex_translate_batch
 
+    # Engine-scoped segment cache — see dcc_claude_cli_vi_to_en.py for the
+    # full rationale. Without this, `common.translate_html` reads Argos/NLLB
+    # cache rows and never invokes the Codex CLI.
+    _engine_tag = ENGINE_VERSION
+
+    def _codex_load_cached_translations(segments: List[str]) -> Dict[str, str]:
+        if not segments:
+            return {}
+        conn = common.open_cache()
+        if conn is None:
+            return {}
+        try:
+            keys = {common.cache_key(seg): seg for seg in segments}
+            out: Dict[str, str] = {}
+            key_items = list(keys.items())
+            for start in range(0, len(key_items), 400):
+                chunk = key_items[start : start + 400]
+                placeholders = ",".join("?" for _ in chunk)
+                rows = conn.execute(
+                    "SELECT cache_key, translated_text "
+                    "FROM segment_translation_cache "
+                    "WHERE engine_version LIKE 'codex_cli_%' "
+                    f"AND cache_key IN ({placeholders})",
+                    [key for key, _seg in chunk],
+                ).fetchall()
+                for key, translated in rows:
+                    seg = keys.get(str(key))
+                    if seg is not None and isinstance(translated, str) and translated.strip():
+                        candidate = common.cleanup_translation(translated)
+                        if not common.has_quality_issue(candidate):
+                            out[seg] = candidate
+            return out
+        except Exception:
+            return {}
+        finally:
+            try:
+                conn.close()
+            except Exception:
+                pass
+
+    def _codex_store_cached_translations(translated_map: Dict[str, str]) -> None:
+        if not translated_map:
+            return
+        conn = common.open_cache()
+        if conn is None:
+            return
+        try:
+            rows = [
+                (common.cache_key(source), source, translated, _engine_tag)
+                for source, translated in translated_map.items()
+                if source and translated
+            ]
+            if not rows:
+                return
+            conn.executemany(
+                "INSERT INTO segment_translation_cache "
+                "(cache_key, source_text, translated_text, engine_version, updated_at) "
+                "VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP) "
+                "ON CONFLICT(cache_key) DO UPDATE SET "
+                "translated_text=excluded.translated_text, "
+                "engine_version=excluded.engine_version, "
+                "updated_at=CURRENT_TIMESTAMP",
+                rows,
+            )
+            conn.commit()
+        except Exception:
+            pass
+        finally:
+            try:
+                conn.close()
+            except Exception:
+                pass
+
+    common.load_cached_translations = _codex_load_cached_translations
+    common.store_cached_translations = _codex_store_cached_translations
+
 
 def main() -> int:
     payload = common.read_payload()
