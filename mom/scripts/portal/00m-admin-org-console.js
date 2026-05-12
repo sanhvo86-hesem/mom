@@ -634,7 +634,7 @@
     var personImage = active.length === 1 ? employeeAvatarUrl(active[0]) : '';
     return {
       icon: groupIcon,
-      image: active.length >= 2 ? groupImage : personImage
+      image: active.length === 1 ? personImage : groupImage
     };
   }
 
@@ -816,6 +816,8 @@
       + '.org-position-card.is-inactive{opacity:.55}'
       + '.org-position-head{display:flex;align-items:center;gap:10px}'
       + '.org-position-icon{flex-shrink:0;width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden}'
+      + '.org-position-visual-trigger{border:0;background:transparent;padding:0;margin:0;cursor:pointer;display:inline-flex;border-radius:10px}'
+      + '.org-position-visual-trigger:hover{outline:2px solid var(--brand-primary,#4f46e5);outline-offset:2px}'
       + '.org-position-icon img,.org-photo img{width:100%;height:100%;object-fit:cover;display:block}'
       + '.org-photo{flex-shrink:0;width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;overflow:hidden}'
       + '.org-position-hero{display:flex;align-items:center;gap:12px;min-width:0}'
@@ -1213,7 +1215,9 @@
     return ''
       + '<div class="org-detail-section">'
       +   '<div class="org-position-hero">'
-      +     visualHtml(visual.image, visual.icon, 'org-position-icon', (u?unitColor(u):'#4f46e5'))
+      +     '<button type="button" class="org-position-visual-trigger" data-act="edit-position-visual" data-pos-id="'+esc(p.hcm_position_id)+'" title="'+esc(t('Edit position icon/image','Sửa icon / hình chức danh'))+'">'
+      +       visualHtml(visual.image, visual.icon, 'org-position-icon', (u?unitColor(u):'#4f46e5'))
+      +     '</button>'
       +     '<div class="org-position-hero-main">'
       +       '<div style="font-weight:800;font-size:15px;color:var(--text-1)">'+esc(p.position_title||'?')+'</div>'
       +       '<div class="org-assignee-meta">'+esc(positionAssigneeLabel(employees))+'</div>'
@@ -1275,10 +1279,10 @@
            +   '<button class="org-btn is-danger" data-act="remove-assignee" data-pos-id="'+esc(p.hcm_position_id)+'" data-assignment-id="'+esc(e.hcm_assignment_id||'')+'" data-employee-id="'+esc(employeeIdentity(e))+'">'+esc(t('Remove','Xóa'))+'</button>'
            + '</div>';
     }).join('') : '<div class="org-empty" style="padding:18px">'+esc(t('No employees assigned to this position yet.','Chưa có nhân sự nào được bổ nhiệm vào vị trí này.'))+'</div>';
-    var groupVisualAction = active.length >= 2
+    var groupVisualAction = active.length !== 1
       ? '<div class="org-detail-section" style="padding:10px 0;border-bottom:0">'
-        + '<button class="org-btn" data-act="edit-group-visual" data-pos-id="'+esc(p.hcm_position_id)+'">🖼️ '+esc(t('Group icon / image','Icon / hình nhóm'))+'</button>'
-        + '<span class="org-assignment-count" style="margin-left:8px">'+esc(t('Used only when the position has multiple assigned people.','Chỉ dùng khi vị trí có nhiều nhân sự được bổ nhiệm.'))+'</span>'
+        + '<button class="org-btn" data-act="edit-group-visual" data-pos-id="'+esc(p.hcm_position_id)+'">🖼️ '+esc(t('Position icon / image','Icon / hình chức danh'))+'</button>'
+        + '<span class="org-assignment-count" style="margin-left:8px">'+esc(t('Used when the position has no assignee or multiple assignees.','Dùng khi vị trí chưa có nhân sự hoặc có nhiều nhân sự.'))+'</span>'
         + '</div>'
       : '';
     var body = document.createElement('div');
@@ -1567,7 +1571,7 @@
     var p = positionId ? S.byPositionId[positionId] : null;
     if (!p) return;
     var employees = S.employeesByPosition[p.hcm_position_id] || [];
-    if (activeEmployees(employees).length < 2){
+    if (activeEmployees(employees).length === 1){
       UI.toast(t('Single-person images are edited on the user profile','Hình cá nhân sửa ở hồ sơ user'), 'error');
       return;
     }
@@ -1626,7 +1630,7 @@
     });
 
     modal({
-      title: t('Group icon and image','Icon và hình nhóm'),
+      title: t('Position icon and image','Icon và hình chức danh'),
       body: body,
       width: '520px',
       buttons: [
@@ -1712,6 +1716,8 @@
         openAssignmentModal(posId, host);
       } else if (act === 'remove-assignee'){
         removeAssigneeFromAttrs(el, host);
+      } else if (act === 'edit-position-visual'){
+        openPositionVisualModal(posId, host);
       } else if (act === 'edit-unit'){
         openUnitModal(unitId, null, host);
       } else if (act === 'edit-position'){
