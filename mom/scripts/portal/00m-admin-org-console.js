@@ -322,7 +322,7 @@
     selectedUnitId: null, selectedPositionId: null,
     filter: { search:'', type:'all', status:'active' },
     chart: {
-      mode:'units',          // 'units' | 'positions'
+      mode:'positions',      // 'units' | 'positions'
       layout:'TB',           // 'TB' | 'LR'
       zoom:1, panX:0, panY:0,
       collapsedPositions:{},
@@ -593,27 +593,48 @@
     var meta = safeJson(e && e.metadata);
     var profileMeta = safeJson(profile.metadata);
     return firstText(
+      profile.avatar_image,
       profile.avatar_url,
       profile.photo_url,
       profile.image_url,
+      profile.avatar_image_url,
       profileMeta.avatar_url,
       profileMeta.photo_url,
       profileMeta.image_url,
       profileMeta.image_data_url,
+      profileMeta.avatar_image,
       meta.avatar_url,
       meta.photo_url,
       meta.image_url,
-      meta.image_data_url
+      meta.image_data_url,
+      meta.avatar_image
+    );
+  }
+
+  function employeeAvatarLabel(e, name){
+    var profile = employeeProfile(e) || {};
+    var meta = safeJson(e && e.metadata);
+    var profileMeta = safeJson(profile.metadata);
+    return firstText(
+      profile.avatar_icon,
+      profile.avatar,
+      profileMeta.avatar_icon,
+      profileMeta.avatar,
+      meta.avatar_icon,
+      meta.avatar,
+      employeeInitials(name)
     );
   }
 
   function positionVisual(p, employees){
     var meta = safeJson(p && p.metadata);
     var active = activeEmployees(employees || []);
+    var groupImage = firstText(meta.org_chart_image, meta.image_url, meta.image_data_url, meta.photo_url);
+    var groupIcon = firstText(meta.org_chart_icon, meta.icon, positionIcon(p && p.position_title));
     var personImage = active.length === 1 ? employeeAvatarUrl(active[0]) : '';
     return {
-      icon: firstText(meta.org_chart_icon, meta.icon, positionIcon(p && p.position_title)),
-      image: firstText(meta.org_chart_image, meta.image_url, meta.image_data_url, meta.photo_url, personImage)
+      icon: groupIcon,
+      image: active.length >= 2 ? groupImage : personImage
     };
   }
 
@@ -1180,7 +1201,7 @@
       var secondary = employeeSecondaryLabel(e);
       var avatar = employeeAvatarUrl(e);
       return '<div class="org-assignee-row"'+(secondary ? ' title="'+esc(secondary)+'"' : '')+'>'
-           +   visualHtml(avatar, employeeInitials(name), 'org-assignee-avatar', '#4f46e5')
+           +   visualHtml(avatar, employeeAvatarLabel(e, name), 'org-assignee-avatar', '#4f46e5')
            +   '<span class="org-assignee-main">'
            +     '<span class="org-assignee-name">'+esc(name)+'</span>'
            +   '</span>'
@@ -1224,7 +1245,6 @@
       + '</div>'
       + '<div class="org-actions" style="border-top:1px solid var(--border-1,#e5e7eb)">'
       +   '<button class="org-btn is-primary" data-act="add-assignee" data-pos-id="'+esc(p.hcm_position_id)+'">'+esc(t('+ Person','+ Nhân sự'))+'</button>'
-      +   '<button class="org-btn" data-act="edit-position-visual" data-pos-id="'+esc(p.hcm_position_id)+'">🖼️ '+esc(t('Icon / image','Icon / hình'))+'</button>'
       +   '<button class="org-btn" data-act="edit-position" data-pos-id="'+esc(p.hcm_position_id)+'">✏️ '+esc(t('Edit','Sửa'))+'</button>'
       +   '<button class="org-btn" data-act="reparent-position" data-pos-id="'+esc(p.hcm_position_id)+'">🔗 '+esc(t('Move to dept','Chuyển phòng'))+'</button>'
       +   '<button class="org-btn '+(inactive?'is-primary':'is-danger')+'" data-act="toggle-position" data-pos-id="'+esc(p.hcm_position_id)+'">'+esc(inactive?t('Activate','Kích hoạt'):t('Archive','Ngừng dùng'))+'</button>'
@@ -1241,14 +1261,13 @@
     var open = Math.max(0, hc - active.length);
     var over = Math.max(0, active.length - hc);
     var visual = positionVisual(p, employees);
-    var body = document.createElement('div');
     var rows = employees.length ? employees.map(function(e){
       var status = assignmentStatus(e);
       var name = employeeDisplayName(e);
       var secondary = employeeSecondaryLabel(e);
       var avatar = employeeAvatarUrl(e);
       return '<div class="org-assignee-row"'+(secondary ? ' title="'+esc(secondary)+'"' : '')+'>'
-           +   visualHtml(avatar, employeeInitials(name), 'org-assignee-avatar', '#4f46e5')
+           +   visualHtml(avatar, employeeAvatarLabel(e, name), 'org-assignee-avatar', '#4f46e5')
            +   '<span class="org-assignee-main">'
            +     '<span class="org-assignee-name">'+esc(name)+'</span>'
            +   '</span>'
@@ -1256,6 +1275,13 @@
            +   '<button class="org-btn is-danger" data-act="remove-assignee" data-pos-id="'+esc(p.hcm_position_id)+'" data-assignment-id="'+esc(e.hcm_assignment_id||'')+'" data-employee-id="'+esc(employeeIdentity(e))+'">'+esc(t('Remove','Xóa'))+'</button>'
            + '</div>';
     }).join('') : '<div class="org-empty" style="padding:18px">'+esc(t('No employees assigned to this position yet.','Chưa có nhân sự nào được bổ nhiệm vào vị trí này.'))+'</div>';
+    var groupVisualAction = active.length >= 2
+      ? '<div class="org-detail-section" style="padding:10px 0;border-bottom:0">'
+        + '<button class="org-btn" data-act="edit-group-visual" data-pos-id="'+esc(p.hcm_position_id)+'">🖼️ '+esc(t('Group icon / image','Icon / hình nhóm'))+'</button>'
+        + '<span class="org-assignment-count" style="margin-left:8px">'+esc(t('Used only when the position has multiple assigned people.','Chỉ dùng khi vị trí có nhiều nhân sự được bổ nhiệm.'))+'</span>'
+        + '</div>'
+      : '';
+    var body = document.createElement('div');
 
     body.innerHTML = ''
       + '<div class="org-position-hero" style="margin-bottom:10px">'
@@ -1272,6 +1298,7 @@
       +   '<div class="org-assignee-metric"><b>'+open+'</b><span>'+esc(t('Open seats','Còn trống'))+'</span></div>'
       +   '<div class="org-assignee-metric"><b>'+over+'</b><span>'+esc(t('Over headcount','Vượt định biên'))+'</span></div>'
       + '</div>'
+      + groupVisualAction
       + '<div class="org-detail-l">'+esc(t('Assigned people','Danh sách người được bổ nhiệm'))+'</div>'
       + rows;
 
@@ -1281,11 +1308,16 @@
       width: '620px',
       buttons: [
         { label: t('+ Add person','+ Thêm nhân sự'), variant:'primary', onClick:function(close){ close(); openAssignmentModal(positionId, host); return false; } },
-        { label: t('Icon / image','Icon / hình'), variant:'secondary', onClick:function(close){ close(); openPositionVisualModal(positionId, host); return false; } },
         { label: t('Close','Đóng'), variant:'secondary', onClick:function(close){ close(); } }
       ]
     });
     body.addEventListener('click', function(ev){
+      var groupBtn = ev.target.closest('[data-act="edit-group-visual"]');
+      if (groupBtn){
+        try { modalRef && modalRef.close && modalRef.close(); } catch(_){}
+        openPositionVisualModal(positionId, host);
+        return;
+      }
       var btn = ev.target.closest('[data-act="remove-assignee"]');
       if (!btn) return;
       removeAssigneeFromAttrs(btn, host, function(){
@@ -1535,6 +1567,10 @@
     var p = positionId ? S.byPositionId[positionId] : null;
     if (!p) return;
     var employees = S.employeesByPosition[p.hcm_position_id] || [];
+    if (activeEmployees(employees).length < 2){
+      UI.toast(t('Single-person images are edited on the user profile','Hình cá nhân sửa ở hồ sơ user'), 'error');
+      return;
+    }
     var meta = safeJson(p.metadata);
     var currentIcon = firstText(meta.org_chart_icon, meta.icon, positionIcon(p.position_title));
     var imageValue = firstText(meta.org_chart_image, meta.image_url, meta.image_data_url);
@@ -1590,7 +1626,7 @@
     });
 
     modal({
-      title: t('Icon and image','Icon và hình đại diện'),
+      title: t('Group icon and image','Icon và hình nhóm'),
       body: body,
       width: '520px',
       buttons: [
@@ -1676,8 +1712,6 @@
         openAssignmentModal(posId, host);
       } else if (act === 'remove-assignee'){
         removeAssigneeFromAttrs(el, host);
-      } else if (act === 'edit-position-visual'){
-        openPositionVisualModal(posId, host);
       } else if (act === 'edit-unit'){
         openUnitModal(unitId, null, host);
       } else if (act === 'edit-position'){
@@ -2132,7 +2166,7 @@
       +   '<div class="org-toolbar">'
       +     '<span style="font-weight:700">'+esc(t('Display','Hiển thị'))+':</span>'
       +     '<button class="org-chip '+(S.chart.mode==='units'?'is-active':'')+'"     data-act="chart-mode" data-val="units">🏢 '+esc(t('Units','Đơn vị'))+'</button>'
-      +     '<button class="org-chip '+(S.chart.mode==='positions'?'is-active':'')+'" data-act="chart-mode" data-val="positions">💼 '+esc(t('Positions','Vị trí'))+'</button>'
+      +     '<button class="org-chip '+(S.chart.mode==='positions'?'is-active':'')+'" data-act="chart-mode" data-val="positions">💼 '+esc(t('Roles','Vai trò'))+'</button>'
       +     '<span style="width:1px;height:24px;background:var(--border-1,#e5e7eb)"></span>'
       +     '<span style="font-weight:700">'+esc(t('Layout','Bố cục'))+':</span>'
       +     '<button class="org-chip '+(S.chart.layout==='TB'?'is-active':'')+'" data-act="chart-layout" data-val="TB">↓ '+esc(t('Top-down','Dọc'))+'</button>'
@@ -2143,7 +2177,6 @@
                 + '<button class="org-btn is-primary" data-act="chart-save-layout">💾 '+esc(t('Save','Lưu'))+'</button>'
                 + '<button class="org-btn" data-act="chart-cancel-layout">'+esc(t('Cancel','Hủy'))+'</button>'
               : '<button class="org-btn" data-act="chart-edit-layout">✏️ '+esc(t('Edit','Sửa'))+'</button>')
-      +     '<button class="org-btn" data-act="chart-visual">🖼️ '+esc(t('Icon / image','Icon / hình'))+'</button>'
       +     '<button class="org-btn" data-act="chart-fit" title="'+esc(t('Fit to screen','Vừa khung'))+'">⛶ '+esc(t('Fit','Vừa khung'))+'</button>'
       +     '<button class="org-btn" data-act="chart-reload">🔄 '+esc(t('Reload','Tải lại'))+'</button>'
       +     '<div style="position:relative" data-export-menu>'
@@ -2209,12 +2242,6 @@
         persistChartLayout(host);
       } else if (act === 'chart-cancel-layout'){
         cancelChartLayoutEdit(host);
-      } else if (act === 'chart-visual'){
-        if (!S.selectedPositionId || !S.byPositionId[S.selectedPositionId]){
-          UI.toast(t('Select a position first','Chọn một vị trí trước'), 'error');
-          return;
-        }
-        openPositionVisualModal(S.selectedPositionId, host);
       } else if (act === 'chart-zoom'){
         var v = parseInt(el.getAttribute('data-val'),10);
         if (v === 0) S.chart.zoom = 1;
@@ -3212,10 +3239,10 @@
     var w = window.open('', '_blank');
     if (!w){ UI.toast(t('Popup blocked','Popup bị chặn'),'error'); return; }
     w.document.write('<!DOCTYPE html><html><head><title>'+esc(t('Organization Chart','Sơ đồ tổ chức'))+'</title>'
-      + '<style>@page{size:A3 landscape;margin:8mm}body{margin:0;padding:0;font-family:-apple-system,Segoe UI,Roboto,sans-serif}'
+      + '<style>@page{size:A3 landscape;margin:8mm}*{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}body{margin:0;padding:0;font-family:-apple-system,Segoe UI,Roboto,sans-serif;background:#fff;color:#111827}'
       + 'header{padding:12px 18px;border-bottom:1px solid #e5e7eb;display:flex;align-items:center;justify-content:space-between}'
       + 'h1{font-size:16px;margin:0}.meta{font-size:11px;color:#6b7280}'
-      + 'svg{width:100%;height:auto;display:block;margin:0 auto}</style></head>'
+      + 'svg{width:100%;height:auto;display:block;margin:0 auto;page-break-inside:avoid;break-inside:avoid}text{paint-order:stroke;stroke:#fff;stroke-width:.35px;stroke-linejoin:round}</style></head>'
       + '<body><header><h1>'+esc(t('HESEM — Organization Chart','HESEM — Sơ đồ tổ chức'))+'</h1>'
       + '<div class="meta">'+esc(new Date().toISOString())+' · '+S.units.length+' '+esc(t('units','đơn vị'))+' · '+S.positions.length+' '+esc(t('positions','vị trí'))+'</div></header>'
       + svgString

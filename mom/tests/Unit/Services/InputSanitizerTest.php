@@ -89,6 +89,8 @@ class InputSanitizerTest extends TestCase
             'name' => 'Admin User',
             'role' => 'admin',
             'active' => true,
+            'avatar_icon' => '👑',
+            'avatar_image' => 'data:image/png;base64,AA==',
             'mfa' => ['enabled' => true],
         ];
 
@@ -96,6 +98,8 @@ class InputSanitizerTest extends TestCase
 
         $this->assertSame('admin', $clean['username']);
         $this->assertSame('Admin User', $clean['name']);
+        $this->assertSame('👑', $clean['avatar_icon']);
+        $this->assertSame('data:image/png;base64,AA==', $clean['avatar_image']);
         $this->assertTrue($clean['mfa']['enabled']);
         $this->assertArrayNotHasKey('password', $clean);
         $this->assertArrayNotHasKey('totp_secret', $clean);

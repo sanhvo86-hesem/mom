@@ -1579,6 +1579,108 @@ function adminUserEmployeeId(user){
   return String((user && (user.employee_id || user.id || user.user_id_code || user.username)) || '').trim();
 }
 
+function adminUserAvatarImage(user){
+  return String((user && (user.avatar_image || user.avatar_url)) || '').trim();
+}
+
+function adminUserAvatarIcon(user){
+  return String((user && (user.avatar_icon || user.avatar)) || '').trim() || '👤';
+}
+
+function adminUserAvatarHtml(user, colorBg){
+  const image = adminUserAvatarImage(user);
+  const icon = adminUserAvatarIcon(user);
+  const initials = (String((user && user.name) || '?').split(' ').filter(Boolean).map(w=>w[0]).join('').substring(0,2) || '?').toUpperCase();
+  if(image){
+    return `<div class="uc-avatar" style="background:${colorBg};overflow:hidden"><img src="${escapeHtml(image)}" alt="" style="width:100%;height:100%;object-fit:cover;display:block"></div>`;
+  }
+  return `<div class="uc-avatar" style="background:${colorBg}">${escapeHtml(icon && icon !== '👤' ? icon : initials)}</div>`;
+}
+
+function userAvatarIconOptionsHtml(selected){
+  const icons = ['👤','👔','🎖️','👑','🛡️','🔬','📋','🧠','💻','⚙️','🏭','🛠️','🔩','🧰','📦','🚚','💰','📊','🦺','🖥️'];
+  const current = String(selected || '👤');
+  return icons.map(icon=>`<option value="${escapeHtml(icon)}" ${icon===current?'selected':''}>${escapeHtml(icon)}</option>`).join('');
+}
+
+function readUserAvatarFile(file){
+  return new Promise((resolve, reject)=>{
+    if(!file || !/^image\//.test(file.type || '')){
+      reject(new Error(lang==='en'?'Please choose an image file':'Vui lòng chọn file hình ảnh'));
+      return;
+    }
+    if(file.size > 2 * 1024 * 1024){
+      reject(new Error(lang==='en'?'Image must be 2 MB or smaller':'Hình phải từ 2 MB trở xuống'));
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = ()=>{
+      const img = new Image();
+      img.onload = ()=>{
+        const maxSide = 512;
+        const scale = Math.min(1, maxSide / Math.max(img.width || maxSide, img.height || maxSide));
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round((img.width || maxSide) * scale));
+        canvas.height = Math.max(1, Math.round((img.height || maxSide) * scale));
+        const ctx = canvas.getContext('2d');
+        if(!ctx){ resolve(String(reader.result || '')); return; }
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', 0.86));
+      };
+      img.onerror = ()=>reject(new Error(lang==='en'?'Cannot read image':'Không đọc được hình'));
+      img.src = String(reader.result || '');
+    };
+    reader.onerror = ()=>reject(new Error(lang==='en'?'Cannot read image':'Không đọc được hình'));
+    reader.readAsDataURL(file);
+  });
+}
+
+function wireUserAvatarControls(modal, user){
+  window.__um_state = window.__um_state || {};
+  window.__um_state.avatarImage = adminUserAvatarImage(user);
+  window.__um_state.avatarIcon = adminUserAvatarIcon(user);
+  const preview = modal.querySelector('#um-avatar-preview');
+  const iconSel = modal.querySelector('#um-avatar-icon');
+  const fileInput = modal.querySelector('#um-avatar-file');
+  const clearBtn = modal.querySelector('#um-avatar-clear');
+  function renderPreview(){
+    if(!preview) return;
+    const image = String(window.__um_state.avatarImage || '');
+    const icon = String(window.__um_state.avatarIcon || '👤');
+    preview.innerHTML = image
+      ? `<img src="${escapeHtml(image)}" alt="" style="width:100%;height:100%;object-fit:cover;display:block">`
+      : `<span>${escapeHtml(icon)}</span>`;
+  }
+  if(iconSel){
+    iconSel.value = window.__um_state.avatarIcon || '👤';
+    iconSel.addEventListener('change', ()=>{
+      window.__um_state.avatarIcon = iconSel.value || '👤';
+      renderPreview();
+    });
+  }
+  if(fileInput){
+    fileInput.addEventListener('change', async ()=>{
+      try{
+        const file = fileInput.files && fileInput.files[0];
+        if(!file) return;
+        window.__um_state.avatarImage = await readUserAvatarFile(file);
+        renderPreview();
+      }catch(err){
+        fileInput.value = '';
+        showToast('⚠ ' + ((err && err.message) || 'image_error'));
+      }
+    });
+  }
+  if(clearBtn){
+    clearBtn.addEventListener('click', ()=>{
+      window.__um_state.avatarImage = '';
+      if(fileInput) fileInput.value = '';
+      renderPreview();
+    });
+  }
+  renderPreview();
+}
+
 function orgUnitById(orgUnitId){
   return (ADMIN_AUTH_STATE.org.orgUnits || []).find(unit=>String(unit.hcm_org_unit_id || '') === String(orgUnitId || '')) || null;
 }
@@ -10039,10 +10141,9 @@ function renderAdminUsers(){
         const r = ROLES[u.role];
         const dept = deptMap[u.dept];
         const colorBg = r ? r.color : 'var(--gray-400,#94a3b8)';
-        const initials = (u.name||'?').split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase();
         return `<div class="user-card ${u.active===false?'inactive':''}" data-name="${escapeHtml((u.name||'').toLowerCase())}" data-dept="${escapeHtml(u.dept||'')}">
           <div class="uc-top">
-            <div class="uc-avatar" style="background:${colorBg}">${initials}</div>
+            ${adminUserAvatarHtml(u, colorBg)}
             <div class="uc-info">
               <div class="uc-name">${escapeHtml(u.name)}</div>
               <div class="uc-title">${escapeHtml(u.title)} · @${escapeHtml(u.username)}</div>
@@ -10402,7 +10503,7 @@ async function showUserModal(userId){
     return;
   }
   const isEdit = !!userId;
-  const seedUser = isEdit ? USERS.find(x=>String(x.id)===String(userId)) : {id:'',name:'',username:'',dept:'',title:'',role:'employee',active:true,mfa_enabled:false,cccd:'',phone:'',personal_email:'',hcm_org_unit_id:'',hcm_position_id:''};
+  const seedUser = isEdit ? USERS.find(x=>String(x.id)===String(userId)) : {id:'',name:'',username:'',dept:'',title:'',role:'employee',active:true,mfa_enabled:false,cccd:'',phone:'',personal_email:'',avatar:'👤',avatar_icon:'👤',avatar_image:'',avatar_url:'',hcm_org_unit_id:'',hcm_position_id:''};
   if(isEdit && !seedUser){
     showToast(lang==='en'?'⚠ User not found':'⚠ Không tìm thấy người dùng');
     return;
@@ -10418,9 +10519,10 @@ async function showUserModal(userId){
   closeModal();
 
   // Reset modal state
-  window.__um_state = { tempPassword: '' };
+  window.__um_state = { tempPassword: '', avatarImage: adminUserAvatarImage(u0), avatarIcon: adminUserAvatarIcon(u0) };
 
   const roleOptions = userRoleOptionHtml(u0.role || '');
+  const avatarIconOptions = userAvatarIconOptionsHtml(adminUserAvatarIcon(u0));
   
   const deptOptions = DEPARTMENTS.map(d=>`<option value="${d.code}" ${u0.dept===d.code?'selected':''}>${d.code} — ${lang==='en'?d.labelEn:d.label}</option>`).join('');
   
@@ -10502,6 +10604,21 @@ async function showUserModal(userId){
         <div style="border-top:1px solid var(--border-light,#e2e8f0);margin:14px 0;padding-top:14px">
           <div style="font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:10px">📋 ${lang==='en'?'Personal Information':'Thông tin cá nhân'}</div>
           <div class="modal-grid-2">
+            <div style="display:flex;align-items:center;gap:12px;padding:10px;border:1px solid var(--border-light,#e2e8f0);border-radius:12px;background:var(--bg-surface-alt,#f8fafc)">
+              <div id="um-avatar-preview" style="width:72px;height:72px;border-radius:14px;background:var(--bg-surface,#fff);border:1px solid var(--border-light,#e2e8f0);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:32px;font-weight:800;color:var(--text-2)"></div>
+              <div style="min-width:0;flex:1">
+                <div style="font-size:12px;font-weight:700;color:var(--text-2);margin-bottom:6px">${lang==='en'?'User image':'Hình cá nhân'}</div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+                  <select id="um-avatar-icon" style="width:82px;padding:8px 10px;border:1.5px solid var(--border);border-radius:8px;font-size:18px">${avatarIconOptions}</select>
+                  <input id="um-avatar-file" type="file" accept="image/*" style="max-width:210px;font-size:11px">
+                  <button id="um-avatar-clear" type="button" class="btn-admin" style="padding:7px 10px;font-size:11px">${lang==='en'?'Remove image':'Xóa hình'}</button>
+                </div>
+                <div class="help-text" style="font-size:10px;margin-top:6px">${lang==='en'?'Stored on the user record and reused by organization modules.':'Lưu trên hồ sơ user và dùng chung cho các module tổ chức.'}</div>
+              </div>
+            </div>
+            <div class="modal-field"></div>
+          </div>
+          <div class="modal-grid-2">
             <div class="modal-field">
               <label>${lang==='en'?'Citizen ID (CCCD)':'Số CCCD / CMND'}</label>
               <input id="um-cccd" type="text" value="${escapeHtml(u0.cccd||'')}" placeholder="${lang==='en'?'e.g. 079123456789':'VD: 079123456789'}" maxlength="12">
@@ -10547,6 +10664,7 @@ async function showUserModal(userId){
     </div>
   `;
   document.body.appendChild(modal);
+  wireUserAvatarControls(modal, u0);
   // Filter Title by Department + default Role = Title
   const deptSel = modal.querySelector('#um-dept');
   const titleSel = modal.querySelector('#um-title');
@@ -10681,6 +10799,8 @@ async function saveUserFromModal(userId){
     const cccd = String(document.getElementById('um-cccd')?.value||'').trim();
     const phone = String(document.getElementById('um-phone')?.value||'').trim();
     const personal_email = String(document.getElementById('um-personal-email')?.value||'').trim();
+    const avatar_icon = String((window.__um_state && window.__um_state.avatarIcon) || document.getElementById('um-avatar-icon')?.value || '👤').trim();
+    const avatar_image = String((window.__um_state && window.__um_state.avatarImage) || '').trim();
 
     if(!username){
       showToast(lang==='en'?'⚠ Username is required':'⚠ Username là bắt buộc');
@@ -10757,6 +10877,10 @@ async function saveUserFromModal(userId){
       cccd,
       phone,
       personal_email,
+      avatar: avatar_icon,
+      avatar_icon,
+      avatar_image,
+      avatar_url: '',
       hcm_org_unit_id: assignment.orgUnitId || '',
       hcm_position_id: assignment.positionId || ''
     };

@@ -79,6 +79,10 @@ class UserController extends BaseController
                 'role',
                 'dept',
                 'title',
+                'avatar',
+                'avatar_icon',
+                'avatar_image',
+                'avatar_url',
                 'phone',
                 'personal_email',
                 'cccd',
@@ -95,6 +99,7 @@ class UserController extends BaseController
             if (array_key_exists('role', $data)) {
                 $data['role'] = strtolower(trim((string)$data['role']));
             }
+            $this->normalizeAvatarPayload($data);
 
             foreach ($allowed as $key) {
                 if (array_key_exists($key, $data)) {
@@ -187,6 +192,10 @@ class UserController extends BaseController
                 'role'          => $providedRole,
                 'dept'          => (string)($data['dept'] ?? ''),
                 'title'         => (string)($data['title'] ?? ''),
+                'avatar'        => (string)($data['avatar'] ?? ''),
+                'avatar_icon'   => (string)($data['avatar_icon'] ?? ($data['avatar'] ?? '')),
+                'avatar_image'  => (string)($data['avatar_image'] ?? ''),
+                'avatar_url'    => (string)($data['avatar_url'] ?? ''),
                 'phone'         => (string)($data['phone'] ?? ''),
                 'personal_email' => (string)($data['personal_email'] ?? ''),
                 'cccd'          => (string)($data['cccd'] ?? ''),
@@ -203,6 +212,7 @@ class UserController extends BaseController
                 'created_at'    => $this->nowIso(),
                 'updated_at'    => $this->nowIso(),
             ];
+            $this->normalizeAvatarPayload($newUser);
 
             if (method_exists($shadowSync, 'normalizeUserLinkage')) {
                 $linkage = $shadowSync->normalizeUserLinkage($newUser);
@@ -304,6 +314,40 @@ class UserController extends BaseController
         $knownRoles = $this->knownRoleCodes($shadowSync);
         if ($knownRoles !== [] && !in_array($roleCode, $knownRoles, true)) {
             $this->error('invalid_role', 400, 'Role must exist in the runtime role catalog.');
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function normalizeAvatarPayload(array &$data): void
+    {
+        foreach (['avatar', 'avatar_icon'] as $key) {
+            if (!array_key_exists($key, $data)) {
+                continue;
+            }
+            $value = trim((string)$data[$key]);
+            $data[$key] = mb_substr($value, 0, 24);
+        }
+
+        foreach (['avatar_image', 'avatar_url'] as $key) {
+            if (!array_key_exists($key, $data)) {
+                continue;
+            }
+            $value = trim((string)$data[$key]);
+            if ($value === '') {
+                $data[$key] = '';
+                continue;
+            }
+            if (strlen($value) > 1500000) {
+                $this->error('avatar_too_large', 400, 'Avatar image must be 1.5 MB or smaller.');
+            }
+            $isDataImage = preg_match('/^data:image\/(?:png|jpe?g|webp|gif);base64,[A-Za-z0-9+\/=\r\n]+$/', $value) === 1;
+            $isRemoteImage = preg_match('/^https:\/\/[^\s<>"\']{1,1000}$/i', $value) === 1;
+            if (!$isDataImage && !$isRemoteImage) {
+                $this->error('invalid_avatar_image', 400, 'Avatar image must be an HTTPS image URL or a data:image payload.');
+            }
+            $data[$key] = $value;
         }
     }
 

@@ -146,6 +146,10 @@ class AuthUserShadowSyncService
 
                 $userMetadata = [
                     'title' => $positionTitle,
+                    'avatar' => (string)($user['avatar'] ?? ''),
+                    'avatar_icon' => (string)($user['avatar_icon'] ?? ($user['avatar'] ?? '')),
+                    'avatar_image' => (string)($user['avatar_image'] ?? ''),
+                    'avatar_url' => (string)($user['avatar_url'] ?? ''),
                     'phone' => (string)($user['phone'] ?? ''),
                     'cccd' => (string)($user['cccd'] ?? ''),
                     'jd_code' => (string)($user['jd_code'] ?? ''),

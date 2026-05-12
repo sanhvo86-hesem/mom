@@ -8,55 +8,8 @@ window.qmsEditorConfig = Object.assign({
   tiptapPilot:false
 }, window.qmsEditorConfig||{});
 
-let USERS = []; // Server-side auth: do NOT embed credentials in client-side code.
+let USERS = []; // Server-side auth SSOT. Admin screens must not inject local demo users.
 window.USERS = USERS;
-// Fallback demo users for offline/dev mode (only used if API returns empty)
-const DEMO_USERS = [
-  // ═══ EXECUTIVE (EXE) ═══
-  {id:'1', name:'Nguyễn Văn A',username:'ceo',role:'ceo',dept:'EXE',title:'Chief Executive Officer (CEO)',avatar:'👔',active:true,pin:''},
-  {id:'2', name:'Trần Văn B',username:'gd.sanxuat',role:'production_director',dept:'EXE',title:'Production Director',avatar:'🎖️',active:true,pin:''},
-  // ═══ PRODUCTION (PRO) ═══
-  {id:'10',name:'PRO — Quản Đốc Xưởng CNC',username:'quandoc.cnc',role:'cnc_workshop_manager',dept:'PRO',title:'CNC Workshop Manager',avatar:'🏭',active:true,pin:''},
-  {id:'11',name:'PRO — Trưởng Ca',username:'truongca',role:'shift_leader',dept:'PRO',title:'Shift Leader',avatar:'📋',active:true,pin:''},
-  {id:'12',name:'PRO — KTV Setup',username:'ktv.setup',role:'setup_technician',dept:'PRO',title:'Setup Technician',avatar:'🛠️',active:true,pin:''},
-  {id:'13',name:'PRO — Thợ CNC',username:'tho.cnc',role:'cnc_operator',dept:'PRO',title:'CNC Operator',avatar:'🔩',active:true,pin:''},
-  {id:'14',name:'PRO — Trưởng Nhóm Deburr',username:'tn.deburr',role:'deburr_team_lead',dept:'PRO',title:'Deburr Team Lead',avatar:'🧽',active:true,pin:''},
-  {id:'15',name:'PRO — KTV Deburr',username:'ktv.deburr',role:'deburr_technician',dept:'PRO',title:'Deburr Technician',avatar:'🧹',active:true,pin:''},
-  {id:'16',name:'PRO — KH Sản Xuất',username:'nv.khsx',role:'production_planner',dept:'PRO',title:'Production Planner',avatar:'📅',active:true,pin:''},
-  {id:'17',name:'PRO — GS Vệ Sinh & Đóng Gói',username:'gs.vsdg',role:'cleaning_packaging_supervisor',dept:'PRO',title:'Cleaning & Packaging Supervisor',avatar:'🧼',active:true,pin:''},
-  {id:'18',name:'PRO — KTV Vệ Sinh & Đóng Gói',username:'ktv.vsdg',role:'cleaning_packaging_technician',dept:'PRO',title:'Cleaning Packaging Technician',avatar:'✨',active:true,pin:''},
-  {id:'19',name:'PRO — KTV Bảo Trì',username:'ktv.baotri',role:'maintenance_technician',dept:'PRO',title:'Maintenance Technician',avatar:'🔧',active:true,pin:''},
-  // ═══ ENGINEERING (ENG) ═══
-  {id:'20',name:'ENG — Trưởng Phòng Kỹ Thuật',username:'tp.kythuat',role:'engineering_lead',dept:'ENG',title:'Engineering Lead / Manager',avatar:'⚙️',active:true,pin:''},
-  {id:'21',name:'ENG — Kỹ Sư Quy Trình',username:'ks.quytrinh',role:'process_engineer',dept:'ENG',title:'Process Engineer',avatar:'🧠',active:true,pin:''},
-  {id:'22',name:'ENG — Lập Trình CAM/NC',username:'lt.camnc',role:'cam_nc_programmer',dept:'ENG',title:'CAM/NC Programmer',avatar:'💻',active:true,pin:''},
-  // ═══ QUALITY (QA) ═══
-  {id:'30',name:'QA — Trưởng Phòng Chất Lượng',username:'tp.chatluong',role:'qa_manager',dept:'QA',title:'QA Manager',avatar:'🛡️',active:true,pin:''},
-  {id:'31',name:'QA — Kỹ Sư Chất Lượng',username:'ks.chatluong',role:'quality_engineer',dept:'QA',title:'Quality Engineer',avatar:'🔬',active:true,pin:''},
-  {id:'32',name:'QA — QC / CMM',username:'qc.inspector',role:'qc_inspector',dept:'QA',title:'QC Inspector / CMM Programmer-Operator',avatar:'🔍',active:true,pin:''},
-  {id:'33',name:'QA — Kỹ Sư QMS',username:'ks.qms',role:'qms_engineer',dept:'QA',title:'QMS Engineer',avatar:'📋',active:true,pin:''},
-  {id:'34',name:'QA — Đánh Giá Nội Bộ',username:'auditor',role:'internal_auditor',dept:'QA',title:'Internal Auditor (Outsource)',avatar:'📊',active:true,pin:''},
-  // ═══ SUPPLY CHAIN (SCM) ═══
-  {id:'40',name:'SCM — Trưởng Phòng Cung Ứng',username:'tp.cungung',role:'supply_chain_manager',dept:'SCM',title:'Supply Chain Manager',avatar:'🛒',active:true,pin:''},
-  {id:'41',name:'SCM — NV Mua Hàng',username:'nv.muahang',role:'buyer',dept:'SCM',title:'Buyer / Purchasing',avatar:'🛍️',active:true,pin:''},
-  {id:'42',name:'SCM — NV Kho',username:'nv.kho',role:'warehouse_clerk',dept:'SCM',title:'Warehouse Clerk',avatar:'📦',active:true,pin:''},
-  {id:'43',name:'SCM — Thủ Kho Dụng Cụ',username:'thukho.dc',role:'tool_storekeeper',dept:'SCM',title:'Tool Crib / Tool Storekeeper',avatar:'🧰',active:true,pin:''},
-  {id:'44',name:'SCM — Điều Phối Giao Nhận',username:'dp.giaonhan',role:'logistics_coordinator',dept:'SCM',title:'Logistics & Shipping Coordinator',avatar:'🚚',active:true,pin:''},
-  // ═══ SALES (SAL) ═══
-  {id:'50',name:'SAL — NV Báo Giá',username:'nv.baogia',role:'estimator',dept:'SAL',title:'Estimator',avatar:'📊',active:true,pin:''},
-  {id:'51',name:'SAL — Dịch Vụ Khách Hàng',username:'nv.dvkh',role:'customer_service',dept:'SAL',title:'Customer Service',avatar:'🤝',active:true,pin:''},
-  // ═══ FINANCE (FIN) ═══
-  {id:'60',name:'FIN — Trưởng Phòng Tài Chính',username:'tp.taichinh',role:'finance_manager',dept:'FIN',title:'Finance Manager',avatar:'🏦',active:true,pin:''},
-  {id:'61',name:'FIN — KT Tổng Hợp & Lương',username:'kt.thluong',role:'gl_payroll_accountant',dept:'FIN',title:'General Ledger & Payroll Accountant',avatar:'💰',active:true,pin:''},
-  {id:'62',name:'FIN — KT Công Nợ',username:'kt.congno',role:'ap_ar_accountant',dept:'FIN',title:'AP/AR & Payments Accountant',avatar:'💳',active:true,pin:''},
-  // ═══ HR ═══
-  {id:'70',name:'HR — Trưởng Phòng Nhân Sự',username:'tp.nhansu',role:'hr_manager',dept:'HR',title:'HR Manager',avatar:'👥',active:true,pin:''},
-  // ═══ EHS ═══
-  {id:'80',name:'EHS — CV An Toàn Môi Trường',username:'cv.antoan',role:'ehs_specialist',dept:'EHS',title:'EHS Specialist',avatar:'🦺',active:true,pin:''},
-  // ═══ IT ═══
-  {id:'90',name:'IT — Quản Trị Hệ Thống',username:'admin',role:'it_admin',dept:'IT',title:'IT Admin',avatar:'🖥️',active:true,pin:''},
-  {id:'91',name:'IT — Quản Trị Epicor',username:'admin.epicor',role:'epicor_admin',dept:'IT',title:'Epicor System Administrator',avatar:'⚡',active:true,pin:''},
-];
 
 // Load server-side users list for Admin screens (read-only, authoritative)
 async function loadUsersFromServerIfAdmin(){
@@ -108,7 +61,10 @@ async function loadUsersFromServerIfAdmin(){
         org_legal_entity_code: String(u.org_legal_entity_code || ''),
         org_plant_id: String(u.org_plant_id || ''),
         org_site_id: String(u.org_site_id || ''),
-        avatar: u.avatar || '👤',
+        avatar: u.avatar || u.avatar_icon || '👤',
+        avatar_icon: u.avatar_icon || u.avatar || '👤',
+        avatar_image: u.avatar_image || '',
+        avatar_url: u.avatar_url || '',
         active: (u.active !== false),
         // Flatten nested mfa.enabled into the flat boolean used by FE table/modal.
         mfa_enabled: !!(u.mfa && u.mfa.enabled),
