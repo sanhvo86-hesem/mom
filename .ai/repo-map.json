@@ -1,6 +1,6 @@
 {
     "_meta": {
-        "generated_at": "2026-04-30T08:14:58+00:00",
+        "generated_at": "2026-05-10T03:11:29+00:00",
         "generator": "tools/scripts/ai-index/generate.php",
         "description": "High-level project topology. Read this first to orient."
     },
@@ -23,11 +23,11 @@
         "MOM\\Database\\": "mom/database/"
     },
     "counts": {
-        "controllers": 89,
-        "services": 124,
+        "controllers": 91,
+        "services": 128,
         "middleware": 6,
-        "migrations": 158,
-        "db_tables": 839,
+        "migrations": 175,
+        "db_tables": 864,
         "contracts": 68,
         "action_routes": 0,
         "rest_routes": 0

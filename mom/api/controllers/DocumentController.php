@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
+use MOM\Api\Services\PortalServices;
 use MOM\Services\DocumentControl\DocumentLocaleAutomationService;
 use MOM\Services\ControlPlane\LegacyWriteSurfacePolicy;
 use RuntimeException;
@@ -323,6 +324,38 @@ class DocumentController extends BaseController
             @error_log('[DocumentLocaleAutomationService] saveDraft sync failed for ' . $code . ': ' . $e->getMessage());
         }
 
+        // ADR-0013 Phase 2: additive shadow-write of the body into
+        // dcc_document_body. In json_only mode this branch is a DB-only
+        // append; the legacy filesystem archive above is the rendering
+        // source. Failure here is non-fatal — the legacy write already
+        // succeeded and the user-visible draft is safe.
+        $docBody = PortalServices::documentBody($this->rootDir . '/mom/docs');
+        if ($docBody !== null) {
+            try {
+                $docBody->saveVersion(
+                    payload: [
+                        'doc_code'    => strtolower($code),
+                        'revision'    => $revision,
+                        'status'      => 'draft',
+                        'locale'      => $this->localeFromBaseRel($baseRel),
+                        'body_html'   => $html,
+                        'source_path' => $baseRel,
+                        // fs_relpath omitted: legacy store_version_file
+                        // already wrote the on-disk archive.
+                        'metadata'    => [
+                            'origin'    => 'controller:saveDraft',
+                            'draft_rel' => $draftRel,
+                        ],
+                        'created_by'  => (string)($me['username'] ?? 'system'),
+                        'change_ref'  => 'doc_save_draft',
+                    ],
+                    actor: (string)($me['username'] ?? 'system'),
+                );
+            } catch (Throwable $e) {
+                @error_log('[DocumentController] DocumentBodyRepository.saveVersion failed: ' . $e->getMessage());
+            }
+        }
+
         $this->auditLog('doc_save_draft', ['code' => $code]);
         $this->success([
             'draft_rel' => $draftRel,
@@ -331,6 +364,24 @@ class DocumentController extends BaseController
             'versions' => $versions,
             'locale_translation' => $localeTranslation,
         ]);
+    }
+
+    /**
+     * Extract the locale tag from a baseRel like
+     * "mom/docs/system/policies/_pol-qms-001-quality-policy.en.html".
+     * Returns 'vi' (default) if no locale suffix is present or the
+     * suffix is a preview marker.
+     */
+    private function localeFromBaseRel(string $baseRel): string
+    {
+        $name = basename($baseRel);
+        if (preg_match('/\.([a-z]{2,5})\.html$/i', $name, $m)) {
+            $cand = strtolower($m[1]);
+            if (!str_starts_with($cand, 'preview')) {
+                return $cand;
+            }
+        }
+        return 'vi';
     }
 
     /**

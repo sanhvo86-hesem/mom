@@ -1,0 +1,20 @@
+# 02 V11 Canonical Workflow Command Model
+
+## Primary plan matrices
+
+- `02_WORKFLOW_COMMAND_TRACEABILITY/M03_ROOT_WORKFLOW_API_FRONTEND_TRACEABILITY_MATRIX.csv`
+- `02_WORKFLOW_COMMAND_TRACEABILITY/M03_COMMAND_ENDPOINT_SCREEN_ACTION_MATRIX.csv`
+- `02_WORKFLOW_COMMAND_TRACEABILITY/B10_STATE_TRANSITION_MASTER_EXPORT.csv`
+- `02_WORKFLOW_COMMAND_TRACEABILITY/B10_COMMAND_EVIDENCE_AUDIT_ESIGN_EXPORT.csv`
+- `02_WORKFLOW_COMMAND_TRACEABILITY/B10_ROOT_WORKFLOW_BINDING_EXPORT.csv`
+- `02_WORKFLOW_COMMAND_TRACEABILITY/B10_VALIDATION_AND_EXCEPTION_EXPORT.csv`
+
+## Exception/correction controls
+
+- `02_WORKFLOW_COMMAND_TRACEABILITY/B09_EXCEPTION_REVERSAL_CORRECTION_MODEL.md`
+- `02_WORKFLOW_COMMAND_TRACEABILITY/B09_CORRECTION_POLICY_MATRIX.csv`
+- `02_WORKFLOW_COMMAND_TRACEABILITY/B09_FRONTEND_API_BLOCKING_MODEL.csv`
+
+## Command minimum contract
+
+Every command must name root, authoritative record, actor/role, owner, from-state/to-state, guard evidence, API family, frontend action, disabled state, audit event, signature/evidence rule, event/telemetry effect, correction/rollback/restriction path, acceptance gate and stop rule.

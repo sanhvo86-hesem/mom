@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace MOM\Api\Controllers;
 
 use MOM\Api\Services\AuthUserShadowSyncService;
+use MOM\Api\Services\PortalServices;
 use MOM\Api\Services\RbacService;
 use Throwable;
 
@@ -216,17 +217,24 @@ class UserController extends BaseController
             $existing = $newUser;
         }
 
-        try {
-            users_save($usersFile, $this->store);
-        } catch (Throwable $e) {
-            $this->rethrowResponse($e);
-            $this->error('save_failed', 500, $e->getMessage());
-        }
-
-        try {
-            $shadowSync->syncUser($existing);
-        } catch (Throwable $e) {
-            @error_log('[UserController] shadow sync failed: ' . $e->getMessage());
+        // ADR-0013: route the write through IdentityRepository when DB is
+        // reachable so it respects data_collection_state.mode, records an
+        // audit_event_chain row, and detects shadow-write drift. Fall back
+        // to the legacy dual-write only when the DB is unavailable.
+        $identity = PortalServices::identity($this->dataDir, $this->rootDir);
+        if ($identity !== null) {
+            try {
+                $identity->saveUser(
+                    $existing,
+                    (string)($me['username'] ?? 'system'),
+                    'admin_user_upsert',
+                );
+            } catch (Throwable $e) {
+                @error_log('[UserController] IdentityRepository.saveUser failed; falling back: ' . $e->getMessage());
+                $this->legacyUserDualWrite($usersFile, $existing, $shadowSync);
+            }
+        } else {
+            $this->legacyUserDualWrite($usersFile, $existing, $shadowSync);
         }
 
         $this->auditLog('admin_user_upsert', ['username' => $username]);
@@ -290,6 +298,26 @@ class UserController extends BaseController
         $knownRoles = $this->knownRoleCodes($shadowSync);
         if ($knownRoles !== [] && !in_array($roleCode, $knownRoles, true)) {
             $this->error('invalid_role', 400, 'Role must exist in the runtime role catalog.');
+        }
+    }
+
+    /**
+     * Legacy dual-write fallback used when ADR-0013's IdentityRepository
+     * is unavailable (DB unreachable). Mirrors the pre-PortalServices
+     * behaviour exactly so json_only deployments keep working.
+     */
+    private function legacyUserDualWrite(string $usersFile, array $existing, AuthUserShadowSyncService $shadowSync): void
+    {
+        try {
+            users_save($usersFile, $this->store);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('save_failed', 500, $e->getMessage());
+        }
+        try {
+            $shadowSync->syncUser($existing);
+        } catch (Throwable $e) {
+            @error_log('[UserController] shadow sync failed: ' . $e->getMessage());
         }
     }
 

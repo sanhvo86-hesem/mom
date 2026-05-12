@@ -1,10 +1,52 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 749,
-        "generated_at": "2026-04-30T08:14:58+00:00"
+        "table_count": 774,
+        "generated_at": "2026-05-10T03:11:29+00:00"
     },
     "tables": {
+        "access_review_campaign": {
+            "defined_in": "164_rbac_access_review.sql",
+            "extended_in": [
+                "172_disposal_event_and_campaign_close.sql"
+            ],
+            "primary_key": "campaign_id",
+            "foreign_keys": [
+                {
+                    "col": "review_owner_id",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
+        "access_review_item": {
+            "defined_in": "164_rbac_access_review.sql",
+            "extended_in": [],
+            "primary_key": "review_item_id",
+            "foreign_keys": [
+                {
+                    "col": "campaign_id",
+                    "ref": "access_review_campaign(campaign_id)"
+                },
+                {
+                    "col": "target_user_id",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "target_role_id",
+                    "ref": "roles(role_id)"
+                },
+                {
+                    "col": "sod_conflict_id",
+                    "ref": "role_sod_conflict(conflict_id)"
+                },
+                {
+                    "col": "attested_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
         "ai_conversations": {
             "defined_in": "099_ai_integration_foundation.sql",
             "extended_in": [],
@@ -1500,6 +1542,13 @@
             ],
             "contract": null
         },
+        "disposal_event": {
+            "defined_in": "172_disposal_event_and_campaign_close.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "doc_distributions": {
             "defined_in": "106_eqms_world_class_control_plane.sql",
             "extended_in": [],
@@ -1594,6 +1643,26 @@
             ],
             "contract": null
         },
+        "document_acknowledgement": {
+            "defined_in": "166_content_effective_documents_and_acknowledgement.sql",
+            "extended_in": [],
+            "primary_key": "ack_id",
+            "foreign_keys": [
+                {
+                    "col": "user_id",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "mfa_challenge_id",
+                    "ref": "mfa_challenge(challenge_id)"
+                },
+                {
+                    "col": "revoked_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
         "document_distribution": {
             "defined_in": "003_document_management.sql",
             "extended_in": [
@@ -1628,6 +1697,22 @@
                 {
                     "col": "version_id",
                     "ref": "document_versions(version_id)"
+                }
+            ],
+            "contract": null
+        },
+        "document_permission_grant": {
+            "defined_in": "161_rbac_document_permission_grant.sql",
+            "extended_in": [],
+            "primary_key": "grant_id",
+            "foreign_keys": [
+                {
+                    "col": "granted_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "revoked_by",
+                    "ref": "users(user_id)"
                 }
             ],
             "contract": null
@@ -1673,7 +1758,8 @@
                 "113_audit_columns.sql",
                 "113_audit_columns.sql",
                 "113_audit_columns.sql",
-                "113_audit_columns.sql"
+                "113_audit_columns.sql",
+                "166_content_effective_documents_and_acknowledgement.sql"
             ],
             "primary_key": "doc_id",
             "foreign_keys": [
@@ -6288,6 +6374,66 @@
             "foreign_keys": [],
             "contract": null
         },
+        "mfa_challenge": {
+            "defined_in": "165_rbac_mfa_factors_and_policy.sql",
+            "extended_in": [],
+            "primary_key": "challenge_id",
+            "foreign_keys": [
+                {
+                    "col": "user_id",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "factor_id",
+                    "ref": "mfa_factor(factor_id)"
+                }
+            ],
+            "contract": null
+        },
+        "mfa_factor": {
+            "defined_in": "165_rbac_mfa_factors_and_policy.sql",
+            "extended_in": [],
+            "primary_key": "factor_id",
+            "foreign_keys": [
+                {
+                    "col": "user_id",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "revoked_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
+        "mfa_policy": {
+            "defined_in": "165_rbac_mfa_factors_and_policy.sql",
+            "extended_in": [],
+            "primary_key": "role_id",
+            "foreign_keys": [
+                {
+                    "col": "role_id",
+                    "ref": "roles(role_id)"
+                },
+                {
+                    "col": "last_modified_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
+        "mfa_recovery_code": {
+            "defined_in": "165_rbac_mfa_factors_and_policy.sql",
+            "extended_in": [],
+            "primary_key": "recovery_code_id",
+            "foreign_keys": [
+                {
+                    "col": "user_id",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
         "mobile_inspection_captures": {
             "defined_in": "042_fmea_apqp_control_plan_mobile.sql",
             "extended_in": [
@@ -6335,6 +6481,34 @@
                 {
                     "col": "operator_id",
                     "ref": "employees(employee_id)"
+                }
+            ],
+            "contract": null
+        },
+        "module_permission": {
+            "defined_in": "160_rbac_modules_and_module_permission.sql",
+            "extended_in": [],
+            "primary_key": "module_permission_id",
+            "foreign_keys": [
+                {
+                    "col": "role_id",
+                    "ref": "roles(role_id)"
+                },
+                {
+                    "col": "module_code",
+                    "ref": "modules_catalog(module_code)"
+                }
+            ],
+            "contract": null
+        },
+        "modules_catalog": {
+            "defined_in": "160_rbac_modules_and_module_permission.sql",
+            "extended_in": [],
+            "primary_key": "module_code",
+            "foreign_keys": [
+                {
+                    "col": "parent_module_code",
+                    "ref": "modules_catalog(module_code)"
                 }
             ],
             "contract": null
@@ -7165,6 +7339,13 @@
             ],
             "contract": null
         },
+        "permission_catalog": {
+            "defined_in": "159_rbac_permission_catalog.sql",
+            "extended_in": [],
+            "primary_key": "permission_code",
+            "foreign_keys": [],
+            "contract": null
+        },
         "planned_supply": {
             "defined_in": "075_canonical_planning_erp_orchestration.sql",
             "extended_in": [
@@ -7758,6 +7939,22 @@
             ],
             "contract": null
         },
+        "portal_display_preference": {
+            "defined_in": "167_content_portal_display.sql",
+            "extended_in": [],
+            "primary_key": "user_id",
+            "foreign_keys": [
+                {
+                    "col": "user_id",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "preferred_layout_id",
+                    "ref": "portal_layout_template(layout_id)"
+                }
+            ],
+            "contract": null
+        },
         "portal_document_access": {
             "defined_in": "038_customer_portal.sql",
             "extended_in": [
@@ -7772,6 +7969,29 @@
                 {
                     "col": "granted_by",
                     "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
+        "portal_layout_template": {
+            "defined_in": "167_content_portal_display.sql",
+            "extended_in": [],
+            "primary_key": "layout_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "portal_layout_widget": {
+            "defined_in": "167_content_portal_display.sql",
+            "extended_in": [],
+            "primary_key": "layout_widget_id",
+            "foreign_keys": [
+                {
+                    "col": "layout_id",
+                    "ref": "portal_layout_template(layout_id)"
+                },
+                {
+                    "col": "widget_code",
+                    "ref": "portal_widget_catalog(widget_code)"
                 }
             ],
             "contract": null
@@ -7824,6 +8044,13 @@
                     "ref": "customers(customer_id)"
                 }
             ],
+            "contract": null
+        },
+        "portal_widget_catalog": {
+            "defined_in": "167_content_portal_display.sql",
+            "extended_in": [],
+            "primary_key": "widget_code",
+            "foreign_keys": [],
             "contract": null
         },
         "ppap_submissions": {
@@ -8604,6 +8831,66 @@
             ],
             "contract": null
         },
+        "retention_class_assignment": {
+            "defined_in": "168_content_retention_policy.sql",
+            "extended_in": [],
+            "primary_key": "assignment_id",
+            "foreign_keys": [
+                {
+                    "col": "policy_code",
+                    "ref": "retention_policy(policy_code)"
+                },
+                {
+                    "col": "classified_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "override_of_id",
+                    "ref": "retention_class_assignment(assignment_id)"
+                }
+            ],
+            "contract": null
+        },
+        "retention_disposal_event": {
+            "defined_in": "168_content_retention_policy.sql",
+            "extended_in": [],
+            "primary_key": "event_id",
+            "foreign_keys": [
+                {
+                    "col": "policy_code",
+                    "ref": "retention_policy(policy_code)"
+                },
+                {
+                    "col": "disposed_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "witnessed_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "reverse_of_event_id",
+                    "ref": "retention_disposal_event(event_id)"
+                }
+            ],
+            "contract": null
+        },
+        "retention_legal_hold": {
+            "defined_in": "168_content_retention_policy.sql",
+            "extended_in": [],
+            "primary_key": "hold_id",
+            "foreign_keys": [
+                {
+                    "col": "started_by",
+                    "ref": "users(user_id)"
+                },
+                {
+                    "col": "released_by",
+                    "ref": "users(user_id)"
+                }
+            ],
+            "contract": null
+        },
         "retention_locks": {
             "defined_in": "106_eqms_world_class_control_plane.sql",
             "extended_in": [],
@@ -8624,6 +8911,13 @@
             "defined_in": "070_enterprise_governance_uplift.sql",
             "extended_in": [],
             "primary_key": "policy_id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "retention_policy": {
+            "defined_in": "168_content_retention_policy.sql",
+            "extended_in": [],
+            "primary_key": "policy_code",
             "foreign_keys": [],
             "contract": null
         },
@@ -8681,6 +8975,22 @@
             ],
             "contract": null
         },
+        "role_sod_conflict": {
+            "defined_in": "162_rbac_role_sod_conflict.sql",
+            "extended_in": [],
+            "primary_key": "conflict_id",
+            "foreign_keys": [
+                {
+                    "col": "role_a_id",
+                    "ref": "roles(role_id)"
+                },
+                {
+                    "col": "role_b_id",
+                    "ref": "roles(role_id)"
+                }
+            ],
+            "contract": null
+        },
         "roles": {
             "defined_in": "002_core_system.sql",
             "extended_in": [
@@ -8689,7 +8999,8 @@
                 "113_audit_columns.sql",
                 "113_audit_columns.sql",
                 "113_audit_columns.sql",
-                "113_audit_columns.sql"
+                "113_audit_columns.sql",
+                "163_rbac_role_badge_tokens.sql"
             ],
             "primary_key": "role_id",
             "foreign_keys": [
@@ -10703,6 +11014,44 @@
                     "ref": "employees(employee_id)"
                 }
             ],
+            "contract": null
+        },
+        "translation_credentials": {
+            "defined_in": "157_translation_admin_module.sql",
+            "extended_in": [],
+            "primary_key": "provider_key",
+            "foreign_keys": [
+                {
+                    "col": "provider_key",
+                    "ref": "translation_provider_config(provider_key)"
+                }
+            ],
+            "contract": null
+        },
+        "translation_provider_config": {
+            "defined_in": "157_translation_admin_module.sql",
+            "extended_in": [],
+            "primary_key": "provider_key",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "translation_routing": {
+            "defined_in": "157_translation_admin_module.sql",
+            "extended_in": [],
+            "primary_key": "routing_id",
+            "foreign_keys": [
+                {
+                    "col": "primary_provider",
+                    "ref": "translation_provider_config(provider_key)"
+                }
+            ],
+            "contract": null
+        },
+        "translation_usage_log": {
+            "defined_in": "157_translation_admin_module.sql",
+            "extended_in": [],
+            "primary_key": "usage_id",
+            "foreign_keys": [],
             "contract": null
         },
         "uom": {
