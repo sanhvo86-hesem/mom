@@ -98,4 +98,5 @@ return static function (Router $router, string $dataDir): void {
     $router->put   ('/api/v1/dcc/admin/translation/documents/{doc_code}/override',                      TranslationAdminController::class, 'setDocumentOverride');
     $router->delete('/api/v1/dcc/admin/translation/documents/{doc_code}/override',                      TranslationAdminController::class, 'removeDocumentOverride');
     $router->post  ('/api/v1/dcc/admin/translation/documents/{doc_code}/retranslate',                   TranslationAdminController::class, 'retranslateDocument');
+    $router->post  ('/api/v1/dcc/admin/translation/documents/{doc_code}/cancel-job',                    TranslationAdminController::class, 'cancelJob');
 };

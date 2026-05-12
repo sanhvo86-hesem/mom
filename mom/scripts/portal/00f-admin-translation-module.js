@@ -1200,8 +1200,25 @@ function ensureTxQueuedStyles() {
   s.id = 'tx-queued-styles';
   s.textContent = '@keyframes tx-queued-pulse{0%,100%{opacity:1}50%{opacity:.45}}'
     + '.tx-queued-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--warn,#e0a000);margin-right:6px;animation:tx-queued-pulse 1.2s ease-in-out infinite;vertical-align:middle}'
-    + '.tx-queued-stuck{background:var(--danger,#c00)!important}';
+    + '.tx-queued-stuck{background:var(--danger,#c00)!important}'
+    + '.tx-translating-wrap{position:relative;display:inline-block}'
+    + '.tx-translating-wrap .tx-cancel-btn{display:none}'
+    + '.tx-translating-wrap:hover .tx-translating-btn{display:none}'
+    + '.tx-translating-wrap:hover .tx-cancel-btn{display:inline-block}';
   document.head.appendChild(s);
+}
+
+// Format a duration_ms value into a short human label: "67s", "5m 11s",
+// "1h 03m". Returns "—" for null / non-numeric values.
+function formatDuration(ms) {
+  if (ms === null || ms === undefined || ms === '' || isNaN(ms)) return '—';
+  const sec = Math.round(Number(ms) / 1000);
+  if (sec < 60) return sec + 's';
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  if (m < 60) return m + 'm ' + String(s).padStart(2, '0') + 's';
+  const h = Math.floor(m / 60);
+  return h + 'h ' + String(m % 60).padStart(2, '0') + 'm';
 }
 
 function renderDocuments() {
@@ -1248,13 +1265,14 @@ function renderDocuments() {
             <th style="padding:9px 8px;">${_t('Phiên bản', 'Revision')}</th>
             <th style="padding:9px 8px;">${_t('Engine dịch', 'Translation engine')}</th>
             <th style="padding:9px 8px;">${_t('Ngày dịch', 'Translated')}</th>
+            <th style="padding:9px 8px;" title="${_t('Thời gian của lần dịch thành công gần nhất', 'Duration of the last successful translation')}">${_t('Thời gian dịch', 'Duration')}</th>
             <th style="padding:9px 8px;">${_t('Trạng thái', 'State')}</th>
             <th style="padding:9px 8px;min-width:200px;"></th>
           </tr>
         </thead>
         <tbody>
           ${list.length === 0
-            ? `<tr><td colspan="7" style="padding:28px;text-align:center;color:var(--text-3);">${_t('Chưa có tài liệu nào được dịch.', 'No translated documents found.')}</td></tr>`
+            ? `<tr><td colspan="8" style="padding:28px;text-align:center;color:var(--text-3);">${_t('Chưa có tài liệu nào được dịch.', 'No translated documents found.')}</td></tr>`
             : list.map(doc => renderDocRow(doc, enabledProviders)).join('')}
         </tbody>
       </table>
@@ -1328,6 +1346,10 @@ function renderDocRow(doc, enabledProviders) {
       <td style="padding:9px 8px;font-size:12px;color:var(--text-3);white-space:nowrap;">
         ${doc.translated_at ? escapeHtml(doc.translated_at.substr(0, 16).replace('T', ' ')) : '—'}
       </td>
+      <td style="padding:9px 8px;font-size:12px;color:var(--text-3);white-space:nowrap;text-align:right;font-family:monospace;"
+          title="${doc.last_provider_key ? escapeHtml(doc.last_provider_key + (doc.last_model_id ? ' / ' + doc.last_model_id : '')) : ''}">
+        ${escapeHtml(formatDuration(doc.last_duration_ms))}
+      </td>
       <td style="padding:9px 8px;">
         ${queued && !stuck
           ? `<span style="padding:3px 8px;border-radius:4px;font-size:11px;white-space:nowrap;background:var(--warn-bg,#fff8e1);color:var(--warn,#e0a000);font-weight:600;">⟳ ${_t('đang dịch', 'translating')}</span>`
@@ -1338,16 +1360,30 @@ function renderDocRow(doc, enabledProviders) {
           style="padding:5px 10px;border:1px solid var(--ln,#ddd);border-radius:4px;background:${expanded ? 'var(--bg-2,#f5f7fb)' : 'var(--bg,#fff)'};cursor:pointer;font-size:12px;margin-right:4px;">
           ${_t('Đổi engine', 'Change engine')} ${expanded ? '▲' : '▼'}
         </button>
+        ${queued && !stuck ? `
+        <span class="tx-translating-wrap">
+          <button class="tx-translating-btn" disabled
+            style="padding:5px 10px;border:0;border-radius:4px;background:var(--brand-primary,#0c63e7);color:#fff;cursor:default;font-size:12px;opacity:.6;">
+            ⟳ ${_t('Đang dịch...', 'Translating...')}
+          </button>
+          <button class="tx-cancel-btn tx-doc-cancel" data-doc-code="${escapeHtml(code)}"
+            title="${_t('Hủy job đang chạy + kill worker', 'Cancel running job + kill worker')}"
+            style="padding:5px 10px;border:0;border-radius:4px;background:var(--danger,#c00);color:#fff;cursor:pointer;font-size:12px;">
+            ✕ ${_t('Hủy', 'Cancel')}
+          </button>
+        </span>
+        ` : `
         <button class="tx-doc-retranslate" data-doc-code="${escapeHtml(code)}"
           ${retranslating && !stuck ? 'disabled' : ''}
           title="${stuck ? _t('Worker quá hạn — bấm để re-queue', 'Worker timeout — click to re-queue') : ''}"
           style="padding:5px 10px;border:0;border-radius:4px;background:${stuck ? 'var(--danger,#c00)' : 'var(--brand-primary,#0c63e7)'};color:#fff;cursor:${retranslating && !stuck ? 'default' : 'pointer'};font-size:12px;opacity:${retranslating && !stuck ? '.6' : '1'};">
           ${stuck ? '↻ ' + _t('Re-queue', 'Re-queue') : (retranslating ? '⟳ ' + _t('Đang dịch...', 'Translating...') : _t('Dịch lại', 'Retranslate'))}
         </button>
+        `}
       </td>
     </tr>
     ${expanded ? `<tr data-override-for="${escapeHtml(code)}" style="background:var(--bg-2,#f5f7fb);">
-      <td colspan="7" style="padding:0;">${renderDocOverridePanel(doc, enabledProviders)}</td>
+      <td colspan="8" style="padding:0;">${renderDocOverridePanel(doc, enabledProviders)}</td>
     </tr>` : ''}
   `;
 }
@@ -1505,6 +1541,34 @@ function wireDocuments() {
           btn.style.color = 'var(--danger,#c00)';
         }
       }, 3000);
+    });
+  });
+
+  // Cancel a queued retranslate (kills worker, removes job/lock, restores
+  // variant out of the queued_background_worker placeholder).
+  document.querySelectorAll('.tx-doc-cancel').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.disabled) return;
+      const code = btn.dataset.docCode;
+      if (!confirm(_t('Hủy job dịch của ' + code + '?', 'Cancel translation job for ' + code + '?'))) return;
+      btn.disabled = true;
+      const orig = btn.textContent;
+      btn.textContent = '⟳ ' + _t('Đang hủy...', 'Canceling...');
+      api('POST', `/api/v1/dcc/admin/translation/documents/${encodeURIComponent(code)}/cancel-job`, {})
+        .then(d => {
+          const killed = (d && d.killed) || {};
+          const pids = Array.isArray(killed.worker_pids) ? killed.worker_pids.length : 0;
+          toast(_t(
+            '✕ ' + code + ' — đã hủy (killed ' + pids + ' worker)',
+            '✕ ' + code + ' — canceled (killed ' + pids + ' worker)'
+          ));
+          loadDocuments();
+        })
+        .catch(err => {
+          btn.disabled = false;
+          btn.textContent = orig;
+          toast(_t('Lỗi hủy: ' + err.message, 'Cancel error: ' + err.message));
+        });
     });
   });
 

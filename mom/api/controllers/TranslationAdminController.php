@@ -610,7 +610,11 @@ final class TranslationAdminController extends EqmsBaseController
                  v.updated_at AS translated_at,
                  r.routing_id AS override_routing_id,
                  r.primary_provider AS override_provider,
-                 r.primary_model AS override_model
+                 r.primary_model AS override_model,
+                 last_ok.duration_ms AS last_duration_ms,
+                 last_ok.provider_key AS last_provider_key,
+                 last_ok.model_id AS last_model_id,
+                 last_ok.created_at AS last_run_at
              FROM dcc_document_header h
              JOIN dcc_document_locale_variant v
                   ON v.doc_code = h.doc_code AND v.locale = 'en'
@@ -618,6 +622,13 @@ final class TranslationAdminController extends EqmsBaseController
                   ON r.scope_type = 'doc_code'
                   AND r.scope_value = h.doc_code
                   AND r.is_enabled = true
+             LEFT JOIN LATERAL (
+                  SELECT duration_ms, provider_key, model_id, created_at
+                    FROM translation_usage_log
+                   WHERE doc_code = h.doc_code AND outcome = 'ok'
+                   ORDER BY created_at DESC
+                   LIMIT 1
+             ) last_ok ON true
              WHERE $whereClause
              ORDER BY v.updated_at DESC NULLS LAST
              LIMIT $perPage OFFSET $offset",
@@ -805,5 +816,133 @@ final class TranslationAdminController extends EqmsBaseController
         }
 
         $this->success(['doc_code' => $docCode, 'result' => $result, 'queued' => true]);
+    }
+
+    /**
+     * POST /api/v1/dcc/admin/translation/documents/{doc_code}/cancel-job
+     *
+     * Aborts an in-flight retranslate job. Kills the worker PHP process and
+     * its child python/codex/claude subprocesses, removes the queued job
+     * file + lock, and flips the locale variant out of the
+     * `queued_background_worker` placeholder state so the UI exits its
+     * "đang dịch..." indicator.
+     *
+     * Idempotent: if the doc is not currently queued, returns ok with
+     * canceled=false so the admin doesn't see a spurious error.
+     */
+    public function cancelJob(): never
+    {
+        $user    = $this->requireAuth();
+        $this->requireAdmin($user);
+        $docCode = $this->pathDocCode();
+        $actor   = $this->adminActor($user);
+
+        $variantRows = $this->data->query(
+            "SELECT translation_state, translation_provider, engine_version, metadata
+               FROM dcc_document_locale_variant
+              WHERE doc_code = :p1 AND locale = 'en' LIMIT 1",
+            [':p1' => $docCode]
+        );
+        if (!is_array($variantRows) || count($variantRows) === 0) {
+            $this->error('translation_cancel_no_variant', 404, "No English variant for $docCode.");
+        }
+        $variant = $variantRows[0];
+        $isQueued = trim((string)($variant['engine_version'] ?? '')) === 'queued_background_worker';
+
+        $metadata = $variant['metadata'];
+        if (is_string($metadata)) {
+            $metadata = json_decode($metadata, true) ?? [];
+        }
+        if (!is_array($metadata)) {
+            $metadata = [];
+        }
+        $relJobPath = trim((string)($metadata['queue_job_path'] ?? ''));
+        $killed = ['worker_pids' => [], 'child_pids' => [], 'job_file_removed' => false, 'lock_file_removed' => false];
+
+        if ($relJobPath !== '') {
+            $absJobPath = rtrim($this->rootDir, '/') . '/' . ltrim($relJobPath, '/');
+            // Find every PHP worker whose argv contains this exact job-file
+            // path, plus any python/node descendants. The pgrep -f matches
+            // against the full command line so the job-path argument is
+            // enough to identify our worker uniquely.
+            $needle  = escapeshellarg($absJobPath);
+            $pidList = trim((string)@shell_exec("pgrep -f $needle 2>/dev/null"));
+            $pids    = $pidList === '' ? [] : preg_split('/\s+/', $pidList);
+            foreach ($pids as $pid) {
+                $pid = (int)$pid;
+                if ($pid <= 0 || $pid === getmypid()) {
+                    continue;
+                }
+                $killed['worker_pids'][] = $pid;
+                // Kill the whole subtree (php -> python -> codex/claude/node).
+                @shell_exec('pkill -TERM -P ' . $pid . ' 2>/dev/null');
+                @posix_kill($pid, SIGTERM);
+            }
+            // Grace period, then SIGKILL anything that survived.
+            usleep(800_000);
+            foreach ($killed['worker_pids'] as $pid) {
+                if (@posix_kill($pid, 0)) {
+                    @shell_exec('pkill -KILL -P ' . $pid . ' 2>/dev/null');
+                    @posix_kill($pid, SIGKILL);
+                }
+            }
+            // Sweep any descendants spawned earlier by the python provider
+            // (codex `node` binary, claude `claude` binary). Match on the
+            // job's hash-named tmp output file isn't reliable, so we settle
+            // for cleaning up the job + lock and trust the SIGTERM cascade.
+            if (is_file($absJobPath)) {
+                @unlink($absJobPath);
+                $killed['job_file_removed'] = true;
+            }
+            $lockPath = $absJobPath . '.lock';
+            if (is_file($lockPath)) {
+                @unlink($lockPath);
+                $killed['lock_file_removed'] = true;
+            }
+        }
+
+        // Restore the variant out of the "queued" placeholder so the UI
+        // stops showing the translating indicator. If the doc previously had
+        // an artifact, leave its translation_state alone; otherwise mark
+        // blocked with a clear reason.
+        if ($isQueued) {
+            $dcc = new \MOM\Services\DocumentControl\DocumentControlService($this->data);
+            $newMetadata = $metadata;
+            $newMetadata['canceled_at'] = gmdate(DATE_ATOM);
+            $newMetadata['canceled_by'] = $actor;
+            unset($newMetadata['queue_job_path'], $newMetadata['queue_spawned'], $newMetadata['queued_at']);
+
+            // Pull the previous variant fields we want to keep stable so the
+            // upsert doesn't null them out.
+            $previous = $this->data->query(
+                "SELECT title, subtitle, artifact_rel_path, artifact_source_revision,
+                        artifact_source_hash_sha256, glossary_version
+                   FROM dcc_document_locale_variant
+                  WHERE doc_code = :p1 AND locale = 'en' LIMIT 1",
+                [':p1' => $docCode]
+            );
+            $prev = (is_array($previous) && isset($previous[0])) ? $previous[0] : [];
+
+            $dcc->upsertLocaleVariant($docCode, 'en', [
+                'title' => (string)($prev['title'] ?? ''),
+                'subtitle' => $prev['subtitle'] ?? null,
+                'artifact_rel_path' => $prev['artifact_rel_path'] ?? null,
+                'artifact_source_revision' => $prev['artifact_source_revision'] ?? null,
+                'artifact_source_hash_sha256' => $prev['artifact_source_hash_sha256'] ?? null,
+                'translation_state' => 'blocked',
+                'translation_provider' => 'admin_canceled',
+                'glossary_version' => (string)($prev['glossary_version'] ?? ''),
+                'engine_version' => 'canceled_by_admin',
+                'published_at' => null,
+                'metadata' => $newMetadata,
+            ], $actor);
+        }
+
+        $this->success([
+            'doc_code'  => $docCode,
+            'was_queued' => $isQueued,
+            'canceled'  => $isQueued,
+            'killed'    => $killed,
+        ]);
     }
 }
