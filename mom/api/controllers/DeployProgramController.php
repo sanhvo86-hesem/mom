@@ -559,7 +559,11 @@ class DeployProgramController extends BaseController
     public function resetState(): never
     {
         $me = $this->requireAuth();
-        $this->requireAnyRole($me, ['admin', 'it_admin']);
+        // Reset is gated by a UI password (DEPLOY_RESET_PASSWORD) AND a role
+        // check. The portal "Hỏi QMS Manager nếu chưa biết mật khẩu reset"
+        // copy implies QMS Manager owns this action, and CEO/QMS roles also
+        // own the deploy program (per WI-106), so widen beyond pure admins.
+        $this->requireAnyRole($me, ['admin', 'it_admin', 'ceo', 'qms_manager']);
         $body = $this->jsonBody();
         $confirm = (string)($body['confirm'] ?? '');
         if ($confirm !== 'RESET_DEPLOY_STATE') $this->error('confirm_required', 400);
