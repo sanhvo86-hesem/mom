@@ -13,28 +13,28 @@
 const DEPLOY_CONFIG = {
   championTarget: 22, // 11 dept × 2 (primary + backup)
   phases: [
-    {id:'P0', label:'Phase 0', title:'Chuẩn bị và đồng bộ',  weeks:'W0–W1', color:'#64748b'},
-    {id:'P1', label:'Phase 1', title:'Đào tạo và readiness', weeks:'W2–W3', color:'#2563eb'},
-    {id:'P2', label:'Phase 2', title:'Pilot và xác nhận',     weeks:'W4–W5', color:'#d97706'},
-    {id:'P3', label:'Phase 3', title:'Go-live theo wave',     weeks:'W6–W9', color:'#16a34a'},
-    {id:'P4', label:'Phase 4', title:'Ổn định và bàn giao',   weeks:'W10–W12', color:'#7c3aed'},
+    {id:'P0', label:'Giai đoạn 0', title:'Chuẩn bị và đồng bộ',          weeks:'W0–W1',  color:'#64748b'},
+    {id:'P1', label:'Giai đoạn 1', title:'Đào tạo và mức sẵn sàng',      weeks:'W2–W3',  color:'#2563eb'},
+    {id:'P2', label:'Giai đoạn 2', title:'Thử nghiệm tiên phong và xác nhận', weeks:'W4–W5', color:'#d97706'},
+    {id:'P3', label:'Giai đoạn 3', title:'Vận hành chính thức theo đợt', weeks:'W6–W9',  color:'#16a34a'},
+    {id:'P4', label:'Giai đoạn 4', title:'Ổn định và bàn giao',          weeks:'W10–W12', color:'#7c3aed'},
   ],
   readinessDimensions: [
-    {id:'docReview', label:'Tài liệu',  help:'Playlist, handbook, QR, SOP/WI link'},
-    {id:'training',  label:'Đào tạo',   help:'Manager briefing, role training, OJT'},
-    {id:'m365',      label:'M365',      help:'Metadata, access, folder routing'},
-    {id:'champion',  label:'Champion',  help:'Champion và backup theo ca'},
-    {id:'pilot',     label:'Pilot',     help:'Dual-run, retrieval, drill, validation'},
-    {id:'golive',    label:'Go-Live',   help:'Go/No-Go, hypercare, handoff'},
+    {id:'docReview', label:'Tài liệu',  help:'Danh mục học, sổ tay, mã QR, liên kết SOP/WI'},
+    {id:'training',  label:'Đào tạo',   help:'Brief cho trưởng phòng, đào tạo theo vai trò, đào tạo tại chỗ'},
+    {id:'m365',      label:'M365',      help:'Siêu dữ liệu, phân quyền, định tuyến thư mục'},
+    {id:'champion',  label:'Người dẫn dắt', help:'Người dẫn dắt chính và dự phòng theo ca'},
+    {id:'pilot',     label:'Thử nghiệm', help:'Chạy song song, tra cứu, diễn tập, kiểm chứng'},
+    {id:'golive',    label:'Vận hành chính thức', help:'Quyết định Đi/Không đi, chăm sóc tăng cường, bàn giao'},
   ],
   pillars: [
-    {key:'gov',   title:'Governance & gate',    owner:'CEO / Steering',    pass:'Quyết định Go/No-Go đã khóa'},
-    {key:'doc',   title:'Tài liệu & playlist',  owner:'QMS Manager',       pass:'Người dùng biết mở tài liệu nào trước'},
-    {key:'m365',  title:'M365 & truy cập',      owner:'IT Manager',        pass:'Truy xuất đúng người, đúng quyền'},
-    {key:'train', title:'Đào tạo & Champion',   owner:'HR / Dept Manager', pass:'Người dùng tự thao tác được'},
-    {key:'pilot', title:'Pilot & xác nhận',     owner:'Production / QA',   pass:'Pilot không còn KPI đỏ'},
-    {key:'golive',title:'Go-live & hypercare',  owner:'Cutover Lead',      pass:'Wave go-live ổn định'},
-    {key:'dash',  title:'Dashboard & bằng chứng',owner:'QMS / Data Owner', pass:'Số dashboard đáng tin'},
+    {key:'gov',   title:'Điều hành và cổng quyết định', owner:'CEO / Tổ điều hành',  pass:'Quyết định Đi/Không đi đã chốt'},
+    {key:'doc',   title:'Tài liệu và danh mục học',     owner:'QMS Manager',         pass:'Người dùng biết mở tài liệu nào trước'},
+    {key:'m365',  title:'M365 và truy cập',             owner:'IT Manager',          pass:'Truy xuất đúng người, đúng quyền'},
+    {key:'train', title:'Đào tạo và người dẫn dắt',     owner:'HR / Trưởng phòng',   pass:'Người dùng tự thao tác được'},
+    {key:'pilot', title:'Thử nghiệm và xác nhận',       owner:'Sản xuất / Chất lượng', pass:'Thử nghiệm không còn KPI báo đỏ'},
+    {key:'golive',title:'Vận hành chính thức và chăm sóc tăng cường', owner:'Trưởng nhóm chuyển đổi', pass:'Đợt vận hành chính thức ổn định'},
+    {key:'dash',  title:'Dashboard và bằng chứng',      owner:'QMS / Chủ sở hữu dữ liệu', pass:'Số liệu dashboard đáng tin'},
   ],
   departments: [
     {id:'PROD', label:'Sản xuất',         wave:1, color:'#1e40af', owner:'Production Director',  handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html',           docs:[{code:'SOP-501',path:'../mom/docs/operations/sops/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html'},{code:'WI-519',path:'../mom/docs/operations/work-instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html'}], record:'DEP-PRO + Job Dossier'},
@@ -49,13 +49,13 @@ const DEPLOY_CONFIG = {
     {id:'ERP',  label:'Epicor / ERP',     wave:3, color:'#0f766e', owner:'ERP Owner',            handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-epicor-handbook.html',                docs:[{code:'ANNEX-115',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html'},{code:'ANNEX-118',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html'}], record:'Epicor SoR + interface logs'},
   ],
   docsByGroup: [
-    {title:'Điều phối tổng', subtitle:'Cho sponsor · ban điều phối · trưởng nhóm cutover', items:[
+    {title:'Điều phối tổng', subtitle:'Cho nhà tài trợ · ban điều phối · trưởng nhóm chuyển đổi', items:[
       {code:'WI-106',  title:'Kế hoạch triển khai tổng',  path:'../mom/docs/operations/work-instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html'},
-      {code:'ANNEX-114', title:'Sổ tay vận hành Go-live', path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html'},
+      {code:'ANNEX-114', title:'Sổ tay vận hành chính thức', path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html'},
       {code:'ANNEX-119', title:'Sổ đăng ký lộ trình thay đổi', path:'../mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html'},
-      {code:'ANNEX-117', title:'Ma trận leo thang & SLA', path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html'},
+      {code:'ANNEX-117', title:'Ma trận leo thang xử lý và cam kết thời gian xử lý', path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html'},
     ]},
-    {title:'Tiếp cận & đào tạo', subtitle:'Cho trưởng phòng · champion · người dùng cuối', items:[
+    {title:'Tiếp cận và đào tạo', subtitle:'Cho trưởng phòng · người dẫn dắt phòng · người dùng cuối', items:[
       {code:'WI-105', title:'Hướng dẫn tra cứu tài liệu',   path:'../mom/docs/operations/work-instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html'},
       {code:'WI-103', title:'Định tuyến thư mục M365',     path:'../mom/docs/operations/work-instructions/01-WI-100/wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html'},
       {code:'WI-104', title:'Thẻ tham chiếu nhanh theo vai trò', path:'../mom/docs/operations/work-instructions/01-WI-100/wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html'},
@@ -67,13 +67,13 @@ const DEPLOY_CONFIG = {
       {code:'POL-QMS-002', title:'Mục tiêu chất lượng', path:'../mom/docs/system/policies/pol-qms-002-quality-objectives.html'},
       {code:'RACI',        title:'Ma trận RACI chính',  path:'../mom/docs/system/organization/04-RACI-Authority/raci-master-matrix.html'},
     ]},
-    {title:'Dashboard & bằng chứng', subtitle:'Cho data owner · IT · governance', items:[
+    {title:'Dashboard và bằng chứng', subtitle:'Cho chủ sở hữu dữ liệu · IT · điều hành', items:[
       {code:'ANNEX-113', title:'Quản trị dashboard',     path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html'},
       {code:'ANNEX-110', title:'Từ điển KPI',            path:'../mom/docs/operations/references/01-ANNEX-100/annex-110-dashboard-kpi-dictionary-and-data-model.html'},
       {code:'WI-202',    title:'Họp điều hành theo tầng', path:'../mom/docs/operations/work-instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html'},
       {code:'WI-901',    title:'Dashboard hiệu suất',    path:'../mom/docs/operations/work-instructions/09-WI-900/wi-901-performance-dashboard.html'},
     ]},
-    {title:'Dự phòng & bằng chứng', subtitle:'Cho hypercare · audit · bàn giao', items:[
+    {title:'Dự phòng và bằng chứng', subtitle:'Cho chăm sóc tăng cường · kiểm toán · bàn giao', items:[
       {code:'ANNEX-118', title:'Bộ dự phòng offline',   path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html'},
       {code:'WI-203',    title:'Bộ bằng chứng hồ sơ',   path:'../mom/docs/operations/work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html'},
       {code:'WI-201',    title:'Cổng chất lượng',       path:'../mom/docs/operations/work-instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html'},
@@ -83,102 +83,102 @@ const DEPLOY_CONFIG = {
   kpis: [
     {id:'KPI-FLD-01', label:'Định tuyến đúng thư mục',   target:'>=95', unit:'%', short:'TM',
       basis:'ISO 9001:2015 §7.5.3 · AIIM Industry Watch 2023',
-      rationale:'Mục tiêu ≥95% cho phép tối đa 1/20 tài liệu sai folder routing — đủ thấp để search index của M365 vẫn tin cậy. Benchmark AIIM 2023: tổ chức mature đạt 90–97% folder compliance.',
-      method:'Audit 50 doc ngẫu nhiên/tuần do champion thực hiện, so sánh với ANNEX-135 file-plan. Tử số = số doc đúng folder, mẫu số = 50.',
-      escalation:'<90% → escalate gate P1-02 (champion bootcamp re-run). 90–94% → warning, training booster cho champion phòng có sai cao nhất.'},
+      rationale:'Mục tiêu ≥95% nghĩa là tối đa 1/20 tài liệu đặt sai thư mục — đủ thấp để chỉ mục tra cứu trên M365 còn đáng tin. Tham chiếu AIIM 2023: doanh nghiệp trưởng thành đạt 90–97% mức tuân thủ thư mục.',
+      method:'Mỗi tuần, người dẫn dắt phòng chọn ngẫu nhiên 50 tài liệu kiểm tra, đối chiếu với ANNEX-135 sơ đồ thư mục. Tử số = số tài liệu đặt đúng thư mục, mẫu số = 50.',
+      escalation:'<90% → leo thang về cổng kiểm P1-02 (mở lại khoá đào tạo người dẫn dắt). 90–94% → cảnh báo, bổ sung tăng cường đào tạo cho phòng có sai sót cao nhất.'},
 
     {id:'KPI-FLD-02', label:'Thời gian tra cứu',          target:'<=180', unit:'s', short:'TC',
       basis:'ISO 9001:2015 §7.5.3 · McKinsey "Social Economy" 2012',
-      rationale:'Mục tiêu ≤180 giây (3 phút) bảo đảm "tài liệu available where & when needed". McKinsey: nhân viên tri thức dành 1.8h/ngày tra cứu — duy trì ≤3min/doc giữ tổng retrieval dưới 30 phút/ngày khi 10 lượt.',
-      method:'Drill ANNEX-114 weekly: champion bốc 5 doc ngẫu nhiên, đo thời gian từ "user nhận yêu cầu" → "mở đúng tài liệu". Lấy median 5 lượt.',
-      escalation:'>240s → escalate (M365 search index hỏng hoặc folder routing sai). 180–240s → drill bổ sung tuần kế.'},
+      rationale:'Mục tiêu ≤180 giây (3 phút) bảo đảm yêu cầu của ISO: tài liệu có sẵn đúng nơi và đúng lúc. McKinsey: nhân viên tri thức mất 1,8 giờ/ngày để tìm tài liệu — giữ ≤3 phút/lần tra cứu thì tổng thời gian tra cứu trong ngày dưới 30 phút khi có 10 lượt.',
+      method:'Diễn tập hàng tuần theo ANNEX-114: người dẫn dắt bốc ngẫu nhiên 5 tài liệu, đo thời gian từ lúc nhận yêu cầu đến khi mở đúng tài liệu. Lấy trung vị của 5 lượt.',
+      escalation:'>240 giây → leo thang (chỉ mục tra cứu M365 hỏng hoặc đặt sai thư mục). 180–240 giây → bổ sung diễn tập trong tuần kế tiếp.'},
 
     {id:'KPI-TRN-01', label:'Hoàn thành đào tạo',         target:'>=90', unit:'%', short:'ĐT',
       basis:'ISO 9001:2015 §7.2 · Prosci ADKAR ROI 2023',
-      rationale:'Mục tiêu ≥90% (không phải 100%) cho phép short-tail absence (nghỉ phép, ốm, mới vào). Prosci ROI 2023: change initiative với training completion <80% bị giảm 50% adoption rate.',
-      method:'SOP-801 training matrix sign-off: ký xác nhận "đã hoàn tất OJT" / tổng số người trong wave hiện tại. Tính theo wave, không theo headcount tổng.',
-      escalation:'<80% → chặn gate go-live wave kế. 80–89% → champion phải report kế hoạch catch-up trong 7 ngày.'},
+      rationale:'Mục tiêu ≥90% (không phải 100%) chấp nhận vắng mặt rải rác (nghỉ phép, ốm, người mới vào). Prosci ROI 2023: sáng kiến thay đổi có tỉ lệ hoàn thành đào tạo <80% bị mất một nửa mức áp dụng.',
+      method:'Ma trận đào tạo SOP-801 ký xác nhận đã hoàn tất đào tạo tại chỗ chia cho tổng số người trong đợt hiện tại. Tính theo đợt, không tính trên tổng nhân sự công ty.',
+      escalation:'<80% → chặn cổng kiểm vận hành đợt kế tiếp. 80–89% → người dẫn dắt phải báo cáo kế hoạch đuổi kịp trong 7 ngày.'},
 
-    {id:'KPI-DEP-01', label:'Phủ champion (primary+backup)', target:'>=100',unit:'%', short:'CH',
+    {id:'KPI-DEP-01', label:'Phủ người dẫn dắt (chính + dự phòng)', target:'>=100',unit:'%', short:'CH',
       basis:'Prosci CMROI 2023 · WI-105 §4.2',
-      rationale:'Mục tiêu 100% (primary + backup mỗi phòng) đảm bảo business continuity khi primary nghỉ. Prosci CMROI 2023: dự án có change agent named có adoption rate cao hơn 6×. Backup không bắt buộc OJT nhưng phải biết escalation path.',
-      method:'Tử số = số phòng có CẢ primary + backup nominated và đã sign-off. Mẫu số = 11 phòng. 100% nghĩa là 22/22 slot (11×2).',
-      escalation:'<100% → gate P0-02 chặn. Phòng nào thiếu backup phải nominate trong 3 ngày làm việc.'},
+      rationale:'Mục tiêu 100% (mỗi phòng có 1 chính + 1 dự phòng) đảm bảo vận hành liên tục khi người chính nghỉ. Prosci CMROI 2023: dự án có người dẫn dắt thay đổi được chỉ định rõ tên đạt mức áp dụng cao hơn 6 lần. Người dự phòng không bắt buộc đào tạo tại chỗ đầy đủ nhưng phải nắm đường leo thang xử lý.',
+      method:'Tử số = số phòng có cả người chính và người dự phòng được đề cử và đã ký xác nhận. Mẫu số = 11 phòng. 100% nghĩa là đủ 22/22 vị trí (11 × 2).',
+      escalation:'<100% → cổng kiểm P0-02 chặn. Phòng nào còn thiếu người dự phòng phải đề cử trong 3 ngày làm việc.'},
 
-    {id:'KPI-DEP-02', label:'Đóng issue đúng hạn',        target:'>=95', unit:'%', short:'ĐI',
+    {id:'KPI-DEP-02', label:'Đóng phiếu việc đúng hạn',   target:'>=95', unit:'%', short:'ĐI',
       basis:'ITIL 4 Incident Management · Gartner ITSM 2023',
-      rationale:'Mục tiêu ≥95% issue closed trong SLA. ITIL benchmark top-quartile ≥95%. Dưới mức này, backlog dồn lại và confidence của user erode (Gartner ITSM 2023).',
-      method:'SLA matrix theo ANNEX-117: Sev-1 24h, Sev-2 3 ngày, Sev-3 1 tuần. Tử số = issue đóng trong SLA tuần này, mẫu số = tổng issue đóng tuần này.',
-      escalation:'<85% → escalate Steering Committee. 85–94% → tăng tần suất daily standup từ tuần này.'},
+      rationale:'Mục tiêu ≥95% phiếu việc được đóng trong cam kết thời gian xử lý (SLA). Tham chiếu ITIL: nhóm tốp 25% đạt ≥95%. Dưới mức này, tồn đọng dồn lại và niềm tin của người dùng bị bào mòn (Gartner ITSM 2023).',
+      method:'Ma trận cam kết thời gian xử lý theo ANNEX-117: Mức 1 trong 24 giờ, Mức 2 trong 3 ngày, Mức 3 trong 1 tuần. Tử số = số phiếu việc đóng đúng SLA trong tuần này, mẫu số = tổng số phiếu đã đóng trong tuần.',
+      escalation:'<85% → leo thang lên Tổ điều hành. 85–94% → tăng tần suất họp nhanh đầu ngày từ tuần này.'},
 
     {id:'KPI-DEP-03', label:'Tỉ lệ thay đổi thất bại',    target:'<=10', unit:'%', short:'TB',
-      basis:'DORA "State of DevOps" 2024 · ITIL 4 Change',
-      rationale:'Mục tiêu ≤10% theo DORA 2024: Elite 0–15%, High 16–30%. 10% phù hợp mid-maturity — cho phép thí nghiệm mà không erode trust. Đo cả change tài liệu (SOP/WI) chứ không chỉ software.',
-      method:'Tử số = số change cần rollback hoặc patch khẩn cấp trong 7 ngày kể từ effective. Mẫu số = tổng change đã release tuần đó. Source: dcc_document_revision.',
-      escalation:'>15% → freeze tất cả change non-critical, root-cause review trong 5 ngày.'},
+      basis:'DORA "State of DevOps" 2024 · ITIL 4 Change Enablement',
+      rationale:'Mục tiêu ≤10% theo DORA 2024: nhóm dẫn đầu 0–15%, nhóm khá 16–30%. 10% phù hợp với mức trưởng thành trung bình — cho phép thử nghiệm mà không bào mòn niềm tin. Đo cả thay đổi tài liệu (SOP/WI), không chỉ phần mềm.',
+      method:'Tử số = số thay đổi phải khôi phục hoặc vá khẩn cấp trong vòng 7 ngày kể từ ngày hiệu lực. Mẫu số = tổng số thay đổi đã phát hành trong tuần đó. Nguồn: dcc_document_revision.',
+      escalation:'>15% → tạm đóng băng mọi thay đổi không trọng yếu, soát xét nguyên nhân gốc trong 5 ngày.'},
 
-    {id:'KPI-DEP-04', label:'Lead time thay đổi (ngày)',  target:'<=10', unit:'d', short:'LT',
+    {id:'KPI-DEP-04', label:'Thời gian phát hành (ngày)', target:'<=10', unit:'d', short:'LT',
       basis:'DORA "State of DevOps" 2024',
-      rationale:'Mục tiêu ≤10 ngày từ request → effective. DORA 2024: Elite <1 ngày, High 1d–1w, Medium 1w–1m. 10 ngày = top-of-Medium, đạt được cho SOP/WI revision (không phải software).',
-      method:'Tử số = SUM(approved_at - submitted_at) của change đã release trong tuần. Mẫu số = số change. Lấy median (không trung bình) để tránh outlier.',
-      escalation:'>15d → review approval bottleneck (thường là ký phê duyệt). Cân nhắc delegation rule theo ANNEX-120.'},
+      rationale:'Mục tiêu ≤10 ngày từ khi đề xuất đến khi tài liệu có hiệu lực. DORA 2024: nhóm dẫn đầu <1 ngày, nhóm khá 1 ngày–1 tuần, nhóm trung bình 1 tuần–1 tháng. 10 ngày là đỉnh nhóm trung bình, đạt được với việc sửa đổi SOP/WI (không phải phần mềm).',
+      method:'Tử số = tổng (ngày phê duyệt − ngày trình) của các thay đổi đã phát hành trong tuần. Mẫu số = số lượng thay đổi. Lấy trung vị (không lấy bình quân) để tránh giá trị ngoại lai.',
+      escalation:'>15 ngày → soát xét nút thắt phê duyệt (thường là khâu ký). Cân nhắc luật uỷ quyền theo ANNEX-120.'},
 
-    {id:'KPI-DEP-05', label:'Refresh dashboard đúng hạn', target:'>=95', unit:'%', short:'RF',
+    {id:'KPI-DEP-05', label:'Cập nhật dashboard đúng hạn', target:'>=95', unit:'%', short:'RF',
       basis:'Gartner Data & Analytics 2023 · ANNEX-110',
-      rationale:'Mục tiêu ≥95% widget refresh trên schedule. Gartner: dashboard refresh trễ <95% mất trust của decision maker trong 4 tuần. Tier meeting cadence không vận hành được nếu KPI nguồn không up-to-date.',
-      method:'Tử số = widget có data_collected_at trong deadline (theo cadence của widget: daily/weekly/monthly). Mẫu số = tổng widget active. Weekly snapshot.',
-      escalation:'<90% → owner widget có 3 ngày fix nguồn dữ liệu. <80% → dashboard tạm gỡ widget đỏ để tránh decision sai.'},
+      rationale:'Mục tiêu ≥95% số ô dữ liệu được cập nhật đúng lịch. Gartner: dashboard cập nhật trễ dưới mức 95% sẽ mất niềm tin của người ra quyết định trong vòng 4 tuần. Nhịp họp tầng không thể vận hành nếu KPI nguồn không kịp thời.',
+      method:'Tử số = số ô có data_collected_at trong hạn (theo nhịp của ô: ngày/tuần/tháng). Mẫu số = tổng số ô đang hoạt động. Chốt số liệu theo tuần.',
+      escalation:'<90% → người phụ trách ô có 3 ngày để khắc phục nguồn dữ liệu. <80% → tạm gỡ ô dữ liệu báo đỏ khỏi dashboard để tránh quyết định sai.'},
 
-    {id:'KPI-DEP-06', label:'Tần suất phát hành (change/tuần)', target:'>=3', unit:'', short:'TS',
-      basis:'DORA "State of DevOps" 2024 (Deployment Frequency)',
-      rationale:'DORA Four Keys metric thứ 4 (chuẩn quốc tế cho change management). Elite ≥1/ngày, High 1/tuần–1/tháng. Mục tiêu ≥3 change/tuần đảm bảo organization đang thực sự áp dụng improvement loop, không đóng băng tài liệu. Nếu = 0 trong 2 tuần liên tiếp → cảnh báo: change pipeline tắc, hoặc Doc Review SLA bị bỏ qua.',
-      method:'Đếm số revision approved trong dcc_document_revision có approved_at trong tuần hiện tại. Tính cả major + minor + patch.',
-      escalation:'<1 trong 2 tuần liên tiếp → review CAB throughput. Có thể là approval bottleneck hoặc Doc Review backlog quá lớn.'},
+    {id:'KPI-DEP-06', label:'Tần suất phát hành (thay đổi/tuần)', target:'>=3', unit:'', short:'TS',
+      basis:'DORA "State of DevOps" 2024 (Tần suất phát hành)',
+      rationale:'Đây là chỉ số thứ 4 trong bộ Four Keys của DORA (chuẩn quốc tế cho quản trị thay đổi). Nhóm dẫn đầu ≥1 lần/ngày, nhóm khá 1 lần/tuần đến 1 lần/tháng. Mục tiêu ≥3 thay đổi/tuần bảo đảm doanh nghiệp thực sự đang vận hành vòng cải tiến, không đóng băng tài liệu. Nếu = 0 trong 2 tuần liên tiếp → cảnh báo: luồng thay đổi đang tắc, hoặc cam kết thời gian soát tài liệu bị bỏ qua.',
+      method:'Đếm số bản sửa đổi đã phê duyệt trong dcc_document_revision có ngày phê duyệt nằm trong tuần hiện tại. Tính cả bản lớn, bản nhỏ và bản vá.',
+      escalation:'<1 trong 2 tuần liên tiếp → soát thông lượng của hội đồng phê duyệt thay đổi (CAB). Có thể là nút thắt phê duyệt hoặc khối lượng tồn đọng soát tài liệu quá lớn.'},
 
-    {id:'KPI-DEP-07', label:'MTTR Sev-1 (giờ)',          target:'<=24', unit:'h', short:'MR',
-      basis:'DORA "State of DevOps" 2024 (Mean Time To Restore) · ITIL 4',
-      rationale:'DORA Four Keys metric thứ 3 (chuẩn quốc tế). Elite <1h, High <1d, Medium 1d–1w. Mục tiêu ≤24h cho doc/process: thời gian từ Sev-1 (sai tài liệu effective, người vận hành đang dùng sai) → đến rollback hoặc patch đã release. Nếu >24h, người dùng đã sản xuất ra ≥1 ca làm việc với tài liệu sai.',
-      method:'Median(closed_at - sev1_reported_at) cho các Sev-1 issue trong 4 tuần gần nhất. Nếu chưa có Sev-1 nào: ghi "—" (không phải 0).',
-      escalation:'>48h → mandatory post-incident review trong 5 ngày. >72h → escalate Steering Committee và xem xét lại danh sách "owner trực" của tài liệu critical.'},
+    {id:'KPI-DEP-07', label:'Thời gian phục hồi sự cố Mức 1 (giờ)', target:'<=24', unit:'h', short:'MR',
+      basis:'DORA "State of DevOps" 2024 (Thời gian phục hồi trung bình) · ITIL 4',
+      rationale:'Đây là chỉ số thứ 3 trong bộ Four Keys của DORA. Nhóm dẫn đầu <1 giờ, nhóm khá <1 ngày, nhóm trung bình 1 ngày–1 tuần. Mục tiêu ≤24 giờ cho tài liệu/quy trình: thời gian từ khi phát hiện sự cố Mức 1 (tài liệu sai đã hiệu lực, người vận hành đang dùng sai) đến khi khôi phục hoặc bản vá đã phát hành. Nếu >24 giờ, người dùng đã sản xuất ≥1 ca làm việc dựa trên tài liệu sai.',
+      method:'Trung vị (closed_at − sev1_reported_at) của các phiếu việc Mức 1 trong 4 tuần gần nhất. Nếu chưa có sự cố Mức 1 nào: ghi "—" (không ghi 0).',
+      escalation:'>48 giờ → bắt buộc tổ chức soát xét sau sự cố trong 5 ngày. >72 giờ → leo thang lên Tổ điều hành và xem lại danh sách "người trực vận hành" cho các tài liệu trọng yếu.'},
   ],
   phaseChecklists: {
     P0:[
-      {code:'P0-01', text:'Handbook, SOP, WI, FRM, ANNEX và QR đã đồng bộ'},
-      {code:'P0-02', text:'Champion và backup theo ca đã được chỉ định'},
-      {code:'P0-03', text:'M365 metadata, permission, folder routing đã test'},
-      {code:'P0-04', text:'Dashboard shell đã có owner, source, quick links'},
-      {code:'P0-05', text:'Issue register và cadence điều hành đã sẵn sàng'},
+      {code:'P0-01', text:'Sổ tay, SOP, WI, biểu mẫu, ANNEX và mã QR đã đồng bộ'},
+      {code:'P0-02', text:'Người dẫn dắt phòng và người dự phòng theo ca đã được chỉ định'},
+      {code:'P0-03', text:'Siêu dữ liệu, phân quyền và định tuyến thư mục M365 đã được kiểm thử'},
+      {code:'P0-04', text:'Khung dashboard đã có chủ sở hữu, nguồn dữ liệu và đường dẫn nhanh'},
+      {code:'P0-05', text:'Sổ ghi vấn đề và nhịp điều hành đã sẵn sàng'},
     ],
     P1:[
-      {code:'P1-01', text:'Manager briefing đã hoàn thành'},
-      {code:'P1-02', text:'Champion bootcamp đã pass'},
-      {code:'P1-03', text:'Người dùng trong wave đã pass OJT'},
-      {code:'P1-04', text:'Baseline KPI và dashboard readiness đã được nạp'},
+      {code:'P1-01', text:'Buổi brief cho trưởng phòng đã hoàn thành'},
+      {code:'P1-02', text:'Khoá huấn luyện ngắn cho người dẫn dắt phòng đã đạt'},
+      {code:'P1-03', text:'Người dùng trong đợt đã hoàn tất đào tạo tại chỗ (OJT)'},
+      {code:'P1-04', text:'Số liệu nền KPI và mức sẵn sàng của dashboard đã được nạp'},
     ],
     P2:[
-      {code:'P2-01', text:'Dual-run và single-run đã xác nhận trên pilot'},
-      {code:'P2-02', text:'Retrieval, traceback và wrong-revision drill đã pass'},
-      {code:'P2-03', text:'Issue pilot đã đóng hoặc có action plan'},
-      {code:'P2-04', text:'Phòng ban core vận hành độc lập được'},
+      {code:'P2-01', text:'Đã xác nhận chạy song song và chạy độc lập trên đợt thử nghiệm'},
+      {code:'P2-02', text:'Diễn tập tra cứu, truy ngược và mở nhầm bản tài liệu đã đạt'},
+      {code:'P2-03', text:'Vấn đề trong đợt thử nghiệm đã đóng hoặc có kế hoạch hành động'},
+      {code:'P2-04', text:'Phòng ban cốt lõi vận hành độc lập được'},
     ],
     P3:[
-      {code:'P3-01', text:'Wave hiện tại có command center và support rota'},
-      {code:'P3-02', text:'Go-live sign-off, fallback và rollback trigger đã khóa'},
-      {code:'P3-03', text:'KPI đỏ = 0 hoặc có exception note'},
+      {code:'P3-01', text:'Đợt hiện tại đã có trung tâm điều hành và ca trực hỗ trợ'},
+      {code:'P3-02', text:'Đã chốt biên bản ký vận hành chính thức, phương án dự phòng và điều kiện khôi phục'},
+      {code:'P3-03', text:'KPI báo đỏ = 0 hoặc có ghi chú ngoại lệ'},
       {code:'P3-04', text:'Người dùng mở đúng tài liệu và lưu đúng hồ sơ'},
     ],
     P4:[
-      {code:'P4-01', text:'Hypercare Sev-1 = 0 và Sev-2 có workaround ổn định'},
-      {code:'P4-02', text:'Dashboard governance, access review và refresh SLA đã khóa'},
-      {code:'P4-03', text:'Tài liệu, QR và playlist đã cập nhật theo bài học thật'},
-      {code:'P4-04', text:'Owner vận hành thường xuyên đã nhận handoff'},
+      {code:'P4-01', text:'Trong giai đoạn chăm sóc tăng cường: sự cố Mức 1 = 0 và sự cố Mức 2 đã có phương án xử lý tạm ổn định'},
+      {code:'P4-02', text:'Quản trị dashboard, soát xét truy cập và cam kết cập nhật dữ liệu đã được chốt'},
+      {code:'P4-03', text:'Tài liệu, mã QR và danh mục học đã được cập nhật theo bài học thực tế'},
+      {code:'P4-04', text:'Chủ sở hữu vận hành thường xuyên đã nhận bàn giao'},
     ],
   },
   commandCadence: [
-    {title:'Họp Thứ Bảy 9:00',     owner:'CEO + QMS Manager',   cadence:'Tuần',    purpose:'Gate review, KPI, decision log · ngoại lệ: W0 (14/5) họp Thứ Năm tổ điều hành'},
-    {title:'Daily command center',  owner:'Cutover Lead',        cadence:'Ngày (pilot/hypercare)', purpose:'Severity board, issue age'},
-    {title:'Document & data review',owner:'QMS / IT',            cadence:'Tuần',    purpose:'Link, QR, refresh, owner'},
-    {title:'Management Review (ISO 9.3)', owner:'CEO + dept heads', cadence:'Quý', purpose:'Mgmt review packet, action items'},
+    {title:'Họp Thứ Bảy 9:00',           owner:'CEO + QMS Manager',  cadence:'Tuần',  purpose:'Soát xét cổng kiểm, KPI, sổ ghi quyết định · ngoại lệ: W0 (14/5) Tổ điều hành họp Thứ Năm'},
+    {title:'Trung tâm điều hành theo ngày', owner:'Trưởng nhóm chuyển đổi', cadence:'Ngày (thử nghiệm/chăm sóc tăng cường)', purpose:'Bảng phân loại mức độ sự cố, độ tồn đọng phiếu việc'},
+    {title:'Soát xét tài liệu và dữ liệu', owner:'QMS / IT',           cadence:'Tuần',  purpose:'Đường dẫn, mã QR, cập nhật, chủ sở hữu'},
+    {title:'Soát xét lãnh đạo (ISO 9.3)', owner:'CEO + Trưởng phòng', cadence:'Quý',   purpose:'Bộ hồ sơ soát xét lãnh đạo, danh mục việc phải làm'},
   ],
 };
 
@@ -325,7 +325,7 @@ async function deployHydratePlaybook(code, target){
   host.innerHTML = `<div class="dwp-brief-loading">⏳ Đang tải nội dung họp chi tiết từ ${deployEscape(code)}…</div>`;
   const data = await deployFetchPlaybook(code);
   if (!data){
-    host.innerHTML = `<div class="dwp-brief-empty">⚠ Không tải được playbook ${deployEscape(code)}. <a href="javascript:void(0)" onclick="if(window.openDoc)openDoc('${deployEscape(code)}');return false;">Mở trực tiếp</a></div>`;
+    host.innerHTML = `<div class="dwp-brief-empty">⚠ Không tải được cẩm nang ${deployEscape(code)}. <a href="javascript:void(0)" onclick="if(window.openDoc)openDoc('${deployEscape(code)}');return false;">Mở trực tiếp</a></div>`;
     return;
   }
   host.innerHTML = deployRenderBrief(code, data, false);
@@ -334,25 +334,25 @@ async function deployHydratePlaybook(code, target){
 function deployRenderBrief(code, data, fullscreen){
   const sections = fullscreen
     ? [
-        ['cover','📌 Tổng quan'],
+        ['cover','📌 Tổng quan buổi họp'],
         ['objective','🎯 Mục tiêu tuần'],
-        ['prep','📋 Prep checklist (T-7 → T-0)'],
-        ['agenda','📅 Agenda 60 phút'],
-        ['slides','🎞 Nội dung họp · slide-by-slide'],
-        ['decisions','✍️ Quyết định cần lấy'],
-        ['gate','🚦 Gate Go/No-Go · CẦN + ĐỦ'],
+        ['prep','📋 Chuẩn bị trước họp (T-7 → T-0)'],
+        ['agenda','📅 Chương trình họp 60 phút'],
+        ['slides','🎞 Nội dung họp · trình bày từng mục'],
+        ['decisions','✍️ Quyết định cần chốt'],
+        ['gate','🚦 Cổng quyết định Đi / Không đi · CẦN + ĐỦ'],
         ['tasks','📤 Nhiệm vụ sau họp (RACI)'],
-        ['nextWeek','▶ Preview tuần sau'],
+        ['nextWeek','▶ Định hướng tuần sau'],
         ['docs','📎 Tài liệu liên quan'],
-        ['risks','⚠ Rủi ro + escalation'],
-        ['lessons','💡 Lessons learned'],
+        ['risks','⚠ Rủi ro và đường leo thang xử lý'],
+        ['lessons','💡 Bài học rút ra'],
       ]
     : [
-        ['agenda','📅 Agenda 60 phút'],
-        ['decisions','✍️ Quyết định cần lấy'],
-        ['gate','🚦 Gate Go/No-Go · CẦN + ĐỦ'],
+        ['agenda','📅 Chương trình họp 60 phút'],
+        ['decisions','✍️ Quyết định cần chốt'],
+        ['gate','🚦 Cổng quyết định Đi / Không đi · CẦN + ĐỦ'],
         ['tasks','📤 Nhiệm vụ sau họp (RACI)'],
-        ['risks','⚠ Rủi ro + escalation'],
+        ['risks','⚠ Rủi ro và đường leo thang xử lý'],
       ];
   const blocks = sections.map(([key, title]) => {
     const html = data[key];
@@ -365,9 +365,9 @@ function deployRenderBrief(code, data, fullscreen){
   }).join('');
   const head = `
     <div class="dwp-brief-head">
-      <strong>📖 Playbook ${deployEscape(code)}</strong>
-      <span>Trích từ tài liệu chính thức · ${fullscreen ? 'toàn bộ 12 section' : '5 section trọng yếu'} ·
-        <a href="javascript:void(0)" onclick="if(window.openDoc)openDoc('${deployEscape(code)}');return false;">Mở doc đầy đủ ↗</a>
+      <strong>📖 Cẩm nang ${deployEscape(code)}</strong>
+      <span>Trích từ tài liệu chính thức · ${fullscreen ? 'toàn bộ 12 mục' : '5 mục trọng yếu'} ·
+        <a href="javascript:void(0)" onclick="if(window.openDoc)openDoc('${deployEscape(code)}');return false;">Mở tài liệu đầy đủ ↗</a>
       </span>
     </div>`;
   return head + blocks;
@@ -679,7 +679,7 @@ function renderTimelineWeek(w, currentWeek){
     ? `<span class="tlw-day-override" title="Ngoại lệ cadence: tuần này họp ${deployEscape(w.dayOverride)}">${deployEscape(w.dayOverride)}</span>`
     : '';
   const attendeesBadge = w.attendees && w.attendees.length
-    ? `<span class="tlw-attendees" title="${deployEscape((w.attendeesNote || ''))}">${w.attendees[0] === 'all_departments' ? '👥 ALL DEPT' : '🔒 ' + w.attendees.length + ' người'}</span>`
+    ? `<span class="tlw-attendees" title="${deployEscape((w.attendeesNote || ''))}">${w.attendees[0] === 'all_departments' ? '👥 ĐẠI DIỆN PHÒNG BAN' : '🔒 ' + w.attendees.length + ' đại biểu'}</span>`
     : '';
   return `
   <button class="tl-week ${statusClass}" onclick="deployOpenWeek(${w.n|0})" style="--phase-color:${phase.color}">
@@ -1272,15 +1272,15 @@ function renderWeekPanel(){
             <div class="dwp-playbook-link">
               <button type="button" class="dwp-playbook-btn"
                 onclick="if(window.openDoc) openDoc('${deployEscape(w.playbookCode)}'); else alert('Trang tài liệu chưa sẵn sàng');"
-                title="Mở tài liệu Playbook chi tiết cho W${wn}">
-                📖 Mở Playbook W${wn} · ${deployEscape(w.playbookCode)}
+                title="Mở cẩm nang triển khai chi tiết cho tuần W${wn}">
+                📖 Mở cẩm nang W${wn} · ${deployEscape(w.playbookCode)}
               </button>
               <button type="button" class="dwp-fullscreen-btn"
                 onclick="deployToggleWeekFullscreen()"
                 title="Hiển thị biên bản họp toàn màn hình">
                 ⛶ Toàn màn hình
               </button>
-              <small>Tài liệu chi tiết: nội dung họp · phân công · gate Go/No-Go · preview tuần kế tiếp</small>
+              <small>Tài liệu chi tiết: nội dung họp · phân công · cổng quyết định Đi / Không đi · định hướng tuần kế tiếp</small>
             </div>` : ''}
         </div>
         <button class="dwp-close" onclick="deployCloseWeek()" aria-label="Đóng">×</button>
@@ -1288,7 +1288,7 @@ function renderWeekPanel(){
 
       ${w.playbookCode ? `
         <section class="dwp-section dwp-meeting-brief-section">
-          <h3>📋 Nội dung họp chi tiết · trích từ playbook</h3>
+          <h3>📋 Nội dung họp chi tiết · trích từ cẩm nang</h3>
           <div id="dwp-meeting-brief" data-playbook-code="${deployEscape(w.playbookCode)}">
             <div class="dwp-brief-loading">⏳ Đang tải nội dung họp chi tiết từ ${deployEscape(w.playbookCode)}…</div>
           </div>
@@ -1296,10 +1296,10 @@ function renderWeekPanel(){
 
       ${(w.attendees && w.attendees.length) ? `
         <section class="dwp-section dwp-attendees-section">
-          <h3>Người tham dự</h3>
+          <h3>Thành phần dự họp</h3>
           <div class="dwp-attendees-chips">
             ${w.attendees[0] === 'all_departments'
-              ? '<span class="dwp-attendee-chip chip-all">👥 Tất cả 10 phòng ban + Steering</span>'
+              ? '<span class="dwp-attendee-chip chip-all">👥 Đại diện 10 phòng ban + Tổ điều hành</span>'
               : w.attendees.map(a => `<span class="dwp-attendee-chip chip-restricted">🔒 ${deployEscape(a)}</span>`).join('')}
           </div>
           ${w.attendeesNote ? `<p class="dwp-attendees-note">${deployEscape(w.attendeesNote)}</p>` : ''}
