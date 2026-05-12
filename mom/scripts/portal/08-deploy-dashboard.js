@@ -1924,7 +1924,35 @@ function deployResetState(){
     onSubmit: async (values) => {
       const pwd = (values.password || '').trim();
       if (pwd !== DEPLOY_RESET_PASSWORD) {
-        alert('Mật khẩu sai. Hủy reset.');
+        // Re-open the dialog with a visible warning instead of blocking
+        // alert(). Native alert() pauses the renderer, which is bad UX
+        // and also freezes Chrome MCP / Selenium-driven testing.
+        deployOpenFormDialog({
+          title: 'Reset state triển khai',
+          kicker: '❌ Mật khẩu sai · thử lại',
+          accentColor: '#dc2626',
+          submitLabel: '🗑 Xác nhận reset',
+          hint: 'Nhập đúng mật khẩu reset (hỏi QMS Manager).',
+          fields: [
+            {
+              type: 'static',
+              label: 'Lỗi',
+              value: 'Mật khẩu không khớp. Đã hủy reset, dữ liệu vẫn nguyên vẹn.',
+            },
+            {
+              type: 'password',
+              key: 'password',
+              label: 'Mật khẩu xác nhận',
+              required: true,
+              maxLength: 12,
+              placeholder: '••••••',
+            },
+          ],
+          onSubmit: async (v2) => {
+            if ((v2.password || '').trim() !== DEPLOY_RESET_PASSWORD) return;
+            await deployResetStateConfirmed();
+          },
+        });
         return;
       }
       await deployResetStateConfirmed();
