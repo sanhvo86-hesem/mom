@@ -197,8 +197,17 @@ restore_runtime_mutations() {
             # fresh checkout where the subdir was never created.
             live_dir="$(dirname "$live")"
             mkdir -p "$live_dir"
+            # Subdir needs to be group-writable so PHP-FPM (www-data) can
+            # create new files alongside preserved ones. Set every pass —
+            # idempotent and corrects perms if a previous deploy left 755.
+            chmod 775 "$live_dir" 2>/dev/null || true
             cp -p "$preserved" "$live" \
                 || die "FATAL: cannot restore $name to $live — runtime data may be lost. Snapshot at $PRESERVED_RUNTIME_DIR is preserved (do NOT clean it up)."
+            # Restored file must remain group-writable. cp -p preserves the
+            # source perms, but if the captured file ever had 644 (e.g. via
+            # bootstrap-from-seed on a previous deploy), we'd carry that
+            # forever and PHP-FPM saves would fail with "Permission denied".
+            chmod 664 "$live" 2>/dev/null || true
             # Verify byte-for-byte that the restore took. A silent cp success
             # with a wrong destination (e.g. selinux relabel) would otherwise
             # leave VPS state corrupted with no signal.
@@ -461,8 +470,13 @@ for name in "${RUNTIME_CONFIG_FILES[@]}"; do
     seed="$SITE_DIR/mom/data/config/${name%.json}.bootstrap.json"
     if [ ! -f "$live" ] && [ -f "$seed" ]; then
         # Ensure subdir exists for nested names like "deploy/program.json"
-        mkdir -p "$(dirname "$live")"
+        live_dir="$(dirname "$live")"
+        mkdir -p "$live_dir"
+        chmod 775 "$live_dir" 2>/dev/null || true
         cp -p "$seed" "$live" || die "Cannot bootstrap $name from $seed"
+        # Seeds are 644 in git; widen to 664 so www-data can mutate the
+        # runtime file once the app starts writing to it.
+        chmod 664 "$live" 2>/dev/null || true
         seeded_count=$((seeded_count + 1))
         log "INFO" "  bootstrapped $name from .bootstrap.json"
     fi
