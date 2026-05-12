@@ -44,6 +44,7 @@ class DeployProgramController extends BaseController
                 'clauses'   => $this->loadFile(self::FILE_CLAUSES),
                 'audits'    => $this->loadFile(self::FILE_AUDITS),
                 'reviews'   => $this->loadFile(self::FILE_REVIEWS),
+                'users'     => $this->loadUserDirectory(),
                 'me'        => [
                     'username' => (string)($me['username'] ?? ''),
                     'name'     => (string)($me['name'] ?? ''),
@@ -577,13 +578,54 @@ class DeployProgramController extends BaseController
         $this->success(['data' => ['reset' => true]]);
     }
 
+    public function listUsers(): never
+    {
+        $this->requireAuth();
+        $this->success(['data' => $this->loadUserDirectory()]);
+    }
+
+    private function loadUserDirectory(): array
+    {
+        $store = $this->store;
+        if (!is_array($store) || !isset($store['users']) || !is_array($store['users'])) {
+            return [];
+        }
+        $out = [];
+        foreach ($store['users'] as $u) {
+            if (!is_array($u)) continue;
+            if (!($u['active'] ?? false)) continue;
+            $out[] = [
+                'username'  => (string)($u['username'] ?? ''),
+                'name'      => (string)($u['name'] ?? ''),
+                'role'      => (string)($u['role'] ?? ''),
+                'title'     => (string)($u['title'] ?? ''),
+                'dept'      => (string)($u['dept'] ?? ''),
+                'phone'     => (string)($u['phone'] ?? ''),
+                'email'     => (string)($u['personal_email'] ?? ''),
+                'jd_code'   => (string)($u['jd_code'] ?? ''),
+                'jd_title'  => (string)($u['jd_title'] ?? ''),
+                'employee_id' => (string)($u['employee_id'] ?? ''),
+            ];
+        }
+        usort($out, static fn($a, $b) => strcasecmp($a['name'], $b['name']));
+        return $out;
+    }
+
     // ── Helpers ─────────────────────────────────────────────────────────────
 
     private function loadFile(string $rel): array
     {
-        $path = $this->dataDir . '/config/' . $rel;
+        $base = $this->dataDir . '/config/';
+        $path = $base . $rel;
         $data = $this->readJsonFile($path);
-        return is_array($data) ? $data : [];
+        if (is_array($data)) return $data;
+        // Fallback: seed from .bootstrap.json sibling shipped in git so fresh
+        // installs render without manual seeding. deploy.sh also copies the
+        // seed into the live path, but this fallback handles the gap window
+        // between fresh checkout and first deploy.
+        $seedPath = $base . preg_replace('/\.json$/', '.bootstrap.json', $rel);
+        $seed = $this->readJsonFile($seedPath);
+        return is_array($seed) ? $seed : [];
     }
 
     private function saveFile(string $rel, array $data): void

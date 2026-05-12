@@ -9,6 +9,7 @@ use MOM\Api\Router;
 return static function (Router $router, string $dataDir): void {
     $router->actions([
         'deploy_state_load'        => [DeployProgramController::class, 'loadState'],
+        'deploy_users_list'        => [DeployProgramController::class, 'listUsers'],
         'deploy_readiness_cycle'   => [DeployProgramController::class, 'cycleReadiness'],
         'deploy_metric_update'     => [DeployProgramController::class, 'updateMetric'],
         'deploy_checklist_toggle'  => [DeployProgramController::class, 'toggleChecklist'],

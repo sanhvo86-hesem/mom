@@ -144,9 +144,11 @@ const DeployState = {
   clauses: null,
   audits: null,
   reviews: null,
+  users: [],
   me: {username:'', name:'', role:'', canSignOff:false, canEdit:false},
   activeTab: 'overview',
   activeWeek: null, // when not null, week side panel is open
+  picker: null,     // {deptId, slot, query, roleFilter} when modal open
 };
 
 // ── API ───────────────────────────────────────────────────────────────────
@@ -177,6 +179,7 @@ async function loadDeployState(){
     DeployState.clauses   = d.clauses   || {clauses:[]};
     DeployState.audits    = d.audits    || {audits:[]};
     DeployState.reviews   = d.reviews   || {reviews:[], inputTemplate:[], outputTemplate:[]};
+    DeployState.users     = Array.isArray(d.users) ? d.users : [];
     DeployState.me        = d.me        || DeployState.me;
     DeployState.loaded    = true;
   }catch(e){
@@ -644,21 +647,55 @@ function renderChampionCard(dept){
       <span class="champion-shift">Ca ${deployEscape(ch.shift || 'A')}</span>
     </div>
     <div class="champion-form">
-      <div class="champion-slot">
-        <span class="champion-slot-label">Champion</span>
-        <input type="text" placeholder="Tên" value="${deployEscape(ch.primary?.name)}" ${ro?'disabled':''} data-deploy-champion="${dept.id}|primary|name">
-        <input type="text" placeholder="SĐT" value="${deployEscape(ch.primary?.phone)}" ${ro?'disabled':''} data-deploy-champion="${dept.id}|primary|phone">
-        <label class="champion-ojt"><input type="checkbox" ${ch.primary?.ojtPass?'checked':''} ${ro?'disabled':''} data-deploy-champion="${dept.id}|primary|ojtPass">OJT pass</label>
-      </div>
-      <div class="champion-slot">
-        <span class="champion-slot-label">Backup</span>
-        <input type="text" placeholder="Tên" value="${deployEscape(ch.backup?.name)}" ${ro?'disabled':''} data-deploy-champion="${dept.id}|backup|name">
-        <input type="text" placeholder="SĐT" value="${deployEscape(ch.backup?.phone)}" ${ro?'disabled':''} data-deploy-champion="${dept.id}|backup|phone">
-        <label class="champion-ojt"><input type="checkbox" ${ch.backup?.ojtPass?'checked':''} ${ro?'disabled':''} data-deploy-champion="${dept.id}|backup|ojtPass">OJT pass</label>
-      </div>
-      <button class="deploy-btn deploy-btn-sm" ${ro?'disabled':''} onclick="deploySaveChampion('${dept.id}')">Lưu</button>
+      ${renderChampionSlot(dept, 'primary', 'Champion', ch.primary || {}, ro)}
+      ${renderChampionSlot(dept, 'backup',  'Backup',   ch.backup  || {}, ro)}
+      <button class="deploy-btn deploy-btn-sm" ${ro?'disabled':''} onclick="deploySaveChampion('${dept.id}')">Lưu thay đổi</button>
     </div>
   </div>`;
+}
+
+function renderChampionSlot(dept, slot, label, person, ro){
+  const filled = !!(person && person.name && !person.name.startsWith('['));
+  const u = filled ? findUserByName(person.name) : null;
+  return `
+  <div class="champion-slot ${filled?'champion-slot-filled':'champion-slot-empty'}" data-deploy-champion-slot="${dept.id}|${slot}">
+    <div class="champion-slot-row">
+      <span class="champion-slot-label">${deployEscape(label)}</span>
+      <div class="champion-slot-actions">
+        ${!ro ? `<button class="deploy-btn deploy-btn-xs" type="button" onclick="deployOpenPicker('${dept.id}','${slot}')">${filled?'🔄 Đổi người':'🔍 Chọn người'}</button>` : ''}
+        ${filled && !ro ? `<button class="deploy-btn-link" type="button" onclick="deployClearChampion('${dept.id}','${slot}')" title="Bỏ chọn">✕</button>` : ''}
+      </div>
+    </div>
+    ${filled ? `
+      <div class="champion-person">
+        <div class="champion-person-main">
+          <strong>${deployEscape(person.name)}</strong>
+          ${u ? `<span class="champion-jd">${deployEscape(u.jd_title || u.title || u.role)}</span>` : ''}
+        </div>
+        <div class="champion-person-meta">
+          ${person.phone ? `<span>📞 ${deployEscape(person.phone)}</span>` : ''}
+          ${u && u.dept ? `<span>🏢 ${deployEscape(u.dept)}</span>` : ''}
+          ${u && u.employee_id ? `<span>🆔 ${deployEscape(u.employee_id)}</span>` : ''}
+        </div>
+      </div>
+    ` : `
+      <div class="champion-person-empty">${deployEscape(person.name || '— Chưa chọn —')}</div>
+    `}
+    <label class="champion-ojt">
+      <input type="checkbox" ${person.ojtPass?'checked':''} ${ro?'disabled':''} data-deploy-champion="${dept.id}|${slot}|ojtPass">
+      Đã pass OJT bootcamp
+    </label>
+    <!-- Hidden mirror fields so deploySaveChampion can read uniformly -->
+    <input type="hidden" data-deploy-champion="${dept.id}|${slot}|name"  value="${deployEscape(person.name||'')}">
+    <input type="hidden" data-deploy-champion="${dept.id}|${slot}|phone" value="${deployEscape(person.phone||'')}">
+    <input type="hidden" data-deploy-champion="${dept.id}|${slot}|m365"  value="${deployEscape(person.m365||'')}">
+  </div>`;
+}
+
+function findUserByName(name){
+  if (!name) return null;
+  const list = DeployState.users || [];
+  return list.find(u => u.name === name) || list.find(u => u.name && u.name.toLowerCase() === name.toLowerCase()) || null;
 }
 
 // ── Tab 5: Tài liệu ───────────────────────────────────────────────────────
@@ -1107,6 +1144,212 @@ function renderWeekMeetingForm(meeting, week, kv){
   </div>`;
 }
 
+// ── User picker modal ─────────────────────────────────────────────────────
+function renderPickerModal(){
+  const p = DeployState.picker;
+  if (!p) return '';
+  const dept = deployGetDept(p.deptId);
+  if (!dept) return '';
+  const q = (p.query || '').trim().toLowerCase();
+  const roleFilter = p.roleFilter || '';
+  const all = DeployState.users || [];
+  // Already-assigned set (to mark used names across roster)
+  const used = new Set();
+  Object.entries((DeployState.champions && DeployState.champions.champions) || {}).forEach(([dId, ch]) => {
+    ['primary','backup'].forEach(s => {
+      const n = (ch && ch[s] && ch[s].name) || '';
+      if (n && !n.startsWith('[')) used.add(`${n}|${dId}|${s}`);
+    });
+  });
+
+  // Rank: dept match → role hint match → name contains query
+  const deptHints = {
+    PROD:  ['PRO','PROD'],
+    ENG:   ['ENG','TECH'],
+    QA:    ['QA','QC','QUALITY'],
+    SCM:   ['SCM','WH','PURCH'],
+    SALES: ['SAL','SALES','CS','CSR'],
+    FIN:   ['FIN','ACC'],
+    HR:    ['HR'],
+    IT:    ['IT'],
+    EHS:   ['EHS','SAF'],
+    ERP:   ['ERP','IT'],
+  };
+  const roleHints = {
+    PROD:  ['production_director','cnc_workshop_manager','shift_leader','production_planner','cnc_operator'],
+    ENG:   ['engineering_lead','process_engineer'],
+    QA:    ['qa_manager','qc_inspector'],
+    SCM:   ['supply_chain_manager','buyer','warehouse_clerk'],
+    SALES: ['sales_manager','estimator'],
+    FIN:   ['finance_manager','gl_payroll_accountant'],
+    HR:    ['hr_manager'],
+    IT:    ['it_manager','it_admin','epicor_admin'],
+    EHS:   ['ehs_manager','cleaning_packaging_supervisor'],
+    ERP:   ['epicor_admin','it_admin'],
+  };
+  const dh = deptHints[p.deptId] || [];
+  const rh = roleHints[p.deptId] || [];
+
+  let list = all.slice();
+  if (roleFilter === 'dept_only') {
+    list = list.filter(u => dh.some(h => (u.dept||'').toUpperCase().startsWith(h)));
+  } else if (roleFilter === 'role_hint') {
+    list = list.filter(u => rh.includes(u.role));
+  } else if (roleFilter === 'managers') {
+    list = list.filter(u => /manager|director|lead|admin/.test(u.role||''));
+  }
+  if (q) {
+    list = list.filter(u =>
+      (u.name||'').toLowerCase().includes(q) ||
+      (u.role||'').toLowerCase().includes(q) ||
+      (u.dept||'').toLowerCase().includes(q) ||
+      (u.jd_title||'').toLowerCase().includes(q) ||
+      (u.username||'').toLowerCase().includes(q)
+    );
+  }
+  // Sort: dept match first, then role hint, then alpha
+  list.sort((a, b) => {
+    const ad = dh.some(h => (a.dept||'').toUpperCase().startsWith(h)) ? 0 : 1;
+    const bd = dh.some(h => (b.dept||'').toUpperCase().startsWith(h)) ? 0 : 1;
+    if (ad !== bd) return ad - bd;
+    const ar = rh.includes(a.role) ? 0 : 1;
+    const br = rh.includes(b.role) ? 0 : 1;
+    if (ar !== br) return ar - br;
+    return (a.name||'').localeCompare(b.name||'', 'vi');
+  });
+
+  const slotLabel = p.slot === 'primary' ? 'Champion (primary)' : 'Backup';
+
+  return `
+  <div class="deploy-picker-overlay" onclick="deployClosePicker(event)">
+    <div class="deploy-picker" onclick="event.stopPropagation()" style="--phase-color:${dept.color}">
+      <header class="dp-head">
+        <div>
+          <span class="dp-kicker">${deployEscape(dept.label)} · ${deployEscape(slotLabel)}</span>
+          <h2>Chọn người vào vai trò</h2>
+        </div>
+        <button class="dwp-close" onclick="deployClosePicker()" aria-label="Đóng">×</button>
+      </header>
+
+      <div class="dp-controls">
+        <input type="text" id="dpSearch" class="dp-search" placeholder="🔍 Tìm theo tên / vai trò / phòng / username..." value="${deployEscape(p.query||'')}" oninput="deployPickerSetQuery(this.value)" autofocus>
+        <div class="dp-filter-chips">
+          ${renderPickerChip('',          'Tất cả',     roleFilter, all.length)}
+          ${renderPickerChip('dept_only', 'Cùng phòng', roleFilter, all.filter(u => dh.some(h => (u.dept||'').toUpperCase().startsWith(h))).length)}
+          ${renderPickerChip('role_hint', 'Vai trò phù hợp', roleFilter, all.filter(u => rh.includes(u.role)).length)}
+          ${renderPickerChip('managers',  'Quản lý / Lead',  roleFilter, all.filter(u => /manager|director|lead|admin/.test(u.role||'')).length)}
+        </div>
+        <div class="dp-summary">${list.length}/${all.length} người · ưu tiên người cùng phòng và vai trò phù hợp</div>
+      </div>
+
+      <div class="dp-list">
+        ${list.length === 0 ? '<div class="deploy-empty">Không có người nào khớp bộ lọc.</div>' : ''}
+        ${list.map(u => renderPickerRow(u, p.deptId, used, dh, rh)).join('')}
+      </div>
+
+      <footer class="dp-foot">
+        <span class="dp-foot-hint">💡 Người không thuộc users.json? Đóng modal, gõ tay vào ô tên ẩn bên dưới slot.</span>
+        <button class="deploy-btn deploy-btn-sm" type="button" onclick="deployPickerAssignManual()">+ Nhập tay</button>
+      </footer>
+    </div>
+  </div>`;
+}
+
+function renderPickerChip(value, label, current, count){
+  const active = (current||'') === value;
+  return `<button class="dp-chip ${active?'dp-chip-active':''}" type="button" onclick="deployPickerSetFilter('${value}')">${deployEscape(label)} <span>${count}</span></button>`;
+}
+
+function renderPickerRow(u, deptId, used, deptHints, roleHints){
+  const inSameDept = deptHints.some(h => (u.dept||'').toUpperCase().startsWith(h));
+  const matchesRole = roleHints.includes(u.role);
+  const usedElsewhere = Array.from(used).find(k => k.startsWith(u.name + '|') && !k.endsWith(`|${deptId}|primary`) && !k.endsWith(`|${deptId}|backup`));
+  return `
+  <button class="dp-row ${inSameDept?'dp-row-dept':''} ${matchesRole?'dp-row-role':''}" type="button" onclick="deployPickerSelect('${deployEscape(u.username)}')">
+    <div class="dp-row-main">
+      <strong>${deployEscape(u.name)}</strong>
+      <span class="dp-jd">${deployEscape(u.jd_title || u.title || u.role)}</span>
+    </div>
+    <div class="dp-row-meta">
+      ${u.dept ? `<span class="dp-dept">🏢 ${deployEscape(u.dept)}</span>` : ''}
+      ${u.phone ? `<span>📞 ${deployEscape(u.phone)}</span>` : ''}
+      ${u.username ? `<span class="dp-username">@${deployEscape(u.username)}</span>` : ''}
+      ${inSameDept ? '<span class="dp-badge dp-badge-dept">cùng phòng</span>' : ''}
+      ${matchesRole ? '<span class="dp-badge dp-badge-role">vai trò phù hợp</span>' : ''}
+      ${usedElsewhere ? '<span class="dp-badge dp-badge-used">đã ở phòng khác</span>' : ''}
+    </div>
+  </button>`;
+}
+
+function deployOpenPicker(deptId, slot){
+  DeployState.picker = {deptId, slot, query:'', roleFilter:'dept_only'};
+  renderDeployDashboard();
+  setTimeout(() => { const el = document.getElementById('dpSearch'); if (el) el.focus(); }, 40);
+}
+function deployClosePicker(ev){
+  if (ev && ev.target && !ev.target.classList.contains('deploy-picker-overlay')) return;
+  DeployState.picker = null;
+  renderDeployDashboard();
+}
+function deployPickerSetQuery(v){
+  if (!DeployState.picker) return;
+  DeployState.picker.query = v;
+  renderDeployDashboard();
+  // Restore focus + cursor position
+  const el = document.getElementById('dpSearch');
+  if (el) { el.focus(); el.selectionStart = el.selectionEnd = el.value.length; }
+}
+function deployPickerSetFilter(value){
+  if (!DeployState.picker) return;
+  DeployState.picker.roleFilter = value;
+  renderDeployDashboard();
+}
+
+function deployPickerSelect(username){
+  const p = DeployState.picker;
+  if (!p) return;
+  const u = (DeployState.users || []).find(x => x.username === username);
+  if (!u) return;
+  // Patch local champion state and persist
+  const champs = DeployState.champions || {champions:{}};
+  if (!champs.champions[p.deptId]) champs.champions[p.deptId] = {primary:{}, backup:{}, shift:'A'};
+  champs.champions[p.deptId][p.slot] = {
+    name: u.name,
+    phone: u.phone || '',
+    m365: u.email || '',
+    ojtPass: !!(champs.champions[p.deptId][p.slot] && champs.champions[p.deptId][p.slot].ojtPass),
+  };
+  DeployState.champions = champs;
+  DeployState.picker = null;
+  renderDeployDashboard();
+  deploySaveChampion(p.deptId);
+}
+
+function deployPickerAssignManual(){
+  const p = DeployState.picker;
+  if (!p) return;
+  const name = prompt('Tên người (nhập tay — không có trong users.json):');
+  if (!name) return;
+  const phone = prompt('SĐT:') || '';
+  const champs = DeployState.champions || {champions:{}};
+  if (!champs.champions[p.deptId]) champs.champions[p.deptId] = {primary:{}, backup:{}, shift:'A'};
+  champs.champions[p.deptId][p.slot] = {name, phone, m365:'', ojtPass:false};
+  DeployState.champions = champs;
+  DeployState.picker = null;
+  renderDeployDashboard();
+  deploySaveChampion(p.deptId);
+}
+
+function deployClearChampion(deptId, slot){
+  if (!confirm('Bỏ chọn người ở vị trí này?')) return;
+  const champs = DeployState.champions || {champions:{}};
+  if (!champs.champions[deptId]) champs.champions[deptId] = {primary:{}, backup:{}, shift:'A'};
+  champs.champions[deptId][slot] = {name:'', phone:'', m365:'', ojtPass:false};
+  DeployState.champions = champs;
+  renderDeployDashboard();
+  deploySaveChampion(deptId);
+}
+
 // ── Actions ───────────────────────────────────────────────────────────────
 async function deployCycleReadiness(deptId, dimId){
   const cur = (DeployState.readiness?.deptReadiness?.[deptId]?.[dimId]) || 'pending';
@@ -1412,6 +1655,7 @@ function renderDeployDashboard(){
         ${me.canSignOff ? `<button class="deploy-btn-reset" onclick="deployResetState()">Reset state</button>` : ''}
       </div>
       ${renderWeekPanel()}
+      ${renderPickerModal()}
     </div>`;
 }
 
@@ -1437,4 +1681,11 @@ window.deployOpenReviewForm = deployOpenReviewForm;
 window.deployEditReview = deployEditReview;
 window.deploySignOffReview = deploySignOffReview;
 window.deployBridgeCapa = deployBridgeCapa;
+window.deployOpenPicker = deployOpenPicker;
+window.deployClosePicker = deployClosePicker;
+window.deployPickerSetQuery = deployPickerSetQuery;
+window.deployPickerSetFilter = deployPickerSetFilter;
+window.deployPickerSelect = deployPickerSelect;
+window.deployPickerAssignManual = deployPickerAssignManual;
+window.deployClearChampion = deployClearChampion;
 window.deployResetState = deployResetState;

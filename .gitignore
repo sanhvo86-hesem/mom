@@ -166,6 +166,13 @@ rate-limit/
 !mom/data/config/
 mom/data/config/*
 !mom/data/config/*.bootstrap.json
+# Deploy program runtime config (Triển khai vận hành module).
+# Subdir must be re-whitelisted: mom/data/config/* matches directories too.
+# Runtime *.json files stay ignored; *.bootstrap.json seeds ship via git so
+# deploy.sh can copy them into the live runtime path on fresh installs.
+!mom/data/config/deploy/
+mom/data/config/deploy/*
+!mom/data/config/deploy/*.bootstrap.json
 mom/data/config/users.json
 mom/data/config/role_permissions.json
 mom/data/config/portal_role_docs.json

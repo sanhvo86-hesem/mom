@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "standard": "ISO 9001:2015",
+  "clauses": [
+    {"code": "4.1", "title": "Bối cảnh tổ chức",                       "section": "4 Context",      "pillars": ["gov"],                    "docs": ["MAN-001", "POL-QMS-001"]},
+    {"code": "4.2", "title": "Nhu cầu & kỳ vọng bên liên quan",        "section": "4 Context",      "pillars": ["gov"],                    "docs": ["MAN-001"]},
+    {"code": "4.3", "title": "Phạm vi QMS",                            "section": "4 Context",      "pillars": ["gov", "doc"],             "docs": ["MAN-001"]},
+    {"code": "4.4", "title": "QMS và quá trình",                       "section": "4 Context",      "pillars": ["gov", "doc"],             "docs": ["MAN-001", "WI-106"]},
+
+    {"code": "5.1", "title": "Cam kết lãnh đạo",                       "section": "5 Leadership",   "pillars": ["gov"],                    "docs": ["POL-QMS-001"]},
+    {"code": "5.2", "title": "Chính sách chất lượng",                  "section": "5 Leadership",   "pillars": ["gov"],                    "docs": ["POL-QMS-001"]},
+    {"code": "5.3", "title": "Vai trò, trách nhiệm, quyền hạn",        "section": "5 Leadership",   "pillars": ["gov"],                    "docs": ["RACI", "ANNEX-119"]},
+
+    {"code": "6.1", "title": "Rủi ro và cơ hội",                       "section": "6 Planning",     "pillars": ["gov", "dash"],            "docs": ["ANNEX-119", "ANNEX-117"]},
+    {"code": "6.2", "title": "Mục tiêu chất lượng",                    "section": "6 Planning",     "pillars": ["gov", "dash"],            "docs": ["POL-QMS-002"]},
+    {"code": "6.3", "title": "Hoạch định thay đổi",                    "section": "6 Planning",     "pillars": ["gov"],                    "docs": ["ANNEX-119"]},
+
+    {"code": "7.1", "title": "Nguồn lực (con người, hạ tầng, MT)",     "section": "7 Support",      "pillars": ["m365", "train"],          "docs": ["WI-103", "ANNEX-113"]},
+    {"code": "7.2", "title": "Năng lực",                               "section": "7 Support",      "pillars": ["train"],                  "docs": ["SOP-801"]},
+    {"code": "7.3", "title": "Nhận thức",                              "section": "7 Support",      "pillars": ["train"],                  "docs": ["WI-105", "WI-104"]},
+    {"code": "7.4", "title": "Trao đổi thông tin",                     "section": "7 Support",      "pillars": ["m365"],                   "docs": ["WI-103", "ANNEX-117"]},
+    {"code": "7.5", "title": "Thông tin dạng văn bản",                 "section": "7 Support",      "pillars": ["doc"],                    "docs": ["WI-105", "ANNEX-135"]},
+
+    {"code": "8.1", "title": "Hoạch định và kiểm soát vận hành",       "section": "8 Operation",    "pillars": ["pilot", "golive"],        "docs": ["WI-106", "SOP-501"]},
+    {"code": "8.2", "title": "Yêu cầu sản phẩm/dịch vụ",               "section": "8 Operation",    "pillars": ["pilot"],                  "docs": ["SOP-201"]},
+    {"code": "8.3", "title": "Thiết kế và phát triển",                 "section": "8 Operation",    "pillars": ["pilot"],                  "docs": ["SOP-303", "WI-302"]},
+    {"code": "8.4", "title": "Kiểm soát quá trình/sản phẩm bên ngoài", "section": "8 Operation",    "pillars": ["pilot"],                  "docs": ["SOP-401", "WI-701"]},
+    {"code": "8.5", "title": "Sản xuất và cung cấp dịch vụ",           "section": "8 Operation",    "pillars": ["pilot", "golive"],        "docs": ["SOP-501", "WI-519"]},
+    {"code": "8.6", "title": "Thông qua sản phẩm/dịch vụ",             "section": "8 Operation",    "pillars": ["pilot"],                  "docs": ["SOP-605", "WI-201"]},
+    {"code": "8.7", "title": "Kiểm soát đầu ra không phù hợp",         "section": "8 Operation",    "pillars": ["pilot"],                  "docs": ["WI-201"]},
+
+    {"code": "9.1", "title": "Theo dõi, đo lường, phân tích, đánh giá","section": "9 Performance",  "pillars": ["dash"],                   "docs": ["ANNEX-110", "WI-901", "WI-202"]},
+    {"code": "9.2", "title": "Đánh giá nội bộ",                        "section": "9 Performance",  "pillars": ["gov", "dash"],            "docs": ["ANNEX-119"]},
+    {"code": "9.3", "title": "Xem xét của lãnh đạo",                   "section": "9 Performance",  "pillars": ["gov"],                    "docs": ["ANNEX-119"]},
+
+    {"code": "10.1","title": "Cải tiến — khái quát",                   "section": "10 Improvement", "pillars": ["dash"],                   "docs": ["ANNEX-119"]},
+    {"code": "10.2","title": "Sự không phù hợp và hành động khắc phục","section": "10 Improvement", "pillars": ["pilot", "golive"],        "docs": ["WI-201", "ANNEX-114"]},
+    {"code": "10.3","title": "Cải tiến liên tục",                      "section": "10 Improvement", "pillars": ["dash"],                   "docs": ["ANNEX-110"]}
+  ]
+}

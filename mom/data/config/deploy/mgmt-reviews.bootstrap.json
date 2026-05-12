@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "inputTemplate": [
+    {"key": "prior_actions",        "label": "Status hành động từ Review trước",       "clause": "9.3.2.a"},
+    {"key": "context_changes",      "label": "Thay đổi bối cảnh nội/ngoại",             "clause": "9.3.2.b"},
+    {"key": "customer_feedback",    "label": "Hài lòng khách hàng + phản hồi",          "clause": "9.3.2.c"},
+    {"key": "objectives_progress",  "label": "Tiến độ mục tiêu chất lượng",             "clause": "9.3.2.c"},
+    {"key": "process_performance",  "label": "Hiệu lực quá trình + sự phù hợp sản phẩm","clause": "9.3.2.c"},
+    {"key": "nc_capa_status",       "label": "NC / CAPA — phân tích nguyên nhân",       "clause": "9.3.2.c"},
+    {"key": "monitoring_results",   "label": "Kết quả theo dõi & đo lường",             "clause": "9.3.2.c"},
+    {"key": "audit_results",        "label": "Kết quả đánh giá nội bộ",                 "clause": "9.3.2.c"},
+    {"key": "supplier_performance", "label": "Hiệu lực nhà cung ứng",                   "clause": "9.3.2.c"},
+    {"key": "resource_adequacy",    "label": "Sự phù hợp của nguồn lực",                "clause": "9.3.2.d"},
+    {"key": "risk_opportunity",     "label": "Rủi ro & cơ hội — hiệu lực hành động",    "clause": "9.3.2.e"},
+    {"key": "improvement_ops",      "label": "Cơ hội cải tiến",                         "clause": "9.3.2.f"}
+  ],
+  "outputTemplate": [
+    {"key": "improvement_actions",  "label": "Cơ hội cải tiến đã quyết định",          "clause": "9.3.3.a"},
+    {"key": "qms_changes",          "label": "Thay đổi QMS cần thực hiện",              "clause": "9.3.3.b"},
+    {"key": "resource_needs",       "label": "Nhu cầu nguồn lực",                       "clause": "9.3.3.c"}
+  ],
+  "reviews": []
+}

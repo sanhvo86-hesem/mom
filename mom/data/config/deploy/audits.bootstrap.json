@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "audits": [
+    {
+      "id": "IA-2026-Q3",
+      "type": "internal",
+      "cycle": "Q3-2026",
+      "plannedDate": "2026-09-12",
+      "executedDate": null,
+      "scope": ["4", "5", "6"],
+      "scopeDepts": ["QA", "PROD", "ENG"],
+      "leadAuditor": "",
+      "auditTeam": [],
+      "status": "scheduled",
+      "findings": [],
+      "createdAt": "2026-05-12T00:00:00+07:00"
+    },
+    {
+      "id": "IA-2026-Q4",
+      "type": "internal",
+      "cycle": "Q4-2026",
+      "plannedDate": "2026-12-12",
+      "executedDate": null,
+      "scope": ["7", "8"],
+      "scopeDepts": ["SCM", "SALES", "HR", "IT"],
+      "leadAuditor": "",
+      "auditTeam": [],
+      "status": "scheduled",
+      "findings": [],
+      "createdAt": "2026-05-12T00:00:00+07:00"
+    },
+    {
+      "id": "IA-2027-Q1",
+      "type": "internal",
+      "cycle": "Q1-2027",
+      "plannedDate": "2027-03-13",
+      "executedDate": null,
+      "scope": ["9", "10"],
+      "scopeDepts": ["PROD", "QA", "FIN", "EHS"],
+      "leadAuditor": "",
+      "auditTeam": [],
+      "status": "scheduled",
+      "findings": [],
+      "createdAt": "2026-05-12T00:00:00+07:00"
+    }
+  ]
+}

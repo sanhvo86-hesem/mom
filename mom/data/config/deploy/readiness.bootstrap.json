@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "deptReadiness": {
+    "PROD":  {"docReview": "pending", "training": "pending", "m365": "pending", "champion": "pending", "pilot": "pending", "golive": "pending"},
+    "ENG":   {"docReview": "pending", "training": "pending", "m365": "pending", "champion": "pending", "pilot": "pending", "golive": "pending"},
+    "QA":    {"docReview": "pending", "training": "pending", "m365": "pending", "champion": "pending", "pilot": "pending", "golive": "pending"},
+    "SCM":   {"docReview": "pending", "training": "pending", "m365": "pending", "champion": "pending", "pilot": "pending", "golive": "pending"},
+    "SALES": {"docReview": "pending", "training": "pending", "m365": "pending", "champion": "pending", "pilot": "pending", "golive": "pending"},
+    "FIN":   {"docReview": "pending", "training": "pending", "m365": "pending", "champion": "pending", "pilot": "pending", "golive": "pending"},
+    "HR":    {"docReview": "pending", "training": "pending", "m365": "pending", "champion": "pending", "pilot": "pending", "golive": "pending"},
+    "IT":    {"docReview": "pending", "training": "pending", "m365": "pending", "champion": "pending", "pilot": "pending", "golive": "pending"},
+    "EHS":   {"docReview": "pending", "training": "pending", "m365": "pending", "champion": "pending", "pilot": "pending", "golive": "pending"},
+    "ERP":   {"docReview": "pending", "training": "pending", "m365": "pending", "champion": "pending", "pilot": "pending", "golive": "pending"}
+  },
+  "kpiValues": {
+    "KPI-FLD-01": "",
+    "KPI-FLD-02": "",
+    "KPI-TRN-01": "",
+    "KPI-DEP-01": "",
+    "KPI-DEP-02": "",
+    "KPI-DEP-03": "",
+    "KPI-DEP-04": "",
+    "KPI-DEP-05": "",
+    "sev1Open": 0,
+    "sev2Open": 0,
+    "sev3Open": 0,
+    "championPass": 0
+  },
+  "checklistItems": {},
+  "lastUpdated": "2026-05-12T00:00:00+07:00"
+}

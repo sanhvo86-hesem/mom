@@ -1,0 +1,240 @@
+{
+  "version": 1,
+  "startDate": "2026-05-16",
+  "meetingTime": "09:00",
+  "meetingDay": "Saturday",
+  "currentWeek": 0,
+  "currentPhase": "P0",
+  "phaseStatus": {
+    "P0": "in_progress",
+    "P1": "pending",
+    "P2": "pending",
+    "P3": "pending",
+    "P4": "pending"
+  },
+  "weeks": [
+    {
+      "n": 0,
+      "date": "2026-05-16",
+      "phase": "P0",
+      "label": "Pre-flight",
+      "objective": "Duyệt 3 tài liệu nền (WI-105, WI-106, ANNEX-114) từ draft sang effective; M365 routing dry-run; retrieval test với Trưởng QA.",
+      "gateCodes": ["P0-01", "P0-02", "P0-03"],
+      "deliverables": [
+        "WI-105 + WI-106 + ANNEX-114 effective",
+        "M365 folder routing test pass với 1 manager",
+        "Retrieval test ≤3 phút với 5 tài liệu bất kỳ",
+        "Audit_events row deploy_program_start"
+      ],
+      "requiredDocs": ["WI-105", "WI-106", "ANNEX-114"],
+      "status": "pending",
+      "signOff": null
+    },
+    {
+      "n": 1,
+      "date": "2026-05-23",
+      "phase": "P0",
+      "label": "Họp công bố chính thức",
+      "objective": "Steering Committee ký hiệu lực QMS Manual + POL-001 + POL-002; trao 11 sổ tay phòng ban + 39 JD cho trưởng phòng; mở cửa sổ phản hồi 14 ngày.",
+      "gateCodes": ["P0-04", "P0-05"],
+      "deliverables": [
+        "MAN-001 effective_date = 2026-05-23",
+        "POL-QMS-001 + POL-QMS-002 effective",
+        "11 dept handbook đã hand-off",
+        "39 JD đã hand-off",
+        "Issue register mở"
+      ],
+      "requiredDocs": ["MAN-001", "POL-QMS-001", "POL-QMS-002"],
+      "status": "pending",
+      "signOff": null
+    },
+    {
+      "n": 2,
+      "date": "2026-05-30",
+      "phase": "P1",
+      "label": "Walkthrough sổ tay & RACI",
+      "objective": "Mỗi trưởng phòng walkthrough sổ tay + JD với team; thu phản hồi vào RACI master; chọn 11 champion (1/phòng) — bootcamp khởi động.",
+      "gateCodes": ["P1-01"],
+      "deliverables": [
+        "11 buổi walkthrough hoàn tất",
+        "Feedback log RACI mở",
+        "11 champion candidate được nominate",
+        "Champion bootcamp session 1 pass"
+      ],
+      "requiredDocs": ["RACI-master-matrix", "Authority-matrix"],
+      "status": "pending",
+      "signOff": null
+    },
+    {
+      "n": 3,
+      "date": "2026-06-06",
+      "phase": "P1",
+      "label": "RACI freeze + champion OJT",
+      "objective": "Đóng cửa sổ phản hồi handbook/JD; ký xác nhận RACI; champion vòng OJT; chuẩn bị fixture pilot QA.",
+      "gateCodes": ["P1-02", "P1-03", "P1-04"],
+      "deliverables": [
+        "RACI master matrix v1.0 ký hiệu lực",
+        "39 JD đã được signature owner + approver",
+        "11 champion pass OJT checklist",
+        "Baseline KPI snapshot tuần 3 đã chốt"
+      ],
+      "requiredDocs": ["RACI-master-matrix"],
+      "status": "pending",
+      "signOff": null
+    },
+    {
+      "n": 4,
+      "date": "2026-06-13",
+      "phase": "P2",
+      "label": "Pilot QA — Tuần 1",
+      "objective": "Phòng Chất Lượng chạy thực 5 ngày: SOP-605 (IQC/IPQC/FQC) + WI-201 (quality gates) + form/ANNEX tương ứng. Daily standup, issue log.",
+      "gateCodes": ["P2-01"],
+      "deliverables": [
+        "Dual-run đã chạy ≥3 ngày",
+        "Retrieval drill ≥10 lần với champion QA",
+        "Issue log có ≥5 entries (kể cả Sev-3)",
+        "Daily standup attendance ≥90%"
+      ],
+      "requiredDocs": ["SOP-605", "WI-201", "DRL-E2E"],
+      "status": "pending",
+      "signOff": null
+    },
+    {
+      "n": 5,
+      "date": "2026-06-20",
+      "phase": "P2",
+      "label": "Pilot QA gate Go/No-Go",
+      "objective": "QA dual-run + retrieval test; đóng issue pilot; gate quyết định Go/No-Go cho Wave 2 (SCM + Sales).",
+      "gateCodes": ["P2-02", "P2-03", "P2-04"],
+      "deliverables": [
+        "Wrong-revision drill pass",
+        "Issue pilot đã đóng hoặc có action plan",
+        "QA vận hành độc lập 1 ngày",
+        "Gate decision Go/No-Go ký bởi CEO + QMS Manager"
+      ],
+      "requiredDocs": ["ANNEX-114", "ANNEX-117"],
+      "status": "pending",
+      "signOff": null
+    },
+    {
+      "n": 6,
+      "date": "2026-06-27",
+      "phase": "P3",
+      "label": "Wave 2 go-live — SCM + Sales",
+      "objective": "Phòng Mua hàng, Kho, Xuất nhập khẩu go-live; daily command center; hypercare ngày.",
+      "gateCodes": ["P3-01"],
+      "deliverables": [
+        "SCM + Sales command center mở",
+        "Support rota 24/5 đã chốt",
+        "Severity board cập nhật hàng ngày",
+        "Champion SCM + Sales pass OJT"
+      ],
+      "requiredDocs": ["SOP-401", "WI-701", "SOP-201"],
+      "status": "pending",
+      "signOff": null
+    },
+    {
+      "n": 7,
+      "date": "2026-07-04",
+      "phase": "P3",
+      "label": "Wave 2 mid-review + Wave 3 prep",
+      "objective": "Wave 2 mid-review + closure tickets; chuẩn bị Wave Production (rủi ro cao nhất).",
+      "gateCodes": ["P3-02"],
+      "deliverables": [
+        "Wave 2 Sev-1 = 0",
+        "Wave 2 Sev-2 có workaround",
+        "Production go-live runbook lock",
+        "Rollback trigger đã test"
+      ],
+      "requiredDocs": ["ANNEX-114", "ANNEX-118"],
+      "status": "pending",
+      "signOff": null
+    },
+    {
+      "n": 8,
+      "date": "2026-07-11",
+      "phase": "P3",
+      "label": "Wave Production go-live — Tuần 1",
+      "objective": "Phòng Sản xuất + Kỹ thuật go-live đồng thời (đi cùng nhau). Chia 2 tuần vì rủi ro cao nhất.",
+      "gateCodes": ["P3-03"],
+      "deliverables": [
+        "PROD + ENG command center mở",
+        "Job Order dossier đầu tiên pass đầy đủ",
+        "Shift handover record đã hoạt động",
+        "KPI đỏ = 0 hoặc có exception note"
+      ],
+      "requiredDocs": ["SOP-501", "WI-519", "SOP-303", "WI-302"],
+      "status": "pending",
+      "signOff": null
+    },
+    {
+      "n": 9,
+      "date": "2026-07-18",
+      "phase": "P3",
+      "label": "Production hypercare + Wave 3 khởi động",
+      "objective": "Production hypercare tuần 2; Wave 3 (HR, FIN, IT, EHS, Epicor) khởi động pilot.",
+      "gateCodes": ["P3-04"],
+      "deliverables": [
+        "Production user mở đúng tài liệu ≥95%",
+        "Wave 3 champion nominated",
+        "Wave 3 docs handed off",
+        "Issue closure on time ≥95%"
+      ],
+      "requiredDocs": ["WI-103", "WI-104", "SOP-801", "ANNEX-113"],
+      "status": "pending",
+      "signOff": null
+    },
+    {
+      "n": 10,
+      "date": "2026-07-25",
+      "phase": "P4",
+      "label": "Wave 3 stabilize",
+      "objective": "Wave 3 stabilize; KPI snapshot: retrieval ≥95%, training ≥90%, champion coverage 100%.",
+      "gateCodes": ["P4-01", "P4-02"],
+      "deliverables": [
+        "Hypercare Sev-1 = 0",
+        "Sev-2 có workaround ổn định",
+        "Dashboard governance access review pass",
+        "Refresh SLA ≥95%"
+      ],
+      "requiredDocs": ["ANNEX-113", "ANNEX-110"],
+      "status": "pending",
+      "signOff": null
+    },
+    {
+      "n": 11,
+      "date": "2026-08-01",
+      "phase": "P4",
+      "label": "Lessons learned + tài liệu hậu triển khai",
+      "objective": "Đóng severity board; cập nhật tài liệu theo bài học thật; quy hoạch chuyển sang vận hành thường xuyên.",
+      "gateCodes": ["P4-03"],
+      "deliverables": [
+        "Lessons learned report ký",
+        "Tài liệu cập nhật revision +1 theo bài học",
+        "QR code refresh batch",
+        "Training playlist v2 release"
+      ],
+      "requiredDocs": ["WI-105", "WI-202"],
+      "status": "pending",
+      "signOff": null
+    },
+    {
+      "n": 12,
+      "date": "2026-08-08",
+      "phase": "P4",
+      "label": "Bàn giao chính thức",
+      "objective": "Owner vận hành thường xuyên nhận handoff; module chuyển sang chế độ vận hành thường xuyên.",
+      "gateCodes": ["P4-04"],
+      "deliverables": [
+        "Handoff memo ký bởi Steering Committee",
+        "Owner vận hành nhận trách nhiệm KPI",
+        "Cadence vận hành: weekly tier meeting + monthly mgmt review",
+        "Internal audit cycle năm 1 đã lên lịch"
+      ],
+      "requiredDocs": ["WI-202", "WI-901", "ANNEX-119"],
+      "status": "pending",
+      "signOff": null
+    }
+  ],
+  "lastUpdated": "2026-05-12T00:00:00+07:00"
+}

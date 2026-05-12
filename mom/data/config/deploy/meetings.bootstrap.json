@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "agendaTemplate": [
+    {"slot": "0-10", "label": "KPI snapshot", "owner": "QMS Manager", "note": "8 KPI từ deploy dashboard (retrieval, training %, champion coverage, issue closure, sev-1/2/3)"},
+    {"slot": "10-30", "label": "Đóng issue tuần trước", "owner": "Cutover Lead", "note": "Severity board, action plan, age tracker"},
+    {"slot": "30-50", "label": "Gate tuần này", "owner": "Steering Committee", "note": "Đọc checklist phase đang chạy, tick pass/fail, ghi evidence link"},
+    {"slot": "50-60", "label": "Phân công tuần kế + Champion shoutout", "owner": "CEO", "note": "Tuyên dương champion, set deliverables tuần kế"}
+  ],
+  "meetings": []
+}
