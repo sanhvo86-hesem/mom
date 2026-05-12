@@ -75,6 +75,31 @@
 table{max-width:100%;table-layout:auto}
 td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 @media (max-width: 960px){.grid-3{grid-template-columns:1fr;}.field-grid{grid-template-columns:1fr;}}
+
+/* === Leadership commitment cards (§2) — redesigned === */
+.commit-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:14px 0 8px;}
+.commit-card{position:relative;display:flex;flex-direction:column;background:#fff;border:1px solid var(--ln);border-radius:14px;padding:22px 20px 18px;box-shadow:0 1px 2px rgba(15,23,42,.04),0 6px 14px -10px rgba(15,23,42,.10);overflow:hidden;transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease;}
+.commit-card:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(15,23,42,.06),0 14px 28px -16px rgba(15,23,42,.18);border-color:#cfd9e6;}
+.commit-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--ca),var(--cb));border-radius:14px 14px 0 0;}
+.commit-card[data-tone="customer"]{--ca:#2563eb;--cb:#38bdf8;--tint:#eff6ff;--ink-accent:#1e3a8a;}
+.commit-card[data-tone="firsttime"]{--ca:#0d9488;--cb:#10b981;--tint:#ecfdf5;--ink-accent:#064e3b;}
+.commit-card[data-tone="capability"]{--ca:#7c3aed;--cb:#6366f1;--tint:#eef2ff;--ink-accent:#3730a3;}
+.commit-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;}
+.commit-icon{flex-shrink:0;width:46px;height:46px;border-radius:12px;background:var(--tint);color:var(--ca);display:flex;align-items:center;justify-content:center;border:1px solid color-mix(in srgb, var(--ca) 18%, #e5e7eb);}
+.commit-icon svg{width:24px;height:24px;}
+.commit-meta{flex:1;min-width:0;}
+.commit-num{display:inline-block;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;font-weight:700;letter-spacing:.6px;color:var(--ca);background:var(--tint);padding:2px 8px;border-radius:999px;margin-bottom:6px;text-transform:uppercase;}
+.commit-title{font-size:15px;font-weight:700;color:var(--ink-accent);line-height:1.35;margin:0;}
+.commit-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;}
+.commit-list li{position:relative;padding:0 0 0 24px;font-size:13px;line-height:1.6;color:var(--ink);}
+.commit-list li::before{content:"";position:absolute;left:0;top:6px;width:14px;height:14px;border-radius:50%;background:var(--tint);border:1.5px solid var(--ca);}
+.commit-list li::after{content:"";position:absolute;left:4px;top:9px;width:6px;height:3px;border-left:1.5px solid var(--ca);border-bottom:1.5px solid var(--ca);transform:rotate(-45deg);}
+.commit-list li b{color:var(--ink-accent);font-weight:600;}
+@media (max-width: 960px){.commit-grid{grid-template-columns:1fr;}}
+@media print{
+  .commit-card{box-shadow:none;break-inside:avoid;page-break-inside:avoid;}
+  .commit-card:hover{transform:none;box-shadow:none;}
+}
 </style>
 
  <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
@@ -87,7 +112,53 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
       data-dcc-locale="vi"
       data-dcc-bootstrap='{"header":{"doc_code":"POL-QMS-001","title":"Quality Policy","subtitle":"Ch\u00ednh s\u00e1ch ch\u1ea5t l\u01b0\u1ee3ng \u2014 cam k\u1ebft v\u00e0 \u0111\u1ecbnh h\u01b0\u1edbng","doc_type":"POL","revision":"V0","effective_date":"2026-04-13","owner_role_code":"QA","approver_role_code":"CEO","iso_clause":"ISO 9001:2026 §5.2","status":"released"},"labels":{"doc_id":{"short":"ID","long":"Document ID","sort":10},"revision":{"short":"Rev","long":"Revision","sort":20},"effective_date":{"short":"Eff","long":"Effective date","sort":30},"owner":{"short":"Owner","long":"Owner","sort":40},"approver":{"short":"Appr","long":"Approved by","sort":50}}}'></div>
  <div class="doc-content" id="docContent"><div class="form-sheet">
- <div class="iso-map"><div class="iso-title">Chuẩn mực áp dụng và nguyên tắc bắt buộc</div><div class="req"><span class="req-tag shall">PHẢI</span><div>Chính sách chất lượng phải được truyền đạt rộng rãi, được thấu hiểu đầy đủ và được áp dụng nhất quán trong toàn tổ chức; đồng thời phải được định kỳ xem xét tính phù hợp với bối cảnh hoạt động. <span class="iso-clause">§5.2</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Mục tiêu chất lượng và các quyết định phân bổ nguồn lực phải phản ánh đúng mức độ rủi ro thực tế của ngành nghề, yêu cầu khách hàng, công đoạn gia công thuê ngoài và năng lực của chuỗi đo lường. <span class="iso-clause">§5.2</span></div></div></div><h2 class="h2" id="p1">1. Tuyên bố chính sách</h2><div class="callout"><p><b>HESEM cam kết cung ứng sản phẩm gia công cơ khí chính xác (CNC) và các dịch vụ liên quan đáp ứng đầy đủ yêu cầu của khách hàng, tuân thủ pháp luật hiện hành và bảo đảm đúng tiến độ đã cam kết. Cam kết này được thực thi thông qua một hệ thống quản lý chất lượng có kỷ cương, đầy đủ năng lực truy xuất nguồn gốc, kiểm soát chặt chẽ mọi thay đổi và không ngừng cải tiến trên nền tảng dữ liệu thực tế.</b></p><p>Chúng tôi PHẢI bảo toàn các yêu cầu chất lượng trong mọi quyết định liên quan đến tiến độ; tuyệt đối không đánh đổi chất lượng để chạy theo tiến độ. Mọi quyết định phát hành sản phẩm đều phải dựa trên bằng chứng phù hợp, mức độ sẵn sàng của nguồn lực và độ tin cậy của chuỗi đo lường.</p></div><h2 class="h2" id="p2">2. Cam kết của lãnh đạo</h2><div class="grid-3"><div class="card"><div class="card-title">Khách hàng là trung tâm</div><ul class="tight"><li>Thấu hiểu đầy đủ bản vẽ kỹ thuật, phiên bản tài liệu, các đặc tính chất lượng then chốt (CTQ), chứng từ kèm theo, điều kiện giao hàng và các rủi ro đặc thù của từng ngành hàng trước khi tiếp nhận đơn hàng.</li><li>Phản hồi kịp thời cho khách hàng ngay khi phát hiện rủi ro về tính khả thi, thời gian giao hàng, năng lực đo lường hoặc chuỗi cung ứng.</li></ul></div><div class="card"><div class="card-title">Đúng ngay từ lần đầu</div><ul class="tight"><li>Ngăn ngừa sai lỗi ngay từ khâu xem xét hợp đồng và lập kế hoạch sản xuất, không dồn áp lực phát hiện lỗi về cuối quy trình.</li><li>Tuân thủ kỷ luật phê duyệt sản phẩm đầu loạt (first-off), kế hoạch ứng phó, hành động khoanh vùng và hành động khắc phục — phòng ngừa (CAPA) trên cơ sở dữ liệu khách quan.</li></ul></div><div class="card"><div class="card-title">Năng lực và tính toàn vẹn hệ thống</div><ul class="tight"><li>Bảo vệ dữ liệu kỹ thuật, kiểm soát phiên bản tài liệu và duy trì năng lực bốn trụ cột: Con người — Máy móc — Phương pháp đo — Nhà cung cấp.</li><li>PHẢI đánh giá tác động trước mỗi thay đổi và lưu giữ hồ sơ đúng tại thời điểm phát sinh; tuyệt đối không hợp thức hóa hồ sơ sau khi sự việc đã xảy ra.</li></ul></div></div><h2 class="h2" id="p3">3. Hành vi bắt buộc trong vận hành</h2><div class="table-card"><table class="table"><colgroup><col style="width:24%"><col style="width:76%"></colgroup><thead><tr><th>Hành vi yêu cầu</th><th>Diễn giải</th></tr></thead><tbody><tr><td>Lên tiếng sớm khi còn nghi ngờ</td><td>Mọi nhân sự đều có quyền và nghĩa vụ tạm dừng hoặc giữ lại công việc khi còn nghi ngờ về phiên bản bản vẽ, phương pháp đo, điều kiện thiết lập máy, tình trạng vật liệu hoặc tình trạng phát hành sản phẩm.</td></tr><tr><td>Không bỏ qua cổng kiểm soát</td><td>Không vì sức ép tiến độ giao hàng mà bỏ qua các cổng kiểm soát: rà soát hợp đồng, phê duyệt sản phẩm đầu loạt, kiểm tra chứng từ vật liệu và phát hành sản phẩm cuối cùng.</td></tr><tr><td>Dữ liệu phải trung thực</td><td>Báo cáo, bảng kiểm, kết quả đo, chứng từ nhà cung cấp và các chỉ số đo lường hiệu quả (KPI) phải phản ánh trung thực thực trạng; nghiêm cấm hành vi tô vẽ, làm đẹp số liệu dưới mọi hình thức.</td></tr><tr><td>Cải tiến phải có hiệu lực</td><td>Mỗi hành động khắc phục — phòng ngừa đều phải được kiểm chứng bằng bằng chứng cụ thể về kết quả giảm rủi ro, giảm sai lỗi hoặc nâng cao tính ổn định của quá trình.</td></tr></tbody></table></div><h2 class="h2" id="p4">4. Triển khai và xem xét</h2><p>Chính sách này được triển khai đồng bộ thông qua hệ thống các công cụ quản trị: mục tiêu chất lượng các cấp, bộ chỉ số đo lường hiệu quả (KPI) phân rã từ mục tiêu chiến lược, chương trình đào tạo nhận thức cho toàn thể cán bộ — nhân viên, hệ thống quy trình tác nghiệp (SOP) và hướng dẫn công việc (WI), đánh giá nội bộ định kỳ, xem xét của lãnh đạo và các chương trình cải tiến trọng điểm. Bộ phận <a class="entity-link role-link" href="../organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> / QMS là đầu mối duy trì nội dung và giám sát thực thi; Ban lãnh đạo chịu trách nhiệm bảo đảm nguồn lực cần thiết và sự tuân thủ của toàn tổ chức.</p><p class="mini-note">Tài liệu liên quan: <a href="../../operations/sops/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html">SOP-102</a>, <a href="pol-qms-002-quality-objectives.html">POL-QMS-002</a>, <a href="../../operations/sops/09-SOP-900/sop-902-management-review.html">SOP-902</a></p>
+ <div class="iso-map"><div class="iso-title">Chuẩn mực áp dụng và nguyên tắc bắt buộc</div><div class="req"><span class="req-tag shall">PHẢI</span><div>Chính sách chất lượng phải được truyền đạt rộng rãi, được thấu hiểu đầy đủ và được áp dụng nhất quán trong toàn tổ chức; đồng thời phải được định kỳ xem xét tính phù hợp với bối cảnh hoạt động. <span class="iso-clause">§5.2</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Mục tiêu chất lượng và các quyết định phân bổ nguồn lực phải phản ánh đúng mức độ rủi ro thực tế của ngành nghề, yêu cầu khách hàng, công đoạn gia công thuê ngoài và năng lực của chuỗi đo lường. <span class="iso-clause">§5.2</span></div></div></div><h2 class="h2" id="p1">1. Tuyên bố chính sách</h2><div class="callout"><p><b>HESEM cam kết cung ứng sản phẩm gia công cơ khí chính xác (CNC) và các dịch vụ liên quan đáp ứng đầy đủ yêu cầu của khách hàng, tuân thủ pháp luật hiện hành và bảo đảm đúng tiến độ đã cam kết. Cam kết này được thực thi thông qua một hệ thống quản lý chất lượng có kỷ cương, đầy đủ năng lực truy xuất nguồn gốc, kiểm soát chặt chẽ mọi thay đổi và không ngừng cải tiến trên nền tảng dữ liệu thực tế.</b></p><p>Chúng tôi PHẢI bảo toàn các yêu cầu chất lượng trong mọi quyết định liên quan đến tiến độ; tuyệt đối không đánh đổi chất lượng để chạy theo tiến độ. Mọi quyết định phát hành sản phẩm đều phải dựa trên bằng chứng phù hợp, mức độ sẵn sàng của nguồn lực và độ tin cậy của chuỗi đo lường.</p></div><h2 class="h2" id="p2">2. Cam kết của lãnh đạo</h2><div class="commit-grid">
+  <div class="commit-card" data-tone="customer">
+    <div class="commit-head">
+      <div class="commit-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5.5 20c.7-3.4 3.3-5.4 6.5-5.4S17.8 16.6 18.5 20"/><path d="M19.5 6.5l1.4 1.4-3.2 3.2-1.6-1.6"/></svg>
+      </div>
+      <div class="commit-meta">
+        <span class="commit-num">Cam kết 01</span>
+        <h3 class="commit-title">Khách hàng là trung tâm</h3>
+      </div>
+    </div>
+    <ul class="commit-list">
+      <li>Thấu hiểu đầy đủ <b>bản vẽ kỹ thuật</b>, phiên bản tài liệu, các đặc tính chất lượng then chốt (CTQ), chứng từ kèm theo, điều kiện giao hàng và các rủi ro đặc thù của từng ngành hàng trước khi tiếp nhận đơn hàng.</li>
+      <li>Phản hồi kịp thời cho khách hàng ngay khi phát hiện rủi ro về <b>tính khả thi</b>, thời gian giao hàng, năng lực đo lường hoặc chuỗi cung ứng.</li>
+    </ul>
+  </div>
+  <div class="commit-card" data-tone="firsttime">
+    <div class="commit-head">
+      <div class="commit-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 12.5l5 5 12-12"/><path d="M3.5 19.5h6"/></svg>
+      </div>
+      <div class="commit-meta">
+        <span class="commit-num">Cam kết 02</span>
+        <h3 class="commit-title">Đúng ngay từ lần đầu</h3>
+      </div>
+    </div>
+    <ul class="commit-list">
+      <li><b>Ngăn ngừa sai lỗi</b> ngay từ khâu xem xét hợp đồng và lập kế hoạch sản xuất, không dồn áp lực phát hiện lỗi về cuối quy trình.</li>
+      <li>Tuân thủ kỷ luật phê duyệt sản phẩm đầu loạt (<b>first-off</b>), kế hoạch ứng phó, hành động khoanh vùng và hành động khắc phục — phòng ngừa (CAPA) trên cơ sở dữ liệu khách quan.</li>
+    </ul>
+  </div>
+  <div class="commit-card" data-tone="capability">
+    <div class="commit-head">
+      <div class="commit-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3.5v5c0 4.5-3.4 8.4-8 9.5-4.6-1.1-8-5-8-9.5v-5L12 3z"/><path d="M8.5 12l2.5 2.5L15.5 10"/></svg>
+      </div>
+      <div class="commit-meta">
+        <span class="commit-num">Cam kết 03</span>
+        <h3 class="commit-title">Năng lực và tính toàn vẹn hệ thống</h3>
+      </div>
+    </div>
+    <ul class="commit-list">
+      <li>Bảo vệ dữ liệu kỹ thuật, kiểm soát phiên bản tài liệu và duy trì năng lực <b>bốn trụ cột</b>: Con người — Máy móc — Phương pháp đo — Nhà cung cấp.</li>
+      <li><b>PHẢI</b> đánh giá tác động trước mỗi thay đổi và lưu giữ hồ sơ đúng tại thời điểm phát sinh; tuyệt đối không hợp thức hóa hồ sơ sau khi sự việc đã xảy ra.</li>
+    </ul>
+  </div>
+</div><h2 class="h2" id="p3">3. Hành vi bắt buộc trong vận hành</h2><div class="table-card"><table class="table"><colgroup><col style="width:24%"><col style="width:76%"></colgroup><thead><tr><th>Hành vi yêu cầu</th><th>Diễn giải</th></tr></thead><tbody><tr><td>Lên tiếng sớm khi còn nghi ngờ</td><td>Mọi nhân sự đều có quyền và nghĩa vụ tạm dừng hoặc giữ lại công việc khi còn nghi ngờ về phiên bản bản vẽ, phương pháp đo, điều kiện thiết lập máy, tình trạng vật liệu hoặc tình trạng phát hành sản phẩm.</td></tr><tr><td>Không bỏ qua cổng kiểm soát</td><td>Không vì sức ép tiến độ giao hàng mà bỏ qua các cổng kiểm soát: rà soát hợp đồng, phê duyệt sản phẩm đầu loạt, kiểm tra chứng từ vật liệu và phát hành sản phẩm cuối cùng.</td></tr><tr><td>Dữ liệu phải trung thực</td><td>Báo cáo, bảng kiểm, kết quả đo, chứng từ nhà cung cấp và các chỉ số đo lường hiệu quả (KPI) phải phản ánh trung thực thực trạng; nghiêm cấm hành vi tô vẽ, làm đẹp số liệu dưới mọi hình thức.</td></tr><tr><td>Cải tiến phải có hiệu lực</td><td>Mỗi hành động khắc phục — phòng ngừa đều phải được kiểm chứng bằng bằng chứng cụ thể về kết quả giảm rủi ro, giảm sai lỗi hoặc nâng cao tính ổn định của quá trình.</td></tr></tbody></table></div><h2 class="h2" id="p4">4. Triển khai và xem xét</h2><p>Chính sách này được triển khai đồng bộ thông qua hệ thống các công cụ quản trị: mục tiêu chất lượng các cấp, bộ chỉ số đo lường hiệu quả (KPI) phân rã từ mục tiêu chiến lược, chương trình đào tạo nhận thức cho toàn thể cán bộ — nhân viên, hệ thống quy trình tác nghiệp (SOP) và hướng dẫn công việc (WI), đánh giá nội bộ định kỳ, xem xét của lãnh đạo và các chương trình cải tiến trọng điểm. Bộ phận <a class="entity-link role-link" href="../organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> / QMS là đầu mối duy trì nội dung và giám sát thực thi; Ban lãnh đạo chịu trách nhiệm bảo đảm nguồn lực cần thiết và sự tuân thủ của toàn tổ chức.</p><p class="mini-note">Tài liệu liên quan: <a href="../../operations/sops/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html">SOP-102</a>, <a href="pol-qms-002-quality-objectives.html">POL-QMS-002</a>, <a href="../../operations/sops/09-SOP-900/sop-902-management-review.html">SOP-902</a></p>
  </div></div>
  </div></div></div>
  <script src="../../../assets/app.js"></script>

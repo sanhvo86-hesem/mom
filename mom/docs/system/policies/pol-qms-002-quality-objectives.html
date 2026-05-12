@@ -75,6 +75,55 @@
 table{max-width:100%;table-layout:auto}
 td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 @media (max-width: 960px){.grid-3{grid-template-columns:1fr;}.field-grid{grid-template-columns:1fr;}}
+
+/* === §1 Principle stack — numbered horizontal cards === */
+.principle-stack{display:flex;flex-direction:column;gap:12px;margin:14px 0 8px;}
+.principle{position:relative;display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:stretch;background:#fff;border:1px solid var(--ln);border-left:4px solid var(--p-color,#2563eb);border-radius:12px;padding:16px 20px;box-shadow:0 1px 2px rgba(15,23,42,.04);transition:box-shadow .18s ease, border-color .18s ease;}
+.principle:hover{box-shadow:0 2px 4px rgba(15,23,42,.06),0 10px 24px -16px rgba(15,23,42,.16);}
+.principle[data-tone="risk"]{--p-color:#dc2626;--p-tint:#fef2f2;--p-deep:#7f1d1d;}
+.principle[data-tone="drive"]{--p-color:#2563eb;--p-tint:#eff6ff;--p-deep:#1e3a8a;}
+.principle[data-tone="custom"]{--p-color:#7c3aed;--p-tint:#f5f3ff;--p-deep:#4c1d95;}
+.principle-num{flex-shrink:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;min-width:54px;padding-top:2px;}
+.principle-num .num{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:28px;font-weight:700;color:var(--p-color);line-height:1;letter-spacing:-1px;}
+.principle-num .num-lbl{font-size:9px;font-weight:700;letter-spacing:1px;color:var(--p-color);text-transform:uppercase;margin-top:4px;}
+.principle-body{display:flex;flex-direction:column;gap:6px;min-width:0;}
+.principle-head{font-size:13px;font-weight:700;color:var(--p-deep);text-transform:uppercase;letter-spacing:.4px;display:flex;align-items:center;gap:8px;}
+.principle-head::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--p-color);}
+.principle-body p{margin:0;font-size:13.5px;line-height:1.65;color:var(--ink);}
+.principle-body p b{color:var(--p-deep);font-weight:600;}
+
+/* === §3 Tier cascade — 3 tiered KPI cards with cascade flow === */
+.tier-cascade{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin:14px 0 8px;position:relative;}
+.tier{position:relative;display:flex;flex-direction:column;background:#fff;border:1px solid var(--ln);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(15,23,42,.04),0 6px 14px -12px rgba(15,23,42,.10);transition:transform .18s ease, box-shadow .18s ease;}
+.tier:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(15,23,42,.06),0 14px 30px -18px rgba(15,23,42,.20);}
+.tier-banner{background:linear-gradient(135deg,var(--t-from),var(--t-to));color:#fff;padding:14px 18px;display:flex;align-items:center;gap:12px;}
+.tier[data-level="1"]{--t-from:#0f172a;--t-to:#1e3a8a;--t-color:#1e3a8a;--t-tint:#eff6ff;}
+.tier[data-level="2"]{--t-from:#1e3a8a;--t-to:#2563eb;--t-color:#2563eb;--t-tint:#eff6ff;}
+.tier[data-level="3"]{--t-from:#2563eb;--t-to:#38bdf8;--t-color:#0369a1;--t-tint:#f0f9ff;}
+.tier-icon{flex-shrink:0;width:38px;height:38px;border-radius:10px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;border:1px solid rgba(255,255,255,.25);}
+.tier-icon svg{width:20px;height:20px;color:#fff;}
+.tier-banner-text{flex:1;min-width:0;}
+.tier-level{font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;opacity:.85;display:block;}
+.tier-title{font-size:14.5px;font-weight:700;line-height:1.3;margin-top:2px;}
+.tier-count{flex-shrink:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;font-weight:700;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.25);color:#fff;padding:3px 9px;border-radius:999px;}
+.tier-body{padding:14px 18px 16px;flex:1;}
+.tier-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;}
+.tier-list li{position:relative;padding:0 0 0 22px;font-size:12.5px;line-height:1.55;color:var(--ink);}
+.tier-list li::before{content:"";position:absolute;left:0;top:7px;width:8px;height:8px;border-radius:2px;background:var(--t-color);transform:rotate(45deg);}
+.tier-list li b{color:var(--navy);font-weight:600;}
+/* cascade arrow between tier 1→2 and 2→3 */
+.tier:not(:last-child)::after{content:"";position:absolute;top:50%;right:-13px;width:18px;height:18px;background:#fff;border-top:2px solid var(--t-color);border-right:2px solid var(--t-color);transform:translateY(-50%) rotate(45deg);z-index:2;opacity:.45;}
+@media (max-width: 960px){
+  .tier-cascade{grid-template-columns:1fr;}
+  .tier:not(:last-child)::after{top:auto;bottom:-13px;right:50%;transform:translateX(50%) rotate(135deg);}
+  .principle{grid-template-columns:1fr;}
+  .principle-num{flex-direction:row;gap:8px;min-width:auto;}
+}
+@media print{
+  .principle,.tier{box-shadow:none;break-inside:avoid;page-break-inside:avoid;}
+  .principle:hover,.tier:hover{transform:none;box-shadow:none;}
+  .tier:not(:last-child)::after{display:none;}
+}
 </style>
 
  <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
@@ -88,7 +137,90 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
      data-dcc-logo="../../../assets/hesem-logo.svg"
      data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;POL-QMS-002&quot;,&quot;title&quot;:&quot;Quality Objectives&quot;,&quot;subtitle&quot;:&quot;Khung KPI điều hành chất lượng, giao hàng, năng lực và cải tiến&quot;,&quot;doc_type&quot;:&quot;POL&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
  <div class="doc-content" id="docContent"><div class="form-sheet">
- <div class="iso-map"><div class="iso-title">Chuẩn mực áp dụng và nguyên tắc bắt buộc</div><div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi mục tiêu chất lượng phải đo lường được, có đầu mối phụ trách rõ ràng, có nguồn dữ liệu xác định, có chu kỳ xem xét định kỳ và có hành động ứng phó cụ thể khi vượt ngưỡng cho phép. <span class="iso-clause">§6.2</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Mục tiêu cấp công ty phải được phân rã và triển khai phân tầng xuống cấp bộ phận, tổ sản xuất, dây chuyền hoặc chuỗi giá trị tương ứng để bảo đảm tính đồng bộ trong toàn tổ chức. <span class="iso-clause">§6.2</span></div></div></div><h2 class="h2" id="o1">1. Nguyên tắc thiết lập mục tiêu</h2><ul class="tight"><li>Mục tiêu phải phản ánh đúng các rủi ro trọng yếu của hệ thống quản lý chất lượng: giao hàng trễ hạn, sử dụng sai phiên bản tài liệu, tỷ lệ đạt ngay từ lần đầu (FPY), lọt lỗi tới khách hàng, sự cố nhà cung cấp, năng lực đo lường, sản phẩm dở dang (WIP) tồn đọng quá hạn và CAPA đóng chậm.</li><li>Tuyệt đối không thiết lập mục tiêu chỉ để đối phó kỳ đánh giá; mỗi chỉ số đo lường hiệu quả (KPI) phải thực sự dẫn dắt quyết định điều hành và phân bổ nguồn lực.</li><li>Khi khách hàng hoặc ngành nghề có yêu cầu riêng, bộ mục tiêu chung được giữ nguyên và bổ sung thêm KPI chuyên đề theo chương trình hoặc theo khách hàng.</li></ul><h2 class="h2" id="o2">2. Bộ mục tiêu cốt lõi</h2><div class="table-card"><table class="table"><colgroup><col style="width:18%"><col style="width:28%"><col style="width:18%"><col style="width:36%"></colgroup><thead><tr><th>Nhóm mục tiêu</th><th>Ví dụ chỉ số</th><th>Đầu mối phụ trách</th><th>Ngưỡng điều hành</th></tr></thead><tbody><tr><td>Chất lượng đầu ra</td><td>Tỷ lệ đạt kiểm cuối, tỷ lệ NCR nội bộ, tỷ lệ khiếu nại của khách hàng, tỷ lệ lọt lỗi tới khách hàng</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phòng Chất lượng)"><span class="entity-code dept-code">D-QUAL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)"><span class="entity-code dept-code">D-PROD</span></a></span></td><td>Đặt ngưỡng riêng theo từng nhóm sản phẩm; ưu tiên đánh giá xu hướng và mức độ nghiêm trọng thay vì chỉ nhìn vào tỷ lệ phần trăm tổng quát</td></tr><tr><td>Giao hàng đúng hạn</td><td>Tỷ lệ giao hàng đúng hạn (OTD), phát hành kế hoạch sản xuất đúng hạn, nhận lại đúng hạn từ gia công thuê ngoài, mức tuân thủ lịch sản xuất</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Planning and Control Function (Điều độ và kiểm soát sản xuất)"><span class="entity-code dept-code">D-PPC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)"><span class="entity-code dept-code">D-PROD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Supply Chain Department (Phòng Chuỗi cung ứng)"><span class="entity-code dept-code">D-SCM</span></a></span></td><td>Quản lý theo ba tầng thời gian: ngày — tuần — tháng</td></tr><tr><td>Kỹ thuật và mức độ sẵn sàng sản xuất</td><td>Thời gian phản hồi RFQ, tỷ lệ setup máy sẵn sàng, hoàn tất FAI đúng hạn, đóng yêu cầu thay đổi kỹ thuật đúng hạn</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td>Tập trung xử lý các điểm tắc nghẽn làm chậm phát hành kế hoạch sản xuất</td></tr><tr><td>Nhà cung cấp</td><td>OTD nhà cung cấp, tỷ lệ khuyết tật hàng nhập / hàng nhận, mức chính xác của chứng chỉ và chứng từ chứng nhận, đóng SCAR đúng hạn</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Supply Chain Department (Phòng Chuỗi cung ứng)"><span class="entity-code dept-code">D-SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phòng Chất lượng)"><span class="entity-code dept-code">D-QUAL</span></a></span></td><td>Phân biệt theo phân tầng nhà cung cấp và mức độ trọng yếu của hạng mục cung ứng</td></tr><tr><td>Hệ thống và cải tiến</td><td>Đóng đánh giá nội bộ đúng hạn, tỷ lệ CAPA quá hạn, tỷ lệ hoàn thành đào tạo, giá trị tiết kiệm hoặc tác động từ Kaizen</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="ALL_DEPTS" href="../organization/04-RACI-Authority/role-and-department-bundles.html#bundle-all-depts" title="All Departments (Toàn bộ phòng ban và phân hệ đã công bố) — D-SCS / D-ENG / D-PROD / D-PPC / D-MNT / D-QUAL / D-SCM / D-PUR / D-WHS / D-TCR / D-LOG / D-FIN / D-HR / D-EHS / D-IT / D-ERP"><span class="entity-code bundle-code">ALL_DEPTS</span></a></span></td><td>Theo dõi đồng thời tỷ lệ đóng đúng hạn và hiệu lực thực tế sau khi đóng</td></tr></tbody></table></div><h2 class="h2" id="o3">3. Cơ chế phân rã và triển khai phân tầng</h2><div class="grid-3"><div class="card"><div class="card-title">Cấp công ty</div><ul class="tight"><li>OTD toàn công ty</li><li>Khiếu nại từ khách hàng</li><li>Tổn thất chất lượng nội bộ</li><li>Tỷ lệ đóng CAPA đúng hạn</li></ul></div><div class="card"><div class="card-title">Cấp bộ phận</div><ul class="tight"><li>Phát hành kế hoạch sản xuất đúng hạn</li><li>OTD nhà cung cấp</li><li>Phê duyệt sản phẩm đầu loạt (first-off)</li><li>Tình trạng đến hạn hiệu chuẩn thiết bị đo</li></ul></div><div class="card"><div class="card-title">Cấp tổ sản xuất / dây chuyền / nhóm</div><ul class="tight"><li>Tỷ lệ hoàn thành lịch sản xuất</li><li>Thời gian dừng máy ngoài kế hoạch</li><li>Tỷ lệ phế phẩm và làm lại</li><li>Mức tuân thủ 5S và đánh giá quá trình theo lớp (LPA)</li></ul></div></div><h2 class="h2" id="o4">4. Cập nhật và rà soát</h2><p>Bộ mục tiêu được rà soát tối thiểu hằng quý tại kỳ xem xét của lãnh đạo, hoặc sớm hơn khi có thay đổi đáng kể về khách hàng, công nghệ, địa điểm sản xuất, cơ cấu ngành nghề, sản lượng hoặc khi xảy ra sự cố hệ thống nghiêm trọng. Khi một KPI vượt ngưỡng xấu trong hai kỳ liên tiếp trở lên, đầu mối phụ trách phải đề xuất kế hoạch ứng phó cụ thể với mốc thời gian và nguồn lực rõ ràng, không chỉ giải thích nguyên nhân kết quả.</p><p class="mini-note">Tài liệu liên quan: <a href="../../operations/sops/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html">SOP-102</a>, <a href="../../operations/sops/09-SOP-900/sop-902-management-review.html">SOP-902</a>, <a href="../../operations/work-instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a></p>
+ <div class="iso-map"><div class="iso-title">Chuẩn mực áp dụng và nguyên tắc bắt buộc</div><div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi mục tiêu chất lượng phải đo lường được, có đầu mối phụ trách rõ ràng, có nguồn dữ liệu xác định, có chu kỳ xem xét định kỳ và có hành động ứng phó cụ thể khi vượt ngưỡng cho phép. <span class="iso-clause">§6.2</span></div></div><div class="req"><span class="req-tag shall">PHẢI</span><div>Mục tiêu cấp công ty phải được phân rã và triển khai phân tầng xuống cấp bộ phận, tổ sản xuất, dây chuyền hoặc chuỗi giá trị tương ứng để bảo đảm tính đồng bộ trong toàn tổ chức. <span class="iso-clause">§6.2</span></div></div></div><h2 class="h2" id="o1">1. Nguyên tắc thiết lập mục tiêu</h2><div class="principle-stack">
+  <div class="principle" data-tone="risk">
+    <div class="principle-num"><span class="num">01</span><span class="num-lbl">Nguyên tắc</span></div>
+    <div class="principle-body">
+      <div class="principle-head">Bám sát rủi ro trọng yếu</div>
+      <p>Mục tiêu phải phản ánh đúng các rủi ro trọng yếu của hệ thống quản lý chất lượng: <b>giao hàng trễ hạn</b>, sử dụng sai phiên bản tài liệu, <b>tỷ lệ đạt ngay từ lần đầu (FPY)</b>, lọt lỗi tới khách hàng, sự cố nhà cung cấp, năng lực đo lường, <b>sản phẩm dở dang (WIP)</b> tồn đọng quá hạn và <b>CAPA đóng chậm</b>.</p>
+    </div>
+  </div>
+  <div class="principle" data-tone="drive">
+    <div class="principle-num"><span class="num">02</span><span class="num-lbl">Nguyên tắc</span></div>
+    <div class="principle-body">
+      <div class="principle-head">KPI phải dẫn dắt điều hành</div>
+      <p><b>Tuyệt đối không</b> thiết lập mục tiêu chỉ để đối phó kỳ đánh giá; mỗi chỉ số đo lường hiệu quả (KPI) phải thực sự <b>dẫn dắt quyết định điều hành</b> và phân bổ nguồn lực.</p>
+    </div>
+  </div>
+  <div class="principle" data-tone="custom">
+    <div class="principle-num"><span class="num">03</span><span class="num-lbl">Nguyên tắc</span></div>
+    <div class="principle-body">
+      <div class="principle-head">Tùy biến theo khách hàng và ngành hàng</div>
+      <p>Khi khách hàng hoặc ngành nghề có yêu cầu riêng, <b>bộ mục tiêu chung được giữ nguyên</b> và bổ sung thêm <b>KPI chuyên đề</b> theo chương trình hoặc theo khách hàng.</p>
+    </div>
+  </div>
+</div><h2 class="h2" id="o2">2. Bộ mục tiêu cốt lõi</h2><div class="table-card"><table class="table"><colgroup><col style="width:18%"><col style="width:28%"><col style="width:18%"><col style="width:36%"></colgroup><thead><tr><th>Nhóm mục tiêu</th><th>Ví dụ chỉ số</th><th>Đầu mối phụ trách</th><th>Ngưỡng điều hành</th></tr></thead><tbody><tr><td>Chất lượng đầu ra</td><td>Tỷ lệ đạt kiểm cuối, tỷ lệ NCR nội bộ, tỷ lệ khiếu nại của khách hàng, tỷ lệ lọt lỗi tới khách hàng</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phòng Chất lượng)"><span class="entity-code dept-code">D-QUAL</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)"><span class="entity-code dept-code">D-PROD</span></a></span></td><td>Đặt ngưỡng riêng theo từng nhóm sản phẩm; ưu tiên đánh giá xu hướng và mức độ nghiêm trọng thay vì chỉ nhìn vào tỷ lệ phần trăm tổng quát</td></tr><tr><td>Giao hàng đúng hạn</td><td>Tỷ lệ giao hàng đúng hạn (OTD), phát hành kế hoạch sản xuất đúng hạn, nhận lại đúng hạn từ gia công thuê ngoài, mức tuân thủ lịch sản xuất</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Planning and Control Function (Điều độ và kiểm soát sản xuất)"><span class="entity-code dept-code">D-PPC</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)"><span class="entity-code dept-code">D-PROD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Supply Chain Department (Phòng Chuỗi cung ứng)"><span class="entity-code dept-code">D-SCM</span></a></span></td><td>Quản lý theo ba tầng thời gian: ngày — tuần — tháng</td></tr><tr><td>Kỹ thuật và mức độ sẵn sàng sản xuất</td><td>Thời gian phản hồi RFQ, tỷ lệ setup máy sẵn sàng, hoàn tất FAI đúng hạn, đóng yêu cầu thay đổi kỹ thuật đúng hạn</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)"><span class="entity-code dept-code">D-ENG</span></a></span></td><td>Tập trung xử lý các điểm tắc nghẽn làm chậm phát hành kế hoạch sản xuất</td></tr><tr><td>Nhà cung cấp</td><td>OTD nhà cung cấp, tỷ lệ khuyết tật hàng nhập / hàng nhận, mức chính xác của chứng chỉ và chứng từ chứng nhận, đóng SCAR đúng hạn</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../organization/02-Department-Handbooks/dept-supply-chain-handbook.html" title="Supply Chain Department (Phòng Chuỗi cung ứng)"><span class="entity-code dept-code">D-SCM</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../organization/02-Department-Handbooks/dept-quality-handbook.html" title="Quality Department (Phòng Chất lượng)"><span class="entity-code dept-code">D-QUAL</span></a></span></td><td>Phân biệt theo phân tầng nhà cung cấp và mức độ trọng yếu của hạng mục cung ứng</td></tr><tr><td>Hệ thống và cải tiến</td><td>Đóng đánh giá nội bộ đúng hạn, tỷ lệ CAPA quá hạn, tỷ lệ hoàn thành đào tạo, giá trị tiết kiệm hoặc tác động từ Kaizen</td><td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="ALL_DEPTS" href="../organization/04-RACI-Authority/role-and-department-bundles.html#bundle-all-depts" title="All Departments (Toàn bộ phòng ban và phân hệ đã công bố) — D-SCS / D-ENG / D-PROD / D-PPC / D-MNT / D-QUAL / D-SCM / D-PUR / D-WHS / D-TCR / D-LOG / D-FIN / D-HR / D-EHS / D-IT / D-ERP"><span class="entity-code bundle-code">ALL_DEPTS</span></a></span></td><td>Theo dõi đồng thời tỷ lệ đóng đúng hạn và hiệu lực thực tế sau khi đóng</td></tr></tbody></table></div><h2 class="h2" id="o3">3. Cơ chế phân rã và triển khai phân tầng</h2><div class="tier-cascade">
+  <div class="tier" data-level="1">
+    <div class="tier-banner">
+      <div class="tier-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V7l8-4 8 4v14"/><path d="M4 21h16"/><path d="M10 21v-6h4v6"/><path d="M9 10h.01M15 10h.01M9 14h.01M15 14h.01"/></svg>
+      </div>
+      <div class="tier-banner-text">
+        <span class="tier-level">Tầng 1 — Chiến lược</span>
+        <div class="tier-title">Cấp công ty</div>
+      </div>
+      <span class="tier-count">4 KPI</span>
+    </div>
+    <div class="tier-body">
+      <ul class="tier-list">
+        <li><b>OTD</b> toàn công ty</li>
+        <li>Khiếu nại từ <b>khách hàng</b></li>
+        <li>Tổn thất chất lượng nội bộ</li>
+        <li>Tỷ lệ đóng <b>CAPA</b> đúng hạn</li>
+      </ul>
+    </div>
+  </div>
+  <div class="tier" data-level="2">
+    <div class="tier-banner">
+      <div class="tier-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M5 21V10l5-3v14"/><path d="M14 21V13l5-3v11"/><path d="M8 14h.01M8 18h.01"/></svg>
+      </div>
+      <div class="tier-banner-text">
+        <span class="tier-level">Tầng 2 — Vận hành</span>
+        <div class="tier-title">Cấp bộ phận</div>
+      </div>
+      <span class="tier-count">4 KPI</span>
+    </div>
+    <div class="tier-body">
+      <ul class="tier-list">
+        <li>Phát hành <b>kế hoạch sản xuất</b> đúng hạn</li>
+        <li><b>OTD</b> nhà cung cấp</li>
+        <li>Phê duyệt sản phẩm đầu loạt (<b>first-off</b>)</li>
+        <li>Tình trạng đến hạn <b>hiệu chuẩn</b> thiết bị đo</li>
+      </ul>
+    </div>
+  </div>
+  <div class="tier" data-level="3">
+    <div class="tier-banner">
+      <div class="tier-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="9" r="2.4"/><path d="M3 20c.5-3 3-5 6-5s5.5 2 6 5"/><path d="M14.5 20c.3-2 1.5-3.4 3-4"/></svg>
+      </div>
+      <div class="tier-banner-text">
+        <span class="tier-level">Tầng 3 — Thực thi</span>
+        <div class="tier-title">Cấp tổ sản xuất / dây chuyền / nhóm</div>
+      </div>
+      <span class="tier-count">4 KPI</span>
+    </div>
+    <div class="tier-body">
+      <ul class="tier-list">
+        <li>Tỷ lệ hoàn thành <b>lịch sản xuất</b></li>
+        <li>Thời gian <b>dừng máy ngoài kế hoạch</b></li>
+        <li>Tỷ lệ <b>phế phẩm và làm lại</b></li>
+        <li>Mức tuân thủ <b>5S</b> và đánh giá quá trình theo lớp (<b>LPA</b>)</li>
+      </ul>
+    </div>
+  </div>
+</div><h2 class="h2" id="o4">4. Cập nhật và rà soát</h2><p>Bộ mục tiêu được rà soát tối thiểu hằng quý tại kỳ xem xét của lãnh đạo, hoặc sớm hơn khi có thay đổi đáng kể về khách hàng, công nghệ, địa điểm sản xuất, cơ cấu ngành nghề, sản lượng hoặc khi xảy ra sự cố hệ thống nghiêm trọng. Khi một KPI vượt ngưỡng xấu trong hai kỳ liên tiếp trở lên, đầu mối phụ trách phải đề xuất kế hoạch ứng phó cụ thể với mốc thời gian và nguồn lực rõ ràng, không chỉ giải thích nguyên nhân kết quả.</p><p class="mini-note">Tài liệu liên quan: <a href="../../operations/sops/01-SOP-100/sop-102-quality-policy-objectives-and-organizational-context.html">SOP-102</a>, <a href="../../operations/sops/09-SOP-900/sop-902-management-review.html">SOP-902</a>, <a href="../../operations/work-instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a></p>
  </div></div>
  </div></div></div>
  <script src="../../../assets/app.js"></script>
