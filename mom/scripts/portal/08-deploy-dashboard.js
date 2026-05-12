@@ -128,6 +128,18 @@ const DEPLOY_CONFIG = {
       rationale:'Mục tiêu ≥95% widget refresh trên schedule. Gartner: dashboard refresh trễ <95% mất trust của decision maker trong 4 tuần. Tier meeting cadence không vận hành được nếu KPI nguồn không up-to-date.',
       method:'Tử số = widget có data_collected_at trong deadline (theo cadence của widget: daily/weekly/monthly). Mẫu số = tổng widget active. Weekly snapshot.',
       escalation:'<90% → owner widget có 3 ngày fix nguồn dữ liệu. <80% → dashboard tạm gỡ widget đỏ để tránh decision sai.'},
+
+    {id:'KPI-DEP-06', label:'Tần suất phát hành (change/tuần)', target:'>=3', unit:'', short:'TS',
+      basis:'DORA "State of DevOps" 2024 (Deployment Frequency)',
+      rationale:'DORA Four Keys metric thứ 4 (chuẩn quốc tế cho change management). Elite ≥1/ngày, High 1/tuần–1/tháng. Mục tiêu ≥3 change/tuần đảm bảo organization đang thực sự áp dụng improvement loop, không đóng băng tài liệu. Nếu = 0 trong 2 tuần liên tiếp → cảnh báo: change pipeline tắc, hoặc Doc Review SLA bị bỏ qua.',
+      method:'Đếm số revision approved trong dcc_document_revision có approved_at trong tuần hiện tại. Tính cả major + minor + patch.',
+      escalation:'<1 trong 2 tuần liên tiếp → review CAB throughput. Có thể là approval bottleneck hoặc Doc Review backlog quá lớn.'},
+
+    {id:'KPI-DEP-07', label:'MTTR Sev-1 (giờ)',          target:'<=24', unit:'h', short:'MR',
+      basis:'DORA "State of DevOps" 2024 (Mean Time To Restore) · ITIL 4',
+      rationale:'DORA Four Keys metric thứ 3 (chuẩn quốc tế). Elite <1h, High <1d, Medium 1d–1w. Mục tiêu ≤24h cho doc/process: thời gian từ Sev-1 (sai tài liệu effective, người vận hành đang dùng sai) → đến rollback hoặc patch đã release. Nếu >24h, người dùng đã sản xuất ra ≥1 ca làm việc với tài liệu sai.',
+      method:'Median(closed_at - sev1_reported_at) cho các Sev-1 issue trong 4 tuần gần nhất. Nếu chưa có Sev-1 nào: ghi "—" (không phải 0).',
+      escalation:'>48h → mandatory post-incident review trong 5 ngày. >72h → escalate Steering Committee và xem xét lại danh sách "owner trực" của tài liệu critical.'},
   ],
   phaseChecklists: {
     P0:[
@@ -163,7 +175,7 @@ const DEPLOY_CONFIG = {
     ],
   },
   commandCadence: [
-    {title:'Họp Thứ Bảy 9:00',     owner:'CEO + QMS Manager',   cadence:'Tuần',    purpose:'Gate review, KPI, decision log'},
+    {title:'Họp Thứ Bảy 9:00',     owner:'CEO + QMS Manager',   cadence:'Tuần',    purpose:'Gate review, KPI, decision log · ngoại lệ: W0 (14/5) họp Thứ Năm tổ điều hành'},
     {title:'Daily command center',  owner:'Cutover Lead',        cadence:'Ngày (pilot/hypercare)', purpose:'Severity board, issue age'},
     {title:'Document & data review',owner:'QMS / IT',            cadence:'Tuần',    purpose:'Link, QR, refresh, owner'},
     {title:'Management Review (ISO 9.3)', owner:'CEO + dept heads', cadence:'Quý', purpose:'Mgmt review packet, action items'},
