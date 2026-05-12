@@ -154,13 +154,34 @@ td,th{max-width:420px;overflow-wrap:break-word;word-wrap:break-word}
 .grid-3 .card ul.tight li::after{content:"";position:absolute;left:4px;top:9px;width:6px;height:3px;border-left:1.5px solid var(--ga,#2563eb);border-bottom:1.5px solid var(--ga,#2563eb);transform:rotate(-45deg);}
 .grid-3 .card ul.tight li b{color:#1e3a8a;font-weight:600;}
 
+/* === .grid-2 cards (non-preface) — Nguyên tắc SoR / tính toàn vẹn hồ sơ, … === */
+.grid-2 .card{position:relative;background:#fff !important;border:1px solid #cbd5e1 !important;border-radius:14px !important;padding:24px 20px 18px !important;margin:0 !important;box-shadow:0 1px 2px rgba(15,23,42,.04),0 6px 14px -10px rgba(15,23,42,.10) !important;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;}
+.grid-2 .card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--ga,#2563eb),var(--gb,#38bdf8));}
+.grid-2 > *:nth-child(2n+1) .card{--ga:#2563eb;--gb:#38bdf8;--tint:#eff6ff;}
+.grid-2 > *:nth-child(2n) .card{--ga:#0d9488;--gb:#10b981;--tint:#ecfdf5;}
+.grid-2 .card:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(15,23,42,.06),0 14px 30px -16px rgba(15,23,42,.18) !important;border-color:#cbd5e1 !important;}
+.grid-2 .card > .card-title{color:#1e3a8a !important;font-size:14.5px !important;font-weight:700 !important;margin-bottom:14px !important;letter-spacing:-.1px;display:flex;align-items:center;gap:10px;}
+.grid-2 .card > .card-title::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--ga,#2563eb);flex-shrink:0;}
+.grid-2 .card ul.tight{list-style:none !important;margin:0 !important;padding:0 !important;display:flex;flex-direction:column;gap:8px;}
+.grid-2 .card ul.tight li{position:relative;padding:0 0 0 22px !important;font-size:13px;line-height:1.55;color:var(--ink);margin:0 !important;}
+.grid-2 .card ul.tight li::before{content:"";position:absolute;left:0;top:6px;width:14px;height:14px;border-radius:50%;background:var(--tint,#eff6ff);border:1.5px solid var(--ga,#2563eb);}
+.grid-2 .card ul.tight li::after{content:"";position:absolute;left:4px;top:9px;width:6px;height:3px;border-left:1.5px solid var(--ga,#2563eb);border-bottom:1.5px solid var(--ga,#2563eb);transform:rotate(-45deg);}
+.grid-2 .card ul.tight li b{color:#1e3a8a;font-weight:600;}
+
+/* Preface block keeps its callout-style override (defined above) — restore !important on bg/border so they still win after the generic .grid-2 .card block */
+.preface-block .grid-2 .card{background:linear-gradient(135deg,#eff6ff 0%,#f8fafc 70%) !important;border:1px solid #bfdbfe !important;border-left:4px solid #2563eb !important;padding:18px 20px !important;}
+.preface-block .grid-2 .card::before{display:none !important;}
+.preface-block .grid-2 .card > .card-title{font-size:12px !important;text-transform:uppercase;}
+.preface-block .grid-2 .card ul.tight li::before,.preface-block .grid-2 .card ul.tight li::after{display:none !important;}
+.preface-block .grid-2 .card ul.tight{list-style:disc inside !important;}
+
 /* Mobile: stack and keep accent stripe */
 @media (max-width: 960px){
-  .preface-block .grid-2{grid-template-columns:1fr;gap:12px;}
+  .preface-block .grid-2,.grid-2{grid-template-columns:1fr;gap:12px;}
 }
 @media print{
-  .preface-block .card,.grid-3 .card{box-shadow:none !important;break-inside:avoid;page-break-inside:avoid;}
-  .grid-3 .card:hover{transform:none;box-shadow:none !important;}
+  .preface-block .card,.grid-2 .card,.grid-3 .card{box-shadow:none !important;break-inside:avoid;page-break-inside:avoid;}
+  .grid-2 .card:hover,.grid-3 .card:hover{transform:none;box-shadow:none !important;}
 }
 </style>
 <style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
