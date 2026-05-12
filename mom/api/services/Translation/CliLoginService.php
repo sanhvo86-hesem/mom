@@ -299,31 +299,92 @@ final class CliLoginService
      */
     private function startCodex(string $providerKey, string $binary, string $authHome): array
     {
-        // codex login --with-api-key reads the key from stdin synchronously.
-        // No background process needed — just record session so completeWithCode()
-        // knows which binary/home to use.
+        // ChatGPT Pro / Plus subscription users authenticate via `codex login
+        // --device-auth` — codex prints a verification URL plus a one-time
+        // pairing code, the admin signs in at the URL on their own browser,
+        // enters the code, and codex auto-completes by writing
+        // `<authHome>/.codex/auth.json`. No API key needed.
+        //
+        // For API-key holders (paid OpenAI API): run
+        // `codex login --with-api-key` manually inside the auth_home, or POST
+        // the key to /credentials/codex_cli with provider override — this
+        // admin button is reserved for subscription users since they are the
+        // ones with no other entry point.
         $sessionId = $this->newSessionId();
         $sessionDir = $this->sessionDir($sessionId);
         if (!@mkdir($sessionDir, 0700, true) && !is_dir($sessionDir)) {
             throw new RuntimeException("Could not create session dir {$sessionDir}");
         }
+        $stdoutFile = $sessionDir . '/stdout';
+        $stderrFile = $sessionDir . '/stderr';
         touch($sessionDir . '/stdin');
-        touch($sessionDir . '/stdout');
+        touch($stdoutFile);
+        touch($stderrFile);
+
+        @mkdir(rtrim($authHome, '/') . '/.codex', 0700, true);
+
+        // Spawn codex in the background. No PTY needed — codex login
+        // --device-auth produces the URL + pairing code on plain stdout.
+        $cmd = sprintf(
+            'nohup env HOME=%s TERM=xterm-256color %s login --device-auth >%s 2>%s </dev/null & echo $!',
+            escapeshellarg($authHome),
+            escapeshellarg($binary),
+            escapeshellarg($stdoutFile),
+            escapeshellarg($stderrFile)
+        );
+        $pid = trim((string)shell_exec($cmd));
+        if (!ctype_digit($pid)) {
+            $this->cleanupSession($sessionId);
+            throw new RuntimeException('Could not spawn `codex login --device-auth`.');
+        }
+        file_put_contents($sessionDir . '/pid', $pid);
         $this->writeMeta($sessionId, [
             'provider_key' => $providerKey,
-            'kind' => 'api_key',
+            'kind' => 'device_auth',
             'started_at' => time(),
             'binary' => $binary,
             'authHome' => $authHome,
+            'pid' => (int)$pid,
         ]);
+
+        // Wait up to 20s for the URL + pairing code to appear. Codex prints
+        // both within a couple of seconds normally; the deadline tolerates
+        // first-run binary cache warmup.
+        $url = '';
+        $code = '';
+        $deadline = microtime(true) + 20;
+        while (microtime(true) < $deadline) {
+            $raw = (string)@file_get_contents($stdoutFile);
+            $plain = preg_replace('~\x1b\[[0-9;]*[A-Za-z]~', '', $raw) ?? $raw;
+            if ($url === '' && preg_match('~https?://auth\.openai\.com/codex/device\S*~', $plain, $m)) {
+                $url = rtrim($m[0], ".,;:\"'");
+            }
+            if ($code === '' && preg_match('~\b([A-Z0-9]{4}-[A-Z0-9]{4,5})\b~', $plain, $m)) {
+                $code = $m[1];
+            }
+            if ($url !== '' && $code !== '') {
+                break;
+            }
+            usleep(300_000);
+        }
+        if ($url === '' || $code === '') {
+            $stderr = (string)@file_get_contents($stderrFile);
+            $this->cleanupSession($sessionId);
+            throw new RuntimeException(
+                'codex login --device-auth did not produce a verification URL within 20s. '
+                . 'CLI stderr: ' . mb_substr(trim($stderr), 0, 400)
+            );
+        }
 
         return [
             'session_id' => $sessionId,
             'provider_key' => $providerKey,
-            'flow' => 'api_key',
-            'expects_paste' => true,
-            'instructions_vi' => "Lấy OpenAI API key tại platform.openai.com/api-keys rồi dán vào ô bên dưới.",
-            'instructions_en' => "Get your OpenAI API key at platform.openai.com/api-keys and paste it below.",
+            'flow' => 'device_auth',
+            'auth_url' => $url,
+            'pairing_code' => $code,
+            'expects_paste' => false,
+            'instructions_vi' => "1. Mở URL bên dưới trên browser của bạn\n2. Đăng nhập tài khoản ChatGPT (Pro / Plus / Free đều được)\n3. Nhập mã pairing rồi nhấn Continue\n4. Sau khi approve, codex CLI sẽ tự nhận token — bấm 'Đợi xác nhận từ browser' để chờ.",
+            'instructions_en' => "1. Open the URL below in your browser\n2. Sign in to your ChatGPT account (Pro / Plus / Free all work)\n3. Enter the pairing code and click Continue\n4. Once approved, the codex CLI receives the token automatically — click 'Wait for browser approval' to wait.",
         ];
     }
 
