@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "startDate": "2026-05-16",
+  "startDate": "2026-05-14",
   "meetingTime": "09:00",
   "meetingDay": "Saturday",
   "currentWeek": 0,
@@ -15,15 +15,18 @@
   "weeks": [
     {
       "n": 0,
-      "date": "2026-05-16",
+      "date": "2026-05-14",
+      "dayOverride": "Thursday",
+      "attendees": ["ceo", "qa_manager", "qms_engineer"],
+      "attendeesNote": "Họp nội bộ tổ điều hành (CEO + QA Manager + QMS Engineer) — không yêu cầu trưởng phòng khác có mặt. Phòng ban toàn bộ chỉ bắt đầu họp từ W1 (16/5).",
       "phase": "P0",
-      "label": "Pre-flight",
-      "objective": "Duyệt 3 tài liệu nền (WI-105, WI-106, ANNEX-114) từ draft sang effective; M365 routing dry-run; retrieval test với Trưởng QA.",
+      "label": "Pre-flight — Steering nhỏ",
+      "objective": "Tổ điều hành (CEO + QA Manager + QMS Engineer) duyệt 3 tài liệu nền (WI-105, WI-106, ANNEX-114) từ draft → effective; chạy M365 routing dry-run; retrieval test nội bộ. Không bắt buộc trưởng phòng khác có mặt — họ vào từ W1.",
       "gateCodes": ["P0-01", "P0-02", "P0-03"],
       "deliverables": [
-        "WI-105 + WI-106 + ANNEX-114 effective",
-        "M365 folder routing test pass với 1 manager",
-        "Retrieval test ≤3 phút với 5 tài liệu bất kỳ",
+        "WI-105 + WI-106 + ANNEX-114 effective (CEO + QMS Engineer ký)",
+        "M365 folder routing dry-run pass (QA Manager xác nhận)",
+        "Retrieval test ≤3 phút với 5 tài liệu bất kỳ (do QA Manager test)",
         "Audit_events row deploy_program_start"
       ],
       "requiredDocs": ["WI-105", "WI-106", "ANNEX-114"],
@@ -32,10 +35,12 @@
     },
     {
       "n": 1,
-      "date": "2026-05-23",
+      "date": "2026-05-16",
+      "attendees": ["all_departments"],
+      "attendeesNote": "Bắt đầu họp toàn bộ phòng ban (10 phòng + Steering). Đây là phiên all-hands chính thức của chương trình.",
       "phase": "P0",
-      "label": "Họp công bố chính thức",
-      "objective": "Steering Committee ký hiệu lực QMS Manual + POL-001 + POL-002; trao 11 sổ tay phòng ban + 39 JD cho trưởng phòng; mở cửa sổ phản hồi 14 ngày.",
+      "label": "Họp công bố chính thức (all-hands)",
+      "objective": "Steering Committee ký hiệu lực QMS Manual + POL-001 + POL-002 trước toàn thể trưởng phòng; trao 11 sổ tay phòng ban + 39 JD; mở cửa sổ phản hồi 14 ngày. Đây là buổi đầu tiên có MẶT đầy đủ trưởng phòng (10 phòng) sau W0 nội bộ.",
       "gateCodes": ["P0-04", "P0-05"],
       "deliverables": [
         "MAN-001 effective_date = 2026-05-23",
