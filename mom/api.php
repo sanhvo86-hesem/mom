@@ -2475,6 +2475,18 @@ function module_access_save_config(string $file, array $config): array {
   return $normalized;
 }
 
+function module_access_can_role_access(array $policy, string $role): bool {
+  if (!($policy['enabled'] ?? true)) return false;
+  $access = strtolower(trim((string)($policy['access'] ?? 'admin')));
+  if ($access === 'all') return true;
+  if ($access === 'admin') return in_array($role, admin_roles(), true);
+  if ($access === 'roles') {
+    $allowedRoles = array_map('strval', (array)($policy['roles'] ?? []));
+    return in_array($role, admin_roles(), true) || in_array($role, $allowedRoles, true);
+  }
+  return false;
+}
+
 function module_access_public_payload(array $config): array {
   $normalized = module_access_config_defaults();
   foreach (module_access_portal_catalog() as $meta) {
@@ -17358,7 +17370,17 @@ case 'doc_save_draft': {
     $role = (string)($me['role'] ?? '');
     $_mRole = migrate_role($role);
     $isAdmin = in_array($role, admin_roles(), true) || in_array($_mRole, admin_roles(), true);
-    if (!$isAdmin) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+    if (!$isAdmin) {
+      $maConfig = module_access_load_config($MODULE_ACCESS_CONFIG_FILE);
+      $usersTabPolicy = module_access_normalize_policy(
+        (array)($maConfig['admin_tabs']['users'] ?? []),
+        ['id' => 'users', 'default_access' => 'admin', 'default_roles' => []]
+      );
+      if (!module_access_can_role_access($usersTabPolicy, $role) &&
+          !module_access_can_role_access($usersTabPolicy, $_mRole)) {
+        api_json(['ok' => false, 'error' => 'forbidden'], 403);
+      }
+    }
 
     $out = [];
     foreach (($store['users'] ?? []) as $u) {

@@ -1161,10 +1161,16 @@
     },
     "hcm_workforce": {
       "list": [
-        "authenticated"
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "hr_manager"
       ],
       "detail": [
-        "authenticated"
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "hr_manager"
       ],
       "create": [
         "it_admin",

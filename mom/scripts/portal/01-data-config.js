@@ -17,7 +17,9 @@ async function loadUsersFromServerIfAdmin(){
     if(!currentUser) return;
     const role = (currentUser.role||'');
     const isAdm = !!(ROLES[role] && ROLES[role].admin);
-    if(!isAdm) return;
+    // Also allow roles explicitly granted the users admin tab via module access config
+    const hasTabAccess = typeof canUserAccessAdminTab === 'function' && canUserAccessAdminTab('users');
+    if(!isAdm && !hasTabAccess) return;
 
     const res = await apiCall('admin_users_list', null, 'GET');
     if(res && res.ok && Array.isArray(res.users)){
