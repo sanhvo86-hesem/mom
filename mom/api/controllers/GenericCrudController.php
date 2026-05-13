@@ -163,7 +163,7 @@ class GenericCrudController extends BaseController
 
     private function isPrivilegedScopeUser(array $user): bool
     {
-        return $this->userHasAnyRole($user, array_merge(admin_roles(), ['it_admin', 'ceo']));
+        return $this->userHasAnyRole($user, array_merge(admin_roles(), ['it_admin', 'ceo', 'hr_manager']));
     }
 
     /**
