@@ -2347,7 +2347,7 @@ function module_access_portal_catalog(): array {
     ['id' => 'schema-studio', 'default_access' => 'all', 'default_roles' => []],
     ['id' => 'energy-dashboard', 'default_access' => 'all', 'default_roles' => []],
     ['id' => 'customer-portal', 'default_access' => 'all', 'default_roles' => []],
-    ['id' => 'admin', 'default_access' => 'admin', 'default_roles' => [], 'locked' => true],
+    ['id' => 'admin', 'default_access' => 'admin', 'default_roles' => []],
     ['id' => 'template-demo', 'default_access' => 'admin', 'default_roles' => []],
     ['id' => 'module-builder', 'default_access' => 'admin', 'default_roles' => []],
   ];

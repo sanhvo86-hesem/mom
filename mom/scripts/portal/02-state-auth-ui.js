@@ -651,7 +651,7 @@ function moduleAccessPortalCatalog(){
     {id:'schema-studio', group:'tools', icon:'🗄', labelEn:'Schema studio', labelVi:'Schema Studio', noteEn:'Schema and metadata tooling.', noteVi:'Công cụ schema và metadata.', defaultAccess:'all'},
     {id:'energy-dashboard', group:'tools', icon:'⚡', labelEn:'Energy', labelVi:'Năng lượng', noteEn:'Energy and utility dashboards.', noteVi:'Dashboard năng lượng và tiện ích.', defaultAccess:'all'},
     {id:'customer-portal', group:'tools', icon:'🌐', labelEn:'Customer portal', labelVi:'Cổng khách hàng', noteEn:'Customer-facing workspace administration.', noteVi:'Quản trị không gian khách hàng.', defaultAccess:'all'},
-    {id:'admin', group:'admin', icon:'⚙', labelEn:'Admin', labelVi:'Admin', noteEn:'System administration shell for the portal.', noteVi:'Không gian quản trị hệ thống portal.', defaultAccess:'admin', locked:true},
+    {id:'admin', group:'admin', icon:'⚙', labelEn:'Admin', labelVi:'Admin', noteEn:'System administration shell for the portal.', noteVi:'Không gian quản trị hệ thống portal.', defaultAccess:'admin'},
     {id:'template-demo', group:'admin', icon:'🧩', labelEn:'Master module template', labelVi:'Master Module Template', noteEn:'Template lab preview workspace.', noteVi:'Không gian xem trước template lab.', defaultAccess:'admin'},
     {id:'module-builder', group:'admin', icon:'➕', labelEn:'Module builder', labelVi:'Tạo Module mới', noteEn:'Module creation workspace.', noteVi:'Không gian tạo module mới.', defaultAccess:'admin'}
   ];
