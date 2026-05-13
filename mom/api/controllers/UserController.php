@@ -33,14 +33,25 @@ class UserController extends BaseController
         $this->requireAdmin($me);
 
         $users = $this->store['users'] ?? [];
+        $identity = PortalServices::identity($this->dataDir, $this->rootDir);
+        if ($identity !== null) {
+            try {
+                $users = $identity->listUsers();
+            } catch (Throwable $e) {
+                @error_log('[UserController] IdentityRepository.listUsers failed; falling back: ' . $e->getMessage());
+            }
+        }
+
         $shadowSync = new AuthUserShadowSyncService($this->rootDir);
         $sanitized = [];
         foreach ($users as $user) {
             if (!is_array($user)) continue;
-            try {
-                $shadowSync->syncUser($user);
-            } catch (Throwable $e) {
-                @error_log('[UserController] shadow list sync failed: ' . $e->getMessage());
+            if ($identity === null) {
+                try {
+                    $shadowSync->syncUser($user);
+                } catch (Throwable $e) {
+                    @error_log('[UserController] shadow list sync failed: ' . $e->getMessage());
+                }
             }
             $sanitized[] = sanitize_user_for_client($user);
         }
