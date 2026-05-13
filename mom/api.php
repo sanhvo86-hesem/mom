@@ -17404,7 +17404,18 @@ case 'doc_save_draft': {
     $data = read_json_body();
     $adminRoles = admin_roles();
     $meRole = migrate_role((string)($me['role'] ?? ''));
-    if (!in_array($meRole, $adminRoles, true) && !in_array((string)($me['role'] ?? ''), $adminRoles, true)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+    $isFullAdmin = in_array($meRole, $adminRoles, true) || in_array((string)($me['role'] ?? ''), $adminRoles, true);
+    if (!$isFullAdmin) {
+      $maConfig = module_access_load_config($MODULE_ACCESS_CONFIG_FILE);
+      $usersTabPolicy = module_access_normalize_policy(
+        (array)($maConfig['admin_tabs']['users'] ?? []),
+        ['id' => 'users', 'default_access' => 'admin', 'default_roles' => []]
+      );
+      if (!module_access_can_role_access($usersTabPolicy, $meRole) &&
+          !module_access_can_role_access($usersTabPolicy, (string)($me['role'] ?? ''))) {
+        api_json(['ok' => false, 'error' => 'forbidden'], 403);
+      }
+    }
 
     $username = strtolower(trim((string)($data['username'] ?? '')));
     if ($username === '' || !preg_match('/^[a-z0-9][a-z0-9._-]{2,32}$/', $username)) {
@@ -17470,8 +17481,8 @@ case 'doc_save_draft': {
         $users[$i]['name'] = $name !== '' ? $name : ($users[$i]['name'] ?? $username);
         $users[$i]['dept'] = $dept;
         $users[$i]['title'] = $title;
-        $users[$i]['role'] = $role;
-        $users[$i]['active'] = $active;
+        if ($isFullAdmin) $users[$i]['role'] = $role;
+        if ($isFullAdmin) $users[$i]['active'] = $active;
         $users[$i]['cccd'] = $cccd;
         $users[$i]['phone'] = $phone;
         $users[$i]['personal_email'] = $personal_email;
@@ -17521,6 +17532,9 @@ case 'doc_save_draft': {
     }
 
     if (!$found) {
+      if (!$isFullAdmin) {
+        api_json(['ok' => false, 'error' => 'forbidden', 'message' => 'only_admin_can_create_users'], 403);
+      }
       if (!$passwordProvided) {
         $plainPassword = random_password(12);
       }
@@ -17642,7 +17656,18 @@ case 'doc_save_draft': {
     $data = read_json_body();
     $adminRoles = admin_roles();
     $_mRole = migrate_role((string)($me['role'] ?? ''));
-    if (!in_array($_mRole, $adminRoles, true) && !in_array((string)($me['role'] ?? ''), $adminRoles, true)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+    $_isAdmin = in_array($_mRole, $adminRoles, true) || in_array((string)($me['role'] ?? ''), $adminRoles, true);
+    if (!$_isAdmin) {
+      $maConfig = module_access_load_config($MODULE_ACCESS_CONFIG_FILE);
+      $_usersTabPolicy = module_access_normalize_policy(
+        (array)($maConfig['admin_tabs']['users'] ?? []),
+        ['id' => 'users', 'default_access' => 'admin', 'default_roles' => []]
+      );
+      if (!module_access_can_role_access($_usersTabPolicy, $_mRole) &&
+          !module_access_can_role_access($_usersTabPolicy, (string)($me['role'] ?? ''))) {
+        api_json(['ok' => false, 'error' => 'forbidden'], 403);
+      }
+    }
 
     $username = strtolower(trim((string)($data['username'] ?? '')));
     if ($username === '') api_json(['ok' => false, 'error' => 'bad_request'], 400);
