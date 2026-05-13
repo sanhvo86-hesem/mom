@@ -361,8 +361,8 @@
     });
     (S.employeeProfiles || []).forEach(function(profile){
       if (profile && profile.role && !profile.role_label &&
-          typeof window.ROLES === 'object' && window.ROLES) {
-        var rc = window.ROLES[profile.role];
+          typeof ROLES !== 'undefined' && ROLES) {
+        var rc = ROLES[profile.role];
         if (rc) profile.role_label = String(rc.labelEn || rc.label || profile.role);
       }
       profileIdentityKeys(profile).forEach(function(id){
