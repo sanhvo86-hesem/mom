@@ -357,6 +357,10 @@ class AuthUserShadowSyncService
                         ':metadata' => json_encode([
                             'phone' => (string)($user['phone'] ?? ''),
                             'cccd' => (string)($user['cccd'] ?? ''),
+                            'avatar' => (string)($user['avatar'] ?? ''),
+                            'avatar_icon' => (string)($user['avatar_icon'] ?? ($user['avatar'] ?? '')),
+                            'avatar_image' => (string)($user['avatar_image'] ?? ''),
+                            'avatar_url' => (string)($user['avatar_url'] ?? ''),
                             'source' => 'users.json',
                         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
                     ]
@@ -427,6 +431,10 @@ class AuthUserShadowSyncService
                             'source' => 'users.json',
                             'title' => $positionTitle,
                             'dept' => (string)($deptCode ?? $user['dept'] ?? ''),
+                            'avatar' => (string)($user['avatar'] ?? ''),
+                            'avatar_icon' => (string)($user['avatar_icon'] ?? ($user['avatar'] ?? '')),
+                            'avatar_image' => (string)($user['avatar_image'] ?? ''),
+                            'avatar_url' => (string)($user['avatar_url'] ?? ''),
                             'email_source' => $emailSource,
                             'assignment_linkage_source' => (($user['hcm_position_id'] ?? '') !== '' || ($user['hcm_org_unit_id'] ?? '') !== '') ? 'explicit_hcm_reference' : 'legacy_text_fallback',
                         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES),
