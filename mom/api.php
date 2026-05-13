@@ -17404,6 +17404,22 @@ case 'doc_save_draft': {
     $orgLegalEntityCode = trim((string)($data['org_legal_entity_code'] ?? ''));
     $orgPlantId = trim((string)($data['org_plant_id'] ?? ''));
     $orgSiteId = trim((string)($data['org_site_id'] ?? ''));
+    $avatar = mb_substr(trim((string)($data['avatar'] ?? '')), 0, 24);
+    $avatarIcon = mb_substr(trim((string)($data['avatar_icon'] ?? ($avatar !== '' ? $avatar : ($data['avatar'] ?? '')))), 0, 24);
+    $avatarImage = trim((string)($data['avatar_image'] ?? ''));
+    $avatarUrl = trim((string)($data['avatar_url'] ?? ''));
+
+    foreach (['avatar_image' => $avatarImage, 'avatar_url' => $avatarUrl] as $avatarKey => $avatarValue) {
+      if ($avatarValue === '') continue;
+      if (strlen($avatarValue) > 1500000) {
+        api_json(['ok' => false, 'error' => 'avatar_too_large'], 400);
+      }
+      $isDataImage = preg_match('/^data:image\/(?:png|jpe?g|webp|gif);base64,[A-Za-z0-9+\/=\r\n]+$/', $avatarValue) === 1;
+      $isRemoteImage = preg_match('/^https:\/\/[^\s<>"\']{1,1000}$/i', $avatarValue) === 1;
+      if (!$isDataImage && !$isRemoteImage) {
+        api_json(['ok' => false, 'error' => 'invalid_' . $avatarKey], 400);
+      }
+    }
 
     $passwordProvided = isset($data['password']) && trim((string)$data['password']) !== '';
     $plainPassword = $passwordProvided ? (string)$data['password'] : null;
@@ -17443,6 +17459,10 @@ case 'doc_save_draft': {
         $users[$i]['org_legal_entity_code'] = $orgLegalEntityCode;
         $users[$i]['org_plant_id'] = $orgPlantId;
         $users[$i]['org_site_id'] = $orgSiteId;
+        $users[$i]['avatar'] = $avatar;
+        $users[$i]['avatar_icon'] = $avatarIcon;
+        $users[$i]['avatar_image'] = $avatarImage;
+        $users[$i]['avatar_url'] = $avatarUrl;
         $users[$i]['updated_at'] = now_iso();
 
         // Flat mfa_enabled toggle from the admin UI maps to nested mfa.enabled.
@@ -17505,6 +17525,10 @@ case 'doc_save_draft': {
         'org_legal_entity_code' => $orgLegalEntityCode,
         'org_plant_id' => $orgPlantId,
         'org_site_id' => $orgSiteId,
+        'avatar' => $avatar,
+        'avatar_icon' => $avatarIcon,
+        'avatar_image' => $avatarImage,
+        'avatar_url' => $avatarUrl,
         'mfa' => ['enabled' => (bool)($data['mfa_enabled'] ?? false)],
         'created_at' => now_iso(),
         'updated_at' => now_iso(),
