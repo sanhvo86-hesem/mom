@@ -1242,14 +1242,46 @@ async function apiCall(action, payload=null, method='POST', timeoutMs=45000){
     if(controller && timeoutMs && timeoutMs > 0){
       timer = setTimeout(()=>{ try{ controller.abort(); }catch(e){} }, timeoutMs);
     }
-    const res = await fetch(url, opts);
+    let res = await fetch(url, opts);
     let data = null;
     try{ data = await res.json(); }catch(e){}
     if(!data) throw new Error('Invalid server response');
+    if(isWrite && isCsrfRetryableResponse(data) && await refreshCsrfForRetry()){
+      if(csrfToken) opts.headers['X-CSRF-Token'] = csrfToken;
+      res = await fetch(url, opts);
+      data = null;
+      try{ data = await res.json(); }catch(e){}
+      if(!data) throw new Error('Invalid server response');
+    }
     return data;
   }finally{
     if(timer) clearTimeout(timer);
     if (isWrite && _apiInFlightWrites > 0) _apiInFlightWrites--;
+  }
+}
+
+function isCsrfRetryableResponse(data){
+  const err = data && data.ok === false ? String(data.error || '') : '';
+  return err === 'csrf_failed' || err === 'csrf_expired';
+}
+
+async function refreshCsrfForRetry(){
+  try{
+    const res = await fetch('api.php?action=status', {
+      method: 'GET',
+      credentials: 'include',
+      headers: {'Accept':'application/json'},
+    });
+    let status = null;
+    try{ status = await res.json(); }catch(e){}
+    if(!status || status.ok === false || !status.csrf_token) return false;
+    const hasUsableAuthState = !!(status.logged_in || status.mfa_pending || status.enroll_pending);
+    if(!hasUsableAuthState) return false;
+    _syncCsrf(status.csrf_token);
+    if(status.user) syncCurrentUserRef(status.user);
+    return true;
+  }catch(e){
+    return false;
   }
 }
 

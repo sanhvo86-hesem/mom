@@ -2310,12 +2310,12 @@ function deployResetState(){
     kicker: '⚠ Hành động không thể hoàn tác',
     accentColor: '#dc2626',
     submitLabel: '🗑 Xác nhận reset',
-    hint: 'Xóa: readiness, champion roster, issue, drill, audit, biên bản review. Không xóa: program.json (12 tuần), iso-clauses.json, meetings template.',
+    hint: 'Xóa readiness, issue, drill, biên bản họp và trạng thái ký gate; giữ khung 12 tuần, tài liệu ISO và meeting template.',
     fields: [
       {
         type: 'static',
         label: 'Ảnh hưởng',
-        value: 'Toàn bộ tiến độ phòng ban, danh sách champion, sổ vấn đề, biên bản họp tuần, đánh giá nội bộ, xem xét lãnh đạo sẽ bị xóa.',
+        value: 'Toàn bộ checklist, tiến độ phòng ban, quyết định gate đã ký, sổ vấn đề và biên bản họp tuần sẽ bị xóa khỏi trạng thái triển khai.',
       },
       {
         type: 'password',

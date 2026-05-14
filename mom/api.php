@@ -14400,8 +14400,14 @@ function session_regenerate_id_safe(bool $deleteOldSession = true): void {
 
 function csrf_token(): string {
   session_init();
-  if (empty($_SESSION['csrf'])) {
+  $ttlSeconds = 3600;
+  $generatedAt = isset($_SESSION['csrf_generated_at']) ? (int)$_SESSION['csrf_generated_at'] : null;
+  $expired = $generatedAt !== null && (time() - $generatedAt) > $ttlSeconds;
+  if (empty($_SESSION['csrf']) || $expired) {
     $_SESSION['csrf'] = bin2hex(random_bytes(32));
+    $_SESSION['csrf_generated_at'] = time();
+  } elseif ($generatedAt === null) {
+    $_SESSION['csrf_generated_at'] = time();
   }
   return (string)$_SESSION['csrf'];
 }
@@ -14411,6 +14417,10 @@ function require_csrf(): void {
   $token = $_SERVER['HTTP_X_CSRF_TOKEN'] ?? '';
   if ($token === '' || empty($_SESSION['csrf']) || !hash_equals((string)$_SESSION['csrf'], (string)$token)) {
     api_json(['ok' => false, 'error' => 'csrf_failed'], 403);
+  }
+  $generatedAt = isset($_SESSION['csrf_generated_at']) ? (int)$_SESSION['csrf_generated_at'] : null;
+  if ($generatedAt !== null && (time() - $generatedAt) > 3600) {
+    api_json(['ok' => false, 'error' => 'csrf_expired'], 403);
   }
 }
 

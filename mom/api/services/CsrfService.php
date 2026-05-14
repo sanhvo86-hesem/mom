@@ -23,6 +23,8 @@ namespace MOM\Api\Services;
  */
 final class CsrfService
 {
+    private const TOKEN_TTL_SECONDS = 3600;
+
     /**
      * List of endpoints that are exempt from CSRF validation.
      * These use alternative auth methods (API key, webhook signature, etc.).
@@ -44,8 +46,13 @@ final class CsrfService
     public static function token(): string
     {
         SessionService::init();
-        if (empty($_SESSION['csrf'])) {
+        $generatedAt = isset($_SESSION['csrf_generated_at']) ? (int)$_SESSION['csrf_generated_at'] : null;
+        $expired = $generatedAt !== null && (time() - $generatedAt) > self::TOKEN_TTL_SECONDS;
+
+        if (empty($_SESSION['csrf']) || $expired) {
             $_SESSION['csrf'] = bin2hex(random_bytes(32));
+            $_SESSION['csrf_generated_at'] = time();
+        } elseif ($generatedAt === null) {
             $_SESSION['csrf_generated_at'] = time();
         }
         return (string)$_SESSION['csrf'];
@@ -82,7 +89,7 @@ final class CsrfService
         // SECURITY FIX PIPE-CSRF-002: Check token freshness
         if ($generatedAt !== null) {
             $tokenAge = time() - $generatedAt;
-            if ($tokenAge > 3600) {
+            if ($tokenAge > self::TOKEN_TTL_SECONDS) {
                 api_json(['ok' => false, 'error' => 'csrf_expired'], 403);
             }
         }

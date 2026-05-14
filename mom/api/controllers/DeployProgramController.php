@@ -568,6 +568,12 @@ class DeployProgramController extends BaseController
         $confirm = (string)($body['confirm'] ?? '');
         if ($confirm !== 'RESET_DEPLOY_STATE') $this->error('confirm_required', 400);
 
+        $program = $this->resetProgramProgress($this->loadFile(self::FILE_PROGRAM));
+        $this->saveFile(self::FILE_PROGRAM, $program);
+
+        $meetings = $this->loadFile(self::FILE_MEETINGS);
+        $agendaTemplate = is_array($meetings['agendaTemplate'] ?? null) ? array_values($meetings['agendaTemplate']) : [];
+
         $this->saveFile(self::FILE_READINESS, [
             'version'        => 1,
             'deptReadiness'  => [],
@@ -575,10 +581,10 @@ class DeployProgramController extends BaseController
             'checklistItems' => [],
             'lastUpdated'    => gmdate('c'),
         ]);
-        $this->saveFile(self::FILE_MEETINGS, ['version' => 1, 'meetings' => [], 'agendaTemplate' => []]);
+        $this->saveFile(self::FILE_MEETINGS, ['version' => 1, 'meetings' => [], 'agendaTemplate' => $agendaTemplate]);
         $this->saveFile(self::FILE_ISSUES, ['version' => 1, 'issues' => []]);
         $this->saveFile(self::FILE_DRILLS, ['version' => 1, 'drills' => []]);
-        $this->audit('deploy.state.reset', $me, []);
+        $this->audit('deploy.state.reset', $me, ['program_progress_cleared' => 1]);
         $this->success(['data' => ['reset' => true]]);
     }
 
@@ -646,6 +652,33 @@ class DeployProgramController extends BaseController
         $dir = dirname($path);
         if (!is_dir($dir)) @mkdir($dir, 0775, true);
         $this->writeJsonFile($path, $data);
+    }
+
+    private function resetProgramProgress(array $program): array
+    {
+        $program['currentWeek'] = 0;
+        $program['currentPhase'] = 'P0';
+        $program['phaseStatus'] = [
+            'P0' => 'in_progress',
+            'P1' => 'pending',
+            'P2' => 'pending',
+            'P3' => 'pending',
+            'P4' => 'pending',
+        ];
+
+        $weeks = is_array($program['weeks'] ?? null) ? $program['weeks'] : [];
+        foreach ($weeks as &$week) {
+            if (!is_array($week)) {
+                continue;
+            }
+            $week['status'] = 'pending';
+            $week['signOff'] = null;
+        }
+        unset($week);
+        $program['weeks'] = $weeks;
+        $program['lastUpdated'] = gmdate('c');
+
+        return $program;
     }
 
     private function hasAnyRole(array $user, array $roles): bool
