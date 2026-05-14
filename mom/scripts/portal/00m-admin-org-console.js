@@ -620,7 +620,17 @@
 
   function assignmentStatus(e){
     var status = String((e && (e.assignment_status || e.employment_status)) || 'active');
-    return status === 'terminated' ? 'ended' : status;
+    if (status === 'terminated') status = 'ended';
+    // Soft-end fallback: backend governance forbids hard-delete on
+    // hcm_employee_position_assignments, so the Remove flow sets
+    // effective_to <= today instead of changing assignment_status. Treat
+    // those rows as ended so they drop out of activeEmployees() filters.
+    if (status === 'active' && e && e.effective_to){
+      var effTo = String(e.effective_to).slice(0, 10);
+      var today = new Date().toISOString().slice(0, 10);
+      if (effTo && effTo <= today) status = 'ended';
+    }
+    return status;
   }
 
   function assignmentTypeLabel(type){
@@ -1632,7 +1642,16 @@
       var ops = [];
       var raw = S.rawEmployeeById[employeeIdentity(row)] || row;
       if (row.hcm_assignment_id){
-        ops.push(safeDelete('hcm_workforce','hcm_employee_position_assignments', row.hcm_assignment_id, row.row_version));
+        // Governance forbids hard-delete on hcm_employee_position_assignments
+        // (table-governance-overlay.json deletionMode=archive_only). Generic
+        // PUT also strips assignment_status (managed status column) and the
+        // transition workflow has no active→ended target, so the only writable
+        // field that ends the assignment is effective_to. Setting it to today
+        // makes assignmentStatus() return 'ended' and the row drops out of
+        // activeEmployees(). Once a soft-delete column lands (deleted_at or a
+        // transition target), this can move back to safeDelete.
+        var today = new Date().toISOString().slice(0, 10);
+        ops.push(safeUpdate('hcm_workforce','hcm_employee_position_assignments', row.hcm_assignment_id, { effective_to: today }, row.row_version));
       }
       if (raw && raw.employee_id && String(raw.hcm_position_id || '') === String(p.hcm_position_id || '')){
         ops.push(safeUpdate('hcm_workforce','hcm_employees', raw.employee_id, { hcm_position_id:null, hcm_org_unit_id:null }, raw.row_version));
