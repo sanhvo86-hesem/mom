@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-05-14T03:12:23.293Z",
+    "generatedAt": "2026-05-14T03:22:47.642Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "98961478-eecf-4976-a17d-ceeceb53cf92",
+    "publication_run_id": "07f801c0-b67e-4772-a57e-9f0198f839e9",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -24,8 +24,8 @@
     "purpose": "Segmented runtime contract read model for bounded-memory reads and targeted rebuild verification.",
     "segmentId": "endpointBindings",
     "sourceArtifact": "data/registry/system-contract-runtime-projections.json",
-    "sourceSha256": "93da7e003ea61c85cf8416ff2282b5bcde7b6cb6e67af01935115d1a7b35d073",
-    "sourceGeneratedAt": "2026-05-14T03:12:23.293Z",
+    "sourceSha256": "05627646a9e786b224f77bc6624d014ac159a260a2558e44fc05d9a0954637dd",
+    "sourceGeneratedAt": "2026-05-14T03:22:47.642Z",
     "writePolicy": "generated_segment_do_not_edit",
     "revisionGuard": "sourceSha256"
   },

@@ -763,6 +763,7 @@ const migrationDomainDefaults = new Map([
   ['180_restore_employees_identity_cols.sql', 'core_system'],
   ['181_drop_employees_identity_cols_final.sql', 'core_system'],
   ['182_restore_employees_identity_cols_again.sql', 'core_system'],
+  ['183_drop_employees_identity_cols_with_parser_support.sql', 'core_system'],
 ]);
 
 const tableDomainOverrides = {
@@ -2283,8 +2284,16 @@ function parseAlterTableStatement(stmt, tables, migration) {
   const masked = maskSingleQuotedLiterals(stmt);
   const match = masked.match(/ALTER\s+TABLE\s+(?:ONLY\s+)?(?:IF\s+EXISTS\s+)?("?[\w.]+"?)/i);
   if (!match) return false;
+  // Skip ALTER statements we don't model. DROP COLUMN was previously in this
+  // skip list, which caused a silent registry/DB divergence whenever a
+  // migration dropped a column — DataSchemaService would report a structural
+  // drift even though the migration sequence was complete. Adding it to the
+  // honored set closes that gap.
   if (!/\bADD\s+(?:COLUMN|CONSTRAINT|PRIMARY\s+KEY|UNIQUE|FOREIGN\s+KEY)\b/i.test(masked)
-      && !/\bALTER\s+(?:COLUMN\s+)?"?[\w]+"?\s+(?:SET\s+DATA\s+)?TYPE\b/i.test(masked)) {
+      && !/\bDROP\s+COLUMN\b/i.test(masked)
+      && !/\bALTER\s+(?:COLUMN\s+)?"?[\w]+"?\s+(?:SET\s+DATA\s+)?TYPE\b/i.test(masked)
+      && !/\bALTER\s+COLUMN\s+"?[\w]+"?\s+SET\s+NOT\s+NULL\b/i.test(masked)
+      && !/\bALTER\s+COLUMN\s+"?[\w]+"?\s+DROP\s+NOT\s+NULL\b/i.test(masked)) {
     return true;
   }
   const tableName = normalizeIdentifier(match[1]);
@@ -2306,6 +2315,41 @@ function parseAlterTableStatement(stmt, tables, migration) {
           referencesColumns: column.references.columns,
         });
       }
+      continue;
+    }
+    // Honor DROP COLUMN — including DROP COLUMN IF EXISTS and CASCADE clauses.
+    // The registry must reflect the final shape after migration replay; if a
+    // column has been dropped at some point in the migration sequence we
+    // remove it from the table model so downstream consumers (table-registry,
+    // data-fields, schema-authority-summary, smoke check) all agree with the
+    // live DB.
+    const dropColumnMatch = clause.match(/^DROP\s+COLUMN\s+(?:IF\s+EXISTS\s+)?"?([A-Za-z_][\w]*)"?\b/i);
+    if (dropColumnMatch) {
+      const colName = normalizeIdentifier(dropColumnMatch[1]);
+      table.columns.delete(colName);
+      table.comments.delete(colName);
+      // Also drop any foreign-key constraint anchored on this column.
+      if (Array.isArray(table.foreignKeys)) {
+        table.foreignKeys = table.foreignKeys.filter((fk) =>
+          !(Array.isArray(fk.columns) && fk.columns.length === 1 && fk.columns[0] === colName));
+      }
+      continue;
+    }
+    // ALTER COLUMN <name> SET NOT NULL / DROP NOT NULL — adjust the nullability
+    // flag on the existing column model so registry says NOT NULL when migrations
+    // tighten the constraint and nullable again when they relax it.
+    const setNotNullMatch = clause.match(/^ALTER\s+COLUMN\s+"?([A-Za-z_][\w]*)"?\s+SET\s+NOT\s+NULL/i);
+    if (setNotNullMatch) {
+      const colName = normalizeIdentifier(setNotNullMatch[1]);
+      const col = table.columns.get(colName);
+      if (col) col.required = true;
+      continue;
+    }
+    const dropNotNullMatch = clause.match(/^ALTER\s+COLUMN\s+"?([A-Za-z_][\w]*)"?\s+DROP\s+NOT\s+NULL/i);
+    if (dropNotNullMatch) {
+      const colName = normalizeIdentifier(dropNotNullMatch[1]);
+      const col = table.columns.get(colName);
+      if (col) col.required = false;
       continue;
     }
     if (parseAlterColumnTypeClause(table, clause)) {

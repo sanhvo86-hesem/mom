@@ -256,6 +256,24 @@ function deployIsoToVi(iso){ if(!iso) return '—'; try{ return new Date(iso).to
 function deployStaticDocByCode(code){
   const target = String(code || '').trim().toUpperCase();
   if (!target) return null;
+  const staticAliases = {
+    'QMS-MAN-001': {
+      code: 'MAN-001',
+      title: 'Sổ tay QMS',
+      path: '../mom/docs/system/quality-manual/qms-man-001-qms-manual.html',
+    },
+    'RACI-MASTER-MATRIX': {
+      code: 'RACI-MASTER-MATRIX',
+      title: 'Ma trận RACI chính',
+      path: '../mom/docs/system/organization/04-RACI-Authority/raci-master-matrix.html',
+    },
+    'AUTHORITY-MATRIX': {
+      code: 'AUTHORITY-MATRIX',
+      title: 'Ma trận thẩm quyền',
+      path: '../mom/docs/system/organization/04-RACI-Authority/authority-matrix.html',
+    },
+  };
+  if (staticAliases[target]) return staticAliases[target];
   for (const group of (DEPLOY_CONFIG.docsByGroup || [])) {
     for (const item of (group.items || [])) {
       if (String(item.code || '').trim().toUpperCase() === target) return item;
@@ -274,6 +292,39 @@ function deployStaticDocByCode(code){
   }
   return null;
 }
+function deployDocCodeCandidates(code){
+  const raw = String(code || '').trim();
+  if (!raw) return [];
+  const upper = raw.toUpperCase();
+  const aliases = {
+    'MAN-001': ['QMS-MAN-001'],
+    'QMS-MAN-001': ['MAN-001'],
+    'RACI': ['RACI-MASTER-MATRIX'],
+    'RACI-MASTER-MATRIX': ['RACI'],
+  };
+  const seen = new Set();
+  return [raw, upper, ...(aliases[upper] || [])].filter(candidate => {
+    const key = String(candidate || '').trim();
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+function deployResolveDocRecord(code){
+  const candidates = deployDocCodeCandidates(code);
+  if (!candidates.length) return null;
+  if (typeof window !== 'undefined' && typeof window._resolveDocRecord === 'function') {
+    for (const candidate of candidates) {
+      const doc = window._resolveDocRecord(candidate);
+      if (doc) return doc;
+    }
+  }
+  const docs = (typeof DOCS !== 'undefined' && Array.isArray(DOCS))
+    ? DOCS
+    : ((typeof window !== 'undefined' && Array.isArray(window.DOCS)) ? window.DOCS : []);
+  const upperCandidates = new Set(candidates.map(candidate => String(candidate).toUpperCase()));
+  return docs.find(doc => upperCandidates.has(String(doc && doc.code || '').trim().toUpperCase())) || null;
+}
 function deployCloseWeekPanelForDocOpen(){
   if (DeployState.activeWeek == null && !DeployState.weekFullscreen) return;
   DeployState.activeWeek = null;
@@ -285,10 +336,10 @@ async function deployOpenDoc(code){
   if (!target) return false;
   try{
     if (typeof window !== 'undefined' && typeof window.openDoc === 'function') {
-      let doc = typeof window._resolveDocRecord === 'function' ? window._resolveDocRecord(target) : null;
+      let doc = deployResolveDocRecord(target);
       if (!doc && typeof window.loadDocsFromServer === 'function') {
         await window.loadDocsFromServer();
-        doc = typeof window._resolveDocRecord === 'function' ? window._resolveDocRecord(target) : null;
+        doc = deployResolveDocRecord(target);
       }
       if (doc) {
         if (typeof window.canAccessDoc === 'function' && !window.canAccessDoc(doc.code)) {
