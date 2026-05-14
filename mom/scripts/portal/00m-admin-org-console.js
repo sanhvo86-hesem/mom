@@ -210,8 +210,19 @@
    *   - tolerate the server's double-body bug via tolerantParseJson
    *   - send X-CSRF-Token + If-Match (for optimistic concurrency)
    *   - retry once on 409 conflict by re-fetching detail for fresh row_version
+   *   - retry once on csrf_failed/csrf_expired by refreshing the token first
    * Returns the parsed body (e.g. {ok:true, record:{…}}). */
-  function mutate(method, domain, table, id, payload, rowVersion){
+  function _refreshCsrfToken(){
+    return fetch('/mom/api.php?action=status', {
+      method: 'GET', credentials: 'same-origin', cache: 'no-store'
+    }).then(function(r){ return r.json(); }).then(function(s){
+      if (s && s.csrf_token) {
+        window.csrfToken = s.csrf_token;
+        if (window.AppState) window.AppState.csrfToken = s.csrf_token;
+      }
+    }).catch(function(){});
+  }
+  function mutate(method, domain, table, id, payload, rowVersion, _isRetry){
     var url = '/api/v1/runtime/'+encodeURIComponent(domain)+'/'+encodeURIComponent(table)
       + (id ? ('/'+encodeURIComponent(id)) : '');
     var headers = { 'Accept':'application/json', 'Content-Type':'application/json' };
@@ -234,6 +245,13 @@
         // (parsed) object is the truth.
         var bodyOk = body && body.ok === true;
         if (!bodyOk && (!r.ok || (body && body.ok === false))){
+          var errCode = (body && (body.error || (body.error && body.error.message))) || '';
+          // Auto-refresh CSRF token and retry once on stale-token errors
+          if (!_isRetry && (errCode === 'csrf_failed' || errCode === 'csrf_expired')){
+            return _refreshCsrfToken().then(function(){
+              return mutate(method, domain, table, id, payload, rowVersion, true);
+            });
+          }
           var msg = (body && body.error && (body.error.message || body.error)) || (body && body.message) || ('HTTP '+r.status);
           var err = new Error(typeof msg === 'string' ? msg : JSON.stringify(msg));
           err.status = r.status;
