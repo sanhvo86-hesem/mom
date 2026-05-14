@@ -762,6 +762,7 @@ const migrationDomainDefaults = new Map([
   ['179_drop_legacy_employees_identity_cols.sql', 'core_system'],
   ['180_restore_employees_identity_cols.sql', 'core_system'],
   ['181_drop_employees_identity_cols_final.sql', 'core_system'],
+  ['182_restore_employees_identity_cols_again.sql', 'core_system'],
 ]);
 
 const tableDomainOverrides = {

@@ -313,17 +313,22 @@ class AuthUserShadowSyncService
                 // with the SSOT and the trg_employees_role_drift_audit
                 // trigger surfaces any divergence. See
                 // .ai/USER_IDENTITY_SSOT.md.
-                // Migration 181 dropped employees.employee_name / role_code /
-                // role_label permanently. Identity (full_name, role) is now
-                // read exclusively via v_user_canonical (migration 178) which
-                // joins users + roles + hcm_employees. This INSERT only
-                // touches the operator-runtime columns that remain on the
-                // legacy table. See .ai/USER_IDENTITY_SSOT.md and migration 181.
+                // Migration 182 restored employees.employee_name / role_code /
+                // role_label (rollback of 181). The physical drop is blocked
+                // by generate-table-architecture.mjs which doesn't honor
+                // ALTER TABLE DROP COLUMN — so the registry expects the cols
+                // and DataSchemaService flags a drift if they're missing.
+                // Until the parser is enhanced (Phase 4), keep dual-writing.
+                // SSOT is still preserved by single-writer + trigger + view.
+                // See .ai/USER_IDENTITY_FUTURE_STACK.md.
                 $this->db->execute(
                     'INSERT INTO employees (
                         employee_id,
+                        employee_name,
                         user_id_code,
                         user_id,
+                        role_code,
+                        role_label,
                         dept_code,
                         shift,
                         is_active,
@@ -332,8 +337,11 @@ class AuthUserShadowSyncService
                         updated_at
                      ) VALUES (
                         :employee_id,
+                        :employee_name,
                         :user_id_code,
                         :user_id,
+                        :role_code,
+                        :role_label,
                         :dept_code,
                         :shift,
                         :is_active,
@@ -342,8 +350,11 @@ class AuthUserShadowSyncService
                         now()
                      )
                      ON CONFLICT (employee_id) DO UPDATE SET
+                        employee_name = EXCLUDED.employee_name,
                         user_id_code = EXCLUDED.user_id_code,
                         user_id = EXCLUDED.user_id,
+                        role_code = EXCLUDED.role_code,
+                        role_label = EXCLUDED.role_label,
                         dept_code = EXCLUDED.dept_code,
                         shift = EXCLUDED.shift,
                         is_active = EXCLUDED.is_active,
@@ -351,8 +362,11 @@ class AuthUserShadowSyncService
                         updated_at = now()',
                     [
                         ':employee_id' => $employeeId,
+                        ':employee_name' => $fullName,
                         ':user_id_code' => $username,
                         ':user_id' => (string)($userRow['user_id'] ?? ''),
+                        ':role_code' => $roleCode !== '' ? $roleCode : null,
+                        ':role_label' => $positionTitle,
                         ':dept_code' => $deptCode,
                         ':shift' => null,
                         ':is_active' => !empty($user['active']),

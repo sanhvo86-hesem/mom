@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-05-14T03:06:11.415Z",
+    "generatedAt": "2026-05-14T03:12:23.293Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "3780b58e-1de8-4679-9fd0-e76384f55e9d",
+    "publication_run_id": "98961478-eecf-4976-a17d-ceeceb53cf92",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -135,7 +135,7 @@
     "endpointSource": "data/registry/endpoint-catalog.json",
     "workflowSource": "data/registry/workflow-library.json",
     "relationSource": "data/registry/relation-map.json",
-    "registryManifestRunId": "3780b58e-1de8-4679-9fd0-e76384f55e9d",
+    "registryManifestRunId": "98961478-eecf-4976-a17d-ceeceb53cf92",
     "graphicsGovernanceSource": "data/registry/graphics-governance-registry.json"
   },
   "deletePolicy": {
