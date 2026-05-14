@@ -17757,9 +17757,15 @@ case 'auth_login': {
     // PasswordService::ARGON2ID_OPTIONS. The plaintext is already verified
     // at this point so we know it matches. No policy enforcement here
     // (existing users grandfather in until they reset).
+    //
+    // CRITICAL: the downstream MFA-disabled flow calls update_user($store,
+    // $user) with the local $user variable. If we only mutate $store but
+    // forget to update $user, the next update_user() overwrites our rehash
+    // with the local $user that still has the OLD bcrypt hash. Mutate both.
     if ($verify['upgrade']) {
       try {
         $newHash = \MOM\Api\Services\PasswordService::hash($password);
+        $user['password_hash'] = $newHash;
         foreach (($store['users'] ?? []) as $idx => $u) {
           if (isset($u['username']) && strtolower((string)$u['username']) === $username) {
             $store['users'][$idx]['password_hash'] = $newHash;
