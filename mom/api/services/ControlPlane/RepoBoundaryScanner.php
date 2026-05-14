@@ -73,6 +73,11 @@ final class RepoBoundaryScanner
         // here so the deploy boundary check stops blocking commits that
         // touch the slice program inputs/outputs.
         '#^_reports/module-template-v4/.*$#',
+        // 12-week deploy playbook prompt scaffolds — feature content
+        // committed by a6a5fa65 for the AI authoring flow. Same allowlist
+        // policy as module-template-v4: explicitly in the repo, mirrored
+        // in .gitignore "!_reports/deploy-playbook/", evaluated on GitHub.
+        '#^_reports/deploy-playbook/.*$#',
     ];
 
     /**

@@ -12,6 +12,10 @@ tests/e2e/node_modules/
 # (Slice 1 dispatch board, Slice 2 nonconformance, future Wave 1 slices).
 # Reviewed off-line by external evaluators; required to be visible on GitHub.
 !_reports/module-template-v4/
+# Whitelist the 12-week deploy playbook prompt scaffolds (committed by
+# a6a5fa65 as feature content for the AI authoring flow). Without this
+# exception the deploy CI's repo-boundary check blocks every push.
+!_reports/deploy-playbook/
 _build/
 _Deleted/
 .tmp/
