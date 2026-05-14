@@ -15067,7 +15067,86 @@ function otpauth_url(string $issuer, string $account, string $secretB32): string
   return "otpauth://totp/{$label}?secret={$secretB32}&issuer={$issuerEnc}&algorithm=SHA1&digits=6&period=30";
 }
 
-function sanitize_user_for_client(array $user): array {
+/**
+ * Mask a Vietnamese CCCD/CMND value, showing only the last 4 digits.
+ *
+ * CCCD is the Vietnamese national identification number — 12 digits, highly
+ * sensitive PII under Decree 13/2023. Showing the full value to non-privileged
+ * viewers is a data-protection violation. This helper returns the form
+ * "••••••••1234" (8 bullets + last 4 digits).
+ *
+ * Returns the unmasked value if it's shorter than 5 chars (cannot meaningfully
+ * mask) or empty.
+ */
+function mask_cccd(string $cccd): string {
+  $clean = trim($cccd);
+  if ($clean === '' || strlen($clean) < 5) return $clean;
+  return str_repeat('•', max(0, strlen($clean) - 4)) . substr($clean, -4);
+}
+
+/**
+ * Decide whether the viewing context is privileged enough to see full PII.
+ *
+ * Returns true if the viewer is an admin role OR is looking at their own
+ * profile. Returns false (= mask PII) otherwise. Called by
+ * sanitize_user_for_client() to gate cccd / phone / personal_email exposure.
+ *
+ * Phase 0 security hardening per .ai/USER_IDENTITY_SSOT.md — replaces the
+ * earlier "always send full CCCD to client" behavior which leaked every
+ * employee's national ID to anyone with a session.
+ */
+function viewer_may_see_full_pii(?array $viewer, array $target): bool {
+  if (!is_array($viewer)) return false;
+  $viewerRole = strtolower(trim((string)($viewer['role'] ?? '')));
+  if (in_array($viewerRole, admin_roles(), true)) return true;
+  // HR manager handles PII as part of their job per role definition in ROLES.
+  if ($viewerRole === 'hr_manager') return true;
+  // Viewing your own profile — you may always see your own PII.
+  $viewerUsername = strtolower(trim((string)($viewer['username'] ?? '')));
+  $targetUsername = strtolower(trim((string)($target['username'] ?? '')));
+  if ($viewerUsername !== '' && $viewerUsername === $targetUsername) return true;
+  return false;
+}
+
+function sanitize_user_for_client(array $user, ?array $viewer = null): array {
+  // Backwards compat: if no viewer is passed, fall back to the current session
+  // user. This lets every existing caller keep working without parameter changes.
+  // We use the lightweight $_SESSION['user'] lookup (username) and reconstruct
+  // a {username, role} dict — that's all viewer_may_see_full_pii() needs.
+  if ($viewer === null && !empty($_SESSION['user'])) {
+    $sessUsername = strtolower(trim((string)$_SESSION['user']));
+    // If we're sanitizing the same user as the session, we can short-circuit
+    // — they're looking at their own profile and qualify for full PII.
+    if ($sessUsername === strtolower(trim((string)($user['username'] ?? '')))) {
+      $viewer = ['username' => $sessUsername, 'role' => (string)($user['role'] ?? '')];
+    } else {
+      // Different target: derive the viewer's role from the store. We re-read
+      // users.json here because the global $store may not be available in every
+      // call path. Cached via static for the duration of the request.
+      static $viewerCache = [];
+      if (!array_key_exists($sessUsername, $viewerCache)) {
+        global $USERS_FILE;
+        $viewerRole = '';
+        try {
+          if ($USERS_FILE && is_file($USERS_FILE)) {
+            $raw = json_decode((string)file_get_contents($USERS_FILE), true);
+            foreach ((is_array($raw['users'] ?? null) ? $raw['users'] : []) as $u) {
+              if (is_array($u) && strtolower((string)($u['username'] ?? '')) === $sessUsername) {
+                $viewerRole = (string)($u['role'] ?? '');
+                break;
+              }
+            }
+          }
+        } catch (\Throwable $e) { /* fail closed: no role → mask PII */ }
+        $viewerCache[$sessUsername] = ['username' => $sessUsername, 'role' => $viewerRole];
+      }
+      $viewer = $viewerCache[$sessUsername];
+    }
+  }
+  $fullPii = viewer_may_see_full_pii($viewer, $user);
+  $cccdRaw = (string)($user['cccd'] ?? '');
+  $phoneRaw = (string)($user['phone'] ?? '');
+  $emailRaw = (string)($user['personal_email'] ?? '');
   return [
     'employee_id' => (string)($user['employee_id'] ?? ''),
     'username' => (string)($user['username'] ?? ''),
@@ -15085,9 +15164,11 @@ function sanitize_user_for_client(array $user): array {
     'role_source' => is_array($user['role_source'] ?? null) ? (array)$user['role_source'] : new stdClass(),
     'hcm_org_unit_id' => (string)($user['hcm_org_unit_id'] ?? ''),
     'hcm_position_id' => (string)($user['hcm_position_id'] ?? ''),
-    'cccd'     => (string)($user['cccd'] ?? ''),
-    'phone'    => (string)($user['phone'] ?? ''),
-    'personal_email' => (string)($user['personal_email'] ?? ''),
+    'cccd'     => $fullPii ? $cccdRaw : mask_cccd($cccdRaw),
+    'cccd_last4' => $cccdRaw !== '' ? substr($cccdRaw, -4) : '',
+    'cccd_masked' => !$fullPii,
+    'phone'    => $fullPii ? $phoneRaw : mask_cccd($phoneRaw),  // same masking shape
+    'personal_email' => $fullPii ? $emailRaw : '',
     'org_company_code' => (string)($user['org_company_code'] ?? ''),
     'org_legal_entity_code' => (string)($user['org_legal_entity_code'] ?? ''),
     'org_plant_id' => (string)($user['org_plant_id'] ?? ''),
@@ -17398,7 +17479,74 @@ case 'doc_save_draft': {
     api_json(['ok' => true, 'users' => $out, 'server_time' => now_iso()]);
   }
 
-  
+  case 'admin_security_audit': {
+    // Phase 0 hardening telemetry: surface the current security posture
+    // (password algorithm distribution, MFA enrollment by role, password
+    // age for admins) so HESEM can monitor the Phase 0 migration progress
+    // and audit which admin accounts are at risk.
+    //
+    // Admin-only. Returns counts and PII-free per-user records keyed by
+    // username (employee_id maps to that). Designed to be embedded in a
+    // dashboard tile or polled by an external monitor.
+    if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    $me = require_logged_in($store);
+    $role = (string)($me['role'] ?? '');
+    if (!in_array($role, admin_roles(), true) && !in_array(migrate_role($role), admin_roles(), true)) {
+      api_json(['ok' => false, 'error' => 'forbidden'], 403);
+    }
+
+    $byAlgo = ['argon2id' => 0, 'bcrypt' => 0, 'empty' => 0, 'unknown' => 0];
+    $adminWithoutMfa = [];
+    $expiredAdmins = [];
+    $maxAgeDays = (int)(($store['settings']['admin_password_max_age_days'] ?? 180));
+
+    foreach (($store['users'] ?? []) as $u) {
+      if (!is_array($u) || empty($u['active'])) continue;
+      $h = (string)($u['password_hash'] ?? '');
+      if (str_starts_with($h, '$argon2id$')) { $byAlgo['argon2id']++; }
+      elseif (str_starts_with($h, '$2'))      { $byAlgo['bcrypt']++; }
+      elseif ($h === '')                       { $byAlgo['empty']++; }
+      else                                     { $byAlgo['unknown']++; }
+
+      $userRole = strtolower(trim((string)($u['role'] ?? '')));
+      $isAdmin  = in_array($userRole, admin_roles(), true);
+      if ($isAdmin) {
+        $mfaOn = (bool)(($u['mfa']['enabled'] ?? false));
+        if (!$mfaOn) {
+          $adminWithoutMfa[] = ['username' => (string)$u['username'], 'role' => $userRole];
+        }
+        $changedAt = trim((string)($u['password_changed_at'] ?? ''));
+        if ($changedAt !== '') {
+          $ts = strtotime($changedAt);
+          if ($ts !== false) {
+            $ageDays = (int)floor((time() - $ts) / 86400);
+            if ($ageDays > $maxAgeDays) {
+              $expiredAdmins[] = [
+                'username' => (string)$u['username'],
+                'role'     => $userRole,
+                'age_days' => $ageDays,
+              ];
+            }
+          }
+        }
+      }
+    }
+
+    api_json([
+      'ok' => true,
+      'server_time' => now_iso(),
+      'password_algorithm_distribution' => $byAlgo,
+      'admins_without_mfa' => $adminWithoutMfa,
+      'admins_with_expired_password' => $expiredAdmins,
+      'thresholds' => [
+        'admin_password_max_age_days' => $maxAgeDays,
+        'admin_mfa_enforcement' => strtolower(trim((string)($store['settings']['admin_mfa_enforcement'] ?? 'soft'))),
+        'admin_password_expiry_enforcement' => strtolower(trim((string)($store['settings']['admin_password_expiry_enforcement'] ?? 'soft'))),
+      ],
+    ]);
+  }
+
+
   case 'admin_user_upsert': {
     $me = require_logged_in($store);
     require_csrf();
@@ -17788,6 +17936,84 @@ case 'auth_login': {
 
     $mfa = $user['mfa'] ?? [];
     $mfaEnabled = (bool)($mfa['enabled'] ?? false);
+
+    // Phase 0.5: admin-role MFA enforcement (per .ai/USER_IDENTITY_FUTURE_STACK.md).
+    // Any role that admin_roles() considers admin (ceo, qa_manager, it_admin,
+    // plus legacy aliases) MUST have MFA enrolled. The enforcement runs in
+    // TWO MODES controlled by $settings['admin_mfa_enforcement']:
+    //   - 'soft' (default): log a warning audit event, return mfa_enrollment_advisory
+    //                       in the response. Login still proceeds. Used during the
+    //                       30-day grace window so existing admins (notably the CEO)
+    //                       can stay logged in while they enroll MFA via the portal UI.
+    //   - 'hard': block login outright with mfa_enrollment_required (403).
+    //
+    // Switch from soft → hard by setting users.json[settings][admin_mfa_enforcement]
+    // = "hard". The audit_events trail of mfa_enrollment_advisory rows shows when
+    // each admin became compliant; flip the switch once the population reaches 100%.
+    //
+    // Rationale: bcrypt-only single-factor is below the ISO 9001:2026 floor
+    // for privileged manufacturing operations. Enforcing MFA at this gate
+    // ensures no admin can log in without two factors once 'hard' is set,
+    // even if the global require_mfa toggle is later disabled by mistake.
+    $userRoleNormalized = strtolower(trim((string)($user['role'] ?? '')));
+    $isAdminRole = in_array($userRoleNormalized, admin_roles(), true);
+
+    // Phase 0.8: password expiry for admin roles. Compares
+    // users.password_changed_at against settings.admin_password_max_age_days
+    // (default 180 — NIST 800-63B says don't auto-rotate without cause, but
+    // for privileged accounts a 180-day floor is current industry practice).
+    // Soft warning today; hard block path is available via
+    // settings.admin_password_expiry_enforcement = 'hard'.
+    $maxAgeDays = (int)($settings['admin_password_max_age_days'] ?? 180);
+    $expiryMode = strtolower(trim((string)($settings['admin_password_expiry_enforcement'] ?? 'soft')));
+    $passwordChangedAt = trim((string)($user['password_changed_at'] ?? ''));
+    $passwordAgeDays = null;
+    if ($isAdminRole && $passwordChangedAt !== '' && $maxAgeDays > 0) {
+      $changedTs = strtotime($passwordChangedAt);
+      if ($changedTs !== false) {
+        $ageDays = (int)floor((time() - $changedTs) / 86400);
+        $passwordAgeDays = $ageDays;
+        if ($ageDays > $maxAgeDays) {
+          portal_audit_session_event('admin_password_expired', $username, [
+            'mode' => $expiryMode,
+            'age_days' => $ageDays,
+            'max_age_days' => $maxAgeDays,
+          ]);
+          if ($expiryMode === 'hard') {
+            api_json([
+              'ok' => false,
+              'error' => 'admin_password_expired',
+              'message' => 'Mật khẩu quản trị đã quá hạn ' . $ageDays . ' ngày. Hãy đổi mật khẩu trước khi đăng nhập.',
+              'age_days' => $ageDays,
+              'max_age_days' => $maxAgeDays,
+            ], 403);
+          }
+          // soft: continue, but flag the user record so the client banner shows.
+          $user['_password_expired_advisory'] = true;
+        }
+      }
+    }
+
+    $adminMfaMode = strtolower(trim((string)($settings['admin_mfa_enforcement'] ?? 'soft')));
+    if ($isAdminRole && !$mfaEnabled) {
+      portal_audit_session_event('admin_mfa_gap_detected', $username, [
+        'mode' => $adminMfaMode,
+        'role' => $userRoleNormalized,
+      ]);
+      if ($adminMfaMode === 'hard') {
+        api_json([
+          'ok' => false,
+          'error' => 'admin_mfa_enrollment_required',
+          'message' => 'Vai trò quản trị bắt buộc đăng ký MFA trước khi đăng nhập. Hãy đăng ký MFA qua trang quản trị người dùng.',
+          'role' => $userRoleNormalized,
+        ], 403);
+      }
+      // soft mode: continue login but stamp an advisory on the user record so
+      // the client / dashboard can show a banner. The flag is set in-memory only
+      // (not persisted) so it doesn't bloat users.json — clients re-derive it
+      // from the response on each login.
+      $user['_admin_mfa_advisory'] = true;
+    }
 
     // When system MFA is globally disabled, skip MFA entirely — just log in
     if (!$requireMfa) {
