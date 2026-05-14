@@ -1610,6 +1610,29 @@ function resolveAuthoritativeUserAssignment(selection={}){
 
 function syncUsersWithAuthoritativeOrg(){
   if(!Array.isArray(USERS) || !USERS.length) return;
+  // Only reconcile once the authoritative HCM catalog is loaded; otherwise resolving against
+  // an empty index would erase the legacy dept/title that the card view still needs to display.
+  const orgState = ADMIN_AUTH_STATE && ADMIN_AUTH_STATE.org;
+  const orgLoaded = !!(orgState && orgState.loaded
+    && Array.isArray(orgState.orgUnits) && orgState.orgUnits.length
+    && Array.isArray(orgState.positions));
+  if(orgLoaded){
+    USERS.forEach(u => {
+      if(!u || typeof u !== 'object') return;
+      const assignment = resolveAuthoritativeUserAssignment(u);
+      // If nothing authoritative resolved (no UUID, no dept+title match, no role match),
+      // leave the legacy fields untouched so the card still renders something.
+      if(!assignment.position && !assignment.orgUnit) return;
+      const nextOrgUnitId = assignment.orgUnitId || String(u.hcm_org_unit_id || '');
+      const nextPositionId = assignment.positionId || String(u.hcm_position_id || '');
+      const nextDept = assignment.deptCode || String(u.dept || '');
+      const nextTitle = assignment.positionTitle || String(u.title || '');
+      u.hcm_org_unit_id = nextOrgUnitId;
+      u.hcm_position_id = nextPositionId;
+      u.dept = nextDept;
+      u.title = nextTitle;
+    });
+  }
   window.USERS = USERS;
   try { window.dispatchEvent(new CustomEvent('admin:users:updated', { detail:{ users:USERS } })); } catch(_){}
 }
