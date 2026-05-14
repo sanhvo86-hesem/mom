@@ -48,7 +48,7 @@ final class ProductionHistoryReadModelServiceTest extends TestCase
             'capa_id' => 'CAPA-HIST',
             'evidence_id' => 'EVID-HIST',
             'actor_id' => 'QE-1',
-            'occurred_at' => '2026-04-13T03:02:00Z',
+            'occurred_at' => $this->recentTs(120),
             'payload' => ['result' => 'fail'],
         ]);
         $eventService->recordWorkExecutionEvent([
@@ -60,7 +60,7 @@ final class ProductionHistoryReadModelServiceTest extends TestCase
             'part_number' => 'PN-HIST',
             'lot_number' => 'LOT-HIST',
             'actor_id' => 'OP-1',
-            'occurred_at' => '2026-04-13T03:00:00Z',
+            'occurred_at' => $this->recentTs(0),
             'payload' => ['state' => 'started'],
         ]);
         $eventService->recordEvidenceAttachmentEvent([
@@ -71,7 +71,7 @@ final class ProductionHistoryReadModelServiceTest extends TestCase
             'wo_number' => 'WO-HIST',
             'ncr_id' => 'NCR-HIST',
             'capa_id' => 'CAPA-HIST',
-            'occurred_at' => '2026-04-13T03:03:00Z',
+            'occurred_at' => $this->recentTs(180),
             'payload' => ['file_hash' => hash('sha256', 'history-evidence')],
         ]);
         $eventService->recordGenealogyRelationEvent([
@@ -80,7 +80,7 @@ final class ProductionHistoryReadModelServiceTest extends TestCase
             'lot_number' => 'LOT-HIST',
             'child_lot_number' => 'LOT-HIST-CHILD',
             'wo_number' => 'WO-HIST',
-            'occurred_at' => '2026-04-13T03:04:00Z',
+            'occurred_at' => $this->recentTs(240),
             'payload' => ['relation' => 'consumed_into'],
         ]);
 
@@ -98,6 +98,11 @@ final class ProductionHistoryReadModelServiceTest extends TestCase
         $this->assertCount(1, $packet['sections']['quality']);
         $this->assertCount(1, $packet['sections']['evidence']);
         $this->assertCount(1, $packet['sections']['genealogy']);
+    }
+
+    private function recentTs(int $offset): string
+    {
+        return gmdate(DATE_ATOM, time() - 7200 + $offset);
     }
 
     private function removeDir(string $dir): void

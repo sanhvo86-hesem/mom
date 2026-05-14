@@ -182,7 +182,7 @@ final class TraceabilityGenealogyServiceTest extends TestCase
             'vendor_id' => 'VEND-1',
             'issue_status' => 'issued',
             'org_site_id' => 'SITE-A',
-            'occurred_at' => '2026-04-13T10:00:00Z',
+            'occurred_at' => $this->recentTs(0),
         ]);
 
         $impact = $this->traceability->supplierIssueImpactSummary(['scar_id' => 'SCAR-1', 'org_site_id' => 'SITE-A']);
@@ -213,7 +213,7 @@ final class TraceabilityGenealogyServiceTest extends TestCase
             'vendor_id' => 'VEND-1',
             'issue_status' => 'closed',
             'org_site_id' => 'SITE-A',
-            'occurred_at' => '2026-04-13T11:00:00Z',
+            'occurred_at' => $this->recentTs(3600),
         ]);
 
         $eligible = $this->traceability->consumptionEligibility(['lot_number' => 'SUP-LOT-Q', 'org_site_id' => 'SITE-A']);
@@ -230,7 +230,7 @@ final class TraceabilityGenealogyServiceTest extends TestCase
             'vendor_id' => 'VEND-SN',
             'issue_status' => 'issued',
             'org_site_id' => 'SITE-A',
-            'occurred_at' => '2026-04-13T10:00:00Z',
+            'occurred_at' => $this->recentTs(0),
         ]);
 
         $impact = $this->traceability->supplierIssueImpactSummary(['scar_id' => 'SCAR-SN', 'org_site_id' => 'SITE-A']);
@@ -251,7 +251,7 @@ final class TraceabilityGenealogyServiceTest extends TestCase
             'vendor_id' => 'VEND-SN',
             'issue_status' => 'closed',
             'org_site_id' => 'SITE-A',
-            'occurred_at' => '2026-04-13T11:00:00Z',
+            'occurred_at' => $this->recentTs(3600),
         ]);
 
         $eligible = $this->traceability->consumptionEligibility(['serial_number' => 'SUP-SN-Q', 'org_site_id' => 'SITE-A']);
@@ -260,7 +260,7 @@ final class TraceabilityGenealogyServiceTest extends TestCase
 
     public function testTraceQueriesPageBeyondFirstFiveHundredEvents(): void
     {
-        $base = strtotime('2026-04-13T07:00:00Z');
+        $base = time() - 7200;
         for ($i = 0; $i < 510; $i++) {
             $this->traceability->recordGenealogyLink([
                 'link_type' => 'supplier_receipt',
@@ -292,7 +292,7 @@ final class TraceabilityGenealogyServiceTest extends TestCase
             'vendor_id' => 'VEND-C',
             'issue_status' => 'issued',
             'org_site_id' => 'SITE-A',
-            'occurred_at' => '2026-04-13T12:00:00Z',
+            'occurred_at' => $this->recentTs(7200),
         ]);
 
         $blocked = $this->traceability->assembleContainmentPacket([
@@ -366,7 +366,7 @@ final class TraceabilityGenealogyServiceTest extends TestCase
             'vendor_id' => 'VEND-1',
             'inspection_id' => 'INC-' . $receiptLot,
             'org_site_id' => $siteId,
-            'occurred_at' => '2026-04-13T08:00:00Z',
+            'occurred_at' => $this->recentTs(0),
         ]);
         $this->traceability->recordGenealogyLink([
             'link_type' => 'production_consumption',
@@ -375,7 +375,7 @@ final class TraceabilityGenealogyServiceTest extends TestCase
             'wo_number' => 'WO-' . $productionLot,
             'operation_seq' => '20',
             'org_site_id' => $siteId,
-            'occurred_at' => '2026-04-13T08:30:00Z',
+            'occurred_at' => $this->recentTs(1800),
         ]);
         $this->traceability->recordGenealogyLink([
             'link_type' => 'shipment_pack',
@@ -384,7 +384,7 @@ final class TraceabilityGenealogyServiceTest extends TestCase
             'packing_id' => 'PK-' . $shipmentId,
             'package_number' => 'PKG-' . $shipmentId,
             'org_site_id' => $siteId,
-            'occurred_at' => '2026-04-13T09:00:00Z',
+            'occurred_at' => $this->recentTs(3600),
         ]);
     }
 
@@ -397,7 +397,7 @@ final class TraceabilityGenealogyServiceTest extends TestCase
             'vendor_id' => 'VEND-SN',
             'inspection_id' => 'INC-' . $receiptSerial,
             'org_site_id' => $siteId,
-            'occurred_at' => '2026-04-13T08:00:00Z',
+            'occurred_at' => $this->recentTs(0),
         ]);
         $this->traceability->recordGenealogyLink([
             'link_type' => 'production_consumption',
@@ -406,7 +406,7 @@ final class TraceabilityGenealogyServiceTest extends TestCase
             'wo_number' => 'WO-' . $productionSerial,
             'operation_seq' => '20',
             'org_site_id' => $siteId,
-            'occurred_at' => '2026-04-13T08:30:00Z',
+            'occurred_at' => $this->recentTs(1800),
         ]);
         $this->traceability->recordGenealogyLink([
             'link_type' => 'shipment_pack',
@@ -415,8 +415,13 @@ final class TraceabilityGenealogyServiceTest extends TestCase
             'packing_id' => 'PK-' . $shipmentId,
             'package_number' => 'PKG-' . $shipmentId,
             'org_site_id' => $siteId,
-            'occurred_at' => '2026-04-13T09:00:00Z',
+            'occurred_at' => $this->recentTs(3600),
         ]);
+    }
+
+    private function recentTs(int $offset): string
+    {
+        return gmdate(DATE_ATOM, time() - 7200 + $offset);
     }
 
     private function removeDir(string $dir): void

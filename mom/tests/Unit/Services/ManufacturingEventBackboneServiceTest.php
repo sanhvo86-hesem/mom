@@ -48,7 +48,7 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
             'nc_program_id' => 'NC-900',
             'actor_id' => 'operator-1',
             'actor_role' => 'operator',
-            'occurred_at' => '2026-04-13T01:00:00Z',
+            'occurred_at' => $this->recentTs(0),
             'idempotency_key' => 'wo-start-001',
             'payload' => ['state' => 'started', 'qty_started' => 10],
         ]);
@@ -63,7 +63,7 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
             'evidence_id' => 'EVID-1001',
             'actor_id' => 'qe-1',
             'actor_role' => 'quality_engineer',
-            'occurred_at' => '2026-04-13T01:05:00Z',
+            'occurred_at' => $this->recentTs(300),
             'payload' => ['result' => 'failed', 'characteristic' => 'diameter'],
         ]);
         $evidence = $service->recordEvidenceAttachmentEvent([
@@ -74,7 +74,7 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
             'ncr_id' => 'NCR-1001',
             'capa_id' => 'CAPA-1001',
             'actor_id' => 'qe-1',
-            'occurred_at' => '2026-04-13T01:06:00Z',
+            'occurred_at' => $this->recentTs(360),
             'payload' => ['file_hash' => hash('sha256', 'evidence')],
         ]);
 
@@ -140,14 +140,14 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
             'correlation_id' => 'corr-chain',
             'wo_number' => 'WO-CHAIN',
             'source_aggregate_id' => 'WO-CHAIN',
-            'occurred_at' => '2026-04-13T02:00:00Z',
+            'occurred_at' => $this->recentTs(0),
             'payload' => ['state' => 'started'],
         ]);
         $second = $service->recordWorkExecutionEvent([
             'correlation_id' => 'corr-chain',
             'wo_number' => 'WO-CHAIN',
             'source_aggregate_id' => 'WO-CHAIN',
-            'occurred_at' => '2026-04-13T02:10:00Z',
+            'occurred_at' => $this->recentTs(600),
             'payload' => ['state' => 'completed'],
         ]);
 
@@ -191,12 +191,12 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
             'wo_number' => 'WO-SCOPE-REPLAY',
             'source_aggregate_id' => 'WO-SCOPE-REPLAY',
             'idempotency_key' => 'idem-scope-replay',
-            'occurred_at' => '2026-04-13T02:00:00Z',
+            'occurred_at' => $this->recentTs(0),
             'payload' => ['state' => 'started'],
         ];
 
         $siteA = $service->recordWorkExecutionEvent($base + ['org_site_id' => 'SITE-A']);
-        $siteB = $service->recordWorkExecutionEvent($base + ['org_site_id' => 'SITE-B', 'occurred_at' => '2026-04-13T02:01:00Z']);
+        $siteB = $service->recordWorkExecutionEvent($base + ['org_site_id' => 'SITE-B', 'occurred_at' => $this->recentTs(60)]);
         $siteAReplay = $service->recordWorkExecutionEvent($base + ['org_site_id' => 'SITE-A']);
 
         $this->assertFalse($siteA['replayed']);
@@ -215,7 +215,7 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
             'correlation_id' => 'corr-taxonomy',
             'wo_number' => 'WO-TAX',
             'source_aggregate_id' => 'WO-TAX',
-            'occurred_at' => '2026-04-13T00:00:01+00:00',
+            'occurred_at' => $this->recentTs(1),
             'payload' => ['state' => 'started'],
         ]);
         $service->recordInspectionEvent([
@@ -223,7 +223,7 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
             'inspection_id' => 'INSP-TAX',
             'source_aggregate_id' => 'INSP-TAX',
             'wo_number' => 'WO-TAX',
-            'occurred_at' => '2026-04-13T00:00:02+00:00',
+            'occurred_at' => $this->recentTs(2),
             'payload' => ['result' => 'pass'],
         ]);
         $service->recordNcrCapaLinkageEvent([
@@ -231,7 +231,7 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
             'ncr_id' => 'NCR-TAX',
             'capa_id' => 'CAPA-TAX',
             'wo_number' => 'WO-TAX',
-            'occurred_at' => '2026-04-13T00:00:03+00:00',
+            'occurred_at' => $this->recentTs(3),
             'payload' => ['linkage' => 'capa_required'],
         ]);
         $service->recordEvidenceAttachmentEvent([
@@ -239,7 +239,7 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
             'evidence_id' => 'EVID-TAX',
             'source_aggregate_id' => 'EVID-TAX',
             'wo_number' => 'WO-TAX',
-            'occurred_at' => '2026-04-13T00:00:04+00:00',
+            'occurred_at' => $this->recentTs(4),
             'payload' => ['attachment' => 'measurement-photo'],
         ]);
         $service->recordGenealogyRelationEvent([
@@ -247,7 +247,7 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
             'lot_number' => 'LOT-PARENT',
             'child_lot_number' => 'LOT-CHILD',
             'wo_number' => 'WO-TAX',
-            'occurred_at' => '2026-04-13T00:00:05+00:00',
+            'occurred_at' => $this->recentTs(5),
             'payload' => ['relation' => 'consumed_into'],
         ]);
 
@@ -312,6 +312,11 @@ final class ManufacturingEventBackboneServiceTest extends TestCase
             repository: new FileManufacturingEventRepository($this->tmpDir),
             databaseConfig: ['use_postgres' => false],
         );
+    }
+
+    private function recentTs(int $offset): string
+    {
+        return gmdate(DATE_ATOM, time() - 7200 + $offset);
     }
 
     private function removeDir(string $dir): void

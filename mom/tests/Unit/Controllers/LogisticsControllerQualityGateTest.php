@@ -43,17 +43,17 @@ final class LogisticsControllerQualityGateTest extends TestCase
             'qty_rejected' => 2,
         ];
 
-        $ncr = $ncrMethod->invoke($controller, $oqc, 'quality-user', '2026-04-13T10:00:00+07:00');
+        $ncr = $ncrMethod->invoke($controller, $oqc, 'quality-user', gmdate(DATE_ATOM, time()));
         $this->assertIsArray($ncr);
         $this->assertStringStartsWith('NCR-OQC-', (string)($ncr['ncr_id'] ?? ''));
         $this->assertSame('open', $ncr['status'] ?? null);
 
-        $hold = $holdMethod->invoke($controller, $oqc, 'quality-user', '2026-04-13T10:00:00+07:00');
+        $hold = $holdMethod->invoke($controller, $oqc, 'quality-user', gmdate(DATE_ATOM, time()));
         $this->assertIsArray($hold);
         $this->assertSame('active', $hold['status'] ?? null);
         $this->assertSame('oqc_failure', $hold['source_type'] ?? null);
 
-        $duplicateNcr = $ncrMethod->invoke($controller, $oqc, 'quality-user', '2026-04-13T10:01:00+07:00');
+        $duplicateNcr = $ncrMethod->invoke($controller, $oqc, 'quality-user', gmdate(DATE_ATOM, time() + 60));
         $this->assertSame($ncr['ncr_id'], $duplicateNcr['ncr_id'] ?? null);
 
         $holds = json_decode((string)file_get_contents($this->dataDir . '/orders/holds.json'), true);
