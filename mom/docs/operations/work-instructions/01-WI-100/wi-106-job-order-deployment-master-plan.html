@@ -88,27 +88,27 @@
  </thead>
  <tbody>
  <tr>
- <td><code>mom/data/config/deploy/program.bootstrap.json</code></td>
+ <td><strong>Module Lịch Triển Khai</strong><br><small><code>program.bootstrap.json</code></small></td>
  <td>Lịch W0-W12, ngày, mục tiêu, gate code, deliverable, tài liệu bắt buộc và playbook từng tuần.</td>
  <td>Đây là lịch nguồn của master plan; mọi bảng hoặc tài liệu phụ phải khớp lịch này.</td>
  </tr>
  <tr>
- <td><code>readiness.json</code> / <code>readiness.bootstrap.json</code></td>
+ <td><strong>Module Sẵn Sàng Phòng Ban</strong><br><small><code>readiness.json</code> / <code>readiness.bootstrap.json</code></small></td>
  <td>Trạng thái từng phòng ban: rà tài liệu, đào tạo, M365, Champion, pilot và go-live.</td>
  <td>Không nâng gate chỉ bằng nhận xét trong họp nếu readiness chưa có trạng thái kiểm soát.</td>
  </tr>
  <tr>
- <td><code>issues.json</code>, <code>audit_events</code>, <code>training_records</code></td>
+ <td><strong>Module Sự Cố &amp; Đào Tạo</strong><br><small><code>issues.json</code>, <code>audit_events</code>, <code>training_records</code></small></td>
  <td>Sự cố triển khai, vết kiểm toán, đào tạo/OJT và bằng chứng đóng gate.</td>
  <td>Sev-1/Sev-2 phải có owner, hạn, quyết định tạm dừng/đi tiếp và bằng chứng đóng.</td>
  </tr>
  <tr>
- <td><code>dcc_document_header</code>, <code>scan_cache.json</code>, portal document center</td>
+ <td><strong>Module Kiểm Soát Tài Liệu</strong><br><small><code>dcc_document_header</code>, <code>scan_cache.json</code>, portal DCC</small></td>
  <td>DCC quyết định trạng thái phát hành; portal giúp tìm và mở đúng tài liệu.</td>
  <td>Listing cache và dashboard là read model; không thay thế DCC header hoặc SOP/WI nguồn.</td>
  </tr>
  <tr>
- <td><a href="../../references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> / <a href="wi-107-sharefile-git-cpanel-sync.html">WI-107</a></td>
+ <td><strong>Quy tắc Ranh Giới Nguồn</strong><br><small><a href="../../references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> / <a href="wi-107-sharefile-git-cpanel-sync.html">WI-107</a></small></td>
  <td>Ranh giới SharePoint/M365, Git, server deploy và runtime trong mọi cập nhật tài liệu.</td>
  <td>Không đưa thay đổi server/runtime thành sự thật nguồn nếu chưa có Git/deploy receipt kiểm soát.</td>
  </tr>
