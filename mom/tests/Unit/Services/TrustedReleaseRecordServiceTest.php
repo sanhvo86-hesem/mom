@@ -79,7 +79,7 @@ final class TrustedReleaseRecordServiceTest extends TestCase
             'org_legal_entity_code' => 'LE-A',
             'org_site_id' => 'SITE-B',
             'org_plant_id' => 'PLANT-B',
-            'occurred_at' => '2026-04-13T04:00:00Z',
+            'occurred_at' => $this->recentTs(0),
             'payload' => ['state' => 'completed'],
         ]);
         $this->events->recordInspectionEvent([
@@ -92,7 +92,7 @@ final class TrustedReleaseRecordServiceTest extends TestCase
             'org_legal_entity_code' => 'LE-A',
             'org_site_id' => 'SITE-B',
             'org_plant_id' => 'PLANT-B',
-            'occurred_at' => '2026-04-13T04:05:00Z',
+            'occurred_at' => $this->recentTs(300),
             'payload' => ['result' => 'pass'],
         ]);
 
@@ -151,7 +151,7 @@ final class TrustedReleaseRecordServiceTest extends TestCase
             'org_legal_entity_code' => 'LE-A',
             'org_site_id' => 'SITE-B',
             'org_plant_id' => 'PLANT-B',
-            'occurred_at' => '2026-04-13T05:00:00Z',
+            'occurred_at' => $this->recentTs(0),
             'payload' => ['state' => 'completed'],
         ]);
         $this->service->assemble($this->criteria('WO-SCOPE-B', 'SITE-B', 'PLANT-B'));
@@ -188,7 +188,7 @@ final class TrustedReleaseRecordServiceTest extends TestCase
             'lot_number' => 'LOT-' . $woNumber,
             'operation_seq' => '10',
             'actor_id' => 'OP-REL',
-            'occurred_at' => '2026-04-13T03:00:00Z',
+            'occurred_at' => $this->recentTs(0),
             'payload' => [
                 'state' => 'completed',
                 'qualification_gate' => [
@@ -210,7 +210,7 @@ final class TrustedReleaseRecordServiceTest extends TestCase
             'lot_number' => 'LOT-' . $woNumber,
             'evidence_id' => 'EVID-' . $woNumber,
             'actor_id' => 'QE-REL',
-            'occurred_at' => '2026-04-13T03:05:00Z',
+            'occurred_at' => $this->recentTs(300),
             'payload' => ['result' => 'pass', 'disposition' => 'accepted'],
         ]);
         $this->events->recordEvidenceAttachmentEvent([
@@ -223,7 +223,7 @@ final class TrustedReleaseRecordServiceTest extends TestCase
             'org_legal_entity_code' => 'LE-A',
             'org_site_id' => $siteId,
             'org_plant_id' => $plantId,
-            'occurred_at' => '2026-04-13T03:06:00Z',
+            'occurred_at' => $this->recentTs(360),
             'payload' => ['file_hash' => hash('sha256', 'evidence-' . $woNumber)],
         ]);
         $this->events->appendEvent([
@@ -240,7 +240,7 @@ final class TrustedReleaseRecordServiceTest extends TestCase
             'org_site_id' => $siteId,
             'org_plant_id' => $plantId,
             'actor_id' => 'QA-REL',
-            'occurred_at' => '2026-04-13T03:07:00Z',
+            'occurred_at' => $this->recentTs(420),
             'payload' => ['decision' => 'approve', 'signature_meaning' => 'release approval'],
         ]);
     }
@@ -257,6 +257,16 @@ final class TrustedReleaseRecordServiceTest extends TestCase
             'org_site_id' => $siteId,
             'org_plant_id' => $plantId,
         ];
+    }
+
+    /**
+     * Return an RFC 3339 timestamp relative to now.
+     * $offset > 0 = future seconds, $offset < 0 = past seconds.
+     * Keeps all timestamps within the 30-day MES-R6-006 acceptance window.
+     */
+    private function recentTs(int $offset): string
+    {
+        return gmdate(DATE_ATOM, time() - 7200 + $offset);
     }
 
     private function removeDir(string $dir): void

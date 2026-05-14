@@ -286,7 +286,7 @@ final class ConnectedGovernanceServiceTest extends TestCase
             'org_plant_id' => 'PLANT-A',
             'org_site_id' => $siteId,
             'released_by' => 'process-owner-1',
-            'released_at' => '2026-04-13T01:00:00Z',
+            'released_at' => $this->recentTs(-7200),
         ], $overrides));
     }
 
@@ -349,7 +349,7 @@ final class ConnectedGovernanceServiceTest extends TestCase
             'event_id' => 'evt-gov-work-complete',
             'source_aggregate_id' => 'WO-GOV-1',
             'actor_id' => 'operator-1',
-            'occurred_at' => '2026-04-13T03:00:00Z',
+            'occurred_at' => $this->recentTs(0),
             'payload' => ['state' => 'completed'],
         ]);
         $this->events->recordInspectionEvent($base + [
@@ -358,14 +358,14 @@ final class ConnectedGovernanceServiceTest extends TestCase
             'source_aggregate_id' => 'INSP-GOV-1',
             'evidence_id' => 'EVID-GOV-1',
             'actor_id' => 'qe-1',
-            'occurred_at' => '2026-04-13T03:05:00Z',
+            'occurred_at' => $this->recentTs(300),
             'payload' => ['result' => 'pass', 'disposition' => 'accepted'],
         ]);
         $this->events->recordEvidenceAttachmentEvent($base + [
             'event_id' => 'evt-gov-evidence',
             'evidence_id' => 'EVID-GOV-1',
             'source_aggregate_id' => 'EVID-GOV-1',
-            'occurred_at' => '2026-04-13T03:06:00Z',
+            'occurred_at' => $this->recentTs(360),
             'payload' => ['file_hash' => hash('sha256', 'evidence')],
         ]);
         $this->events->appendEvent($base + [
@@ -376,9 +376,19 @@ final class ConnectedGovernanceServiceTest extends TestCase
             'source_aggregate_type' => 'release_approval',
             'source_aggregate_id' => 'APR-GOV-1',
             'actor_id' => 'qa-1',
-            'occurred_at' => '2026-04-13T03:07:00Z',
+            'occurred_at' => $this->recentTs(420),
             'payload' => ['decision' => 'approve'],
         ]);
+    }
+
+    /**
+     * Return an RFC 3339 timestamp relative to now.
+     * $offset > 0 = future seconds, $offset < 0 = past seconds.
+     * Keeps all timestamps within the 30-day MES-R6-006 acceptance window.
+     */
+    private function recentTs(int $offset): string
+    {
+        return gmdate(DATE_ATOM, time() - 7200 + $offset);
     }
 
     private function removeDir(string $dir): void
