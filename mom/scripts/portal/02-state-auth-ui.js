@@ -10627,7 +10627,7 @@ async function doSoftDeleteUser(userId){
   try{
     const res = await apiCall('admin_user_upsert', {
       username: u.username, name: u.name, dept: u.dept||'', title: u.title||'',
-      role: u.role||'employee', active: false
+      role: u.role||window.DEFAULT_NEW_USER_ROLE, active: false
     });
     if(res && res.ok){
       showToast(lang==='en'?'✅ Deactivated':'✅ Đã vô hiệu hóa');
@@ -11011,7 +11011,7 @@ async function saveUserFromModal(userId){
     const username = String(document.getElementById('um-username')?.value||'').trim().toLowerCase();
     const dept = String(document.getElementById('um-dept')?.value||'').trim();
     const title = String(document.getElementById('um-title')?.value||'').trim();
-    const role = String(document.getElementById('um-role')?.value||'employee').trim();
+    const role = String(document.getElementById('um-role')?.value||window.DEFAULT_NEW_USER_ROLE||'').trim();
     const active = String(document.getElementById('um-active')?.value||'1') === '1';
     const mfaEnabled = String(document.getElementById('um-mfa')?.value||'0') === '1';
     const password = String(document.getElementById('um-password')?.value||'').trim();
@@ -11239,7 +11239,7 @@ async function toggleUserActive(userId){
       name: u.name||u.username,
       dept: u.dept||'',
       title: u.title||'',
-      role: u.role||'employee',
+      role: u.role||window.DEFAULT_NEW_USER_ROLE,
       active: newActive
     });
 
