@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-05-14T03:02:12.280Z",
+    "generatedAt": "2026-05-14T03:06:11.415Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "a78697bf-4652-476e-a4b9-5a9362caf639",
+    "publication_run_id": "3780b58e-1de8-4679-9fd0-e76384f55e9d",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",

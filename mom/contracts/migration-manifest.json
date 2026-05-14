@@ -1,11 +1,11 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-05-14T03:01:47.682530+00:00",
+    "generatedAt": "2026-05-14T03:05:45.767539+00:00",
     "description": "Non-destructive migration contract for ERP+MOM backend restructuring."
   },
   "storageAuthority": {
-    "databaseSchemaSource": "database/migrations/*.sql (001–180)",
+    "databaseSchemaSource": "database/migrations/*.sql (001–181)",
     "databaseSchemaSnapshot": "database/schema.sql",
     "tableCount": 867,
     "antiParallelAuthorityStatement": "There is exactly ONE schema authority chain: migrations → schema.sql (snapshot). Blueprint and spec SQL files are design inputs, NOT parallel authorities. No table definition outside migrations is authoritative."
