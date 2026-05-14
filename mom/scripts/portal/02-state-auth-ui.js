@@ -1634,20 +1634,66 @@ function syncUsersWithAuthoritativeOrg(){
     && Array.isArray(orgState.orgUnits) && orgState.orgUnits.length
     && Array.isArray(orgState.positions));
   if(orgLoaded){
+    // Build an employee → preferred-active-position index from the assignments
+    // table. Reading u.hcm_position_id is unsafe because the Xóa flow soft-ends
+    // assignments without updating users.json — the user record keeps pointing
+    // at the old position, so the modal/card show stale dept/title. The
+    // assignments table is the SSOT: pick the primary active row, else the
+    // first active concurrent. If no active row exists, clear the fields.
+    const today = new Date().toISOString().slice(0, 10);
+    const activeByEmployee = {};
+    (orgState.assignments || []).forEach(row=>{
+      if(String(row.assignment_status || 'active') !== 'active') return;
+      const effTo = String(row.effective_to || '').slice(0, 10);
+      if(effTo && effTo <= today) return;
+      const eid = String(row.employee_id || '').trim();
+      const posId = String(row.hcm_position_id || '').trim();
+      if(!eid || !posId) return;
+      (activeByEmployee[eid] = activeByEmployee[eid] || []).push(row);
+    });
+    Object.keys(activeByEmployee).forEach(eid=>{
+      activeByEmployee[eid].sort((a,b)=>{
+        const ap = (String(a.assignment_type || '') === 'primary' || a.is_primary === true) ? 0 : 1;
+        const bp = (String(b.assignment_type || '') === 'primary' || b.is_primary === true) ? 0 : 1;
+        return ap - bp;
+      });
+    });
+    // Also index any assignment record (active or soft-ended) per employee, so
+    // we can tell "manually-imported user with no assignment row" (legacy case
+    // — preserve fields) apart from "user whose last assignment got soft-ended
+    // by Xóa" (clear stale fields).
+    const anyAssignmentForEmployee = {};
+    (orgState.assignments || []).forEach(row=>{
+      const eid = String(row.employee_id || '').trim();
+      if(eid) anyAssignmentForEmployee[eid] = true;
+    });
     USERS.forEach(u => {
       if(!u || typeof u !== 'object') return;
-      const assignment = resolveAuthoritativeUserAssignment(u);
-      // If nothing authoritative resolved (no UUID, no dept+title match, no role match),
-      // leave the legacy fields untouched so the card still renders something.
-      if(!assignment.position && !assignment.orgUnit) return;
-      const nextOrgUnitId = assignment.orgUnitId || String(u.hcm_org_unit_id || '');
-      const nextPositionId = assignment.positionId || String(u.hcm_position_id || '');
-      const nextDept = assignment.deptCode || String(u.dept || '');
-      const nextTitle = assignment.positionTitle || String(u.title || '');
-      u.hcm_org_unit_id = nextOrgUnitId;
-      u.hcm_position_id = nextPositionId;
-      u.dept = nextDept;
-      u.title = nextTitle;
+      const eid = adminUserEmployeeId(u);
+      const preferred = (activeByEmployee[eid] || [])[0];
+      if(preferred){
+        const assignment = resolveAuthoritativeUserAssignment({
+          hcm_position_id: preferred.hcm_position_id,
+          hcm_org_unit_id: preferred.hcm_org_unit_id
+        });
+        u.hcm_org_unit_id = assignment.orgUnitId || String(u.hcm_org_unit_id || '');
+        u.hcm_position_id = assignment.positionId || String(u.hcm_position_id || '');
+        u.dept = assignment.deptCode || String(u.dept || '');
+        u.title = assignment.positionTitle || String(u.title || '');
+        return;
+      }
+      // No ACTIVE assignment. If we have a soft-ended assignment record for
+      // this employee, the user was deliberately removed from a position —
+      // clear the stale dept/title/position so the modal/card show empty.
+      // Skip if there's no assignment row at all (legacy import path) so we
+      // don't wipe data that was never written through admin_user_upsert.
+      if(anyAssignmentForEmployee[eid] &&
+         (String(u.hcm_position_id || '').trim() || String(u.hcm_org_unit_id || '').trim())){
+        u.hcm_position_id = '';
+        u.hcm_org_unit_id = '';
+        u.dept = '';
+        u.title = '';
+      }
     });
   }
   window.USERS = USERS;
