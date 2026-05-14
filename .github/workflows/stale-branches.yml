@@ -1,0 +1,102 @@
+name: Stale Branch Cleanup
+
+# Runs every Monday at 08:00 UTC (15:00 ICT).
+# Scans codex/** branches that have had no commits in 7+ days and
+# posts a summary issue comment so the developer can decide to merge or delete.
+# Does NOT auto-delete — a human or AI must run the 4-gate check first.
+
+on:
+  schedule:
+    - cron: '0 8 * * 1'
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  scan-stale-branches:
+    name: Scan Stale codex/** Branches
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: List stale branches and post summary
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          STALE_DAYS: 7
+        run: |
+          set -euo pipefail
+          NOW=$(date +%s)
+          CUTOFF=$(( NOW - STALE_DAYS * 86400 ))
+          REPORT=""
+          STALE_COUNT=0
+
+          # Fetch all remote branches
+          git fetch --prune origin
+
+          for REF in $(git for-each-ref --format='%(refname:short)' refs/remotes/origin/codex/); do
+            BRANCH="${REF#origin/}"
+
+            # Skip if an open PR exists — branch is actively being worked on
+            OPEN_PR=$(gh pr list --head "$BRANCH" --state open --json number -q '.[0].number' 2>/dev/null || echo "")
+            if [ -n "$OPEN_PR" ]; then
+              continue
+            fi
+
+            # Last commit timestamp on this branch
+            LAST_COMMIT_TS=$(git log -1 --format='%ct' "$REF" 2>/dev/null || echo "0")
+            LAST_COMMIT_DATE=$(git log -1 --format='%ci' "$REF" 2>/dev/null || echo "unknown")
+            COMMIT_MSG=$(git log -1 --format='%s' "$REF" 2>/dev/null || echo "(no commits)")
+
+            # Unmerged commit count vs main
+            UNMERGED=$(git log --oneline "origin/main..$REF" 2>/dev/null | wc -l | tr -d ' ')
+
+            if [ "$LAST_COMMIT_TS" -lt "$CUTOFF" ]; then
+              STALE_COUNT=$(( STALE_COUNT + 1 ))
+              if [ "$UNMERGED" -gt 0 ]; then
+                STATUS="⚠️ **$UNMERGED unmerged commit(s)** — do NOT delete without review"
+              else
+                STATUS="✅ Fully merged into main — safe to delete after 4-gate check"
+              fi
+              REPORT="${REPORT}
+          ### \`$BRANCH\`
+          - Last activity: $LAST_COMMIT_DATE
+          - Last commit: $COMMIT_MSG
+          - Unmerged vs main: $UNMERGED commit(s)
+          - Status: $STATUS
+          - Delete command: \`git push origin --delete $BRANCH\`
+          "
+            fi
+          done
+
+          if [ "$STALE_COUNT" -eq 0 ]; then
+            echo "No stale codex/** branches found."
+            exit 0
+          fi
+
+          # Post as a GitHub issue for visibility
+          ISSUE_TITLE="[Branch Guard] $STALE_COUNT stale codex branch(es) — $(date +%Y-%m-%d)"
+          ISSUE_BODY="## Stale Branch Report — $(date '+%Y-%m-%d %H:%M UTC')
+
+          The following \`codex/**\` branches have had no commits in $STALE_DAYS+ days and no open PR.
+
+          $REPORT
+
+          ---
+          **Before deleting any branch, verify the 4-gate checklist:**
+          1. \`gh pr view <N> --json state -q .state\` → \`MERGED\`
+          2. \`gh run list --branch main --limit 3\` → CI completed
+          3. \`ssh eqms 'git -C /var/www/eqms.hesemeng.com log --oneline -1'\` → merge SHA visible
+          4. Browser smoke test on eqms.hesemeng.com passed
+
+          Branches with unmerged commits must NOT be deleted without explicit decision.
+          "
+
+          gh issue create \
+            --title "$ISSUE_TITLE" \
+            --body "$ISSUE_BODY" \
+            --label "branch-hygiene" \
+            || echo "::warning::Could not create issue — label 'branch-hygiene' may not exist. Create it once in GitHub Issues settings."

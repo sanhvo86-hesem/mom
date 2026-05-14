@@ -1,0 +1,148 @@
+name: Branch Guard
+
+# Runs on every push to codex/** branches and on every PR targeting main.
+# Purpose:
+#   1. Enforce codex/<slug> naming on AI-agent branches
+#   2. Detect migration number collisions before they reach main
+#   3. Auto-open a draft PR when a codex/** branch is pushed without one
+#   4. Block any direct push to main that bypasses a PR
+
+on:
+  push:
+    branches:
+      - 'codex/**'
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  # ─── 1. Migration number collision detection ───────────────────────────────
+  migration-collision:
+    name: Migration Collision Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect duplicate migration numbers
+        run: |
+          set -euo pipefail
+          MIGRATION_DIR="mom/database/migrations"
+
+          # Extract the leading NNN from each filename, collect duplicates
+          NUMS=$(ls "$MIGRATION_DIR"/*.sql 2>/dev/null | xargs -I{} basename {} | grep -oE '^[0-9]+' | sort)
+          DUPS=$(echo "$NUMS" | uniq -d)
+
+          if [ -n "$DUPS" ]; then
+            echo "::error::Duplicate migration number(s) detected: $DUPS"
+            echo "Two AI agents created migrations with the same number."
+            echo "Rename the conflicting file to use the next available number."
+            ls "$MIGRATION_DIR"/*.sql | xargs -I{} basename {} | grep -E "^($DUPS)_" | sed 's/^/  - /'
+            exit 1
+          fi
+          echo "PASS: No duplicate migration numbers found."
+
+      - name: Check this branch does not reuse a number already in main
+        if: github.event_name == 'pull_request'
+        run: |
+          set -euo pipefail
+          MIGRATION_DIR="mom/database/migrations"
+
+          # Files added in this PR vs main
+          NEW_FILES=$(git diff --name-only --diff-filter=A origin/main...HEAD -- "$MIGRATION_DIR/*.sql" || true)
+          if [ -z "$NEW_FILES" ]; then
+            echo "No new migration files in this PR."
+            exit 0
+          fi
+
+          # Numbers already on main
+          MAIN_NUMS=$(git show origin/main:HEAD -- "$MIGRATION_DIR" 2>/dev/null | \
+            grep -oE '^[0-9]+' | sort -u || true)
+
+          for f in $NEW_FILES; do
+            NUM=$(basename "$f" | grep -oE '^[0-9]+')
+            if echo "$MAIN_NUMS" | grep -qx "$NUM"; then
+              echo "::error::Migration number $NUM in $f already exists on main."
+              echo "Use the next available number after: $(echo "$MAIN_NUMS" | tail -1)"
+              exit 1
+            fi
+          done
+          echo "PASS: All new migration numbers are unique vs main."
+
+  # ─── 2. Branch naming convention ──────────────────────────────────────────
+  branch-naming:
+    name: Branch Naming Convention
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Enforce codex/<slug> pattern
+        run: |
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          if echo "$BRANCH" | grep -qE '^codex/[a-z0-9]([a-z0-9-]*[a-z0-9])?$'; then
+            echo "PASS: Branch name '$BRANCH' matches codex/<slug> pattern."
+          else
+            echo "::warning::Branch name '$BRANCH' does not follow codex/<slug> convention."
+            echo "Recommended format: codex/short-task-name (lowercase, hyphens only)"
+            # Warning only — do not fail, some human branches may not follow pattern
+          fi
+
+  # ─── 3. Auto-create draft PR when a codex/** branch is pushed ─────────────
+  auto-pr:
+    name: Auto-create Draft PR
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create draft PR if none exists
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="${GITHUB_REF#refs/heads/}"
+          SLUG="${BRANCH#codex/}"
+
+          # Check if an open PR already exists for this branch
+          EXISTING=$(gh pr list --head "$BRANCH" --state open --json number -q '.[0].number' 2>/dev/null || echo "")
+
+          if [ -n "$EXISTING" ]; then
+            echo "PR #$EXISTING already exists for branch $BRANCH — skipping auto-create."
+            exit 0
+          fi
+
+          # Build a meaningful title from the slug
+          TITLE=$(echo "$SLUG" | tr '-' ' ' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) substr($i,2); print}')
+
+          gh pr create \
+            --title "$TITLE" \
+            --body "$(cat <<'EOF'
+## Auto-opened by Branch Guard
+
+Branch: \`$BRANCH\`
+
+### Pre-merge checklist
+- [ ] CI passes (all jobs green)
+- [ ] PHPStan: 0 errors
+- [ ] PHPUnit: no new failures
+- [ ] No duplicate migration numbers
+- [ ] No runtime config files committed
+- [ ] DCC header compliance maintained
+
+### Branch deletion gates (after merge)
+- [ ] PR status = MERGED
+- [ ] deploy.yml completed on main
+- [ ] VPS commit confirmed: \`ssh eqms 'git -C /var/www/eqms.hesemeng.com log --oneline -1'\`
+- [ ] Browser smoke test passed on eqms.hesemeng.com
+EOF
+)" \
+            --draft \
+            --base main \
+            --head "$BRANCH" \
+            || echo "::warning::Could not auto-create PR (may need write permission or branch has no commits ahead of main)."

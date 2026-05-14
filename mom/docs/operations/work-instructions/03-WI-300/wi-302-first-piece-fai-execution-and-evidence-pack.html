@@ -1,9 +1,10 @@
 <!DOCTYPE html>
+
 <html lang="vi">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WI-302 - Mẫu đầu tiên FAI Execution and Gói bằng chứng | HESEM MOM</title>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>WI-302 - Thực hiện mẫu đầu/FAI và gói bằng chứng | HESEM MOM</title>
 <script>
 /* DCC Header bootstrap — computes absolute URLs from location.pathname so the
  * stylesheet + renderer load correctly regardless of how the document is
@@ -24,7 +25,7 @@
   document.head.appendChild(js);
 })();
 </script>
-<link rel="stylesheet" href="../../../../assets/style.css">
+<link href="../../../../assets/style.css" rel="stylesheet"/>
 <style>
 
 .page-body h1 {font-size: 24px; line-height: 1.35; margin:0 0 10px;}
@@ -61,92 +62,101 @@ hr.sep {border:none; border-top:1px solid var(--ln2); margin:18px 0;}
 </head>
 <body>
 <div class="container">
- <div class="page">
- <div class="page-body">
- <!-- DCC Document Change Control header (values served by /api/v1/dcc; bootstrap seed is preview-only) -->
-<div class="dcc-header"
-     data-dcc-doc-code="WI-302"
-     data-dcc-locale="vi"
-     data-dcc-logo="../../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;WI-302&quot;,&quot;title&quot;:&quot;Mẫu đầu tiên FAI Execution and Gói bằng chứng&quot;,&quot;subtitle&quot;:&quot;Thực hiện first piece, FAI, balloon/CMM và dựng evidence pack để chốt readiness cho route kiểm tra.&quot;,&quot;doc_type&quot;:&quot;WI&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
- 
- <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi có part mới, phiên bản mới, đổi máy/chương trình/fixture/tool có ảnh hưởng, sau sự cố nghiêm trọng/PM lớn, hoặc khi khách hàng yêu cầu mẫu đầu/FAI.</div>
- 
- 
-<section id="wi-s1" class="section"><h2>1. Mục đích và nguyên tắc không thương lượng</h2>
-<p>Mẫu đầu và FAI là cổng chặn để bảo vệ xưởng khỏi scrap hàng loạt, bảo vệ tiến độ khỏi treo Job và bảo vệ khách hàng khỏi escape. Khi cổng kiểm soát này chưa pass, sản xuất hàng loạt <strong>không được</strong> chạy.</p>
-<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> kích hoạt mẫu đầu/FAI theo đúng Job đang chạy, thực hiện balloon/CMM khi Job yêu cầu, chỉ ký PASS sau khi đã đo đủ đặc tính thuộc phạm vi kiểm, và chỉ mở cổng kiểm soát FAI khi <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> đã phê duyệt phát hành.</div>
+<div class="page">
+<div class="page-body"> Đầu trang kiểm soát thay đổi tài liệu DCC (giá trị lấy từ /api/v1/dcc; dữ liệu khởi tạo chỉ dùng để xem trước) <div class="dcc-header" data-dcc-bootstrap='{"header":{"doc_code":"WI-302","title":"Thực hiện mẫu đầu/FAI và gói bằng chứng","subtitle":"FAI, first-piece evidence và release decision cho W3 pilot và W7-W8 production.","doc_type":"WI","revision":"V1","effective_date":"2026-05-14","owner_role_code":"QA","approver_role_code":"CEO","iso_clause":null,"status":"released"},"labels":{"doc_id":{"short":"Mã","long":"Mã tài liệu","sort":10},"revision":{"short":"PB","long":"Phiên bản","sort":20},"effective_date":{"short":"HL","long":"Ngày hiệu lực","sort":30},"owner":{"short":"CSH","long":"Chủ sở hữu","sort":40},"approver":{"short":"Duyệt","long":"Người phê duyệt","sort":50}}}' data-dcc-doc-code="WI-302" data-dcc-locale="vi" data-dcc-logo="../../../../assets/hesem-logo.svg"></div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br/>Dùng ở W3 khi Kỹ thuật + QA chạy FAI mẫu trong QA pilot, W4 khi Kỹ thuật ký nhận bằng chứng Đi/Không đi, W7-W8 khi Đợt Sản xuất yêu cầu FAI trước khi mở G4 cho từng Job Order và W11 khi cập nhật biểu mẫu FAI theo bài học triển khai.</div>
+<section class="section" id="wi-s1"><h2>1. Mục đích và nguyên tắc không thương lượng</h2>
+<p>Mẫu đầu và FAI là cổng chặn để bảo vệ xưởng khỏi phế phẩm hàng loạt, bảo vệ tiến độ khỏi treo lệnh sản xuất và bảo vệ khách hàng khỏi lọt lỗi. Khi cổng kiểm soát này chưa đạt, sản xuất hàng loạt <strong>không được</strong> chạy.</p>
+<div class="callout-danger"><span style="display:inline-block;padding:2px 10px;border-radius:8px;border:1px solid #ffc9c9;background:#fff5f5;color:#e03131;font-size:11px;font-weight:700;letter-spacing:.02em;text-transform:uppercase">PHẢI</span> kích hoạt mẫu đầu/FAI theo đúng lệnh sản xuất đang chạy, thực hiện đánh số đặc tính/CMM khi lệnh sản xuất yêu cầu, chỉ ký ĐẠT sau khi đã đo đủ đặc tính thuộc phạm vi kiểm, và chỉ mở cổng kiểm soát FAI khi <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> đã phê duyệt phát hành.</div>
 <ul class="tight" style="padding-left:20px; margin:8px 0;">
-<li>Mọi kích hoạt FAI/mẫu đầu phải được nhìn thấy trên Bộ hồ sơ công việc (job gói hồ sơ), phiếu công nghệ và hồ sơ Job.</li>
-<li>Mẫu đầu phải truy ra được máy, chương trình, tool/fixture, Người setup, ca và thời điểm.</li>
-<li>Phần đã cắt ra trước khi cổng kiểm soát PASS phải được giữ ở trạng thái nghi ngờ nếu chưa có quyết định rõ.</li>
+<li>Mọi kích hoạt FAI/mẫu đầu phải được nhìn thấy trên Hồ sơ công việc, phiếu công nghệ và hồ sơ lệnh sản xuất.</li>
+<li>Mẫu đầu phải truy ra được máy, chương trình, dao cụ/đồ gá, người cài đặt máy, ca và thời điểm.</li>
+<li>Phần đã cắt ra trước khi cổng kiểm soát ĐẠT phải được giữ ở trạng thái nghi ngờ nếu chưa có quyết định rõ.</li>
 </ul></section>
-
-<section id="wi-s2" class="section"><h2>2. Ma trận kích hoạt: Mẫu đầu, Chênh lệch FAI, Đầy đủ FAI</h2>
+<section class="section" id="wi-s2"><h2>2. Ma trận kích hoạt: Mẫu đầu, FAI chênh lệch, FAI đầy đủ</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tình huống</th><th>Mức bắt buộc</th><th>Ghi chú vận hành</th></tr></thead><tbody>
-<tr><td>Part mới / lần chạy đầu</td><td><span class="badge-red">Đầy đủ FAI</span> + Mẫu đầu</td><td>Đo đầy đủ đặc tính theo balloon/spec, khóa phát hành trước khi chạy lô.</td></tr>
-<tr><td>Phiên bản mới / ECO ảnh hưởng đặc tính</td><td><span class="badge-red">Đầy đủ FAI</span> hoặc <span class="badge-amber">Chênh lệch FAI</span> theo tác động</td><td>Nếu ảnh hưởng CTQ, mốc chuẩn (datum), dung sai chuỗi hoặc fit/chức năng thì mặc định Đầy đủ FAI.</td></tr>
-<tr><td>Đổi máy, đổi fixture, đổi lộ trình gia công, đổi WCS logic, đổi chương trình chính</td><td><span class="badge-amber">Chênh lệch FAI</span> + Mẫu đầu</td><td>Phải đo lại toàn bộ đặc tính bị ảnh hưởng và các CTQ liên quan.</td></tr>
-<tr><td>Thay dao/mảnh dao (insert) bình thường không đổi logic cắt</td><td><span class="badge-blue">Mẫu đầu tăng cường</span></td><td>Đo CTQ, kích thước không / bằng không và bề mặt/cạnh nhạy cảm trước khi chạy tiếp.</td></tr>
-<tr><td>Sau sự cố nghiêm trọng, PM lớn, thay trục chính (spindle), sửa đồ gá, nghi ngờ năng lực / khả năng</td><td><span class="badge-red">Tái xác nhận hiệu lực FAI</span></td><td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> và <a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)"><span class="entity-code dept-code">D-ENG</span></a> quyết định phạm vi; không dùng dữ liệu cũ để suy diễn.</td></tr>
-<tr><td>Khởi động lại sau dừng dài / đổi ca với Job rủi ro cao</td><td><span class="badge-blue">Mẫu đầu</span></td><td>Áp dụng mạnh cho QPL-3/QPL-4 hoặc part bề mặt/chức năng nhạy cảm.</td></tr>
+<tr><td>Chi tiết mới/lần chạy đầu</td><td><span class="badge-red">FAI đầy đủ</span> + Mẫu đầu</td><td>Đo đầy đủ đặc tính theo bản vẽ đánh số đặc tính/yêu cầu kỹ thuật, khóa phát hành trước khi chạy lô.</td></tr>
+<tr><td>Phiên bản mới/ECO ảnh hưởng đặc tính</td><td><span class="badge-red">FAI đầy đủ</span> hoặc <span class="badge-amber">FAI chênh lệch</span> theo tác động</td><td>Nếu ảnh hưởng CTQ, mốc chuẩn, dung sai chuỗi hoặc lắp ghép/chức năng thì mặc định FAI đầy đủ.</td></tr>
+<tr><td>Đổi máy, đổi đồ gá, đổi lộ trình gia công, đổi cách xác lập WCS, đổi chương trình chính</td><td><span class="badge-amber">FAI chênh lệch</span> + Mẫu đầu</td><td>Phải đo lại toàn bộ đặc tính bị ảnh hưởng và các CTQ liên quan.</td></tr>
+<tr><td>Thay dao/mảnh dao bình thường không đổi cách cắt</td><td><span class="badge-blue">Mẫu đầu tăng cường</span></td><td>Đo CTQ, kích thước chuẩn gá/điểm 0 và bề mặt/cạnh nhạy cảm trước khi chạy tiếp.</td></tr>
+<tr><td>Sau sự cố nghiêm trọng, PM lớn, thay trục chính, sửa đồ gá, nghi ngờ năng lực quá trình</td><td><span class="badge-red">Tái xác nhận hiệu lực FAI</span></td><td><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> và <a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)"><span class="entity-code dept-code">D-ENG</span></a> quyết định phạm vi; không dùng dữ liệu cũ để suy diễn.</td></tr>
+<tr><td>Khởi động lại sau dừng dài/đổi ca với lệnh sản xuất rủi ro cao</td><td><span class="badge-blue">Mẫu đầu</span></td><td>Áp dụng mạnh cho QPL-3/QPL-4 hoặc chi tiết bề mặt/chức năng nhạy cảm.</td></tr>
 </tbody></table></div>
 <p>Mức cưỡng chế hồ sơ theo QPL xem tại <a href="../../references/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a>.</p></section>
-
-<section id="wi-s3" class="section"><h2>3. Điều kiện vào cổng kiểm soát</h2>
+<section class="section" id="wi-s3"><h2>3. Điều kiện vào cổng kiểm soát</h2>
 <div class="matrix">
-<div class="card"><h3>3.1 Bộ tài liệu bắt buộc</h3><ul class="tight" style="padding-left:20px;"><li>Bản vẽ/spec đúng phiên bản, bộ hồ sơ chuẩn (mốc chuẩn gói hàng) đúng phát hành.</li><li>Phiếu setup, danh sách dao cụ, setup Photos, fixture note theo <a href="../../references/03-ANNEX-300/annex-301-setup-sheet-and-tool-list-standard.html">ANNEX-301</a>.</li><li>Phiếu công nghệ/Bộ hồ sơ công việc ghi rõ OpSeq, QPL, lộ trình gia công đặc biệt nếu có.</li><li>Nếu Job thuộc tuyến đặc biệt, áp dụng thêm <a href="../../references/05-ANNEX-500/annex-505-put-thru-index.html">ANNEX-505</a>.</li></ul></div>
-<div class="card"><h3>3.2 Điều kiện đo</h3><ul class="tight" style="padding-left:20px;"><li>Gage/CMM/program đo sẵn sàng, còn hiệu lực, đúng phạm vi / dải.</li><li>Balloon bản vẽ Released trong SSOT; số balloon phải thống nhất với biểu mẫu đo.</li><li>Part sạch, không phoi, không bavia gây sai số đo; điều kiện đo đặc biệt phải được thỏa mãn trước khi đo.</li></ul></div>
+<div class="card"><h3>3.1 Bộ tài liệu bắt buộc</h3><ul class="tight" style="padding-left:20px;"><li>Bản vẽ/yêu cầu kỹ thuật đúng phiên bản, bộ hồ sơ chuẩn (mốc chuẩn gói hàng) đúng phát hành.</li><li>Phiếu cài đặt máy, danh sách dao cụ, ảnh cài đặt máy, ghi chú đồ gá theo <a href="../../references/03-ANNEX-300/annex-301-setup-sheet-and-tool-list-standard.html">ANNEX-301</a>.</li><li>Phiếu công nghệ/Bộ hồ sơ công việc ghi rõ OpSeq, QPL, lộ trình gia công đặc biệt nếu có.</li><li>Nếu lệnh sản xuất thuộc tuyến đặc biệt, áp dụng thêm <a href="../../references/05-ANNEX-500/annex-505-put-thru-index.html">ANNEX-505</a>.</li></ul></div>
+<div class="card"><h3>3.2 Điều kiện đo</h3><ul class="tight" style="padding-left:20px;"><li>Dưỡng đo/CMM/chương trình đo sẵn sàng, còn hiệu lực, đúng phạm vi/dải.</li><li>Bản vẽ đã đánh số đặc tính và phát hành trong nguồn hồ sơ chuẩn; số đặc tính phải thống nhất với biểu mẫu đo.</li><li>Chi tiết sạch, không phoi, không bavia gây sai số đo; điều kiện đo đặc biệt phải được thỏa mãn trước khi đo.</li></ul></div>
 </div>
 <div class="callout-warn"><strong>TẠM GIỮ</strong> nếu thiếu bất kỳ đầu vào nào ở trên. Thiếu điều kiện đo không được "đo tạm rồi bổ sung sau".</div></section>
-
-<section id="wi-s4" class="section"><h2>4. Thực hiện mẫu đầu / FAI</h2>
+<section class="section" id="wi-s4"><h2>4. Thực hiện mẫu đầu/FAI</h2>
 <div class="step-list">
-<div class="step-item"><strong>Tách mẫu đầu và khóa lô nghi ngờ.</strong><br>Ngay sau setup/chạy kiểm chứng, tách part đầu tiên hoặc tập mẫu đầu theo yêu cầu. Toàn bộ sản phẩm cắt ra trước khi cổng kiểm soát PASS phải được nhận diện là nghi ngờ cho tới khi <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> quyết định phát hành.</div>
-<div class="step-item"><strong>Đối chiếu 4 điểm trước khi đo.</strong><br>Bản vẽ/spec, chương trình, phiếu cài đặt, tool/fixture phải cùng phiên bản và cùng part. Sai một điểm thì dừng, mở hold, trả về <a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)"><span class="entity-code dept-code">D-ENG</span></a> / <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Kỹ thuật viên setup)"><span class="entity-code role-code">SET</span></a>.</div>
-<div class="step-item"><strong>Đo theo thứ tự bảo vệ rủi ro.</strong><br>Đo CTQ, kích thước chuẩn gá/không / bằng không, mốc chuẩn (datum) chuỗi, hình học, đặc tính ảnh hưởng fit/chức năng trước. Sau đó mới đo phần còn lại trong phạm vi Đầy đủ FAI/Chênh lệch FAI. Khi dùng CMM phải lưu cả raw đầu ra, không chỉ lưu bản tóm tắt.</div>
-<div class="step-item"><strong>Balloon và truy vết đặc tính.</strong><br>Mỗi kết quả đo phải truy ngược được về số balloon hoặc mã đặc tính trong kiểm tra program. Không chấp nhận báo cáo mà Người đọc không biết kết quả đó đang nói tới đặc điểm / tính năng nào.</div>
-<div class="step-item"><strong>Đánh giá kết quả và quyết định cổng kiểm soát.</strong><br>Đạt khi toàn bộ đặc tính thuộc phạm vi đều đạt và hồ sơ đầy đủ. Không đạt khi có bất kỳ đặc tính không đạt hoặc bằng chứng không đáng tin cậy. TẠM GIỮ có điều kiện chỉ dùng khi part chưa NG nhưng hồ sơ còn thiếu hoặc đang chờ quyết định kỹ thuật.</div>
-<div class="step-item"><strong>Khóa bằng chứng và phát hành.</strong><br>Sau khi pass, nạp báo cáo, balloon bản vẽ, raw data, ảnh khi cần, quyết định phát hành và Người ký vào Hồ sơ công việc (hồ sơ công việc). Thông tin phát hành phải nhìn thấy được cho Sản xuất tại Point-of-use.</div>
+<div class="step-item"><strong>Tách mẫu đầu và khóa lô nghi ngờ.</strong><br/>Ngay sau cài đặt máy/chạy kiểm chứng, tách chi tiết đầu tiên hoặc tập mẫu đầu theo yêu cầu. Toàn bộ sản phẩm cắt ra trước khi cổng kiểm soát ĐẠT phải được nhận diện là nghi ngờ cho tới khi <a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a> quyết định phát hành.</div>
+<div class="step-item"><strong>Đối chiếu 4 điểm trước khi đo.</strong><br/>Bản vẽ/yêu cầu kỹ thuật, chương trình, phiếu cài đặt, dao cụ/đồ gá phải cùng phiên bản và cùng chi tiết. Sai một điểm thì dừng, mở tạm giữ, trả về <a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)"><span class="entity-code dept-code">D-ENG</span></a>/<a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-setup-technician.html" title="Setup Technician (Kỹ thuật viên setup)"><span class="entity-code role-code">SET</span></a>.</div>
+<div class="step-item"><strong>Đo theo thứ tự bảo vệ rủi ro.</strong><br/>Đo CTQ, kích thước chuẩn gá/điểm 0, chuỗi mốc chuẩn, hình học, đặc tính ảnh hưởng lắp ghép/chức năng trước. Sau đó mới đo phần còn lại trong phạm vi FAI đầy đủ/FAI chênh lệch. Khi dùng CMM phải lưu cả dữ liệu đo thô, không chỉ lưu bản tóm tắt.</div>
+<div class="step-item"><strong>Đánh số và truy vết đặc tính.</strong><br/>Mỗi kết quả đo phải truy ngược được về số đặc tính hoặc mã đặc tính trong kiểm tra chương trình. Không chấp nhận báo cáo mà người đọc không biết kết quả đó đang nói tới đặc tính nào.</div>
+<div class="step-item"><strong>Đánh giá kết quả và quyết định cổng kiểm soát.</strong><br/>Đạt khi toàn bộ đặc tính thuộc phạm vi đều đạt và hồ sơ đầy đủ. Không đạt khi có bất kỳ đặc tính không đạt hoặc bằng chứng không đáng tin cậy. TẠM GIỮ có điều kiện chỉ dùng khi chi tiết chưa NG nhưng hồ sơ còn thiếu hoặc đang chờ quyết định kỹ thuật.</div>
+<div class="step-item"><strong>Khóa bằng chứng và phát hành.</strong><br/>Sau khi đạt, nạp báo cáo, bản vẽ đã đánh số đặc tính, dữ liệu thô, ảnh khi cần, quyết định phát hành và người ký vào Hồ sơ công việc. Thông tin phát hành phải nhìn thấy được cho Sản xuất tại điểm sử dụng.</div>
 </div></section>
-
-<section id="wi-s5" class="section"><h2>5. Tái xác nhận hiệu lực và xử lý FAIL</h2>
+<section class="section" id="wi-s5"><h2>5. Tái xác nhận hiệu lực và xử lý KHÔNG ĐẠT</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Khi nào phải tái xác nhận</th><th>Yêu cầu tối thiểu</th><th>Ai quyết định</th></tr></thead><tbody>
-<tr><td>Thay đổi program/bù trừ (offset) vượt giới hạn đã phê duyệt</td><td>Đo lại đặc tính bị ảnh hưởng + CTQ liên quan</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)"><span class="entity-code dept-code">D-ENG</span></a></span></td></tr>
-<tr><td>Thay fixture/jaw/gá kẹp chi tiết, đổi machine hoặc đổi định hướng / đào tạo hội nhập</td><td>Chênh lệch FAI hoặc Đầy đủ FAI theo tác động</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)"><span class="entity-code dept-code">D-ENG</span></a></span></td></tr>
-<tr><td>sự cố nghiêm trọng, trục chính (spindle) hit, jaw phiếu / trượt, đầu dò (probe) hit, part shift</td><td>Hold toàn bộ WIP nghi ngờ; đánh giá phạm vi và FAI lại</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)"><span class="entity-code dept-code">D-PROD</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)"><span class="entity-code dept-code">D-ENG</span></a></span></td></tr>
-<tr><td>khởi động lại sau dừng dài, chuyển ca ở Job QPL cao</td><td>Mẫu đầu xác nhận lại trước khi chạy tiếp</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)"><span class="entity-code role-code">WKM</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Trưởng ca)"><span class="entity-code role-code">SL</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a></span></td></tr>
+<tr><td>Thay đổi chương trình/bù trừ vượt giới hạn đã phê duyệt</td><td>Đo lại đặc tính bị ảnh hưởng + CTQ liên quan</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)"><span class="entity-code dept-code">D-ENG</span></a></span></td></tr>
+<tr><td>Thay đồ gá/ngàm kẹp/gá kẹp chi tiết, đổi máy hoặc đổi định hướng gá/định hướng chi tiết</td><td>FAI chênh lệch hoặc FAI đầy đủ theo tác động</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)"><span class="entity-code dept-code">D-ENG</span></a></span></td></tr>
+<tr><td>Sự cố nghiêm trọng, trục chính va chạm, ngàm kẹp trượt, đầu dò va chạm, chi tiết bị xê dịch</td><td>Tạm giữ toàn bộ WIP nghi ngờ; đánh giá phạm vi và FAI lại</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-production-handbook.html" title="Production Department (Phòng Sản xuất)"><span class="entity-code dept-code">D-PROD</span></a><span class="entity-sep role-sep">+</span><a class="entity-link dept-link" href="../../../system/organization/02-Department-Handbooks/dept-engineering-handbook.html" title="Engineering Department (Phòng Kỹ thuật)"><span class="entity-code dept-code">D-ENG</span></a></span></td></tr>
+<tr><td>Khởi động lại sau dừng dài, chuyển ca ở lệnh sản xuất QPL cao</td><td>Mẫu đầu xác nhận lại trước khi chạy tiếp</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-cnc-workshop-manager.html" title="CNC Workshop Manager (Quản lý phân xưởng CNC)"><span class="entity-code role-code">WKM</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/02-JD-Production/jd-shift-leader.html" title="Shift Leader (Trưởng ca)"><span class="entity-code role-code">SL</span></a><span class="entity-sep role-sep">+</span><a class="entity-link role-link" href="../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html" title="QA Manager (Trưởng bộ phận đảm bảo chất lượng)"><span class="entity-code role-code">QA</span></a></span></td></tr>
 </tbody></table></div>
-<div class="callout-danger"><strong>FAIL thì làm ngay</strong><br>1) Dừng công đoạn. 2) Cách ly part nghi ngờ từ cuối cùng đã biết tốt / đạt. 3) Bảo toàn setup hiện trạng nếu cần điều tra. 4) Ghi rõ đặc điểm / tính năng fail, phương pháp đo, dụng cụ đo, Người đo, thời điểm. 5) Không tự sửa chương trình/bù trừ (offset) rồi chạy lại khi chưa có quyết định phù hợp.</div></section>
-
-<section id="wi-s6" class="section"><h2>6. Bộ bằng chứng bắt buộc</h2>
+<div class="callout-danger"><strong>Khi KHÔNG ĐẠT phải làm ngay</strong><br/>1) Dừng công đoạn. 2) Cách ly chi tiết nghi ngờ từ cuối cùng đã biết tốt/đạt. 3) Bảo toàn cài đặt máy hiện trạng nếu cần điều tra. 4) Ghi rõ đặc tính không đạt, phương pháp đo, dụng cụ đo, người đo, thời điểm. 5) Không tự sửa chương trình/bù trừ rồi chạy lại khi chưa có quyết định phù hợp.</div></section>
+<section class="section" id="wi-s6"><h2>6. Bộ bằng chứng bắt buộc</h2>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Bằng chứng</th><th>Bắt buộc khi</th><th>Ghi chú</th></tr></thead><tbody>
-<tr><td>Balloon bản vẽ</td><td>Đầy đủ FAI / Chênh lệch FAI</td><td>Phải là phiên bản hiện hành và lưu trong SSOT.</td></tr>
-<tr><td>FAI / Mẫu đầu báo cáo</td><td>Mọi lần mở cổng kiểm soát</td><td>Phải có kết luận rõ PASS/TẠM GIỮ/FAIL. Với gói FAI theo AS9102, báo cáo phải giữ đủ 3 nhóm thông tin Form 1 / Form 2 / Form 3 trên biểu mẫu kiểm soát.</td></tr>
-<tr><td>CMM / raw đo lường data</td><td>Khi dùng CMM hoặc program đo</td><td>Không thay bằng Photos màn hình rời rạc.</td></tr>
-<tr><td>Phiếu setup / danh sách dao cụ / program version</td><td>Mọi lần mở cổng kiểm soát</td><td>Phải truy về cùng phát hành set.</td></tr>
-<tr><td>Ảnh part / fixture / setup quan trọng / nghiêm trọng</td><td>khi part phức tạp, rủi ro cao hoặc khách yêu cầu</td><td>Ảnh phải phục vụ truy vết, không chụp minh họa chung chung.</td></tr>
+<tr><td>Bản vẽ đánh số đặc tính</td><td>FAI đầy đủ/FAI chênh lệch</td><td>Phải là phiên bản hiện hành và lưu trong nguồn hồ sơ chuẩn.</td></tr>
+<tr><td>Báo cáo FAI/mẫu đầu</td><td>Mọi lần mở cổng kiểm soát</td><td>Phải có kết luận rõ ĐẠT/TẠM GIỮ/KHÔNG ĐẠT. Với gói FAI theo AS9102, báo cáo phải giữ đủ 3 nhóm thông tin Biểu mẫu 1/Biểu mẫu 2/Biểu mẫu 3 trên biểu mẫu kiểm soát.</td></tr>
+<tr><td>Dữ liệu đo thô/CMM</td><td>Khi dùng CMM hoặc chương trình đo</td><td>Không thay bằng ảnh chụp màn hình rời rạc.</td></tr>
+<tr><td>Phiếu cài đặt máy/danh sách dao cụ/phiên bản chương trình</td><td>Mọi lần mở cổng kiểm soát</td><td>Phải truy về cùng bộ phát hành.</td></tr>
+<tr><td>Ảnh chi tiết/đồ gá/cài đặt máy quan trọng/nghiêm trọng</td><td>Khi chi tiết phức tạp, rủi ro cao hoặc khách yêu cầu</td><td>Ảnh phải phục vụ truy vết, không chụp minh họa chung chung.</td></tr>
 </tbody></table></div>
-<p>Hồ sơ công việc và siêu dữ liệu cấu trúc theo <a href="../../work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>. Nếu Job thuộc tuyến put-xuyên qua (thru)/pass-xuyên suốt đặc biệt, bộ hồ sơ đi kèm phải mở rộng theo <a href="../../references/05-ANNEX-500/annex-505-put-thru-index.html">ANNEX-505</a>.</p></section>
-
-<section id="wi-s7" class="section"><h2>7. KPI và tài liệu liên kết</h2>
+<p>Hồ sơ công việc và siêu dữ liệu cấu trúc theo <a href="../../work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>. Nếu lệnh sản xuất thuộc tuyến ưu tiên xuyên suốt hoặc tuyến đạt xuyên suốt đặc biệt, bộ hồ sơ đi kèm phải mở rộng theo <a href="../../references/05-ANNEX-500/annex-505-put-thru-index.html">ANNEX-505</a>.</p></section>
+<section class="section" id="wi-s7"><h2>7. KPI và tài liệu liên kết</h2>
 <div class="kpi-grid">
-<div class="kpi-box"><strong>KPI-WI302-01</strong><br>Tỷ lệ mẫu đầu / FAI pass ngay lần đầu. Mục tiêu: tăng ổn định, giảm phế phẩm đầu ca.</div>
-<div class="kpi-box"><strong>KPI-WI302-02</strong><br>Tỷ lệ FAI có raw data/balloon đầy đủ trước phát hành. Mục tiêu: 100%.</div>
-<div class="kpi-box"><strong>KPI-WI302-03</strong><br>Thời gian từ part đầu đến quyết định phát hành. Mục tiêu: ngắn nhưng không bỏ bước.</div>
-<div class="kpi-box"><strong>KPI-WI302-04</strong><br>Số lần khởi động lại/chạy lô trước khi cổng kiểm soát PASS. Mục tiêu: 0.</div>
+<div class="kpi-box"><strong>KPI-WI302-01</strong><br/>Tỷ lệ mẫu đầu/FAI đạt ngay lần đầu. Mục tiêu: tăng ổn định, giảm phế phẩm đầu ca.</div>
+<div class="kpi-box"><strong>KPI-WI302-02</strong><br/>Tỷ lệ FAI có dữ liệu thô/bản vẽ đánh số đặc tính đầy đủ trước phát hành. Mục tiêu: 100%.</div>
+<div class="kpi-box"><strong>KPI-WI302-03</strong><br/>Thời gian từ chi tiết đầu đến quyết định phát hành. Mục tiêu: ngắn nhưng không bỏ bước.</div>
+<div class="kpi-box"><strong>KPI-WI302-04</strong><br/>Số lần khởi động lại/chạy lô trước khi cổng kiểm soát ĐẠT. Mục tiêu: 0.</div>
 </div>
 <div class="table-card"><table class="table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tài liệu</th><th>Vai trò</th></tr></thead><tbody>
 <tr><td><a href="../../references/06-ANNEX-600/annex-603-quality-package-levels-qpl.html">ANNEX-603</a></td><td>Xác định QPL và mức hồ sơ/cổng kiểm soát cưỡng chế.</td></tr>
-<tr><td><a href="../../references/03-ANNEX-300/annex-301-setup-sheet-and-tool-list-standard.html">ANNEX-301</a></td><td>Chuẩn phiếu cài đặt, danh sách dao cụ, setup Photos.</td></tr>
-<tr><td><a href="../../../forms/frm-300-technical/FRM-311_FAI_Report.xlsx" download="">FRM-311</a></td><td>Biểu mẫu FAI được kiểm soát; giữ cấu trúc thông tin Form 1 / Form 2 / Form 3 khi áp dụng AS9102.</td></tr>
-<tr><td><a href="../05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a></td><td>Setup/chuyển đổi (chuyển công đoạn) và xác nhận sẵn sàng chạy.</td></tr>
+<tr><td><a href="../../references/03-ANNEX-300/annex-301-setup-sheet-and-tool-list-standard.html">ANNEX-301</a></td><td>Chuẩn phiếu cài đặt, danh sách dao cụ, ảnh cài đặt máy.</td></tr>
+<tr><td><a download="" href="../../../forms/frm-300-technical/FRM-311_FAI_Report.xlsx">FRM-311</a></td><td>Biểu mẫu FAI được kiểm tra soát; giữ cấu trúc thông tin Biểu mẫu 1/Biểu mẫu 2/Biểu mẫu 3 khi áp dụng AS9102.</td></tr>
+<tr><td><a href="../05-WI-500/wi-517-setup-changeover-smed-standard-work.html">WI-517</a></td><td>Cài đặt máy/chuyển đổi và xác nhận sẵn sàng chạy.</td></tr>
 <tr><td><a href="../05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html">WI-519</a></td><td>Kiểm tra nhanh bộ hồ sơ trước khi bấm chạy.</td></tr>
 <tr><td><a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td><td>Đóng gói bằng chứng vào Hồ sơ công việc và khóa hồ sơ.</td></tr>
 </tbody></table></div></section>
-
- </div>
- </div>
+<section class="section" id="wi-s8"><h2>8. Bản đồ W0-W12</h2>
+<p>Tài liệu này được dùng trong chương trình triển khai QMS hiện hành (lịch nguồn: <code>mom/data/config/deploy/program.bootstrap.json</code>). WI-302 là điểm khóa FAI/chi tiết đầu trước khi mở sản xuất hàng loạt; trong W0-W12, mỗi lần ký ĐẠT phải nối được tới gate, Job Dossier và playbook tuần tương ứng.</p>
+<div class="table-card"><table class="table matrix-table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word"><thead><tr><th>Tuần</th><th>Pha · trụ</th><th>Cổng kiểm liên quan</th><th>Cách dùng tài liệu này</th><th>Bằng chứng đóng cổng</th></tr></thead><tbody>
+<tr><td>W3 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W03.html">TRN-DEP-W03</a></td><td>P2 · <code>pilot</code></td><td><code>P2-01</code></td><td><span class="dept-code">ENG</span> + <span class="role-code">QA</span> chạy FAI mẫu, đo đủ đặc tính trong phạm vi, giữ dữ liệu thô/CMM và ảnh setup trong cùng Job Dossier.</td><td><code>drills.json</code>, FAI sample pack, raw CMM data</td></tr>
+<tr><td>W4 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W04.html">TRN-DEP-W04</a></td><td>P2 · <code>pilot</code></td><td><code>P2-04</code></td><td>Phòng Kỹ thuật ký nhận FAI mẫu trong quyết định Đi/Không đi; mọi ngoại lệ phải có disposition và owner trước khi Đợt 2 đi tiếp.</td><td><code>mgmt-reviews.json</code>, decision log, FAI disposition</td></tr>
+<tr><td>W7-W8 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W07.html">TRN-DEP-W07</a> / <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W08.html">TRN-DEP-W08</a></td><td>P3 · <code>golive</code> + <code>pilot</code></td><td><code>P3-04</code></td><td>Mọi Job Order trong Đợt Sản xuất chạy FAI trước khi mở G4; lệch FAI phải <code>&lt; 3%</code> và không được bypass bằng tin nhắn hoặc bản in rời.</td><td><code>audit_events</code>, readiness sample, Job Dossier FAI link</td></tr>
+<tr><td>W11 · <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W11.html">TRN-DEP-W11</a></td><td>P4 · <code>doc</code></td><td><code>P4-03</code></td><td><span class="role-code">QMS</span> cập nhật biểu mẫu FAI, tiêu chí đánh số đặc tính và điều kiện mở G4 theo bài học thực tế.</td><td><code>dcc_document_revision</code>, lesson-learned action log</td></tr>
+</tbody></table></div>
+</section>
+<section class="section" id="wi-s9"><h2>9. KPI điều hành phải theo dõi</h2>
+<div class="metric-grid">
+<div class="metric-card"><strong>KPI-FLD-01</strong><br/>Định tuyến đúng thư mục <code>>= 95%</code>; đo bằng việc mở FAI report, dữ liệu thô và WI-203 từ Job Dossier.</div>
+<div class="metric-card"><strong>KPI-DEP-03</strong><br/>Tỉ lệ thay đổi thất bại <code>&lt;= 10%</code>; áp dụng cho thay đổi máy, chương trình, đồ gá và tiêu chí FAI.</div>
+<div class="metric-card"><strong>KPI-DEP-04</strong><br/>Thời gian phát hành <code>&lt;= 10 d</code>; đo từ chi tiết đầu tới quyết định FAI đã ký.</div>
+</div>
+<p class="note"><strong>Khi báo đỏ:</strong> mở dòng trong <code>issues.json</code>, gắn JobNum/PartRev/Gate, leo thang theo <a href="../../references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> và giữ lệnh ở trạng thái TẠM GIỮ tới khi FAI có quyết định.</p>
+</section>
+<section class="section" id="wi-s10"><h2>10. Điều kiện NO-GO cho FAI</h2>
+<ul class="tight">
+<li>Không công nhận <code>P2-01</code> khi FAI mẫu W3 thiếu dữ liệu thô/CMM, bản vẽ đánh số đặc tính hoặc chữ ký QA.</li>
+<li>Không ký Đi/Không đi <code>P2-04</code> khi FAI mẫu còn disposition mở mà không có owner và thời hạn đóng.</li>
+<li>Không cho Đợt Sản xuất mở G4 tại <code>P3-04</code> khi Job Order chưa có FAI hoặc lệch FAI <code>> 3%</code>.</li>
+<li>Không phát hành bản cập nhật W11 tại <code>P4-03</code> khi <code>KPI-DEP-03 &gt; 15%</code> chưa có nguyên nhân gốc và hành động ngăn tái diễn.</li>
+</ul>
+</section>
+</div>
+</div>
 </div>
 <div class="no-screen print-disclaimer">⚠ Bản in không có đóng dấu kiểm soát phiên bản thì tài liệu này không có giá trị. Chỉ sử dụng phiên bản hiện hành trên hệ thống HESEM QMS.</div>
 </body>
