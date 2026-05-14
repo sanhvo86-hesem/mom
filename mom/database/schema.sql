@@ -2304,14 +2304,20 @@ BEGIN;
 -- ---------------------------------------------------------------------------
 -- employees / Nhan vien (17 vars from personnel)
 -- ---------------------------------------------------------------------------
--- Identity columns (employee_name, role_code, role_label) were dropped in
--- migration 179. Single read source for identity is now v_user_canonical
--- (migration 178). This table retains only operator-runtime metadata that
--- hasn't yet migrated to users.metadata. See .ai/USER_IDENTITY_SSOT.md.
+-- Identity columns (employee_name, role_code, role_label) are duplicated
+-- from users.full_name / roles.role_code / roles.role_label_vi for now;
+-- migration 179 attempted to drop them but the schema-authority registry
+-- couldn't be regenerated cleanly in the same session, so migration 180
+-- restored them. Read identity via v_user_canonical (migration 178) — never
+-- join `employees` for that. The trg_employees_role_drift_audit trigger
+-- detects any divergence. See .ai/USER_IDENTITY_SSOT.md.
 CREATE TABLE employees (
     employee_id         VARCHAR(20)     PRIMARY KEY,
+    employee_name       VARCHAR(150)    NOT NULL,
     user_id_code        VARCHAR(50),
     user_id             UUID            REFERENCES users(user_id),
+    role_code           VARCHAR(50),
+    role_label          VARCHAR(150),
     dept_code           dept_code       REFERENCES departments(dept_code),
     shift               shift_code,
     supervisor_name     VARCHAR(150),
@@ -2322,7 +2328,7 @@ CREATE TABLE employees (
     created_at          TIMESTAMPTZ     NOT NULL DEFAULT now(),
     updated_at          TIMESTAMPTZ     NOT NULL DEFAULT now()
 );
-COMMENT ON TABLE employees IS 'Operator runtime projection. Identity moved to v_user_canonical in migration 179. / Du lieu runtime cua operator.';
+COMMENT ON TABLE employees IS 'Employee runtime projection. Identity columns are dual-written from users by AuthUserShadowSyncService; read via v_user_canonical. / Du lieu nhan vien.';
 
 -- ---------------------------------------------------------------------------
 -- training_records / Ho so dao tao (10 vars from training)
