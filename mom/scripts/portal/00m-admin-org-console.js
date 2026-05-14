@@ -2368,6 +2368,13 @@
       +     '<span style="font-weight:700">'+esc(t('Layout','Bố cục'))+':</span>'
       +     '<button class="org-chip '+(S.chart.layout==='TB'?'is-active':'')+'" data-act="chart-layout" data-val="TB">↓ '+esc(t('Top-down','Dọc'))+'</button>'
       +     '<button class="org-chip '+(S.chart.layout==='LR'?'is-active':'')+'" data-act="chart-layout" data-val="LR">→ '+esc(t('Left-right','Ngang'))+'</button>'
+      +     '<span style="width:1px;height:24px;background:var(--border-1,#e5e7eb)"></span>'
+      +     '<span style="font-weight:700">'+esc(t('Status','Trạng thái'))+':</span>'
+      +     '<select class="org-btn" data-act="chart-status-filter" style="padding:6px 10px">'
+      +       '<option value="active"'  + (S.filter.status==='active'?' selected':'')   + '>'+esc(t('Active only','Đang hoạt động'))+'</option>'
+      +       '<option value="inactive"'+ (S.filter.status==='inactive'?' selected':'') + '>'+esc(t('Inactive only','Ngừng dùng'))+'</option>'
+      +       '<option value="all"'     + (S.filter.status==='all'?' selected':'')      + '>'+esc(t('All','Tất cả'))+'</option>'
+      +     '</select>'
       +     '<span style="flex:1"></span>'
       +     (S.chart.editing
               ? '<span class="org-btn org-chart-editing">'+esc(t('Editing','Đang sửa'))+(chartHasDirtyLayout()?' *':'')+'</span>'
@@ -2410,6 +2417,16 @@
   function bindOrgChartHostEvents(host){
     if (host._chartHostBound) return;
     host._chartHostBound = true;
+    // Status dropdown lives on the chart toolbar but writes to the SAME
+    // S.filter.status used by the cards view, so toggling here also affects
+    // the next visit to "Phòng ban & Chức danh".
+    host.addEventListener('change', function(ev){
+      var sel = ev.target.closest('[data-act="chart-status-filter"]');
+      if (!sel) return;
+      S.filter.status = String(sel.value || 'active');
+      S.chart.zoom = 1; S.chart.panX = 0; S.chart.panY = 0;
+      renderOrgChart(host);
+    });
     host.addEventListener('click', function(ev){
       var dropdown = host.querySelector('[data-export-dropdown]');
       var menu = host.querySelector('[data-export-menu]');
@@ -2807,14 +2824,46 @@
     }
   }
 
+  // Status filter shared with the cards view (S.filter.status). The chart was
+  // iterating S.units / S.positions directly, so archived / inactive entries
+  // (including soft-archived test units) still rendered on the canvas even
+  // though the cards view honored S.filter.status. Both views must reflect
+  // the same source of truth: an inactive unit/position is hidden from BOTH
+  // when status='active', visible in BOTH when status='all'.
+  function chartUnitPassesStatus(u){
+    if (!u) return false;
+    var active = String(u.status || 'active') !== 'inactive';
+    if (S.filter.status === 'active'   && !active) return false;
+    if (S.filter.status === 'inactive' &&  active) return false;
+    return true;
+  }
+  function chartPositionPassesStatus(p){
+    if (!p) return false;
+    var active = String(p.status || 'active') !== 'inactive';
+    if (S.filter.status === 'active'   && !active) return false;
+    if (S.filter.status === 'inactive' &&  active) return false;
+    return true;
+  }
+
   function drawUnitsTree(rootG, host){
     host._positionChartState = null;
     var SVG_NS = 'http://www.w3.org/2000/svg';
     var W = 230, H = 130;
-    var rootIds = (S.childrenOfUnit['']||[]).map(function(u){ return u.hcm_org_unit_id; });
+    var visibleByParent = {};
+    S.units.forEach(function(u){
+      if (!chartUnitPassesStatus(u)) return;
+      // Reparent to '' when the unit's parent itself is hidden, so the
+      // surviving children still attach somewhere instead of becoming
+      // orphan-floating in the canvas.
+      var parentId = String(u.parent_org_unit_id || '');
+      var parent = parentId ? S.byUnitId[parentId] : null;
+      var rerouted = parent && !chartUnitPassesStatus(parent) ? '' : parentId;
+      (visibleByParent[rerouted] = visibleByParent[rerouted] || []).push(u);
+    });
+    var rootIds = (visibleByParent['']||[]).map(function(u){ return u.hcm_org_unit_id; });
     var positions = layoutTree(
       rootIds,
-      function(id){ return (S.childrenOfUnit[id]||[]).map(function(c){ return c.hcm_org_unit_id; }); },
+      function(id){ return (visibleByParent[id]||[]).map(function(c){ return c.hcm_org_unit_id; }); },
       function(){ return { w:W, h:H }; },
       S.chart.layout
     );
@@ -2827,7 +2876,7 @@
     // shoulder, vertical drop into child top — classic three-segment join.
     Object.keys(positions).forEach(function(id){
       var u = S.byUnitId[id]; if (!u) return;
-      var children = (S.childrenOfUnit[id]||[]);
+      var children = (visibleByParent[id]||[]);
       children.forEach(function(c){
         var p1 = positions[id], p2 = positions[c.hcm_org_unit_id];
         if (!p2) return;
@@ -2855,7 +2904,21 @@
     // Build virtual tree from reports_to_position_id
     var SVG_NS = 'http://www.w3.org/2000/svg';
     var W = 286, H = 104;
-    var childrenMap = buildPositionChildrenMap();
+    var fullChildrenMap = buildPositionChildrenMap();
+    // Apply the same S.filter.status gate that the cards view uses, so the
+    // role chart and the position cards always render the same dataset.
+    var visibleSet = {};
+    S.positions.forEach(function(p){
+      if (chartPositionPassesStatus(p)) visibleSet[String(p.hcm_position_id || '')] = true;
+    });
+    var childrenMap = {};
+    S.positions.forEach(function(p){
+      var pid = String(p.hcm_position_id || '');
+      if (!visibleSet[pid]) return;
+      var parentId = String(p.reports_to_position_id || '');
+      var rerouted = parentId && !visibleSet[parentId] ? '' : parentId;
+      (childrenMap[rerouted] = childrenMap[rerouted] || []).push(pid);
+    });
     var collapsed = S.chart.collapsedPositions || (S.chart.collapsedPositions = {});
     function visibleChildren(id){
       return collapsed[id] ? [] : (childrenMap[id] || []);
