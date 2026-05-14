@@ -1411,6 +1411,18 @@
     (S.users || []).forEach(add);
     (S.hcmEmployees || []).forEach(add);
     if (Array.isArray(window.USERS)) window.USERS.forEach(add);
+    // Dedup: hcm_employees stores canonical EMP... ids; users.json creates duplicate entries
+    // keyed by username. Merge username-keyed entries into their canonical EMP... entries
+    // using hcm_employees.source_record_id (which holds the username) as the link key.
+    (S.hcmEmployees || []).forEach(function(hcme){
+      var empId = String(hcme.employee_id || '').trim();
+      var altKey = String(hcme.source_record_id || '').trim();
+      if (!empId || !altKey || altKey === empId) return;
+      if (!byId[altKey] || !byId[empId]) return;
+      // Merge user-profile display data into the canonical entry, keep EMP id
+      byId[empId] = Object.assign({}, byId[altKey], byId[empId], { employee_id: empId });
+      delete byId[altKey];
+    });
     return Object.keys(byId).map(function(id){ return byId[id]; }).sort(compareEmployeesByDisplayName);
   }
 
