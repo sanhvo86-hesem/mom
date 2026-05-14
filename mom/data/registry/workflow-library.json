@@ -24834,7 +24834,7 @@
       ],
       "stateField": "status",
       "statusSet": "active_inactive",
-      "lifecycleMode": "persisted",
+      "lifecycleMode": "generic_status_only",
       "states": [
         {
           "id": "active",
@@ -24857,42 +24857,6 @@
           "allowedTransitionsFrom": [
             "active"
           ]
-        },
-        {
-          "id": "complete",
-          "label": "Hoàn chỉnh",
-          "labelEn": "Complete",
-          "color": "#10b981",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "partial",
-          "label": "Một phần",
-          "labelEn": "Partial",
-          "color": "#f59e0b",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "broken",
-          "label": "Đứt gãy",
-          "labelEn": "Broken",
-          "color": "#ef4444",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "pending",
-          "label": "Chờ hoàn thiện",
-          "labelEn": "Pending",
-          "color": "#3b82f6",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
         }
       ],
       "transitions": [
@@ -24913,51 +24877,6 @@
           "labelEn": "Reactivate",
           "guards": [],
           "actions": []
-        },
-        {
-          "from": "complete",
-          "to": "partial",
-          "trigger": "move_to_partial",
-          "label": "Mot phan",
-          "labelEn": "Partial",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "hr_manager",
-              "template": "hcm_workforce_partial"
-            }
-          ]
-        },
-        {
-          "from": "partial",
-          "to": "broken",
-          "trigger": "move_to_broken",
-          "label": "Dut gay",
-          "labelEn": "Broken",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "hr_manager",
-              "template": "hcm_workforce_broken"
-            }
-          ]
-        },
-        {
-          "from": "broken",
-          "to": "pending",
-          "trigger": "move_to_pending",
-          "label": "Cho xu ly",
-          "labelEn": "Pending",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "hr_manager",
-              "template": "hcm_workforce_pending"
-            }
-          ]
         }
       ],
       "sla": {
@@ -25248,7 +25167,7 @@
       ],
       "stateField": "status",
       "statusSet": "active_inactive",
-      "lifecycleMode": "persisted",
+      "lifecycleMode": "generic_status_only",
       "states": [
         {
           "id": "active",
@@ -25271,42 +25190,6 @@
           "allowedTransitionsFrom": [
             "active"
           ]
-        },
-        {
-          "id": "complete",
-          "label": "Hoàn chỉnh",
-          "labelEn": "Complete",
-          "color": "#10b981",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "partial",
-          "label": "Một phần",
-          "labelEn": "Partial",
-          "color": "#f59e0b",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "broken",
-          "label": "Đứt gãy",
-          "labelEn": "Broken",
-          "color": "#ef4444",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
-        },
-        {
-          "id": "pending",
-          "label": "Chờ hoàn thiện",
-          "labelEn": "Pending",
-          "color": "#3b82f6",
-          "entryActions": [],
-          "exitActions": [],
-          "allowedTransitionsFrom": []
         }
       ],
       "transitions": [
@@ -25327,51 +25210,6 @@
           "labelEn": "Reactivate",
           "guards": [],
           "actions": []
-        },
-        {
-          "from": "complete",
-          "to": "partial",
-          "trigger": "move_to_partial",
-          "label": "Mot phan",
-          "labelEn": "Partial",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "hr_manager",
-              "template": "hcm_workforce_partial"
-            }
-          ]
-        },
-        {
-          "from": "partial",
-          "to": "broken",
-          "trigger": "move_to_broken",
-          "label": "Dut gay",
-          "labelEn": "Broken",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "hr_manager",
-              "template": "hcm_workforce_broken"
-            }
-          ]
-        },
-        {
-          "from": "broken",
-          "to": "pending",
-          "trigger": "move_to_pending",
-          "label": "Cho xu ly",
-          "labelEn": "Pending",
-          "guards": [],
-          "actions": [
-            {
-              "type": "notify",
-              "to": "hr_manager",
-              "template": "hcm_workforce_pending"
-            }
-          ]
         }
       ],
       "sla": {
