@@ -122,7 +122,7 @@
      data-dcc-doc-code="ANNEX-113"
      data-dcc-locale="vi"
      data-dcc-logo="../../../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;ANNEX-113&quot;,&quot;title&quot;:&quot;Kiểm soát truy cập, phát hành và làm mới bảng điều khiển triển khai&quot;,&quot;subtitle&quot;:&quot;Xuyên suốt G0→G7 — quản trị bảng điều khiển phục vụ triển khai&quot;,&quot;doc_type&quot;:&quot;ANNEX&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
+     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;ANNEX-113&quot;,&quot;title&quot;:&quot;Kiểm soát truy cập, phát hành và làm mới bảng điều khiển triển khai&quot;,&quot;subtitle&quot;:&quot;Quản trị truy cập, refresh, phát hành và bàn giao dashboard theo chương trình W0-W12&quot;,&quot;doc_type&quot;:&quot;ANNEX&quot;,&quot;revision&quot;:&quot;V1&quot;,&quot;effective_date&quot;:&quot;2026-05-14&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;released&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
 
 
 
@@ -130,6 +130,7 @@
   <span class="kicker">Quản trị bảng điều khiển triển khai</span>
   
   <p>Áp dụng cho mọi bảng điều khiển dùng để điều hành triển khai, quản trị tài liệu, theo dõi mức sẵn sàng, hỗ trợ tăng cường sau go-live, theo dõi KPI, công bố bộ số điều hành và làm cửa truy cập tài liệu cho nhiều phòng ban.</p>
+  <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng trong W0-W12 của chương trình triển khai QMS hiện hành: W0 để chốt quyền dashboard khung, W2 để nạp số liệu nền, W5-W8 để vận hành KPI live theo từng đợt go-live, W10 để rà governance dashboard và W12 để bàn giao owner vận hành thường xuyên.</div>
   <div class="actions">
     <a href="annex-110-dashboard-kpi-dictionary-and-data-model.html">ANNEX-110</a>
     <a href="../../../work-instructions/09-WI-900/wi-901-performance-dashboard.html">WI-901</a>
@@ -321,6 +322,29 @@
       <div class="hint">Tự tìm đúng dashboard</div>
     </div>
   </div>
+</div>
+
+
+<!-- ═══ 7A. W0-W12 MAP ═══ -->
+<div class="section" id="dashboard-w0w12"><h2>7A. Bản đồ W0-W12</h2>
+<p>Tài liệu này được dùng trong chương trình triển khai QMS hiện hành (lịch nguồn: <code>mom/data/config/deploy/program.bootstrap.json</code>) để kiểm soát quyền truy cập, nhịp làm mới, phát hành và cam kết dữ liệu của dashboard. ITA, QMS và MR_REPORT_OWNERS phải đọc bảng dưới đây cùng <a href="../../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W10.html">TRN-DEP-W10</a> trước khi khóa review W10; với các tuần go-live, dùng thêm <a href="../../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W05.html">TRN-DEP-W05</a>, <a href="../../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W07.html">TRN-DEP-W07</a> và <a href="../../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W12.html">TRN-DEP-W12</a>. Mọi quyền hoặc refresh ngoại lệ phải có owner, thời điểm hiệu lực, điều kiện khôi phục và người duyệt.</p>
+<div class="table-card"><table class="matrix-table"><thead><tr><th>Tuần</th><th>Pha · trụ</th><th>Cổng kiểm liên quan</th><th>Cách dùng tài liệu này</th><th>Bằng chứng đóng cổng</th></tr></thead><tbody>
+<tr><td>W0</td><td>P0 · dash + m365</td><td>P0-04</td><td>ITA chốt quyền xem/quản trị cho dashboard khung theo vai trò, không mở quyền ngoài phạm vi triển khai.</td><td>Access log, <code>readiness.json</code> và danh sách nhóm quyền.</td></tr>
+<tr><td>W2</td><td>P1 · dash</td><td>P1-04</td><td>QMS và IT xác nhận số liệu nền đã refresh đúng hạn; <code>KPI-DEP-05 ≥95%</code> cho các ô dữ liệu nền.</td><td><code>readiness.json</code>, refresh timestamp và issue ngoại lệ nếu có.</td></tr>
+<tr><td>W5-W8</td><td>P3 · dash + golive</td><td>P3-03</td><td>MR_REPORT_OWNERS kiểm KPI live cho Đợt 2 và Đợt Sản xuất, đối chiếu scan_cache/audit_events trước phiên điều hành.</td><td><code>scan_cache</code>, <code>audit_events</code>, note ngoại lệ theo ngày.</td></tr>
+<tr><td>W10</td><td>P4 · dash</td><td>P4-02</td><td>ITA và QMS rà quyền, owner từng ô dữ liệu, cam kết làm mới và cách thu hồi quyền sau chương trình.</td><td>Access review log, biên bản W10 và danh sách cam kết owner.</td></tr>
+<tr><td>W12</td><td>P4 · gov + dash</td><td>P4-04</td><td>Chủ sở hữu vận hành thường xuyên nhận bàn giao lịch refresh, quyền quản trị, rollback path và hồ sơ dashboard production.</td><td>Biên bản bàn giao W12, register dashboard và release log.</td></tr>
+</tbody></table></div></div>
+<div class="section" id="dashboard-kpi-dock"><h2>7B. KPI điều hành phải theo dõi</h2>
+<div class="metric-grid">
+ <div class="metric-card"><strong>KPI-DEP-05</strong><p>Cập nhật dashboard đúng hạn ≥95%; mỗi dashboard production phải hiển thị lần làm mới gần nhất, owner dữ liệu và số issue refresh đang mở.</p></div>
+ <div class="metric-card"><strong>KPI-DEP-06</strong><p>Tần suất phát hành ≥3 thay đổi/tuần khi cần cập nhật dashboard triển khai; mọi thay đổi Class B/C phải có release log và rollback path.</p></div>
+ <div class="metric-card"><strong>KPI-DEP-03</strong><p>Tỉ lệ thay đổi thất bại ≤10%; nếu rollback hoặc exception vượt ngưỡng thì gate dashboard chuyển đỏ cho tới khi có hành động ổn định.</p></div>
+ <div class="metric-card"><strong>KPI-DEP-07</strong><p>MTTR sự cố Mức 1 ≤24 h khi lỗi dashboard ảnh hưởng quyết định gate, quyền truy cập hoặc nguồn dữ liệu điều hành.</p></div>
+ </div>
+<p class="note"><strong>Khi báo đỏ:</strong> ghi vào <code>issues.json</code> với severity tương ứng, leo thang theo <a href="annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> và cập nhật <code>readiness.json</code>. Không khoá <code>P4-02</code> khi quyền truy cập còn người ngoài đợt hoặc khi owner dữ liệu chưa ký cam kết làm mới.</p></div>
+<div class="section" id="dashboard-nogo"><h2>7C. NO-GO quyền truy cập và refresh</h2>
+<ul class="tight"><li>Không đóng <code>P0-04</code> nếu dashboard khung chưa có owner, nguồn dữ liệu, nhịp làm mới và nhóm quyền theo vai trò.</li><li>Không công nhận <code>P3-03</code> ở W5-W8 nếu <code>KPI-DEP-05 &lt; 95%</code> trong 3 ngày làm việc liên tiếp hoặc refresh timestamp không khớp audit_events.</li><li>Không bàn giao W12 tại <code>P4-04</code> khi access review log còn quyền ngoài phạm vi, quyền admin không có người thay thế hoặc cam kết làm mới dữ liệu chưa ký bởi owner vận hành thường xuyên.</li></ul>
 </div>
 
 <!-- ═══ 8. EVIDENCE PACK ═══ -->
