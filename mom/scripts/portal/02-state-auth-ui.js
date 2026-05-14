@@ -1653,8 +1653,11 @@ function adminUserLegacySingleAssigneeVisual(user, kind){
   const employeeId = adminUserEmployeeId(user);
   if(!employeeId || !ADMIN_AUTH_STATE.org.loaded) return '';
   const activeByPosition = {};
+  const _alstoday = new Date().toISOString().slice(0, 10);
   (ADMIN_AUTH_STATE.org.assignments || []).forEach(row=>{
     if(String(row.assignment_status || 'active') !== 'active') return;
+    const effTo = String(row.effective_to || '').slice(0, 10);
+    if(effTo && effTo <= _alstoday) return;
     const positionId = String(row.hcm_position_id || '').trim();
     if(!positionId) return;
     if(!activeByPosition[positionId]) activeByPosition[positionId] = [];
@@ -1800,9 +1803,17 @@ function orgPositionDisplayLabel(position){
 function userPositionAssignmentRows(user){
   const employeeId = adminUserEmployeeId(user);
   if(!employeeId) return [];
+  const today = new Date().toISOString().slice(0, 10);
   return (ADMIN_AUTH_STATE.org.assignments || [])
     .filter(row=>String(row.employee_id || '').trim() === employeeId)
     .filter(row=>String(row.assignment_status || 'active') === 'active')
+    // Soft-ended rows (assignment_status still 'active' but effective_to in
+    // the past) come from the Xóa flow that has to dodge archive_only
+    // governance. They must disappear from the user-edit modal entirely.
+    .filter(row=>{
+      const effTo = String(row.effective_to || '').slice(0, 10);
+      return !effTo || effTo > today;
+    })
     .map(row=>Object.assign({_synthetic:false}, row))
     .sort((a,b)=>{
     const ap = (String(a.assignment_type || '') === 'primary' || a.is_primary === true) ? 0 : 1;
@@ -10870,7 +10881,14 @@ function removeUserPositionAssignmentFromModal(userId, assignmentId, rowVersion=
     lang==='en'?'Remove this assignment from the user.':'Xóa bổ nhiệm này khỏi người dùng.',
     async function(){
       try{
-        const res = await runtimeDelete('hcm_workforce', 'hcm_employee_position_assignments', assignmentId, rowVersion || null);
+        // Hard delete on hcm_employee_position_assignments is blocked by the
+        // table-governance-overlay (deletionMode=archive_only) and PUT strips
+        // the managed assignment_status column, so the only writable lever
+        // that ends an assignment is effective_to. Set it to today and the
+        // soft-end will be filtered out everywhere by userPositionAssignmentRows
+        // and the org console's buildAssignmentRows.
+        const today = new Date().toISOString().slice(0, 10);
+        const res = await runtimeUpdate('hcm_workforce', 'hcm_employee_position_assignments', assignmentId, { effective_to: today }, rowVersion || null);
         if(!(res && res.ok)){
           showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Remove assignment failed':'Xóa bổ nhiệm thất bại'));
           return;
@@ -12144,8 +12162,11 @@ function renderAdminOrgChartLegacy(){
     const employeeId = String(employee.employee_id || '').trim();
     if(employeeId) employeesByEmployeeId[employeeId] = employee;
   });
+  const _aoptoday = new Date().toISOString().slice(0, 10);
   (ADMIN_AUTH_STATE.org.assignments || []).forEach(assignment=>{
     if(String(assignment.assignment_status || 'active') !== 'active') return;
+    const effTo = String(assignment.effective_to || '').slice(0, 10);
+    if(effTo && effTo <= _aoptoday) return;
     const employeeId = String(assignment.employee_id || '').trim();
     const positionId = String(assignment.hcm_position_id || '').trim();
     if(!employeeId || !positionId) return;

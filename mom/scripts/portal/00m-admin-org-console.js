@@ -431,6 +431,7 @@
 
   function buildAssignmentRows(){
     var byKey = {};
+    var today = new Date().toISOString().slice(0, 10);
     function put(row, priority){
       var eid = employeeIdentity(row);
       var posId = String(row && row.hcm_position_id || '').trim();
@@ -449,6 +450,13 @@
       var posId = String(a.hcm_position_id || '').trim();
       var position = S.byPositionId[posId] || {};
       var status = String(a.assignment_status || 'active');
+      // Hide ended/inactive/terminated assignments from every consumer, and
+      // treat the soft-end pattern (status=active but effective_to<=today)
+      // the same way — Xóa should make the row disappear, not just relabel
+      // it to "Đã kết thúc".
+      if (status === 'ended' || status === 'inactive' || status === 'terminated') return;
+      var effTo = String(a.effective_to || '').slice(0, 10);
+      if (effTo && effTo <= today) return;
       put(Object.assign({}, a, {
         employee_id: eid,
         hcm_position_id: posId,
