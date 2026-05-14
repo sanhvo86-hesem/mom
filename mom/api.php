@@ -119,6 +119,7 @@ $DICT_JS_FILE   = $ROOT_DIR . '/mom/docs/glossary/dict-data.js';
 require_once __DIR__ . '/form_workflow.php';
 require_once __DIR__ . '/online_schema_workflow.php';
 require_once __DIR__ . '/api/services/PasswordService.php';
+require_once __DIR__ . '/api/services/PiiCryptoService.php';
 
 // ---------- Hard fail safe handlers ----------
 register_shutdown_function(function () {
@@ -15144,7 +15145,9 @@ function sanitize_user_for_client(array $user, ?array $viewer = null): array {
     }
   }
   $fullPii = viewer_may_see_full_pii($viewer, $user);
-  $cccdRaw = (string)($user['cccd'] ?? '');
+  // Decrypt-on-read for PII fields stored encrypted at rest (Phase 0 hardening
+  // via PiiCryptoService). Legacy plaintext values pass through unchanged.
+  $cccdRaw = \MOM\Api\Services\PiiCryptoService::decrypt((string)($user['cccd'] ?? ''));
   $phoneRaw = (string)($user['phone'] ?? '');
   $emailRaw = (string)($user['personal_email'] ?? '');
   return [
@@ -17637,7 +17640,7 @@ case 'doc_save_draft': {
         $users[$i]['title'] = $title;
         if ($isFullAdmin) $users[$i]['role'] = $role;
         if ($isFullAdmin) $users[$i]['active'] = $active;
-        $users[$i]['cccd'] = $cccd;
+        $users[$i]['cccd'] = \MOM\Api\Services\PiiCryptoService::encrypt($cccd);
         $users[$i]['phone'] = $phone;
         $users[$i]['personal_email'] = $personal_email;
         $users[$i]['hcm_org_unit_id'] = $hcmOrgUnitId;
@@ -17720,7 +17723,7 @@ case 'doc_save_draft': {
         'dept' => $dept,
         'title' => $title,
         'active' => $active,
-        'cccd' => $cccd,
+        'cccd' => \MOM\Api\Services\PiiCryptoService::encrypt($cccd),
         'phone' => $phone,
         'personal_email' => $personal_email,
         'hcm_org_unit_id' => $hcmOrgUnitId,
