@@ -10853,30 +10853,66 @@ async function addUserPositionAssignmentFromModal(userId){
       showToast(lang==='en'?'⚠ Select a valid position':'⚠ Chọn vị trí hợp lệ');
       return;
     }
+    const today = new Date().toISOString().slice(0, 10);
+    const assignmentTypeFinal = ['concurrent','acting','backup','temporary','role'].includes(assignmentType) ? assignmentType : 'concurrent';
+    // Duplicate check against the *visible* (non-soft-ended) rows. Rows that
+    // were soft-ended via the Xóa flow (effective_to<=today) are filtered out
+    // by userPositionAssignmentRows, so a "duplicate" hit here means a real
+    // live assignment.
     const duplicate = userPositionAssignmentRows(user).some(row=>String(row.hcm_position_id || '') === positionId && String(row.assignment_status || 'active') === 'active');
     if(duplicate){
       showToast(lang==='en'?'⚠ This user is already assigned to that position':'⚠ Người dùng đã được bổ nhiệm vị trí này');
       return;
     }
-    const res = await runtimeCreate('hcm_workforce', 'hcm_employee_position_assignments', {
-      employee_id: employeeId,
-      hcm_position_id: positionId,
-      hcm_org_unit_id: String(position.hcm_org_unit_id || ''),
-      assignment_type: ['concurrent','acting','backup','temporary','role'].includes(assignmentType) ? assignmentType : 'concurrent',
-      assignment_status: 'active',
-      is_primary: false,
-      fte_fraction: 1,
-      effective_from: new Date().toISOString().slice(0, 10),
-      source_system: 'ADMIN_USER_MODAL',
-      source_record_id: `user-modal:${String(user.username || employeeId).slice(0, 40)}:${positionId.slice(0, 36)}`,
-      payload_schema_version: '1.0',
-      metadata: {
-        username: String(user.username || ''),
-        name: String(user.name || ''),
-        position_title: String(position.position_title || ''),
-        created_from: 'admin_user_modal'
-      }
-    });
+    // The Xóa flow leaves a row with assignment_status='active' and
+    // effective_to<=today (governance blocks updating the managed status
+    // column). The partial unique index uq_hcm_emp_pos_assign_active_source
+    // still treats it as active, so a fresh INSERT for the same
+    // (employee_id, position_id, type, source_system, source_record_id)
+    // tuple returns generic_create_failed. Detect that soft-ended row and
+    // revive it via PUT instead of INSERT.
+    const sourceRecordId = `user-modal:${String(user.username || employeeId).slice(0, 40)}:${positionId.slice(0, 36)}`;
+    const resurrectable = (ADMIN_AUTH_STATE.org.assignments || []).find(row =>
+      String(row.employee_id || '') === employeeId
+      && String(row.hcm_position_id || '') === positionId
+      && String(row.assignment_type || '') === assignmentTypeFinal
+      && String(row.source_system || '') === 'ADMIN_USER_MODAL'
+      && String(row.source_record_id || '') === sourceRecordId
+      && String(row.assignment_status || 'active') === 'active'
+    );
+    let res;
+    if(resurrectable){
+      res = await runtimeUpdate('hcm_workforce', 'hcm_employee_position_assignments', resurrectable.hcm_assignment_id, {
+        effective_to: null,
+        effective_from: today,
+        metadata: Object.assign({}, safeJsonObject(resurrectable.metadata), {
+          username: String(user.username || ''),
+          name: String(user.name || ''),
+          position_title: String(position.position_title || ''),
+          created_from: 'admin_user_modal'
+        })
+      }, resurrectable.row_version || null);
+    } else {
+      res = await runtimeCreate('hcm_workforce', 'hcm_employee_position_assignments', {
+        employee_id: employeeId,
+        hcm_position_id: positionId,
+        hcm_org_unit_id: String(position.hcm_org_unit_id || ''),
+        assignment_type: assignmentTypeFinal,
+        assignment_status: 'active',
+        is_primary: false,
+        fte_fraction: 1,
+        effective_from: today,
+        source_system: 'ADMIN_USER_MODAL',
+        source_record_id: sourceRecordId,
+        payload_schema_version: '1.0',
+        metadata: {
+          username: String(user.username || ''),
+          name: String(user.name || ''),
+          position_title: String(position.position_title || ''),
+          created_from: 'admin_user_modal'
+        }
+      });
+    }
     if(!(res && res.ok && res.record)){
       showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Add assignment failed':'Thêm bổ nhiệm thất bại'));
       return;

@@ -1579,6 +1579,7 @@
               UI.toast(t('FTE must be between 0.05 and 1.50','FTE phải từ 0.05 đến 1.50'), 'error');
               return false;
             }
+            var sourceRecordId = 'admin:' + employeeId + ':' + p.hcm_position_id + ':' + assignmentType;
             var payload = {
               employee_id: employeeId,
               hcm_position_id: p.hcm_position_id,
@@ -1589,7 +1590,7 @@
               fte_fraction: fte,
               effective_from: get('effective_from') || today,
               source_system: 'ADMIN_ORG_CONSOLE',
-              source_record_id: 'admin:' + employeeId + ':' + p.hcm_position_id + ':' + assignmentType,
+              source_record_id: sourceRecordId,
               payload_schema_version: '1.0',
               metadata: {
                 note: get('note'),
@@ -1597,7 +1598,35 @@
                 created_from: 'admin_org_console'
               }
             };
-            safeCreate('hcm_workforce','hcm_employee_position_assignments', payload)
+            // The Xóa flow soft-ends an assignment by setting effective_to=today
+            // but leaves assignment_status='active' (governance won't let us
+            // touch the managed status column). The partial unique index
+            // uq_hcm_emp_pos_assign_active_source covers all active rows, so a
+            // straight INSERT for the same (employee, position, type,
+            // source_system, source_record_id) tuple hits 409/400. Detect a
+            // soft-ended row up front and revive it via PUT instead of INSERT.
+            var resurrectableRow = (S.assignments || []).find(function(a){
+              if (!a) return false;
+              if (String(a.employee_id || '') !== employeeId) return false;
+              if (String(a.hcm_position_id || '') !== String(p.hcm_position_id || '')) return false;
+              if (String(a.assignment_type || '') !== assignmentType) return false;
+              if (String(a.source_system || '') !== 'ADMIN_ORG_CONSOLE') return false;
+              if (String(a.source_record_id || '') !== sourceRecordId) return false;
+              return String(a.assignment_status || 'active') === 'active';
+            });
+            var savePromise;
+            if (resurrectableRow){
+              savePromise = safeUpdate('hcm_workforce', 'hcm_employee_position_assignments', resurrectableRow.hcm_assignment_id, {
+                effective_to: null,
+                effective_from: payload.effective_from,
+                fte_fraction: fte,
+                is_primary: payload.is_primary,
+                metadata: Object.assign({}, safeJson(resurrectableRow.metadata) || {}, payload.metadata)
+              }, resurrectableRow.row_version);
+            } else {
+              savePromise = safeCreate('hcm_workforce','hcm_employee_position_assignments', payload);
+            }
+            savePromise
               .then(function(){
                 UI.toast(t('Person assigned','Đã thêm nhân sự'), 'success');
                 close();
