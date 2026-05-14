@@ -638,7 +638,7 @@ final class ShopfloorExecutionServiceTest extends TestCase
             'blocking_issues' => [
                 ['reason_code' => 'BLK-MATL-WAIT', 'severity' => 'major', 'blocked_minutes' => 5],
             ],
-        ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+        ], $target, null, 'operator-1', $this->recentNow());
 
         $this->assertSame(83, $log['quantity_total']);
         $this->assertSame(['DT-TOOL-LIFE'], $log['reason_codes']['downtime']);
@@ -773,7 +773,7 @@ final class ShopfloorExecutionServiceTest extends TestCase
             'quantity_good' => 8,
             'actual_run_minutes' => 40,
             'inspection_result_id' => 'IPQC-RESULT-1',
-        ], $target, null, 'operator-1', '2026-04-13T08:00:00Z');
+        ], $target, null, 'operator-1', $this->recentNow());
 
         $projection = $service->appendProductionReportEvent($log, $target, 'operator-1');
 
@@ -1302,6 +1302,16 @@ final class ShopfloorExecutionServiceTest extends TestCase
             $this->dataDir,
             genealogyGraph: new GenealogyGraphService(new ShopfloorGenealogyGateFakeDb()),
         );
+    }
+
+    /**
+     * Returns a timestamp within the last hour so tests that call
+     * appendProductionReportEvent() do not trip the 30-day staleness guard
+     * added in normalizeTimestamp() (MES-R6-006).
+     */
+    private function recentNow(): string
+    {
+        return gmdate(DATE_ATOM, time() - 3600);
     }
 
     private function removeDir(string $dir): void
