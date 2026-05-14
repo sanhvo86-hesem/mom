@@ -54,6 +54,21 @@ if (!defined('QMS_TEST_DATA_DIR')) {
     define('QMS_TEST_DATA_DIR', $dataDir);
 }
 
+// Seed runtime config files from their *.bootstrap.json counterparts when
+// the runtime file is absent (happens in CI where gitignored files do not
+// exist). Idempotent: skips any file already present (local dev / VPS).
+foreach ([
+    $dataDir . '/config',
+    $dataDir . '/config/deploy',
+] as $configDir) {
+    foreach (glob($configDir . '/*.bootstrap.json') ?: [] as $bootstrap) {
+        $runtime = preg_replace('/\.bootstrap\.json$/', '.json', $bootstrap);
+        if ($runtime !== null && !file_exists($runtime)) {
+            copy($bootstrap, $runtime);
+        }
+    }
+}
+
 require_once $baseDir . '/api.php';
 
 function smoke_assert(bool $condition, string $message): void

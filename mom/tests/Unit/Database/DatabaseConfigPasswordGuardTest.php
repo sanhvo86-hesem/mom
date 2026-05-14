@@ -40,6 +40,7 @@ final class DatabaseConfigPasswordGuardTest extends TestCase
             'DB_ALLOW_EMPTY_PASSWORD' => 'false',
             'DB_REQUIRE_PASSWORD' => null,
             'DB_PASSWORD' => null,
+            'DB_PASS' => null,  // CI sets DB_PASS=test_password; clear it for json-only path
         ]);
 
         $config = $this->loadConfig();
