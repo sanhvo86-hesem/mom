@@ -57,17 +57,71 @@
      data-dcc-doc-code="ANNEX-114"
      data-dcc-locale="vi"
      data-dcc-logo="../../../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;ANNEX-114&quot;,&quot;title&quot;:&quot;Sổ tay điều hành triển khai chính thức và kiểm soát chuyển đổi&quot;,&quot;subtitle&quot;:&quot;Tài liệu tham chiếu / chuẩn bổ trợ cho go-live and cutover control runbook and cutover control.&quot;,&quot;doc_type&quot;:&quot;ANNEX&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
+     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;ANNEX-114&quot;,&quot;title&quot;:&quot;Sổ tay điều hành triển khai chính thức và kiểm soát chuyển đổi&quot;,&quot;subtitle&quot;:&quot;Runbook Đi/Không đi, go-live, hypercare, fallback và bàn giao theo chương trình W0-W12&quot;,&quot;doc_type&quot;:&quot;ANNEX&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-05-14&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;released&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
 
 
-<div class="note"><strong>ÁP DỤNG KHI</strong><br>Áp dụng cho mọi đợt đưa vào vận hành chính thức hoặc chuyển đổi chính thức liên quan đến tài liệu vận hành, hồ sơ M365, bảng điều khiển điều hành, siêu dữ liệu tuyến hồ sơ, quyền truy cập môi trường chính thức, gói phát hành, quy trình mới, giai đoạn thí điểm chuyển sang vận hành chính thức và giai đoạn hỗ trợ tăng cường sau triển khai.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Áp dụng cho cổng Đi/Không đi W4, go-live Đợt 2 W5, soát xét/chuẩn bị Sản xuất W6, go-live Sản xuất + Kỹ thuật W7, hypercare W8, Đợt 3 W9-W10, cập nhật tài liệu W11 và bàn giao W12 trong chương trình QMS mới.</div>
 
 <div class="hero">
  
- <p>Mọi đợt đưa vào vận hành chính thức phải có sổ tay điều hành theo mốc thời gian, người chỉ huy rõ, mức độ sự cố rõ, mốc kích hoạt hoàn nguyên rõ, kênh liên lạc rõ và bằng chứng rõ. Không cho phép triển khai theo kiểu "ai rảnh thì xử lý" hoặc chỉ dựa vào chat nhóm.</p>
+ <p>Mọi đợt đưa vào vận hành chính thức phải có mốc tuần, người chỉ huy, mức sự cố, điều kiện hoàn nguyên, kênh hỗ trợ, nguồn dữ liệu và bằng chứng đóng gate rõ. ANNEX-114 điều phối cutover và hypercare; tài liệu này không cấp quyền điều khiển máy trực tiếp, không cho phép AI advisory tự động hoàn tất/phê duyệt/dispatch và không cho phép dashboard ghi đè nguồn sự thật của MOM/MES, DCC hoặc hồ sơ kiểm soát.</p>
 </div>
 
-<div class="callout"><strong>PHẢI</strong><br>Đợt triển khai chính thức chỉ được phép diễn ra khi đã chốt đủ 6 lớp: người quyết định, người vận hành, dữ liệu nguồn, bảng điều khiển trạng thái, phương án dự phòng và kênh hỗ trợ người dùng. Thiếu một lớp thì dừng triển khai.</div>
+<div class="callout"><strong>PHẢI</strong><br>Đợt triển khai chính thức chỉ được phép diễn ra khi đã chốt đủ 6 lớp: người quyết định, người vận hành, dữ liệu nguồn, trạng thái dashboard có nguồn, phương án dự phòng và kênh hỗ trợ người dùng. Thiếu một lớp, còn Sev-1 mở hoặc không xác nhận được tài liệu hiệu lực thì dừng triển khai.</div>
+
+<div class="section">
+ <h2>0. Lịch cổng go-live đang có hiệu lực</h2>
+ <div class="table-card">
+ <table class="matrix-table">
+ <thead>
+ <tr>
+ <th>Mốc</th>
+ <th>Ngày</th>
+ <th>Phạm vi điều hành</th>
+ <th>Runbook/bằng chứng bắt buộc</th>
+ </tr>
+ </thead>
+ <tbody>
+ <tr>
+ <td>W0</td>
+ <td>2026-05-14</td>
+ <td>Ký nền WI-105, WI-106, ANNEX-114; chưa phải go-live toàn công ty.</td>
+ <td>DCC header đúng, kiểm tra tra cứu 5 tài liệu ≤180 giây, audit event <code>deploy_program_start</code>.</td>
+ </tr>
+ <tr>
+ <td>W4</td>
+ <td>2026-06-06</td>
+ <td>Cổng Đi/Không đi cho Đợt 2 sau QA pilot.</td>
+ <td>ANNEX-114, ANNEX-117, <code>TRN-DEP-W04</code>, readiness QA, issue log và biên bản quyết định.</td>
+ </tr>
+ <tr>
+ <td>W5-W6</td>
+ <td>2026-06-13 đến 2026-06-20</td>
+ <td>Chuỗi cung ứng + Kinh doanh go-live, review Đợt 2 và chuẩn bị Sản xuất.</td>
+ <td>Không Sev-1 mở, hỗ trợ 24/5, ANNEX-114 + ANNEX-118 cập nhật, fallback test có vết kiểm toán.</td>
+ </tr>
+ <tr>
+ <td>W7-W8</td>
+ <td>2026-06-27 đến 2026-07-04</td>
+ <td>Sản xuất + Kỹ thuật go-live và hypercare rủi ro cao.</td>
+ <td>Hồ sơ Job Order đầu tiên đạt, bảng vấn đề trong ngày, pull-cord escalation, KPI snapshot mỗi 2 giờ.</td>
+ </tr>
+ <tr>
+ <td>W9-W10</td>
+ <td>2026-07-11 đến 2026-07-18</td>
+ <td>Nhân sự, Tài chính, IT, EHS, ERP và dashboard access review.</td>
+ <td>Champion/back-up, đào tạo tại chỗ, ANNEX-113/110, không người dùng ngoài vai trò được phép.</td>
+ </tr>
+ <tr>
+ <td>W11-W12</td>
+ <td>2026-07-25 đến 2026-08-01</td>
+ <td>Bài học, cập nhật tài liệu, QR/video mới và bàn giao vận hành thường xuyên.</td>
+ <td>≥10 tài liệu phát hành hậu triển khai, QR mới ≥95% tại 7 khu vực, biên bản bàn giao và lịch audit năm 1.</td>
+ </tr>
+ </tbody>
+ </table>
+ </div>
+</div>
 
 <div class="section">
  <h2>1. Vai trò trong chuyển đổi và hỗ trợ tăng cường</h2>
@@ -125,12 +179,13 @@
 
 <div class="section">
  <h2>2. Trình tự chuyển đổi theo thời gian</h2>
- <div class="timeline-step"><strong>T-30 đến T-14:</strong> Chốt phạm vi, người phụ trách, danh sách phòng ban vào từng đợt, tồn đọng thay đổi, kế hoạch truyền thông, danh mục tài liệu hiệu lực, mô hình phân quyền, phương án dự phòng và kịch bản hoàn nguyên.</div>
- <div class="timeline-step"><strong>T-14 đến T-7:</strong> Hoàn thành họp thống nhất với quản lý, huấn luyện đầu mối hỗ trợ, thử siêu dữ liệu, thử bảng điều khiển, nạp đường cơ sở KPI, kiểm liên kết cổng tra cứu, phát mã QR và thử 3 tình huống truy xuất thật.</div>
- <div class="timeline-step"><strong>T-7 đến T-2:</strong> Đóng băng các thay đổi không bắt buộc, ký UAT, chốt danh sách hỗ trợ, diễn tập hoàn nguyên, kiểm sao lưu và chốt hotline cùng người trực theo từng ca.</div>
- <div class="timeline-step"><strong>T-1:</strong> Họp quyết định triển khai cuối, xác nhận bảng kiểm, kiểm thời điểm làm mới gần nhất của bảng điều khiển, phát thông báo cuối cho người dùng và chụp ảnh trạng thái trước khi triển khai.</div>
- <div class="timeline-step"><strong>Ngày 0:</strong> Thực hiện chuyển đổi theo giờ, kích hoạt trung tâm điều hành, theo dõi giao dịch đầu tiên, đóng hoặc leo thang sự cố theo mức độ và ra quyết định tiếp tục hay hoàn nguyên.</div>
- <div class="timeline-step"><strong>D+1 đến D+14:</strong> Hỗ trợ tăng cường theo ca và theo ngày, rà tuổi tồn sự cố, chỉ giảm hỗ trợ khi dữ liệu xác nhận đã đạt và chốt bài học kinh nghiệm trước khi kết thúc giai đoạn tăng cường.</div>
+ <div class="timeline-step"><strong>W4 - cổng quyết định:</strong> dùng dữ liệu QA pilot để quyết định Đi/Không đi cho Đợt 2; không ký nếu còn Sev-1/Sev-2 mở, DCC header sai hoặc trung vị tra cứu vượt 180 giây.</div>
+ <div class="timeline-step"><strong>W5 - ngày go-live Đợt 2:</strong> mở trung tâm điều hành cho Chuỗi cung ứng + Kinh doanh, công bố lịch hỗ trợ 24/5, ghi issue log hằng ngày và chỉ cho phép đi tiếp khi không có Sev-1 đang mở.</div>
+ <div class="timeline-step"><strong>W6 - review Đợt 2 và chuẩn bị Sản xuất:</strong> đóng phiếu việc còn lại, cập nhật ANNEX-114/118, kiểm thử fallback thật và chụp trạng thái dashboard trước cổng Sản xuất.</div>
+ <div class="timeline-step"><strong>W7 - ngày go-live Sản xuất + Kỹ thuật:</strong> dùng run sheet theo giờ tại mục 4, kiểm Job Order đầu tiên, kích hoạt họp nhanh tại 7 khu vực và giữ quyền hoàn nguyên trong ngày.</div>
+ <div class="timeline-step"><strong>W8 - hypercare Sản xuất:</strong> rà bảng vấn đề trong ngày, pull-cord escalation, KPI snapshot mỗi 2 giờ và mục tiêu Sev-1 = 0 trong 5 ngày liên tiếp.</div>
+ <div class="timeline-step"><strong>W9-W10 - Đợt 3 và dashboard:</strong> triển khai phòng hỗ trợ, xác nhận Champion/back-up, rà quyền dashboard theo ANNEX-110/113 và không để người dùng ngoài vai trò được phép truy cập.</div>
+ <div class="timeline-step"><strong>W11-W12 - bài học và bàn giao:</strong> cập nhật tài liệu hậu triển khai, làm mới QR/video, chuyển chủ sở hữu vận hành thường xuyên, lập lịch audit năm 1 và đóng chương trình.</div>
 </div>
 
 <div class="section">
@@ -181,6 +236,24 @@
  <td>Đã diễn tập hoàn nguyên và đã chốt rõ mốc kích hoạt</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-epicor-system-administrator.html" title="Epicor System Administrator (Quản trị viên hệ thống Epicor)"><span class="entity-code role-code">ESA</span></a></span></td>
  <td>Chưa kiểm được đường quay về chuẩn hoặc kịch bản hoàn nguyên</td>
+ </tr>
+ <tr>
+ <td>DCC và tài liệu nguồn</td>
+ <td>Tất cả tài liệu bắt buộc của tuần mở được từ portal, DCC header đúng mã/phiên bản/ngày hiệu lực/trạng thái và link QR không chết</td>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td>
+ <td>DCC header không xác nhận được hoặc người dùng chỉ có bản tải xuống/ảnh chụp cũ</td>
+ </tr>
+ <tr>
+ <td>Source-control và deploy boundary</td>
+ <td>Thay đổi tài liệu, QR, dashboard hoặc playbook đã qua SharePoint/Git/server deploy boundary theo ANNEX-136</td>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td>
+ <td>Thay đổi chỉ tồn tại ở runtime/server, thư mục cá nhân hoặc chat mà chưa có nguồn kiểm soát</td>
+ </tr>
+ <tr>
+ <td>AI và dashboard boundary</td>
+ <td>AI/copilot chỉ đưa đề xuất; dashboard chỉ hiển thị read model có nguồn và thời điểm làm mới</td>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link bundle-link bundle-chip" data-bundle="MR_REPORT_OWNERS" href="../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-mr-report-owners" title="Management Review Report Owners (Nhóm chủ trì gói báo cáo MR và KPI) — CS / EST / PD / ENGM / QA[QMR] / QMS / SCM / FIN / HR / EHS / ITA"><span class="entity-code bundle-code">MR_REPORT_OWNERS</span></a></span></td>
+ <td>AI hoặc dashboard tự thay quyết định phê duyệt, dispatch, hoàn tất, release hoặc đóng sự cố</td>
  </tr>
  </tbody>
  </table>
@@ -290,6 +363,8 @@
  <li>Kích hoạt hoàn nguyên khi hệ thống mới làm mất khả năng truy hồ sơ, phát hành hàng, kiểm soát phiên bản hoặc bảo mật dữ liệu.</li>
  <li>Kích hoạt phương án dự phòng khi hoạt động vẫn phải tiếp tục nhưng lớp số hóa hoặc bảng điều khiển chưa đáng tin.</li>
  <li>Phương án dự phòng phải quay về nguồn đã được phê duyệt trong <a href="annex-118-offline-fallback-kit.html">ANNEX-118</a>, không tự chế biểu mẫu ngoài luồng.</li>
+ <li>Khi quay về phương án dự phòng, execution truth vẫn thuộc MOM/MES service path, DCC và hồ sơ kiểm soát; dashboard, file xuất tạm hoặc AI advisory không được trở thành nguồn sự thật mới.</li>
+ <li>Mọi hotfix tài liệu, QR, dashboard hoặc playbook phải có đường quay về nguồn theo <a href="../13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a> và <a href="../../../work-instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a>.</li>
  <li>Hoàn nguyên hoặc phương án dự phòng phải ghi rõ phạm vi, thời điểm bắt đầu, người phê duyệt, người thực hiện và tiêu chí quay lại trạng thái chuẩn.</li>
  </ul>
  <div class="ok"><strong>Khái niệm đúng:</strong> hoàn nguyên bảo vệ sản xuất; phương án dự phòng bảo vệ tính liên tục; ghi chú ngoại lệ bảo vệ tính minh bạch; không mục nào được dùng để che lỗi.</div>
@@ -352,6 +427,21 @@
  </thead>
  <tbody>
  <tr>
+ <td>Program gate pack</td>
+ <td>Tuần Wxx, gate code, tài liệu bắt buộc, playbook <code>TRN-DEP-Wxx</code>, quyết định Đi/Không đi và trạng thái sign-off</td>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td>
+ </tr>
+ <tr>
+ <td>Readiness / issue / audit trail</td>
+ <td>Readiness từng phòng ban, issue log Sev-1/2/3, <code>audit_events</code> và bằng chứng đóng sự cố</td>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td>
+ </tr>
+ <tr>
+ <td>DCC/source-control receipt</td>
+ <td>DCC header của tài liệu bắt buộc, link portal/QR, Git/deploy receipt khi có cập nhật tài liệu hoặc dashboard</td>
+ <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td>
+ </tr>
+ <tr>
  <td>Phiếu chấp thuận Go/No-Go</td>
  <td>Bảng kiểm đạt/không đạt, quyết định, điều kiện kèm theo, chữ ký hoặc nhật ký phê duyệt</td>
  <td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html" title="Chief Executive Officer (Tổng Giám đốc)"><span class="entity-code role-code">CEO</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html" title="Production Director (Giám đốc sản xuất)"><span class="entity-code role-code">PD</span></a></span></td>
@@ -394,7 +484,7 @@
  <tbody>
  <tr>
  <td>Kế hoạch triển khai</td>
- <td><a href="../../../work-instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html">WI-106</a>, <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html">ANNEX-119</a></td>
+ <td><a href="../../../work-instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html">WI-106</a>, <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-119-change-roadmap-and-priority-register.html">ANNEX-119</a>, <a href="../../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W04.html">TRN-DEP-W04</a>, <a href="../../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W07.html">TRN-DEP-W07</a>, <a href="../../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W12.html">TRN-DEP-W12</a></td>
  </tr>
  <tr>
  <td>Bảng điều khiển và dữ liệu</td>
@@ -406,7 +496,11 @@
  </tr>
  <tr>
  <td>Điều hướng và bằng chứng</td>
- <td><a href="../../../work-instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a>, <a href="../../../work-instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a>, <a href="../../../work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a></td>
+ <td><a href="../../../work-instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html">WI-105</a>, <a href="../../../work-instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a>, <a href="../../../work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>, <a href="annex-111-document-writing-and-cross-reference-rules.html">ANNEX-111</a></td>
+ </tr>
+ <tr>
+ <td>M365/source/deploy boundary</td>
+ <td><a href="../../../work-instructions/01-WI-100/wi-107-sharefile-git-cpanel-sync.html">WI-107</a>, <a href="../13-ANNEX-130-M365-Records-Control/annex-131-m365-records-metadata-list-schema-and-register-catalog.html">ANNEX-131</a>, <a href="../13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>, <a href="../13-ANNEX-130-M365-Records-Control/annex-136-m365-sharepoint-git-server-source-sync-promotion-and-runtime-boundary.html">ANNEX-136</a></td>
  </tr>
  </tbody>
  </table>
