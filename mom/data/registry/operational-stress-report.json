@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-24T08:27:18.612Z",
+    "generatedAt": "2026-05-14T03:02:06.408Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "description": "Operational stress assessment for real-world backend failure and recovery conditions."
   },
@@ -9,14 +9,14 @@
     "scenario_count": 12,
     "critical": 0,
     "high": 0,
-    "medium": 0,
-    "watch": 12,
-    "idempotency_mentions": 24405,
+    "medium": 1,
+    "watch": 11,
+    "idempotency_mentions": 25546,
     "idempotency_contract_coverage_ratio": 1.0,
-    "default_retry_safe_ratio": 1.0,
+    "default_retry_safe_ratio": 0.988,
     "create_endpoints_requiring_client_key": 0,
     "compensation_markers": 5,
-    "correction_markers": 2413,
+    "correction_markers": 2490,
     "period_close_mentions": 40,
     "credit_memo_mentions": 24,
     "debit_memo_mentions": 24,
@@ -45,35 +45,35 @@
   },
   "current_local_signals": {
     "signal_counts": {
-      "idempotency_mentions": 24405,
-      "optimistic_concurrency_mentions": 9186,
-      "if_match_mentions": 3759,
-      "row_version_mentions": 30704,
+      "idempotency_mentions": 25546,
+      "optimistic_concurrency_mentions": 9696,
+      "if_match_mentions": 3931,
+      "row_version_mentions": 31839,
       "compensation_markers": 5,
-      "correction_markers": 2413,
-      "effective_dating_markers": 1061,
-      "override_mentions": 154,
-      "waiver_mentions": 245,
+      "correction_markers": 2490,
+      "effective_dating_markers": 1128,
+      "override_mentions": 218,
+      "waiver_mentions": 268,
       "heartbeat_mentions": 59,
       "quarantine_mentions": 381,
-      "disposition_mentions": 940,
+      "disposition_mentions": 986,
       "period_close_mentions": 40,
       "credit_memo_mentions": 24,
       "debit_memo_mentions": 24,
       "backdate_exception_mentions": 35,
-      "archive_mentions": 30324,
-      "snapshot_mentions": 1637,
+      "archive_mentions": 31159,
+      "snapshot_mentions": 1678,
       "esign_mentions": 452,
       "cycle_count_mentions": 343
     },
     "idempotency_runtime_contract": {
-      "mutating_endpoint_count": 2931,
-      "idempotent_endpoint_count": 2931,
+      "mutating_endpoint_count": 3086,
+      "idempotent_endpoint_count": 3086,
       "idempotency_contract_coverage_ratio": 1.0,
-      "default_retry_safe_endpoint_count": 2931,
-      "default_retry_safe_ratio": 1.0,
+      "default_retry_safe_endpoint_count": 3049,
+      "default_retry_safe_ratio": 0.988,
       "create_endpoints_requiring_client_key": 0,
-      "response_replay_documented_count": 2931
+      "response_replay_documented_count": 3086
     },
     "override_resources": [
       "quality_improvement.concessions",
@@ -102,19 +102,19 @@
       "scenario_id": "STR-001",
       "title": null,
       "priority": null,
-      "current_severity": "watch",
+      "current_severity": "medium",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 24405,
-        "if_match_mentions": 3759,
-        "row_version_mentions": 30704,
-        "mutating_endpoint_count": 2931,
-        "idempotent_endpoint_count": 2931,
+        "idempotency_mentions": 25546,
+        "if_match_mentions": 3931,
+        "row_version_mentions": 31839,
+        "mutating_endpoint_count": 3086,
+        "idempotent_endpoint_count": 3086,
         "idempotency_contract_coverage_ratio": 1.0,
-        "default_retry_safe_endpoint_count": 2931,
-        "default_retry_safe_ratio": 1.0,
+        "default_retry_safe_endpoint_count": 3049,
+        "default_retry_safe_ratio": 0.988,
         "create_endpoints_requiring_client_key": 0,
-        "response_replay_documented_count": 2931
+        "response_replay_documented_count": 3086
       },
       "required_controls": []
     },
@@ -128,7 +128,7 @@
       ],
       "evidence": {
         "compensation_markers": 5,
-        "correction_markers": 2413,
+        "correction_markers": 2490,
         "reconciliation_resources": [
           "integration_resilience.reconciliation-exceptions"
         ]
@@ -163,8 +163,8 @@
         "Effective dating and release-snapshot resources are both present at meaningful breadth, so the remaining risk is no longer an active design blocker."
       ],
       "evidence": {
-        "effective_dating_markers": 1061,
-        "snapshot_mentions": 1637,
+        "effective_dating_markers": 1128,
+        "snapshot_mentions": 1678,
         "snapshot_resources": [
           "analytics.inventory-balance-snapshots",
           "analytics.mes-oee-snapshots",
@@ -199,8 +199,8 @@
         "Typed, signed, timeboxed override resources are now explicit, so the remaining risk is governance execution quality rather than missing platform structure."
       ],
       "evidence": {
-        "override_mentions": 154,
-        "waiver_mentions": 245,
+        "override_mentions": 218,
+        "waiver_mentions": 268,
         "esign_mentions": 452,
         "override_resources": [
           "quality_improvement.concessions",
@@ -223,7 +223,7 @@
       ],
       "evidence": {
         "heartbeat_mentions": 59,
-        "idempotency_mentions": 24405,
+        "idempotency_mentions": 25546,
         "compensation_markers": 5,
         "reconciliation_resources": [
           "integration_resilience.reconciliation-exceptions"
@@ -240,8 +240,8 @@
         "Archive, correction, and signature evidence are all first-class, so continuity risk has moved into residual-watch territory."
       ],
       "evidence": {
-        "archive_mentions": 30324,
-        "correction_markers": 2413,
+        "archive_mentions": 31159,
+        "correction_markers": 2490,
         "esign_mentions": 452
       },
       "required_controls": []

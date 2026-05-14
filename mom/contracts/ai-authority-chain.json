@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-24T08:27:19.645408+00:00",
+    "generatedAt": "2026-05-14T03:02:07.891020+00:00",
     "standardVersion": "1.0.0",
     "description": "AI authority chain and edit-boundary map. AI tools must read this before altering registry, schema, workflow, API, or frontend surfaces."
   },
@@ -117,30 +117,30 @@
   ],
   "currentEndpointClassificationSummary": {
     "authorityClass": {
-      "admin_governance_contract": 361,
-      "canonical_process_contract": 2711,
-      "generic_runtime_contract": 591,
+      "admin_governance_contract": 509,
+      "canonical_process_contract": 2802,
+      "generic_runtime_contract": 607,
       "machine_runtime_contract": 510,
       "master_data_contract": 90,
-      "support_or_read_model_contract": 362
+      "support_or_read_model_contract": 366
     },
     "exposure": {
-      "admin_governance": 337,
-      "admin_or_internal": 362,
-      "blocked_runtime_internal": 1164,
-      "frontend_process": 1757,
+      "admin_governance": 473,
+      "admin_or_internal": 366,
+      "blocked_runtime_internal": 1179,
+      "frontend_process": 1845,
       "machine_or_operator_ui": 414,
-      "needs_owner_review": 591
+      "needs_owner_review": 607
     },
     "sideEffectLevel": {
-      "destructive": 830,
-      "none": 1694,
-      "transactional_write": 772,
-      "workflow_transition": 1329
+      "destructive": 865,
+      "none": 1798,
+      "transactional_write": 825,
+      "workflow_transition": 1396
     },
     "gapCounts": {
-      "generic_runtime_classification": 591,
-      "runtime_safe_false": 1164
+      "generic_runtime_classification": 607,
+      "runtime_safe_false": 1248
     }
   }
 }

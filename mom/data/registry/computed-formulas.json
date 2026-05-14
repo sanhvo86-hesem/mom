@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Computed formula library expanded from computed field registry and table-level KPI coverage.",
-    "generatedAt": "2026-04-24T08:27:14.538Z",
-    "formulaCount": 1476
+    "generatedAt": "2026-05-14T03:02:00.544Z",
+    "formulaCount": 1517
   },
   "total_line_amount": {
     "formulaId": "total_line_amount",
@@ -32298,6 +32298,887 @@
       {
         "type": "endpoint",
         "id": "system_infrastructure.graphics_wcag_check.list"
+      }
+    ]
+  },
+  "f_permission_catalog_record_count": {
+    "formulaId": "f_permission_catalog_record_count",
+    "name": "Catalog quyền nguyên tử - Số bản ghi",
+    "nameEn": "Permission Catalogue Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM permission_catalog",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "permission_catalog_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.permission_catalog.list"
+      }
+    ]
+  },
+  "f_modules_catalog_record_count": {
+    "formulaId": "f_modules_catalog_record_count",
+    "name": "Catalog module - Số bản ghi",
+    "nameEn": "Modules Catalogue Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM modules_catalog",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "modules_catalog_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.modules_catalog.list"
+      }
+    ]
+  },
+  "f_module_permission_record_count": {
+    "formulaId": "f_module_permission_record_count",
+    "name": "Phân quyền module - Số bản ghi",
+    "nameEn": "Module Permissions Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM module_permission",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "module_permission_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.module_permission.list"
+      }
+    ]
+  },
+  "f_document_permission_grant_record_count": {
+    "formulaId": "f_document_permission_grant_record_count",
+    "name": "Phân quyền tài liệu - Số bản ghi",
+    "nameEn": "Document Permission Grants Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM document_permission_grant",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "document_permission_grant_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.document_permission_grant.list"
+      }
+    ]
+  },
+  "f_role_sod_conflict_record_count": {
+    "formulaId": "f_role_sod_conflict_record_count",
+    "name": "Ma trận tách trách nhiệm - Số bản ghi",
+    "nameEn": "Role SoD Conflict Matrix Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM role_sod_conflict",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "role_sod_conflict_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.role_sod_conflict.list"
+      }
+    ]
+  },
+  "f_access_review_campaign_record_count": {
+    "formulaId": "f_access_review_campaign_record_count",
+    "name": "Chu kỳ đánh giá phân quyền - Số bản ghi",
+    "nameEn": "Access Review Campaign Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM access_review_campaign",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "access_review_campaign_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.access_review_campaign.list"
+      }
+    ]
+  },
+  "f_access_review_item_record_count": {
+    "formulaId": "f_access_review_item_record_count",
+    "name": "Mục đánh giá phân quyền - Số bản ghi",
+    "nameEn": "Access Review Item Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM access_review_item",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "access_review_item_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.access_review_item.list"
+      }
+    ]
+  },
+  "f_mfa_factor_record_count": {
+    "formulaId": "f_mfa_factor_record_count",
+    "name": "Yếu tố MFA - Số bản ghi",
+    "nameEn": "MFA Factor Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM mfa_factor",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "mfa_factor_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.mfa_factor.list"
+      }
+    ]
+  },
+  "f_mfa_recovery_code_record_count": {
+    "formulaId": "f_mfa_recovery_code_record_count",
+    "name": "Mã khôi phục MFA - Số bản ghi",
+    "nameEn": "MFA Recovery Code Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM mfa_recovery_code",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "mfa_recovery_code_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.mfa_recovery_code.list"
+      }
+    ]
+  },
+  "f_mfa_policy_record_count": {
+    "formulaId": "f_mfa_policy_record_count",
+    "name": "Chính sách MFA - Số bản ghi",
+    "nameEn": "MFA Policy Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM mfa_policy",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "mfa_policy_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.mfa_policy.list"
+      }
+    ]
+  },
+  "f_mfa_challenge_record_count": {
+    "formulaId": "f_mfa_challenge_record_count",
+    "name": "Thử thách MFA - Số bản ghi",
+    "nameEn": "MFA Challenge Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM mfa_challenge",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "mfa_challenge_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.mfa_challenge.list"
+      }
+    ]
+  },
+  "f_document_acknowledgement_record_count": {
+    "formulaId": "f_document_acknowledgement_record_count",
+    "name": "Xác nhận đã đọc tài liệu - Số bản ghi",
+    "nameEn": "Document Acknowledgement Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM document_acknowledgement",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "document_acknowledgement_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.document_acknowledgement.list"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.document_acknowledgement.list"
+      }
+    ]
+  },
+  "f_portal_widget_catalog_record_count": {
+    "formulaId": "f_portal_widget_catalog_record_count",
+    "name": "Catalog widget portal - Số bản ghi",
+    "nameEn": "Portal Widget Catalogue Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM portal_widget_catalog",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "portal_widget_catalog_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.portal_widget_catalog.list"
+      }
+    ]
+  },
+  "f_portal_layout_template_record_count": {
+    "formulaId": "f_portal_layout_template_record_count",
+    "name": "Bố cục portal - Số bản ghi",
+    "nameEn": "Portal Layout Template Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM portal_layout_template",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "portal_layout_template_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.portal_layout_template.list"
+      }
+    ]
+  },
+  "f_portal_layout_widget_record_count": {
+    "formulaId": "f_portal_layout_widget_record_count",
+    "name": "Widget trong bố cục - Số bản ghi",
+    "nameEn": "Portal Layout Widget Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM portal_layout_widget",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "portal_layout_widget_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.portal_layout_widget.list"
+      }
+    ]
+  },
+  "f_portal_display_preference_record_count": {
+    "formulaId": "f_portal_display_preference_record_count",
+    "name": "Tùy chỉnh hiển thị portal - Số bản ghi",
+    "nameEn": "Portal Display Preference Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM portal_display_preference",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "portal_display_preference_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.portal_display_preference.list"
+      }
+    ]
+  },
+  "f_retention_policy_record_count": {
+    "formulaId": "f_retention_policy_record_count",
+    "name": "Chính sách lưu giữ - Số bản ghi",
+    "nameEn": "Retention Policy Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM retention_policy",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "retention_policy_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.retention_policy.list"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data_governance.retention_policy.list"
+      }
+    ]
+  },
+  "f_retention_class_assignment_record_count": {
+    "formulaId": "f_retention_class_assignment_record_count",
+    "name": "Gán chính sách lưu giữ - Số bản ghi",
+    "nameEn": "Retention Class Assignment Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM retention_class_assignment",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "retention_class_assignment_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.retention_class_assignment.list"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data_governance.retention_class_assignment.list"
+      }
+    ]
+  },
+  "f_retention_disposal_event_record_count": {
+    "formulaId": "f_retention_disposal_event_record_count",
+    "name": "Sự kiện hủy hồ sơ - Số bản ghi",
+    "nameEn": "Retention Disposal Event Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM retention_disposal_event",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "retention_disposal_event_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.retention_disposal_event.list"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data_governance.retention_disposal_event.list"
+      }
+    ]
+  },
+  "f_retention_legal_hold_record_count": {
+    "formulaId": "f_retention_legal_hold_record_count",
+    "name": "Lệnh giữ pháp lý - Số bản ghi",
+    "nameEn": "Retention Legal Hold Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM retention_legal_hold",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "retention_legal_hold_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.retention_legal_hold.list"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data_governance.retention_legal_hold.list"
+      }
+    ]
+  },
+  "f_disposal_event_record_count": {
+    "formulaId": "f_disposal_event_record_count",
+    "name": "Sự kiện hủy tài liệu - Số bản ghi",
+    "nameEn": "Disposal Event Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM disposal_event",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "disposal_event_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.disposal_event.list"
+      }
+    ]
+  },
+  "f_translation_provider_config_record_count": {
+    "formulaId": "f_translation_provider_config_record_count",
+    "name": "Cấu hình nhà cung cấp dịch thuật - Số bản ghi",
+    "nameEn": "Translation Provider Config Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM translation_provider_config",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "translation_provider_config_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.translation_provider_config.list"
+      }
+    ]
+  },
+  "f_translation_credentials_record_count": {
+    "formulaId": "f_translation_credentials_record_count",
+    "name": "Thông tin xác thực dịch thuật - Số bản ghi",
+    "nameEn": "Translation Credentials Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM translation_credentials",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "translation_credentials_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.translation_credentials.list"
+      }
+    ]
+  },
+  "f_translation_routing_record_count": {
+    "formulaId": "f_translation_routing_record_count",
+    "name": "Quy tắc định tuyến dịch thuật - Số bản ghi",
+    "nameEn": "Translation Routing Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM translation_routing",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "translation_routing_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.translation_routing.list"
+      }
+    ]
+  },
+  "f_translation_usage_log_record_count": {
+    "formulaId": "f_translation_usage_log_record_count",
+    "name": "Lịch sử sử dụng dịch thuật - Số bản ghi",
+    "nameEn": "Translation Usage Log Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM translation_usage_log",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "translation_usage_log_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.translation_usage_log.list"
+      }
+    ]
+  },
+  "f_hcm_employee_position_assignments_record_count": {
+    "formulaId": "f_hcm_employee_position_assignments_record_count",
+    "name": "Bổ nhiệm vị trí HCM - Số bản ghi",
+    "nameEn": "HCM Employee Position Assignments Record Count",
+    "category": "system",
+    "domain": "hcm_workforce",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM hcm_employee_position_assignments",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "hcm_employee_position_assignments_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "hcm_workforce.hcm_employee_position_assignments.list"
+      }
+    ]
+  },
+  "f_hcm_employee_position_assignments_closed_count": {
+    "formulaId": "f_hcm_employee_position_assignments_closed_count",
+    "name": "Bổ nhiệm vị trí HCM - Số hồ sơ đã đóng",
+    "nameEn": "HCM Employee Position Assignments Closed Count",
+    "category": "system",
+    "domain": "hcm_workforce",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE assignment_status IN ('closed','completed','archived','paid','delivered')) FROM hcm_employee_position_assignments",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "hcm_employee_position_assignments_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "hcm_workforce.hcm_employee_position_assignments.transition"
+      }
+    ]
+  },
+  "f_data_collection_state_record_count": {
+    "formulaId": "f_data_collection_state_record_count",
+    "name": "Trạng thái bộ dữ liệu - Số bản ghi",
+    "nameEn": "Data Collection State Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM data_collection_state",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "data_collection_state_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.data_collection_state.list"
+      }
+    ]
+  },
+  "f_data_collection_state_closed_count": {
+    "formulaId": "f_data_collection_state_closed_count",
+    "name": "Trạng thái bộ dữ liệu - Số hồ sơ đã đóng",
+    "nameEn": "Data Collection State Closed Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE mode IN ('closed','completed','archived','paid','delivered')) FROM data_collection_state",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "data_collection_state_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.data_collection_state.transition"
+      }
+    ]
+  },
+  "f_audit_event_chain_record_count": {
+    "formulaId": "f_audit_event_chain_record_count",
+    "name": "Chuỗi sự kiện kiểm toán - Số bản ghi",
+    "nameEn": "Audit Event Chain Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM audit_event_chain",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "audit_event_chain_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.audit_event_chain.list"
+      }
+    ]
+  },
+  "f_data_collection_drift_record_count": {
+    "formulaId": "f_data_collection_drift_record_count",
+    "name": "Lệch bộ dữ liệu - Số bản ghi",
+    "nameEn": "Data Collection Drift Record Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM data_collection_drift",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "data_collection_drift_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.data_collection_drift.list"
+      }
+    ]
+  },
+  "f_data_collection_drift_closed_count": {
+    "formulaId": "f_data_collection_drift_closed_count",
+    "name": "Lệch bộ dữ liệu - Số hồ sơ đã đóng",
+    "nameEn": "Data Collection Drift Closed Count",
+    "category": "system",
+    "domain": "system_infrastructure",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE resolution IN ('closed','completed','archived','paid','delivered')) FROM data_collection_drift",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "data_collection_drift_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "system_infrastructure.data_collection_drift.transition"
+      }
+    ]
+  },
+  "f_dcc_document_body_record_count": {
+    "formulaId": "f_dcc_document_body_record_count",
+    "name": "Nội dung tài liệu DCC - Số bản ghi",
+    "nameEn": "DCC Document Body Record Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM dcc_document_body",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "dcc_document_body_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.dcc_document_body.list"
+      }
+    ]
+  },
+  "f_dcc_document_body_closed_count": {
+    "formulaId": "f_dcc_document_body_closed_count",
+    "name": "Nội dung tài liệu DCC - Số hồ sơ đã đóng",
+    "nameEn": "DCC Document Body Closed Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM dcc_document_body",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "dcc_document_body_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.dcc_document_body.transition"
+      }
+    ]
+  },
+  "f_access_review_campaign_closed_count": {
+    "formulaId": "f_access_review_campaign_closed_count",
+    "name": "Truy cập xem xét chiến dịch - Số hồ sơ đã đóng",
+    "nameEn": "Access Review Campaign Closed Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM access_review_campaign",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "access_review_campaign_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.access_review_campaign.transition"
+      }
+    ]
+  },
+  "f_access_review_item_closed_count": {
+    "formulaId": "f_access_review_item_closed_count",
+    "name": "Truy cập xem xét Mã hàng - Số hồ sơ đã đóng",
+    "nameEn": "Access Review Item Closed Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE snapshot_state IN ('closed','completed','archived','paid','delivered')) FROM access_review_item",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "access_review_item_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.access_review_item.transition"
+      }
+    ]
+  },
+  "f_mfa_challenge_closed_count": {
+    "formulaId": "f_mfa_challenge_closed_count",
+    "name": "MFA Challenge - Số hồ sơ đã đóng",
+    "nameEn": "Mfa Challenge Closed Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM mfa_challenge",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "mfa_challenge_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.mfa_challenge.transition"
+      }
+    ]
+  },
+  "f_mfa_factor_closed_count": {
+    "formulaId": "f_mfa_factor_closed_count",
+    "name": "MFA Factor - Số hồ sơ đã đóng",
+    "nameEn": "Mfa Factor Closed Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE status IN ('closed','completed','archived','paid','delivered')) FROM mfa_factor",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "mfa_factor_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.mfa_factor.transition"
+      }
+    ]
+  },
+  "f_retention_disposal_event_closed_count": {
+    "formulaId": "f_retention_disposal_event_closed_count",
+    "name": "Lưu giữ Disposal sự kiện - Số hồ sơ đã đóng",
+    "nameEn": "Retention Disposal Event Closed Count",
+    "category": "system",
+    "domain": "master_data_governance",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE disposal_status IN ('closed','completed','archived','paid','delivered')) FROM retention_disposal_event",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "retention_disposal_event_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "master_data_governance.retention_disposal_event.transition"
+      }
+    ]
+  },
+  "f_translation_credentials_closed_count": {
+    "formulaId": "f_translation_credentials_closed_count",
+    "name": "Translation Credential - Số hồ sơ đã đóng",
+    "nameEn": "Translation Credentials Closed Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE last_test_status IN ('closed','completed','archived','paid','delivered')) FROM translation_credentials",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "translation_credentials_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.translation_credentials.transition"
+      }
+    ]
+  },
+  "f_translation_provider_config_closed_count": {
+    "formulaId": "f_translation_provider_config_closed_count",
+    "name": "Translation Provider Config - Số hồ sơ đã đóng",
+    "nameEn": "Translation Provider Config Closed Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FILTER (WHERE health_status IN ('closed','completed','archived','paid','delivered')) FROM translation_provider_config",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "translation_provider_config_status"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.translation_provider_config.transition"
       }
     ]
   }

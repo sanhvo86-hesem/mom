@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-15T10:51:37.359Z",
+    "generatedAt": "2026-05-14T03:01:44.789Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "policyVersion": "1.0",
     "description": "Wave 4 production-quality governance verification report."
@@ -10,14 +10,14 @@
     "quality_execution_targets": 3,
     "quality_execution_failed": 0,
     "inspection_backbone_targets": 6,
-    "inspection_backbone_failed": 0,
+    "inspection_backbone_failed": 1,
     "reaction_loop_targets": 4,
     "reaction_loop_failed": 0,
     "qa_qc_role_split_targets": 3,
     "qa_qc_role_split_failed": 0,
     "alias_resolution_targets": 1,
     "alias_resolution_failed": 0,
-    "remaining_wave4_gaps": 0
+    "remaining_wave4_gaps": 1
   },
   "policy_gates": {
     "build_questions": [
@@ -170,12 +170,12 @@
       ],
       "missing_endpoints": [],
       "expected_profile": "governed_case",
-      "actual_profile": "governed_case",
+      "actual_profile": "operator_console",
       "expected_workflow_state": "ready",
       "actual_workflow_state": "ready",
       "forbid_workflow_owner": false,
       "actual_workflow_id": "wf_inspection_lot",
-      "passed": true
+      "passed": false
     },
     {
       "entity_key": "quality_management.incoming_inspection_results",

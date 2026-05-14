@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-24T08:27:14.335Z",
+    "generatedAt": "2026-05-14T03:02:00.056Z",
     "source": "mom/contracts/objects/*/contract.json",
     "authority": "authored_object_contracts",
     "domainCount": 12,
@@ -3619,15 +3619,8 @@
             "dcc_release_requires_dcn",
             "dcc_revision_follows_semver_pattern"
           ],
-          "upstream_objects": [
-            "quality_improvement.document_change_notice",
-            "quality_improvement.document_change_request"
-          ],
-          "downstream_objects": [
-            "quality_improvement.controlled_copies",
-            "quality_improvement.document_acknowledgements",
-            "training_and_competence.training_assignments"
-          ],
+          "upstream_objects": [],
+          "downstream_objects": [],
           "key_relationships": [],
           "runtime_exposure_status": "",
           "purpose": "Govern version control of QMS controlled documents (Manual, Policy, SOP, WI, Form, Annex, Handbook, JD). Distinct from Engineering Change Control (ECC = plm_change_*) which governs parts/BOMs/items.",

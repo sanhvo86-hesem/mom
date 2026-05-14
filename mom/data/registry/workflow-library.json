@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Workflow library expanded from table-registry and domain-driven lifecycle heuristics.",
-    "generatedAt": "2026-04-24T08:27:14.538Z",
-    "workflowCount": 379
+    "generatedAt": "2026-05-14T03:02:00.544Z",
+    "workflowCount": 384
   },
   "workflows": {
     "wf_ai_recommendation_action": {
@@ -8745,6 +8745,477 @@
         "downstreamEffects": []
       }
     },
+    "wf_dcc_document_body": {
+      "workflowId": "wf_dcc_document_body",
+      "name": "Dcc Tài liệu Body - Luong xu ly",
+      "nameEn": "Dcc Document Body Workflow",
+      "entity": "dcc_document_body",
+      "domain": "document_control",
+      "standard": "ISO9001",
+      "primaryTable": "dcc_document_body",
+      "relatedTables": [
+        "dcc_document_body"
+      ],
+      "stateField": "status",
+      "statusSet": "dcc_document_body_status",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "draft",
+          "label": "Nháp",
+          "labelEn": "Draft",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "id": "on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
+          "id": "completed",
+          "label": "Hoàn thành",
+          "labelEn": "Completed",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "on_hold",
+            "draft",
+            "active"
+          ]
+        },
+        {
+          "id": "closed",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "completed",
+            "draft",
+            "active",
+            "on_hold"
+          ]
+        },
+        {
+          "id": "cancelled",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "closed",
+            "draft",
+            "active",
+            "on_hold"
+          ]
+        }
+      ],
+      "transitions": [
+        {
+          "from": "draft",
+          "to": "active",
+          "trigger": "move_to_active",
+          "label": "Hoạt động",
+          "labelEn": "Active",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "document_controller",
+              "template": "document_control_active"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "on_hold",
+          "trigger": "move_to_on_hold",
+          "label": "Tạm dừng",
+          "labelEn": "On Hold",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "document_controller",
+              "template": "document_control_on_hold"
+            }
+          ]
+        },
+        {
+          "from": "on_hold",
+          "to": "completed",
+          "trigger": "complete",
+          "label": "Hoàn thành",
+          "labelEn": "Completed",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "document_controller",
+              "template": "document_control_completed"
+            },
+            {
+              "type": "setField",
+              "field": "completed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "draft",
+          "to": "completed",
+          "trigger": "complete",
+          "label": "Hoàn thành",
+          "labelEn": "Completed",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "document_controller",
+              "template": "document_control_completed"
+            },
+            {
+              "type": "setField",
+              "field": "completed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "completed",
+          "trigger": "complete",
+          "label": "Hoàn thành",
+          "labelEn": "Completed",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "document_controller",
+              "template": "document_control_completed"
+            },
+            {
+              "type": "setField",
+              "field": "completed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "completed",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "document_controller",
+                "quality_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "document_controller",
+              "template": "document_control_closed"
+            },
+            {
+              "type": "setField",
+              "field": "closed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "draft",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "document_controller",
+                "quality_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "document_controller",
+              "template": "document_control_closed"
+            },
+            {
+              "type": "setField",
+              "field": "closed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "document_controller",
+                "quality_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "document_controller",
+              "template": "document_control_closed"
+            },
+            {
+              "type": "setField",
+              "field": "closed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "on_hold",
+          "to": "closed",
+          "trigger": "close",
+          "label": "Đã đóng",
+          "labelEn": "Closed",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "document_controller",
+                "quality_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "document_controller",
+              "template": "document_control_closed"
+            },
+            {
+              "type": "setField",
+              "field": "closed_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "closed",
+          "to": "cancelled",
+          "trigger": "cancel",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "document_controller",
+                "quality_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "document_controller",
+              "template": "document_control_cancelled"
+            },
+            {
+              "type": "setField",
+              "field": "cancelled_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "draft",
+          "to": "cancelled",
+          "trigger": "cancel",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "document_controller",
+                "quality_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "document_controller",
+              "template": "document_control_cancelled"
+            },
+            {
+              "type": "setField",
+              "field": "cancelled_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "active",
+          "to": "cancelled",
+          "trigger": "cancel",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "document_controller",
+                "quality_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "document_controller",
+              "template": "document_control_cancelled"
+            },
+            {
+              "type": "setField",
+              "field": "cancelled_at",
+              "value": "NOW()"
+            }
+          ]
+        },
+        {
+          "from": "on_hold",
+          "to": "cancelled",
+          "trigger": "cancel",
+          "label": "Đã hủy",
+          "labelEn": "Cancelled",
+          "guards": [
+            {
+              "type": "role",
+              "roles": [
+                "document_controller",
+                "quality_manager",
+                "system_admin"
+              ]
+            }
+          ],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "document_controller",
+              "template": "document_control_cancelled"
+            },
+            {
+              "type": "setField",
+              "field": "cancelled_at",
+              "value": "NOW()"
+            }
+          ]
+        }
+      ],
+      "sla": {
+        "draft_to_active": {
+          "hours": 24,
+          "escalateTo": "document_controller"
+        },
+        "active_to_on_hold": {
+          "hours": 24,
+          "escalateTo": "document_controller"
+        },
+        "on_hold_to_completed": {
+          "hours": 72,
+          "escalateTo": "document_controller"
+        },
+        "draft_to_completed": {
+          "hours": 72,
+          "escalateTo": "document_controller"
+        },
+        "active_to_completed": {
+          "hours": 72,
+          "escalateTo": "document_controller"
+        },
+        "completed_to_closed": {
+          "hours": 72,
+          "escalateTo": "document_controller"
+        },
+        "draft_to_closed": {
+          "hours": 72,
+          "escalateTo": "document_controller"
+        },
+        "active_to_closed": {
+          "hours": 72,
+          "escalateTo": "document_controller"
+        },
+        "on_hold_to_closed": {
+          "hours": 72,
+          "escalateTo": "document_controller"
+        },
+        "closed_to_cancelled": {
+          "hours": 24,
+          "escalateTo": "document_controller"
+        },
+        "draft_to_cancelled": {
+          "hours": 24,
+          "escalateTo": "document_controller"
+        },
+        "active_to_cancelled": {
+          "hours": 24,
+          "escalateTo": "document_controller"
+        },
+        "on_hold_to_cancelled": {
+          "hours": 24,
+          "escalateTo": "document_controller"
+        }
+      },
+      "digitalThread": {
+        "upstreamTriggers": [],
+        "downstreamEffects": []
+      }
+    },
     "wf_dcc_document_change_notice": {
       "workflowId": "wf_dcc_document_change_notice",
       "name": "Dcc Tài liệu thay đổi Notice - Luong xu ly",
@@ -10289,6 +10760,7 @@
         "org_plants",
         "mes_sites",
         "users",
+        "retention_policy",
         "document_versions",
         "eng_work_instructions",
         "hcm_disciplinary_actions",
@@ -24030,6 +24502,7 @@
         "hcm_attendance_records",
         "hcm_disciplinary_actions",
         "hcm_employee_certifications",
+        "hcm_employee_position_assignments",
         "hcm_employee_skills",
         "hcm_leave_balances",
         "hcm_payroll_lines"
@@ -24355,6 +24828,7 @@
         "org_legal_entities",
         "org_plants",
         "mes_sites",
+        "hcm_employee_position_assignments",
         "hcm_employees",
         "hcm_positions"
       ],
@@ -24729,6 +25203,7 @@
         "org_legal_entities",
         "org_plants",
         "mes_sites",
+        "hcm_employee_position_assignments",
         "hcm_employees"
       ],
       "stateField": "status",
@@ -33708,6 +34183,230 @@
         "downstreamEffects": []
       }
     },
+    "wf_mfa_challenge": {
+      "workflowId": "wf_mfa_challenge",
+      "name": "MFA Challenge - Luong xu ly",
+      "nameEn": "Mfa Challenge Workflow",
+      "entity": "mfa_challenge",
+      "domain": "core_system",
+      "standard": "internal",
+      "primaryTable": "mfa_challenge",
+      "relatedTables": [
+        "mfa_challenge",
+        "users",
+        "mfa_factor",
+        "document_acknowledgement"
+      ],
+      "stateField": "status",
+      "statusSet": "mfa_challenge_status",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "core_system_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "core_system_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "core_system_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [
+          "mfa_factor",
+          "users"
+        ],
+        "downstreamEffects": [
+          "document_acknowledgement"
+        ]
+      }
+    },
+    "wf_mfa_factor": {
+      "workflowId": "wf_mfa_factor",
+      "name": "MFA Factor - Luong xu ly",
+      "nameEn": "Mfa Factor Workflow",
+      "entity": "mfa_factor",
+      "domain": "core_system",
+      "standard": "internal",
+      "primaryTable": "mfa_factor",
+      "relatedTables": [
+        "mfa_factor",
+        "users",
+        "mfa_challenge"
+      ],
+      "stateField": "status",
+      "statusSet": "mfa_factor_status",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "core_system_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "core_system_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "core_system_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [
+          "users"
+        ],
+        "downstreamEffects": [
+          "mfa_challenge"
+        ]
+      }
+    },
     "wf_mobile_task": {
       "workflowId": "wf_mobile_task",
       "name": "Kiểm tra Capture di động - Luong xu ly",
@@ -35492,6 +36191,7 @@
         "hcm_certifications",
         "hcm_disciplinary_actions",
         "hcm_employee_certifications",
+        "hcm_employee_position_assignments",
         "hcm_employee_skills",
         "hcm_employees",
         "hcm_leave_balances",
@@ -37005,6 +37705,7 @@
         "hcm_certifications",
         "hcm_disciplinary_actions",
         "hcm_employee_certifications",
+        "hcm_employee_position_assignments",
         "hcm_employee_skills",
         "hcm_employees",
         "hcm_leave_balances",
@@ -60957,6 +61658,224 @@
         ]
       }
     },
+    "wf_translation_credential": {
+      "workflowId": "wf_translation_credential",
+      "name": "Translation Credential - Luong xu ly",
+      "nameEn": "Translation Credentials Workflow",
+      "entity": "translation_credentials",
+      "domain": "core_system",
+      "standard": "internal",
+      "primaryTable": "translation_credentials",
+      "relatedTables": [
+        "translation_credentials",
+        "translation_provider_config"
+      ],
+      "stateField": "last_test_status",
+      "statusSet": "translation_credentials_last_test_status",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "core_system_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "core_system_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "core_system_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [
+          "translation_provider_config"
+        ],
+        "downstreamEffects": []
+      }
+    },
+    "wf_translation_provider_config": {
+      "workflowId": "wf_translation_provider_config",
+      "name": "Translation Provider Config - Luong xu ly",
+      "nameEn": "Translation Provider Config Workflow",
+      "entity": "translation_provider_config",
+      "domain": "core_system",
+      "standard": "internal",
+      "primaryTable": "translation_provider_config",
+      "relatedTables": [
+        "translation_provider_config",
+        "translation_credentials",
+        "translation_routing"
+      ],
+      "stateField": "health_status",
+      "statusSet": "translation_provider_config_health_status",
+      "lifecycleMode": "persisted",
+      "states": [
+        {
+          "id": "complete",
+          "label": "Hoàn chỉnh",
+          "labelEn": "Complete",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "color": "#f59e0b",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "color": "#ef4444",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        },
+        {
+          "id": "pending",
+          "label": "Chờ hoàn thiện",
+          "labelEn": "Pending",
+          "color": "#3b82f6",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": []
+        }
+      ],
+      "transitions": [
+        {
+          "from": "complete",
+          "to": "partial",
+          "trigger": "move_to_partial",
+          "label": "Một phần",
+          "labelEn": "Partial",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "core_system_partial"
+            }
+          ]
+        },
+        {
+          "from": "partial",
+          "to": "broken",
+          "trigger": "move_to_broken",
+          "label": "Đứt gãy",
+          "labelEn": "Broken",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "core_system_broken"
+            }
+          ]
+        },
+        {
+          "from": "broken",
+          "to": "pending",
+          "trigger": "move_to_pending",
+          "label": "Chờ xử lý",
+          "labelEn": "Pending",
+          "guards": [],
+          "actions": [
+            {
+              "type": "notify",
+              "to": "module_admin",
+              "template": "core_system_pending"
+            }
+          ]
+        }
+      ],
+      "sla": {},
+      "digitalThread": {
+        "upstreamTriggers": [],
+        "downstreamEffects": [
+          "translation_credentials",
+          "translation_routing"
+        ]
+      }
+    },
     "wf_uom": {
       "workflowId": "wf_uom",
       "name": "undefined - Luong xu ly",
@@ -61391,6 +62310,8 @@
         "org_legal_entities",
         "org_plants",
         "mes_sites",
+        "access_review_campaign",
+        "access_review_item",
         "approved_supplier_list",
         "apqp_gate_reviews",
         "apqp_projects",
@@ -61436,8 +62357,10 @@
         "doc_families",
         "doc_read_acknowledgements",
         "doc_revisions",
+        "document_acknowledgement",
         "document_distribution",
         "document_embeddings",
+        "document_permission_grant",
         "document_versions",
         "documents",
         "e_signature_auth_challenges",
@@ -61516,6 +62439,10 @@
         "management_reviews",
         "material_review_board",
         "mdm_data_stewards",
+        "mfa_challenge",
+        "mfa_factor",
+        "mfa_policy",
+        "mfa_recovery_code",
         "mobile_inspection_captures",
         "ncr_human_factors",
         "ncr_mrb_decisions",
@@ -61547,6 +62474,7 @@
         "pm_maintenance_plans",
         "pm_work_order_operations",
         "pm_work_orders",
+        "portal_display_preference",
         "portal_document_access",
         "portal_order_views",
         "prediction_models",
@@ -61575,6 +62503,9 @@
         "record_links",
         "records",
         "release_manifests",
+        "retention_class_assignment",
+        "retention_disposal_event",
+        "retention_legal_hold",
         "retention_locks",
         "reverse_sync_intakes",
         "risk_register",

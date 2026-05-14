@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-24T08:27:19.645408+00:00",
+    "generatedAt": "2026-05-14T03:02:07.891020+00:00",
     "sourceArtifacts": [
       "mom/data/registry/table-registry.json",
       "mom/data/registry/endpoint-governance-classification.json",
@@ -10,7 +10,7 @@
       "mom/contracts/event-index.json"
     ],
     "description": "Generated table governance overlay. It upgrades table-registry rows with machine-readable authority, ownership, retention, deletion, API/event/workflow, UI and AI boundaries without changing DB data.",
-    "tableCount": 837
+    "tableCount": 867
   },
   "summary": {
     "domains": {
@@ -21,12 +21,12 @@
       "calibration_equipment": 7,
       "cnc_programs": 5,
       "commercial_contracts": 15,
-      "core_system": 6,
+      "core_system": 26,
       "crm": 10,
       "customer_portal": 6,
       "demand_supply_planning": 18,
       "digital_product_passport": 3,
-      "document_control": 26,
+      "document_control": 28,
       "ehs_sustainability": 19,
       "evidence_vault": 21,
       "finance": 9,
@@ -35,11 +35,11 @@
       "fmea_apqp": 9,
       "forms_system": 19,
       "foundation_governance": 24,
-      "hcm_workforce": 14,
+      "hcm_workforce": 15,
       "inventory": 10,
       "lean_manufacturing": 8,
       "master_data": 17,
-      "master_data_governance": 21,
+      "master_data_governance": 25,
       "mes_execution": 72,
       "mfg_engineering": 25,
       "mobile_operations": 3,
@@ -56,7 +56,7 @@
       "service_warranty": 13,
       "shipping_compliance": 7,
       "supplier_relationship": 20,
-      "system_infrastructure": 35,
+      "system_infrastructure": 38,
       "tooling_lifecycle": 14,
       "traceability_serialization": 23,
       "trade_compliance": 12,
@@ -67,18 +67,113 @@
     "authorityMode": {
       "analytics_projection": 30,
       "asset_lifecycle": 18,
-      "domain_runtime": 110,
+      "domain_runtime": 114,
       "governed_support": 24,
       "machine_runtime": 93,
-      "platform_governance": 32,
-      "process_runtime": 530
+      "platform_governance": 49,
+      "process_runtime": 539
     },
     "targetDeletionMode": {
-      "archive_only": 837
+      "archive_only": 867
     },
     "hardDeleteWaiverRequired": 0
   },
   "tables": {
+    "access_review_campaign": {
+      "systemOfRecord": "postgres_migration:164_rbac_access_review.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.access_review_campaign.create",
+        "core_system.access_review_campaign.delete",
+        "core_system.access_review_campaign.detail",
+        "core_system.access_review_campaign.list",
+        "core_system.access_review_campaign.transition",
+        "core_system.access_review_campaign.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:access_review_campaign_status"
+      ],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "access_review_item": {
+      "systemOfRecord": "postgres_migration:164_rbac_access_review.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.access_review_item.create",
+        "core_system.access_review_item.delete",
+        "core_system.access_review_item.detail",
+        "core_system.access_review_item.list",
+        "core_system.access_review_item.transition",
+        "core_system.access_review_item.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:access_review_item_snapshot_state"
+      ],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_data_schema",
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "read_only_contract",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
     "ai_conversations": {
       "systemOfRecord": "postgres_migration:099_ai_integration_foundation.sql",
       "authorityMode": "analytics_projection",
@@ -1537,6 +1632,49 @@
       "businessObjectRefs": [],
       "uiSurfaces": [
         "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "audit_event_chain": {
+      "systemOfRecord": "postgres_migration:174_data_isolation_foundation.sql",
+      "authorityMode": "platform_governance",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "system_infrastructure.audit_event_chain.create",
+        "system_infrastructure.audit_event_chain.delete",
+        "system_infrastructure.audit_event_chain.detail",
+        "system_infrastructure.audit_event_chain.list",
+        "system_infrastructure.audit_event_chain.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
         "system_contract_registry"
       ],
       "aiAuthority": {
@@ -4892,6 +5030,95 @@
         "changeGate": "registry_doctor_and_data_loss_guard"
       }
     },
+    "data_collection_drift": {
+      "systemOfRecord": "postgres_migration:174_data_isolation_foundation.sql",
+      "authorityMode": "platform_governance",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "system_infrastructure.data_collection_drift.create",
+        "system_infrastructure.data_collection_drift.delete",
+        "system_infrastructure.data_collection_drift.detail",
+        "system_infrastructure.data_collection_drift.list",
+        "system_infrastructure.data_collection_drift.transition",
+        "system_infrastructure.data_collection_drift.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "data_collection_state": {
+      "systemOfRecord": "postgres_migration:174_data_isolation_foundation.sql",
+      "authorityMode": "platform_governance",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "system_infrastructure.data_collection_state.create",
+        "system_infrastructure.data_collection_state.delete",
+        "system_infrastructure.data_collection_state.detail",
+        "system_infrastructure.data_collection_state.list",
+        "system_infrastructure.data_collection_state.transition",
+        "system_infrastructure.data_collection_state.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
     "dcc_doc_type_catalog": {
       "systemOfRecord": "postgres_migration:155_dcc_consolidation.sql",
       "authorityMode": "domain_runtime",
@@ -4926,6 +5153,55 @@
       "businessObjectRefs": [],
       "uiSurfaces": [
         "admin_data_schema",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "dcc_document_body": {
+      "systemOfRecord": "postgres_migration:175_dcc_document_body_storage.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "quality_manager",
+      "stewardRole": "document_control_steward",
+      "dataClassification": "regulated_audit_record",
+      "retentionClass": "quality_record_7y_or_customer_specific",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "audit_trail_required",
+          "correction_not_overwrite",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "document_control.dcc_document_body.create",
+        "document_control.dcc_document_body.delete",
+        "document_control.dcc_document_body.detail",
+        "document_control.dcc_document_body.list",
+        "document_control.dcc_document_body.transition",
+        "document_control.dcc_document_body.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:dcc_document_body_status",
+        "wf_dcc_document_body"
+      ],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "process_command_workspace",
         "system_contract_registry"
       ],
       "aiAuthority": {
@@ -4973,7 +5249,9 @@
         "status-set:dcc_document_change_notice_status",
         "wf_dcc_document_change_notice"
       ],
-      "businessObjectRefs": [],
+      "businessObjectRefs": [
+        "quality_improvement.document_control"
+      ],
       "uiSurfaces": [
         "process_command_workspace",
         "system_contract_registry"
@@ -5023,7 +5301,9 @@
         "status-set:dcc_document_change_request_status",
         "wf_dcc_document_change_request"
       ],
-      "businessObjectRefs": [],
+      "businessObjectRefs": [
+        "quality_improvement.document_control"
+      ],
       "uiSurfaces": [
         "process_command_workspace",
         "system_contract_registry"
@@ -5068,12 +5348,19 @@
         "document_control.dcc_document_header.transition",
         "document_control.dcc_document_header.update"
       ],
-      "eventContractRefs": [],
+      "eventContractRefs": [
+        "quality_improvement.document_control.created",
+        "quality_improvement.document_control.state-transitioned",
+        "quality_improvement.document_control.updated"
+      ],
       "workflowRefs": [
+        "quality_improvement.document_control",
         "status-set:dcc_document_header_status",
         "wf_dcc_document_header"
       ],
-      "businessObjectRefs": [],
+      "businessObjectRefs": [
+        "quality_improvement.document_control"
+      ],
       "uiSurfaces": [
         "process_command_workspace",
         "system_contract_registry"
@@ -5215,9 +5502,12 @@
       ],
       "eventContractRefs": [],
       "workflowRefs": [],
-      "businessObjectRefs": [],
+      "businessObjectRefs": [
+        "quality_improvement.document_control"
+      ],
       "uiSurfaces": [
         "admin_data_schema",
+        "process_command_workspace",
         "system_contract_registry"
       ],
       "aiAuthority": {
@@ -5264,7 +5554,9 @@
       "workflowRefs": [
         "status-set:dcc_document_revision_history_to_status"
       ],
-      "businessObjectRefs": [],
+      "businessObjectRefs": [
+        "quality_improvement.document_control"
+      ],
       "uiSurfaces": [
         "admin_data_schema",
         "process_command_workspace",
@@ -5660,6 +5952,49 @@
         "changeGate": "registry_doctor_and_data_loss_guard"
       }
     },
+    "disposal_event": {
+      "systemOfRecord": "postgres_migration:172_disposal_event_and_campaign_close.sql",
+      "authorityMode": "platform_governance",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.disposal_event.create",
+        "core_system.disposal_event.delete",
+        "core_system.disposal_event.detail",
+        "core_system.disposal_event.list",
+        "core_system.disposal_event.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
     "doc_distributions": {
       "systemOfRecord": "postgres_migration:106_eqms_world_class_control_plane.sql",
       "authorityMode": "process_runtime",
@@ -5952,6 +6287,58 @@
         "changeGate": "registry_doctor_and_data_loss_guard"
       }
     },
+    "document_acknowledgement": {
+      "systemOfRecord": "postgres_migration:166_content_effective_documents_and_acknowledgement.sql",
+      "authorityMode": "domain_runtime",
+      "ownerRole": "quality_manager",
+      "stewardRole": "document_control_steward",
+      "dataClassification": "regulated_audit_record",
+      "retentionClass": "quality_record_7y_or_customer_specific",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "audit_trail_required",
+          "correction_not_overwrite",
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.document_acknowledgement.create",
+        "core_system.document_acknowledgement.delete",
+        "core_system.document_acknowledgement.detail",
+        "core_system.document_acknowledgement.list",
+        "core_system.document_acknowledgement.update",
+        "document_control.document_acknowledgement.create",
+        "document_control.document_acknowledgement.delete",
+        "document_control.document_acknowledgement.detail",
+        "document_control.document_acknowledgement.list",
+        "document_control.document_acknowledgement.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_data_schema",
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
     "document_distribution": {
       "systemOfRecord": "postgres_migration:003_document_management.sql",
       "authorityMode": "domain_runtime",
@@ -6032,6 +6419,50 @@
       "businessObjectRefs": [],
       "uiSurfaces": [
         "admin_data_schema",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "document_permission_grant": {
+      "systemOfRecord": "postgres_migration:161_rbac_document_permission_grant.sql",
+      "authorityMode": "platform_governance",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.document_permission_grant.create",
+        "core_system.document_permission_grant.delete",
+        "core_system.document_permission_grant.detail",
+        "core_system.document_permission_grant.list",
+        "core_system.document_permission_grant.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
         "system_contract_registry"
       ],
       "aiAuthority": {
@@ -16483,6 +16914,54 @@
         "changeGate": "registry_doctor_and_data_loss_guard"
       }
     },
+    "hcm_employee_position_assignments": {
+      "systemOfRecord": "postgres_migration:177_hcm_employee_position_assignments.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "hr_manager",
+      "stewardRole": "workforce_data_steward",
+      "dataClassification": "confidential_personal",
+      "retentionClass": "hr_record_policy_based",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "hcm_workforce.hcm_employee_position_assignments.create",
+        "hcm_workforce.hcm_employee_position_assignments.delete",
+        "hcm_workforce.hcm_employee_position_assignments.detail",
+        "hcm_workforce.hcm_employee_position_assignments.list",
+        "hcm_workforce.hcm_employee_position_assignments.transition",
+        "hcm_workforce.hcm_employee_position_assignments.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:hcm_employee_position_assignments_assignment_status"
+      ],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_data_schema",
+        "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "read_only_contract",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
     "hcm_employee_skills": {
       "systemOfRecord": "postgres_migration:049_hcm_workforce_management.sql",
       "authorityMode": "domain_runtime",
@@ -18649,6 +19128,11 @@
         ]
       },
       "apiContractRefs": [
+        "planning_production.transactional.job_orders.create",
+        "planning_production.transactional.job_orders.detail",
+        "planning_production.transactional.job_orders.list",
+        "planning_production.transactional.job_orders.transition",
+        "planning_production.transactional.job_orders.update",
         "production.job_orders.create",
         "production.job_orders.delete",
         "production.job_orders.detail",
@@ -23222,6 +23706,190 @@
         "changeGate": "registry_doctor_and_data_loss_guard"
       }
     },
+    "mfa_challenge": {
+      "systemOfRecord": "postgres_migration:165_rbac_mfa_factors_and_policy.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.mfa_challenge.create",
+        "core_system.mfa_challenge.delete",
+        "core_system.mfa_challenge.detail",
+        "core_system.mfa_challenge.list",
+        "core_system.mfa_challenge.transition",
+        "core_system.mfa_challenge.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:mfa_challenge_status",
+        "wf_mfa_challenge"
+      ],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "mfa_factor": {
+      "systemOfRecord": "postgres_migration:165_rbac_mfa_factors_and_policy.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.mfa_factor.create",
+        "core_system.mfa_factor.delete",
+        "core_system.mfa_factor.detail",
+        "core_system.mfa_factor.list",
+        "core_system.mfa_factor.transition",
+        "core_system.mfa_factor.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:mfa_factor_status",
+        "wf_mfa_factor"
+      ],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "mfa_policy": {
+      "systemOfRecord": "postgres_migration:165_rbac_mfa_factors_and_policy.sql",
+      "authorityMode": "platform_governance",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.mfa_policy.create",
+        "core_system.mfa_policy.delete",
+        "core_system.mfa_policy.detail",
+        "core_system.mfa_policy.list",
+        "core_system.mfa_policy.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "mfa_recovery_code": {
+      "systemOfRecord": "postgres_migration:165_rbac_mfa_factors_and_policy.sql",
+      "authorityMode": "platform_governance",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.mfa_recovery_code.create",
+        "core_system.mfa_recovery_code.delete",
+        "core_system.mfa_recovery_code.detail",
+        "core_system.mfa_recovery_code.list",
+        "core_system.mfa_recovery_code.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
     "mobile_inspection_captures": {
       "systemOfRecord": "postgres_migration:042_fmea_apqp_control_plan_mobile.sql",
       "authorityMode": "process_runtime",
@@ -23356,6 +24024,94 @@
       "businessObjectRefs": [],
       "uiSurfaces": [
         "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "module_permission": {
+      "systemOfRecord": "postgres_migration:160_rbac_modules_and_module_permission.sql",
+      "authorityMode": "platform_governance",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.module_permission.create",
+        "core_system.module_permission.delete",
+        "core_system.module_permission.detail",
+        "core_system.module_permission.list",
+        "core_system.module_permission.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "modules_catalog": {
+      "systemOfRecord": "postgres_migration:160_rbac_modules_and_module_permission.sql",
+      "authorityMode": "platform_governance",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.modules_catalog.create",
+        "core_system.modules_catalog.delete",
+        "core_system.modules_catalog.detail",
+        "core_system.modules_catalog.list",
+        "core_system.modules_catalog.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
         "system_contract_registry"
       ],
       "aiAuthority": {
@@ -26110,6 +26866,49 @@
         "changeGate": "registry_doctor_and_data_loss_guard"
       }
     },
+    "permission_catalog": {
+      "systemOfRecord": "postgres_migration:159_rbac_permission_catalog.sql",
+      "authorityMode": "platform_governance",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.permission_catalog.create",
+        "core_system.permission_catalog.delete",
+        "core_system.permission_catalog.detail",
+        "core_system.permission_catalog.list",
+        "core_system.permission_catalog.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
     "planned_supply": {
       "systemOfRecord": "postgres_migration:075_canonical_planning_erp_orchestration.sql",
       "authorityMode": "process_runtime",
@@ -27852,6 +28651,50 @@
         "changeGate": "registry_doctor_and_data_loss_guard"
       }
     },
+    "portal_display_preference": {
+      "systemOfRecord": "postgres_migration:167_content_portal_display.sql",
+      "authorityMode": "platform_governance",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.portal_display_preference.create",
+        "core_system.portal_display_preference.delete",
+        "core_system.portal_display_preference.detail",
+        "core_system.portal_display_preference.list",
+        "core_system.portal_display_preference.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
     "portal_document_access": {
       "systemOfRecord": "postgres_migration:038_customer_portal.sql",
       "authorityMode": "process_runtime",
@@ -27884,6 +28727,93 @@
       "businessObjectRefs": [],
       "uiSurfaces": [
         "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "portal_layout_template": {
+      "systemOfRecord": "postgres_migration:167_content_portal_display.sql",
+      "authorityMode": "platform_governance",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.portal_layout_template.create",
+        "core_system.portal_layout_template.delete",
+        "core_system.portal_layout_template.detail",
+        "core_system.portal_layout_template.list",
+        "core_system.portal_layout_template.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "portal_layout_widget": {
+      "systemOfRecord": "postgres_migration:167_content_portal_display.sql",
+      "authorityMode": "platform_governance",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.portal_layout_widget.create",
+        "core_system.portal_layout_widget.delete",
+        "core_system.portal_layout_widget.detail",
+        "core_system.portal_layout_widget.list",
+        "core_system.portal_layout_widget.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
         "system_contract_registry"
       ],
       "aiAuthority": {
@@ -28020,6 +28950,49 @@
       "businessObjectRefs": [],
       "uiSurfaces": [
         "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "portal_widget_catalog": {
+      "systemOfRecord": "postgres_migration:167_content_portal_display.sql",
+      "authorityMode": "platform_governance",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.portal_widget_catalog.create",
+        "core_system.portal_widget_catalog.delete",
+        "core_system.portal_widget_catalog.detail",
+        "core_system.portal_widget_catalog.list",
+        "core_system.portal_widget_catalog.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
         "system_contract_registry"
       ],
       "aiAuthority": {
@@ -31179,6 +32152,159 @@
         "changeGate": "registry_doctor_and_data_loss_guard"
       }
     },
+    "retention_class_assignment": {
+      "systemOfRecord": "postgres_migration:168_content_retention_policy.sql",
+      "authorityMode": "domain_runtime",
+      "ownerRole": "master_data_governor",
+      "stewardRole": "master_data_steward",
+      "dataClassification": "internal_master_data",
+      "retentionClass": "master_data_lifecycle",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.retention_class_assignment.create",
+        "core_system.retention_class_assignment.delete",
+        "core_system.retention_class_assignment.detail",
+        "core_system.retention_class_assignment.list",
+        "core_system.retention_class_assignment.update",
+        "master_data_governance.retention_class_assignment.create",
+        "master_data_governance.retention_class_assignment.delete",
+        "master_data_governance.retention_class_assignment.detail",
+        "master_data_governance.retention_class_assignment.list",
+        "master_data_governance.retention_class_assignment.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_data_schema",
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "retention_disposal_event": {
+      "systemOfRecord": "postgres_migration:168_content_retention_policy.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "master_data_governor",
+      "stewardRole": "master_data_steward",
+      "dataClassification": "internal_master_data",
+      "retentionClass": "master_data_lifecycle",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.retention_disposal_event.create",
+        "core_system.retention_disposal_event.delete",
+        "core_system.retention_disposal_event.detail",
+        "core_system.retention_disposal_event.list",
+        "core_system.retention_disposal_event.update",
+        "master_data_governance.retention_disposal_event.create",
+        "master_data_governance.retention_disposal_event.delete",
+        "master_data_governance.retention_disposal_event.detail",
+        "master_data_governance.retention_disposal_event.list",
+        "master_data_governance.retention_disposal_event.transition",
+        "master_data_governance.retention_disposal_event.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:retention_disposal_event_disposal_status"
+      ],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
+        "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "retention_legal_hold": {
+      "systemOfRecord": "postgres_migration:168_content_retention_policy.sql",
+      "authorityMode": "domain_runtime",
+      "ownerRole": "master_data_governor",
+      "stewardRole": "master_data_steward",
+      "dataClassification": "internal_master_data",
+      "retentionClass": "master_data_lifecycle",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.retention_legal_hold.create",
+        "core_system.retention_legal_hold.delete",
+        "core_system.retention_legal_hold.detail",
+        "core_system.retention_legal_hold.list",
+        "core_system.retention_legal_hold.update",
+        "master_data_governance.retention_legal_hold.create",
+        "master_data_governance.retention_legal_hold.delete",
+        "master_data_governance.retention_legal_hold.detail",
+        "master_data_governance.retention_legal_hold.list",
+        "master_data_governance.retention_legal_hold.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_data_schema",
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
     "retention_locks": {
       "systemOfRecord": "postgres_migration:106_eqms_world_class_control_plane.sql",
       "authorityMode": "process_runtime",
@@ -31264,6 +32390,55 @@
       "businessObjectRefs": [],
       "uiSurfaces": [
         "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "retention_policy": {
+      "systemOfRecord": "postgres_migration:168_content_retention_policy.sql",
+      "authorityMode": "domain_runtime",
+      "ownerRole": "master_data_governor",
+      "stewardRole": "master_data_steward",
+      "dataClassification": "internal_master_data",
+      "retentionClass": "master_data_lifecycle",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.retention_policy.create",
+        "core_system.retention_policy.delete",
+        "core_system.retention_policy.detail",
+        "core_system.retention_policy.list",
+        "core_system.retention_policy.update",
+        "master_data_governance.retention_policy.create",
+        "master_data_governance.retention_policy.delete",
+        "master_data_governance.retention_policy.detail",
+        "master_data_governance.retention_policy.list",
+        "master_data_governance.retention_policy.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_data_schema",
+        "admin_governance",
         "system_contract_registry"
       ],
       "aiAuthority": {
@@ -31467,6 +32642,50 @@
       ],
       "uiSurfaces": [
         "process_command_workspace",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "role_sod_conflict": {
+      "systemOfRecord": "postgres_migration:162_rbac_role_sod_conflict.sql",
+      "authorityMode": "platform_governance",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "soft_delete",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.role_sod_conflict.create",
+        "core_system.role_sod_conflict.delete",
+        "core_system.role_sod_conflict.detail",
+        "core_system.role_sod_conflict.list",
+        "core_system.role_sod_conflict.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
         "system_contract_registry"
       ],
       "aiAuthority": {
@@ -31935,6 +33154,11 @@
         ]
       },
       "apiContractRefs": [
+        "planning_production.transactional.sales_orders.create",
+        "planning_production.transactional.sales_orders.detail",
+        "planning_production.transactional.sales_orders.list",
+        "planning_production.transactional.sales_orders.transition",
+        "planning_production.transactional.sales_orders.update",
         "sales.sales_orders.create",
         "sales.sales_orders.delete",
         "sales.sales_orders.detail",
@@ -38164,6 +39388,13 @@
         ]
       },
       "apiContractRefs": [
+        "quality_improvement.eqms_plural.training_records.audit",
+        "quality_improvement.eqms_plural.training_records.create",
+        "quality_improvement.eqms_plural.training_records.curricula",
+        "quality_improvement.eqms_plural.training_records.detail",
+        "quality_improvement.eqms_plural.training_records.matrix",
+        "quality_improvement.eqms_plural.training_records.query",
+        "quality_improvement.eqms_plural.training_records.update",
         "training_hr.training_records.create",
         "training_hr.training_records.delete",
         "training_hr.training_records.detail",
@@ -38181,6 +39412,189 @@
       ],
       "aiAuthority": {
         "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "translation_credentials": {
+      "systemOfRecord": "postgres_migration:157_translation_admin_module.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.translation_credentials.create",
+        "core_system.translation_credentials.delete",
+        "core_system.translation_credentials.detail",
+        "core_system.translation_credentials.list",
+        "core_system.translation_credentials.transition",
+        "core_system.translation_credentials.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:translation_credentials_last_test_status",
+        "wf_translation_credential"
+      ],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "translation_provider_config": {
+      "systemOfRecord": "postgres_migration:157_translation_admin_module.sql",
+      "authorityMode": "process_runtime",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.translation_provider_config.create",
+        "core_system.translation_provider_config.delete",
+        "core_system.translation_provider_config.detail",
+        "core_system.translation_provider_config.list",
+        "core_system.translation_provider_config.transition",
+        "core_system.translation_provider_config.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [
+        "status-set:translation_provider_config_health_status",
+        "wf_translation_provider_config"
+      ],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "translation_routing": {
+      "systemOfRecord": "postgres_migration:157_translation_admin_module.sql",
+      "authorityMode": "platform_governance",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "foreign_key_integrity",
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.translation_routing.create",
+        "core_system.translation_routing.delete",
+        "core_system.translation_routing.detail",
+        "core_system.translation_routing.list",
+        "core_system.translation_routing.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "workflow_or_endpoint_only",
+        "mustNotInferFrom": [
+          "workspace_design",
+          "frontend_label",
+          "screenshot"
+        ],
+        "changeGate": "registry_doctor_and_data_loss_guard"
+      }
+    },
+    "translation_usage_log": {
+      "systemOfRecord": "postgres_migration:157_translation_admin_module.sql",
+      "authorityMode": "platform_governance",
+      "ownerRole": "platform_owner",
+      "stewardRole": "platform_data_steward",
+      "dataClassification": "internal_operational",
+      "retentionClass": "operational_record_3y",
+      "deletionMode": "archive_only",
+      "registryDeletionMode": "archive_only",
+      "hardDeleteWaiverRequired": false,
+      "qualityProfile": {
+        "profile": "iso8000_core",
+        "checks": [
+          "owner_present",
+          "primary_key_present",
+          "system_of_record_present",
+          "timezone_aware_timestamp"
+        ]
+      },
+      "apiContractRefs": [
+        "core_system.translation_usage_log.create",
+        "core_system.translation_usage_log.delete",
+        "core_system.translation_usage_log.detail",
+        "core_system.translation_usage_log.list",
+        "core_system.translation_usage_log.update"
+      ],
+      "eventContractRefs": [],
+      "workflowRefs": [],
+      "businessObjectRefs": [],
+      "uiSurfaces": [
+        "admin_data_schema",
+        "admin_governance",
+        "system_contract_registry"
+      ],
+      "aiAuthority": {
+        "editability": "read_only_contract",
         "mustNotInferFrom": [
           "workspace_design",
           "frontend_label",
@@ -39487,6 +40901,11 @@
         ]
       },
       "apiContractRefs": [
+        "planning_production.transactional.work_orders.create",
+        "planning_production.transactional.work_orders.detail",
+        "planning_production.transactional.work_orders.list",
+        "planning_production.transactional.work_orders.transition",
+        "planning_production.transactional.work_orders.update",
         "production.work_orders.create",
         "production.work_orders.delete",
         "production.work_orders.detail",

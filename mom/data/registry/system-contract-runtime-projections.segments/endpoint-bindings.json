@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-24T08:27:20.938Z",
+    "generatedAt": "2026-05-14T03:02:12.280Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "c544a828-8ff5-44a4-9d02-0e0814d38afa",
+    "publication_run_id": "a78697bf-4652-476e-a4b9-5a9362caf639",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -24,13 +24,77 @@
     "purpose": "Segmented runtime contract read model for bounded-memory reads and targeted rebuild verification.",
     "segmentId": "endpointBindings",
     "sourceArtifact": "data/registry/system-contract-runtime-projections.json",
-    "sourceSha256": "fbc6c46cd5118972e314a08b382f4ca099446c20fdb0be6d9b1d66c328718669",
-    "sourceGeneratedAt": "2026-04-24T08:27:20.938Z",
+    "sourceSha256": "2e2df1ece73e941b2898c37b76f2e64182f7a115a91b56063eab46a39d70f23b",
+    "sourceGeneratedAt": "2026-05-14T03:02:12.280Z",
     "writePolicy": "generated_segment_do_not_edit",
     "revisionGuard": "sourceSha256"
   },
   "section": "endpointBindings",
   "data": [
+    {
+      "tableKey": "public.access_review_campaign",
+      "table": "access_review_campaign",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "core_system.access_review_campaign.create",
+        "core_system.access_review_campaign.delete",
+        "core_system.access_review_campaign.detail",
+        "core_system.access_review_campaign.list",
+        "core_system.access_review_campaign.transition",
+        "core_system.access_review_campaign.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/access_review_campaign",
+        "/api/runtime/core_system/access_review_campaign/{id}",
+        "/api/runtime/core_system/access_review_campaign/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.access_review_item",
+      "table": "access_review_item",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "core_system.access_review_item.create",
+        "core_system.access_review_item.delete",
+        "core_system.access_review_item.detail",
+        "core_system.access_review_item.list",
+        "core_system.access_review_item.transition",
+        "core_system.access_review_item.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/access_review_item",
+        "/api/runtime/core_system/access_review_item/{id}",
+        "/api/runtime/core_system/access_review_item/{id}/transition"
+      ]
+    },
     {
       "tableKey": "public.ai_conversations",
       "table": "ai_conversations",
@@ -980,6 +1044,35 @@
         "/api/runtime/audit_risk/audit_actions",
         "/api/runtime/audit_risk/audit_actions/{id}",
         "/api/runtime/audit_risk/audit_actions/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.audit_event_chain",
+      "table": "audit_event_chain",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "system_infrastructure.audit_event_chain.create",
+        "system_infrastructure.audit_event_chain.delete",
+        "system_infrastructure.audit_event_chain.detail",
+        "system_infrastructure.audit_event_chain.list",
+        "system_infrastructure.audit_event_chain.update"
+      ],
+      "paths": [
+        "/api/runtime/system_infrastructure/audit_event_chain",
+        "/api/runtime/system_infrastructure/audit_event_chain/{id}"
       ]
     },
     {
@@ -3126,6 +3219,70 @@
       ]
     },
     {
+      "tableKey": "public.data_collection_drift",
+      "table": "data_collection_drift",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "system_infrastructure.data_collection_drift.create",
+        "system_infrastructure.data_collection_drift.delete",
+        "system_infrastructure.data_collection_drift.detail",
+        "system_infrastructure.data_collection_drift.list",
+        "system_infrastructure.data_collection_drift.transition",
+        "system_infrastructure.data_collection_drift.update"
+      ],
+      "paths": [
+        "/api/runtime/system_infrastructure/data_collection_drift",
+        "/api/runtime/system_infrastructure/data_collection_drift/{id}",
+        "/api/runtime/system_infrastructure/data_collection_drift/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.data_collection_state",
+      "table": "data_collection_state",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "system_infrastructure.data_collection_state.create",
+        "system_infrastructure.data_collection_state.delete",
+        "system_infrastructure.data_collection_state.detail",
+        "system_infrastructure.data_collection_state.list",
+        "system_infrastructure.data_collection_state.transition",
+        "system_infrastructure.data_collection_state.update"
+      ],
+      "paths": [
+        "/api/runtime/system_infrastructure/data_collection_state",
+        "/api/runtime/system_infrastructure/data_collection_state/{id}",
+        "/api/runtime/system_infrastructure/data_collection_state/{id}/transition"
+      ]
+    },
+    {
       "tableKey": "public.dcc_doc_type_catalog",
       "table": "dcc_doc_type_catalog",
       "endpointCount": 5,
@@ -3152,6 +3309,38 @@
       "paths": [
         "/api/runtime/document_control/dcc_doc_type_catalog",
         "/api/runtime/document_control/dcc_doc_type_catalog/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.dcc_document_body",
+      "table": "dcc_document_body",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "document_control.dcc_document_body.create",
+        "document_control.dcc_document_body.delete",
+        "document_control.dcc_document_body.detail",
+        "document_control.dcc_document_body.list",
+        "document_control.dcc_document_body.transition",
+        "document_control.dcc_document_body.update"
+      ],
+      "paths": [
+        "/api/runtime/document_control/dcc_document_body",
+        "/api/runtime/document_control/dcc_document_body/{id}",
+        "/api/runtime/document_control/dcc_document_body/{id}/transition"
       ]
     },
     {
@@ -3614,6 +3803,35 @@
       ]
     },
     {
+      "tableKey": "public.disposal_event",
+      "table": "disposal_event",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "core_system.disposal_event.create",
+        "core_system.disposal_event.delete",
+        "core_system.disposal_event.detail",
+        "core_system.disposal_event.list",
+        "core_system.disposal_event.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/disposal_event",
+        "/api/runtime/core_system/disposal_event/{id}"
+      ]
+    },
+    {
       "tableKey": "public.doc_distributions",
       "table": "doc_distributions",
       "endpointCount": 6,
@@ -3800,6 +4018,42 @@
       ]
     },
     {
+      "tableKey": "public.document_acknowledgement",
+      "table": "document_acknowledgement",
+      "endpointCount": 10,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 2,
+        "delete": 2,
+        "detail": 2,
+        "list": 2,
+        "update": 2
+      },
+      "actionKeys": [
+        "core_system.document_acknowledgement.create",
+        "core_system.document_acknowledgement.delete",
+        "core_system.document_acknowledgement.detail",
+        "core_system.document_acknowledgement.list",
+        "core_system.document_acknowledgement.update",
+        "document_control.document_acknowledgement.create",
+        "document_control.document_acknowledgement.delete",
+        "document_control.document_acknowledgement.detail",
+        "document_control.document_acknowledgement.list",
+        "document_control.document_acknowledgement.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/document_acknowledgement",
+        "/api/runtime/core_system/document_acknowledgement/{id}",
+        "/api/runtime/document_control/document_acknowledgement",
+        "/api/runtime/document_control/document_acknowledgement/{id}"
+      ]
+    },
+    {
       "tableKey": "public.document_distribution",
       "table": "document_distribution",
       "endpointCount": 5,
@@ -3855,6 +4109,35 @@
       "paths": [
         "/api/runtime/document_control/document_embeddings",
         "/api/runtime/document_control/document_embeddings/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.document_permission_grant",
+      "table": "document_permission_grant",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "core_system.document_permission_grant.create",
+        "core_system.document_permission_grant.delete",
+        "core_system.document_permission_grant.detail",
+        "core_system.document_permission_grant.list",
+        "core_system.document_permission_grant.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/document_permission_grant",
+        "/api/runtime/core_system/document_permission_grant/{id}"
       ]
     },
     {
@@ -10609,6 +10892,38 @@
       ]
     },
     {
+      "tableKey": "public.hcm_employee_position_assignments",
+      "table": "hcm_employee_position_assignments",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "hcm_workforce.hcm_employee_position_assignments.create",
+        "hcm_workforce.hcm_employee_position_assignments.delete",
+        "hcm_workforce.hcm_employee_position_assignments.detail",
+        "hcm_workforce.hcm_employee_position_assignments.list",
+        "hcm_workforce.hcm_employee_position_assignments.transition",
+        "hcm_workforce.hcm_employee_position_assignments.update"
+      ],
+      "paths": [
+        "/api/runtime/hcm_workforce/hcm_employee_position_assignments",
+        "/api/runtime/hcm_workforce/hcm_employee_position_assignments/{id}",
+        "/api/runtime/hcm_workforce/hcm_employee_position_assignments/{id}/transition"
+      ]
+    },
+    {
       "tableKey": "public.hcm_employee_skills",
       "table": "hcm_employee_skills",
       "endpointCount": 5,
@@ -11967,22 +12282,28 @@
     {
       "tableKey": "public.job_orders",
       "table": "job_orders",
-      "endpointCount": 6,
+      "endpointCount": 11,
       "methods": [
         "DELETE",
         "GET",
+        "PATCH",
         "POST",
         "PUT"
       ],
       "operationKinds": {
-        "create": 1,
+        "create": 2,
         "delete": 1,
-        "detail": 1,
-        "list": 1,
-        "transition": 1,
-        "update": 1
+        "detail": 2,
+        "list": 2,
+        "transition": 2,
+        "update": 2
       },
       "actionKeys": [
+        "planning_production.transactional.job_orders.create",
+        "planning_production.transactional.job_orders.detail",
+        "planning_production.transactional.job_orders.list",
+        "planning_production.transactional.job_orders.transition",
+        "planning_production.transactional.job_orders.update",
         "production.job_orders.create",
         "production.job_orders.delete",
         "production.job_orders.detail",
@@ -11993,7 +12314,10 @@
       "paths": [
         "/api/runtime/production/job_orders",
         "/api/runtime/production/job_orders/{id}",
-        "/api/runtime/production/job_orders/{id}/transition"
+        "/api/runtime/production/job_orders/{id}/transition",
+        "/api/v1/job-orders",
+        "/api/v1/job-orders/{joNumber}",
+        "/api/v1/job-orders/{joNumber}:transition"
       ]
     },
     {
@@ -14918,6 +15242,128 @@
       ]
     },
     {
+      "tableKey": "public.mfa_challenge",
+      "table": "mfa_challenge",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "core_system.mfa_challenge.create",
+        "core_system.mfa_challenge.delete",
+        "core_system.mfa_challenge.detail",
+        "core_system.mfa_challenge.list",
+        "core_system.mfa_challenge.transition",
+        "core_system.mfa_challenge.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/mfa_challenge",
+        "/api/runtime/core_system/mfa_challenge/{id}",
+        "/api/runtime/core_system/mfa_challenge/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.mfa_factor",
+      "table": "mfa_factor",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "core_system.mfa_factor.create",
+        "core_system.mfa_factor.delete",
+        "core_system.mfa_factor.detail",
+        "core_system.mfa_factor.list",
+        "core_system.mfa_factor.transition",
+        "core_system.mfa_factor.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/mfa_factor",
+        "/api/runtime/core_system/mfa_factor/{id}",
+        "/api/runtime/core_system/mfa_factor/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.mfa_policy",
+      "table": "mfa_policy",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "core_system.mfa_policy.create",
+        "core_system.mfa_policy.delete",
+        "core_system.mfa_policy.detail",
+        "core_system.mfa_policy.list",
+        "core_system.mfa_policy.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/mfa_policy",
+        "/api/runtime/core_system/mfa_policy/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.mfa_recovery_code",
+      "table": "mfa_recovery_code",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "core_system.mfa_recovery_code.create",
+        "core_system.mfa_recovery_code.delete",
+        "core_system.mfa_recovery_code.detail",
+        "core_system.mfa_recovery_code.list",
+        "core_system.mfa_recovery_code.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/mfa_recovery_code",
+        "/api/runtime/core_system/mfa_recovery_code/{id}"
+      ]
+    },
+    {
       "tableKey": "public.mobile_inspection_captures",
       "table": "mobile_inspection_captures",
       "endpointCount": 6,
@@ -15011,6 +15457,64 @@
         "/api/runtime/mobile_operations/mobile_work_queue",
         "/api/runtime/mobile_operations/mobile_work_queue/{id}",
         "/api/runtime/mobile_operations/mobile_work_queue/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.module_permission",
+      "table": "module_permission",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "core_system.module_permission.create",
+        "core_system.module_permission.delete",
+        "core_system.module_permission.detail",
+        "core_system.module_permission.list",
+        "core_system.module_permission.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/module_permission",
+        "/api/runtime/core_system/module_permission/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.modules_catalog",
+      "table": "modules_catalog",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "core_system.modules_catalog.create",
+        "core_system.modules_catalog.delete",
+        "core_system.modules_catalog.detail",
+        "core_system.modules_catalog.list",
+        "core_system.modules_catalog.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/modules_catalog",
+        "/api/runtime/core_system/modules_catalog/{id}"
       ]
     },
     {
@@ -16809,6 +17313,35 @@
       ]
     },
     {
+      "tableKey": "public.permission_catalog",
+      "table": "permission_catalog",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "core_system.permission_catalog.create",
+        "core_system.permission_catalog.delete",
+        "core_system.permission_catalog.detail",
+        "core_system.permission_catalog.list",
+        "core_system.permission_catalog.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/permission_catalog",
+        "/api/runtime/core_system/permission_catalog/{id}"
+      ]
+    },
+    {
       "tableKey": "public.planned_supply",
       "table": "planned_supply",
       "endpointCount": 6,
@@ -17939,6 +18472,35 @@
       ]
     },
     {
+      "tableKey": "public.portal_display_preference",
+      "table": "portal_display_preference",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "core_system.portal_display_preference.create",
+        "core_system.portal_display_preference.delete",
+        "core_system.portal_display_preference.detail",
+        "core_system.portal_display_preference.list",
+        "core_system.portal_display_preference.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/portal_display_preference",
+        "/api/runtime/core_system/portal_display_preference/{id}"
+      ]
+    },
+    {
       "tableKey": "public.portal_document_access",
       "table": "portal_document_access",
       "endpointCount": 5,
@@ -17965,6 +18527,64 @@
       "paths": [
         "/api/runtime/customer_portal/portal_document_access",
         "/api/runtime/customer_portal/portal_document_access/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.portal_layout_template",
+      "table": "portal_layout_template",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "core_system.portal_layout_template.create",
+        "core_system.portal_layout_template.delete",
+        "core_system.portal_layout_template.detail",
+        "core_system.portal_layout_template.list",
+        "core_system.portal_layout_template.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/portal_layout_template",
+        "/api/runtime/core_system/portal_layout_template/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.portal_layout_widget",
+      "table": "portal_layout_widget",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "core_system.portal_layout_widget.create",
+        "core_system.portal_layout_widget.delete",
+        "core_system.portal_layout_widget.detail",
+        "core_system.portal_layout_widget.list",
+        "core_system.portal_layout_widget.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/portal_layout_widget",
+        "/api/runtime/core_system/portal_layout_widget/{id}"
       ]
     },
     {
@@ -18055,6 +18675,35 @@
         "/api/runtime/customer_portal/portal_users",
         "/api/runtime/customer_portal/portal_users/{id}",
         "/api/runtime/customer_portal/portal_users/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.portal_widget_catalog",
+      "table": "portal_widget_catalog",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "core_system.portal_widget_catalog.create",
+        "core_system.portal_widget_catalog.delete",
+        "core_system.portal_widget_catalog.detail",
+        "core_system.portal_widget_catalog.list",
+        "core_system.portal_widget_catalog.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/portal_widget_catalog",
+        "/api/runtime/core_system/portal_widget_catalog/{id}"
       ]
     },
     {
@@ -20030,6 +20679,117 @@
       ]
     },
     {
+      "tableKey": "public.retention_class_assignment",
+      "table": "retention_class_assignment",
+      "endpointCount": 10,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 2,
+        "delete": 2,
+        "detail": 2,
+        "list": 2,
+        "update": 2
+      },
+      "actionKeys": [
+        "core_system.retention_class_assignment.create",
+        "core_system.retention_class_assignment.delete",
+        "core_system.retention_class_assignment.detail",
+        "core_system.retention_class_assignment.list",
+        "core_system.retention_class_assignment.update",
+        "master_data_governance.retention_class_assignment.create",
+        "master_data_governance.retention_class_assignment.delete",
+        "master_data_governance.retention_class_assignment.detail",
+        "master_data_governance.retention_class_assignment.list",
+        "master_data_governance.retention_class_assignment.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/retention_class_assignment",
+        "/api/runtime/core_system/retention_class_assignment/{id}",
+        "/api/runtime/master_data_governance/retention_class_assignment",
+        "/api/runtime/master_data_governance/retention_class_assignment/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.retention_disposal_event",
+      "table": "retention_disposal_event",
+      "endpointCount": 11,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 2,
+        "delete": 2,
+        "detail": 2,
+        "list": 2,
+        "transition": 1,
+        "update": 2
+      },
+      "actionKeys": [
+        "core_system.retention_disposal_event.create",
+        "core_system.retention_disposal_event.delete",
+        "core_system.retention_disposal_event.detail",
+        "core_system.retention_disposal_event.list",
+        "core_system.retention_disposal_event.update",
+        "master_data_governance.retention_disposal_event.create",
+        "master_data_governance.retention_disposal_event.delete",
+        "master_data_governance.retention_disposal_event.detail",
+        "master_data_governance.retention_disposal_event.list",
+        "master_data_governance.retention_disposal_event.transition",
+        "master_data_governance.retention_disposal_event.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/retention_disposal_event",
+        "/api/runtime/core_system/retention_disposal_event/{id}",
+        "/api/runtime/master_data_governance/retention_disposal_event",
+        "/api/runtime/master_data_governance/retention_disposal_event/{id}",
+        "/api/runtime/master_data_governance/retention_disposal_event/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.retention_legal_hold",
+      "table": "retention_legal_hold",
+      "endpointCount": 10,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 2,
+        "delete": 2,
+        "detail": 2,
+        "list": 2,
+        "update": 2
+      },
+      "actionKeys": [
+        "core_system.retention_legal_hold.create",
+        "core_system.retention_legal_hold.delete",
+        "core_system.retention_legal_hold.detail",
+        "core_system.retention_legal_hold.list",
+        "core_system.retention_legal_hold.update",
+        "master_data_governance.retention_legal_hold.create",
+        "master_data_governance.retention_legal_hold.delete",
+        "master_data_governance.retention_legal_hold.detail",
+        "master_data_governance.retention_legal_hold.list",
+        "master_data_governance.retention_legal_hold.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/retention_legal_hold",
+        "/api/runtime/core_system/retention_legal_hold/{id}",
+        "/api/runtime/master_data_governance/retention_legal_hold",
+        "/api/runtime/master_data_governance/retention_legal_hold/{id}"
+      ]
+    },
+    {
       "tableKey": "public.retention_locks",
       "table": "retention_locks",
       "endpointCount": 6,
@@ -20091,6 +20851,42 @@
         "/api/runtime/master_data_governance/retention_policies",
         "/api/runtime/master_data_governance/retention_policies/{id}",
         "/api/runtime/master_data_governance/retention_policies/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.retention_policy",
+      "table": "retention_policy",
+      "endpointCount": 10,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 2,
+        "delete": 2,
+        "detail": 2,
+        "list": 2,
+        "update": 2
+      },
+      "actionKeys": [
+        "core_system.retention_policy.create",
+        "core_system.retention_policy.delete",
+        "core_system.retention_policy.detail",
+        "core_system.retention_policy.list",
+        "core_system.retention_policy.update",
+        "master_data_governance.retention_policy.create",
+        "master_data_governance.retention_policy.delete",
+        "master_data_governance.retention_policy.detail",
+        "master_data_governance.retention_policy.list",
+        "master_data_governance.retention_policy.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/retention_policy",
+        "/api/runtime/core_system/retention_policy/{id}",
+        "/api/runtime/master_data_governance/retention_policy",
+        "/api/runtime/master_data_governance/retention_policy/{id}"
       ]
     },
     {
@@ -20219,6 +21015,35 @@
         "/api/runtime/service_warranty/rma_orders",
         "/api/runtime/service_warranty/rma_orders/{id}",
         "/api/runtime/service_warranty/rma_orders/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.role_sod_conflict",
+      "table": "role_sod_conflict",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "core_system.role_sod_conflict.create",
+        "core_system.role_sod_conflict.delete",
+        "core_system.role_sod_conflict.detail",
+        "core_system.role_sod_conflict.list",
+        "core_system.role_sod_conflict.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/role_sod_conflict",
+        "/api/runtime/core_system/role_sod_conflict/{id}"
       ]
     },
     {
@@ -20500,22 +21325,28 @@
     {
       "tableKey": "public.sales_orders",
       "table": "sales_orders",
-      "endpointCount": 6,
+      "endpointCount": 11,
       "methods": [
         "DELETE",
         "GET",
+        "PATCH",
         "POST",
         "PUT"
       ],
       "operationKinds": {
-        "create": 1,
+        "create": 2,
         "delete": 1,
-        "detail": 1,
-        "list": 1,
-        "transition": 1,
-        "update": 1
+        "detail": 2,
+        "list": 2,
+        "transition": 2,
+        "update": 2
       },
       "actionKeys": [
+        "planning_production.transactional.sales_orders.create",
+        "planning_production.transactional.sales_orders.detail",
+        "planning_production.transactional.sales_orders.list",
+        "planning_production.transactional.sales_orders.transition",
+        "planning_production.transactional.sales_orders.update",
         "sales.sales_orders.create",
         "sales.sales_orders.delete",
         "sales.sales_orders.detail",
@@ -20526,7 +21357,10 @@
       "paths": [
         "/api/runtime/sales/sales_orders",
         "/api/runtime/sales/sales_orders/{id}",
-        "/api/runtime/sales/sales_orders/{id}/transition"
+        "/api/runtime/sales/sales_orders/{id}/transition",
+        "/api/v1/sales-orders",
+        "/api/v1/sales-orders/{soNumber}",
+        "/api/v1/sales-orders/{soNumber}:transition"
       ]
     },
     {
@@ -24548,6 +25382,114 @@
     {
       "tableKey": "public.training_records",
       "table": "training_records",
+      "endpointCount": 12,
+      "methods": [
+        "DELETE",
+        "GET",
+        "PATCH",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "audit": 1,
+        "create": 2,
+        "delete": 1,
+        "detail": 2,
+        "list": 2,
+        "projection": 2,
+        "update": 2
+      },
+      "actionKeys": [
+        "quality_improvement.eqms_plural.training_records.audit",
+        "quality_improvement.eqms_plural.training_records.create",
+        "quality_improvement.eqms_plural.training_records.curricula",
+        "quality_improvement.eqms_plural.training_records.detail",
+        "quality_improvement.eqms_plural.training_records.matrix",
+        "quality_improvement.eqms_plural.training_records.query",
+        "quality_improvement.eqms_plural.training_records.update",
+        "training_hr.training_records.create",
+        "training_hr.training_records.delete",
+        "training_hr.training_records.detail",
+        "training_hr.training_records.list",
+        "training_hr.training_records.update"
+      ],
+      "paths": [
+        "/api/runtime/training_hr/training_records",
+        "/api/runtime/training_hr/training_records/{id}",
+        "/api/v1/training-records",
+        "/api/v1/training-records/curricula",
+        "/api/v1/training-records/matrix",
+        "/api/v1/training-records/{id}",
+        "/api/v1/training-records/{id}/audit"
+      ]
+    },
+    {
+      "tableKey": "public.translation_credentials",
+      "table": "translation_credentials",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "core_system.translation_credentials.create",
+        "core_system.translation_credentials.delete",
+        "core_system.translation_credentials.detail",
+        "core_system.translation_credentials.list",
+        "core_system.translation_credentials.transition",
+        "core_system.translation_credentials.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/translation_credentials",
+        "/api/runtime/core_system/translation_credentials/{id}",
+        "/api/runtime/core_system/translation_credentials/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.translation_provider_config",
+      "table": "translation_provider_config",
+      "endpointCount": 6,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "transition": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "core_system.translation_provider_config.create",
+        "core_system.translation_provider_config.delete",
+        "core_system.translation_provider_config.detail",
+        "core_system.translation_provider_config.list",
+        "core_system.translation_provider_config.transition",
+        "core_system.translation_provider_config.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/translation_provider_config",
+        "/api/runtime/core_system/translation_provider_config/{id}",
+        "/api/runtime/core_system/translation_provider_config/{id}/transition"
+      ]
+    },
+    {
+      "tableKey": "public.translation_routing",
+      "table": "translation_routing",
       "endpointCount": 5,
       "methods": [
         "DELETE",
@@ -24563,15 +25505,44 @@
         "update": 1
       },
       "actionKeys": [
-        "training_hr.training_records.create",
-        "training_hr.training_records.delete",
-        "training_hr.training_records.detail",
-        "training_hr.training_records.list",
-        "training_hr.training_records.update"
+        "core_system.translation_routing.create",
+        "core_system.translation_routing.delete",
+        "core_system.translation_routing.detail",
+        "core_system.translation_routing.list",
+        "core_system.translation_routing.update"
       ],
       "paths": [
-        "/api/runtime/training_hr/training_records",
-        "/api/runtime/training_hr/training_records/{id}"
+        "/api/runtime/core_system/translation_routing",
+        "/api/runtime/core_system/translation_routing/{id}"
+      ]
+    },
+    {
+      "tableKey": "public.translation_usage_log",
+      "table": "translation_usage_log",
+      "endpointCount": 5,
+      "methods": [
+        "DELETE",
+        "GET",
+        "POST",
+        "PUT"
+      ],
+      "operationKinds": {
+        "create": 1,
+        "delete": 1,
+        "detail": 1,
+        "list": 1,
+        "update": 1
+      },
+      "actionKeys": [
+        "core_system.translation_usage_log.create",
+        "core_system.translation_usage_log.delete",
+        "core_system.translation_usage_log.detail",
+        "core_system.translation_usage_log.list",
+        "core_system.translation_usage_log.update"
+      ],
+      "paths": [
+        "/api/runtime/core_system/translation_usage_log",
+        "/api/runtime/core_system/translation_usage_log/{id}"
       ]
     },
     {
@@ -25411,22 +26382,28 @@
     {
       "tableKey": "public.work_orders",
       "table": "work_orders",
-      "endpointCount": 6,
+      "endpointCount": 11,
       "methods": [
         "DELETE",
         "GET",
+        "PATCH",
         "POST",
         "PUT"
       ],
       "operationKinds": {
-        "create": 1,
+        "create": 2,
         "delete": 1,
-        "detail": 1,
-        "list": 1,
-        "transition": 1,
-        "update": 1
+        "detail": 2,
+        "list": 2,
+        "transition": 2,
+        "update": 2
       },
       "actionKeys": [
+        "planning_production.transactional.work_orders.create",
+        "planning_production.transactional.work_orders.detail",
+        "planning_production.transactional.work_orders.list",
+        "planning_production.transactional.work_orders.transition",
+        "planning_production.transactional.work_orders.update",
         "production.work_orders.create",
         "production.work_orders.delete",
         "production.work_orders.detail",
@@ -25437,7 +26414,10 @@
       "paths": [
         "/api/runtime/production/work_orders",
         "/api/runtime/production/work_orders/{id}",
-        "/api/runtime/production/work_orders/{id}/transition"
+        "/api/runtime/production/work_orders/{id}/transition",
+        "/api/v1/work-orders",
+        "/api/v1/work-orders/{woNumber}",
+        "/api/v1/work-orders/{woNumber}:transition"
       ]
     },
     {

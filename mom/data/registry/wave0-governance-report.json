@@ -1,19 +1,19 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-15T10:51:35.053Z",
+    "generatedAt": "2026-05-14T03:01:40.945Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "policyVersion": "1.1",
     "description": "Wave 0 governance classification and critical-path audit report."
   },
   "summary": {
-    "total_frontend_entities": 775,
-    "canonical_resources": 67,
-    "implemented_canonical_resources": 67,
+    "total_frontend_entities": 883,
+    "canonical_resources": 68,
+    "implemented_canonical_resources": 68,
     "planned_canonical_resources": 0,
-    "core_value_stream_entities": 74,
-    "governed_support_entities": 689,
-    "conditional_extension_entities": 6,
+    "core_value_stream_entities": 78,
+    "governed_support_entities": 789,
+    "conditional_extension_entities": 10,
     "unused_candidate_entities": 0,
     "archive_isolation_entities": 6,
     "generic_status_only_core_entities": 0,
@@ -168,6 +168,45 @@
         "readiness": "ready",
         "canonical_resources": [
           "commercial_customer.customer-care-cases"
+        ]
+      },
+      {
+        "entity_key": "document_control.dcc_document_header",
+        "entity": "dcc_document_header",
+        "profile": "document_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 10,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": [
+          "quality_improvement.document_control"
+        ]
+      },
+      {
+        "entity_key": "document_control.eqms_document_family",
+        "entity": "eqms_document_family",
+        "profile": "document_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": [
+          "quality_improvement.document_control"
+        ]
+      },
+      {
+        "entity_key": "document_control.eqms_document_revision",
+        "entity": "eqms_document_revision",
+        "profile": "document_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 7,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": [
+          "quality_improvement.document_control"
         ]
       },
       {
@@ -350,7 +389,7 @@
         "profile": "business_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
-        "relation_count": 13,
+        "relation_count": 14,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": [
@@ -428,7 +467,7 @@
         "profile": "master_data",
         "zone": "core_value_stream",
         "archive_candidate": false,
-        "relation_count": 98,
+        "relation_count": 102,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": [
@@ -715,7 +754,7 @@
         "profile": "transactional_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
-        "relation_count": 52,
+        "relation_count": 57,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": [
@@ -814,6 +853,19 @@
         ]
       },
       {
+        "entity_key": "quality_management.eqms_documents",
+        "entity": "eqms_documents",
+        "profile": "document_record",
+        "zone": "core_value_stream",
+        "archive_candidate": false,
+        "relation_count": 7,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": [
+          "quality_improvement.document_control"
+        ]
+      },
+      {
         "entity_key": "quality_management.incoming_inspections",
         "entity": "incoming_inspections",
         "profile": "governed_case",
@@ -886,7 +938,7 @@
         "profile": "business_record",
         "zone": "core_value_stream",
         "archive_candidate": false,
-        "relation_count": 50,
+        "relation_count": 51,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": [
@@ -1755,6 +1807,28 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "core_system.access_review_campaign",
+        "entity": "access_review_campaign",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.access_review_item",
+        "entity": "access_review_item",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "core_system.audit_events",
         "entity": "audit_events",
         "profile": "business_record",
@@ -1777,12 +1851,199 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "core_system.document_acknowledgement",
+        "entity": "document_acknowledgement",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.document_permission_grant",
+        "entity": "document_permission_grant",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.mfa_challenge",
+        "entity": "mfa_challenge",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.mfa_factor",
+        "entity": "mfa_factor",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.mfa_policy",
+        "entity": "mfa_policy",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.mfa_recovery_code",
+        "entity": "mfa_recovery_code",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.module_permission",
+        "entity": "module_permission",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.modules_catalog",
+        "entity": "modules_catalog",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.portal_display_preference",
+        "entity": "portal_display_preference",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.portal_layout_template",
+        "entity": "portal_layout_template",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.portal_layout_widget",
+        "entity": "portal_layout_widget",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.portal_widget_catalog",
+        "entity": "portal_widget_catalog",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.retention_class_assignment",
+        "entity": "retention_class_assignment",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.retention_disposal_event",
+        "entity": "retention_disposal_event",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.retention_legal_hold",
+        "entity": "retention_legal_hold",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.retention_policy",
+        "entity": "retention_policy",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.role_sod_conflict",
+        "entity": "role_sod_conflict",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "core_system.roles",
         "entity": "roles",
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 10,
+        "relation_count": 15,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -1794,6 +2055,39 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 7,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.translation_credentials",
+        "entity": "translation_credentials",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.translation_provider_config",
+        "entity": "translation_provider_config",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.translation_routing",
+        "entity": "translation_routing",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -1815,7 +2109,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 435,
+        "relation_count": 453,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -2206,6 +2500,105 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "document_control.dcc_doc_type_catalog",
+        "entity": "dcc_doc_type_catalog",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 6,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "document_control.dcc_document_body",
+        "entity": "dcc_document_body",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "document_control.dcc_document_change_notice",
+        "entity": "dcc_document_change_notice",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 7,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "document_control.dcc_document_change_request",
+        "entity": "dcc_document_change_request",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 7,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "document_control.dcc_document_header_label",
+        "entity": "dcc_document_header_label",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "document_control.dcc_document_locale_variant",
+        "entity": "dcc_document_locale_variant",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "document_control.dcc_document_revision",
+        "entity": "dcc_document_revision",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 9,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "document_control.dcc_document_revision_history",
+        "entity": "dcc_document_revision_history",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "document_control.dcc_role_catalog",
+        "entity": "dcc_role_catalog",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 8,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "document_control.doc_distributions",
         "entity": "doc_distributions",
         "profile": "document_record",
@@ -2272,6 +2665,17 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "document_control.document_acknowledgement",
+        "entity": "document_acknowledgement",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "document_control.document_distribution",
         "entity": "document_distribution",
         "profile": "document_record",
@@ -2321,7 +2725,7 @@
         "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 18,
+        "relation_count": 19,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -2349,17 +2753,6 @@
         "canonical_resources": []
       },
       {
-        "entity_key": "document_control.eqms_document_family",
-        "entity": "eqms_document_family",
-        "profile": "document_record",
-        "zone": "governed_support",
-        "archive_candidate": false,
-        "relation_count": 2,
-        "workflow_state": "ready",
-        "readiness": "ready",
-        "canonical_resources": []
-      },
-      {
         "entity_key": "document_control.eqms_document_read_ack",
         "entity": "eqms_document_read_ack",
         "profile": "document_record",
@@ -2367,17 +2760,6 @@
         "archive_candidate": false,
         "relation_count": 3,
         "workflow_state": "not_applicable",
-        "readiness": "ready",
-        "canonical_resources": []
-      },
-      {
-        "entity_key": "document_control.eqms_document_revision",
-        "entity": "eqms_document_revision",
-        "profile": "document_record",
-        "zone": "governed_support",
-        "archive_candidate": false,
-        "relation_count": 7,
-        "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -3498,7 +3880,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 522,
+        "relation_count": 587,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3531,7 +3913,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 523,
+        "relation_count": 588,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3553,7 +3935,7 @@
         "profile": "master_data",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 523,
+        "relation_count": 588,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3768,6 +4150,17 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "hcm_workforce.hcm_employee_position_assignments",
+        "entity": "hcm_employee_position_assignments",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 7,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "hcm_workforce.hcm_employee_skills",
         "entity": "hcm_employee_skills",
         "profile": "business_record",
@@ -3795,7 +4188,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 9,
+        "relation_count": 10,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3839,7 +4232,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 8,
+        "relation_count": 9,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -3916,7 +4309,7 @@
         "profile": "transactional_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 26,
+        "relation_count": 27,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -4395,6 +4788,39 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "master_data_governance.retention_class_assignment",
+        "entity": "retention_class_assignment",
+        "profile": "master_data",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "master_data_governance.retention_disposal_event",
+        "entity": "retention_disposal_event",
+        "profile": "master_data",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "master_data_governance.retention_legal_hold",
+        "entity": "retention_legal_hold",
+        "profile": "master_data",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "master_data_governance.retention_policies",
         "entity": "retention_policies",
         "profile": "master_data",
@@ -4402,6 +4828,17 @@
         "archive_candidate": false,
         "relation_count": 1,
         "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "master_data_governance.retention_policy",
+        "entity": "retention_policy",
+        "profile": "master_data",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 3,
+        "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
       },
@@ -4928,7 +5365,7 @@
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
-        "relation_count": 526,
+        "relation_count": 591,
         "workflow_state": "not_applicable",
         "readiness": "ready",
         "canonical_resources": []
@@ -6595,12 +7032,518 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "quality_management.eqms_aml_records",
+        "entity": "eqms_aml_records",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_attachments",
+        "entity": "eqms_attachments",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_audit_findings",
+        "entity": "eqms_audit_findings",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_audits",
+        "entity": "eqms_audits",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_batch_release",
+        "entity": "eqms_batch_release",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_calibration_records",
+        "entity": "eqms_calibration_records",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_capa_records",
+        "entity": "eqms_capa_records",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_change_controls",
+        "entity": "eqms_change_controls",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_comments",
+        "entity": "eqms_comments",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_complaints",
+        "entity": "eqms_complaints",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_concession_records",
+        "entity": "eqms_concession_records",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_controlled_copies",
+        "entity": "eqms_controlled_copies",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "quality_management.eqms_controlled_revision_rollout",
         "entity": "eqms_controlled_revision_rollout",
         "profile": "document_record",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 1,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_csat_surveys",
+        "entity": "eqms_csat_surveys",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_deviations",
+        "entity": "eqms_deviations",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_document_acknowledgements",
+        "entity": "eqms_document_acknowledgements",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_engineering_changes",
+        "entity": "eqms_engineering_changes",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_export_jobs",
+        "entity": "eqms_export_jobs",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_fai_characteristics",
+        "entity": "eqms_fai_characteristics",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_fai_reports",
+        "entity": "eqms_fai_reports",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_field_actions",
+        "entity": "eqms_field_actions",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_lab_investigations",
+        "entity": "eqms_lab_investigations",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_lessons_learned",
+        "entity": "eqms_lessons_learned",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_msa_records",
+        "entity": "eqms_msa_records",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_ncr_records",
+        "entity": "eqms_ncr_records",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_quality_agreements",
+        "entity": "eqms_quality_agreements",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_quality_tower_snapshots",
+        "entity": "eqms_quality_tower_snapshots",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_record_links",
+        "entity": "eqms_record_links",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_risk_register",
+        "entity": "eqms_risk_register",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_risks_controls",
+        "entity": "eqms_risks_controls",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_sampling_plans",
+        "entity": "eqms_sampling_plans",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_scars",
+        "entity": "eqms_scars",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_signatures",
+        "entity": "eqms_signatures",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_spc_violation_acks",
+        "entity": "eqms_spc_violation_acks",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_special_characteristics",
+        "entity": "eqms_special_characteristics",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_supplier_audits",
+        "entity": "eqms_supplier_audits",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_supplier_profiles",
+        "entity": "eqms_supplier_profiles",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_supplier_qualification_events",
+        "entity": "eqms_supplier_qualification_events",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_supplier_quality_agreements",
+        "entity": "eqms_supplier_quality_agreements",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_training_curricula",
+        "entity": "eqms_training_curricula",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 6,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_training_matrix",
+        "entity": "eqms_training_matrix",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_training_records",
+        "entity": "eqms_training_records",
+        "profile": "document_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 6,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_validation_executions",
+        "entity": "eqms_validation_executions",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_validation_projects",
+        "entity": "eqms_validation_projects",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 6,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_validation_protocols",
+        "entity": "eqms_validation_protocols",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 6,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_validation_requirements",
+        "entity": "eqms_validation_requirements",
+        "profile": "transactional_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "quality_management.eqms_warranty_claims",
+        "entity": "eqms_warranty_claims",
+        "profile": "governed_case",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -6663,7 +7606,7 @@
       {
         "entity_key": "quality_management.inspection_lot",
         "entity": "inspection_lot",
-        "profile": "governed_case",
+        "profile": "operator_console",
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 8,
@@ -7607,6 +8550,28 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "system_infrastructure.data_collection_drift",
+        "entity": "data_collection_drift",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.data_collection_state",
+        "entity": "data_collection_state",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 1,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "system_infrastructure.domain_outbox_events",
         "entity": "domain_outbox_events",
         "profile": "business_record",
@@ -7653,6 +8618,182 @@
       {
         "entity_key": "system_infrastructure.file_attachments",
         "entity": "file_attachments",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 6,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.graphics_component_contract",
+        "entity": "graphics_component_contract",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.graphics_contrast_check",
+        "entity": "graphics_contrast_check",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 8,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.graphics_module_binding",
+        "entity": "graphics_module_binding",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.graphics_preview_scene",
+        "entity": "graphics_preview_scene",
+        "profile": "assessment_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.graphics_qa_gate_catalog",
+        "entity": "graphics_qa_gate_catalog",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.graphics_qa_gate_result",
+        "entity": "graphics_qa_gate_result",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 6,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.graphics_regulated_entity",
+        "entity": "graphics_regulated_entity",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.graphics_rollout_scope",
+        "entity": "graphics_rollout_scope",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 9,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.graphics_saved_experiment",
+        "entity": "graphics_saved_experiment",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.graphics_simulation_run",
+        "entity": "graphics_simulation_run",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 8,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.graphics_template_zone_binding",
+        "entity": "graphics_template_zone_binding",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.graphics_theme_schedule",
+        "entity": "graphics_theme_schedule",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.graphics_token_catalog",
+        "entity": "graphics_token_catalog",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 9,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.graphics_token_value",
+        "entity": "graphics_token_value",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 5,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.graphics_token_version",
+        "entity": "graphics_token_version",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 6,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.graphics_wcag_check",
+        "entity": "graphics_wcag_check",
         "profile": "business_record",
         "zone": "governed_support",
         "archive_candidate": false,
@@ -7976,6 +9117,17 @@
         "zone": "governed_support",
         "archive_candidate": false,
         "relation_count": 2,
+        "workflow_state": "ready",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "traceability_serialization.genealogy_threads",
+        "entity": "genealogy_threads",
+        "profile": "business_record",
+        "zone": "governed_support",
+        "archive_candidate": false,
+        "relation_count": 4,
         "workflow_state": "ready",
         "readiness": "ready",
         "canonical_resources": []
@@ -8654,6 +9806,39 @@
         "canonical_resources": []
       },
       {
+        "entity_key": "core_system.disposal_event",
+        "entity": "disposal_event",
+        "profile": "business_record",
+        "zone": "conditional_extension",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.permission_catalog",
+        "entity": "permission_catalog",
+        "profile": "business_record",
+        "zone": "conditional_extension",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "core_system.translation_usage_log",
+        "entity": "translation_usage_log",
+        "profile": "business_record",
+        "zone": "conditional_extension",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
         "entity_key": "production.shift_production_report_events",
         "entity": "shift_production_report_events",
         "profile": "business_record",
@@ -8668,6 +9853,17 @@
         "entity_key": "record_system.immutable_storage_objects",
         "entity": "immutable_storage_objects",
         "profile": "document_record",
+        "zone": "conditional_extension",
+        "archive_candidate": false,
+        "relation_count": 0,
+        "workflow_state": "not_applicable",
+        "readiness": "ready",
+        "canonical_resources": []
+      },
+      {
+        "entity_key": "system_infrastructure.audit_event_chain",
+        "entity": "audit_event_chain",
+        "profile": "business_record",
         "zone": "conditional_extension",
         "archive_candidate": false,
         "relation_count": 0,

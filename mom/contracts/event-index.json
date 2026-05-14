@@ -1,9 +1,9 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-15T10:51:38.911151+00:00",
+    "generatedAt": "2026-05-14T03:01:47.682530+00:00",
     "description": "Canonical event inventory for ERP+MOM business objects using CloudEvents-compatible type naming.",
-    "eventCount": 229
+    "eventCount": 232
   },
   "events": [
     {
@@ -2035,6 +2035,36 @@
       "storageTable": "deviations",
       "purpose": "Deviation request or closure path was rejected.",
       "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.document_control.created",
+      "canonicalResource": "quality_improvement.document_control",
+      "eventName": "created",
+      "cloudeventType": "hesem.quality_improvement.document_control.created",
+      "classification": "lifecycle_owner",
+      "storageTable": "dcc_document_header",
+      "purpose": "",
+      "source": "generated_default"
+    },
+    {
+      "key": "quality_improvement.document_control.state-transitioned",
+      "canonicalResource": "quality_improvement.document_control",
+      "eventName": "state-transitioned",
+      "cloudeventType": "hesem.quality_improvement.document_control.state-transitioned",
+      "classification": "lifecycle_owner",
+      "storageTable": "dcc_document_header",
+      "purpose": "",
+      "source": "generated_default"
+    },
+    {
+      "key": "quality_improvement.document_control.updated",
+      "canonicalResource": "quality_improvement.document_control",
+      "eventName": "updated",
+      "cloudeventType": "hesem.quality_improvement.document_control.updated",
+      "classification": "lifecycle_owner",
+      "storageTable": "dcc_document_header",
+      "purpose": "",
+      "source": "generated_default"
     },
     {
       "key": "quality_improvement.fqc-inspections.accepted",

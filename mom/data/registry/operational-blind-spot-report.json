@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-24T08:27:18.557Z",
+    "generatedAt": "2026-05-14T03:02:06.315Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "description": "Operational blind-spot assessment mapped to current backend governance signals."
   },
@@ -9,11 +9,11 @@
     "scenario_count": 15,
     "critical": 0,
     "high": 0,
-    "medium": 0,
-    "watch": 15,
-    "idempotency_mentions": 24373,
+    "medium": 1,
+    "watch": 14,
+    "idempotency_mentions": 25510,
     "idempotency_contract_coverage_ratio": 1.0,
-    "default_retry_safe_ratio": 1.0,
+    "default_retry_safe_ratio": 0.988,
     "create_endpoints_requiring_client_key": 0,
     "generic_status_only_core_entities": 0,
     "missing_transition_contracts_for_core_entities": 0,
@@ -183,11 +183,11 @@
     ],
     "unused_candidate_entities": [],
     "idempotency_runtime_contract": {
-      "mutating_endpoint_count": 2931,
-      "idempotent_endpoint_count": 2931,
+      "mutating_endpoint_count": 3086,
+      "idempotent_endpoint_count": 3086,
       "idempotency_contract_coverage_ratio": 1.0,
-      "default_retry_safe_endpoint_count": 2931,
-      "default_retry_safe_ratio": 1.0,
+      "default_retry_safe_endpoint_count": 3049,
+      "default_retry_safe_ratio": 0.988,
       "create_endpoints_requiring_client_key": 0
     }
   },
@@ -196,16 +196,16 @@
       "scenario_id": "OPS-001",
       "title": null,
       "priority": null,
-      "current_severity": "watch",
+      "current_severity": "medium",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 24373,
-        "optimistic_concurrency_mentions": 9186,
-        "mutating_endpoint_count": 2931,
-        "idempotent_endpoint_count": 2931,
+        "idempotency_mentions": 25510,
+        "optimistic_concurrency_mentions": 9696,
+        "mutating_endpoint_count": 3086,
+        "idempotent_endpoint_count": 3086,
         "idempotency_contract_coverage_ratio": 1.0,
-        "default_retry_safe_endpoint_count": 2931,
-        "default_retry_safe_ratio": 1.0,
+        "default_retry_safe_endpoint_count": 3049,
+        "default_retry_safe_ratio": 0.988,
         "create_endpoints_requiring_client_key": 0
       },
       "required_controls": []
@@ -219,9 +219,9 @@
         "Optimistic concurrency, If-Match preconditions, and row-version evidence are all present broadly enough that this is no longer an active structural blind spot."
       ],
       "evidence": {
-        "optimistic_concurrency_mentions": 9186,
-        "if_match_mentions": 3753,
-        "row_version_mentions": 30704
+        "optimistic_concurrency_mentions": 9696,
+        "if_match_mentions": 3925,
+        "row_version_mentions": 31839
       },
       "required_controls": []
     },
@@ -338,7 +338,7 @@
       "current_severity": "watch",
       "rationale": [],
       "evidence": {
-        "idempotency_mentions": 24373
+        "idempotency_mentions": 25510
       },
       "required_controls": []
     },

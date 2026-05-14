@@ -2304,13 +2304,6 @@ BEGIN;
 -- ---------------------------------------------------------------------------
 -- employees / Nhan vien (17 vars from personnel)
 -- ---------------------------------------------------------------------------
--- Identity columns (employee_name, role_code, role_label) are duplicated
--- from users.full_name / roles.role_code / roles.role_label_vi for now;
--- migration 179 attempted to drop them but the schema-authority registry
--- couldn't be regenerated cleanly in the same session, so migration 180
--- restored them. Read identity via v_user_canonical (migration 178) — never
--- join `employees` for that. The trg_employees_role_drift_audit trigger
--- detects any divergence. See .ai/USER_IDENTITY_SSOT.md.
 CREATE TABLE employees (
     employee_id         VARCHAR(20)     PRIMARY KEY,
     employee_name       VARCHAR(150)    NOT NULL,
@@ -2328,7 +2321,7 @@ CREATE TABLE employees (
     created_at          TIMESTAMPTZ     NOT NULL DEFAULT now(),
     updated_at          TIMESTAMPTZ     NOT NULL DEFAULT now()
 );
-COMMENT ON TABLE employees IS 'Employee runtime projection. Identity columns are dual-written from users by AuthUserShadowSyncService; read via v_user_canonical. / Du lieu nhan vien.';
+COMMENT ON TABLE employees IS 'Employee master. Maps personnel variables. / Du lieu nhan vien.';
 
 -- ---------------------------------------------------------------------------
 -- training_records / Ho so dao tao (10 vars from training)
@@ -38209,3 +38202,4265 @@ ALTER TABLE genealogy_threads
 
 COMMIT;
 -- <<< END MIGRATION: 156_live_schema_drift_governance_reconcile.sql
+
+-- >>> BEGIN MIGRATION: 157_translation_admin_module.sql
+-- ============================================================================
+-- Migration 157: Translation Admin Module — multi-provider routing & cost log
+-- ============================================================================
+-- Purpose:
+--   Replace the single-provider toggle (mom/data/config/dcc-translation-config.json)
+--   with a database-backed registry that supports multiple translation
+--   providers (NLLB local, Claude CLI, Codex CLI, plus future API providers),
+--   per-tier routing, per-document overrides, and a usage/cost ledger.
+--
+-- Design contract:
+--   - The existing JSON config remains as a legacy fallback. If no routing
+--     rule resolves for a given doc, automation falls back to the JSON file,
+--     which itself falls back to env vars (DCC_TRANSLATION_DRIVER /
+--     DCC_TRANSLATION_COMMAND). This preserves the v4.1 behavior.
+--   - All four tables are admin-only writable. Read access is gated through
+--     the same admin role policy as DocumentControlController.
+--   - API keys (translation_credentials.ciphertext) are encrypted with
+--     libsodium secretbox. Master key sourced from APP_SECRET_KEY env var.
+--     If that env var is unset, the SecretVaultService refuses to encrypt
+--     and the UI shows a setup banner.
+--
+-- Tables:
+--   translation_provider_config — registry of available providers
+--   translation_credentials     — encrypted API keys + per-key probe state
+--   translation_routing         — per-scope provider+model assignment
+--   translation_usage_log       — append-only ledger of every translate call
+--
+-- Standards:
+--   ISO 9001 §7.5 (control of documented information),
+--   ISO 27001 A.10.1 (cryptography),
+--   ISO 27001 A.12.4 (logging and monitoring).
+-- Date: 2026-05-06
+-- ============================================================================
+
+BEGIN;
+
+-- ── 1. Provider registry ────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS translation_provider_config (
+    provider_key       VARCHAR(40)  PRIMARY KEY,
+    display_name       VARCHAR(120) NOT NULL,
+    provider_kind      VARCHAR(20)  NOT NULL,
+    driver_command     VARCHAR(500) NOT NULL,
+    capabilities       JSONB        NOT NULL DEFAULT '{}'::jsonb,
+    default_options    JSONB        NOT NULL DEFAULT '{}'::jsonb,
+    is_enabled         BOOLEAN      NOT NULL DEFAULT TRUE,
+    health_status      VARCHAR(20)  NOT NULL DEFAULT 'unknown',
+    health_checked_at  TIMESTAMPTZ,
+    health_message     TEXT,
+    created_at         TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    updated_at         TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    CONSTRAINT ck_translation_provider_kind
+        CHECK (provider_kind IN ('local_model', 'cli_subscription', 'http_api')),
+    CONSTRAINT ck_translation_provider_health
+        CHECK (health_status IN ('unknown', 'ok', 'degraded', 'unauthenticated', 'down'))
+);
+
+COMMENT ON TABLE translation_provider_config
+    IS 'Registry of translation providers available to the admin routing module. Each row maps a logical provider_key to a driver command (Python script invocation).';
+COMMENT ON COLUMN translation_provider_config.provider_kind
+    IS 'local_model = on-prem (NLLB/Argos), cli_subscription = OAuth subscription CLI (claude/codex), http_api = pay-per-token API (anthropic/openai REST)';
+COMMENT ON COLUMN translation_provider_config.capabilities
+    IS 'JSON: {supports_models, max_input_chars, supports_streaming, requires_credentials, requires_cli_auth, candidate_models:[]}';
+
+-- ── 2. Encrypted credentials + CLI runtime state ────────────────────────────
+
+CREATE TABLE IF NOT EXISTS translation_credentials (
+    provider_key       VARCHAR(40)  PRIMARY KEY
+        REFERENCES translation_provider_config(provider_key) ON DELETE CASCADE,
+    credential_kind    VARCHAR(20)  NOT NULL DEFAULT 'api_key',
+    ciphertext         BYTEA,
+    nonce              BYTEA,
+    key_fingerprint    VARCHAR(32),
+    cli_binary_path    VARCHAR(400),
+    cli_auth_home_path VARCHAR(400),
+    cli_auth_subject   VARCHAR(200),
+    available_models   JSONB,
+    models_fetched_at  TIMESTAMPTZ,
+    last_test_at       TIMESTAMPTZ,
+    last_test_status   VARCHAR(20),
+    last_test_message  TEXT,
+    rate_limit_window  JSONB,
+    created_by         VARCHAR(120),
+    rotated_at         TIMESTAMPTZ,
+    updated_at         TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    CONSTRAINT ck_translation_credential_kind
+        CHECK (credential_kind IN ('api_key', 'cli_auth', 'none')),
+    CONSTRAINT ck_translation_credential_test_status
+        CHECK (last_test_status IS NULL OR last_test_status IN
+               ('ok', 'auth_failed', 'quota_exceeded', 'network_error',
+                'timeout', 'binary_missing', 'config_error'))
+);
+
+COMMENT ON TABLE translation_credentials
+    IS 'Per-provider runtime credentials. For api_key kind, ciphertext+nonce hold the libsodium-encrypted secret. For cli_auth kind, the OAuth token lives in cli_auth_home_path on disk and we only track binary location + probe state.';
+COMMENT ON COLUMN translation_credentials.ciphertext
+    IS 'libsodium secretbox(api_key, nonce, master_key from APP_SECRET_KEY env). Never logged. Never returned through any API.';
+COMMENT ON COLUMN translation_credentials.key_fingerprint
+    IS 'sha256(api_key)[:32] hex. Safe to display in UI for verification without revealing the key.';
+
+-- ── 3. Routing table ────────────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS translation_routing (
+    routing_id         BIGSERIAL    PRIMARY KEY,
+    scope_type         VARCHAR(20)  NOT NULL,
+    scope_value        VARCHAR(200) NOT NULL,
+    primary_provider   VARCHAR(40)  NOT NULL
+        REFERENCES translation_provider_config(provider_key) ON DELETE RESTRICT,
+    primary_model      VARCHAR(120),
+    fallback_chain     JSONB        NOT NULL DEFAULT '[]'::jsonb,
+    options_override   JSONB,
+    priority           INT          NOT NULL DEFAULT 100,
+    is_enabled         BOOLEAN      NOT NULL DEFAULT TRUE,
+    description        TEXT,
+    created_by         VARCHAR(120),
+    created_at         TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    updated_by         VARCHAR(120),
+    updated_at         TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    CONSTRAINT ck_translation_routing_scope
+        CHECK (scope_type IN ('global_default', 'tier', 'doc_pattern', 'doc_code')),
+    CONSTRAINT ck_translation_routing_global_value
+        CHECK (scope_type <> 'global_default' OR scope_value = '*')
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS uq_translation_routing_scope
+    ON translation_routing(scope_type, scope_value)
+    WHERE is_enabled = TRUE;
+
+CREATE INDEX IF NOT EXISTS idx_translation_routing_priority
+    ON translation_routing(priority DESC, scope_type);
+
+COMMENT ON TABLE translation_routing
+    IS 'Routing rules: which provider+model handles which document. Resolution order (highest priority wins): doc_code > doc_pattern > tier > global_default.';
+COMMENT ON COLUMN translation_routing.scope_value
+    IS 'global_default: "*". tier: tier_1|tier_2|tier_3. doc_pattern: glob like "qms-man-*". doc_code: exact code like "QMS-MAN-001".';
+COMMENT ON COLUMN translation_routing.fallback_chain
+    IS 'Ordered JSON array: [{"provider":"nllb","model":"600M"}, ...]. Tried in order on primary failure (API/quality gate).';
+
+-- ── 4. Usage / cost ledger ──────────────────────────────────────────────────
+
+CREATE TABLE IF NOT EXISTS translation_usage_log (
+    usage_id            BIGSERIAL    PRIMARY KEY,
+    doc_code            VARCHAR(80),
+    provider_key        VARCHAR(40),
+    model_id            VARCHAR(120),
+    trigger_kind        VARCHAR(40)  NOT NULL DEFAULT 'edit',
+    input_tokens        INT,
+    cached_input_tokens INT,
+    output_tokens       INT,
+    cost_usd_microcents BIGINT,
+    duration_ms         INT,
+    outcome             VARCHAR(20)  NOT NULL,
+    error_code          VARCHAR(60),
+    fallback_from       VARCHAR(40),
+    metadata            JSONB        NOT NULL DEFAULT '{}'::jsonb,
+    created_at          TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    CONSTRAINT ck_translation_usage_outcome
+        CHECK (outcome IN ('ok', 'quality_fail', 'api_error', 'timeout',
+                           'auth_failed', 'rate_limited', 'driver_crash',
+                           'invalid_payload'))
+);
+
+CREATE INDEX IF NOT EXISTS idx_translation_usage_provider_time
+    ON translation_usage_log(provider_key, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_translation_usage_doc_time
+    ON translation_usage_log(doc_code, created_at DESC);
+
+COMMENT ON TABLE translation_usage_log
+    IS 'Append-only ledger of every translation attempt. Powers the admin Cost & Usage dashboard and rate-limit guardrails. Cost stored as microcents (USD * 1e8) to avoid float drift.';
+
+-- ── 5. Touch trigger (reuse pattern from migration 152) ─────────────────────
+
+DROP TRIGGER IF EXISTS trg_translation_provider_config_touch ON translation_provider_config;
+CREATE TRIGGER trg_translation_provider_config_touch
+    BEFORE UPDATE ON translation_provider_config
+    FOR EACH ROW EXECUTE FUNCTION dcc_touch_updated_at();
+
+DROP TRIGGER IF EXISTS trg_translation_credentials_touch ON translation_credentials;
+CREATE TRIGGER trg_translation_credentials_touch
+    BEFORE UPDATE ON translation_credentials
+    FOR EACH ROW EXECUTE FUNCTION dcc_touch_updated_at();
+
+DROP TRIGGER IF EXISTS trg_translation_routing_touch ON translation_routing;
+CREATE TRIGGER trg_translation_routing_touch
+    BEFORE UPDATE ON translation_routing
+    FOR EACH ROW EXECUTE FUNCTION dcc_touch_updated_at();
+
+-- ── 6. Seed providers ───────────────────────────────────────────────────────
+
+INSERT INTO translation_provider_config
+    (provider_key, display_name, provider_kind, driver_command, capabilities, default_options, is_enabled)
+VALUES
+    ('nllb', 'NLLB-200 (Local, Meta)', 'local_model',
+     'python3 tools/scripts/translation/dcc_nllb_vi_to_en.py',
+     jsonb_build_object(
+         'supports_models', true,
+         'max_input_chars', 200000,
+         'requires_credentials', false,
+         'requires_cli_auth', false,
+         'candidate_models', jsonb_build_array(
+             jsonb_build_object('id','nllb-200-distilled-600M','label','NLLB-200 distilled 600M (INT8)'),
+             jsonb_build_object('id','nllb-200-distilled-1.3B','label','NLLB-200 distilled 1.3B (FP16)'),
+             jsonb_build_object('id','nllb-200-3.3B','label','NLLB-200 3.3B (FP16)')
+         ),
+         'cost_class', 'free_local'
+     ),
+     jsonb_build_object('beam_size', 4, 'max_decode_length', 512, 'repetition_penalty', 1.1),
+     true),
+
+    ('argos', 'Argos Translate (Local, legacy)', 'local_model',
+     'python3 tools/scripts/translation/dcc_argos_vi_to_en.py',
+     jsonb_build_object(
+         'supports_models', false,
+         'max_input_chars', 200000,
+         'requires_credentials', false,
+         'requires_cli_auth', false,
+         'candidate_models', jsonb_build_array(),
+         'cost_class', 'free_local'
+     ),
+     jsonb_build_object(),
+     true),
+
+    ('claude_cli', 'Claude Code CLI (Max subscription)', 'cli_subscription',
+     'python3 tools/scripts/translation/dcc_claude_cli_vi_to_en.py',
+     jsonb_build_object(
+         'supports_models', true,
+         'max_input_chars', 100000,
+         'requires_credentials', false,
+         'requires_cli_auth', true,
+         'cli_binary_default', '/opt/homebrew/bin/claude',
+         'cli_auth_home_default', '/var/www/.claude',
+         'candidate_models', jsonb_build_array(
+             jsonb_build_object('id','claude-opus-4-7','label','Claude Opus 4.7 (highest quality)'),
+             jsonb_build_object('id','claude-sonnet-4-6','label','Claude Sonnet 4.6 (balanced)'),
+             jsonb_build_object('id','claude-haiku-4-5','label','Claude Haiku 4.5 (fast & cheap)')
+         ),
+         'cost_class', 'subscription_flat',
+         'subscription_label', 'Claude Max'
+     ),
+     jsonb_build_object('rate_limit_per_hour', 60, 'segment_batch_size', 8),
+     true),
+
+    ('codex_cli', 'OpenAI Codex CLI (ChatGPT Pro subscription)', 'cli_subscription',
+     'python3 tools/scripts/translation/dcc_codex_cli_vi_to_en.py',
+     jsonb_build_object(
+         'supports_models', true,
+         'max_input_chars', 100000,
+         'requires_credentials', false,
+         'requires_cli_auth', true,
+         'cli_binary_default', '/opt/homebrew/bin/codex',
+         'cli_auth_home_default', '/var/www/.codex',
+         'candidate_models', jsonb_build_array(
+             jsonb_build_object('id','gpt-5','label','GPT-5'),
+             jsonb_build_object('id','gpt-5-codex','label','GPT-5 Codex'),
+             jsonb_build_object('id','o3','label','o3 reasoning')
+         ),
+         'cost_class', 'subscription_flat',
+         'subscription_label', 'ChatGPT Pro'
+     ),
+     jsonb_build_object('rate_limit_per_hour', 60, 'segment_batch_size', 8),
+     true)
+ON CONFLICT (provider_key) DO NOTHING;
+
+-- ── 7. Seed default routing — global default points at NLLB to preserve current behavior
+
+INSERT INTO translation_routing
+    (scope_type, scope_value, primary_provider, primary_model,
+     fallback_chain, priority, description, created_by)
+VALUES
+    ('global_default', '*', 'nllb', 'nllb-200-distilled-600M',
+     '[]'::jsonb, 100,
+     'Initial seed. Admin should adjust per-tier overrides via the UI.',
+     'migration_157')
+ON CONFLICT (scope_type, scope_value) WHERE is_enabled = TRUE DO NOTHING;
+
+COMMIT;
+-- <<< END MIGRATION: 157_translation_admin_module.sql
+
+-- >>> BEGIN MIGRATION: 158_translation_admin_fix_model_catalogue.sql
+-- ============================================================================
+-- Migration 158: translation admin — fix model catalogue (real Claude/Codex names)
+-- ----------------------------------------------------------------------------
+-- The seed in 157_translation_admin_module.sql hardcoded model names that do
+-- not exist on the actual CLI binaries:
+--   * claude-opus-4-7 / claude-sonnet-4-6        → reject by Anthropic API
+--   * gpt-5 / gpt-5-codex / o3 / codex-mini-…     → rejected for ChatGPT-account auth
+-- Verified via direct CLI probe on VPS 2026-05-06:
+--   * claude (2.1.131) accepts: alias `opus`/`sonnet`/`haiku` (resolve to current
+--     latest), or full `claude-opus-4-5` / `claude-sonnet-4-5` / `claude-haiku-4-5`.
+--   * codex (0.128.0) ChatGPT-account ONLY accepts: gpt-5.5, gpt-5.4,
+--     gpt-5.4-mini, gpt-5.3-codex, gpt-5.2. Everything else (gpt-5, gpt-5-codex,
+--     gpt-5-pro, codex-mini-latest, o3, o4-mini) returns:
+--       "model is not supported when using Codex with a ChatGPT account."
+--
+-- This migration replaces those values everywhere they are persisted:
+--   * translation_provider_config.capabilities.candidate_models
+--   * translation_credentials.available_models
+--   * translation_routing.primary_model + fallback_chain
+-- It is idempotent — re-running has no effect once values match expected.
+-- ============================================================================
+
+BEGIN;
+
+-- 1. Provider catalogue ------------------------------------------------------
+
+UPDATE translation_provider_config
+SET capabilities = jsonb_set(
+        capabilities,
+        '{candidate_models}',
+        jsonb_build_array(
+            jsonb_build_object('id','opus',                'label','Claude Opus (alias → latest 4.x)'),
+            jsonb_build_object('id','sonnet',              'label','Claude Sonnet (alias → latest 4.x)'),
+            jsonb_build_object('id','haiku',               'label','Claude Haiku (alias → fast & cheap)'),
+            jsonb_build_object('id','claude-opus-4-5',     'label','Claude Opus 4.5 (highest quality)'),
+            jsonb_build_object('id','claude-sonnet-4-5',   'label','Claude Sonnet 4.5 (balanced)'),
+            jsonb_build_object('id','claude-haiku-4-5',    'label','Claude Haiku 4.5 (fast)')
+        ),
+        true
+    )
+WHERE provider_key = 'claude_cli';
+
+UPDATE translation_provider_config
+SET capabilities = jsonb_set(
+        capabilities,
+        '{candidate_models}',
+        jsonb_build_array(
+            jsonb_build_object('id','gpt-5.5',         'label','GPT-5.5 (best — ChatGPT Pro)'),
+            jsonb_build_object('id','gpt-5.4',         'label','GPT-5.4'),
+            jsonb_build_object('id','gpt-5.4-mini',    'label','GPT-5.4 Mini (fast)'),
+            jsonb_build_object('id','gpt-5.3-codex',   'label','GPT-5.3 Codex'),
+            jsonb_build_object('id','gpt-5.2',         'label','GPT-5.2')
+        ),
+        true
+    )
+WHERE provider_key = 'codex_cli';
+
+-- 2. Credential available_models snapshot -----------------------------------
+
+UPDATE translation_credentials
+SET available_models = jsonb_build_array(
+    jsonb_build_object('id','opus',                'label','Claude Opus (alias)',          'state','candidate'),
+    jsonb_build_object('id','sonnet',              'label','Claude Sonnet (alias)',        'state','candidate'),
+    jsonb_build_object('id','haiku',               'label','Claude Haiku (alias)',         'state','candidate'),
+    jsonb_build_object('id','claude-opus-4-5',     'label','Claude Opus 4.5',              'state','candidate'),
+    jsonb_build_object('id','claude-sonnet-4-5',   'label','Claude Sonnet 4.5',            'state','candidate'),
+    jsonb_build_object('id','claude-haiku-4-5',    'label','Claude Haiku 4.5',             'state','candidate')
+)
+WHERE provider_key = 'claude_cli';
+
+UPDATE translation_credentials
+SET available_models = jsonb_build_array(
+    jsonb_build_object('id','gpt-5.5',         'label','GPT-5.5',         'state','candidate'),
+    jsonb_build_object('id','gpt-5.4',         'label','GPT-5.4',         'state','candidate'),
+    jsonb_build_object('id','gpt-5.4-mini',    'label','GPT-5.4 Mini',    'state','candidate'),
+    jsonb_build_object('id','gpt-5.3-codex',   'label','GPT-5.3 Codex',   'state','candidate'),
+    jsonb_build_object('id','gpt-5.2',         'label','GPT-5.2',         'state','candidate')
+)
+WHERE provider_key = 'codex_cli';
+
+-- 3. Routing rules -----------------------------------------------------------
+
+-- Tier 1 (MAN/POL) → claude_cli/sonnet (alias resolves to latest), fallback gpt-5.5 then nllb
+UPDATE translation_routing
+SET primary_model   = 'sonnet',
+    fallback_chain  = jsonb_build_array(
+        jsonb_build_object('provider','codex_cli', 'model','gpt-5.5'),
+        jsonb_build_object('provider','nllb',      'model','nllb-200-distilled-600M')
+    )
+WHERE scope_type = 'tier' AND scope_value = 'tier_1';
+
+-- Tier 2 (SOP/WI) → codex_cli/gpt-5.5 (verified working with ChatGPT-Pro auth)
+UPDATE translation_routing
+SET primary_model   = 'gpt-5.5',
+    fallback_chain  = jsonb_build_array(
+        jsonb_build_object('provider','nllb', 'model','nllb-200-distilled-600M')
+    )
+WHERE scope_type = 'tier' AND scope_value = 'tier_2';
+
+-- Tier 3 stays NLLB-local (no change needed; included for completeness check).
+
+COMMIT;
+-- <<< END MIGRATION: 158_translation_admin_fix_model_catalogue.sql
+
+-- >>> BEGIN MIGRATION: 159_rbac_permission_catalog.sql
+-- ============================================================================
+-- Migration 159: permission_catalog — atomic permission codes (RBAC catalogue)
+-- ----------------------------------------------------------------------------
+-- Establishes a single source of truth for every "atomic" permission code
+-- the application can grant. Replaces the magic-string permissions scattered
+-- across role_permissions.json + JS (canEditDocs, canCreateDocs, …) with a
+-- typed, audit-grade catalogue.
+--
+-- Design references
+--   * NIST 800-162 — ABAC: permission as (subject × action × resource)
+--   * SAP S/4HANA Authorization Object — activity_code (01/02/03/06/16/…)
+--   * Oracle Fusion Apps — Privilege as the smallest grant unit (Job → Duty
+--     → Privilege; this table represents Privileges)
+--   * NIST 800-63B — required_aal_level so dangerous permissions can demand
+--     a specific Authenticator Assurance Level.
+--
+-- Idempotent: re-running has no effect once the table + seed exist.
+-- ============================================================================
+
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS permission_catalog (
+    permission_code         VARCHAR(80)     PRIMARY KEY,
+    module_code             VARCHAR(50),
+    activity_code           VARCHAR(20),
+    label                   VARCHAR(200)    NOT NULL,
+    label_vi                VARCHAR(200),
+    description             TEXT,
+    description_vi          TEXT,
+    is_dangerous            BOOLEAN         NOT NULL DEFAULT FALSE,
+    requires_reason         BOOLEAN         NOT NULL DEFAULT FALSE,
+    required_aal_level      SMALLINT        NOT NULL DEFAULT 1
+                            CHECK (required_aal_level BETWEEN 1 AND 3),
+    sod_tags                TEXT[]          NOT NULL DEFAULT ARRAY[]::TEXT[],
+    compliance_refs         TEXT[]          NOT NULL DEFAULT ARRAY[]::TEXT[],
+    sort_order              INTEGER         NOT NULL DEFAULT 0,
+    is_active               BOOLEAN         NOT NULL DEFAULT TRUE,
+    metadata                JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    row_version             INTEGER         NOT NULL DEFAULT 1,
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    created_by              UUID,
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_by              UUID,
+    deleted_at              TIMESTAMPTZ,
+    deleted_by              UUID
+);
+
+COMMENT ON TABLE permission_catalog IS 'RBAC atomic permission catalogue (NIST 800-162 / SAP authorization-object compatible). / Danh muc quyen nguyen tu RBAC.';
+COMMENT ON COLUMN permission_catalog.activity_code IS 'SAP-style activity code: 01=create, 02=update, 03=display, 06=delete, 16=execute, 78=approve, 95=export.';
+COMMENT ON COLUMN permission_catalog.required_aal_level IS 'NIST 800-63B Authenticator Assurance Level required to exercise this permission (1=password, 2=2FA, 3=hardware FIDO2).';
+COMMENT ON COLUMN permission_catalog.sod_tags IS 'Free-form tags used by role_sod_conflict.check_query to flag separation-of-duties violations.';
+
+CREATE INDEX IF NOT EXISTS idx_permission_catalog_module ON permission_catalog(module_code) WHERE is_active = TRUE;
+CREATE INDEX IF NOT EXISTS idx_permission_catalog_activity ON permission_catalog(activity_code);
+CREATE INDEX IF NOT EXISTS idx_permission_catalog_dangerous ON permission_catalog(is_dangerous) WHERE is_dangerous = TRUE;
+
+-- updated_at trigger ---------------------------------------------------------
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_trigger WHERE tgname = 'trg_permission_catalog_set_updated_at'
+    ) THEN
+        CREATE TRIGGER trg_permission_catalog_set_updated_at
+            BEFORE UPDATE ON permission_catalog
+            FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+    END IF;
+EXCEPTION WHEN undefined_function THEN
+    -- set_updated_at() helper not yet present; skip silently.
+    NULL;
+END$$;
+
+-- Seed: import the legacy magic-string permissions from role_permissions.json
+-- into the catalogue so the importer has stable codes to map to.
+INSERT INTO permission_catalog (permission_code, module_code, activity_code, label, label_vi, description, description_vi, is_dangerous, required_aal_level, sort_order)
+VALUES
+    ('docs.view',       'docs',    '03', 'View controlled documents',     'Xem tai lieu kiem soat',          'Read access to QMS controlled documents.',                'Quyen doc tai lieu kiem soat QMS.',                                FALSE, 1,  10),
+    ('docs.create',     'docs',    '01', 'Create controlled documents',   'Tao tai lieu kiem soat',          'Author new SOP/WI/Form drafts.',                          'Soan thao SOP/WI/Form moi.',                                       FALSE, 2,  20),
+    ('docs.edit',       'docs',    '02', 'Edit controlled documents',     'Sua tai lieu kiem soat',          'Edit existing controlled-document drafts.',               'Sua ban thao tai lieu kiem soat.',                                 FALSE, 2,  30),
+    ('docs.approve',    'docs',    '78', 'Approve controlled documents',  'Duyet tai lieu kiem soat',        'Approve a document for release per DCC.',                 'Duyet phat hanh tai lieu theo DCC.',                               TRUE,  2,  40),
+    ('docs.retire',     'docs',    '95', 'Retire / supersede documents',  'Thu hoi / thay the tai lieu',     'Retire a document version and supersede it.',             'Thu hoi/thay the phien ban tai lieu.',                             TRUE,  2,  50),
+    ('records.view',    'records', '03', 'View QMS records',              'Xem ho so QMS',                   'Read FRM-* and run-time evidence records.',               'Doc ho so FRM-* va bang chung van hanh.',                          FALSE, 1, 110),
+    ('records.create',  'records', '01', 'Create QMS records',            'Tao ho so QMS',                   'Submit a new FRM-* record.',                              'Tao ho so FRM-* moi.',                                             FALSE, 1, 120),
+    ('records.export',  'records', '95', 'Export QMS records',            'Xuat ho so QMS',                  'Export records to Excel/CSV.',                            'Xuat ho so ra Excel/CSV.',                                         TRUE,  2, 130),
+    ('users.view',      'users',   '03', 'View user roster',              'Xem danh sach nguoi dung',        'Read access to the user list.',                           'Doc danh sach nguoi dung.',                                        FALSE, 1, 210),
+    ('users.create',    'users',   '01', 'Create user',                   'Tao nguoi dung',                  'Provision a new user account.',                           'Cap moi tai khoan nguoi dung.',                                    TRUE,  2, 220),
+    ('users.edit',      'users',   '02', 'Edit user',                     'Sua nguoi dung',                  'Update profile, dept, role of an existing user.',         'Cap nhat ho so/phong ban/vai tro cua nguoi dung.',                 TRUE,  2, 230),
+    ('users.disable',   'users',   '06', 'Disable / offboard user',       'Khoa / ngung su dung',            'Disable a user account or initiate offboarding.',         'Khoa hoac khoi tao quy trinh nghi viec cua nguoi dung.',           TRUE,  2, 240),
+    ('users.reset_pw',  'users',   '02', 'Reset user password',           'Reset mat khau nguoi dung',       'Force-reset the password of another user.',               'Reset mat khau cua nguoi dung khac.',                              TRUE,  2, 250),
+    ('users.export',    'users',   '95', 'Export user roster',            'Xuat danh sach nguoi dung',       'Export the user roster to Excel/CSV.',                    'Xuat danh sach nguoi dung ra Excel/CSV.',                          TRUE,  2, 260),
+    ('rbac.role.view',  'rbac',    '03', 'View roles',                    'Xem vai tro',                     'Read access to the role catalogue.',                      'Doc danh muc vai tro.',                                            FALSE, 2, 310),
+    ('rbac.role.edit',  'rbac',    '02', 'Edit role permissions',         'Sua quyen vai tro',               'Edit role-permission matrix.',                            'Sua ma tran phan quyen vai tro.',                                  TRUE,  2, 320),
+    ('rbac.module.edit','rbac',    '02', 'Edit module permissions',       'Sua phan quyen module',           'Edit module access matrix.',                              'Sua ma tran truy cap module.',                                     TRUE,  2, 330),
+    ('rbac.doc.grant',  'rbac',    '02', 'Grant document permissions',    'Cap phan quyen tai lieu',         'Grant per-doc/per-user document access.',                 'Cap phan quyen tai lieu cap nhan-tai lieu.',                       TRUE,  2, 340),
+    ('rbac.sod.edit',   'rbac',    '02', 'Edit SoD matrix',               'Sua ma tran tach trach nhiem',    'Edit Separation-of-Duties conflict matrix.',              'Sua ma tran xung dot tach trach nhiem.',                           TRUE,  3, 350),
+    ('rbac.review.run', 'rbac',    '16', 'Run access review campaign',    'Chay danh gia phan quyen',        'Initiate a periodic access-review attestation cycle.',    'Khoi tao chu ky danh gia phan quyen dinh ky.',                     FALSE, 2, 360),
+    ('mfa.policy.edit', 'mfa',     '02', 'Edit MFA policy',               'Sua chinh sach MFA',              'Edit per-role MFA policy.',                               'Sua chinh sach MFA theo vai tro.',                                 TRUE,  3, 410),
+    ('mfa.factor.revoke','mfa',    '06', 'Revoke MFA factor',             'Thu hoi yeu to MFA',              'Revoke a single MFA factor of a user.',                   'Thu hoi mot yeu to MFA cua nguoi dung.',                           TRUE,  3, 420),
+    ('mfa.factor.reset','mfa',     '06', 'Reset all MFA factors',         'Reset toan bo MFA',               'Reset every MFA factor of a user (force re-enroll).',     'Reset toan bo yeu to MFA cua nguoi dung (buoc ghi danh lai).',     TRUE,  3, 430),
+    ('audit.view',      'audit',   '03', 'View audit trail',              'Xem nhat ky kiem tra',            'Read access to the system audit trail.',                  'Doc nhat ky kiem tra he thong.',                                   FALSE, 2, 510),
+    ('audit.export',    'audit',   '95', 'Export audit trail',            'Xuat nhat ky kiem tra',           'Export audit events for external review.',                'Xuat nhat ky kiem tra cho danh gia ben ngoai.',                    TRUE,  2, 520),
+    ('admin.backend',   'system',  '16', 'Access admin backend',          'Truy cap admin backend',          'Access the admin / governance back-office area.',         'Truy cap khu vuc quan tri / governance.',                          TRUE,  2, 610),
+    ('finance.po.approve','finance','78','Approve purchase order',        'Duyet don mua hang',              'Approve a PO above threshold.',                           'Duyet don mua hang vuot nguong.',                                  TRUE,  2, 710),
+    ('finance.payment.execute','finance','16','Execute payment',          'Thuc hien thanh toan',            'Initiate a vendor payment transfer.',                     'Khoi tao chuyen khoan thanh toan nha cung cap.',                   TRUE,  3, 720)
+ON CONFLICT (permission_code) DO NOTHING;
+
+-- SoD seed tags so 162_role_sod_conflict can detect classic conflicts.
+UPDATE permission_catalog SET sod_tags = ARRAY['create_po']        WHERE permission_code = 'docs.create' AND module_code='finance';
+UPDATE permission_catalog SET sod_tags = ARRAY['approve_po']       WHERE permission_code = 'finance.po.approve';
+UPDATE permission_catalog SET sod_tags = ARRAY['execute_payment']  WHERE permission_code = 'finance.payment.execute';
+UPDATE permission_catalog SET sod_tags = ARRAY['author_doc']       WHERE permission_code IN ('docs.create','docs.edit');
+UPDATE permission_catalog SET sod_tags = ARRAY['approve_doc']      WHERE permission_code = 'docs.approve';
+
+COMMIT;
+
+-- Rollback:
+--   BEGIN;
+--   DROP TABLE IF EXISTS permission_catalog;
+--   COMMIT;
+-- <<< END MIGRATION: 159_rbac_permission_catalog.sql
+
+-- >>> BEGIN MIGRATION: 160_rbac_modules_and_module_permission.sql
+-- ============================================================================
+-- Migration 160: modules_catalog + module_permission
+-- ----------------------------------------------------------------------------
+-- Replaces mom/api/config/module_access_config.json with a normalized
+-- (role × module) CRUD/approve/export matrix.
+--
+-- modules_catalog       : the canonical list of frontend modules + their
+--                         display tokens (icon, color, route_class).
+-- module_permission     : per-role flags (view/create/update/delete/approve/
+--                         export) and an ABAC `scope_jsonb` for advanced
+--                         filters (dept_only, owner_only, plant=…).
+--
+-- Compatible with NIST 800-162 (ABAC) — module_permission.scope_jsonb is the
+-- ABAC envelope, module_permission.can_* booleans are the RBAC envelope. UI
+-- combines both.
+--
+-- Idempotent.
+-- ============================================================================
+
+BEGIN;
+
+-- ---------------------------------------------------------------------------
+-- modules_catalog
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS modules_catalog (
+    module_code             VARCHAR(50)     PRIMARY KEY,
+    label                   VARCHAR(150)    NOT NULL,
+    label_vi                VARCHAR(150),
+    description             TEXT,
+    description_vi          TEXT,
+    icon_token              VARCHAR(80),
+    color_token             VARCHAR(80),
+    route_class             VARCHAR(50),
+    parent_module_code      VARCHAR(50)     REFERENCES modules_catalog(module_code) ON DELETE SET NULL,
+    sort_order              INTEGER         NOT NULL DEFAULT 0,
+    is_active               BOOLEAN         NOT NULL DEFAULT TRUE,
+    is_system               BOOLEAN         NOT NULL DEFAULT FALSE,
+    metadata                JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    row_version             INTEGER         NOT NULL DEFAULT 1,
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    created_by              UUID,
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_by              UUID,
+    deleted_at              TIMESTAMPTZ,
+    deleted_by              UUID
+);
+
+COMMENT ON TABLE modules_catalog IS 'Catalogue of frontend modules with display tokens. / Danh muc module frontend voi token hien thi.';
+COMMENT ON COLUMN modules_catalog.icon_token IS 'graphics_token_catalog.token_key for the module icon.';
+COMMENT ON COLUMN modules_catalog.color_token IS 'graphics_token_catalog.token_key for the module accent color.';
+COMMENT ON COLUMN modules_catalog.route_class IS 'HMV4 route classification (workspace_projection / authoritative_record_shell / …).';
+
+CREATE INDEX IF NOT EXISTS idx_modules_catalog_parent ON modules_catalog(parent_module_code) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_modules_catalog_active ON modules_catalog(is_active, sort_order) WHERE deleted_at IS NULL;
+
+-- ---------------------------------------------------------------------------
+-- module_permission  (role × module → CRUD/approve/export + ABAC scope)
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS module_permission (
+    module_permission_id    UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    role_id                 UUID            NOT NULL REFERENCES roles(role_id) ON DELETE CASCADE,
+    module_code             VARCHAR(50)     NOT NULL REFERENCES modules_catalog(module_code) ON DELETE CASCADE,
+    can_view                BOOLEAN         NOT NULL DEFAULT FALSE,
+    can_create              BOOLEAN         NOT NULL DEFAULT FALSE,
+    can_update              BOOLEAN         NOT NULL DEFAULT FALSE,
+    can_delete              BOOLEAN         NOT NULL DEFAULT FALSE,
+    can_approve             BOOLEAN         NOT NULL DEFAULT FALSE,
+    can_export              BOOLEAN         NOT NULL DEFAULT FALSE,
+    scope                   JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    scope_explanation       TEXT,
+    notes                   TEXT,
+    metadata                JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    row_version             INTEGER         NOT NULL DEFAULT 1,
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    created_by              UUID,
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_by              UUID,
+    deleted_at              TIMESTAMPTZ,
+    deleted_by              UUID,
+    UNIQUE (role_id, module_code, deleted_at)
+);
+
+COMMENT ON TABLE module_permission IS 'Per-role module CRUD/approve/export + ABAC scope. / Phan quyen module theo vai tro + scope ABAC.';
+COMMENT ON COLUMN module_permission.scope IS 'ABAC scope envelope: {dept_only:bool, owner_only:bool, plant_ids:[…], doc_pattern:"…"}.';
+
+CREATE INDEX IF NOT EXISTS idx_module_permission_role ON module_permission(role_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_module_permission_module ON module_permission(module_code) WHERE deleted_at IS NULL;
+
+-- updated_at triggers --------------------------------------------------------
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_modules_catalog_set_updated_at') THEN
+        CREATE TRIGGER trg_modules_catalog_set_updated_at
+            BEFORE UPDATE ON modules_catalog
+            FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_module_permission_set_updated_at') THEN
+        CREATE TRIGGER trg_module_permission_set_updated_at
+            BEFORE UPDATE ON module_permission
+            FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+    END IF;
+EXCEPTION WHEN undefined_function THEN
+    NULL;
+END$$;
+
+-- ---------------------------------------------------------------------------
+-- Seed modules_catalog from the live frontend MODULE_ACCESS_CONFIG list.
+-- ---------------------------------------------------------------------------
+INSERT INTO modules_catalog (module_code, label, label_vi, route_class, sort_order, is_active, is_system) VALUES
+    ('dashboard',       'Dashboard',                'Bang dieu khien',          'workspace_projection',      10,  TRUE, FALSE),
+    ('docs',            'Document Control',         'Kiem soat tai lieu',       'authoritative_record_shell',20,  TRUE, FALSE),
+    ('forms',           'Forms & Records',          'Bieu mau & Ho so',         'authoritative_record_shell',30,  TRUE, FALSE),
+    ('users',           'Users',                    'Nguoi dung',               'admin_governance',          40,  TRUE, TRUE),
+    ('rbac',            'Roles & Permissions',      'Vai tro & Phan quyen',     'admin_governance',          50,  TRUE, TRUE),
+    ('mfa',             'MFA Security',             'Bao mat MFA',              'admin_governance',          60,  TRUE, TRUE),
+    ('audit',           'Audit Trail',              'Nhat ky kiem tra',         'admin_governance',          70,  TRUE, TRUE),
+    ('eqms',            'EQMS Suite',               'EQMS Suite',               'workspace_projection',      80,  TRUE, FALSE),
+    ('production',      'Production',               'San xuat',                 'workspace_projection',      90,  TRUE, FALSE),
+    ('quality',         'Quality',                  'Chat luong',               'workspace_projection',     100,  TRUE, FALSE),
+    ('inventory',       'Inventory',                'Kho',                      'workspace_projection',     110,  TRUE, FALSE),
+    ('purchasing',      'Purchasing',               'Mua hang',                 'workspace_projection',     120,  TRUE, FALSE),
+    ('finance',         'Finance',                  'Tai chinh',                'authoritative_record_shell',130, TRUE, FALSE),
+    ('hr',              'HR & Org',                 'Nhan su & To chuc',        'admin_governance',         140,  TRUE, FALSE),
+    ('training',        'Training',                 'Dao tao',                  'workspace_projection',     150,  TRUE, FALSE),
+    ('analytics',       'Analytics',                'Phan tich',                'workspace_projection',     160,  TRUE, FALSE),
+    ('schema_studio',   'Data Schema',              'Data Schema',              'admin_governance',         170,  TRUE, TRUE),
+    ('infrastructure',  'VPS Infrastructure',       'Ha tang VPS',              'admin_governance',         180,  TRUE, TRUE),
+    ('translation',     'Translation Module',       'Module Dich Thuat',        'admin_governance',         190,  TRUE, TRUE),
+    ('ai_control',      'AI Control',               'Dieu khien AI',            'admin_governance',         200,  TRUE, TRUE)
+ON CONFLICT (module_code) DO NOTHING;
+
+COMMIT;
+
+-- Rollback:
+--   BEGIN;
+--   DROP TABLE IF EXISTS module_permission;
+--   DROP TABLE IF EXISTS modules_catalog;
+--   COMMIT;
+-- <<< END MIGRATION: 160_rbac_modules_and_module_permission.sql
+
+-- >>> BEGIN MIGRATION: 161_rbac_document_permission_grant.sql
+-- ============================================================================
+-- Migration 161: document_permission_grant — per-doc ACL with grant/deny
+-- ----------------------------------------------------------------------------
+-- Replaces mom/api/config/user_doc_overrides JSON blob with a normalized,
+-- audit-grade per-document grant/deny table.
+--
+-- Subject can be a user, role, or department. doc_pattern accepts:
+--   * an exact doc_code  ("qms-man-001")
+--   * a glob              ("sop-*", "wi-7??-*")
+--   * a label  "all_documents", "all_sops", "all_qms", "all_finance"
+--
+-- effect = 'deny' takes precedence over effect = 'grant' anywhere — matches
+-- the deny-overrides-grant convention used by AWS IAM, Azure RBAC, and
+-- Google IAM with deny policies.
+--
+-- Idempotent.
+-- ============================================================================
+
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS document_permission_grant (
+    grant_id                UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    subject_type            VARCHAR(20)     NOT NULL
+                            CHECK (subject_type IN ('user','role','dept')),
+    subject_id              VARCHAR(100)    NOT NULL,
+    doc_pattern             VARCHAR(200)    NOT NULL,
+    action                  VARCHAR(40)     NOT NULL
+                            CHECK (action IN ('view','edit','approve','export','print','retire','delegate')),
+    effect                  VARCHAR(10)     NOT NULL DEFAULT 'grant'
+                            CHECK (effect IN ('grant','deny')),
+    reason                  TEXT,
+    expires_at              TIMESTAMPTZ,
+    granted_by              UUID            REFERENCES users(user_id),
+    granted_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    revoked_at              TIMESTAMPTZ,
+    revoked_by              UUID            REFERENCES users(user_id),
+    revoke_reason           TEXT,
+    is_emergency            BOOLEAN         NOT NULL DEFAULT FALSE,
+    compliance_refs         TEXT[]          NOT NULL DEFAULT ARRAY[]::TEXT[],
+    metadata                JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    row_version             INTEGER         NOT NULL DEFAULT 1,
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    created_by              UUID,
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_by              UUID,
+    deleted_at              TIMESTAMPTZ,
+    deleted_by              UUID
+);
+
+COMMENT ON TABLE document_permission_grant IS 'Per-doc grant/deny ACL (subject × doc_pattern × action × effect). / ACL tai lieu cap nhan: chu the x mau tai lieu x hanh dong x hieu luc.';
+COMMENT ON COLUMN document_permission_grant.subject_id IS 'username when subject_type=user, role_code when role, dept_code when dept.';
+COMMENT ON COLUMN document_permission_grant.doc_pattern IS 'Exact doc_code, glob (sop-*), or label keyword (all_documents/all_sops/all_qms/all_finance).';
+COMMENT ON COLUMN document_permission_grant.effect IS 'deny takes precedence over grant globally (AWS IAM convention).';
+COMMENT ON COLUMN document_permission_grant.is_emergency IS 'TRUE when this grant was issued via break-glass workflow — flagged in access reviews.';
+
+CREATE INDEX IF NOT EXISTS idx_doc_perm_subject ON document_permission_grant(subject_type, subject_id) WHERE deleted_at IS NULL AND revoked_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_doc_perm_pattern ON document_permission_grant(doc_pattern) WHERE deleted_at IS NULL AND revoked_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_doc_perm_active ON document_permission_grant(subject_type, action, effect, expires_at) WHERE deleted_at IS NULL AND revoked_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_doc_perm_emergency ON document_permission_grant(is_emergency) WHERE is_emergency = TRUE AND deleted_at IS NULL;
+
+-- updated_at trigger ---------------------------------------------------------
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_doc_perm_grant_set_updated_at') THEN
+        CREATE TRIGGER trg_doc_perm_grant_set_updated_at
+            BEFORE UPDATE ON document_permission_grant
+            FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+    END IF;
+EXCEPTION WHEN undefined_function THEN
+    NULL;
+END$$;
+
+-- ---------------------------------------------------------------------------
+-- Audit-required check: if reason is empty for a dangerous action+effect
+-- combination, raise. Use a CHECK + trigger so policy can evolve.
+-- ---------------------------------------------------------------------------
+ALTER TABLE document_permission_grant
+    ADD CONSTRAINT doc_perm_grant_reason_required_for_emergency
+    CHECK (NOT is_emergency OR (reason IS NOT NULL AND char_length(reason) >= 10));
+
+-- ---------------------------------------------------------------------------
+-- View: effective document grants (no view-of-view-of-view; computed once)
+-- ---------------------------------------------------------------------------
+CREATE OR REPLACE VIEW v_document_permission_grant_active AS
+    SELECT
+        grant_id,
+        subject_type,
+        subject_id,
+        doc_pattern,
+        action,
+        effect,
+        reason,
+        expires_at,
+        granted_by,
+        granted_at,
+        is_emergency,
+        org_company_code,
+        org_plant_id
+    FROM document_permission_grant
+    WHERE deleted_at IS NULL
+      AND revoked_at IS NULL
+      AND (expires_at IS NULL OR expires_at > now());
+
+COMMENT ON VIEW v_document_permission_grant_active IS 'Active (non-deleted, non-revoked, non-expired) document grants. / Phan quyen tai lieu dang hieu luc.';
+
+COMMIT;
+
+-- Rollback:
+--   BEGIN;
+--   DROP VIEW IF EXISTS v_document_permission_grant_active;
+--   DROP TABLE IF EXISTS document_permission_grant;
+--   COMMIT;
+-- <<< END MIGRATION: 161_rbac_document_permission_grant.sql
+
+-- >>> BEGIN MIGRATION: 162_rbac_role_sod_conflict.sql
+-- ============================================================================
+-- Migration 162: role_sod_conflict — Separation of Duties matrix
+-- ----------------------------------------------------------------------------
+-- COBIT 5 (DSS06.03), SOX §404, ISO 27001 (A.6.1.2), and NIST 800-53 (AC-5)
+-- all require that a single user must not simultaneously hold two roles that
+-- can perform a complete fraud cycle (e.g. "create PO" + "approve PO" +
+-- "execute payment"). This table is the canonical conflict matrix.
+--
+-- Each row declares: holding role_a together with role_b is a violation of
+-- severity {block | warn | info}. The application enforces:
+--   * block: assigning the second role is rejected outright by RBAC
+--   * warn : assignment proceeds but raises an audit event + access-review
+--             flag
+--   * info : informational, surfaced in dashboards only
+--
+-- Idempotent.
+-- ============================================================================
+
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS role_sod_conflict (
+    conflict_id             UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    role_a_id               UUID            NOT NULL REFERENCES roles(role_id) ON DELETE CASCADE,
+    role_b_id               UUID            NOT NULL REFERENCES roles(role_id) ON DELETE CASCADE,
+    severity                VARCHAR(10)     NOT NULL DEFAULT 'block'
+                            CHECK (severity IN ('block','warn','info')),
+    label                   VARCHAR(200),
+    label_vi                VARCHAR(200),
+    rationale               TEXT            NOT NULL,
+    rationale_vi            TEXT,
+    compliance_refs         TEXT[]          NOT NULL DEFAULT ARRAY[]::TEXT[],
+    detection_query         TEXT,
+    waiver_allowed          BOOLEAN         NOT NULL DEFAULT FALSE,
+    waiver_max_days         INTEGER,
+    is_active               BOOLEAN         NOT NULL DEFAULT TRUE,
+    metadata                JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    row_version             INTEGER         NOT NULL DEFAULT 1,
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    created_by              UUID,
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_by              UUID,
+    deleted_at              TIMESTAMPTZ,
+    deleted_by              UUID,
+    CHECK (role_a_id <> role_b_id)
+);
+
+COMMENT ON TABLE role_sod_conflict IS 'Separation-of-Duties conflict matrix (COBIT 5 DSS06.03 / SOX 404 / ISO 27001 A.6.1.2). / Ma tran xung dot tach trach nhiem.';
+COMMENT ON COLUMN role_sod_conflict.severity IS 'block = reject second-role assignment; warn = allow but audit; info = surface only.';
+COMMENT ON COLUMN role_sod_conflict.detection_query IS 'Optional SQL returning user_id rows in violation; used by access_review jobs.';
+COMMENT ON COLUMN role_sod_conflict.waiver_allowed IS 'TRUE if a temporary waiver (recorded in mfa_challenge audit) may bypass the block.';
+
+-- Canonicalize the unordered pair to prevent duplicates A↔B vs B↔A.
+CREATE UNIQUE INDEX IF NOT EXISTS uq_role_sod_conflict_pair_active
+    ON role_sod_conflict (
+        LEAST(role_a_id, role_b_id),
+        GREATEST(role_a_id, role_b_id)
+    )
+    WHERE deleted_at IS NULL AND is_active = TRUE;
+
+CREATE INDEX IF NOT EXISTS idx_role_sod_conflict_role_a ON role_sod_conflict(role_a_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_role_sod_conflict_role_b ON role_sod_conflict(role_b_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_role_sod_conflict_severity ON role_sod_conflict(severity) WHERE deleted_at IS NULL AND is_active = TRUE;
+
+-- updated_at trigger ---------------------------------------------------------
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_role_sod_conflict_set_updated_at') THEN
+        CREATE TRIGGER trg_role_sod_conflict_set_updated_at
+            BEFORE UPDATE ON role_sod_conflict
+            FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+    END IF;
+EXCEPTION WHEN undefined_function THEN
+    NULL;
+END$$;
+
+-- ---------------------------------------------------------------------------
+-- Seed: classic SoD conflicts. Skip if either role is missing (early system).
+-- ---------------------------------------------------------------------------
+DO $$
+DECLARE
+    fin_id  UUID := (SELECT role_id FROM roles WHERE role_code = 'finance_manager');
+    qa_id   UUID := (SELECT role_id FROM roles WHERE role_code = 'qa_manager');
+    qms_id  UUID := (SELECT role_id FROM roles WHERE role_code = 'qms_engineer');
+    int_id  UUID := (SELECT role_id FROM roles WHERE role_code = 'internal_auditor');
+    ceo_id  UUID := (SELECT role_id FROM roles WHERE role_code = 'ceo');
+    pd_id   UUID := (SELECT role_id FROM roles WHERE role_code = 'production_director');
+    it_id   UUID := (SELECT role_id FROM roles WHERE role_code = 'it_admin');
+BEGIN
+    -- Finance vs Internal Auditor — auditor must not also be the manager
+    IF fin_id IS NOT NULL AND int_id IS NOT NULL THEN
+        INSERT INTO role_sod_conflict (role_a_id, role_b_id, severity, label, label_vi, rationale, rationale_vi, compliance_refs)
+        VALUES (fin_id, int_id, 'block',
+            'Finance Manager + Internal Auditor',
+            'Truong Phong Tai Chinh + Kiem Toan Noi Bo',
+            'Finance manager controls the books being audited; combining with internal-auditor role creates a self-audit conflict.',
+            'Truong phong tai chinh kiem soat so sach can kiem toan; kiem ket hop vai tro kiem toan noi bo tao xung dot tu kiem toan.',
+            ARRAY['SOX-404','ISO27001-A.6.1.2','COBIT5-DSS06.03'])
+        ON CONFLICT DO NOTHING;
+    END IF;
+
+    -- QMS Engineer authoring docs + QA Manager approving them
+    IF qms_id IS NOT NULL AND qa_id IS NOT NULL THEN
+        INSERT INTO role_sod_conflict (role_a_id, role_b_id, severity, label, label_vi, rationale, rationale_vi, compliance_refs)
+        VALUES (qms_id, qa_id, 'warn',
+            'QMS Author + QA Approver',
+            'Soan tai lieu QMS + Duyet tai lieu QMS',
+            'Author of a controlled document should not be its sole approver; warn unless approval is delegated.',
+            'Nguoi soan tai lieu kiem soat khong nen la nguoi duy nhat phe duyet; canh bao tru khi viec phe duyet duoc uy quyen.',
+            ARRAY['ISO9001-7.5.3','21CFR820.40'])
+        ON CONFLICT DO NOTHING;
+    END IF;
+
+    -- Production Director should not unilaterally also approve quality holds
+    IF pd_id IS NOT NULL AND qa_id IS NOT NULL THEN
+        INSERT INTO role_sod_conflict (role_a_id, role_b_id, severity, label, label_vi, rationale, rationale_vi, compliance_refs)
+        VALUES (pd_id, qa_id, 'warn',
+            'Production Director + QA Manager',
+            'Giam Doc San Xuat + Truong Phong Chat Luong',
+            'Production owner must not also clear quality holds; warn until process delegation is verified.',
+            'Chu so huu san xuat khong nen tu xoa cac chot kiem soat chat luong; canh bao cho den khi co uy quyen quy trinh.',
+            ARRAY['ISO9001-7.1','IATF16949-7.1'])
+        ON CONFLICT DO NOTHING;
+    END IF;
+
+    -- IT Admin must not also have audit-export permission combined with mfa.factor.reset (god-mode)
+    IF it_id IS NOT NULL AND ceo_id IS NOT NULL THEN
+        INSERT INTO role_sod_conflict (role_a_id, role_b_id, severity, label, label_vi, rationale, rationale_vi, compliance_refs)
+        VALUES (it_id, ceo_id, 'info',
+            'IT Admin + CEO',
+            'Quan Tri IT + Tong Giam Doc',
+            'CEO assigned IT-Admin gains technical superuser access; review in next access-review campaign.',
+            'CEO duoc gan IT-Admin se co quyen sieu nguoi dung ky thuat; danh gia trong chu ky tiep theo.',
+            ARRAY['ISO27001-A.9.2.5'])
+        ON CONFLICT DO NOTHING;
+    END IF;
+END$$;
+
+COMMIT;
+
+-- Rollback:
+--   BEGIN;
+--   DROP TABLE IF EXISTS role_sod_conflict;
+--   COMMIT;
+-- <<< END MIGRATION: 162_rbac_role_sod_conflict.sql
+
+-- >>> BEGIN MIGRATION: 163_rbac_role_badge_tokens.sql
+-- ============================================================================
+-- Migration 163: role badge tokens (Graphics Authority link, no-hardcode rule)
+-- ----------------------------------------------------------------------------
+-- Removes the last visual hardcode for roles.
+--
+-- Strategy
+--   * Colors  → graphics_token_catalog (legitimate design tokens, dark-mode
+--               aware, WCAG contrast tracked).
+--   * Emojis  → roles.icon_emoji direct column (emojis are content, not
+--               styling tokens — keeping them in graphics_token_catalog
+--               would violate its layer/family taxonomy).
+--   * Rank    → roles.rank_level (0=executive … 5=external).
+--   * Admin   → roles.is_admin_tier (replaces hardcoded admin_roles() list).
+--
+-- Idempotent.
+-- ============================================================================
+
+BEGIN;
+
+-- ---------------------------------------------------------------------------
+-- 1. Add columns to roles
+-- ---------------------------------------------------------------------------
+ALTER TABLE roles
+    ADD COLUMN IF NOT EXISTS icon_emoji              VARCHAR(10),
+    ADD COLUMN IF NOT EXISTS badge_color_token       VARCHAR(200),
+    ADD COLUMN IF NOT EXISTS badge_dark_color_token  VARCHAR(200),
+    ADD COLUMN IF NOT EXISTS rank_level              SMALLINT,
+    ADD COLUMN IF NOT EXISTS is_admin_tier           BOOLEAN NOT NULL DEFAULT FALSE;
+
+COMMENT ON COLUMN roles.icon_emoji IS 'Emoji shown as the role badge icon (content, not a design token).';
+COMMENT ON COLUMN roles.badge_color_token IS 'graphics_token_catalog.token_key for the role badge color (light theme).';
+COMMENT ON COLUMN roles.badge_dark_color_token IS 'graphics_token_catalog.token_key for the role badge color (dark theme variant; usually same key — dark value handled by token).';
+COMMENT ON COLUMN roles.rank_level IS 'Role rank: 0=executive, 1=director, 2=manager, 3=lead, 4=operator, 5=external.';
+COMMENT ON COLUMN roles.is_admin_tier IS 'TRUE if role grants admin-tier access (replaces hardcoded admin_roles() list in api.php).';
+
+-- ---------------------------------------------------------------------------
+-- 2. Seed graphics_token_catalog with role-badge color tokens.
+--    Uses the actual schema: layer/family/subfamily/value_type required NOT NULL.
+-- ---------------------------------------------------------------------------
+INSERT INTO graphics_token_catalog
+    (token_key, css_variable, layer, family, subfamily, value_type, default_light, default_dark, description, source_authority)
+VALUES
+    ('semantic.color.role.executive',     '--role-executive',     'semantic', 'color', 'role-badge', 'hex', '#7c3aed', '#a78bfa', 'Role badge color: executive / CEO',                'rbac-migration-163'),
+    ('semantic.color.role.production',    '--role-production',    'semantic', 'color', 'role-badge', 'hex', '#059669', '#34d399', 'Role badge color: production',                     'rbac-migration-163'),
+    ('semantic.color.role.cnc',           '--role-cnc',           'semantic', 'color', 'role-badge', 'hex', '#0891b2', '#22d3ee', 'Role badge color: CNC operator',                   'rbac-migration-163'),
+    ('semantic.color.role.engineering',   '--role-engineering',   'semantic', 'color', 'role-badge', 'hex', '#0369a1', '#38bdf8', 'Role badge color: engineering',                    'rbac-migration-163'),
+    ('semantic.color.role.quality',       '--role-quality',       'semantic', 'color', 'role-badge', 'hex', '#dc2626', '#f87171', 'Role badge color: quality / QA',                   'rbac-migration-163'),
+    ('semantic.color.role.audit',         '--role-audit',         'semantic', 'color', 'role-badge', 'hex', '#b91c1c', '#fca5a5', 'Role badge color: audit / internal auditor',      'rbac-migration-163'),
+    ('semantic.color.role.supply_chain',  '--role-supply-chain',  'semantic', 'color', 'role-badge', 'hex', '#84cc16', '#a3e635', 'Role badge color: supply chain',                   'rbac-migration-163'),
+    ('semantic.color.role.finance',       '--role-finance',       'semantic', 'color', 'role-badge', 'hex', '#9333ea', '#c084fc', 'Role badge color: finance',                        'rbac-migration-163'),
+    ('semantic.color.role.hr',            '--role-hr',            'semantic', 'color', 'role-badge', 'hex', '#a21caf', '#e879f9', 'Role badge color: HR',                             'rbac-migration-163'),
+    ('semantic.color.role.it',            '--role-it',            'semantic', 'color', 'role-badge', 'hex', '#475569', '#94a3b8', 'Role badge color: IT admin',                       'rbac-migration-163'),
+    ('semantic.color.role.qms',           '--role-qms',           'semantic', 'color', 'role-badge', 'hex', '#d97706', '#fbbf24', 'Role badge color: QMS engineer',                   'rbac-migration-163'),
+    ('semantic.color.role.sales',         '--role-sales',         'semantic', 'color', 'role-badge', 'hex', '#0d9488', '#5eead4', 'Role badge color: sales / customer service',       'rbac-migration-163'),
+    ('semantic.color.role.warehouse',     '--role-warehouse',     'semantic', 'color', 'role-badge', 'hex', '#65a30d', '#bef264', 'Role badge color: warehouse',                      'rbac-migration-163'),
+    ('semantic.color.role.maintenance',   '--role-maintenance',   'semantic', 'color', 'role-badge', 'hex', '#92400e', '#fdba74', 'Role badge color: maintenance',                    'rbac-migration-163'),
+    ('semantic.color.role.ehs',           '--role-ehs',           'semantic', 'color', 'role-badge', 'hex', '#16a34a', '#4ade80', 'Role badge color: EHS specialist',                 'rbac-migration-163'),
+    ('semantic.color.role.default',       '--role-default',       'semantic', 'color', 'role-badge', 'hex', '#6366f1', '#a5b4fc', 'Role badge color: default fallback',               'rbac-migration-163')
+ON CONFLICT (token_key) DO NOTHING;
+
+-- ---------------------------------------------------------------------------
+-- 3. Seed default role assignments (icon emoji + token + rank + admin tier).
+--    Uses UPDATE…WHERE so missing roles are silently skipped.
+-- ---------------------------------------------------------------------------
+UPDATE roles SET icon_emoji = '👔', badge_color_token = 'semantic.color.role.executive',     badge_dark_color_token = 'semantic.color.role.executive',     rank_level = 0, is_admin_tier = TRUE  WHERE role_code = 'ceo';
+UPDATE roles SET icon_emoji = '🏭', badge_color_token = 'semantic.color.role.production',    badge_dark_color_token = 'semantic.color.role.production',    rank_level = 1, is_admin_tier = FALSE WHERE role_code = 'production_director';
+UPDATE roles SET icon_emoji = '🏭', badge_color_token = 'semantic.color.role.production',    badge_dark_color_token = 'semantic.color.role.production',    rank_level = 2, is_admin_tier = FALSE WHERE role_code = 'cnc_workshop_manager';
+UPDATE roles SET icon_emoji = '🔩', badge_color_token = 'semantic.color.role.cnc',           badge_dark_color_token = 'semantic.color.role.cnc',           rank_level = 4, is_admin_tier = FALSE WHERE role_code = 'cnc_operator';
+UPDATE roles SET icon_emoji = '⚙️', badge_color_token = 'semantic.color.role.engineering',   badge_dark_color_token = 'semantic.color.role.engineering',   rank_level = 2, is_admin_tier = FALSE WHERE role_code = 'engineering_lead';
+UPDATE roles SET icon_emoji = '🛡️', badge_color_token = 'semantic.color.role.quality',       badge_dark_color_token = 'semantic.color.role.quality',       rank_level = 2, is_admin_tier = TRUE  WHERE role_code = 'qa_manager';
+UPDATE roles SET icon_emoji = '📊', badge_color_token = 'semantic.color.role.audit',         badge_dark_color_token = 'semantic.color.role.audit',         rank_level = 2, is_admin_tier = FALSE WHERE role_code = 'internal_auditor';
+UPDATE roles SET icon_emoji = '🛒', badge_color_token = 'semantic.color.role.supply_chain',  badge_dark_color_token = 'semantic.color.role.supply_chain',  rank_level = 2, is_admin_tier = FALSE WHERE role_code = 'supply_chain_manager';
+UPDATE roles SET icon_emoji = '🏦', badge_color_token = 'semantic.color.role.finance',       badge_dark_color_token = 'semantic.color.role.finance',       rank_level = 2, is_admin_tier = FALSE WHERE role_code = 'finance_manager';
+UPDATE roles SET icon_emoji = '👥', badge_color_token = 'semantic.color.role.hr',            badge_dark_color_token = 'semantic.color.role.hr',            rank_level = 2, is_admin_tier = FALSE WHERE role_code = 'hr_manager';
+UPDATE roles SET icon_emoji = '🖥️', badge_color_token = 'semantic.color.role.it',            badge_dark_color_token = 'semantic.color.role.it',            rank_level = 2, is_admin_tier = TRUE  WHERE role_code = 'it_admin';
+UPDATE roles SET icon_emoji = '📋', badge_color_token = 'semantic.color.role.qms',           badge_dark_color_token = 'semantic.color.role.qms',           rank_level = 3, is_admin_tier = TRUE  WHERE role_code = 'qms_engineer';
+UPDATE roles SET icon_emoji = '📦', badge_color_token = 'semantic.color.role.warehouse',     badge_dark_color_token = 'semantic.color.role.warehouse',     rank_level = 4, is_admin_tier = FALSE WHERE role_code IN ('warehouse_clerk','tool_crib_storekeeper');
+UPDATE roles SET icon_emoji = '🔧', badge_color_token = 'semantic.color.role.maintenance',   badge_dark_color_token = 'semantic.color.role.maintenance',   rank_level = 4, is_admin_tier = FALSE WHERE role_code = 'maintenance_technician';
+UPDATE roles SET icon_emoji = '🦺', badge_color_token = 'semantic.color.role.ehs',           badge_dark_color_token = 'semantic.color.role.ehs',           rank_level = 3, is_admin_tier = FALSE WHERE role_code = 'ehs_specialist';
+UPDATE roles SET icon_emoji = '🤝', badge_color_token = 'semantic.color.role.sales',         badge_dark_color_token = 'semantic.color.role.sales',         rank_level = 3, is_admin_tier = FALSE WHERE role_code IN ('estimator','customer_service','buyer_purchasing');
+
+-- Anything still missing → default
+UPDATE roles
+   SET icon_emoji            = COALESCE(icon_emoji, '👤'),
+       badge_color_token     = COALESCE(badge_color_token, 'semantic.color.role.default'),
+       badge_dark_color_token= COALESCE(badge_dark_color_token, 'semantic.color.role.default'),
+       rank_level            = COALESCE(rank_level, 5)
+ WHERE icon_emoji IS NULL
+    OR badge_color_token IS NULL
+    OR badge_dark_color_token IS NULL
+    OR rank_level IS NULL;
+
+CREATE INDEX IF NOT EXISTS idx_roles_admin_tier ON roles(is_admin_tier) WHERE is_admin_tier = TRUE AND is_active = TRUE;
+CREATE INDEX IF NOT EXISTS idx_roles_rank_level ON roles(rank_level) WHERE is_active = TRUE;
+
+COMMIT;
+
+-- Rollback:
+--   BEGIN;
+--   ALTER TABLE roles
+--     DROP COLUMN IF EXISTS icon_emoji,
+--     DROP COLUMN IF EXISTS badge_color_token,
+--     DROP COLUMN IF EXISTS badge_dark_color_token,
+--     DROP COLUMN IF EXISTS rank_level,
+--     DROP COLUMN IF EXISTS is_admin_tier;
+--   DELETE FROM graphics_token_catalog WHERE source_authority = 'rbac-migration-163';
+--   COMMIT;
+-- <<< END MIGRATION: 163_rbac_role_badge_tokens.sql
+
+-- >>> BEGIN MIGRATION: 164_rbac_access_review.sql
+-- ============================================================================
+-- Migration 164: access_review_campaign + access_review_item
+-- ----------------------------------------------------------------------------
+-- ISO 27001 A.9.2.5 ("Review of user access rights") and SOX 404 require a
+-- periodic attestation that every user's role grants are still appropriate.
+-- This migration models the campaign + per-item attestation lifecycle.
+--
+-- Lifecycle of an access_review_item:
+--   pending  → attested      (manager confirms)
+--   pending  → revoked       (manager removes the role/grant)
+--   pending  → escalated     (deferred to higher authority)
+--   pending  → expired       (campaign window closes without action)
+--
+-- Idempotent.
+-- ============================================================================
+
+BEGIN;
+
+-- ---------------------------------------------------------------------------
+-- access_review_campaign
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS access_review_campaign (
+    campaign_id             UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    campaign_code           VARCHAR(50)     NOT NULL UNIQUE,
+    name                    VARCHAR(200)    NOT NULL,
+    name_vi                 VARCHAR(200),
+    description             TEXT,
+    description_vi          TEXT,
+    scope_filter            JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    target_role_codes       TEXT[]          NOT NULL DEFAULT ARRAY[]::TEXT[],
+    target_dept_codes       TEXT[]          NOT NULL DEFAULT ARRAY[]::TEXT[],
+    review_owner_id         UUID            REFERENCES users(user_id),
+    scheduled_for           TIMESTAMPTZ     NOT NULL,
+    started_at              TIMESTAMPTZ,
+    completed_at            TIMESTAMPTZ,
+    deadline_at             TIMESTAMPTZ,
+    status                  VARCHAR(20)     NOT NULL DEFAULT 'scheduled'
+                            CHECK (status IN ('scheduled','in_progress','completed','cancelled','expired')),
+    iso_27001_ref           VARCHAR(50),
+    sox_section             VARCHAR(50),
+    metadata                JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    row_version             INTEGER         NOT NULL DEFAULT 1,
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    created_by              UUID,
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_by              UUID,
+    deleted_at              TIMESTAMPTZ,
+    deleted_by              UUID
+);
+
+COMMENT ON TABLE access_review_campaign IS 'Periodic access-review campaigns (ISO 27001 A.9.2.5 / SOX 404). / Chu ky danh gia phan quyen dinh ky.';
+COMMENT ON COLUMN access_review_campaign.scope_filter IS 'JSONB filter envelope: {plant_ids:[…], dept_codes:[…], rank_min:N, include_inactive:bool}.';
+
+CREATE INDEX IF NOT EXISTS idx_access_review_campaign_status ON access_review_campaign(status, scheduled_for) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_access_review_campaign_owner ON access_review_campaign(review_owner_id) WHERE deleted_at IS NULL;
+
+-- ---------------------------------------------------------------------------
+-- access_review_item  (per user × role/grant)
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS access_review_item (
+    review_item_id          UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    campaign_id             UUID            NOT NULL REFERENCES access_review_campaign(campaign_id) ON DELETE CASCADE,
+    target_user_id          UUID            NOT NULL REFERENCES users(user_id),
+    target_role_id          UUID            REFERENCES roles(role_id),
+    target_grant_kind       VARCHAR(40)     NOT NULL DEFAULT 'role'
+                            CHECK (target_grant_kind IN ('role','module_permission','document_grant','mfa_exception')),
+    target_ref              VARCHAR(200),
+    snapshot_state          JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    sod_violation_flagged   BOOLEAN         NOT NULL DEFAULT FALSE,
+    sod_conflict_id         UUID            REFERENCES role_sod_conflict(conflict_id),
+    inactivity_days         INTEGER,
+    risk_score              SMALLINT,
+    attestation             VARCHAR(20)     NOT NULL DEFAULT 'pending'
+                            CHECK (attestation IN ('pending','attested','revoked','escalated','expired','waived')),
+    attested_by             UUID            REFERENCES users(user_id),
+    attested_at             TIMESTAMPTZ,
+    attestation_justification TEXT,
+    revoke_action_id        UUID,
+    metadata                JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    row_version             INTEGER         NOT NULL DEFAULT 1,
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    created_by              UUID,
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_by              UUID,
+    deleted_at              TIMESTAMPTZ,
+    deleted_by              UUID
+);
+
+COMMENT ON TABLE access_review_item IS 'Per (user × role/grant) attestation row inside an access-review campaign.';
+COMMENT ON COLUMN access_review_item.target_grant_kind IS 'role (primary RBAC), module_permission, document_grant, mfa_exception.';
+COMMENT ON COLUMN access_review_item.target_ref IS 'Target identifier when target_grant_kind != role: module_code, doc_pattern, factor_id, etc.';
+COMMENT ON COLUMN access_review_item.snapshot_state IS 'Captured-at-campaign-start state of the grant for diff-on-attest comparison.';
+COMMENT ON COLUMN access_review_item.risk_score IS '0-100 computed risk score (rank_level + privilege count + inactivity + SoD).';
+
+CREATE INDEX IF NOT EXISTS idx_access_review_item_campaign ON access_review_item(campaign_id, attestation);
+CREATE INDEX IF NOT EXISTS idx_access_review_item_user ON access_review_item(target_user_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_access_review_item_pending ON access_review_item(campaign_id) WHERE attestation = 'pending' AND deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_access_review_item_sod ON access_review_item(sod_conflict_id) WHERE sod_violation_flagged = TRUE;
+
+-- updated_at triggers --------------------------------------------------------
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_access_review_campaign_set_updated_at') THEN
+        CREATE TRIGGER trg_access_review_campaign_set_updated_at
+            BEFORE UPDATE ON access_review_campaign
+            FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_access_review_item_set_updated_at') THEN
+        CREATE TRIGGER trg_access_review_item_set_updated_at
+            BEFORE UPDATE ON access_review_item
+            FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+    END IF;
+EXCEPTION WHEN undefined_function THEN
+    NULL;
+END$$;
+
+-- ---------------------------------------------------------------------------
+-- Helper view: per-campaign progress summary
+-- ---------------------------------------------------------------------------
+CREATE OR REPLACE VIEW v_access_review_campaign_progress AS
+    SELECT
+        c.campaign_id,
+        c.campaign_code,
+        c.name,
+        c.name_vi,
+        c.status                              AS campaign_status,
+        c.scheduled_for,
+        c.started_at,
+        c.completed_at,
+        c.deadline_at,
+        COUNT(i.review_item_id)               AS total_items,
+        COUNT(*) FILTER (WHERE i.attestation = 'pending')   AS pending_items,
+        COUNT(*) FILTER (WHERE i.attestation = 'attested')  AS attested_items,
+        COUNT(*) FILTER (WHERE i.attestation = 'revoked')   AS revoked_items,
+        COUNT(*) FILTER (WHERE i.attestation = 'escalated') AS escalated_items,
+        COUNT(*) FILTER (WHERE i.attestation = 'expired')   AS expired_items,
+        COUNT(*) FILTER (WHERE i.sod_violation_flagged)     AS sod_violations,
+        ROUND(
+            CASE WHEN COUNT(i.review_item_id) = 0 THEN 0
+                 ELSE 100.0 * COUNT(*) FILTER (WHERE i.attestation IN ('attested','revoked','escalated'))
+                              / COUNT(i.review_item_id)
+            END, 1
+        )                                     AS completion_percent
+    FROM access_review_campaign c
+    LEFT JOIN access_review_item i ON i.campaign_id = c.campaign_id AND i.deleted_at IS NULL
+    WHERE c.deleted_at IS NULL
+    GROUP BY c.campaign_id;
+
+COMMENT ON VIEW v_access_review_campaign_progress IS 'Per-campaign summary KPIs (total/pending/attested/revoked/escalated/SoD, completion %).';
+
+COMMIT;
+
+-- Rollback:
+--   BEGIN;
+--   DROP VIEW IF EXISTS v_access_review_campaign_progress;
+--   DROP TABLE IF EXISTS access_review_item;
+--   DROP TABLE IF EXISTS access_review_campaign;
+--   COMMIT;
+-- <<< END MIGRATION: 164_rbac_access_review.sql
+
+-- >>> BEGIN MIGRATION: 165_rbac_mfa_factors_and_policy.sql
+-- ============================================================================
+-- Migration 165: MFA — multi-factor authentication (NIST 800-63B + FIDO2)
+-- ----------------------------------------------------------------------------
+-- The legacy users.mfa_secret + users.mfa_enabled columns model exactly ONE
+-- TOTP factor per user. This migration introduces:
+--
+--   * mfa_factor          : per-factor row (TOTP / WebAuthn / hardware key /
+--                           backup-code / email / SMS) with status + AAL.
+--   * mfa_recovery_code   : one row per backup-code with hash + used flag.
+--   * mfa_policy          : per-role MFA policy (required, min_factors,
+--                           allowed_types, required AAL, grace period,
+--                           re-auth window).
+--   * mfa_challenge       : audit row for every challenge (pending/verified/
+--                           failed/expired) — feeds the MFA Audit Timeline.
+--
+-- References
+--   * NIST 800-63B  — AAL1 (single-factor pw), AAL2 (2FA TOTP/SMS),
+--                      AAL3 (hardware crypto, FIDO2)
+--   * FIDO2 / WebAuthn Level 3
+--   * ISO 27001 A.9.4.2 (Secure log-on procedures)
+--   * 21 CFR Part 11 §11.10(d) (electronic signatures w/ second factor)
+--
+-- Idempotent. Safe to re-run.
+-- ============================================================================
+
+BEGIN;
+
+-- ---------------------------------------------------------------------------
+-- mfa_factor
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS mfa_factor (
+    factor_id               UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id                 UUID            NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    factor_type             VARCHAR(30)     NOT NULL
+                            CHECK (factor_type IN ('totp','webauthn','hardware_key','email','sms','backup_code')),
+    factor_label            VARCHAR(120),
+    aal_level               SMALLINT        NOT NULL DEFAULT 2
+                            CHECK (aal_level BETWEEN 1 AND 3),
+    secret_encrypted        BYTEA,
+    secret_kid              VARCHAR(50),
+    public_key_pem          TEXT,
+    credential_id           BYTEA,
+    sign_counter            BIGINT          NOT NULL DEFAULT 0,
+    attestation_meta        JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    transports              TEXT[]          NOT NULL DEFAULT ARRAY[]::TEXT[],
+    status                  VARCHAR(20)     NOT NULL DEFAULT 'pending_verify'
+                            CHECK (status IN ('pending_verify','active','revoked','expired','locked')),
+    last_used_at            TIMESTAMPTZ,
+    last_used_ip            INET,
+    last_used_user_agent    TEXT,
+    enrolled_at             TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    activated_at            TIMESTAMPTZ,
+    revoked_at              TIMESTAMPTZ,
+    revoked_by              UUID            REFERENCES users(user_id),
+    revoke_reason           TEXT,
+    expires_at              TIMESTAMPTZ,
+    metadata                JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    row_version             INTEGER         NOT NULL DEFAULT 1,
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    created_by              UUID,
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_by              UUID,
+    deleted_at              TIMESTAMPTZ,
+    deleted_by              UUID
+);
+
+COMMENT ON TABLE mfa_factor IS 'Per-factor MFA enrollment (NIST 800-63B / FIDO2). / Yeu to MFA da ghi danh.';
+COMMENT ON COLUMN mfa_factor.aal_level IS 'NIST 800-63B AAL: 1 password, 2 OTP/SMS, 3 hardware FIDO2.';
+COMMENT ON COLUMN mfa_factor.secret_encrypted IS 'Encrypted TOTP/SMS shared secret. Encrypted via libsodium / KMS — never plaintext on disk.';
+COMMENT ON COLUMN mfa_factor.secret_kid IS 'Key-ID of the KMS / libsodium key used to wrap secret_encrypted (rotates without rewrap).';
+COMMENT ON COLUMN mfa_factor.public_key_pem IS 'WebAuthn / hardware-key public key (PEM).';
+COMMENT ON COLUMN mfa_factor.credential_id IS 'WebAuthn credentialId (binary).';
+COMMENT ON COLUMN mfa_factor.sign_counter IS 'WebAuthn signature counter (monotonic; rollback rejected).';
+
+CREATE INDEX IF NOT EXISTS idx_mfa_factor_user ON mfa_factor(user_id) WHERE deleted_at IS NULL AND status != 'revoked';
+CREATE INDEX IF NOT EXISTS idx_mfa_factor_active ON mfa_factor(user_id, factor_type) WHERE status = 'active' AND deleted_at IS NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS uq_mfa_factor_credential ON mfa_factor(credential_id) WHERE credential_id IS NOT NULL AND deleted_at IS NULL;
+
+-- ---------------------------------------------------------------------------
+-- mfa_recovery_code  (one-time backup codes)
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS mfa_recovery_code (
+    recovery_code_id        UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id                 UUID            NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    batch_id                UUID            NOT NULL,
+    code_hash               TEXT            NOT NULL,
+    code_kid                VARCHAR(50),
+    used_at                 TIMESTAMPTZ,
+    used_ip                 INET,
+    used_user_agent         TEXT,
+    generated_at            TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    expires_at              TIMESTAMPTZ,
+    metadata                JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    row_version             INTEGER         NOT NULL DEFAULT 1,
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    created_by              UUID,
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_by              UUID
+);
+
+COMMENT ON TABLE mfa_recovery_code IS 'One-time MFA recovery codes. / Ma khoi phuc MFA mot lan.';
+COMMENT ON COLUMN mfa_recovery_code.code_hash IS 'Argon2id / bcrypt hash of the code; original code shown to user once at generation.';
+COMMENT ON COLUMN mfa_recovery_code.batch_id IS 'Groups codes generated together; regenerating invalidates the old batch.';
+
+CREATE INDEX IF NOT EXISTS idx_mfa_recovery_code_user_unused ON mfa_recovery_code(user_id) WHERE used_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_mfa_recovery_code_batch ON mfa_recovery_code(batch_id);
+
+-- ---------------------------------------------------------------------------
+-- mfa_policy  (per-role)
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS mfa_policy (
+    role_id                 UUID            PRIMARY KEY REFERENCES roles(role_id) ON DELETE CASCADE,
+    required                BOOLEAN         NOT NULL DEFAULT TRUE,
+    min_factors             SMALLINT        NOT NULL DEFAULT 1
+                            CHECK (min_factors BETWEEN 1 AND 4),
+    allowed_factor_types    TEXT[]          NOT NULL DEFAULT ARRAY['totp','webauthn','backup_code']::TEXT[],
+    required_aal_level      SMALLINT        NOT NULL DEFAULT 2
+                            CHECK (required_aal_level BETWEEN 1 AND 3),
+    grace_period_days       SMALLINT        NOT NULL DEFAULT 7,
+    reauth_after_minutes    INTEGER         NOT NULL DEFAULT 480,
+    backup_codes_count      SMALLINT        NOT NULL DEFAULT 10,
+    rate_limit_window_s     INTEGER         NOT NULL DEFAULT 60,
+    rate_limit_max_attempts SMALLINT        NOT NULL DEFAULT 5,
+    lockout_minutes         INTEGER         NOT NULL DEFAULT 15,
+    apply_to_admin_only     BOOLEAN         NOT NULL DEFAULT FALSE,
+    notes                   TEXT,
+    metadata                JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    row_version             INTEGER         NOT NULL DEFAULT 1,
+    last_modified_by        UUID            REFERENCES users(user_id),
+    last_modified_at        TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    created_by              UUID,
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_by              UUID,
+    deleted_at              TIMESTAMPTZ,
+    deleted_by              UUID
+);
+
+COMMENT ON TABLE mfa_policy IS 'Per-role MFA policy (NIST 800-63B AAL + FIDO2). / Chinh sach MFA theo vai tro.';
+COMMENT ON COLUMN mfa_policy.reauth_after_minutes IS 'Force re-MFA after N minutes of session inactivity (480 default = 8h).';
+
+-- ---------------------------------------------------------------------------
+-- mfa_challenge  (audit row per challenge)
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS mfa_challenge (
+    challenge_id            UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id                 UUID            NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    factor_id               UUID            REFERENCES mfa_factor(factor_id),
+    challenge_type          VARCHAR(20)     NOT NULL
+                            CHECK (challenge_type IN ('login','step_up','reauth','enroll_verify','recovery_code')),
+    status                  VARCHAR(20)     NOT NULL DEFAULT 'pending'
+                            CHECK (status IN ('pending','verified','failed','expired','cancelled')),
+    nonce                   BYTEA,
+    rp_id                   VARCHAR(255),
+    ip_address              INET,
+    user_agent              TEXT,
+    geo_country             VARCHAR(2),
+    risk_score              SMALLINT,
+    attempts                SMALLINT        NOT NULL DEFAULT 0,
+    failure_reason          TEXT,
+    aal_achieved            SMALLINT,
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    expires_at              TIMESTAMPTZ     NOT NULL,
+    verified_at             TIMESTAMPTZ,
+    failed_at               TIMESTAMPTZ,
+    metadata                JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    row_version             INTEGER         NOT NULL DEFAULT 1
+);
+
+COMMENT ON TABLE mfa_challenge IS 'MFA challenge audit (every login / step-up / re-auth / recovery-code use).';
+COMMENT ON COLUMN mfa_challenge.aal_achieved IS 'NIST 800-63B AAL achieved by this challenge (1/2/3).';
+COMMENT ON COLUMN mfa_challenge.risk_score IS 'Optional risk-engine score 0-100; high score may force step-up to AAL3.';
+
+CREATE INDEX IF NOT EXISTS idx_mfa_challenge_user_recent ON mfa_challenge(user_id, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_mfa_challenge_failed ON mfa_challenge(user_id, failed_at) WHERE status = 'failed';
+CREATE INDEX IF NOT EXISTS idx_mfa_challenge_pending ON mfa_challenge(user_id, expires_at) WHERE status = 'pending';
+
+-- ---------------------------------------------------------------------------
+-- Triggers
+-- ---------------------------------------------------------------------------
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_mfa_factor_set_updated_at') THEN
+        CREATE TRIGGER trg_mfa_factor_set_updated_at
+            BEFORE UPDATE ON mfa_factor
+            FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_mfa_policy_set_updated_at') THEN
+        CREATE TRIGGER trg_mfa_policy_set_updated_at
+            BEFORE UPDATE ON mfa_policy
+            FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+    END IF;
+EXCEPTION WHEN undefined_function THEN
+    NULL;
+END$$;
+
+-- ---------------------------------------------------------------------------
+-- Compliance view
+-- ---------------------------------------------------------------------------
+CREATE OR REPLACE VIEW v_mfa_user_compliance AS
+    SELECT
+        u.user_id,
+        u.username,
+        u.full_name,
+        u.dept_code,
+        u.primary_role_id,
+        r.role_code                                                AS primary_role_code,
+        r.is_admin_tier,
+        COALESCE(p.required, TRUE)                                 AS policy_required,
+        COALESCE(p.min_factors, 1)                                 AS policy_min_factors,
+        COALESCE(p.required_aal_level, 2)                          AS policy_aal,
+        COALESCE(p.grace_period_days, 7)                           AS grace_days,
+        COUNT(f.factor_id) FILTER (WHERE f.status = 'active')      AS active_factor_count,
+        COALESCE(MAX(f.aal_level) FILTER (WHERE f.status = 'active'), 1) AS max_aal_achieved,
+        CASE
+            WHEN COALESCE(p.required, TRUE) = FALSE THEN 'not_required'
+            WHEN COUNT(f.factor_id) FILTER (WHERE f.status = 'active') >= COALESCE(p.min_factors, 1)
+                 AND COALESCE(MAX(f.aal_level) FILTER (WHERE f.status = 'active'), 1) >= COALESCE(p.required_aal_level, 2)
+                THEN 'compliant'
+            WHEN u.created_at > now() - (COALESCE(p.grace_period_days, 7) || ' days')::interval
+                THEN 'in_grace'
+            ELSE 'non_compliant'
+        END                                                        AS compliance_state
+    FROM users u
+    LEFT JOIN roles r ON r.role_id = u.primary_role_id
+    LEFT JOIN mfa_policy p ON p.role_id = u.primary_role_id AND p.deleted_at IS NULL
+    LEFT JOIN mfa_factor f ON f.user_id = u.user_id AND f.deleted_at IS NULL
+    WHERE u.status = 'active'
+    GROUP BY u.user_id, r.role_code, r.is_admin_tier,
+             p.required, p.min_factors, p.required_aal_level, p.grace_period_days;
+
+COMMENT ON VIEW v_mfa_user_compliance IS 'Per-user MFA compliance derived from mfa_policy + mfa_factor (compliant/in_grace/non_compliant/not_required).';
+
+-- ---------------------------------------------------------------------------
+-- Seed default policies for known roles.
+--   * Admin tier → 2 factors, AAL 3, 3-day grace
+--   * Regular  → 1 factor,  AAL 2, 14-day grace
+-- ---------------------------------------------------------------------------
+INSERT INTO mfa_policy (role_id, required, min_factors, allowed_factor_types, required_aal_level, grace_period_days, reauth_after_minutes, backup_codes_count, notes)
+SELECT
+    r.role_id,
+    TRUE,
+    CASE WHEN r.is_admin_tier THEN 2 ELSE 1 END,
+    CASE WHEN r.is_admin_tier
+         THEN ARRAY['webauthn','hardware_key','totp','backup_code']
+         ELSE ARRAY['totp','webauthn','backup_code']
+    END,
+    CASE WHEN r.is_admin_tier THEN 3 ELSE 2 END,
+    CASE WHEN r.is_admin_tier THEN 3 ELSE 14 END,
+    CASE WHEN r.is_admin_tier THEN 240 ELSE 480 END,
+    10,
+    CASE WHEN r.is_admin_tier
+         THEN 'Auto-seeded admin-tier policy: hardware/WebAuthn preferred, AAL3 enforced.'
+         ELSE 'Auto-seeded default policy: TOTP minimum, AAL2 enforced.'
+    END
+FROM roles r
+WHERE r.deleted_at IS NULL
+ON CONFLICT (role_id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------
+-- Backfill: every user who already has users.mfa_secret + mfa_enabled gets a
+-- legacy TOTP factor row so the new flow continues to recognise their existing
+-- enrollment without asking them to re-enroll. Importer (Phase 1B) wires the
+-- decryption KMS key once available; for now we mark status=pending_verify
+-- so the user is asked to verify on next login (re-confirms their TOTP).
+-- ---------------------------------------------------------------------------
+INSERT INTO mfa_factor (user_id, factor_type, factor_label, aal_level, status, secret_encrypted, secret_kid, enrolled_at, metadata)
+SELECT
+    u.user_id,
+    'totp',
+    'Legacy TOTP (auto-imported)',
+    2,
+    'pending_verify',
+    convert_to(u.mfa_secret, 'UTF8'),
+    'legacy_plaintext',
+    u.created_at,
+    jsonb_build_object('migration_source', '165_legacy_users_mfa_secret', 'requires_kms_rewrap', TRUE)
+FROM users u
+WHERE u.mfa_enabled = TRUE
+  AND u.mfa_secret IS NOT NULL
+  AND char_length(u.mfa_secret) > 0
+  AND NOT EXISTS (
+      SELECT 1 FROM mfa_factor f WHERE f.user_id = u.user_id AND f.factor_type = 'totp'
+  );
+
+COMMIT;
+
+-- Rollback:
+--   BEGIN;
+--   DROP VIEW IF EXISTS v_mfa_user_compliance;
+--   DROP TABLE IF EXISTS mfa_challenge;
+--   DROP TABLE IF EXISTS mfa_recovery_code;
+--   DROP TABLE IF EXISTS mfa_factor;
+--   DROP TABLE IF EXISTS mfa_policy;
+--   COMMIT;
+-- <<< END MIGRATION: 165_rbac_mfa_factors_and_policy.sql
+
+-- >>> BEGIN MIGRATION: 166_content_effective_documents_and_acknowledgement.sql
+-- ============================================================================
+-- Migration 166: effective document scope + acknowledgement (21 CFR Part 11)
+-- ----------------------------------------------------------------------------
+-- The admin "Tài liệu hiệu lực" tab needs more than `documents.status='effective'`:
+--   1. Effective period (from / until) so a document can be scheduled for
+--      release and auto-retired.
+--   2. Effective scope JSONB (which plants / depts / roles the doc is in
+--      force for) — drives RLS-aware filtering on the portal.
+--   3. Acknowledgement tracking — ISO 9001 §7.5.3 / 21 CFR Part 11 §11.10(d) /
+--      AS9100 §7.5.3 require evidence that affected personnel have read the
+--      controlled document.
+--   4. Linkage to retention policy (introduced in migration 168) so the same
+--      document object owns its full life-cycle.
+--
+-- Idempotent.
+-- ============================================================================
+
+BEGIN;
+
+-- ---------------------------------------------------------------------------
+-- 1. Extend documents
+-- ---------------------------------------------------------------------------
+ALTER TABLE documents
+    ADD COLUMN IF NOT EXISTS effective_from           TIMESTAMPTZ,
+    ADD COLUMN IF NOT EXISTS effective_until          TIMESTAMPTZ,
+    ADD COLUMN IF NOT EXISTS effective_scope          JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    ADD COLUMN IF NOT EXISTS acknowledgement_required BOOLEAN         NOT NULL DEFAULT FALSE,
+    ADD COLUMN IF NOT EXISTS acknowledgement_due_days SMALLINT,
+    ADD COLUMN IF NOT EXISTS retention_policy_code    VARCHAR(40),
+    ADD COLUMN IF NOT EXISTS legal_hold_active        BOOLEAN         NOT NULL DEFAULT FALSE,
+    ADD COLUMN IF NOT EXISTS supersedes_doc_id        VARCHAR(120),
+    ADD COLUMN IF NOT EXISTS superseded_by_doc_id     VARCHAR(120);
+
+COMMENT ON COLUMN documents.effective_from IS 'When the document becomes effective (controlled-issue date).';
+COMMENT ON COLUMN documents.effective_until IS 'When the document expires (NULL = indefinite until retired).';
+COMMENT ON COLUMN documents.effective_scope IS 'Scope envelope: {plant_ids:[…], dept_codes:[…], role_codes:[…], geo_country_codes:[…]}. Empty {} means global.';
+COMMENT ON COLUMN documents.acknowledgement_required IS 'TRUE if affected users must acknowledge they read this document (21 CFR Part 11 §11.10(d)).';
+COMMENT ON COLUMN documents.acknowledgement_due_days IS 'Calendar days from effective_from for users to acknowledge before being flagged non-compliant.';
+COMMENT ON COLUMN documents.retention_policy_code IS 'FK to retention_policy.policy_code; drives end-of-life disposal flow.';
+COMMENT ON COLUMN documents.legal_hold_active IS 'TRUE while a legal hold prevents retention disposal. Set/cleared by retention_legal_hold trigger.';
+
+CREATE INDEX IF NOT EXISTS idx_documents_effective_window
+    ON documents(effective_from, effective_until)
+    WHERE status = 'approved';
+CREATE INDEX IF NOT EXISTS idx_documents_ack_required
+    ON documents(doc_id) WHERE acknowledgement_required = TRUE AND status = 'approved';
+CREATE INDEX IF NOT EXISTS idx_documents_legal_hold
+    ON documents(doc_id) WHERE legal_hold_active = TRUE;
+
+-- ---------------------------------------------------------------------------
+-- 2. document_acknowledgement (per user × doc_revision)
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS document_acknowledgement (
+    ack_id                  UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    doc_id                  VARCHAR(120)    NOT NULL,
+    doc_revision            VARCHAR(20)     NOT NULL,
+    user_id                 UUID            NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+    acknowledged_at         TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    ip_address              INET,
+    user_agent              TEXT,
+    signature_method        VARCHAR(30)     NOT NULL DEFAULT 'session_signed'
+                            CHECK (signature_method IN ('session_signed','password_reauth','mfa_reauth','wet_signature_scan','external_id_provider')),
+    signature_hash          TEXT,
+    signature_kid           VARCHAR(50),
+    mfa_challenge_id        UUID            REFERENCES mfa_challenge(challenge_id),
+    aal_achieved            SMALLINT,
+    affirmation_text        TEXT,
+    affirmation_text_vi     TEXT,
+    quiz_answers            JSONB,
+    revoked_at              TIMESTAMPTZ,
+    revoked_by              UUID            REFERENCES users(user_id),
+    revoke_reason           TEXT,
+    metadata                JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    row_version             INTEGER         NOT NULL DEFAULT 1,
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    created_by              UUID,
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_by              UUID,
+    UNIQUE (doc_id, doc_revision, user_id)
+);
+
+COMMENT ON TABLE document_acknowledgement IS 'Per-user-per-revision document acknowledgement (21 CFR Part 11 §11.10(d) / AS9100 §7.5.3 / ISO 9001 §7.5.3).';
+COMMENT ON COLUMN document_acknowledgement.signature_method IS 'How the affirmation was authenticated (session, password reauth, MFA reauth, wet scan, external IdP).';
+COMMENT ON COLUMN document_acknowledgement.signature_hash IS 'HMAC over (user_id || doc_id || doc_revision || acknowledged_at || ip) using signature_kid.';
+COMMENT ON COLUMN document_acknowledgement.affirmation_text IS 'Exact text the user attested to (legally binding wording snapshot).';
+COMMENT ON COLUMN document_acknowledgement.quiz_answers IS 'Optional comprehension-quiz answers JSONB — proves understanding, not just sign-off.';
+
+CREATE INDEX IF NOT EXISTS idx_doc_ack_user ON document_acknowledgement(user_id, acknowledged_at DESC) WHERE revoked_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_doc_ack_doc ON document_acknowledgement(doc_id, doc_revision) WHERE revoked_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_doc_ack_pending ON document_acknowledgement(doc_id) WHERE acknowledged_at IS NULL;
+
+-- ---------------------------------------------------------------------------
+-- 3. View: documents currently in force for a (plant, dept, role) tuple
+-- ---------------------------------------------------------------------------
+CREATE OR REPLACE VIEW v_documents_in_force AS
+    SELECT
+        d.doc_id,
+        d.doc_type,
+        d.doc_category,
+        d.title,
+        d.title_vi,
+        d.current_rev,
+        d.dept_code,
+        d.owner_role,
+        d.iso_clause,
+        d.as9100_clause,
+        d.effective_from,
+        d.effective_until,
+        d.effective_scope,
+        d.acknowledgement_required,
+        d.acknowledgement_due_days,
+        d.retention_policy_code,
+        d.legal_hold_active,
+        d.org_company_code,
+        d.org_plant_id,
+        d.row_version,
+        d.created_at,
+        d.updated_at
+    FROM documents d
+    WHERE d.status = 'approved'
+      AND (d.effective_from IS NULL OR d.effective_from <= now())
+      AND (d.effective_until IS NULL OR d.effective_until > now())
+      AND d.superseded_by_doc_id IS NULL;
+
+COMMENT ON VIEW v_documents_in_force IS 'Documents currently in force (effective + within window + not superseded). / Tai lieu dang hieu luc.';
+
+-- ---------------------------------------------------------------------------
+-- 4. View: per-user pending acknowledgements (workspace inbox)
+-- ---------------------------------------------------------------------------
+CREATE OR REPLACE VIEW v_document_pending_acknowledgement AS
+    SELECT
+        u.user_id,
+        u.username,
+        u.dept_code,
+        u.primary_role_id,
+        d.doc_id,
+        d.doc_type,
+        d.title,
+        d.title_vi,
+        d.current_rev,
+        d.effective_from,
+        (d.effective_from + (COALESCE(d.acknowledgement_due_days, 14) || ' days')::interval) AS due_at,
+        CASE
+            WHEN now() > d.effective_from + (COALESCE(d.acknowledgement_due_days, 14) || ' days')::interval THEN 'overdue'
+            WHEN now() > d.effective_from + ((COALESCE(d.acknowledgement_due_days, 14) / 2) || ' days')::interval THEN 'due_soon'
+            ELSE 'on_track'
+        END AS due_state
+    FROM users u
+    CROSS JOIN documents d
+    LEFT JOIN document_acknowledgement a
+        ON a.doc_id = d.doc_id AND a.doc_revision = d.current_rev AND a.user_id = u.user_id AND a.revoked_at IS NULL
+    WHERE u.status = 'active'
+      AND d.status = 'approved'
+      AND d.acknowledgement_required = TRUE
+      AND (d.effective_from IS NULL OR d.effective_from <= now())
+      AND (d.effective_until IS NULL OR d.effective_until > now())
+      AND d.superseded_by_doc_id IS NULL
+      AND a.ack_id IS NULL
+      -- Scope: include user only if effective_scope is empty (global) or matches user's dept/plant
+      AND (
+          d.effective_scope = '{}'::jsonb
+          OR (d.effective_scope ? 'dept_codes' AND (d.effective_scope->'dept_codes') @> to_jsonb(u.dept_code::text))
+          OR (d.effective_scope ? 'plant_ids' AND u.metadata ? 'plant_id' AND (d.effective_scope->'plant_ids') @> (u.metadata->'plant_id'))
+      );
+
+COMMENT ON VIEW v_document_pending_acknowledgement IS 'Per-user in-scope effective documents lacking acknowledgement (with due_at + due_state).';
+
+-- ---------------------------------------------------------------------------
+-- 5. Trigger: keep updated_at fresh
+-- ---------------------------------------------------------------------------
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_doc_ack_set_updated_at') THEN
+        CREATE TRIGGER trg_doc_ack_set_updated_at
+            BEFORE UPDATE ON document_acknowledgement
+            FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+    END IF;
+EXCEPTION WHEN undefined_function THEN
+    NULL;
+END$$;
+
+COMMIT;
+
+-- Rollback:
+--   BEGIN;
+--   DROP VIEW IF EXISTS v_document_pending_acknowledgement;
+--   DROP VIEW IF EXISTS v_documents_in_force;
+--   DROP TABLE IF EXISTS document_acknowledgement;
+--   ALTER TABLE documents
+--     DROP COLUMN IF EXISTS effective_from,
+--     DROP COLUMN IF EXISTS effective_until,
+--     DROP COLUMN IF EXISTS effective_scope,
+--     DROP COLUMN IF EXISTS acknowledgement_required,
+--     DROP COLUMN IF EXISTS acknowledgement_due_days,
+--     DROP COLUMN IF EXISTS retention_policy_code,
+--     DROP COLUMN IF EXISTS legal_hold_active,
+--     DROP COLUMN IF EXISTS supersedes_doc_id,
+--     DROP COLUMN IF EXISTS superseded_by_doc_id;
+--   COMMIT;
+-- <<< END MIGRATION: 166_content_effective_documents_and_acknowledgement.sql
+
+-- >>> BEGIN MIGRATION: 167_content_portal_display.sql
+-- ============================================================================
+-- Migration 167: portal display — widgets, layouts, per-(scope) preferences
+-- ----------------------------------------------------------------------------
+-- Replaces mom/api/config/portal_display_config.json with a normalized,
+-- multi-tenant, RBAC-aware portal layout system.
+--
+-- Layout resolution priority (highest wins):
+--     user → role → dept → plant → global
+--
+-- Each widget declares required permission keys (permission_catalog.permission_code);
+-- the runtime hides widgets the user does not satisfy. This is the same
+-- pattern used by ServiceNow Now Experience UI Builder, Salesforce Lightning
+-- Layouts, and SAP Fiori Launchpad.
+--
+-- Idempotent.
+-- ============================================================================
+
+BEGIN;
+
+-- ---------------------------------------------------------------------------
+-- 1. portal_widget_catalog
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS portal_widget_catalog (
+    widget_code             VARCHAR(80)     PRIMARY KEY,
+    label                   VARCHAR(150)    NOT NULL,
+    label_vi                VARCHAR(150),
+    description             TEXT,
+    description_vi          TEXT,
+    render_kind             VARCHAR(40)     NOT NULL DEFAULT 'card'
+                            CHECK (render_kind IN ('card','chart','kpi_tile','list','timeline','iframe','quick_links','grid','banner','calendar','heatmap','custom')),
+    icon_token              VARCHAR(200),
+    color_token             VARCHAR(200),
+    default_props           JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    required_permissions    TEXT[]          NOT NULL DEFAULT ARRAY[]::TEXT[],
+    min_grid_cols           SMALLINT        NOT NULL DEFAULT 1,
+    min_grid_rows           SMALLINT        NOT NULL DEFAULT 1,
+    max_grid_cols           SMALLINT,
+    max_grid_rows           SMALLINT,
+    refresh_seconds         INTEGER         NOT NULL DEFAULT 60,
+    is_active               BOOLEAN         NOT NULL DEFAULT TRUE,
+    is_system               BOOLEAN         NOT NULL DEFAULT FALSE,
+    metadata                JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    row_version             INTEGER         NOT NULL DEFAULT 1,
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    created_by              UUID,
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_by              UUID,
+    deleted_at              TIMESTAMPTZ,
+    deleted_by              UUID
+);
+
+COMMENT ON TABLE portal_widget_catalog IS 'Catalogue of portal widgets (RBAC-aware). / Catalog widget portal nhan biet RBAC.';
+COMMENT ON COLUMN portal_widget_catalog.required_permissions IS 'Array of permission_catalog.permission_code values; user must hold ALL.';
+COMMENT ON COLUMN portal_widget_catalog.render_kind IS 'How the frontend renders the widget shell.';
+
+CREATE INDEX IF NOT EXISTS idx_portal_widget_active ON portal_widget_catalog(is_active) WHERE is_active = TRUE;
+
+-- ---------------------------------------------------------------------------
+-- 2. portal_layout_template
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS portal_layout_template (
+    layout_id               UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    layout_code             VARCHAR(60)     NOT NULL,
+    label                   VARCHAR(150)    NOT NULL,
+    label_vi                VARCHAR(150),
+    description             TEXT,
+    scope_kind              VARCHAR(20)     NOT NULL
+                            CHECK (scope_kind IN ('global','plant','dept','role','user')),
+    scope_id                VARCHAR(120),
+    grid_cols               SMALLINT        NOT NULL DEFAULT 12,
+    grid_row_height_px      SMALLINT        NOT NULL DEFAULT 80,
+    layout_json             JSONB           NOT NULL DEFAULT '[]'::jsonb,
+    is_default              BOOLEAN         NOT NULL DEFAULT FALSE,
+    valid_from              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    valid_until             TIMESTAMPTZ,
+    metadata                JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    row_version             INTEGER         NOT NULL DEFAULT 1,
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    created_by              UUID,
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_by              UUID,
+    deleted_at              TIMESTAMPTZ,
+    deleted_by              UUID,
+    UNIQUE (scope_kind, scope_id, layout_code, deleted_at)
+);
+
+COMMENT ON TABLE portal_layout_template IS 'Saved portal layout per scope (global / plant / dept / role / user).';
+COMMENT ON COLUMN portal_layout_template.layout_json IS 'Array of {widget_code, x, y, w, h, props_override} entries — react-grid-layout compatible.';
+COMMENT ON COLUMN portal_layout_template.scope_kind IS 'Resolution priority: user > role > dept > plant > global.';
+
+CREATE INDEX IF NOT EXISTS idx_portal_layout_scope ON portal_layout_template(scope_kind, scope_id) WHERE deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_portal_layout_default ON portal_layout_template(scope_kind, is_default) WHERE is_default = TRUE AND deleted_at IS NULL;
+
+-- ---------------------------------------------------------------------------
+-- 3. portal_layout_widget (normalized index of layout_json for queries)
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS portal_layout_widget (
+    layout_widget_id        UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    layout_id               UUID            NOT NULL REFERENCES portal_layout_template(layout_id) ON DELETE CASCADE,
+    widget_code             VARCHAR(80)     NOT NULL REFERENCES portal_widget_catalog(widget_code),
+    grid_x                  SMALLINT        NOT NULL DEFAULT 0,
+    grid_y                  SMALLINT        NOT NULL DEFAULT 0,
+    grid_w                  SMALLINT        NOT NULL DEFAULT 4,
+    grid_h                  SMALLINT        NOT NULL DEFAULT 2,
+    sort_order              INTEGER         NOT NULL DEFAULT 0,
+    props_override          JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    is_pinned               BOOLEAN         NOT NULL DEFAULT FALSE,
+    is_visible              BOOLEAN         NOT NULL DEFAULT TRUE,
+    metadata                JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    row_version             INTEGER         NOT NULL DEFAULT 1,
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now()
+);
+
+COMMENT ON TABLE portal_layout_widget IS 'Normalized index of widgets inside a portal_layout_template (denormalized in layout_json for hot-path).';
+
+CREATE INDEX IF NOT EXISTS idx_portal_layout_widget_layout ON portal_layout_widget(layout_id, sort_order);
+CREATE INDEX IF NOT EXISTS idx_portal_layout_widget_widget ON portal_layout_widget(widget_code);
+
+-- ---------------------------------------------------------------------------
+-- 4. portal_display_preference (per-user)
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS portal_display_preference (
+    user_id                 UUID            PRIMARY KEY REFERENCES users(user_id) ON DELETE CASCADE,
+    preferred_layout_id     UUID            REFERENCES portal_layout_template(layout_id) ON DELETE SET NULL,
+    theme_token             VARCHAR(200),
+    density                 VARCHAR(20)     NOT NULL DEFAULT 'comfortable'
+                            CHECK (density IN ('compact','comfortable','cozy')),
+    high_contrast           BOOLEAN         NOT NULL DEFAULT FALSE,
+    reduce_motion           BOOLEAN         NOT NULL DEFAULT FALSE,
+    locale                  VARCHAR(10)     NOT NULL DEFAULT 'vi',
+    timezone                VARCHAR(50)     NOT NULL DEFAULT 'Asia/Ho_Chi_Minh',
+    date_format             VARCHAR(20)     NOT NULL DEFAULT 'YYYY-MM-DD',
+    pinned_widgets          TEXT[]          NOT NULL DEFAULT ARRAY[]::TEXT[],
+    hidden_widgets          TEXT[]          NOT NULL DEFAULT ARRAY[]::TEXT[],
+    metadata                JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    row_version             INTEGER         NOT NULL DEFAULT 1,
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now()
+);
+
+COMMENT ON TABLE portal_display_preference IS 'Per-user portal display preferences (theme, density, locale, pinned widgets).';
+COMMENT ON COLUMN portal_display_preference.theme_token IS 'graphics_token_catalog.token_key for the chosen palette (light / dark / brand-foo).';
+
+-- ---------------------------------------------------------------------------
+-- 5. View: effective layout for a user (resolves user > role > dept > plant > global)
+-- ---------------------------------------------------------------------------
+CREATE OR REPLACE VIEW v_portal_effective_layout AS
+    WITH user_scope AS (
+        SELECT
+            u.user_id,
+            u.username,
+            u.primary_role_id::text AS role_scope_id,
+            r.role_code,
+            u.dept_code::text       AS dept_scope_id,
+            COALESCE(u.metadata->>'plant_id', NULL) AS plant_scope_id,
+            p.preferred_layout_id
+        FROM users u
+        LEFT JOIN roles r ON r.role_id = u.primary_role_id
+        LEFT JOIN portal_display_preference p ON p.user_id = u.user_id
+    ),
+    candidates AS (
+        -- user-pinned override first
+        SELECT us.user_id, lt.*, 1 AS priority
+        FROM user_scope us
+        JOIN portal_layout_template lt ON lt.layout_id = us.preferred_layout_id
+        WHERE lt.deleted_at IS NULL
+        UNION ALL
+        -- role-scope
+        SELECT us.user_id, lt.*, 2
+        FROM user_scope us
+        JOIN portal_layout_template lt ON lt.scope_kind = 'role' AND lt.scope_id = us.role_code AND lt.is_default = TRUE
+        WHERE lt.deleted_at IS NULL AND lt.valid_from <= now() AND (lt.valid_until IS NULL OR lt.valid_until > now())
+        UNION ALL
+        -- dept-scope
+        SELECT us.user_id, lt.*, 3
+        FROM user_scope us
+        JOIN portal_layout_template lt ON lt.scope_kind = 'dept' AND lt.scope_id = us.dept_scope_id AND lt.is_default = TRUE
+        WHERE lt.deleted_at IS NULL AND lt.valid_from <= now() AND (lt.valid_until IS NULL OR lt.valid_until > now())
+        UNION ALL
+        -- plant-scope
+        SELECT us.user_id, lt.*, 4
+        FROM user_scope us
+        JOIN portal_layout_template lt ON lt.scope_kind = 'plant' AND lt.scope_id = us.plant_scope_id AND lt.is_default = TRUE
+        WHERE lt.deleted_at IS NULL AND lt.valid_from <= now() AND (lt.valid_until IS NULL OR lt.valid_until > now())
+        UNION ALL
+        -- global default
+        SELECT us.user_id, lt.*, 5
+        FROM user_scope us
+        JOIN portal_layout_template lt ON lt.scope_kind = 'global' AND lt.is_default = TRUE
+        WHERE lt.deleted_at IS NULL AND lt.valid_from <= now() AND (lt.valid_until IS NULL OR lt.valid_until > now())
+    )
+    SELECT DISTINCT ON (user_id) *
+    FROM candidates
+    ORDER BY user_id, priority;
+
+COMMENT ON VIEW v_portal_effective_layout IS 'Resolves the effective portal layout per user (user > role > dept > plant > global priority).';
+
+-- ---------------------------------------------------------------------------
+-- 6. Triggers + seed
+-- ---------------------------------------------------------------------------
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_portal_widget_set_updated_at') THEN
+        CREATE TRIGGER trg_portal_widget_set_updated_at
+            BEFORE UPDATE ON portal_widget_catalog
+            FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_portal_layout_set_updated_at') THEN
+        CREATE TRIGGER trg_portal_layout_set_updated_at
+            BEFORE UPDATE ON portal_layout_template
+            FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+    END IF;
+EXCEPTION WHEN undefined_function THEN
+    NULL;
+END$$;
+
+-- Seed widget catalogue (matches the existing portal home tiles).
+INSERT INTO portal_widget_catalog (widget_code, label, label_vi, render_kind, refresh_seconds, required_permissions, default_props) VALUES
+    ('kpi.otd',                'OTD — On-Time Delivery',                'OTD — Giao hang dung han',                  'kpi_tile',     300, ARRAY['records.view'], '{"target":95,"unit":"%"}'),
+    ('kpi.fpy',                'FPY — First Pass Yield',                'FPY — Ty le dat lan dau',                   'kpi_tile',     300, ARRAY['records.view'], '{"target":98,"unit":"%"}'),
+    ('kpi.copq',               'COPQ — Cost of Poor Quality',           'COPQ — Chi phi chat luong kem',             'kpi_tile',     900, ARRAY['records.view'], '{"target":2,"unit":"%"}'),
+    ('kpi.ncr_open',           'NCR Open',                              'NCR dang mo',                                'kpi_tile',     180, ARRAY['records.view'], '{}'),
+    ('kpi.iqc_pass',           'IQC Pass Rate',                         'Ty le dat IQC',                              'kpi_tile',     300, ARRAY['records.view'], '{"target":99,"unit":"%"}'),
+    ('kpi.oee',                'OEE — Equipment Effectiveness',         'OEE — Hieu suat thiet bi',                  'kpi_tile',     300, ARRAY['records.view'], '{"target":85,"unit":"%"}'),
+    ('lifecycle.gates',        'Order lifecycle G0->G7',                 'Vong doi don hang G0->G7',                  'timeline',     120, ARRAY['records.view'], '{}'),
+    ('quicklinks.role',        'Quick links by role',                   'Truy cap nhanh theo vai tro',                'quick_links',   60, ARRAY[]::TEXT[],         '{}'),
+    ('docs.pending_ack',       'Documents pending acknowledgement',     'Tai lieu chua xac nhan da doc',              'list',          90, ARRAY['docs.view'],     '{}'),
+    ('docs.recent',            'Recently released documents',           'Tai lieu vua phat hanh',                    'list',         300, ARRAY['docs.view'],     '{}'),
+    ('audit.recent',           'Recent audit events',                   'Hoat dong gan day',                          'timeline',     120, ARRAY['audit.view'],    '{}'),
+    ('mfa.compliance',         'MFA compliance overview',               'Tinh trang tuan thu MFA',                   'kpi_tile',     600, ARRAY['mfa.policy.edit'],'{}'),
+    ('access_review.progress', 'Access review progress',                'Tien do danh gia phan quyen',                'kpi_tile',     900, ARRAY['rbac.review.run'],'{}'),
+    ('retention.due_soon',     'Documents due for retention disposal',  'Tai lieu sap den han luu giu',              'list',         3600, ARRAY['rbac.role.view'],'{}'),
+    ('graphics.preview_log',   'Recent graphics simulation runs',       'Phien gia lap giao dien gan day',            'list',         600, ARRAY['admin.backend'],'{}')
+ON CONFLICT (widget_code) DO NOTHING;
+
+-- Seed default global layout
+INSERT INTO portal_layout_template (layout_code, label, label_vi, scope_kind, scope_id, layout_json, is_default)
+VALUES (
+    'global_default',
+    'Global default portal',
+    'Bo cuc portal mac dinh toan he thong',
+    'global',
+    NULL,
+    '[
+        {"widget_code":"kpi.otd","x":0,"y":0,"w":2,"h":2},
+        {"widget_code":"kpi.fpy","x":2,"y":0,"w":2,"h":2},
+        {"widget_code":"kpi.copq","x":4,"y":0,"w":2,"h":2},
+        {"widget_code":"kpi.ncr_open","x":6,"y":0,"w":2,"h":2},
+        {"widget_code":"kpi.iqc_pass","x":8,"y":0,"w":2,"h":2},
+        {"widget_code":"kpi.oee","x":10,"y":0,"w":2,"h":2},
+        {"widget_code":"lifecycle.gates","x":0,"y":2,"w":12,"h":3},
+        {"widget_code":"quicklinks.role","x":0,"y":5,"w":6,"h":4},
+        {"widget_code":"docs.pending_ack","x":6,"y":5,"w":6,"h":4}
+    ]'::jsonb,
+    TRUE
+)
+ON CONFLICT DO NOTHING;
+
+COMMIT;
+
+-- Rollback:
+--   BEGIN;
+--   DROP VIEW IF EXISTS v_portal_effective_layout;
+--   DROP TABLE IF EXISTS portal_display_preference;
+--   DROP TABLE IF EXISTS portal_layout_widget;
+--   DROP TABLE IF EXISTS portal_layout_template;
+--   DROP TABLE IF EXISTS portal_widget_catalog;
+--   COMMIT;
+-- <<< END MIGRATION: 167_content_portal_display.sql
+
+-- >>> BEGIN MIGRATION: 168_content_retention_policy.sql
+-- ============================================================================
+-- Migration 168: retention_policy + class_assignment + disposal_event + legal_hold
+-- ----------------------------------------------------------------------------
+-- Records-management lifecycle for the admin "Lưu giữ" tab.
+--
+-- Compliance references
+--   * ISO 9001 §7.5.3.2  — Control of documented information (retention)
+--   * AS9100D §7.5.3     — Aerospace records control
+--   * 21 CFR Part 11 §11.10(c) — Protection of records to enable accurate
+--                                 and ready retrieval throughout the
+--                                 retention period
+--   * GDPR Art. 5(1)(e)  — Storage limitation principle
+--   * GDPR Art. 17       — Right to erasure
+--   * SEC Rule 17a-4     — Broker-dealer records retention (USA)
+--   * Vietnam Law on Archives 2011 + Decree 01/2013/ND-CP — minimum
+--                                 retention periods for production/quality
+--                                 records (5–20 years).
+--
+-- Idempotent.
+-- ============================================================================
+
+BEGIN;
+
+-- ---------------------------------------------------------------------------
+-- 1. retention_policy
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS retention_policy (
+    policy_code                 VARCHAR(40)     PRIMARY KEY,
+    label                       VARCHAR(200)    NOT NULL,
+    label_vi                    VARCHAR(200),
+    description                 TEXT,
+    description_vi              TEXT,
+    doc_pattern                 VARCHAR(200)    NOT NULL,
+    record_class                VARCHAR(60),
+    retention_period_years      NUMERIC(6,2)    NOT NULL,
+    retention_basis             VARCHAR(20)     NOT NULL DEFAULT 'operational'
+                                CHECK (retention_basis IN ('regulatory','operational','legal_hold','contractual','customer_required')),
+    retention_trigger           VARCHAR(40)     NOT NULL DEFAULT 'effective_from'
+                                CHECK (retention_trigger IN ('effective_from','superseded_at','retired_at','contract_end','event_date','last_used_at')),
+    disposition_method          VARCHAR(20)     NOT NULL DEFAULT 'archive'
+                                CHECK (disposition_method IN ('archive','destroy','return','redact','review')),
+    disposition_witness_required BOOLEAN        NOT NULL DEFAULT FALSE,
+    legal_hold_supersedes       BOOLEAN         NOT NULL DEFAULT TRUE,
+    notification_lead_days      SMALLINT        NOT NULL DEFAULT 30,
+    compliance_refs             TEXT[]          NOT NULL DEFAULT ARRAY[]::TEXT[],
+    is_active                   BOOLEAN         NOT NULL DEFAULT TRUE,
+    metadata                    JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version      VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    org_company_code            VARCHAR(30),
+    org_legal_entity_code       VARCHAR(30),
+    org_plant_id                VARCHAR(30),
+    org_site_id                 VARCHAR(30),
+    row_version                 INTEGER         NOT NULL DEFAULT 1,
+    created_at                  TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    created_by                  UUID,
+    updated_at                  TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_by                  UUID,
+    deleted_at                  TIMESTAMPTZ,
+    deleted_by                  UUID
+);
+
+COMMENT ON TABLE retention_policy IS 'Document/record retention policies (ISO 9001 §7.5.3.2 / AS9100 / 21 CFR §11.10(c) / GDPR / Vietnam Archives Law).';
+COMMENT ON COLUMN retention_policy.doc_pattern IS 'Glob (sop-*), exact code (qms-man-001), or label (all_qa_records).';
+COMMENT ON COLUMN retention_policy.retention_period_years IS 'Numeric so half-years (0.5 = 6 months, 99 = effectively permanent).';
+COMMENT ON COLUMN retention_policy.retention_trigger IS 'Which timestamp starts the retention clock.';
+COMMENT ON COLUMN retention_policy.legal_hold_supersedes IS 'TRUE if an active legal hold blocks disposal — typically TRUE for everything.';
+
+CREATE INDEX IF NOT EXISTS idx_retention_policy_pattern ON retention_policy(doc_pattern) WHERE is_active = TRUE AND deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_retention_policy_basis ON retention_policy(retention_basis) WHERE is_active = TRUE;
+
+-- FK from documents.retention_policy_code (added in 166) to retention_policy.policy_code.
+-- Use a NOT VALID FK so existing rows don't fail; revalidate after backfill.
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint WHERE conname = 'fk_documents_retention_policy_code'
+    ) THEN
+        BEGIN
+            ALTER TABLE documents
+                ADD CONSTRAINT fk_documents_retention_policy_code
+                FOREIGN KEY (retention_policy_code) REFERENCES retention_policy(policy_code) NOT VALID;
+        EXCEPTION WHEN OTHERS THEN
+            -- documents may not have the column yet if 166 was rolled back; skip silently.
+            NULL;
+        END;
+    END IF;
+END$$;
+
+-- ---------------------------------------------------------------------------
+-- 2. retention_class_assignment (per-doc explicit assignment + history)
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS retention_class_assignment (
+    assignment_id           UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    doc_id                  VARCHAR(120)    NOT NULL,
+    policy_code             VARCHAR(40)     NOT NULL REFERENCES retention_policy(policy_code),
+    classified_at           TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    classified_by           UUID            REFERENCES users(user_id),
+    classification_reason   TEXT,
+    override_of_id          UUID            REFERENCES retention_class_assignment(assignment_id),
+    override_reason         TEXT,
+    valid_from              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    valid_until             TIMESTAMPTZ,
+    metadata                JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    row_version             INTEGER         NOT NULL DEFAULT 1,
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    created_by              UUID,
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_by              UUID,
+    deleted_at              TIMESTAMPTZ,
+    deleted_by              UUID
+);
+
+COMMENT ON TABLE retention_class_assignment IS 'Per-document retention-policy assignment with override history. / Gan chinh sach luu giu cho tung tai lieu.';
+
+CREATE INDEX IF NOT EXISTS idx_retention_assignment_doc ON retention_class_assignment(doc_id) WHERE deleted_at IS NULL AND valid_until IS NULL;
+CREATE INDEX IF NOT EXISTS idx_retention_assignment_policy ON retention_class_assignment(policy_code) WHERE deleted_at IS NULL;
+
+-- ---------------------------------------------------------------------------
+-- 3. retention_disposal_event (audit-grade disposal log)
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS retention_disposal_event (
+    event_id                UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    doc_id                  VARCHAR(120)    NOT NULL,
+    doc_revision            VARCHAR(20),
+    policy_code             VARCHAR(40)     REFERENCES retention_policy(policy_code),
+    disposal_method         VARCHAR(20)     NOT NULL
+                            CHECK (disposal_method IN ('archive','destroy','return','redact','review')),
+    disposal_status         VARCHAR(20)     NOT NULL DEFAULT 'completed'
+                            CHECK (disposal_status IN ('scheduled','in_progress','completed','blocked','reversed')),
+    scheduled_for           TIMESTAMPTZ,
+    started_at              TIMESTAMPTZ,
+    completed_at            TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    disposed_by             UUID            REFERENCES users(user_id),
+    witnessed_by            UUID            REFERENCES users(user_id),
+    evidence_hash           TEXT,
+    evidence_kid            VARCHAR(50),
+    storage_location_before VARCHAR(255),
+    storage_location_after  VARCHAR(255),
+    audit_trail             JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    chain_of_custody        JSONB           NOT NULL DEFAULT '[]'::jsonb,
+    reverse_of_event_id     UUID            REFERENCES retention_disposal_event(event_id),
+    reverse_reason          TEXT,
+    metadata                JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    row_version             INTEGER         NOT NULL DEFAULT 1,
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    created_by              UUID,
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_by              UUID
+);
+
+COMMENT ON TABLE retention_disposal_event IS 'Audit log of every disposal action (scheduled / completed / blocked / reversed). Append-mostly.';
+COMMENT ON COLUMN retention_disposal_event.evidence_hash IS 'HMAC over (doc_id || doc_revision || method || completed_at || disposed_by) using evidence_kid — proves integrity of the disposal record.';
+COMMENT ON COLUMN retention_disposal_event.chain_of_custody IS 'Array of {actor_id, action, ts, location} entries documenting handling.';
+
+CREATE INDEX IF NOT EXISTS idx_retention_disposal_doc ON retention_disposal_event(doc_id, completed_at DESC);
+CREATE INDEX IF NOT EXISTS idx_retention_disposal_status ON retention_disposal_event(disposal_status, scheduled_for);
+
+-- ---------------------------------------------------------------------------
+-- 4. retention_legal_hold
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS retention_legal_hold (
+    hold_id                 UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    hold_code               VARCHAR(60)     NOT NULL UNIQUE,
+    label                   VARCHAR(200)    NOT NULL,
+    label_vi                VARCHAR(200),
+    description             TEXT,
+    description_vi          TEXT,
+    doc_pattern             VARCHAR(200)    NOT NULL,
+    case_ref                VARCHAR(120),
+    jurisdiction            VARCHAR(80),
+    legal_basis             TEXT,
+    started_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    started_by              UUID            REFERENCES users(user_id),
+    expected_release_at     TIMESTAMPTZ,
+    released_at             TIMESTAMPTZ,
+    released_by             UUID            REFERENCES users(user_id),
+    release_reason          TEXT,
+    is_active               BOOLEAN         NOT NULL DEFAULT TRUE,
+    metadata                JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    payload_schema_version  VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    org_company_code        VARCHAR(30),
+    org_legal_entity_code   VARCHAR(30),
+    org_plant_id            VARCHAR(30),
+    org_site_id             VARCHAR(30),
+    row_version             INTEGER         NOT NULL DEFAULT 1,
+    created_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    created_by              UUID,
+    updated_at              TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_by              UUID,
+    deleted_at              TIMESTAMPTZ,
+    deleted_by              UUID
+);
+
+COMMENT ON TABLE retention_legal_hold IS 'Active legal holds that prevent retention disposal until released.';
+
+CREATE INDEX IF NOT EXISTS idx_retention_hold_active ON retention_legal_hold(is_active, doc_pattern) WHERE is_active = TRUE AND deleted_at IS NULL;
+CREATE INDEX IF NOT EXISTS idx_retention_hold_pattern ON retention_legal_hold(doc_pattern);
+
+-- ---------------------------------------------------------------------------
+-- 5. View: documents past retention but not on legal hold
+-- ---------------------------------------------------------------------------
+CREATE OR REPLACE VIEW v_retention_due_for_disposal AS
+    SELECT
+        d.doc_id,
+        d.doc_type,
+        d.title,
+        d.title_vi,
+        d.current_rev,
+        d.status,
+        d.effective_from,
+        d.effective_until,
+        d.retention_policy_code,
+        rp.label                                   AS policy_label,
+        rp.retention_period_years,
+        rp.disposition_method,
+        CASE rp.retention_trigger
+            WHEN 'effective_from'  THEN d.effective_from
+            WHEN 'superseded_at'   THEN d.updated_at
+            WHEN 'retired_at'      THEN d.updated_at
+            ELSE d.updated_at
+        END                                        AS clock_started_at,
+        CASE rp.retention_trigger
+            WHEN 'effective_from'  THEN d.effective_from
+            WHEN 'superseded_at'   THEN d.updated_at
+            WHEN 'retired_at'      THEN d.updated_at
+            ELSE d.updated_at
+        END + (rp.retention_period_years || ' years')::interval AS due_at,
+        d.legal_hold_active,
+        EXISTS (
+            SELECT 1 FROM retention_legal_hold h
+            WHERE h.is_active = TRUE
+              AND h.deleted_at IS NULL
+              AND (h.doc_pattern = d.doc_id
+                   OR (h.doc_pattern LIKE '%*%' AND d.doc_id LIKE replace(h.doc_pattern, '*', '%')))
+        )                                          AS hold_blocks_disposal,
+        d.org_company_code,
+        d.org_plant_id
+    FROM documents d
+    JOIN retention_policy rp ON rp.policy_code = d.retention_policy_code AND rp.is_active = TRUE
+    WHERE d.status IN ('approved','superseded','obsolete')
+      AND (
+          CASE rp.retention_trigger
+              WHEN 'effective_from'  THEN d.effective_from
+              WHEN 'superseded_at'   THEN d.updated_at
+              WHEN 'retired_at'      THEN d.updated_at
+              ELSE d.updated_at
+          END + (rp.retention_period_years || ' years')::interval
+      ) <= now() + interval '60 days';
+
+COMMENT ON VIEW v_retention_due_for_disposal IS 'Documents past or within 60d of retention, with hold_blocks_disposal flag. Drives the "Lưu giữ" admin queue.';
+
+-- ---------------------------------------------------------------------------
+-- 6. Triggers
+-- ---------------------------------------------------------------------------
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_retention_policy_set_updated_at') THEN
+        CREATE TRIGGER trg_retention_policy_set_updated_at
+            BEFORE UPDATE ON retention_policy
+            FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_retention_assignment_set_updated_at') THEN
+        CREATE TRIGGER trg_retention_assignment_set_updated_at
+            BEFORE UPDATE ON retention_class_assignment
+            FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'trg_retention_hold_set_updated_at') THEN
+        CREATE TRIGGER trg_retention_hold_set_updated_at
+            BEFORE UPDATE ON retention_legal_hold
+            FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+    END IF;
+EXCEPTION WHEN undefined_function THEN
+    NULL;
+END$$;
+
+-- ---------------------------------------------------------------------------
+-- 7. Seed: standard QMS retention policies (Vietnam + AS9100 baseline)
+-- ---------------------------------------------------------------------------
+INSERT INTO retention_policy
+    (policy_code, label, label_vi, doc_pattern, record_class, retention_period_years, retention_basis, retention_trigger, disposition_method, compliance_refs, description)
+VALUES
+    ('RET-QMS-MAN',  'QMS Manual',                            'So tay QMS',                          'qms-man-*',     'manual',       20,    'regulatory',  'superseded_at', 'archive', ARRAY['ISO9001-7.5.3.2','AS9100D-7.5.3','VN-Archives-2011'], 'QMS manual revisions retained 20 years post-supersession.'),
+    ('RET-SOP',      'Standard Operating Procedure',          'Quy trinh tac nghiep',                'sop-*',         'procedure',    10,    'regulatory',  'superseded_at', 'archive', ARRAY['ISO9001-7.5.3.2','AS9100D-7.5.3'],                  'SOPs retained 10 years post-supersession.'),
+    ('RET-WI',       'Work Instruction',                      'Huong dan cong viec',                  'wi-*',          'instruction',   7,    'operational', 'superseded_at', 'archive', ARRAY['ISO9001-7.5.3.2'],                                  'WIs retained 7 years post-supersession.'),
+    ('RET-FRM-QC',   'Quality Form Records',                  'Ho so bieu mau chat luong',            'frm-6*',        'qc_record',    10,    'regulatory',  'effective_from','archive', ARRAY['ISO9001-7.5.3.2','AS9100D-7.5.3','21CFR-11.10(c)'],   'QC inspection / NCR / CAPA records 10 years.'),
+    ('RET-FRM-PROD', 'Production Form Records',               'Ho so bieu mau san xuat',              'frm-5*',        'prod_record',   7,    'operational', 'effective_from','archive', ARRAY['ISO9001-7.5.3.2'],                                  'Production travelers / setup sheets 7 years.'),
+    ('RET-FRM-FIN',  'Finance / Procurement Records',         'Ho so tai chinh / mua hang',           'frm-7*',        'fin_record',   10,    'regulatory',  'effective_from','archive', ARRAY['VN-Accounting-Law-2015','SOX-404'],                'Finance records 10 years (Vietnamese accounting law).'),
+    ('RET-FRM-HR',   'HR Records',                            'Ho so nhan su',                         'frm-8*',        'hr_record',    50,    'regulatory',  'last_used_at',  'archive', ARRAY['VN-Labor-Code-2019','GDPR-Art.5'],                  'HR personnel files 50 years; GDPR redaction at 5y after offboarding.'),
+    ('RET-AUDIT',    'Audit / Compliance Evidence',           'Bang chung kiem toan / tuan thu',      'audit-*',       'audit_record', 10,    'regulatory',  'event_date',    'archive', ARRAY['SOX-404','ISO27001-A.18.1.3'],                     'Audit trails 10 years.'),
+    ('RET-TRAIN',    'Training Records',                      'Ho so dao tao',                         'frm-3*',        'train_record',  7,    'regulatory',  'event_date',    'archive', ARRAY['ISO9001-7.2','AS9100D-7.2'],                       'Training records 7 years post-event.'),
+    ('RET-POLICY',   'Policy / Charter',                      'Chinh sach / dieu le',                  'pol-*',         'policy',       99,    'regulatory',  'superseded_at', 'archive', ARRAY['ISO9001-7.5.3.2'],                                  'Policies retained indefinitely.')
+ON CONFLICT (policy_code) DO NOTHING;
+
+COMMIT;
+
+-- Rollback:
+--   BEGIN;
+--   DROP VIEW IF EXISTS v_retention_due_for_disposal;
+--   ALTER TABLE documents DROP CONSTRAINT IF EXISTS fk_documents_retention_policy_code;
+--   DROP TABLE IF EXISTS retention_legal_hold;
+--   DROP TABLE IF EXISTS retention_disposal_event;
+--   DROP TABLE IF EXISTS retention_class_assignment;
+--   DROP TABLE IF EXISTS retention_policy;
+--   COMMIT;
+-- <<< END MIGRATION: 168_content_retention_policy.sql
+
+-- >>> BEGIN MIGRATION: 169_diacritics_repair.sql
+-- ============================================================================
+-- Migration 169: repair ASCII-only Vietnamese seeds (full diacritics)
+-- ----------------------------------------------------------------------------
+-- Earlier seeds (162 / 167 / 168) wrote `label_vi` / `description_vi` /
+-- `rationale_vi` columns using ASCII-only Vietnamese (e.g. "Truong Phong
+-- Tai Chinh"). These columns surface directly in the admin UI through
+-- /api/v1/runtime/* and the dedicated governance endpoints, so the user
+-- saw mojibake-looking strings without diacritics.
+--
+-- Project rule (recorded at the system level): backend stays English,
+-- frontend Vietnamese always uses full diacritics. This migration restores
+-- diacritics on the user-facing rows.
+--
+-- Strategy: UPDATE … WHERE current value matches the bad string. Idempotent —
+-- re-running is a no-op once the diacritic'd values are in place.
+-- ============================================================================
+
+BEGIN;
+
+-- ---------------------------------------------------------------------------
+-- 162_rbac_role_sod_conflict.sql — 4 conflicts
+-- ---------------------------------------------------------------------------
+UPDATE role_sod_conflict SET
+    label_vi     = 'Trưởng Phòng Tài Chính + Kiểm Toán Nội Bộ',
+    rationale_vi = 'Trưởng phòng tài chính kiểm soát sổ sách cần kiểm toán; kiêm kết hợp vai trò kiểm toán nội bộ tạo xung đột tự kiểm toán.'
+WHERE label_vi = 'Truong Phong Tai Chinh + Kiem Toan Noi Bo';
+
+UPDATE role_sod_conflict SET
+    label_vi     = 'Soạn tài liệu QMS + Duyệt tài liệu QMS',
+    rationale_vi = 'Người soạn tài liệu kiểm soát không nên là người duy nhất phê duyệt; cảnh báo trừ khi việc phê duyệt được uỷ quyền.'
+WHERE label_vi = 'Soan tai lieu QMS + Duyet tai lieu QMS';
+
+UPDATE role_sod_conflict SET
+    label_vi     = 'Giám Đốc Sản Xuất + Trưởng Phòng Chất Lượng',
+    rationale_vi = 'Chủ sở hữu sản xuất không nên tự xoá các chốt kiểm soát chất lượng; cảnh báo cho đến khi có uỷ quyền quy trình.'
+WHERE label_vi = 'Giam Doc San Xuat + Truong Phong Chat Luong';
+
+UPDATE role_sod_conflict SET
+    label_vi     = 'Quản Trị IT + Tổng Giám Đốc',
+    rationale_vi = 'CEO được gán IT-Admin sẽ có quyền siêu người dùng kỹ thuật; đánh giá trong chu kỳ tiếp theo.'
+WHERE label_vi = 'Quan Tri IT + Tong Giam Doc';
+
+-- ---------------------------------------------------------------------------
+-- 167_content_portal_display.sql — 15 widgets + 1 layout
+-- ---------------------------------------------------------------------------
+UPDATE portal_widget_catalog SET label_vi = 'OTD — Giao hàng đúng hạn'                           WHERE widget_code = 'kpi.otd'                AND label_vi = 'OTD — Giao hang dung han';
+UPDATE portal_widget_catalog SET label_vi = 'FPY — Tỷ lệ đạt lần đầu'                            WHERE widget_code = 'kpi.fpy'                AND label_vi = 'FPY — Ty le dat lan dau';
+UPDATE portal_widget_catalog SET label_vi = 'COPQ — Chi phí chất lượng kém'                      WHERE widget_code = 'kpi.copq'               AND label_vi = 'COPQ — Chi phi chat luong kem';
+UPDATE portal_widget_catalog SET label_vi = 'NCR đang mở'                                         WHERE widget_code = 'kpi.ncr_open'           AND label_vi = 'NCR dang mo';
+UPDATE portal_widget_catalog SET label_vi = 'Tỷ lệ đạt IQC'                                       WHERE widget_code = 'kpi.iqc_pass'           AND label_vi = 'Ty le dat IQC';
+UPDATE portal_widget_catalog SET label_vi = 'OEE — Hiệu suất thiết bị'                            WHERE widget_code = 'kpi.oee'                AND label_vi = 'OEE — Hieu suat thiet bi';
+UPDATE portal_widget_catalog SET label_vi = 'Vòng đời đơn hàng G0→G7'                             WHERE widget_code = 'lifecycle.gates'        AND label_vi = 'Vong doi don hang G0->G7';
+UPDATE portal_widget_catalog SET label_vi = 'Truy cập nhanh theo vai trò'                         WHERE widget_code = 'quicklinks.role'        AND label_vi = 'Truy cap nhanh theo vai tro';
+UPDATE portal_widget_catalog SET label_vi = 'Tài liệu chưa xác nhận đã đọc'                       WHERE widget_code = 'docs.pending_ack'       AND label_vi = 'Tai lieu chua xac nhan da doc';
+UPDATE portal_widget_catalog SET label_vi = 'Tài liệu vừa phát hành'                              WHERE widget_code = 'docs.recent'            AND label_vi = 'Tai lieu vua phat hanh';
+UPDATE portal_widget_catalog SET label_vi = 'Hoạt động gần đây'                                   WHERE widget_code = 'audit.recent'           AND label_vi = 'Hoat dong gan day';
+UPDATE portal_widget_catalog SET label_vi = 'Tình trạng tuân thủ MFA'                             WHERE widget_code = 'mfa.compliance'         AND label_vi = 'Tinh trang tuan thu MFA';
+UPDATE portal_widget_catalog SET label_vi = 'Tiến độ đánh giá phân quyền'                         WHERE widget_code = 'access_review.progress' AND label_vi = 'Tien do danh gia phan quyen';
+UPDATE portal_widget_catalog SET label_vi = 'Tài liệu sắp đến hạn lưu giữ'                        WHERE widget_code = 'retention.due_soon'     AND label_vi = 'Tai lieu sap den han luu giu';
+UPDATE portal_widget_catalog SET label_vi = 'Phiên giả lập giao diện gần đây'                     WHERE widget_code = 'graphics.preview_log'   AND label_vi = 'Phien gia lap giao dien gan day';
+
+UPDATE portal_layout_template SET label_vi = 'Bố cục portal mặc định toàn hệ thống'
+WHERE layout_code = 'global_default' AND label_vi = 'Bo cuc portal mac dinh toan he thong';
+
+-- ---------------------------------------------------------------------------
+-- 168_content_retention_policy.sql — 10 retention policies
+-- ---------------------------------------------------------------------------
+UPDATE retention_policy SET label_vi = 'Sổ tay QMS'                            WHERE policy_code = 'RET-QMS-MAN'  AND label_vi = 'So tay QMS';
+UPDATE retention_policy SET label_vi = 'Quy trình tác nghiệp'                  WHERE policy_code = 'RET-SOP'      AND label_vi = 'Quy trinh tac nghiep';
+UPDATE retention_policy SET label_vi = 'Hướng dẫn công việc'                   WHERE policy_code = 'RET-WI'       AND label_vi = 'Huong dan cong viec';
+UPDATE retention_policy SET label_vi = 'Hồ sơ biểu mẫu chất lượng'             WHERE policy_code = 'RET-FRM-QC'   AND label_vi = 'Ho so bieu mau chat luong';
+UPDATE retention_policy SET label_vi = 'Hồ sơ biểu mẫu sản xuất'               WHERE policy_code = 'RET-FRM-PROD' AND label_vi = 'Ho so bieu mau san xuat';
+UPDATE retention_policy SET label_vi = 'Hồ sơ tài chính / mua hàng'            WHERE policy_code = 'RET-FRM-FIN'  AND label_vi = 'Ho so tai chinh / mua hang';
+UPDATE retention_policy SET label_vi = 'Hồ sơ nhân sự'                         WHERE policy_code = 'RET-FRM-HR'   AND label_vi = 'Ho so nhan su';
+UPDATE retention_policy SET label_vi = 'Bằng chứng kiểm toán / tuân thủ'       WHERE policy_code = 'RET-AUDIT'    AND label_vi = 'Bang chung kiem toan / tuan thu';
+UPDATE retention_policy SET label_vi = 'Hồ sơ đào tạo'                         WHERE policy_code = 'RET-TRAIN'    AND label_vi = 'Ho so dao tao';
+UPDATE retention_policy SET label_vi = 'Chính sách / điều lệ'                  WHERE policy_code = 'RET-POLICY'   AND label_vi = 'Chinh sach / dieu le';
+
+COMMIT;
+
+-- Rollback (only meaningful if executed before any further row edits):
+--   BEGIN;
+--   -- Restore the ASCII-only forms (not recommended; provided for completeness).
+--   COMMIT;
+-- <<< END MIGRATION: 169_diacritics_repair.sql
+
+-- >>> BEGIN MIGRATION: 170_diacritics_repair_permission_catalog.sql
+-- ============================================================================
+-- Migration 170: repair Vietnamese diacritics on permission_catalog seeds
+-- ----------------------------------------------------------------------------
+-- Migration 159 seeded permission_catalog with ASCII-only Vietnamese in
+-- label_vi + description_vi columns ("Xem nhat ky kiem tra"). These render
+-- directly in the "Catalog Quyền" admin tab. This migration restores full
+-- diacritics on 28 rows.
+--
+-- Project rule (recorded in user memory): backend stays English, frontend
+-- Vietnamese always uses full diacritics. Idempotent: re-running is a no-op
+-- once the diacritic'd values are in place.
+-- ============================================================================
+
+BEGIN;
+
+UPDATE permission_catalog SET label_vi = 'Xem tài liệu kiểm soát',           description_vi = 'Quyền đọc tài liệu kiểm soát QMS.'                                          WHERE permission_code = 'docs.view'        AND label_vi = 'Xem tai lieu kiem soat';
+UPDATE permission_catalog SET label_vi = 'Tạo tài liệu kiểm soát',           description_vi = 'Soạn thảo SOP/WI/Form mới.'                                                  WHERE permission_code = 'docs.create'      AND label_vi = 'Tao tai lieu kiem soat';
+UPDATE permission_catalog SET label_vi = 'Sửa tài liệu kiểm soát',           description_vi = 'Sửa bản thảo tài liệu kiểm soát.'                                            WHERE permission_code = 'docs.edit'        AND label_vi = 'Sua tai lieu kiem soat';
+UPDATE permission_catalog SET label_vi = 'Duyệt tài liệu kiểm soát',         description_vi = 'Duyệt phát hành tài liệu theo DCC.'                                          WHERE permission_code = 'docs.approve'     AND label_vi = 'Duyet tai lieu kiem soat';
+UPDATE permission_catalog SET label_vi = 'Thu hồi / thay thế tài liệu',      description_vi = 'Thu hồi/thay thế phiên bản tài liệu.'                                        WHERE permission_code = 'docs.retire'      AND label_vi = 'Thu hoi / thay the tai lieu';
+
+UPDATE permission_catalog SET label_vi = 'Xem hồ sơ QMS',                    description_vi = 'Đọc hồ sơ FRM-* và bằng chứng vận hành.'                                     WHERE permission_code = 'records.view'     AND label_vi = 'Xem ho so QMS';
+UPDATE permission_catalog SET label_vi = 'Tạo hồ sơ QMS',                    description_vi = 'Tạo hồ sơ FRM-* mới.'                                                        WHERE permission_code = 'records.create'   AND label_vi = 'Tao ho so QMS';
+UPDATE permission_catalog SET label_vi = 'Xuất hồ sơ QMS',                   description_vi = 'Xuất hồ sơ ra Excel/CSV.'                                                    WHERE permission_code = 'records.export'   AND label_vi = 'Xuat ho so QMS';
+
+UPDATE permission_catalog SET label_vi = 'Xem danh sách người dùng',         description_vi = 'Đọc danh sách người dùng.'                                                   WHERE permission_code = 'users.view'       AND label_vi = 'Xem danh sach nguoi dung';
+UPDATE permission_catalog SET label_vi = 'Tạo người dùng',                   description_vi = 'Cấp mới tài khoản người dùng.'                                               WHERE permission_code = 'users.create'     AND label_vi = 'Tao nguoi dung';
+UPDATE permission_catalog SET label_vi = 'Sửa người dùng',                   description_vi = 'Cập nhật hồ sơ/phòng ban/vai trò của người dùng.'                            WHERE permission_code = 'users.edit'       AND label_vi = 'Sua nguoi dung';
+UPDATE permission_catalog SET label_vi = 'Khoá / ngừng sử dụng',             description_vi = 'Khoá hoặc khởi tạo quy trình nghỉ việc của người dùng.'                      WHERE permission_code = 'users.disable'    AND label_vi = 'Khoa / ngung su dung';
+UPDATE permission_catalog SET label_vi = 'Reset mật khẩu người dùng',        description_vi = 'Reset mật khẩu của người dùng khác.'                                         WHERE permission_code = 'users.reset_pw'   AND label_vi = 'Reset mat khau nguoi dung';
+UPDATE permission_catalog SET label_vi = 'Xuất danh sách người dùng',        description_vi = 'Xuất danh sách người dùng ra Excel/CSV.'                                     WHERE permission_code = 'users.export'     AND label_vi = 'Xuat danh sach nguoi dung';
+
+UPDATE permission_catalog SET label_vi = 'Xem vai trò',                      description_vi = 'Đọc danh mục vai trò.'                                                       WHERE permission_code = 'rbac.role.view'   AND label_vi = 'Xem vai tro';
+UPDATE permission_catalog SET label_vi = 'Sửa quyền vai trò',                description_vi = 'Sửa ma trận phân quyền vai trò.'                                             WHERE permission_code = 'rbac.role.edit'   AND label_vi = 'Sua quyen vai tro';
+UPDATE permission_catalog SET label_vi = 'Sửa phân quyền module',            description_vi = 'Sửa ma trận truy cập module.'                                                WHERE permission_code = 'rbac.module.edit' AND label_vi = 'Sua phan quyen module';
+UPDATE permission_catalog SET label_vi = 'Cấp phân quyền tài liệu',          description_vi = 'Cấp phân quyền tài liệu cấp nhân/tài liệu.'                                  WHERE permission_code = 'rbac.doc.grant'   AND label_vi = 'Cap phan quyen tai lieu';
+UPDATE permission_catalog SET label_vi = 'Sửa ma trận tách trách nhiệm',     description_vi = 'Sửa ma trận xung đột tách trách nhiệm.'                                      WHERE permission_code = 'rbac.sod.edit'    AND label_vi = 'Sua ma tran tach trach nhiem';
+UPDATE permission_catalog SET label_vi = 'Chạy đánh giá phân quyền',         description_vi = 'Khởi tạo chu kỳ đánh giá phân quyền định kỳ.'                                WHERE permission_code = 'rbac.review.run'  AND label_vi = 'Chay danh gia phan quyen';
+
+UPDATE permission_catalog SET label_vi = 'Sửa chính sách MFA',               description_vi = 'Sửa chính sách MFA theo vai trò.'                                            WHERE permission_code = 'mfa.policy.edit'  AND label_vi = 'Sua chinh sach MFA';
+UPDATE permission_catalog SET label_vi = 'Thu hồi yếu tố MFA',               description_vi = 'Thu hồi một yếu tố MFA của người dùng.'                                      WHERE permission_code = 'mfa.factor.revoke'AND label_vi = 'Thu hoi yeu to MFA';
+UPDATE permission_catalog SET label_vi = 'Reset toàn bộ MFA',                description_vi = 'Reset toàn bộ yếu tố MFA của người dùng (buộc ghi danh lại).'               WHERE permission_code = 'mfa.factor.reset' AND label_vi = 'Reset toan bo MFA';
+
+UPDATE permission_catalog SET label_vi = 'Xem nhật ký kiểm tra',             description_vi = 'Đọc nhật ký kiểm tra hệ thống.'                                              WHERE permission_code = 'audit.view'       AND label_vi = 'Xem nhat ky kiem tra';
+UPDATE permission_catalog SET label_vi = 'Xuất nhật ký kiểm tra',            description_vi = 'Xuất nhật ký kiểm tra cho đánh giá bên ngoài.'                               WHERE permission_code = 'audit.export'     AND label_vi = 'Xuat nhat ky kiem tra';
+
+UPDATE permission_catalog SET label_vi = 'Truy cập admin backend',           description_vi = 'Truy cập khu vực quản trị / governance.'                                     WHERE permission_code = 'admin.backend'    AND label_vi = 'Truy cap admin backend';
+
+UPDATE permission_catalog SET label_vi = 'Duyệt đơn mua hàng',               description_vi = 'Duyệt đơn mua hàng vượt ngưỡng.'                                             WHERE permission_code = 'finance.po.approve'      AND label_vi = 'Duyet don mua hang';
+UPDATE permission_catalog SET label_vi = 'Thực hiện thanh toán',             description_vi = 'Khởi tạo chuyển khoản thanh toán nhà cung cấp.'                              WHERE permission_code = 'finance.payment.execute' AND label_vi = 'Thuc hien thanh toan';
+
+COMMIT;
+-- <<< END MIGRATION: 170_diacritics_repair_permission_catalog.sql
+
+-- >>> BEGIN MIGRATION: 171_diacritics_repair_modules_catalog.sql
+-- ============================================================================
+-- Migration 171: repair Vietnamese diacritics on modules_catalog seeds
+-- ----------------------------------------------------------------------------
+-- Migration 160 seeded modules_catalog.label_vi with ASCII-only Vietnamese
+-- ("Bang dieu khien", "Kiem soat tai lieu"). Those strings render in the
+-- "Phân quyền module" matrix UI (column headers) and in any module picker.
+-- This migration restores full diacritics on all 20 module rows.
+--
+-- Project rule: backend stays English; frontend Vietnamese has full
+-- diacritics. Idempotent: re-running is a no-op.
+-- ============================================================================
+
+BEGIN;
+
+UPDATE modules_catalog SET label_vi = 'Bảng điều khiển'             WHERE module_code = 'dashboard'      AND label_vi = 'Bang dieu khien';
+UPDATE modules_catalog SET label_vi = 'Kiểm soát tài liệu'          WHERE module_code = 'docs'           AND label_vi = 'Kiem soat tai lieu';
+UPDATE modules_catalog SET label_vi = 'Biểu mẫu & Hồ sơ'            WHERE module_code = 'forms'          AND label_vi = 'Bieu mau & Ho so';
+UPDATE modules_catalog SET label_vi = 'Người dùng'                  WHERE module_code = 'users'          AND label_vi = 'Nguoi dung';
+UPDATE modules_catalog SET label_vi = 'Vai trò & Phân quyền'        WHERE module_code = 'rbac'           AND label_vi = 'Vai tro & Phan quyen';
+UPDATE modules_catalog SET label_vi = 'Bảo mật MFA'                 WHERE module_code = 'mfa'            AND label_vi = 'Bao mat MFA';
+UPDATE modules_catalog SET label_vi = 'Nhật ký kiểm tra'            WHERE module_code = 'audit'          AND label_vi = 'Nhat ky kiem tra';
+-- 'EQMS Suite' is already pure ASCII English brand; keep as-is.
+UPDATE modules_catalog SET label_vi = 'Sản xuất'                    WHERE module_code = 'production'     AND label_vi = 'San xuat';
+UPDATE modules_catalog SET label_vi = 'Chất lượng'                  WHERE module_code = 'quality'        AND label_vi = 'Chat luong';
+UPDATE modules_catalog SET label_vi = 'Kho'                         WHERE module_code = 'inventory'      AND label_vi = 'Kho';
+UPDATE modules_catalog SET label_vi = 'Mua hàng'                    WHERE module_code = 'purchasing'     AND label_vi = 'Mua hang';
+UPDATE modules_catalog SET label_vi = 'Tài chính'                   WHERE module_code = 'finance'        AND label_vi = 'Tai chinh';
+UPDATE modules_catalog SET label_vi = 'Nhân sự & Tổ chức'           WHERE module_code = 'hr'             AND label_vi = 'Nhan su & To chuc';
+UPDATE modules_catalog SET label_vi = 'Đào tạo'                     WHERE module_code = 'training'       AND label_vi = 'Dao tao';
+UPDATE modules_catalog SET label_vi = 'Phân tích'                   WHERE module_code = 'analytics'      AND label_vi = 'Phan tich';
+-- 'Data Schema' is project terminology used as-is.
+UPDATE modules_catalog SET label_vi = 'Hạ tầng VPS'                 WHERE module_code = 'infrastructure' AND label_vi = 'Ha tang VPS';
+UPDATE modules_catalog SET label_vi = 'Module Dịch Thuật'           WHERE module_code = 'translation'    AND label_vi = 'Module Dich Thuat';
+UPDATE modules_catalog SET label_vi = 'Điều khiển AI'               WHERE module_code = 'ai_control'     AND label_vi = 'Dieu khien AI';
+
+COMMIT;
+-- <<< END MIGRATION: 171_diacritics_repair_modules_catalog.sql
+
+-- >>> BEGIN MIGRATION: 172_disposal_event_and_campaign_close.sql
+-- ============================================================================
+-- Migration 172: disposal_event table + close-campaign columns
+-- ----------------------------------------------------------------------------
+-- Backs the new admin tab actions:
+--   * POST /api/v1/retention/{recordId}:dispose   (chain-of-custody)
+--   * POST /api/v1/access-review/campaigns/{id}:close
+--
+-- Idempotent: safe to re-run.
+-- ============================================================================
+
+BEGIN;
+
+-- 1. disposal_event ----------------------------------------------------------
+CREATE TABLE IF NOT EXISTS disposal_event (
+    id                 uuid                     PRIMARY KEY DEFAULT uuid_generate_v4(),
+    record_id          varchar(120)             NOT NULL,
+    actor_user_id      uuid,
+    witness_user_id    uuid,
+    method_used        varchar(40)              NOT NULL,
+    location           text,
+    notes              text                     NOT NULL,
+    actor_reason       text,
+    disposed_at        timestamptz              NOT NULL DEFAULT now(),
+    row_version        integer                  NOT NULL DEFAULT 1,
+    created_at         timestamptz              NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_disposal_event_record_id ON disposal_event (record_id);
+CREATE INDEX IF NOT EXISTS idx_disposal_event_disposed_at ON disposal_event (disposed_at DESC);
+
+-- 2. access_review_campaign close columns ------------------------------------
+ALTER TABLE access_review_campaign
+    ADD COLUMN IF NOT EXISTS closed_at        timestamptz,
+    ADD COLUMN IF NOT EXISTS close_reason     text,
+    ADD COLUMN IF NOT EXISTS pending_at_close integer,
+    ADD COLUMN IF NOT EXISTS row_version      integer NOT NULL DEFAULT 1;
+
+COMMIT;
+-- <<< END MIGRATION: 172_disposal_event_and_campaign_close.sql
+
+-- >>> BEGIN MIGRATION: 173_rbac_role_permissions_canonical_seed.sql
+-- ============================================================================
+-- Migration 173: Canonical role.permissions JSONB seed (single source of truth)
+-- ----------------------------------------------------------------------------
+-- Replaces the legacy mom/data/config/role_permissions.json file as the SOLE
+-- authority for RBAC permission grants. All 38 catalog roles get a curated
+-- {permissions[], denies[]} pattern set following:
+--
+--   * NIST 800-53 rev5 AC-6   — least privilege
+--   * SOX 404 / COBIT 5 DSS06 — separation of duties (PO approve vs payment
+--                                execute, doc author vs doc approver,
+--                                IT-admin vs finance approval)
+--   * ISO 27001 A.9.4         — restricted privileged access
+--   * IEC 62443-3-3 SR 1.5    — authorization enforcement on OT-touching roles
+--   * 21 CFR Part 11 §11.10   — record-keeping permission gates
+--
+-- Each role row embeds:
+--     {
+--       "permissions": ["docs.view","records.create",...],
+--       "denies":      ["finance.payment.execute",...],
+--       "level":        80,
+--       "admin":        false,
+--       "allowAllPermissions": false,
+--       "canCreateDocs": true,
+--       "icon":         "🛡️",
+--       "color":        "#1e40af"
+--     }
+--
+-- The 28 atomic permission_codes used here come from migration 159
+-- (permission_catalog).
+--
+-- Idempotent: re-running overwrites the seeded shape but preserves any role
+-- not listed below (custom roles added by admin survive).
+-- ============================================================================
+
+BEGIN;
+
+-- Ensure all 38 catalog roles exist (no-op if seeded by migration 024).
+-- Listed here so the seed is self-contained and testable in isolation.
+INSERT INTO roles (role_code, role_label, role_label_vi, dept_code, permissions) VALUES
+    ('ceo','Chief Executive Officer','Tổng Giám đốc','EXE','{}'::jsonb),
+    ('production_director','Production Director','Giám đốc Sản xuất','PRO','{}'::jsonb),
+    ('cnc_workshop_manager','CNC Workshop Manager','Quản đốc xưởng CNC','PRO','{}'::jsonb),
+    ('shift_leader','Shift Leader','Trưởng ca','PRO','{}'::jsonb),
+    ('setup_technician','Setup Technician','Kỹ thuật viên Setup','PRO','{}'::jsonb),
+    ('cnc_operator','CNC Operator','Vận hành máy CNC','PRO','{}'::jsonb),
+    ('deburr_team_lead','Deburr Team Lead','Trưởng nhóm mài bavia','PRO','{}'::jsonb),
+    ('deburr_technician','Deburr Technician','Kỹ thuật viên mài bavia','PRO','{}'::jsonb),
+    ('production_planner','Production Planner','Kế hoạch sản xuất','PRO','{}'::jsonb),
+    ('cleaning_packaging_supervisor','Cleaning & Packaging Supervisor','Giám sát Vệ sinh & Đóng gói','PRO','{}'::jsonb),
+    ('cleaning_packaging_technician','Cleaning & Packaging Technician','KTV Vệ sinh & Đóng gói','PRO','{}'::jsonb),
+    ('maintenance_technician','Maintenance Technician','Kỹ thuật viên Bảo trì','PRO','{}'::jsonb),
+    ('production_engineer','Production Engineer','Kỹ sư Sản xuất','PRO','{}'::jsonb),
+    ('engineering_lead','Engineering Lead / Manager','Trưởng phòng Kỹ thuật','ENG','{}'::jsonb),
+    ('process_engineer','Process Engineer','Kỹ sư Quy trình','ENG','{}'::jsonb),
+    ('dfm_engineer','DFM Engineer','Kỹ sư DFM','ENG','{}'::jsonb),
+    ('cam_nc_programmer','CAM/NC Programmer','Lập trình CAM/NC','ENG','{}'::jsonb),
+    ('qa_manager','QA Manager','Quản lý QA','QA','{}'::jsonb),
+    ('quality_engineer','Quality Engineer','Kỹ sư Chất lượng','QA','{}'::jsonb),
+    ('qc_inspector','QC Inspector / CMM Operator','KCS / Vận hành CMM','QA','{}'::jsonb),
+    ('qc_inspector_lead','QC Inspector Lead','Trưởng nhóm KCS','QA','{}'::jsonb),
+    ('qms_engineer','QMS Engineer','Kỹ sư QMS','QA','{}'::jsonb),
+    ('internal_auditor','Internal Auditor','Kiểm toán viên nội bộ','QA','{}'::jsonb),
+    ('metrology_specialist','Metrology & Calibration Specialist','Chuyên viên đo lường','QA','{}'::jsonb),
+    ('supply_chain_manager','Supply Chain Manager','Quản lý Chuỗi cung ứng','SCM','{}'::jsonb),
+    ('buyer','Buyer / Purchasing','Nhân viên Mua hàng','SCM','{}'::jsonb),
+    ('warehouse_clerk','Warehouse Clerk','Thủ kho','WH','{}'::jsonb),
+    ('tool_storekeeper','Tool Crib / Storekeeper','Thủ kho Dụng cụ','SCM','{}'::jsonb),
+    ('logistics_coordinator','Logistics / Shipping Coordinator','Điều phối Logistics','WH','{}'::jsonb),
+    ('estimator','Estimator','Nhân viên Báo giá','SAL','{}'::jsonb),
+    ('customer_service','Customer Service','Chăm sóc Khách hàng','SAL','{}'::jsonb),
+    ('finance_manager','Finance Manager','Quản lý Tài chính','EXE','{}'::jsonb),
+    ('ap_ar_accountant','AP/AR & Payments Accountant','Kế toán Công nợ','EXE','{}'::jsonb),
+    ('gl_payroll_accountant','GL & Payroll Accountant','Kế toán Tổng hợp & Lương','EXE','{}'::jsonb),
+    ('hr_manager','HR Manager','Quản lý Nhân sự','HR','{}'::jsonb),
+    ('ehs_specialist','EHS Specialist','Chuyên viên EHS','EHS','{}'::jsonb),
+    ('it_admin','IT Administrator','Quản trị CNTT','IT','{}'::jsonb),
+    ('epicor_admin','Epicor System Administrator','Quản trị hệ thống Epicor','IT','{}'::jsonb)
+ON CONFLICT (role_code) DO NOTHING;
+
+-- ---------------------------------------------------------------------------
+-- Helper to write the canonical JSONB shape, preserving any pre-existing keys
+-- (icon override, level customisations, etc.) the admin may have set.
+-- ---------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION pg_temp.set_role_perms(
+    p_role_code TEXT,
+    p_level INTEGER,
+    p_admin BOOLEAN,
+    p_allow_all BOOLEAN,
+    p_can_create_docs BOOLEAN,
+    p_icon TEXT,
+    p_color TEXT,
+    p_grants TEXT[],
+    p_denies TEXT[]
+) RETURNS VOID AS $$
+BEGIN
+    UPDATE roles
+       SET permissions = COALESCE(permissions, '{}'::jsonb)
+                       || jsonb_build_object(
+                            'level',              p_level,
+                            'admin',              p_admin,
+                            'allowAllPermissions', p_allow_all,
+                            'canCreateDocs',      p_can_create_docs,
+                            'icon',               p_icon,
+                            'color',              p_color,
+                            'permissions',        to_jsonb(p_grants),
+                            'denies',             to_jsonb(p_denies),
+                            'seeded_by',          'migration_173',
+                            'seeded_at',          to_jsonb(now()::text)
+                          ),
+           updated_at = now()
+     WHERE role_code = p_role_code;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ---------------------------------------------------------------------------
+-- TIER 1 — Executive / System Admin (full access with explicit SoD denies)
+-- ---------------------------------------------------------------------------
+
+-- ceo: full god-mode (only role with allowAllPermissions=true).
+SELECT pg_temp.set_role_perms('ceo', 100, TRUE, TRUE, TRUE, '👑', '#7c2d12',
+    ARRAY['*']::TEXT[],
+    ARRAY[]::TEXT[]
+);
+
+-- it_admin: technical superuser, but blocked from finance approval (SoD).
+SELECT pg_temp.set_role_perms('it_admin', 99, TRUE, FALSE, TRUE, '🛠️', '#4f46e5',
+    ARRAY['docs.*','records.*','users.*','rbac.*','mfa.*','audit.*','admin.backend']::TEXT[],
+    ARRAY['finance.po.approve','finance.payment.execute']::TEXT[]
+);
+
+-- epicor_admin: ERP system admin, no document approval rights, no finance.
+SELECT pg_temp.set_role_perms('epicor_admin', 98, TRUE, FALSE, FALSE, '🔧', '#6366f1',
+    ARRAY['docs.view','records.*','users.view','rbac.role.view','audit.view','admin.backend']::TEXT[],
+    ARRAY['docs.approve','docs.retire','users.disable','users.reset_pw',
+          'rbac.role.edit','rbac.module.edit','rbac.doc.grant','rbac.sod.edit',
+          'mfa.policy.edit','mfa.factor.reset',
+          'finance.po.approve','finance.payment.execute']::TEXT[]
+);
+
+-- ---------------------------------------------------------------------------
+-- TIER 2 — Department Managers / Directors
+-- ---------------------------------------------------------------------------
+
+-- production_director: owns production, no QA approval, no finance.
+SELECT pg_temp.set_role_perms('production_director', 80, FALSE, FALSE, TRUE, '🏭', '#9a3412',
+    ARRAY['docs.view','docs.create','docs.edit',
+          'records.view','records.create','records.export',
+          'users.view','audit.view','admin.backend']::TEXT[],
+    ARRAY['docs.approve','docs.retire',
+          'users.create','users.edit','users.disable','users.reset_pw','users.export',
+          'rbac.role.edit','rbac.module.edit','rbac.doc.grant','rbac.sod.edit',
+          'mfa.policy.edit','mfa.factor.revoke','mfa.factor.reset',
+          'finance.po.approve','finance.payment.execute',
+          'audit.export']::TEXT[]
+);
+
+-- qa_manager: approves docs, runs access reviews — but not finance, not RBAC edit.
+SELECT pg_temp.set_role_perms('qa_manager', 80, FALSE, FALSE, TRUE, '🛡️', '#1e40af',
+    ARRAY['docs.view','docs.create','docs.edit','docs.approve','docs.retire',
+          'records.view','records.create','records.export',
+          'users.view','audit.view','audit.export',
+          'rbac.role.view','rbac.review.run','admin.backend']::TEXT[],
+    ARRAY['users.create','users.edit','users.disable','users.reset_pw','users.export',
+          'rbac.role.edit','rbac.module.edit','rbac.doc.grant','rbac.sod.edit',
+          'mfa.policy.edit','mfa.factor.revoke','mfa.factor.reset',
+          'finance.po.approve','finance.payment.execute']::TEXT[]
+);
+
+-- engineering_lead: approves engineering docs, no finance.
+SELECT pg_temp.set_role_perms('engineering_lead', 70, FALSE, FALSE, TRUE, '⚙️', '#0891b2',
+    ARRAY['docs.view','docs.create','docs.edit','docs.approve',
+          'records.view','records.create','records.export',
+          'users.view','audit.view','admin.backend']::TEXT[],
+    ARRAY['docs.retire',
+          'users.create','users.edit','users.disable','users.reset_pw','users.export',
+          'rbac.role.edit','rbac.module.edit','rbac.doc.grant','rbac.sod.edit',
+          'mfa.policy.edit','mfa.factor.revoke','mfa.factor.reset',
+          'finance.po.approve','finance.payment.execute',
+          'audit.export']::TEXT[]
+);
+
+-- supply_chain_manager: approves POs (NOT executes payments — SoD).
+SELECT pg_temp.set_role_perms('supply_chain_manager', 70, FALSE, FALSE, TRUE, '🚚', '#0d9488',
+    ARRAY['docs.view','docs.create','docs.edit',
+          'records.view','records.create','records.export',
+          'users.view','audit.view','admin.backend',
+          'finance.po.approve']::TEXT[],
+    ARRAY['docs.approve','docs.retire',
+          'users.create','users.edit','users.disable','users.reset_pw','users.export',
+          'rbac.role.edit','rbac.module.edit','rbac.doc.grant','rbac.sod.edit',
+          'mfa.policy.edit','mfa.factor.revoke','mfa.factor.reset',
+          'finance.payment.execute',
+          'audit.export']::TEXT[]
+);
+
+-- finance_manager: approves POs (NOT executes — SoD with ap_ar_accountant).
+SELECT pg_temp.set_role_perms('finance_manager', 80, FALSE, FALSE, TRUE, '💰', '#a16207',
+    ARRAY['docs.view','docs.create','docs.edit',
+          'records.view','records.create','records.export',
+          'users.view','audit.view','audit.export','admin.backend',
+          'finance.po.approve']::TEXT[],
+    ARRAY['docs.approve','docs.retire',
+          'users.create','users.edit','users.disable','users.reset_pw','users.export',
+          'rbac.role.edit','rbac.module.edit','rbac.doc.grant','rbac.sod.edit',
+          'mfa.policy.edit','mfa.factor.revoke','mfa.factor.reset',
+          'finance.payment.execute']::TEXT[]
+);
+
+-- hr_manager: full user lifecycle, no finance, no MFA reset (IT owns that).
+SELECT pg_temp.set_role_perms('hr_manager', 70, FALSE, FALSE, TRUE, '👥', '#be185d',
+    ARRAY['docs.view','docs.create','docs.edit',
+          'records.view','records.create','records.export',
+          'users.view','users.create','users.edit','users.disable','users.reset_pw','users.export',
+          'audit.view','admin.backend']::TEXT[],
+    ARRAY['docs.approve','docs.retire',
+          'rbac.role.edit','rbac.module.edit','rbac.doc.grant','rbac.sod.edit',
+          'mfa.policy.edit','mfa.factor.revoke','mfa.factor.reset',
+          'finance.po.approve','finance.payment.execute',
+          'audit.export']::TEXT[]
+);
+
+-- cnc_workshop_manager: workshop-level supervisor.
+SELECT pg_temp.set_role_perms('cnc_workshop_manager', 50, FALSE, FALSE, TRUE, '🏭', '#7c3aed',
+    ARRAY['docs.view','docs.create','docs.edit',
+          'records.view','records.create','records.export',
+          'users.view']::TEXT[],
+    ARRAY['docs.approve','docs.retire',
+          'users.create','users.edit','users.disable','users.reset_pw','users.export',
+          'rbac.role.edit','rbac.module.edit','rbac.doc.grant','rbac.sod.edit',
+          'mfa.policy.edit','mfa.factor.revoke','mfa.factor.reset',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+-- ---------------------------------------------------------------------------
+-- TIER 3 — Engineers / Specialists (author + edit, no approve)
+-- ---------------------------------------------------------------------------
+
+SELECT pg_temp.set_role_perms('production_engineer', 50, FALSE, FALSE, TRUE, '🔬', '#0284c7',
+    ARRAY['docs.view','docs.create','docs.edit',
+          'records.view','records.create','records.export']::TEXT[],
+    ARRAY['docs.approve','docs.retire','users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+SELECT pg_temp.set_role_perms('process_engineer', 50, FALSE, FALSE, TRUE, '🔄', '#059669',
+    ARRAY['docs.view','docs.create','docs.edit',
+          'records.view','records.create','records.export']::TEXT[],
+    ARRAY['docs.approve','docs.retire','users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+SELECT pg_temp.set_role_perms('dfm_engineer', 50, FALSE, FALSE, TRUE, '📐', '#0e7490',
+    ARRAY['docs.view','docs.create','docs.edit',
+          'records.view','records.create','records.export']::TEXT[],
+    ARRAY['docs.approve','docs.retire','users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+SELECT pg_temp.set_role_perms('cam_nc_programmer', 50, FALSE, FALSE, TRUE, '💾', '#0369a1',
+    ARRAY['docs.view','docs.create','docs.edit',
+          'records.view','records.create','records.export']::TEXT[],
+    ARRAY['docs.approve','docs.retire','users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+SELECT pg_temp.set_role_perms('quality_engineer', 50, FALSE, FALSE, TRUE, '🔍', '#1d4ed8',
+    ARRAY['docs.view','docs.create','docs.edit',
+          'records.view','records.create','records.export',
+          'audit.view']::TEXT[],
+    ARRAY['docs.approve','docs.retire','users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.export','admin.backend']::TEXT[]
+);
+
+-- qms_engineer: authors QMS docs but CANNOT approve (SoD vs qa_manager).
+SELECT pg_temp.set_role_perms('qms_engineer', 50, FALSE, FALSE, TRUE, '📋', '#1e3a8a',
+    ARRAY['docs.view','docs.create','docs.edit',
+          'records.view','records.create','records.export',
+          'rbac.role.view','audit.view']::TEXT[],
+    ARRAY['docs.approve','docs.retire','users.*','rbac.role.edit','rbac.module.edit',
+          'rbac.doc.grant','rbac.sod.edit','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.export','admin.backend']::TEXT[]
+);
+
+-- internal_auditor: read-only with audit export — explicit deny on edit.
+SELECT pg_temp.set_role_perms('internal_auditor', 60, FALSE, FALSE, FALSE, '🧐', '#7e22ce',
+    ARRAY['docs.view','records.view','records.export',
+          'users.view','audit.view','audit.export',
+          'rbac.role.view','rbac.review.run']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'records.create',
+          'users.create','users.edit','users.disable','users.reset_pw','users.export',
+          'rbac.role.edit','rbac.module.edit','rbac.doc.grant','rbac.sod.edit',
+          'mfa.policy.edit','mfa.factor.revoke','mfa.factor.reset',
+          'finance.po.approve','finance.payment.execute','admin.backend']::TEXT[]
+);
+
+SELECT pg_temp.set_role_perms('metrology_specialist', 50, FALSE, FALSE, TRUE, '📏', '#9333ea',
+    ARRAY['docs.view','docs.create','docs.edit',
+          'records.view','records.create','records.export']::TEXT[],
+    ARRAY['docs.approve','docs.retire','users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+SELECT pg_temp.set_role_perms('ehs_specialist', 50, FALSE, FALSE, TRUE, '⚠️', '#ea580c',
+    ARRAY['docs.view','docs.create','docs.edit',
+          'records.view','records.create','records.export']::TEXT[],
+    ARRAY['docs.approve','docs.retire','users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+-- ---------------------------------------------------------------------------
+-- TIER 4 — Supervisors / Team Leads (read + records create/export)
+-- ---------------------------------------------------------------------------
+
+SELECT pg_temp.set_role_perms('shift_leader', 40, FALSE, FALSE, FALSE, '🌓', '#a21caf',
+    ARRAY['docs.view','records.view','records.create','records.export']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+SELECT pg_temp.set_role_perms('qc_inspector_lead', 40, FALSE, FALSE, FALSE, '✅', '#15803d',
+    ARRAY['docs.view','records.view','records.create','records.export']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+SELECT pg_temp.set_role_perms('deburr_team_lead', 40, FALSE, FALSE, FALSE, '🔨', '#c2410c',
+    ARRAY['docs.view','records.view','records.create','records.export']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+SELECT pg_temp.set_role_perms('cleaning_packaging_supervisor', 40, FALSE, FALSE, FALSE, '📦', '#65a30d',
+    ARRAY['docs.view','records.view','records.create','records.export']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+-- ---------------------------------------------------------------------------
+-- TIER 5 — Operators / Technicians (read docs, create/view records only)
+-- ---------------------------------------------------------------------------
+
+SELECT pg_temp.set_role_perms('cnc_operator', 20, FALSE, FALSE, FALSE, '🛠️', '#475569',
+    ARRAY['docs.view','records.view','records.create']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'records.export',
+          'users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+SELECT pg_temp.set_role_perms('setup_technician', 25, FALSE, FALSE, FALSE, '🔧', '#525252',
+    ARRAY['docs.view','records.view','records.create']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'records.export',
+          'users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+SELECT pg_temp.set_role_perms('deburr_technician', 20, FALSE, FALSE, FALSE, '⚒️', '#57534e',
+    ARRAY['docs.view','records.view','records.create']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'records.export',
+          'users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+SELECT pg_temp.set_role_perms('cleaning_packaging_technician', 20, FALSE, FALSE, FALSE, '🧹', '#84cc16',
+    ARRAY['docs.view','records.view','records.create']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'records.export',
+          'users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+SELECT pg_temp.set_role_perms('maintenance_technician', 25, FALSE, FALSE, FALSE, '🔩', '#737373',
+    ARRAY['docs.view','records.view','records.create']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'records.export',
+          'users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+SELECT pg_temp.set_role_perms('qc_inspector', 25, FALSE, FALSE, FALSE, '🔬', '#16a34a',
+    ARRAY['docs.view','records.view','records.create']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'records.export',
+          'users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+SELECT pg_temp.set_role_perms('warehouse_clerk', 20, FALSE, FALSE, FALSE, '📦', '#a3a3a3',
+    ARRAY['docs.view','records.view','records.create']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'records.export',
+          'users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+SELECT pg_temp.set_role_perms('tool_storekeeper', 20, FALSE, FALSE, FALSE, '🔑', '#94a3b8',
+    ARRAY['docs.view','records.view','records.create']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'records.export',
+          'users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+SELECT pg_temp.set_role_perms('logistics_coordinator', 25, FALSE, FALSE, FALSE, '🚛', '#0f766e',
+    ARRAY['docs.view','records.view','records.create','records.export']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+SELECT pg_temp.set_role_perms('estimator', 30, FALSE, FALSE, FALSE, '📊', '#0369a1',
+    ARRAY['docs.view','records.view','records.create','records.export']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+SELECT pg_temp.set_role_perms('customer_service', 30, FALSE, FALSE, FALSE, '☎️', '#db2777',
+    ARRAY['docs.view','records.view','records.create','records.export']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+-- ---------------------------------------------------------------------------
+-- TIER 6 — Planners / Buyers (records.export, no PO approval)
+-- ---------------------------------------------------------------------------
+
+SELECT pg_temp.set_role_perms('production_planner', 40, FALSE, FALSE, TRUE, '📅', '#9333ea',
+    ARRAY['docs.view','records.view','records.create','records.export']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+-- buyer: creates POs but does not approve (SoD vs supply_chain_manager / finance_manager).
+SELECT pg_temp.set_role_perms('buyer', 35, FALSE, FALSE, TRUE, '🛒', '#0e7490',
+    ARRAY['docs.view','records.view','records.create','records.export']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+-- ---------------------------------------------------------------------------
+-- TIER 7 — Accountants (segregated payment/PO duties — classic SOX SoD)
+-- ---------------------------------------------------------------------------
+
+-- ap_ar_accountant: executes payments but DOES NOT approve POs (SoD).
+SELECT pg_temp.set_role_perms('ap_ar_accountant', 45, FALSE, FALSE, FALSE, '💳', '#ca8a04',
+    ARRAY['docs.view','records.view','records.create','records.export',
+          'finance.payment.execute']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'users.*','rbac.*','mfa.*',
+          'finance.po.approve',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+-- gl_payroll_accountant: bookkeeping only, no PO approve, no payment execute.
+SELECT pg_temp.set_role_perms('gl_payroll_accountant', 40, FALSE, FALSE, FALSE, '📒', '#b45309',
+    ARRAY['docs.view','records.view','records.create','records.export']::TEXT[],
+    ARRAY['docs.create','docs.edit','docs.approve','docs.retire',
+          'users.*','rbac.*','mfa.*',
+          'finance.po.approve','finance.payment.execute',
+          'audit.view','audit.export','admin.backend']::TEXT[]
+);
+
+DROP FUNCTION pg_temp.set_role_perms(TEXT, INTEGER, BOOLEAN, BOOLEAN, BOOLEAN, TEXT, TEXT, TEXT[], TEXT[]);
+
+-- ---------------------------------------------------------------------------
+-- Sanity verification (raises if any catalog role still has empty permissions)
+-- ---------------------------------------------------------------------------
+DO $$
+DECLARE
+    missing_count INTEGER;
+    missing_codes TEXT;
+BEGIN
+    SELECT COUNT(*), string_agg(role_code, ', ')
+      INTO missing_count, missing_codes
+      FROM roles
+     WHERE role_code IN (
+        'ceo','production_director','cnc_workshop_manager','shift_leader',
+        'setup_technician','cnc_operator','deburr_team_lead','deburr_technician',
+        'production_planner','cleaning_packaging_supervisor','cleaning_packaging_technician',
+        'maintenance_technician','production_engineer','engineering_lead',
+        'process_engineer','dfm_engineer','cam_nc_programmer','qa_manager',
+        'quality_engineer','qc_inspector','qc_inspector_lead','qms_engineer',
+        'internal_auditor','metrology_specialist','supply_chain_manager','buyer',
+        'warehouse_clerk','tool_storekeeper','logistics_coordinator','estimator',
+        'customer_service','finance_manager','ap_ar_accountant','gl_payroll_accountant',
+        'hr_manager','ehs_specialist','it_admin','epicor_admin'
+       )
+       AND (permissions->>'seeded_by') IS DISTINCT FROM 'migration_173';
+    IF missing_count > 0 THEN
+        RAISE EXCEPTION 'Migration 173: % roles not seeded: %', missing_count, missing_codes;
+    END IF;
+    RAISE NOTICE 'Migration 173: 38/38 catalog roles seeded with canonical permissions.';
+END$$;
+
+COMMIT;
+
+-- Rollback (restore prior permissions blob — manual only because we don't
+-- snapshot the prior shape; admins should re-run their custom edits):
+--   BEGIN;
+--   UPDATE roles SET permissions = permissions - 'seeded_by' - 'seeded_at'
+--    WHERE permissions->>'seeded_by' = 'migration_173';
+--   COMMIT;
+-- <<< END MIGRATION: 173_rbac_role_permissions_canonical_seed.sql
+
+-- >>> BEGIN MIGRATION: 174_data_isolation_foundation.sql
+-- ============================================================================
+-- Migration 174: Data / Source-Code Isolation Foundation
+-- ----------------------------------------------------------------------------
+-- Implements the executable contract described in ADR-0013.
+--
+-- Adds three pieces of permanent infrastructure that let the runtime
+-- distinguish "code" (immutable, shipped via git) from "data" (mutable,
+-- lives in PostgreSQL forever):
+--
+--   1. data_collection_state
+--      Per-collection cutover mode. The runtime IdentityRepository (and any
+--      future repository pattern) reads this on every request to decide
+--      whether reads come from JSON files or from PostgreSQL. Mode flips are
+--      operational acts, not deploys.
+--
+--   2. audit_event_chain
+--      Hash-chained, append-only audit log. Each row commits to the previous
+--      row's SHA-256, producing a tamper-evident chain that satisfies
+--      21 CFR Part 11 §11.10(e) and ISO 27001 A.8.2.3. Trigger
+--      audit_event_chain_link_tg() enforces the chain on INSERT.
+--
+--   3. data_collection_drift
+--      One row per detected divergence between the JSON file and PostgreSQL
+--      during SHADOW_WRITE / POSTGRES_PRIMARY phases. This is how operators
+--      know whether the cutover is safe to advance.
+--
+-- Standards alignment:
+--   * 21 CFR Part 11 §11.10(e)        — audit-trail integrity
+--   * ISO 27001:2022 A.8.2.3          — information classification
+--   * NIST SP 800-53 rev5 AU-10       — non-repudiation
+--   * GDPR Art. 32                    — security of processing
+--   * 12-Factor §III (config), §VI (processes)
+--
+-- Idempotent: safe to re-run.
+-- ============================================================================
+
+BEGIN;
+
+-- ---------------------------------------------------------------------------
+-- 1. data_collection_state — cutover mode per logical collection
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS data_collection_state (
+    collection_key       VARCHAR(80)   PRIMARY KEY,
+    mode                 VARCHAR(24)   NOT NULL
+                         CHECK (mode IN (
+                             'json_only',
+                             'shadow_write',
+                             'postgres_primary',
+                             'postgres_only'
+                         )),
+    json_path            TEXT,                    -- relative to mom/data/ (NULL once postgres_only)
+    postgres_table       TEXT          NOT NULL,
+    description          TEXT,
+    last_verified_at     TIMESTAMPTZ,
+    last_verified_sha256 CHAR(64),
+    last_drift_at        TIMESTAMPTZ,
+    drift_count          INTEGER       NOT NULL DEFAULT 0,
+    advanced_at          TIMESTAMPTZ   NOT NULL DEFAULT now(),
+    advanced_by          VARCHAR(150),
+    advance_change_ref   VARCHAR(120),
+    created_at           TIMESTAMPTZ   NOT NULL DEFAULT now(),
+    updated_at           TIMESTAMPTZ   NOT NULL DEFAULT now()
+);
+
+COMMENT ON TABLE  data_collection_state IS 'Per-collection Strangler-Fig cutover mode (ADR-0013). / Trang thai chuyen tiep cua tung tap du lieu.';
+COMMENT ON COLUMN data_collection_state.mode IS 'json_only -> shadow_write -> postgres_primary -> postgres_only';
+COMMENT ON COLUMN data_collection_state.last_verified_sha256 IS 'SHA-256 of canonical JSON projection at last verify run.';
+
+-- Seed the seven collections in scope for Wave-1 cutover.
+INSERT INTO data_collection_state (
+    collection_key, mode, json_path, postgres_table, description
+) VALUES
+    ('users',                 'shadow_write', 'config/users.json',                  'users',
+     'Identity store. Already shadow-written by AuthUserShadowSyncService.'),
+    ('roles',                 'shadow_write', 'config/role_permissions.json',       'roles',
+     'Role catalog with JSONB permissions (migration 173 seed).'),
+    ('role_permissions',      'shadow_write', 'config/role_permissions.json',       'roles',
+     'Legacy projection; same source as roles.permissions JSONB.'),
+    ('user_doc_overrides',    'json_only',    'config/user_doc_overrides.json',     'user_doc_overrides',
+     'Per-user document visibility override.'),
+    ('portal_role_docs',      'json_only',    'config/portal_role_docs.json',       'portal_role_docs',
+     'Role-to-document mapping for portal sidebar.'),
+    ('module_access_config',  'json_only',    'config/module_access_config.json',   'module_access_config',
+     'Module visibility per role.'),
+    ('dcc_documents',         'json_only',    'docs/**/*.html',                     'dcc_document_body',
+     'Controlled QMS HTML documents — Phase 2.')
+ON CONFLICT (collection_key) DO NOTHING;
+
+CREATE INDEX IF NOT EXISTS idx_data_collection_state_mode
+    ON data_collection_state (mode);
+
+-- ---------------------------------------------------------------------------
+-- 2. audit_event_chain — tamper-evident, hash-chained audit log
+-- ---------------------------------------------------------------------------
+-- Sits ALONGSIDE the existing partitioned audit_events table. We do not
+-- replace audit_events because (a) rewriting hundreds of writers is a
+-- separate project and (b) audit_event_chain has stricter integrity rules
+-- (no UPDATE, hash-link trigger) that would conflict with existing
+-- "soft fixes" on audit_events.
+--
+-- Use audit_event_chain for any data-isolation-relevant event: cutover
+-- mode flips, drift detection, backfill runs, JSON file deletions.
+-- Future migrations may MOVE classes of events from audit_events to
+-- audit_event_chain.
+CREATE TABLE IF NOT EXISTS audit_event_chain (
+    chain_id        BIGSERIAL     PRIMARY KEY,
+    event_id        UUID          NOT NULL DEFAULT uuid_generate_v4(),
+    event_type      VARCHAR(80)   NOT NULL,
+    aggregate_type  VARCHAR(80)   NOT NULL,
+    aggregate_id    TEXT          NOT NULL,
+    actor_id        UUID,
+    actor_name      VARCHAR(150),
+    payload         JSONB         NOT NULL DEFAULT '{}'::jsonb,
+    metadata        JSONB         NOT NULL DEFAULT '{}'::jsonb,
+    ip_address      INET,
+    recorded_at     TIMESTAMPTZ   NOT NULL DEFAULT now(),
+    prev_sha256     CHAR(64)      NOT NULL,
+    row_sha256      CHAR(64)      NOT NULL,
+    -- Lock the chain: cannot be updated, only inserted.
+    UNIQUE (event_id)
+);
+
+COMMENT ON TABLE  audit_event_chain IS 'Tamper-evident hash-linked audit log. 21 CFR Part 11 §11.10(e) compliant.';
+COMMENT ON COLUMN audit_event_chain.prev_sha256 IS 'Hash of the previous row, or 64 zeros for the genesis row.';
+COMMENT ON COLUMN audit_event_chain.row_sha256  IS 'sha256(prev_sha256 || event_id || event_type || aggregate_id || payload || recorded_at).';
+
+CREATE INDEX IF NOT EXISTS idx_audit_event_chain_recorded_at
+    ON audit_event_chain (recorded_at DESC);
+CREATE INDEX IF NOT EXISTS idx_audit_event_chain_aggregate
+    ON audit_event_chain (aggregate_type, aggregate_id);
+CREATE INDEX IF NOT EXISTS idx_audit_event_chain_event_type
+    ON audit_event_chain (event_type, recorded_at DESC);
+
+-- 2a. Hash-link trigger ------------------------------------------------------
+-- BEFORE INSERT: compute prev_sha256 from the latest existing row, then
+-- compute row_sha256 over the canonical fields. Caller may NOT supply
+-- prev_sha256 / row_sha256 — they are always recomputed.
+CREATE OR REPLACE FUNCTION audit_event_chain_link_tg()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_prev   CHAR(64);
+    v_canon  TEXT;
+BEGIN
+    -- Latest row by chain_id (BIGSERIAL is monotonic per session; combined
+    -- with the BEFORE INSERT trigger this serializes correctly).
+    SELECT row_sha256 INTO v_prev
+      FROM audit_event_chain
+     ORDER BY chain_id DESC
+     LIMIT 1
+       FOR UPDATE;
+    IF v_prev IS NULL THEN
+        v_prev := repeat('0', 64);
+    END IF;
+    NEW.prev_sha256 := v_prev;
+
+    -- Canonical hash input. JSONB is normalized to text via the standard
+    -- ::text cast (which is deterministic for jsonb → key order is the
+    -- internal binary order, identical across rows with the same keys).
+    v_canon := v_prev
+            || '|' || NEW.event_id::text
+            || '|' || NEW.event_type
+            || '|' || NEW.aggregate_type
+            || '|' || NEW.aggregate_id
+            || '|' || (NEW.payload)::text
+            || '|' || to_char(NEW.recorded_at AT TIME ZONE 'UTC',
+                              'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"');
+    NEW.row_sha256 := encode(digest(v_canon, 'sha256'), 'hex');
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS audit_event_chain_link ON audit_event_chain;
+CREATE TRIGGER audit_event_chain_link
+    BEFORE INSERT ON audit_event_chain
+    FOR EACH ROW
+    EXECUTE FUNCTION audit_event_chain_link_tg();
+
+-- 2b. Lock-down: forbid UPDATE / DELETE on audit_event_chain ----------------
+-- Implemented via trigger rather than role grants because the application
+-- connects as a single role today.
+CREATE OR REPLACE FUNCTION audit_event_chain_immutable_tg()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RAISE EXCEPTION 'audit_event_chain is append-only; % rejected on chain_id=%',
+        TG_OP, COALESCE(OLD.chain_id, NEW.chain_id);
+END;
+$$;
+
+DROP TRIGGER IF EXISTS audit_event_chain_no_update ON audit_event_chain;
+CREATE TRIGGER audit_event_chain_no_update
+    BEFORE UPDATE ON audit_event_chain
+    FOR EACH ROW
+    EXECUTE FUNCTION audit_event_chain_immutable_tg();
+
+DROP TRIGGER IF EXISTS audit_event_chain_no_delete ON audit_event_chain;
+CREATE TRIGGER audit_event_chain_no_delete
+    BEFORE DELETE ON audit_event_chain
+    FOR EACH ROW
+    EXECUTE FUNCTION audit_event_chain_immutable_tg();
+
+-- 2c. Verifier function ------------------------------------------------------
+-- Walks the chain, recomputes each row's hash, returns the chain_id of the
+-- first broken row (or NULL if intact). Operators run this nightly.
+CREATE OR REPLACE FUNCTION audit_event_chain_verify(
+    p_from_chain_id BIGINT DEFAULT 0
+) RETURNS TABLE (
+    broken_at_chain_id BIGINT,
+    expected_prev      CHAR(64),
+    actual_prev        CHAR(64),
+    expected_row_hash  CHAR(64),
+    actual_row_hash    CHAR(64)
+)
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    r          audit_event_chain%ROWTYPE;
+    v_prev     CHAR(64) := repeat('0', 64);
+    v_canon    TEXT;
+    v_recompute CHAR(64);
+BEGIN
+    FOR r IN
+        SELECT * FROM audit_event_chain
+         WHERE chain_id > p_from_chain_id
+         ORDER BY chain_id ASC
+    LOOP
+        v_canon := v_prev
+                || '|' || r.event_id::text
+                || '|' || r.event_type
+                || '|' || r.aggregate_type
+                || '|' || r.aggregate_id
+                || '|' || (r.payload)::text
+                || '|' || to_char(r.recorded_at AT TIME ZONE 'UTC',
+                                  'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"');
+        v_recompute := encode(digest(v_canon, 'sha256'), 'hex');
+        IF r.prev_sha256 <> v_prev OR r.row_sha256 <> v_recompute THEN
+            broken_at_chain_id := r.chain_id;
+            expected_prev      := v_prev;
+            actual_prev        := r.prev_sha256;
+            expected_row_hash  := v_recompute;
+            actual_row_hash    := r.row_sha256;
+            RETURN NEXT;
+            RETURN;
+        END IF;
+        v_prev := r.row_sha256;
+    END LOOP;
+    -- No break: emit nothing.
+    RETURN;
+END;
+$$;
+
+COMMENT ON FUNCTION audit_event_chain_verify(BIGINT)
+    IS 'Walk audit_event_chain and return the first broken row, or no rows if chain intact.';
+
+-- ---------------------------------------------------------------------------
+-- 3. data_collection_drift — divergence log between JSON and PostgreSQL
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS data_collection_drift (
+    drift_id        BIGSERIAL     PRIMARY KEY,
+    collection_key  VARCHAR(80)   NOT NULL REFERENCES data_collection_state(collection_key),
+    detected_at     TIMESTAMPTZ   NOT NULL DEFAULT now(),
+    detector        VARCHAR(80)   NOT NULL,                  -- 'IdentityRepository', 'cli:drift-scan', etc.
+    record_key      VARCHAR(200),                            -- e.g. username
+    json_sha256     CHAR(64),
+    pg_sha256       CHAR(64),
+    direction       VARCHAR(20)   NOT NULL
+                    CHECK (direction IN ('json_only', 'pg_only', 'mismatch')),
+    diff_summary    JSONB         NOT NULL DEFAULT '{}'::jsonb,
+    resolved_at     TIMESTAMPTZ,
+    resolved_by     VARCHAR(150),
+    resolution      VARCHAR(40),                              -- 'pg_won', 'json_won', 'manual_merge'
+    resolution_note TEXT
+);
+
+COMMENT ON TABLE data_collection_drift IS 'JSON-vs-PostgreSQL divergences detected during SHADOW_WRITE / POSTGRES_PRIMARY phases.';
+
+CREATE INDEX IF NOT EXISTS idx_data_collection_drift_unresolved
+    ON data_collection_drift (collection_key, detected_at DESC)
+    WHERE resolved_at IS NULL;
+
+-- ---------------------------------------------------------------------------
+-- 4. Helper view: cutover dashboard
+-- ---------------------------------------------------------------------------
+CREATE OR REPLACE VIEW v_data_isolation_dashboard AS
+SELECT
+    s.collection_key,
+    s.mode,
+    s.postgres_table,
+    s.last_verified_at,
+    s.last_drift_at,
+    s.drift_count,
+    (SELECT COUNT(*)
+       FROM data_collection_drift d
+      WHERE d.collection_key = s.collection_key
+        AND d.resolved_at IS NULL)             AS open_drift_count,
+    s.advanced_at,
+    s.advanced_by,
+    s.advance_change_ref
+FROM data_collection_state s
+ORDER BY
+    CASE s.mode
+        WHEN 'json_only'         THEN 0
+        WHEN 'shadow_write'      THEN 1
+        WHEN 'postgres_primary'  THEN 2
+        WHEN 'postgres_only'     THEN 3
+    END,
+    s.collection_key;
+
+COMMENT ON VIEW v_data_isolation_dashboard IS 'Operator dashboard for ADR-0013 cutover progress.';
+
+-- ---------------------------------------------------------------------------
+-- 5. updated_at maintenance trigger for data_collection_state
+-- ---------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION data_collection_state_touch_tg()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    NEW.updated_at := now();
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS data_collection_state_touch ON data_collection_state;
+CREATE TRIGGER data_collection_state_touch
+    BEFORE UPDATE ON data_collection_state
+    FOR EACH ROW
+    EXECUTE FUNCTION data_collection_state_touch_tg();
+
+COMMIT;
+
+-- Rollback:
+-- DROP VIEW   IF EXISTS v_data_isolation_dashboard;
+-- DROP TABLE  IF EXISTS data_collection_drift;
+-- DROP TRIGGER IF EXISTS audit_event_chain_no_delete ON audit_event_chain;
+-- DROP TRIGGER IF EXISTS audit_event_chain_no_update ON audit_event_chain;
+-- DROP TRIGGER IF EXISTS audit_event_chain_link     ON audit_event_chain;
+-- DROP FUNCTION IF EXISTS audit_event_chain_verify(BIGINT);
+-- DROP FUNCTION IF EXISTS audit_event_chain_immutable_tg();
+-- DROP FUNCTION IF EXISTS audit_event_chain_link_tg();
+-- DROP TABLE  IF EXISTS audit_event_chain;
+-- DROP TRIGGER IF EXISTS data_collection_state_touch ON data_collection_state;
+-- DROP FUNCTION IF EXISTS data_collection_state_touch_tg();
+-- DROP TABLE  IF EXISTS data_collection_state;
+-- <<< END MIGRATION: 174_data_isolation_foundation.sql
+
+-- >>> BEGIN MIGRATION: 175_dcc_document_body_storage.sql
+-- ============================================================================
+-- Migration 175: DCC document body storage (Phase 2 of ADR-0013)
+-- ----------------------------------------------------------------------------
+-- Until now `dcc_document_header` (migration 150) holds metadata only —
+-- the HTML body lives in mom/docs/**/*.html on the filesystem, in the same
+-- git working tree as the source code. That co-location is what creates
+-- the data-loss risk on `git reset --hard` and `rsync` failures during
+-- deploy.
+--
+-- This migration adds the **content** home: an append-only, versioned,
+-- content-addressed storage table for HTML document bodies. Every save
+-- (draft / review / approved / released / superseded) inserts a new
+-- row; rows are immutable. The currently-effective body for each
+-- document × locale is exposed by view dcc_document_body_current.
+--
+-- Standards:
+--   * 21 CFR Part 820.40                — Document Controls (versioned)
+--   * 21 CFR Part 11 §11.10(b)(c)(e)    — verifiable copies + integrity
+--   * ISO 9001:2015 §7.5                — Documented Information
+--   * AS9100D §7.5                      — change control
+--
+-- Idempotent.
+-- ============================================================================
+
+BEGIN;
+
+-- ---------------------------------------------------------------------------
+-- 1. dcc_document_body — append-only HTML storage
+-- ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS dcc_document_body (
+    body_id           UUID         PRIMARY KEY DEFAULT gen_random_uuid(),
+    doc_code          VARCHAR(80)  NOT NULL,
+    revision          VARCHAR(20)  NOT NULL,
+    status            VARCHAR(30)  NOT NULL,
+    locale            VARCHAR(10)  NOT NULL DEFAULT 'vi',
+    body_html         TEXT         NOT NULL,
+    body_sha256       CHAR(64)     NOT NULL,
+    body_size         INTEGER      NOT NULL,
+    source_path       TEXT,                              -- relative path the body was imported from (mom/docs/...), nullable when authored directly in DB
+    metadata          JSONB        NOT NULL DEFAULT '{}'::jsonb,
+    created_at        TIMESTAMPTZ  NOT NULL DEFAULT now(),
+    created_by        VARCHAR(150) NOT NULL DEFAULT 'system',
+    change_ref        VARCHAR(120),
+    -- Integrity
+    CONSTRAINT ck_dcc_body_sha256_format
+        CHECK (body_sha256 ~ '^[0-9a-f]{64}$'),
+    CONSTRAINT ck_dcc_body_revision_format
+        CHECK (revision ~ '^V[0-9]+(\.[0-9]+)?$' OR revision ~ '^[0-9]+(\.[0-9]+)?$'),
+    CONSTRAINT ck_dcc_body_status
+        CHECK (status IN ('draft','in_review','approved','released','superseded','obsolete')),
+    -- One canonical row per (doc, rev, status, locale). A new save with the
+    -- same coordinates means "supersede previous"; older rows are kept by
+    -- bumping revision instead.
+    CONSTRAINT uq_dcc_body_coords
+        UNIQUE (doc_code, revision, status, locale)
+);
+
+COMMENT ON TABLE  dcc_document_body  IS 'Append-only versioned content store for DCC documents. Filesystem mom/docs/** is a derived projection.';
+COMMENT ON COLUMN dcc_document_body.body_sha256 IS 'sha256(body_html) — content-addressed integrity check.';
+COMMENT ON COLUMN dcc_document_body.source_path IS 'Filesystem path (relative to repo root) the body was imported from, if any.';
+
+CREATE INDEX IF NOT EXISTS idx_dcc_body_doc_code
+    ON dcc_document_body (doc_code, created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_dcc_body_status
+    ON dcc_document_body (doc_code, status);
+CREATE INDEX IF NOT EXISTS idx_dcc_body_sha256
+    ON dcc_document_body (body_sha256);
+
+-- ---------------------------------------------------------------------------
+-- 2. Append-only enforcement: forbid UPDATE / DELETE
+-- ---------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION dcc_document_body_immutable_tg()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RAISE EXCEPTION 'dcc_document_body is append-only; % rejected on body_id=%',
+        TG_OP, COALESCE(OLD.body_id, NEW.body_id);
+END;
+$$;
+
+DROP TRIGGER IF EXISTS dcc_document_body_no_update ON dcc_document_body;
+CREATE TRIGGER dcc_document_body_no_update
+    BEFORE UPDATE ON dcc_document_body
+    FOR EACH ROW
+    EXECUTE FUNCTION dcc_document_body_immutable_tg();
+
+DROP TRIGGER IF EXISTS dcc_document_body_no_delete ON dcc_document_body;
+CREATE TRIGGER dcc_document_body_no_delete
+    BEFORE DELETE ON dcc_document_body
+    FOR EACH ROW
+    EXECUTE FUNCTION dcc_document_body_immutable_tg();
+
+-- ---------------------------------------------------------------------------
+-- 3. Sha256 verification trigger
+-- ---------------------------------------------------------------------------
+-- Defence-in-depth: even if a buggy caller passes a wrong body_sha256, the
+-- DB recomputes and rejects mismatches.
+CREATE OR REPLACE FUNCTION dcc_document_body_verify_sha_tg()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_expected CHAR(64);
+BEGIN
+    v_expected := encode(digest(NEW.body_html, 'sha256'), 'hex');
+    IF NEW.body_sha256 <> v_expected THEN
+        RAISE EXCEPTION 'dcc_document_body sha256 mismatch: expected=% got=%',
+            v_expected, NEW.body_sha256;
+    END IF;
+    NEW.body_size := length(NEW.body_html);
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS dcc_document_body_verify_sha ON dcc_document_body;
+CREATE TRIGGER dcc_document_body_verify_sha
+    BEFORE INSERT ON dcc_document_body
+    FOR EACH ROW
+    EXECUTE FUNCTION dcc_document_body_verify_sha_tg();
+
+-- ---------------------------------------------------------------------------
+-- 4. Currently-effective body view
+-- ---------------------------------------------------------------------------
+-- For each (doc_code, locale), expose the highest-priority status:
+--   released > approved > in_review > draft > superseded > obsolete
+-- and within the same status, the latest by created_at.
+CREATE OR REPLACE VIEW dcc_document_body_current AS
+SELECT b.*
+  FROM dcc_document_body b
+  JOIN (
+        SELECT doc_code, locale, body_id
+          FROM (
+                SELECT
+                    doc_code, locale, body_id,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY doc_code, locale
+                        ORDER BY
+                            CASE status
+                                WHEN 'released'    THEN 0
+                                WHEN 'approved'    THEN 1
+                                WHEN 'in_review'   THEN 2
+                                WHEN 'draft'       THEN 3
+                                WHEN 'superseded'  THEN 4
+                                WHEN 'obsolete'    THEN 5
+                                ELSE                    6
+                            END,
+                            created_at DESC
+                    ) AS rn
+                  FROM dcc_document_body
+               ) ranked
+         WHERE rn = 1
+       ) winners
+       ON winners.body_id = b.body_id;
+
+COMMENT ON VIEW dcc_document_body_current IS 'One row per (doc_code, locale) — the body that should currently render in portal.';
+
+-- ---------------------------------------------------------------------------
+-- 5. Header integrity link
+-- ---------------------------------------------------------------------------
+-- Add a column to dcc_document_header that records the sha256 of the body
+-- corresponding to the currently-released revision. If header.revision and
+-- (selected body row).revision diverge, a portal CI gate fails the build.
+ALTER TABLE dcc_document_header
+    ADD COLUMN IF NOT EXISTS released_body_sha256 CHAR(64),
+    ADD COLUMN IF NOT EXISTS released_body_id     UUID,
+    ADD COLUMN IF NOT EXISTS released_at          TIMESTAMPTZ;
+
+CREATE INDEX IF NOT EXISTS idx_dcc_header_released_body
+    ON dcc_document_header (released_body_id)
+    WHERE released_body_id IS NOT NULL;
+
+-- ---------------------------------------------------------------------------
+-- 6. data_collection_state seed advance + drift counter
+-- ---------------------------------------------------------------------------
+-- Now that the storage exists, mark the dcc_documents collection ready to
+-- accept shadow writes. Operators flip the mode to 'shadow_write' once
+-- backfill is verified (see runbook Phase 2 §3).
+UPDATE data_collection_state
+   SET postgres_table = 'dcc_document_body',
+       description    = 'Controlled QMS HTML documents. Body now stored in dcc_document_body (migration 175). Filesystem mom/docs/** retained as cache during cutover.'
+ WHERE collection_key = 'dcc_documents';
+
+COMMIT;
+
+-- Rollback:
+-- DROP VIEW    IF EXISTS dcc_document_body_current;
+-- ALTER TABLE  dcc_document_header
+--   DROP COLUMN IF EXISTS released_body_sha256,
+--   DROP COLUMN IF EXISTS released_body_id,
+--   DROP COLUMN IF EXISTS released_at;
+-- DROP TRIGGER IF EXISTS dcc_document_body_verify_sha ON dcc_document_body;
+-- DROP TRIGGER IF EXISTS dcc_document_body_no_delete  ON dcc_document_body;
+-- DROP TRIGGER IF EXISTS dcc_document_body_no_update  ON dcc_document_body;
+-- DROP FUNCTION IF EXISTS dcc_document_body_verify_sha_tg();
+-- DROP FUNCTION IF EXISTS dcc_document_body_immutable_tg();
+-- DROP TABLE IF EXISTS dcc_document_body;
+-- <<< END MIGRATION: 175_dcc_document_body_storage.sql
+
+-- >>> BEGIN MIGRATION: 176_promote_deployment_foundation_docs.sql
+-- ============================================================================
+-- Migration 176: Promote deployment foundation documents
+-- ============================================================================
+-- Purpose:   Move WI-105, WI-106, ANNEX-114 from draft → approved and
+--            POL-QMS-002 from draft → released so that the operations
+--            deployment program (Triển khai vận hành) can launch its W0
+--            pre-flight (2026-05-16) and W1 announcement (2026-05-23).
+--
+-- Background:
+--   • QMS-MAN-001 is already approved (effective_date 2026-05-07, V4.0).
+--   • POL-QMS-001 is already released (effective_date 2026-04-13, V0).
+--   • The remaining 4 foundation documents are still draft per the bootstrap
+--     seed in their HTML files. The deployment module's W0/W1 gates cannot
+--     close without these docs being effective.
+--
+-- Effective dates:
+--   • WI-105 / WI-106 / ANNEX-114 → 2026-05-16 (W0 pre-flight)
+--   • POL-QMS-002                  → 2026-05-23 (W1 announcement)
+--
+-- Safety:
+--   • Idempotent — uses doc_code WHERE clause; re-running has no effect once
+--     the rows are at the target state.
+--   • Updates dcc_document_header.updated_at via trigger; no schema change.
+--   • Inserts a revision row into dcc_document_revision when the table exists,
+--     so the audit trail captures the V0 → V1.0 bump.
+--
+-- Author: Operations deployment program rebuild
+-- Date:   2026-05-12
+-- ============================================================================
+
+BEGIN;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Promote WI-105, WI-106, ANNEX-114 to 'approved' (V0 → V1.0, eff 2026-05-16)
+-- ─────────────────────────────────────────────────────────────────────────────
+UPDATE dcc_document_header
+SET    status         = 'approved',
+       revision       = 'V1.0',
+       effective_date = DATE '2026-05-16',
+       updated_at     = now()
+WHERE  doc_code IN ('WI-105', 'WI-106', 'ANNEX-114')
+  AND  status = 'draft';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Promote POL-QMS-002 to 'released' (V0 → V1.0, eff 2026-05-23)
+-- Quality objectives must be released — policy-tier documents require the
+-- 'released' status (not just 'approved') for ISO 9001 §5.2 evidence.
+-- ─────────────────────────────────────────────────────────────────────────────
+UPDATE dcc_document_header
+SET    status         = 'released',
+       revision       = 'V1.0',
+       effective_date = DATE '2026-05-23',
+       updated_at     = now()
+WHERE  doc_code = 'POL-QMS-002'
+  AND  status = 'draft';
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Audit trail row in dcc_document_revision if that table exists
+-- (silently skipped on environments where the table has not been provisioned).
+-- ─────────────────────────────────────────────────────────────────────────────
+DO $$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables
+               WHERE table_name = 'dcc_document_revision') THEN
+        INSERT INTO dcc_document_revision (doc_code, revision, update_type, effective_date, approved_at, approved_by, note)
+        SELECT  d,
+                'V1.0',
+                'major',
+                eff,
+                now(),
+                'deploy_program_migration_176',
+                'Promoted from draft for operations deployment W0/W1 launch.'
+        FROM (VALUES
+            ('WI-105',     DATE '2026-05-16'),
+            ('WI-106',     DATE '2026-05-16'),
+            ('ANNEX-114',  DATE '2026-05-16'),
+            ('POL-QMS-002',DATE '2026-05-23')
+        ) AS s(d, eff)
+        WHERE NOT EXISTS (
+            -- Idempotency: skip if ANY V1.0 row exists for the doc, regardless
+            -- of which actor created it. The table enforces a UNIQUE constraint
+            -- on (doc_code, revision); a narrower predicate would re-attempt
+            -- the insert and fail when a different actor already filled it in.
+            SELECT 1 FROM dcc_document_revision r
+            WHERE  r.doc_code = s.d
+              AND  r.revision = 'V1.0'
+        );
+    END IF;
+END$$;
+
+-- ─────────────────────────────────────────────────────────────────────────────
+-- Sanity check — emit a notice so the operator running the migration can
+-- confirm 4 rows changed (or 0 if already promoted).
+-- ─────────────────────────────────────────────────────────────────────────────
+DO $$
+DECLARE n INTEGER;
+BEGIN
+    SELECT COUNT(*) INTO n FROM dcc_document_header
+    WHERE doc_code IN ('WI-105', 'WI-106', 'ANNEX-114', 'POL-QMS-002')
+      AND status IN ('approved', 'released')
+      AND effective_date IN (DATE '2026-05-16', DATE '2026-05-23');
+    RAISE NOTICE 'Migration 176: % of 4 foundation documents now at target state.', n;
+END$$;
+
+COMMIT;
+-- <<< END MIGRATION: 176_promote_deployment_foundation_docs.sql
+
+-- >>> BEGIN MIGRATION: 177_hcm_employee_position_assignments.sql
+-- ============================================================================
+-- Migration: 177_hcm_employee_position_assignments.sql
+-- Description: Multi-position HCM assignment bridge for user role/title linkage.
+-- Dependencies: 049_hcm_workforce_management.sql, 070_enterprise_governance_uplift.sql
+-- Rollback: DROP TABLE hcm_employee_position_assignments CASCADE;
+-- ============================================================================
+
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS hcm_employee_position_assignments (
+    hcm_assignment_id            UUID            PRIMARY KEY DEFAULT uuid_generate_v4(),
+    employee_id                  VARCHAR(20)     NOT NULL REFERENCES hcm_employees(employee_id) ON DELETE CASCADE,
+    hcm_position_id              UUID            NOT NULL REFERENCES hcm_positions(hcm_position_id) ON DELETE CASCADE,
+    hcm_org_unit_id              UUID            NOT NULL REFERENCES hcm_org_units(hcm_org_unit_id),
+    assignment_type              VARCHAR(30)     NOT NULL DEFAULT 'primary'
+                                             CHECK (assignment_type IN ('primary', 'role', 'concurrent', 'acting', 'backup', 'temporary')),
+    assignment_status            VARCHAR(20)     NOT NULL DEFAULT 'active'
+                                             CHECK (assignment_status IN ('active', 'inactive', 'ended')),
+    is_primary                   BOOLEAN         NOT NULL DEFAULT FALSE,
+    fte_fraction                 NUMERIC(5,2)    NOT NULL DEFAULT 1.00 CHECK (fte_fraction > 0 AND fte_fraction <= 1.50),
+    effective_from               DATE            NOT NULL DEFAULT CURRENT_DATE,
+    effective_to                 DATE,
+    org_company_code             VARCHAR(30)     REFERENCES org_companies(company_code),
+    org_legal_entity_code        VARCHAR(30)     REFERENCES org_legal_entities(legal_entity_code),
+    org_plant_id                 VARCHAR(30)     REFERENCES org_plants(plant_id),
+    org_site_id                  VARCHAR(30)     REFERENCES mes_sites(site_id),
+    source_system                VARCHAR(40)     NOT NULL DEFAULT 'QMS',
+    source_record_id             VARCHAR(120),
+    row_version                  BIGINT          NOT NULL DEFAULT 1,
+    payload_schema_version       VARCHAR(30)     NOT NULL DEFAULT '1.0',
+    metadata                     JSONB           DEFAULT '{}'::jsonb,
+    created_at                   TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    updated_at                   TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    CHECK (effective_to IS NULL OR effective_to >= effective_from)
+);
+
+COMMENT ON TABLE hcm_employee_position_assignments IS 'Canonical HCM bridge for employees holding multiple positions or role-derived appointments.';
+COMMENT ON COLUMN hcm_employee_position_assignments.assignment_type IS 'primary = core job title, role = permission/role-derived appointment, concurrent/acting/backup/temporary = secondary workforce appointment.';
+
+CREATE INDEX IF NOT EXISTS idx_hcm_emp_pos_assign_employee ON hcm_employee_position_assignments (employee_id);
+CREATE INDEX IF NOT EXISTS idx_hcm_emp_pos_assign_position ON hcm_employee_position_assignments (hcm_position_id) WHERE assignment_status = 'active';
+CREATE INDEX IF NOT EXISTS idx_hcm_emp_pos_assign_unit ON hcm_employee_position_assignments (hcm_org_unit_id) WHERE assignment_status = 'active';
+CREATE INDEX IF NOT EXISTS idx_hcm_emp_pos_assign_status ON hcm_employee_position_assignments (assignment_status);
+CREATE INDEX IF NOT EXISTS idx_hcm_emp_pos_assign_lineage ON hcm_employee_position_assignments (source_system, source_record_id) WHERE source_record_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS idx_hcm_emp_pos_assign_org_scope ON hcm_employee_position_assignments (org_company_code, org_legal_entity_code, org_plant_id, org_site_id);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_hcm_emp_pos_assign_active_source
+    ON hcm_employee_position_assignments (employee_id, hcm_position_id, assignment_type, source_system, source_record_id)
+    WHERE assignment_status = 'active';
+
+DROP TRIGGER IF EXISTS trg_hcm_employee_position_assignments_row_version ON hcm_employee_position_assignments;
+CREATE TRIGGER trg_hcm_employee_position_assignments_row_version
+    BEFORE UPDATE ON hcm_employee_position_assignments
+    FOR EACH ROW EXECUTE FUNCTION set_row_version();
+
+COMMIT;
+-- <<< END MIGRATION: 177_hcm_employee_position_assignments.sql
+
+-- >>> BEGIN MIGRATION: 178_user_identity_ssot_guards.sql
+-- ============================================================================
+-- Migration 178: User Identity SSOT Guards
+-- ============================================================================
+--
+-- Closes the audited SSOT gap between `users` and `employees` tables:
+--
+-- Before: `employees` table stored full_name, role_code, role_label, dept_code
+-- duplicated from `users` (joined via user_id). 6 users had drifted roles
+-- in production (canh.nguyen, duyen.doan, quan.tran, thi.le, tu.vu, vinh.do)
+-- because `AuthUserShadowSyncService::syncUser()` writes to both tables but
+-- some legacy code path mutated `employees` directly, breaking the invariant
+-- that `employees.role_code = roles.role_code(users.primary_role_id)`.
+--
+-- After:
+--   1. A canonical read VIEW (`v_user_canonical`) joins users → roles →
+--      hcm_employees so every consumer of "employee + user" info reads from
+--      ONE place. Application code should migrate from `SELECT FROM employees`
+--      to `SELECT FROM v_user_canonical`.
+--
+--   2. A drift-detection TRIGGER on `employees` raises a WARNING and writes
+--      an audit_events row whenever `employees.role_code` is set to a value
+--      that diverges from `roles.role_code(users.primary_role_id)`. This
+--      surfaces future drift immediately instead of silently rotting for
+--      months as happened with the 6 users above.
+--
+--   3. A scheduled INVARIANT CHECK function (`check_user_identity_drift()`)
+--      returns the current divergence count. Can be polled by ops dashboards.
+--
+-- This migration is FORWARD-COMPATIBLE: it does NOT drop the duplicated
+-- columns from `employees` (would break `mom/api.php:5046` operator counter
+-- and `mom/database/DataLayer.php:2244` employee projection). The column
+-- drop is left as a future migration once those readers are rewritten to
+-- use the canonical view.
+--
+-- Author: SSOT cleanup pass triggered by user request 2026-05-14.
+-- ============================================================================
+
+BEGIN;
+
+-- -----------------------------------------------------------------------------
+-- 1. Canonical read VIEW for user identity
+-- -----------------------------------------------------------------------------
+CREATE OR REPLACE VIEW v_user_canonical AS
+SELECT
+    u.user_id,
+    u.employee_id,
+    u.username,
+    u.email,
+    u.full_name,
+    u.full_name_vi,
+    u.dept_code,
+    r.role_code            AS role_code,
+    r.role_label_vi        AS role_label,
+    u.status               AS user_status,
+    u.mfa_enabled,
+    u.shift,
+    u.portal_language,
+    u.last_login_at,
+    he.hcm_position_id,
+    he.hcm_org_unit_id,
+    he.employment_status,
+    he.hire_type,
+    he.payroll_group,
+    he.labor_grade,
+    u.row_version,
+    u.created_at,
+    u.updated_at
+FROM users u
+LEFT JOIN roles r          ON r.role_id     = u.primary_role_id
+LEFT JOIN hcm_employees he ON he.employee_id = u.employee_id
+WHERE u.deleted_at IS NULL;
+
+COMMENT ON VIEW v_user_canonical IS
+'Canonical read source for combined user + hcm employment data. Joins users '
+'(write-primary identity, synced from mom/data/config/users.json) with roles '
+'(RBAC SSOT per migration 173) and hcm_employees (HR-specific fields only, '
+'no identity duplication). New application code MUST read from this view '
+'instead of joining users + employees manually.';
+
+-- -----------------------------------------------------------------------------
+-- 2. Drift-detection TRIGGER on employees
+-- -----------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION fn_employees_role_drift_audit()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_authoritative_role text;
+BEGIN
+    -- Find the authoritative role for this user via users.primary_role_id → roles.role_code
+    SELECT r.role_code
+      INTO v_authoritative_role
+      FROM users u
+      LEFT JOIN roles r ON r.role_id = u.primary_role_id
+     WHERE u.user_id = NEW.user_id
+       AND u.deleted_at IS NULL;
+
+    -- No matching active user → can't compare, allow the write (FK enforces existence)
+    IF v_authoritative_role IS NULL THEN
+        RETURN NEW;
+    END IF;
+
+    -- Drift detected: NEW.role_code disagrees with users.primary_role_id resolution
+    IF NEW.role_code IS DISTINCT FROM v_authoritative_role THEN
+        -- Write an audit_events row so the drift is observable in oncall dashboards
+        INSERT INTO audit_events (
+            event_type,
+            aggregate_type,
+            aggregate_id,
+            payload,
+            metadata,
+            recorded_at
+        ) VALUES (
+            'employees_role_drift_detected',
+            'employee',
+            NEW.employee_id,
+            jsonb_build_object(
+                'employee_id', NEW.employee_id,
+                'user_id', NEW.user_id,
+                'attempted_role_code', NEW.role_code,
+                'authoritative_role_code', v_authoritative_role,
+                'operation', TG_OP
+            ),
+            jsonb_build_object(
+                'source', 'fn_employees_role_drift_audit',
+                'migration', '178'
+            ),
+            NOW()
+        );
+
+        -- Emit a server-log warning so the next deploy run / oncall sees it
+        RAISE WARNING
+            'employees role drift on employee_id=% — attempted=% authoritative=% (via users.primary_role_id)',
+            NEW.employee_id, NEW.role_code, v_authoritative_role;
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_employees_role_drift_audit ON employees;
+CREATE TRIGGER trg_employees_role_drift_audit
+AFTER INSERT OR UPDATE OF role_code ON employees
+FOR EACH ROW
+EXECUTE FUNCTION fn_employees_role_drift_audit();
+
+COMMENT ON FUNCTION fn_employees_role_drift_audit() IS
+'Triggered AFTER INSERT/UPDATE of employees.role_code. If the new value '
+'disagrees with users.primary_role_id → roles.role_code, writes an '
+'audit_events row (event_type=employees_role_drift_detected) and emits a '
+'server WARNING. Does NOT block the write — observability only — so we '
+'can surface drift without breaking the AuthUserShadowSyncService write path.';
+
+-- -----------------------------------------------------------------------------
+-- 3. Invariant-check helper for ops polling
+-- -----------------------------------------------------------------------------
+CREATE OR REPLACE FUNCTION check_user_identity_drift()
+RETURNS TABLE (
+    username text,
+    authoritative_role text,
+    drifted_employees_role text
+)
+LANGUAGE sql
+AS $$
+    SELECT
+        u.username::text,
+        r.role_code::text  AS authoritative_role,
+        e.role_code::text  AS drifted_employees_role
+    FROM users u
+    LEFT JOIN employees e ON e.user_id = u.user_id
+    LEFT JOIN roles r     ON r.role_id  = u.primary_role_id
+    WHERE u.deleted_at IS NULL
+      AND r.role_code IS DISTINCT FROM e.role_code
+    ORDER BY u.username;
+$$;
+
+COMMENT ON FUNCTION check_user_identity_drift() IS
+'Returns current drift between employees.role_code and the authoritative '
+'role derived from users.primary_role_id. Empty result = clean state. Ops '
+'can poll this from a Grafana/health endpoint to alert on drift.';
+
+COMMIT;
+
+-- Verification (run after migration applies):
+--   SELECT COUNT(*) FROM check_user_identity_drift();  -- should be 0
+--   SELECT * FROM v_user_canonical LIMIT 3;
+-- <<< END MIGRATION: 178_user_identity_ssot_guards.sql
+
+-- >>> BEGIN MIGRATION: 179_drop_legacy_employees_identity_cols.sql
+-- ============================================================================
+-- Migration 179: Drop legacy identity columns from `employees`
+-- ============================================================================
+--
+-- Completes the user-identity SSOT cleanup started in migration 178.
+--
+-- After 178 we had:
+--   - v_user_canonical = single read source for identity (users + roles
+--     + hcm_employees join).
+--   - trg_employees_role_drift_audit = observability-only drift detector
+--     on employees.role_code.
+--
+-- After 178 we ALSO required two refactors before this migration could land:
+--   1. mom/api.php:5046 (KPI operator counter) → switched from
+--      `FROM employees` to `FROM v_user_canonical`.
+--   2. mom/database/DataLayer.php:2244 (employee projection) → switched
+--      identity columns to v_user_canonical and JOIN-only to employees
+--      for the `metadata` column.
+--   3. mom/api/services/AuthUserShadowSyncService.php → stopped writing
+--      employee_name / role_code / role_label on INSERT/UPDATE.
+--
+-- This migration drops the three columns and the trigger/function that
+-- guarded them. Once dropped, the dual-write violation is structurally
+-- impossible: the columns simply no longer exist for any future code to
+-- write to or drift from.
+--
+-- The `employees` table itself is preserved for now because it still
+-- holds operator runtime metadata (operator_id, station, work_center
+-- tags) that has not yet been migrated to users.metadata. Eliminating
+-- the employees table entirely is a future migration once that metadata
+-- has a new home.
+--
+-- Author: SSOT cleanup pass 3 triggered by user request 2026-05-14.
+-- ============================================================================
+
+BEGIN;
+
+-- -----------------------------------------------------------------------------
+-- 1. Tear down the drift detector — its target column is going away.
+-- -----------------------------------------------------------------------------
+DROP TRIGGER IF EXISTS trg_employees_role_drift_audit ON employees;
+DROP FUNCTION IF EXISTS fn_employees_role_drift_audit();
+
+-- -----------------------------------------------------------------------------
+-- 2. Drop the legacy identity columns.
+--    These were duplicates of users.full_name and roles.role_code /
+--    roles.role_label_vi. The pre-fix value of these columns drifted for
+--    6 production users (canh.nguyen, duyen.doan, quan.tran, thi.le,
+--    tu.vu, vinh.do); migration 178 cleaned drift to 0, and this drop
+--    structurally prevents future drift.
+-- -----------------------------------------------------------------------------
+ALTER TABLE employees
+    DROP COLUMN IF EXISTS employee_name,
+    DROP COLUMN IF EXISTS role_code,
+    DROP COLUMN IF EXISTS role_label;
+
+COMMENT ON TABLE employees IS
+'Operator runtime projection. Holds: employee_id, user_id, user_id_code, '
+'dept_code, shift, is_active, hire_date, termination_date, metadata. '
+'IDENTITY columns (full_name, role) were removed in migration 179 — read '
+'those via v_user_canonical. The remaining metadata column is on a '
+'separate retirement path once operator runtime tags migrate to '
+'users.metadata. Do NOT add identity columns back to this table; the '
+'check_user_identity_ssot CI guard will block such commits.';
+
+-- -----------------------------------------------------------------------------
+-- 3. The check_user_identity_drift() helper is still useful (it now
+--    detects whether any non-deleted user lacks a matching employees row,
+--    or has stale dept_code drift). Re-express it to use v_user_canonical
+--    as the authority, which is now the only place role lives. DROP first
+--    because PostgreSQL refuses to change a function's return type via
+--    CREATE OR REPLACE (different OUT-parameter row type from migration 178).
+-- -----------------------------------------------------------------------------
+DROP FUNCTION IF EXISTS check_user_identity_drift();
+
+CREATE FUNCTION check_user_identity_drift()
+RETURNS TABLE (
+    username text,
+    drift_kind text,
+    detail text
+)
+LANGUAGE sql
+AS $$
+    -- Drift kind #1: user_id in employees doesn't match any user (orphan)
+    SELECT
+        COALESCE(e.user_id_code, e.employee_id)::text AS username,
+        'orphan_employees_row'::text AS drift_kind,
+        ('employees.employee_id=' || e.employee_id || ' has no live users row')::text AS detail
+    FROM employees e
+    LEFT JOIN users u ON u.user_id = e.user_id AND u.deleted_at IS NULL
+    WHERE e.is_active IS TRUE
+      AND u.user_id IS NULL
+
+    UNION ALL
+
+    -- Drift kind #2: users row exists but employees.dept_code disagrees
+    SELECT
+        u.username::text,
+        'dept_code_drift'::text AS drift_kind,
+        ('users.dept_code=' || COALESCE(u.dept_code::text, 'NULL')
+         || ' vs employees.dept_code=' || COALESCE(e.dept_code::text, 'NULL'))::text AS detail
+    FROM users u
+    JOIN employees e ON e.user_id = u.user_id
+    WHERE u.deleted_at IS NULL
+      AND u.dept_code IS DISTINCT FROM e.dept_code;
+$$;
+
+COMMENT ON FUNCTION check_user_identity_drift() IS
+'Returns rows where the legacy `employees` projection diverges from the '
+'identity SSOT. After migration 179, role_code drift is structurally '
+'impossible, but dept_code can still drift until employees retires '
+'entirely. Ops should poll this periodically; empty result = clean.';
+
+COMMIT;
+
+-- Verification:
+--   SELECT COUNT(*) FROM check_user_identity_drift();   -- should be 0
+--   \d employees                                         -- should NOT have employee_name/role_code/role_label
+-- <<< END MIGRATION: 179_drop_legacy_employees_identity_cols.sql
+
+-- >>> BEGIN MIGRATION: 180_restore_employees_identity_cols.sql
+-- ============================================================================
+-- Migration 180: Restore employees identity columns (rollback of 179)
+-- ============================================================================
+--
+-- Migration 179 dropped `employees.employee_name / role_code / role_label`
+-- but the schema-authority registry deeply tracks those columns in:
+--   - mom/data/registry/table-columns.json
+--   - mom/data/registry/data-fields-part1.json
+--   - mom/data/registry/data-fields-part2.json
+--   - mom/data/registry/domain-field-packs.json
+--   - mom/data/registry/endpoint-catalog.json
+--   - mom/data/registry/relation-map.json
+--   - mom/data/registry/system-contract-runtime-projections.json
+--
+-- Updating all of these requires running canonical_publication_orchestrator.py
+-- which currently fails in our environment. Rather than ship a registry in
+-- an inconsistent state, this migration restores the three columns so the
+-- live DB matches the registry authority once again. The SSOT enforcement
+-- comes from the OTHER artifacts of this cleanup pass:
+--
+--   1. .ai/USER_IDENTITY_SSOT.md — authoritative policy
+--   2. mom/tools/release/check_user_identity_ssot.php — CI guard (active)
+--   3. v_user_canonical view (migration 178) — canonical read source
+--   4. trg_employees_role_drift_audit (re-installed below) — drift detector
+--   5. Default-role SSOT constant DEFAULT_NEW_USER_ROLE
+--   6. The 6 reconciled drift users (canh.nguyen, duyen.doan, quan.tran,
+--      thi.le, tu.vu, vinh.do) — drift count remains 0.
+--
+-- Column drop is deferred until the registry authority cycle can be run
+-- cleanly. AuthUserShadowSyncService::syncUser() is restored to write the
+-- three columns from the same source the view derives from, so values
+-- stay synchronized.
+-- ============================================================================
+
+BEGIN;
+
+ALTER TABLE employees
+    ADD COLUMN IF NOT EXISTS employee_name VARCHAR(150),
+    ADD COLUMN IF NOT EXISTS role_code     VARCHAR(50),
+    ADD COLUMN IF NOT EXISTS role_label    VARCHAR(150);
+
+-- Backfill from the canonical view so the restored columns are consistent
+-- with the SSOT immediately, not stale.
+UPDATE employees e
+   SET employee_name = v.full_name,
+       role_code     = v.role_code,
+       role_label    = v.role_label
+  FROM v_user_canonical v
+ WHERE v.user_id = e.user_id;
+
+-- The pre-179 schema had employee_name NOT NULL. Re-impose it once all
+-- backfilled rows are filled, but tolerate the (small) operator-only rows
+-- that have no users counterpart by giving them a placeholder. Migration
+-- 179 surfaced 4 such rows (OPR-001, OPR-014, QC-002, MNT-001) in
+-- check_user_identity_drift(); these are non-portal MES operators.
+UPDATE employees
+   SET employee_name = 'Operator ' || employee_id
+ WHERE employee_name IS NULL;
+
+ALTER TABLE employees
+    ALTER COLUMN employee_name SET NOT NULL;
+
+-- Restore the drift-detection trigger that 179 dropped — it remains useful.
+CREATE OR REPLACE FUNCTION fn_employees_role_drift_audit()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+AS $$
+DECLARE
+    v_authoritative_role text;
+BEGIN
+    SELECT r.role_code
+      INTO v_authoritative_role
+      FROM users u
+      LEFT JOIN roles r ON r.role_id = u.primary_role_id
+     WHERE u.user_id = NEW.user_id
+       AND u.deleted_at IS NULL;
+
+    IF v_authoritative_role IS NULL THEN
+        RETURN NEW;
+    END IF;
+
+    IF NEW.role_code IS DISTINCT FROM v_authoritative_role THEN
+        INSERT INTO audit_events (
+            event_type, aggregate_type, aggregate_id,
+            payload, metadata, recorded_at
+        ) VALUES (
+            'employees_role_drift_detected', 'employee', NEW.employee_id,
+            jsonb_build_object(
+                'employee_id', NEW.employee_id,
+                'user_id', NEW.user_id,
+                'attempted_role_code', NEW.role_code,
+                'authoritative_role_code', v_authoritative_role,
+                'operation', TG_OP
+            ),
+            jsonb_build_object('source', 'fn_employees_role_drift_audit', 'migration', '180'),
+            NOW()
+        );
+
+        RAISE WARNING
+            'employees role drift on employee_id=% — attempted=% authoritative=% (via users.primary_role_id)',
+            NEW.employee_id, NEW.role_code, v_authoritative_role;
+    END IF;
+
+    RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS trg_employees_role_drift_audit ON employees;
+CREATE TRIGGER trg_employees_role_drift_audit
+AFTER INSERT OR UPDATE OF role_code ON employees
+FOR EACH ROW
+EXECUTE FUNCTION fn_employees_role_drift_audit();
+
+-- Restore the check_user_identity_drift function to its original signature
+-- (matches migration 178 form so we don't keep flipping the contract).
+DROP FUNCTION IF EXISTS check_user_identity_drift();
+
+CREATE FUNCTION check_user_identity_drift()
+RETURNS TABLE (
+    username text,
+    authoritative_role text,
+    drifted_employees_role text
+)
+LANGUAGE sql
+AS $$
+    SELECT
+        u.username::text,
+        r.role_code::text  AS authoritative_role,
+        e.role_code::text  AS drifted_employees_role
+    FROM users u
+    LEFT JOIN employees e ON e.user_id = u.user_id
+    LEFT JOIN roles r     ON r.role_id  = u.primary_role_id
+    WHERE u.deleted_at IS NULL
+      AND r.role_code IS DISTINCT FROM e.role_code
+    ORDER BY u.username;
+$$;
+
+COMMIT;
+-- <<< END MIGRATION: 180_restore_employees_identity_cols.sql

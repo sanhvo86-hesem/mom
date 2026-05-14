@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "generatedAt": "2026-04-24T08:27:20.938Z",
+    "generatedAt": "2026-05-14T03:02:12.280Z",
     "source": "system_contract_authority_generator",
     "authorityLayer": "system_contract_registry",
     "authorityViewKind": "db_derived_contract",
@@ -8,7 +8,7 @@
     "designEditable": false,
     "physicalDbSchema": "public",
     "authoritySource": "database/migrations/*.sql -> database/schema.sql -> table-registry.json",
-    "publication_run_id": "c544a828-8ff5-44a4-9d02-0e0814d38afa",
+    "publication_run_id": "a78697bf-4652-476e-a4b9-5a9362caf639",
     "sourceFiles": [
       "data/registry/table-registry.json",
       "data/registry/relation-map.json",
@@ -24,13 +24,181 @@
     "purpose": "Segmented runtime contract read model for bounded-memory reads and targeted rebuild verification.",
     "segmentId": "relations",
     "sourceArtifact": "data/registry/system-contract-runtime-projections.json",
-    "sourceSha256": "fbc6c46cd5118972e314a08b382f4ca099446c20fdb0be6d9b1d66c328718669",
-    "sourceGeneratedAt": "2026-04-24T08:27:20.938Z",
+    "sourceSha256": "2e2df1ece73e941b2898c37b76f2e64182f7a115a91b56063eab46a39d70f23b",
+    "sourceGeneratedAt": "2026-05-14T03:02:12.280Z",
     "writePolicy": "generated_segment_do_not_edit",
     "revisionGuard": "sourceSha256"
   },
   "section": "relations",
   "data": [
+    {
+      "id": "rel_access_review_campaign_review_owner_id_users_user_id",
+      "from": {
+        "entity": "access_review_campaign",
+        "field": "review_owner_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_access_review_campaign_review_owner_id",
+      "nullable": true,
+      "label": "Truy cập xem xét chiến dịch → Người dùng",
+      "labelEn": "Access Review Campaign → Users",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "review_owner_id",
+      "targetColumn": "user_id",
+      "lookupEntity": "users",
+      "lookupEndpoint": "core_system.users.list",
+      "displayField": "full_name",
+      "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_access_review_item_campaign_id_access_review_campaign_campaign_id",
+      "from": {
+        "entity": "access_review_item",
+        "field": "campaign_id"
+      },
+      "to": {
+        "entity": "access_review_campaign",
+        "field": "campaign_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_access_review_item_campaign_id",
+      "nullable": false,
+      "label": "Truy cập xem xét Mã hàng → Truy cập xem xét chiến dịch",
+      "labelEn": "Access Review Item → Access Review Campaign",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "campaign_id",
+      "targetColumn": "campaign_id",
+      "lookupEntity": "access_review_campaign",
+      "lookupEndpoint": "core_system.access_review_campaign.list",
+      "displayField": "name",
+      "valueField": "campaign_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_access_review_item_target_user_id_users_user_id",
+      "from": {
+        "entity": "access_review_item",
+        "field": "target_user_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_access_review_item_target_user_id",
+      "nullable": false,
+      "label": "Truy cập xem xét Mã hàng → Người dùng",
+      "labelEn": "Access Review Item → Users",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "target_user_id",
+      "targetColumn": "user_id",
+      "lookupEntity": "users",
+      "lookupEndpoint": "core_system.users.list",
+      "displayField": "full_name",
+      "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_access_review_item_target_role_id_roles_role_id",
+      "from": {
+        "entity": "access_review_item",
+        "field": "target_role_id"
+      },
+      "to": {
+        "entity": "roles",
+        "field": "role_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_access_review_item_target_role_id",
+      "nullable": true,
+      "label": "Truy cập xem xét Mã hàng → Vai trò",
+      "labelEn": "Access Review Item → Roles",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "target_role_id",
+      "targetColumn": "role_id",
+      "lookupEntity": "roles",
+      "lookupEndpoint": "core_system.roles.list",
+      "displayField": "dept_code",
+      "valueField": "role_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_access_review_item_sod_conflict_id_role_sod_conflict_conflict_id",
+      "from": {
+        "entity": "access_review_item",
+        "field": "sod_conflict_id"
+      },
+      "to": {
+        "entity": "role_sod_conflict",
+        "field": "conflict_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_access_review_item_sod_conflict_id",
+      "nullable": true,
+      "label": "Truy cập xem xét Mã hàng → Vai trò Sod xung đột",
+      "labelEn": "Access Review Item → Role Sod Conflict",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "sod_conflict_id",
+      "targetColumn": "conflict_id",
+      "lookupEntity": "role_sod_conflict",
+      "lookupEndpoint": "core_system.role_sod_conflict.list",
+      "displayField": "org_company_code",
+      "valueField": "conflict_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_access_review_item_attested_by_users_user_id",
+      "from": {
+        "entity": "access_review_item",
+        "field": "attested_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_access_review_item_attested_by",
+      "nullable": true,
+      "label": "Truy cập xem xét Mã hàng → Người dùng",
+      "labelEn": "Access Review Item → Users",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "attested_by",
+      "targetColumn": "user_id",
+      "lookupEntity": "users",
+      "lookupEndpoint": "core_system.users.list",
+      "displayField": "full_name",
+      "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
     {
       "id": "rel_alarm_event_work_unit_id_org_work_unit_work_unit_id",
       "from": {
@@ -14240,6 +14408,34 @@
       "cascadeActions": []
     },
     {
+      "id": "rel_data_collection_drift_collection_key_data_collection_state_collection_key",
+      "from": {
+        "entity": "data_collection_drift",
+        "field": "collection_key"
+      },
+      "to": {
+        "entity": "data_collection_state",
+        "field": "collection_key"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_data_collection_drift_collection_key",
+      "nullable": false,
+      "label": "Dữ liệu Collection Drift → Dữ liệu Collection Trạng thái",
+      "labelEn": "Data Collection Drift → Data Collection State",
+      "domain": "system_infrastructure -> system_infrastructure",
+      "fromDomain": "system_infrastructure",
+      "toDomain": "system_infrastructure",
+      "sourceColumn": "collection_key",
+      "targetColumn": "collection_key",
+      "lookupEntity": "data_collection_state",
+      "lookupEndpoint": "system_infrastructure.data_collection_state.list",
+      "displayField": "advance_change_ref",
+      "valueField": "collection_key",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
       "id": "rel_dcc_doc_type_catalog_default_owner_role_dcc_role_catalog_role_code",
       "from": {
         "entity": "dcc_doc_type_catalog",
@@ -16956,6 +17152,90 @@
       "cascadeActions": []
     },
     {
+      "id": "rel_document_acknowledgement_user_id_users_user_id",
+      "from": {
+        "entity": "document_acknowledgement",
+        "field": "user_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_document_acknowledgement_user_id",
+      "nullable": false,
+      "label": "Tài liệu Acknowledgement → Người dùng",
+      "labelEn": "Document Acknowledgement → Users",
+      "domain": "document_control -> core_system",
+      "fromDomain": "document_control",
+      "toDomain": "core_system",
+      "sourceColumn": "user_id",
+      "targetColumn": "user_id",
+      "lookupEntity": "users",
+      "lookupEndpoint": "core_system.users.list",
+      "displayField": "full_name",
+      "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_document_acknowledgement_mfa_challenge_id_mfa_challenge_challenge_id",
+      "from": {
+        "entity": "document_acknowledgement",
+        "field": "mfa_challenge_id"
+      },
+      "to": {
+        "entity": "mfa_challenge",
+        "field": "challenge_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_document_acknowledgement_mfa_challenge_id",
+      "nullable": true,
+      "label": "Tài liệu Acknowledgement → MFA Challenge",
+      "labelEn": "Document Acknowledgement → Mfa Challenge",
+      "domain": "document_control -> core_system",
+      "fromDomain": "document_control",
+      "toDomain": "core_system",
+      "sourceColumn": "mfa_challenge_id",
+      "targetColumn": "challenge_id",
+      "lookupEntity": "mfa_challenge",
+      "lookupEndpoint": "core_system.mfa_challenge.list",
+      "displayField": "aal_achieved",
+      "valueField": "challenge_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_document_acknowledgement_revoked_by_users_user_id",
+      "from": {
+        "entity": "document_acknowledgement",
+        "field": "revoked_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_document_acknowledgement_revoked_by",
+      "nullable": true,
+      "label": "Tài liệu Acknowledgement → Người dùng",
+      "labelEn": "Document Acknowledgement → Users",
+      "domain": "document_control -> core_system",
+      "fromDomain": "document_control",
+      "toDomain": "core_system",
+      "sourceColumn": "revoked_by",
+      "targetColumn": "user_id",
+      "lookupEntity": "users",
+      "lookupEndpoint": "core_system.users.list",
+      "displayField": "full_name",
+      "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
       "id": "rel_document_distribution_version_id_document_versions_version_id",
       "from": {
         "entity": "document_distribution",
@@ -17367,6 +17647,62 @@
       "fromDomain": "document_control",
       "toDomain": "core_system",
       "sourceColumn": "deleted_by",
+      "targetColumn": "user_id",
+      "lookupEntity": "users",
+      "lookupEndpoint": "core_system.users.list",
+      "displayField": "full_name",
+      "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_document_permission_grant_granted_by_users_user_id",
+      "from": {
+        "entity": "document_permission_grant",
+        "field": "granted_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_document_permission_grant_granted_by",
+      "nullable": true,
+      "label": "Tài liệu Quyền Grant → Người dùng",
+      "labelEn": "Document Permission Grant → Users",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "granted_by",
+      "targetColumn": "user_id",
+      "lookupEntity": "users",
+      "lookupEndpoint": "core_system.users.list",
+      "displayField": "full_name",
+      "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_document_permission_grant_revoked_by_users_user_id",
+      "from": {
+        "entity": "document_permission_grant",
+        "field": "revoked_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_document_permission_grant_revoked_by",
+      "nullable": true,
+      "label": "Tài liệu Quyền Grant → Người dùng",
+      "labelEn": "Document Permission Grant → Users",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "revoked_by",
       "targetColumn": "user_id",
       "lookupEntity": "users",
       "lookupEndpoint": "core_system.users.list",
@@ -17848,6 +18184,34 @@
       "lookupEndpoint": "core_system.users.list",
       "displayField": "full_name",
       "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_documents_retention_policy_code_retention_policy_policy_code",
+      "from": {
+        "entity": "documents",
+        "field": "retention_policy_code"
+      },
+      "to": {
+        "entity": "retention_policy",
+        "field": "policy_code"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_documents_retention_policy_code",
+      "nullable": true,
+      "label": "Tài liệu → Lưu giữ Chính sách",
+      "labelEn": "Documents → Retention Policy",
+      "domain": "document_control -> master_data_governance",
+      "fromDomain": "document_control",
+      "toDomain": "master_data_governance",
+      "sourceColumn": "retention_policy_code",
+      "targetColumn": "policy_code",
+      "lookupEntity": "retention_policy",
+      "lookupEndpoint": "master_data_governance.retention_policy.list",
+      "displayField": "org_company_code",
+      "valueField": "policy_code",
       "digitalThread": true,
       "cascadeActions": []
     },
@@ -41126,6 +41490,202 @@
       "cascadeActions": []
     },
     {
+      "id": "rel_hcm_employee_position_assignments_employee_id_hcm_employees_employee_id",
+      "from": {
+        "entity": "hcm_employee_position_assignments",
+        "field": "employee_id"
+      },
+      "to": {
+        "entity": "hcm_employees",
+        "field": "employee_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_hcm_employee_position_assignments_employee_id",
+      "nullable": false,
+      "label": "Nhân viên vị trí phân công HCM → Nhân viên HCM",
+      "labelEn": "HCM Employee Position Assignments → HCM Employees",
+      "domain": "hcm_workforce -> hcm_workforce",
+      "fromDomain": "hcm_workforce",
+      "toDomain": "hcm_workforce",
+      "sourceColumn": "employee_id",
+      "targetColumn": "employee_id",
+      "lookupEntity": "hcm_employees",
+      "lookupEndpoint": "hcm_workforce.hcm_employees.list",
+      "displayField": "emergency_contact_name",
+      "valueField": "employee_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_hcm_employee_position_assignments_hcm_position_id_hcm_positions_hcm_position_id",
+      "from": {
+        "entity": "hcm_employee_position_assignments",
+        "field": "hcm_position_id"
+      },
+      "to": {
+        "entity": "hcm_positions",
+        "field": "hcm_position_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_hcm_employee_position_assignments_hcm_position_id",
+      "nullable": false,
+      "label": "Nhân viên vị trí phân công HCM → Vị trí HCM",
+      "labelEn": "HCM Employee Position Assignments → HCM Positions",
+      "domain": "hcm_workforce -> hcm_workforce",
+      "fromDomain": "hcm_workforce",
+      "toDomain": "hcm_workforce",
+      "sourceColumn": "hcm_position_id",
+      "targetColumn": "hcm_position_id",
+      "lookupEntity": "hcm_positions",
+      "lookupEndpoint": "hcm_workforce.hcm_positions.list",
+      "displayField": "position_title",
+      "valueField": "hcm_position_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_hcm_employee_position_assignments_hcm_org_unit_id_hcm_org_units_hcm_org_unit_id",
+      "from": {
+        "entity": "hcm_employee_position_assignments",
+        "field": "hcm_org_unit_id"
+      },
+      "to": {
+        "entity": "hcm_org_units",
+        "field": "hcm_org_unit_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_hcm_employee_position_assignments_hcm_org_unit_id",
+      "nullable": false,
+      "label": "Nhân viên vị trí phân công HCM → Org Đơn vị HCM",
+      "labelEn": "HCM Employee Position Assignments → HCM Org Units",
+      "domain": "hcm_workforce -> hcm_workforce",
+      "fromDomain": "hcm_workforce",
+      "toDomain": "hcm_workforce",
+      "sourceColumn": "hcm_org_unit_id",
+      "targetColumn": "hcm_org_unit_id",
+      "lookupEntity": "hcm_org_units",
+      "lookupEndpoint": "hcm_workforce.hcm_org_units.list",
+      "displayField": "org_unit_name",
+      "valueField": "hcm_org_unit_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_hcm_employee_position_assignments_org_company_code_org_companies_company_code",
+      "from": {
+        "entity": "hcm_employee_position_assignments",
+        "field": "org_company_code"
+      },
+      "to": {
+        "entity": "org_companies",
+        "field": "company_code"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_hcm_employee_position_assignments_org_company_code",
+      "nullable": true,
+      "label": "Nhân viên vị trí phân công HCM → Org Company",
+      "labelEn": "HCM Employee Position Assignments → Org Companies",
+      "domain": "hcm_workforce -> foundation_governance",
+      "fromDomain": "hcm_workforce",
+      "toDomain": "foundation_governance",
+      "sourceColumn": "org_company_code",
+      "targetColumn": "company_code",
+      "lookupEntity": "org_companies",
+      "lookupEndpoint": "foundation_governance.org_companies.list",
+      "displayField": "company_name",
+      "valueField": "company_code",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_hcm_employee_position_assignments_org_legal_entity_code_org_legal_entities_legal_entity_code",
+      "from": {
+        "entity": "hcm_employee_position_assignments",
+        "field": "org_legal_entity_code"
+      },
+      "to": {
+        "entity": "org_legal_entities",
+        "field": "legal_entity_code"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_hcm_employee_position_assignments_org_legal_entity_code",
+      "nullable": true,
+      "label": "Nhân viên vị trí phân công HCM → Org Legal đối tượng",
+      "labelEn": "HCM Employee Position Assignments → Org Legal Entities",
+      "domain": "hcm_workforce -> foundation_governance",
+      "fromDomain": "hcm_workforce",
+      "toDomain": "foundation_governance",
+      "sourceColumn": "org_legal_entity_code",
+      "targetColumn": "legal_entity_code",
+      "lookupEntity": "org_legal_entities",
+      "lookupEndpoint": "foundation_governance.org_legal_entities.list",
+      "displayField": "legal_entity_name",
+      "valueField": "legal_entity_code",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_hcm_employee_position_assignments_org_plant_id_org_plants_plant_id",
+      "from": {
+        "entity": "hcm_employee_position_assignments",
+        "field": "org_plant_id"
+      },
+      "to": {
+        "entity": "org_plants",
+        "field": "plant_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_hcm_employee_position_assignments_org_plant_id",
+      "nullable": true,
+      "label": "Nhân viên vị trí phân công HCM → Org Plant",
+      "labelEn": "HCM Employee Position Assignments → Org Plants",
+      "domain": "hcm_workforce -> foundation_governance",
+      "fromDomain": "hcm_workforce",
+      "toDomain": "foundation_governance",
+      "sourceColumn": "org_plant_id",
+      "targetColumn": "plant_id",
+      "lookupEntity": "org_plants",
+      "lookupEndpoint": "foundation_governance.org_plants.list",
+      "displayField": "plant_name",
+      "valueField": "plant_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_hcm_employee_position_assignments_org_site_id_mes_sites_site_id",
+      "from": {
+        "entity": "hcm_employee_position_assignments",
+        "field": "org_site_id"
+      },
+      "to": {
+        "entity": "mes_sites",
+        "field": "site_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_hcm_employee_position_assignments_org_site_id",
+      "nullable": true,
+      "label": "Nhân viên vị trí phân công HCM → Địa điểm MES",
+      "labelEn": "HCM Employee Position Assignments → MES Sites",
+      "domain": "hcm_workforce -> mes_execution",
+      "fromDomain": "hcm_workforce",
+      "toDomain": "mes_execution",
+      "sourceColumn": "org_site_id",
+      "targetColumn": "site_id",
+      "lookupEntity": "mes_sites",
+      "lookupEndpoint": "mes_execution.mes_sites.list",
+      "displayField": "site_name",
+      "valueField": "site_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
       "id": "rel_hcm_employee_skills_employee_id_hcm_employees_employee_id",
       "from": {
         "entity": "hcm_employee_skills",
@@ -59382,6 +59942,202 @@
       "cascadeActions": []
     },
     {
+      "id": "rel_mfa_challenge_user_id_users_user_id",
+      "from": {
+        "entity": "mfa_challenge",
+        "field": "user_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_mfa_challenge_user_id",
+      "nullable": false,
+      "label": "MFA Challenge → Người dùng",
+      "labelEn": "Mfa Challenge → Users",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "user_id",
+      "targetColumn": "user_id",
+      "lookupEntity": "users",
+      "lookupEndpoint": "core_system.users.list",
+      "displayField": "full_name",
+      "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_mfa_challenge_factor_id_mfa_factor_factor_id",
+      "from": {
+        "entity": "mfa_challenge",
+        "field": "factor_id"
+      },
+      "to": {
+        "entity": "mfa_factor",
+        "field": "factor_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_mfa_challenge_factor_id",
+      "nullable": true,
+      "label": "MFA Challenge → MFA Factor",
+      "labelEn": "Mfa Challenge → Mfa Factor",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "factor_id",
+      "targetColumn": "factor_id",
+      "lookupEntity": "mfa_factor",
+      "lookupEndpoint": "core_system.mfa_factor.list",
+      "displayField": "org_company_code",
+      "valueField": "factor_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_mfa_factor_user_id_users_user_id",
+      "from": {
+        "entity": "mfa_factor",
+        "field": "user_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_mfa_factor_user_id",
+      "nullable": false,
+      "label": "MFA Factor → Người dùng",
+      "labelEn": "Mfa Factor → Users",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "user_id",
+      "targetColumn": "user_id",
+      "lookupEntity": "users",
+      "lookupEndpoint": "core_system.users.list",
+      "displayField": "full_name",
+      "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_mfa_factor_revoked_by_users_user_id",
+      "from": {
+        "entity": "mfa_factor",
+        "field": "revoked_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_mfa_factor_revoked_by",
+      "nullable": true,
+      "label": "MFA Factor → Người dùng",
+      "labelEn": "Mfa Factor → Users",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "revoked_by",
+      "targetColumn": "user_id",
+      "lookupEntity": "users",
+      "lookupEndpoint": "core_system.users.list",
+      "displayField": "full_name",
+      "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_mfa_policy_role_id_roles_role_id",
+      "from": {
+        "entity": "mfa_policy",
+        "field": "role_id"
+      },
+      "to": {
+        "entity": "roles",
+        "field": "role_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_mfa_policy_role_id",
+      "nullable": true,
+      "label": "MFA Chính sách → Vai trò",
+      "labelEn": "Mfa Policy → Roles",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "role_id",
+      "targetColumn": "role_id",
+      "lookupEntity": "roles",
+      "lookupEndpoint": "core_system.roles.list",
+      "displayField": "dept_code",
+      "valueField": "role_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_mfa_policy_last_modified_by_users_user_id",
+      "from": {
+        "entity": "mfa_policy",
+        "field": "last_modified_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_mfa_policy_last_modified_by",
+      "nullable": true,
+      "label": "MFA Chính sách → Người dùng",
+      "labelEn": "Mfa Policy → Users",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "last_modified_by",
+      "targetColumn": "user_id",
+      "lookupEntity": "users",
+      "lookupEndpoint": "core_system.users.list",
+      "displayField": "full_name",
+      "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_mfa_recovery_code_user_id_users_user_id",
+      "from": {
+        "entity": "mfa_recovery_code",
+        "field": "user_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_mfa_recovery_code_user_id",
+      "nullable": false,
+      "label": "MFA Recovery Mã → Người dùng",
+      "labelEn": "Mfa Recovery Code → Users",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "user_id",
+      "targetColumn": "user_id",
+      "lookupEntity": "users",
+      "lookupEndpoint": "core_system.users.list",
+      "displayField": "full_name",
+      "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
       "id": "rel_mobile_inspection_captures_operator_id_employees_employee_id",
       "from": {
         "entity": "mobile_inspection_captures",
@@ -59854,6 +60610,90 @@
       "lookupEndpoint": "mes_execution.mes_sites.list",
       "displayField": "site_name",
       "valueField": "site_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_module_permission_role_id_roles_role_id",
+      "from": {
+        "entity": "module_permission",
+        "field": "role_id"
+      },
+      "to": {
+        "entity": "roles",
+        "field": "role_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_module_permission_role_id",
+      "nullable": false,
+      "label": "Module Quyền → Vai trò",
+      "labelEn": "Module Permission → Roles",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "role_id",
+      "targetColumn": "role_id",
+      "lookupEntity": "roles",
+      "lookupEndpoint": "core_system.roles.list",
+      "displayField": "dept_code",
+      "valueField": "role_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_module_permission_module_code_modules_catalog_module_code",
+      "from": {
+        "entity": "module_permission",
+        "field": "module_code"
+      },
+      "to": {
+        "entity": "modules_catalog",
+        "field": "module_code"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_module_permission_module_code",
+      "nullable": false,
+      "label": "Module Quyền → Module danh mục",
+      "labelEn": "Module Permission → Modules Catalog",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "module_code",
+      "targetColumn": "module_code",
+      "lookupEntity": "modules_catalog",
+      "lookupEndpoint": "core_system.modules_catalog.list",
+      "displayField": "module_code",
+      "valueField": "module_code",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_modules_catalog_parent_module_code_modules_catalog_module_code",
+      "from": {
+        "entity": "modules_catalog",
+        "field": "parent_module_code"
+      },
+      "to": {
+        "entity": "modules_catalog",
+        "field": "module_code"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_modules_catalog_parent_module_code",
+      "nullable": true,
+      "label": "Module danh mục → Module danh mục",
+      "labelEn": "Modules Catalog → Modules Catalog",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "parent_module_code",
+      "targetColumn": "module_code",
+      "lookupEntity": "modules_catalog",
+      "lookupEndpoint": "core_system.modules_catalog.list",
+      "displayField": "module_code",
+      "valueField": "module_code",
       "digitalThread": true,
       "cascadeActions": []
     },
@@ -71428,6 +72268,62 @@
       "cascadeActions": []
     },
     {
+      "id": "rel_portal_display_preference_user_id_users_user_id",
+      "from": {
+        "entity": "portal_display_preference",
+        "field": "user_id"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_portal_display_preference_user_id",
+      "nullable": true,
+      "label": "Cổng Display Preference → Người dùng",
+      "labelEn": "Portal Display Preference → Users",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "user_id",
+      "targetColumn": "user_id",
+      "lookupEntity": "users",
+      "lookupEndpoint": "core_system.users.list",
+      "displayField": "full_name",
+      "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_portal_display_preference_preferred_layout_id_portal_layout_template_layout_id",
+      "from": {
+        "entity": "portal_display_preference",
+        "field": "preferred_layout_id"
+      },
+      "to": {
+        "entity": "portal_layout_template",
+        "field": "layout_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_portal_display_preference_preferred_layout_id",
+      "nullable": true,
+      "label": "Cổng Display Preference → Cổng bố trí mẫu",
+      "labelEn": "Portal Display Preference → Portal Layout Template",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "preferred_layout_id",
+      "targetColumn": "layout_id",
+      "lookupEntity": "portal_layout_template",
+      "lookupEndpoint": "core_system.portal_layout_template.list",
+      "displayField": "layout_code",
+      "valueField": "layout_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
       "id": "rel_portal_document_access_portal_user_id_portal_users_portal_user_id",
       "from": {
         "entity": "portal_document_access",
@@ -71592,6 +72488,62 @@
       "lookupEndpoint": "mes_execution.mes_sites.list",
       "displayField": "site_name",
       "valueField": "site_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_portal_layout_widget_layout_id_portal_layout_template_layout_id",
+      "from": {
+        "entity": "portal_layout_widget",
+        "field": "layout_id"
+      },
+      "to": {
+        "entity": "portal_layout_template",
+        "field": "layout_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_portal_layout_widget_layout_id",
+      "nullable": false,
+      "label": "Cổng bố trí Widget → Cổng bố trí mẫu",
+      "labelEn": "Portal Layout Widget → Portal Layout Template",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "layout_id",
+      "targetColumn": "layout_id",
+      "lookupEntity": "portal_layout_template",
+      "lookupEndpoint": "core_system.portal_layout_template.list",
+      "displayField": "layout_code",
+      "valueField": "layout_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_portal_layout_widget_widget_code_portal_widget_catalog_widget_code",
+      "from": {
+        "entity": "portal_layout_widget",
+        "field": "widget_code"
+      },
+      "to": {
+        "entity": "portal_widget_catalog",
+        "field": "widget_code"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_portal_layout_widget_widget_code",
+      "nullable": false,
+      "label": "Cổng bố trí Widget → Cổng Widget danh mục",
+      "labelEn": "Portal Layout Widget → Portal Widget Catalog",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "widget_code",
+      "targetColumn": "widget_code",
+      "lookupEntity": "portal_widget_catalog",
+      "lookupEndpoint": "core_system.portal_widget_catalog.list",
+      "displayField": "org_company_code",
+      "valueField": "widget_code",
       "digitalThread": true,
       "cascadeActions": []
     },
@@ -80948,6 +81900,258 @@
       "cascadeActions": []
     },
     {
+      "id": "rel_retention_class_assignment_policy_code_retention_policy_policy_code",
+      "from": {
+        "entity": "retention_class_assignment",
+        "field": "policy_code"
+      },
+      "to": {
+        "entity": "retention_policy",
+        "field": "policy_code"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_retention_class_assignment_policy_code",
+      "nullable": false,
+      "label": "Lưu giữ Cla phân công → Lưu giữ Chính sách",
+      "labelEn": "Retention Class Assignment → Retention Policy",
+      "domain": "master_data_governance -> master_data_governance",
+      "fromDomain": "master_data_governance",
+      "toDomain": "master_data_governance",
+      "sourceColumn": "policy_code",
+      "targetColumn": "policy_code",
+      "lookupEntity": "retention_policy",
+      "lookupEndpoint": "master_data_governance.retention_policy.list",
+      "displayField": "org_company_code",
+      "valueField": "policy_code",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_retention_class_assignment_classified_by_users_user_id",
+      "from": {
+        "entity": "retention_class_assignment",
+        "field": "classified_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_retention_class_assignment_classified_by",
+      "nullable": true,
+      "label": "Lưu giữ Cla phân công → Người dùng",
+      "labelEn": "Retention Class Assignment → Users",
+      "domain": "master_data_governance -> core_system",
+      "fromDomain": "master_data_governance",
+      "toDomain": "core_system",
+      "sourceColumn": "classified_by",
+      "targetColumn": "user_id",
+      "lookupEntity": "users",
+      "lookupEndpoint": "core_system.users.list",
+      "displayField": "full_name",
+      "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_retention_class_assignment_override_of_id_retention_class_assignment_assignment_id",
+      "from": {
+        "entity": "retention_class_assignment",
+        "field": "override_of_id"
+      },
+      "to": {
+        "entity": "retention_class_assignment",
+        "field": "assignment_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_retention_class_assignment_override_of_id",
+      "nullable": true,
+      "label": "Lưu giữ Cla phân công → Lưu giữ Cla phân công",
+      "labelEn": "Retention Class Assignment → Retention Class Assignment",
+      "domain": "master_data_governance -> master_data_governance",
+      "fromDomain": "master_data_governance",
+      "toDomain": "master_data_governance",
+      "sourceColumn": "override_of_id",
+      "targetColumn": "assignment_id",
+      "lookupEntity": "retention_class_assignment",
+      "lookupEndpoint": "master_data_governance.retention_class_assignment.list",
+      "displayField": "org_company_code",
+      "valueField": "assignment_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_retention_disposal_event_policy_code_retention_policy_policy_code",
+      "from": {
+        "entity": "retention_disposal_event",
+        "field": "policy_code"
+      },
+      "to": {
+        "entity": "retention_policy",
+        "field": "policy_code"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_retention_disposal_event_policy_code",
+      "nullable": true,
+      "label": "Lưu giữ Disposal sự kiện → Lưu giữ Chính sách",
+      "labelEn": "Retention Disposal Event → Retention Policy",
+      "domain": "master_data_governance -> master_data_governance",
+      "fromDomain": "master_data_governance",
+      "toDomain": "master_data_governance",
+      "sourceColumn": "policy_code",
+      "targetColumn": "policy_code",
+      "lookupEntity": "retention_policy",
+      "lookupEndpoint": "master_data_governance.retention_policy.list",
+      "displayField": "org_company_code",
+      "valueField": "policy_code",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_retention_disposal_event_disposed_by_users_user_id",
+      "from": {
+        "entity": "retention_disposal_event",
+        "field": "disposed_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_retention_disposal_event_disposed_by",
+      "nullable": true,
+      "label": "Lưu giữ Disposal sự kiện → Người dùng",
+      "labelEn": "Retention Disposal Event → Users",
+      "domain": "master_data_governance -> core_system",
+      "fromDomain": "master_data_governance",
+      "toDomain": "core_system",
+      "sourceColumn": "disposed_by",
+      "targetColumn": "user_id",
+      "lookupEntity": "users",
+      "lookupEndpoint": "core_system.users.list",
+      "displayField": "full_name",
+      "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_retention_disposal_event_witnessed_by_users_user_id",
+      "from": {
+        "entity": "retention_disposal_event",
+        "field": "witnessed_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_retention_disposal_event_witnessed_by",
+      "nullable": true,
+      "label": "Lưu giữ Disposal sự kiện → Người dùng",
+      "labelEn": "Retention Disposal Event → Users",
+      "domain": "master_data_governance -> core_system",
+      "fromDomain": "master_data_governance",
+      "toDomain": "core_system",
+      "sourceColumn": "witnessed_by",
+      "targetColumn": "user_id",
+      "lookupEntity": "users",
+      "lookupEndpoint": "core_system.users.list",
+      "displayField": "full_name",
+      "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_retention_disposal_event_reverse_of_event_id_retention_disposal_event_event_id",
+      "from": {
+        "entity": "retention_disposal_event",
+        "field": "reverse_of_event_id"
+      },
+      "to": {
+        "entity": "retention_disposal_event",
+        "field": "event_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_retention_disposal_event_reverse_of_event_id",
+      "nullable": true,
+      "label": "Lưu giữ Disposal sự kiện → Lưu giữ Disposal sự kiện",
+      "labelEn": "Retention Disposal Event → Retention Disposal Event",
+      "domain": "master_data_governance -> master_data_governance",
+      "fromDomain": "master_data_governance",
+      "toDomain": "master_data_governance",
+      "sourceColumn": "reverse_of_event_id",
+      "targetColumn": "event_id",
+      "lookupEntity": "retention_disposal_event",
+      "lookupEndpoint": "master_data_governance.retention_disposal_event.list",
+      "displayField": "org_company_code",
+      "valueField": "event_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_retention_legal_hold_started_by_users_user_id",
+      "from": {
+        "entity": "retention_legal_hold",
+        "field": "started_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_retention_legal_hold_started_by",
+      "nullable": true,
+      "label": "Lưu giữ Legal tạm giữ → Người dùng",
+      "labelEn": "Retention Legal Hold → Users",
+      "domain": "master_data_governance -> core_system",
+      "fromDomain": "master_data_governance",
+      "toDomain": "core_system",
+      "sourceColumn": "started_by",
+      "targetColumn": "user_id",
+      "lookupEntity": "users",
+      "lookupEndpoint": "core_system.users.list",
+      "displayField": "full_name",
+      "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_retention_legal_hold_released_by_users_user_id",
+      "from": {
+        "entity": "retention_legal_hold",
+        "field": "released_by"
+      },
+      "to": {
+        "entity": "users",
+        "field": "user_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_retention_legal_hold_released_by",
+      "nullable": true,
+      "label": "Lưu giữ Legal tạm giữ → Người dùng",
+      "labelEn": "Retention Legal Hold → Users",
+      "domain": "master_data_governance -> core_system",
+      "fromDomain": "master_data_governance",
+      "toDomain": "core_system",
+      "sourceColumn": "released_by",
+      "targetColumn": "user_id",
+      "lookupEntity": "users",
+      "lookupEndpoint": "core_system.users.list",
+      "displayField": "full_name",
+      "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
       "id": "rel_retention_locks_created_by_user_id_users_user_id",
       "from": {
         "entity": "retention_locks",
@@ -81616,6 +82820,62 @@
       "lookupEndpoint": "mes_execution.mes_sites.list",
       "displayField": "site_name",
       "valueField": "site_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_role_sod_conflict_role_a_id_roles_role_id",
+      "from": {
+        "entity": "role_sod_conflict",
+        "field": "role_a_id"
+      },
+      "to": {
+        "entity": "roles",
+        "field": "role_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_role_sod_conflict_role_a_id",
+      "nullable": false,
+      "label": "Vai trò Sod xung đột → Vai trò",
+      "labelEn": "Role Sod Conflict → Roles",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "role_a_id",
+      "targetColumn": "role_id",
+      "lookupEntity": "roles",
+      "lookupEndpoint": "core_system.roles.list",
+      "displayField": "dept_code",
+      "valueField": "role_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_role_sod_conflict_role_b_id_roles_role_id",
+      "from": {
+        "entity": "role_sod_conflict",
+        "field": "role_b_id"
+      },
+      "to": {
+        "entity": "roles",
+        "field": "role_id"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_role_sod_conflict_role_b_id",
+      "nullable": false,
+      "label": "Vai trò Sod xung đột → Vai trò",
+      "labelEn": "Role Sod Conflict → Roles",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "role_b_id",
+      "targetColumn": "role_id",
+      "lookupEntity": "roles",
+      "lookupEndpoint": "core_system.roles.list",
+      "displayField": "dept_code",
+      "valueField": "role_id",
       "digitalThread": true,
       "cascadeActions": []
     },
@@ -100410,6 +101670,62 @@
       "lookupEndpoint": "core_system.users.list",
       "displayField": "full_name",
       "valueField": "user_id",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_translation_credentials_provider_key_translation_provider_config_provider_key",
+      "from": {
+        "entity": "translation_credentials",
+        "field": "provider_key"
+      },
+      "to": {
+        "entity": "translation_provider_config",
+        "field": "provider_key"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_translation_credentials_provider_key",
+      "nullable": true,
+      "label": "Translation Credential → Translation Provider Config",
+      "labelEn": "Translation Credentials → Translation Provider Config",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "provider_key",
+      "targetColumn": "provider_key",
+      "lookupEntity": "translation_provider_config",
+      "lookupEndpoint": "core_system.translation_provider_config.list",
+      "displayField": "display_name",
+      "valueField": "provider_key",
+      "digitalThread": true,
+      "cascadeActions": []
+    },
+    {
+      "id": "rel_translation_routing_primary_provider_translation_provider_config_provider_key",
+      "from": {
+        "entity": "translation_routing",
+        "field": "primary_provider"
+      },
+      "to": {
+        "entity": "translation_provider_config",
+        "field": "provider_key"
+      },
+      "type": "many_to_one",
+      "cardinality": "many_to_one",
+      "constraintName": "fk_translation_routing_primary_provider",
+      "nullable": false,
+      "label": "Translation Quy trình công nghệ → Translation Provider Config",
+      "labelEn": "Translation Routing → Translation Provider Config",
+      "domain": "core_system -> core_system",
+      "fromDomain": "core_system",
+      "toDomain": "core_system",
+      "sourceColumn": "primary_provider",
+      "targetColumn": "provider_key",
+      "lookupEntity": "translation_provider_config",
+      "lookupEndpoint": "core_system.translation_provider_config.list",
+      "displayField": "display_name",
+      "valueField": "provider_key",
       "digitalThread": true,
       "cascadeActions": []
     },

@@ -1,9 +1,9 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-15T10:51:38.911151+00:00",
+    "generatedAt": "2026-05-14T03:01:47.682530+00:00",
     "description": "Ledger of legacy object names and tables retained for non-destructive migration and compatibility.",
-    "entryCount": 218
+    "entryCount": 221
   },
   "entries": [
     {
@@ -317,6 +317,24 @@
       "successorCanonicalResource": "master_data.employees",
       "status": "compatibility_supported",
       "reason": "Legacy logical name retained in authored contract package for safe migration and AI-readable traceability."
+    },
+    {
+      "legacyKey": "eqms_document_family",
+      "successorCanonicalResource": "quality_improvement.document_control",
+      "status": "compatibility_supported",
+      "reason": "Legacy table or naming surface retained during canonical ERP+MOM normalization."
+    },
+    {
+      "legacyKey": "eqms_document_revision",
+      "successorCanonicalResource": "quality_improvement.document_control",
+      "status": "compatibility_supported",
+      "reason": "Legacy table or naming surface retained during canonical ERP+MOM normalization."
+    },
+    {
+      "legacyKey": "eqms_documents",
+      "successorCanonicalResource": "quality_improvement.document_control",
+      "status": "compatibility_supported",
+      "reason": "Legacy table or naming surface retained during canonical ERP+MOM normalization."
     },
     {
       "legacyKey": "equipment",

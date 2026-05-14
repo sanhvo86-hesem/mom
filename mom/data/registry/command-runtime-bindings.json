@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-24T08:27:19.645408+00:00",
+    "generatedAt": "2026-05-14T03:02:07.891020+00:00",
     "sourceArtifacts": [
       "mom/contracts/command-index.json",
       "mom/contracts/object-index.json",
@@ -10,15 +10,15 @@
       "mom/api/index.php"
     ],
     "description": "Executable command-to-runtime binding map. It keeps canonical business commands separate from the concrete route frontend can call today.",
-    "commandCount": 276
+    "commandCount": 281
   },
   "summary": {
     "bindingStatus": {
-      "bound": 276
+      "bound": 281
     },
     "bindingKind": {
       "create": 4,
-      "transition": 263,
+      "transition": 268,
       "update": 9
     }
   },
@@ -6899,6 +6899,156 @@
         "command_key": "quality_improvement.deviations:submit_for_review",
         "canonical_resource": "quality_improvement.deviations",
         "to_status": "pending_review"
+      },
+      "idempotencyRequired": true,
+      "auditRequired": true,
+      "recommendation": "Frontend should call this executable binding, not infer command routing from canonical labels."
+    },
+    {
+      "key": "quality_improvement.document_control:approve",
+      "canonicalResource": "quality_improvement.document_control",
+      "command": "approve",
+      "storageTable": "dcc_document_header",
+      "resolvedRuntimeTable": "dcc_document_header",
+      "runtimeAliases": [
+        "eqms_document_family",
+        "eqms_document_revision",
+        "eqms_documents"
+      ],
+      "targetState": "approved",
+      "bindingStatus": "bound",
+      "bindingKind": "transition",
+      "method": "POST",
+      "path": "/api/runtime/document_control/dcc_document_header/{id}/transition",
+      "endpointKey": "document_control.dcc_document_header.transition",
+      "routeSource": "object_index.currentRuntimeEndpoints",
+      "executableInEndpointCatalog": true,
+      "executableInRouter": false,
+      "requestBodyTemplate": {
+        "command": "approve",
+        "command_key": "quality_improvement.document_control:approve",
+        "canonical_resource": "quality_improvement.document_control",
+        "to_status": "approved"
+      },
+      "idempotencyRequired": true,
+      "auditRequired": true,
+      "recommendation": "Frontend should call this executable binding, not infer command routing from canonical labels."
+    },
+    {
+      "key": "quality_improvement.document_control:obsolete",
+      "canonicalResource": "quality_improvement.document_control",
+      "command": "obsolete",
+      "storageTable": "dcc_document_header",
+      "resolvedRuntimeTable": "dcc_document_header",
+      "runtimeAliases": [
+        "eqms_document_family",
+        "eqms_document_revision",
+        "eqms_documents"
+      ],
+      "targetState": "obsolete",
+      "bindingStatus": "bound",
+      "bindingKind": "transition",
+      "method": "POST",
+      "path": "/api/runtime/document_control/dcc_document_header/{id}/transition",
+      "endpointKey": "document_control.dcc_document_header.transition",
+      "routeSource": "object_index.currentRuntimeEndpoints",
+      "executableInEndpointCatalog": true,
+      "executableInRouter": false,
+      "requestBodyTemplate": {
+        "command": "obsolete",
+        "command_key": "quality_improvement.document_control:obsolete",
+        "canonical_resource": "quality_improvement.document_control",
+        "to_status": "obsolete"
+      },
+      "idempotencyRequired": true,
+      "auditRequired": true,
+      "recommendation": "Frontend should call this executable binding, not infer command routing from canonical labels."
+    },
+    {
+      "key": "quality_improvement.document_control:release",
+      "canonicalResource": "quality_improvement.document_control",
+      "command": "release",
+      "storageTable": "dcc_document_header",
+      "resolvedRuntimeTable": "dcc_document_header",
+      "runtimeAliases": [
+        "eqms_document_family",
+        "eqms_document_revision",
+        "eqms_documents"
+      ],
+      "targetState": "released",
+      "bindingStatus": "bound",
+      "bindingKind": "transition",
+      "method": "POST",
+      "path": "/api/runtime/document_control/dcc_document_header/{id}/transition",
+      "endpointKey": "document_control.dcc_document_header.transition",
+      "routeSource": "object_index.currentRuntimeEndpoints",
+      "executableInEndpointCatalog": true,
+      "executableInRouter": false,
+      "requestBodyTemplate": {
+        "command": "release",
+        "command_key": "quality_improvement.document_control:release",
+        "canonical_resource": "quality_improvement.document_control",
+        "to_status": "released"
+      },
+      "idempotencyRequired": true,
+      "auditRequired": true,
+      "recommendation": "Frontend should call this executable binding, not infer command routing from canonical labels."
+    },
+    {
+      "key": "quality_improvement.document_control:submit_review",
+      "canonicalResource": "quality_improvement.document_control",
+      "command": "submit_review",
+      "storageTable": "dcc_document_header",
+      "resolvedRuntimeTable": "dcc_document_header",
+      "runtimeAliases": [
+        "eqms_document_family",
+        "eqms_document_revision",
+        "eqms_documents"
+      ],
+      "targetState": "in_review",
+      "bindingStatus": "bound",
+      "bindingKind": "transition",
+      "method": "POST",
+      "path": "/api/runtime/document_control/dcc_document_header/{id}/transition",
+      "endpointKey": "document_control.dcc_document_header.transition",
+      "routeSource": "object_index.currentRuntimeEndpoints",
+      "executableInEndpointCatalog": true,
+      "executableInRouter": false,
+      "requestBodyTemplate": {
+        "command": "submit_review",
+        "command_key": "quality_improvement.document_control:submit_review",
+        "canonical_resource": "quality_improvement.document_control",
+        "to_status": "in_review"
+      },
+      "idempotencyRequired": true,
+      "auditRequired": true,
+      "recommendation": "Frontend should call this executable binding, not infer command routing from canonical labels."
+    },
+    {
+      "key": "quality_improvement.document_control:supersede",
+      "canonicalResource": "quality_improvement.document_control",
+      "command": "supersede",
+      "storageTable": "dcc_document_header",
+      "resolvedRuntimeTable": "dcc_document_header",
+      "runtimeAliases": [
+        "eqms_document_family",
+        "eqms_document_revision",
+        "eqms_documents"
+      ],
+      "targetState": "superseded",
+      "bindingStatus": "bound",
+      "bindingKind": "transition",
+      "method": "POST",
+      "path": "/api/runtime/document_control/dcc_document_header/{id}/transition",
+      "endpointKey": "document_control.dcc_document_header.transition",
+      "routeSource": "object_index.currentRuntimeEndpoints",
+      "executableInEndpointCatalog": true,
+      "executableInRouter": false,
+      "requestBodyTemplate": {
+        "command": "supersede",
+        "command_key": "quality_improvement.document_control:supersede",
+        "canonical_resource": "quality_improvement.document_control",
+        "to_status": "superseded"
       },
       "idempotencyRequired": true,
       "auditRequired": true,

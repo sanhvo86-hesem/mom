@@ -1,9 +1,9 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-15T10:51:38.911151+00:00",
+    "generatedAt": "2026-05-14T03:01:47.682530+00:00",
     "description": "Explicit lifecycle and state-contract index for canonical business objects.",
-    "stateModelCount": 65
+    "stateModelCount": 66
   },
   "stateModels": [
     {
@@ -3773,6 +3773,72 @@
       "implemented": true,
       "truthStatus": "implemented_runtime",
       "contractPackagePath": "contracts/objects/quality_improvement--deviations/contract.json"
+    },
+    {
+      "canonicalResource": "quality_improvement.document_control",
+      "storageTables": [
+        "dcc_document_header"
+      ],
+      "statusOptions": [
+        {
+          "value": "draft",
+          "label": "Draft",
+          "labelEn": "Draft",
+          "allowedTransitionsFrom": []
+        },
+        {
+          "value": "in_review",
+          "label": "In Review",
+          "labelEn": "In Review",
+          "allowedTransitionsFrom": [
+            "draft"
+          ]
+        },
+        {
+          "value": "approved",
+          "label": "Approved",
+          "labelEn": "Approved",
+          "allowedTransitionsFrom": [
+            "in_review"
+          ]
+        },
+        {
+          "value": "released",
+          "label": "Released",
+          "labelEn": "Released",
+          "allowedTransitionsFrom": [
+            "approved"
+          ]
+        },
+        {
+          "value": "superseded",
+          "label": "Superseded",
+          "labelEn": "Superseded",
+          "allowedTransitionsFrom": [
+            "released"
+          ]
+        },
+        {
+          "value": "obsolete",
+          "label": "Obsolete",
+          "labelEn": "Obsolete",
+          "allowedTransitionsFrom": [
+            "released",
+            "superseded"
+          ]
+        }
+      ],
+      "statusSetKey": "dcc_document_header_status",
+      "lifecycleMode": "guarded_transition_runtime",
+      "purpose": "Govern version control of QMS controlled documents (Manual, Policy, SOP, WI, Form, Annex, Handbook, JD). Distinct from Engineering Change Control (ECC = plm_change_*) which governs parts/BOMs/items.",
+      "usageZone": "qms_controlled_information",
+      "gateType": "documented_information_control_gate",
+      "auditClass": "part_11_part_820_40_audit_trail",
+      "continuousImprovementLoop": "management_review",
+      "workflowSource": "dcc_document_header.status",
+      "implemented": true,
+      "truthStatus": "implemented_runtime",
+      "contractPackagePath": "contracts/objects/quality_improvement--document-control/contract.json"
     },
     {
       "canonicalResource": "quality_improvement.fqc-inspections",

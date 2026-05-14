@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-24T08:27:19.821998+00:00",
+    "generatedAt": "2026-05-14T03:02:08.216019+00:00",
     "simulationType": "contract_level_frontend_interaction",
     "sourceArtifacts": [
       "mom/data/registry/table-registry.json",
@@ -17,19 +17,22 @@
       "mom/data/registry/enterprise-registry-doctor-report.json"
     ]
   },
-  "status": "watch",
+  "status": "blocked",
   "summary": {
     "scenarioCount": 10,
     "scenarioStatus": {
-      "pass": 7,
+      "blocked": 2,
+      "pass": 5,
       "watch": 3
     },
-    "blockerCounts": {},
+    "blockerCounts": {
+      "runtime_safe_false_exposed": 2
+    },
     "warningCounts": {
       "frontend_surface_not_explicit": 1,
       "missing_command_or_state_model": 2
     },
-    "doctorStatus": "watch"
+    "doctorStatus": "blocked"
   },
   "frontendOperatingStandard": [
     "System Contract Registry is the default read-only source for frontend discovery.",
@@ -213,8 +216,15 @@
       "id": "quote_to_cash",
       "persona": "Sales / customer service",
       "goal": "Quote, customer PO, SO confirmation, shipment, invoice and customer care are traceable end-to-end.",
-      "status": "pass",
-      "blockers": [],
+      "status": "blocked",
+      "blockers": [
+        {
+          "code": "runtime_safe_false_exposed",
+          "tables": [
+            "sales_orders"
+          ]
+        }
+      ],
       "warnings": [],
       "tableEvidence": [
         {
@@ -332,11 +342,12 @@
             "process_command_workspace",
             "system_contract_registry"
           ],
-          "endpointCount": 6,
+          "endpointCount": 11,
           "frontendSafeEndpointCount": 3,
           "endpointMethods": [
             "DELETE",
             "GET",
+            "PATCH",
             "POST",
             "PUT"
           ],
@@ -345,7 +356,7 @@
           "stateModelCount": 1,
           "eventCount": 5,
           "quarantinedDeleteCount": 0,
-          "runtimeUnsafeEndpointCount": 0
+          "runtimeUnsafeEndpointCount": 5
         },
         {
           "table": "sales_order_lines",
@@ -749,8 +760,16 @@
       "id": "plan_to_produce",
       "persona": "Planner",
       "goal": "Demand, APS/MRP, capacity, JO/WO release and dispatch are simulated before committing production.",
-      "status": "pass",
-      "blockers": [],
+      "status": "blocked",
+      "blockers": [
+        {
+          "code": "runtime_safe_false_exposed",
+          "tables": [
+            "job_orders",
+            "work_orders"
+          ]
+        }
+      ],
       "warnings": [],
       "tableEvidence": [
         {
@@ -895,11 +914,12 @@
             "process_command_workspace",
             "system_contract_registry"
           ],
-          "endpointCount": 6,
+          "endpointCount": 11,
           "frontendSafeEndpointCount": 3,
           "endpointMethods": [
             "DELETE",
             "GET",
+            "PATCH",
             "POST",
             "PUT"
           ],
@@ -908,7 +928,7 @@
           "stateModelCount": 1,
           "eventCount": 4,
           "quarantinedDeleteCount": 0,
-          "runtimeUnsafeEndpointCount": 0
+          "runtimeUnsafeEndpointCount": 5
         },
         {
           "table": "work_orders",
@@ -928,11 +948,12 @@
             "process_command_workspace",
             "system_contract_registry"
           ],
-          "endpointCount": 6,
+          "endpointCount": 11,
           "frontendSafeEndpointCount": 3,
           "endpointMethods": [
             "DELETE",
             "GET",
+            "PATCH",
             "POST",
             "PUT"
           ],
@@ -941,7 +962,7 @@
           "stateModelCount": 1,
           "eventCount": 4,
           "quarantinedDeleteCount": 0,
-          "runtimeUnsafeEndpointCount": 0
+          "runtimeUnsafeEndpointCount": 5
         },
         {
           "table": "mes_dispatch_queue",

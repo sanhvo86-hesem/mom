@@ -102,15 +102,18 @@
     ]
   },
   "integration": {
-    "upstreamObjects": [
+    "upstreamObjects": [],
+    "downstreamObjects": [],
+    "plannedUpstreamObjects": [
       "quality_improvement.document_change_request",
       "quality_improvement.document_change_notice"
     ],
-    "downstreamObjects": [
+    "plannedDownstreamObjects": [
       "training_and_competence.training_assignments",
       "quality_improvement.controlled_copies",
       "quality_improvement.document_acknowledgements"
     ],
+    "integrationNote": "upstream/downstream objects are validated against existing canonical resources in mom/contracts/objects/. The 5 objects above are documented intent but no matching canonical resource directory exists yet. Moved to plannedUpstreamObjects/plannedDownstreamObjects so the orchestrator's business_contract_bundle validation passes; promote back to upstreamObjects/downstreamObjects once each resource is created.",
     "crossDomainDistinctions": [
       {
         "domain": "part_lifecycle_management",

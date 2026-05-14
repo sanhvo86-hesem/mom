@@ -1,7 +1,7 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-24T08:27:19.645408+00:00",
+    "generatedAt": "2026-05-14T03:02:07.891020+00:00",
     "standardVersion": "1.0.0",
     "inputs": [
       "mom/contracts/registry-authority-standard.json",
@@ -19,43 +19,43 @@
       "mom/contracts/deprecation-ledger.json"
     ]
   },
-  "status": "watch",
+  "status": "blocked",
   "scorecard": {
     "tables": {
-      "count": 837,
+      "count": 867,
       "domains": 49,
       "missingOwnerRole": 0,
       "missingSystemOfRecord": 0,
       "governanceOverlayApplied": true,
-      "governanceOverlayCount": 837
+      "governanceOverlayCount": 867
     },
     "endpoints": {
-      "count": 4625,
-      "classified": 4625,
+      "count": 4884,
+      "classified": 4884,
       "hardDelete": 0,
       "hardDeleteForbiddenDomain": 0,
       "quarantinedDelete": 0,
-      "runtimeUnsafeExposed": 0,
-      "runtimeUnsafeBlocked": 1164,
+      "runtimeUnsafeExposed": 69,
+      "runtimeUnsafeBlocked": 1179,
       "missingWriteRequestSchemaRef": 0
     },
     "businessContracts": {
-      "objects": 67,
-      "stateModels": 65,
-      "commands": 276,
-      "boundRuntimeCommandRoutes": 276,
+      "objects": 68,
+      "stateModels": 66,
+      "commands": 281,
+      "boundRuntimeCommandRoutes": 281,
       "unboundRuntimeCommandRoutes": 0,
       "missingExecutableCommandRoutes": 0
     },
     "events": {
-      "eventIndexCount": 229,
+      "eventIndexCount": 232,
       "eventContractMapGenerated": true
     },
     "governance": {
       "manifestDeletionModes": {
-        "hard_delete": 12,
-        "soft_delete": 63,
-        "archive_only": 774
+        "hard_delete": 13,
+        "soft_delete": 80,
+        "archive_only": 792
       },
       "openapiVersion": "3.1.2",
       "aiAuthorityChainGenerated": true,
@@ -64,40 +64,402 @@
   },
   "findings": [
     {
+      "id": "REG-RUNTIME-001",
+      "severity": "P1",
+      "title": "Runtime-unsafe endpoints are still exposed through generated CRUD contracts",
+      "evidence": {
+        "runtimeUnsafeExposedTotal": 69,
+        "runtimeUnsafeBlockedTotal": 1179,
+        "samples": [
+          {
+            "key": "planning_production.transactional.job_orders.detail",
+            "method": "GET",
+            "path": "/api/v1/job-orders/{joNumber}",
+            "domain": "planning_production",
+            "entity": "job_orders",
+            "kind": "detail",
+            "source": "rest-routes.php+ADR-0008-Stream-C.2",
+            "controller": "OrderController",
+            "handler": "getJobOrderDetailForPath",
+            "authorityClass": "canonical_process_contract",
+            "exposure": "frontend_process",
+            "sideEffectLevel": "none",
+            "deletionMode": "not_exposed",
+            "idempotencyRequired": false,
+            "auditRequired": true,
+            "requestSchemaRef": "",
+            "responseSchemaRef": "mom/data/registry/endpoint-catalog-index.json#planning_production.transactional.job_orders.detail",
+            "eventRefs": [
+              "hesem.registry.planning_production.job_orders.detail"
+            ],
+            "permissionCount": 1,
+            "supportTable": false,
+            "workflowMode": "dedicated_controller",
+            "runtimeSafe": false,
+            "rawRuntimeSafe": false,
+            "frontendEligible": false,
+            "blockedFromFrontend": false,
+            "frontendBlockers": [
+              "runtime_safe_false"
+            ],
+            "gaps": [
+              "runtime_safe_false"
+            ]
+          },
+          {
+            "key": "planning_production.transactional.job_orders.list",
+            "method": "GET",
+            "path": "/api/v1/job-orders",
+            "domain": "planning_production",
+            "entity": "job_orders",
+            "kind": "list",
+            "source": "rest-routes.php+ADR-0008-Stream-C.2",
+            "controller": "OrderController",
+            "handler": "listJobOrders",
+            "authorityClass": "canonical_process_contract",
+            "exposure": "frontend_process",
+            "sideEffectLevel": "none",
+            "deletionMode": "not_exposed",
+            "idempotencyRequired": false,
+            "auditRequired": true,
+            "requestSchemaRef": "",
+            "responseSchemaRef": "mom/data/registry/endpoint-catalog-index.json#planning_production.transactional.job_orders.list",
+            "eventRefs": [
+              "hesem.registry.planning_production.job_orders.list"
+            ],
+            "permissionCount": 1,
+            "supportTable": false,
+            "workflowMode": "dedicated_controller",
+            "runtimeSafe": false,
+            "rawRuntimeSafe": false,
+            "frontendEligible": false,
+            "blockedFromFrontend": false,
+            "frontendBlockers": [
+              "runtime_safe_false"
+            ],
+            "gaps": [
+              "runtime_safe_false"
+            ]
+          },
+          {
+            "key": "planning_production.transactional.job_orders.update",
+            "method": "PATCH",
+            "path": "/api/v1/job-orders/{joNumber}",
+            "domain": "planning_production",
+            "entity": "job_orders",
+            "kind": "update",
+            "source": "rest-routes.php+ADR-0008-Stream-C.2",
+            "controller": "OrderController",
+            "handler": "updateJobOrderForPath",
+            "authorityClass": "canonical_process_contract",
+            "exposure": "frontend_process",
+            "sideEffectLevel": "workflow_transition",
+            "deletionMode": "not_exposed",
+            "idempotencyRequired": true,
+            "auditRequired": true,
+            "requestSchemaRef": "mom/data/registry/data-fields-index.json#planning_production.transactional.job_orders.update",
+            "responseSchemaRef": "mom/data/registry/endpoint-catalog-index.json#planning_production.transactional.job_orders.update",
+            "eventRefs": [
+              "hesem.registry.planning_production.job_orders.update"
+            ],
+            "permissionCount": 1,
+            "supportTable": false,
+            "workflowMode": "dedicated_controller",
+            "runtimeSafe": false,
+            "rawRuntimeSafe": false,
+            "frontendEligible": false,
+            "blockedFromFrontend": false,
+            "frontendBlockers": [
+              "runtime_safe_false"
+            ],
+            "gaps": [
+              "runtime_safe_false"
+            ]
+          },
+          {
+            "key": "planning_production.transactional.job_orders.create",
+            "method": "POST",
+            "path": "/api/v1/job-orders",
+            "domain": "planning_production",
+            "entity": "job_orders",
+            "kind": "create",
+            "source": "rest-routes.php+ADR-0008-Stream-C.2",
+            "controller": "OrderController",
+            "handler": "createJobOrder",
+            "authorityClass": "canonical_process_contract",
+            "exposure": "frontend_process",
+            "sideEffectLevel": "workflow_transition",
+            "deletionMode": "not_exposed",
+            "idempotencyRequired": true,
+            "auditRequired": true,
+            "requestSchemaRef": "mom/data/registry/data-fields-index.json#planning_production.transactional.job_orders.create",
+            "responseSchemaRef": "mom/data/registry/endpoint-catalog-index.json#planning_production.transactional.job_orders.create",
+            "eventRefs": [
+              "hesem.registry.planning_production.job_orders.create"
+            ],
+            "permissionCount": 1,
+            "supportTable": false,
+            "workflowMode": "dedicated_controller",
+            "runtimeSafe": false,
+            "rawRuntimeSafe": false,
+            "frontendEligible": false,
+            "blockedFromFrontend": false,
+            "frontendBlockers": [
+              "runtime_safe_false"
+            ],
+            "gaps": [
+              "runtime_safe_false"
+            ]
+          },
+          {
+            "key": "planning_production.transactional.job_orders.transition",
+            "method": "POST",
+            "path": "/api/v1/job-orders/{joNumber}:transition",
+            "domain": "planning_production",
+            "entity": "job_orders",
+            "kind": "transition",
+            "source": "rest-routes.php+ADR-0008-Stream-C.2",
+            "controller": "OrderController",
+            "handler": "transitionJobOrder",
+            "authorityClass": "canonical_process_contract",
+            "exposure": "frontend_process",
+            "sideEffectLevel": "workflow_transition",
+            "deletionMode": "not_exposed",
+            "idempotencyRequired": true,
+            "auditRequired": true,
+            "requestSchemaRef": "mom/data/registry/data-fields-index.json#planning_production.transactional.job_orders.transition",
+            "responseSchemaRef": "mom/data/registry/endpoint-catalog-index.json#planning_production.transactional.job_orders.transition",
+            "eventRefs": [
+              "hesem.registry.planning_production.job_orders.transition"
+            ],
+            "permissionCount": 1,
+            "supportTable": false,
+            "workflowMode": "dedicated_controller",
+            "runtimeSafe": false,
+            "rawRuntimeSafe": false,
+            "frontendEligible": false,
+            "blockedFromFrontend": false,
+            "frontendBlockers": [
+              "runtime_safe_false"
+            ],
+            "gaps": [
+              "runtime_safe_false"
+            ]
+          },
+          {
+            "key": "planning_production.transactional.sales_orders.detail",
+            "method": "GET",
+            "path": "/api/v1/sales-orders/{soNumber}",
+            "domain": "planning_production",
+            "entity": "sales_orders",
+            "kind": "detail",
+            "source": "rest-routes.php+ADR-0008-Stream-C.2",
+            "controller": "OrderController",
+            "handler": "getSalesOrderDetailForPath",
+            "authorityClass": "canonical_process_contract",
+            "exposure": "frontend_process",
+            "sideEffectLevel": "none",
+            "deletionMode": "not_exposed",
+            "idempotencyRequired": false,
+            "auditRequired": true,
+            "requestSchemaRef": "",
+            "responseSchemaRef": "mom/data/registry/endpoint-catalog-index.json#planning_production.transactional.sales_orders.detail",
+            "eventRefs": [
+              "hesem.registry.planning_production.sales_orders.detail"
+            ],
+            "permissionCount": 1,
+            "supportTable": false,
+            "workflowMode": "dedicated_controller",
+            "runtimeSafe": false,
+            "rawRuntimeSafe": false,
+            "frontendEligible": false,
+            "blockedFromFrontend": false,
+            "frontendBlockers": [
+              "runtime_safe_false"
+            ],
+            "gaps": [
+              "runtime_safe_false"
+            ]
+          },
+          {
+            "key": "planning_production.transactional.sales_orders.list",
+            "method": "GET",
+            "path": "/api/v1/sales-orders",
+            "domain": "planning_production",
+            "entity": "sales_orders",
+            "kind": "list",
+            "source": "rest-routes.php+ADR-0008-Stream-C.2",
+            "controller": "OrderController",
+            "handler": "listSalesOrders",
+            "authorityClass": "canonical_process_contract",
+            "exposure": "frontend_process",
+            "sideEffectLevel": "none",
+            "deletionMode": "not_exposed",
+            "idempotencyRequired": false,
+            "auditRequired": true,
+            "requestSchemaRef": "",
+            "responseSchemaRef": "mom/data/registry/endpoint-catalog-index.json#planning_production.transactional.sales_orders.list",
+            "eventRefs": [
+              "hesem.registry.planning_production.sales_orders.list"
+            ],
+            "permissionCount": 1,
+            "supportTable": false,
+            "workflowMode": "dedicated_controller",
+            "runtimeSafe": false,
+            "rawRuntimeSafe": false,
+            "frontendEligible": false,
+            "blockedFromFrontend": false,
+            "frontendBlockers": [
+              "runtime_safe_false"
+            ],
+            "gaps": [
+              "runtime_safe_false"
+            ]
+          },
+          {
+            "key": "planning_production.transactional.sales_orders.update",
+            "method": "PATCH",
+            "path": "/api/v1/sales-orders/{soNumber}",
+            "domain": "planning_production",
+            "entity": "sales_orders",
+            "kind": "update",
+            "source": "rest-routes.php+ADR-0008-Stream-C.2",
+            "controller": "OrderController",
+            "handler": "updateSalesOrderForPath",
+            "authorityClass": "canonical_process_contract",
+            "exposure": "frontend_process",
+            "sideEffectLevel": "workflow_transition",
+            "deletionMode": "not_exposed",
+            "idempotencyRequired": true,
+            "auditRequired": true,
+            "requestSchemaRef": "mom/data/registry/data-fields-index.json#planning_production.transactional.sales_orders.update",
+            "responseSchemaRef": "mom/data/registry/endpoint-catalog-index.json#planning_production.transactional.sales_orders.update",
+            "eventRefs": [
+              "hesem.registry.planning_production.sales_orders.update"
+            ],
+            "permissionCount": 1,
+            "supportTable": false,
+            "workflowMode": "dedicated_controller",
+            "runtimeSafe": false,
+            "rawRuntimeSafe": false,
+            "frontendEligible": false,
+            "blockedFromFrontend": false,
+            "frontendBlockers": [
+              "runtime_safe_false"
+            ],
+            "gaps": [
+              "runtime_safe_false"
+            ]
+          },
+          {
+            "key": "planning_production.transactional.sales_orders.create",
+            "method": "POST",
+            "path": "/api/v1/sales-orders",
+            "domain": "planning_production",
+            "entity": "sales_orders",
+            "kind": "create",
+            "source": "rest-routes.php+ADR-0008-Stream-C.2",
+            "controller": "OrderController",
+            "handler": "createSalesOrder",
+            "authorityClass": "canonical_process_contract",
+            "exposure": "frontend_process",
+            "sideEffectLevel": "workflow_transition",
+            "deletionMode": "not_exposed",
+            "idempotencyRequired": true,
+            "auditRequired": true,
+            "requestSchemaRef": "mom/data/registry/data-fields-index.json#planning_production.transactional.sales_orders.create",
+            "responseSchemaRef": "mom/data/registry/endpoint-catalog-index.json#planning_production.transactional.sales_orders.create",
+            "eventRefs": [
+              "hesem.registry.planning_production.sales_orders.create"
+            ],
+            "permissionCount": 1,
+            "supportTable": false,
+            "workflowMode": "dedicated_controller",
+            "runtimeSafe": false,
+            "rawRuntimeSafe": false,
+            "frontendEligible": false,
+            "blockedFromFrontend": false,
+            "frontendBlockers": [
+              "runtime_safe_false"
+            ],
+            "gaps": [
+              "runtime_safe_false"
+            ]
+          },
+          {
+            "key": "planning_production.transactional.sales_orders.transition",
+            "method": "POST",
+            "path": "/api/v1/sales-orders/{soNumber}:transition",
+            "domain": "planning_production",
+            "entity": "sales_orders",
+            "kind": "transition",
+            "source": "rest-routes.php+ADR-0008-Stream-C.2",
+            "controller": "OrderController",
+            "handler": "transitionSalesOrder",
+            "authorityClass": "canonical_process_contract",
+            "exposure": "frontend_process",
+            "sideEffectLevel": "workflow_transition",
+            "deletionMode": "not_exposed",
+            "idempotencyRequired": true,
+            "auditRequired": true,
+            "requestSchemaRef": "mom/data/registry/data-fields-index.json#planning_production.transactional.sales_orders.transition",
+            "responseSchemaRef": "mom/data/registry/endpoint-catalog-index.json#planning_production.transactional.sales_orders.transition",
+            "eventRefs": [
+              "hesem.registry.planning_production.sales_orders.transition"
+            ],
+            "permissionCount": 1,
+            "supportTable": false,
+            "workflowMode": "dedicated_controller",
+            "runtimeSafe": false,
+            "rawRuntimeSafe": false,
+            "frontendEligible": false,
+            "blockedFromFrontend": false,
+            "frontendBlockers": [
+              "runtime_safe_false"
+            ],
+            "gaps": [
+              "runtime_safe_false"
+            ]
+          }
+        ]
+      },
+      "recommendation": "Keep runtime_safe=false generic CRUD endpoints blocked from frontend process surfaces until a domain command/service contract owns the workflow, validation, event and audit rules."
+    },
+    {
       "id": "REG-ENDPOINT-001",
       "severity": "P2",
       "title": "Endpoint catalog needs governance classification as release input",
       "evidence": {
         "gapCounts": {
-          "generic_runtime_classification": 591,
-          "runtime_safe_false": 1164
+          "generic_runtime_classification": 607,
+          "runtime_safe_false": 1248
         },
         "classificationSummary": {
           "authorityClass": {
-            "admin_governance_contract": 361,
-            "canonical_process_contract": 2711,
-            "generic_runtime_contract": 591,
+            "admin_governance_contract": 509,
+            "canonical_process_contract": 2802,
+            "generic_runtime_contract": 607,
             "machine_runtime_contract": 510,
             "master_data_contract": 90,
-            "support_or_read_model_contract": 362
+            "support_or_read_model_contract": 366
           },
           "exposure": {
-            "admin_governance": 337,
-            "admin_or_internal": 362,
-            "blocked_runtime_internal": 1164,
-            "frontend_process": 1757,
+            "admin_governance": 473,
+            "admin_or_internal": 366,
+            "blocked_runtime_internal": 1179,
+            "frontend_process": 1845,
             "machine_or_operator_ui": 414,
-            "needs_owner_review": 591
+            "needs_owner_review": 607
           },
           "sideEffectLevel": {
-            "destructive": 830,
-            "none": 1694,
-            "transactional_write": 772,
-            "workflow_transition": 1329
+            "destructive": 865,
+            "none": 1798,
+            "transactional_write": 825,
+            "workflow_transition": 1396
           },
           "gapCounts": {
-            "generic_runtime_classification": 591,
-            "runtime_safe_false": 1164
+            "generic_runtime_classification": 607,
+            "runtime_safe_false": 1248
           }
         }
       },

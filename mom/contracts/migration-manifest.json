@@ -1,23 +1,23 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-17T01:17:01.274857+00:00",
+    "generatedAt": "2026-05-14T03:01:47.682530+00:00",
     "description": "Non-destructive migration contract for ERP+MOM backend restructuring."
   },
   "storageAuthority": {
-    "databaseSchemaSource": "database/migrations/*.sql (001–139)",
+    "databaseSchemaSource": "database/migrations/*.sql (001–180)",
     "databaseSchemaSnapshot": "database/schema.sql",
-    "tableCount": 803,
+    "tableCount": 867,
     "antiParallelAuthorityStatement": "There is exactly ONE schema authority chain: migrations → schema.sql (snapshot). Blueprint and spec SQL files are design inputs, NOT parallel authorities. No table definition outside migrations is authoritative."
   },
   "businessContractAuthority": {
     "bundlePath": "mom/contracts",
-    "objectCount": 67,
-    "stateModelCount": 65,
-    "authoredPackageCount": 67
+    "objectCount": 68,
+    "stateModelCount": 66,
+    "authoredPackageCount": 68
   },
   "compatibility": {
-    "ledgerEntryCount": 218,
+    "ledgerEntryCount": 221,
     "rules": [
       "no_physical_drop_before_successor_mapping_and_retention_review",
       "no_dual_write_except_timeboxed_verified_migration_bridges",

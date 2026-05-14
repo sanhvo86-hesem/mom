@@ -1,10 +1,10 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-15T10:51:38.911151+00:00",
+    "generatedAt": "2026-05-14T03:01:47.682530+00:00",
     "description": "Canonical ERP+MOM object inventory for the business contract authority layer.",
-    "objectCount": 67,
-    "authoredPackageCount": 67
+    "objectCount": 68,
+    "authoredPackageCount": 68
   },
   "objects": [
     {
@@ -613,10 +613,22 @@
           "path": "/api/v1/commercial/customer-purchase-orders"
         },
         {
+          "action": "commercial_customer.customer_purchase_orders.canonical.create",
+          "kind": "create",
+          "method": "POST",
+          "path": "/api/v1/customer-purchase-orders"
+        },
+        {
           "action": "commercial_customer.customer_purchase_orders.detail",
           "kind": "detail",
           "method": "GET",
           "path": "/api/v1/commercial/customer-purchase-orders/{customerPoId}"
+        },
+        {
+          "action": "commercial_customer.customer_purchase_orders.canonical.detail",
+          "kind": "detail",
+          "method": "GET",
+          "path": "/api/v1/customer-purchase-orders/{customerPoId}"
         },
         {
           "action": "commercial_customer.customer_purchase_orders.list",
@@ -625,10 +637,22 @@
           "path": "/api/v1/commercial/customer-purchase-orders"
         },
         {
+          "action": "commercial_customer.customer_purchase_orders.canonical.list",
+          "kind": "list",
+          "method": "GET",
+          "path": "/api/v1/customer-purchase-orders"
+        },
+        {
           "action": "commercial_customer.customer_purchase_orders.transition",
           "kind": "transition",
           "method": "POST",
           "path": "/api/v1/commercial/customer-purchase-orders/{customerPoId}:transition"
+        },
+        {
+          "action": "commercial_customer.customer_purchase_orders.canonical.transition",
+          "kind": "transition",
+          "method": "POST",
+          "path": "/api/v1/customer-purchase-orders/{customerPoId}:transition"
         }
       ],
       "contractAuthority": "authored_package",
@@ -960,6 +984,12 @@
           "path": "/api/runtime/sales/sales_orders"
         },
         {
+          "action": "planning_production.transactional.sales_orders.create",
+          "kind": "create",
+          "method": "POST",
+          "path": "/api/v1/sales-orders"
+        },
+        {
           "action": "sales.sales_orders.delete",
           "kind": "delete",
           "method": "DELETE",
@@ -972,16 +1002,40 @@
           "path": "/api/runtime/sales/sales_orders/{id}"
         },
         {
+          "action": "planning_production.transactional.sales_orders.detail",
+          "kind": "detail",
+          "method": "GET",
+          "path": "/api/v1/sales-orders/{soNumber}"
+        },
+        {
           "action": "sales.sales_orders.list",
           "kind": "list",
           "method": "GET",
           "path": "/api/runtime/sales/sales_orders"
         },
         {
+          "action": "planning_production.transactional.sales_orders.list",
+          "kind": "list",
+          "method": "GET",
+          "path": "/api/v1/sales-orders"
+        },
+        {
           "action": "sales.sales_orders.transition",
           "kind": "transition",
           "method": "POST",
           "path": "/api/runtime/sales/sales_orders/{id}/transition"
+        },
+        {
+          "action": "planning_production.transactional.sales_orders.transition",
+          "kind": "transition",
+          "method": "POST",
+          "path": "/api/v1/sales-orders/{soNumber}:transition"
+        },
+        {
+          "action": "planning_production.transactional.sales_orders.update",
+          "kind": "update",
+          "method": "PATCH",
+          "path": "/api/v1/sales-orders/{soNumber}"
         },
         {
           "action": "sales.sales_orders.update",
@@ -4855,6 +4909,12 @@
           "path": "/api/runtime/production/job_orders"
         },
         {
+          "action": "planning_production.transactional.job_orders.create",
+          "kind": "create",
+          "method": "POST",
+          "path": "/api/v1/job-orders"
+        },
+        {
           "action": "production.job_orders.delete",
           "kind": "delete",
           "method": "DELETE",
@@ -4867,16 +4927,40 @@
           "path": "/api/runtime/production/job_orders/{id}"
         },
         {
+          "action": "planning_production.transactional.job_orders.detail",
+          "kind": "detail",
+          "method": "GET",
+          "path": "/api/v1/job-orders/{joNumber}"
+        },
+        {
           "action": "production.job_orders.list",
           "kind": "list",
           "method": "GET",
           "path": "/api/runtime/production/job_orders"
         },
         {
+          "action": "planning_production.transactional.job_orders.list",
+          "kind": "list",
+          "method": "GET",
+          "path": "/api/v1/job-orders"
+        },
+        {
           "action": "production.job_orders.transition",
           "kind": "transition",
           "method": "POST",
           "path": "/api/runtime/production/job_orders/{id}/transition"
+        },
+        {
+          "action": "planning_production.transactional.job_orders.transition",
+          "kind": "transition",
+          "method": "POST",
+          "path": "/api/v1/job-orders/{joNumber}:transition"
+        },
+        {
+          "action": "planning_production.transactional.job_orders.update",
+          "kind": "update",
+          "method": "PATCH",
+          "path": "/api/v1/job-orders/{joNumber}"
         },
         {
           "action": "production.job_orders.update",
@@ -5196,6 +5280,12 @@
           "path": "/api/runtime/production/work_orders"
         },
         {
+          "action": "planning_production.transactional.work_orders.create",
+          "kind": "create",
+          "method": "POST",
+          "path": "/api/v1/work-orders"
+        },
+        {
           "action": "production.work_orders.delete",
           "kind": "delete",
           "method": "DELETE",
@@ -5208,16 +5298,40 @@
           "path": "/api/runtime/production/work_orders/{id}"
         },
         {
+          "action": "planning_production.transactional.work_orders.detail",
+          "kind": "detail",
+          "method": "GET",
+          "path": "/api/v1/work-orders/{woNumber}"
+        },
+        {
           "action": "production.work_orders.list",
           "kind": "list",
           "method": "GET",
           "path": "/api/runtime/production/work_orders"
         },
         {
+          "action": "planning_production.transactional.work_orders.list",
+          "kind": "list",
+          "method": "GET",
+          "path": "/api/v1/work-orders"
+        },
+        {
           "action": "production.work_orders.transition",
           "kind": "transition",
           "method": "POST",
           "path": "/api/runtime/production/work_orders/{id}/transition"
+        },
+        {
+          "action": "planning_production.transactional.work_orders.transition",
+          "kind": "transition",
+          "method": "POST",
+          "path": "/api/v1/work-orders/{woNumber}:transition"
+        },
+        {
+          "action": "planning_production.transactional.work_orders.update",
+          "kind": "update",
+          "method": "PATCH",
+          "path": "/api/v1/work-orders/{woNumber}"
         },
         {
           "action": "production.work_orders.update",
@@ -6594,6 +6708,117 @@
       "compatibilityNotes": [
         "Deviation naming is retained for migration safety, but the canonical contract clarifies that this is a governed exception object, not a generic workflow placeholder."
       ]
+    },
+    {
+      "key": "quality_improvement.document_control",
+      "domain": "quality_improvement",
+      "resource": "document_control",
+      "label": "Document Change Control (DCC)",
+      "canonicalApiPath": "/api/v1/quality-improvement/document_control",
+      "classification": "lifecycle_owner",
+      "storageTable": "dcc_document_header",
+      "primaryKey": "header_id",
+      "statusColumn": "status",
+      "resultColumn": null,
+      "purpose": "Govern version control of QMS controlled documents (Manual, Policy, SOP, WI, Form, Annex, Handbook, JD). Distinct from Engineering Change Control (ECC = plm_change_*) which governs parts/BOMs/items.",
+      "usageZone": "qms_controlled_information",
+      "gateType": "documented_information_control_gate",
+      "auditClass": "part_11_part_820_40_audit_trail",
+      "continuousImprovementLoop": "management_review",
+      "storageTablesInStateModel": [
+        "dcc_document_header"
+      ],
+      "legacyTables": [
+        "eqms_document_family",
+        "eqms_document_revision",
+        "eqms_documents"
+      ],
+      "legacyTablesToIsolate": [],
+      "childTables": [
+        "dcc_document_change_notice",
+        "dcc_document_change_request",
+        "dcc_document_revision",
+        "dcc_document_revision_history"
+      ],
+      "recommendedActions": [
+        "submit_review",
+        "approve",
+        "release",
+        "supersede",
+        "obsolete"
+      ],
+      "keyRelationships": [],
+      "currentRuntimeEndpoints": [
+        {
+          "action": "document_control.dcc_document_header.create",
+          "kind": "create",
+          "method": "POST",
+          "path": "/api/runtime/document_control/dcc_document_header"
+        },
+        {
+          "action": "document_control.dcc_document_header.delete",
+          "kind": "delete",
+          "method": "DELETE",
+          "path": "/api/runtime/document_control/dcc_document_header/{id}"
+        },
+        {
+          "action": "document_control.dcc_document_header.detail",
+          "kind": "detail",
+          "method": "GET",
+          "path": "/api/runtime/document_control/dcc_document_header/{id}"
+        },
+        {
+          "action": "document_control.dcc_document_header.list",
+          "kind": "list",
+          "method": "GET",
+          "path": "/api/runtime/document_control/dcc_document_header"
+        },
+        {
+          "action": "document_control.dcc_document_header.transition",
+          "kind": "transition",
+          "method": "POST",
+          "path": "/api/runtime/document_control/dcc_document_header/{id}/transition"
+        },
+        {
+          "action": "document_control.dcc_document_header.update",
+          "kind": "update",
+          "method": "PUT",
+          "path": "/api/runtime/document_control/dcc_document_header/{id}"
+        }
+      ],
+      "contractAuthority": "authored_package",
+      "contractPackagePath": "contracts/objects/quality_improvement--document-control/contract.json",
+      "ownerTeam": "quality_assurance",
+      "identityStrategy": "doc_code",
+      "identityNaturalKeys": [
+        "doc_code"
+      ],
+      "retentionClass": "quality_record_10y",
+      "evidenceRequirements": [
+        "revision_history_entry",
+        "release_signature_event",
+        "approved_change_notice"
+      ],
+      "kpiSignals": [
+        "document_release_lead_time",
+        "expired_document_rate",
+        "unacknowledged_controlled_copy_rate"
+      ],
+      "autoAuditChecks": [
+        "dcc_release_requires_dcn",
+        "dcc_header_single_owner_only",
+        "dcc_header_single_approver_only",
+        "dcc_revision_follows_semver_pattern",
+        "dcc_effective_date_not_backdated_without_dcn"
+      ],
+      "invariants": [],
+      "upstreamObjects": [],
+      "downstreamObjects": [],
+      "workflowSource": "dcc_document_header.status",
+      "workflowTruthStatus": "implemented_runtime",
+      "runtimeExposureStatus": null,
+      "runtimeExposureNotes": [],
+      "compatibilityNotes": []
     },
     {
       "key": "quality_improvement.fqc-inspections",

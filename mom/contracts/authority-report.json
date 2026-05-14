@@ -1,15 +1,15 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-15T10:51:38.911151+00:00",
+    "generatedAt": "2026-05-14T03:01:47.682530+00:00",
     "description": "Authored business-contract authority coverage report for ERP+MOM canonical resources."
   },
   "summary": {
-    "totalCanonicalObjects": 67,
-    "authoredPackageCount": 67,
+    "totalCanonicalObjects": 68,
+    "authoredPackageCount": 68,
     "authoredCoverageRatio": 1.0,
-    "lifecycleLikeObjectCount": 54,
-    "authoredLifecycleLikeCount": 54,
+    "lifecycleLikeObjectCount": 55,
+    "authoredLifecycleLikeCount": 55,
     "lifecycleLikeCoverageRatio": 1.0,
     "coreValueStreamObjectCount": 46,
     "authoredCoreValueStreamCount": 46,
@@ -28,8 +28,8 @@
     },
     {
       "domain": "quality_improvement",
-      "totalObjects": 12,
-      "authoredPackages": 12,
+      "totalObjects": 13,
+      "authoredPackages": 13,
       "coreValueStreamObjects": 7,
       "authoredCoreValueStreamObjects": 7,
       "authoredCoverageRatio": 1.0,

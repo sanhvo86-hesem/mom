@@ -2,61 +2,61 @@
   "_meta": {
     "version": "5.0",
     "description": "Registry manifest and coverage index for the registry-backed runtime.",
-    "generatedAt": "2026-04-24T08:27:15.189Z",
+    "generatedAt": "2026-05-14T03:02:01.284Z",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "c544a828-8ff5-44a4-9d02-0e0814d38afa",
-    "enterpriseAuthorityGeneratedAt": "2026-04-24T08:27:19.645408+00:00",
-    "enterpriseFrontendSimulationGeneratedAt": "2026-04-24T08:27:19.821998+00:00"
+    "publication_run_id": "a78697bf-4652-476e-a4b9-5a9362caf639",
+    "enterpriseAuthorityGeneratedAt": "2026-05-14T03:02:07.891020+00:00",
+    "enterpriseFrontendSimulationGeneratedAt": "2026-05-14T03:02:08.216019+00:00"
   },
   "coverage": {
-    "router_actions": 4625,
-    "field_registry_actions": 5430,
-    "field_definitions": 85512,
-    "unique_field_keys": 5265,
-    "status_sets": 971,
-    "workflow_count": 379,
-    "relation_edges": 3773,
-    "validation_rules": 60506,
-    "formula_count": 1476,
-    "domain_pack_count": 5069,
-    "scalar_record_endpoints": 4481,
+    "router_actions": 4884,
+    "field_registry_actions": 5619,
+    "field_definitions": 89124,
+    "unique_field_keys": 5514,
+    "status_sets": 989,
+    "workflow_count": 384,
+    "relation_edges": 3820,
+    "validation_rules": 64243,
+    "formula_count": 1517,
+    "domain_pack_count": 5249,
+    "scalar_record_endpoints": 4716,
     "workflow_runtime_modes": {
-      "stateless": 395,
-      "generic_status_only": 49,
+      "stateless": 421,
+      "generic_status_only": 53,
       "guarded_transition_runtime": 5,
-      "persisted": 388,
-      "unknown": 12
+      "persisted": 393,
+      "unknown": 23
     },
     "deletion_modes": {
-      "hard_delete": 12,
-      "soft_delete": 63,
-      "archive_only": 774
+      "hard_delete": 13,
+      "soft_delete": 80,
+      "archive_only": 792
     },
     "workflow_engine_bridge": {
-      "ready": 388,
+      "ready": 393,
       "blocked": 0,
-      "unneeded": 461
+      "unneeded": 502
     },
     "frontend_foundation": {
-      "entity_count": 848,
-      "ready_entities": 848,
+      "entity_count": 883,
+      "ready_entities": 883,
       "partial_entities": 0,
       "blocked_entities": 0,
-      "workflow_ready_entities": 434,
-      "related_ready_entities": 811,
+      "workflow_ready_entities": 443,
+      "related_ready_entities": 841,
       "analytics_ready_entities": 416,
       "planning_console_entities": 34,
       "operator_console_entities": 68
     },
     "wave0_governance": {
-      "total_frontend_entities": 775,
-      "canonical_resources": 67,
-      "implemented_canonical_resources": 67,
+      "total_frontend_entities": 883,
+      "canonical_resources": 68,
+      "implemented_canonical_resources": 68,
       "planned_canonical_resources": 0,
-      "core_value_stream_entities": 74,
-      "governed_support_entities": 689,
-      "conditional_extension_entities": 6,
+      "core_value_stream_entities": 78,
+      "governed_support_entities": 789,
+      "conditional_extension_entities": 10,
       "unused_candidate_entities": 0,
       "archive_isolation_entities": 6,
       "generic_status_only_core_entities": 0,
@@ -70,11 +70,11 @@
       "scenario_count": 15,
       "critical": 0,
       "high": 0,
-      "medium": 0,
-      "watch": 15,
-      "idempotency_mentions": 24373,
+      "medium": 1,
+      "watch": 14,
+      "idempotency_mentions": 25510,
       "idempotency_contract_coverage_ratio": 1.0,
-      "default_retry_safe_ratio": 1.0,
+      "default_retry_safe_ratio": 0.988,
       "create_endpoints_requiring_client_key": 0,
       "generic_status_only_core_entities": 0,
       "missing_transition_contracts_for_core_entities": 0,
@@ -91,8 +91,8 @@
       "unused_candidate_entities": 0
     },
     "wave2_canonical_governance": {
-      "canonical_resources": 67,
-      "canonical_catalog_meta_resource_count": 67,
+      "canonical_resources": 68,
+      "canonical_catalog_meta_resource_count": 68,
       "canonical_catalog_meta_mismatch": 0,
       "catalog_alignment_targets": 12,
       "catalog_alignment_failures": 2,
@@ -101,7 +101,7 @@
       "planned_canonical_resources_not_yet_in_registry": 0,
       "archive_isolation_targets": 5,
       "archive_isolation_targets_failed": 0,
-      "direct_table_matches": 54,
+      "direct_table_matches": 55,
       "legacy_table_matches": 8,
       "service_backed_slice_matches": 5,
       "true_schema_gaps": 0,
@@ -124,14 +124,14 @@
       "quality_execution_targets": 3,
       "quality_execution_failed": 0,
       "inspection_backbone_targets": 6,
-      "inspection_backbone_failed": 0,
+      "inspection_backbone_failed": 1,
       "reaction_loop_targets": 4,
       "reaction_loop_failed": 0,
       "qa_qc_role_split_targets": 3,
       "qa_qc_role_split_failed": 0,
       "alias_resolution_targets": 1,
       "alias_resolution_failed": 0,
-      "remaining_wave4_gaps": 0
+      "remaining_wave4_gaps": 1
     },
     "wave5_maintenance_ehs_governance": {
       "execution_targets": 7,
@@ -163,14 +163,14 @@
       "scenario_count": 12,
       "critical": 0,
       "high": 0,
-      "medium": 0,
-      "watch": 12,
-      "idempotency_mentions": 24405,
+      "medium": 1,
+      "watch": 11,
+      "idempotency_mentions": 25546,
       "idempotency_contract_coverage_ratio": 1.0,
-      "default_retry_safe_ratio": 1.0,
+      "default_retry_safe_ratio": 0.988,
       "create_endpoints_requiring_client_key": 0,
       "compensation_markers": 5,
-      "correction_markers": 2413,
+      "correction_markers": 2490,
       "period_close_mentions": 40,
       "credit_memo_mentions": 24,
       "debit_memo_mentions": 24,
@@ -179,25 +179,27 @@
       "mes_execution_blockers": 0
     },
     "enterprise_registry_doctor": {
-      "status": "watch",
-      "finding_count": 2,
-      "p0_p1_finding_count": 0,
-      "table_governance_overlay_count": 837,
+      "status": "blocked",
+      "finding_count": 3,
+      "p0_p1_finding_count": 1,
+      "table_governance_overlay_count": 867,
       "missing_owner_role": 0,
       "missing_system_of_record": 0,
       "hard_delete_endpoint_count": 0,
       "quarantined_delete_endpoint_count": 0,
-      "runtime_unsafe_exposed_endpoint_count": 0,
-      "runtime_unsafe_blocked_endpoint_count": 1164,
-      "generic_runtime_classification_count": 591,
-      "bound_command_runtime_binding_count": 276,
+      "runtime_unsafe_exposed_endpoint_count": 69,
+      "runtime_unsafe_blocked_endpoint_count": 1179,
+      "generic_runtime_classification_count": 607,
+      "bound_command_runtime_binding_count": 281,
       "unbound_command_runtime_binding_count": 0
     },
     "enterprise_frontend_simulation": {
-      "status": "watch",
+      "status": "blocked",
       "scenario_count": 10,
-      "blocked_scenario_count": 0,
-      "blocker_counts": {},
+      "blocked_scenario_count": 2,
+      "blocker_counts": {
+        "runtime_safe_false_exposed": 2
+      },
       "warning_counts": {
         "frontend_surface_not_explicit": 1,
         "missing_command_or_state_model": 2
@@ -220,15 +222,15 @@
   "assets": {
     "data-fields-index.json": {
       "kind": "field-registry-index",
-      "records": 5430
+      "records": 5619
     },
     "endpoint-catalog.json": {
       "kind": "endpoint-catalog",
-      "records": 4625
+      "records": 4884
     },
     "endpoint-catalog-index.json": {
       "kind": "endpoint-catalog-index",
-      "records": 4625
+      "records": 4884
     },
     "runtime-access-policy.json": {
       "kind": "runtime-access-policy",
@@ -236,23 +238,23 @@
     },
     "domain-field-packs.json": {
       "kind": "pack-library",
-      "records": 5069
+      "records": 5249
     },
     "relation-map.json": {
       "kind": "relation-map",
-      "records": 3773
+      "records": 3820
     },
     "frontend-foundation-catalog.json": {
       "kind": "frontend-foundation-catalog",
-      "records": 848
+      "records": 883
     },
     "workflow-library.json": {
       "kind": "workflow-library",
-      "records": 379
+      "records": 384
     },
     "status-options.json": {
       "kind": "status-library",
-      "records": 971
+      "records": 989
     },
     "field-types.json": {
       "kind": "field-types",
@@ -260,11 +262,11 @@
     },
     "validation-rules.json": {
       "kind": "validation-rules",
-      "records": 60506
+      "records": 64243
     },
     "computed-formulas.json": {
       "kind": "formula-library",
-      "records": 1476
+      "records": 1517
     },
     "registry-manifest.json": {
       "kind": "manifest",
@@ -280,7 +282,7 @@
     },
     "wave0-governance-report.json": {
       "kind": "wave0-governance-report",
-      "records": 775
+      "records": 883
     },
     "operational-blind-spot-catalog.json": {
       "kind": "operational-blind-spot-catalog",
@@ -312,7 +314,7 @@
     },
     "wave2-canonical-report.json": {
       "kind": "wave2-canonical-report",
-      "records": 67
+      "records": 68
     },
     "wave3-process-governance-policy.json": {
       "kind": "wave3-process-governance-policy",
@@ -380,15 +382,15 @@
     },
     "endpoint-governance-classification.json": {
       "kind": "endpoint-governance-classification",
-      "records": 4625
+      "records": 4884
     },
     "table-governance-overlay.json": {
       "kind": "table-governance-overlay",
-      "records": 837
+      "records": 867
     },
     "enterprise-event-contract-map.json": {
       "kind": "enterprise-event-contract-map",
-      "records": 229
+      "records": 232
     },
     "destructive-endpoint-quarantine.json": {
       "kind": "destructive-endpoint-quarantine",
@@ -396,11 +398,11 @@
     },
     "command-runtime-bindings.json": {
       "kind": "command-runtime-bindings",
-      "records": 276
+      "records": 281
     },
     "enterprise-registry-doctor-report.json": {
       "kind": "enterprise-registry-doctor-report",
-      "records": 2
+      "records": 3
     },
     "ai-authority-chain.json": {
       "kind": "ai-authority-chain",

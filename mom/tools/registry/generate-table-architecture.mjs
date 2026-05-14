@@ -754,6 +754,14 @@ const migrationDomainDefaults = new Map([
   ['171_diacritics_repair_modules_catalog.sql', 'core_system'],
   ['172_disposal_event_and_campaign_close.sql', 'core_system'],
   ['173_rbac_role_permissions_canonical_seed.sql', 'core_system'],
+  ['174_data_isolation_foundation.sql', 'system_infrastructure'],
+  ['175_dcc_document_body_storage.sql', 'document_control'],
+  ['176_promote_deployment_foundation_docs.sql', 'document_control'],
+  ['177_hcm_employee_position_assignments.sql', 'hcm_workforce'],
+  ['178_user_identity_ssot_guards.sql', 'core_system'],
+  ['179_drop_legacy_employees_identity_cols.sql', 'core_system'],
+  ['180_restore_employees_identity_cols.sql', 'core_system'],
+  ['181_drop_employees_identity_cols_final.sql', 'core_system'],
 ]);
 
 const tableDomainOverrides = {

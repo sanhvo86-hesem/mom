@@ -2,120 +2,131 @@
   "_meta": {
     "version": "5.0",
     "description": "Internal quality report for registry-backed Module Builder assets.",
-    "generatedAt": "2026-04-24T08:27:15.189Z",
+    "generatedAt": "2026-05-14T03:02:01.284Z",
     "integrity_gate": "all_passed",
     "publishability_gate": "publishability.ready",
     "slice_publication_pass": "foundation_governance_contract_slice",
     "publication_scope": "platform_global",
-    "publication_run_id": "c544a828-8ff5-44a4-9d02-0e0814d38afa"
+    "publication_run_id": "a78697bf-4652-476e-a4b9-5a9362caf639"
   },
   "summary": {
-    "endpoint_count": 4625,
-    "pack_count": 5069,
-    "relation_edge_count": 3773,
-    "workflow_count": 379,
-    "status_set_count": 971,
-    "validation_rule_count": 60506,
-    "formula_count": 1476,
-    "formula_reference_count": 1476,
-    "field_context_count": 85512,
-    "row_version_tables": 681,
-    "org_scoped_tables": 641,
+    "endpoint_count": 4884,
+    "pack_count": 5249,
+    "relation_edge_count": 3820,
+    "workflow_count": 384,
+    "status_set_count": 989,
+    "validation_rule_count": 64243,
+    "formula_count": 1517,
+    "formula_reference_count": 1517,
+    "field_context_count": 89124,
+    "row_version_tables": 703,
+    "org_scoped_tables": 658,
     "composite_pk_tables": 21,
     "missing_primary_key_tables": 0,
-    "unsupported_record_endpoints": 0,
+    "unsupported_record_endpoints": 2,
     "optimistic_concurrency_issues": 0,
     "idempotency_contract_issues": 0,
     "org_scope_contract_issues": 0,
     "contract_issues": 0,
     "workflow_alignment_issues": 0,
-    "transition_runtime_warnings": 388,
-    "workflow_engine_bridge_ready": 388,
+    "transition_runtime_warnings": 393,
+    "workflow_engine_bridge_ready": 393,
     "workflow_engine_bridge_blocked": 0,
-    "archive_only_tables": 774,
-    "soft_delete_tables": 63,
+    "archive_only_tables": 790,
+    "soft_delete_tables": 77,
     "hard_delete_tables": 0,
     "workflow_lifecycle_modes": {
-      "stateless": 395,
-      "generic_status_only": 49,
+      "stateless": 416,
+      "generic_status_only": 53,
       "guarded_transition_runtime": 5,
-      "persisted": 388,
+      "persisted": 393,
       "unknown": 0
     },
-    "frontend_foundation_entities": 848,
-    "frontend_ready_entities": 848,
+    "frontend_foundation_entities": 883,
+    "frontend_ready_entities": 883,
     "frontend_partial_entities": 0,
     "frontend_blocked_entities": 0,
     "frontend_archive_isolation_entities": 6,
-    "frontend_publishable_entities": 842,
+    "frontend_publishable_entities": 877,
     "frontend_unpublishable_entities": 0,
-    "schema_authority_table_count": 837,
+    "schema_authority_table_count": 867,
     "schema_authority_partition_table_count": 13,
-    "schema_authority_physical_table_count": 850,
-    "attachment_contract_entities": 835,
-    "comment_contract_entities": 835,
-    "activity_contract_entities": 648,
-    "publishability_ready": true,
+    "schema_authority_physical_table_count": 880,
+    "attachment_contract_entities": 870,
+    "comment_contract_entities": 870,
+    "activity_contract_entities": 650,
+    "publishability_ready": false,
     "publishability_review_required_entities": 0
   },
   "publishability": {
-    "ready": true,
-    "status": "ready",
-    "review_required": false,
-    "failed_checks": [],
+    "ready": false,
+    "status": "review_required",
+    "review_required": true,
+    "failed_checks": [
+      {
+        "id": "record_endpoint_contracts_clean",
+        "passed": false,
+        "actual": 2,
+        "target": 0
+      }
+    ],
     "blocking_counts": {
       "frontend_partial_entities": 0,
       "frontend_blocked_entities": 0,
       "frontend_unpublishable_entities": 0,
       "workflow_engine_bridge_blocked": 0,
-      "unsupported_record_endpoints": 0,
+      "unsupported_record_endpoints": 2,
       "contract_issues": 0,
       "schema_authority_table_count_mismatch": 0
     },
-    "recommended_next_actions": []
+    "recommended_next_actions": [
+      "Close remaining unpublishable record surfaces before rollout.",
+      "Bridge persisted workflows into the workflow engine before exposing transition UX.",
+      "Resolve remaining record endpoint/runtime contract gaps before publishing modules."
+    ]
   },
   "checks": [
     {
       "id": "tables_have_fields",
       "passed": true,
-      "actual": 837,
-      "target": 837
+      "actual": 867,
+      "target": 867
     },
     {
       "id": "tables_have_endpoint_catalog",
       "passed": true,
-      "actual": 837,
-      "target": 837
+      "actual": 867,
+      "target": 867
     },
     {
       "id": "tables_have_pack",
       "passed": true,
-      "actual": 837,
-      "target": 837
+      "actual": 867,
+      "target": 867
     },
     {
       "id": "fk_edges_covered",
       "passed": true,
-      "actual": 3773,
-      "target": 3773
+      "actual": 3820,
+      "target": 3820
     },
     {
       "id": "workflow_coverage",
       "passed": true,
-      "actual": 528,
-      "target": 528
+      "actual": 536,
+      "target": 536
     },
     {
       "id": "status_coverage",
       "passed": true,
-      "actual": 429,
-      "target": 429
+      "actual": 438,
+      "target": 438
     },
     {
       "id": "scalar_pk_tables",
       "passed": true,
-      "actual": 816,
-      "target": 805
+      "actual": 846,
+      "target": 835
     },
     {
       "id": "optimistic_concurrency_contracts",
@@ -144,13 +155,13 @@
     {
       "id": "frontend_foundation_coverage",
       "passed": true,
-      "actual": 848,
-      "target": 837
+      "actual": 883,
+      "target": 867
     },
     {
       "id": "no_unsupported_record_endpoints",
-      "passed": true,
-      "actual": 0,
+      "passed": false,
+      "actual": 2,
       "target": 0
     },
     {
@@ -168,7 +179,7 @@
     {
       "id": "workflow_count_target",
       "passed": true,
-      "actual": 379,
+      "actual": 384,
       "target": 60
     },
     {
@@ -180,30 +191,38 @@
     {
       "id": "status_set_target",
       "passed": true,
-      "actual": 971,
+      "actual": 989,
       "target": 180
     },
     {
       "id": "validation_rule_target",
       "passed": true,
-      "actual": 60506,
+      "actual": 64243,
       "target": 5000
     },
     {
       "id": "formula_target",
       "passed": true,
-      "actual": 1476,
+      "actual": 1517,
       "target": 200
     },
     {
       "id": "formula_reference_target",
       "passed": true,
-      "actual": 1476,
-      "target": 1476
+      "actual": 1517,
+      "target": 1517
     }
   ],
   "warnings": {
     "row_version_tables": [
+      {
+        "table": "access_review_campaign",
+        "concurrency_field": "row_version"
+      },
+      {
+        "table": "access_review_item",
+        "concurrency_field": "row_version"
+      },
       {
         "table": "ai_conversations",
         "concurrency_field": "row_version"
@@ -435,17 +454,27 @@
       {
         "table": "com_rebate_accruals",
         "concurrency_field": "row_version"
-      },
-      {
-        "table": "com_rebate_programs",
-        "concurrency_field": "row_version"
-      },
-      {
-        "table": "comments",
-        "concurrency_field": "row_version"
       }
     ],
     "org_scoped_tables": [
+      {
+        "table": "access_review_campaign",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
+      {
+        "table": "access_review_item",
+        "scope_fields": [
+          "org_company_code",
+          "org_legal_entity_code",
+          "org_plant_id",
+          "org_site_id"
+        ]
+      },
       {
         "table": "ai_conversations",
         "scope_fields": [
@@ -967,24 +996,6 @@
           "org_plant_id",
           "org_site_id"
         ]
-      },
-      {
-        "table": "comments",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
-      },
-      {
-        "table": "commercial_accounts",
-        "scope_fields": [
-          "org_company_code",
-          "org_legal_entity_code",
-          "org_plant_id",
-          "org_site_id"
-        ]
       }
     ],
     "composite_pk_tables": [
@@ -1160,7 +1171,10 @@
       }
     ],
     "missing_primary_key_tables": [],
-    "unsupported_record_endpoints": [],
+    "unsupported_record_endpoints": [
+      "system_infrastructure.data_collection_drift.transition",
+      "system_infrastructure.data_collection_state.transition"
+    ],
     "optimistic_concurrency_issues": [],
     "idempotency_contract_issues": [],
     "org_scope_contract_issues": [],
@@ -1631,6 +1645,12 @@
         "governance_level": "governed"
       },
       {
+        "table": "audit_event_chain",
+        "domain": "system_infrastructure",
+        "mode": "archive_only",
+        "governance_level": "governed"
+      },
+      {
         "table": "audit_events",
         "domain": "core_system",
         "mode": "archive_only",
@@ -1803,15 +1823,9 @@
         "domain": "commercial_contracts",
         "mode": "archive_only",
         "governance_level": "support"
-      },
-      {
-        "table": "com_price_lists",
-        "domain": "commercial_contracts",
-        "mode": "archive_only",
-        "governance_level": "default_no_data_loss"
       }
     ],
     "frontend_foundation": []
   },
-  "all_passed": true
+  "all_passed": false
 }

@@ -1,14 +1,14 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-15T10:51:36.677Z",
+    "generatedAt": "2026-05-14T03:01:43.682Z",
     "registryDir": "/Users/a10/Documents/mom/mom/data/registry",
     "policyVersion": "1.0",
     "description": "Wave 2 canonical governance verification report."
   },
   "summary": {
-    "canonical_resources": 67,
-    "canonical_catalog_meta_resource_count": 67,
+    "canonical_resources": 68,
+    "canonical_catalog_meta_resource_count": 68,
     "canonical_catalog_meta_mismatch": 0,
     "catalog_alignment_targets": 12,
     "catalog_alignment_failures": 2,
@@ -17,7 +17,7 @@
     "planned_canonical_resources_not_yet_in_registry": 0,
     "archive_isolation_targets": 5,
     "archive_isolation_targets_failed": 0,
-    "direct_table_matches": 54,
+    "direct_table_matches": 55,
     "legacy_table_matches": 8,
     "service_backed_slice_matches": 5,
     "true_schema_gaps": 0,
@@ -1181,6 +1181,24 @@
         "deviation",
         "deviations",
         "plm_deviation_permits"
+      ]
+    },
+    {
+      "resource_key": "quality_improvement.document_control",
+      "table": "dcc_document_header",
+      "legacy_tables": [
+        "eqms_document_family",
+        "eqms_document_revision",
+        "eqms_documents"
+      ],
+      "resolution_mode": "direct_table_match",
+      "matched_entities": [
+        "document_control.dcc_document_header"
+      ],
+      "matched_legacy_tables": [
+        "eqms_document_family",
+        "eqms_document_revision",
+        "eqms_documents"
       ]
     },
     {

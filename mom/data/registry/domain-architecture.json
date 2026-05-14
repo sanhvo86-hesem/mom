@@ -1,9 +1,9 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-24T08:27:09.061Z",
+    "generatedAt": "2026-05-14T03:01:53.537Z",
     "domainCount": 49,
-    "tableCount": 837,
+    "tableCount": 867,
     "description": "Domain architecture map for HESEM QMS Portal aligned to SAP, Epicor, IFS, Oracle, and Dynamics patterns.",
     "researchReferences": [
       {
@@ -250,7 +250,7 @@
         "multilingualPattern": "LocalizedLabels on metadata objects and label merge semantics by language code."
       }
     },
-    "workflowCoverageGeneratedAt": "2026-04-24T08:27:14.538Z"
+    "workflowCoverageGeneratedAt": "2026-05-14T03:02:00.544Z"
   },
   "domains": {
     "core_system": {
@@ -261,14 +261,38 @@
       "description": "Người dùng, vai trò, phiên, tổ chức và nhật ký hệ thống lõi.",
       "businessProcess": "Identity, authorization, tenancy, security, and audit foundation.",
       "tables": [
+        "access_review_campaign",
+        "access_review_item",
         "audit_events",
         "departments",
+        "disposal_event",
+        "document_permission_grant",
+        "mfa_challenge",
+        "mfa_factor",
+        "mfa_policy",
+        "mfa_recovery_code",
+        "module_permission",
+        "modules_catalog",
+        "permission_catalog",
+        "portal_display_preference",
+        "portal_layout_template",
+        "portal_layout_widget",
+        "portal_widget_catalog",
+        "role_sod_conflict",
         "roles",
         "sessions",
+        "translation_credentials",
+        "translation_provider_config",
+        "translation_routing",
+        "translation_usage_log",
         "user_roles",
         "users"
       ],
       "primaryWorkflows": [
+        "wf_mfa_challenge",
+        "wf_mfa_factor",
+        "wf_translation_credential",
+        "wf_translation_provider_config",
         "wf_user"
       ],
       "upstreamDomains": [
@@ -321,6 +345,10 @@
       ],
       "supportDomain": false,
       "workflows": [
+        "wf_mfa_challenge",
+        "wf_mfa_factor",
+        "wf_translation_credential",
+        "wf_translation_provider_config",
         "wf_user"
       ]
     },
@@ -463,6 +491,7 @@
       "businessProcess": "Controlled documents, revisions, release, acknowledgment, and retrieval.",
       "tables": [
         "dcc_doc_type_catalog",
+        "dcc_document_body",
         "dcc_document_change_notice",
         "dcc_document_change_request",
         "dcc_document_header",
@@ -477,6 +506,7 @@
         "doc_read_acknowledgements",
         "doc_revisions",
         "document",
+        "document_acknowledgement",
         "document_distribution",
         "document_embeddings",
         "document_revision",
@@ -490,6 +520,7 @@
         "read_ack_gate_decisions"
       ],
       "primaryWorkflows": [
+        "wf_dcc_document_body",
         "wf_dcc_document_change_notice",
         "wf_dcc_document_change_request",
         "wf_dcc_document_header",
@@ -506,6 +537,7 @@
       "upstreamDomains": [
         "core_system",
         "foundation_governance",
+        "master_data_governance",
         "mes_execution",
         "plm_change_control"
       ],
@@ -519,6 +551,7 @@
       ],
       "supportDomain": false,
       "workflows": [
+        "wf_dcc_document_body",
         "wf_dcc_document_change_notice",
         "wf_dcc_document_change_request",
         "wf_dcc_document_header",
@@ -1821,6 +1854,7 @@
         "hcm_certifications",
         "hcm_disciplinary_actions",
         "hcm_employee_certifications",
+        "hcm_employee_position_assignments",
         "hcm_employee_skills",
         "hcm_employees",
         "hcm_leave_balances",
@@ -2628,7 +2662,11 @@
         "mdm_shipping_methods",
         "mdm_site_parameters",
         "mdm_uom_conversions",
+        "retention_class_assignment",
+        "retention_disposal_event",
+        "retention_legal_hold",
         "retention_policies",
+        "retention_policy",
         "source_system_registry"
       ],
       "primaryWorkflows": [
@@ -2644,6 +2682,7 @@
         "mes_execution"
       ],
       "downstreamDomains": [
+        "document_control",
         "system_infrastructure"
       ],
       "supportDomain": false,
@@ -3030,8 +3069,11 @@
       "description": "Biến hệ thống, naming, file, tag, comment, notification và workflow runtime.",
       "businessProcess": "Infrastructure, metadata, notification, workflow runtime, and system-level services.",
       "tables": [
+        "audit_event_chain",
         "background_jobs",
         "comments",
+        "data_collection_drift",
+        "data_collection_state",
         "domain_outbox_events",
         "duplicate_detection_fingerprints",
         "escalation_log",

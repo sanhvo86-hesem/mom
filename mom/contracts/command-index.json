@@ -1,9 +1,9 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-15T10:51:38.911151+00:00",
+    "generatedAt": "2026-05-14T03:01:47.682530+00:00",
     "description": "Canonical business command catalog derived from authored object packages with generator fallback.",
-    "commandCount": 276
+    "commandCount": 281
   },
   "commands": [
     {
@@ -3726,6 +3726,81 @@
       "preconditions": [
         "risk_and_scope_recorded"
       ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.document_control:approve",
+      "canonicalResource": "quality_improvement.document_control",
+      "command": "approve",
+      "purpose": "Reviewer approves the drafted revision.",
+      "targetApiPath": "/api/runtime/document_control/dcc_document_header/{id}/transition",
+      "runtimeEndpointKind": "transition",
+      "classification": "lifecycle_owner",
+      "storageTable": "dcc_document_header",
+      "targetState": "approved",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "dcr_approved"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.document_control:obsolete",
+      "canonicalResource": "quality_improvement.document_control",
+      "command": "obsolete",
+      "purpose": "Retire the document from the controlled corpus.",
+      "targetApiPath": "/api/runtime/document_control/dcc_document_header/{id}/transition",
+      "runtimeEndpointKind": "transition",
+      "classification": "lifecycle_owner",
+      "storageTable": "dcc_document_header",
+      "targetState": "obsolete",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.document_control:release",
+      "canonicalResource": "quality_improvement.document_control",
+      "command": "release",
+      "purpose": "Release authority signs the DCN and publishes the new revision.",
+      "targetApiPath": "/api/runtime/document_control/dcc_document_header/{id}/transition",
+      "runtimeEndpointKind": "transition",
+      "classification": "lifecycle_owner",
+      "storageTable": "dcc_document_header",
+      "targetState": "released",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [
+        "dcn_issued",
+        "signature_event"
+      ],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.document_control:submit_review",
+      "canonicalResource": "quality_improvement.document_control",
+      "command": "submit_review",
+      "purpose": "Submit the current draft for review.",
+      "targetApiPath": "/api/runtime/document_control/dcc_document_header/{id}/transition",
+      "runtimeEndpointKind": "transition",
+      "classification": "lifecycle_owner",
+      "storageTable": "dcc_document_header",
+      "targetState": "in_review",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
+      "source": "authored_package"
+    },
+    {
+      "key": "quality_improvement.document_control:supersede",
+      "canonicalResource": "quality_improvement.document_control",
+      "command": "supersede",
+      "purpose": "Mark the current revision as superseded by a newer released revision.",
+      "targetApiPath": "/api/runtime/document_control/dcc_document_header/{id}/transition",
+      "runtimeEndpointKind": "transition",
+      "classification": "lifecycle_owner",
+      "storageTable": "dcc_document_header",
+      "targetState": "superseded",
+      "idempotencyScope": "resource+transition",
+      "preconditions": [],
       "source": "authored_package"
     },
     {

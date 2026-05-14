@@ -248,8 +248,83 @@ function deployEscape(s){
     .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
     .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 }
+function deployInlineString(s){
+  return deployEscape(JSON.stringify(String(s == null ? '' : s)));
+}
 function deployNum(v){ const n = parseFloat(v); return Number.isFinite(n) ? n : 0; }
 function deployIsoToVi(iso){ if(!iso) return '—'; try{ return new Date(iso).toLocaleString('vi-VN'); }catch(_){ return iso; } }
+function deployStaticDocByCode(code){
+  const target = String(code || '').trim().toUpperCase();
+  if (!target) return null;
+  for (const group of (DEPLOY_CONFIG.docsByGroup || [])) {
+    for (const item of (group.items || [])) {
+      if (String(item.code || '').trim().toUpperCase() === target) return item;
+    }
+  }
+  for (const dept of (DEPLOY_CONFIG.departments || [])) {
+    for (const item of (dept.docs || [])) {
+      if (String(item.code || '').trim().toUpperCase() === target) return item;
+    }
+  }
+  if (/^TRN-DEP-W\d{2}$/i.test(target)) {
+    return {
+      code: target,
+      path: `../mom/docs/training/system-ops/03-Deploy-Playbook/${target}.html`,
+    };
+  }
+  return null;
+}
+function deployCloseWeekPanelForDocOpen(){
+  if (DeployState.activeWeek == null && !DeployState.weekFullscreen) return;
+  DeployState.activeWeek = null;
+  DeployState.weekFullscreen = false;
+  renderDeployDashboard();
+}
+async function deployOpenDoc(code){
+  const target = String(code || '').trim();
+  if (!target) return false;
+  try{
+    if (typeof window !== 'undefined' && typeof window.openDoc === 'function') {
+      let doc = typeof window._resolveDocRecord === 'function' ? window._resolveDocRecord(target) : null;
+      if (!doc && typeof window.loadDocsFromServer === 'function') {
+        await window.loadDocsFromServer();
+        doc = typeof window._resolveDocRecord === 'function' ? window._resolveDocRecord(target) : null;
+      }
+      if (doc) {
+        if (typeof window.canAccessDoc === 'function' && !window.canAccessDoc(doc.code)) {
+          if (typeof window.showToast === 'function') {
+            window.showToast(lang === 'en' ? 'You do not have access to this document.' : 'Bạn không có quyền truy cập tài liệu này.');
+          }
+          return false;
+        }
+        deployCloseWeekPanelForDocOpen();
+        await window.openDoc(doc);
+        return true;
+      }
+    }
+    const staticDoc = deployStaticDocByCode(target);
+    if (staticDoc && staticDoc.path && typeof window !== 'undefined' && typeof window.open === 'function') {
+      window.open(staticDoc.path, '_blank', 'noopener');
+      return true;
+    }
+    if (typeof window !== 'undefined' && typeof window.alert === 'function') {
+      window.alert('Trang tài liệu chưa sẵn sàng: ' + target);
+    }
+  }catch(e){
+    console.warn('[deploy] open document failed', target, e && e.message);
+    if (typeof window !== 'undefined' && typeof window.alert === 'function') {
+      window.alert('Không mở được tài liệu: ' + target);
+    }
+  }
+  return false;
+}
+function deployRewriteDocOpenHandlers(html){
+  return String(html || '')
+    .replace(/onclick=(["'])if\(window\.openDoc\)\s*openDoc\((["'])([^"']+)\2\);\s*return false;?\1/g,
+      (_m, _q1, _q2, docCode) => `onclick="deployOpenDoc(${deployInlineString(docCode)});return false;"`)
+    .replace(/onclick=(["'])openDoc\((["'])([^"']+)\2\);\s*return false;?\1/g,
+      (_m, _q1, _q2, docCode) => `onclick="deployOpenDoc(${deployInlineString(docCode)});return false;"`);
+}
 // ── Playbook fetch + cache ────────────────────────────────────────────────
 // Pulls the 12-section playbook HTML for a given doc code (TRN-DEP-W01..W12)
 // via the existing doc_stream API and parses out individual sections so the
@@ -325,7 +400,7 @@ async function deployHydratePlaybook(code, target){
   host.innerHTML = `<div class="dwp-brief-loading">⏳ Đang tải nội dung họp chi tiết từ ${deployEscape(code)}…</div>`;
   const data = await deployFetchPlaybook(code);
   if (!data){
-    host.innerHTML = `<div class="dwp-brief-empty">⚠ Không tải được cẩm nang ${deployEscape(code)}. <a href="javascript:void(0)" onclick="if(window.openDoc)openDoc('${deployEscape(code)}');return false;">Mở trực tiếp</a></div>`;
+    host.innerHTML = `<div class="dwp-brief-empty">⚠ Không tải được cẩm nang ${deployEscape(code)}. <a href="javascript:void(0)" onclick="deployOpenDoc(${deployInlineString(code)});return false;">Mở trực tiếp</a></div>`;
     return;
   }
   host.innerHTML = deployRenderBrief(code, data, false);
@@ -355,7 +430,7 @@ function deployRenderBrief(code, data, fullscreen){
         ['risks','⚠ Rủi ro và đường leo thang xử lý'],
       ];
   const blocks = sections.map(([key, title]) => {
-    const html = data[key];
+    const html = deployRewriteDocOpenHandlers(data[key]);
     if (!html) return '';
     return `
       <details class="dwp-brief-block" ${fullscreen ? 'open' : (key==='agenda' ? 'open' : '')}>
@@ -367,7 +442,7 @@ function deployRenderBrief(code, data, fullscreen){
     <div class="dwp-brief-head">
       <strong>📖 Cẩm nang ${deployEscape(code)}</strong>
       <span>Trích từ tài liệu chính thức · ${fullscreen ? 'toàn bộ 12 mục' : '5 mục trọng yếu'} ·
-        <a href="javascript:void(0)" onclick="if(window.openDoc)openDoc('${deployEscape(code)}');return false;">Mở tài liệu đầy đủ ↗</a>
+        <a href="javascript:void(0)" onclick="deployOpenDoc(${deployInlineString(code)});return false;">Mở tài liệu đầy đủ ↗</a>
       </span>
     </div>`;
   return head + blocks;
@@ -379,10 +454,7 @@ function deployRenderDocChip(code){
   // Reuse the portal-wide openDoc() resolver (defined in 02-state-auth-ui.js).
   // It maps a doc-code to its file path via the DCC registry and opens the
   // correct viewer. When unavailable (e.g. anonymous test), fall back to chip.
-  if (typeof window !== 'undefined' && typeof window.openDoc === 'function') {
-    return `<a class="${baseClass} deploy-doc-chip-link dwp-doc-chip-link" href="javascript:void(0)" onclick="openDoc('${safe}');return false;" title="Mở tài liệu ${safe}">${safe}</a>`;
-  }
-  return `<span class="${baseClass}">${safe}</span>`;
+  return `<a class="${baseClass} deploy-doc-chip-link dwp-doc-chip-link" href="javascript:void(0)" onclick="deployOpenDoc(${deployInlineString(code)});return false;" title="Mở tài liệu ${safe}">${safe}</a>`;
 }
 function deployFmtDate(iso){ if(!iso) return '—'; try{ return new Date(iso).toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}); }catch(_){ return iso; } }
 function deployTodayIso(){ return new Date().toISOString().slice(0,10); }
@@ -1271,7 +1343,7 @@ function renderWeekPanel(){
           ${w.playbookCode ? `
             <div class="dwp-playbook-link">
               <button type="button" class="dwp-playbook-btn"
-                onclick="if(window.openDoc) openDoc('${deployEscape(w.playbookCode)}'); else alert('Trang tài liệu chưa sẵn sàng');"
+                onclick="deployOpenDoc(${deployInlineString(w.playbookCode)})"
                 title="Mở cẩm nang triển khai chi tiết cho tuần W${wn}">
                 📖 Mở cẩm nang W${wn} · ${deployEscape(w.playbookCode)}
               </button>
@@ -2303,6 +2375,7 @@ function renderDeployDashboard(){
 // Legacy global aliases (kept so the portal router and any cached HTML keep working)
 window.renderDeployDashboard = renderDeployDashboard;
 window.switchDeployTab = switchDeployTab;
+window.deployOpenDoc = deployOpenDoc;
 window.deployCycleReadiness = deployCycleReadiness;
 window.deployUpdateMetric = deployUpdateMetric;
 window.deployToggleChecklist = deployToggleChecklist;

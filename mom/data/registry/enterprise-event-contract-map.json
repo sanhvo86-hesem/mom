@@ -1,10 +1,10 @@
 {
   "_meta": {
     "version": "1.0",
-    "generatedAt": "2026-04-24T08:27:19.645408+00:00",
+    "generatedAt": "2026-05-14T03:02:07.891020+00:00",
     "sourceArtifact": "mom/contracts/event-index.json",
     "standard": "CloudEvents 1.0 envelope + AsyncAPI-ready message map",
-    "eventCount": 229
+    "eventCount": 232
   },
   "events": [
     {
@@ -4472,6 +4472,72 @@
       "classification": "lifecycle_owner",
       "storageTable": "deviations",
       "purpose": "Deviation request or closure path was rejected."
+    },
+    {
+      "key": "quality_improvement.document_control.created",
+      "canonicalResource": "quality_improvement.document_control",
+      "cloudeventsVersion": "1.0",
+      "type": "hesem.quality_improvement.document_control.created",
+      "source": "urn:hesem:mom:quality_improvement",
+      "subjectTemplate": "quality_improvement.document_control/{id}",
+      "timeRequired": true,
+      "idRequired": true,
+      "correlationIdRequired": true,
+      "dataContentType": "application/json",
+      "dataSchemaRef": "mom/contracts/event-index.json#/events/quality_improvement.document_control.created",
+      "producerAuthority": "workflow_or_service_runtime",
+      "consumerAuthorities": [
+        "audit_trail",
+        "dashboard_projection",
+        "registry_drift_monitor"
+      ],
+      "classification": "lifecycle_owner",
+      "storageTable": "dcc_document_header",
+      "purpose": ""
+    },
+    {
+      "key": "quality_improvement.document_control.state-transitioned",
+      "canonicalResource": "quality_improvement.document_control",
+      "cloudeventsVersion": "1.0",
+      "type": "hesem.quality_improvement.document_control.state-transitioned",
+      "source": "urn:hesem:mom:quality_improvement",
+      "subjectTemplate": "quality_improvement.document_control/{id}",
+      "timeRequired": true,
+      "idRequired": true,
+      "correlationIdRequired": true,
+      "dataContentType": "application/json",
+      "dataSchemaRef": "mom/contracts/event-index.json#/events/quality_improvement.document_control.state-transitioned",
+      "producerAuthority": "workflow_or_service_runtime",
+      "consumerAuthorities": [
+        "audit_trail",
+        "dashboard_projection",
+        "registry_drift_monitor"
+      ],
+      "classification": "lifecycle_owner",
+      "storageTable": "dcc_document_header",
+      "purpose": ""
+    },
+    {
+      "key": "quality_improvement.document_control.updated",
+      "canonicalResource": "quality_improvement.document_control",
+      "cloudeventsVersion": "1.0",
+      "type": "hesem.quality_improvement.document_control.updated",
+      "source": "urn:hesem:mom:quality_improvement",
+      "subjectTemplate": "quality_improvement.document_control/{id}",
+      "timeRequired": true,
+      "idRequired": true,
+      "correlationIdRequired": true,
+      "dataContentType": "application/json",
+      "dataSchemaRef": "mom/contracts/event-index.json#/events/quality_improvement.document_control.updated",
+      "producerAuthority": "workflow_or_service_runtime",
+      "consumerAuthorities": [
+        "audit_trail",
+        "dashboard_projection",
+        "registry_drift_monitor"
+      ],
+      "classification": "lifecycle_owner",
+      "storageTable": "dcc_document_header",
+      "purpose": ""
     },
     {
       "key": "quality_improvement.fqc-inspections.accepted",
