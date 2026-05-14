@@ -4017,7 +4017,13 @@
         "quality_manager",
         "qms_engineer"
       ],
-      "delete": [],
+      "delete": [
+        "it_admin",
+        "ceo",
+        "qa_manager",
+        "quality_manager",
+        "qms_engineer"
+      ],
       "genericMutation": "allow"
     },
     "hcm_payroll_lines": {
