@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+# Git pre-commit hook — HESEM MOM
+# Catches migration number collisions and runtime-config commits before they are recorded.
+# Install: cp tools/vps-setup/hooks/pre-commit .git/hooks/pre-commit && chmod +x .git/hooks/pre-commit
+# Or run:  bash tools/vps-setup/hooks/install-hooks.sh
+
+set -euo pipefail
+
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+MIGRATION_DIR="mom/database/migrations"
+
+# ── 1. Migration number collision check ──────────────────────────────────────
+# New migration files staged for this commit
+STAGED_MIGRATIONS=$(git diff --cached --name-only --diff-filter=A | grep -E "^${MIGRATION_DIR}/[0-9]" || true)
+
+if [ -n "$STAGED_MIGRATIONS" ]; then
+  for NEW_FILE in $STAGED_MIGRATIONS; do
+    NEW_NUM=$(basename "$NEW_FILE" | grep -oE '^[0-9]+')
+
+    # Check all existing migration files (including unstaged) for the same number
+    CONFLICT=$(find "$MIGRATION_DIR" -name "*.sql" ! -name "$(basename "$NEW_FILE")" 2>/dev/null | \
+      xargs -I{} basename {} | grep -E "^${NEW_NUM}_" || true)
+
+    if [ -n "$CONFLICT" ]; then
+      echo -e "${RED}[pre-commit] BLOCKED: Migration number collision!${NC}" >&2
+      echo "" >&2
+      echo "  You are staging: $NEW_FILE" >&2
+      echo "  Conflicts with:  $MIGRATION_DIR/$CONFLICT" >&2
+      echo "" >&2
+      echo "  Two AI sessions created migrations with number $NEW_NUM." >&2
+      echo "  Rename your file to use the next available number:" >&2
+      HIGHEST=$(ls "$MIGRATION_DIR"/*.sql 2>/dev/null | xargs -I{} basename {} | \
+        grep -oE '^[0-9]+' | sort -n | tail -1 || echo "0")
+      NEXT=$(( HIGHEST + 1 ))
+      echo "    Next available: ${NEXT}_<description>.sql" >&2
+      exit 1
+    fi
+
+    # Also check for duplicates already in the staged set itself
+    echo "  [pre-commit] Staging migration $NEW_NUM — $(basename "$NEW_FILE")"
+  done
+
+  # Check for duplicate numbers within the entire migrations directory
+  ALL_NUMS=$(ls "$MIGRATION_DIR"/*.sql 2>/dev/null | xargs -I{} basename {} | grep -oE '^[0-9]+' | sort)
+  DUPS=$(echo "$ALL_NUMS" | uniq -d)
+  if [ -n "$DUPS" ]; then
+    echo -e "${RED}[pre-commit] BLOCKED: Duplicate migration numbers exist: $DUPS${NC}" >&2
+    echo "Resolve duplicates before committing." >&2
+    exit 1
+  fi
+fi
+
+# ── 2. Runtime config files must not be committed ────────────────────────────
+# Source the canonical list from the deploy toolchain
+RUNTIME_CONFIG_REGEX=""
+if [ -f "tools/vps-setup/scripts/_runtime-files.sh" ]; then
+  # shellcheck source=tools/vps-setup/scripts/_runtime-files.sh
+  . tools/vps-setup/scripts/_runtime-files.sh 2>/dev/null || true
+fi
+
+if [ -n "${RUNTIME_CONFIG_REGEX:-}" ]; then
+  OFFENDERS=$(git diff --cached --name-only | grep -E "$RUNTIME_CONFIG_REGEX" || true)
+  if [ -n "$OFFENDERS" ]; then
+    echo -e "${RED}[pre-commit] BLOCKED: Runtime config file(s) staged for commit:${NC}" >&2
+    echo "$OFFENDERS" | sed 's/^/  - /' >&2
+    echo "" >&2
+    echo "  Runtime config must NOT travel through git." >&2
+    echo "  Use: bash tools/vps-setup/scripts/data-push.sh --change-ref CR-XXX" >&2
+    exit 1
+  fi
+fi
+
+# ── 3. Check for files accidentally staged from wrong branch ─────────────────
+BRANCH=$(git symbolic-ref --short HEAD 2>/dev/null || echo "detached")
+if [ "$BRANCH" = "main" ]; then
+  echo -e "${YELLOW}[pre-commit] WARNING: You are committing directly to 'main'.${NC}" >&2
+  echo "  The correct workflow is to commit on a codex/<slug> branch and merge via PR." >&2
+  echo "  Continue? (type YES to proceed)" >&2
+  read -r CONFIRM </dev/tty
+  if [ "$CONFIRM" != "YES" ]; then
+    echo -e "${RED}[pre-commit] Aborted.${NC}" >&2
+    exit 1
+  fi
+fi
+
+echo -e "${GREEN}[pre-commit] All checks passed.${NC}" >&2
+exit 0

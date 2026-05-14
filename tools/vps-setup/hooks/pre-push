@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# Git pre-push hook — HESEM MOM
+# Blocks direct pushes to main and warns about force-pushing active codex branches.
+# Install: cp tools/vps-setup/hooks/pre-push .git/hooks/pre-push && chmod +x .git/hooks/pre-push
+# Or run:  bash tools/vps-setup/hooks/install-hooks.sh
+
+set -euo pipefail
+
+REMOTE="$1"
+URL="$2"
+
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+GREEN='\033[0;32m'
+NC='\033[0m'
+
+while read LOCAL_REF LOCAL_SHA REMOTE_REF REMOTE_SHA; do
+  BRANCH="${REMOTE_REF#refs/heads/}"
+
+  # ── Block direct push to main ────────────────────────────────────────────
+  if [ "$BRANCH" = "main" ]; then
+    echo -e "${RED}[pre-push] BLOCKED: Direct push to 'main' is not allowed.${NC}" >&2
+    echo "" >&2
+    echo "  The correct workflow:" >&2
+    echo "    1. Push your codex/<branch> to origin" >&2
+    echo "    2. Open a PR (auto-created by branch-guard.yml)" >&2
+    echo "    3. Let CI pass, then merge via GitHub UI or: gh pr merge --squash" >&2
+    echo "" >&2
+    echo "  If you are the CI/CD deploy.yml and need to push main, this hook" >&2
+    echo "  should not be running — check your CI environment." >&2
+    exit 1
+  fi
+
+  # ── Warn on force-push to codex branches ────────────────────────────────
+  # Detect force push: remote SHA is not an ancestor of local SHA
+  if [ "$REMOTE_SHA" != "0000000000000000000000000000000000000000" ]; then
+    if ! git merge-base --is-ancestor "$REMOTE_SHA" "$LOCAL_SHA" 2>/dev/null; then
+      echo -e "${YELLOW}[pre-push] WARNING: Force-push detected on '$BRANCH'.${NC}" >&2
+      echo "" >&2
+      echo "  Force-pushing rewrites history and will orphan commits made by" >&2
+      echo "  other AI sessions on this branch." >&2
+      echo "" >&2
+      echo "  Confirm you intend to force-push? (type YES to continue)" >&2
+      read -r CONFIRM </dev/tty
+      if [ "$CONFIRM" != "YES" ]; then
+        echo -e "${RED}[pre-push] Aborted. Push normally or rebase and push with care.${NC}" >&2
+        exit 1
+      fi
+      echo -e "${YELLOW}[pre-push] Force-push confirmed by user.${NC}" >&2
+    fi
+  fi
+
+  # ── Remind about push-before-close discipline ────────────────────────────
+  UNCOMMITTED=$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')
+  if [ "$UNCOMMITTED" -gt 0 ]; then
+    echo -e "${YELLOW}[pre-push] REMINDER: You have $UNCOMMITTED uncommitted change(s).${NC}" >&2
+    echo "  These will NOT be pushed and will be lost if the session resets." >&2
+    echo "  Commit them before closing this window." >&2
+  fi
+
+done
+
+echo -e "${GREEN}[pre-push] OK.${NC}" >&2
+exit 0
