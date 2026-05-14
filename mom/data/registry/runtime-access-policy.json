@@ -4017,7 +4017,8 @@
         "quality_manager",
         "qms_engineer"
       ],
-      "delete": []
+      "delete": [],
+      "genericMutation": "allow"
     },
     "hcm_payroll_lines": {
       "list": [
@@ -4047,7 +4048,8 @@
         "quality_manager",
         "qms_engineer"
       ],
-      "delete": []
+      "delete": [],
+      "genericMutation": "allow"
     },
     "hcm_qualification_requirements": {
       "list": [
@@ -4077,7 +4079,8 @@
         "quality_manager",
         "qms_engineer"
       ],
-      "delete": []
+      "delete": [],
+      "genericMutation": "allow"
     },
     "incoming_inspection_results": {
       "list": [
