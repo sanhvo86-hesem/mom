@@ -176,38 +176,46 @@
 .pillar-pass { font-size: 12px; padding: 6px 8px; background: #f1f5f9; border-radius: 6px; color: var(--c-ink); border-left: 3px solid var(--c-green); }
 
 /* ── KPI mini cards ───────────────────────────────────────────────────── */
-.kpi-mini-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }
+.kpi-mini-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
 .kpi-mini-card {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 8px;
   background: var(--c-card);
   border: 1px solid var(--c-border);
-  border-left: 4px solid var(--c-muted);
-  border-radius: 10px;
-  padding: 10px 12px;
+  border-top: 3px solid var(--c-muted);
+  border-radius: 12px;
+  padding: 14px 14px 12px;
   box-shadow: var(--shadow-sm);
+  position: relative;
 }
-.kpi-mini-card.kpi-rag-green { border-left-color: var(--c-green); }
-.kpi-mini-card.kpi-rag-amber { border-left-color: var(--c-amber); }
-.kpi-mini-card.kpi-rag-red   { border-left-color: var(--c-red); background: #fef2f2; }
-.kpi-mini-card.kpi-rag-none  { border-left-color: var(--c-border); }
+.kpi-mini-card.kpi-rag-green { border-top-color: var(--c-green); }
+.kpi-mini-card.kpi-rag-amber { border-top-color: var(--c-amber); }
+.kpi-mini-card.kpi-rag-red   { border-top-color: var(--c-red); background: #fef2f2; }
+.kpi-mini-card.kpi-rag-none  { border-top-color: var(--c-border); }
+.kpi-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
 .kpi-mini-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
   background: var(--c-brand-soft);
   color: var(--c-brand);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 11px;
   flex-shrink: 0;
+  letter-spacing: .04em;
 }
 .kpi-mini-body { flex: 1; min-width: 0; }
-.kpi-mini-label { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
-.kpi-mini-target { font-size: 10px; color: var(--c-muted); }
+.kpi-mini-label { font-size: 13px; font-weight: 600; line-height: 1.45; color: var(--c-text); flex: 1; }
+.kpi-mini-target { font-size: 10.5px; font-weight: 500; color: var(--c-muted); white-space: nowrap; }
 
 /* KPI rationale tooltip — show on hover/focus of the card or info button.
    Anchored to the card via `position: relative` set by .kpi-mini-card below. */
@@ -489,14 +497,17 @@
   .deploy-dash .dwp-brief-body .grid-2, .deploy-dash .dwp-brief-body .grid-3 { grid-template-columns: 1fr; }
 }
 .kpi-mini-input {
-  width: 70px;
-  padding: 4px 6px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 10px;
   font-size: 13px;
   font-weight: 600;
-  text-align: right;
+  text-align: center;
   border: 1px solid var(--c-border);
-  border-radius: 6px;
+  border-radius: 7px;
   font-family: inherit;
+  background: var(--c-bg, #f8fafc);
+  margin-top: auto;
 }
 .kpi-mini-input:focus { outline: none; border-color: var(--c-brand); box-shadow: 0 0 0 2px var(--c-brand-soft); }
 
@@ -1374,10 +1385,11 @@ body.dark-theme .deploy-dash .deploy-heatmap th,
 .deploy-dash .deploy-pillar-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px -10px rgba(15,23,42,.20); }
 .deploy-dash .pillar-pass { background: var(--emerald-soft); border-left-color: var(--emerald); }
 
-/* ── KPI mini-card — left rainbow indicator ────────────────────────────── */
+/* ── KPI mini-card — vertical card with top RAG stripe ─────────────────── */
 .deploy-dash .kpi-mini-card {
   background: linear-gradient(180deg, #fff 0%, #fafbff 100%);
   border-radius: 12px;
+  border-left: 1px solid var(--c-border);
   box-shadow: 0 4px 12px -8px rgba(15,23,42,.10);
 }
 .deploy-dash .kpi-mini-icon {
@@ -1386,19 +1398,22 @@ body.dark-theme .deploy-dash .deploy-heatmap th,
   font-weight: 800;
   letter-spacing: .04em;
   font-size: 11px;
-  border-radius: 8px;
-  padding: 6px 8px;
-  min-width: 38px;
+  border-radius: 9px;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
   text-align: center;
 }
-.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(8n+1) .kpi-mini-icon { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
-.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(8n+2) .kpi-mini-icon { background: linear-gradient(135deg, #06b6d4, #0ea5e9); }
-.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(8n+3) .kpi-mini-icon { background: linear-gradient(135deg, #10b981, #14b8a6); }
-.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(8n+4) .kpi-mini-icon { background: linear-gradient(135deg, #f59e0b, #f97316); }
-.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(8n+5) .kpi-mini-icon { background: linear-gradient(135deg, #ec4899, #f43f5e); }
-.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(8n+6) .kpi-mini-icon { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
-.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(8n+7) .kpi-mini-icon { background: linear-gradient(135deg, #f97316, #ef4444); }
-.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(8n+8) .kpi-mini-icon { background: linear-gradient(135deg, #14b8a6, #06b6d4); }
+.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(10n+1) .kpi-mini-icon { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(10n+2) .kpi-mini-icon { background: linear-gradient(135deg, #06b6d4, #0ea5e9); }
+.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(10n+3) .kpi-mini-icon { background: linear-gradient(135deg, #10b981, #14b8a6); }
+.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(10n+4) .kpi-mini-icon { background: linear-gradient(135deg, #f59e0b, #f97316); }
+.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(10n+5) .kpi-mini-icon { background: linear-gradient(135deg, #ec4899, #f43f5e); }
+.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(10n+6) .kpi-mini-icon { background: linear-gradient(135deg, #8b5cf6, #ec4899); }
+.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(10n+7) .kpi-mini-icon { background: linear-gradient(135deg, #f97316, #ef4444); }
+.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(10n+8) .kpi-mini-icon { background: linear-gradient(135deg, #14b8a6, #06b6d4); }
+.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(10n+9) .kpi-mini-icon { background: linear-gradient(135deg, #a78bfa, #6366f1); }
+.deploy-dash .kpi-mini-grid > .kpi-mini-card:nth-child(10n+10) .kpi-mini-icon { background: linear-gradient(135deg, #34d399, #10b981); }
 
 /* ── Cadence — softer cards ───────────────────────────────────────────── */
 .deploy-dash .cadence-item {

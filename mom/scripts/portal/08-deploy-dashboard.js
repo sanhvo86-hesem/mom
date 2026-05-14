@@ -626,11 +626,11 @@ function renderKpiCard(kpi, value){
     : '';
   return `
   <div class="kpi-mini-card kpi-rag-${rag}${hasTip ? ' has-kpi-tip' : ''}">
-    <div class="kpi-mini-icon">${deployEscape(kpi.short)}</div>
-    <div class="kpi-mini-body">
-      <div class="kpi-mini-label">${deployEscape(kpi.label)} ${hasTip ? `<button type="button" class="kpi-info-btn" aria-label="Cơ sở KPI" tabindex="0">ⓘ</button>` : ''}</div>
-      <div class="kpi-mini-target">Target ${deployEscape(kpi.target)}${deployEscape(kpi.unit)}</div>
+    <div class="kpi-card-header">
+      <div class="kpi-mini-icon">${deployEscape(kpi.short)}</div>
+      <span class="kpi-mini-target">Target ${deployEscape(kpi.target)}${deployEscape(kpi.unit)}</span>
     </div>
+    <div class="kpi-mini-label">${deployEscape(kpi.label)}</div>
     <input type="text" class="kpi-mini-input" value="${deployEscape(v)}" placeholder="—" ${ro ? 'disabled' : ''} title="${deployEscape(titleAttr)}" onchange="deployUpdateMetric('${deployEscape(kpi.id)}', this.value)">
     ${tipHtml}
   </div>`;
