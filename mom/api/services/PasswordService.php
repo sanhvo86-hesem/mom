@@ -76,8 +76,8 @@ final class PasswordService
             throw new \InvalidArgumentException('Cannot hash an empty password');
         }
         $hash = password_hash($plaintext, PASSWORD_ARGON2ID, self::ARGON2ID_OPTIONS);
-        // @phpstan-ignore-next-line — PHP 8 password_hash() always returns non-empty-string;
-        // guard is kept as a defensive runtime check against unexpected engine behaviour.
+        // PHP 8 password_hash(ARGON2ID) always returns non-empty-string; guard is defensive only.
+        // @phpstan-ignore-next-line
         if (!is_string($hash) || $hash === '') {
             throw new \RuntimeException('password_hash() returned an invalid result');
         }
