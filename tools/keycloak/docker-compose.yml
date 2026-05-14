@@ -1,0 +1,67 @@
+# HESEM Keycloak deployment — Phase 1 prep, not yet running in production.
+#
+# What this provisions:
+#   - Keycloak 25.x running on the existing VPS at :8080 (HTTP, behind nginx)
+#   - Storage backed by the existing PostgreSQL (new schema 'keycloak')
+#   - Realm 'hesem' bootstrapped from realm/hesem-realm.json
+#   - Admin user 'kc-admin' seeded from env (KEYCLOAK_ADMIN_PASSWORD)
+#
+# What this does NOT do:
+#   - Replace existing PHP auth. Custom auth stays alive in parallel during
+#     Phase 1 migration. Both paths work; new logins can route through KC.
+#   - Federate with Microsoft Entra ID / Google Workspace. That's Phase 6.
+#   - Open public ports. Keycloak listens on 127.0.0.1:8080 only; nginx
+#     proxies it under /auth/ on the existing eqms.hesemeng.com cert.
+#
+# Bring up: bash tools/keycloak/scripts/up.sh
+# Tear down: bash tools/keycloak/scripts/down.sh
+# Realm export: bash tools/keycloak/scripts/export-realm.sh
+#
+# Pre-reqs:
+#   - Docker installed on VPS (apt install docker.io docker-compose-plugin)
+#   - PostgreSQL on VPS with a 'keycloak' user + 'keycloak' database created
+#     (see scripts/bootstrap-db.sh)
+#   - /var/www/data-private/secrets/keycloak.env file containing
+#     KEYCLOAK_ADMIN_PASSWORD=<random>
+#     KC_DB_PASSWORD=<random>
+
+version: "3.8"
+
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.6
+    container_name: hesem-keycloak
+    restart: unless-stopped
+    command: ["start", "--optimized"]
+    env_file:
+      - /var/www/data-private/secrets/keycloak.env
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://172.17.0.1:5432/keycloak
+      KC_DB_USERNAME: keycloak
+      # KC_DB_PASSWORD comes from env_file
+      KC_HOSTNAME_STRICT: "false"
+      KC_HOSTNAME_STRICT_HTTPS: "false"
+      KC_HTTP_ENABLED: "true"
+      KC_PROXY: edge
+      KC_HOSTNAME: eqms.hesemeng.com
+      KC_HTTP_RELATIVE_PATH: /auth
+      KC_HEALTH_ENABLED: "true"
+      KC_METRICS_ENABLED: "true"
+      KC_LOG_LEVEL: INFO
+      JAVA_OPTS_APPEND: "-Xms256m -Xmx768m"
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+      - ./realm/hesem-realm.json:/opt/keycloak/data/import/hesem-realm.json:ro
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080 && echo -e 'GET /auth/health/live HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && grep -q UP <&3"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+volumes:
+  keycloak_data:
+    driver: local

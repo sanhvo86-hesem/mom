@@ -1,0 +1,125 @@
+{
+  "_comment": "HESEM realm bootstrap. Import via volume mount in docker-compose. Generated for Phase 1 prep — not yet active in production. Clients reference the existing MOM portal at https://eqms.hesemeng.com and are configured for OIDC authorization-code with PKCE. The 'mom-portal' client maps Keycloak realm roles to the application's ROLES const via the 'roles' user attribute.",
+  "realm": "hesem",
+  "enabled": true,
+  "displayName": "HESEM Engineering MOM",
+  "displayNameHtml": "<b>HESEM</b> Engineering MOM",
+  "sslRequired": "external",
+  "registrationAllowed": false,
+  "resetPasswordAllowed": true,
+  "rememberMe": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "verifyEmail": false,
+  "loginTheme": "keycloak",
+  "accountTheme": "keycloak.v3",
+  "internationalizationEnabled": true,
+  "supportedLocales": ["vi", "en"],
+  "defaultLocale": "vi",
+  "bruteForceProtected": true,
+  "failureFactor": 5,
+  "waitIncrementSeconds": 60,
+  "maxFailureWaitSeconds": 900,
+  "passwordPolicy": "length(12) and lowerCase(1) and upperCase(1) and digits(1) and specialChars(1) and notUsername and hashIterations(27500) and hashAlgorithm(argon2)",
+  "otpPolicyType": "totp",
+  "otpPolicyAlgorithm": "HmacSHA1",
+  "otpPolicyDigits": 6,
+  "otpPolicyLookAheadWindow": 1,
+  "otpPolicyPeriod": 30,
+  "webAuthnPolicyRpEntityName": "HESEM Engineering",
+  "webAuthnPolicyAttestationConveyancePreference": "not specified",
+  "webAuthnPolicyUserVerificationRequirement": "preferred",
+
+  "roles": {
+    "realm": [
+      { "name": "ceo", "description": "Chief Executive Officer (full admin)" },
+      { "name": "qa_manager", "description": "QA Manager (admin scope)" },
+      { "name": "it_admin", "description": "IT Administrator (admin scope)" },
+      { "name": "hr_manager", "description": "HR Manager (PII privileged)" },
+      { "name": "production_director", "description": "Production Director" },
+      { "name": "cnc_workshop_manager", "description": "CNC Workshop Manager" },
+      { "name": "shift_leader", "description": "Shift Leader" },
+      { "name": "process_engineer", "description": "Process Engineer" },
+      { "name": "cam_nc_programmer", "description": "CAM/NC Programmer" },
+      { "name": "qc_inspector", "description": "QC Inspector / CMM Programmer" },
+      { "name": "cnc_operator", "description": "CNC Operator" },
+      { "name": "qms_engineer", "description": "QMS Engineer / Document Controller" },
+      { "name": "internal_auditor", "description": "Internal Auditor (read-only)" },
+      { "name": "buyer", "description": "Buyer / Purchasing" },
+      { "name": "supply_chain_manager", "description": "Supply Chain Manager" },
+      { "name": "warehouse_clerk", "description": "Warehouse Clerk" },
+      { "name": "maintenance_technician", "description": "Maintenance Technician" },
+      { "name": "ehs_specialist", "description": "EHS Specialist" }
+    ]
+  },
+
+  "clients": [
+    {
+      "clientId": "mom-portal",
+      "name": "HESEM MOM Portal",
+      "description": "Browser SPA + PHP backend. OIDC authorization code with PKCE.",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "redirectUris": [
+        "https://eqms.hesemeng.com/mom/portal.html",
+        "https://eqms.hesemeng.com/mom/portal.html*",
+        "https://eqms.hesemeng.com/auth/callback"
+      ],
+      "webOrigins": [
+        "https://eqms.hesemeng.com"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "https://eqms.hesemeng.com/mom/portal.html##"
+      },
+      "defaultClientScopes": [
+        "profile",
+        "email",
+        "roles"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access"
+      ]
+    },
+    {
+      "clientId": "mom-api",
+      "name": "HESEM MOM API service",
+      "description": "Confidential client for server-to-server tasks (SCIM provisioning, role audit, etc.).",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "secret": "REPLACE_AT_FIRST_BOOT",
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": true,
+      "attributes": {
+        "client.secret.creation.time": "0"
+      }
+    }
+  ],
+
+  "users": [
+    {
+      "_comment": "Bootstrap admin to log into Keycloak admin console before SCIM-syncing the 80 HESEM users. Replace this user's password on first login.",
+      "username": "kc-bootstrap-admin",
+      "enabled": true,
+      "firstName": "Bootstrap",
+      "lastName": "Admin",
+      "email": "kc-bootstrap@hesem.local",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "ChangeMeOnFirstLogin!2026",
+          "temporary": true
+        }
+      ],
+      "realmRoles": ["ceo"]
+    }
+  ]
+}
