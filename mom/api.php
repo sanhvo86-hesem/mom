@@ -118,6 +118,7 @@ $DICT_JS_FILE   = $ROOT_DIR . '/mom/docs/glossary/dict-data.js';
 
 require_once __DIR__ . '/form_workflow.php';
 require_once __DIR__ . '/online_schema_workflow.php';
+require_once __DIR__ . '/api/services/PasswordService.php';
 
 // ---------- Hard fail safe handlers ----------
 register_shutdown_function(function () {
@@ -17511,7 +17512,12 @@ case 'doc_save_draft': {
         }
 
         if ($passwordProvided) {
-          $users[$i]['password_hash'] = password_hash((string)$plainPassword, PASSWORD_DEFAULT);
+          $policyErrors = \MOM\Api\Services\PasswordService::assertPolicy((string)$plainPassword, $username);
+          if ($policyErrors !== []) {
+            api_json(['ok' => false, 'error' => 'password_policy', 'violations' => $policyErrors], 400);
+          }
+          $users[$i]['password_hash'] = \MOM\Api\Services\PasswordService::hash((string)$plainPassword);
+          $users[$i]['password_changed_at'] = now_iso();
           // Reset MFA on password set/reset (user must enroll again)
           unset($users[$i]['mfa']);
           // Clear any legacy keys
@@ -17539,6 +17545,14 @@ case 'doc_save_draft': {
         $plainPassword = random_password(12);
       }
 
+      // Even for admin-generated random passwords, run the policy so we
+      // can't accidentally seed a HIBP-breached or sub-12-char default.
+      // random_password(12) returns a strong random string but the policy
+      // gate documents the invariant in code so future callers can't bypass it.
+      $policyErrors = \MOM\Api\Services\PasswordService::assertPolicy((string)$plainPassword, $username);
+      if ($policyErrors !== []) {
+        api_json(['ok' => false, 'error' => 'password_policy', 'violations' => $policyErrors], 400);
+      }
       $users[] = [
         'employee_id' => portal_auth_employee_id_for_user([
           'username' => $username,
@@ -17546,7 +17560,8 @@ case 'doc_save_draft': {
           'cccd' => $cccd,
         ]),
         'username' => $username,
-        'password_hash' => password_hash((string)$plainPassword, PASSWORD_DEFAULT),
+        'password_hash' => \MOM\Api\Services\PasswordService::hash((string)$plainPassword),
+        'password_changed_at' => now_iso(),
         'name' => $name !== '' ? $name : $username,
         'role' => $role,
         'dept' => $dept,
@@ -17682,7 +17697,8 @@ case 'doc_save_draft': {
         $users[$i]['employee_id'] = trim((string)($users[$i]['employee_id'] ?? '')) !== ''
           ? (string)$users[$i]['employee_id']
           : portal_auth_employee_id_for_user($users[$i]);
-        $users[$i]['password_hash'] = password_hash($newPw, PASSWORD_DEFAULT);
+        $users[$i]['password_hash'] = \MOM\Api\Services\PasswordService::hash($newPw);
+        $users[$i]['password_changed_at'] = now_iso();
         $users[$i]['updated_at'] = now_iso();
         // Reset MFA enrollment (force re-enroll)
         unset($users[$i]['mfa']);
@@ -17730,9 +17746,35 @@ case 'auth_login': {
     }
 
     $hash = (string)($user['password_hash'] ?? '');
-    if ($hash === '' || !password_verify($password, $hash)) {
+    $verify = \MOM\Api\Services\PasswordService::verify($password, $hash);
+    if (!$verify['ok']) {
       usleep(150000);
       api_json(['ok' => false, 'error' => 'invalid_credentials'], 401);
+    }
+
+    // Transparent rehash-on-login: if the stored hash is legacy bcrypt or
+    // uses outdated Argon2id parameters, upgrade it to current
+    // PasswordService::ARGON2ID_OPTIONS. The plaintext is already verified
+    // at this point so we know it matches. No policy enforcement here
+    // (existing users grandfather in until they reset).
+    if ($verify['upgrade']) {
+      try {
+        $newHash = \MOM\Api\Services\PasswordService::hash($password);
+        foreach (($store['users'] ?? []) as $idx => $u) {
+          if (isset($u['username']) && strtolower((string)$u['username']) === $username) {
+            $store['users'][$idx]['password_hash'] = $newHash;
+            $store['users'][$idx]['updated_at'] = now_iso();
+            // Don't bump password_changed_at — algo upgrade is not a user-initiated change.
+            break;
+          }
+        }
+        try { users_save($USERS_FILE, $store); } catch (\Throwable $e) {
+          error_log('[auth_login] rehash persist failed: ' . $e->getMessage());
+        }
+      } catch (\Throwable $e) {
+        // A rehash failure must not break login — log and continue with legacy hash.
+        error_log('[auth_login] rehash failed for ' . $username . ': ' . $e->getMessage());
+      }
     }
 
     $settings = $store['settings'] ?? [];
@@ -17872,7 +17914,10 @@ if ($username === '') {
   if (!$uRec || !($uRec['active'] ?? true)) api_json(['ok' => false, 'error' => 'unauthorized'], 401);
 
   $h = (string)($uRec['password_hash'] ?? '');
-  if ($h === '' || !password_verify($p, $h)) { usleep(150000); api_json(['ok' => false, 'error' => 'unauthorized'], 401); }
+  if (!\MOM\Api\Services\PasswordService::verify($p, $h)['ok']) {
+    usleep(150000);
+    api_json(['ok' => false, 'error' => 'unauthorized'], 401);
+  }
 
   $username = $u;
 }
@@ -24634,7 +24679,7 @@ if ($username === '') {
       foreach (($usersData['users'] ?? []) as $u) {
         if (is_array($u) && (string)($u['username'] ?? '') === $username) { $authUser = $u; break; }
       }
-      if (!$authUser || !password_verify($password, (string)($authUser['password_hash'] ?? ''))) {
+      if (!$authUser || !\MOM\Api\Services\PasswordService::verify($password, (string)($authUser['password_hash'] ?? ''))['ok']) {
         api_json(['ok' => false, 'error' => 'invalid_password'], 403);
       }
 

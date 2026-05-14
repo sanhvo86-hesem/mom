@@ -140,8 +140,20 @@ Allowlisted writer files (read by the guard):
 - `mom/scripts/portal/02-state-auth-ui.js` (the duplicate _ROLE_MIGRATE — tracked tech debt)
 - `mom/api/services/AuthUserShadowSyncService.php` (the dual-write service)
 - `mom/api/services/DataSyncMutationService.php` (the JSON mutator)
+- `mom/api/services/PasswordService.php` (Phase 0 — Argon2id hash, policy, HIBP check)
 - `mom/api.php` (the upsert handler that delegates to the service)
 - `mom/database/migrations/*.sql` (schema authority)
+
+**Password handling — Phase 0 rule:** ALL password creation/verification MUST
+flow through `PasswordService::hash()` / `::verify()` / `::assertPolicy()`. Direct
+calls to `password_hash()` or `password_verify()` outside that file will be
+flagged in future audits. The service enforces:
+- Argon2id with HESEM-tuned cost (memory=19MiB, time=2, threads=1).
+- Min 12 chars, 3 of 4 character classes (lower/upper/digit/symbol).
+- HIBP k-anonymity breach check (only first 5 SHA1 chars sent; fail-open on
+  network blip with a server log).
+- Transparent rehash-on-login upgrades legacy bcrypt → Argon2id without
+  user friction.
 
 If you genuinely need to write outside this allowlist, propose extending the allowlist in this file in the same PR — don't disable the guard.
 
