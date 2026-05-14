@@ -813,8 +813,8 @@ function renderTimelineWeek(w, currentWeek){
     <div class="tlw-phase">${deployEscape(phase.label)}</div>
     <div class="tlw-label">${deployEscape(w.label || '')}</div>
     <div class="tlw-foot">
-      <span class="tlw-gate">${(w.gateCodes||[]).join(' · ') || '—'}</span>
       ${decisionBadge || attendeesBadge}
+      ${(w.gateCodes||[]).length ? `<span class="tlw-gate">${(w.gateCodes||[]).join(' · ')}</span>` : ''}
     </div>
   </button>`;
 }

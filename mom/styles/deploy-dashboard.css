@@ -555,7 +555,7 @@
 .tlw-date { font-size: 11px; color: var(--c-muted); }
 .tlw-phase { font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--phase-color, var(--c-muted)); font-weight: 700; }
 .tlw-label { font-size: 13px; font-weight: 600; line-height: 1.3; flex: 1; }
-.tlw-foot { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.tlw-foot { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
 .tlw-gate { font-size: 10px; color: var(--c-muted); font-family: ui-monospace, SFMono-Regular, monospace; }
 .deploy-dash .tlw-decision {
   font-size: 10px;
