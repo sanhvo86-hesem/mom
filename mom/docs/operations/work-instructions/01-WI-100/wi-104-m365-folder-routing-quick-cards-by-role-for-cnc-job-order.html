@@ -56,10 +56,10 @@ ul.tight li {margin:4px 0;}
      data-dcc-doc-code="WI-104"
      data-dcc-locale="vi"
      data-dcc-logo="../../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;WI-104&quot;,&quot;title&quot;:&quot;M365 Folder Tuyến công nghệ Quick Cards by Role for CNC Lệnh công việc&quot;,&quot;subtitle&quot;:&quot;Quick cards điều hướng thư mục M365 theo vai trò cho lệnh công việc CNC&quot;,&quot;doc_type&quot;:&quot;WI&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
+     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;WI-104&quot;,&quot;title&quot;:&quot;M365 Folder Tuyến công nghệ Quick Cards by Role for CNC Lệnh công việc&quot;,&quot;subtitle&quot;:&quot;Thẻ mở nhanh thư mục M365 theo vai trò trong chương trình W0–W12&quot;,&quot;doc_type&quot;:&quot;WI&quot;,&quot;revision&quot;:&quot;V1&quot;,&quot;effective_date&quot;:&quot;2026-05-14&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;released&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
 
 
-<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng làm thẻ nhanh tại điểm dùng, link QR, nhanh playlist và nhắc hành vi sau đào tạo. Tài liệu này không thay <a href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a>; nó là bản nhắc ngắn theo vai trò để Người dùng quyết định nơi lưu file ngay tại thời điểm phát sinh.</div>
+<div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng ở W1 khi phát thẻ cùng buổi công bố, W2 khi chốt thẻ theo vai trò sau RACI bản 1.0, W3–W9 khi người dùng pilot và go-live theo đợt cần mở đúng thư mục ngay tại điểm dùng, và W11 khi cập nhật thẻ theo bài học triển khai. Tài liệu này không thay <a href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a>; nó là bản nhắc ngắn theo vai trò để người dùng quyết định nơi lưu file trong chương trình W0–W12.</div>
 
 
 
@@ -343,6 +343,46 @@ ul.tight li {margin:4px 0;}
  </ul>
  </div>
  </div>
+</div>
+
+<div class="section">
+ <h2>8. Bản đồ W0–W12</h2>
+ <p>Tài liệu này được dùng trong chương trình triển khai QMS hiện hành
+ (lịch nguồn: <code>mom/data/config/deploy/program.bootstrap.json</code>).
+ Mỗi tuần dưới đây đều có playbook chi tiết tương ứng tại
+ <code>mom/docs/training/system-ops/03-Deploy-Playbook/TRN-DEP-Wxx.html</code>.</p>
+ <div class="table-card">
+ <table class="matrix-table">
+ <thead>
+ <tr><th>Tuần</th><th>Pha · trụ</th><th>Cổng kiểm liên quan</th><th>Cách dùng tài liệu này</th><th>Bằng chứng đóng cổng</th></tr>
+ </thead>
+ <tbody>
+ <tr><td>W1</td><td>P0 · <code>m365</code> + <code>doc</code></td><td><code>P0-01</code></td><td>QMS + IT bàn giao 11 sổ thẻ tham chiếu nhanh cho 10 phòng ban và Tổ điều hành.</td><td>Biên bản bàn giao W1 + <a href="../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W01.html">TRN-DEP-W01</a></td></tr>
+ <tr><td>W2</td><td>P1 · <code>m365</code> + <code>train</code></td><td><code>P1-02</code></td><td>Người dẫn dắt từng phòng diễn tập mở đúng thư mục theo thẻ trong khóa huấn luyện buổi 1.</td><td>Biên bản huấn luyện + <code>readiness.json</code> trường <code>champion</code></td></tr>
+ <tr><td>W3–W4</td><td>P2 · <code>m365</code> + <code>pilot</code></td><td><code>P2-02</code></td><td>Phòng QA chạy ≥10 lượt diễn tập tra cứu theo thẻ và ghi lỗi đường dẫn ngay trong ngày.</td><td><code>drills.json</code> + <code>issues.json</code></td></tr>
+ <tr><td>W11</td><td>P4 · <code>m365</code> + <code>doc</code></td><td><code>P4-03</code></td><td>QMS cập nhật thẻ theo bài học hậu triển khai và làm mới QR tại điểm dùng.</td><td><code>dcc_document_revision</code> + biên bản bài học</td></tr>
+ </tbody>
+ </table>
+ </div>
+</div>
+
+<div class="section">
+ <h2>9. KPI điều hành phải theo dõi</h2>
+ <div class="metric-grid">
+  <div class="metric-card"><strong>KPI-FLD-01</strong><br>Định tuyến đúng thư mục ≥95% khi người dùng mở theo thẻ.</div>
+  <div class="metric-card"><strong>KPI-FLD-02</strong><br>Thời gian tra cứu ≤180 s, không phát hành thẻ mới nếu đo thực tế vượt 240 s ở đợt hiện tại.</div>
+  <div class="metric-card"><strong>KPI-TRN-01</strong><br>Hoàn thành đào tạo ≥90% cho nhóm người dẫn dắt dùng thẻ tại điểm dùng.</div>
+ </div>
+ <p class="note"><strong>Khi báo đỏ:</strong> ghi vào <code>issues.json</code> với severity tương ứng, leo thang theo <a href="../../references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> và cập nhật <code>readiness.json</code>.</p>
+</div>
+
+<div class="section">
+ <h2>10. NO-GO theo cổng kiểm</h2>
+ <ul class="tight" style="padding-left:20px; margin:8px 0;">
+ <li>Không phát hành thẻ V1.0 cho <code>P1-02</code> khi <code>KPI-FLD-02 &gt;240 s</code> ở đợt hiện tại.</li>
+ <li>Không công nhận <code>P2-02</code> khi phòng QA có &lt;10 lượt diễn tập tra cứu theo thẻ hoặc còn link chết chưa đóng trong <code>issues.json</code>.</li>
+ <li>Không tái phát hành W11 cho <code>P4-03</code> khi tỉ lệ link chết &gt;5% hoặc QR điểm dùng chưa được kiểm lại.</li>
+ </ul>
 </div>
 
 <div class="keyline"><strong>Tài liệu liên kết:</strong> <a href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103</a>, <a href="wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html">WI-102</a>, <a href="../02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>, <a href="../../references/01-ANNEX-100/13-ANNEX-130-M365-Records-Control/annex-135-m365-operational-records-file-plan-by-department-role-and-job.html">ANNEX-135</a>.</div>

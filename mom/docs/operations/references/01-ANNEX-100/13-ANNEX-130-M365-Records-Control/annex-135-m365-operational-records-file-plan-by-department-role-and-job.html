@@ -60,10 +60,10 @@
      data-dcc-doc-code="ANNEX-135"
      data-dcc-locale="vi"
      data-dcc-logo="../../../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;ANNEX-135&quot;,&quot;title&quot;:&quot;Sơ đồ lưu hồ sơ tác nghiệp theo phòng ban, vai trò và job&quot;,&quot;subtitle&quot;:&quot;File plan hồ sơ vận hành theo phòng ban, vai trò và lệnh công việc&quot;,&quot;doc_type&quot;:&quot;ANNEX&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
+     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;ANNEX-135&quot;,&quot;title&quot;:&quot;Sơ đồ lưu hồ sơ tác nghiệp theo phòng ban, vai trò và job&quot;,&quot;subtitle&quot;:&quot;File plan M365 theo phòng, vai trò và job trong chương trình W0–W12&quot;,&quot;doc_type&quot;:&quot;ANNEX&quot;,&quot;revision&quot;:&quot;V1&quot;,&quot;effective_date&quot;:&quot;2026-05-14&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;released&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
 
 
-      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi xác định mọi tệp phát sinh trong vận hành phải lưu ở đâu trên M365: hồ sơ chính thức, dữ liệu hiện hành, nhật ký, hồ sơ dự án, bản nháp, tài liệu nhận từ ngoài, bản sao tiện tra cứu, ảnh chụp trạng thái từ hệ nguồn, hồ sơ nhân sự hạn chế, hồ sơ quản trị hệ thống và toàn bộ bằng chứng theo cổng job.</div>
+      <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng ở W0 để kiểm cây thư mục với 3 tài liệu nền WI-105 / WI-106 / ANNEX-114, W1–W2 để chốt cây thư mục cho 10 phòng và 39 JD, W3–W8 để xác nhận lưu hồ sơ đúng nơi trong pilot + go-live, W10 để audit quyền và lịch lưu, và W12 để bàn giao chủ sở hữu theo chương trình W0–W12.</div>
       
 
       <div class="section">
@@ -593,7 +593,46 @@
       </div>
 
       <div class="section">
-        <h2>10. Tài liệu liên quan</h2>
+        <h2>10. Bản đồ W0–W12</h2>
+        <p>Tài liệu này được dùng trong chương trình triển khai QMS hiện hành
+        (lịch nguồn: <code>mom/data/config/deploy/program.bootstrap.json</code>).
+        Mỗi tuần dưới đây đều có playbook chi tiết tương ứng tại
+        <code>mom/docs/training/system-ops/03-Deploy-Playbook/TRN-DEP-Wxx.html</code>.</p>
+        <div class="table-card">
+          <table class="matrix-table">
+            <thead>
+              <tr><th>Tuần</th><th>Pha · trụ</th><th>Cổng kiểm liên quan</th><th>Cách dùng tài liệu này</th><th>Bằng chứng đóng cổng</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>W0</td><td>P0 · <code>m365</code> + <code>doc</code></td><td><code>P0-03</code></td><td>QA Manager kiểm cây thư mục cho WI-105, WI-106 và ANNEX-114 trước khi mở rộng.</td><td>ANNEX-135 ký hiệu lực 2026-05-14 + <a href="../../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W01.html">TRN-DEP-W01</a></td></tr>
+              <tr><td>W2</td><td>P1 · <code>m365</code> + <code>doc</code></td><td><code>P1-04</code></td><td>QMS + IT chốt cây thư mục cho 10 phòng và 39 JD, gắn metadata bắt buộc cho readiness baseline.</td><td><code>readiness.json</code> trường <code>docReview=pass</code></td></tr>
+              <tr><td>W3–W8</td><td>P2+P3 · <code>m365</code> + <code>pilot</code> + <code>golive</code></td><td><code>P2-02</code> + <code>P3-04</code></td><td>Đội pilot/go-live diễn tập lưu nhầm thư mục ≤5% và đo <code>KPI-FLD-01</code> trên hồ sơ thật.</td><td><code>issues.json</code> + <code>drills.json</code></td></tr>
+              <tr><td>W10</td><td>P4 · <code>dash</code> + <code>m365</code></td><td><code>P4-02</code></td><td>IT + QMS soát quyền, lịch lưu hồ sơ và nguồn dữ liệu cho dashboard governance.</td><td>Access review log + biên bản W10</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>11. KPI điều hành phải theo dõi</h2>
+        <div class="metric-grid">
+          <div class="metric-card"><strong>KPI-FLD-01</strong><br>Định tuyến đúng thư mục ≥95%, đo theo mẫu job và record series trong pilot/go-live.</div>
+          <div class="metric-card"><strong>KPI-DEP-05</strong><br>Cập nhật dashboard đúng hạn ≥95% cho nguồn M365/file-plan trong W10.</div>
+        </div>
+        <p class="note"><strong>Khi báo đỏ:</strong> ghi vào <code>issues.json</code> với severity tương ứng, leo thang theo <a href="../11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> và cập nhật <code>readiness.json</code>.</p>
+      </div>
+
+      <div class="section">
+        <h2>12. NO-GO theo cổng kiểm</h2>
+        <ul class="tight" style="padding-left:20px; margin:8px 0;">
+          <li>Không công nhận <code>P3-04</code> khi lưu nhầm thư mục &gt;5% trong pilot hoặc thiếu bằng chứng <code>drills.json</code>.</li>
+          <li>Không khóa <code>P4-02</code> khi quyền M365 còn người ngoài đợt được mở hoặc access review chưa có chủ sở hữu ký.</li>
+          <li>Không bàn giao W12 khi file plan chưa có chủ sở hữu vận hành thường xuyên cho từng phòng ban.</li>
+        </ul>
+      </div>
+
+      <div class="section">
+        <h2>13. Tài liệu liên quan</h2>
         <div class="table-card">
           <table>
             <thead>

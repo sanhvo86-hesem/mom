@@ -57,10 +57,10 @@
      data-dcc-doc-code="ANNEX-117"
      data-dcc-locale="vi"
      data-dcc-logo="../../../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;ANNEX-117&quot;,&quot;title&quot;:&quot;Ma trận chuyển cấp and SLA&quot;,&quot;subtitle&quot;:&quot;Tài liệu tham chiếu / chuẩn bổ trợ cho ma trận escalation, sla phản ứng, liên lạc theo cấp và quyền quyết định.&quot;,&quot;doc_type&quot;:&quot;ANNEX&quot;,&quot;revision&quot;:&quot;V0&quot;,&quot;effective_date&quot;:&quot;2026-04-23&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;draft&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
+     data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;ANNEX-117&quot;,&quot;title&quot;:&quot;Ma trận chuyển cấp and SLA&quot;,&quot;subtitle&quot;:&quot;Ma trận leo thang và SLA vận hành theo chương trình W0–W12&quot;,&quot;doc_type&quot;:&quot;ANNEX&quot;,&quot;revision&quot;:&quot;V1&quot;,&quot;effective_date&quot;:&quot;2026-05-14&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;released&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
  
 
- <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng khi phát sinh sự kiện chất lượng, giao hàng, an toàn, máy móc, dữ liệu, khiếu nại, escalation sau giờ hoặc sự cố cần nâng cấp quyết định theo cấp.</div>
+ <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng ở W0 để mở sổ leo thang, W1 để công bố SLA cho 10 phòng, W3–W4 để chạy pilot và cổng Đi/Không đi, và W5–W12 cho mọi đợt go-live/hypercare cần đóng sự cố theo SLA trong chương trình W0–W12.</div>
  
 
  <div class="section">
@@ -173,17 +173,44 @@
  </div>
 
  <div class="section">
- <h2>9. KPI hiệu lực của chương trình escalation</h2>
- <div class="kpi-grid">
- <div class="kpi-box"><b>KPI-1 — % sự kiện chạm ngưỡng được báo cáo vượt cấp đúng SLA</b><br>Mục tiêu: ≥ 95% / tháng</div>
- <div class="kpi-box"><b>KPI-2 — % sự kiện log có đủ người chịu trách nhiệm + Ngày đến hạn + next hành động</b><br>Mục tiêu: 100%</div>
- <div class="kpi-box"><b>KPI-3 — % L3/L4 có ngăn chặn xác nhận trong SLA</b><br>Mục tiêu: ≥ 95%</div>
- <div class="kpi-box"><b>KPI-4 — % khách hàng thông báo phát hành đúng Người có thẩm quyền</b><br>Mục tiêu: 100%</div>
- </div>
+ <h2>9. Bản đồ W0–W12</h2>
+ <p>Tài liệu này được dùng trong chương trình triển khai QMS hiện hành
+ (lịch nguồn: <code>mom/data/config/deploy/program.bootstrap.json</code>).
+ Mỗi tuần dưới đây đều có playbook chi tiết tương ứng tại
+ <code>mom/docs/training/system-ops/03-Deploy-Playbook/TRN-DEP-Wxx.html</code>.</p>
+ <div class="table-card"><table class="matrix-table" style="width:100%;table-layout:fixed;border-collapse:collapse;word-wrap:break-word">
+ <thead><tr><th>Tuần</th><th>Pha · trụ</th><th>Cổng kiểm liên quan</th><th>Cách dùng tài liệu này</th><th>Bằng chứng đóng cổng</th></tr></thead>
+ <tbody>
+ <tr><td>W0</td><td>P0 · <code>gov</code></td><td><code>P0-05</code></td><td>QMS mở sổ ghi vấn đề và công bố nhịp leo thang đầu chương trình.</td><td><code>issues.json</code> mở + <a href="../../../../training/system-ops/03-Deploy-Playbook/TRN-DEP-W01.html">TRN-DEP-W01</a></td></tr>
+ <tr><td>W1</td><td>P0 · <code>gov</code> + <code>doc</code></td><td><code>P0-04</code></td><td>Tổ điều hành công bố ma trận SLA cho 10 phòng và chốt kênh gọi ngoài giờ.</td><td>Biên bản W1</td></tr>
+ <tr><td>W3–W4</td><td>P2 · <code>pilot</code> + <code>gov</code></td><td><code>P2-03</code></td><td>QA đóng vấn đề pilot đúng SLA và kiểm <code>KPI-DEP-02 ≥95%</code>.</td><td><code>issues.json</code></td></tr>
+ <tr><td>W5–W9</td><td>P3 · <code>golive</code> + <code>gov</code></td><td><code>P3-01</code> + <code>P3-03</code></td><td>Trung tâm điều hành theo đợt; sự cố Mức 1 phải đóng trong 24 h.</td><td><code>issues.json</code> + MTTR snapshot</td></tr>
+ <tr><td>W10–W12</td><td>P4 · <code>gov</code></td><td><code>P4-01</code> + <code>P4-04</code></td><td>Hypercare yêu cầu Sev-1 = 0 và bàn giao SLA cho chủ sở hữu vận hành thường xuyên.</td><td>Biên bản bàn giao W12</td></tr>
+ </tbody>
+ </table></div>
  </div>
 
  <div class="section">
- <h2>10. Liên kết bắt buộc</h2>
+ <h2>10. KPI điều hành phải theo dõi</h2>
+ <div class="metric-grid">
+ <div class="metric-card"><strong>KPI-DEP-02</strong><br>Đóng phiếu việc đúng hạn ≥95%; pilot QA không được qua cổng khi chỉ số dưới 85%.</div>
+ <div class="metric-card"><strong>KPI-DEP-07</strong><br>MTTR sự cố Mức 1 ≤24 h trong mọi đợt go-live và hypercare.</div>
+ <div class="metric-card"><strong>KPI-DEP-03</strong><br>Tỉ lệ thay đổi thất bại ≤10%; sự cố leo thang do thay đổi lỗi phải vào sổ trong ngày.</div>
+ </div>
+ <p class="note"><strong>Khi báo đỏ:</strong> ghi vào <code>issues.json</code> với severity tương ứng, leo thang theo <a href="annex-117-escalation-matrix-and-sla.html">ANNEX-117</a> và cập nhật <code>readiness.json</code>.</p>
+ </div>
+
+ <div class="section">
+ <h2>11. NO-GO theo cổng kiểm</h2>
+ <ul class="tight" style="padding-left:20px; margin:8px 0;">
+ <li>Không cho Đợt 2 đi tiếp ở <code>P2-03</code> khi <code>KPI-DEP-02 &lt;85%</code> hoặc còn vấn đề pilot QA chưa có chủ sở hữu.</li>
+ <li>Không công nhận <code>P3-01</code> khi trung tâm điều hành đợt không có người trực SLA cho Mức 1.</li>
+ <li>Không bàn giao W12 / <code>P4-04</code> khi MTTR Sev-1 trong 4 tuần gần nhất &gt;24 h.</li>
+ </ul>
+ </div>
+
+ <div class="section">
+ <h2>12. Liên kết bắt buộc</h2>
  <p><b>SOP liên đới:</b> <a href="../../../sops/01-SOP-100/sop-107-communication-management.html">SOP-107</a>, <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a>, <a href="../../../sops/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html">SOP-501</a>, <a href="../../../sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html">SOP-605</a>, <a href="../../../sops/06-SOP-600/sop-606-ncr-capa-and-ipqc-reaction.html">SOP-606</a>, <a href="../../../sops/08-SOP-800/sop-802-incident-near-miss-and-ehs.html">SOP-802</a>.</p>
  <p><b>WI liên đới:</b> <a href="../../../work-instructions/02-WI-200/wi-202-daily-management-tier-meetings-kpi-and-escalation.html">WI-202</a>, <a href="../../../work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>, <a href="../../../work-instructions/02-WI-200/wi-206-ship-release-pack-sscc-label-and-pack-reconciliation.html">WI-206</a>, <a href="../../../work-instructions/02-WI-200/wi-207-high-risk-job-readiness-control-tower.html">WI-207</a>, <a href="../../../work-instructions/06-WI-600/wi-606-suspect-product-containment-segregation-and-reaction.html">WI-606</a>.</p>
  <p><b>ANNEX liên đới:</b> <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html">ANNEX-120</a>, <a href="../12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html">ANNEX-123</a>, <a href="../../../work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html">WI-203</a>, <a href="../../05-ANNEX-500/annex-501-dispatch-capacity-wip-rules.html">ANNEX-501</a>, <a href="../../05-ANNEX-500/annex-502-gate-mrr-and-execution-synchronization-pack.html">ANNEX-502</a>.</p>
