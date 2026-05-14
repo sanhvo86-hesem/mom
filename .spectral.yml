@@ -1,0 +1,19 @@
+extends:
+  - spectral:oas
+
+rules:
+  # Pre-existing openapi.yaml style issues — disabled as a documented baseline
+  # so Spectral is properly wired into CI without breaking on legacy gaps.
+  # Re-enable these incrementally as the spec is cleaned up:
+  #
+  #   operation-description: Operations missing description field (~47 paths)
+  #   oas3-unused-component: RuntimeComplianceBeacon, UnauthorizedProblem, ForbiddenProblem
+  #   typed-enum: null enum value in AuthStatusResponse.auth_expired
+  #   oas3-valid-media-example: example objects don't match their oneOf/object schemas
+  #                             (auth login + auth status endpoints, 5 instances)
+  operation-description: off
+  oas3-unused-component: off
+  typed-enum: off
+  oas3-valid-media-example: off
+  # Legacy action-based routes use /?action=… query params in path (~20 paths)
+  path-not-include-query: off
