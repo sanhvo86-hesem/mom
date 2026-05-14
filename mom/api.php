@@ -15177,6 +15177,11 @@ function sanitize_user_for_client(array $user, ?array $viewer = null): array {
     'portal_language' => (string)($user['portal_language'] ?? 'vi'),
     'updated_at' => (string)($user['updated_at'] ?? ''),
     'created_at' => (string)($user['created_at'] ?? ''),
+    // Phase 0.5 / 0.8 advisory flags — set in-memory by auth_login when the
+    // admin is non-compliant in soft mode. Exposed so the portal can show
+    // a banner urging the user to enroll MFA / change password.
+    'admin_mfa_advisory' => (bool)($user['_admin_mfa_advisory'] ?? false),
+    'password_expired_advisory' => (bool)($user['_password_expired_advisory'] ?? false),
   ];
 }
 
