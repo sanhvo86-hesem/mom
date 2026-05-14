@@ -1159,6 +1159,7 @@
       ]
     },
     "hcm_workforce": {
+      "genericMutation": "allow",
       "list": [
         "authenticated"
       ],
