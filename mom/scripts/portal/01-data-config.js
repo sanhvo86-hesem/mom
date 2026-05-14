@@ -48,7 +48,7 @@ async function loadUsersFromServerIfAdmin(){
         employee_id: String(u.employee_id || ''),
         name: u.name || u.username || '',
         username: u.username || '',
-        role: _ROLE_MIGRATE[u.role] || u.role || 'cnc_operator',
+        role: _ROLE_MIGRATE[u.role] || (ROLES[u.role] ? u.role : DEFAULT_NEW_USER_ROLE),
         dept: (u.dept==='BOD'?'EXE':(u.dept==='WH'?'WHS':(u.dept||''))),
         title: (u.title||''),
         jd_code: String(u.jd_code || ''),
@@ -138,6 +138,16 @@ const ROLES = {
   it_admin:                     {level:2,approve:false,admin:true,canEditDocs:true,canCreateDocs:true,canViewActivity:true,canExportUsers:true,label:"Quản Trị Hệ Thống IT",labelEn:"IT Admin",color:"var(--purple-light,#6366f1)",icon:"🖥️",dept:"IT"},
   epicor_admin:                 {level:3,approve:false,admin:false,canEditDocs:true,canViewActivity:false,canExportUsers:false,label:"Quản Trị Epicor ERP",labelEn:"Epicor System Administrator",color:"var(--purple-light,#4f46e5)",icon:"⚡",dept:"IT"}
 };
+
+// SSOT default role for newly created users (admin "Tạo người dùng" modal
+// seed, bulk-import fallback, server role-migration fallback). Must be a
+// valid key in ROLES — guarded by the assert below so a typo crashes at
+// load time instead of silently rendering an unstyled badge.
+const DEFAULT_NEW_USER_ROLE = 'cnc_operator';
+if (!ROLES[DEFAULT_NEW_USER_ROLE]) {
+  throw new Error('DEFAULT_NEW_USER_ROLE "'+DEFAULT_NEW_USER_ROLE+'" is not a valid key in ROLES');
+}
+window.DEFAULT_NEW_USER_ROLE = DEFAULT_NEW_USER_ROLE;
 
 // ═══════════════════════════════════════════════════
 // HmRegistry Integration — Centralized Data Layer
