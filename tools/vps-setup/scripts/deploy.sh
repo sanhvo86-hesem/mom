@@ -309,6 +309,22 @@ rollback_to_tag() {
 }
 
 run_composer_install() {
+    local lock_file="$SITE_DIR/mom/composer.lock"
+    local hash_cache="$SITE_DIR/mom/vendor/.composer-lock-hash"
+    local current_hash=""
+
+    if [ -f "$lock_file" ]; then
+        current_hash="$(sha256sum "$lock_file" | awk '{print $1}')"
+    fi
+
+    if [ -n "$current_hash" ] \
+        && [ -f "$hash_cache" ] \
+        && [ "$(cat "$hash_cache" 2>/dev/null)" = "$current_hash" ] \
+        && [ -d "$SITE_DIR/mom/vendor" ]; then
+        log "INFO" "composer.lock unchanged — skipping composer install"
+        return
+    fi
+
     log "INFO" "Refreshing production Composer dependencies..."
     if COMPOSER_ALLOW_SUPERUSER=1 composer install \
         --working-dir="$SITE_DIR/mom" \
@@ -317,6 +333,7 @@ run_composer_install() {
         --no-interaction \
         --prefer-dist >>"$LOG" 2>&1; then
         log "INFO" "Composer dependencies refreshed"
+        [ -n "$current_hash" ] && echo "$current_hash" > "$hash_cache" || true
         return
     fi
 
@@ -496,8 +513,15 @@ fi
 # ── Fix permissions ──────────────────────────────────────────────────────
 log "INFO" "Setting permissions..."
 chown -R "$DEPLOY_USER:$WEB_GROUP" "$SITE_DIR"
-find "$SITE_DIR" -type d -exec chmod 755 {} +
-find "$SITE_DIR" -type f -exec chmod 644 {} +
+# Exclude vendor/ and .git/ — vendor is owned by composer (correct perms after
+# composer install), .git/ objects/packfiles do not need to be chmod'd on every
+# deploy and scanning them adds seconds for zero benefit.
+find "$SITE_DIR" \
+    \( -path "$SITE_DIR/mom/vendor" -o -path "$SITE_DIR/.git" \) -prune \
+    -o -type d -print0 | xargs -0 chmod 755
+find "$SITE_DIR" \
+    \( -path "$SITE_DIR/mom/vendor" -o -path "$SITE_DIR/.git" \) -prune \
+    -o -type f -print0 | xargs -0 chmod 644
 restore_git_executable_bits
 
 # .git/ stays owned by $DEPLOY_USER:$WEB_GROUP with default 755/644 — the
@@ -648,7 +672,6 @@ scan_cache="$SITE_DIR/mom/data/scan_cache.json"
 touch "$scan_cache"
 chown "$WEB_USER:$WEB_GROUP" "$scan_cache"
 chmod 664 "$scan_cache"
-restore_git_executable_bits
 
 # ── Run governed database migrations before PHP-FPM serves the new release ──
 if [ "$RUN_DB_MIGRATIONS" = "1" ]; then

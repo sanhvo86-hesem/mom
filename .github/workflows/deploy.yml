@@ -71,14 +71,24 @@ jobs:
         # humans share one authoritative reference.
         run: php mom/tools/release/check_user_identity_ssot.php
 
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.composer/cache
+          key: ${{ runner.os }}-composer-${{ hashFiles('mom/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
       - name: Install validation dependencies
         working-directory: mom
         run: composer install --no-interaction --prefer-dist
 
-      # Split into 4 steps so the GitHub Actions UI shows EXACTLY which gate
+      # Split into 3 steps so the GitHub Actions UI shows EXACTLY which gate
       # fails. Previously bundled into one step where a phpunit failure
       # looked identical to a phpstan failure looked identical to a
       # workflow-status-authority failure.
+      #
+      # NOTE: "composer check" = @analyse + @test — do NOT add it back here;
+      # it would run PHPStan and PHPUnit a second time, doubling CI duration.
       #
       # Use system `composer` (provided by setup-php), NOT `./composer` —
       # the local wrapper at mom/composer is gitignored and absent in CI.
@@ -91,11 +101,6 @@ jobs:
         working-directory: mom
         env: { APP_ENV: test, DB_PASSWORD: test_password }
         run: composer test
-
-      - name: Validate — composer check (analyse + test)
-        working-directory: mom
-        env: { APP_ENV: test, DB_PASSWORD: test_password }
-        run: composer check
 
       - name: Validate — workflow status authority
         working-directory: mom
