@@ -10548,7 +10548,7 @@ async function showUserModal(userId){
         adminUserEmployeeId(x)===String(userId) ||
         String(x.username || '')===String(userId)
       )
-    : {id:'',name:'',username:'',dept:'',title:'',role:'employee',active:true,mfa_enabled:false,cccd:'',phone:'',personal_email:'',avatar:'👤',avatar_icon:'👤',avatar_image:'',avatar_url:'',hcm_org_unit_id:'',hcm_position_id:''};
+    : {id:'',name:'',username:'',dept:'',title:'',role:'cnc_operator',active:true,mfa_enabled:false,cccd:'',phone:'',personal_email:'',avatar:'👤',avatar_icon:'👤',avatar_image:'',avatar_url:'',hcm_org_unit_id:'',hcm_position_id:''};
   if(isEdit && !seedUser){
     showToast(lang==='en'?'⚠ User not found':'⚠ Không tìm thấy người dùng');
     return;
