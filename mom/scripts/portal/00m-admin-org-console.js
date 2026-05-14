@@ -432,6 +432,16 @@
   function buildAssignmentRows(){
     var byKey = {};
     var today = new Date().toISOString().slice(0, 10);
+    // The assignments table is the source of truth for "who is currently
+    // assigned to which position". When any row exists in S.assignments
+    // for (employee_id, hcm_position_id) — whether active or soft-ended —
+    // it dictates the outcome. The hcm_employees + users.json fallbacks
+    // below must NOT resurrect a (eid, posId) pair the assignment table
+    // already covers; otherwise stale users.json[user].hcm_position_id
+    // brings back rows the user just clicked "Xóa" on. This is exactly
+    // the bug we hit on Engineering Lead / Manager (Phú & Dương stayed
+    // visible after soft-end because users.json still pointed there).
+    var assignmentSeen = {};
     function put(row, priority){
       var eid = employeeIdentity(row);
       var posId = String(row && row.hcm_position_id || '').trim();
@@ -448,6 +458,7 @@
     (S.assignments || []).forEach(function(a){
       var eid = String(a.employee_id || '').trim();
       var posId = String(a.hcm_position_id || '').trim();
+      if (eid && posId) assignmentSeen[eid + '|' + posId] = true;
       var position = S.byPositionId[posId] || {};
       var status = String(a.assignment_status || 'active');
       // Hide ended/inactive/terminated assignments from every consumer, and
@@ -471,6 +482,7 @@
       var eid = employeeIdentity(e);
       var posId = String(e && e.hcm_position_id || '').trim();
       if (!eid || !posId) return;
+      if (assignmentSeen[eid + '|' + posId]) return;
       var position = S.byPositionId[posId] || {};
       put(Object.assign({}, e, {
         employee_id: eid,
@@ -487,6 +499,7 @@
       var eid = employeeIdentity(user);
       var posId = String(user && user.hcm_position_id || '').trim();
       if (!eid || !posId) return;
+      if (assignmentSeen[eid + '|' + posId]) return;
       var position = S.byPositionId[posId] || {};
       put(Object.assign({}, user, {
         employee_id: eid,
