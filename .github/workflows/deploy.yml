@@ -60,6 +60,17 @@ jobs:
       - name: Block generated/runtime artifacts in controlled source
         run: php mom/tools/release/check_repo_boundary.php
 
+      - name: Enforce user identity SSOT (.ai/USER_IDENTITY_SSOT.md)
+        # Fails the deploy if any code path: (a) hardcodes role-key literals
+        # outside the ROLES owner files, (b) creates a new table with
+        # username/full_name/employee_name/password_hash outside the existing
+        # user-identity tables, (c) writes directly to users/employees/
+        # hcm_employees outside AuthUserShadowSyncService, or (d) calls
+        # file_put_contents() against users.json outside DataSyncMutationService.
+        # Policy lives at .ai/USER_IDENTITY_SSOT.md so AI assistants and
+        # humans share one authoritative reference.
+        run: php mom/tools/release/check_user_identity_ssot.php
+
       - name: Install validation dependencies
         working-directory: mom
         run: composer install --no-interaction --prefer-dist

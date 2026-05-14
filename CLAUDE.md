@@ -8,9 +8,11 @@ Quick mandatory sequence every session:
 1. Read `.ai/CONVENTIONS.md` — WHERE to put files
 2. Read `.ai/repo-map.json` — project topology
 3. Read `AGENTS.md` — governance rules
-4. THEN locate → plan → execute → verify
+4. Read `.ai/USER_IDENTITY_SSOT.md` if your change touches user/role/employee data
+5. THEN locate → plan → execute → verify
 
 **NEVER create files at repo root. NEVER place reports inside `mom/docs/`.**
+**NEVER hardcode a role key, create a parallel user table, or write to users.json outside `DataSyncMutationService`.** See `.ai/USER_IDENTITY_SSOT.md` — enforced by `php mom/tools/release/check_user_identity_ssot.php` in CI.
 
 ## MANDATORY: VPS deployment policy (NEVER `git reset --hard` on VPS)
 

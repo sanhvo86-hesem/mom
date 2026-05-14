@@ -5043,7 +5043,7 @@ function runtime_cutover_postgres_counts(array $runtimeMode): array {
       'revisions' => "SELECT COUNT(*) AS c FROM item_revisions WHERE COALESCE(metadata->>'revision', '') <> ''",
       'work_centers' => "SELECT COUNT(*) AS c FROM work_centers WHERE COALESCE(metadata->>'work_center_id', '') <> ''",
       'machines' => "SELECT COUNT(*) AS c FROM equipment WHERE COALESCE(metadata->>'machine_id', '') <> ''",
-      'operators' => "SELECT COUNT(*) AS c FROM employees WHERE is_active IS TRUE AND (role_code IN ({$operatorRolesSql}) OR lower(COALESCE(role_label, '')) LIKE '%operator%' OR lower(COALESCE(role_label, '')) LIKE '%technician%' OR lower(COALESCE(role_label, '')) LIKE '%inspector%' OR COALESCE(metadata->>'operator_id', '') <> '')",
+      'operators' => "SELECT COUNT(*) AS c FROM v_user_canonical WHERE user_status = 'active' AND (role_code IN ({$operatorRolesSql}) OR lower(COALESCE(role_label, '')) LIKE '%operator%' OR lower(COALESCE(role_label, '')) LIKE '%technician%' OR lower(COALESCE(role_label, '')) LIKE '%inspector%')",
       'tooling_assets' => "SELECT COUNT(*) AS c FROM tools WHERE COALESCE(metadata->>'shadow_source', '') <> 'mes_runtime'",
       'capas' => "SELECT COUNT(*) AS c FROM records WHERE record_type = 'CAPA'",
     ],

@@ -305,14 +305,16 @@ class AuthUserShadowSyncService
                     );
                 }
 
+                // Migration 179 dropped employees.employee_name / role_code /
+                // role_label — those are sourced from v_user_canonical (which
+                // resolves users.full_name + roles.role_code/role_label_vi).
+                // We write only the non-identity columns here. See
+                // .ai/USER_IDENTITY_SSOT.md.
                 $this->db->execute(
                     'INSERT INTO employees (
                         employee_id,
-                        employee_name,
                         user_id_code,
                         user_id,
-                        role_code,
-                        role_label,
                         dept_code,
                         shift,
                         is_active,
@@ -321,11 +323,8 @@ class AuthUserShadowSyncService
                         updated_at
                      ) VALUES (
                         :employee_id,
-                        :employee_name,
                         :user_id_code,
                         :user_id,
-                        :role_code,
-                        :role_label,
                         :dept_code,
                         :shift,
                         :is_active,
@@ -334,11 +333,8 @@ class AuthUserShadowSyncService
                         now()
                      )
                      ON CONFLICT (employee_id) DO UPDATE SET
-                        employee_name = EXCLUDED.employee_name,
                         user_id_code = EXCLUDED.user_id_code,
                         user_id = EXCLUDED.user_id,
-                        role_code = EXCLUDED.role_code,
-                        role_label = EXCLUDED.role_label,
                         dept_code = EXCLUDED.dept_code,
                         shift = EXCLUDED.shift,
                         is_active = EXCLUDED.is_active,
@@ -346,11 +342,8 @@ class AuthUserShadowSyncService
                         updated_at = now()',
                     [
                         ':employee_id' => $employeeId,
-                        ':employee_name' => $fullName,
                         ':user_id_code' => $username,
                         ':user_id' => (string)($userRow['user_id'] ?? ''),
-                        ':role_code' => $roleCode !== '' ? $roleCode : null,
-                        ':role_label' => $positionTitle,
                         ':dept_code' => $deptCode,
                         ':shift' => null,
                         ':is_active' => !empty($user['active']),

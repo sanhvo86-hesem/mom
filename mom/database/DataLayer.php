@@ -2241,7 +2241,24 @@ class DataLayer
         $machineRows = $this->db->query('SELECT metadata, updated_at FROM equipment ORDER BY equipment_id');
         $toolingRows = $this->db->query("SELECT metadata, updated_at FROM tools WHERE COALESCE(metadata->>'shadow_source', '') <> 'mes_runtime' ORDER BY tool_id");
         $capaRows = $this->db->query("SELECT data, updated_at FROM records WHERE record_type = 'CAPA' ORDER BY record_id");
-        $employeeRows = $this->db->query('SELECT employee_id, employee_name, user_id_code, role_code, role_label, dept_code, shift, is_active, metadata, updated_at FROM employees ORDER BY employee_id');
+        // Identity columns (employee_name, role_code, role_label, dept_code,
+        // shift, user_status) sourced from v_user_canonical so this projection
+        // cannot drift from the identity SSOT. The `metadata` column is the
+        // last reason we still touch the legacy `employees` table at all —
+        // it holds operator-runtime tags (operator_id, work_center, station,
+        // …) that haven't been migrated to users.metadata yet. Migration 178
+        // installed v_user_canonical; migration 179 drops the legacy identity
+        // columns from `employees`. See .ai/USER_IDENTITY_SSOT.md.
+        $employeeRows = $this->db->query(
+            'SELECT v.employee_id, v.full_name AS employee_name, v.username AS user_id_code, '
+            . 'v.role_code, v.role_label, v.dept_code, v.shift, '
+            . "(v.user_status = 'active') AS is_active, "
+            . 'COALESCE(e.metadata, \'{}\'::jsonb) AS metadata, '
+            . 'v.updated_at '
+            . 'FROM v_user_canonical v '
+            . 'LEFT JOIN employees e ON e.user_id = v.user_id '
+            . 'ORDER BY v.employee_id'
+        );
         $programRows = $this->db->query('SELECT metadata, updated_at FROM mes_nc_release_packages ORDER BY package_id');
         $adapterRows = $this->db->query('SELECT metadata, updated_at FROM mes_connectivity_adapters ORDER BY adapter_id');
         $alarmCatalogRows = $this->db->query('SELECT metadata, updated_at FROM mes_alarm_catalog ORDER BY alarm_code');

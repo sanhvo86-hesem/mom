@@ -21,6 +21,7 @@ This repository is an integrated ERP + MOM + MES + EQMS platform for CNC/discret
 - File-backed stores may remain compatibility authority only when documented with a DB bridge or migration path.
 - Advisory AI must never silently replace, mutate, complete, dispatch, approve, or command execution truth.
 - AI-named scheduling, maintenance, quality, and copilot routes must return advisory proposals or human-review intent unless they delegate to an explicit governed planning/EQMS write path.
+- **User identity SSOT is mandatory.** Read `.ai/USER_IDENTITY_SSOT.md` before touching anything that identifies a person (username, employee_id, role, dept, title, full_name, password_hash, mfa, avatar). Hardcoding role keys, creating parallel user tables, or writing to `users.json`/`users`/`employees`/`hcm_employees` outside the allowlisted writer files is blocked by `php mom/tools/release/check_user_identity_ssot.php` in the deploy CI gate.
 
 ## Validation Commands
 
