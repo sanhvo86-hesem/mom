@@ -1440,6 +1440,23 @@ async function runtimeDelete(domain, table, recordId, rowVersion=null){
   return await apiRequest(runtimeApiPath(domain, table, recordId), {method:'DELETE', payload, headers});
 }
 
+// Status transitions on tables with a managed statusColumn (e.g. hcm_org_units.status,
+// hcm_positions.status). PUT through runtimeUpdate silently filters the column out
+// because filterWritableColumns treats statusColumn as managed — only the dedicated
+// /transition endpoint can move it, and the workflow registry decides which targets
+// are valid.
+async function runtimeTransition(domain, table, recordId, toStatus, rowVersion=null){
+  const path = runtimeApiPath(domain, table, recordId) + '/transition';
+  const payload = { to: toStatus };
+  const headers = {};
+  if(rowVersion !== null && rowVersion !== undefined && rowVersion !== ''){
+    payload.row_version = rowVersion;
+    payload.expected_row_version = rowVersion;
+    headers['If-Match'] = String(rowVersion);
+  }
+  return await apiRequest(path, {method:'POST', payload, headers});
+}
+
 function safeJsonObject(value){
   if(value && typeof value === 'object' && !Array.isArray(value)) return value;
   if(typeof value === 'string' && value.trim()){
@@ -11919,14 +11936,19 @@ function setAuthoritativeOrgUnitActive(orgUnitId, active){
     (active ? 'Kích hoạt lại đơn vị ' : 'Ngừng sử dụng đơn vị ') + unit.org_unit_code + '?',
     (active ? 'Reactivate unit ' : 'Deactivate unit ') + unit.org_unit_code + '?',
     async function(){
-      const res = await runtimeUpdate('hcm_workforce', 'hcm_org_units', unit.hcm_org_unit_id, {
-        status: active ? 'active' : 'inactive',
-        metadata: Object.assign({}, safeJsonObject(unit.metadata), {color: defaultDepartmentColor(unit.org_unit_code)})
-      }, unit.row_version || null);
-      if(!(res && res.ok && res.record)){
-        showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Org unit status update failed':'Cập nhật trạng thái đơn vị thất bại'), 'error');
+      // status is the managed status column on hcm_org_units, so it must move via
+      // /transition (runtimeUpdate silently drops the field). The workflow registry
+      // wires active↔inactive transitions for the wf_hcm_org_unit workflow.
+      const transitionRes = await runtimeTransition('hcm_workforce', 'hcm_org_units', unit.hcm_org_unit_id, active ? 'active' : 'inactive', unit.row_version || null);
+      if(!(transitionRes && transitionRes.ok)){
+        showToast('⚠ ' + runtimeErrorMessage(transitionRes, lang==='en'?'Org unit status update failed':'Cập nhật trạng thái đơn vị thất bại'), 'error');
         return;
       }
+      // Optional metadata refresh (color) goes through the regular PUT path.
+      const nextRowVersion = (transitionRes.record && transitionRes.record.row_version) || (unit.row_version || null);
+      await runtimeUpdate('hcm_workforce', 'hcm_org_units', unit.hcm_org_unit_id, {
+        metadata: Object.assign({}, safeJsonObject(unit.metadata), {color: defaultDepartmentColor(unit.org_unit_code)})
+      }, nextRowVersion);
       showToast(active ? '✅ Đã kích hoạt lại đơn vị' : '✅ Đã ngừng dùng đơn vị');
       await loadAuthoritativeOrgCatalog({force:true});
     }
@@ -12011,10 +12033,11 @@ function setAuthoritativePositionActive(positionId, active){
     (active ? 'Kích hoạt lại vị trí ' : 'Ngừng sử dụng vị trí ') + position.position_code + '?',
     (active ? 'Reactivate position ' : 'Deactivate position ') + position.position_code + '?',
     async function(){
-      const res = await runtimeUpdate('hcm_workforce', 'hcm_positions', position.hcm_position_id, {
-        status: active ? 'active' : 'inactive'
-      }, position.row_version || null);
-      if(!(res && res.ok && res.record)){
+      // hcm_positions.status is the managed status column for wf_hcm_position, so PUT
+      // would silently drop it — go through the transition endpoint (the workflow
+      // registry exposes active↔inactive transitions for this entity).
+      const res = await runtimeTransition('hcm_workforce', 'hcm_positions', position.hcm_position_id, active ? 'active' : 'inactive', position.row_version || null);
+      if(!(res && res.ok)){
         showToast('⚠ ' + runtimeErrorMessage(res, lang==='en'?'Position status update failed':'Cập nhật trạng thái vị trí thất bại'), 'error');
         return;
       }

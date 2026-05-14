@@ -24837,6 +24837,28 @@
       "lifecycleMode": "persisted",
       "states": [
         {
+          "id": "active",
+          "label": "Đang hoạt động",
+          "labelEn": "Active",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "inactive"
+          ]
+        },
+        {
+          "id": "inactive",
+          "label": "Ngừng dùng",
+          "labelEn": "Inactive",
+          "color": "#9ca3af",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
           "id": "complete",
           "label": "Hoàn chỉnh",
           "labelEn": "Complete",
@@ -24874,6 +24896,24 @@
         }
       ],
       "transitions": [
+        {
+          "from": "active",
+          "to": "inactive",
+          "trigger": "deactivate",
+          "label": "Ngừng dùng",
+          "labelEn": "Deactivate",
+          "guards": [],
+          "actions": []
+        },
+        {
+          "from": "inactive",
+          "to": "active",
+          "trigger": "reactivate",
+          "label": "Kích hoạt",
+          "labelEn": "Reactivate",
+          "guards": [],
+          "actions": []
+        },
         {
           "from": "complete",
           "to": "partial",
@@ -25211,6 +25251,28 @@
       "lifecycleMode": "persisted",
       "states": [
         {
+          "id": "active",
+          "label": "Đang hoạt động",
+          "labelEn": "Active",
+          "color": "#10b981",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "inactive"
+          ]
+        },
+        {
+          "id": "inactive",
+          "label": "Ngừng dùng",
+          "labelEn": "Inactive",
+          "color": "#9ca3af",
+          "entryActions": [],
+          "exitActions": [],
+          "allowedTransitionsFrom": [
+            "active"
+          ]
+        },
+        {
           "id": "complete",
           "label": "Hoàn chỉnh",
           "labelEn": "Complete",
@@ -25248,6 +25310,24 @@
         }
       ],
       "transitions": [
+        {
+          "from": "active",
+          "to": "inactive",
+          "trigger": "deactivate",
+          "label": "Ngừng dùng",
+          "labelEn": "Deactivate",
+          "guards": [],
+          "actions": []
+        },
+        {
+          "from": "inactive",
+          "to": "active",
+          "trigger": "reactivate",
+          "label": "Kích hoạt",
+          "labelEn": "Reactivate",
+          "guards": [],
+          "actions": []
+        },
         {
           "from": "complete",
           "to": "partial",
