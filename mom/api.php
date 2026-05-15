@@ -15301,29 +15301,51 @@ $action = match ($action) {
 })();
 
 // ──────────────────────────────────────────────────────────────────────────
-// Defense-in-depth: AuthorizationKernel-gated routes must never fall back
-// to this legacy switch. When mom/api/index.php is the entry point (the only
-// supported path), it defines API_HELPERS_ONLY and we return earlier at
-// line ~15241. If somehow this point is reached for a kernelized action,
-// the legacy admin_roles() hardcoded check would silently override the
-// matrix — exactly the bug class the AuthorizationKernel was built to fix.
-// Fail loud instead.
+// Authorization kernel bridge for the legacy switch path.
 //
-// Kernelized actions (must match controllers/UserController.php +
-// RbacController.php route bindings):
-$kernelized_actions = [
-    'admin_users_list', 'admin_user_upsert', 'admin_user_delete',
-    'admin_user_reset_password', 'role_perms_get', 'admin_role_perms_save',
-];
-if (in_array($action, $kernelized_actions, true)) {
-    @error_log('[api] legacy switch reached for kernelized action "' . $action . '" — refusing');
+// The portal frontend (apiCall in 02-state-auth-ui.js) sends requests to
+// `api.php?action=...` which resolves to /mom/api.php directly (NOT
+// /api/index.php). That bypasses the MVC Router so kernelized controllers
+// like UserController::upsert never execute on this code path.
+//
+// To preserve the matrix-driven authorization promise without rewriting
+// every legacy switch case, we load the AuthorizationKernel up front and
+// expose a helper $authz_kernel_check($permission, $context) the affected
+// cases call BEFORE the legacy admin_roles() check. The kernel decision is
+// authoritative; legacy admin_roles() is now a fallback only when the
+// kernel cannot reach the DB (returns null).
+//
+// Loaded inline so api.php remains self-contained when accessed directly.
+$authz_kernel = null;
+$authz_kernel_check = static function (string $perm, array $context = []) use (&$authz_kernel, $CONF_DIR, $store) {
+    // Lazy-load on first request.
+    if ($authz_kernel === false) return; // Tried and failed earlier; skip.
+    if ($authz_kernel === null) {
+        $autoload = __DIR__ . '/vendor/autoload.php';
+        if (!is_file($autoload)) { $authz_kernel = false; return; }
+        require_once $autoload;
+        if (!class_exists('\\MOM\\Api\\Services\\AuthorizationKernel')) { $authz_kernel = false; return; }
+        $authz_kernel = new \MOM\Api\Services\AuthorizationKernel($CONF_DIR);
+    }
+    $me = require_logged_in($store);
+    $d  = $authz_kernel->decide($me, $perm, $context + ['route_action' => 'legacy:' . ($_GET['action'] ?? '')]);
+    if ($d->isAllow()) return;
+    if ($d->isStepUp()) {
+        api_json([
+            'ok'           => false,
+            'error'        => 'step_up_required',
+            'permission'   => $perm,
+            'required_aal' => $d->requiredAal,
+            'current_aal'  => $d->currentAal,
+        ], 401);
+    }
     api_json([
-        'ok'    => false,
-        'error' => 'legacy_path_disabled',
-        'detail'=> 'This action is owned by the MVC controller via AuthorizationKernel. '
-                 . 'The legacy switch path is forbidden. Route via /api/index.php.',
-    ], 410);
-}
+        'ok'         => false,
+        'error'      => 'forbidden',
+        'reason'     => $d->reason,
+        'permission' => $perm,
+    ], 403);
+};
 
 switch ($action) {
   case 'status': {
@@ -15420,8 +15442,7 @@ switch ($action) {
 
   case 'role_perms_get': {
     if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
-    $me = require_logged_in($store);
-    if (!user_is_admin($me)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+    $authz_kernel_check('rbac.role.view');
     $perms = load_role_permissions($ROLE_PERMS_FILE);
     $roleDocs = portal_load_role_docs($PORTAL_CONFIG_JS_FILE, $PORTAL_ROLE_DOCS_FILE);
     api_json(['ok' => true, 'perms' => $perms, 'role_docs' => $roleDocs, 'server_time' => now_iso()]);
@@ -15429,12 +15450,8 @@ switch ($action) {
 
   case 'admin_role_perms_save': {
     if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
-    $me = require_logged_in($store);
     require_csrf();
-    // Basic admin check (server-side)
-    $adminRoles = admin_roles();
-    $_mRole = migrate_role((string)($me['role'] ?? ''));
-    if (!in_array($_mRole, $adminRoles, true) && !in_array((string)($me['role'] ?? ''), $adminRoles, true)) api_json(['ok' => false, 'error' => 'forbidden'], 403);
+    $authz_kernel_check('rbac.role.edit');
 
     $data = read_json_body();
     $in = $data['perms'] ?? null;
@@ -17490,22 +17507,12 @@ case 'doc_save_draft': {
 
   case 'admin_users_list': {
     if (!is_array($store)) api_json(['ok' => false, 'error' => 'system_not_initialized'], 500);
+    // AuthorizationKernel-driven gate. Replaces the legacy hardcoded
+    // admin_roles() check + module_access_config fallback. Roles granted
+    // `users.view` in the matrix (incl. hr_manager) now load the list;
+    // others fall through to a structured 403 with reason/permission.
+    $authz_kernel_check('users.view');
     $me = require_logged_in($store);
-
-    $role = (string)($me['role'] ?? '');
-    $_mRole = migrate_role($role);
-    $isAdmin = in_array($role, admin_roles(), true) || in_array($_mRole, admin_roles(), true);
-    if (!$isAdmin) {
-      $maConfig = module_access_load_config($MODULE_ACCESS_CONFIG_FILE);
-      $usersTabPolicy = module_access_normalize_policy(
-        (array)($maConfig['admin_tabs']['users'] ?? []),
-        ['id' => 'users', 'default_access' => 'admin', 'default_roles' => []]
-      );
-      if (!module_access_can_role_access($usersTabPolicy, $role) &&
-          !module_access_can_role_access($usersTabPolicy, $_mRole)) {
-        api_json(['ok' => false, 'error' => 'forbidden'], 403);
-      }
-    }
 
     $out = [];
     foreach (($store['users'] ?? []) as $u) {
@@ -17591,25 +17598,18 @@ case 'doc_save_draft': {
 
 
   case 'admin_user_upsert': {
-    $me = require_logged_in($store);
     require_csrf();
     $data = read_json_body();
-    $adminRoles = admin_roles();
-    $meRole = migrate_role((string)($me['role'] ?? ''));
-    $isFullAdmin = in_array($meRole, $adminRoles, true) || in_array((string)($me['role'] ?? ''), $adminRoles, true);
-    if (!$isFullAdmin) {
-      $maConfig = module_access_load_config($MODULE_ACCESS_CONFIG_FILE);
-      $usersTabPolicy = module_access_normalize_policy(
-        (array)($maConfig['admin_tabs']['users'] ?? []),
-        ['id' => 'users', 'default_access' => 'admin', 'default_roles' => []]
-      );
-      if (!module_access_can_role_access($usersTabPolicy, $meRole) &&
-          !module_access_can_role_access($usersTabPolicy, (string)($me['role'] ?? ''))) {
-        api_json(['ok' => false, 'error' => 'forbidden'], 403);
-      }
-    }
-
     $username = strtolower(trim((string)($data['username'] ?? '')));
+    if ($username === '') api_json(['ok' => false, 'error' => 'missing_username'], 400);
+
+    // Distinguish create vs edit so the kernel checks the right permission.
+    $existingForGate = find_user_by_username($store, $username);
+    $authz_kernel_check(
+        $existingForGate ? 'users.edit' : 'users.create',
+        ['resource_kind' => 'user', 'resource_id' => $username]
+    );
+    $me = require_logged_in($store);
     if ($username === '' || !preg_match('/^[a-z0-9][a-z0-9._-]{2,32}$/', $username)) {
       api_json(['ok' => false, 'error' => 'bad_username'], 400);
     }
@@ -17813,17 +17813,16 @@ case 'doc_save_draft': {
   }
 
   case 'admin_user_delete': {
-    $me = require_logged_in($store);
     require_csrf();
     $data = read_json_body();
-    $adminRoles = admin_roles();
-    $meRole = migrate_role((string)($me['role'] ?? ''));
-    if (!in_array($meRole, $adminRoles, true) && !in_array((string)($me['role'] ?? ''), $adminRoles, true)) {
-      api_json(['ok' => false, 'error' => 'forbidden'], 403);
-    }
-
     $username = strtolower(trim((string)($data['username'] ?? '')));
     if ($username === '') api_json(['ok' => false, 'error' => 'bad_request'], 400);
+
+    $authz_kernel_check('users.disable', [
+        'resource_kind' => 'user',
+        'resource_id'   => $username,
+    ]);
+    $me = require_logged_in($store);
 
     // Prevent self-deletion
     $meUsername = strtolower((string)($me['username'] ?? ''));
@@ -17857,26 +17856,16 @@ case 'doc_save_draft': {
   }
 
   case 'admin_user_reset_password': {
-    $me = require_logged_in($store);
     require_csrf();
     $data = read_json_body();
-    $adminRoles = admin_roles();
-    $_mRole = migrate_role((string)($me['role'] ?? ''));
-    $_isAdmin = in_array($_mRole, $adminRoles, true) || in_array((string)($me['role'] ?? ''), $adminRoles, true);
-    if (!$_isAdmin) {
-      $maConfig = module_access_load_config($MODULE_ACCESS_CONFIG_FILE);
-      $_usersTabPolicy = module_access_normalize_policy(
-        (array)($maConfig['admin_tabs']['users'] ?? []),
-        ['id' => 'users', 'default_access' => 'admin', 'default_roles' => []]
-      );
-      if (!module_access_can_role_access($_usersTabPolicy, $_mRole) &&
-          !module_access_can_role_access($_usersTabPolicy, (string)($me['role'] ?? ''))) {
-        api_json(['ok' => false, 'error' => 'forbidden'], 403);
-      }
-    }
-
     $username = strtolower(trim((string)($data['username'] ?? '')));
     if ($username === '') api_json(['ok' => false, 'error' => 'bad_request'], 400);
+
+    $authz_kernel_check('users.reset_pw', [
+        'resource_kind' => 'user',
+        'resource_id'   => $username,
+    ]);
+    $me = require_logged_in($store);
 
     $users = $store['users'] ?? [];
     $found = false;
