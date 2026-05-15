@@ -36,17 +36,28 @@ const DEPLOY_CONFIG = {
     {key:'golive',title:'Vận hành chính thức và chăm sóc tăng cường', owner:'Trưởng nhóm chuyển đổi', pass:'Đợt vận hành chính thức ổn định'},
     {key:'dash',  title:'Dashboard và bằng chứng',      owner:'QMS / Chủ sở hữu dữ liệu', pass:'Số liệu dashboard đáng tin'},
   ],
+  // Wave keys match the 12-week program (mom/data/config/deploy/program.json):
+  //   pilot = Phòng Chất lượng chạy thử   (W4–5, P2)
+  //   w2    = SCM + Sales go-live          (W6,   P3)
+  //   prod  = Sản xuất + Kỹ thuật go-live  (W8–9, P3 — rủi ro cao nhất, đi cùng tuần)
+  //   w3    = Back-office (FIN, HR, IT, EHS, ERP) go-live (W10, P4)
+  waves: [
+    {key:'pilot', label:'Pilot',           weeks:'W4–5', accent:'#166534', subtitle:'Phòng Chất lượng chạy thử (Go/No-Go)'},
+    {key:'w2',    label:'Wave 2',          weeks:'W6',   accent:'#92400e', subtitle:'SCM + Kinh doanh / CS'},
+    {key:'prod',  label:'Wave Production', weeks:'W8–9', accent:'#1e40af', subtitle:'Sản xuất + Kỹ thuật (đi cùng tuần)'},
+    {key:'w3',    label:'Wave 3',          weeks:'W10',  accent:'#6b21a8', subtitle:'Tài chính, Nhân sự, IT, EHS, ERP'},
+  ],
   departments: [
-    {id:'PROD', label:'Sản xuất',         wave:1, color:'#1e40af', owner:'Production Director',  handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html',           docs:[{code:'SOP-501',path:'../mom/docs/operations/sops/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html'},{code:'WI-519',path:'../mom/docs/operations/work-instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html'}], record:'DEP-PRO + Job Dossier'},
-    {id:'ENG',  label:'Kỹ thuật',         wave:1, color:'#9d174d', owner:'Engineering Manager',  handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html',           docs:[{code:'SOP-303',path:'../mom/docs/operations/sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html'},{code:'WI-302',path:'../mom/docs/operations/work-instructions/03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html'}], record:'Part master + Job Dossier'},
-    {id:'QA',   label:'Chất lượng',       wave:1, color:'#166534', owner:'QA Manager',           handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-quality-handbook.html',              docs:[{code:'SOP-605',path:'../mom/docs/operations/sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html'},{code:'WI-201',path:'../mom/docs/operations/work-instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html'}], record:'Quality records + DEP-QA'},
-    {id:'SCM',  label:'Chuỗi cung ứng',   wave:2, color:'#92400e', owner:'SCM Manager',          handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html',         docs:[{code:'SOP-401',path:'../mom/docs/operations/sops/04-SOP-400/sop-401-supplier-control-and-special-process.html'},{code:'WI-701',path:'../mom/docs/operations/work-instructions/07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html'}], record:'DEP-SCM + receiving/shipping'},
-    {id:'SALES',label:'Kinh doanh / CS',  wave:2, color:'#3730a3', owner:'Sales Manager',        handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html', docs:[{code:'SOP-201',path:'../mom/docs/operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html'},{code:'WI-203',path:'../mom/docs/operations/work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html'}], record:'DEP-SAL + customer records'},
-    {id:'FIN',  label:'Tài chính',        wave:3, color:'#6b21a8', owner:'Finance Manager',      handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-finance-handbook.html',              docs:[{code:'SOP-803',path:'../mom/docs/operations/sops/08-SOP-800/sop-803-invoicing-job-costing-and-arap.html'}], record:'DEP-FIN + ERP SoR'},
-    {id:'HR',   label:'Nhân sự',          wave:3, color:'#9f1239', owner:'HR Manager',           handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-hr-handbook.html',                   docs:[{code:'SOP-801',path:'../mom/docs/operations/sops/08-SOP-800/sop-801-competence-training-and-certification.html'}], record:'Training records'},
-    {id:'IT',   label:'IT',               wave:3, color:'#155e75', owner:'IT Manager',           handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-it-handbook.html',                   docs:[{code:'ANNEX-113',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html'},{code:'WI-102',path:'../mom/docs/operations/work-instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html'}], record:'Digital control + access logs'},
-    {id:'EHS',  label:'EHS',              wave:3, color:'#b45309', owner:'EHS Manager',          handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-ehs-handbook.html',                  docs:[{code:'SOP-802',path:'../mom/docs/operations/sops/08-SOP-800/sop-802-incident-near-miss-and-ehs.html'}], record:'DEP-EHS + incident records'},
-    {id:'ERP',  label:'Epicor / ERP',     wave:3, color:'#0f766e', owner:'ERP Owner',            handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-epicor-handbook.html',                docs:[{code:'ANNEX-115',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html'},{code:'ANNEX-118',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html'}], record:'Epicor SoR + interface logs'},
+    {id:'PROD', label:'Sản xuất',         wave:'prod',  color:'#1e40af', owner:'Production Director',  handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html',           docs:[{code:'SOP-501',path:'../mom/docs/operations/sops/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html'},{code:'WI-519',path:'../mom/docs/operations/work-instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html'}], record:'DEP-PRO + Job Dossier'},
+    {id:'ENG',  label:'Kỹ thuật',         wave:'prod',  color:'#9d174d', owner:'Engineering Manager',  handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html',           docs:[{code:'SOP-303',path:'../mom/docs/operations/sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html'},{code:'WI-302',path:'../mom/docs/operations/work-instructions/03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html'}], record:'Part master + Job Dossier'},
+    {id:'QA',   label:'Chất lượng',       wave:'pilot', color:'#166534', owner:'QA Manager',           handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-quality-handbook.html',              docs:[{code:'SOP-605',path:'../mom/docs/operations/sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html'},{code:'WI-201',path:'../mom/docs/operations/work-instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html'}], record:'Quality records + DEP-QA'},
+    {id:'SCM',  label:'Chuỗi cung ứng',   wave:'w2',    color:'#92400e', owner:'SCM Manager',          handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html',         docs:[{code:'SOP-401',path:'../mom/docs/operations/sops/04-SOP-400/sop-401-supplier-control-and-special-process.html'},{code:'WI-701',path:'../mom/docs/operations/work-instructions/07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html'}], record:'DEP-SCM + receiving/shipping'},
+    {id:'SALES',label:'Kinh doanh / CS',  wave:'w2',    color:'#3730a3', owner:'Sales Manager',        handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html', docs:[{code:'SOP-201',path:'../mom/docs/operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html'},{code:'WI-203',path:'../mom/docs/operations/work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html'}], record:'DEP-SAL + customer records'},
+    {id:'FIN',  label:'Tài chính',        wave:'w3',    color:'#6b21a8', owner:'Finance Manager',      handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-finance-handbook.html',              docs:[{code:'SOP-803',path:'../mom/docs/operations/sops/08-SOP-800/sop-803-invoicing-job-costing-and-arap.html'}], record:'DEP-FIN + ERP SoR'},
+    {id:'HR',   label:'Nhân sự',          wave:'w3',    color:'#9f1239', owner:'HR Manager',           handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-hr-handbook.html',                   docs:[{code:'SOP-801',path:'../mom/docs/operations/sops/08-SOP-800/sop-801-competence-training-and-certification.html'}], record:'Training records'},
+    {id:'IT',   label:'IT',               wave:'w3',    color:'#155e75', owner:'IT Manager',           handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-it-handbook.html',                   docs:[{code:'ANNEX-113',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html'},{code:'WI-102',path:'../mom/docs/operations/work-instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html'}], record:'Digital control + access logs'},
+    {id:'EHS',  label:'EHS',              wave:'w3',    color:'#b45309', owner:'EHS Manager',          handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-ehs-handbook.html',                  docs:[{code:'SOP-802',path:'../mom/docs/operations/sops/08-SOP-800/sop-802-incident-near-miss-and-ehs.html'}], record:'DEP-EHS + incident records'},
+    {id:'ERP',  label:'Epicor / ERP',     wave:'w3',    color:'#0f766e', owner:'ERP Owner',            handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-epicor-handbook.html',                docs:[{code:'ANNEX-115',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html'},{code:'ANNEX-118',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html'}], record:'Epicor SoR + interface logs'},
   ],
   docsByGroup: [
     {title:'Điều phối tổng', subtitle:'Cho nhà tài trợ · ban điều phối · trưởng nhóm chuyển đổi', items:[
@@ -530,12 +541,33 @@ function deployChampionState(){
 function deployNormalizeDeptId(id){
   return String(id || '').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 24);
 }
+function deployNormalizeWave(raw){
+  const v = String(raw == null ? '' : raw).toLowerCase().trim();
+  if (v === 'pilot' || v === 'w2' || v === 'prod' || v === 'w3') return v;
+  // Legacy integer migration: old wave 1 was a mixed bucket (PROD+ENG+QA);
+  // we cannot disambiguate at this layer, so map to 'prod' (the heavier
+  // half). Default departments are remapped explicitly above. Custom-dept
+  // wave:1 rows get the safer default of 'prod'.
+  if (v === '1') return 'prod';
+  if (v === '2') return 'w2';
+  if (v === '3' || v === '') return 'w3';
+  return 'w3';
+}
+function deployWaveCatalog(){ return DEPLOY_CONFIG.waves || []; }
+function deployGetWave(key){
+  const k = deployNormalizeWave(key);
+  return deployWaveCatalog().find(w => w.key === k) || deployWaveCatalog()[deployWaveCatalog().length - 1] || null;
+}
+function deployWaveLabel(key){
+  const w = deployGetWave(key);
+  return w ? w.label : String(key || '');
+}
 function deployDepartmentCatalog(){
   const state = deployChampionState();
   const custom = Object.values(state.departmentRoster.custom || {}).map(d => ({
     id: deployNormalizeDeptId(d.id),
     label: d.label || d.id,
-    wave: Math.max(1, Math.min(3, parseInt(d.wave, 10) || 3)),
+    wave: deployNormalizeWave(d.wave),
     color: /^#[0-9a-f]{6}$/i.test(String(d.color || '')) ? d.color : '#475569',
     owner: d.owner || '',
     handbook: d.handbook || '',
@@ -573,17 +605,33 @@ function deployInactiveDepartments(){
   return deployDepartmentCatalog().filter(d => !active.has(d.id));
 }
 function deployEmptyPerson(){
-  return {name:'', phone:'', m365:'', ojtPass:false, username:'', employee_id:''};
+  return {name:'', phone:'', m365:'', ojtPass:false, username:'', employee_id:'', bootcampAttended:[], ojtScore:null, ojtPassed:false, ojtSignedBy:'', ojtSignedAt:''};
+}
+function deployNormalizeOjtAttendance(value){
+  const rows = Array.isArray(value) ? value : String(value || '').split(',');
+  return Array.from(new Set(rows.map(n => parseInt(n, 10)).filter(n => Number.isInteger(n) && n >= 1 && n <= 4))).sort((a,b) => a - b);
+}
+function deployNormalizeOjtScore(value){
+  if (value === null || value === undefined || value === '') return null;
+  const n = parseInt(value, 10);
+  return Number.isInteger(n) && n >= 0 && n <= 20 ? n : null;
 }
 function deployNormalizePerson(person){
   person = person || {};
+  const score = deployNormalizeOjtScore(person.ojtScore);
+  const passed = score == null ? (!!person.ojtPassed || !!person.ojtPass) : score >= 16;
   return {
     name: String(person.name || '').trim(),
     phone: String(person.phone || '').trim(),
     m365: String(person.m365 || person.email || '').trim(),
-    ojtPass: !!person.ojtPass,
+    ojtPass: passed,
     username: String(person.username || '').trim(),
     employee_id: String(person.employee_id || person.id || '').trim(),
+    bootcampAttended: deployNormalizeOjtAttendance(person.bootcampAttended),
+    ojtScore: score,
+    ojtPassed: passed,
+    ojtSignedBy: String(person.ojtSignedBy || '').trim(),
+    ojtSignedAt: String(person.ojtSignedAt || '').trim(),
   };
 }
 function deployPersonFilled(person){
@@ -613,6 +661,52 @@ function deployChampionRecord(deptId){
 function deployChampionPeople(deptId, slot){
   const rec = deployChampionRecord(deptId);
   return slot === 'backups' ? rec.backups : rec.participants;
+}
+function deployOjtSlotName(slot){
+  return slot === 'backups' ? 'backup' : 'primary';
+}
+function deployOjtSlotLabel(slot){
+  return slot === 'backup' || slot === 'backups' ? 'Dự phòng' : 'Chính';
+}
+function deployOjtStatusText(person){
+  const p = deployNormalizePerson(person);
+  if (p.ojtScore == null) return 'Chưa chấm';
+  return p.ojtPassed ? `✓ Đậu — ${p.ojtScore}/20` : `✗ Chưa đậu — ${p.ojtScore}/20`;
+}
+function deployOjtPrevText(person){
+  const p = deployNormalizePerson(person);
+  if (p.ojtScore == null) return '—';
+  const by = p.ojtSignedBy || '—';
+  const at = p.ojtSignedAt ? deployIsoToVi(p.ojtSignedAt) : '—';
+  return `${by} · ${at}`;
+}
+function deployOjtBadge(person){
+  const p = deployNormalizePerson(person);
+  if (p.ojtScore == null) return '<span class="ojt-badge none">—</span>';
+  return p.ojtPassed
+    ? `<span class="ojt-badge ok">✓ ${p.ojtScore}/20</span>`
+    : `<span class="ojt-badge fail">✗ ${p.ojtScore}/20</span>`;
+}
+function deployEnsureOjtStyles(){
+  if (document.getElementById('deploy-ojt-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'deploy-ojt-styles';
+  style.textContent = `
+.deploy-dash .champion-ojt-block{margin-top:10px;padding:10px;border:1px solid var(--c-border);border-radius:8px;background:var(--c-card)}
+.deploy-dash .champion-ojt-block h4{margin:0 0 4px;font-size:13px}
+.deploy-dash .champion-ojt-block .small{margin:0 0 8px;font-size:11px;color:var(--c-muted)}
+.deploy-dash .ojt-bootcamp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:6px}
+.deploy-dash .ojt-bootcamp-grid label,.deploy-dash .ojt-score-row label{font-size:12px}
+.deploy-dash .ojt-score-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px}
+.deploy-dash .ojt-score-input{width:72px;padding:4px 6px;border:1px solid var(--c-border);border-radius:6px}
+.deploy-dash .ojt-prev{margin-top:6px;color:var(--c-muted)}
+.deploy-dash .ojt-save-btn{margin-top:8px}
+.deploy-dash .ojt-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--r-pill);font-size:11px;font-weight:700}
+.deploy-dash .ojt-badge.ok{background:var(--c-green);color:#fff}
+.deploy-dash .ojt-badge.fail{background:var(--c-red);color:#fff}
+.deploy-dash .ojt-badge.none{background:#f1f5f9;color:var(--c-muted)}
+`;
+  document.head.appendChild(style);
 }
 
 function deployDeptProgress(deptId){
@@ -1019,19 +1113,19 @@ function renderTabDepartments(){
   <div class="deploy-tab-panel active" id="dtab-departments">
     ${renderDepartmentRosterManager(activeDepts)}
     <section class="deploy-section">
-      <div class="deploy-section-head"><h2>Wave rollout</h2><span>3 wave · go-live theo thứ tự rủi ro</span></div>
-      <div class="deploy-wave-grid">
-        ${[1,2,3].map(w => renderWaveColumn(w)).join('')}
+      <div class="deploy-section-head"><h2>Triển khai theo đợt</h2><span>4 đợt · khớp 12-week plan (Pilot → Wave 2 → Production → Wave 3)</span></div>
+      <div class="deploy-wave-grid deploy-wave-grid-4">
+        ${deployWaveCatalog().map(w => renderWaveColumn(w)).join('')}
       </div>
     </section>
     <section class="deploy-section">
-      <div class="deploy-section-head"><h2>Bảng readiness 6 chiều</h2><span>Click ô để cycle pending → in_progress → completed → blocked</span></div>
+      <div class="deploy-section-head"><h2>Bảng sẵn sàng 6 chiều</h2><span>Bấm ô để đổi trạng thái: chưa bắt đầu → đang thực hiện → hoàn thành → bị chặn</span></div>
       <div class="deploy-table-wrap">
         <table class="deploy-heatmap">
           <thead>
             <tr>
               <th>Phòng ban</th>
-              <th>Wave</th>
+              <th>Đợt</th>
               ${DEPLOY_CONFIG.readinessDimensions.map(dim => `<th title="${deployEscape(dim.help)}">${deployEscape(dim.label)}</th>`).join('')}
               <th>Tiến độ</th>
             </tr>
@@ -1047,7 +1141,11 @@ function renderTabDepartments(){
       </div>
     </section>
     <section class="deploy-section">
-      <div class="deploy-section-head"><h2>Champion roster</h2><span>Người tham dự + dự bị — ${deployChampionCount()}/${chTarget} đã pass OJT</span></div>
+      <div class="deploy-section-head"><h2>Bảng người dẫn dắt</h2><span>Cột OJT lấy từ lần chấm gần nhất</span></div>
+      ${renderChampionOjtTable(activeDepts)}
+    </section>
+    <section class="deploy-section">
+      <div class="deploy-section-head"><h2>Danh sách người dẫn dắt</h2><span>Người tham dự + dự bị — ${deployChampionCount()}/${chTarget} đã đạt OJT</span></div>
       <div class="champion-grid">
         ${activeDepts.map(d => renderChampionCard(d)).join('')}
       </div>
@@ -1073,12 +1171,19 @@ function renderDepartmentRosterManager(activeDepts){
 }
 
 function renderWaveColumn(wave){
-  const depts = deployActiveDepartments().filter(d => d.wave === wave);
+  const depts = deployActiveDepartments().filter(d => d.wave === wave.key);
   return `
-  <div class="wave-card">
-    <div class="wave-card-head"><strong>Wave ${wave}</strong><span>${depts.length} phòng</span></div>
+  <div class="wave-card deploy-wave-card wave-card-${deployEscape(wave.key)}" style="--wave-accent:${deployEscape(wave.accent || '#475569')}">
+    <div class="wave-card-head">
+      <div class="wave-card-title">
+        <strong>${deployEscape(wave.label)}</strong>
+        <span class="wave-weeks">${deployEscape(wave.weeks || '')}</span>
+      </div>
+      <span>${depts.length} phòng</span>
+    </div>
+    <div class="wave-card-sub">${deployEscape(wave.subtitle || '')}</div>
     <div class="wave-card-body">
-      ${depts.map(d => {
+      ${depts.length === 0 ? `<div class="wave-empty">Chưa có phòng ban gán vào đợt này.</div>` : depts.map(d => {
         const pct = Math.round(deployDeptProgress(d.id) * 100);
         return `
         <div class="wave-dept-row">
@@ -1106,7 +1211,7 @@ function renderReadinessRow(dept){
         <small>${deployEscape(dept.owner)}</small>
       </div>
     </td>
-    <td><span class="deploy-wave-badge wave-${dept.wave}">Wave ${dept.wave}</span></td>
+    <td><span class="deploy-wave-badge wave-${deployEscape(dept.wave)}">${deployEscape(deployWaveLabel(dept.wave))}</span></td>
     ${DEPLOY_CONFIG.readinessDimensions.map(dim => {
       const v = r[dim.id] || 'pending';
       const onClick = ro ? '' : `onclick="deployCycleReadiness('${dept.id}','${dim.id}')"`;
@@ -1114,6 +1219,49 @@ function renderReadinessRow(dept){
     }).join('')}
     <td><strong>${pct}%</strong><div class="dept-mini-bar"><span style="width:${pct}%;background:${dept.color}"></span></div></td>
   </tr>`;
+}
+
+function renderChampionOjtTable(activeDepts){
+  const rows = [];
+  activeDepts.forEach(dept => {
+    const ch = deployChampionRecord(dept.id);
+    [
+      {slot:'primary', person: ch.primary || ch.participants[0]},
+      {slot:'backup', person: ch.backup || ch.backups[0]},
+    ].forEach(item => {
+      const person = deployNormalizePerson(item.person);
+      if (!deployPersonFilled(person)) return;
+      rows.push({dept, slot:item.slot, person});
+    });
+  });
+  if (!rows.length) {
+    return '<div class="champion-person-empty">— Chưa chọn người dẫn dắt —</div>';
+  }
+  return `
+  <div class="deploy-table-wrap">
+    <table class="deploy-heatmap">
+      <thead>
+        <tr>
+          <th>Phòng ban</th>
+          <th>Vai trò</th>
+          <th>Họ tên</th>
+          <th>M365</th>
+          <th>OJT</th>
+          <th>Lần chấm gần nhất</th>
+        </tr>
+      </thead>
+      <tbody>${rows.map(row => `
+        <tr>
+          <td><div class="readiness-dept-name"><span class="wave-color" style="background:${row.dept.color}"></span><span>${deployEscape(row.dept.label)}</span></div></td>
+          <td>${deployOjtSlotLabel(row.slot)}</td>
+          <td>${deployEscape(row.person.name)}</td>
+          <td>${deployEscape(row.person.m365 || row.person.username || '—')}</td>
+          <td>${deployOjtBadge(row.person)}</td>
+          <td>${deployEscape(deployOjtPrevText(row.person))}</td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
 }
 
 function renderChampionCard(dept){
@@ -1152,6 +1300,7 @@ function renderChampionSlotGroup(dept, slot, label, people, ro){
 }
 
 function renderChampionPersonSlot(dept, slot, index, person, ro){
+  person = deployNormalizePerson(person);
   const filled = deployPersonFilled(person);
   const u = filled ? findUserForChampionPerson(person) : null;
   const key = `${dept.id}|${slot}|${index}`;
@@ -1181,14 +1330,47 @@ function renderChampionPersonSlot(dept, slot, index, person, ro){
     `}
     <label class="champion-ojt">
       <input type="checkbox" ${person.ojtPass?'checked':''} ${ro?'disabled':''} data-deploy-champion="${key}|ojtPass">
-      Đã pass OJT bootcamp
+      Đã đạt bài kiểm OJT
     </label>
+    ${filled ? renderChampionOjtBlock(dept, slot, index, person, ro) : ''}
     <input type="hidden" data-deploy-champion="${key}|name" value="${deployEscape(person.name||'')}">
     <input type="hidden" data-deploy-champion="${key}|phone" value="${deployEscape(person.phone||'')}">
     <input type="hidden" data-deploy-champion="${key}|m365" value="${deployEscape(person.m365||'')}">
     <input type="hidden" data-deploy-champion="${key}|username" value="${deployEscape(person.username||'')}">
     <input type="hidden" data-deploy-champion="${key}|employee_id" value="${deployEscape(person.employee_id||'')}">
+    <input type="hidden" data-deploy-champion="${key}|bootcampAttended" value="${deployEscape((person.bootcampAttended||[]).join(','))}">
+    <input type="hidden" data-deploy-champion="${key}|ojtScore" value="${person.ojtScore == null ? '' : deployEscape(person.ojtScore)}">
+    <input type="hidden" data-deploy-champion="${key}|ojtPassed" value="${person.ojtPassed ? '1' : '0'}">
+    <input type="hidden" data-deploy-champion="${key}|ojtSignedBy" value="${deployEscape(person.ojtSignedBy||'')}">
+    <input type="hidden" data-deploy-champion="${key}|ojtSignedAt" value="${deployEscape(person.ojtSignedAt||'')}">
   </div>`;
+}
+
+function renderChampionOjtBlock(dept, slot, index, person, ro){
+  const ojtSlot = deployOjtSlotName(slot);
+  const attended = new Set(deployNormalizeOjtAttendance(person.bootcampAttended));
+  const score = deployNormalizeOjtScore(person.ojtScore);
+  const canSave = !ro && index === 0;
+  const disabled = canSave ? '' : 'disabled';
+  return `
+    <div class="champion-ojt-block" data-dept="${deployEscape(dept.id)}" data-slot="${ojtSlot}">
+      <h4>Bài kiểm năng lực OJT</h4>
+      <p class="small muted">Người chấm: Trưởng QMS / QA. Đậu khi điểm ≥ 16/20.</p>
+      <div class="ojt-bootcamp-grid">
+        <label><input type="checkbox" value="1" ${attended.has(1)?'checked':''} ${disabled}> Buổi 1 — Người dẫn dắt khác công nhân</label>
+        <label><input type="checkbox" value="2" ${attended.has(2)?'checked':''} ${disabled}> Buổi 2 — Đọc DCC header trong 60 giây</label>
+        <label><input type="checkbox" value="3" ${attended.has(3)?'checked':''} ${disabled}> Buổi 3 — Mở hồ sơ + ghi sự cố</label>
+        <label><input type="checkbox" value="4" ${attended.has(4)?'checked':''} ${disabled}> Buổi 4 — Cây leo thang xử lý</label>
+      </div>
+      <div class="ojt-score-row">
+        <label>Điểm OJT (0-20): <input type="number" min="0" max="20" step="1" class="ojt-score-input" value="${score == null ? '' : score}" ${disabled}></label>
+        <span class="ojt-status">${deployOjtStatusText(person)}</span>
+      </div>
+      <div class="ojt-prev" data-prev-by="${deployEscape(person.ojtSignedBy||'')}" data-prev-at="${deployEscape(person.ojtSignedAt||'')}" data-prev-score="${score == null ? '' : score}">
+        <small>Lần chấm gần nhất: <span class="ojt-prev-text">${deployEscape(deployOjtPrevText(person))}</span></small>
+      </div>
+      <button class="deploy-btn deploy-btn-sm ojt-save-btn" type="button" onclick="deploySaveChampionOjt(this)" ${disabled}>Lưu điểm OJT</button>
+    </div>`;
 }
 
 function findUserByName(name){
@@ -2038,6 +2220,11 @@ function deployPickerSelect(username){
     username: u.username || '',
     employee_id: u.employee_id || u.id || '',
     ojtPass: p.index != null && list[p.index] ? !!list[p.index].ojtPass : false,
+    bootcampAttended: [],
+    ojtScore: null,
+    ojtPassed: false,
+    ojtSignedBy: '',
+    ojtSignedAt: '',
   };
   if (p.index != null && list[p.index]) list[p.index] = nextPerson;
   else list.push(nextPerson);
@@ -2084,11 +2271,9 @@ function deployOpenDepartmentForm(){
       {key:'customId', label:'Mã phòng mới', type:'text', value:'', placeholder:'VD: MNT'},
       {key:'customLabel', label:'Tên phòng mới', type:'text', value:'', placeholder:'VD: Bảo trì'},
       {key:'owner', label:'Owner', type:'text', value:'', placeholder:'VD: Maintenance Manager'},
-      {key:'wave', label:'Wave', type:'select', value:'3', options:[
-        {value:'1', label:'Wave 1'},
-        {value:'2', label:'Wave 2'},
-        {value:'3', label:'Wave 3'},
-      ]},
+      {key:'wave', label:'Wave', type:'select', value:'w3', options:
+        deployWaveCatalog().map(w => ({value:w.key, label:`${w.label} (${w.weeks})`})),
+      },
       {key:'color', label:'Màu nhận diện', type:'text', value:'#475569', placeholder:'#475569'},
       {key:'record', label:'Hồ sơ liên quan', type:'text', value:'', placeholder:'VD: DEP-MNT + PM records'},
     ],
@@ -2107,7 +2292,7 @@ function deployOpenDepartmentForm(){
           id: deptId,
           label: String(v.customLabel || deptId).trim(),
           owner: String(v.owner || '').trim(),
-          wave: Math.max(1, Math.min(3, parseInt(v.wave, 10) || 3)),
+          wave: deployNormalizeWave(v.wave),
           color: /^#[0-9a-f]{6}$/i.test(String(v.color || '')) ? String(v.color) : '#475569',
           record: String(v.record || '').trim(),
           handbook: '',
@@ -2282,6 +2467,11 @@ async function deploySaveChampion(deptId){
         username: get('username'),
         employee_id: get('employee_id'),
         ojtPass: get('ojtPass'),
+        bootcampAttended: get('bootcampAttended'),
+        ojtScore: get('ojtScore'),
+        ojtPassed: get('ojtPassed') === '1',
+        ojtSignedBy: get('ojtSignedBy'),
+        ojtSignedAt: get('ojtSignedAt'),
       });
     }).filter(deployPersonFilled);
   };
@@ -2300,6 +2490,31 @@ async function deploySaveChampion(deptId){
     DeployState.champions = res.data;
     renderDeployDashboard();
   }catch(e){ console.error('[deploy] champion failed', e); alert('Lỗi lưu champion: ' + e.message); }
+}
+
+async function deploySaveChampionOjt(btn){
+  const block = btn && btn.closest ? btn.closest('.champion-ojt-block') : null;
+  if (!block) return;
+  const deptId = block.dataset.dept;
+  const slot = block.dataset.slot;
+  const score = parseInt(block.querySelector('.ojt-score-input')?.value || '', 10);
+  if (isNaN(score) || score < 0 || score > 20) { alert('Điểm phải từ 0 tới 20.'); return; }
+  const bootcampAttended = Array.from(block.querySelectorAll('input[type=checkbox]:checked'))
+    .map(c => parseInt(c.value, 10))
+    .filter(n => Number.isInteger(n));
+  btn.disabled = true;
+  try {
+    const res = await deployApi('deploy_champion_ojt_save', {deptId, slot, score, bootcampAttended});
+    if (res && res.data) {
+      DeployState.champions = res.data;
+      renderDeployDashboard();
+    }
+  } catch (e) {
+    console.error('[deploy] champion ojt save failed', e);
+    alert('Lỗi lưu điểm OJT: ' + e.message);
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 function deployOpenIssueForm(existing){
@@ -2652,6 +2867,7 @@ async function deployResetStateConfirmed(){
 function renderDeployDashboard(){
   const container = document.getElementById('page-deploy');
   if (!container) return;
+  deployEnsureOjtStyles();
   if (!DeployState.loaded) {
     container.innerHTML = `<div class="deploy-loading"><div class="deploy-spinner"></div><p>Đang nạp Command Center...</p></div>`;
     loadDeployState().then(() => renderDeployDashboard());
@@ -2711,6 +2927,7 @@ window.deploySaveMeeting = deploySaveMeeting;
 window.deploySignOffMeeting = deploySignOffMeeting;
 window.deploySignOffWeek = deploySignOffWeek;
 window.deploySaveChampion = deploySaveChampion;
+window.deploySaveChampionOjt = deploySaveChampionOjt;
 window.deployOpenIssueForm = deployOpenIssueForm;
 window.deployUpdateIssueStatus = deployUpdateIssueStatus;
 window.deployRecordDrill = deployRecordDrill;

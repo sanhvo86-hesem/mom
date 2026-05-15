@@ -30,6 +30,10 @@ class DeployProgramController extends BaseController
     private const SIGNOFF_ROLES = ['admin', 'it_admin', 'ceo', 'qms_manager', 'qa_manager', 'general_director'];
     private const EDIT_ROLES    = ['admin', 'it_admin', 'ceo', 'qms_manager', 'qa_manager', 'general_director', 'production_director', 'supply_chain_manager', 'hr_manager', 'finance_manager', 'engineering_lead'];
     private const DEFAULT_DEPARTMENT_IDS = ['PROD', 'ENG', 'QA', 'SCM', 'SALES', 'FIN', 'HR', 'IT', 'EHS', 'ERP'];
+    // Wave keys align with mom/data/config/deploy/program.json — see
+    // 08-deploy-dashboard.js DEPLOY_CONFIG.waves. Persisted in custom-dept
+    // rows under departmentRoster.custom[*].wave.
+    private const VALID_WAVES = ['pilot', 'w2', 'prod', 'w3'];
 
     public function loadState(): never
     {
@@ -398,6 +402,69 @@ class DeployProgramController extends BaseController
         $this->success(['data' => $drills, 'drill' => $payload]);
     }
 
+    public function saveChampionOjt(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::SIGNOFF_ROLES);
+        $body = $this->jsonBody();
+
+        $deptId = $this->normalizeDepartmentId((string)($body['deptId'] ?? ''));
+        $slot = strtolower(trim((string)($body['slot'] ?? '')));
+        $scoreRaw = $body['score'] ?? null;
+        $bootcampAttended = $body['bootcampAttended'] ?? [];
+
+        if ($deptId === '' || !in_array($slot, ['primary', 'backup'], true)) {
+            $this->error('missing_dept_or_slot', 400);
+        }
+        if (!is_numeric($scoreRaw) || (int)$scoreRaw < 0 || (int)$scoreRaw > 20) {
+            $this->error('invalid_score', 400);
+        }
+        $score = (int)$scoreRaw;
+
+        $state = $this->normalizeChampionState($this->loadFile(self::FILE_CHAMPIONS));
+        if (!isset($state['champions'][$deptId]) || !is_array($state['champions'][$deptId])) {
+            $this->error('champion_slot_not_found', 404);
+        }
+
+        $listKey = $slot === 'backup' ? 'backups' : 'participants';
+        $record = $state['champions'][$deptId];
+        $person = is_array($record[$slot] ?? null)
+            ? $this->normalizeChampionPerson($record[$slot])
+            : $this->emptyChampionPerson();
+        if (!$this->hasChampionPersonData($person) && is_array($record[$listKey][0] ?? null)) {
+            $person = $this->normalizeChampionPerson($record[$listKey][0]);
+        }
+        if (!$this->hasChampionPersonData($person)) {
+            $this->error('champion_slot_not_found', 404);
+        }
+
+        $person['ojtScore'] = $score;
+        $person['ojtPassed'] = $score >= 16;
+        $person['ojtPass'] = $person['ojtPassed'];
+        $person['ojtSignedBy'] = (string)($me['name'] ?? $me['username'] ?? '');
+        $person['ojtSignedAt'] = gmdate('c');
+        if (is_array($bootcampAttended)) {
+            $person['bootcampAttended'] = $this->normalizeBootcampAttended($bootcampAttended);
+        }
+
+        $record[$slot] = $person;
+        if (!isset($record[$listKey]) || !is_array($record[$listKey])) {
+            $record[$listKey] = [];
+        }
+        $record[$listKey][0] = $person;
+        $state['champions'][$deptId] = $record;
+        $state['lastUpdated'] = gmdate('c');
+
+        $this->saveFile(self::FILE_CHAMPIONS, $state);
+        $this->audit('deploy.champion.ojt.save', $me, [
+            'dept' => $deptId,
+            'slot' => $slot,
+            'score' => $score,
+            'passed' => $person['ojtPassed'],
+        ]);
+        $this->success(['data' => $state, 'person' => $person]);
+    }
+
     public function saveAudit(): never
     {
         $me = $this->requireAuth();
@@ -757,23 +824,31 @@ class DeployProgramController extends BaseController
     }
 
     /**
-     * @return array{name:string,phone:string,m365:string,ojtPass:bool,username:string,employee_id:string}
+     * @return array{name:string,phone:string,m365:string,ojtPass:bool,username:string,employee_id:string,bootcampAttended:list<int>,ojtScore:?int,ojtPassed:bool,ojtSignedBy:string,ojtSignedAt:string}
      */
     private function normalizeChampionPerson(mixed $person): array
     {
         $person = is_array($person) ? $person : [];
+        $scoreRaw = $person['ojtScore'] ?? null;
+        $score = is_numeric($scoreRaw) ? max(0, min(20, (int)$scoreRaw)) : null;
+        $passed = $score !== null ? $score >= 16 : (!empty($person['ojtPassed']) || !empty($person['ojtPass']));
         return [
             'name'        => trim((string)($person['name'] ?? '')),
             'phone'       => trim((string)($person['phone'] ?? '')),
             'm365'        => trim((string)($person['m365'] ?? $person['email'] ?? '')),
-            'ojtPass'     => !empty($person['ojtPass']),
+            'ojtPass'     => $passed,
             'username'    => trim((string)($person['username'] ?? '')),
             'employee_id' => trim((string)($person['employee_id'] ?? $person['id'] ?? '')),
+            'bootcampAttended' => $this->normalizeBootcampAttended($person['bootcampAttended'] ?? []),
+            'ojtScore'    => $score,
+            'ojtPassed'   => $passed,
+            'ojtSignedBy' => trim((string)($person['ojtSignedBy'] ?? '')),
+            'ojtSignedAt' => trim((string)($person['ojtSignedAt'] ?? '')),
         ];
     }
 
     /**
-     * @param array{name:string,phone:string,m365:string,ojtPass:bool,username:string,employee_id:string} $person
+     * @param array{name:string,phone:string,m365:string,ojtPass:bool,username:string,employee_id:string,bootcampAttended:list<int>,ojtScore:?int,ojtPassed:bool,ojtSignedBy:string,ojtSignedAt:string} $person
      */
     private function hasChampionPersonData(array $person): bool
     {
@@ -782,7 +857,7 @@ class DeployProgramController extends BaseController
     }
 
     /**
-     * @return array{name:string,phone:string,m365:string,ojtPass:bool,username:string,employee_id:string}
+     * @return array{name:string,phone:string,m365:string,ojtPass:bool,username:string,employee_id:string,bootcampAttended:list<int>,ojtScore:?int,ojtPassed:bool,ojtSignedBy:string,ojtSignedAt:string}
      */
     private function emptyChampionPerson(): array
     {
@@ -793,7 +868,34 @@ class DeployProgramController extends BaseController
             'ojtPass' => false,
             'username' => '',
             'employee_id' => '',
+            'bootcampAttended' => [],
+            'ojtScore' => null,
+            'ojtPassed' => false,
+            'ojtSignedBy' => '',
+            'ojtSignedAt' => '',
         ];
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function normalizeBootcampAttended(mixed $source): array
+    {
+        if (!is_array($source)) {
+            return [];
+        }
+        $out = [];
+        foreach ($source as $n) {
+            if (!is_numeric($n)) {
+                continue;
+            }
+            $v = (int)$n;
+            if ($v >= 1 && $v <= 4) {
+                $out[] = $v;
+            }
+        }
+        sort($out);
+        return array_values(array_unique($out));
     }
 
     /**
@@ -842,7 +944,7 @@ class DeployProgramController extends BaseController
         }
         $label = trim((string)($raw['label'] ?? $id));
         $owner = trim((string)($raw['owner'] ?? ''));
-        $wave = max(1, min(3, (int)($raw['wave'] ?? 3)));
+        $wave = $this->normalizeWave($raw['wave'] ?? null);
         $color = trim((string)($raw['color'] ?? '#475569'));
         if (!preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
             $color = '#475569';
@@ -869,7 +971,7 @@ class DeployProgramController extends BaseController
         return [
             'id' => $deptId,
             'label' => $deptId,
-            'wave' => 3,
+            'wave' => 'w3',
             'color' => '#475569',
             'owner' => '',
             'handbook' => '',
@@ -877,6 +979,20 @@ class DeployProgramController extends BaseController
             'record' => '',
             'custom' => true,
         ];
+    }
+
+    private function normalizeWave(mixed $raw): string
+    {
+        $v = strtolower(trim((string)$raw));
+        if (in_array($v, self::VALID_WAVES, true)) return $v;
+        // Legacy integer migration. Old wave=1 was the mixed PROD+ENG+QA
+        // bucket; we cannot disambiguate at this layer, so map it to
+        // 'prod' (the heavier half). Default depts are remapped on the
+        // client; only custom-dept rows pass through this path.
+        if ($v === '1') return 'prod';
+        if ($v === '2') return 'w2';
+        if ($v === '3' || $v === '') return 'w3';
+        return 'w3';
     }
 
     private function normalizeDepartmentId(string $deptId): string
