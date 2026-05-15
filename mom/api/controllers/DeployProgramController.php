@@ -63,6 +63,7 @@ class DeployProgramController extends BaseController
                 'audits'    => $this->loadFile(self::FILE_AUDITS),
                 'reviews'   => $this->loadFile(self::FILE_REVIEWS),
                 'users'     => $users,
+                'availability' => $this->loadFile('deploy/availability.json'),
                 'docAccessAnalytics' => $this->docAccessAnalytics($champions, $users),
                 'me'        => [
                     'username' => (string)($me['username'] ?? ''),

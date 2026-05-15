@@ -8,7 +8,7 @@ KEY_FILE="${KEY_FILE:-/var/www/data-private/secrets/cron-api-key}"
 LOG="${LOG:-/var/log/qms-drill-cron.log}"
 
 if [ ! -r "$KEY_FILE" ]; then
-  echo "$(date '+%F %T') FATAL: api key $KEY_FILE not readable" >> "$LOG"
+  echo "$(date '+%F %T') Lỗi: không đọc được API key $KEY_FILE" >> "$LOG"
   exit 1
 fi
 

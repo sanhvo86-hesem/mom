@@ -289,6 +289,7 @@ async function loadDeployState(){
     DeployState.audits    = d.audits    || {audits:[]};
     DeployState.reviews   = d.reviews   || {reviews:[], inputTemplate:[], outputTemplate:[]};
     DeployState.users     = Array.isArray(d.users) ? d.users : [];
+    DeployState.availability = d.availability || {absences:[]};
     DeployState.me        = d.me        || DeployState.me;
     DeployState.loaded    = true;
   }catch(e){
@@ -887,7 +888,7 @@ function renderDeployHero(){
       <div class="deploy-hero-actions">
         <a class="deploy-action-link" href="../mom/docs/operations/work-instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html" target="_blank">WI-106 Kế hoạch tổng</a>
         <a class="deploy-action-link" href="../mom/docs/operations/work-instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html" target="_blank">WI-105 Hướng dẫn tra cứu</a>
-        <a class="deploy-action-link" href="../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html" target="_blank">ANNEX-114 Sổ tay Go-live</a>
+        <a class="deploy-action-link" href="../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html" target="_blank">ANNEX-114 Sổ tay vận hành chính thức</a>
       </div>
     </div>
     <div class="deploy-hero-side">
@@ -923,10 +924,10 @@ function renderDeploySummary(){
     <div class="deploy-summary-card">
       <span class="summary-label">Phòng ban sẵn sàng</span>
       <strong>${ready}/${total}</strong>
-      <div>${inProg} đang trong wave</div>
+      <div>${inProg} đang trong đợt triển khai</div>
     </div>
     <div class="deploy-summary-card">
-      <span class="summary-label">Champion đạt OJT</span>
+      <span class="summary-label">Người dẫn dắt đạt OJT</span>
       <strong>${chPct}%</strong>
       <div>${chPass}/${chTarget} đã đạt</div>
     </div>
@@ -955,7 +956,7 @@ function renderTabOverview(){
       </div>
     </section>
     <section class="deploy-section">
-      <div class="deploy-section-head"><h2>7 trụ triển khai</h2><span>Thiếu trụ nào = chưa go-live</span></div>
+      <div class="deploy-section-head"><h2>7 trụ triển khai</h2><span>Thiếu trụ nào = chưa thể vận hành chính thức</span></div>
       <div class="deploy-pillar-grid">
         ${DEPLOY_CONFIG.pillars.map(pl => `
           <div class="deploy-pillar-card">
@@ -1184,13 +1185,13 @@ function renderTabDepartments(){
   <div class="deploy-tab-panel active" id="dtab-departments">
     ${renderDepartmentRosterManager(activeDepts)}
     <section class="deploy-section">
-      <div class="deploy-section-head"><h2>Wave rollout</h2><span>3 wave · go-live theo thứ tự rủi ro</span></div>
+      <div class="deploy-section-head"><h2>Triển khai theo đợt</h2><span>4 đợt · vận hành chính thức theo thứ tự rủi ro</span></div>
       <div class="deploy-wave-grid">
         ${(DEPLOY_CONFIG.waves || [{n:1},{n:2},{n:3},{n:4}]).map(w => renderWaveColumn(w.n)).join('')}
       </div>
     </section>
     <section class="deploy-section">
-      <div class="deploy-section-head"><h2>Bảng readiness 6 chiều</h2><span>Click ô để cycle pending → in_progress → completed → blocked</span></div>
+      <div class="deploy-section-head"><h2>Bảng sẵn sàng 6 chiều</h2><span>Bấm ô để xoay: chưa bắt đầu → đang thực hiện → hoàn thành → bị chặn</span></div>
       <div class="deploy-table-wrap">
         <table class="deploy-heatmap">
           <thead>
@@ -1213,12 +1214,104 @@ function renderTabDepartments(){
       </div>
     </section>
     <section class="deploy-section">
-      <div class="deploy-section-head"><h2>Champion roster</h2><span>Người tham dự + dự bị — ${deployChampionCount()}/${chTarget} đã pass OJT</span></div>
+      <div class="deploy-section-head"><h2>Danh sách người dẫn dắt</h2><span>Người tham dự + dự bị — ${deployChampionCount()}/${chTarget} đã đạt OJT</span></div>
       <div class="champion-grid">
         ${activeDepts.map(d => renderChampionCard(d)).join('')}
       </div>
     </section>
+    ${renderAvailabilitySection(activeDepts)}
   </div>`;
+}
+
+function renderAvailabilitySection(activeDepts){
+  const state = DeployState.availability || {absences:[]};
+  const list = Array.isArray(state.absences) ? state.absences : [];
+  const today = new Date().toISOString().slice(0,10);
+  // Sắp xếp: đang vắng hôm nay lên đầu, kế đến vắng sắp tới, cuối là quá khứ.
+  const sorted = list.slice().sort((a,b) => {
+    const aActive = (a.fromDate <= today && a.toDate >= today) ? 0 : (a.toDate >= today ? 1 : 2);
+    const bActive = (b.fromDate <= today && b.toDate >= today) ? 0 : (b.toDate >= today ? 1 : 2);
+    if (aActive !== bActive) return aActive - bActive;
+    return String(a.fromDate||'').localeCompare(String(b.fromDate||''));
+  }).slice(0, 20);
+  const ro = !DeployState.me.canEdit;
+  const optDepts = activeDepts.map(d => `<option value="${deployEscape(d.id)}">${deployEscape(d.label)}</option>`).join('');
+  return `
+  <section class="deploy-section">
+    <div class="deploy-section-head">
+      <h2>Lịch vắng người dẫn dắt</h2>
+      <span>Trưởng phòng đăng ký trước → cron 06:30 cảnh báo Trưởng QMS nếu chưa có người trực thay</span>
+    </div>
+    ${ro ? '' : `
+    <form class="deploy-availability-form" onsubmit="deploySaveAvailability(event); return false;">
+      <div class="form-grid">
+        <label>Tên người dẫn dắt<input type="text" name="championName" required placeholder="VD: Nguyễn Văn A"></label>
+        <label>Phòng<select name="deptId" required>${optDepts}</select></label>
+        <label>Vai trò<select name="role"><option value="primary">Chính</option><option value="backup">Dự phòng</option></select></label>
+        <label>Từ ngày<input type="date" name="fromDate" required></label>
+        <label>Tới ngày<input type="date" name="toDate" required></label>
+        <label>Lý do<input type="text" name="reason" required placeholder="VD: Nghỉ phép · đi công tác · ốm"></label>
+        <label>Người trực thay<input type="text" name="coverBy" placeholder="Trống nếu chưa sắp xếp"></label>
+        <label>SĐT người trực thay<input type="tel" name="coverPhone" placeholder="VD: 0912 345 678"></label>
+      </div>
+      <button class="deploy-btn deploy-btn-sm" type="submit">Đăng ký vắng</button>
+    </form>`}
+    <div class="deploy-availability-list">
+      ${sorted.length === 0 ? '<div class="deploy-availability-empty">Chưa có lịch vắng nào được đăng ký.</div>' : `
+        <table class="deploy-availability-table">
+          <thead><tr>
+            <th>Người</th><th>Phòng</th><th>Vai trò</th><th>Từ</th><th>Tới</th><th>Lý do</th><th>Người trực thay</th><th>Trạng thái</th>
+          </tr></thead>
+          <tbody>
+          ${sorted.map(a => {
+            const active = (a.fromDate <= today && a.toDate >= today);
+            const past = (a.toDate < today);
+            const covered = !!String(a.coverBy || '').trim();
+            const cls = active ? (covered ? 'av-active-covered' : 'av-active-uncovered') : (past ? 'av-past' : 'av-future');
+            const label = active
+              ? (covered ? 'Vắng hôm nay · có người thay' : '⚠ Vắng hôm nay · CHƯA có người thay')
+              : (past ? 'Đã kết thúc' : 'Vắng sắp tới');
+            return `
+            <tr class="${cls}">
+              <td>${deployEscape(a.championName||'')}</td>
+              <td>${deployEscape(a.deptId||'')}</td>
+              <td>${a.role === 'backup' ? 'Dự phòng' : 'Chính'}</td>
+              <td>${deployEscape(a.fromDate||'')}</td>
+              <td>${deployEscape(a.toDate||'')}</td>
+              <td>${deployEscape(a.reason||'')}</td>
+              <td>${a.coverBy ? `${deployEscape(a.coverBy)}${a.coverPhone ? ' · '+deployEscape(a.coverPhone) : ''}` : '<em>chưa có</em>'}</td>
+              <td>${label}</td>
+            </tr>`;
+          }).join('')}
+          </tbody>
+        </table>`}
+    </div>
+  </section>`;
+}
+
+async function deploySaveAvailability(ev){
+  const form = ev.target;
+  const fd = new FormData(form);
+  const payload = {};
+  for (const [k,v] of fd.entries()) payload[k] = String(v).trim();
+  if (!payload.championName || !payload.deptId || !payload.fromDate || !payload.toDate || !payload.reason){
+    alert('Cần điền đủ: Tên, Phòng, Từ ngày, Tới ngày, Lý do.');
+    return;
+  }
+  if (payload.fromDate > payload.toDate){
+    alert('Từ ngày phải trước hoặc bằng Tới ngày.');
+    return;
+  }
+  try {
+    const res = await deployApi('deploy_availability_save', payload);
+    if (res && res.data){
+      DeployState.availability = res.data;
+      renderDeployDashboard();
+    }
+  } catch (e){
+    console.error('[deploy] availability save failed', e);
+    alert('Lỗi đăng ký vắng: ' + (e && e.message || e));
+  }
 }
 
 function renderDepartmentRosterManager(activeDepts){
@@ -2313,7 +2406,7 @@ function deployOpenDepartmentForm(){
   const inactive = deployInactiveDepartments();
   const defaultChoice = inactive[0] ? inactive[0].id : '__custom__';
   deployOpenFormDialog({
-    kicker: 'ISO deployment roster',
+    kicker: 'Phòng ban ISO',
     title: 'Thêm phòng ban tham gia',
     accentColor: '#2563eb',
     submitLabel: 'Thêm phòng ban',
@@ -2955,6 +3048,7 @@ window.deploySignOffMeeting = deploySignOffMeeting;
 window.deploySignOffWeek = deploySignOffWeek;
 window.deploySaveChampion = deploySaveChampion;
 window.deploySaveChampionOjt = deploySaveChampionOjt;
+window.deploySaveAvailability = deploySaveAvailability;
 window.deployOpenIssueForm = deployOpenIssueForm;
 window.deployUpdateIssueStatus = deployUpdateIssueStatus;
 window.deployRecordDrill = deployRecordDrill;
