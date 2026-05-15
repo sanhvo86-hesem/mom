@@ -94,7 +94,7 @@ final class AuthDecisionLogger
                                               ? $decision->matchedPattern
                                               : null,
                     ':ip_addr'         => self::clientIp(),
-                    ':user_agent'      => self::clip((string)($_SERVER['HTTP_USER_AGENT'] ?? ''), 500),
+                    ':user_agent'      => self::clip((string)((isset($_SERVER) && is_array($_SERVER)) ? ($_SERVER['HTTP_USER_AGENT'] ?? '') : ''), 500),
                     ':extra'           => json_encode($context['extra'] ?? new \stdClass()) ?: '{}',
                 ]
             );
@@ -139,6 +139,9 @@ final class AuthDecisionLogger
 
     private static function clientIp(): ?string
     {
+        if (!isset($_SERVER) || !is_array($_SERVER)) {
+            return null;
+        }
         $candidates = [
             $_SERVER['HTTP_X_FORWARDED_FOR'] ?? '',
             $_SERVER['HTTP_X_REAL_IP']       ?? '',

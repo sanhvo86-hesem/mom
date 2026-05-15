@@ -201,7 +201,8 @@ final class AuthorizationKernel
         if (!empty($user['current_aal'])) {
             return (int)$user['current_aal'];
         }
-        if (!empty($_SESSION['mfa_ok'])) {
+        // $_SESSION may not exist under CLI smoke tests; access defensively.
+        if (isset($_SESSION) && is_array($_SESSION) && !empty($_SESSION['mfa_ok'])) {
             return 2;
         }
         return 1;
