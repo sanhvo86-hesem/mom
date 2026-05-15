@@ -1400,7 +1400,7 @@ class GenericCrudService
             ];
         }
 
-        if ((bool)($table['supportTable'] ?? false) && $overlayDeletionMode === 'hard_delete') {
+        if ($overlayDeletionMode === 'hard_delete') {
             return [
                 'mode' => 'hard_delete',
                 'message' => '',
