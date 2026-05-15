@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Howto screenshot builder | HESEM MOM</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --ink: #172033;
+      --muted: #64748b;
+      --line: #cbd5e1;
+      --panel: #ffffff;
+      --blue: #1d4ed8;
+      --red: #dc2626;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.42;
+    }
+    header {
+      background: #0f172a;
+      color: #fff;
+      padding: 20px 24px;
+    }
+    h1 {
+      margin: 0 0 6px;
+      font-size: 24px;
+      letter-spacing: 0;
+    }
+    header p { margin: 0; color: #dbeafe; }
+    main {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+    .toolbar,
+    .capture-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    .toolbar {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      align-items: end;
+    }
+    label {
+      display: grid;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    select,
+    input,
+    button {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 8px 10px;
+      font: inherit;
+      background: #fff;
+      color: var(--ink);
+    }
+    button {
+      border-color: var(--blue);
+      background: var(--blue);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 700;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 14px;
+    }
+    .capture-card h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+    }
+    .capture-card p,
+    .capture-card li {
+      margin: 4px 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .preview {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      object-fit: contain;
+      background: #fff;
+      margin: 10px 0;
+    }
+    .path {
+      display: block;
+      padding: 8px;
+      border: 1px dashed var(--line);
+      border-radius: 6px;
+      background: #f8fafc;
+      color: var(--ink);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      overflow-wrap: anywhere;
+    }
+    .status {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #fee2e2;
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    ol { padding-left: 18px; }
+    @media (max-width: 820px) {
+      .toolbar { grid-template-columns: 1fr; }
+    }
+    @media print {
+      body { background: #fff; }
+      header,
+      .toolbar { display: none; }
+      main { max-width: none; padding: 0; }
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .capture-card { break-inside: avoid; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Howto screenshot builder</h1>
+    <p>Dùng để chụp và thay ảnh thật cho 10 hướng dẫn thao tác Thứ Hai.</p>
+  </header>
+  <main>
+    <section class="toolbar" aria-label="Bộ lọc ảnh cần thay">
+      <label>
+        Phòng ban
+        <select id="deptFilter"></select>
+      </label>
+      <label>
+        Bước
+        <select id="stepFilter">
+          <option value="all">Tất cả bước</option>
+          <option value="1">Bước 1</option>
+          <option value="2">Bước 2</option>
+          <option value="3">Bước 3</option>
+        </select>
+      </label>
+      <label>
+        Tên file ảnh
+        <input id="fileName" readonly>
+      </label>
+      <button type="button" id="copyPath">Chép đường dẫn thay ảnh</button>
+    </section>
+    <section class="capture-card">
+      <h2>Quy trình thay ảnh thật</h2>
+      <ol>
+        <li>Mở hướng dẫn của phòng ban trên cổng thật và thực hiện đúng bước cần minh họa.</li>
+        <li>Chụp ảnh màn hình 16:9, khoanh đỏ vùng cần bấm hoặc trạng thái cần kiểm.</li>
+        <li>Lưu PNG đúng tên trong danh sách bên dưới, kích thước khuyến nghị 800x450.</li>
+        <li>Ghi đè file placeholder tại <span class="path">mom/assets/howto/&lt;DEPT&gt;-step&lt;N&gt;.png</span>.</li>
+      </ol>
+    </section>
+    <section class="grid" id="grid" aria-label="Danh sách ảnh howto"></section>
+  </main>
+  <script>
+    const departments = ['PROD', 'ENG', 'QA', 'SCM', 'SALES', 'FIN', 'HR', 'IT', 'EHS', 'ERP'];
+    const steps = [
+      { id: '1', title: 'Bước 1 - mở màn hình đúng' },
+      { id: '2', title: 'Bước 2 - bấm đúng nút hoặc ô dữ liệu' },
+      { id: '3', title: 'Bước 3 - lưu và kiểm trạng thái' }
+    ];
+    const deptFilter = document.getElementById('deptFilter');
+    const stepFilter = document.getElementById('stepFilter');
+    const fileName = document.getElementById('fileName');
+    const grid = document.getElementById('grid');
+    const copyPath = document.getElementById('copyPath');
+
+    deptFilter.innerHTML = '<option value="all">Tất cả phòng ban</option>' +
+      departments.map((dept) => `<option value="${dept}">${dept}</option>`).join('');
+
+    function fileFor(dept, step) {
+      return `${dept}-step${step}.png`;
+    }
+
+    function assetPath(dept, step) {
+      return `../assets/howto/${fileFor(dept, step)}`;
+    }
+
+    function repoPath(dept, step) {
+      return `mom/assets/howto/${fileFor(dept, step)}`;
+    }
+
+    function render() {
+      const deptValue = deptFilter.value;
+      const stepValue = stepFilter.value;
+      const shown = [];
+      departments.forEach((dept) => {
+        if (deptValue !== 'all' && deptValue !== dept) return;
+        steps.forEach((step) => {
+          if (stepValue !== 'all' && stepValue !== step.id) return;
+          shown.push({ dept, step });
+        });
+      });
+      const first = shown[0];
+      fileName.value = first ? fileFor(first.dept, first.step.id) : '';
+      grid.innerHTML = shown.map(({ dept, step }) => `
+        <article class="capture-card">
+          <h2>${dept} - ${step.title}</h2>
+          <span class="status">Cần ảnh thật từ cổng</span>
+          <img class="preview" src="${assetPath(dept, step.id)}" alt="Ảnh minh họa ${dept} bước ${step.id}" loading="lazy">
+          <span class="path">${repoPath(dept, step.id)}</span>
+          <p>Chụp đúng màn hình thao tác, khoanh đỏ vị trí cần bấm, rồi lưu đè file này.</p>
+        </article>
+      `).join('');
+    }
+
+    copyPath.addEventListener('click', async () => {
+      const dept = deptFilter.value === 'all' ? departments[0] : deptFilter.value;
+      const step = stepFilter.value === 'all' ? '1' : stepFilter.value;
+      const value = repoPath(dept, step);
+      fileName.value = fileFor(dept, step);
+      if (navigator.clipboard) {
+        await navigator.clipboard.writeText(value);
+      }
+      copyPath.textContent = 'Đã chép đường dẫn';
+      setTimeout(() => { copyPath.textContent = 'Chép đường dẫn thay ảnh'; }, 1200);
+    });
+    deptFilter.addEventListener('change', render);
+    stepFilter.addEventListener('change', render);
+    render();
+  </script>
+</body>
+</html>
