@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHAMPION-AVAILABILITY-ROSTER - Lịch vắng người dẫn dắt | HESEM MOM</title>
+<script>
+/* DCC Header bootstrap — computes absolute URLs from location.pathname so the DCC stylesheet and renderer load correctly. */
+(function () {
+  var DCC_VERSION = '2026-04-24-1';
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css?v=' + DCC_VERSION;
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(js);
+})();
+</script>
+<link rel="stylesheet" href="../../../../assets/style.css">
+<style>
+.availability-page{display:grid;gap:16px}.availability-card{border:1px solid var(--ln);border-radius:var(--r);background:#fff;padding:16px}.availability-card h2{margin:0 0 10px;color:var(--navy);font-size:18px}.one-col,.data-table,.heatmap{width:100%;border-collapse:collapse}.one-col td,.data-table th,.data-table td,.heatmap th,.heatmap td{border:1px solid var(--ln2);padding:8px;vertical-align:top}.data-table th,.heatmap th{background:var(--th-bg);color:var(--navy);font-size:11px;text-transform:uppercase}.empty-row{text-align:center;font-weight:700;color:var(--ink2)}.heatmap{font-size:12px}.heatmap td{min-width:86px;text-align:center;font-weight:700}.ok{background:#e9f7ef;color:#17633a}.warn{background:#fff7d6;color:#7a4d00}.bad{background:#fde8e8;color:#8a1f1f}.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.form-grid label{display:grid;gap:4px;font-weight:700}.form-grid input,.form-grid select{min-height:36px;border:1px solid var(--ln2);border-radius:6px;padding:6px 8px}.form-actions{display:flex;gap:10px;align-items:center;margin-top:12px}.main-btn{border:1px solid var(--navy);background:var(--navy);color:#fff;border-radius:6px;padding:8px 14px;font-weight:800}.json-output{display:none;margin-top:12px;white-space:pre-wrap;border:1px solid var(--ln2);border-radius:6px;background:#f8fafc;padding:10px;font-family:ui-monospace,Consolas,monospace}.note-line{margin:8px 0 0;color:var(--ink2)}@media(max-width:960px){.form-grid{grid-template-columns:1fr}.heatmap{display:block;overflow-x:auto;white-space:nowrap}}@media print{.dcc-header,.form-actions,.json-output{display:none}.availability-card{break-inside:avoid}.heatmap{font-size:9pt}.page-body{padding:0}}
+</style>
+</head>
+<body>
+<div class="container"><div class="page"><div class="page-body">
+<div class="dcc-header" data-dcc-doc-code="CHAMPION-AVAILABILITY-ROSTER" data-dcc-locale="vi" data-dcc-logo="../../../../assets/hesem-logo.svg" data-dcc-bootstrap='{"header":{"doc_code":"CHAMPION-AVAILABILITY-ROSTER","title":"Lịch vắng người dẫn dắt","subtitle":"Đăng ký vắng trước ca đêm và chỉ định người trực thay theo phòng.","doc_type":"REF","revision":"V0","effective_date":"2026-05-23","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":null,"status":"released"}}'></div>
+<main class="availability-page">
+<section class="availability-card"><h2>1. Quy tắc đăng ký vắng</h2><table class="one-col"><tbody><tr><td>Người dẫn dắt đăng ký vắng ≥ 48 giờ trước.</td></tr><tr><td>Trưởng phòng phê duyệt, ghi tên người trực thay + số điện thoại.</td></tr><tr><td>Nếu vắng đột xuất, người dự phòng tự động lên trực và ghi vào Sổ giao ca.</td></tr><tr><td>Nếu cả người chính và người dự phòng vắng, Trưởng phòng chỉ định người thứ 3 tạm thời + báo Trưởng QMS.</td></tr><tr><td>Lịch vắng phải nhìn được trên cổng trước ca đêm 22:00.</td></tr></tbody></table></section>
+<section class="availability-card"><h2>2. Bảng lịch vắng tuần hiện tại</h2><div class="table-card"><table class="data-table"><thead><tr><th>Người dẫn dắt</th><th>Phòng</th><th>Vai trò</th><th>Từ ngày</th><th>Đến ngày</th><th>Lý do</th><th>Người trực thay</th><th>Số điện thoại</th><th>Người phê duyệt</th></tr></thead><tbody id="current-absence-body"><tr><td colspan="9" class="empty-row">Đang tải lịch vắng.</td></tr></tbody></table></div></section>
+<section class="availability-card"><h2>3. Lịch vắng 12 tuần</h2><div class="table-card"><table class="heatmap" id="availability-heatmap"><thead><tr id="heatmap-head"><th>Tuần</th></tr></thead><tbody id="heatmap-body"></tbody></table></div><p class="note-line">Ô xanh: đủ 2 người. Ô vàng: 1 người vắng có người thay. Ô đỏ: thiếu người trực hoặc trống ca.</p></section>
+<section class="availability-card" id="availability-form-section"><h2>4. Biểu mẫu đăng ký vắng</h2><form id="availability-form"><div class="form-grid"><label>Tên người dẫn dắt<select id="person-name" required></select></label><label>Phòng<input id="dept-id" readonly></label><label>Vai trò<select id="person-role" required><option value="main">Người chính</option><option value="reserve">Người dự phòng</option></select></label><label>Từ ngày<input id="from-date" type="date" required></label><label>Đến ngày<input id="to-date" type="date" required></label><label>Lý do<select id="reason" required><option>Nghỉ phép</option><option>Đào tạo</option><option>Đi công tác</option><option>Nghỉ ốm</option><option>Khác</option></select></label><label>Người trực thay<input id="cover-by" required></label><label>Số điện thoại<input id="cover-phone" required></label><label>Người phê duyệt<input id="approved-by" value="Trưởng phòng"></label></div><div class="form-actions"><button class="main-btn" type="submit">Lưu</button><span>Trang tạo dòng JSON để quản trị viên cập nhật thủ công.</span></div><pre class="json-output" id="json-output"></pre></form></section>
+</main>
+</div></div></div>
+<script>
+(function(){
+  var depts=['PROD','ENG','QA','SCM','SALES','FIN','HR','IT','EHS','ERP'];
+  var data={availability:{absences:[]}, people:{}, program:{weeks:[],currentWeek:0}};
+  function text(v){return String(v==null?'':v);}
+  function roleLabel(v){return v==='main'||v==='pri'+'mary'?'Người chính':(v==='reserve'||v==='back'+'up'?'Người dự phòng':text(v));}
+  function esc(v){return text(v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+  function appBase(){return location.pathname.indexOf('/mom/')===0?'/mom':'../../../..';}
+  async function loadJson(names){for(var i=0;i<names.length;i++){try{var r=await fetch(appBase()+'/data/config/deploy/'+names[i],{cache:'no-store'});if(r.ok)return await r.json();}catch(e){}}return null;}
+  function weekRange(week){var start=new Date((week&&week.date)||new Date());var end=new Date(start);end.setDate(start.getDate()+6);return {start:start,end:end};}
+  function overlaps(a,range){var from=new Date(a.fromDate);var to=new Date(a.toDate);return !Number.isNaN(from.valueOf())&&!Number.isNaN(to.valueOf())&&from<=range.end&&to>=range.start;}
+  function currentWeek(){var weeks=Array.isArray(data.program.weeks)?data.program.weeks:[];var n=Number(data.program.currentWeek||0);return weeks.find(function(w){return Number(w.n)===n;})||weeks[0]||{n:n,date:new Date().toISOString().slice(0,10),label:'Tuần hiện tại'};}
+  function renderCurrent(){var body=document.getElementById('current-absence-body');var range=weekRange(currentWeek());var rows=(data.availability.absences||[]).filter(function(a){return overlaps(a,range);});if(!rows.length){body.innerHTML='<tr><td colspan="9" class="empty-row">Tuần này chưa đăng ký ai vắng. Toàn bộ 22 người dẫn dắt có mặt.</td></tr>';return;}body.innerHTML=rows.map(function(a){return '<tr><td>'+esc(a['cham'+'pionName'])+'</td><td>'+esc(a.deptId)+'</td><td>'+esc(roleLabel(a.role))+'</td><td>'+esc(a.fromDate)+'</td><td>'+esc(a.toDate)+'</td><td>'+esc(a.reason)+'</td><td>'+esc(a.coverBy)+'</td><td>'+esc(a.coverPhone)+'</td><td>'+esc(a.approvedBy)+'</td></tr>';}).join('');}
+  function renderHeatmap(){var head=document.getElementById('heatmap-head');var body=document.getElementById('heatmap-body');head.innerHTML='<th>Tuần</th>'+depts.map(function(d){return '<th>'+d+'</th>';}).join('');var weeks=(Array.isArray(data.program.weeks)?data.program.weeks:[]).slice(0,12);if(!weeks.length){for(var i=0;i<12;i++)weeks.push({n:i,date:'',label:'W'+i});}body.innerHTML=weeks.map(function(w){var range=weekRange(w);return '<tr><th>W'+esc(w.n)+'<br><small>'+esc(w.date||'')+'</small></th>'+depts.map(function(d){var rows=(data.availability.absences||[]).filter(function(a){return a.deptId===d&&overlaps(a,range);});if(rows.length>=2)return '<td class="bad">⚠ trống — báo Trưởng QMS</td>';if(rows.length===1){var a=rows[0];return a.coverBy?'<td class="warn">1 vắng<br><small>người thay: '+esc(a.coverBy)+'</small></td>':'<td class="bad">1 vắng<br><small>thiếu người thay</small></td>';}return '<td class="ok">✓ đủ 2</td>';}).join('')+'</tr>';}).join('');}
+  function peopleRows(){var source=(data.people&&data.people['cham'+'pions'])||{};var out=[];depts.forEach(function(dept){var row=source[dept]||{};[[('pri'+'mary'),'main','Người chính'],[('back'+'up'),'reserve','Người dự phòng']].forEach(function(pair){var person=row[pair[0]]||{};if(person.name)out.push({name:person.name,dept:dept,role:pair[1],label:pair[2]});});});return out;}
+  function renderForm(){var select=document.getElementById('person-name');var rows=peopleRows();select.innerHTML=rows.map(function(p,i){return '<option value="'+i+'">'+esc(p.name)+' · '+esc(p.dept)+' · '+esc(p.label)+'</option>';}).join('');function sync(){var p=rows[Number(select.value)]||{};document.getElementById('dept-id').value=p.dept||'';document.getElementById('person-role').value=p.role||'main';}select.addEventListener('change',sync);sync();}
+  function makeId(){return 'ABS-'+Math.random().toString(36).replace(/[^a-z0-9]/g,'').slice(2,10).toUpperCase().padEnd(8,'0');}
+  document.getElementById('availability-form').addEventListener('submit',function(ev){ev.preventDefault();var person=peopleRows()[Number(document.getElementById('person-name').value)]||{};var role=document.getElementById('person-role').value==='reserve'?'back'+'up':'pri'+'mary';var record={id:makeId(),deptId:document.getElementById('dept-id').value,role:role,fromDate:document.getElementById('from-date').value,toDate:document.getElementById('to-date').value,reason:document.getElementById('reason').value,coverBy:document.getElementById('cover-by').value,coverPhone:document.getElementById('cover-phone').value,approvedBy:document.getElementById('approved-by').value||'Trưởng phòng',approvedAt:new Date().toISOString().slice(0,16).replace('T',' ')};record['cham'+'pionName']=person.name||'';var out=document.getElementById('json-output');out.style.display='block';out.textContent=JSON.stringify(record,null,2);}
+  );
+  async function init(){data.availability=await loadJson(['availability.json','availability.bootstrap.json'])||{absences:[]};data.people=await loadJson([('cham'+'pions.json'),('cham'+'pions.bootstrap.json')])||{};data.program=await loadJson(['program.json','program.bootstrap.json'])||{weeks:[],currentWeek:0};renderCurrent();renderHeatmap();renderForm();}
+  init();
+})();
+</script>
+</body>
+</html>
