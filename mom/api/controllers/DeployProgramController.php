@@ -428,6 +428,7 @@ class DeployProgramController extends BaseController
         $this->success(['data' => $result]);
     }
 
+<<<<<<< HEAD
     public function saveChampionOjt(): never
     {
         $me = $this->requireAuth();
@@ -611,6 +612,39 @@ class DeployProgramController extends BaseController
             'uncovered_count' => count($uncovered),
             'notification_sent' => $notificationSent,
         ]]);
+=======
+    public function runDocUsageAggregate(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::SIGNOFF_ROLES);
+
+        $champions = $this->normalizeChampionState($this->loadFile(self::FILE_CHAMPIONS));
+        $users = $this->loadUserDirectory();
+        $kpis = (new DocAccessAnalyticsService($this->data))->aggregateKpis($champions, $users);
+
+        $state = $this->loadFile(self::FILE_READINESS);
+        if (!isset($state['kpiValues']) || !is_array($state['kpiValues'])) {
+            $state['kpiValues'] = [];
+        }
+
+        foreach (['KPI-USE-01', 'KPI-USE-02', 'KPI-USE-03'] as $key) {
+            if (($kpis[$key] ?? null) !== null) {
+                $state['kpiValues'][$key] = (string)$kpis[$key];
+            }
+        }
+        $state['kpiValues']['KPI-USE_updatedAt'] = (string)($kpis['calculatedAt'] ?? gmdate('c'));
+        $sampleSize = json_encode($kpis['sampleSize'] ?? [], JSON_UNESCAPED_UNICODE);
+        $state['kpiValues']['KPI-USE_sampleSize'] = is_string($sampleSize) ? $sampleSize : '{}';
+        $state['lastUpdated'] = gmdate('c');
+
+        $this->saveFile(self::FILE_READINESS, $state);
+        $this->audit('deploy.doc_usage.aggregate', $me, [
+            'use_01' => $kpis['KPI-USE-01'],
+            'use_02' => $kpis['KPI-USE-02'],
+            'use_03' => $kpis['KPI-USE-03'],
+        ]);
+        $this->success(['data' => $kpis]);
+>>>>>>> 90cf3a88 (Add deploy doc usage KPI aggregation)
     }
 
     public function saveAudit(): never

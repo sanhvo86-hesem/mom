@@ -768,6 +768,18 @@ function deployOverviewKpis(){
   const other = items.filter(kpi => !String(kpi.id || '').startsWith('KPI-USE-'));
   return usage.concat(other);
 }
+function deployKpiUpdatedLabel(kpi, kv){
+  if (!String(kpi.id || '').startsWith('KPI-USE-')) return '';
+  const t = kv && kv['KPI-USE_updatedAt'];
+  if (!t) return '';
+  const d = new Date(t);
+  if (Number.isNaN(d.getTime())) return '';
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mo = String(d.getMonth() + 1).padStart(2, '0');
+  return `<div class="kpi-mini-updated">Cập nhật: ${hh}:${mm} ngày ${dd}/${mo}</div>`;
+}
 function deployDeptKpiOwnerSummary(dept){
   const ownerRole = deployOwnerRoleFromDeptOwner(dept && dept.owner);
   const items = ownerRole ? DEPLOY_CONFIG.kpis.filter(kpi => kpi.ownerRole === ownerRole) : [];
@@ -977,7 +989,9 @@ function renderKpiCard(kpi, value){
   const hasTip = !!(kpi.rationale || kpi.basis || kpi.method);
   const isUsageKpi = String(kpi.id || '').startsWith('KPI-USE-');
   const usagePending = isUsageKpi && v === '';
-  const placeholder = usagePending ? 'Chưa có số liệu' : '—';
+  const placeholder = usagePending ? 'Đang chờ tổng hợp' : '—';
+  const kv = (DeployState.readiness && DeployState.readiness.kpiValues) || {};
+  const updatedLabel = deployKpiUpdatedLabel(kpi, kv);
   // Build rationale tooltip body. Uses an <aside> floating beside the card on
   // hover (CSS-only). Native `title=` on the input is also set so screen-
   // readers and keyboard-focus users get the same content.
@@ -1002,8 +1016,9 @@ function renderKpiCard(kpi, value){
     </div>
     <div class="kpi-mini-label">${deployEscape(kpi.label)}</div>
     <input type="text" class="kpi-mini-input" value="${deployEscape(v)}" placeholder="${deployEscape(placeholder)}" ${ro ? 'disabled' : ''} title="${deployEscape(titleAttr)}" onchange="deployUpdateMetric('${deployEscape(kpi.id)}', this.value)">
-    ${usagePending ? '<div class="kpi-mini-hint">Nhật ký doc_access_log đã bật từ R2-06; chờ đủ 7 ngày để tính.</div>' : ''}
+    ${usagePending ? '<div class="kpi-mini-hint">Đang chờ tổng hợp lần đầu (cron 15 phút/lần). Mở <code>tail -f /var/log/qms-doc-usage-cron.log</code> để theo dõi.</div>' : ''}
     <div class="kpi-mini-owner">Chủ trì: ${deployEscape(deployKpiOwnerLabel(kpi.ownerRole))}</div>
+    ${updatedLabel}
     ${tipHtml}
   </div>`;
 }
