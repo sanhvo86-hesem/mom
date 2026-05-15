@@ -22,6 +22,7 @@ return static function (Router $router, string $dataDir): void {
         'deploy_champion_save'     => [DeployProgramController::class, 'saveChampion'],
         'deploy_issue_save'        => [DeployProgramController::class, 'saveIssue'],
         'deploy_drill_record'      => [DeployProgramController::class, 'recordDrill'],
+        'deploy_drill_reminders_run' => [DeployProgramController::class, 'runDrillReminders'],
         'deploy_audit_save'        => [DeployProgramController::class, 'saveAudit'],
         'deploy_audit_finding_save'=> [DeployProgramController::class, 'saveFinding'],
         'deploy_review_save'       => [DeployProgramController::class, 'saveReview'],
