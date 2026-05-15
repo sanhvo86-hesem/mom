@@ -1460,7 +1460,6 @@ function renderChampionPersonSlot(dept, slot, index, person, ro){
       <input type="checkbox" ${person.ojtPass?'checked':''} ${ro?'disabled':''} data-deploy-champion="${key}|ojtPass">
       Đã đạt bài kiểm OJT
     </label>
-    ${filled && index === 0 ? renderChampionOjtBlock(dept, slot, person, ro) : ''}
     <input type="hidden" data-deploy-champion="${key}|name" value="${deployEscape(person.name||'')}">
     <input type="hidden" data-deploy-champion="${key}|phone" value="${deployEscape(person.phone||'')}">
     <input type="hidden" data-deploy-champion="${key}|m365" value="${deployEscape(person.m365||'')}">
