@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 779,
-        "generated_at": "2026-05-15T08:29:36+00:00"
+        "table_count": 780,
+        "generated_at": "2026-05-15T08:34:09+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -1577,6 +1577,13 @@
         },
         "disposal_event": {
             "defined_in": "172_disposal_event_and_campaign_close.sql",
+            "extended_in": [],
+            "primary_key": "id",
+            "foreign_keys": [],
+            "contract": null
+        },
+        "doc_access_log": {
+            "defined_in": "187_doc_access_log.sql",
             "extended_in": [],
             "primary_key": "id",
             "foreign_keys": [],

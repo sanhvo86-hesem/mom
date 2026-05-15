@@ -6,6 +6,8 @@ namespace MOM\Api\Controllers;
 
 use InvalidArgumentException;
 use MOM\Services\DeployDrillReminderService;
+use MOM\Api\Services\DocAccessAnalyticsService;
+use Throwable;
 
 /**
  * Deploy Program Controller
@@ -25,6 +27,7 @@ class DeployProgramController extends BaseController
     private const FILE_CHAMPIONS  = 'deploy/champions.json';
     private const FILE_READINESS  = 'deploy/readiness.json';
     private const FILE_ISSUES     = 'deploy/issues.json';
+    private const FILE_DRILLS     = 'deploy/drills.json';
     private const FILE_CLAUSES    = 'deploy/iso-clauses.json';
     private const FILE_AUDITS     = 'deploy/audits.json';
     private const FILE_REVIEWS    = 'deploy/mgmt-reviews.json';
@@ -37,18 +40,21 @@ class DeployProgramController extends BaseController
     {
         $me = $this->requireAuth();
         $drillService = $this->deployDrillReminderService();
+        $champions = $this->normalizeChampionState($this->loadFile(self::FILE_CHAMPIONS));
+        $users     = $this->loadUserDirectory();
         $this->success([
             'data' => [
                 'program'   => $this->loadFile(self::FILE_PROGRAM),
                 'meetings'  => $this->loadFile(self::FILE_MEETINGS),
-                'champions' => $this->normalizeChampionState($this->loadFile(self::FILE_CHAMPIONS)),
+                'champions' => $champions,
                 'readiness' => $this->loadFile(self::FILE_READINESS),
                 'issues'    => $drillService->loadIssuesState(),
                 'drills'    => $drillService->loadDrillsState(),
                 'clauses'   => $this->loadFile(self::FILE_CLAUSES),
                 'audits'    => $this->loadFile(self::FILE_AUDITS),
                 'reviews'   => $this->loadFile(self::FILE_REVIEWS),
-                'users'     => $this->loadUserDirectory(),
+                'users'     => $users,
+                'docAccessAnalytics' => $this->docAccessAnalytics($champions, $users),
                 'me'        => [
                     'username' => (string)($me['username'] ?? ''),
                     'name'     => (string)($me['name'] ?? ''),
@@ -338,51 +344,39 @@ class DeployProgramController extends BaseController
         $me = $this->requireAuth();
         $this->requireAnyRole($me, self::EDIT_ROLES);
         $body = $this->jsonBody();
-        $drillService = $this->deployDrillReminderService();
-        $issues = $drillService->loadIssuesState();
-        $rows = is_array($issues['issues'] ?? null) ? $issues['issues'] : [];
+        $issues = $this->loadFile(self::FILE_ISSUES);
+        if (!isset($issues['issues']) || !is_array($issues['issues'])) $issues['issues'] = [];
 
-        $existing = null;
-        $existingIdx = null;
-        $id = trim((string)($body['id'] ?? ''));
-        if ($id !== '') {
-            foreach ($rows as $idx => $row) {
-                if (is_array($row) && (string)($row['id'] ?? '') === $id) {
-                    $existing = $row;
-                    $existingIdx = $idx;
-                    break;
-                }
+        $id = (string)($body['id'] ?? '');
+        $now = gmdate('c');
+        $payload = [
+            'id'        => $id !== '' ? $id : ('ISS-' . substr(md5($now . random_int(0, 999999)), 0, 8)),
+            'weekN'     => (int)($body['weekN'] ?? 0),
+            'sev'       => max(1, min(3, (int)($body['sev'] ?? 3))),
+            'deptId'    => (string)($body['deptId'] ?? ''),
+            'title'     => (string)($body['title'] ?? ''),
+            'owner'     => (string)($body['owner'] ?? ''),
+            'status'    => in_array($body['status'] ?? '', ['open', 'workaround', 'closed'], true) ? (string)$body['status'] : 'open',
+            'capaLink'  => (string)($body['capaLink'] ?? ''),
+            'openedAt'  => (string)($body['openedAt'] ?? $now),
+            'closedAt'  => (string)($body['status'] ?? '') === 'closed' ? $now : null,
+            'updatedAt' => $now,
+            'updatedBy' => (string)($me['username'] ?? ''),
+        ];
+
+        $replaced = false;
+        foreach ($issues['issues'] as &$is) {
+            if ((string)($is['id'] ?? '') === $payload['id']) {
+                $payload['openedAt'] = (string)($is['openedAt'] ?? $payload['openedAt']);
+                $is = $payload;
+                $replaced = true;
+                break;
             }
         }
-
-        try {
-            $payload = $drillService->buildIssuePayload(
-                $body,
-                $existing,
-                (string)($me['username'] ?? ''),
-                null,
-                $drillService->loadDrillsState(),
-            );
-        } catch (InvalidArgumentException $e) {
-            $this->error($e->getMessage(), 400);
-        }
-
-        if ($existingIdx !== null) {
-            $rows[$existingIdx] = $payload;
-        } else {
-            $rows[] = $payload;
-        }
-        $issues['issues'] = array_values($rows);
-        $issues['lastUpdated'] = gmdate('c');
-        $drillService->saveIssuesState($issues);
-        $issues = $drillService->loadIssuesState();
-        $this->audit('deploy.issue.save', $me, [
-            'id' => $payload['id'],
-            'sev' => $payload['sev'],
-            'status' => $payload['status'],
-            'source' => $payload['source'],
-            'drill_id' => (string)($payload['drillId'] ?? ''),
-        ]);
+        unset($is);
+        if (!$replaced) $issues['issues'][] = $payload;
+        $this->saveFile(self::FILE_ISSUES, $issues);
+        $this->audit('deploy.issue.save', $me, ['id' => $payload['id'], 'sev' => $payload['sev'], 'status' => $payload['status']]);
         $this->success(['data' => $issues, 'issue' => $payload]);
     }
 
@@ -391,32 +385,26 @@ class DeployProgramController extends BaseController
         $me = $this->requireAuth();
         $this->requireAnyRole($me, self::EDIT_ROLES);
         $body = $this->jsonBody();
-        try {
-            $result = $this->deployDrillReminderService()->recordDrillResult($body, (string)($me['username'] ?? ''));
-        } catch (InvalidArgumentException $e) {
-            $this->error($e->getMessage(), 400);
-        }
-        $payload = $result['drill'];
-        $this->audit('deploy.drill.record', $me, [
-            'dept' => (string)($payload['deptId'] ?? ''),
-            'seconds' => (int)($payload['seconds'] ?? 0),
-            'drill_id' => (string)($payload['id'] ?? ''),
-            'status' => (string)($payload['status'] ?? ''),
-        ]);
-        $this->success(['data' => $result['state'], 'drill' => $payload]);
-    }
+        $drills = $this->loadFile(self::FILE_DRILLS);
+        if (!isset($drills['drills']) || !is_array($drills['drills'])) $drills['drills'] = [];
 
-    public function runDrillReminders(): never
-    {
-        $me = $this->requireAuth();
-        $this->requireAnyRole($me, self::SIGNOFF_ROLES);
-        $result = $this->deployDrillReminderService()->runDaily();
-        $this->audit('deploy.drill.reminder.run', $me, [
-            'marked_overdue' => (int)($result['marked_overdue'] ?? 0),
-            'overdue_count' => (int)($result['overdue_count'] ?? 0),
-            'notification_sent' => !empty($result['notification_sent']) ? 1 : 0,
-        ]);
-        $this->success(['data' => $result]);
+        $seconds = (int)($body['seconds'] ?? 0);
+        $payload = [
+            'id'       => 'DRL-' . substr(md5(gmdate('c') . random_int(0, 999999)), 0, 8),
+            'date'     => (string)($body['date'] ?? gmdate('Y-m-d')),
+            'person'   => (string)($body['person'] ?? ''),
+            'deptId'   => (string)($body['deptId'] ?? ''),
+            'docCode'  => (string)($body['docCode'] ?? ''),
+            'seconds'  => $seconds,
+            'pass'     => $seconds > 0 && $seconds <= 180,
+            'note'     => (string)($body['note'] ?? ''),
+            'recordedBy' => (string)($me['username'] ?? ''),
+            'recordedAt' => gmdate('c'),
+        ];
+        $drills['drills'][] = $payload;
+        $this->saveFile(self::FILE_DRILLS, $drills);
+        $this->audit('deploy.drill.record', $me, ['dept' => $payload['deptId'], 'seconds' => $seconds]);
+        $this->success(['data' => $drills, 'drill' => $payload]);
     }
 
     public function saveAudit(): never
@@ -638,10 +626,9 @@ class DeployProgramController extends BaseController
             'checklistItems' => [],
             'lastUpdated'    => gmdate('c'),
         ]);
-        $drillService = $this->deployDrillReminderService();
         $this->saveFile(self::FILE_MEETINGS, ['version' => 1, 'meetings' => [], 'agendaTemplate' => $agendaTemplate]);
-        $drillService->saveIssuesState(['version' => 2, 'issues' => []]);
-        $drillService->resetDrillsStateFromBootstrap();
+        $this->saveFile(self::FILE_ISSUES, ['version' => 1, 'issues' => []]);
+        $this->saveFile(self::FILE_DRILLS, ['version' => 1, 'drills' => []]);
         $this->audit('deploy.state.reset', $me, ['program_progress_cleared' => 1]);
         $this->success(['data' => ['reset' => true]]);
     }
@@ -685,6 +672,20 @@ class DeployProgramController extends BaseController
         }
         usort($out, static fn($a, $b) => strcasecmp($a['name'], $b['name']));
         return $out;
+    }
+
+    /**
+     * @param array<string, mixed> $champions
+     * @param array<int, array<string, mixed>> $users
+     * @return array<string, mixed>
+     */
+    private function docAccessAnalytics(array $champions, array $users): array
+    {
+        try {
+            return (new DocAccessAnalyticsService($this->data))->summary($champions, $users);
+        } catch (Throwable $e) {
+            return DocAccessAnalyticsService::unavailable($e->getMessage());
+        }
     }
 
     // ── Helpers ─────────────────────────────────────────────────────────────

@@ -114,6 +114,24 @@ const DEPLOY_CONFIG = {
       method:'Diễn tập hàng tuần theo ANNEX-114: người dẫn dắt bốc ngẫu nhiên 5 tài liệu, đo thời gian từ lúc nhận yêu cầu đến khi mở đúng tài liệu. Lấy trung vị của 5 lượt.',
       escalation:'>240 giây → leo thang (chỉ mục tra cứu M365 hỏng hoặc đặt sai thư mục). 180–240 giây → bổ sung diễn tập trong tuần kế tiếp.'},
 
+    {id:'KPI-USE-01', label:'Tỉ lệ người dùng tích cực mở tài liệu', target:'>=80', unit:'%', short:'ND', live:true,
+      basis:'Server log doc_access_log · ISO 9001:2015 §7.5.3',
+      rationale:'Chỉ số này đo hành vi thật: người dùng đã mở SOP/WI qua server trong 7 ngày gần nhất, không dựa vào tự khai hoặc kết quả diễn tập.',
+      method:"SELECT COUNT(DISTINCT user_id) FROM doc_access_log WHERE access_at >= NOW() - INTERVAL '7 days' AND is_real. Tỉ lệ = số user mở ≥1 SOP/WI trong 7 ngày qua / tổng user.",
+      escalation:'<80% → người dẫn dắt phải kiểm tra lại điểm truy cập tài liệu, mã QR và huấn luyện tại chỗ trong tuần hiện tại.'},
+
+    {id:'KPI-USE-02', label:'Tài liệu chết — không ai mở 14 ngày', target:'<=10', unit:'%', short:'TL', live:true, action:'deadDocs',
+      basis:'Server log doc_access_log · danh mục SOP/WI bắt buộc',
+      rationale:'Tài liệu bắt buộc mà không ai mở trong 14 ngày là dấu hiệu người dùng không vận hành theo tài liệu hoặc đường truy cập tài liệu bị hỏng.',
+      method:'Tài liệu chết = SOP/WI bắt buộc có 0 user mở trong 14 ngày. Tỉ lệ = số tài liệu chết / tổng SOP/WI bắt buộc.',
+      escalation:'>10% → mở danh sách tài liệu chết, xác nhận chủ quản và khắc phục đường truy cập/đào tạo trong 7 ngày.'},
+
+    {id:'KPI-USE-03', label:'Người dẫn dắt sử dụng thực tế ≥ người thường', target:'>=150', unit:'%', short:'DD', live:true,
+      basis:'Server log doc_access_log · roster người dẫn dắt',
+      rationale:'Người dẫn dắt phải dùng tài liệu nhiều hơn người thường; nếu không, họ không thể kéo hành vi vận hành đúng tài liệu trong phòng ban.',
+      method:'Trong tuần, so sánh số lượt mở SOP/WI trung bình mỗi người dẫn dắt với trung bình mỗi user không phải người dẫn dắt. Mục tiêu ≥150%.',
+      escalation:'<150% → yêu cầu người dẫn dắt mở/điều hướng tài liệu trong nhịp họp và OJT, không chỉ ký xác nhận đào tạo.'},
+
     {id:'KPI-TRN-01', label:'Hoàn thành đào tạo',         target:'>=90', unit:'%', short:'ĐT',
       basis:'ISO 9001:2015 §7.2 · Prosci ADKAR ROI 2023',
       rationale:'Mục tiêu ≥90% (không phải 100%) chấp nhận vắng mặt rải rác (nghỉ phép, ốm, người mới vào). Prosci ROI 2023: sáng kiến thay đổi có tỉ lệ hoàn thành đào tạo <80% bị mất một nửa mức áp dụng.',
@@ -216,10 +234,13 @@ const DeployState = {
   clauses: null,
   audits: null,
   reviews: null,
+  docAccessAnalytics: null,
   users: [],
   me: {username:'', name:'', role:'', canSignOff:false, canEdit:false},
   activeTab: 'overview',
   activeWeek: null, // when not null, week side panel is open
+  deadDocsOpen: false,
+  refreshTimer: null,
   picker: null,     // {deptId, slot, query, roleFilter} when modal open
   formDialog: null, // {title, kicker, fields, submitLabel, accentColor, onSubmit} when dialog open
 };
@@ -252,6 +273,7 @@ async function loadDeployState(){
     DeployState.clauses   = d.clauses   || {clauses:[]};
     DeployState.audits    = d.audits    || {audits:[]};
     DeployState.reviews   = d.reviews   || {reviews:[], inputTemplate:[], outputTemplate:[]};
+    DeployState.docAccessAnalytics = d.docAccessAnalytics || {available:false, lastAccessByDoc:{}};
     DeployState.users     = Array.isArray(d.users) ? d.users : [];
     DeployState.me        = d.me        || DeployState.me;
     DeployState.loaded    = true;
@@ -372,6 +394,12 @@ async function deployOpenDoc(code){
           }
           return false;
         }
+        const href = deployDocStreamHref(doc, 'portal', false);
+        if (href && typeof window.open === 'function') {
+          deployCloseWeekPanelForDocOpen();
+          window.open(href, '_blank', 'noopener');
+          return true;
+        }
         deployCloseWeekPanelForDocOpen();
         await window.openDoc(doc);
         return true;
@@ -379,7 +407,7 @@ async function deployOpenDoc(code){
     }
     const staticDoc = deployStaticDocByCode(target);
     if (staticDoc && staticDoc.path && typeof window !== 'undefined' && typeof window.open === 'function') {
-      window.open(staticDoc.path, '_blank', 'noopener');
+      window.open(deployDocStreamHref(staticDoc, 'portal', false) || staticDoc.path, '_blank', 'noopener');
       return true;
     }
     if (typeof window !== 'undefined' && typeof window.alert === 'function') {
@@ -419,7 +447,7 @@ async function deployFetchPlaybook(code){
       // Try doc_stream first (respects auth + DCC pipeline); fall back to direct
       // path so a missing doc_stream registration doesn't kill the brief.
       const tryUrls = [
-        `api.php?action=doc_stream&path=${encodeURIComponent(path)}&code=${encodeURIComponent(code)}`,
+        `api.php?action=doc_stream&path=${encodeURIComponent(path)}&code=${encodeURIComponent(code)}&source=portal`,
         '/' + path,
       ];
       let html = '';
@@ -670,6 +698,126 @@ function deployKpiRag(kpi, value){
   }
   return 'none';
 }
+function deployIsSopWi(code){
+  return /^(SOP|WI)-/i.test(String(code || '').trim());
+}
+function deployDocStreamHref(item, source='portal', drillMode=false){
+  const doc = (typeof item === 'string') ? deployStaticDocByCode(item) : item;
+  if (!doc) return '';
+  let path = String(doc.path || doc.file || doc.href || '').trim();
+  if (!path) return '';
+  path = path.replace(/^(\.\.\/)+/, '').replace(/^\.\//, '').replace(/^\//, '');
+  const code = String(doc.code || doc.docCode || (typeof item === 'string' ? item : '') || '').trim();
+  const qs = new URLSearchParams({
+    action: 'doc_stream',
+    path,
+    code,
+    source: source || 'portal',
+  });
+  if (drillMode) qs.set('drill_mode', '1');
+  return 'api.php?' + qs.toString();
+}
+function deployDocAccessAnalytics(){
+  return DeployState.docAccessAnalytics || {available:false, lastAccessByDoc:{}};
+}
+function deployDocAccessMap(){
+  const raw = deployDocAccessAnalytics().lastAccessByDoc || {};
+  if (Array.isArray(raw)) {
+    return raw.reduce((acc, row) => {
+      const code = String(row && (row.docCode || row.doc_code) || '').trim().toUpperCase();
+      if (code) acc[code] = row;
+      return acc;
+    }, {});
+  }
+  return raw;
+}
+function deployRequiredSopWiDocs(){
+  const byCode = new Map();
+  const addDoc = (doc, owner) => {
+    if (!doc) return;
+    const code = String(doc.code || doc.docCode || doc).trim().toUpperCase();
+    if (!deployIsSopWi(code) || byCode.has(code)) return;
+    byCode.set(code, {
+      code,
+      title: String(doc.title || ''),
+      path: String(doc.path || doc.file || ''),
+      owner: String(doc.owner || owner || '—'),
+    });
+  };
+
+  (DEPLOY_CONFIG.docsByGroup || []).forEach(group => {
+    (group.items || []).forEach(doc => addDoc(doc, group.title));
+  });
+  deployActiveDepartments().forEach(dept => {
+    (dept.docs || []).forEach(doc => addDoc(doc, dept.owner || dept.label));
+  });
+  ((DeployState.program && DeployState.program.weeks) || []).forEach(week => {
+    (week.requiredDocs || week.docs || []).forEach(doc => {
+      if (typeof doc === 'string') addDoc({code: doc}, week.label || 'Chương trình triển khai');
+      else addDoc(doc, week.label || 'Chương trình triển khai');
+    });
+  });
+
+  return Array.from(byCode.values()).sort((a, b) => a.code.localeCompare(b.code));
+}
+function deployDeadDocs(){
+  const access = deployDocAccessMap();
+  return deployRequiredSopWiDocs().filter(doc => {
+    const row = access[doc.code] || {};
+    return deployNum(row.realAccess14d || row.real_access_14d || 0) <= 0;
+  }).map(doc => {
+    const row = access[doc.code] || {};
+    return {
+      ...doc,
+      lastAccessAt: String(row.lastAccessAt || row.last_access_at || ''),
+    };
+  });
+}
+function deployLiveKpiValue(kpi, kv){
+  if (!kpi || !kpi.live) return kv ? kv[kpi.id] : '';
+  const analytics = deployDocAccessAnalytics();
+  if (!analytics.available) return '';
+  if (kpi.id === 'KPI-USE-01') {
+    return analytics.activeUserRatePct == null ? '' : String(Math.round(Number(analytics.activeUserRatePct)));
+  }
+  if (kpi.id === 'KPI-USE-02') {
+    const total = deployRequiredSopWiDocs().length;
+    if (!total) return '';
+    return String(Math.round((deployDeadDocs().length * 100) / total));
+  }
+  if (kpi.id === 'KPI-USE-03') {
+    return analytics.championUsageRatioPct == null ? '' : String(Math.round(Number(analytics.championUsageRatioPct)));
+  }
+  return '';
+}
+function deployKpiDisplayValue(kpi, kv){
+  return deployLiveKpiValue(kpi, kv || {});
+}
+function deployKpiLiveMeta(kpi){
+  const analytics = deployDocAccessAnalytics();
+  if (!analytics.available) return 'Chưa có dữ liệu server log';
+  if (kpi.id === 'KPI-USE-01') {
+    const active = analytics.activeUsers7d == null ? '—' : analytics.activeUsers7d;
+    const total = analytics.totalUsers == null ? '—' : analytics.totalUsers;
+    return `${active}/${total} user mở SOP/WI trong 7 ngày`;
+  }
+  if (kpi.id === 'KPI-USE-02') {
+    return `${deployDeadDocs().length}/${deployRequiredSopWiDocs().length} SOP/WI bắt buộc không có lượt mở thật trong 14 ngày`;
+  }
+  if (kpi.id === 'KPI-USE-03') {
+    const champion = analytics.championAccessCount7d == null ? '—' : analytics.championAccessCount7d;
+    const other = analytics.nonChampionAccessCount7d == null ? '—' : analytics.nonChampionAccessCount7d;
+    return `${champion} lượt người dẫn dắt · ${other} lượt user khác trong 7 ngày`;
+  }
+  return '';
+}
+function deployKpiSnapshotValues(){
+  const kv = {...((DeployState.readiness && DeployState.readiness.kpiValues) || {})};
+  DEPLOY_CONFIG.kpis.forEach(kpi => {
+    if (kpi.live) kv[kpi.id] = deployKpiDisplayValue(kpi, kv);
+  });
+  return kv;
+}
 function deployChampionCount(){
   let pass = 0;
   deployActiveDepartments().forEach(dept => {
@@ -717,43 +865,16 @@ function deployChecklistDoneCount(phaseId){
   items.forEach((it) => { if (cl[it.code]) done++; });
   return {done, total: items.length};
 }
-function deployIssueSource(issue){
-  const source = String(issue && issue.source || 'real').toLowerCase();
-  return ['real','drill','audit'].includes(source) ? source : 'real';
-}
-function deployIssuesBySource(source){
+function deployIssuesOpen(){
   const list = (DeployState.issues && DeployState.issues.issues) || [];
-  if (!source) return list;
-  return list.filter(i => deployIssueSource(i) === source);
-}
-function deployIssuesOpen(source){
-  return deployIssuesBySource(source).filter(i => (i.status || 'open') !== 'closed');
-}
-function deployOverdueDrills(deptId){
-  const list = (DeployState.drills && DeployState.drills.drills) || [];
-  const wantedDept = deptId ? deployNormalizeDeptId(deptId) : '';
-  return list.filter(d => {
-    const isOverdue = String(d.status || '') === 'overdue';
-    const sameDept = !wantedDept || deployNormalizeDeptId(d.deptId || '') === wantedDept;
-    return isOverdue && sameDept;
-  });
-}
-function deployRecordedDrills(){
-  const list = (DeployState.drills && DeployState.drills.drills) || [];
-  return list.filter(d => !!(d.recordedAt || d.person || d.seconds || d.medianSeconds != null || d.totalCount != null));
-}
-function deployDrillLabel(d){
-  const dept = deployGetDept(d.deptId);
-  const type = d.drillType ? String(d.drillType).replace(/_/g, ' ') : 'drill';
-  return `${d.id || 'DRL'} · W${d.weekN|0} · ${dept ? dept.label : (d.deptId || '—')} · ${type} · ${d.scheduledAt || '—'}`;
+  return list.filter(i => (i.status || 'open') !== 'closed');
 }
 function deployRedSignals(){
   let red = 0;
   deployActiveDepartments().forEach(d => { if (deployDeptHasBlocker(d.id)) red++; });
-  const kv = (DeployState.readiness && DeployState.readiness.kpiValues) || {};
-  DEPLOY_CONFIG.kpis.forEach(k => { if (deployKpiRag(k, kv[k.id]) === 'red') red++; });
+  const kv = deployKpiSnapshotValues();
+  DEPLOY_CONFIG.kpis.forEach(k => { if (deployKpiRag(k, deployKpiDisplayValue(k, kv)) === 'red') red++; });
   red += deployNum(kv.sev1Open);
-  red += deployOverdueDrills().length;
   return red;
 }
 
@@ -761,6 +882,22 @@ function deployRedSignals(){
 function switchDeployTab(tab){
   DeployState.activeTab = tab;
   renderDeployDashboard();
+}
+function deployToggleDeadDocs(){
+  DeployState.deadDocsOpen = !DeployState.deadDocsOpen;
+  renderDeployDashboard();
+}
+function deployStartAutoRefresh(){
+  if (DeployState.refreshTimer || typeof window === 'undefined') return;
+  DeployState.refreshTimer = window.setInterval(async () => {
+    if (!document.getElementById('page-deploy')) return;
+    try{
+      await loadDeployState();
+      renderDeployDashboard();
+    }catch(e){
+      console.warn('[deploy] auto refresh failed', e && e.message);
+    }
+  }, 300000);
 }
 
 // ── Render: hero + summary ────────────────────────────────────────────────
@@ -809,9 +946,7 @@ function renderDeploySummary(){
   const chPct = chTarget ? Math.min(100, Math.round((chPass / chTarget) * 100)) : 0;
   const blocked = activeDepts.filter(d => deployDeptHasBlocker(d.id)).length;
   const red = deployRedSignals();
-  const realIssuesOpen = deployIssuesOpen('real').length;
-  const drillIssuesOpen = deployIssuesOpen('drill').length;
-  const drillOverdue = deployOverdueDrills().length;
+  const issuesOpen = deployIssuesOpen().length;
   return `
   <section class="deploy-summary-grid">
     <div class="deploy-summary-card">
@@ -824,22 +959,24 @@ function renderDeploySummary(){
       <strong>${chPct}%</strong>
       <div>${chPass}/${chTarget} đã đạt</div>
     </div>
-    <div class="deploy-summary-card ${realIssuesOpen > 0 ? 'summary-alert' : ''}">
-      <span class="summary-label">Sự cố thật đang mở</span>
-      <strong>${realIssuesOpen}</strong>
-      <div>Diễn tập ${drillIssuesOpen} · Drill quá hạn ${drillOverdue}</div>
+    <div class="deploy-summary-card">
+      <span class="summary-label">Vấn đề đang mở</span>
+      <strong>${issuesOpen}</strong>
+      <div>Bảng nghiêm trọng đang theo dõi</div>
     </div>
     <div class="deploy-summary-card ${red > 0 ? 'summary-alert' : ''}">
       <span class="summary-label">Tín hiệu đỏ</span>
       <strong>${red}</strong>
-      <div>${blocked} phòng chặn · ${red - blocked} KPI/sev/drill đỏ</div>
+      <div>${blocked} phòng chặn · ${red - blocked} KPI/sev đỏ</div>
     </div>
   </section>`;
 }
 
 // ── Tab 1: Overview ───────────────────────────────────────────────────────
 function renderTabOverview(){
-  const kv = (DeployState.readiness && DeployState.readiness.kpiValues) || {};
+  const kv = deployKpiSnapshotValues();
+  const analytics = deployDocAccessAnalytics();
+  const refreshLabel = analytics.generatedAt ? `Server log · refresh 5 phút · cập nhật ${deployIsoToVi(analytics.generatedAt)}` : 'Server log · refresh 5 phút';
   return `
   <div class="deploy-tab-panel active" id="dtab-overview">
     <section class="deploy-section">
@@ -860,12 +997,11 @@ function renderTabOverview(){
       </div>
     </section>
     <section class="deploy-section">
-      <div class="deploy-section-head"><h2>KPI triển khai</h2><span>${DeployState.me.canEdit ? 'Nhập giá trị thực tế' : 'Chỉ đọc — không có quyền edit'}</span></div>
+      <div class="deploy-section-head"><h2>KPI triển khai</h2><span>${refreshLabel}</span></div>
       <div class="kpi-mini-grid">
-        ${renderDrillOverdueKpiCard()}
-        ${renderIssueSourceKpiCards()}
-        ${DEPLOY_CONFIG.kpis.map(k => renderKpiCard(k, kv[k.id])).join('')}
+        ${DEPLOY_CONFIG.kpis.map(k => renderKpiCard(k, deployKpiDisplayValue(k, kv))).join('')}
       </div>
+      ${renderDeadDocsPanel()}
     </section>
     <section class="deploy-section">
       <div class="deploy-section-head"><h2>Cadence điều hành</h2><span>Nhịp họp cố định</span></div>
@@ -896,48 +1032,16 @@ function renderPhaseNode(phase){
   </button>`;
 }
 
-function renderDrillOverdueKpiCard(){
-  const overdue = deployOverdueDrills();
-  const rag = overdue.length > 0 ? 'red' : 'green';
-  return `
-  <div class="kpi-mini-card kpi-rag-${rag}">
-    <div class="kpi-card-header">
-      <div class="kpi-mini-icon">DR</div>
-      <span class="kpi-mini-target">Target 0</span>
-    </div>
-    <div class="kpi-mini-label">Drill quá hạn</div>
-    <strong class="kpi-mini-input" style="display:block;line-height:32px;">${overdue.length}</strong>
-    <div class="kpi-tip-row">${overdue.length ? overdue.slice(0, 3).map(d => deployEscape(deployDrillLabel(d))).join('<br>') : 'Không có drill quá hạn'}</div>
-  </div>`;
-}
-
-function renderIssueSourceKpiCards(){
-  const realOpen = deployIssuesOpen('real').length;
-  const drillOpen = deployIssuesOpen('drill').length;
-  const auditOpen = deployIssuesOpen('audit').length;
-  return `
-  <div class="kpi-mini-card kpi-rag-${realOpen ? 'red' : 'green'}">
-    <div class="kpi-card-header"><div class="kpi-mini-icon">SC</div><span class="kpi-mini-target">Production</span></div>
-    <div class="kpi-mini-label">Sự cố thật đang mở</div>
-    <strong class="kpi-mini-input" style="display:block;line-height:32px;">${realOpen}</strong>
-  </div>
-  <div class="kpi-mini-card kpi-rag-${drillOpen ? 'amber' : 'green'}">
-    <div class="kpi-card-header"><div class="kpi-mini-icon">DT</div><span class="kpi-mini-target">Drill</span></div>
-    <div class="kpi-mini-label">Sự cố diễn tập đang mở</div>
-    <strong class="kpi-mini-input" style="display:block;line-height:32px;">${drillOpen}</strong>
-  </div>
-  <div class="kpi-mini-card kpi-rag-${auditOpen ? 'amber' : 'green'}">
-    <div class="kpi-card-header"><div class="kpi-mini-icon">AU</div><span class="kpi-mini-target">Audit</span></div>
-    <div class="kpi-mini-label">Phát hiện audit đang mở</div>
-    <strong class="kpi-mini-input" style="display:block;line-height:32px;">${auditOpen}</strong>
-  </div>`;
-}
-
 function renderKpiCard(kpi, value){
   const v = value == null ? '' : String(value);
   const rag = deployKpiRag(kpi, v);
-  const ro = !DeployState.me.canEdit;
+  const live = !!kpi.live;
+  const ro = live || !DeployState.me.canEdit;
   const hasTip = !!(kpi.rationale || kpi.basis || kpi.method);
+  const liveMeta = live ? deployKpiLiveMeta(kpi) : '';
+  const actionHtml = kpi.action === 'deadDocs'
+    ? `<button class="deploy-btn deploy-btn-sm" type="button" onclick="deployToggleDeadDocs()">${DeployState.deadDocsOpen ? 'Đóng danh sách' : 'Mở danh sách'}</button>`
+    : '';
   // Build rationale tooltip body. Uses an <aside> floating beside the card on
   // hover (CSS-only). Native `title=` on the input is also set so screen-
   // readers and keyboard-focus users get the same content.
@@ -961,9 +1065,44 @@ function renderKpiCard(kpi, value){
       <span class="kpi-mini-target">Target ${deployEscape(kpi.target)}${deployEscape(kpi.unit)}</span>
     </div>
     <div class="kpi-mini-label">${deployEscape(kpi.label)}</div>
-    <input type="text" class="kpi-mini-input" value="${deployEscape(v)}" placeholder="—" ${ro ? 'disabled' : ''} title="${deployEscape(titleAttr)}" onchange="deployUpdateMetric('${deployEscape(kpi.id)}', this.value)">
+    <input type="text" class="kpi-mini-input" value="${deployEscape(v)}" placeholder="—" ${ro ? 'disabled' : ''} title="${deployEscape(titleAttr)}" ${live ? '' : `onchange="deployUpdateMetric('${deployEscape(kpi.id)}', this.value)"`}>
+    ${liveMeta ? `<small class="kpi-live-meta">${deployEscape(liveMeta)}</small>` : ''}
+    ${actionHtml}
     ${tipHtml}
   </div>`;
+}
+
+function renderDeadDocsPanel(){
+  if (!DeployState.deadDocsOpen) return '';
+  if (!deployDocAccessAnalytics().available) {
+    return '<div class="deploy-empty">Chưa có dữ liệu server log doc_access_log để mở danh sách tài liệu chết.</div>';
+  }
+  const rows = deployDeadDocs();
+  return `
+    <div class="deploy-table-wrap dead-docs-panel">
+      <table class="deploy-heatmap dead-docs-table">
+        <thead>
+          <tr>
+            <th>Mã tài liệu</th>
+            <th>Tên</th>
+            <th>Ngày mở cuối</th>
+            <th>Người chủ quản</th>
+            <th>Mở</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.map(doc => `
+            <tr>
+              <td><strong>${deployEscape(doc.code)}</strong></td>
+              <td>${deployEscape(doc.title || '—')}</td>
+              <td>${doc.lastAccessAt ? deployIsoToVi(doc.lastAccessAt) : 'Chưa có lượt mở thật'}</td>
+              <td>${deployEscape(doc.owner || '—')}</td>
+              <td>${doc.path ? `<a class="deploy-btn deploy-btn-sm" href="${deployEscape(deployDocStreamHref(doc, 'portal', false))}" target="_blank" rel="noopener">Mở</a>` : '—'}</td>
+            </tr>`).join('')}
+          ${rows.length === 0 ? '<tr><td colspan="5">Không có SOP/WI bắt buộc nào bị chết theo log 14 ngày.</td></tr>' : ''}
+        </tbody>
+      </table>
+    </div>`;
 }
 
 // ── Tab 2: Lộ trình (Timeline) ────────────────────────────────────────────
@@ -1169,15 +1308,13 @@ function renderWaveColumn(wave){
     <div class="wave-card-body">
       ${depts.map(d => {
         const pct = Math.round(deployDeptProgress(d.id) * 100);
-        const overdueCount = deployOverdueDrills(d.id).length;
-        const overdueStyle = overdueCount ? ' style="border:1px solid var(--c-red);background:#fef2f2;"' : '';
         return `
-        <div class="wave-dept-row"${overdueStyle}>
+        <div class="wave-dept-row">
           <div class="wave-dept-main">
             <span class="wave-color" style="background:${d.color}"></span>
             <span>${deployEscape(d.label)}</span>
           </div>
-          <span class="wave-score">${overdueCount ? `Quá hạn ${overdueCount}` : pct + '%'}</span>
+          <span class="wave-score">${pct}%</span>
         </div>`;
       }).join('')}
     </div>
@@ -1210,14 +1347,11 @@ function renderReadinessRow(dept){
 function renderChampionCard(dept){
   const ch = deployChampionRecord(dept.id);
   const ro = !DeployState.me.canEdit;
-  const overdueCount = deployOverdueDrills(dept.id).length;
-  const overdueStyle = overdueCount ? ' style="border-color:var(--c-red);box-shadow:0 0 0 1px rgba(220,38,38,.18);"' : '';
   return `
-  <div class="champion-card"${overdueStyle}>
+  <div class="champion-card">
     <div class="champion-card-head">
       <span class="wave-color" style="background:${dept.color}"></span>
       <strong>${deployEscape(dept.label)}</strong>
-      ${overdueCount ? `<span class="issue-sev-badge" title="Drill quá hạn của phòng">${overdueCount} drill quá hạn</span>` : ''}
       <span class="champion-shift">Ca ${deployEscape(ch.shift || 'A')}</span>
       ${!ro ? `<button class="deploy-btn-link champion-card-remove" type="button" onclick="deployRemoveDepartment('${dept.id}')" title="Bớt phòng ban khỏi roster">✕</button>` : ''}
     </div>
@@ -1300,11 +1434,8 @@ function findUserForChampionPerson(person){
 
 // ── Tab 5: Tài liệu ───────────────────────────────────────────────────────
 function renderTabDocs(){
-  const allDrills = ((DeployState.drills && DeployState.drills.drills) || []).slice();
-  const recordedDrills = deployRecordedDrills().slice().sort((a,b) => (b.recordedAt || '').localeCompare(a.recordedAt || ''));
-  const pendingDrills = allDrills.filter(d => ['scheduled','overdue'].includes(String(d.status || ''))).sort((a,b) => String(a.scheduledAt || '').localeCompare(String(b.scheduledAt || '')));
-  const overdue = deployOverdueDrills();
-  const drillStats = computeDrillStats(recordedDrills);
+  const drills = ((DeployState.drills && DeployState.drills.drills) || []).slice().sort((a,b) => (b.recordedAt || '').localeCompare(a.recordedAt || ''));
+  const drillStats = computeDrillStats(drills);
   return `
   <div class="deploy-tab-panel active" id="dtab-docs">
     <section class="deploy-section">
@@ -1316,7 +1447,7 @@ function renderTabDocs(){
             <p>${deployEscape(g.subtitle)}</p>
             <div class="doc-group-links">
               ${g.items.map(it => `
-                <a class="deploy-doc-card" href="${deployEscape(it.path)}" target="_blank">
+                <a class="deploy-doc-card" href="${deployEscape(deployDocStreamHref(it, 'portal', false) || it.path)}" target="_blank" rel="noopener">
                   <span class="deploy-doc-code">${deployEscape(it.code)}</span>
                   <span class="deploy-doc-title">${deployEscape(it.title)}</span>
                 </a>`).join('')}
@@ -1325,13 +1456,9 @@ function renderTabDocs(){
       </div>
     </section>
     <section class="deploy-section">
-      <div class="deploy-section-head"><h2>Diễn tập tra cứu tài liệu · KPI ≤3 phút</h2><span>${drillStats.total} lượt ghi nhận · đạt ${drillStats.passPct}% · quá hạn ${overdue.length}</span></div>
+      <div class="deploy-section-head"><h2>Diễn tập tra cứu tài liệu · KPI ≤3 phút</h2><span>${drillStats.total} lượt · đạt ${drillStats.passPct}%</span></div>
       <div class="drill-recorder">
         <form onsubmit="event.preventDefault(); deployRecordDrill();" class="drill-form" id="deployDrillForm">
-          <select id="drillId" ${DeployState.me.canEdit?'':'disabled'}>
-            <option value="">— Chọn lịch drill —</option>
-            ${pendingDrills.map(d => `<option value="${deployEscape(d.id)}">${deployEscape(deployDrillLabel(d))}${d.status === 'overdue' ? ' · QUÁ HẠN' : ''}</option>`).join('')}
-          </select>
           <input type="date" id="drillDate" value="${deployTodayIso()}" ${DeployState.me.canEdit?'':'disabled'}>
           <input type="text" id="drillPerson" placeholder="Người thực hiện" ${DeployState.me.canEdit?'':'disabled'}>
           <select id="drillDept" ${DeployState.me.canEdit?'':'disabled'}>
@@ -1343,15 +1470,14 @@ function renderTabDocs(){
           <button type="submit" class="deploy-btn" ${DeployState.me.canEdit?'':'disabled'}>Ghi lượt diễn tập</button>
         </form>
         <div class="drill-log">
-          ${overdue.length ? `<div class="deploy-empty" style="border-color:var(--c-red);background:#fef2f2;color:var(--c-red);">Drill quá hạn: ${overdue.slice(0, 5).map(d => deployEscape(d.id)).join(', ')}${overdue.length > 5 ? '…' : ''}</div>` : ''}
-          ${recordedDrills.slice(0, 10).map(d => `
+          ${drills.slice(0, 10).map(d => `
             <div class="drill-row drill-${d.pass ? 'pass' : 'fail'}">
               <span class="drill-pass-icon">${d.pass ? '✓' : '✗'}</span>
               <span class="drill-meta"><strong>${deployEscape(d.person)}</strong> · ${deployEscape(d.deptId)} · ${deployEscape(d.docCode)}</span>
               <span class="drill-seconds">${d.seconds}s</span>
               <small>${deployFmtDate(d.date)}</small>
             </div>`).join('')}
-          ${recordedDrills.length === 0 ? '<div class="deploy-empty">Chưa có lượt diễn tập nào. Mục tiêu KPI: ≤180 giây (3 phút).</div>' : ''}
+          ${drills.length === 0 ? '<div class="deploy-empty">Chưa có lượt diễn tập nào. Mục tiêu KPI: ≤180 giây (3 phút).</div>' : ''}
         </div>
       </div>
     </section>
@@ -1367,44 +1493,21 @@ function computeDrillStats(drills){
 // ── Tab 6: Issues ─────────────────────────────────────────────────────────
 function renderTabIssues(){
   const issues = ((DeployState.issues && DeployState.issues.issues) || []).slice().sort((a,b) => (a.sev|0) - (b.sev|0) || (b.updatedAt||'').localeCompare(a.updatedAt||''));
-  const realIssues = issues.filter(i => deployIssueSource(i) === 'real');
-  const drillIssues = issues.filter(i => deployIssueSource(i) === 'drill');
-  const auditIssues = issues.filter(i => deployIssueSource(i) === 'audit');
-  const open = realIssues.filter(i => i.status !== 'closed').length;
-  const closed = realIssues.length - open;
+  const open = issues.filter(i => i.status !== 'closed').length;
+  const closed = issues.length - open;
   return `
   <div class="deploy-tab-panel active" id="dtab-issues">
     <section class="deploy-section">
       <div class="deploy-section-head">
-        <h2>Báo cáo sự cố sản xuất thật · ${open} mở · ${closed} đã đóng</h2>
-        <span>Không tính issue source=drill</span>
+        <h2>Sổ vấn đề · ${open} mở · ${closed} đã đóng</h2>
+        <span>Bảng nghiêm trọng đang theo dõi</span>
       </div>
       <div class="issue-toolbar">
         ${DeployState.me.canEdit ? `<button class="deploy-btn" onclick="deployOpenIssueForm()">+ Ghi vấn đề mới</button>` : ''}
       </div>
       <div class="issue-list">
-        ${realIssues.length === 0 ? '<div class="deploy-empty">Chưa có sự cố sản xuất thật nào.</div>' : ''}
-        ${realIssues.map(i => renderIssueRow(i)).join('')}
-      </div>
-    </section>
-    <section class="deploy-section">
-      <div class="deploy-section-head">
-        <h2>Sự cố diễn tập · ${drillIssues.filter(i => i.status !== 'closed').length} mở</h2>
-        <span>Auditor đối chiếu bằng drillId</span>
-      </div>
-      <div class="issue-list">
-        ${drillIssues.length === 0 ? '<div class="deploy-empty">Chưa có issue phát sinh từ drill.</div>' : ''}
-        ${drillIssues.map(i => renderIssueRow(i)).join('')}
-      </div>
-    </section>
-    <section class="deploy-section">
-      <div class="deploy-section-head">
-        <h2>Phát hiện audit · ${auditIssues.filter(i => i.status !== 'closed').length} mở</h2>
-        <span>Nguồn audit không trộn với sự cố sản xuất</span>
-      </div>
-      <div class="issue-list">
-        ${auditIssues.length === 0 ? '<div class="deploy-empty">Chưa có issue nguồn audit.</div>' : ''}
-        ${auditIssues.map(i => renderIssueRow(i)).join('')}
+        ${issues.length === 0 ? '<div class="deploy-empty">Chưa có vấn đề nào. Bảng nghiêm trọng sẽ kích hoạt khi pilot bắt đầu (W4).</div>' : ''}
+        ${issues.map(i => renderIssueRow(i)).join('')}
       </div>
     </section>
   </div>`;
@@ -1412,12 +1515,9 @@ function renderTabIssues(){
 
 function renderIssueRow(i){
   const dept = deployGetDept(i.deptId);
-  const source = deployIssueSource(i);
-  const sourceLabel = source === 'drill' ? `Drill ${i.drillId || '—'}` : source === 'audit' ? 'Audit' : 'Real';
   return `
-  <div class="issue-row issue-sev-${i.sev|0} issue-status-${deployEscape(i.status||'open')} issue-source-${source}">
+  <div class="issue-row issue-sev-${i.sev|0} issue-status-${deployEscape(i.status||'open')}">
     <span class="issue-sev-badge">SEV-${i.sev|0}</span>
-    <span class="issue-sev-badge">${deployEscape(sourceLabel)}</span>
     <div class="issue-main">
       <strong>${deployEscape(i.title)}</strong>
       <div class="issue-meta">
@@ -1674,7 +1774,7 @@ function renderWeekPanel(){
   const meetings = (DeployState.meetings && DeployState.meetings.meetings) || [];
   const existingMeeting = meetings.find(m => (m.weekN|0) === wn);
   const issues = ((DeployState.issues && DeployState.issues.issues) || []).filter(i => (i.weekN|0) === wn);
-  const kv = (DeployState.readiness && DeployState.readiness.kpiValues) || {};
+  const kv = deployKpiSnapshotValues();
 
   return `
   <div class="deploy-week-overlay" onclick="deployCloseWeek(event)">
@@ -2359,7 +2459,7 @@ async function deploySaveMeeting(weekN){
   const attendees = (document.getElementById('dwpAttendees')?.value || '').split(',').map(s => s.trim()).filter(Boolean);
   const minutes = document.getElementById('dwpMinutes')?.value || '';
   const decisions = (document.getElementById('dwpDecisions')?.value || '').split('\n').map(s => s.trim()).filter(Boolean);
-  const kv = (DeployState.readiness && DeployState.readiness.kpiValues) || {};
+  const kv = deployKpiSnapshotValues();
   const existing = ((DeployState.meetings?.meetings) || []).find(m => (m.weekN|0) === (weekN|0));
   try{
     const res = await deployApi('deploy_meeting_save', {
@@ -2446,15 +2546,6 @@ function deployOpenIssueForm(existing){
           {value:'2', label:'Sev-2 — Ảnh hưởng lớn / High'},
           {value:'3', label:'Sev-3 — Bất tiện / Low'},
         ]},
-      {key:'source', label:'Nguồn issue', type:'select', required:true, value: existing?.source || 'real',
-        options: [
-          {value:'real', label:'Sự cố sản xuất thật'},
-          {value:'drill', label:'Phát sinh từ diễn tập'},
-          {value:'audit', label:'Phát hiện audit'},
-        ],
-        hint:'source=drill bắt buộc chọn drillId để auditor tách khỏi sự cố thật.'},
-      {key:'drillId', label:'Drill liên quan', type:'select', value: existing?.drillId || '',
-        options: [{value:'', label:'— Không áp dụng —'}].concat(((DeployState.drills && DeployState.drills.drills) || []).map(d => ({value:d.id, label:deployDrillLabel(d)})))},
       {key:'deptId', label:'Phòng ban', type:'select', required:true, value: existing?.deptId || deployDefaultDeptId(),
         options: deployActiveDepartments().map(d => ({value:d.id, label: d.label}))},
       {key:'owner', label:'Owner xử lý', type:'text', required:true,
@@ -2472,24 +2563,16 @@ function deployOpenIssueForm(existing){
       {key:'capaLink', label:'Link CAPA (nếu có)', type:'text', value: existing?.capaLink || '',
         placeholder:'/portal.html#eqms?capa=CAPA-...', hint:'Nếu Sev-1/2, dùng nút "→ CAPA" để tự sinh stub.'},
     ],
-    onSubmit: (v) => {
-      if (v.source === 'drill' && !v.drillId) {
-        alert('Issue nguồn diễn tập phải chọn drillId.');
-        return;
-      }
-      return deploySaveIssue({
-        ...(existing || {}),
-        title: v.title,
-        sev: parseInt(v.sev, 10) || 3,
-        deptId: v.deptId,
-        owner: v.owner,
-        weekN: parseInt(v.weekN, 10) || 0,
-        status: v.status,
-        source: v.source || 'real',
-        drillId: v.source === 'drill' ? v.drillId : null,
-        capaLink: v.capaLink || '',
-      });
-    },
+    onSubmit: (v) => deploySaveIssue({
+      ...(existing || {}),
+      title: v.title,
+      sev: parseInt(v.sev, 10) || 3,
+      deptId: v.deptId,
+      owner: v.owner,
+      weekN: parseInt(v.weekN, 10) || 0,
+      status: v.status,
+      capaLink: v.capaLink || '',
+    }),
   });
 }
 
@@ -2516,7 +2599,6 @@ async function deployUpdateIssueStatus(id, status){
 
 async function deployRecordDrill(){
   const f = id => document.getElementById(id);
-  const drillId = f('drillId')?.value || '';
   const date = f('drillDate').value;
   const person = f('drillPerson').value.trim();
   const deptId = f('drillDept').value;
@@ -2524,7 +2606,7 @@ async function deployRecordDrill(){
   const seconds = parseInt(f('drillSeconds').value, 10) || 0;
   if (!person || !deptId || !docCode || !seconds) { alert('Điền đủ các ô.'); return; }
   try{
-    const res = await deployApi('deploy_drill_record', {drillId, date, person, deptId, docCode, seconds});
+    const res = await deployApi('deploy_drill_record', {date, person, deptId, docCode, seconds});
     DeployState.drills = res.data;
     renderDeployDashboard();
   }catch(e){ console.error('[deploy] drill failed', e); alert('Lỗi ghi drill: ' + e.message); }
@@ -2798,6 +2880,7 @@ async function deployResetStateConfirmed(){
 function renderDeployDashboard(){
   const container = document.getElementById('page-deploy');
   if (!container) return;
+  deployStartAutoRefresh();
   if (!DeployState.loaded) {
     container.innerHTML = `<div class="deploy-loading"><div class="deploy-spinner"></div><p>Đang nạp Command Center...</p></div>`;
     loadDeployState().then(() => renderDeployDashboard());
@@ -2847,6 +2930,7 @@ function renderDeployDashboard(){
 window.renderDeployDashboard = renderDeployDashboard;
 window.switchDeployTab = switchDeployTab;
 window.deployOpenDoc = deployOpenDoc;
+window.deployToggleDeadDocs = deployToggleDeadDocs;
 window.deployCycleReadiness = deployCycleReadiness;
 window.deployUpdateMetric = deployUpdateMetric;
 window.deployToggleChecklist = deployToggleChecklist;
