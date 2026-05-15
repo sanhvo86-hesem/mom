@@ -2290,14 +2290,14 @@ async function deploySignOffMeeting(id){
 }
 
 async function deploySignOffWeek(weekN, decision){
-  if (!DeployState.me.canSignOff) { alert('Cần quyền CEO/QMS Manager để ký gate.'); return; }
+  if (!DeployState.me.canSignOff) { alert('Cần quyền Giám đốc / Trưởng QMS để ký cổng.'); return; }
   const notes = document.getElementById('dwpSignOffNotes')?.value || '';
   if (!confirm('Ký gate W' + weekN + ' với quyết định ' + decision.toUpperCase() + '?')) return;
   try{
     const res = await deployApi('deploy_week_signoff', {weekN, decision, notes});
     DeployState.program = res.data;
     renderDeployDashboard();
-  }catch(e){ console.error('[deploy] week signoff failed', e); alert('Lỗi ký gate: ' + e.message); }
+  }catch(e){ console.error('[deploy] week signoff failed', e); alert('Lỗi ký cổng: ' + e.message); }
 }
 
 async function deploySaveChampion(deptId){
@@ -2332,7 +2332,7 @@ async function deploySaveChampion(deptId){
     const res = await deployApi('deploy_champion_save', payload);
     DeployState.champions = res.data;
     renderDeployDashboard();
-  }catch(e){ console.error('[deploy] champion failed', e); alert('Lỗi lưu champion: ' + e.message); }
+  }catch(e){ console.error('[deploy] champion failed', e); alert('Lỗi lưu người dẫn dắt: ' + e.message); }
 }
 
 function deployOpenIssueForm(existing){
@@ -2414,7 +2414,7 @@ async function deployRecordDrill(){
     const res = await deployApi('deploy_drill_record', {date, person, deptId, docCode, seconds});
     DeployState.drills = res.data;
     renderDeployDashboard();
-  }catch(e){ console.error('[deploy] drill failed', e); alert('Lỗi ghi drill: ' + e.message); }
+  }catch(e){ console.error('[deploy] drill failed', e); alert('Lỗi ghi diễn tập: ' + e.message); }
 }
 
 function deployOpenAuditForm(existing){
@@ -2582,7 +2582,7 @@ async function deploySaveReview(payload){
     const res = await deployApi('deploy_review_save', payload);
     DeployState.reviews = res.data;
     renderDeployDashboard();
-  }catch(e){ console.error('[deploy] review failed', e); alert('Lỗi lưu review: ' + e.message); }
+  }catch(e){ console.error('[deploy] review failed', e); alert('Lỗi lưu xem xét: ' + e.message); }
 }
 
 async function deploySignOffReview(id){
@@ -2617,7 +2617,7 @@ function deployResetState(){
     kicker: '⚠ Hành động không thể hoàn tác',
     accentColor: '#dc2626',
     submitLabel: '🗑 Xác nhận reset',
-    hint: 'Xóa readiness, issue, drill, biên bản họp và trạng thái ký gate; giữ khung 12 tuần, tài liệu ISO và meeting template.',
+    hint: 'Xóa sẵn sàng, vấn đề, diễn tập, biên bản họp và trạng thái ký cổng; giữ khung 12 tuần, tài liệu ISO và mẫu họp.',
     fields: [
       {
         type: 'static',

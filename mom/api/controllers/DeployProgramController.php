@@ -395,26 +395,32 @@ class DeployProgramController extends BaseController
         $me = $this->requireAuth();
         $this->requireAnyRole($me, self::EDIT_ROLES);
         $body = $this->jsonBody();
-        $drills = $this->loadFile(self::FILE_DRILLS);
-        if (!isset($drills['drills']) || !is_array($drills['drills'])) $drills['drills'] = [];
+        try {
+            $result = $this->deployDrillReminderService()->recordDrillResult($body, (string)($me['username'] ?? ''));
+        } catch (InvalidArgumentException $e) {
+            $this->error($e->getMessage(), 400);
+        }
+        $payload = $result['drill'];
+        $this->audit('deploy.drill.record', $me, [
+            'dept' => (string)($payload['deptId'] ?? ''),
+            'seconds' => (int)($payload['seconds'] ?? 0),
+            'drill_id' => (string)($payload['id'] ?? ''),
+            'status' => (string)($payload['status'] ?? ''),
+        ]);
+        $this->success(['data' => $result['state'], 'drill' => $payload]);
+    }
 
-        $seconds = (int)($body['seconds'] ?? 0);
-        $payload = [
-            'id'       => 'DRL-' . substr(md5(gmdate('c') . random_int(0, 999999)), 0, 8),
-            'date'     => (string)($body['date'] ?? gmdate('Y-m-d')),
-            'person'   => (string)($body['person'] ?? ''),
-            'deptId'   => (string)($body['deptId'] ?? ''),
-            'docCode'  => (string)($body['docCode'] ?? ''),
-            'seconds'  => $seconds,
-            'pass'     => $seconds > 0 && $seconds <= 180,
-            'note'     => (string)($body['note'] ?? ''),
-            'recordedBy' => (string)($me['username'] ?? ''),
-            'recordedAt' => gmdate('c'),
-        ];
-        $drills['drills'][] = $payload;
-        $this->saveFile(self::FILE_DRILLS, $drills);
-        $this->audit('deploy.drill.record', $me, ['dept' => $payload['deptId'], 'seconds' => $seconds]);
-        $this->success(['data' => $drills, 'drill' => $payload]);
+    public function runDrillReminders(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::SIGNOFF_ROLES);
+        $result = $this->deployDrillReminderService()->runDaily();
+        $this->audit('deploy.drill.reminder.run', $me, [
+            'marked_overdue' => (int)($result['marked_overdue'] ?? 0),
+            'overdue_count' => (int)($result['overdue_count'] ?? 0),
+            'notification_sent' => !empty($result['notification_sent']) ? 1 : 0,
+        ]);
+        $this->success(['data' => $result]);
     }
 
     public function saveAudit(): never
