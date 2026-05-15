@@ -30,7 +30,7 @@ class UserController extends BaseController
     public function list(): never
     {
         $me = $this->requireAuth();
-        $this->requireAdmin($me);
+        $this->requireAuthz($me, 'users.view', ['route_action' => 'admin_users_list']);
 
         $users = $this->store['users'] ?? [];
         $identity = PortalServices::identity($this->dataDir, $this->rootDir);
@@ -70,7 +70,6 @@ class UserController extends BaseController
     {
         $me = $this->requireAuth();
         $this->requireCsrf();
-        $this->requireAdmin($me);
 
         $data     = $this->jsonBody();
         $username = strtolower(trim((string)($data['username'] ?? '')));
@@ -80,6 +79,20 @@ class UserController extends BaseController
         $usersFile = $this->confDir . '/users.json';
         /** @var array<string, mixed>|false $existing */
         $existing  = find_user_by_username($this->store, $username);
+
+        // Matrix-driven authorization: users.create for new, users.edit for existing.
+        // The PDP (AuthorizationKernel) consults the canonical roles.permissions
+        // JSONB — no hardcoded role list, no admin-bypass code path.
+        $this->requireAuthz(
+            $me,
+            $existing ? 'users.edit' : 'users.create',
+            [
+                'route_action'  => 'admin_user_upsert',
+                'resource_kind' => 'user',
+                'resource_id'   => $username,
+            ]
+        );
+
         $shadowSync = new AuthUserShadowSyncService($this->rootDir);
 
         if ($existing) {
@@ -393,10 +406,15 @@ class UserController extends BaseController
     {
         $me = $this->requireAuth();
         $this->requireCsrf();
-        $this->requireAdmin($me);
 
         $data     = $this->jsonBody();
         $username = strtolower(trim((string)($data['username'] ?? '')));
+
+        $this->requireAuthz($me, 'users.disable', [
+            'route_action'  => 'admin_user_delete',
+            'resource_kind' => 'user',
+            'resource_id'   => $username,
+        ]);
 
         if ($username === '') $this->error('missing_username', 400);
 
@@ -441,11 +459,16 @@ class UserController extends BaseController
     {
         $me = $this->requireAuth();
         $this->requireCsrf();
-        $this->requireAdmin($me);
 
         $data     = $this->jsonBody();
         $username = strtolower(trim((string)($data['username'] ?? '')));
         $newPw    = (string)($data['password'] ?? '');
+
+        $this->requireAuthz($me, 'users.reset_pw', [
+            'route_action'  => 'admin_user_reset_password',
+            'resource_kind' => 'user',
+            'resource_id'   => $username,
+        ]);
 
         if ($username === '') $this->error('missing_username', 400);
 
@@ -505,7 +528,7 @@ class UserController extends BaseController
     public function getPermissions(): never
     {
         $me = $this->requireAuth();
-        $this->requireAdmin($me);
+        $this->requireAuthz($me, 'rbac.role.view', ['route_action' => 'role_perms_get']);
 
         $rolePermsFile = $this->confDir . '/role_permissions.json';
         $perms = load_role_permissions($rolePermsFile);
@@ -526,7 +549,7 @@ class UserController extends BaseController
     {
         $me = $this->requireAuth();
         $this->requireCsrf();
-        $this->requireAdmin($me);
+        $this->requireAuthz($me, 'rbac.role.edit', ['route_action' => 'admin_role_perms_save']);
 
         $data = $this->jsonBody();
         $in   = $data['perms'] ?? null;

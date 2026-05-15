@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
+use MOM\Api\Services\AuthDecision;
+use MOM\Api\Services\AuthorizationKernel;
 use MOM\Database\DataLayer;
 use RuntimeException;
 use Throwable;
@@ -36,6 +38,9 @@ abstract class BaseController
 
     /** @var array|null Cached user store. */
     protected ?array $store = null;
+
+    /** @var AuthorizationKernel|null Lazily-built single PDP for the request. */
+    private ?AuthorizationKernel $authzKernel = null;
 
     // ── Construction ────────────────────────────────────────────────────────
 
@@ -593,6 +598,56 @@ abstract class BaseController
         if (!$this->hasAnyPermission($user, $permissions)) {
             $this->error('forbidden', 403);
         }
+    }
+
+    /**
+     * AuthorizationKernel-driven permission gate (new PDP, since 2026-05-15).
+     *
+     * Replaces requireAdmin()/requireAnyPermission() for new code paths. Reads
+     * grants/denies from the canonical roles.permissions JSONB + permission_catalog
+     * (no hardcoded role list). Every call is logged to auth_decision_event.
+     *
+     *   * Allow                 → returns silently.
+     *   * Deny                  → emits 403 JSON {error:'forbidden', reason, permission}.
+     *   * StepUp (AAL gap)      → emits 401 JSON {error:'step_up_required', ...}.
+     *
+     * `$context` may carry the route_action, resource_kind, resource_id used
+     * in the audit row — leave empty for plain action-level gates.
+     *
+     * @param array<string,mixed>            $user        Authenticated user record (from requireAuth()).
+     * @param string                         $permission  Permission code (e.g. "users.create").
+     * @param array<string,mixed>            $context     Optional audit context.
+     */
+    protected function requireAuthz(array $user, string $permission, array $context = []): void
+    {
+        $kernel   = $this->authzKernel();
+        $decision = $kernel->decide($user, $permission, $context);
+
+        if ($decision->isAllow()) {
+            return;
+        }
+        if ($decision->isStepUp()) {
+            $this->error('step_up_required', 401, null, [
+                'permission'   => $permission,
+                'required_aal' => $decision->requiredAal,
+                'current_aal'  => $decision->currentAal,
+            ]);
+        }
+        // Deny — surface a structured error so the matrix admin dashboard can
+        // explain "why" without grepping source.
+        $this->error('forbidden', 403, null, [
+            'reason'     => $decision->reason,
+            'permission' => $permission,
+        ]);
+    }
+
+    /** Lazy AuthorizationKernel for this controller instance. */
+    private function authzKernel(): AuthorizationKernel
+    {
+        if ($this->authzKernel === null) {
+            $this->authzKernel = new AuthorizationKernel($this->confDir);
+        }
+        return $this->authzKernel;
     }
 
     // ── Validation Helpers ──────────────────────────────────────────────────
