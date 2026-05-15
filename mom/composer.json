@@ -7,6 +7,7 @@
     "prefer-stable": true,
     "require": {
         "php": ">=8.5",
+        "bacon/bacon-qr-code": "^3.0",
         "lcobucci/jwt": "^5.4",
         "php-amqplib/php-amqplib": "^3.7",
         "phpoffice/phpspreadsheet": "^5.6",
