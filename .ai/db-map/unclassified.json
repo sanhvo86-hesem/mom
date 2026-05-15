@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 778,
-        "generated_at": "2026-05-15T05:24:11+00:00"
+        "table_count": 779,
+        "generated_at": "2026-05-15T08:29:36+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -546,6 +546,13 @@
                     "ref": "users(user_id)"
                 }
             ],
+            "contract": null
+        },
+        "auth_decision_event": {
+            "defined_in": "185_authz_decision_log.sql",
+            "extended_in": [],
+            "primary_key": "decision_id, occurred_at",
+            "foreign_keys": [],
             "contract": null
         },
         "background_jobs": {

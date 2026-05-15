@@ -717,9 +717,35 @@ function deployChecklistDoneCount(phaseId){
   items.forEach((it) => { if (cl[it.code]) done++; });
   return {done, total: items.length};
 }
-function deployIssuesOpen(){
+function deployIssueSource(issue){
+  const source = String(issue && issue.source || 'real').toLowerCase();
+  return ['real','drill','audit'].includes(source) ? source : 'real';
+}
+function deployIssuesBySource(source){
   const list = (DeployState.issues && DeployState.issues.issues) || [];
-  return list.filter(i => (i.status || 'open') !== 'closed');
+  if (!source) return list;
+  return list.filter(i => deployIssueSource(i) === source);
+}
+function deployIssuesOpen(source){
+  return deployIssuesBySource(source).filter(i => (i.status || 'open') !== 'closed');
+}
+function deployOverdueDrills(deptId){
+  const list = (DeployState.drills && DeployState.drills.drills) || [];
+  const wantedDept = deptId ? deployNormalizeDeptId(deptId) : '';
+  return list.filter(d => {
+    const isOverdue = String(d.status || '') === 'overdue';
+    const sameDept = !wantedDept || deployNormalizeDeptId(d.deptId || '') === wantedDept;
+    return isOverdue && sameDept;
+  });
+}
+function deployRecordedDrills(){
+  const list = (DeployState.drills && DeployState.drills.drills) || [];
+  return list.filter(d => !!(d.recordedAt || d.person || d.seconds || d.medianSeconds != null || d.totalCount != null));
+}
+function deployDrillLabel(d){
+  const dept = deployGetDept(d.deptId);
+  const type = d.drillType ? String(d.drillType).replace(/_/g, ' ') : 'drill';
+  return `${d.id || 'DRL'} · W${d.weekN|0} · ${dept ? dept.label : (d.deptId || '—')} · ${type} · ${d.scheduledAt || '—'}`;
 }
 function deployRedSignals(){
   let red = 0;
@@ -727,6 +753,7 @@ function deployRedSignals(){
   const kv = (DeployState.readiness && DeployState.readiness.kpiValues) || {};
   DEPLOY_CONFIG.kpis.forEach(k => { if (deployKpiRag(k, kv[k.id]) === 'red') red++; });
   red += deployNum(kv.sev1Open);
+  red += deployOverdueDrills().length;
   return red;
 }
 
@@ -782,7 +809,9 @@ function renderDeploySummary(){
   const chPct = chTarget ? Math.min(100, Math.round((chPass / chTarget) * 100)) : 0;
   const blocked = activeDepts.filter(d => deployDeptHasBlocker(d.id)).length;
   const red = deployRedSignals();
-  const issuesOpen = deployIssuesOpen().length;
+  const realIssuesOpen = deployIssuesOpen('real').length;
+  const drillIssuesOpen = deployIssuesOpen('drill').length;
+  const drillOverdue = deployOverdueDrills().length;
   return `
   <section class="deploy-summary-grid">
     <div class="deploy-summary-card">
@@ -795,15 +824,15 @@ function renderDeploySummary(){
       <strong>${chPct}%</strong>
       <div>${chPass}/${chTarget} đã đạt</div>
     </div>
-    <div class="deploy-summary-card">
-      <span class="summary-label">Vấn đề đang mở</span>
-      <strong>${issuesOpen}</strong>
-      <div>Bảng nghiêm trọng đang theo dõi</div>
+    <div class="deploy-summary-card ${realIssuesOpen > 0 ? 'summary-alert' : ''}">
+      <span class="summary-label">Sự cố thật đang mở</span>
+      <strong>${realIssuesOpen}</strong>
+      <div>Diễn tập ${drillIssuesOpen} · Drill quá hạn ${drillOverdue}</div>
     </div>
     <div class="deploy-summary-card ${red > 0 ? 'summary-alert' : ''}">
       <span class="summary-label">Tín hiệu đỏ</span>
       <strong>${red}</strong>
-      <div>${blocked} phòng chặn · ${red - blocked} KPI/sev đỏ</div>
+      <div>${blocked} phòng chặn · ${red - blocked} KPI/sev/drill đỏ</div>
     </div>
   </section>`;
 }
@@ -833,6 +862,8 @@ function renderTabOverview(){
     <section class="deploy-section">
       <div class="deploy-section-head"><h2>KPI triển khai</h2><span>${DeployState.me.canEdit ? 'Nhập giá trị thực tế' : 'Chỉ đọc — không có quyền edit'}</span></div>
       <div class="kpi-mini-grid">
+        ${renderDrillOverdueKpiCard()}
+        ${renderIssueSourceKpiCards()}
         ${DEPLOY_CONFIG.kpis.map(k => renderKpiCard(k, kv[k.id])).join('')}
       </div>
     </section>
@@ -863,6 +894,43 @@ function renderPhaseNode(phase){
     </div>
     <div class="phase-status-dot" style="background:${phase.color}"></div>
   </button>`;
+}
+
+function renderDrillOverdueKpiCard(){
+  const overdue = deployOverdueDrills();
+  const rag = overdue.length > 0 ? 'red' : 'green';
+  return `
+  <div class="kpi-mini-card kpi-rag-${rag}">
+    <div class="kpi-card-header">
+      <div class="kpi-mini-icon">DR</div>
+      <span class="kpi-mini-target">Target 0</span>
+    </div>
+    <div class="kpi-mini-label">Drill quá hạn</div>
+    <strong class="kpi-mini-input" style="display:block;line-height:32px;">${overdue.length}</strong>
+    <div class="kpi-tip-row">${overdue.length ? overdue.slice(0, 3).map(d => deployEscape(deployDrillLabel(d))).join('<br>') : 'Không có drill quá hạn'}</div>
+  </div>`;
+}
+
+function renderIssueSourceKpiCards(){
+  const realOpen = deployIssuesOpen('real').length;
+  const drillOpen = deployIssuesOpen('drill').length;
+  const auditOpen = deployIssuesOpen('audit').length;
+  return `
+  <div class="kpi-mini-card kpi-rag-${realOpen ? 'red' : 'green'}">
+    <div class="kpi-card-header"><div class="kpi-mini-icon">SC</div><span class="kpi-mini-target">Production</span></div>
+    <div class="kpi-mini-label">Sự cố thật đang mở</div>
+    <strong class="kpi-mini-input" style="display:block;line-height:32px;">${realOpen}</strong>
+  </div>
+  <div class="kpi-mini-card kpi-rag-${drillOpen ? 'amber' : 'green'}">
+    <div class="kpi-card-header"><div class="kpi-mini-icon">DT</div><span class="kpi-mini-target">Drill</span></div>
+    <div class="kpi-mini-label">Sự cố diễn tập đang mở</div>
+    <strong class="kpi-mini-input" style="display:block;line-height:32px;">${drillOpen}</strong>
+  </div>
+  <div class="kpi-mini-card kpi-rag-${auditOpen ? 'amber' : 'green'}">
+    <div class="kpi-card-header"><div class="kpi-mini-icon">AU</div><span class="kpi-mini-target">Audit</span></div>
+    <div class="kpi-mini-label">Phát hiện audit đang mở</div>
+    <strong class="kpi-mini-input" style="display:block;line-height:32px;">${auditOpen}</strong>
+  </div>`;
 }
 
 function renderKpiCard(kpi, value){
@@ -1101,13 +1169,15 @@ function renderWaveColumn(wave){
     <div class="wave-card-body">
       ${depts.map(d => {
         const pct = Math.round(deployDeptProgress(d.id) * 100);
+        const overdueCount = deployOverdueDrills(d.id).length;
+        const overdueStyle = overdueCount ? ' style="border:1px solid var(--c-red);background:#fef2f2;"' : '';
         return `
-        <div class="wave-dept-row">
+        <div class="wave-dept-row"${overdueStyle}>
           <div class="wave-dept-main">
             <span class="wave-color" style="background:${d.color}"></span>
             <span>${deployEscape(d.label)}</span>
           </div>
-          <span class="wave-score">${pct}%</span>
+          <span class="wave-score">${overdueCount ? `Quá hạn ${overdueCount}` : pct + '%'}</span>
         </div>`;
       }).join('')}
     </div>
@@ -1140,11 +1210,14 @@ function renderReadinessRow(dept){
 function renderChampionCard(dept){
   const ch = deployChampionRecord(dept.id);
   const ro = !DeployState.me.canEdit;
+  const overdueCount = deployOverdueDrills(dept.id).length;
+  const overdueStyle = overdueCount ? ' style="border-color:var(--c-red);box-shadow:0 0 0 1px rgba(220,38,38,.18);"' : '';
   return `
-  <div class="champion-card">
+  <div class="champion-card"${overdueStyle}>
     <div class="champion-card-head">
       <span class="wave-color" style="background:${dept.color}"></span>
       <strong>${deployEscape(dept.label)}</strong>
+      ${overdueCount ? `<span class="issue-sev-badge" title="Drill quá hạn của phòng">${overdueCount} drill quá hạn</span>` : ''}
       <span class="champion-shift">Ca ${deployEscape(ch.shift || 'A')}</span>
       ${!ro ? `<button class="deploy-btn-link champion-card-remove" type="button" onclick="deployRemoveDepartment('${dept.id}')" title="Bớt phòng ban khỏi roster">✕</button>` : ''}
     </div>
@@ -1227,8 +1300,11 @@ function findUserForChampionPerson(person){
 
 // ── Tab 5: Tài liệu ───────────────────────────────────────────────────────
 function renderTabDocs(){
-  const drills = ((DeployState.drills && DeployState.drills.drills) || []).slice().sort((a,b) => (b.recordedAt || '').localeCompare(a.recordedAt || ''));
-  const drillStats = computeDrillStats(drills);
+  const allDrills = ((DeployState.drills && DeployState.drills.drills) || []).slice();
+  const recordedDrills = deployRecordedDrills().slice().sort((a,b) => (b.recordedAt || '').localeCompare(a.recordedAt || ''));
+  const pendingDrills = allDrills.filter(d => ['scheduled','overdue'].includes(String(d.status || ''))).sort((a,b) => String(a.scheduledAt || '').localeCompare(String(b.scheduledAt || '')));
+  const overdue = deployOverdueDrills();
+  const drillStats = computeDrillStats(recordedDrills);
   return `
   <div class="deploy-tab-panel active" id="dtab-docs">
     <section class="deploy-section">
@@ -1249,9 +1325,13 @@ function renderTabDocs(){
       </div>
     </section>
     <section class="deploy-section">
-      <div class="deploy-section-head"><h2>Diễn tập tra cứu tài liệu · KPI ≤3 phút</h2><span>${drillStats.total} lượt · đạt ${drillStats.passPct}%</span></div>
+      <div class="deploy-section-head"><h2>Diễn tập tra cứu tài liệu · KPI ≤3 phút</h2><span>${drillStats.total} lượt ghi nhận · đạt ${drillStats.passPct}% · quá hạn ${overdue.length}</span></div>
       <div class="drill-recorder">
         <form onsubmit="event.preventDefault(); deployRecordDrill();" class="drill-form" id="deployDrillForm">
+          <select id="drillId" ${DeployState.me.canEdit?'':'disabled'}>
+            <option value="">— Chọn lịch drill —</option>
+            ${pendingDrills.map(d => `<option value="${deployEscape(d.id)}">${deployEscape(deployDrillLabel(d))}${d.status === 'overdue' ? ' · QUÁ HẠN' : ''}</option>`).join('')}
+          </select>
           <input type="date" id="drillDate" value="${deployTodayIso()}" ${DeployState.me.canEdit?'':'disabled'}>
           <input type="text" id="drillPerson" placeholder="Người thực hiện" ${DeployState.me.canEdit?'':'disabled'}>
           <select id="drillDept" ${DeployState.me.canEdit?'':'disabled'}>
@@ -1263,14 +1343,15 @@ function renderTabDocs(){
           <button type="submit" class="deploy-btn" ${DeployState.me.canEdit?'':'disabled'}>Ghi lượt diễn tập</button>
         </form>
         <div class="drill-log">
-          ${drills.slice(0, 10).map(d => `
+          ${overdue.length ? `<div class="deploy-empty" style="border-color:var(--c-red);background:#fef2f2;color:var(--c-red);">Drill quá hạn: ${overdue.slice(0, 5).map(d => deployEscape(d.id)).join(', ')}${overdue.length > 5 ? '…' : ''}</div>` : ''}
+          ${recordedDrills.slice(0, 10).map(d => `
             <div class="drill-row drill-${d.pass ? 'pass' : 'fail'}">
               <span class="drill-pass-icon">${d.pass ? '✓' : '✗'}</span>
               <span class="drill-meta"><strong>${deployEscape(d.person)}</strong> · ${deployEscape(d.deptId)} · ${deployEscape(d.docCode)}</span>
               <span class="drill-seconds">${d.seconds}s</span>
               <small>${deployFmtDate(d.date)}</small>
             </div>`).join('')}
-          ${drills.length === 0 ? '<div class="deploy-empty">Chưa có lượt diễn tập nào. Mục tiêu KPI: ≤180 giây (3 phút).</div>' : ''}
+          ${recordedDrills.length === 0 ? '<div class="deploy-empty">Chưa có lượt diễn tập nào. Mục tiêu KPI: ≤180 giây (3 phút).</div>' : ''}
         </div>
       </div>
     </section>
@@ -1286,21 +1367,44 @@ function computeDrillStats(drills){
 // ── Tab 6: Issues ─────────────────────────────────────────────────────────
 function renderTabIssues(){
   const issues = ((DeployState.issues && DeployState.issues.issues) || []).slice().sort((a,b) => (a.sev|0) - (b.sev|0) || (b.updatedAt||'').localeCompare(a.updatedAt||''));
-  const open = issues.filter(i => i.status !== 'closed').length;
-  const closed = issues.length - open;
+  const realIssues = issues.filter(i => deployIssueSource(i) === 'real');
+  const drillIssues = issues.filter(i => deployIssueSource(i) === 'drill');
+  const auditIssues = issues.filter(i => deployIssueSource(i) === 'audit');
+  const open = realIssues.filter(i => i.status !== 'closed').length;
+  const closed = realIssues.length - open;
   return `
   <div class="deploy-tab-panel active" id="dtab-issues">
     <section class="deploy-section">
       <div class="deploy-section-head">
-        <h2>Sổ vấn đề · ${open} mở · ${closed} đã đóng</h2>
-        <span>Bảng nghiêm trọng đang theo dõi</span>
+        <h2>Báo cáo sự cố sản xuất thật · ${open} mở · ${closed} đã đóng</h2>
+        <span>Không tính issue source=drill</span>
       </div>
       <div class="issue-toolbar">
         ${DeployState.me.canEdit ? `<button class="deploy-btn" onclick="deployOpenIssueForm()">+ Ghi vấn đề mới</button>` : ''}
       </div>
       <div class="issue-list">
-        ${issues.length === 0 ? '<div class="deploy-empty">Chưa có vấn đề nào. Bảng nghiêm trọng sẽ kích hoạt khi pilot bắt đầu (W4).</div>' : ''}
-        ${issues.map(i => renderIssueRow(i)).join('')}
+        ${realIssues.length === 0 ? '<div class="deploy-empty">Chưa có sự cố sản xuất thật nào.</div>' : ''}
+        ${realIssues.map(i => renderIssueRow(i)).join('')}
+      </div>
+    </section>
+    <section class="deploy-section">
+      <div class="deploy-section-head">
+        <h2>Sự cố diễn tập · ${drillIssues.filter(i => i.status !== 'closed').length} mở</h2>
+        <span>Auditor đối chiếu bằng drillId</span>
+      </div>
+      <div class="issue-list">
+        ${drillIssues.length === 0 ? '<div class="deploy-empty">Chưa có issue phát sinh từ drill.</div>' : ''}
+        ${drillIssues.map(i => renderIssueRow(i)).join('')}
+      </div>
+    </section>
+    <section class="deploy-section">
+      <div class="deploy-section-head">
+        <h2>Phát hiện audit · ${auditIssues.filter(i => i.status !== 'closed').length} mở</h2>
+        <span>Nguồn audit không trộn với sự cố sản xuất</span>
+      </div>
+      <div class="issue-list">
+        ${auditIssues.length === 0 ? '<div class="deploy-empty">Chưa có issue nguồn audit.</div>' : ''}
+        ${auditIssues.map(i => renderIssueRow(i)).join('')}
       </div>
     </section>
   </div>`;
@@ -1308,9 +1412,12 @@ function renderTabIssues(){
 
 function renderIssueRow(i){
   const dept = deployGetDept(i.deptId);
+  const source = deployIssueSource(i);
+  const sourceLabel = source === 'drill' ? `Drill ${i.drillId || '—'}` : source === 'audit' ? 'Audit' : 'Real';
   return `
-  <div class="issue-row issue-sev-${i.sev|0} issue-status-${deployEscape(i.status||'open')}">
+  <div class="issue-row issue-sev-${i.sev|0} issue-status-${deployEscape(i.status||'open')} issue-source-${source}">
     <span class="issue-sev-badge">SEV-${i.sev|0}</span>
+    <span class="issue-sev-badge">${deployEscape(sourceLabel)}</span>
     <div class="issue-main">
       <strong>${deployEscape(i.title)}</strong>
       <div class="issue-meta">
@@ -2339,6 +2446,15 @@ function deployOpenIssueForm(existing){
           {value:'2', label:'Sev-2 — Ảnh hưởng lớn / High'},
           {value:'3', label:'Sev-3 — Bất tiện / Low'},
         ]},
+      {key:'source', label:'Nguồn issue', type:'select', required:true, value: existing?.source || 'real',
+        options: [
+          {value:'real', label:'Sự cố sản xuất thật'},
+          {value:'drill', label:'Phát sinh từ diễn tập'},
+          {value:'audit', label:'Phát hiện audit'},
+        ],
+        hint:'source=drill bắt buộc chọn drillId để auditor tách khỏi sự cố thật.'},
+      {key:'drillId', label:'Drill liên quan', type:'select', value: existing?.drillId || '',
+        options: [{value:'', label:'— Không áp dụng —'}].concat(((DeployState.drills && DeployState.drills.drills) || []).map(d => ({value:d.id, label:deployDrillLabel(d)})))},
       {key:'deptId', label:'Phòng ban', type:'select', required:true, value: existing?.deptId || deployDefaultDeptId(),
         options: deployActiveDepartments().map(d => ({value:d.id, label: d.label}))},
       {key:'owner', label:'Owner xử lý', type:'text', required:true,
@@ -2356,16 +2472,24 @@ function deployOpenIssueForm(existing){
       {key:'capaLink', label:'Link CAPA (nếu có)', type:'text', value: existing?.capaLink || '',
         placeholder:'/portal.html#eqms?capa=CAPA-...', hint:'Nếu Sev-1/2, dùng nút "→ CAPA" để tự sinh stub.'},
     ],
-    onSubmit: (v) => deploySaveIssue({
-      ...(existing || {}),
-      title: v.title,
-      sev: parseInt(v.sev, 10) || 3,
-      deptId: v.deptId,
-      owner: v.owner,
-      weekN: parseInt(v.weekN, 10) || 0,
-      status: v.status,
-      capaLink: v.capaLink || '',
-    }),
+    onSubmit: (v) => {
+      if (v.source === 'drill' && !v.drillId) {
+        alert('Issue nguồn diễn tập phải chọn drillId.');
+        return;
+      }
+      return deploySaveIssue({
+        ...(existing || {}),
+        title: v.title,
+        sev: parseInt(v.sev, 10) || 3,
+        deptId: v.deptId,
+        owner: v.owner,
+        weekN: parseInt(v.weekN, 10) || 0,
+        status: v.status,
+        source: v.source || 'real',
+        drillId: v.source === 'drill' ? v.drillId : null,
+        capaLink: v.capaLink || '',
+      });
+    },
   });
 }
 
@@ -2392,6 +2516,7 @@ async function deployUpdateIssueStatus(id, status){
 
 async function deployRecordDrill(){
   const f = id => document.getElementById(id);
+  const drillId = f('drillId')?.value || '';
   const date = f('drillDate').value;
   const person = f('drillPerson').value.trim();
   const deptId = f('drillDept').value;
@@ -2399,7 +2524,7 @@ async function deployRecordDrill(){
   const seconds = parseInt(f('drillSeconds').value, 10) || 0;
   if (!person || !deptId || !docCode || !seconds) { alert('Điền đủ các ô.'); return; }
   try{
-    const res = await deployApi('deploy_drill_record', {date, person, deptId, docCode, seconds});
+    const res = await deployApi('deploy_drill_record', {drillId, date, person, deptId, docCode, seconds});
     DeployState.drills = res.data;
     renderDeployDashboard();
   }catch(e){ console.error('[deploy] drill failed', e); alert('Lỗi ghi drill: ' + e.message); }
