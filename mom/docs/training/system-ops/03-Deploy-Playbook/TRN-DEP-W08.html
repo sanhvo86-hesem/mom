@@ -46,15 +46,15 @@
 <section class="card" id="sec-cover">
 <h1 class="h2">W08 · 2026-07-04 · P3 · Đánh giá đưa Sản xuất vào vận hành chính thức</h1>
 <p>Giám đốc Sản xuất dùng cuộc họp này để ký số đóng cổng chăm sóc tăng cường W07-W08 trên cổng — chứng minh Sản xuất + Kỹ thuật vận hành theo hồ sơ Job Order số, không theo trí nhớ.</p>
-<p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P3-03 (đóng) · <strong>ISO 9001:2015:</strong> §8.5 (sản xuất) · §8.7 (đầu ra không phù hợp) · §9.1.3 (phân tích đánh giá) · <strong>Tài liệu bắt buộc:</strong> SOP-501, WI-519, ANNEX-117 · <strong>Tài liệu sẵn trên cổng trước buổi họp:</strong> Bảng "vấn đề trong ngày" 7 khu vực hiển thị live trên dashboard với cờ filter category=daily_issue; biểu đồ KPI mỗi 2 giờ trong 5 ngày đã có sẵn; sổ kéo dây cảnh báo phân theo cờ kind=test vs kind=real trong issues.json; kết quả diễn tập tra cứu ngẫu nhiên Sản xuất ≥95% trong training_records/drill_logs · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=8">Mở Lộ trình W08 trên cổng</a></p>
-<p class="meta-roles"><strong>Người chủ trì:</strong> Giám đốc Sản xuất · <strong>Người ký kết quả:</strong> Giám đốc (chữ ký số trên cổng — không ký giấy) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
+<p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P3-03 (đóng) · <strong>ISO 9001:2015:</strong> §8.5 (sản xuất) · §8.7 (đầu ra không phù hợp) · §9.1.3 (phân tích đánh giá) · <strong>Tài liệu bắt buộc:</strong> SOP-501, WI-519, ANNEX-117 · <strong>Tài liệu sẵn trên cổng trước buổi họp:</strong> Bảng "vấn đề trong ngày" 7 khu vực hiển thị live trên dashboard với cờ filter description LIKE '%daily_issue%' (vấn đề trong ngày); biểu đồ KPI mỗi 2 giờ trong 5 ngày đã có sẵn; sổ kéo dây cảnh báo phân theo cờ source=drill vs source=real trong issues.json; kết quả diễn tập tra cứu ngẫu nhiên Sản xuất ≥95% trong training_records/drill_logs · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=8">Mở Lộ trình W08 trên cổng</a></p>
+<p class="meta-roles"><strong>Người chủ trì:</strong> Giám đốc Sản xuất · <strong>Người ký kết quả:</strong> Giám đốc (xác nhận điện tử qua tài khoản M365+MFA — không ký giấy, không tự lập chữ ký số CA (xem PLAYBOOK chương "Cơ chế xác thực")) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
 </section>
 <section class="card" id="sec-objective">
 <h2 class="h2">3 câu hỏi đánh giá riêng</h2>
 <ol class="tight">
 <li>Tổ trưởng có chứng minh mỗi Job Order số mở đúng SOP-501 + WI-519 + SOP-303 + WI-302 trước khi chạy máy và Người vận hành đã mở đúng tài liệu ≥95% trên diễn tập ngẫu nhiên (drill_logs) chưa?</li>
-<li>Bảng "vấn đề trong ngày" có tỉ lệ đóng trong 24 giờ ≥95% (issues.json filter category=daily_issue close_within=24h) và ≥1 lượt kiểm thử cơ chế kéo dây cảnh báo (kind=test) trong tuần chưa?</li>
-<li>Sự cố Mức 1 = 0 trong 5 ngày làm việc liên tiếp (T2-T6) trong issues.json để đóng cổng P3-03 chưa?</li>
+<li>Bảng "vấn đề trong ngày" có tỉ lệ đóng trong 24 giờ ≥95% (issues.json filter description LIKE '%daily_issue%' (vấn đề trong ngày) close_within=24h) và ≥1 lượt kiểm thử cơ chế kéo dây cảnh báo (source=drill) trong tuần chưa?</li>
+<li>issues.json filter severity=Mức 1: 0 dòng với created_at trong 5 ngày làm việc liên tiếp (T2-T6) gần nhất, BẤT KỂ status (kể cả status=closed cũng tính 1 sự cố trong cửa sổ này) để đóng cổng P3-03 chưa?</li>
 </ol>
 </section>
 <section class="card" id="sec-tasks">
@@ -65,8 +65,8 @@
 <tr><td>Hồ sơ Job Order số của 7 khu vực</td><td>Tổ trưởng</td><td>dcc_document_header lọc doc_type=JobOrder: mỗi khu vực có ≥1 hồ sơ tuần này; mở đúng phiên bản bản vẽ, chương trình NC.</td><td class="col-gate">P3-03 khoá: §8.5 chạy lô không có hồ sơ truy xuất.</td></tr>
 <tr><td>Phiếu cài đặt máy đã ký số</td><td>Người cài đặt máy</td><td>dcc_document_header lọc doc_type=MachineSetup: ≥1 phiếu/máy/ca; chữ ký số người cài đặt; chặn nếu sai dao cụ/chương trình NC.</td><td class="col-gate">P3-03 khoá: §8.5.6 thay đổi không kiểm soát.</td></tr>
 <tr><td>Kết quả FAI mẫu đầu</td><td>Trưởng QA</td><td>FAI bản AS9102 (hoặc tương đương) đã upload với chữ ký số Người vận hành + Trưởng QA trước khi chạy lô; kèm phiếu đo CMM hoặc dung sai.</td><td class="col-gate">P3-03 khoá: §8.7 không phát hiện đầu ra không phù hợp.</td></tr>
-<tr><td>Bảng vấn đề trong ngày + sổ kéo dây cảnh báo</td><td>Trưởng QMS</td><td>issues.json filter category=daily_issue: tỉ lệ đóng ≤24h ≥95%; filter category=alert_cord có ≥1 dòng kind=test trong tuần; mọi lượt kind=real (nếu có) có chữ ký số ghi sổ.</td><td class="col-gate">P3-03 khoá: §10.2 hành động khắc phục không kịp.</td></tr>
-<tr><td>Biểu đồ KPI mỗi 2 giờ + sự cố Mức 1 = 0</td><td>Trưởng QA</td><td>Dashboard hiển thị KPI mỗi 2 giờ trong giờ làm việc; xu hướng 5 ngày; issues.json filter level=Mức1 = 0 trong 5 ngày làm việc liên tiếp.</td><td class="col-gate">P3-03 khoá: §9.1.3 không có dữ liệu đóng cổng chăm sóc tăng cường.</td></tr>
+<tr><td>Bảng vấn đề trong ngày + sổ kéo dây cảnh báo</td><td>Trưởng QMS</td><td>issues.json filter description LIKE '%daily_issue%' (vấn đề trong ngày): tỉ lệ đóng ≤24h ≥95%; filter description LIKE '%alert_cord%' (đường kéo dây cảnh báo) có ≥1 dòng source=drill trong tuần; mọi lượt source=real (nếu có) có chữ ký số ghi sổ.</td><td class="col-gate">P3-03 khoá: §10.2 hành động khắc phục không kịp.</td></tr>
+<tr><td>Biểu đồ KPI mỗi 2 giờ + sự cố Mức 1 = 0</td><td>Trưởng QA</td><td>Dashboard hiển thị KPI mỗi 2 giờ trong giờ làm việc; xu hướng 5 ngày; issues.json filter severity=Mức1 = 0 trong 5 ngày làm việc liên tiếp.</td><td class="col-gate">P3-03 khoá: §9.1.3 không có dữ liệu đóng cổng chăm sóc tăng cường.</td></tr>
 </tbody>
 </table>
 <p class="champ-block"><strong>Việc của người dẫn dắt phòng tuần W08:</strong></p>
@@ -83,7 +83,7 @@
 <li>Sổ vấn đề tuần này có dòng nào cần nâng mức theo ANNEX-117 (Mức 3 → Mức 2 hoặc Mức 2 → Mức 1) không, ai duyệt nâng mức?</li>
 <li>3 hành động tuần sau là gì, ai làm, hạn nào, và sẽ chặn cổng nào nếu trễ?</li>
 </ol>
-<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.gate.signoff hoặc deploy.issues.escalated), không in giấy.</p>
+<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.week.signoff hoặc deploy.issue.save (nâng severity)), không in giấy.</p>
 </section>
 </div>
 </div></div></div>

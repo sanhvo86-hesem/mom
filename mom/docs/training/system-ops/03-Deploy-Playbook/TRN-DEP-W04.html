@@ -47,14 +47,14 @@
 <h1 class="h2">W04 · 2026-06-06 · P2 · Cổng quyết định Đi/Không đi cho Đợt 2</h1>
 <p>Trưởng QMS dùng cuộc họp này để xác nhận Phòng QA đã chạy thí điểm thật và Giám đốc ký số quyết định Đi/Không đi cho Đợt 2 trên cổng tại bàn — không hoãn, không giấy. Tất cả bằng chứng đã đính cổng 24 giờ trước.</p>
 <p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P2-02, P2-03, P2-04 · <strong>ISO 9001:2015:</strong> §8.1 (hoạch định) · §9.1.3 (phân tích đánh giá) · §10.2 (hành động khắc phục) · <strong>Tài liệu bắt buộc:</strong> ANNEX-114 (sổ tay vận hành chính thức), ANNEX-117 (ma trận phân loại sự cố) · <strong>Tài liệu sẵn trên cổng trước buổi họp:</strong> TRƯỚC 24 GIỜ buổi họp: Trưởng QMS đính tất cả bằng chứng lên cổng (sổ vấn đề thí điểm, kết quả diễn tập DRL-E2E 10 lượt với số liệu thực, biên bản 1 ngày QA tự vận hành, biểu đồ KPI tuần 1+2, danh sách hành động sau thí điểm). Phiếu quyết định 3 ô (Đi tiếp / Đi có điều kiện / Không đi tiếp) đã tạo dưới dạng form số trên cổng — chỉ chờ Giám đốc tick + ký số. · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=4">Mở Lộ trình W04 trên cổng</a></p>
-<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng QMS · <strong>Người ký kết quả:</strong> Giám đốc (chữ ký số trên cổng — không ký giấy) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
+<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng QMS · <strong>Người ký kết quả:</strong> Giám đốc (xác nhận điện tử qua tài khoản M365+MFA — không ký giấy, không tự lập chữ ký số CA (xem PLAYBOOK chương "Cơ chế xác thực")) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
 </section>
 <section class="card" id="sec-objective">
 <h2 class="h2">3 câu hỏi đánh giá riêng</h2>
 <ol class="tight">
 <li>QA đã vận hành độc lập 1 ngày không sự cố Mức 1/Mức 2 theo ANNEX-117 và bằng chứng có trong issues.json + audit_events chưa? (P2-02)</li>
 <li>Mọi vấn đề Mức 1 từ thí điểm đã đóng (issues.json status=closed); trung vị tra cứu ≤180 giây trên ≥10 lượt diễn tập DRL-E2E ghi trong training_records/drill_logs chưa? (P2-03)</li>
-<li>Giám đốc + Trưởng QMS đã ký số quyết định Đi/Không đi cho Đợt 2 trên cổng (audit_events deploy.gate.signoff với phase=P2 ghi cùng ngày) chưa? (P2-04)</li>
+<li>Giám đốc + Trưởng QMS đã ký số quyết định Đi/Không đi cho Đợt 2 trên cổng (audit_events deploy.week.signoff với decision=GO|CONDITIONAL|NO_GO ghi cùng ngày) chưa? (P2-04)</li>
 </ol>
 </section>
 <section class="card" id="sec-tasks">
@@ -65,8 +65,8 @@
 <tr><td>Sổ vấn đề thí điểm QA đã đóng</td><td>Trưởng QA</td><td>issues.json: 100% Mức 1 status=closed hoặc có quyết định không đi tiếp; phân loại theo ma trận ANNEX-117.</td><td class="col-gate">P2-02 + P2-03 khoá: §10.2 không đủ bằng chứng đóng vấn đề.</td></tr>
 <tr><td>Kết quả diễn tập DRL-E2E ≥10 lượt</td><td>Người dẫn dắt QA</td><td>training_records/drill_logs có 10 dòng; trung vị thời gian mở đúng ≤180 giây; ≥95% mở đúng phiên bản tài liệu (dcc_document_header).</td><td class="col-gate">P2-02 khoá: §9.1.3 không có phân tích đo lường.</td></tr>
 <tr><td>Biên bản 1 ngày QA tự vận hành</td><td>Trưởng ca QA</td><td>Tài liệu trên cổng có chữ ký số của 3 ca trưởng QA; ca thật không cần đội triển khai đứng cạnh.</td><td class="col-gate">P2-02 khoá: chứng minh năng lực không đủ → không ký Đi tiếp.</td></tr>
-<tr><td>Danh sách hành động sau thí điểm</td><td>Trưởng QMS</td><td>issues.json có ≥3 dòng kind=action_item; mỗi dòng có người làm, hạn đóng, mức theo ANNEX-117.</td><td class="col-gate">P2-03 khoá: §10.2 thiếu kế hoạch khắc phục.</td></tr>
-<tr><td>Phiếu quyết định cổng P2 đã ký số</td><td>Giám đốc</td><td>audit_events deploy.gate.signoff với metadata phase=P2, decision=GO|CONDITIONAL|NO_GO; chữ ký số Giám đốc + Trưởng QMS cùng ngày.</td><td class="col-gate">P2-04 khoá: cổng không đóng → Đợt 2 không khởi động W05.</td></tr>
+<tr><td>Danh sách hành động sau thí điểm</td><td>Trưởng QMS</td><td>issues.json có ≥3 dòng source=audit (mục hành động sau đánh giá); mỗi dòng có người làm, hạn đóng, mức theo ANNEX-117.</td><td class="col-gate">P2-03 khoá: §10.2 thiếu kế hoạch khắc phục.</td></tr>
+<tr><td>Phiếu quyết định cổng P2 đã ký số</td><td>Giám đốc</td><td>audit_events deploy.week.signoff với metadata week=4 + decision=GO|CONDITIONAL|NO_GO; quyết định ghi trong meetings.json (trường decisions); xác nhận điện tử của Giám đốc + Trưởng QMS qua tài khoản M365+MFA cùng ngày.</td><td class="col-gate">P2-04 khoá: cổng không đóng → Đợt 2 không khởi động W05.</td></tr>
 </tbody>
 </table>
 <p class="champ-block"><strong>Việc của người dẫn dắt phòng tuần W04:</strong></p>
@@ -83,7 +83,7 @@
 <li>Sổ vấn đề tuần này có dòng nào cần nâng mức theo ANNEX-117 (Mức 3 → Mức 2 hoặc Mức 2 → Mức 1) không, ai duyệt nâng mức?</li>
 <li>3 hành động tuần sau là gì, ai làm, hạn nào, và sẽ chặn cổng nào nếu trễ?</li>
 </ol>
-<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.gate.signoff hoặc deploy.issues.escalated), không in giấy.</p>
+<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.week.signoff hoặc deploy.issue.save (nâng severity)), không in giấy.</p>
 </section>
 </div>
 </div></div></div>

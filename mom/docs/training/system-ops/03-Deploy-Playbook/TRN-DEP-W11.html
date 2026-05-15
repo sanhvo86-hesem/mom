@@ -47,7 +47,7 @@
 <h1 class="h2">W11 · 2026-07-25 · P4 · Bài học rút ra + cập nhật tài liệu hậu triển khai</h1>
 <p>Tổ điều hành dùng cuộc họp này để ký số tổng hợp 3 bài học từ mỗi phòng (1 tốt giữ, 1 xấu sửa, 1 đề xuất sửa cụ thể) — đã thu qua form số 7 ngày trước. Tài liệu sửa trực tiếp trên cổng, không in.</p>
 <p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P4-03 · <strong>ISO 9001:2015:</strong> §9.1.2 (sự hài lòng khách hàng nội bộ) · §10.3 (cải tiến liên tục) · §7.5.2 (cập nhật tài liệu) · <strong>Tài liệu bắt buộc:</strong> WI-105 (tra cứu tài liệu), WI-202 (đánh giá nội bộ) · <strong>Tài liệu sẵn trên cổng trước buổi họp:</strong> 33 phiếu bài học (3 × 11 phòng) đã thu qua form số trên cổng trước họp 7 ngày; bản tổng hợp báo cáo bài học đã upload trạng thái = bản thảo chờ Tổ điều hành ký số; danh sách ≥10 tài liệu cập nhật bản sửa đổi tiếp theo đã chuẩn bị trong dcc_document_header với ánh xạ bài học → tài liệu; bộ nhãn QR mới sinh số cho 7 khu vực; danh mục học bản 2 (≥3 video) đã upload · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=11">Mở Lộ trình W11 trên cổng</a></p>
-<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng QMS · <strong>Người ký kết quả:</strong> Giám đốc (chữ ký số trên cổng — không ký giấy) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
+<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng QMS · <strong>Người ký kết quả:</strong> Giám đốc (xác nhận điện tử qua tài khoản M365+MFA — không ký giấy, không tự lập chữ ký số CA (xem PLAYBOOK chương "Cơ chế xác thực")) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
 </section>
 <section class="card" id="sec-objective">
 <h2 class="h2">3 câu hỏi đánh giá riêng</h2>
@@ -63,8 +63,8 @@
 <thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm (trên cổng)</th><th>Cổng khoá nếu thiếu</th></tr></thead>
 <tbody>
 <tr><td>Báo cáo bài học rút ra trên cổng</td><td>Trưởng QMS</td><td>Form số: 33 phiếu thu trong 7 ngày; báo cáo tổng hợp có chữ ký số Tổ điều hành; bằng chứng §10.3 cải tiến liên tục.</td><td class="col-gate">P4-03 khoá: §10.3 không có chu trình cải tiến.</td></tr>
-<tr><td>Danh sách ≥10 tài liệu cập nhật + ánh xạ bài học</td><td>Trưởng QMS</td><td>dcc_document_header: ≥10 tài liệu status=draft trong tuần này; trường mapping liên kết tới ≥1 dòng bài học cụ thể.</td><td class="col-gate">P4-03 khoá: §7.5.2 cập nhật tài liệu không có lịch hoặc tài liệu rỗng không gắn bài học.</td></tr>
-<tr><td>Bộ nhãn QR mới + dán tại 7 khu vực</td><td>Kỹ sư QMS + Trưởng Sản xuất</td><td>Bảng QR mới sinh số trên cổng (qr_codes table); ≥95% nhãn cũ đã thay; ngày + số sê-ri QR ghi vào audit_events deploy.qr.rotated.</td><td class="col-gate">P4-03 khoá: §7.5.3 truy xuất tài liệu hỏng.</td></tr>
+<tr><td>Danh sách ≥10 tài liệu cập nhật + ánh xạ bài học</td><td>Trưởng QMS</td><td>dcc_document_header: ≥10 tài liệu status=draft trong tuần này; trường description tham chiếu mã bài học (ví dụ "Bài học #07/W11: ..."); bằng chứng ánh xạ qua biên bản W11.</td><td class="col-gate">P4-03 khoá: §7.5.2 cập nhật tài liệu không có lịch hoặc tài liệu rỗng không gắn bài học.</td></tr>
+<tr><td>Bộ nhãn QR mới + dán tại 7 khu vực</td><td>Kỹ sư QMS + Trưởng Sản xuất</td><td>Bảng QR mới sinh số trên cổng (role-card-qr-map.json); ≥95% nhãn cũ đã thay; ngày + số sê-ri QR ghi vào audit_events deploy.metric.update (key=qr_rotation_rate).</td><td class="col-gate">P4-03 khoá: §7.5.3 truy xuất tài liệu hỏng.</td></tr>
 <tr><td>Danh mục học bản 2 (≥3 video mới)</td><td>Kỹ sư QMS</td><td>≥3 video upload lên cổng với quyền xem theo vai trò; có chú thích tiếng Việt; tham chiếu trong training_records.</td><td class="col-gate">P4-03 khoá: §7.2 năng lực không cập nhật.</td></tr>
 <tr><td>Kế hoạch chuyển sang vận hành thường xuyên</td><td>Tổ điều hành</td><td>program.json có lịch họp tầng tuần + soát xét lãnh đạo tháng đã chốt; sẵn cho W12 bàn giao.</td><td class="col-gate">P4-03 khoá: W12 không có cơ sở bàn giao.</td></tr>
 </tbody>
@@ -83,7 +83,7 @@
 <li>Sổ vấn đề tuần này có dòng nào cần nâng mức theo ANNEX-117 (Mức 3 → Mức 2 hoặc Mức 2 → Mức 1) không, ai duyệt nâng mức?</li>
 <li>3 hành động tuần sau là gì, ai làm, hạn nào, và sẽ chặn cổng nào nếu trễ?</li>
 </ol>
-<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.gate.signoff hoặc deploy.issues.escalated), không in giấy.</p>
+<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.week.signoff hoặc deploy.issue.save (nâng severity)), không in giấy.</p>
 </section>
 </div>
 </div></div></div>

@@ -46,15 +46,15 @@
 <section class="card" id="sec-cover">
 <h1 class="h2">W07 · 2026-06-27 · P3 · Đợt Sản xuất vận hành chính thức — Tuần 1 (Sản xuất + Kỹ thuật đồng thời)</h1>
 <p>Giám đốc Sản xuất + Trưởng Kỹ thuật dùng cuộc họp này để cam kết kế hoạch 5 ngày tại xưởng — đi xưởng 15 phút/ngày qua dashboard, hồ sơ Job Order đầu tiên có chữ ký số. Cuộc họp này KHÔNG thay thế họp nhanh đầu ngày tại xưởng — Sản xuất + Kỹ thuật tự tổ chức họp 15 phút/ngày suốt tuần.</p>
-<p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P3-03 · <strong>ISO 9001:2015:</strong> §8.5 (sản xuất và cung cấp) · §8.5.6 (kiểm soát thay đổi) · §8.7 (đầu ra không phù hợp) · <strong>Tài liệu bắt buộc:</strong> SOP-501 (kế hoạch và điều độ sản xuất), WI-519 (kiểm hồ sơ Job Order), SOP-303 (release engineering), WI-302 (FAI và bằng chứng) · <strong>Tài liệu sẵn trên cổng trước buổi họp:</strong> Lịch đi xưởng 15 phút/ngày × 7 khu vực đã đặt trong program.json với người trực rõ; mẫu hồ sơ Job Order số đã có trên cổng (Tổ trưởng/Trưởng QA chuẩn bị trước ca, Người vận hành chỉ xem); mẫu phiếu cài đặt máy + mẫu FAI đã upload; sổ bàn giao ca 3 ca đã active; sổ kéo dây cảnh báo có cờ kind=test/real · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=7">Mở Lộ trình W07 trên cổng</a></p>
-<p class="meta-roles"><strong>Người chủ trì:</strong> Giám đốc Sản xuất · <strong>Người ký kết quả:</strong> Giám đốc (chữ ký số trên cổng — không ký giấy) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
+<p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P3-03 · <strong>ISO 9001:2015:</strong> §8.5 (sản xuất và cung cấp) · §8.5.6 (kiểm soát thay đổi) · §8.7 (đầu ra không phù hợp) · <strong>Tài liệu bắt buộc:</strong> SOP-501 (kế hoạch và điều độ sản xuất), WI-519 (kiểm hồ sơ Job Order), SOP-303 (release engineering), WI-302 (FAI và bằng chứng) · <strong>Tài liệu sẵn trên cổng trước buổi họp:</strong> Lịch đi xưởng 15 phút/ngày × 7 khu vực đã đặt trong program.json với người trực rõ; mẫu hồ sơ Job Order số đã có trên cổng (Tổ trưởng/Trưởng QA chuẩn bị trước ca, Người vận hành chỉ xem); mẫu phiếu cài đặt máy + mẫu FAI đã upload; sổ bàn giao ca 3 ca đã active; sổ kéo dây cảnh báo có cờ source=drill/real · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=7">Mở Lộ trình W07 trên cổng</a></p>
+<p class="meta-roles"><strong>Người chủ trì:</strong> Giám đốc Sản xuất · <strong>Người ký kết quả:</strong> Giám đốc (xác nhận điện tử qua tài khoản M365+MFA — không ký giấy, không tự lập chữ ký số CA (xem PLAYBOOK chương "Cơ chế xác thực")) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
 </section>
 <section class="card" id="sec-objective">
 <h2 class="h2">3 câu hỏi đánh giá riêng</h2>
 <ol class="tight">
 <li>Lịch đi xưởng 15 phút/ngày × 7 khu vực có người trực rõ trong program.json, Đội tăng cường (Trưởng QA + Kỹ sư QMS + 2 người dẫn dắt) đã ký số cam kết trực 24/5 chưa?</li>
 <li>Hồ sơ Job Order đầu tiên: Tổ trưởng/Trưởng QA đã chuẩn bị trước ca theo SOP-501+SOP-303; Người vận hành chỉ check phiếu cài đặt máy (WI-519) + FAI mẫu đầu (WI-302); ≥1 hồ sơ đã có chữ ký số Người vận hành + Trưởng QA trước khi chạy lô chưa?</li>
-<li>Cơ chế kéo dây cảnh báo + đường leo thang đã kiểm thử thật (kind=test trong issues.json) cùng tổ trưởng + người cài đặt máy trước tuần này chưa?</li>
+<li>Cơ chế kéo dây cảnh báo + đường leo thang đã kiểm thử thật (source=drill trong issues.json) cùng tổ trưởng + người cài đặt máy trước tuần này chưa?</li>
 </ol>
 </section>
 <section class="card" id="sec-tasks">
@@ -62,17 +62,17 @@
 <table>
 <thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm (trên cổng)</th><th>Cổng khoá nếu thiếu</th></tr></thead>
 <tbody>
-<tr><td>Lịch đi xưởng + người trực 7 khu vực</td><td>Giám đốc Sản xuất</td><td>program.json: 7 khu vực × 5 ngày = 35 dòng lịch, mỗi dòng có người trực; audit_events deploy.shopfloor.checkin ghi sổ.</td><td class="col-gate">P3-03 khoá: §8.5 không có kiểm soát thực địa.</td></tr>
+<tr><td>Lịch đi xưởng + người trực 7 khu vực</td><td>Giám đốc Sản xuất</td><td>program.json: 7 khu vực × 5 ngày = 35 dòng lịch, mỗi dòng có người trực; audit_events deploy.checklist.toggle cho mỗi khu vực trong 7 khu vực (key=shopfloor_checkin_<area>).</td><td class="col-gate">P3-03 khoá: §8.5 không có kiểm soát thực địa.</td></tr>
 <tr><td>Hồ sơ Job Order đầu tiên có chữ ký số</td><td>Trưởng QA</td><td>dcc_document_header lọc theo doc_type=JobOrder: ≥1 dòng đã có chữ ký số Trưởng QA + Người vận hành; mở đúng SOP-501 + WI-519 + SOP-303 + WI-302.</td><td class="col-gate">P3-03 khoá: §8.5 và §8.7 lệch — chạy lô không có FAI.</td></tr>
-<tr><td>Sổ phân ca + lịch trực 24/5 trên cổng</td><td>Trưởng QMS</td><td>champions.json: 3 ca có người dẫn dắt thường trực; meeting_minutes có 3 dòng/ngày sổ bàn giao ca ≥90% hoàn tất.</td><td class="col-gate">P3-03 khoá: §7.2 năng lực không đảm bảo ngoài giờ.</td></tr>
-<tr><td>Kiểm thử cơ chế kéo dây cảnh báo</td><td>Tổ trưởng</td><td>issues.json filter kind=test category=alert_cord: ≥1 dòng trước tuần này; đường leo thang theo ANNEX-117 đúng; chữ ký số tổ trưởng + Kỹ sư QMS.</td><td class="col-gate">P3-03 khoá: §10.2 không có cơ chế chặn sự cố nóng.</td></tr>
-<tr><td>Bản chụp KPI báo đỏ ngày 1</td><td>Trưởng QA</td><td>readiness.json: KPI báo đỏ = 0 hoặc có ngoại lệ trong audit_events deploy.kpi.exception ký số Giám đốc trong ngày.</td><td class="col-gate">P3-03 khoá: §9.1.3 phân tích đo lường không có cơ sở.</td></tr>
+<tr><td>Sổ phân ca + lịch trực 24/5 trên cổng</td><td>Trưởng QMS</td><td>champions.json: 3 ca có người dẫn dắt thường trực; meetings.json (trường daily_standup) có 3 dòng/ngày sổ bàn giao ca ≥90% hoàn tất.</td><td class="col-gate">P3-03 khoá: §7.2 năng lực không đảm bảo ngoài giờ.</td></tr>
+<tr><td>Kiểm thử cơ chế kéo dây cảnh báo</td><td>Tổ trưởng</td><td>issues.json filter source=drill description chứa 'alert_cord': ≥1 dòng trước tuần này; đường leo thang theo ANNEX-117 đúng; chữ ký số tổ trưởng + Kỹ sư QMS.</td><td class="col-gate">P3-03 khoá: §10.2 không có cơ chế chặn sự cố nóng.</td></tr>
+<tr><td>Bản chụp KPI báo đỏ ngày 1</td><td>Trưởng QA</td><td>readiness.json: KPI báo đỏ = 0 hoặc có ngoại lệ trong issues.json source=audit severity=Mức 2 + sự kiện deploy.metric.update (key=kpi_red_exception); xác nhận điện tử Giám đốc trong ngày.</td><td class="col-gate">P3-03 khoá: §9.1.3 phân tích đo lường không có cơ sở.</td></tr>
 </tbody>
 </table>
 <p class="champ-block"><strong>Việc của người dẫn dắt phòng tuần W07:</strong></p>
 <ul class="tight" style="margin-top:-6px">
 <li>Tổ trưởng + Người cài đặt máy: chuẩn bị hồ sơ Job Order số trước mỗi ca; Người vận hành chỉ xem trên cổng, không in.</li>
-<li>14 người dẫn dắt 7 khu vực: tham dự họp nhanh đầu ngày 15 phút tại xưởng (truy cập dashboard qua máy tính khu vực); ghi vào meeting_minutes trên cổng.</li>
+<li>14 người dẫn dắt 7 khu vực: tham dự họp nhanh đầu ngày 15 phút tại xưởng (truy cập dashboard qua máy tính khu vực); ghi vào meetings.json trên cổng.</li>
 <li>Đội tăng cường: trực 24/5 theo lịch; phản hồi sự cố Mức 1 qua issues.json trong ≤24 giờ.</li>
 </ul>
 </section>
@@ -83,7 +83,7 @@
 <li>Sổ vấn đề tuần này có dòng nào cần nâng mức theo ANNEX-117 (Mức 3 → Mức 2 hoặc Mức 2 → Mức 1) không, ai duyệt nâng mức?</li>
 <li>3 hành động tuần sau là gì, ai làm, hạn nào, và sẽ chặn cổng nào nếu trễ?</li>
 </ol>
-<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.gate.signoff hoặc deploy.issues.escalated), không in giấy.</p>
+<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.week.signoff hoặc deploy.issue.save (nâng severity)), không in giấy.</p>
 </section>
 </div>
 </div></div></div>

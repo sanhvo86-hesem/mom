@@ -47,7 +47,7 @@
 <h1 class="h2">W05 · 2026-06-13 · P3 · Đợt 2 vận hành chính thức — Chuỗi cung ứng + Kinh doanh</h1>
 <p>Trưởng Chuỗi cung ứng và Trưởng Kinh doanh dùng cuộc họp này để cam kết mốc cụ thể tuần đầu vận hành chính thức trên cổng — trung tâm điều hành mở online 8:30 mỗi sáng, ca trực 24/5 quản lý qua cổng, không quay về quy trình cũ.</p>
 <p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P3-01 · <strong>ISO 9001:2015:</strong> §8.2 (xác định yêu cầu khách hàng) · §8.4 (kiểm soát bên ngoài) · §8.5 (sản xuất và cung cấp) · <strong>Tài liệu bắt buộc:</strong> SOP-401 (kiểm soát nhà cung cấp), WI-701 (IQC + truy xuất), SOP-201 (đơn hàng RFQ → tiền) · <strong>Tài liệu sẵn trên cổng trước buổi họp:</strong> Trung tâm điều hành SCM + Kinh doanh đã tạo trong dashboard (tab Phòng ban → trang riêng); lịch ca trực 24/5 đã đặt trong program.json + thông báo cho 4+ người trực; danh sách liên lạc khẩn đã upload (không dán giấy, chỉ truy cập qua cổng); mẫu bảng phân loại sự cố theo ANNEX-117 đã liên kết · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=5">Mở Lộ trình W05 trên cổng</a></p>
-<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng nhóm chuyển đổi · <strong>Người ký kết quả:</strong> Giám đốc (chữ ký số trên cổng — không ký giấy) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
+<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng nhóm chuyển đổi · <strong>Người ký kết quả:</strong> Giám đốc (xác nhận điện tử qua tài khoản M365+MFA — không ký giấy, không tự lập chữ ký số CA (xem PLAYBOOK chương "Cơ chế xác thực")) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
 </section>
 <section class="card" id="sec-objective">
 <h2 class="h2">3 câu hỏi đánh giá riêng</h2>
@@ -63,10 +63,10 @@
 <thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm (trên cổng)</th><th>Cổng khoá nếu thiếu</th></tr></thead>
 <tbody>
 <tr><td>Trung tâm điều hành active + bảng phân loại sự cố</td><td>Trưởng nhóm chuyển đổi</td><td>Dashboard có tab Phòng ban → SCM/Sales active; issues.json cập nhật hàng ngày theo ANNEX-117; cuối ngày không còn sự cố Mức 1 đang mở.</td><td class="col-gate">P3-01 khoá: §10.2 không kiểm soát được sự cố mới.</td></tr>
-<tr><td>Lịch ca trực 24/5 + danh sách liên lạc trên cổng</td><td>Trưởng Chuỗi cung ứng + Trưởng Kinh doanh</td><td>program.json có 7 dòng lịch ca/tuần; danh sách liên lạc đã upload có chữ ký số cam kết của 4 người trực.</td><td class="col-gate">P3-01 khoá: không có hỗ trợ khi sự cố ngoài giờ.</td></tr>
+<tr><td>Lịch ca trực 24/5 + danh sách liên lạc trên cổng</td><td>Trưởng Chuỗi cung ứng + Trưởng Kinh doanh</td><td>program.json có 7 dòng lịch ca/tuần; danh sách liên lạc đã upload có xác nhận điện tử cam kết (qua biên bản tuần + audit log đăng nhập M365) của 4 người trực.</td><td class="col-gate">P3-01 khoá: không có hỗ trợ khi sự cố ngoài giờ.</td></tr>
 <tr><td>Kết quả đào tạo tại chỗ người dẫn dắt</td><td>Trưởng QMS</td><td>training_records/drill_logs có ≥4 dòng (2 phòng × 2 người dẫn dắt) với thời gian ≤180 giây; có chữ ký số Trưởng QA xác nhận.</td><td class="col-gate">P3-01 khoá: §7.2 năng lực không chứng minh được.</td></tr>
-<tr><td>Biên bản họp nhanh đầu ngày tuần 1</td><td>Trưởng nhóm chuyển đổi</td><td>Mỗi sáng 8:30 có 1 biên bản trên cổng; 5 biên bản đã ghi sổ; tỉ lệ có mặt ≥90% trong meeting_minutes.</td><td class="col-gate">P3-01 khoá: KPI-DEP-02 không có dữ liệu.</td></tr>
-<tr><td>Kế hoạch xử lý sự cố Mức 2 còn mở</td><td>Trưởng QMS</td><td>issues.json filter status=open level=Mức2 có ≥0 dòng; mỗi dòng có phương án ổn định tạm + người làm + hạn đóng; nâng mức theo ANNEX-117 nếu trễ.</td><td class="col-gate">P3-01 khoá: §10.2 thiếu kế hoạch khắc phục.</td></tr>
+<tr><td>Biên bản họp nhanh đầu ngày tuần 1</td><td>Trưởng nhóm chuyển đổi</td><td>Mỗi sáng 8:30 có 1 dòng biên bản trong meetings.json (trường daily_standup); 5 biên bản đã ghi sổ; tỉ lệ có mặt ≥90% trong trường attendees.</td><td class="col-gate">P3-01 khoá: KPI-DEP-02 không có dữ liệu.</td></tr>
+<tr><td>Kế hoạch xử lý sự cố Mức 2 còn mở</td><td>Trưởng QMS</td><td>issues.json filter status=open severity=Mức2 có ≥0 dòng; mỗi dòng có phương án ổn định tạm + người làm + hạn đóng; nâng mức theo ANNEX-117 nếu trễ.</td><td class="col-gate">P3-01 khoá: §10.2 thiếu kế hoạch khắc phục.</td></tr>
 </tbody>
 </table>
 <p class="champ-block"><strong>Việc của người dẫn dắt phòng tuần W05:</strong></p>
@@ -83,7 +83,7 @@
 <li>Sổ vấn đề tuần này có dòng nào cần nâng mức theo ANNEX-117 (Mức 3 → Mức 2 hoặc Mức 2 → Mức 1) không, ai duyệt nâng mức?</li>
 <li>3 hành động tuần sau là gì, ai làm, hạn nào, và sẽ chặn cổng nào nếu trễ?</li>
 </ol>
-<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.gate.signoff hoặc deploy.issues.escalated), không in giấy.</p>
+<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.week.signoff hoặc deploy.issue.save (nâng severity)), không in giấy.</p>
 </section>
 </div>
 </div></div></div>

@@ -47,14 +47,14 @@
 <h1 class="h2">W02 · 2026-05-23 · P1 · Chốt sổ tay phòng ban + bản mô tả công việc + ma trận RACI</h1>
 <p>Trưởng QMS dùng cuộc họp này để đóng cửa sổ phản hồi 14 ngày + cho 11 trưởng phòng ký số ma trận RACI bản 1.0 đồng loạt trên cổng tại bàn — không in giấy, không ký bút.</p>
 <p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P1-01, P1-02 · <strong>ISO 9001:2015:</strong> §5.3 (vai trò, trách nhiệm, quyền hạn) · §7.2 (năng lực) · §7.5.2 (cập nhật tài liệu) · <strong>Tài liệu bắt buộc:</strong> RACI-master-matrix, Authority-matrix, 11 sổ tay phòng ban, 39 JD bản 1.0 · <strong>Tài liệu sẵn trên cổng trước buổi họp:</strong> Ma trận RACI bản dự thảo 1.0 đã upload lên cổng và gửi thông báo cho 11 trưởng phòng ĐỌC TRƯỚC 7 NGÀY; sổ phản hồi RACI mở trên cổng nhận góp ý 7 ngày; danh sách 22 ứng viên người dẫn dắt + dự phòng đã chuẩn bị sẵn trong champions.json; bản hợp nhất sổ tay + JD theo phản hồi 14 ngày đã upload trạng thái = bản thảo · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=2">Mở Lộ trình W02 trên cổng</a></p>
-<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng QMS · <strong>Người ký kết quả:</strong> Giám đốc (chữ ký số trên cổng — không ký giấy) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
+<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng QMS · <strong>Người ký kết quả:</strong> Giám đốc (xác nhận điện tử qua tài khoản M365+MFA — không ký giấy, không tự lập chữ ký số CA (xem PLAYBOOK chương "Cơ chế xác thực")) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
 </section>
 <section class="card" id="sec-objective">
 <h2 class="h2">3 câu hỏi đánh giá riêng</h2>
 <ol class="tight">
 <li>Sổ phản hồi RACI trên cổng đã thu đủ ý kiến 14 ngày và mỗi mục đã có quyết định nhận/không nhận được Trưởng QMS ký số chưa?</li>
-<li>11/11 trưởng phòng có ký số ma trận RACI bản 1.0 đồng loạt tại bàn họp (audit_events deploy.raci.signoff ghi 11 dòng cùng ngày) chưa?</li>
-<li>champions.json đã có 11 chính + 11 dự phòng với chữ ký số cam kết của cả 22 người và buổi huấn luyện ngắn buổi 1 đạt ≥80% bài kiểm tra chưa?</li>
+<li>11/11 trưởng phòng có ký số ma trận RACI bản 1.0 đồng loạt tại bàn họp (biên bản W02 trong meetings.json ghi 11 chữ ký + sự kiện deploy.meeting.signoff) chưa?</li>
+<li>champions.json đã có 11 chính + 11 dự phòng với cam kết tập thể trong biên bản W02 (meetings.json field attendees) + xác nhận điện tử qua M365 của 22 người và buổi huấn luyện ngắn buổi 1 đạt ≥80% bài kiểm tra chưa?</li>
 </ol>
 </section>
 <section class="card" id="sec-tasks">
@@ -63,9 +63,9 @@
 <thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm (trên cổng)</th><th>Cổng khoá nếu thiếu</th></tr></thead>
 <tbody>
 <tr><td>Sổ phản hồi RACI đã đóng trên cổng</td><td>Trưởng QMS</td><td>Sổ phản hồi (feedback table) có 100% mục được Trưởng QMS đánh dấu nhận/không nhận; mỗi mục có ghi chú lý do.</td><td class="col-gate">P1-01 khoá: không có căn cứ chốt bản 1.0.</td></tr>
-<tr><td>Ma trận RACI bản 1.0 đã ký số</td><td>Tổ điều hành</td><td>dcc_document_header: doc_code=RACI-master-matrix, status=released, effective_date=2026-05-23; audit_events deploy.raci.signoff có 11 chữ ký số trưởng phòng + Giám đốc.</td><td class="col-gate">P1-01 khoá: không có quyền hạn rõ ràng cho thí điểm W03.</td></tr>
-<tr><td>22 người dẫn dắt + dự phòng trong champions.json</td><td>Trưởng Nhân sự</td><td>champions.json có 11 phòng × 2 vai = 22 dòng; mỗi dòng có ojtSignedAt trống (chưa OJT) nhưng có signedConsentAt + chữ ký số cam kết.</td><td class="col-gate">P1-02 khoá: thí điểm W03 không có người dẫn dắt QA.</td></tr>
-<tr><td>Kết quả khoá huấn luyện buổi 1</td><td>Kỹ sư QMS</td><td>training_records có 22 dòng với score≥80%; ≥90% có mặt; sự kiện kiểm toán deploy.training.session1.completed.</td><td class="col-gate">P1-02 khoá: §7.2 năng lực không chứng minh được.</td></tr>
+<tr><td>Ma trận RACI bản 1.0 đã ký số</td><td>Tổ điều hành</td><td>dcc_document_header: doc_code=RACI-master-matrix, status=released, effective_date=2026-05-23; meetings.json (biên bản W02) có trường attendees = 11 trưởng phòng + Giám đốc; xác nhận điện tử qua deploy.meeting.signoff.</td><td class="col-gate">P1-01 khoá: không có quyền hạn rõ ràng cho thí điểm W03.</td></tr>
+<tr><td>22 người dẫn dắt + dự phòng trong champions.json</td><td>Trưởng Nhân sự</td><td>champions.json có 11 phòng × 2 vai = 22 dòng; mỗi dòng có ojtSignedAt trống (chưa OJT) nhưng có ojtSignedBy đặt khi cam kết (trước OJT) + cam kết tập thể trong meetings.json (biên bản W02).</td><td class="col-gate">P1-02 khoá: thí điểm W03 không có người dẫn dắt QA.</td></tr>
+<tr><td>Kết quả khoá huấn luyện buổi 1</td><td>Kỹ sư QMS</td><td>training_records có 22 dòng với score≥80%; ≥90% có mặt; sự kiện kiểm toán deploy.metric.update (key=training_session1_completed_rate).</td><td class="col-gate">P1-02 khoá: §7.2 năng lực không chứng minh được.</td></tr>
 <tr><td>Bản hợp nhất sổ tay phòng ban + JD đã hiệu lực</td><td>Trưởng QMS</td><td>dcc_document_header: 11 sổ tay + 39 JD chuyển từ draft sang released cùng ngày; effective_date=2026-05-23.</td><td class="col-gate">P1-01 khoá: §7.5.2 cập nhật tài liệu không đạt.</td></tr>
 </tbody>
 </table>
@@ -84,7 +84,7 @@
 <li>Sổ vấn đề tuần này có dòng nào cần nâng mức theo ANNEX-117 (Mức 3 → Mức 2 hoặc Mức 2 → Mức 1) không, ai duyệt nâng mức?</li>
 <li>3 hành động tuần sau là gì, ai làm, hạn nào, và sẽ chặn cổng nào nếu trễ?</li>
 </ol>
-<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.gate.signoff hoặc deploy.issues.escalated), không in giấy.</p>
+<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.week.signoff hoặc deploy.issue.save (nâng severity)), không in giấy.</p>
 </section>
 </div>
 </div></div></div>
