@@ -628,9 +628,10 @@
 .readiness-dept-name { display: flex; align-items: center; gap: 8px; }
 .readiness-dept-name small { display: block; color: var(--c-muted); font-size: 11px; }
 .deploy-dash .deploy-wave-badge { padding: 2px 8px; border-radius: var(--r-pill); font-size: 10px; font-weight: 700; }
-.deploy-dash .deploy-wave-badge.wave-1 { background: var(--c-brand-soft); color: var(--c-brand); }
+.deploy-dash .deploy-wave-badge.wave-1 { background: #dcfce7; color: #166534; }
 .deploy-dash .deploy-wave-badge.wave-2 { background: #fde68a; color: #92400e; }
-.deploy-dash .deploy-wave-badge.wave-3 { background: #ddd6fe; color: var(--c-purple); }
+.deploy-dash .deploy-wave-badge.wave-3 { background: var(--c-brand-soft); color: var(--c-brand); }
+.deploy-dash .deploy-wave-badge.wave-4 { background: #ddd6fe; color: var(--c-purple); }
 
 .heatmap-cell {
   text-align: center;
