@@ -1359,7 +1359,7 @@
       +   '<button class="org-btn is-primary" data-act="add-assignee" data-pos-id="'+esc(p.hcm_position_id)+'">'+esc(t('+ Person','+ Nhân sự'))+'</button>'
       +   '<button class="org-btn" data-act="edit-position" data-pos-id="'+esc(p.hcm_position_id)+'">✏️ '+esc(t('Edit','Sửa'))+'</button>'
       +   '<button class="org-btn" data-act="reparent-position" data-pos-id="'+esc(p.hcm_position_id)+'">🔗 '+esc(t('Move to dept','Chuyển phòng'))+'</button>'
-      +   '<button class="org-btn '+(inactive?'is-primary':'is-danger')+'" data-act="toggle-position" data-pos-id="'+esc(p.hcm_position_id)+'">'+esc(inactive?t('Activate','Kích hoạt'):t('Archive','Ngừng dùng'))+'</button>'
+      +   '<button class="org-btn is-danger" data-act="delete-position" data-pos-id="'+esc(p.hcm_position_id)+'">🗑️ '+esc(t('Delete','Xóa'))+'</button>'
       + '</div>';
   }
 
@@ -1921,8 +1921,8 @@
         openReparentPositionModal(posId, host);
       } else if (act === 'toggle-unit'){
         toggleUnit(unitId, host);
-      } else if (act === 'toggle-position'){
-        togglePosition(posId, host);
+      } else if (act === 'delete-position'){
+        deletePosition(posId, host);
       } else if (act === 'open-chart'){
         // Trigger sibling Sơ đồ tổ chức tab via the legacy global pattern.
         if (typeof window.switchAdminTab === 'function'){
@@ -2238,20 +2238,25 @@
     });
   }
 
-  function togglePosition(posId, host){
+  function deletePosition(posId, host){
     var p = S.byPositionId[posId]; if (!p) return;
-    var willInactivate = String(p.status||'active') !== 'inactive';
+    var employees = (S.employeesByPosition[p.hcm_position_id] || []);
+    var active = activeEmployees(employees);
+    if (active.length > 0){
+      UI.toast(t('Cannot delete: position has assigned employees. Remove all assignments first.','Không thể xóa: vị trí đang có nhân sự. Hãy gỡ nhân sự trước.'),'error');
+      return;
+    }
     confirm({
-      title: willInactivate ? t('Archive position?','Ngừng dùng vị trí?') : t('Activate position?','Kích hoạt vị trí?'),
-      message: t('Status changes are audited.','Thay đổi trạng thái được ghi audit.'),
-      confirmLabel: willInactivate ? t('Archive','Ngừng dùng') : t('Activate','Kích hoạt')
+      title: t('Delete position?','Xóa vị trí vĩnh viễn?'),
+      message: t('This permanently deletes "'+p.position_title+'". This cannot be undone.','Xóa vĩnh viễn "'+p.position_title+'". Không thể hoàn tác.'),
+      confirmLabel: t('Delete','Xóa')
     }).then(function(ok){
       if (!ok) return;
-      safeTransition('hcm_workforce','hcm_positions', p.hcm_position_id, willInactivate ? 'inactive' : 'active', p.row_version)
+      safeDelete('hcm_workforce','hcm_positions', p.hcm_position_id, p.row_version)
         .then(function(){
-          UI.toast(t('Saved','Đã lưu'),'success');
+          UI.toast(t('Position deleted','Đã xóa vị trí'),'success');
           loadAll(true).then(function(){ renderOrgUnits(host); });
-        }).catch(function(err){ UI.toast(err && err.message || 'save_failed','error'); });
+        }).catch(function(err){ UI.toast(err && err.message || 'delete_failed','error'); });
     });
   }
 

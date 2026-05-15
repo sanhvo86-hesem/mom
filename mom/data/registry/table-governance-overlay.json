@@ -17296,8 +17296,8 @@
       "stewardRole": "workforce_data_steward",
       "dataClassification": "confidential_personal",
       "retentionClass": "hr_record_policy_based",
-      "deletionMode": "archive_only",
-      "registryDeletionMode": "archive_only",
+      "deletionMode": "hard_delete",
+      "registryDeletionMode": "hard_delete",
       "hardDeleteWaiverRequired": false,
       "qualityProfile": {
         "profile": "iso8000_core",
