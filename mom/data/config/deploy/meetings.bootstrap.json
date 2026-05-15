@@ -1,10 +1,10 @@
 {
   "version": 1,
   "agendaTemplate": [
-    {"slot": "0-10", "label": "KPI snapshot", "owner": "QMS Manager", "note": "8 KPI từ deploy dashboard (retrieval, training %, champion coverage, issue closure, sev-1/2/3)"},
-    {"slot": "10-30", "label": "Đóng issue tuần trước", "owner": "Cutover Lead", "note": "Severity board, action plan, age tracker"},
-    {"slot": "30-50", "label": "Gate tuần này", "owner": "Steering Committee", "note": "Đọc checklist phase đang chạy, tick pass/fail, ghi evidence link"},
-    {"slot": "50-60", "label": "Phân công tuần kế + Champion shoutout", "owner": "CEO", "note": "Tuyên dương champion, set deliverables tuần kế"}
+    {"slot": "0–10 phút",  "label": "Bản chụp KPI tuần",          "owner": "QMS Manager",            "note": "8 KPI từ bảng điều khiển: tra cứu, đào tạo, phủ người dẫn dắt, đóng vấn đề, sự cố Mức 1/2/3."},
+    {"slot": "10–30 phút", "label": "Đóng vấn đề tuần trước",      "owner": "Trưởng nhóm chuyển đổi", "note": "Bảng phân loại mức độ sự cố, kế hoạch hành động, sổ tuổi vấn đề. Mỗi vấn đề có người phụ trách + hạn."},
+    {"slot": "30–50 phút", "label": "Cổng tuần này",                "owner": "Tổ điều hành",           "note": "Đọc danh sách kiểm tra của pha đang chạy, tick đạt/không đạt, ghi đường dẫn bằng chứng vào sổ kiểm toán."},
+    {"slot": "50–60 phút", "label": "Phân công tuần kế + tuyên dương người dẫn dắt", "owner": "CEO",  "note": "Tuyên dương người dẫn dắt nổi bật, chốt sản phẩm phải có của tuần kế cho từng phòng."}
   ],
   "meetings": []
 }

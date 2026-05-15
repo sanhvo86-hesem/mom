@@ -575,6 +575,7 @@
 .deploy-decision-table tr:last-child td { border-bottom: 0; }
 
 /* ── Meetings (tab 3) ─────────────────────────────────────────────────── */
+.agenda-attendees-source { margin: 4px 0 12px; padding: 8px 12px; background: #f0f9ff; border-left: 3px solid #0284c7; border-radius: 4px; font-size: 12px; color: var(--c-ink); }
 .agenda-template-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
 .agenda-slot {
   background: var(--c-card);

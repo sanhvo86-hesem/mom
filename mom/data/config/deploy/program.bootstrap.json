@@ -3,6 +3,8 @@
   "startDate": "2026-05-14",
   "meetingTime": "09:00",
   "meetingDay": "Saturday",
+  "meetingVenue": "Phòng họp lớn HESEM (tầng 1) — 60 phút",
+  "meetingAttendeesSource": "Lấy từ bảng \"Phòng ban tham gia ISO\" trên cổng. Mặc định: trưởng phòng + 1 người dẫn dắt phòng cho mỗi phòng ban đang tham gia, cộng Tổ điều hành (CEO + QMS Manager + QA Manager + Kỹ sư QMS). Không cần khai thành phần lại theo tuần.",
   "currentWeek": 0,
   "currentPhase": "P0",
   "phaseStatus": {
@@ -17,11 +19,11 @@
       "n": 0,
       "date": "2026-05-14",
       "dayOverride": "Thứ Năm",
-      "attendees": ["ceo", "qa_manager", "qms_engineer"],
-      "attendeesNote": "Họp nội bộ Tổ điều hành (CEO + QA Manager + Kỹ sư QMS) — không yêu cầu trưởng phòng khác có mặt. Đại diện 10 phòng ban chỉ bắt đầu họp từ W1 (16/5).",
+      "attendees": ["steering_core"],
+      "attendeesNote": "Họp nội bộ Tổ điều hành thu hẹp (CEO + QA Manager + Kỹ sư QMS) tại phòng họp lớn. Trưởng phòng các phòng ban chưa cần có mặt — bắt đầu họp đầy đủ từ W1 (16/5).",
       "phase": "P0",
-      "label": "Tiền khởi động — Tổ điều hành thu hẹp",
-      "objective": "Tổ điều hành (CEO + QA Manager + Kỹ sư QMS) duyệt 3 tài liệu nền (WI-105, WI-106, ANNEX-114) từ bản thảo sang hiệu lực; chạy thử định tuyến thư mục M365; kiểm tra tra cứu nội bộ. Không bắt buộc trưởng phòng khác có mặt — họ vào từ W1.",
+      "label": "Tiền khởi động — Tổ điều hành duyệt tài liệu nền",
+      "objective": "Trong 60 phút: Tổ điều hành duyệt 3 tài liệu nền (WI-105 + WI-106 + ANNEX-114) từ bản thảo sang hiệu lực, chạy thử định tuyến thư mục M365, kiểm tra tra cứu nội bộ. Khoá sổ trước khi mời đại diện 10 phòng ban vào W1.",
       "gateCodes": ["P0-01", "P0-02", "P0-03"],
       "deliverables": [
         "WI-105 + WI-106 + ANNEX-114 đã hiệu lực (CEO + Kỹ sư QMS ký)",
@@ -38,10 +40,10 @@
       "n": 1,
       "date": "2026-05-16",
       "attendees": ["all_departments"],
-      "attendeesNote": "Buổi họp đại diện chính thức của chương trình — trưởng phòng và 1 người dẫn dắt phòng cho mỗi đơn vị (10 phòng ban) + Tổ điều hành. Đây là buổi đầu tiên sau W0 nội bộ. Không họp toàn thể nhân viên — phổ biến tới nhân viên qua trưởng phòng.",
+      "attendeesNote": "Họp tại phòng họp lớn, 60 phút. Thành phần lấy theo bảng \"Phòng ban tham gia ISO\" trên cổng. Sau họp, mỗi trưởng phòng tự phổ biến và triển khai trong phòng mình — không họp toàn thể nhân viên.",
       "phase": "P0",
       "label": "Công bố chính thức · giới thiệu MAN-001 + POL-QMS-001/002",
-      "objective": "Tổ điều hành ký hiệu lực Sổ tay QMS + POL-QMS-001 + POL-QMS-002 trước đại diện 10 phòng ban; trao 11 sổ tay phòng ban + 39 bản mô tả công việc; nêu nhiệm vụ tuần 2 (chốt sổ tay/JD/RACI); mở cửa sổ phản hồi 14 ngày; mở sổ ghi vấn đề.",
+      "objective": "Trong 60 phút: Tổ điều hành ký hiệu lực Sổ tay QMS + POL-QMS-001 + POL-QMS-002 trực tiếp tại bàn họp; trao 11 sổ tay phòng ban + 39 bản mô tả công việc cho trưởng phòng; công bố nhiệm vụ tuần 2 (chốt sổ tay/JD/RACI); mở cửa sổ phản hồi 14 ngày; mở sổ ghi vấn đề.",
       "gateCodes": ["P0-04", "P0-05"],
       "deliverables": [
         "MAN-001 ngày hiệu lực = 2026-05-16",
@@ -59,13 +61,13 @@
       "n": 2,
       "date": "2026-05-23",
       "attendees": ["all_departments"],
-      "attendeesNote": "Đại diện 10 phòng ban (trưởng phòng + ứng viên người dẫn dắt). Tuần chốt sổ tay phòng ban, bản mô tả công việc và ma trận RACI.",
+      "attendeesNote": "Họp tại phòng họp lớn, 60 phút. Thành phần lấy theo bảng \"Phòng ban tham gia ISO\" trên cổng. Sau họp, mỗi trưởng phòng đi sâu sổ tay + JD với đội của mình.",
       "phase": "P1",
       "label": "Chốt sổ tay phòng ban + bản mô tả công việc + ma trận RACI",
-      "objective": "Đóng cửa sổ phản hồi sổ tay/bản mô tả công việc; mỗi trưởng phòng đi sâu sổ tay và bản mô tả công việc với đội của mình; ký xác nhận ma trận RACI bản 1.0; chọn 11 người dẫn dắt phòng (1/phòng) + 11 người dự phòng; mở khoá huấn luyện ngắn cho người dẫn dắt — buổi 1.",
+      "objective": "Trong 60 phút: tổng hợp phản hồi 14 ngày về sổ tay/JD; 11 trưởng phòng ký xác nhận ma trận RACI bản 1.0 ngay tại bàn; chốt danh sách 11 người dẫn dắt phòng + 11 người dự phòng. Sau họp, mỗi phòng ban tự đi sâu sổ tay + JD trong tuần và bật khoá huấn luyện ngắn cho người dẫn dắt — buổi 1.",
       "gateCodes": ["P1-01", "P1-02"],
       "deliverables": [
-        "11 buổi đi sâu sổ tay và bản mô tả công việc đã hoàn tất",
+        "11 buổi đi sâu sổ tay và bản mô tả công việc đã hoàn tất tại từng phòng",
         "Đã thu sổ ghi phản hồi về RACI",
         "Ma trận RACI bản 1.0 đã được 11 trưởng phòng ký hiệu lực",
         "39 bản mô tả công việc đã có chữ ký người sở hữu và người phê duyệt",
@@ -79,17 +81,17 @@
     {
       "n": 3,
       "date": "2026-05-30",
-      "attendees": ["all_departments", "qa_team", "champions"],
-      "attendeesNote": "Phòng Chất Lượng (5 người) + 11 người dẫn dắt phòng + Tổ điều hành. Bắt đầu thử nghiệm tiên phong tại Phòng Chất Lượng — chỉ 1 chuyền/khu vực duy nhất, chạy song song với hệ thống cũ.",
+      "attendees": ["all_departments"],
+      "attendeesNote": "Họp tại phòng họp lớn, 60 phút. Thành phần lấy theo bảng \"Phòng ban tham gia ISO\" trên cổng. Sau họp, Phòng Chất Lượng tự bắt đầu thử nghiệm tiên phong tại xưởng — các phòng khác quan sát, chuẩn bị cho đợt mình.",
       "phase": "P2",
-      "label": "Thử nghiệm tiên phong tại Chất Lượng — Tuần 1 (chạy song song SOP-605 + WI-201)",
-      "objective": "Phòng Chất Lượng chạy thực 5 ngày: SOP-605 (IQC/IPQC/FQC) + WI-201 (cổng chất lượng) + biểu mẫu/ANNEX tương ứng. Chạy song song với hệ thống cũ. Họp nhanh đầu ngày 15 phút/ngày, mở sổ ghi vấn đề.",
+      "label": "Khởi động thử nghiệm tiên phong tại Chất Lượng — Tuần 1",
+      "objective": "Trong 60 phút: Trưởng phòng Chất Lượng trình bày kế hoạch chạy song song SOP-605 + WI-201 trong 5 ngày kế tiếp; Tổ điều hành chốt ranh giới chạy song song (chỉ 1 chuyền/khu vực duy nhất, không lan sang phòng khác); các phòng khác ghi nhận để chuẩn bị tuần đợt mình. Sau họp, Chất Lượng tự tổ chức họp nhanh đầu ngày 15 phút trong tuần.",
       "gateCodes": ["P2-01"],
       "deliverables": [
-        "Đã chạy song song ≥3 ngày",
+        "Chất Lượng đã chạy song song ≥3 ngày",
         "Diễn tập tra cứu ≥10 lượt với người dẫn dắt Chất Lượng",
         "Sổ ghi vấn đề có ≥5 mục (kể cả sự cố Mức 3)",
-        "Tỉ lệ có mặt họp nhanh đầu ngày ≥90% · đã có bản chụp KPI tuần 1"
+        "Tỉ lệ có mặt họp nhanh đầu ngày của Chất Lượng ≥90% · đã có bản chụp KPI tuần 1"
       ],
       "requiredDocs": ["SOP-605", "WI-201", "DRL-E2E"],
       "playbookCode": "TRN-DEP-PLAYBOOK",
@@ -99,11 +101,11 @@
     {
       "n": 4,
       "date": "2026-06-06",
-      "attendees": ["ceo", "qms_manager", "qa_manager", "steering", "champions"],
-      "attendeesNote": "Tổ điều hành + 11 người dẫn dắt phòng. Cổng quyết định Đi/Không đi cho Đợt 2 (Chuỗi cung ứng + Kinh doanh).",
+      "attendees": ["all_departments"],
+      "attendeesNote": "Họp tại phòng họp lớn, 60 phút. Thành phần lấy theo bảng \"Phòng ban tham gia ISO\" trên cổng. Đây là cổng quyết định Đi/Không đi cho Đợt 2 — yêu cầu trưởng phòng Chuỗi cung ứng + Kinh doanh có mặt.",
       "phase": "P2",
       "label": "Cổng quyết định Đi/Không đi cho Đợt 2",
-      "objective": "Chất Lượng chạy song song và kiểm tra tra cứu; đóng vấn đề tồn từ tuần thử nghiệm; cổng quyết định Đi/Không đi cho Đợt 2 (Chuỗi cung ứng + Kinh doanh). Chất Lượng vận hành độc lập (không chạy song song) ít nhất 1 ngày để khẳng định năng lực.",
+      "objective": "Trong 60 phút: Chất Lượng báo cáo kết quả thử nghiệm + đóng vấn đề tồn; Tổ điều hành kiểm tra điều kiện Đi/Không đi cho Đợt 2 (Chuỗi cung ứng + Kinh doanh) qua checklist ANNEX-114 + ANNEX-117; CEO + QMS Manager ký quyết định tại bàn họp; biên bản ghi vào sổ kiểm toán. Trước họp, Chất Lượng phải vận hành độc lập 1 ngày không sự cố Mức 1/2 để đủ điều kiện trình.",
       "gateCodes": ["P2-02", "P2-03", "P2-04"],
       "deliverables": [
         "Diễn tập mở nhầm bản tài liệu đã đạt · trung vị kiểm tra tra cứu ≤3 phút",
@@ -119,11 +121,11 @@
     {
       "n": 5,
       "date": "2026-06-13",
-      "attendees": ["scm_dept", "sales_dept", "champions", "cutover_lead"],
-      "attendeesNote": "Đại diện Chuỗi cung ứng (Mua hàng/Kho/Xuất nhập khẩu) + Đại diện Kinh doanh/Chăm sóc khách hàng + người dẫn dắt phòng + Trưởng nhóm chuyển đổi.",
+      "attendees": ["all_departments"],
+      "attendeesNote": "Họp tại phòng họp lớn, 60 phút. Thành phần lấy theo bảng \"Phòng ban tham gia ISO\" trên cổng. Tuần đầu vận hành chính thức Đợt 2 — Chuỗi cung ứng + Kinh doanh báo cáo tại bàn, các phòng khác giám sát + chuẩn bị đợt mình.",
       "phase": "P3",
       "label": "Đợt 2 vận hành chính thức — Chuỗi cung ứng + Kinh doanh",
-      "objective": "Phòng Mua hàng, Kho, Xuất nhập khẩu + Kinh doanh/Chăm sóc khách hàng vận hành chính thức; mở trung tâm điều hành theo ngày; chăm sóc tăng cường 24/5 trong tuần đầu; bảng phân loại mức độ sự cố cập nhật theo thời gian thực.",
+      "objective": "Trong 60 phút: Trưởng phòng Chuỗi cung ứng (Mua hàng/Kho/Xuất nhập khẩu) + Kinh doanh/Chăm sóc khách hàng cam kết mốc cụ thể tuần này (mở trung tâm điều hành theo ngày, chăm sóc tăng cường 24/5, họp nhanh đầu ngày 8:30); Trưởng nhóm chuyển đổi công bố danh sách liên lạc + bảng phân loại mức độ sự cố. Sau họp, hai phòng này tự vận hành tại phòng mình.",
       "gateCodes": ["P3-01"],
       "deliverables": [
         "Đã mở trung tâm điều hành cho Chuỗi cung ứng + Kinh doanh · họp nhanh đầu ngày 8:30",
@@ -139,16 +141,16 @@
     {
       "n": 6,
       "date": "2026-06-20",
-      "attendees": ["steering", "scm_dept", "sales_dept", "production_dept", "engineering_dept", "champions"],
-      "attendeesNote": "Tổ điều hành + Trưởng phòng các đơn vị thuộc Đợt 2 + Trưởng phòng Sản xuất và Kỹ thuật (chuẩn bị vận hành chính thức tuần 7) + người dẫn dắt phòng.",
+      "attendees": ["all_departments"],
+      "attendeesNote": "Họp tại phòng họp lớn, 60 phút. Thành phần lấy theo bảng \"Phòng ban tham gia ISO\" trên cổng. Tuần soát xét giữa Đợt 2 + chuẩn bị cho Đợt Sản xuất (đợt rủi ro cao nhất).",
       "phase": "P3",
-      "label": "Soát xét giữa Đợt 2 + chuẩn bị đợt Sản xuất",
-      "objective": "Soát xét giữa Đợt 2 và đóng các phiếu việc còn lại; chốt cẩm nang vận hành chính thức + điều kiện kích hoạt khôi phục cho đợt Sản xuất (đợt rủi ro cao nhất); phê duyệt cho đợt Sản xuất vận hành chính thức.",
+      "label": "Soát xét giữa Đợt 2 + chuẩn bị Đợt Sản xuất",
+      "objective": "Trong 60 phút: Đợt 2 báo cáo phiếu việc còn lại + cam kết đóng trong tuần; Tổ điều hành cùng Trưởng phòng Sản xuất + Kỹ thuật soát xét cẩm nang vận hành chính thức (ANNEX-114 + ANNEX-118), kiểm chứng điều kiện kích hoạt khôi phục đã thử thật; phê duyệt cho Đợt Sản xuất vận hành chính thức tuần kế. Sau họp, Sản xuất + Kỹ thuật chuẩn bị xưởng + chia ca trực tăng cường.",
       "gateCodes": ["P3-02"],
       "deliverables": [
         "Sự cố Mức 1 của Đợt 2 = 0 trong 5 ngày làm việc gần nhất",
         "Sự cố Mức 2 của Đợt 2 có phương án xử lý tạm ổn định",
-        "Cẩm nang vận hành chính thức cho đợt Sản xuất đã chốt · ANNEX-114 + ANNEX-118 đã cập nhật",
+        "Cẩm nang vận hành chính thức cho Đợt Sản xuất đã chốt · ANNEX-114 + ANNEX-118 đã cập nhật",
         "Điều kiện kích hoạt khôi phục đã được kiểm thử thật · bằng chứng kiểm thử ghi vào sổ kiểm toán"
       ],
       "requiredDocs": ["ANNEX-114", "ANNEX-118"],
@@ -159,11 +161,11 @@
     {
       "n": 7,
       "date": "2026-06-27",
-      "attendees": ["production_dept", "engineering_dept", "champions", "cutover_lead", "hypercare_team"],
-      "attendeesNote": "Đại diện Sản xuất + Kỹ thuật đi cùng nhau (rủi ro cao nhất, chia 2 tuần). Đội chăm sóc tăng cường (QA Manager + Kỹ sư QMS + 2 người dẫn dắt phòng) trực 24/5.",
+      "attendees": ["all_departments"],
+      "attendeesNote": "Họp tại phòng họp lớn, 60 phút. Thành phần lấy theo bảng \"Phòng ban tham gia ISO\" trên cổng. Đợt Sản xuất + Kỹ thuật vận hành chính thức đồng thời — rủi ro cao nhất, chia 2 tuần chăm sóc tăng cường.",
       "phase": "P3",
       "label": "Đợt Sản xuất vận hành chính thức — Tuần 1 (Sản xuất + Kỹ thuật đồng thời)",
-      "objective": "Phòng Sản xuất + Kỹ thuật vận hành chính thức đồng thời. Đi xưởng kiểm tra hàng ngày 15 phút/ngày tại 7 khu vực. Hồ sơ Job Order đầu tiên phải đạt đầy đủ. Chuẩn bị sẵn cơ chế kéo dây cảnh báo và đường leo thang.",
+      "objective": "Trong 60 phút: Trưởng phòng Sản xuất + Kỹ thuật cam kết kế hoạch 5 ngày tuần này (đi xưởng kiểm tra hàng ngày 15 phút/ngày tại 7 khu vực; hồ sơ Job Order đầu tiên phải đạt đầy đủ); Đội chăm sóc tăng cường (QA Manager + Kỹ sư QMS + 2 người dẫn dắt phòng) công bố lịch trực 24/5; chuẩn bị cơ chế kéo dây cảnh báo + đường leo thang. Sau họp, Sản xuất + Kỹ thuật tự triển khai tại xưởng.",
       "gateCodes": ["P3-03"],
       "deliverables": [
         "Đã mở trung tâm điều hành cho Sản xuất + Kỹ thuật · họp nhanh tại xưởng cho 7 khu vực",
@@ -179,11 +181,11 @@
     {
       "n": 8,
       "date": "2026-07-04",
-      "attendees": ["production_dept", "engineering_dept", "hypercare_team", "champions"],
-      "attendeesNote": "Đại diện Sản xuất + Kỹ thuật trong giai đoạn chăm sóc tăng cường tuần 2. Mỗi khu vực trong 7 khu vực có 1 người dẫn dắt thường trực.",
+      "attendees": ["all_departments"],
+      "attendeesNote": "Họp tại phòng họp lớn, 60 phút. Thành phần lấy theo bảng \"Phòng ban tham gia ISO\" trên cổng. Tuần 2 chăm sóc tăng cường Sản xuất — mục tiêu đóng cổng Sản xuất ổn định.",
       "phase": "P3",
       "label": "Chăm sóc tăng cường Sản xuất — Tuần 2",
-      "objective": "Chăm sóc tăng cường tuần 2 cho Sản xuất: đi xưởng kiểm tra hàng ngày; bảng 'vấn đề trong ngày'; thử thật cơ chế kéo dây cảnh báo; bản chụp KPI mỗi 2 giờ trong giờ làm việc. Mục tiêu: sự cố Mức 1 = 0 trong 5 ngày liên tiếp.",
+      "objective": "Trong 60 phút: Trưởng phòng Sản xuất + Kỹ thuật báo cáo kết quả tuần 1; Tổ điều hành kiểm chứng cơ chế kéo dây cảnh báo đã được thử thật; cam kết bản chụp KPI mỗi 2 giờ trong giờ làm việc + bảng \"vấn đề trong ngày\" đóng trong 24 giờ. Mục tiêu cổng: sự cố Mức 1 = 0 trong 5 ngày liên tiếp. Sau họp, Sản xuất + Kỹ thuật tiếp tục chăm sóc tại xưởng.",
       "gateCodes": ["P3-03"],
       "deliverables": [
         "Người dùng Sản xuất mở đúng tài liệu ≥95% (đo qua diễn tập tra cứu ngẫu nhiên)",
@@ -199,11 +201,11 @@
     {
       "n": 9,
       "date": "2026-07-11",
-      "attendees": ["hr_dept", "finance_dept", "it_dept", "ehs_dept", "epicor_admin", "champions"],
-      "attendeesNote": "Đợt 3 — đại diện các phòng hỗ trợ (Nhân sự, Tài chính, IT, EHS, quản trị Epicor/ERP). Mỗi phòng đề cử 1 người dẫn dắt + 1 dự phòng.",
+      "attendees": ["all_departments"],
+      "attendeesNote": "Họp tại phòng họp lớn, 60 phút. Thành phần lấy theo bảng \"Phòng ban tham gia ISO\" trên cổng. Khởi động Đợt 3 — 5 phòng hỗ trợ (Nhân sự, Tài chính, IT, EHS, Epicor) vào thử nghiệm tiên phong. Đợt Sản xuất vẫn duy trì chăm sóc tăng cường song song.",
       "phase": "P3",
       "label": "Khởi động Đợt 3 — Nhân sự / Tài chính / IT / EHS / Epicor",
-      "objective": "Đợt 3 (5 phòng hỗ trợ) bước vào thử nghiệm tiên phong. Đề cử người dẫn dắt + khoá huấn luyện ngắn. Bàn giao tài liệu. Đợt Sản xuất vẫn duy trì chăm sóc tăng cường song song.",
+      "objective": "Trong 60 phút: 5 trưởng phòng Đợt 3 (HR/FIN/IT/EHS/ERP) đề cử người dẫn dắt + dự phòng và nhận tài liệu (5 sổ tay phòng ban + bản mô tả công việc); QA Manager công bố lịch khoá huấn luyện ngắn cho 10 người dẫn dắt mới; Đội chăm sóc tăng cường Sản xuất báo cáo tình trạng đóng cổng. Sau họp, 5 phòng hỗ trợ tự khởi động tại phòng mình.",
       "gateCodes": ["P3-04"],
       "deliverables": [
         "Người dẫn dắt Đợt 3 (5) + dự phòng (5) đã được đề cử · khoá huấn luyện đã đạt",
@@ -219,11 +221,11 @@
     {
       "n": 10,
       "date": "2026-07-18",
-      "attendees": ["hr_dept", "finance_dept", "it_dept", "ehs_dept", "epicor_admin", "qms_manager"],
-      "attendeesNote": "Đợt 3 ổn định tuần 1 + soát xét truy cập điều hành cho dashboard.",
+      "attendees": ["all_departments"],
+      "attendeesNote": "Họp tại phòng họp lớn, 60 phút. Thành phần lấy theo bảng \"Phòng ban tham gia ISO\" trên cổng. Tuần ổn định Đợt 3 + soát xét truy cập điều hành cho dashboard.",
       "phase": "P4",
-      "label": "Đợt 3 ổn định + soát xét điều hành dashboard",
-      "objective": "Đợt 3 ổn định; bản chụp KPI: tra cứu ≥95%, đào tạo ≥90%, phủ người dẫn dắt 100%; soát xét truy cập theo ô dữ liệu dashboard đã đạt.",
+      "label": "Đợt 3 ổn định + soát xét truy cập dashboard",
+      "objective": "Trong 60 phút: 5 trưởng phòng Đợt 3 báo cáo chỉ số tuần 1 (tra cứu ≥95%, đào tạo ≥90%, phủ người dẫn dắt 100%); IT Manager + QMS Manager trình bày kết quả soát xét truy cập ô dữ liệu dashboard và đề xuất hiệu chỉnh quyền. CEO ký kết quả soát xét. Sau họp, các phòng tự đóng tồn đọng CAPA + bản chụp KPI tuần liên tiếp.",
       "gateCodes": ["P4-01", "P4-02"],
       "deliverables": [
         "Chăm sóc tăng cường: sự cố Mức 1 cho Đợt 3 = 0 trong 5 ngày",
@@ -239,11 +241,11 @@
     {
       "n": 11,
       "date": "2026-07-25",
-      "attendees": ["all_departments", "steering"],
-      "attendeesNote": "Đại diện 10 phòng ban + người dẫn dắt phòng + Tổ điều hành. Tổng kết bài học, cập nhật tài liệu bản sửa đổi tiếp theo.",
+      "attendees": ["all_departments"],
+      "attendeesNote": "Họp tại phòng họp lớn, 60 phút. Thành phần lấy theo bảng \"Phòng ban tham gia ISO\" trên cổng. Tổng kết bài học toàn chương trình, cập nhật tài liệu bản sửa đổi tiếp theo.",
       "phase": "P4",
       "label": "Bài học rút ra + cập nhật tài liệu hậu triển khai",
-      "objective": "Đóng bảng phân loại mức độ sự cố; cập nhật tài liệu theo bài học thực tế (bản sửa đổi tiếp theo); ban hành đợt làm mới mã QR; phát hành danh mục học bản 2; lên kế hoạch chuyển sang vận hành thường xuyên.",
+      "objective": "Trong 60 phút: từng trưởng phòng nộp 3 bài học từ phòng mình (tốt/xấu/đề xuất sửa); Tổ điều hành tổng hợp thành báo cáo bài học rút ra; QMS Manager công bố danh sách ≥10 tài liệu cần cập nhật lên bản sửa đổi tiếp theo + ban hành đợt làm mới mã QR tại 7 khu vực; phát hành danh mục học bản 2 (≥3 video mới). Sau họp, các phòng tự dán nhãn QR mới.",
       "gateCodes": ["P4-03"],
       "deliverables": [
         "Báo cáo bài học rút ra đã được Tổ điều hành ký",
@@ -259,11 +261,11 @@
     {
       "n": 12,
       "date": "2026-08-01",
-      "attendees": ["steering", "all_departments"],
-      "attendeesNote": "Ban Chỉ đạo + đại diện các phòng ban dự họp bàn giao chính thức từ chương trình triển khai sang chế độ vận hành thường xuyên. Thông báo sau họp mới phổ biến tới toàn công ty.",
+      "attendees": ["all_departments"],
+      "attendeesNote": "Họp tại phòng họp lớn, 60 phút. Thành phần lấy theo bảng \"Phòng ban tham gia ISO\" trên cổng. Buổi bàn giao chính thức từ chương trình triển khai sang chế độ vận hành thường xuyên. Thông báo toàn công ty sau buổi họp.",
       "phase": "P4",
       "label": "Bàn giao chính thức · sang vận hành thường xuyên",
-      "objective": "Chủ sở hữu vận hành thường xuyên nhận bàn giao; module chuyển sang chế độ vận hành thường xuyên. Nhịp họp: họp tầng hàng tuần + soát xét lãnh đạo hàng tháng. Đã lên lịch chu kỳ kiểm toán nội bộ năm 1.",
+      "objective": "Trong 60 phút: Tổ điều hành ký biên bản bàn giao trực tiếp tại bàn họp; CEO trao trách nhiệm KPI cho chủ sở hữu vận hành thường xuyên (QMS Manager); công bố nhịp vận hành mới (họp tầng hàng tuần Thứ Bảy 9:00 + soát xét lãnh đạo hàng tháng); lên lịch 4 quý kiểm toán nội bộ năm 1. Sau họp, QMS Manager phổ biến tới toàn công ty + công khai dashboard KPI.",
       "gateCodes": ["P4-04"],
       "deliverables": [
         "Biên bản bàn giao đã được Tổ điều hành ký · ghi vào sổ kiểm toán",
@@ -277,5 +279,5 @@
       "signOff": null
     }
   ],
-  "lastUpdated": "2026-05-13T00:00:00+07:00"
+  "lastUpdated": "2026-05-15T00:00:00+07:00"
 }

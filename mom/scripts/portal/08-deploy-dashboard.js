@@ -1123,17 +1123,20 @@ function renderDecisionLog(weeks){
 function renderTabMeetings(){
   const meetings = ((DeployState.meetings && DeployState.meetings.meetings) || []).slice().sort((a,b) => (b.weekN|0) - (a.weekN|0));
   const tpl = (DeployState.meetings && DeployState.meetings.agendaTemplate) || [];
+  const venue = (DeployState.program && DeployState.program.meetingVenue) || 'Phòng họp lớn HESEM — 60 phút';
+  const attendeesSource = (DeployState.program && DeployState.program.meetingAttendeesSource) || '';
   return `
   <div class="deploy-tab-panel active" id="dtab-meetings">
     <section class="deploy-section">
       <div class="deploy-section-head">
-        <h2>Khuôn họp Thứ Bảy 9:00 — 60 phút</h2>
-        <span>Mẫu agenda cố định, lặp đúng mỗi tuần</span>
+        <h2>Khuôn họp Thứ Bảy 9:00 — ${deployEscape(venue)}</h2>
+        <span>Mẫu chương trình họp cố định, lặp đúng mỗi tuần. Thành phần dự họp lấy từ bảng Phòng ban tham gia ISO.</span>
       </div>
+      ${attendeesSource ? `<p class="agenda-attendees-source">${deployEscape(attendeesSource)}</p>` : ''}
       <div class="agenda-template-grid">
         ${tpl.map(t => `
           <div class="agenda-slot">
-            <span class="agenda-slot-time">${deployEscape(t.slot)}'</span>
+            <span class="agenda-slot-time">${deployEscape(t.slot)}</span>
             <strong>${deployEscape(t.label)}</strong>
             <div class="agenda-owner">${deployEscape(t.owner)}</div>
             <p>${deployEscape(t.note)}</p>
@@ -1142,10 +1145,10 @@ function renderTabMeetings(){
     </section>
     <section class="deploy-section">
       <div class="deploy-section-head">
-        <h2>Lịch họp & biên bản</h2>
-        <span>${meetings.length} biên bản · click một tuần ở tab Lộ trình để tạo mới</span>
+        <h2>Lịch họp và biên bản</h2>
+        <span>${meetings.length} biên bản · bấm một tuần ở tab Lộ trình để tạo mới</span>
       </div>
-      ${meetings.length === 0 ? '<div class="deploy-empty">Chưa có biên bản. Mở tab <strong>Lộ trình</strong>, click tuần và bấm <strong>Tạo biên bản</strong>.</div>' : `
+      ${meetings.length === 0 ? '<div class="deploy-empty">Chưa có biên bản. Mở tab <strong>Lộ trình</strong>, bấm tuần và bấm <strong>Tạo biên bản</strong>.</div>' : `
       <div class="deploy-meeting-list">
         ${meetings.map(m => renderMeetingCard(m)).join('')}
       </div>`}
