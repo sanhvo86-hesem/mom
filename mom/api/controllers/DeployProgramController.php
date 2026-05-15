@@ -36,10 +36,14 @@ class DeployProgramController extends BaseController
     private const SIGNOFF_ROLES = ['admin', 'it_admin', 'ceo', 'qms_manager', 'qa_manager', 'general_director'];
     private const EDIT_ROLES    = ['admin', 'it_admin', 'ceo', 'qms_manager', 'qa_manager', 'general_director', 'production_director', 'supply_chain_manager', 'hr_manager', 'finance_manager', 'engineering_lead'];
     private const DEFAULT_DEPARTMENT_IDS = ['PROD', 'ENG', 'QA', 'SCM', 'SALES', 'FIN', 'HR', 'IT', 'EHS', 'ERP'];
-    // Wave keys align with mom/data/config/deploy/program.json — see
-    // 08-deploy-dashboard.js DEPLOY_CONFIG.waves. Persisted in custom-dept
-    // rows under departmentRoster.custom[*].wave.
-    private const VALID_WAVES = ['pilot', 'w2', 'prod', 'w3'];
+    // Đợt triển khai 1..4 — khớp lộ trình 12 tuần (xem
+    // mom/data/config/deploy/program.json + DEPLOY_CONFIG.waves trong
+    // 08-deploy-dashboard.js). Lưu trong departmentRoster.custom[*].wave.
+    //   1 = Thí điểm (W4, phòng QA)
+    //   2 = Mở rộng SCM + Kinh doanh (W5–W7)
+    //   3 = Sản xuất + Kỹ thuật (W8 — rủi ro cao nhất)
+    //   4 = Hỗ trợ + ERP (W9–W10)
+    private const VALID_WAVES = [1, 2, 3, 4];
 
     public function loadState(): never
     {
@@ -428,7 +432,6 @@ class DeployProgramController extends BaseController
         $this->success(['data' => $result]);
     }
 
-<<<<<<< HEAD
     public function saveChampionOjt(): never
     {
         $me = $this->requireAuth();
@@ -612,7 +615,8 @@ class DeployProgramController extends BaseController
             'uncovered_count' => count($uncovered),
             'notification_sent' => $notificationSent,
         ]]);
-=======
+    }
+
     public function runDocUsageAggregate(): never
     {
         $me = $this->requireAuth();
@@ -644,7 +648,6 @@ class DeployProgramController extends BaseController
             'use_03' => $kpis['KPI-USE-03'],
         ]);
         $this->success(['data' => $kpis]);
->>>>>>> 90cf3a88 (Add deploy doc usage KPI aggregation)
     }
 
     public function saveAudit(): never
@@ -1206,7 +1209,7 @@ class DeployProgramController extends BaseController
         return [
             'id' => $deptId,
             'label' => $deptId,
-            'wave' => 'w3',
+            'wave' => 4,
             'color' => '#475569',
             'owner' => '',
             'handbook' => '',
@@ -1216,18 +1219,20 @@ class DeployProgramController extends BaseController
         ];
     }
 
-    private function normalizeWave(mixed $raw): string
+    private function normalizeWave(mixed $raw): int
     {
+        if (is_int($raw)) {
+            return in_array($raw, self::VALID_WAVES, true) ? $raw : 4;
+        }
         $v = strtolower(trim((string)$raw));
-        if (in_array($v, self::VALID_WAVES, true)) return $v;
-        // Legacy integer migration. Old wave=1 was the mixed PROD+ENG+QA
-        // bucket; we cannot disambiguate at this layer, so map it to
-        // 'prod' (the heavier half). Default depts are remapped on the
-        // client; only custom-dept rows pass through this path.
-        if ($v === '1') return 'prod';
-        if ($v === '2') return 'w2';
-        if ($v === '3' || $v === '') return 'w3';
-        return 'w3';
+        if ($v === '') return 4;
+        // Hỗ trợ chuỗi cũ (pilot/w2/prod/w3) — chuyển về số đợt mới.
+        if ($v === 'pilot') return 1;
+        if ($v === 'w2')    return 2;
+        if ($v === 'prod')  return 3;
+        if ($v === 'w3')    return 4;
+        $n = (int)$v;
+        return in_array($n, self::VALID_WAVES, true) ? $n : 4;
     }
 
     private function normalizeDepartmentId(string $deptId): string
