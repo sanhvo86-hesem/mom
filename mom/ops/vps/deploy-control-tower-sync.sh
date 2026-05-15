@@ -210,6 +210,7 @@ sync_repo() {
   run_remote_cmd "mkdir -p '${APP_DIR}'"
   local rsync_path="rsync"
   local excludes=(
+    --exclude '.git'
     --exclude '.git/'
     --exclude '.DS_Store'
     --exclude '.claude/'
