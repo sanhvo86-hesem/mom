@@ -1,0 +1,10 @@
+[Unit]
+Description=Chạy deploy-availability-check lúc 06:30 hằng ngày
+
+[Timer]
+OnCalendar=*-*-* 06:30:00
+Persistent=true
+Unit=deploy-availability-check.service
+
+[Install]
+WantedBy=timers.target

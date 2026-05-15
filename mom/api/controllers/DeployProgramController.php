@@ -6,6 +6,7 @@ namespace MOM\Api\Controllers;
 
 use InvalidArgumentException;
 use MOM\Services\DeployDrillReminderService;
+use MOM\Services\NotificationGateway;
 use MOM\Api\Services\DocAccessAnalyticsService;
 use Throwable;
 
@@ -488,6 +489,128 @@ class DeployProgramController extends BaseController
             'passed' => $person['ojtPassed'],
         ]);
         $this->success(['data' => $state, 'person' => $person]);
+    }
+
+    public function saveAvailability(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::EDIT_ROLES);
+        $body = $this->jsonBody();
+
+        foreach (['championName', 'deptId', 'role', 'fromDate', 'toDate', 'reason'] as $field) {
+            if (trim((string)($body[$field] ?? '')) === '') {
+                $this->error("missing_{$field}", 400);
+            }
+        }
+
+        $role = strtolower(trim((string)$body['role']));
+        if (!in_array($role, ['primary', 'backup'], true)) {
+            $this->error('invalid_role', 400);
+        }
+
+        $fromDate = trim((string)$body['fromDate']);
+        $toDate = trim((string)$body['toDate']);
+        if (
+            preg_match('/^\d{4}-\d{2}-\d{2}$/', $fromDate) !== 1
+            || preg_match('/^\d{4}-\d{2}-\d{2}$/', $toDate) !== 1
+        ) {
+            $this->error('invalid_date_format', 400);
+        }
+        if ($fromDate > $toDate) {
+            $this->error('invalid_date_range', 400);
+        }
+
+        $state = $this->loadFile('deploy/availability.json');
+        if (!isset($state['absences']) || !is_array($state['absences'])) {
+            $state['absences'] = [];
+        }
+
+        $now = gmdate('c');
+        $entry = [
+            'id' => 'ABS-' . substr(hash('sha256', $now . random_int(0, 999999)), 0, 8),
+            'championName' => trim((string)$body['championName']),
+            'deptId' => strtoupper(trim((string)$body['deptId'])),
+            'role' => $role,
+            'fromDate' => $fromDate,
+            'toDate' => $toDate,
+            'reason' => trim((string)$body['reason']),
+            'coverBy' => trim((string)($body['coverBy'] ?? '')),
+            'coverPhone' => trim((string)($body['coverPhone'] ?? '')),
+            'approvedBy' => (string)($me['name'] ?? $me['username'] ?? ''),
+            'approvedAt' => $now,
+        ];
+
+        $state['absences'][] = $entry;
+        $state['lastUpdated'] = $now;
+        $this->saveFile('deploy/availability.json', $state);
+        $this->audit('deploy.availability.save', $me, [
+            'dept' => $entry['deptId'],
+            'from' => $entry['fromDate'],
+            'to' => $entry['toDate'],
+        ]);
+        $this->success(['data' => $state, 'entry' => $entry]);
+    }
+
+    public function checkAvailability(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::SIGNOFF_ROLES);
+
+        $state = $this->loadFile('deploy/availability.json');
+        $today = gmdate('Y-m-d');
+        $uncovered = [];
+        foreach (($state['absences'] ?? []) as $absence) {
+            if (!is_array($absence)) {
+                continue;
+            }
+            if (
+                (string)($absence['fromDate'] ?? '') <= $today
+                && (string)($absence['toDate'] ?? '') >= $today
+                && trim((string)($absence['coverBy'] ?? '')) === ''
+            ) {
+                $uncovered[] = $absence;
+            }
+        }
+
+        $notificationSent = false;
+        if ($uncovered !== []) {
+            try {
+                $items = array_map(
+                    static fn(array $absence): string => trim((string)($absence['championName'] ?? '')) . ' (' . strtoupper(trim((string)($absence['deptId'] ?? ''))) . ')',
+                    $uncovered,
+                );
+                $list = implode(', ', array_values(array_filter($items)));
+                $count = count($uncovered);
+                $subject = "Cảnh báo: {$count} người dẫn dắt vắng hôm nay chưa có người trực thay";
+                $body = $list !== '' ? "{$subject}: {$list}. Trưởng phòng cập nhật người trực thay trên cổng." : $subject;
+                (new NotificationGateway($this->dataDir))->send(
+                    NotificationGateway::CAT_ESCALATION,
+                    NotificationGateway::PRIORITY_HIGH,
+                    $subject,
+                    $body,
+                    recipientRoles: ['qms_manager'],
+                    sourceType: 'deploy_availability',
+                    sourceId: $today,
+                    metadata: [
+                        'channels' => ['zalo', 'email', 'log'],
+                        'uncovered_count' => $count,
+                    ],
+                );
+                $notificationSent = true;
+            } catch (Throwable $e) {
+                @error_log('[checkAvailability] notify failed: ' . $e->getMessage());
+            }
+        }
+
+        $this->audit('deploy.availability.check', $me, [
+            'uncovered_count' => count($uncovered),
+            'notification_sent' => $notificationSent ? 1 : 0,
+        ]);
+        $this->success(['data' => [
+            'uncovered' => $uncovered,
+            'uncovered_count' => count($uncovered),
+            'notification_sent' => $notificationSent,
+        ]]);
     }
 
     public function saveAudit(): never

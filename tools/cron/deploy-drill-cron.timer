@@ -1,0 +1,10 @@
+[Unit]
+Description=Chạy deploy-drill-cron lúc 06:00 hằng ngày
+
+[Timer]
+OnCalendar=*-*-* 06:00:00
+Persistent=true
+Unit=deploy-drill-cron.service
+
+[Install]
+WantedBy=timers.target
