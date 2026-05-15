@@ -2,11 +2,10 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>TRN-DEP-W12 — Sổ tay triển khai tuần 12 (2026-08-01) | HESEM MOM</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRN-DEP-W12 — Đánh giá bàn giao vận hành thường xuyên | HESEM MOM</title>
 <script>
-	/* Nap bo hien thi DCC dung chung theo mau TRN-OPS-09.
-	 * Tinh URL tuyet doi de tep dinh dang va bo hien thi tai dung khi mo truc tiep hoac trong khung nhung cong thong tin. */
+/* DCC Header bootstrap */
 (function () {
   var DCC_VERSION = '2026-04-24-1';
   var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
@@ -21,207 +20,57 @@
   document.head.appendChild(js);
 })();
 </script>
-<link href="../../../../assets/style.css" rel="stylesheet">
+<link rel="stylesheet" href="../../../../assets/style.css">
 <style>
- .role-chip{display:inline-block;padding:2px 8px;border-radius:999px;background:#f3f4f6;margin:2px 6px 2px 0;font-size:12px}
- .tight li{margin:2px 0}
- table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; }
- td,th { word-wrap:break-word; overflow-wrap:break-word; padding:8px 10px; border:1px solid #e2e8f0; vertical-align:top; }
- th { background:#f1f5f9; text-align:left; font-weight:700; }
+ table{width:100%;border-collapse:collapse;table-layout:fixed}
+ th,td{border:1px solid #e2e8f0;padding:8px 10px;vertical-align:top;overflow-wrap:anywhere}
+ th{background:#f1f5f9;text-align:left}
+ .tight li{margin:4px 0}
 </style>
 </head>
 <body>
 <div class="container"><div class="page"><div class="page-body">
-
-	<!-- Tieu de kiem soat thay doi DCC (du lieu mau xem truoc; gia tri thuc te do /api/v1/dcc cung cap) -->
 <div class="dcc-header"
      data-dcc-doc-code="TRN-DEP-W12"
      data-dcc-locale="vi"
      data-dcc-logo="../../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap='{"header":{"doc_code":"TRN-DEP-W12","title":"Sổ tay triển khai tuần 12 — Bàn giao chính thức sang vận hành thường xuyên","subtitle":"Triển khai vận hành QMS · Giai đoạn P4 · 2026-08-01 (Thứ Bảy)","doc_type":"TRN","revision":"V0","effective_date":"2026-08-01","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":null,"status":"draft"}}'></div>
-
+     data-dcc-bootstrap='{"header":{"doc_code":"TRN-DEP-W12","title":"Đánh giá bàn giao vận hành thường xuyên","subtitle":"Triển khai vận hành · Giai đoạn P4 · 2026-08-01","doc_type":"TRN","revision":"V0","effective_date":"2026-08-01","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":null,"status":"released"}}'></div>
 <div class="doc-content" id="docContent">
-<section class="card" id="sec-cover">
-  <h1 class="h2" style="margin-top:0;">W12 · 2026-08-01 — Bàn giao chính thức sang vận hành thường xuyên</h1>
-  <p class="lead">Tuần 12 đóng chương trình triển khai 12 tuần và bàn giao hệ thống sang vận hành thường xuyên, nhưng chỉ đóng khi chủ trì vận hành nhận KPI, nhịp điều hành, lịch đánh giá, danh sách hạt nhân và hành động còn mở bằng chữ ký rõ ràng. Đây là điểm Kotter bước 8 được chứng minh: QMS không còn là dự án đặc biệt mà trở thành cách công ty điều hành hằng tuần, hằng tháng và hằng quý. ISO 9001:2015 §9.3 quản trị rà soát đầu vào, ITIL 4 chuyển sang vận hành, NIST mốc đầu kỳ khóa dữ liệu và Toyota thể chế hóa đều được chuyển thành bằng chứng cụ thể trong gói hồ sơ bàn giao.</p>
-  <div class="grid-3">
-    <div class="metric-card"><strong>Ngày</strong><br>2026-08-01</div>
-    <div class="metric-card"><strong>Thứ</strong><br>Thứ Bảy</div>
-    <div class="metric-card"><strong>Giai đoạn</strong><br>P4 · Bàn giao sang vận hành thường xuyên</div>
-    <div class="metric-card"><strong>Trụ cột</strong><br>quản trị · nhịp điều hành thường xuyên</div>
-    <div class="metric-card"><strong>Thành phần tham dự</strong><br>Ban Chỉ đạo · đại diện được ủy quyền của các phòng ban · CEO, QMS_MGR, QA_MGR, PROD_DIR, ENG_MGR ký trực tiếp</div>
-    <div class="metric-card"><strong>Chủ trì</strong><br>CEO + QMS_MGR · chủ trì vận hành thường xuyên nhận trách nhiệm KPI</div>
-  </div>
-  <p>Thông điệp cuối cùng: chương trình đóng, nhưng vòng kiểm soát không đóng. Từ 2026-08-08 trở đi, cuộc họp thứ Bảy 09:00 là cuộc họp điều hành hằng tuần theo WI-202; từ 2026-08-27, quản trị rà soát tháng đầu tiên chạy theo WI-901; và từ tháng 09/2026, đánh giá nội bộ chu kỳ năm 1 bắt đầu theo ANNEX-119.</p>
+<section class="card">
+<h1 class="h2">W12 · 2026-08-01 · P4 · Đánh giá bàn giao</h1>
+<p>Giám đốc dùng cuộc họp này để bàn giao nhịp vận hành thường xuyên cho chủ trì thật, không để chương trình triển khai biến thành việc riêng của QMS.</p>
 </section>
-<section class="card" id="sec-objective">
-  <h2 class="h2">Mục tiêu tuần 12</h2>
-  <ol class="tight">
-    <li>Bản ghi nhớ bàn giao v1.0 phải được ký trực tiếp bởi 5 vai trò Ban chỉ đạo: CEO, QMS_MGR, QA_MGR, PROD_DIR, ENG_MGR trước 2026-08-01 09:25.</li>
-    <li>Ma trận bàn giao chủ trì KPI phải gán đủ 10 mã KPI từ KPI-FLD-01 đến KPI-DEP-07 cho vai trò vận hành thường xuyên chịu trách nhiệm, hệ thống nguồn, rà soát nhịp điều hành và leo thang xử lý đường dẫn trước 2026-08-01 09:35.</li>
-    <li>Nhịp vận hành sau chương trình phải được công bố: cuộc họp điều hành hằng tuần thứ Bảy 09:00, xem xét của lãnh đạo hằng tháng thứ Năm cuối tháng, hằng quý đánh giá nội bộ theo lịch 09/2026, 12/2026, 03/2027, 06/2027.</li>
-    <li>Danh sách hạt nhân chuyển trạng thái từ `deploy` sang `ongoing`; mỗi hạt nhân có dự phòng, liên kết JD và đào tạo trách nhiệm để không biến mất sau lễ đóng chương trình.</li>
-    <li>Bản ghi audit_events `deploy_program_handoff_complete` phải được tạo trước 2026-08-01 17:00, kèm gói hồ sơ bàn giao, ma trận KPI, lịch bằng chứng và quyết định biên bản.</li>
-  </ol>
-  <div class="table-card"><table class="table"><thead><tr><th>Mốc đầu kỳ trước W12</th><th>Giá trị cuối W11</th><th>Mục tiêu W12</th><th>Bằng chứng</th><th>Chủ trì tiếp nhận</th></tr></thead><tbody>
-    <tr><td>Bản ghi nhớ bàn giao</td><td>v0.9 đã ở trạng thái bản nháp, cần chữ ký trực tiếp</td><td>v1.0 đã ký bởi 5 vai trò Ban chỉ đạo</td><td>bản ghi nhớ bàn giao PDF, trang chữ ký</td><td>CEO</td></tr>
-    <tr><td>KPI trách nhiệm chủ trì</td><td>Ma trận bản nháp 10 KPI, cần vận hành thường xuyên xác nhận tiếp nhận</td><td>10/10 KPI có vai trò chịu trách nhiệm và nhịp điều hành</td><td>ANNEX-110 chủ trì bàn giao ma trận</td><td>QMS_MGR</td></tr>
-    <tr><td>Lịch đánh giá</td><td>Q1-Q4 đã đặt lịch bản nháp</td><td>4 lịch sự kiện đã xác nhận</td><td>ANNEX-119, lịch tệp xuất</td><td>QMS_MGR</td></tr>
-    <tr><td>trạng thái CAPA</td><td>0 quá hạn bắt buộc từ W11</td><td>0 CAPA quá hạn tại thời điểm bàn giao</td><td>CAPA truy vấn, ANNEX-117</td><td>QA_MGR</td></tr>
-    <tr><td>Danh sách hạt nhân</td><td>22 triển khai hạt nhân + người dự phòng</td><td>Trạng thái `ongoing`, vai trò chịu trách nhiệm, dự phòng và liên kết JD có đủ</td><td>`champions.json`, training_records</td><td>HR_MGR</td></tr>
-  </tbody></table></div>
-  <p>W12 không được đóng nếu còn câu trả lời mơ hồ, không có ngày, không có chủ trì hoặc không có bằng chứng. Mỗi mục tiêu phải kết thúc bằng bằng chứng bàn giao: bản ghi nhớ, ma trận, lịch, danh sách, đánh giá sự kiện. Nếu một bằng chứng bàn giao thiếu, chương trình chuyển sang Bàn giao có điều kiện và CEO phải ký lý do thay vì ghi hoàn tất.</p>
+<section class="card">
+<h2 class="h2">3 câu hỏi đánh giá riêng</h2>
+<ol class="tight">
+<li>Chủ trì vận hành thường xuyên có nhận đủ KPI, lịch họp, lịch đánh giá và đường báo cáo không?</li>
+<li>Trưởng QMS có chứng minh mọi hành động còn mở có người làm, hạn đóng và bằng chứng kiểm lại không?</li>
+<li>Giám đốc có đủ căn cứ để ký Đi tiếp, Đi tiếp có điều kiện hoặc Không đi tiếp sau bàn giao không?</li>
+</ol>
 </section>
-<section class="card" id="sec-prep">
-  <h2 class="h2">Danh sách chuẩn bị — T-7 / T-3 / T-1 / T-0</h2>
-  <div class="table-card"><table class="table"><thead><tr><th>Mốc</th><th>Chủ trì</th><th>Việc phải làm</th><th>Bằng chứng</th><th>Hạn chót</th></tr></thead><tbody>
-    <tr><td>T-7 · 2026-07-25</td><td>QMS_MGR</td><td>Tập hợp bản nháp bản ghi nhớ bàn giao từ W01-W11 bằng chứng, gồm cổng quyết định, KPI, CAPA, tài liệu lần sửa đổi và hành động còn mở.</td><td>bản ghi nhớ bàn giao v0.7</td><td>2026-07-25 18:00</td></tr>
-    <tr><td>T-7 · 2026-07-25</td><td>QMS_ENG</td><td>Khóa dữ liệu gốc KPI 12 tuần và lập gói đường xu hướng nhỏ cho KPI-FLD-01..KPI-DEP-07.</td><td>ANNEX-110 dữ liệu gói hồ sơ</td><td>2026-07-25 18:00</td></tr>
-    <tr><td>T-7 · 2026-07-25</td><td>HR_MGR</td><td>Soạn nháp danh sách hạt nhân chuyển từ triển khai vai trò sang duy trì thường xuyên vai trò, gồm dự phòng và liên kết JD.</td><td>`champions.json` bản nháp</td><td>2026-07-25 18:30</td></tr>
-    <tr><td>T-7 · 2026-07-25</td><td>IT_MGR</td><td>Xác nhận mã QR dán nhãn bằng chứng và công tắc chuyển bảng điều hành sang chế độ vận hành thường xuyên.</td><td>QR kho ảnh bằng chứng, bảng điều hành cấu hình ghi chú</td><td>2026-07-25 18:30</td></tr>
-    <tr><td>T-3 · 2026-07-29</td><td>QMS_ENG</td><td>Hoàn thiện Ma trận bàn giao chủ trì KPI với hệ thống nguồn, rà soát nhịp điều hành, leo thang xử lý chủ trì và ô xác nhận tiếp nhận của chủ trì vận hành thường xuyên.</td><td>ANNEX-110 ma trận v0.9</td><td>2026-07-29 12:00</td></tr>
-    <tr><td>T-3 · 2026-07-29</td><td>QMS_MGR</td><td>Xác nhận đánh giá nội bộ lịch Q1-Q4 và xem xét của lãnh đạo hằng tháng đầu tiên khung lịch 2026-08-27.</td><td>lịch tệp xuất, ANNEX-119</td><td>2026-07-29 15:00</td></tr>
-    <tr><td>T-3 · 2026-07-29</td><td>QA_MGR</td><td>Chạy CAPA cuối cùng trạng thái truy vấn và liệt kê mọi CAPA còn mở với chủ trì, ngày đến hạn và kiểm tra hiệu lực trạng thái.</td><td>CAPA truy vấn đầu ra, ANNEX-117</td><td>2026-07-29 16:00</td></tr>
-    <tr><td>T-3 · 2026-07-29</td><td>HR_MGR</td><td>Xác nhận nhật ký ghi hình danh sách video đào tạo v2 và ánh xạ toàn bộ video đã phát hành sang `training_records`.</td><td>SOP-801, nhật ký danh sách video v2</td><td>2026-07-29 17:00</td></tr>
-    <tr><td>T-1 · 2026-07-31</td><td>QMS_MGR</td><td>Hoàn thiện gói hồ sơ bàn giao: bản ghi nhớ, ma trận KPI, lịch đánh giá, danh sách hạt nhân, trạng thái CAPA, W11 lần sửa đổi kế hoạch.</td><td>gói hồ sơ bàn giao v1.0 ứng viên</td><td>2026-07-31 12:00</td></tr>
-    <tr><td>T-1 · 2026-07-31</td><td>CEO</td><td>Rà soát bài phát biểu kết thúc và chữ ký thứ tự; xác nhận không còn cổng quyết định bất đồng.</td><td>CEO rà soát xác nhận</td><td>2026-07-31 14:00</td></tr>
-    <tr><td>T-1 · 2026-07-31</td><td>IT_MGR</td><td>Chuẩn bị trực tiếp màn hình trực tiếp của bảng điều hành ở chế độ vận hành thường xuyên và bảo đảm không hiển thị dữ liệu chỉ dành cho bản nháp trong cuộc họp bàn giao cấp đại diện phòng ban.</td><td>bảng điều hành ảnh chụp màn hình có dấu thời gian</td><td>2026-07-31 15:00</td></tr>
-    <tr><td>T-1 · 2026-07-31</td><td>QMS_ENG</td><td>Chuẩn bị audit_events gói ghi dữ liệu cho `deploy_program_handoff_complete`.</td><td>bản nháp dữ liệu ghi sự kiện đánh giá</td><td>2026-07-31 16:00</td></tr>
-    <tr><td>T-0 · 2026-08-01</td><td>QMS_MGR</td><td>30 phút trước họp, xác nhận các trang chữ ký đã in, chữ ký số phương án dự phòng sẵn sàng và lịch tệp xuất đính kèm.</td><td>chữ ký danh sách kiểm tra mức sẵn sàng</td><td>2026-08-01 08:30</td></tr>
-    <tr><td>T-0 · 2026-08-01</td><td>QMS_ENG</td><td>Xác nhận toàn bộ 12 liên kết TRN-DEP-Wnn mở từ cổng thông tin và hiển thị phần đầu DCC.</td><td>sổ tay triển khai liên kết nhật ký kiểm tra nhanh</td><td>2026-08-01 08:35</td></tr>
-    <tr><td>T-0 · 2026-08-01</td><td>QA_MGR</td><td>Chạy lại CAPA quá hạn kiểm tra; bất kỳ CAPA quá hạn sẽ chặn bàn giao đầy đủ.</td><td>CAPA cuối cùng truy vấn</td><td>2026-08-01 08:40</td></tr>
-    <tr><td>T-0 · 2026-08-01</td><td>CEO</td><td>Xác nhận câu chốt: chương trình đóng, nhịp vận hành thường xuyên điều hành bắt đầu, cuộc họp điều hành hằng tuần đầu tiên lúc 2026-08-08 09:00.</td><td>kịch bản điều phối của CEO</td><td>2026-08-01 08:45</td></tr>
-  </tbody></table></div>
+<section class="card">
+<h2 class="h2">Bằng chứng phải có</h2>
+<table>
+<thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm</th></tr></thead>
+<tbody>
+<tr><td>Bản ghi nhớ bàn giao</td><td>Giám đốc</td><td>Giám đốc, Trưởng QMS và chủ trì vận hành ký.</td></tr>
+<tr><td>Ma trận chủ trì KPI</td><td>Trưởng QMS</td><td>Mỗi KPI có người chủ trì và nhịp rà soát.</td></tr>
+<tr><td>Lịch họp vận hành thường xuyên</td><td>Trưởng QMS</td><td>Lịch tuần và lịch tháng có chủ trì rõ.</td></tr>
+<tr><td>Danh sách người dẫn dắt và người dự phòng</td><td>Trưởng Nhân sự</td><td>Mỗi phòng có người chính và người dự phòng.</td></tr>
+<tr><td>Danh sách hành động còn mở</td><td>Trưởng QA</td><td>Mọi hành động còn mở ở Mức 3 hoặc cao hơn.</td></tr>
+</tbody>
+</table>
 </section>
-<section class="card" id="sec-agenda">
-  <h2 class="h2">Chương trình họp · 09:00–10:00 (60 phút)</h2>
-  <div class="table-card"><table class="table"><thead><tr><th>Thời gian</th><th>Phút</th><th>Đề mục</th><th>Chủ trì</th><th>Kết quả kỳ vọng</th></tr></thead><tbody>
-    <tr><td>09:00-09:05</td><td>5</td><td>CEO phát biểu kết thúc: neo QMS thành hệ điều hành hằng ngày của công ty</td><td>CEO</td><td>Đại diện phòng ban hiểu chương trình đóng, nhịp điều hành vận hành thường xuyên bắt đầu và có trách nhiệm phổ biến lại cho đội nhóm.</td></tr>
-    <tr><td>09:05-09:15</td><td>10</td><td>Tổng kết hành trình 12 tuần với đường xu hướng KPI</td><td>QMS_MGR</td><td>W01-W12 dòng thời gian, các đợt triển khai, vấn đề, CAPA và KPI xu hướng được trình bày kèm bằng chứng.</td></tr>
-    <tr><td>09:15-09:25</td><td>10</td><td>Bản ghi nhớ bàn giao điểm qua + trực tiếp chữ ký</td><td>CEO, QMS_MGR</td><td>5 vai trò Ban chỉ đạo ký bản ghi nhớ v1.0.</td></tr>
-    <tr><td>09:25-09:35</td><td>10</td><td>Ma trận bàn giao chủ trì KPI</td><td>QMS_ENG</td><td>10 KPI được giao cho vai trò vận hành thường xuyên chịu trách nhiệm, nhịp điều hành và leo thang xử lý đường dẫn.</td></tr>
-    <tr><td>09:35-09:43</td><td>8</td><td>Chu kỳ đánh giá nội bộ năm 1</td><td>QMS_MGR</td><td>4 đánh giá hằng quý khung lịch đã xác nhận và hiển thị trên lịch.</td></tr>
-    <tr><td>09:43-09:50</td><td>7</td><td>Nhịp vận hành sau chương trình</td><td>QMS_MGR</td><td>Họp điều hành hằng tuần, xem xét của lãnh đạo hằng tháng, đánh giá hằng quý và vấn đề leo thang xử lý đã được tiếp nhận.</td></tr>
-    <tr><td>09:50-09:56</td><td>6</td><td>Ghi nhận hạt nhân và chuyển sang duy trì thường xuyên vai trò</td><td>HR_MGR</td><td>22 hạt nhân được ghi nhận bởi vai trò nhóm và duy trì thường xuyên trạng thái đã xác nhận.</td></tr>
-    <tr><td>09:56-09:59</td><td>3</td><td>Cổng P4-04 quyết định</td><td>CEO</td><td>Đi tiếp / Bàn giao có điều kiện / Dừng lại được ghi hồ sơ.</td></tr>
-    <tr><td>09:59-10:00</td><td>1</td><td>Xem trước tuần 13, tuần vận hành thường xuyên đầu tiên</td><td>QMS_MGR</td><td>Cuộc họp điều hành hằng tuần đầu tiên đã xác nhận cho 2026-08-08 09:00.</td></tr>
-  </tbody></table></div>
+<section class="card">
+<h2 class="h2">Vòng rút kinh nghiệm 10 phút</h2>
+<ol class="tight">
+<li>Việc gì làm lại sẽ làm khác?</li>
+<li>Việc gì sẽ giữ nguyên?</li>
+<li>3 hành động cụ thể tuần sau là gì, ai làm, hạn nào?</li>
+</ol>
+<p>Trưởng QMS ghi 3 hành động vào <code>issues.json</code> ở Mức 3. Trưởng QMS không tạo biểu mẫu mới.</p>
 </section>
-<section class="card" id="sec-slides">
-  <h2 class="h2">Nội dung họp tuần 12 — theo từng trang</h2>
-  <div class="card"><h3>Trang 1 — Dòng thời gian hành trình 12 tuần</h3><p>QMS_MGR trình bày hành trình từ W01 công bố chính thức, W03-W04 thí điểm QA, W05-W06 Đợt 2, W07-W08 Đợt Sản xuất, W09-W10 Đợt 3, W11 bài học kinh nghiệm đến W12 bàn giao. Dòng thời gian không chỉ kể tuần; mỗi mốc phải kèm cổng quyết định mã, sản phẩm bàn giao và bằng chứng. Kotter bước 8 được diễn giải bằng câu: "đây là cách chúng ta vận hành từ nay".</p><ul class="tight"><li>W01-W03: P0/P1/P2 nền tảng và khởi động thí điểm.</li><li>W04-W09: các cổng quyết định theo đợt P2/P3 và hỗ trợ tăng cường.</li><li>W10-W12: quản trị bảng điều hành, bài học, bàn giao.</li></ul></div>
-  <div class="card"><h3>Trang 2 — đường xu hướng KPI: KPI-FLD-01, KPI-FLD-02, KPI-TRN-01</h3><p>Trang này hiển thị ba KPI người dùng: định tuyến đúng thư mục, thời gian tra cứu và hoàn thành đào tạo. Nếu W01 mốc đầu kỳ thấp, phải giữ nguyên để thấy đường học tập. Không được chỉ hiển thị điểm cuối; điểm cuối không giải thích được năng lực vận hành nếu không thấy xu hướng theo đợt triển khai.</p><ul class="tight"><li>KPI-FLD-01 mục tiêu ≥95%.</li><li>KPI-FLD-02 mục tiêu ≤180s.</li><li>KPI-TRN-01 mục tiêu ≥90%.</li><li>Bằng chứng: ANNEX-110, training_records, nhật ký diễn tập tra cứu.</li></ul></div>
-  <div class="card"><h3>Trang 3 — đường xu hướng KPI: KPI-DEP-01..KPI-DEP-05</h3><p>QMS_ENG trình bày hạt nhân mức bao phủ, đóng vấn đề đúng hạn, tỷ lệ thay đổi lỗi, thay đổi thời gian xử lý và tỷ lệ cập nhật đúng hạn. Đây là nhóm KPI chứng minh chương trình có kỷ luật vận hành. Nếu KPI-DEP-05 chỉ đạt sau khi cập nhật thủ công, trang trình chiếu phải ghi ngoại lệ vì vận hành thường xuyên không thể phụ thuộc vào thao tác thủ công mỗi tuần.</p><ul class="tight"><li>KPI-DEP-01 hạt nhân mức bao phủ = 100% chính + dự phòng.</li><li>KPI-DEP-02 đóng vấn đề ≥95% đúng hạn.</li><li>KPI-DEP-05 tỷ lệ cập nhật đúng hạn ≥95%.</li></ul></div>
-  <div class="card"><h3>Trang 4 — đường xu hướng KPI: KPI-DEP-06 và KPI-DEP-07</h3><p>DORA 2024 và ITIL 4 được dùng để giải thích hai KPI cuối: triển khai/thay đổi tần suất và MTTR Sev-1. Mục tiêu không phải tăng thay đổi vô hạn, mà duy trì nhịp thay đổi đủ nhỏ để học nhanh và MTTR đủ thấp nếu sự cố xảy ra. Nếu không có Sev-1 trong giai đoạn cuối, MTTR Sev-1 ghi `n/a` và dùng Sev-2 độ ổn định của phương án tạm thời làm ngữ cảnh.</p><ul class="tight"><li>KPI-DEP-06 mục tiêu ≥3 thay đổi/tuần.</li><li>KPI-DEP-07 mục tiêu ≤24h cho Sev-1.</li><li>Bằng chứng: triển khai nhật ký, PIR, sự cố nhật ký.</li></ul></div>
-  <div class="card"><h3>Trang 5 — Phân tích theo đợt</h3><p>Trang này giúp đại diện các phòng ban thấy chương trình bao phủ toàn công ty: QA thí điểm, SCM + Bán hàng, Sản xuất + Kỹ thuật, rồi HR/FIN/IT/EHS/Epicor. Mỗi đợt triển khai có nhóm người dùng, hồ sơ rủi ro, cổng quyết định kết quả và hỗ trợ tăng cường ghi chú. Không dùng "thành công" nếu chưa nêu số vấn đề, Sev-1, CAPA và đóng vấn đề bằng chứng.</p><ul class="tight"><li>QA thí điểm: sai lần sửa đổi diễn tập và kỷ luật tra cứu.</li><li>Đợt 2: nghiệp vụ SCM/Bán hàng có ảnh hưởng tài chính.</li><li>Đợt Sản xuất: triển khai rủi ro cao tại xưởng.</li><li>Đợt 3: hỗ trợ chức năng và quản trị bảng điều hành.</li></ul></div>
-	  <div class="card"><h3>Trang 6 — Thống kê đóng vấn đề</h3><p>QA_MGR trình bày tổng số vấn đề đã mở, đã đóng, theo mức độ nghiêm trọng và theo đợt triển khai. Số vấn đề cao trong thí điểm không phải xấu nếu đóng vấn đề đúng hạn đạt mục tiêu; vấn đề thấp bất thường có thể nghĩa là người dùng không báo cáo. Bảng cần phân biệt Sev-1, Sev-2, Sev-3 và các dòng thử được dùng để kiểm thử luồng xử lý.</p><ul class="tight"><li>Mục tiêu: KPI-DEP-02 ≥95% đóng vấn đề đúng hạn.</li><li>Bằng chứng: `issues.json`, bảng mức độ nghiêm trọng, audit_events.</li><li>Mở vấn đề tại thời điểm bàn giao: phải có chủ trì và ngày đến hạn.</li></ul></div>
-  <div class="card"><h3>Trang 7 — Thống kê CAPA</h3><p>CAPA không được dùng như thùng chứa nợ. Trang này hiện tổng số đã mở, tổng số đã đóng, lũy kế động tồn đọng, quá hạn số lượng và kiểm tra hiệu lực hoàn thành. ISO §10.2/§10.3 yêu cầu hành động khắc phục và cải tiến liên tục; vì vậy CAPA còn mở tại bàn giao vẫn được phép nếu có chủ trì, ngày đến hạn, mức rủi ro và kiểm tra hiệu lực.</p><ul class="tight"><li>Ngưỡng bàn giao: 0 CAPA quá hạn.</li><li>tồn đọng CAPA mục tiêu: ≤5 mở.</li><li>Bằng chứng: bảng CAPA, ANNEX-117, hiệu lực hồ sơ.</li></ul></div>
-  <div class="card"><h3>Trang 8 — Tài liệu hoạt động sửa đổi</h3><p>QMS_MGR trình bày 27 tài liệu được kiểm soát có hiệu lực, 10+ tài liệu lần sửa đổi +1 từ W11 và mức phù hợp phần đầu DCC. Trang phải nêu rõ tài liệu nào đã phát hành, tài liệu nào đang lần sửa đổi kế hoạch và tài liệu nào là theo dõi vận hành thường xuyên. Mức phù hợp phần đầu DCC = 100% là điều kiện chất lượng tài liệu, không phải việc trang trí.</p><ul class="tight"><li>Bằng chứng: `dcc_document_header`, DCC đánh giá đầu ra, ANNEX-119.</li><li>Hạn hoàn thành dự kiến cho kế hoạch sửa đổi: không muộn hơn 2026-08-24.</li><li>Tài liệu bắt buộc: MAN-001, POL-QMS-001, POL-QMS-002, WI/SOP/ANNEX bộ.</li></ul></div>
-	  <div class="card"><h3>Trang 9 — Danh sách hạt nhân duy trì thường xuyên</h3><p>HR_MGR trình bày danh sách hạt nhân theo mã vai trò và khu vực, không dùng tên cá nhân. Mỗi hạt nhân phải có người dự phòng, phạm vi, liên kết JD và trách nhiệm duy trì thường xuyên. Hạt nhân không còn là người cứu dự án; họ là một phần của cơ chế quản trị thường xuyên và đào tạo củng cố.</p><ul class="tight"><li>Mục tiêu: 22 hạt nhân + 22 dự phòng có trạng thái duy trì thường xuyên.</li><li>Bằng chứng: `champions.json`, training_records, liên kết JD.</li><li>Rủi ro: hao hụt nhân sự; biện pháp giảm thiểu: vai trò trở thành một phần của JD và KPI hằng năm.</li></ul></div>
-  <div class="card"><h3>Trang 10 — Ma trận bàn giao chủ trì KPI</h3><p>QMS_ENG trình bày 10 KPI theo chủ trì vận hành thường xuyên. Ma trận phải có hệ thống nguồn, rà soát nhịp điều hành, leo thang xử lý chủ trì và mục tiêu. Nếu vai trò chịu trách nhiệm chưa nhận trách nhiệm trực tiếp, KPI đó không được coi là bàn giao. Đây là điểm chuyển từ dự án quản trị sang cơ chế quản trị thường xuyên.</p><ul class="tight"><li>KPI-FLD-01/02: QMS_MGR + IT_MGR.</li><li>KPI-TRN-01: HR_MGR.</li><li>KPI-DEP-01/02/03/04/05/06/07: QMS_MGR với theo vai trò dữ liệu chủ trì.</li></ul></div>
-  <div class="card"><h3>Trang 11 — Chu kỳ đánh giá nội bộ năm 1</h3><p>Trang này biến ISO 9001 §9.2 từ yêu cầu trừu tượng thành lịch thật. Q1 09/2026 kiểm tài liệu kiểm soát + đào tạo, Q2 12/2026 kiểm sản xuất truy xuất nguồn gốc + CAPA, Q3 03/2027 kiểm quản trị bảng điều hành + RBAC, Q4 06/2027 kiểm quản trị rà soát đầu vào gói hồ sơ. Sự kiện lịch phải có phạm vi, chủ trì và báo cáo ngày đến hạn.</p><ul class="tight"><li>Lần đánh giá đầu tiên: tuần 2 của 09/2026.</li><li>Khung giờ rà soát tháng đầu tiên: 2026-08-27.</li><li>Bằng chứng: ANNEX-119, lịch tệp xuất.</li></ul></div>
-  <div class="card"><h3>Trang 12 — Nhịp vận hành sau chương trình</h3><p>CEO chốt trang trình chiếu cuối: cuộc họp điều hành hằng tuần thứ Bảy 09:00 theo WI-202, xem xét của lãnh đạo hằng tháng thứ Năm cuối tháng theo WI-901, đánh giá hằng quý theo ANNEX-119. Chương trình triển khai không còn là lý do để làm khác hệ thống; chế độ vận hành thường xuyên là hệ thống. Nếu nhịp điều hành rơi trong 4 tuần đầu, CEO cam kết tham dự để giữ nhịp.</p><ul class="tight"><li>Cuộc họp điều hành hằng tuần đầu tiên: 2026-08-08 09:00.</li><li>Cuộc xem xét của lãnh đạo hằng tháng đầu tiên: 2026-08-27.</li><li>Lần đánh giá đầu tiên nội bộ: 09/2026.</li></ul></div>
-</section>
-<section class="card" id="sec-decisions">
-  <h2 class="h2">Quyết định cần lấy trong cuộc họp này</h2>
-  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Quyết định</th><th>Người ký</th><th>Cơ sở tài liệu / dữ liệu</th><th>Cách xử lý nếu hoãn quyết định</th></tr></thead><tbody>
-    <tr><td>1</td><td>Phê duyệt bản ghi nhớ bàn giao v1.0.</td><td>CEO, QMS_MGR, QA_MGR, PROD_DIR, ENG_MGR</td><td>gói hồ sơ bàn giao, W01-W12 bằng chứng, ANNEX-119</td><td>Bàn giao có điều kiện nếu chỉ thiếu phụ lục không trọng yếu; Dừng lại nếu thiếu chữ ký Ban chỉ đạo.</td></tr>
-    <tr><td>2</td><td>Phê duyệt Ma trận bàn giao chủ trì KPI 10 KPI sang vận hành thường xuyên.</td><td>CEO, QMS_MGR, chủ trì vận hành thường xuyên</td><td>ANNEX-110, bảng điều hành chủ trì ma trận</td><td>Không chuyển KPI thiếu chủ trì; QMS_MGR giữ chủ trì tạm thời tối đa 14 ngày với vấn đề mở.</td></tr>
-    <tr><td>3</td><td>Phê duyệt đánh giá nội bộ chu kỳ năm 1 lịch.</td><td>CEO, QMS_MGR</td><td>ANNEX-119, lịch tệp xuất</td><td>Hoãn tối đa 2026-08-03; nếu chưa đặt lịch, không ghi bàn giao đầy đủ hoàn tất.</td></tr>
-    <tr><td>4</td><td>Phê duyệt nhịp điều hành vận hành sau chương trình.</td><td>CEO, QMS_MGR</td><td>WI-202, WI-901, lịch xem xét của lãnh đạo</td><td>Giữ triển khai nhịp điều hành thêm 2 tuần nếu chủ trì vận hành thường xuyên chưa nhận nhịp.</td></tr>
-    <tr><td>5</td><td>Phê duyệt danh sách hạt nhân chuyển sang duy trì thường xuyên vai trò.</td><td>HR_MGR, QMS_MGR</td><td>`champions.json`, training_records, liên kết JD</td><td>Hạt nhân thiếu người dự phòng thì giữ trạng thái `deploy-extended` đến khi dự phòng được đào tạo.</td></tr>
-  </tbody></table></div>
-</section>
-<section class="card" id="sec-gate">
-  <h2 class="h2">Cổng quyết định Đi tiếp/Dừng lại — Điều kiện CẦN và ĐỦ</h2>
-  <h3>Cổng P4-04 · Điều kiện CẦN</h3>
-  <div class="table-card"><table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Ngưỡng</th><th>Bằng chứng</th></tr></thead><tbody>
-    <tr><td>Bản ghi nhớ bàn giao đã ký.</td><td>Kiểm tra trang chữ ký.</td><td>5 vai trò Ban chỉ đạo ký: CEO, QMS_MGR, QA_MGR, PROD_DIR, ENG_MGR.</td><td>bản ghi nhớ bàn giao v1.0, chữ ký lưu trữ.</td></tr>
-    <tr><td>KPI trách nhiệm chủ trì bàn giao hoàn tất.</td><td>Đếm 10 KPI dòng có chủ trì vận hành thường xuyên.</td><td>10/10 KPI có vai trò chịu trách nhiệm, hệ thống nguồn, nhịp điều hành và leo thang xử lý chủ trì.</td><td>ANNEX-110 chủ trì ma trận.</td></tr>
-    <tr><td>Chu kỳ đánh giá nội bộ đã được đặt lịch.</td><td>Kiểm lịch tệp xuất.</td><td>4 đánh giá hằng quý sự kiện tồn tại với phạm vi và chủ trì.</td><td>ANNEX-119, lịch tệp xuất.</td></tr>
-    <tr><td>Nhịp vận hành đã công bố.</td><td>Kiểm tra bản ghi nhớ đã gửi cho đại diện các phòng ban để phổ biến lại.</td><td>Họp điều hành hằng tuần, xem xét của lãnh đạo hằng tháng, đánh giá hằng quý trong bản ghi nhớ.</td><td>thông báo bàn giao, WI-202, WI-901.</td></tr>
-  </tbody></table></div>
-  <h3>Cổng P4-04 · Điều kiện ĐỦ</h3>
-  <div class="table-card"><table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Ngưỡng</th><th>Bằng chứng</th></tr></thead><tbody>
-    <tr><td>0 chưa xử lý cổng quyết định bất đồng.</td><td>Kiểm tra cuộc họp biên bản và ý kiến không đồng thuận nhật ký.</td><td>0 chưa xử lý ý kiến không đồng thuận; nếu ý kiến không đồng thuận tồn tại, lý do + chủ trì đường dẫn đã ghi.</td><td>`mgmt-reviews.json`, biên bản.</td></tr>
-    <tr><td>0 CAPA quá hạn.</td><td>CAPA cuối cùng truy vấn.</td><td>0 CAPA quá 30 ngày tại 2026-08-01 17:00.</td><td>bảng CAPA, ANNEX-117.</td></tr>
-    <tr><td>Phê duyệt của lãnh đạo đã được ghi nhận.</td><td>Sự kiện đánh giá đã tạo.</td><td>Bản ghi audit_events `deploy_program_handoff_complete` tồn tại.</td><td>`audit_events`.</td></tr>
-    <tr><td>Toàn bộ 12 sổ tay được lưu thành bộ tham chiếu.</td><td>kiểm tra nhanh openDoc và danh mục lưu trữ.</td><td>TRN-DEP-W01..W12 hiển thị với phần đầu DCC và được liên kết từ ANNEX-119.</td><td>ANNEX-119, sổ tay triển khai nhật ký kiểm tra nhanh.</td></tr>
-  </tbody></table></div>
-</section>
-<section class="card" id="sec-tasks">
-  <h2 class="h2">Phân công nhiệm vụ sau họp · RACI · hạn chót</h2>
-  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Nhiệm vụ</th><th>R</th><th>A</th><th>C</th><th>I</th><th>Hạn chót</th><th>Bằng chứng</th><th>KPI</th></tr></thead><tbody>
-    <tr><td>1</td><td>Lưu hồ sơ 12 sổ tay triển khai vào ANNEX-119 bộ tham chiếu.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>Đại diện các phòng ban</td><td>2026-08-01 17:00</td><td>ANNEX-119, TRN-DEP-W01..W12</td><td>KPI-FLD-01</td></tr>
-    <tr><td>2</td><td>Tạo bản ghi audit_events `deploy_program_handoff_complete`.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>CEO</td><td>2026-08-01 17:30</td><td>`audit_events`</td><td>KPI-DEP-02</td></tr>
-    <tr><td>3</td><td>Cập nhật bảng điều hành với chế độ vận hành thường xuyên công tắc chế độ và ẩn chỉ dành cho triển khai ô chỉ báo.</td><td>IT_MGR</td><td>QMS_MGR</td><td>Ô chỉ báo chủ trì</td><td>CEO</td><td>2026-08-03</td><td>bảng điều hành cấu hình, ANNEX-113</td><td>KPI-DEP-05</td></tr>
-    <tr><td>4</td><td>Gửi thông báo bàn giao cho đại diện các phòng ban để phổ biến lại cho nhân sự trong phòng.</td><td>QMS_MGR</td><td>CEO</td><td>HR_MGR</td><td>Đại diện các phòng ban</td><td>2026-08-03 10:00</td><td>thông báo bàn giao lưu trữ</td><td>KPI-FLD-01</td></tr>
-    <tr><td>5</td><td>Cập nhật danh sách hạt nhân với `ongoing` trạng thái.</td><td>HR_MGR</td><td>QMS_MGR</td><td>Trưởng các phòng</td><td>CEO</td><td>2026-08-03</td><td>`champions.json`</td><td>KPI-DEP-01</td></tr>
-    <tr><td>6</td><td>Đặt lịch cuộc họp điều hành hằng tuần đầu tiên trong vận hành thường xuyên cho cấp đại diện phòng ban.</td><td>QMS_MGR</td><td>CEO</td><td>Đại diện các phòng ban</td><td>Trưởng phòng phổ biến lại</td><td>2026-08-03</td><td>lịch sự kiện 2026-08-08 09:00</td><td>KPI-DEP-02</td></tr>
-    <tr><td>7</td><td>Đặt lịch đầu tiên xem xét của lãnh đạo hằng tháng.</td><td>QMS_MGR</td><td>CEO</td><td>FIN_MGR, QA_MGR</td><td>Ban chỉ đạo</td><td>2026-08-03</td><td>lịch sự kiện 2026-08-27</td><td>KPI-DEP-02</td></tr>
-    <tr><td>8</td><td>Lưu hồ sơ nhật ký audit_events của chương trình và khóa gói bằng chứng bàn giao.</td><td>IT_MGR</td><td>QMS_MGR</td><td>QMS_ENG</td><td>QA_MGR</td><td>2026-08-04</td><td>danh mục lưu trữ đánh giá</td><td>KPI-DEP-05</td></tr>
-    <tr><td>9</td><td>Cập nhật `currentPhase` trong program.json sang `BAU` sau cổng quyết định Đi tiếp.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>CEO</td><td>2026-08-04</td><td>program.json, audit_events</td><td>KPI-DEP-02</td></tr>
-    <tr><td>10</td><td>Phát hành W11 tài liệu lần sửa đổi +1 màn hình theo dõi cho theo dõi vận hành thường xuyên.</td><td>QMS_MGR</td><td>QA_MGR</td><td>Chủ trì tài liệu</td><td>CEO</td><td>2026-08-05</td><td>tài liệu lần sửa đổi bảng theo dõi</td><td>KPI-FLD-01</td></tr>
-    <tr><td>11</td><td>Chạy khảo sát nhanh đầu tiên về mức sẵn sàng vận hành thường xuyên trước cuộc họp điều hành hằng tuần.</td><td>HR_MGR</td><td>QMS_MGR</td><td>IT_MGR</td><td>Đại diện các phòng ban</td><td>2026-08-07</td><td>khảo sát nhanh tệp xuất</td><td>KPI-TRN-01</td></tr>
-    <tr><td>12</td><td>Chuẩn bị chương trình họp điều hành hằng tuần đầu tiên theo mẫu WI-202.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>QA_MGR</td><td>Đại diện các phòng ban</td><td>2026-08-07</td><td>WI-202 chương trình họp gói hồ sơ</td><td>KPI-DEP-02</td></tr>
-  </tbody></table></div>
-</section>
-<section class="card" id="sec-next-week">
-  <h2 class="h2">Xem trước tuần 13 · nhiệm vụ chuẩn bị</h2>
-  <p>Tuần 13 không còn là tuần triển khai. Đó là tuần vận hành thường xuyên đầu tiên, cùng khung lịch thứ Bảy 09:00 nhưng chương trình họp chuyển sang cuộc họp điều hành hằng tuần theo WI-202: KPI rà soát, vấn đề leo thang xử lý, CAPA hiệu lực, bảng điều hành ngoại lệ, quyết định nhật ký và hành động chủ trì. Mọi vai trò phải ngừng hỏi "đội triển khai xử lý chưa" và bắt đầu hỏi "chủ trì vận hành thường xuyên đã xử lý theo nhịp điều hành chưa".</p>
-  <div class="table-card"><table class="table"><thead><tr><th>Vai trò</th><th>Nhiệm vụ chuẩn bị cho Tuần 13</th><th>Hạn chót</th></tr></thead><tbody>
-    <tr><td>QMS_MGR</td><td>Gửi chương trình họp cuộc họp điều hành hằng tuần trong vận hành thường xuyên đầu tiên, kèm KPI ảnh chụp dữ liệu và danh sách CAPA còn mở.</td><td>2026-08-07 12:00</td></tr>
-    <tr><td>QA_MGR</td><td>Chuẩn bị CAPA hiệu lực cập nhật và quá hạn danh sách rủi ro, dù quá hạn số lượng = 0.</td><td>2026-08-07 15:00</td></tr>
-    <tr><td>IT_MGR</td><td>Xác nhận bảng điều hành chế độ vận hành thường xuyên chạy và tỷ lệ cập nhật đúng hạn theo dõi vẫn ≥95%.</td><td>2026-08-07 15:00</td></tr>
-    <tr><td>HR_MGR</td><td>Chuẩn bị hạt nhân duy trì thường xuyên tỷ lệ tham dự và danh sách video v2 hoàn thành trạng thái.</td><td>2026-08-07 16:00</td></tr>
-    <tr><td>CEO</td><td>Tham dự 4 cuộc họp điều hành hằng tuần đầu tiên để neo giữ chế độ vận hành thường xuyên trong tháng 08/2026.</td><td>2026-08-08 09:00</td></tr>
-  </tbody></table></div>
-</section>
-<section class="card" id="sec-tài liệu">
-  <h2 class="h2">Tài liệu liên quan · bấm để mở</h2>
-  <p>
-    <a href="#" onclick="if(window.openDoc)openDoc('WI-202');return false;" class="role-chip">WI-202</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('WI-901');return false;" class="role-chip">WI-901</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-119');return false;" class="role-chip">ANNEX-119</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('MAN-001');return false;" class="role-chip">MAN-001</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('POL-QMS-001');return false;" class="role-chip">POL-QMS-001</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('POL-QMS-002');return false;" class="role-chip">POL-QMS-002</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W01');return false;" class="role-chip">TRN-DEP-W01</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W02');return false;" class="role-chip">TRN-DEP-W02</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W03');return false;" class="role-chip">TRN-DEP-W03</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W04');return false;" class="role-chip">TRN-DEP-W04</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W05');return false;" class="role-chip">TRN-DEP-W05</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W06');return false;" class="role-chip">TRN-DEP-W06</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W07');return false;" class="role-chip">TRN-DEP-W07</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W08');return false;" class="role-chip">TRN-DEP-W08</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W09');return false;" class="role-chip">TRN-DEP-W09</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W10');return false;" class="role-chip">TRN-DEP-W10</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W11');return false;" class="role-chip">TRN-DEP-W11</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W12');return false;" class="role-chip">TRN-DEP-W12</a>
-  </p>
-  <p>W12 phải mở được toàn bộ bộ tham chiếu vì bàn giao chỉ đáng tin khi đại diện phòng ban có thể truy xuất lịch sử 12 tuần và phổ biến lại đúng cho đội nhóm. Người dùng toàn công ty là phạm vi áp dụng sau bàn giao, không phải thành phần tham dự buổi họp. WI-202 là chương trình họp vận hành thường xuyên, WI-901 là quản trị rà soát, ANNEX-119 là nơi lưu dấu vết quyết định, còn MAN-001 và hai quy định QMS giữ vai trò khung quản trị.</p>
-</section>
-<section class="card" id="sec-risks">
-  <h2 class="h2">Rủi ro tuần 12 + leo thang xử lý</h2>
-  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Mô tả rủi ro</th><th>L</th><th>I</th><th>Biện pháp giảm thiểu</th><th>Điều kiện leo thang xử lý</th><th>Chủ trì</th></tr></thead><tbody>
-	    <tr><td>1</td><td>Vận hành thường xuyên bị chùng xuống: nhịp điều hành rơi trong 4 tuần đầu vì mọi người nghĩ chương trình đã xong.</td><td>M</td><td>H</td><td>CEO tham dự 4 cuộc họp điều hành hằng tuần đầu tiên; cuộc họp bị bỏ lỡ phải có lý do bằng văn bản.</td><td>Bất kỳ cuộc họp điều hành hằng tuần bị hủy trong 08/2026.</td><td>CEO</td></tr>
-	    <tr><td>2</td><td>Trách nhiệm chủ trì KPI chưa rõ, đặc biệt KPI-DEP-06 và KPI-DEP-07 không rõ chủ trì giữa QMS_MGR và IT_MGR.</td><td>M</td><td>H</td><td>Ma trận trang trình chiếu 10 ghi vai trò chịu trách nhiệm, hệ thống nguồn, nhịp điều hành và đường dẫn leo thang xử lý.</td><td>Bất kỳ dòng KPI nào thiếu chủ trì hoặc chủ trì từ chối nhận trách nhiệm trực tiếp.</td><td>QMS_MGR</td></tr>
-    <tr><td>3</td><td>Chu kỳ đánh giá bị trượt vì Q1 đánh giá đụng khóa sổ cuối tháng hoặc sản xuất khóa dữ liệu.</td><td>M</td><td>M</td><td>đặt lịch tuần 2 của tháng; FIN_MGR xác nhận không xung đột trước 2026-08-03.</td><td>Q1 sự kiện chưa có lời mời lịch trước 2026-08-03.</td><td>QMS_MGR</td></tr>
-	    <tr><td>4</td><td>Hạt nhân hao hụt nhân sự: 22 hạt nhân nhiều, một số đổi ca hoặc chuyển vai trò.</td><td>M</td><td>M</td><td>Vai trò hạt nhân trở thành một phần của JD và KPI hằng năm; đào tạo dự phòng là bắt buộc.</td><td>Bất kỳ hạt nhân nào thiếu người dự phòng hoặc thiếu liên kết JD.</td><td>HR_MGR</td></tr>
-	    <tr><td>5</td><td>Rủi ro theo Hofstede: chế độ vận hành thường xuyên mất sự hiện diện chủ động của CEO, vai trò trưởng bộ phận quay lại chờ chỉ đạo trên.</td><td>M</td><td>H</td><td>CEO tham dự 4 cuộc họp hằng tuần đầu tiên, sau đó rà soát hằng tháng; QMS_MGR công bố nhật ký quyết định.</td><td>Nhật ký quyết định không có chủ trì hành động trong 2 tuần liên tiếp.</td><td>CEO</td></tr>
-    <tr><td>6</td><td>Mở tài liệu lần sửa đổi từ W11 bị quên sau bàn giao.</td><td>M</td><td>H</td><td>Bảng theo dõi lần sửa đổi tài liệu trở thành nội dung cố định trong họp điều hành hằng tuần cho đến khi toàn bộ ≥10 tài liệu được đóng đúng hạn.</td><td>Bất kỳ hành động lần sửa đổi +1 nào trễ hạn hoàn thành dự kiến.</td><td>QMS_MGR</td></tr>
-  </tbody></table></div>
-</section>
-<section class="card" id="sec-bài học">
-  <h2 class="h2">Bài học kinh nghiệm · điền sau họp (chu trình Lean Change)</h2>
-  <div class="grid-3">
-    <div class="note-blue"><h3>Nhận định</h3><p>1) Người dùng học nhanh nhất khi tài liệu, mã QR và bảng điều hành cùng chỉ về một lần sửa đổi rõ ràng tại điểm dùng. 2) Đợt Sản xuất tạo nhiều dữ liệu nhất nhưng Đợt 3 tạo rủi ro phạm vi ảnh hưởng âm thầm vì lương, hóa đơn, quyền truy cập và EHS ít thấy trên xưởng sản xuất. 3) Mạng lưới hạt nhân hoạt động tốt khi có dự phòng và khu vực trách nhiệm, nhưng sẽ suy yếu nếu không đưa vào JD. 4) Bảng điều hành quản trị chỉ có giá trị khi ô chỉ báo có chủ trì, quy tắc quyền truy cập và đường leo thang xử lý. 5) CAPA không đóng bằng hành động đã hoàn tất; CAPA đóng khi kiểm tra hiệu lực được họp điều hành hằng tuần nhìn thấy.</p></div>
-    <div class="note"><h3>Lựa chọn</h3><p>Những việc đã chọn không làm trong bàn giao: không giữ hỗ trợ tăng cường hằng ngày cho toàn công ty vì sẽ làm vận hành thường xuyên phụ thuộc vào đội triển khai; không công bố mọi phản hồi thô vì có nguy cơ nhận diện cá nhân; không sửa toàn bộ 27 tài liệu cùng lúc vì quá tải tài liệu chủ trì; không cho bảng điều hành không có chủ trì tiếp tục hiển thị vì tạo cảm giác kiểm soát giả; không gọi W12 là thành công nếu CAPA quá hạn hoặc KPI chủ trì còn trống.</p></div>
-    <div class="note-green"><h3>Thử nghiệm</h3><p>Thử nghiệm vận hành thường xuyên trong năm 2: 1) 4 tuần đầu đo tỷ lệ tham dự và đóng hành động của cuộc họp điều hành hằng tuần để kiểm nhịp điều hành có sống thật không. 2) Thực hiện QR quét đánh giá bất ngờ tại 7 khu vực trong tháng 08/2026. 3) Chạy RBAC kiểm tra thử bảng điều hành mỗi tháng trong Q3. 4) Đo danh sách video đào tạo v2 bằng diễn tập tra cứu trước và sau khi xem video. 5) Dùng dòng kiểm tra hiệu lực CAPA trong WI-202 để giảm tỷ lệ lặp lại vấn đề trong Q4.</p></div>
-  </div>
-</section>
-
-</div><!-- /doc-content -->
+</div>
 </div></div></div>
 </body>
 </html>
