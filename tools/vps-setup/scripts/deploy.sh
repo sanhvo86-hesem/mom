@@ -477,6 +477,26 @@ else
     log "INFO" "Updated: $(echo "$BEFORE" | head -c 8) → $(echo "$AFTER" | head -c 8)"
 fi
 
+# ── Stamp portal HTML with deploy SHA to bust browser cache ──────────────
+# nginx serves /mom/scripts/**/*.js and /mom/styles/**/*.css with
+# Cache-Control: public, immutable, max-age=2592000 (30 days). Without a
+# version query, users keep an old asset in their browser for up to a month
+# after a deploy. Inject ?v=<short-sha> at deploy time so every commit
+# produces unique URLs and stale caches flush automatically the next time
+# the user loads portal.html. Strips any pre-existing ?v=... so multiple
+# deploys do not stack query params. Targets only ./ and /mom/ asset URLs
+# so external CDN references (Tailwind, fonts) are not touched.
+SHORT_SHA="$(echo "$AFTER" | head -c 8)"
+export SHORT_SHA
+for html in "$SITE_DIR/mom/portal.html" "$SITE_DIR/mom/index.html"; do
+    [ -f "$html" ] || continue
+    perl -i -pe 's{(src|href)="((?!https?://)[^"?]+\.(?:js|css))(?:\?v=[A-Za-z0-9._-]+)?"}{$1."=\"".$2."?v=$ENV{SHORT_SHA}\""}ge' \
+        "$html" \
+        || die "Cannot stamp $html with cache-bust version"
+done
+unset SHORT_SHA
+log "INFO" "Stamped portal/index HTML asset URLs with ?v=$(echo "$AFTER" | head -c 8)"
+
 run_composer_install
 
 # ── Copy private config that lives outside the repo ──────────────────────
