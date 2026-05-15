@@ -964,7 +964,7 @@
       + '.org-node-rect.is-selected{stroke:var(--brand-primary,#4f46e5);stroke-width:2.4}'
       + '.org-node-rect.is-drop-target{stroke:#10b981;stroke-width:3;stroke-dasharray:6 3}'
       + '.org-node-rect.is-drop-illegal{stroke:#ef4444;stroke-width:3;stroke-dasharray:6 3}'
-      + '.org-node-band{rx:0;ry:0}'
+      + '.org-node-band{pointer-events:none}'
       + '.org-node-title{font-family:inherit;font-weight:800;fill:var(--text-1)}'
       + '.org-node-person{font-family:inherit;font-weight:800;fill:var(--text-1);font-size:11px}'
       + '.org-node-sub{font-family:inherit;fill:var(--text-3);font-size:10.5px}'
@@ -3028,6 +3028,31 @@
     g.appendChild(iconText);
   }
 
+  function nodeBandPath(width, height, radius, bandWidth){
+    var r = Math.max(0, Math.min(radius || 0, width / 2, height / 2));
+    var b = Math.max(0, Math.min(bandWidth || 0, width));
+    if (!b) return '';
+    if (!r) return 'M0 0 H'+b+' V'+height+' H0 Z';
+    if (b >= r){
+      return 'M'+r+' 0 H'+b+' V'+height+' H'+r
+        +' A'+r+' '+r+' 0 0 1 0 '+(height-r)
+        +' V'+r
+        +' A'+r+' '+r+' 0 0 1 '+r+' 0 Z';
+    }
+    var insetY = r - Math.sqrt(Math.max(0, r * r - Math.pow(r - b, 2)));
+    return 'M'+b+' '+insetY
+      +' A'+r+' '+r+' 0 0 0 0 '+r
+      +' V'+(height-r)
+      +' A'+r+' '+r+' 0 0 0 '+b+' '+(height-insetY)
+      +' Z';
+  }
+
+  function appendNodeBand(g, width, height, radius, bandWidth, color){
+    var path = nodeBandPath(width, height, radius, bandWidth);
+    if (!path) return;
+    g.appendChild(svgEl('path', { d:path, fill:color, class:'org-node-band' }));
+  }
+
   function drawUnitNode(rootG, u, x, y, W, H, host){
     var meta = typeMeta(u.org_unit_type);
     var color = unitColor(u);
@@ -3041,8 +3066,7 @@
     var rect = svgEl('rect', { x:0, y:0, width:W, height:H, 'class':'org-node-rect', rx:14, ry:14, fill:'var(--surface-1,#fff)', stroke:'#e5e7eb' });
     if (S.selectedUnitId === u.hcm_org_unit_id) rect.classList.add('is-selected');
     g.appendChild(rect);
-    var band = svgEl('rect', { x:0, y:0, width:8, height:H, fill:color, rx:14, ry:14 });
-    g.appendChild(band);
+    appendNodeBand(g, W, H, 14, 8, color);
     var iconBg = svgEl('rect', { x:18, y:14, width:36, height:36, rx:10, ry:10, fill:'color-mix(in srgb,'+color+' 14%,#fff)' });
     g.appendChild(iconBg);
     var iconText = svgEl('text', { x:36, y:38, 'text-anchor':'middle', class:'org-node-icon' });
@@ -3111,8 +3135,7 @@
     var rect = svgEl('rect', { x:0, y:0, width:W, height:H, 'class':'org-node-rect', rx:12, ry:12, fill:'var(--surface-1,#fff)', stroke:over>0?'#ef4444':'#e5e7eb' });
     if (S.selectedPositionId === p.hcm_position_id) rect.classList.add('is-selected');
     g.appendChild(rect);
-    var band = svgEl('rect', { x:0, y:0, width:6, height:H, fill:color, rx:12, ry:12 });
-    g.appendChild(band);
+    appendNodeBand(g, W, H, 12, 6, color);
     appendSvgVisual(g, 16, 20, 56, visual, color);
     var title = svgEl('text', { x:86, y:32, class:'org-node-title', 'font-size':14 });
     title.textContent = ellipsize(p.position_title||'?', 27);
