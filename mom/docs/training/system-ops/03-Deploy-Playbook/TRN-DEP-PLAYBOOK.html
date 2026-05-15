@@ -39,7 +39,7 @@
 <div class="doc-content" id="docContent">
 <h1 class="h2">Kịch bản họp triển khai vận hành</h1>
 <p>Trưởng QMS dùng một khung họp thống nhất cho mọi tuần. Bảng tuần đọc từ <code>program.json</code> để ngày, nhãn và tài liệu bắt buộc không bị gõ lại sai.</p>
-<section class="card" id="chuong-1">
+<section class="card" id="sec-prep">
 <h2 class="h2">Chương 1 — Chuẩn bị buổi họp · T-7 / T-3 / T-1 / T-0</h2>
 <table>
 <thead><tr><th>Mốc</th><th>Người làm</th><th>Việc</th><th>Bằng chứng</th></tr></thead>
@@ -55,7 +55,7 @@
 </tbody>
 </table>
 </section>
-<section class="card" id="chuong-2">
+<section class="card" id="sec-agenda">
 <h2 class="h2">Chương 2 — Khung họp 60 phút</h2>
 <table>
 <tbody>
@@ -66,14 +66,14 @@
 </tbody>
 </table>
 </section>
-<section class="card" id="chuong-3">
+<section class="card" id="sec-objective">
 <h2 class="h2">Chương 3 — Bảng 12 tuần — mỗi tuần khác gì</h2>
 <table>
 <thead><tr><th>Tuần</th><th>Ngày</th><th>Việc khác biệt</th><th>Tài liệu bắt buộc</th></tr></thead>
 <tbody id="program-weeks-body"><tr><td colspan="4">Bảng đang đọc <code>program.json</code>.</td></tr></tbody>
 </table>
 </section>
-<section class="card" id="chuong-4">
+<section class="card" id="sec-tasks">
 <h2 class="h2">Chương 4 — Mẫu báo cáo 5 phút mỗi phòng</h2>
 <ol class="tight">
 <li>Tuần này tôi đã làm xong việc gì có bằng chứng?</li>
@@ -82,7 +82,7 @@
 <li>Tuần sau tôi cần ai làm gì cho tôi trước Thứ Tư?</li>
 </ol>
 </section>
-<section class="card" id="chuong-5">
+<section class="card" id="sec-gate">
 <h2 class="h2">Chương 5 — Quy ước chốt Đi tiếp / Không đi tiếp</h2>
 <table>
 <thead><tr><th>Điều kiện CẦN</th><th>Điều kiện ĐỦ</th></tr></thead>
@@ -100,24 +100,11 @@
 <script>
 (function () {
   var body = document.getElementById('program-weeks-body');
-  var summaries = [
-    'Tổ điều hành kiểm tài liệu nền',
-    'Giám đốc công bố tài liệu nền',
-    'Trưởng phòng rà sổ tay và RACI',
-    'Trưởng phòng chốt RACI và người dẫn dắt học tại việc',
-    'QA chạy thí điểm có bằng chứng thật',
-    'QA chốt Đi tiếp hoặc Không đi tiếp',
-    'Đợt 2 mở cho Chuỗi cung ứng và Kinh doanh',
-    'Đợt 2 rà giữa kỳ và chuẩn bị đợt 3',
-    'Sản xuất và Kỹ thuật vào vận hành chính thức',
-    'Sản xuất được chăm sóc sát và đợt 3 khởi động',
-    'Đợt 3 ổn định và soát bảng điều khiển',
-    'Phòng ban rút kinh nghiệm và sửa tài liệu'
-  ];
-  function rewriteLabel(label, index) {
-    if (summaries[index]) return summaries[index];
+  function shortLabel(label) {
     var text = String(label || '').trim();
-    return text.split(/\s+/).slice(0, 18).join(' ');
+    var parts = text.split(/\s+/);
+    if (parts.length <= 18) return text;
+    return parts.slice(0, 18).join(' ') + '…';
   }
   function docLink(code) {
     var a = document.createElement('a');
@@ -125,25 +112,26 @@
     a.href = '#';
     a.textContent = code;
     a.addEventListener('click', function (event) {
-      event.preventDefault();
-      if (window.openDoc) window.openDoc(code);
+      if (window.openDoc) { event.preventDefault(); window.openDoc(code); }
     });
     return a;
   }
   function render(data) {
-    var weeks = Array.isArray(data.weeks) ? data.weeks.slice(0, 12) : [];
+    var weeks = Array.isArray(data.weeks) ? data.weeks : [];
     body.innerHTML = '';
-    weeks.forEach(function (week, index) {
+    weeks.forEach(function (week) {
       var tr = document.createElement('tr');
       var weekCell = document.createElement('td');
       var dateCell = document.createElement('td');
       var labelCell = document.createElement('td');
       var docsCell = document.createElement('td');
-      weekCell.textContent = 'W' + String(index + 1).padStart(2, '0');
+      var n = (typeof week.n === 'number') ? week.n : 0;
+      weekCell.textContent = 'W' + n;
       dateCell.textContent = week.date || '';
-      labelCell.textContent = rewriteLabel(week.label, index);
+      labelCell.textContent = shortLabel(week.label);
       (Array.isArray(week.requiredDocs) ? week.requiredDocs : []).forEach(function (code) {
         docsCell.appendChild(docLink(code));
+        docsCell.appendChild(document.createTextNode(' '));
       });
       tr.appendChild(weekCell);
       tr.appendChild(dateCell);

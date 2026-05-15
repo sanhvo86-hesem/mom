@@ -151,6 +151,7 @@ function load_doc_descriptions(string $rootDir): array
 
 /** Same patterns as `scan_extract_code()` and `deriveDocCodeFromPath()`. */
 const CODE_PATTERNS = [
+    '/^(WI-\d{3}-CARD-[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)*)/',
     '/^(SOP-\d{3})/',
     '/^(FRM-\d{3})/',
     '/^(WI-\d{3})/',

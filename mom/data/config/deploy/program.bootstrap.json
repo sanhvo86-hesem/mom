@@ -51,7 +51,7 @@
         "Đã mở sổ ghi vấn đề · nhịp điều hành đã công bố"
       ],
       "requiredDocs": ["MAN-001", "POL-QMS-001", "POL-QMS-002"],
-      "playbookCode": "TRN-DEP-W01",
+      "playbookCode": "TRN-DEP-PLAYBOOK",
       "status": "pending",
       "signOff": null
     },
@@ -72,7 +72,7 @@
         "Đã đề cử 11 người dẫn dắt phòng + 11 người dự phòng; khoá huấn luyện buổi 1 đã đạt"
       ],
       "requiredDocs": ["RACI-master-matrix", "Authority-matrix"],
-      "playbookCode": "TRN-DEP-W02",
+      "playbookCode": "TRN-DEP-PLAYBOOK",
       "status": "pending",
       "signOff": null
     },
@@ -92,7 +92,7 @@
         "Tỉ lệ có mặt họp nhanh đầu ngày ≥90% · đã có bản chụp KPI tuần 1"
       ],
       "requiredDocs": ["SOP-605", "WI-201", "DRL-E2E"],
-      "playbookCode": "TRN-DEP-W03",
+      "playbookCode": "TRN-DEP-PLAYBOOK",
       "status": "pending",
       "signOff": null
     },
@@ -132,7 +132,7 @@
         "Người dẫn dắt phòng Chuỗi cung ứng + Kinh doanh đã đạt đào tạo tại chỗ · đã có chữ ký xác nhận"
       ],
       "requiredDocs": ["SOP-401", "WI-701", "SOP-201"],
-      "playbookCode": "TRN-DEP-W05",
+      "playbookCode": "TRN-DEP-PLAYBOOK",
       "status": "pending",
       "signOff": null
     },
@@ -152,7 +152,7 @@
         "Điều kiện kích hoạt khôi phục đã được kiểm thử thật · bằng chứng kiểm thử ghi vào sổ kiểm toán"
       ],
       "requiredDocs": ["ANNEX-114", "ANNEX-118"],
-      "playbookCode": "TRN-DEP-W06",
+      "playbookCode": "TRN-DEP-PLAYBOOK",
       "status": "pending",
       "signOff": null
     },
@@ -172,7 +172,7 @@
         "KPI báo đỏ = 0 hoặc có ghi chú ngoại lệ được CEO ký"
       ],
       "requiredDocs": ["SOP-501", "WI-519", "SOP-303", "WI-302"],
-      "playbookCode": "TRN-DEP-W07",
+      "playbookCode": "TRN-DEP-PLAYBOOK",
       "status": "pending",
       "signOff": null
     },
@@ -212,7 +212,7 @@
         "Sự cố Mức 1 của Đợt Sản xuất = 0 trong 5 ngày liên tiếp (đóng cổng chăm sóc tăng cường)"
       ],
       "requiredDocs": ["WI-103", "WI-104", "SOP-801", "ANNEX-113"],
-      "playbookCode": "TRN-DEP-W09",
+      "playbookCode": "TRN-DEP-PLAYBOOK",
       "status": "pending",
       "signOff": null
     },
@@ -232,7 +232,7 @@
         "Cam kết cập nhật dữ liệu ≥95% · đã có bản chụp tuần liên tiếp trong 4 tuần"
       ],
       "requiredDocs": ["ANNEX-113", "ANNEX-110"],
-      "playbookCode": "TRN-DEP-W10",
+      "playbookCode": "TRN-DEP-PLAYBOOK",
       "status": "pending",
       "signOff": null
     },
@@ -252,7 +252,7 @@
         "Danh mục học bản 2 đã phát hành · ≥3 video mới"
       ],
       "requiredDocs": ["WI-105", "WI-202"],
-      "playbookCode": "TRN-DEP-W11",
+      "playbookCode": "TRN-DEP-PLAYBOOK",
       "status": "pending",
       "signOff": null
     },
