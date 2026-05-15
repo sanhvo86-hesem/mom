@@ -15300,6 +15300,31 @@ $action = match ($action) {
     }
 })();
 
+// ──────────────────────────────────────────────────────────────────────────
+// Defense-in-depth: AuthorizationKernel-gated routes must never fall back
+// to this legacy switch. When mom/api/index.php is the entry point (the only
+// supported path), it defines API_HELPERS_ONLY and we return earlier at
+// line ~15241. If somehow this point is reached for a kernelized action,
+// the legacy admin_roles() hardcoded check would silently override the
+// matrix — exactly the bug class the AuthorizationKernel was built to fix.
+// Fail loud instead.
+//
+// Kernelized actions (must match controllers/UserController.php +
+// RbacController.php route bindings):
+$kernelized_actions = [
+    'admin_users_list', 'admin_user_upsert', 'admin_user_delete',
+    'admin_user_reset_password', 'role_perms_get', 'admin_role_perms_save',
+];
+if (in_array($action, $kernelized_actions, true)) {
+    @error_log('[api] legacy switch reached for kernelized action "' . $action . '" — refusing');
+    api_json([
+        'ok'    => false,
+        'error' => 'legacy_path_disabled',
+        'detail'=> 'This action is owned by the MVC controller via AuthorizationKernel. '
+                 . 'The legacy switch path is forbidden. Route via /api/index.php.',
+    ], 410);
+}
+
 switch ($action) {
   case 'status': {
     $logged = false;

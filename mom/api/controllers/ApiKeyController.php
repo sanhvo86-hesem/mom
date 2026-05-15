@@ -44,8 +44,8 @@ class ApiKeyController extends BaseController
     public function create(): void
     {
         $user = $this->requireAuth();
-        $this->requireAdmin($user);
         $this->requireCsrf();
+        $this->requireAuthz($user, 'apikeys.create', ['route_action' => 'apikey_create']);
 
         $body = $this->jsonBody();
         $name = trim($body['name'] ?? '');
@@ -101,7 +101,7 @@ class ApiKeyController extends BaseController
     public function list(): void
     {
         $user = $this->requireAuth();
-        $this->requireAdmin($user);
+        $this->requireAuthz($user, 'apikeys.view', ['route_action' => 'apikey_list']);
 
         $store = $this->loadStore();
         $keys = array_map(function (array $key): array {
@@ -122,13 +122,17 @@ class ApiKeyController extends BaseController
     public function revoke(): void
     {
         $user = $this->requireAuth();
-        $this->requireAdmin($user);
         $this->requireCsrf();
 
         $keyId = $_GET['key_id'] ?? $_GET['keyId'] ?? '';
         if ($keyId === '') {
             $this->json(['ok' => false, 'error' => 'key_id_required'], 400);
         }
+        $this->requireAuthz($user, 'apikeys.revoke', [
+            'route_action' => 'apikey_revoke',
+            'resource_kind' => 'api_key',
+            'resource_id' => (string)$keyId,
+        ]);
 
         $store = $this->loadStore();
         $found = false;
@@ -161,8 +165,8 @@ class ApiKeyController extends BaseController
     public function generateJwt(): void
     {
         $user = $this->requireAuth();
-        $this->requireAdmin($user);
         $this->requireCsrf();
+        $this->requireAuthz($user, 'jwt.issue', ['route_action' => 'jwt_issue']);
 
         $jwtSecret = getenv('JWT_SECRET') ?: '';
         if ($jwtSecret === '') {
