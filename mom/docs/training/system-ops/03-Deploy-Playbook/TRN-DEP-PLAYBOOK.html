@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRN-DEP-PLAYBOOK — Kịch bản họp triển khai vận hành | HESEM MOM</title>
+<script>
+/* DCC Header bootstrap */
+(function () {
+  var DCC_VERSION = '2026-04-24-1';
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css?v=' + DCC_VERSION;
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(js);
+})();
+</script>
+<link rel="stylesheet" href="../../../../assets/style.css">
+<style>
+ table{width:100%;border-collapse:collapse;table-layout:fixed}
+ th,td{border:1px solid #e2e8f0;padding:8px 10px;vertical-align:top;overflow-wrap:anywhere}
+ th{background:#f1f5f9;text-align:left}
+ .doc-chip{display:inline-block;margin:2px 4px 2px 0;padding:3px 8px;border-radius:999px;background:#eef2ff;text-decoration:none}
+ .tight li{margin:4px 0}
+</style>
+</head>
+<body>
+<div class="container"><div class="page"><div class="page-body">
+<div class="dcc-header"
+     data-dcc-doc-code="TRN-DEP-PLAYBOOK"
+     data-dcc-locale="vi"
+     data-dcc-logo="../../../../assets/hesem-logo.svg"
+     data-dcc-bootstrap='{"header":{"doc_code":"TRN-DEP-PLAYBOOK","title":"Kịch bản họp triển khai vận hành","subtitle":"Khung họp tuần đọc dữ liệu từ program.json","doc_type":"TRN","revision":"V0","effective_date":"2026-05-14","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":null,"status":"released"}}'></div>
+<div class="doc-content" id="docContent">
+<h1 class="h2">Kịch bản họp triển khai vận hành</h1>
+<p>Trưởng QMS dùng một khung họp thống nhất cho mọi tuần. Bảng tuần đọc từ <code>program.json</code> để ngày, nhãn và tài liệu bắt buộc không bị gõ lại sai.</p>
+<section class="card" id="chuong-1">
+<h2 class="h2">Chương 1 — Chuẩn bị buổi họp · T-7 / T-3 / T-1 / T-0</h2>
+<table>
+<thead><tr><th>Mốc</th><th>Người làm</th><th>Việc</th><th>Bằng chứng</th></tr></thead>
+<tbody>
+<tr><td>T-7</td><td>Trưởng QMS</td><td>Trưởng QMS khóa mục tiêu, mã cổng và phạm vi quyết định.</td><td>Chương trình họp tuần</td></tr>
+<tr><td>T-7</td><td>Trưởng phòng liên quan</td><td>Trưởng phòng gửi danh sách người dự và người thay thế.</td><td>Danh sách tham dự</td></tr>
+<tr><td>T-3</td><td>Người dẫn dắt phòng</td><td>Người dẫn dắt phòng nộp số liệu, ảnh chụp và sổ vấn đề.</td><td>Gói bằng chứng phòng</td></tr>
+<tr><td>T-3</td><td>Trưởng IT</td><td>Trưởng IT kiểm quyền mở tài liệu và bảng điều khiển.</td><td>Biên bản kiểm quyền</td></tr>
+<tr><td>T-1</td><td>Trưởng QA</td><td>Trưởng QA rà điểm dừng, mẫu đầu, CoC, CAPA và sự cố chất lượng.</td><td>Danh sách điểm đỏ</td></tr>
+<tr><td>T-1</td><td>Trưởng QMS</td><td>Trưởng QMS gửi trước quyết định dự kiến và dữ liệu chặn.</td><td>Gói đọc trước</td></tr>
+<tr><td>T-0</td><td>Trưởng ca</td><td>Trưởng ca kiểm dữ liệu hiện trường trước khi họp bắt đầu.</td><td>Sổ giao ca</td></tr>
+<tr><td>T-0</td><td>Trưởng QMS</td><td>Trưởng QMS mở bảng bằng chứng, phiếu quyết định và sổ hành động.</td><td>Màn hình bằng chứng</td></tr>
+</tbody>
+</table>
+</section>
+<section class="card" id="chuong-2">
+<h2 class="h2">Chương 2 — Khung họp 60 phút</h2>
+<table>
+<tbody>
+<tr><td>08:30-09:00</td><td>Trưởng ca + Người dẫn dắt phòng tới sớm kiểm số liệu</td></tr>
+<tr><td>09:00-09:10</td><td>Đối chiếu mục tiêu tuần + bằng chứng đã có</td></tr>
+<tr><td>09:10-09:50</td><td>Đi từng phòng — báo cáo 5 phút/phòng theo mẫu</td></tr>
+<tr><td>09:50-10:00</td><td>Chốt Đi tiếp / Không đi tiếp + phân việc</td></tr>
+</tbody>
+</table>
+</section>
+<section class="card" id="chuong-3">
+<h2 class="h2">Chương 3 — Bảng 12 tuần — mỗi tuần khác gì</h2>
+<table>
+<thead><tr><th>Tuần</th><th>Ngày</th><th>Việc khác biệt</th><th>Tài liệu bắt buộc</th></tr></thead>
+<tbody id="program-weeks-body"><tr><td colspan="4">Bảng đang đọc <code>program.json</code>.</td></tr></tbody>
+</table>
+</section>
+<section class="card" id="chuong-4">
+<h2 class="h2">Chương 4 — Mẫu báo cáo 5 phút mỗi phòng</h2>
+<ol class="tight">
+<li>Tuần này tôi đã làm xong việc gì có bằng chứng?</li>
+<li>Tuần này có Mức 1 nào mở không?</li>
+<li>Người dẫn dắt phòng tôi đã đạt diễn tập 3 phút tuần này chưa?</li>
+<li>Tuần sau tôi cần ai làm gì cho tôi trước Thứ Tư?</li>
+</ol>
+</section>
+<section class="card" id="chuong-5">
+<h2 class="h2">Chương 5 — Quy ước chốt Đi tiếp / Không đi tiếp</h2>
+<table>
+<thead><tr><th>Điều kiện CẦN</th><th>Điều kiện ĐỦ</th></tr></thead>
+<tbody>
+<tr><td>Sổ vấn đề không còn Mức 1 mở.</td><td>KPI tuần đạt ngưỡng hoặc có ngoại lệ đã ký.</td></tr>
+<tr><td>Tài liệu bắt buộc mở đúng phiên bản.</td><td>Người dẫn dắt phòng đạt diễn tập 3 phút.</td></tr>
+<tr><td>Bằng chứng tuần có người giữ và thời điểm rõ.</td><td>Hành động tồn có người làm và hạn đóng.</td></tr>
+<tr><td>Điểm dừng CNC không bị bỏ qua.</td><td>Phòng liên quan đã nhận việc tuần sau.</td></tr>
+</tbody>
+</table>
+<p>Kết quả chỉ dùng 3 nhãn: Đi tiếp; Đi tiếp có điều kiện; Không đi tiếp.</p>
+<p>Người ký: Giám đốc + Trưởng QMS.</p>
+</section>
+</div>
+<script>
+(function () {
+  var body = document.getElementById('program-weeks-body');
+  var summaries = [
+    'Tổ điều hành kiểm tài liệu nền',
+    'Giám đốc công bố tài liệu nền',
+    'Trưởng phòng rà sổ tay và RACI',
+    'Trưởng phòng chốt RACI và người dẫn dắt học tại việc',
+    'QA chạy thí điểm có bằng chứng thật',
+    'QA chốt Đi tiếp hoặc Không đi tiếp',
+    'Đợt 2 mở cho Chuỗi cung ứng và Kinh doanh',
+    'Đợt 2 rà giữa kỳ và chuẩn bị đợt 3',
+    'Sản xuất và Kỹ thuật vào vận hành chính thức',
+    'Sản xuất được chăm sóc sát và đợt 3 khởi động',
+    'Đợt 3 ổn định và soát bảng điều khiển',
+    'Phòng ban rút kinh nghiệm và sửa tài liệu'
+  ];
+  function rewriteLabel(label, index) {
+    if (summaries[index]) return summaries[index];
+    var text = String(label || '').trim();
+    return text.split(/\s+/).slice(0, 18).join(' ');
+  }
+  function docLink(code) {
+    var a = document.createElement('a');
+    a.className = 'doc-chip';
+    a.href = '#';
+    a.textContent = code;
+    a.addEventListener('click', function (event) {
+      event.preventDefault();
+      if (window.openDoc) window.openDoc(code);
+    });
+    return a;
+  }
+  function render(data) {
+    var weeks = Array.isArray(data.weeks) ? data.weeks.slice(0, 12) : [];
+    body.innerHTML = '';
+    weeks.forEach(function (week, index) {
+      var tr = document.createElement('tr');
+      var weekCell = document.createElement('td');
+      var dateCell = document.createElement('td');
+      var labelCell = document.createElement('td');
+      var docsCell = document.createElement('td');
+      weekCell.textContent = 'W' + String(index + 1).padStart(2, '0');
+      dateCell.textContent = week.date || '';
+      labelCell.textContent = rewriteLabel(week.label, index);
+      (Array.isArray(week.requiredDocs) ? week.requiredDocs : []).forEach(function (code) {
+        docsCell.appendChild(docLink(code));
+      });
+      tr.appendChild(weekCell);
+      tr.appendChild(dateCell);
+      tr.appendChild(labelCell);
+      tr.appendChild(docsCell);
+      body.appendChild(tr);
+    });
+    if (!weeks.length) body.innerHTML = '<tr><td colspan="4">Trưởng QMS chưa đọc được dữ liệu tuần.</td></tr>';
+  }
+  fetch('../../../../data/config/deploy/program.json', {cache: 'no-store'})
+    .then(function (response) { return response.json(); })
+    .then(render)
+    .catch(function () {
+      body.innerHTML = '<tr><td colspan="4">Trưởng QMS kiểm lại đường dẫn program.json trước buổi họp.</td></tr>';
+    });
+})();
+</script>
+</div></div></div>
+</body>
+</html>
