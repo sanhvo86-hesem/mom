@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
+use MOM\Api\Services\DocAccessAnalyticsService;
 use MOM\Api\Services\PortalServices;
 use MOM\Services\DocumentControl\DocumentLocaleAutomationService;
 use MOM\Services\ControlPlane\LegacyWriteSurfacePolicy;
@@ -230,6 +231,69 @@ class DocumentController extends BaseController
             if ($e instanceof \MOM\Api\Controllers\ExitException) throw $e;
             $this->error('doc_create_failed', 500, $e->getMessage());
         }
+    }
+
+    /**
+     * @param array<string, mixed> $user
+     * @param array<string, mixed> $doc
+     */
+    private function logDocumentAccess(array $user, array $doc, string $relPath): void
+    {
+        try {
+            if (trim((string)($doc['code'] ?? '')) === '') {
+                $doc['code'] = trim((string)($this->query('code') ?? ''));
+            }
+            if (trim((string)($doc['code'] ?? '')) === '') {
+                $doc['code'] = pathinfo($relPath, PATHINFO_FILENAME);
+            }
+
+            (new DocAccessAnalyticsService($this->data))->recordAccess(
+                $user,
+                $doc,
+                $this->documentAccessSource(),
+                !$this->isDocumentAccessDrill(),
+            );
+        } catch (Throwable $e) {
+            @error_log('[DocumentController] doc access analytics failed: ' . $e->getMessage());
+        }
+    }
+
+    private function documentAccessSource(): string
+    {
+        $source = strtolower(trim((string)($this->query('source') ?? '')));
+        if (in_array($source, ['portal', 'qr', 'direct', 'api'], true)) {
+            return $source;
+        }
+        if ($this->query('qr') !== null) {
+            return 'qr';
+        }
+        if ($this->query('api') !== null) {
+            return 'api';
+        }
+        if ($this->query('direct') !== null) {
+            return 'direct';
+        }
+        return 'portal';
+    }
+
+    private function isDocumentAccessDrill(): bool
+    {
+        foreach (['drill_mode', 'drill', 'is_drill'] as $key) {
+            $raw = $this->query($key);
+            if ($raw === null) {
+                continue;
+            }
+            $parsed = filter_var($raw, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
+            if ($parsed !== null) {
+                return (bool)$parsed;
+            }
+            if (in_array(strtolower(trim($raw)), ['drill', 'training', 'rehearsal'], true)) {
+                return true;
+            }
+        }
+
+        $mode = strtolower(trim((string)($this->query('mode') ?? '')));
+        return in_array($mode, ['drill', 'training', 'rehearsal'], true);
     }
 
     /**
@@ -1342,6 +1406,8 @@ class DocumentController extends BaseController
         if (!portal_can_access_doc($me, $doc, $roleDocs, $hidden, $displayConfig)) {
             $this->error('forbidden', 403);
         }
+
+        $this->logDocumentAccess($me, $doc, $relPath);
 
         $mime = portal_stream_mime_type($ext);
         $asAttachment = $this->query('download') !== null || !portal_stream_can_inline($ext);

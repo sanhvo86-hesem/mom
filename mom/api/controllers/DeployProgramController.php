@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace MOM\Api\Controllers;
 
+use MOM\Api\Services\DocAccessAnalyticsService;
+use Throwable;
+
 /**
  * Deploy Program Controller
  *
@@ -34,18 +37,30 @@ class DeployProgramController extends BaseController
     public function loadState(): never
     {
         $me = $this->requireAuth();
+        $program = $this->loadFile(self::FILE_PROGRAM);
+        $meetings = $this->loadFile(self::FILE_MEETINGS);
+        $champions = $this->normalizeChampionState($this->loadFile(self::FILE_CHAMPIONS));
+        $readiness = $this->loadFile(self::FILE_READINESS);
+        $issues = $this->loadFile(self::FILE_ISSUES);
+        $drills = $this->loadFile(self::FILE_DRILLS);
+        $clauses = $this->loadFile(self::FILE_CLAUSES);
+        $audits = $this->loadFile(self::FILE_AUDITS);
+        $reviews = $this->loadFile(self::FILE_REVIEWS);
+        $users = $this->loadUserDirectory();
+
         $this->success([
             'data' => [
-                'program'   => $this->loadFile(self::FILE_PROGRAM),
-                'meetings'  => $this->loadFile(self::FILE_MEETINGS),
-                'champions' => $this->normalizeChampionState($this->loadFile(self::FILE_CHAMPIONS)),
-                'readiness' => $this->loadFile(self::FILE_READINESS),
-                'issues'    => $this->loadFile(self::FILE_ISSUES),
-                'drills'    => $this->loadFile(self::FILE_DRILLS),
-                'clauses'   => $this->loadFile(self::FILE_CLAUSES),
-                'audits'    => $this->loadFile(self::FILE_AUDITS),
-                'reviews'   => $this->loadFile(self::FILE_REVIEWS),
-                'users'     => $this->loadUserDirectory(),
+                'program'   => $program,
+                'meetings'  => $meetings,
+                'champions' => $champions,
+                'readiness' => $readiness,
+                'issues'    => $issues,
+                'drills'    => $drills,
+                'clauses'   => $clauses,
+                'audits'    => $audits,
+                'reviews'   => $reviews,
+                'users'     => $users,
+                'docAccessAnalytics' => $this->docAccessAnalytics($champions, $users),
                 'me'        => [
                     'username' => (string)($me['username'] ?? ''),
                     'name'     => (string)($me['name'] ?? ''),
@@ -663,6 +678,20 @@ class DeployProgramController extends BaseController
         }
         usort($out, static fn($a, $b) => strcasecmp($a['name'], $b['name']));
         return $out;
+    }
+
+    /**
+     * @param array<string, mixed> $champions
+     * @param array<int, array<string, mixed>> $users
+     * @return array<string, mixed>
+     */
+    private function docAccessAnalytics(array $champions, array $users): array
+    {
+        try {
+            return (new DocAccessAnalyticsService($this->data))->summary($champions, $users);
+        } catch (Throwable $e) {
+            return DocAccessAnalyticsService::unavailable($e->getMessage());
+        }
     }
 
     // ── Helpers ─────────────────────────────────────────────────────────────
