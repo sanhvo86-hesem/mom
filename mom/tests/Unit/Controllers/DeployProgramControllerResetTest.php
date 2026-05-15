@@ -102,7 +102,8 @@ final class DeployProgramControllerResetTest extends TestCase
 
         $this->assertSame(['QA', 'MNT'], $normalized['active']);
         $this->assertSame('Bảo trì', $normalized['custom']['MNT']['label']);
-        $this->assertSame(3, $normalized['custom']['MNT']['wave']);
+        // wave=9 không hợp lệ → bị normalize về mặc định 4 (đợt hỗ trợ).
+        $this->assertSame(4, $normalized['custom']['MNT']['wave']);
         $this->assertSame('#475569', $normalized['custom']['MNT']['color']);
         $this->assertSame('Maintenance Manager', $normalized['custom']['MNT']['owner']);
     }
