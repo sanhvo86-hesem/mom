@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRN-CHAMP-02 — Đọc bản vẽ và tiêu đề DCC trong 60 giây | HESEM MOM</title>
+<script>
+/* DCC Header bootstrap */
+(function () {
+  var DCC_VERSION = '2026-04-24-1';
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css?v=' + DCC_VERSION;
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(js);
+})();
+</script>
+<link rel="stylesheet" href="../../../../assets/style.css">
+<style>
+ table{width:100%;border-collapse:collapse;table-layout:fixed}
+ th,td{border:1px solid #e2e8f0;padding:8px 10px;vertical-align:top;overflow-wrap:anywhere}
+ th{background:#f1f5f9;text-align:left}.tight li{margin:4px 0}.diagram{border:1px dashed #94a3b8;padding:12px;background:#f8fafc}
+</style>
+</head>
+<body>
+<div class="container"><div class="page"><div class="page-body">
+<div class="dcc-header"
+     data-dcc-doc-code="TRN-CHAMP-02"
+     data-dcc-locale="vi"
+     data-dcc-logo="../../../../assets/hesem-logo.svg"
+     data-dcc-bootstrap='{"header":{"doc_code":"TRN-CHAMP-02","title":"Đọc bản vẽ và tiêu đề DCC trong 60 giây","subtitle":"Buổi 2 · W2 · 90 phút","doc_type":"TRN","revision":"V0","effective_date":"2026-05-23","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":null,"status":"released"}}'></div>
+<div class="doc-content" id="docContent">
+<h1 class="h2">Buổi 2 — Đọc bản vẽ và tiêu đề DCC trong 60 giây</h1>
+<p><b>Mục tiêu:</b> học viên nhìn một bản vẽ phát hành lạ và xác định trong 60 giây: mã, phiên bản, ngày hiệu lực, người duyệt và trạng thái.</p>
+<section class="card">
+<h2 class="h2">1. Sáu trường bắt buộc trên tiêu đề DCC</h2>
+<div class="diagram">Sơ đồ đọc nhanh: Trạng thái → Mã tài liệu → Phiên bản → Ngày hiệu lực → Chủ quản → Người duyệt.</div>
+<table><thead><tr><th>Trường</th><th>Học viên phải nói được</th></tr></thead><tbody>
+<tr><td>Mã</td><td>Mã tài liệu hoặc mã bản vẽ đang mở.</td></tr>
+<tr><td>Phiên bản</td><td>Phiên bản đang phát hành, không dùng ảnh chụp cũ.</td></tr>
+<tr><td>Ngày hiệu lực</td><td>Ngày tài liệu bắt đầu được phép dùng.</td></tr>
+<tr><td>Chủ quản</td><td>Vai trò chịu trách nhiệm nội dung.</td></tr>
+<tr><td>Người duyệt</td><td>Vai trò ký duyệt phát hành.</td></tr>
+<tr><td>Trạng thái</td><td>Phát hành, nháp, hết hiệu lực hoặc bị thay thế.</td></tr>
+</tbody></table>
+</section>
+<section class="card">
+<h2 class="h2">2. Quy tắc đọc nhanh</h2>
+<ol class="tight">
+<li>Học viên đọc trạng thái trước, vì tài liệu nháp hoặc hết hiệu lực phải dừng ngay.</li>
+<li>Học viên đọc mã và phiên bản trước khi đọc nội dung.</li>
+<li>Học viên kiểm ngày hiệu lực và người duyệt trước khi hướng dẫn người khác.</li>
+<li>Học viên ghi nghi ngờ sai phiên bản vào sổ vấn đề, không tự đoán.</li>
+</ol>
+</section>
+<section class="card">
+<h2 class="h2">3. Mười bài tập thật</h2>
+<p>Giảng viên chuẩn bị 10 tài liệu thật. Học viên làm trong 10 phút và tự chấm sau khi giảng viên công bố đáp án.</p>
+<table><thead><tr><th>Tài liệu thật</th><th>Mã đúng</th><th>Phiên bản đúng</th><th>Có hiệu lực không</th></tr></thead><tbody>
+<tr><td>MAN-001 bản phát hành</td><td></td><td></td><td></td></tr>
+<tr><td>POL-QMS-001 bản phát hành</td><td></td><td></td><td></td></tr>
+<tr><td>SOP-501 bản đang dùng tại Sản xuất</td><td></td><td></td><td></td></tr>
+<tr><td>WI-519 bản mở từ QR máy</td><td></td><td></td><td></td></tr>
+<tr><td>Bản nháp SOP-605 do giảng viên gài bẫy</td><td></td><td></td><td></td></tr>
+<tr><td>Bản hết hiệu lực WI-201 do giảng viên gài bẫy</td><td></td><td></td><td></td></tr>
+<tr><td>Bản sai mã ANNEX-118 do giảng viên gài bẫy</td><td></td><td></td><td></td></tr>
+<tr><td>FRM-504 sổ giao ca</td><td></td><td></td><td></td></tr>
+<tr><td>ANNEX-117 ma trận leo thang xử lý</td><td></td><td></td><td></td></tr>
+<tr><td>WI-202 họp điều hành hằng ngày</td><td></td><td></td><td></td></tr>
+</tbody></table>
+</section>
+<section class="card">
+<h2 class="h2">4. Tiêu chí đạt</h2>
+<p>Học viên đạt khi trả lời đúng ít nhất 9/10 tài liệu và mỗi tài liệu không quá 60 giây. Học viên sai ở bẫy nháp, hết hiệu lực hoặc sai mã phải học lại phần 2.</p>
+</section>
+</div>
+</div></div></div>
+</body>
+</html>

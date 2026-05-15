@@ -6,73 +6,73 @@
   },
   "champions": {
     "PROD": {
-      "participants": [{"name": "Nguyễn Sỹ Văn", "phone": "0985 994 010", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
-      "backups": [{"name": "Nguyễn Văn Nam", "phone": "0972754204", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
-      "primary": {"name": "Nguyễn Sỹ Văn", "phone": "0985 994 010", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
-      "backup": {"name": "Nguyễn Văn Nam", "phone": "0972754204", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "participants": [{"name": "Nguyễn Sỹ Văn", "phone": "0985 994 010", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""}],
+      "backups": [{"name": "Nguyễn Văn Nam", "phone": "0972754204", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""}],
+      "primary": {"name": "Nguyễn Sỹ Văn", "phone": "0985 994 010", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
+      "backup": {"name": "Nguyễn Văn Nam", "phone": "0972754204", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
       "shift": "A"
     },
     "ENG": {
-      "participants": [{"name": "Nguyễn Hướng Dương", "phone": "0336 573 651", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
-      "backups": [{"name": "Phạm Tuấn Cường", "phone": "0333 799 377", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
-      "primary": {"name": "Nguyễn Hướng Dương", "phone": "0336 573 651", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
-      "backup": {"name": "Phạm Tuấn Cường", "phone": "0333 799 377", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "participants": [{"name": "Nguyễn Hướng Dương", "phone": "0336 573 651", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""}],
+      "backups": [{"name": "Phạm Tuấn Cường", "phone": "0333 799 377", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""}],
+      "primary": {"name": "Nguyễn Hướng Dương", "phone": "0336 573 651", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
+      "backup": {"name": "Phạm Tuấn Cường", "phone": "0333 799 377", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
       "shift": "A"
     },
     "QA": {
-      "participants": [{"name": "Nguyễn Quốc Cường", "phone": "0373519642", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
-      "backups": [{"name": "Võ Quốc Đạt", "phone": "035 570 5777", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
-      "primary": {"name": "Nguyễn Quốc Cường", "phone": "0373519642", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
-      "backup": {"name": "Võ Quốc Đạt", "phone": "035 570 5777", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "participants": [{"name": "Nguyễn Quốc Cường", "phone": "0373519642", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""}],
+      "backups": [{"name": "Võ Quốc Đạt", "phone": "035 570 5777", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""}],
+      "primary": {"name": "Nguyễn Quốc Cường", "phone": "0373519642", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
+      "backup": {"name": "Võ Quốc Đạt", "phone": "035 570 5777", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
       "shift": "A"
     },
     "SCM": {
-      "participants": [{"name": "Bùi Thị Huệ", "phone": "0346021882", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
-      "backups": [{"name": "Huỳnh Thị Thúy Diễm", "phone": "0388701127", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
-      "primary": {"name": "Bùi Thị Huệ", "phone": "0346021882", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
-      "backup": {"name": "Huỳnh Thị Thúy Diễm", "phone": "0388701127", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "participants": [{"name": "Bùi Thị Huệ", "phone": "0346021882", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""}],
+      "backups": [{"name": "Huỳnh Thị Thúy Diễm", "phone": "0388701127", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""}],
+      "primary": {"name": "Bùi Thị Huệ", "phone": "0346021882", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
+      "backup": {"name": "Huỳnh Thị Thúy Diễm", "phone": "0388701127", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
       "shift": "A"
     },
     "SALES": {
-      "participants": [{"name": "Phan Hồng Sơn", "phone": "0335 327 727", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
+      "participants": [{"name": "Phan Hồng Sơn", "phone": "0335 327 727", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""}],
       "backups": [],
-      "primary": {"name": "Phan Hồng Sơn", "phone": "0335 327 727", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
-      "backup": {"name": "", "phone": "", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "primary": {"name": "Phan Hồng Sơn", "phone": "0335 327 727", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
+      "backup": {"name": "", "phone": "", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
       "shift": "A"
     },
     "FIN": {
-      "participants": [{"name": "Trần Ngọc Yến", "phone": "0983868670", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
-      "backups": [{"name": "Trương Thị Kim Hồng", "phone": "0397246743", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
-      "primary": {"name": "Trần Ngọc Yến", "phone": "0983868670", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
-      "backup": {"name": "Trương Thị Kim Hồng", "phone": "0397246743", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "participants": [{"name": "Trần Ngọc Yến", "phone": "0983868670", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""}],
+      "backups": [{"name": "Trương Thị Kim Hồng", "phone": "0397246743", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""}],
+      "primary": {"name": "Trần Ngọc Yến", "phone": "0983868670", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
+      "backup": {"name": "Trương Thị Kim Hồng", "phone": "0397246743", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
       "shift": "A"
     },
     "HR": {
-      "participants": [{"name": "Bùi Thị Bích", "phone": "0974 864 113", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
+      "participants": [{"name": "Bùi Thị Bích", "phone": "0974 864 113", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""}],
       "backups": [],
-      "primary": {"name": "Bùi Thị Bích", "phone": "0974 864 113", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
-      "backup": {"name": "", "phone": "", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "primary": {"name": "Bùi Thị Bích", "phone": "0974 864 113", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
+      "backup": {"name": "", "phone": "", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
       "shift": "A"
     },
     "IT": {
       "participants": [],
-      "backups": [{"name": "Lê Ngọc Như Ý", "phone": "0793702577", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
-      "primary": {"name": "", "phone": "", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
-      "backup": {"name": "Lê Ngọc Như Ý", "phone": "0793702577", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "backups": [{"name": "Lê Ngọc Như Ý", "phone": "0793702577", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""}],
+      "primary": {"name": "", "phone": "", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
+      "backup": {"name": "Lê Ngọc Như Ý", "phone": "0793702577", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
       "shift": "A"
     },
     "EHS": {
       "participants": [],
       "backups": [],
-      "primary": {"name": "", "phone": "", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
-      "backup": {"name": "", "phone": "", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "primary": {"name": "", "phone": "", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
+      "backup": {"name": "", "phone": "", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
       "shift": "A"
     },
     "ERP": {
-      "participants": [{"name": "Lê Ngọc Như Ý", "phone": "0793702577", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
+      "participants": [{"name": "Lê Ngọc Như Ý", "phone": "0793702577", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""}],
       "backups": [],
-      "primary": {"name": "Lê Ngọc Như Ý", "phone": "0793702577", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
-      "backup": {"name": "", "phone": "", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "primary": {"name": "Lê Ngọc Như Ý", "phone": "0793702577", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
+      "backup": {"name": "", "phone": "", "m365": "", "ojtPass": false, "username": "", "employee_id": "", "bootcampAttended": [], "ojtScore": null, "ojtPassed": false, "ojtSignedBy": "", "ojtSignedAt": ""},
       "shift": "A"
     }
   }
