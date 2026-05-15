@@ -72,7 +72,11 @@ class RbacController extends BaseController
     public function effectivePermissions(): void
     {
         $user = $this->requireAuthOrFail();
-        $this->requireAdmin($user);
+        $this->requireAuthz($user, 'rbac.role.view', [
+            'route_action' => 'rbac_effective_permissions',
+            'resource_kind' => 'user',
+            'resource_id' => trim((string)($_GET['userId'] ?? '')),
+        ]);
         $userId = trim((string)($_GET['userId'] ?? ''));
         if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i', $userId)) {
             $this->error('invalid_user_id', 400);
@@ -89,7 +93,7 @@ class RbacController extends BaseController
     public function sodViolations(): void
     {
         $user = $this->requireAuthOrFail();
-        $this->requireAdmin($user);
+        $this->requireAuthz($user, 'rbac.role.view', ['route_action' => 'rbac_sod_violations']);
         try {
             $rows = $this->rbac()->currentSodViolations();
             $this->success(['data' => $rows, 'count' => count($rows)]);
@@ -102,7 +106,6 @@ class RbacController extends BaseController
     public function assignRole(): void
     {
         $user = $this->requireAuthOrFail();
-        $this->requireAdmin($user);
         $body = $this->jsonBody();
         $userId   = trim((string)($body['user_id'] ?? ''));
         $roleId   = trim((string)($body['role_id'] ?? ''));
@@ -112,6 +115,12 @@ class RbacController extends BaseController
         if ($userId === '' || $roleId === '') {
             $this->error('invalid_request', 400, 'user_id and role_id are required');
         }
+
+        $this->requireAuthz($user, 'rbac.role.edit', [
+            'route_action' => 'rbac_assign_role',
+            'resource_kind' => 'user',
+            'resource_id' => $userId,
+        ]);
         try {
             $result = $this->rbac()->assignRole($userId, $roleId, $this->actorId($user), $reason ?: null, $waiveSod);
             if (($result['ok'] ?? false) !== true) {
@@ -127,7 +136,6 @@ class RbacController extends BaseController
     public function revokeRole(): void
     {
         $user = $this->requireAuthOrFail();
-        $this->requireAdmin($user);
         $body = $this->jsonBody();
         $userId = trim((string)($body['user_id'] ?? $_GET['user_id'] ?? ''));
         $roleId = trim((string)($body['role_id'] ?? $_GET['role_id'] ?? ''));
@@ -135,6 +143,11 @@ class RbacController extends BaseController
         if ($userId === '' || $roleId === '') {
             $this->error('invalid_request', 400);
         }
+        $this->requireAuthz($user, 'rbac.role.edit', [
+            'route_action' => 'rbac_revoke_role',
+            'resource_kind' => 'user',
+            'resource_id' => $userId,
+        ]);
         try {
             $result = $this->rbac()->revokeRole($userId, $roleId, $this->actorId($user), $reason ?: null);
             $this->success(['data' => $result]);
@@ -150,11 +163,16 @@ class RbacController extends BaseController
     {
         $user = $this->requireAuthOrFail();
         $userId = trim((string)($_GET['user_id'] ?? ''));
-        // Non-admin can only list their own factors.
+        // Non-admin can only list their own factors. Admin/privileged reads
+        // of another user's factors require the rbac.role.view permission.
         if ($userId === '' || $userId === $this->actorId($user)) {
             $userId = $this->actorId($user);
         } else {
-            $this->requireAdmin($user);
+            $this->requireAuthz($user, 'rbac.role.view', [
+                'route_action' => 'mfa_list_factors_admin',
+                'resource_kind' => 'user',
+                'resource_id' => $userId,
+            ]);
         }
         try {
             $rows = $this->rbac()->listFactorsForUser($userId);
@@ -168,13 +186,17 @@ class RbacController extends BaseController
     public function revokeFactor(): void
     {
         $user = $this->requireAuthOrFail();
-        $this->requireAdmin($user);
         $factorId = trim((string)($_GET['factorId'] ?? ''));
         $body = $this->jsonBody();
         $reason = trim((string)($body['reason'] ?? ''));
         if ($factorId === '') {
             $this->error('invalid_request', 400);
         }
+        $this->requireAuthz($user, 'mfa.factor.revoke', [
+            'route_action' => 'mfa_revoke_factor',
+            'resource_kind' => 'mfa_factor',
+            'resource_id' => $factorId,
+        ]);
         try {
             $result = $this->rbac()->revokeFactor($factorId, $this->actorId($user), $reason);
             if (($result['ok'] ?? false) !== true) {
@@ -190,13 +212,17 @@ class RbacController extends BaseController
     public function resetFactors(): void
     {
         $user = $this->requireAuthOrFail();
-        $this->requireAdmin($user);
         $body = $this->jsonBody();
         $userId = trim((string)($body['user_id'] ?? ''));
         $reason = trim((string)($body['reason'] ?? ''));
         if ($userId === '') {
             $this->error('invalid_request', 400);
         }
+        $this->requireAuthz($user, 'mfa.factor.reset', [
+            'route_action' => 'mfa_reset_factors',
+            'resource_kind' => 'user',
+            'resource_id' => $userId,
+        ]);
         try {
             $result = $this->rbac()->resetAllFactors($userId, $this->actorId($user), $reason);
             if (($result['ok'] ?? false) !== true) {
@@ -230,7 +256,11 @@ class RbacController extends BaseController
         $user = $this->requireAuthOrFail();
         $userId = trim((string)($_GET['user_id'] ?? $this->actorId($user)));
         if ($userId !== $this->actorId($user)) {
-            $this->requireAdmin($user);
+            $this->requireAuthz($user, 'audit.view', [
+                'route_action' => 'pending_ack_admin',
+                'resource_kind' => 'user',
+                'resource_id' => $userId,
+            ]);
         }
         try {
             $rows = $this->rbac()->documentsPendingAckForUser($userId, (int)($_GET['limit'] ?? 100));
@@ -246,7 +276,11 @@ class RbacController extends BaseController
         $user = $this->requireAuthOrFail();
         $userId = trim((string)($_GET['user_id'] ?? $this->actorId($user)));
         if ($userId !== $this->actorId($user)) {
-            $this->requireAdmin($user);
+            $this->requireAuthz($user, 'audit.view', [
+                'route_action' => 'effective_layout_admin',
+                'resource_kind' => 'user',
+                'resource_id' => $userId,
+            ]);
         }
         try {
             $row = $this->rbac()->effectiveLayoutForUser($userId);
@@ -260,7 +294,7 @@ class RbacController extends BaseController
     public function retentionDueForDisposal(): void
     {
         $user = $this->requireAuthOrFail();
-        $this->requireAdmin($user);
+        $this->requireAuthz($user, 'audit.view', ['route_action' => 'retention_due_for_disposal']);
         try {
             $rows = $this->rbac()->retentionDueForDisposal(
                 (int)($_GET['limit'] ?? 200),
@@ -276,7 +310,7 @@ class RbacController extends BaseController
     public function accessReviewProgress(): void
     {
         $user = $this->requireAuthOrFail();
-        $this->requireAdmin($user);
+        $this->requireAuthz($user, 'rbac.review.run', ['route_action' => 'access_review_progress']);
         try {
             $rows = $this->rbac()->accessReviewProgress();
             $this->success(['data' => $rows, 'count' => count($rows)]);
@@ -323,7 +357,11 @@ class RbacController extends BaseController
     public function disposeRecord(string $recordId): void
     {
         $user = $this->requireAuthOrFail();
-        $this->requireAdmin($user);
+        $this->requireAuthz($user, 'audit.export', [
+            'route_action' => 'retention_dispose_record',
+            'resource_kind' => 'record',
+            'resource_id' => $recordId,
+        ]);
         $body = $this->jsonBody();
         $required = ['method_used','witness_user_id','notes'];
         foreach ($required as $f) {
@@ -353,7 +391,11 @@ class RbacController extends BaseController
     public function closeCampaign(string $campaignId): void
     {
         $user = $this->requireAuthOrFail();
-        $this->requireAdmin($user);
+        $this->requireAuthz($user, 'rbac.review.run', [
+            'route_action' => 'access_review_close_campaign',
+            'resource_kind' => 'access_review_campaign',
+            'resource_id' => $campaignId,
+        ]);
         $body = $this->jsonBody();
         if (empty($body['reason'])) { $this->error('reason_required', 400); }
         try {
@@ -379,7 +421,7 @@ class RbacController extends BaseController
     public function listActiveSessions(): void
     {
         $user = $this->requireAuthOrFail();
-        $this->requireAdmin($user);
+        $this->requireAuthz($user, 'audit.view', ['route_action' => 'sessions_list_active']);
         try {
             $rows = $this->rbac()->listActiveSessions($this->getCurrentSessionId());
             $this->success(['data' => $rows, 'count' => count($rows), 'current_session_id' => $this->getCurrentSessionId()]);
@@ -398,7 +440,11 @@ class RbacController extends BaseController
     public function revokeSession(string $sessionId): void
     {
         $user = $this->requireAuthOrFail();
-        $this->requireAdmin($user);
+        $this->requireAuthz($user, 'rbac.role.edit', [
+            'route_action' => 'sessions_revoke',
+            'resource_kind' => 'session',
+            'resource_id' => $sessionId,
+        ]);
         $body = $this->jsonBody();
         if (empty($body['reason'])) { $this->error('reason_required', 400); }
         if ($sessionId === $this->getCurrentSessionId()) {
@@ -425,7 +471,9 @@ class RbacController extends BaseController
     public function applyCanonicalSeed(): void
     {
         $user = $this->requireAuthOrFail();
-        $this->requireAdmin($user);
+        // This re-seeds the canonical RBAC matrix system-wide — the highest
+        // permission impact in the application. Gate behind rbac.sod.edit (AAL3).
+        $this->requireAuthz($user, 'rbac.sod.edit', ['route_action' => 'rbac_canonical_seed_apply']);
         $body = $this->jsonBody();
         $reason = trim((string)($body['reason'] ?? ''));
         if (strlen($reason) < 5) {

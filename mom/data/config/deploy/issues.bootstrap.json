@@ -1,4 +1,12 @@
 {
-  "version": 1,
+  "version": 2,
+  "issueSchema": {
+    "source": [
+      "real",
+      "drill",
+      "audit"
+    ],
+    "drillId": "required when source is drill; null for real or audit issues"
+  },
   "issues": []
 }

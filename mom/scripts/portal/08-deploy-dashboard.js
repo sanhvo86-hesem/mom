@@ -60,27 +60,6 @@ const DEPLOY_CONFIG = {
       {code:'WI-103', title:'Định tuyến thư mục M365',     path:'../mom/docs/operations/work-instructions/01-WI-100/wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html'},
       {code:'WI-104', title:'Thẻ tham chiếu nhanh theo vai trò', path:'../mom/docs/operations/work-instructions/01-WI-100/wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html'},
       {code:'DRL-E2E', title:'Bài diễn tập đơn hàng đầu-cuối', path:'../mom/docs/training/content/03-Practice-Drills/drill-joborder-e2e.html'},
-      {code:'TRN-DEP-PLAYBOOK', title:'Kịch bản họp tuần (khung chung)', path:'../mom/docs/training/system-ops/03-Deploy-Playbook/TRN-DEP-PLAYBOOK.html'},
-    ]},
-    {title:'Thẻ A4 in cho hiện trường', subtitle:'Dán bảng tổ · 5 vai trò gần máy · in lại khi đổi người dẫn dắt', items:[
-      {code:'WI-105-CARD-OPERATOR-CNC', title:'Người vận hành CNC',  path:'../mom/docs/operations/work-instructions/01-WI-100/wi-105-card-operator-cnc.html'},
-      {code:'WI-105-CARD-SETTER',       title:'Người cài đặt máy',   path:'../mom/docs/operations/work-instructions/01-WI-100/wi-105-card-setter.html'},
-      {code:'WI-105-CARD-QC-INSPECTOR', title:'QC kiểm tra',         path:'../mom/docs/operations/work-instructions/01-WI-100/wi-105-card-qc-inspector.html'},
-      {code:'WI-105-CARD-PLANNER',      title:'Điều độ sản xuất',    path:'../mom/docs/operations/work-instructions/01-WI-100/wi-105-card-planner.html'},
-      {code:'WI-105-CARD-LEADER',       title:'Tổ trưởng',           path:'../mom/docs/operations/work-instructions/01-WI-100/wi-105-card-leader.html'},
-    ]},
-    {title:'Thẻ Thứ Hai đầu tiên theo phòng', subtitle:'Dán tại bảng tổ phòng — đổi cách làm từ ngày Thứ Hai đầu tiên của phòng', items:[
-      {code:'DEPT-MONDAY-INDEX', title:'Chỉ mục 10 phòng',  path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-index.html'},
-      {code:'DEPT-MONDAY-PROD',  title:'Phòng Sản xuất',    path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-PROD.html'},
-      {code:'DEPT-MONDAY-ENG',   title:'Phòng Kỹ thuật',    path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-ENG.html'},
-      {code:'DEPT-MONDAY-QA',    title:'Phòng Chất lượng',  path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-QA.html'},
-      {code:'DEPT-MONDAY-SCM',   title:'Phòng Chuỗi cung ứng', path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-SCM.html'},
-      {code:'DEPT-MONDAY-SALES', title:'Phòng Kinh doanh',  path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-SALES.html'},
-      {code:'DEPT-MONDAY-FIN',   title:'Phòng Tài chính',   path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-FIN.html'},
-      {code:'DEPT-MONDAY-HR',    title:'Phòng Nhân sự',     path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-HR.html'},
-      {code:'DEPT-MONDAY-IT',    title:'Phòng CNTT',        path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-IT.html'},
-      {code:'DEPT-MONDAY-EHS',   title:'Phòng EHS',         path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-EHS.html'},
-      {code:'DEPT-MONDAY-ERP',   title:'ERP / Epicor',      path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-ERP.html'},
     ]},
     {title:'Tài liệu nền QMS', subtitle:'Sổ tay · Chính sách · Sổ tay phòng ban', items:[
       {code:'MAN-001',     title:'Sổ tay QMS',          path:'../mom/docs/system/quality-manual/qms-man-001-qms-manual.html'},
@@ -305,10 +284,7 @@ function deployStaticDocByCode(code){
       if (String(item.code || '').trim().toUpperCase() === target) return item;
     }
   }
-  // Sau khi gom 12 kịch bản tuần thành 1 kịch bản chung, chỉ còn 3 tuần đánh giá
-  // (W04, W08, W12) giữ file riêng. Mọi tuần thường trỏ TRN-DEP-PLAYBOOK qua
-  // docsByGroup ở trên.
-  if (/^TRN-DEP-W(04|08|12)$/i.test(target) || /^TRN-DEP-PLAYBOOK$/i.test(target)) {
+  if (/^TRN-DEP-W\d{2}$/i.test(target)) {
     return {
       code: target,
       path: `../mom/docs/training/system-ops/03-Deploy-Playbook/${target}.html`,
@@ -401,11 +377,11 @@ function deployRewriteDocOpenHandlers(html){
       (_m, _q1, _q2, docCode) => `onclick="deployOpenDoc(${deployInlineString(docCode)});return false;"`);
 }
 // ── Playbook fetch + cache ────────────────────────────────────────────────
-// Sau khi 12 file tuần được gom thành 1 kịch bản chung TRN-DEP-PLAYBOOK + 3 file
-// tuần đánh giá (W04, W08, W12), parser này tìm các id sec-* trong cả 2 dạng:
-//   - TRN-DEP-PLAYBOOK   : sec-prep, sec-agenda, sec-objective, sec-tasks, sec-gate
-//   - TRN-DEP-W04/08/12  : sec-cover, sec-objective, sec-tasks, sec-lessons
-// Mục nào không có id thì giữ chuỗi rỗng; renderer tự bỏ qua mục rỗng.
+// Pulls the playbook HTML for a given deploy training code (TRN-DEP-W01..W12)
+// via the existing doc_stream API and parses out individual sections so the
+// week side panel can render meeting brief inline (and fullscreen mode can
+// render the full playbook). Results are cached in DeployState.playbookCache
+// to avoid re-fetching on tab switches.
 async function deployFetchPlaybook(code){
   if (!code) return null;
   DeployState.playbookCache = DeployState.playbookCache || {};
@@ -415,13 +391,23 @@ async function deployFetchPlaybook(code){
 
   const promise = (async () => {
     try{
-      const path = `mom/docs/training/system-ops/03-Deploy-Playbook/${code}.html`;
+      const playbookPaths = [{
+        path: `mom/docs/training/system-ops/03-Deploy-Playbook/${code}.html`,
+        docCode: code,
+      }];
+      if (/^TRN-DEP-W\d{2}$/i.test(String(code || ''))) {
+        playbookPaths.push({
+          path: 'mom/docs/training/system-ops/03-Deploy-Playbook/TRN-DEP-PLAYBOOK.html',
+          docCode: 'TRN-DEP-PLAYBOOK',
+        });
+      }
       // Try doc_stream first (respects auth + DCC pipeline); fall back to direct
       // path so a missing doc_stream registration doesn't kill the brief.
-      const tryUrls = [
-        `api.php?action=doc_stream&path=${encodeURIComponent(path)}&code=${encodeURIComponent(code)}`,
-        '/' + path,
-      ];
+      const tryUrls = [];
+      playbookPaths.forEach(item => {
+        tryUrls.push(`api.php?action=doc_stream&path=${encodeURIComponent(item.path)}&code=${encodeURIComponent(item.docCode)}`);
+        tryUrls.push('/' + item.path);
+      });
       let html = '';
       for (const url of tryUrls){
         try{
@@ -434,19 +420,22 @@ async function deployFetchPlaybook(code){
       }
       if (!html) throw new Error('empty playbook');
       const dom = new DOMParser().parseFromString(html, 'text/html');
-      const pick = (id) => {
-        const el = dom.querySelector('#' + id);
-        return el ? el.outerHTML : '';
+      const pick = (...ids) => {
+        for (const id of ids) {
+          const el = dom.querySelector('#' + id);
+          if (el) return el.outerHTML;
+        }
+        return '';
       };
       const parsed = {
         cover:     pick('sec-cover'),
-        objective: pick('sec-objective'),
-        prep:      pick('sec-prep'),
-        agenda:    pick('sec-agenda'),
+        objective: pick('sec-objective', 'chuong-3'),
+        prep:      pick('sec-prep', 'chuong-1'),
+        agenda:    pick('sec-agenda', 'chuong-2'),
         slides:    pick('sec-slides'),
         decisions: pick('sec-decisions'),
-        gate:      pick('sec-gate'),
-        tasks:     pick('sec-tasks'),
+        gate:      pick('sec-gate', 'chuong-5'),
+        tasks:     pick('sec-tasks', 'chuong-4'),
         nextWeek:  pick('sec-next-week'),
         docs:      pick('sec-docs'),
         risks:     pick('sec-risks'),
@@ -482,30 +471,33 @@ async function deployHydratePlaybook(code, target){
 }
 
 function deployRenderBrief(code, data, fullscreen){
-  // Khung trích dẫn rút gọn cho phiên bản kịch bản chung + 3 tuần đánh giá.
-  // Mục nào không có nội dung (do file không có id sec-*) sẽ tự bỏ qua.
   const sections = fullscreen
     ? [
         ['cover','📌 Tổng quan buổi họp'],
-        ['objective','🎯 Mục tiêu tuần · 12 tuần khác gì'],
+        ['objective','🎯 Mục tiêu tuần'],
         ['prep','📋 Chuẩn bị trước họp (T-7 → T-0)'],
         ['agenda','📅 Chương trình họp 60 phút'],
-        ['tasks','📤 Mẫu báo cáo 5 phút · bằng chứng phải có'],
+        ['slides','🎞 Nội dung họp · trình bày từng mục'],
+        ['decisions','✍️ Quyết định cần chốt'],
         ['gate','🚦 Cổng quyết định Đi / Không đi · CẦN + ĐỦ'],
-        ['lessons','💡 Vòng rút kinh nghiệm 10 phút'],
+        ['tasks','📤 Nhiệm vụ sau họp (RACI)'],
+        ['nextWeek','▶ Định hướng tuần sau'],
+        ['docs','📎 Tài liệu liên quan'],
+        ['risks','⚠ Rủi ro và đường leo thang xử lý'],
+        ['lessons','💡 Bài học rút ra'],
       ]
     : [
+        ['prep','📋 Chuẩn bị trước họp (T-7 → T-0)'],
         ['agenda','📅 Chương trình họp 60 phút'],
-        ['objective','🎯 Mục tiêu tuần · 12 tuần khác gì'],
-        ['tasks','📤 Mẫu báo cáo 5 phút · bằng chứng phải có'],
+        ['objective','🎯 Mục tiêu tuần'],
+        ['tasks','📤 Nhiệm vụ sau họp (RACI)'],
         ['gate','🚦 Cổng quyết định Đi / Không đi · CẦN + ĐỦ'],
-        ['lessons','💡 Vòng rút kinh nghiệm 10 phút'],
       ];
   const blocks = sections.map(([key, title]) => {
     const html = deployRewriteDocOpenHandlers(data[key]);
     if (!html) return '';
     return `
-      <details class="dwp-brief-block" ${fullscreen ? 'open' : (key==='agenda' ? 'open' : '')}>
+      <details class="dwp-brief-block" ${fullscreen ? 'open' : (key==='prep' ? 'open' : '')}>
         <summary><span>${title}</span></summary>
         <div class="dwp-brief-body">${html}</div>
       </details>`;
@@ -513,7 +505,7 @@ function deployRenderBrief(code, data, fullscreen){
   const head = `
     <div class="dwp-brief-head">
       <strong>📖 Cẩm nang ${deployEscape(code)}</strong>
-      <span>Trích từ kịch bản chung · ${fullscreen ? 'đủ các mục' : 'các mục trọng yếu'} ·
+      <span>Trích từ tài liệu chính thức · ${fullscreen ? 'toàn bộ 12 mục' : '5 mục trọng yếu'} ·
         <a href="javascript:void(0)" onclick="deployOpenDoc(${deployInlineString(code)});return false;">Mở tài liệu đầy đủ ↗</a>
       </span>
     </div>`;
@@ -531,6 +523,25 @@ function deployRenderDocChip(code){
 function deployFmtDate(iso){ if(!iso) return '—'; try{ return new Date(iso).toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}); }catch(_){ return iso; } }
 function deployTodayIso(){ return new Date().toISOString().slice(0,10); }
 function deployGetPhaseDef(id){ return DEPLOY_CONFIG.phases.find(p=>p.id===id) || DEPLOY_CONFIG.phases[0]; }
+function deployGateText(code){
+  const pid = String(code || '').split('-')[0];
+  const items = DEPLOY_CONFIG.phaseChecklists[pid] || [];
+  const it = items.find(x => x.code === code);
+  return it ? it.text : '';
+}
+function deployWeekGatesTooltip(w){
+  const phase = deployGetPhaseDef(w && w.phase);
+  const codes = (w && w.gateCodes) || [];
+  const header = `${phase.label} — ${phase.title} (${phase.weeks})`;
+  if (!codes.length){
+    return `${header}\n\nTuần này không có cổng kiểm phải đóng.`;
+  }
+  const lines = codes.map(code => {
+    const txt = deployGateText(code);
+    return txt ? `• ${code} — ${txt}` : `• ${code}`;
+  });
+  return `${header}\n\nCổng kiểm phải đóng trong tuần này:\n${lines.join('\n')}`;
+}
 function deployChampionState(){
   if (!DeployState.champions || typeof DeployState.champions !== 'object') DeployState.champions = {version:2, champions:{}};
   if (!DeployState.champions.champions || typeof DeployState.champions.champions !== 'object') DeployState.champions.champions = {};
@@ -943,8 +954,9 @@ function renderTimelineWeek(w, currentWeek){
   const attendeesBadge = w.attendees && w.attendees.length
     ? `<span class="tlw-attendees" title="${deployEscape((w.attendeesNote || ''))}">${w.attendees[0] === 'all_departments' ? '👥 ĐẠI DIỆN PHÒNG BAN' : '🔒 ' + w.attendees.length + ' đại biểu'}</span>`
     : '';
+  const gatesTip = deployEscape(deployWeekGatesTooltip(w));
   return `
-  <button class="tl-week ${statusClass}" onclick="deployOpenWeek(${w.n|0})" style="--phase-color:${phase.color}">
+  <button class="tl-week ${statusClass}" onclick="deployOpenWeek(${w.n|0})" style="--phase-color:${phase.color}" title="${gatesTip}">
     <div class="tlw-head">
       <span class="tlw-num">W${w.n|0}</span>
       <span class="tlw-date">${deployFmtDate(w.date)}${dayBadge}</span>
@@ -2278,14 +2290,14 @@ async function deploySignOffMeeting(id){
 }
 
 async function deploySignOffWeek(weekN, decision){
-  if (!DeployState.me.canSignOff) { alert('Cần quyền CEO/QMS Manager để ký gate.'); return; }
+  if (!DeployState.me.canSignOff) { alert('Cần quyền Giám đốc / Trưởng QMS để ký cổng.'); return; }
   const notes = document.getElementById('dwpSignOffNotes')?.value || '';
   if (!confirm('Ký gate W' + weekN + ' với quyết định ' + decision.toUpperCase() + '?')) return;
   try{
     const res = await deployApi('deploy_week_signoff', {weekN, decision, notes});
     DeployState.program = res.data;
     renderDeployDashboard();
-  }catch(e){ console.error('[deploy] week signoff failed', e); alert('Lỗi ký gate: ' + e.message); }
+  }catch(e){ console.error('[deploy] week signoff failed', e); alert('Lỗi ký cổng: ' + e.message); }
 }
 
 async function deploySaveChampion(deptId){
@@ -2320,7 +2332,7 @@ async function deploySaveChampion(deptId){
     const res = await deployApi('deploy_champion_save', payload);
     DeployState.champions = res.data;
     renderDeployDashboard();
-  }catch(e){ console.error('[deploy] champion failed', e); alert('Lỗi lưu champion: ' + e.message); }
+  }catch(e){ console.error('[deploy] champion failed', e); alert('Lỗi lưu người dẫn dắt: ' + e.message); }
 }
 
 function deployOpenIssueForm(existing){
@@ -2402,7 +2414,7 @@ async function deployRecordDrill(){
     const res = await deployApi('deploy_drill_record', {date, person, deptId, docCode, seconds});
     DeployState.drills = res.data;
     renderDeployDashboard();
-  }catch(e){ console.error('[deploy] drill failed', e); alert('Lỗi ghi drill: ' + e.message); }
+  }catch(e){ console.error('[deploy] drill failed', e); alert('Lỗi ghi diễn tập: ' + e.message); }
 }
 
 function deployOpenAuditForm(existing){
@@ -2570,7 +2582,7 @@ async function deploySaveReview(payload){
     const res = await deployApi('deploy_review_save', payload);
     DeployState.reviews = res.data;
     renderDeployDashboard();
-  }catch(e){ console.error('[deploy] review failed', e); alert('Lỗi lưu review: ' + e.message); }
+  }catch(e){ console.error('[deploy] review failed', e); alert('Lỗi lưu xem xét: ' + e.message); }
 }
 
 async function deploySignOffReview(id){
@@ -2605,7 +2617,7 @@ function deployResetState(){
     kicker: '⚠ Hành động không thể hoàn tác',
     accentColor: '#dc2626',
     submitLabel: '🗑 Xác nhận reset',
-    hint: 'Xóa readiness, issue, drill, biên bản họp và trạng thái ký gate; giữ khung 12 tuần, tài liệu ISO và meeting template.',
+    hint: 'Xóa sẵn sàng, vấn đề, diễn tập, biên bản họp và trạng thái ký cổng; giữ khung 12 tuần, tài liệu ISO và mẫu họp.',
     fields: [
       {
         type: 'static',

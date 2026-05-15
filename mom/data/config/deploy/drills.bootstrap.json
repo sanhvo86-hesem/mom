@@ -1,6 +1,20 @@
 {
-  "version": 1,
+  "version": 2,
   "lastUpdated": "2026-05-14T00:00:00+07:00",
+  "reminderPolicy": {
+    "schedule": "0 6 * * *",
+    "timezone": "Asia/Ho_Chi_Minh",
+    "overdueAfterHours": 24,
+    "escalateOverdueCount": 2,
+    "escalationRoles": [
+      "qms_manager"
+    ],
+    "channels": [
+      "zalo",
+      "email"
+    ]
+  },
+  "reminderState": {},
   "drills": [
     {
       "id": "DRL-W02-PROD-RETR",

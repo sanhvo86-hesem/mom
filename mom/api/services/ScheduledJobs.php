@@ -18,6 +18,7 @@ use Throwable;
  * Typical crontab schedule:
  *   - Daily at 01:00:   runDailyKpiSnapshot, runNcrAging, runNotificationDigest
  *   - Daily at 06:00:   runCalibrationAlerts, runTrainingAlerts, runCapaEscalation
+ *   - Daily at 06:00:   runDeployDrillReminders
  *   - Weekly Sun 02:00: runWeeklyReport
  *   - Monthly 1st 03:00: runSupplierScoring
  *   - Monthly 1st 04:00: runDataPurge
@@ -50,6 +51,7 @@ final class ScheduledJobs
         require_once __DIR__ . '/SpcEngine.php';
         require_once __DIR__ . '/DashboardService.php';
         require_once __DIR__ . '/NotificationService.php';
+        require_once __DIR__ . '/DeployDrillReminderService.php';
 
         $this->dataDir = rtrim(str_replace('\\', '/', $dataDir), '/');
         $this->logDir  = $this->dataDir . '/job-logs';
@@ -728,6 +730,21 @@ final class ScheduledJobs
                 'escalated' => $escalated,
                 'allocations_scanned' => $allocationsScanned,
             ];
+        });
+    }
+
+    /**
+     * Deploy drill reminders: mark missed drill seeds overdue and escalate to QMS.
+     *
+     * Schedule: Daily at 06:00.
+     *
+     * @return array<string, mixed>
+     */
+    public function runDeployDrillReminders(): array
+    {
+        return $this->executeJob('deploy_drill_reminders', function (): array {
+            $service = new DeployDrillReminderService($this->dataDir);
+            return $service->runDaily();
         });
     }
 
