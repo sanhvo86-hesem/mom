@@ -1,0 +1,10 @@
+[Unit]
+Description=Tổng hợp doc_access_log thành KPI USE mỗi 15 phút
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=15min
+Unit=deploy-doc-usage-cron.service
+
+[Install]
+WantedBy=timers.target

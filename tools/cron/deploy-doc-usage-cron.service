@@ -1,0 +1,9 @@
+[Unit]
+Description=HESEM QMS - tổng hợp doc_access_log thành KPI USE
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/var/www/eqms.hesemeng.com/tools/cron/deploy-doc-usage-cron.sh
+User=www-data
+Group=www-data

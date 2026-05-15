@@ -289,6 +289,7 @@ async function loadDeployState(){
     DeployState.audits    = d.audits    || {audits:[]};
     DeployState.reviews   = d.reviews   || {reviews:[], inputTemplate:[], outputTemplate:[]};
     DeployState.users     = Array.isArray(d.users) ? d.users : [];
+    DeployState.availability = d.availability || {absences:[]};
     DeployState.me        = d.me        || DeployState.me;
     DeployState.loaded    = true;
   }catch(e){
@@ -666,14 +667,32 @@ function deployEmptyPerson(){
 }
 function deployNormalizePerson(person){
   person = person || {};
+  const score = deployNormalizeOjtScore(person.ojtScore);
+  const passed = score == null ? !!person.ojtPass : score >= 16;
   return {
     name: String(person.name || '').trim(),
     phone: String(person.phone || '').trim(),
     m365: String(person.m365 || person.email || '').trim(),
-    ojtPass: !!person.ojtPass,
+    ojtPass: passed,
     username: String(person.username || '').trim(),
     employee_id: String(person.employee_id || person.id || '').trim(),
+    bootcampAttended: deployNormalizeBootcampAttended(person.bootcampAttended),
+    ojtScore: score,
+    ojtPassed: passed,
+    ojtSignedBy: String(person.ojtSignedBy || '').trim(),
+    ojtSignedAt: String(person.ojtSignedAt || '').trim(),
   };
+}
+function deployNormalizeOjtScore(value){
+  if (value === null || value === undefined || value === '') return null;
+  const n = parseInt(value, 10);
+  return Number.isInteger(n) && n >= 0 && n <= 20 ? n : null;
+}
+function deployNormalizeBootcampAttended(value){
+  const rows = Array.isArray(value) ? value : String(value || '').split(',');
+  return Array.from(new Set(
+    rows.map(n => parseInt(n, 10)).filter(n => Number.isInteger(n) && n >= 1 && n <= 4)
+  )).sort((a,b) => a - b);
 }
 function deployPersonFilled(person){
   const p = deployNormalizePerson(person);
@@ -768,6 +787,18 @@ function deployOverviewKpis(){
   const other = items.filter(kpi => !String(kpi.id || '').startsWith('KPI-USE-'));
   return usage.concat(other);
 }
+function deployKpiUpdatedLabel(kpi, kv){
+  if (!String(kpi.id || '').startsWith('KPI-USE-')) return '';
+  const t = kv && kv['KPI-USE_updatedAt'];
+  if (!t) return '';
+  const d = new Date(t);
+  if (Number.isNaN(d.getTime())) return '';
+  const hh = String(d.getHours()).padStart(2, '0');
+  const mm = String(d.getMinutes()).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mo = String(d.getMonth() + 1).padStart(2, '0');
+  return `<div class="kpi-mini-updated">Cập nhật: ${hh}:${mm} ngày ${dd}/${mo}</div>`;
+}
 function deployDeptKpiOwnerSummary(dept){
   const ownerRole = deployOwnerRoleFromDeptOwner(dept && dept.owner);
   const items = ownerRole ? DEPLOY_CONFIG.kpis.filter(kpi => kpi.ownerRole === ownerRole) : [];
@@ -857,7 +888,7 @@ function renderDeployHero(){
       <div class="deploy-hero-actions">
         <a class="deploy-action-link" href="../mom/docs/operations/work-instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html" target="_blank">WI-106 Kế hoạch tổng</a>
         <a class="deploy-action-link" href="../mom/docs/operations/work-instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html" target="_blank">WI-105 Hướng dẫn tra cứu</a>
-        <a class="deploy-action-link" href="../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html" target="_blank">ANNEX-114 Sổ tay Go-live</a>
+        <a class="deploy-action-link" href="../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-114-go-live-runbook-and-cutover-control.html" target="_blank">ANNEX-114 Sổ tay vận hành chính thức</a>
       </div>
     </div>
     <div class="deploy-hero-side">
@@ -893,10 +924,10 @@ function renderDeploySummary(){
     <div class="deploy-summary-card">
       <span class="summary-label">Phòng ban sẵn sàng</span>
       <strong>${ready}/${total}</strong>
-      <div>${inProg} đang trong wave</div>
+      <div>${inProg} đang trong đợt triển khai</div>
     </div>
     <div class="deploy-summary-card">
-      <span class="summary-label">Champion đạt OJT</span>
+      <span class="summary-label">Người dẫn dắt đạt OJT</span>
       <strong>${chPct}%</strong>
       <div>${chPass}/${chTarget} đã đạt</div>
     </div>
@@ -925,7 +956,7 @@ function renderTabOverview(){
       </div>
     </section>
     <section class="deploy-section">
-      <div class="deploy-section-head"><h2>7 trụ triển khai</h2><span>Thiếu trụ nào = chưa go-live</span></div>
+      <div class="deploy-section-head"><h2>7 trụ triển khai</h2><span>Thiếu trụ nào = chưa thể vận hành chính thức</span></div>
       <div class="deploy-pillar-grid">
         ${DEPLOY_CONFIG.pillars.map(pl => `
           <div class="deploy-pillar-card">
@@ -977,7 +1008,9 @@ function renderKpiCard(kpi, value){
   const hasTip = !!(kpi.rationale || kpi.basis || kpi.method);
   const isUsageKpi = String(kpi.id || '').startsWith('KPI-USE-');
   const usagePending = isUsageKpi && v === '';
-  const placeholder = usagePending ? 'Chưa có số liệu' : '—';
+  const placeholder = usagePending ? 'Đang chờ tổng hợp' : '—';
+  const kv = (DeployState.readiness && DeployState.readiness.kpiValues) || {};
+  const updatedLabel = deployKpiUpdatedLabel(kpi, kv);
   // Build rationale tooltip body. Uses an <aside> floating beside the card on
   // hover (CSS-only). Native `title=` on the input is also set so screen-
   // readers and keyboard-focus users get the same content.
@@ -1002,8 +1035,9 @@ function renderKpiCard(kpi, value){
     </div>
     <div class="kpi-mini-label">${deployEscape(kpi.label)}</div>
     <input type="text" class="kpi-mini-input" value="${deployEscape(v)}" placeholder="${deployEscape(placeholder)}" ${ro ? 'disabled' : ''} title="${deployEscape(titleAttr)}" onchange="deployUpdateMetric('${deployEscape(kpi.id)}', this.value)">
-    ${usagePending ? '<div class="kpi-mini-hint">Nhật ký doc_access_log đã bật từ R2-06; chờ đủ 7 ngày để tính.</div>' : ''}
+    ${usagePending ? '<div class="kpi-mini-hint">Đang chờ tổng hợp lần đầu (cron 15 phút/lần). Mở <code>tail -f /var/log/qms-doc-usage-cron.log</code> để theo dõi.</div>' : ''}
     <div class="kpi-mini-owner">Chủ trì: ${deployEscape(deployKpiOwnerLabel(kpi.ownerRole))}</div>
+    ${updatedLabel}
     ${tipHtml}
   </div>`;
 }
@@ -1151,13 +1185,13 @@ function renderTabDepartments(){
   <div class="deploy-tab-panel active" id="dtab-departments">
     ${renderDepartmentRosterManager(activeDepts)}
     <section class="deploy-section">
-      <div class="deploy-section-head"><h2>Wave rollout</h2><span>3 wave · go-live theo thứ tự rủi ro</span></div>
+      <div class="deploy-section-head"><h2>Triển khai theo đợt</h2><span>4 đợt · vận hành chính thức theo thứ tự rủi ro</span></div>
       <div class="deploy-wave-grid">
         ${(DEPLOY_CONFIG.waves || [{n:1},{n:2},{n:3},{n:4}]).map(w => renderWaveColumn(w.n)).join('')}
       </div>
     </section>
     <section class="deploy-section">
-      <div class="deploy-section-head"><h2>Bảng readiness 6 chiều</h2><span>Click ô để cycle pending → in_progress → completed → blocked</span></div>
+      <div class="deploy-section-head"><h2>Bảng sẵn sàng 6 chiều</h2><span>Bấm ô để xoay: chưa bắt đầu → đang thực hiện → hoàn thành → bị chặn</span></div>
       <div class="deploy-table-wrap">
         <table class="deploy-heatmap">
           <thead>
@@ -1180,12 +1214,104 @@ function renderTabDepartments(){
       </div>
     </section>
     <section class="deploy-section">
-      <div class="deploy-section-head"><h2>Champion roster</h2><span>Người tham dự + dự bị — ${deployChampionCount()}/${chTarget} đã pass OJT</span></div>
+      <div class="deploy-section-head"><h2>Danh sách người dẫn dắt</h2><span>Người tham dự + dự bị — ${deployChampionCount()}/${chTarget} đã đạt OJT</span></div>
       <div class="champion-grid">
         ${activeDepts.map(d => renderChampionCard(d)).join('')}
       </div>
     </section>
+    ${renderAvailabilitySection(activeDepts)}
   </div>`;
+}
+
+function renderAvailabilitySection(activeDepts){
+  const state = DeployState.availability || {absences:[]};
+  const list = Array.isArray(state.absences) ? state.absences : [];
+  const today = new Date().toISOString().slice(0,10);
+  // Sắp xếp: đang vắng hôm nay lên đầu, kế đến vắng sắp tới, cuối là quá khứ.
+  const sorted = list.slice().sort((a,b) => {
+    const aActive = (a.fromDate <= today && a.toDate >= today) ? 0 : (a.toDate >= today ? 1 : 2);
+    const bActive = (b.fromDate <= today && b.toDate >= today) ? 0 : (b.toDate >= today ? 1 : 2);
+    if (aActive !== bActive) return aActive - bActive;
+    return String(a.fromDate||'').localeCompare(String(b.fromDate||''));
+  }).slice(0, 20);
+  const ro = !DeployState.me.canEdit;
+  const optDepts = activeDepts.map(d => `<option value="${deployEscape(d.id)}">${deployEscape(d.label)}</option>`).join('');
+  return `
+  <section class="deploy-section">
+    <div class="deploy-section-head">
+      <h2>Lịch vắng người dẫn dắt</h2>
+      <span>Trưởng phòng đăng ký trước → cron 06:30 cảnh báo Trưởng QMS nếu chưa có người trực thay</span>
+    </div>
+    ${ro ? '' : `
+    <form class="deploy-availability-form" onsubmit="deploySaveAvailability(event); return false;">
+      <div class="form-grid">
+        <label>Tên người dẫn dắt<input type="text" name="championName" required placeholder="VD: Nguyễn Văn A"></label>
+        <label>Phòng<select name="deptId" required>${optDepts}</select></label>
+        <label>Vai trò<select name="role"><option value="primary">Chính</option><option value="backup">Dự phòng</option></select></label>
+        <label>Từ ngày<input type="date" name="fromDate" required></label>
+        <label>Tới ngày<input type="date" name="toDate" required></label>
+        <label>Lý do<input type="text" name="reason" required placeholder="VD: Nghỉ phép · đi công tác · ốm"></label>
+        <label>Người trực thay<input type="text" name="coverBy" placeholder="Trống nếu chưa sắp xếp"></label>
+        <label>SĐT người trực thay<input type="tel" name="coverPhone" placeholder="VD: 0912 345 678"></label>
+      </div>
+      <button class="deploy-btn deploy-btn-sm" type="submit">Đăng ký vắng</button>
+    </form>`}
+    <div class="deploy-availability-list">
+      ${sorted.length === 0 ? '<div class="deploy-availability-empty">Chưa có lịch vắng nào được đăng ký.</div>' : `
+        <table class="deploy-availability-table">
+          <thead><tr>
+            <th>Người</th><th>Phòng</th><th>Vai trò</th><th>Từ</th><th>Tới</th><th>Lý do</th><th>Người trực thay</th><th>Trạng thái</th>
+          </tr></thead>
+          <tbody>
+          ${sorted.map(a => {
+            const active = (a.fromDate <= today && a.toDate >= today);
+            const past = (a.toDate < today);
+            const covered = !!String(a.coverBy || '').trim();
+            const cls = active ? (covered ? 'av-active-covered' : 'av-active-uncovered') : (past ? 'av-past' : 'av-future');
+            const label = active
+              ? (covered ? 'Vắng hôm nay · có người thay' : '⚠ Vắng hôm nay · CHƯA có người thay')
+              : (past ? 'Đã kết thúc' : 'Vắng sắp tới');
+            return `
+            <tr class="${cls}">
+              <td>${deployEscape(a.championName||'')}</td>
+              <td>${deployEscape(a.deptId||'')}</td>
+              <td>${a.role === 'backup' ? 'Dự phòng' : 'Chính'}</td>
+              <td>${deployEscape(a.fromDate||'')}</td>
+              <td>${deployEscape(a.toDate||'')}</td>
+              <td>${deployEscape(a.reason||'')}</td>
+              <td>${a.coverBy ? `${deployEscape(a.coverBy)}${a.coverPhone ? ' · '+deployEscape(a.coverPhone) : ''}` : '<em>chưa có</em>'}</td>
+              <td>${label}</td>
+            </tr>`;
+          }).join('')}
+          </tbody>
+        </table>`}
+    </div>
+  </section>`;
+}
+
+async function deploySaveAvailability(ev){
+  const form = ev.target;
+  const fd = new FormData(form);
+  const payload = {};
+  for (const [k,v] of fd.entries()) payload[k] = String(v).trim();
+  if (!payload.championName || !payload.deptId || !payload.fromDate || !payload.toDate || !payload.reason){
+    alert('Cần điền đủ: Tên, Phòng, Từ ngày, Tới ngày, Lý do.');
+    return;
+  }
+  if (payload.fromDate > payload.toDate){
+    alert('Từ ngày phải trước hoặc bằng Tới ngày.');
+    return;
+  }
+  try {
+    const res = await deployApi('deploy_availability_save', payload);
+    if (res && res.data){
+      DeployState.availability = res.data;
+      renderDeployDashboard();
+    }
+  } catch (e){
+    console.error('[deploy] availability save failed', e);
+    alert('Lỗi đăng ký vắng: ' + (e && e.message || e));
+  }
 }
 
 function renderDepartmentRosterManager(activeDepts){
@@ -1328,14 +1454,76 @@ function renderChampionPersonSlot(dept, slot, index, person, ro){
     `}
     <label class="champion-ojt">
       <input type="checkbox" ${person.ojtPass?'checked':''} ${ro?'disabled':''} data-deploy-champion="${key}|ojtPass">
-      Đã pass OJT bootcamp
+      Đã đạt bài kiểm OJT
     </label>
+    ${filled && index === 0 ? renderChampionOjtBlock(dept, slot, person, ro) : ''}
     <input type="hidden" data-deploy-champion="${key}|name" value="${deployEscape(person.name||'')}">
     <input type="hidden" data-deploy-champion="${key}|phone" value="${deployEscape(person.phone||'')}">
     <input type="hidden" data-deploy-champion="${key}|m365" value="${deployEscape(person.m365||'')}">
     <input type="hidden" data-deploy-champion="${key}|username" value="${deployEscape(person.username||'')}">
     <input type="hidden" data-deploy-champion="${key}|employee_id" value="${deployEscape(person.employee_id||'')}">
   </div>`;
+}
+
+function renderChampionOjtBlock(dept, slot, person, ro){
+  const slotKey = slot === 'backups' ? 'backup' : 'primary';
+  const p = deployNormalizePerson(person);
+  const attended = p.bootcampAttended.reduce((acc,n) => (acc[n]=true, acc), {});
+  const statusText = p.ojtScore == null
+    ? 'Chưa chấm'
+    : (p.ojtPassed ? `✓ Đậu — ${p.ojtScore}/20` : `✗ Chưa đậu — ${p.ojtScore}/20`);
+  const statusClass = p.ojtScore == null ? 'none' : (p.ojtPassed ? 'ok' : 'fail');
+  const prevText = p.ojtSignedAt
+    ? `${p.ojtSignedBy || '—'} · ${deployIsoToVi(p.ojtSignedAt)}`
+    : '—';
+  const bootcampLabels = {
+    1: 'Buổi 1 — Vai trò người dẫn dắt',
+    2: 'Buổi 2 — Đọc DCC header trong 60 giây',
+    3: 'Buổi 3 — Mở hồ sơ và ghi sự cố',
+    4: 'Buổi 4 — Cây leo thang xử lý',
+  };
+  return `
+  <div class="champion-ojt-block" data-dept="${deployEscape(dept.id)}" data-slot="${slotKey}">
+    <div class="champion-ojt-head">
+      <strong>Bài kiểm năng lực OJT</strong>
+      <span class="champion-ojt-status champion-ojt-status-${statusClass}">${deployEscape(statusText)}</span>
+    </div>
+    <p class="champion-ojt-help">Trưởng QMS hoặc Trưởng QA chấm sau buổi đánh giá tại xưởng. Đậu khi điểm ≥ 16/20.</p>
+    <div class="champion-ojt-bootcamps">
+      ${[1,2,3,4].map(n => `
+        <label class="champion-ojt-bootcamp"><input type="checkbox" value="${n}" ${attended[n]?'checked':''} ${ro?'disabled':''} data-ojt-bootcamp> ${deployEscape(bootcampLabels[n])}</label>
+      `).join('')}
+    </div>
+    <div class="champion-ojt-score-row">
+      <label>Điểm OJT (0–20): <input type="number" min="0" max="20" step="1" value="${p.ojtScore == null ? '' : p.ojtScore}" ${ro?'disabled':''} class="champion-ojt-score-input"></label>
+      <button class="deploy-btn deploy-btn-sm" type="button" ${ro?'disabled':''} onclick="deploySaveChampionOjt('${deployEscape(dept.id)}','${slotKey}')">Lưu điểm OJT</button>
+    </div>
+    <small class="champion-ojt-prev">Lần chấm gần nhất: ${deployEscape(prevText)}</small>
+  </div>`;
+}
+
+async function deploySaveChampionOjt(deptId, slot){
+  const block = document.querySelector(`.champion-ojt-block[data-dept="${deptId}"][data-slot="${slot}"]`);
+  if (!block) { alert('Không tìm thấy ô chấm OJT.'); return; }
+  const scoreInput = block.querySelector('.champion-ojt-score-input');
+  const score = parseInt(scoreInput && scoreInput.value, 10);
+  if (!Number.isInteger(score) || score < 0 || score > 20){
+    alert('Điểm OJT phải là số nguyên từ 0 tới 20.');
+    return;
+  }
+  const bootcampAttended = Array.from(block.querySelectorAll('input[data-ojt-bootcamp]:checked'))
+    .map(c => parseInt(c.value, 10))
+    .filter(n => Number.isInteger(n) && n >= 1 && n <= 4);
+  try {
+    const res = await deployApi('deploy_champion_ojt_save', {deptId, slot, score, bootcampAttended});
+    if (res && res.data) {
+      DeployState.champions = res.data;
+      renderDeployDashboard();
+    }
+  } catch (e) {
+    console.error('[deploy] champion ojt save failed', e);
+    alert('Lỗi lưu điểm OJT: ' + (e && e.message || e));
+  }
 }
 
 function findUserByName(name){
@@ -2218,7 +2406,7 @@ function deployOpenDepartmentForm(){
   const inactive = deployInactiveDepartments();
   const defaultChoice = inactive[0] ? inactive[0].id : '__custom__';
   deployOpenFormDialog({
-    kicker: 'ISO deployment roster',
+    kicker: 'Phòng ban ISO',
     title: 'Thêm phòng ban tham gia',
     accentColor: '#2563eb',
     submitLabel: 'Thêm phòng ban',
@@ -2859,6 +3047,8 @@ window.deploySaveMeeting = deploySaveMeeting;
 window.deploySignOffMeeting = deploySignOffMeeting;
 window.deploySignOffWeek = deploySignOffWeek;
 window.deploySaveChampion = deploySaveChampion;
+window.deploySaveChampionOjt = deploySaveChampionOjt;
+window.deploySaveAvailability = deploySaveAvailability;
 window.deployOpenIssueForm = deployOpenIssueForm;
 window.deployUpdateIssueStatus = deployUpdateIssueStatus;
 window.deployRecordDrill = deployRecordDrill;

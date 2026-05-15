@@ -6,6 +6,7 @@ namespace MOM\Api\Controllers;
 
 use InvalidArgumentException;
 use MOM\Services\DeployDrillReminderService;
+use MOM\Services\NotificationGateway;
 use MOM\Api\Services\DocAccessAnalyticsService;
 use Throwable;
 
@@ -35,6 +36,14 @@ class DeployProgramController extends BaseController
     private const SIGNOFF_ROLES = ['admin', 'it_admin', 'ceo', 'qms_manager', 'qa_manager', 'general_director'];
     private const EDIT_ROLES    = ['admin', 'it_admin', 'ceo', 'qms_manager', 'qa_manager', 'general_director', 'production_director', 'supply_chain_manager', 'hr_manager', 'finance_manager', 'engineering_lead'];
     private const DEFAULT_DEPARTMENT_IDS = ['PROD', 'ENG', 'QA', 'SCM', 'SALES', 'FIN', 'HR', 'IT', 'EHS', 'ERP'];
+    // Đợt triển khai 1..4 — khớp lộ trình 12 tuần (xem
+    // mom/data/config/deploy/program.json + DEPLOY_CONFIG.waves trong
+    // 08-deploy-dashboard.js). Lưu trong departmentRoster.custom[*].wave.
+    //   1 = Thí điểm (W4, phòng QA)
+    //   2 = Mở rộng SCM + Kinh doanh (W5–W7)
+    //   3 = Sản xuất + Kỹ thuật (W8 — rủi ro cao nhất)
+    //   4 = Hỗ trợ + ERP (W9–W10)
+    private const VALID_WAVES = [1, 2, 3, 4];
 
     public function loadState(): never
     {
@@ -54,6 +63,7 @@ class DeployProgramController extends BaseController
                 'audits'    => $this->loadFile(self::FILE_AUDITS),
                 'reviews'   => $this->loadFile(self::FILE_REVIEWS),
                 'users'     => $users,
+                'availability' => $this->loadFile('deploy/availability.json'),
                 'docAccessAnalytics' => $this->docAccessAnalytics($champions, $users),
                 'me'        => [
                     'username' => (string)($me['username'] ?? ''),
@@ -421,6 +431,224 @@ class DeployProgramController extends BaseController
             'notification_sent' => !empty($result['notification_sent']) ? 1 : 0,
         ]);
         $this->success(['data' => $result]);
+    }
+
+    public function saveChampionOjt(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::SIGNOFF_ROLES);
+        $body = $this->jsonBody();
+
+        $deptId = $this->normalizeDepartmentId((string)($body['deptId'] ?? ''));
+        $slot = strtolower(trim((string)($body['slot'] ?? '')));
+        $scoreRaw = $body['score'] ?? null;
+        $bootcampAttended = $body['bootcampAttended'] ?? [];
+
+        if ($deptId === '' || !in_array($slot, ['primary', 'backup'], true)) {
+            $this->error('missing_dept_or_slot', 400);
+        }
+        if (!is_numeric($scoreRaw) || (int)$scoreRaw < 0 || (int)$scoreRaw > 20) {
+            $this->error('invalid_score', 400);
+        }
+        $score = (int)$scoreRaw;
+
+        $state = $this->normalizeChampionState($this->loadFile(self::FILE_CHAMPIONS));
+        if (!isset($state['champions'][$deptId]) || !is_array($state['champions'][$deptId])) {
+            $this->error('champion_slot_not_found', 404);
+        }
+
+        $listKey = $slot === 'backup' ? 'backups' : 'participants';
+        $record = $state['champions'][$deptId];
+        $person = is_array($record[$slot] ?? null)
+            ? $this->normalizeChampionPerson($record[$slot])
+            : $this->emptyChampionPerson();
+        if (!$this->hasChampionPersonData($person) && is_array($record[$listKey][0] ?? null)) {
+            $person = $this->normalizeChampionPerson($record[$listKey][0]);
+        }
+        if (!$this->hasChampionPersonData($person)) {
+            $this->error('champion_slot_not_found', 404);
+        }
+
+        $person['ojtScore'] = $score;
+        $person['ojtPassed'] = $score >= 16;
+        $person['ojtPass'] = $person['ojtPassed'];
+        $person['ojtSignedBy'] = (string)($me['name'] ?? $me['username'] ?? '');
+        $person['ojtSignedAt'] = gmdate('c');
+        if (is_array($bootcampAttended)) {
+            $person['bootcampAttended'] = $this->normalizeBootcampAttended($bootcampAttended);
+        }
+
+        $record[$slot] = $person;
+        if (!isset($record[$listKey]) || !is_array($record[$listKey])) {
+            $record[$listKey] = [];
+        }
+        $record[$listKey][0] = $person;
+        $state['champions'][$deptId] = $record;
+        $state['lastUpdated'] = gmdate('c');
+
+        $this->saveFile(self::FILE_CHAMPIONS, $state);
+        $this->audit('deploy.champion.ojt.save', $me, [
+            'dept' => $deptId,
+            'slot' => $slot,
+            'score' => $score,
+            'passed' => $person['ojtPassed'],
+        ]);
+        $this->success(['data' => $state, 'person' => $person]);
+    }
+
+    public function saveAvailability(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::EDIT_ROLES);
+        $body = $this->jsonBody();
+
+        foreach (['championName', 'deptId', 'role', 'fromDate', 'toDate', 'reason'] as $field) {
+            if (trim((string)($body[$field] ?? '')) === '') {
+                $this->error("missing_{$field}", 400);
+            }
+        }
+
+        $role = strtolower(trim((string)$body['role']));
+        if (!in_array($role, ['primary', 'backup'], true)) {
+            $this->error('invalid_role', 400);
+        }
+
+        $fromDate = trim((string)$body['fromDate']);
+        $toDate = trim((string)$body['toDate']);
+        if (
+            preg_match('/^\d{4}-\d{2}-\d{2}$/', $fromDate) !== 1
+            || preg_match('/^\d{4}-\d{2}-\d{2}$/', $toDate) !== 1
+        ) {
+            $this->error('invalid_date_format', 400);
+        }
+        if ($fromDate > $toDate) {
+            $this->error('invalid_date_range', 400);
+        }
+
+        $state = $this->loadFile('deploy/availability.json');
+        if (!isset($state['absences']) || !is_array($state['absences'])) {
+            $state['absences'] = [];
+        }
+
+        $now = gmdate('c');
+        $entry = [
+            'id' => 'ABS-' . substr(hash('sha256', $now . random_int(0, 999999)), 0, 8),
+            'championName' => trim((string)$body['championName']),
+            'deptId' => strtoupper(trim((string)$body['deptId'])),
+            'role' => $role,
+            'fromDate' => $fromDate,
+            'toDate' => $toDate,
+            'reason' => trim((string)$body['reason']),
+            'coverBy' => trim((string)($body['coverBy'] ?? '')),
+            'coverPhone' => trim((string)($body['coverPhone'] ?? '')),
+            'approvedBy' => (string)($me['name'] ?? $me['username'] ?? ''),
+            'approvedAt' => $now,
+        ];
+
+        $state['absences'][] = $entry;
+        $state['lastUpdated'] = $now;
+        $this->saveFile('deploy/availability.json', $state);
+        $this->audit('deploy.availability.save', $me, [
+            'dept' => $entry['deptId'],
+            'from' => $entry['fromDate'],
+            'to' => $entry['toDate'],
+        ]);
+        $this->success(['data' => $state, 'entry' => $entry]);
+    }
+
+    public function checkAvailability(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::SIGNOFF_ROLES);
+
+        $state = $this->loadFile('deploy/availability.json');
+        $today = gmdate('Y-m-d');
+        $uncovered = [];
+        foreach (($state['absences'] ?? []) as $absence) {
+            if (!is_array($absence)) {
+                continue;
+            }
+            if (
+                (string)($absence['fromDate'] ?? '') <= $today
+                && (string)($absence['toDate'] ?? '') >= $today
+                && trim((string)($absence['coverBy'] ?? '')) === ''
+            ) {
+                $uncovered[] = $absence;
+            }
+        }
+
+        $notificationSent = false;
+        if ($uncovered !== []) {
+            try {
+                $items = array_map(
+                    static fn(array $absence): string => trim((string)($absence['championName'] ?? '')) . ' (' . strtoupper(trim((string)($absence['deptId'] ?? ''))) . ')',
+                    $uncovered,
+                );
+                $list = implode(', ', array_values(array_filter($items)));
+                $count = count($uncovered);
+                $subject = "Cảnh báo: {$count} người dẫn dắt vắng hôm nay chưa có người trực thay";
+                $body = $list !== '' ? "{$subject}: {$list}. Trưởng phòng cập nhật người trực thay trên cổng." : $subject;
+                (new NotificationGateway($this->dataDir))->send(
+                    NotificationGateway::CAT_ESCALATION,
+                    NotificationGateway::PRIORITY_HIGH,
+                    $subject,
+                    $body,
+                    recipientRoles: ['qms_manager'],
+                    sourceType: 'deploy_availability',
+                    sourceId: $today,
+                    metadata: [
+                        'channels' => ['zalo', 'email', 'log'],
+                        'uncovered_count' => $count,
+                    ],
+                );
+                $notificationSent = true;
+            } catch (Throwable $e) {
+                @error_log('[checkAvailability] notify failed: ' . $e->getMessage());
+            }
+        }
+
+        $this->audit('deploy.availability.check', $me, [
+            'uncovered_count' => count($uncovered),
+            'notification_sent' => $notificationSent ? 1 : 0,
+        ]);
+        $this->success(['data' => [
+            'uncovered' => $uncovered,
+            'uncovered_count' => count($uncovered),
+            'notification_sent' => $notificationSent,
+        ]]);
+    }
+
+    public function runDocUsageAggregate(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::SIGNOFF_ROLES);
+
+        $champions = $this->normalizeChampionState($this->loadFile(self::FILE_CHAMPIONS));
+        $users = $this->loadUserDirectory();
+        $kpis = (new DocAccessAnalyticsService($this->data))->aggregateKpis($champions, $users);
+
+        $state = $this->loadFile(self::FILE_READINESS);
+        if (!isset($state['kpiValues']) || !is_array($state['kpiValues'])) {
+            $state['kpiValues'] = [];
+        }
+
+        foreach (['KPI-USE-01', 'KPI-USE-02', 'KPI-USE-03'] as $key) {
+            if (($kpis[$key] ?? null) !== null) {
+                $state['kpiValues'][$key] = (string)$kpis[$key];
+            }
+        }
+        $state['kpiValues']['KPI-USE_updatedAt'] = (string)($kpis['calculatedAt'] ?? gmdate('c'));
+        $sampleSize = json_encode($kpis['sampleSize'] ?? [], JSON_UNESCAPED_UNICODE);
+        $state['kpiValues']['KPI-USE_sampleSize'] = is_string($sampleSize) ? $sampleSize : '{}';
+        $state['lastUpdated'] = gmdate('c');
+
+        $this->saveFile(self::FILE_READINESS, $state);
+        $this->audit('deploy.doc_usage.aggregate', $me, [
+            'use_01' => $kpis['KPI-USE-01'],
+            'use_02' => $kpis['KPI-USE-02'],
+            'use_03' => $kpis['KPI-USE-03'],
+        ]);
+        $this->success(['data' => $kpis]);
     }
 
     public function saveAudit(): never
@@ -835,23 +1063,31 @@ class DeployProgramController extends BaseController
     }
 
     /**
-     * @return array{name:string,phone:string,m365:string,ojtPass:bool,username:string,employee_id:string}
+     * @return array{name:string,phone:string,m365:string,ojtPass:bool,username:string,employee_id:string,bootcampAttended:list<int>,ojtScore:?int,ojtPassed:bool,ojtSignedBy:string,ojtSignedAt:string}
      */
     private function normalizeChampionPerson(mixed $person): array
     {
         $person = is_array($person) ? $person : [];
+        $scoreRaw = $person['ojtScore'] ?? null;
+        $score = is_numeric($scoreRaw) ? max(0, min(20, (int)$scoreRaw)) : null;
+        $passed = $score !== null ? $score >= 16 : (!empty($person['ojtPassed']) || !empty($person['ojtPass']));
         return [
             'name'        => trim((string)($person['name'] ?? '')),
             'phone'       => trim((string)($person['phone'] ?? '')),
             'm365'        => trim((string)($person['m365'] ?? $person['email'] ?? '')),
-            'ojtPass'     => !empty($person['ojtPass']),
+            'ojtPass'     => $passed,
             'username'    => trim((string)($person['username'] ?? '')),
             'employee_id' => trim((string)($person['employee_id'] ?? $person['id'] ?? '')),
+            'bootcampAttended' => $this->normalizeBootcampAttended($person['bootcampAttended'] ?? []),
+            'ojtScore'    => $score,
+            'ojtPassed'   => $passed,
+            'ojtSignedBy' => trim((string)($person['ojtSignedBy'] ?? '')),
+            'ojtSignedAt' => trim((string)($person['ojtSignedAt'] ?? '')),
         ];
     }
 
     /**
-     * @param array{name:string,phone:string,m365:string,ojtPass:bool,username:string,employee_id:string} $person
+     * @param array{name:string,phone:string,m365:string,ojtPass:bool,username:string,employee_id:string,bootcampAttended:list<int>,ojtScore:?int,ojtPassed:bool,ojtSignedBy:string,ojtSignedAt:string} $person
      */
     private function hasChampionPersonData(array $person): bool
     {
@@ -860,7 +1096,7 @@ class DeployProgramController extends BaseController
     }
 
     /**
-     * @return array{name:string,phone:string,m365:string,ojtPass:bool,username:string,employee_id:string}
+     * @return array{name:string,phone:string,m365:string,ojtPass:bool,username:string,employee_id:string,bootcampAttended:list<int>,ojtScore:?int,ojtPassed:bool,ojtSignedBy:string,ojtSignedAt:string}
      */
     private function emptyChampionPerson(): array
     {
@@ -871,7 +1107,34 @@ class DeployProgramController extends BaseController
             'ojtPass' => false,
             'username' => '',
             'employee_id' => '',
+            'bootcampAttended' => [],
+            'ojtScore' => null,
+            'ojtPassed' => false,
+            'ojtSignedBy' => '',
+            'ojtSignedAt' => '',
         ];
+    }
+
+    /**
+     * @return list<int>
+     */
+    private function normalizeBootcampAttended(mixed $source): array
+    {
+        if (!is_array($source)) {
+            return [];
+        }
+        $out = [];
+        foreach ($source as $n) {
+            if (!is_numeric($n)) {
+                continue;
+            }
+            $v = (int)$n;
+            if ($v >= 1 && $v <= 4) {
+                $out[] = $v;
+            }
+        }
+        sort($out);
+        return array_values(array_unique($out));
     }
 
     /**
@@ -920,7 +1183,7 @@ class DeployProgramController extends BaseController
         }
         $label = trim((string)($raw['label'] ?? $id));
         $owner = trim((string)($raw['owner'] ?? ''));
-        $wave = max(1, min(3, (int)($raw['wave'] ?? 3)));
+        $wave = $this->normalizeWave($raw['wave'] ?? null);
         $color = trim((string)($raw['color'] ?? '#475569'));
         if (!preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
             $color = '#475569';
@@ -947,7 +1210,7 @@ class DeployProgramController extends BaseController
         return [
             'id' => $deptId,
             'label' => $deptId,
-            'wave' => 3,
+            'wave' => 4,
             'color' => '#475569',
             'owner' => '',
             'handbook' => '',
@@ -955,6 +1218,22 @@ class DeployProgramController extends BaseController
             'record' => '',
             'custom' => true,
         ];
+    }
+
+    private function normalizeWave(mixed $raw): int
+    {
+        if (is_int($raw)) {
+            return in_array($raw, self::VALID_WAVES, true) ? $raw : 4;
+        }
+        $v = strtolower(trim((string)$raw));
+        if ($v === '') return 4;
+        // Hỗ trợ chuỗi cũ (pilot/w2/prod/w3) — chuyển về số đợt mới.
+        if ($v === 'pilot') return 1;
+        if ($v === 'w2')    return 2;
+        if ($v === 'prod')  return 3;
+        if ($v === 'w3')    return 4;
+        $n = (int)$v;
+        return in_array($n, self::VALID_WAVES, true) ? $n : 4;
     }
 
     private function normalizeDepartmentId(string $deptId): string

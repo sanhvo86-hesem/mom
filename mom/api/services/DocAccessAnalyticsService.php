@@ -90,6 +90,77 @@ final class DocAccessAnalyticsService
     }
 
     /**
+     * Chạy tổng hợp định kỳ để controller ghi vào readiness.kpiValues.
+     *
+     * @param array<string, mixed> $championState
+     * @param array<int, array<string, mixed>> $userDirectory
+     * @return array{
+     *   'KPI-USE-01': float|null,
+     *   'KPI-USE-02': float|null,
+     *   'KPI-USE-03': float|null,
+     *   sampleSize: array<string, int>,
+     *   calculatedAt: string
+     * }
+     */
+    public function aggregateKpis(array $championState, array $userDirectory): array
+    {
+        $result = [
+            'KPI-USE-01' => null,
+            'KPI-USE-02' => null,
+            'KPI-USE-03' => null,
+            'sampleSize' => [
+                'total_users' => 0,
+                'active_users' => 0,
+                'champion_users' => 0,
+                'non_champion_users' => 0,
+                'tracked_docs' => 0,
+                'dead_docs' => 0,
+            ],
+            'calculatedAt' => gmdate('c'),
+        ];
+
+        try {
+            $totalUsers = $this->activeUserCount();
+            $activeUsers = $this->activeDocumentUserCount7d();
+            $result['sampleSize']['total_users'] = $totalUsers;
+            $result['sampleSize']['active_users'] = $activeUsers;
+            $result['KPI-USE-01'] = $totalUsers > 0 ? round(($activeUsers * 100) / $totalUsers, 1) : null;
+
+            $requiredDocs = $this->loadRequiredDocsThisWave();
+            $deadDocs = 0;
+            foreach ($requiredDocs as $code) {
+                $row = $this->data->row(
+                    "SELECT 1 AS found
+                       FROM doc_access_log
+                      WHERE doc_code = :doc_code
+                        AND access_at >= NOW() - INTERVAL '14 days'
+                        AND is_real
+                      LIMIT 1",
+                    [':doc_code' => $code],
+                );
+                if ($row === null) {
+                    $deadDocs++;
+                }
+            }
+            $trackedDocs = count($requiredDocs);
+            $result['sampleSize']['tracked_docs'] = $trackedDocs;
+            $result['sampleSize']['dead_docs'] = $deadDocs;
+            $result['KPI-USE-02'] = $trackedDocs > 0 ? round(($deadDocs * 100) / $trackedDocs, 1) : null;
+
+            $championIds = $this->resolveChampionUserIds($championState, $userDirectory);
+            $usage = $this->championUsage($championIds, $totalUsers);
+            $result['sampleSize']['champion_users'] = count($championIds);
+            $result['sampleSize']['non_champion_users'] = (int)$usage['nonChampionUserCount'];
+            $ratio = $usage['championUsageRatioPct'];
+            $result['KPI-USE-03'] = is_float($ratio) || is_int($ratio) ? round((float)$ratio, 0) : null;
+        } catch (Throwable $e) {
+            @error_log('[DocAccessAnalyticsService] aggregateKpis unavailable: ' . $e->getMessage());
+        }
+
+        return $result;
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public static function unavailable(string $error = ''): array
@@ -165,6 +236,44 @@ final class DocAccessAnalyticsService
         }
 
         return $out;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function loadRequiredDocsThisWave(): array
+    {
+        $programFile = rtrim($this->data->getDataDir(), '/') . '/config/deploy/program.json';
+        if (!is_file($programFile)) {
+            $programFile = preg_replace('/\.json$/', '.bootstrap.json', $programFile) ?: $programFile;
+        }
+        if (!is_file($programFile)) {
+            return [];
+        }
+
+        $raw = @file_get_contents($programFile);
+        $data = is_string($raw) ? json_decode($raw, true) : null;
+        if (!is_array($data) || !is_array($data['weeks'] ?? null)) {
+            return [];
+        }
+
+        $codes = [];
+        foreach ($data['weeks'] as $week) {
+            if (!is_array($week) || !is_array($week['requiredDocs'] ?? null)) {
+                continue;
+            }
+            foreach ($week['requiredDocs'] as $code) {
+                if (!is_scalar($code)) {
+                    continue;
+                }
+                $normalized = $this->normalizeDocCode((string)$code);
+                if ($normalized !== '') {
+                    $codes[$normalized] = $normalized;
+                }
+            }
+        }
+
+        return array_values($codes);
     }
 
     /**

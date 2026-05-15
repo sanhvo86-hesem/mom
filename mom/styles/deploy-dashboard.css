@@ -703,6 +703,41 @@
 .champion-person-empty { padding: 10px; text-align: center; color: var(--c-muted); font-size: 12px; font-style: italic; background: var(--c-card); border-radius: 6px; border: 1px dashed var(--c-border); }
 .champion-ojt { font-size: 12px; display: flex; align-items: center; gap: 6px; color: var(--c-ink); margin-top: 8px; }
 
+/* ── Bài kiểm OJT (R4-01) ────────────────────────────────────────────── */
+.champion-ojt-block { margin-top: 10px; padding: 10px 12px; background: var(--c-card, #f8fafc); border: 1px solid var(--c-border, #e2e8f0); border-radius: 6px; display: flex; flex-direction: column; gap: 8px; }
+.champion-ojt-head { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; }
+.champion-ojt-head strong { font-size: 12px; color: var(--c-ink); }
+.champion-ojt-status { font-size: 12px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+.champion-ojt-status-none { background: #e2e8f0; color: #64748b; }
+.champion-ojt-status-ok   { background: #dcfce7; color: #166534; }
+.champion-ojt-status-fail { background: #fee2e2; color: #991b1b; }
+.champion-ojt-help { font-size: 11px; color: var(--c-muted, #64748b); margin: 0; }
+.champion-ojt-bootcamps { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; font-size: 11px; }
+.champion-ojt-bootcamp { display: flex; align-items: center; gap: 6px; color: var(--c-ink); cursor: pointer; }
+.champion-ojt-bootcamp input[type=checkbox] { margin: 0; }
+.champion-ojt-score-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+.champion-ojt-score-row label { display: flex; align-items: center; gap: 6px; flex: 1; }
+.champion-ojt-score-input { width: 70px; padding: 3px 6px; border: 1px solid var(--c-border, #e2e8f0); border-radius: 4px; font-size: 12px; }
+.champion-ojt-prev { font-size: 10px; color: var(--c-muted, #64748b); }
+
+/* ── Lịch vắng người dẫn dắt (R4-02) ───────────────────────────────── */
+.deploy-availability-form { display: flex; flex-direction: column; gap: 10px; padding: 12px; background: var(--c-card, #f8fafc); border: 1px solid var(--c-border, #e2e8f0); border-radius: 6px; margin-bottom: 12px; }
+.deploy-availability-form .form-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px 12px; font-size: 12px; }
+.deploy-availability-form label { display: flex; flex-direction: column; gap: 3px; color: var(--c-ink); }
+.deploy-availability-form input,
+.deploy-availability-form select { padding: 4px 6px; border: 1px solid var(--c-border, #e2e8f0); border-radius: 4px; font-size: 12px; }
+.deploy-availability-list { margin-top: 8px; }
+.deploy-availability-empty { padding: 12px; text-align: center; color: var(--c-muted, #64748b); font-size: 12px; font-style: italic; background: var(--c-card, #f8fafc); border-radius: 6px; border: 1px dashed var(--c-border, #e2e8f0); }
+.deploy-availability-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.deploy-availability-table th,
+.deploy-availability-table td { padding: 6px 8px; border-bottom: 1px solid var(--c-border, #e2e8f0); text-align: left; }
+.deploy-availability-table th { background: var(--c-card, #f8fafc); font-weight: 600; }
+.deploy-availability-table tr.av-active-uncovered { background: #fef2f2; }
+.deploy-availability-table tr.av-active-covered { background: #fff7ed; }
+.deploy-availability-table tr.av-future { background: #f0f9ff; }
+.deploy-availability-table tr.av-past { color: var(--c-muted, #64748b); }
+@media (max-width: 900px){ .deploy-availability-form .form-grid { grid-template-columns: 1fr 1fr; } }
+
 /* Tiny buttons (xs) + link variant */
 .deploy-btn-xs { padding: 3px 8px; font-size: 11px; border-radius: 5px; }
 .deploy-btn-link { background: transparent; border: none; color: var(--c-muted); cursor: pointer; padding: 3px 6px; font-size: 14px; border-radius: 4px; }

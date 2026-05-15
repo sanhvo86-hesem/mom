@@ -1,0 +1,10 @@
+[Unit]
+Description=HESEM QMS - đánh dấu diễn tập triển khai quá hạn
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/var/www/eqms.hesemeng.com/tools/cron/deploy-drill-cron.sh
+User=www-data
+Group=www-data

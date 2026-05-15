@@ -45,6 +45,7 @@ final class DeployDrillReminderService
         $state = $this->loadDrillsState();
         $threshold = $now->sub(new DateInterval('PT24H'));
         $marked = [];
+        $newlyOverdue = [];
         $changed = false;
 
         foreach ($state['drills'] as &$drill) {
@@ -62,6 +63,7 @@ final class DeployDrillReminderService
             $drill['overdueAt'] = $now->format(DATE_ATOM);
             $drill['updatedAt'] = $now->format(DATE_ATOM);
             $marked[] = (string)($drill['id'] ?? '');
+            $newlyOverdue[] = $drill;
             $changed = true;
         }
         unset($drill);
@@ -87,7 +89,7 @@ final class DeployDrillReminderService
             $this->saveDrillsState($state);
         }
 
-        return [
+        $result = [
             'checked_at' => $now->format(DATE_ATOM),
             'marked_overdue' => count(array_filter($marked)),
             'marked_ids' => array_values(array_filter($marked)),
@@ -97,6 +99,8 @@ final class DeployDrillReminderService
             'notification' => $notification,
             'notification_error' => $notificationError,
         ];
+        $result['notification_sent'] = !empty($result['notification_sent']) || $this->notifyOverdue($newlyOverdue);
+        return $result;
     }
 
     /**
@@ -452,6 +456,59 @@ final class DeployDrillReminderService
                 'target' => 'qms_lead',
             ],
         );
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $newlyOverdue
+     */
+    private function notifyOverdue(array $newlyOverdue): bool
+    {
+        if ($newlyOverdue === []) {
+            return false;
+        }
+
+        try {
+            if (!class_exists(NotificationGateway::class)) {
+                require_once __DIR__ . '/NotificationGateway.php';
+            }
+            $departments = [];
+            foreach ($newlyOverdue as $drill) {
+                $deptId = strtoupper(trim((string)($drill['deptId'] ?? '')));
+                if ($deptId !== '') {
+                    $departments[$deptId] = $deptId;
+                }
+            }
+            $deptList = implode(', ', array_slice(array_values($departments), 0, 3));
+            if (count($departments) > 3) {
+                $deptList .= '...';
+            }
+            if ($deptList === '') {
+                $deptList = 'N/A';
+            }
+
+            $count = count($newlyOverdue);
+            $ids = $this->overdueIds($newlyOverdue);
+            $gateway = $this->notificationGateway ??= new NotificationGateway($this->dataDir);
+            $gateway->send(
+                NotificationGateway::CAT_ESCALATION,
+                NotificationGateway::PRIORITY_HIGH,
+                "Cảnh báo Triển khai: {$count} diễn tập quá hạn",
+                "Cảnh báo Triển khai: {$count} diễn tập quá hạn ({$deptList}). Mở bảng điều khiển Triển khai, tab Phòng ban để xử lý trong ngày.",
+                recipientRoles: ['qms_manager', 'qa_manager'],
+                sourceType: 'deploy_drill',
+                sourceId: implode(',', $ids),
+                metadata: [
+                    'channels' => ['zalo', 'email', 'log'],
+                    'overdue_count' => $count,
+                    'overdue_ids' => $ids,
+                    'target' => 'department_tab',
+                ],
+            );
+            return true;
+        } catch (Throwable $e) {
+            @error_log('[DeployDrillReminderService] notify failed: ' . $e->getMessage());
+            return false;
+        }
     }
 
     /**

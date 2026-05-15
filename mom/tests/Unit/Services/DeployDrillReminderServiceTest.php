@@ -45,9 +45,37 @@ final class DeployDrillReminderServiceTest extends TestCase
         $result = $service->runDaily(new DateTimeImmutable('2026-05-15 06:00:00+07:00'));
 
         $this->assertSame(1, $result['marked_overdue']);
+        $this->assertTrue($result['notification_sent']);
+        $this->assertFileExists($this->tmpDir . '/notifications/email_queue.jsonl');
         $saved = $this->readJson('config/deploy/drills.json');
         $this->assertSame('overdue', $saved['drills'][0]['status']);
         $this->assertArrayHasKey('overdueAt', $saved['drills'][0]);
+    }
+
+    public function testDailyRunDoesNotNotifyWhenNoDrillNewlyBecomesOverdue(): void
+    {
+        $this->writeJson('config/deploy/drills.bootstrap.json', [
+            'version' => 2,
+            'reminderPolicy' => ['escalateOverdueCount' => 2],
+            'drills' => [
+                [
+                    'id' => 'DRL-W02-PROD-RETR',
+                    'weekN' => 2,
+                    'deptId' => 'PROD',
+                    'drillType' => 'retrieve_3min',
+                    'scheduledAt' => '2026-05-13 05:59',
+                    'targetSeconds' => 180,
+                    'status' => 'overdue',
+                ],
+            ],
+        ]);
+
+        $service = new DeployDrillReminderService($this->tmpDir);
+        $result = $service->runDaily(new DateTimeImmutable('2026-05-15 06:00:00+07:00'));
+
+        $this->assertSame(0, $result['marked_overdue']);
+        $this->assertFalse($result['notification_sent']);
+        $this->assertFileDoesNotExist($this->tmpDir . '/notifications/email_queue.jsonl');
     }
 
     public function testDailyRunEscalatesWhenAtLeastTwoDrillsAreOverdue(): void

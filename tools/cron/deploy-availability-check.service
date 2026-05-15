@@ -1,0 +1,10 @@
+[Unit]
+Description=HESEM QMS - kiểm lịch vắng người dẫn dắt
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/var/www/eqms.hesemeng.com/tools/cron/deploy-availability-check.sh
+User=www-data
+Group=www-data
