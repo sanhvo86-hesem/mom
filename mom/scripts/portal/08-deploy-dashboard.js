@@ -11,7 +11,7 @@
 
 // ── Static config (catalog, not state) ────────────────────────────────────
 const DEPLOY_CONFIG = {
-  championTarget: 22, // 11 dept × 2 (primary + backup)
+  championTarget: 22, // Legacy fallback; runtime target is active departments × participant/backup coverage.
   phases: [
     {id:'P0', label:'Giai đoạn 0', title:'Chuẩn bị và đồng bộ',          weeks:'W0–W1',  color:'#64748b'},
     {id:'P1', label:'Giai đoạn 1', title:'Đào tạo và mức sẵn sàng',      weeks:'W2–W3',  color:'#2563eb'},
@@ -102,7 +102,7 @@ const DEPLOY_CONFIG = {
     {id:'KPI-DEP-01', label:'Phủ người dẫn dắt (chính + dự phòng)', target:'>=100',unit:'%', short:'CH',
       basis:'Prosci CMROI 2023 · WI-105 §4.2',
       rationale:'Mục tiêu 100% (mỗi phòng có 1 chính + 1 dự phòng) đảm bảo vận hành liên tục khi người chính nghỉ. Prosci CMROI 2023: dự án có người dẫn dắt thay đổi được chỉ định rõ tên đạt mức áp dụng cao hơn 6 lần. Người dự phòng không bắt buộc đào tạo tại chỗ đầy đủ nhưng phải nắm đường leo thang xử lý.',
-      method:'Tử số = số phòng có cả người chính và người dự phòng được đề cử và đã ký xác nhận. Mẫu số = 11 phòng. 100% nghĩa là đủ 22/22 vị trí (11 × 2).',
+      method:'Tử số = số phòng có đủ người tham dự và người dự bị được đề cử và đã ký xác nhận. Mẫu số = số phòng đang tham gia × 2 tối thiểu; nếu phòng thêm người, mẫu số tăng theo roster thực tế.',
       escalation:'<100% → cổng kiểm P0-02 chặn. Phòng nào còn thiếu người dự phòng phải đề cử trong 3 ngày làm việc.'},
 
     {id:'KPI-DEP-02', label:'Đóng phiếu việc đúng hạn',   target:'>=95', unit:'%', short:'ĐI',
@@ -510,8 +510,110 @@ function deployRenderDocChip(code){
 function deployFmtDate(iso){ if(!iso) return '—'; try{ return new Date(iso).toLocaleDateString('vi-VN',{day:'2-digit',month:'2-digit',year:'numeric'}); }catch(_){ return iso; } }
 function deployTodayIso(){ return new Date().toISOString().slice(0,10); }
 function deployGetPhaseDef(id){ return DEPLOY_CONFIG.phases.find(p=>p.id===id) || DEPLOY_CONFIG.phases[0]; }
-function deployGetDept(id){ return DEPLOY_CONFIG.departments.find(d=>d.id===id); }
+function deployChampionState(){
+  if (!DeployState.champions || typeof DeployState.champions !== 'object') DeployState.champions = {version:2, champions:{}};
+  if (!DeployState.champions.champions || typeof DeployState.champions.champions !== 'object') DeployState.champions.champions = {};
+  if (!DeployState.champions.departmentRoster || typeof DeployState.champions.departmentRoster !== 'object') {
+    DeployState.champions.departmentRoster = {
+      active: DEPLOY_CONFIG.departments.map(d => d.id),
+      custom: {},
+    };
+  }
+  if (!Array.isArray(DeployState.champions.departmentRoster.active)) {
+    DeployState.champions.departmentRoster.active = DEPLOY_CONFIG.departments.map(d => d.id);
+  }
+  if (!DeployState.champions.departmentRoster.custom || typeof DeployState.champions.departmentRoster.custom !== 'object') {
+    DeployState.champions.departmentRoster.custom = {};
+  }
+  return DeployState.champions;
+}
+function deployNormalizeDeptId(id){
+  return String(id || '').trim().toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 24);
+}
+function deployDepartmentCatalog(){
+  const state = deployChampionState();
+  const custom = Object.values(state.departmentRoster.custom || {}).map(d => ({
+    id: deployNormalizeDeptId(d.id),
+    label: d.label || d.id,
+    wave: Math.max(1, Math.min(3, parseInt(d.wave, 10) || 3)),
+    color: /^#[0-9a-f]{6}$/i.test(String(d.color || '')) ? d.color : '#475569',
+    owner: d.owner || '',
+    handbook: d.handbook || '',
+    docs: Array.isArray(d.docs) ? d.docs : [],
+    record: d.record || '',
+    custom: true,
+  })).filter(d => d.id);
+  const byId = new Map();
+  DEPLOY_CONFIG.departments.forEach(d => byId.set(d.id, d));
+  custom.forEach(d => byId.set(d.id, d));
+  return Array.from(byId.values());
+}
+function deployGetDept(id){
+  const key = deployNormalizeDeptId(id);
+  return deployDepartmentCatalog().find(d => d.id === key) || null;
+}
 function deployGetWeek(n){ return (DeployState.program && DeployState.program.weeks || []).find(w => (w.n|0) === (n|0)); }
+function deployActiveDepartmentIds(){
+  const state = deployChampionState();
+  const catalogIds = new Set(deployDepartmentCatalog().map(d => d.id));
+  const raw = Array.isArray(state.departmentRoster.active) ? state.departmentRoster.active : DEPLOY_CONFIG.departments.map(d => d.id);
+  const active = raw.map(deployNormalizeDeptId).filter(id => id && catalogIds.has(id));
+  return active.length ? Array.from(new Set(active)) : DEPLOY_CONFIG.departments.map(d => d.id);
+}
+function deployActiveDepartments(){
+  const ids = deployActiveDepartmentIds();
+  return ids.map(id => deployGetDept(id)).filter(Boolean);
+}
+function deployDefaultDeptId(){
+  const first = deployActiveDepartments()[0];
+  return first ? first.id : 'QA';
+}
+function deployInactiveDepartments(){
+  const active = new Set(deployActiveDepartmentIds());
+  return deployDepartmentCatalog().filter(d => !active.has(d.id));
+}
+function deployEmptyPerson(){
+  return {name:'', phone:'', m365:'', ojtPass:false, username:'', employee_id:''};
+}
+function deployNormalizePerson(person){
+  person = person || {};
+  return {
+    name: String(person.name || '').trim(),
+    phone: String(person.phone || '').trim(),
+    m365: String(person.m365 || person.email || '').trim(),
+    ojtPass: !!person.ojtPass,
+    username: String(person.username || '').trim(),
+    employee_id: String(person.employee_id || person.id || '').trim(),
+  };
+}
+function deployPersonFilled(person){
+  const p = deployNormalizePerson(person);
+  return !!(p.name && !p.name.startsWith('['));
+}
+function deployNormalizePeople(list, legacyPerson){
+  const rows = Array.isArray(list) ? list : (legacyPerson ? [legacyPerson] : []);
+  return rows.map(deployNormalizePerson).filter(deployPersonFilled);
+}
+function deployChampionRecord(deptId){
+  const state = deployChampionState();
+  const key = deployNormalizeDeptId(deptId);
+  const record = state.champions[key] || {};
+  const participants = deployNormalizePeople(record.participants, record.primary);
+  const backups = deployNormalizePeople(record.backups, record.backup);
+  const normalized = {
+    participants,
+    backups,
+    primary: participants[0] || deployEmptyPerson(),
+    backup: backups[0] || deployEmptyPerson(),
+    shift: record.shift || 'A',
+  };
+  state.champions[key] = normalized;
+  return normalized;
+}
+function deployChampionPeople(deptId, slot){
+  const rec = deployChampionRecord(deptId);
+  return slot === 'backups' ? rec.backups : rec.participants;
+}
 
 function deployDeptProgress(deptId){
   const r = (DeployState.readiness && DeployState.readiness.deptReadiness && DeployState.readiness.deptReadiness[deptId]) || {};
@@ -549,12 +651,25 @@ function deployKpiRag(kpi, value){
 }
 function deployChampionCount(){
   let pass = 0;
-  const ch = (DeployState.champions && DeployState.champions.champions) || {};
-  Object.values(ch).forEach(d => {
-    if (d && d.primary && d.primary.ojtPass) pass++;
-    if (d && d.backup  && d.backup.ojtPass)  pass++;
+  deployActiveDepartments().forEach(dept => {
+    const rec = deployChampionRecord(dept.id);
+    [...rec.participants, ...rec.backups].forEach(person => {
+      if (deployPersonFilled(person) && person.ojtPass) pass++;
+    });
   });
   return pass;
+}
+function deployChampionAssignedCount(){
+  let assigned = 0;
+  deployActiveDepartments().forEach(dept => {
+    const rec = deployChampionRecord(dept.id);
+    assigned += rec.participants.filter(deployPersonFilled).length;
+    assigned += rec.backups.filter(deployPersonFilled).length;
+  });
+  return assigned;
+}
+function deployChampionTarget(){
+  return Math.max(deployActiveDepartments().length * 2, deployChampionAssignedCount());
 }
 function deployStatusIcon(status){
   if (status === 'completed') return '✓';
@@ -587,7 +702,7 @@ function deployIssuesOpen(){
 }
 function deployRedSignals(){
   let red = 0;
-  DEPLOY_CONFIG.departments.forEach(d => { if (deployDeptHasBlocker(d.id)) red++; });
+  deployActiveDepartments().forEach(d => { if (deployDeptHasBlocker(d.id)) red++; });
   const kv = (DeployState.readiness && DeployState.readiness.kpiValues) || {};
   DEPLOY_CONFIG.kpis.forEach(k => { if (deployKpiRag(k, kv[k.id]) === 'red') red++; });
   red += deployNum(kv.sev1Open);
@@ -606,12 +721,13 @@ function renderDeployHero(){
   const cw = deployCurrentWeek();
   const wk = deployGetWeek(cw) || {label:'—', date:'—'};
   const cl = deployChecklistDoneCount(phase.id);
+  const deptCount = deployActiveDepartments().length;
   return `
   <section class="deploy-hero">
     <div class="deploy-hero-main">
       <span class="deploy-kicker">Triển khai vận hành · ISO 9001:2015</span>
       <h1>Command Center triển khai vận hành</h1>
-      <p>12 tuần · 10 phòng ban · 7 trụ · cadence Thứ Bảy 9:00. State chia sẻ qua backend.</p>
+      <p>12 tuần · ${deptCount} phòng ban · 7 trụ · cadence Thứ Bảy 9:00. State chia sẻ qua backend.</p>
       <div class="deploy-hero-actions">
         <a class="deploy-action-link" href="../mom/docs/operations/work-instructions/01-WI-100/wi-106-job-order-deployment-master-plan.html" target="_blank">WI-106 Kế hoạch tổng</a>
         <a class="deploy-action-link" href="../mom/docs/operations/work-instructions/01-WI-100/wi-105-qms-document-navigation-role-based-reading-path-and-deployment.html" target="_blank">WI-105 Hướng dẫn tra cứu</a>
@@ -636,12 +752,14 @@ function renderDeployHero(){
 }
 
 function renderDeploySummary(){
-  const ready = DEPLOY_CONFIG.departments.filter(d => deployDeptProgress(d.id) >= 1).length;
-  const total = DEPLOY_CONFIG.departments.length;
-  const inProg = DEPLOY_CONFIG.departments.filter(d => { const p = deployDeptProgress(d.id); return p > 0 && p < 1; }).length;
+  const activeDepts = deployActiveDepartments();
+  const ready = activeDepts.filter(d => deployDeptProgress(d.id) >= 1).length;
+  const total = activeDepts.length;
+  const inProg = activeDepts.filter(d => { const p = deployDeptProgress(d.id); return p > 0 && p < 1; }).length;
   const chPass = deployChampionCount();
-  const chPct = Math.min(100, Math.round((chPass / DEPLOY_CONFIG.championTarget) * 100));
-  const blocked = DEPLOY_CONFIG.departments.filter(d => deployDeptHasBlocker(d.id)).length;
+  const chTarget = deployChampionTarget();
+  const chPct = chTarget ? Math.min(100, Math.round((chPass / chTarget) * 100)) : 0;
+  const blocked = activeDepts.filter(d => deployDeptHasBlocker(d.id)).length;
   const red = deployRedSignals();
   const issuesOpen = deployIssuesOpen().length;
   return `
@@ -654,7 +772,7 @@ function renderDeploySummary(){
     <div class="deploy-summary-card">
       <span class="summary-label">Champion đạt OJT</span>
       <strong>${chPct}%</strong>
-      <div>${chPass}/${DEPLOY_CONFIG.championTarget} đã đạt</div>
+      <div>${chPass}/${chTarget} đã đạt</div>
     </div>
     <div class="deploy-summary-card">
       <span class="summary-label">Vấn đề đang mở</span>
@@ -895,8 +1013,11 @@ function renderMeetingCard(m){
 
 // ── Tab 4: Phòng ban + champion ───────────────────────────────────────────
 function renderTabDepartments(){
+  const activeDepts = deployActiveDepartments();
+  const chTarget = deployChampionTarget();
   return `
   <div class="deploy-tab-panel active" id="dtab-departments">
+    ${renderDepartmentRosterManager(activeDepts)}
     <section class="deploy-section">
       <div class="deploy-section-head"><h2>Wave rollout</h2><span>3 wave · go-live theo thứ tự rủi ro</span></div>
       <div class="deploy-wave-grid">
@@ -915,7 +1036,7 @@ function renderTabDepartments(){
               <th>Tiến độ</th>
             </tr>
           </thead>
-          <tbody>${DEPLOY_CONFIG.departments.map(d => renderReadinessRow(d)).join('')}</tbody>
+          <tbody>${activeDepts.map(d => renderReadinessRow(d)).join('')}</tbody>
         </table>
       </div>
       <div class="heatmap-legend">
@@ -926,16 +1047,33 @@ function renderTabDepartments(){
       </div>
     </section>
     <section class="deploy-section">
-      <div class="deploy-section-head"><h2>Champion roster</h2><span>Primary + Backup mỗi phòng — ${deployChampionCount()}/${DEPLOY_CONFIG.championTarget} đã pass OJT</span></div>
+      <div class="deploy-section-head"><h2>Champion roster</h2><span>Người tham dự + dự bị — ${deployChampionCount()}/${chTarget} đã pass OJT</span></div>
       <div class="champion-grid">
-        ${DEPLOY_CONFIG.departments.map(d => renderChampionCard(d)).join('')}
+        ${activeDepts.map(d => renderChampionCard(d)).join('')}
       </div>
     </section>
   </div>`;
 }
 
+function renderDepartmentRosterManager(activeDepts){
+  const inactive = deployInactiveDepartments();
+  return `
+  <section class="deploy-section deploy-roster-section">
+    <div class="deploy-section-head">
+      <h2>Phòng ban tham gia ISO</h2>
+      <span>${activeDepts.length} đang tham gia · ${inactive.length} có thể thêm lại</span>
+    </div>
+    <div class="deploy-roster-toolbar">
+      <div class="deploy-roster-chips">
+        ${activeDepts.map(d => `<span class="deploy-roster-chip" style="--dept-color:${deployEscape(d.color)}">${deployEscape(d.label)}</span>`).join('')}
+      </div>
+      ${DeployState.me.canEdit ? `<button class="deploy-btn" type="button" onclick="deployOpenDepartmentForm()">+ Thêm phòng ban</button>` : ''}
+    </div>
+  </section>`;
+}
+
 function renderWaveColumn(wave){
-  const depts = DEPLOY_CONFIG.departments.filter(d => d.wave === wave);
+  const depts = deployActiveDepartments().filter(d => d.wave === wave);
   return `
   <div class="wave-card">
     <div class="wave-card-head"><strong>Wave ${wave}</strong><span>${depts.length} phòng</span></div>
@@ -979,7 +1117,7 @@ function renderReadinessRow(dept){
 }
 
 function renderChampionCard(dept){
-  const ch = (DeployState.champions && DeployState.champions.champions && DeployState.champions.champions[dept.id]) || {primary:{}, backup:{}, shift:'A'};
+  const ch = deployChampionRecord(dept.id);
   const ro = !DeployState.me.canEdit;
   return `
   <div class="champion-card">
@@ -987,25 +1125,43 @@ function renderChampionCard(dept){
       <span class="wave-color" style="background:${dept.color}"></span>
       <strong>${deployEscape(dept.label)}</strong>
       <span class="champion-shift">Ca ${deployEscape(ch.shift || 'A')}</span>
+      ${!ro ? `<button class="deploy-btn-link champion-card-remove" type="button" onclick="deployRemoveDepartment('${dept.id}')" title="Bớt phòng ban khỏi roster">✕</button>` : ''}
     </div>
     <div class="champion-form">
-      ${renderChampionSlot(dept, 'primary', 'Champion', ch.primary || {}, ro)}
-      ${renderChampionSlot(dept, 'backup',  'Backup',   ch.backup  || {}, ro)}
+      ${renderChampionSlotGroup(dept, 'participants', 'Người tham dự', ch.participants || [], ro)}
+      ${renderChampionSlotGroup(dept, 'backups', 'Người dự bị', ch.backups || [], ro)}
       <button class="deploy-btn deploy-btn-sm" ${ro?'disabled':''} onclick="deploySaveChampion('${dept.id}')">Lưu thay đổi</button>
     </div>
   </div>`;
 }
 
-function renderChampionSlot(dept, slot, label, person, ro){
-  const filled = !!(person && person.name && !person.name.startsWith('['));
-  const u = filled ? findUserByName(person.name) : null;
+function renderChampionSlotGroup(dept, slot, label, people, ro){
+  const list = deployNormalizePeople(people);
   return `
-  <div class="champion-slot ${filled?'champion-slot-filled':'champion-slot-empty'}" data-deploy-champion-slot="${dept.id}|${slot}">
-    <div class="champion-slot-row">
-      <span class="champion-slot-label">${deployEscape(label)}</span>
+  <div class="champion-slot-group champion-slot-${slot}" data-deploy-champion-group="${dept.id}|${slot}">
+    <div class="champion-slot-row champion-slot-group-head">
+      <span class="champion-slot-label">${deployEscape(label)} <small>${list.length}</small></span>
       <div class="champion-slot-actions">
-        ${!ro ? `<button class="deploy-btn deploy-btn-xs" type="button" onclick="deployOpenPicker('${dept.id}','${slot}')">${filled?'🔄 Đổi người':'🔍 Chọn người'}</button>` : ''}
-        ${filled && !ro ? `<button class="deploy-btn-link" type="button" onclick="deployClearChampion('${dept.id}','${slot}')" title="Bỏ chọn">✕</button>` : ''}
+        ${!ro ? `<button class="deploy-btn deploy-btn-xs" type="button" onclick="deployOpenPicker('${dept.id}','${slot}')">+ Thêm người</button>` : ''}
+      </div>
+    </div>
+    ${list.length ? list.map((person, idx) => renderChampionPersonSlot(dept, slot, idx, person, ro)).join('') : `
+      <div class="champion-person-empty">— Chưa chọn —</div>
+    `}
+  </div>`;
+}
+
+function renderChampionPersonSlot(dept, slot, index, person, ro){
+  const filled = deployPersonFilled(person);
+  const u = filled ? findUserForChampionPerson(person) : null;
+  const key = `${dept.id}|${slot}|${index}`;
+  return `
+  <div class="champion-slot ${filled?'champion-slot-filled':'champion-slot-empty'}" data-deploy-champion-person="${key}">
+    <div class="champion-slot-row">
+      <span class="champion-slot-label">${slot === 'backups' ? 'Dự bị' : 'Tham dự'} ${index + 1}</span>
+      <div class="champion-slot-actions">
+        ${!ro ? `<button class="deploy-btn deploy-btn-xs" type="button" onclick="deployOpenPicker('${dept.id}','${slot}',${index})">Đổi người</button>` : ''}
+        ${filled && !ro ? `<button class="deploy-btn-link" type="button" onclick="deployRemoveChampionPerson('${dept.id}','${slot}',${index})" title="Bỏ chọn">✕</button>` : ''}
       </div>
     </div>
     ${filled ? `
@@ -1024,13 +1180,14 @@ function renderChampionSlot(dept, slot, label, person, ro){
       <div class="champion-person-empty">${deployEscape(person.name || '— Chưa chọn —')}</div>
     `}
     <label class="champion-ojt">
-      <input type="checkbox" ${person.ojtPass?'checked':''} ${ro?'disabled':''} data-deploy-champion="${dept.id}|${slot}|ojtPass">
+      <input type="checkbox" ${person.ojtPass?'checked':''} ${ro?'disabled':''} data-deploy-champion="${key}|ojtPass">
       Đã pass OJT bootcamp
     </label>
-    <!-- Hidden mirror fields so deploySaveChampion can read uniformly -->
-    <input type="hidden" data-deploy-champion="${dept.id}|${slot}|name"  value="${deployEscape(person.name||'')}">
-    <input type="hidden" data-deploy-champion="${dept.id}|${slot}|phone" value="${deployEscape(person.phone||'')}">
-    <input type="hidden" data-deploy-champion="${dept.id}|${slot}|m365"  value="${deployEscape(person.m365||'')}">
+    <input type="hidden" data-deploy-champion="${key}|name" value="${deployEscape(person.name||'')}">
+    <input type="hidden" data-deploy-champion="${key}|phone" value="${deployEscape(person.phone||'')}">
+    <input type="hidden" data-deploy-champion="${key}|m365" value="${deployEscape(person.m365||'')}">
+    <input type="hidden" data-deploy-champion="${key}|username" value="${deployEscape(person.username||'')}">
+    <input type="hidden" data-deploy-champion="${key}|employee_id" value="${deployEscape(person.employee_id||'')}">
   </div>`;
 }
 
@@ -1038,6 +1195,13 @@ function findUserByName(name){
   if (!name) return null;
   const list = DeployState.users || [];
   return list.find(u => u.name === name) || list.find(u => u.name && u.name.toLowerCase() === name.toLowerCase()) || null;
+}
+function findUserForChampionPerson(person){
+  const p = deployNormalizePerson(person);
+  const list = DeployState.users || [];
+  return (p.username && list.find(u => u.username === p.username))
+    || (p.employee_id && list.find(u => u.employee_id === p.employee_id || u.id === p.employee_id))
+    || findUserByName(p.name);
 }
 
 // ── Tab 5: Tài liệu ───────────────────────────────────────────────────────
@@ -1071,7 +1235,7 @@ function renderTabDocs(){
           <input type="text" id="drillPerson" placeholder="Người thực hiện" ${DeployState.me.canEdit?'':'disabled'}>
           <select id="drillDept" ${DeployState.me.canEdit?'':'disabled'}>
             <option value="">— Phòng —</option>
-            ${DEPLOY_CONFIG.departments.map(d => `<option value="${d.id}">${deployEscape(d.label)}</option>`).join('')}
+            ${deployActiveDepartments().map(d => `<option value="${d.id}">${deployEscape(d.label)}</option>`).join('')}
           </select>
           <input type="text" id="drillDoc" placeholder="Mã tài liệu (vd SOP-501)" ${DeployState.me.canEdit?'':'disabled'}>
           <input type="number" id="drillSeconds" placeholder="Số giây" min="1" max="900" ${DeployState.me.canEdit?'':'disabled'}>
@@ -1422,7 +1586,7 @@ function renderWeekPanel(){
           <h3>Thành phần dự họp</h3>
           <div class="dwp-attendees-chips">
             ${w.attendees[0] === 'all_departments'
-              ? '<span class="dwp-attendee-chip chip-all">👥 Đại diện 10 phòng ban + Tổ điều hành</span>'
+              ? `<span class="dwp-attendee-chip chip-all">👥 Đại diện ${deployActiveDepartments().length} phòng ban + Tổ điều hành</span>`
               : w.attendees.map(a => `<span class="dwp-attendee-chip chip-restricted">🔒 ${deployEscape(a)}</span>`).join('')}
           </div>
           ${w.attendeesNote ? `<p class="dwp-attendees-note">${deployEscape(w.attendeesNote)}</p>` : ''}
@@ -1704,9 +1868,10 @@ function renderPickerModal(){
   // Already-assigned set (to mark used names across roster)
   const used = new Set();
   Object.entries((DeployState.champions && DeployState.champions.champions) || {}).forEach(([dId, ch]) => {
-    ['primary','backup'].forEach(s => {
-      const n = (ch && ch[s] && ch[s].name) || '';
-      if (n && !n.startsWith('[')) used.add(`${n}|${dId}|${s}`);
+    ['participants','backups'].forEach(s => {
+      deployNormalizePeople(ch && ch[s], ch && (s === 'participants' ? ch.primary : ch.backup)).forEach((person, idx) => {
+        if (deployPersonFilled(person)) used.add(`${person.name}|${dId}|${s}|${idx}`);
+      });
     });
   });
 
@@ -1739,9 +1904,9 @@ function renderPickerModal(){
   const rh = roleHints[p.deptId] || [];
 
   let list = all.slice();
-  if (roleFilter === 'dept_only') {
+  if (roleFilter === 'dept_only' && dh.length) {
     list = list.filter(u => dh.some(h => (u.dept||'').toUpperCase().startsWith(h)));
-  } else if (roleFilter === 'role_hint') {
+  } else if (roleFilter === 'role_hint' && rh.length) {
     list = list.filter(u => rh.includes(u.role));
   } else if (roleFilter === 'managers') {
     list = list.filter(u => /manager|director|lead|admin/.test(u.role||''));
@@ -1757,8 +1922,8 @@ function renderPickerModal(){
   }
   // Sort: dept match first, then role hint, then alpha
   list.sort((a, b) => {
-    const ad = dh.some(h => (a.dept||'').toUpperCase().startsWith(h)) ? 0 : 1;
-    const bd = dh.some(h => (b.dept||'').toUpperCase().startsWith(h)) ? 0 : 1;
+    const ad = dh.length && dh.some(h => (a.dept||'').toUpperCase().startsWith(h)) ? 0 : 1;
+    const bd = dh.length && dh.some(h => (b.dept||'').toUpperCase().startsWith(h)) ? 0 : 1;
     if (ad !== bd) return ad - bd;
     const ar = rh.includes(a.role) ? 0 : 1;
     const br = rh.includes(b.role) ? 0 : 1;
@@ -1766,7 +1931,7 @@ function renderPickerModal(){
     return (a.name||'').localeCompare(b.name||'', 'vi');
   });
 
-  const slotLabel = p.slot === 'primary' ? 'Champion (primary)' : 'Backup';
+  const slotLabel = p.slot === 'backups' ? 'Người dự bị' : 'Người tham dự';
 
   return `
   <div class="deploy-picker-overlay" onclick="deployClosePicker(event)">
@@ -1783,8 +1948,8 @@ function renderPickerModal(){
         <input type="text" id="dpSearch" class="dp-search" placeholder="🔍 Tìm theo tên / vai trò / phòng / username..." value="${deployEscape(p.query||'')}" oninput="deployPickerSetQuery(this.value)" autofocus>
         <div class="dp-filter-chips">
           ${renderPickerChip('',          'Tất cả',     roleFilter, all.length)}
-          ${renderPickerChip('dept_only', 'Cùng phòng', roleFilter, all.filter(u => dh.some(h => (u.dept||'').toUpperCase().startsWith(h))).length)}
-          ${renderPickerChip('role_hint', 'Vai trò phù hợp', roleFilter, all.filter(u => rh.includes(u.role)).length)}
+          ${renderPickerChip('dept_only', 'Cùng phòng', roleFilter, dh.length ? all.filter(u => dh.some(h => (u.dept||'').toUpperCase().startsWith(h))).length : all.length)}
+          ${renderPickerChip('role_hint', 'Vai trò phù hợp', roleFilter, rh.length ? all.filter(u => rh.includes(u.role)).length : 0)}
           ${renderPickerChip('managers',  'Quản lý / Lead',  roleFilter, all.filter(u => /manager|director|lead|admin/.test(u.role||'')).length)}
         </div>
         <div class="dp-summary">${list.length}/${all.length} người · ưu tiên người cùng phòng và vai trò phù hợp</div>
@@ -1810,7 +1975,7 @@ function renderPickerChip(value, label, current, count){
 function renderPickerRow(u, deptId, used, deptHints, roleHints){
   const inSameDept = deptHints.some(h => (u.dept||'').toUpperCase().startsWith(h));
   const matchesRole = roleHints.includes(u.role);
-  const usedElsewhere = Array.from(used).find(k => k.startsWith(u.name + '|') && !k.endsWith(`|${deptId}|primary`) && !k.endsWith(`|${deptId}|backup`));
+  const usedElsewhere = Array.from(used).find(k => k.startsWith(u.name + '|') && !k.startsWith(`${u.name}|${deptId}|`));
   return `
   <button class="dp-row ${inSameDept?'dp-row-dept':''} ${matchesRole?'dp-row-role':''}" type="button" onclick="deployPickerSelect('${deployEscape(u.username)}')">
     <div class="dp-row-main">
@@ -1828,8 +1993,14 @@ function renderPickerRow(u, deptId, used, deptHints, roleHints){
   </button>`;
 }
 
-function deployOpenPicker(deptId, slot){
-  DeployState.picker = {deptId, slot, query:'', roleFilter:'dept_only'};
+function deployOpenPicker(deptId, slot, index){
+  DeployState.picker = {
+    deptId,
+    slot: slot === 'backups' ? 'backups' : 'participants',
+    index: Number.isInteger(index) ? index : null,
+    query:'',
+    roleFilter:'dept_only',
+  };
   renderDeployDashboard();
   setTimeout(() => { const el = document.getElementById('dpSearch'); if (el) el.focus(); }, 40);
 }
@@ -1857,15 +2028,24 @@ function deployPickerSelect(username){
   if (!p) return;
   const u = (DeployState.users || []).find(x => x.username === username);
   if (!u) return;
-  // Patch local champion state and persist
-  const champs = DeployState.champions || {champions:{}};
-  if (!champs.champions[p.deptId]) champs.champions[p.deptId] = {primary:{}, backup:{}, shift:'A'};
-  champs.champions[p.deptId][p.slot] = {
+  const champs = deployChampionState();
+  const rec = deployChampionRecord(p.deptId);
+  const list = p.slot === 'backups' ? rec.backups : rec.participants;
+  const nextPerson = {
     name: u.name,
     phone: u.phone || '',
     m365: u.email || '',
-    ojtPass: !!(champs.champions[p.deptId][p.slot] && champs.champions[p.deptId][p.slot].ojtPass),
+    username: u.username || '',
+    employee_id: u.employee_id || u.id || '',
+    ojtPass: p.index != null && list[p.index] ? !!list[p.index].ojtPass : false,
   };
+  if (p.index != null && list[p.index]) list[p.index] = nextPerson;
+  else list.push(nextPerson);
+  if (!champs.champions[p.deptId]) champs.champions[p.deptId] = rec;
+  champs.champions[p.deptId].participants = rec.participants;
+  champs.champions[p.deptId].backups = rec.backups;
+  champs.champions[p.deptId].primary = rec.participants[0] || deployEmptyPerson();
+  champs.champions[p.deptId].backup = rec.backups[0] || deployEmptyPerson();
   DeployState.champions = champs;
   DeployState.picker = null;
   renderDeployDashboard();
@@ -1876,14 +2056,93 @@ function deployPickerAssignManual(){
   alert('Vui lòng thêm người dùng trong Admin > Người dùng trước khi bổ nhiệm.');
 }
 
-function deployClearChampion(deptId, slot){
-  if (!confirm('Bỏ chọn người ở vị trí này?')) return;
-  const champs = DeployState.champions || {champions:{}};
-  if (!champs.champions[deptId]) champs.champions[deptId] = {primary:{}, backup:{}, shift:'A'};
-  champs.champions[deptId][slot] = {name:'', phone:'', m365:'', ojtPass:false};
-  DeployState.champions = champs;
+function deployRemoveChampionPerson(deptId, slot, index){
+  if (!confirm('Bỏ người này khỏi roster?')) return;
+  const rec = deployChampionRecord(deptId);
+  const list = slot === 'backups' ? rec.backups : rec.participants;
+  list.splice(index, 1);
+  rec.primary = rec.participants[0] || deployEmptyPerson();
+  rec.backup = rec.backups[0] || deployEmptyPerson();
   renderDeployDashboard();
   deploySaveChampion(deptId);
+}
+
+function deployOpenDepartmentForm(){
+  const inactive = deployInactiveDepartments();
+  const defaultChoice = inactive[0] ? inactive[0].id : '__custom__';
+  deployOpenFormDialog({
+    kicker: 'ISO deployment roster',
+    title: 'Thêm phòng ban tham gia',
+    accentColor: '#2563eb',
+    submitLabel: 'Thêm phòng ban',
+    fields: [
+      {key:'deptId', label:'Phòng ban có sẵn', type:'select', value: defaultChoice,
+        options: [
+          {value:'__custom__', label:'Phòng ban mới'},
+          ...inactive.map(d => ({value:d.id, label:d.label})),
+        ]},
+      {key:'customId', label:'Mã phòng mới', type:'text', value:'', placeholder:'VD: MNT'},
+      {key:'customLabel', label:'Tên phòng mới', type:'text', value:'', placeholder:'VD: Bảo trì'},
+      {key:'owner', label:'Owner', type:'text', value:'', placeholder:'VD: Maintenance Manager'},
+      {key:'wave', label:'Wave', type:'select', value:'3', options:[
+        {value:'1', label:'Wave 1'},
+        {value:'2', label:'Wave 2'},
+        {value:'3', label:'Wave 3'},
+      ]},
+      {key:'color', label:'Màu nhận diện', type:'text', value:'#475569', placeholder:'#475569'},
+      {key:'record', label:'Hồ sơ liên quan', type:'text', value:'', placeholder:'VD: DEP-MNT + PM records'},
+    ],
+    onSubmit: (v) => {
+      const state = deployChampionState();
+      const active = deployActiveDepartmentIds();
+      const custom = {...(state.departmentRoster.custom || {})};
+      let deptId = deployNormalizeDeptId(v.deptId);
+      if (deptId === '__CUSTOM__' || deptId === '') {
+        deptId = deployNormalizeDeptId(v.customId);
+        if (!deptId || !String(v.customLabel || '').trim()) {
+          alert('Cần nhập mã và tên phòng ban mới.');
+          return;
+        }
+        custom[deptId] = {
+          id: deptId,
+          label: String(v.customLabel || deptId).trim(),
+          owner: String(v.owner || '').trim(),
+          wave: Math.max(1, Math.min(3, parseInt(v.wave, 10) || 3)),
+          color: /^#[0-9a-f]{6}$/i.test(String(v.color || '')) ? String(v.color) : '#475569',
+          record: String(v.record || '').trim(),
+          handbook: '',
+          docs: [],
+          custom: true,
+        };
+      }
+      if (!active.includes(deptId)) active.push(deptId);
+      return deploySaveDepartmentRoster(active, custom);
+    },
+  });
+}
+
+function deployRemoveDepartment(deptId){
+  const active = deployActiveDepartmentIds();
+  if (active.length <= 1) {
+    alert('Roster cần ít nhất 1 phòng ban đang tham gia.');
+    return;
+  }
+  const dept = deployGetDept(deptId);
+  if (!confirm('Bớt phòng ban ' + (dept ? dept.label : deptId) + ' khỏi triển khai ISO? Dữ liệu người đã chọn sẽ được giữ để có thể thêm lại.')) return;
+  const next = active.filter(id => id !== deployNormalizeDeptId(deptId));
+  const custom = {...(deployChampionState().departmentRoster.custom || {})};
+  deploySaveDepartmentRoster(next, custom);
+}
+
+async function deploySaveDepartmentRoster(activeIds, customDepartments){
+  try{
+    const res = await deployApi('deploy_department_roster_save', {
+      departmentIds: activeIds,
+      customDepartments: customDepartments || {},
+    });
+    DeployState.champions = res.data;
+    renderDeployDashboard();
+  }catch(e){ console.error('[deploy] department roster failed', e); alert('Lỗi lưu danh sách phòng ban: ' + e.message); }
 }
 
 // ── Actions ───────────────────────────────────────────────────────────────
@@ -2009,16 +2268,31 @@ async function deploySignOffWeek(weekN, decision){
 }
 
 async function deploySaveChampion(deptId){
-  const get = (slot, field) => {
-    const sel = `[data-deploy-champion="${deptId}|${slot}|${field}"]`;
-    const el = document.querySelector(sel);
-    if (!el) return field === 'ojtPass' ? false : '';
-    return field === 'ojtPass' ? !!el.checked : el.value;
+  const readList = (slot) => {
+    return Array.from(document.querySelectorAll(`[data-deploy-champion-person^="${deptId}|${slot}|"]`)).map((row, idx) => {
+      const get = (field) => {
+        const el = row.querySelector(`[data-deploy-champion="${deptId}|${slot}|${idx}|${field}"]`);
+        if (!el) return field === 'ojtPass' ? false : '';
+        return field === 'ojtPass' ? !!el.checked : el.value;
+      };
+      return deployNormalizePerson({
+        name: get('name'),
+        phone: get('phone'),
+        m365: get('m365'),
+        username: get('username'),
+        employee_id: get('employee_id'),
+        ojtPass: get('ojtPass'),
+      });
+    }).filter(deployPersonFilled);
   };
+  const participants = readList('participants');
+  const backups = readList('backups');
   const payload = {
     deptId,
-    primary: { name: get('primary','name'), phone: get('primary','phone'), m365: '', ojtPass: get('primary','ojtPass') },
-    backup:  { name: get('backup','name'),  phone: get('backup','phone'),  m365: '', ojtPass: get('backup','ojtPass') },
+    participants,
+    backups,
+    primary: participants[0] || deployEmptyPerson(),
+    backup: backups[0] || deployEmptyPerson(),
     shift: 'A',
   };
   try{
@@ -2044,8 +2318,8 @@ function deployOpenIssueForm(existing){
           {value:'2', label:'Sev-2 — Ảnh hưởng lớn / High'},
           {value:'3', label:'Sev-3 — Bất tiện / Low'},
         ]},
-      {key:'deptId', label:'Phòng ban', type:'select', required:true, value: existing?.deptId || 'QA',
-        options: DEPLOY_CONFIG.departments.map(d => ({value:d.id, label: d.label}))},
+      {key:'deptId', label:'Phòng ban', type:'select', required:true, value: existing?.deptId || deployDefaultDeptId(),
+        options: deployActiveDepartments().map(d => ({value:d.id, label: d.label}))},
       {key:'owner', label:'Owner xử lý', type:'text', required:true,
         value: existing?.owner || (DeployState.me.name || DeployState.me.username || ''),
         placeholder:'Họ tên người nhận xử lý'},
@@ -2132,8 +2406,8 @@ function deployOpenAuditForm(existing){
         value: existing?.scope || ['4','5','6'],
         options: clauseSections.map(s => ({value: s, label: sectionLabels[s]}))},
       {key:'scopeDepts', label:'Phòng ban trong phạm vi', type:'multiselect', required:true,
-        value: existing?.scopeDepts || ['QA'],
-        options: DEPLOY_CONFIG.departments.map(d => ({value: d.id, label: d.label}))},
+        value: existing?.scopeDepts || [deployDefaultDeptId()],
+        options: deployActiveDepartments().map(d => ({value: d.id, label: d.label}))},
       {key:'status', label:'Trạng thái', type:'select', value: existing?.status || 'scheduled',
         options: [
           {value:'scheduled', label:'Đã lên lịch'},
@@ -2175,8 +2449,8 @@ function deployOpenFindingForm(auditId, existing){
           {value:'opportunity', label:'Opportunity — Cơ hội cải tiến'},
         ]},
       {key:'deptId', label:'Phòng ban liên quan', type:'select', required:true,
-        value: existing?.deptId || 'QA',
-        options: DEPLOY_CONFIG.departments.map(d => ({value:d.id, label: d.label}))},
+        value: existing?.deptId || deployDefaultDeptId(),
+        options: deployActiveDepartments().map(d => ({value:d.id, label: d.label}))},
       {key:'description', label:'Mô tả phát hiện', type:'textarea', required:true, rows:3, value: existing?.description || '',
         placeholder:'Ghi rõ điểm không phù hợp + tham chiếu hoạt động/quá trình'},
       {key:'evidence', label:'Bằng chứng', type:'textarea', rows:2, value: existing?.evidence || '',
@@ -2452,7 +2726,11 @@ window.deployPickerSetQuery = deployPickerSetQuery;
 window.deployPickerSetFilter = deployPickerSetFilter;
 window.deployPickerSelect = deployPickerSelect;
 window.deployPickerAssignManual = deployPickerAssignManual;
-window.deployClearChampion = deployClearChampion;
+window.deployRemoveChampionPerson = deployRemoveChampionPerson;
+window.deployClearChampion = (deptId, slot) => deployRemoveChampionPerson(deptId, slot === 'backup' ? 'backups' : 'participants', 0);
+window.deployOpenDepartmentForm = deployOpenDepartmentForm;
+window.deployRemoveDepartment = deployRemoveDepartment;
+window.deploySaveDepartmentRoster = deploySaveDepartmentRoster;
 window.deployCloseFormDialog = deployCloseFormDialog;
 window.deployFormDialogSubmit = deployFormDialogSubmit;
 window.deployEditIssue = deployEditIssue;

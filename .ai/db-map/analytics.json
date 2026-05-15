@@ -2,7 +2,7 @@
     "_meta": {
         "domain": "analytics",
         "table_count": 5,
-        "generated_at": "2026-05-14T12:16:00+00:00"
+        "generated_at": "2026-05-15T01:10:31+00:00"
     },
     "tables": {
         "inventory_balance_snapshot": {
