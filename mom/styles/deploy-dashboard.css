@@ -656,12 +656,38 @@
 .hm-dot { width: 22px; height: 22px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; font-weight: 700; }
 
 /* Champion cards */
+.deploy-roster-section { border-left: 4px solid var(--c-brand); }
+.deploy-roster-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.deploy-roster-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.deploy-roster-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--c-border);
+  background: var(--c-card);
+  color: var(--c-ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+.deploy-roster-chip::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--dept-color, var(--c-brand));
+}
 .champion-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 12px; }
 .champion-card { background: var(--c-card); border: 1px solid var(--c-border); border-radius: var(--r-card); padding: 12px 14px; box-shadow: var(--shadow-sm); }
 .champion-card-head { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
 .champion-card-head strong { flex: 1; font-size: 14px; }
+.champion-card-remove { flex: 0 0 auto; }
 .deploy-dash .champion-shift { font-size: 11px; padding: 2px 8px; background: var(--c-brand-soft); color: var(--c-brand); border-radius: var(--r-pill); font-weight: 600; }
 .champion-form { display: flex; flex-direction: column; gap: 10px; }
+.champion-slot-group { padding: 10px 12px; background: #f8fafc; border-radius: 8px; border: 1px solid var(--c-border); display: flex; flex-direction: column; gap: 8px; }
+.champion-slot-group-head { margin-bottom: 0; }
+.champion-slot-group .champion-slot-label small { color: var(--c-brand); margin-left: 4px; }
 .champion-slot { padding: 10px 12px; background: #f8fafc; border-radius: 8px; border: 1px solid transparent; transition: border-color .12s ease; }
 .champion-slot.champion-slot-filled { border-color: var(--c-green); background: #f0fdf4; }
 .champion-slot.champion-slot-empty { border-style: dashed; border-color: var(--c-border); }

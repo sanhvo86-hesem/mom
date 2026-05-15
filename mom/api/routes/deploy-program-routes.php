@@ -18,6 +18,7 @@ return static function (Router $router, string $dataDir): void {
         'deploy_week_signoff'      => [DeployProgramController::class, 'signOffWeek'],
         'deploy_meeting_save'      => [DeployProgramController::class, 'saveMeeting'],
         'deploy_meeting_signoff'   => [DeployProgramController::class, 'signOffMeeting'],
+        'deploy_department_roster_save' => [DeployProgramController::class, 'saveDepartmentRoster'],
         'deploy_champion_save'     => [DeployProgramController::class, 'saveChampion'],
         'deploy_issue_save'        => [DeployProgramController::class, 'saveIssue'],
         'deploy_drill_record'      => [DeployProgramController::class, 'recordDrill'],

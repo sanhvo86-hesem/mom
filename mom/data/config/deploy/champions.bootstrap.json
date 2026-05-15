@@ -1,15 +1,79 @@
 {
-  "version": 1,
+  "version": 2,
+  "departmentRoster": {
+    "active": ["PROD", "ENG", "QA", "SCM", "SALES", "FIN", "HR", "IT", "EHS", "ERP"],
+    "custom": {}
+  },
   "champions": {
-    "PROD":  {"primary": {"name": "Nguyễn Sỹ Văn",         "phone": "0985 994 010", "m365": "", "ojtPass": false}, "backup": {"name": "Nguyễn Văn Nam",        "phone": "0972754204",    "m365": "", "ojtPass": false}, "shift": "A"},
-    "ENG":   {"primary": {"name": "Nguyễn Hướng Dương",     "phone": "0336 573 651", "m365": "", "ojtPass": false}, "backup": {"name": "Phạm Tuấn Cường",       "phone": "0333 799 377",  "m365": "", "ojtPass": false}, "shift": "A"},
-    "QA":    {"primary": {"name": "Nguyễn Quốc Cường",      "phone": "0373519642",   "m365": "", "ojtPass": false}, "backup": {"name": "Võ Quốc Đạt",           "phone": "035 570 5777",  "m365": "", "ojtPass": false}, "shift": "A"},
-    "SCM":   {"primary": {"name": "Bùi Thị Huệ",            "phone": "0346021882",   "m365": "", "ojtPass": false}, "backup": {"name": "Huỳnh Thị Thúy Diễm",   "phone": "0388701127",    "m365": "", "ojtPass": false}, "shift": "A"},
-    "SALES": {"primary": {"name": "Phan Hồng Sơn",          "phone": "0335 327 727", "m365": "", "ojtPass": false}, "backup": {"name": "[Chờ nominate backup]", "phone": "",              "m365": "", "ojtPass": false}, "shift": "A"},
-    "FIN":   {"primary": {"name": "Trần Ngọc Yến",          "phone": "0983868670",   "m365": "", "ojtPass": false}, "backup": {"name": "Trương Thị Kim Hồng",   "phone": "0397246743",    "m365": "", "ojtPass": false}, "shift": "A"},
-    "HR":    {"primary": {"name": "Bùi Thị Bích",           "phone": "0974 864 113", "m365": "", "ojtPass": false}, "backup": {"name": "[Chờ nominate backup]", "phone": "",              "m365": "", "ojtPass": false}, "shift": "A"},
-    "IT":    {"primary": {"name": "[Chờ tuyển/nominate IT lead]", "phone": "",       "m365": "", "ojtPass": false}, "backup": {"name": "Lê Ngọc Như Ý",         "phone": "0793702577",    "m365": "", "ojtPass": false}, "shift": "A"},
-    "EHS":   {"primary": {"name": "[Chờ nominate — kiêm nhiệm từ PROD]", "phone": "", "m365": "", "ojtPass": false}, "backup": {"name": "[Chờ nominate backup]", "phone": "",              "m365": "", "ojtPass": false}, "shift": "A"},
-    "ERP":   {"primary": {"name": "Lê Ngọc Như Ý",          "phone": "0793702577",   "m365": "", "ojtPass": false}, "backup": {"name": "[Chờ nominate backup]", "phone": "",              "m365": "", "ojtPass": false}, "shift": "A"}
+    "PROD": {
+      "participants": [{"name": "Nguyễn Sỹ Văn", "phone": "0985 994 010", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
+      "backups": [{"name": "Nguyễn Văn Nam", "phone": "0972754204", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
+      "primary": {"name": "Nguyễn Sỹ Văn", "phone": "0985 994 010", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "backup": {"name": "Nguyễn Văn Nam", "phone": "0972754204", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "shift": "A"
+    },
+    "ENG": {
+      "participants": [{"name": "Nguyễn Hướng Dương", "phone": "0336 573 651", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
+      "backups": [{"name": "Phạm Tuấn Cường", "phone": "0333 799 377", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
+      "primary": {"name": "Nguyễn Hướng Dương", "phone": "0336 573 651", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "backup": {"name": "Phạm Tuấn Cường", "phone": "0333 799 377", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "shift": "A"
+    },
+    "QA": {
+      "participants": [{"name": "Nguyễn Quốc Cường", "phone": "0373519642", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
+      "backups": [{"name": "Võ Quốc Đạt", "phone": "035 570 5777", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
+      "primary": {"name": "Nguyễn Quốc Cường", "phone": "0373519642", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "backup": {"name": "Võ Quốc Đạt", "phone": "035 570 5777", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "shift": "A"
+    },
+    "SCM": {
+      "participants": [{"name": "Bùi Thị Huệ", "phone": "0346021882", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
+      "backups": [{"name": "Huỳnh Thị Thúy Diễm", "phone": "0388701127", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
+      "primary": {"name": "Bùi Thị Huệ", "phone": "0346021882", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "backup": {"name": "Huỳnh Thị Thúy Diễm", "phone": "0388701127", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "shift": "A"
+    },
+    "SALES": {
+      "participants": [{"name": "Phan Hồng Sơn", "phone": "0335 327 727", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
+      "backups": [],
+      "primary": {"name": "Phan Hồng Sơn", "phone": "0335 327 727", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "backup": {"name": "", "phone": "", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "shift": "A"
+    },
+    "FIN": {
+      "participants": [{"name": "Trần Ngọc Yến", "phone": "0983868670", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
+      "backups": [{"name": "Trương Thị Kim Hồng", "phone": "0397246743", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
+      "primary": {"name": "Trần Ngọc Yến", "phone": "0983868670", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "backup": {"name": "Trương Thị Kim Hồng", "phone": "0397246743", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "shift": "A"
+    },
+    "HR": {
+      "participants": [{"name": "Bùi Thị Bích", "phone": "0974 864 113", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
+      "backups": [],
+      "primary": {"name": "Bùi Thị Bích", "phone": "0974 864 113", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "backup": {"name": "", "phone": "", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "shift": "A"
+    },
+    "IT": {
+      "participants": [],
+      "backups": [{"name": "Lê Ngọc Như Ý", "phone": "0793702577", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
+      "primary": {"name": "", "phone": "", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "backup": {"name": "Lê Ngọc Như Ý", "phone": "0793702577", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "shift": "A"
+    },
+    "EHS": {
+      "participants": [],
+      "backups": [],
+      "primary": {"name": "", "phone": "", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "backup": {"name": "", "phone": "", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "shift": "A"
+    },
+    "ERP": {
+      "participants": [{"name": "Lê Ngọc Như Ý", "phone": "0793702577", "m365": "", "ojtPass": false, "username": "", "employee_id": ""}],
+      "backups": [],
+      "primary": {"name": "Lê Ngọc Như Ý", "phone": "0793702577", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "backup": {"name": "", "phone": "", "m365": "", "ojtPass": false, "username": "", "employee_id": ""},
+      "shift": "A"
+    }
   }
 }

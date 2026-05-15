@@ -29,6 +29,7 @@ class DeployProgramController extends BaseController
 
     private const SIGNOFF_ROLES = ['admin', 'it_admin', 'ceo', 'qms_manager', 'qa_manager', 'general_director'];
     private const EDIT_ROLES    = ['admin', 'it_admin', 'ceo', 'qms_manager', 'qa_manager', 'general_director', 'production_director', 'supply_chain_manager', 'hr_manager', 'finance_manager', 'engineering_lead'];
+    private const DEFAULT_DEPARTMENT_IDS = ['PROD', 'ENG', 'QA', 'SCM', 'SALES', 'FIN', 'HR', 'IT', 'EHS', 'ERP'];
 
     public function loadState(): never
     {
@@ -37,7 +38,7 @@ class DeployProgramController extends BaseController
             'data' => [
                 'program'   => $this->loadFile(self::FILE_PROGRAM),
                 'meetings'  => $this->loadFile(self::FILE_MEETINGS),
-                'champions' => $this->loadFile(self::FILE_CHAMPIONS),
+                'champions' => $this->normalizeChampionState($this->loadFile(self::FILE_CHAMPIONS)),
                 'readiness' => $this->loadFile(self::FILE_READINESS),
                 'issues'    => $this->loadFile(self::FILE_ISSUES),
                 'drills'    => $this->loadFile(self::FILE_DRILLS),
@@ -270,27 +271,62 @@ class DeployProgramController extends BaseController
         $me = $this->requireAuth();
         $this->requireAnyRole($me, self::EDIT_ROLES);
         $body = $this->jsonBody();
-        $dept = (string)($body['deptId'] ?? '');
+        $dept = $this->normalizeDepartmentId((string)($body['deptId'] ?? ''));
         if ($dept === '') $this->error('missing_dept', 400);
 
-        $champions = $this->loadFile(self::FILE_CHAMPIONS);
-        if (!isset($champions['champions']) || !is_array($champions['champions'])) $champions['champions'] = [];
-        $clean = static function ($p): array {
-            $p = is_array($p) ? $p : [];
-            return [
-                'name'    => (string)($p['name'] ?? ''),
-                'phone'   => (string)($p['phone'] ?? ''),
-                'm365'    => (string)($p['m365'] ?? ''),
-                'ojtPass' => !empty($p['ojtPass']),
-            ];
-        };
+        $champions = $this->normalizeChampionState($this->loadFile(self::FILE_CHAMPIONS));
+        $participants = $this->normalizeChampionPeople($body['participants'] ?? null, $body['primary'] ?? null);
+        $backups = $this->normalizeChampionPeople($body['backups'] ?? null, $body['backup'] ?? null);
         $champions['champions'][$dept] = [
-            'primary' => $clean($body['primary'] ?? []),
-            'backup'  => $clean($body['backup'] ?? []),
-            'shift'   => (string)($body['shift'] ?? 'A'),
+            'participants' => $participants,
+            'backups'      => $backups,
+            'primary'      => $participants[0] ?? $this->emptyChampionPerson(),
+            'backup'       => $backups[0] ?? $this->emptyChampionPerson(),
+            'shift'        => (string)($body['shift'] ?? 'A'),
         ];
+        $active = $champions['departmentRoster']['active'] ?? self::DEFAULT_DEPARTMENT_IDS;
+        if (!in_array($dept, $active, true)) {
+            $active[] = $dept;
+            $champions['departmentRoster']['active'] = array_values(array_unique($active));
+        }
+        $champions['version'] = 2;
+        $champions['lastUpdated'] = gmdate('c');
         $this->saveFile(self::FILE_CHAMPIONS, $champions);
-        $this->audit('deploy.champion.save', $me, ['dept' => $dept]);
+        $this->audit('deploy.champion.save', $me, ['dept' => $dept, 'participants' => count($participants), 'backups' => count($backups)]);
+        $this->success(['data' => $champions]);
+    }
+
+    public function saveDepartmentRoster(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::EDIT_ROLES);
+        $body = $this->jsonBody();
+
+        $champions = $this->normalizeChampionState($this->loadFile(self::FILE_CHAMPIONS));
+        $roster = $this->normalizeDepartmentRoster([
+            'active' => $body['departmentIds'] ?? $body['active'] ?? [],
+            'custom' => $body['customDepartments'] ?? $champions['departmentRoster']['custom'] ?? [],
+        ]);
+        $champions['departmentRoster'] = $roster;
+        foreach ($roster['active'] as $deptId) {
+            if (!isset($champions['champions'][$deptId]) || !is_array($champions['champions'][$deptId])) {
+                $champions['champions'][$deptId] = [
+                    'participants' => [],
+                    'backups' => [],
+                    'primary' => $this->emptyChampionPerson(),
+                    'backup' => $this->emptyChampionPerson(),
+                    'shift' => 'A',
+                ];
+            }
+        }
+        $champions['version'] = 2;
+        $champions['lastUpdated'] = gmdate('c');
+
+        $this->saveFile(self::FILE_CHAMPIONS, $champions);
+        $this->audit('deploy.department_roster.save', $me, [
+            'active_count' => count($roster['active']),
+            'custom_count' => count($roster['custom']),
+        ]);
         $this->success(['data' => $champions]);
     }
 
@@ -652,6 +688,202 @@ class DeployProgramController extends BaseController
         $dir = dirname($path);
         if (!is_dir($dir)) @mkdir($dir, 0775, true);
         $this->writeJsonFile($path, $data);
+    }
+
+    private function normalizeChampionState(array $state): array
+    {
+        $rawChampions = is_array($state['champions'] ?? null) ? $state['champions'] : [];
+        $champions = [];
+        foreach ($rawChampions as $deptId => $record) {
+            $deptId = $this->normalizeDepartmentId((string)$deptId);
+            if ($deptId === '' || !is_array($record)) {
+                continue;
+            }
+            $participants = $this->normalizeChampionPeople($record['participants'] ?? null, $record['primary'] ?? null);
+            $backups = $this->normalizeChampionPeople($record['backups'] ?? null, $record['backup'] ?? null);
+            $champions[$deptId] = [
+                'participants' => $participants,
+                'backups'      => $backups,
+                'primary'      => $participants[0] ?? $this->emptyChampionPerson(),
+                'backup'       => $backups[0] ?? $this->emptyChampionPerson(),
+                'shift'        => (string)($record['shift'] ?? 'A'),
+            ];
+        }
+
+        $hasRoster = is_array($state['departmentRoster'] ?? null);
+        $roster = $this->normalizeDepartmentRoster($state['departmentRoster'] ?? []);
+        if (!$hasRoster) {
+            $active = $roster['active'];
+            foreach (array_keys($champions) as $deptId) {
+                if (!in_array($deptId, $active, true)) {
+                    $active[] = $deptId;
+                }
+            }
+            $roster['active'] = array_values(array_unique($active));
+        }
+        foreach ($roster['active'] as $deptId) {
+            if (!in_array($deptId, self::DEFAULT_DEPARTMENT_IDS, true) && !isset($roster['custom'][$deptId])) {
+                $roster['custom'][$deptId] = $this->genericCustomDepartment($deptId);
+            }
+        }
+
+        $state['version'] = max(2, (int)($state['version'] ?? 1));
+        $state['departmentRoster'] = $roster;
+        $state['champions'] = $champions;
+        return $state;
+    }
+
+    /**
+     * @return list<array<string, mixed>>
+     */
+    private function normalizeChampionPeople(mixed $people, mixed $legacyPerson = null): array
+    {
+        $rows = [];
+        if (is_array($people) && array_is_list($people)) {
+            $rows = $people;
+        } elseif (is_array($legacyPerson)) {
+            $rows = [$legacyPerson];
+        }
+
+        $out = [];
+        foreach ($rows as $row) {
+            $person = $this->normalizeChampionPerson($row);
+            if (!$this->hasChampionPersonData($person)) {
+                continue;
+            }
+            $out[] = $person;
+        }
+        return $out;
+    }
+
+    /**
+     * @return array{name:string,phone:string,m365:string,ojtPass:bool,username:string,employee_id:string}
+     */
+    private function normalizeChampionPerson(mixed $person): array
+    {
+        $person = is_array($person) ? $person : [];
+        return [
+            'name'        => trim((string)($person['name'] ?? '')),
+            'phone'       => trim((string)($person['phone'] ?? '')),
+            'm365'        => trim((string)($person['m365'] ?? $person['email'] ?? '')),
+            'ojtPass'     => !empty($person['ojtPass']),
+            'username'    => trim((string)($person['username'] ?? '')),
+            'employee_id' => trim((string)($person['employee_id'] ?? $person['id'] ?? '')),
+        ];
+    }
+
+    /**
+     * @param array{name:string,phone:string,m365:string,ojtPass:bool,username:string,employee_id:string} $person
+     */
+    private function hasChampionPersonData(array $person): bool
+    {
+        $name = $person['name'];
+        return $name !== '' && !str_starts_with($name, '[');
+    }
+
+    /**
+     * @return array{name:string,phone:string,m365:string,ojtPass:bool,username:string,employee_id:string}
+     */
+    private function emptyChampionPerson(): array
+    {
+        return [
+            'name' => '',
+            'phone' => '',
+            'm365' => '',
+            'ojtPass' => false,
+            'username' => '',
+            'employee_id' => '',
+        ];
+    }
+
+    /**
+     * @return array{active:list<string>,custom:array<string,array<string, mixed>>}
+     */
+    private function normalizeDepartmentRoster(mixed $source): array
+    {
+        $source = is_array($source) ? $source : [];
+        $custom = [];
+        $rawCustom = is_array($source['custom'] ?? null) ? $source['custom'] : [];
+        foreach ($rawCustom as $key => $raw) {
+            $dept = $this->normalizeCustomDepartment($raw, is_string($key) ? $key : '');
+            if ($dept !== null) {
+                $custom[$dept['id']] = $dept;
+            }
+        }
+
+        $allowed = array_fill_keys(array_merge(self::DEFAULT_DEPARTMENT_IDS, array_keys($custom)), true);
+        $active = [];
+        $rawActive = is_array($source['active'] ?? null) ? $source['active'] : self::DEFAULT_DEPARTMENT_IDS;
+        foreach ($rawActive as $deptId) {
+            $deptId = $this->normalizeDepartmentId((string)$deptId);
+            if ($deptId !== '' && isset($allowed[$deptId])) {
+                $active[] = $deptId;
+            }
+        }
+        if ($active === []) {
+            $active = self::DEFAULT_DEPARTMENT_IDS;
+        }
+
+        return [
+            'active' => array_values(array_unique($active)),
+            'custom' => $custom,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>|null
+     */
+    private function normalizeCustomDepartment(mixed $raw, string $fallbackId = ''): ?array
+    {
+        $raw = is_array($raw) ? $raw : [];
+        $id = $this->normalizeDepartmentId((string)($raw['id'] ?? $fallbackId));
+        if ($id === '' || in_array($id, self::DEFAULT_DEPARTMENT_IDS, true)) {
+            return null;
+        }
+        $label = trim((string)($raw['label'] ?? $id));
+        $owner = trim((string)($raw['owner'] ?? ''));
+        $wave = max(1, min(3, (int)($raw['wave'] ?? 3)));
+        $color = trim((string)($raw['color'] ?? '#475569'));
+        if (!preg_match('/^#[0-9a-fA-F]{6}$/', $color)) {
+            $color = '#475569';
+        }
+
+        return [
+            'id' => $id,
+            'label' => $label !== '' ? $label : $id,
+            'wave' => $wave,
+            'color' => strtolower($color),
+            'owner' => $owner,
+            'handbook' => trim((string)($raw['handbook'] ?? '')),
+            'docs' => [],
+            'record' => trim((string)($raw['record'] ?? '')),
+            'custom' => true,
+        ];
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function genericCustomDepartment(string $deptId): array
+    {
+        return [
+            'id' => $deptId,
+            'label' => $deptId,
+            'wave' => 3,
+            'color' => '#475569',
+            'owner' => '',
+            'handbook' => '',
+            'docs' => [],
+            'record' => '',
+            'custom' => true,
+        ];
+    }
+
+    private function normalizeDepartmentId(string $deptId): string
+    {
+        $deptId = strtoupper(trim($deptId));
+        $deptId = preg_replace('/[^A-Z0-9_-]/', '', $deptId) ?? '';
+        return substr($deptId, 0, 24);
     }
 
     private function resetProgramProgress(array $program): array
