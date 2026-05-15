@@ -30,6 +30,9 @@
  .meta-roles{margin:6px 0 0;font-size:12px;color:#475569}
  .meta-anchor strong,.meta-roles strong{color:#0f172a}
  .col-gate{color:#991b1b;font-style:italic}
+ .champ-block{margin-top:8px;padding:8px 10px;background:#fef3c7;border-left:3px solid #d97706;border-radius:4px;font-size:12px}
+ .champ-block ul{margin:4px 0 0;padding-left:20px}
+ .champ-block li{margin:3px 0}
 </style>
 </head>
 <body>
@@ -42,39 +45,45 @@
 <div class="doc-content" id="docContent">
 <section class="card" id="sec-cover">
 <h1 class="h2">W09 · 2026-07-11 · P3 · Khởi động Đợt 3 — Nhân sự / Tài chính / IT / EHS / Epicor</h1>
-<p>5 trưởng phòng hỗ trợ dùng cuộc họp này để đề cử người dẫn dắt + dự phòng và nhận tài liệu — không kiểu "ai cũng được". Đợt Sản xuất vẫn duy trì chăm sóc tăng cường song song.</p>
-<p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P3-04 · <strong>ISO 9001:2015:</strong> §7.1 (nguồn lực) · §7.2 (năng lực) · §8.1 (hoạch định) · <strong>Tài liệu bắt buộc:</strong> WI-103 (định tuyến M365), WI-104 (thẻ tham chiếu vai trò), SOP-801 (đào tạo + năng lực), ANNEX-113 (truy cập dashboard) · <strong>Pile giấy in cho bàn họp:</strong> 5 sổ tay phòng ban (HR/FIN/IT/EHS/ERP) in + 5 phiếu giao, JD theo phòng + phiếu giao, lịch khoá huấn luyện ngắn buổi 1 in (gồm ngày, giảng viên, tài liệu), báo cáo chăm sóc tăng cường Sản xuất tuần 8 (để xin đóng cổng) · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=9">Mở Lộ trình W09 trên cổng</a></p>
-<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng QMS · <strong>Người ký kết quả:</strong> Giám đốc · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
+<p>5 trưởng phòng hỗ trợ dùng cuộc họp này để đề cử người dẫn dắt + dự phòng qua chữ ký số trên cổng và nhận tài liệu số — không kiểu "ai cũng được". Đợt Sản xuất vẫn duy trì chăm sóc tăng cường song song.</p>
+<p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P3-04 · <strong>ISO 9001:2015:</strong> §7.1 (nguồn lực) · §7.2 (năng lực) · §8.1 (hoạch định) · <strong>Tài liệu bắt buộc:</strong> WI-103 (định tuyến M365), WI-104 (thẻ tham chiếu vai trò), SOP-801 (đào tạo + năng lực), ANNEX-113 (truy cập dashboard) · <strong>Tài liệu sẵn trên cổng trước buổi họp:</strong> 5 sổ tay phòng ban (HR/FIN/IT/EHS/ERP) đã upload trạng thái = bản thảo, chờ ký số tại bàn; JD theo phòng đã upload với 10 phiếu giao số (5 chính + 5 dự phòng); lịch khoá huấn luyện ngắn buổi 1 đã đặt trong program.json kèm giảng viên + tài liệu (WI-103/104, SOP-801, ANNEX-113); báo cáo chăm sóc tăng cường Sản xuất tuần 8 đã đính cổng · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=9">Mở Lộ trình W09 trên cổng</a></p>
+<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng QMS · <strong>Người ký kết quả:</strong> Giám đốc (chữ ký số trên cổng — không ký giấy) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
 </section>
 <section class="card" id="sec-objective">
 <h2 class="h2">3 câu hỏi đánh giá riêng</h2>
 <ol class="tight">
-<li>5 trưởng phòng hỗ trợ có nêu đích danh người dẫn dắt + dự phòng (10 người) và họ đã ký nhận trách nhiệm chưa?</li>
-<li>5 sổ tay phòng ban + JD tương ứng đã bàn giao tại bàn họp và lịch khoá huấn luyện ngắn buổi 1 đã có lịch + giảng viên + tài liệu (WI-103/104, SOP-801, ANNEX-113) chưa?</li>
-<li>Đội chăm sóc tăng cường Sản xuất có báo cáo sự cố Mức 1 = 0 trong 5 ngày liên tiếp để đủ điều kiện đóng cổng P3-03 không?</li>
+<li>5 trưởng phòng hỗ trợ có nêu đích danh người dẫn dắt + dự phòng (10 người) và họ đã ký số cam kết trong champions.json chưa?</li>
+<li>5 sổ tay phòng ban + JD tương ứng đã chuyển từ bản thảo sang đã hiệu lực (dcc_document_header) tại bàn họp và lịch khoá huấn luyện ngắn buổi 1 đã đặt trong program.json với giảng viên + tài liệu (WI-103/104, SOP-801, ANNEX-113) chưa?</li>
+<li>Đội chăm sóc tăng cường Sản xuất có báo cáo sự cố Mức 1 = 0 trong 5 ngày làm việc liên tiếp (issues.json) để đủ điều kiện đóng cổng P3-03 không?</li>
 </ol>
 </section>
 <section class="card" id="sec-tasks">
 <h2 class="h2">Bằng chứng phải có</h2>
 <table>
-<thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm</th><th>Cổng khoá nếu thiếu</th></tr></thead>
+<thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm (trên cổng)</th><th>Cổng khoá nếu thiếu</th></tr></thead>
 <tbody>
-<tr><td>Danh sách 5 người dẫn dắt + 5 dự phòng</td><td>Trưởng Nhân sự</td><td>Mỗi phòng có 1 chính + 1 dự phòng; có chữ ký cam kết của cả 10 người.</td><td class="col-gate">P3-04 khoá: §7.2 năng lực Đợt 3 không có người.</td></tr>
-<tr><td>5 sổ tay phòng ban + JD tương ứng đã bàn giao</td><td>Trưởng QMS</td><td>Có chữ ký nhận của trưởng phòng và người sở hữu JD; ngày hiệu lực 2026-07-11.</td><td class="col-gate">P3-04 khoá: §8.1 hoạch định Đợt 3 không có cơ sở.</td></tr>
-<tr><td>Lịch khoá huấn luyện ngắn buổi 1 cho 10 người dẫn dắt mới</td><td>Kỹ sư QMS</td><td>Lịch có ngày, giảng viên, tài liệu (WI-103/104, SOP-801, ANNEX-113); đã gửi lời mời lịch.</td><td class="col-gate">P3-04 khoá: §7.2 năng lực không chứng minh được trước W10.</td></tr>
-<tr><td>Báo cáo chăm sóc tăng cường Sản xuất</td><td>Trưởng QMS</td><td>Sự cố Mức 1 = 0 trong 5 ngày; biểu đồ ngày có sẵn; đề xuất đóng cổng P3-03 ký bởi Trưởng QA.</td><td class="col-gate">P3-03 khoá: chăm sóc tăng cường kéo dài → ảnh hưởng Đợt 3.</td></tr>
-<tr><td>Tỉ lệ đóng phiếu việc đúng hạn</td><td>Trưởng nhóm chuyển đổi</td><td>≥95%; nhịp họp tầng theo tuần đã hoạt động cho 5 phòng Đợt 3.</td><td class="col-gate">P3-04 khoá: §10.2 không xử lý được phiếu mới của Đợt 3.</td></tr>
+<tr><td>Danh sách 5 + 5 người dẫn dắt trong champions.json</td><td>Trưởng Nhân sự</td><td>champions.json: 5 phòng × 2 vai = 10 dòng có chữ ký số cam kết của cả 10 người.</td><td class="col-gate">P3-04 khoá: §7.2 năng lực Đợt 3 không có người.</td></tr>
+<tr><td>5 sổ tay phòng ban + JD tương ứng đã hiệu lực</td><td>Trưởng QMS</td><td>dcc_document_header: 5 sổ tay + 10 JD chuyển từ draft sang released; effective_date=2026-07-11; chữ ký số trưởng phòng + người sở hữu.</td><td class="col-gate">P3-04 khoá: §8.1 hoạch định Đợt 3 không có cơ sở.</td></tr>
+<tr><td>Lịch khoá huấn luyện ngắn buổi 1</td><td>Kỹ sư QMS</td><td>program.json có 1 dòng lịch khoá huấn luyện với giảng viên, tài liệu (WI-103/104, SOP-801, ANNEX-113); thông báo đã gửi cho 10 người dẫn dắt.</td><td class="col-gate">P3-04 khoá: §7.2 năng lực không chứng minh được trước W10.</td></tr>
+<tr><td>Báo cáo chăm sóc tăng cường Sản xuất</td><td>Trưởng QMS</td><td>issues.json filter level=Mức1 phase=P3-03: 0 dòng trong 5 ngày; biểu đồ ngày trên dashboard; đề xuất đóng cổng P3-03 có chữ ký số Trưởng QA.</td><td class="col-gate">P3-03 khoá: chăm sóc tăng cường kéo dài → ảnh hưởng Đợt 3.</td></tr>
+<tr><td>Tỉ lệ đóng phiếu việc đúng hạn</td><td>Trưởng nhóm chuyển đổi</td><td>issues.json: ≥95% phiếu việc Đợt 3 đóng trong hạn; nhịp họp tầng theo tuần đã hoạt động cho 5 phòng (program.json).</td><td class="col-gate">P3-04 khoá: §10.2 không xử lý được phiếu mới của Đợt 3.</td></tr>
 </tbody>
 </table>
+<p class="champ-block"><strong>Việc của người dẫn dắt phòng tuần W09:</strong></p>
+<ul class="tight" style="margin-top:-6px">
+<li>Người dẫn dắt 5 phòng hỗ trợ mới (HR/FIN/IT/EHS/ERP): đăng nhập cổng nhận sổ tay phòng + JD; ký số cam kết trong champions.json.</li>
+<li>10 người dẫn dắt mới: đăng ký lịch khoá huấn luyện ngắn buổi 1 qua program.json; hoàn thành trước W10.</li>
+<li>11 người dẫn dắt Đợt 1+2: theo dõi tiến độ Đợt 3 qua dashboard để hỗ trợ chéo nếu cần.</li>
+</ul>
 </section>
 <section class="card" id="sec-lessons">
 <h2 class="h2">Vòng rút kinh nghiệm 10 phút — neo tuần W09</h2>
 <ol class="tight">
-<li>Tuần này KPI-TRN-01 (% người dẫn dắt đạt huấn luyện) và KPI-DEP-02 (đóng phiếu việc đúng hạn) ra số bao nhiêu, có đi đúng ngưỡng không, vì sao? (đối chiếu với ANNEX-110 từ điển KPI)</li>
+<li>Tuần này KPI-TRN-01 (Hoàn thành đào tạo ≥90%) và KPI-DEP-02 (Đóng phiếu việc đúng hạn ≥95%) ra số bao nhiêu, có đi đúng ngưỡng không, vì sao? (đối chiếu với ANNEX-110 từ điển KPI)</li>
 <li>Sổ vấn đề tuần này có dòng nào cần nâng mức theo ANNEX-117 (Mức 3 → Mức 2 hoặc Mức 2 → Mức 1) không, ai duyệt nâng mức?</li>
 <li>3 hành động tuần sau là gì, ai làm, hạn nào, và sẽ chặn cổng nào nếu trễ?</li>
 </ol>
-<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký Trưởng QMS hoặc Giám đốc.</p>
+<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.gate.signoff hoặc deploy.issues.escalated), không in giấy.</p>
 </section>
 </div>
 </div></div></div>

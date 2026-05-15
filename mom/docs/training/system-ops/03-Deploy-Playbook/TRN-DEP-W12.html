@@ -30,6 +30,9 @@
  .meta-roles{margin:6px 0 0;font-size:12px;color:#475569}
  .meta-anchor strong,.meta-roles strong{color:#0f172a}
  .col-gate{color:#991b1b;font-style:italic}
+ .champ-block{margin-top:8px;padding:8px 10px;background:#fef3c7;border-left:3px solid #d97706;border-radius:4px;font-size:12px}
+ .champ-block ul{margin:4px 0 0;padding-left:20px}
+ .champ-block li{margin:3px 0}
 </style>
 </head>
 <body>
@@ -42,39 +45,45 @@
 <div class="doc-content" id="docContent">
 <section class="card" id="sec-cover">
 <h1 class="h2">W12 · 2026-08-01 · P4 · Bàn giao chính thức · sang vận hành thường xuyên</h1>
-<p>Tổ điều hành dùng cuộc họp này để bàn giao chương trình triển khai sang chế độ vận hành thường xuyên — Giám đốc trao trách nhiệm KPI tại bàn, không qua văn bản nội bộ.</p>
-<p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P4-04 · <strong>ISO 9001:2015:</strong> §9.2 (đánh giá nội bộ) · §9.3 (xem xét lãnh đạo) · §10.3 (cải tiến liên tục) · <strong>Tài liệu bắt buộc:</strong> WI-202 (đánh giá nội bộ), WI-901 (xem xét lãnh đạo), ANNEX-119 (lộ trình thay đổi) · <strong>Pile giấy in cho bàn họp:</strong> Biên bản bàn giao chính thức in (3 trang), bảng 13 KPI có chủ trì + chu kỳ rà soát in, lịch chu kỳ kiểm toán nội bộ 4 quý in (Q1/Q2/Q3/Q4), lịch họp tầng tuần Thứ Bảy 9:00, lịch soát xét lãnh đạo tháng · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=12">Mở Lộ trình W12 trên cổng</a></p>
-<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng QMS · <strong>Người ký kết quả:</strong> Giám đốc · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
+<p>Tổ điều hành dùng cuộc họp này để ký số bàn giao chương trình triển khai sang chế độ vận hành thường xuyên — Giám đốc trao trách nhiệm 13 KPI cho Trưởng QMS qua chữ ký số trên cổng, không qua văn bản giấy.</p>
+<p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P4-04 · <strong>ISO 9001:2015:</strong> §9.2 (đánh giá nội bộ) · §9.3 (xem xét lãnh đạo) · §10.3 (cải tiến liên tục) · <strong>Tài liệu bắt buộc:</strong> WI-202 (đánh giá nội bộ), WI-901 (xem xét lãnh đạo), ANNEX-119 (lộ trình thay đổi) · <strong>Tài liệu sẵn trên cổng trước buổi họp:</strong> Biên bản bàn giao chính thức đã upload trạng thái = bản thảo chờ ký số tập thể; bảng 13 KPI có chủ trì + chu kỳ rà soát đã có trong DEPLOY_CONFIG.kpis + readiness.json; lịch chu kỳ kiểm toán nội bộ 4 quý (Q1/Q2/Q3/Q4) đã đặt trong program.json với ngày, người trưởng đoàn, phạm vi từng quý; lịch họp tầng tuần Thứ Bảy 9:00 + lịch soát xét lãnh đạo tháng đã đặt · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=12">Mở Lộ trình W12 trên cổng</a></p>
+<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng QMS · <strong>Người ký kết quả:</strong> Giám đốc (chữ ký số trên cổng — không ký giấy) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
 </section>
 <section class="card" id="sec-objective">
 <h2 class="h2">3 câu hỏi đánh giá riêng</h2>
 <ol class="tight">
-<li>Tổ điều hành đã ký biên bản bàn giao trực tiếp tại bàn và 13/13 KPI có chủ trì + chu kỳ rà soát đã giao cho người sở hữu vận hành thường xuyên (Trưởng QMS) chưa?</li>
-<li>Nhịp vận hành mới (họp tầng tuần Thứ Bảy 9:00 + soát xét lãnh đạo tháng) đã công bố cho 10 phòng và lịch đã đặt trên cổng chưa?</li>
-<li>Chu kỳ kiểm toán nội bộ năm 1 (4 quý) đã có lịch cụ thể (ngày, người trưởng đoàn, phạm vi từng quý) theo §9.2 chưa?</li>
+<li>Tổ điều hành đã ký số biên bản bàn giao trên cổng (audit_events deploy.handover) và 13/13 KPI đã có chủ trì + chu kỳ rà soát + người sở hữu vận hành thường xuyên (Trưởng QMS) trong DEPLOY_CONFIG.kpis chưa?</li>
+<li>Nhịp vận hành mới (họp tầng tuần Thứ Bảy 9:00 + soát xét lãnh đạo tháng) đã đặt trong program.json và thông báo cho 10 phòng qua cổng chưa?</li>
+<li>Chu kỳ kiểm toán nội bộ năm 1 (4 quý) đã có lịch cụ thể (ngày, người trưởng đoàn, phạm vi) trong program.json/audit_plans theo §9.2 chưa?</li>
 </ol>
 </section>
 <section class="card" id="sec-tasks">
 <h2 class="h2">Bằng chứng phải có</h2>
 <table>
-<thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm</th><th>Cổng khoá nếu thiếu</th></tr></thead>
+<thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm (trên cổng)</th><th>Cổng khoá nếu thiếu</th></tr></thead>
 <tbody>
-<tr><td>Biên bản bàn giao đã ký</td><td>Tổ điều hành</td><td>Có chữ ký Giám đốc + Trưởng QMS + 11 trưởng phòng; ghi vào audit_events deploy.handover cùng ngày.</td><td class="col-gate">P4-04 khoá: §9.3 không có bằng chứng xem xét lãnh đạo cuối kỳ.</td></tr>
-<tr><td>Bảng 13 KPI có chủ trì + chu kỳ rà soát</td><td>Trưởng QMS</td><td>13/13 KPI có người chủ trì + chu kỳ rà soát; dashboard KPI đã công khai trên cổng cho toàn nhà máy.</td><td class="col-gate">P4-04 khoá: §9.1 đo lường không có chủ.</td></tr>
-<tr><td>Lịch chu kỳ kiểm toán nội bộ 4 quý</td><td>Trưởng QMS</td><td>Q1/Q2/Q3/Q4 có ngày, người trưởng đoàn, phạm vi (10 phòng phủ đủ); ghi vào audit_plans.</td><td class="col-gate">P4-04 khoá: §9.2 chu kỳ đánh giá nội bộ không có kế hoạch.</td></tr>
-<tr><td>Nhịp vận hành tuần + tháng đã công bố</td><td>Tổ điều hành</td><td>Họp tầng tuần Thứ Bảy 9:00 + soát xét lãnh đạo tháng; ICS đã gửi cho 22 người dẫn dắt + 11 trưởng phòng.</td><td class="col-gate">P4-04 khoá: §9.3 không duy trì nhịp xem xét.</td></tr>
-<tr><td>Lộ trình thay đổi năm 1 (ANNEX-119)</td><td>Trưởng QMS</td><td>Có ≥3 mục cải tiến đã chốt với người sở hữu + hạn; ghi vào ANNEX-119 trạng thái = đã hiệu lực.</td><td class="col-gate">P4-04 khoá: §10.3 không có chu trình cải tiến nối tiếp.</td></tr>
+<tr><td>Biên bản bàn giao đã ký số</td><td>Tổ điều hành</td><td>audit_events deploy.handover có chữ ký số Giám đốc + Trưởng QMS + 11 trưởng phòng cùng ngày.</td><td class="col-gate">P4-04 khoá: §9.3 không có bằng chứng xem xét lãnh đạo cuối kỳ.</td></tr>
+<tr><td>Bảng 13 KPI có chủ trì + chu kỳ rà soát</td><td>Trưởng QMS</td><td>DEPLOY_CONFIG.kpis: 13/13 KPI có ownerRole + reviewCadence; dashboard KPI công khai trên cổng cho toàn nhà máy.</td><td class="col-gate">P4-04 khoá: §9.1 đo lường không có chủ.</td></tr>
+<tr><td>Lịch chu kỳ kiểm toán nội bộ 4 quý</td><td>Trưởng QMS</td><td>program.json/audit_plans: Q1/Q2/Q3/Q4 có ngày, người trưởng đoàn, phạm vi (10 phòng phủ đủ).</td><td class="col-gate">P4-04 khoá: §9.2 chu kỳ đánh giá nội bộ không có kế hoạch.</td></tr>
+<tr><td>Nhịp vận hành tuần + tháng đã công bố</td><td>Tổ điều hành</td><td>program.json: họp tầng Thứ Bảy 9:00 hằng tuần + soát xét lãnh đạo tháng; thông báo cổng đã gửi cho 22 người dẫn dắt + 11 trưởng phòng.</td><td class="col-gate">P4-04 khoá: §9.3 không duy trì nhịp xem xét.</td></tr>
+<tr><td>Lộ trình thay đổi năm 1 + lịch xem xét cẩm nang</td><td>Trưởng QMS</td><td>ANNEX-119: ≥3 mục cải tiến đã chốt với người sở hữu + hạn; trạng thái released; Trưởng QMS có lịch rà soát 12 cẩm nang TRN-DEP-Wxx sau mỗi quý.</td><td class="col-gate">P4-04 khoá: §10.3 không có chu trình cải tiến nối tiếp + cẩm nang không có người duy trì.</td></tr>
 </tbody>
 </table>
+<p class="champ-block"><strong>Việc của người dẫn dắt phòng tuần W12:</strong></p>
+<ul class="tight" style="margin-top:-6px">
+<li>22 người dẫn dắt: nhận thông báo bàn giao qua cổng; xác nhận hiểu nhịp vận hành mới (họp tầng tuần + soát xét tháng).</li>
+<li>11 trưởng phòng: ký số biên bản bàn giao trên cổng cùng buổi họp.</li>
+<li>11 người dẫn dắt: theo dõi 13 KPI hằng tuần qua dashboard; báo bất thường qua issues.json.</li>
+</ul>
 </section>
 <section class="card" id="sec-lessons">
 <h2 class="h2">Vòng rút kinh nghiệm 10 phút — neo tuần W12</h2>
 <ol class="tight">
-<li>13/13 KPI đã có chủ trì + chu kỳ rà soát + người sở hữu vận hành thường xuyên chưa, KPI nào chưa khớp với ANNEX-110 từ điển KPI? Có KPI nào trong tuần qua đi sai ngưỡng mà chưa có hành động khắc phục không?</li>
+<li>Tuần này Toàn bộ 13 KPI — kiểm tra 13/13 có ownerRole + reviewCadence + người sở hữu vận hành thường xuyên ra số bao nhiêu, có đi đúng ngưỡng không, vì sao? (đối chiếu với ANNEX-110 từ điển KPI)</li>
 <li>Sổ vấn đề tuần này có dòng nào cần nâng mức theo ANNEX-117 (Mức 3 → Mức 2 hoặc Mức 2 → Mức 1) không, ai duyệt nâng mức?</li>
 <li>3 hành động tuần sau là gì, ai làm, hạn nào, và sẽ chặn cổng nào nếu trễ?</li>
 </ol>
-<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký Trưởng QMS hoặc Giám đốc.</p>
+<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.gate.signoff hoặc deploy.issues.escalated), không in giấy.</p>
 </section>
 </div>
 </div></div></div>

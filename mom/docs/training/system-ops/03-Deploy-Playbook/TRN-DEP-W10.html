@@ -30,6 +30,9 @@
  .meta-roles{margin:6px 0 0;font-size:12px;color:#475569}
  .meta-anchor strong,.meta-roles strong{color:#0f172a}
  .col-gate{color:#991b1b;font-style:italic}
+ .champ-block{margin-top:8px;padding:8px 10px;background:#fef3c7;border-left:3px solid #d97706;border-radius:4px;font-size:12px}
+ .champ-block ul{margin:4px 0 0;padding-left:20px}
+ .champ-block li{margin:3px 0}
 </style>
 </head>
 <body>
@@ -42,39 +45,45 @@
 <div class="doc-content" id="docContent">
 <section class="card" id="sec-cover">
 <h1 class="h2">W10 · 2026-07-18 · P4 · Đợt 3 ổn định + soát xét truy cập dashboard</h1>
-<p>Trưởng IT và Trưởng QMS dùng cuộc họp này để báo cáo chỉ số tuần 1 của Đợt 3 và trình bày kết quả soát xét truy cập theo ô dữ liệu dashboard — Giám đốc ký kết quả ngay tại bàn.</p>
-<p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P4-01, P4-02 · <strong>ISO 9001:2015:</strong> §7.1.6 (tri thức tổ chức) · §9.1.3 (phân tích đánh giá) · §7.5.3 (kiểm soát thông tin) · <strong>Tài liệu bắt buộc:</strong> ANNEX-113 (truy cập dashboard), ANNEX-110 (từ điển KPI) · <strong>Pile giấy in cho bàn họp:</strong> Bản chụp KPI tuần 1 Đợt 3 (3 mốc: tra cứu ≥95%, đào tạo ≥90%, phủ người dẫn dắt 100%), báo cáo soát xét truy cập dashboard (đối chiếu vai trò ↔ quyền), quyết định hiệu chỉnh quyền in, bảng CAPA còn mở (≤5 mục), bản chụp dashboard 4 tuần liên tiếp · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=10">Mở Lộ trình W10 trên cổng</a></p>
-<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng IT · <strong>Người ký kết quả:</strong> Giám đốc · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
+<p>Trưởng IT + Trưởng QMS dùng cuộc họp này để báo cáo chỉ số tuần 1 Đợt 3 và trình kết quả soát xét truy cập dashboard — Giám đốc ký số quyết định hiệu chỉnh quyền ngay tại bàn.</p>
+<p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P4-01, P4-02 · <strong>ISO 9001:2015:</strong> §7.1.6 (tri thức tổ chức) · §9.1.3 (phân tích đánh giá) · §7.5.3 (kiểm soát thông tin) · <strong>Tài liệu bắt buộc:</strong> ANNEX-113 (truy cập dashboard), ANNEX-110 (từ điển KPI) · <strong>Tài liệu sẵn trên cổng trước buổi họp:</strong> Bản chụp KPI tuần 1 Đợt 3 đã có trên dashboard (KPI-FLD-01 ≥95%, KPI-TRN-01 ≥90%, KPI-DEP-01 = 100%); báo cáo soát xét truy cập dashboard đã upload (đối chiếu vai trò ↔ quyền lấy từ users.json + roles); bảng CAPA còn mở filter từ issues.json ≤5 mục; bản chụp dashboard 4 tuần liên tiếp lưu tại ANNEX-110/snapshots/ · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=10">Mở Lộ trình W10 trên cổng</a></p>
+<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng IT · <strong>Người ký kết quả:</strong> Giám đốc (chữ ký số trên cổng — không ký giấy) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
 </section>
 <section class="card" id="sec-objective">
 <h2 class="h2">3 câu hỏi đánh giá riêng</h2>
 <ol class="tight">
-<li>5 phòng Đợt 3 có đạt KPI tuần 1: tra cứu ≥95%, đào tạo ≥90%, phủ người dẫn dắt 100% không và bản chụp 4 tuần liên tiếp đã đầy đủ chưa?</li>
-<li>Kết quả soát xét truy cập dashboard có chỉ rõ không còn người dùng nằm ngoài vai trò được phép và đã có quyết định hiệu chỉnh quyền ký bởi Giám đốc chưa?</li>
-<li>Sự cố Mức 2 còn mở của Đợt 3 có phương án xử lý tạm ổn định và tồn đọng CAPA ≤5 mục mở không?</li>
+<li>5 phòng Đợt 3 có đạt KPI tuần 1: KPI-FLD-01 ≥95%, KPI-TRN-01 ≥90%, KPI-DEP-01 = 100% trên dashboard và bản chụp 4 tuần liên tiếp đã đầy đủ trong ANNEX-110/snapshots/ chưa?</li>
+<li>Kết quả soát xét truy cập dashboard có chỉ rõ không còn người dùng nằm ngoài vai trò được phép (đối chiếu users.json) và quyết định hiệu chỉnh quyền đã có chữ ký số Giám đốc (audit_events deploy.access.review) chưa?</li>
+<li>Sự cố Mức 2 còn mở Đợt 3 có phương án xử lý tạm ổn định và tồn đọng CAPA ≤5 mục mở trong issues.json không?</li>
 </ol>
 </section>
 <section class="card" id="sec-tasks">
 <h2 class="h2">Bằng chứng phải có</h2>
 <table>
-<thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm</th><th>Cổng khoá nếu thiếu</th></tr></thead>
+<thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm (trên cổng)</th><th>Cổng khoá nếu thiếu</th></tr></thead>
 <tbody>
-<tr><td>Bản chụp KPI tuần 1 Đợt 3</td><td>Trưởng QMS</td><td>3 mốc đạt: KPI-FLD-01 ≥95%, KPI-TRN-01 ≥90%, phủ người dẫn dắt 100%.</td><td class="col-gate">P4-01 khoá: §9.1.3 không đủ bằng chứng đóng cổng ổn định.</td></tr>
-<tr><td>Bản chụp dashboard 4 tuần liên tiếp</td><td>Trưởng IT</td><td>File lưu tại ANNEX-110/snapshots/, có dấu thời gian; xu hướng nâng dần.</td><td class="col-gate">P4-01 khoá: §7.1.6 tri thức tổ chức không lưu giữ.</td></tr>
-<tr><td>Báo cáo soát xét truy cập dashboard</td><td>Trưởng IT</td><td>Liệt kê đối chiếu vai trò ↔ quyền; chỉ rõ ngoại lệ; đề xuất hiệu chỉnh; tham chiếu ANNEX-113.</td><td class="col-gate">P4-02 khoá: §7.5.3 kiểm soát thông tin lỗ hổng.</td></tr>
-<tr><td>Quyết định hiệu chỉnh quyền đã ký</td><td>Giám đốc</td><td>Ký tại bàn họp; ghi sổ kiểm toán audit_events deploy.access.review cùng ngày.</td><td class="col-gate">P4-02 khoá: cổng truy cập không đóng → §7.5.3 thiếu bằng chứng.</td></tr>
-<tr><td>Bảng CAPA còn mở</td><td>Trưởng QMS</td><td>≤5 mục mở; mỗi mục có người làm + hạn đóng + mức theo ANNEX-117; lịch chăm sóc tăng cường tuần 2 cho 5 phòng đã chốt.</td><td class="col-gate">P4-01 khoá: §10.2 CAPA tồn đọng → không vào W11.</td></tr>
+<tr><td>Bản chụp KPI tuần 1 Đợt 3</td><td>Trưởng QMS</td><td>Dashboard hiển thị: KPI-FLD-01 ≥95%, KPI-TRN-01 ≥90%, KPI-DEP-01 = 100% cho 5 phòng Đợt 3 trong tuần này.</td><td class="col-gate">P4-01 khoá: §9.1.3 không đủ bằng chứng đóng cổng ổn định.</td></tr>
+<tr><td>Bản chụp dashboard 4 tuần liên tiếp</td><td>Trưởng IT</td><td>File ANNEX-110/snapshots/ có 4 ảnh png/pdf với metadata: tuần, ngày, KPI; xu hướng nâng dần.</td><td class="col-gate">P4-01 khoá: §7.1.6 tri thức tổ chức không lưu giữ.</td></tr>
+<tr><td>Báo cáo soát xét truy cập dashboard</td><td>Trưởng IT</td><td>Tài liệu trên cổng: đối chiếu users.json × roles × module_access_config; liệt kê ngoại lệ; đề xuất hiệu chỉnh; tham chiếu ANNEX-113.</td><td class="col-gate">P4-02 khoá: §7.5.3 kiểm soát thông tin lỗ hổng.</td></tr>
+<tr><td>Quyết định hiệu chỉnh quyền đã ký số</td><td>Giám đốc</td><td>audit_events deploy.access.review với chữ ký số Giám đốc; ghi cùng ngày; metadata diff_count.</td><td class="col-gate">P4-02 khoá: cổng truy cập không đóng → §7.5.3 thiếu bằng chứng.</td></tr>
+<tr><td>Bảng CAPA còn mở</td><td>Trưởng QMS</td><td>issues.json filter kind=capa status=open: ≤5 mục mở; mỗi mục có người làm + hạn đóng + mức theo ANNEX-117; lịch chăm sóc tăng cường Đợt 3 tuần 2 đã chốt trong program.json.</td><td class="col-gate">P4-01 khoá: §10.2 CAPA tồn đọng → không vào W11.</td></tr>
 </tbody>
 </table>
+<p class="champ-block"><strong>Việc của người dẫn dắt phòng tuần W10:</strong></p>
+<ul class="tight" style="margin-top:-6px">
+<li>Người dẫn dắt 5 phòng Đợt 3: kiểm tra bản chụp KPI phòng mình trên dashboard; nếu lệch ngưỡng nộp phương án qua issues.json.</li>
+<li>Người dẫn dắt 5 phòng Đợt 1+2: hỗ trợ chéo các phòng Đợt 3 chưa đạt KPI qua đào tạo tại chỗ.</li>
+<li>Tất cả 22 người dẫn dắt: theo dõi soát xét truy cập dashboard — nếu phát hiện quyền lệch của thành viên phòng mình, báo qua issues.json.</li>
+</ul>
 </section>
 <section class="card" id="sec-lessons">
 <h2 class="h2">Vòng rút kinh nghiệm 10 phút — neo tuần W10</h2>
 <ol class="tight">
-<li>Tuần này KPI-FLD-01 (tỉ lệ mở đúng) và KPI-TRN-01 (% người dẫn dắt đạt huấn luyện) ra số bao nhiêu, có đi đúng ngưỡng không, vì sao? (đối chiếu với ANNEX-110 từ điển KPI)</li>
+<li>Tuần này KPI-FLD-01 (Định tuyến đúng thư mục ≥95%) và KPI-TRN-01 (Hoàn thành đào tạo ≥90%) ra số bao nhiêu, có đi đúng ngưỡng không, vì sao? (đối chiếu với ANNEX-110 từ điển KPI)</li>
 <li>Sổ vấn đề tuần này có dòng nào cần nâng mức theo ANNEX-117 (Mức 3 → Mức 2 hoặc Mức 2 → Mức 1) không, ai duyệt nâng mức?</li>
 <li>3 hành động tuần sau là gì, ai làm, hạn nào, và sẽ chặn cổng nào nếu trễ?</li>
 </ol>
-<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký Trưởng QMS hoặc Giám đốc.</p>
+<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.gate.signoff hoặc deploy.issues.escalated), không in giấy.</p>
 </section>
 </div>
 </div></div></div>

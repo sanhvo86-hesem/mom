@@ -30,6 +30,9 @@
  .meta-roles{margin:6px 0 0;font-size:12px;color:#475569}
  .meta-anchor strong,.meta-roles strong{color:#0f172a}
  .col-gate{color:#991b1b;font-style:italic}
+ .champ-block{margin-top:8px;padding:8px 10px;background:#fef3c7;border-left:3px solid #d97706;border-radius:4px;font-size:12px}
+ .champ-block ul{margin:4px 0 0;padding-left:20px}
+ .champ-block li{margin:3px 0}
 </style>
 </head>
 <body>
@@ -42,30 +45,36 @@
 <div class="doc-content" id="docContent">
 <section class="card" id="sec-cover">
 <h1 class="h2">W03 · 2026-05-30 · P2 · Khởi động thí điểm QA — Tuần 1 chạy song song</h1>
-<p>Trưởng QA dùng cuộc họp này để trình kế hoạch chạy thí điểm SOP-605 + WI-201 trong 5 ngày tới — ranh giới chỉ 1 chuyền/khu vực, không lan sang phòng khác.</p>
-<p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P2-01 · <strong>ISO 9001:2015:</strong> §8.1 (hoạch định và kiểm soát vận hành) · §9.1.1 (đo lường, theo dõi) · <strong>Tài liệu bắt buộc:</strong> SOP-605, WI-201, DRL-E2E (bài diễn tập Job Order đầu cuối) · <strong>Pile giấy in cho bàn họp:</strong> Kế hoạch chạy song song QA 5 ngày in, lịch họp nhanh đầu ngày 8:00, danh sách 10 lượt diễn tập DRL-E2E in (gồm ID tài liệu mục tiêu, thời gian mở đúng), sổ vấn đề ≥5 dòng thử · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=3">Mở Lộ trình W03 trên cổng</a></p>
-<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng QA · <strong>Người ký kết quả:</strong> Giám đốc · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
+<p>Trưởng QA dùng cuộc họp này để chốt kế hoạch chạy thí điểm SOP-605 + WI-201 trong 5 ngày tới — ranh giới chỉ 1 chuyền/khu vực, không lan sang phòng khác. Mọi tài liệu mở trên cổng.</p>
+<p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P2-01 · <strong>ISO 9001:2015:</strong> §8.1 (hoạch định và kiểm soát vận hành) · §9.1.1 (đo lường, theo dõi) · <strong>Tài liệu bắt buộc:</strong> SOP-605, WI-201, DRL-E2E (bài diễn tập Job Order đầu cuối) · <strong>Tài liệu sẵn trên cổng trước buổi họp:</strong> Kế hoạch chạy song song QA 5 ngày đã upload lên cổng kèm sơ đồ khu vực thí điểm; lịch họp nhanh đầu ngày 8:00 đã đặt trong program.json; danh sách 10 lượt diễn tập DRL-E2E đã chuẩn bị khung trong training_records (chỉ chờ điền kết quả); sổ vấn đề mở trên cổng với khung 5 dòng thử · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=3">Mở Lộ trình W03 trên cổng</a></p>
+<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng QA · <strong>Người ký kết quả:</strong> Giám đốc (chữ ký số trên cổng — không ký giấy) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
 </section>
 <section class="card" id="sec-objective">
 <h2 class="h2">3 câu hỏi đánh giá riêng</h2>
 <ol class="tight">
-<li>Kế hoạch chạy song song của QA có rõ ranh giới chuyền/khu vực, lịch họp nhanh đầu ngày 15 phút, người trực mỗi ca và sổ vấn đề đã sẵn không?</li>
-<li>Diễn tập tra cứu theo DRL-E2E đã chuẩn bị ≥10 lượt (mỗi lượt có ID tài liệu, thời gian mở đúng) và 2 người dẫn dắt QA đã được giao trực chưa?</li>
-<li>5 trưởng phòng đợt sau đã ngồi xem và ghi nhận ≥1 quan sát chuẩn bị cho tuần đợt mình chưa?</li>
+<li>Kế hoạch chạy song song của QA có rõ ranh giới chuyền/khu vực, lịch họp nhanh đầu ngày 15 phút, người trực mỗi ca, sơ đồ khu vực thí điểm đã upload cổng và Giám đốc đã ký số xác nhận kế hoạch chưa?</li>
+<li>Khung 10 lượt diễn tập DRL-E2E đã có sẵn trên cổng (training_records/drill_logs có 10 dòng chờ điền) và 2 người dẫn dắt QA đã được giao trực với chữ ký số cam kết chưa?</li>
+<li>5/5 trưởng phòng đợt sau đã đăng nhập cổng và ghi nhận ≥1 quan sát chuẩn bị qua phiếu quan sát trên cổng (không họp riêng) chưa?</li>
 </ol>
 </section>
 <section class="card" id="sec-tasks">
 <h2 class="h2">Bằng chứng phải có</h2>
 <table>
-<thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm</th><th>Cổng khoá nếu thiếu</th></tr></thead>
+<thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm (trên cổng)</th><th>Cổng khoá nếu thiếu</th></tr></thead>
 <tbody>
-<tr><td>Kế hoạch chạy song song QA 5 ngày</td><td>Trưởng QA</td><td>Ranh giới chuyền + danh sách người trực + lịch họp nhanh 8:00 đã rõ; đính kèm sơ đồ khu vực thí điểm.</td><td class="col-gate">P2-01 khoá: thí điểm không có ranh giới → lan ra phòng khác.</td></tr>
-<tr><td>Danh sách diễn tập DRL-E2E ≥10 lượt</td><td>Người dẫn dắt QA</td><td>Mỗi lượt có người dùng, ID tài liệu mục tiêu (SOP-605/WI-201), thời gian mở đúng ≤180 giây.</td><td class="col-gate">P2-01 khoá: §8.1 hoạch định không có bằng chứng kiểm thử.</td></tr>
-<tr><td>Sổ vấn đề khởi động</td><td>Trưởng QMS</td><td>≥5 mục thử (kể cả 1 mục Mức 3), có người phụ trách + hạn đóng.</td><td class="col-gate">P2-01 khoá: §10.2 không có kênh xử lý sự cố.</td></tr>
-<tr><td>Bảng tóm tắt KPI tuần 1 sẵn khung</td><td>Trưởng QA</td><td>Khung trống cho tỉ lệ có mặt họp nhanh ≥90%, có biểu đồ ngày, đo từ ngày 1.</td><td class="col-gate">P2-01 khoá: §9.1.1 không có chỉ tiêu đo.</td></tr>
-<tr><td>Phiếu quan sát từ 5 phòng đợt sau</td><td>Trưởng QMS</td><td>Mỗi phòng có 1 quan sát chính + đề xuất chuẩn bị, ký bởi trưởng phòng.</td><td class="col-gate">P2-01 khoá: đợt 2 không học được từ thí điểm.</td></tr>
+<tr><td>Kế hoạch chạy song song QA 5 ngày trên cổng</td><td>Trưởng QA</td><td>Tài liệu kế hoạch đã upload với chữ ký số Trưởng QA + Giám đốc; ranh giới chuyền có sơ đồ; lịch họp nhanh 8:00 trong program.json.</td><td class="col-gate">P2-01 khoá: thí điểm không có ranh giới → lan ra phòng khác.</td></tr>
+<tr><td>Khung 10 lượt diễn tập DRL-E2E</td><td>Người dẫn dắt QA</td><td>training_records/drill_logs có 10 dòng chờ điền: người dùng, ID tài liệu mục tiêu (SOP-605/WI-201), thời gian dự kiến ≤180 giây.</td><td class="col-gate">P2-01 khoá: §8.1 hoạch định không có bằng chứng kiểm thử.</td></tr>
+<tr><td>Sổ vấn đề khởi động trên cổng</td><td>Trưởng QMS</td><td>issues.json có ≥5 mục thử (kể cả 1 mục Mức 3 với cờ kind=test); có người phụ trách + hạn đóng.</td><td class="col-gate">P2-01 khoá: §10.2 không có kênh xử lý sự cố.</td></tr>
+<tr><td>Khung bảng KPI tuần 1 trên dashboard</td><td>Trưởng QA</td><td>readiness.json có KPI-DEP-02 + KPI-FLD-02 với baseline=null, target rõ; chờ điền dữ liệu thực 5 ngày kế.</td><td class="col-gate">P2-01 khoá: §9.1.1 không có chỉ tiêu đo.</td></tr>
+<tr><td>Phiếu quan sát từ 5 phòng đợt sau qua cổng</td><td>Trưởng QMS</td><td>5 phiếu trên cổng có chữ ký số trưởng phòng + ≥1 quan sát chính + đề xuất chuẩn bị; sự kiện kiểm toán deploy.pilot.observation.recorded.</td><td class="col-gate">P2-01 khoá: đợt 2 không học được từ thí điểm.</td></tr>
 </tbody>
 </table>
+<p class="champ-block"><strong>Việc của người dẫn dắt phòng tuần W03:</strong></p>
+<ul class="tight" style="margin-top:-6px">
+<li>Người dẫn dắt QA: chuẩn bị 2 ca trực trong tuần thí điểm; tham dự họp nhanh đầu ngày 8:00 mỗi sáng.</li>
+<li>Người dẫn dắt 5 phòng đợt sau: nộp phiếu quan sát trên cổng trong tuần (1 quan sát + 1 đề xuất chuẩn bị).</li>
+<li>Người dẫn dắt tất cả phòng: theo dõi sổ vấn đề QA trên cổng, học cách phân loại Mức 1/2/3 theo ANNEX-117.</li>
+</ul>
 </section>
 <section class="card" id="sec-lessons">
 <h2 class="h2">Vòng rút kinh nghiệm 10 phút — neo tuần W03</h2>
@@ -74,7 +83,7 @@
 <li>Sổ vấn đề tuần này có dòng nào cần nâng mức theo ANNEX-117 (Mức 3 → Mức 2 hoặc Mức 2 → Mức 1) không, ai duyệt nâng mức?</li>
 <li>3 hành động tuần sau là gì, ai làm, hạn nào, và sẽ chặn cổng nào nếu trễ?</li>
 </ol>
-<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký Trưởng QMS hoặc Giám đốc.</p>
+<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.gate.signoff hoặc deploy.issues.escalated), không in giấy.</p>
 </section>
 </div>
 </div></div></div>

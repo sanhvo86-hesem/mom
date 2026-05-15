@@ -30,6 +30,9 @@
  .meta-roles{margin:6px 0 0;font-size:12px;color:#475569}
  .meta-anchor strong,.meta-roles strong{color:#0f172a}
  .col-gate{color:#991b1b;font-style:italic}
+ .champ-block{margin-top:8px;padding:8px 10px;background:#fef3c7;border-left:3px solid #d97706;border-radius:4px;font-size:12px}
+ .champ-block ul{margin:4px 0 0;padding-left:20px}
+ .champ-block li{margin:3px 0}
 </style>
 </head>
 <body>
@@ -42,30 +45,36 @@
 <div class="doc-content" id="docContent">
 <section class="card" id="sec-cover">
 <h1 class="h2">W06 · 2026-06-20 · P3 · Soát xét giữa Đợt 2 + chuẩn bị Đợt Sản xuất</h1>
-<p>Trưởng QMS dùng cuộc họp này để đóng tồn của Đợt 2 và chốt cẩm nang vận hành chính thức + điều kiện kích hoạt khôi phục cho Đợt Sản xuất — đợt rủi ro cao nhất, không được sửa cẩm nang sau khi đi vào tuần 7.</p>
-<p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P3-02 · <strong>ISO 9001:2015:</strong> §8.1 (hoạch định) · §8.5.6 (kiểm soát thay đổi) · §10.2 (hành động khắc phục) · <strong>Tài liệu bắt buộc:</strong> ANNEX-114 (sổ tay vận hành), ANNEX-118 (bộ kit dự phòng offline) · <strong>Pile giấy in cho bàn họp:</strong> ANNEX-114 bản cẩm nang Sản xuất in (đã chốt), ANNEX-118 bộ kit dự phòng in, biểu đồ sự cố Mức 1/Mức 2 của Đợt 2, biên bản kiểm thử thật điều kiện kích hoạt khôi phục, danh sách 14 người dẫn dắt thường trực 7 khu vực · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=6">Mở Lộ trình W06 trên cổng</a></p>
-<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng QMS · <strong>Người ký kết quả:</strong> Giám đốc · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
+<p>Trưởng QMS dùng cuộc họp này để đóng tồn Đợt 2 và ký số chốt cẩm nang vận hành chính thức + điều kiện kích hoạt khôi phục cho Đợt Sản xuất trên cổng — không in giấy. Sau khi ký, cẩm nang khoá theo dcc_document_header.</p>
+<p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P3-02 · <strong>ISO 9001:2015:</strong> §8.1 (hoạch định) · §8.5.6 (kiểm soát thay đổi) · §10.2 (hành động khắc phục) · <strong>Tài liệu bắt buộc:</strong> ANNEX-114 (sổ tay vận hành), ANNEX-118 (bộ kit dự phòng offline) · <strong>Tài liệu sẵn trên cổng trước buổi họp:</strong> ANNEX-114 bản cẩm nang Sản xuất đã upload trạng thái = bản thảo, chờ ký số tại buổi họp; ANNEX-118 bộ kit dự phòng đã upload; biểu đồ sự cố Mức 1/Mức 2 Đợt 2 hiển thị trên dashboard; biên bản kiểm thử thật điều kiện kích hoạt khôi phục đã đính cổng với video/ảnh; danh sách 14 người dẫn dắt thường trực 7 khu vực đã cập nhật champions.json · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=6">Mở Lộ trình W06 trên cổng</a></p>
+<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng QMS · <strong>Người ký kết quả:</strong> Giám đốc (chữ ký số trên cổng — không ký giấy) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
 </section>
 <section class="card" id="sec-objective">
 <h2 class="h2">3 câu hỏi đánh giá riêng</h2>
 <ol class="tight">
-<li>Đợt 2 có 0 sự cố Mức 1 trong 5 ngày làm việc gần nhất và mọi sự cố Mức 2 có phương án xử lý tạm ổn định theo ANNEX-117 chưa?</li>
-<li>Cẩm nang vận hành chính thức cho Đợt Sản xuất (ANNEX-114 + ANNEX-118) đã chốt nội dung, in và dán ở 7 khu vực chưa?</li>
-<li>Điều kiện kích hoạt khôi phục đã được kiểm thử thật (không phải tưởng tượng) và bằng chứng đã ghi vào sổ kiểm toán chưa?</li>
+<li>Đợt 2 có 0 sự cố Mức 1 trong 5 ngày làm việc liên tiếp (T2-T6 gần nhất, issues.json filter level=Mức1) và mọi sự cố Mức 2 có phương án xử lý tạm ổn định theo ANNEX-117 chưa?</li>
+<li>Cẩm nang vận hành chính thức cho Đợt Sản xuất (ANNEX-114 + ANNEX-118) đã chuyển từ bản thảo sang đã hiệu lực trên cổng (dcc_document_header) chưa?</li>
+<li>Điều kiện kích hoạt khôi phục đã được kiểm thử thật (audit_events deploy.recovery.test) và bằng chứng video/ảnh đã đính cổng chưa?</li>
 </ol>
 </section>
 <section class="card" id="sec-tasks">
 <h2 class="h2">Bằng chứng phải có</h2>
 <table>
-<thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm</th><th>Cổng khoá nếu thiếu</th></tr></thead>
+<thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm (trên cổng)</th><th>Cổng khoá nếu thiếu</th></tr></thead>
 <tbody>
-<tr><td>Biểu đồ sự cố Mức 1/Mức 2 của Đợt 2</td><td>Trưởng QMS</td><td>Mức 1 = 0 trong 5 ngày; Mức 2 có phương án tạm ổn định; phân loại theo ANNEX-117.</td><td class="col-gate">P3-02 khoá: §10.2 chưa đóng → Đợt Sản xuất không khởi động.</td></tr>
-<tr><td>ANNEX-114 + ANNEX-118 bản cẩm nang Sản xuất</td><td>Tổ điều hành</td><td>Đã ký, in tại xưởng, dán ở 7 khu vực; ngày hiệu lực 2026-06-20.</td><td class="col-gate">P3-02 khoá: §8.1 hoạch định Sản xuất không đầy đủ.</td></tr>
-<tr><td>Kết quả kiểm thử điều kiện kích hoạt khôi phục</td><td>Kỹ sư QMS + Trưởng IT</td><td>Có biên bản kiểm thử thật + bằng chứng video/ảnh; ghi sổ kiểm toán deploy.recovery.test.</td><td class="col-gate">P3-02 khoá: §8.5.6 thay đổi không kiểm soát.</td></tr>
-<tr><td>Danh sách 14 người dẫn dắt Sản xuất + Kỹ thuật bổ sung</td><td>Trưởng Nhân sự</td><td>Mỗi khu vực trong 7 khu vực có 1 người dẫn dắt thường trực + 1 dự phòng cho W07–W08.</td><td class="col-gate">P3-02 khoá: §7.2 năng lực không phủ hết khu vực.</td></tr>
-<tr><td>Lịch trực hỗ trợ tăng cường 24/5 cho W07</td><td>Trưởng QMS</td><td>Đội tăng cường (Trưởng QA + Kỹ sư QMS + 2 người dẫn dắt) đã cam kết; ca trực dán cửa.</td><td class="col-gate">P3-02 khoá: không có hỗ trợ khi rủi ro cao xảy ra.</td></tr>
+<tr><td>Biểu đồ sự cố Mức 1/Mức 2 của Đợt 2</td><td>Trưởng QMS</td><td>Dashboard hiển thị: Mức 1 = 0 trong 5 ngày làm việc; Mức 2 có phương án tạm ổn định; phân loại theo ANNEX-117 trong issues.json.</td><td class="col-gate">P3-02 khoá: §10.2 chưa đóng → Đợt Sản xuất không khởi động.</td></tr>
+<tr><td>ANNEX-114 + ANNEX-118 đã hiệu lực</td><td>Tổ điều hành</td><td>dcc_document_header: 2 tài liệu status=released, effective_date=2026-06-20; có chữ ký số Giám đốc + Trưởng QMS.</td><td class="col-gate">P3-02 khoá: §8.1 hoạch định Sản xuất không đầy đủ.</td></tr>
+<tr><td>Kết quả kiểm thử điều kiện kích hoạt khôi phục</td><td>Kỹ sư QMS + Trưởng IT</td><td>Tài liệu trên cổng có video/ảnh kiểm thử thật; audit_events deploy.recovery.test với metadata duration, result; chữ ký số 2 người.</td><td class="col-gate">P3-02 khoá: §8.5.6 thay đổi không kiểm soát.</td></tr>
+<tr><td>14 người dẫn dắt Sản xuất + Kỹ thuật trong champions.json</td><td>Trưởng Nhân sự</td><td>champions.json: 7 khu vực × 2 vai = 14 dòng có chữ ký số cam kết cho W07-W08; mỗi khu vực có 1 chính + 1 dự phòng.</td><td class="col-gate">P3-02 khoá: §7.2 năng lực không phủ hết khu vực.</td></tr>
+<tr><td>Lịch trực hỗ trợ tăng cường 24/5 cho W07 trên cổng</td><td>Trưởng QMS</td><td>program.json có lịch ca trực 24/5; 4 người trong đội tăng cường (Trưởng QA + Kỹ sư QMS + 2 người dẫn dắt) có chữ ký số cam kết.</td><td class="col-gate">P3-02 khoá: không có hỗ trợ khi rủi ro cao xảy ra.</td></tr>
 </tbody>
 </table>
+<p class="champ-block"><strong>Việc của người dẫn dắt phòng tuần W06:</strong></p>
+<ul class="tight" style="margin-top:-6px">
+<li>Người dẫn dắt SCM + Sales: nộp báo cáo tồn Đợt 2 qua phiếu trên cổng trước buổi họp 24 giờ.</li>
+<li>Người dẫn dắt Sản xuất + Kỹ thuật: đọc ANNEX-114 + ANNEX-118 bản dự thảo trên cổng, nộp góp ý qua sổ phản hồi trước họp.</li>
+<li>14 người dẫn dắt 7 khu vực: ký số cam kết trực thường trực cho W07-W08 trong champions.json.</li>
+</ul>
 </section>
 <section class="card" id="sec-lessons">
 <h2 class="h2">Vòng rút kinh nghiệm 10 phút — neo tuần W06</h2>
@@ -74,7 +83,7 @@
 <li>Sổ vấn đề tuần này có dòng nào cần nâng mức theo ANNEX-117 (Mức 3 → Mức 2 hoặc Mức 2 → Mức 1) không, ai duyệt nâng mức?</li>
 <li>3 hành động tuần sau là gì, ai làm, hạn nào, và sẽ chặn cổng nào nếu trễ?</li>
 </ol>
-<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký Trưởng QMS hoặc Giám đốc.</p>
+<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.gate.signoff hoặc deploy.issues.escalated), không in giấy.</p>
 </section>
 </div>
 </div></div></div>

@@ -30,6 +30,9 @@
  .meta-roles{margin:6px 0 0;font-size:12px;color:#475569}
  .meta-anchor strong,.meta-roles strong{color:#0f172a}
  .col-gate{color:#991b1b;font-style:italic}
+ .champ-block{margin-top:8px;padding:8px 10px;background:#fef3c7;border-left:3px solid #d97706;border-radius:4px;font-size:12px}
+ .champ-block ul{margin:4px 0 0;padding-left:20px}
+ .champ-block li{margin:3px 0}
 </style>
 </head>
 <body>
@@ -42,39 +45,46 @@
 <div class="doc-content" id="docContent">
 <section class="card" id="sec-cover">
 <h1 class="h2">W01 · 2026-05-16 · P0 · Công bố chính thức MAN-001 + POL-QMS-001/002</h1>
-<p>Giám đốc dùng cuộc họp này để chuyển từ cam kết nội bộ sang ký công khai trước đại diện 10 phòng ban — không phổ biến qua email, không nhắc miệng.</p>
-<p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P0-04, P0-05 · <strong>ISO 9001:2015:</strong> §5.1.1 (cam kết lãnh đạo) · §5.2 (chính sách chất lượng) · §7.5.2 (tạo và cập nhật tài liệu) · <strong>Tài liệu bắt buộc:</strong> MAN-001, POL-QMS-001, POL-QMS-002 · <strong>Pile giấy in cho bàn họp:</strong> MAN-001 (1 cuốn để Giám đốc ký), POL-QMS-001 (1 trang), POL-QMS-002 (1 trang), 11 phiếu giao sổ tay (1/phòng), 39 phiếu giao JD (1/JD), sổ vấn đề rỗng có dòng thử Mức 3, mẫu biên bản công bố nhịp điều hành · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=1">Mở Lộ trình W01 trên cổng</a></p>
-<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng QMS · <strong>Người ký kết quả:</strong> Giám đốc · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
+<p>Giám đốc dùng cuộc họp này để chuyển 3 tài liệu lõi từ bản thảo sang đã hiệu lực bằng chữ ký số trên cổng — không dùng giấy. Bằng chứng theo dõi qua trạng thái trong dcc_document_header.</p>
+<p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P0-04, P0-05 · <strong>ISO 9001:2015:</strong> §5.1.1 (cam kết lãnh đạo) · §5.2 (chính sách chất lượng) · §7.5.2 (tạo và cập nhật tài liệu) · <strong>Tài liệu bắt buộc:</strong> MAN-001, POL-QMS-001, POL-QMS-002 · <strong>Tài liệu sẵn trên cổng trước buổi họp:</strong> MAN-001 + POL-QMS-001 + POL-QMS-002 đã upload lên cổng, trạng thái = bản thảo; 11 sổ tay phòng ban + 39 bản mô tả công việc đã upload, trạng thái = bản thảo, người sở hữu + trưởng phòng đã ký số trên cổng TRƯỚC buổi họp (lệch giờ, không ký tại bàn). Trưởng QMS chỉ trình bảng theo dõi "11/11 sổ tay + 39/39 JD đã ký số" trong họp · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=1">Mở Lộ trình W01 trên cổng</a></p>
+<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng QMS · <strong>Người ký kết quả:</strong> Giám đốc (chữ ký số trên cổng — không ký giấy) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
 </section>
 <section class="card" id="sec-objective">
 <h2 class="h2">3 câu hỏi đánh giá riêng</h2>
 <ol class="tight">
-<li>Giám đốc đã ký MAN-001 + POL-QMS-001 + POL-QMS-002 ngay tại bàn họp và trạng thái trên cổng đã chuyển sang đã hiệu lực chưa?</li>
-<li>11 sổ tay phòng ban + 39 bản mô tả công việc đã được trưởng phòng nhận tại bàn và ký xác nhận trên phiếu giao chưa?</li>
-<li>Nhịp điều hành (lịch họp tầng tuần, soát xét lãnh đạo tháng, đường leo thang sự cố) đã công bố cho 10 phòng và có biên bản công bố ký Trưởng QMS chưa?</li>
+<li>Giám đốc đã ký số MAN-001 + POL-QMS-001 + POL-QMS-002 trên cổng ngay tại bàn họp và trạng thái dcc_document_header đã chuyển sang đã hiệu lực chưa? (sự kiện kiểm toán deploy.doc.signoff ghi cùng ngày)</li>
+<li>11/11 sổ tay phòng ban + 39/39 bản mô tả công việc đã có chữ ký số của người sở hữu + trưởng phòng trước buổi họp và Trưởng QMS đã trình bảng tổng hợp tại bàn chưa?</li>
+<li>Nhịp điều hành (lịch họp tầng tuần, soát xét lãnh đạo tháng, đường leo thang sự cố) đã công bố qua thông báo cổng cho 10 phòng và có ghi sự kiện kiểm toán deploy.cadence.published chưa?</li>
 </ol>
 </section>
 <section class="card" id="sec-tasks">
 <h2 class="h2">Bằng chứng phải có</h2>
 <table>
-<thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm</th><th>Cổng khoá nếu thiếu</th></tr></thead>
+<thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm (trên cổng)</th><th>Cổng khoá nếu thiếu</th></tr></thead>
 <tbody>
-<tr><td>3 tài liệu lõi đã hiệu lực trên cổng</td><td>Trưởng QMS</td><td>Trạng thái = đã hiệu lực, ngày hiệu lực = 2026-05-16, có chữ ký Giám đốc trong biên bản.</td><td class="col-gate">P0-04 khoá: tuần sau không vào W02 chốt RACI được.</td></tr>
-<tr><td>Phiếu giao 11 sổ tay phòng ban</td><td>Trưởng QMS</td><td>Mỗi sổ có chữ ký nhận của trưởng phòng tương ứng.</td><td class="col-gate">P0-04 khoá: trưởng phòng không có cơ sở triển khai trong phòng.</td></tr>
-<tr><td>Phiếu giao 39 bản mô tả công việc</td><td>Trưởng Nhân sự</td><td>Mỗi bản có chữ ký nhận của người sở hữu và trưởng phòng.</td><td class="col-gate">P0-05 khoá: vai trò không rõ → không ký RACI W02.</td></tr>
-<tr><td>Sổ vấn đề đã mở</td><td>Trưởng QMS</td><td>Có ít nhất 1 dòng thử Mức 3, có người phụ trách + hạn đóng.</td><td class="col-gate">P0-04 khoá: không có kênh xử lý sự cố cho W02 trở đi.</td></tr>
-<tr><td>Biên bản công bố nhịp điều hành + Kiểm tra nhận thức ≥80%</td><td>Kỹ sư QMS</td><td>Lịch họp tầng tuần dán bảng; bài kiểm 1 câu ("3 tài liệu nền QMS là gì?") ≥80% đạt, điểm vào training_records.</td><td class="col-gate">P0-05 khoá: không đủ bằng chứng cam kết lãnh đạo §5.1.1.</td></tr>
+<tr><td>3 tài liệu lõi đã hiệu lực trên cổng</td><td>Trưởng QMS</td><td>dcc_document_header: status=released, effective_date=2026-05-16; audit_events deploy.doc.signoff ghi 3 dòng cùng ngày + chữ ký số Giám đốc.</td><td class="col-gate">P0-04 khoá: tuần sau không vào W02 chốt RACI được.</td></tr>
+<tr><td>11/11 sổ tay phòng ban có chữ ký số</td><td>Trưởng QMS</td><td>dcc_document_header lọc theo doc_type=MAN-DEPT có 11 dòng status=released; mỗi dòng có chữ ký số trưởng phòng tương ứng.</td><td class="col-gate">P0-04 khoá: trưởng phòng không có cơ sở triển khai.</td></tr>
+<tr><td>39/39 bản mô tả công việc có chữ ký số</td><td>Trưởng Nhân sự</td><td>dcc_document_header lọc theo doc_type=JD có 39 dòng status=released; mỗi dòng có chữ ký số người sở hữu + trưởng phòng.</td><td class="col-gate">P0-05 khoá: vai trò không rõ → không ký RACI W02.</td></tr>
+<tr><td>Sổ vấn đề đã khởi tạo trên cổng</td><td>Trưởng QMS</td><td>issues.json có ≥1 dòng thử Mức 3 (kind=test); có người phụ trách + hạn đóng; audit_events deploy.issues.opened ghi cùng ngày.</td><td class="col-gate">P0-04 khoá: không có kênh xử lý sự cố cho W02 trở đi.</td></tr>
+<tr><td>Nhịp điều hành đã công bố online + kiểm tra nhận thức ≥80%</td><td>Kỹ sư QMS</td><td>Lịch họp tầng tuần đã ghi vào program.json (sự kiện deploy.cadence.published); bài kiểm 1 câu "3 tài liệu nền QMS là gì?" lưu trong training_records với điểm ≥80%.</td><td class="col-gate">P0-05 khoá: không đủ bằng chứng cam kết lãnh đạo §5.1.1.</td></tr>
 </tbody>
 </table>
+<p class="champ-block"><strong>Việc của người dẫn dắt phòng tuần W01:</strong></p>
+<ul class="tight" style="margin-top:-6px">
+<li>Đăng nhập cổng trước buổi họp, xác nhận đã nhận sổ tay phòng + JD của vai trò mình qua thông báo cổng.</li>
+<li>Sau buổi họp 2 giờ: in danh sách 5 tài liệu nền (MAN-001, POL-QMS-001/002, sổ tay phòng, JD vai trò mình) — chỉ in ảnh chụp dán bảng tổ, không in lưu hành nội bộ.</li>
+<li>Mở sổ vấn đề trên cổng, ghi 1 dòng thử Mức 3 "kiểm thử luồng vấn đề" để chứng minh đã biết cách dùng.</li>
+<li>Đăng ký lịch học khoá huấn luyện ngắn buổi 1 (do Kỹ sư QMS đặt lịch trên cổng).</li>
+</ul>
 </section>
 <section class="card" id="sec-lessons">
 <h2 class="h2">Vòng rút kinh nghiệm 10 phút — neo tuần W01</h2>
 <ol class="tight">
-<li>Tuần này KPI-FLD-01 (tỉ lệ mở đúng thư mục, mốc nền) và KPI-FLD-02 (trung vị tra cứu, mốc nền) ra số bao nhiêu, có đi đúng ngưỡng không, vì sao? (đối chiếu với ANNEX-110 từ điển KPI)</li>
+<li>Tuần này KPI-FLD-01 (Định tuyến đúng thư mục ≥95%) và KPI-FLD-02 (Thời gian tra cứu ≤180 giây) — đo mốc nền ra số bao nhiêu, có đi đúng ngưỡng không, vì sao? (đối chiếu với ANNEX-110 từ điển KPI)</li>
 <li>Sổ vấn đề tuần này có dòng nào cần nâng mức theo ANNEX-117 (Mức 3 → Mức 2 hoặc Mức 2 → Mức 1) không, ai duyệt nâng mức?</li>
 <li>3 hành động tuần sau là gì, ai làm, hạn nào, và sẽ chặn cổng nào nếu trễ?</li>
 </ol>
-<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký Trưởng QMS hoặc Giám đốc.</p>
+<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.gate.signoff hoặc deploy.issues.escalated), không in giấy.</p>
 </section>
 </div>
 </div></div></div>
