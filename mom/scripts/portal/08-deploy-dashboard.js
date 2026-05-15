@@ -36,17 +36,23 @@ const DEPLOY_CONFIG = {
     {key:'golive',title:'Vận hành chính thức và chăm sóc tăng cường', owner:'Trưởng nhóm chuyển đổi', pass:'Đợt vận hành chính thức ổn định'},
     {key:'dash',  title:'Dashboard và bằng chứng',      owner:'QMS / Chủ sở hữu dữ liệu', pass:'Số liệu dashboard đáng tin'},
   ],
+  waves: [
+    {n:1, label:'Đợt 1 — Thí điểm',       weeks:'W4',    note:'Phòng QA chạy thí điểm trước (program.json W4)'},
+    {n:2, label:'Đợt 2 — Mở rộng SCM/Sales', weeks:'W5–W7', note:'SCM + Kinh doanh vào vận hành chính thức'},
+    {n:3, label:'Đợt 3 — Sản xuất',       weeks:'W8',    note:'Sản xuất + Kỹ thuật vào vận hành (rủi ro cao nhất)'},
+    {n:4, label:'Đợt 4 — Hỗ trợ + ERP',   weeks:'W9–W10',note:'Tài chính, Nhân sự, IT, EHS, Epicor (đợt cuối)'},
+  ],
   departments: [
-    {id:'PROD', label:'Sản xuất',         wave:1, color:'#1e40af', owner:'Production Director',  handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html',           docs:[{code:'SOP-501',path:'../mom/docs/operations/sops/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html'},{code:'WI-519',path:'../mom/docs/operations/work-instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html'}], record:'DEP-PRO + Job Dossier'},
-    {id:'ENG',  label:'Kỹ thuật',         wave:1, color:'#9d174d', owner:'Engineering Manager',  handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html',           docs:[{code:'SOP-303',path:'../mom/docs/operations/sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html'},{code:'WI-302',path:'../mom/docs/operations/work-instructions/03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html'}], record:'Part master + Job Dossier'},
+    {id:'PROD', label:'Sản xuất',         wave:3, color:'#1e40af', owner:'Production Director',  handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-production-handbook.html',           docs:[{code:'SOP-501',path:'../mom/docs/operations/sops/05-SOP-500/sop-501-production-planning-scheduling-and-dispatch-control.html'},{code:'WI-519',path:'../mom/docs/operations/work-instructions/05-WI-500/wi-519-job-packet-quick-check-and-pre-run-verification.html'}], record:'DEP-PRO + Job Dossier'},
+    {id:'ENG',  label:'Kỹ thuật',         wave:3, color:'#9d174d', owner:'Engineering Manager',  handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-engineering-handbook.html',           docs:[{code:'SOP-303',path:'../mom/docs/operations/sops/03-SOP-300/sop-303-engineering-release-baseline-package-and-job-snapshot-control.html'},{code:'WI-302',path:'../mom/docs/operations/work-instructions/03-WI-300/wi-302-first-piece-fai-execution-and-evidence-pack.html'}], record:'Part master + Job Dossier'},
     {id:'QA',   label:'Chất lượng',       wave:1, color:'#166534', owner:'QA Manager',           handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-quality-handbook.html',              docs:[{code:'SOP-605',path:'../mom/docs/operations/sops/06-SOP-600/sop-605-final-inspection-coc-and-shipment-release.html'},{code:'WI-201',path:'../mom/docs/operations/work-instructions/02-WI-200/wi-201-quality-gates-hold-points-and-release-execution.html'}], record:'Quality records + DEP-QA'},
     {id:'SCM',  label:'Chuỗi cung ứng',   wave:2, color:'#92400e', owner:'SCM Manager',          handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-supply-chain-handbook.html',         docs:[{code:'SOP-401',path:'../mom/docs/operations/sops/04-SOP-400/sop-401-supplier-control-and-special-process.html'},{code:'WI-701',path:'../mom/docs/operations/work-instructions/07-WI-700/wi-701-receiving-iqc-traceability-and-put-away.html'}], record:'DEP-SCM + receiving/shipping'},
     {id:'SALES',label:'Kinh doanh / CS',  wave:2, color:'#3730a3', owner:'Sales Manager',        handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-sales-and-customer-service-handbook.html', docs:[{code:'SOP-201',path:'../mom/docs/operations/sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html'},{code:'WI-203',path:'../mom/docs/operations/work-instructions/02-WI-200/wi-203-job-dossier-evidence-pack-and-record-completeness.html'}], record:'DEP-SAL + customer records'},
-    {id:'FIN',  label:'Tài chính',        wave:3, color:'#6b21a8', owner:'Finance Manager',      handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-finance-handbook.html',              docs:[{code:'SOP-803',path:'../mom/docs/operations/sops/08-SOP-800/sop-803-invoicing-job-costing-and-arap.html'}], record:'DEP-FIN + ERP SoR'},
-    {id:'HR',   label:'Nhân sự',          wave:3, color:'#9f1239', owner:'HR Manager',           handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-hr-handbook.html',                   docs:[{code:'SOP-801',path:'../mom/docs/operations/sops/08-SOP-800/sop-801-competence-training-and-certification.html'}], record:'Training records'},
-    {id:'IT',   label:'IT',               wave:3, color:'#155e75', owner:'IT Manager',           handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-it-handbook.html',                   docs:[{code:'ANNEX-113',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html'},{code:'WI-102',path:'../mom/docs/operations/work-instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html'}], record:'Digital control + access logs'},
-    {id:'EHS',  label:'EHS',              wave:3, color:'#b45309', owner:'EHS Manager',          handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-ehs-handbook.html',                  docs:[{code:'SOP-802',path:'../mom/docs/operations/sops/08-SOP-800/sop-802-incident-near-miss-and-ehs.html'}], record:'DEP-EHS + incident records'},
-    {id:'ERP',  label:'Epicor / ERP',     wave:3, color:'#0f766e', owner:'ERP Owner',            handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-epicor-handbook.html',                docs:[{code:'ANNEX-115',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html'},{code:'ANNEX-118',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html'}], record:'Epicor SoR + interface logs'},
+    {id:'FIN',  label:'Tài chính',        wave:4, color:'#6b21a8', owner:'Finance Manager',      handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-finance-handbook.html',              docs:[{code:'SOP-803',path:'../mom/docs/operations/sops/08-SOP-800/sop-803-invoicing-job-costing-and-arap.html'}], record:'DEP-FIN + ERP SoR'},
+    {id:'HR',   label:'Nhân sự',          wave:4, color:'#9f1239', owner:'HR Manager',           handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-hr-handbook.html',                   docs:[{code:'SOP-801',path:'../mom/docs/operations/sops/08-SOP-800/sop-801-competence-training-and-certification.html'}], record:'Training records'},
+    {id:'IT',   label:'IT',               wave:4, color:'#155e75', owner:'IT Manager',           handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-it-handbook.html',                   docs:[{code:'ANNEX-113',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-113-dashboard-deployment-access-and-refresh-control.html'},{code:'WI-102',path:'../mom/docs/operations/work-instructions/01-WI-100/wi-102-sharepoint-record-sites-libraries-and-permissions-click-by-click.html'}], record:'Digital control + access logs'},
+    {id:'EHS',  label:'EHS',              wave:4, color:'#b45309', owner:'EHS Manager',          handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-ehs-handbook.html',                  docs:[{code:'SOP-802',path:'../mom/docs/operations/sops/08-SOP-800/sop-802-incident-near-miss-and-ehs.html'}], record:'DEP-EHS + incident records'},
+    {id:'ERP',  label:'Epicor / ERP',     wave:4, color:'#0f766e', owner:'ERP Owner',            handbook:'../mom/docs/system/organization/02-Department-Handbooks/dept-epicor-handbook.html',                docs:[{code:'ANNEX-115',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-115-epicor-transaction-and-interface-map.html'},{code:'ANNEX-118',path:'../mom/docs/operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-118-offline-fallback-kit.html'}], record:'Epicor SoR + interface logs'},
   ],
   docsByGroup: [
     {title:'Điều phối tổng', subtitle:'Cho nhà tài trợ · ban điều phối · trưởng nhóm chuyển đổi', items:[
@@ -1087,7 +1093,7 @@ function renderTabDepartments(){
     <section class="deploy-section">
       <div class="deploy-section-head"><h2>Wave rollout</h2><span>3 wave · go-live theo thứ tự rủi ro</span></div>
       <div class="deploy-wave-grid">
-        ${[1,2,3].map(w => renderWaveColumn(w)).join('')}
+        ${(DEPLOY_CONFIG.waves || [{n:1},{n:2},{n:3},{n:4}]).map(w => renderWaveColumn(w.n)).join('')}
       </div>
     </section>
     <section class="deploy-section">
@@ -1097,7 +1103,7 @@ function renderTabDepartments(){
           <thead>
             <tr>
               <th>Phòng ban</th>
-              <th>Wave</th>
+              <th>Đợt</th>
               ${DEPLOY_CONFIG.readinessDimensions.map(dim => `<th title="${deployEscape(dim.help)}">${deployEscape(dim.label)}</th>`).join('')}
               <th>Tiến độ</th>
             </tr>
@@ -1140,9 +1146,13 @@ function renderDepartmentRosterManager(activeDepts){
 
 function renderWaveColumn(wave){
   const depts = deployActiveDepartments().filter(d => d.wave === wave);
+  const meta = (DEPLOY_CONFIG.waves || []).find(w => w.n === wave) || {label: 'Đợt ' + wave, weeks: ''};
   return `
   <div class="wave-card">
-    <div class="wave-card-head"><strong>Wave ${wave}</strong><span>${depts.length} phòng</span></div>
+    <div class="wave-card-head" title="${deployEscape(meta.note || '')}">
+      <strong>${deployEscape(meta.label)}</strong>
+      <span>${meta.weeks ? deployEscape(meta.weeks) + ' · ' : ''}${depts.length} phòng</span>
+    </div>
     <div class="wave-card-body">
       ${depts.map(d => {
         const pct = Math.round(deployDeptProgress(d.id) * 100);
@@ -1172,7 +1182,7 @@ function renderReadinessRow(dept){
         <small>${deployEscape(dept.owner)}</small>
       </div>
     </td>
-    <td><span class="deploy-wave-badge wave-${dept.wave}">Wave ${dept.wave}</span></td>
+    <td><span class="deploy-wave-badge wave-${dept.wave}" title="${deployEscape(((DEPLOY_CONFIG.waves||[]).find(w=>w.n===dept.wave)||{}).note || '')}">Đợt ${dept.wave}${(()=>{const m=(DEPLOY_CONFIG.waves||[]).find(w=>w.n===dept.wave); return m && m.weeks ? ' · '+m.weeks : '';})()}</span></td>
     ${DEPLOY_CONFIG.readinessDimensions.map(dim => {
       const v = r[dim.id] || 'pending';
       const onClick = ro ? '' : `onclick="deployCycleReadiness('${dept.id}','${dim.id}')"`;
@@ -2150,10 +2160,11 @@ function deployOpenDepartmentForm(){
       {key:'customId', label:'Mã phòng mới', type:'text', value:'', placeholder:'VD: MNT'},
       {key:'customLabel', label:'Tên phòng mới', type:'text', value:'', placeholder:'VD: Bảo trì'},
       {key:'owner', label:'Owner', type:'text', value:'', placeholder:'VD: Maintenance Manager'},
-      {key:'wave', label:'Wave', type:'select', value:'3', options:[
-        {value:'1', label:'Wave 1'},
-        {value:'2', label:'Wave 2'},
-        {value:'3', label:'Wave 3'},
+      {key:'wave', label:'Đợt triển khai', type:'select', value:'4', options:[
+        {value:'1', label:'Đợt 1 — Thí điểm (W4)'},
+        {value:'2', label:'Đợt 2 — SCM/Sales (W5–W7)'},
+        {value:'3', label:'Đợt 3 — Sản xuất (W8)'},
+        {value:'4', label:'Đợt 4 — Hỗ trợ + ERP (W9–W10)'},
       ]},
       {key:'color', label:'Màu nhận diện', type:'text', value:'#475569', placeholder:'#475569'},
       {key:'record', label:'Hồ sơ liên quan', type:'text', value:'', placeholder:'VD: DEP-MNT + PM records'},
