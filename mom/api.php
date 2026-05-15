@@ -17610,6 +17610,10 @@ case 'doc_save_draft': {
         ['resource_kind' => 'user', 'resource_id' => $username]
     );
     $me = require_logged_in($store);
+    // Past the kernel gate, the actor is authorized for the full mutation
+    // (role + active flag). Legacy code uses $isFullAdmin to permit those
+    // fields; the kernel decision now establishes that authority.
+    $isFullAdmin = true;
     if ($username === '' || !preg_match('/^[a-z0-9][a-z0-9._-]{2,32}$/', $username)) {
       api_json(['ok' => false, 'error' => 'bad_username'], 400);
     }
