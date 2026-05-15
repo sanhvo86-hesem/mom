@@ -60,6 +60,27 @@ const DEPLOY_CONFIG = {
       {code:'WI-103', title:'Định tuyến thư mục M365',     path:'../mom/docs/operations/work-instructions/01-WI-100/wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html'},
       {code:'WI-104', title:'Thẻ tham chiếu nhanh theo vai trò', path:'../mom/docs/operations/work-instructions/01-WI-100/wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html'},
       {code:'DRL-E2E', title:'Bài diễn tập đơn hàng đầu-cuối', path:'../mom/docs/training/content/03-Practice-Drills/drill-joborder-e2e.html'},
+      {code:'TRN-DEP-PLAYBOOK', title:'Kịch bản họp tuần (khung chung)', path:'../mom/docs/training/system-ops/03-Deploy-Playbook/TRN-DEP-PLAYBOOK.html'},
+    ]},
+    {title:'Thẻ A4 in cho hiện trường', subtitle:'Dán bảng tổ · 5 vai trò gần máy · in lại khi đổi người dẫn dắt', items:[
+      {code:'WI-105-CARD-OPERATOR-CNC', title:'Người vận hành CNC',  path:'../mom/docs/operations/work-instructions/01-WI-100/wi-105-card-operator-cnc.html'},
+      {code:'WI-105-CARD-SETTER',       title:'Người cài đặt máy',   path:'../mom/docs/operations/work-instructions/01-WI-100/wi-105-card-setter.html'},
+      {code:'WI-105-CARD-QC-INSPECTOR', title:'QC kiểm tra',         path:'../mom/docs/operations/work-instructions/01-WI-100/wi-105-card-qc-inspector.html'},
+      {code:'WI-105-CARD-PLANNER',      title:'Điều độ sản xuất',    path:'../mom/docs/operations/work-instructions/01-WI-100/wi-105-card-planner.html'},
+      {code:'WI-105-CARD-LEADER',       title:'Tổ trưởng',           path:'../mom/docs/operations/work-instructions/01-WI-100/wi-105-card-leader.html'},
+    ]},
+    {title:'Thẻ Thứ Hai đầu tiên theo phòng', subtitle:'Dán tại bảng tổ phòng — đổi cách làm từ ngày Thứ Hai đầu tiên của phòng', items:[
+      {code:'DEPT-MONDAY-INDEX', title:'Chỉ mục 10 phòng',  path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-index.html'},
+      {code:'DEPT-MONDAY-PROD',  title:'Phòng Sản xuất',    path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-PROD.html'},
+      {code:'DEPT-MONDAY-ENG',   title:'Phòng Kỹ thuật',    path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-ENG.html'},
+      {code:'DEPT-MONDAY-QA',    title:'Phòng Chất lượng',  path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-QA.html'},
+      {code:'DEPT-MONDAY-SCM',   title:'Phòng Chuỗi cung ứng', path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-SCM.html'},
+      {code:'DEPT-MONDAY-SALES', title:'Phòng Kinh doanh',  path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-SALES.html'},
+      {code:'DEPT-MONDAY-FIN',   title:'Phòng Tài chính',   path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-FIN.html'},
+      {code:'DEPT-MONDAY-HR',    title:'Phòng Nhân sự',     path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-HR.html'},
+      {code:'DEPT-MONDAY-IT',    title:'Phòng CNTT',        path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-IT.html'},
+      {code:'DEPT-MONDAY-EHS',   title:'Phòng EHS',         path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-EHS.html'},
+      {code:'DEPT-MONDAY-ERP',   title:'ERP / Epicor',      path:'../mom/docs/operations/work-instructions/01-WI-100/dept-monday-ERP.html'},
     ]},
     {title:'Tài liệu nền QMS', subtitle:'Sổ tay · Chính sách · Sổ tay phòng ban', items:[
       {code:'MAN-001',     title:'Sổ tay QMS',          path:'../mom/docs/system/quality-manual/qms-man-001-qms-manual.html'},
@@ -284,7 +305,10 @@ function deployStaticDocByCode(code){
       if (String(item.code || '').trim().toUpperCase() === target) return item;
     }
   }
-  if (/^TRN-DEP-W\d{2}$/i.test(target)) {
+  // Sau khi gom 12 kịch bản tuần thành 1 kịch bản chung, chỉ còn 3 tuần đánh giá
+  // (W04, W08, W12) giữ file riêng. Mọi tuần thường trỏ TRN-DEP-PLAYBOOK qua
+  // docsByGroup ở trên.
+  if (/^TRN-DEP-W(04|08|12)$/i.test(target) || /^TRN-DEP-PLAYBOOK$/i.test(target)) {
     return {
       code: target,
       path: `../mom/docs/training/system-ops/03-Deploy-Playbook/${target}.html`,
@@ -377,11 +401,11 @@ function deployRewriteDocOpenHandlers(html){
       (_m, _q1, _q2, docCode) => `onclick="deployOpenDoc(${deployInlineString(docCode)});return false;"`);
 }
 // ── Playbook fetch + cache ────────────────────────────────────────────────
-// Pulls the 12-section playbook HTML for a given doc code (TRN-DEP-W01..W12)
-// via the existing doc_stream API and parses out individual sections so the
-// week side panel can render meeting brief inline (and fullscreen mode can
-// render the full playbook). Results are cached in DeployState.playbookCache
-// to avoid re-fetching on tab switches.
+// Sau khi 12 file tuần được gom thành 1 kịch bản chung TRN-DEP-PLAYBOOK + 3 file
+// tuần đánh giá (W04, W08, W12), parser này tìm các id sec-* trong cả 2 dạng:
+//   - TRN-DEP-PLAYBOOK   : sec-prep, sec-agenda, sec-objective, sec-tasks, sec-gate
+//   - TRN-DEP-W04/08/12  : sec-cover, sec-objective, sec-tasks, sec-lessons
+// Mục nào không có id thì giữ chuỗi rỗng; renderer tự bỏ qua mục rỗng.
 async function deployFetchPlaybook(code){
   if (!code) return null;
   DeployState.playbookCache = DeployState.playbookCache || {};
@@ -458,27 +482,24 @@ async function deployHydratePlaybook(code, target){
 }
 
 function deployRenderBrief(code, data, fullscreen){
+  // Khung trích dẫn rút gọn cho phiên bản kịch bản chung + 3 tuần đánh giá.
+  // Mục nào không có nội dung (do file không có id sec-*) sẽ tự bỏ qua.
   const sections = fullscreen
     ? [
         ['cover','📌 Tổng quan buổi họp'],
-        ['objective','🎯 Mục tiêu tuần'],
+        ['objective','🎯 Mục tiêu tuần · 12 tuần khác gì'],
         ['prep','📋 Chuẩn bị trước họp (T-7 → T-0)'],
         ['agenda','📅 Chương trình họp 60 phút'],
-        ['slides','🎞 Nội dung họp · trình bày từng mục'],
-        ['decisions','✍️ Quyết định cần chốt'],
+        ['tasks','📤 Mẫu báo cáo 5 phút · bằng chứng phải có'],
         ['gate','🚦 Cổng quyết định Đi / Không đi · CẦN + ĐỦ'],
-        ['tasks','📤 Nhiệm vụ sau họp (RACI)'],
-        ['nextWeek','▶ Định hướng tuần sau'],
-        ['docs','📎 Tài liệu liên quan'],
-        ['risks','⚠ Rủi ro và đường leo thang xử lý'],
-        ['lessons','💡 Bài học rút ra'],
+        ['lessons','💡 Vòng rút kinh nghiệm 10 phút'],
       ]
     : [
         ['agenda','📅 Chương trình họp 60 phút'],
-        ['decisions','✍️ Quyết định cần chốt'],
+        ['objective','🎯 Mục tiêu tuần · 12 tuần khác gì'],
+        ['tasks','📤 Mẫu báo cáo 5 phút · bằng chứng phải có'],
         ['gate','🚦 Cổng quyết định Đi / Không đi · CẦN + ĐỦ'],
-        ['tasks','📤 Nhiệm vụ sau họp (RACI)'],
-        ['risks','⚠ Rủi ro và đường leo thang xử lý'],
+        ['lessons','💡 Vòng rút kinh nghiệm 10 phút'],
       ];
   const blocks = sections.map(([key, title]) => {
     const html = deployRewriteDocOpenHandlers(data[key]);
@@ -492,7 +513,7 @@ function deployRenderBrief(code, data, fullscreen){
   const head = `
     <div class="dwp-brief-head">
       <strong>📖 Cẩm nang ${deployEscape(code)}</strong>
-      <span>Trích từ tài liệu chính thức · ${fullscreen ? 'toàn bộ 12 mục' : '5 mục trọng yếu'} ·
+      <span>Trích từ kịch bản chung · ${fullscreen ? 'đủ các mục' : 'các mục trọng yếu'} ·
         <a href="javascript:void(0)" onclick="deployOpenDoc(${deployInlineString(code)});return false;">Mở tài liệu đầy đủ ↗</a>
       </span>
     </div>`;

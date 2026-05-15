@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DEPT-MONDAY-HR | HESEM MOM</title>
+<script>
+/* DCC Header bootstrap — computes absolute URLs from location.pathname so the DCC stylesheet and renderer load correctly. */
+(function () {
+  var DCC_VERSION = '2026-04-24-1';
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css?v=' + DCC_VERSION;
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(js);
+})();
+</script>
+<link rel="stylesheet" href="../../../../assets/style.css">
+<style>
+.monday-sheet{border:1px solid var(--ln);border-radius:8px;padding:14px;background:#fff;display:grid;gap:10px;}
+.box{border:1px solid var(--ln2);border-left:4px solid var(--blue);border-radius:8px;padding:10px 12px;background:#fcfdff;}
+.box h2{margin:0 0 6px;font-size:15px;color:var(--navy);}
+.headbox strong{display:block;font-size:24px;line-height:1.2;color:var(--navy);}
+.headbox p,.box p{margin:4px 0;line-height:1.35;}
+.box ul{margin:4px 0 0;padding-left:18px;}
+.box li{margin:4px 0;}
+.doc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.big-btn{display:flex;align-items:center;justify-content:center;min-height:58px;text-align:center;border:1px solid var(--ln);border-radius:8px;background:#f8fafc;color:var(--navy);font-weight:800;text-decoration:none;}
+@media print{@page{size:A4 portrait;margin:7mm;}body{background:#fff;margin:0;}.container,.page,.page-body{max-width:none;margin:0;padding:0;border:0;box-shadow:none;background:#fff;}.monday-sheet{border:0;padding:0;gap:6mm;}.box{break-inside:avoid;padding:7px 9px;}.box li,.box p,.big-btn{font-size:14pt;}.dcc-header{break-inside:avoid;}}
+</style>
+</head>
+<body>
+<div class="container"><div class="page"><div class="page-body">
+<div class="dcc-header" data-dcc-doc-code="DEPT-MONDAY-HR" data-dcc-locale="vi" data-dcc-logo="../../../../assets/hesem-logo.svg" data-dcc-bootstrap='{"header":{"doc_code":"DEPT-MONDAY-HR","title":"Thẻ Thứ Hai đầu tiên - Phòng Nhân sự","subtitle":"Từ Thứ Hai 2026-07-20, phòng Nhân sự đổi cách kiểm năng lực, OJT và người dẫn dắt.","doc_type":"REF","revision":"V0","effective_date":"2026-07-20","owner_role_code":"HR","approver_role_code":"CEO","iso_clause":null,"status":"released"},"labels":{"doc_id":{"short":"Mã","long":"Mã tài liệu","sort":10},"revision":{"short":"Rev","long":"Phiên bản","sort":20},"effective_date":{"short":"Hiệu lực","long":"Ngày hiệu lực","sort":30},"owner":{"short":"Chủ trì","long":"Người phụ trách","sort":40},"approver":{"short":"Duyệt","long":"Người phê duyệt","sort":50}}}'></div>
+<main class="monday-sheet">
+<section class="box headbox"><strong>PHÒNG NHÂN SỰ</strong><p>Ngày Thứ Hai của phòng bạn là 2026-07-20.</p><small>Dán tại bảng tổ. In lại khi đổi người dẫn dắt.</small></section>
+<section class="box"><h2>3 việc thay đổi</h2><ul><li>Nhân sự kiểm năng lực trước khi cho đứng máy.</li><li>HR lấy chữ ký OJT ngay trong ca đào tạo.</li><li>Nhân sự cập nhật người dẫn dắt khi đổi vai.</li></ul></section>
+<section class="box"><h2>3 tài liệu tôi mở mỗi ca</h2><div class="doc-grid"><a class="big-btn" href="../../sops/08-SOP-800/sop-801-competence-training-and-certification.html">SOP-801<br>năng lực và đào tạo</a><a class="big-btn" href="wi-103-m365-folder-routing-training-competence-and-adoption-for-cnc-job-orders.html">WI-103<br>định tuyến M365</a><a class="big-btn" href="wi-104-m365-folder-routing-quick-cards-by-role-for-cnc-job-order.html">WI-104<br>thẻ nhanh</a></div></section>
+<section class="box"><h2>Người dẫn dắt phòng tôi</h2><p>Bùi Thị Bích · 0974 864 113</p><p>[CHƯA CÓ — gọi Trưởng phòng]</p></section>
+<section class="box"><h2>Khi mất mạng</h2><p>Mở phong bì giấy ca trưởng đã chuẩn bị (xem ANNEX-118).</p><p>Gọi Trực kỹ thuật: ____</p></section>
+<section class="box"><h2>Khi nào bắt buộc dừng</h2><ul><li>Người chưa đủ năng lực đứng máy</li><li>Đào tạo OJT chưa ký</li><li>Sự cố lao động</li></ul></section>
+</main>
+</div></div></div>
+</body>
+</html>

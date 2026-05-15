@@ -2,12 +2,10 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
-<meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>TRN-DEP-W08 — Kế hoạch tuần 08: Chăm sóc sau triển khai khối Sản xuất (2026-07-04) | HESEM MOM</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRN-DEP-W08 — Đánh giá vận hành chính thức Sản xuất | HESEM MOM</title>
 <script>
-/* DCC Header bootstrap — copy verbatim from TRN-OPS-09 pattern.
- * Computes absolute URLs so the stylesheet + renderer load correctly
- * regardless of how the document is served (direct, portal iframe, …). */
+/* DCC Header bootstrap */
 (function () {
   var DCC_VERSION = '2026-04-24-1';
   var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
@@ -22,223 +20,57 @@
   document.head.appendChild(js);
 })();
 </script>
-<link href="../../../../assets/style.css" rel="stylesheet">
+<link rel="stylesheet" href="../../../../assets/style.css">
 <style>
- .role-chip{display:inline-block;padding:2px 8px;border-radius:999px;background:#f3f4f6;margin:2px 6px 2px 0;font-size:12px}
- .tight li{margin:2px 0}
- .pending-fill{background:#fef3c7;border-left:4px solid #f59e0b;padding:12px 16px;border-radius:8px;color:#78350f;margin:12px 0;font-size:13px}
- .pending-fill strong{color:#92400e;font-weight:700}
- .pending-fill code{background:rgba(146,64,14,.10);padding:1px 5px;border-radius:4px;font-size:12px}
- table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; }
- td,th { word-wrap:break-word; overflow-wrap:break-word; padding:8px 10px; border:1px solid #e2e8f0; vertical-align:top; }
- th { background:#f1f5f9; text-align:left; font-weight:700; }
+ table{width:100%;border-collapse:collapse;table-layout:fixed}
+ th,td{border:1px solid #e2e8f0;padding:8px 10px;vertical-align:top;overflow-wrap:anywhere}
+ th{background:#f1f5f9;text-align:left}
+ .tight li{margin:4px 0}
 </style>
 </head>
 <body>
 <div class="container"><div class="page"><div class="page-body">
-
-<!-- DCC Document Change Control header (preview seed; live values served by /api/v1/dcc) -->
 <div class="dcc-header"
      data-dcc-doc-code="TRN-DEP-W08"
      data-dcc-locale="vi"
      data-dcc-logo="../../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap='{"header":{"doc_code":"TRN-DEP-W08","title":"Kế hoạch tuần 08 — Chăm sóc sau triển khai khối Sản xuất — Tuần 2","subtitle":"Triển khai vận hành QMS · Giai đoạn P3 · 2026-07-04 (Thứ Bảy)","doc_type":"TRN","revision":"V0","effective_date":"2026-07-04","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":null,"status":"draft"}}'></div>
-
+     data-dcc-bootstrap='{"header":{"doc_code":"TRN-DEP-W08","title":"Đánh giá vận hành chính thức Sản xuất","subtitle":"Triển khai vận hành · Giai đoạn P3 · 2026-07-04","doc_type":"TRN","revision":"V0","effective_date":"2026-07-04","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":null,"status":"released"}}'></div>
 <div class="doc-content" id="docContent">
-
 <section class="card" id="sec-cover">
-  <h1 class="h2" style="margin-top:0;">W08 · 2026-07-04 — Chăm sóc sau triển khai khối Sản xuất — Tuần 2</h1>
-  <p class="lead">W08 chuyển khối Sản xuất từ trạng thái vừa đưa vào vận hành chính thức sang nhịp vận hành bình thường có bằng chứng. Mục tiêu không phải ăn mừng sớm mà là đóng giai đoạn chăm sóc sau triển khai theo điều kiện: Sev-1 = 0 trong 5 ngày làm việc liên tiếp, tỷ lệ đóng bảng vấn đề trong ngày ≥95% trong 24 giờ, dây báo dừng Andon được dùng đúng mỗi ngày, KPI-FLD-01 đạt ≥95% cho nhóm đo KPI 60+ người và PIR được QA_MGR + PROD_DIR + 11 hạt nhân triển khai ký. Cách điều hành dựa trên kèm cặp Toyota Kata (Rother 2009), ISO 9001:2015 §9.1.3, ITIL 4 Post-Implementation Review và NIST SP 800-53 AU/CM cho vết đánh giá.</p>
-  <div class="grid-3">
-    <div class="note"><b>Ngày</b><br>2026-07-04</div>
-    <div class="note"><b>Thứ</b><br>Thứ Bảy · 09:00-10:00</div>
-    <div class="note"><b>Giai đoạn</b><br>P3 · Quyết định đóng chăm sóc sau triển khai</div>
-    <div class="note"><b>Trụ cột</b><br>vận hành chính thức · bằng chứng · ổn định hóa</div>
-    <div class="note"><b>Thành phần</b><br>đại diện Sản xuất, Kỹ thuật, QA, QMS, IT, HR và hạt nhân đại diện các khu vực trọng yếu · khoảng 14-18 người; không triệu tập toàn bộ nhóm đo KPI hoặc 80 nhân sự</div>
-    <div class="note"><b>Chủ trì</b><br>PROD_DIR + QA_MGR; QMS_MGR điều phối cửa P3-03 tiếp diễn</div>
-  </div>
-  <p>Vì văn hóa nể cấp trên dễ làm người vận hành ngại báo lỗi, cuộc họp yêu cầu dữ liệu đi trước nhận xét. PROD_DIR báo cáo trạng thái, QA_MGR xác minh bằng chứng, hạt nhân triển khai trình bày mẫu vấn đề lặp lại, CEO chỉ kết luận sau khi nghe đủ dữ liệu và ý kiến bằng văn bản.</p>
+<h1 class="h2">W08 · 2026-07-04 · P3 · Đánh giá đưa Sản xuất vào vận hành chính thức</h1>
+<p>Giám đốc Sản xuất dùng cuộc họp này để chứng minh Sản xuất và Kỹ thuật vận hành theo hồ sơ lệnh sản xuất, không theo bản in rời hoặc trí nhớ.</p>
 </section>
-
 <section class="card" id="sec-objective">
-  <h2 class="h2">Mục tiêu tuần 08</h2>
-  <ol class="tight">
-    <li><b>Chuỗi Sev-1 đạt điều kiện đóng:</b> khối Sản xuất có Sev-1 = 0 trong 5 ngày làm việc liên tiếp trước 2026-07-04 09:45; nếu chuỗi bị phá vào 2026-07-03 thì chưa đóng chăm sóc sau triển khai vào 2026-07-07.</li>
-    <li><b>Bảng vấn đề trong ngày vận hành đúng:</b> ≥95% mục vấn đề được đóng hoặc có biện pháp khoanh vùng trong 24 giờ; mục mở quá 24 giờ phải có người chịu trách nhiệm, thời hạn và liên kết CAPA.</li>
-    <li><b>KPI-FLD-01 đạt mục tiêu đầy đủ:</b> nhóm đo KPI của Sản xuất gồm 60+ người mở đúng tài liệu/thư mục ≥95%, đo bằng bài diễn tập tra cứu ngẫu nhiên theo ANNEX-110; đây là mẫu đo năng lực sử dụng tài liệu, không phải danh sách người tham dự họp.</li>
-    <li><b>Dây báo dừng Andon được dùng đúng mỗi ngày:</b> ≥1 lượt kéo đúng/ngày trong 2026-06-30..2026-07-03; đường báo cáo vượt cấp phải đóng đúng, không biến Andon thành kênh báo lỗi nhỏ.</li>
-    <li><b>PIR đóng chăm sóc sau triển khai ký đủ:</b> QA_MGR + PROD_DIR + 11 hạt nhân triển khai ký mẫu, xác nhận bàn giao ca ≥90% và CAPA tồn ≤5 mục mở, 0 mục quá hạn >30 ngày.</li>
-  </ol>
-  <div class="table-card"><table class="table"><thead><tr><th>KPI</th><th>Mốc từ W07</th><th>Mục tiêu W08</th><th>Nguồn bằng chứng</th></tr></thead><tbody>
-    <tr><td>KPI-FLD-01</td><td>W07 yêu cầu ≥90%</td><td>≥95% nhóm đo KPI 60+ người</td><td>nhật ký diễn tập tra cứu + ANNEX-110</td></tr>
-    <tr><td>KPI-FLD-02</td><td>Trung vị ≤180 giây</td><td>Trung vị ≤160 giây; p90 ≤240 giây</td><td>readiness.json kpiValues</td></tr>
-    <tr><td>KPI-DEP-02</td><td>Vấn đề có người chịu trách nhiệm/hạn hoàn tất trong 24 giờ</td><td>Đóng bảng vấn đề ≥95%</td><td>issues.json + dữ liệu xuất từ bảng</td></tr>
-    <tr><td>KPI-DEP-03</td><td>Lỗi thay đổi ≤10%</td><td>0 lần quay lui khẩn cấp sau kế hoạch vận hành v1.1</td><td>nhật ký thay đổi + biên bản ECAB</td></tr>
-    <tr><td>KPI-DEP-05</td><td>Bảng điều hành hằng ngày trước 17:00</td><td>Tỷ lệ cập nhật đúng hạn ≥95% trong W07-W08</td><td>dấu thời gian readiness.json</td></tr>
-    <tr><td>KPI-DEP-07</td><td>MTTR Sev-1 ≤24 giờ</td><td>Trung vị trượt ≤24 giờ; số Sev-1 W08 = 0</td><td>dòng thời gian sự cố + bảng CAPA</td></tr>
-  </tbody></table></div>
-  <div class="note-blue">
-    <p><b>Ghi chú vận hành cho W08:</b> Đóng chăm sóc sau triển khai là quyết định quản trị rủi ro, không phải phần thưởng cho đội đã làm việc vất vả. Cửa quyết định chỉ có ý nghĩa khi phân biệt được ba trạng thái: Đi tiếp nghĩa là đủ điều kiện đóng bàn điều phối ngày 2026-07-07; Ở lại nghĩa là tiếp tục chăm sóc sau triển khai vì thiếu điều kiện cần; Đi tiếp có điều kiện nghĩa là có thể giảm một phần nhịp vận hành nhưng vẫn giữ người chịu trách nhiệm cho điểm chặn, hạn hoàn tất và rà soát hằng ngày. QMS_MGR phải ghi rõ trạng thái trên mẫu quyết định cửa; không dùng lời né trách nhiệm nếu không có ngưỡng. Với chuỗi Sev-1, ngày nào có Sev-1 rồi đóng nhanh vẫn làm lại bộ đếm. Với bảng vấn đề, mục chỉ được tính là đóng nếu biện pháp khoanh vùng đã được xác minh hoặc hành động khắc phục đã giao người chịu trách nhiệm; ghi chú “đã nhắc đội” là không đủ. Với Andon, lượt kéo đúng nghĩa là dấu hiệu kích hoạt đúng ngưỡng, người nhận đúng vai trò, khoanh vùng đúng hạn; kéo nhầm nhiều lần cũng là tín hiệu cần kèm cặp, không phải lý do tắt Andon.</p>
-    <p>QMS_ENG cần tách dữ liệu theo khu vực, theo ca và theo loại người dùng. Nếu bài diễn tập tra cứu chỉ lấy hạt nhân triển khai thì KPI-FLD-01/KPI-FLD-02 sẽ đẹp giả; nhóm đo KPI 60+ người phải có mẫu người vận hành không phải hạt nhân triển khai, nhưng cuộc họp W08 chỉ mời đại diện có trách nhiệm ra quyết định. Nếu tỷ lệ đóng vấn đề đạt 95% nhưng tất cả mục khó bị chuyển sang CAPA không có hạn, cửa quyết định vẫn chưa đủ. Nếu CAPA tồn ≤5 nhưng có 1 CAPA quá 30 ngày, W08 không được đóng chăm sóc sau triển khai vì điều kiện đủ đã không đạt. Đây là điểm ISO 9001:2015 §10.2/§10.3 nối với Toyota Kata: vấn đề phải được nhìn thấy, thử nghiệm đối sách nhỏ, kiểm tra hiệu lực và cập nhật công việc chuẩn nếu đối sách tốt. Mục tiêu sau W08 là người vận hành tự thấy nhịp bình thường, không còn phụ thuộc vào nỗ lực cá nhân của đội trực hỗ trợ.</p>
-    <p>Về con người, HR_MGR phải quan sát dấu hiệu quá tải của hạt nhân triển khai. Nếu hạt nhân triển khai mệt, chất lượng ghi vấn đề sẽ giảm trước khi KPI đỏ xuất hiện; vì vậy nghỉ bù và kích hoạt người dự phòng là một kiểm soát vận hành, không phải phúc lợi tùy ý. PROD_DIR cũng phải giữ cách nói “hệ thống đang học” thay vì “ai làm sai”, nhất là khi người vận hành hoặc hạt nhân triển khai phải thừa nhận khu vực mình vẫn dùng bản in cũ. Cấp trên phát biểu sau cùng trong phần hồi cứu, còn phiếu ghi ý kiến ẩn danh và trao đổi 1:1 được dùng để thu tín hiệu mà cuộc họp đông người không lấy được.</p>
-  </div>
+<h2 class="h2">3 câu hỏi đánh giá riêng</h2>
+<ol class="tight">
+<li>Tổ trưởng có chứng minh mỗi lệnh sản xuất mở đúng SOP-501, WI-519, SOP-303 và WI-302 trước khi chạy máy không?</li>
+<li>Người cài đặt máy có chặn sai phiên bản bản vẽ, chương trình NC không rõ nguồn và mẫu đầu chưa ký không?</li>
+<li>Trưởng QA có đủ dữ liệu để xác nhận Sản xuất được tiếp tục vận hành chính thức sau tuần này không?</li>
+</ol>
 </section>
-
-<section class="card" id="sec-prep">
-  <h2 class="h2">Danh mục chuẩn bị — T-7 / T-3 / T-1 / T-0</h2>
-  <div class="table-card"><table class="table"><thead><tr><th>Mốc</th><th>Vai trò</th><th>Việc cần làm</th><th>Bằng chứng</th><th>Hạn hoàn tất</th></tr></thead><tbody>
-    <tr><td>T-7 · 2026-06-27</td><td>PROD_DIR</td><td>Công bố điều kiện đóng W08 bằng số: chuỗi Sev-1, tỷ lệ đóng vấn đề, Andon/ngày, hoàn tất bàn giao ca, CAPA tồn.</td><td>nhịp ANNEX-118</td><td>2026-06-27 17:00</td></tr>
-    <tr><td>T-7 · 2026-06-27</td><td>QA_MGR</td><td>Khóa mẫu PIR cho quyết định đóng chăm sóc sau triển khai; các ô bắt buộc gồm nguyên nhân gốc, khoanh vùng, kiểm tra hiệu lực và chữ ký 11 hạt nhân triển khai.</td><td>bản nháp mẫu PIR</td><td>2026-06-27 17:30</td></tr>
-    <tr><td>T-7 · 2026-06-27</td><td>QMS_ENG</td><td>Làm mới bảng điều hành W08 để tách dữ liệu tuần 1 vận hành chính thức và tuần 2 chăm sóc sau triển khai, tránh lấy trung bình che việc chuỗi Sev-1 bị phá.</td><td>cấu trúc readiness.json</td><td>2026-06-27 18:00</td></tr>
-    <tr><td>T-7 · 2026-06-27</td><td>HR_MGR</td><td>Chốt phòng họp và danh sách huấn luyện tập trung hạt nhân triển khai đợt 3 lúc 2026-06-30 14:00.</td><td>lịch training_records</td><td>2026-06-27 18:30</td></tr>
-    <tr><td>T-3 · 2026-07-01</td><td>QA_MGR</td><td>Trao đổi nhanh 1:1 với 11 hạt nhân triển khai theo khu vực; hỏi vấn đề nào người vận hành không dám nói ở họp đứng.</td><td>nhật ký trao đổi hạt nhân triển khai</td><td>2026-07-01 11:00</td></tr>
-    <tr><td>T-3 · 2026-07-01</td><td>PROD_CHAMPION</td><td>Kiểm bảng vấn đề trong ngày: mục quá 24 giờ, mục lặp lại, mục cần CAPA.</td><td>dữ liệu xuất từ bảng</td><td>2026-07-01 12:00</td></tr>
-    <tr><td>T-3 · 2026-07-01</td><td>ENG_MGR</td><td>Đánh giá CAD/CAM chạy song song; nếu không còn lỗi phiên bản, chuẩn bị đề xuất tắt hệ cũ cho 2026-07-07.</td><td>ghi nhớ SOP-303</td><td>2026-07-01 15:00</td></tr>
-    <tr><td>T-3 · 2026-07-01</td><td>IT_MGR</td><td>Kiểm nhanh độ trễ cổng tài liệu tại 7 khu vực, đo bằng thiết bị tại xưởng, không dùng máy văn phòng.</td><td>nhật ký độ trễ</td><td>2026-07-01 16:00</td></tr>
-    <tr><td>T-1 · 2026-07-03</td><td>QMS_ENG</td><td>Tập hợp gói bằng chứng đóng chăm sóc sau triển khai: chuỗi Sev-1, bảng vấn đề 5 ngày, Andon/ngày, KPI-FLD-01/02, MTTR, CAPA.</td><td>gói bằng chứng W08</td><td>2026-07-03 16:00</td></tr>
-    <tr><td>T-1 · 2026-07-03</td><td>PROD_DIR</td><td>Đề xuất nhịp vận hành sau chăm sóc dựa trên xu hướng dữ liệu, không dựa trên việc đội đã mệt.</td><td>bản ghi nhớ nhịp vận hành</td><td>2026-07-03 16:30</td></tr>
-    <tr><td>T-1 · 2026-07-03</td><td>QA_MGR</td><td>Kiểm CAPA tồn; điểm chặn là CAPA quá 30 ngày hoặc CAPA không có người chịu trách nhiệm.</td><td>dữ liệu xuất CAPA</td><td>2026-07-03 17:00</td></tr>
-    <tr><td>T-1 · 2026-07-03</td><td>HR_MGR</td><td>Xác nhận tham dự huấn luyện tập trung đợt 3 và mức sẵn sàng của người dự phòng.</td><td>training_records</td><td>2026-07-03 17:30</td></tr>
-    <tr><td>T-0 · 2026-07-04</td><td>QMS_MGR</td><td>Kiểm phiếu cửa quyết định: nếu chuỗi Sev-1 thiếu 5 ngày, trang cửa phải ghi Ở lại.</td><td>phiếu kiểm cửa quyết định</td><td>2026-07-04 08:30</td></tr>
-    <tr><td>T-0 · 2026-07-04</td><td>PROD_DIR</td><td>Chuẩn bị phần mở đầu: mục tiêu là nhịp ổn định, không kể công nỗ lực cá nhân.</td><td>kịch bản mở đầu</td><td>2026-07-04 08:40</td></tr>
-    <tr><td>T-0 · 2026-07-04</td><td>QA_MGR</td><td>Đối chiếu chữ ký PIR đủ QA_MGR + PROD_DIR + 11 hạt nhân triển khai hoặc có kích hoạt người dự phòng hợp lệ.</td><td>mẫu PIR</td><td>2026-07-04 08:50</td></tr>
-    <tr><td>T-0 · 2026-07-04</td><td>IT_MGR</td><td>Mở thử ANNEX-117, ANNEX-110, SOP-501, WI-519 trên cổng tài liệu phòng họp và thiết bị tại xưởng.</td><td>kiểm tra cổng tài liệu</td><td>2026-07-04 08:55</td></tr>
-  </tbody></table></div>
-</section>
-
-<section class="card" id="sec-agenda">
-  <h2 class="h2">Chương trình họp · 09:00-10:00 (60 phút)</h2>
-  <div class="table-card"><table class="table"><thead><tr><th>Thời gian</th><th>Phút</th><th>Đề mục</th><th>Chủ trì</th><th>Kết quả cần chốt</th></tr></thead><tbody>
-    <tr><td>09:00-09:08</td><td>8</td><td>Tóm tắt tuần 2 chăm sóc sau triển khai: đã bình thường hóa chưa, còn phụ thuộc nỗ lực cá nhân không</td><td>PROD_DIR</td><td>Trạng thái Đi tiếp/Ở lại theo điều kiện đóng</td></tr>
-    <tr><td>09:08-09:18</td><td>10</td><td>Chuỗi Sev-1 và xu hướng sự cố</td><td>QA_MGR</td><td>Bộ đếm 5 ngày có dấu thời gian</td></tr>
-    <tr><td>09:18-09:31</td><td>13</td><td>Phân tích bảng vấn đề trong ngày</td><td>QMS_ENG</td><td>Đóng ≥95% hoặc danh sách điểm chặn</td></tr>
-    <tr><td>09:31-09:40</td><td>9</td><td>Cách dùng Andon và nhận định kèm cặp Toyota Kata</td><td>PROD_CHAMPION</td><td>≥1 lượt kéo đúng/ngày</td></tr>
-    <tr><td>09:40-09:48</td><td>8</td><td>Ảnh chụp KPI</td><td>QMS_MGR</td><td>So sánh W07-W08</td></tr>
-    <tr><td>09:48-09:55</td><td>7</td><td>Quyết định đóng chăm sóc sau triển khai</td><td>CEO + QMS_MGR + PROD_DIR</td><td>Quyết định cửa được ký</td></tr>
-    <tr><td>09:55-10:00</td><td>5</td><td>Chuẩn bị W09 khởi động đợt 3</td><td>HR_MGR</td><td>Chuẩn bị đợt 3 không bị kéo trễ</td></tr>
-  </tbody></table></div>
-</section>
-
-<section class="card" id="sec-slides">
-  <h2 class="h2">Nội dung họp tuần 08 — từng trang trình bày</h2>
-  <div class="card"><h3>Trang 1 — Dòng thời gian Sev-1 theo ngày</h3><p>Hiển thị 5 ngày làm việc theo từng ô ngày, không dùng đường trung bình. Mỗi ngày có Sev-1, Sev-2, biện pháp khoanh vùng đầu tiên, người chịu trách nhiệm và trạng thái cuối ngày. Nếu một ngày có Sev-1 rồi đóng nhanh, chuỗi vẫn bị làm lại; đây là kỷ luật PIR theo ITIL, không phải đánh giá cá nhân.</p></div>
-  <div class="card"><h3>Trang 2 — Bộ đếm trượt Sev-1</h3><p>QA_MGR giải thích bộ đếm bắt đầu khi không còn Sev-1 mở và không có ảnh hưởng khách hàng/quy định pháp lý chưa được khoanh vùng. Nếu bộ đếm chưa đạt, quyết định mặc định là Ở lại, không tranh luận cảm tính. ISO 9001:2015 §10.2 yêu cầu xử lý sự không phù hợp bằng hành động khắc phục.</p></div>
-  <div class="card"><h3>Trang 3 — Đóng bảng vấn đề</h3><p>QMS_ENG trình bày tổng số mục, mục đóng trong 24 giờ, mục chuyển CAPA, mục mở lại. Mục đóng bằng câu “đã nhắc lại đội” không được tính là đóng nếu không có khoanh vùng hoặc thay đổi công việc chuẩn.</p></div>
-  <div class="card"><h3>Trang 4 — 5 nhóm vấn đề lớn nhất</h3><p>Nhóm lỗi: truy cập tài liệu, sai phiên bản, tuổi dao, bàn giao ca, xuất dữ liệu CAD/CAM. Toyota Kata yêu cầu hỏi điều kiện mục tiêu trước khi nêu giải pháp; mỗi nhóm có mục tiêu cụ thể cho 2026-07-07.</p></div>
-  <div class="card"><h3>Trang 5 — Cách dùng Andon</h3><p>Andon tốt là thấy vấn đề sớm, không phải kéo càng nhiều càng hay. Trang này hiển thị số lượt/ngày, thời gian xác nhận, thời gian khoanh vùng và số lượt báo nhầm. Nếu 0 lượt kéo nhưng bảng vấn đề có nhiều mục nghiêm trọng, khả năng đang dùng thiếu là cao.</p></div>
-  <div class="card"><h3>Trang 6 — Đường xu hướng KPI-FLD-01</h3><p>QMS_MGR trình bày tiến bộ từ thí điểm QA đến khối Sản xuất, tách hạt nhân triển khai và người vận hành để tránh số đẹp giả. Mục tiêu W08 là ≥95% cho nhóm đo KPI 60+ người, không phải số người ngồi trong buổi họp.</p></div>
-  <div class="card"><h3>Trang 7 — KPI-FLD-02 trung vị/p90</h3><p>Trung vị ≤160 giây chưa đủ nếu p90 >300 giây tại khu vực trọng yếu. IT_MGR giải thích độ trễ hoặc vấn đề quyền truy cập bằng dấu thời gian, không nói chung chung là mạng chậm.</p></div>
-  <div class="card"><h3>Trang 8 — MTTR Sev-1</h3><p>Đồng hồ bắt đầu khi vấn đề Sev-1 được ghi hoặc xác nhận dừng Sản xuất, dừng khi biện pháp khoanh vùng được xác minh và người chịu trách nhiệm ký. Kiểm tra hiệu lực CAPA không trộn vào MTTR nhưng vẫn phải có thời hạn.</p></div>
-  <div class="card"><h3>Trang 9 — Bảng theo dõi hạt nhân triển khai</h3><p>Bảng 11 khu vực gồm tham dự, kèm cặp, ghi vấn đề, kỷ luật báo cáo vượt cấp và kích hoạt người dự phòng. Đây không phải bảng xếp hạng cá nhân; mục tiêu là phát hiện khu vực thiếu hỗ trợ hoặc hạt nhân triển khai quá tải.</p></div>
-  <div class="card"><h3>Trang 10 — Hoàn tất bàn giao ca</h3><p>Bàn giao ca chứng minh hệ thống đã vào nhịp. Trang này hiển thị 3 ca × 10 ngày từ W07-W08, tỷ lệ hoàn tất, trường bị thiếu và vấn đề lặp lại. Trường “rủi ro ca sau” là trường trọng yếu.</p></div>
-  <div class="card"><h3>Trang 11 — Danh mục kiểm đóng chăm sóc sau triển khai</h3><p>Danh mục gồm chuỗi Sev-1, đóng vấn đề, Andon/ngày, kèm cặp tại chỗ cho hạt nhân triển khai, bàn giao ca, CAPA tồn. QMS_MGR đọc từng dòng, QA_MGR xác nhận bằng chứng, PROD_DIR xác nhận thực tế vận hành.</p></div>
-  <div class="card"><h3>Trang 12 — Chuẩn bị W09</h3><p>HR_MGR nhận phần việc tiếp theo: đợt 3 gồm HR, FIN, IT, EHS, EPICOR_ADMIN. Nhóm nhỏ hơn nhưng trọng yếu cho kinh doanh. PROD_DIR và ENG_MGR chỉ cung cấp trạng thái chuyển tiếp để tránh làm trễ đợt 3.</p></div>
-</section>
-
-<section class="card" id="sec-decisions">
-  <h2 class="h2">Quyết định cần lấy trong cuộc họp này</h2>
-  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Quyết định</th><th>Người ký</th><th>Cơ sở</th><th>Phương án nếu phải hoãn</th></tr></thead><tbody>
-    <tr><td>1</td><td>Đóng chăm sóc sau triển khai: đóng thứ Ba 2026-07-07 hay kéo dài thêm 1 tuần.</td><td>CEO + QMS_MGR + PROD_DIR</td><td>P3-03 tiếp diễn, chuỗi Sev-1, PIR</td><td>Nếu thiếu chuỗi 5 ngày, Ở lại đến 2026-07-14.</td></tr>
-    <tr><td>2</td><td>Nhịp sau chăm sóc: hằng ngày, cách ngày hoặc theo tầng hằng tuần.</td><td>PROD_DIR + QA_MGR</td><td>Xu hướng bảng vấn đề, bảng theo dõi hạt nhân triển khai</td><td>Nếu đóng &lt;95%, giữ đi hiện trường hằng ngày.</td></tr>
-    <tr><td>3</td><td>Xác nhận ngày vận hành chính thức đợt 3 là 2026-07-13.</td><td>HR_MGR + QMS_MGR</td><td>Danh sách huấn luyện tập trung, quyền M365</td><td>Đạt &lt;90% thì Đi tiếp có điều kiện.</td></tr>
-    <tr><td>4</td><td>Phân loại CAPA tồn: đóng, chuyển tiếp, báo cáo vượt cấp.</td><td>QA_MGR + QMS_MGR</td><td>bảng CAPA, ISO §10.2</td><td>Quá hạn >30 ngày chặn quyết định đóng.</td></tr>
-    <tr><td>5</td><td>Đề xuất tắt hệ chạy song song của Kỹ thuật.</td><td>ENG_MGR + PROD_DIR</td><td>ghi nhớ SOP-303, số lỗi phiên bản</td><td>Nếu lỗi phiên bản >2, kéo đến 2026-07-10.</td></tr>
-  </tbody></table></div>
-</section>
-
-<section class="card" id="sec-gate">
-  <h2 class="h2">Cửa quyết định Đi tiếp/Dừng — Điều kiện CẦN và ĐỦ</h2>
-  <h3>Điều kiện CẦN</h3>
-  <div class="table-card"><table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Ngưỡng</th><th>Bằng chứng</th></tr></thead><tbody>
-    <tr><td>Chuỗi Sev-1</td><td>Lọc vấn đề sev=1 theo ngày</td><td>0 Sev-1 trong ≥5 ngày làm việc liên tiếp</td><td>issues.json + dòng thời gian sự cố</td></tr>
-    <tr><td>Đóng vấn đề</td><td>Đếm mục đã đóng/đã khoanh vùng trong 24 giờ</td><td>≥95%</td><td>dữ liệu xuất từ bảng + bảng CAPA</td></tr>
-    <tr><td>Andon dùng đúng</td><td>Đếm lượt kéo/ngày, thời gian xác nhận</td><td>≥1 lượt kéo đúng/ngày, QA_MGR ≤5 phút</td><td>nhật ký sự kiện Andon</td></tr>
-    <tr><td>Hạt nhân triển khai đạt kèm cặp tại chỗ</td><td>11 người chính ký hoặc kích hoạt dự phòng hợp lệ</td><td>≥10/11 người chính hoặc có dự phòng được ghi nhận</td><td>champions.json</td></tr>
-    <tr><td>Bàn giao ca</td><td>Đếm 3 ca × 5 ngày</td><td>Hoàn tất ≥90%; trường trọng yếu ≥95%</td><td>sổ bàn giao ca</td></tr>
-  </tbody></table></div>
-  <h3>Điều kiện ĐỦ</h3>
-  <div class="table-card"><table class="table"><thead><tr><th>Điều kiện</th><th>Cách đo</th><th>Ngưỡng</th><th>Bằng chứng</th></tr></thead><tbody>
-    <tr><td>KPI-FLD-01</td><td>Nhóm diễn tập tra cứu ngẫu nhiên 60+</td><td>≥95%</td><td>nhật ký diễn tập + ANNEX-110</td></tr>
-    <tr><td>KPI-DEP-07</td><td>Trung vị trượt MTTR Sev-1</td><td>≤24 giờ; số Sev-1 W08 = 0</td><td>dòng thời gian sự cố</td></tr>
-    <tr><td>CAPA tồn</td><td>Đếm mở/quá hạn</td><td>≤5 mở; 0 quá hạn >30 ngày</td><td>bảng CAPA</td></tr>
-    <tr><td>PIR đã ký</td><td>Kiểm chữ ký và ý kiến không đồng thuận</td><td>QA_MGR + PROD_DIR + 11 hạt nhân triển khai đã ký</td><td>mẫu PIR</td></tr>
-    <tr><td>Sự kiện đánh giá</td><td>Kiểm tên sự kiện</td><td>wave_production_hypercare_exit_go hoặc wave_production_hypercare_exit_cond</td><td>audit_events</td></tr>
-  </tbody></table></div>
-</section>
-
 <section class="card" id="sec-tasks">
-  <h2 class="h2">Phân công nhiệm vụ sau họp · RACI · hạn hoàn tất</h2>
-  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Nhiệm vụ</th><th>R</th><th>A</th><th>C</th><th>I</th><th>Hạn hoàn tất</th><th>Bằng chứng</th><th>KPI</th></tr></thead><tbody>
-    <tr><td>1</td><td>Nếu cửa quyết định là Đi tiếp, đóng bàn điều phối vào thứ Ba 2026-07-07 17:00.</td><td>PROD_DIR</td><td>CEO</td><td>QMS_MGR</td><td>Đại diện các phòng ban</td><td>2026-07-07 17:00</td><td>mgmt-reviews.json</td><td>KPI-DEP-05</td></tr>
-    <tr><td>2</td><td>Nếu Ở lại, công bố kế hoạch kéo dài đến 2026-07-14.</td><td>QMS_MGR</td><td>CEO</td><td>QA_MGR</td><td>PROD_DIR</td><td>2026-07-04 17:00</td><td>bản ghi nhớ kéo dài</td><td>KPI-DEP-02</td></tr>
-    <tr><td>3</td><td>Lưu dữ liệu chăm sóc sau triển khai vào ANNEX-117.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>QA_MGR</td><td>CEO</td><td>2026-07-08 17:00</td><td>ANNEX-117</td><td>KPI-DEP-05</td></tr>
-    <tr><td>4</td><td>Cập nhật WI-519 với 3 bài học về tuổi dao nếu có thiếu sót lặp lại.</td><td>ENG_MGR</td><td>QMS_MGR</td><td>PROD_DIR</td><td>QA_MGR</td><td>2026-07-10 16:00</td><td>bản nháp WI-519</td><td>KPI-FLD-01</td></tr>
-    <tr><td>5</td><td>Hoàn tất bộ nội dung nhập môn cho đợt 3.</td><td>HR_MGR</td><td>QMS_MGR</td><td>FIN_MGR, IT_MGR, EHS_MGR, EPICOR_ADMIN</td><td>CEO</td><td>2026-07-08 12:00</td><td>bộ trình bày TRN-DEP-W09</td><td>KPI-TRN-01</td></tr>
-    <tr><td>6</td><td>Xác minh quyền M365 cho đợt 3.</td><td>IT_MGR</td><td>HR_MGR</td><td>QMS_ENG</td><td>QMS_MGR</td><td>2026-07-09 17:00</td><td>ma trận quyền truy cập</td><td>KPI-FLD-02</td></tr>
-    <tr><td>7</td><td>Công bố kế hoạch nghỉ bù cho 11 hạt nhân triển khai theo khu vực nếu chăm sóc sau triển khai được đóng.</td><td>HR_MGR</td><td>PROD_DIR</td><td>QMS_MGR</td><td>CEO</td><td>2026-07-08 09:00</td><td>ghi nhớ HR</td><td>KPI-TRN-01</td></tr>
-    <tr><td>8</td><td>Chuyển danh sách CAPA sang bảng điều hành W09.</td><td>QA_MGR</td><td>QMS_MGR</td><td>HR_MGR</td><td>CEO</td><td>2026-07-10 12:00</td><td>bảng CAPA</td><td>KPI-DEP-02</td></tr>
-    <tr><td>9</td><td>Tắt hoặc kéo dài hệ chạy song song của Kỹ thuật.</td><td>ENG_MGR</td><td>PROD_DIR</td><td>IT_MGR</td><td>QMS_MGR</td><td>2026-07-10 16:00</td><td>ghi nhớ SOP-303</td><td>KPI-DEP-03</td></tr>
-    <tr><td>10</td><td>Ghi sự kiện đánh giá cho quyết định cửa W08.</td><td>QMS_ENG</td><td>QMS_MGR</td><td>IT_MGR</td><td>CEO</td><td>2026-07-04 12:00</td><td>audit_events</td><td>KPI-DEP-05</td></tr>
-    <tr><td>11</td><td>Chuẩn bị trang trạng thái đóng khối Sản xuất cho W09.</td><td>PROD_DIR</td><td>QMS_MGR</td><td>QA_MGR</td><td>HR_MGR</td><td>2026-07-10 15:00</td><td>trang 10 W09</td><td>KPI-DEP-02</td></tr>
-    <tr><td>12</td><td>Khóa ghi chú bàn giao người chịu trách nhiệm bảng điều hành cho phần chuẩn bị W10.</td><td>QMS_MGR</td><td>CEO</td><td>IT_MGR</td><td>HR_MGR</td><td>2026-07-10 17:00</td><td>ANNEX-110</td><td>KPI-DEP-05</td></tr>
-  </tbody></table></div>
+<h2 class="h2">Bằng chứng phải có</h2>
+<table>
+<thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm</th></tr></thead>
+<tbody>
+<tr><td>Hồ sơ lệnh sản xuất mẫu</td><td>Tổ trưởng</td><td>Hồ sơ có lộ trình, phiên bản bản vẽ và điểm giữ.</td></tr>
+<tr><td>Phiếu cài đặt máy đã ký</td><td>Người cài đặt máy</td><td>Phiếu gắn với đúng máy, đúng dao cụ, đúng chương trình.</td></tr>
+<tr><td>Kết quả FAI mẫu đầu</td><td>Trưởng QA</td><td>FAI ký trước khi chạy lô.</td></tr>
+<tr><td>Sổ giao ca và sổ sự cố ca</td><td>Trưởng ca</td><td>Mọi điểm đỏ có người xử lý và hạn đóng.</td></tr>
+<tr><td>Phiếu quyết định cổng P3</td><td>Giám đốc</td><td>Giám đốc và Trưởng QMS ký cùng một trạng thái.</td></tr>
+</tbody>
+</table>
 </section>
-
-<section class="card" id="sec-next-week">
-  <h2 class="h2">Chuẩn bị tuần 9 · nhiệm vụ cần làm</h2>
-  <p>W09 ngày 2026-07-11 khởi động đợt 3 cho HR, FIN, IT, EHS và EPICOR_ADMIN. Nhóm nhỏ hơn Sản xuất nhưng phạm vi ảnh hưởng cao: HR giữ hồ sơ đào tạo, FIN giữ dữ liệu hóa đơn và bằng chứng chi phí, IT giữ quyền truy cập, EHS giữ rủi ro an toàn/pháp lý, EPICOR_ADMIN giữ cấu hình ERP. HR_MGR làm điều phối chính để PROD_DIR và ENG_MGR chỉ cung cấp trạng thái chuyển tiếp từ W08.</p>
-  <div class="table-card"><table class="table"><thead><tr><th>Vai trò</th><th>Nhiệm vụ chuẩn bị</th><th>Hạn hoàn tất</th></tr></thead><tbody>
-    <tr><td>HR_MGR</td><td>Chốt danh sách 10 hạt nhân chính + 10 hạt nhân dự phòng và tỷ lệ đạt huấn luyện tập trung ≥90%.</td><td>2026-07-08 17:00</td></tr>
-    <tr><td>IT_MGR</td><td>Cấp quyền M365 cho 15 người dùng đợt 3.</td><td>2026-07-09 17:00</td></tr>
-    <tr><td>FIN_MGR</td><td>Chuẩn bị tình huống về lương, hóa đơn và bằng chứng chi phí.</td><td>2026-07-10 12:00</td></tr>
-    <tr><td>EHS_MGR</td><td>Rà soát SOP-801 và lưu giữ hồ sơ an toàn.</td><td>2026-07-10 12:00</td></tr>
-    <tr><td>PROD_DIR</td><td>Nộp trạng thái chuyển tiếp: đã đóng/Ở lại, CAPA, chuỗi Sev-1.</td><td>2026-07-10 15:00</td></tr>
-  </tbody></table></div>
-</section>
-
-<section class="card" id="sec-docs">
-  <h2 class="h2">Tài liệu liên quan · bấm để mở</h2>
-  <p>
-    <a href="#" onclick="if(window.openDoc)openDoc('SOP-501');return false;" class="role-chip">SOP-501</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('WI-519');return false;" class="role-chip">WI-519</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-117');return false;" class="role-chip">ANNEX-117</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-118');return false;" class="role-chip">ANNEX-118</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('ANNEX-110');return false;" class="role-chip">ANNEX-110</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('WI-201');return false;" class="role-chip">WI-201</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('WI-202');return false;" class="role-chip">WI-202</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W07');return false;" class="role-chip">TRN-DEP-W07</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('TRN-DEP-W09');return false;" class="role-chip">TRN-DEP-W09</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('WI-103');return false;" class="role-chip">WI-103</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('WI-104');return false;" class="role-chip">WI-104</a>
-    <a href="#" onclick="if(window.openDoc)openDoc('SOP-801');return false;" class="role-chip">SOP-801</a>
-  </p>
-</section>
-
-<section class="card" id="sec-risks">
-  <h2 class="h2">Rủi ro tuần 08 + báo cáo vượt cấp</h2>
-  <div class="table-card"><table class="table"><thead><tr><th>#</th><th>Rủi ro</th><th>K</th><th>A</th><th>Biện pháp giảm thiểu</th><th>Dấu hiệu phải báo cáo</th><th>Chủ trì</th></tr></thead><tbody>
-    <tr><td>1</td><td>Đóng chăm sóc sau triển khai quá sớm do mọi người mệt.</td><td>M</td><td>H</td><td>Cửa quyết định mặc định Ở lại nếu thiếu chuỗi.</td><td>Chuỗi bị phá sau 2026-07-01</td><td>CEO</td></tr>
-    <tr><td>2</td><td>Hạt nhân triển khai quá tải làm chất lượng ghi vấn đề giảm.</td><td>H</td><td>M</td><td>Nghỉ bù, kích hoạt người dự phòng, luân phiên đi hiện trường.</td><td>2 ngày nhật ký vấn đề thiếu người chịu trách nhiệm/thời hạn</td><td>HR_MGR</td></tr>
-    <tr><td>3</td><td>Andon bị dùng quá mức cho vấn đề nhỏ.</td><td>M</td><td>M</td><td>Kèm cặp Toyota Kata để phân biệt điều kiện bất thường, mục trên bảng vấn đề và Andon.</td><td>>3 lượt báo nhầm/ngày</td><td>PROD_DIR</td></tr>
-    <tr><td>4</td><td>Chuẩn bị đợt 3 bị bỏ quên.</td><td>M</td><td>H</td><td>HR_MGR điều phối độc lập, nhịp thứ Ba/thứ Năm.</td><td>Đạt huấn luyện tập trung &lt;90%</td><td>HR_MGR</td></tr>
-    <tr><td>5</td><td>CAPA quá 30 ngày bị bỏ qua.</td><td>M</td><td>H</td><td>Cửa quyết định dùng cả số lượng và trạng thái quá hạn.</td><td>CAPA quá hạn >30 ngày</td><td>QMS_MGR</td></tr>
-    <tr><td>6</td><td>Hạt nhân triển khai không nói khu vực còn dùng bản in cũ vì sợ mất mặt.</td><td>H</td><td>H</td><td>Trao đổi 1:1, phiếu viết ẩn danh, cấp trên phát biểu sau cùng.</td><td>Đi hiện trường phát hiện bản in cũ chưa được báo</td><td>QA_MGR</td></tr>
-    <tr><td>7</td><td>Bảng điều hành cập nhật đẹp nhưng nguồn nhập muộn.</td><td>M</td><td>M</td><td>Kiểm dấu thời gian nguồn và dấu thời gian công bố.</td><td>Dấu thời gian nguồn trễ >24 giờ</td><td>IT_MGR</td></tr>
-  </tbody></table></div>
-</section>
-
 <section class="card" id="sec-lessons">
-  <h2 class="h2">Bài học sau họp · điền theo chu trình thay đổi tinh gọn</h2>
-  <div class="grid-3">
-    <div class="note"><b>Nhận định</b><br>Điền sau cuộc họp 2026-07-04 bởi QMS_ENG + QA_MGR. Tập trung vào điểm chặn, hành vi dùng Andon, dấu hiệu quá tải và dữ liệu nhập trễ.</div>
-    <div class="note"><b>Phương án</b><br>Điền sau cuộc họp 2026-07-04 bởi QMS_ENG + QA_MGR. Mỗi phương án nêu tác động lên chuỗi Sev-1, đóng vấn đề và mức sẵn sàng đợt 3.</div>
-    <div class="note"><b>Thử nghiệm</b><br>Điền sau cuộc họp 2026-07-04 bởi QMS_ENG + QA_MGR. Chỉ chọn thử nghiệm chạy trong 2026-07-07..2026-07-10, có vai trò chịu trách nhiệm.</div>
-  </div>
-  <p class="note-blue">Bài học W08 phải trả lời câu hỏi hệ thống có đủ ổn định để giảm chăm sóc sau triển khai hay chưa. Nếu câu trả lời là Đi tiếp, phải ghi bằng chứng nào cho phép giảm nhịp mà không mất kiểm soát: chuỗi Sev-1, đóng vấn đề, kỷ luật Andon, hoàn tất bàn giao, CAPA tồn và cập nhật bảng điều hành. Nếu câu trả lời là Ở lại, phải ghi điểm chặn có người chịu trách nhiệm, thời hạn và điều kiện thoát. Không ghi “đội còn mệt” như điểm chặn nếu không nối được với rủi ro vận hành; thay vào đó ghi dấu hiệu quá tải cụ thể như hạt nhân triển khai bỏ sót người chịu trách nhiệm của vấn đề, bàn giao thiếu rủi ro ca sau, hoặc bài diễn tập tra cứu không đạt lặp lại ở một khu vực. Bài học cũng phải nêu những gì không đổi: không giảm yêu cầu bằng chứng, không tắt Andon, không bỏ CAPA quá hạn khỏi cửa quyết định, và không đẩy đợt 3 vào vận hành nếu điểm chặn chung về quyền truy cập/bảng điều hành chưa được khoanh vùng.</p>
-  <p class="note-blue">Phần thử nghiệm của W08 nên ưu tiên những việc có thể kiểm trong 3-5 ngày: đổi định dạng bảng vấn đề để tách khoanh vùng và hành động khắc phục, thêm trường “dấu thời gian nguồn” cho bảng điều hành, ghép hạt nhân triển khai mệt với người dự phòng trong 2 ca, hoặc chạy diễn tập ngẫu nhiên bằng người vận hành không phải hạt nhân triển khai. Mỗi thử nghiệm phải có quy tắc dừng, ví dụ nếu Andon báo nhầm >3/ngày thì chuyển sang kèm cặp chứ không phạt người kéo; nếu p90 tra cứu >240 giây ở một khu vực thì IT_MGR giữ kiểm tra hằng ngày đến khi xu hướng xanh 2 ngày liên tiếp.</p>
+<h2 class="h2">Vòng rút kinh nghiệm 10 phút</h2>
+<ol class="tight">
+<li>Việc gì làm lại sẽ làm khác?</li>
+<li>Việc gì sẽ giữ nguyên?</li>
+<li>3 hành động cụ thể tuần sau là gì, ai làm, hạn nào?</li>
+</ol>
+<p>Trưởng QMS ghi 3 hành động vào <code>issues.json</code> ở Mức 3. Trưởng QMS không tạo biểu mẫu mới.</p>
 </section>
-
-</div><!-- /doc-content -->
+</div>
 </div></div></div>
 </body>
 </html>
