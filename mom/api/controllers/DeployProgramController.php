@@ -35,7 +35,7 @@ class DeployProgramController extends BaseController
 
     private const SIGNOFF_ROLES = ['admin', 'it_admin', 'ceo', 'qms_manager', 'qa_manager', 'general_director'];
     private const EDIT_ROLES    = ['admin', 'it_admin', 'ceo', 'qms_manager', 'qa_manager', 'general_director', 'production_director', 'supply_chain_manager', 'hr_manager', 'finance_manager', 'engineering_lead'];
-    private const DEFAULT_DEPARTMENT_IDS = ['PROD', 'ENG', 'QA', 'SCM', 'SALES', 'FIN', 'HR', 'IT', 'EHS', 'ERP'];
+    private const DEFAULT_DEPARTMENT_IDS = ['EXE', 'PROD', 'ENG', 'QA', 'SCM', 'SALES', 'FIN', 'HR', 'IT', 'EHS', 'ERP'];
     // Đợt triển khai 1..4 — khớp lộ trình 12 tuần (xem
     // mom/data/config/deploy/program.json + DEPLOY_CONFIG.waves trong
     // 08-deploy-dashboard.js). Lưu trong departmentRoster.custom[*].wave.
