@@ -139,22 +139,22 @@ const DEPLOY_CONFIG = {
       escalation:'<80% → chặn cổng kiểm vận hành đợt kế tiếp. 80–89% → người dẫn dắt phải báo cáo kế hoạch đuổi kịp trong 7 ngày.'},
 
     {id:'KPI-USE-01', label:'Người dùng tích cực mở tài liệu', target:'>=80', unit:'%', short:'NDM', ownerRole:'qms_manager',
-      basis:'doc_access_log (migration 187) · Prosci 2023 giai đoạn duy trì',
-      rationale:'Đo xem tài liệu đã đi vào hành vi thật chưa. Nếu người dùng không mở tài liệu trong tuần, hệ thống đào tạo có thể chỉ dừng ở ký nhận.',
-      method:'Đếm người dùng duy nhất có lượt mở tài liệu thật trong 7 ngày gần nhất, chia cho tổng người dùng đang trong phạm vi triển khai.',
-      escalation:'<80% → trưởng QMS mở lại đợt nhắc theo phòng và yêu cầu người dẫn dắt xác nhận đường dẫn tài liệu đang dùng.'},
+      basis:'ISO 9001:2015 §7.5.3 · Prosci 2023 giai đoạn duy trì',
+      rationale:'Mục tiêu ≥80% người dùng trong đợt triển khai có ít nhất 1 lần mở tài liệu trong 7 ngày qua. Đây là chỉ số "tài liệu đã đi vào hành vi thật". Ký xác nhận đào tạo chỉ chứng minh người ta biết tài liệu tồn tại, không chứng minh người ta đang dùng. Prosci 2023: ở giai đoạn duy trì sau triển khai, tỉ lệ tích cực <80% là tín hiệu sớm cho thấy người dùng đã trượt về "bản chui" (in ra dán tường, lưu USB, làm theo trí nhớ).',
+      method:'Tử số = số người dùng (trong phạm vi triển khai) có ít nhất 1 lượt mở tài liệu chính thức trong 7 ngày gần nhất. Mẫu số = tổng số người dùng đang ở trong đợt. Đếm theo người duy nhất, không đếm theo lượt mở.',
+      escalation:'<80% → trưởng QMS rà soát phòng nào tỉ lệ thấp, nhắc người dẫn dắt xác nhận lại đường dẫn và mã QR đang treo tại xưởng có còn đúng. <60% → mở lại buổi sinh hoạt đầu ca trong tuần kế tiếp.'},
 
     {id:'KPI-USE-02', label:'Tài liệu chết — không ai mở 14 ngày', target:'<=10', unit:'%', short:'TLC', ownerRole:'qa_manager',
-      basis:'doc_access_log · ISO 9001:2015 §7.5.3',
-      rationale:'Tài liệu không có lượt mở trong 14 ngày có nguy cơ là tài liệu chết, sai tuyến đọc hoặc không còn nằm trong dòng công việc thật.',
-      method:'Đếm tài liệu còn hiệu lực nhưng không có lượt mở trong 14 ngày gần nhất, chia cho tổng tài liệu còn hiệu lực trong phạm vi triển khai.',
-      escalation:'>10% → QA cùng QMS rà lại danh mục học và đường dẫn mã QR; tài liệu chết phải được phân loại giữ lại, đào tạo lại hoặc thay thế.'},
+      basis:'ISO 9001:2015 §7.5.3 (tài liệu có sẵn đúng nơi đúng lúc)',
+      rationale:'Mục tiêu ≤10% tài liệu bắt buộc không có lượt mở trong 14 ngày liên tục. Tài liệu chết là rủi ro phiên bản: nếu không ai mở bản chính thức trong 2 tuần, khả năng cao người dùng đang theo bản cũ trong đầu, ảnh chụp điện thoại hoặc bản giấy đã quá hạn. Mỗi tài liệu chết = 1 cơ hội sai phiên bản trong sản xuất.',
+      method:'Tử số = số tài liệu còn hiệu lực, thuộc danh mục đọc bắt buộc của đợt, không có lượt mở nào trong 14 ngày gần nhất. Mẫu số = tổng số tài liệu bắt buộc của đợt. Tài liệu mới phát hành dưới 14 ngày không đưa vào mẫu.',
+      escalation:'>10% → QA và QMS rà lại danh mục đọc bắt buộc và sơ đồ tuyến đọc; mỗi tài liệu chết phải phân loại "giữ lại + đào tạo lại", "thay thế" hoặc "rút khỏi danh mục bắt buộc". >20% → tạm dừng phát hành mới đến khi danh mục đọc được làm sạch.'},
 
     {id:'KPI-USE-03', label:'Người dẫn dắt sử dụng nhiều hơn người thường', target:'>=150', unit:'%', short:'NDD', ownerRole:'qms_manager',
-      basis:'doc_access_log · Tỉ lệ người dẫn dắt 1,5×',
-      rationale:'Người dẫn dắt phải dùng tài liệu nhiều hơn người dùng thường để kéo hành vi tra cứu đúng. Nếu tỉ lệ thấp, vai trò dẫn dắt chỉ tồn tại trên danh sách.',
-      method:'So sánh số lượt mở tài liệu trung bình của người dẫn dắt với số lượt mở trung bình của người dùng thường trong 7 ngày gần nhất.',
-      escalation:'<150% → trưởng QMS nhắc trực tiếp người dẫn dắt phòng và đưa chỉ số vào họp Thứ Bảy.'},
+      basis:'Tỉ lệ tham chiếu 1,5× — người dẫn dắt phải dùng nhiều hơn người thường',
+      rationale:'Mục tiêu: lượt mở trung bình của một người dẫn dắt ≥1,5 lần lượt mở trung bình của một người dùng thường. Người dẫn dắt là người gánh vai trò "hỏi gì tra liền" cho phòng — nếu họ không dùng tài liệu nhiều hơn người thường thì vai trò này chỉ tồn tại trên danh sách. Tỉ lệ thấp = người dẫn dắt đang trả lời theo trí nhớ thay vì mở tài liệu, hành vi này lan nhanh xuống ca làm.',
+      method:'(Tổng lượt mở của tất cả người dẫn dắt ÷ số người dẫn dắt) ÷ (tổng lượt mở của tất cả người dùng thường ÷ số người dùng thường) × 100%. Lấy số liệu trong 7 ngày gần nhất.',
+      escalation:'<150% → trưởng QMS nhắc tên cụ thể người dẫn dắt có tỉ lệ thấp tại họp Thứ Bảy. <100% (người dẫn dắt dùng ít hơn người thường) → tự động đưa vào danh sách thay người dẫn dắt; chuyển vai trò sang người dự phòng và mở đợt đào tạo lại.'},
 
     {id:'KPI-DEP-01', label:'Phủ người dẫn dắt (chính + dự phòng)', target:'>=100',unit:'%', short:'CH', ownerRole:'qms_manager',
       basis:'Prosci CMROI 2023 · WI-105 §4.2',
@@ -171,7 +171,7 @@ const DEPLOY_CONFIG = {
     {id:'KPI-DEP-03', label:'Tỉ lệ thay đổi thất bại',    target:'<=10', unit:'%', short:'TB', ownerRole:'qa_manager',
       basis:'DORA "State of DevOps" 2024 · ITIL 4 Change Enablement',
       rationale:'Mục tiêu ≤10% theo DORA 2024: nhóm dẫn đầu 0–15%, nhóm khá 16–30%. 10% phù hợp với mức trưởng thành trung bình — cho phép thử nghiệm mà không bào mòn niềm tin. Đo cả thay đổi tài liệu (SOP/WI), không chỉ phần mềm.',
-      method:'Tử số = số thay đổi phải khôi phục hoặc vá khẩn cấp trong vòng 7 ngày kể từ ngày hiệu lực. Mẫu số = tổng số thay đổi đã phát hành trong tuần đó. Nguồn: dcc_document_revision.',
+      method:'Tử số = số thay đổi tài liệu (SOP/WI/biểu mẫu/ANNEX) phải khôi phục về bản trước, vá khẩn cấp hoặc thu hồi trong vòng 7 ngày kể từ ngày hiệu lực. Mẫu số = tổng số thay đổi đã phát hành trong tuần đó. Tính theo tuần phát hành, không theo tuần phát hiện lỗi.',
       escalation:'>15% → tạm đóng băng mọi thay đổi không trọng yếu, soát xét nguyên nhân gốc trong 5 ngày.'},
 
     {id:'KPI-DEP-04', label:'Thời gian phát hành (ngày)', target:'<=10', unit:'d', short:'LT', ownerRole:'it_manager',
@@ -183,19 +183,19 @@ const DEPLOY_CONFIG = {
     {id:'KPI-DEP-05', label:'Cập nhật dashboard đúng hạn', target:'>=95', unit:'%', short:'RF', ownerRole:'qms_manager',
       basis:'Gartner Data & Analytics 2023 · ANNEX-110',
       rationale:'Mục tiêu ≥95% số ô dữ liệu được cập nhật đúng lịch. Gartner: dashboard cập nhật trễ dưới mức 95% sẽ mất niềm tin của người ra quyết định trong vòng 4 tuần. Nhịp họp tầng không thể vận hành nếu KPI nguồn không kịp thời.',
-      method:'Tử số = số ô có data_collected_at trong hạn (theo nhịp của ô: ngày/tuần/tháng). Mẫu số = tổng số ô đang hoạt động. Chốt số liệu theo tuần.',
+      method:'Tử số = số ô KPI được người phụ trách cập nhật đúng nhịp đã cam kết (ngày / tuần / tháng tuỳ ô). Mẫu số = tổng số ô KPI đang hoạt động trên dashboard. Một ô được tính "đúng hạn" nếu giá trị mới có trước nhịp họp gần nhất sử dụng ô đó.',
       escalation:'<90% → người phụ trách ô có 3 ngày để khắc phục nguồn dữ liệu. <80% → tạm gỡ ô dữ liệu báo đỏ khỏi dashboard để tránh quyết định sai.'},
 
     {id:'KPI-DEP-06', label:'Tần suất phát hành (thay đổi/tuần)', target:'>=3', unit:'', short:'TS', ownerRole:'qms_manager',
       basis:'DORA "State of DevOps" 2024 (Tần suất phát hành)',
       rationale:'Đây là chỉ số thứ 4 trong bộ Four Keys của DORA (chuẩn quốc tế cho quản trị thay đổi). Nhóm dẫn đầu ≥1 lần/ngày, nhóm khá 1 lần/tuần đến 1 lần/tháng. Mục tiêu ≥3 thay đổi/tuần bảo đảm doanh nghiệp thực sự đang vận hành vòng cải tiến, không đóng băng tài liệu. Nếu = 0 trong 2 tuần liên tiếp → cảnh báo: luồng thay đổi đang tắc, hoặc cam kết thời gian soát tài liệu bị bỏ qua.',
-      method:'Đếm số bản sửa đổi đã phê duyệt trong dcc_document_revision có ngày phê duyệt nằm trong tuần hiện tại. Tính cả bản lớn, bản nhỏ và bản vá.',
+      method:'Đếm số bản sửa đổi tài liệu (SOP / WI / biểu mẫu / ANNEX) đã được phê duyệt và có ngày hiệu lực rơi vào tuần hiện tại. Tính cả thay đổi lớn (đổi nội dung), thay đổi nhỏ (sửa câu chữ) và bản vá khẩn cấp.',
       escalation:'<1 trong 2 tuần liên tiếp → soát thông lượng của hội đồng phê duyệt thay đổi (CAB). Có thể là nút thắt phê duyệt hoặc khối lượng tồn đọng soát tài liệu quá lớn.'},
 
     {id:'KPI-DEP-07', label:'Thời gian phục hồi sự cố Mức 1 (giờ)', target:'<=24', unit:'h', short:'MR', ownerRole:'qms_manager',
       basis:'DORA "State of DevOps" 2024 (Thời gian phục hồi trung bình) · ITIL 4',
       rationale:'Đây là chỉ số thứ 3 trong bộ Four Keys của DORA. Nhóm dẫn đầu <1 giờ, nhóm khá <1 ngày, nhóm trung bình 1 ngày–1 tuần. Mục tiêu ≤24 giờ cho tài liệu/quy trình: thời gian từ khi phát hiện sự cố Mức 1 (tài liệu sai đã hiệu lực, người vận hành đang dùng sai) đến khi khôi phục hoặc bản vá đã phát hành. Nếu >24 giờ, người dùng đã sản xuất ≥1 ca làm việc dựa trên tài liệu sai.',
-      method:'Trung vị (closed_at − sev1_reported_at) của các phiếu việc Mức 1 trong 4 tuần gần nhất. Nếu chưa có sự cố Mức 1 nào: ghi "—" (không ghi 0).',
+      method:'Trung vị (thời điểm đóng phiếu − thời điểm ghi nhận sự cố) của các phiếu Mức 1 trong 4 tuần gần nhất. Đếm theo giờ thực tế (24/7), không trừ ngoài giờ làm. Nếu chưa có sự cố Mức 1 nào trong cửa sổ 4 tuần: ghi "—" (không ghi 0 vì 0 giờ có nghĩa là phục hồi tức thời, không phải chưa có sự cố).',
       escalation:'>48 giờ → bắt buộc tổ chức soát xét sau sự cố trong 5 ngày. >72 giờ → leo thang lên Tổ điều hành và xem lại danh sách "người trực vận hành" cho các tài liệu trọng yếu.'},
   ],
   phaseChecklists: {
@@ -1035,7 +1035,7 @@ function renderKpiCard(kpi, value){
     </div>
     <div class="kpi-mini-label">${deployEscape(kpi.label)}</div>
     <input type="text" class="kpi-mini-input" value="${deployEscape(v)}" placeholder="${deployEscape(placeholder)}" ${ro ? 'disabled' : ''} title="${deployEscape(titleAttr)}" onchange="deployUpdateMetric('${deployEscape(kpi.id)}', this.value)">
-    ${usagePending ? '<div class="kpi-mini-hint">Đang chờ tổng hợp lần đầu (cron 15 phút/lần). Mở <code>tail -f /var/log/qms-doc-usage-cron.log</code> để theo dõi.</div>' : ''}
+    ${usagePending ? '<div class="kpi-mini-hint">Đang chờ hệ thống tổng hợp lượt mở tài liệu. Số liệu sẽ tự xuất hiện khi đủ dữ liệu 7 ngày đầu — không cần thao tác thủ công.</div>' : ''}
     <div class="kpi-mini-owner">Chủ trì: ${deployEscape(deployKpiOwnerLabel(kpi.ownerRole))}</div>
     ${updatedLabel}
     ${tipHtml}
