@@ -666,14 +666,32 @@ function deployEmptyPerson(){
 }
 function deployNormalizePerson(person){
   person = person || {};
+  const score = deployNormalizeOjtScore(person.ojtScore);
+  const passed = score == null ? !!person.ojtPass : score >= 16;
   return {
     name: String(person.name || '').trim(),
     phone: String(person.phone || '').trim(),
     m365: String(person.m365 || person.email || '').trim(),
-    ojtPass: !!person.ojtPass,
+    ojtPass: passed,
     username: String(person.username || '').trim(),
     employee_id: String(person.employee_id || person.id || '').trim(),
+    bootcampAttended: deployNormalizeBootcampAttended(person.bootcampAttended),
+    ojtScore: score,
+    ojtPassed: passed,
+    ojtSignedBy: String(person.ojtSignedBy || '').trim(),
+    ojtSignedAt: String(person.ojtSignedAt || '').trim(),
   };
+}
+function deployNormalizeOjtScore(value){
+  if (value === null || value === undefined || value === '') return null;
+  const n = parseInt(value, 10);
+  return Number.isInteger(n) && n >= 0 && n <= 20 ? n : null;
+}
+function deployNormalizeBootcampAttended(value){
+  const rows = Array.isArray(value) ? value : String(value || '').split(',');
+  return Array.from(new Set(
+    rows.map(n => parseInt(n, 10)).filter(n => Number.isInteger(n) && n >= 1 && n <= 4)
+  )).sort((a,b) => a - b);
 }
 function deployPersonFilled(person){
   const p = deployNormalizePerson(person);
@@ -1343,14 +1361,76 @@ function renderChampionPersonSlot(dept, slot, index, person, ro){
     `}
     <label class="champion-ojt">
       <input type="checkbox" ${person.ojtPass?'checked':''} ${ro?'disabled':''} data-deploy-champion="${key}|ojtPass">
-      Đã pass OJT bootcamp
+      Đã đạt bài kiểm OJT
     </label>
+    ${filled && index === 0 ? renderChampionOjtBlock(dept, slot, person, ro) : ''}
     <input type="hidden" data-deploy-champion="${key}|name" value="${deployEscape(person.name||'')}">
     <input type="hidden" data-deploy-champion="${key}|phone" value="${deployEscape(person.phone||'')}">
     <input type="hidden" data-deploy-champion="${key}|m365" value="${deployEscape(person.m365||'')}">
     <input type="hidden" data-deploy-champion="${key}|username" value="${deployEscape(person.username||'')}">
     <input type="hidden" data-deploy-champion="${key}|employee_id" value="${deployEscape(person.employee_id||'')}">
   </div>`;
+}
+
+function renderChampionOjtBlock(dept, slot, person, ro){
+  const slotKey = slot === 'backups' ? 'backup' : 'primary';
+  const p = deployNormalizePerson(person);
+  const attended = p.bootcampAttended.reduce((acc,n) => (acc[n]=true, acc), {});
+  const statusText = p.ojtScore == null
+    ? 'Chưa chấm'
+    : (p.ojtPassed ? `✓ Đậu — ${p.ojtScore}/20` : `✗ Chưa đậu — ${p.ojtScore}/20`);
+  const statusClass = p.ojtScore == null ? 'none' : (p.ojtPassed ? 'ok' : 'fail');
+  const prevText = p.ojtSignedAt
+    ? `${p.ojtSignedBy || '—'} · ${deployIsoToVi(p.ojtSignedAt)}`
+    : '—';
+  const bootcampLabels = {
+    1: 'Buổi 1 — Vai trò người dẫn dắt',
+    2: 'Buổi 2 — Đọc DCC header trong 60 giây',
+    3: 'Buổi 3 — Mở hồ sơ và ghi sự cố',
+    4: 'Buổi 4 — Cây leo thang xử lý',
+  };
+  return `
+  <div class="champion-ojt-block" data-dept="${deployEscape(dept.id)}" data-slot="${slotKey}">
+    <div class="champion-ojt-head">
+      <strong>Bài kiểm năng lực OJT</strong>
+      <span class="champion-ojt-status champion-ojt-status-${statusClass}">${deployEscape(statusText)}</span>
+    </div>
+    <p class="champion-ojt-help">Trưởng QMS hoặc Trưởng QA chấm sau buổi đánh giá tại xưởng. Đậu khi điểm ≥ 16/20.</p>
+    <div class="champion-ojt-bootcamps">
+      ${[1,2,3,4].map(n => `
+        <label class="champion-ojt-bootcamp"><input type="checkbox" value="${n}" ${attended[n]?'checked':''} ${ro?'disabled':''} data-ojt-bootcamp> ${deployEscape(bootcampLabels[n])}</label>
+      `).join('')}
+    </div>
+    <div class="champion-ojt-score-row">
+      <label>Điểm OJT (0–20): <input type="number" min="0" max="20" step="1" value="${p.ojtScore == null ? '' : p.ojtScore}" ${ro?'disabled':''} class="champion-ojt-score-input"></label>
+      <button class="deploy-btn deploy-btn-sm" type="button" ${ro?'disabled':''} onclick="deploySaveChampionOjt('${deployEscape(dept.id)}','${slotKey}')">Lưu điểm OJT</button>
+    </div>
+    <small class="champion-ojt-prev">Lần chấm gần nhất: ${deployEscape(prevText)}</small>
+  </div>`;
+}
+
+async function deploySaveChampionOjt(deptId, slot){
+  const block = document.querySelector(`.champion-ojt-block[data-dept="${deptId}"][data-slot="${slot}"]`);
+  if (!block) { alert('Không tìm thấy ô chấm OJT.'); return; }
+  const scoreInput = block.querySelector('.champion-ojt-score-input');
+  const score = parseInt(scoreInput && scoreInput.value, 10);
+  if (!Number.isInteger(score) || score < 0 || score > 20){
+    alert('Điểm OJT phải là số nguyên từ 0 tới 20.');
+    return;
+  }
+  const bootcampAttended = Array.from(block.querySelectorAll('input[data-ojt-bootcamp]:checked'))
+    .map(c => parseInt(c.value, 10))
+    .filter(n => Number.isInteger(n) && n >= 1 && n <= 4);
+  try {
+    const res = await deployApi('deploy_champion_ojt_save', {deptId, slot, score, bootcampAttended});
+    if (res && res.data) {
+      DeployState.champions = res.data;
+      renderDeployDashboard();
+    }
+  } catch (e) {
+    console.error('[deploy] champion ojt save failed', e);
+    alert('Lỗi lưu điểm OJT: ' + (e && e.message || e));
+  }
 }
 
 function findUserByName(name){
@@ -2874,6 +2954,7 @@ window.deploySaveMeeting = deploySaveMeeting;
 window.deploySignOffMeeting = deploySignOffMeeting;
 window.deploySignOffWeek = deploySignOffWeek;
 window.deploySaveChampion = deploySaveChampion;
+window.deploySaveChampionOjt = deploySaveChampionOjt;
 window.deployOpenIssueForm = deployOpenIssueForm;
 window.deployUpdateIssueStatus = deployUpdateIssueStatus;
 window.deployRecordDrill = deployRecordDrill;
