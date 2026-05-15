@@ -120,61 +120,79 @@ const DEPLOY_CONFIG = {
     ]},
   ],
   kpis: [
-    {id:'KPI-FLD-01', label:'Định tuyến đúng thư mục',   target:'>=95', unit:'%', short:'TM',
+    {id:'KPI-FLD-01', label:'Định tuyến đúng thư mục',   target:'>=95', unit:'%', short:'TM', ownerRole:'qms_manager',
       basis:'ISO 9001:2015 §7.5.3 · AIIM Industry Watch 2023',
       rationale:'Mục tiêu ≥95% nghĩa là tối đa 1/20 tài liệu đặt sai thư mục — đủ thấp để chỉ mục tra cứu trên M365 còn đáng tin. Tham chiếu AIIM 2023: doanh nghiệp trưởng thành đạt 90–97% mức tuân thủ thư mục.',
       method:'Mỗi tuần, người dẫn dắt phòng chọn ngẫu nhiên 50 tài liệu kiểm tra, đối chiếu với ANNEX-135 sơ đồ thư mục. Tử số = số tài liệu đặt đúng thư mục, mẫu số = 50.',
       escalation:'<90% → leo thang về cổng kiểm P1-02 (mở lại khoá đào tạo người dẫn dắt). 90–94% → cảnh báo, bổ sung tăng cường đào tạo cho phòng có sai sót cao nhất.'},
 
-    {id:'KPI-FLD-02', label:'Thời gian tra cứu',          target:'<=180', unit:'s', short:'TC',
+    {id:'KPI-FLD-02', label:'Thời gian tra cứu',          target:'<=180', unit:'s', short:'TC', ownerRole:'qms_manager',
       basis:'ISO 9001:2015 §7.5.3 · McKinsey "Social Economy" 2012',
       rationale:'Mục tiêu ≤180 giây (3 phút) bảo đảm yêu cầu của ISO: tài liệu có sẵn đúng nơi và đúng lúc. McKinsey: nhân viên tri thức mất 1,8 giờ/ngày để tìm tài liệu — giữ ≤3 phút/lần tra cứu thì tổng thời gian tra cứu trong ngày dưới 30 phút khi có 10 lượt.',
       method:'Diễn tập hàng tuần theo ANNEX-114: người dẫn dắt bốc ngẫu nhiên 5 tài liệu, đo thời gian từ lúc nhận yêu cầu đến khi mở đúng tài liệu. Lấy trung vị của 5 lượt.',
       escalation:'>240 giây → leo thang (chỉ mục tra cứu M365 hỏng hoặc đặt sai thư mục). 180–240 giây → bổ sung diễn tập trong tuần kế tiếp.'},
 
-    {id:'KPI-TRN-01', label:'Hoàn thành đào tạo',         target:'>=90', unit:'%', short:'ĐT',
+    {id:'KPI-TRN-01', label:'Hoàn thành đào tạo',         target:'>=90', unit:'%', short:'ĐT', ownerRole:'hr_manager',
       basis:'ISO 9001:2015 §7.2 · Prosci ADKAR ROI 2023',
       rationale:'Mục tiêu ≥90% (không phải 100%) chấp nhận vắng mặt rải rác (nghỉ phép, ốm, người mới vào). Prosci ROI 2023: sáng kiến thay đổi có tỉ lệ hoàn thành đào tạo <80% bị mất một nửa mức áp dụng.',
       method:'Ma trận đào tạo SOP-801 ký xác nhận đã hoàn tất đào tạo tại chỗ chia cho tổng số người trong đợt hiện tại. Tính theo đợt, không tính trên tổng nhân sự công ty.',
       escalation:'<80% → chặn cổng kiểm vận hành đợt kế tiếp. 80–89% → người dẫn dắt phải báo cáo kế hoạch đuổi kịp trong 7 ngày.'},
 
-    {id:'KPI-DEP-01', label:'Phủ người dẫn dắt (chính + dự phòng)', target:'>=100',unit:'%', short:'CH',
+    {id:'KPI-USE-01', label:'Người dùng tích cực mở tài liệu', target:'>=80', unit:'%', short:'NDM', ownerRole:'qms_manager',
+      basis:'doc_access_log (migration 187) · Prosci 2023 giai đoạn duy trì',
+      rationale:'Đo xem tài liệu đã đi vào hành vi thật chưa. Nếu người dùng không mở tài liệu trong tuần, hệ thống đào tạo có thể chỉ dừng ở ký nhận.',
+      method:'Đếm người dùng duy nhất có lượt mở tài liệu thật trong 7 ngày gần nhất, chia cho tổng người dùng đang trong phạm vi triển khai.',
+      escalation:'<80% → trưởng QMS mở lại đợt nhắc theo phòng và yêu cầu người dẫn dắt xác nhận đường dẫn tài liệu đang dùng.'},
+
+    {id:'KPI-USE-02', label:'Tài liệu chết — không ai mở 14 ngày', target:'<=10', unit:'%', short:'TLC', ownerRole:'qa_manager',
+      basis:'doc_access_log · ISO 9001:2015 §7.5.3',
+      rationale:'Tài liệu không có lượt mở trong 14 ngày có nguy cơ là tài liệu chết, sai tuyến đọc hoặc không còn nằm trong dòng công việc thật.',
+      method:'Đếm tài liệu còn hiệu lực nhưng không có lượt mở trong 14 ngày gần nhất, chia cho tổng tài liệu còn hiệu lực trong phạm vi triển khai.',
+      escalation:'>10% → QA cùng QMS rà lại danh mục học và đường dẫn mã QR; tài liệu chết phải được phân loại giữ lại, đào tạo lại hoặc thay thế.'},
+
+    {id:'KPI-USE-03', label:'Người dẫn dắt sử dụng nhiều hơn người thường', target:'>=150', unit:'%', short:'NDD', ownerRole:'qms_manager',
+      basis:'doc_access_log · Tỉ lệ người dẫn dắt 1,5×',
+      rationale:'Người dẫn dắt phải dùng tài liệu nhiều hơn người dùng thường để kéo hành vi tra cứu đúng. Nếu tỉ lệ thấp, vai trò dẫn dắt chỉ tồn tại trên danh sách.',
+      method:'So sánh số lượt mở tài liệu trung bình của người dẫn dắt với số lượt mở trung bình của người dùng thường trong 7 ngày gần nhất.',
+      escalation:'<150% → trưởng QMS nhắc trực tiếp người dẫn dắt phòng và đưa chỉ số vào họp Thứ Bảy.'},
+
+    {id:'KPI-DEP-01', label:'Phủ người dẫn dắt (chính + dự phòng)', target:'>=100',unit:'%', short:'CH', ownerRole:'qms_manager',
       basis:'Prosci CMROI 2023 · WI-105 §4.2',
       rationale:'Mục tiêu 100% (mỗi phòng có 1 chính + 1 dự phòng) đảm bảo vận hành liên tục khi người chính nghỉ. Prosci CMROI 2023: dự án có người dẫn dắt thay đổi được chỉ định rõ tên đạt mức áp dụng cao hơn 6 lần. Người dự phòng không bắt buộc đào tạo tại chỗ đầy đủ nhưng phải nắm đường leo thang xử lý.',
       method:'Tử số = số phòng có đủ người tham dự và người dự bị được đề cử và đã ký xác nhận. Mẫu số = số phòng đang tham gia × 2 tối thiểu; nếu phòng thêm người, mẫu số tăng theo roster thực tế.',
       escalation:'<100% → cổng kiểm P0-02 chặn. Phòng nào còn thiếu người dự phòng phải đề cử trong 3 ngày làm việc.'},
 
-    {id:'KPI-DEP-02', label:'Đóng phiếu việc đúng hạn',   target:'>=95', unit:'%', short:'ĐI',
+    {id:'KPI-DEP-02', label:'Đóng phiếu việc đúng hạn',   target:'>=95', unit:'%', short:'ĐI', ownerRole:'ceo',
       basis:'ITIL 4 Incident Management · Gartner ITSM 2023',
       rationale:'Mục tiêu ≥95% phiếu việc được đóng trong cam kết thời gian xử lý (SLA). Tham chiếu ITIL: nhóm tốp 25% đạt ≥95%. Dưới mức này, tồn đọng dồn lại và niềm tin của người dùng bị bào mòn (Gartner ITSM 2023).',
       method:'Ma trận cam kết thời gian xử lý theo ANNEX-117: Mức 1 trong 24 giờ, Mức 2 trong 3 ngày, Mức 3 trong 1 tuần. Tử số = số phiếu việc đóng đúng SLA trong tuần này, mẫu số = tổng số phiếu đã đóng trong tuần.',
       escalation:'<85% → leo thang lên Tổ điều hành. 85–94% → tăng tần suất họp nhanh đầu ngày từ tuần này.'},
 
-    {id:'KPI-DEP-03', label:'Tỉ lệ thay đổi thất bại',    target:'<=10', unit:'%', short:'TB',
+    {id:'KPI-DEP-03', label:'Tỉ lệ thay đổi thất bại',    target:'<=10', unit:'%', short:'TB', ownerRole:'qa_manager',
       basis:'DORA "State of DevOps" 2024 · ITIL 4 Change Enablement',
       rationale:'Mục tiêu ≤10% theo DORA 2024: nhóm dẫn đầu 0–15%, nhóm khá 16–30%. 10% phù hợp với mức trưởng thành trung bình — cho phép thử nghiệm mà không bào mòn niềm tin. Đo cả thay đổi tài liệu (SOP/WI), không chỉ phần mềm.',
       method:'Tử số = số thay đổi phải khôi phục hoặc vá khẩn cấp trong vòng 7 ngày kể từ ngày hiệu lực. Mẫu số = tổng số thay đổi đã phát hành trong tuần đó. Nguồn: dcc_document_revision.',
       escalation:'>15% → tạm đóng băng mọi thay đổi không trọng yếu, soát xét nguyên nhân gốc trong 5 ngày.'},
 
-    {id:'KPI-DEP-04', label:'Thời gian phát hành (ngày)', target:'<=10', unit:'d', short:'LT',
+    {id:'KPI-DEP-04', label:'Thời gian phát hành (ngày)', target:'<=10', unit:'d', short:'LT', ownerRole:'it_manager',
       basis:'DORA "State of DevOps" 2024',
       rationale:'Mục tiêu ≤10 ngày từ khi đề xuất đến khi tài liệu có hiệu lực. DORA 2024: nhóm dẫn đầu <1 ngày, nhóm khá 1 ngày–1 tuần, nhóm trung bình 1 tuần–1 tháng. 10 ngày là đỉnh nhóm trung bình, đạt được với việc sửa đổi SOP/WI (không phải phần mềm).',
       method:'Tử số = tổng (ngày phê duyệt − ngày trình) của các thay đổi đã phát hành trong tuần. Mẫu số = số lượng thay đổi. Lấy trung vị (không lấy bình quân) để tránh giá trị ngoại lai.',
       escalation:'>15 ngày → soát xét nút thắt phê duyệt (thường là khâu ký). Cân nhắc luật uỷ quyền theo ANNEX-120.'},
 
-    {id:'KPI-DEP-05', label:'Cập nhật dashboard đúng hạn', target:'>=95', unit:'%', short:'RF',
+    {id:'KPI-DEP-05', label:'Cập nhật dashboard đúng hạn', target:'>=95', unit:'%', short:'RF', ownerRole:'qms_manager',
       basis:'Gartner Data & Analytics 2023 · ANNEX-110',
       rationale:'Mục tiêu ≥95% số ô dữ liệu được cập nhật đúng lịch. Gartner: dashboard cập nhật trễ dưới mức 95% sẽ mất niềm tin của người ra quyết định trong vòng 4 tuần. Nhịp họp tầng không thể vận hành nếu KPI nguồn không kịp thời.',
       method:'Tử số = số ô có data_collected_at trong hạn (theo nhịp của ô: ngày/tuần/tháng). Mẫu số = tổng số ô đang hoạt động. Chốt số liệu theo tuần.',
       escalation:'<90% → người phụ trách ô có 3 ngày để khắc phục nguồn dữ liệu. <80% → tạm gỡ ô dữ liệu báo đỏ khỏi dashboard để tránh quyết định sai.'},
 
-    {id:'KPI-DEP-06', label:'Tần suất phát hành (thay đổi/tuần)', target:'>=3', unit:'', short:'TS',
+    {id:'KPI-DEP-06', label:'Tần suất phát hành (thay đổi/tuần)', target:'>=3', unit:'', short:'TS', ownerRole:'qms_manager',
       basis:'DORA "State of DevOps" 2024 (Tần suất phát hành)',
       rationale:'Đây là chỉ số thứ 4 trong bộ Four Keys của DORA (chuẩn quốc tế cho quản trị thay đổi). Nhóm dẫn đầu ≥1 lần/ngày, nhóm khá 1 lần/tuần đến 1 lần/tháng. Mục tiêu ≥3 thay đổi/tuần bảo đảm doanh nghiệp thực sự đang vận hành vòng cải tiến, không đóng băng tài liệu. Nếu = 0 trong 2 tuần liên tiếp → cảnh báo: luồng thay đổi đang tắc, hoặc cam kết thời gian soát tài liệu bị bỏ qua.',
       method:'Đếm số bản sửa đổi đã phê duyệt trong dcc_document_revision có ngày phê duyệt nằm trong tuần hiện tại. Tính cả bản lớn, bản nhỏ và bản vá.',
       escalation:'<1 trong 2 tuần liên tiếp → soát thông lượng của hội đồng phê duyệt thay đổi (CAB). Có thể là nút thắt phê duyệt hoặc khối lượng tồn đọng soát tài liệu quá lớn.'},
 
-    {id:'KPI-DEP-07', label:'Thời gian phục hồi sự cố Mức 1 (giờ)', target:'<=24', unit:'h', short:'MR',
+    {id:'KPI-DEP-07', label:'Thời gian phục hồi sự cố Mức 1 (giờ)', target:'<=24', unit:'h', short:'MR', ownerRole:'qms_manager',
       basis:'DORA "State of DevOps" 2024 (Thời gian phục hồi trung bình) · ITIL 4',
       rationale:'Đây là chỉ số thứ 3 trong bộ Four Keys của DORA. Nhóm dẫn đầu <1 giờ, nhóm khá <1 ngày, nhóm trung bình 1 ngày–1 tuần. Mục tiêu ≤24 giờ cho tài liệu/quy trình: thời gian từ khi phát hiện sự cố Mức 1 (tài liệu sai đã hiệu lực, người vận hành đang dùng sai) đến khi khôi phục hoặc bản vá đã phát hành. Nếu >24 giờ, người dùng đã sản xuất ≥1 ca làm việc dựa trên tài liệu sai.',
       method:'Trung vị (closed_at − sev1_reported_at) của các phiếu việc Mức 1 trong 4 tuần gần nhất. Nếu chưa có sự cố Mức 1 nào: ghi "—" (không ghi 0).',
@@ -720,6 +738,43 @@ function deployKpiRag(kpi, value){
   }
   return 'none';
 }
+function deployKpiOwnerLabel(ownerRole){
+  const labels = {
+    ceo: 'Giám đốc',
+    qms_manager: 'Trưởng QMS',
+    qa_manager: 'Trưởng QA',
+    hr_manager: 'Trưởng Nhân sự',
+    it_manager: 'Trưởng IT',
+  };
+  return labels[String(ownerRole || '')] || 'Chưa phân công';
+}
+function deployOwnerRoleFromDeptOwner(owner){
+  const normalized = String(owner || '').trim().toLowerCase();
+  const aliases = {
+    'ceo': 'ceo',
+    'giám đốc': 'ceo',
+    'giam doc': 'ceo',
+    'qms manager': 'qms_manager',
+    'qa manager': 'qa_manager',
+    'quality manager': 'qa_manager',
+    'hr manager': 'hr_manager',
+    'it manager': 'it_manager',
+  };
+  return aliases[normalized] || '';
+}
+function deployOverviewKpis(){
+  const items = DEPLOY_CONFIG.kpis.slice();
+  const usage = items.filter(kpi => String(kpi.id || '').startsWith('KPI-USE-'));
+  const other = items.filter(kpi => !String(kpi.id || '').startsWith('KPI-USE-'));
+  return usage.concat(other);
+}
+function deployDeptKpiOwnerSummary(dept){
+  const ownerRole = deployOwnerRoleFromDeptOwner(dept && dept.owner);
+  const items = ownerRole ? DEPLOY_CONFIG.kpis.filter(kpi => kpi.ownerRole === ownerRole) : [];
+  const kv = (DeployState.readiness && DeployState.readiness.kpiValues) || {};
+  const redItems = items.filter(kpi => deployKpiRag(kpi, kv[kpi.id]) === 'red');
+  return { ownerRole, items, redItems };
+}
 function deployChampionCount(){
   let pass = 0;
   deployActiveDepartments().forEach(dept => {
@@ -881,9 +936,9 @@ function renderTabOverview(){
       </div>
     </section>
     <section class="deploy-section">
-      <div class="deploy-section-head"><h2>KPI triển khai</h2><span>${DeployState.me.canEdit ? 'Nhập giá trị thực tế' : 'Chỉ đọc — không có quyền edit'}</span></div>
+      <div class="deploy-section-head"><h2>KPI triển khai</h2><span>${DeployState.me.canEdit ? 'Nhập giá trị thực tế' : 'Chỉ đọc — không có quyền chỉnh'}</span></div>
       <div class="kpi-mini-grid">
-        ${DEPLOY_CONFIG.kpis.map(k => renderKpiCard(k, kv[k.id])).join('')}
+        ${deployOverviewKpis().map(k => renderKpiCard(k, kv[k.id])).join('')}
       </div>
     </section>
     <section class="deploy-section">
@@ -920,12 +975,15 @@ function renderKpiCard(kpi, value){
   const rag = deployKpiRag(kpi, v);
   const ro = !DeployState.me.canEdit;
   const hasTip = !!(kpi.rationale || kpi.basis || kpi.method);
+  const isUsageKpi = String(kpi.id || '').startsWith('KPI-USE-');
+  const usagePending = isUsageKpi && v === '';
+  const placeholder = usagePending ? 'Chưa có số liệu' : '—';
   // Build rationale tooltip body. Uses an <aside> floating beside the card on
   // hover (CSS-only). Native `title=` on the input is also set so screen-
   // readers and keyboard-focus users get the same content.
   const tipHtml = hasTip ? `
     <aside class="kpi-tip" role="tooltip">
-      <div class="kpi-tip-head">${deployEscape(kpi.label)} <span>· Target ${deployEscape(kpi.target)}${deployEscape(kpi.unit)}</span></div>
+      <div class="kpi-tip-head">${deployEscape(kpi.label)} <span>· Mục tiêu ${deployEscape(kpi.target)}${deployEscape(kpi.unit)}</span></div>
       ${kpi.basis     ? `<div class="kpi-tip-row"><strong>Cơ sở:</strong> ${deployEscape(kpi.basis)}</div>` : ''}
       ${kpi.rationale ? `<div class="kpi-tip-row"><strong>Vì sao:</strong> ${deployEscape(kpi.rationale)}</div>` : ''}
       ${kpi.method    ? `<div class="kpi-tip-row"><strong>Đo thế nào:</strong> ${deployEscape(kpi.method)}</div>` : ''}
@@ -940,10 +998,12 @@ function renderKpiCard(kpi, value){
   <div class="kpi-mini-card kpi-rag-${rag}${hasTip ? ' has-kpi-tip' : ''}">
     <div class="kpi-card-header">
       <div class="kpi-mini-icon">${deployEscape(kpi.short)}</div>
-      <span class="kpi-mini-target">Target ${deployEscape(kpi.target)}${deployEscape(kpi.unit)}</span>
+      <span class="kpi-mini-target">Mục tiêu ${deployEscape(kpi.target)}${deployEscape(kpi.unit)}</span>
     </div>
     <div class="kpi-mini-label">${deployEscape(kpi.label)}</div>
-    <input type="text" class="kpi-mini-input" value="${deployEscape(v)}" placeholder="—" ${ro ? 'disabled' : ''} title="${deployEscape(titleAttr)}" onchange="deployUpdateMetric('${deployEscape(kpi.id)}', this.value)">
+    <input type="text" class="kpi-mini-input" value="${deployEscape(v)}" placeholder="${deployEscape(placeholder)}" ${ro ? 'disabled' : ''} title="${deployEscape(titleAttr)}" onchange="deployUpdateMetric('${deployEscape(kpi.id)}', this.value)">
+    ${usagePending ? '<div class="kpi-mini-hint">Nhật ký doc_access_log đã bật từ R2-06; chờ đủ 7 ngày để tính.</div>' : ''}
+    <div class="kpi-mini-owner">Chủ trì: ${deployEscape(deployKpiOwnerLabel(kpi.ownerRole))}</div>
     ${tipHtml}
   </div>`;
 }
@@ -1105,6 +1165,7 @@ function renderTabDepartments(){
               <th>Phòng ban</th>
               <th>Đợt</th>
               ${DEPLOY_CONFIG.readinessDimensions.map(dim => `<th title="${deployEscape(dim.help)}">${deployEscape(dim.label)}</th>`).join('')}
+              <th>KPI tôi chịu</th>
               <th>Tiến độ</th>
             </tr>
           </thead>
@@ -1173,6 +1234,15 @@ function renderReadinessRow(dept){
   const r = (DeployState.readiness && DeployState.readiness.deptReadiness && DeployState.readiness.deptReadiness[dept.id]) || {};
   const pct = Math.round(deployDeptProgress(dept.id) * 100);
   const ro = !DeployState.me.canEdit;
+  const ownedKpis = deployDeptKpiOwnerSummary(dept);
+  const ownedTotal = ownedKpis.items.length;
+  const ownedRed = ownedKpis.redItems.length;
+  const ownedText = ownedTotal ? (ownedRed ? `${ownedRed}/${ownedTotal} đỏ` : `${ownedTotal}`) : '—';
+  const ownedTitle = ownedTotal
+    ? `Chủ trì: ${deployKpiOwnerLabel(ownedKpis.ownerRole)} · ${ownedKpis.items.map(kpi => kpi.id).join(', ')}`
+    : 'Chưa có KPI gắn với trưởng phòng này';
+  const ownedClass = ownedRed ? 'hm-blocked' : (ownedTotal ? 'hm-completed' : 'hm-pending');
+  const ownedStyle = ownedRed ? 'border:2px solid #dc2626' : '';
   return `
   <tr>
     <td>
@@ -1188,6 +1258,7 @@ function renderReadinessRow(dept){
       const onClick = ro ? '' : `onclick="deployCycleReadiness('${dept.id}','${dim.id}')"`;
       return `<td class="heatmap-cell hm-${v} ${ro ? 'hm-readonly' : ''}" ${onClick} title="${deployEscape(dept.label)} · ${deployEscape(dim.label)} · ${v}">${deployStatusIcon(v)}</td>`;
     }).join('')}
+    <td class="heatmap-cell ${ownedClass}" style="${ownedStyle}" title="${deployEscape(ownedTitle)}">${deployEscape(ownedText)}</td>
     <td><strong>${pct}%</strong><div class="dept-mini-bar"><span style="width:${pct}%;background:${dept.color}"></span></div></td>
   </tr>`;
 }
