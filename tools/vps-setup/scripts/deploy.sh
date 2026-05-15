@@ -322,6 +322,18 @@ run_composer_install() {
         && [ "$(cat "$hash_cache" 2>/dev/null)" = "$current_hash" ] \
         && [ -d "$SITE_DIR/mom/vendor" ]; then
         log "INFO" "composer.lock unchanged — skipping composer install"
+        # Still regenerate the optimised classmap so NEW PHP files added to
+        # existing PSR-4 namespaces become resolvable. Without this, classes
+        # added in feature branches that don't touch composer.lock are missing
+        # from autoload_classmap and PHP-FPM emits "Class not found" errors
+        # until composer dump-autoload runs.
+        log "INFO" "Refreshing autoload classmap (composer dump-autoload -o)..."
+        COMPOSER_ALLOW_SUPERUSER=1 composer dump-autoload \
+            --working-dir="$SITE_DIR/mom" \
+            --no-dev \
+            --optimize \
+            --no-interaction >>"$LOG" 2>&1 \
+            || log "WARN" "composer dump-autoload returned non-zero (continuing)"
         return
     fi
 
