@@ -40,6 +40,16 @@ $violations = [];
 //     requireAdmin().
 $REQUIRE_AUTHZ_FILES = [
     'mom/api/controllers/UserController.php',
+    'mom/api/controllers/RbacController.php',
+    'mom/api/controllers/ApiKeyController.php',
+];
+
+// Minimum requireAuthz() callsites per kernelized controller. Detects silent
+// regressions where someone deletes the gate without replacing it.
+$MIN_AUTHZ_CALLSITES = [
+    'mom/api/controllers/UserController.php'   => 6,
+    'mom/api/controllers/RbacController.php'   => 16,
+    'mom/api/controllers/ApiKeyController.php' => 4,
 ];
 
 foreach ($REQUIRE_AUTHZ_FILES as $rel) {
@@ -56,13 +66,25 @@ foreach ($REQUIRE_AUTHZ_FILES as $rel) {
                       . 'This controller is on the AuthorizationKernel allowlist — '
                       . 'use $this->requireAuthz(\$me, \'permission.code\') instead.';
     }
-    // Sanity: every requireAuth() should be paired with at least one
-    // requireAuthz() (we expect 6 in UserController). A drop to zero would
-    // be a silent regression.
+    // Detect silent regressions (gate deletions). The minimum count is the
+    // floor — adding more is fine.
     $authzCount = preg_match_all('/->requireAuthz\s*\(/', $src);
-    if ($authzCount < 1) {
-        $violations[] = "[authz-1] $rel has zero requireAuthz() calls — "
-                      . 'kernel gate disappeared. Reinstate requireAuthz() per method.';
+    $expected = $MIN_AUTHZ_CALLSITES[$rel] ?? 1;
+    if ($authzCount < $expected) {
+        $violations[] = "[authz-1] $rel has $authzCount requireAuthz() calls — "
+                      . "expected at least $expected. A gate disappeared.";
+    }
+}
+
+// --- (1b) Legacy api.php switch must fail-closed for kernelized actions.
+$apiPhp = $root . '/mom/api.php';
+if (is_file($apiPhp)) {
+    $src = (string)file_get_contents($apiPhp);
+    if (strpos($src, "'legacy_path_disabled'") === false
+        || strpos($src, 'kernelized_actions') === false) {
+        $violations[] = '[authz-1b] mom/api.php legacy switch is missing the '
+                      . 'fail-closed deny-list for kernelized actions. Add the '
+                      . '$kernelized_actions guard that emits legacy_path_disabled (410).';
     }
 }
 
@@ -106,14 +128,25 @@ foreach ($phpFiles as $rel) {
     }
 }
 
-// --- (3) Migration 185 present.
-$mig = $root . '/mom/database/migrations/185_authz_decision_log.sql';
-if (!is_file($mig)) {
-    $violations[] = '[authz-3] missing migration mom/database/migrations/185_authz_decision_log.sql';
+// --- (3) Migration 185 + 186 present.
+$mig185 = $root . '/mom/database/migrations/185_authz_decision_log.sql';
+if (!is_file($mig185)) {
+    $violations[] = '[authz-3a] missing migration mom/database/migrations/185_authz_decision_log.sql';
 } else {
-    $src = (string)file_get_contents($mig);
+    $src = (string)file_get_contents($mig185);
     if (!str_contains($src, 'CREATE TABLE IF NOT EXISTS auth_decision_event')) {
-        $violations[] = '[authz-3] migration 185 does not declare auth_decision_event';
+        $violations[] = '[authz-3a] migration 185 does not declare auth_decision_event';
+    }
+}
+$mig186 = $root . '/mom/database/migrations/186_authz_kernel_apikey_perms.sql';
+if (!is_file($mig186)) {
+    $violations[] = '[authz-3b] missing migration mom/database/migrations/186_authz_kernel_apikey_perms.sql';
+} else {
+    $src = (string)file_get_contents($mig186);
+    foreach (['apikeys.view','apikeys.create','apikeys.revoke','jwt.issue'] as $perm) {
+        if (!str_contains($src, "'$perm'")) {
+            $violations[] = "[authz-3b] migration 186 does not seed permission_catalog row for '$perm'";
+        }
     }
 }
 
