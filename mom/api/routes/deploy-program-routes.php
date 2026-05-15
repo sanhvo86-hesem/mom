@@ -32,6 +32,8 @@ return static function (Router $router, string $dataDir): void {
         'deploy_access_review' => [DeployProgramController::class, 'recordAccessReview'],
         'deploy_handover' => [DeployProgramController::class, 'recordHandover'],
         'deploy_qr_rotated' => [DeployProgramController::class, 'recordQrRotation'],
+        'deploy_signer_delegated' => [DeployProgramController::class, 'recordSignerDelegation'],
+        'deploy_offline_fallback' => [DeployProgramController::class, 'recordOfflineFallback'],
         'deploy_audit_save'        => [DeployProgramController::class, 'saveAudit'],
         'deploy_audit_finding_save'=> [DeployProgramController::class, 'saveFinding'],
         'deploy_review_save'       => [DeployProgramController::class, 'saveReview'],

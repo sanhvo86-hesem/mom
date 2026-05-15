@@ -106,6 +106,7 @@
 <tr><td>Đăng nhập</td><td>SSO Microsoft 365 + MFA bắt buộc; không có local password.</td></tr>
 <tr><td>Mượn account</td><td>Vi phạm POL-QMS-002 đạo đức nghề nghiệp; bị đình chỉ tài khoản 30 ngày.</td></tr>
 <tr><td>audit_events</td><td>Mỗi sự kiện ghi user_id (UUID) + ip_address + user_agent + session_id; bảng INSERT-only (trigger chặn UPDATE/DELETE).</td></tr>
+<tr><td>Nâng mức sự cố</td><td>deploy.issue.save khi sev giảm (Mức 3→Mức 2 hoặc Mức 2→Mức 1) ghi thêm previous_sev + severity_bumped=1 trong metadata để kiểm toán viên truy ngược dòng nâng mức; không cần endpoint riêng.</td></tr>
 <tr><td>Sửa cẩm nang sau released</td><td>Chỉ Trưởng QMS submit dcc_change_request; Giám đốc approve ≤3 ngày làm việc; phiên bản tăng V0→V1; revision_history ghi lý do.</td></tr>
 <tr><td>Phiên bản bản vẽ khoá</td><td>Trường drawing_rev_locked_at trong hồ sơ Job Order — không cho update sau Trưởng QA ký, dù bản vẽ rev tăng lên.</td></tr>
 </tbody>
@@ -120,8 +121,8 @@
 <tr><td>Sáng Thứ Bảy 9:00 cổng không truy cập được</td><td>(a) hoãn 30 phút, IT khắc phục; (b) nếu vẫn không lên sau 60 phút, dời họp sang Chủ Nhật cùng giờ; (c) sự cố ghi issues.json severity=Mức 1 source=real ngay khi cổng phục hồi.</td></tr>
 <tr><td>Phòng họp lớn không có TV/projector</td><td>Hoãn họp đến khi có TV ≥55 inch hoặc projector kết nối Wi-Fi/HDMI; không họp giấy.</td></tr>
 <tr><td>Champion vắng đột xuất ngày họp</td><td>Người dự phòng (champions.json field backup) tiếp quản; xác nhận điện tử qua M365 trong vòng 4 giờ.</td></tr>
-<tr><td>Giám đốc vắng cổng quyết định Đi/Không đi</td><td>Theo Authority-matrix: Phó Giám đốc Vận hành ký thay; ghi sự kiện audit_events deploy.signer.delegated.</td></tr>
-<tr><td>VPS mất điện toàn ngày</td><td>Đội tăng cường ghi sổ giấy tạm; nhập lại cổng trong 24 giờ sau khi phục hồi; ghi sự kiện deploy.offline.fallback.</td></tr>
+<tr><td>Giám đốc vắng cổng quyết định Đi/Không đi</td><td>Theo Authority-matrix (ANNEX-120): Phó Giám đốc Vận hành ký thay; gọi endpoint deploy_signer_delegated với weekN + decision + delegatedFrom (ceo) + delegatedTo (operations_director) + reason; backend ghi audit_events deploy.signer.delegated + lưu signOff.delegation vào program.json.</td></tr>
+<tr><td>VPS mất điện toàn ngày</td><td>Đội tăng cường ghi sổ giấy tạm; trong 24h sau khi phục hồi gọi endpoint deploy_offline_fallback với outageStart + outageEnd + scope + paperLogUrl + reentryCount; backend ghi audit_events deploy.offline.fallback + lưu readiness.offlineFallbacks[].</td></tr>
 </tbody>
 </table>
 <p>Nguyên tắc: KHÔNG quay về ký giấy thường xuyên; giấy chỉ là sổ tạm cho tình huống đặc biệt — phải nhập lại cổng.</p>
