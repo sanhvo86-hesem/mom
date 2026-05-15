@@ -35,11 +35,11 @@
      data-dcc-doc-code="TRN-DEP-PLAYBOOK"
      data-dcc-locale="vi"
      data-dcc-logo="../../../../assets/hesem-logo.svg"
-     data-dcc-bootstrap='{"header":{"doc_code":"TRN-DEP-PLAYBOOK","title":"Kịch bản họp triển khai vận hành","subtitle":"Khung họp tuần đọc dữ liệu từ program.json","doc_type":"TRN","revision":"V0","effective_date":"2026-05-14","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":null,"status":"released"}}'></div>
+     data-dcc-bootstrap='{"header":{"doc_code":"TRN-DEP-PLAYBOOK","title":"Kịch bản họp triển khai vận hành","subtitle":"Khung họp tuần đọc dữ liệu từ chương trình triển khai","doc_type":"TRN","revision":"V0","effective_date":"2026-05-14","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":null,"status":"released"}}'></div>
 <div class="doc-content" id="docContent">
 <h1 class="h2">Kịch bản họp triển khai vận hành</h1>
-<p>Trưởng QMS dùng một khung họp thống nhất cho mọi tuần. Bảng tuần đọc từ <code>program.json</code> để ngày, nhãn và tài liệu bắt buộc không bị gõ lại sai.</p>
-<section class="card" id="sec-prep">
+<p>Trưởng QMS dùng một khung họp thống nhất cho mọi tuần. Bảng tuần đọc từ endpoint chương trình triển khai để ngày, nhãn và tài liệu bắt buộc không bị gõ lại sai.</p>
+<section class="card" id="chuong-1">
 <h2 class="h2">Chương 1 — Chuẩn bị buổi họp · T-7 / T-3 / T-1 / T-0</h2>
 <table>
 <thead><tr><th>Mốc</th><th>Người làm</th><th>Việc</th><th>Bằng chứng</th></tr></thead>
@@ -55,7 +55,7 @@
 </tbody>
 </table>
 </section>
-<section class="card" id="sec-agenda">
+<section class="card" id="chuong-2">
 <h2 class="h2">Chương 2 — Khung họp 60 phút</h2>
 <table>
 <tbody>
@@ -66,14 +66,14 @@
 </tbody>
 </table>
 </section>
-<section class="card" id="sec-objective">
-<h2 class="h2">Chương 3 — Bảng 12 tuần — mỗi tuần khác gì</h2>
+<section class="card" id="chuong-3">
+<h2 class="h2">Chương 3 — Bảng 13 tuần — mỗi tuần khác gì</h2>
 <table>
 <thead><tr><th>Tuần</th><th>Ngày</th><th>Việc khác biệt</th><th>Tài liệu bắt buộc</th></tr></thead>
-<tbody id="program-weeks-body"><tr><td colspan="4">Bảng đang đọc <code>program.json</code>.</td></tr></tbody>
+<tbody id="program-weeks-body"><tr><td colspan="4">Bảng đang đọc chương trình triển khai.</td></tr></tbody>
 </table>
 </section>
-<section class="card" id="sec-tasks">
+<section class="card" id="chuong-4">
 <h2 class="h2">Chương 4 — Mẫu báo cáo 5 phút mỗi phòng</h2>
 <ol class="tight">
 <li>Tuần này tôi đã làm xong việc gì có bằng chứng?</li>
@@ -82,7 +82,7 @@
 <li>Tuần sau tôi cần ai làm gì cho tôi trước Thứ Tư?</li>
 </ol>
 </section>
-<section class="card" id="sec-gate">
+<section class="card" id="chuong-5">
 <h2 class="h2">Chương 5 — Quy ước chốt Đi tiếp / Không đi tiếp</h2>
 <table>
 <thead><tr><th>Điều kiện CẦN</th><th>Điều kiện ĐỦ</th></tr></thead>
@@ -100,11 +100,25 @@
 <script>
 (function () {
   var body = document.getElementById('program-weeks-body');
-  function shortLabel(label) {
+  var summaries = {
+    0: 'Tổ điều hành kiểm tài liệu nền',
+    1: 'Giám đốc công bố tài liệu nền',
+    2: 'Trưởng phòng rà sổ tay và RACI',
+    3: 'Trưởng phòng chốt RACI và người dẫn dắt học tại việc',
+    4: 'QA chạy thí điểm có bằng chứng thật',
+    5: 'QA chốt Đi tiếp hoặc Không đi tiếp',
+    6: 'Đợt 2 mở cho Chuỗi cung ứng và Kinh doanh',
+    7: 'Đợt 2 rà giữa kỳ và chuẩn bị đợt 3',
+    8: 'Sản xuất và Kỹ thuật vào vận hành chính thức',
+    9: 'Sản xuất được chăm sóc sát và đợt 3 khởi động',
+    10: 'Đợt 3 ổn định và soát bảng điều khiển',
+    11: 'Phòng ban rút kinh nghiệm và sửa tài liệu',
+    12: 'Giám đốc bàn giao sang vận hành thường xuyên'
+  };
+  function rewriteLabel(label, weekN) {
+    if (Object.prototype.hasOwnProperty.call(summaries, weekN)) return summaries[weekN];
     var text = String(label || '').trim();
-    var parts = text.split(/\s+/);
-    if (parts.length <= 18) return text;
-    return parts.slice(0, 18).join(' ') + '…';
+    return text.split(/\s+/).slice(0, 18).join(' ');
   }
   function docLink(code) {
     var a = document.createElement('a');
@@ -112,26 +126,36 @@
     a.href = '#';
     a.textContent = code;
     a.addEventListener('click', function (event) {
-      if (window.openDoc) { event.preventDefault(); window.openDoc(code); }
+      event.preventDefault();
+      if (window.openDoc) {
+        window.openDoc(code);
+      }
     });
     return a;
   }
+  function normalizeProgramPayload(payload) {
+    if (payload && Array.isArray(payload.weeks)) return payload;
+    if (payload && payload.data && Array.isArray(payload.data.weeks)) return payload.data;
+    if (payload && payload.data && payload.data.program && Array.isArray(payload.data.program.weeks)) return payload.data.program;
+    if (payload && payload.program && Array.isArray(payload.program.weeks)) return payload.program;
+    return null;
+  }
   function render(data) {
-    var weeks = Array.isArray(data.weeks) ? data.weeks : [];
+    var weeks = Array.isArray(data.weeks) ? data.weeks.slice(0, 13) : [];
     body.innerHTML = '';
-    weeks.forEach(function (week) {
+    weeks.forEach(function (week, index) {
       var tr = document.createElement('tr');
       var weekCell = document.createElement('td');
       var dateCell = document.createElement('td');
       var labelCell = document.createElement('td');
       var docsCell = document.createElement('td');
-      var n = (typeof week.n === 'number') ? week.n : 0;
-      weekCell.textContent = 'W' + n;
+      var parsedWeekN = Number(week.n);
+      var weekN = Number.isFinite(parsedWeekN) ? parsedWeekN : index;
+      weekCell.textContent = 'W' + String(weekN).padStart(2, '0');
       dateCell.textContent = week.date || '';
-      labelCell.textContent = shortLabel(week.label);
+      labelCell.textContent = rewriteLabel(week.label, weekN);
       (Array.isArray(week.requiredDocs) ? week.requiredDocs : []).forEach(function (code) {
         docsCell.appendChild(docLink(code));
-        docsCell.appendChild(document.createTextNode(' '));
       });
       tr.appendChild(weekCell);
       tr.appendChild(dateCell);
@@ -141,12 +165,49 @@
     });
     if (!weeks.length) body.innerHTML = '<tr><td colspan="4">Trưởng QMS chưa đọc được dữ liệu tuần.</td></tr>';
   }
-  fetch('../../../../data/config/deploy/program.json', {cache: 'no-store'})
-    .then(function (response) { return response.json(); })
-    .then(render)
-    .catch(function () {
-      body.innerHTML = '<tr><td colspan="4">Trưởng QMS kiểm lại đường dẫn program.json trước buổi họp.</td></tr>';
+  function renderFallbackMessage() {
+    body.innerHTML = '';
+    var tr = document.createElement('tr');
+    var td = document.createElement('td');
+    var link = document.createElement('a');
+    td.colSpan = 4;
+    td.appendChild(document.createTextNode('Bảng tuần chỉ hiển thị khi mở qua bảng điều khiển. Mở tại: '));
+    link.href = '/mom/portal.html#module=deploy';
+    link.textContent = '/mom/portal.html#module=deploy';
+    td.appendChild(link);
+    tr.appendChild(td);
+    body.appendChild(tr);
+  }
+  function fetchProgramFromSource(source) {
+    return fetch(source.url, {
+      cache: 'no-store',
+      credentials: 'same-origin',
+      headers: {Accept: 'application/json'}
+    }).then(function (response) {
+      if (!response.ok) throw new Error(source.name + ' ' + response.status);
+      return response.json();
+    }).then(function (payload) {
+      var normalized = normalizeProgramPayload(payload);
+      if (!normalized) throw new Error(source.name + ' payload');
+      return normalized;
     });
+  }
+  function readProgram(sources, index) {
+    if (index >= sources.length) {
+      renderFallbackMessage();
+      return;
+    }
+    fetchProgramFromSource(sources[index])
+      .then(render)
+      .catch(function () {
+        readProgram(sources, index + 1);
+      });
+  }
+  readProgram([
+    {name: 'legacy-action', url: '/api.php?action=deploy_program_get'},
+    {name: 'rest-route', url: '/mom/api/v1/deploy/program'},
+    {name: 'static-json', url: '../../../../data/config/deploy/program.json'}
+  ], 0);
 })();
 </script>
 </div></div></div>

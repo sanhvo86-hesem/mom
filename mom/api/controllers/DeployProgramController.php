@@ -66,6 +66,16 @@ class DeployProgramController extends BaseController
         ]);
     }
 
+    public function getProgram(): never
+    {
+        $this->requireAuth();
+        $this->success([
+            'data' => [
+                'weeks' => $this->minimalProgramWeeks($this->loadFile(self::FILE_PROGRAM)),
+            ],
+        ]);
+    }
+
     public function cycleReadiness(): never
     {
         $me = $this->requireAuth();
@@ -708,6 +718,40 @@ class DeployProgramController extends BaseController
         $seedPath = $base . preg_replace('/\.json$/', '.bootstrap.json', $rel);
         $seed = $this->readJsonFile($seedPath);
         return is_array($seed) ? $seed : [];
+    }
+
+    /**
+     * @return list<array{n:int,date:string,label:string,requiredDocs:list<string>,playbookCode:?string}>
+     */
+    private function minimalProgramWeeks(array $program): array
+    {
+        $weeks = is_array($program['weeks'] ?? null) ? array_values($program['weeks']) : [];
+        $out = [];
+        foreach ($weeks as $idx => $week) {
+            if (!is_array($week)) {
+                continue;
+            }
+            $requiredDocs = [];
+            $rawDocs = is_array($week['requiredDocs'] ?? null) ? $week['requiredDocs'] : [];
+            foreach ($rawDocs as $docCode) {
+                if (!is_scalar($docCode)) {
+                    continue;
+                }
+                $docCode = trim((string)$docCode);
+                if ($docCode !== '') {
+                    $requiredDocs[] = $docCode;
+                }
+            }
+            $playbookCode = $week['playbookCode'] ?? null;
+            $out[] = [
+                'n' => (int)($week['n'] ?? $idx),
+                'date' => (string)($week['date'] ?? ''),
+                'label' => (string)($week['label'] ?? ''),
+                'requiredDocs' => $requiredDocs,
+                'playbookCode' => is_scalar($playbookCode) && trim((string)$playbookCode) !== '' ? trim((string)$playbookCode) : null,
+            ];
+        }
+        return $out;
     }
 
     private function saveFile(string $rel, array $data): void

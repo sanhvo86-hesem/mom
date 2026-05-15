@@ -9,6 +9,7 @@ use MOM\Api\Router;
 return static function (Router $router, string $dataDir): void {
     $router->actions([
         'deploy_state_load'        => [DeployProgramController::class, 'loadState'],
+        'deploy_program_get'       => [DeployProgramController::class, 'getProgram'],
         'deploy_users_list'        => [DeployProgramController::class, 'listUsers'],
         'deploy_readiness_cycle'   => [DeployProgramController::class, 'cycleReadiness'],
         'deploy_metric_update'     => [DeployProgramController::class, 'updateMetric'],
@@ -30,4 +31,6 @@ return static function (Router $router, string $dataDir): void {
         'deploy_capa_bridge'       => [DeployProgramController::class, 'bridgeCapa'],
         'deploy_state_reset'       => [DeployProgramController::class, 'resetState'],
     ]);
+    $router->get('/api/v1/deploy/program', DeployProgramController::class, 'getProgram');
+    $router->get('/mom/api/v1/deploy/program', DeployProgramController::class, 'getProgram');
 };
