@@ -1,0 +1,206 @@
+{
+  "$schema": "https://hesem.io/schema/m365-provisioning-blueprint.v2-canonical.json",
+  "version": "2.0.0-canonical",
+  "generated_at": "2026-05-16",
+  "spec_reference": "ANNEX-133 (canonical from main branch)",
+  "audit_target": ["AS9100D certification", "Lam Research customer audit", "ISO 9001/14001/45001"],
+  "owner_role": "QMS Engineer",
+  "approver": "CEO",
+  "tenant_placeholder": "{tenant}.sharepoint.com",
+  "sites": [
+    {
+      "code": "hesem-records",
+      "title": "HESEM-Records",
+      "purpose": "Hồ sơ vận hành dùng chung (biểu mẫu đã điền + bằng chứng không gắn job)",
+      "libraries": ["QMS-Governance", "Quality-Records", "Training-Records", "Department-Ops"]
+    },
+    {
+      "code": "hesem-job-evidence",
+      "title": "HESEM-Job-Evidence",
+      "purpose": "Hồ sơ job + engineering baseline + customer IP",
+      "external_sharing": "OFF (không phê duyệt từ trước)",
+      "libraries": ["Part-REV-Master", "Job-Dossiers", "Customer-Received", "Tooling-Fixture-Gage"]
+    },
+    {
+      "code": "hesem-people",
+      "title": "HESEM-People",
+      "purpose": "Hồ sơ nhân sự hạn chế",
+      "owners": "HR Manager",
+      "libraries": ["Employee-Records", "HR-Operations"]
+    },
+    {
+      "code": "hesem-digital",
+      "title": "HESEM-Digital",
+      "purpose": "Hồ sơ điều hành hệ thống số, mã nguồn kiểm soát, quản trị CNTT",
+      "libraries": ["System-Records", "QMS-Source-Control"]
+    }
+  ],
+  "special_libraries_cross_site": {
+    "06-Archive": {
+      "subfolders": ["01-Closed-Year-Archive/{YYYY}", "02-Superseded-and-Obsolete", "03-Legal-Hold", "04-Locked-Job-Pack/{YYYY}"],
+      "rule": "Read-only sau khi khóa; chỉ đưa vào qua luồng lưu trữ chính thức"
+    },
+    "07-Working-Templates": {
+      "subfolders": ["{Function}/{TemplateType}"],
+      "owners": "QMS[DC] + FUNC_OWNERS",
+      "rule": "Không chứa hồ sơ phát hành chính thức"
+    }
+  },
+  "library_blueprints": {
+    "QMS-Governance": {
+      "default_subfolders": [
+        "01-Management-Review/{YYYY}", "02-Internal-Audits/{YYYY}", "03-External-Audits-and-CB/{YYYY}",
+        "04-Risk-and-Opportunity/{YYYY}", "05-Change-Control/{YYYY}", "06-Document-Control-and-Issuance/{YYYY}",
+        "07-Communication-and-Leadership/{YYYY}", "08-Context-and-Interested-Parties/{YYYY}",
+        "09-Continual-Improvement-and-Kaizen/{YYYY}", "10-Contingency-and-Disruption/{YYYY}",
+        "11-Legal-and-Compliance/{YYYY}", "12-Knowledge-and-Lessons-Learned",
+        "13-Authority-RACI-Deputy", "14-KPI-and-Dashboard-Control/{YYYY}"
+      ],
+      "owner": "QMS"
+    },
+    "Quality-Records": {
+      "default_subfolders": [
+        "01-Quality-Planning/{YYYY}", "02-Inspection-Execution/{YYYY}", "03-Calibration-and-MSA/{YYYY}",
+        "04-NCR/{YYYY}", "05-CAPA/{YYYY}", "06-Customer-Complaints/{YYYY}",
+        "07-FAI-and-First-Article/{YYYY}", "08-SPC-and-Capability/{YYYY}",
+        "09-Product-Safety-and-FOD/{YYYY}", "10-Ship-Release-and-CoC/{YYYY}",
+        "11-Supplier-Quality-and-SCAR/{YYYY}", "12-Audit-and-MR-Quality-Inputs/{YYYY}"
+      ],
+      "owner": "QA"
+    },
+    "Training-Records": {
+      "default_subfolders": [
+        "01-Training-Plan/{YYYY}", "02-Attendance-and-Class-Records/{YYYY}", "03-OJT-Evidence/{YYYY}",
+        "04-Competence-Assessment/{YYYY}", "05-Certification-Register/{YYYY}",
+        "06-Skill-Matrix-and-Coverage/{YYYY}", "07-Academy-Content-Control",
+        "08-Safety-Induction-and-Special-Briefings/{YYYY}"
+      ],
+      "owner": "D-HR"
+    },
+    "Department-Ops": {
+      "structure": "DEP-{CODE}/{zone}/{partition}/{custom-subfolders}",
+      "departments": ["DEP-EXEC", "DEP-QMS", "DEP-QA", "DEP-ENG", "DEP-PROD", "DEP-SCM", "DEP-SCS", "DEP-FIN", "DEP-HR", "DEP-EHS", "DEP-IT", "DEP-ERP"],
+      "zones_required": [
+        "00-Live-Control-and-Master-Data (7 sub: Boards, Master-Lists, Dashboards, Open-Issues, Link-Indexes, Calendar-Roster, Reference-Indexes)",
+        "01-Governance (00-Current + {YYYY})",
+        "02-Operations (00-Current + {YYYY}) — dept-specific sub per ANNEX-133 §8",
+        "03-Registers-and-Logs (00-Current + {YYYY}) — dept-specific sub",
+        "04-Projects-and-Improvement (00-Active + {YYYY})",
+        "05-Interfaces-and-Released-Packs (00-Current + {YYYY}) — dept-specific sub",
+        "06-Working-Transitory-and-Draft/ROLE-{RoleCode}/ (7 team sub + 90-Employee-WB + 91-Deputy-Handoffs + 99-Clear-90d)",
+        "07-Reference-and-Received-External (7 sub: Customer-Received, Supplier-Received, Standards-Manuals, Dept-Work-Aids, Portal-Exports, Convenience-Copies, To-Be-Culled)",
+        "99-Archive"
+      ],
+      "function_codes_inside_parent_dept": {
+        "D-PPC": "DEP-PROD (Production Planning Control)",
+        "D-WHS": "DEP-SCM (Warehouse)",
+        "D-PUR": "DEP-SCM (Purchasing)",
+        "D-TCR": "DEP-SCM (Tool Crib)",
+        "D-LOG": "DEP-SCM (Logistics)"
+      }
+    },
+    "Part-REV-Master": {
+      "path_pattern": "{CustomerID}/{PartNo}/REV-{Rev}",
+      "purpose": "Engineering baseline master per customer/part/revision",
+      "owner": "D-ENG update; QA + D-PROD read",
+      "rule": "Production phải link/extract có kiểm soát; không sửa tại chỗ"
+    },
+    "Job-Dossiers": {
+      "path_pattern": "{YYYY}/{JobNum}-{PartNo}-REV-{Revision}",
+      "optional_customer_layer": "{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}",
+      "gates": [
+        {"folder": "00_Admin-Control", "owner": "D-PPC / QA", "form": "FRM-205"},
+        {"folder": "01_G0-Contract-Kickoff", "owner": "D-SCS / D-PPC"},
+        {"folder": "02_G1-Engineering-Release", "owner": "D-ENG"},
+        {"folder": "03_G2-IQC-Receiving", "owner": "D-SCM / QA / D-WHS"},
+        {"folder": "04_G3-Setup-Release", "owner": "D-ENG / D-PROD"},
+        {"folder": "05_G4-FAI-First-Article", "owner": "QA / D-ENG"},
+        {"folder": "06_G5-IPQC-Production", "owner": "D-PROD / QA"},
+        {"folder": "07_G6-Final-QC-Packaging", "owner": "QA / D-PROD / D-WHS"},
+        {"folder": "08_G7-Ship-Release", "owner": "D-WHS / D-LOG / QA"},
+        {"folder": "09_NCR-CAPA-Deviation", "owner": "QA"},
+        {"folder": "99_Archive-Locked", "owner": "QA / QMS"}
+      ],
+      "rule": "Không skip gate, không rút gọn tên, không thêm folder phá gate logic"
+    },
+    "Employee-Records": {
+      "top_level": [
+        "01-Active-Employees/{EmployeeID}-{FullName}",
+        "02-Pending-Starters/{YYYY}/{Population}/{CandidateOrPersonID}-{Name}",
+        "03-Former-Employees/{YYYY}/{EmployeeID}-{FullName}",
+        "04-Contractors-Interns-Temps/{YYYY}/{Population}/{ID-Name}",
+        "05-Visitors-and-Vendors/{YYYY}/{VisitType}/{VisitorName}",
+        "06-Restricted-Shared-Ops/{RestrictedProcess}/00-Current"
+      ],
+      "per_person_subfolders": [
+        "00-Identity-and-Employment-Profile",
+        "01-Recruitment-and-Offer",
+        "02-Employment-Contract-and-Legal",
+        "03-Onboarding-Role-and-Access",
+        "04-Training-and-Certification-Link",
+        "05-Probation-Performance-and-Development",
+        "06-Payroll-and-Benefits-Restricted",
+        "07-Leave-Attendance-and-Time-Case",
+        "08-Medical-and-Fit-to-Work-Restricted",
+        "09-Assets-Access-and-Issued-Items",
+        "10-Role-Change-Transfer-and-Promotion",
+        "11-Disciplinary-and-Legal-Restricted",
+        "12-Offboarding-and-Exit",
+        "13-Sealed-Copies-and-Legal-Hold"
+      ],
+      "max_storage_locations_per_employee": 3,
+      "storage_locations": ["Department-Ops workbench (Role-based)", "Training-Records (SSOT đào tạo)", "Employee-Records dossier (chỉ nếu thuộc diện hạn chế)"]
+    },
+    "System-Records": {
+      "default_subfolders": [
+        "01-Access-and-Identity/{YYYY}",
+        "02-M365-and-SharePoint-Configuration/{YYYY}",
+        "03-Epicor-Master-Data-and-Role-Control/{YYYY}",
+        "04-Deployment-UAT-and-Cutover/{YYYY}",
+        "05-Backup-Restore-and-Recovery/{YYYY}",
+        "06-Incident-and-Problem-Management/{YYYY}",
+        "07-Asset-and-Endpoint-Control/{YYYY}",
+        "08-Automation-Run-Logs/{YYYY}"
+      ],
+      "owner": "D-IT / D-ERP"
+    },
+    "QMS-Source-Control": {
+      "default_subfolders": [
+        "01-Controlled-Source/qms.hesem.com.vn",
+        "02-Release-Manifests/{YYYY}",
+        "03-Server-Deploy-Receipts/{YYYY}",
+        "04-Reverse-Sync-Intake/{YYYY}"
+      ],
+      "owner": "QMS / D-IT",
+      "rule": "Không runtime payload, session, secrets, transaction records"
+    }
+  },
+  "naming_tokens": {
+    "{YYYY}": "Năm 4 chữ số (vd 2026)",
+    "{DeptCode}": "D-EXEC/SCS/ENG/PROD/PPC/QUAL/SCM/PUR/WHS/TCR/LOG/FIN/HR/EHS/IT/ERP",
+    "{EmployeeID}": "Mã NV duy nhất (vd E0247)",
+    "{JobNum}": "Mã job Epicor (vd J240315)",
+    "{CustomerID}": "Mã KH (vd CUST-ABC)",
+    "{PartNo}": "Mã part chuẩn (vd PN7788)",
+    "{Revision}": "Phiên bản kỹ thuật (vd B)",
+    "{RecordType}": "Mã hồ sơ theo ANNEX-131",
+    "{DescriptionSlug}": "Slug không dấu gạch nối",
+    "{RoleCode}": "Mã vai trò (ROLE-QAM, ROLE-SET, ROLE-CNC) — dùng cho THƯ MỤC",
+    "{UserID}": "Mã user cá nhân (NVA, QC1, TDH) — dùng cho NHÃN TÊN FILE"
+  },
+  "file_naming_patterns": [
+    "REC-{DeptCode}-{YYYY}-{NNNN}-{DescriptionSlug}.pdf",
+    "{RecordType}-{JobNum}-{PartNo}-{DescriptionSlug}.pdf",
+    "Photos-{YYYYMMDD}-{JobNum}-{DescriptionSlug}.jpg"
+  ],
+  "rolecode_vs_userid_warning": "RoleCode = thư mục (06-Working/ROLE-{RoleCode}/). UserID = nhãn trong tên file (NCR-2026-043-NVA.pdf). KHÔNG NHẦM LẪN.",
+  "totals": {
+    "sites": 4,
+    "special_libs": 2,
+    "content_libraries": 12,
+    "dept_codes": 12,
+    "blueprint_directories_approx": 1054
+  },
+  "regeneration_rule": "Mọi thay đổi cấu trúc phải sửa ANNEX-133 trên main TRƯỚC, rồi mirror sang manifest này, rồi rebuild folder structure, rồi update PnP provisioning script.",
+  "v1_v2_failed_attempt_note": "Trong session 2026-05-16, các commit eb0ad189/98d1364f/d13db002 trên branch codex/m365-records-130-series-author đã ghi đè 3 ANNEX canonical (133/134/136) bằng skeleton-replacement và xây folder blueprint không khớp canonical. Các commit đó đã bị revert toàn bộ. Blueprint này là V2.0.0-canonical, build từ canonical ANNEX-133 trên main."
+}
