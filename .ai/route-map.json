@@ -1,6 +1,6 @@
 {
     "_meta": {
-        "generated_at": "2026-05-14T12:16:00+00:00",
+        "generated_at": "2026-05-15T01:01:18+00:00",
         "description": "All API routes with controller, method, services used, and domain. Search by action key or URL path.",
         "usage": "Find the right controller by searching action key or path. Then open only that controller file."
     },
