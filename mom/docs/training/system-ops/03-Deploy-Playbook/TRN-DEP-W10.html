@@ -53,7 +53,7 @@
 <h2 class="h2">3 câu hỏi đánh giá riêng</h2>
 <ol class="tight">
 <li>5 phòng Đợt 3 có đạt KPI tuần 1: KPI-FLD-01 ≥95%, KPI-TRN-01 ≥90%, KPI-DEP-01 = 100% trên dashboard và bản chụp 4 tuần liên tiếp đã đầy đủ trong ANNEX-110/snapshots/ chưa?</li>
-<li>Kết quả soát xét truy cập dashboard có chỉ rõ không còn người dùng nằm ngoài vai trò được phép (đối chiếu users.json) và quyết định hiệu chỉnh quyền đã có chữ ký số Giám đốc (audit_events deploy.review.save (cycle=access_review)) chưa?</li>
+<li>Kết quả soát xét truy cập dashboard có chỉ rõ không còn người dùng nằm ngoài vai trò được phép (đối chiếu users.json) và quyết định hiệu chỉnh quyền đã có chữ ký số Giám đốc (audit_events deploy.access.review) chưa?</li>
 <li>Sự cố Mức 2 còn mở Đợt 3 có phương án xử lý tạm ổn định và tồn đọng CAPA ≤5 mục mở trong issues.json không?</li>
 </ol>
 </section>
@@ -65,7 +65,7 @@
 <tr><td>Bản chụp KPI tuần 1 Đợt 3</td><td>Trưởng QMS</td><td>Dashboard hiển thị: KPI-FLD-01 ≥95%, KPI-TRN-01 ≥90%, KPI-DEP-01 = 100% cho 5 phòng Đợt 3 trong tuần này.</td><td class="col-gate">P4-01 khoá: §9.1.3 không đủ bằng chứng đóng cổng ổn định.</td></tr>
 <tr><td>Bản chụp dashboard 4 tuần liên tiếp</td><td>Trưởng IT</td><td>File ANNEX-110/snapshots/ có 4 ảnh png/pdf với metadata: tuần, ngày, KPI; xu hướng nâng dần.</td><td class="col-gate">P4-01 khoá: §7.1.6 tri thức tổ chức không lưu giữ.</td></tr>
 <tr><td>Báo cáo soát xét truy cập dashboard</td><td>Trưởng IT</td><td>Tài liệu trên cổng: đối chiếu users.json × roles × module_access_config; liệt kê ngoại lệ; đề xuất hiệu chỉnh; tham chiếu ANNEX-113.</td><td class="col-gate">P4-02 khoá: §7.5.3 kiểm soát thông tin lỗ hổng.</td></tr>
-<tr><td>Quyết định hiệu chỉnh quyền đã ký số</td><td>Giám đốc</td><td>audit_events deploy.review.save với cycle="access_review_2026Q3"; quyết định ghi trong audits.json; xác nhận điện tử Giám đốc qua M365.</td><td class="col-gate">P4-02 khoá: cổng truy cập không đóng → §7.5.3 thiếu bằng chứng.</td></tr>
+<tr><td>Quyết định hiệu chỉnh quyền đã ký số</td><td>Giám đốc</td><td>audit_events deploy.access.review với metadata cycle=access_review_2026Q3 + reviewed (số người dùng đã rà) + diff (số ngoại lệ) + decision; audits.json.accessReviews có 1 dòng; xác nhận điện tử Giám đốc qua M365+MFA.</td><td class="col-gate">P4-02 khoá: cổng truy cập không đóng → §7.5.3 thiếu bằng chứng.</td></tr>
 <tr><td>Bảng CAPA còn mở</td><td>Trưởng QMS</td><td>issues.json filter source=audit (CAPA) status=open: ≤5 mục mở; mỗi mục có người làm + hạn đóng + mức theo ANNEX-117; lịch chăm sóc tăng cường Đợt 3 tuần 2 đã chốt trong program.json.</td><td class="col-gate">P4-01 khoá: §10.2 CAPA tồn đọng → không vào W11.</td></tr>
 </tbody>
 </table>

@@ -52,7 +52,7 @@
 <section class="card" id="sec-objective">
 <h2 class="h2">3 câu hỏi đánh giá riêng</h2>
 <ol class="tight">
-<li>Tổ điều hành đã ký số biên bản bàn giao trên cổng (audit_events deploy.week.signoff (week=12)) và 13/13 KPI đã có chủ trì + chu kỳ rà soát + người sở hữu vận hành thường xuyên (Trưởng QMS) trong DEPLOY_CONFIG.kpis chưa?</li>
+<li>Tổ điều hành đã ký số biên bản bàn giao trên cổng (audit_events deploy.handover) và 13/13 KPI đã có chủ trì + chu kỳ rà soát + người sở hữu vận hành thường xuyên (Trưởng QMS) trong DEPLOY_CONFIG.kpis chưa?</li>
 <li>Nhịp vận hành mới (họp tầng tuần Thứ Bảy 9:00 + soát xét lãnh đạo tháng) đã đặt trong program.json và thông báo cho 10 phòng qua cổng chưa?</li>
 <li>Chu kỳ kiểm toán nội bộ năm 1 (4 quý) đã có lịch cụ thể (ngày, người trưởng đoàn, phạm vi) trong audits.json (đã có schema cho chu kỳ kiểm toán) theo §9.2 chưa?</li>
 </ol>
@@ -62,7 +62,7 @@
 <table>
 <thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm (trên cổng)</th><th>Cổng khoá nếu thiếu</th></tr></thead>
 <tbody>
-<tr><td>Biên bản bàn giao đã ký số</td><td>Tổ điều hành</td><td>audit_events deploy.week.signoff với week=12 + decision=GO; biên bản bàn giao trong meetings.json có 13 chữ ký (Giám đốc + Trưởng QMS + 11 trưởng phòng).</td><td class="col-gate">P4-04 khoá: §9.3 không có bằng chứng xem xét lãnh đạo cuối kỳ.</td></tr>
+<tr><td>Biên bản bàn giao đã ký số</td><td>Tổ điều hành</td><td>audit_events deploy.handover với metadata kpiOwnerRole=qms_manager + attendees (13 người); program.json.handover có trường signedBy + signedAt + cadenceNote; xác nhận điện tử tập thể 13 người qua M365+MFA.</td><td class="col-gate">P4-04 khoá: §9.3 không có bằng chứng xem xét lãnh đạo cuối kỳ.</td></tr>
 <tr><td>Bảng 13 KPI có chủ trì + chu kỳ rà soát</td><td>Trưởng QMS</td><td>DEPLOY_CONFIG.kpis: 13/13 KPI có ownerRole + reviewCadence; dashboard KPI công khai trên cổng cho toàn nhà máy.</td><td class="col-gate">P4-04 khoá: §9.1 đo lường không có chủ.</td></tr>
 <tr><td>Lịch chu kỳ kiểm toán nội bộ 4 quý</td><td>Trưởng QMS</td><td>audits.json (đã có schema cho chu kỳ kiểm toán): Q1/Q2/Q3/Q4 có ngày, người trưởng đoàn, phạm vi (10 phòng phủ đủ).</td><td class="col-gate">P4-04 khoá: §9.2 chu kỳ đánh giá nội bộ không có kế hoạch.</td></tr>
 <tr><td>Nhịp vận hành tuần + tháng đã công bố</td><td>Tổ điều hành</td><td>program.json: họp tầng Thứ Bảy 9:00 hằng tuần + soát xét lãnh đạo tháng; thông báo cổng đã gửi cho 22 người dẫn dắt + 11 trưởng phòng.</td><td class="col-gate">P4-04 khoá: §9.3 không duy trì nhịp xem xét.</td></tr>

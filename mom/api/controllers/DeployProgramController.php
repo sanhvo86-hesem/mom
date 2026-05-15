@@ -651,6 +651,154 @@ class DeployProgramController extends BaseController
         $this->success(['data' => $kpis]);
     }
 
+    /**
+     * Ghi nhận kiểm thử kích hoạt khôi phục (W06 P3-02).
+     * Lưu vào readiness.json + audit deploy.recovery.test.
+     */
+    public function recordRecoveryTest(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::SIGNOFF_ROLES);
+        $body = $this->jsonBody();
+
+        $scope = trim((string)($body['scope'] ?? ''));
+        $result = strtolower(trim((string)($body['result'] ?? '')));
+        $durationSec = (int)($body['durationSec'] ?? 0);
+        $evidenceUrl = trim((string)($body['evidenceUrl'] ?? ''));
+        if ($scope === '' || !in_array($result, ['pass', 'fail', 'partial'], true)) {
+            $this->error('missing_scope_or_result', 400);
+        }
+
+        $state = $this->loadFile(self::FILE_READINESS);
+        if (!isset($state['recoveryTests']) || !is_array($state['recoveryTests'])) {
+            $state['recoveryTests'] = [];
+        }
+        $entry = [
+            'id' => 'RCV-' . substr(hash('sha256', gmdate('c') . random_int(0, 999999)), 0, 8),
+            'scope' => $scope,
+            'result' => $result,
+            'durationSec' => $durationSec,
+            'evidenceUrl' => $evidenceUrl,
+            'testedBy' => (string)($me['name'] ?? $me['username'] ?? ''),
+            'testedAt' => gmdate('c'),
+        ];
+        $state['recoveryTests'][] = $entry;
+        $state['lastUpdated'] = gmdate('c');
+        $this->saveFile(self::FILE_READINESS, $state);
+        $this->audit('deploy.recovery.test', $me, [
+            'scope' => $scope, 'result' => $result, 'duration_sec' => $durationSec,
+        ]);
+        $this->success(['data' => $state, 'entry' => $entry]);
+    }
+
+    /**
+     * Soát xét truy cập điều hành (W10 P4-02).
+     * Ghi kết quả đối chiếu vai trò ↔ quyền vào audits.json + audit deploy.access.review.
+     */
+    public function recordAccessReview(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::SIGNOFF_ROLES);
+        $body = $this->jsonBody();
+
+        $diffCount = (int)($body['diffCount'] ?? 0);
+        $reviewed = (int)($body['reviewed'] ?? 0);
+        $decision = strtolower(trim((string)($body['decision'] ?? '')));
+        if (!in_array($decision, ['approved', 'pending', 'rejected'], true)) {
+            $this->error('invalid_decision', 400);
+        }
+
+        $state = $this->loadFile(self::FILE_AUDITS);
+        if (!isset($state['accessReviews']) || !is_array($state['accessReviews'])) {
+            $state['accessReviews'] = [];
+        }
+        $entry = [
+            'id' => 'AR-' . gmdate('Y\QW'),
+            'cycle' => 'access_review_' . gmdate('Y\QW'),
+            'reviewed' => $reviewed,
+            'diffCount' => $diffCount,
+            'decision' => $decision,
+            'signedBy' => (string)($me['name'] ?? $me['username'] ?? ''),
+            'signedAt' => gmdate('c'),
+        ];
+        $state['accessReviews'][] = $entry;
+        $state['lastUpdated'] = gmdate('c');
+        $this->saveFile(self::FILE_AUDITS, $state);
+        $this->audit('deploy.access.review', $me, [
+            'cycle' => $entry['cycle'], 'reviewed' => $reviewed, 'diff' => $diffCount, 'decision' => $decision,
+        ]);
+        $this->success(['data' => $state, 'entry' => $entry]);
+    }
+
+    /**
+     * Bàn giao chính thức sang vận hành thường xuyên (W12 P4-04).
+     * Ghi danh sách người nhận trách nhiệm KPI + audit deploy.handover.
+     */
+    public function recordHandover(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::SIGNOFF_ROLES);
+        $body = $this->jsonBody();
+
+        $kpiOwnerRole = strtolower(trim((string)($body['kpiOwnerRole'] ?? '')));
+        $attendees = is_array($body['attendees'] ?? null) ? $body['attendees'] : [];
+        $cadenceNote = trim((string)($body['cadenceNote'] ?? ''));
+        if ($kpiOwnerRole === '' || count($attendees) < 1) {
+            $this->error('missing_owner_or_attendees', 400);
+        }
+        $attendees = array_values(array_unique(array_filter(array_map(
+            static fn($x): string => trim((string)$x), $attendees,
+        ))));
+
+        $state = $this->loadFile(self::FILE_PROGRAM);
+        $state['handover'] = [
+            'kpiOwnerRole' => $kpiOwnerRole,
+            'attendees' => $attendees,
+            'cadenceNote' => $cadenceNote,
+            'signedBy' => (string)($me['name'] ?? $me['username'] ?? ''),
+            'signedAt' => gmdate('c'),
+        ];
+        $state['lastUpdated'] = gmdate('c');
+        $this->saveFile(self::FILE_PROGRAM, $state);
+        $this->audit('deploy.handover', $me, [
+            'kpi_owner' => $kpiOwnerRole, 'attendees' => count($attendees),
+        ]);
+        $this->success(['data' => $state]);
+    }
+
+    /**
+     * Đợt làm mới mã QR cho 7 khu vực (W11 P4-03).
+     * Ghi % nhãn đã thay + audit deploy.qr.rotated.
+     */
+    public function recordQrRotation(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::EDIT_ROLES);
+        $body = $this->jsonBody();
+
+        $rotatedCount = (int)($body['rotatedCount'] ?? 0);
+        $totalCount = (int)($body['totalCount'] ?? 0);
+        if ($totalCount <= 0 || $rotatedCount < 0 || $rotatedCount > $totalCount) {
+            $this->error('invalid_counts', 400);
+        }
+        $rate = round(($rotatedCount * 100.0) / $totalCount, 1);
+
+        $state = $this->loadFile(self::FILE_READINESS);
+        if (!isset($state['kpiValues']) || !is_array($state['kpiValues'])) {
+            $state['kpiValues'] = [];
+        }
+        $state['kpiValues']['qr_rotation_rate'] = (string)$rate;
+        $state['kpiValues']['qr_rotation_count'] = (string)$rotatedCount;
+        $state['kpiValues']['qr_rotation_total'] = (string)$totalCount;
+        $state['kpiValues']['qr_rotation_at'] = gmdate('c');
+        $state['lastUpdated'] = gmdate('c');
+        $this->saveFile(self::FILE_READINESS, $state);
+        $this->audit('deploy.qr.rotated', $me, [
+            'rotated' => $rotatedCount, 'total' => $totalCount, 'rate' => $rate,
+        ]);
+        $this->success(['data' => $state, 'rotation_rate' => $rate]);
+    }
+
     public function saveAudit(): never
     {
         $me = $this->requireAuth();

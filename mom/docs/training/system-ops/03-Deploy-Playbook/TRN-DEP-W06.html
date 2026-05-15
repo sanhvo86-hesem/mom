@@ -54,7 +54,7 @@
 <ol class="tight">
 <li>Đợt 2 có 0 sự cố Mức 1 trong 5 ngày làm việc liên tiếp (T2-T6 gần nhất, issues.json filter severity=Mức1) và mọi sự cố Mức 2 có phương án xử lý tạm ổn định theo ANNEX-117 chưa?</li>
 <li>Cẩm nang vận hành chính thức cho Đợt Sản xuất (ANNEX-114 + ANNEX-118) đã chuyển từ bản thảo sang đã hiệu lực trên cổng (dcc_document_header) chưa?</li>
-<li>Điều kiện kích hoạt khôi phục đã được kiểm thử thật (audit_events deploy.issue.save (source=drill)) và bằng chứng video/ảnh đã đính cổng chưa?</li>
+<li>Điều kiện kích hoạt khôi phục đã được kiểm thử thật (audit_events deploy.recovery.test) và bằng chứng video/ảnh đã đính cổng chưa?</li>
 </ol>
 </section>
 <section class="card" id="sec-tasks">
@@ -64,7 +64,7 @@
 <tbody>
 <tr><td>Biểu đồ sự cố Mức 1/Mức 2 của Đợt 2</td><td>Trưởng QMS</td><td>Dashboard hiển thị: Mức 1 = 0 trong 5 ngày làm việc; Mức 2 có phương án tạm ổn định; phân loại theo ANNEX-117 trong issues.json.</td><td class="col-gate">P3-02 khoá: §10.2 chưa đóng → Đợt Sản xuất không khởi động.</td></tr>
 <tr><td>ANNEX-114 + ANNEX-118 đã hiệu lực</td><td>Tổ điều hành</td><td>dcc_document_header: 2 tài liệu status=released, effective_date=2026-06-20; có chữ ký số Giám đốc + Trưởng QMS.</td><td class="col-gate">P3-02 khoá: §8.1 hoạch định Sản xuất không đầy đủ.</td></tr>
-<tr><td>Kết quả kiểm thử điều kiện kích hoạt khôi phục</td><td>Kỹ sư QMS + Trưởng IT</td><td>Tài liệu trên cổng có video/ảnh kiểm thử thật; issues.json có dòng source=drill, severity=Mức 3, description="Kiểm thử kích hoạt khôi phục" với người phụ trách + hạn đóng; sự kiện deploy.issue.save ghi cùng ngày + xác nhận điện tử 2 người qua M365.</td><td class="col-gate">P3-02 khoá: §8.5.6 thay đổi không kiểm soát.</td></tr>
+<tr><td>Kết quả kiểm thử điều kiện kích hoạt khôi phục</td><td>Kỹ sư QMS + Trưởng IT</td><td>Tài liệu trên cổng có video/ảnh kiểm thử thật; audit_events deploy.recovery.test với metadata scope + result (pass/fail/partial) + duration_sec; readiness.json.recoveryTests có 1 dòng cùng ngày + đường dẫn bằng chứng video/ảnh; xác nhận điện tử 2 người (Kỹ sư QMS + Trưởng IT) qua M365+MFA.</td><td class="col-gate">P3-02 khoá: §8.5.6 thay đổi không kiểm soát.</td></tr>
 <tr><td>14 người dẫn dắt Sản xuất + Kỹ thuật trong champions.json</td><td>Trưởng Nhân sự</td><td>champions.json: 7 khu vực × 2 vai = 14 dòng có xác nhận điện tử cam kết (qua biên bản tuần + audit log đăng nhập M365) cho W07-W08; mỗi khu vực có 1 chính + 1 dự phòng.</td><td class="col-gate">P3-02 khoá: §7.2 năng lực không phủ hết khu vực.</td></tr>
 <tr><td>Lịch trực hỗ trợ tăng cường 24/5 cho W07 trên cổng</td><td>Trưởng QMS</td><td>program.json có lịch ca trực 24/5; 4 người trong đội tăng cường (Trưởng QA + Kỹ sư QMS + 2 người dẫn dắt) có xác nhận điện tử cam kết (qua biên bản tuần + audit log đăng nhập M365).</td><td class="col-gate">P3-02 khoá: không có hỗ trợ khi rủi ro cao xảy ra.</td></tr>
 </tbody>
