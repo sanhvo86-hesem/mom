@@ -67,6 +67,7 @@
 
  <div class="section">
  <h2>2. SoR, SSOT và nguyên tắc link-not-copy</h2>
+ <p style="margin:8px 0;">HESEM dùng mô hình ba tầng dữ liệu cho hồ sơ vận hành và chất lượng: Epicor là <strong>SoR cho giao dịch</strong>, EQMS Portal là <strong>SoT cho workflow chất lượng có cấu trúc</strong>, và M365 là <strong>SSOT cho file tài liệu và bằng chứng</strong>. Ba tầng có ranh giới rõ và không thay thế nhau. Chi tiết mô hình ba tầng, decision tree "lưu ở đâu", cross-reference register pattern và cơ sở pháp lý được khóa trong <span class="code">ANNEX-130</span>.</p>
  <div class="table-card">
  <table class="table">
  <thead>
@@ -74,12 +75,14 @@
  </thead>
  <tbody>
  <tr><td>Epicor SoR</td><td>Job, giao dịch nhân công/time, giao dịch tồn kho, PO/receipt, lô giao hàng xác nhận, master khách hàng/nhà cung cấp và trạng thái giao dịch.</td></tr>
- <tr><td>M365 SSOT</td><td>Tài liệu được kiểm soát, hồ sơ chất lượng, hồ sơ theo job, hồ sơ đào tạo, gói vận hành phòng ban, hồ sơ nhân sự và hồ sơ quản trị hệ thống.</td></tr>
- <tr><td>Link-not-copy</td><td>List item phải lưu <span class="code">EvidenceUrl</span> hoặc <span class="code">ProvisionedUrl</span> trỏ tới file hoặc thư mục SSOT. Không tạo bản sao tiện dùng trùng lặp giữa <span class="code">Training-Records</span>, <span class="code">Employee-Records</span>, <span class="code">Job-Dossiers</span>, <span class="code">System-Records</span> và <span class="code">Part-REV-Master</span>.</td></tr>
+ <tr><td>EQMS Portal SoT (Tier 1)</td><td>Bản ghi cấu trúc có state machine: NCR (<span class="code">eqms_ncr_records</span>), CAPA (<span class="code">eqms_capa_records</span>), FAI, concession, deviation, MSA, audit, training. Sở hữu các trường <span class="code">number</span>, <span class="code">status</span>, <span class="code">disposition</span>, <span class="code">linked_jobs</span>, audit trail per row. Không tái tạo các trường này trong SharePoint metadata; xem ANNEX-130 §2.1.</td></tr>
+ <tr><td>M365 SSOT (Tier 2)</td><td>File chính thức đã ký, gói phát hành, evidence PDF — lưu một lần ở thư viện chuẩn (Quality-Records, QMS-Governance, Training-Records, …) với retention label áp ở cấp library. Hồ sơ theo job, gói vận hành phòng ban và hồ sơ nhân sự thuộc Tier 3 chỉ giữ cross-reference. Xem ANNEX-130 §2.2 và §2.3.</td></tr>
+ <tr><td>Link-not-copy</td><td>List item phải lưu <span class="code">EvidenceUrl</span> hoặc <span class="code">ProvisionedUrl</span> trỏ tới file hoặc thư mục SSOT. Không tạo bản sao tiện dùng trùng lặp giữa <span class="code">Training-Records</span>, <span class="code">Employee-Records</span>, <span class="code">Job-Dossiers</span>, <span class="code">System-Records</span> và <span class="code">Part-REV-Master</span>. Cross-reference giữa các site thực hiện qua SharePoint List <span class="code">NCR-Cross-Reference</span>, <span class="code">CAPA-Cross-Reference</span>, <span class="code">FAI-Cross-Reference</span> (đặc tả tại ANNEX-130 §6) — không dùng SharePoint shortcut vì retention label không kế thừa.</td></tr>
  <tr><td>Hạn chế dữ liệu</td><td>Bảng lương, hồ sơ pháp lý hoặc kỷ luật, hồ sơ y tế, nhật ký quản trị bảo mật và log chia sẻ ra ngoài phải đi theo vùng restricted riêng và nhóm quyền riêng.</td></tr>
  </tbody>
  </table>
  </div>
+ <div class="keyline" style="background:#fffaf0;"><strong>Quy tắc cứng phái sinh (ANNEX-130 SSOT-R01..R10):</strong> mỗi record series chỉ có một bản ghi Tier 1 và một file Tier 2. Số hồ sơ (NCR/CAPA/FAI) chỉ do EQMS auto-sequence cấp. Status / disposition chỉ thay đổi qua EQMS state-transition endpoint, không sửa trực tiếp trong SharePoint metadata. File ở Tier 2 không được copy sang Tier 3 dù chỉ làm "convenience copy".</div>
  </div>
 
  <div class="section">
