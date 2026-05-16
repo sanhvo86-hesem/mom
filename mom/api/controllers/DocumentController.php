@@ -6,6 +6,7 @@ namespace MOM\Api\Controllers;
 
 use MOM\Api\Services\DocAccessAnalyticsService;
 use MOM\Api\Services\PortalServices;
+use MOM\Services\DocumentControl\DocumentControlService;
 use MOM\Services\DocumentControl\DocumentLocaleAutomationService;
 use MOM\Services\ControlPlane\LegacyWriteSurfacePolicy;
 use RuntimeException;
@@ -826,6 +827,7 @@ class DocumentController extends BaseController
             $updateType,
             $liveFile,
             (string)($me['username'] ?? 'system'),
+            $this->workflowActorRole($me),
             (string)($catalog['title'] ?? ''),
             $note
         );
@@ -1253,11 +1255,20 @@ class DocumentController extends BaseController
 
         $manifest = load_doc_manifest($this->rootDir, $baseRel, $archiveDir, $code);
         $state    = load_doc_state($this->rootDir, $baseRel, $archiveDir, $code);
+        $versions = $manifest['versions'] ?? [];
+        $source = 'legacy_manifest';
+        $dcc = $this->buildDccBackedVersionHistory($code, $baseRel, $versions, is_array($state) ? $state : []);
+        if ($dcc !== null) {
+            $versions = $dcc['versions'];
+            $state = $this->overlayStateWithDccCurrent(is_array($state) ? $state : [], $dcc['current']);
+            $source = 'dcc_document_revision';
+        }
 
         $this->success([
             'code'     => $code,
-            'versions' => $this->enrichVersionHistory($manifest['versions'] ?? []),
+            'versions' => $this->enrichVersionHistory($versions),
             'state'    => $state,
+            'source'   => $source,
         ]);
     }
 
@@ -1292,7 +1303,7 @@ class DocumentController extends BaseController
         if (!$state) $state = ['code' => $code, 'status' => 'draft', 'revision' => '0.0'];
 
         // Compute next revision
-        $currentRev = (string)($state['released_revision'] ?? ($state['revision'] ?? '0.0'));
+        $currentRev = $this->resolveReleasedRevisionForNewCycle($code, $baseRel, $state);
         $parts = explode('.', $currentRev, 2);
         $major = (int)($parts[0] ?? 0);
         $minor = (int)($parts[1] ?? 0);
@@ -1338,13 +1349,10 @@ class DocumentController extends BaseController
 
         $customDocsFile = $this->confDir . '/docs_custom.json';
         patch_custom_doc_entries($customDocsFile, $code, ['status' => 'draft', 'rev' => $newRevision]);
-        $this->syncDccHeaderBaseline($code, $baseRel, $state, (string)($me['username'] ?? 'system'));
 
-        // DCC bridge: starting a new revision draft does NOT change the DCC
-        // state. The DCC header stays 'released' until the next submitReview
-        // drives it back into 'in_review', so there is no transition to mirror
-        // here. syncDccHeaderBaseline() above refreshes the revision/date
-        // projection; no further DCC write is needed.
+        // Starting a draft never mutates the DCC current revision projection.
+        // The header stays on the last released revision until approve/release
+        // records the next controlled body row.
 
         $this->auditLog('doc_start_new_revision', ['code' => $code, 'revision' => $newRevision]);
         $this->success(['revision' => $newRevision, 'state' => $state, 'versions' => $this->enrichVersionHistory($versions)]);
@@ -1779,7 +1787,7 @@ class DocumentController extends BaseController
                 'doc_code' => $code,
                 'title' => (string)($catalog['title'] ?? $code),
                 'subtitle' => $catalog['description'] ?? null,
-                'doc_type' => \MOM\Services\DocumentControl\DocumentControlService::deriveDocType($code),
+                'doc_type' => DocumentControlService::deriveDocType($code),
                 'revision' => $rawRevision,
                 'effective_date' => $effectiveDate,
                 'status' => $status !== '' ? $status : 'draft',
@@ -1787,6 +1795,286 @@ class DocumentController extends BaseController
         } catch (Throwable $e) {
             @error_log('[DocumentController] DCC header baseline sync failed for ' . $code . ': ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Return the DCC current revision projection for legacy authoring code.
+     *
+     * @return array{revision:string,legacy_revision:string,effective_date:string,status:string,header:array<string,mixed>,body:array<string,mixed>|null,bodies:list<array<string,mixed>>}|null
+     */
+    private function currentDccRevisionProjection(string $code): ?array
+    {
+        $canonical = DocumentControlService::canonicalizeCode($code);
+        if ($canonical === '') {
+            return null;
+        }
+        try {
+            $svc = new DocumentControlService($this->data);
+            $header = $svc->getHeader($canonical);
+            $revisionSet = $svc->listRevisions($canonical);
+            $bodies = is_array($revisionSet['bodies'] ?? null) ? array_values($revisionSet['bodies']) : [];
+            $currentBody = null;
+            foreach ($bodies as $body) {
+                if (is_array($body) && $this->truthyDccFlag($body['is_current'] ?? false)) {
+                    $currentBody = $body;
+                    break;
+                }
+            }
+            if ($currentBody === null) {
+                $headerRevision = $this->normaliseDccRevision((string)($header['revision'] ?? ''));
+                foreach ($bodies as $body) {
+                    if (!is_array($body)) {
+                        continue;
+                    }
+                    if ($this->normaliseDccRevision((string)($body['revision'] ?? '')) === $headerRevision) {
+                        $currentBody = $body;
+                        break;
+                    }
+                }
+            }
+            if ($currentBody === null && isset($bodies[0]) && is_array($bodies[0])) {
+                $currentBody = $bodies[0];
+            }
+
+            $revision = trim((string)($currentBody['revision'] ?? ($header['revision'] ?? '')));
+            if ($revision === '') {
+                return null;
+            }
+            $revision = $this->normaliseDccRevision($revision);
+            $effective = trim((string)($currentBody['effective_date'] ?? ($header['effective_date'] ?? '')));
+            if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $effective)) {
+                $effective = trim((string)($header['effective_date'] ?? ''));
+            }
+
+            return [
+                'revision' => $revision,
+                'legacy_revision' => $this->legacyRevisionFromDcc($revision),
+                'effective_date' => $effective,
+                'status' => strtolower(trim((string)($header['status'] ?? ''))),
+                'header' => $header,
+                'body' => $currentBody,
+                'bodies' => $bodies,
+            ];
+        } catch (Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
+     * @param array<string, mixed> $state
+     */
+    private function resolveReleasedRevisionForNewCycle(string $code, string $baseRel, array $state): string
+    {
+        $dcc = $this->currentDccRevisionProjection($code);
+        if ($dcc !== null && $dcc['legacy_revision'] !== '') {
+            return $dcc['legacy_revision'];
+        }
+
+        $catalog = $this->resolveDocumentCatalogEntry($code, $baseRel);
+        $currentRev = trim((string)($state['released_revision'] ?? ($state['revision'] ?? ($catalog['rev'] ?? '0.0'))));
+        $currentRev = preg_replace('/^[vV]\s*/', '', $currentRev) ?? $currentRev;
+        return $currentRev !== '' ? $currentRev : '0.0';
+    }
+
+    /**
+     * @param array<int, mixed> $manifestVersions
+     * @param array<string, mixed> $state
+     * @return array{versions:list<array<string,mixed>>,current:array<string,mixed>}|null
+     */
+    private function buildDccBackedVersionHistory(string $code, string $baseRel, array $manifestVersions, array $state): ?array
+    {
+        $dcc = $this->currentDccRevisionProjection($code);
+        if ($dcc === null) {
+            return null;
+        }
+        $bodies = $dcc['bodies'];
+        $hasBodies = $bodies !== [];
+        if (!$hasBodies && ($dcc['legacy_revision'] === '' || $dcc['legacy_revision'] === '0')) {
+            return null;
+        }
+
+        usort($bodies, function (mixed $a, mixed $b): int {
+            $ar = is_array($a) ? $this->revisionRank((string)($a['revision'] ?? '')) : 0.0;
+            $br = is_array($b) ? $this->revisionRank((string)($b['revision'] ?? '')) : 0.0;
+            return $br <=> $ar;
+        });
+
+        $seen = [];
+        $out = [];
+        $stateStatus = strtolower(trim((string)($state['status'] ?? '')));
+        if (in_array($stateStatus, ['draft', 'in_review', 'pending_approval', 'rejected'], true)) {
+            foreach ($manifestVersions as $entry) {
+                if (!is_array($entry)) {
+                    continue;
+                }
+                $status = strtolower(trim((string)($entry['status'] ?? '')));
+                if (!in_array($status, ['draft', 'in_review', 'pending_approval', 'rejected'], true)) {
+                    continue;
+                }
+                $rev = $this->normaliseDccRevision((string)($entry['version'] ?? ''));
+                if ($rev === '') {
+                    continue;
+                }
+                $entry['source'] = 'legacy_workflow_transient';
+                $out[] = $entry;
+                $seen[$rev] = true;
+            }
+        }
+
+        foreach ($bodies as $body) {
+            if (!is_array($body)) {
+                continue;
+            }
+            $rev = $this->normaliseDccRevision((string)($body['revision'] ?? ''));
+            if ($rev === '') {
+                continue;
+            }
+            $seen[$rev] = true;
+            $current = $rev === $dcc['revision'] || $this->truthyDccFlag($body['is_current'] ?? false);
+            $actor = trim((string)($body['released_by'] ?? ''));
+            if ($actor === '') {
+                $actor = trim((string)($body['approved_by'] ?? ''));
+            }
+            $date = $this->versionHistoryDateFromDccBody($body);
+            $out[] = [
+                'status' => $current ? 'approved' : 'obsolete',
+                'version' => 'v' . $this->legacyRevisionFromDcc($rev),
+                'date' => $date,
+                'by' => $actor,
+                'approvedBy' => trim((string)($body['approved_by'] ?? $actor)),
+                'approvedDate' => $date,
+                'file' => trim((string)($body['content_path'] ?? '')) !== '' ? trim((string)$body['content_path']) : $baseRel,
+                'note' => trim((string)($body['note'] ?? '')) !== '' ? (string)$body['note'] : 'DCC controlled revision',
+                'updateType' => trim((string)($body['update_type'] ?? '')),
+                'source' => 'dcc_document_revision',
+                'is_current' => $current,
+            ];
+        }
+
+        if (!$hasBodies && $dcc['legacy_revision'] !== '' && !isset($seen[$dcc['revision']])) {
+            $out[] = [
+                'status' => in_array($dcc['status'], ['obsolete', 'superseded'], true) ? $dcc['status'] : 'approved',
+                'version' => 'v' . $dcc['legacy_revision'],
+                'date' => $dcc['effective_date'],
+                'by' => trim((string)($dcc['header']['updated_by'] ?? '')),
+                'approvedBy' => trim((string)($dcc['header']['updated_by'] ?? '')),
+                'approvedDate' => $dcc['effective_date'],
+                'file' => $baseRel,
+                'note' => 'DCC header projection',
+                'source' => 'dcc_document_header',
+                'is_current' => true,
+            ];
+            $seen[$dcc['revision']] = true;
+        }
+
+        foreach ($manifestVersions as $entry) {
+            if (!is_array($entry)) {
+                continue;
+            }
+            $status = strtolower(trim((string)($entry['status'] ?? '')));
+            if (!in_array($status, ['approved', 'initial_release', 'released', 'effective', 'obsolete'], true)) {
+                continue;
+            }
+            $rev = $this->normaliseDccRevision((string)($entry['version'] ?? ''));
+            if ($rev === '' || isset($seen[$rev])) {
+                continue;
+            }
+            $entry['status'] = 'obsolete';
+            $entry['source'] = 'legacy_manifest_compat';
+            $out[] = $entry;
+            $seen[$rev] = true;
+        }
+
+        return ['versions' => array_values($out), 'current' => $dcc];
+    }
+
+    /**
+     * @param array<string, mixed> $state
+     * @param array<string, mixed> $dcc
+     * @return array<string, mixed>
+     */
+    private function overlayStateWithDccCurrent(array $state, array $dcc): array
+    {
+        $legacyRevision = (string)($dcc['legacy_revision'] ?? '');
+        if ($legacyRevision === '') {
+            return $state;
+        }
+
+        $stateStatus = strtolower(trim((string)($state['status'] ?? '')));
+        $state['released_revision'] = $legacyRevision;
+        $state['has_release'] = true;
+        if (!in_array($stateStatus, ['draft', 'in_review', 'pending_approval', 'rejected'], true)) {
+            $state['revision'] = $legacyRevision;
+            $state['status'] = 'approved';
+        }
+        if (trim((string)($dcc['effective_date'] ?? '')) !== '') {
+            $state['effective_date'] = (string)$dcc['effective_date'];
+        }
+        $state['version_source'] = 'dcc_document_revision';
+        $state['dcc_revision'] = (string)$dcc['revision'];
+        return $state;
+    }
+
+    private function legacyRevisionFromDcc(string $revision): string
+    {
+        $revision = trim($revision);
+        $revision = preg_replace('/^[vV]\s*/', '', $revision) ?? $revision;
+        return trim($revision);
+    }
+
+    private function truthyDccFlag(mixed $value): bool
+    {
+        if (is_bool($value)) {
+            return $value;
+        }
+        $value = strtolower(trim((string)$value));
+        return in_array($value, ['1', 't', 'true', 'yes', 'y'], true);
+    }
+
+    private function revisionRank(string $revision): float
+    {
+        $revision = $this->legacyRevisionFromDcc($revision);
+        if (!preg_match('/^(\d+)(?:\.(\d+))?$/', $revision, $m)) {
+            return 0.0;
+        }
+        return ((int)$m[1] * 1000) + (int)($m[2] ?? 0);
+    }
+
+    /**
+     * @param array<string, mixed> $body
+     */
+    private function versionHistoryDateFromDccBody(array $body): string
+    {
+        foreach (['released_at', 'approved_at', 'effective_date'] as $key) {
+            $value = trim((string)($body[$key] ?? ''));
+            if ($value !== '') {
+                return $value;
+            }
+        }
+        return '';
+    }
+
+    /**
+     * @param array<string, mixed> $user
+     */
+    private function workflowActorRole(array $user): ?string
+    {
+        foreach (['role_code', 'role', 'primary_role_code'] as $key) {
+            $role = trim((string)($user[$key] ?? ''));
+            if ($role !== '') {
+                return function_exists('migrate_role') ? migrate_role($role) : $role;
+            }
+        }
+        $roles = $user['roles'] ?? null;
+        if (is_array($roles)) {
+            foreach ($roles as $role) {
+                $role = trim((string)$role);
+                if ($role !== '') {
+                    return function_exists('migrate_role') ? migrate_role($role) : $role;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -1894,11 +2182,12 @@ class DocumentController extends BaseController
         string $updateType,
         string $liveFile,
         string $actor,
+        ?string $actorRole = null,
         string $title = '',
         string $note = ''
     ): void {
         try {
-            $canonical = \MOM\Services\DocumentControl\DocumentControlService::canonicalizeCode($code);
+            $canonical = DocumentControlService::canonicalizeCode($code);
             if ($canonical === '') {
                 return;
             }
@@ -1910,6 +2199,7 @@ class DocumentController extends BaseController
             }
 
             $svc = $this->ensureDccHeader($canonical, $baseRel, $actor, $title);
+            $actorName = $actor !== '' ? $actor : 'system';
 
             $svc->recordRevision(
                 $canonical,
@@ -1922,22 +2212,19 @@ class DocumentController extends BaseController
                     'filename' => $liveFile !== '' ? basename($liveFile) : null,
                     'note' => $note !== '' ? $note : null,
                 ],
-                $actor !== '' ? $actor : 'system'
+                $actorName
             );
 
-            try {
-                $svc->approve(
-                    $canonical,
-                    $actor !== '' ? $actor : 'system',
-                    'QA_APPROVER',
-                    null,
-                    $note !== '' ? $note : null
-                );
-            } catch (RuntimeException $e) {
-                // Already past 'approved' (e.g. released then re-approved via
-                // legacy) — silent per transition-window contract.
-                if (!str_starts_with($e->getMessage(), 'dcc_invalid_transition')) {
-                    throw $e;
+            $headerBefore = $svc->getHeader($canonical);
+            $statusBefore = strtolower(trim((string)($headerBefore['status'] ?? '')));
+            if ($statusBefore === 'draft') {
+                try {
+                    $svc->submitReview($canonical, $actorName, $actorRole, $note !== '' ? $note : null);
+                    $statusBefore = 'in_review';
+                } catch (RuntimeException $e) {
+                    if (!str_starts_with($e->getMessage(), 'dcc_invalid_transition')) {
+                        throw $e;
+                    }
                 }
             }
 
@@ -1947,22 +2234,35 @@ class DocumentController extends BaseController
             // always reflects the latest approved body, not the seeded V0/V1.
             // Without this, the viewer shows V1.0 forever even after multiple
             // approve cycles bump the legacy manifest to V2.0, V3.0, …
-            $this->data->execute(
-                "UPDATE dcc_document_header
-                 SET revision = :rev,
-                     effective_date = :eff,
-                     updated_by = :actor
-                 WHERE doc_code = :c",
-                [
-                    ':rev'   => $normalisedRev,
-                    ':eff'   => $effective,
-                    ':actor' => $actor !== '' ? $actor : 'system',
-                    ':c'     => $canonical,
-                ]
+            $svc->projectCurrentRevision(
+                $canonical,
+                $normalisedRev,
+                $effective,
+                $actorName,
+                null,
+                $actorRole,
+                $note !== '' ? $note : 'legacy_approve_projection'
             );
+            try {
+                if ($statusBefore === 'in_review') {
+                    $svc->approve(
+                        $canonical,
+                        $actorName,
+                        $actorRole,
+                        null,
+                        $note !== '' ? $note : null
+                    );
+                }
+            } catch (RuntimeException $e) {
+                // Already past 'approved' (e.g. released then re-approved via
+                // legacy) — silent per transition-window contract.
+                if (!str_starts_with($e->getMessage(), 'dcc_invalid_transition')) {
+                    throw $e;
+                }
+            }
             // Flip is_current on the just-recorded revision so /revisions and
             // the unique-current-per-doc index reflect the projection.
-            $svc->markRevisionCurrent($canonical, $normalisedRev, $actor !== '' ? $actor : 'system');
+            $svc->markRevisionCurrent($canonical, $normalisedRev, $actorName);
         } catch (Throwable $e) {
             @error_log('[dcc-bridge] approve ' . $code . ' failed: ' . $e->getMessage());
         }

@@ -719,6 +719,82 @@ final class DocumentControlService
     }
 
     /**
+     * Project the controlled-current revision onto the header row.
+     *
+     * This is the single service boundary for compatibility workflows that
+     * have already written a released body row but do not run a formal DCN
+     * release ceremony. It keeps `dcc_document_header` and the append-only
+     * transition log aligned without letting draft creation mutate the current
+     * released revision.
+     */
+    public function projectCurrentRevision(
+        string $docCode,
+        string $revision,
+        string $effectiveDate,
+        string $actor,
+        ?string $status = null,
+        ?string $actorRoleCode = null,
+        ?string $note = null
+    ): array {
+        $this->assertValidRevision($revision);
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $effectiveDate)) {
+            throw new InvalidArgumentException('dcc_project_revision_invalid_effective_date');
+        }
+        if ($status !== null && !array_key_exists($status, self::TRANSITIONS)) {
+            throw new InvalidArgumentException('dcc_project_revision_invalid_status');
+        }
+
+        $current = $this->getHeader($docCode);
+        if ($current['status'] === 'obsolete') {
+            throw new RuntimeException('dcc_document_obsolete_readonly');
+        }
+
+        $sets = [
+            'revision = :rev',
+            'effective_date = :eff',
+            'updated_by = :actor',
+        ];
+        $params = [
+            ':c' => $docCode,
+            ':rev' => $revision,
+            ':eff' => $effectiveDate,
+            ':actor' => $actor,
+        ];
+        $targetStatus = (string)$current['status'];
+        if ($status !== null) {
+            $sets[] = 'status = :status';
+            $params[':status'] = $status;
+            $targetStatus = $status;
+        }
+
+        $changed = (string)$current['revision'] !== $revision
+            || (string)$current['effective_date'] !== $effectiveDate
+            || (string)$current['status'] !== $targetStatus;
+
+        $this->data->execute(
+            'UPDATE dcc_document_header SET ' . implode(', ', $sets) . ' WHERE doc_code = :c',
+            $params
+        );
+
+        if ($changed) {
+            $this->recordHistory($docCode, [
+                'revision'          => $revision,
+                'previous_revision' => $current['revision'] ?? null,
+                'from_status'       => $current['status'] ?? null,
+                'to_status'         => $targetStatus,
+                'effective_date'    => $effectiveDate,
+                'actor_party_id'    => $actor,
+                'actor_role_code'   => $actorRoleCode,
+                'dcr_id'            => null,
+                'dcn_id'            => null,
+                'note'              => $note ?? 'current_revision_projected',
+            ]);
+        }
+
+        return $this->getHeader($docCode);
+    }
+
+    /**
      * Update the filename / filesystem_path anchor on the header row.
      * Called from the rename pipeline so the DB stays consistent with disk.
      */

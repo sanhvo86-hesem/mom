@@ -98,6 +98,45 @@ final class DocumentControlServiceConsolidationTest extends TestCase
         $this->assertSame('V2.0', $raises[0]['params'][':r']);
     }
 
+    public function testProjectCurrentRevisionUpdatesHeaderAndWritesHistory(): void
+    {
+        $before = [[
+            'doc_code' => 'SOP-606',
+            'status' => 'approved',
+            'revision' => 'V1.0',
+            'effective_date' => '2026-01-01',
+        ]];
+        $after = [[
+            'doc_code' => 'SOP-606',
+            'status' => 'approved',
+            'revision' => 'V2.0',
+            'effective_date' => '2026-05-07',
+        ]];
+        $this->data->queueRow('SELECT header_id, doc_code, eqms_doc_id, title, subtitle, doc_type', $before);
+        $this->data->queueRow('SELECT header_id, doc_code, eqms_doc_id, title, subtitle, doc_type', $after);
+
+        $result = $this->service->projectCurrentRevision(
+            'SOP-606',
+            'V2.0',
+            '2026-05-07',
+            'qa.alice',
+            null,
+            'qa_manager',
+            'legacy approve projection'
+        );
+
+        $this->assertSame('V2.0', $result['revision']);
+        $updates = $this->data->findExecutes('UPDATE dcc_document_header', 'revision = :rev');
+        $this->assertCount(1, $updates);
+        $this->assertSame('V2.0', $updates[0]['params'][':rev']);
+        $history = $this->data->findExecutes('INSERT INTO dcc_document_revision_history');
+        $this->assertCount(1, $history);
+        $this->assertSame('V2.0', $history[0]['params'][':rev']);
+        $this->assertSame('V1.0', $history[0]['params'][':prev']);
+        $this->assertSame('approved', $history[0]['params'][':to']);
+        $this->assertSame('qa_manager', $history[0]['params'][':role']);
+    }
+
     public function testReleaseRequiresDcnMatch(): void
     {
         $this->data->queueRow('SELECT dcn_id, doc_code, to_revision', [[
