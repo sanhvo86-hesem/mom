@@ -435,6 +435,98 @@ QMS_SOURCE_CONTROLLED_MIRROR = [
     "tools",
 ]
 
+# ============================================================================
+# ANNEX-139 — internal blueprint for 6 IP/restricted libraries
+# ============================================================================
+
+# §2 Part-REV-Master internal (10 sub-folders per REV-{Rev})
+PART_REV_MASTER_SUBS = [
+    "00-Index-and-Status",
+    "01-Customer-Source-Documents",
+    "02-Drawings-and-Models",
+    "03-Process-and-Risk",
+    "04-Approved-Material-and-Suppliers",
+    "05-NPI-Qualification",
+    "06-Surface-Finish-and-Cleanliness",
+    "07-Tooling-Concept-and-Fixture-Refs",
+    "08-Standards-Customer-Specific",
+    "09-Engineering-Change-History",
+    "99-Superseded-and-Locked",
+]
+
+# Wait — ANNEX-139 §2 actually defines 10 folders (01-09 + 99) with different names.
+# Use ANNEX-139 §2 literal names instead:
+PART_REV_MASTER_SUBS = [
+    "01-Engineering-Baseline-Source",
+    "02-CAM-Source",
+    "03-Inspection-Plan-and-Balloon",
+    "04-Approved-Material-and-Suppliers",
+    "05-FAI-Baseline-Pack",
+    "06-Surface-Finish-and-Cleanliness",
+    "07-Tooling-Concept-and-Fixture-Refs",
+    "08-Standards-Customer-Specific",
+    "09-Engineering-Change-History",
+    "99-Superseded-and-Locked",
+]
+
+# §3 Customer-Received internal (7 sub by-customer + quarantine + export-control + archive)
+CUSTOMER_RECEIVED_BY_CUSTOMER_SUBS = [
+    "Drawings",
+    "Specs",
+    "NDA-Legal",
+    "Customer-Forms",
+    "Audit-Reports-Received",
+]
+
+# §4 Tooling-Fixture-Gage internal (6 groups)
+TOOLING_GROUPS = {
+    "01-Cutting-Tools": "{ToolID}",
+    "02-Workholding-Fixtures": "{FixtureID}",
+    "03-Gages-and-Inspection-Equipment": "{GageID}",
+}
+TOOLING_ASSET_SUBS_TOOL = ["01-Tool-Master-Spec", "02-Preset-Data", "03-Reorder-and-Lifecycle", "99-Scrapped"]
+TOOLING_ASSET_SUBS_FIXTURE = ["01-Design-Pack", "02-Validation-and-Proveout", "03-Usage-Log", "04-Maintenance-and-Repair", "99-Superseded"]
+TOOLING_ASSET_SUBS_GAGE = ["01-Specification", "02-Calibration-Certificates", "03-MSA-and-GR-R-Studies", "04-Daily-Check-Records", "99-Retired"]
+
+# §5 HR-Operations internal (7 sub)
+HR_OPERATIONS_SUBS_WITH_YEAR = [
+    "01-Manpower-Planning-Annual",
+    "05-Audit-Pack-Inputs",
+    "06-HR-Reports-and-Dashboards",
+]
+HR_OPERATIONS_SUBS_NO_YEAR = [
+    "02-Recruitment-Pipeline-Non-PII",
+    "03-HR-Policy-and-Handbook-Current",
+    "04-Compensation-Bands-Restricted",
+]
+HR_OPERATIONS_REGISTERS = [
+    "01-Headcount-Master-Log",
+    "02-Recruitment-Funnel-Restricted",
+    "03-Discipline-Case-Register",
+    "04-Asset-Return-Master",
+    "05-Access-Revocation-Master",
+]
+
+# §7 Cleanroom-Records internal (8 sub)
+CLEANROOM_ENV_MONITORING_ROOMS = ["RM-CR-01", "RM-INSP-01", "RM-PACK-01"]
+CLEANROOM_SUBS_WITH_YEAR = [
+    "04-Personnel-Gowning-and-Training",
+    "06-Incident-and-Excursion",
+    "07-Audit-and-Customer-Inspection",
+]
+CLEANROOM_SUBS_NO_YEAR = [
+    "05-Cleaning-Validation-and-SOP",
+]
+
+# §8 Subcontractor-Records internal (9 sub)
+SUBCONTRACTOR_BY_SUBCONTRACTOR_SUBS = [
+    "01-Qualification-Pack",
+    "02-Process-Cert-Letters",
+    "03-Audit-Reports-and-Surveys",
+    "04-Process-Records-per-Job",
+]
+SUBCONTRACTOR_TEMPLATE_PROCESSORS = ["PROC-PLAT-001", "PROC-HT-001", "PROC-NDT-001"]
+
 
 def mkpath(p: Path) -> None:
     """Create dir + .gitkeep."""
@@ -493,9 +585,18 @@ def build_dept_specific(base: Path, spec: dict) -> None:
 
 
 def build_blueprint() -> None:
+    """Wipe folder tree but preserve top-level user docs (README/manifest)."""
+    preserved = {}
     if ROOT.exists():
+        # Capture top-level user docs so the wipe-and-rebuild doesn't destroy them.
+        for f in ROOT.iterdir():
+            if f.is_file() and f.name not in {".gitkeep", "_TREE.txt"}:
+                preserved[f.name] = f.read_bytes()
         shutil.rmtree(ROOT)
     ROOT.mkdir(parents=True)
+    # Restore preserved user docs after recreating empty root.
+    for name, data in preserved.items():
+        (ROOT / name).write_bytes(data)
 
     # =====================================================================
     # SITE 1 — HESEM-Records (§2 line 165)
@@ -528,26 +629,82 @@ def build_blueprint() -> None:
         build_dept_zone(dept_base)
         build_dept_specific(dept_base, spec)
 
+    # ANNEX-139 §7 Cleanroom-Records — NEW library in SITE 1
+    cr_lib = s1 / "Cleanroom-Records"
+    # 01-Environment-Monitoring/{Room}/{YYYY-MM}/ — template for HESEM initial rooms
+    for room in CLEANROOM_ENV_MONITORING_ROOMS:
+        mkpath(cr_lib / "01-Environment-Monitoring" / room / "{YYYY-MM}")
+    mkpath(cr_lib / "01-Environment-Monitoring" / "{Room}" / "{YYYY-MM}")
+    # 02-Validation-and-Qualification + 03-HVAC-and-Filter-Maintenance: {Room}/{YYYY}
+    for room in CLEANROOM_ENV_MONITORING_ROOMS:
+        mkpath(cr_lib / "02-Validation-and-Qualification" / room / YYYY)
+        mkpath(cr_lib / "03-HVAC-and-Filter-Maintenance" / room / YYYY)
+    mkpath(cr_lib / "02-Validation-and-Qualification" / "{Room}" / YYYY)
+    mkpath(cr_lib / "03-HVAC-and-Filter-Maintenance" / "{Room}" / YYYY)
+    # 04, 06, 07: {YYYY}
+    for sub in CLEANROOM_SUBS_WITH_YEAR:
+        mkpath(cr_lib / sub / YYYY)
+    # 05: no year
+    for sub in CLEANROOM_SUBS_NO_YEAR:
+        mkpath(cr_lib / sub)
+    mkpath(cr_lib / "99-Archive" / YYYY)
+
     # =====================================================================
     # SITE 2 — HESEM-Job-Evidence (§2 line 166)
     # =====================================================================
     s2 = ROOT / "HESEM-Job-Evidence"
 
-    # §11 Part-REV-Master/{CustomerID}/{PartNo}/REV-{Rev}/
+    # §11 Part-REV-Master/{CustomerID}/{PartNo}/REV-{Rev}/<ANNEX-139 §2 10 subs>
     prm = s2 / "Part-REV-Master"
-    mkpath(prm / "{CustomerID}" / "{PartNo}" / "REV-{Rev}")
+    prm_template = prm / "{CustomerID}" / "{PartNo}" / "REV-{Rev}"
+    for sub in PART_REV_MASTER_SUBS:
+        mkpath(prm_template / sub)
 
     # §5 Job-Dossiers/{YYYY}/{JobNum}-{PartNo}-REV-{Revision}/<11 gates>
     jd = s2 / "Job-Dossiers" / YYYY / "{JobNum}-{PartNo}-REV-{Revision}"
     for gate in JOB_DOSSIER_GATES:
         mkpath(jd / gate)
 
-    # Customer-Received — §2 keyline only; no internal §3-§11 spec.
-    # Strict compliance: create library root only with .gitkeep
-    mkpath(s2 / "Customer-Received")
+    # ANNEX-139 §3 Customer-Received/ — 7 sub
+    cr = s2 / "Customer-Received"
+    cr_by = cr / "01-By-Customer" / "{CustomerID}"
+    for sub in CUSTOMER_RECEIVED_BY_CUSTOMER_SUBS:
+        mkpath(cr_by / sub)
+    mkpath(cr / "02-Inbound-Quarantine")
+    mkpath(cr / "03-Restricted-Export-Control" / "{CustomerID}")
+    mkpath(cr / "99-Archive-Closed-Customer")
 
-    # Tooling-Fixture-Gage — §2 keyline only; no internal §3-§11 spec.
-    mkpath(s2 / "Tooling-Fixture-Gage")
+    # ANNEX-139 §4 Tooling-Fixture-Gage/ — 6 groups
+    tfg = s2 / "Tooling-Fixture-Gage"
+    for sub in TOOLING_ASSET_SUBS_TOOL:
+        mkpath(tfg / "01-Cutting-Tools" / "{ToolID}" / sub)
+    for sub in TOOLING_ASSET_SUBS_FIXTURE:
+        mkpath(tfg / "02-Workholding-Fixtures" / "{FixtureID}" / sub)
+    # 03-Gages: calibration certs by year inside the asset
+    for sub in TOOLING_ASSET_SUBS_GAGE:
+        if sub == "02-Calibration-Certificates":
+            mkpath(tfg / "03-Gages-and-Inspection-Equipment" / "{GageID}" / sub / YYYY)
+        else:
+            mkpath(tfg / "03-Gages-and-Inspection-Equipment" / "{GageID}" / sub)
+    # 04-Calibration-Records — separate aggregated path per ANNEX-139 §4
+    mkpath(tfg / "04-Calibration-Records" / "{GageID}" / YYYY)
+    mkpath(tfg / "05-Maintenance-Logs" / "{AssetID}")
+    mkpath(tfg / "06-Retired-and-Disposal" / "{AssetID}")
+
+    # ANNEX-139 §8 Subcontractor-Records — NEW library in SITE 2
+    sr_pr = s2 / "Subcontractor-Records"
+    mkpath(sr_pr / "01-Approved-Supplier-List-with-Scope")
+    by_sub = sr_pr / "02-By-Subcontractor" / "{ProcessorID}"
+    for sub in SUBCONTRACTOR_BY_SUBCONTRACTOR_SUBS:
+        mkpath(by_sub / sub)
+    # Template processors (initial seed for HESEM rollout)
+    for proc in SUBCONTRACTOR_TEMPLATE_PROCESSORS:
+        for sub in SUBCONTRACTOR_BY_SUBCONTRACTOR_SUBS:
+            mkpath(sr_pr / "02-By-Subcontractor" / proc / sub)
+    mkpath(sr_pr / "03-Suspension-and-Decertification-Log")
+    mkpath(sr_pr / "04-NADCAP-Audit-Coordination" / YYYY)
+    mkpath(sr_pr / "05-Flow-Down-Quality-Clauses")
+    mkpath(sr_pr / "99-Archive-Former-Subcontractor")
 
     # =====================================================================
     # SITE 3 — HESEM-People (§2 line 167)
@@ -588,8 +745,20 @@ def build_blueprint() -> None:
     # 06-Restricted-Shared-Ops/{RestrictedProcess}/00-Current/
     mkpath(er / "06-Restricted-Shared-Ops" / "{RestrictedProcess}" / "00-Current")
 
-    # HR-Operations — §2 keyline only; no internal §3-§11 spec.
-    mkpath(s3 / "HR-Operations")
+    # ANNEX-139 §5 HR-Operations/ — 7 sub policy + aggregate (NO PII)
+    hro = s3 / "HR-Operations"
+    for sub in HR_OPERATIONS_SUBS_WITH_YEAR:
+        # 06-HR-Reports-and-Dashboards uses {YYYY-Qn} pattern, others use {YYYY}
+        if sub == "06-HR-Reports-and-Dashboards":
+            mkpath(hro / sub / "{YYYY-Qn}")
+        else:
+            mkpath(hro / sub / YYYY)
+    for sub in HR_OPERATIONS_SUBS_NO_YEAR:
+        mkpath(hro / sub)
+    # 09-Registers (per ANNEX-139 §5 inferred substructure for registers grouping)
+    for reg in HR_OPERATIONS_REGISTERS:
+        mkpath(hro / "09-Registers" / reg)
+    mkpath(hro / "99-Archive" / YYYY)
 
     # =====================================================================
     # SITE 4 — HESEM-Digital (§2 line 168)
