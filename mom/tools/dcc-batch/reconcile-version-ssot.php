@@ -30,11 +30,14 @@ require __DIR__ . '/../../vendor/autoload.php';
 
 use MOM\Database\DataLayer;
 use MOM\Services\DocumentControl\DocumentControlService;
+use const MOM\Tools\DccBatch\DCC_DEFAULT_LOCALE;
+use const MOM\Tools\DccBatch\DCC_PLACEHOLDER_COMMENT;
 use function MOM\Tools\DccBatch\build_data_layer;
 use function MOM\Tools\DccBatch\code_from_filename;
 use function MOM\Tools\DccBatch\code_from_filename_loose;
 use function MOM\Tools\DccBatch\doc_type_from_code;
 use function MOM\Tools\DccBatch\is_html_path;
+use function MOM\Tools\DccBatch\logo_path_for;
 use function MOM\Tools\DccBatch\walk_docs;
 
 $ROOT_DIR = realpath(__DIR__ . '/../../..');
@@ -140,7 +143,7 @@ foreach ($codes as $code) {
     }
 
     $html = (string)@file_get_contents($ROOT_DIR . '/' . $baseRel);
-    $nextHtml = sync_html_cache($html, $headers[$code] ?? [], $authority);
+    $nextHtml = sync_html_cache($html, $headers[$code] ?? [], $authority, $ROOT_DIR, $baseRel);
     if ($nextHtml !== $html) {
         $stats['html_written']++;
         if (!$opts['dry_run']) {
@@ -477,7 +480,7 @@ function build_state(string $code, array $state, array $authority): array
     return $state;
 }
 
-function sync_html_cache(string $html, array $header, array $authority): string
+function sync_html_cache(string $html, array $header, array $authority, string $rootDir = '', string $baseRel = ''): string
 {
     if ($html === '') {
         return $html;
@@ -490,6 +493,11 @@ function sync_html_cache(string $html, array $header, array $authority): string
     $approver = (string)($header['approver_role_code'] ?? '');
     $docType = (string)($header['doc_type'] ?? doc_type_from_code((string)($authority['doc_code'] ?? '')));
     $status = (string)($authority['status'] ?? ($header['status'] ?? 'approved'));
+
+    if ($rootDir !== '' && $baseRel !== '' && dcc_cache_structurally_corrupt($html)) {
+        $placeholder = build_dcc_cache_placeholder($rootDir, $baseRel, $header, $authority);
+        $html = replace_dcc_cache_region($html, $placeholder);
+    }
 
     $html = preg_replace_callback('/data-dcc-bootstrap="([^"]*)"/i', static function (array $m) use ($authority, $revision, $effective, $title, $subtitle, $owner, $approver, $docType, $status): string {
         $decoded = html_entity_decode((string)$m[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
@@ -515,14 +523,29 @@ function sync_html_cache(string $html, array $header, array $authority): string
         return 'data-dcc-bootstrap="' . $encoded . '"';
     }, $html) ?? $html;
 
-    $html = preg_replace('/data-dcc-status="[^"]*"/i', 'data-dcc-status="' . h($status) . '"', $html) ?? $html;
+    $html = preg_replace_callback(
+        '/data-dcc-status="[^"]*"/i',
+        static fn (): string => 'data-dcc-status="' . h($status) . '"',
+        $html,
+        1
+    ) ?? $html;
     $html = replace_dcc_cell($html, 'revision', $revision);
     $html = replace_dcc_cell($html, 'effective_date', $effective);
     if ($title !== '') {
-        $html = preg_replace('/(<h2 class="dcc-header__title">)(.*?)(<\/h2>)/isu', '$1' . h($title) . '$3', $html, 1) ?? $html;
+        $html = preg_replace_callback(
+            '/(<h2 class="dcc-header__title">)(.*?)(<\/h2>)/isu',
+            static fn (array $m): string => $m[1] . h($title) . $m[3],
+            $html,
+            1
+        ) ?? $html;
     }
     if ($subtitle !== '') {
-        $html = preg_replace('/(<p class="dcc-header__subtitle">)(.*?)(<\/p>)/isu', '$1' . h($subtitle) . '$3', $html, 1) ?? $html;
+        $html = preg_replace_callback(
+            '/(<p class="dcc-header__subtitle">)(.*?)(<\/p>)/isu',
+            static fn (array $m): string => $m[1] . h($subtitle) . $m[3],
+            $html,
+            1
+        ) ?? $html;
     }
     return $html;
 }
@@ -530,7 +553,126 @@ function sync_html_cache(string $html, array $header, array $authority): string
 function replace_dcc_cell(string $html, string $cell, string $value): string
 {
     $pattern = '/(<div class="dcc-header__cell"[^>]*data-dcc-cell="' . preg_quote($cell, '/') . '"[^>]*>.*?<span class="dcc-header__value">)(.*?)(<\/span>)/isu';
-    return preg_replace($pattern, '$1' . h($value) . '$3', $html, 1) ?? $html;
+    return preg_replace_callback(
+        $pattern,
+        static fn (array $m): string => $m[1] . h($value) . $m[3],
+        $html,
+        1
+    ) ?? $html;
+}
+
+function dcc_cache_structurally_corrupt(string $html): bool
+{
+    $pageBodyPos = stripos($html, '<div class="page-body"');
+    $docContentPos = stripos($html, '<div class="doc-content"', $pageBodyPos === false ? 0 : $pageBodyPos);
+    if ($pageBodyPos !== false && $docContentPos !== false) {
+        $bodyPrefix = substr($html, $pageBodyPos, $docContentPos - $pageBodyPos);
+        $openCount = preg_match_all('/<div\b/i', $bodyPrefix);
+        $closeCount = preg_match_all('/<\/div>/i', $bodyPrefix);
+        if (($openCount - $closeCount) <= 0) {
+            return true;
+        }
+    }
+
+    $region = dcc_cache_region($html);
+    if ($region === null) {
+        return false;
+    }
+    $fragment = substr($html, $region[0], $region[1] - $region[0]);
+    if (preg_match('/<\/div>\d{3}-\d{2}-\d{2}<\/span><\/div>\s*<div[^>]+data-dcc-cell=["\']owner["\']/isu', $fragment) === 1) {
+        return true;
+    }
+    if (stripos($fragment, 'dcc-header__ribbon') !== false && stripos($fragment, 'data-dcc-cell="effective_date"') === false) {
+        return true;
+    }
+    return false;
+}
+
+function dcc_cache_region(string $html): ?array
+{
+    if (!preg_match('/<div[^>]*class=["\'][^"\']*\bdcc-header\b[^"\']*["\'][^>]*>/i', $html, $m, PREG_OFFSET_CAPTURE)) {
+        return null;
+    }
+    $headerStart = (int)$m[0][1];
+    $start = $headerStart;
+    $before = substr($html, 0, $headerStart);
+    $markerPos = strrpos($before, DCC_PLACEHOLDER_COMMENT);
+    if ($markerPos !== false && ($headerStart - $markerPos) < 512) {
+        $start = $markerPos;
+    }
+
+    $docContentPos = stripos($html, '<div class="doc-content"', $headerStart);
+    if ($docContentPos !== false) {
+        return [$start, $docContentPos];
+    }
+
+    $selfClosingPattern = '#(?:' . preg_quote(DCC_PLACEHOLDER_COMMENT, '#') . '\s*)?<div[^>]*class=["\'][^"\']*\bdcc-header\b[^"\']*["\'][^>]*></div>#i';
+    if (preg_match($selfClosingPattern, $html, $selfMatch, PREG_OFFSET_CAPTURE, $start) === 1) {
+        return [(int)$selfMatch[0][1], (int)$selfMatch[0][1] + strlen($selfMatch[0][0])];
+    }
+
+    return null;
+}
+
+function replace_dcc_cache_region(string $html, string $placeholder): string
+{
+    $region = dcc_cache_region($html);
+    if ($region === null) {
+        return $html;
+    }
+    return substr($html, 0, $region[0]) . rtrim($placeholder) . "\n" . ltrim(substr($html, $region[1]));
+}
+
+function build_dcc_cache_placeholder(string $rootDir, string $baseRel, array $header, array $authority): string
+{
+    $docCode = (string)($authority['doc_code'] ?? ($header['doc_code'] ?? ''));
+    $title = (string)($header['title'] ?? '');
+    $subtitle = (string)($header['subtitle'] ?? '');
+    $docType = (string)($header['doc_type'] ?? doc_type_from_code($docCode));
+    $logoPath = logo_path_for(rtrim($rootDir, '/') . '/' . $baseRel, $rootDir);
+    $status = (string)($authority['status'] ?? ($header['status'] ?? 'approved'));
+    $payload = [
+        'header' => [
+            'doc_code' => $docCode,
+            'title' => $title,
+            'subtitle' => $subtitle !== '' ? $subtitle : null,
+            'doc_type' => $docType,
+            'revision' => (string)$authority['revision'],
+            'effective_date' => (string)$authority['effective_date'],
+            'owner_role_code' => (string)($header['owner_role_code'] ?? ''),
+            'approver_role_code' => (string)($header['approver_role_code'] ?? ''),
+            'iso_clause' => $header['iso_clause'] ?? null,
+            'status' => $status,
+        ],
+        'labels' => [
+            'doc_id' => ['short' => 'ID', 'long' => 'Document ID', 'sort' => 10],
+            'revision' => ['short' => 'Rev', 'long' => 'Revision', 'sort' => 20],
+            'effective_date' => ['short' => 'Eff', 'long' => 'Effective date', 'sort' => 30],
+            'owner' => ['short' => 'Owner', 'long' => 'Owner', 'sort' => 40],
+            'approver' => ['short' => 'Appr', 'long' => 'Approved by', 'sort' => 50],
+        ],
+    ];
+    $seedJson = json_encode($payload, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if (!is_string($seedJson)) {
+        $seedJson = '{}';
+    }
+    $codeAttr = h($docCode);
+    $localeAttr = h(DCC_DEFAULT_LOCALE);
+    $logoAttr = h($logoPath);
+    $seedAttr = h($seedJson);
+    $statusAttr = h($status);
+    $marker = DCC_PLACEHOLDER_COMMENT;
+    return <<<HTML
+{$marker}
+<div class="dcc-header"
+     data-dcc-doc-code="{$codeAttr}"
+     data-dcc-locale="{$localeAttr}"
+     data-dcc-logo="{$logoAttr}"
+     data-dcc-bootstrap="{$seedAttr}"
+     data-dcc-state="ready"
+     data-dcc-bootstrap-source="portal-authoritative"
+     data-dcc-status="{$statusAttr}"></div>
+HTML;
 }
 
 function doc_store_paths(string $rootDir, string $baseRel): array
