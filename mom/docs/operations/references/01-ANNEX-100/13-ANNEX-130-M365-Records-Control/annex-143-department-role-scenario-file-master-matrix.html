@@ -101,15 +101,18 @@ DEP-EXEC = bố trí ngang với CEO (BOD pack, Strategy, ERM, Insurance, M&amp;
 </section>
 
 <section class="card">
-<h2>3. Cấu trúc M365 v3 — 5 site + 2 special</h2>
+<h2>3. Cấu trúc M365 v3.1 — 7 site + 2 special</h2>
+<div class="ok-callout"><strong>v3.1 update (2026-05-16 chiều):</strong> Sau khi xem lại visualization folder structure, người dùng yêu cầu thêm site cấp 1 cho rõ. Đảo ngược quyết định v3 (vốn dồn IP vào DLP folder-level) — bổ sung <b>SITE 6 HESEM-Engineering-IP</b> + <b>SITE 7 HESEM-People-Competency</b> để có top-level visibility và phân tách quyền cấp site. Tổng blueprint <b>2129 directories</b> (v3: 2022).</div>
 <table>
 <thead><tr><th>Path</th><th>Mục đích</th><th># Library cấp 1</th><th>Sensitivity mặc định</th><th>Retention dài nhất</th></tr></thead>
 <tbody>
 <tr><td><code>HESEM-Records/</code></td><td>Bộ ghi cấp công ty: QMS-Gov, Quality, Training, Department-Ops (16 dept), Cleanroom</td><td>5</td><td>L1 Internal</td><td>R-Life + 15y</td></tr>
 <tr><td><code>HESEM-Job-Evidence/</code></td><td>Part-REV master + Job-Dossiers theo 11 gate + Customer-Received + Tooling/Fixture/Gage + Subcontractor-Records</td><td>5</td><td>L3 Confidential-Customer</td><td>Life-of-part + 15y</td></tr>
-<tr><td><code>HESEM-People/</code></td><td>Employee-Records (6+14 sub) + HR-Operations</td><td>2</td><td>L3 Highly-Confidential PII</td><td>LC30 (occ. health)</td></tr>
+<tr><td><code>HESEM-People/</code></td><td>Employee-Records (6+14 sub) + HR-Operations — <strong>chỉ PII</strong></td><td>2</td><td>L3 Highly-Confidential PII</td><td>LC30 (occ. health)</td></tr>
 <tr><td><code>HESEM-Digital/</code></td><td>System-Records (8 area) + QMS-Source-Control (4 area mirror eqms.hesemeng.com)</td><td>2</td><td>L4 Restricted-Cyber</td><td>R-Life</td></tr>
 <tr><td><code>HESEM-ESG-Compliance/</code></td><td>RBA, Carbon Scope 1/2/3, CMRT, UFLPA, Banned-Sub, OEM Code-of-Conduct, Modern-Slavery</td><td>7</td><td>L3 Confidential-Customer</td><td>R-Life + 15y</td></tr>
+<tr style="background:#ebfbee;"><td><code>HESEM-Engineering-IP/</code> <b>★ v3.1</b></td><td>Vault Customer CAD + HESEM Derivative CAD + CAM Source + Post-Processor library + Reverse Engineering + Trade-Secret + IP Acks + Patent/Trademark + Customer-Standards-Mirror</td><td>9</td><td>L4 Restricted-CustomerNDA</td><td>Life-of-part + 15y / Life-of-IP</td></tr>
+<tr style="background:#ebfbee;"><td><code>HESEM-People-Competency/</code> <b>★ v3.1</b></td><td>Skills-Taxonomy + Required/Actual matrix + Gap-Report + Cert-Expiry-Watch + Customer-Approved-Operator-List + Customer-Audit-People-Pack + Critical-Cert-Library (10 family) + Training-Effectiveness-KPI</td><td>9</td><td>L2 Internal (no PII)</td><td>Employment + 10y</td></tr>
 <tr><td><code>06-Archive/</code></td><td>Closed-year + Superseded + Legal-Hold + Locked-Job-Pack</td><td>4</td><td>Write-once</td><td>Theo retention gốc</td></tr>
 <tr><td><code>07-Working-Templates/</code></td><td>Mẫu công việc theo Function × TemplateType</td><td>1</td><td>L1 Internal</td><td>—</td></tr>
 </tbody>

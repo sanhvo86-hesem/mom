@@ -1160,14 +1160,93 @@ def build_blueprint() -> None:
     # =====================================================================
     # NOTE: SITE 6 HESEM-Customer-Portals removed in v3 (2026-05-16).
     # Rationale: HESEM is a CONSUMER of customer portals (Ariba/Coupa/
-    # myASML/TPS), not a publisher. We do NOT host customer portals.
-    # Portal-pull/push evidence lives under:
-    #   - DEP-SCS/02-Operations/.../01-RFQ-Intake-and-Portal-Pull
-    #   - DEP-SCS/02-Operations/.../04-Quote-Submission-and-Portal-Upload
-    #   - DEP-ERP/02-Operations/.../07-Customer-Portal-Account-Registry
-    #   - DEP-ERP/02-Operations/.../08-Portal-Pull-Push-Evidence-Log
-    # See ANNEX-143 §3 for full department×scenario mapping.
+    # myASML/TPS), not a publisher. Portal-pull/push evidence lives in
+    # DEP-SCS + DEP-ERP scenarios and QMS-Governance/19.
     # =====================================================================
+
+    # =====================================================================
+    # SITE 6 — HESEM-Engineering-IP (NEW v3.1, 2026-05-16)
+    # Separated L4-Restricted vault for: Customer CAD + HESEM Derivative
+    # CAD + CAM Source + Post-Processor library + Reverse Engineering +
+    # Trade-Secret Register + IP Access Acknowledgements + Patents.
+    # Rationale (overriding earlier v3 §3 decision): user feedback explicit
+    # — top-level visibility required. Site-level DLP + IB segment cho
+    # nhóm engineer named-NDA AMAT/LAM/ASML/TEL; data-flow một chiều
+    # từ DEP-ENG scenario folder modern-link, KHÔNG copy.
+    # =====================================================================
+    s6 = ROOT / "HESEM-Engineering-IP"
+    # 01-Customer-CAD-Controlled — Customer-source IP, L4 strictest
+    cad = s6 / "01-Customer-CAD-Controlled"
+    mkpath(cad / "_Incoming-Quarantine")
+    mkpath(cad / "_Receipt-Log" / YYYY)
+    for oem in ["AMAT", "LAM", "ASML", "TEL"]:
+        mkpath(cad / oem / "{PartNo}" / "REV-{Rev}" / "00-Controlled")
+        mkpath(cad / oem / "{PartNo}" / "REV-{Rev}" / "_SUPERSEDED")
+    # 02-HESEM-Derivative-CAD — internal models derived from customer source
+    mkpath(s6 / "02-HESEM-Derivative-CAD" / "{IPN}" / "REV-{Rev}")
+    # 03-CAM-Source-Restricted — CAM master + posted G-code archive
+    mkpath(s6 / "03-CAM-Source-Restricted" / "{IPN}" / "{Machine}" / "source")
+    mkpath(s6 / "03-CAM-Source-Restricted" / "{IPN}" / "{Machine}" / "posted")
+    mkpath(s6 / "03-CAM-Source-Restricted" / "{IPN}" / "{Machine}" / "validation")
+    # 04-Post-Processor-Kinematic-Library — machine-specific posts + kinematics
+    mkpath(s6 / "04-Post-Processor-Kinematic-Library" / "PostProcessors")
+    mkpath(s6 / "04-Post-Processor-Kinematic-Library" / "Kinematics")
+    mkpath(s6 / "04-Post-Processor-Kinematic-Library" / "Qualification" / YYYY)
+    # 05-Reverse-Engineering — gated per project with explicit authorization
+    re_base = s6 / "05-Reverse-Engineering" / "{Project}"
+    mkpath(re_base / "00-Authorization")
+    mkpath(re_base / "01-Sample-Receiving")
+    mkpath(re_base / "02-Scan-Data-3D")
+    mkpath(re_base / "03-Reconstructed-CAD")
+    mkpath(re_base / "04-Material-Analysis")
+    mkpath(re_base / "05-Validation-Report")
+    # 06-Trade-Secret-Register-Restricted — recipe / process know-how
+    mkpath(s6 / "06-Trade-Secret-Register-Restricted")
+    # 07-IP-Access-Acknowledgement — per engineer × customer × project
+    for oem in ["AMAT", "LAM", "ASML", "TEL"]:
+        mkpath(s6 / "07-IP-Access-Acknowledgement" / oem / "{Project}")
+    # 08-Patent-Trademark-Filings — IP portfolio
+    mkpath(s6 / "08-Patent-Filings" / "{CaseID}")
+    mkpath(s6 / "08-Trademark-Filings" / "{CaseID}")
+    # 09-Customer-Standards-Mirror — controlled customer spec library
+    for oem in ["AMAT", "LAM", "ASML", "TEL"]:
+        mkpath(s6 / "09-Customer-Standards-Mirror" / oem)
+    # 99-Archive-Locked
+    mkpath(s6 / "99-Archive-Locked" / YYYY)
+
+    # =====================================================================
+    # SITE 7 — HESEM-People-Competency (NEW v3.1, 2026-05-16)
+    # Separated from HESEM-People (which holds PII contracts/medical/payroll)
+    # to host the competency/training MATRIX and customer-audit people-pack
+    # exports — these get shared cross-functionally (QA, Production, Audit)
+    # without exposing PII. Live Power BI workspace also lives here.
+    # =====================================================================
+    s7 = ROOT / "HESEM-People-Competency"
+    # 01-Skills-Taxonomy — master skill catalog
+    mkpath(s7 / "01-Skills-Taxonomy")
+    # 02-Required-Skill-Matrix — per role per dept
+    mkpath(s7 / "02-Required-Skill-Matrix" / "{DeptCode}")
+    # 03-Actual-Skill-Snapshot — quarterly snapshot, live in Power BI
+    mkpath(s7 / "03-Actual-Skill-Snapshot" / "{DeptCode}" / YYYY)
+    # 04-Competency-Gap-Report — annual analysis → ATP input
+    mkpath(s7 / "04-Competency-Gap-Report" / YYYY)
+    # 05-Cert-Expiry-Watch-90d — rolling 90-day expiry watch
+    mkpath(s7 / "05-Cert-Expiry-Watch-90d")
+    # 06-Customer-Approved-Operator-List — named lists for OEM audits
+    for oem in ["AMAT", "LAM", "ASML", "TEL"]:
+        mkpath(s7 / "06-Customer-Approved-Operator-List" / oem)
+    # 07-Customer-Audit-People-Pack — redacted pack for customer audit
+    for oem in ["AMAT", "LAM", "ASML", "TEL"]:
+        mkpath(s7 / "07-Customer-Audit-People-Pack" / oem / YYYY)
+    # 08-Critical-Cert-Library — taxonomy per cert family
+    for cert in ["CNC-Operator", "Special-Process", "CMM-Operator",
+                 "Lead-Auditor", "FAI-Engineer", "ESD-Coordinator",
+                 "FOD-Trainer", "Forklift", "First-Aider", "Fire-Warden"]:
+        mkpath(s7 / "08-Critical-Cert-Library" / cert)
+    # 09-Training-Effectiveness-KPI — ATP delivery vs. plan
+    mkpath(s7 / "09-Training-Effectiveness-KPI" / YYYY)
+    # 99-Archive
+    mkpath(s7 / "99-Archive" / YYYY)
 
     # =====================================================================
     # Workflow Libraries cấp công ty (ANNEX-141 §3 workflows + v3 ANNEX-143)
