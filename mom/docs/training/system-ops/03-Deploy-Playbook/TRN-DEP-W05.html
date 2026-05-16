@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRN-DEP-W05 — Đợt 2 vận hành chính thức — Chuỗi cung ứng + Kinh doanh | HESEM MOM</title>
+<script>
+/* DCC Header bootstrap */
+(function () {
+  var DCC_VERSION = '2026-04-24-1';
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css?v=' + DCC_VERSION;
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(js);
+})();
+</script>
+<link rel="stylesheet" href="../../../../assets/style.css">
+<style>
+ table{width:100%;border-collapse:collapse;table-layout:fixed}
+ th,td{border:1px solid #e2e8f0;padding:8px 10px;vertical-align:top;overflow-wrap:anywhere;font-size:13px}
+ th{background:#f1f5f9;text-align:left}
+ .tight li{margin:4px 0}
+ .meta-anchor{margin:8px 0;padding:8px 10px;background:#f0f9ff;border-left:3px solid #0284c7;border-radius:4px;font-size:12px;line-height:1.6}
+ .meta-roles{margin:6px 0 0;font-size:12px;color:#475569}
+ .meta-anchor strong,.meta-roles strong{color:#0f172a}
+ .col-gate{color:#991b1b;font-style:italic}
+ .champ-block{margin-top:8px;padding:8px 10px;background:#fef3c7;border-left:3px solid #d97706;border-radius:4px;font-size:12px}
+ .champ-block ul{margin:4px 0 0;padding-left:20px}
+ .champ-block li{margin:3px 0}
+</style>
+</head>
+<body>
+<div class="container"><div class="page"><div class="page-body">
+<div class="dcc-header"
+     data-dcc-doc-code="TRN-DEP-W05"
+     data-dcc-locale="vi"
+     data-dcc-logo="../../../../assets/hesem-logo.svg"
+     data-dcc-bootstrap='{"header":{"doc_code":"TRN-DEP-W05","title":"Đợt 2 vận hành chính thức — Chuỗi cung ứng + Kinh doanh","subtitle":"Triển khai vận hành · Giai đoạn P3 · 2026-06-13","doc_type":"TRN","revision":"V0","effective_date":"2026-06-13","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":"ISO 9001:2015 §8.2, §8.4, §8.5","status":"released"}}'></div>
+<div class="doc-content" id="docContent">
+<section class="card" id="sec-cover">
+<h1 class="h2">W05 · 2026-06-13 · P3 · Đợt 2 vận hành chính thức — Chuỗi cung ứng + Kinh doanh</h1>
+<p>Trưởng Chuỗi cung ứng và Trưởng Kinh doanh dùng cuộc họp này để cam kết mốc cụ thể tuần đầu vận hành chính thức trên cổng — trung tâm điều hành mở online 8:30 mỗi sáng, ca trực 24/5 quản lý qua cổng, không quay về quy trình cũ.</p>
+<p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P3-01 · <strong>ISO 9001:2015:</strong> §8.2 (xác định yêu cầu khách hàng) · §8.4 (kiểm soát bên ngoài) · §8.5 (sản xuất và cung cấp) · <strong>Tài liệu bắt buộc:</strong> SOP-401 (kiểm soát nhà cung cấp), WI-701 (IQC + truy xuất), SOP-201 (đơn hàng RFQ → tiền) · <strong>Tài liệu sẵn trên cổng trước buổi họp:</strong> Trung tâm điều hành SCM + Kinh doanh đã tạo trong dashboard (tab Phòng ban → trang riêng); lịch ca trực 24/5 đã đặt trong program.json + thông báo cho 4+ người trực; danh sách liên lạc khẩn đã upload (không dán giấy, chỉ truy cập qua cổng); mẫu bảng phân loại sự cố theo ANNEX-117 đã liên kết · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=5">Mở Lộ trình W05 trên cổng</a></p>
+<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng nhóm chuyển đổi · <strong>Người ký kết quả:</strong> Giám đốc (xác nhận điện tử qua tài khoản M365+MFA — không ký giấy, không tự lập chữ ký số CA. Mỗi audit_events ghi user_id + ip_address + user_agent + session_id (immutable INSERT-only — xem PLAYBOOK chương "Cơ chế xác thực").) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
+</section>
+<section class="card" id="sec-objective">
+<h2 class="h2">3 câu hỏi đánh giá riêng</h2>
+<ol class="tight">
+<li>Trung tâm điều hành cho Chuỗi cung ứng + Kinh doanh đã active trên dashboard chưa, có lịch họp nhanh đầu ngày 8:30 trong program.json, bảng phân loại sự cố theo ANNEX-117 cập nhật trực tiếp qua issues.json không?</li>
+<li>Ca trực 24/5 đã chốt với ≥2 người dẫn dắt mỗi phòng (chữ ký số cam kết trong champions.json), danh sách liên lạc đã công bố qua thông báo cổng cho toàn nhà máy chưa?</li>
+<li>Người dẫn dắt 2 phòng đã đạt đào tạo tại chỗ (mở SOP-401 + WI-701 + SOP-201 ≤180 giây trong ca thật, ghi vào training_records/drill_logs) và Trưởng QA đã ký số xác nhận chưa?</li>
+</ol>
+</section>
+<section class="card" id="sec-tasks">
+<h2 class="h2">Bằng chứng phải có</h2>
+<table>
+<thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm (trên cổng)</th><th>Cổng khoá nếu thiếu</th></tr></thead>
+<tbody>
+<tr><td>Trung tâm điều hành active + bảng phân loại sự cố</td><td>Trưởng nhóm chuyển đổi</td><td>Dashboard có tab Phòng ban → SCM/Sales active; issues.json cập nhật hàng ngày theo ANNEX-117; cuối ngày không còn sự cố Mức 1 đang mở.</td><td class="col-gate">P3-01 khoá: §10.2 không kiểm soát được sự cố mới.</td></tr>
+<tr><td>Lịch ca trực 24/5 + danh sách liên lạc trên cổng</td><td>Trưởng Chuỗi cung ứng + Trưởng Kinh doanh</td><td>program.json có 7 dòng lịch ca/tuần; danh sách liên lạc đã upload có xác nhận điện tử cam kết (qua biên bản tuần + audit log đăng nhập M365) của 4 người trực.</td><td class="col-gate">P3-01 khoá: không có hỗ trợ khi sự cố ngoài giờ.</td></tr>
+<tr><td>Kết quả đào tạo tại chỗ người dẫn dắt</td><td>Trưởng QMS</td><td>training_records/drill_logs có ≥4 dòng (2 phòng × 2 người dẫn dắt) với thời gian ≤180 giây; có chữ ký số Trưởng QA xác nhận.</td><td class="col-gate">P3-01 khoá: §7.2 năng lực không chứng minh được.</td></tr>
+<tr><td>Biên bản họp nhanh đầu ngày tuần 1</td><td>Trưởng nhóm chuyển đổi</td><td>Mỗi sáng 8:30 có 1 dòng biên bản trong meetings.json (trường daily_standup); 5 biên bản đã ghi sổ; tỉ lệ có mặt ≥90% trong trường attendees.</td><td class="col-gate">P3-01 khoá: KPI-DEP-02 không có dữ liệu.</td></tr>
+<tr><td>Kế hoạch xử lý sự cố Mức 2 còn mở</td><td>Trưởng QMS</td><td>issues.json filter status=open severity=Mức2 có ≥0 dòng; mỗi dòng có phương án ổn định tạm + người làm + hạn đóng; nâng mức theo ANNEX-117 nếu trễ.</td><td class="col-gate">P3-01 khoá: §10.2 thiếu kế hoạch khắc phục.</td></tr>
+</tbody>
+</table>
+<p class="champ-block"><strong>Việc của người dẫn dắt phòng tuần W05:</strong></p>
+<ul class="tight" style="margin-top:-6px">
+<li>Người dẫn dắt SCM + Sales: tham dự họp nhanh đầu ngày 8:30 trong tuần này; nhập sự cố vào issues.json ngay khi phát hiện.</li>
+<li>Người dẫn dắt 8 phòng còn lại: theo dõi dashboard Đợt 2 hàng ngày để học mô hình; góp ý qua sổ vấn đề khi thấy điểm cần cải thiện.</li>
+<li>Người dẫn dắt SCM + Sales: hoàn thành đào tạo tại chỗ trên cổng trong 2 ngày đầu (DRL-E2E ≥3 lượt).</li>
+</ul>
+</section>
+<section class="card" id="sec-lessons">
+<h2 class="h2">Vòng rút kinh nghiệm 10 phút — neo tuần W05</h2>
+<ol class="tight">
+<li>Tuần này KPI-DEP-01 (Phủ người dẫn dắt chính + dự phòng = 100%) và KPI-DEP-02 (Đóng phiếu việc đúng hạn ≥95%) ra số bao nhiêu, có đi đúng ngưỡng không, vì sao? (đối chiếu với ANNEX-110 từ điển KPI)</li>
+<li>Sổ vấn đề tuần này có dòng nào cần nâng mức theo ANNEX-117 (Mức 3 → Mức 2 hoặc Mức 2 → Mức 1) không, ai duyệt nâng mức?</li>
+<li>3 hành động tuần sau là gì, ai làm, hạn nào, và sẽ chặn cổng nào nếu trễ?</li>
+</ol>
+<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.week.signoff hoặc deploy.issue.save (nâng severity)), không in giấy.</p>
+</section>
+</div>
+</div></div></div>
+</body>
+</html>

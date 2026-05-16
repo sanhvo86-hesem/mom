@@ -369,24 +369,45 @@ class DeployProgramController extends BaseController
 
         $id = (string)($body['id'] ?? '');
         $now = gmdate('c');
+        // source: real | drill | audit — cẩm nang W03/W04/W07/W08 filter trên cờ này
+        $source = strtolower(trim((string)($body['source'] ?? 'real')));
+        if (!in_array($source, ['real', 'drill', 'audit'], true)) $source = 'real';
+        // category: ncr | alert_cord | daily_issue | capa | observation | ...
+        $category = strtolower(trim((string)($body['category'] ?? '')));
+        $shift = strtoupper(trim((string)($body['shift'] ?? '')));
+        if (!in_array($shift, ['', 'A', 'B', 'C'], true)) $shift = '';
+        $affectedQty = (int)($body['affectedQty'] ?? 0);
+        if ($affectedQty < 0) $affectedQty = 0;
+        $sev = max(1, min(3, (int)($body['sev'] ?? 3)));
+        $status = in_array($body['status'] ?? '', ['open', 'workaround', 'closed'], true) ? (string)$body['status'] : 'open';
         $payload = [
-            'id'        => $id !== '' ? $id : ('ISS-' . substr(md5($now . random_int(0, 999999)), 0, 8)),
-            'weekN'     => (int)($body['weekN'] ?? 0),
-            'sev'       => max(1, min(3, (int)($body['sev'] ?? 3))),
-            'deptId'    => (string)($body['deptId'] ?? ''),
-            'title'     => (string)($body['title'] ?? ''),
-            'owner'     => (string)($body['owner'] ?? ''),
-            'status'    => in_array($body['status'] ?? '', ['open', 'workaround', 'closed'], true) ? (string)$body['status'] : 'open',
-            'capaLink'  => (string)($body['capaLink'] ?? ''),
-            'openedAt'  => (string)($body['openedAt'] ?? $now),
-            'closedAt'  => (string)($body['status'] ?? '') === 'closed' ? $now : null,
-            'updatedAt' => $now,
-            'updatedBy' => (string)($me['username'] ?? ''),
+            'id'          => $id !== '' ? $id : ('ISS-' . substr(md5($now . random_int(0, 999999)), 0, 8)),
+            'weekN'       => (int)($body['weekN'] ?? 0),
+            'sev'         => $sev,
+            'deptId'      => (string)($body['deptId'] ?? ''),
+            'title'       => (string)($body['title'] ?? ''),
+            'description' => (string)($body['description'] ?? ''),
+            'source'      => $source,
+            'category'    => $category,
+            'jobOrderId'  => trim((string)($body['jobOrderId'] ?? '')),
+            'drawingRev'  => trim((string)($body['drawingRev'] ?? '')),
+            'affectedQty' => $affectedQty,
+            'operator'    => trim((string)($body['operator'] ?? '')),
+            'shift'       => $shift,
+            'owner'       => (string)($body['owner'] ?? ''),
+            'status'      => $status,
+            'capaLink'    => (string)($body['capaLink'] ?? ''),
+            'openedAt'    => (string)($body['openedAt'] ?? $now),
+            'closedAt'    => $status === 'closed' ? $now : null,
+            'updatedAt'   => $now,
+            'updatedBy'   => (string)($me['username'] ?? ''),
         ];
 
+        $previousSev = null;
         $replaced = false;
         foreach ($issues['issues'] as &$is) {
             if ((string)($is['id'] ?? '') === $payload['id']) {
+                $previousSev = isset($is['sev']) ? (int)$is['sev'] : null;
                 $payload['openedAt'] = (string)($is['openedAt'] ?? $payload['openedAt']);
                 $is = $payload;
                 $replaced = true;
@@ -396,7 +417,21 @@ class DeployProgramController extends BaseController
         unset($is);
         if (!$replaced) $issues['issues'][] = $payload;
         $this->saveFile(self::FILE_ISSUES, $issues);
-        $this->audit('deploy.issue.save', $me, ['id' => $payload['id'], 'sev' => $payload['sev'], 'status' => $payload['status']]);
+        // Chương 7 cẩm nang: severity bump (Mức 3→Mức 2→Mức 1) phải có chữ ký
+        // số và ghi previous_sev để kiểm toán viên truy ngược được.
+        $auditExtra = [
+            'id' => $payload['id'],
+            'sev' => $payload['sev'],
+            'status' => $payload['status'],
+            'source' => $source,
+            'category' => $category,
+        ];
+        if ($previousSev !== null && $previousSev !== $sev) {
+            $auditExtra['previous_sev'] = $previousSev;
+            $auditExtra['severity_bumped'] = $sev < $previousSev ? 1 : 0;
+        }
+        if ($payload['jobOrderId'] !== '') $auditExtra['job_order_id'] = $payload['jobOrderId'];
+        $this->audit('deploy.issue.save', $me, $auditExtra);
         $this->success(['data' => $issues, 'issue' => $payload]);
     }
 
@@ -649,6 +684,263 @@ class DeployProgramController extends BaseController
             'use_03' => $kpis['KPI-USE-03'],
         ]);
         $this->success(['data' => $kpis]);
+    }
+
+    /**
+     * Ghi nhận kiểm thử kích hoạt khôi phục (W06 P3-02).
+     * Lưu vào readiness.json + audit deploy.recovery.test.
+     */
+    public function recordRecoveryTest(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::SIGNOFF_ROLES);
+        $body = $this->jsonBody();
+
+        $scope = trim((string)($body['scope'] ?? ''));
+        $result = strtolower(trim((string)($body['result'] ?? '')));
+        $durationSec = (int)($body['durationSec'] ?? 0);
+        $evidenceUrl = trim((string)($body['evidenceUrl'] ?? ''));
+        if ($scope === '' || !in_array($result, ['pass', 'fail', 'partial'], true)) {
+            $this->error('missing_scope_or_result', 400);
+        }
+
+        $state = $this->loadFile(self::FILE_READINESS);
+        if (!isset($state['recoveryTests']) || !is_array($state['recoveryTests'])) {
+            $state['recoveryTests'] = [];
+        }
+        $entry = [
+            'id' => 'RCV-' . substr(hash('sha256', gmdate('c') . random_int(0, 999999)), 0, 8),
+            'scope' => $scope,
+            'result' => $result,
+            'durationSec' => $durationSec,
+            'evidenceUrl' => $evidenceUrl,
+            'testedBy' => (string)($me['name'] ?? $me['username'] ?? ''),
+            'testedAt' => gmdate('c'),
+        ];
+        $state['recoveryTests'][] = $entry;
+        $state['lastUpdated'] = gmdate('c');
+        $this->saveFile(self::FILE_READINESS, $state);
+        $this->audit('deploy.recovery.test', $me, [
+            'scope' => $scope, 'result' => $result, 'duration_sec' => $durationSec,
+        ]);
+        $this->success(['data' => $state, 'entry' => $entry]);
+    }
+
+    /**
+     * Soát xét truy cập điều hành (W10 P4-02).
+     * Ghi kết quả đối chiếu vai trò ↔ quyền vào audits.json + audit deploy.access.review.
+     */
+    public function recordAccessReview(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::SIGNOFF_ROLES);
+        $body = $this->jsonBody();
+
+        $diffCount = (int)($body['diffCount'] ?? 0);
+        $reviewed = (int)($body['reviewed'] ?? 0);
+        $decision = strtolower(trim((string)($body['decision'] ?? '')));
+        if (!in_array($decision, ['approved', 'pending', 'rejected'], true)) {
+            $this->error('invalid_decision', 400);
+        }
+
+        $state = $this->loadFile(self::FILE_AUDITS);
+        if (!isset($state['accessReviews']) || !is_array($state['accessReviews'])) {
+            $state['accessReviews'] = [];
+        }
+        $entry = [
+            'id' => 'AR-' . gmdate('Y\QW'),
+            'cycle' => 'access_review_' . gmdate('Y\QW'),
+            'reviewed' => $reviewed,
+            'diffCount' => $diffCount,
+            'decision' => $decision,
+            'signedBy' => (string)($me['name'] ?? $me['username'] ?? ''),
+            'signedAt' => gmdate('c'),
+        ];
+        $state['accessReviews'][] = $entry;
+        $state['lastUpdated'] = gmdate('c');
+        $this->saveFile(self::FILE_AUDITS, $state);
+        $this->audit('deploy.access.review', $me, [
+            'cycle' => $entry['cycle'], 'reviewed' => $reviewed, 'diff' => $diffCount, 'decision' => $decision,
+        ]);
+        $this->success(['data' => $state, 'entry' => $entry]);
+    }
+
+    /**
+     * Bàn giao chính thức sang vận hành thường xuyên (W12 P4-04).
+     * Ghi danh sách người nhận trách nhiệm KPI + audit deploy.handover.
+     */
+    public function recordHandover(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::SIGNOFF_ROLES);
+        $body = $this->jsonBody();
+
+        $kpiOwnerRole = strtolower(trim((string)($body['kpiOwnerRole'] ?? '')));
+        $attendees = is_array($body['attendees'] ?? null) ? $body['attendees'] : [];
+        $cadenceNote = trim((string)($body['cadenceNote'] ?? ''));
+        if ($kpiOwnerRole === '' || count($attendees) < 1) {
+            $this->error('missing_owner_or_attendees', 400);
+        }
+        $attendees = array_values(array_unique(array_filter(array_map(
+            static fn($x): string => trim((string)$x), $attendees,
+        ))));
+
+        $state = $this->loadFile(self::FILE_PROGRAM);
+        $state['handover'] = [
+            'kpiOwnerRole' => $kpiOwnerRole,
+            'attendees' => $attendees,
+            'cadenceNote' => $cadenceNote,
+            'signedBy' => (string)($me['name'] ?? $me['username'] ?? ''),
+            'signedAt' => gmdate('c'),
+        ];
+        $state['lastUpdated'] = gmdate('c');
+        $this->saveFile(self::FILE_PROGRAM, $state);
+        $this->audit('deploy.handover', $me, [
+            'kpi_owner' => $kpiOwnerRole, 'attendees' => count($attendees),
+        ]);
+        $this->success(['data' => $state]);
+    }
+
+    /**
+     * Phó Giám đốc Vận hành ký thay Giám đốc theo Authority-matrix
+     * (PLAYBOOK chương 7 — Kế hoạch dự phòng khi cổng đứt).
+     * Ghi quyết định Đi/Không đi + sự kiện deploy.signer.delegated.
+     */
+    public function recordSignerDelegation(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::SIGNOFF_ROLES);
+        $body = $this->jsonBody();
+        $weekN = (int)($body['weekN'] ?? -1);
+        $decision = (string)($body['decision'] ?? '');
+        $delegatedFrom = trim((string)($body['delegatedFrom'] ?? ''));
+        $delegatedTo = trim((string)($body['delegatedTo'] ?? ''));
+        $reason = trim((string)($body['reason'] ?? ''));
+        $authorityRef = trim((string)($body['authorityRef'] ?? 'ANNEX-120'));
+        if ($weekN < 0) $this->error('invalid_week', 400);
+        if ($delegatedFrom === '' || $delegatedTo === '') $this->error('missing_delegation_parties', 400);
+        if (!in_array($decision, ['go', 'no_go', 'conditional'], true)) $this->error('invalid_decision', 400);
+
+        $program = $this->loadFile(self::FILE_PROGRAM);
+        $found = false;
+        foreach ($program['weeks'] as &$w) {
+            if ((int)($w['n'] ?? -1) === $weekN) {
+                $w['status'] = $decision === 'go' ? 'completed' : ($decision === 'no_go' ? 'blocked' : 'conditional');
+                $w['signOff'] = [
+                    'by'           => (string)($me['username'] ?? ''),
+                    'name'         => (string)($me['name'] ?? ''),
+                    'role'         => (string)($me['role'] ?? ''),
+                    'decision'     => $decision,
+                    'notes'        => $reason,
+                    'at'           => gmdate('c'),
+                    'delegation'   => [
+                        'delegatedFrom' => $delegatedFrom,
+                        'delegatedTo'   => $delegatedTo,
+                        'authorityRef'  => $authorityRef,
+                        'reason'        => $reason,
+                    ],
+                ];
+                $found = true;
+                break;
+            }
+        }
+        unset($w);
+        if (!$found) $this->error('week_not_found', 404);
+        $program['lastUpdated'] = gmdate('c');
+        $this->saveFile(self::FILE_PROGRAM, $program);
+        $this->audit('deploy.signer.delegated', $me, [
+            'week' => $weekN,
+            'decision' => $decision,
+            'delegated_from' => $delegatedFrom,
+            'delegated_to' => $delegatedTo,
+            'authority_ref' => $authorityRef,
+        ]);
+        $this->success(['data' => $program]);
+    }
+
+    /**
+     * Sự cố VPS mất điện toàn ngày — đội tăng cường ghi sổ giấy tạm,
+     * nhập lại cổng trong 24h sau khi phục hồi
+     * (PLAYBOOK chương 7 — Kế hoạch dự phòng khi cổng đứt).
+     */
+    public function recordOfflineFallback(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::EDIT_ROLES);
+        $body = $this->jsonBody();
+
+        $outageStart = trim((string)($body['outageStart'] ?? ''));
+        $outageEnd = trim((string)($body['outageEnd'] ?? ''));
+        $scope = trim((string)($body['scope'] ?? ''));
+        $paperLogUrl = trim((string)($body['paperLogUrl'] ?? ''));
+        $reentryCount = (int)($body['reentryCount'] ?? 0);
+        if ($outageStart === '' || $outageEnd === '' || $scope === '') {
+            $this->error('missing_outage_or_scope', 400);
+        }
+        $startTs = strtotime($outageStart);
+        $endTs = strtotime($outageEnd);
+        if ($startTs === false || $endTs === false || $endTs <= $startTs) {
+            $this->error('invalid_outage_window', 400);
+        }
+        $durationMinutes = (int)round(($endTs - $startTs) / 60.0);
+
+        $state = $this->loadFile(self::FILE_READINESS);
+        if (!isset($state['offlineFallbacks']) || !is_array($state['offlineFallbacks'])) {
+            $state['offlineFallbacks'] = [];
+        }
+        $entry = [
+            'id' => 'OFL-' . substr(hash('sha256', $outageStart . random_int(0, 999999)), 0, 8),
+            'scope' => $scope,
+            'outageStart' => gmdate('c', $startTs),
+            'outageEnd' => gmdate('c', $endTs),
+            'durationMinutes' => $durationMinutes,
+            'paperLogUrl' => $paperLogUrl,
+            'reentryCount' => $reentryCount,
+            'reentryBy' => (string)($me['name'] ?? $me['username'] ?? ''),
+            'reentryAt' => gmdate('c'),
+        ];
+        $state['offlineFallbacks'][] = $entry;
+        $state['lastUpdated'] = gmdate('c');
+        $this->saveFile(self::FILE_READINESS, $state);
+        $this->audit('deploy.offline.fallback', $me, [
+            'scope' => $scope,
+            'duration_minutes' => $durationMinutes,
+            'reentry_count' => $reentryCount,
+        ]);
+        $this->success(['data' => $state, 'entry' => $entry]);
+    }
+
+    /**
+     * Đợt làm mới mã QR cho 7 khu vực (W11 P4-03).
+     * Ghi % nhãn đã thay + audit deploy.qr.rotated.
+     */
+    public function recordQrRotation(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAnyRole($me, self::EDIT_ROLES);
+        $body = $this->jsonBody();
+
+        $rotatedCount = (int)($body['rotatedCount'] ?? 0);
+        $totalCount = (int)($body['totalCount'] ?? 0);
+        if ($totalCount <= 0 || $rotatedCount < 0 || $rotatedCount > $totalCount) {
+            $this->error('invalid_counts', 400);
+        }
+        $rate = round(($rotatedCount * 100.0) / $totalCount, 1);
+
+        $state = $this->loadFile(self::FILE_READINESS);
+        if (!isset($state['kpiValues']) || !is_array($state['kpiValues'])) {
+            $state['kpiValues'] = [];
+        }
+        $state['kpiValues']['qr_rotation_rate'] = (string)$rate;
+        $state['kpiValues']['qr_rotation_count'] = (string)$rotatedCount;
+        $state['kpiValues']['qr_rotation_total'] = (string)$totalCount;
+        $state['kpiValues']['qr_rotation_at'] = gmdate('c');
+        $state['lastUpdated'] = gmdate('c');
+        $this->saveFile(self::FILE_READINESS, $state);
+        $this->audit('deploy.qr.rotated', $me, [
+            'rotated' => $rotatedCount, 'total' => $totalCount, 'rate' => $rate,
+        ]);
+        $this->success(['data' => $state, 'rotation_rate' => $rate]);
     }
 
     public function saveAudit(): never

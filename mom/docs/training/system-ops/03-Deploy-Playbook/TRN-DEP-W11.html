@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRN-DEP-W11 — Bài học rút ra + cập nhật tài liệu hậu triển khai | HESEM MOM</title>
+<script>
+/* DCC Header bootstrap */
+(function () {
+  var DCC_VERSION = '2026-04-24-1';
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css?v=' + DCC_VERSION;
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(js);
+})();
+</script>
+<link rel="stylesheet" href="../../../../assets/style.css">
+<style>
+ table{width:100%;border-collapse:collapse;table-layout:fixed}
+ th,td{border:1px solid #e2e8f0;padding:8px 10px;vertical-align:top;overflow-wrap:anywhere;font-size:13px}
+ th{background:#f1f5f9;text-align:left}
+ .tight li{margin:4px 0}
+ .meta-anchor{margin:8px 0;padding:8px 10px;background:#f0f9ff;border-left:3px solid #0284c7;border-radius:4px;font-size:12px;line-height:1.6}
+ .meta-roles{margin:6px 0 0;font-size:12px;color:#475569}
+ .meta-anchor strong,.meta-roles strong{color:#0f172a}
+ .col-gate{color:#991b1b;font-style:italic}
+ .champ-block{margin-top:8px;padding:8px 10px;background:#fef3c7;border-left:3px solid #d97706;border-radius:4px;font-size:12px}
+ .champ-block ul{margin:4px 0 0;padding-left:20px}
+ .champ-block li{margin:3px 0}
+</style>
+</head>
+<body>
+<div class="container"><div class="page"><div class="page-body">
+<div class="dcc-header"
+     data-dcc-doc-code="TRN-DEP-W11"
+     data-dcc-locale="vi"
+     data-dcc-logo="../../../../assets/hesem-logo.svg"
+     data-dcc-bootstrap='{"header":{"doc_code":"TRN-DEP-W11","title":"Bài học rút ra + cập nhật tài liệu hậu triển khai","subtitle":"Triển khai vận hành · Giai đoạn P4 · 2026-07-25","doc_type":"TRN","revision":"V0","effective_date":"2026-07-25","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":"ISO 9001:2015 §9.1.2, §10.3, §7.5.2","status":"released"}}'></div>
+<div class="doc-content" id="docContent">
+<section class="card" id="sec-cover">
+<h1 class="h2">W11 · 2026-07-25 · P4 · Bài học rút ra + cập nhật tài liệu hậu triển khai</h1>
+<p>Tổ điều hành dùng cuộc họp này để ký số tổng hợp 3 bài học từ mỗi phòng (1 tốt giữ, 1 xấu sửa, 1 đề xuất sửa cụ thể) — đã thu qua form số 7 ngày trước. Tài liệu sửa trực tiếp trên cổng, không in.</p>
+<p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P4-03 · <strong>ISO 9001:2015:</strong> §9.1.2 (sự hài lòng khách hàng nội bộ) · §10.3 (cải tiến liên tục) · §7.5.2 (cập nhật tài liệu) · <strong>Tài liệu bắt buộc:</strong> WI-105 (tra cứu tài liệu), WI-202 (đánh giá nội bộ) · <strong>Tài liệu sẵn trên cổng trước buổi họp:</strong> 33 phiếu bài học (3 × 11 phòng) đã thu qua form số trên cổng trước họp 7 ngày; bản tổng hợp báo cáo bài học đã upload trạng thái = bản thảo chờ Tổ điều hành ký số; danh sách ≥10 tài liệu cập nhật bản sửa đổi tiếp theo đã chuẩn bị trong dcc_document_header với ánh xạ bài học → tài liệu; bộ nhãn QR mới sinh số cho 7 khu vực; danh mục học bản 2 (≥3 video) đã upload · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=11">Mở Lộ trình W11 trên cổng</a></p>
+<p class="meta-roles"><strong>Người chủ trì:</strong> Trưởng QMS · <strong>Người ký kết quả:</strong> Giám đốc (xác nhận điện tử qua tài khoản M365+MFA — không ký giấy, không tự lập chữ ký số CA. Mỗi audit_events ghi user_id + ip_address + user_agent + session_id (immutable INSERT-only — xem PLAYBOOK chương "Cơ chế xác thực").) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
+</section>
+<section class="card" id="sec-objective">
+<h2 class="h2">3 câu hỏi đánh giá riêng</h2>
+<ol class="tight">
+<li>33 phiếu bài học (3 × 11 phòng) đã thu qua form số trên cổng và Tổ điều hành đã ký số báo cáo tổng hợp chưa?</li>
+<li>Danh sách ≥10 tài liệu cập nhật bản sửa đổi tiếp theo có ÁNH XẠ TỚI BÀI HỌC trong cột mapping (mỗi tài liệu liên kết tới ≥1 dòng bài học) và đã có người sở hữu + hạn phát hành theo §7.5.2 chưa?</li>
+<li>Đợt làm mới mã QR (≥95% nhãn mới đã sinh số trong cổng, dán vật lý tại 7 khu vực qua chu trình re-print) và danh mục học bản 2 (≥3 video mới upload) đã sẵn sàng phát hành chưa?</li>
+</ol>
+</section>
+<section class="card" id="sec-tasks">
+<h2 class="h2">Bằng chứng phải có</h2>
+<table>
+<thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm (trên cổng)</th><th>Cổng khoá nếu thiếu</th></tr></thead>
+<tbody>
+<tr><td>Báo cáo bài học rút ra trên cổng</td><td>Trưởng QMS</td><td>Form số: 33 phiếu thu trong 7 ngày; báo cáo tổng hợp có chữ ký số Tổ điều hành; bằng chứng §10.3 cải tiến liên tục.</td><td class="col-gate">P4-03 khoá: §10.3 không có chu trình cải tiến.</td></tr>
+<tr><td>Danh sách ≥10 tài liệu cập nhật + ánh xạ bài học</td><td>Trưởng QMS</td><td>dcc_document_header: ≥10 tài liệu status=draft trong tuần này; trường description tham chiếu mã bài học (ví dụ "Bài học #07/W11: ..."); bằng chứng ánh xạ qua biên bản W11.</td><td class="col-gate">P4-03 khoá: §7.5.2 cập nhật tài liệu không có lịch hoặc tài liệu rỗng không gắn bài học.</td></tr>
+<tr><td>Bộ nhãn QR mới + dán tại 7 khu vực</td><td>Kỹ sư QMS + Trưởng Sản xuất</td><td>Bảng QR mới sinh số trên cổng (role-card-qr-map.json); ≥95% nhãn cũ đã thay; ngày + số sê-ri QR ghi vào audit_events deploy.qr.rotated với metadata rotated (số nhãn đã thay) + total (số nhãn yêu cầu) + rate (%); readiness.json.kpiValues có qr_rotation_rate cập nhật.</td><td class="col-gate">P4-03 khoá: §7.5.3 truy xuất tài liệu hỏng.</td></tr>
+<tr><td>Danh mục học bản 2 (≥3 video mới)</td><td>Kỹ sư QMS</td><td>≥3 video upload lên cổng với quyền xem theo vai trò; có chú thích tiếng Việt; tham chiếu trong training_records.</td><td class="col-gate">P4-03 khoá: §7.2 năng lực không cập nhật.</td></tr>
+<tr><td>Kế hoạch chuyển sang vận hành thường xuyên</td><td>Tổ điều hành</td><td>program.json có lịch họp tầng tuần + soát xét lãnh đạo tháng đã chốt; sẵn cho W12 bàn giao.</td><td class="col-gate">P4-03 khoá: W12 không có cơ sở bàn giao.</td></tr>
+</tbody>
+</table>
+<p class="champ-block"><strong>Việc của người dẫn dắt phòng tuần W11:</strong></p>
+<ul class="tight" style="margin-top:-6px">
+<li>11 người dẫn dắt: nộp 3 bài học (tốt/xấu/đề xuất) qua form số trước họp 7 ngày.</li>
+<li>Người dẫn dắt phòng có tài liệu cần cập nhật: ký số nhận trách nhiệm sửa tài liệu trong dcc_document_header.</li>
+<li>11 người dẫn dắt: dán nhãn QR mới tại bảng tổ phòng mình (vật lý) — quét thử bằng điện thoại để xác nhận đúng URL trên cổng.</li>
+</ul>
+</section>
+<section class="card" id="sec-lessons">
+<h2 class="h2">Vòng rút kinh nghiệm 10 phút — neo tuần W11</h2>
+<ol class="tight">
+<li>Tuần này KPI-USE-01 (Người dùng tích cực ≥80%) và KPI-USE-02 (Tài liệu chết không ai mở 14 ngày ≤10%) ra số bao nhiêu, có đi đúng ngưỡng không, vì sao? (đối chiếu với ANNEX-110 từ điển KPI)</li>
+<li>Sổ vấn đề tuần này có dòng nào cần nâng mức theo ANNEX-117 (Mức 3 → Mức 2 hoặc Mức 2 → Mức 1) không, ai duyệt nâng mức?</li>
+<li>3 hành động tuần sau là gì, ai làm, hạn nào, và sẽ chặn cổng nào nếu trễ?</li>
+</ol>
+<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.week.signoff hoặc deploy.issue.save (nâng severity)), không in giấy.</p>
+</section>
+</div>
+</div></div></div>
+</body>
+</html>

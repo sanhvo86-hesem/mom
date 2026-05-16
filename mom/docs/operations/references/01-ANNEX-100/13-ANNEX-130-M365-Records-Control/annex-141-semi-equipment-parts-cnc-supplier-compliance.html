@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANNEX-141 — Semi-Equipment Parts CNC Supplier Compliance (AMAT/LAM/ASML/TEL) | HESEM MOM</title>
+<script>
+/* DCC Header bootstrap */
+(function () {
+  var DCC_VERSION = '2026-05-16-1';
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css?v=' + DCC_VERSION;
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(js);
+})();
+</script>
+<link rel="stylesheet" href="../../../../../assets/style.css">
+<style>
+ table{width:100%;border-collapse:collapse;table-layout:fixed;margin:10px 0;}
+ th,td{border:1px solid #e2e8f0;padding:8px 10px;vertical-align:top;overflow-wrap:anywhere;font-size:13px}
+ th{background:#f1f5f9;text-align:left}
+ .tight li{margin:4px 0}
+ .code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+ .path {font-family: var(--mono); font-size:11px; color: var(--ink2);}
+ .keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+ .callout {margin:10px 0; padding:10px 14px; background:#fff5f5; border-left:4px solid #c92a2a; border-radius:4px; font-size:13px;}
+ .ok-callout {margin:10px 0; padding:10px 14px; background:#ebfbee; border-left:4px solid #2b8a3e; border-radius:4px; font-size:13px;}
+ .warn-callout {margin:10px 0; padding:10px 14px; background:#fff9db; border-left:4px solid #e67700; border-radius:4px; font-size:13px;}
+ .oem-grid {display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin:12px 0;}
+ .oem-card {border:1px solid #e2e8f0; border-left:4px solid #1971c2; border-radius:4px; padding:12px 14px; background:#fff;}
+ .oem-card h3 {margin:0 0 8px; font-size:14px;}
+ .oem-card.amat {border-left-color:#0072ce;}
+ .oem-card.lam {border-left-color:#ed1c24;}
+ .oem-card.asml {border-left-color:#00a3e0;}
+ .oem-card.tel {border-left-color:#003087;}
+ @media (max-width:900px){.oem-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="container"><div class="page"><div class="page-body">
+<div class="dcc-header"
+     data-dcc-doc-code="ANNEX-141"
+     data-dcc-locale="vi"
+     data-dcc-logo="../../../../../assets/hesem-logo.svg"
+     data-dcc-bootstrap='{"header":{"doc_code":"ANNEX-141","title":"Tuân thủ nhà cung cấp CNC cho thiết bị bán dẫn — AMAT/LAM/ASML/TEL","subtitle":"Cấu trúc thư mục + workflow + evidence pack cho HESEM gia công chamber parts, ESC, end-effector, gas distribution cho 4 OEM lớn","doc_type":"ANNEX","revision":"V0","effective_date":"2026-05-16","owner_role_code":"QA","approver_role_code":"CEO","iso_clause":"ISO 9001:2015 §7.5.3 §8.4 §8.5 + SEMI E155 + IEST-STD-CC1246E + ASTM E595","status":"released"}}'></div>
+
+<div class="doc-content" id="docContent">
+
+<h1>Tuân thủ nhà cung cấp CNC cho thiết bị bán dẫn — AMAT/LAM/ASML/TEL</h1>
+
+<div class="callout"><strong>BỐI CẢNH — vì sao có tài liệu này?</strong><br>
+HESEM gia công chi tiết cơ khí cho thiết bị bán dẫn (chamber parts, electrostatic chuck ESC, end-effector, gas distribution manifold). Khách hàng chính: <b>Applied Materials (AMAT) · LAM Research · ASML · Tokyo Electron (TEL)</b> — 4 OEM kiểm soát ~80% thị trường semi equipment. Mỗi OEM có hệ supplier quality riêng (NDA-locked) nhưng yêu cầu chung là <b>cleanliness là tiêu chí pass/fail #1, không phải dung sai kích thước</b>. ANNEX-141 đặt khung tuân thủ thực chiến cho HESEM, từ <b>mới bắt đầu</b> đến <b>Tier-1 audit-ready</b> trong 12-18 tháng.</div>
+
+<section class="card">
+<h2>1. So sánh 4 OEM — đặc thù tuân thủ</h2>
+<div class="oem-grid">
+ <div class="oem-card amat">
+  <h3>Applied Materials (AMAT)</h3>
+  <ul class="tight">
+   <li><b>Spec family:</b> <span class="code">0250-XXXXX</span> workmanship (NDA via SCMS portal)</li>
+   <li><b>QMS min:</b> ISO 9001:2015 scope "semiconductor precision machining"</li>
+   <li><b>FAI:</b> AS9102 Rev C 3-form accepted</li>
+   <li><b>PCN lead time:</b> 90 ngày</li>
+   <li><b>Retention:</b> 7 năm (10 năm cho ESC/serialized)</li>
+   <li><b>Audit cycle:</b> Tier-1 annual on-site</li>
+   <li><b>ESG:</b> <a href="https://www.appliedmaterials.com/us/en/corporate-responsibility.html">SuCCESS2030</a> + RBA Code v8.0 + CMRT + CDP Scope 1+2</li>
+   <li><b>Special:</b> UFLPA supply chain mapping, PFAS disclosure 2025+, CMMC L2 nếu defense-adjacent</li>
+  </ul>
+ </div>
+ <div class="oem-card lam">
+  <h3>LAM Research</h3>
+  <ul class="tight">
+   <li><b>Spec family:</b> <span class="code">02-XXXXXX</span> drawing, <span class="code">06-XXXXXX</span> cleanliness (NDA via Ariba portal)</li>
+   <li><b>QMS min:</b> ISO 9001:2015 + ISO 14001:2015 (Preferred tier)</li>
+   <li><b>FAI:</b> AS9102 Rev C</li>
+   <li><b>PCN lead time:</b> 90-120 ngày (Category-A: ESC, chamber liner, gas dist)</li>
+   <li><b>Retention:</b> 10 năm</li>
+   <li><b>Special:</b> APSL (Approved Process Source List) cho anodize/EP/heat-treat — supplier KHÔNG được tự đổi sub-tier</li>
+   <li><b>Cybersecurity:</b> NIST SP 800-171 Rev 2 cho Tier-A parts; CMMC L2 cho US DoD adjacent</li>
+   <li><b>Surface Ra:</b> 316L EP ≤0.25 μm (chặt hơn AMAT 0.4)</li>
+  </ul>
+ </div>
+ <div class="oem-card asml">
+  <h3>ASML (EUV/DUV)</h3>
+  <ul class="tight">
+   <li><b>Spec family:</b> <span class="code">4022.XXX.XXXX</span> drawing + GSA cleanliness Grade 1/2/4</li>
+   <li><b>QMS min:</b> ISO 9001 + ISO 14001 + ISO 27001 (bắt buộc)</li>
+   <li><b>Outgassing:</b> TML ≤0.1% CVCM ≤0.01% (10× chặt hơn ASTM E595 baseline) cho UHV; RGA bake-out 150°C × 24h, partial pressure >44 amu phải <1×10⁻¹⁰ mbar</li>
+   <li><b>Banned HIO elements (Grade 1):</b> <span class="code">Pb, Zn, Mg, P, Sn, Cd</span> — zero tolerance. Cấm Zn-plate/Cd-plate fastener, brass có Pb, Be-Cu, Buna-N nội UHV</li>
+   <li><b>Surface Ra:</b> 316L EP ≤0.2 μm (chặt nhất 4 OEM)</li>
+   <li><b>He leak:</b> ≤1×10⁻¹⁰ Pa·m³/s (UHV)</li>
+   <li><b>PCN lead time:</b> 120-180 ngày (EUV-adjacent)</li>
+   <li><b>Retention:</b> 15 năm (EUV)</li>
+   <li><b>Carbon:</b> Net-zero Scope 3 upstream 2030 — top-80% suppliers cam kết SBTi</li>
+   <li><b>Packaging Grade 1:</b> KHÔNG chạm bề mặt → cần jig/spacer riêng; double-bag class-100 PE-LD; N₂ purge + seal trong cleanroom cùng class assembly</li>
+  </ul>
+ </div>
+ <div class="oem-card tel">
+  <h3>Tokyo Electron (TEL)</h3>
+  <ul class="tight">
+   <li><b>Spec family:</b> <span class="code">TEL-PR-XXX</span> + JIS standards</li>
+   <li><b>QMS min:</b> ISO 9001 + JIS Q 9001 + ISO 27001 + STQA (Supplier Total Quality Assessment) framework nội bộ TEL</li>
+   <li><b>BCP:</b> bắt buộc — earthquake/typhoon recovery plan (post-Tōhoku mandate)</li>
+   <li><b>5S audit:</b> Seiri/Seiton/Seisō/Seiketsu/Shitsuke — chấm 25/25, ngưỡng đạt ≥20</li>
+   <li><b>Kaizen:</b> quarterly report, ≥1 kaizen/operator/quarter, photo before/after</li>
+   <li><b>Genchi-genbutsu:</b> TEL SQE đến shop floor — không chấp nhận audit PowerPoint-only</li>
+   <li><b>Cleanliness:</b> JIS B 9920 (~ISO 14644); mizu-arai (水洗い) DI water rinse cuối, resistivity ≥18 MΩ·cm</li>
+   <li><b>Chemical declaration:</b> <span class="code">chemSHERPA</span> format (Japanese industry std), không phải IMDS</li>
+   <li><b>Surface:</b> JIS B 0601 (~ISO 4287)</li>
+  </ul>
+ </div>
+</div>
+<table>
+<thead><tr><th>Tiêu chí</th><th>AMAT</th><th>LAM</th><th>ASML</th><th>TEL</th></tr></thead>
+<tbody>
+<tr><td><b>QMS tối thiểu</b></td><td>ISO 9001</td><td>ISO 9001 + 14001</td><td>ISO 9001 + 14001 + 27001</td><td>ISO 9001 + JIS Q 9001 + 27001 + STQA</td></tr>
+<tr><td><b>Cleanliness baseline</b></td><td>IEST L100-L300</td><td>IEST L100-L300</td><td>GSA Grade 4 (ISO 7)</td><td>JIS B 9920 Class 5</td></tr>
+<tr><td><b>Outgassing TML/CVCM</b></td><td>≤1% / ≤0.1%</td><td>≤1% / ≤0.1% (chặt cho EUV-adj)</td><td>≤0.1% / ≤0.01%</td><td>≤1% / ≤0.1%</td></tr>
+<tr><td><b>He leak rate</b></td><td>≤1×10⁻⁹ Pa·m³/s</td><td>≤1×10⁻⁹</td><td>≤1×10⁻¹⁰ (UHV)</td><td>≤1×10⁻⁹</td></tr>
+<tr><td><b>Surface Ra (316L EP)</b></td><td>≤0.4 μm</td><td>≤0.25 μm</td><td>≤0.2 μm</td><td>≤0.4 μm (JIS B 0601)</td></tr>
+<tr><td><b>PCN lead time</b></td><td>90 ngày</td><td>90-120 ngày</td><td>120-180 ngày</td><td>90 ngày + STQA delta-audit</td></tr>
+<tr><td><b>FAI format</b></td><td>AS9102 Rev C</td><td>AS9102 Rev C</td><td>ASML 4022.XXX</td><td>TEL-specific + JIS</td></tr>
+<tr><td><b>Audit cycle</b></td><td>Annual (Tier-1)</td><td>2 năm Preferred / 1 năm Probation</td><td>Annual (Grade 1/2)</td><td>Annual + Kaizen quarterly</td></tr>
+<tr><td><b>Retention</b></td><td>7-10 năm</td><td>10 năm</td><td>15 năm (EUV)</td><td>10 năm + life-time safety parts</td></tr>
+<tr><td><b>Cybersecurity</b></td><td>NIST 800-171</td><td>NIST 800-171 / CMMC L2</td><td>ISO 27001 + supplier cyber requirements</td><td>ISO 27001 + Japan APPI</td></tr>
+<tr><td><b>Chemical declaration</b></td><td>RMI CMRT</td><td>RMI CMRT + EMRT (cobalt)</td><td>CMRT + EMRT + chemSHERPA optional</td><td>chemSHERPA + CMRT</td></tr>
+<tr><td><b>Carbon (Scope 3)</b></td><td>SBTi-aligned</td><td>Top-100 supplier survey</td><td>Net-zero 2030 (top-80% committed)</td><td>TEL E-COMPASS, 2040 net-zero</td></tr>
+</tbody>
+</table>
+<div class="warn-callout"><strong>⚠ Bài học cực kỳ quan trọng cho HESEM:</strong> Spec ID nội bộ (<span class="code">0250-XXXXX</span>, <span class="code">06-XXXXXX</span>, <span class="code">4022.XXX</span>, <span class="code">TEL-PR-XXX</span>) <b>chỉ phát hành qua supplier portal sau khi ký NDA</b>. KHÔNG truy được public. Khi mới onboarding với 1 OEM, làm ngay 3 bước: (1) ký NDA — DCC theo dõi expiry, (2) request portal access cho 2-3 user lõi (QA, DCC, Engineering), (3) sync rev mỗi tuần để tránh dùng spec đã obsolete (LAM/ASML rev tăng nhanh, đặc biệt EUV).</div>
+</section>
+
+<section class="card">
+<h2>2. Cấu trúc thư mục mở rộng cho semi compliance — bổ sung vào ANNEX-133</h2>
+<p>Đây là <b>incremental additions</b> trên cây 1187 directory hiện có. Không break cấu trúc cũ; chỉ thêm folder mới + content type mới.</p>
+
+<h3>2.1. SITE 2 <span class="code">HESEM-Job-Evidence</span> — bổ sung cấu trúc Job-Dossier</h3>
+<table>
+<thead><tr><th>Thư mục đề xuất</th><th>Nội dung</th><th>OEM cần</th><th>Retention</th></tr></thead>
+<tbody>
+<tr><td class="path">Job-Dossiers/{YYYY}/{JobNum}-{PartNo}-REV-{Rev}/_Cleanliness-Pack/00-Banned-Substance-Check.pdf</td><td>Checklist HIO banned (Pb/Zn/Mg/P/Sn/Cd cho ASML Grade 1) + Si grease + DEHP/DOP + PEG ký bởi production lead</td><td>ASML bắt buộc; AMAT/LAM/TEL khuyến khích</td><td>R10</td></tr>
+<tr><td class="path">Job-Dossiers/{YYYY}/{JobNum}-.../_Cleanliness-Pack/01-Particle-Count-IEST-CC1246E.pdf</td><td>Particle count tích lũy theo bin size 5/10/25/50/100/200/300 μm, đo trên 0.1m² critical surface; level kết luận (Level 50/100/300)</td><td>4/4 OEM</td><td>R10</td></tr>
+<tr><td class="path">Job-Dossiers/{YYYY}/{JobNum}-.../_Cleanliness-Pack/02-NVR-Gravimetric.pdf</td><td>NVR mass test, gravimetric IPA rinse + evaporation + microbalance ±1μg, kết luận Level A/AA</td><td>4/4 OEM</td><td>R10</td></tr>
+<tr><td class="path">Job-Dossiers/{YYYY}/{JobNum}-.../_Cleanliness-Pack/03-Outgassing-ASTM-E595.pdf</td><td>TML/CVCM/WVR test 125°C × 24h × ≤5×10⁻⁵ torr; NASA/ESA-listed lab cert. ASML lot: thêm RGA bake-out 150°C × 24h, partial pressure >44 amu</td><td>ASML bắt buộc; AMAT/LAM cho non-metal parts</td><td>R10 (R15 ASML)</td></tr>
+<tr><td class="path">Job-Dossiers/{YYYY}/{JobNum}-.../_Cleanliness-Pack/04-Helium-Leak-ASTM-E498.pdf</td><td>He leak rate, calibrated leak ID, threshold theo OEM (1×10⁻⁹ AMAT/LAM/TEL; 1×10⁻¹⁰ ASML UHV)</td><td>Vacuum chamber parts 4/4 OEM</td><td>R10</td></tr>
+<tr><td class="path">Job-Dossiers/{YYYY}/{JobNum}-.../_Cleanliness-Pack/05-Surface-Ra-Profilometer.pdf</td><td>Surface roughness Ra report theo profilometer; SEMI F19 grade (UHP ≤0.13 μm / HP ≤0.38 / GP ≤0.81); OEM threshold</td><td>4/4 OEM</td><td>R10</td></tr>
+<tr><td class="path">Job-Dossiers/{YYYY}/{JobNum}-.../_Cleanliness-Pack/06-Packaging-Class-Log.pdf</td><td>Packaging procedure record: bag class, vacuum/N₂ purge, double-bag, desiccant, humidity indicator, shock indicator ≥25G (SEMI E137); photo</td><td>4/4 OEM</td><td>R10</td></tr>
+<tr><td class="path">Job-Dossiers/{YYYY}/{JobNum}-.../_Audit-Trail-Pack/01-FAI-AS9102.pdf</td><td>AS9102 Form 1 (part accountability) + Form 2 (material/process) + Form 3 (characteristic) — đầy đủ 3 form</td><td>AMAT/LAM/ASML accepted; TEL có format riêng</td><td>R10</td></tr>
+<tr><td class="path">Job-Dossiers/{YYYY}/{JobNum}-.../_Audit-Trail-Pack/02-Material-Cert-MTR.pdf</td><td>Mill Test Report (MTR) heat number, chemistry + mechanical theo AMS/ASTM spec; PMI XRF verification log</td><td>4/4 OEM</td><td>R10</td></tr>
+<tr><td class="path">Job-Dossiers/{YYYY}/{JobNum}-.../_Audit-Trail-Pack/03-SPC-Critical-Dims.pdf</td><td>SPC chart cho critical dim (sealing surface, gas hole), Cpk ≥1.33 minimum / ≥1.67 cho gas-leak / sealing feature</td><td>4/4 OEM</td><td>R10</td></tr>
+<tr><td class="path">Job-Dossiers/{YYYY}/{JobNum}-.../_Audit-Trail-Pack/04-Surface-Treatment-Cert.pdf</td><td>Cert từ subcontractor anodize/EP/passivation; bao gồm thickness (eddy current ASTM B244), coating weight ≥6 mg/in² cho Type III hard anodize</td><td>4/4 OEM</td><td>R10</td></tr>
+<tr><td class="path">Job-Dossiers/{YYYY}/{JobNum}-.../_Audit-Trail-Pack/05-Cleanroom-Assembly-Log.pdf</td><td>Cleanroom particle log giờ assembly diễn ra (per ISO 14644-1); operator gowning sign; final clean inspect</td><td>4/4 OEM</td><td>R10</td></tr>
+<tr><td class="path">Job-Dossiers/{YYYY}/{JobNum}-.../_Audit-Trail-Pack/06-CofC.pdf</td><td>Certificate of Conformance — ký CEO/QA Manager, dấu phòng QA, danh sách evidence tham chiếu</td><td>4/4 OEM</td><td>R10</td></tr>
+<tr><td class="path">Job-Dossiers/{YYYY}/{JobNum}-.../_Audit-Trail-Pack/manifest.json</td><td>Index file liệt kê 13 evidence với sha256 + expiry; auditor mở manifest là biết status đầy đủ chưa</td><td>4/4 OEM</td><td>R10</td></tr>
+</tbody>
+</table>
+
+<h3>2.2. SITE 1 <span class="code">HESEM-Records</span> — bổ sung Subcontractor APSL</h3>
+<table>
+<thead><tr><th>Thư mục đề xuất</th><th>Nội dung</th></tr></thead>
+<tbody>
+<tr><td class="path">Quality-Records/Subcontractor-Records/{vendor}/01-Approval-Package/</td><td>Vendor ISO 9001 cert + initial audit report + AMAT/LAM/ASML/TEL pre-qualification letter; flow-down requirement signed</td></tr>
+<tr><td class="path">Quality-Records/Subcontractor-Records/{vendor}/02-Process-Spec-Frozen/</td><td><b>Frozen process spec</b> — anodize tank chemistry, bath concentration, current density, time/temp; bất kỳ delta nào phải qua PCN trước</td></tr>
+<tr><td class="path">Quality-Records/Subcontractor-Records/{vendor}/03-Cert-Per-Lot/{YYYY}/</td><td>Cert theo mỗi lô gia công bên ngoài: thickness, sealed/unsealed, batch chemistry test</td></tr>
+<tr><td class="path">Quality-Records/Subcontractor-Records/{vendor}/04-Audit-Reports/{YYYY}/</td><td>Audit on-site annual (≥1/năm cho category-A); audit checklist, findings, CAR, closure</td></tr>
+<tr><td class="path">Quality-Records/Subcontractor-Records/{vendor}/05-APSL-Approval-Letter/</td><td>Customer (AMAT/LAM/ASML/TEL) APSL approval letter cho vendor này — không có letter = không được dùng cho parts của OEM đó</td></tr>
+</tbody>
+</table>
+
+<h3>2.3. SITE mới <span class="code">HESEM-ESG-Compliance</span> (SITE 5)</h3>
+<p>Đăng ký SITE thứ 5. Lý do tách khỏi SITE 1 (HESEM-Records): ESG có audit cycle độc lập (CDP annual, RBA mỗi 2-3 năm, CMRT annual, UFLPA on-demand), retention dài hơn (15-20 năm cho SBTi target), reporting format chuẩn quốc tế khác Quality-Records.</p>
+<table>
+<thead><tr><th>Thư mục</th><th>Nội dung</th><th>Retention</th></tr></thead>
+<tbody>
+<tr><td class="path">HESEM-ESG-Compliance/01-RBA-Compliance/{YYYY}/</td><td>RBA SAQ (Self-Assessment Questionnaire) annual + VAP (Validated Assessment Program) audit report mỗi 2-3 năm + CAR + Code of Conduct v8.0 signed</td><td>R10</td></tr>
+<tr><td class="path">HESEM-ESG-Compliance/02-Carbon-Scope-1-2-3/{YYYY}/</td><td>Scope 1+2 emissions inventory (GHG Protocol), Scope 3 calculation, SBTi target letter, CDP Supply Chain response annual</td><td>R15 (SBTi 5-15 year horizon)</td></tr>
+<tr><td class="path">HESEM-ESG-Compliance/03-Conflict-Minerals-3TG-Cobalt/{YYYY}/</td><td>CMRT (RMI v6.40+) + CRT cobalt template annual; smelter due diligence; gap closure</td><td>R7</td></tr>
+<tr><td class="path">HESEM-ESG-Compliance/04-UFLPA-Supply-Chain-Map/</td><td>Aluminum/Si/W smelter location map, mill location, billet origin — đặc biệt cấm vùng XUAR (Xinjiang)</td><td>R10 (CBP 5y min)</td></tr>
+<tr><td class="path">HESEM-ESG-Compliance/05-Banned-Substance-Declarations/</td><td>RoHS 3 DoC, REACH SVHC declarations, PFAS disclosure (2025+), halogen-free per IEC 61249-2-21, chemSHERPA (TEL)</td><td>R10</td></tr>
+<tr><td class="path">HESEM-ESG-Compliance/06-Customer-Code-of-Conduct-Signed/</td><td>4 OEM Code signed: AMAT, LAM (GSCC), ASML, TEL (Green Procurement)</td><td>R-Life of customer relationship</td></tr>
+<tr><td class="path">HESEM-ESG-Compliance/07-Modern-Slavery-UFLPA-Statements/</td><td>Annual modern slavery statement (UK Modern Slavery Act, AU 2018, US UFLPA); supply chain mapping</td><td>R7</td></tr>
+</tbody>
+</table>
+
+<h3>2.4. SITE 1 <span class="code">HESEM-Records/QMS-Governance</span> — bổ sung PCN + Customer Spec Map</h3>
+<table>
+<thead><tr><th>Thư mục/List</th><th>Nội dung</th></tr></thead>
+<tbody>
+<tr><td class="path">QMS-Governance/Customer-Spec-Map/Lists/Spec-Mapping</td><td>SharePoint List mapping: customer_oem + customer_spec_id (e.g. AMAT 0250-09954) → HESEM internal procedure → evidence path → effective rev → expiry. Cập nhật mỗi tuần đối chiếu portal OEM.</td></tr>
+<tr><td class="path">QMS-Governance/PCN-Register/Lists/PCN-Active</td><td>SharePoint List: PCN ID, customer, part, reason, lead time required (90/120/180 days), submit date, customer approve date, qual plan, FAI new required (Y/N), sample submission tracking</td></tr>
+<tr><td class="path">QMS-Governance/PCN-Register/Records/{YYYY}/{PCN-ID}/01-Change-Description.pdf</td><td>Mô tả thay đổi quy trình, current vs proposed, risk assessment</td></tr>
+<tr><td class="path">QMS-Governance/PCN-Register/Records/{YYYY}/{PCN-ID}/02-Customer-Notification-Letter.pdf</td><td>Letter gửi customer (qua portal hoặc email), với lead time cụ thể</td></tr>
+<tr><td class="path">QMS-Governance/PCN-Register/Records/{YYYY}/{PCN-ID}/03-Qual-Plan.pdf</td><td>Qualification plan: sample qty, test method, acceptance criteria</td></tr>
+<tr><td class="path">QMS-Governance/PCN-Register/Records/{YYYY}/{PCN-ID}/04-Customer-Approval-Letter.pdf</td><td>Approval letter từ customer (PDF + e-signature evidence)</td></tr>
+<tr><td class="path">QMS-Governance/PCN-Register/Records/{YYYY}/{PCN-ID}/05-FAI-New-After-Change.pdf</td><td>FAI mới sau thay đổi quy trình</td></tr>
+<tr><td class="path">QMS-Governance/PCN-Register/Records/{YYYY}/{PCN-ID}/06-First-Shipment-Validation.pdf</td><td>Validation report của lô đầu tiên sau khi đổi</td></tr>
+</tbody>
+</table>
+
+<h3>2.5. SITE 1 <span class="code">HESEM-Records/Department-Ops/DEP-PROD/</span> — Cleanroom + 5S/Kaizen</h3>
+<table>
+<thead><tr><th>Thư mục/List</th><th>Nội dung</th></tr></thead>
+<tbody>
+<tr><td class="path">Department-Ops/DEP-PROD/Cleanroom/{YYYY}/{MM}/Lists/Particle-Count-Daily</td><td>SharePoint List daily log particle count theo area; index theo timestamp + area_id; archive sau 1 năm vào CSV nén (R7 retention label, declared-record)</td></tr>
+<tr><td class="path">Department-Ops/DEP-PROD/Cleanroom/{YYYY}/{MM}/Gowning-Log.pdf</td><td>Operator gowning log, người vào/ra cleanroom, training cert tham chiếu</td></tr>
+<tr><td class="path">Department-Ops/DEP-PROD/Cleanroom/{YYYY}/{MM}/DI-Water-Resistivity-Log.csv</td><td>DI water resistivity log (≥18 MΩ·cm) — mizu-arai (水洗い) bắt buộc cho TEL parts</td></tr>
+<tr><td class="path">Department-Ops/DEP-PROD/Cleanroom/{YYYY}/{MM}/Cleanroom-Cert-ISO-14644.pdf</td><td>Cleanroom certification annual ISO 14644-1 Class — ISO 7 minimum semi assembly; ISO 5 final clean/ESC</td></tr>
+<tr><td class="path">Department-Ops/DEP-PROD/5S-Kaizen/{YYYY}-Q{N}/5S-Audit-Score.pdf</td><td>5S audit quarterly: Seiri (Sàng lọc) + Seiton (Sắp xếp) + Seisō (Sạch sẽ) + Seiketsu (Săn sóc) + Shitsuke (Sẵn sàng) — 25/25, ngưỡng đạt ≥20. Photo before/after.</td></tr>
+<tr><td class="path">Department-Ops/DEP-PROD/5S-Kaizen/{YYYY}-Q{N}/Kaizen-Submissions.xlsx</td><td>Kaizen quarterly log: ≥1 kaizen/operator/quarter; photo before/after; savings (VND/USD); category (safety/quality/productivity/morale)</td></tr>
+</tbody>
+</table>
+</section>
+
+<section class="card">
+<h2>3. Workflow nghiệp vụ thực chiến — 5 luồng cốt lõi</h2>
+
+<h3>3.1. Workflow PCN (Process Change Notification) — luồng quan trọng nhất</h3>
+<table>
+<thead><tr><th>Bước</th><th>Owner</th><th>Hành động</th><th>SLA</th></tr></thead>
+<tbody>
+<tr><td>1. Phát hiện cần đổi process</td><td>Engineering / QE</td><td>Lý do: defect rate ↑, vendor đổi, customer DCN, cost reduction. Tạo PCN ID, nhập vào <span class="code">PCN-Register</span> List, status=Draft</td><td>D0</td></tr>
+<tr><td>2. Risk assessment + qual plan</td><td>QA Manager + Engineering Lead</td><td>Đánh giá risk (critical/major/minor); plan qual gồm sample qty, test method, acceptance criteria. Status=Risk-Assessed</td><td>D+3</td></tr>
+<tr><td>3. Áp <span class="code">PCN-Pending</span> sensitivity label</td><td>DCC</td><td>Drawing release rev hiện hành áp label <span class="code">PCN-Pending</span> → sensitivity label workflow BLOCK operator mở file để chạy job mới. Job đang chạy được hoàn thành nhưng không nhận job mới với rev đó</td><td>D+3</td></tr>
+<tr><td>4. Submit PCN qua customer portal</td><td>Sales / Account Manager</td><td>Submit AMAT SCMS / LAM Ariba / ASML supplier portal / TEL portal. Đính kèm: change description, risk assessment, qual plan, FAI plan</td><td>D+5</td></tr>
+<tr><td>5. Customer review</td><td>Customer SQE</td><td>Customer xem xét — có thể yêu cầu sample submission, additional test, deviation. Lead time: 90d (AMAT/TEL), 90-120d (LAM cat-A), 120-180d (ASML EUV)</td><td>D+5 → D+95-185</td></tr>
+<tr><td>6. Customer approval + signature</td><td>Customer SQE → HESEM Sales</td><td>Approval letter PDF + e-signature evidence. Lưu <span class="code">PCN-Register/Records/{PCN-ID}/04-Customer-Approval-Letter.pdf</span></td><td>Customer-dependent</td></tr>
+<tr><td>7. Execute change + new FAI</td><td>Production + QA</td><td>Đổi process per plan; chạy first article lot; FAI mới (AS9102 cho AMAT/LAM, ASML format cho ASML). Lưu <span class="code">05-FAI-New-After-Change.pdf</span></td><td>D+10</td></tr>
+<tr><td>8. First shipment validation</td><td>QA Manager</td><td>Validation report của lô đầu sau đổi; sample test pass criteria; lưu <span class="code">06-First-Shipment-Validation.pdf</span></td><td>D+15</td></tr>
+<tr><td>9. Remove <span class="code">PCN-Pending</span> label</td><td>DCC + QA Manager</td><td>Áp label mới <span class="code">Released-Post-PCN-{YYYY}-{PCN-ID}</span>; status=Closed-Approved. Drawing rev tăng nếu có drawing change.</td><td>D+15</td></tr>
+</tbody>
+</table>
+<div class="ok-callout"><strong>Cốt lõi PCN workflow:</strong> Sensitivity label <span class="code">PCN-Pending</span> là <b>cơ chế kỹ thuật</b> ngăn operator chạy job với rev đã không còn hợp lệ; không có cơ chế này thì PCN chỉ là giấy. Implementation: Microsoft Purview sensitivity label + DLP rule "block edit when label = PCN-Pending" + auto-apply theo metadata column <span class="code">drawing_rev</span>.</div>
+
+<h3>3.2. Workflow Cleanliness Evidence Pack (auto-gom mỗi lô)</h3>
+<table>
+<thead><tr><th>Bước</th><th>Trigger</th><th>Hành động auto</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>QC sign off final inspection</td><td>Power Automate flow tạo folder <span class="code">_Cleanliness-Pack/</span> trong Job-Dossier</td></tr>
+<tr><td>2</td><td>Particle count test complete</td><td>Test report PDF upload qua portal → flow đặt vào <span class="code">01-Particle-Count-IEST-CC1246E.pdf</span> + cập nhật manifest</td></tr>
+<tr><td>3</td><td>NVR test complete</td><td>Tương tự → <span class="code">02-NVR-Gravimetric.pdf</span></td></tr>
+<tr><td>4</td><td>Outgassing test complete (lab third-party)</td><td>Lab gửi PDF → email parsing → flow đặt vào <span class="code">03-Outgassing-ASTM-E595.pdf</span></td></tr>
+<tr><td>5</td><td>He leak test complete</td><td>→ <span class="code">04-Helium-Leak-ASTM-E498.pdf</span></td></tr>
+<tr><td>6</td><td>Surface Ra measurement complete</td><td>→ <span class="code">05-Surface-Ra-Profilometer.pdf</span></td></tr>
+<tr><td>7</td><td>Packaging done</td><td>Cleanroom log + photo + shock indicator log → <span class="code">06-Packaging-Class-Log.pdf</span></td></tr>
+<tr><td>8</td><td>All 6 evidence in</td><td>Flow tạo <span class="code">manifest.json</span> với sha256 mỗi file; status=Complete; nếu thiếu 1 → status=Incomplete, alert QA Manager qua Teams</td></tr>
+<tr><td>9</td><td>Manifest complete</td><td>Áp sensitivity label <span class="code">Confidential-Customer-{OEM}</span>; áp retention label <span class="code">R10-PCN-Customer</span> (hoặc R15 cho ASML EUV); declare-as-record (immutable)</td></tr>
+</tbody>
+</table>
+
+<h3>3.3. Workflow Customer Audit (AMAT auditor đến site)</h3>
+<p>Tham chiếu ANNEX-142 §G — Guest Audit Access Flow.</p>
+
+<h3>3.4. Workflow Subcontractor APSL Approval</h3>
+<table>
+<thead><tr><th>Bước</th><th>Owner</th><th>Hành động</th></tr></thead>
+<tbody>
+<tr><td>1. Identify vendor</td><td>Procurement + QA</td><td>Tìm vendor anodize/EP/passivation; collect ISO 9001 cert</td></tr>
+<tr><td>2. Initial assessment</td><td>Supplier Quality Engineer (SQE)</td><td>Paper assessment: cert, financial stability, capacity, similar customer references</td></tr>
+<tr><td>3. On-site audit</td><td>SQE + QA Manager</td><td>2-day on-site: process flow walk, calibration, training, cleanliness, sample test. Score per checklist (target ≥80%)</td></tr>
+<tr><td>4. Pre-qual sample</td><td>Vendor</td><td>Vendor chạy 5-10 sample, HESEM test cleanliness/dimensional. Compare vs spec</td></tr>
+<tr><td>5. Customer APSL submission</td><td>QA Manager + Sales</td><td>Submit qua AMAT/LAM/ASML/TEL portal cho APSL approval. <b>Quan trọng:</b> mỗi OEM có APSL riêng — vendor approved cho AMAT chưa chắc approved cho LAM</td></tr>
+<tr><td>6. Customer APSL approval</td><td>Customer SQE</td><td>Lead time: 60-90 ngày tùy OEM. Letter approval lưu <span class="code">Subcontractor-Records/{vendor}/05-APSL-Approval-Letter/</span></td></tr>
+<tr><td>7. First production run</td><td>Production</td><td>Lô đầu 100% inspect; sample to customer for confirmation</td></tr>
+<tr><td>8. Annual audit (sustaining)</td><td>SQE</td><td>≥1/năm on-site; CAPA tracking; cert renewal monitoring</td></tr>
+</tbody>
+</table>
+
+<h3>3.5. Workflow ESG quarterly reporting</h3>
+<table>
+<thead><tr><th>Tần suất</th><th>Hành động</th></tr></thead>
+<tbody>
+<tr><td>Monthly</td><td>Cập nhật Scope 1 (fuel, refrigerant) + Scope 2 (electricity) emissions data từ ERP</td></tr>
+<tr><td>Quarterly</td><td>5S audit score nộp; Kaizen quarterly count; Carbon dashboard refresh; report to CEO</td></tr>
+<tr><td>Annually</td><td>RBA SAQ refresh + submit; CMRT compile + submit; CDP Supply Chain response; SBTi progress check; UFLPA statement</td></tr>
+<tr><td>Mỗi 2-3 năm</td><td>RBA VAP audit on-site bởi RBA-approved auditor</td></tr>
+</tbody>
+</table>
+</section>
+
+<section class="card">
+<h2>4. Lộ trình triển khai 18 tháng — "Mới bắt đầu" → Tier-1 Audit-Ready</h2>
+
+<h3>Pha 1 — Tháng 1-3: Foundation (chuẩn bị nền)</h3>
+<ul class="tight">
+<li>Mua/license 12 standard core: ISO 9001:2015, ISO 14644-1:2015, IEST-STD-CC1246E, ASTM E595, AS9102 Rev C, SEMI E155, S2, S8, F19, F47, MIL-A-8625F, AMS 2700F</li>
+<li>Provision SITE 5 (HESEM-ESG-Compliance), bổ sung 2.1-2.5 folder cấu trúc</li>
+<li>Setup Customer-Spec-Map List với 4 OEM placeholder (chưa NDA = không có spec ID; chỉ đăng ký framework)</li>
+<li>Setup PCN-Register List với workflow Power Automate</li>
+<li>Đào tạo DCC + QA + Engineering về 4 OEM expectation</li>
+</ul>
+<p><b>Acceptance:</b> 12 standard có sẵn trên SharePoint; gap analysis matrix (HESEM SOP ↔ SEMI clause) hoàn tất; SITE 5 + workflow PCN/Customer-Spec-Map active.</p>
+
+<h3>Pha 2 — Tháng 4-6: Cleanliness Capability</h3>
+<ul class="tight">
+<li>Setup cleanroom Class ISO 7 cho assembly + Class ISO 5 cho final clean (10-20 m²)</li>
+<li>Mua particle counter calibrated (ISO 21501-4); microbalance ±1 μg cho NVR; profilometer Ra</li>
+<li>Qualify 1 third-party lab cho outgassing ASTM E595 + RGA (gửi sample monthly initially)</li>
+<li>Setup He leak test station (≤1×10⁻⁹ Pa·m³/s)</li>
+<li>Pilot 5 part hiện đang chạy: retrofit Cleanliness Pack đầy đủ 6 evidence</li>
+</ul>
+<p><b>Acceptance:</b> 5 part pilot có cleanliness pack đầy đủ; sample test pass ASTM E595 baseline + IEST L100; cleanroom particle log daily không gap.</p>
+
+<h3>Pha 3 — Tháng 7-9: Customer Onboarding</h3>
+<ul class="tight">
+<li>Ký NDA với 1 OEM ưu tiên (recommend: <b>AMAT</b> vì onboarding flow rõ nhất, audit cycle predictable)</li>
+<li>Request SCMS portal access cho QA Manager + DCC + Engineering Lead</li>
+<li>Sync AMAT 0250-XXXXX spec mới nhất → upload vào Customer-Spec-Map List</li>
+<li>Submit RBA SAQ (target score ≥80)</li>
+<li>Submit CMRT (3TG + Cobalt) annual</li>
+<li>First AMAT mock audit nội bộ — chấm theo 20-item checklist</li>
+</ul>
+<p><b>Acceptance:</b> AMAT NDA ký, SCMS access có, RBA SAQ ≥80, CMRT submitted, mock audit ≥70%.</p>
+
+<h3>Pha 4 — Tháng 10-12: First Real Audit</h3>
+<ul class="tight">
+<li>AMAT SQE on-site audit (2-3 ngày)</li>
+<li>Findings → CAR closure trong 90 ngày</li>
+<li>Tier promotion: từ Conditional → Approved (sau audit pass)</li>
+<li>Mở rộng PCN workflow real với 3-5 PCN active</li>
+<li>Setup ESG dashboard public-facing cho customer review</li>
+</ul>
+<p><b>Acceptance:</b> AMAT audit pass với ≤2 major finding, đóng trong SLA; HESEM trong AMAT Approved Supplier List.</p>
+
+<h3>Pha 5 — Tháng 13-18: Multi-OEM Scaling</h3>
+<ul class="tight">
+<li>Onboard 2nd OEM (recommend: <b>LAM</b> vì spec gần AMAT + Asia presence)</li>
+<li>Onboard 3rd OEM (LAM hoặc TEL — TEL nếu Japan customer base)</li>
+<li>Đầu tư ASML capability: cleanroom Class 5 advanced + bake-out oven RGA + UHV He leak station — TỐN KÉM, chỉ nếu có customer ASML committed</li>
+<li>Add ISO 14001 cert + ISO 27001 cert</li>
+<li>Setup Customer Portal (HESEM-Customer-Portal SITE)</li>
+</ul>
+<p><b>Acceptance:</b> 2-3 OEM Approved Supplier; revenue từ semi parts ≥30% tổng doanh thu; ASML capability gate decision có data hỗ trợ.</p>
+</section>
+
+<section class="card">
+<h2>5. KPI tuân thủ — đo lường monthly</h2>
+<table>
+<thead><tr><th>KPI</th><th>Target</th><th>Báo cáo</th></tr></thead>
+<tbody>
+<tr><td>Cleanliness Pack completion rate (per shipped lot)</td><td>≥95% trong 24h sau ship</td><td>Monthly QA report</td></tr>
+<tr><td>FAI on-time (per part rev change)</td><td>≥98%</td><td>Monthly</td></tr>
+<tr><td>PCN customer-approve rate</td><td>≥95% submitted PCN approved without rework</td><td>Quarterly</td></tr>
+<tr><td>Heat number traceability test (random pull)</td><td>100% truy được từ shipped part → heat → mill</td><td>Monthly QA spot check 5 part random</td></tr>
+<tr><td>Subcontractor APSL coverage</td><td>100% surface treatment vendor có APSL letter từ ≥1 customer</td><td>Quarterly</td></tr>
+<tr><td>Cleanroom particle count compliance</td><td>≥98% daily log không vượt class limit</td><td>Weekly</td></tr>
+<tr><td>5S audit score</td><td>≥20/25 (TEL requirement)</td><td>Quarterly</td></tr>
+<tr><td>Kaizen submission per operator</td><td>≥1/operator/quarter</td><td>Quarterly</td></tr>
+<tr><td>RBA SAQ score</td><td>≥80</td><td>Annual</td></tr>
+<tr><td>CMRT 3TG smelter "unknown" rate</td><td>0%</td><td>Annual</td></tr>
+<tr><td>NCR/CAPA close-on-time (≤30 days major)</td><td>≥95%</td><td>Monthly</td></tr>
+<tr><td>Customer audit pass rate (no major finding)</td><td>≥90%</td><td>Per audit</td></tr>
+<tr><td>Scope 1+2 emission YoY reduction</td><td>≥5% (SBTi 1.5°C pathway)</td><td>Annual</td></tr>
+</tbody>
+</table>
+</section>
+
+<section class="card">
+<h2>6. Tài liệu liên kết bắt buộc</h2>
+<ul class="tight">
+<li><a href="annex-130-m365-eqms-ssot-boundary-and-cross-reference-policy.html">ANNEX-130</a> — SSOT 3 tầng EQMS↔M365↔Cross-Reference</li>
+<li><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> — Site topology + folder blueprint (sẽ patch để thêm SITE 5 ESG-Compliance + bổ sung cleanliness/PCN folder)</li>
+<li><a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> — Provisioning + permissions (sẽ patch để bổ sung 6 RequestType mới: CreateCleanlinessPack, CreatePCN, ApprovePCN, RegisterCustomerSpec, CreateSubcontractorAPSL, CreateESGEvidence)</li>
+<li><a href="annex-139-m365-ip-and-restricted-library-internal-blueprint.html">ANNEX-139</a> — IP/restricted L2/L3 (sẽ patch Subcontractor-Records với APSL detail)</li>
+<li><a href="annex-140-runtime-data-boundary-postgres-redis-rabbitmq-and-qmsdata.html">ANNEX-140</a> — Runtime data boundary (audit_events mirror)</li>
+<li><b>ANNEX-142</b> (sắp ban hành) — M365 Permission Model for Semi Audit (Entra ID groups + Sensitivity labels + Information Barriers + DLP + Guest audit flow)</li>
+</ul>
+</section>
+
+</div>
+</div></div></div>
+</body>
+</html>

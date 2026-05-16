@@ -166,11 +166,7 @@ liệt kê ở đây để source-doc author cân nhắc khi nâng cấp ANNEX-1
    Không xuất hiện trong §12 token table như một entry riêng. Giữ
    nguyên literal.
 
-5. **Customer-Received / Tooling-Fixture-Gage / HR-Operations** — §2
-   keyline chỉ kể tên các thư viện này nhưng **không có §3-§11 nào
-   định nghĩa cấu trúc sub-folder**. Blueprint chỉ tạo library root
-   với `.gitkeep`; sub-structure để admin tự tổ chức theo customer/job
-   thực tế hoặc chờ source-doc author bổ sung spec.
+5. **Customer-Received / Tooling-Fixture-Gage / HR-Operations / Cleanroom-Records / Subcontractor-Records** — đã được spec hoá đầy đủ cấp L2/L3 tại `ANNEX-139` (rev 2026-05-09) cho 6 thư viện IP/restricted; blueprint nay đã tạo full cấu trúc thư mục đúng theo §2-§8 của ANNEX-139. Note cũ "chỉ tạo root với .gitkeep" đã được thay thế bởi đợt rebuild 2026-05-16.
 
 ## Library counts (cho audit)
 
@@ -210,7 +206,11 @@ blueprint — never edit folders by hand.
 ## Provisioning to live tenant (not yet implemented)
 
 The next step is a PowerShell PnP script that reads `manifest.json` and
-this folder tree, then provisions the 4 sites + 14 libraries + 1055
-sub-folders on the HESEM SharePoint tenant. Permission groups, sensitivity
+this folder tree, then provisions the 6 sites + ~27 libraries + 1270
+sub-folders on the HESEM SharePoint tenant (count updated 2026-05-16
+after rebuild including ANNEX-139 §2-§8 L2/L3 structure for 6 IP/
+restricted libraries + ANNEX-141 SITE 5 HESEM-ESG-Compliance + ANNEX-142
+SITE 6 HESEM-Customer-Portals with 4 customer-OEM sites under
+Information Barriers). Permission groups, sensitivity
 labels, and retention policies are out of scope for this blueprint and
 belong to ANNEX-134 (provisioning) and ANNEX-135 (retention) automation.

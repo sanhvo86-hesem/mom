@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRN-DEP-W07 — Đợt Sản xuất vận hành chính thức — Tuần 1 (Sản xuất + Kỹ thuật đồng thời) | HESEM MOM</title>
+<script>
+/* DCC Header bootstrap */
+(function () {
+  var DCC_VERSION = '2026-04-24-1';
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css?v=' + DCC_VERSION;
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(js);
+})();
+</script>
+<link rel="stylesheet" href="../../../../assets/style.css">
+<style>
+ table{width:100%;border-collapse:collapse;table-layout:fixed}
+ th,td{border:1px solid #e2e8f0;padding:8px 10px;vertical-align:top;overflow-wrap:anywhere;font-size:13px}
+ th{background:#f1f5f9;text-align:left}
+ .tight li{margin:4px 0}
+ .meta-anchor{margin:8px 0;padding:8px 10px;background:#f0f9ff;border-left:3px solid #0284c7;border-radius:4px;font-size:12px;line-height:1.6}
+ .meta-roles{margin:6px 0 0;font-size:12px;color:#475569}
+ .meta-anchor strong,.meta-roles strong{color:#0f172a}
+ .col-gate{color:#991b1b;font-style:italic}
+ .champ-block{margin-top:8px;padding:8px 10px;background:#fef3c7;border-left:3px solid #d97706;border-radius:4px;font-size:12px}
+ .champ-block ul{margin:4px 0 0;padding-left:20px}
+ .champ-block li{margin:3px 0}
+</style>
+</head>
+<body>
+<div class="container"><div class="page"><div class="page-body">
+<div class="dcc-header"
+     data-dcc-doc-code="TRN-DEP-W07"
+     data-dcc-locale="vi"
+     data-dcc-logo="../../../../assets/hesem-logo.svg"
+     data-dcc-bootstrap='{"header":{"doc_code":"TRN-DEP-W07","title":"Đợt Sản xuất vận hành chính thức — Tuần 1 (Sản xuất + Kỹ thuật đồng thời)","subtitle":"Triển khai vận hành · Giai đoạn P3 · 2026-06-27","doc_type":"TRN","revision":"V0","effective_date":"2026-06-27","owner_role_code":"QMS","approver_role_code":"CEO","iso_clause":"ISO 9001:2015 §8.5, §8.5.6, §8.7","status":"released"}}'></div>
+<div class="doc-content" id="docContent">
+<section class="card" id="sec-cover">
+<h1 class="h2">W07 · 2026-06-27 · P3 · Đợt Sản xuất vận hành chính thức — Tuần 1 (Sản xuất + Kỹ thuật đồng thời)</h1>
+<p>Giám đốc Sản xuất + Trưởng Kỹ thuật dùng cuộc họp này để cam kết kế hoạch 5 ngày tại xưởng — đi xưởng 15 phút/ngày qua dashboard, hồ sơ Job Order đầu tiên có chữ ký số. Cuộc họp này KHÔNG thay thế họp nhanh đầu ngày tại xưởng — Sản xuất + Kỹ thuật tự tổ chức họp 15 phút/ngày suốt tuần.</p>
+<p class="meta-anchor"><strong>Cổng đóng tuần này:</strong> P3-03 · <strong>ISO 9001:2015:</strong> §8.5 (sản xuất và cung cấp) · §8.5.6 (kiểm soát thay đổi) · §8.7 (đầu ra không phù hợp) · <strong>Tài liệu bắt buộc:</strong> SOP-501 (kế hoạch và điều độ sản xuất), WI-519 (kiểm hồ sơ Job Order), SOP-303 (release engineering), WI-302 (FAI và bằng chứng) · <strong>Tài liệu sẵn trên cổng trước buổi họp:</strong> Lịch đi xưởng 15 phút/ngày × 7 khu vực đã đặt trong program.json với người trực rõ; mẫu hồ sơ Job Order số đã có trên cổng (Tổ trưởng/Trưởng QA chuẩn bị trước ca, Người vận hành chỉ xem); mẫu phiếu cài đặt máy + mẫu FAI đã upload; sổ bàn giao ca 3 ca đã active; sổ kéo dây cảnh báo có cờ source=drill/real · <a href="/mom/portal.html#module=deploy&amp;tab=timeline&amp;week=7">Mở Lộ trình W07 trên cổng</a></p>
+<p class="meta-roles"><strong>Người chủ trì:</strong> Giám đốc Sản xuất · <strong>Người ký kết quả:</strong> Giám đốc (xác nhận điện tử qua tài khoản M365+MFA — không ký giấy, không tự lập chữ ký số CA. Mỗi audit_events ghi user_id + ip_address + user_agent + session_id (immutable INSERT-only — xem PLAYBOOK chương "Cơ chế xác thực").) · <strong>Người ghi biên bản:</strong> Kỹ sư QMS</p>
+</section>
+<section class="card" id="sec-objective">
+<h2 class="h2">3 câu hỏi đánh giá riêng</h2>
+<ol class="tight">
+<li>Lịch đi xưởng 15 phút/ngày × 7 khu vực có người trực rõ trong program.json, Đội tăng cường (Trưởng QA + Kỹ sư QMS + 2 người dẫn dắt) đã ký số cam kết trực 24/5 chưa?</li>
+<li>Hồ sơ Job Order đầu tiên: Tổ trưởng/Trưởng QA đã chuẩn bị trước ca theo SOP-501+SOP-303; Người vận hành chỉ check phiếu cài đặt máy (WI-519) + FAI mẫu đầu (WI-302); ≥1 hồ sơ đã có chữ ký số Người vận hành + Trưởng QA trước khi chạy lô chưa?</li>
+<li>Cơ chế kéo dây cảnh báo + đường leo thang đã kiểm thử thật (source=drill trong issues.json) cùng tổ trưởng + người cài đặt máy trước tuần này chưa?</li>
+</ol>
+</section>
+<section class="card" id="sec-tasks">
+<h2 class="h2">Bằng chứng phải có</h2>
+<table>
+<thead><tr><th>Bằng chứng</th><th>Người giữ</th><th>Điểm kiểm (trên cổng)</th><th>Cổng khoá nếu thiếu</th></tr></thead>
+<tbody>
+<tr><td>Lịch đi xưởng + người trực 7 khu vực</td><td>Giám đốc Sản xuất</td><td>program.json: 7 khu vực × 5 ngày = 35 dòng lịch, mỗi dòng có người trực; audit_events deploy.checklist.toggle cho mỗi khu vực trong 7 khu vực (key=shopfloor_checkin_<area>).</td><td class="col-gate">P3-03 khoá: §8.5 không có kiểm soát thực địa.</td></tr>
+<tr><td>Hồ sơ Job Order đầu tiên (6 file đóng gói + phiên bản khoá)</td><td>Trưởng QA</td><td>dcc_document_header doc_type=JobOrder: ≥1 dòng có 6 file đóng gói (bản vẽ 2D PDF rev, CAD 3D .step, chương trình NC .nc/.mpf rev, phiếu cài đặt dao+offset, FAI mẫu đầu AS9102 3 form, lot vật liệu + MTC EN10204 3.1); trường drawing_rev_locked_at khoá tại thời điểm Trưởng QA xác nhận; mở đúng SOP-501 + WI-519 + SOP-303 + WI-302.</td><td class="col-gate">P3-03 khoá: §8.5 và §8.7 lệch — chạy lô không có FAI.</td></tr>
+<tr><td>Mọi CTQ trong bản vẽ đo 100% + CMM data upload</td><td>Trưởng QA</td><td>Bản vẽ đánh dấu Δ hoặc ⚫ (Critical-to-Quality); mọi đặc tính đo 100%; file CMM .xml/.csv upload kèm Job Order; đối chiếu dung sai nominal/upper/lower trong dcc_document_header doc_type=FAIform3; lệch = trigger issues.json source=real severity=Mức 2 ngay.</td><td class="col-gate">P3-03 khoá: §8.7 đầu ra không phù hợp không phát hiện đặc tính CTQ → khách hàng từ chối lô.</td></tr>
+<tr><td>Phê duyệt trước Job Order cho ca đêm</td><td>Trưởng QA</td><td>Champion ca ngày ký gói Job Order cho cả 24h trước 18:00 ngày hôm trước; tổ trưởng ca đêm chỉ xác nhận đã thực thi qua deploy.checklist.toggle key=jobOrder_executed_at_<night_time> — không cần gọi champion lúc 23:00. UI ký Job Order ≤30 giây (đã đăng nhập M365 sẵn); Trưởng IT xác nhận trên cổng trước W07.</td><td class="col-gate">P3-03 khoá: §8.5 ca đêm không có người ký → dừng máy hoặc bypass quy trình.</td></tr>
+<tr><td>Sổ phân ca + lịch trực 24/5 trên cổng</td><td>Trưởng QMS</td><td>champions.json: 3 ca có người dẫn dắt thường trực; meetings.json (trường daily_standup) có 3 dòng/ngày sổ bàn giao ca ≥90% hoàn tất.</td><td class="col-gate">P3-03 khoá: §7.2 năng lực không đảm bảo ngoài giờ.</td></tr>
+<tr><td>Kiểm thử cơ chế kéo dây cảnh báo</td><td>Tổ trưởng</td><td>issues.json filter source=drill description chứa 'alert_cord': ≥1 dòng trước tuần này; đường leo thang theo ANNEX-117 đúng; chữ ký số tổ trưởng + Kỹ sư QMS.</td><td class="col-gate">P3-03 khoá: §10.2 không có cơ chế chặn sự cố nóng.</td></tr>
+<tr><td>Bản chụp KPI báo đỏ ngày 1</td><td>Trưởng QA</td><td>readiness.json: KPI báo đỏ = 0 hoặc có ngoại lệ trong issues.json source=audit severity=Mức 2 + sự kiện deploy.metric.update (key=kpi_red_exception); xác nhận điện tử Giám đốc trong ngày.</td><td class="col-gate">P3-03 khoá: §9.1.3 phân tích đo lường không có cơ sở.</td></tr>
+</tbody>
+</table>
+<p class="champ-block"><strong>Việc của người dẫn dắt phòng tuần W07:</strong></p>
+<ul class="tight" style="margin-top:-6px">
+<li>Tổ trưởng + Người cài đặt máy: chuẩn bị hồ sơ Job Order số trước mỗi ca; Người vận hành chỉ xem trên cổng, không in.</li>
+<li>14 người dẫn dắt 7 khu vực: tham dự họp nhanh đầu ngày 15 phút tại xưởng (truy cập dashboard qua máy tính khu vực); ghi vào meetings.json trên cổng.</li>
+<li>Đội tăng cường: trực 24/5 theo lịch; phản hồi sự cố Mức 1 qua issues.json trong ≤24 giờ.</li>
+</ul>
+</section>
+<section class="card" id="sec-lessons">
+<h2 class="h2">Vòng rút kinh nghiệm 10 phút — neo tuần W07</h2>
+<ol class="tight">
+<li>Tuần này KPI-FLD-02 (Thời gian tra cứu ≤180 giây) và KPI-DEP-07 (Thời gian phục hồi sự cố Mức 1 ≤24 giờ) ra số bao nhiêu, có đi đúng ngưỡng không, vì sao? (đối chiếu với ANNEX-110 từ điển KPI)</li>
+<li>Sổ vấn đề tuần này có dòng nào cần nâng mức theo ANNEX-117 (Mức 3 → Mức 2 hoặc Mức 2 → Mức 1) không, ai duyệt nâng mức?</li>
+<li>3 hành động tuần sau là gì, ai làm, hạn nào, và sẽ chặn cổng nào nếu trễ?</li>
+</ol>
+<p>Người ghi biên bản (mặc định Kỹ sư QMS) ghi 3 hành động vào <code>issues.json</code> kèm mức độ thật theo ANNEX-117 — không mặc định Mức 3. Mức 1/Mức 2 phải có chữ ký số Trưởng QMS hoặc Giám đốc. Toàn bộ ký số trên cổng (audit_events deploy.week.signoff hoặc deploy.issue.save (nâng severity)), không in giấy.</p>
+</section>
+</div>
+</div></div></div>
+</body>
+</html>

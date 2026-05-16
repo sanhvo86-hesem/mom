@@ -243,6 +243,29 @@ ANNEX-139 chỉ bổ sung cấu trúc nội bộ cho bốn thư viện chưa đ�
 </div>
 <div class="keyline"><strong>Quy tắc cứng:</strong> Subcontractor-Records là SSOT cho special process traceability theo AS9100D §8.4.3 + NADCAP. Mọi PO ra special-process processor BẮT BUỘC reference processor's qualification pack tại 02-By-Subcontractor/{ProcessorID}/01-Qualification-Pack/ và customer process approval tại /02-Process-Cert-Letters/. Cấm PO ra processor chưa có entry trong 01-Approved-Supplier-List-with-Scope. Suspend/decertify event BẮT BUỘC ghi vào 03-Suspension-and-Decertification-Log/ trong 24h kể từ khi nhận thông tin.</div>
 <div class="keyline"><strong>Phân biệt với Part-REV-Master/04-Approved-Material-and-Suppliers/:</strong> Part-REV-Master/04 chứa danh sách processor được phê duyệt CHO TỪNG part rev (subset của ASL); Subcontractor-Records/01-ASL chứa MASTER ASL toàn công ty. Khi customer audit một part cụ thể, drill down từ part rev sang ASL master qua link metadata <span class="code">ProcessorID</span>.</div>
+
+<div class="keyline" style="background:#fff5f5;border-left:4px solid #c92a2a;"><strong>Semi-Equipment Parts CNC — APSL theo 4 OEM (bổ sung 2026-05-16 theo ANNEX-141):</strong><br>
+Mỗi OEM (AMAT/LAM/ASML/TEL) có <b>APSL riêng</b> (Approved Process Source List) — processor được approve cho AMAT KHÔNG tự động được approve cho LAM/ASML/TEL. Cấu trúc sub-folder bổ sung trong <span class="code">02-By-Subcontractor/{ProcessorID}/02-Process-Cert-Letters/</span>:
+<ul style="margin:6px 0 0;padding-left:22px;">
+ <li><span class="code">02-Process-Cert-Letters/AMAT/</span> — AMAT-issued process approval letter (qua SCMS portal). Hết hạn theo AMAT (thường 2-3 năm).</li>
+ <li><span class="code">02-Process-Cert-Letters/LAM/</span> — LAM APSL approval letter (qua Lam Supplier Portal). Lam yêu cầu PCN nếu tank chemistry thay đổi → re-qualify.</li>
+ <li><span class="code">02-Process-Cert-Letters/ASML/</span> — ASML APL (Approved Process List) letter. ASML Grade 1 process (EUV-related) yêu cầu HIO-banned-element-free guarantee từ processor.</li>
+ <li><span class="code">02-Process-Cert-Letters/TEL/</span> — TEL pre-approval letter qua STQA framework. TEL Genchi-genbutsu on-site verification của processor.</li>
+</ul>
+<small>Workflow: khi mới onboard processor mới cho 1 part shipped đến OEM cụ thể → submit qualification pack qua customer portal → wait 60-90 ngày customer approval → letter PDF lưu vào sub-folder OEM tương ứng. Cấm dùng processor nếu KHÔNG có letter approval của OEM mà part sẽ ship đến. Xem <a href="annex-141-semi-equipment-parts-cnc-supplier-compliance.html">ANNEX-141</a> §3.4 workflow Subcontractor APSL Approval.</small></div>
+
+<div class="keyline" style="background:#e7f5ff;border-left:4px solid #1971c2;"><strong>Special process families cho semi equipment parts CNC — chi tiết surface treatment:</strong><br>
+Pattern <span class="code">PROC-{Process}-{NNN}</span> với Process families cụ thể cho ngành bán dẫn:
+<ul style="margin:6px 0 0;padding-left:22px;">
+ <li><span class="code">PROC-ANOD-{NNN}</span> — Anodize Type II/III per MIL-A-8625F (chamber Al parts). Tank chemistry: 15% H₂SO₄, 10-25°C, 12-150 V depending on coating thickness. Process Records per Job: thickness measurement (eddy current ASTM B244), coating weight ≥6 mg/in² Type III.</li>
+ <li><span class="code">PROC-EP-{NNN}</span> — Electropolish stainless 316L per SEMI F19 + ASTM B912. Bath: H₃PO₄ + H₂SO₄ + glycerin. Process Records: Ra profilometer (UHP ≤0.13μm, HP ≤0.38μm, GP ≤0.81μm), XPS Cr/Fe ratio (≥1.5), CrO/FeO (≥2.0).</li>
+ <li><span class="code">PROC-PASS-{NNN}</span> — Passivation per AMS 2700F (nitric/citric). Methods 1 (nitric) hoặc 2 (citric green-chem). Process Records: copper sulfate test pass evidence.</li>
+ <li><span class="code">PROC-PEO-{NNN}</span> — Plasma electrolytic oxidation cho parts chịu fluorine plasma (LAM RF chamber). Process Records: thickness ceramic layer, dielectric strength test.</li>
+ <li><span class="code">PROC-CLEAN-{NNN}</span> — Precision cleaning (cleanliness shop) — non-NADCAP nhưng critical. Process Records: IPA bath quality (TOC analyzer), DI water resistivity (≥18 MΩ·cm), cleanroom class.</li>
+ <li><span class="code">PROC-HE-LEAK-{NNN}</span> — Helium leak test service (third-party hoặc in-house). Process Records: leak rate, calibrated leak ID, threshold OEM-specific.</li>
+ <li><span class="code">PROC-OUTGAS-{NNN}</span> — Outgassing test lab (ASTM E595 + RGA). Process Records: TML/CVCM/WVR, lab cert (NASA/ESA listed), test conditions log.</li>
+</ul>
+<small>Lưu ý: ASML Grade 1 process nghiêm khắc nhất — banned HIO elements (Pb, Zn, Mg, P, Sn, Cd) trên surface phải zero tolerance. Anodize/EP/Passivation cho ASML chamber phải có additional declaration "HIO-free verified by XPS".</small></div>
 </div>
 
 <div class="section">
