@@ -124,15 +124,17 @@ foreach ($codes as $code) {
 
     $nextManifest = build_manifest($code, $baseRel, $manifest, $bodyRows, $authority);
     $nextState = build_state($code, $state, $authority);
-    if ($nextManifest !== $manifest) {
+    if (projection_changed($nextManifest, $manifest, ['updated_at'])) {
         $stats['manifest_written']++;
         if (!$opts['dry_run']) {
+            $nextManifest['updated_at'] = gmdate('c');
             write_json($store['manifest'], $nextManifest);
         }
     }
-    if ($nextState !== $state) {
+    if (projection_changed($nextState, $state, ['updated_at'])) {
         $stats['state_written']++;
         if (!$opts['dry_run']) {
+            $nextState['updated_at'] = gmdate('c');
             write_json($store['state'], $nextState);
         }
     }
@@ -258,18 +260,12 @@ function choose_authority(array $header, array $rows, array $legacy, string $bas
 
     $headerRev = normalise_revision((string)($header['revision'] ?? ''));
     $headerStatus = strtolower(trim((string)($header['status'] ?? '')));
-    if ($headerRev !== '' && in_array($headerStatus, ['approved', 'released', 'superseded', 'obsolete'], true)) {
-        return [
-            'source' => 'header',
-            'doc_code' => strtoupper((string)($header['doc_code'] ?? '')),
-            'revision' => $headerRev,
-            'legacy_revision' => legacy_revision($headerRev),
-            'effective_date' => valid_date((string)($header['effective_date'] ?? '')),
-            'status' => $headerStatus,
-            'path' => $baseRel,
-            'actor' => (string)($header['updated_by'] ?? 'dcc-version-ssot'),
-            'note' => 'dcc_header_projection',
-        ];
+    if ($headerRev !== '' && is_release_status($headerStatus)) {
+        return authority_from_header($header, $headerRev, $headerStatus, $baseRel);
+    }
+
+    if ($headerRev !== '' && legacy_is_generated_header_projection($legacy)) {
+        return authority_from_header($header, $headerRev, $headerStatus !== '' ? $headerStatus : 'draft', $baseRel);
     }
 
     if (($legacy['revision'] ?? '') !== '') {
@@ -287,20 +283,25 @@ function choose_authority(array $header, array $rows, array $legacy, string $bas
     }
 
     if ($headerRev !== '') {
-        return [
-            'source' => 'header',
-            'doc_code' => strtoupper((string)($header['doc_code'] ?? '')),
-            'revision' => $headerRev,
-            'legacy_revision' => legacy_revision($headerRev),
-            'effective_date' => valid_date((string)($header['effective_date'] ?? '')),
-            'status' => $headerStatus !== '' ? $headerStatus : 'draft',
-            'path' => $baseRel,
-            'actor' => (string)($header['updated_by'] ?? 'dcc-version-ssot'),
-            'note' => 'dcc_header_projection',
-        ];
+        return authority_from_header($header, $headerRev, $headerStatus !== '' ? $headerStatus : 'draft', $baseRel);
     }
 
     return null;
+}
+
+function authority_from_header(array $header, string $revision, string $status, string $baseRel): array
+{
+    return [
+        'source' => 'header',
+        'doc_code' => strtoupper((string)($header['doc_code'] ?? '')),
+        'revision' => $revision,
+        'legacy_revision' => legacy_revision($revision),
+        'effective_date' => valid_date((string)($header['effective_date'] ?? '')),
+        'status' => $status !== '' ? $status : 'draft',
+        'path' => $baseRel,
+        'actor' => (string)($header['updated_by'] ?? 'dcc-version-ssot'),
+        'note' => 'dcc_header_projection',
+    ];
 }
 
 function authority_from_row(array $row, string $source, string $baseRel, array $header): array
@@ -406,6 +407,7 @@ function build_manifest(string $code, string $baseRel, array $manifest, array $r
             continue;
         }
         $current = $rev === $authority['revision'] || truthy($row['is_current'] ?? false);
+        $authoritySource = (string)($row['authority_source'] ?? ($authority['source'] ?? 'dcc_revision'));
         $actor = trim((string)($row['released_by'] ?? ($row['approved_by'] ?? ($authority['actor'] ?? ''))));
         $date = first_nonempty([
             (string)($row['released_at'] ?? ''),
@@ -414,7 +416,7 @@ function build_manifest(string $code, string $baseRel, array $manifest, array $r
             (string)$authority['effective_date'],
         ]);
         $out[] = [
-            'status' => $current ? 'approved' : 'obsolete',
+            'status' => manifest_status($authority, $current),
             'version' => 'v' . legacy_revision($rev),
             'date' => $date,
             'by' => $actor,
@@ -423,7 +425,7 @@ function build_manifest(string $code, string $baseRel, array $manifest, array $r
             'file' => normalize_rel((string)($row['content_path'] ?? '')) ?: $baseRel,
             'note' => trim((string)($row['note'] ?? '')) ?: 'DCC controlled revision',
             'updateType' => trim((string)($row['update_type'] ?? '')),
-            'source' => 'dcc_document_revision',
+            'source' => version_source_label($authoritySource),
         ];
         $seen[$rev] = true;
     }
@@ -445,27 +447,33 @@ function build_manifest(string $code, string $baseRel, array $manifest, array $r
         $seen[$rev] = true;
     }
     $manifest['code'] = $code;
-    $manifest['updated_at'] = gmdate('c');
+    $manifest['updated_at'] = (string)($manifest['updated_at'] ?? '');
     $manifest['versions'] = array_values($out);
-    $manifest['version_source'] = 'dcc_document_revision';
+    $manifest['version_source'] = version_source_label((string)($authority['source'] ?? 'dcc_revision'));
     return $manifest;
 }
 
 function build_state(string $code, array $state, array $authority): array
 {
     $legacyRev = legacy_revision((string)$authority['revision']);
+    $status = strtolower(trim((string)($authority['status'] ?? '')));
+    $hasRelease = authority_has_release($authority);
     $state['code'] = $code;
-    $state['status'] = 'approved';
+    $state['status'] = $status !== '' ? $status : ($hasRelease ? 'approved' : 'draft');
     $state['revision'] = $legacyRev;
-    $state['released_revision'] = $legacyRev;
-    $state['has_release'] = true;
+    if ($hasRelease) {
+        $state['released_revision'] = $legacyRev;
+    } else {
+        unset($state['released_revision']);
+    }
+    $state['has_release'] = $hasRelease;
     $state['effective_date'] = (string)$authority['effective_date'];
-    $state['version_source'] = 'dcc_document_revision';
+    $state['version_source'] = version_source_label((string)($authority['source'] ?? 'dcc_revision'));
     $state['dcc_revision'] = (string)$authority['revision'];
     foreach (['lastEdit', 'submittedBy', 'submittedDate', 'submittedUpdateType', 'rejectedBy', 'rejectedDate', 'checked_out_by'] as $key) {
         unset($state[$key]);
     }
-    $state['updated_at'] = gmdate('c');
+    $state['updated_at'] = (string)($state['updated_at'] ?? '');
     return $state;
 }
 
@@ -577,6 +585,9 @@ function legacy_current_release(array $manifest, array $state): array
             'revision' => $rev,
             'effective_date' => valid_date((string)($entry['approvedDate'] ?? ($entry['date'] ?? ''))),
             'actor' => (string)($entry['approvedBy'] ?? ($entry['by'] ?? 'dcc-version-ssot')),
+            'source' => (string)($entry['source'] ?? ''),
+            'note' => (string)($entry['note'] ?? ''),
+            'version_source' => (string)($manifest['version_source'] ?? ''),
         ];
     }
     $rev = normalise_revision((string)($state['released_revision'] ?? ($state['revision'] ?? '')));
@@ -587,6 +598,9 @@ function legacy_current_release(array $manifest, array $state): array
         'revision' => $rev,
         'effective_date' => valid_date((string)($state['effective_date'] ?? ($state['updated_at'] ?? ''))),
         'actor' => (string)($state['approved_by'] ?? 'dcc-version-ssot'),
+        'source' => (string)($state['version_source'] ?? ''),
+        'note' => '',
+        'version_source' => (string)($state['version_source'] ?? ''),
     ];
 }
 
@@ -605,7 +619,60 @@ function synthetic_revision_row(array $authority): array
         'released_at' => $authority['effective_date'],
         'is_current' => true,
         'note' => $authority['note'],
+        'authority_source' => $authority['source'],
     ];
+}
+
+function projection_changed(array $next, array $current, array $volatileKeys): bool
+{
+    foreach ($volatileKeys as $key) {
+        unset($next[$key], $current[$key]);
+    }
+    return $next !== $current;
+}
+
+function is_release_status(string $status): bool
+{
+    return in_array(strtolower(trim($status)), ['approved', 'released', 'effective', 'initial_release', 'superseded', 'obsolete'], true);
+}
+
+function authority_has_release(array $authority): bool
+{
+    $source = (string)($authority['source'] ?? '');
+    if ($source === 'dcc_revision' || $source === 'legacy') {
+        return true;
+    }
+    return is_release_status((string)($authority['status'] ?? ''));
+}
+
+function manifest_status(array $authority, bool $current): string
+{
+    if (!$current) {
+        return 'obsolete';
+    }
+    $status = strtolower(trim((string)($authority['status'] ?? '')));
+    if (authority_has_release($authority)) {
+        return 'approved';
+    }
+    return $status !== '' ? $status : 'draft';
+}
+
+function version_source_label(string $source): string
+{
+    return match ($source) {
+        'header' => 'dcc_document_header',
+        'legacy' => 'legacy_manifest',
+        default => 'dcc_document_revision',
+    };
+}
+
+function legacy_is_generated_header_projection(array $legacy): bool
+{
+    if ($legacy === []) {
+        return false;
+    }
+    return (string)($legacy['note'] ?? '') === 'dcc_header_projection'
+        || (string)($legacy['version_source'] ?? '') === 'dcc_document_header';
 }
 
 function normalise_revision(string $raw): string
