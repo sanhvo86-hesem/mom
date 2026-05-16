@@ -764,6 +764,10 @@ const migrationDomainDefaults = new Map([
   ['181_drop_employees_identity_cols_final.sql', 'core_system'],
   ['182_restore_employees_identity_cols_again.sql', 'core_system'],
   ['183_drop_employees_identity_cols_with_parser_support.sql', 'core_system'],
+  ['184_cnc_milling_turning_org_chart_titles.sql', 'hcm_workforce'],
+  ['185_authz_decision_log.sql', 'core_system'],
+  ['186_authz_kernel_apikey_perms.sql', 'core_system'],
+  ['187_doc_access_log.sql', 'document_control'],
 ]);
 
 const tableDomainOverrides = {

@@ -2,8 +2,8 @@
   "_meta": {
     "version": "4.0",
     "description": "Computed formula library expanded from computed field registry and table-level KPI coverage.",
-    "generatedAt": "2026-05-14T03:22:35.227Z",
-    "formulaCount": 1517
+    "generatedAt": "2026-05-16T07:50:37.824Z",
+    "formulaCount": 1519
   },
   "total_line_amount": {
     "formulaId": "total_line_amount",
@@ -33179,6 +33179,48 @@
       {
         "type": "endpoint",
         "id": "core_system.translation_provider_config.transition"
+      }
+    ]
+  },
+  "f_auth_decision_event_record_count": {
+    "formulaId": "f_auth_decision_event_record_count",
+    "name": "Xác thực Decision sự kiện - Số bản ghi",
+    "nameEn": "Auth Decision Event Record Count",
+    "category": "system",
+    "domain": "core_system",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM auth_decision_event",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "auth_decision_event_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "core_system.auth_decision_event.list"
+      }
+    ]
+  },
+  "f_doc_access_log_record_count": {
+    "formulaId": "f_doc_access_log_record_count",
+    "name": "Doc truy cập Nhật ký - Số bản ghi",
+    "nameEn": "Doc Access Log Record Count",
+    "category": "compliance",
+    "domain": "document_control",
+    "unit": "records",
+    "outputType": "number",
+    "expression": "COUNT(*) FROM doc_access_log",
+    "source": "registry-auto",
+    "referencedBy": [
+      {
+        "type": "pack",
+        "id": "doc_access_log_kpi"
+      },
+      {
+        "type": "endpoint",
+        "id": "document_control.doc_access_log.list"
       }
     ]
   }

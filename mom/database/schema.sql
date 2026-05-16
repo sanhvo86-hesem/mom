@@ -42769,3 +42769,995 @@ COMMENT ON FUNCTION check_user_identity_drift() IS
 
 COMMIT;
 -- <<< END MIGRATION: 183_drop_employees_identity_cols_with_parser_support.sql
+
+-- >>> BEGIN MIGRATION: 184_cnc_milling_turning_org_chart_titles.sql
+-- ============================================================================
+-- Migration: 184_cnc_milling_turning_org_chart_titles.sql
+-- Description: Standardize CNC Milling/Turning org-chart titles and seed the
+--              CNC Turning workshop branch to match the Milling structure.
+-- Dependencies: 049_hcm_workforce_management.sql, 177_hcm_employee_position_assignments.sql
+-- Rollback:
+--   Data migration. Restore titles/assignments from pre-migration backup if needed.
+-- ============================================================================
+
+BEGIN;
+
+-- Keep the shop-floor org units explicit under the Production division while
+-- preserving Vietnamese display names and adding international English labels.
+WITH production AS (
+    SELECT hcm_org_unit_id
+      FROM hcm_org_units
+     WHERE org_unit_code = 'PRO'
+     LIMIT 1
+),
+seed_units AS (
+    SELECT *
+      FROM (VALUES
+        ('MILL',  'Phòng Phay CNC', 'CNC Milling Workshop', '#ef4444'),
+        ('LATHE', 'Phòng Tiện CNC', 'CNC Turning Workshop', '#0891b2')
+      ) AS v(org_unit_code, org_unit_name, label_en, color)
+)
+INSERT INTO hcm_org_units (
+    org_unit_code,
+    parent_org_unit_id,
+    org_unit_name,
+    org_unit_type,
+    status,
+    metadata,
+    source_record_id
+)
+SELECT
+    s.org_unit_code,
+    p.hcm_org_unit_id,
+    s.org_unit_name,
+    'department',
+    'active',
+    jsonb_build_object(
+        'label_en', s.label_en,
+        'color', s.color,
+        'catalog_source', 'cnc_org_chart_standard'
+    ),
+    s.org_unit_code
+  FROM seed_units s
+ CROSS JOIN production p
+ON CONFLICT (org_unit_code) DO UPDATE SET
+    parent_org_unit_id = EXCLUDED.parent_org_unit_id,
+    org_unit_name = EXCLUDED.org_unit_name,
+    org_unit_type = EXCLUDED.org_unit_type,
+    status = 'active',
+    metadata = COALESCE(hcm_org_units.metadata, '{}'::jsonb) || EXCLUDED.metadata,
+    source_record_id = EXCLUDED.source_record_id,
+    updated_at = now();
+
+-- Milling branch: keep existing IDs/assignments stable, but replace local
+-- phrasing with internationally recognizable CNC workshop titles.
+WITH refs AS (
+    SELECT
+        (SELECT hcm_org_unit_id FROM hcm_org_units WHERE org_unit_code = 'MILL' LIMIT 1) AS mill_unit_id,
+        (SELECT hcm_position_id FROM hcm_positions WHERE position_code = 'PRODUCTION_DIRECTOR' LIMIT 1) AS production_director_id
+),
+milling_manager AS (
+    INSERT INTO hcm_positions (
+        position_code,
+        position_title,
+        hcm_org_unit_id,
+        reports_to_position_id,
+        required_headcount,
+        employment_type,
+        status,
+        metadata,
+        source_record_id
+    )
+    SELECT
+        'CNC_WORKSHOP_MANAGER',
+        'CNC Milling Workshop Manager',
+        refs.mill_unit_id,
+        refs.production_director_id,
+        1,
+        'full_time',
+        'active',
+        jsonb_build_object(
+            'dept_code', 'MILL',
+            'catalog_source', 'cnc_org_chart_standard',
+            'org_chart_layout', jsonb_build_object('TB', jsonb_build_object('x', 2784, 'y', 816))
+        ),
+        'CNC_WORKSHOP_MANAGER'
+      FROM refs
+    ON CONFLICT (position_code) DO UPDATE SET
+        position_title = EXCLUDED.position_title,
+        hcm_org_unit_id = EXCLUDED.hcm_org_unit_id,
+        reports_to_position_id = EXCLUDED.reports_to_position_id,
+        required_headcount = GREATEST(1, hcm_positions.required_headcount),
+        employment_type = EXCLUDED.employment_type,
+        status = 'active',
+        metadata = COALESCE(hcm_positions.metadata, '{}'::jsonb) || EXCLUDED.metadata,
+        source_record_id = EXCLUDED.source_record_id,
+        updated_at = now()
+    RETURNING hcm_position_id
+),
+milling_deputy AS (
+    INSERT INTO hcm_positions (
+        position_code,
+        position_title,
+        hcm_org_unit_id,
+        reports_to_position_id,
+        required_headcount,
+        employment_type,
+        status,
+        metadata,
+        source_record_id
+    )
+    SELECT
+        'DMILL',
+        'Deputy CNC Milling Workshop Manager',
+        refs.mill_unit_id,
+        milling_manager.hcm_position_id,
+        1,
+        'full_time',
+        'active',
+        jsonb_build_object(
+            'dept_code', 'MILL',
+            'catalog_source', 'cnc_org_chart_standard',
+            'org_chart_layout', jsonb_build_object('TB', jsonb_build_object('x', 2784, 'y', 984))
+        ),
+        'DMILL'
+      FROM refs
+     CROSS JOIN milling_manager
+    ON CONFLICT (position_code) DO UPDATE SET
+        position_title = EXCLUDED.position_title,
+        hcm_org_unit_id = EXCLUDED.hcm_org_unit_id,
+        reports_to_position_id = EXCLUDED.reports_to_position_id,
+        required_headcount = EXCLUDED.required_headcount,
+        employment_type = EXCLUDED.employment_type,
+        status = 'active',
+        metadata = COALESCE(hcm_positions.metadata, '{}'::jsonb) || EXCLUDED.metadata,
+        source_record_id = EXCLUDED.source_record_id,
+        updated_at = now()
+    RETURNING hcm_position_id
+),
+milling_shift AS (
+    INSERT INTO hcm_positions (
+        position_code,
+        position_title,
+        hcm_org_unit_id,
+        reports_to_position_id,
+        required_headcount,
+        employment_type,
+        status,
+        metadata,
+        source_record_id
+    )
+    SELECT
+        'SHIFT_LEADER',
+        'CNC Milling Shift Leader',
+        refs.mill_unit_id,
+        milling_deputy.hcm_position_id,
+        1,
+        'full_time',
+        'active',
+        jsonb_build_object(
+            'dept_code', 'MILL',
+            'catalog_source', 'cnc_org_chart_standard',
+            'org_chart_layout', jsonb_build_object('TB', jsonb_build_object('x', 2784, 'y', 1152))
+        ),
+        'SHIFT_LEADER'
+      FROM refs
+     CROSS JOIN milling_deputy
+    ON CONFLICT (position_code) DO UPDATE SET
+        position_title = EXCLUDED.position_title,
+        hcm_org_unit_id = EXCLUDED.hcm_org_unit_id,
+        reports_to_position_id = EXCLUDED.reports_to_position_id,
+        required_headcount = EXCLUDED.required_headcount,
+        employment_type = EXCLUDED.employment_type,
+        status = 'active',
+        metadata = COALESCE(hcm_positions.metadata, '{}'::jsonb) || EXCLUDED.metadata,
+        source_record_id = EXCLUDED.source_record_id,
+        updated_at = now()
+    RETURNING hcm_position_id
+)
+INSERT INTO hcm_positions (
+    position_code,
+    position_title,
+    hcm_org_unit_id,
+    reports_to_position_id,
+    required_headcount,
+    employment_type,
+    status,
+    metadata,
+    source_record_id
+)
+SELECT
+    v.position_code,
+    v.position_title,
+    refs.mill_unit_id,
+    milling_shift.hcm_position_id,
+    v.required_headcount,
+    'full_time',
+    'active',
+    jsonb_build_object(
+        'dept_code', 'MILL',
+        'catalog_source', 'cnc_org_chart_standard',
+        'org_chart_layout', jsonb_build_object('TB', jsonb_build_object('x', v.layout_x, 'y', v.layout_y))
+    ),
+    v.position_code
+  FROM refs
+ CROSS JOIN milling_shift
+ CROSS JOIN (VALUES
+    ('CNC_OPERATOR',      'CNC Milling Machinist',        35, 2616, 1320),
+    ('SETUP_TECHNICIAN', 'CNC Milling Setup Technician',  1, 2928, 1320)
+ ) AS v(position_code, position_title, required_headcount, layout_x, layout_y)
+ON CONFLICT (position_code) DO UPDATE SET
+    position_title = EXCLUDED.position_title,
+    hcm_org_unit_id = EXCLUDED.hcm_org_unit_id,
+    reports_to_position_id = EXCLUDED.reports_to_position_id,
+    required_headcount = EXCLUDED.required_headcount,
+    employment_type = EXCLUDED.employment_type,
+    status = 'active',
+    metadata = COALESCE(hcm_positions.metadata, '{}'::jsonb) || EXCLUDED.metadata,
+    source_record_id = EXCLUDED.source_record_id,
+    updated_at = now();
+
+-- Turning branch: mirror the Milling hierarchy with process-specific titles.
+WITH refs AS (
+    SELECT
+        (SELECT hcm_org_unit_id FROM hcm_org_units WHERE org_unit_code = 'LATHE' LIMIT 1) AS turning_unit_id,
+        (SELECT hcm_position_id FROM hcm_positions WHERE position_code = 'PRODUCTION_DIRECTOR' LIMIT 1) AS production_director_id,
+        GREATEST(1, (
+            SELECT count(*)::int
+              FROM users
+             WHERE metadata->'role_source'->>'excel_role' = 'Production (Lathe)'
+        )) AS turning_operator_headcount
+),
+turning_manager AS (
+    INSERT INTO hcm_positions (
+        position_code,
+        position_title,
+        hcm_org_unit_id,
+        reports_to_position_id,
+        required_headcount,
+        employment_type,
+        status,
+        metadata,
+        source_record_id
+    )
+    SELECT
+        'LATHE WORKSHOP MANAGER',
+        'CNC Turning Workshop Manager',
+        refs.turning_unit_id,
+        refs.production_director_id,
+        1,
+        'full_time',
+        'active',
+        jsonb_build_object(
+            'dept_code', 'LATHE',
+            'catalog_source', 'cnc_org_chart_standard',
+            'org_chart_layout', jsonb_build_object('TB', jsonb_build_object('x', 3288, 'y', 816))
+        ),
+        'LATHE WORKSHOP MANAGER'
+      FROM refs
+    ON CONFLICT (position_code) DO UPDATE SET
+        position_title = EXCLUDED.position_title,
+        hcm_org_unit_id = EXCLUDED.hcm_org_unit_id,
+        reports_to_position_id = EXCLUDED.reports_to_position_id,
+        required_headcount = EXCLUDED.required_headcount,
+        employment_type = EXCLUDED.employment_type,
+        status = 'active',
+        metadata = COALESCE(hcm_positions.metadata, '{}'::jsonb) || EXCLUDED.metadata,
+        source_record_id = EXCLUDED.source_record_id,
+        updated_at = now()
+    RETURNING hcm_position_id
+),
+turning_deputy AS (
+    INSERT INTO hcm_positions (
+        position_code,
+        position_title,
+        hcm_org_unit_id,
+        reports_to_position_id,
+        required_headcount,
+        employment_type,
+        status,
+        metadata,
+        source_record_id
+    )
+    SELECT
+        'CNC_TURNING_DEPUTY_MANAGER',
+        'Deputy CNC Turning Workshop Manager',
+        refs.turning_unit_id,
+        turning_manager.hcm_position_id,
+        1,
+        'full_time',
+        'active',
+        jsonb_build_object(
+            'dept_code', 'LATHE',
+            'catalog_source', 'cnc_org_chart_standard',
+            'org_chart_layout', jsonb_build_object('TB', jsonb_build_object('x', 3288, 'y', 984))
+        ),
+        'CNC_TURNING_DEPUTY_MANAGER'
+      FROM refs
+     CROSS JOIN turning_manager
+    ON CONFLICT (position_code) DO UPDATE SET
+        position_title = EXCLUDED.position_title,
+        hcm_org_unit_id = EXCLUDED.hcm_org_unit_id,
+        reports_to_position_id = EXCLUDED.reports_to_position_id,
+        required_headcount = EXCLUDED.required_headcount,
+        employment_type = EXCLUDED.employment_type,
+        status = 'active',
+        metadata = COALESCE(hcm_positions.metadata, '{}'::jsonb) || EXCLUDED.metadata,
+        source_record_id = EXCLUDED.source_record_id,
+        updated_at = now()
+    RETURNING hcm_position_id
+),
+turning_shift AS (
+    INSERT INTO hcm_positions (
+        position_code,
+        position_title,
+        hcm_org_unit_id,
+        reports_to_position_id,
+        required_headcount,
+        employment_type,
+        status,
+        metadata,
+        source_record_id
+    )
+    SELECT
+        'CNC_TURNING_SHIFT_LEADER',
+        'CNC Turning Shift Leader',
+        refs.turning_unit_id,
+        turning_deputy.hcm_position_id,
+        1,
+        'full_time',
+        'active',
+        jsonb_build_object(
+            'dept_code', 'LATHE',
+            'catalog_source', 'cnc_org_chart_standard',
+            'org_chart_layout', jsonb_build_object('TB', jsonb_build_object('x', 3288, 'y', 1152))
+        ),
+        'CNC_TURNING_SHIFT_LEADER'
+      FROM refs
+     CROSS JOIN turning_deputy
+    ON CONFLICT (position_code) DO UPDATE SET
+        position_title = EXCLUDED.position_title,
+        hcm_org_unit_id = EXCLUDED.hcm_org_unit_id,
+        reports_to_position_id = EXCLUDED.reports_to_position_id,
+        required_headcount = EXCLUDED.required_headcount,
+        employment_type = EXCLUDED.employment_type,
+        status = 'active',
+        metadata = COALESCE(hcm_positions.metadata, '{}'::jsonb) || EXCLUDED.metadata,
+        source_record_id = EXCLUDED.source_record_id,
+        updated_at = now()
+    RETURNING hcm_position_id
+)
+INSERT INTO hcm_positions (
+    position_code,
+    position_title,
+    hcm_org_unit_id,
+    reports_to_position_id,
+    required_headcount,
+    employment_type,
+    status,
+    metadata,
+    source_record_id
+)
+SELECT
+    v.position_code,
+    v.position_title,
+    refs.turning_unit_id,
+    turning_shift.hcm_position_id,
+    CASE WHEN v.position_code = 'CNC_TURNING_MACHINIST'
+         THEN refs.turning_operator_headcount
+         ELSE v.required_headcount
+    END,
+    'full_time',
+    'active',
+    jsonb_build_object(
+        'dept_code', 'LATHE',
+        'catalog_source', 'cnc_org_chart_standard',
+        'org_chart_layout', jsonb_build_object('TB', jsonb_build_object('x', v.layout_x, 'y', v.layout_y))
+    ),
+    v.position_code
+  FROM refs
+ CROSS JOIN turning_shift
+ CROSS JOIN (VALUES
+    ('CNC_TURNING_MACHINIST',        'CNC Turning Machinist',        1, 3120, 1320),
+    ('CNC_TURNING_SETUP_TECHNICIAN', 'CNC Turning Setup Technician', 1, 3440, 1320)
+ ) AS v(position_code, position_title, required_headcount, layout_x, layout_y)
+ON CONFLICT (position_code) DO UPDATE SET
+    position_title = EXCLUDED.position_title,
+    hcm_org_unit_id = EXCLUDED.hcm_org_unit_id,
+    reports_to_position_id = EXCLUDED.reports_to_position_id,
+    required_headcount = EXCLUDED.required_headcount,
+    employment_type = EXCLUDED.employment_type,
+    status = 'active',
+    metadata = COALESCE(hcm_positions.metadata, '{}'::jsonb) || EXCLUDED.metadata,
+    source_record_id = EXCLUDED.source_record_id,
+    updated_at = now();
+
+-- Move Production (Lathe) users out of the generic MILL operator position
+-- through the assignment table. The ended CNC_OPERATOR row blocks stale
+-- users/hcm_employees fallbacks from resurrecting the old pair in the chart.
+DO $$
+DECLARE
+    v_mill_operator_id UUID;
+    v_turning_operator_id UUID;
+    v_turning_unit_id UUID;
+    v_employee RECORD;
+BEGIN
+    SELECT hcm_position_id
+      INTO v_mill_operator_id
+      FROM hcm_positions
+     WHERE position_code = 'CNC_OPERATOR'
+     LIMIT 1;
+
+    SELECT hcm_position_id, hcm_org_unit_id
+      INTO v_turning_operator_id, v_turning_unit_id
+      FROM hcm_positions
+     WHERE position_code = 'CNC_TURNING_MACHINIST'
+     LIMIT 1;
+
+    IF v_mill_operator_id IS NULL OR v_turning_operator_id IS NULL OR v_turning_unit_id IS NULL THEN
+        RAISE EXCEPTION 'CNC turning operator migration prerequisites missing';
+    END IF;
+
+    FOR v_employee IN
+        SELECT u.employee_id
+          FROM users u
+          JOIN hcm_employees h ON h.employee_id = u.employee_id
+         WHERE u.deleted_at IS NULL
+           AND COALESCE(u.status, 'active') <> 'inactive'
+           AND u.metadata->'role_source'->>'excel_role' = 'Production (Lathe)'
+    LOOP
+        UPDATE hcm_employee_position_assignments
+           SET assignment_status = 'ended',
+               is_primary = false,
+               effective_to = COALESCE(effective_to, CURRENT_DATE),
+               updated_at = now(),
+               metadata = COALESCE(metadata, '{}'::jsonb)
+                    || jsonb_build_object('ended_by_migration', '184_cnc_milling_turning_org_chart_titles')
+         WHERE employee_id = v_employee.employee_id
+           AND hcm_position_id = v_mill_operator_id
+           AND assignment_status = 'active';
+
+        IF NOT EXISTS (
+            SELECT 1
+              FROM hcm_employee_position_assignments
+             WHERE employee_id = v_employee.employee_id
+               AND hcm_position_id = v_mill_operator_id
+        ) THEN
+            INSERT INTO hcm_employee_position_assignments (
+                employee_id,
+                hcm_position_id,
+                hcm_org_unit_id,
+                assignment_type,
+                assignment_status,
+                is_primary,
+                fte_fraction,
+                effective_from,
+                effective_to,
+                source_system,
+                source_record_id,
+                metadata
+            ) VALUES (
+                v_employee.employee_id,
+                v_mill_operator_id,
+                (SELECT hcm_org_unit_id FROM hcm_positions WHERE hcm_position_id = v_mill_operator_id),
+                'primary',
+                'ended',
+                false,
+                1.00,
+                CURRENT_DATE,
+                CURRENT_DATE,
+                'QMS',
+                '184-lathe-old-milling-operator-' || v_employee.employee_id,
+                jsonb_build_object('fallback_blocker', true, 'reason', 'Production (Lathe) moved to CNC Turning Machinist')
+            );
+        END IF;
+
+        IF EXISTS (
+            SELECT 1
+              FROM hcm_employee_position_assignments
+             WHERE employee_id = v_employee.employee_id
+               AND hcm_position_id = v_turning_operator_id
+               AND assignment_status = 'active'
+        ) THEN
+            UPDATE hcm_employee_position_assignments
+               SET hcm_org_unit_id = v_turning_unit_id,
+                   assignment_type = 'primary',
+                   is_primary = true,
+                   effective_to = NULL,
+                   updated_at = now(),
+                   metadata = COALESCE(metadata, '{}'::jsonb)
+                        || jsonb_build_object('aligned_by_migration', '184_cnc_milling_turning_org_chart_titles')
+             WHERE employee_id = v_employee.employee_id
+               AND hcm_position_id = v_turning_operator_id
+               AND assignment_status = 'active';
+        ELSE
+            INSERT INTO hcm_employee_position_assignments (
+                employee_id,
+                hcm_position_id,
+                hcm_org_unit_id,
+                assignment_type,
+                assignment_status,
+                is_primary,
+                fte_fraction,
+                effective_from,
+                source_system,
+                source_record_id,
+                metadata
+            ) VALUES (
+                v_employee.employee_id,
+                v_turning_operator_id,
+                v_turning_unit_id,
+                'primary',
+                'active',
+                true,
+                1.00,
+                CURRENT_DATE,
+                'QMS',
+                '184-lathe-turning-operator-' || v_employee.employee_id,
+                jsonb_build_object('assignment_source', 'users.metadata.role_source.excel_role=Production (Lathe)')
+            );
+        END IF;
+    END LOOP;
+END $$;
+
+-- Align the sample leadership assignments shown on the org chart:
+-- Huỳnh Minh Quan owns CNC Turning Workshop Manager; Nguyễn Quốc Tuấn owns the
+-- CNC Milling Shift Leader node.
+DO $$
+DECLARE
+    v_huynh_employee_id VARCHAR(20);
+    v_tuan_employee_id VARCHAR(20);
+    v_mill_shift_id UUID;
+    v_mill_shift_unit_id UUID;
+    v_turning_manager_id UUID;
+    v_turning_manager_unit_id UUID;
+BEGIN
+    SELECT employee_id INTO v_huynh_employee_id FROM users WHERE username = 'quan.huynh' LIMIT 1;
+    SELECT employee_id INTO v_tuan_employee_id FROM users WHERE username = 'tuan.nguyen' LIMIT 1;
+
+    SELECT hcm_position_id, hcm_org_unit_id
+      INTO v_mill_shift_id, v_mill_shift_unit_id
+      FROM hcm_positions
+     WHERE position_code = 'SHIFT_LEADER'
+     LIMIT 1;
+
+    SELECT hcm_position_id, hcm_org_unit_id
+      INTO v_turning_manager_id, v_turning_manager_unit_id
+      FROM hcm_positions
+     WHERE position_code = 'LATHE WORKSHOP MANAGER'
+     LIMIT 1;
+
+    IF v_huynh_employee_id IS NOT NULL AND v_mill_shift_id IS NOT NULL THEN
+        UPDATE hcm_employee_position_assignments
+           SET assignment_status = 'ended',
+               is_primary = false,
+               effective_to = COALESCE(effective_to, CURRENT_DATE),
+               updated_at = now(),
+               metadata = COALESCE(metadata, '{}'::jsonb)
+                    || jsonb_build_object('ended_by_migration', '184_cnc_milling_turning_org_chart_titles')
+         WHERE employee_id = v_huynh_employee_id
+           AND hcm_position_id = v_mill_shift_id
+           AND assignment_status = 'active';
+
+        IF NOT EXISTS (
+            SELECT 1 FROM hcm_employee_position_assignments
+             WHERE employee_id = v_huynh_employee_id
+               AND hcm_position_id = v_mill_shift_id
+        ) THEN
+            INSERT INTO hcm_employee_position_assignments (
+                employee_id,
+                hcm_position_id,
+                hcm_org_unit_id,
+                assignment_type,
+                assignment_status,
+                is_primary,
+                fte_fraction,
+                effective_from,
+                effective_to,
+                source_system,
+                source_record_id,
+                metadata
+            ) VALUES (
+                v_huynh_employee_id,
+                v_mill_shift_id,
+                v_mill_shift_unit_id,
+                'primary',
+                'ended',
+                false,
+                1.00,
+                CURRENT_DATE,
+                CURRENT_DATE,
+                'QMS',
+                '184-huynh-old-milling-shift',
+                jsonb_build_object('fallback_blocker', true, 'reason', 'Huynh assigned to CNC Turning Workshop Manager')
+            );
+        END IF;
+    END IF;
+
+    IF v_tuan_employee_id IS NOT NULL AND v_turning_manager_id IS NOT NULL THEN
+        UPDATE hcm_employee_position_assignments
+           SET assignment_status = 'ended',
+               is_primary = false,
+               effective_to = COALESCE(effective_to, CURRENT_DATE),
+               updated_at = now(),
+               metadata = COALESCE(metadata, '{}'::jsonb)
+                    || jsonb_build_object('ended_by_migration', '184_cnc_milling_turning_org_chart_titles')
+         WHERE employee_id = v_tuan_employee_id
+           AND hcm_position_id = v_turning_manager_id
+           AND assignment_status = 'active';
+    END IF;
+
+    IF v_huynh_employee_id IS NOT NULL AND v_turning_manager_id IS NOT NULL THEN
+        IF EXISTS (
+            SELECT 1
+              FROM hcm_employee_position_assignments
+             WHERE employee_id = v_huynh_employee_id
+               AND hcm_position_id = v_turning_manager_id
+               AND assignment_status = 'active'
+        ) THEN
+            UPDATE hcm_employee_position_assignments
+               SET hcm_org_unit_id = v_turning_manager_unit_id,
+                   assignment_type = 'primary',
+                   is_primary = true,
+                   effective_to = NULL,
+                   updated_at = now(),
+                   metadata = COALESCE(metadata, '{}'::jsonb)
+                        || jsonb_build_object('aligned_by_migration', '184_cnc_milling_turning_org_chart_titles')
+             WHERE employee_id = v_huynh_employee_id
+               AND hcm_position_id = v_turning_manager_id
+               AND assignment_status = 'active';
+        ELSE
+            INSERT INTO hcm_employee_position_assignments (
+                employee_id,
+                hcm_position_id,
+                hcm_org_unit_id,
+                assignment_type,
+                assignment_status,
+                is_primary,
+                fte_fraction,
+                effective_from,
+                source_system,
+                source_record_id,
+                metadata
+            ) VALUES (
+                v_huynh_employee_id,
+                v_turning_manager_id,
+                v_turning_manager_unit_id,
+                'primary',
+                'active',
+                true,
+                1.00,
+                CURRENT_DATE,
+                'QMS',
+                '184-huynh-turning-manager',
+                jsonb_build_object('assignment_source', 'org_chart_standard')
+            );
+        END IF;
+    END IF;
+
+    IF v_tuan_employee_id IS NOT NULL AND v_mill_shift_id IS NOT NULL THEN
+        IF EXISTS (
+            SELECT 1
+              FROM hcm_employee_position_assignments
+             WHERE employee_id = v_tuan_employee_id
+               AND hcm_position_id = v_mill_shift_id
+               AND assignment_status = 'active'
+        ) THEN
+            UPDATE hcm_employee_position_assignments
+               SET hcm_org_unit_id = v_mill_shift_unit_id,
+                   assignment_type = 'primary',
+                   is_primary = true,
+                   effective_to = NULL,
+                   updated_at = now(),
+                   metadata = COALESCE(metadata, '{}'::jsonb)
+                        || jsonb_build_object('aligned_by_migration', '184_cnc_milling_turning_org_chart_titles')
+             WHERE employee_id = v_tuan_employee_id
+               AND hcm_position_id = v_mill_shift_id
+               AND assignment_status = 'active';
+        ELSE
+            INSERT INTO hcm_employee_position_assignments (
+                employee_id,
+                hcm_position_id,
+                hcm_org_unit_id,
+                assignment_type,
+                assignment_status,
+                is_primary,
+                fte_fraction,
+                effective_from,
+                source_system,
+                source_record_id,
+                metadata
+            ) VALUES (
+                v_tuan_employee_id,
+                v_mill_shift_id,
+                v_mill_shift_unit_id,
+                'primary',
+                'active',
+                true,
+                1.00,
+                CURRENT_DATE,
+                'QMS',
+                '184-tuan-milling-shift-leader',
+                jsonb_build_object('assignment_source', 'org_chart_standard')
+            );
+        END IF;
+    END IF;
+END $$;
+
+COMMIT;
+-- <<< END MIGRATION: 184_cnc_milling_turning_org_chart_titles.sql
+
+-- >>> BEGIN MIGRATION: 185_authz_decision_log.sql
+-- ============================================================================
+-- Migration 185: Authorization decision log (auth_decision_event)
+-- ----------------------------------------------------------------------------
+-- Introduces a dedicated, partitioned, append-only log for every authorization
+-- decision rendered by AuthorizationKernel (PDP). Sits alongside audit_events:
+--
+--   * audit_events       — business mutations ("user X created user Y")
+--   * auth_decision_event — authorization outcomes ("HR Manager DENIED
+--                          users.create with reason=no_grant")
+--
+-- Separation is deliberate (NIST SP 800-53 AU-2 + AU-3 — events of authorization
+-- decisions are auditable independently of the business event they gate).
+-- Filling this table is what lets the matrix admin diagnose "why was role X
+-- forbidden from action Y" without grepping PHP source.
+--
+-- Rationale:
+--   * 21 CFR Part 11 §11.10(d,e)  — limit access to authorized individuals,
+--                                    record AAL2 step-up evidence.
+--   * ISO 27001 A.9.4 / A.12.4    — privileged access logging.
+--   * NIST SP 800-53 AC-3, AC-6   — access enforcement, least privilege.
+--
+-- Compatible with both POSTGRES_PRIMARY and JSON_ONLY modes — kernel silently
+-- skips logging when DB unavailable, decision result is unaffected.
+-- ============================================================================
+
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS auth_decision_event (
+    decision_id      BIGSERIAL,
+    occurred_at      TIMESTAMPTZ     NOT NULL DEFAULT now(),
+    user_id          UUID,
+    actor_username   VARCHAR(80),
+    subject_role     VARCHAR(60),
+    subject_roles    TEXT[]          NOT NULL DEFAULT ARRAY[]::TEXT[],
+    permission_code  VARCHAR(80)     NOT NULL,
+    route_action     VARCHAR(120),
+    resource_kind    VARCHAR(40),
+    resource_id      TEXT,
+    decision         VARCHAR(16)     NOT NULL
+                     CHECK (decision IN ('allow', 'deny', 'stepup')),
+    reason_code      VARCHAR(40)     NOT NULL,
+    current_aal      SMALLINT,
+    required_aal     SMALLINT,
+    matched_grant    TEXT,
+    matched_deny     TEXT,
+    request_id       UUID,
+    ip_addr          INET,
+    user_agent       TEXT,
+    extra            JSONB           NOT NULL DEFAULT '{}'::jsonb,
+    PRIMARY KEY (decision_id, occurred_at)
+) PARTITION BY RANGE (occurred_at);
+
+COMMENT ON TABLE auth_decision_event IS
+    'Append-only authorization decision log (PDP audit). One row per allow/deny/stepup decision.';
+
+-- Quarterly partitions covering 2026Q2..2027Q4 + default.
+CREATE TABLE IF NOT EXISTS auth_decision_event_2026_q2 PARTITION OF auth_decision_event
+    FOR VALUES FROM ('2026-04-01') TO ('2026-07-01');
+CREATE TABLE IF NOT EXISTS auth_decision_event_2026_q3 PARTITION OF auth_decision_event
+    FOR VALUES FROM ('2026-07-01') TO ('2026-10-01');
+CREATE TABLE IF NOT EXISTS auth_decision_event_2026_q4 PARTITION OF auth_decision_event
+    FOR VALUES FROM ('2026-10-01') TO ('2027-01-01');
+CREATE TABLE IF NOT EXISTS auth_decision_event_2027_q1 PARTITION OF auth_decision_event
+    FOR VALUES FROM ('2027-01-01') TO ('2027-04-01');
+CREATE TABLE IF NOT EXISTS auth_decision_event_2027_q2 PARTITION OF auth_decision_event
+    FOR VALUES FROM ('2027-04-01') TO ('2027-07-01');
+CREATE TABLE IF NOT EXISTS auth_decision_event_2027_q3 PARTITION OF auth_decision_event
+    FOR VALUES FROM ('2027-07-01') TO ('2027-10-01');
+CREATE TABLE IF NOT EXISTS auth_decision_event_2027_q4 PARTITION OF auth_decision_event
+    FOR VALUES FROM ('2027-10-01') TO ('2028-01-01');
+CREATE TABLE IF NOT EXISTS auth_decision_event_default PARTITION OF auth_decision_event DEFAULT;
+
+-- Indexes (created on the parent, propagate to partitions).
+CREATE INDEX IF NOT EXISTS idx_auth_decision_user_time
+    ON auth_decision_event (user_id, occurred_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_auth_decision_perm_decision_time
+    ON auth_decision_event (permission_code, decision, occurred_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_auth_decision_role_decision_time
+    ON auth_decision_event (subject_role, decision, occurred_at DESC);
+
+CREATE INDEX IF NOT EXISTS idx_auth_decision_deny_only_time
+    ON auth_decision_event (occurred_at DESC)
+    WHERE decision = 'deny';
+
+COMMIT;
+
+-- ============================================================================
+-- Rollback (manual):
+--   BEGIN;
+--   DROP TABLE IF EXISTS
+--       auth_decision_event_2026_q2,
+--       auth_decision_event_2026_q3,
+--       auth_decision_event_2026_q4,
+--       auth_decision_event_2027_q1,
+--       auth_decision_event_2027_q2,
+--       auth_decision_event_2027_q3,
+--       auth_decision_event_2027_q4,
+--       auth_decision_event_default CASCADE;
+--   DROP TABLE IF EXISTS auth_decision_event CASCADE;
+--   COMMIT;
+-- ============================================================================
+-- <<< END MIGRATION: 185_authz_decision_log.sql
+
+-- >>> BEGIN MIGRATION: 186_authz_kernel_apikey_perms.sql
+-- ============================================================================
+-- Migration 186: Authorization kernel — apikeys + jwt catalog entries
+-- ----------------------------------------------------------------------------
+-- Adds the catalog rows for API key + JWT management permissions so the
+-- AuthorizationKernel can gate ApiKeyController correctly. Without these
+-- rows the kernel falls through to `no_grant_catalog_missing` even when a
+-- role's grant pattern matches — costing observability and surprise behaviour
+-- in JSON_ONLY mode.
+--
+-- Grants only the admin tier (it_admin explicit; ceo via existing `*` wildcard).
+-- Every other role gets default-deny via the kernel.
+--
+-- Rationale:
+--   * apikeys.view    AAL2 — list API keys (hashes redacted at the response layer)
+--   * apikeys.create  AAL2, dangerous — mints a long-lived service credential
+--   * apikeys.revoke  AAL2, dangerous — instant credential kill-switch
+--   * jwt.issue       AAL2, dangerous — short-lived bearer tokens
+--
+-- Compatibility: rows are idempotent on permission_code, role grants use
+-- jsonb_set with array append guarded by NOT IN to avoid duplicate keys.
+-- Safe to re-run.
+-- ============================================================================
+
+BEGIN;
+
+-- ── (1) Catalog rows ─────────────────────────────────────────────────────
+INSERT INTO permission_catalog
+    (permission_code, module_code, activity_code, label, label_vi,
+     description, description_vi,
+     is_dangerous, requires_reason, required_aal_level,
+     sod_tags, compliance_refs, sort_order, is_active,
+     payload_schema_version)
+VALUES
+    ('apikeys.view',   'apikeys', '01',
+     'List API keys',  'Xem danh sách API key',
+     'List API service credentials (hashes redacted).',
+     'Xem danh sách API key dịch vụ (đã ẩn hash).',
+     FALSE, FALSE, 2,
+     ARRAY['credentials']::TEXT[], ARRAY['ISO27001:A.9.4','NIST:AC-3']::TEXT[],
+     500, TRUE, '1.0'),
+    ('apikeys.create', 'apikeys', '02',
+     'Create API key', 'Tạo API key',
+     'Mint a new long-lived API service credential. The raw key is shown once.',
+     'Tạo API key dịch vụ mới. Khóa thô chỉ hiện 1 lần.',
+     TRUE, TRUE, 2,
+     ARRAY['credentials']::TEXT[], ARRAY['ISO27001:A.9.4','NIST:AC-3','21CFR11:11.10(d)']::TEXT[],
+     501, TRUE, '1.0'),
+    ('apikeys.revoke', 'apikeys', '03',
+     'Revoke API key', 'Thu hồi API key',
+     'Revoke an existing API service credential. Effect is immediate.',
+     'Thu hồi API key dịch vụ. Có hiệu lực ngay.',
+     TRUE, TRUE, 2,
+     ARRAY['credentials']::TEXT[], ARRAY['ISO27001:A.9.4','NIST:AC-3','21CFR11:11.10(d)']::TEXT[],
+     502, TRUE, '1.0'),
+    ('jwt.issue',      'apikeys', '04',
+     'Issue JWT token', 'Cấp JWT',
+     'Issue a short-lived JWT bearer token for service-to-service auth.',
+     'Cấp JWT bearer ngắn hạn cho gọi dịch vụ.',
+     TRUE, FALSE, 2,
+     ARRAY['credentials']::TEXT[], ARRAY['ISO27001:A.9.4','NIST:AC-3']::TEXT[],
+     503, TRUE, '1.0')
+ON CONFLICT (permission_code) DO UPDATE SET
+    label              = EXCLUDED.label,
+    label_vi           = EXCLUDED.label_vi,
+    description        = EXCLUDED.description,
+    description_vi     = EXCLUDED.description_vi,
+    is_dangerous       = EXCLUDED.is_dangerous,
+    required_aal_level = EXCLUDED.required_aal_level,
+    sod_tags           = EXCLUDED.sod_tags,
+    compliance_refs    = EXCLUDED.compliance_refs,
+    is_active          = EXCLUDED.is_active,
+    updated_at         = now();
+
+-- ── (2) Grant the new perms to it_admin explicitly ───────────────────────
+-- ceo already holds `*` (allowAllPermissions=true), so it inherits these.
+-- Use a function to append a pattern to the grants[] array if missing.
+DO $migration_186$
+DECLARE
+    grants_now JSONB;
+    new_pat TEXT;
+    target_role TEXT := 'it_admin';
+    candidates TEXT[] := ARRAY['apikeys.*', 'jwt.issue'];
+BEGIN
+    SELECT permissions->'permissions' INTO grants_now
+      FROM roles WHERE role_code = target_role;
+
+    IF grants_now IS NULL THEN
+        RAISE NOTICE 'Migration 186: role % not present — skipping grant.', target_role;
+        RETURN;
+    END IF;
+
+    FOREACH new_pat IN ARRAY candidates LOOP
+        IF NOT (grants_now @> to_jsonb(new_pat)) THEN
+            grants_now := grants_now || to_jsonb(new_pat);
+        END IF;
+    END LOOP;
+
+    UPDATE roles
+       SET permissions = jsonb_set(permissions, '{permissions}', grants_now),
+           updated_at  = now(),
+           row_version = row_version + 1
+     WHERE role_code = target_role;
+END
+$migration_186$;
+
+COMMIT;
+
+-- ============================================================================
+-- Rollback (manual):
+--   BEGIN;
+--   UPDATE roles
+--      SET permissions = jsonb_set(
+--            permissions,
+--            '{permissions}',
+--            (SELECT jsonb_agg(p) FROM jsonb_array_elements(permissions->'permissions') p
+--              WHERE p::text NOT IN ('"apikeys.*"','"jwt.issue"'))
+--          ),
+--          row_version = row_version + 1
+--    WHERE role_code = 'it_admin';
+--   DELETE FROM permission_catalog
+--    WHERE permission_code IN ('apikeys.view','apikeys.create','apikeys.revoke','jwt.issue');
+--   COMMIT;
+-- ============================================================================
+-- <<< END MIGRATION: 186_authz_kernel_apikey_perms.sql
+
+-- >>> BEGIN MIGRATION: 187_doc_access_log.sql
+-- ============================================================================
+-- Migration 187: Document access log for real usage KPI
+-- ----------------------------------------------------------------------------
+-- Server-side event log for actual document openings. Drill/self-test traffic is
+-- retained but marked is_real=false so adoption KPIs are not inflated by
+-- rehearsal activity.
+-- ============================================================================
+
+BEGIN;
+
+CREATE TABLE IF NOT EXISTS doc_access_log (
+    id BIGSERIAL PRIMARY KEY,
+    user_id UUID NOT NULL,
+    doc_code VARCHAR(64) NOT NULL,
+    access_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    source VARCHAR(32) NOT NULL CHECK (source IN ('portal', 'qr', 'direct', 'api')),
+    dept_id VARCHAR(8),
+    role_code VARCHAR(16),
+    is_real BOOLEAN DEFAULT TRUE
+);
+
+COMMENT ON TABLE doc_access_log IS
+    'Append-only server log of controlled-document access, used for real behavior adoption KPIs.';
+COMMENT ON COLUMN doc_access_log.is_real IS
+    'False for drill mode or rehearsal access so training drills do not distort real-usage metrics.';
+
+CREATE INDEX IF NOT EXISTS idx_doc_access_user_time
+    ON doc_access_log(user_id, access_at);
+
+CREATE INDEX IF NOT EXISTS idx_doc_access_doc_time
+    ON doc_access_log(doc_code, access_at);
+
+COMMIT;
+
+-- ============================================================================
+-- Rollback (manual):
+--   BEGIN;
+--   DROP TABLE IF EXISTS doc_access_log CASCADE;
+--   COMMIT;
+-- ============================================================================
+-- <<< END MIGRATION: 187_doc_access_log.sql
