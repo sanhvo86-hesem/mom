@@ -262,8 +262,8 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </tr>
  </thead>
  <tbody>
- <tr><td><code>{AssetType}-{AssetID}</code></td><td>Luôn</td><td>Loại tài sản + mã tài sản</td><td>FIX-001, GAGE-CMM-005</td></tr>
- <tr><td><code>{DocType}</code></td><td>Luôn</td><td>Loại tài liệu đính kèm</td><td>DWG, CAL-CERT, PHOTO</td></tr>
+ <tr><td><code>{AssetType}-{AssetID}</code></td><td>Luôn</td><td>Loại tài sản + mã tài sản. AssetType chuẩn theo <a href="annex-139-m365-ip-and-restricted-library-internal-blueprint.html">ANNEX-139</a> §6: TOOL/FIX/GAGE/PROC/RM (tooling, fixture, gage, subcontract processor, cleanroom). Sub-type tùy AssetType (END/INSERT cho TOOL; CMM/MIC cho GAGE; PLAT/HT cho PROC; CR/INSP/PACK cho RM).</td><td>FIX-0089, GAGE-CMM-0007, TOOL-END-0125, PROC-PLAT-012, RM-CR-01</td></tr>
+ <tr><td><code>{DocType}</code></td><td>Luôn</td><td>Loại tài liệu đính kèm. Mã chuẩn DocType cho ANNEX-139 use case (xem Section 4): DWG, CAL-CERT, MSA-STUDY, PHOTO, MAINT-LOG, FIXTURE-DWG, TOOL-SPEC, HR-POLICY, CSR-EXTRACT, PARTICLE-LOG, GOWNING-CERT, PROC-QUAL-PACK, PROC-AUDIT-RPT.</td><td>DWG, CAL-CERT, PARTICLE-LOG, GOWNING-CERT</td></tr>
  <tr><td><code>{YYYYMMDD}</code></td><td>Luôn</td><td>Ngày tạo</td><td>20260327</td></tr>
  <tr><td><code>{HHMM}-{UserID}</code></td><td>Luôn</td><td>Giờ phút + mã người tạo</td><td>0800-ENGM1</td></tr>
  <tr><td><code>.{ext}</code></td><td>Luôn</td><td>Extension gốc</td><td>.pdf</td></tr>
@@ -271,7 +271,7 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  </table>
  </div>
  <p><strong>Ví dụ thực tế:</strong></p>
- <div class="pattern-box">FIX-001_DWG_20260327_0800-ENGM1.pdf<br>FIX-001_PHOTO_20260327_0830-SET1.jpg<br>GAGE-CMM-005_CAL-CERT_20260327_0800-QC1.pdf<br>GAGE-MIC-012_CAL-CERT_20260415_0900-QC1.pdf<br>FIX-003_MAINT-LOG_20260327_1400-MNT1.xlsx</div>
+ <div class="pattern-box">FIX-0089_DWG_20260327_0800-ENGM1.pdf<br>FIX-0089_PHOTO_20260327_0830-SET1.jpg<br>GAGE-CMM-0007_CAL-CERT_20260327_0800-QC1.pdf<br>GAGE-MIC-0142_CAL-CERT_20260415_0900-QC1.pdf<br>FIX-0042_MAINT-LOG_20260327_1400-MNT1.xlsx<br>RM-CR-01_PARTICLE-LOG_20260516_0700-EHS1.csv<br>RM-INSP-01_GOWNING-CERT_20260516_0900-HR1.pdf<br>PROC-PLAT-012_PROC-QUAL-PACK_20260516_1000-QA1.pdf<br>PROC-HT-005_PROC-AUDIT-RPT_20260516_1400-QA1.pdf</div>
  </div>
 
 <!-- ═══════════════════════════════════════════════════════════════
@@ -409,6 +409,15 @@ code, .code {font-family:var(--mono); font-size:12px; background:#f1f3f5; paddin
  <tr><td><code>CAL-CERT</code></td><td>Calibration certificate</td></tr>
  <tr><td><code>MAINT-LOG</code></td><td>Maintenance log</td></tr>
  <tr><td><code>SPEC</code></td><td>Specification sheet</td></tr>
+ <tr><td><code>MSA-STUDY</code></td><td>Measurement System Analysis study (GR&amp;R, độ chệch, độ tuyến tính, độ ổn định) — bắt buộc cho gage MSA tại <a href="annex-139-m365-ip-and-restricted-library-internal-blueprint.html">ANNEX-139</a> §4 Tooling-Fixture-Gage/03-Gages/.../03-MSA-and-GR-R-Studies/</td></tr>
+ <tr><td><code>FIXTURE-DWG</code></td><td>Fixture design drawing — đặt tại Tooling-Fixture-Gage/02-Workholding-Fixtures/{FixtureID}/01-Design-Pack/</td></tr>
+ <tr><td><code>TOOL-SPEC</code></td><td>Cutting tool specification — đặt tại Tooling-Fixture-Gage/01-Cutting-Tools/{ToolID}/01-Tool-Master-Spec/</td></tr>
+ <tr><td><code>HR-POLICY</code></td><td>HR policy / handbook — đặt tại HR-Operations/03-HR-Policy-and-Handbook-Current/</td></tr>
+ <tr><td><code>CSR-EXTRACT</code></td><td>Customer-Specific Requirement extract for a part rev — đặt tại Part-REV-Master/.../08-Standards-Customer-Specific/</td></tr>
+ <tr><td><code>PARTICLE-LOG</code></td><td>Cleanroom particle count log (0.5μm, 5μm) — đặt tại Cleanroom-Records/01-Environment-Monitoring/{Room}/{YYYY-MM}/</td></tr>
+ <tr><td><code>GOWNING-CERT</code></td><td>Cleanroom gowning training certificate — đặt tại Cleanroom-Records/04-Personnel-Gowning-and-Training/{YYYY}/</td></tr>
+ <tr><td><code>PROC-QUAL-PACK</code></td><td>Subcontractor qualification pack (ISO 9001/AS9100, NADCAP cert, insurance, EHS) — đặt tại Subcontractor-Records/02-By-Subcontractor/{ProcessorID}/01-Qualification-Pack/</td></tr>
+ <tr><td><code>PROC-AUDIT-RPT</code></td><td>Subcontractor audit report (annual on-site, desktop survey, SCAR response) — đặt tại Subcontractor-Records/02-By-Subcontractor/{ProcessorID}/03-Audit-Reports-and-Surveys/</td></tr>
  </tbody>
  </table>
  </div>
