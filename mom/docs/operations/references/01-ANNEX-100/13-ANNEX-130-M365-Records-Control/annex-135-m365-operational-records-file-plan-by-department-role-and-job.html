@@ -63,6 +63,10 @@
      data-dcc-bootstrap="{&quot;header&quot;:{&quot;doc_code&quot;:&quot;ANNEX-135&quot;,&quot;title&quot;:&quot;Sơ đồ lưu hồ sơ tác nghiệp theo phòng ban, vai trò và job&quot;,&quot;subtitle&quot;:&quot;File plan M365 theo phòng, vai trò và job trong chương trình W0–W12&quot;,&quot;doc_type&quot;:&quot;ANNEX&quot;,&quot;revision&quot;:&quot;V1&quot;,&quot;effective_date&quot;:&quot;2026-05-14&quot;,&quot;owner_role_code&quot;:&quot;QA&quot;,&quot;approver_role_code&quot;:&quot;CEO&quot;,&quot;iso_clause&quot;:null,&quot;status&quot;:&quot;released&quot;},&quot;labels&quot;:{&quot;doc_id&quot;:{&quot;short&quot;:&quot;ID&quot;,&quot;long&quot;:&quot;Document ID&quot;,&quot;sort&quot;:10},&quot;revision&quot;:{&quot;short&quot;:&quot;Rev&quot;,&quot;long&quot;:&quot;Revision&quot;,&quot;sort&quot;:20},&quot;effective_date&quot;:{&quot;short&quot;:&quot;Eff&quot;,&quot;long&quot;:&quot;Effective date&quot;,&quot;sort&quot;:30},&quot;owner&quot;:{&quot;short&quot;:&quot;Owner&quot;,&quot;long&quot;:&quot;Owner&quot;,&quot;sort&quot;:40},&quot;approver&quot;:{&quot;short&quot;:&quot;Appr&quot;,&quot;long&quot;:&quot;Approved by&quot;,&quot;sort&quot;:50}}}"></div>
 
 
+      <div class="note" style="background:#ebfbee;border-left:4px solid #2b8a3e;padding:10px 12px;"><strong>RANH GIỚI SSOT — Phạm vi của ANNEX-135</strong><br>
+      Tài liệu này là <b>hướng dẫn route file thực tế</b> theo phòng ban + vai trò + cổng job: "file này phải đi đâu, ai làm chủ, lúc nào". ANNEX-135 <b>KHÔNG</b> định nghĩa lại cây thư mục gốc — cấu trúc cây là SSOT duy nhất tại <a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> (cấp 1-2) và <a href="annex-139-m365-ip-and-restricted-library-internal-blueprint.html">ANNEX-139</a> (cấp 2-3 IP/restricted). Khi có xung đột path giữa 135 và 133/139, 133/139 thắng.<br>
+      Các path xuất hiện trong tài liệu này là <b>tham chiếu cây gốc</b>, không phải định nghĩa cây mới.</div>
+
       <div class="note"><strong>ÁP DỤNG KHI</strong><br>Dùng ở W0 để kiểm cây thư mục với 3 tài liệu nền WI-105 / WI-106 / ANNEX-114, W1–W2 để chốt cây thư mục cho 10 phòng và 39 JD, W3–W8 để xác nhận lưu hồ sơ đúng nơi trong pilot + go-live, W10 để audit quyền và lịch lưu, và W12 để bàn giao chủ sở hữu theo chương trình W0–W12.</div>
       
 
@@ -139,10 +143,10 @@
           <div class="figure-box">
             <h3>06-Working-Transitory-and-Draft</h3>
             <p style="margin:8px 0;">Mỗi vai trò phải có workbench riêng:</p>
-            <p style="margin:0;" class="path">ROLE-{RoleCode}/00-Inbox/</p>
+            <p style="margin:0;" class="path">ROLE-{RoleCode}/00-Team-Inbox/</p>
             <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/01-Draft/</p>
             <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/02-Review/</p>
-            <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/03-Promote-to-Official-Record/</p>
+            <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/03-Team-Promote/</p>
             <p style="margin:4px 0 0;" class="path">ROLE-{RoleCode}/99-Clear-Within-90d/</p>
           </div>
           <div class="figure-box">
@@ -518,17 +522,17 @@
       <div class="section">
         <h2>8. File plan chi tiết cho từng job</h2>
         <div class="figure-box">
-          <p style="margin:0;" class="path">Job-Dossiers/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/00_Admin-Control/</p>
-          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/01_G0-Contract-Kickoff/</p>
-          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/02_G1-Engineering-Release/</p>
-          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/03_G2-IQC-Receiving/</p>
-          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/04_G3-Setup-Release/</p>
-          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/05_G4-FAI-First-Article/</p>
-          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/06_G5-IPQC-Production/</p>
-          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/07_G6-Final-QC-Packaging/</p>
-          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/08_G7-Ship-Release/</p>
-          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/09_NCR-CAPA-Deviation/</p>
-          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{CustomerID}/{JobNum}-{PartNo}-REV-{Revision}/99_Archive-Locked/</p>
+          <p style="margin:0;" class="path">Job-Dossiers/{YYYY}/{JobNum}-{PartNo}-REV-{Revision}/00_Admin-Control/</p>
+          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{JobNum}-{PartNo}-REV-{Revision}/01_G0-Contract-Kickoff/</p>
+          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{JobNum}-{PartNo}-REV-{Revision}/02_G1-Engineering-Release/</p>
+          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{JobNum}-{PartNo}-REV-{Revision}/03_G2-IQC-Receiving/</p>
+          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{JobNum}-{PartNo}-REV-{Revision}/04_G3-Setup-Release/</p>
+          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{JobNum}-{PartNo}-REV-{Revision}/05_G4-FAI-First-Article/</p>
+          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{JobNum}-{PartNo}-REV-{Revision}/06_G5-IPQC-Production/</p>
+          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{JobNum}-{PartNo}-REV-{Revision}/07_G6-Final-QC-Packaging/</p>
+          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{JobNum}-{PartNo}-REV-{Revision}/08_G7-Ship-Release/</p>
+          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{JobNum}-{PartNo}-REV-{Revision}/09_NCR-CAPA-Deviation/</p>
+          <p style="margin:4px 0 0;" class="path">Job-Dossiers/{YYYY}/{JobNum}-{PartNo}-REV-{Revision}/99_Archive-Locked/</p>
         </div>
         <div class="table-card">
           <table>
