@@ -48,6 +48,8 @@
 
 <div class="callout"><strong>BỐI CẢNH:</strong> HESEM là supplier cho 4 OEM semi cạnh tranh nhau (AMAT/LAM/ASML/TEL). <b>Drawing AMAT KHÔNG được lẫn LAM</b> — data segregation pháp lý + thương mại. Đồng thời customer auditor yêu cầu remote review hoặc onsite access vào SharePoint của HESEM. ANNEX-142 đặt khung phân quyền M365 đáp ứng đồng thời: (1) audit khắt khe của 4 OEM, (2) bảo vệ IP của từng OEM khỏi rò rỉ, (3) ESG/ITAR/EAR compliance, (4) cybersecurity (NIST SP 800-171 cho LAM Tier-A, CMMC L2 nếu defense-adjacent).</div>
 
+<div class="ok-callout" style="background:#ebfbee;border-left:4px solid #2b8a3e;padding:10px 14px;margin:10px 0;font-size:13px;"><strong>v3 cross-reference (2026-05-16):</strong> Permission model trong ANNEX-142 này áp dụng cho cấu trúc folder/library mới của v3 — chi tiết folder-pattern-to-group mapping tại <a href="annex-143-department-role-scenario-file-master-matrix.html">ANNEX-143</a> §7 (16 dept × 16 Entra ID group). <strong>v3 đã XÓA SITE 6 HESEM-Customer-Portals</strong> — Information Barriers segment 4 OEM nay áp dụng <em>cấp library + folder</em> thay vì cấp site (đơn giản hóa quản trị; vẫn đảm bảo AMAT engineer không nhìn thấy LAM CAD và ngược lại qua DLP block + SG-Customer-{OEM}-Members named-access). Decision: KHÔNG tách SITE riêng cho Engineering-IP hoặc People-Competency vì L4 sensitivity label folder-level đã đủ enforcement ở scale 200 nhân viên; xem <a href="annex-143-department-role-scenario-file-master-matrix.html">ANNEX-143</a> §3 ok-callout.</div>
+
 <section class="card">
 <h2>1. Architecture tổng thể</h2>
 <table>
