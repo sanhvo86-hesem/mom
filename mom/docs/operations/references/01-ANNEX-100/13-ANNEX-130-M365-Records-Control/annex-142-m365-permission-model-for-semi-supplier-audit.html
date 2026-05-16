@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ANNEX-142 — M365 Permission Model cho Semi Supplier Audit | HESEM MOM</title>
+<script>
+/* DCC Header bootstrap */
+(function () {
+  var DCC_VERSION = '2026-05-16-1';
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css?v=' + DCC_VERSION;
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(js);
+})();
+</script>
+<link rel="stylesheet" href="../../../../../assets/style.css">
+<style>
+ table{width:100%;border-collapse:collapse;table-layout:fixed;margin:10px 0;}
+ th,td{border:1px solid #e2e8f0;padding:8px 10px;vertical-align:top;overflow-wrap:anywhere;font-size:13px}
+ th{background:#f1f5f9;text-align:left}
+ .tight li{margin:4px 0}
+ .code {font-family: var(--mono); font-size:12px; background:#f1f3f5; padding:1px 6px; border-radius:4px;}
+ .path {font-family: var(--mono); font-size:11px; color: var(--ink2);}
+ .keyline {margin:10px 0; padding:10px 12px; border:1px dashed var(--th-bdr); border-radius: var(--r); background:#fcfcfd;}
+ .callout {margin:10px 0; padding:10px 14px; background:#fff5f5; border-left:4px solid #c92a2a; border-radius:4px; font-size:13px;}
+ .ok-callout {margin:10px 0; padding:10px 14px; background:#ebfbee; border-left:4px solid #2b8a3e; border-radius:4px; font-size:13px;}
+ .warn-callout {margin:10px 0; padding:10px 14px; background:#fff9db; border-left:4px solid #e67700; border-radius:4px; font-size:13px;}
+</style>
+</head>
+<body>
+<div class="container"><div class="page"><div class="page-body">
+<div class="dcc-header"
+     data-dcc-doc-code="ANNEX-142"
+     data-dcc-locale="vi"
+     data-dcc-logo="../../../../../assets/hesem-logo.svg"
+     data-dcc-bootstrap='{"header":{"doc_code":"ANNEX-142","title":"M365 Permission Model cho Semi Supplier Audit","subtitle":"Entra ID groups + Conditional Access + Sensitivity Labels + Information Barriers + DLP + Guest Audit Flow cho HESEM khi audit bởi AMAT/LAM/ASML/TEL","doc_type":"ANNEX","revision":"V0","effective_date":"2026-05-16","owner_role_code":"IT","approver_role_code":"CEO","iso_clause":"ISO 9001:2015 §7.5.3 + ISO 27001:2022 + SEMI E155 + NIST SP 800-171","status":"released"}}'></div>
+
+<div class="doc-content" id="docContent">
+
+<h1>M365 Permission Model cho Semi Supplier Audit</h1>
+
+<div class="callout"><strong>BỐI CẢNH:</strong> HESEM là supplier cho 4 OEM semi cạnh tranh nhau (AMAT/LAM/ASML/TEL). <b>Drawing AMAT KHÔNG được lẫn LAM</b> — data segregation pháp lý + thương mại. Đồng thời customer auditor yêu cầu remote review hoặc onsite access vào SharePoint của HESEM. ANNEX-142 đặt khung phân quyền M365 đáp ứng đồng thời: (1) audit khắt khe của 4 OEM, (2) bảo vệ IP của từng OEM khỏi rò rỉ, (3) ESG/ITAR/EAR compliance, (4) cybersecurity (NIST SP 800-171 cho LAM Tier-A, CMMC L2 nếu defense-adjacent).</div>
+
+<section class="card">
+<h2>1. Architecture tổng thể</h2>
+<table>
+<thead><tr><th>Lớp</th><th>Công cụ Microsoft</th><th>Mục tiêu</th></tr></thead>
+<tbody>
+<tr><td><b>L1 Identity</b></td><td>Microsoft Entra ID (Azure AD)</td><td>Groups + PIM eligible + Conditional Access policies</td></tr>
+<tr><td><b>L2 Data Classification</b></td><td>Microsoft Purview Sensitivity Labels</td><td>7 label theo audience + encryption + watermark</td></tr>
+<tr><td><b>L3 Data Loss Prevention</b></td><td>Microsoft Purview DLP</td><td>8 policy chặn leak cross-customer, ITAR/EAR, HIO banned</td></tr>
+<tr><td><b>L4 Information Barriers</b></td><td>Microsoft Purview Information Barriers</td><td>4 segment cứng AMAT/LAM/ASML/TEL — không cross-talk Teams/SharePoint/OneDrive</td></tr>
+<tr><td><b>L5 Retention &amp; Records</b></td><td>Microsoft Purview Records Management</td><td>Retention labels R3/R7/R10/R15/R-Life + declare-as-record + regulatory record</td></tr>
+<tr><td><b>L6 Audit &amp; eDiscovery</b></td><td>Microsoft Purview Audit + eDiscovery Premium</td><td>Unified audit log 10 năm + eDiscovery hold + chain-of-custody export</td></tr>
+<tr><td><b>L7 Guest Access</b></td><td>Entra Entitlement Management Access Package</td><td>Time-boxed guest auditor với View-Only-No-Download + watermark</td></tr>
+<tr><td><b>L8 SIEM</b></td><td>Microsoft Sentinel</td><td>SIEM tích hợp Entra + M365 + Defender; 2 năm hot + 7 năm archive</td></tr>
+</tbody>
+</table>
+<div class="keyline"><strong>License plan:</strong> 20-30 user lõi (admin, DCC, QA director, PCN approver, sale lead 4 OEM, Compliance officer) = <b>M365 E5</b>; 100-150 employee thường = <b>M365 E3 + E5 Compliance add-on</b>; 20-30 factory operator view-only = <b>M365 F3</b>. Cộng Entra P2 cho 30 user lõi (PIM + Identity Protection + Entitlement Management). Ước tính tổng ~$105K/năm cho HESEM 150-user. So với mất AMAT supplier status = $2-5M revenue/năm → ROI rõ ràng.</div>
+</section>
+
+<section class="card">
+<h2>2. Entra ID Group Model</h2>
+<h3>2.1. Naming convention bắt buộc (đặt trong Entra ID Groups → Naming policy)</h3>
+<p><span class="code">{Type}-{Scope}-{Purpose}[-{Modifier}]</span></p>
+<ul class="tight">
+<li><span class="code">SG-</span> Security Group (assigned)</li>
+<li><span class="code">DG-</span> Dynamic Group (membership rule)</li>
+<li><span class="code">M365G-</span> Microsoft 365 Group (gắn với Teams + SharePoint site)</li>
+<li><span class="code">PIM-</span> chỉ dùng cho privileged role-assignable</li>
+<li><span class="code">EXT-</span> chứa guest external (auditor)</li>
+</ul>
+
+<h3>2.2. Bộ group bắt buộc cho HESEM semi supplier</h3>
+<table>
+<thead><tr><th>Group</th><th>Loại</th><th>Membership rule</th><th>Mục đích</th></tr></thead>
+<tbody>
+<tr><td><span class="code">DG-ALL-Employees</span></td><td>Dynamic</td><td><span class="code">user.employeeType -eq "Employee"</span></td><td>Baseline mọi nhân viên</td></tr>
+<tr><td><span class="code">DG-DEPT-QA</span>, <span class="code">DG-DEPT-DCC</span>, <span class="code">DG-DEPT-Sales</span>, <span class="code">DG-DEPT-Production</span>, <span class="code">DG-DEPT-Engineering</span></td><td>Dynamic</td><td><span class="code">user.department -eq "QA"</span> (và tương tự)</td><td>Department-based access</td></tr>
+<tr><td><span class="code">SG-Customer-AMAT-Members</span></td><td>Assigned</td><td>Sale rep AMAT + QA AMAT + DCC AMAT + Engineering Lead AMAT</td><td><b>Segment AMAT cho Information Barrier — CỐT LÕI</b></td></tr>
+<tr><td><span class="code">SG-Customer-LAM-Members</span></td><td>Assigned</td><td>Tương tự, người phục vụ LAM</td><td>Segment LAM</td></tr>
+<tr><td><span class="code">SG-Customer-ASML-Members</span></td><td>Assigned</td><td>Người được clear cho ASML EUV (NDA + training UHV/HIO)</td><td>Segment ASML</td></tr>
+<tr><td><span class="code">SG-Customer-TEL-Members</span></td><td>Assigned</td><td>Người phục vụ TEL (có thể trùng AMAT cho non-conflicting roles)</td><td>Segment TEL</td></tr>
+<tr><td><span class="code">SG-Role-DocumentController</span></td><td>Assigned</td><td>DCC team (2-3 người)</td><td>Edit Controlled Documents</td></tr>
+<tr><td><span class="code">SG-Role-PCN-Approver</span></td><td>Assigned</td><td>QA Director + Engineering Manager</td><td>Approve PCN trong workflow</td></tr>
+<tr><td><span class="code">SG-Role-ITAR-Cleared</span></td><td>Assigned</td><td>Người đã ký NDA + US person where required</td><td>DLP exception cho EAR/ITAR drawings</td></tr>
+<tr><td><span class="code">SG-Role-Compliance-Officer</span></td><td>Assigned</td><td>QA Manager + IT Manager + 1 director</td><td>Audit cross-customer, eDiscovery, sensitive label management</td></tr>
+<tr><td><span class="code">SG-Role-SQE-Subcontractor</span></td><td>Assigned</td><td>Supplier Quality Engineer (audit vendor)</td><td>Access Subcontractor-Records + APSL</td></tr>
+<tr><td><span class="code">M365G-Customer-AMAT-Site</span></td><td>M365 Group</td><td>= <span class="code">SG-Customer-AMAT-Members</span></td><td>Gắn site SharePoint AMAT</td></tr>
+<tr><td><span class="code">M365G-Customer-LAM-Site</span>, <span class="code">M365G-Customer-ASML-Site</span>, <span class="code">M365G-Customer-TEL-Site</span></td><td>M365 Group</td><td>Tương ứng</td><td>Gắn site cho 3 OEM còn lại</td></tr>
+<tr><td><span class="code">SG-EXT-Auditor-AMAT-{YYYY}Q{N}</span></td><td>Assigned</td><td>Guest auditor, <b>có expiry date</b></td><td>Time-boxed audit access, hết hạn auto-disable</td></tr>
+<tr><td><span class="code">PIM-GlobalAdmin</span>, <span class="code">PIM-SharePointAdmin</span>, <span class="code">PIM-ComplianceAdmin</span>, <span class="code">PIM-SecurityAdmin</span>, <span class="code">PIM-ExchangeAdmin</span></td><td>Role-assignable</td><td>Eligible, KHÔNG Active</td><td>Just-in-time admin activation</td></tr>
+</tbody>
+</table>
+
+<h3>2.3. PIM (Privileged Identity Management) — bắt buộc</h3>
+<p>Activation rule cho mọi PIM role:</p>
+<ul class="tight">
+<li>Max activation duration: <b>4 giờ</b></li>
+<li>Require MFA tại activation</li>
+<li>Require approval bởi 2nd admin (separation of duty)</li>
+<li>Require justification + ticket number</li>
+<li>Notification gửi Compliance Officer khi activation</li>
+</ul>
+</section>
+
+<section class="card">
+<h2>3. Conditional Access — 8 policy bắt buộc</h2>
+<table>
+<thead><tr><th>Policy</th><th>Target</th><th>Condition</th><th>Control</th></tr></thead>
+<tbody>
+<tr><td><span class="code">CA01-Block-Legacy-Auth</span></td><td>All users</td><td>Client app = legacy (POP, IMAP, SMTP basic)</td><td>Block</td></tr>
+<tr><td><span class="code">CA02-Require-MFA-AllUsers</span></td><td>All users (trừ break-glass)</td><td>Mọi sign-in</td><td>Require MFA (Authenticator hoặc FIDO2 key)</td></tr>
+<tr><td><span class="code">CA03-Require-Compliant-Device-Admin</span></td><td><span class="code">PIM-*</span> users</td><td>Activation PIM role</td><td>Require Intune compliant device</td></tr>
+<tr><td><span class="code">CA04-Block-Guest-Download</span></td><td><span class="code">SG-EXT-Auditor-*</span></td><td>Truy cập SharePoint customer site</td><td>App Enforced Restrictions: View-only, no download, no print, no sync, session 1h idle</td></tr>
+<tr><td><span class="code">CA05-Block-HighRisk-SignIn</span></td><td>All users</td><td>Sign-in risk = High (Entra ID Protection)</td><td>Block</td></tr>
+<tr><td><span class="code">CA06-Geo-Restrict-Sensitive</span></td><td>Confidential+ label users</td><td>Location ∈ sanctioned country (EAR list)</td><td>Block</td></tr>
+<tr><td><span class="code">CA07-Require-MFA-External-Sharing</span></td><td>All users</td><td>Khi share external (B2B link)</td><td>Require MFA + accept terms</td></tr>
+<tr><td><span class="code">CA08-Block-Personal-Device-CustomerSite</span></td><td><span class="code">SG-Customer-*-Members</span></td><td>Truy cập site Customer-{OEM}</td><td>Require compliant device OR hybrid Entra-joined</td></tr>
+</tbody>
+</table>
+</section>
+
+<section class="card">
+<h2>4. Sensitivity Labels — 8 label cho semi context</h2>
+<table>
+<thead><tr><th>Label</th><th>Màu</th><th>Đối tượng</th><th>Encryption</th><th>Marking</th><th>Auto-apply trigger</th></tr></thead>
+<tbody>
+<tr><td><span class="code">Public</span></td><td>Xanh lá</td><td>Marketing, datasheet</td><td>Không</td><td>Footer "Public"</td><td>Manual</td></tr>
+<tr><td><span class="code">Internal</span></td><td>Xám</td><td>Default mọi file nội bộ</td><td>Không</td><td>Header "HESEM Internal"</td><td>Default khi tạo file</td></tr>
+<tr><td><span class="code">Confidential-General</span></td><td>Vàng</td><td>SOP, WI, internal report</td><td>Encrypt all employees</td><td>"Confidential" watermark</td><td>Manual</td></tr>
+<tr><td><span class="code">Confidential-Customer-AMAT</span></td><td>Cam</td><td>Drawing AMAT, PCN AMAT, RMA AMAT</td><td>Encrypt chỉ <span class="code">SG-Customer-AMAT-Members</span> + Compliance Officer</td><td>"AMAT Confidential — Do Not Distribute" diagonal watermark</td><td>Auto: site = Customer-AMAT-Site HOẶC filename match <span class="code">*AMAT*</span>, <span class="code">*PN-AM-*</span>, <span class="code">*0250-*</span></td></tr>
+<tr><td><span class="code">Confidential-Customer-LAM</span></td><td>Cam</td><td>Drawing LAM, 02-XXXXXX rev</td><td>Encrypt chỉ <span class="code">SG-Customer-LAM-Members</span></td><td>"LAM Confidential" watermark</td><td>Auto: site = Customer-LAM HOẶC filename <span class="code">*LAM*</span>, <span class="code">*PN-LM-*</span></td></tr>
+<tr><td><span class="code">Confidential-Customer-ASML</span></td><td>Cam</td><td>Drawing 4022.XXX, ASML evidence</td><td>Encrypt chỉ <span class="code">SG-Customer-ASML-Members</span></td><td>"ASML Confidential" watermark</td><td>Auto: site = Customer-ASML HOẶC filename <span class="code">*4022.*</span>, <span class="code">*ASML*</span></td></tr>
+<tr><td><span class="code">Confidential-Customer-TEL</span></td><td>Cam</td><td>Drawing TEL-PR-XXX</td><td>Encrypt chỉ <span class="code">SG-Customer-TEL-Members</span></td><td>"TEL Confidential" watermark</td><td>Auto: site = Customer-TEL HOẶC filename <span class="code">*TEL*</span>, <span class="code">*PN-TE-*</span></td></tr>
+<tr><td><span class="code">Highly-Confidential-ITAR-EAR</span></td><td>Đỏ</td><td>Defense-adjacent drawings, ECCN-controlled</td><td>Encrypt + <b>Do Not Forward</b> + no offline + <span class="code">SG-Role-ITAR-Cleared</span> only</td><td>"EAR-Controlled — Export License Required"</td><td>Auto: SIT (Sensitive Info Type) match ECCN pattern HOẶC folder <span class="code">/ITAR/</span></td></tr>
+<tr><td><span class="code">Highly-Confidential-PCN-Pending</span></td><td>Đỏ + cảnh báo</td><td>Drawing rev đang trong PCN review</td><td>Encrypt + <b>co-authoring off</b> + read-only cho operator</td><td>"PCN PENDING — DO NOT USE FOR PRODUCTION"</td><td>Auto khi metadata column <span class="code">pcn_status</span> = "Pending"; remove khi PCN closed</td></tr>
+<tr><td><span class="code">Highly-Confidential-PCN-Signed</span></td><td>Tím</td><td>PCN đã ký approve</td><td>Encrypt + <b>regulatory record</b> (immutable, Global Admin cũng không xóa được)</td><td>"Signed PCN Record — Immutable"</td><td>Auto khi PCN status → Closed-Approved + declare-as-record</td></tr>
+</tbody>
+</table>
+<div class="warn-callout"><strong>⚠ Critical setting:</strong> Bật <b>mandatory labeling</b> (user phải chọn label trước khi save) trong Purview → Information Protection → Auto-labeling. Bật <b>default label = Internal</b>. Bật <b>label inheritance từ email sang attachment</b>. Test trước rollout với pilot 10 user để tránh user frustration.</div>
+</section>
+
+<section class="card">
+<h2>5. Retention Labels — SEMI + Customer specific</h2>
+<table>
+<thead><tr><th>Label</th><th>Thời hạn</th><th>Hành động cuối</th><th>Áp dụng cho</th></tr></thead>
+<tbody>
+<tr><td><span class="code">R3-Operational</span></td><td>3 năm</td><td>Delete</td><td>Email vận hành, draft, sessions/cache</td></tr>
+<tr><td><span class="code">R7-Quality-Record</span></td><td>7 năm sau end-of-product</td><td>Delete sau review</td><td>Inspection record, CoC, FAI report (SEMI E10/E155 align, AMAT min)</td></tr>
+<tr><td><span class="code">R10-PCN-Customer</span></td><td>10 năm sau approval</td><td>Delete sau review</td><td>PCN approved, customer-signed change, AMAT/LAM/TEL records</td></tr>
+<tr><td><span class="code">R15-ASML-EUV</span></td><td>15 năm sau approval</td><td>Delete sau Compliance review</td><td>ASML EUV-related records (longer retention per ASML supplier req)</td></tr>
+<tr><td><span class="code">R-Life-of-Product+10</span></td><td>Event-based</td><td>Delete</td><td>Drawing controlled, master spec — event "Product EOL" trigger countdown</td></tr>
+<tr><td><span class="code">R-Permanent-ITAR-EAR</span></td><td>Vô hạn</td><td>Review required</td><td>EAR/ITAR shipping record (15 CFR 762 yêu cầu 5 năm tối thiểu, HESEM giữ 15+)</td></tr>
+<tr><td><span class="code">R-SBTi-Carbon-Baseline</span></td><td>15 năm</td><td>Delete sau review</td><td>Scope 1+2+3 emissions baseline, CDP submissions</td></tr>
+<tr><td><span class="code">R-Contract-Customer</span></td><td>Theo MSA (thường 7y post-termination)</td><td>Delete sau review</td><td>Customer contract, NDA, supplier agreement</td></tr>
+</tbody>
+</table>
+<div class="ok-callout"><strong>Event-based retention setup:</strong> Trong Purview Records Management → Events → tạo event type <span class="code">ProductEOL</span>. Khi customer (AMAT/LAM/ASML/TEL) gửi end-of-life notice qua portal → DCC manually trigger event qua Graph API (KHÔNG auto-trigger để tránh xóa nhầm). Files có label <span class="code">R-Life-of-Product+10</span> bắt đầu countdown 10 năm.</div>
+</section>
+
+<section class="card">
+<h2>6. DLP Policies — 10 policy semi-specific</h2>
+<table>
+<thead><tr><th>#</th><th>Policy</th><th>Condition</th><th>Action</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><span class="code">DLP-Block-AMAT-Drawing-External</span></td><td>Sensitivity = <span class="code">Confidential-Customer-AMAT</span> AND recipient external AND domain NOT IN <span class="code">amat.com</span></td><td>Block + notify + admin alert</td></tr>
+<tr><td>2</td><td><span class="code">DLP-Block-CrossCustomer-Leak</span></td><td>File label = AMAT AND uploaded to LAM/ASML/TEL site (hoặc ngược lại)</td><td>Block + audit log + alert Compliance</td></tr>
+<tr><td>3</td><td><span class="code">DLP-ITAR-Export-Control</span></td><td>Label = <span class="code">Highly-Confidential-ITAR-EAR</span> AND share external</td><td>Block hoàn toàn, không có override option</td></tr>
+<tr><td>4</td><td><span class="code">DLP-PII-PCI</span></td><td>SIT: Credit Card + Passport + SSN</td><td>Block external, allow internal with justification</td></tr>
+<tr><td>5</td><td><span class="code">DLP-PCN-Signed-NoModify</span></td><td>Label = <span class="code">Highly-Confidential-PCN-Signed</span> AND action = Edit/Delete</td><td>Block + alert Compliance</td></tr>
+<tr><td>6</td><td><span class="code">DLP-Drawing-PN-Pattern</span></td><td>Regex match <span class="code">PN-(AM|LM|AS|TE)-\d{6}</span> AND share external khác domain customer</td><td>Block + tip "Use customer-specific site only"</td></tr>
+<tr><td>7</td><td><span class="code">DLP-HIO-Banned-Material-ASML</span></td><td>Drawing metadata <span class="code">material_contains</span> ∈ {Zn-plate, Cd-plate, Pb-bearing brass, Be-Cu, Buna-N} AND customer = ASML AND folder = ASML-Grade-1</td><td>Block save + alert Engineering Lead "HIO banned per ASML Grade 1 — Use approved material list"</td></tr>
+<tr><td>8</td><td><span class="code">DLP-Endpoint-USB-Block</span></td><td>Device DLP: file label Confidential+ AND copy to removable media</td><td>Block, audit log</td></tr>
+<tr><td>9</td><td><span class="code">DLP-Print-Watermark</span></td><td>Print Confidential+ → require watermark có username + timestamp</td><td>Allow with watermark</td></tr>
+<tr><td>10</td><td><span class="code">DLP-Adaptive-InsiderRisk</span></td><td>User có Insider Risk score = High (Microsoft Insider Risk Management)</td><td>DLP enforcement nâng tự động: block external share Confidential+, require Compliance approval</td></tr>
+</tbody>
+</table>
+</section>
+
+<section class="card">
+<h2>7. Information Barriers — 4 segment cứng cho 4 OEM</h2>
+<table>
+<thead><tr><th>Segment</th><th>UserGroup filter</th><th>Block giao tiếp với</th></tr></thead>
+<tbody>
+<tr><td><span class="code">Segment-AMAT</span></td><td><span class="code">user.memberOf -contains "SG-Customer-AMAT-Members"</span></td><td>Segment-LAM, Segment-ASML, Segment-TEL</td></tr>
+<tr><td><span class="code">Segment-LAM</span></td><td><span class="code">user.memberOf -contains "SG-Customer-LAM-Members"</span></td><td>Segment-AMAT, Segment-ASML, Segment-TEL</td></tr>
+<tr><td><span class="code">Segment-ASML</span></td><td><span class="code">user.memberOf -contains "SG-Customer-ASML-Members"</span></td><td>Segment-AMAT, Segment-LAM, Segment-TEL</td></tr>
+<tr><td><span class="code">Segment-TEL</span></td><td><span class="code">user.memberOf -contains "SG-Customer-TEL-Members"</span></td><td>Segment-AMAT, Segment-LAM, Segment-ASML</td></tr>
+</tbody>
+</table>
+<p><b>IB mode:</b> Explicit. Block cross-segment trên Teams + SharePoint + OneDrive + Exchange.</p>
+<p><b>User multi-OEM</b> (sale director phục vụ cả 4, QA director, CEO, Compliance Officer): <b>không thuộc segment nào</b> → không bị restrict, thấy hết. KHÔNG đưa vào nhiều segment cùng lúc (gây race condition).</p>
+<div class="warn-callout"><strong>⚠ Bật IB là one-way trip:</strong> Disable IB phức tạp + có thể leave orphan permissions. Plan kỹ trước bật. Pilot với 1 segment (AMAT) 30 ngày trước khi bật cả 4.</div>
+
+<h3>Site pattern khuyến nghị</h3>
+<ul class="tight">
+<li><b>1 site per customer</b>: <span class="code">Customer-AMAT-Site</span>, <span class="code">Customer-LAM-Site</span>, <span class="code">Customer-ASML-Site</span>, <span class="code">Customer-TEL-Site</span> — IB segment gán cấp site (đúng pattern).</li>
+<li><b>Hub site</b> <span class="code">Customers-Hub</span> chỉ liên kết navigation + search scope + theme. KHÔNG share content.</li>
+<li><b>Tránh:</b> library-per-customer trong 1 site chung — IB không scope xuống library được, dễ leak.</li>
+</ul>
+</section>
+
+<section class="card">
+<h2>8. Guest Audit Access Flow — AMAT auditor cụ thể</h2>
+<p>Kịch bản: 2 auditor AMAT yêu cầu remote review 5 ngày, xem PCN + FAI + RMA của 3 part number critical.</p>
+<table>
+<thead><tr><th>Ngày</th><th>Hành động</th><th>Owner</th></tr></thead>
+<tbody>
+<tr><td>D-7</td><td>AMAT account manager mở ticket → Compliance Officer tạo Access Package <span class="code">AP-Audit-AMAT-2026Q2-Onsite</span> trong Entra Entitlement Management. Tags: auditor name, audit scope (3 part numbers + period), expected end date.</td><td>AM + Compliance</td></tr>
+<tr><td>D-5</td><td>Auditor email request access link → 2 approver duyệt (AM + Compliance Officer, separation of duty) → guest account tạo trong tenant, gán <span class="code">SG-EXT-Auditor-AMAT-2026Q2</span>, expiry 7 ngày sau end date.</td><td>Compliance</td></tr>
+<tr><td>D-3</td><td>DCC chuẩn bị library <span class="code">Audit-Response-AMAT-2026Q2</span> (sub-site của Customer-AMAT-Site) → copy/link tài liệu cần show (3 part numbers' FAI/PCN/RMA) → áp label <span class="code">Confidential-Customer-AMAT</span> + watermark dynamic <span class="code">${User.Name} ${Date}</span>.</td><td>DCC</td></tr>
+<tr><td>D-1</td><td>Gửi guest invitation link (Entra B2B), bắt buộc MFA, conditional access policy <span class="code">CA04-Block-Guest-Download</span> apply → view-only Office Web, no download, no print, no sync, session 1h idle timeout.</td><td>IT</td></tr>
+<tr><td>D0 → D+5</td><td>Auditor login → mọi action ghi Unified Audit Log: FileAccessed, FilePreviewed, SearchPerformed. Download attempt sẽ bị block (logged as FileDownloaded blocked).</td><td>Auditor (logged)</td></tr>
+<tr><td>D+6</td><td>Access package auto-expire 24h sau end date → guest deactivated. Notification gửi AM + Compliance.</td><td>Auto</td></tr>
+<tr><td>D+7</td><td>Compliance export Unified Audit Log filtered theo guest UPN → lưu <span class="code">Audit-Evidence-Library/AMAT-2026Q2/audit-trail.csv</span> với label <span class="code">R10-PCN-Customer</span>.</td><td>Compliance</td></tr>
+<tr><td>D+30</td><td>Access Review xác nhận guest đã offboard hoàn toàn → delete guest account khỏi tenant.</td><td>Compliance</td></tr>
+</tbody>
+</table>
+<div class="ok-callout"><strong>Dynamic watermark:</strong> SharePoint Online hỗ trợ qua sensitivity label content marking với variable <span class="code">${User.Name}</span> + <span class="code">${Date}</span>. Mọi trang khi auditor preview Office Web đều có watermark với username họ — không thể chối nếu screenshot leak.</div>
+<p><b>Exception flow</b> (rare): nếu auditor đòi download → mở exception qua Compliance Officer approval → watermark stamp "Audit-Export-{ticket}-{date}" lên PDF + đăng ký vào <span class="code">External-Distribution-Log</span> List.</p>
+</section>
+
+<section class="card">
+<h2>9. Audit Logging + eDiscovery setup</h2>
+<table>
+<thead><tr><th>Yếu tố</th><th>Setup</th></tr></thead>
+<tbody>
+<tr><td>Unified Audit Log</td><td>Bật mặc định, verify trong Purview → Audit. Tất cả workload: SharePoint, OneDrive, Exchange, Teams, Entra, Defender.</td></tr>
+<tr><td>Retention</td><td>E3 = 180 ngày; E5 = 1 năm; add-on <b>"10-Year Audit Log Retention"</b> cho 30 user lõi (DCC, admin, PCN approver, Compliance Officer)</td></tr>
+<tr><td>Sentinel SIEM integration</td><td>Entra ID logs + M365 audit + Defender alerts → Log Analytics workspace → Sentinel. Retention 2 năm hot + 7 năm archive. Workbook: "SharePoint File Operations", "External Sharing", "PIM Activity", "Cross-Customer Access Attempts"</td></tr>
+<tr><td>Immutability</td><td>Purview audit log không edit/delete được kể cả Global Admin (Microsoft-managed). Đáp ứng SOX/SEMI immutable logging.</td></tr>
+<tr><td>eDiscovery Premium (E5)</td><td>Mỗi customer audit tạo case mới (vd <span class="code">Audit-AMAT-2026Q2</span>) → custodian = user lõi liên quan → hold dữ liệu (legal hold) → search → export với chain-of-custody report</td></tr>
+<tr><td>Alert rules</td><td>5 alert bắt buộc: (1) Guest account created, (2) Sensitivity label downgraded, (3) Bulk download >100 file, (4) Cross-customer access attempt, (5) PCN-Signed record modify attempt</td></tr>
+</tbody>
+</table>
+</section>
+
+<section class="card">
+<h2>10. Onboarding/Offboarding flow</h2>
+<h3>10.1. Onboarding nhân viên mới (semi context)</h3>
+<ol class="tight">
+<li>HR creates user trong Entra ID với <span class="code">employeeType</span> + <span class="code">department</span> attribute → DG-* groups tự fill</li>
+<li>HR ký NDA — DCC theo dõi expiry (R-Contract-Customer label)</li>
+<li>Training: ESD + Cleanroom + Workmanship (semi-specific) — record vào Training-Records library với cert</li>
+<li>IT cấp M365 license (F3/E3/E5 theo role)</li>
+<li>Manager request thêm vào <span class="code">SG-Customer-{OEM}-Members</span> nếu phục vụ OEM cụ thể — qua Access Package request → approval</li>
+<li>Information Barrier policy tự apply trong vòng 24h</li>
+</ol>
+
+<h3>10.2. Offboarding (CRITICAL — chống mất drawing)</h3>
+<ol class="tight">
+<li>HR notify Disable date (D-day) — D-7 alert IT + Manager</li>
+<li>Manager xác định owner chuyển giao OneDrive + Outlook</li>
+<li>D-day -1: Compliance Officer review user's OneDrive cho drawing/IP — nếu có Confidential+ file ở OneDrive personal → ép migrate sang SharePoint site có retention</li>
+<li>D-day 00:00: Entra Lifecycle Workflow tự động: (1) disable account, (2) revoke session tokens (Entra "Revoke sessions"), (3) remove from all groups, (4) transfer OneDrive delegate to manager 30 ngày, (5) litigation hold mailbox 7 năm</li>
+<li>D-day +30: review final, archive mailbox, delete account khỏi tenant active list</li>
+<li>D-day +90: Access Review confirm zero residual permission</li>
+</ol>
+</section>
+
+<section class="card">
+<h2>11. 12 Anti-pattern để TRÁNH</h2>
+<table>
+<thead><tr><th>#</th><th>Anti-pattern</th><th>Hậu quả</th><th>Cách chặn</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Cấp quyền cho cá nhân thay vì group</td><td>Sau 2 năm không ai biết user X có quyền gì</td><td>Chỉ gán group; quarterly Access Review</td></tr>
+<tr><td>2</td><td>Item-level break inheritance &gt;50</td><td>SharePoint search chậm + không quản lý được</td><td>Break ở library/folder, tối đa 50 unique per site</td></tr>
+<tr><td>3</td><td>1 site SharePoint chung cho tất cả customer, library-per-customer</td><td>IB không scope xuống library → AMAT search ra file LAM</td><td>Site-per-customer</td></tr>
+<tr><td>4</td><td>Guest không expire</td><td>Auditor cũ vẫn còn account sau 2 năm = vulnerability</td><td>Entitlement Management access package có expiry bắt buộc + quarterly access review</td></tr>
+<tr><td>5</td><td>Sensitivity label optional</td><td>User lười không gán → DLP không bắt được</td><td>Mandatory labeling + default label = Internal + auto-labeling</td></tr>
+<tr><td>6</td><td>PCN signed lưu PDF thường</td><td>Vẫn edit/delete được = không immutable</td><td>Declare regulatory record + label <span class="code">Highly-Confidential-PCN-Signed</span> + co-authoring off</td></tr>
+<tr><td>7</td><td>Drawing share qua "Anyone with the link"</td><td>Leak ra ngoài không truy vết</td><td>SharePoint tenant setting → external sharing = "New and existing guests" max, disable "Anyone link" cho site Customer-*</td></tr>
+<tr><td>8</td><td>Admin dùng account thường có quyền Global Admin permanent</td><td>Phishing 1 lần = mất tenant</td><td>PIM eligible, activation MFA + approval</td></tr>
+<tr><td>9</td><td>Audit log retention 90 ngày mặc định</td><td>Auditor hỏi log 2 năm trước → không có</td><td>10-year retention cho user lõi, Sentinel archive 7 năm</td></tr>
+<tr><td>10</td><td>OneDrive cá nhân lưu drawing</td><td>Nhân viên nghỉ → OneDrive xóa sau 30 ngày → mất drawing</td><td>DLP block confidential trên OneDrive personal; ép lưu SharePoint có retention; offboarding flow transfer ownership</td></tr>
+<tr><td>11</td><td>HIO banned material không có DLP rule</td><td>Engineer vô tình design Zn-plate vào ASML chamber part → ship → ASML reject lô → mất lô + supplier rating ↓</td><td>DLP rule <span class="code">DLP-HIO-Banned-Material-ASML</span> + material database integration</td></tr>
+<tr><td>12</td><td>PCN-Pending label chỉ áp manual</td><td>DCC quên áp → operator dùng rev cũ → ship sai → customer audit FAIL</td><td>Auto-apply theo metadata column <span class="code">pcn_status</span>; alert nếu file không có label sau 1h status change</td></tr>
+</tbody>
+</table>
+</section>
+
+<section class="card">
+<h2>12. Tài liệu liên kết</h2>
+<ul class="tight">
+<li><a href="annex-141-semi-equipment-parts-cnc-supplier-compliance.html">ANNEX-141</a> — Semi-Equipment Parts CNC Supplier Compliance (folder + workflow)</li>
+<li><a href="annex-130-m365-eqms-ssot-boundary-and-cross-reference-policy.html">ANNEX-130</a> — SSOT 3 tầng (sẽ patch để bổ sung Information Barriers segment trong AP-09 anti-pattern)</li>
+<li><a href="annex-132-m365-records-flow-approval-sharing-and-exception-control.html">ANNEX-132</a> — Approval/sharing flow (cross-ref guest audit access flow tại §G)</li>
+<li><a href="annex-133-m365-records-site-topology-library-and-folder-blueprint.html">ANNEX-133</a> — Site topology (đăng ký 4 Customer-{OEM}-Site + 1 Customers-Hub + 1 HESEM-ESG-Compliance SITE 5)</li>
+<li><a href="annex-134-m365-records-provisioning-permissions-and-automation-architecture.html">ANNEX-134</a> — Provisioning logic (sẽ patch align với ANNEX-142 group model)</li>
+<li><a href="annex-140-runtime-data-boundary-postgres-redis-rabbitmq-and-qmsdata.html">ANNEX-140</a> — Runtime data boundary (audit_events mirror lên SharePoint System-Records)</li>
+<li>Microsoft Learn references: <a href="https://learn.microsoft.com/en-us/purview/sensitivity-labels">Sensitivity Labels</a>, <a href="https://learn.microsoft.com/en-us/purview/information-barriers">Information Barriers</a>, <a href="https://learn.microsoft.com/en-us/entra/id-governance/privileged-identity-management/pim-configure">PIM</a>, <a href="https://learn.microsoft.com/en-us/purview/records-management">Records Management</a></li>
+</ul>
+</section>
+
+</div>
+</div></div></div>
+</body>
+</html>

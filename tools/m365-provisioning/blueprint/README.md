@@ -206,9 +206,11 @@ blueprint — never edit folders by hand.
 ## Provisioning to live tenant (not yet implemented)
 
 The next step is a PowerShell PnP script that reads `manifest.json` and
-this folder tree, then provisions the 4 sites + 14 libraries + 1187
+this folder tree, then provisions the 6 sites + ~27 libraries + 1270
 sub-folders on the HESEM SharePoint tenant (count updated 2026-05-16
 after rebuild including ANNEX-139 §2-§8 L2/L3 structure for 6 IP/
-restricted libraries). Permission groups, sensitivity
+restricted libraries + ANNEX-141 SITE 5 HESEM-ESG-Compliance + ANNEX-142
+SITE 6 HESEM-Customer-Portals with 4 customer-OEM sites under
+Information Barriers). Permission groups, sensitivity
 labels, and retention policies are out of scope for this blueprint and
 belong to ANNEX-134 (provisioning) and ANNEX-135 (retention) automation.

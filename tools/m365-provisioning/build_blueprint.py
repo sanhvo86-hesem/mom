@@ -793,6 +793,65 @@ def build_blueprint() -> None:
     tmpl = ROOT / "07-Working-Templates"
     mkpath(tmpl / "{Function}" / "{TemplateType}")
 
+    # =====================================================================
+    # SITE 5 — HESEM-ESG-Compliance (ANNEX-141 §2.3, 2026-05-16)
+    # ESG audit cycle độc lập với Quality-Records: CDP annual, RBA 2-3 năm,
+    # CMRT annual, UFLPA on-demand, SBTi 5-15 năm horizon.
+    # =====================================================================
+    s5 = ROOT / "HESEM-ESG-Compliance"
+    # 01-RBA-Compliance: annual SAQ + 2-3 năm VAP + CAR + Code of Conduct
+    mkpath(s5 / "01-RBA-Compliance" / YYYY)
+    # 02-Carbon-Scope-1-2-3: GHG Protocol, SBTi, CDP — retention 15 năm
+    mkpath(s5 / "02-Carbon-Scope-1-2-3" / YYYY)
+    # 03-Conflict-Minerals-3TG-Cobalt: CMRT v6.40+ annual + CRT cobalt
+    mkpath(s5 / "03-Conflict-Minerals-3TG-Cobalt" / YYYY)
+    # 04-UFLPA-Supply-Chain-Map: aluminum/Si/W smelter map, mill location
+    mkpath(s5 / "04-UFLPA-Supply-Chain-Map")
+    # 05-Banned-Substance-Declarations: RoHS 3 + REACH SVHC + PFAS + halogen-free + chemSHERPA
+    mkpath(s5 / "05-Banned-Substance-Declarations")
+    # 06-Customer-Code-of-Conduct-Signed: 4 OEM Code signed
+    for oem in ["AMAT", "LAM", "ASML", "TEL"]:
+        mkpath(s5 / "06-Customer-Code-of-Conduct-Signed" / oem)
+    # 07-Modern-Slavery-UFLPA-Statements: annual statement
+    mkpath(s5 / "07-Modern-Slavery-UFLPA-Statements" / YYYY)
+
+    # =====================================================================
+    # SITE 6 — HESEM-Customer-Portals (ANNEX-142 §7, 2026-05-16)
+    # 4 customer site độc lập + 1 hub site. Information Barrier segment cấp
+    # site theo SG-Customer-{OEM}-Members group.
+    # =====================================================================
+    s6 = ROOT / "HESEM-Customer-Portals"
+    # Hub site — chỉ liên kết navigation, KHÔNG share content
+    mkpath(s6 / "Customers-Hub")
+    # 4 customer site độc lập
+    for oem in ["AMAT", "LAM", "ASML", "TEL"]:
+        site = s6 / f"Customer-{oem}-Site"
+        # Cấu trúc cấp 1 cho mỗi customer site
+        mkpath(site / "01-Quoted-Parts" / YYYY)
+        mkpath(site / "02-PCN-Submitted" / YYYY)
+        mkpath(site / "03-Released-Lots-with-Cleanliness-Cert" / YYYY)
+        mkpath(site / "04-Audit-Response" / YYYY)
+        mkpath(site / "05-Quality-Issues" / YYYY)
+        mkpath(site / "06-Customer-Spec-Library")  # mirror spec từ portal OEM
+        mkpath(site / "99-Archive")
+
+    # =====================================================================
+    # Workflow Libraries cấp công ty (ANNEX-141 §3 workflows)
+    # Đặt trong HESEM-Records/QMS-Governance/ để gắn QMS owner
+    # =====================================================================
+    qg = s1 / "QMS-Governance"
+    # PCN-Register: List + folder structure cho mỗi PCN ID
+    mkpath(qg / "15-PCN-Register" / "Active")
+    mkpath(qg / "15-PCN-Register" / "Records" / YYYY)
+    # Customer-Spec-Map: List mapping spec ID → HESEM procedure
+    mkpath(qg / "16-Customer-Spec-Map")
+    for oem in ["AMAT", "LAM", "ASML", "TEL"]:
+        mkpath(qg / "16-Customer-Spec-Map" / oem)
+    # External-Distribution-Log: cho audit export tracking
+    mkpath(qg / "17-External-Distribution-Log" / YYYY)
+    # Audit-Evidence-Library: cho customer audit response evidence
+    mkpath(qg / "18-Audit-Evidence-Library" / YYYY)
+
 
 def collect_tree(root: Path) -> list[str]:
     out: list[str] = []
