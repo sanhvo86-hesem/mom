@@ -72,10 +72,10 @@
  <tr><th>Thành phần</th><th>Path / ví dụ</th><th>Rule</th></tr>
  </thead>
  <tbody>
- <tr><td>Source library path</td><td><span class="code">HESEM-Digital/QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span></td><td>Đây là nguồn SharePoint duy nhất được phép đồng bộ xuống máy local.</td></tr>
- <tr><td>Local synced worktree</td><td><span class="code">%UserProfile%\HESEM Engineering\HESEM-Digital - QMS-Source-Control\01-Controlled-Source\qms.hesem.com.vn\</span></td><td>Đây là nơi người dùng làm việc với source content đã được kiểm soát.</td></tr>
- <tr><td>Local git-dir</td><td><span class="code">C:\HESEM-Git\qms.hesem.com.vn.git\</span></td><td>Phải đặt ngoài vùng sync; không được nằm trong worktree.</td></tr>
- <tr><td>Server worktree</td><td><span class="code">/home/&lt;server-user&gt;/qms.hesem.com.vn</span></td><td>Chỉ dùng cho deploy runtime; không phải nơi biên tập chính.</td></tr>
+ <tr><td>Source library path</td><td><span class="code">HESEM-Digital/QMS-Source-Control/01-Controlled-Source/eqms.hesemeng.com/</span></td><td>Đây là nguồn SharePoint duy nhất được phép đồng bộ xuống máy local.</td></tr>
+ <tr><td>Local synced worktree</td><td><span class="code">%UserProfile%\HESEM Engineering\HESEM-Digital - QMS-Source-Control\01-Controlled-Source\eqms.hesemeng.com\</span></td><td>Đây là nơi người dùng làm việc với source content đã được kiểm soát.</td></tr>
+ <tr><td>Local git-dir</td><td><span class="code">C:\HESEM-Git\eqms.hesemeng.com.git\</span></td><td>Phải đặt ngoài vùng sync; không được nằm trong worktree.</td></tr>
+ <tr><td>Server worktree</td><td><span class="code">/var/www/eqms.hesemeng.com/</span></td><td>Worktree runtime trên VPS (host PHP 8.5 + nginx + PostgreSQL + Redis + RabbitMQ). Chỉ dùng cho deploy runtime; không phải nơi biên tập chính. Hồ sơ runtime mutate (state JSON, audit log, snapshot dữ liệu) nằm tại <span class="code">/var/www/data-private/</span> — tách khỏi worktree theo CLAUDE.md §VPS deployment policy.</td></tr>
  </tbody>
  </table>
  </div>
@@ -88,14 +88,14 @@
  <h3>Bố cục được phép</h3>
  <div class="path">SharePoint source library
  -&gt; OneDrive sync folder
- -&gt; qms.hesem.com.vn (worktree only)
+ -&gt; eqms.hesemeng.com (worktree only)
 Git metadata
- -&gt; C:\HESEM-Git\qms.hesem.com.vn.git</div>
+ -&gt; C:\HESEM-Git\eqms.hesemeng.com.git</div>
  </div>
  <div class="figure-box">
  <h3>Bố cục bị cấm</h3>
  <div class="path">SharePoint source library
- -&gt; qms.hesem.com.vn
+ -&gt; eqms.hesemeng.com
  -&gt; .git
  -&gt; node_modules runtime cache
  -&gt; secrets

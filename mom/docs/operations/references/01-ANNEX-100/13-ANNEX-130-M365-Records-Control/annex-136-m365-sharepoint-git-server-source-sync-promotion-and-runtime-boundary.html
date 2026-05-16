@@ -76,8 +76,8 @@
  <tr><th>Lớp</th><th>Vai trò bắt buộc</th><th>Ví dụ HESEM</th><th>Không được làm</th></tr>
  </thead>
  <tbody>
- <tr><td>Nguồn được kiểm soát</td><td>Nơi chứa nội dung nguồn đã được kiểm soát để soạn, rà soát, commit và phát hành.</td><td><span class="code">HESEM-Digital/QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span></td><td>Không chứa session, workflow draft binary, rate-limit log, secrets hoặc dữ liệu giao dịch của biểu mẫu.</td></tr>
- <tr><td>Lịch sử phiên bản Git</td><td>Sổ cái kỹ thuật trung tâm để quản lý commit, branch, merge, pull, push và rollback theo commit.</td><td>Repo remote của <span class="code">qms.hesem.com.vn</span> và local <span class="code">git-dir</span> được tách khỏi thư mục đang đồng bộ.</td><td>Không dùng Git để lưu hồ sơ giao dịch, approval log hay runtime export.</td></tr>
+ <tr><td>Nguồn được kiểm soát</td><td>Nơi chứa nội dung nguồn đã được kiểm soát để soạn, rà soát, commit và phát hành.</td><td><span class="code">HESEM-Digital/QMS-Source-Control/01-Controlled-Source/eqms.hesemeng.com/</span></td><td>Không chứa session, workflow draft binary, rate-limit log, secrets hoặc dữ liệu giao dịch của biểu mẫu.</td></tr>
+ <tr><td>Lịch sử phiên bản Git</td><td>Sổ cái kỹ thuật trung tâm để quản lý commit, branch, merge, pull, push và rollback theo commit.</td><td>Repo remote của <span class="code">eqms.hesemeng.com</span> và local <span class="code">git-dir</span> được tách khỏi thư mục đang đồng bộ.</td><td>Không dùng Git để lưu hồ sơ giao dịch, approval log hay runtime export.</td></tr>
  <tr><td>Bản triển khai trên server</td><td>Bản đang chạy cho portal và điểm sử dụng sau khi pull hoặc deploy thành công.</td><td>Repo worktree đang chạy trên server hoặc cPanel.</td><td>Không để thay đổi có ý nghĩa nằm lại trên server mà không quay về Git.</td></tr>
  <tr><td>Runtime và hồ sơ vận hành</td><td>Dữ liệu đang chạy của hệ thống, bằng chứng, log, lịch sử phê duyệt, bản ghi giao dịch, binary lưu trữ và các thư viện hồ sơ.</td><td><span class="code">mom/qms-data/...</span>, <span class="code">System-Records</span>, các records library tại <span class="code">HESEM-Records</span>.</td><td>Không đồng bộ ngược dữ liệu runtime vào thư viện nguồn chỉ vì chúng cùng tồn tại dưới dạng file.</td></tr>
  </tbody>
@@ -93,7 +93,7 @@
  <tr><th>Site</th><th>Library</th><th>Path bắt buộc</th><th>Mục đích</th><th>Nhóm phụ trách</th></tr>
  </thead>
  <tbody>
- <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">QMS-Source-Control</span></td><td class="path">QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</td><td>Nơi đặt tài liệu nguồn, mã nguồn portal, định nghĩa biểu mẫu đã phát hành, tài sản tĩnh và cấu hình được phép đi theo Git.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td></tr>
+ <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">QMS-Source-Control</span></td><td class="path">QMS-Source-Control/01-Controlled-Source/eqms.hesemeng.com/</td><td>Nơi đặt tài liệu nguồn, mã nguồn portal, định nghĩa biểu mẫu đã phát hành, tài sản tĩnh và cấu hình được phép đi theo Git.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/10-JD-IT/jd-it-admin.html" title="IT Admin (Quản trị viên CNTT)"><span class="entity-code role-code">ITA</span></a></span></td></tr>
  <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">QMS-Source-Control</span></td><td class="path">QMS-Source-Control/02-Release-Manifests/{YYYY}/</td><td>Nơi lưu manifest phát hành, ánh xạ commit, branch, tag, phạm vi phát hành và ghi chú phát hành đã được phê duyệt.</td><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a><span class="entity-sep role-sep">/</span><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td></tr>
  <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">QMS-Source-Control</span></td><td class="path">QMS-Source-Control/03-Server-Deploy-Receipts/{YYYY}/</td><td>Nơi lưu bằng chứng pull hoặc deploy, kết quả smoke test, biên nhận rollback và xác nhận point-of-use.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a></span></td></tr>
  <tr><td><span class="code">HESEM-Digital</span></td><td><span class="code">QMS-Source-Control</span></td><td class="path">QMS-Source-Control/04-Reverse-Sync-Intake/{YYYY}/</td><td>Nơi lưu hồ sơ tiếp nhận hotfix từ server, lý do sửa trực tiếp, commit quay ngược về nguồn và bằng chứng close-out.</td><td><span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../../../system/organization/02-Department-Handbooks/dept-it-handbook.html" title="IT Department (Phòng CNTT)"><span class="entity-code dept-code">D-IT</span></a><span class="entity-sep role-sep">/</span><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html" title="QMS Engineer (Kỹ sư hệ thống QMS)"><span class="entity-code role-code">QMS</span></a></span></td></tr>
@@ -113,7 +113,7 @@
  │ └─ 08-Automation-Run-Logs
  └─ QMS-Source-Control
  ├─ 01-Controlled-Source
- │ └─ qms.hesem.com.vn
+ │ └─ eqms.hesemeng.com
  ├─ 02-Release-Manifests
  ├─ 03-Server-Deploy-Receipts
  └─ 04-Reverse-Sync-Intake</div>
@@ -125,12 +125,12 @@
  <div class="figure-box">
  <h3>Đường dẫn local được phép</h3>
  <p style="margin:8px 0;">Chỉ các máy đã được IT/QMS chỉ định mới được sync library <span class="code">QMS-Source-Control</span>. Worktree local phải nằm dưới thư mục sync do OneDrive quản lý trong hồ sơ người dùng, ví dụ:</p>
- <p class="path">%UserProfile%\HESEM Engineering\HESEM-Digital - QMS-Source-Control\01-Controlled-Source\qms.hesem.com.vn\</p>
+ <p class="path">%UserProfile%\HESEM Engineering\HESEM-Digital - QMS-Source-Control\01-Controlled-Source\eqms.hesemeng.com\</p>
  </div>
  <div class="figure-box">
  <h3>Git metadata được phép</h3>
  <p style="margin:8px 0;">Thư mục <span class="code">.git</span> không được nằm trong thư mục đang sync với SharePoint. Git metadata phải được đặt ở path tách rời ngoài vùng sync, ví dụ:</p>
- <p class="path">C:\HESEM-Git\qms.hesem.com.vn.git\</p>
+ <p class="path">C:\HESEM-Git\eqms.hesemeng.com.git\</p>
  </div>
  </div>
  <div class="step-box">
@@ -179,6 +179,11 @@
  <p style="margin:8px 0;">Định nghĩa biểu mẫu, schema đã phát hành và source template đi theo luồng nguồn chuẩn. Form entry, approval, runtime archive và submission payload không được đi vào Git hoặc source library trên SharePoint.</p>
  </div>
  </div>
+ <div class="callout"><strong>Cơ chế phát hành lên VPS thực tế (eqms.hesemeng.com — host chạy PHP 8.5 + nginx + PostgreSQL + Redis + RabbitMQ):</strong><br>
+ <b>Đường mặc định:</b> push vào branch <span class="code">main</span> trên Git remote → GitHub Actions chạy <span class="code">.github/workflows/deploy.yml</span> → SSH vào VPS, gọi <span class="code">/var/www/eqms.hesemeng.com/tools/vps-setup/scripts/deploy.sh</span>. Script này chụp ảnh dữ liệu runtime vào <span class="code">/var/www/data-private/.deploy-snapshots/&lt;TS&gt;/</span>, chạy reset có kiểm soát, sau đó phục hồi runtime theo xác thực sha256; nếu mismatch sẽ dừng và báo lỗi to.<br>
+ <b>Đường thủ công (khi CI không khả dụng):</b> <span class="code">ssh eqms 'sudo -n bash /var/www/eqms.hesemeng.com/tools/vps-setup/scripts/deploy.sh'</span> — bắt buộc dùng script này, không gõ trực tiếp <span class="code">git reset --hard</span>, <span class="code">git restore</span>, <span class="code">git clean -fd</span> trên VPS.<br>
+ <b>Hot-fix tại VPS (hiếm):</b> chỉ chỉnh qua giao diện admin của portal đi qua <span class="code">DataSyncMutationService</span> (ghi snapshot + audit_events). Không sửa trực tiếp <span class="code">mom/data/config/*.json</span> bằng vi/sed/cat&gt;. Sau hotfix, đóng hồ sơ tại <span class="code">QMS-Source-Control/04-Reverse-Sync-Intake/{YYYY}/</span> theo §6 luồng reverse sync.<br>
+ <b>Tuyệt đối cấm trên VPS:</b> bất kỳ thao tác Git phá huỷ nào (<span class="code">git reset --hard</span>, <span class="code">git restore</span>, <span class="code">git clean -fd</span>) trên <span class="code">/var/www/eqms.hesemeng.com</span> — đã có tiền lệ mất dữ liệu người dùng <span class="code">users.json</span> khi rollback bằng <span class="code">git reset --hard origin/main</span> qua SSH (sự cố commit <span class="code">4a8ffebd</span>); chính sách hiện hành neo tại CLAUDE.md §VPS deployment policy.</div>
  </div>
 
  <div class="section">
@@ -206,7 +211,7 @@
  <tr><th>Thành phần</th><th>Nơi lưu bắt buộc</th><th>Đường đi bắt buộc</th></tr>
  </thead>
  <tbody>
- <tr><td>Form definition / schema / release model</td><td><span class="code">QMS-Source-Control/01-Controlled-Source/qms.hesem.com.vn/</span></td><td>Đi theo Git và SharePoint local sync như các nguồn được kiểm soát khác.</td></tr>
+ <tr><td>Form definition / schema / release model</td><td><span class="code">QMS-Source-Control/01-Controlled-Source/eqms.hesemeng.com/</span></td><td>Đi theo Git và SharePoint local sync như các nguồn được kiểm soát khác.</td></tr>
  <tr><td>Draft binary / in-review binary / archived obsolete workbook</td><td>Server runtime area dưới <span class="code">mom/qms-data/form-workflow/</span> hoặc path runtime tương đương đã được duyệt</td><td>Không quay vào source library; chỉ lưu evidence, manifest hoặc receipt trong records khi thật sự cần.</td></tr>
  <tr><td>Form entry / submission / approval / operational response</td><td>Records library phù hợp tại <span class="code">HESEM-Records</span> hoặc runtime record area đã được phê duyệt</td><td>Không đi theo Git source. Chỉ điều hướng sang file plan chính thức hoặc runtime index có thời hạn lưu trữ.</td></tr>
  </tbody>
