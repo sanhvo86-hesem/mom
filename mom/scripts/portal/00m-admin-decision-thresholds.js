@@ -116,7 +116,7 @@ function _setField(key, field, value){
   _state.draft.items[key][field] = value;
   _state.error = '';
   _state.message = '';
-  _render();
+  _syncStatusUi();
 }
 
 function _setReason(value){
@@ -157,6 +157,7 @@ function _render(){
     .dt-btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-contrast)}
     .dt-btn:disabled{opacity:.48;cursor:not-allowed}
     .dt-alert{border:1px solid var(--border);border-radius:8px;padding:12px 14px;background:var(--surface);color:var(--text-2)}
+    .dt-alert[hidden]{display:none}
     .dt-alert.error{border-color:var(--danger);color:var(--danger)}
     .dt-alert.ok{border-color:var(--success);color:var(--success)}
     .dt-meta-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
@@ -184,12 +185,12 @@ function _render(){
     <div class="dt-actions">
       <button class="dt-btn" type="button" onclick="_dtReload()">${_t('Tải lại', 'Reload')}</button>
       <button class="dt-btn" type="button" onclick="_dtReset()">${_t('Hoàn tác', 'Reset')}</button>
-      <button class="dt-btn primary" type="button" ${financeBlocked || _state.saving ? 'disabled' : ''} onclick="_dtSave()">${_state.saving ? _t('Đang lưu...', 'Saving...') : _t('Lưu và cập nhật tài liệu', 'Save and publish docs')}</button>
+      <button class="dt-btn primary" id="dt-save-btn" type="button" ${financeBlocked || _state.saving ? 'disabled' : ''} onclick="_dtSave()">${_state.saving ? _t('Đang lưu...', 'Saving...') : _t('Lưu và cập nhật tài liệu', 'Save and publish docs')}</button>
     </div>
   </div>
-  ${_state.error ? '<div class="dt-alert error">'+_esc(_state.error)+'</div>' : ''}
-  ${_state.message ? '<div class="dt-alert ok">'+_esc(_state.message)+'</div>' : ''}
-  ${financeBlocked ? '<div class="dt-alert error">'+_t('Không được có mã FIN hoặc vai trò tài chính trong ngưỡng quyết định. CEO là người quyết định cuối.', 'FIN/Finance is not allowed in decision thresholds. CEO is the final authority.')+'</div>' : ''}
+  <div class="dt-alert error" id="dt-error-alert" ${_state.error ? '' : 'hidden'}>${_esc(_state.error)}</div>
+  <div class="dt-alert ok" id="dt-message-alert" ${_state.message ? '' : 'hidden'}>${_esc(_state.message)}</div>
+  <div class="dt-alert error" id="dt-finance-alert" ${financeBlocked ? '' : 'hidden'}>${_t('Không được có mã FIN hoặc vai trò tài chính trong ngưỡng quyết định. CEO là người quyết định cuối.', 'FIN/Finance is not allowed in decision thresholds. CEO is the final authority.')}</div>
   <div class="dt-meta-grid">
     <div class="dt-meta"><b>${_t('Người duyệt cuối', 'Final authority')}</b><span>${_esc(cfg.final_authority_role || 'CEO')}</span></div>
     <div class="dt-meta"><b>${_t('Cập nhật lần cuối', 'Last updated')}</b><span>${_esc(cfg.updated_at || _t('Chưa có', 'Not yet'))}</span></div>
@@ -203,6 +204,29 @@ function _render(){
     ${items.map(_renderItem).join('')}
   </div>
 </section>`;
+  _syncStatusUi();
+}
+
+function _setAlert(id, text){
+  var node = document.getElementById(id);
+  if(!node) return;
+  node.textContent = text || '';
+  node.hidden = !text;
+}
+
+function _syncStatusUi(){
+  var financeBlocked = _hasFinanceToken();
+  _setAlert('dt-error-alert', _state.error || '');
+  _setAlert('dt-message-alert', _state.message || '');
+  _setAlert('dt-finance-alert', financeBlocked
+    ? _t('Không được có mã FIN hoặc vai trò tài chính trong ngưỡng quyết định. CEO là người quyết định cuối.', 'FIN/Finance is not allowed in decision thresholds. CEO is the final authority.')
+    : ''
+  );
+  var saveBtn = document.getElementById('dt-save-btn');
+  if(saveBtn){
+    saveBtn.disabled = !!(_state.saving || financeBlocked);
+    saveBtn.textContent = _state.saving ? _t('Đang lưu...', 'Saving...') : _t('Lưu và cập nhật tài liệu', 'Save and publish docs');
+  }
 }
 
 function _renderItem(item){
