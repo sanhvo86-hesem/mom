@@ -1,15 +1,11 @@
 # HESEM-Internal — Strict-permission internal data
 
-This site holds:
-- **HR/** — Employee dossiers with PII (contract, medical, payroll, discipline) — restricted to HR
-- **IT/** — System records (Access, M365 config, DLP, SOC, Backup, Vuln) — restricted to IT
-- **OT/** — CNC backup, post-processor, kinematic XML — restricted to OT + IT-SOC, air-gapped
-- **Legal/** — Contracts (non-customer), Insurance, Litigation, IP filings — restricted to Legal
-- **Executive/** — BOD pack, Strategy, ERM — restricted to BOD + Exec
+5 libraries, each with named-only access:
+- **HR/** — Employee dossiers (PII). SG-HR-Custodians only; medical/payroll SG-named-only.
+- **IT/** — System records (Access, M365, DLP, SOC, Backup). SG-IT-Admin only.
+- **OT/** — CNC/PLC/CMM backup, post-processor, kinematic. SG-OT + IT-SOC, AIR-GAPPED.
+- **Legal/** — Contracts (non-customer), Insurance, Litigation, IP. SG-Legal-Custodians only.
+- **Executive/** — BOD pack, Strategy, ERM. SG-BOD + Exec only, encryption + expiry.
 
-Permission per LIBRARY (not per folder) for clean isolation. Named-only access
-for medical/payroll/discipline/BOD.
-
-## SSOT note
-- IT policies, SOPs, RACI, training curriculum live in MOM. This site stores
-  only IT/OT operational evidence (access logs, backup receipts, incident records).
+SSOT note: HR/IT/OT/Legal/Executive policies live in MOM, not here. M365 stores
+only operational evidence (access logs, incident records, backup receipts, etc.).

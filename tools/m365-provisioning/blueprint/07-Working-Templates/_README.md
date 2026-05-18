@@ -1,1 +1,0 @@
-# Working Templates — blank form templates per Function × TemplateType
