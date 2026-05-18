@@ -1,1 +1,0 @@
-# Lot-Trace — Heat-lot → process-lot → finished-lot chain

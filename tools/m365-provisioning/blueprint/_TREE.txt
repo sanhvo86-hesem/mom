@@ -1,1180 +1,942 @@
-HESEM-Archive
-HESEM-Archive/Closed-Year-Archive
-HESEM-Archive/Closed-Year-Archive/{YYYY}
-HESEM-Archive/Disposition-Log
-HESEM-Archive/Disposition-Log/{YYYY}
-HESEM-Archive/Legal-Hold-Litigation
-HESEM-Archive/List-Row-Destruction-Trail
-HESEM-Archive/List-Row-Destruction-Trail/{YYYY}
-HESEM-Archive/Locked-Job-Pack-Final
-HESEM-Archive/Locked-Job-Pack-Final/{YYYY}
-HESEM-Archive/Records-Retention-Schedule
-HESEM-Archive/Superseded-Documents
-HESEM-Internal
-HESEM-Internal/Executive
-HESEM-Internal/Executive/BOD-Minutes
-HESEM-Internal/Executive/BOD-Minutes/{YYYY}
-HESEM-Internal/Executive/BOD-Minutes/{YYYY}/_TEMPLATES
-HESEM-Internal/Executive/BOD-Minutes/{YYYY}/_TEMPLATES/Q{N}
-HESEM-Internal/Executive/BOD-Minutes/{YYYY}/_TEMPLATES/Q{N}/1-Working
-HESEM-Internal/Executive/BOD-Minutes/{YYYY}/_TEMPLATES/Q{N}/2-In-Review
-HESEM-Internal/Executive/BOD-Minutes/{YYYY}/_TEMPLATES/Q{N}/3-Released
-HESEM-Internal/Executive/BOD-Pack
-HESEM-Internal/Executive/BOD-Pack/{YYYY}
-HESEM-Internal/Executive/BOD-Pack/{YYYY}/_TEMPLATES
-HESEM-Internal/Executive/BOD-Pack/{YYYY}/_TEMPLATES/Q{N}
-HESEM-Internal/Executive/BOD-Pack/{YYYY}/_TEMPLATES/Q{N}/1-Working
-HESEM-Internal/Executive/BOD-Pack/{YYYY}/_TEMPLATES/Q{N}/2-Pre-BOD-Distribution
-HESEM-Internal/Executive/BOD-Pack/{YYYY}/_TEMPLATES/Q{N}/3-Released-to-BOD
-HESEM-Internal/Executive/BOD-Resolutions
-HESEM-Internal/Executive/BOD-Resolutions/{YYYY}
-HESEM-Internal/Executive/ERM-Risk-Register
-HESEM-Internal/Executive/ERM-Risk-Register/{YYYY}
-HESEM-Internal/Executive/ERM-Risk-Register/{YYYY}/1-Working
-HESEM-Internal/Executive/ERM-Risk-Register/{YYYY}/2-In-Review
-HESEM-Internal/Executive/ERM-Risk-Register/{YYYY}/3-Released
-HESEM-Internal/Executive/Investor-Updates
-HESEM-Internal/Executive/Investor-Updates/{YYYY}
-HESEM-Internal/Executive/Investor-Updates/{YYYY}/_TEMPLATES
-HESEM-Internal/Executive/Investor-Updates/{YYYY}/_TEMPLATES/Q{N}
-HESEM-Internal/Executive/Investor-Updates/{YYYY}/_TEMPLATES/Q{N}/1-Working
-HESEM-Internal/Executive/Investor-Updates/{YYYY}/_TEMPLATES/Q{N}/2-In-Review
-HESEM-Internal/Executive/Investor-Updates/{YYYY}/_TEMPLATES/Q{N}/3-Submitted-to-Customer
-HESEM-Internal/Executive/Investor-Updates/{YYYY}/_TEMPLATES/Q{N}/4-Customer-Approved
-HESEM-Internal/Executive/Strategy-5Y-AOP
-HESEM-Internal/Executive/Strategy-5Y-AOP/{YYYY}
-HESEM-Internal/Executive/Strategy-5Y-AOP/{YYYY}/1-Working
-HESEM-Internal/Executive/Strategy-5Y-AOP/{YYYY}/2-In-Review
-HESEM-Internal/Executive/Strategy-5Y-AOP/{YYYY}/3-Released
-HESEM-Internal/Finance
-HESEM-Internal/Finance/Capex
-HESEM-Internal/Finance/Capex/_TEMPLATES
-HESEM-Internal/Finance/Capex/_TEMPLATES/AFE-{Id}
-HESEM-Internal/Finance/Capex/_TEMPLATES/AFE-{Id}/1-Working
-HESEM-Internal/Finance/Capex/_TEMPLATES/AFE-{Id}/2-In-Review
-HESEM-Internal/Finance/Capex/_TEMPLATES/AFE-{Id}/3-Released
-HESEM-Internal/Finance/Cost-Roll-Up-from-Epicor
-HESEM-Internal/Finance/Cost-Roll-Up-from-Epicor/{YYYY}
-HESEM-Internal/Finance/Customer-Scorecard-Response
-HESEM-Internal/Finance/Customer-Scorecard-Response/AMAT
-HESEM-Internal/Finance/Customer-Scorecard-Response/AMAT/{YYYY}
-HESEM-Internal/Finance/Customer-Scorecard-Response/AMAT/{YYYY}/1-Working
-HESEM-Internal/Finance/Customer-Scorecard-Response/AMAT/{YYYY}/2-In-Review
-HESEM-Internal/Finance/Customer-Scorecard-Response/AMAT/{YYYY}/3-Submitted-to-Customer
-HESEM-Internal/Finance/Customer-Scorecard-Response/AMAT/{YYYY}/4-Customer-Approved
-HESEM-Internal/Finance/Customer-Scorecard-Response/ASML
-HESEM-Internal/Finance/Customer-Scorecard-Response/ASML/{YYYY}
-HESEM-Internal/Finance/Customer-Scorecard-Response/ASML/{YYYY}/1-Working
-HESEM-Internal/Finance/Customer-Scorecard-Response/ASML/{YYYY}/2-In-Review
-HESEM-Internal/Finance/Customer-Scorecard-Response/ASML/{YYYY}/3-Submitted-to-Customer
-HESEM-Internal/Finance/Customer-Scorecard-Response/ASML/{YYYY}/4-Customer-Approved
-HESEM-Internal/Finance/Customer-Scorecard-Response/LAM
-HESEM-Internal/Finance/Customer-Scorecard-Response/LAM/{YYYY}
-HESEM-Internal/Finance/Customer-Scorecard-Response/LAM/{YYYY}/1-Working
-HESEM-Internal/Finance/Customer-Scorecard-Response/LAM/{YYYY}/2-In-Review
-HESEM-Internal/Finance/Customer-Scorecard-Response/LAM/{YYYY}/3-Submitted-to-Customer
-HESEM-Internal/Finance/Customer-Scorecard-Response/LAM/{YYYY}/4-Customer-Approved
-HESEM-Internal/Finance/Customer-Scorecard-Response/TEL
-HESEM-Internal/Finance/Customer-Scorecard-Response/TEL/{YYYY}
-HESEM-Internal/Finance/Customer-Scorecard-Response/TEL/{YYYY}/1-Working
-HESEM-Internal/Finance/Customer-Scorecard-Response/TEL/{YYYY}/2-In-Review
-HESEM-Internal/Finance/Customer-Scorecard-Response/TEL/{YYYY}/3-Submitted-to-Customer
-HESEM-Internal/Finance/Customer-Scorecard-Response/TEL/{YYYY}/4-Customer-Approved
-HESEM-Internal/Finance/External-Audit
-HESEM-Internal/Finance/External-Audit/{YYYY}
-HESEM-Internal/Finance/External-Audit/{YYYY}/Response-Pack
-HESEM-Internal/Finance/External-Audit/{YYYY}/Response-Pack/1-Working
-HESEM-Internal/Finance/External-Audit/{YYYY}/Response-Pack/2-In-Review
-HESEM-Internal/Finance/External-Audit/{YYYY}/Response-Pack/3-Submitted-to-Customer
-HESEM-Internal/Finance/External-Audit/{YYYY}/Response-Pack/4-Customer-Approved
-HESEM-Internal/Finance/Monthly-Close
-HESEM-Internal/Finance/Monthly-Close/{YYYY}
-HESEM-Internal/Finance/Monthly-Close/{YYYY}/_TEMPLATES
-HESEM-Internal/Finance/Monthly-Close/{YYYY}/_TEMPLATES/{Month}
-HESEM-Internal/Finance/Monthly-Close/{YYYY}/_TEMPLATES/{Month}/1-Working
-HESEM-Internal/Finance/Monthly-Close/{YYYY}/_TEMPLATES/{Month}/2-In-Review
-HESEM-Internal/Finance/Monthly-Close/{YYYY}/_TEMPLATES/{Month}/3-Released
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/AMAT
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/AMAT/1-Working
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/AMAT/2-In-Review
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/AMAT/3-Submitted-to-Customer
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/AMAT/4-Customer-Approved
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/ASML
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/ASML/1-Working
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/ASML/2-In-Review
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/ASML/3-Submitted-to-Customer
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/ASML/4-Customer-Approved
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/LAM
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/LAM/1-Working
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/LAM/2-In-Review
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/LAM/3-Submitted-to-Customer
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/LAM/4-Customer-Approved
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/TEL
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/TEL/1-Working
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/TEL/2-In-Review
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/TEL/3-Submitted-to-Customer
-HESEM-Internal/Finance/Open-Book-Customer-Costing-Restricted/TEL/4-Customer-Approved
-HESEM-Internal/HR
-HESEM-Internal/HR/Employees
-HESEM-Internal/HR/Employees/_TEMPLATES
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/00-Identity
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/01-Recruitment-Offer
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/02-Contract-Legal
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/02-Contract-Legal/_TEMPLATES
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/02-Contract-Legal/_TEMPLATES/{Id}
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/02-Contract-Legal/_TEMPLATES/{Id}/1-Working
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/02-Contract-Legal/_TEMPLATES/{Id}/2-In-Review
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/02-Contract-Legal/_TEMPLATES/{Id}/3-Pending-Signature
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/02-Contract-Legal/_TEMPLATES/{Id}/4-Executed
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/03-Onboarding-Access
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/04-Training-Cert-LINK-ONLY
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/05-Performance
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/05-Performance/{YYYY}
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/05-Performance/{YYYY}/Annual-Review
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/05-Performance/{YYYY}/Annual-Review/1-Working
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/05-Performance/{YYYY}/Annual-Review/2-In-Review
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/05-Performance/{YYYY}/Annual-Review/3-Released
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/06-Payroll-Restricted
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/07-Leave-Attendance
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/08-Medical-Restricted
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/09-Assets-Issued
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/10-Transfer-Promotion
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/10-Transfer-Promotion/_TEMPLATES
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/10-Transfer-Promotion/_TEMPLATES/{Id}
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/10-Transfer-Promotion/_TEMPLATES/{Id}/1-Working
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/10-Transfer-Promotion/_TEMPLATES/{Id}/2-In-Review
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/10-Transfer-Promotion/_TEMPLATES/{Id}/3-Released
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/11-Disciplinary-Restricted
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/11-Disciplinary-Restricted/_TEMPLATES
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/11-Disciplinary-Restricted/_TEMPLATES/{Id}
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/11-Disciplinary-Restricted/_TEMPLATES/{Id}/1-Working
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/11-Disciplinary-Restricted/_TEMPLATES/{Id}/2-In-Review
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/11-Disciplinary-Restricted/_TEMPLATES/{Id}/3-Released
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/12-Offboarding
-HESEM-Internal/HR/Employees/_TEMPLATES/{EmployeeID}-{Name}/13-Legal-Hold
-HESEM-Internal/HR/RBA-Worker-Voice
-HESEM-Internal/HR/RBA-Worker-Voice/{YYYY}
-HESEM-Internal/HR/Recruitment-Pipeline
-HESEM-Internal/HR/Working-Hours
-HESEM-Internal/HR/Working-Hours/{YYYY}
-HESEM-Internal/IT
-HESEM-Internal/IT/Access-Identity-IAM
-HESEM-Internal/IT/Access-Identity-IAM/Current
-HESEM-Internal/IT/Access-Identity-IAM/{YYYY}
-HESEM-Internal/IT/Audit-Guest-Access
-HESEM-Internal/IT/Audit-Guest-Access/Current
-HESEM-Internal/IT/Audit-Guest-Access/{YYYY}
-HESEM-Internal/IT/Backup-Restore
-HESEM-Internal/IT/Backup-Restore/Current
-HESEM-Internal/IT/Backup-Restore/{YYYY}
-HESEM-Internal/IT/CMDB-Endpoint
-HESEM-Internal/IT/CMDB-Endpoint/Current
-HESEM-Internal/IT/CMDB-Endpoint/{YYYY}
-HESEM-Internal/IT/DLP-Policy
-HESEM-Internal/IT/DLP-Policy/Current
-HESEM-Internal/IT/DLP-Policy/{YYYY}
-HESEM-Internal/IT/DR-BCP-Drill
-HESEM-Internal/IT/DR-BCP-Drill/{YYYY}
-HESEM-Internal/IT/DR-BCP-Drill/{YYYY}/Report
-HESEM-Internal/IT/DR-BCP-Drill/{YYYY}/Report/1-Working
-HESEM-Internal/IT/DR-BCP-Drill/{YYYY}/Report/2-In-Review
-HESEM-Internal/IT/DR-BCP-Drill/{YYYY}/Report/3-Released
-HESEM-Internal/IT/M365-Purview-Config
-HESEM-Internal/IT/M365-Purview-Config/Current
-HESEM-Internal/IT/M365-Purview-Config/{YYYY}
-HESEM-Internal/IT/Network-Diagram
-HESEM-Internal/IT/Network-Diagram/Current
-HESEM-Internal/IT/Network-Diagram/{YYYY}
-HESEM-Internal/IT/RPA-Run-Logs
-HESEM-Internal/IT/RPA-Run-Logs/Current
-HESEM-Internal/IT/RPA-Run-Logs/{YYYY}
-HESEM-Internal/IT/SOC-Sentinel-Incident
-HESEM-Internal/IT/SOC-Sentinel-Incident/_TEMPLATES
-HESEM-Internal/IT/SOC-Sentinel-Incident/_TEMPLATES/INC-{Id}
-HESEM-Internal/IT/SOC-Sentinel-Incident/_TEMPLATES/INC-{Id}/1-Working
-HESEM-Internal/IT/SOC-Sentinel-Incident/_TEMPLATES/INC-{Id}/2-In-Review
-HESEM-Internal/IT/SOC-Sentinel-Incident/_TEMPLATES/INC-{Id}/3-Released
-HESEM-Internal/IT/Vendor-Security
-HESEM-Internal/IT/Vendor-Security/Current
-HESEM-Internal/IT/Vendor-Security/{YYYY}
-HESEM-Internal/IT/Vulnerability-Patch
-HESEM-Internal/IT/Vulnerability-Patch/Current
-HESEM-Internal/IT/Vulnerability-Patch/{YYYY}
-HESEM-Internal/Legal
-HESEM-Internal/Legal/Authority-Matrix
-HESEM-Internal/Legal/Authority-Matrix/1-Working
-HESEM-Internal/Legal/Authority-Matrix/2-In-Review
-HESEM-Internal/Legal/Authority-Matrix/3-Released
-HESEM-Internal/Legal/Contracts-General
-HESEM-Internal/Legal/Contracts-General/_TEMPLATES
-HESEM-Internal/Legal/Contracts-General/_TEMPLATES/{Type}
-HESEM-Internal/Legal/Contracts-General/_TEMPLATES/{Type}/{Id}
-HESEM-Internal/Legal/Contracts-General/_TEMPLATES/{Type}/{Id}/1-Working
-HESEM-Internal/Legal/Contracts-General/_TEMPLATES/{Type}/{Id}/2-In-Review
-HESEM-Internal/Legal/Contracts-General/_TEMPLATES/{Type}/{Id}/3-Pending-Signature
-HESEM-Internal/Legal/Contracts-General/_TEMPLATES/{Type}/{Id}/4-Executed
-HESEM-Internal/Legal/IP-Patents
-HESEM-Internal/Legal/IP-Patents/_TEMPLATES
-HESEM-Internal/Legal/IP-Patents/_TEMPLATES/{CaseId}
-HESEM-Internal/Legal/IP-Patents/_TEMPLATES/{CaseId}/1-Working
-HESEM-Internal/Legal/IP-Patents/_TEMPLATES/{CaseId}/2-In-Review
-HESEM-Internal/Legal/IP-Patents/_TEMPLATES/{CaseId}/3-Submitted-to-Customer
-HESEM-Internal/Legal/IP-Patents/_TEMPLATES/{CaseId}/4-Customer-Approved
-HESEM-Internal/Legal/IP-Trademarks
-HESEM-Internal/Legal/IP-Trademarks/_TEMPLATES
-HESEM-Internal/Legal/IP-Trademarks/_TEMPLATES/{CaseId}
-HESEM-Internal/Legal/IP-Trademarks/_TEMPLATES/{CaseId}/1-Working
-HESEM-Internal/Legal/IP-Trademarks/_TEMPLATES/{CaseId}/2-In-Review
-HESEM-Internal/Legal/IP-Trademarks/_TEMPLATES/{CaseId}/3-Submitted-to-Customer
-HESEM-Internal/Legal/IP-Trademarks/_TEMPLATES/{CaseId}/4-Customer-Approved
-HESEM-Internal/Legal/Insurance-Policies
-HESEM-Internal/Legal/Insurance-Policies/Cargo
-HESEM-Internal/Legal/Insurance-Policies/Cargo/1-Working
-HESEM-Internal/Legal/Insurance-Policies/Cargo/2-In-Review
-HESEM-Internal/Legal/Insurance-Policies/Cargo/3-Pending-Signature
-HESEM-Internal/Legal/Insurance-Policies/Cargo/4-Executed
-HESEM-Internal/Legal/Insurance-Policies/Cyber
-HESEM-Internal/Legal/Insurance-Policies/Cyber/1-Working
-HESEM-Internal/Legal/Insurance-Policies/Cyber/2-In-Review
-HESEM-Internal/Legal/Insurance-Policies/Cyber/3-Pending-Signature
-HESEM-Internal/Legal/Insurance-Policies/Cyber/4-Executed
-HESEM-Internal/Legal/Insurance-Policies/DO
-HESEM-Internal/Legal/Insurance-Policies/DO/1-Working
-HESEM-Internal/Legal/Insurance-Policies/DO/2-In-Review
-HESEM-Internal/Legal/Insurance-Policies/DO/3-Pending-Signature
-HESEM-Internal/Legal/Insurance-Policies/DO/4-Executed
-HESEM-Internal/Legal/Insurance-Policies/PL
-HESEM-Internal/Legal/Insurance-Policies/PL/1-Working
-HESEM-Internal/Legal/Insurance-Policies/PL/2-In-Review
-HESEM-Internal/Legal/Insurance-Policies/PL/3-Pending-Signature
-HESEM-Internal/Legal/Insurance-Policies/PL/4-Executed
-HESEM-Internal/Legal/Insurance-Policies/Property
-HESEM-Internal/Legal/Insurance-Policies/Property/1-Working
-HESEM-Internal/Legal/Insurance-Policies/Property/2-In-Review
-HESEM-Internal/Legal/Insurance-Policies/Property/3-Pending-Signature
-HESEM-Internal/Legal/Insurance-Policies/Property/4-Executed
-HESEM-Internal/Legal/Litigation-Hold
-HESEM-Internal/Legal/Litigation-Hold/_TEMPLATES
-HESEM-Internal/Legal/Litigation-Hold/_TEMPLATES/{CaseId}
-HESEM-Internal/Legal/Litigation-Hold/_TEMPLATES/{CaseId}/1-Working
-HESEM-Internal/Legal/Litigation-Hold/_TEMPLATES/{CaseId}/2-In-Review
-HESEM-Internal/Legal/Litigation-Hold/_TEMPLATES/{CaseId}/3-Submitted-to-Customer
-HESEM-Internal/Legal/Litigation-Hold/_TEMPLATES/{CaseId}/4-Customer-Approved
-HESEM-Internal/OT
-HESEM-Internal/OT/Air-Gap-Workstation-Config
-HESEM-Internal/OT/CAD-CAM-License-Backup
-HESEM-Internal/OT/CAD-CAM-License-Backup/{YYYY}
-HESEM-Internal/OT/CMM-Program-Backup
-HESEM-Internal/OT/CMM-Program-Backup/_TEMPLATES
-HESEM-Internal/OT/CMM-Program-Backup/_TEMPLATES/{CMMCode}
-HESEM-Internal/OT/CNC-Param-Backup
-HESEM-Internal/OT/CNC-Param-Backup/_TEMPLATES
-HESEM-Internal/OT/CNC-Param-Backup/_TEMPLATES/{MachineCode}
-HESEM-Internal/OT/CNC-Param-Backup/_TEMPLATES/{MachineCode}/{YYYY}
-HESEM-Internal/OT/DNC-Server-Config
-HESEM-Internal/OT/Kinematic-XML
-HESEM-Internal/OT/OT-Incident-Playbook
-HESEM-Internal/OT/PLC-Ladder-Backup
-HESEM-Internal/OT/PLC-Ladder-Backup/_TEMPLATES
-HESEM-Internal/OT/PLC-Ladder-Backup/_TEMPLATES/{MachineCode}
-HESEM-Internal/OT/PLC-Ladder-Backup/_TEMPLATES/{MachineCode}/{YYYY}
-HESEM-Internal/OT/Post-Processor-Library
-HESEM-Workspace
-HESEM-Workspace/Asset-Master
-HESEM-Workspace/Asset-Master/Fixtures
-HESEM-Workspace/Asset-Master/Fixtures/_TEMPLATES
-HESEM-Workspace/Asset-Master/Fixtures/_TEMPLATES/{FixtureCode}
-HESEM-Workspace/Asset-Master/Fixtures/_TEMPLATES/{FixtureCode}/00-Profile
-HESEM-Workspace/Asset-Master/Fixtures/_TEMPLATES/{FixtureCode}/01-Design-Pack
-HESEM-Workspace/Asset-Master/Fixtures/_TEMPLATES/{FixtureCode}/01-Design-Pack/1-Working
-HESEM-Workspace/Asset-Master/Fixtures/_TEMPLATES/{FixtureCode}/01-Design-Pack/2-In-Review
-HESEM-Workspace/Asset-Master/Fixtures/_TEMPLATES/{FixtureCode}/01-Design-Pack/3-Released
-HESEM-Workspace/Asset-Master/Fixtures/_TEMPLATES/{FixtureCode}/01-Validation-Proveout
-HESEM-Workspace/Asset-Master/Fixtures/_TEMPLATES/{FixtureCode}/01-Validation-Proveout/1-Working
-HESEM-Workspace/Asset-Master/Fixtures/_TEMPLATES/{FixtureCode}/01-Validation-Proveout/2-In-Review
-HESEM-Workspace/Asset-Master/Fixtures/_TEMPLATES/{FixtureCode}/01-Validation-Proveout/3-Released
-HESEM-Workspace/Asset-Master/Fixtures/_TEMPLATES/{FixtureCode}/02-Usage-Log
-HESEM-Workspace/Asset-Master/Fixtures/_TEMPLATES/{FixtureCode}/03-Maintenance-Repair
-HESEM-Workspace/Asset-Master/Fixtures/_TEMPLATES/{FixtureCode}/04-Annual-Cert
-HESEM-Workspace/Asset-Master/Fixtures/_TEMPLATES/{FixtureCode}/99-Retired
-HESEM-Workspace/Asset-Master/Gages
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/00-Profile
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/01-Specification
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/02-Calibration
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/02-Calibration/{YYYY}
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/02-Calibration/{YYYY}/_Lab-Methodology-NDA
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_generic
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_generic/1-Working
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_generic/2-In-Review
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_generic/3-Released
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_per-Customer
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_per-Customer/AMAT
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_per-Customer/AMAT/1-Working
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_per-Customer/AMAT/2-In-Review
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_per-Customer/AMAT/3-Released
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_per-Customer/ASML
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_per-Customer/ASML/1-Working
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_per-Customer/ASML/2-In-Review
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_per-Customer/ASML/3-Released
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_per-Customer/LAM
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_per-Customer/LAM/1-Working
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_per-Customer/LAM/2-In-Review
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_per-Customer/LAM/3-Released
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_per-Customer/TEL
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_per-Customer/TEL/1-Working
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_per-Customer/TEL/2-In-Review
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/03-MSA-GR-R/_per-Customer/TEL/3-Released
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/04-Daily-Check-Log
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/05-OOT-Investigation
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/05-OOT-Investigation/_TEMPLATES
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/05-OOT-Investigation/_TEMPLATES/{Id}
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/05-OOT-Investigation/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/05-OOT-Investigation/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/05-OOT-Investigation/_TEMPLATES/{Id}/3-Released
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/06-Maintenance-Repair
-HESEM-Workspace/Asset-Master/Gages/_TEMPLATES/{GageCode}/99-Retired
-HESEM-Workspace/Asset-Master/Lines
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/00-Profile
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/01-IQ-OQ-PQ-Qualification
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/01-IQ-OQ-PQ-Qualification/_TEMPLATES
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/01-IQ-OQ-PQ-Qualification/_TEMPLATES/{Id}
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/01-IQ-OQ-PQ-Qualification/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/01-IQ-OQ-PQ-Qualification/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/01-IQ-OQ-PQ-Qualification/_TEMPLATES/{Id}/3-Released
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/02-Bath-Chemistry
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/02-Bath-Chemistry/{YYYY}
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/03-Calibration
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/03-Calibration/{YYYY}
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/04-Maintenance-Schedule
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/05-Environmental-Monitor
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/05-Environmental-Monitor/{YYYY}
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/06-HEPA-Filter-Integrity
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/06-HEPA-Filter-Integrity/{YYYY}
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/07-Bath-Replacement-Log
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/07-Bath-Replacement-Log/{YYYY}
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/08-Equipment-Used-Log
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/08-Equipment-Used-Log/{YYYY}
-HESEM-Workspace/Asset-Master/Lines/_TEMPLATES/{LineCode}/99-Decommissioned
-HESEM-Workspace/Asset-Master/Machines
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/00-Profile
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/01-Capability-Spec
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/02-Geometry-Verification
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/02-Geometry-Verification/{YYYY}
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/03-PM-Records
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/03-PM-Records/{YYYY}
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/04-PdM-Records
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/04-PdM-Records/{YYYY}
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/05-Firmware-Updates
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/06-Breakdown-RCA
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/06-Breakdown-RCA/_TEMPLATES
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/06-Breakdown-RCA/_TEMPLATES/{Id}
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/06-Breakdown-RCA/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/06-Breakdown-RCA/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/06-Breakdown-RCA/_TEMPLATES/{Id}/3-Released
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/07-Spindle-Rebuild-Capex
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/07-Spindle-Rebuild-Capex/_TEMPLATES
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/07-Spindle-Rebuild-Capex/_TEMPLATES/{Id}
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/07-Spindle-Rebuild-Capex/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/07-Spindle-Rebuild-Capex/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/07-Spindle-Rebuild-Capex/_TEMPLATES/{Id}/3-Released
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/08-Backup-CNC-PLC
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/09-Equipment-Used-Log
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/10-Customer-Cap-Cert
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/10-Customer-Cap-Cert/{YYYY}
-HESEM-Workspace/Asset-Master/Machines/_TEMPLATES/{MachineCode}/99-Decommissioned
-HESEM-Workspace/Asset-Master/Tools
-HESEM-Workspace/Asset-Master/Tools/_TEMPLATES
-HESEM-Workspace/Asset-Master/Tools/_TEMPLATES/{ToolCode}
-HESEM-Workspace/Asset-Master/Tools/_TEMPLATES/{ToolCode}/00-Master-Spec
-HESEM-Workspace/Asset-Master/Tools/_TEMPLATES/{ToolCode}/01-Preset-Data
-HESEM-Workspace/Asset-Master/Tools/_TEMPLATES/{ToolCode}/02-Life-History
-HESEM-Workspace/Asset-Master/Tools/_TEMPLATES/{ToolCode}/03-OOT-Investigation
-HESEM-Workspace/Asset-Master/Tools/_TEMPLATES/{ToolCode}/03-OOT-Investigation/_TEMPLATES
-HESEM-Workspace/Asset-Master/Tools/_TEMPLATES/{ToolCode}/03-OOT-Investigation/_TEMPLATES/{Id}
-HESEM-Workspace/Asset-Master/Tools/_TEMPLATES/{ToolCode}/03-OOT-Investigation/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Asset-Master/Tools/_TEMPLATES/{ToolCode}/03-OOT-Investigation/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Asset-Master/Tools/_TEMPLATES/{ToolCode}/03-OOT-Investigation/_TEMPLATES/{Id}/3-Released
-HESEM-Workspace/Asset-Master/Tools/_TEMPLATES/{ToolCode}/99-Scrapped
-HESEM-Workspace/Compliance
-HESEM-Workspace/Compliance/ASML-HIO
-HESEM-Workspace/Compliance/Banned-Substance-Library
-HESEM-Workspace/Compliance/CDP-EcoVadis-Submission
-HESEM-Workspace/Compliance/CDP-EcoVadis-Submission/{YYYY}
-HESEM-Workspace/Compliance/CDP-EcoVadis-Submission/{YYYY}/1-Working
-HESEM-Workspace/Compliance/CDP-EcoVadis-Submission/{YYYY}/2-In-Review
-HESEM-Workspace/Compliance/CDP-EcoVadis-Submission/{YYYY}/3-Submitted-to-Customer
-HESEM-Workspace/Compliance/CDP-EcoVadis-Submission/{YYYY}/4-Customer-Approved
-HESEM-Workspace/Compliance/CMRT-Annual-Roll-Up
-HESEM-Workspace/Compliance/CMRT-Annual-Roll-Up/{YYYY}
-HESEM-Workspace/Compliance/CMRT-Annual-Roll-Up/{YYYY}/1-Working
-HESEM-Workspace/Compliance/CMRT-Annual-Roll-Up/{YYYY}/2-In-Review
-HESEM-Workspace/Compliance/CMRT-Annual-Roll-Up/{YYYY}/3-Submitted-to-Customer
-HESEM-Workspace/Compliance/CMRT-Annual-Roll-Up/{YYYY}/4-Customer-Approved
-HESEM-Workspace/Compliance/Carbon-Scope-1-2-3-Inventory
-HESEM-Workspace/Compliance/Carbon-Scope-1-2-3-Inventory/{YYYY}
-HESEM-Workspace/Compliance/Carbon-Scope-1-2-3-Inventory/{YYYY}/1-Working
-HESEM-Workspace/Compliance/Carbon-Scope-1-2-3-Inventory/{YYYY}/2-In-Review
-HESEM-Workspace/Compliance/Carbon-Scope-1-2-3-Inventory/{YYYY}/3-Submitted-to-Customer
-HESEM-Workspace/Compliance/Carbon-Scope-1-2-3-Inventory/{YYYY}/4-Customer-Approved
-HESEM-Workspace/Compliance/Customer-CoC-Signed
-HESEM-Workspace/Compliance/Customer-CoC-Signed/AMAT
-HESEM-Workspace/Compliance/Customer-CoC-Signed/AMAT/1-Working
-HESEM-Workspace/Compliance/Customer-CoC-Signed/AMAT/2-In-Review
-HESEM-Workspace/Compliance/Customer-CoC-Signed/AMAT/3-Pending-Signature
-HESEM-Workspace/Compliance/Customer-CoC-Signed/AMAT/4-Executed
-HESEM-Workspace/Compliance/Customer-CoC-Signed/ASML
-HESEM-Workspace/Compliance/Customer-CoC-Signed/ASML/1-Working
-HESEM-Workspace/Compliance/Customer-CoC-Signed/ASML/2-In-Review
-HESEM-Workspace/Compliance/Customer-CoC-Signed/ASML/3-Pending-Signature
-HESEM-Workspace/Compliance/Customer-CoC-Signed/ASML/4-Executed
-HESEM-Workspace/Compliance/Customer-CoC-Signed/LAM
-HESEM-Workspace/Compliance/Customer-CoC-Signed/LAM/1-Working
-HESEM-Workspace/Compliance/Customer-CoC-Signed/LAM/2-In-Review
-HESEM-Workspace/Compliance/Customer-CoC-Signed/LAM/3-Pending-Signature
-HESEM-Workspace/Compliance/Customer-CoC-Signed/LAM/4-Executed
-HESEM-Workspace/Compliance/Customer-CoC-Signed/TEL
-HESEM-Workspace/Compliance/Customer-CoC-Signed/TEL/1-Working
-HESEM-Workspace/Compliance/Customer-CoC-Signed/TEL/2-In-Review
-HESEM-Workspace/Compliance/Customer-CoC-Signed/TEL/3-Pending-Signature
-HESEM-Workspace/Compliance/Customer-CoC-Signed/TEL/4-Executed
-HESEM-Workspace/Compliance/EMRT-Cobalt-Annual
-HESEM-Workspace/Compliance/EMRT-Cobalt-Annual/{YYYY}
-HESEM-Workspace/Compliance/EMRT-Cobalt-Annual/{YYYY}/1-Working
-HESEM-Workspace/Compliance/EMRT-Cobalt-Annual/{YYYY}/2-In-Review
-HESEM-Workspace/Compliance/EMRT-Cobalt-Annual/{YYYY}/3-Submitted-to-Customer
-HESEM-Workspace/Compliance/EMRT-Cobalt-Annual/{YYYY}/4-Customer-Approved
-HESEM-Workspace/Compliance/Export-Classification
-HESEM-Workspace/Compliance/IP-Patent-Filings
-HESEM-Workspace/Compliance/IP-Patent-Filings/_TEMPLATES
-HESEM-Workspace/Compliance/IP-Patent-Filings/_TEMPLATES/{CaseId}
-HESEM-Workspace/Compliance/IP-Patent-Filings/_TEMPLATES/{CaseId}/1-Working
-HESEM-Workspace/Compliance/IP-Patent-Filings/_TEMPLATES/{CaseId}/2-In-Review
-HESEM-Workspace/Compliance/IP-Patent-Filings/_TEMPLATES/{CaseId}/3-Submitted-to-Customer
-HESEM-Workspace/Compliance/IP-Patent-Filings/_TEMPLATES/{CaseId}/4-Customer-Approved
-HESEM-Workspace/Compliance/IP-Trademark-Filings
-HESEM-Workspace/Compliance/IP-Trademark-Filings/_TEMPLATES
-HESEM-Workspace/Compliance/IP-Trademark-Filings/_TEMPLATES/{CaseId}
-HESEM-Workspace/Compliance/IP-Trademark-Filings/_TEMPLATES/{CaseId}/1-Working
-HESEM-Workspace/Compliance/IP-Trademark-Filings/_TEMPLATES/{CaseId}/2-In-Review
-HESEM-Workspace/Compliance/IP-Trademark-Filings/_TEMPLATES/{CaseId}/3-Submitted-to-Customer
-HESEM-Workspace/Compliance/IP-Trademark-Filings/_TEMPLATES/{CaseId}/4-Customer-Approved
-HESEM-Workspace/Compliance/Modern-Slavery-Statement
-HESEM-Workspace/Compliance/Modern-Slavery-Statement/{YYYY}
-HESEM-Workspace/Compliance/Modern-Slavery-Statement/{YYYY}/1-Working
-HESEM-Workspace/Compliance/Modern-Slavery-Statement/{YYYY}/2-In-Review
-HESEM-Workspace/Compliance/Modern-Slavery-Statement/{YYYY}/3-Submitted-to-Customer
-HESEM-Workspace/Compliance/Modern-Slavery-Statement/{YYYY}/4-Customer-Approved
-HESEM-Workspace/Compliance/RBA-SAQ-VAP
-HESEM-Workspace/Compliance/RBA-SAQ-VAP/{YYYY}
-HESEM-Workspace/Compliance/RBA-SAQ-VAP/{YYYY}/1-Working
-HESEM-Workspace/Compliance/RBA-SAQ-VAP/{YYYY}/2-In-Review
-HESEM-Workspace/Compliance/RBA-SAQ-VAP/{YYYY}/3-Submitted-to-Customer
-HESEM-Workspace/Compliance/RBA-SAQ-VAP/{YYYY}/4-Customer-Approved
-HESEM-Workspace/Compliance/REACH-RoHS-per-Part
-HESEM-Workspace/Compliance/Trade-Secret-Master-Index
-HESEM-Workspace/Compliance/UFLPA-Map
-HESEM-Workspace/Customer-Account
-HESEM-Workspace/Customer-Account/AMAT
-HESEM-Workspace/Customer-Account/AMAT/Approved-Suppliers-Flowdown
-HESEM-Workspace/Customer-Account/AMAT/Audits
-HESEM-Workspace/Customer-Account/AMAT/Audits/{YYYY}
-HESEM-Workspace/Customer-Account/AMAT/Audits/{YYYY}/_TEMPLATES
-HESEM-Workspace/Customer-Account/AMAT/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack
-HESEM-Workspace/Customer-Account/AMAT/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack/1-Working
-HESEM-Workspace/Customer-Account/AMAT/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack/2-In-Review
-HESEM-Workspace/Customer-Account/AMAT/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack/3-Submitted-to-Customer
-HESEM-Workspace/Customer-Account/AMAT/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack/4-Customer-Approved
-HESEM-Workspace/Customer-Account/AMAT/Bulletins
-HESEM-Workspace/Customer-Account/AMAT/Bulletins/{YYYY}
-HESEM-Workspace/Customer-Account/AMAT/Complaints-Master-Log
-HESEM-Workspace/Customer-Account/AMAT/Contracts
-HESEM-Workspace/Customer-Account/AMAT/Contracts/LTA
-HESEM-Workspace/Customer-Account/AMAT/Contracts/LTA/_TEMPLATES
-HESEM-Workspace/Customer-Account/AMAT/Contracts/LTA/_TEMPLATES/{Id}
-HESEM-Workspace/Customer-Account/AMAT/Contracts/LTA/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Customer-Account/AMAT/Contracts/LTA/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/AMAT/Contracts/LTA/_TEMPLATES/{Id}/3-Pending-Signature
-HESEM-Workspace/Customer-Account/AMAT/Contracts/LTA/_TEMPLATES/{Id}/4-Executed
-HESEM-Workspace/Customer-Account/AMAT/Contracts/MSA
-HESEM-Workspace/Customer-Account/AMAT/Contracts/MSA/_TEMPLATES
-HESEM-Workspace/Customer-Account/AMAT/Contracts/MSA/_TEMPLATES/{Id}
-HESEM-Workspace/Customer-Account/AMAT/Contracts/MSA/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Customer-Account/AMAT/Contracts/MSA/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/AMAT/Contracts/MSA/_TEMPLATES/{Id}/3-Pending-Signature
-HESEM-Workspace/Customer-Account/AMAT/Contracts/MSA/_TEMPLATES/{Id}/4-Executed
-HESEM-Workspace/Customer-Account/AMAT/Contracts/NDA
-HESEM-Workspace/Customer-Account/AMAT/Contracts/NDA/_TEMPLATES
-HESEM-Workspace/Customer-Account/AMAT/Contracts/NDA/_TEMPLATES/{Id}
-HESEM-Workspace/Customer-Account/AMAT/Contracts/NDA/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Customer-Account/AMAT/Contracts/NDA/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/AMAT/Contracts/NDA/_TEMPLATES/{Id}/3-Pending-Signature
-HESEM-Workspace/Customer-Account/AMAT/Contracts/NDA/_TEMPLATES/{Id}/4-Executed
-HESEM-Workspace/Customer-Account/AMAT/Contracts/Quality-Agreement
-HESEM-Workspace/Customer-Account/AMAT/Contracts/Quality-Agreement/_TEMPLATES
-HESEM-Workspace/Customer-Account/AMAT/Contracts/Quality-Agreement/_TEMPLATES/{Id}
-HESEM-Workspace/Customer-Account/AMAT/Contracts/Quality-Agreement/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Customer-Account/AMAT/Contracts/Quality-Agreement/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/AMAT/Contracts/Quality-Agreement/_TEMPLATES/{Id}/3-Pending-Signature
-HESEM-Workspace/Customer-Account/AMAT/Contracts/Quality-Agreement/_TEMPLATES/{Id}/4-Executed
-HESEM-Workspace/Customer-Account/AMAT/Demand-Forecast
-HESEM-Workspace/Customer-Account/AMAT/Demand-Forecast/{YYYY}
-HESEM-Workspace/Customer-Account/AMAT/ESG-Surveys
-HESEM-Workspace/Customer-Account/AMAT/ESG-Surveys/{YYYY}
-HESEM-Workspace/Customer-Account/AMAT/PCN-Inbound-Master-Log
-HESEM-Workspace/Customer-Account/AMAT/PCN-Outbound-Master-Log
-HESEM-Workspace/Customer-Account/AMAT/PCN-Outbound-Master-Log/_TEMPLATES
-HESEM-Workspace/Customer-Account/AMAT/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}
-HESEM-Workspace/Customer-Account/AMAT/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}/1-Working
-HESEM-Workspace/Customer-Account/AMAT/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/AMAT/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}/3-Submitted-to-Customer
-HESEM-Workspace/Customer-Account/AMAT/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}/4-Customer-Approved
-HESEM-Workspace/Customer-Account/AMAT/Portal-Account-Refs
-HESEM-Workspace/Customer-Account/AMAT/Scorecards
-HESEM-Workspace/Customer-Account/AMAT/Scorecards/{YYYY}
-HESEM-Workspace/Customer-Account/AMAT/Standards-Library
-HESEM-Workspace/Customer-Account/ASML
-HESEM-Workspace/Customer-Account/ASML/Approved-Suppliers-Flowdown
-HESEM-Workspace/Customer-Account/ASML/Audits
-HESEM-Workspace/Customer-Account/ASML/Audits/{YYYY}
-HESEM-Workspace/Customer-Account/ASML/Audits/{YYYY}/_TEMPLATES
-HESEM-Workspace/Customer-Account/ASML/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack
-HESEM-Workspace/Customer-Account/ASML/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack/1-Working
-HESEM-Workspace/Customer-Account/ASML/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack/2-In-Review
-HESEM-Workspace/Customer-Account/ASML/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack/3-Submitted-to-Customer
-HESEM-Workspace/Customer-Account/ASML/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack/4-Customer-Approved
-HESEM-Workspace/Customer-Account/ASML/Bulletins
-HESEM-Workspace/Customer-Account/ASML/Bulletins/{YYYY}
-HESEM-Workspace/Customer-Account/ASML/Complaints-Master-Log
-HESEM-Workspace/Customer-Account/ASML/Contracts
-HESEM-Workspace/Customer-Account/ASML/Contracts/LTA
-HESEM-Workspace/Customer-Account/ASML/Contracts/LTA/_TEMPLATES
-HESEM-Workspace/Customer-Account/ASML/Contracts/LTA/_TEMPLATES/{Id}
-HESEM-Workspace/Customer-Account/ASML/Contracts/LTA/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Customer-Account/ASML/Contracts/LTA/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/ASML/Contracts/LTA/_TEMPLATES/{Id}/3-Pending-Signature
-HESEM-Workspace/Customer-Account/ASML/Contracts/LTA/_TEMPLATES/{Id}/4-Executed
-HESEM-Workspace/Customer-Account/ASML/Contracts/MSA
-HESEM-Workspace/Customer-Account/ASML/Contracts/MSA/_TEMPLATES
-HESEM-Workspace/Customer-Account/ASML/Contracts/MSA/_TEMPLATES/{Id}
-HESEM-Workspace/Customer-Account/ASML/Contracts/MSA/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Customer-Account/ASML/Contracts/MSA/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/ASML/Contracts/MSA/_TEMPLATES/{Id}/3-Pending-Signature
-HESEM-Workspace/Customer-Account/ASML/Contracts/MSA/_TEMPLATES/{Id}/4-Executed
-HESEM-Workspace/Customer-Account/ASML/Contracts/NDA
-HESEM-Workspace/Customer-Account/ASML/Contracts/NDA/_TEMPLATES
-HESEM-Workspace/Customer-Account/ASML/Contracts/NDA/_TEMPLATES/{Id}
-HESEM-Workspace/Customer-Account/ASML/Contracts/NDA/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Customer-Account/ASML/Contracts/NDA/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/ASML/Contracts/NDA/_TEMPLATES/{Id}/3-Pending-Signature
-HESEM-Workspace/Customer-Account/ASML/Contracts/NDA/_TEMPLATES/{Id}/4-Executed
-HESEM-Workspace/Customer-Account/ASML/Contracts/Quality-Agreement
-HESEM-Workspace/Customer-Account/ASML/Contracts/Quality-Agreement/_TEMPLATES
-HESEM-Workspace/Customer-Account/ASML/Contracts/Quality-Agreement/_TEMPLATES/{Id}
-HESEM-Workspace/Customer-Account/ASML/Contracts/Quality-Agreement/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Customer-Account/ASML/Contracts/Quality-Agreement/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/ASML/Contracts/Quality-Agreement/_TEMPLATES/{Id}/3-Pending-Signature
-HESEM-Workspace/Customer-Account/ASML/Contracts/Quality-Agreement/_TEMPLATES/{Id}/4-Executed
-HESEM-Workspace/Customer-Account/ASML/Demand-Forecast
-HESEM-Workspace/Customer-Account/ASML/Demand-Forecast/{YYYY}
-HESEM-Workspace/Customer-Account/ASML/ESG-Surveys
-HESEM-Workspace/Customer-Account/ASML/ESG-Surveys/{YYYY}
-HESEM-Workspace/Customer-Account/ASML/PCN-Inbound-Master-Log
-HESEM-Workspace/Customer-Account/ASML/PCN-Outbound-Master-Log
-HESEM-Workspace/Customer-Account/ASML/PCN-Outbound-Master-Log/_TEMPLATES
-HESEM-Workspace/Customer-Account/ASML/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}
-HESEM-Workspace/Customer-Account/ASML/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}/1-Working
-HESEM-Workspace/Customer-Account/ASML/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/ASML/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}/3-Submitted-to-Customer
-HESEM-Workspace/Customer-Account/ASML/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}/4-Customer-Approved
-HESEM-Workspace/Customer-Account/ASML/Portal-Account-Refs
-HESEM-Workspace/Customer-Account/ASML/Scorecards
-HESEM-Workspace/Customer-Account/ASML/Scorecards/{YYYY}
-HESEM-Workspace/Customer-Account/ASML/Standards-Library
-HESEM-Workspace/Customer-Account/LAM
-HESEM-Workspace/Customer-Account/LAM/Approved-Suppliers-Flowdown
-HESEM-Workspace/Customer-Account/LAM/Audits
-HESEM-Workspace/Customer-Account/LAM/Audits/{YYYY}
-HESEM-Workspace/Customer-Account/LAM/Audits/{YYYY}/_TEMPLATES
-HESEM-Workspace/Customer-Account/LAM/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack
-HESEM-Workspace/Customer-Account/LAM/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack/1-Working
-HESEM-Workspace/Customer-Account/LAM/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack/2-In-Review
-HESEM-Workspace/Customer-Account/LAM/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack/3-Submitted-to-Customer
-HESEM-Workspace/Customer-Account/LAM/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack/4-Customer-Approved
-HESEM-Workspace/Customer-Account/LAM/Bulletins
-HESEM-Workspace/Customer-Account/LAM/Bulletins/{YYYY}
-HESEM-Workspace/Customer-Account/LAM/Complaints-Master-Log
-HESEM-Workspace/Customer-Account/LAM/Contracts
-HESEM-Workspace/Customer-Account/LAM/Contracts/LTA
-HESEM-Workspace/Customer-Account/LAM/Contracts/LTA/_TEMPLATES
-HESEM-Workspace/Customer-Account/LAM/Contracts/LTA/_TEMPLATES/{Id}
-HESEM-Workspace/Customer-Account/LAM/Contracts/LTA/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Customer-Account/LAM/Contracts/LTA/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/LAM/Contracts/LTA/_TEMPLATES/{Id}/3-Pending-Signature
-HESEM-Workspace/Customer-Account/LAM/Contracts/LTA/_TEMPLATES/{Id}/4-Executed
-HESEM-Workspace/Customer-Account/LAM/Contracts/MSA
-HESEM-Workspace/Customer-Account/LAM/Contracts/MSA/_TEMPLATES
-HESEM-Workspace/Customer-Account/LAM/Contracts/MSA/_TEMPLATES/{Id}
-HESEM-Workspace/Customer-Account/LAM/Contracts/MSA/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Customer-Account/LAM/Contracts/MSA/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/LAM/Contracts/MSA/_TEMPLATES/{Id}/3-Pending-Signature
-HESEM-Workspace/Customer-Account/LAM/Contracts/MSA/_TEMPLATES/{Id}/4-Executed
-HESEM-Workspace/Customer-Account/LAM/Contracts/NDA
-HESEM-Workspace/Customer-Account/LAM/Contracts/NDA/_TEMPLATES
-HESEM-Workspace/Customer-Account/LAM/Contracts/NDA/_TEMPLATES/{Id}
-HESEM-Workspace/Customer-Account/LAM/Contracts/NDA/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Customer-Account/LAM/Contracts/NDA/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/LAM/Contracts/NDA/_TEMPLATES/{Id}/3-Pending-Signature
-HESEM-Workspace/Customer-Account/LAM/Contracts/NDA/_TEMPLATES/{Id}/4-Executed
-HESEM-Workspace/Customer-Account/LAM/Contracts/Quality-Agreement
-HESEM-Workspace/Customer-Account/LAM/Contracts/Quality-Agreement/_TEMPLATES
-HESEM-Workspace/Customer-Account/LAM/Contracts/Quality-Agreement/_TEMPLATES/{Id}
-HESEM-Workspace/Customer-Account/LAM/Contracts/Quality-Agreement/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Customer-Account/LAM/Contracts/Quality-Agreement/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/LAM/Contracts/Quality-Agreement/_TEMPLATES/{Id}/3-Pending-Signature
-HESEM-Workspace/Customer-Account/LAM/Contracts/Quality-Agreement/_TEMPLATES/{Id}/4-Executed
-HESEM-Workspace/Customer-Account/LAM/Demand-Forecast
-HESEM-Workspace/Customer-Account/LAM/Demand-Forecast/{YYYY}
-HESEM-Workspace/Customer-Account/LAM/ESG-Surveys
-HESEM-Workspace/Customer-Account/LAM/ESG-Surveys/{YYYY}
-HESEM-Workspace/Customer-Account/LAM/PCN-Inbound-Master-Log
-HESEM-Workspace/Customer-Account/LAM/PCN-Outbound-Master-Log
-HESEM-Workspace/Customer-Account/LAM/PCN-Outbound-Master-Log/_TEMPLATES
-HESEM-Workspace/Customer-Account/LAM/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}
-HESEM-Workspace/Customer-Account/LAM/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}/1-Working
-HESEM-Workspace/Customer-Account/LAM/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/LAM/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}/3-Submitted-to-Customer
-HESEM-Workspace/Customer-Account/LAM/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}/4-Customer-Approved
-HESEM-Workspace/Customer-Account/LAM/Portal-Account-Refs
-HESEM-Workspace/Customer-Account/LAM/Scorecards
-HESEM-Workspace/Customer-Account/LAM/Scorecards/{YYYY}
-HESEM-Workspace/Customer-Account/LAM/Standards-Library
-HESEM-Workspace/Customer-Account/TEL
-HESEM-Workspace/Customer-Account/TEL/Approved-Suppliers-Flowdown
-HESEM-Workspace/Customer-Account/TEL/Audits
-HESEM-Workspace/Customer-Account/TEL/Audits/{YYYY}
-HESEM-Workspace/Customer-Account/TEL/Audits/{YYYY}/_TEMPLATES
-HESEM-Workspace/Customer-Account/TEL/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack
-HESEM-Workspace/Customer-Account/TEL/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack/1-Working
-HESEM-Workspace/Customer-Account/TEL/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack/2-In-Review
-HESEM-Workspace/Customer-Account/TEL/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack/3-Submitted-to-Customer
-HESEM-Workspace/Customer-Account/TEL/Audits/{YYYY}/_TEMPLATES/AUD-{Id}-Response-Pack/4-Customer-Approved
-HESEM-Workspace/Customer-Account/TEL/Bulletins
-HESEM-Workspace/Customer-Account/TEL/Bulletins/{YYYY}
-HESEM-Workspace/Customer-Account/TEL/Complaints-Master-Log
-HESEM-Workspace/Customer-Account/TEL/Contracts
-HESEM-Workspace/Customer-Account/TEL/Contracts/LTA
-HESEM-Workspace/Customer-Account/TEL/Contracts/LTA/_TEMPLATES
-HESEM-Workspace/Customer-Account/TEL/Contracts/LTA/_TEMPLATES/{Id}
-HESEM-Workspace/Customer-Account/TEL/Contracts/LTA/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Customer-Account/TEL/Contracts/LTA/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/TEL/Contracts/LTA/_TEMPLATES/{Id}/3-Pending-Signature
-HESEM-Workspace/Customer-Account/TEL/Contracts/LTA/_TEMPLATES/{Id}/4-Executed
-HESEM-Workspace/Customer-Account/TEL/Contracts/MSA
-HESEM-Workspace/Customer-Account/TEL/Contracts/MSA/_TEMPLATES
-HESEM-Workspace/Customer-Account/TEL/Contracts/MSA/_TEMPLATES/{Id}
-HESEM-Workspace/Customer-Account/TEL/Contracts/MSA/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Customer-Account/TEL/Contracts/MSA/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/TEL/Contracts/MSA/_TEMPLATES/{Id}/3-Pending-Signature
-HESEM-Workspace/Customer-Account/TEL/Contracts/MSA/_TEMPLATES/{Id}/4-Executed
-HESEM-Workspace/Customer-Account/TEL/Contracts/NDA
-HESEM-Workspace/Customer-Account/TEL/Contracts/NDA/_TEMPLATES
-HESEM-Workspace/Customer-Account/TEL/Contracts/NDA/_TEMPLATES/{Id}
-HESEM-Workspace/Customer-Account/TEL/Contracts/NDA/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Customer-Account/TEL/Contracts/NDA/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/TEL/Contracts/NDA/_TEMPLATES/{Id}/3-Pending-Signature
-HESEM-Workspace/Customer-Account/TEL/Contracts/NDA/_TEMPLATES/{Id}/4-Executed
-HESEM-Workspace/Customer-Account/TEL/Contracts/Quality-Agreement
-HESEM-Workspace/Customer-Account/TEL/Contracts/Quality-Agreement/_TEMPLATES
-HESEM-Workspace/Customer-Account/TEL/Contracts/Quality-Agreement/_TEMPLATES/{Id}
-HESEM-Workspace/Customer-Account/TEL/Contracts/Quality-Agreement/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Customer-Account/TEL/Contracts/Quality-Agreement/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/TEL/Contracts/Quality-Agreement/_TEMPLATES/{Id}/3-Pending-Signature
-HESEM-Workspace/Customer-Account/TEL/Contracts/Quality-Agreement/_TEMPLATES/{Id}/4-Executed
-HESEM-Workspace/Customer-Account/TEL/Demand-Forecast
-HESEM-Workspace/Customer-Account/TEL/Demand-Forecast/{YYYY}
-HESEM-Workspace/Customer-Account/TEL/ESG-Surveys
-HESEM-Workspace/Customer-Account/TEL/ESG-Surveys/{YYYY}
-HESEM-Workspace/Customer-Account/TEL/PCN-Inbound-Master-Log
-HESEM-Workspace/Customer-Account/TEL/PCN-Outbound-Master-Log
-HESEM-Workspace/Customer-Account/TEL/PCN-Outbound-Master-Log/_TEMPLATES
-HESEM-Workspace/Customer-Account/TEL/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}
-HESEM-Workspace/Customer-Account/TEL/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}/1-Working
-HESEM-Workspace/Customer-Account/TEL/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}/2-In-Review
-HESEM-Workspace/Customer-Account/TEL/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}/3-Submitted-to-Customer
-HESEM-Workspace/Customer-Account/TEL/PCN-Outbound-Master-Log/_TEMPLATES/PCN-{Id}/4-Customer-Approved
-HESEM-Workspace/Customer-Account/TEL/Portal-Account-Refs
-HESEM-Workspace/Customer-Account/TEL/Scorecards
-HESEM-Workspace/Customer-Account/TEL/Scorecards/{YYYY}
-HESEM-Workspace/Customer-Account/TEL/Standards-Library
-HESEM-Workspace/Job-Dossier
-HESEM-Workspace/Job-Dossier/AMAT
-HESEM-Workspace/Job-Dossier/ASML
-HESEM-Workspace/Job-Dossier/LAM
-HESEM-Workspace/Job-Dossier/TEL
-HESEM-Workspace/Job-Dossier/_TEMPLATES
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/00-Job-Admin
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/01-Engineering-Release
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/02-Material-Receiving
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/03-Job-Setup
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/04-First-Piece-Approval
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/05-FAI-Execution
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/05-FAI-Execution/1-Working
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/05-FAI-Execution/2-In-Review
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/05-FAI-Execution/3-Submitted-to-Customer
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/05-FAI-Execution/4-Customer-Approved
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/06-Production-Execution
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/07-Special-Process
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/08-Final-QC
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/08-Final-QC/Cleanliness-Pack-6
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/08-Final-QC/Cleanliness-Pack-6/00-Banned-Substance-XRF
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/08-Final-QC/Cleanliness-Pack-6/01-LPC
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/08-Final-QC/Cleanliness-Pack-6/02-IC
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/08-Final-QC/Cleanliness-Pack-6/03-NVR
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/08-Final-QC/Cleanliness-Pack-6/04-FTIR
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/08-Final-QC/Cleanliness-Pack-6/05-Ra
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/08-Final-QC/Cleanliness-Pack-6/06-Visual
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/08-Final-QC/Cleanliness-Pack-6/07-He-Leak-or-Outgas
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/09-Ship-Release
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/10-Quality-Events
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/10-Quality-Events/Concession-Deviation
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/10-Quality-Events/Concession-Deviation/_TEMPLATES
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/10-Quality-Events/Concession-Deviation/_TEMPLATES/DEV-{Id}
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/10-Quality-Events/Concession-Deviation/_TEMPLATES/DEV-{Id}/1-Working
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/10-Quality-Events/Concession-Deviation/_TEMPLATES/DEV-{Id}/2-In-Review
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/10-Quality-Events/Concession-Deviation/_TEMPLATES/DEV-{Id}/3-Submitted-to-Customer
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/10-Quality-Events/Concession-Deviation/_TEMPLATES/DEV-{Id}/4-Customer-Approved
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/10-Quality-Events/NCR
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/10-Quality-Events/NCR/_Intake
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/10-Quality-Events/NCR/_Intake/{OperatorInitials}-{Timestamp}
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/10-Quality-Events/NCR/_TEMPLATES
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/10-Quality-Events/NCR/_TEMPLATES/NCR-{NcrId}
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/10-Quality-Events/NCR/_TEMPLATES/NCR-{NcrId}/00-Source-Evidence
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/10-Quality-Events/NCR/_TEMPLATES/NCR-{NcrId}/01-Containment
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/10-Quality-Events/NCR/_TEMPLATES/NCR-{NcrId}/02-Disposition-MRB
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/10-Quality-Events/NCR/_TEMPLATES/NCR-{NcrId}/03-Linked-CAPA-Reference
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/11-Customer-Touchpoints
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/12-Subcontract-Routing
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/13-Cost-Roll-Up-Restricted-Finance-Only
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/14-Reports
-HESEM-Workspace/Job-Dossier/_TEMPLATES/{CustomerCode}/{YYYY}/{JobNumber}/99-Closed-Archive
-HESEM-Workspace/Lot-Trace
-HESEM-Workspace/Lot-Trace/Finished-Lots
-HESEM-Workspace/Lot-Trace/Finished-Lots/_TEMPLATES
-HESEM-Workspace/Lot-Trace/Finished-Lots/_TEMPLATES/{LotID}
-HESEM-Workspace/Lot-Trace/Finished-Lots/_TEMPLATES/{LotID}/00-Mill-Cert-or-Origin
-HESEM-Workspace/Lot-Trace/Finished-Lots/_TEMPLATES/{LotID}/01-Receiving-or-Process-Record
-HESEM-Workspace/Lot-Trace/Finished-Lots/_TEMPLATES/{LotID}/02-IQC-or-Process-QC
-HESEM-Workspace/Lot-Trace/Finished-Lots/_TEMPLATES/{LotID}/03-Internal-Lot-Mapping
-HESEM-Workspace/Lot-Trace/Finished-Lots/_TEMPLATES/{LotID}/04-Linked-Jobs
-HESEM-Workspace/Lot-Trace/Finished-Lots/_TEMPLATES/{LotID}/05-Recall-Investigation
-HESEM-Workspace/Lot-Trace/Finished-Lots/_TEMPLATES/{LotID}/05-Recall-Investigation/_TEMPLATES
-HESEM-Workspace/Lot-Trace/Finished-Lots/_TEMPLATES/{LotID}/05-Recall-Investigation/_TEMPLATES/{Id}
-HESEM-Workspace/Lot-Trace/Finished-Lots/_TEMPLATES/{LotID}/05-Recall-Investigation/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Lot-Trace/Finished-Lots/_TEMPLATES/{LotID}/05-Recall-Investigation/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Lot-Trace/Finished-Lots/_TEMPLATES/{LotID}/05-Recall-Investigation/_TEMPLATES/{Id}/3-Released
-HESEM-Workspace/Lot-Trace/Finished-Lots/_TEMPLATES/{LotID}/99-Consumed-or-Archived
-HESEM-Workspace/Lot-Trace/Heat-Lots
-HESEM-Workspace/Lot-Trace/Heat-Lots/_TEMPLATES
-HESEM-Workspace/Lot-Trace/Heat-Lots/_TEMPLATES/{LotID}
-HESEM-Workspace/Lot-Trace/Heat-Lots/_TEMPLATES/{LotID}/00-Mill-Cert-or-Origin
-HESEM-Workspace/Lot-Trace/Heat-Lots/_TEMPLATES/{LotID}/01-Receiving-or-Process-Record
-HESEM-Workspace/Lot-Trace/Heat-Lots/_TEMPLATES/{LotID}/02-IQC-or-Process-QC
-HESEM-Workspace/Lot-Trace/Heat-Lots/_TEMPLATES/{LotID}/03-Internal-Lot-Mapping
-HESEM-Workspace/Lot-Trace/Heat-Lots/_TEMPLATES/{LotID}/04-Linked-Jobs
-HESEM-Workspace/Lot-Trace/Heat-Lots/_TEMPLATES/{LotID}/05-Recall-Investigation
-HESEM-Workspace/Lot-Trace/Heat-Lots/_TEMPLATES/{LotID}/05-Recall-Investigation/_TEMPLATES
-HESEM-Workspace/Lot-Trace/Heat-Lots/_TEMPLATES/{LotID}/05-Recall-Investigation/_TEMPLATES/{Id}
-HESEM-Workspace/Lot-Trace/Heat-Lots/_TEMPLATES/{LotID}/05-Recall-Investigation/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Lot-Trace/Heat-Lots/_TEMPLATES/{LotID}/05-Recall-Investigation/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Lot-Trace/Heat-Lots/_TEMPLATES/{LotID}/05-Recall-Investigation/_TEMPLATES/{Id}/3-Released
-HESEM-Workspace/Lot-Trace/Heat-Lots/_TEMPLATES/{LotID}/99-Consumed-or-Archived
-HESEM-Workspace/Lot-Trace/Process-Lots
-HESEM-Workspace/Lot-Trace/Process-Lots/_TEMPLATES
-HESEM-Workspace/Lot-Trace/Process-Lots/_TEMPLATES/{LotID}
-HESEM-Workspace/Lot-Trace/Process-Lots/_TEMPLATES/{LotID}/00-Mill-Cert-or-Origin
-HESEM-Workspace/Lot-Trace/Process-Lots/_TEMPLATES/{LotID}/01-Receiving-or-Process-Record
-HESEM-Workspace/Lot-Trace/Process-Lots/_TEMPLATES/{LotID}/02-IQC-or-Process-QC
-HESEM-Workspace/Lot-Trace/Process-Lots/_TEMPLATES/{LotID}/03-Internal-Lot-Mapping
-HESEM-Workspace/Lot-Trace/Process-Lots/_TEMPLATES/{LotID}/04-Linked-Jobs
-HESEM-Workspace/Lot-Trace/Process-Lots/_TEMPLATES/{LotID}/05-Recall-Investigation
-HESEM-Workspace/Lot-Trace/Process-Lots/_TEMPLATES/{LotID}/05-Recall-Investigation/_TEMPLATES
-HESEM-Workspace/Lot-Trace/Process-Lots/_TEMPLATES/{LotID}/05-Recall-Investigation/_TEMPLATES/{Id}
-HESEM-Workspace/Lot-Trace/Process-Lots/_TEMPLATES/{LotID}/05-Recall-Investigation/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Lot-Trace/Process-Lots/_TEMPLATES/{LotID}/05-Recall-Investigation/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Lot-Trace/Process-Lots/_TEMPLATES/{LotID}/05-Recall-Investigation/_TEMPLATES/{Id}/3-Released
-HESEM-Workspace/Lot-Trace/Process-Lots/_TEMPLATES/{LotID}/99-Consumed-or-Archived
-HESEM-Workspace/PO-Index
-HESEM-Workspace/PO-Index/AMAT
-HESEM-Workspace/PO-Index/ASML
-HESEM-Workspace/PO-Index/LAM
-HESEM-Workspace/PO-Index/TEL
-HESEM-Workspace/PO-Index/_TEMPLATES
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}/{YYYY}
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}/{YYYY}/PO-{Num}
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}/{YYYY}/PO-{Num}/00-Source
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}/{YYYY}/PO-{Num}/01-Review
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}/{YYYY}/PO-{Num}/02-Acknowledgement
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}/{YYYY}/PO-{Num}/03-Amendments
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}/{YYYY}/PO-{Num}/04-Linked-Jobs
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}/{YYYY}/PO-{Num}/05-Linked-Parts
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}/{YYYY}/PO-{Num}/06-Invoices
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}/{YYYY}/PO-{Num}/99-Closed
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}/{YYYY}/RFQ-{Id}
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}/{YYYY}/RFQ-{Id}/00-Inbound-RFQ
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}/{YYYY}/RFQ-{Id}/01-Quote-Authoring
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}/{YYYY}/RFQ-{Id}/01-Quote-Authoring/1-Working
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}/{YYYY}/RFQ-{Id}/01-Quote-Authoring/2-In-Review
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}/{YYYY}/RFQ-{Id}/01-Quote-Authoring/3-Submitted-to-Customer
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}/{YYYY}/RFQ-{Id}/01-Quote-Authoring/4-Customer-Approved
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}/{YYYY}/RFQ-{Id}/02-Revision-Rounds
-HESEM-Workspace/PO-Index/_TEMPLATES/{CustomerCode}/{YYYY}/RFQ-{Id}/99-PO-Spawned
-HESEM-Workspace/Part-Master
-HESEM-Workspace/Part-Master/AMAT
-HESEM-Workspace/Part-Master/ASML
-HESEM-Workspace/Part-Master/HESEM-Owned
-HESEM-Workspace/Part-Master/LAM
-HESEM-Workspace/Part-Master/TEL
-HESEM-Workspace/Part-Master/_TEMPLATES
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/00-Status
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/01-Drawing
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/01-Drawing/1-Working
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/01-Drawing/1-Working/{AuthorInitials}
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/01-Drawing/2-In-Review
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/01-Drawing/3-Released
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/02-Model-3D
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/02-Model-3D/1-Working
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/02-Model-3D/1-Working/{AuthorInitials}
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/02-Model-3D/2-In-Review
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/02-Model-3D/3-Released
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/03-BOM
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/03-BOM/1-Working
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/03-BOM/1-Working/{AuthorInitials}
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/03-BOM/2-In-Review
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/03-BOM/3-Released
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/04-CAM
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/04-CAM/1-Working
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/04-CAM/1-Working/{AuthorInitials}
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/04-CAM/2-In-Review
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/04-CAM/3-Released
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/05-Inspection-Plan
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/05-Inspection-Plan/1-Working
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/05-Inspection-Plan/1-Working/{AuthorInitials}
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/05-Inspection-Plan/2-In-Review
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/05-Inspection-Plan/3-Released
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/06-Specification
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/06-Specification/1-Working
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/06-Specification/1-Working/{AuthorInitials}
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/06-Specification/2-In-Review
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/06-Specification/3-Released
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/07-FAI-Baseline
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/07-FAI-Baseline/1-Working
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/07-FAI-Baseline/1-Working/{AuthorInitials}
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/07-FAI-Baseline/2-In-Review
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/07-FAI-Baseline/3-Released
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/08-ECN-PCN-History
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/08-ECN-PCN-History/_TEMPLATES
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/08-ECN-PCN-History/_TEMPLATES/ECN-{Id}
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/08-ECN-PCN-History/_TEMPLATES/ECN-{Id}/1-Working
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/08-ECN-PCN-History/_TEMPLATES/ECN-{Id}/2-In-Review
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/08-ECN-PCN-History/_TEMPLATES/ECN-{Id}/3-Released
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/09-Approved-Source-List
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/10-Tooling-Fixture-Refs
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/11-Customer-Standards-Linked
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/12-Trade-Secret-Restricted
-HESEM-Workspace/Part-Master/_TEMPLATES/{CustomerCode}/{PartNumber}/{Rev}/99-Superseded
-HESEM-Workspace/Quality
-HESEM-Workspace/Quality/8D-SCAR-Master
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/00-Customer-Notice-Inbound
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/01-D1-Team
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/01-D1-Team/1-Working
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/01-D1-Team/2-In-Review
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/01-D1-Team/3-Released
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/02-D2-Problem
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/02-D2-Problem/1-Working
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/02-D2-Problem/2-In-Review
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/02-D2-Problem/3-Released
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/03-D3-Containment
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/03-D3-Containment/1-Working
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/03-D3-Containment/2-In-Review
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/03-D3-Containment/3-Released
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/04-D4-Root-Cause
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/04-D4-Root-Cause/1-Working
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/04-D4-Root-Cause/2-In-Review
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/04-D4-Root-Cause/3-Released
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/05-D5-Corrective-Action
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/05-D5-Corrective-Action/1-Working
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/05-D5-Corrective-Action/2-In-Review
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/05-D5-Corrective-Action/3-Released
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/06-D6-Implementation
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/06-D6-Implementation/1-Working
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/06-D6-Implementation/2-In-Review
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/06-D6-Implementation/3-Released
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/07-D7-Preventive
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/07-D7-Preventive/1-Working
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/07-D7-Preventive/2-In-Review
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/07-D7-Preventive/3-Released
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/08-D8-Recognition
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/08-D8-Recognition/1-Working
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/08-D8-Recognition/2-In-Review
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/08-D8-Recognition/3-Released
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/09-Final-Response-to-Customer
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/09-Final-Response-to-Customer/1-Working
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/09-Final-Response-to-Customer/2-In-Review
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/09-Final-Response-to-Customer/3-Submitted-to-Customer
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/09-Final-Response-to-Customer/4-Customer-Approved
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/10-Customer-Closure-Letter
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/11-Linked-Jobs-Reference
-HESEM-Workspace/Quality/8D-SCAR-Master/_TEMPLATES/{8dId}/99-Closed
-HESEM-Workspace/Quality/Audit-Findings
-HESEM-Workspace/Quality/Audit-Findings/_TEMPLATES
-HESEM-Workspace/Quality/Audit-Findings/_TEMPLATES/{AuditId}
-HESEM-Workspace/Quality/Audit-Findings/_TEMPLATES/{AuditId}/00-Audit-Reference
-HESEM-Workspace/Quality/Audit-Findings/_TEMPLATES/{AuditId}/01-Finding-Description
-HESEM-Workspace/Quality/Audit-Findings/_TEMPLATES/{AuditId}/02-Affected-Areas
-HESEM-Workspace/Quality/Audit-Findings/_TEMPLATES/{AuditId}/03-Response-CA
-HESEM-Workspace/Quality/Audit-Findings/_TEMPLATES/{AuditId}/03-Response-CA/1-Working
-HESEM-Workspace/Quality/Audit-Findings/_TEMPLATES/{AuditId}/03-Response-CA/2-In-Review
-HESEM-Workspace/Quality/Audit-Findings/_TEMPLATES/{AuditId}/03-Response-CA/3-Released
-HESEM-Workspace/Quality/Audit-Findings/_TEMPLATES/{AuditId}/04-Effectiveness-Check
-HESEM-Workspace/Quality/Audit-Findings/_TEMPLATES/{AuditId}/04-Effectiveness-Check/1-Working
-HESEM-Workspace/Quality/Audit-Findings/_TEMPLATES/{AuditId}/04-Effectiveness-Check/2-In-Review
-HESEM-Workspace/Quality/Audit-Findings/_TEMPLATES/{AuditId}/04-Effectiveness-Check/3-Released
-HESEM-Workspace/Quality/Audit-Findings/_TEMPLATES/{AuditId}/99-Closed
-HESEM-Workspace/Quality/CAPA-Master
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/00-Source
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/01-Containment
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/02-Root-Cause-Analysis
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/02-Root-Cause-Analysis/1-Working
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/02-Root-Cause-Analysis/2-In-Review
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/02-Root-Cause-Analysis/3-Released
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/03-Corrective-Action
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/03-Corrective-Action/1-Working
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/03-Corrective-Action/2-In-Review
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/03-Corrective-Action/3-Released
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/04-Preventive-Action
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/04-Preventive-Action/1-Working
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/04-Preventive-Action/2-In-Review
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/04-Preventive-Action/3-Released
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/05-Effectiveness-Check
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/05-Effectiveness-Check/1-Working
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/05-Effectiveness-Check/2-In-Review
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/05-Effectiveness-Check/3-Released
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/06-Linked-NCRs-Reference
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/07-Read-Across-Assessment
-HESEM-Workspace/Quality/CAPA-Master/_TEMPLATES/{CapaId}/99-Closed
-HESEM-Workspace/Quality/Counterfeit-Prevention
-HESEM-Workspace/Quality/FOD-Program
-HESEM-Workspace/Quality/Heat-Lot-Investigation
-HESEM-Workspace/Quality/Heat-Lot-Investigation/_TEMPLATES
-HESEM-Workspace/Quality/Heat-Lot-Investigation/_TEMPLATES/{LotId}
-HESEM-Workspace/Quality/Heat-Lot-Investigation/_TEMPLATES/{LotId}/00-Trigger
-HESEM-Workspace/Quality/Heat-Lot-Investigation/_TEMPLATES/{LotId}/01-Scope-Determination
-HESEM-Workspace/Quality/Heat-Lot-Investigation/_TEMPLATES/{LotId}/02-Containment
-HESEM-Workspace/Quality/Heat-Lot-Investigation/_TEMPLATES/{LotId}/03-Root-Cause-Analysis
-HESEM-Workspace/Quality/Heat-Lot-Investigation/_TEMPLATES/{LotId}/03-Root-Cause-Analysis/1-Working
-HESEM-Workspace/Quality/Heat-Lot-Investigation/_TEMPLATES/{LotId}/03-Root-Cause-Analysis/2-In-Review
-HESEM-Workspace/Quality/Heat-Lot-Investigation/_TEMPLATES/{LotId}/03-Root-Cause-Analysis/3-Released
-HESEM-Workspace/Quality/Heat-Lot-Investigation/_TEMPLATES/{LotId}/04-Linked-Jobs
-HESEM-Workspace/Quality/Heat-Lot-Investigation/_TEMPLATES/{LotId}/05-Customer-Notification
-HESEM-Workspace/Quality/Heat-Lot-Investigation/_TEMPLATES/{LotId}/05-Customer-Notification/1-Working
-HESEM-Workspace/Quality/Heat-Lot-Investigation/_TEMPLATES/{LotId}/05-Customer-Notification/2-In-Review
-HESEM-Workspace/Quality/Heat-Lot-Investigation/_TEMPLATES/{LotId}/05-Customer-Notification/3-Submitted-to-Customer
-HESEM-Workspace/Quality/Heat-Lot-Investigation/_TEMPLATES/{LotId}/05-Customer-Notification/4-Customer-Approved
-HESEM-Workspace/Quality/Heat-Lot-Investigation/_TEMPLATES/{LotId}/99-Closed
-HESEM-Workspace/Quality/Improvement-Kaizen
-HESEM-Workspace/Quality/Improvement-Kaizen/{YYYY}
-HESEM-Workspace/Quality/Incident-Investigation
-HESEM-Workspace/Quality/Incident-Investigation/_Intake
-HESEM-Workspace/Quality/Incident-Investigation/_Intake/{ReporterInitials}-{Timestamp}
-HESEM-Workspace/Quality/Incident-Investigation/_TEMPLATES
-HESEM-Workspace/Quality/Incident-Investigation/_TEMPLATES/INC-{Id}
-HESEM-Workspace/Quality/Incident-Investigation/_TEMPLATES/INC-{Id}/00-Source-Evidence
-HESEM-Workspace/Quality/Incident-Investigation/_TEMPLATES/INC-{Id}/01-Classification-EHS-Cyber-Safety
-HESEM-Workspace/Quality/Incident-Investigation/_TEMPLATES/INC-{Id}/02-Immediate-Containment
-HESEM-Workspace/Quality/Incident-Investigation/_TEMPLATES/INC-{Id}/03-Root-Cause-Investigation
-HESEM-Workspace/Quality/Incident-Investigation/_TEMPLATES/INC-{Id}/03-Root-Cause-Investigation/1-Working
-HESEM-Workspace/Quality/Incident-Investigation/_TEMPLATES/INC-{Id}/03-Root-Cause-Investigation/2-In-Review
-HESEM-Workspace/Quality/Incident-Investigation/_TEMPLATES/INC-{Id}/03-Root-Cause-Investigation/3-Released
-HESEM-Workspace/Quality/Incident-Investigation/_TEMPLATES/INC-{Id}/04-Corrective-Preventive-Action
-HESEM-Workspace/Quality/Incident-Investigation/_TEMPLATES/INC-{Id}/04-Corrective-Preventive-Action/1-Working
-HESEM-Workspace/Quality/Incident-Investigation/_TEMPLATES/INC-{Id}/04-Corrective-Preventive-Action/2-In-Review
-HESEM-Workspace/Quality/Incident-Investigation/_TEMPLATES/INC-{Id}/04-Corrective-Preventive-Action/3-Released
-HESEM-Workspace/Quality/Incident-Investigation/_TEMPLATES/INC-{Id}/05-Lessons-Learned
-HESEM-Workspace/Quality/Incident-Investigation/_TEMPLATES/INC-{Id}/05-Lessons-Learned/1-Working
-HESEM-Workspace/Quality/Incident-Investigation/_TEMPLATES/INC-{Id}/05-Lessons-Learned/2-In-Review
-HESEM-Workspace/Quality/Incident-Investigation/_TEMPLATES/INC-{Id}/05-Lessons-Learned/3-Released
-HESEM-Workspace/Quality/Incident-Investigation/_TEMPLATES/INC-{Id}/06-Customer-Notification-if-Customer-Affecting
-HESEM-Workspace/Quality/Incident-Investigation/_TEMPLATES/INC-{Id}/99-Closed
-HESEM-Workspace/Quality/Internal-Audits
-HESEM-Workspace/Quality/Internal-Audits/{YYYY}
-HESEM-Workspace/Quality/Internal-Audits/{YYYY}/_TEMPLATES
-HESEM-Workspace/Quality/Internal-Audits/{YYYY}/_TEMPLATES/{AuditId}
-HESEM-Workspace/Quality/Internal-Audits/{YYYY}/_TEMPLATES/{AuditId}/Findings
-HESEM-Workspace/Quality/Internal-Audits/{YYYY}/_TEMPLATES/{AuditId}/Plan
-HESEM-Workspace/Quality/Internal-Audits/{YYYY}/_TEMPLATES/{AuditId}/Plan/1-Working
-HESEM-Workspace/Quality/Internal-Audits/{YYYY}/_TEMPLATES/{AuditId}/Plan/2-In-Review
-HESEM-Workspace/Quality/Internal-Audits/{YYYY}/_TEMPLATES/{AuditId}/Plan/3-Released
-HESEM-Workspace/Quality/Internal-Audits/{YYYY}/_TEMPLATES/{AuditId}/Report
-HESEM-Workspace/Quality/Internal-Audits/{YYYY}/_TEMPLATES/{AuditId}/Report/1-Working
-HESEM-Workspace/Quality/Internal-Audits/{YYYY}/_TEMPLATES/{AuditId}/Report/2-In-Review
-HESEM-Workspace/Quality/Internal-Audits/{YYYY}/_TEMPLATES/{AuditId}/Report/3-Released
-HESEM-Workspace/Quality/Management-Review
-HESEM-Workspace/Quality/Management-Review/{YYYY}
-HESEM-Workspace/Quality/Management-Review/{YYYY}/_TEMPLATES
-HESEM-Workspace/Quality/Management-Review/{YYYY}/_TEMPLATES/Q{N}
-HESEM-Workspace/Quality/Management-Review/{YYYY}/_TEMPLATES/Q{N}/Pack
-HESEM-Workspace/Quality/Management-Review/{YYYY}/_TEMPLATES/Q{N}/Pack/1-Working
-HESEM-Workspace/Quality/Management-Review/{YYYY}/_TEMPLATES/Q{N}/Pack/2-In-Review
-HESEM-Workspace/Quality/Management-Review/{YYYY}/_TEMPLATES/Q{N}/Pack/3-Released
-HESEM-Workspace/Quality/Risk-Register
-HESEM-Workspace/Quality/Risk-Register/{YYYY}
-HESEM-Workspace/Quality/Risk-Register/{YYYY}/1-Working
-HESEM-Workspace/Quality/Risk-Register/{YYYY}/2-In-Review
-HESEM-Workspace/Quality/Risk-Register/{YYYY}/3-Released
-HESEM-Workspace/Reports
-HESEM-Workspace/Reports/Annual
-HESEM-Workspace/Reports/Daily
-HESEM-Workspace/Reports/Monthly
-HESEM-Workspace/Reports/Quarterly
-HESEM-Workspace/Reports/Weekly
-HESEM-Workspace/Supplier-Master
-HESEM-Workspace/Supplier-Master/_TEMPLATES
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/00-Profile
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/01-Qualification
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/01-Qualification/1-Working
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/01-Qualification/2-In-Review
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/01-Qualification/3-Released
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/02-NDA-SQA
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/02-NDA-SQA/_TEMPLATES
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/02-NDA-SQA/_TEMPLATES/{Id}
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/02-NDA-SQA/_TEMPLATES/{Id}/1-Working
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/02-NDA-SQA/_TEMPLATES/{Id}/2-In-Review
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/02-NDA-SQA/_TEMPLATES/{Id}/3-Pending-Signature
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/02-NDA-SQA/_TEMPLATES/{Id}/4-Executed
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/AMAT
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/AMAT/1-Working
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/AMAT/2-In-Review
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/AMAT/3-Submitted-to-Customer
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/AMAT/4-Customer-Approved
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/ASML
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/ASML/1-Working
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/ASML/2-In-Review
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/ASML/3-Submitted-to-Customer
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/ASML/4-Customer-Approved
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/LAM
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/LAM/1-Working
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/LAM/2-In-Review
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/LAM/3-Submitted-to-Customer
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/LAM/4-Customer-Approved
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/TEL
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/TEL/1-Working
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/TEL/2-In-Review
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/TEL/3-Submitted-to-Customer
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/03-APSL-Scope-per-OEM/TEL/4-Customer-Approved
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/04-Process-Cert-Letters-per-OEM
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/05-Batch-Records
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/05-Batch-Records/_TEMPLATES
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/05-Batch-Records/_TEMPLATES/{BatchId}
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/06-Annual-Audit-Report
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/06-Annual-Audit-Report/1-Working
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/06-Annual-Audit-Report/2-In-Review
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/06-Annual-Audit-Report/3-Released
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/06-Annual-Audit-Report/{YYYY}
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/06-Annual-Audit-Report/{YYYY}/1-Working
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/06-Annual-Audit-Report/{YYYY}/2-In-Review
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/06-Annual-Audit-Report/{YYYY}/3-Released
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/07-Scorecard
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/07-Scorecard/1-Working
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/07-Scorecard/2-In-Review
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/07-Scorecard/3-Released
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/07-Scorecard/{YYYY}
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/07-Scorecard/{YYYY}/1-Working
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/07-Scorecard/{YYYY}/2-In-Review
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/07-Scorecard/{YYYY}/3-Released
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/08-Sub-PO-History
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/09-SCAR-Log
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/10-CMRT-EMRT
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/10-CMRT-EMRT/{YYYY}
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/11-Banned-Substance
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/12-Sub-Tier-Change-Notification
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/13-Counterfeit-Prevention-Attestation
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/13-Counterfeit-Prevention-Attestation/1-Working
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/13-Counterfeit-Prevention-Attestation/2-In-Review
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/13-Counterfeit-Prevention-Attestation/3-Released
-HESEM-Workspace/Supplier-Master/_TEMPLATES/{SupplierCode}/99-Disqualified
-HESEM-Workspace/Training
-HESEM-Workspace/Training/Annual-Plan
-HESEM-Workspace/Training/Annual-Plan/{YYYY}
-HESEM-Workspace/Training/Annual-Plan/{YYYY}/1-Working
-HESEM-Workspace/Training/Annual-Plan/{YYYY}/2-In-Review
-HESEM-Workspace/Training/Annual-Plan/{YYYY}/3-Released
-HESEM-Workspace/Training/Cert-Master-Register
-HESEM-Workspace/Training/Competency-Snapshot
-HESEM-Workspace/Training/Competency-Snapshot/{YYYY}
-HESEM-Workspace/Training/Critical-Certs
-HESEM-Workspace/Training/Critical-Certs/CMM-Operator
-HESEM-Workspace/Training/Critical-Certs/CNC-Operator
-HESEM-Workspace/Training/Critical-Certs/ESD-Coordinator
-HESEM-Workspace/Training/Critical-Certs/FAI-Engineer
-HESEM-Workspace/Training/Critical-Certs/FOD-Trainer
-HESEM-Workspace/Training/Critical-Certs/Fire-Warden
-HESEM-Workspace/Training/Critical-Certs/First-Aider
-HESEM-Workspace/Training/Critical-Certs/Forklift
-HESEM-Workspace/Training/Critical-Certs/Lead-Auditor
-HESEM-Workspace/Training/Critical-Certs/Special-Process
-HESEM-Workspace/Training/Customer-Approved-Operators
-HESEM-Workspace/Training/Customer-Approved-Operators/AMAT
-HESEM-Workspace/Training/Customer-Approved-Operators/ASML
-HESEM-Workspace/Training/Customer-Approved-Operators/LAM
-HESEM-Workspace/Training/Customer-Approved-Operators/TEL
-HESEM-Workspace/Training/Customer-Audit-Pack
-HESEM-Workspace/Training/Customer-Audit-Pack/AMAT
-HESEM-Workspace/Training/Customer-Audit-Pack/AMAT/{YYYY}
-HESEM-Workspace/Training/Customer-Audit-Pack/AMAT/{YYYY}/1-Working
-HESEM-Workspace/Training/Customer-Audit-Pack/AMAT/{YYYY}/2-In-Review
-HESEM-Workspace/Training/Customer-Audit-Pack/AMAT/{YYYY}/3-Submitted-to-Customer
-HESEM-Workspace/Training/Customer-Audit-Pack/AMAT/{YYYY}/4-Customer-Approved
-HESEM-Workspace/Training/Customer-Audit-Pack/ASML
-HESEM-Workspace/Training/Customer-Audit-Pack/ASML/{YYYY}
-HESEM-Workspace/Training/Customer-Audit-Pack/ASML/{YYYY}/1-Working
-HESEM-Workspace/Training/Customer-Audit-Pack/ASML/{YYYY}/2-In-Review
-HESEM-Workspace/Training/Customer-Audit-Pack/ASML/{YYYY}/3-Submitted-to-Customer
-HESEM-Workspace/Training/Customer-Audit-Pack/ASML/{YYYY}/4-Customer-Approved
-HESEM-Workspace/Training/Customer-Audit-Pack/LAM
-HESEM-Workspace/Training/Customer-Audit-Pack/LAM/{YYYY}
-HESEM-Workspace/Training/Customer-Audit-Pack/LAM/{YYYY}/1-Working
-HESEM-Workspace/Training/Customer-Audit-Pack/LAM/{YYYY}/2-In-Review
-HESEM-Workspace/Training/Customer-Audit-Pack/LAM/{YYYY}/3-Submitted-to-Customer
-HESEM-Workspace/Training/Customer-Audit-Pack/LAM/{YYYY}/4-Customer-Approved
-HESEM-Workspace/Training/Customer-Audit-Pack/TEL
-HESEM-Workspace/Training/Customer-Audit-Pack/TEL/{YYYY}
-HESEM-Workspace/Training/Customer-Audit-Pack/TEL/{YYYY}/1-Working
-HESEM-Workspace/Training/Customer-Audit-Pack/TEL/{YYYY}/2-In-Review
-HESEM-Workspace/Training/Customer-Audit-Pack/TEL/{YYYY}/3-Submitted-to-Customer
-HESEM-Workspace/Training/Customer-Audit-Pack/TEL/{YYYY}/4-Customer-Approved
-HESEM-Workspace/Training/Effectiveness-KPI
-HESEM-Workspace/Training/Effectiveness-KPI/{YYYY}
-HESEM-Workspace/Training/Skills-Matrix
-HESEM-Workspace/Workflow-Lists-Specification-NOT-FOLDERS
+# HESEM M365 Blueprint v10 — Semi-Equipment CNC edition
+# Total directories: 939
+
+(ROOT)/
+  01-HESEM-Hub/
+    01-Navigation/
+    02-Company-Announcements/
+    03-Cross-Customer-KPI-Rollups/
+      {YYYY-Q}/
+    04-Operational-Calendar/
+      {YYYY}/
+    05-Communities-of-Practice/
+      CoP-CNC/
+      CoP-DataAnalytics/
+      CoP-LeanContinuous/
+      CoP-Quality/
+    06-Cross-Functional-Projects/
+      {ProjectCode}/
+    07-Onboarding-Wayfinder/
+  02-HESEM-AMAT/
+    00-Customer-Source-IP/
+      01-Drawings/
+        {PartNumber}/
+          {Rev}_{ReceiptDate}/
+      02-Models-3D/
+        {PartNumber}/
+          {Rev}_{ReceiptDate}/
+      03-Specifications/
+        {PartNumber}/
+          {Rev}_{ReceiptDate}/
+      04-ECN-Inbound/
+        {ECN-No}_{ReceivedDate}/
+      05-Customer-SQM-NDA-Vault/
+        {SQM-DocID}/
+          {Rev}_{EffectiveDate}/
+    10-HESEM-Engineering/
+      01-BOM-Internal/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      02-CAM-NC-Programs/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      03-Process-Plan-Router/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      04-Inspection-Plan-Ballooned/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      05-FAI-Baseline-Released/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      06-Work-Instruction-Local/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      07-Tooling-Fixture-Design/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      08-ECN-Internal-Response/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+    20-PO-Lots/
+      {YYYY}/
+        {PO}/
+          {LotID}/
+            01-CofC/
+            02-MillCert-CMTR/
+            03-Dimensional-Report/
+            04-FAI-Lot-Specific/
+            05-Surface-Finish-Ra-F19/
+            06-Cleanliness-Particle-F70/
+            07-Special-Process-Certs/
+            08-Welding-Records-F78-F81/
+            09-Helium-Leak-F1/
+            10-Packaging-Photos/
+            11-Shipping-CofO-Customs/
+            12-Customer-Delta/
+    30-SCAR-8D/
+      {SCAR-No}_{OpenDate}/
+        D0-Symptom-Logged/
+        D1-Team-Formed/
+        D2-Problem-Described/
+        D3-Containment-Action/
+        D4-Root-Cause-Analysis/
+        D5-Permanent-Corrective-Action/
+        D6-Implementation-Verification/
+        D7-Systemic-Prevention/
+        D8-Closure-Recognition/
+        evidence/
+    40-Customer-Audits/
+      {YYYY-MM-DD}_{Auditor}/
+        CAPA/
+        evidence/
+        findings/
+    50-Compliance-CustomerSpecific/
+      CMRT-Conflict-Minerals/
+      Counterfeit-Prevention-AS6174-Statement/
+      ISO-14001-Cert/
+      ISO-45001-Cert/
+      ISO-9001-Cert/
+      NIST-SP-800-171-Cyber-Posture/
+      RBA-Self-Assessment/
+      REACH-SVHC-Declaration/
+      RoHS-Declaration/
+      USMCA-Country-of-Origin/
+    60-Scorecards/
+      {YYYY}-Q1/
+      {YYYY}-Q2/
+      {YYYY}-Q3/
+      {YYYY}-Q4/
+    70-ECN-Acknowledgements/
+      Signed-Ack-PDFs/
+    80-Portal-Exports/
+      AMAT-Ariba-SecureTransfer/
+    90-Inbox/
+      Ariba/
+        {YYYY-MM-DD}_{sender-slug}/
+      Email/
+        {YYYY-MM-DD}_{sender-slug}/
+      Portal-Download/
+        {YYYY-MM-DD}_{sender-slug}/
+      SecureTransfer/
+        {YYYY-MM-DD}_{sender-slug}/
+  02-HESEM-ASML/
+    00-Customer-Source-IP/
+      01-Drawings/
+        {PartNumber}/
+          {Rev}_{ReceiptDate}/
+      02-Models-3D/
+        {PartNumber}/
+          {Rev}_{ReceiptDate}/
+      03-Specifications/
+        {PartNumber}/
+          {Rev}_{ReceiptDate}/
+      04-ECN-Inbound/
+        {ECN-No}_{ReceivedDate}/
+      05-Customer-SQM-NDA-Vault/
+        {SQM-DocID}/
+          {Rev}_{EffectiveDate}/
+    10-HESEM-Engineering/
+      01-BOM-Internal/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      02-CAM-NC-Programs/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      03-Process-Plan-Router/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      04-Inspection-Plan-Ballooned/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      05-FAI-Baseline-Released/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      06-Work-Instruction-Local/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      07-Tooling-Fixture-Design/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      08-ECN-Internal-Response/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+    20-PO-Lots/
+      {YYYY}/
+        {PO}/
+          {LotID}/
+            01-CofC/
+            02-MillCert-CMTR/
+            03-Dimensional-Report/
+            04-FAI-Lot-Specific/
+            05-Surface-Finish-Ra-F19/
+            06-Cleanliness-Particle-F70/
+            07-Special-Process-Certs/
+            08-Welding-Records-F78-F81/
+            09-Helium-Leak-F1/
+            10-Packaging-Photos/
+            11-Shipping-CofO-Customs/
+            12-Customer-Delta/
+    30-SCAR-8D/
+      {SCAR-No}_{OpenDate}/
+        D0-Symptom-Logged/
+        D1-Team-Formed/
+        D2-Problem-Described/
+        D3-Containment-Action/
+        D4-Root-Cause-Analysis/
+        D5-Permanent-Corrective-Action/
+        D6-Implementation-Verification/
+        D7-Systemic-Prevention/
+        D8-Closure-Recognition/
+        evidence/
+    40-Customer-Audits/
+      {YYYY-MM-DD}_{Auditor}/
+        CAPA/
+        evidence/
+        findings/
+    50-Compliance-CustomerSpecific/
+      CMRT-Conflict-Minerals/
+      Counterfeit-Prevention-AS6174-Statement/
+      ISO-14001-Cert/
+      ISO-45001-Cert/
+      ISO-9001-Cert/
+      NIST-SP-800-171-Cyber-Posture/
+      RBA-Self-Assessment/
+      REACH-SVHC-Declaration/
+      RoHS-Declaration/
+      USMCA-Country-of-Origin/
+    60-Scorecards/
+      {YYYY}-Q1/
+      {YYYY}-Q2/
+      {YYYY}-Q3/
+      {YYYY}-Q4/
+    70-ECN-Acknowledgements/
+      Signed-Ack-PDFs/
+    80-Portal-Exports/
+      SupplierNet-SupplierIdentities/
+    90-Inbox/
+      Ariba/
+        {YYYY-MM-DD}_{sender-slug}/
+      Email/
+        {YYYY-MM-DD}_{sender-slug}/
+      Portal-Download/
+        {YYYY-MM-DD}_{sender-slug}/
+      SecureTransfer/
+        {YYYY-MM-DD}_{sender-slug}/
+  02-HESEM-LAM/
+    00-Customer-Source-IP/
+      01-Drawings/
+        {PartNumber}/
+          {Rev}_{ReceiptDate}/
+      02-Models-3D/
+        {PartNumber}/
+          {Rev}_{ReceiptDate}/
+      03-Specifications/
+        {PartNumber}/
+          {Rev}_{ReceiptDate}/
+      04-ECN-Inbound/
+        {ECN-No}_{ReceivedDate}/
+      05-Customer-SQM-NDA-Vault/
+        {SQM-DocID}/
+          {Rev}_{EffectiveDate}/
+    10-HESEM-Engineering/
+      01-BOM-Internal/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      02-CAM-NC-Programs/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      03-Process-Plan-Router/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      04-Inspection-Plan-Ballooned/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      05-FAI-Baseline-Released/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      06-Work-Instruction-Local/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      07-Tooling-Fixture-Design/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      08-ECN-Internal-Response/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+    20-PO-Lots/
+      {YYYY}/
+        {PO}/
+          {LotID}/
+            01-CofC/
+            02-MillCert-CMTR/
+            03-Dimensional-Report/
+            04-FAI-Lot-Specific/
+            05-Surface-Finish-Ra-F19/
+            06-Cleanliness-Particle-F70/
+            07-Special-Process-Certs/
+            08-Welding-Records-F78-F81/
+            09-Helium-Leak-F1/
+            10-Packaging-Photos/
+            11-Shipping-CofO-Customs/
+            12-Customer-Delta/
+    30-SCAR-8D/
+      {SCAR-No}_{OpenDate}/
+        D0-Symptom-Logged/
+        D1-Team-Formed/
+        D2-Problem-Described/
+        D3-Containment-Action/
+        D4-Root-Cause-Analysis/
+        D5-Permanent-Corrective-Action/
+        D6-Implementation-Verification/
+        D7-Systemic-Prevention/
+        D8-Closure-Recognition/
+        evidence/
+    40-Customer-Audits/
+      {YYYY-MM-DD}_{Auditor}/
+        CAPA/
+        evidence/
+        findings/
+    50-Compliance-CustomerSpecific/
+      CMRT-Conflict-Minerals/
+      Counterfeit-Prevention-AS6174-Statement/
+      ISO-14001-Cert/
+      ISO-45001-Cert/
+      ISO-9001-Cert/
+      NIST-SP-800-171-Cyber-Posture/
+      RBA-Self-Assessment/
+      REACH-SVHC-Declaration/
+      RoHS-Declaration/
+      USMCA-Country-of-Origin/
+    60-Scorecards/
+      {YYYY}-Q1/
+      {YYYY}-Q2/
+      {YYYY}-Q3/
+      {YYYY}-Q4/
+    70-ECN-Acknowledgements/
+      Signed-Ack-PDFs/
+    80-Portal-Exports/
+      MyLam-Ariba/
+    90-Inbox/
+      Ariba/
+        {YYYY-MM-DD}_{sender-slug}/
+      Email/
+        {YYYY-MM-DD}_{sender-slug}/
+      Portal-Download/
+        {YYYY-MM-DD}_{sender-slug}/
+      SecureTransfer/
+        {YYYY-MM-DD}_{sender-slug}/
+  02-HESEM-TEL/
+    00-Customer-Source-IP/
+      01-Drawings/
+        {PartNumber}/
+          {Rev}_{ReceiptDate}/
+      02-Models-3D/
+        {PartNumber}/
+          {Rev}_{ReceiptDate}/
+      03-Specifications/
+        {PartNumber}/
+          {Rev}_{ReceiptDate}/
+      04-ECN-Inbound/
+        {ECN-No}_{ReceivedDate}/
+      05-Customer-SQM-NDA-Vault/
+        {SQM-DocID}/
+          {Rev}_{EffectiveDate}/
+    10-HESEM-Engineering/
+      01-BOM-Internal/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      02-CAM-NC-Programs/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      03-Process-Plan-Router/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      04-Inspection-Plan-Ballooned/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      05-FAI-Baseline-Released/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      06-Work-Instruction-Local/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      07-Tooling-Fixture-Design/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+      08-ECN-Internal-Response/
+        {PartNumber}/
+          {Rev}/
+            1-Working/
+            2-In-Review/
+            3-Released/
+    20-PO-Lots/
+      {YYYY}/
+        {PO}/
+          {LotID}/
+            01-CofC/
+            02-MillCert-CMTR/
+            03-Dimensional-Report/
+            04-FAI-Lot-Specific/
+            05-Surface-Finish-Ra-F19/
+            06-Cleanliness-Particle-F70/
+            07-Special-Process-Certs/
+            08-Welding-Records-F78-F81/
+            09-Helium-Leak-F1/
+            10-Packaging-Photos/
+            11-Shipping-CofO-Customs/
+            12-Customer-Delta/
+    30-SCAR-8D/
+      {SCAR-No}_{OpenDate}/
+        D0-Symptom-Logged/
+        D1-Team-Formed/
+        D2-Problem-Described/
+        D3-Containment-Action/
+        D4-Root-Cause-Analysis/
+        D5-Permanent-Corrective-Action/
+        D6-Implementation-Verification/
+        D7-Systemic-Prevention/
+        D8-Closure-Recognition/
+        evidence/
+    40-Customer-Audits/
+      {YYYY-MM-DD}_{Auditor}/
+        CAPA/
+        evidence/
+        findings/
+    50-Compliance-CustomerSpecific/
+      CMRT-Conflict-Minerals/
+      Counterfeit-Prevention-AS6174-Statement/
+      ISO-14001-Cert/
+      ISO-45001-Cert/
+      ISO-9001-Cert/
+      NIST-SP-800-171-Cyber-Posture/
+      RBA-Self-Assessment/
+      REACH-SVHC-Declaration/
+      RoHS-Declaration/
+      USMCA-Country-of-Origin/
+    60-Scorecards/
+      {YYYY}-Q1/
+      {YYYY}-Q2/
+      {YYYY}-Q3/
+      {YYYY}-Q4/
+    70-ECN-Acknowledgements/
+      Signed-Ack-PDFs/
+    80-Portal-Exports/
+      TEL-Portal-BCWeb/
+    90-Inbox/
+      Ariba/
+        {YYYY-MM-DD}_{sender-slug}/
+      Email/
+        {YYYY-MM-DD}_{sender-slug}/
+      Portal-Download/
+        {YYYY-MM-DD}_{sender-slug}/
+      SecureTransfer/
+        {YYYY-MM-DD}_{sender-slug}/
+  03-HESEM-Internal-Workspace/
+    DEP-EHS/
+      1-Private/
+      2-Shared/
+        01-Incident-Intake-Pre-Formalization/
+        02-Near-Miss-Ledger-Working/
+        03-Hazard-Identification-Walkthroughs/
+        04-Risk-Assessment-Workspace-ISO45001/
+        05-Aspects-Impact-Assessment-Workspace-ISO14001/
+        06-Emergency-Drill-Calendar/
+        07-RBA-Working-Data-Assembly-Workspace/
+        08-Permit-To-Work-Daily-Ledger/
+    DEP-ENG/
+      1-Private/
+      2-Shared/
+        01-NPI-Project-Workspace/
+        02-Drawing-Markup-Pre-Release/
+        03-CAM-Development-Sandbox/
+        04-Tooling-Fixture-Design-Sandbox/
+        05-FMEA-Design-PFMEA-Drafts/
+        06-Process-Capability-Improvement/
+        07-Reverse-Engineering-Workspace/
+        08-ECN-Engineering-Response-Drafts/
+        09-Engineering-Lessons-Learned-Library/
+        10-Customer-Standards-Cache-Mirror/
+        11-Trade-Secret-Process-Recipe-Drafts/
+        12-Cross-Train-Material-Library/
+        13-Engineering-Calibration-Master-Models/
+    DEP-ERP/
+      1-Private/
+      2-Shared/
+        01-MDCR-Master-Data-Change-Request-Working-Set/
+        02-Epicor-User-Request-Queue/
+        03-OEM-Portal-Credentials-Vault-Privileged/
+        04-OEM-Portal-Onboarding-Workstream/
+        05-Workflow-Logic-Change-Queue/
+        06-Custom-Field-UD-Change-Queue/
+        07-Integration-Mapping-Workspace/
+        08-Data-Migration-Workspace/
+        09-ERP-Upgrade-Patching-Workspace/
+        10-Report-Library-Working/
+        11-Dashboard-Library-Working/
+        12-ERP-User-Training-Working/
+    DEP-EXEC/
+      1-Private/
+      2-Shared/
+        01-Strategy-OKR-Workspace/
+        02-Board-PreRead-Drafts/
+        03-Capital-Decisions-Workspace/
+        04-Customer-Strategic-Relationship/
+        05-Investor-IR-Comms-Workspace/
+        06-Executive-Briefing-Notes/
+        07-Crisis-Response-WarRoom/
+        08-MgmtReview-Prep-Materials/
+        09-EXEC-Risk-Register-Working/
+        10-EXEC-Travel-Calendar/
+        11-Strategic-Initiatives-Tracker/
+    DEP-FIN/
+      1-Private/
+      2-Shared/
+        01-Close-Calendar-Active-Quarter/
+        02-AP-Vendor-Invoice-Queue/
+        03-AR-Customer-Invoice-Queue/
+        04-Vendor-Master-Change-Queue/
+        05-Customer-Master-Change-Queue/
+        06-Bank-Reconciliation-Workspace/
+        07-Treasury-Cash-Forecast-Working/
+        08-Capex-Approval-Workspace/
+        09-Forecast-Budget-Working/
+        10-Internal-Controls-Walkthrough-Workspace/
+        11-Tax-Filing-Calendar/
+        12-Costing-Standards-Workspace/
+        13-Audit-PBC-Provided-By-Client-Workspace/
+        14-FIN-Risk-Register-Working/
+    DEP-HR/
+      1-Private/
+      2-Shared/
+        01-Onboarding-Pipeline-Pre-Hire/
+        02-Employee-Records-Working/
+        03-Performance-Review-Cycle-Workspace/
+        04-Compensation-Cycle-Workspace/
+        05-Recruiting-Active-Requisitions/
+        06-Recruiting-Candidate-Pipeline/
+        07-Training-Program-Workspace/
+        08-Training-Compliance-Tracker/
+        09-Disciplinary-Cases-Working/
+        10-Grievance-Cases-Working/
+        11-RBA-Working-Hours-Tracker/
+        12-RBA-Pulse-Action-Board/
+        13-RBA-Worker-Voice-Workspace/
+        14-Headcount-Plan-Working/
+        15-Payroll-Cycle-Workpapers/
+        16-PDPL-DataSubject-Request-Queue/
+        17-Exit-Offboarding-Pipeline/
+        18-Engagement-Pulse-Surveys-Workspace/
+    DEP-IT/
+      1-Private/
+      2-Shared/
+        01-Helpdesk-Ticket-Queue/
+        02-New-Hire-IT-Onboarding-Tracker/
+        03-Offboarding-Asset-Return-Tracker/
+        04-Asset-Inventory-Working/
+        05-Patch-Calendar-Workspace/
+        06-Backup-Verification-Log/
+        07-Network-Change-Queue/
+        08-Vendor-Software-License-Tracker/
+        09-SOC-Alert-Triage-Board/
+        10-Cyber-Incident-Workspace-Pre-Formal/
+        11-Endpoint-Compliance-Workspace/
+        12-Conditional-Access-Policy-Workspace/
+        13-Identity-Lifecycle-Working/
+        14-Cyber-Awareness-Training-Tracker/
+    DEP-LEGAL/
+      1-Private/
+      2-Shared/
+        01-Contract-Drafting-Workspace/
+        02-NDA-Library-Working/
+        03-IP-Trade-Secret-Register-Working/
+        04-Litigation-Hold-Pre-Filing/
+        05-Regulatory-Filing-Calendar/
+        06-Commercial-Dispute-Workspace/
+        07-Customer-Contract-Negotiation-Workspace/
+        08-Supplier-Contract-Negotiation-Workspace/
+        09-Corporate-Governance-Workspace/
+        10-Data-Protection-PDPL-Register-Working/
+        11-Export-Control-ITAR-EAR-Working/
+        12-Insurance-Claims-Workspace/
+    DEP-METRO/
+      1-Private/
+      2-Shared/
+        01-Calibration-Active-Queue/
+        02-CMM-Programs-Library/
+        03-Gauge-RnR-MSA-Studies/
+        04-Inspection-Equipment-Maintenance-Log/
+        05-Profilometer-Trace-Library/
+        06-Cleanroom-Lab-Daily-Ops/
+        07-Standards-Reference-Library-Mirror/
+        08-Special-Calibration-Outsource-Queue/
+        09-Lab-NCR-Investigation-Workspace/
+        10-NPI-First-Article-Metrology-Plan/
+    DEP-MNT/
+      1-Private/
+      2-Shared/
+        01-PM-Schedule-Active/
+        02-Breakdown-Response-Log/
+        03-Asset-Daily-Readiness-Checklist/
+        04-Spare-Parts-Crib-Workspace/
+        05-Calibration-Outsource-Coordination/
+        06-Facility-Maintenance-Queue/
+        07-Utility-System-Daily-Ops-Workspace/
+        08-OEE-Workspace/
+        09-Predictive-Maintenance-Sensor-Data/
+        10-MNT-Improvement-Workspace/
+    DEP-PRO/
+      1-Private/
+      2-Shared/
+        01-Production-Schedule-Active/
+        02-Routing-Active-WorkOrders/
+        03-Excursion-Pre-NCR-Ledger/
+        04-Setup-Sheet-Library-Mirror/
+        05-Tool-Crib-Daily-Log/
+        06-Operator-Handoff-Notes/
+        07-Yield-Scrap-Daily-Workspace/
+        08-Cell-Performance-Workspace/
+        09-Throughput-Capacity-Workspace/
+        10-Production-Shift-Meeting-Notes/
+        11-Cell-Improvement-Kaizen-Workspace/
+    DEP-QA/
+      1-Private/
+      2-Shared/
+        01-NCR-Disposition-Workspace-Active/
+        02-NCR-Intake-Pre-Formalization/
+        03-FAI-Programme-Active-Parts/
+        04-In-Process-Sampling-Plan-Library/
+        05-Customer-Audit-WarRoom-Active/
+        06-SCAR-Coordination-Workspace/
+        07-MRB-Material-Review-Board-Active/
+        08-Outgoing-Inspection-Reports/
+        09-Calibration-Out-of-Tolerance-Queue/
+        10-DPPM-Trend-Workspace/
+        11-Customer-Complaint-Triage-Queue/
+    DEP-QMS/
+      1-Private/
+      2-Shared/
+        01-Controlled-Doc-Pipeline-Drafts/
+        02-Internal-Audit-Schedule-WorkArea/
+        03-MgmtReview-Quarterly-WorkArea/
+        04-MOC-Change-Mgmt-Queue/
+        05-RBA-Compliance-Workspace/
+        06-ISO-Surveillance-Audit-Prep/
+        07-CAPA-Effectiveness-Verification-Queue/
+        08-Policy-Refresh-Calendar/
+        09-Risk-Register-Working-Master/
+    DEP-SCM/
+      1-Private/
+      2-Shared/
+        01-Strategic-Sourcing-Workspace/
+        02-Operational-Buyer-Queue-Active/
+        03-Supplier-Intelligence-Dossier-Library/
+        04-Commodity-Market-Scan/
+        05-Supplier-Onboarding-Pipeline/
+        06-Supplier-Audit-Coordination/
+        07-Counterfeit-Prevention-ASL-Workspace-AS6174/
+        08-Supplier-Risk-Register-Working/
+        09-Inventory-Replenishment-Strategic/
+        10-Inventory-Replenishment-Operational/
+        11-Sub-Tier-Audit-Coordination/
+        12-Mill-Sub-Tier-FlowDown-Library/
+        13-Approved-Supplier-List-Working-Master/
+        14-Cost-Reduction-Initiatives-Tracker/
+    DEP-SCS/
+      1-Private/
+      2-Shared/
+        01-Customer-Account-Plans-Library/
+        02-Opportunity-Pipeline-Workspace/
+        03-Quote-Pricing-Workspace/
+        04-Account-Team-Meeting-Notes/
+        05-Customer-Relationship-History/
+        06-OEM-Portal-Onboarding-Workstream/
+        07-Customer-Comms-Inbox-Triage/
+        08-Customer-Visit-Coordination/
+        09-Win-Loss-Lessons-Learned/
+        10-Quote-Conversion-Funnel-Workspace/
+    DEP-SP/
+      1-Private/
+      2-Shared/
+        01-Surface-Treatment-Daily-Ops/
+        02-EP-Passivation-Batch-Records/
+        03-Anodize-Batch-Records/
+        04-Heat-Treat-Pyrometry-Records/
+        05-NDT-Daily-Inspection-Log/
+        06-Welding-WPS-Operator-Log/
+        07-Outsource-Special-Process-Queue/
+        08-Process-Bath-Daily-Readiness/
+        09-Special-Process-NCR-Workspace/
+  04-HESEM-Quality-QMS/
+    01-Compliance-Canonical/
+      01-ISO-9001-2015/
+        Audit-Schedule/
+        CB-Auditor-CV/
+        Certificate/
+          1-Working/
+          2-In-Review/
+          3-Submitted-to-Customer/
+          4-Customer-Approved/
+        Surveillance-Reports/
+      02-AS9100D-Aerospace-Optional/
+        Gap-Assessment/
+        Roadmap-To-Certification/
+      03-ISO-14001-Environmental/
+      04-ISO-45001-OHS/
+      05-ISO-27001-InformationSecurity/
+      06-ISO-17025-Lab-Optional/
+      07-RBA-Code-of-Conduct-v8/
+        Self-Assessment-Annual/
+        VAP-Audit-Results/
+        Worker-Voice-Records/
+      08-Counterfeit-Prevention-AS6174/
+        ASL-Approved-Supplier-List/
+        IQC-Incoming-Inspection-Records/
+        Retained-Samples-Log/
+        Scrap-Disposition-Records/
+        Sub-Tier-FlowDown-Clauses/
+      09-NIST-SP-800-171-CMMC/
+      10-PDPL-VN-Decree-13-2023/
+      11-ITAR-EAR-Export-Control/
+    02-Standards-Library-External-Origin/
+      ASTM-SAE-AMS/
+        A240-SS-Plate-Sheet/
+        A269-SS-Tubing/
+        A276-SS-Bar-Shapes/
+        A632-SS-Small-Diameter/
+        A967-SS-Passivation-Practice/
+        AMS-2700-Passivation/
+        AMS-2750-Pyrometry/
+        AS5553-Counterfeit-EEE-Parts/
+        AS6174-Counterfeit-Materiel/
+        AS9102-First-Article-Inspection-RevC/
+        ASME-IX-Welding-Qualification/
+        ASME-Y14-35-Drawing-Revisions/
+        ASME-Y14-5-2018-GDT/
+        B912-SS-Electropolish/
+        E1417-Liquid-Penetrant-Examination/
+        E165-Liquid-Penetrant-Standard/
+        E595-Outgassing-TML-CVCM/
+        MIL-A-8625-Aluminum-Anodize/
+      IEST-ESD-RBA/
+        ANSI-ESD-S20-20/
+        IEST-STD-CC1246E-Product-Cleanliness/
+        RBA-Code-of-Conduct-v8-0/
+        RBA-VAP-Audit-Process/
+      IPC-JEDEC/
+        IPC-1782-Traceability-Records/
+        J-STD-033D-MSL-Handling/
+        JEDEC-MSL-Levels-1-to-6/
+      ISO-IEC/
+        13485-Medical-Device-Optional/
+        14001-2015-EMS/
+        14644-1-Cleanroom-Class/
+        14644-5-Cleanroom-Operations/
+        17025-2017-Lab-Competence/
+        27001-InformationSecurity/
+        45001-OHS/
+        9001-2015-QMS/
+      SEMI/
+        E10-RAM-Equipment-Reliability/
+        F1-Helium-Leak-Integrity/
+        F106-Helium-Leak-Detection/
+        F19-Surface-Condition-Wetted-SS/
+        F20-316L-Stainless-Spec/
+        F37-Roughness-Measurement/
+        F57-Polymer-UPW-LCDS/
+        F60-ESCA-XPS-Passive-Layer/
+        F70-Particle-Test-Gas-System/
+        F78-GTA-Welding-Practice/
+        F81-GTA-Weld-Visual-Inspection/
+        S2-EHS-Equipment-Guideline/
+        S22-Electrical-Design-Equipment/
+        T20-Authentication-Components/
+        T21-CSB-Organization-Identity/
+        T22-Self-Authentication-Traceability/
+    03-Authentication-T20-Master/
+      DMC-Issue-Log/
+      Digital-CofC-T21-Signed/
+      Registry-AMAT/
+      Registry-ASML/
+      Registry-LAM/
+      Registry-TEL/
+    04-Workflow-Lists-Catalog/
+  05-HESEM-Engineering-IP/
+    01-Process-Recipes-Master-DKE/
+      CNC-Feed-Speed-Master-Tables/
+      Cleanliness-Process-Recipes/
+      EP-Electrolyte-Formulations/
+      Passivation-Bath-Specifications/
+      Tool-Path-Strategies/
+      Welding-Procedure-Trade-Secret/
+    02-Tooling-Library/
+      Cutting-Tool-Library/
+      Fixture-Designs/
+      Jig-Designs/
+      Workholding-Templates/
+    03-CAM-Macros-Templates/
+      MasterCAM-Macros/
+      Post-Processors/
+      PowerMill-Macros/
+      Setup-Sheet-Templates/
+    04-Cpk-Process-Capability-DB/
+      By-Machine/
+      By-Material/
+      By-Process-Family/
+      Trend-Analytics/
+    05-Lessons-Learned-NPI/
+      By-Customer/
+      By-Failure-Mode/
+      By-Part-Family/
+      By-Year/
+    06-Internal-Tribal-Knowledge/
+    07-Patents-Filed-Drafts/
+      Filed/
+      In-Drafting/
+      Pending-Disclosure-Review/
+  06-HESEM-Archive/
+    01-By-Customer-By-Year/
+      AMAT/
+        {YYYY}/
+      ASML/
+        {YYYY}/
+      HESEM-Owned/
+        {YYYY}/
+      LAM/
+        {YYYY}/
+      TEL/
+        {YYYY}/
+    02-By-Record-Type/
+      CAPA-Closed/
+        {YYYY}/
+      Counterfeit-Prevention-AS6174/
+        {YYYY}/
+      Customer-Audits-Closed/
+        {YYYY}/
+      Customer-Contracts/
+        {YYYY}/
+      ECN-Closed/
+        {YYYY}/
+      Finance-Records/
+        {YYYY}/
+      HR-Records/
+        {YYYY}/
+      Helium-Leak-Cert/
+        {YYYY}/
+      Internal-Audits-Closed/
+        {YYYY}/
+      Mill-Cert-Heat-Genealogy/
+        {YYYY}/
+      PDPL-Data-Subject-Records/
+        {YYYY}/
+      Packaging-MSL-Logs/
+        {YYYY}/
+      Particle-Ionic-GCMS-FTIR/
+        {YYYY}/
+      SCAR-Closed/
+        {YYYY}/
+      Safety-FlowDown/
+        {YYYY}/
+      Supplier-Contracts/
+        {YYYY}/
+      Surface-Finish-ESCA/
+        {YYYY}/
+      Welding-WPS-PQR/
+        {YYYY}/
+    03-Disposition-Review-Queue/
+      {YYYY-MM}/
+    04-Destroy-Approved-Queue/
+      {YYYY-MM}/

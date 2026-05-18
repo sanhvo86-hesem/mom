@@ -1,1 +1,0 @@
-# Per-Job template — 16 gates following CNC workflow
