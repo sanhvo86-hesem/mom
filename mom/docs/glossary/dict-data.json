@@ -1,5 +1,32 @@
 [
   {
+    "term": "100% Inspection",
+    "meaning": "100% Inspection",
+    "vi": "Kiểm tra 100%",
+    "def": "Hoạt động kiểm tra 100%: kiểm toàn bộ sản phẩm/đặc tính (thường trong containment hoặc rủi ro cao); giảm rủi ro lọt lỗi nhưng tốn nguồn lực.",
+    "ctx": "QC Inspector/Quality Engineer dùng trong bước kiểm tra/đo kiểm và phân tích năng lực: lập plan kiểm tra, đo ghi nhận kết quả (CMM/gage), đánh giá pass/fail và theo dõi xu hướng/SPC.",
+    "rec": "Inspection report (FAI/FAIR/FPI/Final inspection); Dimensional report / CMM report; Control chart/SPC log (nếu áp dụng); Inspection plan / control plan reference",
+    "cat": "Quality"
+  },
+  {
+    "term": "13th-month Salary",
+    "meaning": "13th-month Salary",
+    "vi": "13th month Salary",
+    "def": "Khoản chi trả theo chính sách (thường cuối năm) dựa trên điều kiện/điểm mốc làm việc; phải có căn cứ tính, phê duyệt và ghi nhận trong payroll.",
+    "ctx": "HR C&B/Payroll và kế toán dùng theo kỳ lương để tính, kiểm soát và chi trả lương–phụ cấp–thưởng; ở bước tổng hợp dữ liệu chấm công, tính khấu trừ, phê duyệt bảng lương và phát hành phiếu lương.",
+    "rec": "Bảng lương; Phiếu lương; Quyết định/đề nghị điều chỉnh lương–phụ cấp–thưởng; Hồ sơ bảo hiểm & tờ khai liên quan; Bảng tính OT/khấu trừ; Danh sách chi trả/ngân hàng; Hồ sơ trợ cấp thôi việc (nếu có).",
+    "cat": "HR/Training"
+  },
+  {
+    "term": "20GP",
+    "meaning": "20-foot General Purpose container",
+    "vi": "Container 20' GP",
+    "def": "Container 20 feet loại thường (20-foot General Purpose, 20GP) dùng trong vận chuyển biển.",
+    "ctx": "Dùng khi lập kế hoạch đóng hàng/booking vận chuyển, tính thể tích và tối ưu tải.",
+    "rec": "Hồ sơ giao nhận/bao gói (nếu áp dụng): nhãn thùng, phiếu kiểm đếm, chứng từ vận chuyển.",
+    "cat": "Logistics"
+  },
+  {
     "term": "2A",
     "meaning": "External thread class 2A",
     "vi": "2A",
@@ -126,6 +153,24 @@
     "cat": "CNC/Engineering"
   },
   {
+    "term": "40GP",
+    "meaning": "40-foot General Purpose container",
+    "vi": "Container 40' GP",
+    "def": "Container 40 feet loại thường (40-foot General Purpose, 40GP) dùng trong vận chuyển biển.",
+    "ctx": "Dùng khi lập kế hoạch đóng hàng/booking vận chuyển, tính thể tích và tối ưu tải.",
+    "rec": "Hồ sơ giao nhận/bao gói (nếu áp dụng): nhãn thùng, phiếu kiểm đếm, chứng từ vận chuyển.",
+    "cat": "Logistics"
+  },
+  {
+    "term": "40HC",
+    "meaning": "40-foot High Cube container",
+    "vi": "Container 40' HC",
+    "def": "Container 40 feet cao (40-foot High Cube, 40HC) dùng khi cần thêm thể tích.",
+    "ctx": "Dùng khi lập kế hoạch đóng hàng/booking vận chuyển, tính thể tích và tối ưu tải.",
+    "rec": "Hồ sơ giao nhận/bao gói (nếu áp dụng): nhãn thùng, phiếu kiểm đếm, chứng từ vận chuyển.",
+    "cat": "Logistics"
+  },
+  {
     "term": "5 Why",
     "meaning": "5 Whys",
     "vi": "Kỹ thuật 5 Tại sao",
@@ -177,51 +222,6 @@
     "def": "Phương pháp 8D: quy trình giải quyết vấn đề theo 8 bước (team, problem, containment, root cause, corrective action, verify, prevent recurrence, closure).",
     "ctx": "QC/QA dùng trong kiểm soát chất lượng theo QMS: định nghĩa tiêu chí kiểm tra, ghi nhận kết quả và phục vụ truy xuất/đánh giá nội bộ.",
     "rec": "Applicable SOP/WI reference; Approval/decision record (nếu có); System transaction log (ERP/MES/WMS)",
-    "cat": "Quality"
-  },
-  {
-    "term": "13th-month Salary",
-    "meaning": "13th-month Salary",
-    "vi": "13th month Salary",
-    "def": "Khoản chi trả theo chính sách (thường cuối năm) dựa trên điều kiện/điểm mốc làm việc; phải có căn cứ tính, phê duyệt và ghi nhận trong payroll.",
-    "ctx": "HR C&B/Payroll và kế toán dùng theo kỳ lương để tính, kiểm soát và chi trả lương–phụ cấp–thưởng; ở bước tổng hợp dữ liệu chấm công, tính khấu trừ, phê duyệt bảng lương và phát hành phiếu lương.",
-    "rec": "Bảng lương; Phiếu lương; Quyết định/đề nghị điều chỉnh lương–phụ cấp–thưởng; Hồ sơ bảo hiểm & tờ khai liên quan; Bảng tính OT/khấu trừ; Danh sách chi trả/ngân hàng; Hồ sơ trợ cấp thôi việc (nếu có).",
-    "cat": "HR/Training"
-  },
-  {
-    "term": "20GP",
-    "meaning": "20-foot General Purpose container",
-    "vi": "Container 20' GP",
-    "def": "Container 20 feet loại thường (20-foot General Purpose, 20GP) dùng trong vận chuyển biển.",
-    "ctx": "Dùng khi lập kế hoạch đóng hàng/booking vận chuyển, tính thể tích và tối ưu tải.",
-    "rec": "Hồ sơ giao nhận/bao gói (nếu áp dụng): nhãn thùng, phiếu kiểm đếm, chứng từ vận chuyển.",
-    "cat": "Logistics"
-  },
-  {
-    "term": "40GP",
-    "meaning": "40-foot General Purpose container",
-    "vi": "Container 40' GP",
-    "def": "Container 40 feet loại thường (40-foot General Purpose, 40GP) dùng trong vận chuyển biển.",
-    "ctx": "Dùng khi lập kế hoạch đóng hàng/booking vận chuyển, tính thể tích và tối ưu tải.",
-    "rec": "Hồ sơ giao nhận/bao gói (nếu áp dụng): nhãn thùng, phiếu kiểm đếm, chứng từ vận chuyển.",
-    "cat": "Logistics"
-  },
-  {
-    "term": "40HC",
-    "meaning": "40-foot High Cube container",
-    "vi": "Container 40' HC",
-    "def": "Container 40 feet cao (40-foot High Cube, 40HC) dùng khi cần thêm thể tích.",
-    "ctx": "Dùng khi lập kế hoạch đóng hàng/booking vận chuyển, tính thể tích và tối ưu tải.",
-    "rec": "Hồ sơ giao nhận/bao gói (nếu áp dụng): nhãn thùng, phiếu kiểm đếm, chứng từ vận chuyển.",
-    "cat": "Logistics"
-  },
-  {
-    "term": "100% Inspection",
-    "meaning": "100% Inspection",
-    "vi": "Kiểm tra 100%",
-    "def": "Hoạt động kiểm tra 100%: kiểm toàn bộ sản phẩm/đặc tính (thường trong containment hoặc rủi ro cao); giảm rủi ro lọt lỗi nhưng tốn nguồn lực.",
-    "ctx": "QC Inspector/Quality Engineer dùng trong bước kiểm tra/đo kiểm và phân tích năng lực: lập plan kiểm tra, đo ghi nhận kết quả (CMM/gage), đánh giá pass/fail và theo dõi xu hướng/SPC.",
-    "rec": "Inspection report (FAI/FAIR/FPI/Final inspection); Dimensional report / CMM report; Control chart/SPC log (nếu áp dụng); Inspection plan / control plan reference",
     "cat": "Quality"
   },
   {
@@ -693,6 +693,15 @@
     "cat": "HSE"
   },
   {
+    "term": "ALCOA+",
+    "meaning": "Attributable, Legible, Contemporaneous, Original, Accurate plus Complete, Consistent, Enduring, Available",
+    "vi": "Nguyên tắc toàn vẹn dữ liệu ALCOA+",
+    "def": "ALCOA+ là bộ nguyên tắc toàn vẹn dữ liệu: có thể quy trách nhiệm, dễ đọc, ghi nhận đúng thời điểm, bản gốc, chính xác, đầy đủ, nhất quán, bền vững và sẵn có.",
+    "ctx": "Dùng trong data integrity, DCC, EQMS evidence, training, audit pack và hồ sơ chất lượng điện tử.",
+    "rec": "Audit trail; controlled record; electronic signature record; training evidence; DCC/DCR/DCN; CAPA/NCR evidence",
+    "cat": "ISO/QMS"
+  },
+  {
     "term": "Alert",
     "meaning": "Alert",
     "vi": "Cảnh báo",
@@ -700,6 +709,15 @@
     "ctx": "IT/Người dùng áp dụng khi vận hành hệ thống, trao đổi dữ liệu và kiểm soát rủi ro; nội dung cụ thể phụ thuộc phạm vi hệ thống triển khai.",
     "rec": "Chính sách/quy định liên quan (nếu có); Cấu hình hệ thống & CR quản lý thay đổi; Log vận hành (nếu có); Ticket xử lý sự cố/yêu cầu",
     "cat": "IT/Systems"
+  },
+  {
+    "term": "ALL_DEPTS",
+    "meaning": "All Departments",
+    "vi": "Toàn bộ phòng ban và phân hệ đã công bố",
+    "def": "ALL_DEPTS là mã nhóm vai trò/bộ phận dùng trong RACI và triển khai vận hành để gom các owner có trách nhiệm giống nhau. Không phải một chức danh đơn lẻ; khi ra quyết định vẫn phải truy về các vai trò thành viên và thẩm quyền cụ thể.",
+    "ctx": "Dùng trong role-and-department bundles, RACI matrix, training/deployment plan, quyền truy cập và các kịch bản phối hợp liên chức năng.",
+    "rec": "Role-and-department bundles; RACI/authority matrix; access matrix; deployment roster; training assignment; decision log có role owner cụ thể",
+    "cat": "General"
   },
   {
     "term": "Allocation Base",
@@ -765,6 +783,15 @@
     "cat": "Finance"
   },
   {
+    "term": "AMS",
+    "meaning": "Aerospace Material Specification",
+    "vi": "Đặc tả vật liệu hàng không AMS",
+    "def": "AMS là bộ đặc tả vật liệu/quy trình thường dùng trong aerospace và special process. Khi xuất hiện trong HESEM, cần kiểm soát đúng revision, phạm vi áp dụng và bằng chứng cert.",
+    "ctx": "Dùng trong material, special process, plating/passivation/heat treat and semi-equipment compliance docs.",
+    "rec": "Material cert; processor approval; controlled standard copy; receiving/IQC evidence; job dossier",
+    "cat": "CNC/Engineering"
+  },
+  {
     "term": "Analytics",
     "meaning": "Analytics",
     "vi": "Phân tích dữ liệu",
@@ -808,6 +835,15 @@
     "ctx": "QC/Operator đối chiếu bản vẽ và dùng dụng cụ đo phù hợp để ghi nhận kết quả; nếu NG thì lập NCR và cách ly sản phẩm.",
     "rec": "Bản vẽ/Model có GD&T; Kế hoạch kiểm tra (inspection plan); Phiếu kiểm công đoạn; FAI (nếu áp dụng); Hồ sơ hiệu chuẩn dụng cụ đo; NCR/CAPA (nếu NG)",
     "cat": "CNC/Engineering"
+  },
+  {
+    "term": "ANNEX",
+    "meaning": "Controlled Annex",
+    "vi": "Phụ lục kiểm soát",
+    "def": "ANNEX là tài liệu phụ lục kiểm soát dùng để mô tả matrix, registry, policy detail, operating model hoặc chuẩn bổ trợ cho SOP/WI/QMS Manual.",
+    "ctx": "Dùng trong hệ tài liệu app-served để liên kết authority matrix, KPI registry, M365 records, competency và các chuẩn vận hành chi tiết.",
+    "rec": "ANNEX document; DCC header; change history; approval record; cross-reference/link validation",
+    "cat": "ISO/QMS"
   },
   {
     "term": "Annual Leave",
@@ -925,6 +961,15 @@
     "ctx": "Finance Manager và AP/AR Accountant dùng trong SOP-803, báo cáo cashflow, đối chiếu công nợ và lập kế hoạch thanh toán/thu tiền.",
     "rec": "SOP-803; FRM-821; sổ công nợ AP/AR; hóa đơn; chứng từ thanh toán",
     "cat": "Finance"
+  },
+  {
+    "term": "APAR",
+    "meaning": "AP / AR and Payments Accountant",
+    "vi": "Kế toán công nợ và thanh toán",
+    "def": "APAR là mã vai trò trong hệ thống HESEM cho Kế toán công nợ và thanh toán. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
   },
   {
     "term": "API",
@@ -1062,6 +1107,15 @@
     "cat": "Quality"
   },
   {
+    "term": "APS",
+    "meaning": "Advanced Planning and Scheduling",
+    "vi": "Lập kế hoạch và lập lịch nâng cao",
+    "def": "APS là lớp lập kế hoạch/lập lịch nâng cao có xét năng lực, ràng buộc, trình tự và tối ưu. Trong HESEM, tài liệu benchmark phân biệt rõ foundational planning với full APS optimizer parity.",
+    "ctx": "Dùng trong planning benchmark, finite-capacity scheduling, roadmap và product-scope decisions.",
+    "rec": "Planning scenario; schedule snapshot; capacity model; optimizer decision record; roadmap/gap analysis",
+    "cat": "Operations/Planning"
+  },
+  {
     "term": "AQL",
     "meaning": "Acceptable Quality Limit",
     "vi": "Mức chất lượng chấp nhận",
@@ -1123,6 +1177,15 @@
     "ctx": "Dùng trong SOP/WI an toàn của khu vực sản xuất; xuất hiện trong đào tạo, kiểm tra hiện trường và đánh giá nội bộ/đánh giá nội bộ.",
     "rec": "SOP/WI liên quan; checklist/biên bản kiểm tra; hồ sơ đào tạo/truyền thông; log theo dõi và hành động khắc phục (nếu phát sinh).",
     "cat": "HSE"
+  },
+  {
+    "term": "AREA_LEADS",
+    "meaning": "Area Leads",
+    "vi": "Nhóm đầu mối khu vực hiện trường",
+    "def": "AREA_LEADS là mã nhóm vai trò/bộ phận dùng trong RACI và triển khai vận hành để gom các owner có trách nhiệm giống nhau. Không phải một chức danh đơn lẻ; khi ra quyết định vẫn phải truy về các vai trò thành viên và thẩm quyền cụ thể.",
+    "ctx": "Dùng trong role-and-department bundles, RACI matrix, training/deployment plan, quyền truy cập và các kịch bản phối hợp liên chức năng.",
+    "rec": "Role-and-department bundles; RACI/authority matrix; access matrix; deployment roster; training assignment; decision log có role owner cụ thể",
+    "cat": "General"
   },
   {
     "term": "As Found",
@@ -1627,6 +1690,15 @@
     "ctx": "Dùng như thuật ngữ chuẩn trong SOP/WI/biểu mẫu khi cần mô tả trách nhiệm hoặc nghiệp vụ liên quan.",
     "rec": "Sao kê ngân hàng; Phiếu thu/chi; Bảng đối chiếu ngân hàng; Hợp đồng vay",
     "cat": "Finance"
+  },
+  {
+    "term": "BAQ",
+    "meaning": "Business Activity Query",
+    "cat": "ERP/Epicor",
+    "def": "BAQ là truy vấn hoạt động nghiệp vụ trong Epicor/ERP dùng để lấy dữ liệu vận hành, báo cáo, dashboard hoặc tích hợp. BAQ trọng yếu phải có chủ dữ liệu, logic được xác nhận, UAT và kiểm soát thay đổi trước khi phát hành.",
+    "ctx": "Dùng trong sổ tay Epicor, bản đồ tích hợp, báo cáo ERP, luồng xuất dữ liệu sang M365 và kiểm soát thay đổi báo cáo.",
+    "rec": "BAQ register; data owner approval; UAT evidence; report catalog; change record",
+    "vi": "Truy vấn hoạt động nghiệp vụ"
   },
   {
     "term": "Barcode",
@@ -2256,6 +2328,15 @@
     "def": "Nguyên tắc đạo đức kinh doanh quy định hành vi được phép/không được phép trong giao dịch (trung thực, minh bạch, tránh xung đột lợi ích); là nền tảng cho compliance và quản trị rủi ro.",
     "ctx": "Dùng trong đào tạo và đánh giá tuân thủ; Management/Compliance ban hành và kiểm tra thực thi.",
     "rec": "Code of ethics; Training record; Khai báo xung đột lợi ích; Hồ sơ vi phạm nếu có",
+    "cat": "General"
+  },
+  {
+    "term": "BUY",
+    "meaning": "Buyer / Purchasing",
+    "vi": "Nhân viên mua hàng",
+    "def": "BUY là mã vai trò trong hệ thống HESEM cho Nhân viên mua hàng. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
     "cat": "General"
   },
   {
@@ -2979,6 +3060,24 @@
     "cat": "Finance"
   },
   {
+    "term": "CCR",
+    "meaning": "Customer Change Request",
+    "vi": "Yêu cầu thay đổi của khách hàng",
+    "def": "CCR là yêu cầu thay đổi do khách hàng khởi tạo hoặc xác nhận, có thể ảnh hưởng giá, lịch giao, phạm vi, yêu cầu kỹ thuật, FAI/CoC, cổng G0-G7 hoặc cam kết giao hàng. Trong hệ thống HESEM hiện tại, CCR không dùng cho complaint/rate; nếu cần dùng nghĩa Critical Constraint Resource phải viết đầy đủ để tránh nhầm.",
+    "ctx": "CS mở CCR; ENGM, QA, PPL và CEO tham gia đánh giá/duyệt theo ngưỡng trong ANNEX-120/121 và RACI authority matrix trước khi hứa ngày giao, xin nhượng bộ hoặc giao tiếp khách hàng.",
+    "rec": "FRM-212 Customer Change Request; ANNEX-120 A6; ANNEX-121 G0/G7; customer communication log; approval/decision log; job dossier evidence",
+    "cat": "Commercial/Customer"
+  },
+  {
+    "term": "CDP",
+    "meaning": "Carbon Disclosure Project",
+    "vi": "CDP / công bố dữ liệu carbon",
+    "def": "CDP là nền tảng/chuẩn báo cáo môi trường và khí thải thường xuất hiện trong customer ESG hoặc supply-chain response. Trong HESEM, CDP thuộc hồ sơ compliance, không phải dữ liệu sản xuất gốc.",
+    "ctx": "Dùng trong ESG evidence, customer portal, supplier compliance và annual reporting.",
+    "rec": "CDP response; ESG evidence folder; emission/source data; approval log; customer submission receipt",
+    "cat": "HSE"
+  },
+  {
     "term": "CDR",
     "meaning": "Control Decision Record",
     "vi": "Mã quyết định kiểm soát",
@@ -3003,6 +3102,15 @@
     "def": "General Manager (EXE-01) chịu trách nhiệm điều hành tổng thể và ra quyết định chiến lược; thường là người phê duyệt cuối cho các quyết định vượt hạn mức.",
     "ctx": "Dùng trong quản trị và phê duyệt cấp cao; các quyết định được ghi nhận trong MoM/decision log theo quy định.",
     "rec": "Decision log; MoM họp quản trị; DoA/authority matrix",
+    "cat": "General"
+  },
+  {
+    "term": "CEO[IC-BIZ]",
+    "meaning": "Chief Executive Officer as Business Incident Commander",
+    "vi": "Tổng Giám đốc kiêm chỉ huy sự cố kinh doanh",
+    "def": "CEO[IC-BIZ] là mã vai trò trong hệ thống HESEM cho Tổng Giám đốc kiêm chỉ huy sự cố kinh doanh. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
     "cat": "General"
   },
   {
@@ -3876,6 +3984,15 @@
     "def": "Tập điều khoản thương mại quy định giá, điều kiện thanh toán, giao hàng, bảo hành, phạt, hiệu lực báo giá và các ràng buộc hợp đồng; ảnh hưởng trực tiếp rủi ro và lợi nhuận.",
     "ctx": "Dùng trong báo giá/hợp đồng; Sales/Legal/Finance review và phê duyệt theo thẩm quyền.",
     "rec": "Quotation/contract; T&C; Approval records; Change/addendum records",
+    "cat": "General"
+  },
+  {
+    "term": "COMMERCIAL_FRONT",
+    "meaning": "Commercial Front",
+    "vi": "Nhóm tuyến đầu thương mại",
+    "def": "COMMERCIAL_FRONT là mã nhóm vai trò/bộ phận dùng trong RACI và triển khai vận hành để gom các owner có trách nhiệm giống nhau. Không phải một chức danh đơn lẻ; khi ra quyết định vẫn phải truy về các vai trò thành viên và thẩm quyền cụ thể.",
+    "ctx": "Dùng trong role-and-department bundles, RACI matrix, training/deployment plan, quyền truy cập và các kịch bản phối hợp liên chức năng.",
+    "rec": "Role-and-department bundles; RACI/authority matrix; access matrix; deployment roster; training assignment; decision log có role owner cụ thể",
     "cat": "General"
   },
   {
@@ -5022,6 +5139,15 @@
     "cat": "Operations/Planning"
   },
   {
+    "term": "CPS",
+    "meaning": "Cleaning and Packaging Supervisor",
+    "vi": "Giám sát vệ sinh và đóng gói",
+    "def": "CPS là mã vai trò trong hệ thống HESEM cho Giám sát vệ sinh và đóng gói. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
     "term": "CPT",
     "meaning": "Carriage Paid To",
     "vi": "cước phí trả tới",
@@ -5688,6 +5814,186 @@
     "cat": "CNC/Engineering"
   },
   {
+    "term": "D-EHS",
+    "meaning": "EHS Department",
+    "vi": "Phòng EHS",
+    "def": "D-EHS là mã bộ phận/chức năng trong HESEM cho Phòng EHS. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
+    "term": "D-ENG",
+    "meaning": "Engineering Department",
+    "vi": "Phòng Kỹ thuật",
+    "def": "D-ENG là mã bộ phận/chức năng trong HESEM cho Phòng Kỹ thuật. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
+    "term": "D-ERP",
+    "meaning": "ERP Administration Function",
+    "vi": "Bộ phận quản trị ERP",
+    "def": "D-ERP là mã bộ phận/chức năng trong HESEM cho Bộ phận quản trị ERP. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
+    "term": "D-EXEC",
+    "meaning": "Executive Department",
+    "vi": "Ban Điều hành",
+    "def": "D-EXEC là mã bộ phận/chức năng trong HESEM cho Ban Điều hành. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
+    "term": "D-FIN",
+    "meaning": "Finance Department",
+    "vi": "Phòng Tài chính",
+    "def": "D-FIN là mã bộ phận/chức năng trong HESEM cho Phòng Tài chính. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
+    "term": "D-HR",
+    "meaning": "Human Resources Department",
+    "vi": "Phòng Nhân sự",
+    "def": "D-HR là mã bộ phận/chức năng trong HESEM cho Phòng Nhân sự. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
+    "term": "D-IT",
+    "meaning": "Information Technology Department",
+    "vi": "Phòng CNTT",
+    "def": "D-IT là mã bộ phận/chức năng trong HESEM cho Phòng CNTT. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
+    "term": "D-LEGAL",
+    "meaning": "Legal and Corporate Secretary Department",
+    "vi": "Bộ phận pháp chế và thư ký công ty",
+    "def": "D-LEGAL là mã bộ phận/chức năng trong HESEM cho Bộ phận pháp chế và thư ký công ty. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
+    "term": "D-LOG",
+    "meaning": "Logistics and Shipping Function",
+    "vi": "Bộ phận Logistics và Giao vận",
+    "def": "D-LOG là mã bộ phận/chức năng trong HESEM cho Bộ phận Logistics và Giao vận. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
+    "term": "D-METRO",
+    "meaning": "Metrology and Calibration Department",
+    "vi": "Bộ phận đo lường và hiệu chuẩn",
+    "def": "D-METRO là mã bộ phận/chức năng trong HESEM cho Bộ phận đo lường và hiệu chuẩn. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
+    "term": "D-MNT",
+    "meaning": "Maintenance Function",
+    "vi": "Bộ phận Bảo trì",
+    "def": "D-MNT là mã bộ phận/chức năng trong HESEM cho Bộ phận Bảo trì. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
+    "term": "D-PPC",
+    "meaning": "Production Planning and Control Function",
+    "vi": "Bộ phận Điều độ và kiểm soát sản xuất",
+    "def": "D-PPC là mã bộ phận/chức năng trong HESEM cho Bộ phận Điều độ và kiểm soát sản xuất. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
+    "term": "D-PROD",
+    "meaning": "Production Department",
+    "vi": "Phòng Sản xuất",
+    "def": "D-PROD là mã bộ phận/chức năng trong HESEM cho Phòng Sản xuất. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
+    "term": "D-PUR",
+    "meaning": "Purchasing Function",
+    "vi": "Bộ phận Mua hàng",
+    "def": "D-PUR là mã bộ phận/chức năng trong HESEM cho Bộ phận Mua hàng. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
+    "term": "D-QUAL",
+    "meaning": "Quality Department",
+    "vi": "Phòng Chất lượng",
+    "def": "D-QUAL là mã bộ phận/chức năng trong HESEM cho Phòng Chất lượng. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
+    "term": "D-SCM",
+    "meaning": "Supply Chain Department",
+    "vi": "Phòng Chuỗi cung ứng",
+    "def": "D-SCM là mã bộ phận/chức năng trong HESEM cho Phòng Chuỗi cung ứng. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
+    "term": "D-SCS",
+    "meaning": "Sales and Customer Service Department",
+    "vi": "Phòng Kinh doanh và Dịch vụ khách hàng",
+    "def": "D-SCS là mã bộ phận/chức năng trong HESEM cho Phòng Kinh doanh và Dịch vụ khách hàng. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
+    "term": "D-SP",
+    "meaning": "Special Process Department",
+    "vi": "Bộ phận công đoạn đặc biệt",
+    "def": "D-SP là mã bộ phận/chức năng trong HESEM cho Bộ phận công đoạn đặc biệt. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
+    "term": "D-TCR",
+    "meaning": "Tool Crib Department",
+    "vi": "Bộ phận Kho dao cụ",
+    "def": "D-TCR là mã bộ phận/chức năng trong HESEM cho Bộ phận Kho dao cụ. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
+    "term": "D-WHS",
+    "meaning": "Warehouse Function",
+    "vi": "Bộ phận Kho",
+    "def": "D-WHS là mã bộ phận/chức năng trong HESEM cho Bộ phận Kho. Dùng để phân quyền, định tuyến hồ sơ, xác định owner tài liệu và ranh giới trách nhiệm liên phòng ban.",
+    "ctx": "Xuất hiện trong department handbook, JD, RACI/authority matrix, M365/SSOT folder rules, SOP/WI và training để tránh nhầm giữa vai trò cá nhân và đơn vị sở hữu quá trình.",
+    "rec": "Department handbook; access/permission matrix; document owner register; RACI/authority matrix; M365/SSOT folder map; audit trail phân quyền",
+    "cat": "General"
+  },
+  {
     "term": "DA",
     "meaning": "Documents against Acceptance",
     "vi": "Nhờ thu trả chậm",
@@ -6156,6 +6462,15 @@
     "cat": "IT/Systems"
   },
   {
+    "term": "DBL",
+    "meaning": "Deburr Team Lead",
+    "vi": "Tổ trưởng phá ba via",
+    "def": "DBL là mã vai trò trong hệ thống HESEM cho Tổ trưởng phá ba via. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
     "term": "DBR",
     "meaning": "Drum-Buffer-Rope",
     "vi": "DBR (Drum–Buffer–Rope)",
@@ -6163,6 +6478,15 @@
     "ctx": "Áp dụng DBR (Drum–Buffer–Rope) trong lập kế hoạch/điều độ để kiểm soát tiến độ.",
     "rec": "Kế hoạch sản xuất; Bảng điều độ; Hồ sơ họp/ghi nhận hành động",
     "cat": "Operations/Planning"
+  },
+  {
+    "term": "DBT",
+    "meaning": "Deburr Technician",
+    "vi": "Kỹ thuật viên phá ba via",
+    "def": "DBT là mã vai trò trong hệ thống HESEM cho Kỹ thuật viên phá ba via. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
   },
   {
     "term": "DC",
@@ -6489,6 +6813,195 @@
     "cat": "HR/Training"
   },
   {
+    "term": "DEP-EHS",
+    "meaning": "EHS Department folder code",
+    "cat": "Records/M365",
+    "def": "DEP-EHS là mã thư mục cấp phòng ban cho Môi trường, Sức khỏe và An toàn trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "vi": "Mã thư mục Phòng EHS"
+  },
+  {
+    "term": "DEP-ENG",
+    "meaning": "Engineering Department folder code",
+    "cat": "Records/M365",
+    "def": "DEP-ENG là mã thư mục cấp phòng ban cho Kỹ thuật trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "vi": "Mã thư mục Phòng Kỹ thuật"
+  },
+  {
+    "term": "DEP-ERP",
+    "meaning": "ERP Administration folder code",
+    "cat": "Records/M365",
+    "def": "DEP-ERP là mã thư mục cấp phòng ban cho Quản trị ERP trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "vi": "Mã thư mục Quản trị ERP"
+  },
+  {
+    "term": "DEP-EXEC",
+    "meaning": "Executive Department folder code",
+    "cat": "Records/M365",
+    "def": "DEP-EXEC là mã thư mục cấp phòng ban cho Ban điều hành trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "vi": "Mã thư mục Ban điều hành"
+  },
+  {
+    "term": "DEP-FIN",
+    "meaning": "Finance Department folder code",
+    "cat": "Records/M365",
+    "def": "DEP-FIN là mã thư mục cấp phòng ban cho Tài chính trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "vi": "Mã thư mục Phòng Tài chính"
+  },
+  {
+    "term": "DEP-HR",
+    "meaning": "Human Resources Department folder code",
+    "cat": "Records/M365",
+    "def": "DEP-HR là mã thư mục cấp phòng ban cho Nhân sự trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "vi": "Mã thư mục Phòng Nhân sự"
+  },
+  {
+    "term": "DEP-IT",
+    "meaning": "IT Department folder code",
+    "cat": "Records/M365",
+    "def": "DEP-IT là mã thư mục cấp phòng ban cho CNTT trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "vi": "Mã thư mục Phòng CNTT"
+  },
+  {
+    "term": "DEP-LEGAL",
+    "meaning": "Legal and Corporate Secretary folder code",
+    "vi": "Mã thư mục bộ phận pháp chế",
+    "def": "DEP-LEGAL là mã thư mục cấp phòng ban cho Pháp chế và thư ký công ty trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "cat": "Records/M365"
+  },
+  {
+    "term": "DEP-LOG",
+    "meaning": "Logistics and Shipping folder code",
+    "cat": "Records/M365",
+    "def": "DEP-LOG là mã thư mục cấp chức năng cho Logistics và giao vận trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "vi": "Mã thư mục Logistics và giao vận"
+  },
+  {
+    "term": "DEP-METRO",
+    "meaning": "Metrology and Calibration folder code",
+    "vi": "Mã thư mục bộ phận đo lường và hiệu chuẩn",
+    "def": "DEP-METRO là mã thư mục cấp phòng ban cho Đo lường và hiệu chuẩn trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "cat": "Records/M365"
+  },
+  {
+    "term": "DEP-MNT",
+    "meaning": "Maintenance and Facility folder code",
+    "vi": "Mã thư mục bộ phận bảo trì",
+    "def": "DEP-MNT là mã thư mục cấp phòng ban cho Bảo trì và hạ tầng trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "cat": "Records/M365"
+  },
+  {
+    "term": "DEP-PPC",
+    "meaning": "Production Planning and Control folder code",
+    "cat": "Records/M365",
+    "def": "DEP-PPC là mã thư mục cấp chức năng cho Điều độ và kiểm soát sản xuất trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "vi": "Mã thư mục Điều độ và kiểm soát sản xuất"
+  },
+  {
+    "term": "DEP-PRO",
+    "meaning": "Production Department folder code",
+    "cat": "Records/M365",
+    "def": "DEP-PRO là mã thư mục cấp phòng ban cho Sản xuất trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "vi": "Mã thư mục Sản xuất"
+  },
+  {
+    "term": "DEP-PUR",
+    "meaning": "Purchasing folder code",
+    "cat": "Records/M365",
+    "def": "DEP-PUR là mã thư mục cấp chức năng cho Mua hàng trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "vi": "Mã thư mục Mua hàng"
+  },
+  {
+    "term": "DEP-QA",
+    "meaning": "Quality Assurance and Quality Control folder code",
+    "cat": "Records/M365",
+    "def": "DEP-QA là mã thư mục cấp phòng ban cho QA/QC trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "vi": "Mã thư mục QA/QC"
+  },
+  {
+    "term": "DEP-QMS",
+    "meaning": "QMS and Document Control folder code",
+    "cat": "Records/M365",
+    "def": "DEP-QMS là mã thư mục cấp phòng ban cho QMS và kiểm soát tài liệu trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "vi": "Mã thư mục QMS và kiểm soát tài liệu"
+  },
+  {
+    "term": "DEP-SCM",
+    "meaning": "Supply Chain Department folder code",
+    "cat": "Records/M365",
+    "def": "DEP-SCM là mã thư mục cấp phòng ban cho Chuỗi cung ứng trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "vi": "Mã thư mục Chuỗi cung ứng"
+  },
+  {
+    "term": "DEP-SCS",
+    "meaning": "Sales and Customer Service Department folder code",
+    "cat": "Records/M365",
+    "def": "DEP-SCS là mã thư mục cấp phòng ban cho Kinh doanh và Dịch vụ khách hàng trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "vi": "Mã thư mục Kinh doanh và Dịch vụ khách hàng"
+  },
+  {
+    "term": "DEP-SP",
+    "meaning": "Special Process folder code",
+    "vi": "Mã thư mục bộ phận công đoạn đặc biệt",
+    "def": "DEP-SP là mã thư mục cấp phòng ban cho Công đoạn đặc biệt trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "cat": "Records/M365"
+  },
+  {
+    "term": "DEP-TCR",
+    "meaning": "Tool Crib folder code",
+    "cat": "Records/M365",
+    "def": "DEP-TCR là mã thư mục cấp chức năng cho Kho dao cụ trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "vi": "Mã thư mục Kho dao cụ"
+  },
+  {
+    "term": "DEP-WHS",
+    "meaning": "Warehouse folder code",
+    "cat": "Records/M365",
+    "def": "DEP-WHS là mã thư mục cấp chức năng cho Kho trong cấu trúc SharePoint/M365 của HESEM. Dùng để đặt tên thư mục, nhóm quyền, vùng working file và tuyến truy cập hồ sơ theo phòng ban; không thay thế mã vai trò cá nhân trong RACI.",
+    "ctx": "Dùng trong ANNEX/WI về M365, SharePoint, records topology, permission groups và routing hồ sơ khi cần định tuyến theo vùng Department-Ops/DEP-{CODE}.",
+    "rec": "SharePoint site/library map; Department-Ops folder; permission group; routing matrix",
+    "vi": "Mã thư mục Kho"
+  },
+  {
     "term": "Department Head",
     "meaning": "Department Head",
     "vi": "Trưởng bộ phận",
@@ -6514,6 +7027,24 @@
     "ctx": "IT/Người dùng áp dụng khi vận hành hệ thống, trao đổi dữ liệu và kiểm soát rủi ro; nội dung cụ thể phụ thuộc phạm vi hệ thống triển khai.",
     "rec": "Chính sách/quy định liên quan (nếu có); Cấu hình hệ thống & CR quản lý thay đổi; Log vận hành (nếu có); Ticket xử lý sự cố/yêu cầu",
     "cat": "IT/Systems"
+  },
+  {
+    "term": "DEPLOYMENT_LEADS",
+    "meaning": "Deployment Leads",
+    "vi": "Nhóm đầu mối triển khai theo ca và phòng ban",
+    "def": "DEPLOYMENT_LEADS là mã nhóm vai trò/bộ phận dùng trong RACI và triển khai vận hành để gom các owner có trách nhiệm giống nhau. Không phải một chức danh đơn lẻ; khi ra quyết định vẫn phải truy về các vai trò thành viên và thẩm quyền cụ thể.",
+    "ctx": "Dùng trong role-and-department bundles, RACI matrix, training/deployment plan, quyền truy cập và các kịch bản phối hợp liên chức năng.",
+    "rec": "Role-and-department bundles; RACI/authority matrix; access matrix; deployment roster; training assignment; decision log có role owner cụ thể",
+    "cat": "General"
+  },
+  {
+    "term": "DEPLOYMENT_STEERING",
+    "meaning": "Deployment Steering Group",
+    "vi": "Nhóm chỉ đạo triển khai liên chức năng",
+    "def": "DEPLOYMENT_STEERING là mã nhóm vai trò/bộ phận dùng trong RACI và triển khai vận hành để gom các owner có trách nhiệm giống nhau. Không phải một chức danh đơn lẻ; khi ra quyết định vẫn phải truy về các vai trò thành viên và thẩm quyền cụ thể.",
+    "ctx": "Dùng trong role-and-department bundles, RACI matrix, training/deployment plan, quyền truy cập và các kịch bản phối hợp liên chức năng.",
+    "rec": "Role-and-department bundles; RACI/authority matrix; access matrix; deployment roster; training assignment; decision log có role owner cụ thể",
+    "cat": "General"
   },
   {
     "term": "Deposit",
@@ -6838,6 +7369,15 @@
     "ctx": "Dùng như thuật ngữ chuẩn trong SOP/WI/biểu mẫu khi cần mô tả trách nhiệm hoặc nghiệp vụ liên quan.",
     "rec": "Biên bản họp/trao đổi (nếu áp dụng); Log phê duyệt/phiên bản (nếu áp dụng); Hồ sơ truy xuất trên ERP/WMS (nếu áp dụng)",
     "cat": "Finance"
+  },
+  {
+    "term": "DIRECT_LINE_MGRS",
+    "meaning": "Direct Line Managers",
+    "vi": "Nhóm quản lý trực tiếp",
+    "def": "DIRECT_LINE_MGRS là mã nhóm vai trò/bộ phận dùng trong RACI và triển khai vận hành để gom các owner có trách nhiệm giống nhau. Không phải một chức danh đơn lẻ; khi ra quyết định vẫn phải truy về các vai trò thành viên và thẩm quyền cụ thể.",
+    "ctx": "Dùng trong role-and-department bundles, RACI matrix, training/deployment plan, quyền truy cập và các kịch bản phối hợp liên chức năng.",
+    "rec": "Role-and-department bundles; RACI/authority matrix; access matrix; deployment roster; training assignment; decision log có role owner cụ thể",
+    "cat": "General"
   },
   {
     "term": "Directory",
@@ -8001,6 +8541,15 @@
     "cat": "HSE"
   },
   {
+    "term": "EHS[IC-EHS]",
+    "meaning": "EHS Specialist as EHS Incident Commander",
+    "vi": "Chuyên viên EHS kiêm chỉ huy sự cố an toàn",
+    "def": "EHS[IC-EHS] là mã vai trò trong hệ thống HESEM cho Chuyên viên EHS kiêm chỉ huy sự cố an toàn. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
     "term": "Electrical Permit",
     "meaning": "Electrical Work Permit",
     "vi": "Giấy phép Electrical làm việc",
@@ -8325,6 +8874,15 @@
     "cat": "General"
   },
   {
+    "term": "ENGM",
+    "meaning": "Engineering Lead / Manager",
+    "vi": "Trưởng nhóm / quản lý kỹ thuật",
+    "def": "ENGM là mã vai trò trong hệ thống HESEM cho Trưởng nhóm / quản lý kỹ thuật. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
     "term": "Envelope Requirement",
     "meaning": "Envelope Requirement",
     "vi": "Yêu cầu bao",
@@ -8487,6 +9045,15 @@
     "cat": "Logistics"
   },
   {
+    "term": "EQMS",
+    "meaning": "Enterprise Quality Management System",
+    "vi": "Hệ thống quản lý chất lượng doanh nghiệp",
+    "def": "EQMS là lớp hệ thống quản lý chất lượng doanh nghiệp cho document control, training, CAPA, audit, supplier quality, evidence, signature và traceability. Trong HESEM, EQMS phải giữ ranh giới rõ với ERP/MOM/MES nhưng chia sẻ bằng chứng và governance.",
+    "ctx": "Dùng trong kiến trúc, benchmark, chất lượng và compliance khi nói về hệ thống chất lượng số hóa cấp doanh nghiệp.",
+    "rec": "QMS Manual; EQMS workflow records; DCC/DCR/DCN; CAPA/NCR; audit pack; training evidence",
+    "cat": "ISO/QMS"
+  },
+  {
     "term": "EQSP",
     "meaning": "Equally spaced",
     "vi": "EQSP (chia đều/khoảng cách đều)",
@@ -8561,11 +9128,29 @@
   {
     "term": "ERP",
     "meaning": "Enterprise Resource Planning",
-    "vi": "Hệ thống hoạch định nguồn lực",
-    "def": "Kế hoạch quy định kịch bản, vai trò, nguồn lực và trình tự hành động để ứng phó tình huống khẩn hoặc kiểm soát rủi ro. Yêu cầu rà soát định kỳ và diễn tập/đào tạo để đảm bảo khả năng thực thi.",
-    "ctx": "Dùng như thuật ngữ chuẩn trong SOP/WI/biểu mẫu khi cần mô tả trách nhiệm hoặc nghiệp vụ liên quan.",
-    "rec": "Quyền truy cập/phân quyền; Log yêu cầu hỗ trợ; Tài liệu hướng dẫn sử dụng; Báo cáo trích xuất dữ liệu",
+    "vi": "Hệ thống hoạch định nguồn lực doanh nghiệp",
+    "def": "ERP là hệ thống hoạch định nguồn lực doanh nghiệp dùng để quản lý đơn hàng, vật tư, tồn kho, sản xuất, mua hàng, tài chính và dữ liệu giao dịch nền tảng. Trong HESEM, ERP là nguồn giao dịch doanh nghiệp nhưng không tự thay thế execution truth của MOM/MES service paths.",
+    "ctx": "Dùng trong tích hợp Epicor/ERP, dữ liệu đơn hàng, tồn kho, tài chính, kế hoạch và phân quyền người dùng.",
+    "rec": "ERP transaction log; integration log; master data change record; access review; reconciliation report; SOP/WI liên quan",
     "cat": "IT/Systems"
+  },
+  {
+    "term": "ESA",
+    "meaning": "Epicor System Administrator",
+    "vi": "Quản trị viên hệ thống Epicor",
+    "def": "ESA là mã vai trò trong hệ thống HESEM cho Quản trị viên hệ thống Epicor. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
+    "term": "ESA[IC-IT]",
+    "meaning": "Epicor System Administrator as IT Incident Commander",
+    "vi": "Quản trị viên Epicor kiêm chỉ huy sự cố hệ thống số",
+    "def": "ESA[IC-IT] là mã vai trò trong hệ thống HESEM cho Quản trị viên Epicor kiêm chỉ huy sự cố hệ thống số. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
   },
   {
     "term": "Escalate",
@@ -8721,6 +9306,15 @@
     "cat": "HSE"
   },
   {
+    "term": "EST",
+    "meaning": "Estimator",
+    "vi": "Nhân viên báo giá",
+    "def": "EST là mã vai trò trong hệ thống HESEM cho Nhân viên báo giá. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
     "term": "Estimate",
     "meaning": "Estimate",
     "vi": "tính toán",
@@ -8791,6 +9385,15 @@
     "ctx": "Áp dụng ETO (Thiết kế theo đơn hàng) trong lập kế hoạch/điều độ để kiểm soát tiến độ.",
     "rec": "Kế hoạch sản xuất; Bảng điều độ; Hồ sơ họp/ghi nhận hành động",
     "cat": "Operations/Planning"
+  },
+  {
+    "term": "ETQ",
+    "meaning": "ETQ Reliance Quality Management Platform",
+    "vi": "Nền tảng quản lý chất lượng ETQ",
+    "def": "ETQ là nền tảng eQMS/vendor benchmark được nhắc trong tài liệu gap analysis. Trong HESEM, ETQ là mốc so sánh về connected quality, supplier quality, CAPA, audit, document và training workflow.",
+    "ctx": "Dùng trong benchmark/gap analysis, không phải hệ thống nội bộ đang vận hành.",
+    "rec": "Benchmark dossier; gap analysis; roadmap decision; quality workflow comparison",
+    "cat": "ISO/QMS"
   },
   {
     "term": "EUR",
@@ -8890,6 +9493,15 @@
     "ctx": "Dùng như thuật ngữ chuẩn trong SOP/WI/biểu mẫu khi cần mô tả trách nhiệm hoặc nghiệp vụ liên quan.",
     "rec": "Sơ đồ tổ chức/Org chart; Ma trận phân quyền/ủy quyền; Mô tả công việc (JD); Ma trận năng lực/đào tạo",
     "cat": "General"
+  },
+  {
+    "term": "EXEC",
+    "meaning": "Executive Department short code",
+    "cat": "Records/M365",
+    "def": "EXEC là mã rút gọn dùng trong blueprint hồ sơ M365 để chỉ Ban điều hành. Khi gắn trách nhiệm vận hành chính thức, ưu tiên mã phòng ban đầy đủ tương ứng như D-* hoặc mã thư mục DEP-*.",
+    "ctx": "Dùng trong bảng 16 phòng ban, folder blueprint, permission model và các sơ đồ M365 cần mã ngắn để giữ đường dẫn hoặc bảng ma trận gọn.",
+    "rec": "Department code map; folder blueprint; permission matrix; records topology",
+    "vi": "Ban điều hành"
   },
   {
     "term": "Exit Interview",
@@ -9216,6 +9828,15 @@
     "cat": "Logistics"
   },
   {
+    "term": "FDA",
+    "meaning": "U.S. Food and Drug Administration",
+    "vi": "Cơ quan Quản lý Thực phẩm và Dược phẩm Hoa Kỳ",
+    "def": "FDA là cơ quan quản lý của Hoa Kỳ, được nhắc trong benchmark/compliance khi đánh giá yêu cầu chất lượng, auditability hoặc regulated manufacturing. HESEM chỉ dùng làm mốc tham chiếu khi tài liệu yêu cầu.",
+    "ctx": "Dùng trong benchmark, compliance và regulated-quality references.",
+    "rec": "Benchmark dossier; regulatory applicability assessment; compliance decision log",
+    "cat": "ISO/QMS"
+  },
+  {
     "term": "Feed Hold",
     "meaning": "Feed Hold",
     "vi": "tạm dừng chạy dao",
@@ -9415,12 +10036,12 @@
   },
   {
     "term": "FIN",
-    "meaning": "Finish",
-    "vi": "FIN (gia công tinh)",
-    "def": "FIN (gia công tinh) là hạng mục kỹ thuật dùng để chuẩn hóa giao tiếp và kiểm soát công việc trong sản xuất CNC; áp dụng khi lập SOP/WI, lập trình, setup hoặc kiểm tra để đảm bảo cùng cách hiểu và truy xuất trong đánh giá nội bộ.",
-    "ctx": "QC/Operator đối chiếu bản vẽ và dùng dụng cụ đo phù hợp để ghi nhận kết quả; nếu NG thì lập NCR và cách ly sản phẩm.",
-    "rec": "Bản vẽ/Model có GD&T; Kế hoạch kiểm tra (inspection plan); Phiếu kiểm công đoạn; FAI (nếu áp dụng); Hồ sơ hiệu chuẩn dụng cụ đo; NCR/CAPA (nếu NG)",
-    "cat": "CNC/Engineering"
+    "meaning": "Finance Manager / Finish (context-dependent)",
+    "vi": "Trưởng phòng Tài chính - Kế toán / gia công tinh",
+    "def": "Trong JD/RACI/ANNEX của HESEM, FIN là mã vai trò Finance Manager hoặc chức năng tài chính. Trong ngữ cảnh bản vẽ/quy trình CNC, FIN cũng có thể là finish/gia công tinh. Khi có rủi ro nhầm với vai trò tài chính, tài liệu phải viết rõ Finance Manager hoặc finish/gia công tinh.",
+    "ctx": "Dùng trong role links, authority matrix, finance workflow và đôi khi trong thuật ngữ gia công. Luôn đọc theo ngữ cảnh dòng tài liệu, bảng RACI hoặc bản vẽ.",
+    "rec": "JD Finance Manager; RACI/authority matrix; finance approval log; bản vẽ/process sheet nếu dùng theo nghĩa finish; decision log khi phê duyệt tài chính",
+    "cat": "Finance / CNC/Engineering"
   },
   {
     "term": "Final Inspection",
@@ -10107,6 +10728,15 @@
     "cat": "ISO/QMS"
   },
   {
+    "term": "FRONTLINE_LEADS",
+    "meaning": "Frontline Leads",
+    "vi": "Nhóm điều hành tuyến đầu",
+    "def": "FRONTLINE_LEADS là mã nhóm vai trò/bộ phận dùng trong RACI và triển khai vận hành để gom các owner có trách nhiệm giống nhau. Không phải một chức danh đơn lẻ; khi ra quyết định vẫn phải truy về các vai trò thành viên và thẩm quyền cụ thể.",
+    "ctx": "Dùng trong role-and-department bundles, RACI matrix, training/deployment plan, quyền truy cập và các kịch bản phối hợp liên chức năng.",
+    "rec": "Role-and-department bundles; RACI/authority matrix; access matrix; deployment roster; training assignment; decision log có role owner cụ thể",
+    "cat": "General"
+  },
+  {
     "term": "FTA",
     "meaning": "Free Trade Agreement",
     "vi": "FTA (Hiệp định thương mại tự do)",
@@ -10159,6 +10789,24 @@
     "ctx": "Quality và Engineering dùng cho part mới, revision mới, thay đổi có ảnh hưởng rộng, requirement khách hàng hoặc trường hợp không đủ căn cứ để chỉ dùng delta FAI.",
     "rec": "FAI full report; ballooned drawing; characteristic list; CMM/dimensional report; approved sources evidence; inspection plan/control plan",
     "cat": "Quality"
+  },
+  {
+    "term": "FUNC_HEADS",
+    "meaning": "Function Heads",
+    "vi": "Nhóm đầu mối điều hành chức năng",
+    "def": "FUNC_HEADS là mã nhóm vai trò/bộ phận dùng trong RACI và triển khai vận hành để gom các owner có trách nhiệm giống nhau. Không phải một chức danh đơn lẻ; khi ra quyết định vẫn phải truy về các vai trò thành viên và thẩm quyền cụ thể.",
+    "ctx": "Dùng trong role-and-department bundles, RACI matrix, training/deployment plan, quyền truy cập và các kịch bản phối hợp liên chức năng.",
+    "rec": "Role-and-department bundles; RACI/authority matrix; access matrix; deployment roster; training assignment; decision log có role owner cụ thể",
+    "cat": "General"
+  },
+  {
+    "term": "FUNC_OWNERS",
+    "meaning": "Functional Content Owners",
+    "vi": "Nhóm sở hữu nội dung nghiệp vụ theo chức năng",
+    "def": "FUNC_OWNERS là mã nhóm vai trò/bộ phận dùng trong RACI và triển khai vận hành để gom các owner có trách nhiệm giống nhau. Không phải một chức danh đơn lẻ; khi ra quyết định vẫn phải truy về các vai trò thành viên và thẩm quyền cụ thể.",
+    "ctx": "Dùng trong role-and-department bundles, RACI matrix, training/deployment plan, quyền truy cập và các kịch bản phối hợp liên chức năng.",
+    "rec": "Role-and-department bundles; RACI/authority matrix; access matrix; deployment roster; training assignment; decision log có role owner cụ thể",
+    "cat": "General"
   },
   {
     "term": "Fusion 360",
@@ -10872,6 +11520,15 @@
     "cat": "HSE"
   },
   {
+    "term": "GLP",
+    "meaning": "General Ledger and Payroll Accountant",
+    "vi": "Kế toán tổng hợp và tiền lương",
+    "def": "GLP là mã vai trò trong hệ thống HESEM cho Kế toán tổng hợp và tiền lương. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
     "term": "Gmail",
     "meaning": "Gmail",
     "vi": "Gmail – Dịch vụ email",
@@ -11439,6 +12096,15 @@
     "cat": "CNC/Engineering"
   },
   {
+    "term": "HESEM",
+    "meaning": "HESEM Operating System",
+    "vi": "Hệ điều hành quản trị HESEM",
+    "def": "HESEM là tên hệ thống/nền tảng vận hành dùng trong bộ tài liệu ERP/MOM/MES/EQMS của doanh nghiệp. Thuật ngữ dùng để chỉ chuẩn vận hành, portal, dữ liệu, bằng chứng và hệ tài liệu nội bộ.",
+    "ctx": "Xuất hiện trong tiêu đề tài liệu, portal, training, SOP/WI/ANNEX và các gói triển khai.",
+    "rec": "QMS Manual; portal docs; SOP/WI/ANNEX; training docs; release/deploy records",
+    "cat": "General"
+  },
+  {
     "term": "HESEM-QMS-SSOT",
     "meaning": "HESEM QMS Single Source of Truth",
     "vi": "Nhà kho dữ liệu chuẩn HESEM QMS",
@@ -11862,6 +12528,24 @@
     "cat": "IT/Systems"
   },
   {
+    "term": "IAO",
+    "meaning": "Internal Auditor Outsource",
+    "vi": "Đánh giá viên nội bộ thuê ngoài",
+    "def": "IAO là mã vai trò trong hệ thống HESEM cho Đánh giá viên nội bộ thuê ngoài. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
+    "term": "IATF",
+    "meaning": "International Automotive Task Force",
+    "vi": "Tổ chức IATF / chuẩn IATF 16949",
+    "def": "IATF thường xuất hiện trong tài liệu như IATF 16949, chuẩn hệ thống quản lý chất lượng ngành ô tô. HESEM dùng khi yêu cầu khách hàng hoặc benchmark cần đối chiếu điều khoản.",
+    "ctx": "Dùng trong MRR-Pack, material/supplier/FAI references và compliance matrix.",
+    "rec": "Applicability matrix; supplier quality record; audit evidence; control plan; corrective action record",
+    "cat": "ISO/QMS"
+  },
+  {
     "term": "IATF 16949",
     "meaning": "Quality management system requirements for automotive",
     "vi": "Tiêu chuẩn IATF 16949",
@@ -11896,6 +12580,15 @@
     "ctx": "Quản lý bộ phận và HRBP dùng theo chu kỳ mục tiêu/đánh giá để theo dõi hiệu suất và phát triển nhân sự; ở bước đặt mục tiêu, review định kỳ, chốt đánh giá và lập kế hoạch phát triển/cải thiện.",
     "rec": "Mục tiêu/KPI/OKR đã phê duyệt; phiếu đánh giá & xếp loại; biên bản review; kế hoạch IDP/PIP; kết quả khảo sát engagement/satisfaction (nếu có); biên bản họp & action plan.",
     "cat": "HR/Training"
+  },
+  {
+    "term": "IEC",
+    "meaning": "International Electrotechnical Commission",
+    "vi": "Ủy ban Kỹ thuật Điện Quốc tế",
+    "def": "IEC là tổ chức tiêu chuẩn quốc tế cho lĩnh vực điện/điện tử. Trong HESEM, IEC thường xuất hiện trong tham chiếu chuẩn, bảo mật, thiết bị hoặc compliance.",
+    "ctx": "Dùng trong benchmark, standards matrix, IT/OT and compliance references.",
+    "rec": "Standards applicability matrix; controlled-copy register; compliance assessment; audit evidence",
+    "cat": "General"
   },
   {
     "term": "IEST-STD-CC1246E",
@@ -12717,6 +13410,15 @@
     "cat": "Quality"
   },
   {
+    "term": "IR",
+    "meaning": "Inspection Report / Incident Report",
+    "vi": "Báo cáo kiểm tra / báo cáo sự cố",
+    "def": "IR là mã viết tắt theo ngữ cảnh. Trong quality/FAI, IR thường là Inspection Report; trong EHS/incident context, IR có thể là Incident Report. Tài liệu phải đọc theo SOP/WI và biểu mẫu liên quan.",
+    "ctx": "Xuất hiện cùng FAI, inspection, measurement, incident hoặc evidence naming; cần tránh dùng IR đơn độc nếu có rủi ro nhầm.",
+    "rec": "Inspection report; FAI/FAIR; incident report; evidence naming rule; job dossier; CAPA/NCR nếu phát sinh",
+    "cat": "Quality / HSE"
+  },
+  {
     "term": "IRR",
     "meaning": "Internal Rate of Return",
     "vi": "Tỷ suất hoàn vốn nội bộ",
@@ -12724,6 +13426,15 @@
     "ctx": "Dùng như thuật ngữ chuẩn trong SOP/WI/biểu mẫu khi cần mô tả trách nhiệm hoặc nghiệp vụ liên quan.",
     "rec": "Đề nghị/Phê duyệt đầu tư; Sổ tài sản; Bảng khấu hao/phan bổ; Hồ sơ mua sắm",
     "cat": "Finance"
+  },
+  {
+    "term": "ISA-95",
+    "meaning": "Enterprise-Control System Integration Standard",
+    "vi": "Chuẩn tích hợp doanh nghiệp và điều khiển ISA-95",
+    "def": "ISA-95 là chuẩn mô hình hóa ranh giới doanh nghiệp, sản xuất và điều khiển. HESEM dùng ISA-95 để giữ rõ ranh giới ERP, MOM, MES, EQMS, analytics và integration.",
+    "ctx": "Dùng trong kiến trúc, operating model, boundary discipline và benchmark tài liệu.",
+    "rec": "Architecture docs; domain contract; process model; integration map; governance decision log",
+    "cat": "Operations/Planning"
   },
   {
     "term": "Ishikawa",
@@ -12757,24 +13468,6 @@
     "meaning": "International Organization for Standardization",
     "vi": "Tổ chức tiêu chuẩn hóa quốc tế ISO",
     "def": "Tổ chức Tiêu chuẩn hóa Quốc tế ban hành các tiêu chuẩn (ví dụ: ISO 9001) dùng làm căn cứ yêu cầu hệ thống.",
-    "ctx": "Dùng trong vận hành QMS theo ISO 9001 để đảm bảo nhất quán thuật ngữ và kiểm soát quá trình.",
-    "rec": "Documented information/record theo quy định kiểm soát tài liệu & lưu giữ hồ sơ (ISO 9001:2015 7.5).",
-    "cat": "ISO/QMS"
-  },
-  {
-    "term": "ISO 9000",
-    "meaning": "Quality management systems — Fundamentals and vocabulary",
-    "vi": "Tiêu chuẩn ISO 9000",
-    "def": "Tiêu chuẩn về thuật ngữ và nguyên tắc QMS; dùng làm từ vựng/định nghĩa chính thức khi xây dựng hệ thống.",
-    "ctx": "Dùng trong vận hành QMS theo ISO 9001 để đảm bảo nhất quán thuật ngữ và kiểm soát quá trình.",
-    "rec": "Documented information/record theo quy định kiểm soát tài liệu & lưu giữ hồ sơ (ISO 9001:2015 7.5).",
-    "cat": "ISO/QMS"
-  },
-  {
-    "term": "ISO 9001",
-    "meaning": "Quality Management Systems — Requirements",
-    "vi": "Tiêu chuẩn ISO 9001",
-    "def": "Tiêu chuẩn hệ thống quản lý chất lượng (QMS) – yêu cầu; nền tảng cho vận hành quy trình, kiểm soát rủi ro, đánh giá nội bộ và cải tiến.",
     "ctx": "Dùng trong vận hành QMS theo ISO 9001 để đảm bảo nhất quán thuật ngữ và kiểm soát quá trình.",
     "rec": "Documented information/record theo quy định kiểm soát tài liệu & lưu giữ hồ sơ (ISO 9001:2015 7.5).",
     "cat": "ISO/QMS"
@@ -12832,6 +13525,33 @@
     "ctx": "Dùng trong SOP/WI an toàn của khu vực sản xuất; xuất hiện trong đào tạo, kiểm tra hiện trường và đánh giá nội bộ/đánh giá nội bộ.",
     "rec": "SOP/WI liên quan; checklist/biên bản kiểm tra; hồ sơ đào tạo/truyền thông; log theo dõi và hành động khắc phục (nếu phát sinh).",
     "cat": "HSE"
+  },
+  {
+    "term": "ISO 9000",
+    "meaning": "Quality management systems — Fundamentals and vocabulary",
+    "vi": "Tiêu chuẩn ISO 9000",
+    "def": "Tiêu chuẩn về thuật ngữ và nguyên tắc QMS; dùng làm từ vựng/định nghĩa chính thức khi xây dựng hệ thống.",
+    "ctx": "Dùng trong vận hành QMS theo ISO 9001 để đảm bảo nhất quán thuật ngữ và kiểm soát quá trình.",
+    "rec": "Documented information/record theo quy định kiểm soát tài liệu & lưu giữ hồ sơ (ISO 9001:2015 7.5).",
+    "cat": "ISO/QMS"
+  },
+  {
+    "term": "ISO 9001",
+    "meaning": "Quality Management Systems — Requirements",
+    "vi": "Tiêu chuẩn ISO 9001",
+    "def": "Tiêu chuẩn hệ thống quản lý chất lượng (QMS) – yêu cầu; nền tảng cho vận hành quy trình, kiểm soát rủi ro, đánh giá nội bộ và cải tiến.",
+    "ctx": "Dùng trong vận hành QMS theo ISO 9001 để đảm bảo nhất quán thuật ngữ và kiểm soát quá trình.",
+    "rec": "Documented information/record theo quy định kiểm soát tài liệu & lưu giữ hồ sơ (ISO 9001:2015 7.5).",
+    "cat": "ISO/QMS"
+  },
+  {
+    "term": "ISO17025",
+    "meaning": "ISO / IEC 17025 Testing and Calibration Laboratories",
+    "vi": "ISO/IEC 17025 cho phòng thử nghiệm và hiệu chuẩn",
+    "def": "ISO17025 là cách viết rút gọn cho ISO/IEC 17025, chuẩn năng lực phòng thử nghiệm và hiệu chuẩn. Dùng để kiểm soát truy xuất hiệu chuẩn và bằng chứng đo lường.",
+    "ctx": "Dùng trong calibration, metrology, supplier/lab evidence và MRR-Pack.",
+    "rec": "Calibration certificate; lab accreditation evidence; gage register; MSA/GRR record; supplier/lab qualification file",
+    "cat": "Quality"
   },
   {
     "term": "Isolation",
@@ -12904,6 +13624,24 @@
     "ctx": "Xuất hiện trong contingency, authority matrix, access control và integration giữa portal, M365 và Epicor.",
     "rec": "SOP-104; SOP-108; REF-013",
     "cat": "IT/Systems"
+  },
+  {
+    "term": "ITA",
+    "meaning": "IT Admin",
+    "vi": "Quản trị viên CNTT",
+    "def": "ITA là mã vai trò trong hệ thống HESEM cho Quản trị viên CNTT. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
+    "term": "ITA[IC-IT]",
+    "meaning": "IT Admin as IT Incident Commander",
+    "vi": "Quản trị viên CNTT kiêm chỉ huy sự cố CNTT",
+    "def": "ITA[IC-IT] là mã vai trò trong hệ thống HESEM cho Quản trị viên CNTT kiêm chỉ huy sự cố CNTT. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
   },
   {
     "term": "JavaScript",
@@ -13410,6 +14148,15 @@
     "cat": "ISO/QMS"
   },
   {
+    "term": "KNOWLEDGE_SMES",
+    "meaning": "Knowledge Subject Matter Experts",
+    "vi": "Nhóm chuyên gia tri thức",
+    "def": "KNOWLEDGE_SMES là mã nhóm vai trò/bộ phận dùng trong RACI và triển khai vận hành để gom các owner có trách nhiệm giống nhau. Không phải một chức danh đơn lẻ; khi ra quyết định vẫn phải truy về các vai trò thành viên và thẩm quyền cụ thể.",
+    "ctx": "Dùng trong role-and-department bundles, RACI matrix, training/deployment plan, quyền truy cập và các kịch bản phối hợp liên chức năng.",
+    "rec": "Role-and-department bundles; RACI/authority matrix; access matrix; deployment roster; training assignment; decision log có role owner cụ thể",
+    "cat": "General"
+  },
+  {
     "term": "KPC",
     "meaning": "Key Product Characteristic",
     "vi": "Đặc tính sản phẩm then chốt",
@@ -13824,6 +14571,15 @@
     "cat": "HR/Training"
   },
   {
+    "term": "LEGAL",
+    "meaning": "Legal and Corporate Secretary short code",
+    "cat": "Records/M365",
+    "def": "LEGAL là mã rút gọn dùng trong blueprint hồ sơ M365 để chỉ Pháp chế và thư ký công ty. Khi gắn trách nhiệm vận hành chính thức, ưu tiên mã phòng ban đầy đủ tương ứng như D-* hoặc mã thư mục DEP-*.",
+    "ctx": "Dùng trong bảng 16 phòng ban, folder blueprint, permission model và các sơ đồ M365 cần mã ngắn để giữ đường dẫn hoặc bảng ma trận gọn.",
+    "rec": "Department code map; folder blueprint; permission matrix; records topology",
+    "vi": "Pháp chế và thư ký công ty"
+  },
+  {
     "term": "Legal Compliance",
     "meaning": "Legal Compliance",
     "vi": "Legal tuân thủ",
@@ -14146,6 +14902,15 @@
     "ctx": "Dùng khi vận hành/bảo trì máy: kiểm tra dừng khẩn/liên động/cửa che chắn và thực hiện cô lập năng lượng trước khi can thiệp vùng nguy hiểm.",
     "rec": "Checklist an toàn máy; hồ sơ bảo trì; biên bản kiểm tra chức năng an toàn; log cô lập năng lượng (nếu áp dụng); báo cáo sự cố thiết bị (nếu có).",
     "cat": "HSE"
+  },
+  {
+    "term": "LOG",
+    "meaning": "Logistics / Shipping Coordinator",
+    "vi": "Điều phối logistics / giao nhận",
+    "def": "LOG là mã vai trò trong hệ thống HESEM cho Điều phối logistics / giao nhận. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
   },
   {
     "term": "Log Retention",
@@ -14994,6 +15759,24 @@
     "cat": "CNC/Engineering"
   },
   {
+    "term": "MCQ",
+    "meaning": "Multiple Choice Question",
+    "vi": "Câu hỏi trắc nghiệm",
+    "def": "MCQ là dạng câu hỏi trắc nghiệm dùng trong kiểm tra đào tạo và đánh giá năng lực; phải có đáp án, tiêu chí pass/fail và lưu bằng chứng kết quả.",
+    "ctx": "Dùng trong training module, role gate test, competency assessment và chứng nhận OJT.",
+    "rec": "Question bank; test result; certificate register; training record; retest/action plan nếu fail",
+    "cat": "HR/Training"
+  },
+  {
+    "term": "MCS",
+    "meaning": "Metrology and Calibration Specialist",
+    "vi": "Chuyên viên đo lường và hiệu chuẩn",
+    "def": "MCS là mã vai trò trong hệ thống HESEM cho Chuyên viên đo lường và hiệu chuẩn. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
     "term": "MDM",
     "meaning": "Mobile Device Management",
     "vi": "Quản lý thiết bị di động",
@@ -15165,6 +15948,15 @@
     "cat": "ISO/QMS"
   },
   {
+    "term": "METRO",
+    "meaning": "Metrology and Calibration short code",
+    "cat": "Records/M365",
+    "def": "METRO là mã rút gọn dùng trong blueprint hồ sơ M365 để chỉ Đo lường và hiệu chuẩn. Khi gắn trách nhiệm vận hành chính thức, ưu tiên mã phòng ban đầy đủ tương ứng như D-* hoặc mã thư mục DEP-*.",
+    "ctx": "Dùng trong bảng 16 phòng ban, folder blueprint, permission model và các sơ đồ M365 cần mã ngắn để giữ đường dẫn hoặc bảng ma trận gọn.",
+    "rec": "Department code map; folder blueprint; permission matrix; records topology",
+    "vi": "Đo lường và hiệu chuẩn"
+  },
+  {
     "term": "MFA",
     "meaning": "Multi-Factor Authentication",
     "vi": "Xác thực đa yếu tố",
@@ -15318,6 +16110,15 @@
     "cat": "CNC/Engineering"
   },
   {
+    "term": "MNT",
+    "meaning": "Maintenance Technician",
+    "vi": "Kỹ thuật viên bảo trì",
+    "def": "MNT là mã vai trò trong hệ thống HESEM cho Kỹ thuật viên bảo trì. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
     "term": "MOC",
     "meaning": "Management of Change",
     "vi": "Quản lý thay đổi",
@@ -15345,13 +16146,13 @@
     "cat": "Finance"
   },
   {
-    "term": "MoM",
-    "meaning": "MoM",
-    "vi": "Biên bản cuộc họp (MoM)",
-    "def": "Biên bản cuộc họp ghi lại quyết định, hành động, chủ sở hữu, thời hạn và các điểm thống nhất; là bằng chứng quản trị và cơ sở theo dõi đóng hành động.",
-    "ctx": "Dùng sau mọi cuộc họp có quyết định/hành động; người thư ký phát hành MoM và theo dõi action closure.",
-    "rec": "MoM; Action log; Decision log; Bằng chứng đóng hành động",
-    "cat": "General"
+    "term": "MOM",
+    "meaning": "Manufacturing Operations Management / Minutes of Meeting",
+    "vi": "Quản lý vận hành sản xuất / biên bản cuộc họp",
+    "def": "MOM là Manufacturing Operations Management trong kiến trúc ERP/MOM/MES/EQMS của nền tảng HESEM. Khi viết MoM trong ngữ cảnh họp, thuật ngữ có thể là Minutes of Meeting/biên bản cuộc họp; tài liệu phải phân biệt bằng ngữ cảnh hoặc viết đầy đủ lần đầu.",
+    "ctx": "Dùng cho lớp quản lý vận hành sản xuất, điều phối thực thi, chất lượng, truy xuất và quản trị bằng chứng. Trong biên bản họp, MoM là bằng chứng quyết định/hành động.",
+    "rec": "Architecture docs; SOP/WI vận hành; decision log; MoM họp quản trị; action log; evidence package",
+    "cat": "Operations/Planning"
   },
   {
     "term": "Monitoring",
@@ -15462,6 +16263,15 @@
     "cat": "ISO/QMS"
   },
   {
+    "term": "MR_REPORT_OWNERS",
+    "meaning": "Management Review Report Owners",
+    "vi": "Nhóm chủ trì gói báo cáo MR và KPI",
+    "def": "MR_REPORT_OWNERS là mã nhóm vai trò/bộ phận dùng trong RACI và triển khai vận hành để gom các owner có trách nhiệm giống nhau. Không phải một chức danh đơn lẻ; khi ra quyết định vẫn phải truy về các vai trò thành viên và thẩm quyền cụ thể.",
+    "ctx": "Dùng trong role-and-department bundles, RACI matrix, training/deployment plan, quyền truy cập và các kịch bản phối hợp liên chức năng.",
+    "rec": "Role-and-department bundles; RACI/authority matrix; access matrix; deployment roster; training assignment; decision log có role owner cụ thể",
+    "cat": "General"
+  },
+  {
     "term": "MRB",
     "meaning": "Material Review Board",
     "vi": "Hội đồng xử lý hàng không phù hợp",
@@ -15481,12 +16291,12 @@
   },
   {
     "term": "MRR",
-    "meaning": "Material Removal Rate",
-    "vi": "MRR (tốc độ bóc vật liệu)",
-    "def": "MRR (tốc độ bóc vật liệu) là hạng mục kỹ thuật dùng để chuẩn hóa giao tiếp và kiểm soát công việc trong sản xuất CNC; áp dụng khi lập SOP/WI, lập trình, setup hoặc kiểm tra để đảm bảo cùng cách hiểu và truy xuất trong đánh giá nội bộ.",
-    "ctx": "Dùng trong giao tiếp kỹ thuật giữa lập trình–sản xuất–QC để tránh hiểu sai; thường xuất hiện trong setup sheet, bản vẽ và báo cáo kiểm tra.",
-    "rec": "Setup sheet/Process sheet; NC program; Tool list; Prove‑out record; Phiếu kiểm công đoạn",
-    "cat": "CNC/Engineering"
+    "meaning": "Material Removal Rate / Minimum Required Records",
+    "vi": "Tốc độ bóc vật liệu / bộ hồ sơ bắt buộc tối thiểu",
+    "def": "MRR có hai nghĩa đang xuất hiện trong tài liệu: trong CNC, MRR là Material Removal Rate/tốc độ bóc vật liệu; trong gói training và readiness, MRR là bộ hồ sơ/bằng chứng bắt buộc tối thiểu để qua cổng kiểm soát. Khi dùng trong training, phải hiểu là hồ sơ bắt buộc trong SSOT chứ không phải thông số cắt gọt.",
+    "ctx": "CNC/Engineering dùng MRR khi nói về thông số gia công. Training/OJT/MRR-Pack dùng MRR để kiểm tra đủ bằng chứng trước khi PASS hoặc chuyển gate.",
+    "rec": "Setup sheet; NC program; tool list; prove-out record; MRR-Pack; training record; SSOT evidence folder; gate checklist",
+    "cat": "CNC/Engineering / HR/Training"
   },
   {
     "term": "MRR (Minimum Required Records)",
@@ -15550,6 +16360,15 @@
     "ctx": "Purchasing/Planner/kho sử dụng trong quy trình mua hàng và quản trị vật tư, cập nhật giao dịch và lưu hồ sơ trên ERP/WMS.",
     "rec": "Hồ sơ mua hàng; Hồ sơ nhà cung cấp; Giao dịch ERP/WMS; Chứng từ kèm theo khi áp dụng",
     "cat": "General"
+  },
+  {
+    "term": "MTConnect",
+    "meaning": "MTConnect Machine Data Standard",
+    "vi": "Chuẩn dữ liệu máy MTConnect",
+    "def": "MTConnect là chuẩn trao đổi dữ liệu máy công nghiệp, dùng để thu thập trạng thái máy, sự kiện và dữ liệu vận hành phục vụ MES/MOM analytics và traceability.",
+    "ctx": "Dùng trong CNC/digital-thread readiness, machine event capture, append-only event spine và benchmark.",
+    "rec": "Machine event log; connector config; raw telemetry archive; derived production event; validation/smoke record",
+    "cat": "Integration/Resilience"
   },
   {
     "term": "MTO",
@@ -16209,6 +17028,15 @@
     "cat": "IT/Systems"
   },
   {
+    "term": "NVA",
+    "meaning": "Non-Value Added",
+    "vi": "Không tạo giá trị gia tăng",
+    "def": "NVA là hoạt động không tạo giá trị gia tăng từ góc nhìn khách hàng/quá trình, ví dụ chờ, tìm, đi lại, sửa lỗi hoặc thao tác thừa. NVA là mục tiêu giảm trong Lean/Kaizen.",
+    "ctx": "Dùng trong Kaizen, time study, process improvement, training và KPI cải tiến.",
+    "rec": "Time study; spaghetti chart; Kaizen/A3 record; before-after evidence; action log",
+    "cat": "Operations/Planning"
+  },
+  {
     "term": "NX CAM",
     "meaning": "Siemens NX CAM",
     "vi": "phần mềm NX CAM",
@@ -16441,6 +17269,15 @@
     "ctx": "HR/QA/Điều phối đào tạo & Trưởng ca/Trainer dùng khi lập kế hoạch và triển khai đào tạo tay nghề (vận hành CNC, QC, kho) trước khi giao việc; ở bước đào tạo, đánh giá lý thuyết/thực hành và cập nhật skill matrix/trạng thái đủ điều kiện.",
     "rec": "Kế hoạch đào tạo & lịch đào tạo; Danh sách điểm danh; WI/SOP & giáo trình; Đề–đáp án/biên bản chấm; Checklist OJT/phiếu đánh giá thực hành; Skill/competency matrix; Chứng chỉ & số chứng chỉ; Phiếu phản hồi/đánh giá hiệu quả đào tạo; Hồ sơ công nhận trainer/qualification.",
     "cat": "HR/Training"
+  },
+  {
+    "term": "OJT_COACHES",
+    "meaning": "OJT Coaches",
+    "vi": "Nhóm huấn luyện OJT",
+    "def": "OJT_COACHES là mã nhóm vai trò/bộ phận dùng trong RACI và triển khai vận hành để gom các owner có trách nhiệm giống nhau. Không phải một chức danh đơn lẻ; khi ra quyết định vẫn phải truy về các vai trò thành viên và thẩm quyền cụ thể.",
+    "ctx": "Dùng trong role-and-department bundles, RACI matrix, training/deployment plan, quyền truy cập và các kịch bản phối hợp liên chức năng.",
+    "rec": "Role-and-department bundles; RACI/authority matrix; access matrix; deployment roster; training assignment; decision log có role owner cụ thể",
+    "cat": "General"
   },
   {
     "term": "OK",
@@ -16704,12 +17541,30 @@
     "cat": "ISO/QMS"
   },
   {
+    "term": "OPR",
+    "meaning": "CNC Operator",
+    "vi": "Nhân viên vận hành CNC",
+    "def": "OPR là mã vai trò trong hệ thống HESEM cho Nhân viên vận hành CNC. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
     "term": "OPS",
     "meaning": "Operations",
     "vi": "Vận hành / Operations",
     "def": "Mã viết tắt cho function Operations, bao gồm điều hành sản xuất, điều độ, xử lý blocker hiện trường, giữ nhịp tier meeting và đảm bảo gate được thực thi đúng nhịp.",
     "ctx": "Xuất hiện trong scoreboards, RACI, meeting action log, costing rule và workflow ownership để chỉ nhóm vận hành chủ trì ra quyết định tại hiện trường.",
     "rec": "Dispatch list; tier meeting log; action log; shift handover; production dashboard",
+    "cat": "General"
+  },
+  {
+    "term": "OPS_SCOPE_OWNERS",
+    "meaning": "Operational Scope Owners",
+    "vi": "Nhóm đầu mối sở hữu phạm vi vận hành",
+    "def": "OPS_SCOPE_OWNERS là mã nhóm vai trò/bộ phận dùng trong RACI và triển khai vận hành để gom các owner có trách nhiệm giống nhau. Không phải một chức danh đơn lẻ; khi ra quyết định vẫn phải truy về các vai trò thành viên và thẩm quyền cụ thể.",
+    "ctx": "Dùng trong role-and-department bundles, RACI matrix, training/deployment plan, quyền truy cập và các kịch bản phối hợp liên chức năng.",
+    "rec": "Role-and-department bundles; RACI/authority matrix; access matrix; deployment roster; training assignment; decision log có role owner cụ thể",
     "cat": "General"
   },
   {
@@ -17658,6 +18513,24 @@
     "cat": "CNC/Engineering"
   },
   {
+    "term": "PD",
+    "meaning": "Production Director",
+    "vi": "Giám đốc sản xuất",
+    "def": "PD là mã vai trò trong hệ thống HESEM cho Giám đốc sản xuất. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
+    "term": "PD[IC-PROD]",
+    "meaning": "Production Director as Production Incident Commander",
+    "vi": "Giám đốc sản xuất kiêm chỉ huy sự cố sản xuất",
+    "def": "PD[IC-PROD] là mã vai trò trong hệ thống HESEM cho Giám đốc sản xuất kiêm chỉ huy sự cố sản xuất. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
     "term": "PDCA",
     "meaning": "Plan–Do–Check–Act",
     "vi": "Chu trình PDCA",
@@ -17692,6 +18565,15 @@
     "ctx": "IT/Người dùng áp dụng khi vận hành hệ thống, trao đổi dữ liệu và kiểm soát rủi ro; nội dung cụ thể phụ thuộc phạm vi hệ thống triển khai.",
     "rec": "Chính sách/quy định liên quan (nếu có); Cấu hình hệ thống & CR quản lý thay đổi; Log vận hành (nếu có); Ticket xử lý sự cố/yêu cầu",
     "cat": "IT/Systems"
+  },
+  {
+    "term": "PE",
+    "meaning": "Process Engineer",
+    "vi": "Kỹ sư quy trình",
+    "def": "PE là mã vai trò trong hệ thống HESEM cho Kỹ sư quy trình. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
   },
   {
     "term": "PE Bag",
@@ -17935,6 +18817,24 @@
     "ctx": "Dùng tại kho hóa chất/điểm sử dụng: kiểm tra nhãn, truy xuất bảng dữ liệu an toàn, lưu trữ đúng khu vực và xử lý tràn đổ theo quy trình.",
     "rec": "Danh mục hóa chất; bảng dữ liệu an toàn; hồ sơ phê duyệt hóa chất; đánh giá rủi ro hóa chất; biên bản xử lý tràn đổ (nếu phát sinh); chứng từ chuyển giao chất thải (nếu có).",
     "cat": "HSE"
+  },
+  {
+    "term": "PIE",
+    "meaning": "Production Engineer / Industrial Engineer",
+    "vi": "Kỹ sư sản xuất / kỹ sư công nghiệp",
+    "def": "PIE là mã vai trò trong hệ thống HESEM cho Kỹ sư sản xuất / kỹ sư công nghiệp. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
+    "term": "PIE[CI]",
+    "meaning": "Production / Industrial Engineer as Continuous Improvement Lead",
+    "vi": "Kỹ sư sản xuất / công nghiệp kiêm lead cải tiến liên tục",
+    "def": "PIE[CI] là mã vai trò trong hệ thống HESEM cho Kỹ sư sản xuất / công nghiệp kiêm lead cải tiến liên tục. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
   },
   {
     "term": "PII",
@@ -18369,6 +19269,15 @@
     "cat": "ISO/QMS"
   },
   {
+    "term": "POU_LEADS",
+    "meaning": "Point-of-Use Leads",
+    "vi": "Nhóm đầu mối tại điểm dùng",
+    "def": "POU_LEADS là mã nhóm vai trò/bộ phận dùng trong RACI và triển khai vận hành để gom các owner có trách nhiệm giống nhau. Không phải một chức danh đơn lẻ; khi ra quyết định vẫn phải truy về các vai trò thành viên và thẩm quyền cụ thể.",
+    "ctx": "Dùng trong role-and-department bundles, RACI matrix, training/deployment plan, quyền truy cập và các kịch bản phối hợp liên chức năng.",
+    "rec": "Role-and-department bundles; RACI/authority matrix; access matrix; deployment roster; training assignment; decision log có role owner cụ thể",
+    "cat": "General"
+  },
+  {
     "term": "Powder Coating",
     "meaning": "Powder Coating",
     "vi": "Sơn tĩnh điện",
@@ -18510,6 +19419,15 @@
     "def": "Chỉ số hiệu suất quá trình có xét vị trí trung bình so với giới hạn đặc tính; dùng đánh giá rủi ro không phù hợp khi quá trình bị lệch tâm.",
     "ctx": "QA/QC sử dụng trong SOP/WI và hồ sơ chất lượng để kiểm soát sản phẩm và quá trình.",
     "rec": "Hồ sơ chất lượng liên quan; NCR/MRB/CAPA khi áp dụng; Hồ sơ hiệu chuẩn và đào tạo liên quan",
+    "cat": "General"
+  },
+  {
+    "term": "PPL",
+    "meaning": "Production Planner",
+    "vi": "Điều độ sản xuất",
+    "def": "PPL là mã vai trò trong hệ thống HESEM cho Điều độ sản xuất. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
     "cat": "General"
   },
   {
@@ -18700,6 +19618,15 @@
     "ctx": "IT thiết lập và kiểm soát quyền truy cập cho hệ thống (ERP/DMS/app); trưởng bộ phận/QA tham gia phê duyệt và rà soát định kỳ.",
     "rec": "Danh sách tài khoản & phân quyền (access list); Phiếu yêu cầu cấp/thu hồi quyền (ticket/form); Biên bản phê duyệt quyền; nhật ký giám sát thay đổi quyền/đăng nhập; Kết quả rà soát quyền định kỳ",
     "cat": "IT/Systems"
+  },
+  {
+    "term": "PRO",
+    "meaning": "Production Department short folder code",
+    "cat": "Records/M365",
+    "def": "PRO là mã rút gọn dùng trong blueprint hồ sơ M365 để chỉ Sản xuất. Khi gắn trách nhiệm vận hành chính thức, ưu tiên mã phòng ban đầy đủ tương ứng như D-* hoặc mã thư mục DEP-*.",
+    "ctx": "Dùng trong bảng 16 phòng ban, folder blueprint, permission model và các sơ đồ M365 cần mã ngắn để giữ đường dẫn hoặc bảng ma trận gọn.",
+    "rec": "Department code map; folder blueprint; permission matrix; records topology",
+    "vi": "Mã rút gọn Sản xuất"
   },
   {
     "term": "Probability",
@@ -18934,6 +19861,15 @@
     "ctx": "Dùng như quy trình tổng thể mua sắm; các bước được kiểm soát bằng phê duyệt, tiêu chí lựa chọn và hồ sơ truy vết.",
     "rec": "PR/RFQ/PO; Hồ sơ lựa chọn nhà cung cấp; Receiving/IQC records; Invoice/3-way match",
     "cat": "General"
+  },
+  {
+    "term": "PROD",
+    "meaning": "Production Department shorthand",
+    "cat": "Records/M365",
+    "def": "PROD là mã rút gọn dùng trong một số thẻ routing và chỉ mục thao tác để chỉ khu vực hoặc phòng Sản xuất. Khi ghi trách nhiệm chính thức, ưu tiên dùng D-PROD cho mã phòng ban hoặc DEP-PRO cho mã thư mục M365.",
+    "ctx": "Dùng trong quick cards, routing index, bảng hiển thị ngắn và các chỉ mục vận hành cần mã compact cho Production.",
+    "rec": "Routing card; department index; D-PROD/DEP-PRO mapping; permission or workflow matrix",
+    "vi": "Mã rút gọn Sản xuất"
   },
   {
     "term": "Product Change",
@@ -19404,6 +20340,24 @@
     "cat": "General"
   },
   {
+    "term": "QA[PSO]",
+    "meaning": "QA Manager with Product Safety Officer assignment",
+    "vi": "QA Manager kiêm Product Safety Officer",
+    "def": "QA[PSO] là mã vai trò trong hệ thống HESEM cho QA Manager kiêm Product Safety Officer. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
+    "term": "QA[QMR]",
+    "meaning": "QA Manager with Quality Management Representative assignment",
+    "vi": "QA Manager kiêm QMR",
+    "def": "QA[QMR] là mã vai trò trong hệ thống HESEM cho QA Manager kiêm QMR. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
     "term": "QA/QMS",
     "meaning": "Quality Assurance / Quality Management System",
     "vi": "Đảm bảo chất lượng / Hệ thống quản lý chất lượng",
@@ -19458,6 +20412,15 @@
     "cat": "General"
   },
   {
+    "term": "QCL",
+    "meaning": "QC Inspector Lead",
+    "vi": "Tổ trưởng QC",
+    "def": "QCL là mã vai trò trong hệ thống HESEM cho Tổ trưởng QC. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
     "term": "QDC",
     "meaning": "Quality–Delivery–Cost",
     "vi": "Chất lượng – Giao hàng – Chi phí",
@@ -19482,6 +20445,15 @@
     "def": "Nguyên tắc quản lý chất lượng (Quality Management Principles, QMP) – nền tảng cho triển khai QMS (định hướng khách hàng, lãnh đạo, sự tham gia, quá trình, cải tiến…).",
     "ctx": "Dùng trong vận hành QMS theo ISO 9001 để đảm bảo nhất quán thuật ngữ và kiểm soát quá trình.",
     "rec": "Documented information/record theo quy định kiểm soát tài liệu & lưu giữ hồ sơ (ISO 9001:2015 7.5).",
+    "cat": "ISO/QMS"
+  },
+  {
+    "term": "QMR",
+    "meaning": "Quality Management Representative",
+    "vi": "Đại diện lãnh đạo về chất lượng",
+    "def": "QMR là vai trò đại diện hệ thống quản lý chất lượng, có trách nhiệm bảo đảm QMS được duy trì, báo cáo hiệu lực và điều phối các vấn đề chất lượng hệ thống với lãnh đạo.",
+    "ctx": "Xuất hiện trong QA[QMR], QMS[QMR], DCC owner/approver, audit, management review và authority matrix.",
+    "rec": "Appointment/role assignment; management review minutes; internal audit records; DCC records; QMS performance report",
     "cat": "ISO/QMS"
   },
   {
@@ -19519,6 +20491,33 @@
     "ctx": "Dùng trong vận hành QMS theo ISO 9001 để đảm bảo nhất quán thuật ngữ và kiểm soát quá trình.",
     "rec": "Documented information/record theo quy định kiểm soát tài liệu & lưu giữ hồ sơ (ISO 9001:2015 7.5).",
     "cat": "ISO/QMS"
+  },
+  {
+    "term": "QMS[DC]",
+    "meaning": "QMS Engineer with Document Controller assignment",
+    "vi": "QMS Engineer kiêm Document Controller",
+    "def": "QMS[DC] là mã vai trò trong hệ thống HESEM cho QMS Engineer kiêm Document Controller. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
+    "term": "QMS[LA]",
+    "meaning": "QMS Engineer with Lead Auditor assignment",
+    "vi": "QMS Engineer kiêm Lead Auditor",
+    "def": "QMS[LA] là mã vai trò trong hệ thống HESEM cho QMS Engineer kiêm Lead Auditor. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
+    "term": "QMS[QMR]",
+    "meaning": "QMS / Quality Management Representative assignment",
+    "vi": "QMS / QMR assignment",
+    "def": "QMS[QMR] là mã vai trò trong hệ thống HESEM cho QMS / QMR assignment. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
   },
   {
     "term": "QOP",
@@ -19762,6 +20761,15 @@
     "ctx": "HR/QA/Điều phối đào tạo & Trưởng ca/Trainer dùng khi lập kế hoạch và triển khai đào tạo tay nghề (vận hành CNC, QC, kho) trước khi giao việc; ở bước đào tạo, đánh giá lý thuyết/thực hành và cập nhật skill matrix/trạng thái đủ điều kiện.",
     "rec": "Kế hoạch đào tạo & lịch đào tạo; Danh sách điểm danh; WI/SOP & giáo trình; Đề–đáp án/biên bản chấm; Checklist OJT/phiếu đánh giá thực hành; Skill/competency matrix; Chứng chỉ & số chứng chỉ; Phiếu phản hồi/đánh giá hiệu quả đào tạo; Hồ sơ công nhận trainer/qualification.",
     "cat": "HR/Training"
+  },
+  {
+    "term": "QUALITY_CORE",
+    "meaning": "Quality Core",
+    "vi": "Nhóm nòng cốt chất lượng",
+    "def": "QUALITY_CORE là mã nhóm vai trò/bộ phận dùng trong RACI và triển khai vận hành để gom các owner có trách nhiệm giống nhau. Không phải một chức danh đơn lẻ; khi ra quyết định vẫn phải truy về các vai trò thành viên và thẩm quyền cụ thể.",
+    "ctx": "Dùng trong role-and-department bundles, RACI matrix, training/deployment plan, quyền truy cập và các kịch bản phối hợp liên chức năng.",
+    "rec": "Role-and-department bundles; RACI/authority matrix; access matrix; deployment roster; training assignment; decision log có role owner cụ thể",
+    "cat": "General"
   },
   {
     "term": "Quarantine",
@@ -20016,6 +21024,15 @@
     "cat": "CNC/Engineering"
   },
   {
+    "term": "RAG",
+    "meaning": "Red-Amber-Green Status",
+    "vi": "Trạng thái đỏ-vàng-xanh",
+    "def": "RAG là cách mã hóa trạng thái bằng màu Red/Amber/Green để thể hiện mức rủi ro, tiến độ hoặc hiệu suất. Tài liệu phải định nghĩa rõ ngưỡng kích hoạt từng màu.",
+    "ctx": "Dùng trong dashboard, KPI, tier meeting, deployment và escalation.",
+    "rec": "KPI dashboard; threshold register; tier meeting record; escalation/action log",
+    "cat": "Analytics"
+  },
+  {
     "term": "RAID",
     "meaning": "Redundant Array of Independent Disks",
     "vi": "Mảng đĩa dự phòng",
@@ -20061,6 +21078,15 @@
     "cat": "General"
   },
   {
+    "term": "RBA",
+    "meaning": "Responsible Business Alliance",
+    "vi": "Liên minh kinh doanh có trách nhiệm",
+    "def": "RBA là bộ chuẩn/audit trách nhiệm xã hội và chuỗi cung ứng được dùng trong hồ sơ compliance khách hàng, ESG và supplier assessment.",
+    "ctx": "Dùng trong semi-equipment compliance, customer portal evidence, supplier audit và annual self-assessment.",
+    "rec": "RBA SAQ; RBA VAP audit evidence; supplier compliance file; corrective action log; annual review",
+    "cat": "Procurement/Supplier Quality"
+  },
+  {
     "term": "RBAC",
     "meaning": "Role-Based Access Control",
     "vi": "Phân quyền theo vai trò",
@@ -20077,6 +21103,15 @@
     "ctx": "Dùng trong vận hành QMS theo ISO 9001 để đảm bảo nhất quán thuật ngữ và kiểm soát quá trình.",
     "rec": "Documented information/record theo quy định kiểm soát tài liệu & lưu giữ hồ sơ (ISO 9001:2015 7.5).",
     "cat": "ISO/QMS"
+  },
+  {
+    "term": "RCA",
+    "meaning": "Root Cause Analysis",
+    "vi": "Phân tích nguyên nhân gốc",
+    "def": "RCA là phương pháp phân tích nguyên nhân gốc của sự cố, nonconformance, complaint hoặc vấn đề hiệu suất; kết quả phải dựa trên bằng chứng và dẫn tới hành động khắc phục có kiểm chứng.",
+    "ctx": "Dùng trong NCR/CAPA, 8D, A3/PDCA, complaint, audit finding và continual improvement.",
+    "rec": "NCR; CAPA/8D; A3/PDCA; evidence log; verification record; lesson learned register",
+    "cat": "Quality"
   },
   {
     "term": "RCCP",
@@ -21924,6 +22959,15 @@
     "cat": "General"
   },
   {
+    "term": "SALES",
+    "meaning": "Sales function shorthand",
+    "cat": "Commercial/Customer",
+    "def": "SALES là mã rút gọn dùng trong một số thẻ routing hoặc chỉ mục thao tác để chỉ chức năng Kinh doanh/khách hàng. Khi ghi trách nhiệm chính thức, ưu tiên dùng D-SCS cho phòng Kinh doanh và Dịch vụ khách hàng hoặc mã vai trò CS/EST theo ngữ cảnh.",
+    "ctx": "Dùng trong quick cards, routing index và các bảng vận hành cần nhãn ngắn cho luồng RFQ, báo giá, rà soát hợp đồng và phản hồi khách hàng.",
+    "rec": "Routing card; customer communication log; RFQ/quote pack; D-SCS mapping; role assignment",
+    "vi": "Mã rút gọn Kinh doanh"
+  },
+  {
     "term": "Sales Order",
     "meaning": "Sales Order",
     "vi": "Đơn bán hàng",
@@ -22012,6 +23056,24 @@
     "ctx": "Dùng trước sơn/phủ/anod; nhà cung cấp/Production thực hiện và QA kiểm độ nhám/độ sạch nếu yêu cầu.",
     "rec": "Spec xử lý bề mặt; Kết quả đo độ nhám; Biên bản kiểm tra; NCR nếu phát sinh",
     "cat": "General"
+  },
+  {
+    "term": "SAP",
+    "meaning": "Systems, Applications, and Products",
+    "vi": "SAP",
+    "def": "SAP là nhà cung cấp hệ thống doanh nghiệp/sản xuất được dùng làm mốc benchmark trong tài liệu. Khi nhắc SAP trong HESEM, đó là đối chiếu năng lực hoặc tích hợp, không phải nguồn execution truth nội bộ.",
+    "ctx": "Dùng trong benchmark ERP/MOM/MES/EQMS và so sánh khoảng cách sản phẩm.",
+    "rec": "Benchmark dossier; roadmap decision; integration assessment; gap analysis",
+    "cat": "IT/Systems"
+  },
+  {
+    "term": "SAQ",
+    "meaning": "Self-Assessment Questionnaire",
+    "vi": "Bảng tự đánh giá",
+    "def": "SAQ là bảng tự đánh giá dùng cho supplier/compliance/customer audit. Kết quả SAQ phải có owner, bằng chứng, ngày cập nhật và hành động khắc phục khi điểm thấp hoặc có gap.",
+    "ctx": "Dùng trong RBA, supplier onboarding, annual compliance refresh và customer evidence pack.",
+    "rec": "SAQ response; evidence attachment; score summary; CAPA/action log; customer submission record",
+    "cat": "Procurement/Supplier Quality"
   },
   {
     "term": "SBR",
@@ -22113,6 +23175,15 @@
     "cat": "Operations/Planning"
   },
   {
+    "term": "SCM",
+    "meaning": "Supply Chain Manager",
+    "vi": "Quản lý chuỗi cung ứng",
+    "def": "SCM là mã vai trò trong hệ thống HESEM cho Quản lý chuỗi cung ứng. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
     "term": "SCN",
     "meaning": "Supplier Change Notice",
     "vi": "Thông báo thay đổi nhà cung cấp",
@@ -22192,6 +23263,15 @@
     "ctx": "HR và quản lý bộ phận (quản đốc/line leader/kho) dùng khi phát sinh nhu cầu tuyển; ở bước mở requisition, sàng lọc, phỏng vấn, phát hành offer và chuẩn bị onboarding.",
     "rec": "Yêu cầu tuyển dụng (requisition); JD; danh sách ứng viên/CV; checklist sàng lọc; phiếu chấm phỏng vấn; kết quả background/reference check (nếu áp dụng); offer letter & xác nhận; hồ sơ onboarding & checklist cấp phát.",
     "cat": "HR/Training"
+  },
+  {
+    "term": "SCS",
+    "meaning": "Sales and Customer Service short code",
+    "cat": "Records/M365",
+    "def": "SCS là mã rút gọn dùng trong blueprint hồ sơ M365 để chỉ Kinh doanh và Dịch vụ khách hàng. Khi gắn trách nhiệm vận hành chính thức, ưu tiên mã phòng ban đầy đủ tương ứng như D-* hoặc mã thư mục DEP-*.",
+    "ctx": "Dùng trong bảng 16 phòng ban, folder blueprint, permission model và các sơ đồ M365 cần mã ngắn để giữ đường dẫn hoặc bảng ma trận gọn.",
+    "rec": "Department code map; folder blueprint; permission matrix; records topology",
+    "vi": "Kinh doanh và Dịch vụ khách hàng"
   },
   {
     "term": "SDE",
@@ -22381,6 +23461,15 @@
     "ctx": "IT/Người dùng áp dụng khi vận hành hệ thống, trao đổi dữ liệu và kiểm soát rủi ro; nội dung cụ thể phụ thuộc phạm vi hệ thống triển khai.",
     "rec": "Chính sách/quy định liên quan (nếu có); Cấu hình hệ thống & CR quản lý thay đổi; Log vận hành (nếu có); Ticket xử lý sự cố/yêu cầu",
     "cat": "IT/Systems"
+  },
+  {
+    "term": "SET",
+    "meaning": "Setup Technician",
+    "vi": "Kỹ thuật viên setup",
+    "def": "SET là mã vai trò trong hệ thống HESEM cho Kỹ thuật viên setup. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
   },
   {
     "term": "Setup Fee",
@@ -22968,6 +24057,15 @@
     "cat": "HR/Training"
   },
   {
+    "term": "SL",
+    "meaning": "Shift Leader",
+    "vi": "Trưởng ca",
+    "def": "SL là mã vai trò trong hệ thống HESEM cho Trưởng ca. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
     "term": "SLA",
     "meaning": "Service Level Agreement",
     "vi": "Thoả thuận mức dịch vụ",
@@ -23191,6 +24289,15 @@
     "ctx": "Dùng trong chuỗi tiếp nhận yêu cầu–báo giá–xác nhận đơn và mở lệnh sản xuất.",
     "rec": "Biên bản họp/trao đổi (nếu áp dụng); Log phê duyệt/phiên bản (nếu áp dụng); Hồ sơ truy xuất trên ERP/WMS (nếu áp dụng)",
     "cat": "General"
+  },
+  {
+    "term": "SP",
+    "meaning": "Special Process short code",
+    "cat": "Records/M365",
+    "def": "SP là mã rút gọn dùng trong blueprint hồ sơ M365 để chỉ Công đoạn đặc biệt. Khi gắn trách nhiệm vận hành chính thức, ưu tiên mã phòng ban đầy đủ tương ứng như D-* hoặc mã thư mục DEP-*.",
+    "ctx": "Dùng trong bảng 16 phòng ban, folder blueprint, permission model và các sơ đồ M365 cần mã ngắn để giữ đường dẫn hoặc bảng ma trận gọn.",
+    "rec": "Department code map; folder blueprint; permission matrix; records topology",
+    "vi": "Công đoạn đặc biệt"
   },
   {
     "term": "Spam",
@@ -23445,6 +24552,15 @@
     "cat": "Operations/Planning"
   },
   {
+    "term": "SQE",
+    "meaning": "Supplier Quality Engineer",
+    "vi": "Kỹ sư chất lượng nhà cung cấp",
+    "def": "SQE là vai trò kỹ sư chất lượng nhà cung cấp, phụ trách đánh giá, theo dõi CAPA/SCAR, chứng chỉ và hiệu lực nhà cung cấp theo rủi ro.",
+    "ctx": "Dùng trong supplier quality, onboarding, annual audit và semi-equipment compliance.",
+    "rec": "Supplier audit; SCAR/CAPA; approved supplier list; qualification evidence; scorecard",
+    "cat": "Procurement/Supplier Quality"
+  },
+  {
     "term": "SQL",
     "meaning": "Structured Query Language",
     "vi": "Ngôn ngữ truy vấn",
@@ -23478,6 +24594,15 @@
     "def": "Khái niệm CNTT/điều khiển liên quan đến hệ thống, dữ liệu hoặc hạ tầng. Áp dụng theo phạm vi sử dụng thực tế; điểm kiểm soát: phân quyền, quản lý thay đổi và lưu bằng chứng khi có tác động đến chất lượng.",
     "ctx": "IT/Người dùng áp dụng khi vận hành hệ thống, trao đổi dữ liệu và kiểm soát rủi ro; nội dung cụ thể phụ thuộc phạm vi hệ thống triển khai.",
     "rec": "Chính sách/quy định liên quan (nếu có); Cấu hình hệ thống & CR quản lý thay đổi; Log vận hành (nếu có); Ticket xử lý sự cố/yêu cầu",
+    "cat": "IT/Systems"
+  },
+  {
+    "term": "SSDF",
+    "meaning": "Secure Software Development Framework",
+    "vi": "Khung phát triển phần mềm an toàn",
+    "def": "SSDF là khung thực hành phát triển phần mềm an toàn, dùng để chuẩn hóa kiểm soát bảo mật, kiểm thử, quản lý lỗ hổng và bằng chứng trong vòng đời phần mềm.",
+    "ctx": "Dùng trong security/reliability benchmark, release governance và DevSecOps documentation.",
+    "rec": "Secure development checklist; vulnerability scan; code review; release gate; remediation evidence",
     "cat": "IT/Systems"
   },
   {
@@ -24678,6 +25803,15 @@
     "cat": "General"
   },
   {
+    "term": "SUPPORT_ENABLEMENT",
+    "meaning": "Support Enablement Functions",
+    "vi": "Nhóm chức năng hỗ trợ nền",
+    "def": "SUPPORT_ENABLEMENT là mã nhóm vai trò/bộ phận dùng trong RACI và triển khai vận hành để gom các owner có trách nhiệm giống nhau. Không phải một chức danh đơn lẻ; khi ra quyết định vẫn phải truy về các vai trò thành viên và thẩm quyền cụ thể.",
+    "ctx": "Dùng trong role-and-department bundles, RACI matrix, training/deployment plan, quyền truy cập và các kịch bản phối hợp liên chức năng.",
+    "rec": "Role-and-department bundles; RACI/authority matrix; access matrix; deployment roster; training assignment; decision log có role owner cụ thể",
+    "cat": "General"
+  },
+  {
     "term": "SURF",
     "meaning": "Surface finish / texture",
     "vi": "SURF (bề mặt bề mặt hoàn thiện/texture)",
@@ -24786,6 +25920,15 @@
     "cat": "General"
   },
   {
+    "term": "SYS-OPS",
+    "meaning": "System Operations Guide",
+    "vi": "Hướng dẫn vận hành hệ thống",
+    "def": "SYS-OPS là nhóm tài liệu hướng dẫn vận hành hệ thống, dữ liệu, hồ sơ, portal, luồng triển khai và kiểm soát bằng chứng trong HESEM.",
+    "ctx": "Dùng trong training/system-ops để chuẩn hóa thao tác vận hành hệ thống và cách lưu/đọc SSOT evidence.",
+    "rec": "SYS-OPS guide; training record; SSOT folder; portal operation log; deployment checklist",
+    "cat": "IT/Systems"
+  },
+  {
     "term": "System Log",
     "meaning": "System Log",
     "vi": "Nhật ký hệ thống",
@@ -24793,6 +25936,15 @@
     "ctx": "IT/QA dùng để truy vết thao tác, điều tra sự cố, chứng minh kiểm soát vận hành và đáp ứng yêu cầu đánh giá nội bộ.",
     "rec": "nhật ký giám sát/System log/Access log; Chính sách lưu giữ log; Bằng chứng đồng bộ thời gian (NTP) nếu cần; Ticket điều tra sự cố; Báo cáo đánh giá nội bộ/đánh giá rủi ro",
     "cat": "IT/Systems"
+  },
+  {
+    "term": "SYSTEM_OWNERS",
+    "meaning": "System Owners",
+    "vi": "Nhóm sở hữu hệ thống",
+    "def": "SYSTEM_OWNERS là mã nhóm vai trò/bộ phận dùng trong RACI và triển khai vận hành để gom các owner có trách nhiệm giống nhau. Không phải một chức danh đơn lẻ; khi ra quyết định vẫn phải truy về các vai trò thành viên và thẩm quyền cụ thể.",
+    "ctx": "Dùng trong role-and-department bundles, RACI matrix, training/deployment plan, quyền truy cập và các kịch bản phối hợp liên chức năng.",
+    "rec": "Role-and-department bundles; RACI/authority matrix; access matrix; deployment roster; training assignment; decision log có role owner cụ thể",
+    "cat": "General"
   },
   {
     "term": "Tactical Buying",
@@ -25407,6 +26559,15 @@
     "cat": "CNC/Engineering"
   },
   {
+    "term": "TOOL",
+    "meaning": "Tool Crib / Tool Storekeeper",
+    "vi": "Thủ kho dao cụ",
+    "def": "TOOL là mã vai trò trong hệ thống HESEM cho Thủ kho dao cụ. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
     "term": "Tool Compensation",
     "meaning": "Tool Compensation",
     "vi": "bù dao",
@@ -25567,6 +26728,15 @@
     "ctx": "Trong setup, chọn đúng dao/kẹp và kiểm offset trên presetter; theo dõi mòn dao trong quá trình chạy series.",
     "rec": "Tool list; Tool offset sheet; Tool life/wear log; Setup sheet; Fixture list; Hồ sơ hiệu chuẩn presetter/probe (nếu có)",
     "cat": "CNC/Engineering"
+  },
+  {
+    "term": "TOP_MGMT",
+    "meaning": "Top Management",
+    "vi": "Ban lãnh đạo",
+    "def": "TOP_MGMT là mã nhóm vai trò/bộ phận dùng trong RACI và triển khai vận hành để gom các owner có trách nhiệm giống nhau. Không phải một chức danh đơn lẻ; khi ra quyết định vẫn phải truy về các vai trò thành viên và thẩm quyền cụ thể.",
+    "ctx": "Dùng trong role-and-department bundles, RACI matrix, training/deployment plan, quyền truy cập và các kịch bản phối hợp liên chức năng.",
+    "rec": "Role-and-department bundles; RACI/authority matrix; access matrix; deployment roster; training assignment; decision log có role owner cụ thể",
+    "cat": "General"
   },
   {
     "term": "Total Amount",
@@ -26208,6 +27378,15 @@
     "cat": "HSE"
   },
   {
+    "term": "TRN",
+    "meaning": "Training Document",
+    "vi": "Tài liệu đào tạo",
+    "def": "TRN là mã loại tài liệu đào tạo trong HESEM, bao gồm module, guide, workbook, deploy playbook, test và chứng nhận năng lực.",
+    "ctx": "Dùng trong training portal, OJT, competency framework, deployment playbook và hồ sơ chứng nhận.",
+    "rec": "Training module; attendance/evidence record; OJT checklist; certificate register; skill matrix",
+    "cat": "HR/Training"
+  },
+  {
     "term": "Trochoidal",
     "meaning": "Trochoidal milling",
     "vi": "Trochoidal",
@@ -26406,6 +27585,15 @@
     "cat": "General"
   },
   {
+    "term": "UAT",
+    "meaning": "User Acceptance Testing",
+    "vi": "Kiểm thử chấp nhận người dùng",
+    "def": "UAT là bước kiểm thử bởi người dùng/quy trình owner để xác nhận chức năng hoặc thay đổi đáp ứng nghiệp vụ trước khi release hoặc go-live.",
+    "ctx": "Dùng trong thay đổi hệ thống, ERP/MOM/MES/EQMS, deploy playbook, access/config change và backup/rollback evidence.",
+    "rec": "UAT script; test evidence; defect log; sign-off; release/change approval; rollback plan",
+    "cat": "IT/Systems"
+  },
+  {
     "term": "UCL",
     "meaning": "Upper Control Limit",
     "vi": "Giới hạn kiểm soát trên",
@@ -26440,6 +27628,15 @@
     "ctx": "Dùng tại bước chuẩn bị vào khu vực làm việc: nhận/cấp phát PPE, kiểm tra trước khi dùng và giám sát tuân thủ trong ca.",
     "rec": "Ma trận PPE; phiếu cấp phát PPE; checklist kiểm tra PPE; hồ sơ đào tạo PPE; log thay thế/hủy PPE hỏng.",
     "cat": "HSE"
+  },
+  {
+    "term": "UFLPA",
+    "meaning": "Uyghur Forced Labor Prevention Act",
+    "vi": "Đạo luật phòng ngừa lao động cưỡng bức Uyghur",
+    "def": "UFLPA là yêu cầu tuân thủ chuỗi cung ứng liên quan lao động cưỡng bức; trong tài liệu HESEM, thuật ngữ xuất hiện trong compliance evidence và customer/supplier audit package.",
+    "ctx": "Dùng trong hồ sơ compliance, ESG, supplier evidence, customer audit và M365 records architecture.",
+    "rec": "Supplier declaration; compliance evidence folder; audit package; customer portal submission; annual review record",
+    "cat": "Procurement/Supplier Quality"
   },
   {
     "term": "UI",
@@ -27054,6 +28251,15 @@
     "cat": "IT/Systems"
   },
   {
+    "term": "VPS",
+    "meaning": "Virtual Private Server",
+    "vi": "Máy chủ riêng ảo",
+    "def": "VPS là máy chủ riêng ảo dùng để vận hành portal/app, dữ liệu runtime, deploy, backup và observability trong phạm vi hạ tầng HESEM.",
+    "ctx": "Dùng trong tài liệu vận hành server, deploy, sync, terminal gateway, backup và smoke test.",
+    "rec": "VPS access log; deploy receipt; backup manifest; monitoring log; incident ticket; SSH/change log",
+    "cat": "IT/Systems"
+  },
+  {
     "term": "VSM",
     "meaning": "Value Stream Mapping",
     "vi": "Sơ đồ dòng giá trị",
@@ -27151,6 +28357,15 @@
     "ctx": "IT/Network admin cấu hình và giám sát hạ tầng mạng phục vụ kết nối văn phòng–xưởng–máy chủ; dùng khi xử lý sự cố và tối ưu hiệu năng.",
     "rec": "Sơ đồ mạng & phân đoạn; Cấu hình thiết bị mạng/firewall/VPN; Log truy cập/kết nối; Phiếu thay đổi cấu hình (CR); Báo cáo giám sát/uptime",
     "cat": "IT/Systems"
+  },
+  {
+    "term": "WAR",
+    "meaning": "Warehouse Clerk",
+    "vi": "Nhân viên kho",
+    "def": "WAR là mã vai trò trong hệ thống HESEM cho Nhân viên kho. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
   },
   {
     "term": "Warehouse",
@@ -27585,6 +28800,15 @@
     "cat": "ISO/QMS"
   },
   {
+    "term": "WKM",
+    "meaning": "CNC Workshop Manager",
+    "vi": "Quản lý phân xưởng CNC",
+    "def": "WKM là mã vai trò trong hệ thống HESEM cho Quản lý phân xưởng CNC. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
+    "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
+    "cat": "General"
+  },
+  {
     "term": "WMS",
     "meaning": "Warehouse Management System",
     "vi": "WMS (Hệ thống quản lý kho)",
@@ -27885,10 +29109,10 @@
     "term": "Xbar-S",
     "meaning": "Mean and Standard Deviation Control Chart",
     "vi": "Biểu đồ trung bình và độ lệch chuẩn",
-    "def": "",
-    "ctx": "",
-    "rec": "",
-    "cat": "General"
+    "def": "Xbar-S là biểu đồ kiểm soát dùng trung bình mẫu và độ lệch chuẩn để theo dõi ổn định quá trình khi subgroup đủ lớn hoặc cần theo dõi biến thiên bằng S thay vì R.",
+    "ctx": "QA/QC hoặc kỹ sư chất lượng dùng trong SPC khi phân tích dữ liệu đo theo nhóm con và phản ứng với tín hiệu mất kiểm soát.",
+    "rec": "SPC chart; measurement log; reaction plan; capability study; training evidence",
+    "cat": "Quality"
   },
   {
     "term": "XLSX",
@@ -27907,6 +29131,24 @@
     "ctx": "IT/Người dùng áp dụng khi vận hành hệ thống, trao đổi dữ liệu và kiểm soát rủi ro; nội dung cụ thể phụ thuộc phạm vi hệ thống triển khai.",
     "rec": "Chính sách/quy định liên quan (nếu có); Cấu hình hệ thống & CR quản lý thay đổi; Log vận hành (nếu có); Ticket xử lý sự cố/yêu cầu",
     "cat": "IT/Systems"
+  },
+  {
+    "term": "XPS",
+    "meaning": "X-ray Photoelectron Spectroscopy",
+    "vi": "Quang phổ quang điện tử tia X",
+    "def": "XPS là phương pháp phân tích bề mặt để đánh giá thành phần hóa học/lớp thụ động, ví dụ tỷ lệ Cr/Fe trong passivation/electropolish.",
+    "ctx": "Dùng trong semi-equipment surface finish, special process evidence và customer compliance.",
+    "rec": "XPS test report; process cert; special process record; material/surface finish evidence; customer submission",
+    "cat": "Quality"
+  },
+  {
+    "term": "XRF",
+    "meaning": "X-ray Fluorescence",
+    "vi": "Huỳnh quang tia X",
+    "def": "XRF là phương pháp phân tích thành phần vật liệu/lớp phủ bằng huỳnh quang tia X; thường dùng để xác minh vật liệu, plating hoặc compliance.",
+    "ctx": "Dùng trong material verification, special process, semi-equipment evidence và lab/testing references.",
+    "rec": "XRF report; material cert; inspection record; equipment calibration record; NCR nếu không phù hợp",
+    "cat": "Quality"
   },
   {
     "term": "Year-End Close",
