@@ -799,6 +799,8 @@ pre, code { overflow-wrap: anywhere; word-break: break-word; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  max-width: 100%;
+  box-sizing: border-box;
   font-family: var(--mono);
   font-size: 11px;
   line-height: 1.2;
@@ -806,7 +808,11 @@ pre, code { overflow-wrap: anywhere; word-break: break-word; }
   border-radius: 999px;
   border: 1px solid var(--ln2, #cbd5e1);
   background: var(--bg3, #eef2f7);
-  white-space: nowrap;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  text-align: center;
+  vertical-align: middle;
 }
 
 .dept-code {
@@ -831,6 +837,10 @@ pre, code { overflow-wrap: anywhere; word-break: break-word; }
 .role-link,
 .dept-link,
 .bundle-link {
+  max-width: 100%;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
   text-decoration: none;
 }
 

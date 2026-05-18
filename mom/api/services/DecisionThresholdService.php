@@ -729,9 +729,22 @@ final class DecisionThresholdService
         );
         $html = str_replace(
             '.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;white-space:nowrap}',
-            '.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;display:inline-block;max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.35;vertical-align:middle}',
+            '.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;display:inline-block;box-sizing:border-box;max-width:100%;white-space:normal;overflow-wrap:anywhere;word-break:break-word;line-height:1.35;vertical-align:middle;text-align:center}',
             $html
         );
+        $html = str_replace(
+            '.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;display:inline-block;max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.35;vertical-align:middle}',
+            '.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;display:inline-block;box-sizing:border-box;max-width:100%;white-space:normal;overflow-wrap:anywhere;word-break:break-word;line-height:1.35;vertical-align:middle;text-align:center}',
+            $html
+        );
+        if (strpos($html, '.role-code a,.role-code .entity-link,.role-code .role-link,.role-code .bundle-link') === false) {
+            $html = str_replace(
+                '.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;display:inline-block;box-sizing:border-box;max-width:100%;white-space:normal;overflow-wrap:anywhere;word-break:break-word;line-height:1.35;vertical-align:middle;text-align:center}',
+                '.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;display:inline-block;box-sizing:border-box;max-width:100%;white-space:normal;overflow-wrap:anywhere;word-break:break-word;line-height:1.35;vertical-align:middle;text-align:center}' . "\n" .
+                '.role-code a,.role-code .entity-link,.role-code .role-link,.role-code .bundle-link{display:inline;max-width:100%;white-space:normal;overflow-wrap:anywhere;word-break:break-word}',
+                $html
+            );
+        }
 
         return $html;
     }
