@@ -1,32 +1,5 @@
 [
   {
-    "term": "100% Inspection",
-    "meaning": "100% Inspection",
-    "vi": "Kiểm tra 100%",
-    "def": "Hoạt động kiểm tra 100%: kiểm toàn bộ sản phẩm/đặc tính (thường trong containment hoặc rủi ro cao); giảm rủi ro lọt lỗi nhưng tốn nguồn lực.",
-    "ctx": "QC Inspector/Quality Engineer dùng trong bước kiểm tra/đo kiểm và phân tích năng lực: lập plan kiểm tra, đo ghi nhận kết quả (CMM/gage), đánh giá pass/fail và theo dõi xu hướng/SPC.",
-    "rec": "Inspection report (FAI/FAIR/FPI/Final inspection); Dimensional report / CMM report; Control chart/SPC log (nếu áp dụng); Inspection plan / control plan reference",
-    "cat": "Quality"
-  },
-  {
-    "term": "13th-month Salary",
-    "meaning": "13th-month Salary",
-    "vi": "13th month Salary",
-    "def": "Khoản chi trả theo chính sách (thường cuối năm) dựa trên điều kiện/điểm mốc làm việc; phải có căn cứ tính, phê duyệt và ghi nhận trong payroll.",
-    "ctx": "HR C&B/Payroll và kế toán dùng theo kỳ lương để tính, kiểm soát và chi trả lương–phụ cấp–thưởng; ở bước tổng hợp dữ liệu chấm công, tính khấu trừ, phê duyệt bảng lương và phát hành phiếu lương.",
-    "rec": "Bảng lương; Phiếu lương; Quyết định/đề nghị điều chỉnh lương–phụ cấp–thưởng; Hồ sơ bảo hiểm & tờ khai liên quan; Bảng tính OT/khấu trừ; Danh sách chi trả/ngân hàng; Hồ sơ trợ cấp thôi việc (nếu có).",
-    "cat": "HR/Training"
-  },
-  {
-    "term": "20GP",
-    "meaning": "20-foot General Purpose container",
-    "vi": "Container 20' GP",
-    "def": "Container 20 feet loại thường (20-foot General Purpose, 20GP) dùng trong vận chuyển biển.",
-    "ctx": "Dùng khi lập kế hoạch đóng hàng/booking vận chuyển, tính thể tích và tối ưu tải.",
-    "rec": "Hồ sơ giao nhận/bao gói (nếu áp dụng): nhãn thùng, phiếu kiểm đếm, chứng từ vận chuyển.",
-    "cat": "Logistics"
-  },
-  {
     "term": "2A",
     "meaning": "External thread class 2A",
     "vi": "2A",
@@ -153,24 +126,6 @@
     "cat": "CNC/Engineering"
   },
   {
-    "term": "40GP",
-    "meaning": "40-foot General Purpose container",
-    "vi": "Container 40' GP",
-    "def": "Container 40 feet loại thường (40-foot General Purpose, 40GP) dùng trong vận chuyển biển.",
-    "ctx": "Dùng khi lập kế hoạch đóng hàng/booking vận chuyển, tính thể tích và tối ưu tải.",
-    "rec": "Hồ sơ giao nhận/bao gói (nếu áp dụng): nhãn thùng, phiếu kiểm đếm, chứng từ vận chuyển.",
-    "cat": "Logistics"
-  },
-  {
-    "term": "40HC",
-    "meaning": "40-foot High Cube container",
-    "vi": "Container 40' HC",
-    "def": "Container 40 feet cao (40-foot High Cube, 40HC) dùng khi cần thêm thể tích.",
-    "ctx": "Dùng khi lập kế hoạch đóng hàng/booking vận chuyển, tính thể tích và tối ưu tải.",
-    "rec": "Hồ sơ giao nhận/bao gói (nếu áp dụng): nhãn thùng, phiếu kiểm đếm, chứng từ vận chuyển.",
-    "cat": "Logistics"
-  },
-  {
     "term": "5 Why",
     "meaning": "5 Whys",
     "vi": "Kỹ thuật 5 Tại sao",
@@ -222,6 +177,51 @@
     "def": "Phương pháp 8D: quy trình giải quyết vấn đề theo 8 bước (team, problem, containment, root cause, corrective action, verify, prevent recurrence, closure).",
     "ctx": "QC/QA dùng trong kiểm soát chất lượng theo QMS: định nghĩa tiêu chí kiểm tra, ghi nhận kết quả và phục vụ truy xuất/đánh giá nội bộ.",
     "rec": "Applicable SOP/WI reference; Approval/decision record (nếu có); System transaction log (ERP/MES/WMS)",
+    "cat": "Quality"
+  },
+  {
+    "term": "13th-month Salary",
+    "meaning": "13th-month Salary",
+    "vi": "13th month Salary",
+    "def": "Khoản chi trả theo chính sách (thường cuối năm) dựa trên điều kiện/điểm mốc làm việc; phải có căn cứ tính, phê duyệt và ghi nhận trong payroll.",
+    "ctx": "HR C&B/Payroll và kế toán dùng theo kỳ lương để tính, kiểm soát và chi trả lương–phụ cấp–thưởng; ở bước tổng hợp dữ liệu chấm công, tính khấu trừ, phê duyệt bảng lương và phát hành phiếu lương.",
+    "rec": "Bảng lương; Phiếu lương; Quyết định/đề nghị điều chỉnh lương–phụ cấp–thưởng; Hồ sơ bảo hiểm & tờ khai liên quan; Bảng tính OT/khấu trừ; Danh sách chi trả/ngân hàng; Hồ sơ trợ cấp thôi việc (nếu có).",
+    "cat": "HR/Training"
+  },
+  {
+    "term": "20GP",
+    "meaning": "20-foot General Purpose container",
+    "vi": "Container 20' GP",
+    "def": "Container 20 feet loại thường (20-foot General Purpose, 20GP) dùng trong vận chuyển biển.",
+    "ctx": "Dùng khi lập kế hoạch đóng hàng/booking vận chuyển, tính thể tích và tối ưu tải.",
+    "rec": "Hồ sơ giao nhận/bao gói (nếu áp dụng): nhãn thùng, phiếu kiểm đếm, chứng từ vận chuyển.",
+    "cat": "Logistics"
+  },
+  {
+    "term": "40GP",
+    "meaning": "40-foot General Purpose container",
+    "vi": "Container 40' GP",
+    "def": "Container 40 feet loại thường (40-foot General Purpose, 40GP) dùng trong vận chuyển biển.",
+    "ctx": "Dùng khi lập kế hoạch đóng hàng/booking vận chuyển, tính thể tích và tối ưu tải.",
+    "rec": "Hồ sơ giao nhận/bao gói (nếu áp dụng): nhãn thùng, phiếu kiểm đếm, chứng từ vận chuyển.",
+    "cat": "Logistics"
+  },
+  {
+    "term": "40HC",
+    "meaning": "40-foot High Cube container",
+    "vi": "Container 40' HC",
+    "def": "Container 40 feet cao (40-foot High Cube, 40HC) dùng khi cần thêm thể tích.",
+    "ctx": "Dùng khi lập kế hoạch đóng hàng/booking vận chuyển, tính thể tích và tối ưu tải.",
+    "rec": "Hồ sơ giao nhận/bao gói (nếu áp dụng): nhãn thùng, phiếu kiểm đếm, chứng từ vận chuyển.",
+    "cat": "Logistics"
+  },
+  {
+    "term": "100% Inspection",
+    "meaning": "100% Inspection",
+    "vi": "Kiểm tra 100%",
+    "def": "Hoạt động kiểm tra 100%: kiểm toàn bộ sản phẩm/đặc tính (thường trong containment hoặc rủi ro cao); giảm rủi ro lọt lỗi nhưng tốn nguồn lực.",
+    "ctx": "QC Inspector/Quality Engineer dùng trong bước kiểm tra/đo kiểm và phân tích năng lực: lập plan kiểm tra, đo ghi nhận kết quả (CMM/gage), đánh giá pass/fail và theo dõi xu hướng/SPC.",
+    "rec": "Inspection report (FAI/FAIR/FPI/Final inspection); Dimensional report / CMM report; Control chart/SPC log (nếu áp dụng); Inspection plan / control plan reference",
     "cat": "Quality"
   },
   {
@@ -2977,6 +2977,15 @@
     "ctx": "Dùng như thuật ngữ chuẩn trong SOP/WI/biểu mẫu khi cần mô tả trách nhiệm hoặc nghiệp vụ liên quan.",
     "rec": "Sao kê ngân hàng; Phiếu thu/chi; Bảng đối chiếu ngân hàng; Hợp đồng vay",
     "cat": "Finance"
+  },
+  {
+    "term": "CDR",
+    "meaning": "Control Decision Record",
+    "vi": "Mã quyết định kiểm soát",
+    "def": "CDR là mã định danh một điểm quyết định kiểm soát trong ANNEX-120 và ANNEX-121. Mỗi CDR phải làm rõ việc cần quyết định, người chịu trách nhiệm, ngưỡng áp dụng, bằng chứng bắt buộc, trạng thái dừng/chạy và tài liệu liên quan. CDR không phải chức danh và không tạo quyền mới; CDR giúp tra đúng thẩm quyền ký và RACI vận hành.",
+    "ctx": "Dùng trong RACI, ma trận thẩm quyền và luồng vận hành xưởng CNC bán dẫn khi cần tra ai được dừng, nhả, phê duyệt, đồng ký hoặc leo thang một quyết định tại các cổng G0-G7.",
+    "rec": "ANNEX-120 Authority Matrix; ANNEX-121 RACI Master Matrix; ANNEX-123 Deputy/Backup Matrix; form hoặc SOP được gắn trực tiếp với từng CDR.",
+    "cat": "ISO/QMS"
   },
   {
     "term": "Center Drill",
@@ -12753,6 +12762,24 @@
     "cat": "ISO/QMS"
   },
   {
+    "term": "ISO 9000",
+    "meaning": "Quality management systems — Fundamentals and vocabulary",
+    "vi": "Tiêu chuẩn ISO 9000",
+    "def": "Tiêu chuẩn về thuật ngữ và nguyên tắc QMS; dùng làm từ vựng/định nghĩa chính thức khi xây dựng hệ thống.",
+    "ctx": "Dùng trong vận hành QMS theo ISO 9001 để đảm bảo nhất quán thuật ngữ và kiểm soát quá trình.",
+    "rec": "Documented information/record theo quy định kiểm soát tài liệu & lưu giữ hồ sơ (ISO 9001:2015 7.5).",
+    "cat": "ISO/QMS"
+  },
+  {
+    "term": "ISO 9001",
+    "meaning": "Quality Management Systems — Requirements",
+    "vi": "Tiêu chuẩn ISO 9001",
+    "def": "Tiêu chuẩn hệ thống quản lý chất lượng (QMS) – yêu cầu; nền tảng cho vận hành quy trình, kiểm soát rủi ro, đánh giá nội bộ và cải tiến.",
+    "ctx": "Dùng trong vận hành QMS theo ISO 9001 để đảm bảo nhất quán thuật ngữ và kiểm soát quá trình.",
+    "rec": "Documented information/record theo quy định kiểm soát tài liệu & lưu giữ hồ sơ (ISO 9001:2015 7.5).",
+    "cat": "ISO/QMS"
+  },
+  {
     "term": "ISO 13485",
     "meaning": "Quality management systems for medical devices",
     "vi": "Tiêu chuẩn ISO 13485",
@@ -12805,24 +12832,6 @@
     "ctx": "Dùng trong SOP/WI an toàn của khu vực sản xuất; xuất hiện trong đào tạo, kiểm tra hiện trường và đánh giá nội bộ/đánh giá nội bộ.",
     "rec": "SOP/WI liên quan; checklist/biên bản kiểm tra; hồ sơ đào tạo/truyền thông; log theo dõi và hành động khắc phục (nếu phát sinh).",
     "cat": "HSE"
-  },
-  {
-    "term": "ISO 9000",
-    "meaning": "Quality management systems — Fundamentals and vocabulary",
-    "vi": "Tiêu chuẩn ISO 9000",
-    "def": "Tiêu chuẩn về thuật ngữ và nguyên tắc QMS; dùng làm từ vựng/định nghĩa chính thức khi xây dựng hệ thống.",
-    "ctx": "Dùng trong vận hành QMS theo ISO 9001 để đảm bảo nhất quán thuật ngữ và kiểm soát quá trình.",
-    "rec": "Documented information/record theo quy định kiểm soát tài liệu & lưu giữ hồ sơ (ISO 9001:2015 7.5).",
-    "cat": "ISO/QMS"
-  },
-  {
-    "term": "ISO 9001",
-    "meaning": "Quality Management Systems — Requirements",
-    "vi": "Tiêu chuẩn ISO 9001",
-    "def": "Tiêu chuẩn hệ thống quản lý chất lượng (QMS) – yêu cầu; nền tảng cho vận hành quy trình, kiểm soát rủi ro, đánh giá nội bộ và cải tiến.",
-    "ctx": "Dùng trong vận hành QMS theo ISO 9001 để đảm bảo nhất quán thuật ngữ và kiểm soát quá trình.",
-    "rec": "Documented information/record theo quy định kiểm soát tài liệu & lưu giữ hồ sơ (ISO 9001:2015 7.5).",
-    "cat": "ISO/QMS"
   },
   {
     "term": "Isolation",

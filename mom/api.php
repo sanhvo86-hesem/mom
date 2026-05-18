@@ -2362,6 +2362,7 @@ function module_access_admin_tab_catalog(): array {
     ['id' => 'roles', 'default_access' => 'admin', 'default_roles' => []],
     ['id' => 'orgchart', 'default_access' => 'admin', 'default_roles' => []],
     ['id' => 'perms', 'default_access' => 'admin', 'default_roles' => []],
+    ['id' => 'decision_thresholds', 'default_access' => 'admin', 'default_roles' => []],
     ['id' => 'module_access', 'default_access' => 'admin', 'default_roles' => [], 'locked' => true],
     ['id' => 'activity', 'default_access' => 'admin', 'default_roles' => []],
     ['id' => 'docs', 'default_access' => 'admin', 'default_roles' => []],

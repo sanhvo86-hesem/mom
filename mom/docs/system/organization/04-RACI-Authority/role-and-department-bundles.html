@@ -30,7 +30,8 @@
 .toc{border:1px solid var(--ln);border-radius:8px;padding:16px;background:var(--bg2);margin:18px 0 24px;}
 .toc-title{font-size:12px;font-weight:700;color:var(--navy);text-transform:uppercase;letter-spacing:0;margin-bottom:10px;}
 .toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px;}
-.toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln);border-radius:6px;background:var(--bg);font-size:12px;color:var(--ink);text-decoration:none;}
+.toc-grid a{display:block;padding:8px 10px;border:1px solid var(--ln2);border-radius:6px;background:var(--bg);font-size:12px;color:#0b5ed7;text-decoration:none;font-weight:700;}
+.toc-grid a:hover{border-color:#0b5ed7;background:#eef6ff;}
 .mini-note{font-size:12px;color:var(--ink2);line-height:1.6}
 table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; }
 td,th { word-wrap:break-word; overflow-wrap:break-word; }
@@ -41,11 +42,11 @@ td,th { word-wrap:break-word; overflow-wrap:break-word; }
 <div class="page">
 <div class="page-body">
 <!-- Đầu trang kiểm soát thay đổi tài liệu: giữ nguyên cơ chế hiển thị của hệ thống. -->
-<div class="dcc-header" data-dcc-bootstrap='{"header":{"doc_code":"ROLE-AND-DEPARTMENT-BUNDLES","title":"Danh mục nhóm vai trò và phòng ban","subtitle":"Nguồn chuẩn để dùng mã nhóm trong SOP / WI / ANNEX / JD / RACI cho doanh nghiệp gia công CNC theo đơn hàng","doc_type":"REF","revision":"V1","effective_date":"2026-05-08","owner_role_code":"QA[QMR]","approver_role_code":"CEO","iso_clause":"ISO 9001:2015/Amd 1:2024 — 5.3, 7.5, 8.1, 8.6, 8.7, 9.3, 10.2","status":"draft"},"labels":{"doc_id":{"short":"Mã","long":"Mã tài liệu","sort":10},"revision":{"short":"Lần sửa","long":"Lần sửa đổi","sort":20},"effective_date":{"short":"Hiệu lực","long":"Ngày hiệu lực","sort":30},"owner":{"short":"Sở hữu","long":"Bộ phận sở hữu","sort":40},"approver":{"short":"Duyệt","long":"Người phê duyệt","sort":50}}}' data-dcc-doc-code="ROLE-AND-DEPARTMENT-BUNDLES" data-dcc-locale="vi" data-dcc-logo="../../../../assets/hesem-logo.svg"></div>
+<div class="dcc-header" data-dcc-bootstrap='{"header":{"doc_code":"ROLE-AND-DEPARTMENT-BUNDLES","title":"Danh mục nhóm vai trò và phòng ban","subtitle":"Nguồn chuẩn để dùng mã nhóm trong SOP / WI / ANNEX / JD / RACI cho doanh nghiệp gia công CNC theo đơn hàng","doc_type":"REF","revision":"V1.1","effective_date":"2026-05-18","owner_role_code":"QA[QMR]","approver_role_code":"CEO","iso_clause":"ISO 9001:2015/Amd 1:2024 — 5.3, 7.5, 8.1, 8.6, 8.7, 9.3, 10.2","status":"draft"},"labels":{"doc_id":{"short":"Mã","long":"Mã tài liệu","sort":10},"revision":{"short":"Lần sửa","long":"Lần sửa đổi","sort":20},"effective_date":{"short":"Hiệu lực","long":"Ngày hiệu lực","sort":30},"owner":{"short":"Sở hữu","long":"Bộ phận sở hữu","sort":40},"approver":{"short":"Duyệt","long":"Người phê duyệt","sort":50}}}' data-dcc-doc-code="ROLE-AND-DEPARTMENT-BUNDLES" data-dcc-locale="vi" data-dcc-logo="../../../../assets/hesem-logo.svg"></div>
 <div class="doc-content" id="docContent">
 <div class="form-sheet">
 <div class="note-blue terminology-note" style="margin:12px 0">
-<p><b>Quy ước thuật ngữ viết tắt trong tài liệu:</b> Ma trận phân định trách nhiệm theo bốn trạng thái (<b>RACI</b>); người phê duyệt cuối (<b>A</b>); Tổ chức Tiêu chuẩn hóa Quốc tế (<b>ISO</b>); máy điều khiển số bằng máy tính (<b>CNC</b>); hệ thống hoạch định nguồn lực doanh nghiệp (<b>ERP</b>); hệ thống quản lý chất lượng (<b><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html">QMS</a></b>); phụ lục kiểm soát (<b>ANNEX</b>); báo cáo không phù hợp (<b>NCR</b>); hành động khắc phục và phòng ngừa (<b>CAPA</b>).</p>
+<p><b>Quy ước thuật ngữ viết tắt trong tài liệu:</b> Ma trận phân định trách nhiệm theo bốn trạng thái (<b>RACI</b>); người phê duyệt cuối (<b>A</b>); mã quyết định kiểm soát (<b><a class="entity-link" href="../../../../glossary/index.html?q=CDR">CDR</a></b>); Tổ chức Tiêu chuẩn hóa Quốc tế (<b>ISO</b>); máy điều khiển số bằng máy tính (<b>CNC</b>); hệ thống hoạch định nguồn lực doanh nghiệp (<b>ERP</b>); hệ thống quản lý chất lượng (<b><a class="entity-link role-link" href="../03-Job-Descriptions/04-JD-Quality/jd-qms-engineer.html">QMS</a></b>); phụ lục kiểm soát (<b>ANNEX</b>); báo cáo không phù hợp (<b>NCR</b>); hành động khắc phục và phòng ngừa (<b>CAPA</b>).</p>
 <p><b>7 mã nhóm còn hiệu lực:</b> Ban lãnh đạo (<b><a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-top-mgmt">TOP_MGMT</a></b>); nhóm trưởng chức năng/phòng ban (<b><a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-func-heads">FUNC_HEADS</a></b>); nhóm sở hữu nội dung nghiệp vụ theo chức năng (<b><a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-func-owners">FUNC_OWNERS</a></b>); nhóm quản lý trực tiếp (<b><a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-direct-line-mgrs">DIRECT_LINE_MGRS</a></b>); nhóm đầu mối khách hàng và báo giá (<b><a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-commercial-front">COMMERCIAL_FRONT</a></b>); nhóm nòng cốt chất lượng (<b><a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-quality-core">QUALITY_CORE</a></b>); nhóm chức năng hỗ trợ nền tảng (<b><a class="entity-link bundle-link" href="role-and-department-bundles.html#bundle-support-enablement">SUPPORT_ENABLEMENT</a></b>).</p>
 </div>
 
@@ -56,13 +57,13 @@ td,th { word-wrap:break-word; overflow-wrap:break-word; }
 <div class="note"><b>Quy tắc bắt buộc:</b><br/>Nếu tài liệu xác định được người giữ quyền, người phê duyệt, người giữ/nhả sản phẩm, người ký xác nhận hoặc người chịu trách nhiệm cuối cùng thì phải dùng mã vai trò hoặc mã phòng ban đúng cấp. Chỉ dùng 7 mã nhóm dưới đây khi trách nhiệm thật sự thuộc về một lớp vai trò/phòng ban lặp lại, đã được công bố và có liên kết truy vết tại trang này.</div>
 
 <div class="toc"><div class="toc-title">Mục lục nhanh</div><div class="toc-grid">
-<a href="#bundle-top-mgmt">TOP_MGMT - Ban lãnh đạo</a>
-<a href="#bundle-func-heads">FUNC_HEADS - Nhóm trưởng chức năng/phòng ban</a>
-<a href="#bundle-func-owners">FUNC_OWNERS - Nhóm sở hữu nội dung nghiệp vụ</a>
-<a href="#bundle-direct-line-mgrs">DIRECT_LINE_MGRS - Nhóm quản lý trực tiếp</a>
-<a href="#bundle-commercial-front">COMMERCIAL_FRONT - Nhóm đầu mối khách hàng và báo giá</a>
-<a href="#bundle-quality-core">QUALITY_CORE - Nhóm nòng cốt chất lượng</a>
-<a href="#bundle-support-enablement">SUPPORT_ENABLEMENT - Nhóm chức năng hỗ trợ nền tảng</a>
+<a class="entity-link bundle-link" href="#bundle-top-mgmt">TOP_MGMT - Ban lãnh đạo</a>
+<a class="entity-link bundle-link" href="#bundle-func-heads">FUNC_HEADS - Nhóm trưởng chức năng/phòng ban</a>
+<a class="entity-link bundle-link" href="#bundle-func-owners">FUNC_OWNERS - Nhóm sở hữu nội dung nghiệp vụ</a>
+<a class="entity-link bundle-link" href="#bundle-direct-line-mgrs">DIRECT_LINE_MGRS - Nhóm quản lý trực tiếp</a>
+<a class="entity-link bundle-link" href="#bundle-commercial-front">COMMERCIAL_FRONT - Nhóm đầu mối khách hàng và báo giá</a>
+<a class="entity-link bundle-link" href="#bundle-quality-core">QUALITY_CORE - Nhóm nòng cốt chất lượng</a>
+<a class="entity-link bundle-link" href="#bundle-support-enablement">SUPPORT_ENABLEMENT - Nhóm chức năng hỗ trợ nền tảng</a>
 </div></div>
 
 <h2 class="h2">1. Danh mục nhóm được công bố</h2>
@@ -107,7 +108,7 @@ td,th { word-wrap:break-word; overflow-wrap:break-word; }
 <td>Nhóm đầu mối khách hàng và báo giá</td>
 <td>Nhóm vai trò</td>
 <td><a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-customer-service.html">CS</a> + <a class="entity-link role-link" href="../03-Job-Descriptions/06-JD-Sales/jd-estimator.html">EST</a> xử lý tiếp nhận RFQ, làm rõ yêu cầu, báo giá và chuyển điều kiện thương mại vào đơn hàng.</td>
-<td>Không dùng thay <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a>/<a class="entity-link role-link" href="../03-Job-Descriptions/07-JD-Finance/jd-finance-manager.html">FIN</a> khi có ngoại lệ giá, điều kiện thanh toán hoặc hợp đồng vượt ngưỡng.</td>
+<td>Không dùng thay <a class="entity-link role-link" href="../03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a> khi có ngoại lệ giá, điều kiện thanh toán hoặc hợp đồng vượt ngưỡng.</td>
 <td><span class="mini-note">Dùng ở CDR: <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-A1">A1</a>, <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-A2">A2</a>, <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-A3">A3</a>, <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-A4">A4</a>, <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-A5">A5</a>, <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-A6">A6</a>, <a href="../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html#cdr-F5">F5</a>.</span></td>
 </tr>
 <tr>

@@ -3,13 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title><a href="annex-120B-scenario-playbook.html">ANNEX-120B</a> - Bảng tình huống thẩm quyền | HESEM MOM</title>
+<title>ANNEX-120B - Bảng tình huống thẩm quyền | HESEM MOM</title>
 <script>
-/* DCC Header bootstrap — computes absolute URLs from location.pathname so the
- * stylesheet + renderer load correctly regardless of how the document is
- * served (direct, portal iframe + <base href="../"> injection, doc_stream, …).
- * The explicit `?v=…` query string busts browser + service-worker caches
- * whenever the DCC header CSS or renderer ships a new revision. */
 (function () {
   var DCC_VERSION = '2026-04-24-1';
   var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
@@ -33,8 +28,8 @@ thead { display: table-header-group; }
 }
 .page-body { overflow-x: hidden; }
 .table-card, .table-block, .table-wrap { overflow-x: auto; max-width: 100%; }
-table { max-width: 100%; table-layout: auto; }
-td, th { max-width: 420px; overflow-wrap: break-word; word-wrap: break-word; }
+table { max-width: 100%; table-layout: fixed; }
+td, th { max-width: 420px; overflow-wrap: anywhere; word-wrap: break-word; }
 .role-code {font-family: var(--mono); font-size: 11px; background: var(--bg3); padding: 2px 6px; border-radius: 5px;}
 .raci-cell {text-align:center; font-weight:700; width:34px; min-width:34px; padding:6px 4px !important;}
 .raci-A {background:#fff5f5; color:#c92a2a;}
@@ -105,7 +100,7 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 .kpi-good{background:#ebfbee;color:#2b8a3e}
 .kpi-warn{background:#fff9db;color:#e67700}
 .kpi-bad{background:#fff5f5;color:#c92a2a}
-.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;white-space:nowrap}
+.role-code{font-family:var(--mono);font-size:11px;background:var(--bg3);padding:2px 6px;border-radius:5px;display:inline-block;max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.35;vertical-align:middle}
 .matrix-table{width:100%;border-collapse:collapse;font-size:12px;}
 .matrix-table th{padding:8px 10px;text-align:left;font-size:11px;font-weight:800;color:var(--navy);background:var(--th-bg);border:1px solid var(--th-bdr);text-transform:uppercase;letter-spacing:.3px;vertical-align:bottom}
 .matrix-table td{padding:8px 10px;border:1px solid var(--ln2);vertical-align:top;line-height:1.45}
@@ -126,33 +121,33 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </head>
 <body>
 <div class="container"><div class="page"><div class="page-body">
-<div class="dcc-header" data-dcc-bootstrap='{"header":{"doc_code":"ANNEX-120B","title":"Bảng tình huống thẩm quyền — Tra cứu quyết định trong vận hành thực chiến","subtitle":"Bộ tình huống vận hành thực tế tại xưởng gia công CNC — mỗi tình huống dẫn về CDR + FRM + ngưỡng số","doc_type":"REF","revision":"V0","effective_date":"2026-05-12","owner_role_code":"QA","approver_role_code":"CEO","iso_clause":"ISO 9001:2015 §5.3 §8.1 §8.7 §9.1","status":"draft"},"labels":{"doc_id":{"short":"Mã","long":"Mã tài liệu","sort":10},"revision":{"short":"Lần sửa","long":"Lần sửa đổi","sort":20},"effective_date":{"short":"Hiệu lực","long":"Ngày hiệu lực","sort":30},"owner":{"short":"Sở hữu","long":"Bộ phận sở hữu","sort":40},"approver":{"short":"Duyệt","long":"Người phê duyệt","sort":50}}}' data-dcc-doc-code="ANNEX-120B" data-dcc-locale="vi" data-dcc-logo="../../../../../assets/hesem-logo.svg"></div>
+<div class="dcc-header" data-dcc-bootstrap='{"header":{"doc_code":"ANNEX-120B","title":"Bảng tình huống thẩm quyền","subtitle":"Tình huống vận hành xưởng CNC; mỗi dòng dẫn về CDR, hồ sơ và ngưỡng leo thang.","doc_type":"REF","revision":"V0.1","effective_date":"2026-05-18","owner_role_code":"QA","approver_role_code":"CEO","iso_clause":"ISO 9001:2015 §5.3 §8.1 §8.7 §9.1","status":"draft"},"labels":{"doc_id":{"short":"Mã","long":"Mã tài liệu","sort":10},"revision":{"short":"Lần sửa","long":"Lần sửa đổi","sort":20},"effective_date":{"short":"Hiệu lực","long":"Ngày hiệu lực","sort":30},"owner":{"short":"Sở hữu","long":"Bộ phận sở hữu","sort":40},"approver":{"short":"Duyệt","long":"Người phê duyệt","sort":50}}}' data-dcc-doc-code="ANNEX-120B" data-dcc-locale="vi" data-dcc-logo="../../../../../assets/hesem-logo.svg"></div>
 
 <div class="doc-content" id="docContent"><div class="form-sheet">
 
 <div class="iso-map">
-<div class="iso-title">Mục đích — tra cứu 1 phút khi có sự cố</div>
-<div class="req"><span class="req-tag shall">PHẢI</span><div>Trang này là chỉ mục ngược theo tình huống thực tế tại xưởng. Khi gặp sự cố, mở trang này trước để biết: trigger, người quyết định, FRM/SOP, ngưỡng leo thang. Mọi quyết định cuối vẫn phải đối chiếu <a href="annex-120-authority-matrix.html">ANNEX-120</a> (CDR) và <a href="annex-121-raci-master-matrix.html">ANNEX-121</a> (RACI). <span class="iso-clause">§5.3 / §8.7</span></div></div>
+<div class="iso-title">Mục đích</div>
+<div class="req"><span class="req-tag shall">QUY TẮC</span><div>Khi phát sinh sự cố, chọn dòng tình huống, xác định CDR, người ký, hồ sơ và ngưỡng leo thang. Quyết định cuối lấy theo <a href="annex-120-authority-matrix.html">ANNEX-120</a>; trách nhiệm phối hợp lấy theo <a href="annex-121-raci-master-matrix.html">ANNEX-121</a>. <span class="iso-clause">§5.3 / §8.7</span></div></div>
 </div>
 
-<h2 class="h2" id="p1">1. Bảng tra tình huống (20 ca thực chiến)</h2>
-<div class="table-card"><table class="table">
+<h2 class="h2" id="p1">1. Bảng tình huống vận hành</h2>
+<div class="table-card"><table class="table scenario-table">
 <colgroup>
 <col style="width:5%"><col style="width:20%"><col style="width:18%">
 <col style="width:8%"><col style="width:12%"><col style="width:10%">
 <col style="width:15%"><col style="width:12%">
 </colgroup>
 <thead><tr>
-<th>#</th><th>Tình huống</th><th>Điều kiện kích hoạt định lượng</th>
-<th>Cổng G</th><th>Quyết định cần (CDR)</th><th>Người ký A</th>
-<th>FRM / SOP</th><th>Leo thang nếu</th>
+<th>#</th><th>Tình huống</th><th>Điều kiện kích hoạt</th>
+<th>Cổng G</th><th>CDR</th><th>Người ký</th>
+<th>Hồ sơ</th><th>Leo thang</th>
 </tr></thead>
 <tbody>
 <tr><td>1</td><td>Khách hủy đơn sau khi đã ra lệnh sản xuất</td><td>Lệnh sản xuất đã phát hành ≥ <a href="annex-121-raci-master-matrix.html#r5gate">G2</a>, khách thông báo hủy</td><td><a href="annex-121-raci-master-matrix.html#r5gate">G0</a>/<a href="annex-121-raci-master-matrix.html#r5gate">G3</a></td><td><a href="annex-120-authority-matrix.html#cdr-A6">A6</a> + <a href="annex-120-authority-matrix.html#cdr-C7">C7</a></td><td><span class="role-code"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></span></td><td><a download="" href="../../../../forms/frm-200-purchase/FRM-212_Customer_Change_Request.xlsx">FRM-212</a> · <a download="" href="../../../../forms/frm-500-production/FRM-503_WIP_Aging_Report.xlsx">FRM-503</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td><td>Khách yêu cầu hủy sau khi đã mua vật tư hoặc WIP có chi phí không thu hồi.</td></tr>
 <tr><td>2</td><td>Máy CNC hỏng giữa ca, lô WIP đang gia công</td><td>Dừng máy ≥ 30 phút</td><td><a href="annex-121-raci-master-matrix.html#r5gate">G3</a></td><td><a href="annex-120-authority-matrix.html#cdr-C7">C7</a></td><td><span class="role-code"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a></span></td><td><a download="" href="../../../../forms/frm-500-production/FRM-512_Downtime_Log.xlsx">FRM-512</a> · <a download="" href="../../../../forms/frm-500-production/FRM-522_Crash_Report.xlsx">FRM-522</a> · <a download="" href="../../../../forms/frm-500-production/FRM-503_WIP_Aging_Report.xlsx">FRM-503</a></td><td>Lô có khách ưu tiên, máy thay thế không đủ năng lực hoặc trễ giao vượt <a href="annex-120-authority-matrix.html#cdr-C7">C7</a> L2: 3 ngày giao hàng.</td></tr>
 <tr><td>3</td><td>Lô không đạt FAI, khách yêu cầu giao gấp</td><td>FAI không đạt + còn ≤ 3 ngày đến hạn giao</td><td><a href="annex-121-raci-master-matrix.html#r5gate">G4</a></td><td><a href="annex-120-authority-matrix.html#cdr-D2">D2</a></td><td><span class="role-code"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a></span>+<span class="role-code"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></span></td><td><a download="" href="../../../../forms/frm-300-technical/FRM-311_FAI_Report.xlsx">FRM-311</a> · <a download="" href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302</a></td><td>Khách yêu cầu giao trước khi <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> xác nhận bằng chứng kiểm lại.</td></tr>
 <tr><td>4</td><td>Đứt vật tư đột xuất giữa lệnh sản xuất</td><td>Tồn kho &lt; điểm đặt hàng lại, nhà cung cấp trễ ≥ 2 ngày giao hàng</td><td><a href="annex-121-raci-master-matrix.html#r5gate">G2</a></td><td><a href="annex-120-authority-matrix.html#cdr-E5">E5</a></td><td><span class="role-code"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-supply-chain-manager.html">SCM</a></span></td><td><a download="" href="../../../../forms/frm-400-quality/FRM-401_Purchase_Order_Tracking_Log.xlsx">FRM-401</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td><td>Đơn mua khẩn vượt L2: 150 triệu VND, vật tư thay thế ảnh hưởng kỹ thuật hoặc khách hàng phải duyệt.</td></tr>
-<tr><td>5</td><td>Trưởng <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> vắng, có lô chờ phát hành</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> vắng ≥ 1 giờ + lô đang giữ ≥ 10 chi tiết</td><td>—</td><td><a href="annex-120-authority-matrix.html#cdr-F3">F3</a></td><td><span class="role-code"><a class="entity-link bundle-link" href="../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-direct-line-mgrs">DIRECT_LINE_MGRS</a></span> → <span class="role-code"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></span></td><td><a href="annex-123-deputy-backup-matrix.html#d4">ANNEX-123 d4</a> · <a download="" href="../../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a></td><td>Phó không có chứng nhận hoặc giới hạn d4 chặn quyền phát hành.</td></tr>
+<tr><td>5</td><td>Trưởng <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> vắng, có lô chờ phát hành</td><td><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a> vắng ≥ 1 giờ + lô đang giữ ≥ 10 chi tiết</td><td>—</td><td><a href="annex-120-authority-matrix.html#cdr-F3">F3</a></td><td><span class="role-code"><a class="entity-link bundle-link" href="../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-direct-line-mgrs">DIRECT_LINE_MGRS</a></span><br><span class="role-sep">→</span> <span class="role-code"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></span></td><td><a href="annex-123-deputy-backup-matrix.html#d4">ANNEX-123 d4</a> · <a download="" href="../../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a></td><td>Phó không có chứng nhận hoặc giới hạn d4 chặn quyền phát hành.</td></tr>
 <tr><td>6</td><td>Khách yêu cầu miễn FAI</td><td>CCR yêu cầu bỏ qua hoặc miễn FAI</td><td><a href="annex-121-raci-master-matrix.html#r5gate">G3</a></td><td><a href="annex-120-authority-matrix.html#cdr-B7">B7</a></td><td><span class="role-code"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html">QA</a></span>+<span class="role-code"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a></span></td><td><a download="" href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a> · <a href="../../../sops/03-SOP-300/sop-302-first-article-inspection-fai.html">SOP-302</a></td><td>Miễn FAI ảnh hưởng đặc tính trọng yếu, khách không ghi rõ chấp thuận hoặc <a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-engineering-lead-manager.html">ENGM</a> không xác nhận rủi ro.</td></tr>
 <tr><td>7</td><td>Tăng ca sản xuất vượt ngưỡng tuần</td><td>OT &gt; 8 giờ/người/tuần</td><td><a href="annex-121-raci-master-matrix.html#r5gate">G3</a></td><td><a href="annex-120-authority-matrix.html#cdr-C6">C6</a></td><td><span class="role-code"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html">HR</a></span>+<span class="role-code"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-production-director.html">PD</a></span></td><td><a download="" href="../../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a> · <a href="../../../sops/02-SOP-200/sop-201-order-fulfillment-rfq-to-cash.html">SOP-201</a></td><td>Tăng ca vượt 16 giờ/người/tuần, kéo dài qua tuần kế tiếp hoặc tạo rủi ro an toàn / chất lượng.</td></tr>
 <tr><td>8</td><td>Giá trị phế phẩm bất thường</td><td>Phế phẩm &gt; 5 triệu VND/lô</td><td><a href="annex-121-raci-master-matrix.html#r5gate">G5</a></td><td><a href="annex-120-authority-matrix.html#cdr-D9">D9</a></td><td><span class="role-code"><a class="entity-link role-link" href="../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html">CEO</a></span></td><td><a download="" href="../../../../forms/frm-600-inspection/FRM-651_NCR_Report.xlsx">FRM-651</a> · <a download="" href="../../../../forms/frm-400-quality/FRM-413_HOLD_and_Disposition_Log.xlsx">FRM-413</a></td><td>Phế phẩm lặp lại cùng nguyên nhân, vượt L2: 30 triệu VND hoặc có dấu hiệu ảnh hưởng khách hàng.</td></tr>
@@ -171,10 +166,10 @@ kbd{font-family:var(--mono);font-size:11px;border:1px solid var(--ln);padding:2p
 </tbody>
 </table></div>
 
-<h2 class="h2" id="p2">2. Quy tắc dùng playbook</h2>
-<div class="req"><span class="req-tag shall">PHẢI</span><div>Bảng tình huống là điểm vào tra cứu nhanh; quyết định cuối vẫn lấy theo CDR trong <a href="annex-120-authority-matrix.html">ANNEX-120</a> và trách nhiệm RACI trong <a href="annex-121-raci-master-matrix.html">ANNEX-121</a>.</div></div>
-<div class="req"><span class="req-tag shall">PHẢI</span><div>Nếu tình huống không khớp mã CDR, người nhận sự cố phải leo thang <a class="entity-link bundle-link" href="../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-top-mgmt">TOP_MGMT</a> để bổ sung CDR; không tự tạo thẩm quyền mới trong ca.</div></div>
-<div class="req"><span class="req-tag shall">PHẢI</span><div>Mọi áp dụng bảng tình huống phải để lại nhật ký tại FRM tương ứng trong hàng tình huống; nếu dùng phó/dự phòng, ghi thêm <a href="../../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a> hoặc kênh bàn giao tương đương.</div></div>
+<h2 class="h2" id="p2">2. Quy tắc áp dụng</h2>
+<div class="req"><span class="req-tag shall">QUY TẮC</span><div>Bảng này chỉ định điểm vào xử lý. CDR trong <a href="annex-120-authority-matrix.html">ANNEX-120</a> giữ quyền quyết định; <a href="annex-121-raci-master-matrix.html">ANNEX-121</a> giữ trách nhiệm phối hợp.</div></div>
+<div class="req"><span class="req-tag shall">QUY TẮC</span><div>Tình huống chưa có CDR: dừng suy diễn, leo thang <a class="entity-link bundle-link" href="../../../../system/organization/04-RACI-Authority/role-and-department-bundles.html#bundle-top-mgmt">TOP_MGMT</a> để bổ sung CDR trước khi xử lý vượt quyền.</div></div>
+<div class="req"><span class="req-tag shall">QUY TẮC</span><div>Mỗi lần áp dụng phải ghi hồ sơ tại biểu mẫu trong dòng tình huống. Khi dùng phó/dự phòng, ghi thêm <a href="../../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx">FRM-504</a> hoặc nhật ký bàn giao tương đương.</div></div>
 
 </div></div></div></div></div>
 </body></html>

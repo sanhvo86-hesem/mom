@@ -6,6 +6,7 @@ namespace MOM\Api\Controllers;
 
 use MOM\Api\Services\DataSyncMutationService;
 use MOM\Api\Services\DataSyncStatusService;
+use MOM\Api\Services\DecisionThresholdService;
 use MOM\Api\Services\GraphicsGovernanceException;
 use MOM\Api\Services\GraphicsGovernanceService;
 use MOM\Api\Services\VersionControlService;
@@ -24,12 +25,22 @@ class AdminController extends BaseController
 {
     private ?GraphicsGovernanceService $graphicsGovernanceService = null;
 
+    private ?DecisionThresholdService $decisionThresholdService = null;
+
     private function graphicsGovernance(): GraphicsGovernanceService
     {
         if ($this->graphicsGovernanceService === null) {
             $this->graphicsGovernanceService = new GraphicsGovernanceService($this->rootDir, $this->dataDir);
         }
         return $this->graphicsGovernanceService;
+    }
+
+    private function decisionThresholds(): DecisionThresholdService
+    {
+        if ($this->decisionThresholdService === null) {
+            $this->decisionThresholdService = new DecisionThresholdService($this->rootDir, $this->dataDir);
+        }
+        return $this->decisionThresholdService;
     }
 
     /**
@@ -795,6 +806,71 @@ class AdminController extends BaseController
 
         $this->auditLog('admin_module_access_save');
         $this->success(['config' => module_access_public_payload($saved)]);
+    }
+
+    /**
+     * GET admin_decision_thresholds_get — Load decision-threshold authority data.
+     *
+     * The persisted JSON is the admin-owned source for threshold wording.
+     * Publishing back to controlled RACI documents happens only through
+     * admin_decision_thresholds_save.
+     *
+     * @return never
+     */
+    public function decisionThresholdsGet(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, array_values(array_unique(array_merge(admin_roles(), ['ceo', 'general_director']))));
+
+        try {
+            $this->success(['config' => $this->decisionThresholds()->load()]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('decision_thresholds_get_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST admin_decision_thresholds_save — Save thresholds and republish RACI docs.
+     *
+     * This path intentionally rejects Finance/FIN in threshold authority text.
+     * CEO is the final approval role and the affected documents receive a
+     * revision bump during publication.
+     *
+     * @return never
+     */
+    public function decisionThresholdsSave(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAnyRole($user, array_values(array_unique(array_merge(admin_roles(), ['ceo', 'general_director']))));
+
+        $body = $this->jsonBody();
+        $config = $body['config'] ?? null;
+        if (!is_array($config)) {
+            $this->error('invalid_config', 400, 'Decision threshold config must be an object.');
+        }
+
+        try {
+            $result = $this->decisionThresholds()->save(
+                $config,
+                $user,
+                trim((string)($body['reason'] ?? ''))
+            );
+            $docs = is_array($result['updated_documents'] ?? null) ? $result['updated_documents'] : [];
+            $this->auditLog('admin_decision_thresholds_save', [
+                'document_count' => count($docs),
+                'approval_role_code' => 'CEO',
+                'finance_role_removed' => 'true',
+            ], (string)($user['username'] ?? 'admin'));
+            $this->success($result);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            if ($e->getMessage() === 'decision_threshold_finance_role_blocked') {
+                $this->error('decision_threshold_finance_role_blocked', 422, 'Finance/FIN is not allowed in decision-threshold authority. CEO is the final authority.');
+            }
+            $this->error('decision_thresholds_save_failed', 500, $e->getMessage());
+        }
     }
 
     /**

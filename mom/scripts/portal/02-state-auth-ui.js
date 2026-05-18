@@ -664,6 +664,7 @@ function moduleAccessAdminTabCatalog(){
     {id:'roles', group:'governance', icon:'🛡', labelEn:'Roles', labelVi:'Vai trò', noteEn:'Role model definition.', noteVi:'Định nghĩa mô hình vai trò.', defaultAccess:'admin'},
     {id:'orgchart', group:'identity', icon:'🏗', labelEn:'Org chart', labelVi:'Sơ đồ tổ chức', noteEn:'Organisation structure view.', noteVi:'Sơ đồ cấu trúc tổ chức.', defaultAccess:'admin'},
     {id:'perms', group:'governance', icon:'🔐', labelEn:'Permissions', labelVi:'Phân quyền tài liệu', noteEn:'Document and workflow permissions.', noteVi:'Phân quyền tài liệu và workflow.', defaultAccess:'admin'},
+    {id:'decision_thresholds', group:'governance', icon:'⚖', labelEn:'Decision thresholds', labelVi:'Ngưỡng quyết định', noteEn:'CEO-owned decision thresholds that republish RACI authority documents.', noteVi:'Ngưỡng quyết định do CEO sở hữu, tự cập nhật tài liệu RACI liên quan.', defaultAccess:'admin'},
     {id:'module_access', group:'governance', icon:'🧭', labelEn:'Module access', labelVi:'Phân quyền module', noteEn:'Central visibility and access control for portal modules.', noteVi:'Điều khiển tập trung việc hiển thị và truy cập module.', defaultAccess:'admin', locked:true},
     {id:'iam_console', group:'governance', icon:'🛡️', labelEn:'IAM Control Console', labelVi:'Kiểm Soát Vận Hành', noteEn:'Unified IAM hub: activity, sessions, permissions, SoD, retention, audit (NIST 800-53 / ISO 27001 / SOX / 21 CFR Part 11).', noteVi:'Trung tâm IAM: hành vi, phiên đăng nhập, quyền, tách trách nhiệm, lưu trữ, audit (NIST 800-53 / ISO 27001 / SOX / 21 CFR Part 11).', defaultAccess:'admin'},
     {id:'portal_display', group:'content', icon:'🧭', labelEn:'Portal display', labelVi:'Hiển thị portal', noteEn:'Portal file and sidebar display control.', noteVi:'Điều khiển hiển thị file và sidebar portal.', defaultAccess:'admin'},
@@ -8983,6 +8984,7 @@ function renderAdmin(){
   if(adminTab==='roles') renderAdminRoles();
   if(adminTab==='orgchart') renderAdminOrgChart();
   if(adminTab==='activity') renderAdminActivity();
+  if(adminTab==='decision_thresholds') renderAdminDecisionThresholds();
   if(adminTab==='module_access') renderAdminModuleAccess();   // legacy hero + 2 cards
   if(adminTab==='infrastructure') renderAdminInfrastructure();
   if(adminTab==='manual_runtime') renderAdminManualRuntime();
@@ -9036,6 +9038,28 @@ function renderAdminIamConsole(){
     s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00l-admin-iam-console.js?v=' + (window.APP_VERSION || Date.now());
     s.onload = function(){
       if(typeof window._renderAdminIamConsole === 'function') window._renderAdminIamConsole(el);
+    };
+    document.head.appendChild(s);
+  });
+}
+
+/* ── Admin: Decision Thresholds (RACI authority source) ─────────────────── */
+function renderAdminDecisionThresholds(){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+  if(typeof window._renderAdminDecisionThresholds === 'function'){
+    window._renderAdminDecisionThresholds(el, lang);
+    return;
+  }
+  el.innerHTML = '<div class="hm-empty">'+(lang==='en'?'Loading decision thresholds...':'Đang tải ngưỡng quyết định...')+'</div>';
+  ensureAdminShared(function(){
+    var existing = document.getElementById('admin-decision-thresholds-script');
+    if(existing){ existing.remove(); }
+    var s = document.createElement('script');
+    s.id  = 'admin-decision-thresholds-script';
+    s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00m-admin-decision-thresholds.js?v=' + (window.APP_VERSION || Date.now());
+    s.onload = function(){
+      if(typeof window._renderAdminDecisionThresholds === 'function') window._renderAdminDecisionThresholds(el, lang);
     };
     document.head.appendChild(s);
   });
