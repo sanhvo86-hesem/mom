@@ -17,6 +17,7 @@ final class DecisionThresholdService
         'EST'  => '06-JD-Sales/jd-estimator.html',
         'CS'   => '06-JD-Sales/jd-customer-service.html',
         'BUY'  => '05-JD-Supply-Chain/jd-buyer-purchasing.html',
+        'BUYER' => '05-JD-Supply-Chain/jd-buyer-purchasing.html',
         'SCM'  => '05-JD-Supply-Chain/jd-supply-chain-manager.html',
         'SL'   => '02-JD-Production/jd-shift-leader.html',
         'WKM'  => '02-JD-Production/jd-cnc-workshop-manager.html',
@@ -809,13 +810,17 @@ final class DecisionThresholdService
     {
         $rows = [];
         foreach ($this->items($config) as $item) {
-            $rows[] = '<tr><td>' . $this->e($item['label']) . '</td><td>' . $this->thresholdLookupLines($item, 'system') . '</td><td>' . $this->cdrLinks($item['cdrs'], 'system') . '</td></tr>';
+            $rows[] = '<tr class="authority-decision-row">'
+                . '<td class="decision-subject-cell">' . $this->decisionSubjectBlock($item, 'system') . '</td>'
+                . '<td class="threshold-cell">' . $this->thresholdLookupLines($item, 'system') . '</td>'
+                . '<td class="cdr-cell">' . $this->cdrLinks($item['cdrs'], 'system') . '</td>'
+                . '</tr>';
         }
 
         return '<h3>Tôi cần duyệt cái gì?</h3>' . "\n"
-            . '<div class="table-card"><table class="table">' . "\n"
-            . '<colgroup><col style="width:28%"/><col style="width:48%"/><col style="width:24%"/></colgroup>' . "\n"
-            . '<thead><tr><th>Cần duyệt</th><th>Ngưỡng</th><th>Người ký / CDR</th></tr></thead>' . "\n"
+            . '<div class="table-card authority-lookup-card"><table class="table authority-lookup-table">' . "\n"
+            . '<colgroup><col style="width:27%"/><col style="width:57%"/><col style="width:16%"/></colgroup>' . "\n"
+            . '<thead><tr><th>Loại quyết định</th><th>Luồng ngưỡng / leo thang</th><th>CDR</th></tr></thead>' . "\n"
             . '<tbody>' . "\n"
             . implode("\n", $rows) . "\n"
             . '</tbody>' . "\n"
@@ -825,13 +830,44 @@ final class DecisionThresholdService
     /**
      * @param array<string, mixed> $item
      */
+    private function decisionSubjectBlock(array $item, string $context): string
+    {
+        $html = '<div class="decision-subject">'
+            . '<strong>' . $this->e($item['label']) . '</strong>';
+
+        $decision = $this->normaliseThresholdDisplayLine((string)($item['decision'] ?? ''));
+        if ($decision !== '') {
+            $html .= '<span class="decision-summary">' . $this->linkText($decision, $context) . '</span>';
+        }
+
+        return $html . '</div>';
+    }
+
+    /**
+     * @param array<string, mixed> $item
+     */
     private function thresholdLookupLines(array $item, string $context): string
     {
         $lines = [];
-        foreach (['l1', 'l2', 'l3'] as $field) {
+        foreach ([
+            ['field' => 'l1', 'label' => 'L1', 'class' => 'l1'],
+            ['field' => 'l2', 'label' => 'L2', 'class' => 'l2'],
+            ['field' => 'l3', 'label' => 'L3 / CEO', 'class' => 'l3'],
+        ] as $level) {
+            $field = $level['field'];
             foreach ($this->thresholdTextFragments((string)($item[$field] ?? '')) as $line) {
-                $lines[] = '<div class="threshold-line">' . $this->linkText($line, $context) . '</div>';
+                $lines[] = '<div class="threshold-step threshold-step-' . $level['class'] . '">'
+                    . '<span class="threshold-badge threshold-badge-' . $level['class'] . '">' . $level['label'] . '</span>'
+                    . '<div class="threshold-body">' . $this->linkText($line, $context) . '</div>'
+                    . '</div>';
             }
+        }
+
+        foreach ($this->thresholdTextFragments((string)($item['escalation'] ?? '')) as $line) {
+            $lines[] = '<div class="threshold-step threshold-escalation">'
+                . '<span class="threshold-badge threshold-badge-escalation">LEO THANG</span>'
+                . '<div class="threshold-body">' . $this->linkText($line, $context) . '</div>'
+                . '</div>';
         }
 
         return implode('', $lines);
@@ -866,6 +902,7 @@ final class DecisionThresholdService
         $text = preg_replace('/\s+/u', ' ', $text) ?? $text;
         $text = preg_replace('/^\s*,\s*/u', '', $text) ?? $text;
         $text = preg_replace('/([:;]|->|→)\s*,\s*/u', '$1 ', $text) ?? $text;
+        $text = str_replace('->', '→', $text);
         $text = preg_replace('/\s+([.,;:])/u', '$1', $text) ?? $text;
 
         return trim($text);
