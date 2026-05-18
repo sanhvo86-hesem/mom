@@ -638,7 +638,8 @@ for config_file in \
     "$SITE_DIR/mom/data/config/docs_visibility.json" \
     "$SITE_DIR/mom/data/config/form_control_registry.json" \
     "$SITE_DIR/mom/data/config/portal_display_config.json" \
-    "$SITE_DIR/mom/data/config/design-system-config.json"; do
+    "$SITE_DIR/mom/data/config/design-system-config.json" \
+    "$SITE_DIR/mom/data/config/decision_thresholds.json"; do
     [ -e "$config_file" ] || continue
     chown "$WEB_USER:$WEB_GROUP" "$config_file"
     chmod 664 "$config_file"

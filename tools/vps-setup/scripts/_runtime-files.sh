@@ -48,6 +48,7 @@ RUNTIME_CONFIG_FILES=(
     # ── Portal display / theming ──────────────────────────────────────────
     portal_display_config.json          # admin portal display editor
     design-system-config.json           # GraphicsGovernanceService::saveDesignConfig (admin graphics tab)
+    decision_thresholds.json            # DecisionThresholdService::save — admin authority threshold editor
 
     # ── Data layer / observability ────────────────────────────────────────
     data_collection_settings.json       # DataLayer::saveConfig('data_collection_settings')
@@ -77,7 +78,7 @@ RUNTIME_CONFIG_FILES=(
 
 # Regex (extended) for matching the same set inside git diff paths. Kept in
 # sync with the array above by hand; audit-runtime-files.php verifies parity.
-RUNTIME_CONFIG_REGEX='^mom/data/config/(users|role_permissions|portal_role_docs|module_access_config|user_doc_overrides|docs_custom(\.local)?|docs_visibility|doc_descriptions|folder_descriptions|doc_owner_overrides|doc_review_policy|record_type_expanded|form_control_registry|form_builder_formulas|so_jo_wo_config|portal_display_config|design-system-config|data_collection_settings|epicor_integration_policy|evidence_retention_policy|evidence_review_sla_policy|ai_config|deploy/(program|meetings|champions|readiness|issues|drills|audits|mgmt-reviews))\.json$'
+RUNTIME_CONFIG_REGEX='^mom/data/config/(users|role_permissions|portal_role_docs|module_access_config|user_doc_overrides|docs_custom(\.local)?|docs_visibility|doc_descriptions|folder_descriptions|doc_owner_overrides|doc_review_policy|record_type_expanded|form_control_registry|form_builder_formulas|so_jo_wo_config|portal_display_config|design-system-config|decision_thresholds|data_collection_settings|epicor_integration_policy|evidence_retention_policy|evidence_review_sla_policy|ai_config|deploy/(program|meetings|champions|readiness|issues|drills|audits|mgmt-reviews))\.json$'
 
 # ── Portal-managed HTML document files ─────────────────────────────────────
 # These files live under mom/docs/ AND are written at runtime by the portal
