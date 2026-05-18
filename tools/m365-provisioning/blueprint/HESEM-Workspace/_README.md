@@ -1,31 +1,31 @@
-# HESEM-Workspace — Unified main transactional site
+# HESEM-Workspace — Main transactional site
 
-All customer-related transactional evidence + cross-customer shared internal data.
-Industry-standard model for international contract CNC manufacturer.
+12 top-level libraries (Part-Master is PEER with Job-Dossier — PLM industry pattern):
 
-## Top-level structure
-- **Customers/{CustomerCode}/** — Per-customer workspace (Account, Parts, POs, Jobs, Multi-Job-Evidence)
-- **Suppliers/{SupplierCode}/** — Per-supplier accounts (qualification, APSL, audit, CMRT)
-- **Assets/** — Machines, Gages (cal cert canonical), Tools, Fixtures
-- **Parts-HESEM-Owned/{PartNo}/{Rev}/** — Commodity parts (HESEM-owned drawings)
-- **Lot-Trace/** — Heat-lot → process-lot → finished-lot chain
-- **Quality/** — Internal-Audit, Management-Review, Risk, FOD, Counterfeit (cross-customer)
-- **Compliance/** — CMRT, UFLPA, ESG, REACH, Banned-Sub, Trade-Secret-Index, IP
-- **Training/** — Cert-Master, Skills-Matrix, Customer-Approved-Operators
-- **Reports/** — Company-wide reporting
+1. **Part-Master/** — Engineering vault (Customer/PartNo/Rev keyed, 3-state lifecycle)
+2. **Job-Dossier/** — Execution evidence (Customer/Year/JobNum keyed, 16-gate workflow)
+3. **Customer-Account/** — Relationship master per Customer
+4. **PO-Index/** — Transactional PO documents + RFQ-Quote authoring
+5. **Supplier-Master/** — Per-supplier records
+6. **Asset-Master/** — Machines, Gages, Tools, Fixtures, Lines (v8 NEW)
+7. **Lot-Trace/** — Heat-lot → process-lot → finished-lot chain
+8. **Quality/** — CAPA-Master, 8D-SCAR, Heat-Lot-Investigation, Audit-Findings,
+                  Incident-Investigation (v8 NEW), Internal-Audits, MR, Risk
+9. **Compliance/** — CMRT, UFLPA, ESG roll-up, IP filings
+10. **Training/** — Cert-Master, Skills-Matrix, Customer-Approved-Operators
+11. **Reports/** — Company-wide reporting
+12. **Workflow-Lists/** (SharePoint Lists, NOT folders — see _README in folder)
 
-## Permission model
-- Default site permission: all HESEM employees (Read)
-- Customers/{Code}/ → SG-Cust-{Code}-Members (Edit per role) + IB at folder level
-- Suppliers/ → SG-DEP-SCM + SG-QA-SQE
-- Assets/Gages/ → SG-DEP-METRO (write), all others (read)
-- HR-Training-related → SG-HR-Training-Coord (write)
-- Compliance roll-ups → SG-DEP-EHS-ESG (write)
+## Universal lifecycle patterns
 
-## SSOT rule
-MOM is SSOT for: Manual/Policy/SOP/WI/RACI/ANNEX/Training curriculum/JDs/Form templates.
-M365 stores transactional evidence ONLY. Cross-link MOM URL when needed (no copy).
+- **3-state** (default authoring): 1-Working → 2-In-Review → 3-Released
+- **4-state contract**: 1-Working → 2-In-Review → 3-Pending-Signature → 4-Executed
+- **4-state customer-outbound**: 1-Working → 2-In-Review → 3-Submitted-to-Customer → 4-Customer-Approved
+- **2-state Intake**: _Intake/{Operator}-{Timestamp} → formal-ID/ (NCR + Incident)
+- **Single-pass**: Released only (external receive, no authoring)
 
-## Adding a new customer
-Just create folder `Customers/{NewCode}/` and run provisioning script (no new site).
-Permission group `SG-Cust-{NewCode}-Members` provisioned by IAM workflow.
+## SSOT rules
+- Each file canonical at exactly 1 path
+- MOM = SSOT for Manual/Policy/SOP/WI/RACI/ANNEX/Training-curriculum/JD/Form-templates
+- M365 = transactional evidence only
+- Job-Dossier/01-Engineering-Release contains modern-link references to Part-Master/Released — NO copy
