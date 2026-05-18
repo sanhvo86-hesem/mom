@@ -104,11 +104,11 @@ fi
 
 # ── Working dir layout ─────────────────────────────────────────────────────
 # working/
-#   files/config/*.json    ← editable local copy
-#   manifest.json          ← baseline = state of VPS at last successful sync
-#   .history/<ts>/         ← per-sync VPS snapshot manifests
-#   .sync-state.jsonl      ← append-only log of every sync decision
-#   .sync.lock             ← flock target (single sync at a time per host)
+#   files/config/**/*.json ← editable local runtime copy
+#   manifest.json         ← baseline = state of VPS at last successful sync
+#   .history/<ts>/        ← per-sync VPS snapshot manifests
+#   .sync-state.jsonl     ← append-only log of every sync decision
+#   .sync.lock            ← flock target (single sync at a time per host)
 mkdir -p "$WORKING_DIR/files/$SUBSET" "$WORKING_DIR/.history"
 
 # Single-sync-at-a-time guard. flock(1) is preferred (atomic, kernel-backed)
@@ -356,6 +356,7 @@ if [[ "$PULL_AT_END" == "1" && "${#PULL_FILES[@]}" -gt 0 ]]; then
     for f in "${PULL_FILES[@]}"; do
         src="$SCRATCH/files/$f"
         dest="$WORKING_DIR/files/$SUBSET/$f"
+        mkdir -p "$(dirname "$dest")"
         if [[ ! -f "$src" ]]; then
             warn "  $f: VPS scratch missing — file deleted on VPS? Removing local copy."
             rm -f "$dest"
@@ -406,6 +407,7 @@ if [[ "$PUSH_AT_END" == "1" && "${#PUSH_FILES[@]}" -gt 0 ]]; then
             warn "  $f: local missing — would delete on VPS. Skipping (use data-push.sh manually to delete)."
             continue
         fi
+        mkdir -p "$(dirname "$dest")"
         cp -p "$src" "$dest"
     done
 
