@@ -668,6 +668,25 @@
     return item ? (lang() === 'en' ? item.en : item.vi) : '';
   }
 
+  function isPrimaryAssignment(e){
+    if (!e) return false;
+    if (e.is_primary === true || e.is_primary === 't' || e.is_primary === 'true' || e.is_primary === 1) return true;
+    return String(e.assignment_type || '') === 'primary';
+  }
+
+  function assignmentPrimaryBadgeHtml(e){
+    var primary = isPrimaryAssignment(e);
+    var label = primary
+      ? (lang() === 'en' ? 'Primary' : 'Chính')
+      : (lang() === 'en' ? 'Concurrent' : 'Kiêm nhiệm');
+    var icon = primary ? '🎯' : '➕';
+    var tip = primary
+      ? (lang() === 'en' ? 'Primary appointment — shown as this employee’s main title' : 'Bổ nhiệm chính — chức danh hiển thị trên sơ đồ tổ chức')
+      : (lang() === 'en' ? 'Concurrent appointment — secondary to the employee’s primary title' : 'Bổ nhiệm kiêm nhiệm — chức danh phụ bên cạnh chức danh chính');
+    var cls = primary ? 'is-active' : 'is-warn';
+    return '<span class="org-assignee-status '+cls+'" title="'+esc(tip)+'">'+icon+' '+esc(label)+'</span>';
+  }
+
   function employeeInitials(name){
     var words = String(name || '').trim().split(/\s+/).filter(Boolean);
     if (!words.length) return '?';
@@ -757,8 +776,30 @@
 
   function positionAssigneeLabel(employees){
     var active = activeEmployees(employees);
-    if (active.length === 1) return employeeDisplayName(active[0]);
-    if (active.length > 1) return active.length + ' ' + (lang() === 'en' ? 'people assigned' : 'người được bổ nhiệm');
+    if (active.length === 1){
+      var name = employeeDisplayName(active[0]);
+      // Surface concurrent appointments on the card meta so a single-person
+      // position card does not look identical when filled by a primary vs. by
+      // a kiêm-nhiệm holder. The detail modal still shows the full primary
+      // count separately.
+      if (!isPrimaryAssignment(active[0])){
+        return name + ' (' + (lang() === 'en' ? 'concurrent' : 'kiêm nhiệm') + ')';
+      }
+      return name;
+    }
+    if (active.length > 1){
+      var primaryCount = active.filter(isPrimaryAssignment).length;
+      var concurrentCount = active.length - primaryCount;
+      if (concurrentCount > 0 && primaryCount > 0){
+        return (lang() === 'en'
+          ? primaryCount + ' primary · ' + concurrentCount + ' concurrent'
+          : primaryCount + ' chính · ' + concurrentCount + ' kiêm');
+      }
+      if (concurrentCount > 0 && primaryCount === 0){
+        return concurrentCount + ' ' + (lang() === 'en' ? 'concurrent' : 'kiêm nhiệm');
+      }
+      return active.length + ' ' + (lang() === 'en' ? 'people assigned' : 'người được bổ nhiệm');
+    }
     if ((employees || []).length > 0) return lang() === 'en' ? 'No active assignee' : 'Chưa có người đang làm';
     return lang() === 'en' ? 'Unassigned' : 'Chưa bổ nhiệm';
   }
@@ -1315,6 +1356,7 @@
            +   '<span class="org-assignee-main">'
            +     '<span class="org-assignee-name">'+esc(name)+'</span>'
            +   '</span>'
+           +   assignmentPrimaryBadgeHtml(e)
            +   '<span class="org-assignee-status '+employeeStatusClass(status)+'">'+esc(statusLabel(status))+'</span>'
            +   '<button class="org-btn is-danger" data-act="remove-assignee" data-pos-id="'+esc(p.hcm_position_id)+'" data-assignment-id="'+esc(e.hcm_assignment_id||'')+'" data-employee-id="'+esc(employeeIdentity(e))+'">'+esc(t('Remove','Xóa'))+'</button>'
            + '</div>';
@@ -1383,6 +1425,7 @@
            +   '<span class="org-assignee-main">'
            +     '<span class="org-assignee-name">'+esc(name)+'</span>'
            +   '</span>'
+           +   assignmentPrimaryBadgeHtml(e)
            +   '<span class="org-assignee-status '+employeeStatusClass(status)+'">'+esc(statusLabel(status))+'</span>'
            +   '<button class="org-btn is-danger" data-act="remove-assignee" data-pos-id="'+esc(p.hcm_position_id)+'" data-assignment-id="'+esc(e.hcm_assignment_id||'')+'" data-employee-id="'+esc(employeeIdentity(e))+'">'+esc(t('Remove','Xóa'))+'</button>'
            + '</div>';
