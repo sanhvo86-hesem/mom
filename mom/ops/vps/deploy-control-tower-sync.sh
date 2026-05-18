@@ -26,20 +26,13 @@ APP_DATA_OWNER_GROUP="${APP_DATA_OWNER_GROUP:-}"
 REMOTE_SUDO="${REMOTE_SUDO:-}"
 DOMAIN="${DOMAIN:-}"
 
-RUNTIME_CONFIG_EXCLUDES=(
-  mom/data/config/users.json
-  mom/data/config/role_permissions.json
-  mom/data/config/portal_role_docs.json
-  mom/data/config/module_access_config.json
-  mom/data/config/user_doc_overrides.json
-  mom/data/config/docs_custom.json
-  mom/data/config/docs_custom.local.json
-  mom/data/config/docs_visibility.json
-  mom/data/config/doc_descriptions.json
-  mom/data/config/folder_descriptions.json
-  mom/data/config/form_control_registry.json
-  mom/data/config/portal_display_config.json
-)
+# shellcheck source=../../../tools/vps-setup/scripts/_runtime-files.sh
+source "${REPO_ROOT}/tools/vps-setup/scripts/_runtime-files.sh"
+
+RUNTIME_CONFIG_EXCLUDES=()
+for runtime_config_file in "${RUNTIME_CONFIG_FILES[@]}"; do
+  RUNTIME_CONFIG_EXCLUDES+=("mom/data/config/${runtime_config_file}")
+done
 
 require_cmd() {
   if ! command -v "$1" >/dev/null 2>&1; then

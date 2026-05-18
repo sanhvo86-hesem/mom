@@ -207,7 +207,7 @@ final class DecisionThresholdService
                 'decision' => 'Phê duyệt yêu cầu thay đổi của khách hàng ảnh hưởng giá / lịch / phạm vi',
                 'condition' => 'CCR làm đổi giá, lịch, phạm vi, yêu cầu kỹ thuật hoặc cổng G0 đến G7',
                 'l1' => 'CS + PPL xử lý CCR tác động ≤ 1 ngày giao hoặc 2% giá trị.',
-                'l2' => 'ENGM + QA rà soát CCR tác động ≤ 3 ngày giao hoặc 3% giá trị.',
+                'l2' => 'ENGM + QA + PD rà soát CCR tác động ≤ 3 ngày giao hoặc 5% giá trị.',
                 'l3' => 'CEO phê duyệt CCR vượt ngưỡng L2, vào G5-G7 hoặc ảnh hưởng cam kết khách.',
                 'r' => 'CS',
                 'evidence' => 'FRM-212 · SOP-201',

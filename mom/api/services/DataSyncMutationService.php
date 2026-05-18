@@ -48,6 +48,8 @@ final class DataSyncMutationService
         'form_builder_formulas.json',
         'so_jo_wo_config.json',
         'portal_display_config.json',
+        'design-system-config.json',
+        'decision_thresholds.json',
         'data_collection_settings.json',
         'epicor_integration_policy.json',
         'evidence_retention_policy.json',

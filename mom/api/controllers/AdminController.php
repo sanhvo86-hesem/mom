@@ -857,11 +857,14 @@ class AdminController extends BaseController
                 $user,
                 trim((string)($body['reason'] ?? ''))
             );
+            $mirrorSync = $this->syncDecisionThresholdMirror($user);
+            $result['mirror_sync'] = $mirrorSync;
             $docs = is_array($result['updated_documents'] ?? null) ? $result['updated_documents'] : [];
             $this->auditLog('admin_decision_thresholds_save', [
                 'document_count' => count($docs),
                 'approval_role_code' => 'CEO',
                 'finance_role_removed' => 'true',
+                'mirror_sync_status' => (string)($mirrorSync['status'] ?? 'unknown'),
             ], (string)($user['username'] ?? 'admin'));
             $this->success($result);
         } catch (Throwable $e) {
@@ -870,6 +873,35 @@ class AdminController extends BaseController
                 $this->error('decision_threshold_finance_role_blocked', 422, 'Finance/FIN is not allowed in decision-threshold authority. CEO is the final authority.');
             }
             $this->error('decision_thresholds_save_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * Keep VPS data-private mirror current after the admin threshold editor
+     * republishes runtime-owned RACI authority data.
+     */
+    private function syncDecisionThresholdMirror(array $user): array
+    {
+        try {
+            $actor = (string)($user['username'] ?? 'admin');
+            $result = $this->dataSyncMutator()->resolveMirrorDrift(
+                'decision_thresholds.json',
+                'site_to_mirror',
+                $actor,
+                'admin_decision_thresholds_save'
+            );
+
+            return array_merge(['status' => 'synced'], $result);
+        } catch (Throwable $e) {
+            $this->auditLog('admin_decision_thresholds_mirror_failed', [
+                'file' => 'decision_thresholds.json',
+                'error' => $e->getMessage(),
+            ], (string)($user['username'] ?? 'admin'));
+
+            return [
+                'status' => 'failed',
+                'error' => $e->getMessage(),
+            ];
         }
     }
 
