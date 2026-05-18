@@ -809,12 +809,7 @@ final class DecisionThresholdService
     {
         $rows = [];
         foreach ($this->items($config) as $item) {
-            $thresholds = array_values(array_filter([
-                $this->linkText($item['l1'], 'system'),
-                $this->linkText($item['l2'], 'system'),
-                $this->linkText($item['l3'], 'system'),
-            ]));
-            $rows[] = '<tr><td>' . $this->e($item['label']) . '</td><td>' . implode('<br/>', $thresholds) . '</td><td>' . $this->cdrLinks($item['cdrs'], 'system') . '</td></tr>';
+            $rows[] = '<tr><td>' . $this->e($item['label']) . '</td><td>' . $this->thresholdLookupLines($item, 'system') . '</td><td>' . $this->cdrLinks($item['cdrs'], 'system') . '</td></tr>';
         }
 
         return '<h3>Tôi cần duyệt cái gì?</h3>' . "\n"
@@ -825,6 +820,55 @@ final class DecisionThresholdService
             . implode("\n", $rows) . "\n"
             . '</tbody>' . "\n"
             . '</table></div>';
+    }
+
+    /**
+     * @param array<string, mixed> $item
+     */
+    private function thresholdLookupLines(array $item, string $context): string
+    {
+        $lines = [];
+        foreach (['l1', 'l2', 'l3'] as $field) {
+            foreach ($this->thresholdTextFragments((string)($item[$field] ?? '')) as $line) {
+                $lines[] = '<div class="threshold-line">' . $this->linkText($line, $context) . '</div>';
+            }
+        }
+
+        return implode('', $lines);
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function thresholdTextFragments(string $text): array
+    {
+        $text = trim($text);
+        if ($text === '') {
+            return [];
+        }
+
+        $text = preg_replace('/(?<=[\p{L}\p{N}.])(?=[<>≤≥]\s*)/u', "\n", $text) ?? $text;
+        $parts = preg_split('/\R/u', $text) ?: [$text];
+        $lines = [];
+        foreach ($parts as $part) {
+            $line = $this->normaliseThresholdDisplayLine($part);
+            if ($line !== '') {
+                $lines[] = $line;
+            }
+        }
+
+        return $lines;
+    }
+
+    private function normaliseThresholdDisplayLine(string $text): string
+    {
+        $text = trim($text);
+        $text = preg_replace('/\s+/u', ' ', $text) ?? $text;
+        $text = preg_replace('/^\s*,\s*/u', '', $text) ?? $text;
+        $text = preg_replace('/([:;]|->|→)\s*,\s*/u', '$1 ', $text) ?? $text;
+        $text = preg_replace('/\s+([.,;:])/u', '$1', $text) ?? $text;
+
+        return trim($text);
     }
 
     private function raciGateQuickTableBlock(): string
