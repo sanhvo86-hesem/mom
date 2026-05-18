@@ -282,15 +282,15 @@ function _render(){
     .dt-level-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
     .dt-level-panel{border:1px solid var(--border);border-left-width:4px;border-radius:8px;background:var(--surface-2);padding:10px;display:flex;flex-direction:column;gap:8px;min-width:0}
     .dt-level-panel.l1{border-left-color:var(--accent)}
-    .dt-level-panel.l2{border-left-color:var(--success)}
-    .dt-level-panel.l3{border-left-color:var(--warning)}
+    .dt-level-panel.l2{border-left-color:var(--success,var(--green,var(--accent)))}
+    .dt-level-panel.l3{border-left-color:var(--warning,var(--gold,var(--accent)))}
     .dt-level-head{display:flex;align-items:flex-start;gap:8px;min-height:34px}
     .dt-level-badge{display:inline-flex;align-items:center;justify-content:center;min-width:42px;border:1px solid var(--border);border-radius:6px;background:var(--surface);padding:4px 7px;font-weight:900;color:var(--text-1)}
     .dt-level-head strong{display:block;font-size:12px;line-height:1.25}
     .dt-level-head span{display:block;color:var(--text-2);font-size:11px;line-height:1.35;margin-top:2px}
     .dt-level-panel .dt-textarea{min-height:112px;background:var(--surface)}
-    .dt-escalation-panel{border:1px solid var(--danger);border-left:4px solid var(--danger);border-radius:8px;background:var(--surface-2);padding:10px;display:flex;flex-direction:column;gap:8px}
-    .dt-escalation-panel label{color:var(--danger)}
+    .dt-escalation-panel{border:1px solid var(--danger,var(--red,var(--accent)));border-left:4px solid var(--danger,var(--red,var(--accent)));border-radius:8px;background:var(--surface-2);padding:10px;display:flex;flex-direction:column;gap:8px}
+    .dt-escalation-panel label{color:var(--danger,var(--red,var(--accent)))}
     .dt-escalation-panel .dt-textarea{min-height:68px;background:var(--surface)}
     .dt-split{display:grid;grid-template-columns:1fr 1fr;gap:8px}
     @media (max-width:1250px){.dt-workbench{grid-template-columns:1fr}.dt-sidebar{position:static;max-height:none}.dt-group-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.dt-level-grid,.dt-context-grid,.dt-meta-grid{grid-template-columns:1fr}.dt-head{flex-direction:column}.dt-actions{justify-content:flex-start}.dt-split{grid-template-columns:1fr}}
