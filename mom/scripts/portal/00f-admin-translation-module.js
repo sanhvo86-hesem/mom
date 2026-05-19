@@ -1771,13 +1771,23 @@ function renderBulkProgress(status) {
   const done = !!status.done;
   const running = !!status.running;
 
+  // The supervisor needs a brief moment after spawn to overwrite the
+  // controller-written status row (pid=0) with its own pid. Treat a fresh
+  // not-yet-claimed status (pid=0 + no docs processed yet + started recently)
+  // as "Starting…" instead of the alarming "Stopped" warning.
+  const startedAtMs = status.started_at ? Date.parse(status.started_at) : 0;
+  const ageSec = startedAtMs > 0 ? (Date.now() - startedAtMs) / 1000 : 0;
+  const isStarting = !done && !running && processed === 0 && ageSec < 15;
+
   const statusLabel = done
     ? (errors > 0
         ? `<span style="color:var(--danger,#c00);">${_t('Hoàn tất với lỗi', 'Finished with errors')}: ${errors}</span>`
         : `<span style="color:var(--success,#0a7e3a);">${_t('Đã hoàn tất', 'Finished')}</span>`)
     : running
       ? `<span style="color:var(--brand-primary,#0c63e7);">${_t('Đang chạy', 'Running')} · pid ${escapeHtml(String(status.pid || '?'))}</span>`
-      : `<span style="color:var(--warn,#e0a000);">${_t('Đã dừng (supervisor chết?)', 'Stopped (supervisor died?)')}</span>`;
+      : isStarting
+        ? `<span style="color:var(--brand-primary,#0c63e7);">${_t('Đang khởi động supervisor…', 'Starting supervisor…')}</span>`
+        : `<span style="color:var(--warn,#e0a000);">${_t('Đã dừng (supervisor chết?)', 'Stopped (supervisor died?)')}</span>`;
 
   const lastDoc = status.last_doc ? `<code style="background:var(--bg,#fff);padding:1px 5px;border-radius:3px;">${escapeHtml(status.last_doc)}</code>` : '—';
 
@@ -2354,14 +2364,19 @@ function bulkRetranslateStart() {
 }
 
 function pollBulkStatusOnce(opts) {
+  const prev = STATE.bulkStatus;
+  const prevWasActive = !!(prev && prev.has_run && !prev.done);
   return api('GET', '/api/v1/dcc/admin/translation/bulk/status')
     .then(d => {
       STATE.bulkStatus = d;
+      // Refresh the documents list when we observe a running→done transition
+      // (so per-row engine_version + translation_state catch up). Also reload
+      // when we land on a freshly-finished run that we had not previously
+      // observed (e.g., admin just kicked off a tiny bulk that completed
+      // before the first poll fired).
+      const justFinished = d && d.done === true && d.has_run && (prevWasActive || !prev);
       if (STATE.activeTab === 'documents') {
-        // Re-render so the bulk bar + progress reflect the latest status.
-        // Also refresh the documents list when a run just finished so per-row
-        // engine_version/state catches up.
-        if (d && d.running === false && d.done === true && STATE.bulkPollHandle) {
+        if (justFinished) {
           STATE.documents = null;
           loadDocuments();
         } else {
