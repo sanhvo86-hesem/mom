@@ -221,13 +221,41 @@ final class TranslationReviewer
             'DCC_REVIEWER_MODEL' => $model,
             'DCC_REVIEWER_TIMEOUT' => (string)self::DEFAULT_TIMEOUT_SECONDS,
         ];
-        $cliAuthHome = getenv('DCC_CLI_AUTH_HOME');
-        if (is_string($cliAuthHome) && $cliAuthHome !== '') {
-            $envOverlay['DCC_CLI_AUTH_HOME'] = $cliAuthHome;
+        // The claude CLI lives under the operator's home (not www-data's),
+        // and the binary path is operator-specific (/usr/local/bin/claude on
+        // VPS, /opt/homebrew/bin/claude on dev Macs). PHP-FPM env doesn't
+        // carry these — they live in translation_credentials. Mirror the
+        // resolution that TranslationAdminController::runSingleTest does for
+        // the translator side so the reviewer can find its CLI.
+        try {
+            $credRows = $this->data->query(
+                "SELECT cli_binary_path, cli_auth_home_path
+                   FROM translation_credentials
+                  WHERE provider_key = :p1 LIMIT 1",
+                [':p1' => $provider]
+            );
+            if (is_array($credRows) && isset($credRows[0])) {
+                $bin = trim((string)($credRows[0]['cli_binary_path'] ?? ''));
+                $home = trim((string)($credRows[0]['cli_auth_home_path'] ?? ''));
+                if ($bin !== '') {
+                    $envOverlay['DCC_CLI_BINARY'] = $bin;
+                }
+                if ($home !== '') {
+                    $envOverlay['DCC_CLI_AUTH_HOME'] = $home;
+                    $envOverlay['HOME'] = $home;
+                }
+            }
+        } catch (Throwable $e) {
+            error_log('TranslationReviewer: credential lookup failed: ' . $e->getMessage());
         }
-        $cliBinary = getenv('DCC_CLI_BINARY');
-        if (is_string($cliBinary) && $cliBinary !== '') {
-            $envOverlay['DCC_CLI_BINARY'] = $cliBinary;
+        // Fallback to env (dev workstation) if DB row is empty.
+        $envCliBinary = getenv('DCC_CLI_BINARY');
+        if (empty($envOverlay['DCC_CLI_BINARY']) && is_string($envCliBinary) && $envCliBinary !== '') {
+            $envOverlay['DCC_CLI_BINARY'] = $envCliBinary;
+        }
+        $envAuthHome = getenv('DCC_CLI_AUTH_HOME');
+        if (empty($envOverlay['DCC_CLI_AUTH_HOME']) && is_string($envAuthHome) && $envAuthHome !== '') {
+            $envOverlay['DCC_CLI_AUTH_HOME'] = $envAuthHome;
         }
 
         $env = $_ENV !== [] ? $_ENV : (getenv() ?: []);
@@ -263,7 +291,14 @@ final class TranslationReviewer
         $exit = proc_close($proc);
 
         if ($exit !== 0) {
-            return ['ok' => false, 'error' => 'reviewer_exit_' . $exit . ':' . substr((string)$stderr, 0, 400)];
+            // Reviewer writes its JSON {ok:false, error:...} to stdout (per
+            // the bash exit code convention in dcc_locale_reviewer_haiku.py).
+            // Capture both streams so the admin can see what actually broke.
+            $errDetail = trim((string)$stderr);
+            if ($errDetail === '') {
+                $errDetail = trim((string)$stdout);
+            }
+            return ['ok' => false, 'error' => 'reviewer_exit_' . $exit . ': ' . substr($errDetail, 0, 400)];
         }
         $decoded = json_decode((string)$stdout, true);
         if (!is_array($decoded) || empty($decoded['ok'])) {

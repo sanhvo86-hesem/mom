@@ -1287,44 +1287,43 @@ function toggleAutoTranslate(nextEnabled) {
 }
 
 function renderAutoTranslateToggle() {
+  ensureTxV43Styles();
   const enabled = STATE.autoTranslateEnabled;
   if (enabled === null) {
-    return `<div style="margin-bottom:14px;padding:10px 14px;background:var(--bg-2,#f5f7fb);border-radius:8px;color:var(--text-3);font-size:13px;">
-      ${_t('Đang tải trạng thái dịch tự động...', 'Loading auto-translate state...')}
-    </div>`;
+    return `<div class="tx-auto-banner"><div class="tx-auto-banner__body">
+      <div class="tx-auto-banner__hint">${_t('Đang tải trạng thái dịch tự động…', 'Loading auto-translate state…')}</div>
+    </div></div>`;
   }
   const busy = STATE.autoTranslateBusy;
-  const onTone  = 'background:var(--success-bg,#e6f9ee);border-color:var(--success,#0a7e3a);color:var(--success,#0a7e3a)';
-  const offTone = 'background:var(--warn-bg,#fff8e1);border-color:var(--warn,#e0a000);color:var(--warn,#e0a000)';
-  const tone = enabled ? onTone : offTone;
+  const cls = enabled ? 'tx-auto-banner--on' : 'tx-auto-banner--off';
   const headline = enabled
-    ? _t('🟢 Dịch tự động ĐANG BẬT', '🟢 Auto-translate is ON')
-    : _t('🟡 Dịch tự động ĐANG TẮT', '🟡 Auto-translate is OFF');
+    ? _t('Dịch tự động đang BẬT', 'Auto-translate is ON')
+    : _t('Dịch tự động đang TẮT', 'Auto-translate is OFF');
   const explainOn = _t(
-    'Mỗi khi tài liệu được tạo/lưu/duyệt, hệ thống tự động chạy translator + reviewer. Tiêu thụ token AI và thời gian tính toán.',
-    'On every document create / save / submit / approve, the system auto-runs translator + reviewer. Consumes AI tokens and compute time.'
+    'Mỗi khi tài liệu được tạo / lưu / duyệt, hệ thống tự chạy translator và reviewer. Tiêu hao token AI.',
+    'On every document create / save / submit / approve, translator + reviewer run automatically. Consumes AI tokens.'
   );
   const explainOff = _t(
-    'Hệ thống KHÔNG tự dịch khi tài liệu thay đổi. Bạn phải bấm "Dịch lại" thủ công cho từng tài liệu cần dịch. Tiết kiệm token AI.',
-    'The system does NOT auto-translate on document changes. You must click "Retranslate" manually for each document. Saves AI tokens.'
+    'Hệ thống không tự dịch khi tài liệu thay đổi. Phải bấm “Dịch lại” thủ công cho từng tài liệu. Tiết kiệm token AI.',
+    'The system does NOT auto-translate on document changes. Click “Retranslate” per document. Saves AI tokens.'
   );
   const meta = (STATE.autoTranslateUpdatedAt || STATE.autoTranslateUpdatedBy)
-    ? `<div style="font-size:11px;opacity:.75;margin-top:4px;">${_t('Đổi gần nhất', 'Last change')}: ${escapeHtml(STATE.autoTranslateUpdatedAt || '?')}${STATE.autoTranslateUpdatedBy ? ' • ' + escapeHtml(STATE.autoTranslateUpdatedBy) : ''}</div>`
+    ? `<div class="tx-auto-banner__meta">${_t('Đổi gần nhất', 'Last change')}: ${escapeHtml(STATE.autoTranslateUpdatedAt || '?')}${STATE.autoTranslateUpdatedBy ? ' · ' + escapeHtml(STATE.autoTranslateUpdatedBy) : ''}</div>`
     : '';
-
-  // Custom toggle switch — pure inline styles so no CSS file edit required.
   return `
-    <div style="margin-bottom:14px;padding:12px 16px;border:1px solid;border-radius:8px;${tone};display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
-      <div style="flex:1;min-width:280px;">
-        <div style="font-weight:600;">${headline}</div>
-        <div style="font-size:12px;margin-top:2px;opacity:.85;">${enabled ? explainOn : explainOff}</div>
+    <div class="tx-auto-banner ${cls}">
+      <div class="tx-auto-banner__body">
+        <div class="tx-auto-banner__title">
+          <span class="tx-auto-banner__title-dot"></span>${escapeHtml(headline)}
+        </div>
+        <div class="tx-auto-banner__hint">${enabled ? explainOn : explainOff}</div>
         ${meta}
       </div>
-      <button id="tx-auto-toggle" ${busy ? 'disabled' : ''}
-        style="position:relative;width:64px;height:30px;border-radius:30px;border:0;background:${enabled ? 'var(--success,#0a7e3a)' : 'var(--text-3,#999)'};cursor:${busy ? 'wait' : 'pointer'};opacity:${busy ? '.6' : '1'};transition:background .15s;">
-        <span style="position:absolute;top:3px;left:${enabled ? '37' : '3'}px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .15s;"></span>
+      <button id="tx-auto-toggle" class="tx-switch ${enabled ? 'tx-switch--on' : ''}" ${busy ? 'disabled' : ''}
+        aria-label="${escapeHtml(_t('Bật/Tắt dịch tự động', 'Toggle auto-translate'))}">
+        <span class="tx-switch__knob"></span>
       </button>
-      <div style="font-size:12px;font-weight:600;width:34px;text-align:center;">${enabled ? 'ON' : 'OFF'}</div>
+      <div class="tx-switch-label">${enabled ? 'ON' : 'OFF'}</div>
     </div>
   `;
 }
@@ -1341,21 +1340,18 @@ function docStateBadgeStyle(state) {
 
 // Post-translation reviewer (Claude Haiku 4.5) badge. Surfaces the most-recent
 // reviewer outcome cached on dcc_document_locale_variant.last_review_*.
-// Clicking opens a small modal that fetches the full JSON issue list.
-function reviewBadgeStyle(outcome) {
-  const map = {
-    pass:     'background:var(--success-bg,#e6f9ee);color:var(--success,#0a7e3a)',
-    advisory: 'background:var(--warn-bg,#fff8e1);color:var(--warn,#e0a000)',
-    fail:     'background:var(--danger-bg,#fff0f0);color:var(--danger,#c00)',
-    error:    'background:var(--bg-2,#f5f7fb);color:var(--text-3)',
-    skipped:  'background:var(--bg-2,#f5f7fb);color:var(--text-3)',
-  };
-  return map[outcome] || 'background:var(--bg-2,#f5f7fb);color:var(--text-3)';
-}
+// Clicking opens a modal that fetches the full JSON issue list.
 function reviewBadgeIcon(outcome) {
-  return ({ pass: '✓', advisory: '⚠', fail: '✗', error: '?', skipped: '–' })[outcome] || '·';
+  return ({ pass: '✓', advisory: '⚠', fail: '✗', error: '?', skipped: '·' })[outcome] || '·';
+}
+function reviewBadgeVariant(outcome) {
+  if (outcome === 'pass') return 'tx-review-badge--pass';
+  if (outcome === 'advisory') return 'tx-review-badge--advisory';
+  if (outcome === 'fail') return 'tx-review-badge--fail';
+  return 'tx-review-badge--neutral';
 }
 function renderReviewBadge(doc) {
+  ensureTxV43Styles();
   const outcome = doc.last_review_outcome;
   if (!outcome) return '';
   const crit = doc.last_review_issues_critical || 0;
@@ -1370,30 +1366,32 @@ function renderReviewBadge(doc) {
         : (outcome === 'error')
           ? _t('Lỗi reviewer', 'Reviewer error')
           : _t('Bỏ qua', 'Skipped');
-  const tip = _t('Bấm để xem chi tiết bản review (Claude Haiku 4.5)', 'Click for review details (Claude Haiku 4.5)');
-  return `<span class="tx-review-badge" data-review-id="${reviewId || ''}" title="${escapeHtml(tip)}"
-    style="display:inline-block;margin-left:6px;padding:3px 7px;border-radius:4px;font-size:10px;white-space:nowrap;cursor:${reviewId ? 'pointer' : 'default'};${reviewBadgeStyle(outcome)}">
-    ${reviewBadgeIcon(outcome)} ${escapeHtml(summary)}
+  const tip = _t('Bấm để xem chi tiết review (Claude Haiku 4.5)', 'Click for review details (Claude Haiku 4.5)');
+  const clickable = reviewId ? 'tx-review-badge--clickable' : '';
+  return `<span class="tx-review-badge ${reviewBadgeVariant(outcome)} ${clickable}"
+    data-review-id="${reviewId || ''}" title="${escapeHtml(tip)}">
+    <span aria-hidden="true">${reviewBadgeIcon(outcome)}</span> ${escapeHtml(summary)}
   </span>`;
 }
 function openReviewModal(reviewId) {
   if (!reviewId) return;
-  // Lightweight inline modal — no CSS file edit.
+  ensureTxV43Styles();
   const overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  overlay.className = 'tx-modal-overlay';
   overlay.innerHTML = `
-    <div style="background:var(--bg,#fff);border-radius:8px;max-width:800px;width:90vw;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.3);">
-      <div style="padding:14px 18px;border-bottom:1px solid var(--ln,#ddd);display:flex;justify-content:space-between;align-items:center;">
-        <strong>${_t('Chi tiết Review (Claude Haiku)', 'Review Detail (Claude Haiku)')}</strong>
-        <button class="tx-review-close" style="border:0;background:transparent;font-size:22px;cursor:pointer;line-height:1;">×</button>
+    <div class="tx-modal-panel">
+      <div class="tx-modal-head">
+        <strong>${escapeHtml(_t('Chi tiết review (Claude Haiku)', 'Review detail (Claude Haiku)'))}</strong>
+        <button class="tx-modal-close" aria-label="${escapeHtml(_t('Đóng', 'Close'))}">×</button>
       </div>
-      <div class="tx-review-body" style="padding:14px 18px;overflow:auto;font-size:13px;">
-        <i style="color:var(--text-3);">${_t('Đang tải...', 'Loading...')}</i>
+      <div class="tx-modal-body">
+        <i style="color:var(--text-3,#8a93a3);">${escapeHtml(_t('Đang tải…', 'Loading…'))}</i>
       </div>
     </div>`;
   document.body.appendChild(overlay);
-  overlay.querySelector('.tx-review-close').addEventListener('click', () => overlay.remove());
-  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  const close = () => overlay.remove();
+  overlay.querySelector('.tx-modal-close').addEventListener('click', close);
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
 
   api('GET', '/api/v1/dcc/admin/translation/reviews/' + encodeURIComponent(reviewId))
     .then(d => {
@@ -1401,41 +1399,45 @@ function openReviewModal(reviewId) {
       let issues = r.issues_jsonb;
       if (typeof issues === 'string') { try { issues = JSON.parse(issues); } catch (_) { issues = []; } }
       if (!Array.isArray(issues)) issues = [];
-      const body = overlay.querySelector('.tx-review-body');
+      const body = overlay.querySelector('.tx-modal-body');
+      const outcomeBadge = `<span class="tx-review-badge ${reviewBadgeVariant(r.outcome)}">${escapeHtml(r.outcome || '—')}</span>`;
       const head = `
-        <div style="margin-bottom:12px;">
-          <div><strong>${_t('Doc', 'Doc')}:</strong> <code>${escapeHtml(r.doc_code || '—')}</code>
-            &nbsp;·&nbsp; <strong>${_t('Outcome', 'Outcome')}:</strong>
-            <span style="padding:2px 8px;border-radius:4px;${reviewBadgeStyle(r.outcome)}">${escapeHtml(r.outcome || '—')}</span>
-            &nbsp;·&nbsp; <strong>${_t('Critical', 'Critical')}:</strong> ${r.issues_critical || 0}
-            &nbsp;·&nbsp; <strong>${_t('Advisory', 'Advisory')}:</strong> ${r.issues_advisory || 0}
+        <div class="tx-review-summary">
+          <div class="tx-review-summary__row">
+            <span><b>${escapeHtml(_t('Tài liệu', 'Doc'))}:</b> <code>${escapeHtml(r.doc_code || '—')}</code></span>
+            <span><b>${escapeHtml(_t('Kết quả', 'Outcome'))}:</b> ${outcomeBadge}</span>
+            <span><b>${escapeHtml(_t('Nghiêm trọng', 'Critical'))}:</b> ${r.issues_critical || 0}</span>
+            <span><b>${escapeHtml(_t('Khuyến nghị', 'Advisory'))}:</b> ${r.issues_advisory || 0}</span>
           </div>
-          <div style="margin-top:6px;color:var(--text-2);">${escapeHtml(r.summary || '')}</div>
-          <div style="margin-top:6px;font-size:11px;color:var(--text-3);">
-            ${_t('Model', 'Model')}: <code>${escapeHtml(r.reviewer_model || '—')}</code>
-            &nbsp;·&nbsp; ${_t('Đã rà soát', 'Reviewed')}: ${r.paragraphs_reviewed || 0} ${_t('đoạn', 'paragraphs')}
-            &nbsp;·&nbsp; ${escapeHtml(r.created_at || '')}
+          ${r.summary ? `<div class="tx-review-summary__text">${escapeHtml(r.summary)}</div>` : ''}
+          <div class="tx-review-summary__row" style="margin-top:6px;font-size:11px;color:var(--text-3,#8a93a3);">
+            <span>${escapeHtml(_t('Mô hình', 'Model'))}: <code>${escapeHtml(r.reviewer_model || '—')}</code></span>
+            <span>${escapeHtml(_t('Số đoạn rà soát', 'Paragraphs reviewed'))}: ${r.paragraphs_reviewed || 0}</span>
+            <span>${escapeHtml(r.created_at || '')}</span>
           </div>
         </div>`;
       const list = issues.length === 0
-        ? `<div style="color:var(--text-3);padding:14px;text-align:center;">${_t('Không có vấn đề.', 'No issues.')}</div>`
-        : issues.map(i => `
-            <div style="border:1px solid var(--ln-2,#eee);border-radius:6px;padding:10px 12px;margin-bottom:8px;background:${i.severity === 'critical' ? 'var(--danger-bg,#fff5f5)' : 'var(--warn-bg,#fffbee)'};">
-              <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;">
-                <code style="font-size:11px;background:var(--bg-2,#f5f7fb);padding:1px 5px;border-radius:3px;">${escapeHtml(i.segment || '—')}</code>
-                <span style="font-size:10px;padding:1px 6px;border-radius:3px;${i.severity === 'critical' ? 'background:var(--danger,#c00);color:#fff' : 'background:var(--warn,#e0a000);color:#fff'}">${escapeHtml(i.severity || '—')}</span>
-                <span style="font-size:11px;color:var(--text-3);">${escapeHtml(i.category || '—')}</span>
-              </div>
-              <div style="font-size:12px;color:var(--text-2);"><strong>VI:</strong> ${escapeHtml(i.vi_excerpt || '')}</div>
-              <div style="font-size:12px;color:var(--text-2);"><strong>EN:</strong> <span style="color:var(--danger,#c00);">${escapeHtml(i.en_excerpt || '')}</span></div>
-              <div style="font-size:12px;margin-top:4px;"><strong>${_t('Lý do', 'Why')}:</strong> ${escapeHtml(i.explanation || '')}</div>
-              <div style="font-size:12px;margin-top:2px;color:var(--success,#0a7e3a);"><strong>${_t('Đề xuất', 'Suggestion')}:</strong> ${escapeHtml(i.suggestion || '')}</div>
-            </div>`).join('');
+        ? `<div style="color:var(--text-3,#8a93a3);padding:16px;text-align:center;font-style:italic;">${escapeHtml(_t('Không có vấn đề.', 'No issues.'))}</div>`
+        : issues.map(i => {
+            const sev = i.severity === 'critical' ? 'critical' : 'advisory';
+            return `
+              <div class="tx-issue tx-issue--${sev}">
+                <div class="tx-issue__head">
+                  <code class="tx-issue__seg">${escapeHtml(i.segment || '—')}</code>
+                  <span class="tx-issue__sev tx-issue__sev--${sev}">${escapeHtml(i.severity || '—')}</span>
+                  <span class="tx-issue__cat">${escapeHtml(i.category || '—')}</span>
+                </div>
+                ${i.vi_excerpt ? `<div class="tx-issue__line"><b>VI</b> ${escapeHtml(i.vi_excerpt)}</div>` : ''}
+                ${i.en_excerpt ? `<div class="tx-issue__line"><b>EN</b> <span class="tx-issue__en-wrong">${escapeHtml(i.en_excerpt)}</span></div>` : ''}
+                ${i.explanation ? `<div class="tx-issue__line"><b>${escapeHtml(_t('Lý do', 'Why'))}</b> ${escapeHtml(i.explanation)}</div>` : ''}
+                ${i.suggestion ? `<div class="tx-issue__line"><b>${escapeHtml(_t('Đề xuất', 'Fix'))}</b> <span class="tx-issue__suggestion">${escapeHtml(i.suggestion)}</span></div>` : ''}
+              </div>`;
+          }).join('');
       body.innerHTML = head + list;
     })
     .catch(err => {
-      const body = overlay.querySelector('.tx-review-body');
-      if (body) body.innerHTML = `<div style="color:var(--danger,#c00);">${_t('Không tải được', 'Load failed')}: ${escapeHtml(String(err && err.message || err))}</div>`;
+      const body = overlay.querySelector('.tx-modal-body');
+      if (body) body.innerHTML = `<div style="color:var(--danger,#c00);padding:14px;">${escapeHtml(_t('Không tải được', 'Load failed'))}: ${escapeHtml(String(err && err.message || err))}</div>`;
     });
 }
 
@@ -1451,6 +1453,125 @@ function ensureTxQueuedStyles() {
     + '.tx-translating-wrap .tx-cancel-btn{display:none}'
     + '.tx-translating-wrap:hover .tx-translating-btn{display:none}'
     + '.tx-translating-wrap:hover .tx-cancel-btn{display:inline-block}';
+  document.head.appendChild(s);
+}
+
+// v4.3 styles for the auto-translate banner, review badge/modal, and learnings
+// tab. Tone matches the rest of the portal admin: neutral surface, subtle
+// accent rules, no gradient/emoji-heavy decoration. Injected once.
+function ensureTxV43Styles() {
+  if (document.getElementById('tx-v43-styles')) return;
+  const s = document.createElement('style');
+  s.id = 'tx-v43-styles';
+  s.textContent = `
+    /* ── Auto-translate banner ───────────────────────────────────────── */
+    .tx-auto-banner{display:flex;gap:16px;align-items:center;
+      padding:14px 18px;margin-bottom:16px;
+      border:1px solid var(--ln,#e3e6ec);border-left-width:4px;border-radius:8px;
+      background:var(--bg,#fff);}
+    .tx-auto-banner--on{border-left-color:var(--success,#0a7e3a);}
+    .tx-auto-banner--off{border-left-color:var(--warn,#e0a000);}
+    .tx-auto-banner__body{flex:1;min-width:0;}
+    .tx-auto-banner__title{font-weight:600;font-size:14px;color:var(--text-1,#1a1f29);
+      display:flex;align-items:center;gap:8px;}
+    .tx-auto-banner__title-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+    .tx-auto-banner--on .tx-auto-banner__title-dot{background:var(--success,#0a7e3a);}
+    .tx-auto-banner--off .tx-auto-banner__title-dot{background:var(--warn,#e0a000);}
+    .tx-auto-banner__hint{font-size:12px;line-height:1.5;color:var(--text-2,#5a6573);margin-top:4px;}
+    .tx-auto-banner__meta{font-size:11px;color:var(--text-3,#8a93a3);margin-top:6px;}
+
+    .tx-switch{position:relative;width:48px;height:26px;border-radius:13px;
+      border:0;cursor:pointer;flex-shrink:0;padding:0;
+      background:var(--text-3,#8a93a3);transition:background .15s;}
+    .tx-switch--on{background:var(--success,#0a7e3a);}
+    .tx-switch:disabled{opacity:.6;cursor:wait;}
+    .tx-switch__knob{position:absolute;top:3px;left:3px;width:20px;height:20px;
+      border-radius:50%;background:#fff;
+      box-shadow:0 1px 3px rgba(0,0,0,.18);transition:left .15s;}
+    .tx-switch--on .tx-switch__knob{left:25px;}
+    .tx-switch-label{font-size:11px;font-weight:600;letter-spacing:.5px;
+      color:var(--text-2,#5a6573);min-width:30px;text-align:center;flex-shrink:0;}
+
+    /* ── Review badge (inline next to translation_state) ─────────────── */
+    .tx-review-badge{display:inline-flex;align-items:center;gap:4px;
+      margin-left:6px;padding:2px 8px;border-radius:10px;
+      font-size:10.5px;font-weight:500;line-height:1.5;
+      border:1px solid transparent;white-space:nowrap;}
+    .tx-review-badge--clickable{cursor:pointer;transition:transform .1s;}
+    .tx-review-badge--clickable:hover{transform:translateY(-1px);}
+    .tx-review-badge--pass{background:rgba(10,126,58,.08);color:var(--success,#0a7e3a);
+      border-color:rgba(10,126,58,.2);}
+    .tx-review-badge--advisory{background:rgba(224,160,0,.1);color:var(--warn,#e0a000);
+      border-color:rgba(224,160,0,.25);}
+    .tx-review-badge--fail{background:rgba(204,0,0,.08);color:var(--danger,#c00);
+      border-color:rgba(204,0,0,.25);}
+    .tx-review-badge--neutral{background:var(--bg-2,#f5f7fb);color:var(--text-3,#8a93a3);
+      border-color:var(--ln,#e3e6ec);}
+
+    /* ── Review modal ─────────────────────────────────────────────────── */
+    .tx-modal-overlay{position:fixed;inset:0;background:rgba(15,20,28,.55);
+      z-index:9999;display:flex;align-items:center;justify-content:center;
+      padding:24px;}
+    .tx-modal-panel{background:var(--bg,#fff);border-radius:10px;
+      max-width:820px;width:100%;max-height:84vh;
+      display:flex;flex-direction:column;
+      box-shadow:0 12px 40px rgba(0,0,0,.25);
+      border:1px solid var(--ln,#e3e6ec);}
+    .tx-modal-head{display:flex;justify-content:space-between;align-items:center;
+      padding:14px 20px;border-bottom:1px solid var(--ln,#e3e6ec);}
+    .tx-modal-head strong{font-size:14px;color:var(--text-1,#1a1f29);}
+    .tx-modal-close{border:0;background:transparent;font-size:22px;line-height:1;
+      cursor:pointer;color:var(--text-2,#5a6573);padding:0 4px;}
+    .tx-modal-close:hover{color:var(--text-1,#1a1f29);}
+    .tx-modal-body{padding:16px 20px;overflow:auto;font-size:13px;}
+
+    .tx-review-summary{padding:12px 14px;background:var(--bg-2,#f5f7fb);
+      border-radius:6px;margin-bottom:14px;border:1px solid var(--ln,#e3e6ec);}
+    .tx-review-summary__row{display:flex;flex-wrap:wrap;gap:14px;
+      font-size:12px;color:var(--text-2,#5a6573);margin-bottom:4px;}
+    .tx-review-summary__row b{color:var(--text-1,#1a1f29);}
+    .tx-review-summary__text{font-size:13px;color:var(--text-1,#1a1f29);margin-top:6px;}
+
+    .tx-issue{border:1px solid var(--ln-2,#eef0f3);border-radius:6px;
+      padding:10px 12px;margin-bottom:8px;background:var(--bg,#fff);
+      border-left:3px solid var(--ln-2,#eef0f3);}
+    .tx-issue--critical{border-left-color:var(--danger,#c00);}
+    .tx-issue--advisory{border-left-color:var(--warn,#e0a000);}
+    .tx-issue__head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+      margin-bottom:6px;}
+    .tx-issue__seg{font-family:monospace;font-size:11px;
+      background:var(--bg-2,#f5f7fb);padding:2px 6px;border-radius:3px;
+      color:var(--text-2,#5a6573);}
+    .tx-issue__sev{font-size:10px;font-weight:600;letter-spacing:.5px;
+      padding:2px 7px;border-radius:3px;color:#fff;text-transform:uppercase;}
+    .tx-issue__sev--critical{background:var(--danger,#c00);}
+    .tx-issue__sev--advisory{background:var(--warn,#e0a000);}
+    .tx-issue__cat{font-size:11px;color:var(--text-3,#8a93a3);font-family:monospace;}
+    .tx-issue__line{font-size:12.5px;color:var(--text-2,#5a6573);
+      margin-top:2px;line-height:1.5;}
+    .tx-issue__line b{display:inline-block;min-width:36px;color:var(--text-3,#8a93a3);
+      font-weight:600;font-size:11px;letter-spacing:.3px;}
+    .tx-issue__en-wrong{color:var(--danger,#c00);}
+    .tx-issue__suggestion{color:var(--success,#0a7e3a);}
+
+    .tx-promote-btn{margin-top:8px;padding:5px 12px;
+      border:1px solid var(--brand-primary,#0c63e7);
+      background:var(--brand-primary,#0c63e7);color:#fff;
+      border-radius:4px;cursor:pointer;font-size:11.5px;
+      font-weight:500;transition:opacity .15s;}
+    .tx-promote-btn:hover:not(:disabled){opacity:.88;}
+    .tx-promote-btn:disabled{opacity:.5;cursor:default;}
+
+    /* ── Learnings tab ───────────────────────────────────────────────── */
+    .tx-learning-status{display:inline-block;padding:2px 9px;border-radius:10px;
+      font-size:11px;font-weight:500;border:1px solid transparent;}
+    .tx-learning-status--auto{background:rgba(224,160,0,.1);color:var(--warn,#e0a000);
+      border-color:rgba(224,160,0,.25);}
+    .tx-learning-status--approved{background:rgba(10,126,58,.08);color:var(--success,#0a7e3a);
+      border-color:rgba(10,126,58,.2);}
+    .tx-learning-status--disabled{background:var(--bg-2,#f5f7fb);color:var(--text-3,#8a93a3);
+      border-color:var(--ln,#e3e6ec);}
+  `;
   document.head.appendChild(s);
 }
 
@@ -1915,17 +2036,14 @@ function loadLearnings() {
 }
 
 function learningStatusBadge(status) {
-  const styles = {
-    auto:     'background:var(--warn-bg,#fff8e1);color:var(--warn,#e0a000)',
-    approved: 'background:var(--success-bg,#e6f9ee);color:var(--success,#0a7e3a)',
-    disabled: 'background:var(--bg-2,#f5f7fb);color:var(--text-3)',
-  };
+  ensureTxV43Styles();
+  const variant = (status === 'approved' || status === 'auto' || status === 'disabled') ? status : 'disabled';
   const labels = {
     auto:     _t('Chờ duyệt', 'Pending'),
     approved: _t('Đã duyệt', 'Approved'),
     disabled: _t('Đã tắt', 'Disabled'),
   };
-  return `<span style="padding:2px 8px;border-radius:4px;font-size:11px;${styles[status] || styles.disabled}">${escapeHtml(labels[status] || status)}</span>`;
+  return `<span class="tx-learning-status tx-learning-status--${variant}">${escapeHtml(labels[status] || status)}</span>`;
 }
 
 function renderLearnings() {
@@ -2189,18 +2307,17 @@ if (_origOpenReviewModal) {
     const tick = setInterval(() => {
       attempts++;
       if (attempts > 40) { clearInterval(tick); return; }
-      const body = document.querySelector('.tx-review-body');
+      const body = document.querySelector('.tx-modal-body');
       if (!body) { clearInterval(tick); return; }
-      const issueDivs = body.querySelectorAll('div[style*="border:1px solid var(--ln-2"]');
+      const issueDivs = body.querySelectorAll('.tx-issue');
       if (issueDivs.length === 0) return;
       clearInterval(tick);
       // Pull review issues from the rendered DOM by walking each issue card.
       issueDivs.forEach((card, idx) => {
         if (card.querySelector('.tx-promote-learning')) return;
         const btn = document.createElement('button');
-        btn.className = 'tx-promote-learning';
-        btn.textContent = _t('➕ Ghi vào bộ nhớ lỗi (duyệt ngay)', '➕ Promote to learning (auto-approve)');
-        btn.style.cssText = 'margin-top:6px;padding:4px 10px;border:1px solid var(--brand-primary,#0c63e7);background:var(--brand-primary,#0c63e7);color:#fff;border-radius:3px;cursor:pointer;font-size:11px;';
+        btn.className = 'tx-promote-learning tx-promote-btn';
+        btn.textContent = _t('+ Ghi vào bộ nhớ lỗi và duyệt', '+ Promote to learning (auto-approve)');
         btn.addEventListener('click', () => {
           // Extract the issue fields from the card's textContent. We re-fetch
           // the review JSON to get the structured issue rather than parse DOM.

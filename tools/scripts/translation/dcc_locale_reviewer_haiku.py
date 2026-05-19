@@ -60,7 +60,20 @@ from typing import Dict, List, Optional
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 
-CLI_BINARY = os.environ.get("DCC_CLI_BINARY", "/opt/homebrew/bin/claude")
+# Resolve CLI binary at startup. DCC_CLI_BINARY env (set by PHP from the
+# translation_credentials.cli_binary_path column) wins. Otherwise fall back
+# to common Linux/macOS install paths so dev workstations work too.
+def _resolve_cli_binary() -> str:
+    env = (os.environ.get("DCC_CLI_BINARY") or "").strip()
+    if env and Path(env).is_file():
+        return env
+    for candidate in ("/usr/local/bin/claude", "/opt/homebrew/bin/claude", "/usr/bin/claude"):
+        if Path(candidate).is_file():
+            return candidate
+    return env or "/usr/local/bin/claude"
+
+
+CLI_BINARY = _resolve_cli_binary()
 MODEL = os.environ.get("DCC_REVIEWER_MODEL", "haiku-4-5").strip() or "haiku-4-5"
 TIMEOUT = int(os.environ.get("DCC_REVIEWER_TIMEOUT", "120") or 120)
 
