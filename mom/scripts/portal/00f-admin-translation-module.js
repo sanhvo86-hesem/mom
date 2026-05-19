@@ -46,6 +46,16 @@ const STATE = {
   docStateFilter: '',
   docExpandedOverride: null,
   docRetranslating: {},
+  // ── Documents tab: bulk-select state
+  docSelectedCodes: {},           // map: doc_code → true
+  docAllMatchingCodes: null,      // null when not loaded; list[] once /document-codes was fetched
+  docAllMatchingLoading: false,
+  bulkEngineProvider: '',
+  bulkEngineModel: '',
+  bulkConcurrency: 4,
+  bulkActionBusy: false,
+  bulkStatus: null,               // last response from /bulk/status
+  bulkPollHandle: null,
   // ── Auto-translate toggle (Translated Docs tab)
   autoTranslateEnabled: null,   // null = not yet loaded, true/false = known
   autoTranslateUpdatedBy: null,
@@ -1614,6 +1624,11 @@ function renderDocuments() {
   const perPage    = docs.per_page || 50;
   const totalPages = Math.ceil(total / perPage) || 1;
 
+  const visibleCodes = list.map(d => d.doc_code);
+  const visibleSelectedCount = visibleCodes.filter(c => STATE.docSelectedCodes[c]).length;
+  const allVisibleSelected = list.length > 0 && visibleSelectedCount === visibleCodes.length;
+  const selectedTotal = Object.keys(STATE.docSelectedCodes).length;
+
   return `
     ${renderAutoTranslateToggle()}
     <div style="margin-bottom:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
@@ -1629,10 +1644,17 @@ function renderDocuments() {
       </span>
     </div>
 
+    ${renderBulkActionBar(enabledProviders, total, selectedTotal)}
+
     <div style="overflow-x:auto;">
       <table style="width:100%;border-collapse:collapse;font-size:13px;">
         <thead>
           <tr style="text-align:left;border-bottom:2px solid var(--ln,#ddd);background:var(--bg-2,#f5f7fb);">
+            <th style="padding:9px 8px;width:30px;text-align:center;">
+              <input id="tx-doc-master-check" type="checkbox" ${allVisibleSelected ? 'checked' : ''}
+                title="${_t('Chọn/Bỏ chọn tất cả trên trang này', 'Select/clear all on this page')}"
+                style="cursor:pointer;width:14px;height:14px;">
+            </th>
             <th style="padding:9px 8px;">${_t('Tài liệu', 'Document')}</th>
             <th style="padding:9px 8px;">${_t('Loại', 'Type')}</th>
             <th style="padding:9px 8px;">${_t('Phiên bản', 'Revision')}</th>
@@ -1645,7 +1667,7 @@ function renderDocuments() {
         </thead>
         <tbody>
           ${list.length === 0
-            ? `<tr><td colspan="8" style="padding:28px;text-align:center;color:var(--text-3);">${_t('Chưa có tài liệu nào được dịch.', 'No translated documents found.')}</td></tr>`
+            ? `<tr><td colspan="9" style="padding:28px;text-align:center;color:var(--text-3);">${_t('Chưa có tài liệu nào được dịch.', 'No translated documents found.')}</td></tr>`
             : list.map(doc => renderDocRow(doc, enabledProviders)).join('')}
         </tbody>
       </table>
@@ -1664,6 +1686,136 @@ function renderDocuments() {
       </div>
     ` : ''}
   `;
+}
+
+function renderBulkActionBar(enabledProviders, totalMatching, selectedCount) {
+  ensureTxBulkStyles();
+  const selProvider = STATE.bulkEngineProvider || (enabledProviders[0] && enabledProviders[0].provider_key) || '';
+  const selModel    = STATE.bulkEngineModel || '';
+  const conc        = Math.max(1, Math.min(4, parseInt(STATE.bulkConcurrency, 10) || 4));
+  const busy        = STATE.bulkActionBusy;
+  const status      = STATE.bulkStatus;
+  const running     = !!(status && status.running);
+
+  const concOpts = [1,2,3,4].map(n => `<option value="${n}" ${conc===n?'selected':''}>${n}</option>`).join('');
+
+  const selBanner = selectedCount > 0
+    ? `<strong>${selectedCount}</strong> ${_t('tài liệu đã chọn', 'docs selected')}`
+    : `${_t('Chưa chọn tài liệu nào', 'No docs selected')}`;
+
+  // "Select all 397 matching" — surfaced when filter has results not all selected
+  const showSelectAllAll = (selectedCount < totalMatching);
+  const selectAllAllLabel = STATE.docAllMatchingLoading
+    ? `⟳ ${_t('Đang tải mã…', 'Loading codes…')}`
+    : _t(`Chọn tất cả ${totalMatching} tài liệu khớp bộ lọc`, `Select all ${totalMatching} matching`);
+
+  const progress = (status && status.has_run) ? renderBulkProgress(status) : '';
+
+  const tooltipDisabled = selectedCount === 0
+    ? ` title="${_t('Chọn ít nhất 1 tài liệu trước', 'Select at least one doc first')}"` : '';
+
+  return `
+    <div class="tx-bulk-bar" style="margin-bottom:14px;padding:12px 14px;
+      background:var(--bg-2,#f5f7fb);border:1px solid var(--ln,#e3e6ec);border-radius:8px;
+      display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
+      <div style="font-size:13px;color:var(--text-2);min-width:140px;">${selBanner}</div>
+
+      ${showSelectAllAll
+        ? `<button id="tx-bulk-select-all-all" ${STATE.docAllMatchingLoading ? 'disabled' : ''}
+            style="padding:5px 10px;border:1px dashed var(--brand-primary,#0c63e7);background:transparent;color:var(--brand-primary,#0c63e7);border-radius:4px;cursor:${STATE.docAllMatchingLoading?'wait':'pointer'};font-size:12px;">${selectAllAllLabel}</button>`
+        : ''}
+
+      ${selectedCount > 0
+        ? `<button id="tx-bulk-clear-sel"
+            style="padding:5px 10px;border:1px solid var(--ln,#ddd);background:var(--bg,#fff);border-radius:4px;cursor:pointer;font-size:12px;">${_t('Bỏ chọn', 'Clear selection')}</button>`
+        : ''}
+
+      <div style="height:24px;width:1px;background:var(--ln,#ddd);"></div>
+
+      <label style="font-size:12px;color:var(--text-2);">${_t('Engine', 'Engine')}:</label>
+      <select id="tx-bulk-provider" style="padding:5px 8px;border:1px solid var(--ln,#ddd);border-radius:4px;font-size:12px;">
+        ${enabledProviders.map(p => `<option value="${escapeHtml(p.provider_key)}" ${selProvider===p.provider_key?'selected':''}>${escapeHtml(p.provider_key)}</option>`).join('')}
+      </select>
+      <select id="tx-bulk-model" style="padding:5px 8px;border:1px solid var(--ln,#ddd);border-radius:4px;font-size:12px;min-width:120px;">
+        ${renderModelOptions(selProvider, selModel)}
+      </select>
+      <button id="tx-bulk-apply-override" ${selectedCount === 0 || busy ? 'disabled' : ''}${tooltipDisabled}
+        style="padding:5px 12px;border:0;border-radius:4px;background:var(--brand-primary,#0c63e7);color:#fff;cursor:${selectedCount===0||busy?'not-allowed':'pointer'};font-size:12px;opacity:${selectedCount===0||busy?'.5':'1'};">
+        ${_t('Áp dụng engine', 'Apply engine')} (${selectedCount})
+      </button>
+      <button id="tx-bulk-clear-override" ${selectedCount === 0 || busy ? 'disabled' : ''}${tooltipDisabled}
+        style="padding:5px 12px;border:1px solid var(--danger,#c00);background:var(--bg,#fff);color:var(--danger,#c00);border-radius:4px;cursor:${selectedCount===0||busy?'not-allowed':'pointer'};font-size:12px;opacity:${selectedCount===0||busy?'.5':'1'};">
+        ${_t('Xóa override', 'Clear override')} (${selectedCount})
+      </button>
+
+      <div style="height:24px;width:1px;background:var(--ln,#ddd);"></div>
+
+      <label style="font-size:12px;color:var(--text-2);">${_t('Số luồng song song', 'Concurrency')}:</label>
+      <select id="tx-bulk-concurrency" style="padding:5px 8px;border:1px solid var(--ln,#ddd);border-radius:4px;font-size:12px;">${concOpts}</select>
+      <button id="tx-bulk-retranslate" ${selectedCount === 0 || busy || running ? 'disabled' : ''}${tooltipDisabled}
+        style="padding:5px 12px;border:0;border-radius:4px;background:var(--success,#0a7e3a);color:#fff;cursor:${selectedCount===0||busy||running?'not-allowed':'pointer'};font-size:12px;opacity:${selectedCount===0||busy||running?'.5':'1'};font-weight:600;">
+        ${running ? '⟳ ' + _t('Đang dịch tuần tự…', 'Translating sequentially…') : '⚡ ' + _t('Dịch tất cả', 'Translate all') + ` (${selectedCount})`}
+      </button>
+    </div>
+    ${progress}
+  `;
+}
+
+function renderBulkProgress(status) {
+  const total = parseInt(status.total, 10) || 0;
+  const queued = parseInt(status.queued, 10) || 0;
+  const errors = parseInt(status.errors, 10) || 0;
+  const skipped = parseInt(status.skipped_ready, 10) || 0;
+  const processed = queued + skipped + errors;
+  const pct = total > 0 ? Math.min(100, Math.round((processed / total) * 100)) : 0;
+  const done = !!status.done;
+  const running = !!status.running;
+
+  const statusLabel = done
+    ? (errors > 0
+        ? `<span style="color:var(--danger,#c00);">${_t('Hoàn tất với lỗi', 'Finished with errors')}: ${errors}</span>`
+        : `<span style="color:var(--success,#0a7e3a);">${_t('Đã hoàn tất', 'Finished')}</span>`)
+    : running
+      ? `<span style="color:var(--brand-primary,#0c63e7);">${_t('Đang chạy', 'Running')} · pid ${escapeHtml(String(status.pid || '?'))}</span>`
+      : `<span style="color:var(--warn,#e0a000);">${_t('Đã dừng (supervisor chết?)', 'Stopped (supervisor died?)')}</span>`;
+
+  const lastDoc = status.last_doc ? `<code style="background:var(--bg,#fff);padding:1px 5px;border-radius:3px;">${escapeHtml(status.last_doc)}</code>` : '—';
+
+  return `
+    <div id="tx-bulk-progress" style="margin-bottom:14px;padding:12px 14px;background:var(--bg,#fff);border:1px solid var(--ln,#e3e6ec);border-radius:8px;">
+      <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+        <strong style="font-size:13px;">${_t('Tiến độ bulk retranslate', 'Bulk retranslate progress')}</strong>
+        ${statusLabel}
+        <span style="margin-left:auto;font-size:12px;color:var(--text-3);">
+          ${_t('Bắt đầu', 'Started')}: ${escapeHtml((status.started_at || '').substr(0, 19).replace('T', ' '))}
+          ${status.finished_at ? ' · ' + _t('Xong', 'Done') + ': ' + escapeHtml(status.finished_at.substr(0, 19).replace('T', ' ')) : ''}
+        </span>
+      </div>
+      <div style="background:var(--bg-2,#f5f7fb);height:18px;border-radius:9px;overflow:hidden;position:relative;">
+        <div style="background:linear-gradient(90deg,var(--brand-primary,#0c63e7),var(--success,#0a7e3a));height:100%;width:${pct}%;transition:width .4s;"></div>
+        <div style="position:absolute;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--text-1);">
+          ${processed} / ${total} (${pct}%)
+        </div>
+      </div>
+      <div style="margin-top:8px;font-size:11px;color:var(--text-3);display:flex;gap:14px;flex-wrap:wrap;">
+        <span>${_t('Đã queue', 'Queued')}: <strong>${queued}</strong></span>
+        <span>${_t('Đã sẵn sàng (skip)', 'Already ready (skip)')}: <strong>${skipped}</strong></span>
+        <span>${_t('Lỗi', 'Errors')}: <strong style="color:${errors>0?'var(--danger,#c00)':'inherit'};">${errors}</strong></span>
+        <span>${_t('Doc gần nhất', 'Last doc')}: ${lastDoc}</span>
+      </div>
+    </div>
+  `;
+}
+
+function ensureTxBulkStyles() {
+  if (document.getElementById('tx-bulk-styles')) return;
+  const s = document.createElement('style');
+  s.id = 'tx-bulk-styles';
+  s.textContent = `
+    .tx-bulk-bar select:focus, .tx-bulk-bar input:focus { outline:2px solid var(--brand-primary,#0c63e7); outline-offset:1px; }
+    .tx-doc-check { accent-color: var(--brand-primary,#0c63e7); }
+  `;
+  document.head.appendChild(s);
 }
 
 function renderDocRow(doc, enabledProviders) {
@@ -1699,9 +1851,15 @@ function renderDocRow(doc, enabledProviders) {
     engineLabel = `<span class="tx-queued-dot${stuck ? ' tx-queued-stuck' : ''}"></span>${engineLabel}${stuckBadge}`;
   }
 
+  const isSelected = !!STATE.docSelectedCodes[code];
+
   return `
     <tr class="tx-doc-row" data-doc-code="${escapeHtml(code)}"
-        style="border-bottom:1px solid var(--ln-2,#eee);${expanded ? 'background:var(--bg-2,#f5f7fb);' : ''}vertical-align:top;">
+        style="border-bottom:1px solid var(--ln-2,#eee);${expanded || isSelected ? 'background:var(--bg-2,#f5f7fb);' : ''}vertical-align:top;">
+      <td style="padding:9px 8px;text-align:center;">
+        <input type="checkbox" class="tx-doc-check" data-doc-code="${escapeHtml(code)}"
+          ${isSelected ? 'checked' : ''} style="cursor:pointer;width:14px;height:14px;">
+      </td>
       <td style="padding:9px 8px;">
         <div style="font-weight:600;font-family:monospace;font-size:12px;">${escapeHtml(code)}</div>
         <div style="color:var(--text-2);font-size:12px;max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(doc.title || '')}">${escapeHtml(doc.title || '')}</div>
@@ -1761,7 +1919,7 @@ function renderDocRow(doc, enabledProviders) {
       </td>
     </tr>
     ${expanded ? `<tr data-override-for="${escapeHtml(code)}" style="background:var(--bg-2,#f5f7fb);">
-      <td colspan="8" style="padding:0;">${renderDocOverridePanel(doc, enabledProviders)}</td>
+      <td colspan="9" style="padding:0;">${renderDocOverridePanel(doc, enabledProviders)}</td>
     </tr>` : ''}
   `;
 }
@@ -1822,6 +1980,9 @@ function wireDocuments() {
         STATE.docSearch = searchEl.value.trim();
         STATE.docPage = 1;
         STATE.documents = null;
+        // Filter changed → invalidate the cached "all matching codes" list.
+        // Selection itself is preserved (admin may have already curated a set).
+        STATE.docAllMatchingCodes = null;
         loadDocuments();
       }, 400);
     });
@@ -1831,6 +1992,7 @@ function wireDocuments() {
       STATE.docStateFilter = stateEl.value;
       STATE.docPage = 1;
       STATE.documents = null;
+      STATE.docAllMatchingCodes = null;
       loadDocuments();
     });
   }
@@ -1840,6 +2002,8 @@ function wireDocuments() {
       loadDocuments();
     });
   }
+
+  wireBulkControls();
 
   document.querySelectorAll('.tx-doc-page').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -2020,6 +2184,208 @@ function wireDocuments() {
       }, 3000);
     });
   });
+}
+
+// ── Bulk action wiring & helpers ─────────────────────────────────────────────
+
+function wireBulkControls() {
+  // Per-row checkboxes
+  document.querySelectorAll('.tx-doc-check').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const code = cb.dataset.docCode;
+      if (cb.checked) {
+        STATE.docSelectedCodes[code] = true;
+      } else {
+        delete STATE.docSelectedCodes[code];
+      }
+      render();
+    });
+  });
+
+  // Master "select all visible" checkbox in table header
+  const master = document.getElementById('tx-doc-master-check');
+  if (master) {
+    master.addEventListener('change', () => {
+      const visibleCodes = ((STATE.documents && STATE.documents.documents) || []).map(d => d.doc_code);
+      if (master.checked) {
+        visibleCodes.forEach(c => { STATE.docSelectedCodes[c] = true; });
+      } else {
+        visibleCodes.forEach(c => { delete STATE.docSelectedCodes[c]; });
+      }
+      render();
+    });
+  }
+
+  // "Select all N matching" (across pagination)
+  const selAllAll = document.getElementById('tx-bulk-select-all-all');
+  if (selAllAll) {
+    selAllAll.addEventListener('click', () => loadAllMatchingCodesThenSelect());
+  }
+
+  // Clear all selection
+  const clearSel = document.getElementById('tx-bulk-clear-sel');
+  if (clearSel) {
+    clearSel.addEventListener('click', () => {
+      STATE.docSelectedCodes = {};
+      render();
+    });
+  }
+
+  // Engine provider/model dropdowns (live state)
+  const provSel = document.getElementById('tx-bulk-provider');
+  const modelSel = document.getElementById('tx-bulk-model');
+  if (provSel) {
+    provSel.addEventListener('change', () => {
+      STATE.bulkEngineProvider = provSel.value;
+      STATE.bulkEngineModel = '';
+      // Re-render only the model dropdown (avoid full re-render to preserve focus).
+      if (modelSel) modelSel.innerHTML = renderModelOptions(provSel.value, '');
+    });
+  }
+  if (modelSel) {
+    modelSel.addEventListener('change', () => {
+      STATE.bulkEngineModel = modelSel.value;
+    });
+  }
+
+  const concSel = document.getElementById('tx-bulk-concurrency');
+  if (concSel) {
+    concSel.addEventListener('change', () => {
+      STATE.bulkConcurrency = parseInt(concSel.value, 10) || 4;
+    });
+  }
+
+  // Apply engine override to all selected
+  const applyBtn = document.getElementById('tx-bulk-apply-override');
+  if (applyBtn) applyBtn.addEventListener('click', () => bulkApplyOverride());
+
+  // Clear engine override for all selected
+  const clearOverrideBtn = document.getElementById('tx-bulk-clear-override');
+  if (clearOverrideBtn) clearOverrideBtn.addEventListener('click', () => bulkClearOverride());
+
+  // Bulk retranslate (sequential)
+  const reBtn = document.getElementById('tx-bulk-retranslate');
+  if (reBtn) reBtn.addEventListener('click', () => bulkRetranslateStart());
+
+  // If a previous bulk run is already in flight (from a prior session), make sure
+  // we resume polling so the progress bar updates.
+  if (STATE.bulkStatus && STATE.bulkStatus.running && !STATE.bulkPollHandle) {
+    scheduleBulkPoll();
+  } else if (!STATE.bulkStatus) {
+    // First render after entering Documents tab: probe once.
+    pollBulkStatusOnce({ silent: true });
+  }
+}
+
+function loadAllMatchingCodesThenSelect() {
+  STATE.docAllMatchingLoading = true;
+  render();
+  const params = new URLSearchParams();
+  if (STATE.docSearch) params.set('search', STATE.docSearch);
+  if (STATE.docStateFilter) params.set('state', STATE.docStateFilter);
+  api('GET', '/api/v1/dcc/admin/translation/document-codes?' + params.toString())
+    .then(d => {
+      STATE.docAllMatchingCodes = d.codes || [];
+      STATE.docAllMatchingCodes.forEach(c => { STATE.docSelectedCodes[c] = true; });
+    })
+    .catch(err => { toast('Error: ' + (err.message || err)); })
+    .finally(() => {
+      STATE.docAllMatchingLoading = false;
+      render();
+    });
+}
+
+function bulkApplyOverride() {
+  const codes = Object.keys(STATE.docSelectedCodes);
+  if (codes.length === 0) return;
+  const provider = STATE.bulkEngineProvider || '';
+  const model = (STATE.bulkEngineModel || '').trim() || null;
+  if (!provider) { toast(_t('Chọn engine trước', 'Pick an engine first')); return; }
+
+  STATE.bulkActionBusy = true; render();
+  api('POST', '/api/v1/dcc/admin/translation/bulk/override', {
+    doc_codes: codes,
+    primary_provider: provider,
+    primary_model: model,
+  }).then(d => {
+    const errCount = (d.errors || []).length;
+    toast(errCount === 0
+      ? _t('Đã áp dụng cho ' + d.updated + ' tài liệu', 'Applied to ' + d.updated + ' docs')
+      : _t('Áp dụng ' + d.updated + ' / lỗi ' + errCount, 'Applied ' + d.updated + ' / errors ' + errCount));
+    STATE.documents = null;
+    loadDocuments();
+  }).catch(err => { toast('Error: ' + (err.message || err)); })
+    .finally(() => { STATE.bulkActionBusy = false; render(); });
+}
+
+function bulkClearOverride() {
+  const codes = Object.keys(STATE.docSelectedCodes);
+  if (codes.length === 0) return;
+  STATE.bulkActionBusy = true; render();
+  api('DELETE', '/api/v1/dcc/admin/translation/bulk/override', { doc_codes: codes })
+    .then(d => {
+      toast(_t('Đã xóa override cho ' + d.deleted + ' tài liệu', 'Cleared override for ' + d.deleted + ' docs'));
+      STATE.documents = null;
+      loadDocuments();
+    }).catch(err => { toast('Error: ' + (err.message || err)); })
+    .finally(() => { STATE.bulkActionBusy = false; render(); });
+}
+
+function bulkRetranslateStart() {
+  const codes = Object.keys(STATE.docSelectedCodes);
+  if (codes.length === 0) return;
+  const concurrency = Math.max(1, Math.min(4, parseInt(STATE.bulkConcurrency, 10) || 4));
+  const ok = confirm(_t(
+    `Dịch lại tuần tự ${codes.length} tài liệu (${concurrency} song song)? Quá trình sẽ chạy nền dưới worker pool.`,
+    `Sequentially retranslate ${codes.length} docs (${concurrency} parallel)? The job runs in a background worker pool.`
+  ));
+  if (!ok) return;
+
+  STATE.bulkActionBusy = true; render();
+  api('POST', '/api/v1/dcc/admin/translation/bulk/retranslate', {
+    doc_codes: codes,
+    concurrency,
+  }).then(d => {
+    toast(_t('Đã khởi động bulk dịch ' + d.queued_count + ' tài liệu', 'Bulk translate started for ' + d.queued_count + ' docs'));
+    pollBulkStatusOnce({ silent: false });
+    scheduleBulkPoll();
+  }).catch(err => { toast('Error: ' + (err.message || err)); })
+    .finally(() => { STATE.bulkActionBusy = false; render(); });
+}
+
+function pollBulkStatusOnce(opts) {
+  return api('GET', '/api/v1/dcc/admin/translation/bulk/status')
+    .then(d => {
+      STATE.bulkStatus = d;
+      if (STATE.activeTab === 'documents') {
+        // Re-render so the bulk bar + progress reflect the latest status.
+        // Also refresh the documents list when a run just finished so per-row
+        // engine_version/state catches up.
+        if (d && d.running === false && d.done === true && STATE.bulkPollHandle) {
+          STATE.documents = null;
+          loadDocuments();
+        } else {
+          render();
+        }
+      }
+      return d;
+    }).catch(err => {
+      if (!opts || !opts.silent) toast('Error: ' + (err.message || err));
+    });
+}
+
+function scheduleBulkPoll() {
+  if (STATE.bulkPollHandle) clearTimeout(STATE.bulkPollHandle);
+  STATE.bulkPollHandle = setTimeout(() => {
+    STATE.bulkPollHandle = null;
+    pollBulkStatusOnce({ silent: true }).then(d => {
+      if (d && d.running) scheduleBulkPoll();
+      // When the supervisor flips to done, do one more poll after 3s to make
+      // sure we capture the final stats (the supervisor may write the final
+      // status row a tick after marking done=true).
+      else if (d && d.done && (STATE.bulkStatus && (STATE.bulkStatus.queued !== d.queued))) scheduleBulkPoll();
+    });
+  }, 4000);
 }
 
 // ── Tab 7: Learnings (curated anti-pattern memory) ───────────────────────────

@@ -27,6 +27,7 @@ require_once $rootDir . '/mom/api/services/Translation/TranslationRuntimeSetting
 $options = getopt('', [
     'actor::',
     'code::',
+    'codes-file::',
     'dry-run',
     'fpm-env::',
     'force',
@@ -38,6 +39,7 @@ $options = getopt('', [
     'prewarm-segment-cache',
     'segment-prewarm-limit::',
     'start-workers::',
+    'status-file::',
     'wait-for-workers',
     'worker-slots::',
 ]);
@@ -50,6 +52,60 @@ if ($actor === '') {
     $actor = 'system.locale-backfill';
 }
 $onlyCode = DocumentControlService::canonicalizeCode((string)($options['code'] ?? ''));
+
+// --codes-file=<path>: newline-separated list of doc_codes to include. Used by
+// the admin "bulk retranslate" endpoint to drive selective batch processing
+// without forcing one HTTP call per doc.
+$codesAllowlist = null;
+$codesFilePath = trim((string)($options['codes-file'] ?? ''));
+if ($codesFilePath !== '') {
+    if (!is_file($codesFilePath)) {
+        fwrite(STDERR, "[dcc_locale_backfill] --codes-file not found: $codesFilePath\n");
+        exit(2);
+    }
+    $rawLines = (array)@file($codesFilePath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    $codesAllowlist = [];
+    foreach ($rawLines as $line) {
+        $canon = DocumentControlService::canonicalizeCode(trim((string)$line));
+        if ($canon !== '') {
+            $codesAllowlist[$canon] = true;
+        }
+    }
+    if (count($codesAllowlist) === 0) {
+        fwrite(STDERR, "[dcc_locale_backfill] --codes-file is empty after canonicalization\n");
+        exit(2);
+    }
+}
+
+// --status-file=<path>: target for periodic JSON-status writes so the admin UI
+// can poll bulk-retranslate progress. Updated each loop iteration.
+$statusFilePath = trim((string)($options['status-file'] ?? ''));
+$statusState = [
+    'started_at' => date(DATE_ATOM),
+    'pid' => getmypid(),
+    'actor' => $actor,
+    'total' => 0,
+    'queued' => 0,
+    'skipped_ready' => 0,
+    'errors' => 0,
+    'done' => false,
+    'finished_at' => null,
+    'last_doc' => null,
+    'codes_file' => $codesFilePath !== '' ? $codesFilePath : null,
+];
+$writeStatus = function () use (&$statusFilePath, &$statusState): void {
+    if ($statusFilePath === '') {
+        return;
+    }
+    $encoded = json_encode($statusState, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+    if (!is_string($encoded)) {
+        return;
+    }
+    $tmp = $statusFilePath . '.tmp';
+    if (@file_put_contents($tmp, $encoded, LOCK_EX) !== false) {
+        @rename($tmp, $statusFilePath);
+    }
+};
 $dryRun = array_key_exists('dry-run', $options);
 $force = array_key_exists('force', $options);
 $onlyMissingJob = array_key_exists('only-missing-job', $options);
@@ -129,6 +185,13 @@ $processed = 0;
 $initialQueueCount = countQueuedJobs($rootDir);
 $currentQueueCount = $initialQueueCount;
 
+if (is_array($codesAllowlist)) {
+    $statusState['total'] = count($codesAllowlist);
+} else {
+    $statusState['total'] = 0;
+}
+$writeStatus();
+
 if (!$dryRun && $prewarmSegmentCache) {
     $stats['segment_cache_prewarm'] = prewarmSegmentCache($rootDir, $segmentPrewarmLimit);
     if (($stats['segment_cache_prewarm']['ok'] ?? false) !== true) {
@@ -147,9 +210,18 @@ for ($offset = 0; ; $offset += 500) {
         if ($docCode === '' || ($onlyCode !== '' && $docCode !== $onlyCode)) {
             continue;
         }
+        if (is_array($codesAllowlist) && !isset($codesAllowlist[$docCode])) {
+            continue;
+        }
         if ($limit > 0 && $processed >= $limit) {
             break 2;
         }
+
+        $statusState['last_doc'] = $docCode;
+        $statusState['queued'] = $stats['queued'];
+        $statusState['skipped_ready'] = $stats['skipped_ready'];
+        $statusState['errors'] = $stats['errors'];
+        $writeStatus();
 
         $processed++;
         $stats['scanned']++;
@@ -274,6 +346,14 @@ if (!$dryRun && $startWorkers > 0) {
         }
     }
 }
+
+$statusState['queued'] = $stats['queued'];
+$statusState['skipped_ready'] = $stats['skipped_ready'];
+$statusState['errors'] = $stats['errors'];
+$statusState['done'] = true;
+$statusState['finished_at'] = date(DATE_ATOM);
+$statusState['workers_started'] = $stats['workers_started'];
+$writeStatus();
 
 echo json_encode([
     'ok' => $stats['errors'] === 0,

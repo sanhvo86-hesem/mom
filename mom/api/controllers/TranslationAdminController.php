@@ -1205,4 +1205,375 @@ final class TranslationAdminController extends EqmsBaseController
         }
         $this->success(['enabled' => $enabled]);
     }
+
+    // ── Bulk operations (multi-doc admin actions) ────────────────────────────
+
+    private function bulkStatusFile(): string
+    {
+        return rtrim($this->rootDir, '/') . '/mom/data/cache/dcc-locale-jobs/.bulk.status.json';
+    }
+
+    private function bulkCodesDir(): string
+    {
+        return rtrim($this->rootDir, '/') . '/mom/data/cache/dcc-locale-jobs/.bulk-codes';
+    }
+
+    /**
+     * Returns the canonicalized list of doc_codes from the request body.
+     * Rejects empty payloads with 422.
+     *
+     * @return list<string>
+     */
+    private function readBulkDocCodes(): array
+    {
+        $body = $this->jsonBody();
+        $codes = $body['doc_codes'] ?? null;
+        if (!is_array($codes) || count($codes) === 0) {
+            $this->error('translation_bulk_missing_doc_codes', 422, 'Body must contain a non-empty doc_codes array.');
+        }
+        $seen = [];
+        $out = [];
+        foreach ($codes as $raw) {
+            if (!is_string($raw)) {
+                continue;
+            }
+            $canon = \MOM\Services\DocumentControl\DocumentControlService::canonicalizeCode($raw);
+            if ($canon === '' || isset($seen[$canon])) {
+                continue;
+            }
+            $seen[$canon] = true;
+            $out[] = $canon;
+        }
+        if (count($out) === 0) {
+            $this->error('translation_bulk_invalid_doc_codes', 422, 'doc_codes contained no valid canonical codes.');
+        }
+        return $out;
+    }
+
+    /**
+     * GET /api/v1/dcc/admin/translation/document-codes
+     *
+     * Returns every doc_code that matches the current search/state filter so
+     * the admin UI can offer a "Select all N matching docs" link without
+     * paginating through every page. Backed by the same WHERE clause as
+     * listTranslatedDocuments to keep results consistent.
+     */
+    public function listDocumentCodes(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+
+        $search      = trim((string)($this->query('search') ?? ''));
+        $stateFilter = trim((string)($this->query('state') ?? ''));
+
+        $where  = ["v.locale = 'en'"];
+        $params = [];
+        if ($search !== '') {
+            $where[]            = '(h.doc_code ILIKE :p_srch1 OR h.title ILIKE :p_srch2)';
+            $params[':p_srch1'] = '%' . $search . '%';
+            $params[':p_srch2'] = '%' . $search . '%';
+        }
+        if ($stateFilter !== '') {
+            $where[]            = 'v.translation_state = :p_state';
+            $params[':p_state'] = $stateFilter;
+        }
+        $whereClause = implode(' AND ', $where);
+
+        $rows = $this->data->query(
+            "SELECT h.doc_code
+               FROM dcc_document_header h
+               JOIN dcc_document_locale_variant v
+                    ON v.doc_code = h.doc_code AND v.locale = 'en'
+              WHERE $whereClause
+              ORDER BY h.doc_code ASC",
+            $params
+        );
+        $codes = [];
+        if (is_array($rows)) {
+            foreach ($rows as $r) {
+                $code = (string)($r['doc_code'] ?? '');
+                if ($code !== '') {
+                    $codes[] = $code;
+                }
+            }
+        }
+        $this->success(['codes' => $codes, 'total' => count($codes)]);
+    }
+
+    /**
+     * POST /api/v1/dcc/admin/translation/bulk/override
+     * Body: { doc_codes: string[], primary_provider: string, primary_model?: string|null }
+     *
+     * Upserts a per-document routing override for each supplied doc_code.
+     * Individual failures are surfaced in the response without aborting the
+     * batch — partial success is acceptable for an admin action.
+     */
+    public function bulkSetDocumentOverride(): never
+    {
+        $user  = $this->requireAuth();
+        $this->requireAdmin($user);
+        $body  = $this->jsonBody();
+        $actor = $this->adminActor($user);
+
+        $provider = trim((string)($body['primary_provider'] ?? ''));
+        $model    = isset($body['primary_model']) && (string)$body['primary_model'] !== ''
+            ? (string)$body['primary_model'] : null;
+        if ($provider === '') {
+            $this->error('translation_bulk_override_missing_provider', 422, 'primary_provider is required.');
+        }
+
+        $codes  = $this->readBulkDocCodes();
+        $updated = 0;
+        $errors  = [];
+
+        foreach ($codes as $docCode) {
+            try {
+                $existing = $this->data->query(
+                    "SELECT routing_id FROM translation_routing
+                      WHERE scope_type = 'doc_code' AND scope_value = :p1",
+                    [':p1' => $docCode]
+                );
+                $routingId = is_array($existing) && count($existing) > 0
+                    ? (int)$existing[0]['routing_id'] : 0;
+                $this->registry()->upsertRoutingRule($routingId, [
+                    'scope_type'       => 'doc_code',
+                    'scope_value'      => $docCode,
+                    'primary_provider' => $provider,
+                    'primary_model'    => $model,
+                    'fallback_chain'   => [],
+                    'is_enabled'       => true,
+                ], $actor);
+                $updated++;
+            } catch (Throwable $e) {
+                $errors[] = ['doc_code' => $docCode, 'message' => $e->getMessage()];
+            }
+        }
+
+        $this->success([
+            'updated'         => $updated,
+            'errors'          => $errors,
+            'requested_count' => count($codes),
+            'provider'        => $provider,
+            'model'           => $model,
+        ]);
+    }
+
+    /**
+     * DELETE /api/v1/dcc/admin/translation/bulk/override
+     * Body: { doc_codes: string[] }
+     *
+     * Removes the per-doc override for every supplied doc_code (reverting
+     * each to its inherited tier/global routing). Missing override rows are
+     * a no-op, not an error.
+     */
+    public function bulkRemoveDocumentOverride(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $codes = $this->readBulkDocCodes();
+
+        $deleted = 0;
+        $errors  = [];
+        foreach ($codes as $docCode) {
+            try {
+                $this->data->execute(
+                    "DELETE FROM translation_routing
+                      WHERE scope_type = 'doc_code' AND scope_value = :p1",
+                    [':p1' => $docCode]
+                );
+                $deleted++;
+            } catch (Throwable $e) {
+                $errors[] = ['doc_code' => $docCode, 'message' => $e->getMessage()];
+            }
+        }
+        $this->success([
+            'deleted'         => $deleted,
+            'errors'          => $errors,
+            'requested_count' => count($codes),
+        ]);
+    }
+
+    /**
+     * POST /api/v1/dcc/admin/translation/bulk/retranslate
+     * Body: { doc_codes: string[], concurrency?: int (1..4) }
+     *
+     * Queues a batch retranslate for every supplied doc_code. Writes a
+     * codes-file under mom/data/cache/dcc-locale-jobs/.bulk-codes/ and spawns
+     * a single detached `dcc_locale_backfill.php` supervisor (--codes-file +
+     * --force + --start-workers + --status-file + --wait-for-workers). The
+     * supervisor drains the queue at the requested concurrency (capped by the
+     * worker slot ceiling). Returns immediately; poll bulk-status for
+     * progress.
+     *
+     * Concurrent runs are rejected: if the status file shows an in-flight
+     * supervisor whose PID is still alive, returns 409.
+     */
+    public function bulkRetranslate(): never
+    {
+        $user  = $this->requireAuth();
+        $this->requireAdmin($user);
+        $body  = $this->jsonBody();
+        $actor = $this->adminActor($user);
+
+        $codes = $this->readBulkDocCodes();
+
+        $concurrency = isset($body['concurrency']) ? (int)$body['concurrency'] : 4;
+        if ($concurrency < 1) $concurrency = 1;
+        if ($concurrency > 4) $concurrency = 4;
+
+        $statusPath = $this->bulkStatusFile();
+        $existing = $this->readBulkStatusFile($statusPath);
+        if ($existing !== null && ($existing['done'] ?? true) === false) {
+            $pid = (int)($existing['pid'] ?? 0);
+            if ($pid > 0 && $this->processAlive($pid)) {
+                $this->error(
+                    'translation_bulk_busy',
+                    409,
+                    "A bulk retranslate is already running (pid=$pid, started_at=" . ($existing['started_at'] ?? '?') . "). Wait for it to finish or cancel it first."
+                );
+            }
+        }
+
+        // Write codes file
+        $codesDir = $this->bulkCodesDir();
+        if (!is_dir($codesDir) && !@mkdir($codesDir, 0775, true) && !is_dir($codesDir)) {
+            $this->error('translation_bulk_codes_dir_failed', 500, "Could not create $codesDir");
+        }
+        $codesFilePath = $codesDir . '/' . date('Ymd-His') . '-' . substr(bin2hex(random_bytes(3)), 0, 6) . '.txt';
+        if (@file_put_contents($codesFilePath, implode("\n", $codes) . "\n", LOCK_EX) === false) {
+            $this->error('translation_bulk_codes_write_failed', 500, "Could not write $codesFilePath");
+        }
+
+        // Reset status file (so GET returns the new run, not the previous one)
+        @file_put_contents($statusPath, json_encode([
+            'pid' => 0,
+            'started_at' => date(DATE_ATOM),
+            'actor' => $actor,
+            'total' => count($codes),
+            'done' => false,
+            'queued' => 0,
+            'errors' => 0,
+            'last_doc' => null,
+            'codes_file' => $codesFilePath,
+        ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), LOCK_EX);
+
+        // Spawn the supervisor: php-cli detached via nohup so it survives the
+        // FPM request. Pass --force so the runtime auto-translate-OFF guard
+        // doesn't block this admin-explicit action. Pass --no-spawn-per-job
+        // so per-doc queue files don't each fork their own worker — the
+        // --start-workers pool drains the queue at the requested concurrency.
+        $phpBinary = $this->resolvePhpCliForBulk();
+        $worker = rtrim($this->rootDir, '/') . '/tools/scripts/translation/dcc_locale_backfill.php';
+        if (!is_file($worker)) {
+            $this->error('translation_bulk_worker_missing', 500, "Backfill script not found: $worker");
+        }
+        $fpmConf = '/etc/php/8.5/fpm/pool.d/mom.conf';
+        $logFile = rtrim($this->rootDir, '/') . '/mom/data/php_error.log';
+        $cmdParts = [
+            'cd ' . escapeshellarg($this->rootDir),
+            '&&',
+            'nohup',
+            escapeshellarg($phpBinary),
+            escapeshellarg($worker),
+            '--codes-file=' . escapeshellarg($codesFilePath),
+            '--status-file=' . escapeshellarg($statusPath),
+            '--force',
+            '--no-spawn-per-job',
+            '--start-workers=' . $concurrency,
+            '--worker-slots=' . $concurrency,
+            '--wait-for-workers',
+            '--actor=' . escapeshellarg('admin.bulk:' . $actor),
+        ];
+        if (is_file($fpmConf)) {
+            $cmdParts[] = '--fpm-env=' . escapeshellarg($fpmConf);
+        }
+        $cmdParts[] = '>> ' . escapeshellarg($logFile) . ' 2>&1 < /dev/null &';
+        $command = implode(' ', $cmdParts);
+
+        $process = @proc_open(['/bin/sh', '-lc', $command], [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ], $pipes, $this->rootDir);
+        if (!is_resource($process)) {
+            $this->error('translation_bulk_spawn_failed', 500, 'proc_open returned no resource');
+        }
+        foreach ($pipes as $pipe) {
+            if (is_resource($pipe)) {
+                fclose($pipe);
+            }
+        }
+        @proc_close($process);
+
+        $this->success([
+            'queued_count'    => count($codes),
+            'concurrency'     => $concurrency,
+            'codes_file'      => $codesFilePath,
+            'status_endpoint' => '/api/v1/dcc/admin/translation/bulk/status',
+        ]);
+    }
+
+    /**
+     * GET /api/v1/dcc/admin/translation/bulk/status
+     *
+     * Returns the most-recent supervisor status JSON, or `{running:false}` if
+     * no run has happened in this deploy. Augments the raw status with
+     * `running` (= !done AND pid alive) so the frontend doesn't have to
+     * re-implement the liveness probe.
+     */
+    public function bulkRetranslateStatus(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+
+        $status = $this->readBulkStatusFile($this->bulkStatusFile());
+        if ($status === null) {
+            $this->success(['running' => false, 'has_run' => false]);
+        }
+        $pid = (int)($status['pid'] ?? 0);
+        $done = (bool)($status['done'] ?? false);
+        $alive = $pid > 0 && $this->processAlive($pid);
+        $status['running'] = !$done && $alive;
+        $status['pid_alive'] = $alive;
+        $status['has_run'] = true;
+        $this->success($status);
+    }
+
+    /**
+     * @return array<string,mixed>|null
+     */
+    private function readBulkStatusFile(string $path): ?array
+    {
+        if (!is_file($path)) {
+            return null;
+        }
+        $raw = @file_get_contents($path);
+        if (!is_string($raw) || trim($raw) === '') {
+            return null;
+        }
+        $decoded = json_decode($raw, true);
+        return is_array($decoded) ? $decoded : null;
+    }
+
+    private function processAlive(int $pid): bool
+    {
+        if ($pid <= 0) {
+            return false;
+        }
+        // `kill -0` returns 0 when the pid exists and we are permitted to
+        // signal it. Use shell `kill` because pcntl/POSIX is commonly
+        // disabled under PHP-FPM.
+        $rc = (int)trim((string)@shell_exec('kill -0 ' . $pid . ' 2>/dev/null; echo $?'));
+        return $rc === 0;
+    }
+
+    private function resolvePhpCliForBulk(): string
+    {
+        foreach (['/usr/bin/php8.5', '/usr/bin/php8.4', '/usr/bin/php8.3', '/usr/bin/php', '/usr/local/bin/php8.5', '/usr/local/bin/php'] as $candidate) {
+            if (is_file($candidate) && is_executable($candidate)) {
+                return $candidate;
+            }
+        }
+        return 'php';
+    }
 }

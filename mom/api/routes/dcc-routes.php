@@ -100,6 +100,13 @@ return static function (Router $router, string $dataDir): void {
     $router->post  ('/api/v1/dcc/admin/translation/documents/{doc_code}/retranslate',                   TranslationAdminController::class, 'retranslateDocument');
     $router->post  ('/api/v1/dcc/admin/translation/documents/{doc_code}/cancel-job',                    TranslationAdminController::class, 'cancelJob');
 
+    // ── Bulk operations: multi-doc engine override + sequential retranslate
+    $router->get   ('/api/v1/dcc/admin/translation/document-codes',                                     TranslationAdminController::class, 'listDocumentCodes');
+    $router->post  ('/api/v1/dcc/admin/translation/bulk/override',                                      TranslationAdminController::class, 'bulkSetDocumentOverride');
+    $router->delete('/api/v1/dcc/admin/translation/bulk/override',                                      TranslationAdminController::class, 'bulkRemoveDocumentOverride');
+    $router->post  ('/api/v1/dcc/admin/translation/bulk/retranslate',                                   TranslationAdminController::class, 'bulkRetranslate');
+    $router->get   ('/api/v1/dcc/admin/translation/bulk/status',                                        TranslationAdminController::class, 'bulkRetranslateStatus');
+
     // ── Reviewer (post-translation QC by Claude Haiku 4.5) ────────────────
     $router->get   ('/api/v1/dcc/admin/translation/reviews',                                            TranslationAdminController::class, 'listReviewRuns');
     $router->get   ('/api/v1/dcc/admin/translation/reviews/{review_id}',                                TranslationAdminController::class, 'getReviewRun');
