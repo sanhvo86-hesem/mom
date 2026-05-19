@@ -413,7 +413,12 @@ run_dcc_locale_prewarm_kick() {
         fi
     fi
 
-    log "INFO" "Starting DCC English locale prewarm (workers=$workers, max_queue=$max_queue)..."
+    # NOTE: dcc_locale_backfill.php reads translation_runtime_setting
+    # auto_translate_enabled and exits immediately (status 0) when OFF. So
+    # starting the service here is a cheap no-op when the admin toggle is OFF;
+    # we still kick it so the service unit gets exercised and the timer stays
+    # in a healthy state.
+    log "INFO" "Starting DCC English locale prewarm (workers=$workers, max_queue=$max_queue) — script self-skips if admin toggle is OFF"
     if command -v systemctl >/dev/null 2>&1 && [ -f "/etc/systemd/system/dcc-locale-prewarm.service" ]; then
         systemctl start --no-block dcc-locale-prewarm.service \
             && log "INFO" "DCC locale prewarm service started asynchronously" \

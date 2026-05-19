@@ -22,6 +22,7 @@ if (!is_string($rootDir)) {
 require_once $rootDir . '/mom/database/DataLayer.php';
 require_once $rootDir . '/mom/api/services/DocumentControl/DocumentControlService.php';
 require_once $rootDir . '/mom/api/services/DocumentControl/DocumentLocaleAutomationService.php';
+require_once $rootDir . '/mom/api/services/Translation/TranslationRuntimeSettingsService.php';
 
 $options = getopt('', [
     'actor::',
@@ -89,6 +90,25 @@ if (!function_exists('strip_base_href_archive')) {
 }
 
 $data = new DataLayer($rootDir . '/mom/data', $rootDir);
+
+// Honor the runtime auto-translate toggle (admin panel switch). The cron-driven
+// prewarm and the deploy-time kick both run this script with no --force; if the
+// admin has switched auto-translate OFF they expect NO new translation jobs to
+// be queued. Exit cleanly (status 0) so systemd does not flag a failure and so
+// the timer can re-fire harmlessly later. --force overrides for manual runs.
+$runtimeSettings = new \MOM\Services\Translation\TranslationRuntimeSettingsService($data);
+$autoTranslateOn = $runtimeSettings->isAutoTranslateEnabled();
+if (!$autoTranslateOn && !$force) {
+    fwrite(STDERR, "[dcc_locale_backfill] auto_translate_enabled=false; skipping (pass --force to override).\n");
+    echo json_encode([
+        'ok' => true,
+        'skipped' => 'auto_translate_disabled',
+        'actor' => $actor,
+        'auto_translate_enabled' => false,
+    ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\n";
+    exit(0);
+}
+
 $dcc = new DocumentControlService($data);
 $locale = new DocumentLocaleAutomationService($data, $rootDir);
 

@@ -1480,17 +1480,22 @@ function ensureTxV43Styles() {
     .tx-auto-banner__hint{font-size:12px;line-height:1.5;color:var(--text-2,#5a6573);margin-top:4px;}
     .tx-auto-banner__meta{font-size:11px;color:var(--text-3,#8a93a3);margin-top:6px;}
 
-    .tx-switch{position:relative;width:48px;height:26px;border-radius:13px;
-      border:0;cursor:pointer;flex-shrink:0;padding:0;
-      background:var(--text-3,#8a93a3);transition:background .15s;}
-    .tx-switch--on{background:var(--success,#0a7e3a);}
-    .tx-switch:disabled{opacity:.6;cursor:wait;}
-    .tx-switch__knob{position:absolute;top:3px;left:3px;width:20px;height:20px;
-      border-radius:50%;background:#fff;
+    button.tx-switch{position:relative;display:inline-block;
+      width:44px;height:24px;min-height:0;max-height:24px;line-height:1;
+      border-radius:12px;border:0;outline:0;cursor:pointer;flex-shrink:0;
+      padding:0;margin:0;vertical-align:middle;box-sizing:border-box;
+      background:var(--text-3,#8a93a3);transition:background .15s;
+      -webkit-appearance:none;appearance:none;}
+    button.tx-switch.tx-switch--on{background:var(--success,#0a7e3a);}
+    button.tx-switch:disabled{opacity:.6;cursor:wait;}
+    button.tx-switch:focus-visible{box-shadow:0 0 0 2px var(--brand-primary,#0c63e7);}
+    .tx-switch__knob{position:absolute;top:3px;left:3px;width:18px;height:18px;
+      border-radius:50%;background:#fff;pointer-events:none;
       box-shadow:0 1px 3px rgba(0,0,0,.18);transition:left .15s;}
-    .tx-switch--on .tx-switch__knob{left:25px;}
-    .tx-switch-label{font-size:11px;font-weight:600;letter-spacing:.5px;
-      color:var(--text-2,#5a6573);min-width:30px;text-align:center;flex-shrink:0;}
+    .tx-switch--on .tx-switch__knob{left:23px;}
+    .tx-switch-label{font-size:11px;font-weight:700;letter-spacing:.5px;
+      color:var(--text-2,#5a6573);min-width:28px;text-align:center;
+      flex-shrink:0;line-height:24px;}
 
     /* ── Review badge (inline next to translation_state) ─────────────── */
     .tx-review-badge{display:inline-flex;align-items:center;gap:4px;
