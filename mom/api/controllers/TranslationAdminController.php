@@ -1434,6 +1434,22 @@ final class TranslationAdminController extends EqmsBaseController
             }
         }
 
+        // Clear the cached source hash for every selected doc so the backfill
+        // truly retranslates rather than short-circuiting via
+        // scheduleEnglishMachinePreview's content-hash cache. The single-doc
+        // /retranslate endpoint does the same one-row UPDATE; for bulk we
+        // batch it into a single statement using ANY(:codes).
+        try {
+            $this->data->execute(
+                "UPDATE dcc_document_locale_variant
+                    SET artifact_source_hash_sha256 = NULL
+                  WHERE locale = 'en' AND doc_code = ANY(:codes)",
+                [':codes' => '{' . implode(',', array_map(static fn ($c) => '"' . str_replace('"', '\\"', $c) . '"', $codes)) . '}']
+            );
+        } catch (Throwable $e) {
+            @error_log('[TranslationAdminController.bulkRetranslate] hash clear failed: ' . $e->getMessage());
+        }
+
         // Write codes file
         $codesDir = $this->bulkCodesDir();
         if (!is_dir($codesDir) && !@mkdir($codesDir, 0775, true) && !is_dir($codesDir)) {
