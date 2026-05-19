@@ -87,6 +87,20 @@ $dryRun = (string)(getenv('DCC_CRON_DRY_RUN') ?: '') === '1';
 $startTs = microtime(true);
 log_line("dcc-translation-cron start: limit={$batchLimit} only_tiers={$onlyTiers} dry_run=" . ($dryRun ? 'yes' : 'no'));
 
+// Admin-toggleable kill-switch (translation_runtime_setting.auto_translate_enabled).
+// When the admin flips auto-translate OFF in the Translated Docs tab, this
+// cron should bail out before doing any work so we don't burn tokens or
+// schedule jobs. Manual "Retranslate" button in the admin remains unaffected.
+try {
+    $settings = new \MOM\Services\Translation\TranslationRuntimeSettingsService($dataLayer);
+    if (!$settings->isAutoTranslateEnabled()) {
+        log_line('auto_translate_enabled is FALSE — skipping cron tick.');
+        exit(0);
+    }
+} catch (\Throwable $e) {
+    log_line('Settings probe failed, defaulting to ON: ' . $e->getMessage());
+}
+
 // Find candidates: variants in machine_preview/blocked whose engine_version
 // doesn't match the currently-routed provider. We re-translate when the
 // engine has changed (e.g. switched from NLLB to Codex/Claude routing).

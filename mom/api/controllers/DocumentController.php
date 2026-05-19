@@ -44,6 +44,35 @@ class DocumentController extends BaseController
         return $svc;
     }
 
+    /**
+     * Check the admin-toggleable auto-translate flag (table
+     * translation_runtime_setting, key auto_translate_enabled).
+     *
+     * Returns true when auto-translate hooks may fire on doc create /
+     * saveDraft / submitReview / approve / ensureLocale. Returns false
+     * when the admin has switched the toggle off in the Translated Docs
+     * tab — manual "Retranslate" buttons still trigger translation;
+     * only the event-driven hooks are gated.
+     *
+     * Cached statically per-request via TranslationRuntimeSettingsService.
+     * Defaults to true on any failure (preserve current behavior).
+     */
+    private function autoTranslateEnabled(): bool
+    {
+        static $cached = null;
+        if ($cached !== null) {
+            return $cached;
+        }
+        try {
+            $svc = new \MOM\Services\Translation\TranslationRuntimeSettingsService($this->data);
+            $cached = $svc->isAutoTranslateEnabled();
+        } catch (Throwable $e) {
+            @error_log('[DocumentController] auto-translate flag read failed, defaulting to ON: ' . $e->getMessage());
+            $cached = true;
+        }
+        return $cached;
+    }
+
     private function denyLegacyDocumentWrite(string $operation): void
     {
         if (!$this->enforceLegacyWriteGuard) {
@@ -197,7 +226,9 @@ class DocumentController extends BaseController
             $this->invalidateScanCache();
 
             $localeTranslation = [];
-            try {
+            if (!$this->autoTranslateEnabled()) {
+                $localeTranslation = ['skipped' => 'auto_translate_disabled'];
+            } else try {
                 $localeTranslation = $this->localeAutomation()->scheduleEnglishMachinePreview([
                     'doc_code' => $code,
                     'base_rel_path' => $baseRel,
@@ -372,7 +403,9 @@ class DocumentController extends BaseController
 
         $catalog = $this->resolveDocumentCatalogEntry($code, $baseRel);
         $localeTranslation = [];
-        try {
+        if (!$this->autoTranslateEnabled()) {
+            $localeTranslation = ['skipped' => 'auto_translate_disabled'];
+        } else try {
             $localeTranslation = $this->localeAutomation()->scheduleEnglishMachinePreview([
                 'doc_code' => $code,
                 'base_rel_path' => $baseRel,
@@ -558,7 +591,9 @@ class DocumentController extends BaseController
         }
 
         $localeTranslation = [];
-        if ($sourceHtml !== '') {
+        if ($sourceHtml !== '' && !$this->autoTranslateEnabled()) {
+            $localeTranslation = ['skipped' => 'auto_translate_disabled'];
+        } elseif ($sourceHtml !== '') {
             try {
                 $localeTranslation = $this->localeAutomation()->scheduleEnglishMachinePreview([
                     'doc_code' => $code,
@@ -833,7 +868,9 @@ class DocumentController extends BaseController
         );
 
         $localeTranslation = [];
-        try {
+        if (!$this->autoTranslateEnabled()) {
+            $localeTranslation = ['skipped' => 'auto_translate_disabled'];
+        } else try {
             $localeTranslation = $this->localeAutomation()->scheduleEnglishMachinePreview([
                 'doc_code' => $code,
                 'base_rel_path' => $baseRel,
@@ -1005,7 +1042,9 @@ class DocumentController extends BaseController
         }
 
         $localeTranslation = [];
-        try {
+        if (!$this->autoTranslateEnabled()) {
+            $localeTranslation = ['skipped' => 'auto_translate_disabled'];
+        } else try {
             $localeTranslation = $this->localeAutomation()->scheduleEnglishMachinePreview([
                 'doc_code' => $code,
                 'base_rel_path' => $baseRel,

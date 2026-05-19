@@ -11,6 +11,7 @@ use MOM\Services\Translation\ProviderRegistryService;
 use MOM\Services\Translation\SecretVaultService;
 use MOM\Services\Translation\TranslationLearningService;
 use MOM\Services\Translation\TranslationReviewer;
+use MOM\Services\Translation\TranslationRuntimeSettingsService;
 use MOM\Services\Translation\TranslationUsageRecorder;
 use Throwable;
 
@@ -1146,5 +1147,52 @@ final class TranslationAdminController extends EqmsBaseController
         $this->requireAdmin($user);
         $ok = $this->learning()->regenerateCacheFile();
         $this->success(['ok' => $ok, 'cache_path' => $this->learning()->cacheFilePath()]);
+    }
+
+    // ── Runtime settings (auto-translate toggle) ─────────────────────────────
+
+    private function runtimeSettings(): TranslationRuntimeSettingsService
+    {
+        static $svc = null;
+        if ($svc === null) {
+            $svc = new TranslationRuntimeSettingsService($this->data);
+        }
+        return $svc;
+    }
+
+    /**
+     * GET /api/v1/dcc/admin/translation/auto-translate
+     */
+    public function getAutoTranslateSetting(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $all = $this->runtimeSettings()->listAll();
+        $row = $all[TranslationRuntimeSettingsService::KEY_AUTO_TRANSLATE_ENABLED] ?? null;
+        $this->success([
+            'enabled' => $this->runtimeSettings()->isAutoTranslateEnabled(),
+            'updated_at' => $row['updated_at'] ?? null,
+            'updated_by' => $row['updated_by'] ?? null,
+        ]);
+    }
+
+    /**
+     * PUT /api/v1/dcc/admin/translation/auto-translate
+     * Body: { enabled: true|false }
+     */
+    public function setAutoTranslateSetting(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $body = $this->jsonBody();
+        if (!array_key_exists('enabled', $body ?? [])) {
+            $this->error('translation_auto_translate_missing_enabled', 422, 'Body must include `enabled: true|false`.');
+        }
+        $enabled = (bool)$body['enabled'];
+        $ok = $this->runtimeSettings()->setAutoTranslateEnabled($enabled, $this->adminActor($user));
+        if (!$ok) {
+            $this->error('translation_auto_translate_write_failed', 500, 'Could not persist auto-translate flag.');
+        }
+        $this->success(['enabled' => $enabled]);
     }
 }

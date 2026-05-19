@@ -104,6 +104,10 @@ return static function (Router $router, string $dataDir): void {
     $router->get   ('/api/v1/dcc/admin/translation/reviews',                                            TranslationAdminController::class, 'listReviewRuns');
     $router->get   ('/api/v1/dcc/admin/translation/reviews/{review_id}',                                TranslationAdminController::class, 'getReviewRun');
 
+    // ── Auto-translate global toggle (saves tokens when off) ─────────────
+    $router->get   ('/api/v1/dcc/admin/translation/auto-translate',                                     TranslationAdminController::class, 'getAutoTranslateSetting');
+    $router->put   ('/api/v1/dcc/admin/translation/auto-translate',                                     TranslationAdminController::class, 'setAutoTranslateSetting');
+
     // ── Learning loop (curated anti-patterns auto-injected into prompts) ──
     $router->get   ('/api/v1/dcc/admin/translation/learnings',                                          TranslationAdminController::class, 'listLearnings');
     $router->post  ('/api/v1/dcc/admin/translation/learnings',                                          TranslationAdminController::class, 'createLearning');

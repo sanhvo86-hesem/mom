@@ -46,6 +46,11 @@ const STATE = {
   docStateFilter: '',
   docExpandedOverride: null,
   docRetranslating: {},
+  // ── Auto-translate toggle (Translated Docs tab)
+  autoTranslateEnabled: null,   // null = not yet loaded, true/false = known
+  autoTranslateUpdatedBy: null,
+  autoTranslateUpdatedAt: null,
+  autoTranslateBusy: false,
   // ── Learnings tab
   learnings: null,
   learningStatusFilter: '',
@@ -187,6 +192,7 @@ function switchTab(id) {
   if (id === 'models') loadAllModels();
   if (id === 'documents' && !STATE.documents) loadDocuments();
   if (id === 'documents' && STATE.documents) scheduleDocsPoll();
+  if (id === 'documents' && STATE.autoTranslateEnabled === null) loadAutoTranslateSetting();
   if (id === 'learnings' && !STATE.learnings) loadLearnings();
   render();
 }
@@ -1235,6 +1241,94 @@ function scheduleDocsPoll() {
   }, 20_000);
 }
 
+// ── Auto-translate toggle (top of Translated Docs tab) ──────────────────
+// Global ON/OFF switch backed by translation_runtime_setting.auto_translate_enabled.
+// When OFF, the 5 event-driven hooks in DocumentController (create / save /
+// submit / approve / ensureLocale) and dcc_translation_cron.php bail out
+// before spawning any translator command. Manual Retranslate button stays
+// unconditional. Saves Opus tokens on busy editing days.
+function loadAutoTranslateSetting() {
+  api('GET', '/api/v1/dcc/admin/translation/auto-translate')
+    .then(d => {
+      STATE.autoTranslateEnabled = !!d.enabled;
+      STATE.autoTranslateUpdatedBy = d.updated_by || null;
+      STATE.autoTranslateUpdatedAt = d.updated_at || null;
+      render();
+    })
+    .catch(() => {
+      // On failure: default UI to "ON (assumed)" — backend defaults to ON
+      // too if the row is missing. Show a small warning.
+      STATE.autoTranslateEnabled = true;
+      STATE.autoTranslateUpdatedBy = null;
+      STATE.autoTranslateUpdatedAt = null;
+      render();
+    });
+}
+
+function toggleAutoTranslate(nextEnabled) {
+  if (STATE.autoTranslateBusy) return;
+  STATE.autoTranslateBusy = true;
+  render();
+  api('PUT', '/api/v1/dcc/admin/translation/auto-translate', { enabled: !!nextEnabled })
+    .then(d => {
+      STATE.autoTranslateEnabled = !!d.enabled;
+      STATE.autoTranslateBusy = false;
+      toast(d.enabled
+        ? _t('✓ Đã BẬT dịch tự động', '✓ Auto-translate ON')
+        : _t('✓ Đã TẮT dịch tự động (tiết kiệm token)', '✓ Auto-translate OFF (saves tokens)'));
+      // Refresh metadata (updated_by, updated_at).
+      loadAutoTranslateSetting();
+    })
+    .catch(err => {
+      STATE.autoTranslateBusy = false;
+      toast(_t('Lỗi: ', 'Error: ') + (err.message || err));
+      render();
+    });
+}
+
+function renderAutoTranslateToggle() {
+  const enabled = STATE.autoTranslateEnabled;
+  if (enabled === null) {
+    return `<div style="margin-bottom:14px;padding:10px 14px;background:var(--bg-2,#f5f7fb);border-radius:8px;color:var(--text-3);font-size:13px;">
+      ${_t('Đang tải trạng thái dịch tự động...', 'Loading auto-translate state...')}
+    </div>`;
+  }
+  const busy = STATE.autoTranslateBusy;
+  const onTone  = 'background:var(--success-bg,#e6f9ee);border-color:var(--success,#0a7e3a);color:var(--success,#0a7e3a)';
+  const offTone = 'background:var(--warn-bg,#fff8e1);border-color:var(--warn,#e0a000);color:var(--warn,#e0a000)';
+  const tone = enabled ? onTone : offTone;
+  const headline = enabled
+    ? _t('🟢 Dịch tự động ĐANG BẬT', '🟢 Auto-translate is ON')
+    : _t('🟡 Dịch tự động ĐANG TẮT', '🟡 Auto-translate is OFF');
+  const explainOn = _t(
+    'Mỗi khi tài liệu được tạo/lưu/duyệt, hệ thống tự động chạy translator + reviewer. Tiêu thụ token AI và thời gian tính toán.',
+    'On every document create / save / submit / approve, the system auto-runs translator + reviewer. Consumes AI tokens and compute time.'
+  );
+  const explainOff = _t(
+    'Hệ thống KHÔNG tự dịch khi tài liệu thay đổi. Bạn phải bấm "Dịch lại" thủ công cho từng tài liệu cần dịch. Tiết kiệm token AI.',
+    'The system does NOT auto-translate on document changes. You must click "Retranslate" manually for each document. Saves AI tokens.'
+  );
+  const meta = (STATE.autoTranslateUpdatedAt || STATE.autoTranslateUpdatedBy)
+    ? `<div style="font-size:11px;opacity:.75;margin-top:4px;">${_t('Đổi gần nhất', 'Last change')}: ${escapeHtml(STATE.autoTranslateUpdatedAt || '?')}${STATE.autoTranslateUpdatedBy ? ' • ' + escapeHtml(STATE.autoTranslateUpdatedBy) : ''}</div>`
+    : '';
+
+  // Custom toggle switch — pure inline styles so no CSS file edit required.
+  return `
+    <div style="margin-bottom:14px;padding:12px 16px;border:1px solid;border-radius:8px;${tone};display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
+      <div style="flex:1;min-width:280px;">
+        <div style="font-weight:600;">${headline}</div>
+        <div style="font-size:12px;margin-top:2px;opacity:.85;">${enabled ? explainOn : explainOff}</div>
+        ${meta}
+      </div>
+      <button id="tx-auto-toggle" ${busy ? 'disabled' : ''}
+        style="position:relative;width:64px;height:30px;border-radius:30px;border:0;background:${enabled ? 'var(--success,#0a7e3a)' : 'var(--text-3,#999)'};cursor:${busy ? 'wait' : 'pointer'};opacity:${busy ? '.6' : '1'};transition:background .15s;">
+        <span style="position:absolute;top:3px;left:${enabled ? '37' : '3'}px;width:24px;height:24px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.3);transition:left .15s;"></span>
+      </button>
+      <div style="font-size:12px;font-weight:600;width:34px;text-align:center;">${enabled ? 'ON' : 'OFF'}</div>
+    </div>
+  `;
+}
+
 function docStateBadgeStyle(state) {
   const map = {
     machine_preview: 'background:var(--info-bg,#e3f0ff);color:var(--info,#0c63e7)',
@@ -1395,6 +1489,7 @@ function renderDocuments() {
   const totalPages = Math.ceil(total / perPage) || 1;
 
   return `
+    ${renderAutoTranslateToggle()}
     <div style="margin-bottom:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
       <input id="tx-doc-search" type="text" value="${escapeHtml(STATE.docSearch)}"
         placeholder="${_t('Tìm theo mã/tên tài liệu', 'Search by code or title')}"
@@ -1628,6 +1723,21 @@ function wireDocuments() {
       loadDocuments();
     });
   });
+
+  const autoToggleBtn = document.getElementById('tx-auto-toggle');
+  if (autoToggleBtn) {
+    autoToggleBtn.addEventListener('click', () => {
+      const next = !(STATE.autoTranslateEnabled);
+      if (!next) {
+        const ok = confirm(_t(
+          'TẮT dịch tự động? Tài liệu mới hoặc thay đổi sẽ KHÔNG được dịch cho đến khi bạn bấm "Dịch lại" thủ công.',
+          'Turn auto-translate OFF? New or changed documents will NOT be translated until you click "Retranslate" manually.'
+        ));
+        if (!ok) return;
+      }
+      toggleAutoTranslate(next);
+    });
+  }
 
   document.querySelectorAll('.tx-review-badge').forEach(badge => {
     const reviewId = badge.getAttribute('data-review-id');
