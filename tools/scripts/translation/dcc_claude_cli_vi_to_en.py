@@ -69,6 +69,9 @@ SYSTEM_PROMPT_PATH = (
 LEARNING_BLOCK_PATH = (
     common.ROOT / "mom" / "data" / "cache" / "translation-learning-block.md"
 )
+LEARNING_RULES_PATH = (
+    common.ROOT / "mom" / "data" / "cache" / "translation-learning-rules.json"
+)
 PROMPT_CACHE: Optional[str] = None
 
 
@@ -87,6 +90,89 @@ def _load_learning_block() -> str:
     except Exception:
         pass
     return ""
+
+
+def _load_learning_rules() -> List[Dict[str, str]]:
+    """Approved learning rules with non-empty corrections, parsed from the
+    JSON cache file. Returned shape: [{vi_pattern, en_correct, category}, ...].
+
+    Used by _apply_learning_substitutions to FORCE-override LLM output. This
+    is the safety net for cases where the prompt injection isn't enough —
+    e.g. when LEO THANG sits inside <span class="threshold-badge"> and the
+    LLM decides to preserve it as a code badge despite the explicit rule
+    in the learning block. Regex substitution beats LLM judgment here.
+    """
+    try:
+        if LEARNING_RULES_PATH.is_file():
+            raw = LEARNING_RULES_PATH.read_text(encoding="utf-8")
+            data = json.loads(raw)
+            if isinstance(data, list):
+                out: List[Dict[str, str]] = []
+                for entry in data:
+                    if not isinstance(entry, dict):
+                        continue
+                    vi = str(entry.get("vi_pattern", "")).strip()
+                    en = str(entry.get("en_correct", "")).strip()
+                    cat = str(entry.get("category", "")).strip()
+                    if vi and en:
+                        out.append({"vi_pattern": vi, "en_correct": en, "category": cat})
+                return out
+    except Exception:
+        pass
+    return []
+
+
+def _apply_learning_substitutions(translated_text: str) -> str:
+    """For every approved learning rule, replace occurrences of vi_pattern
+    in the translator output with en_correct. Word-boundary regex when the
+    pattern is a single word (lowercased alpha); otherwise plain substring
+    replace (case-insensitive). HTML attribute values are not protected —
+    operators should not promote a rule whose VI pattern collides with a
+    CSS class or href fragment; the admin UI's edit dialog is the place to
+    refine the pattern when that happens.
+    """
+    rules = _load_learning_rules()
+    if not rules or not translated_text:
+        return translated_text
+    out = translated_text
+    for rule in rules:
+        vi = rule["vi_pattern"]
+        en = rule["en_correct"]
+        if not vi or not en or vi == en:
+            continue
+        try:
+            # Use a case-insensitive pattern with word boundaries when the
+            # pattern looks like a single token (no whitespace, alphanumeric +
+            # underscore + hyphen only). Otherwise fall back to a plain
+            # literal replace which is the safest default for multi-word VN
+            # phrases that may contain punctuation or diacritics.
+            if re.fullmatch(r"[\w-]+", vi):
+                pattern = r"\b" + re.escape(vi) + r"\b"
+                out = re.sub(pattern, en, out, flags=re.IGNORECASE)
+            else:
+                # plain substring replace (case-insensitive)
+                lower_out = out.lower()
+                lower_vi = vi.lower()
+                if lower_vi in lower_out:
+                    # Re-build with original case preservation in the
+                    # surrounding text; only the matched span is replaced
+                    # with en_correct verbatim.
+                    start = 0
+                    rebuilt = []
+                    while True:
+                        idx = lower_out.find(lower_vi, start)
+                        if idx < 0:
+                            rebuilt.append(out[start:])
+                            break
+                        rebuilt.append(out[start:idx])
+                        rebuilt.append(en)
+                        start = idx + len(vi)
+                    out = "".join(rebuilt)
+        except Exception:
+            # Never let a bad rule crash translation. Log and continue.
+            sys.stderr.write(f"learning rule application failed for vi={vi!r}: skipped\n")
+            continue
+    return out
 
 OPTIONS = {}
 try:
@@ -288,6 +374,11 @@ def install_engine_overrides() -> None:
         out: Dict[str, str] = {}
         for source, candidate in zip(segments, translated_lines):
             cleaned = common.cleanup_translation(candidate or "")
+            # Force-apply approved learning rules after the LLM emits its
+            # text. This is the only mechanism that beats LLM judgment when
+            # the model decides to preserve a Vietnamese phrase as a code
+            # badge (e.g. LEO THANG inside threshold-badge spans).
+            cleaned = _apply_learning_substitutions(cleaned)
             if cleaned.strip() == "":
                 continue
             critical_now = common.classify_quality_issues(cleaned)["critical"]

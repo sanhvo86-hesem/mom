@@ -27,6 +27,7 @@ use Throwable;
 final class TranslationLearningService
 {
     private const CACHE_REL = 'mom/data/cache/translation-learning-block.md';
+    private const RULES_CACHE_REL = 'mom/data/cache/translation-learning-rules.json';
     private const MAX_ACTIVE_ROWS = 60;
     private const MAX_DOC_CODES_PER_ROW = 25;
 
@@ -190,25 +191,84 @@ final class TranslationLearningService
     }
 
     /**
-     * Regenerate the on-disk cache file so python adapters can read the
-     * block without hitting the DB. Called on every mutation.
+     * Load the approved learning rules as structured JSON for the python
+     * translator's post-substitution step. The .md cache file is for the
+     * LLM prompt (advisory); this .json file is the authoritative list
+     * the translator regex-replaces with after each segment is translated
+     * — a force-override that beats any LLM judgment about whether to
+     * leave a phrase untranslated (e.g. LEO THANG inside a badge span).
+     *
+     * Only rules with a non-empty `en_correct` are substitution-eligible;
+     * a rule with VI pattern but no correction is prompt-only.
+     *
+     * @return list<array{vi_pattern:string, en_correct:string, category:string, severity:string}>
+     */
+    public function loadActiveSubstitutionRules(): array
+    {
+        $rows = $this->data->query(
+            "SELECT vi_pattern, en_correct, category, severity
+               FROM translation_learning
+              WHERE status = 'approved' AND en_correct IS NOT NULL AND en_correct <> ''
+              ORDER BY hit_count DESC, last_seen_at DESC
+              LIMIT :p1",
+            [':p1' => self::MAX_ACTIVE_ROWS]
+        );
+        if (!is_array($rows)) return [];
+        $out = [];
+        foreach ($rows as $row) {
+            $vi = trim((string)($row['vi_pattern'] ?? ''));
+            $en = trim((string)($row['en_correct'] ?? ''));
+            if ($vi === '' || $en === '') continue;
+            $out[] = [
+                'vi_pattern' => $vi,
+                'en_correct' => $en,
+                'category' => (string)($row['category'] ?? 'other'),
+                'severity' => (string)($row['severity'] ?? 'advisory'),
+            ];
+        }
+        return $out;
+    }
+
+    /**
+     * Regenerate both on-disk cache files so python adapters can read them
+     * without hitting the DB:
+     *   - translation-learning-block.md  → injected into the LLM prompt
+     *   - translation-learning-rules.json → forced post-translation regex
+     *     substitution applied to every translated segment
+     *
+     * Called on every approve / disable / update / delete / promote mutation.
      */
     public function regenerateCacheFile(): bool
     {
-        $block = $this->loadActivePromptBlock();
-        $path = rtrim($this->rootDir, '/') . '/' . self::CACHE_REL;
+        $okMd = $this->writeFile(self::CACHE_REL, $this->loadActivePromptBlock());
+        $rules = $this->loadActiveSubstitutionRules();
+        $okJson = $this->writeFile(
+            self::RULES_CACHE_REL,
+            json_encode($rules, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '[]'
+        );
+        return $okMd && $okJson;
+    }
+
+    private function writeFile(string $rel, string $contents): bool
+    {
+        $path = rtrim($this->rootDir, '/') . '/' . $rel;
         $dir = dirname($path);
         if (!is_dir($dir)) {
             if (!@mkdir($dir, 0775, true) && !is_dir($dir)) {
                 return false;
             }
         }
-        return (bool)@file_put_contents($path, $block, LOCK_EX);
+        return (bool)@file_put_contents($path, $contents, LOCK_EX);
     }
 
     public function cacheFilePath(): string
     {
         return rtrim($this->rootDir, '/') . '/' . self::CACHE_REL;
+    }
+
+    public function rulesCacheFilePath(): string
+    {
+        return rtrim($this->rootDir, '/') . '/' . self::RULES_CACHE_REL;
     }
 
     // ── 3. Admin CRUD ───────────────────────────────────────────────────────
