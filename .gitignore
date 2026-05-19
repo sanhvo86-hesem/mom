@@ -198,3 +198,4 @@ mom/data/config/portal_display_config.json
 mom/data/config/epicor_integration_policy.json
 mom/data/config/evidence_retention_policy.json
 mom/data/config/evidence_review_sla_policy.json
+.ai/session-state.json

@@ -1,19 +1,25 @@
 #!/usr/bin/env bash
 # ============================================================================
-# pre-push: warn if local runtime-data is out of sync with the VPS before a
-# git push triggers a deploy.
+# pre-push: data-loss + collision guard
+# ============================================================================
+# Three concerns, in priority order:
 #
-# Why: pushing while local↔VPS are diverged risks either (a) committing
-# runtime data that should never be in git, or (b) running a deploy whose
-# preserve/restore step has to fight with stale local copies. This hook
-# runs `data-sync.sh --check-only` and asks for confirmation if anything is
-# pending.
+# 1. COLLISION (file-level): another commit landed on origin/main since this
+#    session started AND touched a file we also modified. Aborts so the
+#    operator can rebase + re-test instead of force-pushing over someone else's
+#    work. This is the case that lost the Error Code Registry feature: an
+#    earlier AI session pushed code that was overwritten by a later session
+#    rebasing wrong.
 #
-# Soft-fail: if SSH to the VPS is unavailable (no network, no key loaded,
-# wrong host), the hook exits 0 silently — it must never block a developer
-# who is offline or working from a clean checkout.
+# 2. VPS↔LOCAL data drift: original purpose of this hook. Warns when runtime
+#    data on the VPS differs from the local mirror so the post-push deploy
+#    doesn't have to fight stale local copies. Soft-skip when SSH is down.
 #
-# Activate once per clone (one-time setup):
+# 3. MIGRATION DRIFT: offline file/numbering check. Prevents the
+#    188_error_code_registry repeat (live DB applied a migration whose file
+#    was deleted from the repo).
+#
+# Activate once per clone:
 #   git config core.hooksPath .githooks
 #
 # Bypass for an individual push:
@@ -21,66 +27,151 @@
 # ============================================================================
 set -u
 
-# Skip entirely if the user has not opted into hookspath. This avoids
-# running the check from random clones / CI.
+# Skip in non-interactive contexts (CI, scripts) — nothing to confirm to.
+if [[ ! -t 0 || ! -t 1 ]]; then
+    # Still run the cheap offline checks since they don't need a TTY.
+    OFFLINE_ONLY=1
+else
+    OFFLINE_ONLY=0
+fi
+
+# Skip entirely if the user has not opted into hookspath.
 HOOKS_PATH="$(git config --get core.hooksPath 2>/dev/null || true)"
 if [[ "$HOOKS_PATH" != ".githooks" ]]; then
     exit 0
 fi
 
-# Skip in non-interactive contexts (CI, scripts) — nothing to confirm to.
-if [[ ! -t 0 || ! -t 1 ]]; then
+REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo .)"
+STATE_FILE="$REPO_ROOT/.ai/session-state.json"
+PRE_PUSH_LOG="/tmp/mom-pre-push-$$.log"
+trap 'rm -f "$PRE_PUSH_LOG"' EXIT
+
+# ── Check 1: file-level collision detection ────────────────────────────────
+# Read branch_base_sha from preflight. If session-state.json is missing or
+# unreadable, fall back to merge-base — slower but always correct.
+BRANCH_BASE_SHA=""
+if [[ -f "$STATE_FILE" ]]; then
+    BRANCH_BASE_SHA="$(grep '"branch_base_sha"' "$STATE_FILE" 2>/dev/null \
+                       | sed -E 's/.*"branch_base_sha": *"([^"]*)".*/\1/' | head -1)"
+fi
+
+git fetch origin --quiet 2>/dev/null || true
+CURRENT_BRANCH="$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo HEAD)"
+HEAD_SHA="$(git rev-parse HEAD 2>/dev/null || echo)"
+ORIGIN_MAIN_SHA="$(git rev-parse origin/main 2>/dev/null || echo)"
+
+if [[ -z "$BRANCH_BASE_SHA" || ! "$BRANCH_BASE_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+    # Fallback: merge-base of HEAD and origin/main. Always defined unless the
+    # repo is brand-new with no merge base.
+    BRANCH_BASE_SHA="$(git merge-base HEAD origin/main 2>/dev/null || echo)"
+fi
+
+if [[ -n "$BRANCH_BASE_SHA" && -n "$ORIGIN_MAIN_SHA" && "$BRANCH_BASE_SHA" != "$ORIGIN_MAIN_SHA" ]]; then
+    # origin/main moved since session start. Compute the overlap of:
+    #   A = files MY commits (not on origin/main) touched
+    #   B = files OTHER commits touched on origin/main since session start
+    # Use merge-base for $MINE so that if I've already pulled origin/main into
+    # HEAD, those commits don't double-count as "my changes". Otherwise every
+    # file codex touched would also appear in $MINE and trigger a false
+    # positive. The collision we actually care about is: my OWN commits
+    # touch a file that codex's commits also touched.
+    MERGE_BASE="$(git merge-base HEAD origin/main 2>/dev/null || echo "$BRANCH_BASE_SHA")"
+    MINE="$(git diff --name-only "$MERGE_BASE" HEAD 2>/dev/null | sort -u || true)"
+    THEIRS="$(git diff --name-only "$BRANCH_BASE_SHA" origin/main 2>/dev/null | sort -u || true)"
+
+    if [[ -n "$MINE" && -n "$THEIRS" ]]; then
+        OVERLAP="$(comm -12 <(printf '%s\n' "$MINE") <(printf '%s\n' "$THEIRS") || true)"
+        if [[ -n "$OVERLAP" ]]; then
+            echo ""
+            echo "pre-push: COLLISION DETECTED — origin/main changed files you also modified."
+            echo ""
+            echo "  Session base: $(echo "$BRANCH_BASE_SHA" | head -c 8)"
+            echo "  Your HEAD:    $(echo "$HEAD_SHA" | head -c 8)"
+            echo "  Origin/main:  $(echo "$ORIGIN_MAIN_SHA" | head -c 8)"
+            echo ""
+            echo "  Overlapping files:"
+            printf '%s\n' "$OVERLAP" | head -20 | sed 's/^/    - /'
+            OVERLAP_COUNT=$(printf '%s\n' "$OVERLAP" | wc -l | tr -d ' ')
+            if [[ "$OVERLAP_COUNT" -gt 20 ]]; then
+                echo "    … and $((OVERLAP_COUNT - 20)) more"
+            fi
+            echo ""
+            echo "  Recommended sequence:"
+            echo "    1. git stash --include-untracked   # park your work"
+            echo "    2. git pull --rebase origin main   # apply origin/main"
+            echo "    3. git stash pop                   # restore your work"
+            echo "    4. resolve conflicts file by file"
+            echo "    5. re-run tests"
+            echo "    6. git push (this hook will re-run)"
+            echo ""
+            echo "  Bypass (DANGEROUS — only if you've verified manually):"
+            echo "    git push --no-verify"
+            echo ""
+            exit 1
+        fi
+
+        # No file overlap — safe to fast-forward rebase. Just inform.
+        echo "pre-push: origin/main advanced but no file overlap — safe to push (consider rebase for linear history)."
+    fi
+fi
+
+# ── Check 2: migration drift (cheap offline file check) ────────────────────
+if [[ -f "$REPO_ROOT/mom/tools/release/check_migration_drift.php" ]]; then
+    if ! php "$REPO_ROOT/mom/tools/release/check_migration_drift.php" --quiet >"$PRE_PUSH_LOG" 2>&1; then
+        echo ""
+        echo "pre-push: migration drift detected — refusing to push."
+        cat "$PRE_PUSH_LOG" | sed 's/^/  /'
+        echo ""
+        echo "  Fix the drift then re-push, or bypass with: git push --no-verify"
+        exit 1
+    fi
+fi
+
+# ── Check 3: VPS↔local data drift (original hook purpose) ──────────────────
+if [[ "$OFFLINE_ONLY" -eq 1 ]]; then
     exit 0
 fi
 
-REPO_ROOT="$(git rev-parse --show-toplevel 2>/dev/null || echo .)"
 SYNC_SCRIPT="$REPO_ROOT/tools/vps-setup/scripts/data-sync.sh"
 [[ -x "$SYNC_SCRIPT" ]] || exit 0
 
-# Quick reachability probe (3s) so the hook can't hang on a flaky network.
-VPS="${TARGET:-${VPS:-deploy@vps.hesemeng.com}}"
+VPS="${TARGET:-${VPS:-eqms}}"
 if ! ssh -o ConnectTimeout=3 -o BatchMode=yes -o StrictHostKeyChecking=accept-new \
         "$VPS" 'true' >/dev/null 2>&1; then
-    # Cannot reach VPS — silent skip. We're not the right place to alert.
     exit 0
 fi
 
 echo "pre-push: checking local↔VPS data sync state..."
 set +e
-"$SYNC_SCRIPT" --check-only --vps "$VPS" >/tmp/mom-sync-check.$$ 2>&1
+"$SYNC_SCRIPT" --check-only --vps "$VPS" >"$PRE_PUSH_LOG" 2>&1
 rc=$?
 set -e
 
 case "$rc" in
     0)
         echo "pre-push: local and VPS are in sync. Proceeding."
-        rm -f /tmp/mom-sync-check.$$
         exit 0
         ;;
     10)
         echo ""
         echo "pre-push: WARNING — local runtime data differs from VPS:"
-        sed -n '/Plan:/,/^Proceed?/{/^Proceed?/d; p;}' /tmp/mom-sync-check.$$ \
+        sed -n '/Plan:/,/^Proceed?/{/^Proceed?/d; p;}' "$PRE_PUSH_LOG" \
             | sed 's/^/  /' || true
         echo ""
-        echo "  The deploy that runs after this push will preserve VPS state,"
-        echo "  but you may also want to:"
+        echo "  Deploy will preserve VPS state, but you may want to:"
         echo "    bash $SYNC_SCRIPT                 # reconcile interactively"
         echo "    git push --no-verify              # bypass this check"
         echo ""
         printf 'Continue with push anyway? [y/N] '
         read -r ans </dev/tty || ans=""
-        rm -f /tmp/mom-sync-check.$$
         case "$ans" in
             y|Y|yes|YES) exit 0 ;;
             *) echo "pre-push: aborted by user."; exit 1 ;;
         esac
         ;;
     *)
-        # Sync script error (not a clean diff) — show output, don't block push.
         echo "pre-push: data-sync --check-only exited $rc (non-fatal). Output:"
-        sed 's/^/  /' /tmp/mom-sync-check.$$ >&2
-        rm -f /tmp/mom-sync-check.$$
+        sed 's/^/  /' "$PRE_PUSH_LOG" >&2
         exit 0
         ;;
 esac

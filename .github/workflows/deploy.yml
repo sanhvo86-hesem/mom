@@ -10,9 +10,59 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  # ── Job 1: classify the changeset so we can skip heavy validation on
+  # frontend-only patches (CSS/JS/HTML/docs). Saves ~2 minutes per deploy.
+  # Fail-closed: any non-frontend touch flips needs_php_validation=true.
+  classify:
+    name: Classify Changeset
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    outputs:
+      needs_php_validation: ${{ steps.classify.outputs.needs_php_validation }}
+      needs_db_migration_check: ${{ steps.classify.outputs.needs_db_migration_check }}
+      changed_files_summary: ${{ steps.classify.outputs.summary }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - id: classify
+        name: Compute file class flags
+        run: |
+          set -euo pipefail
+          BASE="${{ github.event.before }}"
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
+            BASE="HEAD~1"
+          fi
+          CHANGED="$(git diff --name-only "$BASE" HEAD 2>/dev/null || git ls-files)"
+          echo "Changed files:"
+          printf '%s\n' "$CHANGED" | head -50 | sed 's/^/  /'
+          [ "$(printf '%s\n' "$CHANGED" | wc -l)" -gt 50 ] && echo "  ... (truncated)"
+
+          # Frontend-only allowlist. Anything NOT matching => needs PHP validation.
+          # We err on the side of running full validation if in doubt.
+          FRONTEND_REGEX='^(mom/(scripts|styles|templates|docs|assets)/|mom/portal\.html$|mom/index\.html$|.*\.(md|txt)$)'
+          PHP_TOUCH="$(printf '%s\n' "$CHANGED" | grep -Ev "$FRONTEND_REGEX" || true)"
+          DB_TOUCH="$(printf '%s\n' "$CHANGED" | grep -E '^mom/database/migrations/.*\.sql$' || true)"
+
+          if [ -z "$PHP_TOUCH" ]; then
+            echo "needs_php_validation=false" >> "$GITHUB_OUTPUT"
+            echo "summary=frontend-only ($(printf '%s\n' "$CHANGED" | wc -l) files)" >> "$GITHUB_OUTPUT"
+            echo "::notice::Frontend-only changeset — skipping PHPStan/PHPUnit/SSOT gates"
+          else
+            echo "needs_php_validation=true" >> "$GITHUB_OUTPUT"
+            echo "summary=full ($(printf '%s\n' "$CHANGED" | wc -l) files, $(printf '%s\n' "$PHP_TOUCH" | wc -l) non-frontend)" >> "$GITHUB_OUTPUT"
+          fi
+
+          if [ -n "$DB_TOUCH" ]; then
+            echo "needs_db_migration_check=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "needs_db_migration_check=false" >> "$GITHUB_OUTPUT"
+          fi
+
   deploy:
     name: Deploy to Production
     runs-on: ubuntu-latest
+    needs: classify
     if: github.ref == 'refs/heads/main'
     environment: production
     steps:
@@ -24,6 +74,13 @@ jobs:
       - uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
+          tools: composer:v2
+
+      - name: Show classification
+        run: |
+          echo "Changeset class: ${{ needs.classify.outputs.changed_files_summary }}"
+          echo "PHP validation:  ${{ needs.classify.outputs.needs_php_validation }}"
+          echo "Migration check: ${{ needs.classify.outputs.needs_db_migration_check }}"
 
       - name: Refuse runtime config / docs in commit
         # Hard gate: even if the deploy.sh capture/restore would catch this
@@ -51,6 +108,7 @@ jobs:
           fi
 
       - name: Verify runtime-files preserve list covers all PHP writers
+        if: needs.classify.outputs.needs_php_validation == 'true'
         # If a developer added a new save_*() / saveConfig() / write_json_file()
         # call whose path resolves under mom/data/config/ but didn't add the
         # basename to RUNTIME_CONFIG_FILES in _runtime-files.sh, the next
@@ -60,25 +118,37 @@ jobs:
       - name: Block generated/runtime artifacts in controlled source
         run: php mom/tools/release/check_repo_boundary.php
 
+      - name: Migration drift check (offline)
+        # Catches the 188_error_code_registry repeat: live DB applied a
+        # migration whose file was deleted from the repo, so fresh clones
+        # can't recreate the schema. Offline mode runs file-level checks
+        # only; full DB cross-check runs inside deploy.sh on the VPS.
+        if: needs.classify.outputs.needs_db_migration_check == 'true'
+        run: php mom/tools/release/check_migration_drift.php
+
       - name: Enforce user identity SSOT (.ai/USER_IDENTITY_SSOT.md)
+        if: needs.classify.outputs.needs_php_validation == 'true'
         # Fails the deploy if any code path: (a) hardcodes role-key literals
         # outside the ROLES owner files, (b) creates a new table with
         # username/full_name/employee_name/password_hash outside the existing
         # user-identity tables, (c) writes directly to users/employees/
         # hcm_employees outside AuthUserShadowSyncService, or (d) calls
         # file_put_contents() against users.json outside DataSyncMutationService.
-        # Policy lives at .ai/USER_IDENTITY_SSOT.md so AI assistants and
-        # humans share one authoritative reference.
         run: php mom/tools/release/check_user_identity_ssot.php
 
       - name: Cache Composer dependencies
+        if: needs.classify.outputs.needs_php_validation == 'true'
         uses: actions/cache@v4
         with:
-          path: ~/.composer/cache
-          key: ${{ runner.os }}-composer-${{ hashFiles('mom/composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
+          path: |
+            ~/.composer/cache
+            mom/vendor
+          key: ${{ runner.os }}-php85-composer-${{ hashFiles('mom/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php85-composer-
 
       - name: Install validation dependencies
+        if: needs.classify.outputs.needs_php_validation == 'true'
         working-directory: mom
         run: composer install --no-interaction --prefer-dist
 
@@ -86,52 +156,40 @@ jobs:
       # fails. Previously bundled into one step where a phpunit failure
       # looked identical to a phpstan failure looked identical to a
       # workflow-status-authority failure.
-      #
-      # NOTE: "composer check" = @analyse + @test — do NOT add it back here;
-      # it would run PHPStan and PHPUnit a second time, doubling CI duration.
-      #
-      # Use system `composer` (provided by setup-php), NOT `./composer` —
-      # the local wrapper at mom/composer is gitignored and absent in CI.
       - name: Validate — phpstan analyse
+        if: needs.classify.outputs.needs_php_validation == 'true'
         working-directory: mom
         env: { APP_ENV: test, DB_PASSWORD: test_password }
         run: composer analyse -- --memory-limit=1G
 
       - name: Validate — phpunit tests
+        if: needs.classify.outputs.needs_php_validation == 'true'
         working-directory: mom
         env: { APP_ENV: test, DB_PASSWORD: test_password }
         run: composer test
 
       - name: Validate — workflow status authority
+        if: needs.classify.outputs.needs_php_validation == 'true'
         working-directory: mom
         env: { APP_ENV: test, DB_PASSWORD: test_password }
         run: php tools/release/check_workflow_status_authority.php
 
       - name: Verify governed promotion inputs (when configured)
+        if: needs.classify.outputs.needs_php_validation == 'true'
         env:
           RELEASE_MANIFEST_REF: ${{ vars.RELEASE_MANIFEST_REF }}
           CHANGE_AUTHORITY_REF: ${{ vars.CHANGE_AUTHORITY_REF }}
           DEPLOY_COMMIT_SHA: ${{ github.sha }}
         run: |
-          # Pre-production posture (per ADR-0001): controlled-source
-          # promotion via release manifest is OPTIONAL. When the repo
-          # variables RELEASE_MANIFEST_REF + CHANGE_AUTHORITY_REF are
-          # both configured, the manifest binding is verified strictly
-          # (the original ISO ALCOA+ guarantee). When either is empty,
-          # we log a warning and proceed — operationally necessary
-          # because the manifest cannot self-reference its own commit
-          # SHA, so a manifest must be authored against a parent commit
-          # and bound to its child via this gate. Pre-production work
-          # iterates faster than that handshake; the gate is wired up
-          # for production cutover (ADR-0001) but does not block
-          # development deploys when the inputs are not yet provisioned.
+          # Pre-production posture (per ADR-0001): controlled-source promotion
+          # via release manifest is OPTIONAL until the production cutover.
           if [ -n "$RELEASE_MANIFEST_REF" ] && [ -n "$CHANGE_AUTHORITY_REF" ]; then
             php mom/tools/release/verify_release_manifest_binding.php \
               --manifest-ref="$RELEASE_MANIFEST_REF" \
               --change-authority-ref="$CHANGE_AUTHORITY_REF" \
               --commit-sha="$DEPLOY_COMMIT_SHA"
           else
-            echo "::warning::RELEASE_MANIFEST_REF / CHANGE_AUTHORITY_REF unset — proceeding without manifest binding verification (pre-production posture). Set both variables to enforce strict governance for the production cutover."
+            echo "::warning::RELEASE_MANIFEST_REF / CHANGE_AUTHORITY_REF unset — proceeding without manifest binding verification (pre-production posture)."
           fi
 
       - name: Deploy via SSH
@@ -141,10 +199,7 @@ jobs:
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           # Requires the SSH user to have a NOPASSWD sudo rule for the deploy
-          # script. Provision once during VPS setup, e.g.:
-          #   echo "${VPS_USER} ALL=(root) NOPASSWD: /usr/bin/bash ${DEPLOY_PATH}/tools/vps-setup/scripts/deploy.sh" \
-          #     | sudo tee /etc/sudoers.d/qms-deploy
-          # `sudo -n` fails fast (instead of hanging) if NOPASSWD is missing.
+          # script. `sudo -n` fails fast if NOPASSWD is missing.
           script: |
             set -euo pipefail
             sudo -n bash ${{ secrets.DEPLOY_PATH }}/tools/vps-setup/scripts/deploy.sh
