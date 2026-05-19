@@ -9,6 +9,8 @@ use MOM\Services\Translation\CliRuntimeService;
 use MOM\Services\Translation\ModelDiscoveryService;
 use MOM\Services\Translation\ProviderRegistryService;
 use MOM\Services\Translation\SecretVaultService;
+use MOM\Services\Translation\TranslationLearningService;
+use MOM\Services\Translation\TranslationReviewer;
 use MOM\Services\Translation\TranslationUsageRecorder;
 use Throwable;
 
@@ -608,6 +610,11 @@ final class TranslationAdminController extends EqmsBaseController
                  v.translation_state, v.translation_provider, v.engine_version,
                  v.artifact_source_revision AS translated_revision,
                  v.updated_at AS translated_at,
+                 v.last_review_outcome,
+                 v.last_review_at,
+                 v.last_review_issues_critical,
+                 v.last_review_issues_advisory,
+                 v.last_review_id,
                  r.routing_id AS override_routing_id,
                  r.primary_provider AS override_provider,
                  r.primary_model AS override_model,
@@ -944,5 +951,200 @@ final class TranslationAdminController extends EqmsBaseController
             'canceled'  => $isQueued,
             'killed'    => $killed,
         ]);
+    }
+
+    // ── Reviewer (post-translation QC) ───────────────────────────────────────
+
+    private function reviewer(): TranslationReviewer
+    {
+        static $svc = null;
+        if ($svc === null) {
+            $svc = new TranslationReviewer($this->data, $this->rootDir);
+        }
+        return $svc;
+    }
+
+    /**
+     * GET /api/v1/dcc/admin/translation/reviews?limit=50
+     */
+    public function listReviewRuns(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $limit = (int)($this->query('limit') ?? '50');
+        $rows = $this->reviewer()->recentRuns($limit);
+        $this->success(['reviews' => $rows]);
+    }
+
+    /**
+     * GET /api/v1/dcc/admin/translation/reviews/{review_id}
+     */
+    public function getReviewRun(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $idRaw = $this->requirePathId('review_id', 'review_id');
+        $id = (int)$idRaw;
+        if ($id <= 0) {
+            $this->error('translation_review_id_invalid', 422, 'review_id must be a positive integer.');
+        }
+        $row = $this->reviewer()->findRun($id);
+        if ($row === null) {
+            $this->error('translation_review_not_found', 404, 'No such review run.');
+        }
+        $this->success(['review' => $row]);
+    }
+
+    // ── Learning loop (curated anti-patterns) ────────────────────────────────
+
+    private function learning(): TranslationLearningService
+    {
+        static $svc = null;
+        if ($svc === null) {
+            $svc = new TranslationLearningService($this->data, $this->rootDir);
+        }
+        return $svc;
+    }
+
+    /**
+     * GET /api/v1/dcc/admin/translation/learnings?status=auto&category=&search=&limit=&offset=
+     */
+    public function listLearnings(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $result = $this->learning()->listLearnings([
+            'status' => (string)($this->query('status') ?? ''),
+            'category' => (string)($this->query('category') ?? ''),
+            'search' => (string)($this->query('search') ?? ''),
+            'limit' => (int)($this->query('limit') ?? '50'),
+            'offset' => (int)($this->query('offset') ?? '0'),
+        ]);
+        $this->success([
+            'rows' => $result['rows'],
+            'total' => $result['total'],
+            'stats' => $this->learning()->stats(),
+        ]);
+    }
+
+    /**
+     * POST /api/v1/dcc/admin/translation/learnings
+     * Body: { vi_pattern, en_correct, en_wrong_pattern?, category, severity?, explanation?, notes? }
+     */
+    public function createLearning(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $body = $this->jsonBody();
+        $actor = $this->adminActor($user);
+        $id = $this->learning()->createManual([
+            'vi_pattern' => (string)($body['vi_pattern'] ?? ''),
+            'en_wrong_pattern' => (string)($body['en_wrong_pattern'] ?? ''),
+            'en_correct' => (string)($body['en_correct'] ?? ''),
+            'category' => (string)($body['category'] ?? 'other'),
+            'severity' => (string)($body['severity'] ?? 'advisory'),
+            'explanation' => (string)($body['explanation'] ?? ''),
+            'notes' => (string)($body['notes'] ?? ''),
+        ], $actor);
+        if ($id === null) {
+            $this->error('translation_learning_create_failed', 422, 'vi_pattern and en_correct are required.');
+        }
+        $this->success(['learning_id' => $id, 'row' => $this->learning()->findById($id)]);
+    }
+
+    /**
+     * PUT /api/v1/dcc/admin/translation/learnings/{learning_id}
+     * Body: { vi_pattern?, en_wrong_pattern?, en_correct?, category?, severity?, explanation?, notes? }
+     */
+    public function updateLearning(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $id = (int)$this->requirePathId('learning_id', 'learning_id');
+        if ($id <= 0) {
+            $this->error('translation_learning_id_invalid', 422, 'learning_id is required.');
+        }
+        $body = $this->jsonBody();
+        $actor = $this->adminActor($user);
+        $ok = $this->learning()->updateFields($id, is_array($body) ? $body : [], $actor);
+        if (!$ok) {
+            $this->error('translation_learning_update_failed', 422, 'No editable fields provided.');
+        }
+        $this->success(['row' => $this->learning()->findById($id)]);
+    }
+
+    /**
+     * POST /api/v1/dcc/admin/translation/learnings/{learning_id}/approve
+     */
+    public function approveLearning(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $id = (int)$this->requirePathId('learning_id', 'learning_id');
+        if (!$this->learning()->approve($id, $this->adminActor($user))) {
+            $this->error('translation_learning_approve_failed', 422, 'Approve failed.');
+        }
+        $this->success(['row' => $this->learning()->findById($id)]);
+    }
+
+    /**
+     * POST /api/v1/dcc/admin/translation/learnings/{learning_id}/disable
+     */
+    public function disableLearning(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $id = (int)$this->requirePathId('learning_id', 'learning_id');
+        if (!$this->learning()->disable($id, $this->adminActor($user))) {
+            $this->error('translation_learning_disable_failed', 422, 'Disable failed.');
+        }
+        $this->success(['row' => $this->learning()->findById($id)]);
+    }
+
+    /**
+     * DELETE /api/v1/dcc/admin/translation/learnings/{learning_id}
+     */
+    public function deleteLearning(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $id = (int)$this->requirePathId('learning_id', 'learning_id');
+        if (!$this->learning()->delete($id)) {
+            $this->error('translation_learning_delete_failed', 422, 'Delete failed.');
+        }
+        $this->success(['deleted' => true, 'learning_id' => $id]);
+    }
+
+    /**
+     * POST /api/v1/dcc/admin/translation/learnings/from-issue
+     * Body: { issue: {vi_excerpt, en_excerpt, category, severity, suggestion, explanation},
+     *         doc_code, review_id, approve? (default true) }
+     */
+    public function learningFromIssue(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $body = $this->jsonBody();
+        $issue = is_array($body['issue'] ?? null) ? $body['issue'] : [];
+        $docCode = (string)($body['doc_code'] ?? '');
+        $reviewId = isset($body['review_id']) ? (int)$body['review_id'] : null;
+        $approve = !array_key_exists('approve', $body) || (bool)$body['approve'];
+        $id = $this->learning()->promoteFromIssue($issue, $docCode, $reviewId, $this->adminActor($user), $approve);
+        if ($id === null) {
+            $this->error('translation_learning_promote_failed', 422, 'issue.vi_excerpt and issue.category are required.');
+        }
+        $this->success(['learning_id' => $id, 'row' => $this->learning()->findById($id)]);
+    }
+
+    /**
+     * POST /api/v1/dcc/admin/translation/learnings/regenerate-block
+     * Manual rebuild of the on-disk cache file (in case it drifted from DB).
+     */
+    public function regenerateLearningBlock(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAdmin($user);
+        $ok = $this->learning()->regenerateCacheFile();
+        $this->success(['ok' => $ok, 'cache_path' => $this->learning()->cacheFilePath()]);
     }
 }

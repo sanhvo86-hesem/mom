@@ -46,6 +46,13 @@ const STATE = {
   docStateFilter: '',
   docExpandedOverride: null,
   docRetranslating: {},
+  // ── Learnings tab
+  learnings: null,
+  learningStatusFilter: '',
+  learningCategoryFilter: '',
+  learningSearch: '',
+  learningPage: 1,
+  learningEditing: null,
 };
 
 const TABS = [
@@ -53,6 +60,7 @@ const TABS = [
   { id: 'providers', vi: 'Provider',         en: 'Providers' },
   { id: 'models',    vi: 'Model',            en: 'Models' },
   { id: 'documents', vi: 'Tài liệu đã dịch', en: 'Translated Docs' },
+  { id: 'learnings', vi: 'Ghi nhớ lỗi',      en: 'Learnings' },
   { id: 'test',      vi: 'Test bench',       en: 'Test bench' },
   { id: 'usage',     vi: 'Chi phí',          en: 'Cost & Usage' },
 ];
@@ -162,6 +170,7 @@ function render() {
     case 'providers': bodyEl.innerHTML = renderProviders(); wireProviders(); break;
     case 'models':    bodyEl.innerHTML = renderModels(); wireModels(); break;
     case 'documents': bodyEl.innerHTML = renderDocuments(); wireDocuments(); break;
+    case 'learnings': bodyEl.innerHTML = renderLearnings(); wireLearnings(); break;
     case 'test':      bodyEl.innerHTML = renderTestBench(); wireTestBench(); break;
     case 'usage':     bodyEl.innerHTML = renderUsage(); break;
   }
@@ -178,6 +187,7 @@ function switchTab(id) {
   if (id === 'models') loadAllModels();
   if (id === 'documents' && !STATE.documents) loadDocuments();
   if (id === 'documents' && STATE.documents) scheduleDocsPoll();
+  if (id === 'learnings' && !STATE.learnings) loadLearnings();
   render();
 }
 
@@ -1235,6 +1245,106 @@ function docStateBadgeStyle(state) {
   return map[state] || 'background:var(--bg-2,#f5f7fb);color:var(--text-3)';
 }
 
+// Post-translation reviewer (Claude Haiku 4.5) badge. Surfaces the most-recent
+// reviewer outcome cached on dcc_document_locale_variant.last_review_*.
+// Clicking opens a small modal that fetches the full JSON issue list.
+function reviewBadgeStyle(outcome) {
+  const map = {
+    pass:     'background:var(--success-bg,#e6f9ee);color:var(--success,#0a7e3a)',
+    advisory: 'background:var(--warn-bg,#fff8e1);color:var(--warn,#e0a000)',
+    fail:     'background:var(--danger-bg,#fff0f0);color:var(--danger,#c00)',
+    error:    'background:var(--bg-2,#f5f7fb);color:var(--text-3)',
+    skipped:  'background:var(--bg-2,#f5f7fb);color:var(--text-3)',
+  };
+  return map[outcome] || 'background:var(--bg-2,#f5f7fb);color:var(--text-3)';
+}
+function reviewBadgeIcon(outcome) {
+  return ({ pass: '✓', advisory: '⚠', fail: '✗', error: '?', skipped: '–' })[outcome] || '·';
+}
+function renderReviewBadge(doc) {
+  const outcome = doc.last_review_outcome;
+  if (!outcome) return '';
+  const crit = doc.last_review_issues_critical || 0;
+  const adv  = doc.last_review_issues_advisory || 0;
+  const reviewId = doc.last_review_id;
+  const summary = (outcome === 'pass')
+    ? _t('Đã rà soát', 'Reviewed')
+    : (outcome === 'advisory')
+      ? _t(adv + ' khuyến nghị', adv + ' advisory')
+      : (outcome === 'fail')
+        ? _t(crit + ' lỗi nghiêm trọng', crit + ' critical')
+        : (outcome === 'error')
+          ? _t('Lỗi reviewer', 'Reviewer error')
+          : _t('Bỏ qua', 'Skipped');
+  const tip = _t('Bấm để xem chi tiết bản review (Claude Haiku 4.5)', 'Click for review details (Claude Haiku 4.5)');
+  return `<span class="tx-review-badge" data-review-id="${reviewId || ''}" title="${escapeHtml(tip)}"
+    style="display:inline-block;margin-left:6px;padding:3px 7px;border-radius:4px;font-size:10px;white-space:nowrap;cursor:${reviewId ? 'pointer' : 'default'};${reviewBadgeStyle(outcome)}">
+    ${reviewBadgeIcon(outcome)} ${escapeHtml(summary)}
+  </span>`;
+}
+function openReviewModal(reviewId) {
+  if (!reviewId) return;
+  // Lightweight inline modal — no CSS file edit.
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = `
+    <div style="background:var(--bg,#fff);border-radius:8px;max-width:800px;width:90vw;max-height:80vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,.3);">
+      <div style="padding:14px 18px;border-bottom:1px solid var(--ln,#ddd);display:flex;justify-content:space-between;align-items:center;">
+        <strong>${_t('Chi tiết Review (Claude Haiku)', 'Review Detail (Claude Haiku)')}</strong>
+        <button class="tx-review-close" style="border:0;background:transparent;font-size:22px;cursor:pointer;line-height:1;">×</button>
+      </div>
+      <div class="tx-review-body" style="padding:14px 18px;overflow:auto;font-size:13px;">
+        <i style="color:var(--text-3);">${_t('Đang tải...', 'Loading...')}</i>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelector('.tx-review-close').addEventListener('click', () => overlay.remove());
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+
+  api('GET', '/api/v1/dcc/admin/translation/reviews/' + encodeURIComponent(reviewId))
+    .then(d => {
+      const r = (d && d.review) || {};
+      let issues = r.issues_jsonb;
+      if (typeof issues === 'string') { try { issues = JSON.parse(issues); } catch (_) { issues = []; } }
+      if (!Array.isArray(issues)) issues = [];
+      const body = overlay.querySelector('.tx-review-body');
+      const head = `
+        <div style="margin-bottom:12px;">
+          <div><strong>${_t('Doc', 'Doc')}:</strong> <code>${escapeHtml(r.doc_code || '—')}</code>
+            &nbsp;·&nbsp; <strong>${_t('Outcome', 'Outcome')}:</strong>
+            <span style="padding:2px 8px;border-radius:4px;${reviewBadgeStyle(r.outcome)}">${escapeHtml(r.outcome || '—')}</span>
+            &nbsp;·&nbsp; <strong>${_t('Critical', 'Critical')}:</strong> ${r.issues_critical || 0}
+            &nbsp;·&nbsp; <strong>${_t('Advisory', 'Advisory')}:</strong> ${r.issues_advisory || 0}
+          </div>
+          <div style="margin-top:6px;color:var(--text-2);">${escapeHtml(r.summary || '')}</div>
+          <div style="margin-top:6px;font-size:11px;color:var(--text-3);">
+            ${_t('Model', 'Model')}: <code>${escapeHtml(r.reviewer_model || '—')}</code>
+            &nbsp;·&nbsp; ${_t('Đã rà soát', 'Reviewed')}: ${r.paragraphs_reviewed || 0} ${_t('đoạn', 'paragraphs')}
+            &nbsp;·&nbsp; ${escapeHtml(r.created_at || '')}
+          </div>
+        </div>`;
+      const list = issues.length === 0
+        ? `<div style="color:var(--text-3);padding:14px;text-align:center;">${_t('Không có vấn đề.', 'No issues.')}</div>`
+        : issues.map(i => `
+            <div style="border:1px solid var(--ln-2,#eee);border-radius:6px;padding:10px 12px;margin-bottom:8px;background:${i.severity === 'critical' ? 'var(--danger-bg,#fff5f5)' : 'var(--warn-bg,#fffbee)'};">
+              <div style="display:flex;gap:8px;align-items:center;margin-bottom:4px;">
+                <code style="font-size:11px;background:var(--bg-2,#f5f7fb);padding:1px 5px;border-radius:3px;">${escapeHtml(i.segment || '—')}</code>
+                <span style="font-size:10px;padding:1px 6px;border-radius:3px;${i.severity === 'critical' ? 'background:var(--danger,#c00);color:#fff' : 'background:var(--warn,#e0a000);color:#fff'}">${escapeHtml(i.severity || '—')}</span>
+                <span style="font-size:11px;color:var(--text-3);">${escapeHtml(i.category || '—')}</span>
+              </div>
+              <div style="font-size:12px;color:var(--text-2);"><strong>VI:</strong> ${escapeHtml(i.vi_excerpt || '')}</div>
+              <div style="font-size:12px;color:var(--text-2);"><strong>EN:</strong> <span style="color:var(--danger,#c00);">${escapeHtml(i.en_excerpt || '')}</span></div>
+              <div style="font-size:12px;margin-top:4px;"><strong>${_t('Lý do', 'Why')}:</strong> ${escapeHtml(i.explanation || '')}</div>
+              <div style="font-size:12px;margin-top:2px;color:var(--success,#0a7e3a);"><strong>${_t('Đề xuất', 'Suggestion')}:</strong> ${escapeHtml(i.suggestion || '')}</div>
+            </div>`).join('');
+      body.innerHTML = head + list;
+    })
+    .catch(err => {
+      const body = overlay.querySelector('.tx-review-body');
+      if (body) body.innerHTML = `<div style="color:var(--danger,#c00);">${_t('Không tải được', 'Load failed')}: ${escapeHtml(String(err && err.message || err))}</div>`;
+    });
+}
+
 // Inline keyframes so the "translating" pulse works without a CSS edit.
 function ensureTxQueuedStyles() {
   if (document.getElementById('tx-queued-styles')) return;
@@ -1400,6 +1510,7 @@ function renderDocRow(doc, enabledProviders) {
         ${queued && !stuck
           ? `<span style="padding:3px 8px;border-radius:4px;font-size:11px;white-space:nowrap;background:var(--warn-bg,#fff8e1);color:var(--warn,#e0a000);font-weight:600;">⟳ ${_t('đang dịch', 'translating')}</span>`
           : `<span style="padding:3px 8px;border-radius:4px;font-size:11px;white-space:nowrap;${docStateBadgeStyle(doc.translation_state)}">${escapeHtml(doc.translation_state || 'unknown')}</span>`}
+        ${renderReviewBadge(doc)}
       </td>
       <td style="padding:9px 8px;text-align:right;white-space:nowrap;">
         <button class="tx-doc-override-toggle" data-doc-code="${escapeHtml(code)}"
@@ -1516,6 +1627,12 @@ function wireDocuments() {
       STATE.documents = null;
       loadDocuments();
     });
+  });
+
+  document.querySelectorAll('.tx-review-badge').forEach(badge => {
+    const reviewId = badge.getAttribute('data-review-id');
+    if (!reviewId) return;
+    badge.addEventListener('click', () => openReviewModal(reviewId));
   });
 
   document.querySelectorAll('.tx-doc-override-toggle').forEach(btn => {
@@ -1667,6 +1784,346 @@ function wireDocuments() {
       }, 3000);
     });
   });
+}
+
+// ── Tab 7: Learnings (curated anti-pattern memory) ───────────────────────────
+
+const LEARNING_CATEGORIES = [
+  'vietnamese_residue', 'word_salad', 'expanded_acronym', 'wrong_terminology',
+  'missing_translation', 'broken_html', 'css_class_translated', 'reversed_noun_order',
+  'stuttering', 'untranslated_linking_word', 'style_violation', 'other',
+];
+
+function loadLearnings() {
+  const params = new URLSearchParams({ limit: 50, offset: (STATE.learningPage - 1) * 50 });
+  if (STATE.learningStatusFilter)   params.set('status', STATE.learningStatusFilter);
+  if (STATE.learningCategoryFilter) params.set('category', STATE.learningCategoryFilter);
+  if (STATE.learningSearch)         params.set('search', STATE.learningSearch);
+  api('GET', '/api/v1/dcc/admin/translation/learnings?' + params.toString())
+    .then(d => { STATE.learnings = d; render(); })
+    .catch(err => { STATE.error = String(err.message || err); render(); });
+}
+
+function learningStatusBadge(status) {
+  const styles = {
+    auto:     'background:var(--warn-bg,#fff8e1);color:var(--warn,#e0a000)',
+    approved: 'background:var(--success-bg,#e6f9ee);color:var(--success,#0a7e3a)',
+    disabled: 'background:var(--bg-2,#f5f7fb);color:var(--text-3)',
+  };
+  const labels = {
+    auto:     _t('Chờ duyệt', 'Pending'),
+    approved: _t('Đã duyệt', 'Approved'),
+    disabled: _t('Đã tắt', 'Disabled'),
+  };
+  return `<span style="padding:2px 8px;border-radius:4px;font-size:11px;${styles[status] || styles.disabled}">${escapeHtml(labels[status] || status)}</span>`;
+}
+
+function renderLearnings() {
+  const data  = STATE.learnings;
+  const rows  = (data && Array.isArray(data.rows)) ? data.rows : [];
+  const stats = (data && data.stats) || { auto: 0, approved: 0, disabled: 0, total: 0 };
+  const total = (data && data.total) || 0;
+  const page  = STATE.learningPage;
+  const totalPages = Math.max(1, Math.ceil(total / 50));
+
+  return `
+    <section>
+      <h3 style="margin:0 0 6px 0;">${_t('Bộ nhớ lỗi (Learning loop)', 'Learning memory')}</h3>
+      <p style="color:var(--text-3);font-size:13px;margin:0 0 14px 0;">
+        ${_t('Mỗi lần reviewer (Haiku) phát hiện lỗi, hệ thống tự ghi vào đây với trạng thái <b>Chờ duyệt</b>. Bạn duyệt các lỗi đúng — chúng sẽ được tự động chèn vào prompt của lần dịch sau để engine không lặp lại.',
+             'Every time the reviewer (Haiku) flags an issue, it lands here as <b>Pending</b>. Approve the ones that are genuine errors — they will be auto-injected into the next translator/reviewer prompt so the engine learns not to repeat them.')}
+      </p>
+
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center;">
+        <div style="display:flex;gap:6px;">
+          <span style="padding:4px 10px;border-radius:4px;background:var(--warn-bg,#fff8e1);color:var(--warn,#e0a000);font-size:12px;">
+            ${_t('Chờ duyệt', 'Pending')}: <b>${stats.auto}</b>
+          </span>
+          <span style="padding:4px 10px;border-radius:4px;background:var(--success-bg,#e6f9ee);color:var(--success,#0a7e3a);font-size:12px;">
+            ${_t('Đã duyệt', 'Approved')}: <b>${stats.approved}</b>
+          </span>
+          <span style="padding:4px 10px;border-radius:4px;background:var(--bg-2,#f5f7fb);color:var(--text-3);font-size:12px;">
+            ${_t('Đã tắt', 'Disabled')}: <b>${stats.disabled}</b>
+          </span>
+        </div>
+        <div style="margin-left:auto;display:flex;gap:6px;">
+          <button id="tx-learning-new" style="padding:6px 12px;border:1px solid var(--brand-primary,#0c63e7);background:var(--brand-primary,#0c63e7);color:#fff;border-radius:4px;cursor:pointer;font-size:12px;">
+            + ${_t('Thêm thủ công', 'New manual rule')}
+          </button>
+          <button id="tx-learning-regen" style="padding:6px 12px;border:1px solid var(--ln,#ddd);background:var(--bg,#fff);border-radius:4px;cursor:pointer;font-size:12px;">
+            ${_t('Tạo lại cache prompt', 'Rebuild prompt cache')}
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;">
+        <input id="tx-learning-search" placeholder="${_t('Tìm trong VI/EN/correct...', 'Search VI/EN/correct...')}"
+          value="${escapeHtml(STATE.learningSearch)}"
+          style="flex:1;min-width:240px;padding:7px 10px;border:1px solid var(--ln,#ddd);border-radius:4px;font-size:13px;">
+        <select id="tx-learning-status" style="padding:7px 10px;border:1px solid var(--ln,#ddd);border-radius:4px;font-size:13px;">
+          <option value="">${_t('— Mọi trạng thái —', '— Any status —')}</option>
+          <option value="auto"    ${STATE.learningStatusFilter === 'auto' ? 'selected' : ''}>${_t('Chờ duyệt', 'Pending')}</option>
+          <option value="approved"${STATE.learningStatusFilter === 'approved' ? 'selected' : ''}>${_t('Đã duyệt', 'Approved')}</option>
+          <option value="disabled"${STATE.learningStatusFilter === 'disabled' ? 'selected' : ''}>${_t('Đã tắt', 'Disabled')}</option>
+        </select>
+        <select id="tx-learning-category" style="padding:7px 10px;border:1px solid var(--ln,#ddd);border-radius:4px;font-size:13px;">
+          <option value="">${_t('— Mọi loại —', '— Any category —')}</option>
+          ${LEARNING_CATEGORIES.map(c => `<option value="${c}" ${STATE.learningCategoryFilter === c ? 'selected' : ''}>${c}</option>`).join('')}
+        </select>
+      </div>
+
+      <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;">
+        <thead>
+          <tr style="text-align:left;border-bottom:2px solid var(--ln,#ddd);background:var(--bg-2,#f5f7fb);">
+            <th style="padding:9px 8px;width:90px;">${_t('Trạng thái', 'Status')}</th>
+            <th style="padding:9px 8px;">${_t('VI nguồn', 'VI source')}</th>
+            <th style="padding:9px 8px;">${_t('EN sai (cấm)', 'EN wrong (ban)')}</th>
+            <th style="padding:9px 8px;">${_t('EN đúng', 'EN correct')}</th>
+            <th style="padding:9px 8px;width:140px;">${_t('Loại', 'Category')}</th>
+            <th style="padding:9px 8px;width:60px;text-align:center;">${_t('Hits', 'Hits')}</th>
+            <th style="padding:9px 8px;width:200px;text-align:right;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${rows.length === 0
+            ? `<tr><td colspan="7" style="padding:28px;text-align:center;color:var(--text-3);">${_t('Chưa có ghi nhớ nào.', 'No learnings yet.')}</td></tr>`
+            : rows.map(renderLearningRow).join('')}
+        </tbody>
+      </table>
+      </div>
+
+      ${totalPages > 1 ? `
+        <div style="margin-top:12px;display:flex;gap:6px;justify-content:flex-end;align-items:center;font-size:12px;color:var(--text-3);">
+          ${_t('Trang', 'Page')} ${page} / ${totalPages}
+          <button class="tx-learning-page" data-page="${page - 1}" ${page <= 1 ? 'disabled' : ''}
+            style="padding:5px 10px;border:1px solid var(--ln,#ddd);border-radius:4px;background:var(--bg,#fff);cursor:${page <= 1 ? 'default' : 'pointer'};opacity:${page <= 1 ? '.4' : '1'};">‹</button>
+          <button class="tx-learning-page" data-page="${page + 1}" ${page >= totalPages ? 'disabled' : ''}
+            style="padding:5px 10px;border:1px solid var(--ln,#ddd);border-radius:4px;background:var(--bg,#fff);cursor:${page >= totalPages ? 'default' : 'pointer'};opacity:${page >= totalPages ? '.4' : '1'};">›</button>
+        </div>
+      ` : ''}
+    </section>
+  `;
+}
+
+function renderLearningRow(row) {
+  const id = row.learning_id;
+  const status = row.status;
+  return `
+    <tr data-learning-id="${id}" style="border-bottom:1px solid var(--ln-2,#eee);vertical-align:top;">
+      <td style="padding:9px 8px;">${learningStatusBadge(status)}</td>
+      <td style="padding:9px 8px;font-size:12px;max-width:220px;word-break:break-word;">${escapeHtml(row.vi_pattern || '')}</td>
+      <td style="padding:9px 8px;font-size:12px;color:var(--danger,#c00);max-width:200px;word-break:break-word;">${escapeHtml(row.en_wrong_pattern || '—')}</td>
+      <td style="padding:9px 8px;font-size:12px;color:var(--success,#0a7e3a);max-width:220px;word-break:break-word;">${escapeHtml(row.en_correct || '—')}</td>
+      <td style="padding:9px 8px;font-size:11px;color:var(--text-3);"><code>${escapeHtml(row.category || '')}</code><br><span style="font-size:10px;">${escapeHtml(row.severity || '')}</span></td>
+      <td style="padding:9px 8px;font-size:12px;text-align:center;font-family:monospace;">${row.hit_count || 0}</td>
+      <td style="padding:9px 8px;text-align:right;white-space:nowrap;">
+        ${status !== 'approved' ? `<button class="tx-learning-approve" data-id="${id}" style="padding:4px 8px;border:1px solid var(--success,#0a7e3a);background:var(--success,#0a7e3a);color:#fff;border-radius:3px;cursor:pointer;font-size:11px;margin-right:3px;">${_t('Duyệt', 'Approve')}</button>` : ''}
+        ${status !== 'disabled' ? `<button class="tx-learning-disable" data-id="${id}" style="padding:4px 8px;border:1px solid var(--ln,#ddd);background:var(--bg,#fff);border-radius:3px;cursor:pointer;font-size:11px;margin-right:3px;">${_t('Tắt', 'Disable')}</button>` : ''}
+        <button class="tx-learning-edit"   data-id="${id}" style="padding:4px 8px;border:1px solid var(--ln,#ddd);background:var(--bg,#fff);border-radius:3px;cursor:pointer;font-size:11px;margin-right:3px;">${_t('Sửa', 'Edit')}</button>
+        <button class="tx-learning-delete" data-id="${id}" style="padding:4px 8px;border:1px solid var(--danger,#c00);background:var(--bg,#fff);color:var(--danger,#c00);border-radius:3px;cursor:pointer;font-size:11px;">${_t('Xóa', 'Delete')}</button>
+      </td>
+    </tr>
+  `;
+}
+
+function wireLearnings() {
+  const sEl = document.getElementById('tx-learning-search');
+  let st;
+  if (sEl) sEl.addEventListener('input', () => {
+    clearTimeout(st);
+    st = setTimeout(() => {
+      STATE.learningSearch = sEl.value.trim();
+      STATE.learningPage = 1;
+      loadLearnings();
+    }, 400);
+  });
+  const statusEl = document.getElementById('tx-learning-status');
+  if (statusEl) statusEl.addEventListener('change', () => {
+    STATE.learningStatusFilter = statusEl.value;
+    STATE.learningPage = 1;
+    loadLearnings();
+  });
+  const catEl = document.getElementById('tx-learning-category');
+  if (catEl) catEl.addEventListener('change', () => {
+    STATE.learningCategoryFilter = catEl.value;
+    STATE.learningPage = 1;
+    loadLearnings();
+  });
+  document.querySelectorAll('.tx-learning-page').forEach(b => {
+    b.addEventListener('click', () => {
+      const p = parseInt(b.getAttribute('data-page'), 10);
+      if (!isNaN(p) && p >= 1) { STATE.learningPage = p; loadLearnings(); }
+    });
+  });
+  document.querySelectorAll('.tx-learning-approve').forEach(b => {
+    b.addEventListener('click', () => {
+      const id = b.getAttribute('data-id');
+      api('POST', '/api/v1/dcc/admin/translation/learnings/' + id + '/approve')
+        .then(() => { toast(_t('✓ Đã duyệt', '✓ Approved')); loadLearnings(); })
+        .catch(err => toast(_t('Lỗi: ', 'Error: ') + (err.message || err)));
+    });
+  });
+  document.querySelectorAll('.tx-learning-disable').forEach(b => {
+    b.addEventListener('click', () => {
+      const id = b.getAttribute('data-id');
+      api('POST', '/api/v1/dcc/admin/translation/learnings/' + id + '/disable')
+        .then(() => { toast(_t('✓ Đã tắt', '✓ Disabled')); loadLearnings(); })
+        .catch(err => toast(_t('Lỗi: ', 'Error: ') + (err.message || err)));
+    });
+  });
+  document.querySelectorAll('.tx-learning-delete').forEach(b => {
+    b.addEventListener('click', () => {
+      if (!confirm(_t('Xóa vĩnh viễn rule này?', 'Delete this rule permanently?'))) return;
+      const id = b.getAttribute('data-id');
+      api('DELETE', '/api/v1/dcc/admin/translation/learnings/' + id)
+        .then(() => { toast(_t('✓ Đã xóa', '✓ Deleted')); loadLearnings(); })
+        .catch(err => toast(_t('Lỗi: ', 'Error: ') + (err.message || err)));
+    });
+  });
+  document.querySelectorAll('.tx-learning-edit').forEach(b => {
+    b.addEventListener('click', () => {
+      const id = b.getAttribute('data-id');
+      const rows = (STATE.learnings && STATE.learnings.rows) || [];
+      const row = rows.find(r => String(r.learning_id) === String(id));
+      if (row) openLearningEditor(row);
+    });
+  });
+  const newBtn = document.getElementById('tx-learning-new');
+  if (newBtn) newBtn.addEventListener('click', () => openLearningEditor(null));
+  const regenBtn = document.getElementById('tx-learning-regen');
+  if (regenBtn) regenBtn.addEventListener('click', () => {
+    api('POST', '/api/v1/dcc/admin/translation/learnings/regenerate-block')
+      .then(d => toast(_t('✓ Cache cập nhật: ', '✓ Cache rebuilt: ') + (d.cache_path || '')))
+      .catch(err => toast(_t('Lỗi: ', 'Error: ') + (err.message || err)));
+  });
+}
+
+function openLearningEditor(row) {
+  const isNew = !row;
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;';
+  overlay.innerHTML = `
+    <div style="background:var(--bg,#fff);border-radius:8px;max-width:640px;width:90vw;box-shadow:0 8px 32px rgba(0,0,0,.3);">
+      <div style="padding:14px 18px;border-bottom:1px solid var(--ln,#ddd);display:flex;justify-content:space-between;align-items:center;">
+        <strong>${isNew ? _t('Thêm rule thủ công', 'New manual rule') : _t('Sửa rule', 'Edit rule')}</strong>
+        <button class="tx-learn-close" style="border:0;background:transparent;font-size:22px;cursor:pointer;">×</button>
+      </div>
+      <div style="padding:14px 18px;display:flex;flex-direction:column;gap:10px;font-size:13px;">
+        <label>${_t('VI nguồn (bắt buộc)', 'VI source (required)')}
+          <textarea class="tx-learn-vi" rows="2" style="width:100%;padding:6px 8px;border:1px solid var(--ln,#ddd);border-radius:4px;font-family:inherit;">${escapeHtml(row ? row.vi_pattern : '')}</textarea>
+        </label>
+        <label>${_t('EN sai (engine không được sinh ra)', 'EN wrong (forbidden output)')}
+          <textarea class="tx-learn-wrong" rows="2" style="width:100%;padding:6px 8px;border:1px solid var(--ln,#ddd);border-radius:4px;color:var(--danger,#c00);">${escapeHtml(row ? (row.en_wrong_pattern || '') : '')}</textarea>
+        </label>
+        <label>${_t('EN đúng (bắt buộc)', 'EN correct (required)')}
+          <textarea class="tx-learn-correct" rows="2" style="width:100%;padding:6px 8px;border:1px solid var(--ln,#ddd);border-radius:4px;color:var(--success,#0a7e3a);">${escapeHtml(row ? (row.en_correct || '') : '')}</textarea>
+        </label>
+        <div style="display:flex;gap:10px;">
+          <label style="flex:1;">${_t('Loại', 'Category')}
+            <select class="tx-learn-cat" style="width:100%;padding:6px 8px;border:1px solid var(--ln,#ddd);border-radius:4px;">
+              ${LEARNING_CATEGORIES.map(c => `<option value="${c}" ${row && row.category === c ? 'selected' : ''}>${c}</option>`).join('')}
+            </select>
+          </label>
+          <label style="flex:1;">${_t('Mức độ', 'Severity')}
+            <select class="tx-learn-sev" style="width:100%;padding:6px 8px;border:1px solid var(--ln,#ddd);border-radius:4px;">
+              <option value="advisory" ${!row || row.severity === 'advisory' ? 'selected' : ''}>advisory</option>
+              <option value="critical" ${row && row.severity === 'critical' ? 'selected' : ''}>critical</option>
+            </select>
+          </label>
+        </div>
+        <label>${_t('Ghi chú (tùy)', 'Notes (optional)')}
+          <input type="text" class="tx-learn-notes" value="${escapeHtml(row ? (row.notes || '') : '')}" style="width:100%;padding:6px 8px;border:1px solid var(--ln,#ddd);border-radius:4px;">
+        </label>
+      </div>
+      <div style="padding:12px 18px;border-top:1px solid var(--ln,#ddd);display:flex;justify-content:flex-end;gap:8px;">
+        <button class="tx-learn-cancel" style="padding:7px 14px;border:1px solid var(--ln,#ddd);background:var(--bg,#fff);border-radius:4px;cursor:pointer;">${_t('Hủy', 'Cancel')}</button>
+        <button class="tx-learn-save" style="padding:7px 14px;border:0;background:var(--brand-primary,#0c63e7);color:#fff;border-radius:4px;cursor:pointer;">
+          ${isNew ? _t('Tạo + Duyệt', 'Create + Approve') : _t('Lưu', 'Save')}
+        </button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+  const close = () => overlay.remove();
+  overlay.querySelector('.tx-learn-close').addEventListener('click', close);
+  overlay.querySelector('.tx-learn-cancel').addEventListener('click', close);
+  overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+  overlay.querySelector('.tx-learn-save').addEventListener('click', () => {
+    const body = {
+      vi_pattern: overlay.querySelector('.tx-learn-vi').value.trim(),
+      en_wrong_pattern: overlay.querySelector('.tx-learn-wrong').value.trim(),
+      en_correct: overlay.querySelector('.tx-learn-correct').value.trim(),
+      category: overlay.querySelector('.tx-learn-cat').value,
+      severity: overlay.querySelector('.tx-learn-sev').value,
+      notes: overlay.querySelector('.tx-learn-notes').value.trim(),
+    };
+    const url = isNew
+      ? '/api/v1/dcc/admin/translation/learnings'
+      : '/api/v1/dcc/admin/translation/learnings/' + row.learning_id;
+    api(isNew ? 'POST' : 'PUT', url, body)
+      .then(() => { toast(_t('✓ Đã lưu', '✓ Saved')); close(); loadLearnings(); })
+      .catch(err => alert(_t('Lỗi: ', 'Error: ') + (err.message || err)));
+  });
+}
+
+// ── Promote-to-learning button injected into the review modal ─────────────
+// `openReviewModal` (Documents tab) renders each issue with vi/en excerpts but
+// no learning hook. Patch the issue card after render: find each .tx-review-body
+// issue block and append a "Promote" button bound to the issue payload.
+const _origOpenReviewModal = (typeof openReviewModal === 'function') ? openReviewModal : null;
+if (_origOpenReviewModal) {
+  window.openReviewModal = function (reviewId) {
+    _origOpenReviewModal(reviewId);
+    // The review JSON is fetched async; observe the body until issues land.
+    let attempts = 0;
+    const tick = setInterval(() => {
+      attempts++;
+      if (attempts > 40) { clearInterval(tick); return; }
+      const body = document.querySelector('.tx-review-body');
+      if (!body) { clearInterval(tick); return; }
+      const issueDivs = body.querySelectorAll('div[style*="border:1px solid var(--ln-2"]');
+      if (issueDivs.length === 0) return;
+      clearInterval(tick);
+      // Pull review issues from the rendered DOM by walking each issue card.
+      issueDivs.forEach((card, idx) => {
+        if (card.querySelector('.tx-promote-learning')) return;
+        const btn = document.createElement('button');
+        btn.className = 'tx-promote-learning';
+        btn.textContent = _t('➕ Ghi vào bộ nhớ lỗi (duyệt ngay)', '➕ Promote to learning (auto-approve)');
+        btn.style.cssText = 'margin-top:6px;padding:4px 10px;border:1px solid var(--brand-primary,#0c63e7);background:var(--brand-primary,#0c63e7);color:#fff;border-radius:3px;cursor:pointer;font-size:11px;';
+        btn.addEventListener('click', () => {
+          // Extract the issue fields from the card's textContent. We re-fetch
+          // the review JSON to get the structured issue rather than parse DOM.
+          api('GET', '/api/v1/dcc/admin/translation/reviews/' + encodeURIComponent(reviewId))
+            .then(d => {
+              const r = (d && d.review) || {};
+              let issues = r.issues_jsonb;
+              if (typeof issues === 'string') { try { issues = JSON.parse(issues); } catch (_) { issues = []; } }
+              if (!Array.isArray(issues) || !issues[idx]) {
+                toast(_t('Không tìm thấy issue', 'Issue not found'));
+                return;
+              }
+              return api('POST', '/api/v1/dcc/admin/translation/learnings/from-issue', {
+                issue: issues[idx],
+                doc_code: r.doc_code || '',
+                review_id: parseInt(reviewId, 10),
+                approve: true,
+              });
+            })
+            .then(d => {
+              if (d) {
+                toast(_t('✓ Đã thêm vào bộ nhớ lỗi', '✓ Added to learning memory'));
+                btn.disabled = true;
+                btn.textContent = _t('✓ Đã thêm', '✓ Added');
+                btn.style.opacity = '.6';
+              }
+            })
+            .catch(err => toast(_t('Lỗi: ', 'Error: ') + (err.message || err)));
+        });
+        card.appendChild(btn);
+      });
+    }, 100);
+  };
 }
 
 })();

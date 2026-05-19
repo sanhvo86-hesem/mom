@@ -170,6 +170,9 @@ rate-limit/
 !mom/data/config/
 mom/data/config/*
 !mom/data/config/*.bootstrap.json
+# Translation engine prompts (versioned in git, not runtime-mutated).
+!mom/data/config/translator-system-prompt.md
+!mom/data/config/translation-reviewer-system-prompt.md
 # Deploy program runtime config (Triển khai vận hành module).
 # Subdir must be re-whitelisted: mom/data/config/* matches directories too.
 # Runtime *.json files stay ignored; *.bootstrap.json seeds ship via git so

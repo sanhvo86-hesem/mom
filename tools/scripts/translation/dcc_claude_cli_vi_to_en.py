@@ -66,7 +66,27 @@ ENGINE_VERSION = f"claude_cli_{re.sub(r'[^a-z0-9]+', '_', MODEL.lower())}_v1"
 SYSTEM_PROMPT_PATH = (
     common.ROOT / "mom" / "data" / "config" / "translator-system-prompt.md"
 )
+LEARNING_BLOCK_PATH = (
+    common.ROOT / "mom" / "data" / "cache" / "translation-learning-block.md"
+)
 PROMPT_CACHE: Optional[str] = None
+
+
+def _load_learning_block() -> str:
+    """Read the learning-loop anti-pattern block (approved rows only) written
+    by TranslationLearningService. Empty string when no rows are approved or
+    when the cache file doesn't exist (first deploy, before any approve).
+
+    Read fresh every call: the file changes when an admin clicks Approve /
+    Disable, and translator workers are long-lived processes.
+    """
+    try:
+        if LEARNING_BLOCK_PATH.is_file():
+            text = LEARNING_BLOCK_PATH.read_text(encoding="utf-8").strip()
+            return text
+    except Exception:
+        pass
+    return ""
 
 OPTIONS = {}
 try:
@@ -181,7 +201,12 @@ def _call_claude_cli(user_prompt: str) -> Dict[str, object]:
 
 
 def _build_user_prompt(segments: List[str]) -> str:
-    parts = ["Translate the following Vietnamese segments to English. Reply with the same [N] markers."]
+    parts: List[str] = []
+    learning_block = _load_learning_block()
+    if learning_block:
+        parts.append(learning_block)
+        parts.append("")
+    parts.append("Translate the following Vietnamese segments to English. Reply with the same [N] markers.")
     parts.append("")
     for i, seg in enumerate(segments, start=1):
         parts.append(f"[{i}] {seg}")

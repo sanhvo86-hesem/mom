@@ -99,4 +99,18 @@ return static function (Router $router, string $dataDir): void {
     $router->delete('/api/v1/dcc/admin/translation/documents/{doc_code}/override',                      TranslationAdminController::class, 'removeDocumentOverride');
     $router->post  ('/api/v1/dcc/admin/translation/documents/{doc_code}/retranslate',                   TranslationAdminController::class, 'retranslateDocument');
     $router->post  ('/api/v1/dcc/admin/translation/documents/{doc_code}/cancel-job',                    TranslationAdminController::class, 'cancelJob');
+
+    // ── Reviewer (post-translation QC by Claude Haiku 4.5) ────────────────
+    $router->get   ('/api/v1/dcc/admin/translation/reviews',                                            TranslationAdminController::class, 'listReviewRuns');
+    $router->get   ('/api/v1/dcc/admin/translation/reviews/{review_id}',                                TranslationAdminController::class, 'getReviewRun');
+
+    // ── Learning loop (curated anti-patterns auto-injected into prompts) ──
+    $router->get   ('/api/v1/dcc/admin/translation/learnings',                                          TranslationAdminController::class, 'listLearnings');
+    $router->post  ('/api/v1/dcc/admin/translation/learnings',                                          TranslationAdminController::class, 'createLearning');
+    $router->put   ('/api/v1/dcc/admin/translation/learnings/{learning_id}',                            TranslationAdminController::class, 'updateLearning');
+    $router->post  ('/api/v1/dcc/admin/translation/learnings/{learning_id}/approve',                    TranslationAdminController::class, 'approveLearning');
+    $router->post  ('/api/v1/dcc/admin/translation/learnings/{learning_id}/disable',                    TranslationAdminController::class, 'disableLearning');
+    $router->delete('/api/v1/dcc/admin/translation/learnings/{learning_id}',                            TranslationAdminController::class, 'deleteLearning');
+    $router->post  ('/api/v1/dcc/admin/translation/learnings/from-issue',                               TranslationAdminController::class, 'learningFromIssue');
+    $router->post  ('/api/v1/dcc/admin/translation/learnings/regenerate-block',                         TranslationAdminController::class, 'regenerateLearningBlock');
 };

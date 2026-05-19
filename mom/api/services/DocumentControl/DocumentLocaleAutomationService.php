@@ -406,13 +406,96 @@ final class DocumentLocaleAutomationService
             'metadata' => $metadata,
         ], $actor);
 
+        // ── Post-translation reviewer (Claude Haiku 4.5) ─────────────────────
+        // Read the rendered EN artifact + the source VN HTML, ask the reviewer
+        // for a structured defect report, persist it. If outcome=fail we flip
+        // the variant back to `blocked` so the admin badge surfaces the issue.
+        $reviewResult = $this->runPostTranslationReviewer(
+            $docCode,
+            $normalizedSourceHtml,
+            $artifactHtml,
+            $variant['id'] ?? null,
+            $sourceRevision,
+            $sourceHash,
+            $actor
+        );
+
+        if (is_array($reviewResult) && ($reviewResult['outcome'] ?? null) === 'fail') {
+            $blockedMetadata = $metadata;
+            $blockedMetadata['blocked_reason'] = 'translation_review_failed';
+            $blockedMetadata['blocked_message'] = $reviewResult['summary']
+                ?? 'Post-translation reviewer found critical issues.';
+            $blockedMetadata['review_run_id'] = $reviewResult['review_id'] ?? null;
+            $blockedMetadata['review_issues_critical'] = $reviewResult['issues_critical'] ?? 0;
+            $blockedMetadata['review_issues_advisory'] = $reviewResult['issues_advisory'] ?? 0;
+            $variant = $dcc->upsertLocaleVariant($docCode, self::TARGET_LOCALE, [
+                'title' => $this->nullableText($attempt['title'] ?? $title),
+                'subtitle' => $this->nullableText($attempt['subtitle'] ?? $subtitle),
+                'artifact_rel_path' => $artifactRelPath,
+                'artifact_source_revision' => $dccRevision,
+                'artifact_source_hash_sha256' => $sourceHash,
+                'translation_state' => 'blocked',
+                'translation_provider' => (string)($attempt['provider'] ?? 'configured_command'),
+                'glossary_version' => (string)($attempt['glossary_version'] ?? $this->glossaryVersion()),
+                'engine_version' => (string)($attempt['engine_version'] ?? 'command'),
+                'published_at' => null,
+                'metadata' => $blockedMetadata,
+            ], $actor);
+
+            return [
+                'ok' => false,
+                'doc_code' => $docCode,
+                'translation_state' => 'blocked',
+                'artifact_rel_path' => $artifactRelPath,
+                'locale_variant' => $variant,
+                'reason' => 'translation_review_failed',
+                'message' => $reviewResult['summary'] ?? 'Reviewer found critical issues.',
+                'review' => $reviewResult,
+            ];
+        }
+
         return [
             'ok' => true,
             'doc_code' => $docCode,
             'translation_state' => $state,
             'artifact_rel_path' => $artifactRelPath,
             'locale_variant' => $variant,
+            'review' => $reviewResult,
         ];
+    }
+
+    /**
+     * Spawn the post-translation reviewer (Claude Haiku 4.5) and persist its
+     * report. Failures are non-fatal: any spawn/runtime error returns an
+     * `error` outcome so translation publication is not blocked on a tooling
+     * regression.
+     *
+     * @return array{outcome:string, review:array<string,mixed>, review_id:?int, summary:string, issues_critical:int, issues_advisory:int}|null
+     */
+    private function runPostTranslationReviewer(
+        string $docCode,
+        string $viHtml,
+        string $enHtml,
+        ?int $variantId,
+        string $sourceRevision,
+        string $sourceHash,
+        string $actor
+    ): ?array {
+        try {
+            $reviewer = new \MOM\Services\Translation\TranslationReviewer($this->data, $this->rootDir);
+            return $reviewer->run([
+                'doc_code' => $docCode,
+                'vi_html' => $viHtml,
+                'en_html' => $enHtml,
+                'variant_id' => $variantId,
+                'source_revision' => $sourceRevision,
+                'source_hash' => $sourceHash,
+                'triggered_by' => $actor,
+            ]);
+        } catch (Throwable $e) {
+            @error_log('[DCC locale automation] reviewer failed for ' . $docCode . ': ' . $e->getMessage());
+            return null;
+        }
     }
 
     /**

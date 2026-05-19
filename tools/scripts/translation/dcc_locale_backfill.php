@@ -33,6 +33,7 @@ $options = getopt('', [
     'max-queue::',
     'no-spawn-per-job',
     'only-missing-job',
+    'only-quality-issues',
     'prewarm-segment-cache',
     'segment-prewarm-limit::',
     'start-workers::',
@@ -51,6 +52,7 @@ $onlyCode = DocumentControlService::canonicalizeCode((string)($options['code'] ?
 $dryRun = array_key_exists('dry-run', $options);
 $force = array_key_exists('force', $options);
 $onlyMissingJob = array_key_exists('only-missing-job', $options);
+$onlyQualityIssues = array_key_exists('only-quality-issues', $options);
 $prewarmSegmentCache = array_key_exists('prewarm-segment-cache', $options);
 $spawnPerJob = !array_key_exists('no-spawn-per-job', $options);
 $waitForWorkers = array_key_exists('wait-for-workers', $options);
@@ -151,6 +153,25 @@ for ($offset = 0; ; $offset += 500) {
             $results[] = ['doc_code' => $docCode, 'status' => 'skipped_ready', 'reason' => $readiness['reason']];
             continue;
         }
+        // --only-quality-issues: skip variants whose "not ready" reason is
+        // something other than a quality issue or blocked state. This narrows
+        // the re-translate batch to artifacts that actually have detectable
+        // defects (artifact_quality_failed:* or state_blocked) plus variants
+        // tagged with translation_review_run.outcome='fail' (post-review).
+        if ($onlyQualityIssues && !$force) {
+            $reason = (string)$readiness['reason'];
+            $reviewOutcome = strtolower(trim((string)($rawVariant['last_review_outcome'] ?? '')));
+            $isQualityCandidate = (
+                $reason === 'state_blocked'
+                || strpos($reason, 'artifact_quality_failed') === 0
+                || $reviewOutcome === 'fail'
+            );
+            if (!$isQualityCandidate) {
+                $stats['skipped_ready']++;
+                $results[] = ['doc_code' => $docCode, 'status' => 'skipped_not_quality_issue', 'reason' => $reason];
+                continue;
+            }
+        }
 
         $jobPath = queuedTranslationJobPath($rootDir, $docCode, 'en', $sourceHash);
         if ($onlyMissingJob && is_file($jobPath)) {
@@ -239,6 +260,7 @@ echo json_encode([
     'dry_run' => $dryRun,
     'force' => $force,
     'only_missing_job' => $onlyMissingJob,
+    'only_quality_issues' => $onlyQualityIssues,
     'spawn_per_job' => $spawnPerJob,
     'start_workers' => $startWorkers,
     'wait_for_workers' => $waitForWorkers,
@@ -342,7 +364,7 @@ function normalizeRepoRelativePath(string $path): string
 function fetchLocaleVariant(DataLayer $data, string $docCode): array
 {
     $rows = $data->query(
-        "SELECT artifact_rel_path, artifact_source_hash_sha256, translation_state, translation_provider
+        "SELECT artifact_rel_path, artifact_source_hash_sha256, translation_state, translation_provider, last_review_outcome
          FROM dcc_document_locale_variant
          WHERE doc_code = :doc_code AND locale = 'en'
          LIMIT 1",
