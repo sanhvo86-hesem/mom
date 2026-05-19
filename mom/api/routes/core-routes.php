@@ -185,4 +185,18 @@ return static function (Router $router, string $dataDir): void {
         'record_id_history'         => [AllocationController::class, 'getHistory'],
         'record_id_void'            => [AllocationController::class, 'void'],
     ]);
+
+    // Error Code Registry — bilingual error catalogue.
+    // Public read endpoints (any session): every frontend module fetches
+    // localised error messages from /api/v1/error-codes so the UI shows
+    // operator-friendly text instead of bare codes. Admin endpoints
+    // (admin role only) drive the IAM Console "Error Codes" tab.
+    $router->get   ('/api/v1/error-codes',                          ErrorCodeRegistryController::class, 'listPublic');
+    $router->get   ('/api/v1/error-codes/{code}',                   ErrorCodeRegistryController::class, 'getPublic');
+    $router->get   ('/api/v1/admin/error-codes',                    ErrorCodeRegistryController::class, 'listAdmin');
+    $router->post  ('/api/v1/admin/error-codes',                    ErrorCodeRegistryController::class, 'upsert');
+    $router->put   ('/api/v1/admin/error-codes/{code}',             ErrorCodeRegistryController::class, 'update');
+    $router->post  ('/api/v1/admin/error-codes/{code}/activate',    ErrorCodeRegistryController::class, 'activate');
+    $router->post  ('/api/v1/admin/error-codes/{code}/deactivate',  ErrorCodeRegistryController::class, 'deactivate');
+    $router->delete('/api/v1/admin/error-codes/{code}',             ErrorCodeRegistryController::class, 'delete');
 };

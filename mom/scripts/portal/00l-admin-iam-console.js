@@ -78,6 +78,7 @@
       { key:'sod',        label:'⚖️ '+t('SoD','Tách Trách Nhiệm'),       render: renderSoD },
       { key:'review',     label:'🧐 '+t('Access Review','Đánh Giá Định Kỳ'), render: renderReview },
       { key:'retention',  label:'📋 '+t('Retention','Lưu Trữ & Tuân Thủ'), render: renderRetention },
+      { key:'errorcodes', label:'🛑 '+t('Error Codes','Mã Lỗi'),         render: renderErrorCodes },
       { key:'audit',      label:'📜 '+t('Audit Trail','Audit Trail'),    render: renderAudit }
     ], {});
   }
@@ -145,7 +146,7 @@
       // customer_portal.portal_sessions (which is for external customer portal users).
       UI.fetchJson('/api/v1/sessions/active').catch(function(){ return { data: [] }; }),
       UI.runtime.list('core_system','audit_events', { sort:'-recorded_at', limit: 1, include_total: 1 }).catch(function(){ return { raw: { total: 0 } }; }),
-      UI.runtime.list('core_system','retention_policy', { limit: 100 }).catch(function(){ return { data: [] }; }),
+      UI.runtime.list('master_data_governance','retention_policy', { limit: 100 }).catch(function(){ return { data: [] }; }),
       sharedAdminUsers().then(function(users){ return { data: users }; }).catch(function(){ return { data: [] }; })
     ]).then(function(results){
       var roles = results[0].data || [];
@@ -844,9 +845,167 @@
   }
 
   // ── 6. Retention ────────────────────────────────────────────────────────────
+  // ── 8. Error Codes — bilingual error catalogue (restored 2026-05-20) ──────
+  // Every API controller can look up an operator-friendly bilingual message
+  // for a stable code (e.g. AUTH-001) via /api/v1/error-codes/{code}. This
+  // tab is the admin CRUD over those rows. Data: 33+ rows on live VPS.
+  function renderErrorCodes(el){
+    el.innerHTML = UI.loadingHtml();
+    UI.fetchJson('/api/v1/admin/error-codes').then(function(payload){
+      var rows = (payload && payload.error_codes) || [];
+      var grouped = (payload && payload.grouped_by_domain) || {};
+      var domains = Object.keys(grouped).sort();
+      var head = UI.panelHeader(
+        t('Error Code Registry','Sổ Mã Lỗi'),
+        t('Bilingual catalogue of API error codes. Modules call /api/v1/error-codes/{code} to render friendly messages. Activate / deactivate keeps history intact; delete is destructive.',
+          'Danh mục mã lỗi song ngữ. Mỗi module gọi /api/v1/error-codes/{code} để hiển thị thông báo thân thiện. Tắt giữ lịch sử; xoá là không phục hồi.'),
+        UI.btn(t('+ New code','+ Thêm mã'),{ icon:'➕', kind:'primary', id:'ec-new' })
+          + ' ' + UI.btn(t('Refresh','Làm mới'),{ icon:'🔄', kind:'secondary', id:'ec-refresh' })
+      );
+      var columns = [
+        { key:'code', label:t('Code','Mã'), width:'120px', render:function(r){
+            return '<code style="font-family:ui-monospace,monospace;font-size:12.5px;background:var(--bg-2,#f5f7fb);padding:2px 6px;border-radius:3px">'+esc(r.code||'')+'</code>';
+          } },
+        { key:'domain', label:t('Domain','Miền'), width:'110px', render:function(r){
+            return '<span style="font-size:11px;color:var(--text-2);font-family:ui-monospace,monospace">'+esc(r.domain||'')+'</span>';
+          } },
+        { key:'http_status', label:'HTTP', width:'70px', render:function(r){
+            var s = String(r.http_status||'');
+            var tone = (s.charAt(0)==='5') ? 'block' : (s.charAt(0)==='4' ? 'warn' : 'info');
+            return badge(s, tone);
+          } },
+        { key:'severity', label:t('Severity','Mức'), width:'90px', render:function(r){
+            var sev = r.severity || 'error';
+            var tone = sev==='error' ? 'block' : (sev==='warning' ? 'warn' : 'info');
+            return badge(sev, tone);
+          } },
+        { key:'title_vi', label:t('Title (VI / EN)','Tiêu đề (VI / EN)'), render:function(r){
+            return '<div style="font-size:13px;color:var(--text-1)">'+esc(r.title_vi||'')+'</div>'
+              + (r.title_en ? '<div style="font-size:11.5px;color:var(--text-3);margin-top:2px">'+esc(r.title_en)+'</div>' : '');
+          } },
+        { key:'is_active', label:t('Status','Trạng thái'), width:'110px', render:function(r){
+            return r.is_active ? badge(t('Active','Đang dùng'),'success') : badge(t('Disabled','Tắt'),'muted');
+          } },
+        { key:'_actions', label:'', width:'200px', render:function(r){
+            var act = r.is_active
+              ? '<button class="btn-admin secondary ec-toggle" data-code="'+esc(r.code)+'" data-target="deactivate" style="font-size:11px;padding:3px 9px;margin-right:3px">'+t('Disable','Tắt')+'</button>'
+              : '<button class="btn-admin secondary ec-toggle" data-code="'+esc(r.code)+'" data-target="activate" style="font-size:11px;padding:3px 9px;margin-right:3px">'+t('Enable','Bật')+'</button>';
+            return act
+              + '<button class="btn-admin secondary ec-edit"   data-code="'+esc(r.code)+'" style="font-size:11px;padding:3px 9px;margin-right:3px">'+t('Edit','Sửa')+'</button>'
+              + '<button class="btn-admin danger    ec-delete" data-code="'+esc(r.code)+'" style="font-size:11px;padding:3px 9px">'+t('Delete','Xoá')+'</button>';
+          } }
+      ];
+      var meta = ''
+        + '<div style="display:flex;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--text-3);margin-bottom:10px">'
+        +   '<span>'+esc(t('Total codes','Tổng số mã'))+': <b style="color:var(--text-1)">'+rows.length+'</b></span>'
+        +   '<span>·</span>'
+        +   '<span>'+esc(t('Domains','Miền nghiệp vụ'))+': <b style="color:var(--text-1)">'+domains.length+'</b></span>'
+        +   '<span>·</span>'
+        +   '<span>'+esc(t('Active','Đang dùng'))+': <b style="color:var(--text-1)">'+rows.filter(function(x){return x.is_active;}).length+'</b></span>'
+        + '</div>';
+      el.innerHTML = head + meta;
+      if (!rows.length) {
+        el.innerHTML += UI.emptyHtml(t('No error codes registered yet','Chưa có mã lỗi nào'));
+      } else {
+        el.appendChild(UI.buildTable(columns, rows, { rowKey:'code' }));
+      }
+      el.querySelector('#ec-refresh').addEventListener('click', function(){ renderErrorCodes(el); });
+      el.querySelector('#ec-new').addEventListener('click', function(){ openErrorCodeEditor(null, function(){ renderErrorCodes(el); }); });
+      Array.prototype.forEach.call(el.querySelectorAll('.ec-toggle'), function(btn){
+        btn.addEventListener('click', function(){
+          var code = btn.getAttribute('data-code');
+          var op = btn.getAttribute('data-target');
+          UI.fetchJson('/api/v1/admin/error-codes/'+encodeURIComponent(code)+'/'+op, { method:'POST' })
+            .then(function(){ renderErrorCodes(el); })
+            .catch(function(err){ alert((err && err.message) || op + ' failed'); });
+        });
+      });
+      Array.prototype.forEach.call(el.querySelectorAll('.ec-edit'), function(btn){
+        btn.addEventListener('click', function(){
+          var code = btn.getAttribute('data-code');
+          var row = rows.filter(function(x){ return x.code === code; })[0];
+          openErrorCodeEditor(row, function(){ renderErrorCodes(el); });
+        });
+      });
+      Array.prototype.forEach.call(el.querySelectorAll('.ec-delete'), function(btn){
+        btn.addEventListener('click', function(){
+          var code = btn.getAttribute('data-code');
+          if (!confirm(t('Delete '+code+' permanently? Disable is usually safer.','Xoá vĩnh viễn '+code+'? Nên dùng Tắt để giữ lịch sử.'))) return;
+          UI.fetchJson('/api/v1/admin/error-codes/'+encodeURIComponent(code), { method:'DELETE' })
+            .then(function(){ renderErrorCodes(el); })
+            .catch(function(err){ alert((err && err.message) || 'delete failed'); });
+        });
+      });
+    }).catch(function(err){ el.innerHTML = UI.errorHtml(err && err.message, function(){ renderErrorCodes(el); }); });
+  }
+
+  function openErrorCodeEditor(row, onSaved){
+    var isNew = !row;
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,20,28,.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
+    var rec = row || { code:'', domain:'', http_status:400, severity:'error', title_vi:'', title_en:'', description_vi:'', hint_vi:'', is_active:true };
+    function fld(label, key, value, opts){
+      opts = opts || {};
+      var input = opts.area
+        ? '<textarea id="ec-fld-'+key+'" rows="2" style="width:100%;padding:6px 8px;border:1px solid var(--ln,#e3e6ec);border-radius:4px;font-family:inherit;font-size:13px">'+esc(value||'')+'</textarea>'
+        : '<input id="ec-fld-'+key+'" type="'+(opts.type||'text')+'" value="'+esc(value||'')+'" '+(opts.disabled?'disabled':'')+' placeholder="'+esc(opts.placeholder||'')+'" style="width:100%;padding:6px 8px;border:1px solid var(--ln,#e3e6ec);border-radius:4px;font-size:13px'+(opts.mono?';font-family:ui-monospace,monospace':'')+(opts.disabled?';background:var(--bg-2,#f5f7fb)':'')+'">';
+      return '<label style="display:block'+(opts.span===2?';grid-column:span 2':'')+'"><div style="font-size:11px;color:var(--text-2);margin-bottom:3px">'+esc(label)+'</div>'+input+'</label>';
+    }
+    function sel(label, key, value, options){
+      var opts = options.map(function(o){ return '<option value="'+esc(o[0])+'" '+(o[0]===value?'selected':'')+'>'+esc(o[1])+'</option>'; }).join('');
+      return '<label style="display:block"><div style="font-size:11px;color:var(--text-2);margin-bottom:3px">'+esc(label)+'</div><select id="ec-fld-'+key+'" style="width:100%;padding:6px 8px;border:1px solid var(--ln,#e3e6ec);border-radius:4px;font-size:13px">'+opts+'</select></label>';
+    }
+    overlay.innerHTML = ''
+      + '<div style="background:var(--bg,#fff);border-radius:10px;max-width:620px;width:100%;border:1px solid var(--ln,#e3e6ec);box-shadow:0 12px 40px rgba(0,0,0,.25)">'
+      +   '<div style="padding:14px 20px;border-bottom:1px solid var(--ln,#e3e6ec);display:flex;justify-content:space-between;align-items:center">'
+      +     '<strong>'+esc(isNew ? t('New error code','Thêm mã lỗi') : t('Edit '+rec.code,'Sửa '+rec.code))+'</strong>'
+      +     '<button class="ec-close" style="border:0;background:transparent;font-size:22px;line-height:1;cursor:pointer">×</button>'
+      +   '</div>'
+      +   '<div style="padding:16px 20px;display:grid;gap:10px;grid-template-columns:1fr 1fr;font-size:13px">'
+      +     fld(t('Code','Mã'), 'code', rec.code, { mono:true, disabled:!isNew, placeholder:'AUTH-001' })
+      +     fld(t('Domain','Miền'), 'domain', rec.domain, { placeholder:'auth / user / system / …' })
+      +     fld('HTTP', 'http_status', String(rec.http_status||400), { type:'number' })
+      +     sel(t('Severity','Mức'), 'severity', rec.severity, [['error','error'],['warning','warning'],['info','info']])
+      +     fld(t('Title (VI) — required','Tiêu đề VI (bắt buộc)'), 'title_vi', rec.title_vi||'', { span:2 })
+      +     fld(t('Title (EN)','Tiêu đề EN'), 'title_en', rec.title_en||'', { span:2 })
+      +     fld(t('Description (VI)','Mô tả VI'), 'description_vi', rec.description_vi||'', { span:2, area:true })
+      +     fld(t('Hint (VI)','Gợi ý VI'), 'hint_vi', rec.hint_vi||'', { span:2 })
+      +     '<label style="grid-column:span 2;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-2)"><input type="checkbox" id="ec-fld-is_active" '+(rec.is_active!==false?'checked':'')+'> '+esc(t('Active (modules can fetch this code)','Đang dùng (module được phép gọi mã này)'))+'</label>'
+      +   '</div>'
+      +   '<div style="padding:12px 20px;border-top:1px solid var(--ln,#e3e6ec);display:flex;justify-content:flex-end;gap:8px">'
+      +     '<button class="ec-cancel btn-admin secondary">'+esc(t('Cancel','Hủy'))+'</button>'
+      +     '<button class="ec-save btn-admin primary">'+esc(isNew ? t('Create','Tạo') : t('Save','Lưu'))+'</button>'
+      +   '</div>'
+      + '</div>';
+    document.body.appendChild(overlay);
+    var close = function(){ overlay.remove(); };
+    overlay.querySelector('.ec-close').addEventListener('click', close);
+    overlay.querySelector('.ec-cancel').addEventListener('click', close);
+    overlay.addEventListener('click', function(e){ if (e.target === overlay) close(); });
+    overlay.querySelector('.ec-save').addEventListener('click', function(){
+      var v = function(k){ var el2 = overlay.querySelector('#ec-fld-'+k); return el2 ? el2.value : ''; };
+      var body = {
+        code: v('code'),
+        domain: v('domain'),
+        http_status: parseInt(v('http_status'),10) || 400,
+        severity: v('severity'),
+        title_vi: v('title_vi'),
+        title_en: v('title_en'),
+        description_vi: v('description_vi'),
+        hint_vi: v('hint_vi'),
+        is_active: overlay.querySelector('#ec-fld-is_active').checked,
+      };
+      var url = isNew ? '/api/v1/admin/error-codes' : '/api/v1/admin/error-codes/'+encodeURIComponent(rec.code);
+      var method = isNew ? 'POST' : 'PUT';
+      UI.fetchJson(url, { method: method, body: body })
+        .then(function(){ close(); if (typeof onSaved === 'function') onSaved(); })
+        .catch(function(err){ alert((err && err.message) || 'save failed'); });
+    });
+  }
+
   function renderRetention(el){
     el.innerHTML = UI.loadingHtml();
-    UI.runtime.list('core_system','retention_policy', { limit: 100 }).then(function(r){
+    UI.runtime.list('master_data_governance','retention_policy', { limit: 100 }).then(function(r){
       var policies = r.data || [];
       var head = UI.panelHeader(
         t('Retention policies','Chính sách lưu trữ hồ sơ'),

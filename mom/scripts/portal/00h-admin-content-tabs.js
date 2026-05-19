@@ -63,7 +63,7 @@
       }).catch(function(e){ console.warn('[admin-content] fetchDocs failed', e); state.docs = []; });
   }
   function fetchAcknowledgements(){ return UI.runtime.list('core_system','document_acknowledgement',{ limit:1000 }).then(function(r){ state.acknowledgements = (r&&r.data)||r||[]; }).catch(function(){ state.acknowledgements = []; }); }
-  function fetchRetentionPolicies(){ return UI.runtime.list('core_system','retention_policy',{ limit:200 }).then(function(r){ state.retentionPolicies = (r&&r.data)||r||[]; }).catch(function(){ state.retentionPolicies = []; }); }
+  function fetchRetentionPolicies(){ return UI.runtime.list('master_data_governance','retention_policy',{ limit:200 }).then(function(r){ state.retentionPolicies = (r&&r.data)||r||[]; }).catch(function(){ state.retentionPolicies = []; }); }
   function fetchLegalHolds(){ return UI.runtime.list('core_system','legal_hold',{ limit:500 }).then(function(r){ state.legalHolds = (r&&r.data)||r||[]; }).catch(function(){ state.legalHolds = []; }); }
   function fetchDisposalQueue(){ return UI.fetchJson('/api/v1/retention/due-for-disposal').then(function(r){ state.disposalQueue = (r&&r.data)||r||[]; }).catch(function(){ state.disposalQueue = []; }); }
 
@@ -646,7 +646,7 @@
         var p = state.retentionPolicies.find(function(x){ return String(x.policy_code||x.id)===pk; });
         UI.confirmDestructive({ title:t('Remove retention policy','Xoá chính sách lưu trữ'), requireReason:true }).then(function(r){
           if (!r||!r.confirmed) return;
-          UI.runtime.delete('core_system','retention_policy', pk, p && p.row_version).then(function(){
+          UI.runtime.delete('master_data_governance','retention_policy', pk, p && p.row_version).then(function(){
             UI.audit('retention.policy.delete', { id:id, reason:r.reason });
             UI.toast(t('Removed','Đã xoá'),'ok');
             fetchRetentionPolicies().then(function(){ renderRetentionPolicies(el); });
@@ -691,8 +691,8 @@
       var v = form.getValues();
       if (!v.record_class || !v.label_vi || !v.retention_years) return;
       var p = existing
-        ? UI.runtime.update('core_system','retention_policy', existing.id, v, existing.row_version)
-        : UI.runtime.create('core_system','retention_policy', v);
+        ? UI.runtime.update('master_data_governance','retention_policy', existing.id, v, existing.row_version)
+        : UI.runtime.create('master_data_governance','retention_policy', v);
       p.then(function(){
         UI.audit(existing?'retention.policy.update':'retention.policy.create', v);
         UI.toast(t('Saved','Đã lưu'),'ok');
