@@ -9,6 +9,7 @@ use MOM\Api\Services\DataSyncStatusService;
 use MOM\Api\Services\DecisionThresholdService;
 use MOM\Api\Services\GraphicsGovernanceException;
 use MOM\Api\Services\GraphicsGovernanceService;
+use MOM\Api\Services\LocalRuntimeSyncService;
 use MOM\Api\Services\VersionControlService;
 use Throwable;
 
@@ -27,6 +28,8 @@ class AdminController extends BaseController
 
     private ?DecisionThresholdService $decisionThresholdService = null;
 
+    private ?LocalRuntimeSyncService $localRuntimeSyncService = null;
+
     private function graphicsGovernance(): GraphicsGovernanceService
     {
         if ($this->graphicsGovernanceService === null) {
@@ -41,6 +44,14 @@ class AdminController extends BaseController
             $this->decisionThresholdService = new DecisionThresholdService($this->rootDir, $this->dataDir);
         }
         return $this->decisionThresholdService;
+    }
+
+    private function localRuntimeSync(): LocalRuntimeSyncService
+    {
+        if ($this->localRuntimeSyncService === null) {
+            $this->localRuntimeSyncService = new LocalRuntimeSyncService($this->rootDir, $this->dataDir);
+        }
+        return $this->localRuntimeSyncService;
     }
 
     /**
@@ -125,6 +136,8 @@ class AdminController extends BaseController
      * The portal NEVER drives data-sync from PHP — that script must run on
      * the developer workstation (where it has SSH credentials and a working
      * pool to reconcile against). This endpoint only observes state.
+     * The separate local-sync control endpoints below are guarded so they can
+     * execute only when this API itself is running from a local macOS checkout.
      *
      * @return never
      */
@@ -358,6 +371,89 @@ class AdminController extends BaseController
     }
 
     /**
+     * POST admin_data_sync_unregister_file
+     * Body: { file }
+     * Removes a single "missing both" file from the Config Sync registry so it
+     * stops appearing in the table. Only allowed when the file is absent from
+     * both site and mirror pools.
+     */
+    public function dataSyncUnregisterFile(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $body  = $this->jsonBody();
+        $file  = (string)($body['file'] ?? '');
+        $actor = (string)($me['username'] ?? 'unknown');
+        $cr    = 'admin-ui-unregister-' . substr(bin2hex(random_bytes(3)), 0, 6);
+
+        try {
+            // Verify the file is truly absent from both pools before excluding.
+            $statusSvc = new DataSyncStatusService(
+                $this->rootDir,
+                $this->dataDir,
+                $this->data
+            );
+            $found = null;
+            foreach ($statusSvc->status()['config_files'] as $row) {
+                if (($row['name'] ?? '') === $file) {
+                    $found = $row;
+                    break;
+                }
+            }
+            // Also accept files that are already excluded (idempotent re-exclusion).
+            // If $found is null, it may be excluded already — proceed.
+            if ($found !== null && ($found['site_present'] || $found['private_present'])) {
+                $this->error('unregister_only_for_missing_both', 409,
+                    'File exists on at least one pool; only missing-both files may be unregistered.');
+            }
+            $result = $this->dataSyncMutator()->excludeFile($file, $actor, $cr);
+            $this->success(array_merge(['file' => $file, 'change_ref' => $cr], $result));
+        } catch (Throwable $e) {
+            $this->mapMutationException($e);
+        }
+    }
+
+    /**
+     * POST admin_data_sync_batch_unregister
+     * Removes ALL "missing both" files from the registry in one call.
+     */
+    public function dataSyncBatchUnregister(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $actor = (string)($me['username'] ?? 'unknown');
+        $cr    = 'admin-ui-batch-unregister-' . substr(bin2hex(random_bytes(3)), 0, 6);
+
+        try {
+            $statusSvc = new DataSyncStatusService(
+                $this->rootDir,
+                $this->dataDir,
+                $this->data
+            );
+            $goneFiles = array_filter(
+                $statusSvc->status()['config_files'],
+                fn($row) => !($row['site_present'] ?? false) && !($row['private_present'] ?? false)
+            );
+            $mutSvc  = $this->dataSyncMutator();
+            $results = [];
+            foreach ($goneFiles as $row) {
+                $results[] = $mutSvc->excludeFile((string)$row['name'], $actor, $cr);
+            }
+            $this->success([
+                'change_ref'    => $cr,
+                'excluded_count' => count($results),
+                'results'       => $results,
+            ]);
+        } catch (Throwable $e) {
+            $this->mapMutationException($e);
+        }
+    }
+
+    /**
      * GET admin_local_sync_report
      *
      * Returns the last sync report written by data-sync.sh after completing a
@@ -404,6 +500,100 @@ class AdminController extends BaseController
                 'conflict_count' => (int)($report['conflict_count'] ?? 0),
             ],
         ]);
+    }
+
+    /**
+     * GET admin_local_sync_control_status
+     *
+     * Reports whether this API can safely execute the workstation pull-down
+     * path. On the production VPS it intentionally returns execution_allowed=false.
+     *
+     * @return never
+     */
+    public function localSyncControlStatus(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireAdmin($me);
+
+        $target = (string)($this->query('target', 'eqms') ?? 'eqms');
+        try {
+            $this->success($this->localRuntimeSync()->status($target));
+        } catch (Throwable $e) {
+            $this->error('local_sync_status_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST admin_local_sync_run
+     * Body: { target?, apply_decision_thresholds? }
+     *
+     * Runs the laptop-side pull-down script only from a local checkout.
+     *
+     * @return never
+     */
+    public function localSyncRun(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $body = $this->jsonBody();
+        $target = (string)($body['target'] ?? 'eqms');
+        $applyDecisionThresholds = !empty($body['apply_decision_thresholds']);
+
+        try {
+            $result = $this->localRuntimeSync()->runPull($target, $applyDecisionThresholds);
+            $this->auditLog('admin_local_sync_run', [
+                'target' => (string)($result['target'] ?? $target),
+                'apply_decision_thresholds' => $applyDecisionThresholds ? '1' : '0',
+                'exit_code' => (string)($result['exit_code'] ?? ''),
+            ]);
+            $this->success($result);
+        } catch (Throwable $e) {
+            $this->error('local_sync_run_failed', 409, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST admin_local_sync_schedule_set
+     * Body: { interval_minutes, enabled, target?, apply_decision_thresholds? }
+     *
+     * Installs/updates the macOS LaunchAgent that pulls VPS runtime config
+     * down to the laptop on a fixed interval.
+     *
+     * @return never
+     */
+    public function localSyncScheduleSet(): never
+    {
+        $me = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAdmin($me);
+
+        $body = $this->jsonBody();
+        $intervalMinutes = max(1, min(1440, (int)($body['interval_minutes'] ?? 5)));
+        $enabled = (bool)($body['enabled'] ?? false);
+        $target = (string)($body['target'] ?? 'eqms');
+        $applyDecisionThresholds = array_key_exists('apply_decision_thresholds', $body)
+            ? (bool)$body['apply_decision_thresholds']
+            : true;
+
+        try {
+            $result = $this->localRuntimeSync()->configureSchedule(
+                $intervalMinutes,
+                $enabled,
+                $target,
+                $applyDecisionThresholds
+            );
+            $this->auditLog('admin_local_sync_schedule_set', [
+                'target' => (string)($result['target'] ?? $target),
+                'enabled' => $enabled ? '1' : '0',
+                'interval_minutes' => (string)$intervalMinutes,
+                'apply_decision_thresholds' => $applyDecisionThresholds ? '1' : '0',
+            ]);
+            $this->success($result);
+        } catch (Throwable $e) {
+            $this->error('local_sync_schedule_failed', 409, $e->getMessage());
+        }
     }
 
     /**

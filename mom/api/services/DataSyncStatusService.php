@@ -102,12 +102,45 @@ final class DataSyncStatusService
     }
 
     /**
+     * Returns basenames that have been excluded from tracking by an admin.
+     * Stored in mom/data/config/sync_registry_excluded.json (simple JSON array).
+     *
+     * @return array<string,true>
+     */
+    private function loadExcludedFiles(): array
+    {
+        $path = $this->dataDir . '/config/sync_registry_excluded.json';
+        if (!is_file($path)) {
+            return [];
+        }
+        $raw = @file_get_contents($path);
+        if ($raw === false) {
+            return [];
+        }
+        $decoded = json_decode($raw, true);
+        if (!is_array($decoded)) {
+            return [];
+        }
+        $out = [];
+        foreach ($decoded as $v) {
+            if (is_string($v) && $v !== '') {
+                $out[$v] = true;
+            }
+        }
+        return $out;
+    }
+
+    /**
      * @return list<array<string,mixed>>
      */
     private function collectConfigFiles(): array
     {
+        $excluded = $this->loadExcludedFiles();
         $rows = [];
         foreach (self::RUNTIME_CONFIG_FILES as $name) {
+            if (isset($excluded[$name])) {
+                continue;
+            }
             $sitePath    = $this->dataDir . '/config/' . $name;
             $privatePath = $this->privateDataDir . '/config/' . $name;
 

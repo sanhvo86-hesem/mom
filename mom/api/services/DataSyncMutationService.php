@@ -520,6 +520,71 @@ final class DataSyncMutationService
         return ['snapshot' => $snap];
     }
 
+    // ── Registry exclusion ─────────────────────────────────────────────────
+
+    private const EXCLUSION_FILE = 'sync_registry_excluded.json';
+
+    /**
+     * Add $name to the admin-exclusion list so it stops appearing in the
+     * Config Sync table. Only valid for files that are currently MISSING from
+     * both pools (site and mirror). The caller must verify this precondition.
+     *
+     * @return array<string,mixed>
+     */
+    public function excludeFile(string $name, string $actor, string $changeRef): array
+    {
+        $this->assertWhitelisted($name);
+        $path     = $this->dataDir . '/config/' . self::EXCLUSION_FILE;
+        $existing = $this->readExclusionList($path);
+        if (in_array($name, $existing, true)) {
+            return ['excluded' => $name, 'already_excluded' => true, 'list' => $existing];
+        }
+        $existing[] = $name;
+        sort($existing);
+        $this->atomicWrite($path, json_encode($existing, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
+        $this->writeAudit('admin_ui_sync_exclude', $name, [
+            'actor' => $actor, 'change_ref' => $changeRef, 'list' => $existing,
+        ]);
+        return ['excluded' => $name, 'already_excluded' => false, 'list' => $existing];
+    }
+
+    /**
+     * Remove $name from the exclusion list (re-register it).
+     *
+     * @return array<string,mixed>
+     */
+    public function unexcludeFile(string $name, string $actor, string $changeRef): array
+    {
+        $this->assertWhitelisted($name);
+        $path     = $this->dataDir . '/config/' . self::EXCLUSION_FILE;
+        $existing = $this->readExclusionList($path);
+        $filtered = array_values(array_filter($existing, fn($v) => $v !== $name));
+        if (count($filtered) === count($existing)) {
+            return ['unexcluded' => $name, 'was_excluded' => false, 'list' => $existing];
+        }
+        $this->atomicWrite($path, json_encode($filtered, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n");
+        $this->writeAudit('admin_ui_sync_unexclude', $name, [
+            'actor' => $actor, 'change_ref' => $changeRef, 'list' => $filtered,
+        ]);
+        return ['unexcluded' => $name, 'was_excluded' => true, 'list' => $filtered];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function readExclusionList(string $path): array
+    {
+        if (!is_file($path)) {
+            return [];
+        }
+        $raw     = @file_get_contents($path);
+        $decoded = $raw !== false ? json_decode($raw, true) : null;
+        if (!is_array($decoded)) {
+            return [];
+        }
+        return array_values(array_filter($decoded, fn($v) => is_string($v) && $v !== ''));
+    }
+
     // ── Helpers ────────────────────────────────────────────────────────────
 
     private function sitePath(string $name): string

@@ -7148,6 +7148,51 @@ async function adminDataSyncBatchResolve(direction, scope){
   );
 }
 
+async function adminDataSyncUnregisterFile(name){
+  if(!name) return;
+  showAdminConfirmModal(
+    `Xóa "${name}" khỏi danh sách theo dõi Config Sync? File đã mất cả hai bên nên sẽ không hiện nữa trong bảng. Có thể khôi phục bằng cách đẩy lại file sau.`,
+    `Remove "${name}" from the Config Sync registry? The file is gone from both pools and will no longer appear in the table. You can re-register it by uploading a fresh copy later.`,
+    async () => {
+      try{
+        showToast(lang==='en'?`Unregistering ${name}…`:`Đang xóa đăng ký ${name}…`);
+        const res = await apiCall('admin_data_sync_unregister_file', {file:name}, 'POST');
+        if(res && res.ok){
+          showToast(lang==='en'?`"${name}" removed from registry.`:`Đã xóa "${name}" khỏi danh sách.`);
+          adminRefreshDataSyncStatus();
+        }else{
+          showToast((lang==='en'?'Unregister failed: ':'Xóa đăng ký thất bại: ')+(res&&(res.detail||res.error)||'unknown'));
+        }
+      }catch(e){
+        showToast('Unregister error: '+e.message);
+      }
+    }
+  );
+}
+
+async function adminDataSyncBatchUnregister(){
+  showAdminConfirmModal(
+    'Xóa tất cả file "mất cả hai bên" khỏi danh sách theo dõi? Chúng không còn hiện trong bảng Config Sync.',
+    'Remove all "missing both" files from the Config Sync registry? They will no longer appear in the table.',
+    async () => {
+      try{
+        showToast(lang==='en'?'Unregistering all missing-both files…':'Đang xóa tất cả file mất cả hai…');
+        const res = await apiCall('admin_data_sync_batch_unregister', {}, 'POST');
+        if(res && res.ok){
+          showToast(lang==='en'
+            ?`Done: ${res.excluded_count||0} file(s) unregistered.`
+            :`Xong: đã xóa ${res.excluded_count||0} file khỏi danh sách.`);
+          adminRefreshDataSyncStatus();
+        }else{
+          showToast((lang==='en'?'Batch unregister failed: ':'Xóa hàng loạt thất bại: ')+(res&&(res.detail||res.error)||'unknown'));
+        }
+      }catch(e){
+        showToast('Batch unregister error: '+e.message);
+      }
+    }
+  );
+}
+
 async function adminDataSyncViewDiff(name){
   if(!name) return;
   vcConfigSyncDiffState = {open:true, name, loading:true, site:null, mirror:null, error:''};
@@ -7433,6 +7478,12 @@ function renderAdminVCConfigSync(){
           title="${escapeHtml(lang==='en'?'Restore all VPS-absent files from their mirror copies':'Khôi phục tất cả file thiếu trên VPS từ bản mirror')}">
           ↺ ${escapeHtml(lang==='en'?`Restore ${absentFiles.length} absent`:`Khôi phục ${absentFiles.length} file thiếu`)}
         </button>` : ''}
+      ${goneFiles.length ? `
+        <button class="dsync-act" onclick="adminDataSyncBatchUnregister()"
+          style="color:var(--red,#ef4444);border-color:var(--red,#ef4444)"
+          title="${escapeHtml(lang==='en'?'Remove all missing-both files from the tracking registry':'Xóa tất cả file mất cả hai khỏi danh sách theo dõi')}">
+          ✕ ${escapeHtml(lang==='en'?`Unregister ${goneFiles.length} missing both`:`Xóa ${goneFiles.length} file mất cả hai`)}
+        </button>` : ''}
     </div>` : '';
 
   // ── Per-file table rows ────────────────────────────────────────────────
@@ -7474,7 +7525,7 @@ function renderAdminVCConfigSync(){
       acts.push(`<button class="dsync-act dsync-resolve" onclick='adminDataSyncResolveDrift(${fName},"mirror_to_site")' title="${escapeHtml(lang==='en'?'Restore file on VPS from mirror':'Khôi phục file lên VPS từ mirror')}">↺ ${escapeHtml(lang==='en'?'Restore to VPS':'Khôi phục VPS')}</button>`);
     }
     if(bothAbsent){
-      acts.push(`<span style="font-size:10px;color:var(--text-3)">${escapeHtml(lang==='en'?'Missing from both pools — restore from a snapshot below':'Mất cả hai bên — khôi phục từ snapshot bên dưới')}</span>`);
+      acts.push(`<button class="dsync-act dsync-danger" onclick='adminDataSyncUnregisterFile(${fName})' title="${escapeHtml(lang==='en'?'Remove from tracking — file is gone from both pools':'Xóa khỏi danh sách theo dõi — file mất cả hai bên')}" style="color:var(--red,#ef4444);border-color:var(--red,#ef4444)">✕ ${escapeHtml(lang==='en'?'Unregister':'Xóa đăng ký')}</button>`);
     }
 
     return `<tr class="${bothAbsent?'vc-cs-row-critical':drifted||noMirror||absentVPS?'vc-cs-row-warn':''}">
@@ -7734,6 +7785,8 @@ launchctl load ~/Library/LaunchAgents/com.hesem.mom-sync.plist`)}</pre>`;
 
     </div>
 
+    ${renderAdminVCLocalPullCard()}
+    ${renderAdminVCLocalAgentCard()}
     ${renderAdminVCSyncScheduleCard()}
 
     <article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:14px">
@@ -7971,6 +8024,21 @@ let vcConfigSyncDiffState  = {open:false, name:'', loading:false, site:null, mir
 let vcConfigSyncEditorState= {open:false, name:'', loading:false, content:'', error:'', saving:false};
 // local_sync sub-tab: last report written by data-sync.sh to VPS
 let localSyncReportState = {loading:false, loaded:false, error:'', data:null};
+let localSyncControlState = {
+  loading:false, loaded:false, error:'', data:null,
+  running:false, saving:false, target:'eqms', applyDecisionThresholds:true
+};
+let localSyncAgentState = {
+  loading:false, loaded:false, error:'', data:null, running:false, saving:false,
+  endpoint:'http://127.0.0.1:48735',
+  token:'',
+  target:'eqms',
+  applyDecisionThresholds:true
+};
+try{
+  localSyncAgentState.endpoint = localStorage.getItem('mom.localSyncAgent.endpoint') || localSyncAgentState.endpoint;
+  localSyncAgentState.token = localStorage.getItem('mom.localSyncAgent.token') || '';
+}catch(e){}
 
 // Auto-sync schedule: stored on VPS, read/written via admin_sync_schedule_* endpoints
 let syncScheduleState = {loading:false, loaded:false, error:'', data:null};
@@ -7999,6 +8067,8 @@ function setVersionControlSubTab(id){
     if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading) loadDataSyncStatus({silent:true});
   } else if(id === 'local_sync'){
     if(!localSyncReportState.loaded && !localSyncReportState.loading) loadLocalSyncReport({silent:true});
+    if(!localSyncControlState.loaded && !localSyncControlState.loading) loadLocalSyncControlStatus({silent:true});
+    if(!localSyncAgentState.loaded && !localSyncAgentState.loading) loadLocalSyncAgentStatus({silent:true});
     if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading) loadDataSyncStatus({silent:true});
     if(!syncScheduleState.loaded && !syncScheduleState.loading) loadSyncSchedule({silent:true});
   }
@@ -8216,6 +8286,206 @@ async function runAutoSyncNow(){
   }
 }
 
+function renderAdminVCLocalPullCard(){
+  const state = localSyncControlState;
+  const data = state.data && typeof state.data === 'object' ? state.data : null;
+  const allowed = !!(data && data.execution_allowed);
+  const running = !!state.running;
+  const saving = !!state.saving;
+  const dt = data && data.decision_thresholds ? data.decision_thresholds : {};
+  const launch = data && data.launch_agent ? data.launch_agent : {};
+  const interval = Number(launch.interval_minutes || 3);
+  const target = String((data && data.target) || state.target || 'eqms');
+  const command = data && data.commands && data.commands.run_pull
+    ? data.commands.run_pull
+    : 'TARGET=eqms APPLY_DECISION_THRESHOLDS=1 bash tools/vps-setup/scripts/local-sync-down.sh';
+
+  const status = !data && state.loading
+    ? `<div class="admin-sync-callout-bar is-info">${escapeHtml(lang==='en'?'Loading local pull controls…':'Đang tải điều khiển kéo local…')}</div>`
+    : state.error
+    ? `<div class="admin-sync-callout-bar is-error">${escapeHtml(state.error)}</div>`
+    : !data
+    ? `<div class="admin-sync-callout-bar is-warn">${escapeHtml(lang==='en'?'Local pull status is not loaded yet.':'Chưa tải trạng thái kéo local.')}</div>`
+    : allowed
+    ? `<div class="admin-sync-callout-bar is-good">${escapeHtml(lang==='en'
+        ?'This portal is running from a local checkout, so it can pull VPS runtime config into this laptop.'
+        :'Portal đang chạy từ checkout local, nên có thể kéo config runtime từ VPS xuống laptop này.')}</div>`
+    : `<div class="admin-sync-callout-bar is-warn">${escapeHtml(lang==='en'
+        ?'This tab is open on a server/VPS context. A browser button here cannot write to your laptop; run the command below or open the local portal.'
+        :'Tab này đang mở trong ngữ cảnh server/VPS. Nút trên browser không thể ghi vào laptop; hãy chạy lệnh bên dưới hoặc mở portal local.')}</div>`;
+
+  const dtTone = dt.in_sync ? 'is-good' : (dt.pulled_present ? 'is-warn' : 'is-info');
+  const dtText = dt.in_sync
+    ? (lang==='en'?'decision_thresholds.json is applied to local app runtime.':'decision_thresholds.json đã được áp vào runtime app local.')
+    : dt.pulled_present
+    ? (lang==='en'?'Pulled copy exists but local app runtime is not identical.':'Đã có bản kéo xuống nhưng runtime app local chưa giống.')
+    : (lang==='en'?'No pulled decision_thresholds.json found in the local sync pool yet.':'Chưa có decision_thresholds.json trong sync pool local.');
+
+  const launchText = launch.installed
+    ? `${lang==='en'?'LaunchAgent installed':'LaunchAgent đã cài'} · ${launch.loaded?(lang==='en'?'loaded':'đã load'):(lang==='en'?'not loaded':'chưa load')} · ${interval} ${lang==='en'?'min':'phút'}`
+    : (lang==='en'?'LaunchAgent not installed.':'Chưa cài LaunchAgent.');
+
+  const presets = [1,3,5,10,15,30,60].map(m=>{
+    const active = launch.installed && launch.loaded && interval === m;
+    return `<button class="admin-sync-mini${active?' vc-sched-active':''}"
+      onclick="saveLocalPullSchedule(${m}, true)" ${(!allowed||saving)?'disabled':''}>
+      ${m} ${lang==='en'?'min':'phút'}
+    </button>`;
+  }).join('');
+
+  return `<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:14px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+      <div>
+        <div class="admin-sync-panel-title">${lang==='en'?'Laptop pull-down sync':'Đồng bộ kéo xuống laptop'}
+          &nbsp;<span style="font-size:11px;font-weight:400;color:var(--text-3)">${escapeHtml(target)}</span>
+        </div>
+        <div style="margin-top:4px;font-size:12px;color:var(--text-3)">${escapeHtml(launchText)}</div>
+      </div>
+      <button class="admin-sync-mini" onclick="runLocalPullDownNow()" ${(!allowed||running)?'disabled':''}>
+        <span class="admin-sync-mini-ico">⇣</span>
+        <span>${running?(lang==='en'?'Pulling…':'Đang kéo…'):(lang==='en'?'Pull down now':'Kéo xuống ngay')}</span>
+      </button>
+    </div>
+    ${status}
+    <div class="admin-sync-callout-bar ${dtTone}" style="margin-top:10px;font-size:12px">
+      ${escapeHtml(dtText)}
+      ${dt.pulled_sha256_short || dt.app_sha256_short
+        ? ` <span style="color:var(--text-3)">pool <code>${escapeHtml(dt.pulled_sha256_short||'--')}</code> · app <code>${escapeHtml(dt.app_sha256_short||'--')}</code></span>`
+        : ''}
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--text-2)">
+      <input id="vc-local-sync-apply-thresholds" type="checkbox" ${state.applyDecisionThresholds?'checked':''}
+        onchange="localSyncControlState.applyDecisionThresholds=!!this.checked">
+      <span>${lang==='en'
+        ?'After pull, apply decision_thresholds.json to the local app runtime. Identity files such as users.json are never applied by this control.'
+        :'Sau khi kéo, áp decision_thresholds.json vào runtime app local. Các file identity như users.json không bao giờ được áp bởi điều khiển này.'}</span>
+    </label>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px">
+      <span style="font-size:13px;font-weight:600">${lang==='en'?'Auto pull every:':'Tự kéo mỗi:'}</span>
+      ${presets}
+      <span style="font-size:12px;color:var(--text-3);margin:0 4px">${lang==='en'?'or custom:':'hoặc tùy chỉnh:'}</span>
+      <input type="number" min="1" max="1440" value="${escapeHtml(String(interval))}"
+        class="vc-sched-input" id="vc-local-pull-custom-input" ${(!allowed||saving)?'disabled':''}
+        onkeydown="if(event.key==='Enter'){const v=parseInt(this.value,10);if(v>=1)saveLocalPullSchedule(v,true);}">
+      <button class="admin-sync-mini" onclick="const v=parseInt(document.getElementById('vc-local-pull-custom-input').value,10);if(v>=1)saveLocalPullSchedule(v,true);" ${(!allowed||saving)?'disabled':''}>
+        ${lang==='en'?'Set':'Đặt'}
+      </button>
+      <button class="admin-sync-mini" style="color:var(--red,#ef4444);border-color:var(--red,#ef4444)"
+        onclick="saveLocalPullSchedule(${interval||3}, false)" ${(!allowed||saving||!launch.installed)?'disabled':''}>
+        ${lang==='en'?'Disable':'Tắt'}
+      </button>
+      <button class="admin-sync-mini" onclick="loadLocalSyncControlStatus({force:true})">
+        ${lang==='en'?'Refresh':'Làm mới'}
+      </button>
+    </div>
+    ${!allowed ? `<details style="margin-top:10px"><summary style="cursor:pointer;font-size:12px;font-weight:600">${escapeHtml(lang==='en'?'Manual command':'Lệnh chạy thủ công')}</summary>
+      <pre style="font-size:11px;line-height:1.5;background:var(--bg-2,#f6f7fb);padding:8px;border-radius:6px;overflow:auto;margin:8px 0 0">${escapeHtml(command)}</pre>
+    </details>` : ''}
+  </article>`;
+}
+
+function renderAdminVCLocalAgentCard(){
+  const state = localSyncAgentState;
+  const data = state.data && typeof state.data === 'object' ? state.data : null;
+  const authenticated = !!(data && data.authenticated);
+  const dt = data && data.decision_thresholds ? data.decision_thresholds : {};
+  const schedule = data && data.pull_schedule ? data.pull_schedule : {};
+  const interval = Number(schedule.interval_minutes || 3);
+  const agentInstalled = !!(data && data.agent_schedule && data.agent_schedule.loaded);
+  const tokenValue = String(state.token || '');
+
+  const status = state.loading
+    ? `<div class="admin-sync-callout-bar is-info">${escapeHtml(lang==='en'?'Checking laptop agent…':'Đang kiểm tra agent trên laptop…')}</div>`
+    : state.error
+    ? `<div class="admin-sync-callout-bar is-error">${escapeHtml(state.error)}</div>`
+    : !data
+    ? `<div class="admin-sync-callout-bar is-warn">${escapeHtml(lang==='en'?'Laptop agent has not been checked yet.':'Chưa kiểm tra agent trên laptop.')}</div>`
+    : authenticated
+    ? `<div class="admin-sync-callout-bar is-good">${escapeHtml(lang==='en'
+        ?'Chrome is connected to the laptop sync agent.'
+        :'Chrome đã kết nối với sync agent trên laptop.')}</div>`
+    : `<div class="admin-sync-callout-bar is-warn">${escapeHtml(lang==='en'
+        ?'Laptop agent is reachable but needs the local token, or it is not installed yet.'
+        :'Agent trên laptop đã phản hồi nhưng cần token local, hoặc chưa được cài.')}</div>`;
+
+  const dtTone = dt.in_sync ? 'is-good' : (dt.pulled_present ? 'is-warn' : 'is-info');
+  const dtText = dt.in_sync
+    ? (lang==='en'?'decision_thresholds.json is applied to local app runtime.':'decision_thresholds.json đã được áp vào runtime app local.')
+    : dt.pulled_present
+    ? (lang==='en'?'Pulled copy exists but local app runtime is not identical.':'Đã có bản kéo xuống nhưng runtime app local chưa giống.')
+    : (lang==='en'?'No pulled decision_thresholds.json found in the laptop sync pool yet.':'Chưa có decision_thresholds.json trong sync pool laptop.');
+
+  const presets = [1,3,5,10,15,30,60].map(m=>{
+    const active = authenticated && schedule.installed && schedule.loaded && interval === m;
+    return `<button class="admin-sync-mini${active?' vc-sched-active':''}"
+      onclick="saveLocalAgentSchedule(${m}, true)" ${(!authenticated||state.saving)?'disabled':''}>
+      ${m} ${lang==='en'?'min':'phút'}
+    </button>`;
+  }).join('');
+
+  return `<article class="admin-sync-cpanel-card admin-sync-cpanel-card--full" style="margin-top:14px">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;margin-bottom:12px">
+      <div>
+        <div class="admin-sync-panel-title">${lang==='en'?'Chrome live VPS → laptop agent':'Chrome live VPS → agent laptop'}</div>
+        <div style="margin-top:4px;font-size:12px;color:var(--text-3)">
+          ${escapeHtml((agentInstalled?(lang==='en'?'Agent loaded':'Agent đã load'):(lang==='en'?'Agent not confirmed':'Chưa xác nhận agent'))+
+            ' · '+String(state.endpoint||''))}
+        </div>
+      </div>
+      <button class="admin-sync-mini" onclick="runLocalAgentPullNow()" ${(!authenticated||state.running)?'disabled':''}>
+        <span class="admin-sync-mini-ico">⇣</span>
+        <span>${state.running?(lang==='en'?'Pulling…':'Đang kéo…'):(lang==='en'?'Pull down now':'Kéo xuống ngay')}</span>
+      </button>
+    </div>
+    ${status}
+    <div style="display:grid;grid-template-columns:minmax(220px,1fr) minmax(220px,1fr);gap:10px;margin-top:10px">
+      <label style="font-size:12px;color:var(--text-2)">
+        <span style="display:block;font-weight:600;margin-bottom:4px">${lang==='en'?'Agent endpoint':'Endpoint agent'}</span>
+        <input class="vc-sched-input" style="width:100%;text-align:left" value="${escapeHtml(state.endpoint||'')}"
+          onchange="localSyncAgentState.endpoint=this.value.trim()||'http://127.0.0.1:48735';try{localStorage.setItem('mom.localSyncAgent.endpoint',localSyncAgentState.endpoint)}catch(e){}">
+      </label>
+      <label style="font-size:12px;color:var(--text-2)">
+        <span style="display:block;font-weight:600;margin-bottom:4px">${lang==='en'?'Local token':'Token local'}</span>
+        <input class="vc-sched-input" style="width:100%;text-align:left" type="password" value="${escapeHtml(tokenValue)}"
+          onchange="localSyncAgentState.token=this.value.trim();try{localStorage.setItem('mom.localSyncAgent.token',localSyncAgentState.token)}catch(e){}">
+      </label>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
+      <button class="admin-sync-mini" onclick="loadLocalSyncAgentStatus({force:true})">${lang==='en'?'Check agent':'Kiểm tra agent'}</button>
+      <details><summary class="admin-sync-mini" style="display:inline-flex;cursor:pointer">${lang==='en'?'Install helper':'Cài helper'}</summary>
+        <pre style="font-size:11px;line-height:1.5;background:var(--bg-2,#f6f7fb);padding:8px;border-radius:6px;overflow:auto;margin:8px 0 0">${escapeHtml('bash tools/vps-setup/scripts/install-local-sync-agent.sh')}</pre>
+      </details>
+    </div>
+    <div class="admin-sync-callout-bar ${dtTone}" style="margin-top:10px;font-size:12px">
+      ${escapeHtml(dtText)}
+      ${dt.pulled_sha256_short || dt.app_sha256_short
+        ? ` <span style="color:var(--text-3)">pool <code>${escapeHtml(dt.pulled_sha256_short||'--')}</code> · app <code>${escapeHtml(dt.app_sha256_short||'--')}</code></span>`
+        : ''}
+    </div>
+    <label style="display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--text-2)">
+      <input id="vc-local-agent-apply-thresholds" type="checkbox" ${state.applyDecisionThresholds?'checked':''}
+        onchange="localSyncAgentState.applyDecisionThresholds=!!this.checked">
+      <span>${lang==='en'
+        ?'Apply decision_thresholds.json to local app runtime after pull. Identity files are not applied.'
+        :'Áp decision_thresholds.json vào runtime app local sau khi kéo. Không áp file identity.'}</span>
+    </label>
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:12px">
+      <span style="font-size:13px;font-weight:600">${lang==='en'?'Auto pull every:':'Tự kéo mỗi:'}</span>
+      ${presets}
+      <input type="number" min="1" max="1440" value="${escapeHtml(String(interval))}"
+        class="vc-sched-input" id="vc-agent-pull-custom-input" ${(!authenticated||state.saving)?'disabled':''}
+        onkeydown="if(event.key==='Enter'){const v=parseInt(this.value,10);if(v>=1)saveLocalAgentSchedule(v,true);}">
+      <button class="admin-sync-mini" onclick="const v=parseInt(document.getElementById('vc-agent-pull-custom-input').value,10);if(v>=1)saveLocalAgentSchedule(v,true);" ${(!authenticated||state.saving)?'disabled':''}>
+        ${lang==='en'?'Set':'Đặt'}
+      </button>
+      <button class="admin-sync-mini" style="color:var(--red,#ef4444);border-color:var(--red,#ef4444)"
+        onclick="saveLocalAgentSchedule(${interval||3}, false)" ${(!authenticated||state.saving||!schedule.installed)?'disabled':''}>
+        ${lang==='en'?'Disable':'Tắt'}
+      </button>
+    </div>
+  </article>`;
+}
+
 function renderAdminVCSyncScheduleCard(){
   const sched   = syncScheduleState.data || {};
   const enabled  = !!(sched.enabled);
@@ -8302,6 +8572,225 @@ async function loadLocalSyncReport(options){
   } catch(e){
     localSyncReportState = {loading:false, loaded:false, error:e.message||'local_sync_report_failed', data:null};
   } finally {
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+async function loadLocalSyncControlStatus(options){
+  options = options || {};
+  const force = !!options.force;
+  if(localSyncControlState.loading && !force) return;
+  if(localSyncControlState.loaded && !force) return;
+  localSyncControlState = Object.assign({}, localSyncControlState, {loading:true, loaded:false, error:''});
+  if(!options.silent && currentPage === 'admin') renderAdmin();
+  try{
+    const res = await apiCall('admin_local_sync_control_status',
+      {target: localSyncControlState.target || 'eqms'}, 'GET');
+    if(res && res.ok){
+      localSyncControlState = Object.assign({}, localSyncControlState, {
+        loading:false, loaded:true, error:'', data:res,
+        target:res.target || localSyncControlState.target || 'eqms'
+      });
+    }else{
+      localSyncControlState = Object.assign({}, localSyncControlState, {
+        loading:false, loaded:false,
+        error:(res && (res.detail||res.error)) ? String(res.detail||res.error) : 'local_sync_control_failed',
+        data:null
+      });
+    }
+  }catch(e){
+    localSyncControlState = Object.assign({}, localSyncControlState, {
+      loading:false, loaded:false, error:e.message||'local_sync_control_failed', data:null
+    });
+  }finally{
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+function vcLocalSyncApplyDecisionThresholds(){
+  const el = document.getElementById('vc-local-sync-apply-thresholds');
+  if(el) localSyncControlState.applyDecisionThresholds = !!el.checked;
+  return !!localSyncControlState.applyDecisionThresholds;
+}
+
+async function runLocalPullDownNow(){
+  if(localSyncControlState.running) return;
+  localSyncControlState = Object.assign({}, localSyncControlState, {running:true, error:''});
+  renderAdmin();
+  try{
+    const res = await apiCall('admin_local_sync_run', {
+      target: localSyncControlState.target || 'eqms',
+      apply_decision_thresholds: vcLocalSyncApplyDecisionThresholds()
+    }, 'POST', 240000);
+    if(res && res.ok && Number(res.exit_code||0) === 0){
+      showToast(lang==='en'?'Pulled VPS runtime config to local.':'Đã kéo config runtime từ VPS xuống local.', 'success');
+      localSyncControlState = Object.assign({}, localSyncControlState, {running:false, loaded:false, data:null});
+      localSyncReportState = {loading:false, loaded:false, error:'', data:null};
+      await loadLocalSyncControlStatus({force:true, silent:true});
+      await loadLocalSyncReport({force:true, silent:true});
+    }else{
+      const detail = (res && (res.stderr||res.detail||res.error)) || 'local_sync_failed';
+      showToast((lang==='en'?'Local sync failed: ':'Đồng bộ local thất bại: ')+String(detail).slice(0,180), 'error');
+      localSyncControlState = Object.assign({}, localSyncControlState, {running:false, error:String(detail), data:res||localSyncControlState.data});
+    }
+  }catch(e){
+    showToast((lang==='en'?'Local sync error: ':'Lỗi đồng bộ local: ')+e.message, 'error');
+    localSyncControlState = Object.assign({}, localSyncControlState, {running:false, error:e.message});
+  }finally{
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+async function saveLocalPullSchedule(minutes, enabled){
+  if(localSyncControlState.saving) return;
+  minutes = Math.max(1, Math.min(1440, Number(minutes)||3));
+  localSyncControlState = Object.assign({}, localSyncControlState, {saving:true, error:''});
+  renderAdmin();
+  try{
+    const res = await apiCall('admin_local_sync_schedule_set', {
+      interval_minutes: minutes,
+      enabled: !!enabled,
+      target: localSyncControlState.target || 'eqms',
+      apply_decision_thresholds: vcLocalSyncApplyDecisionThresholds()
+    }, 'POST', 60000);
+    if(res && res.ok){
+      showToast(enabled
+        ? (lang==='en'?`Laptop auto-pull enabled every ${minutes} min`:`Đã bật tự kéo xuống laptop mỗi ${minutes} phút`)
+        : (lang==='en'?'Laptop auto-pull disabled':'Đã tắt tự kéo xuống laptop'), 'success');
+      localSyncControlState = Object.assign({}, localSyncControlState, {saving:false, loaded:false, data:null});
+      await loadLocalSyncControlStatus({force:true, silent:true});
+    }else{
+      const detail = (res && (res.detail||res.error||res.bootstrap_stderr)) || 'schedule_save_failed';
+      showToast((lang==='en'?'Schedule failed: ':'Lỗi lưu lịch: ')+String(detail).slice(0,180), 'error');
+      localSyncControlState = Object.assign({}, localSyncControlState, {saving:false, error:String(detail)});
+    }
+  }catch(e){
+    showToast((lang==='en'?'Schedule error: ':'Lỗi lịch: ')+e.message, 'error');
+    localSyncControlState = Object.assign({}, localSyncControlState, {saving:false, error:e.message});
+  }finally{
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+function localSyncAgentEndpoint(){
+  return String(localSyncAgentState.endpoint || 'http://127.0.0.1:48735').replace(/\/+$/,'');
+}
+
+function localSyncAgentApplyDecisionThresholds(){
+  const el = document.getElementById('vc-local-agent-apply-thresholds');
+  if(el) localSyncAgentState.applyDecisionThresholds = !!el.checked;
+  return !!localSyncAgentState.applyDecisionThresholds;
+}
+
+async function callLocalSyncAgent(path, payload, method, timeoutMs){
+  method = method || 'GET';
+  const controller = (typeof AbortController !== 'undefined') ? new AbortController() : null;
+  const headers = {};
+  if(method !== 'GET') headers['Content-Type'] = 'application/json';
+  if(localSyncAgentState.token) headers['X-MOM-Local-Sync-Token'] = localSyncAgentState.token;
+  const opts = {method, headers, mode:'cors', cache:'no-store'};
+  if(controller) opts.signal = controller.signal;
+  if(payload && method !== 'GET') opts.body = JSON.stringify(payload);
+  let timer = null;
+  try{
+    if(controller) timer = setTimeout(()=>{ try{ controller.abort(); }catch(e){} }, timeoutMs || 15000);
+    const res = await fetch(localSyncAgentEndpoint()+path, opts);
+    const text = await res.text();
+    let body = null;
+    try{ body = text ? JSON.parse(text) : {}; }catch(e){ body = {ok:false,error:'invalid_agent_json',detail:text.slice(0,300)}; }
+    if(!res.ok && body && !body.error) body.error = 'agent_http_'+res.status;
+    return body;
+  } finally {
+    if(timer) clearTimeout(timer);
+  }
+}
+
+async function loadLocalSyncAgentStatus(options){
+  options = options || {};
+  if(localSyncAgentState.loading && !options.force) return;
+  if(localSyncAgentState.loaded && !options.force) return;
+  localSyncAgentState = Object.assign({}, localSyncAgentState, {loading:true, loaded:false, error:''});
+  if(!options.silent && currentPage === 'admin') renderAdmin();
+  try{
+    const res = await callLocalSyncAgent('/status', null, 'GET', 8000);
+    if(res && res.ok){
+      localSyncAgentState = Object.assign({}, localSyncAgentState, {
+        loading:false, loaded:true, error:'', data:res,
+        target:res.target || localSyncAgentState.target || 'eqms'
+      });
+    }else{
+      localSyncAgentState = Object.assign({}, localSyncAgentState, {
+        loading:false, loaded:false, data:res||null,
+        error:(res && (res.detail||res.error)) ? String(res.detail||res.error) : 'local_agent_unreachable'
+      });
+    }
+  }catch(e){
+    localSyncAgentState = Object.assign({}, localSyncAgentState, {
+      loading:false, loaded:false, data:null,
+      error:lang==='en'
+        ?'Local agent is not reachable from Chrome. Install/start it on this laptop first.'
+        :'Chrome chưa gọi được local agent. Cài/khởi động agent trên laptop này trước.'
+    });
+  }finally{
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+async function runLocalAgentPullNow(){
+  if(localSyncAgentState.running) return;
+  localSyncAgentState = Object.assign({}, localSyncAgentState, {running:true, error:''});
+  renderAdmin();
+  try{
+    const res = await callLocalSyncAgent('/run', {
+      target: localSyncAgentState.target || 'eqms',
+      apply_decision_thresholds: localSyncAgentApplyDecisionThresholds()
+    }, 'POST', 240000);
+    if(res && res.ok){
+      showToast(lang==='en'?'Laptop agent pulled VPS config.':'Agent laptop đã kéo config từ VPS.', 'success');
+      localSyncAgentState = Object.assign({}, localSyncAgentState, {running:false, loaded:false, data:null});
+      await loadLocalSyncAgentStatus({force:true, silent:true});
+      localSyncReportState = {loading:false, loaded:false, error:'', data:null};
+      await loadLocalSyncReport({force:true, silent:true});
+    }else{
+      const detail = (res && (res.stderr||res.detail||res.error)) || 'agent_pull_failed';
+      showToast((lang==='en'?'Agent pull failed: ':'Agent kéo thất bại: ')+String(detail).slice(0,180), 'error');
+      localSyncAgentState = Object.assign({}, localSyncAgentState, {running:false, error:String(detail), data:res||localSyncAgentState.data});
+    }
+  }catch(e){
+    showToast((lang==='en'?'Agent error: ':'Lỗi agent: ')+e.message, 'error');
+    localSyncAgentState = Object.assign({}, localSyncAgentState, {running:false, error:e.message});
+  }finally{
+    if(currentPage === 'admin') renderAdmin();
+  }
+}
+
+async function saveLocalAgentSchedule(minutes, enabled){
+  if(localSyncAgentState.saving) return;
+  minutes = Math.max(1, Math.min(1440, Number(minutes)||3));
+  localSyncAgentState = Object.assign({}, localSyncAgentState, {saving:true, error:''});
+  renderAdmin();
+  try{
+    const res = await callLocalSyncAgent('/schedule', {
+      interval_minutes: minutes,
+      enabled: !!enabled,
+      target: localSyncAgentState.target || 'eqms',
+      apply_decision_thresholds: localSyncAgentApplyDecisionThresholds()
+    }, 'POST', 60000);
+    if(res && res.ok){
+      showToast(enabled
+        ? (lang==='en'?`Laptop agent auto-pull: ${minutes} min`:`Agent laptop tự kéo mỗi ${minutes} phút`)
+        : (lang==='en'?'Laptop agent auto-pull disabled':'Đã tắt lịch tự kéo của agent'), 'success');
+      localSyncAgentState = Object.assign({}, localSyncAgentState, {saving:false, loaded:false, data:null});
+      await loadLocalSyncAgentStatus({force:true, silent:true});
+    }else{
+      const detail = (res && (res.detail||res.error||res.bootstrap_stderr)) || 'agent_schedule_failed';
+      showToast((lang==='en'?'Agent schedule failed: ':'Lỗi lưu lịch agent: ')+String(detail).slice(0,180), 'error');
+      localSyncAgentState = Object.assign({}, localSyncAgentState, {saving:false, error:String(detail), data:res||localSyncAgentState.data});
+    }
+  }catch(e){
+    showToast((lang==='en'?'Agent schedule error: ':'Lỗi lịch agent: ')+e.message, 'error');
+    localSyncAgentState = Object.assign({}, localSyncAgentState, {saving:false, error:e.message});
+  }finally{
     if(currentPage === 'admin') renderAdmin();
   }
 }
@@ -8702,11 +9191,11 @@ function renderAdminVCProcess(){
     '<ol>'+
       '<li>Edit through the portal admin UI — never SSH and edit files directly.</li>'+
       '<li>Mutation is written via the controller, which: takes a snapshot first, writes atomically (tmp + rename), records an <code>audit_events</code> row, and (for runtime config) mirrors to <code>/var/www/data-private/config/</code>.</li>'+
-      '<li>Periodically (e.g. once a week) pull the live state back to a developer laptop with <code>bash tools/vps-setup/scripts/data-sync.sh pull</code> — review with <code>--check-only</code> first.</li>'+
+      '<li>Periodically pull the live state back to a developer laptop with <code>bash tools/vps-setup/scripts/data-sync.sh --pull-only --yes</code> — review with <code>--check-only</code> first, or use the Laptop pull-down controls in this tab.</li>'+
     '</ol>'+
     '<h4>C — Mixed change (code + content together)</h4>'+
     '<ol>'+
-      '<li>Pull content first: <code>bash tools/vps-setup/scripts/data-sync.sh pull</code>.</li>'+
+      '<li>Pull content first: <code>bash tools/vps-setup/scripts/data-sync.sh --pull-only --yes</code>.</li>'+
       '<li>Make code edits locally, commit, push (deploy preserves content via capture-restore).</li>'+
       '<li>If you must include a doc in the PR, follow the <code>ALLOW_DOC_COMMIT=1</code> exception with a DCR reference.</li>'+
     '</ol>'+
@@ -8747,11 +9236,11 @@ function renderAdminVCProcess(){
     '<ol>'+
       '<li>Sửa qua giao diện admin trong portal — KHÔNG SSH lên VPS sửa file trực tiếp.</li>'+
       '<li>Controller xử lý: tạo snapshot trước, ghi atomic (tmp + rename), ghi audit_events, và (với runtime config) mirror sang <code>/var/www/data-private/config/</code>.</li>'+
-      '<li>Định kỳ (ví dụ mỗi tuần) kéo state live về laptop bằng <code>bash tools/vps-setup/scripts/data-sync.sh pull</code> — xem trước bằng <code>--check-only</code>.</li>'+
+      '<li>Định kỳ kéo state live về laptop bằng <code>bash tools/vps-setup/scripts/data-sync.sh --pull-only --yes</code> — xem trước bằng <code>--check-only</code>, hoặc dùng phần Kéo xuống laptop trong tab này.</li>'+
     '</ol>'+
     '<h4>C — Thay đổi HỖN HỢP (code + nội dung cùng lúc)</h4>'+
     '<ol>'+
-      '<li>Kéo nội dung về trước: <code>bash tools/vps-setup/scripts/data-sync.sh pull</code>.</li>'+
+      '<li>Kéo nội dung về trước: <code>bash tools/vps-setup/scripts/data-sync.sh --pull-only --yes</code>.</li>'+
       '<li>Sửa code ở local, commit, push (deploy sẽ bảo toàn nội dung qua capture-restore).</li>'+
       '<li>Nếu bắt buộc đưa tài liệu vào PR, dùng exception <code>ALLOW_DOC_COMMIT=1</code> kèm số DCR.</li>'+
     '</ol>'+
@@ -8814,6 +9303,8 @@ function renderAdminVersionControl(){
   }
   if(versionControlSubTab === 'local_sync'){
     if(!localSyncReportState.loaded && !localSyncReportState.loading && !localSyncReportState.error) loadLocalSyncReport({silent:true});
+    if(!localSyncControlState.loaded && !localSyncControlState.loading && !localSyncControlState.error) loadLocalSyncControlStatus({silent:true});
+    if(!localSyncAgentState.loaded && !localSyncAgentState.loading && !localSyncAgentState.error) loadLocalSyncAgentStatus({silent:true});
     if(!dataSyncStatusState.loaded && !dataSyncStatusState.loading && !dataSyncStatusState.error) loadDataSyncStatus({silent:true});
     if(!syncScheduleState.loaded && !syncScheduleState.loading && !syncScheduleState.error) loadSyncSchedule({silent:true});
   }

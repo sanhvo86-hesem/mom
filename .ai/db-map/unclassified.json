@@ -1,8 +1,8 @@
 {
     "_meta": {
         "domain": "unclassified",
-        "table_count": 780,
-        "generated_at": "2026-05-18T02:44:45+00:00"
+        "table_count": 783,
+        "generated_at": "2026-05-19T19:02:07+00:00"
     },
     "tables": {
         "access_review_campaign": {
@@ -1475,7 +1475,8 @@
         "dcc_document_locale_variant": {
             "defined_in": "152_dcc_document_locale_variants.sql",
             "extended_in": [
-                "156_live_schema_drift_governance_reconcile.sql"
+                "156_live_schema_drift_governance_reconcile.sql",
+                "189_translation_review_module.sql"
             ],
             "primary_key": "locale_variant_id",
             "foreign_keys": [
@@ -11104,6 +11105,18 @@
             ],
             "contract": null
         },
+        "translation_learning": {
+            "defined_in": "190_translation_learning.sql",
+            "extended_in": [],
+            "primary_key": "learning_id",
+            "foreign_keys": [
+                {
+                    "col": "last_review_id",
+                    "ref": "translation_review_run(review_id)"
+                }
+            ],
+            "contract": null
+        },
         "translation_provider_config": {
             "defined_in": "157_translation_admin_module.sql",
             "extended_in": [],
@@ -11111,9 +11124,18 @@
             "foreign_keys": [],
             "contract": null
         },
+        "translation_review_run": {
+            "defined_in": "189_translation_review_module.sql",
+            "extended_in": [],
+            "primary_key": "review_id",
+            "foreign_keys": [],
+            "contract": null
+        },
         "translation_routing": {
             "defined_in": "157_translation_admin_module.sql",
-            "extended_in": [],
+            "extended_in": [
+                "189_translation_review_module.sql"
+            ],
             "primary_key": "routing_id",
             "foreign_keys": [
                 {
@@ -11121,6 +11143,13 @@
                     "ref": "translation_provider_config(provider_key)"
                 }
             ],
+            "contract": null
+        },
+        "translation_runtime_setting": {
+            "defined_in": "191_translation_runtime_settings.sql",
+            "extended_in": [],
+            "primary_key": "setting_key",
+            "foreign_keys": [],
             "contract": null
         },
         "translation_usage_log": {
