@@ -883,15 +883,25 @@ final class TranslationAdminController extends EqmsBaseController
                 }
                 $killed['worker_pids'][] = $pid;
                 // Kill the whole subtree (php -> python -> codex/claude/node).
+                // Use shell `kill` instead of posix_kill() because PHP-FPM
+                // commonly disables pcntl/POSIX signal constants for security
+                // (verified on this VPS: SIGTERM is undefined in the FPM SAPI
+                // even though `posix_kill` is callable). External /bin/kill
+                // is always available and accepts both numeric and named
+                // signals, so this path works in any SAPI.
                 @shell_exec('pkill -TERM -P ' . $pid . ' 2>/dev/null');
-                @posix_kill($pid, SIGTERM);
+                @shell_exec('kill -TERM ' . $pid . ' 2>/dev/null');
             }
             // Grace period, then SIGKILL anything that survived.
             usleep(800_000);
             foreach ($killed['worker_pids'] as $pid) {
-                if (@posix_kill($pid, 0)) {
+                // Probe with `kill -0` which returns 0 if pid exists and we
+                // have permission to signal it. Same semantics as
+                // posix_kill($pid, 0) but works without the POSIX extension.
+                $probe = (int)trim((string)@shell_exec('kill -0 ' . $pid . ' 2>/dev/null; echo $?'));
+                if ($probe === 0) {
                     @shell_exec('pkill -KILL -P ' . $pid . ' 2>/dev/null');
-                    @posix_kill($pid, SIGKILL);
+                    @shell_exec('kill -KILL ' . $pid . ' 2>/dev/null');
                 }
             }
             // Sweep any descendants spawned earlier by the python provider
