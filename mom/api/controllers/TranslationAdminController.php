@@ -1185,7 +1185,7 @@ final class TranslationAdminController extends EqmsBaseController
         $user = $this->requireAuth();
         $this->requireAdmin($user);
         $body = $this->jsonBody();
-        if (!array_key_exists('enabled', $body ?? [])) {
+        if (!array_key_exists('enabled', $body)) {
             $this->error('translation_auto_translate_missing_enabled', 422, 'Body must include `enabled: true|false`.');
         }
         $enabled = (bool)$body['enabled'];
