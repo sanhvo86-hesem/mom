@@ -211,15 +211,31 @@ function doc_type_from_code(string $code): string
 
 /**
  * Extract the human-readable title from an existing HTML file. Tries (in
- * order): <title> tag, <h1>, legacy `<strong class="doc-name">`, filename.
+ * order): data-dcc-bootstrap seed `header.title`, legacy
+ * `<strong class="doc-name">`, <h1>, <title> tag, filename.
  * Always strips a leading "<CODE> - " or "<CODE> — " prefix.
+ *
+ * Note: the `<h2>` tag is deliberately NOT a source — DCC-formatted docs
+ * use `<h2 class="h2">` for section headings (e.g. "1. Thông tin vị trí"),
+ * which must never be mistaken for the document title.
  */
 function extract_title(string $html, string $code, string $absPath): string
 {
+    // 0) Authoritative DCC bootstrap seed — the title declared in the file.
+    //    HTML-attribute-encoded JSON; pull the attr then JSON-decode.
+    if (preg_match('/data-dcc-bootstrap\s*=\s*([\'"])(.*?)\1/is', $html, $bm)) {
+        $raw  = html_entity_decode((string)$bm[2], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $seed = json_decode($raw, true);
+        if (is_array($seed) && isset($seed['header']['title'])) {
+            $seedTitle = strip_brand_suffix(strip_code_prefix(clean_text((string)$seed['header']['title']), $code));
+            if ($seedTitle !== '' && strtoupper($seedTitle) !== strtoupper($code)) {
+                return $seedTitle;
+            }
+        }
+    }
     $patterns = [
         '/<strong[^>]*class=["\'][^"\']*\bdoc-name\b[^"\']*["\'][^>]*>(.*?)<\/strong>/isu',
         '/<h1\b[^>]*>(.*?)<\/h1>/isu',
-        '/<h2\b[^>]*>(.*?)<\/h2>/isu',
         '/<title[^>]*>(.*?)<\/title>/isu',
     ];
     foreach ($patterns as $p) {
