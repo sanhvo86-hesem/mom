@@ -452,6 +452,12 @@ def install_engine_overrides() -> None:
                     seg = keys.get(str(key))
                     if seg is not None and isinstance(translated, str) and translated.strip():
                         candidate = common.cleanup_translation(translated)
+                        # Apply learning rules to cached results too. Without
+                        # this, a segment cached before a rule was approved
+                        # (e.g. "LEO THANG" stored as-is because the LLM
+                        # preserved it) will bypass substitution forever and
+                        # retranslation will never fix it.
+                        candidate = _apply_learning_substitutions(candidate)
                         if not common.has_quality_issue(candidate):
                             out[seg] = candidate
             return out
@@ -552,6 +558,16 @@ def main() -> int:
     try:
         install_engine_overrides()
         translated = common.translate_html(source_html, title, subtitle)
+        # Final HTML-level learning substitution pass.
+        # build_translation_plan() skips all-ASCII text with no diacritics
+        # (e.g. badge labels like "LEO THANG" inside threshold-badge spans)
+        # because it cannot distinguish them from already-English text.
+        # Those segments are never sent to translate_batch, so the segment-
+        # level substitution in _claude_translate_batch never fires for them.
+        # This post-translate pass ensures approved learning rules are applied
+        # to the complete output regardless of whether the segment was
+        # translated by the pipeline or passed through unchanged.
+        translated["html"] = _apply_learning_substitutions(translated["html"])
     except Exception as exc:
         print(json.dumps({
             "ok": False,
