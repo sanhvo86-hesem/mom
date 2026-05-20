@@ -2041,6 +2041,16 @@ function deriveDocTitleFromPath(doc){
       stem = stem.replace(new RegExp(prefixPattern, 'i'), '');
     }
   }
+  // When the filename slug equals the doc code (e.g. jd-import-export-staff
+  // ⇄ JD-IMPORT-EXPORT-STAFF — the standard JD naming convention), stripping
+  // the full code empties the stem. Fall back to dropping only the leading
+  // document-type token so the descriptive remainder still yields a title.
+  if(!stem){
+    const firstTok = base.split(/[-_]+/).filter(Boolean)[0] || '';
+    if(firstTok){
+      stem = base.replace(new RegExp('^' + firstTok + '[-_]+', 'i'), '');
+    }
+  }
   if(!stem) return '';
 
   const tokens = stem.split(/[-_]+/).filter(Boolean);

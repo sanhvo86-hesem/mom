@@ -3293,6 +3293,17 @@ function portal_standard_title_from_filename(string $fileName, string $code = ''
     if (is_string($removed)) $stem = $removed;
   }
   $stem = trim((string)$stem, "-_ \t\n\r\0\x0B");
+  if ($stem === '') {
+    // Filename slug equals the doc code (e.g. jd-import-export-staff ⇄
+    // JD-IMPORT-EXPORT-STAFF — the standard JD naming convention). Stripping
+    // the full code empties the stem; fall back to dropping only the leading
+    // document-type token so the descriptive remainder still yields a title.
+    $baseStem = (string)pathinfo($fileName, PATHINFO_FILENAME);
+    $firstTok = preg_split('/[-_]+/', $baseStem, -1, PREG_SPLIT_NO_EMPTY)[0] ?? '';
+    if ($firstTok !== '') {
+      $stem = trim((string)preg_replace('/^' . preg_quote($firstTok, '/') . '[-_]+/i', '', $baseStem, 1), "-_ \t\n\r\0\x0B");
+    }
+  }
   if ($stem === '') return portal_fallback_doc_title($fileName);
 
   $tokens = preg_split('/[-_]+/', $stem, -1, PREG_SPLIT_NO_EMPTY);
