@@ -14904,10 +14904,10 @@
     "cat": "HSE"
   },
   {
-    "term": "LOG",
-    "meaning": "Logistics / Shipping Coordinator",
-    "vi": "Điều phối logistics / giao nhận",
-    "def": "LOG là mã vai trò trong hệ thống HESEM cho Điều phối logistics / giao nhận. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
+    "term": "XNK",
+    "meaning": "Import-Export Staff",
+    "vi": "Nhân viên Xuất Nhập Khẩu",
+    "def": "XNK là mã vai trò trong hệ thống HESEM cho Nhân viên Xuất Nhập Khẩu. Dùng để gắn trách nhiệm thực hiện, phê duyệt, tham vấn hoặc nhận thông tin trong RACI, SOP/WI, ANNEX, biểu mẫu và hồ sơ đào tạo.",
     "ctx": "Xuất hiện trong JD, RACI/authority matrix, training matrix, dashboard và các luồng phê duyệt để chỉ đúng owner hoặc người thay thế theo thẩm quyền.",
     "rec": "JD liên quan; RACI/authority matrix; training matrix; decision log; approval/workflow record; hồ sơ bàn giao khi thay thế",
     "cat": "General"

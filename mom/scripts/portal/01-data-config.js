@@ -122,7 +122,7 @@ const ROLES = {
   buyer:                        {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Nhân Viên Mua Hàng",labelEn:"Buyer / Purchasing",color:"#a3e635",icon:"🛍️",dept:"SCM"},
   warehouse_clerk:              {level:4,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Nhân Viên Kho",labelEn:"Warehouse Clerk",color:"#65a30d",icon:"📦",dept:"SCM"},
   tool_storekeeper:             {level:4,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Thủ Kho Dụng Cụ",labelEn:"Tool Crib / Tool Storekeeper",color:"#4d7c0f",icon:"🧰",dept:"SCM"},
-  logistics_coordinator:        {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Điều Phối Giao Nhận",labelEn:"Logistics & Shipping Coordinator",color:"var(--green-dark,#16a34a)",icon:"🚚",dept:"SCM"},
+  logistics_coordinator:        {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Nhân Viên Xuất Nhập Khẩu",labelEn:"Import-Export Staff",color:"var(--green-dark,#16a34a)",icon:"🚚",dept:"SCM"},
   // ═══ SALES (SAL) ═══
   estimator:                    {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Nhân Viên Báo Giá",labelEn:"Estimator",color:"var(--amber-light,#f59e0b)",icon:"📊",dept:"SAL"},
   customer_service:             {level:3,approve:false,admin:false,canEditDocs:false,canViewActivity:false,canExportUsers:false,label:"Dịch Vụ Khách Hàng",labelEn:"Customer Service",color:"#fbbf24",icon:"🤝",dept:"SAL"},
@@ -223,7 +223,8 @@ const DEFAULT_DEPT_TITLES = {
     'Buyer / Purchasing',
     'Warehouse Clerk',
     'Tool Crib / Tool Storekeeper',
-    'Logistics & Shipping Coordinator'
+    'Import-Export Staff',
+    'Material Planning and Inventory Control Specialist'
   ],
   SAL:[
     'Estimator',

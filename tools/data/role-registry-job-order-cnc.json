@@ -227,13 +227,22 @@
       "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-buyer-purchasing.html",
       "hats_allowed": []
     },
-    "LOG": {
-      "jd_code": "JD-LOG",
-      "title_en": "Logistics / Shipping Coordinator",
-      "title_vi": "Điều phối logistics / giao nhận",
-      "body_vi": "Điều phối logistics / giao nhận",
+    "XNK": {
+      "jd_code": "JD-XNK",
+      "title_en": "Import-Export Staff",
+      "title_vi": "Nhân viên Xuất Nhập Khẩu",
+      "body_vi": "Nhân viên Xuất Nhập Khẩu",
       "department": "Supply Chain",
-      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-logistics-shipping-coordinator.html",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-import-export-staff.html",
+      "hats_allowed": []
+    },
+    "MPL": {
+      "jd_code": "JD-MPL",
+      "title_en": "Material Planning and Inventory Control Specialist",
+      "title_vi": "Nhân viên Kế hoạch Vật tư và Kiểm soát Tồn kho",
+      "body_vi": "Nhân viên Kế hoạch Vật tư và Kiểm soát Tồn kho",
+      "department": "Supply Chain",
+      "jd_path": "02-Tai-Lieu-He-Thong/03-Organization/03-Job-Descriptions/05-JD-Supply-Chain/jd-material-planning-inventory-control.html",
       "hats_allowed": []
     },
     "SCM": {
