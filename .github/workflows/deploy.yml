@@ -24,33 +24,62 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          # Fetch enough history that `git diff <before> HEAD` resolves even
+          # when a push lands several commits at once. github.event.before is
+          # unreachable with a shallow depth-2 clone if >1 commit was pushed,
+          # which previously made classify list the entire repo and (worse)
+          # abort on a SIGPIPE. 0 = full history; cheap for this small repo
+          # and unambiguously correct.
+          fetch-depth: 0
       - id: classify
         name: Compute file class flags
         run: |
           set -euo pipefail
           BASE="${{ github.event.before }}"
-          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ]; then
-            BASE="HEAD~1"
+          # Resolve a usable base commit. If github.event.before is empty,
+          # all-zero, or not present in this clone, fall back to HEAD~1, and
+          # if even that is missing, fail CLOSED (full validation).
+          if [ -z "$BASE" ] || [ "$BASE" = "0000000000000000000000000000000000000000" ] \
+             || ! git cat-file -e "${BASE}^{commit}" 2>/dev/null; then
+            if git cat-file -e 'HEAD~1^{commit}' 2>/dev/null; then
+              BASE="HEAD~1"
+            else
+              BASE=""
+            fi
           fi
-          CHANGED="$(git diff --name-only "$BASE" HEAD 2>/dev/null || git ls-files)"
-          echo "Changed files:"
-          printf '%s\n' "$CHANGED" | head -50 | sed 's/^/  /'
-          [ "$(printf '%s\n' "$CHANGED" | wc -l)" -gt 50 ] && echo "  ... (truncated)"
+
+          if [ -n "$BASE" ]; then
+            CHANGED="$(git diff --name-only "$BASE" HEAD)"
+          else
+            # No resolvable base — cannot classify, so demand full validation.
+            CHANGED=""
+          fi
+
+          # Display the changeset without a pipe to head (a closed head pipe
+          # raises SIGPIPE in the writer, which under pipefail fails the step).
+          FILE_COUNT="$(printf '%s' "$CHANGED" | grep -c '' || true)"
+          echo "Changed files ($FILE_COUNT):"
+          echo "$CHANGED" | awk 'NR<=50 {print "  " $0} NR==51 {print "  ... (truncated)"}'
 
           # Frontend-only allowlist. Anything NOT matching => needs PHP validation.
-          # We err on the side of running full validation if in doubt.
+          # Empty changeset (unresolvable base) also => full validation.
           FRONTEND_REGEX='^(mom/(scripts|styles|templates|docs|assets)/|mom/portal\.html$|mom/index\.html$|.*\.(md|txt)$)'
-          PHP_TOUCH="$(printf '%s\n' "$CHANGED" | grep -Ev "$FRONTEND_REGEX" || true)"
-          DB_TOUCH="$(printf '%s\n' "$CHANGED" | grep -E '^mom/database/migrations/.*\.sql$' || true)"
+          if [ -z "$CHANGED" ]; then
+            PHP_TOUCH="unresolved-base"
+            DB_TOUCH=""
+          else
+            PHP_TOUCH="$(echo "$CHANGED" | grep -Ev "$FRONTEND_REGEX" || true)"
+            DB_TOUCH="$(echo "$CHANGED" | grep -E '^mom/database/migrations/.*\.sql$' || true)"
+          fi
 
           if [ -z "$PHP_TOUCH" ]; then
             echo "needs_php_validation=false" >> "$GITHUB_OUTPUT"
-            echo "summary=frontend-only ($(printf '%s\n' "$CHANGED" | wc -l) files)" >> "$GITHUB_OUTPUT"
+            echo "summary=frontend-only ($FILE_COUNT files)" >> "$GITHUB_OUTPUT"
             echo "::notice::Frontend-only changeset — skipping PHPStan/PHPUnit/SSOT gates"
           else
             echo "needs_php_validation=true" >> "$GITHUB_OUTPUT"
-            echo "summary=full ($(printf '%s\n' "$CHANGED" | wc -l) files, $(printf '%s\n' "$PHP_TOUCH" | wc -l) non-frontend)" >> "$GITHUB_OUTPUT"
+            NON_FE="$(echo "$PHP_TOUCH" | grep -c '' || true)"
+            echo "summary=full ($FILE_COUNT files, $NON_FE non-frontend)" >> "$GITHUB_OUTPUT"
           fi
 
           if [ -n "$DB_TOUCH" ]; then
