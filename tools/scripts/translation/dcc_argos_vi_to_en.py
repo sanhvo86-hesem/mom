@@ -60,7 +60,7 @@ def ensure_runtime_home_env() -> None:
 ensure_runtime_home_env()
 
 try:
-    from bs4 import BeautifulSoup, NavigableString
+    from bs4 import BeautifulSoup, Comment, NavigableString
 except Exception as exc:  # pragma: no cover - runtime guard
     print(
         json.dumps(
@@ -815,6 +815,8 @@ def phrase_regex(source: str) -> re.Pattern[str]:
 
 
 def should_skip_text_node(node: NavigableString) -> bool:
+    if isinstance(node, Comment):
+        return True
     parent = getattr(node, "parent", None)
     if parent is None:
         return True
