@@ -92,6 +92,15 @@ def _load_learning_block() -> str:
     return ""
 
 
+# Built-in substitutions that must always apply regardless of whether the
+# translation_learning DB table has been seeded. Add entries here for any
+# system-generated badge label or UI chrome that the LLM consistently skips
+# because it looks like a code identifier.
+_BUILTIN_SUBSTITUTIONS: List[Dict[str, str]] = [
+    {"vi_pattern": "LEO THANG", "en_correct": "ESCALATION", "category": "badge_label"},
+]
+
+
 def _load_learning_rules() -> List[Dict[str, str]]:
     """Approved learning rules with non-empty corrections, parsed from the
     JSON cache file. Returned shape: [{vi_pattern, en_correct, category}, ...].
@@ -101,13 +110,16 @@ def _load_learning_rules() -> List[Dict[str, str]]:
     e.g. when LEO THANG sits inside <span class="threshold-badge"> and the
     LLM decides to preserve it as a code badge despite the explicit rule
     in the learning block. Regex substitution beats LLM judgment here.
+
+    Built-in substitutions (_BUILTIN_SUBSTITUTIONS) are always prepended so
+    critical badge labels are translated even when the DB cache file is absent.
     """
+    out: List[Dict[str, str]] = list(_BUILTIN_SUBSTITUTIONS)
     try:
         if LEARNING_RULES_PATH.is_file():
             raw = LEARNING_RULES_PATH.read_text(encoding="utf-8")
             data = json.loads(raw)
             if isinstance(data, list):
-                out: List[Dict[str, str]] = []
                 for entry in data:
                     if not isinstance(entry, dict):
                         continue
@@ -116,10 +128,9 @@ def _load_learning_rules() -> List[Dict[str, str]]:
                     cat = str(entry.get("category", "")).strip()
                     if vi and en:
                         out.append({"vi_pattern": vi, "en_correct": en, "category": cat})
-                return out
     except Exception:
         pass
-    return []
+    return out
 
 
 def _apply_learning_substitutions(translated_text: str) -> str:
