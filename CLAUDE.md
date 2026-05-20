@@ -5,14 +5,45 @@
 **Follow the 4-phase workflow in `.ai/AI-WORKFLOW.md` — no exceptions.**
 
 Quick mandatory sequence every session:
-1. Read `.ai/CONVENTIONS.md` — WHERE to put files
-2. Read `.ai/repo-map.json` — project topology
-3. Read `AGENTS.md` — governance rules
-4. Read `.ai/USER_IDENTITY_SSOT.md` if your change touches user/role/employee data
-5. THEN locate → plan → execute → verify
+1. **Run preflight FIRST**: `bash tools/ai/preflight.sh` — records branch_base_sha
+   into `.ai/session-state.json` so the pre-push collision guard can detect
+   concurrent edits, auto-enables `.githooks`, reports skip-worktree flags,
+   unpushed commits, dirty tree, drift from origin/main, migration drift.
+2. Read `.ai/CONVENTIONS.md` — WHERE to put files
+3. Read `.ai/repo-map.json` — project topology
+4. Read `AGENTS.md` — governance rules
+5. Read `.ai/USER_IDENTITY_SSOT.md` if your change touches user/role/employee data
+6. THEN locate → plan → execute → verify
 
 **NEVER create files at repo root. NEVER place reports inside `mom/docs/`.**
 **NEVER hardcode a role key, create a parallel user table, or write to users.json outside `DataSyncMutationService`.** See `.ai/USER_IDENTITY_SSOT.md` — enforced by `php mom/tools/release/check_user_identity_ssot.php` in CI.
+
+## MANDATORY: Multi-AI session safety + fast deploys
+
+The repo is edited concurrently by multiple AI sessions (Claude, Codex, …).
+Three guards prevent data loss between sessions:
+
+1. **Preflight at session start** (`bash tools/ai/preflight.sh`) — records
+   the SHA you branched from. Auto-enables `.githooks`. Without preflight
+   the pre-push hook falls back to `git merge-base` (less precise about
+   when a collision started but still correct).
+
+2. **Pre-push collision guard** (`.githooks/pre-push`) — refuses to push
+   when `origin/main` advanced during the session AND touched a file the
+   current commits also modified. Bypass with `git push --no-verify` only
+   after verifying overlap manually.
+
+3. **Migration drift detector** (`php mom/tools/release/check_migration_drift.php`)
+   — runs in CI on every commit touching `mom/database/migrations/*.sql`.
+   Detects ghost migrations (live DB applied + file missing — the exact
+   bug that lost `188_error_code_registry`), duplicate ids, prefix
+   collisions, naming violations. P0 findings block deploy.
+
+**Fast deploy path**: `.github/workflows/deploy.yml` has a `classify` job
+that skips PHPStan/PHPUnit/SSOT/audit when the changeset is frontend-only
+(`mom/scripts/**`, `mom/styles/**`, `mom/templates/**`, `mom/docs/**`,
+`*.md`). Backend or migration changes fall through to full validation.
+Expect ~1m30s deploys for UI-only patches vs ~4m for backend changes.
 
 ## MANDATORY: VPS deployment policy (NEVER `git reset --hard` on VPS)
 
