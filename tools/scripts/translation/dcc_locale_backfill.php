@@ -594,6 +594,13 @@ function listQueuedJobs(string $rootDir, int $limit): array
             if (!str_ends_with($path, '.json')) {
                 continue;
             }
+            // Dot-prefixed files are bookkeeping (e.g. .bulk.status.json,
+            // .worker-global.<N>.lock-state) and must never be picked up as
+            // queue jobs — the worker would try to translate them and emit
+            // "dcc_locale_automation_missing_doc_code" forever.
+            if (str_starts_with($item->getFilename(), '.')) {
+                continue;
+            }
             $jobs[$path] = [
                 'priority' => queuedJobPriority($path),
                 'size' => max(0, (int)$item->getSize()),
