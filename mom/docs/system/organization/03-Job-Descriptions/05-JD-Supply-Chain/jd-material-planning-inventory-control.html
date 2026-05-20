@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+
+<html lang="vi">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JD-MPL - Nhân viên kế hoạch vật tư và kiểm soát tồn kho | HESEM MOM</title>
+<script>
+/* DCC Header bootstrap (vi) — Khởi tạo đầu trang kiểm soát tài liệu: tự tính đường dẫn tuyệt đối từ location.pathname
+ * để tải đúng biểu định dạng và bộ dựng đầu trang khi mở trực tiếp, trong cổng nội bộ
+ * hoặc qua luồng xem tài liệu. Tham số phiên bản giúp trình duyệt nhận bản mới khi
+ * thành phần đầu trang được cập nhật. */
+(function () {
+  var DCC_VERSION = '2026-04-24-1';
+  var appBase = (location.pathname.indexOf('/mom/') === 0) ? '/mom' : '';
+  var css = document.createElement('link');
+  css.rel = 'stylesheet';
+  css.href = appBase + '/styles/dcc-header.css?v=' + DCC_VERSION;
+  css.setAttribute('data-dcc-header-stylesheet', '1');
+  document.head.appendChild(css);
+  var js = document.createElement('script');
+  js.defer = true;
+  js.src = appBase + '/scripts/portal/11-dcc-header-renderer.js?v=' + DCC_VERSION;
+  document.head.appendChild(js);
+})();
+</script>
+<style>table { width:100%; table-layout:fixed; border-collapse:collapse; word-wrap:break-word; overflow-wrap:break-word; } td,th { word-wrap:break-word; overflow-wrap:break-word; }</style>
+<link href="../../../../../assets/style.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="container">
+<div class="page">
+<div class="page-body">
+<!-- Đầu trang kiểm soát thay đổi tài liệu: giữ nguyên cơ chế hiển thị của hệ thống. -->
+<div class="dcc-header" data-dcc-bootstrap='{"header":{"doc_code":"JD-MATERIAL-PLANNING-INVENTORY-CONTROL","title":"Nhân viên kế hoạch vật tư và kiểm soát tồn kho","subtitle":"Hoạch định nhu cầu vật tư / điểm đặt hàng lại / kiểm soát tồn kho","doc_type":"JD","revision":"V0","effective_date":"2026-05-20","owner_role_code":"QA","approver_role_code":"CEO","iso_clause":null,"status":"draft"},"labels":{"doc_id":{"short":"Mã","long":"Mã tài liệu","sort":10},"revision":{"short":"Lần sửa","long":"Lần sửa đổi","sort":20},"effective_date":{"short":"Hiệu lực","long":"Ngày hiệu lực","sort":30},"owner":{"short":"Sở hữu","long":"Bộ phận sở hữu","sort":40},"approver":{"short":"Duyệt","long":"Người phê duyệt","sort":50}}}' data-dcc-doc-code="JD-MATERIAL-PLANNING-INVENTORY-CONTROL" data-dcc-locale="vi" data-dcc-logo="../../../../../assets/hesem-logo.svg"></div>
+<div class="doc-content" id="docContent">
+<div class="form-sheet">
+<div class="note-blue terminology-note" style="margin:12px 0"><p><b>Quy ước thuật ngữ viết tắt trong tài liệu:</b> Tài liệu mô tả công việc (<b>JD</b>); Tổ chức Tiêu chuẩn hóa Quốc tế (<b>ISO</b>); Máy điều khiển số bằng máy tính (<b>CNC</b>); Hệ thống hoạch định nguồn lực doanh nghiệp (<b>ERP</b>); Hoạch định nhu cầu vật tư (<b>MRP</b>); Định mức vật tư (<b>BOM</b>); Điểm đặt hàng lại (<b>ROP</b>); Tồn kho an toàn (<b>safety stock</b>); Nhập trước xuất trước (<b>FIFO</b>); Ma trận phân định trách nhiệm theo bốn trạng thái: thực hiện, chịu trách nhiệm phê duyệt, tham vấn và nhận thông tin (<b>RACI</b>); Chỉ số đánh giá hiệu quả công việc (<b>KPI</b>); Quy trình thao tác chuẩn (<b>SOP</b>); Hướng dẫn công việc (<b>WI</b>); Phụ lục kiểm soát (<b>ANNEX</b>); Biểu mẫu/hồ sơ kiểm soát (<b>FRM</b>); Đơn đặt hàng (<b>PO</b>); Đào tạo tại nơi làm việc (<b>OJT</b>); Đảm bảo chất lượng (<b>QA</b>); Kiểm tra chất lượng (<b>QC</b>).</p><p><b>Mã vai trò và bộ phận xuất hiện trong tài liệu:</b> Phòng Chuỗi cung ứng (<b>D-SCM</b>); Bộ phận Kho (<b>D-WHS</b>); Nhân viên Kế hoạch Vật tư và Kiểm soát Tồn kho (<b>MPL</b>); Trưởng phòng Chuỗi cung ứng (<b>SCM</b>); Nhân viên mua hàng (<b>BUY</b>); Nhân viên kho (<b>WAR</b>); Thủ kho dao cụ (<b>TOOL</b>); Nhân viên Xuất Nhập Khẩu (<b>XNK</b>); Điều độ sản xuất (<b>PPL</b>); Nhân viên kiểm tra chất lượng kiêm lập trình và vận hành máy đo tọa độ (<b>QC</b>); Trưởng phòng Tài chính - Kế toán (<b>FIN</b>).</p></div><div class="preface-block">
+<p><b>Bộ phận</b> <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../02-Department-Handbooks/dept-supply-chain-handbook.html" title="Bộ phận Kho (D-WHS)"><span class="entity-code dept-code">D-WHS</span></a></span> / <span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../02-Department-Handbooks/dept-supply-chain-handbook.html" title="Phòng Chuỗi cung ứng (D-SCM)"><span class="entity-code dept-code">D-SCM</span></a></span> <b>Vai trò trong chuỗi giá trị</b> Từ định mức vật tư và lệnh sản xuất → tính nhu cầu vật tư → đặt điểm đặt hàng lại và mức tồn an toàn → phát tín hiệu mua cho Mua hàng → kiểm soát mức tồn, độ chính xác tồn kho và hàng chậm luân chuyển → bảo đảm vật tư sẵn sàng đúng thời điểm mà không ứ đọng vốn. <b>Tài liệu liên đới</b> Quy trình thao tác chuẩn (SOP), hướng dẫn công việc (WI) và phụ lục vận hành (ANNEX): <a href="../../../../operations/sops/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401</a> <a href="../../../../operations/sops/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html">SOP-402</a> <a href="../../../../operations/sops/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html">SOP-701</a> <a href="../../../../operations/work-instructions/07-WI-700/wi-702-storage-environment-location-and-fifo-control.html">WI-702</a> <a href="../../../../operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a></p>
+</div>
+<div class="jd-purpose"><p>Vai trò của tài liệu: Bản mô tả công việc này xác định phạm vi, quyền hạn, điểm dừng trách nhiệm và cơ chế bàn giao của Nhân viên Kế hoạch Vật tư và Kiểm soát Tồn kho (<span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-material-planning-inventory-control.html" title="Nhân viên Kế hoạch Vật tư và Kiểm soát Tồn kho (MPL)"><span class="entity-code role-code">MPL</span></a></span>); dùng làm chuẩn cho tuyển dụng, đào tạo tại chỗ theo công việc (OJT), đánh giá năng lực, chỉ số đánh giá hiệu quả công việc (KPI), lương thưởng và phối hợp liên phòng ban. Vai trò này được lập để đóng lỗ hổng "không có người sở hữu việc hoạch định nhu cầu vật tư và kiểm soát mức tồn" đã nêu trong đánh giá tổ chức Phòng Chuỗi cung ứng. Tài liệu phải được đọc cùng ANNEX-503, ma trận thẩm quyền ANNEX-120, ma trận trách nhiệm thực hiện – chịu trách nhiệm phê duyệt – tham vấn – thông báo (RACI) tại ANNEX-121, từ điển KPI ANNEX-122, ma trận người thay thế ANNEX-123 và các SOP/WI/ANNEX đang hiệu lực.</p></div>
+<div class="note-blue" style="margin:12px 0">
+<b>🗺️ Hệ thống 8 cổng (G0→G7):</b> trọng tâm tại cổng xác nhận khả năng cung ứng và cổng cấp phát vật tư cho sản xuất; bảo đảm lịch chạy máy không gián đoạn vì thiếu vật tư, đồng thời không ứ đọng vốn vì tồn dư.
+ <br/>→ Xem <a href="../../../../operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503</a> để đối chiếu ma trận vai trò theo từng cổng.
+</div>
+<h2 class="h2">1. Thông tin vị trí</h2>
+<div class="table-card"><table class="table require-table"><tbody>
+<tr><th>Mã vị trí</th><td>JD-MPL</td></tr>
+<tr><th>Mã vai trò dùng trong SOP và RACI</th><td>Nhân viên Kế hoạch Vật tư và Kiểm soát Tồn kho (<span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-material-planning-inventory-control.html" title="Nhân viên Kế hoạch Vật tư và Kiểm soát Tồn kho (MPL)"><span class="entity-code role-code">MPL</span></a></span>)</td></tr>
+<tr><th>Chức danh theo tài liệu</th><td>Nhân viên Kế hoạch Vật tư và Kiểm soát Tồn kho</td></tr>
+<tr><th>Bộ phận</th><td>Bộ phận Kho (<span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../02-Department-Handbooks/dept-supply-chain-handbook.html" title="Bộ phận Kho (D-WHS)"><span class="entity-code dept-code">D-WHS</span></a></span>) / Phòng Chuỗi cung ứng (<span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../02-Department-Handbooks/dept-supply-chain-handbook.html" title="Phòng Chuỗi cung ứng (D-SCM)"><span class="entity-code dept-code">D-SCM</span></a></span>)</td></tr>
+<tr><th>Cấp vai trò</th><td>Nhân viên chuyên môn</td></tr>
+<tr><th>Nhóm vai trò</th><td>Hoạch định nhu cầu vật tư, điểm đặt hàng lại, tồn kho an toàn, kiểm soát độ chính xác tồn kho và phân tích hàng chậm luân chuyển.</td></tr>
+<tr><th>Báo cáo trực tiếp cho</th><td>Quản lý chuỗi cung ứng (<span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-supply-chain-manager.html" title="Trưởng phòng Chuỗi cung ứng (SCM)"><span class="entity-code role-code">SCM</span></a></span>)</td></tr>
+<tr><th>Quản lý trực tiếp</th><td>Không có nhân sự báo cáo trực tiếp.</td></tr>
+<tr><th>Phối hợp chức năng chính</th><td>Nhân viên mua hàng (<span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-buyer-purchasing.html" title="Nhân viên mua hàng (BUY)"><span class="entity-code role-code">BUY</span></a></span>); Nhân viên kho (<span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-warehouse-clerk.html" title="Nhân viên kho (WAR)"><span class="entity-code role-code">WAR</span></a></span>); Thủ kho dao cụ (<span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-tool-crib-tool-storekeeper.html" title="Thủ kho dao cụ (TOOL)"><span class="entity-code role-code">TOOL</span></a></span>); Nhân viên Xuất Nhập Khẩu (<span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-import-export-staff.html" title="Nhân viên Xuất Nhập Khẩu (XNK)"><span class="entity-code role-code">XNK</span></a></span>); Nhân viên điều độ sản xuất (<span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../02-JD-Production/jd-production-planner.html" title="Điều độ sản xuất (PPL)"><span class="entity-code role-code">PPL</span></a></span>); Quản lý tài chính (<span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../07-JD-Finance/jd-finance-manager.html" title="Trưởng phòng Tài chính - Kế toán (FIN)"><span class="entity-code role-code">FIN</span></a></span>).</td></tr>
+<tr><th>Hệ thống / công cụ vận hành chính</th><td>Epicor cho định mức vật tư, hoạch định nhu cầu, đơn mua và dữ liệu tồn kho; bảng tính Excel cho phân tích; báo cáo tồn kho và mức sẵn sàng; bảng kiểm kê và đối chiếu kho; thư điện tử được kiểm soát.</td></tr>
+<tr><th>Vai trò trong chuỗi giá trị</th><td>Biến nhu cầu sản xuất thành tín hiệu mua đúng số lượng, đúng thời điểm; giữ mức tồn đủ để không dừng máy nhưng không ứ đọng vốn; bảo đảm số liệu tồn kho trên hệ thống khớp với thực tế.</td></tr>
+</tbody></table></div>
+<h2 class="h2">2. Sứ mệnh vị trí</h2>
+<div class="jd-mission">
+<p>Nhân viên Kế hoạch Vật tư và Kiểm soát Tồn kho chịu trách nhiệm trả lời chính xác hai câu hỏi nền tảng của chuỗi cung ứng: cần mua cái gì – bao nhiêu – khi nào, và tồn kho thực tế đang ở đâu – có đúng như hệ thống ghi nhận hay không.</p>
+<p>Trong nhà máy gia công CNC theo đơn hàng, nếu không có người sở hữu việc hoạch định, hoạt động mua hàng dễ rơi vào trạng thái phản ứng: hết mới mua, mua gấp, mua thừa. Hệ quả là vừa dừng máy vì thiếu vật tư, vừa đọng vốn vì tồn dư và phát sinh hàng chậm luân chuyển. Vị trí này đặt một lớp hoạch định có kỷ luật giữa nhu cầu sản xuất và hành động mua, đồng thời giữ cho dữ liệu tồn kho đủ tin cậy để mọi phòng ban dùng chung một sự thật về mức sẵn sàng.</p>
+<div class="callout"><p><b>Kết quả vị trí phải tạo ra</b></p><ul>
+<li>Tín hiệu mua được tính từ định mức vật tư, lệnh sản xuất và mức tồn hiện có; có điểm đặt hàng lại và tồn kho an toàn cho các mã hàng trọng yếu.</li>
+<li>Mức tồn kho cân bằng: đủ để bảo vệ lịch chạy máy, không dư thừa gây đọng vốn; hàng chậm luân chuyển và hàng có nguy cơ hết hạn được nhận diện sớm.</li>
+<li>Độ chính xác tồn kho được duy trì qua kiểm kê định kỳ; chênh lệch được điều tra, ghi nhận và xử lý thay vì điều chỉnh số liệu cho khớp.</li>
+</ul></div>
+<p class="inline-note"><b>Ranh giới vị trí:</b> Nhân viên Kế hoạch Vật tư sở hữu việc tính nhu cầu, đặt thông số hoạch định và kiểm soát tồn kho; không tự phát hành đơn mua hay đàm phán nhà cung cấp (thuộc Mua hàng), không tự thay đổi định mức vật tư hay đặc tính kỹ thuật (thuộc Kỹ thuật), không tự điều chỉnh số liệu tồn kho khi chưa điều tra xong chênh lệch.</p>
+</div>
+<div class="callout"><p><b>Trọng tâm điều hành bắt buộc</b></p><ul class="tight">
+<li>Chạy hoạch định nhu cầu trên dữ liệu chính thức từ định mức vật tư, lệnh sản xuất và tồn kho thực; không dựa trên ước lượng hay thông báo miệng.</li>
+<li>Mỗi chênh lệch tồn kho phải được điều tra nguyên nhân trước khi điều chỉnh; điều chỉnh không có căn cứ là hành vi bị cấm.</li>
+<li>Là điểm cảnh báo sớm: phát hiện nguy cơ thiếu hụt vật tư hoặc tồn dư bất thường và leo thang trong ngày phát hiện.</li>
+</ul></div>
+<h2 class="h2">3. Tuyến báo cáo và phạm vi quản lý</h2>
+<div class="table-card"><table class="table require-table"><tbody>
+<tr><th>Báo cáo trực tiếp</th><td>Quản lý chuỗi cung ứng (<span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-supply-chain-manager.html" title="Trưởng phòng Chuỗi cung ứng (SCM)"><span class="entity-code role-code">SCM</span></a></span>)</td></tr>
+<tr><th>Nhân sự báo cáo trực tiếp</th><td>Không có nhân sự báo cáo trực tiếp.</td></tr>
+<tr><th>Tuyến phối hợp chức năng</th><td><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-supply-chain-manager.html" title="Trưởng phòng Chuỗi cung ứng (SCM)"><span class="entity-code role-code">SCM</span></a></span> / <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-buyer-purchasing.html" title="Nhân viên mua hàng (BUY)"><span class="entity-code role-code">BUY</span></a></span> / <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-warehouse-clerk.html" title="Nhân viên kho (WAR)"><span class="entity-code role-code">WAR</span></a></span> / <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-tool-crib-tool-storekeeper.html" title="Thủ kho dao cụ (TOOL)"><span class="entity-code role-code">TOOL</span></a></span> / <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../02-JD-Production/jd-production-planner.html" title="Điều độ sản xuất (PPL)"><span class="entity-code role-code">PPL</span></a></span> / <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../07-JD-Finance/jd-finance-manager.html" title="Trưởng phòng Tài chính - Kế toán (FIN)"><span class="entity-code role-code">FIN</span></a></span></td></tr>
+<tr><th>Đầu mối nội bộ chính</th><td>Mua hàng, Kho vật tư, Kho dao cụ, Điều độ sản xuất, Kỹ thuật và Tài chính khi có rủi ro thiếu hụt, tồn dư hoặc sai lệch tồn kho.</td></tr>
+<tr><th>Đầu mối bên ngoài</th><td>Không trực tiếp; mọi trao đổi với nhà cung cấp đi qua Nhân viên mua hàng.</td></tr>
+<tr><th>Phạm vi vị trí</th><td>Vai trò chuyên môn thuộc Phòng Chuỗi cung ứng; tập trung vào hoạch định nhu cầu vật tư, thông số hoạch định, kiểm soát mức tồn, độ chính xác tồn kho và phân tích hàng chậm luân chuyển.</td></tr>
+</tbody></table></div>
+<h2 class="h2">4. Trách nhiệm chính</h2>
+<div class="table-card"><table class="table"><thead><tr><th style="width:26%">Nhóm trách nhiệm</th><th>Nội dung trách nhiệm</th></tr></thead><tbody>
+<tr><th style="width:26%">Hoạch định nhu cầu vật tư</th><td><ul>
+<li>Tính nhu cầu vật tư từ định mức vật tư, lệnh sản xuất và đơn hàng; phát tín hiệu mua cho Nhân viên mua hàng với số lượng và thời điểm rõ ràng.</li>
+<li>Đối chiếu nhu cầu với tồn kho hiện có, hàng đang về và hàng đang giữ để tránh mua trùng hoặc mua thiếu.</li>
+<li>Phối hợp Điều độ sản xuất để đồng bộ lịch chạy máy với mức sẵn sàng vật tư.</li>
+</ul></td></tr>
+<tr><th style="width:26%">Thiết lập và duy trì thông số hoạch định</th><td><ul>
+<li>Đặt và rà soát điểm đặt hàng lại, tồn kho an toàn, lượng đặt hàng và thời gian dẫn cho các mã hàng theo mức độ trọng yếu và tính sẵn có.</li>
+<li>Cập nhật thông số khi thời gian dẫn, mức tiêu thụ hoặc rủi ro nguồn cung thay đổi.</li>
+<li>Phân loại mã hàng theo mức ảnh hưởng để tập trung kiểm soát vào nhóm trọng yếu.</li>
+</ul></td></tr>
+<tr><th style="width:26%">Kiểm soát mức tồn và phân tích tồn dư</th><td><ul>
+<li>Theo dõi mức tồn vật tư và dao cụ; cảnh báo sớm nguy cơ thiếu hụt hoặc tồn dư bất thường.</li>
+<li>Nhận diện hàng chậm luân chuyển, hàng tồn lâu và hàng có nguy cơ hết hạn; đề xuất hướng xử lý.</li>
+<li>Phân tích cân đối giữa mức phục vụ sản xuất và vốn đọng trong tồn kho.</li>
+</ul></td></tr>
+<tr><th style="width:26%">Bảo đảm độ chính xác tồn kho</th><td><ul>
+<li>Lập lịch và điều phối kiểm kê định kỳ theo nhóm mã hàng, phối hợp Nhân viên kho và Thủ kho dao cụ.</li>
+<li>Điều tra nguyên nhân chênh lệch giữa số liệu hệ thống và thực tế trước khi đề xuất điều chỉnh.</li>
+<li>Lưu hồ sơ kiểm kê, chênh lệch và điều chỉnh đủ để truy xuất và đối soát.</li>
+</ul></td></tr>
+<tr><th style="width:26%">Báo cáo mức sẵn sàng và xử lý ngoại lệ</th><td><ul>
+<li>Duy trì báo cáo mức sẵn sàng vật tư để Mua hàng, Kho, Sản xuất và Tài chính dùng chung một dữ liệu.</li>
+<li>Kích hoạt báo cáo vượt cấp khi có nguy cơ dừng máy do thiếu vật tư, tồn dư lớn hoặc sai lệch tồn kho cần điều tra.</li>
+<li>Đề xuất cải tiến về thông số hoạch định, cách phân loại mã hàng hoặc nhịp kiểm kê.</li>
+</ul></td></tr>
+</tbody></table></div>
+<div class="table-card ranh giới trách nhiệm-box"><table class="table"><tbody>
+<tr><th style="width:26%">Điểm kết thúc trách nhiệm</th><td>Trách nhiệm của Nhân viên Kế hoạch Vật tư kết thúc khi tín hiệu mua đã được tính đúng và bàn giao cho Mua hàng, thông số hoạch định được duy trì cập nhật, và số liệu tồn kho được kiểm soát có bằng chứng kiểm kê. Việc phát hành đơn mua, đàm phán nhà cung cấp và thao tác nhập – xuất kho thuộc các vị trí khác.</td></tr>
+<tr><th style="width:26%">Không thuộc trách nhiệm chính / phải báo cáo vượt cấp</th><td><ul>
+<li>Không tự phát hành đơn mua hoặc đàm phán giá, điều khoản với nhà cung cấp.</li>
+<li>Không tự thay đổi định mức vật tư, đặc tính kỹ thuật hoặc yêu cầu chất lượng khi chưa có phê duyệt của Kỹ thuật và Chất lượng.</li>
+<li>Không tự điều chỉnh số liệu tồn kho khi chưa điều tra xong nguyên nhân chênh lệch.</li>
+<li>Không quyết định thanh lý, hủy hoặc giảm giá trị hàng tồn nếu chưa được phê duyệt theo ma trận thẩm quyền.</li>
+</ul></td></tr>
+</tbody></table></div>
+<p class="inline-note boundary-inline-note">Nguyên tắc phân vai: khi công việc chạm tới quyết định vượt thẩm quyền, người giữ vị trí phải chuyển đúng người chịu trách nhiệm thay vì xử lý ngoài tuyến kiểm soát.</p>
+<p class="inline-note">Mọi thay đổi ảnh hưởng chất lượng, giao hàng, chi phí, phiên bản, phát hành hoặc truy vết phải tuân theo quy trình/hồ sơ liên kết tại Mục 12.</p>
+<h2 class="h2">5. Quyền hạn</h2>
+<div class="auth-grid">
+<div class="auth-item">Phát tín hiệu mua và xác định mức ưu tiên cho Nhân viên mua hàng dựa trên kết quả hoạch định nhu cầu.</div>
+<div class="auth-item">Đặt và điều chỉnh thông số hoạch định (điểm đặt hàng lại, tồn kho an toàn, lượng đặt hàng) trong khung được Quản lý chuỗi cung ứng phê duyệt.</div>
+<div class="auth-item">Yêu cầu Nhân viên kho và Thủ kho dao cụ kiểm kê hoặc xác minh lại tồn kho khi phát hiện nghi vấn sai lệch.</div>
+<div class="auth-item">Kích hoạt báo cáo vượt cấp khi có nguy cơ dừng máy do thiếu vật tư, tồn dư lớn hoặc chênh lệch tồn kho chưa giải trình được.</div>
+<div class="auth-item">Đề xuất tạm khóa giao dịch một mã hàng hoặc vị trí kho khi chênh lệch tồn kho cần điều tra.</div>
+</div>
+<h2 class="h2">6. Giao diện liên phòng ban — RACI / Bàn giao</h2>
+<div class="table-card"><table class="table"><thead><tr><th style="width:24%">Đối tác / tuyến phối hợp</th><th>Nội dung bàn giao / phối hợp</th><th style="width:10%">RACI</th><th>Kết quả mong đợi</th></tr></thead><tbody>
+<tr><th><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-buyer-purchasing.html" title="Nhân viên mua hàng (BUY)"><span class="entity-code role-code">BUY</span></a></span></th><td><p>Bàn giao tín hiệu mua: mã hàng, số lượng, thời điểm cần và mức ưu tiên; nhận lại thời gian dẫn thực tế và tình trạng đơn mua.</p></td><td style="text-align:center"><span class="raci-badge raci-r">R</span></td><td>Mua hàng hành động trên nhu cầu đã được tính, không phải ước lượng.</td></tr>
+<tr><th><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../02-JD-Production/jd-production-planner.html" title="Điều độ sản xuất (PPL)"><span class="entity-code role-code">PPL</span></a></span></th><td><p>Đồng bộ lịch chạy máy với mức sẵn sàng vật tư; nhận thay đổi lệnh sản xuất ảnh hưởng nhu cầu vật tư.</p></td><td style="text-align:center"><span class="raci-badge raci-c">C</span></td><td>Lịch sản xuất và kế hoạch vật tư nhất quán với nhau.</td></tr>
+<tr><th><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-warehouse-clerk.html" title="Nhân viên kho (WAR)"><span class="entity-code role-code">WAR</span></a></span> / <span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-tool-crib-tool-storekeeper.html" title="Thủ kho dao cụ (TOOL)"><span class="entity-code role-code">TOOL</span></a></span></th><td><p>Phối hợp kiểm kê định kỳ, đối chiếu tồn kho và điều tra chênh lệch; nhận dữ liệu nhập – xuất – tồn thực tế.</p></td><td style="text-align:center"><span class="raci-badge raci-a">A</span></td><td>Số liệu tồn kho trên hệ thống khớp với thực tế.</td></tr>
+<tr><th><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="../07-JD-Finance/jd-finance-manager.html" title="Trưởng phòng Tài chính - Kế toán (FIN)"><span class="entity-code role-code">FIN</span></a></span></th><td><p>Chuyển dữ liệu giá trị tồn kho, hàng chậm luân chuyển và đề xuất xử lý tồn dư phục vụ đánh giá vốn lưu động.</p></td><td style="text-align:center"><span class="raci-badge raci-i">I</span></td><td>Tài chính có dữ liệu đúng để theo dõi vốn đọng trong tồn kho.</td></tr>
+<tr><th><span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-supply-chain-manager.html" title="Trưởng phòng Chuỗi cung ứng (SCM)"><span class="entity-code role-code">SCM</span></a></span></th><td><p>Báo cáo mức sẵn sàng, rủi ro thiếu hụt/tồn dư và đề xuất thông số hoạch định cần phê duyệt.</p></td><td style="text-align:center"><span class="raci-badge raci-c">C</span></td><td>Quyết định hoạch định nằm trong khung thẩm quyền được duyệt.</td></tr>
+</tbody></table></div>
+<p class="inline-note">Quy ước RACI: R = trực tiếp thực hiện/phản hồi; A = chịu trách nhiệm phê duyệt cuối cùng trong tuyến phối hợp; C = bắt buộc tham vấn trước khi tiếp tục; I = cần được thông báo để đồng bộ trạng thái.</p>
+<h2 class="h2">7. Đầu ra bắt buộc / hồ sơ quản trị</h2>
+<div class="table-card"><table class="table"><thead><tr><th>Đầu ra / hồ sơ</th><th>Nội dung bắt buộc</th><th>Chu kỳ</th><th>Nơi lưu / nguồn</th></tr></thead><tbody>
+<tr><td>Kết quả hoạch định nhu cầu</td><td>Tín hiệu mua theo mã hàng: số lượng, thời điểm cần, mức ưu tiên và căn cứ tính từ định mức vật tư và lệnh sản xuất.</td><td>Theo chu kỳ hoạch định</td><td>Epicor; hồ sơ hoạch định vật tư.</td></tr>
+<tr><td>Bảng thông số hoạch định</td><td>Điểm đặt hàng lại, tồn kho an toàn, lượng đặt hàng, thời gian dẫn và phân loại mã hàng theo mức trọng yếu.</td><td>Rà soát định kỳ / khi thay đổi</td><td>Epicor; hồ sơ hoạch định vật tư.</td></tr>
+<tr><td>Báo cáo mức sẵn sàng vật tư</td><td>Tồn hiện có, hàng đang về, nhu cầu, nguy cơ thiếu hụt và tồn dư.</td><td>Tuần / theo yêu cầu</td><td>Báo cáo tồn kho; hồ sơ chuỗi cung ứng.</td></tr>
+<tr><td>Hồ sơ kiểm kê và chênh lệch</td><td>Kết quả kiểm kê, chênh lệch phát hiện, nguyên nhân điều tra và điều chỉnh đã phê duyệt.</td><td>Theo lịch kiểm kê</td><td>Bảng kiểm kê; hồ sơ kho.</td></tr>
+<tr><td>Phân tích hàng chậm luân chuyển</td><td>Danh mục hàng tồn lâu, hàng có nguy cơ hết hạn và đề xuất hướng xử lý.</td><td>Tháng / quý</td><td>Hồ sơ hoạch định vật tư; hồ sơ Tài chính.</td></tr>
+</tbody></table></div>
+<h2 class="h2">8. Chỉ số đánh giá hiệu quả công việc (KPI) cá nhân</h2>
+<div class="table-card"><table class="table"><thead><tr><th>KPI trọng yếu</th><th>Cách đo / nguồn dữ liệu</th><th>Chu kỳ theo dõi</th></tr></thead><tbody>
+<tr><td>Tỷ lệ thiếu hụt vật tư gây ảnh hưởng sản xuất</td><td>Số lần lịch chạy máy bị ảnh hưởng do thiếu vật tư hoặc dao cụ trong tầm kiểm soát hoạch định.</td><td>Tháng</td></tr>
+<tr><td>Độ chính xác tồn kho</td><td>Tỷ lệ mã hàng/vị trí có số liệu hệ thống khớp với thực tế khi kiểm kê.</td><td>Tháng / quý</td></tr>
+<tr><td>Vòng quay và mức tồn kho</td><td>Vòng quay tồn kho và giá trị tồn so với mục tiêu; mức tồn dư ngoài định mức.</td><td>Tháng / quý</td></tr>
+<tr><td>Tỷ lệ hàng chậm luân chuyển</td><td>Giá trị và tỷ trọng hàng tồn lâu, hàng có nguy cơ hết hạn trên tổng tồn kho.</td><td>Quý</td></tr>
+<tr><td>Kỷ luật điều tra chênh lệch</td><td>Tỷ lệ chênh lệch tồn kho được điều tra nguyên nhân trước khi điều chỉnh.</td><td>Tháng</td></tr>
+</tbody></table></div>
+<h2 class="h2">9. Yêu cầu năng lực</h2>
+<div class="comp-grid">
+<div class="comp-card"><p><b>Kiến thức chuyên môn và hệ thống</b></p><ul>
+<li>Hiểu nguyên lý hoạch định nhu cầu vật tư, định mức vật tư, điểm đặt hàng lại, tồn kho an toàn và thời gian dẫn.</li>
+<li>Hiểu kiểm soát tồn kho, phương pháp kiểm kê, nhập trước xuất trước và phân loại mã hàng theo mức ảnh hưởng.</li>
+<li>Sử dụng được Epicor hoặc hệ thống hoạch định nguồn lực doanh nghiệp (ERP) và bảng tính Excel ở mức phân tích dữ liệu.</li>
+</ul></div>
+<div class="comp-card"><p><b>Năng lực hành vi / phối hợp</b></p><ul>
+<li>Tư duy định lượng, làm việc dựa trên dữ liệu; không kết luận khi số liệu chưa được đối chiếu.</li>
+<li>Kỷ luật điều tra nguyên nhân thay vì điều chỉnh số liệu cho khớp.</li>
+<li>Phối hợp tốt với Mua hàng, Kho, Kho dao cụ, Điều độ sản xuất và Tài chính để giữ một dữ liệu chung về mức sẵn sàng.</li>
+</ul></div>
+</div>
+<div class="callout"><p><b>Mô-đun năng lực / đào tạo cốt lõi</b></p><ul>
+<li><a href="../../../../training/content/01-Modules/C04.html">C04 — Giao tiếp liên phòng ban và phối hợp</a></li>
+<li><a href="../../../../training/content/01-Modules/C08.html">C08 — Tư duy dựa trên dữ liệu và sử dụng hệ thống ERP/bảng tính Excel</a></li>
+<li><a href="../../../../training/content/01-Modules/C10.html">C10 — Quy trình lệnh sản xuất CNC từ RFQ đến thu tiền</a></li>
+<li><a href="../../../../training/content/01-Modules/C18.html">C18 — Chuỗi cung ứng, mua hàng và giao nhận</a></li>
+</ul></div>
+<p class="inline-note">Mức đánh giá chi tiết, cổng OJT và lộ trình phát triển áp dụng theo ma trận đào tạo/năng lực hiện hành của bộ phận.</p>
+<h2 class="h2">10. Học vấn, kinh nghiệm và yêu cầu tuyển dụng</h2>
+<div class="table-card"><table class="table require-table"><tbody>
+<tr><th>Trình độ / chứng chỉ</th><td><ul><li>Tốt nghiệp cao đẳng/đại học ngành chuỗi cung ứng, logistics, quản lý công nghiệp, kinh tế hoặc lĩnh vực liên quan; hoặc có kinh nghiệm tương đương.</li><li>Ưu tiên ứng viên đã làm hoạch định vật tư hoặc kiểm soát tồn kho trong môi trường sản xuất.</li></ul></td></tr>
+<tr><th>Kinh nghiệm</th><td><ul><li>Có kinh nghiệm với định mức vật tư, hoạch định nhu cầu và kiểm soát tồn kho.</li><li>Ưu tiên từng làm việc trên hệ thống ERP và xử lý kiểm kê, chênh lệch tồn kho, hàng chậm luân chuyển.</li></ul></td></tr>
+<tr><th>Hệ thống / công cụ cần dùng</th><td><p>Epicor hoặc ERP tương đương, bảng tính Excel, báo cáo tồn kho, bảng kiểm kê, thư điện tử và hệ thống lưu trữ hồ sơ kiểm soát.</p></td></tr>
+<tr><th>Điều kiện / đặc thù công việc</th><td><p>Kết hợp giữa bàn làm việc và kho; phải xuống kho xác minh thực tế khi có chênh lệch tồn kho hoặc nghi vấn số liệu.</p></td></tr>
+<tr><th>Lưu ý tuyển dụng ưu tiên</th><td><p>Ưu tiên ứng viên cẩn thận với số liệu, có tư duy phân tích, biết đặt câu hỏi khi dữ liệu bất thường và không điều chỉnh số liệu cho khớp một cách dễ dãi.</p></td></tr>
+</tbody></table></div>
+<h2 class="h2">11. Người thay thế / kế nhiệm tạm thời</h2>
+<div class="backup-card">
+<p><b>Người thay thế chính:</b> Quản lý chuỗi cung ứng (<span class="entity-cluster role-cluster"><a class="entity-link role-link" href="jd-supply-chain-manager.html" title="Trưởng phòng Chuỗi cung ứng (SCM)"><span class="entity-code role-code">SCM</span></a></span>) chỉ định theo ANNEX-123; người thay thế phải được OJT, có bàn giao và được phép nhận việc trong phạm vi được giao.</p>
+<p><b>Người thay thế phụ:</b> Quản lý chuỗi cung ứng phối hợp Phòng Chuỗi cung ứng (<span class="entity-cluster role-cluster"><a class="entity-link dept-link" href="../../02-Department-Handbooks/dept-supply-chain-handbook.html" title="Phòng Chuỗi cung ứng (D-SCM)"><span class="entity-code dept-code">D-SCM</span></a></span>) bố trí nguồn lực dự phòng theo khối lượng hoạch định và nhịp kiểm kê.</p>
+<p><b>Giới hạn quyền khi thay thế:</b> Chỉ thực hiện giao dịch thường lệ; không tự thay đổi thông số hoạch định ngoài khung đã duyệt và không điều chỉnh tồn kho khi chưa điều tra chênh lệch.</p>
+<p><b>Nguyên tắc kích hoạt:</b> Kích hoạt khi nghỉ phép, công tác, đào tạo, vắng mặt ngắn hạn hoặc khi vào kỳ kiểm kê cao điểm; phải có phân công rõ bằng thư điện tử, bảng phân nhiệm hoặc phiếu giao việc.</p>
+</div>
+<h2 class="h2">12. Quy trình thao tác chuẩn (SOP) / Hướng dẫn công việc (WI) / Biểu mẫu / Đào tạo liên quan</h2>
+<div class="table-card"><table class="table"><tbody>
+<tr><th style="width:28%">SOP cốt lõi</th><td><ul class="doc-link-list">
+<li><a href="../../../../operations/sops/04-SOP-400/sop-401-supplier-control-and-special-process.html">SOP-401 — Kiểm soát nhà cung cấp và quy trình đặc biệt</a></li>
+<li><a href="../../../../operations/sops/04-SOP-400/sop-402-material-verification-traceability-and-counterfeit-prevention.html">SOP-402 — Xác minh vật tư, truy xuất nguồn gốc và phòng ngừa hàng giả</a></li>
+<li><a href="../../../../operations/sops/07-SOP-700/sop-701-receiving-packaging-handling-and-storage.html">SOP-701 — Tiếp nhận, kho, đóng gói, vận hành và bảo quản</a></li>
+</ul></td></tr>
+<tr><th style="width:28%">WI / Tài liệu tham chiếu / Hệ thống</th><td><ul class="doc-link-list">
+<li><a href="../../../../operations/work-instructions/07-WI-700/wi-702-storage-environment-location-and-fifo-control.html">WI-702 — Môi trường lưu kho, vị trí và kiểm soát nhập trước xuất trước</a></li>
+<li><a href="../../../../operations/references/01-ANNEX-100/11-ANNEX-110-Digital-Control-and-Resilience/annex-117-escalation-matrix-and-sla.html">ANNEX-117 — Ma trận báo cáo vượt cấp, SLA phản hồi, liên lạc theo cấp và quyền quyết định</a></li>
+</ul></td></tr>
+<tr><th style="width:28%">Biểu mẫu / hồ sơ</th><td><ul class="doc-link-list">
+<li>Hồ sơ hoạch định nhu cầu vật tư và bảng thông số hoạch định.</li>
+<li>Bảng kiểm kê, hồ sơ chênh lệch tồn kho và phân tích hàng chậm luân chuyển.</li>
+</ul></td></tr>
+<tr><th style="width:28%">Đào tạo / năng lực</th><td><ul class="doc-link-list">
+<li><a href="../../../../training/content/01-Modules/C08.html"><b>Mô-đun C08</b> — Tư duy dựa trên dữ liệu và sử dụng hệ thống ERP/bảng tính Excel</a></li>
+<li><a href="../../../../training/content/01-Modules/C10.html"><b>Mô-đun C10</b> — Quy trình lệnh sản xuất CNC từ RFQ đến thu tiền</a></li>
+<li><a href="../../../../training/content/01-Modules/C18.html"><b>Mô-đun C18</b> — Chuỗi cung ứng, mua hàng và giao nhận</a></li>
+</ul></td></tr>
+<tr><th style="width:28%">Tham chiếu điều hành</th><td><ul class="doc-link-list">
+<li><a href="../../../../operations/references/05-ANNEX-500/annex-503-cnc-operating-model-and-role-boundary.html">ANNEX-503 — Mô hình vận hành CNC và ranh giới vai trò</a></li>
+<li><a href="../../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html"><b>ANNEX-120</b> — Ma trận thẩm quyền quyết định và nhả giữ</a></li>
+<li><a href="../../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html"><b>ANNEX-121</b> — Ma trận RACI gốc ở mức hoạt động và tài liệu</a></li>
+<li><a href="../../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html"><b>ANNEX-122</b> — Từ điển KPI phân tầng</a></li>
+<li><a href="../../../../operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-123-deputy-backup-matrix.html"><b>ANNEX-123</b> — Ma trận người thay thế / dự phòng</a></li>
+</ul></td></tr>
+</tbody></table></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>
