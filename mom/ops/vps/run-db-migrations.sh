@@ -99,6 +99,28 @@ resolve_db_env() {
   export PGPASSWORD="$DB_PASSWORD"
 }
 
+migration_drift_check() {
+  # DB-aware drift gate: with DB env resolved we can detect ghost
+  # migrations (a migration_id applied on the live DB whose .sql file is
+  # missing from the repo). The offline CI check cannot see the live
+  # schema_migrations table; this is the defense-in-depth catch that fires
+  # even when a deploy bypassed CI. Advisory by default — logs the drift
+  # but does not abort, because an existing ghost should not block an
+  # unrelated hotfix deploy. Set MIGRATION_DRIFT_STRICT=1 to hard-fail.
+  local drift_script="${REPO_ROOT}/mom/tools/release/check_migration_drift.php"
+  [ -f "$drift_script" ] || return 0
+  command -v php >/dev/null 2>&1 || return 0
+  log "Checking migration drift against live DB..."
+  if php "$drift_script" 2>&1 | sed 's/^/    /'; then
+    log "Migration drift check passed"
+  else
+    if [ "${MIGRATION_DRIFT_STRICT:-0}" = "1" ]; then
+      die "Migration drift detected (MIGRATION_DRIFT_STRICT=1)"
+    fi
+    log "WARNING: migration drift detected — see output above (advisory, not blocking)"
+  fi
+}
+
 run_migrations() {
   if [ "$RUN_DB_MIGRATIONS" != "1" ]; then
     log "DB migrations skipped (RUN_DB_MIGRATIONS=$RUN_DB_MIGRATIONS)"
@@ -184,5 +206,6 @@ PHP
 
 cd "$REPO_ROOT"
 resolve_db_env
+migration_drift_check
 run_migrations
 schema_smoke

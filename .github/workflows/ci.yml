@@ -40,9 +40,26 @@ jobs:
         with:
           php-version: '8.5'
           extensions: pdo, pdo_pgsql, mbstring, json
+          tools: composer:v2
+      - name: Cache Composer dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.composer/cache
+            mom/vendor
+          key: ${{ runner.os }}-php85-composer-${{ hashFiles('mom/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php85-composer-
       - name: Install dependencies
         working-directory: mom
         run: composer install --no-interaction --prefer-dist
+      - name: Cache PHPStan result cache
+        uses: actions/cache@v4
+        with:
+          path: mom/.phpstan-cache
+          key: ${{ runner.os }}-phpstan-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-phpstan-
       - name: Run PHPStan
         working-directory: mom
         run: vendor/bin/phpstan analyse --error-format=github

@@ -152,6 +152,20 @@ jobs:
         working-directory: mom
         run: composer install --no-interaction --prefer-dist
 
+      - name: Cache PHPStan result cache
+        if: needs.classify.outputs.needs_php_validation == 'true'
+        # PHPStan writes an incremental result cache to mom/.phpstan-cache
+        # (tmpDir in phpstan.neon). Restoring it lets PHPStan re-analyse only
+        # the files changed since the last run — a full ~135s analyse drops
+        # to ~20-40s. Keyed by sha so each run saves a fresh copy; restore-keys
+        # falls back to the most recent prior cache.
+        uses: actions/cache@v4
+        with:
+          path: mom/.phpstan-cache
+          key: ${{ runner.os }}-phpstan-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-phpstan-
+
       # Split into 3 steps so the GitHub Actions UI shows EXACTLY which gate
       # fails. Previously bundled into one step where a phpunit failure
       # looked identical to a phpstan failure looked identical to a

@@ -1,6 +1,12 @@
 parameters:
     level: 5
     treatPhpDocTypesAsCertain: false
+    # Persist the result cache in the repo tree (gitignored) so GitHub
+    # Actions can cache it across runs. PHPStan then only re-analyses files
+    # that changed since the last run — cuts a full ~135s analyse down to
+    # ~20-40s on an incremental commit. The default tmpDir is the system
+    # temp dir, which a fresh CI runner never preserves.
+    tmpDir: .phpstan-cache
     paths:
         - api/controllers
         - api/middleware
