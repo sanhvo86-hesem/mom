@@ -144,6 +144,21 @@ function _assetUrl(relative){
     } catch (e) {}
 })();
 
+/* ── Companion widget: RACI / Authority sidebar ─────────────────────────────
+ * Loaded here so every controlled document that renders the DCC header also
+ * receives the RACI sidebar, with no per-document markup change. The widget
+ * itself decides whether to display (it shows only on SOP and JD documents). */
+(function _loadRaciSidebar(){
+    try {
+        if (document.querySelector('script[data-raci-sidebar-js]')) return;
+        var s = document.createElement('script');
+        s.src = _assetUrl('scripts/portal/12-raci-authority-sidebar.js');
+        s.defer = true;
+        s.setAttribute('data-raci-sidebar-js', '1');
+        (document.head || document.documentElement).appendChild(s);
+    } catch (e) {}
+})();
+
 /* ── Label-registry cache (per-locale) ─────────────────────────────────── */
 var _labelsCache = {}; // locale -> {label_key: {short, long, sort}}
 var _labelsPending = {}; // locale -> Promise
