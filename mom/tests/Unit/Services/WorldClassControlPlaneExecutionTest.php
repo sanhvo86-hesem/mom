@@ -70,6 +70,7 @@ final class WorldClassControlPlaneExecutionTest extends TestCase
             'mom/_reports/publication-proof-latest.json',
             'mom/api/services/WorkflowEngine.php',
             'prompts/PROMPT-BACKEND-AI.md',
+            '_reports/kpi-upgrade-prompts/README.md',
         ]);
 
         $this->assertCount(3, $findings);

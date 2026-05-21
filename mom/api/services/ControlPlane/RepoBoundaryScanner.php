@@ -78,6 +78,10 @@ final class RepoBoundaryScanner
         // policy as module-template-v4: explicitly in the repo, mirrored
         // in .gitignore "!_reports/deploy-playbook/", evaluated on GitHub.
         '#^_reports/deploy-playbook/.*$#',
+        // KPI upgrade prompt pack — sequential AI execution plan committed as
+        // durable prompt content and mirrored by .gitignore
+        // "!_reports/kpi-upgrade-prompts/".
+        '#^_reports/kpi-upgrade-prompts/.*$#',
     ];
 
     /**
