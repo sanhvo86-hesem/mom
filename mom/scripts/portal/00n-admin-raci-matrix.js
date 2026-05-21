@@ -264,6 +264,24 @@ function _setDocHtml(key, slug, value){
   _state.message = '';
 }
 
+/* In-place (contenteditable) edits — capture the rendered HTML only when
+   the user actually edits, so an untouched dataset stays byte-identical. */
+function _editAuxCell(key, rowIdx, colIdx, el){
+  var rows = _auxRows(key);
+  if(!rows[rowIdx] || !Array.isArray(rows[rowIdx].cells)) return;
+  rows[rowIdx].cells[colIdx] = el.innerHTML;
+  _state.error = '';
+  _state.message = '';
+}
+
+function _editDocBlob(key, slug, el){
+  var map = _docMap(key);
+  if(!map[slug]) return;
+  map[slug].html = el.innerHTML;
+  _state.error = '';
+  _state.message = '';
+}
+
 function _setReason(value){ _state.reason = value; }
 
 function _resetDraft(){
@@ -503,6 +521,8 @@ function _renderCard(row, idx){
 }
 
 /* ── Cell-table datasets (§4 / §6 / support) ──────────────────────── */
+/* Each cell renders its real content (role chips, RACI badges, document
+   links) and is edited in place — no raw HTML is shown to the user. */
 function _renderAuxSection(ds){
   var def = AUX[ds.key];
   var rows = _auxRows(ds.key);
@@ -518,9 +538,10 @@ function _renderAuxSection(ds){
     var tds = '<td class="rc-rownum">' + (ri + 1) + '</td>';
     for(var ci = 0; ci < cols; ci++){
       var val = cells[ci] == null ? '' : String(cells[ci]);
-      tds += '<td><textarea class="rc-cell-ta" spellcheck="false"'
-        + ' oninput="_rmSetAuxCell(\'' + ds.key + '\',' + ri + ',' + ci + ',this.value)">'
-        + _esc(val) + '</textarea></td>';
+      tds += '<td class="rc-doccell"><div class="rc-cell" contenteditable="true" spellcheck="false"'
+        + ' data-ph="' + _t('Trống', 'Empty') + '"'
+        + ' oninput="_rmEditAux(\'' + ds.key + '\',' + ri + ',' + ci + ',this)">'
+        + val + '</div></td>';
     }
     return '<tr>' + tds + '</tr>';
   }).join('');
@@ -533,19 +554,21 @@ function _renderAuxSection(ds){
   <div class="rc-panel">
     <div class="rc-panel-head">
       <b>${_t(ds.vi, ds.en)} — ${_esc(ds.sync)}</b>
-      <span>${_t(ds.descVi, ds.descEn)}</span>
+      <span>${_t(ds.descVi, ds.descEn)} — ${_t('bấm vào ô bất kỳ để sửa trực tiếp.', 'click any cell to edit it in place.')}</span>
     </div>
     <div class="rc-scroll">
-      <table class="rc-table">
+      <table class="rc-table rc-doc">
         <thead>${thead}</thead>
         <tbody>${bodyRows}</tbody>
       </table>
     </div>
-    <div class="rc-note">${_t('Ô chứa HTML gốc của ANNEX-121 (giữ liên kết vai trò/tài liệu). Khi lưu, mã script và thuộc tính sự kiện bị loại bỏ; số dòng và số cột phải giữ nguyên.', 'Cells hold the original ANNEX-121 HTML. On save scripts are stripped; row and column counts must stay unchanged.')}</div>
+    <div class="rc-note">${_t('Mỗi ô hiển thị nội dung thật (mã vai trò, nhãn RACI, liên kết tài liệu) và sửa được ngay tại chỗ. Khi lưu, số dòng và số cột phải giữ nguyên; mã script bị loại bỏ.', 'Each cell shows its real content and is edited in place. On save the row and column counts must stay unchanged; scripts are stripped.')}</div>
   </div>`;
 }
 
-/* ── Document-keyed HTML datasets (JD interface / SOP §4 roles) ───── */
+/* ── Document-keyed datasets (JD interface / SOP §4 roles) ────────── */
+/* The captured table renders exactly as in the source document and is
+   edited in place; raw HTML stays behind an optional advanced panel. */
 function _renderDocMapSection(ds){
   var dm = DOCMAP[ds.key];
   var map = _docMap(ds.key);
@@ -574,7 +597,7 @@ function _renderDocMapSection(ds){
   <div class="rc-panel">
     <div class="rc-panel-head">
       <b>${_t(ds.vi, ds.en)} — ${_esc(ds.sync)}</b>
-      <span>${_t(ds.descVi, ds.descEn)}</span>
+      <span>${_t(ds.descVi, ds.descEn)} — ${_t('bấm vào bảng để sửa trực tiếp.', 'click inside the table to edit it in place.')}</span>
     </div>
     <div class="rc-doc-bar">
       <label>${_t(dm.labelVi, dm.labelEn)}</label>
@@ -584,17 +607,15 @@ function _renderDocMapSection(ds){
       <button class="rc-btn rc-btn-sm" type="button" onclick="_rmSetDocSel('${ds.key}','${_esc(next)}')">›</button>
     </div>
     <div class="rc-doc-body">
-      <div class="rc-field">
-        <label>${_t(dm.fieldVi, dm.fieldEn)}</label>
+      <div class="rc-render" contenteditable="true" spellcheck="false"
+        oninput="_rmEditDoc('${ds.key}','${_esc(slug)}',this)">${html}</div>
+      <details class="rc-adv">
+        <summary>${_t('Sửa HTML nâng cao', 'Advanced HTML editing')}</summary>
         <textarea class="rc-doc-html" spellcheck="false"
-          oninput="_rmSetDocHtml('${ds.key}','${_esc(slug)}',this.value)">${_esc(html)}</textarea>
-      </div>
-      <div class="rc-preview">
-        <div class="rc-preview-cap">${_t('Xem trước', 'Preview')}</div>
-        ${html}
-      </div>
+          onchange="_rmSetDocHtml('${ds.key}','${_esc(slug)}',this.value);_rmRerender()">${_esc(html)}</textarea>
+      </details>
     </div>
-    <div class="rc-note">${_t('Ô chứa HTML gốc của tài liệu (giữ nguyên liên kết tương đối). Khi lưu, mã script bị loại bỏ; bảng được ghi lại đúng vào vùng quản lý của tài liệu tương ứng.', 'The field holds the original document HTML. On save scripts are stripped and the table is written back into the matching managed region.')}</div>
+    <div class="rc-note">${_t('Bảng hiển thị đúng như trong tài liệu gốc và sửa được ngay tại chỗ. Khi lưu, mã script bị loại bỏ; bảng được ghi lại vào vùng quản lý của tài liệu tương ứng.', 'The table renders exactly as in the source document and is edited in place. On save scripts are stripped and the table is written back into its managed region.')}</div>
   </div>`;
 }
 
@@ -736,29 +757,55 @@ function _styleBlock(){
   .rc-role select[data-val="R"]{border-color:var(--accent);color:var(--accent)}
   .rc-role select[data-val="C"]{border-color:var(--warning,var(--accent))}
   .rc-role select[data-val="I"]{border-color:var(--success,var(--accent))}
-  /* cell table */
+  /* cell table — rendered, in-place editable */
   .rc-scroll{overflow:auto}
   table.rc-table{width:100%;border-collapse:collapse;font-size:12.5px}
-  table.rc-table th{background:var(--surface-2);color:var(--text-2);text-transform:uppercase;font-size:11px;letter-spacing:.03em;text-align:left;padding:9px 10px;border-bottom:1px solid var(--border);position:sticky;top:0}
-  table.rc-table td{vertical-align:top;padding:6px 8px;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
-  table.rc-table td:last-child{border-right:none}
-  table.rc-table tr:last-child td{border-bottom:none}
-  .rc-rownum{color:var(--text-2);font-weight:800;text-align:right;width:36px}
-  .rc-cell-ta{width:100%;min-width:120px;min-height:46px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--text-1);font:inherit;font-size:12px;padding:5px 7px;resize:vertical;line-height:1.45}
-  .rc-cell-ta:focus{border-color:var(--accent);outline:none}
-  /* doc map */
-  .rc-doc-bar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border)}
+  table.rc-table>thead>tr>th{background:var(--surface-2);color:var(--text-2);text-transform:uppercase;font-size:11px;letter-spacing:.03em;text-align:left;padding:9px 10px;border-bottom:2px solid var(--border);position:sticky;top:0;z-index:1}
+  table.rc-table>tbody>tr>td{vertical-align:top;padding:0;border-bottom:1px solid var(--border);border-right:1px solid var(--border)}
+  table.rc-table>tbody>tr>td:last-child{border-right:none}
+  table.rc-table>tbody>tr:last-child>td{border-bottom:none}
+  table.rc-table>tbody>tr:hover{background:var(--surface-2)}
+  td.rc-rownum,th.rc-rownum{color:var(--text-2);font-weight:800;text-align:center;width:38px;padding:8px 6px;background:var(--surface-2)}
+  .rc-cell{min-height:40px;padding:8px 10px;font-size:12.5px;line-height:1.6;color:var(--text-1);outline:none;border:2px solid transparent;border-radius:6px;transition:border-color .1s,background .1s}
+  .rc-cell:hover{background:var(--surface-2)}
+  .rc-cell:focus{border-color:var(--accent);background:var(--surface)}
+  .rc-cell:empty::before{content:attr(data-ph);color:var(--text-2);font-style:italic;opacity:.6}
+  /* doc map — rendered, in-place editable */
+  .rc-doc-bar{display:flex;flex-wrap:wrap;gap:9px;align-items:center;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--surface-2)}
   .rc-doc-bar label{font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text-2)}
-  .rc-doc-select{flex:1 1 300px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text-1);font:inherit;font-weight:700;font-size:13px;padding:8px 10px}
+  .rc-doc-select{flex:1 1 300px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-1);font:inherit;font-weight:700;font-size:13px;padding:8px 10px}
   .rc-doc-count{font-size:12px;font-weight:800;color:var(--text-2)}
   .rc-doc-body{padding:14px 16px;display:flex;flex-direction:column;gap:12px}
-  .rc-doc-html{width:100%;min-height:240px;border:1px solid var(--border);border-radius:8px;background:var(--surface-2);color:var(--text-1);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;padding:10px 11px;resize:vertical;line-height:1.55}
+  .rc-render{border:1px solid var(--border);border-radius:9px;padding:14px;background:var(--surface);outline:none;overflow:auto}
+  .rc-render:focus{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 16%,transparent)}
+  .rc-adv{border:1px solid var(--border);border-radius:9px;background:var(--surface-2)}
+  .rc-adv>summary{cursor:pointer;padding:9px 13px;font-weight:700;font-size:12px;color:var(--text-2);list-style:none}
+  .rc-adv>summary::-webkit-details-marker{display:none}
+  .rc-adv>summary::before{content:'▸ ';color:var(--text-2)}
+  .rc-adv[open]>summary::before{content:'▾ '}
+  .rc-doc-html{width:calc(100% - 24px);margin:0 12px 12px;min-height:200px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text-1);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;padding:10px 11px;resize:vertical;line-height:1.55}
   .rc-doc-html:focus{border-color:var(--accent);outline:none}
-  .rc-preview{border:1px dashed var(--border);border-radius:8px;padding:12px;overflow:auto;background:var(--surface-2)}
-  .rc-preview-cap{font-size:11px;font-weight:800;text-transform:uppercase;color:var(--text-2);margin-bottom:8px}
-  .rc-preview table{width:100%;border-collapse:collapse;font-size:12px}
-  .rc-preview th,.rc-preview td{border:1px solid var(--border);padding:6px 8px;text-align:left;vertical-align:top}
-  .rc-preview a{color:var(--accent)}
+  /* rendered RACI content — role chips, badges, document links */
+  .rc-cell table,.rc-render table{width:100%;border-collapse:collapse;font-size:12.5px;margin:0 0 8px}
+  .rc-cell table:last-child,.rc-render table:last-child{margin-bottom:0}
+  .rc-render .table-card{border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-bottom:10px}
+  .rc-render .table-card:last-child{margin-bottom:0}
+  .rc-cell th,.rc-render th{background:var(--surface-2);color:var(--text-2);text-transform:uppercase;font-size:10.5px;letter-spacing:.03em;text-align:left;padding:7px 9px;border:1px solid var(--border)}
+  .rc-cell td,.rc-render td{padding:7px 9px;border:1px solid var(--border);vertical-align:top;line-height:1.55}
+  .rc-cell a,.rc-render a{color:var(--accent);text-decoration:none;cursor:text}
+  .rc-cell .role-code,.rc-render .role-code,.rc-cell .entity-code,.rc-render .entity-code,
+  .rc-cell .bundle-code,.rc-render .bundle-code{display:inline-block;padding:1px 7px;border-radius:5px;background:var(--surface-2);border:1px solid var(--border);font-weight:800;font-size:11px;color:var(--text-1);line-height:1.7}
+  .rc-cell .bundle-chip .bundle-code,.rc-render .bundle-chip .bundle-code,
+  .rc-cell .bundle-code,.rc-render .bundle-code{color:var(--accent);border-color:var(--accent)}
+  .rc-cell .entity-sep,.rc-render .entity-sep,.rc-cell .role-sep,.rc-render .role-sep{color:var(--text-2);font-weight:700;margin:0 2px}
+  .rc-cell .raci-badge,.rc-render .raci-badge{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;font-weight:800;font-size:12px;border:1px solid var(--border)}
+  .rc-cell .raci-badge.raci-a,.rc-render .raci-badge.raci-a,.rc-cell .raci-a,.rc-render .raci-a{background:var(--accent);color:var(--accent-contrast);border-color:var(--accent)}
+  .rc-cell .raci-badge.raci-r,.rc-render .raci-badge.raci-r,.rc-cell .raci-r,.rc-render .raci-r{color:var(--accent);border-color:var(--accent)}
+  .rc-cell .raci-badge.raci-c,.rc-render .raci-badge.raci-c{color:var(--warning,var(--text-1));border-color:var(--warning,var(--border))}
+  .rc-cell .raci-badge.raci-i,.rc-render .raci-badge.raci-i{color:var(--success);border-color:var(--success)}
+  .rc-cell .raci-cell,.rc-render .raci-cell{font-weight:800;text-align:center}
+  .rc-render .auth-item{padding:4px 0;border-bottom:1px dashed var(--border)}
+  .rc-render .note{color:var(--text-2);font-size:12px;font-style:italic}
   /* linked docs */
   .rc-links{border:1px solid var(--border);border-radius:12px;background:var(--surface)}
   .rc-links>summary{cursor:pointer;padding:14px 16px;font-weight:800;font-size:14px;list-style:none}
@@ -793,8 +840,11 @@ window._rmReload = _load;
 window._rmReset = _resetDraft;
 window._rmSave = _save;
 window._rmGo = _go;
+window._rmRerender = _render;
 window._rmSetRole = _setRole;
 window._rmSetAuxCell = _setAuxCell;
+window._rmEditAux = _editAuxCell;
+window._rmEditDoc = _editDocBlob;
 window._rmSetDocSel = _setDocSel;
 window._rmSetDocHtml = _setDocHtml;
 window._rmSetReason = _setReason;
