@@ -76,7 +76,7 @@
       dept:   { vi: 'Sales / Báo giá', en: 'Sales / Quoting'  },
       desc:   { vi: 'Rà soát & khóa cam kết thương mại, kỹ thuật, năng lực trước khi nhận PO',
                 en: 'Lock commercial, technical & capacity commitment before accepting PO' },
-      docs:   ['SOP-201','FRM-201','FRM-202','FRM-204'],
+      docs:   ['SOP-201','SOP-202','SOP-203','WI-201','FRM-201','FRM-202','FRM-203','FRM-204','ANNEX-201'],
       col: 0
     },
     {
@@ -87,7 +87,7 @@
       dept:   { vi: 'Phòng Kỹ thuật',  en: 'Engineering'       },
       desc:   { vi: 'DFM, phát hành gói baseline (BOM, route, bản vẽ) — song song với G2',
                 en: 'DFM review, baseline package release (BOM, route, drawings) — parallel with G2' },
-      docs:   ['SOP-301','SOP-303'],
+      docs:   ['SOP-301','SOP-303','FRM-301','FRM-302','FRM-303','FRM-305','FRM-306','ANNEX-301','ANNEX-302'],
       parallel: 'G2',
       col: 2
     },
@@ -99,7 +99,7 @@
       dept:   { vi: 'Mua hàng + QA',   en: 'Purchasing + QA'     },
       desc:   { vi: 'Kiểm tra nguyên vật liệu đầu vào, truy xuất — song song với G1',
                 en: 'Incoming material QC, traceability — parallel with G1' },
-      docs:   ['SOP-401','SOP-402'],
+      docs:   ['SOP-401','SOP-402','FRM-401','FRM-402','FRM-403','FRM-405','FRM-408','FRM-409','FRM-411','FRM-413','FRM-701','ANNEX-401','ANNEX-402','ANNEX-403'],
       parallel: 'G1',
       col: 3
     },
@@ -111,7 +111,7 @@
       dept:   { vi: 'Hoạch định + Sản xuất', en: 'Planning + Production' },
       desc:   { vi: 'Lập lịch, điều độ & lắp đặt setup — chỉ mở sau khi G1 và G2 hoàn tất',
                 en: 'Scheduling & setup execution — opens only after both G1 and G2 complete' },
-      docs:   ['SOP-501','SOP-504','ANNEX-501','WI-519'],
+      docs:   ['SOP-501','SOP-503','SOP-504','WI-517','WI-518','WI-519','FRM-501','FRM-502','FRM-504','FRM-511','FRM-513','FRM-519','FRM-521','FRM-523','ANNEX-501','ANNEX-502','ANNEX-503'],
       col: 4
     },
     {
@@ -122,7 +122,7 @@
       dept:   { vi: 'QA / QC',           en: 'QA / QC'               },
       desc:   { vi: 'Kiểm tra & phê duyệt chi tiết đầu tiên trước sản xuất hàng loạt',
                 en: 'First article inspection & approval before production run' },
-      docs:   ['SOP-302','FRM-205'],
+      docs:   ['SOP-302','SOP-601','SOP-602','WI-302','WI-602','FRM-205','FRM-305','FRM-311','FRM-601','FRM-602','FRM-611','FRM-612','FRM-613','ANNEX-602','ANNEX-604'],
       col: 5
     },
     {
@@ -133,7 +133,7 @@
       dept:   { vi: 'QA / QC + Sản xuất', en: 'QA / QC + Production' },
       desc:   { vi: 'Kiểm soát chất lượng liên tục trong quá trình gia công CNC',
                 en: 'Continuous quality control during CNC machining process' },
-      docs:   ['SOP-502','SOP-503','SOP-505','WI-201'],
+      docs:   ['SOP-502','SOP-503','SOP-505','SOP-606','WI-501','WI-604','WI-606','FRM-511','FRM-512','FRM-621','FRM-631','FRM-651','ANNEX-601','ANNEX-507'],
       col: 1
     },
     {
@@ -144,7 +144,7 @@
       dept:   { vi: 'QA / QC',           en: 'QA / QC'               },
       desc:   { vi: 'Kiểm tra xuất xưởng (OQC), phát hành CoC & chốt chất lượng trước giao hàng',
                 en: 'Outgoing quality control (OQC), CoC issuance & sign-off before shipment' },
-      docs:   ['SOP-603','SOP-604','SOP-605','FRM-206'],
+      docs:   ['SOP-603','SOP-604','SOP-605','WI-603','WI-605','FRM-206','FRM-621','FRM-641','FRM-642','FRM-643','ANNEX-601','ANNEX-603','ANNEX-606'],
       col: 6
     },
     {
@@ -155,7 +155,7 @@
       dept:   { vi: 'Logistics + Tài chính', en: 'Logistics + Finance' },
       desc:   { vi: 'Đóng gói, xuất hàng, phát hành hóa đơn & đóng hồ sơ đơn hàng',
                 en: 'Pack, ship, issue invoice & close job dossier' },
-      docs:   ['SOP-701','WI-206','FRM-207','SOP-803'],
+      docs:   ['SOP-701','SOP-702','SOP-703','SOP-803','WI-206','WI-701','WI-714','FRM-702','FRM-704','FRM-706','FRM-707','FRM-708','FRM-712','FRM-821','ANNEX-701','ANNEX-702'],
       col: 7
     }
   ];
@@ -532,7 +532,7 @@
 
       /* Sub-branches — one per doc, staggered along the bone */
       for (var k = 0; k < n; k++) {
-        var t  = 0.22 + k * (0.56 / Math.max(n - 1, 1));
+        var t  = 0.10 + k * (0.80 / Math.max(n - 1, 1));
         var bx = tx + t * boneVecX;
         var by = ty + t * boneVecY;
         var ex = bx + perpX * 30;
@@ -543,7 +543,7 @@
         s += '<line x1="' + bx + '" y1="' + by + '" x2="' + ex + '" y2="' + ey +
              '" stroke="' + cc + '" stroke-width="1.5" opacity="0.85"/>';
         s += '<circle cx="' + bx + '" cy="' + by + '" r="2.5" fill="' + cc + '" opacity="0.7"/>';
-        s += '<text x="' + (ex + 3) + '" y="' + ey + '" font-size="9" font-weight="700"' +
+        s += '<text x="' + (ex + 3) + '" y="' + ey + '" font-size="' + (n > 7 ? '7.5' : '9') + '" font-weight="700"' +
              ' font-family="monospace" fill="' + cc + '" text-anchor="start"' +
              ' dominant-baseline="middle" class="dov-doc-code-link"' +
              ' data-doc-code="' + esc(code) + '" style="cursor:pointer">' + esc(code) + '</text>';
@@ -657,9 +657,9 @@
    * VIEW A2 — GATE FLOW (SVG, G0→G7 with parallel G1∥G2)
    * ======================================================================= */
   function renderGateFlow(canvas) {
-    var W = 1010, H = 340, midY = 170;
+    var W = 1010, H = 420, midY = 170;
     var G1Y = 95, G2Y = 245;
-    var bW = 90, bH = 68; /* taller box fits doc pills */
+    var bW = 90; /* pill grid width; bH computed per gate inside gateBox */
     var CAT_COL = { SOP: '#1565c0', WI: '#16a34a', ANNEX: '#7c3aed', FRM: '#d97706' };
 
     /* G0 shifted right so RFQ→G0 shaft ≥35px; G3-G7 compressed to give G7→Cash room */
@@ -685,8 +685,8 @@
     s += '<text x="50" y="' + (midY + 8) + '" text-anchor="middle" font-size="9" fill="' + bp + '" font-family="inherit">KH</text>';
 
     /* Parallel G1∥G2 background zone */
-    s += '<rect x="232" y="58" width="96" height="226" rx="10" fill="rgba(100,116,139,0.05)" stroke="rgba(100,116,139,0.18)" stroke-dasharray="5,3" stroke-width="1.2"/>';
-    s += '<text x="280" y="58" text-anchor="middle" font-size="9.5" fill="' + cv('text-tertiary', '#94a3b8') + '" font-family="inherit" font-weight="600">Song song</text>';
+    s += '<rect x="232" y="36" width="96" height="302" rx="10" fill="rgba(100,116,139,0.05)" stroke="rgba(100,116,139,0.18)" stroke-dasharray="5,3" stroke-width="1.2"/>';
+    s += '<text x="280" y="34" text-anchor="middle" font-size="9.5" fill="' + cv('text-tertiary', '#94a3b8') + '" font-family="inherit" font-weight="600">Song song</text>';
 
     /* Gate boxes — doc codes as clickable pills inside the box */
     function gateBox(gateId, centerX, centerY) {
@@ -695,6 +695,7 @@
       var gate  = GATES[gi];
       var col   = palette(gate.col);
       var n     = gate.docs.length;
+      var bH    = Math.max(68, 36 + Math.ceil(n / 2) * 13);
       var x     = centerX - bW / 2;
       var y     = centerY - bH / 2;
       var hdrH  = 16;
