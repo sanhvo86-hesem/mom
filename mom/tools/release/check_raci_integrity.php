@@ -37,8 +37,11 @@ $annex121 = $base.'/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authori
 $annex120 = $base.'/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html';
 
 $ROLE_COLS = ['CS','EST','ENG','PPL','WKM','PD','QA','SCM','CEO','EHS','HR/IT'];
-$ALIAS     = ['PE'=>'ENG','ENGM'=>'ENG','CAM'=>'ENG','DFM'=>'ENG','BUY'=>'SCM',
-              'ITA'=>'HR/IT','ESA'=>'HR/IT','QCL'=>'QA','QC'=>'QA'];
+// Sub-role → RACI-column alias map. Authoritative source: ROLE-AND-DEPARTMENT-
+// BUNDLES §6. Keep this in sync with that table.
+$ALIAS     = ['PE'=>'ENG','ENGM'=>'ENG','CAM'=>'ENG','DFM'=>'ENG',
+              'BUY'=>'SCM','XNK'=>'SCM','ITA'=>'HR/IT','ESA'=>'HR/IT',
+              'QCL'=>'QA','QC'=>'QA','QE'=>'QA','SL'=>'WKM','SET'=>'WKM','OPR'=>'WKM'];
 $R_SEMANTICS_WHITELIST = [];             // no exceptions — F1/F2 realigned to IT=R
 
 $p0 = [];
