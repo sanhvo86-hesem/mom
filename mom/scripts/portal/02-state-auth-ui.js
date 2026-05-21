@@ -2973,7 +2973,7 @@ function renderSidebar(){
   SIDEBAR_SECTIONS.forEach(sec => {
     if(!isPortalSidebarSectionVisible(sec.id)) return;
     const catsInSec = CATEGORIES.filter(c => !c.hidden && isPortalSidebarCategoryVisible(c.id) && c.section === sec.id && (VDOCS.some(d => d.cat === c.id) || portalCategoryHasPhysicalTree(c.id)));
-    const hasDocOverviewEntry = sec.id === 'ops' && canUserAccessModule('eqms');
+    const hasDocOverviewEntry = sec.id === 'ops' && canUserAccessModule('doc-overview');
     if(catsInSec.length === 0 && !hasDocOverviewEntry) return;
     html += `<div class="nav-section"><div class="nav-section-title">${sec.label}</div>`;
     if(hasDocOverviewEntry) {
