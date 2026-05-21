@@ -456,8 +456,8 @@
    * Click on bone → gate detail panel
    * ======================================================================= */
   function renderFishboneSOP201(canvas) {
-    var W = 1010, H = 580, spineY = 290;
-    var tipTopY = 76, tipBotY = 504;
+    var W = 1010, H = 650, spineY = 325;
+    var tipTopY = 104, tipBotY = 546;
 
     var topGates = [0, 1, 3, 5];
     var topSX    = [165, 320, 480, 640];
@@ -466,6 +466,9 @@
     var botGates = [2, 4, 6, 7];
     var botSX    = [243, 400, 560, 720];
     var botTX    = [183, 340, 500, 660];
+
+    /* Category accent colors for doc code pills */
+    var CAT_COL = { SOP: '#1565c0', WI: '#16a34a', ANNEX: '#7c3aed', FRM: '#d97706' };
 
     var bp = cv('brand-primary', '#1565c0');
     var s = '';
@@ -507,28 +510,32 @@
       var gate = GATES[gi];
       var col  = palette(gate.col);
       var n    = gate.docs.length;
-      var lbW  = 112, lbH = 62, hdrH = 19;
-      var lbX  = tx - lbW / 2;
-      var lbY  = isTop ? ty - lbH - 8 : ty + 8;
+      /* Fixed card size: header(20) + name(16) + role(12) + sep(5) + 2 doc-rows(28) + pad(7) = 88 */
+      var lbW = 128, lbH = 88, hdrH = 20;
+      var lbX = tx - lbW / 2;
+      var lbY = isTop ? ty - lbH - 8 : ty + 8;
 
       /* Main bone */
       s += '<line x1="' + tx + '" y1="' + ty + '" x2="' + sx + '" y2="' + spineY +
            '" stroke="' + col + '" stroke-width="2.5" class="dov-bone"/>';
 
-      /* Dots along bone — one per document, no text labels */
+      /* Colored dots along bone — one per doc, no text */
       for (var j = 0; j < n && j < 5; j++) {
         var t  = 0.22 + j * (0.56 / Math.max(n - 1, 1));
         var bx = tx + t * (sx - tx);
         var by = ty + t * (spineY - ty);
-        s += '<circle cx="' + bx + '" cy="' + by + '" r="3.5" fill="' + col + '" opacity="0.45"/>';
+        var cat0 = catOfCode(gate.docs[j]);
+        var dc   = CAT_COL[cat0] || col;
+        s += '<circle cx="' + bx + '" cy="' + by + '" r="4" fill="' + dc + '" opacity="0.5"/>';
       }
 
-      /* Junction dot on spine */
+      /* Junction dot */
       s += '<circle cx="' + sx + '" cy="' + spineY + '" r="5.5" fill="' + col + '"/>';
 
-      /* White-card label box */
+      /* ── White card label box ── */
       s += '<g class="dov-gate-lbl" data-gi="' + gi + '" role="button" tabindex="0" aria-label="' + esc(T(gate.label)) + '">';
       if (gate.parallel) s += '<title>' + gate.id + ' ∥ ' + gate.parallel + '</title>';
+
       /* Card body */
       s += '<rect x="' + lbX + '" y="' + lbY + '" width="' + lbW + '" height="' + lbH +
            '" rx="9" fill="' + cv('bg-surface', '#fff') + '" stroke="' + col + '" stroke-width="1.5"/>';
@@ -537,25 +544,42 @@
            '" rx="9" fill="' + col + '"/>';
       s += '<rect x="' + lbX + '" y="' + (lbY + 10) + '" width="' + lbW + '" height="' + (hdrH - 10) +
            '" fill="' + col + '"/>';
-      /* Gate ID */
+      /* Gate ID (left of header) */
       s += '<text x="' + (lbX + 7) + '" y="' + (lbY + 14) + '" font-size="10.5" font-weight="800"' +
            ' fill="' + cv('text-inverse', '#fff') + '" font-family="inherit">' + esc(gate.id) + '</text>';
-      /* Parallel badge in header */
+      /* Parallel badge (right of header) */
       if (gate.parallel) {
         s += '<text x="' + (lbX + lbW - 6) + '" y="' + (lbY + 14) + '" text-anchor="end" font-size="8.5"' +
-             ' fill="rgba(255,255,255,0.88)" font-family="inherit" font-weight="600">∥' + gate.parallel + '</text>';
+             ' fill="rgba(255,255,255,0.9)" font-family="inherit" font-weight="600">∥' + gate.parallel + '</text>';
       }
       /* Short name */
-      s += '<text x="' + tx + '" y="' + (lbY + hdrH + 15) + '" text-anchor="middle" font-size="11.5"' +
+      s += '<text x="' + tx + '" y="' + (lbY + hdrH + 13) + '" text-anchor="middle" font-size="11"' +
            ' font-weight="700" fill="' + col + '" font-family="inherit">' + esc(T(gate.short)) + '</text>';
       /* Role */
-      s += '<text x="' + (lbX + 7) + '" y="' + (lbY + lbH - 9) + '" font-size="8.5"' +
-           ' fill="' + col + '" font-family="inherit" opacity="0.75">' + esc(gate.role) + '</text>';
-      /* Doc count badge */
-      s += '<rect x="' + (lbX + lbW - 31) + '" y="' + (lbY + lbH - 18) + '" width="27" height="13"' +
-           ' rx="4" fill="' + col + '" fill-opacity="0.15"/>';
-      s += '<text x="' + (lbX + lbW - 17) + '" y="' + (lbY + lbH - 8) + '" text-anchor="middle" font-size="8.5"' +
-           ' font-weight="700" fill="' + col + '" font-family="inherit">' + n + ' TL</text>';
+      s += '<text x="' + tx + '" y="' + (lbY + hdrH + 25) + '" text-anchor="middle" font-size="8.5"' +
+           ' fill="' + col + '" font-family="inherit" opacity="0.72">' + esc(gate.role) + '</text>';
+
+      /* Separator line */
+      var sepY = lbY + hdrH + 32;
+      s += '<line x1="' + (lbX + 6) + '" y1="' + sepY + '" x2="' + (lbX + lbW - 6) + '" y2="' + sepY +
+           '" stroke="' + col + '" stroke-width="0.6" opacity="0.25"/>';
+
+      /* Doc code pills — 2 per row, category-colored */
+      var pillW  = Math.floor(lbW / 2) - 7; /* width of each pill column */
+      var docRow0Y = sepY + 14;              /* baseline of first row */
+      for (var k = 0; k < n; k++) {
+        var code  = gate.docs[k];
+        var ccat  = catOfCode(code);
+        var cc    = CAT_COL[ccat] || col;
+        var col2  = k % 2;                    /* 0=left, 1=right */
+        var row   = Math.floor(k / 2);
+        var px    = col2 === 0 ? lbX + 4 : lbX + lbW / 2 + 3;
+        var py    = docRow0Y + row * 15;       /* text baseline */
+        s += '<rect x="' + px + '" y="' + (py - 9) + '" width="' + pillW + '" height="12"' +
+             ' rx="3" fill="' + cc + '" fill-opacity="0.14"/>';
+        s += '<text x="' + (px + 4) + '" y="' + py + '" font-size="7.5" font-weight="700"' +
+             ' font-family="monospace" fill="' + cc + '">' + esc(code) + '</text>';
+      }
       s += '</g>';
     }
 
@@ -769,7 +793,7 @@
     };
 
     var el = document.createElement('div');
-    el.style.cssText = 'height:540px;width:100%';
+    el.style.cssText = 'height:680px;width:100%';
     var legendHtml = '<div class="dov-chart-legend">' +
       GROUPS.map(function (g, i) {
         return '<span class="dov-legend-item"><span class="dov-legend-dot" style="background:' + palette(i) + '"></span>' +
@@ -785,17 +809,17 @@
       series: [{
         type: 'tree',
         data: [treeData],
-        top: '5%', bottom: '5%', left: '12%', right: '12%',
+        top: '3%', bottom: '3%', left: '10%', right: '10%',
         layout: 'radial',
         symbol: 'emptyCircle',
         symbolSize: function (v) { return v ? Math.min(8 + v * 0.08, 16) : 6; },
-        initialTreeDepth: 1,
+        initialTreeDepth: 2,
         lineStyle: { color: '#e2e8f0', width: 1.5, curveness: 0.6 },
         label: {
           position: 'top', fontSize: 11, fontWeight: '600',
           formatter: function (p) { return p.data.name; }
         },
-        leaves: { label: { position: 'right', fontSize: 10 } }
+        leaves: { label: { position: 'right', fontSize: 9, rotate: 'radial' } }
       }]
     });
 
