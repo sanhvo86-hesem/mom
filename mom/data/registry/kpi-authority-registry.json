@@ -1,7 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
   "version": "2026-05-21",
-  "schema_version": 5,
+  "schema_version": 6,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. Existing ANNEX-122 KPIs are retained, legacy metric aliases are mapped to canonical codes, and proposed CNC operating metrics are staged without granting automatic runtime authority.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -111,16 +111,18 @@
       "formula": {
         "numerator": "Số lô giao hàng có delivery_date_actual <= delivery_date_est trong kỳ",
         "denominator": "Tổng số lô có shipment_status = 'delivered' trong kỳ",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "Lô bị khách huỷ trước ship không tính",
         "direction": "higher_is_better",
         "min_sample": 5
       },
       "thresholds": {
-        "green": "≥95%",
-        "yellow": "90–94.99%",
-        "red": "<90%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95.0,
+        "yellow_point": 90.0,
+        "target": 95.0,
         "basis": "Benchmark giao hàng gia công CNC job-shop hàng đầu ≥98%; HESEM đặt green ≥95% theo scorecard CNC-EXEC-BSC-15-2026 và cam kết hợp đồng khách hàng phổ biến."
       },
       "data_source": {
@@ -167,9 +169,11 @@
         "min_sample": 30
       },
       "thresholds": {
-        "green": "≤100 ppm",
-        "yellow": "101–200 ppm",
-        "red": ">200 ppm",
+        "direction": "lower_is_better",
+        "unit": "ppm",
+        "green_point": 100.0,
+        "yellow_point": 200.0,
+        "target": 100.0,
         "basis": "Mục tiêu 6-sigma escape ≤233 ppm; CNC chính xác hàng đầu vận hành ≤100 ppm. HESEM green ≤100 ppm, đỏ >200 ppm theo ANNEX-129 §7."
       },
       "data_source": {
@@ -211,16 +215,18 @@
       "formula": {
         "numerator": "Số lô qua final release không bị re-open trong kỳ",
         "denominator": "Tổng số lô đưa vào final release trong kỳ",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
         "min_sample": 5
       },
       "thresholds": {
-        "green": "≥98%",
-        "yellow": "95–97.99%",
-        "red": "<95%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 98.0,
+        "yellow_point": 95.0,
+        "target": 98.0,
         "basis": "Right-first-time phát hành cuối chuẩn ngành ≥98%; dưới 95% là tín hiệu cổng phát hành yếu. Căn cứ AIAG APQP + ANNEX-129 §7 outcome KPI."
       },
       "data_source": {
@@ -259,17 +265,20 @@
       "formula": {
         "numerator": "Doanh thu trừ giá vốn theo nhóm lệnh/sản phẩm trong kỳ",
         "denominator": "Doanh thu theo nhóm lệnh/sản phẩm trong kỳ",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "Lệnh nội bộ/bảo hành không tính",
         "direction": "higher_is_better",
         "min_sample": 0
       },
       "thresholds": {
-        "green": "≥28%",
-        "yellow": "22–27.99%",
-        "red": "<22%",
-        "basis": "Biên gộp gia công CNC khoẻ mạnh ≥28%; dưới 22% là tín hiệu cơ cấu mặt hàng/giá có vấn đề. Căn cứ chuẩn tài chính ngành + ANNEX-129 §6 góc tài chính."
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 28.0,
+        "yellow_point": 22.0,
+        "target": 28.0,
+        "basis": "Biên gộp gia công CNC khoẻ mạnh ≥28%; dưới 22% là tín hiệu cơ cấu mặt hàng/giá có vấn đề. Căn cứ chuẩn tài chính ngành + ANNEX-129 §6 góc tài chính.",
+        "calibration_pending": true
       },
       "data_source": {
         "system": "ERP",
@@ -315,10 +324,13 @@
         "min_sample": 0
       },
       "thresholds": {
-        "green": "0 sự cố ghi nhận",
-        "yellow": "1 sự cố ghi nhận, không LTI",
-        "red": "≥1 LTI hoặc ≥2 recordable",
-        "basis": "OSHA recordable rate ngành chế tạo kim loại trung vị ~3.0; HESEM đặt 0 sự cố là cổng an toàn không đánh đổi. Căn cứ ANNEX-129 §7 (safety gate-only)."
+        "direction": "lower_is_better",
+        "unit": "rate",
+        "green_point": 1.0,
+        "yellow_point": 3.0,
+        "target": 1.0,
+        "basis": "OSHA recordable rate ngành chế tạo kim loại trung vị ~3.0; HESEM đặt 0 sự cố là cổng an toàn không đánh đổi. Căn cứ ANNEX-129 §7 (safety gate-only).",
+        "calibration_pending": true
       },
       "data_source": {
         "system": "EHS",
@@ -356,16 +368,18 @@
       "formula": {
         "numerator": "Số chức năng trọng yếu có phương án dự phòng + phó + soát xét gần đây",
         "denominator": "Tổng số chức năng trọng yếu",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
         "min_sample": 0
       },
       "thresholds": {
-        "green": "100%",
-        "yellow": "90–99.99%",
-        "red": "<90%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100.0,
+        "yellow_point": 90.0,
+        "target": 100.0,
         "basis": "Chuẩn tính liên tục: 100% chức năng trọng yếu có dự phòng. Dưới 90% là rủi ro gián đoạn. Căn cứ ANNEX-123 ma trận phó/dự phòng."
       },
       "data_source": {
@@ -411,9 +425,11 @@
         "min_sample": 3
       },
       "thresholds": {
-        "green": "≤3 ngày",
-        "yellow": "3.01–5 ngày",
-        "red": ">5 ngày",
+        "direction": "lower_is_better",
+        "unit": "day",
+        "green_point": 3.0,
+        "yellow_point": 5.0,
+        "target": 3.0,
         "basis": "Job-shop CNC cạnh tranh phản hồi RFQ ≤3 ngày làm việc; >5 ngày làm mất cơ hội. Căn cứ thực tiễn thương mại ngành."
       },
       "data_source": {
@@ -452,16 +468,18 @@
       "formula": {
         "numerator": "Số đơn vào sản xuất không phải mở lại soát xét trong kỳ",
         "denominator": "Tổng số đơn được soát xét trong kỳ",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
         "min_sample": 5
       },
       "thresholds": {
-        "green": "≥97%",
-        "yellow": "92–96.99%",
-        "red": "<92%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 97.0,
+        "yellow_point": 92.0,
+        "target": 97.0,
         "basis": "Soát xét hợp đồng/đơn hàng đúng lần đầu chuẩn ≥97%; căn cứ ISO 9001 §8.2 contract review + ANNEX-129 §7."
       },
       "data_source": {
@@ -499,16 +517,18 @@
       "formula": {
         "numerator": "Số lệnh sản xuất bám lịch đã khoá hoặc tái sắp xếp có phê duyệt",
         "denominator": "Tổng số lệnh sản xuất trong kỳ",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "Lệnh có cờ approved_resequence (re-sequence khách yêu cầu được duyệt) không tính là lệch",
         "direction": "higher_is_better",
         "min_sample": 10
       },
       "thresholds": {
-        "green": "≥90%",
-        "yellow": "80–89.99%",
-        "red": "<80%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 90.0,
+        "yellow_point": 80.0,
+        "target": 90.0,
         "basis": "Độ ổn định điều độ job-shop CNC tốt ≥90%; dưới 80% cho thấy lịch không giữ được. Căn cứ TOC + thực tiễn Lean Daily Management."
       },
       "data_source": {
@@ -547,16 +567,18 @@
       "formula": {
         "numerator": "Số FAI đạt ngay lần kiểm đầu tiên (attempt_number = 1) trong kỳ",
         "denominator": "Tổng số FAI thực hiện trong kỳ",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
         "min_sample": 5
       },
       "thresholds": {
-        "green": "≥95%",
-        "yellow": "88–94.99%",
-        "red": "<88%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95.0,
+        "yellow_point": 88.0,
+        "target": 95.0,
         "basis": "Chấp nhận mẫu đầu/FAI ngay lần đầu chuẩn ≥95% với xưởng CNC trưởng thành; dưới 88% cho thấy DFM/program/setup yếu. Căn cứ AIAG FAI + ANNEX-127 §9."
       },
       "data_source": {
@@ -595,16 +617,18 @@
       "formula": {
         "numerator": "Số lệnh sản xuất đang mở có (ngày hiện tại - created_date) vượt ngưỡng tuổi của cổng",
         "denominator": "Tổng số lệnh sản xuất đang mở trong cổng",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "lower_is_better",
         "min_sample": 5
       },
       "thresholds": {
-        "green": "≤5%",
-        "yellow": "5.01–12%",
-        "red": ">12%",
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 5.0,
+        "yellow_point": 12.0,
+        "target": 5.0,
         "basis": "TOC: WIP quá tuổi tại cổng nên ≤5%; >12% là tín hiệu nút thắt nghiêm trọng. Ngưỡng tính theo SỐ NGÀY mở của lệnh, không theo ngày đóng."
       },
       "data_source": {
@@ -642,16 +666,18 @@
       "formula": {
         "numerator": "Trung bình otd_pct của các nhà cung cấp được đánh giá trong kỳ",
         "denominator": "Số nhà cung cấp có đánh giá trong kỳ",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
         "min_sample": 3
       },
       "thresholds": {
-        "green": "≥90%",
-        "yellow": "85–89.99%",
-        "red": "<85%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 90.0,
+        "yellow_point": 85.0,
+        "target": 90.0,
         "basis": "Giao hàng đúng hạn nhà cung cấp chuẩn ≥90%; dưới 85% gây thiếu hụt kế hoạch. Căn cứ AIAG supplier readiness + ANNEX-127 §3."
       },
       "data_source": {
@@ -697,9 +723,11 @@
         "min_sample": 5
       },
       "thresholds": {
-        "green": "≤2 ngày",
-        "yellow": "2.01–4 ngày",
-        "red": ">4 ngày",
+        "direction": "lower_is_better",
+        "unit": "day",
+        "green_point": 2.0,
+        "yellow_point": 4.0,
+        "target": 2.0,
         "basis": "Thời gian sẵn sàng giao → hóa đơn nên ≤2 ngày; >4 ngày là tắc quy trình lập hóa đơn. Căn cứ thực tiễn order-to-cash."
       },
       "data_source": {
@@ -745,9 +773,11 @@
         "min_sample": 5
       },
       "thresholds": {
-        "green": "≤45 ngày",
-        "yellow": "45.01–60 ngày",
-        "red": ">60 ngày",
+        "direction": "lower_is_better",
+        "unit": "day",
+        "green_point": 45.0,
+        "yellow_point": 60.0,
+        "target": 45.0,
         "basis": "DSO ngành gia công CNC B2B lành mạnh ≤45 ngày; >60 ngày là rủi ro dòng tiền. Căn cứ chuẩn tài chính + điều khoản thanh toán hợp đồng."
       },
       "data_source": {
@@ -786,16 +816,18 @@
       "formula": {
         "numerator": "Số lệnh lệch lịch được khôi phục về cam kết trong cửa sổ phục hồi",
         "denominator": "Tổng số lệnh lệch lịch trong kỳ",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
         "min_sample": 5
       },
       "thresholds": {
-        "green": "≥85%",
-        "yellow": "70–84.99%",
-        "red": "<70%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 85.0,
+        "yellow_point": 70.0,
+        "target": 85.0,
         "basis": "Hiệu quả khôi phục tiến độ sau lệch lịch nên ≥85%; căn cứ Lean Daily Management thực tiễn."
       },
       "data_source": {
@@ -834,16 +866,18 @@
       "formula": {
         "numerator": "Số lần kiểm tra FOD/line-clearance đạt trong kỳ",
         "denominator": "Tổng số lần kiểm tra FOD/line-clearance thực hiện",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
         "min_sample": 5
       },
       "thresholds": {
-        "green": "100%",
-        "yellow": "98–99.99%",
-        "red": "<98%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100.0,
+        "yellow_point": 98.0,
+        "target": 100.0,
         "basis": "Tuân thủ vệ sinh FOD/line-clearance chuẩn 100%; mọi sai lệch là rủi ro chất lượng. Căn cứ AS9100/ngành hàng không khi áp dụng."
       },
       "data_source": {
@@ -881,16 +915,18 @@
       "formula": {
         "numerator": "Số gói phát hành kỹ thuật hoàn tất trước hoặc đúng due_date",
         "denominator": "Tổng số gói phát hành kỹ thuật trong kỳ",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
         "min_sample": 5
       },
       "thresholds": {
-        "green": "≥95%",
-        "yellow": "88–94.99%",
-        "red": "<88%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95.0,
+        "yellow_point": 88.0,
+        "target": 95.0,
         "basis": "Phát hành kỹ thuật đúng hạn chuẩn ≥95%; dưới 88% gây trễ chuỗi sau. Căn cứ thực tiễn quản lý kỹ thuật."
       },
       "data_source": {
@@ -928,16 +964,18 @@
       "formula": {
         "numerator": "Số ECO đang mở có (ngày hiện tại - created_at) vượt ngưỡng tuổi",
         "denominator": "Tổng số ECO đang mở",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "Tính theo ngày mở, không theo ngày đóng",
         "direction": "lower_is_better",
         "min_sample": 5
       },
       "thresholds": {
-        "green": "≤10%",
-        "yellow": "10.01–25%",
-        "red": ">25%",
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 10.0,
+        "yellow_point": 25.0,
+        "target": 10.0,
         "basis": "ECO tồn quá tuổi nên ≤10%; >25% là tồn đọng kỹ thuật. Tính theo SỐ NGÀY từ ngày MỞ ECO."
       },
       "data_source": {
@@ -975,16 +1013,18 @@
       "formula": {
         "numerator": "Số NCR đang mở có (ngày hiện tại - created_at) vượt ngưỡng tuổi",
         "denominator": "Tổng số NCR đang mở",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "Tính theo ngày mở (created_at), không theo ngày đóng",
         "direction": "lower_is_better",
         "min_sample": 5
       },
       "thresholds": {
-        "green": "≤10%",
-        "yellow": "10.01–25%",
-        "red": ">25%",
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 10.0,
+        "yellow_point": 25.0,
+        "target": 10.0,
         "basis": "NCR tồn quá tuổi nên ≤10%; >25% cho thấy CAPA tắc. Tính theo SỐ NGÀY từ ngày MỞ NCR (chống dồn đóng cuối kỳ cho số đẹp)."
       },
       "data_source": {
@@ -1022,16 +1062,18 @@
       "formula": {
         "numerator": "Số thiết bị có lần hiệu chuẩn mới nhất calibration_date <= calibration_due",
         "denominator": "Tổng số thiết bị đang hoạt động có calibration_due trong kỳ",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
         "min_sample": 0
       },
       "thresholds": {
-        "green": "100%",
-        "yellow": "98–99.99%",
-        "red": "<98%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100.0,
+        "yellow_point": 98.0,
+        "target": 100.0,
         "basis": "Tuân thủ hiệu chuẩn phải 100% — thiết bị đo quá hạn làm vô hiệu mọi kết quả đo. Căn cứ ISO 10012 + IATF 16949 §7.1.5."
       },
       "data_source": {
@@ -1071,16 +1113,18 @@
       "formula": {
         "numerator": "Số lệnh sản xuất trong lịch có đủ vật tư sẵn sàng trước freeze",
         "denominator": "Tổng số lệnh sản xuất trong lịch đã khoá",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
         "min_sample": 10
       },
       "thresholds": {
-        "green": "≥95%",
-        "yellow": "85–94.99%",
-        "red": "<85%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95.0,
+        "yellow_point": 85.0,
+        "target": 95.0,
         "basis": "Sẵn sàng vật tư cho lịch đã khoá nên ≥95%; dưới 85% gây dừng chuyền. Căn cứ thực tiễn MRP/Lean."
       },
       "data_source": {
@@ -1118,16 +1162,18 @@
       "formula": {
         "numerator": "Số dòng cycle-count có số đếm khớp số hệ thống",
         "denominator": "Tổng số dòng cycle-count thực hiện trong kỳ",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
         "min_sample": 20
       },
       "thresholds": {
-        "green": "≥98%",
-        "yellow": "95–97.99%",
-        "red": "<95%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 98.0,
+        "yellow_point": 95.0,
+        "target": 98.0,
         "basis": "Độ chính xác tồn kho chuẩn ≥98%; dưới 95% làm sai kế hoạch vật tư. Căn cứ thực tiễn cycle-count."
       },
       "data_source": {
@@ -1165,17 +1211,20 @@
       "formula": {
         "numerator": "Số RFQ chuyển thành đơn hàng trong kỳ",
         "denominator": "Tổng số RFQ đủ năng lực được báo giá trong kỳ",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "RFQ ngoài năng lực không tính vào mẫu số",
         "direction": "higher_is_better",
         "min_sample": 10
       },
       "thresholds": {
-        "green": "≥35%",
-        "yellow": "25–34.99%",
-        "red": "<25%",
-        "basis": "Tỷ lệ trúng báo giá trên RFQ đủ năng lực ngành CNC ~25–35%; dưới 25% cần soát định giá/năng lực. Mẫu số CHỈ tính RFQ đủ năng lực (chống chọn RFQ dễ)."
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 35.0,
+        "yellow_point": 25.0,
+        "target": 35.0,
+        "basis": "Tỷ lệ trúng báo giá trên RFQ đủ năng lực ngành CNC ~25–35%; dưới 25% cần soát định giá/năng lực. Mẫu số CHỈ tính RFQ đủ năng lực (chống chọn RFQ dễ).",
+        "calibration_pending": true
       },
       "data_source": {
         "system": "ERP",
@@ -1213,16 +1262,18 @@
       "formula": {
         "numerator": "Số trao đổi khách hàng đóng trong SLA",
         "denominator": "Tổng số trao đổi khách hàng trong kỳ",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
         "min_sample": 5
       },
       "thresholds": {
-        "green": "≥95%",
-        "yellow": "85–94.99%",
-        "red": "<85%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95.0,
+        "yellow_point": 85.0,
+        "target": 95.0,
         "basis": "Đóng trao đổi khách đúng hạn nên ≥95%; căn cứ thực tiễn dịch vụ khách hàng."
       },
       "data_source": {
@@ -1261,16 +1312,18 @@
       "formula": {
         "numerator": "Số hóa đơn không có lỗi (error_count = 0) trong kỳ",
         "denominator": "Tổng số hóa đơn phát hành trong kỳ",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
         "min_sample": 10
       },
       "thresholds": {
-        "green": "≥98%",
-        "yellow": "95–97.99%",
-        "red": "<95%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 98.0,
+        "yellow_point": 95.0,
+        "target": 98.0,
         "basis": "Hóa đơn đúng ngay lần đầu chuẩn ≥98%; lỗi hóa đơn kéo dài DSO. Căn cứ thực tiễn order-to-cash."
       },
       "data_source": {
@@ -1308,16 +1361,18 @@
       "formula": {
         "numerator": "Số bước đóng sổ hoàn tất đúng lịch",
         "denominator": "Tổng số bước trong lịch đóng sổ cuối tháng",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
         "min_sample": 0
       },
       "thresholds": {
-        "green": "100%",
-        "yellow": "90–99.99%",
-        "red": "<90%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100.0,
+        "yellow_point": 90.0,
+        "target": 100.0,
         "basis": "Đóng sổ cuối tháng đúng lịch phải 100% các bước; chậm làm trễ báo cáo điều hành. Căn cứ thực tiễn kế toán."
       },
       "data_source": {
@@ -1356,16 +1411,18 @@
       "formula": {
         "numerator": "Số bản ghi đào tạo có assessment_result thuộc ('Pass','Conditional')",
         "denominator": "Tổng số bản ghi đào tạo trong kỳ",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
         "min_sample": 5
       },
       "thresholds": {
-        "green": "≥95%",
-        "yellow": "85–94.99%",
-        "red": "<85%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95.0,
+        "yellow_point": 85.0,
+        "target": 95.0,
         "basis": "Hoàn thành đào tạo đúng hạn chuẩn ≥95%; dưới 85% gây rủi ro năng lực. Căn cứ IATF 16949 §7.2 competence."
       },
       "data_source": {
@@ -1403,16 +1460,18 @@
       "formula": {
         "numerator": "Số vai trò trọng yếu có ít nhất một người dự phòng được chứng nhận còn hiệu lực",
         "denominator": "Tổng số vai trò trọng yếu",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
         "min_sample": 0
       },
       "thresholds": {
-        "green": "100%",
-        "yellow": "85–99.99%",
-        "red": "<85%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100.0,
+        "yellow_point": 85.0,
+        "target": 100.0,
         "basis": "Bao phủ dự phòng vai trò trọng yếu phải 100%; dưới 85% là rủi ro phụ thuộc người. Căn cứ ANNEX-123 ma trận phó/dự phòng."
       },
       "data_source": {
@@ -1452,16 +1511,18 @@
       "formula": {
         "numerator": "Số hành động sự cố đang mở có (ngày hiện tại - created_at) vượt ngưỡng tuổi",
         "denominator": "Tổng số hành động sự cố đang mở",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "Tính theo ngày mở hành động",
         "direction": "lower_is_better",
         "min_sample": 5
       },
       "thresholds": {
-        "green": "≤10%",
-        "yellow": "10.01–25%",
-        "red": ">25%",
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 10.0,
+        "yellow_point": 25.0,
+        "target": 10.0,
         "basis": "Hành động sự cố tồn quá tuổi nên ≤10%; >25% là rủi ro an toàn tích tụ. Tính theo SỐ NGÀY từ ngày MỞ hành động."
       },
       "data_source": {
@@ -1499,16 +1560,18 @@
       "formula": {
         "numerator": "Số nhân sự mới hoàn thành đào tạo an toàn hội nhập đúng hạn",
         "denominator": "Tổng số nhân sự mới trong kỳ",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
         "min_sample": 0
       },
       "thresholds": {
-        "green": "100%",
-        "yellow": "95–99.99%",
-        "red": "<95%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 100.0,
+        "yellow_point": 95.0,
+        "target": 100.0,
         "basis": "Đào tạo an toàn hội nhập phải 100% trước khi vào xưởng; dưới 95% là rủi ro an toàn trực tiếp. Căn cứ OSHA/luật lao động."
       },
       "data_source": {
@@ -1547,16 +1610,18 @@
       "formula": {
         "numerator": "Số phiếu dịch vụ đóng trong SLA",
         "denominator": "Tổng số phiếu dịch vụ trong kỳ",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
         "min_sample": 5
       },
       "thresholds": {
-        "green": "≥95%",
-        "yellow": "85–94.99%",
-        "red": "<85%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 95.0,
+        "yellow_point": 85.0,
+        "target": 95.0,
         "basis": "Đóng phiếu dịch vụ IT trong SLA chuẩn ≥95%; căn cứ thực tiễn ITSM."
       },
       "data_source": {
@@ -1595,16 +1660,18 @@
       "formula": {
         "numerator": "Tổng thời gian hệ thống trọng yếu sẵn sàng trong kỳ",
         "denominator": "Tổng thời gian theo lịch của hệ thống trọng yếu",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "Bảo trì kế hoạch không tính là downtime",
         "direction": "higher_is_better",
         "min_sample": 0
       },
       "thresholds": {
-        "green": "≥99.5%",
-        "yellow": "98–99.49%",
-        "red": "<98%",
+        "direction": "higher_is_better",
+        "unit": "percent",
+        "green_point": 99.5,
+        "yellow_point": 98.0,
+        "target": 99.5,
         "basis": "Sẵn sàng hệ thống trọng yếu chuẩn ≥99.5%; dưới 98% gây gián đoạn vận hành. Bảo trì kế hoạch KHÔNG tính là downtime. Căn cứ thực tiễn SLA hạ tầng."
       },
       "data_source": {
@@ -1642,16 +1709,18 @@
       "formula": {
         "numerator": "Số ngoại lệ dữ liệu đang mở có (ngày hiện tại - created_at) vượt ngưỡng tuổi",
         "denominator": "Tổng số ngoại lệ dữ liệu đang mở",
-        "unit": "%",
+        "unit": "percent",
         "rounding": "round to 2 decimals",
         "exclusions": "Tính theo ngày mở ngoại lệ",
         "direction": "lower_is_better",
         "min_sample": 5
       },
       "thresholds": {
-        "green": "≤10%",
-        "yellow": "10.01–25%",
-        "red": ">25%",
+        "direction": "lower_is_better",
+        "unit": "percent",
+        "green_point": 10.0,
+        "yellow_point": 25.0,
+        "target": 10.0,
         "basis": "Ngoại lệ dữ liệu gốc tồn quá tuổi nên ≤10%; >25% làm sai giao dịch hạ nguồn. Tính theo SỐ NGÀY từ ngày MỞ ngoại lệ."
       },
       "data_source": {
@@ -3422,5 +3491,19 @@
     "calculation_endpoint": "GET /api/kpi/{metricCode}",
     "trend_endpoint": "GET /api/kpi/{metricCode}/trend",
     "rule": "Calculation endpoints are allowed only for runtime_calculated_metrics after alias normalization. Known non-runtime metrics must return catalog coverage and data-contract status, not a fake value."
+  },
+  "threshold_schema": {
+    "version": 1,
+    "fields": [
+      "direction",
+      "unit",
+      "green_point",
+      "yellow_point",
+      "target",
+      "basis"
+    ],
+    "rag_logic_higher_is_better": "GREEN if value>=green_point; YELLOW if value>=yellow_point; else RED",
+    "rag_logic_lower_is_better": "GREEN if value<=green_point; YELLOW if value<=yellow_point; else RED",
+    "note": "All threshold bounds are numeric so RAG status, gap (value-target), achievement (value/target), scorecard score and trend roll-up are computed arithmetically. Display strings are derived, never stored."
   }
 }

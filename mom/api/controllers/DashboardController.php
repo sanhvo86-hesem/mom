@@ -28,6 +28,7 @@ final class DashboardController extends BaseController
     private DashboardService $dashboard;
     private KpiEngine        $kpi;
     private SpcEngine        $spc;
+    private Connection       $db;
 
     private function analyticsReadRoles(): array
     {
@@ -120,6 +121,7 @@ final class DashboardController extends BaseController
         parent::__construct($data, $rootDir, $dataDir);
 
         $db = Connection::getInstance();
+        $this->db        = $db;
         $this->kpi       = new KpiEngine($db);
         $this->spc       = new SpcEngine($db);
         $this->dashboard = new DashboardService($dataDir, $db, $this->kpi, $this->spc);
@@ -423,6 +425,135 @@ final class DashboardController extends BaseController
         $this->requireAnyRole($user, $this->analyticsReadRoles());
         $alerts = $this->kpi->getKpiAlerts();
         $this->success(['alerts' => $alerts, 'count' => count($alerts)]);
+    }
+
+    // ── KPI manual data-input endpoints ──────────────────────────────────────
+    // Every KPI in the governed registry exposes a data-input endpoint a
+    // frontend can POST to. Runtime KPIs are computed from the DB; staged /
+    // manual KPIs are fed through this endpoint, which writes kpi_manual_inputs
+    // — the surface KpiEngine reads for non-runtime KPIs. The endpoint validates
+    // metric_code against the registry (SSOT), never a hardcoded list. The
+    // input frontend module is not built yet; these endpoints are wired and
+    // waiting.
+
+    /** Read the KPI code from a body, a query param, or a REST path param. */
+    private function kpiInputCode(array $body = []): string
+    {
+        $code = (string) ($body['metric_code'] ?? '');
+        if ($code === '') {
+            $code = (string) $this->query('metric_code', (string) $this->query('metricCode', ''));
+        }
+        return strtoupper(trim($code));
+    }
+
+    /**
+     * POST /api/kpi/{metricCode}/input  (?action=kpi_input_save)
+     * Body: {metric_code, period_start, period_end, value, unit?, breakdown?,
+     *        evidence_reference?, notes?, input_status?}
+     */
+    public function kpiInputSave(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAnyRole($user, $this->executiveDashboardRoles());
+
+        $body = $this->jsonBody();
+        $code = $this->kpiInputCode($body);
+        if ($code === '') {
+            $this->error('missing_metric_code', 400);
+        }
+
+        $support = $this->kpi->describeMetricSupport($code);
+        if (($support['known_metric'] ?? false) !== true) {
+            $this->error('unknown_kpi_metric', 404,
+                'Metric code is not in the governed KPI registry.', ['metric_support' => $support]);
+        }
+
+        $this->requireFields($body, ['period_start', 'period_end', 'value']);
+        $periodStart = trim((string) $body['period_start']);
+        $periodEnd   = trim((string) $body['period_end']);
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $periodStart)
+            || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $periodEnd)) {
+            $this->error('invalid_period', 400, 'period_start and period_end must be YYYY-MM-DD.');
+        }
+        if (!is_numeric($body['value'])) {
+            $this->error('invalid_value', 400, 'value must be numeric.');
+        }
+        $statusIn = (string) ($body['input_status'] ?? 'submitted');
+        if (!in_array($statusIn, ['draft', 'submitted', 'verified'], true)) {
+            $statusIn = 'submitted';
+        }
+        $breakdown = $body['breakdown'] ?? [];
+        if (!is_array($breakdown)) {
+            $breakdown = [];
+        }
+
+        try {
+            $row = $this->db->insertReturning(
+                "INSERT INTO kpi_manual_inputs
+                    (metric_code, period_start, period_end, value, unit, breakdown,
+                     evidence_reference, input_status, notes, entered_by)
+                 VALUES
+                    (:c, :ps, :pe, :v, :u, :b::jsonb, :ev, :st, :n, :by)
+                 RETURNING input_id, entered_at",
+                [
+                    ':c'  => $code,
+                    ':ps' => $periodStart,
+                    ':pe' => $periodEnd,
+                    ':v'  => (float) $body['value'],
+                    ':u'  => isset($body['unit']) ? (string) $body['unit'] : null,
+                    ':b'  => json_encode($breakdown, JSON_UNESCAPED_UNICODE),
+                    ':ev' => isset($body['evidence_reference']) ? (string) $body['evidence_reference'] : null,
+                    ':st' => $statusIn,
+                    ':n'  => isset($body['notes']) ? (string) $body['notes'] : null,
+                    ':by' => (string) ($user['username'] ?? 'unknown'),
+                ],
+            );
+            $this->auditLog('kpi_input_save', [
+                'metric_code' => $code,
+                'period'      => $periodStart . '..' . $periodEnd,
+            ], (string) ($user['username'] ?? 'unknown'));
+            $this->success([
+                'saved'       => true,
+                'metric_code' => $code,
+                'input'       => $row,
+            ]);
+        } catch (\Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('kpi_input_save_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * GET /api/kpi/{metricCode}/input  (?action=kpi_input_list)
+     */
+    public function kpiInputList(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, $this->analyticsReadRoles());
+        $code = $this->kpiInputCode();
+        if ($code === '') {
+            $this->error('missing_metric_code', 400);
+        }
+        try {
+            $rows = $this->db->query(
+                "SELECT input_id, metric_code, period_start, period_end, value, unit,
+                        input_status, evidence_reference, notes, entered_by, entered_at
+                 FROM kpi_manual_inputs
+                 WHERE metric_code = :c
+                 ORDER BY period_end DESC, entered_at DESC
+                 LIMIT 200",
+                [':c' => $code],
+            );
+            $this->success([
+                'metric_code' => $code,
+                'inputs'      => $rows,
+                'count'       => count($rows),
+            ]);
+        } catch (\Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('kpi_input_list_failed', 500, $e->getMessage());
+        }
     }
 
     // â”€â”€ SPC Endpoints â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€

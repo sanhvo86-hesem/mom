@@ -245,11 +245,23 @@ final class KpiRegistryAdminService
             }
             $seen[$code] = true;
 
+            // Numeric threshold schema (SSOT): green_point + yellow_point must
+            // be present and numeric, and ordered consistently with direction.
             $t = $row['thresholds'] ?? null;
-            if (!is_array($t) || trim((string) ($t['green'] ?? '')) === ''
-                || trim((string) ($t['yellow'] ?? '')) === ''
-                || trim((string) ($t['red'] ?? '')) === '') {
+            if (!is_array($t) || !is_numeric($t['green_point'] ?? null)
+                || !is_numeric($t['yellow_point'] ?? null)) {
                 throw new RuntimeException('kpi_registry_threshold_incomplete:' . $code);
+            }
+            $gp = (float) $t['green_point'];
+            $yp = (float) $t['yellow_point'];
+            $dir = (string) ($t['direction'] ?? 'higher_is_better');
+            if ($dir === 'higher_is_better' && $gp < $yp) {
+                throw new RuntimeException('kpi_registry_threshold_order:' . $code
+                    . ' (higher_is_better needs green_point >= yellow_point)');
+            }
+            if ($dir === 'lower_is_better' && $gp > $yp) {
+                throw new RuntimeException('kpi_registry_threshold_order:' . $code
+                    . ' (lower_is_better needs green_point <= yellow_point)');
             }
 
             if (($row['reward_eligible'] ?? false) === true) {
@@ -271,7 +283,13 @@ final class KpiRegistryAdminService
         if ($field === 'thresholds') {
             $out = [];
             if (is_array($value)) {
-                foreach (['green', 'yellow', 'red', 'basis'] as $k) {
+                // Numeric bounds — coerce to float so the SSOT stays numeric.
+                foreach (['green_point', 'yellow_point', 'target'] as $k) {
+                    if (isset($value[$k]) && is_numeric($value[$k])) {
+                        $out[$k] = (float) $value[$k];
+                    }
+                }
+                foreach (['direction', 'unit', 'basis'] as $k) {
                     if (isset($value[$k])) {
                         $out[$k] = $this->plainText((string) $value[$k]);
                     }
@@ -444,9 +462,10 @@ final class KpiRegistryAdminService
             $formula .= '<br><span class="mini-note">Cỡ mẫu tối thiểu: ' . $e($f['min_sample']) . '</span>';
         }
 
-        $thresholds = '<span class="kpi-good" style="padding:1px 5px;border-radius:4px">Xanh ' . $e($t['green'] ?? '') . '</span><br>'
-            . '<span class="kpi-warn" style="padding:1px 5px;border-radius:4px">Vàng ' . $e($t['yellow'] ?? '') . '</span><br>'
-            . '<span class="kpi-bad" style="padding:1px 5px;border-radius:4px">Đỏ ' . $e($t['red'] ?? '') . '</span>';
+        [$tg, $ty, $tr] = $this->thresholdDisplay($t);
+        $thresholds = '<span class="kpi-good" style="padding:1px 5px;border-radius:4px">Xanh ' . $e($tg) . '</span><br>'
+            . '<span class="kpi-warn" style="padding:1px 5px;border-radius:4px">Vàng ' . $e($ty) . '</span><br>'
+            . '<span class="kpi-bad" style="padding:1px 5px;border-radius:4px">Đỏ ' . $e($tr) . '</span>';
         if (!empty($t['basis'])) {
             $thresholds .= '<br><span class="mini-note">Căn cứ: ' . $e($t['basis']) . '</span>';
         }
@@ -500,6 +519,35 @@ final class KpiRegistryAdminService
             . '<td>' . $formula . '</td><td class="nowrap">' . $thresholds . '</td>'
             . '<td>' . $owner . '</td><td>' . $src . '</td><td>' . $cadenceCell . '</td>'
             . '<td>' . $decision . '</td></tr>';
+    }
+
+    /**
+     * Derive (green, yellow, red) display strings from the numeric threshold
+     * schema. Must stay byte-identical to the Python stage generator's
+     * _threshold_display so a Console save and a stage regeneration produce
+     * the same ANNEX-122.
+     *
+     * @param array<string, mixed> $t
+     * @return array{0: string, 1: string, 2: string}
+     */
+    private function thresholdDisplay(array $t): array
+    {
+        if (!isset($t['green_point'], $t['yellow_point'])) {
+            return [(string) ($t['green'] ?? ''), (string) ($t['yellow'] ?? ''), (string) ($t['red'] ?? '')];
+        }
+        $suffix = [
+            'percent' => '%', 'ppm' => ' ppm', 'day' => ' ngày',
+            'rate' => '', 'ratio' => '', 'count' => '', 'vnd' => ' ₫',
+        ];
+        $suf = $suffix[(string) ($t['unit'] ?? '')] ?? '';
+        // %g matches Python's "%g" formatting (95.0→"95", 99.5→"99.5").
+        $num = static fn(mixed $x): string => sprintf('%g', (float) $x);
+        $g = $num($t['green_point']);
+        $y = $num($t['yellow_point']);
+        if (($t['direction'] ?? '') === 'lower_is_better') {
+            return ["≤ {$g}{$suf}", ">{$g} – ≤{$y}{$suf}", "> {$y}{$suf}"];
+        }
+        return ["≥ {$g}{$suf}", "{$y} – <{$g}{$suf}", "< {$y}{$suf}"];
     }
 
     private function roleLink(string $code): string

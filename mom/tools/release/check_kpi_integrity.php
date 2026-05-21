@@ -16,8 +16,9 @@ declare(strict_types=1);
  * P0 findings (block deploy)
  * ──────────────────────────
  *   1. ANNEX-122 governance KPI codes (data-kpi-code) ≠ registry codes.
- *   2. A governance KPI is missing formula / thresholds (green+yellow+red) /
- *      owner_role / data_source / calculation_status / decision_action.
+ *   2. A governance KPI is missing formula / numeric thresholds
+ *      (green_point + yellow_point, ordered by direction) / owner_role /
+ *      data_source / calculation_status / decision_action.
  *   3. calculation_status=runtime_calculated but the code is absent from
  *      registry.runtime_calculated_metrics or from KpiEngine.php.
  *   4. Duplicate canonical_code among governance KPIs.
@@ -126,12 +127,23 @@ foreach ($governance as $row) {
             $p0[] = "Registry $code: missing '$field'.";
         }
     }
+    // Numeric threshold schema (SSOT): green_point + yellow_point must be
+    // numbers, ordered consistently with direction, so RAG/trend/scorecard
+    // roll-up is pure arithmetic.
     $t = $row['thresholds'] ?? null;
-    if (!is_array($t)
-        || trim((string) ($t['green'] ?? '')) === ''
-        || trim((string) ($t['yellow'] ?? '')) === ''
-        || trim((string) ($t['red'] ?? '')) === '') {
-        $p0[] = "Registry $code: thresholds incomplete (need green, yellow, red).";
+    if (!is_array($t) || !is_numeric($t['green_point'] ?? null)
+        || !is_numeric($t['yellow_point'] ?? null)) {
+        $p0[] = "Registry $code: thresholds not numeric (need green_point + yellow_point).";
+    } else {
+        $gp = (float) $t['green_point'];
+        $yp = (float) $t['yellow_point'];
+        $dir = (string) ($t['direction'] ?? 'higher_is_better');
+        if ($dir === 'higher_is_better' && $gp < $yp) {
+            $p0[] = "Registry $code: higher_is_better needs green_point >= yellow_point ($gp < $yp).";
+        }
+        if ($dir === 'lower_is_better' && $gp > $yp) {
+            $p0[] = "Registry $code: lower_is_better needs green_point <= yellow_point ($gp > $yp).";
+        }
     }
 
     // ── P0.3 — runtime_calculated must be wired to the engine ────────────────

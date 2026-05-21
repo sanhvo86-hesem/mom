@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-05-21T18:53:47+00:00",
+    "generated_at": "2026-05-21T19:41:47+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
     "registry_version": "2026-05-21",
@@ -2618,7 +2618,7 @@
             ],
             "governance_signals": {
                 "evaluation_terms": 16,
-                "recognition_terms": 13,
+                "recognition_terms": 12,
                 "discipline_or_corrective_terms": 39,
                 "action_ownership_terms": 93,
                 "has_evaluation": true,

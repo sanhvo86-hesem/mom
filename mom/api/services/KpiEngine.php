@@ -332,6 +332,8 @@ final class KpiEngine
 
     private Connection $db;
     private ?array $kpiAuthorityRegistry = null;
+    /** @var array<string, array{green_point: float, yellow_point: float, target: float, direction: string, unit: string}>|null */
+    private ?array $governanceThresholdMap = null;
 
     // ── Construction ────────────────────────────────────────────────────────
 
@@ -353,6 +355,15 @@ final class KpiEngine
     public function calculateKpi(string $metricCode, DateRange $period, array $filters = []): KpiResult
     {
         $metricCode = $this->normalizeMetricCode($metricCode);
+
+        // Non-runtime (staged / manual) KPI — there is no calc* function. Read
+        // the latest manually-entered data point from kpi_manual_inputs (the
+        // KPI data-input API writes there). The metric still resolves to a
+        // real KpiResult instead of throwing.
+        if (!in_array($metricCode, self::ALL_METRICS, true)) {
+            return $this->calculateFromManualInput($metricCode, $period);
+        }
+
         $calculator = $this->getCalculator($metricCode);
         $breakdown  = $calculator($period, $filters);
 
@@ -390,6 +401,82 @@ final class KpiEngine
             periodEnd:    $period->end,
             calculatedAt: gmdate('c'),
         );
+    }
+
+    /**
+     * Resolve a non-runtime (staged / manual) KPI from its latest manual
+     * data point in kpi_manual_inputs. When no input exists the result is
+     * grey and carries the input_endpoint so a frontend knows where to POST.
+     */
+    private function calculateFromManualInput(string $metricCode, DateRange $period): KpiResult
+    {
+        $rt     = $this->registryGovernanceThresholds($metricCode);
+        $unit   = $rt['unit'] ?? (self::UNITS[$metricCode] ?? '%');
+        $target = $this->getKpiTarget($metricCode);
+
+        $row = null;
+        try {
+            $row = $this->db->queryOne(
+                "SELECT value, unit, breakdown, input_status, entered_at, entered_by
+                 FROM kpi_manual_inputs
+                 WHERE metric_code = :code
+                   AND input_status <> 'superseded'
+                   AND period_start >= :s AND period_end <= :e
+                 ORDER BY period_end DESC, entered_at DESC
+                 LIMIT 1",
+                [':code' => $metricCode, ':s' => $period->start, ':e' => $period->end],
+            );
+        } catch (\Throwable) {
+            $row = null;
+        }
+
+        if ($row === null) {
+            return new KpiResult(
+                metricCode:   $metricCode,
+                value:        0.0,
+                unit:         $unit,
+                target:       $target,
+                status:       KpiStatus::GREY,
+                breakdown:    [
+                    'value'           => 0,
+                    'no_manual_input' => true,
+                    'data_source'     => 'manual_input',
+                    'input_endpoint'  => $this->inputEndpoint($metricCode),
+                    'note'            => 'No manual input for this period — the KPI '
+                        . 'data-input endpoint is wired and waiting for a frontend POST.',
+                ],
+                periodStart:  $period->start,
+                periodEnd:    $period->end,
+                calculatedAt: gmdate('c'),
+            );
+        }
+
+        $value  = (float) $row['value'];
+        $status = $this->evaluateStatus($metricCode, $value, $target);
+
+        return new KpiResult(
+            metricCode:   $metricCode,
+            value:        $value,
+            unit:         (string) ($row['unit'] ?? '') !== '' ? (string) $row['unit'] : $unit,
+            target:       $target,
+            status:       $status,
+            breakdown:    [
+                'value'        => $value,
+                'data_source'  => 'manual_input',
+                'input_status' => $row['input_status'] ?? null,
+                'entered_by'   => $row['entered_by'] ?? null,
+                'entered_at'   => $row['entered_at'] ?? null,
+            ],
+            periodStart:  $period->start,
+            periodEnd:    $period->end,
+            calculatedAt: gmdate('c'),
+        );
+    }
+
+    /** Action-route a frontend uses to POST a manual data point for a KPI. */
+    public function inputEndpoint(string $metricCode): string
+    {
+        return 'POST /api/kpi/' . strtoupper(trim($metricCode)) . '/input';
     }
 
     /**
@@ -644,6 +731,13 @@ final class KpiEngine
     public function getKpiTarget(string $metricCode): float
     {
         $metricCode = $this->normalizeMetricCode($metricCode);
+
+        // The registry numeric threshold is the SSOT target for a governance KPI.
+        $rt = $this->registryGovernanceThresholds($metricCode);
+        if ($rt !== null) {
+            return $rt['target'];
+        }
+
         try {
             $row = $this->db->queryOne(
                 'SELECT target FROM kpi_definitions WHERE metric_code = :code AND is_active = TRUE',
@@ -1614,31 +1708,77 @@ final class KpiEngine
 
     /**
      * Evaluate RAG status for a metric value vs target.
+     *
+     * A governance KPI carries numeric thresholds in the registry
+     * (thresholds.green_point / yellow_point / direction) — the SSOT. RAG is
+     * then pure arithmetic. Pure-runtime operating metrics without a registry
+     * threshold fall back to the target ± yellow-band heuristic.
      */
     private function evaluateStatus(string $metricCode, float $value, float $target): KpiStatus
     {
+        $rt = $this->registryGovernanceThresholds($metricCode);
+        if ($rt !== null) {
+            $green  = $rt['green_point'];
+            $yellow = $rt['yellow_point'];
+            if ($rt['direction'] === 'lower_is_better') {
+                if ($value <= $green) {
+                    return KpiStatus::GREEN;
+                }
+                return $value <= $yellow ? KpiStatus::YELLOW : KpiStatus::RED;
+            }
+            if ($value >= $green) {
+                return KpiStatus::GREEN;
+            }
+            return $value >= $yellow ? KpiStatus::YELLOW : KpiStatus::RED;
+        }
+
         if ($target === 0.0) {
             return KpiStatus::GREY;
         }
 
         $lowerBetter = in_array($metricCode, self::LOWER_IS_BETTER, true);
-
-        // Load thresholds from definition if available
         $yellowThreshold = $this->getYellowThreshold($metricCode, $target);
 
         if ($lowerBetter) {
-            // Lower is better: green if value <= target
             if ($value <= $target) {
                 return KpiStatus::GREEN;
             }
             return $value <= $yellowThreshold ? KpiStatus::YELLOW : KpiStatus::RED;
         }
 
-        // Higher is better: green if value >= target
         if ($value >= $target) {
             return KpiStatus::GREEN;
         }
         return $value >= $yellowThreshold ? KpiStatus::YELLOW : KpiStatus::RED;
+    }
+
+    /**
+     * Numeric thresholds authored for a governance KPI in the registry.
+     * Returns null when the code is not a governance KPI.
+     *
+     * @return array{green_point: float, yellow_point: float, target: float, direction: string, unit: string}|null
+     */
+    private function registryGovernanceThresholds(string $metricCode): ?array
+    {
+        $code = strtoupper(trim($metricCode));
+        if ($this->governanceThresholdMap === null) {
+            $this->governanceThresholdMap = [];
+            foreach ($this->registryRows($this->loadKpiAuthorityRegistry(), 'annex122_governance_kpis') as $row) {
+                $rc = $this->codeField($row, 'canonical_code');
+                $t = $row['thresholds'] ?? null;
+                if ($rc === '' || !is_array($t) || !isset($t['green_point'], $t['yellow_point'])) {
+                    continue;
+                }
+                $this->governanceThresholdMap[$rc] = [
+                    'green_point'  => (float) $t['green_point'],
+                    'yellow_point' => (float) $t['yellow_point'],
+                    'target'       => (float) ($t['target'] ?? $t['green_point']),
+                    'direction'    => (string) ($t['direction'] ?? 'higher_is_better'),
+                    'unit'         => (string) ($t['unit'] ?? ''),
+                ];
+            }
+        }
+        return $this->governanceThresholdMap[$code] ?? null;
     }
 
     /**
@@ -2386,6 +2526,12 @@ final class KpiEngine
             'calculation_status' => $calculationStatus,
             'calculation_endpoint' => $runtimeCalculated ? "GET /api/kpi/{$code}" : null,
             'catalog_endpoint' => 'GET /api/kpi/catalog',
+            // Every KPI exposes a data-input endpoint a frontend can POST to.
+            // Runtime KPIs read from GET; staged/manual KPIs are fed through
+            // this POST. The endpoint is derived from the code (SSOT) — never
+            // hardcoded per metric.
+            'input_endpoint' => "POST /api/kpi/{$code}/input",
+            'input_list_endpoint' => "GET /api/kpi/{$code}/input",
             'primary_endpoint' => $primaryEndpoint !== '' ? $primaryEndpoint : 'GET /api/kpi/catalog',
             'source_system' => $this->overrideOrDefault($override, 'source_system', 'approved MOM/MES/EQMS/ERP read model or staged data contract'),
             'source_table_or_record' => $this->overrideOrDefault($override, 'source_table_or_record', 'approved source table, event record, or staged data contract'),

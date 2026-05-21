@@ -140,8 +140,26 @@ function _setThreshold(code, key, value){
   var cur = (_state.overrides[code] && _state.overrides[code].thresholds)
     ? _state.overrides[code].thresholds
     : Object.assign({}, kpi.thresholds || {});
-  cur[key] = value;
+  // green_point / yellow_point / target are numeric SSOT fields.
+  if(key === 'green_point' || key === 'yellow_point' || key === 'target'){
+    var n = parseFloat(value);
+    cur[key] = isNaN(n) ? value : n;
+  } else {
+    cur[key] = value;
+  }
   _setField(code, 'thresholds', cur);
+}
+
+/* Derive (green,yellow,red) display bands from numeric thresholds — mirrors
+   the registry-render logic so the editor preview matches ANNEX-122. */
+function _ragBands(t){
+  if(!t || t.green_point == null || t.yellow_point == null) return null;
+  var suf = {percent:'%',ppm:' ppm',day:' ngày',rate:'',ratio:'',count:'',vnd:' ₫'}[t.unit] || '';
+  var g = t.green_point, y = t.yellow_point;
+  if(t.direction === 'lower_is_better'){
+    return {green:'≤ '+g+suf, yellow:'>'+g+' – ≤'+y+suf, red:'> '+y+suf};
+  }
+  return {green:'≥ '+g+suf, yellow:y+' – <'+g+suf, red:'< '+y+suf};
 }
 function _setReason(value){ _state.reason = value; }
 function _reset(){
@@ -319,16 +337,17 @@ function _renderEditCard(kpi){
     (kpi.calculation_status === 'staged_data_contract'
       ? '<div class="kc-warn">' + _t('KPI chưa có hợp đồng dữ liệu — số liệu hiển thị là tạm.', 'KPI has no data contract yet — values shown are provisional.') + '</div>'
       : '') +
+    _ragPreview(kpi) +
     '<div class="kc-grid">' +
-      _field(_t('Ngưỡng xanh', 'Green threshold'),
-        '<input class="kc-input" type="text" value="' + c(_threshold(kpi,'green')) +
-        '" oninput="_kpiSetThreshold(\'' + c(code) + '\',\'green\',this.value)">') +
-      _field(_t('Ngưỡng vàng', 'Yellow threshold'),
-        '<input class="kc-input" type="text" value="' + c(_threshold(kpi,'yellow')) +
-        '" oninput="_kpiSetThreshold(\'' + c(code) + '\',\'yellow\',this.value)">') +
-      _field(_t('Ngưỡng đỏ', 'Red threshold'),
-        '<input class="kc-input" type="text" value="' + c(_threshold(kpi,'red')) +
-        '" oninput="_kpiSetThreshold(\'' + c(code) + '\',\'red\',this.value)">') +
+      _field(_t('Điểm xanh (green_point)', 'Green point'),
+        '<input class="kc-input" type="number" step="any" value="' + c(_threshold(kpi,'green_point')) +
+        '" oninput="_kpiSetThreshold(\'' + c(code) + '\',\'green_point\',this.value)">') +
+      _field(_t('Điểm vàng (yellow_point)', 'Yellow point'),
+        '<input class="kc-input" type="number" step="any" value="' + c(_threshold(kpi,'yellow_point')) +
+        '" oninput="_kpiSetThreshold(\'' + c(code) + '\',\'yellow_point\',this.value)">') +
+      _field(_t('Chiều / đơn vị', 'Direction / unit'),
+        '<input class="kc-input" type="text" disabled value="' +
+        c((_threshold(kpi,'direction')||'') + ' · ' + (_threshold(kpi,'unit')||'')) + '">') +
       _field(_t('Owner', 'Owner'),
         '<select class="kc-input" onchange="_kpiSetField(\'' + c(code) + '\',\'owner_role\',this.value)">' +
         _roleOptions(_val(kpi,'owner_role')) + '</select>') +
@@ -356,6 +375,18 @@ function _renderEditCard(kpi){
 
 function _field(label, control){
   return '<div class="kc-f"><label>' + _esc(label) + '</label>' + control + '</div>';
+}
+
+/* Live RAG-band preview computed from the (possibly edited) numeric
+   thresholds — shows the editor what green/yellow/red resolve to. */
+function _ragPreview(kpi){
+  var t = _val(kpi, 'thresholds') || kpi.thresholds || {};
+  var b = _ragBands(t);
+  if(!b) return '';
+  return '<div class="kc-rag">' +
+    '<span class="kc-badge kc-badge-ok">' + _esc(b.green) + '</span> ' +
+    '<span class="kc-badge kc-badge-staged">' + _esc(b.yellow) + '</span> ' +
+    '<span class="kc-badge kc-badge-bad">' + _esc(b.red) + '</span></div>';
 }
 
 function _renderReadOnlyRow(m){
@@ -421,6 +452,8 @@ function _styleBlock(){
   '.kc-badge-ok{background:var(--success-soft,#ebfbee);color:var(--success,#2b8a3e)}' +
   '.kc-badge-staged{background:var(--warning-soft,#fff9db);color:var(--warning,#e67700)}' +
   '.kc-badge-manual{background:var(--accent-soft,#eef2ff);color:var(--accent,#3730a3)}' +
+  '.kc-badge-bad{background:var(--danger-soft,#fff5f5);color:var(--danger,#c92a2a)}' +
+  '.kc-rag{display:flex;gap:6px;flex-wrap:wrap;margin:2px 0 4px}' +
   '.kc-warn{font-size:11px;color:var(--warning,#e67700);background:var(--warning-soft,#fff9db);' +
     'border-radius:6px;padding:5px 8px}' +
   '.kc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px}' +

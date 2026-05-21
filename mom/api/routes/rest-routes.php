@@ -197,6 +197,8 @@ return static function (Router $router, string $dataDir): void {
     $router->get('/api/kpi/catalog', DashboardController::class, 'kpiCatalog');
     $router->get('/api/kpi/{metricCode}', DashboardController::class, 'kpiGet');
     $router->get('/api/kpi/{metricCode}/trend', DashboardController::class, 'kpiTrend');
+    $router->get('/api/kpi/{metricCode}/input', DashboardController::class, 'kpiInputList');
+    $router->post('/api/kpi/{metricCode}/input', DashboardController::class, 'kpiInputSave');
     
     // SPC
     $router->post('/api/spc/capability', DashboardController::class, 'spcCapability');

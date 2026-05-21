@@ -153,6 +153,8 @@ return static function (Router $router, string $dataDir): void {
         'kpi_get'              => [DashboardController::class, 'kpiGet'],
         'kpi_trend'            => [DashboardController::class, 'kpiTrend'],
         'kpi_alerts'           => [DashboardController::class, 'kpiAlerts'],
+        'kpi_input_save'       => [DashboardController::class, 'kpiInputSave'],
+        'kpi_input_list'       => [DashboardController::class, 'kpiInputList'],
         'spc_capability'       => [DashboardController::class, 'spcCapability'],
         'spc_chart'            => [DashboardController::class, 'spcChart'],
         'spc_summary'          => [DashboardController::class, 'spcSummary'],
