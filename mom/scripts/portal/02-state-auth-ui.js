@@ -681,6 +681,7 @@ function moduleAccessAdminTabCatalog(){
     {id:'perms', group:'governance', icon:'🔐', labelEn:'Permissions', labelVi:'Phân quyền tài liệu', noteEn:'Document and workflow permissions.', noteVi:'Phân quyền tài liệu và workflow.', defaultAccess:'admin'},
     {id:'decision_thresholds', group:'governance', icon:'⚖', labelEn:'Decision thresholds', labelVi:'Ngưỡng quyết định', noteEn:'CEO-owned decision thresholds that republish RACI authority documents.', noteVi:'Ngưỡng quyết định do CEO sở hữu, tự cập nhật tài liệu RACI liên quan.', defaultAccess:'admin'},
     {id:'raci_matrix', group:'governance', icon:'🧮', labelEn:'RACI matrix', labelVi:'Ma trận RACI', noteEn:'CEO-owned RACI gate-matrix editor that regenerates the §5 matrix inside ANNEX-121.', noteVi:'Trình sửa ma trận RACI theo cổng G0→G7, tự cập nhật bảng RACI mục 5 trong ANNEX-121.', defaultAccess:'admin'},
+    {id:'kpi_registry', group:'governance', icon:'📊', labelEn:'KPI console', labelVi:'Console KPI', noteEn:'Governed editor for the KPI authority registry — thresholds, owner, cadence, action and counter-metric; regenerates the §4/§5/§6 regions inside ANNEX-122.', noteVi:'Trình biên tập hệ KPI thực chiến — ngưỡng, owner, nhịp, hành động và counter-metric; tự cập nhật vùng §4/§5/§6 trong ANNEX-122.', defaultAccess:'admin'},
     {id:'module_access', group:'governance', icon:'🧭', labelEn:'Module access', labelVi:'Phân quyền module', noteEn:'Central visibility and access control for portal modules.', noteVi:'Điều khiển tập trung việc hiển thị và truy cập module.', defaultAccess:'admin', locked:true},
     {id:'iam_console', group:'governance', icon:'🛡️', labelEn:'IAM Control Console', labelVi:'Kiểm Soát Vận Hành', noteEn:'Unified IAM hub: activity, sessions, permissions, SoD, retention, audit (NIST 800-53 / ISO 27001 / SOX / 21 CFR Part 11).', noteVi:'Trung tâm IAM: hành vi, phiên đăng nhập, quyền, tách trách nhiệm, lưu trữ, audit (NIST 800-53 / ISO 27001 / SOX / 21 CFR Part 11).', defaultAccess:'admin'},
     {id:'portal_display', group:'content', icon:'🧭', labelEn:'Portal display', labelVi:'Hiển thị portal', noteEn:'Portal file and sidebar display control.', noteVi:'Điều khiển hiển thị file và sidebar portal.', defaultAccess:'admin'},
@@ -9504,6 +9505,7 @@ function renderAdmin(){
   if(adminTab==='activity') renderAdminActivity();
   if(adminTab==='decision_thresholds') renderAdminDecisionThresholds();
   if(adminTab==='raci_matrix') renderAdminRaciMatrix();
+  if(adminTab==='kpi_registry') renderAdminKpiRegistry();
   if(adminTab==='module_access') renderAdminModuleAccess();   // legacy hero + 2 cards
   if(adminTab==='infrastructure') renderAdminInfrastructure();
   if(adminTab==='manual_runtime') renderAdminManualRuntime();
@@ -9601,6 +9603,27 @@ function renderAdminRaciMatrix(){
     s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00n-admin-raci-matrix.js?v=' + (window.APP_VERSION || Date.now());
     s.onload = function(){
       if(typeof window._renderAdminRaciMatrix === 'function') window._renderAdminRaciMatrix(el, lang);
+    };
+    document.head.appendChild(s);
+  });
+}
+
+function renderAdminKpiRegistry(){
+  const el = document.getElementById('admin-content');
+  if(!el) return;
+  if(typeof window._renderAdminKpiRegistry === 'function'){
+    window._renderAdminKpiRegistry(el, lang);
+    return;
+  }
+  el.innerHTML = '<div class="hm-empty">'+(lang==='en'?'Loading KPI console...':'Đang tải Console KPI...')+'</div>';
+  ensureAdminShared(function(){
+    var existing = document.getElementById('admin-kpi-registry-script');
+    if(existing){ existing.remove(); }
+    var s = document.createElement('script');
+    s.id  = 'admin-kpi-registry-script';
+    s.src = (window.HmRuntimePaths && HmRuntimePaths.scriptsBase ? HmRuntimePaths.scriptsBase : 'scripts/portal/') + '00o-admin-kpi-registry.js?v=' + (window.APP_VERSION || Date.now());
+    s.onload = function(){
+      if(typeof window._renderAdminKpiRegistry === 'function') window._renderAdminKpiRegistry(el, lang);
     };
     document.head.appendChild(s);
   });

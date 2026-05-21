@@ -10,6 +10,7 @@ use MOM\Api\Services\DecisionThresholdService;
 use MOM\Api\Services\GraphicsGovernanceException;
 use MOM\Api\Services\GraphicsGovernanceService;
 use MOM\Api\Services\LocalRuntimeSyncService;
+use MOM\Api\Services\KpiRegistryAdminService;
 use MOM\Api\Services\RaciMatrixService;
 use MOM\Api\Services\VersionControlService;
 use Throwable;
@@ -30,6 +31,8 @@ class AdminController extends BaseController
     private ?DecisionThresholdService $decisionThresholdService = null;
 
     private ?RaciMatrixService $raciMatrixService = null;
+
+    private ?KpiRegistryAdminService $kpiRegistryAdminService = null;
 
     private ?LocalRuntimeSyncService $localRuntimeSyncService = null;
 
@@ -55,6 +58,14 @@ class AdminController extends BaseController
             $this->raciMatrixService = new RaciMatrixService($this->rootDir, $this->dataDir);
         }
         return $this->raciMatrixService;
+    }
+
+    private function kpiRegistryAdmin(): KpiRegistryAdminService
+    {
+        if ($this->kpiRegistryAdminService === null) {
+            $this->kpiRegistryAdminService = new KpiRegistryAdminService($this->rootDir, $this->dataDir);
+        }
+        return $this->kpiRegistryAdminService;
     }
 
     private function localRuntimeSync(): LocalRuntimeSyncService
@@ -1164,6 +1175,69 @@ class AdminController extends BaseController
                 $this->error('raci_matrix_invalid', 422, 'Vi phạm bất biến RACI (1 chữ A và ít nhất 1 chữ R mỗi dòng): ' . $msg);
             }
             $this->error('raci_matrix_save_failed', 500, $msg);
+        }
+    }
+
+    /**
+     * GET admin_kpi_registry_get — Load the governed KPI catalog for the
+     * KPI Admin Console (33 governance KPIs + gate / proposed / dashboard
+     * metrics, with coverage statistics).
+     *
+     * @return never
+     */
+    public function kpiRegistryGet(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireAnyRole($user, array_values(array_unique(array_merge(admin_roles(), ['ceo', 'general_director']))));
+
+        try {
+            $this->success(['config' => $this->kpiRegistryAdmin()->load()]);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $this->error('kpi_registry_get_failed', 500, $e->getMessage());
+        }
+    }
+
+    /**
+     * POST admin_kpi_registry_save — Persist Console edits to the KPI runtime
+     * overlay and regenerate the §4/§5/§6 marker regions inside ANNEX-122.
+     *
+     * @return never
+     */
+    public function kpiRegistrySave(): never
+    {
+        $user = $this->requireAuth();
+        $this->requireCsrf();
+        $this->requireAnyRole($user, array_values(array_unique(array_merge(admin_roles(), ['ceo', 'general_director']))));
+
+        $body = $this->jsonBody();
+        $overrides = $body['governance_overrides'] ?? null;
+        if (!is_array($overrides)) {
+            $this->error('invalid_config', 400, 'KPI registry save needs a governance_overrides object.');
+        }
+
+        try {
+            $result = $this->kpiRegistryAdmin()->save(
+                ['governance_overrides' => $overrides],
+                $user,
+                trim((string)($body['reason'] ?? '')),
+            );
+            $this->auditLog('admin_kpi_registry_save', [
+                'override_count'   => (int)($result['override_count'] ?? 0),
+                'annex122_updated' => (bool)($result['annex122_updated'] ?? false),
+            ], (string)($user['username'] ?? 'admin'));
+            $this->success($result);
+        } catch (Throwable $e) {
+            $this->rethrowResponse($e);
+            $msg = $e->getMessage();
+            if (str_starts_with($msg, 'kpi_registry_threshold_incomplete')
+                || str_starts_with($msg, 'kpi_registry_reward_without_counter')
+                || str_starts_with($msg, 'kpi_registry_duplicate_code')
+                || str_starts_with($msg, 'kpi_registry_invalid_cadence')
+                || str_starts_with($msg, 'kpi_registry_missing_code')) {
+                $this->error('kpi_registry_invalid', 422, 'Vi phạm quy tắc KPI: ' . $msg);
+            }
+            $this->error('kpi_registry_save_failed', 500, $msg);
         }
     }
 

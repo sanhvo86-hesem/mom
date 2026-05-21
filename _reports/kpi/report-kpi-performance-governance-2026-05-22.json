@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-05-21T17:36:48+00:00",
+    "generated_at": "2026-05-21T18:10:40+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
     "registry_version": "2026-05-21",
@@ -307,7 +307,7 @@
                 "KPI-OPERATING-MECHANISM-ASSESSMENT"
             ],
             "canonical_metric_codes": [],
-            "snippet": "OTDOn-Time Deliveryexecutive_scorecard_kpiruntime_calculated_metrics, annex122_governance_kpis, dashboard_core_kpis, gate_control_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides147390≥95%<90%; red <90%; yellow 90; ≥95%runtime_calculated_with_registry_contractactive_runtimet",
+            "snippet": "OTDOn-Time Delivery (gate view)executive_scorecard_kpiruntime_calculated_metrics, annex122_governance_kpis, dashboard_core_kpis, gate_control_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides147391≥95%<90%; red <90%; yellow 90; ≥95%runtime_calculated_with_registry_contractact",
             "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
         },
         {
@@ -407,10 +407,10 @@
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL",
                 "KPI-AUTHORITY-REGISTRY-AND-OPERATIONAL-METRICS",
-                "KPI-OPERATING-MECHANISM-ASSESSMENT"
+                "KPI-CASCADE-DICTIONARY"
             ],
             "canonical_metric_codes": [],
-            "snippet": "THROUGHPUT_PER_CONSTRAINT_HOURRevenue/throughput per constraint hourexecutive_scorecard_kpiproposed_operating_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides34≥1.1 baseline_indexcandidate_data_contract_required_before_payoutcandidate_data_contractregistered_target_not_repea",
+            "snippet": "FAI_FIRST_PASSFAI/first-piece first-pass acceptanceexecutive_scorecard_kpilegacy_aliases, annex122_governance_kpis, gate_control_metrics, proposed_operating_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides34≥98%candidate_data_contract_required_before_payoutcandidate_data_con",
             "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
         },
         {
@@ -420,10 +420,10 @@
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL",
                 "KPI-AUTHORITY-REGISTRY-AND-OPERATIONAL-METRICS",
-                "KPI-CASCADE-DICTIONARY"
+                "KPI-OPERATING-MECHANISM-ASSESSMENT"
             ],
             "canonical_metric_codes": [],
-            "snippet": "FAI_FIRST_PASSFAI/first-piece first-pass acceptanceexecutive_scorecard_kpilegacy_aliases, annex122_governance_kpis, gate_control_metrics, proposed_operating_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides33≥98%candidate_data_contract_required_before_payoutcandidate_data_con",
+            "snippet": "THROUGHPUT_PER_CONSTRAINT_HOURRevenue/throughput per constraint hourexecutive_scorecard_kpiproposed_operating_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides34≥1.1 baseline_indexcandidate_data_contract_required_before_payoutcandidate_data_contractregistered_target_not_repea",
             "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
         },
         {
@@ -2777,7 +2777,7 @@
             "bucket": "annex_references",
             "title": "KPI System Matrix and Document Usage",
             "has_kpi": true,
-            "kpi_occurrences": 154,
+            "kpi_occurrences": 156,
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL",
                 "KPI-AND-ESCALATION",

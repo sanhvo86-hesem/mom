@@ -165,6 +165,21 @@ final class KpiEngine
 {
     private const KPI_AUTHORITY_REGISTRY_PATH = __DIR__ . '/../../data/registry/kpi-authority-registry.json';
 
+    /**
+     * Runtime overlay written by the KPI Admin Console. The git-tracked
+     * registry above is the structural SSOT; this gitignored overlay carries
+     * only Console-editable governance fields (thresholds, owner, cadence,
+     * decision/action, counter_metric). A schema-version gate discards a
+     * stale overlay when a deploy bumps the seed schema.
+     */
+    private const KPI_AUTHORITY_REGISTRY_RUNTIME_PATH = __DIR__ . '/../../data/registry/kpi-authority-registry.runtime.json';
+
+    /** Governance KPI fields the Console may override at runtime. */
+    public const CONSOLE_EDITABLE_FIELDS = [
+        'thresholds', 'owner_role', 'data_stewardship_role', 'cadence',
+        'decision_action', 'action_reference', 'counter_metric',
+    ];
+
     /** Metric codes for all supported KPIs. */
     public const METRIC_OEE                  = 'OEE';
     public const METRIC_OTD                  = 'OTD';
@@ -1827,9 +1842,64 @@ final class KpiEngine
         $payload = json_decode((string) file_get_contents(self::KPI_AUTHORITY_REGISTRY_PATH), true);
         if (is_array($payload)) {
             $this->kpiAuthorityRegistry = $payload;
+            $this->applyRuntimeOverlay($this->kpiAuthorityRegistry);
         }
 
         return $this->kpiAuthorityRegistry;
+    }
+
+    /**
+     * Merge the KPI Admin Console runtime overlay onto the seed registry.
+     * Only CONSOLE_EDITABLE_FIELDS of annex122_governance_kpis rows are
+     * overlaid. Schema-version gate: an overlay stamped older than the seed
+     * schema_version is structurally stale and ignored — same rule as
+     * RaciMatrixService::load().
+     *
+     * @param array<string, mixed> $registry
+     */
+    private function applyRuntimeOverlay(array &$registry): void
+    {
+        if (!is_file(self::KPI_AUTHORITY_REGISTRY_RUNTIME_PATH)) {
+            return;
+        }
+        $overlay = json_decode((string) file_get_contents(self::KPI_AUTHORITY_REGISTRY_RUNTIME_PATH), true);
+        if (!is_array($overlay)) {
+            return;
+        }
+
+        $seedSchema    = (int) ($registry['schema_version'] ?? 0);
+        $overlaySchema = (int) ($overlay['schema_version'] ?? 0);
+        if ($seedSchema > 0 && $overlaySchema < $seedSchema) {
+            return; // stale overlay — seed advanced past it
+        }
+
+        $overrides = $overlay['governance_overrides'] ?? null;
+        if (!is_array($overrides)) {
+            return;
+        }
+
+        $rows = $registry['annex122_governance_kpis'] ?? null;
+        if (!is_array($rows)) {
+            return;
+        }
+        foreach ($rows as $i => $row) {
+            if (!is_array($row)) {
+                continue;
+            }
+            $code = strtoupper(trim((string) ($row['canonical_code'] ?? '')));
+            $patch = $overrides[$code] ?? null;
+            if (!is_array($patch)) {
+                continue;
+            }
+            foreach (self::CONSOLE_EDITABLE_FIELDS as $field) {
+                if (array_key_exists($field, $patch)) {
+                    $rows[$i][$field] = $patch[$field];
+                }
+            }
+        }
+        $registry['annex122_governance_kpis'] = $rows;
+        $registry['runtime_overlay_applied'] = true;
+        $registry['runtime_overlay_updated_at'] = (string) ($overlay['updated_at'] ?? '');
     }
 
     /**
