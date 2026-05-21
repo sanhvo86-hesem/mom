@@ -970,8 +970,6 @@ paths:
                     logged_in: true
                     mfa_pending: false
                     enroll_pending: false
-                    pending_expires_in: null
-                    auth_expired: null
                     user:
                       username: "john.doe"
                       name: "John Doe"
@@ -989,8 +987,6 @@ paths:
                     mfa_pending: true
                     enroll_pending: false
                     pending_expires_in: 240
-                    auth_expired: null
-                    user: null
                     csrf_token: "abc123def456"
                     server_time: "2025-06-01T08:00:00+00:00"
                     initialized: true
@@ -8688,12 +8684,15 @@ components:
           nullable: true
           description: Seconds remaining for pending auth (MFA/enroll window).
         auth_expired:
-          type: string
-          nullable: true
-          enum: [mfa, enroll, null]
+          oneOf:
+            - type: string
+              enum: [mfa, enroll]
+            - type: 'null'
           description: Which pending auth expired, if any.
         user:
-          $ref: '#/components/schemas/UserPublic'
+          oneOf:
+            - $ref: '#/components/schemas/UserPublic'
+            - type: 'null'
         csrf_token:
           type: string
         server_time:
