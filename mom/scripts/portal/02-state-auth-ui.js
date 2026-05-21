@@ -641,6 +641,7 @@ function moduleAccessPortalCatalog(){
     {id:'apqp-ppap', group:'quality', icon:'🎯', labelEn:'APQP / PPAP', labelVi:'APQP / PPAP', noteEn:'[Integrated] Now a native module inside EQMS Suite → Pre-Launch Quality group.', noteVi:'[Tích hợp] Nay là module nội bộ bên trong EQMS Suite → nhóm Tiền sản xuất.', defaultAccess:'all', deprecated:true, deprecatedNote:'Integrated into EQMS Suite → Pre-Launch Quality (IATF 16949)'},
     {id:'ai-scheduling', group:'quality', icon:'🤖', labelEn:'AI scheduling & quality', labelVi:'AI Lập lịch & Chất lượng', noteEn:'[Sidebar hidden] AI scheduling (accessible from Orders) + AI quality (use EQMS Tower).', noteVi:'[Ẩn sidebar] AI lập lịch (từ Đơn hàng) + AI chất lượng (dùng EQMS Tower).', defaultAccess:'all', deprecated:true, deprecatedNote:'AI quality merged into EQMS Tower; scheduling accessible from Orders module'},
     {id:'eqms', group:'eqms', icon:'🏯', labelEn:'EQMS Suite', labelVi:'EQMS Suite', noteEn:'Enterprise Quality Management System — 31 world-class quality modules (v4.1).', noteVi:'Hệ thống Quản lý Chất lượng Doanh nghiệp — 31 module chất lượng đẳng cấp (v4.1).', defaultAccess:'all'},
+    {id:'doc-overview', group:'eqms', icon:'🗺️', labelEn:'Document visual map', labelVi:'Sơ đồ Tài liệu', noteEn:'Visual document overview: fishbone SOP-201, gate flow G0→G7, mindmap, matrix.', noteVi:'Sơ đồ tổng quan tài liệu: xương cá SOP-201, luồng G0→G7, sơ đồ cây, ma trận.', defaultAccess:'all'},
     {id:'forms', group:'records', icon:'📋', labelEn:'Evidence control', labelVi:'Kiểm soát chứng cứ', noteEn:'Controlled forms and evidence capture.', noteVi:'Biểu mẫu kiểm soát và thu thập chứng cứ.', defaultAccess:'all'},
     /* 'evidence' nav removed — Evidence Vault is now inside "Kiểm soát chứng cứ" (forms module), Chứng cứ tab */
     {id:'compliance-reports', group:'records', icon:'📊', labelEn:'Reports', labelVi:'Báo cáo', noteEn:'Compliance and operational reporting.', noteVi:'Báo cáo tuân thủ và vận hành.', defaultAccess:'all'},
@@ -654,7 +655,15 @@ function moduleAccessPortalCatalog(){
     {id:'admin', group:'admin', icon:'⚙', labelEn:'Admin', labelVi:'Admin', noteEn:'System administration shell for the portal.', noteVi:'Không gian quản trị hệ thống portal.', defaultAccess:'admin'},
     {id:'template-demo', group:'admin', icon:'🧩', labelEn:'Master module template', labelVi:'Master Module Template', noteEn:'Template lab preview workspace.', noteVi:'Không gian xem trước template lab.', defaultAccess:'admin'},
     {id:'module-builder', group:'admin', icon:'➕', labelEn:'Module builder', labelVi:'Tạo Module mới', noteEn:'Module creation workspace.', noteVi:'Không gian tạo module mới.', defaultAccess:'admin'}
-  ];
+  ].concat(
+    /* Auto-discovery: modules self-register by pushing onto window._PORTAL_MODULE_REGISTRY.
+     * Filter out any id that already appears in the hardcoded list above. */
+    (function(){
+      var reg = Array.isArray(window._PORTAL_MODULE_REGISTRY) ? window._PORTAL_MODULE_REGISTRY : [];
+      var hardcoded = ['dashboard','documents','search','dictionary','access','deploy','exceptions','orders','dispatch','mes','mobile-shopfloor','quoting','purchasing','quality-exceptions','supplier-quality','fmea','apqp-ppap','ai-scheduling','eqms','doc-overview','forms','compliance-reports','continuous-improvement','knowledge-base','cnc-programs','product-passport','schema-studio','energy-dashboard','customer-portal','admin','template-demo','module-builder'];
+      return reg.filter(function(m){ return hardcoded.indexOf(String(m.id||'')) === -1; });
+    })()
+  );
 }
 
 function moduleAccessAdminTabCatalog(){
@@ -3163,7 +3172,7 @@ function navigateTo(page, filter, bypassGuard){
       adminTab = firstAccessibleAdminTab();
     }
   }
-  if(page !== 'admin' && page !== 'doc-overview' && !canUserAccessModule(page)){
+  if(page !== 'admin' && !canUserAccessModule(page)){
     const fallbackPage = firstAccessiblePortalModule();
     if(!bypassGuard && page !== fallbackPage){
       showToast(lang==='en' ? 'You do not have access to that module.' : 'Bạn không có quyền truy cập module đó.');

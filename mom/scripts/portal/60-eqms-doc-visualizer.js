@@ -932,4 +932,13 @@
   window._renderDocOverview  = render;
   window._destroyDocOverview = destroy;
 
+  /* Self-register for auto-discovery in moduleAccessPortalCatalog() */
+  (window._PORTAL_MODULE_REGISTRY = window._PORTAL_MODULE_REGISTRY || []).push({
+    id: 'doc-overview', group: 'eqms', icon: '🗺️',
+    labelEn: 'Document visual map', labelVi: 'Sơ đồ Tài liệu',
+    noteEn: 'Visual document overview: fishbone SOP-201, gate flow G0→G7, mindmap, matrix.',
+    noteVi: 'Sơ đồ tổng quan tài liệu: xương cá SOP-201, luồng G0→G7, sơ đồ cây, ma trận.',
+    defaultAccess: 'all'
+  });
+
 })();
