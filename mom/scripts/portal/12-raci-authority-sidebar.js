@@ -129,6 +129,35 @@ function _parseThresholds(doc){
     return map;
 }
 
+/* ── Parse ANNEX-121 support-function supplement (MNT / FIN) ────────────── */
+function _parseSupplement(doc){
+    var tables = doc.querySelectorAll('table');
+    var sup = null;
+    for (var t = 0; t < tables.length; t++) {
+        var head = tables[t].querySelector('thead');
+        if (!head) continue;
+        var h = head.textContent || '';
+        if (h.indexOf('Vai trò hỗ trợ') >= 0 && h.indexOf('Lý do tham gia') >= 0) {
+            sup = tables[t]; break;
+        }
+    }
+    if (!sup) return [];
+    var rows = sup.querySelectorAll('tbody > tr');
+    var out = [];
+    for (var r = 0; r < rows.length; r++) {
+        var tds = rows[r].children;
+        if (tds.length < 5) continue;
+        out.push({
+            gate: (tds[0].textContent || '').trim(),
+            cdr: (tds[1].textContent || '').trim(),
+            activity: (tds[2].textContent || '').trim(),
+            role: (tds[3].textContent || '').trim().toUpperCase(),
+            letter: (tds[4].textContent || '').trim().toUpperCase()
+        });
+    }
+    return out;
+}
+
 /* ── Detect the role code of the current JD page ────────────────────────── */
 function _currentJdRole(){
     var ths = document.querySelectorAll('th');
@@ -147,7 +176,7 @@ function _currentJdRole(){
 }
 
 /* ── Relevance filter ───────────────────────────────────────────────────── */
-function _relevantRows(info, gateRows){
+function _relevantRows(info, gateRows, suppRows){
     if (info.type === 'SOP') {
         return gateRows.filter(function(row){ return row.evidence.indexOf(info.code) >= 0; });
     }
@@ -159,8 +188,15 @@ function _relevantRows(info, gateRows){
                       ITA:'HR/IT', ESA:'HR/IT', QCL:'QA', QC:'QA', QE:'QA',
                       SL:'WKM', SET:'WKM', OPR:'WKM' };
         var col = ALIAS[role] || role;
-        return gateRows.filter(function(row){ return !!row.roles[col]; }).map(function(row){
+        var main = gateRows.filter(function(row){ return !!row.roles[col]; }).map(function(row){
             row.__highlight = col; return row;
+        });
+        if (main.length) return main;
+        // role absent from the core columns (MNT/FIN) → project the support supplement
+        return (suppRows || []).filter(function(s){ return s.role === role; }).map(function(s){
+            var roles = {}; roles[s.role] = s.letter;
+            return { gate: s.gate, cdr: s.cdr, activity: s.activity,
+                     roles: roles, __highlight: s.role };
         });
     }
     return [];
@@ -266,8 +302,9 @@ function _populate(panel, info){
         _fetchDoc(_annexUrl('annex-120-authority-matrix.html'))
     ]).then(function(docs){
         var gateRows = _parseGateMatrix(docs[0]);
+        var suppRows = _parseSupplement(docs[0]);
         var thresholds = _parseThresholds(docs[1]);
-        var rows = _relevantRows(info, gateRows);
+        var rows = _relevantRows(info, gateRows, suppRows);
         var frag = document.createDocumentFragment();
         if (!rows.length) {
             var msg = _el('div', 'raci-sb-msg',

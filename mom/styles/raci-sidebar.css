@@ -164,7 +164,7 @@
     border-radius: 4px;
     color: #fff;
 }
-.raci-sb-tag--a   { background: var(--brand-primary, #1565c0); }
+.raci-sb-tag--a   { background: var(--raci-accountable, #13294b); }
 .raci-sb-tag--r   { background: var(--status-info, #1864ab); }
 .raci-sb-tag--c   { background: var(--status-warning, #e67700); }
 .raci-sb-tag--i   { background: var(--status-success, #2b8a3e); }
