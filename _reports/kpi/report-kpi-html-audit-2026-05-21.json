@@ -1,17 +1,17 @@
 {
-    "generated_at": "2026-05-21T14:54:52+00:00",
+    "generated_at": "2026-05-21T15:13:38+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
     "registry_version": "2026-05-21",
     "summary": {
         "html_file_count": 870,
         "files_with_kpi": 686,
-        "kpi_occurrences": 4139,
+        "kpi_occurrences": 4185,
         "unique_coded_kpi_ids": 85,
         "unique_likely_operational_kpi_ids": 48,
-        "unique_canonical_metric_codes_seen": 33,
+        "unique_canonical_metric_codes_seen": 35,
         "unique_legacy_alias_codes_seen": 4,
-        "kpi_row_candidates": 3637
+        "kpi_row_candidates": 3652
     },
     "registry_counts": {
         "runtime_calculated_metrics": 19,
@@ -177,6 +177,7 @@
         "GROSS_MARGIN_JOB_FAMILY",
         "INCIDENT_ACTION_CLOSURE_AGING",
         "INVENTORY_ACCURACY",
+        "INVOICE_RFT",
         "IN_PROCESS_REJECT_RATE",
         "MATERIAL_AVAILABILITY_PLAN",
         "MTBF",
@@ -194,6 +195,7 @@
         "SCRAP_RATE",
         "SETUP_FIRST_PASS",
         "SETUP_RATIO",
+        "SUPPLIER_OTD",
         "THROUGHPUT_PER_CONSTRAINT_HOUR",
         "WIP_AGING"
     ],
@@ -207,8 +209,8 @@
         "annex_references": {
             "html_files": 76,
             "files_with_kpi": 59,
-            "kpi_occurrences": 556,
-            "kpi_row_candidates": 459,
+            "kpi_occurrences": 602,
+            "kpi_row_candidates": 474,
             "coded_kpi_ids": [
                 "KPI-01",
                 "KPI-01OTDOTD",
@@ -267,6 +269,7 @@
                 "GROSS_MARGIN_JOB_FAMILY",
                 "INCIDENT_ACTION_CLOSURE_AGING",
                 "INVENTORY_ACCURACY",
+                "INVOICE_RFT",
                 "IN_PROCESS_REJECT_RATE",
                 "MATERIAL_AVAILABILITY_PLAN",
                 "MTBF",
@@ -284,6 +287,7 @@
                 "SCRAP_RATE",
                 "SETUP_FIRST_PASS",
                 "SETUP_RATIO",
+                "SUPPLIER_OTD",
                 "THROUGHPUT_PER_CONSTRAINT_HOUR",
                 "WIP_AGING"
             ],
@@ -585,8 +589,8 @@
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
             "bucket": "annex_references",
             "title": "KPI System Matrix and Document Usage",
-            "kpi_occurrences": 116,
-            "kpi_row_candidates": 41,
+            "kpi_occurrences": 148,
+            "kpi_row_candidates": 54,
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL",
                 "KPI-AND-ESCALATION",
@@ -673,7 +677,7 @@
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-127-kpi-authority-registry-and-operational-metrics.html",
             "bucket": "annex_references",
             "title": "ANNEX-127 - KPI Authority Registry and Operational Metrics | HESEM MOM",
-            "kpi_occurrences": 74,
+            "kpi_occurrences": 78,
             "kpi_row_candidates": 32,
             "coded_kpi_ids": [
                 "KPI-AUTHORITY-REGISTRY",
@@ -766,42 +770,10 @@
             ]
         },
         {
-            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-            "bucket": "annex_references",
-            "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
-            "kpi_occurrences": 46,
-            "kpi_row_candidates": 27,
-            "coded_kpi_ids": [
-                "KPI-AUTHORITY-REGISTRY",
-                "KPI-GX"
-            ],
-            "canonical_metric_codes": [
-                "CRITICAL_ROLE_BACKUP_COVERAGE",
-                "DSO",
-                "FAI_FIRST_PASS",
-                "FINAL_RELEASE_RFT",
-                "FPY",
-                "GROSS_MARGIN_JOB_FAMILY",
-                "INCIDENT_ACTION_CLOSURE_AGING",
-                "INVENTORY_ACCURACY",
-                "MATERIAL_AVAILABILITY_PLAN",
-                "ORDER_REVIEW_RFT",
-                "OTD",
-                "PLAN_ADHERENCE",
-                "QUOTE_HIT_RATE",
-                "RECORDABLE_INCIDENT_RATE",
-                "RFQ_TURNAROUND_TIME",
-                "SCHEDULE_RECOVERY_EFFECTIVENESS"
-            ],
-            "legacy_alias_codes": [
-                "SETUP"
-            ]
-        },
-        {
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-129-bsc-kpi-operating-mechanism-assessment.html",
             "bucket": "annex_references",
             "title": "ANNEX-129 - BSC and KPI Operating Mechanism Assessment | HESEM MOM",
-            "kpi_occurrences": 41,
+            "kpi_occurrences": 50,
             "kpi_row_candidates": 26,
             "coded_kpi_ids": [],
             "canonical_metric_codes": [
@@ -813,6 +785,42 @@
             ],
             "legacy_alias_codes": [
                 "SCRAP",
+                "SETUP"
+            ]
+        },
+        {
+            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+            "bucket": "annex_references",
+            "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+            "kpi_occurrences": 47,
+            "kpi_row_candidates": 29,
+            "coded_kpi_ids": [
+                "KPI-AUTHORITY-REGISTRY",
+                "KPI-GX"
+            ],
+            "canonical_metric_codes": [
+                "COMPLAINT_RATE",
+                "CRITICAL_ROLE_BACKUP_COVERAGE",
+                "DSO",
+                "FAI_FIRST_PASS",
+                "FINAL_RELEASE_RFT",
+                "FPY",
+                "GROSS_MARGIN_JOB_FAMILY",
+                "INCIDENT_ACTION_CLOSURE_AGING",
+                "INVENTORY_ACCURACY",
+                "INVOICE_RFT",
+                "MATERIAL_AVAILABILITY_PLAN",
+                "ORDER_REVIEW_RFT",
+                "OTD",
+                "PLAN_ADHERENCE",
+                "QUOTE_HIT_RATE",
+                "RECORDABLE_INCIDENT_RATE",
+                "RFQ_TURNAROUND_TIME",
+                "SCHEDULE_RECOVERY_EFFECTIVENESS",
+                "SUPPLIER_OTD"
+            ],
+            "legacy_alias_codes": [
+                "DOWNTIME",
                 "SETUP"
             ]
         },
@@ -1772,8 +1780,8 @@
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
             "bucket": "annex_references",
             "title": "KPI System Matrix and Document Usage",
-            "kpi_occurrences": 116,
-            "kpi_row_candidates": 41,
+            "kpi_occurrences": 148,
+            "kpi_row_candidates": 54,
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL",
                 "KPI-AND-ESCALATION",
@@ -1860,7 +1868,7 @@
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-127-kpi-authority-registry-and-operational-metrics.html",
             "bucket": "annex_references",
             "title": "ANNEX-127 - KPI Authority Registry and Operational Metrics | HESEM MOM",
-            "kpi_occurrences": 74,
+            "kpi_occurrences": 78,
             "kpi_row_candidates": 32,
             "coded_kpi_ids": [
                 "KPI-AUTHORITY-REGISTRY",
@@ -1953,42 +1961,10 @@
             ]
         },
         {
-            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-            "bucket": "annex_references",
-            "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
-            "kpi_occurrences": 46,
-            "kpi_row_candidates": 27,
-            "coded_kpi_ids": [
-                "KPI-AUTHORITY-REGISTRY",
-                "KPI-GX"
-            ],
-            "canonical_metric_codes": [
-                "CRITICAL_ROLE_BACKUP_COVERAGE",
-                "DSO",
-                "FAI_FIRST_PASS",
-                "FINAL_RELEASE_RFT",
-                "FPY",
-                "GROSS_MARGIN_JOB_FAMILY",
-                "INCIDENT_ACTION_CLOSURE_AGING",
-                "INVENTORY_ACCURACY",
-                "MATERIAL_AVAILABILITY_PLAN",
-                "ORDER_REVIEW_RFT",
-                "OTD",
-                "PLAN_ADHERENCE",
-                "QUOTE_HIT_RATE",
-                "RECORDABLE_INCIDENT_RATE",
-                "RFQ_TURNAROUND_TIME",
-                "SCHEDULE_RECOVERY_EFFECTIVENESS"
-            ],
-            "legacy_alias_codes": [
-                "SETUP"
-            ]
-        },
-        {
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-129-bsc-kpi-operating-mechanism-assessment.html",
             "bucket": "annex_references",
             "title": "ANNEX-129 - BSC and KPI Operating Mechanism Assessment | HESEM MOM",
-            "kpi_occurrences": 41,
+            "kpi_occurrences": 50,
             "kpi_row_candidates": 26,
             "coded_kpi_ids": [],
             "canonical_metric_codes": [
@@ -2000,6 +1976,42 @@
             ],
             "legacy_alias_codes": [
                 "SCRAP",
+                "SETUP"
+            ]
+        },
+        {
+            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+            "bucket": "annex_references",
+            "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+            "kpi_occurrences": 47,
+            "kpi_row_candidates": 29,
+            "coded_kpi_ids": [
+                "KPI-AUTHORITY-REGISTRY",
+                "KPI-GX"
+            ],
+            "canonical_metric_codes": [
+                "COMPLAINT_RATE",
+                "CRITICAL_ROLE_BACKUP_COVERAGE",
+                "DSO",
+                "FAI_FIRST_PASS",
+                "FINAL_RELEASE_RFT",
+                "FPY",
+                "GROSS_MARGIN_JOB_FAMILY",
+                "INCIDENT_ACTION_CLOSURE_AGING",
+                "INVENTORY_ACCURACY",
+                "INVOICE_RFT",
+                "MATERIAL_AVAILABILITY_PLAN",
+                "ORDER_REVIEW_RFT",
+                "OTD",
+                "PLAN_ADHERENCE",
+                "QUOTE_HIT_RATE",
+                "RECORDABLE_INCIDENT_RATE",
+                "RFQ_TURNAROUND_TIME",
+                "SCHEDULE_RECOVERY_EFFECTIVENESS",
+                "SUPPLIER_OTD"
+            ],
+            "legacy_alias_codes": [
+                "DOWNTIME",
                 "SETUP"
             ]
         },

@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-05-21T14:54:54+00:00",
+    "generated_at": "2026-05-21T15:13:40+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
     "registry_version": "2026-05-21",
@@ -15,7 +15,7 @@
         "kpi_files_missing_recognition_terms": 230,
         "kpi_files_missing_discipline_or_corrective_terms": 30,
         "kpi_files_missing_all_people_governance_terms": 0,
-        "kpi_table_rows_without_people_governance_terms": 232
+        "kpi_table_rows_without_people_governance_terms": 223
     },
     "bucket_stats": {
         "annex_references": {
@@ -25,7 +25,7 @@
             "kpi_files_missing_recognition": 23,
             "kpi_files_missing_discipline_or_corrective": 4,
             "kpi_files_missing_all_people_governance": 0,
-            "kpi_rows_without_people_governance": 44
+            "kpi_rows_without_people_governance": 35
         },
         "department_handbooks": {
             "html_files": 56,
@@ -209,140 +209,6 @@
         {
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
             "bucket": "annex_references",
-            "row_index": 17,
-            "coded_kpi_ids": [],
-            "canonical_metric_codes": [
-                "PLAN_ADHERENCE"
-            ],
-            "snippet": "Giao hàng đúng hạnOTD On-Time DeliveryTử số: Số lô giao hàng có delivery_date_actual <= delivery_date_est trong kỳMẫu số: Tổng số lô có shipment_status = 'delivered' trong kỳĐơn vị: % · cao hơn là tốtLoại trừ: Lô bị khách huỷ trước ship không tínhXanh ≥95%Vàng 90–94.99%Đỏ <90%PDXác nhận dữ liệu: CSMOM/ERP · shipmentsHồ",
-            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
-        },
-        {
-            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-            "bucket": "annex_references",
-            "row_index": 20,
-            "coded_kpi_ids": [],
-            "canonical_metric_codes": [
-                "QUOTE_HIT_RATE"
-            ],
-            "snippet": "Biên lợi nhuận gộp theo nhóm lệnh/sản phẩmGROSS_MARGIN_JOB_FAMILY Gross Margin by Job / Product FamilyTử số: Doanh thu trừ giá vốn theo nhóm lệnh/sản phẩm trong kỳMẫu số: Doanh thu theo nhóm lệnh/sản phẩm trong kỳĐơn vị: % · cao hơn là tốtLoại trừ: Lệnh nội bộ/bảo hành không tínhXanh ≥28%Vàng 22–27.99%Đỏ <22%FINERP · j",
-            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
-        },
-        {
-            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-            "bucket": "annex_references",
-            "row_index": 22,
-            "coded_kpi_ids": [],
-            "canonical_metric_codes": [
-                "CRITICAL_ROLE_BACKUP_COVERAGE"
-            ],
-            "snippet": "Mức sẵn sàng về tính liên tục kinh doanhBCP_READINESS Business Continuity ReadinessTử số: Số chức năng trọng yếu có phương án dự phòng + phó + soát xét gần đâyMẫu số: Tổng số chức năng trọng yếuĐơn vị: % · cao hơn là tốtXanh 100%Vàng 90–99.99%Đỏ <90%QMSXác nhận dữ liệu: HRform · role_backup_certificationsHợp đồng dữ li",
-            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
-        },
-        {
-            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-            "bucket": "annex_references",
-            "row_index": 27,
-            "coded_kpi_ids": [],
-            "canonical_metric_codes": [
-                "FINAL_RELEASE_RFT",
-                "SETUP",
-                "SETUP_FIRST_PASS"
-            ],
-            "snippet": "Tỷ lệ chấp nhận mẫu đầu / FAI ngay lần đầuFAI_FIRST_PASS First-Piece / FAI First-Pass AcceptanceTử số: Số FAI đạt ngay lần kiểm đầu tiên (attempt_number = 1) trong kỳMẫu số: Tổng số FAI thực hiện trong kỳĐơn vị: % · cao hơn là tốtXanh ≥95%Vàng 88–94.99%Đỏ <88%QAXác nhận dữ liệu: QCEQMS · inspection_resultsHợp đồng dữ l",
-            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
-        },
-        {
-            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-            "bucket": "annex_references",
-            "row_index": 30,
-            "coded_kpi_ids": [],
-            "canonical_metric_codes": [
-                "INVOICE_RFT"
-            ],
-            "snippet": "Thời gian từ sẵn sàng giao đến xuất hóa đơnSHIP_READY_TO_INVOICE_LT Ship-Ready to Invoice Lead TimeTử số: Tổng số ngày từ ngày sẵn sàng giao đến ngày xuất hóa đơn của các lô trong kỳMẫu số: Số lô được xuất hóa đơn trong kỳĐơn vị: day · thấp hơn là tốtXanh ≤2 ngàyVàng 2.01–4 ngàyĐỏ >4 ngàyFINXác nhận dữ liệu: CSERP · sh",
-            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
-        },
-        {
-            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-            "bucket": "annex_references",
-            "row_index": 36,
-            "coded_kpi_ids": [],
-            "canonical_metric_codes": [
-                "ENGINEERING_RELEASE_ON_TIME"
-            ],
-            "snippet": "Tuổi tồn đóng ECOECO_CLOSURE_AGING ECO Closure AgingTử số: Số ECO đang mở có (ngày hiện tại - created_at) vượt ngưỡng tuổiMẫu số: Tổng số ECO đang mởĐơn vị: % · thấp hơn là tốtLoại trừ: Tính theo ngày mở, không theo ngày đóngXanh ≤10%Vàng 10.01–25%Đỏ >25%ENGMERP · eco_recordsHợp đồng dữ liệu chưa xác nhận — prompt 04 h",
-            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
-        },
-        {
-            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-            "bucket": "annex_references",
-            "row_index": 38,
-            "coded_kpi_ids": [],
-            "canonical_metric_codes": [
-                "FAI_FIRST_PASS"
-            ],
-            "snippet": "Tuân thủ hiệu chuẩn / sẵn sàng đo lườngCAL_COMPLIANCE Calibration / Metrology ReadinessTử số: Số thiết bị có lần hiệu chuẩn mới nhất calibration_date <= calibration_dueMẫu số: Tổng số thiết bị đang hoạt động có calibration_due trong kỳĐơn vị: % · cao hơn là tốtXanh 100%Vàng 98–99.99%Đỏ <98%QAXác nhận dữ liệu: QCMOM · e",
-            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
-        },
-        {
-            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-            "bucket": "annex_references",
-            "row_index": 39,
-            "coded_kpi_ids": [],
-            "canonical_metric_codes": [
-                "PLAN_ADHERENCE"
-            ],
-            "snippet": "Mức sẵn sàng nguyên vật liệu cho kế hoạchMATERIAL_AVAILABILITY_PLAN Material Availability for PlanTử số: Số lệnh sản xuất trong lịch có đủ vật tư sẵn sàng trước freezeMẫu số: Tổng số lệnh sản xuất trong lịch đã khoáĐơn vị: % · cao hơn là tốtXanh ≥95%Vàng 85–94.99%Đỏ <85%SCMERP · purchase_orders, inventory_balancesHợp đ",
-            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
-        },
-        {
-            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-            "bucket": "annex_references",
-            "row_index": 43,
-            "coded_kpi_ids": [],
-            "canonical_metric_codes": [
-                "DSO"
-            ],
-            "snippet": "Hóa đơn đúng ngay lần đầuINVOICE_RFT Invoice Right-First-TimeTử số: Số hóa đơn không có lỗi (error_count = 0) trong kỳMẫu số: Tổng số hóa đơn phát hành trong kỳĐơn vị: % · cao hơn là tốtXanh ≥98%Vàng 95–97.99%Đỏ <95%FINERP · invoicesHợp đồng dữ liệu chưa xác nhận — prompt 04 hoàn tất nguồn và hàm calc*.Tuần · BSC tháng",
-            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
-        },
-        {
-            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-            "bucket": "annex_references",
-            "row_index": 45,
-            "coded_kpi_ids": [],
-            "canonical_metric_codes": [
-                "CRITICAL_ROLE_BACKUP_COVERAGE"
-            ],
-            "snippet": "Hoàn thành đào tạo đúng hạnTRAINING_COMP Training Completion On TimeTử số: Số bản ghi đào tạo có assessment_result thuộc ('Pass','Conditional')Mẫu số: Tổng số bản ghi đào tạo trong kỳĐơn vị: % · cao hơn là tốtXanh ≥95%Vàng 85–94.99%Đỏ <85%HREQMS · training_recordsBiểu mẫu FRM-801–806.Tháng · BSC thángChỉ số dẫn (lead)T",
-            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
-        },
-        {
-            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-            "bucket": "annex_references",
-            "row_index": 48,
-            "coded_kpi_ids": [],
-            "canonical_metric_codes": [
-                "RECORDABLE_INCIDENT_RATE"
-            ],
-            "snippet": "Tuân thủ đào tạo an toàn hội nhậpSAFETY_ONBOARDING_COMPLIANCE Safety Onboarding Training ComplianceTử số: Số nhân sự mới hoàn thành đào tạo an toàn hội nhập đúng hạnMẫu số: Tổng số nhân sự mới trong kỳĐơn vị: % · cao hơn là tốtXanh 100%Vàng 95–99.99%Đỏ <95%EHSXác nhận dữ liệu: HREQMS · training_recordsHợp đồng dữ liệu ",
-            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
-        },
-        {
-            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-            "bucket": "annex_references",
-            "row_index": 50,
-            "coded_kpi_ids": [],
-            "canonical_metric_codes": [
-                "SERVICE_TICKET_SLA"
-            ],
-            "snippet": "Mức sẵn sàng hệ thống trọng yếuCRITICAL_SYSTEM_AVAILABILITY Critical System Availability / ReadinessTử số: Tổng thời gian hệ thống trọng yếu sẵn sàng trong kỳMẫu số: Tổng thời gian theo lịch của hệ thống trọng yếuĐơn vị: % · cao hơn là tốtLoại trừ: Bảo trì kế hoạch không tính là downtimeXanh ≥99.5%Vàng 98–99.49%Đỏ <98%",
-            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
-        },
-        {
-            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-            "bucket": "annex_references",
             "row_index": 86,
             "coded_kpi_ids": [],
             "canonical_metric_codes": [
@@ -419,7 +285,7 @@
                 "KPI-OPERATING-MECHANISM-ASSESSMENT"
             ],
             "canonical_metric_codes": [],
-            "snippet": "OTDOn-Time Deliveryexecutive_scorecard_kpiruntime_calculated_metrics, annex122_governance_kpis, dashboard_core_kpis, gate_control_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides147389≥95%<90%; red <90%; yellow 90; ≥95%runtime_calculated_with_registry_contractactive_runtimet",
+            "snippet": "OTDOn-Time Deliveryexecutive_scorecard_kpiruntime_calculated_metrics, annex122_governance_kpis, dashboard_core_kpis, gate_control_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides147388≥95%<90%; red <90%; yellow 90; ≥95%runtime_calculated_with_registry_contractactive_runtimet",
             "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
         },
         {
@@ -428,11 +294,12 @@
             "row_index": 20,
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL",
+                "KPI-CASCADE-DICTIONARY",
                 "KPI-DICTIONARY-AND-DATA-MODEL",
                 "KPI-OPERATING-MECHANISM-ASSESSMENT"
             ],
             "canonical_metric_codes": [],
-            "snippet": "FPYFirst Pass Yieldexecutive_scorecard_kpiruntime_calculated_metrics, dashboard_core_kpis, gate_control_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides4870≥98%<95%; red <95%; yellow 95; ≥98%runtime_calculated_with_registry_contractactive_runtimetarget_seen_matches_registry_",
+            "snippet": "FPYFirst Pass Yieldexecutive_scorecard_kpiruntime_calculated_metrics, dashboard_core_kpis, gate_control_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides4971≥98%<95%; red <95%; yellow 95; ≥98%runtime_calculated_with_registry_contractactive_runtimetarget_seen_matches_registry_",
             "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
         },
         {
@@ -465,6 +332,18 @@
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
             "bucket": "annex_references",
             "row_index": 26,
+            "coded_kpi_ids": [
+                "KPI-AND-DEPUTY-CONTROL",
+                "KPI-CASCADE-DICTIONARY"
+            ],
+            "canonical_metric_codes": [],
+            "snippet": "INVENTORY_ACCURACYInventory Accuracygovernance_kpilegacy_aliases, annex122_governance_kpis, dashboard_core_kpis1012≥ 99%candidate_data_contract_required_before_payoutlocal_target_requires_classificationcanonical_or_mapped_nameDocumentsmom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Con",
+            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
+        },
+        {
+            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
+            "bucket": "annex_references",
+            "row_index": 27,
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL",
                 "KPI-AUTHORITY-REGISTRY-AND-OPERATIONAL-METRICS"
@@ -514,7 +393,20 @@
         {
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
             "bucket": "annex_references",
-            "row_index": 84,
+            "row_index": 81,
+            "coded_kpi_ids": [
+                "KPI-AND-DEPUTY-CONTROL",
+                "KPI-AUTHORITY-REGISTRY-AND-OPERATIONAL-METRICS",
+                "KPI-CASCADE-DICTIONARY"
+            ],
+            "canonical_metric_codes": [],
+            "snippet": "FAI_FIRST_PASSFAI/first-piece first-pass acceptanceexecutive_scorecard_kpilegacy_aliases, annex122_governance_kpis, gate_control_metrics, proposed_operating_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides33≥98%candidate_data_contract_required_before_payoutcandidate_data_con",
+            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
+        },
+        {
+            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
+            "bucket": "annex_references",
+            "row_index": 85,
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL",
                 "KPI-AUTHORITY-REGISTRY-AND-OPERATIONAL-METRICS"
@@ -526,19 +418,7 @@
         {
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
             "bucket": "annex_references",
-            "row_index": 132,
-            "coded_kpi_ids": [
-                "KPI-AND-DEPUTY-CONTROL",
-                "KPI-AUTHORITY-REGISTRY-AND-OPERATIONAL-METRICS"
-            ],
-            "canonical_metric_codes": [],
-            "snippet": "FAI_FIRST_PASSFAI/first-piece first-pass acceptanceexecutive_scorecard_kpilegacy_aliases, annex122_governance_kpis, gate_control_metrics, proposed_operating_metrics, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides22≥98%candidate_data_contract_required_before_payoutcandidate_data_con",
-            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
-        },
-        {
-            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
-            "bucket": "annex_references",
-            "row_index": 139,
+            "row_index": 142,
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL"
             ],
@@ -549,7 +429,31 @@
         {
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
             "bucket": "annex_references",
-            "row_index": 144,
+            "row_index": 146,
+            "coded_kpi_ids": [
+                "KPI-AND-DEPUTY-CONTROL",
+                "KPI-CASCADE-DICTIONARY"
+            ],
+            "canonical_metric_codes": [],
+            "snippet": "GROSS_MARGIN_JOB_FAMILYGross Margin by Job / Product Familyexecutive_scorecard_kpiannex122_governance_kpis, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides11≥28%candidate_data_contract_required_before_payoutcandidate_data_contractregistered_target_not_repeated_in_docscanonical_or_ma",
+            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
+        },
+        {
+            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
+            "bucket": "annex_references",
+            "row_index": 152,
+            "coded_kpi_ids": [
+                "KPI-AND-DEPUTY-CONTROL",
+                "KPI-CASCADE-DICTIONARY"
+            ],
+            "canonical_metric_codes": [],
+            "snippet": "RECORDABLE_INCIDENT_RATERecordable Incident / LTI Ratesafety_gateannex122_governance_kpis, scorecard_operating_model, scorecard_evidence_contracts, metric_governance_overrides11≤0 countnot_declared_or_informationalgate_onlyregistered_target_not_repeated_in_docscanonical_or_mapped_nameDocumentsmom/docs/operations/refere",
+            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
+        },
+        {
+            "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-128-kpi-system-matrix-and-document-usage.html",
+            "bucket": "annex_references",
+            "row_index": 156,
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL",
                 "KPI-OPERATING-MECHANISM-ASSESSMENT"
@@ -1595,6 +1499,87 @@
             "canonical_metric_codes": [],
             "snippet": " - The index.KPI The measurement formula The Source data Frequency Target L1 Target L2 Target L3 Target L4 control Gateway/Rule ",
             "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
+        },
+        {
+            "path": "mom/docs/training/competency/02-Levels/19-C19-Leadership-Coaching/_C19-L4.preview_r0_0.en.html",
+            "bucket": "training",
+            "row_index": 3,
+            "coded_kpi_ids": [],
+            "canonical_metric_codes": [],
+            "snippet": " - The index.KPI The measurement formula The Source data Frequency Target L1 Target L2 Target L3 Target L4 control Gateway/Rule ",
+            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
+        },
+        {
+            "path": "mom/docs/training/content/01-Modules/C01.html",
+            "bucket": "training",
+            "row_index": 40,
+            "coded_kpi_ids": [],
+            "canonical_metric_codes": [],
+            "snippet": "DChuẩn hóa & hệ thống (L4)lập yêu cầu chuẩn hóa, Cơ chế chặn theo KPI, kế hoạch đào tạo10%nhỏ / thu gọn‑A3/one‑page đề xuất",
+            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
+        },
+        {
+            "path": "mom/docs/training/content/01-Modules/C02.html",
+            "bucket": "training",
+            "row_index": 40,
+            "coded_kpi_ids": [],
+            "canonical_metric_codes": [],
+            "snippet": "DChuẩn hóa & hệ thống (L4)lập yêu cầu chuẩn hóa, Cơ chế chặn theo KPI, kế hoạch đào tạo10%nhỏ / thu gọn‑A3/one‑page đề xuất",
+            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
+        },
+        {
+            "path": "mom/docs/training/content/01-Modules/C03.html",
+            "bucket": "training",
+            "row_index": 40,
+            "coded_kpi_ids": [],
+            "canonical_metric_codes": [],
+            "snippet": "DChuẩn hóa & hệ thống (L4)lập yêu cầu chuẩn hóa, Cơ chế chặn theo KPI, kế hoạch đào tạo10%nhỏ / thu gọn‑A3/one‑page đề xuất",
+            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
+        },
+        {
+            "path": "mom/docs/training/content/01-Modules/C04.html",
+            "bucket": "training",
+            "row_index": 40,
+            "coded_kpi_ids": [],
+            "canonical_metric_codes": [],
+            "snippet": "DChuẩn hóa & hệ thống (L4)lập yêu cầu chuẩn hóa, Cơ chế chặn theo KPI, kế hoạch đào tạo10%nhỏ / thu gọn‑A3/one‑page đề xuất",
+            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
+        },
+        {
+            "path": "mom/docs/training/content/01-Modules/C05.html",
+            "bucket": "training",
+            "row_index": 40,
+            "coded_kpi_ids": [],
+            "canonical_metric_codes": [],
+            "snippet": "DChuẩn hóa & hệ thống (L4)lập yêu cầu chuẩn hóa, Cơ chế chặn theo KPI, kế hoạch đào tạo10%nhỏ / thu gọn‑A3/one‑page đề xuất",
+            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
+        },
+        {
+            "path": "mom/docs/training/content/01-Modules/C06.html",
+            "bucket": "training",
+            "row_index": 40,
+            "coded_kpi_ids": [],
+            "canonical_metric_codes": [],
+            "snippet": "DChuẩn hóa & hệ thống (L4)lập yêu cầu chuẩn hóa, Cơ chế chặn theo KPI, kế hoạch đào tạo10%nhỏ / thu gọn‑A3/one‑page đề xuất",
+            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
+        },
+        {
+            "path": "mom/docs/training/content/01-Modules/C07.html",
+            "bucket": "training",
+            "row_index": 40,
+            "coded_kpi_ids": [],
+            "canonical_metric_codes": [],
+            "snippet": "DChuẩn hóa & hệ thống (L4)lập yêu cầu chuẩn hóa, Cơ chế chặn theo KPI, kế hoạch đào tạo10%nhỏ / thu gọn‑A3/one‑page đề xuất",
+            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
+        },
+        {
+            "path": "mom/docs/training/content/01-Modules/C08.html",
+            "bucket": "training",
+            "row_index": 40,
+            "coded_kpi_ids": [],
+            "canonical_metric_codes": [],
+            "snippet": "DChuẩn hóa & hệ thống (L4)lập yêu cầu chuẩn hóa, Cơ chế chặn theo KPI, kế hoạch đào tạo10%nhỏ / thu gọn‑A3/one‑page đề xuất",
+            "recommendation": "Rename to control metric unless a central KPI performance-governance rule maps this row to evaluation, recognition, and corrective-action use."
         }
     ],
     "files": [
@@ -2596,13 +2581,15 @@
             "bucket": "annex_references",
             "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
             "has_kpi": true,
-            "kpi_occurrences": 46,
+            "kpi_occurrences": 47,
             "coded_kpi_ids": [
                 "KPI-AUTHORITY-REGISTRY",
                 "KPI-GX"
             ],
             "canonical_metric_codes": [
+                "COMPLAINT_RATE",
                 "CRITICAL_ROLE_BACKUP_COVERAGE",
+                "DOWNTIME",
                 "DSO",
                 "FAI_FIRST_PASS",
                 "FINAL_RELEASE_RFT",
@@ -2610,6 +2597,7 @@
                 "GROSS_MARGIN_JOB_FAMILY",
                 "INCIDENT_ACTION_CLOSURE_AGING",
                 "INVENTORY_ACCURACY",
+                "INVOICE_RFT",
                 "MATERIAL_AVAILABILITY_PLAN",
                 "ORDER_REVIEW_RFT",
                 "OTD",
@@ -2618,13 +2606,14 @@
                 "RECORDABLE_INCIDENT_RATE",
                 "RFQ_TURNAROUND_TIME",
                 "SCHEDULE_RECOVERY_EFFECTIVENESS",
-                "SETUP"
+                "SETUP",
+                "SUPPLIER_OTD"
             ],
             "governance_signals": {
-                "evaluation_terms": 13,
-                "recognition_terms": 4,
-                "discipline_or_corrective_terms": 20,
-                "action_ownership_terms": 57,
+                "evaluation_terms": 18,
+                "recognition_terms": 13,
+                "discipline_or_corrective_terms": 32,
+                "action_ownership_terms": 101,
                 "has_evaluation": true,
                 "has_recognition": true,
                 "has_discipline_or_corrective": true,
@@ -2741,7 +2730,7 @@
             "bucket": "annex_references",
             "title": "ANNEX-127 - KPI Authority Registry and Operational Metrics | HESEM MOM",
             "has_kpi": true,
-            "kpi_occurrences": 74,
+            "kpi_occurrences": 78,
             "coded_kpi_ids": [
                 "KPI-AUTHORITY-REGISTRY",
                 "KPI-HTML-AUDIT-2026-04-18",
@@ -2765,10 +2754,10 @@
                 "WIP_AGING"
             ],
             "governance_signals": {
-                "evaluation_terms": 24,
-                "recognition_terms": 23,
+                "evaluation_terms": 25,
+                "recognition_terms": 25,
                 "discipline_or_corrective_terms": 29,
-                "action_ownership_terms": 21,
+                "action_ownership_terms": 23,
                 "has_evaluation": true,
                 "has_recognition": true,
                 "has_discipline_or_corrective": true,
@@ -2781,7 +2770,7 @@
             "bucket": "annex_references",
             "title": "KPI System Matrix and Document Usage",
             "has_kpi": true,
-            "kpi_occurrences": 116,
+            "kpi_occurrences": 148,
             "coded_kpi_ids": [
                 "KPI-AND-DEPUTY-CONTROL",
                 "KPI-AND-ESCALATION",
@@ -2803,10 +2792,10 @@
                 "SETUP_RATIO"
             ],
             "governance_signals": {
-                "evaluation_terms": 12,
+                "evaluation_terms": 13,
                 "recognition_terms": 6,
                 "discipline_or_corrective_terms": 7,
-                "action_ownership_terms": 6,
+                "action_ownership_terms": 7,
                 "has_evaluation": true,
                 "has_recognition": true,
                 "has_discipline_or_corrective": true,
@@ -2819,7 +2808,7 @@
             "bucket": "annex_references",
             "title": "ANNEX-129 - BSC and KPI Operating Mechanism Assessment | HESEM MOM",
             "has_kpi": true,
-            "kpi_occurrences": 41,
+            "kpi_occurrences": 50,
             "coded_kpi_ids": [],
             "canonical_metric_codes": [
                 "COPQ",
@@ -2830,10 +2819,10 @@
                 "SCRAP"
             ],
             "governance_signals": {
-                "evaluation_terms": 18,
-                "recognition_terms": 13,
-                "discipline_or_corrective_terms": 25,
-                "action_ownership_terms": 22,
+                "evaluation_terms": 20,
+                "recognition_terms": 18,
+                "discipline_or_corrective_terms": 28,
+                "action_ownership_terms": 24,
                 "has_evaluation": true,
                 "has_recognition": true,
                 "has_discipline_or_corrective": true,

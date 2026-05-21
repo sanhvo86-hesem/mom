@@ -1,7 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
   "version": "2026-05-21",
-  "schema_version": 2,
+  "schema_version": 3,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. Existing ANNEX-122 KPIs are retained, legacy metric aliases are mapped to canonical codes, and proposed CNC operating metrics are staged without granting automatic runtime authority.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -106,12 +106,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "Lô bị khách huỷ trước ship không tính",
         "direction": "higher_is_better",
-        "min_sample": 0
+        "min_sample": 5
       },
       "thresholds": {
         "green": "≥95%",
         "yellow": "90–94.99%",
-        "red": "<90%"
+        "red": "<90%",
+        "basis": "Benchmark giao hàng gia công CNC job-shop hàng đầu ≥98%; HESEM đặt green ≥95% theo scorecard CNC-EXEC-BSC-15-2026 và cam kết hợp đồng khách hàng phổ biến."
       },
       "data_source": {
         "system": "MOM/ERP",
@@ -132,7 +133,9 @@
       "lead_or_lag": "lag",
       "paired_metric": "PLAN_ADHERENCE",
       "decision_action": "Đỏ: mở bảng rủi ro giao hàng, soát năng lực/vật tư/chất lượng đang chặn; PD triệu tập trong 24h.",
-      "counter_metric": "PROMISE_DATE_REVISION_RATE",
+      "action_reference": "WI-202 họp tầng T2 + ANNEX-117 ma trận leo thang; CDR cổng G6 phát hành/giao.",
+      "attribution_rule": "Đỏ phải tách breakdown nguyên nhân (nhà cung cấp trễ, máy hỏng, engineering trễ, thiếu vật tư, khách đổi yêu cầu) trước khi quy trách nhiệm cho PD; phần do bộ phận khác chuyển về owner tương ứng.",
+      "counter_metric": "COMPLAINT_RATE",
       "reward_eligible": true,
       "calculation_status": "runtime_calculated",
       "status": "retained"
@@ -152,12 +155,13 @@
         "rounding": "round to integer",
         "exclusions": "none",
         "direction": "lower_is_better",
-        "min_sample": 0
+        "min_sample": 30
       },
       "thresholds": {
         "green": "≤100 ppm",
         "yellow": "101–200 ppm",
-        "red": ">200 ppm"
+        "red": ">200 ppm",
+        "basis": "Mục tiêu 6-sigma escape ≤233 ppm; CNC chính xác hàng đầu vận hành ≤100 ppm. HESEM green ≤100 ppm, đỏ >200 ppm theo ANNEX-129 §7."
       },
       "data_source": {
         "system": "EQMS",
@@ -180,7 +184,9 @@
       "lead_or_lag": "lag",
       "paired_metric": "FPY",
       "decision_action": "Đỏ: CEO/QA soát xét, mở bao vây trong 24h và thông báo khách nếu cần.",
-      "counter_metric": "COMPLAINT_ACK_SLA_COMPLIANCE",
+      "action_reference": "SOP-902 xem xét của lãnh đạo + quy trình NCR/CAPA; CDR cổng G6.",
+      "attribution_rule": "Khiếu nại phải được ghi nhận đầy đủ — cấm nén số bằng cách không mở NCR; kiểm tra chéo qua data-integrity gate.",
+      "counter_metric": "OTD",
       "reward_eligible": true,
       "calculation_status": "runtime_calculated",
       "status": "retained"
@@ -200,12 +206,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
-        "min_sample": 0
+        "min_sample": 5
       },
       "thresholds": {
         "green": "≥98%",
         "yellow": "95–97.99%",
-        "red": "<95%"
+        "red": "<95%",
+        "basis": "Right-first-time phát hành cuối chuẩn ngành ≥98%; dưới 95% là tín hiệu cổng phát hành yếu. Căn cứ AIAG APQP + ANNEX-129 §7 outcome KPI."
       },
       "data_source": {
         "system": "EQMS",
@@ -225,7 +232,9 @@
       "lead_or_lag": "lag",
       "paired_metric": "FAI_FIRST_PASS",
       "decision_action": "Vàng/đỏ: phân tích nguồn lỗi theo nhóm sản phẩm/quy trình; QA mở hành động khắc phục.",
-      "counter_metric": "COMPLAINT_RATE",
+      "action_reference": "Quy trình phát hành cuối + SOP-902; CDR cổng G6.",
+      "attribution_rule": "Đỏ tách theo nhóm sản phẩm/quy trình; lỗi do engineering hoặc setup chuyển về D-ENG/WKM, không quy hết cho QA.",
+      "counter_metric": "OTD",
       "reward_eligible": true,
       "calculation_status": "staged_data_contract",
       "status": "retained"
@@ -250,7 +259,8 @@
       "thresholds": {
         "green": "≥28%",
         "yellow": "22–27.99%",
-        "red": "<22%"
+        "red": "<22%",
+        "basis": "Biên gộp gia công CNC khoẻ mạnh ≥28%; dưới 22% là tín hiệu cơ cấu mặt hàng/giá có vấn đề. Căn cứ chuẩn tài chính ngành + ANNEX-129 §6 góc tài chính."
       },
       "data_source": {
         "system": "ERP",
@@ -271,7 +281,9 @@
       "lead_or_lag": "lag",
       "paired_metric": "QUOTE_HIT_RATE",
       "decision_action": "Đỏ: soát biên lợi nhuận theo khách/quy trình/nguyên nhân làm lại; FIN trình CEO.",
-      "counter_metric": null,
+      "action_reference": "SOP-902 + soát giá theo nhóm; CDR review báo giá cổng G0.",
+      "attribution_rule": "Đỏ tách theo khách/quy trình/nguyên nhân làm lại; biên thấp do giá đầu vào tăng thuộc SCM, do làm lại thuộc D-PROD/QA — không quy hết cho FIN.",
+      "counter_metric": "COMPLAINT_RATE",
       "reward_eligible": true,
       "calculation_status": "staged_data_contract",
       "status": "retained"
@@ -296,7 +308,8 @@
       "thresholds": {
         "green": "0 sự cố ghi nhận",
         "yellow": "1 sự cố ghi nhận, không LTI",
-        "red": "≥1 LTI hoặc ≥2 recordable"
+        "red": "≥1 LTI hoặc ≥2 recordable",
+        "basis": "OSHA recordable rate ngành chế tạo kim loại trung vị ~3.0; HESEM đặt 0 sự cố là cổng an toàn không đánh đổi. Căn cứ ANNEX-129 §7 (safety gate-only)."
       },
       "data_source": {
         "system": "EHS",
@@ -316,6 +329,8 @@
       "lead_or_lag": "lag",
       "paired_metric": "SAFETY_ONBOARDING_COMPLIANCE",
       "decision_action": "Bất kỳ sự cố nghiêm trọng: lãnh đạo soát xét ngay; EHS mở điều tra trong 24h.",
+      "action_reference": "ANNEX-117 leo thang an toàn + điều tra sự cố EHS trong 24h.",
+      "attribution_rule": "Sự cố an toàn không phân bổ điểm; luôn điều tra nguyên nhân hệ thống, không quy lỗi cá nhân vận hành trừ khi có hành vi cố ý mất an toàn.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -341,7 +356,8 @@
       "thresholds": {
         "green": "100%",
         "yellow": "90–99.99%",
-        "red": "<90%"
+        "red": "<90%",
+        "basis": "Chuẩn tính liên tục: 100% chức năng trọng yếu có dự phòng. Dưới 90% là rủi ro gián đoạn. Căn cứ ANNEX-123 ma trận phó/dự phòng."
       },
       "data_source": {
         "system": "form",
@@ -361,6 +377,8 @@
       "lead_or_lag": "lead",
       "paired_metric": "CRITICAL_ROLE_BACKUP_COVERAGE",
       "decision_action": "Đỏ: lập kế hoạch lấp khoảng trống về người/hệ thống/tài liệu; QMS trình CEO theo quý.",
+      "action_reference": "Soát xét lãnh đạo theo quý + ANNEX-123; CDR rà soát năng lực.",
+      "attribution_rule": "Khoảng trống dự phòng thuộc trách nhiệm chung QMS/HR/trưởng phòng; không quy cho một cá nhân.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -381,12 +399,13 @@
         "rounding": "round to 1 decimal",
         "exclusions": "RFQ khách rút lại trước khi báo giá không tính",
         "direction": "lower_is_better",
-        "min_sample": 0
+        "min_sample": 3
       },
       "thresholds": {
         "green": "≤3 ngày",
         "yellow": "3.01–5 ngày",
-        "red": ">5 ngày"
+        "red": ">5 ngày",
+        "basis": "Job-shop CNC cạnh tranh phản hồi RFQ ≤3 ngày làm việc; >5 ngày làm mất cơ hội. Căn cứ thực tiễn thương mại ngành."
       },
       "data_source": {
         "system": "ERP",
@@ -406,6 +425,8 @@
       "lead_or_lag": "lag",
       "paired_metric": "QUOTE_HIT_RATE",
       "decision_action": "Vượt ngưỡng: soát chất lượng RFQ tiếp nhận và hỗ trợ kỹ thuật; CS chủ trì.",
+      "action_reference": "WI-202 họp tầng T2 + soát chất lượng tiếp nhận RFQ; CDR cổng G0.",
+      "attribution_rule": "Trễ do thiếu dữ liệu kỹ thuật từ khách hoặc chờ hỗ trợ D-ENG phải tách khỏi phần thuộc CS/EST.",
       "counter_metric": "RFQ_COMPLETENESS_SCORE",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -426,12 +447,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
-        "min_sample": 0
+        "min_sample": 5
       },
       "thresholds": {
         "green": "≥97%",
         "yellow": "92–96.99%",
-        "red": "<92%"
+        "red": "<92%",
+        "basis": "Soát xét hợp đồng/đơn hàng đúng lần đầu chuẩn ≥97%; căn cứ ISO 9001 §8.2 contract review + ANNEX-129 §7."
       },
       "data_source": {
         "system": "ERP",
@@ -450,6 +472,8 @@
       "lead_or_lag": "lag",
       "paired_metric": "RFQ_COMPLETENESS_SCORE",
       "decision_action": "Đỏ: soát lại bàn giao tại bước báo giá/chấp nhận đơn hàng; CS + D-ENG cùng xử lý.",
+      "action_reference": "Bảng kiểm soát xét đơn hàng + WI-202 T2; CDR cổng G0.",
+      "attribution_rule": "Đỏ do bản vẽ/thông số khách thiếu tách khỏi phần thuộc CS; lỗi điều kiện kỹ thuật chuyển D-ENG.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -470,12 +494,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "Lệnh có cờ approved_resequence (re-sequence khách yêu cầu được duyệt) không tính là lệch",
         "direction": "higher_is_better",
-        "min_sample": 0
+        "min_sample": 10
       },
       "thresholds": {
         "green": "≥90%",
         "yellow": "80–89.99%",
-        "red": "<80%"
+        "red": "<80%",
+        "basis": "Độ ổn định điều độ job-shop CNC tốt ≥90%; dưới 80% cho thấy lịch không giữ được. Căn cứ TOC + thực tiễn Lean Daily Management."
       },
       "data_source": {
         "system": "MOM",
@@ -495,6 +520,8 @@
       "lead_or_lag": "lead",
       "paired_metric": "OTD",
       "decision_action": "Đỏ: soát kỷ luật hot-job và ràng buộc vật tư/dụng cụ; PPL mở hành động trong ngày.",
+      "action_reference": "WI-202 họp tầng T1/T2 + ANNEX-117; CDR điều độ cổng G3.",
+      "attribution_rule": "Lệch lịch do job gấp khách yêu cầu (re-sequence có phê duyệt) KHÔNG tính cho PPL; lệch do máy/vật tư tách về WKM/SCM.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -515,12 +542,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
-        "min_sample": 0
+        "min_sample": 5
       },
       "thresholds": {
         "green": "≥95%",
         "yellow": "88–94.99%",
-        "red": "<88%"
+        "red": "<88%",
+        "basis": "Chấp nhận mẫu đầu/FAI ngay lần đầu chuẩn ≥95% với xưởng CNC trưởng thành; dưới 88% cho thấy DFM/program/setup yếu. Căn cứ AIAG FAI + ANNEX-127 §9."
       },
       "data_source": {
         "system": "EQMS",
@@ -540,6 +568,8 @@
       "lead_or_lag": "lead",
       "paired_metric": "FINAL_RELEASE_RFT",
       "decision_action": "Đỏ: liên kết soát CAM/setup/quy trình/đo lường; D-ENG + QA xử lý trong 48h.",
+      "action_reference": "Soát DFM/CAM/setup trước lô kế + quy trình FAI; CDR cổng G4.",
+      "attribution_rule": "Đỏ tách: lỗi bản vẽ/program thuộc D-ENG, lỗi setup/đồ gá thuộc WKM, lỗi đo lường thuộc QC — không quy hết cho QA.",
       "counter_metric": "SETUP_FIRST_PASS",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -560,12 +590,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "lower_is_better",
-        "min_sample": 0
+        "min_sample": 5
       },
       "thresholds": {
         "green": "≤5%",
         "yellow": "5.01–12%",
-        "red": ">12%"
+        "red": ">12%",
+        "basis": "TOC: WIP quá tuổi tại cổng nên ≤5%; >12% là tín hiệu nút thắt nghiêm trọng. Ngưỡng tính theo SỐ NGÀY mở của lệnh, không theo ngày đóng."
       },
       "data_source": {
         "system": "MOM",
@@ -585,6 +616,8 @@
       "lead_or_lag": "lead",
       "paired_metric": "OTD",
       "decision_action": "Đỏ: mở soát luồng-control; ưu tiên gỡ nút thắt; PPL + PD chủ trì TOC tuần.",
+      "action_reference": "WI-202 họp tầng TOC tuần + ANNEX-117; CDR luồng-control.",
+      "attribution_rule": "Lệnh quá tuổi do chờ phê duyệt/vật tư/engineering tách về owner cổng tương ứng; PPL chịu phần điều độ.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -605,12 +638,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
-        "min_sample": 0
+        "min_sample": 3
       },
       "thresholds": {
         "green": "≥90%",
         "yellow": "85–89.99%",
-        "red": "<85%"
+        "red": "<85%",
+        "basis": "Giao hàng đúng hạn nhà cung cấp chuẩn ≥90%; dưới 85% gây thiếu hụt kế hoạch. Căn cứ AIAG supplier readiness + ANNEX-127 §3."
       },
       "data_source": {
         "system": "ERP",
@@ -630,6 +664,8 @@
       "lead_or_lag": "lag",
       "paired_metric": "MATERIAL_AVAILABILITY_PLAN",
       "decision_action": "Đỏ: mở hành động nhà cung cấp hoặc quyết định đổi nguồn; SCM chủ trì.",
+      "action_reference": "Quy trình đánh giá nhà cung cấp + WI-202 T3; CDR mua hàng cổng G2.",
+      "attribution_rule": "Đỏ do nhà cung cấp; SCM chịu trách nhiệm quản lý nhà cung cấp, không bị quy vì năng lực nội bộ nhà cung cấp.",
       "counter_metric": "SUPPLIER_IQC_PASS_RATE",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
@@ -650,12 +686,13 @@
         "rounding": "round to 1 decimal",
         "exclusions": "none",
         "direction": "lower_is_better",
-        "min_sample": 0
+        "min_sample": 5
       },
       "thresholds": {
         "green": "≤2 ngày",
         "yellow": "2.01–4 ngày",
-        "red": ">4 ngày"
+        "red": ">4 ngày",
+        "basis": "Thời gian sẵn sàng giao → hóa đơn nên ≤2 ngày; >4 ngày là tắc quy trình lập hóa đơn. Căn cứ thực tiễn order-to-cash."
       },
       "data_source": {
         "system": "ERP",
@@ -675,6 +712,8 @@
       "lead_or_lag": "lag",
       "paired_metric": "INVOICE_RFT",
       "decision_action": "Đỏ: đóng khoảng trống lập hóa đơn bằng bằng chứng; FIN + CS xử lý trong tuần.",
+      "action_reference": "WI-202 T2 + đóng khoảng trống lập hóa đơn; CDR cổng G7.",
+      "attribution_rule": "Trễ do hồ sơ giao hàng thiếu tách về CS/D-WHS; phần lập hóa đơn thuộc FIN.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -695,12 +734,13 @@
         "rounding": "round to 1 decimal",
         "exclusions": "none",
         "direction": "lower_is_better",
-        "min_sample": 0
+        "min_sample": 5
       },
       "thresholds": {
         "green": "≤45 ngày",
         "yellow": "45.01–60 ngày",
-        "red": ">60 ngày"
+        "red": ">60 ngày",
+        "basis": "DSO ngành gia công CNC B2B lành mạnh ≤45 ngày; >60 ngày là rủi ro dòng tiền. Căn cứ chuẩn tài chính + điều khoản thanh toán hợp đồng."
       },
       "data_source": {
         "system": "ERP",
@@ -720,6 +760,8 @@
       "lead_or_lag": "lag",
       "paired_metric": "INVOICE_RFT",
       "decision_action": "Đỏ: lập kế hoạch thu hồi và leo thang thương mại; FIN chủ trì.",
+      "action_reference": "SOP-902 + kế hoạch thu hồi công nợ; CDR cổng G7.",
+      "attribution_rule": "DSO cao do điều khoản khách hoặc tranh chấp chất lượng tách khỏi phần thuộc FIN; phần do hóa đơn lỗi liên kết INVOICE_RFT.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -740,12 +782,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
-        "min_sample": 0
+        "min_sample": 5
       },
       "thresholds": {
         "green": "≥85%",
         "yellow": "70–84.99%",
-        "red": "<70%"
+        "red": "<70%",
+        "basis": "Hiệu quả khôi phục tiến độ sau lệch lịch nên ≥85%; căn cứ Lean Daily Management thực tiễn."
       },
       "data_source": {
         "system": "MOM",
@@ -765,6 +808,8 @@
       "lead_or_lag": "lag",
       "paired_metric": "PLAN_ADHERENCE",
       "decision_action": "Đỏ: sắp xếp lại và mở hành động năng lực; PD chủ trì họp tầng.",
+      "action_reference": "WI-202 họp tầng T1/T2 hằng ngày; CDR điều độ.",
+      "attribution_rule": "Khôi phục phụ thuộc năng lực sẵn có; thiếu năng lực do quyết định nguồn lực quản lý không quy cho PD.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -785,12 +830,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
-        "min_sample": 0
+        "min_sample": 5
       },
       "thresholds": {
         "green": "100%",
         "yellow": "98–99.99%",
-        "red": "<98%"
+        "red": "<98%",
+        "basis": "Tuân thủ vệ sinh FOD/line-clearance chuẩn 100%; mọi sai lệch là rủi ro chất lượng. Căn cứ AS9100/ngành hàng không khi áp dụng."
       },
       "data_source": {
         "system": "EQMS",
@@ -809,6 +855,8 @@
       "lead_or_lag": "lag",
       "paired_metric": "FAI_FIRST_PASS",
       "decision_action": "Lặp lỗi: mở bao vây và đào tạo lại; WKM xử lý trong ca.",
+      "action_reference": "Quy trình line-clearance + đào tạo lại; CDR cổng G3/G5.",
+      "attribution_rule": "Lặp lỗi do thiếu đào tạo tách về HR/WKM; cá nhân chỉ bị xử lý khi cố ý bỏ bước.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -829,12 +877,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
-        "min_sample": 0
+        "min_sample": 5
       },
       "thresholds": {
         "green": "≥95%",
         "yellow": "88–94.99%",
-        "red": "<88%"
+        "red": "<88%",
+        "basis": "Phát hành kỹ thuật đúng hạn chuẩn ≥95%; dưới 88% gây trễ chuỗi sau. Căn cứ thực tiễn quản lý kỹ thuật."
       },
       "data_source": {
         "system": "ERP",
@@ -853,6 +902,8 @@
       "lead_or_lag": "lag",
       "paired_metric": "ORDER_REVIEW_RFT",
       "decision_action": "Trễ: soát nút thắt và thay đổi thứ tự hàng đợi; ENGM chủ trì.",
+      "action_reference": "WI-202 T2 + soát nút thắt kỹ thuật; CDR cổng G1.",
+      "attribution_rule": "Trễ do chờ thông tin khách hoặc thay đổi phạm vi tách khỏi phần thuộc D-ENG.",
       "counter_metric": "ENGINEERING_RELEASE_DEFECT_RATE",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -873,12 +924,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "Tính theo ngày mở, không theo ngày đóng",
         "direction": "lower_is_better",
-        "min_sample": 0
+        "min_sample": 5
       },
       "thresholds": {
         "green": "≤10%",
         "yellow": "10.01–25%",
-        "red": ">25%"
+        "red": ">25%",
+        "basis": "ECO tồn quá tuổi nên ≤10%; >25% là tồn đọng kỹ thuật. Tính theo SỐ NGÀY từ ngày MỞ ECO."
       },
       "data_source": {
         "system": "ERP",
@@ -898,6 +950,8 @@
       "lead_or_lag": "lag",
       "paired_metric": "ENGINEERING_RELEASE_ON_TIME",
       "decision_action": "Quá hạn: leo thang báo cáo công việc/đơn hàng bị ảnh hưởng; ENGM trình tầng kế.",
+      "action_reference": "WI-202 T2/T3 leo thang ECO; CDR quản lý thay đổi cổng G1.",
+      "attribution_rule": "ECO chờ phê duyệt/đánh giá liên phòng tách về owner bước tương ứng; ENGM chịu phần điều phối.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -918,12 +972,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "Tính theo ngày mở (created_at), không theo ngày đóng",
         "direction": "lower_is_better",
-        "min_sample": 0
+        "min_sample": 5
       },
       "thresholds": {
         "green": "≤10%",
         "yellow": "10.01–25%",
-        "red": ">25%"
+        "red": ">25%",
+        "basis": "NCR tồn quá tuổi nên ≤10%; >25% cho thấy CAPA tắc. Tính theo SỐ NGÀY từ ngày MỞ NCR (chống dồn đóng cuối kỳ cho số đẹp)."
       },
       "data_source": {
         "system": "EQMS",
@@ -943,6 +998,8 @@
       "lead_or_lag": "lag",
       "paired_metric": "CAPA_EFFECTIVENESS",
       "decision_action": "Quá hạn: leo thang hàng tuần; QA chủ trì soát root-cause cùng phòng liên quan.",
+      "action_reference": "Quy trình NCR/CAPA + WI-202 T3 leo thang; SOP-902 nếu vượt L2.",
+      "attribution_rule": "NCR mở chờ ECO/đổi vật tư/hành động khắc phục phòng khác tách về owner tương ứng; QA chịu phần điều phối đóng.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -968,7 +1025,8 @@
       "thresholds": {
         "green": "100%",
         "yellow": "98–99.99%",
-        "red": "<98%"
+        "red": "<98%",
+        "basis": "Tuân thủ hiệu chuẩn phải 100% — thiết bị đo quá hạn làm vô hiệu mọi kết quả đo. Căn cứ ISO 10012 + IATF 16949 §7.1.5."
       },
       "data_source": {
         "system": "MOM",
@@ -989,6 +1047,8 @@
       "lead_or_lag": "lead",
       "paired_metric": "FAI_FIRST_PASS",
       "decision_action": "Quá hạn: tạm giữ hoạt động phụ thuộc đo lường; QA + MCS xử lý trong 24h.",
+      "action_reference": "Lịch hiệu chuẩn + tạm giữ hoạt động phụ thuộc đo lường; CDR cổng G4/G5.",
+      "attribution_rule": "Quá hạn do nhà hiệu chuẩn ngoài trễ tách khỏi phần thuộc QA/MCS.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
@@ -1009,12 +1069,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
-        "min_sample": 0
+        "min_sample": 10
       },
       "thresholds": {
         "green": "≥95%",
         "yellow": "85–94.99%",
-        "red": "<85%"
+        "red": "<85%",
+        "basis": "Sẵn sàng vật tư cho lịch đã khoá nên ≥95%; dưới 85% gây dừng chuyền. Căn cứ thực tiễn MRP/Lean."
       },
       "data_source": {
         "system": "ERP",
@@ -1034,6 +1095,8 @@
       "lead_or_lag": "lead",
       "paired_metric": "PLAN_ADHERENCE",
       "decision_action": "Đỏ: đẩy nhanh tiến độ hoặc quyết định đổi nguồn; SCM xử lý trong ngày.",
+      "action_reference": "WI-202 T1/T2 + đẩy nhanh tiến độ mua; CDR cổng G2.",
+      "attribution_rule": "Thiếu vật tư do nhà cung cấp trễ liên kết SUPPLIER_OTD; SCM chịu phần lập kế hoạch mua.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -1054,12 +1117,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
-        "min_sample": 0
+        "min_sample": 20
       },
       "thresholds": {
         "green": "≥98%",
         "yellow": "95–97.99%",
-        "red": "<95%"
+        "red": "<95%",
+        "basis": "Độ chính xác tồn kho chuẩn ≥98%; dưới 95% làm sai kế hoạch vật tư. Căn cứ thực tiễn cycle-count."
       },
       "data_source": {
         "system": "ERP",
@@ -1078,6 +1142,8 @@
       "lead_or_lag": "lag",
       "paired_metric": "MATERIAL_AVAILABILITY_PLAN",
       "decision_action": "Chênh lệch: đếm lại và mở hành động kiểm soát; D-SCM + D-WHS xử lý.",
+      "action_reference": "Quy trình cycle-count + hành động kiểm soát; CDR kho.",
+      "attribution_rule": "Sai lệch do giao dịch chưa ghi ở khâu sản xuất tách về D-PROD; D-SCM/D-WHS chịu phần kho.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -1098,12 +1164,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "RFQ ngoài năng lực không tính vào mẫu số",
         "direction": "higher_is_better",
-        "min_sample": 0
+        "min_sample": 10
       },
       "thresholds": {
         "green": "≥35%",
         "yellow": "25–34.99%",
-        "red": "<25%"
+        "red": "<25%",
+        "basis": "Tỷ lệ trúng báo giá trên RFQ đủ năng lực ngành CNC ~25–35%; dưới 25% cần soát định giá/năng lực. Mẫu số CHỈ tính RFQ đủ năng lực (chống chọn RFQ dễ)."
       },
       "data_source": {
         "system": "ERP",
@@ -1123,6 +1190,8 @@
       "lead_or_lag": "lag",
       "paired_metric": "GROSS_MARGIN_JOB_FAMILY",
       "decision_action": "Soát định giá, đánh giá năng lực, phản hồi chất lượng; CS + EST chủ trì.",
+      "action_reference": "SOP-902 soát định giá + phản hồi chất lượng; CDR cổng G0.",
+      "attribution_rule": "Tỷ lệ thấp do giá thị trường hoặc năng lực kỹ thuật không đủ tách về phần tương ứng; CS/EST chịu phần chất lượng báo giá.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -1143,12 +1212,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
-        "min_sample": 0
+        "min_sample": 5
       },
       "thresholds": {
         "green": "≥95%",
         "yellow": "85–94.99%",
-        "red": "<85%"
+        "red": "<85%",
+        "basis": "Đóng trao đổi khách đúng hạn nên ≥95%; căn cứ thực tiễn dịch vụ khách hàng."
       },
       "data_source": {
         "system": "ERP",
@@ -1168,6 +1238,8 @@
       "lead_or_lag": "lag",
       "paired_metric": "COMPLAINT_RATE",
       "decision_action": "Quá hạn: leo thang lãnh đạo trên tài khoản rủi ro; CS chủ trì.",
+      "action_reference": "WI-202 T2 + leo thang tài khoản rủi ro; CDR dịch vụ khách hàng.",
+      "attribution_rule": "Trao đổi chờ phòng khác trả lời tách khỏi phần thuộc CS.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -1188,12 +1260,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
-        "min_sample": 0
+        "min_sample": 10
       },
       "thresholds": {
         "green": "≥98%",
         "yellow": "95–97.99%",
-        "red": "<95%"
+        "red": "<95%",
+        "basis": "Hóa đơn đúng ngay lần đầu chuẩn ≥98%; lỗi hóa đơn kéo dài DSO. Căn cứ thực tiễn order-to-cash."
       },
       "data_source": {
         "system": "ERP",
@@ -1212,6 +1285,8 @@
       "lead_or_lag": "lead",
       "paired_metric": "DSO",
       "decision_action": "Lỗi: truy nguyên nhân gốc theo vai trò xác nhận dữ liệu nguồn; FIN xử lý.",
+      "action_reference": "Quy trình lập hóa đơn + truy nguyên nhân gốc; CDR cổng G7.",
+      "attribution_rule": "Lỗi do dữ liệu nguồn sai (giá, số lượng) tách về vai trò xác nhận dữ liệu nguồn; FIN chịu phần lập hóa đơn.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -1237,7 +1312,8 @@
       "thresholds": {
         "green": "100%",
         "yellow": "90–99.99%",
-        "red": "<90%"
+        "red": "<90%",
+        "basis": "Đóng sổ cuối tháng đúng lịch phải 100% các bước; chậm làm trễ báo cáo điều hành. Căn cứ thực tiễn kế toán."
       },
       "data_source": {
         "system": "ERP",
@@ -1257,6 +1333,8 @@
       "lead_or_lag": "lag",
       "paired_metric": "INVOICE_RFT",
       "decision_action": "Chậm trễ: sửa dữ liệu công đoạn trước hoặc bố trí nhân sự; FIN chủ trì.",
+      "action_reference": "Lịch đóng sổ + bố trí nhân sự; SOP-902.",
+      "attribution_rule": "Chậm do dữ liệu công đoạn trước (giao hàng, mua hàng) chưa khoá tách về phòng nguồn; FIN chịu phần đóng sổ.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -1277,12 +1355,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
-        "min_sample": 0
+        "min_sample": 5
       },
       "thresholds": {
         "green": "≥95%",
         "yellow": "85–94.99%",
-        "red": "<85%"
+        "red": "<85%",
+        "basis": "Hoàn thành đào tạo đúng hạn chuẩn ≥95%; dưới 85% gây rủi ro năng lực. Căn cứ IATF 16949 §7.2 competence."
       },
       "data_source": {
         "system": "EQMS",
@@ -1301,6 +1380,8 @@
       "lead_or_lag": "lead",
       "paired_metric": "CRITICAL_ROLE_BACKUP_COVERAGE",
       "decision_action": "Quá hạn: khoá quyền được uỷ quyền thực hiện công việc ở nơi bắt buộc; HR + trưởng phòng xử lý.",
+      "action_reference": "Kế hoạch đào tạo + khoá quyền thực hiện công việc khi bắt buộc; CDR năng lực.",
+      "attribution_rule": "Chưa hoàn thành do lịch sản xuất chiếm chỗ tách trách nhiệm chung HR/trưởng phòng; không quy cho riêng HR.",
       "counter_metric": "TRAINING_COMPETENCY_VERIFIED_RATE",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
@@ -1326,7 +1407,8 @@
       "thresholds": {
         "green": "100%",
         "yellow": "85–99.99%",
-        "red": "<85%"
+        "red": "<85%",
+        "basis": "Bao phủ dự phòng vai trò trọng yếu phải 100%; dưới 85% là rủi ro phụ thuộc người. Căn cứ ANNEX-123 ma trận phó/dự phòng."
       },
       "data_source": {
         "system": "form",
@@ -1347,6 +1429,8 @@
       "lead_or_lag": "lead",
       "paired_metric": "BCP_READINESS",
       "decision_action": "Khoảng trống: mở kế hoạch đào tạo chéo; HR + trưởng phòng chủ trì.",
+      "action_reference": "ANNEX-123 + kế hoạch đào tạo chéo; CDR rà soát năng lực.",
+      "attribution_rule": "Khoảng trống dự phòng là trách nhiệm chung HR/trưởng phòng.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -1367,12 +1451,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "Tính theo ngày mở hành động",
         "direction": "lower_is_better",
-        "min_sample": 0
+        "min_sample": 5
       },
       "thresholds": {
         "green": "≤10%",
         "yellow": "10.01–25%",
-        "red": ">25%"
+        "red": ">25%",
+        "basis": "Hành động sự cố tồn quá tuổi nên ≤10%; >25% là rủi ro an toàn tích tụ. Tính theo SỐ NGÀY từ ngày MỞ hành động."
       },
       "data_source": {
         "system": "EHS",
@@ -1392,6 +1477,8 @@
       "lead_or_lag": "lag",
       "paired_metric": "RECORDABLE_INCIDENT_RATE",
       "decision_action": "Quá hạn: leo thang an toàn; EHS chủ trì soát xét tuần.",
+      "action_reference": "ANNEX-117 leo thang an toàn + soát xét tuần EHS.",
+      "attribution_rule": "Hành động chờ phòng khác thực hiện tách về owner tương ứng; EHS chịu phần điều phối.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -1417,7 +1504,8 @@
       "thresholds": {
         "green": "100%",
         "yellow": "95–99.99%",
-        "red": "<95%"
+        "red": "<95%",
+        "basis": "Đào tạo an toàn hội nhập phải 100% trước khi vào xưởng; dưới 95% là rủi ro an toàn trực tiếp. Căn cứ OSHA/luật lao động."
       },
       "data_source": {
         "system": "EQMS",
@@ -1437,6 +1525,8 @@
       "lead_or_lag": "lead",
       "paired_metric": "RECORDABLE_INCIDENT_RATE",
       "decision_action": "Chưa đủ: khoá quyền vào xưởng cho đến khi hoàn thành; EHS + HR xử lý.",
+      "action_reference": "Quy trình hội nhập + khoá quyền vào xưởng; CDR an toàn.",
+      "attribution_rule": "Chưa hoàn thành là cổng chặn; không phân bổ điểm, luôn hoàn thành trước khi bố trí việc.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -1457,12 +1547,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "none",
         "direction": "higher_is_better",
-        "min_sample": 0
+        "min_sample": 5
       },
       "thresholds": {
         "green": "≥95%",
         "yellow": "85–94.99%",
-        "red": "<85%"
+        "red": "<85%",
+        "basis": "Đóng phiếu dịch vụ IT trong SLA chuẩn ≥95%; căn cứ thực tiễn ITSM."
       },
       "data_source": {
         "system": "MOM",
@@ -1482,6 +1573,8 @@
       "lead_or_lag": "lag",
       "paired_metric": "CRITICAL_SYSTEM_AVAILABILITY",
       "decision_action": "Đỏ: bổ sung nguồn lực hỗ trợ; ITA chủ trì.",
+      "action_reference": "Quy trình ITSM + bổ sung nguồn lực hỗ trợ; CDR dịch vụ IT.",
+      "attribution_rule": "Phiếu chờ phụ thuộc nhà cung cấp ngoài tách khỏi phần thuộc ITA.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -1507,7 +1600,8 @@
       "thresholds": {
         "green": "≥99.5%",
         "yellow": "98–99.49%",
-        "red": "<98%"
+        "red": "<98%",
+        "basis": "Sẵn sàng hệ thống trọng yếu chuẩn ≥99.5%; dưới 98% gây gián đoạn vận hành. Bảo trì kế hoạch KHÔNG tính là downtime. Căn cứ thực tiễn SLA hạ tầng."
       },
       "data_source": {
         "system": "MOM",
@@ -1526,6 +1620,8 @@
       "lead_or_lag": "lag",
       "paired_metric": "SERVICE_TICKET_SLA",
       "decision_action": "Đỏ: quyết định đầu tư hạ tầng hoặc phương án dự phòng; ITA trình lãnh đạo.",
+      "action_reference": "SOP-902 quyết định đầu tư hạ tầng; CDR hạ tầng IT.",
+      "attribution_rule": "Downtime do nhà cung cấp hạ tầng/điện ngoài tầm tách khỏi phần thuộc ITA.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
@@ -1546,12 +1642,13 @@
         "rounding": "round to 2 decimals",
         "exclusions": "Tính theo ngày mở ngoại lệ",
         "direction": "lower_is_better",
-        "min_sample": 0
+        "min_sample": 5
       },
       "thresholds": {
         "green": "≤10%",
         "yellow": "10.01–25%",
-        "red": ">25%"
+        "red": ">25%",
+        "basis": "Ngoại lệ dữ liệu gốc tồn quá tuổi nên ≤10%; >25% làm sai giao dịch hạ nguồn. Tính theo SỐ NGÀY từ ngày MỞ ngoại lệ."
       },
       "data_source": {
         "system": "MOM",
@@ -1571,6 +1668,8 @@
       "lead_or_lag": "lag",
       "paired_metric": "INVENTORY_ACCURACY",
       "decision_action": "Quá hạn: mở hành động làm sạch dữ liệu gốc; ITA + D-SCM xử lý.",
+      "action_reference": "WI-202 T3 + hành động làm sạch dữ liệu; CDR quản trị dữ liệu.",
+      "attribution_rule": "Ngoại lệ do nhập liệu sai ở phòng nghiệp vụ tách về phòng nguồn; ITA chịu phần quản trị.",
       "counter_metric": null,
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",

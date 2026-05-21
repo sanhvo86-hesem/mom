@@ -373,6 +373,8 @@ final class KpiEngine
                 'lead_or_lag' => $this->stringField($row, 'lead_or_lag'),
                 'paired_metric' => $this->stringField($row, 'paired_metric'),
                 'decision_action' => $this->stringField($row, 'decision_action'),
+                'action_reference' => $this->stringField($row, 'action_reference'),
+                'attribution_rule' => $this->stringField($row, 'attribution_rule'),
                 'registry_counter_metric' => $this->stringField($row, 'counter_metric'),
                 'reward_eligible' => $row['reward_eligible'] ?? null,
             ], $aliases);
@@ -1893,16 +1895,18 @@ final class KpiEngine
      */
     private function applyGovernanceLists(array &$metric, array $override): void
     {
-        // Precedence: metric_governance_overrides → registry-authored
-        // counter_metric on the governance KPI row (prompt 02) → kpi default.
+        // Precedence: a counter_metric authored on the governance KPI row is
+        // the SSOT (prompt 02/03) and wins over legacy
+        // metric_governance_overrides; overrides still apply to non-governance
+        // metrics, which carry no registry_counter_metric.
         $counterMetric = $override['counter_metric'] ?? null;
         $registryCounter = $this->stringField($metric, 'registry_counter_metric');
-        if (is_array($counterMetric)) {
+        if ($registryCounter !== '') {
+            $metric['counter_metric'] = [$registryCounter];
+        } elseif (is_array($counterMetric)) {
             $metric['counter_metric'] = array_values(array_filter($counterMetric, static fn(mixed $item): bool => is_string($item) && trim($item) !== ''));
         } elseif (is_string($counterMetric) && trim($counterMetric) !== '') {
             $metric['counter_metric'] = [trim($counterMetric)];
-        } elseif ($registryCounter !== '') {
-            $metric['counter_metric'] = [$registryCounter];
         } elseif (($metric['metric_type'] ?? null) === 'kpi') {
             $metric['counter_metric'] = ['SAFETY_QUALITY_DELIVERY_DATA_INTEGRITY_GATE'];
         } else {
