@@ -27,8 +27,7 @@ declare(strict_types=1);
  *   7. Cross-check: the primary Responsible role recorded for each CDR in
  *      ANNEX-120 should appear as A or R for that CDR in ANNEX-121 (sub-roles
  *      are alias-mapped to their column, e.g. PE/ENGM/CAM→ENG, BUY→SCM,
- *      ITA/ESA→HR/IT). F1/F2 are whitelisted: ANNEX-121 deliberately records
- *      the originating role as R there (see ANNEX-121 §2 R-semantics rule).
+ *      ITA/ESA→HR/IT). No whitelist — every CDR must reconcile.
  *
  * Exit code: 0 = clean (warnings allowed), 1 = at least one P0 finding.
  */
@@ -40,7 +39,7 @@ $annex120 = $base.'/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authori
 $ROLE_COLS = ['CS','EST','ENG','PPL','WKM','PD','QA','SCM','CEO','EHS','HR/IT'];
 $ALIAS     = ['PE'=>'ENG','ENGM'=>'ENG','CAM'=>'ENG','DFM'=>'ENG','BUY'=>'SCM',
               'ITA'=>'HR/IT','ESA'=>'HR/IT','QCL'=>'QA','QC'=>'QA'];
-$R_SEMANTICS_WHITELIST = ['F1','F2'];   // documented R-as-originator cases
+$R_SEMANTICS_WHITELIST = [];             // no exceptions — F1/F2 realigned to IT=R
 
 $p0 = [];
 $p1 = [];
