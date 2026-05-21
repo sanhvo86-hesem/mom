@@ -138,12 +138,12 @@
     },
     {
       id: 'G6',
-      label:  { vi: 'G6 · QC Cuối',     en: 'G6 · Final QC'        },
-      short:  { vi: 'QC Cuối',           en: 'Final QC'              },
+      label:  { vi: 'G6 · OQC',          en: 'G6 · OQC'              },
+      short:  { vi: 'OQC',               en: 'OQC'                   },
       role:   'QCL',
       dept:   { vi: 'QA / QC',           en: 'QA / QC'               },
-      desc:   { vi: 'Kiểm tra cuối, phát hành CoC & chốt chất lượng trước giao hàng',
-                en: 'Final inspection, CoC issuance & quality sign-off before shipment' },
+      desc:   { vi: 'Kiểm tra xuất xưởng (OQC), phát hành CoC & chốt chất lượng trước giao hàng',
+                en: 'Outgoing quality control (OQC), CoC issuance & sign-off before shipment' },
       docs:   ['SOP-603','SOP-604','SOP-605','FRM-206'],
       col: 6
     },
@@ -459,15 +459,16 @@
     var W = 1010, H = 650, spineY = 325;
     var tipTopY = 104, tipBotY = 546;
 
+    /* Wider x-span (120px) so sub-branches have room along each bone */
     var topGates = [0, 1, 3, 5];
-    var topSX    = [165, 320, 480, 640];
-    var topTX    = [105, 260, 420, 580];
+    var topSX    = [208, 368, 528, 688];  /* spine junction X = tipX + 120 */
+    var topTX    = [88,  248, 408, 568];  /* bone tip X */
 
     var botGates = [2, 4, 6, 7];
-    var botSX    = [243, 400, 560, 720];
-    var botTX    = [183, 340, 500, 660];
+    var botSX    = [283, 428, 588, 748];
+    var botTX    = [163, 308, 468, 628];
 
-    /* Category accent colors for doc code pills */
+    /* Category accent colors for doc code sub-branch labels */
     var CAT_COL = { SOP: '#1565c0', WI: '#16a34a', ANNEX: '#7c3aed', FRM: '#d97706' };
 
     var bp = cv('brand-primary', '#1565c0');
@@ -510,8 +511,9 @@
       var gate = GATES[gi];
       var col  = palette(gate.col);
       var n    = gate.docs.length;
-      /* Fixed card size: header(20) + name(16) + role(12) + sep(5) + 2 doc-rows(28) + pad(7) = 88 */
-      var lbW = 128, lbH = 88, hdrH = 20;
+
+      /* Compact card: header(20) + short-name(16) + role(14) + pad(4) = 54 */
+      var lbW = 112, lbH = 54, hdrH = 20;
       var lbX = tx - lbW / 2;
       var lbY = isTop ? ty - lbH - 8 : ty + 8;
 
@@ -519,67 +521,55 @@
       s += '<line x1="' + tx + '" y1="' + ty + '" x2="' + sx + '" y2="' + spineY +
            '" stroke="' + col + '" stroke-width="2.5" class="dov-bone"/>';
 
-      /* Colored dots along bone — one per doc, no text */
-      for (var j = 0; j < n && j < 5; j++) {
-        var t  = 0.22 + j * (0.56 / Math.max(n - 1, 1));
-        var bx = tx + t * (sx - tx);
-        var by = ty + t * (spineY - ty);
-        var cat0 = catOfCode(gate.docs[j]);
-        var dc   = CAT_COL[cat0] || col;
-        s += '<circle cx="' + bx + '" cy="' + by + '" r="4" fill="' + dc + '" opacity="0.5"/>';
+      /* Perpendicular unit vector — points away from spine */
+      var boneVecX = sx - tx;
+      var boneVecY = spineY - ty;
+      var boneLen  = Math.sqrt(boneVecX * boneVecX + boneVecY * boneVecY);
+      var perpX    = isTop ?  boneVecY / boneLen : -boneVecY / boneLen;
+      var perpY    = isTop ? -boneVecX / boneLen :  boneVecX / boneLen;
+
+      /* Sub-branches — one per doc, staggered along the bone */
+      for (var k = 0; k < n; k++) {
+        var t  = 0.22 + k * (0.56 / Math.max(n - 1, 1));
+        var bx = tx + t * boneVecX;
+        var by = ty + t * boneVecY;
+        var ex = bx + perpX * 30;
+        var ey = by + perpY * 30;
+        var code = gate.docs[k];
+        var ccat = catOfCode(code);
+        var cc   = CAT_COL[ccat] || col;
+        s += '<line x1="' + bx + '" y1="' + by + '" x2="' + ex + '" y2="' + ey +
+             '" stroke="' + cc + '" stroke-width="1.5" opacity="0.85"/>';
+        s += '<circle cx="' + bx + '" cy="' + by + '" r="2.5" fill="' + cc + '" opacity="0.7"/>';
+        var textY = isTop ? ey - 2 : ey + 9;
+        s += '<text x="' + ex + '" y="' + textY + '" font-size="7.5" font-weight="700"' +
+             ' font-family="monospace" fill="' + cc + '" text-anchor="middle">' + esc(code) + '</text>';
       }
 
       /* Junction dot */
       s += '<circle cx="' + sx + '" cy="' + spineY + '" r="5.5" fill="' + col + '"/>';
 
-      /* ── White card label box ── */
+      /* ── Compact white card label box ── */
       s += '<g class="dov-gate-lbl" data-gi="' + gi + '" role="button" tabindex="0" aria-label="' + esc(T(gate.label)) + '">';
       if (gate.parallel) s += '<title>' + gate.id + ' ∥ ' + gate.parallel + '</title>';
 
-      /* Card body */
       s += '<rect x="' + lbX + '" y="' + lbY + '" width="' + lbW + '" height="' + lbH +
            '" rx="9" fill="' + cv('bg-surface', '#fff') + '" stroke="' + col + '" stroke-width="1.5"/>';
-      /* Colored header strip */
       s += '<rect x="' + lbX + '" y="' + lbY + '" width="' + lbW + '" height="' + hdrH +
            '" rx="9" fill="' + col + '"/>';
       s += '<rect x="' + lbX + '" y="' + (lbY + 10) + '" width="' + lbW + '" height="' + (hdrH - 10) +
            '" fill="' + col + '"/>';
-      /* Gate ID (left of header) */
       s += '<text x="' + (lbX + 7) + '" y="' + (lbY + 14) + '" font-size="10.5" font-weight="800"' +
            ' fill="' + cv('text-inverse', '#fff') + '" font-family="inherit">' + esc(gate.id) + '</text>';
-      /* Parallel badge (right of header) */
       if (gate.parallel) {
         s += '<text x="' + (lbX + lbW - 6) + '" y="' + (lbY + 14) + '" text-anchor="end" font-size="8.5"' +
              ' fill="rgba(255,255,255,0.9)" font-family="inherit" font-weight="600">∥' + gate.parallel + '</text>';
       }
-      /* Short name */
-      s += '<text x="' + tx + '" y="' + (lbY + hdrH + 13) + '" text-anchor="middle" font-size="11"' +
+      s += '<text x="' + tx + '" y="' + (lbY + hdrH + 14) + '" text-anchor="middle" font-size="11"' +
            ' font-weight="700" fill="' + col + '" font-family="inherit">' + esc(T(gate.short)) + '</text>';
-      /* Role */
-      s += '<text x="' + tx + '" y="' + (lbY + hdrH + 25) + '" text-anchor="middle" font-size="8.5"' +
+      s += '<text x="' + tx + '" y="' + (lbY + hdrH + 28) + '" text-anchor="middle" font-size="8.5"' +
            ' fill="' + col + '" font-family="inherit" opacity="0.72">' + esc(gate.role) + '</text>';
 
-      /* Separator line */
-      var sepY = lbY + hdrH + 32;
-      s += '<line x1="' + (lbX + 6) + '" y1="' + sepY + '" x2="' + (lbX + lbW - 6) + '" y2="' + sepY +
-           '" stroke="' + col + '" stroke-width="0.6" opacity="0.25"/>';
-
-      /* Doc code pills — 2 per row, category-colored */
-      var pillW  = Math.floor(lbW / 2) - 7; /* width of each pill column */
-      var docRow0Y = sepY + 14;              /* baseline of first row */
-      for (var k = 0; k < n; k++) {
-        var code  = gate.docs[k];
-        var ccat  = catOfCode(code);
-        var cc    = CAT_COL[ccat] || col;
-        var col2  = k % 2;                    /* 0=left, 1=right */
-        var row   = Math.floor(k / 2);
-        var px    = col2 === 0 ? lbX + 4 : lbX + lbW / 2 + 3;
-        var py    = docRow0Y + row * 15;       /* text baseline */
-        s += '<rect x="' + px + '" y="' + (py - 9) + '" width="' + pillW + '" height="12"' +
-             ' rx="3" fill="' + cc + '" fill-opacity="0.14"/>';
-        s += '<text x="' + (px + 4) + '" y="' + py + '" font-size="7.5" font-weight="700"' +
-             ' font-family="monospace" fill="' + cc + '">' + esc(code) + '</text>';
-      }
       s += '</g>';
     }
 
