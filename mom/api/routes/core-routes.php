@@ -112,6 +112,8 @@ return static function (Router $router, string $dataDir): void {
         'admin_module_access_save'         => [AdminController::class, 'saveModuleAccessConfig'],
         'admin_decision_thresholds_get'    => [AdminController::class, 'decisionThresholdsGet'],
         'admin_decision_thresholds_save'   => [AdminController::class, 'decisionThresholdsSave'],
+        'admin_raci_matrix_get'            => [AdminController::class, 'raciMatrixGet'],
+        'admin_raci_matrix_save'           => [AdminController::class, 'raciMatrixSave'],
         'admin_audit_trail_list'           => [AdminController::class, 'getAuditTrail'],
         'user_doc_overrides_get'           => [AdminController::class, 'getUserDocumentOverrides'],
         'admin_user_doc_overrides_save'    => [AdminController::class, 'saveUserDocumentOverrides'],

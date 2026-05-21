@@ -49,6 +49,7 @@ RUNTIME_CONFIG_FILES=(
     portal_display_config.json          # admin portal display editor
     design-system-config.json           # GraphicsGovernanceService::saveDesignConfig (admin graphics tab)
     decision_thresholds.json            # DecisionThresholdService::save — admin authority threshold editor
+    raci_matrix.json                    # RaciMatrixService::save — admin RACI matrix editor
 
     # ── Data layer / observability ────────────────────────────────────────
     data_collection_settings.json       # DataLayer::saveConfig('data_collection_settings')
