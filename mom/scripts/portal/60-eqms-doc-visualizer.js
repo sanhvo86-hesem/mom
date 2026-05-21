@@ -459,14 +459,16 @@
     var W = 1010, H = 650, spineY = 325;
     var tipTopY = 104, tipBotY = 546;
 
-    /* Wider x-span (120px) so sub-branches have room along each bone */
-    var topGates = [0, 1, 3, 5];
-    var topSX    = [208, 368, 528, 688];  /* spine junction X = tipX + 120 */
-    var topTX    = [88,  248, 408, 568];  /* bone tip X */
+    /* Sequential order G0 → G1∥G2 → G3 → G4 → G5 → G6 → G7
+     * G1(top) and G2(bottom) share the same spine junction (parallel gates).
+     * G3-G7 alternate top/bottom so spine reads left-to-right in correct order. */
+    var topGates = [0, 1, 4, 6];  /* G0, G1, G4-FAI, G6-OQC */
+    var topSX    = [185, 335, 520, 655];  /* spine junction X */
+    var topTX    = [75,  225, 410, 545];  /* bone tip X (sx - 110) */
 
-    var botGates = [2, 4, 6, 7];
-    var botSX    = [283, 428, 588, 748];
-    var botTX    = [163, 308, 468, 628];
+    var botGates = [2, 3, 5, 7];  /* G2-IQC (∥G1), G3-Setup, G5-IPQC, G7-Shipment */
+    var botSX    = [335, 440, 600, 770];  /* G2 shares jx=335 with G1 */
+    var botTX    = [225, 330, 490, 660];
 
     /* Category accent colors for doc code sub-branch labels */
     var CAT_COL = { SOP: '#1565c0', WI: '#16a34a', ANNEX: '#7c3aed', FRM: '#d97706' };
@@ -513,7 +515,7 @@
       var n    = gate.docs.length;
 
       /* Compact card: header(20) + short-name(16) + role(14) + pad(4) = 54 */
-      var lbW = 112, lbH = 54, hdrH = 20;
+      var lbW = 88, lbH = 54, hdrH = 20;
       var lbX = tx - lbW / 2;
       var lbY = isTop ? ty - lbH - 8 : ty + 8;
 
@@ -541,9 +543,10 @@
         s += '<line x1="' + bx + '" y1="' + by + '" x2="' + ex + '" y2="' + ey +
              '" stroke="' + cc + '" stroke-width="1.5" opacity="0.85"/>';
         s += '<circle cx="' + bx + '" cy="' + by + '" r="2.5" fill="' + cc + '" opacity="0.7"/>';
-        var textY = isTop ? ey - 2 : ey + 9;
-        s += '<text x="' + ex + '" y="' + textY + '" font-size="7.5" font-weight="700"' +
-             ' font-family="monospace" fill="' + cc + '" text-anchor="middle">' + esc(code) + '</text>';
+        s += '<text x="' + (ex + 3) + '" y="' + ey + '" font-size="9" font-weight="700"' +
+             ' font-family="monospace" fill="' + cc + '" text-anchor="start"' +
+             ' dominant-baseline="middle" class="dov-doc-code-link"' +
+             ' data-doc-code="' + esc(code) + '" style="cursor:pointer">' + esc(code) + '</text>';
       }
 
       /* Junction dot */
@@ -584,6 +587,13 @@
          '</p></div>';
 
     canvas.innerHTML = '<div class="dov-fishbone-wrap">' + s + '</div>';
+
+    canvas.querySelectorAll('.dov-doc-code-link').forEach(function (el) {
+      el.addEventListener('click', function (e) {
+        e.stopPropagation();
+        openDocSafe(el.getAttribute('data-doc-code'));
+      });
+    });
 
     canvas.querySelectorAll('.dov-gate-lbl').forEach(function (el) {
       el.addEventListener('click', function () {
