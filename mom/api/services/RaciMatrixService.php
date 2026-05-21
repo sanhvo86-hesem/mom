@@ -68,6 +68,17 @@ final class RaciMatrixService
         $boot    = FileHelper::readJson($this->bootstrapPath());
         $boot    = is_array($boot) ? $boot : [];
 
+        // Schema-version gate. When the bootstrap seed ships a newer schema
+        // (e.g. a column added or a CDR set restructured) the runtime file
+        // written under the old schema is structurally stale — discard it so
+        // the deployed seed takes full effect. A save() under the new schema
+        // re-stamps the runtime file and normal merging resumes.
+        $bootSv = (int)($boot['schema_version'] ?? 0);
+        $rtSv   = (int)($runtime['schema_version'] ?? 0);
+        if ($bootSv > 0 && $rtSv < $bootSv) {
+            $runtime = [];
+        }
+
         // The bootstrap seed is the STRUCTURAL source of truth — it defines
         // which CDR rows exist (gate, code, activity, forms). The runtime
         // file only carries the live A/R/C/I letter state. Merging the two
@@ -98,6 +109,9 @@ final class RaciMatrixService
             $gateSrc[$metaKey] = (string)($runtime[$metaKey] ?? $boot[$metaKey] ?? '');
         }
         $config = $this->normalise($gateSrc);
+        // Carry the bootstrap schema version so a save() re-stamps the
+        // runtime file as current and future loads merge it normally.
+        $config['schema_version'] = $bootSv > 0 ? $bootSv : 1;
 
         // Auxiliary datasets (value-stream §4, document-level §6, support).
         // Same rule as the gate matrix: the bootstrap defines how many rows

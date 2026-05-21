@@ -1,5 +1,5 @@
 {
-  "schema_version": 4,
+  "schema_version": 5,
   "updated_at": "2026-05-21T08:56:06.309513Z",
   "updated_by": "bootstrap-extract",
   "reason": "Initial seed extracted from ANNEX-121 §5 gate matrix",
