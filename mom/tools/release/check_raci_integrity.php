@@ -13,31 +13,37 @@ declare(strict_types=1);
  * editing of a wide table silently breaks RACI invariants. This script catches
  * those breaks before deploy.
  *
- * What this script verifies (ANNEX-121 G0→G7 gate matrix)
- * ───────────────────────────────────────────────────────
- *   1. The matrix has exactly 15 columns
- *      (G, CDR, Hoạt động, 11 role columns, FRM/SOP).
- *   2. Every data row has exactly one Accountable (A) — accountability cannot
- *      be shared or absent.
+ * P0 findings (block deploy)
+ * ──────────────────────────
+ *   1. The G0→G7 matrix has exactly 15 columns.
+ *   2. Every data row has exactly one Accountable (A).
  *   3. Every data row has at least one Responsible (R).
- *   4. Every RACI cell holds only A / R / C / I (or is blank).
- *   5. Every CDR code used in ANNEX-121 exists as an id="cdr-XX" anchor in
- *      ANNEX-120 (authority register) — no orphan CDR codes.
- *   6. The support-function supplement table uses only MNT / FIN role codes
- *      (EHS is a first-class column in the main matrix, not a supplement role).
+ *   4. Every RACI cell holds only A / R / C / I (or blank).
+ *   5. Every CDR code used in ANNEX-121 has an id="cdr-XX" anchor in ANNEX-120.
  *
- * Exit code: 0 = clean, 1 = at least one P0 finding (blocks deploy).
+ * P1 findings (warn, do not block)
+ * ────────────────────────────────
+ *   6. Support-function supplement uses only MNT / FIN role codes.
+ *   7. Cross-check: the primary Responsible role recorded for each CDR in
+ *      ANNEX-120 should appear as A or R for that CDR in ANNEX-121 (sub-roles
+ *      are alias-mapped to their column, e.g. PE/ENGM/CAM→ENG, BUY→SCM,
+ *      ITA/ESA→HR/IT). F1/F2 are whitelisted: ANNEX-121 deliberately records
+ *      the originating role as R there (see ANNEX-121 §2 R-semantics rule).
+ *
+ * Exit code: 0 = clean (warnings allowed), 1 = at least one P0 finding.
  */
 
-$base    = dirname(__DIR__, 2);                 // -> repo .../mom
+$base     = dirname(__DIR__, 2);                 // -> repo .../mom
 $annex121 = $base.'/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-121-raci-master-matrix.html';
 $annex120 = $base.'/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-120-authority-matrix.html';
 
-$ROLE_COLS   = ['CS','EST','ENG','PPL','WKM','PD','QA','SCM','CEO','EHS','HR/IT'];
-$VALID_LETTERS = ['A','R','C','I',''];
+$ROLE_COLS = ['CS','EST','ENG','PPL','WKM','PD','QA','SCM','CEO','EHS','HR/IT'];
+$ALIAS     = ['PE'=>'ENG','ENGM'=>'ENG','CAM'=>'ENG','DFM'=>'ENG','BUY'=>'SCM',
+              'ITA'=>'HR/IT','ESA'=>'HR/IT','QCL'=>'QA','QC'=>'QA'];
+$R_SEMANTICS_WHITELIST = ['F1','F2'];   // documented R-as-originator cases
 
-$p0 = [];   // blocking findings
-$p1 = [];   // warnings
+$p0 = [];
+$p1 = [];
 
 function loadDoc(string $path): DOMDocument {
     if (!is_file($path)) {
@@ -50,21 +56,38 @@ function loadDoc(string $path): DOMDocument {
     libxml_clear_errors();
     return $doc;
 }
-
-function cellText(DOMNode $node): string {
-    return trim(preg_replace('/\s+/u', ' ', $node->textContent));
+function cellText(DOMNode $n): string {
+    return trim(preg_replace('/\s+/u', ' ', $n->textContent));
+}
+function tdChildren(DOMNode $tr): array {
+    $out = [];
+    foreach ($tr->childNodes as $c) {
+        if ($c->nodeType === XML_ELEMENT_NODE && strtolower($c->nodeName) === 'td') {
+            $out[] = $c;
+        }
+    }
+    return $out;
 }
 
-/* ── Load ANNEX-120 CDR anchor set ─────────────────────────────────────────── */
+/* ── ANNEX-120: CDR anchor set + primary R-role per CDR ────────────────────── */
+$doc120   = loadDoc($annex120);
 $cdrKnown = [];
-if (preg_match_all('/id="cdr-([A-F][0-9])"/', file_get_contents($annex120), $m)) {
-    $cdrKnown = array_flip($m[1]);
+$cdr120R  = [];
+foreach ($doc120->getElementsByTagName('tr') as $tr) {
+    $id = $tr->getAttribute('id');
+    if (!str_starts_with($id, 'cdr-')) { continue; }
+    $code = substr($id, 4);
+    $cdrKnown[$code] = true;
+    $tds = tdChildren($tr);
+    if (count($tds) >= 7) {
+        $cdr120R[$code] = cellText($tds[6]);   // the "R" column
+    }
 }
 if (!$cdrKnown) {
-    $p0[] = "ANNEX-120: no id=\"cdr-XX\" anchors found — cannot validate CDR codes.";
+    $p0[] = "ANNEX-120: no id=\"cdr-XX\" anchors found.";
 }
 
-/* ── Locate and validate the ANNEX-121 G0→G7 gate matrix ───────────────────── */
+/* ── ANNEX-121 G0→G7 gate matrix ───────────────────────────────────────────── */
 $doc = loadDoc($annex121);
 $gateTable = null;
 foreach ($doc->getElementsByTagName('table') as $tbl) {
@@ -77,68 +100,56 @@ foreach ($doc->getElementsByTagName('table') as $tbl) {
         break;
     }
 }
+$gateRACI = [];   // cdr => list of [gate, aRoles[], rRoles[]]
 if ($gateTable === null) {
-    $p0[] = "ANNEX-121: G0→G7 gate matrix not found (thead missing expected role codes).";
+    $p0[] = "ANNEX-121: G0→G7 gate matrix not found.";
 } else {
-    // header column count
-    $hrow = $gateTable->getElementsByTagName('thead')->item(0)->getElementsByTagName('tr')->item(0);
-    $ths  = $hrow->getElementsByTagName('th');
+    $ths = $gateTable->getElementsByTagName('thead')->item(0)
+                     ->getElementsByTagName('tr')->item(0)
+                     ->getElementsByTagName('th');
     if ($ths->length !== 15) {
         $p0[] = "ANNEX-121: gate matrix header has {$ths->length} columns, expected 15.";
     }
-
-    $tbody = $gateTable->getElementsByTagName('tbody')->item(0);
-    $rows  = $tbody->getElementsByTagName('tr');
     $rowCount = 0;
-    $cdrUsed  = [];
-    foreach ($rows as $tr) {
-        $tds = [];
-        foreach ($tr->childNodes as $c) {
-            if ($c->nodeType === XML_ELEMENT_NODE && strtolower($c->nodeName) === 'td') {
-                $tds[] = $c;
-            }
-        }
+    foreach ($gateTable->getElementsByTagName('tbody')->item(0)
+                       ->getElementsByTagName('tr') as $tr) {
+        $tds = tdChildren($tr);
         if (count($tds) === 0) { continue; }
         $rowCount++;
         $gate = cellText($tds[0]);
         $cdr  = cellText($tds[1]);
         $label = "$gate/$cdr";
-
         if (count($tds) !== 15) {
-            $p0[] = "ANNEX-121 row $label: has ".count($tds)." cells, expected 15.";
+            $p0[] = "ANNEX-121 row $label: ".count($tds)." cells, expected 15.";
             continue;
         }
-        // role cells = indexes 3..13
-        $letters = [];
+        $aRoles = $rRoles = [];
         for ($i = 3; $i <= 13; $i++) {
             $v = strtoupper(cellText($tds[$i]));
+            $role = $GLOBALS['ROLE_COLS'][$i - 3];
             if (!in_array($v, ['A','R','C','I',''], true)) {
-                $p0[] = "ANNEX-121 row $label: invalid RACI letter '".cellText($tds[$i])."' in column ".($i-2).".";
+                $p0[] = "ANNEX-121 row $label: invalid letter '".cellText($tds[$i])."' in '$role'.";
             }
-            $letters[] = $v;
+            if ($v === 'A') { $aRoles[] = $role; }
+            if ($v === 'R') { $rRoles[] = $role; }
         }
-        $aCount = count(array_filter($letters, fn($x) => $x === 'A'));
-        $rCount = count(array_filter($letters, fn($x) => $x === 'R'));
-        if ($aCount !== 1) {
-            $p0[] = "ANNEX-121 row $label: has $aCount Accountable (A), expected exactly 1.";
+        if (count($aRoles) !== 1) {
+            $p0[] = "ANNEX-121 row $label: ".count($aRoles)." Accountable (A), expected exactly 1.";
         }
-        if ($rCount < 1) {
-            $p0[] = "ANNEX-121 row $label: has no Responsible (R).";
+        if (count($rRoles) < 1) {
+            $p0[] = "ANNEX-121 row $label: no Responsible (R).";
         }
         if ($cdr !== '') {
-            $cdrUsed[$cdr] = true;
             if ($cdrKnown && !isset($cdrKnown[$cdr])) {
-                $p0[] = "ANNEX-121 row $label: CDR code '$cdr' has no id=\"cdr-$cdr\" anchor in ANNEX-120.";
+                $p0[] = "ANNEX-121 row $label: CDR '$cdr' has no id=\"cdr-$cdr\" in ANNEX-120.";
             }
+            $gateRACI[$cdr][] = [$gate, $aRoles, $rRoles];
         }
     }
-    if ($rowCount < 1) {
-        $p0[] = "ANNEX-121: gate matrix tbody has no data rows.";
-    }
-    echo "  gate matrix: $rowCount rows, ".count($cdrUsed)." distinct CDR codes\n";
+    echo "  gate matrix: $rowCount rows, ".count($gateRACI)." distinct CDR codes\n";
 }
 
-/* ── Validate the support-function supplement table ────────────────────────── */
+/* ── Support-function supplement table ─────────────────────────────────────── */
 $supTable = null;
 foreach ($doc->getElementsByTagName('table') as $tbl) {
     $theads = $tbl->getElementsByTagName('thead');
@@ -152,23 +163,42 @@ foreach ($doc->getElementsByTagName('table') as $tbl) {
 if ($supTable === null) {
     $p1[] = "ANNEX-121: support-function supplement table not found.";
 } else {
-    $tbody = $supTable->getElementsByTagName('tbody')->item(0);
     $n = 0;
-    foreach ($tbody->getElementsByTagName('tr') as $tr) {
+    foreach ($supTable->getElementsByTagName('tbody')->item(0)
+                      ->getElementsByTagName('tr') as $tr) {
         $tds = $tr->getElementsByTagName('td');
         if ($tds->length < 5) { continue; }
         $n++;
         $role   = cellText($tds->item(3));
         $letter = strtoupper(cellText($tds->item(4)));
         if (!in_array($role, ['MNT','FIN'], true)) {
-            $p1[] = "ANNEX-121 supplement row $n: role '$role' should be MNT or FIN (EHS is a main-matrix column).";
+            $p1[] = "ANNEX-121 supplement row $n: role '$role' should be MNT or FIN.";
         }
         if (!in_array($letter, ['A','R','C','I'], true)) {
-            $p1[] = "ANNEX-121 supplement row $n: invalid RACI letter '$letter'.";
+            $p1[] = "ANNEX-121 supplement row $n: invalid letter '$letter'.";
         }
     }
     echo "  support supplement: $n rows\n";
 }
+
+/* ── Cross-check: ANNEX-120 primary R-role vs ANNEX-121 A∪R ───────────────── */
+$xMiss = 0;
+foreach ($gateRACI as $cdr => $occurrences) {
+    if (!isset($cdr120R[$cdr])) { continue; }
+    if (in_array($cdr, $R_SEMANTICS_WHITELIST, true)) { continue; }
+    $r120 = $cdr120R[$cdr];
+    $mapped = $ALIAS[$r120] ?? $r120;
+    foreach ($occurrences as [$gate, $aRoles, $rRoles]) {
+        $present = array_merge($aRoles, $rRoles);
+        if ($mapped !== '' && !in_array($mapped, $present, true)) {
+            $p1[] = "Cross-check $gate/$cdr: ANNEX-120 R-role '$r120' (→$mapped) "
+                  . "not found as A or R in ANNEX-121 [A=".implode(',',$aRoles)
+                  . " R=".implode(',',$rRoles)."].";
+            $xMiss++;
+        }
+    }
+}
+echo "  ANNEX-120↔121 cross-check: $xMiss advisory mismatch(es)\n";
 
 /* ── Report ────────────────────────────────────────────────────────────────── */
 echo "\n";

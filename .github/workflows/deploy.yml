@@ -147,6 +147,14 @@ jobs:
       - name: Block generated/runtime artifacts in controlled source
         run: php mom/tools/release/check_repo_boundary.php
 
+      - name: RACI integrity check (ANNEX-121 SSOT)
+        # Runs unconditionally — RACI changes are doc-only changesets that the
+        # classify job marks frontend-only, so this must not be gated behind
+        # needs_php_validation. Validates one-A-per-row, >=1 R, valid letters,
+        # 15-column shape, every CDR present in ANNEX-120, and the ANNEX-120↔121
+        # accountability cross-check.
+        run: php mom/tools/release/check_raci_integrity.php
+
       - name: Migration drift check (offline)
         # Catches the 188_error_code_registry repeat: live DB applied a
         # migration whose file was deleted from the repo, so fresh clones
