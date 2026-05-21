@@ -155,6 +155,14 @@ jobs:
         # accountability cross-check.
         run: php mom/tools/release/check_raci_integrity.php
 
+      - name: KPI integrity check (kpi-authority-registry SSOT)
+        # Runs unconditionally — KPI changes are often doc-only changesets that
+        # the classify job marks frontend-only. Validates ANNEX-122 ↔ registry
+        # code parity, required KPI fields, runtime_calculated wiring to
+        # KpiEngine, reward⇒counter-metric, alias targets, and gate linked_cdr
+        # against ANNEX-121. P0 findings block the deploy.
+        run: php mom/tools/release/check_kpi_integrity.php
+
       - name: Migration drift check (offline)
         # Catches the 188_error_code_registry repeat: live DB applied a
         # migration whose file was deleted from the repo, so fresh clones

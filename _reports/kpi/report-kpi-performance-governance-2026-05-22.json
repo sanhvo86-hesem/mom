@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-05-21T18:26:33+00:00",
+    "generated_at": "2026-05-21T18:46:29+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
     "registry_version": "2026-05-21",
@@ -291,7 +291,7 @@
         {
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-127-kpi-authority-registry-and-operational-metrics.html",
             "bucket": "annex_references",
-            "row_index": 70,
+            "row_index": 71,
             "coded_kpi_ids": [],
             "canonical_metric_codes": [],
             "snippet": "ANNEX-128Ma trận KPI/metric toàn hệ thống: tài liệu sử dụng, số lần xuất hiện, target/ngưỡng, phân loại, link tài liệu và trạng thái data/evaluation.",
@@ -2737,7 +2737,7 @@
             "bucket": "annex_references",
             "title": "ANNEX-127 - KPI Authority Registry and Operational Metrics | HESEM MOM",
             "has_kpi": true,
-            "kpi_occurrences": 78,
+            "kpi_occurrences": 80,
             "coded_kpi_ids": [
                 "KPI-AUTHORITY-REGISTRY",
                 "KPI-HTML-AUDIT-2026-04-18",
