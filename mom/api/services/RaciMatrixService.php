@@ -99,20 +99,42 @@ final class RaciMatrixService
         }
         $config = $this->normalise($gateSrc);
 
-        // Auxiliary datasets (value-stream §4, document-level §6, support) —
-        // runtime copy if present, otherwise the bootstrap seed.
+        // Auxiliary datasets (value-stream §4, document-level §6, support).
+        // Same rule as the gate matrix: the bootstrap defines how many rows
+        // exist; the runtime file overlays edited cells by position. A new
+        // row appended to the bootstrap therefore appears immediately.
         foreach (['value_stream', 'document_level', 'support'] as $key) {
-            $src = is_array($runtime[$key] ?? null) ? $runtime[$key]
-                 : (is_array($boot[$key] ?? null) ? $boot[$key] : []);
+            $bootArr = is_array($boot[$key] ?? null) ? $boot[$key] : [];
+            $rtArr   = is_array($runtime[$key] ?? null) ? $runtime[$key] : [];
+            if ($bootArr) {
+                $merged = [];
+                foreach ($bootArr as $i => $br) {
+                    $merged[] = (isset($rtArr[$i]) && is_array($rtArr[$i])) ? $rtArr[$i] : $br;
+                }
+                $src = $merged;
+            } else {
+                $src = $rtArr;
+            }
             $config[$key] = $this->normaliseCells($src);
         }
 
-        // JD interface RACI — per-JD authored "Giao diện liên phòng ban"
-        // table, keyed by document slug. SOP role RACI — per-SOP §4
-        // "Vai trò, quyền hạn & RACI" content, keyed by document slug.
+        // JD interface RACI + SOP role RACI — document-keyed maps. The
+        // bootstrap defines which documents are managed; the runtime file
+        // overlays edited HTML per slug.
         foreach (['jd_interface', 'sop_roles'] as $key) {
-            $src = is_array($runtime[$key] ?? null) ? $runtime[$key]
-                 : (is_array($boot[$key] ?? null) ? $boot[$key] : []);
+            $bootMap = is_array($boot[$key] ?? null) ? $boot[$key] : [];
+            $rtMap   = is_array($runtime[$key] ?? null) ? $runtime[$key] : [];
+            if ($bootMap) {
+                $merged = $bootMap;
+                foreach ($rtMap as $slug => $entry) {
+                    if (isset($merged[$slug]) && is_array($entry)) {
+                        $merged[$slug] = $entry;
+                    }
+                }
+                $src = $merged;
+            } else {
+                $src = $rtMap;
+            }
             $config[$key] = $this->normaliseDocHtmlMap($src);
         }
 

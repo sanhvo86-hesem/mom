@@ -699,6 +699,27 @@
     },
     {
       "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G4</a>",
+      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-D12\">D12</a>",
+      "gate": "G4",
+      "cdr": "D12",
+      "activity_html": "Nộp hồ sơ FAI/FAIR/PPAP cho khách hàng và xin phê duyệt trước khi sản xuất loạt",
+      "frm_html": "<a href=\"../../../../forms/frm-300-technical/FRM-311_FAI_Report.xlsx\">FRM-311</a> · <a href=\"../../../sops/03-SOP-300/sop-302-first-article-inspection-fai.html\">SOP-302</a>",
+      "roles": {
+        "CS": "R",
+        "EST": "",
+        "ENG": "C",
+        "PPL": "",
+        "WKM": "",
+        "PD": "",
+        "QA": "A",
+        "SCM": "",
+        "CEO": "",
+        "EHS": "",
+        "HR/IT": ""
+      }
+    },
+    {
+      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G4</a>",
       "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-B7\">B7</a>",
       "gate": "G4",
       "cdr": "B7",
@@ -993,6 +1014,27 @@
     },
     {
       "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G7</a>",
+      "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-D11\">D11</a>",
+      "gate": "G7",
+      "cdr": "D11",
+      "activity_html": "Thông báo khách hàng khi phát hiện sản phẩm không phù hợp đã hoặc có thể đã giao (quality escape)",
+      "frm_html": "<a href=\"../../../../forms/frm-200-purchase/FRM-211_Complaint_Log.xlsx\">FRM-211</a> · <a href=\"../../../sops/02-SOP-200/sop-202-customer-complaint-feedback-rma-and-escape.html\">SOP-202</a>",
+      "roles": {
+        "CS": "A",
+        "EST": "",
+        "ENG": "I",
+        "PPL": "",
+        "WKM": "",
+        "PD": "",
+        "QA": "R",
+        "SCM": "",
+        "CEO": "C",
+        "EHS": "",
+        "HR/IT": ""
+      }
+    },
+    {
+      "gate_html": "<a href=\"annex-121-raci-master-matrix.html#r5gate\">G7</a>",
       "cdr_html": "<a href=\"annex-120-authority-matrix.html#cdr-A6\">A6</a>",
       "gate": "G7",
       "cdr": "A6",
@@ -1057,6 +1099,24 @@
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/08-JD-HR/jd-hr-manager.html\">HR</a></span>",
         "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/01-JD-Executive/jd-chief-executive-officer.html\">CEO</a></span> / <span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
         "<a href=\"annex-123-deputy-backup-matrix.html\">ANNEX-123</a> · <a href=\"../../../../forms/frm-500-production/FRM-504_Shift_Handover_Log.xlsx\">FRM-504</a>"
+      ]
+    },
+    {
+      "cells": [
+        "Thu hồi và đánh giá tác động hồi tố khi thiết bị đo lệch chuẩn",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-metrology-and-calibration-specialist.html\">MET</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html\">PE</a></span>",
+        "<a href=\"../../../sops/06-SOP-600/sop-601-calibration-and-gage-control.html\">SOP-601</a> · <a href=\"../../../../forms/frm-600-inspection/FRM-601_Calibration_Log.xlsx\">FRM-601</a>"
+      ]
+    },
+    {
+      "cells": [
+        "Phê duyệt chấp nhận MSA / Gage R&R cho hệ thống đo đặc tính trọng yếu",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-qa-manager.html\">QA</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/04-JD-Quality/jd-quality-engineer.html\">QE</a></span>",
+        "<span class=\"role-code\"><a class=\"entity-link role-link\" href=\"../../../../system/organization/03-Job-Descriptions/03-JD-Engineering/jd-process-engineer.html\">PE</a></span>",
+        "<a href=\"../../../sops/06-SOP-600/sop-602-measurement-system-analysis-msagr-r.html\">SOP-602</a> · <a href=\"../../../../forms/frm-600-inspection/FRM-611_GRR_Study_Form.xlsx\">FRM-611</a>"
       ]
     }
   ],
