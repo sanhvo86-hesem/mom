@@ -20,6 +20,9 @@ tests/e2e/node_modules/
 # (10 stages) the user points an AI session at. Tracked so it survives a
 # fresh clone and is available to any AI session.
 !_reports/kpi-upgrade-prompts/
+# Whitelist KPI audit/report outputs so AI sessions can commit evidence
+# produced during the KPI upgrade program (prompt pack 01→09).
+!_reports/kpi/
 _build/
 _Deleted/
 .tmp/
