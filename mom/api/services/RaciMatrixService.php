@@ -63,13 +63,47 @@ final class RaciMatrixService
     /** @return array<string, mixed> */
     public function load(): array
     {
-        $stored = FileHelper::readJson($this->configPath());
-        if (!is_array($stored) || empty($stored['rows'])) {
-            $stored = FileHelper::readJson($this->bootstrapPath());
+        $runtime = FileHelper::readJson($this->configPath());
+        $runtime = is_array($runtime) ? $runtime : [];
+        $boot    = FileHelper::readJson($this->bootstrapPath());
+        $boot    = is_array($boot) ? $boot : [];
+
+        $gateSrc = !empty($runtime['rows']) ? $runtime : $boot;
+        $config  = $this->normalise($gateSrc);
+
+        // Auxiliary datasets (value-stream §4, document-level §6, support) —
+        // runtime copy if present, otherwise the bootstrap seed.
+        foreach (['value_stream', 'document_level', 'support'] as $key) {
+            $src = is_array($runtime[$key] ?? null) ? $runtime[$key]
+                 : (is_array($boot[$key] ?? null) ? $boot[$key] : []);
+            $config[$key] = $this->normaliseCells($src);
         }
-        $config = $this->normalise(is_array($stored) ? $stored : []);
+
         $config['linked_documents'] = $this->linkedDocuments();
         return $config;
+    }
+
+    /**
+     * @param array<int, mixed> $src
+     * @return array<int, array{cells: array<int, string>}>
+     */
+    private function normaliseCells(array $src): array
+    {
+        $out = [];
+        foreach ($src as $row) {
+            $cells = is_array($row['cells'] ?? null) ? $row['cells'] : [];
+            $out[] = ['cells' => array_map(fn($c) => $this->sanitiseCell((string)$c), $cells)];
+        }
+        return $out;
+    }
+
+    /** Defence-in-depth: strip scripting from admin-authored controlled-doc cells. */
+    private function sanitiseCell(string $html): string
+    {
+        $html = (string)preg_replace('/<\s*script\b.*?<\s*\/\s*script\s*>/is', '', $html);
+        $html = (string)preg_replace('/\son\w+\s*=\s*("[^"]*"|\'[^\']*\'|\S+)/i', '', $html);
+        $html = (string)preg_replace('/javascript:/i', '', $html);
+        return $html;
     }
 
     /**
@@ -211,8 +245,16 @@ final class RaciMatrixService
         if ($html === false) {
             throw new RuntimeException('raci_matrix_annex121_not_readable');
         }
-        $block   = $this->buildGateBlock($config['rows']);
-        $updated = $this->replaceRegion($html, self::GATE_REGION, $block);
+        // Regenerate all four ANNEX-121 RACI regions in one read-modify-write.
+        $updated = $html;
+        $updated = $this->replaceRegionIfPresent($updated, self::GATE_REGION,
+            $this->buildGateBlock($config['rows']));
+        $updated = $this->replaceRegionIfPresent($updated, 'RACI-VALUESTREAM',
+            $this->buildSimpleBlock($config['value_stream'] ?? []));
+        $updated = $this->replaceRegionIfPresent($updated, 'RACI-DOCLEVEL',
+            $this->buildSimpleBlock($config['document_level'] ?? []));
+        $updated = $this->replaceRegionIfPresent($updated, 'RACI-SUPPORT',
+            $this->buildSimpleBlock($config['support'] ?? []));
 
         if ($updated === $html) {
             return ['doc_code' => 'ANNEX-121', 'path' => self::ANNEX121_RELATIVE_PATH,
@@ -225,6 +267,25 @@ final class RaciMatrixService
         return ['doc_code' => 'ANNEX-121', 'path' => self::ANNEX121_RELATIVE_PATH,
                 'previous_revision' => $rev['previous_revision'],
                 'new_revision' => $rev['new_revision'], 'changed' => 'yes'];
+    }
+
+    /**
+     * Auxiliary-dataset region block: one <tr> per row, cells verbatim.
+     *
+     * @param array<int, array{cells: array<int, string>}> $rows
+     */
+    private function buildSimpleBlock(array $rows): string
+    {
+        $out = [];
+        foreach ($rows as $row) {
+            $cells = is_array($row['cells'] ?? null) ? $row['cells'] : [];
+            $tds = '';
+            foreach ($cells as $c) {
+                $tds .= '<td>' . (string)$c . '</td>';
+            }
+            $out[] = '<tr>' . $tds . '</tr>';
+        }
+        return implode("\n", $out);
     }
 
     /**
@@ -365,6 +426,16 @@ final class RaciMatrixService
     }
 
     /* ── Region replacement ─────────────────────────────────────────────── */
+
+    /** Replace a region, or return the HTML unchanged if its markers are absent. */
+    private function replaceRegionIfPresent(string $html, string $key, string $block): string
+    {
+        if (!str_contains($html, '<!-- ' . $key . ':START -->')
+            || !str_contains($html, '<!-- ' . $key . ':END -->')) {
+            return $html;
+        }
+        return $this->replaceRegion($html, $key, $block);
+    }
 
     private function replaceRegion(string $html, string $key, string $block): string
     {
