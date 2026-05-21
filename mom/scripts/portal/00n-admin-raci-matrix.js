@@ -43,6 +43,7 @@ var AUX = {
   }
 };
 var AUX_KEYS = ['value_stream', 'document_level', 'support'];
+var SECTIONS = ['gate', 'value_stream', 'document_level', 'support', 'jd'];
 
 var _state = {
   loading: false,
@@ -53,7 +54,8 @@ var _state = {
   draft: null,
   reason: '',
   activeGate: 'all',
-  activeSection: 'gate'
+  activeSection: 'gate',
+  activeJd: ''
 };
 
 window._renderAdminRaciMatrix = function(el, langCode){
@@ -84,6 +86,15 @@ function _rows(){
 function _auxRows(key){
   var d = _state.draft || {};
   return Array.isArray(d[key]) ? d[key] : [];
+}
+
+function _jdMap(){
+  var d = _state.draft || {};
+  return (d.jd_interface && typeof d.jd_interface === 'object') ? d.jd_interface : {};
+}
+
+function _jdSlugs(){
+  return Object.keys(_jdMap()).sort();
 }
 
 function _gates(){
@@ -186,6 +197,19 @@ function _setAuxCell(key, rowIdx, colIdx, value){
   _state.message = '';
 }
 
+function _setJd(slug){
+  _state.activeJd = slug || '';
+  _render();
+}
+
+function _setJdHtml(slug, value){
+  var map = _jdMap();
+  if(!map[slug]) return;
+  map[slug].html = value;
+  _state.error = '';
+  _state.message = '';
+}
+
 function _setReason(value){ _state.reason = value; }
 
 function _resetDraft(){
@@ -246,7 +270,7 @@ function _render(){
   if(_state.activeGate !== 'all' && gates.indexOf(_state.activeGate) < 0){
     _state.activeGate = 'all';
   }
-  if(_state.activeSection !== 'gate' && AUX_KEYS.indexOf(_state.activeSection) < 0){
+  if(SECTIONS.indexOf(_state.activeSection) < 0){
     _state.activeSection = 'gate';
   }
   var badCount = _invalidCount();
@@ -319,6 +343,17 @@ function _render(){
     .rm-cell-ta{width:100%;min-width:120px;min-height:46px;border:1px solid var(--border);border-radius:5px;background:var(--surface-2);color:var(--text-1);font:inherit;font-size:12px;padding:5px 6px;resize:vertical;line-height:1.45}
     .rm-cell-ta:focus{border-color:var(--accent);background:var(--surface);outline:none}
     .rm-aux-note{padding:9px 14px;color:var(--text-2);font-size:11.5px;line-height:1.5;border-top:1px solid var(--border)}
+    .rm-jd-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--border)}
+    .rm-jd-bar label{font-size:11px;font-weight:800;color:var(--text-2);text-transform:uppercase}
+    .rm-jd-select{flex:1 1 320px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text-1);font:inherit;font-weight:700;padding:7px 9px}
+    .rm-jd-open{font-size:12px;font-weight:700;color:var(--accent);text-decoration:none;white-space:nowrap}
+    .rm-jd-body{padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+    .rm-jd-html{width:100%;min-height:260px;border:1px solid var(--border);border-radius:6px;background:var(--surface-2);color:var(--text-1);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;padding:9px 10px;resize:vertical;line-height:1.5}
+    .rm-jd-html:focus{border-color:var(--accent);background:var(--surface);outline:none}
+    .rm-jd-preview{border:1px dashed var(--border);border-radius:6px;padding:10px;overflow:auto}
+    .rm-jd-preview-cap{font-size:11px;font-weight:800;color:var(--text-2);text-transform:uppercase;margin-bottom:6px}
+    .rm-jd-preview table{width:100%;border-collapse:collapse;font-size:12px}
+    .rm-jd-preview th,.rm-jd-preview td{border:1px solid var(--border);padding:5px 7px;text-align:left;vertical-align:top}
     .rm-docs{border:1px solid var(--border);border-radius:8px;background:var(--surface)}
     .rm-docs>summary{cursor:pointer;padding:12px 14px;font-weight:800;list-style:none}
     .rm-docs>summary::-webkit-details-marker{display:none}
@@ -363,7 +398,9 @@ function _render(){
     <label>${_t('Lý do cập nhật', 'Change reason')}</label>
     <textarea class="rm-reason" oninput="_rmSetReason(this.value)" placeholder="${_t('Ví dụ: chuyển PD thành R cho A5 theo IATF 16949 §8.2.3.1.3...', 'Example: set PD to R on A5 per IATF 16949 §8.2.3.1.3...')}">${_esc(_state.reason || '')}</textarea>
   </div>
-  ${_state.activeSection === 'gate' ? _renderGateSection(rows, gates) : _renderAuxSection(_state.activeSection)}
+  ${_state.activeSection === 'gate' ? _renderGateSection(rows, gates)
+    : _state.activeSection === 'jd' ? _renderJdSection()
+    : _renderAuxSection(_state.activeSection)}
 </section>`;
   _syncStatus();
 }
@@ -376,11 +413,13 @@ function _renderTabs(cfg){
   AUX_KEYS.forEach(function(k){
     defs.push({ key: k, vi: AUX[k].vi, en: AUX[k].en, count: _auxRows(k).length });
   });
+  defs.push({ key: 'jd', vi: 'Giao diện JD', en: 'JD interface', count: _jdSlugs().length, unit: 'JD' });
   var html = '<div class="rm-tabs">';
   defs.forEach(function(d){
+    var unit = d.unit || _t('dòng', 'rows');
     html += `
     <button class="rm-tab ${_state.activeSection === d.key ? 'active' : ''}" type="button" onclick="_rmSetSection('${d.key}')">
-      <b>${_t(d.vi, d.en)}</b><span>${d.count} ${_t('dòng', 'rows')}</span>
+      <b>${_t(d.vi, d.en)}</b><span>${d.count} ${_esc(unit)}</span>
     </button>`;
   });
   return html + '</div>';
@@ -495,6 +534,54 @@ function _renderAuxSection(key){
   </div>`;
 }
 
+/* ── JD interface RACI (§6 "Giao diện liên phòng ban") ────────────── */
+function _renderJdSection(){
+  var map = _jdMap();
+  var slugs = _jdSlugs();
+  if(!slugs.length){
+    return '<div class="rm-aux"><div class="rm-aux-head"><b>'
+      + _t('Giao diện JD', 'JD interface') + '</b><span>'
+      + _t('Chưa có bản mô tả công việc nào.', 'No job descriptions captured.')
+      + '</span></div></div>';
+  }
+  if(slugs.indexOf(_state.activeJd) < 0){ _state.activeJd = slugs[0]; }
+  var slug = _state.activeJd;
+  var entry = map[slug] || { title: slug, html: '' };
+  var html = entry.html == null ? '' : String(entry.html);
+
+  var options = slugs.map(function(s){
+    var t = (map[s] && map[s].title) ? map[s].title : s;
+    return '<option value="' + _esc(s) + '"' + (s === slug ? ' selected' : '') + '>'
+      + _esc(t) + '  ·  ' + _esc(s) + '</option>';
+  }).join('');
+
+  var href = _docHref('docs/system/organization/03-Job-Descriptions/');
+
+  return `
+  <div class="rm-aux">
+    <div class="rm-aux-head">
+      <b>${_t('Giao diện JD §6 — RACI liên phòng ban', 'JD §6 interface — cross-department RACI')}</b>
+      <span>${_t('Bảng “Giao diện liên phòng ban — RACI / Bàn giao” trong từng bản mô tả công việc. Mỗi bảng là vùng quản lý nhúng trong tài liệu JD; lưu ở đây sẽ tái tạo lại bảng đó.', 'The “Cross-department interface — RACI / handover” table inside each job description. Each table is a managed region embedded in its JD document; saving here regenerates it.')}</span>
+    </div>
+    <div class="rm-jd-bar">
+      <label>${_t('Bản mô tả công việc', 'Job description')}</label>
+      <select class="rm-jd-select" onchange="_rmSetJd(this.value)">${options}</select>
+    </div>
+    <div class="rm-jd-body">
+      <div class="rm-field">
+        <label>${_t('HTML bảng giao diện RACI', 'Interface RACI table HTML')}</label>
+        <textarea class="rm-jd-html" spellcheck="false"
+          oninput="_rmSetJdHtml('${_esc(slug)}',this.value)">${_esc(html)}</textarea>
+      </div>
+      <div class="rm-jd-preview">
+        <div class="rm-jd-preview-cap">${_t('Xem trước', 'Preview')}</div>
+        ${html}
+      </div>
+    </div>
+    <div class="rm-aux-note">${_t('Ô chứa HTML gốc của tài liệu JD (giữ nguyên liên kết vai trò/tài liệu tương đối). Khi lưu, mã script và thuộc tính sự kiện bị loại bỏ; bảng được ghi lại đúng vào vùng quản lý của tài liệu JD tương ứng.', 'The field holds the original JD document HTML (relative role/document links preserved). On save, scripts and event attributes are stripped; the table is written back into the matching JD document managed region.')}</div>
+  </div>`;
+}
+
 /* ── Linked documents (RACI ecosystem hub) ────────────────────────── */
 function _docHref(url){
   if(!url) return '';
@@ -549,5 +636,7 @@ window._rmSetAuxCell = _setAuxCell;
 window._rmSetReason = _setReason;
 window._rmSetGate = _setGate;
 window._rmSetSection = _setSection;
+window._rmSetJd = _setJd;
+window._rmSetJdHtml = _setJdHtml;
 
 })();

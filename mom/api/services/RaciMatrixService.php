@@ -79,8 +79,31 @@ final class RaciMatrixService
             $config[$key] = $this->normaliseCells($src);
         }
 
+        // JD interface RACI — per-JD authored "Giao diện liên phòng ban"
+        // table, keyed by document slug.
+        $jdSrc = is_array($runtime['jd_interface'] ?? null) ? $runtime['jd_interface']
+               : (is_array($boot['jd_interface'] ?? null) ? $boot['jd_interface'] : []);
+        $config['jd_interface'] = $this->normaliseJdInterface($jdSrc);
+
         $config['linked_documents'] = $this->linkedDocuments();
         return $config;
+    }
+
+    /**
+     * @param array<string, mixed> $src
+     * @return array<string, array{title: string, html: string}>
+     */
+    private function normaliseJdInterface(array $src): array
+    {
+        $out = [];
+        foreach ($src as $slug => $entry) {
+            if (!is_string($slug) || !is_array($entry)) { continue; }
+            $out[$slug] = [
+                'title' => trim((string)($entry['title'] ?? $slug)),
+                'html'  => $this->sanitiseCell((string)($entry['html'] ?? '')),
+            ];
+        }
+        return $out;
     }
 
     /**
@@ -141,6 +164,20 @@ final class RaciMatrixService
             if (count($cleaned) === count($stored)) {
                 $config[$key] = $cleaned;
             }
+        }
+
+        // JD interface RACI — accept edited entries for slugs that already
+        // exist in the store; unknown slugs are ignored so a stray payload
+        // cannot register a document the publisher would not recognise.
+        if (is_array($incoming['jd_interface'] ?? null)) {
+            $stored  = is_array($config['jd_interface'] ?? null) ? $config['jd_interface'] : [];
+            $cleaned = $this->normaliseJdInterface($incoming['jd_interface']);
+            foreach ($cleaned as $slug => $entry) {
+                if (isset($stored[$slug])) {
+                    $stored[$slug] = $entry;
+                }
+            }
+            $config['jd_interface'] = $stored;
         }
 
         $this->validate($config);
@@ -314,7 +351,15 @@ final class RaciMatrixService
             return null;
         }
         $p = $this->markerParams($html);
-        $block = $this->buildRegionTable($p['kind'], $p['key'], $config['rows']);
+        // JD interface region — emit the per-JD authored table verbatim.
+        // SOP regions (and any JD without a captured entry) keep the
+        // gate-matrix projection.
+        $jdStore = is_array($config['jd_interface'] ?? null) ? $config['jd_interface'] : [];
+        if ($p['kind'] === 'jd' && $p['jd'] !== '' && isset($jdStore[$p['jd']]['html'])) {
+            $block = (string)$jdStore[$p['jd']]['html'];
+        } else {
+            $block = $this->buildRegionTable($p['kind'], $p['key'], $config['rows']);
+        }
         $updated = $this->replaceManagedRegion($html, $block);
         if ($updated === null || $updated === $html) {
             return null;
@@ -482,16 +527,17 @@ final class RaciMatrixService
         return ($count === 1 && $next !== null) ? $next : null;
     }
 
-    /** @return array{kind: string, key: string} */
+    /** @return array{kind: string, key: string, jd: string} */
     private function markerParams(string $html): array
     {
-        $kind = ''; $key = '';
+        $kind = ''; $key = ''; $jd = '';
         if (preg_match('/<!-- RACI-MATRIX:START\s+([^>]*?)-->/', $html, $m)) {
             if (preg_match('/kind=(\S+)/', $m[1], $k)) { $kind = $k[1]; }
+            if (preg_match('/jd=(\S+)/', $m[1], $j)) { $jd = $j[1]; }
             if (preg_match('/code=(\S+)/', $m[1], $c)) { $key = $c[1]; }
             elseif (preg_match('/role=(\S+)/', $m[1], $r)) { $key = $r[1]; }
         }
-        return ['kind' => $kind, 'key' => $key];
+        return ['kind' => $kind, 'key' => $key, 'jd' => $jd];
     }
 
     /* ── DCC minor revision bump ─────────────────────────────────────────── */
