@@ -1,7 +1,7 @@
 {
   "registry_id": "KPI-AUTHORITY-CNC-OPS",
   "version": "2026-05-21",
-  "schema_version": 6,
+  "schema_version": 7,
   "owner": "QMS/CEO",
   "purpose": "Single governed KPI code registry for CNC Performance Operating System. Existing ANNEX-122 KPIs are retained, legacy metric aliases are mapped to canonical codes, and proposed CNC operating metrics are staged without granting automatic runtime authority.",
   "authority_rule": "KpiEngine may auto-register only metrics listed in runtime_calculated_metrics after alias normalization. Governance-only and proposed operating metrics require an approved data contract, owner, formula, evaluation use, review cadence, evidence source, and consequence rule before runtime calculation. A measurement that is not used for approved evaluation must not be named KPI.",
@@ -352,7 +352,7 @@
       "decision_action": "Bất kỳ sự cố nghiêm trọng: lãnh đạo soát xét ngay; EHS mở điều tra trong 24h.",
       "action_reference": "ANNEX-117 leo thang an toàn + điều tra sự cố EHS trong 24h.",
       "attribution_rule": "Sự cố an toàn không phân bổ điểm; luôn điều tra nguyên nhân hệ thống, không quy lỗi cá nhân vận hành trừ khi có hành vi cố ý mất an toàn.",
-      "counter_metric": null,
+      "counter_metric": "INCIDENT_ACTION_CLOSURE_AGING",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
       "status": "retained"
@@ -402,7 +402,7 @@
       "decision_action": "Đỏ: lập kế hoạch lấp khoảng trống về người/hệ thống/tài liệu; QMS trình CEO theo quý.",
       "action_reference": "Soát xét lãnh đạo theo quý + ANNEX-123; CDR rà soát năng lực.",
       "attribution_rule": "Khoảng trống dự phòng thuộc trách nhiệm chung QMS/HR/trưởng phòng; không quy cho một cá nhân.",
-      "counter_metric": null,
+      "counter_metric": "CRITICAL_ROLE_BACKUP_COVERAGE",
       "reward_eligible": false,
       "calculation_status": "manual",
       "status": "retained"
@@ -452,7 +452,7 @@
       "decision_action": "Vượt ngưỡng: soát chất lượng RFQ tiếp nhận và hỗ trợ kỹ thuật; CS chủ trì.",
       "action_reference": "WI-202 họp tầng T2 + soát chất lượng tiếp nhận RFQ; CDR cổng G0.",
       "attribution_rule": "Trễ do thiếu dữ liệu kỹ thuật từ khách hoặc chờ hỗ trợ D-ENG phải tách khỏi phần thuộc CS/EST.",
-      "counter_metric": "RFQ_COMPLETENESS_SCORE",
+      "counter_metric": "QUOTE_HIT_RATE",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
       "status": "retained"
@@ -501,7 +501,7 @@
       "decision_action": "Đỏ: soát lại bàn giao tại bước báo giá/chấp nhận đơn hàng; CS + D-ENG cùng xử lý.",
       "action_reference": "Bảng kiểm soát xét đơn hàng + WI-202 T2; CDR cổng G0.",
       "attribution_rule": "Đỏ do bản vẽ/thông số khách thiếu tách khỏi phần thuộc CS; lỗi điều kiện kỹ thuật chuyển D-ENG.",
-      "counter_metric": null,
+      "counter_metric": "RFQ_TURNAROUND_TIME",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
       "status": "retained"
@@ -551,7 +551,7 @@
       "decision_action": "Đỏ: soát kỷ luật hot-job và ràng buộc vật tư/dụng cụ; PPL mở hành động trong ngày.",
       "action_reference": "WI-202 họp tầng T1/T2 + ANNEX-117; CDR điều độ cổng G3.",
       "attribution_rule": "Lệch lịch do job gấp khách yêu cầu (re-sequence có phê duyệt) KHÔNG tính cho PPL; lệch do máy/vật tư tách về WKM/SCM.",
-      "counter_metric": null,
+      "counter_metric": "OTD",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
       "status": "retained"
@@ -601,7 +601,7 @@
       "decision_action": "Đỏ: liên kết soát CAM/setup/quy trình/đo lường; D-ENG + QA xử lý trong 48h.",
       "action_reference": "Soát DFM/CAM/setup trước lô kế + quy trình FAI; CDR cổng G4.",
       "attribution_rule": "Đỏ tách: lỗi bản vẽ/program thuộc D-ENG, lỗi setup/đồ gá thuộc WKM, lỗi đo lường thuộc QC — không quy hết cho QA.",
-      "counter_metric": "SETUP_FIRST_PASS",
+      "counter_metric": "FINAL_RELEASE_RFT",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
       "status": "retained"
@@ -650,7 +650,7 @@
       "decision_action": "Đỏ: mở soát luồng-control; ưu tiên gỡ nút thắt; PPL + PD chủ trì TOC tuần.",
       "action_reference": "WI-202 họp tầng TOC tuần + ANNEX-117; CDR luồng-control.",
       "attribution_rule": "Lệnh quá tuổi do chờ phê duyệt/vật tư/engineering tách về owner cổng tương ứng; PPL chịu phần điều độ.",
-      "counter_metric": null,
+      "counter_metric": "OTD",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
       "status": "retained"
@@ -700,7 +700,7 @@
       "decision_action": "Đỏ: mở hành động nhà cung cấp hoặc quyết định đổi nguồn; SCM chủ trì.",
       "action_reference": "Quy trình đánh giá nhà cung cấp + WI-202 T3; CDR mua hàng cổng G2.",
       "attribution_rule": "Đỏ do nhà cung cấp; SCM chịu trách nhiệm quản lý nhà cung cấp, không bị quy vì năng lực nội bộ nhà cung cấp.",
-      "counter_metric": "SUPPLIER_IQC_PASS_RATE",
+      "counter_metric": "FAI_FIRST_PASS",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
       "status": "retained"
@@ -750,7 +750,7 @@
       "decision_action": "Đỏ: đóng khoảng trống lập hóa đơn bằng bằng chứng; FIN + CS xử lý trong tuần.",
       "action_reference": "WI-202 T2 + đóng khoảng trống lập hóa đơn; CDR cổng G7.",
       "attribution_rule": "Trễ do hồ sơ giao hàng thiếu tách về CS/D-WHS; phần lập hóa đơn thuộc FIN.",
-      "counter_metric": null,
+      "counter_metric": "INVOICE_RFT",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
       "status": "retained"
@@ -800,7 +800,7 @@
       "decision_action": "Đỏ: lập kế hoạch thu hồi và leo thang thương mại; FIN chủ trì.",
       "action_reference": "SOP-902 + kế hoạch thu hồi công nợ; CDR cổng G7.",
       "attribution_rule": "DSO cao do điều khoản khách hoặc tranh chấp chất lượng tách khỏi phần thuộc FIN; phần do hóa đơn lỗi liên kết INVOICE_RFT.",
-      "counter_metric": null,
+      "counter_metric": "CUSTOMER_COMM_CLOSURE_OT",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
       "status": "retained"
@@ -850,7 +850,7 @@
       "decision_action": "Đỏ: sắp xếp lại và mở hành động năng lực; PD chủ trì họp tầng.",
       "action_reference": "WI-202 họp tầng T1/T2 hằng ngày; CDR điều độ.",
       "attribution_rule": "Khôi phục phụ thuộc năng lực sẵn có; thiếu năng lực do quyết định nguồn lực quản lý không quy cho PD.",
-      "counter_metric": null,
+      "counter_metric": "PLAN_ADHERENCE",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
       "status": "retained"
@@ -899,7 +899,7 @@
       "decision_action": "Lặp lỗi: mở bao vây và đào tạo lại; WKM xử lý trong ca.",
       "action_reference": "Quy trình line-clearance + đào tạo lại; CDR cổng G3/G5.",
       "attribution_rule": "Lặp lỗi do thiếu đào tạo tách về HR/WKM; cá nhân chỉ bị xử lý khi cố ý bỏ bước.",
-      "counter_metric": null,
+      "counter_metric": "FAI_FIRST_PASS",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
       "status": "retained"
@@ -948,7 +948,7 @@
       "decision_action": "Trễ: soát nút thắt và thay đổi thứ tự hàng đợi; ENGM chủ trì.",
       "action_reference": "WI-202 T2 + soát nút thắt kỹ thuật; CDR cổng G1.",
       "attribution_rule": "Trễ do chờ thông tin khách hoặc thay đổi phạm vi tách khỏi phần thuộc D-ENG.",
-      "counter_metric": "ENGINEERING_RELEASE_DEFECT_RATE",
+      "counter_metric": "FAI_FIRST_PASS",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
       "status": "retained"
@@ -997,7 +997,7 @@
       "decision_action": "Quá hạn: leo thang báo cáo công việc/đơn hàng bị ảnh hưởng; ENGM trình tầng kế.",
       "action_reference": "WI-202 T2/T3 leo thang ECO; CDR quản lý thay đổi cổng G1.",
       "attribution_rule": "ECO chờ phê duyệt/đánh giá liên phòng tách về owner bước tương ứng; ENGM chịu phần điều phối.",
-      "counter_metric": null,
+      "counter_metric": "ENGINEERING_RELEASE_ON_TIME",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
       "status": "retained"
@@ -1046,7 +1046,7 @@
       "decision_action": "Quá hạn: leo thang hàng tuần; QA chủ trì soát root-cause cùng phòng liên quan.",
       "action_reference": "Quy trình NCR/CAPA + WI-202 T3 leo thang; SOP-902 nếu vượt L2.",
       "attribution_rule": "NCR mở chờ ECO/đổi vật tư/hành động khắc phục phòng khác tách về owner tương ứng; QA chịu phần điều phối đóng.",
-      "counter_metric": null,
+      "counter_metric": "COMPLAINT_RATE",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
       "status": "retained"
@@ -1097,7 +1097,7 @@
       "decision_action": "Quá hạn: tạm giữ hoạt động phụ thuộc đo lường; QA + MCS xử lý trong 24h.",
       "action_reference": "Lịch hiệu chuẩn + tạm giữ hoạt động phụ thuộc đo lường; CDR cổng G4/G5.",
       "attribution_rule": "Quá hạn do nhà hiệu chuẩn ngoài trễ tách khỏi phần thuộc QA/MCS.",
-      "counter_metric": null,
+      "counter_metric": "FAI_FIRST_PASS",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
       "status": "retained"
@@ -1146,7 +1146,7 @@
       "decision_action": "Đỏ: đẩy nhanh tiến độ hoặc quyết định đổi nguồn; SCM xử lý trong ngày.",
       "action_reference": "WI-202 T1/T2 + đẩy nhanh tiến độ mua; CDR cổng G2.",
       "attribution_rule": "Thiếu vật tư do nhà cung cấp trễ liên kết SUPPLIER_OTD; SCM chịu phần lập kế hoạch mua.",
-      "counter_metric": null,
+      "counter_metric": "INVENTORY_ACCURACY",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
       "status": "retained"
@@ -1195,7 +1195,7 @@
       "decision_action": "Chênh lệch: đếm lại và mở hành động kiểm soát; D-SCM + D-WHS xử lý.",
       "action_reference": "Quy trình cycle-count + hành động kiểm soát; CDR kho.",
       "attribution_rule": "Sai lệch do giao dịch chưa ghi ở khâu sản xuất tách về D-PROD; D-SCM/D-WHS chịu phần kho.",
-      "counter_metric": null,
+      "counter_metric": "MATERIAL_AVAILABILITY_PLAN",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
       "status": "retained"
@@ -1246,7 +1246,7 @@
       "decision_action": "Soát định giá, đánh giá năng lực, phản hồi chất lượng; CS + EST chủ trì.",
       "action_reference": "SOP-902 soát định giá + phản hồi chất lượng; CDR cổng G0.",
       "attribution_rule": "Tỷ lệ thấp do giá thị trường hoặc năng lực kỹ thuật không đủ tách về phần tương ứng; CS/EST chịu phần chất lượng báo giá.",
-      "counter_metric": null,
+      "counter_metric": "GROSS_MARGIN_JOB_FAMILY",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
       "status": "retained"
@@ -1296,7 +1296,7 @@
       "decision_action": "Quá hạn: leo thang lãnh đạo trên tài khoản rủi ro; CS chủ trì.",
       "action_reference": "WI-202 T2 + leo thang tài khoản rủi ro; CDR dịch vụ khách hàng.",
       "attribution_rule": "Trao đổi chờ phòng khác trả lời tách khỏi phần thuộc CS.",
-      "counter_metric": null,
+      "counter_metric": "COMPLAINT_RATE",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
       "status": "retained"
@@ -1345,7 +1345,7 @@
       "decision_action": "Lỗi: truy nguyên nhân gốc theo vai trò xác nhận dữ liệu nguồn; FIN xử lý.",
       "action_reference": "Quy trình lập hóa đơn + truy nguyên nhân gốc; CDR cổng G7.",
       "attribution_rule": "Lỗi do dữ liệu nguồn sai (giá, số lượng) tách về vai trò xác nhận dữ liệu nguồn; FIN chịu phần lập hóa đơn.",
-      "counter_metric": null,
+      "counter_metric": "SHIP_READY_TO_INVOICE_LT",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
       "status": "retained"
@@ -1395,7 +1395,7 @@
       "decision_action": "Chậm trễ: sửa dữ liệu công đoạn trước hoặc bố trí nhân sự; FIN chủ trì.",
       "action_reference": "Lịch đóng sổ + bố trí nhân sự; SOP-902.",
       "attribution_rule": "Chậm do dữ liệu công đoạn trước (giao hàng, mua hàng) chưa khoá tách về phòng nguồn; FIN chịu phần đóng sổ.",
-      "counter_metric": null,
+      "counter_metric": "INVOICE_RFT",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
       "status": "retained"
@@ -1444,7 +1444,7 @@
       "decision_action": "Quá hạn: khoá quyền được uỷ quyền thực hiện công việc ở nơi bắt buộc; HR + trưởng phòng xử lý.",
       "action_reference": "Kế hoạch đào tạo + khoá quyền thực hiện công việc khi bắt buộc; CDR năng lực.",
       "attribution_rule": "Chưa hoàn thành do lịch sản xuất chiếm chỗ tách trách nhiệm chung HR/trưởng phòng; không quy cho riêng HR.",
-      "counter_metric": "TRAINING_COMPETENCY_VERIFIED_RATE",
+      "counter_metric": "FAI_FIRST_PASS",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
       "status": "retained"
@@ -1495,7 +1495,7 @@
       "decision_action": "Khoảng trống: mở kế hoạch đào tạo chéo; HR + trưởng phòng chủ trì.",
       "action_reference": "ANNEX-123 + kế hoạch đào tạo chéo; CDR rà soát năng lực.",
       "attribution_rule": "Khoảng trống dự phòng là trách nhiệm chung HR/trưởng phòng.",
-      "counter_metric": null,
+      "counter_metric": "TRAINING_COMP",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
       "status": "retained"
@@ -1544,7 +1544,7 @@
       "decision_action": "Quá hạn: leo thang an toàn; EHS chủ trì soát xét tuần.",
       "action_reference": "ANNEX-117 leo thang an toàn + soát xét tuần EHS.",
       "attribution_rule": "Hành động chờ phòng khác thực hiện tách về owner tương ứng; EHS chịu phần điều phối.",
-      "counter_metric": null,
+      "counter_metric": "RECORDABLE_INCIDENT_RATE",
       "reward_eligible": false,
       "calculation_status": "runtime_calculated",
       "status": "retained"
@@ -1594,7 +1594,7 @@
       "decision_action": "Chưa đủ: khoá quyền vào xưởng cho đến khi hoàn thành; EHS + HR xử lý.",
       "action_reference": "Quy trình hội nhập + khoá quyền vào xưởng; CDR an toàn.",
       "attribution_rule": "Chưa hoàn thành là cổng chặn; không phân bổ điểm, luôn hoàn thành trước khi bố trí việc.",
-      "counter_metric": null,
+      "counter_metric": "RECORDABLE_INCIDENT_RATE",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
       "status": "retained"
@@ -1644,7 +1644,7 @@
       "decision_action": "Đỏ: bổ sung nguồn lực hỗ trợ; ITA chủ trì.",
       "action_reference": "Quy trình ITSM + bổ sung nguồn lực hỗ trợ; CDR dịch vụ IT.",
       "attribution_rule": "Phiếu chờ phụ thuộc nhà cung cấp ngoài tách khỏi phần thuộc ITA.",
-      "counter_metric": null,
+      "counter_metric": "CRITICAL_SYSTEM_AVAILABILITY",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
       "status": "retained"
@@ -1693,7 +1693,7 @@
       "decision_action": "Đỏ: quyết định đầu tư hạ tầng hoặc phương án dự phòng; ITA trình lãnh đạo.",
       "action_reference": "SOP-902 quyết định đầu tư hạ tầng; CDR hạ tầng IT.",
       "attribution_rule": "Downtime do nhà cung cấp hạ tầng/điện ngoài tầm tách khỏi phần thuộc ITA.",
-      "counter_metric": null,
+      "counter_metric": "SERVICE_TICKET_SLA",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
       "status": "retained"
@@ -1743,7 +1743,7 @@
       "decision_action": "Quá hạn: mở hành động làm sạch dữ liệu gốc; ITA + D-SCM xử lý.",
       "action_reference": "WI-202 T3 + hành động làm sạch dữ liệu; CDR quản trị dữ liệu.",
       "attribution_rule": "Ngoại lệ do nhập liệu sai ở phòng nghiệp vụ tách về phòng nguồn; ITA chịu phần quản trị.",
-      "counter_metric": null,
+      "counter_metric": "INVENTORY_ACCURACY",
       "reward_eligible": false,
       "calculation_status": "staged_data_contract",
       "status": "retained"

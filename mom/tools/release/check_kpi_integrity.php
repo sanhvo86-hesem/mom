@@ -24,7 +24,8 @@ declare(strict_types=1);
  *   4. Duplicate canonical_code among governance KPIs.
  *   5. A legacy alias maps to a code that is not a known metric.
  *   6. A gate metric linked_cdr references a CDR absent from ANNEX-121.
- *   7. reward_eligible=true but counter_metric is empty or not a known code.
+ *   7. A governance KPI is missing a counter_metric, or its counter is not a
+ *      known code / is the KPI itself.
  *
  * P1 findings (warn, do not block)
  * ────────────────────────────────
@@ -154,14 +155,18 @@ foreach ($governance as $row) {
         }
     }
 
-    // ── P0.7 — reward KPI must have a real counter-metric ────────────────────
-    if (($row['reward_eligible'] ?? false) === true) {
-        $counter = strtoupper(trim((string) ($row['counter_metric'] ?? '')));
-        if ($counter === '') {
-            $p0[] = "Registry $code: reward_eligible=true but counter_metric is empty.";
-        } elseif (!isset($knownCodes[$counter])) {
-            $p0[] = "Registry $code: counter_metric '$counter' is not a known metric code.";
-        }
+    // ── P0.7 — every governance KPI must have a real counter-metric ──────────
+    // A counter-metric is the opposite-pressure metric that blocks gaming;
+    // it is mandatory for every company / value-stream / department KPI and
+    // must resolve to a known metric code (and never to the KPI itself).
+    $counter = strtoupper(trim((string) ($row['counter_metric'] ?? '')));
+    if ($counter === '') {
+        $p0[] = "Registry $code: counter_metric is empty — every governance KPI "
+            . "needs an anti-gaming counter-metric.";
+    } elseif (!isset($knownCodes[$counter])) {
+        $p0[] = "Registry $code: counter_metric '$counter' is not a known metric code.";
+    } elseif ($counter === $code) {
+        $p0[] = "Registry $code: counter_metric cannot be the KPI itself.";
     }
 
     // ── P1 — lag without lead pairing ────────────────────────────────────────

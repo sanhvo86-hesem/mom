@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-05-21T19:41:56+00:00",
+    "generated_at": "2026-05-21T23:47:04+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
     "registry_version": "2026-05-21",
@@ -17,7 +17,7 @@
         "html_file_count": 869,
         "documents_with_metric_usage": 256,
         "registry_metric_count": 76,
-        "metric_codes_seen": 141,
+        "metric_codes_seen": 145,
         "executive_scorecard_metrics_seen": 15,
         "role_measure_codes_seen": 95,
         "findings_total": 11,
@@ -58,7 +58,7 @@
                 "red_below": 90
             },
             "expected_target_text": "≥95%",
-            "total_occurrences": 391,
+            "total_occurrences": 393,
             "documents_count": 147,
             "target_values_seen": [
                 "<90%",
@@ -79,6 +79,20 @@
                     "context_fit": {
                         "status": "ok",
                         "reason": "Context acceptable or informational."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 12,
+                    "matched_terms": [
+                        "OTD"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
                     }
                 },
                 {
@@ -121,20 +135,6 @@
                     "context_fit": {
                         "status": "ok",
                         "reason": "Context acceptable or informational."
-                    }
-                },
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 10,
-                    "matched_terms": [
-                        "OTD"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
                     }
                 },
                 {
@@ -4136,8 +4136,8 @@
                 "red_below": 80
             },
             "expected_target_text": "≥90%",
-            "total_occurrences": 20,
-            "documents_count": 18,
+            "total_occurrences": 21,
+            "documents_count": 19,
             "target_values_seen": [],
             "documents": [
                 {
@@ -4167,6 +4167,20 @@
                     "context_fit": {
                         "status": "ok",
                         "reason": "Context acceptable or informational."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "CAPA_EFFECTIVENESS"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
                     }
                 },
                 {
@@ -4846,7 +4860,7 @@
                 "red_above": 2
             },
             "expected_target_text": "≤1 complaints_per_100_shipments",
-            "total_occurrences": 41,
+            "total_occurrences": 42,
             "documents_count": 10,
             "target_values_seen": [],
             "documents": [
@@ -4921,6 +4935,20 @@
                     }
                 },
                 {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 3,
+                    "matched_terms": [
+                        "COMPLAINT_RATE"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                },
+                {
                     "path": "mom/docs/system/organization/04-RACI-Authority/_raci-master-matrix.en.html",
                     "title": "Responsibility Matrix (RACI) Overview | HESEM MOM",
                     "bucket": "raci_authority",
@@ -4946,20 +4974,6 @@
                     "context_fit": {
                         "status": "ok",
                         "reason": "Context acceptable or informational."
-                    }
-                },
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 2,
-                    "matched_terms": [
-                        "COMPLAINT_RATE"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
                     }
                 },
                 {
@@ -5022,7 +5036,7 @@
             "statistical_plan_status": "candidate_data_contract_required_before_payout",
             "expected_thresholds": null,
             "expected_target_text": null,
-            "total_occurrences": 12,
+            "total_occurrences": 14,
             "documents_count": 10,
             "target_values_seen": [
                 "≥ 99%"
@@ -5032,7 +5046,7 @@
                     "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
                     "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
                     "bucket": "annex_references",
-                    "occurrences": 2,
+                    "occurrences": 4,
                     "matched_terms": [
                         "INVENTORY ACCURACY",
                         "INVENTORY_ACCURACY"
@@ -5324,7 +5338,7 @@
             "statistical_plan_status": "candidate_data_contract_required_before_payout",
             "expected_thresholds": null,
             "expected_target_text": null,
-            "total_occurrences": 12,
+            "total_occurrences": 13,
             "documents_count": 6,
             "target_values_seen": [],
             "documents": [
@@ -5332,7 +5346,7 @@
                     "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
                     "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
                     "bucket": "annex_references",
-                    "occurrences": 4,
+                    "occurrences": 5,
                     "matched_terms": [
                         "PLAN ADHERENCE",
                         "PLAN_ADHERENCE"
@@ -10064,6 +10078,90 @@
             "name_consistency": "canonical_or_mapped_name"
         },
         {
+            "code": "FAI_FIRST_PASS",
+            "display_name": "FAI/first-piece first-pass acceptance",
+            "classification": "executive_scorecard_kpi",
+            "registry_sources": [
+                "legacy_aliases",
+                "annex122_governance_kpis",
+                "gate_control_metrics",
+                "proposed_operating_metrics",
+                "scorecard_operating_model",
+                "scorecard_evidence_contracts",
+                "metric_governance_overrides"
+            ],
+            "aliases": [
+                "FAI_FIRST_PASS_RATE"
+            ],
+            "local_ids": [
+                "KPI-G4-01"
+            ],
+            "backend_status": "retained_from_annex122",
+            "scorecard_weight_pct": 7,
+            "scorecard_target": 98,
+            "scorecard_unit": "percent",
+            "scorecard_scoring_status": "candidate_data_contract",
+            "scorecard_contributes_to_reward": false,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout",
+            "expected_thresholds": {
+                "stretch_min": 99,
+                "green_min": 98,
+                "yellow_min": 95,
+                "red_below": 95
+            },
+            "expected_target_text": "≥98%",
+            "total_occurrences": 6,
+            "documents_count": 3,
+            "target_values_seen": [],
+            "documents": [
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 4,
+                    "matched_terms": [
+                        "FAI_FIRST_PASS"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-126-hoshin-strategy-deployment-and-catchball.html",
+                    "title": "ANNEX-126 - Hoshin Strategy Deployment and Catchball | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "FAI_FIRST_PASS"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Context acceptable or informational."
+                    }
+                },
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-127-kpi-authority-registry-and-operational-metrics.html",
+                    "title": "ANNEX-127 - KPI Authority Registry and Operational Metrics | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "FAI_FIRST_PASS"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                }
+            ],
+            "finding_codes": [],
+            "target_consistency": "registered_target_not_repeated_in_docs",
+            "name_consistency": "canonical_or_mapped_name"
+        },
+        {
             "code": "OEE_BOTTLENECK",
             "display_name": "OEE at current constraint resource",
             "classification": "executive_scorecard_kpi",
@@ -10130,90 +10228,6 @@
                     "occurrences": 1,
                     "matched_terms": [
                         "OEE_BOTTLENECK"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    }
-                }
-            ],
-            "finding_codes": [],
-            "target_consistency": "registered_target_not_repeated_in_docs",
-            "name_consistency": "canonical_or_mapped_name"
-        },
-        {
-            "code": "FAI_FIRST_PASS",
-            "display_name": "FAI/first-piece first-pass acceptance",
-            "classification": "executive_scorecard_kpi",
-            "registry_sources": [
-                "legacy_aliases",
-                "annex122_governance_kpis",
-                "gate_control_metrics",
-                "proposed_operating_metrics",
-                "scorecard_operating_model",
-                "scorecard_evidence_contracts",
-                "metric_governance_overrides"
-            ],
-            "aliases": [
-                "FAI_FIRST_PASS_RATE"
-            ],
-            "local_ids": [
-                "KPI-G4-01"
-            ],
-            "backend_status": "retained_from_annex122",
-            "scorecard_weight_pct": 7,
-            "scorecard_target": 98,
-            "scorecard_unit": "percent",
-            "scorecard_scoring_status": "candidate_data_contract",
-            "scorecard_contributes_to_reward": false,
-            "statistical_plan_status": "candidate_data_contract_required_before_payout",
-            "expected_thresholds": {
-                "stretch_min": 99,
-                "green_min": 98,
-                "yellow_min": 95,
-                "red_below": 95
-            },
-            "expected_target_text": "≥98%",
-            "total_occurrences": 4,
-            "documents_count": 3,
-            "target_values_seen": [],
-            "documents": [
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 2,
-                    "matched_terms": [
-                        "FAI_FIRST_PASS"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    }
-                },
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-126-hoshin-strategy-deployment-and-catchball.html",
-                    "title": "ANNEX-126 - Hoshin Strategy Deployment and Catchball | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "FAI_FIRST_PASS"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Context acceptable or informational."
-                    }
-                },
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-127-kpi-authority-registry-and-operational-metrics.html",
-                    "title": "ANNEX-127 - KPI Authority Registry and Operational Metrics | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "FAI_FIRST_PASS"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -14148,6 +14162,48 @@
             "name_consistency": "canonical_or_mapped_name"
         },
         {
+            "code": "INVOICE_RFT",
+            "display_name": "Invoice Right-First-Time",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "annex122_governance_kpis"
+            ],
+            "aliases": [],
+            "local_ids": [],
+            "backend_status": "runtime_calculated",
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract",
+            "expected_thresholds": null,
+            "expected_target_text": null,
+            "total_occurrences": 4,
+            "documents_count": 1,
+            "target_values_seen": [],
+            "documents": [
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 4,
+                    "matched_terms": [
+                        "INVOICE_RFT"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                }
+            ],
+            "finding_codes": [],
+            "target_consistency": "no_registered_target_no_local_target",
+            "name_consistency": "canonical_or_mapped_name"
+        },
+        {
             "code": "QUOTE_HIT_RATE",
             "display_name": "Quote Hit Rate vs Qualified RFQ",
             "classification": "governance_kpi",
@@ -14177,6 +14233,137 @@
                     "matched_terms": [
                         "QUOTE HIT RATE",
                         "QUOTE_HIT_RATE"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                }
+            ],
+            "finding_codes": [],
+            "target_consistency": "no_registered_target_no_local_target",
+            "name_consistency": "canonical_or_mapped_name"
+        },
+        {
+            "code": "RECORDABLE_INCIDENT_RATE",
+            "display_name": "Recordable Incident / LTI Rate",
+            "classification": "safety_gate",
+            "registry_sources": [
+                "annex122_governance_kpis",
+                "scorecard_operating_model",
+                "scorecard_evidence_contracts",
+                "metric_governance_overrides"
+            ],
+            "aliases": [],
+            "local_ids": [],
+            "backend_status": "not_declared",
+            "scorecard_weight_pct": 0,
+            "scorecard_target": 0,
+            "scorecard_unit": "count",
+            "scorecard_scoring_status": "gate_only",
+            "scorecard_contributes_to_reward": false,
+            "statistical_plan_status": "not_declared_or_informational",
+            "expected_thresholds": {
+                "green_max": 0,
+                "yellow_condition": "0 recordable incidents but high-potential near-miss action overdue",
+                "red_above": 0
+            },
+            "expected_target_text": "≤0 count",
+            "total_occurrences": 3,
+            "documents_count": 1,
+            "target_values_seen": [],
+            "documents": [
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 3,
+                    "matched_terms": [
+                        "RECORDABLE_INCIDENT_RATE"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                }
+            ],
+            "finding_codes": [],
+            "target_consistency": "registered_target_not_repeated_in_docs",
+            "name_consistency": "canonical_or_mapped_name"
+        },
+        {
+            "code": "CRITICAL_ROLE_BACKUP_COVERAGE",
+            "display_name": "Certified Role Backup Coverage",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "aliases": [],
+            "local_ids": [],
+            "backend_status": "not_declared",
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
+            "statistical_plan_status": "not_declared_or_informational",
+            "expected_thresholds": null,
+            "expected_target_text": null,
+            "total_occurrences": 2,
+            "documents_count": 1,
+            "target_values_seen": [],
+            "documents": [
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 2,
+                    "matched_terms": [
+                        "CRITICAL_ROLE_BACKUP_COVERAGE"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                }
+            ],
+            "finding_codes": [],
+            "target_consistency": "no_registered_target_no_local_target",
+            "name_consistency": "canonical_or_mapped_name"
+        },
+        {
+            "code": "CRITICAL_SYSTEM_AVAILABILITY",
+            "display_name": "Critical System Availability / Readiness",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "aliases": [],
+            "local_ids": [],
+            "backend_status": "not_declared",
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
+            "statistical_plan_status": "not_declared_or_informational",
+            "expected_thresholds": null,
+            "expected_target_text": null,
+            "total_occurrences": 2,
+            "documents_count": 1,
+            "target_values_seen": [],
+            "documents": [
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 2,
+                    "matched_terms": [
+                        "CRITICAL SYSTEM AVAILABILITY",
+                        "CRITICAL_SYSTEM_AVAILABILITY"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -14239,6 +14426,97 @@
             "name_consistency": "legacy_alias_seen"
         },
         {
+            "code": "GROSS_MARGIN_JOB_FAMILY",
+            "display_name": "Gross Margin by Job / Product Family",
+            "classification": "executive_scorecard_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis",
+                "scorecard_operating_model",
+                "scorecard_evidence_contracts",
+                "metric_governance_overrides"
+            ],
+            "aliases": [],
+            "local_ids": [],
+            "backend_status": "not_declared",
+            "scorecard_weight_pct": 8,
+            "scorecard_target": 28,
+            "scorecard_unit": "percent",
+            "scorecard_scoring_status": "candidate_data_contract",
+            "scorecard_contributes_to_reward": false,
+            "statistical_plan_status": "candidate_data_contract_required_before_payout",
+            "expected_thresholds": {
+                "stretch_min": 35,
+                "green_min": 28,
+                "yellow_min": 22,
+                "red_below": 22
+            },
+            "expected_target_text": "≥28%",
+            "total_occurrences": 2,
+            "documents_count": 1,
+            "target_values_seen": [],
+            "documents": [
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 2,
+                    "matched_terms": [
+                        "GROSS_MARGIN_JOB_FAMILY"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                }
+            ],
+            "finding_codes": [],
+            "target_consistency": "registered_target_not_repeated_in_docs",
+            "name_consistency": "canonical_or_mapped_name"
+        },
+        {
+            "code": "MATERIAL_AVAILABILITY_PLAN",
+            "display_name": "Material Availability for Plan",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "runtime_calculated_metrics",
+                "annex122_governance_kpis"
+            ],
+            "aliases": [],
+            "local_ids": [],
+            "backend_status": "runtime_calculated",
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
+            "statistical_plan_status": "runtime_calculated_with_registry_contract",
+            "expected_thresholds": null,
+            "expected_target_text": null,
+            "total_occurrences": 2,
+            "documents_count": 1,
+            "target_values_seen": [],
+            "documents": [
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 2,
+                    "matched_terms": [
+                        "MATERIAL_AVAILABILITY_PLAN"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                }
+            ],
+            "finding_codes": [],
+            "target_consistency": "no_registered_target_no_local_target",
+            "name_consistency": "canonical_or_mapped_name"
+        },
+        {
             "code": "REWORK_RATE",
             "display_name": "REWORK_RATE",
             "classification": "local_or_unmapped_metric",
@@ -14280,8 +14558,52 @@
             "name_consistency": "unmapped_or_local_name"
         },
         {
-            "code": "CRITICAL_ROLE_BACKUP_COVERAGE",
-            "display_name": "Certified Role Backup Coverage",
+            "code": "SHIP_READY_TO_INVOICE_LT",
+            "display_name": "Ship-to-Invoice Turnaround",
+            "classification": "gate_control_metric",
+            "registry_sources": [
+                "annex122_governance_kpis",
+                "gate_control_metrics"
+            ],
+            "aliases": [],
+            "local_ids": [
+                "KPI-G7-02"
+            ],
+            "backend_status": "not_declared",
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
+            "statistical_plan_status": "gate_hold_release_evidence_not_payout",
+            "expected_thresholds": null,
+            "expected_target_text": null,
+            "total_occurrences": 2,
+            "documents_count": 1,
+            "target_values_seen": [],
+            "documents": [
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 2,
+                    "matched_terms": [
+                        "SHIP_READY_TO_INVOICE_LT"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                }
+            ],
+            "finding_codes": [],
+            "target_consistency": "no_registered_target_no_local_target",
+            "name_consistency": "canonical_or_mapped_name"
+        },
+        {
+            "code": "BCP_READINESS",
+            "display_name": "Business Continuity Readiness",
             "classification": "governance_kpi",
             "registry_sources": [
                 "annex122_governance_kpis"
@@ -14307,7 +14629,7 @@
                     "bucket": "annex_references",
                     "occurrences": 1,
                     "matched_terms": [
-                        "CRITICAL_ROLE_BACKUP_COVERAGE"
+                        "BCP_READINESS"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -14370,47 +14692,6 @@
             "name_consistency": "canonical_or_mapped_name"
         },
         {
-            "code": "CRITICAL_SYSTEM_AVAILABILITY",
-            "display_name": "Critical System Availability / Readiness",
-            "classification": "governance_kpi",
-            "registry_sources": [
-                "annex122_governance_kpis"
-            ],
-            "aliases": [],
-            "local_ids": [],
-            "backend_status": "not_declared",
-            "scorecard_weight_pct": null,
-            "scorecard_target": null,
-            "scorecard_unit": null,
-            "scorecard_scoring_status": null,
-            "scorecard_contributes_to_reward": null,
-            "statistical_plan_status": "not_declared_or_informational",
-            "expected_thresholds": null,
-            "expected_target_text": null,
-            "total_occurrences": 1,
-            "documents_count": 1,
-            "target_values_seen": [],
-            "documents": [
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "CRITICAL SYSTEM AVAILABILITY"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    }
-                }
-            ],
-            "finding_codes": [],
-            "target_consistency": "no_registered_target_no_local_target",
-            "name_consistency": "canonical_or_mapped_name"
-        },
-        {
             "code": "CYCLE_TIME_VARIANCE",
             "display_name": "Actual cycle time variance vs standard",
             "classification": "operating_metric",
@@ -14443,6 +14724,47 @@
                     "occurrences": 1,
                     "matched_terms": [
                         "CYCLE_TIME_VARIANCE"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                }
+            ],
+            "finding_codes": [],
+            "target_consistency": "no_registered_target_no_local_target",
+            "name_consistency": "canonical_or_mapped_name"
+        },
+        {
+            "code": "ENGINEERING_RELEASE_ON_TIME",
+            "display_name": "Engineering Release On Time",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "aliases": [],
+            "local_ids": [],
+            "backend_status": "not_declared",
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
+            "statistical_plan_status": "not_declared_or_informational",
+            "expected_thresholds": null,
+            "expected_target_text": null,
+            "total_occurrences": 1,
+            "documents_count": 1,
+            "target_values_seen": [],
+            "documents": [
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "ENGINEERING_RELEASE_ON_TIME"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -14497,55 +14819,6 @@
             "name_consistency": "canonical_or_mapped_name"
         },
         {
-            "code": "GROSS_MARGIN_JOB_FAMILY",
-            "display_name": "Gross Margin by Job / Product Family",
-            "classification": "executive_scorecard_kpi",
-            "registry_sources": [
-                "annex122_governance_kpis",
-                "scorecard_operating_model",
-                "scorecard_evidence_contracts",
-                "metric_governance_overrides"
-            ],
-            "aliases": [],
-            "local_ids": [],
-            "backend_status": "not_declared",
-            "scorecard_weight_pct": 8,
-            "scorecard_target": 28,
-            "scorecard_unit": "percent",
-            "scorecard_scoring_status": "candidate_data_contract",
-            "scorecard_contributes_to_reward": false,
-            "statistical_plan_status": "candidate_data_contract_required_before_payout",
-            "expected_thresholds": {
-                "stretch_min": 35,
-                "green_min": 28,
-                "yellow_min": 22,
-                "red_below": 22
-            },
-            "expected_target_text": "≥28%",
-            "total_occurrences": 1,
-            "documents_count": 1,
-            "target_values_seen": [],
-            "documents": [
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "GROSS_MARGIN_JOB_FAMILY"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    }
-                }
-            ],
-            "finding_codes": [],
-            "target_consistency": "registered_target_not_repeated_in_docs",
-            "name_consistency": "canonical_or_mapped_name"
-        },
-        {
             "code": "INCIDENT_ACTION_CLOSURE_AGING",
             "display_name": "Incident Action Closure Aging",
             "classification": "governance_kpi",
@@ -14575,48 +14848,6 @@
                     "occurrences": 1,
                     "matched_terms": [
                         "INCIDENT_ACTION_CLOSURE_AGING"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    }
-                }
-            ],
-            "finding_codes": [],
-            "target_consistency": "no_registered_target_no_local_target",
-            "name_consistency": "canonical_or_mapped_name"
-        },
-        {
-            "code": "INVOICE_RFT",
-            "display_name": "Invoice Right-First-Time",
-            "classification": "governance_kpi",
-            "registry_sources": [
-                "runtime_calculated_metrics",
-                "annex122_governance_kpis"
-            ],
-            "aliases": [],
-            "local_ids": [],
-            "backend_status": "runtime_calculated",
-            "scorecard_weight_pct": null,
-            "scorecard_target": null,
-            "scorecard_unit": null,
-            "scorecard_scoring_status": null,
-            "scorecard_contributes_to_reward": null,
-            "statistical_plan_status": "runtime_calculated_with_registry_contract",
-            "expected_thresholds": null,
-            "expected_target_text": null,
-            "total_occurrences": 1,
-            "documents_count": 1,
-            "target_values_seen": [],
-            "documents": [
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "INVOICE_RFT"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -14669,48 +14900,6 @@
                     "context_fit": {
                         "status": "ok",
                         "reason": "Context acceptable or informational."
-                    }
-                }
-            ],
-            "finding_codes": [],
-            "target_consistency": "no_registered_target_no_local_target",
-            "name_consistency": "canonical_or_mapped_name"
-        },
-        {
-            "code": "MATERIAL_AVAILABILITY_PLAN",
-            "display_name": "Material Availability for Plan",
-            "classification": "governance_kpi",
-            "registry_sources": [
-                "runtime_calculated_metrics",
-                "annex122_governance_kpis"
-            ],
-            "aliases": [],
-            "local_ids": [],
-            "backend_status": "runtime_calculated",
-            "scorecard_weight_pct": null,
-            "scorecard_target": null,
-            "scorecard_unit": null,
-            "scorecard_scoring_status": null,
-            "scorecard_contributes_to_reward": null,
-            "statistical_plan_status": "runtime_calculated_with_registry_contract",
-            "expected_thresholds": null,
-            "expected_target_text": null,
-            "total_occurrences": 1,
-            "documents_count": 1,
-            "target_values_seen": [],
-            "documents": [
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "MATERIAL_AVAILABILITY_PLAN"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
                     }
                 }
             ],
@@ -14804,54 +14993,6 @@
             "name_consistency": "canonical_or_mapped_name"
         },
         {
-            "code": "RECORDABLE_INCIDENT_RATE",
-            "display_name": "Recordable Incident / LTI Rate",
-            "classification": "safety_gate",
-            "registry_sources": [
-                "annex122_governance_kpis",
-                "scorecard_operating_model",
-                "scorecard_evidence_contracts",
-                "metric_governance_overrides"
-            ],
-            "aliases": [],
-            "local_ids": [],
-            "backend_status": "not_declared",
-            "scorecard_weight_pct": 0,
-            "scorecard_target": 0,
-            "scorecard_unit": "count",
-            "scorecard_scoring_status": "gate_only",
-            "scorecard_contributes_to_reward": false,
-            "statistical_plan_status": "not_declared_or_informational",
-            "expected_thresholds": {
-                "green_max": 0,
-                "yellow_condition": "0 recordable incidents but high-potential near-miss action overdue",
-                "red_above": 0
-            },
-            "expected_target_text": "≤0 count",
-            "total_occurrences": 1,
-            "documents_count": 1,
-            "target_values_seen": [],
-            "documents": [
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "RECORDABLE_INCIDENT_RATE"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    }
-                }
-            ],
-            "finding_codes": [],
-            "target_consistency": "registered_target_not_repeated_in_docs",
-            "name_consistency": "canonical_or_mapped_name"
-        },
-        {
             "code": "RFQ_TURNAROUND_TIME",
             "display_name": "RFQ Turnaround Time",
             "classification": "gate_control_metric",
@@ -14883,6 +15024,47 @@
                     "occurrences": 1,
                     "matched_terms": [
                         "RFQ_TURNAROUND_TIME"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                }
+            ],
+            "finding_codes": [],
+            "target_consistency": "no_registered_target_no_local_target",
+            "name_consistency": "canonical_or_mapped_name"
+        },
+        {
+            "code": "SAFETY_ONBOARDING_COMPLIANCE",
+            "display_name": "Safety Onboarding Training Compliance",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "aliases": [],
+            "local_ids": [],
+            "backend_status": "not_declared",
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
+            "statistical_plan_status": "not_declared_or_informational",
+            "expected_thresholds": null,
+            "expected_target_text": null,
+            "total_occurrences": 1,
+            "documents_count": 1,
+            "target_values_seen": [],
+            "documents": [
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "SAFETY_ONBOARDING_COMPLIANCE"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -14937,6 +15119,47 @@
             "name_consistency": "canonical_or_mapped_name"
         },
         {
+            "code": "SERVICE_TICKET_SLA",
+            "display_name": "Service Ticket Closure Within SLA",
+            "classification": "governance_kpi",
+            "registry_sources": [
+                "annex122_governance_kpis"
+            ],
+            "aliases": [],
+            "local_ids": [],
+            "backend_status": "not_declared",
+            "scorecard_weight_pct": null,
+            "scorecard_target": null,
+            "scorecard_unit": null,
+            "scorecard_scoring_status": null,
+            "scorecard_contributes_to_reward": null,
+            "statistical_plan_status": "not_declared_or_informational",
+            "expected_thresholds": null,
+            "expected_target_text": null,
+            "total_occurrences": 1,
+            "documents_count": 1,
+            "target_values_seen": [],
+            "documents": [
+                {
+                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
+                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
+                    "bucket": "annex_references",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "SERVICE_TICKET_SLA"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    }
+                }
+            ],
+            "finding_codes": [],
+            "target_consistency": "no_registered_target_no_local_target",
+            "name_consistency": "canonical_or_mapped_name"
+        },
+        {
             "code": "SHIP_PACKET_COMPLETENESS",
             "display_name": "Release Package Completeness",
             "classification": "gate_control_metric",
@@ -14978,50 +15201,6 @@
                     "context_fit": {
                         "status": "ok",
                         "reason": "Context acceptable or informational."
-                    }
-                }
-            ],
-            "finding_codes": [],
-            "target_consistency": "no_registered_target_no_local_target",
-            "name_consistency": "canonical_or_mapped_name"
-        },
-        {
-            "code": "SHIP_READY_TO_INVOICE_LT",
-            "display_name": "Ship-to-Invoice Turnaround",
-            "classification": "gate_control_metric",
-            "registry_sources": [
-                "annex122_governance_kpis",
-                "gate_control_metrics"
-            ],
-            "aliases": [],
-            "local_ids": [
-                "KPI-G7-02"
-            ],
-            "backend_status": "not_declared",
-            "scorecard_weight_pct": null,
-            "scorecard_target": null,
-            "scorecard_unit": null,
-            "scorecard_scoring_status": null,
-            "scorecard_contributes_to_reward": null,
-            "statistical_plan_status": "gate_hold_release_evidence_not_payout",
-            "expected_thresholds": null,
-            "expected_target_text": null,
-            "total_occurrences": 1,
-            "documents_count": 1,
-            "target_values_seen": [],
-            "documents": [
-                {
-                    "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
-                    "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
-                    "bucket": "annex_references",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "SHIP_READY_TO_INVOICE_LT"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
                     }
                 }
             ],
@@ -19899,14 +20078,14 @@
             "path": "mom/docs/operations/references/01-ANNEX-100/12-ANNEX-120-Authority-KPI-and-Deputy-Control/annex-122-kpi-cascade-dictionary.html",
             "title": "ANNEX-122 - KPI Cascade Dictionary | HESEM MOM",
             "bucket": "annex_references",
-            "metrics_count": 22,
-            "total_metric_occurrences": 45,
+            "metrics_count": 27,
+            "total_metric_occurrences": 68,
             "metrics": [
                 {
                     "code": "OTD",
                     "display_name": "On-Time Delivery (gate view)",
                     "classification": "executive_scorecard_kpi",
-                    "occurrences": 10,
+                    "occurrences": 12,
                     "matched_terms": [
                         "OTD"
                     ],
@@ -19936,10 +20115,71 @@
                     "code": "PLAN_ADHERENCE",
                     "display_name": "Dispatch/Plan Adherence",
                     "classification": "governance_kpi",
-                    "occurrences": 4,
+                    "occurrences": 5,
                     "matched_terms": [
                         "PLAN ADHERENCE",
                         "PLAN_ADHERENCE"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    },
+                    "row_snippets": []
+                },
+                {
+                    "code": "FAI_FIRST_PASS",
+                    "display_name": "FAI/first-piece first-pass acceptance",
+                    "classification": "executive_scorecard_kpi",
+                    "occurrences": 4,
+                    "matched_terms": [
+                        "FAI_FIRST_PASS"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    },
+                    "row_snippets": []
+                },
+                {
+                    "code": "INVENTORY_ACCURACY",
+                    "display_name": "Inventory Accuracy",
+                    "classification": "governance_kpi",
+                    "occurrences": 4,
+                    "matched_terms": [
+                        "INVENTORY ACCURACY",
+                        "INVENTORY_ACCURACY"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    },
+                    "row_snippets": []
+                },
+                {
+                    "code": "INVOICE_RFT",
+                    "display_name": "Invoice Right-First-Time",
+                    "classification": "governance_kpi",
+                    "occurrences": 4,
+                    "matched_terms": [
+                        "INVOICE_RFT"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    },
+                    "row_snippets": []
+                },
+                {
+                    "code": "COMPLAINT_RATE",
+                    "display_name": "Customer Quality Escape / Complaint Rate",
+                    "classification": "executive_scorecard_kpi",
+                    "occurrences": 3,
+                    "matched_terms": [
+                        "COMPLAINT_RATE"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -19965,12 +20205,12 @@
                     "row_snippets": []
                 },
                 {
-                    "code": "COMPLAINT_RATE",
-                    "display_name": "Customer Quality Escape / Complaint Rate",
-                    "classification": "executive_scorecard_kpi",
-                    "occurrences": 2,
+                    "code": "RECORDABLE_INCIDENT_RATE",
+                    "display_name": "Recordable Incident / LTI Rate",
+                    "classification": "safety_gate",
+                    "occurrences": 3,
                     "matched_terms": [
-                        "COMPLAINT_RATE"
+                        "RECORDABLE_INCIDENT_RATE"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -19980,28 +20220,73 @@
                     "row_snippets": []
                 },
                 {
-                    "code": "FAI_FIRST_PASS",
-                    "display_name": "FAI/first-piece first-pass acceptance",
-                    "classification": "executive_scorecard_kpi",
-                    "occurrences": 2,
-                    "matched_terms": [
-                        "FAI_FIRST_PASS"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    },
-                    "row_snippets": []
-                },
-                {
-                    "code": "INVENTORY_ACCURACY",
-                    "display_name": "Inventory Accuracy",
+                    "code": "CRITICAL_ROLE_BACKUP_COVERAGE",
+                    "display_name": "Certified Role Backup Coverage",
                     "classification": "governance_kpi",
                     "occurrences": 2,
                     "matched_terms": [
-                        "INVENTORY ACCURACY",
-                        "INVENTORY_ACCURACY"
+                        "CRITICAL_ROLE_BACKUP_COVERAGE"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    },
+                    "row_snippets": []
+                },
+                {
+                    "code": "CRITICAL_SYSTEM_AVAILABILITY",
+                    "display_name": "Critical System Availability / Readiness",
+                    "classification": "governance_kpi",
+                    "occurrences": 2,
+                    "matched_terms": [
+                        "CRITICAL SYSTEM AVAILABILITY",
+                        "CRITICAL_SYSTEM_AVAILABILITY"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    },
+                    "row_snippets": []
+                },
+                {
+                    "code": "GROSS_MARGIN_JOB_FAMILY",
+                    "display_name": "Gross Margin by Job / Product Family",
+                    "classification": "executive_scorecard_kpi",
+                    "occurrences": 2,
+                    "matched_terms": [
+                        "GROSS_MARGIN_JOB_FAMILY"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    },
+                    "row_snippets": []
+                },
+                {
+                    "code": "MATERIAL_AVAILABILITY_PLAN",
+                    "display_name": "Material Availability for Plan",
+                    "classification": "governance_kpi",
+                    "occurrences": 2,
+                    "matched_terms": [
+                        "MATERIAL_AVAILABILITY_PLAN"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    },
+                    "row_snippets": []
+                },
+                {
+                    "code": "SHIP_READY_TO_INVOICE_LT",
+                    "display_name": "Ship-to-Invoice Turnaround",
+                    "classification": "gate_control_metric",
+                    "occurrences": 2,
+                    "matched_terms": [
+                        "SHIP_READY_TO_INVOICE_LT"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -20027,12 +20312,12 @@
                     "row_snippets": []
                 },
                 {
-                    "code": "CRITICAL_ROLE_BACKUP_COVERAGE",
-                    "display_name": "Certified Role Backup Coverage",
+                    "code": "BCP_READINESS",
+                    "display_name": "Business Continuity Readiness",
                     "classification": "governance_kpi",
                     "occurrences": 1,
                     "matched_terms": [
-                        "CRITICAL_ROLE_BACKUP_COVERAGE"
+                        "BCP_READINESS"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -20042,12 +20327,27 @@
                     "row_snippets": []
                 },
                 {
-                    "code": "CRITICAL_SYSTEM_AVAILABILITY",
-                    "display_name": "Critical System Availability / Readiness",
+                    "code": "CAPA_EFFECTIVENESS",
+                    "display_name": "CAPA effectiveness after verification window",
+                    "classification": "executive_scorecard_kpi",
+                    "occurrences": 1,
+                    "matched_terms": [
+                        "CAPA_EFFECTIVENESS"
+                    ],
+                    "target_values_seen": [],
+                    "context_fit": {
+                        "status": "ok",
+                        "reason": "Authority or scorecard document."
+                    },
+                    "row_snippets": []
+                },
+                {
+                    "code": "ENGINEERING_RELEASE_ON_TIME",
+                    "display_name": "Engineering Release On Time",
                     "classification": "governance_kpi",
                     "occurrences": 1,
                     "matched_terms": [
-                        "CRITICAL SYSTEM AVAILABILITY"
+                        "ENGINEERING_RELEASE_ON_TIME"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -20087,57 +20387,12 @@
                     "row_snippets": []
                 },
                 {
-                    "code": "GROSS_MARGIN_JOB_FAMILY",
-                    "display_name": "Gross Margin by Job / Product Family",
-                    "classification": "executive_scorecard_kpi",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "GROSS_MARGIN_JOB_FAMILY"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    },
-                    "row_snippets": []
-                },
-                {
                     "code": "INCIDENT_ACTION_CLOSURE_AGING",
                     "display_name": "Incident Action Closure Aging",
                     "classification": "governance_kpi",
                     "occurrences": 1,
                     "matched_terms": [
                         "INCIDENT_ACTION_CLOSURE_AGING"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    },
-                    "row_snippets": []
-                },
-                {
-                    "code": "INVOICE_RFT",
-                    "display_name": "Invoice Right-First-Time",
-                    "classification": "governance_kpi",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "INVOICE_RFT"
-                    ],
-                    "target_values_seen": [],
-                    "context_fit": {
-                        "status": "ok",
-                        "reason": "Authority or scorecard document."
-                    },
-                    "row_snippets": []
-                },
-                {
-                    "code": "MATERIAL_AVAILABILITY_PLAN",
-                    "display_name": "Material Availability for Plan",
-                    "classification": "governance_kpi",
-                    "occurrences": 1,
-                    "matched_terms": [
-                        "MATERIAL_AVAILABILITY_PLAN"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -20162,12 +20417,12 @@
                     "row_snippets": []
                 },
                 {
-                    "code": "RECORDABLE_INCIDENT_RATE",
-                    "display_name": "Recordable Incident / LTI Rate",
-                    "classification": "safety_gate",
+                    "code": "RFQ_TURNAROUND_TIME",
+                    "display_name": "RFQ Turnaround Time",
+                    "classification": "gate_control_metric",
                     "occurrences": 1,
                     "matched_terms": [
-                        "RECORDABLE_INCIDENT_RATE"
+                        "RFQ_TURNAROUND_TIME"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -20177,12 +20432,12 @@
                     "row_snippets": []
                 },
                 {
-                    "code": "RFQ_TURNAROUND_TIME",
-                    "display_name": "RFQ Turnaround Time",
-                    "classification": "gate_control_metric",
+                    "code": "SAFETY_ONBOARDING_COMPLIANCE",
+                    "display_name": "Safety Onboarding Training Compliance",
+                    "classification": "governance_kpi",
                     "occurrences": 1,
                     "matched_terms": [
-                        "RFQ_TURNAROUND_TIME"
+                        "SAFETY_ONBOARDING_COMPLIANCE"
                     ],
                     "target_values_seen": [],
                     "context_fit": {
@@ -20207,12 +20462,12 @@
                     "row_snippets": []
                 },
                 {
-                    "code": "SHIP_READY_TO_INVOICE_LT",
-                    "display_name": "Ship-to-Invoice Turnaround",
-                    "classification": "gate_control_metric",
+                    "code": "SERVICE_TICKET_SLA",
+                    "display_name": "Service Ticket Closure Within SLA",
+                    "classification": "governance_kpi",
                     "occurrences": 1,
                     "matched_terms": [
-                        "SHIP_READY_TO_INVOICE_LT"
+                        "SERVICE_TICKET_SLA"
                     ],
                     "target_values_seen": [],
                     "context_fit": {

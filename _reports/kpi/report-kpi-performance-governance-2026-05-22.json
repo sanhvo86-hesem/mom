@@ -1,5 +1,5 @@
 {
-    "generated_at": "2026-05-21T19:41:47+00:00",
+    "generated_at": "2026-05-21T23:46:55+00:00",
     "scanned_root": "mom/docs",
     "registry_id": "KPI-AUTHORITY-CNC-OPS",
     "registry_version": "2026-05-21",
@@ -2593,10 +2593,14 @@
                 "KPI-GX"
             ],
             "canonical_metric_codes": [
+                "BCP_READINESS",
+                "CAPA_EFFECTIVENESS",
                 "COMPLAINT_RATE",
                 "CRITICAL_ROLE_BACKUP_COVERAGE",
+                "CRITICAL_SYSTEM_AVAILABILITY",
                 "DOWNTIME",
                 "DSO",
+                "ENGINEERING_RELEASE_ON_TIME",
                 "FAI_FIRST_PASS",
                 "FINAL_RELEASE_RFT",
                 "FPY",
@@ -2611,8 +2615,9 @@
                 "QUOTE_HIT_RATE",
                 "RECORDABLE_INCIDENT_RATE",
                 "RFQ_TURNAROUND_TIME",
+                "SAFETY_ONBOARDING_COMPLIANCE",
                 "SCHEDULE_RECOVERY_EFFECTIVENESS",
-                "SETUP",
+                "SERVICE_TICKET_SLA",
                 "SHIP_READY_TO_INVOICE_LT",
                 "SUPPLIER_OTD"
             ],
